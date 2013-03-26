@@ -58,16 +58,10 @@ def gluinoSMSes ( n ):
   weakinos=n["C1"]+n["N2"]+n["C2"]+n["N3"]
   if weakinos==0 and n["t"]==4:
     return "T1tttt"
-  if weakinos==0 and n["b"]==4 and n["W"]==4:
-    return "T1tttt*"
   if n["t"]==4: return "T1tttt+"
-  if weakinos==0 and n["b"]==4:
-    return "T1bbbb"
   if weakinos==2 and n["N2"]==2:
     if n["Z"]==2:
       return "T5zz"
-    if n["photon"]==2:
-      return "T5gg"
     return "T5NN"
   if n["higgs"]==2 and weakinos == 2 and n["N2"]==2:
       return "T5hh"
@@ -89,8 +83,6 @@ def gluinoSMSes ( n ):
     return "T3N"
   if n["C1"]==1 and n["N2"]==0 and n["higgs"]==0:
     if n["W"]==1:
-      if n["b"]==2:
-        return "T3wb"
       return "T3w"
     return "T3C"
   if weakinos==1 and n["N2"]==1  and n["Z"]==0 and n["higgs"]==1:
@@ -104,7 +96,7 @@ def gluinoSMSes ( n ):
   return "T1+"
 
 def squarkSMSes ( n ):
-  nPs=n["jet"]+n["neutrino"]+n["electron"]+n["muon"]+n["tau"]
+  nPs=n["jets"]+n["neutrino"]+n["electron"]+n["muon"]+n["tau"]
   if n["C2"]==2 and n["N3"]==0:
     return "T6C2C2"
   if n["N3"]==2 and n["C2"]==0:
@@ -209,7 +201,7 @@ def weakinoSMSes ( n ):
       return "TChizh"
     if n["pC1"]==0 and n["pN2"]==2 and n["higgs"]>=1 and n["Z"]>=1 and n["slepton"]==0:
       return "TChizh+"
-    nPs=n["jet"]+n["neutrino"]+n["electron"]+n["muon"]+n["tau"]+n["b"]+n["t"]
+    nPs=n["jets"]+n["neutrino"]+n["electron"]+n["muon"]+n["tau"]+n["b"]+n["t"]
     if n["pC1"]==0 and n["pN2"]==2 and n["slepton"]==0 and n["sneutrino"]==0:
       if nPs==4:
         return "TChiN2N2"
@@ -274,12 +266,6 @@ def weakinoSMSes ( n ):
       return "TChiSnuSlep"
     if n["pN2"]==1 and n["pC1"]==1 and n["slepton"]==1 and n["sneutrino"]==1:
       return "TChiChipmSnuSlep"
-    if n["pN2"]==1 and n["pC1"]==1 and n["slepton"]==2 and n["sneutrino"]==0:
-      return "TChiChipmSlepSlep"
-    if n["pC1"]==2 and n["slepton"]==2:
-      return "TChipmSlepSlep"
-    if n["pC1"]==2 and n["sneutrino"]==2:
-      return "TChipmSnuSnu"
     if n["pC1"]==2 and sleptons==2:
       return "TChipmSnuSlep"
     if ( n["pN2"] + n["pC1"])==2 and ( n["slepton"] + n["sneutrino"] )==2: 
@@ -484,7 +470,7 @@ def particle ( pid ):
   if p==36: return "higgs"
   if p==37: return "higgs"
   if p==23: return "Z"
-  if p==22: return "photon"
+  if p==22: return "photons"
   if p==24: return "W"
   if p==16: return "neutrino"
   if p==15: return "tau"
@@ -493,9 +479,8 @@ def particle ( pid ):
   if p==12: return "neutrino"
   if p==11: return "electron"
   if p==5: return "b"
-  if p==6: return "t"
-  if p==21: return "gluon"
-  if p>=1 and p<=4: return "jet"
+  if p==6: return "top"
+  if p>=1 and p<=4: return "jets"
   return str(p)
 
 allproduction=[ "ss", "gg", "??", "ng", "ns", "tb", "bb", "sb", "tt", "ll" ]
@@ -515,8 +500,8 @@ empty={ "T1general":0, "??":0, "ss":0, "gg": 0, "sg": 0, "nn": 0, "ng": 0,
          "TChiwn": 0, "TChizn": 0, "TChinn":0, "TChizh": 0, "TChiwh": 0,
          "T5zw":0, "T3z":0, "T4z":0, "noncolored":0, "TGQ": 0, "total":0 }
 
-countingvariables=[ "jet", "electron", "muon", "gluino", "squark",
-  "gluon", "stop", "squarkbar", "sbottom", "N1", "photon",
+countingvariables=[ "jets", "electron", "muon", "gluino", "squark",
+  "stop", "squarkbar", "sbottom", "N1", "photons",
   "N2", "pN2", "C1", "pC1", "pC2", "pN3", "C2", "N3",
   "Z", "W", "t", "b", "higgs", "pgluino", "psquark", "tau",
   "pN1", "slepton", "sneutrino", "msugra_m12", "msugra_m0", "?s",

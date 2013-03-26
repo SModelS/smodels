@@ -4,21 +4,6 @@
 
 import SMSHelpers
 
-def getEclusions(topo,ana,expected = False, plusminussigma=0,xvalue=None):
-  """ retrieve the minimum and maximum exclusion values, as
-    they are needed for the summary plot """
-  if xvalue==None: xvalue=''
-  import SMSResultsCollector
-  ex=SMSResultsCollector.exclusions(topo,ana,xvalue,expected,plusminussigma)
-  return ex
-    
-def getExclusionLine(topo,ana,expected=False,plusminussigma=0,extendedinfo=True,xvalue=None,factor=1.0):
-  """ get the exclusion line, as a TGraph """
-  if xvalue==None: xvalue=''
-  import SMSResultsCollector
-  ex=SMSResultsCollector.exclusionline(topo,ana,xvalue,expected,plusminussigma)
-  return ex
-
 def ResultsForSqrts ( sqrts ):
   import SMSResultsCollector
   """ If this is called, only results for a
@@ -81,21 +66,6 @@ def getAnalyses ( topo, run=None ):
     
   return analyses.keys()
 
-def getAllResults ( run=None ):
-  import os
-  """ returns all analyses and the topologies they have results for """
-  runs=SMSHelpers.runs
-  if run: runs= [ run ]
-  ret={}
-  for r in runs:
-    ## so thats the runs I really have to think about
-    dirs=os.listdir ( "%s/%s/" % ( SMSHelpers.Base, r ) )
-    for ana in dirs:
-      if os.path.exists ( "%s/%s/%s/info.txt" % ( SMSHelpers.Base, r, ana ) ):
-        topos=getTopologies ( ana, run )
-        ret[ana]=topos
-  return ret
-
 def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None ):
   """ get the upper limit for run/analysis/topo. 
       return none if it doesnt exist.
@@ -155,14 +125,6 @@ def getLumi ( analysis, run=None ):
 def getPAS ( analysis, run=None ):
   """ get the PAS for this analysis """
   return SMSHelpers.getMetaInfoField ( analysis, "pas", run )
-
-def getFigures ( analysis, run=None ):
-  """ get the figure number for this analysis """
-  return SMSHelpers.getMetaInfoField ( analysis, "figures", run )
-
-def getRequirement ( analysis, run=None ):
-  """ get the PAS for this analysis """
-  return SMSHelpers.getMetaInfoField ( analysis, "requires", run )
 
 def getURL ( analysis, run=None ):
   """ get the URL for this analysis """

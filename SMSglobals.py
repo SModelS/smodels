@@ -5,17 +5,16 @@ def initglob():
     global min_lep_pt, min_tau_pt, min_jet_pt, min_b_pt, min_pt
     global ListOfAnalyses
     global AnalysesRes
-    global evcount
-    global massequiv,maxgap
+    global evcount,nComp,nInvis
+    global minmassgap
+    global DoCompress, DoInvisible
+
+    DoCompress = False     #Flag to turn on/off compression
+    DoInvisible = False    #Flag to turn on/off invisible compression
     evcount = 0
-    ncomp = [0,0]
-    min_pt = 0.         #Minimum pT for any particle (= 0 to turn off compression)
-    min_lep_pt = 0.     #Minimum lepton pT (= 0 to turn off compression)
-    min_tau_pt = 0.     #Minimum tau pT (= 0 to turn off compression)
-    min_jet_pt = 0.     #Minimum jet pT (= 0 to turn off compression)
-    min_b_pt = 0.       #Minimum b pT (= 0 to turn off compression)
-    massequiv = 0.05     #Maximum difference (in %) for the definition of equal masses
-    maxgap = 100.         #Max absolute gap between masses for the def. of equal masses
+    nComp = 0              #Counter for mass compressed topologies
+    nInvis = 0             #Counter for invisible compressed topologies
+    minmassgap = 1.         #Minimum mass gap (for compression)
     
     ListOfAnalyses = []  #Initialize list of analyses
     AnalysesRes = []   #Initialize dictionary for all analyses

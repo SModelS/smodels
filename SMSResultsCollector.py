@@ -755,6 +755,8 @@ def getUpperLimit ( topo, analysis, xfrac, mx=None, my=None ):
   histo=SMSObjects("limit",topo,analysis,xfrac)
   if verbose:
     print "[SMSResultsCollector.getUpperLimit] histo=",histo
+
+
   if histo==None: return None
   tmp=histo[1]
   keys=tmp.keys()

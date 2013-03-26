@@ -1,3 +1,4 @@
+#---------------Dictionaries:
 Rodd={ 
 1000021 : "gluino", 1000022: "N1", 1000023 : "N2", 1000025 : "N3", 1000035 : "N4", 1000024 : "C1", 1000037 : "C2", 1000039 : "gravitino",  1000001 : "squark", 1000002 : "squark", 1000003 : "squark", 1000004 : "squark", 2000001 : "squark", 2000002 : "squark", 2000003 : "squark", 2000004 : "squark", 1000005 : "sbottom", 2000005 : "sbottom", 1000006 : "stop", 2000006 : "stop", 1000011 : "slepton", 1000013 : "slepton", 1000015 : "stau", 2000011 : "slepton", 2000013 : "slepton", 2000015 : "stau", 1000012 : "sneutrino", 1000014 : "sneutrino", 1000016 : "sneutrino", 2000012 : "sneutrino", 2000014 : "sneutrino", 2000016 : "sneutrino", -1000021 : "gluino", -1000022: "N1", -1000023 : "N2", -1000025 : "N3", -1000035 : "N4", -1000024 : "C1", -1000037 : "C2", -1000039 : "gravitino",  1000001 : "squark", -1000002 : "squark", -1000003 : "squark", -1000004 : "squark", -2000001 : "squark", -2000002 : "squark", -2000003 : "squark", -2000004 : "squark", -1000005 : "sbottom", -2000005 : "sbottom", -1000006 : "stop", -2000006 : "stop", -1000011 : "slepton", -1000013 : "slepton", -1000015 : "stau", -2000011 : "slepton", -2000013 : "slepton", -2000015 : "stau", -1000012 : "sneutrino", -1000014 : "sneutrino", -1000016 : "sneutrino", -2000012 : "sneutrino", -2000014 : "sneutrino", -2000016 : "sneutrino"  
 
@@ -13,66 +14,9 @@ PtcDic={
 }
 
 
-
-class DBranch:
-    def __init__(self):
-        self.vertnumb = 0
-        self.vertins = []
-        self.ElList = []
+#--------------------Classes:
     
     
-class TElement:
-    def __init__(self):
-        self.masses = []
-        self.particles = []
-        self.momID = 0
-        
-class TMassEntry:
-    def __init__(self):
-        self.B1masses = []
-        self.B2masses = []
-        self.weight = []
-                
-
-class GTop:
-    def __init__(self):
-        self.B = [DBranch(),DBranch()]
-        self.WeightList = []
-    
-    def AddElement(self, masses, particles, momID, weight = 0.):
-        
-#Sanity checks:
-        if len(masses) != 2 or len(particles) !=2 or len(momID) !=2:
-            print "AddElement: wrong number of branches"
-            return False
-        for i in range(2):
-            if len(masses[i]) != self.B[i].vertnumb:
-                print "AddElement: wrong number of masses"
-                return False
-            if len(particles[i]) != sum(self.B[i].vertins):
-                print "AddElement: wrong number of particles"
-                return False
-            
-#Create elements for each branch and add them to ElList:            
-        for ibranch in range(2):
-            NewEl = TElement()
-            NewEl.masses = masses[ibranch]
-            NewEl.particles = particles[ibranch]
-            NewEl.momID = momID[ibranch]
-            self.B[ibranch].ElList.append(NewEl)
-     
-        self.WeightList.append(weight)
-        return True
-    
-    def OrderBranches(self):
-        Branch1 = DBranch()
-        Branch2 = DBranch()
-        Branch1 = self.B[0]
-        Branch2 = self.B[1]
-        if (self.B[0].vertnumb < self.B[1].vertnumb) or (self.B[0].vertnumb == self.B[1].vertnumb and sum(self.B[0].vertins) < sum(self.B[1].vertins)):
-            self.B = [Branch2,Branch1]
-
-
 class MParticle:
     def __init__(self):
         self.pdg = 0
@@ -83,8 +27,116 @@ class MParticle:
         self.pz = 0.
         self.e = 0.
         self.mass = 0.
+      
+class TElement:
+    def __init__(self):
+        self.masses = []
+        self.particles = []
+        self.momID = 0
         
+class DBranch:
+    def __init__(self):
+        self.vertnumb = 0
+        self.vertparts = []
+        self.ElList = []
+
+class GTop:
+    def __init__(self):
+        self.B = [DBranch(),DBranch()]
+        self.WeightList = []
+
+#Adds element to ElLists in branches
+#OBS: input must be given with the correct branch ordering!  
+    def AddElement(self, NewElement, weight = {}):
         
+#Sanity checks:
+        for i in range(2):
+            masses = NewElement[i].masses
+            particles = NewElement[i].particles
+            if len(masses) != self.B[i].vertnumb:
+                print "AddElement: wrong number of masses"
+                return False
+            if len(particles) != sum(self.B[i].vertparts):
+                print "AddElement: wrong number of particles"
+                return False
+            
+#Create elements for each branch and add them to ElList:            
+        for ibranch in range(2):
+            self.B[ibranch].ElList.append(NewElement[ibranch])
+     
+        neweight = {}
+        neweight.update(weight)
+        self.WeightList.append(neweight)
+        return True
+    
+class EAnalysis:    
+    def __init__(self):
+        self.label = ""
+        self.Top = GTop()
+        self.sqrts = 8.
+        self.lum = 0.
+        self.results = {}
+        self.plots = {}
+        self.plotpath = ""
+        self.masscomp = 0.001
+
+
+#Given the constraints dictionary, automatically fill the element list with the
+#elements corresponding to the strings in the dictionary, skipping repeated ones
+    def GenerateElements(self):
+       
+        ListOfStrs = []
+        vertnumb = [self.Top.B[0].vertnumb,self.Top.B[1].vertnumb]
+        vertparts = [self.Top.B[0].vertparts,self.Top.B[1].vertparts]
+#Syntax check:        
+        for k in range(2):
+            if len(vertparts[k]) != vertnumb[k]:
+                print "GenerateElements: Wrong syntax"
+                return False
+        
+#Get all element strings:        
+        inelements = self.results.items()
+        
+        for iii in range(len(inelements)):
+            for ii in range(2):    
+
+                con = inelements[iii][ii].replace(" ","")
+                while "[" in con:  #String has element                
+                    st = con[con.find("[["):con.find("]]")+2] #Get duplet
+                    con = con.replace(st,"")  # Remove element duplet
+                    ptclist = eltostr(st)     # Get particle list
+#Syntax checks:
+                    for ib in range(2):
+                        if len(ptclist[ib]) != sum(vertparts[ib]):
+                            print "GenerateElements: Wrong syntax"
+                            return False
+                        for ptc in ptclist[ib]:
+                            if not ptc in Reven.values() and not PtcDic.has_key(ptc):
+                                print "GenerateElements: Unknown particle ",ptc
+                                return False        
+                    ListOfStrs.append(st)
+                    
+                    
+#Remove repeated elements:
+        ListOfStrs = set(ListOfStrs)
+#Now add all elements to element list        
+        while len(ListOfStrs) > 0:
+            ptclist = eltostr(ListOfStrs.pop())            
+            for ib in range(2):
+                NewEl = TElement()
+                NewEl.particles = ptclist[ib]
+                self.Top.B[ib].ElList.append(NewEl)
+                self.Top.WeightList.append([])
+    
+    
+
+
+        
+
+
+#--------------------Methods:
+    
+#Event reader. Returns a list of MParticles
 def getNextEvent(filename): 
     
     line = " "
@@ -99,11 +151,6 @@ def getNextEvent(filename):
 #Get particles info:            
     line = filename.readline()  
     while line.find("</event>") == -1: 
-        if line.find("#")>-1:
-          line=line[:line.find('#')]
-        if len(line)==0: 
-          line=filename.readline()
-          continue
         particle = MParticle()
         linep = [float(x) for x in line.split()]
         particle.pdg = int(linep[0])
@@ -118,24 +165,25 @@ def getNextEvent(filename):
         PartList.append(particle)
         line = filename.readline()  
 
-
     return PartList
 
 
-def getEventTop(PList, weight):
-    import math, SMSglobals 
-    
-    leppT_cut = SMSglobals.min_lep_pt 
-    jetpT_cut = SMSglobals.min_jet_pt
-    taupT_cut = SMSglobals.min_tau_pt
-    bpT_cut = SMSglobals.min_b_pt
-    pT_cut = SMSglobals.min_pt
 
+#Reads particle list (PList) from event and generates Topology (GTop)
+#with only one element in ElList, corresponding to the event
+#If the DoCompress and/or DoInvisible flags are on, also generate
+#compressed topologies with there are small mass gaps and/or neutrinos
+#emitted in the last step of the cascade ("effective LSP")
+def getEventTop(PList, weight = {}):
+    import SMSglobals 
+        
+    ETopList = []
     ETop = GTop()
     
     momspdg = [0,0]
     mompos = [0,0]
     imom = 0
+    nptcs = 0      #Particle counter just for sanity checks
     
 #First get Mothers:    
     for i in range(len(PList)):
@@ -150,66 +198,135 @@ def getEventTop(PList, weight):
         newmom = mompos[ib]
         El = TElement()
         
-        
+        nptcs += 1
         
         ndaugs = 2
         while ndaugs > 0:
             ndaugs = 0  
             nmoms = 0
-            nvertins = 0      
+            nvertparts = 0      
             for i in range(len(PList)):
                 if PList[i].moms[0] != mother+1 and PList[i].moms[1] != mother+1: continue
                 if abs(PList[i].pdg) in Rodd:
                     newmom = i
                     ndaugs += 1
-                    nmoms +=1
+                    nmoms += 1
+                    nptcs += 1
                 elif abs(PList[i].pdg) in Reven:
                     pname = ptype(PList[i].pdg)
-                    pT = math.sqrt(PList[i].px**2 + PList[i].py**2)
-                    if pT < pT_cut: continue
-                    if EqualParticles(pname,"l") and pT < leppT_cut: continue
-                    if EqualParticles(pname,"ta") and pT < taupT_cut: continue
-                    if EqualParticles(pname,"jet") and pT < jetpT_cut: continue
-                    if EqualParticles(pname,"b") and pT < bpT_cut: continue
-
                     El.particles.append(pname)
-                    nvertins +=1
+                    nvertparts +=1
                     ndaugs += 1
-                else:
+                    nptcs += 1
+                else:                    
                     print "getEventTop: Unknown particle!"
                     return False
-                
-            if ndaugs > 1:
-                if nmoms != 1 or ndaugs != nvertins+1:
-                    print "getEventTop: R-parity violated!"
-                    return False
 
-                El.masses.append(PList[mother].mass)
-                mother = newmom
-                ETop.B[ib].vertins.append(nvertins)
-                ETop.B[ib].vertnumb += 1
-            elif ndaugs == 1:         #Compressed case->glue mother and daughter
-                SMSglobals.ncomp[ib] +=1
-                if mother == mompos[ib]:   # If compression happens at 1st decay
-                    mompos[ib] = newmom    # redifine first mother
-                    momspdg[ib] = PList[newmom].pdg
-                mother  = newmom
-                                 
+            El.masses.append(PList[mother].mass)
+            mother = newmom
+            ETop.B[ib].vertparts.append(nvertparts)
+            ETop.B[ib].vertnumb += 1
+
+
         ETop.B[ib].ElList.append(El)    
         ETop.B[ib].ElList[0].momID = momspdg[ib]
 
+    neweight = {}
+    neweight.update(weight)
+    ETop.WeightList.append(neweight)
 
-    ETop.WeightList.append(weight)
-#Sort branches
-    Branch1 = ETop.B[0]
-    Branch2 = ETop.B[1]
-    if (ETop.B[0].vertnumb < ETop.B[1].vertnumb) or (ETop.B[0].vertnumb == ETop.B[1].vertnumb and sum(ETop.B[0].vertins) < sum(ETop.B[1].vertins)):
-        ETop.B = [Branch2,Branch1]
+#Check to see if all particles (minus initial state) have been included 
+#(Only for later. Right now higgsses decays are not 
+#included in the topology, so ignore warning for now)
+#    if nptcs != len(PList)-2:
+#        for ipt in PList:
+#            print ipt.pdg,ipt.mass
+#        print "nptcs = ",nptcs    
+#        print "getEventTop: Error reading event!"
+#        return False
+#    else:
+    ETopList.append(ETop)
         
-       
-    return ETop    
         
-        
+#Check for compressed topologies:
+    if SMSglobals.DoCompress:
+        ETopComp = GTop()
+        neweight = {}
+        neweight.update(weight)
+        ETopComp.WeightList.append(neweight)
+        Comp = False
+#Loop over branches        
+        for ib in range(2):
+            ETopComp.B[ib].ElList.append(TElement())            
+            for i in range(len(ETop.B[ib].ElList[0].masses)):
+                massA = ETop.B[ib].ElList[0].masses[i]
+                if i < len(ETop.B[ib].ElList[0].masses)-1:
+                    massB = ETop.B[ib].ElList[0].masses[i+1]
+                    if abs(massA-massB) < SMSglobals.minmassgap:
+                        Comp  = True
+                        continue           #If compressed, skip this vertex
+              
+                ETopComp.B[ib].ElList[0].masses.append(massA) 
+                vertparts = ETop.B[ib].vertparts
+                ptcs = ETop.B[ib].ElList[0].particles[sum(vertparts[:i]):sum(vertparts[:i+1])]
+                for ptc in ptcs:
+                    ETopComp.B[ib].ElList[0].particles.append(ptc)
+                ETopComp.B[ib].vertnumb += 1
+                ETopComp.B[ib].vertparts.append(len(ptcs))               
+        if Comp:
+            SMSglobals.nComp += 1
+            ETopList.append(ETopComp)
+
+                
+            
+            
+#Check for effective LSPs (LSP + neutrino = LSP'):                   
+    if SMSglobals.DoInvisible:
+        ETopIComp = GTop()
+        neweight = {}
+        neweight.update(weight)
+        ETopIComp.WeightList.append(neweight)
+        if SMSglobals.DoCompress:  #Do invisible compression+mass compression
+            ETopIComp = ETopComp
+        else:    
+            ETopIComp = ETop        #or just invisble compression
+        Icomp = False
+#Loop over branches        
+        for ib in range(2):
+            nnu = 0
+            ptcs = ETopIComp.B[ib].ElList[0].particles
+            i = len(ptcs)-1
+            nnu = 0
+            while i >= 0 and ptcs[i] == 'nu':   #Count number of nus emitted at the end of the cascade decay
+                nnu += 1
+                i -= 1
+            ilsp = ETopIComp.B[ib].vertnumb    #Position of effective LSP
+            vertin = ETopIComp.B[ib].vertparts[ilsp-1]
+            while nnu >= vertin and ilsp >= 1:                            
+                ilsp -= 1
+                vertin += ETopIComp.B[ib].vertparts[ilsp-1]
+                
+   
+            if ilsp < ETopIComp.B[ib].vertnumb-1:
+                Icomp = True    
+                ETopIComp.B[ib].vertnumb = ilsp + 1
+                ETopIComp.B[ib].vertparts = ETopIComp.B[ib].vertparts[:ilsp]
+                ETopIComp.B[ib].vertparts.append(0)
+                ETopIComp.B[ib].ElList[0].particles = ptcs[:sum(ETopIComp.B[ib].vertparts)]
+                ETopIComp.B[ib].ElList[0].masses = ETopIComp.B[ib].ElList[0].masses[:ilsp+1]
+                
+        if Icomp:
+            SMSglobals.nInvis += 1
+            ETopList.append(ETopIComp)
+            
+    return ETopList           
+                
+                
+     
+                        
+
+#Converts pdg number to particle name according to the dictionaries Rodd
+# and Reven        
 def ptype(pdg):
   p=int(pdg)
   if p in Rodd: return Rodd[p]
@@ -219,36 +336,68 @@ def ptype(pdg):
       return False
   
   
+#Compares two global topologies. Returns true if they have the same
+#number of vertices and particles, independent of branch ordering.
 def EqualTops(Top1,Top2):
-    if (Top1.B[0].vertnumb == Top2.B[0].vertnumb and Top1.B[1].vertnumb == Top2.B[1].vertnumb):
-        if Top1.B[0].vertins != Top2.B[0].vertins: return False 
-        if Top1.B[1].vertins != Top2.B[1].vertins: return False
-        return True
-    elif (Top1.B[0].vertnumb == Top2.B[1].vertnumb and Top1.B[1].vertnumb == Top2.B[0].vertnumb):        
-        if Top1.B[0].vertins != Top2.B[1].vertins: return False 
-        if Top1.B[1].vertins != Top2.B[0].vertins: return False
-        return True
-    else:    
+    if (EqualBranches(Top1.B[0],Top2.B[0]) and EqualBranches(Top1.B[1],Top2.B[1])) or (EqualBranches(Top1.B[0],Top2.B[1]) and EqualBranches(Top1.B[1],Top2.B[0])): return True
+    else:
         return False
+    
+#Compares two branches. Returns true if they have the same
+#number of vertices and particles
+def EqualBranches(B1,B2):
+    if B1.vertparts != B2.vertparts: return False 
+    if B1.vertnumb != B2.vertnumb: return False
+    return True
+    
 
-       
+#Compare two elements or array of elements.
+#If all masses and particles are equal, retsscurns True,
+#otherwise returns False       
 def EqualEls(El1,El2):
-    if len(El1.particles) != len(El2.particles): return False
-    if len(El1.masses) != len(El2.masses): return False
-    if El1.particles != El2.particles: return False
-    if not EqualMasses(El1.masses,El2.masses): return False
+    El1v = []
+    El2v = []
+    if type(El1) == type(list()):
+        El1v = El1
+    else:
+        El1v.append(El1)
+    if type(El2) == type(list()):
+        El2v = El2
+    else:
+        El2v.append(El2)
+    if len(El1v) != len(El2v): return False
+    for i in range(len(El1v)):
+        if El1v[i].particles != El2v[i].particles: return False
+        if El1v[i].masses != El2v[i].masses: return False
     return True
 
-def SimEls(El1,El2):
-    if len(El1.particles) != len(El2.particles): return False
-    if len(El1.masses) != len(El2.masses): return False
-    if not EqualParticles(El1.particles,El2.particles): return False
-    if not EqualMasses(El1.masses,El2.masses): return False
+#Compare two elements or array of elements.
+#If all masses and particles are similar, returns True,
+#otherwise returns False       
+def SimEls(El1,El2,masscomp = 0.1):
+    El1v = []
+    El2v = []
+    if type(El1) == type(list()):
+        El1v = El1
+    else:
+        El1v.append(El1)
+    if type(El2) == type(list()):
+        El2v = El2
+    else:
+        El2v.append(El2)
+    if len(El1v) != len(El2v): return False
+    for i in range(len(El1v)):
+        if len(El1v[i].particles) != len(El2v[i].particles): return False
+        if len(El1v[i].masses) != len(El2v[i].masses): return False
+        if not EqualParticles(El1v[i].particles,El2v[i].particles): return False
+        if not EqualMasses(El1v[i].masses,El2v[i].masses,masscomp): return False
     return True
 
 
-def EqualMasses(mass1,mass2):
-    from SMSglobals import massequiv,maxgap
+#Compares two masses or array of masses.
+#Returns True if the masses (or correponding mass entries) do not differ
+#by more than masscomp*100 %
+def EqualMasses(mass1, mass2, masscomp = 0.1):
     mass10 = mass1
     mass20 = mass2
     mass1v = []
@@ -276,10 +425,11 @@ def EqualMasses(mass1,mass2):
         massA = mass1v[i]
         massB = mass2v[i]   
         if massA != massB:
-            if 2.*abs(massA-massB)/(massA+massB) > massequiv: return False
-            if abs(massA-massB) > maxgap: return False
+            if 2.*abs(massA-massB)/(massA+massB) > masscomp: return False
 
     return True
+
+
 
 #Compares 2 particle names or 2 name arrays. Allows for dictionary labels
 #(Ex: L = l, l+ = l, l = l-,...)
@@ -319,149 +469,280 @@ def EqualParticles(ptype1,ptype2):
 
 
 
+#Check if elements in SMSTop matches an entry in SMSTopList. If it does, add weight.
+#If the same topology exists, but not the same element, add element.
+#If neither element nor topology exist, add the new topology and all its elements
 def AddToList(SMSTop,SMSTopList):
     
-    equaltops = -1
-    equalels = -1
-    for i in range(len(SMSTopList)):
-        if EqualTops(SMSTop,SMSTopList[i]):
-            equaltops = i
-            for j in range(len(SMSTopList[i].B[0].ElList)):
-                MEl_B1 = SMSTopList[i].B[0].ElList[j]
-                MEl_B2 = SMSTopList[i].B[1].ElList[j]
-                El_B1 = SMSTop.B[0].ElList[0]
-                El_B2 = SMSTop.B[1].ElList[0]
-                if (EqualEls(MEl_B1,El_B1) and EqualEls(MEl_B2,El_B2)):
+    for inew in range(len(SMSTop.B[0].ElList)):
+        NewEl_a = [SMSTop.B[0].ElList[inew],SMSTop.B[1].ElList[inew]]  #Check both orderings
+        NewEl_b = [SMSTop.B[1].ElList[inew],SMSTop.B[0].ElList[inew]]                
+        equaltops = -1
+        equalels = -1
+        i = -1
+        while (equaltops < 0 or equalels < 0) and i < len(SMSTopList)-1:
+            i += 1
+            if EqualTops(SMSTop,SMSTopList[i]):    #First look for matching topology
+                equaltops = i
+            else: continue 
+                
+            for j in range(len(SMSTopList[i].B[0].ElList)):  #Search for matching element
+                OldEl = [SMSTopList[i].B[0].ElList[j],SMSTopList[i].B[1].ElList[j]]
+                if EqualEls(OldEl,NewEl_a):
                     equalels = j
-                    ebr = [0,1]
-                elif (EqualEls(MEl_B1,El_B2) and EqualEls(MEl_B2,El_B1)):
+                    NewEl = NewEl_a                    
+                elif EqualEls(OldEl,NewEl_b):
                     equalels = j
-                    ebr = [1,0]
+                    NewEl = NewEl_b
+                    
+                    
 #If element exists, add weight:
-                if equalels == j:
-                    if len(SMSTopList[i].WeightList[j]) != len(SMSTop.WeightList[0]):
-                        print "Wrong number of weights"
-                    else:    
-                        for iw in range(len(SMSTop.WeightList[0])):
-                            SMSTopList[i].WeightList[j][iw] += SMSTop.WeightList[0][iw]
-#For the "mothers" keep the smallest set of PDG mother IDs (not used in the analysis, only relevant to set a standard):
-                    if min(abs(El_B1.momID),abs(El_B2.momID)) < min(abs(MEl_B1.momID),abs(MEl_B2.momID)):
-                        for im in range(2): SMSTopList[i].B[im].ElList[j].momID = SMSTop.B[ebr[im]].ElList[0].momID
-#For the masses, keep the highest sum:
-                    MsumA = sum(MEl_B1.masses) + sum(MEl_B2.masses)
-                    MsumB = sum(El_B1.masses) + sum(El_B2.masses)
-                    if MsumB >= MsumA:
-                        for im in range(2): SMSTopList[i].B[im].ElList[j].masses = [x for x in SMSTop.B[ebr[im]].ElList[0].masses]
+        if equalels >= 0:
+            if len(SMSTopList[equaltops].WeightList[equalels]) != len(SMSTop.WeightList[inew]):
+                print "Wrong number of weights"
+            else:
+                for w in SMSTop.WeightList[inew].keys():
+                    SMSTopList[equaltops].WeightList[equalels][w] += SMSTop.WeightList[inew][w]
+                    
+    
+                    
+#When combining elements, keep the smallest set of PDG mother IDs (not used in the analysis, only relevant to set a standard):
+                if min(abs(NewEl[0].momID),abs(NewEl[0].momID)) < min(abs(OldEl[0].momID),abs(OldEl[1].momID)):
+                    for ib in range(2): SMSTopList[equaltops].B[ib].ElList[equalels].momID = NewEl[ib].momID
                         
                         
 #If topology and/or element does not exist, add:
     if equaltops == -1:
         SMSTopList.append(SMSTop)
     elif equalels == -1:
-        allmass = [SMSTop.B[0].ElList[0].masses,SMSTop.B[1].ElList[0].masses]
-        allparts = [SMSTop.B[0].ElList[0].particles,SMSTop.B[1].ElList[0].particles]
-        allmom = [SMSTop.B[0].ElList[0].momID,SMSTop.B[1].ElList[0].momID]
-        if not SMSTopList[equaltops].AddElement(allmass, allparts, allmom, SMSTop.WeightList[0]):
+        if EqualBranches(SMSTop.B[0],SMSTopList[equaltops].B[0]):
+            NewEl = [SMSTop.B[0].ElList[inew],SMSTop.B[1].ElList[inew]]
+        else:
+            NewEl = [SMSTop.B[1].ElList[inew],SMSTop.B[0].ElList[inew]]
+        if not SMSTopList[equaltops].AddElement(NewEl,SMSTop.WeightList[inew]):
             print "Error adding element"
             print '\n'
             
-            
-def AddToAnalyses(SMSTopList):
-    from SMSglobals import AnalysesRes    
-    
-#Find matching topologies:
-    for iA in range(len(AnalysesRes)):
-        for iE in range(len(SMSTopList)):  
-            if not EqualTops(AnalysesRes[iA].Top,SMSTopList[iE]): continue
-    
-            SMSTop = SMSTopList[iE]
-            
-#Loop over analyses elements:            
-            for i in range(len(AnalysesRes[iA].StrList)):
-                Rptclist = eltostr(AnalysesRes[iA].StrList[i])
-                MassList = []
-                WeightList = []
-#Collect all elements matching analyses element and order masses according
-#to analyses branch order. If both orderings match, tag element with negative
-#weights and add both possibilities to masslist
-                for j in range(len(SMSTop.WeightList)):                
-                    weight = SMSTop.WeightList[j]
-                    El1 = SMSTop.B[0].ElList[j]
-                    El2 = SMSTop.B[1].ElList[j] 
-                    ptclist = [El1.particles,El2.particles]
-                    masslist = [El1.masses,El2.masses]
-                    pmatch = False        
-                    
-                    
-                    if EqualParticles(ptclist,Rptclist):
-                        pmatch = True
-                        massnew = [masslist[0],masslist[1]]
-                        weightnew = [x for x in weight]
-                        if EqualParticles(ptclist,[Rptclist[1],Rptclist[0]]) and not EqualMasses(masslist[0],masslist[1]):
-                            weightnew = [-x for x in weight]                    
-                    elif EqualParticles(ptclist,[Rptclist[1],Rptclist[0]]):    
-                        pmatch = True
-                        massnew = [masslist[1],masslist[0]]
-                        weightnew = [x for x in weight]
-                    if pmatch:
-                        MassList.append(massnew)
-                        WeightList.append(weightnew)
-                        if sum(weightnew) < 0.:
-                            MassList.append([massnew[1],massnew[0]])
-                            WeightList.append(weightnew)
-                        
-                    
-                                
-                  
-#Now put all elements with ambiguous ordering at the bottom of the list 
-#(to be added for last):
-                for j in range(len(WeightList)):
-                    if sum(WeightList[j]) < 0.:
-                        Rmass = MassList.pop(j)
-                        Rweight = WeightList.pop(j)
-                        MassList.append(Rmass)
-                        WeightList.append(Rweight)
-                    
 
-#Finally include all matching elements to AnalysesRes:
-                for j in range(len(WeightList)):
-                    match = -1
-                    for k in range(len(AnalysesRes[iA].ElList[i].MassList)):
-                        if (EqualMasses(MassList[j],AnalysesRes[iA].ElList[i].MassList[k])):
-                            match = k
-                            break                        
+#Loop over all elements in SMSTopList and add the weight to the 
+#matching elements in Analysis.
+#Uses EqualMasses to combine elements with similar masses and EqualParticles
+#to match particles. The parameter for
+#mass comparison is defined in Analysis.masscomp (default = 10%)
+def AddToAnalysis(SMSTopList,Analysis):
+    
+    masscomp = Analysis.masscomp
+    masscomp = 0.15
+    
+    for itop in range(len(SMSTopList)):
+        NewTop = SMSTopList[itop]    
+#Check if topologies match:
+        if not EqualTops(NewTop,Analysis.Top): continue
+        
+#Loop over (event) element list:
+        for iel in range(len(NewTop.B[0].ElList)):
+#Loop over analysis elements:
+            for jel in range(len(Analysis.Top.B[0].ElList)):
+                NewEl_a = [NewTop.B[0].ElList[iel],NewTop.B[1].ElList[iel]]
+                NewEl_b = [NewTop.B[1].ElList[iel],NewTop.B[0].ElList[iel]]
+                oldptcs = [Analysis.Top.B[0].ElList[jel].particles,Analysis.Top.B[1].ElList[jel].particles]
+                newptcs_a = [NewEl_a[0].particles,NewEl_a[1].particles]
+                newptcs_b = [NewEl_b[0].particles,NewEl_b[1].particles]
+                
+                
+                
+#Check if particles match (independent of branch order)
+                ptcmatch = EqualParticles(newptcs_a,oldptcs) or EqualParticles(newptcs_b,oldptcs)
+                if not ptcmatch: continue
+
+                weight = {}
+                weight.update(NewTop.WeightList[iel])
+
+                
+#Loop over nested mass list in Analysis element:                
+                massmatch = False
+                for imass in range(len(Analysis.Top.B[0].ElList[jel].masses)):
+                    OldEl = [TElement(),TElement()]
+                    for ib in range(2):
+                        OldEl[ib].particles = oldptcs[ib]
+                        OldEl[ib].masses = Analysis.Top.B[ib].ElList[jel].masses[imass]
                         
-                    if match >= 0:
-                        for iw in range(len(AnalysesRes[iA].ElList[i].WeightList[match])):
-                            AnalysesRes[iA].ElList[i].WeightList[match][iw] += abs(WeightList[j][iw])
-                        MsumB = sum(MassList[j][0]) + sum(MassList[j][1])
-                        MsumA = sum(AnalysesRes[iA].ElList[i].MassList[match][0]) + sum(AnalysesRes[iA].ElList[i].MassList[match][1])
-                        if  MsumB >= MsumA:
-                            AnalysesRes[iA].ElList[i].MassList[match] = [x for x in MassList[j]]     
-                                
-                    else:    #Mass not found, add to list
-                        mass = [x for x in MassList[j]]
-                        weight = [abs(x) for x in WeightList[j]]
-                        AnalysesRes[iA].ElList[i].MassList.append(mass)
-                        AnalysesRes[iA].ElList[i].WeightList.append(weight)
+                        
+#Check if elements match (with identical masses) and  add weight
+                    if SimEls(NewEl_a,OldEl,0.) or SimEls(NewEl_b,OldEl,0.):
+                        massmatch = True
+                        for w in weight.keys():
+                            Analysis.Top.WeightList[jel][imass][w] += weight[w]
+
+#If particles match, but not masses, add element to nested 
+# mass list and nested weight list
+#(check for both branch orderings. If both match, add both mass orderings):
+                if not massmatch:
+                    if EqualParticles(newptcs_a,oldptcs):
+                        for ib in range(2):
+                            Analysis.Top.B[ib].ElList[jel].masses.append(NewEl_a[ib].masses)                            
+                        Analysis.Top.WeightList[jel].append(weight)
+                        massmatch = True
+                    if EqualParticles(newptcs_b,oldptcs) and (not massmatch or not EqualMasses(NewEl_b[0].masses,NewEl_b[1].masses,masscomp)):
+                        for ib in range(2):
+                            Analysis.Top.B[ib].ElList[jel].masses.append(NewEl_b[ib].masses)
+                        Analysis.Top.WeightList[jel].append(weight)
+                        
+
+#Create mass list with all mass elements in analysis:
+    Allmasses = []
+    for iel in range(len(Analysis.Top.B[0].ElList)):
+        for imass in range(len(Analysis.Top.B[0].ElList[iel].masses)):
+            mass = [Analysis.Top.B[0].ElList[iel].masses[imass],Analysis.Top.B[1].ElList[iel].masses[imass]]
+            Allmasses.append(str(mass))
+            
+    if len(Allmasses) == 0: return   #Skip empty analysis
+    
+#Remove repeated entries:
+    Allmasses = set(Allmasses)
+    Allmasses = [eval(x) for x in Allmasses]
+    
+#Create dictionary for equivalent masses:
+    Massdic = {}
+    for imass in range(len(Allmasses)):
+        if Allmasses[imass] == []: continue
+        equivmasses = []
+        massA = Allmasses[imass]
+        equivmasses.append(massA)
+        Allmasses[imass] = []        #Remove mass from subsequent groupings
+#Collect all masses equivalent to massA:
+        for jmass in range(len(Allmasses)):
+            if Allmasses[jmass] == []: continue
+            massB = Allmasses[jmass]
+            if EqualMasses(massA,massB,masscomp):
+                equivmasses.append(massB)
+                Allmasses[jmass] = []    #Remove mass from subsequent groupings
+        avgmass = MassAvg(equivmasses,"harmonic")  #Compute average mass
+        for mass in equivmasses:
+            Massdic.update({str(mass) : str(avgmass)}) #Create entries for ~ masses
+            
+            
+#Use dictionary to combine elements:
+    newmasslist = []
+    for k in Massdic.keys(): newmasslist.append(Massdic[k])
+    newmasslist = set(newmasslist)  #Remove repeated elements
+    
+#Get weight format and generate a zero weight dictionary:
+    zeroweight = {}
+    for iel in range(len(Analysis.Top.WeightList)):
+        if len(Analysis.Top.WeightList[iel]) > 0:
+            for wk in Analysis.Top.WeightList[iel][0].keys():                
+                zeroweight.update({wk : 0.})
+            break
+
+#Loop over analysis elements and combine weights using mass dictionary
+    for iel in range(len(Analysis.Top.B[0].ElList)):
+        listdic = {}
+        for mass in newmasslist:
+            listdic.update({mass : zeroweight})  #Dictionary with zero weights
+            
+        for imass in range(len(Analysis.Top.B[0].ElList[iel].masses)):
+            mass = str([Analysis.Top.B[0].ElList[iel].masses[imass],Analysis.Top.B[1].ElList[iel].masses[imass]]) #Get original mass
+            weight = Analysis.Top.WeightList[iel][imass] #Get weight
+            massavg = Massdic[mass]   #Get equivalent averaged mass
+            neweight = {}
+            neweight.update(zeroweight)
+            for wk in listdic[massavg].keys():
+                neweight[wk] = listdic[massavg][wk] + weight[wk]
+            listdic.update({massavg : neweight})   #Combine weights
+
+#Delete original masses and weights and replace by equivalent masses
+#and combined weights:
+        Analysis.Top.B[0].ElList[iel].masses = []            
+        Analysis.Top.B[1].ElList[iel].masses = []
+        Analysis.Top.WeightList[iel] = []
+        for k in listdic.keys():
+            mass = eval(k)
+            weight = listdic[k]
+            Analysis.Top.B[0].ElList[iel].masses.append(mass[0])
+            Analysis.Top.B[1].ElList[iel].masses.append(mass[1])
+            Analysis.Top.WeightList[iel].append(weight)
+            
+                          
+                        
+#For a list of equivalent masses, compute an average mass (or mass array)
+#using the defined method. 
+#harmonic = harmonic mean
+#mean = standard mean
+def MassAvg(equivin, method = "mean"):
+    import numpy
+
+    N = len(equivin)
+    if N == 0:
+        print "MassAvg: Empty array"
+        return False
+    if N == 1: return equivin[0]
+
+#In case the input has 2 branches of different sizes, average
+#each one individually
+    if len(equivin[0]) == 2 and type(equivin[0][0]) == type(list()):
+        if len(equivin[0][0]) != len(equivin[0][1]):
+            equivinBr = [[],[]]
+            for mass in equivin:
+                equivinBr[0].append(mass[0])
+                equivinBr[1].append(mass[1])
+        else:
+            equivinBr = [equivin]
+
+    massout = []    
+    for ib in range(len(equivinBr)):            
+        equivmasses = numpy.array(equivinBr[ib])  #Generate numpy array
+    
+#Sanity checks:    
+        for mass in equivmasses.flat:
+            if mass == 0.:
+                print "MassAvg: Zero mass!"
+                return False
+            if mass < 0.:
+                print "MassAvg: Negative mass!"
+                return False
+
+        if method == "mean":
+            massavg = equivmasses[0]
+        elif method == "harmonic":
+            massavg = 1./equivmasses[0]
+        else:
+            print "MassAvg: Unknown method"
+            return False
+
+        for imass in range(1,N):
+            mass = equivmasses[imass]
+            if mass.shape != massavg.shape:        #Sanity check
+                print "MassAvg: Wrong input"
+                return False
+            if method == "mean":
+                massavg = massavg + mass
+            elif method == "harmonic":
+                massavg = massavg + 1./mass
+            
+        if method == "mean":
+            massavg = massavg/float(N)
+        elif method == "harmonic":
+            massavg = float(N)/massavg
+    
+        if massavg.shape != equivmasses[0].shape:
+            print "MassAvg: Error computing average"
+            return False
+        
+        massout.append(massavg.tolist())
+    
+    if len(massout) == 1:    
+        return massout[0]
+    else:
+        return massout
+    
+                    
 
 
 #Evaluate theoretical predictions for the analysis constraint\condition:
 def Aeval(Analysis,instr):
-    from SMSglobals import AnalysesRes
     
-#First find equivalent topology in AnalysesRes:
-    itop = -1
-    for i in range(len(AnalysesRes)):
-        if EqualTops(Analysis.Top,AnalysesRes[i].Top):
-            itop = i
-            break
-    if itop == -1: return False
-    
-    ARes = AnalysesRes[itop]    
-    
-    
-#First remove all blanks:
+#Remove all blanks from string:
     outstr = instr.replace(" ","")
 #Get ordered list of elements:
     El = []
@@ -473,33 +754,44 @@ def Aeval(Analysis,instr):
         for ib in range(2):
             for ip in range(len(ptclist[ib])):
                 if not ptclist[ib][ip] in Reven.values() and not PtcDic.has_key(ptclist[ib][ip]):
-                    print "Ceval: Unknown particle ",ptclist[ip]
+                    print "Aeval: Unknown particle ",ptclist[ip]
                     return False
         outstr = outstr.replace(st,"El["+str(iels)+"]")  # Replace element
-        El.append(ptclist)
+        El.append(ptclist)   #Store elements
         iels +=1
         
         
 #Get list of expressions (separated by commas):
     outstrv = outstr.rsplit(",")
-#Find elements in AnalysesRes corresponding to El[i]:
+    
+#Find elements in Analysis corresponding to elements in El:
     ieq =[]
     for i in range(len(El)):
-        for j in range(len(ARes.StrList)):
-            Rptc = eltostr(ARes.StrList[j])
-            if El[i] == Rptc:
+        for j in range(len(Analysis.Top.B[0].ElList)):
+            AEl = [Analysis.Top.B[0].ElList[j].particles,Analysis.Top.B[1].ElList[j].particles]
+            if El[i] == AEl:
                 ieq.append(j)
                 break
-#Loop through masslist and evaluate with weights:
+            
+    if len(ieq) != len(El):
+        print "Aeval: Error evaluating analysis"
+        return False
+#Loop through masslist and replace element by its weight:
     Allres = []
-    for i in range(len(ARes.ElList[0].MassList)):
-        resw = []
-        for iw in range(len(ARes.ElList[0].WeightList[0])):
-            for j in range(len(El)):            
-                El[j] = ARes.ElList[ieq[j]].WeightList[i][iw]
+    for imass in range(len(Analysis.Top.WeightList[0])):
+        resw = {}
+        mass = [Analysis.Top.B[0].ElList[0].masses[imass],Analysis.Top.B[1].ElList[0].masses[imass]]
+        for w in Analysis.Top.WeightList[0][imass].keys():
+            for j in range(len(El)):
+                if len(Analysis.Top.WeightList[ieq[j]]) != len(Analysis.Top.WeightList[0]):
+                    print "Aeval: Mismatch in Analysis.ElList"
+                    return False
+                El[j] = Analysis.Top.WeightList[ieq[j]][imass][w]
+                
             eout = [Ceval(x,El) for x in outstrv]
-            resw.append(eout)
-        Allres.append([ARes.ElList[0].MassList[i],resw])
+            if len(eout) == 1: eout = eout[0]
+            resw.update({w : eout})
+        Allres.append([mass,resw])
         
     return Allres      
                 
@@ -510,12 +802,7 @@ def GetPlotLimit(masses,plot):
     return sigmax
     
     
-    
-    
-    
-    
-
-    
+#Converts an element string to a particle list or vice-versa    
 def eltostr(invar):
     if type(invar) == type(list()):
         st = str(invar).replace("'","")
@@ -538,151 +825,7 @@ def eltostr(invar):
         print "ElToStr: Wrong input"
         return False
         
-            
-            
-class GTopAnalyses:
-     
-    def __init__(self):
-        self.Top = GTop()
-        self.ElList = []
-        self.StrList = []
 
-#Generates a common mass list for all the masses appearing in the topology
-#Useful for evaluating constraints and conditions        
-    def CreateAll(self):
-
-#Collect all masses:
-        AllMasses = []
-        for i in range(len(self.ElList)):
-            for j in range(len(self.ElList[i].MassList)):
-                AllMasses.append(str(self.ElList[i].MassList[j]))
-                wlength = len(self.ElList[i].WeightList[j])
-#Remove duplicates:
-        AllMasses = set(AllMasses)
-        AllMasses = [eval(x) for x in AllMasses]
-
-#Remove Equivalent masses:
-        for i in range(len(AllMasses)-1):
-            massA = AllMasses[i]
-            if massA == []: continue
-            for j in range(i+1,len(AllMasses)):
-                massB = AllMasses[j]
-                if massB == []: continue
-                if EqualMasses(massA,massB):
-                    MsumA = sum(massA[0]) + sum(massA[1])
-                    MsumB = sum(massB[0]) + sum(massB[1])
-                    if  MsumB >= MsumA:
-                        AllMasses[i] = []
-                    else:    
-                        AllMasses[j] = []
-                    
-        AllMassesNew = []        
-        for i in range(len(AllMasses)):
-            if AllMasses[i] != []: AllMassesNew.append(AllMasses[i])
-        AllMasses = [x for x in AllMassesNew]
-
-        for i in range(len(self.ElList)):
-            NewWeightList = []
-            for j in range(len(AllMasses)):
-                weight = [0.]*wlength
-                for imass in range(len(self.ElList[i].MassList)):
-                    if EqualMasses(AllMasses[j],self.ElList[i].MassList[imass]):
-                        for iw in range(wlength):
-                            weight[iw] += self.ElList[i].WeightList[imass][iw]
-                NewWeightList.append(weight)
-            
-
-            self.ElList[i].MassList = [x for x in AllMasses]   
-            self.ElList[i].WeightList = [x for x in NewWeightList]
-                        
-            
-        
-       
-        
-class TElementAnalyses:                  
-    def __init__(self):
-        self.MassList = []
-        self.WeightList = []
-            
-
-class EAnalysis:    
-    def __init__(self):
-        self.label = ""
-        self.Top = GTop()
-        self.sqrts = 8.
-        self.lum = 0.
-        self.constraints = {}
-        self.plots = {}
-        self.plotpath = ""
-
-
-#Given the constraints dictionary, automatically fill AnalysesRes with
-# the element list for all the elemenents appearing in the constraints 
-# and conditions, skipping repeated or equivalent ones.
-    def FillElements(self):
-        from SMSglobals import AnalysesRes
-       
-        ListOfStrs = []
-        vertnumb = [self.Top.B[0].vertnumb,self.Top.B[1].vertnumb]
-        vertins = [self.Top.B[0].vertins,self.Top.B[1].vertins]
-# Syntax check:        
-        for k in range(2):
-            if len(vertins[k]) != vertnumb[k]:
-                print "FillElements: Wrong syntax"
-                return False
-        
-        inelements = self.constraints.items()
-
-        for iii in range(len(inelements)):
-            for ii in range(2):    
-
-                con = inelements[iii][ii].replace(" ","")
-                while "[" in con:  #String has element list                
-                    st = con[con.find("[["):con.find("]]")+2] #Get duplet
-                    con = con.replace(st,"")  # Remove element duplet
-                    ptclist = eltostr(st)     # Get particle list
-#Syntax checks:
-                    for k in range(2):
-                        if len(ptclist[k]) != sum(vertins[k]):
-                            print "FillElements: Wrong syntax"
-                            return False
-                        for ip in range(len(ptclist[k])):
-                            if not ptclist[k][ip] in Reven.values() and not PtcDic.has_key(ptclist[k][ip]):
-                                print "FillElements: Unknown particle ",ptclist[k][ip]
-                                return False        
-                    ListOfStrs.append(st)
-                    
-#Find correct AnalysesRes topology to insert the strings:
-        itop = -1
-        for i in range(len(AnalysesRes)):
-            ATop = AnalysesRes[i].Top
-            if EqualTops(ATop,self.Top):
-                itop = i
-                break
-            
-        if itop == -1:
-            NewAnalyses = GTopAnalyses()
-            for i in range(2):
-               NewAnalyses.Top.B[i].vertnumb = vertnumb[i]
-               NewAnalyses.Top.B[i].vertins = vertins[i]
-            AnalysesRes.append(NewAnalyses)
-            itop = len(AnalysesRes)-1
-            
-            
-#Now find if element already exists:
-        ListOfStrs = set(ListOfStrs)
-        while len(ListOfStrs) > 0:
-            strA = ListOfStrs.pop()        #Check for same branch order
-#            strB = eltostr(strA)           
-#            strB = [strB[1],strB[0]]
-#            strB = eltostr(strB)
-            Allstr = AnalysesRes[itop].StrList
-#            if (strA in Allstr) or (strB in Allstr): continue #Skip element
-            if (strA in Allstr): continue #Skip element
-
-            NewEl = TElementAnalyses()
-            AnalysesRes[itop].ElList.append(NewEl)
-            AnalysesRes[itop].StrList.append(strA)
             
             
         
@@ -710,14 +853,6 @@ def Ceval(instring,El):
 
   
     
-
-
-
-
-
-
-        
-        
 
 
 def runpythia(slhafile,nevts = 10000, Sqrts = 7):

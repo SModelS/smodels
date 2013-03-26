@@ -19,12 +19,12 @@ def load():
     Analysis.sqrts = sqrts
     Analysis.histname = histname     
     Analysis.label = "LeptonsMT - C1N2_slepton"
-    Analysis.Top.B[0].vertnumb = 2
-    Analysis.Top.B[0].vertins = [1,1]
-    Analysis.Top.B[1].vertnumb = 2
-    Analysis.Top.B[1].vertins = [1,1]
+    Analysis.Top.B[0].vertnumb = 3
+    Analysis.Top.B[0].vertparts = [1,1,0]
+    Analysis.Top.B[1].vertnumb = 3
+    Analysis.Top.B[1].vertparts = [1,1,0]
     #Constraints
-    Analysis.constraints = {
+    Analysis.results = {
 #Left-handed sleptons
 "[[L,L],[L,nu]] + [[L,L],[nu,L]]" : "[[L,L],[L,nu]] ~ [[L,L],[nu,L]], [[L,L],[L,nu]] ~ 9.*[[ta,ta],[nu,ta]] ",
 #Right-handed sleptons
@@ -35,9 +35,6 @@ def load():
 "[[L,L],[L,nu]] + [[L,L],[nu,L]]" : "plot1",
 "[[L,L],[nu,ta]]" : "plot2"
 }
-    
-    Analysis.FillElements() # Build list of elements from constraints
-
     ListOfAnalyses.append(Analysis)
 
 #    
@@ -48,20 +45,17 @@ def load():
     Analysis.sqrts = sqrts
     Analysis.histname = histname  
     Analysis.label = "LeptonsMT - C1N2_VV"
-    Analysis.Top.B[0].vertnumb = 1
-    Analysis.Top.B[0].vertins = [1]
-    Analysis.Top.B[1].vertnumb = 1
-    Analysis.Top.B[1].vertins = [1]
+    Analysis.Top.B[0].vertnumb = 2
+    Analysis.Top.B[0].vertparts = [1,0]
+    Analysis.Top.B[1].vertnumb = 2
+    Analysis.Top.B[1].vertparts = [1,0]
     #Constraints    
-    Analysis.constraints = {
+    Analysis.results = {
 #C1N2_WZ
 "[[W],[Z]]" : "None",
 #C1N2_ZZ
 "[[Z],[Z]]" : "None"
 }    
-    
-    Analysis.FillElements() # Build list of elements from constraints
-
     ListOfAnalyses.append(Analysis)
     
     
@@ -82,12 +76,12 @@ def load():
     Analysis.sqrts = sqrts
     Analysis.histname = histname  
     Analysis.label = "LeptonsMT8 - C1N2_slepton + C1C1_slepton"
-    Analysis.Top.B[0].vertnumb = 2
-    Analysis.Top.B[0].vertins = [1,1]
-    Analysis.Top.B[1].vertnumb = 2
-    Analysis.Top.B[1].vertins = [1,1]
+    Analysis.Top.B[0].vertnumb = 3
+    Analysis.Top.B[0].vertparts = [1,1,0]
+    Analysis.Top.B[1].vertnumb = 3
+    Analysis.Top.B[1].vertparts = [1,1,0]
     #Contraints
-    Analysis.constraints = {
+    Analysis.results = {
 #Left-handed sleptons
 #"[[L,L],[L,nu]] + [[L,L],[nu,L]]" : "[[L,L],[L,nu]] ~ [[L,L],[nu,L]]",
 "[[L,nu],[L,L]] + [[nu,L],[L,L]]" : "[[L,nu],[L,L]] ~ [[nu,L],[L,L]]",
@@ -98,9 +92,6 @@ def load():
 #C1C1 production
 "[[L,nu],[nu,L]] + [[L,nu],[L,nu]] + [[nu,L],[nu,L]]" : "[[L,nu],[nu,L]] ~ 2*[[L,nu],[L,nu]], [[L,nu],[nu,L]] ~ 2*[[nu,L],[nu,L]]"
 }
-    Analysis.FillElements() # Build list of elements from constraints
-
-    
     ListOfAnalyses.append(Analysis)
     
     
@@ -111,12 +102,12 @@ def load():
     Analysis.sqrts = sqrts
     Analysis.histname = histname    
     Analysis.label = "LeptonsMT8 - C1N2_VV + SlepSlep"
-    Analysis.Top.B[0].vertnumb = 1
-    Analysis.Top.B[0].vertins = [1]
-    Analysis.Top.B[1].vertnumb = 1
-    Analysis.Top.B[1].vertins = [1]
+    Analysis.Top.B[0].vertnumb = 2
+    Analysis.Top.B[0].vertparts = [1,0]
+    Analysis.Top.B[1].vertnumb = 2
+    Analysis.Top.B[1].vertparts = [1,0]
     #Constraints    
-    Analysis.constraints = {
+    Analysis.results = {
 #C1N2_WZ
 "[[W],[Z]]" : "None",
 #C1N2_ZZ
@@ -124,11 +115,29 @@ def load():
 #SlepSlep
 "[[l+],[l-]]" : "None"
 }
-    Analysis.FillElements() # Build list of elements from constraints
-
-    
     ListOfAnalyses.append(Analysis)
     
+    
+    #Test Topology:
+    Analysis = EAnalysis()
+    Analysis.lum = lum
+    Analysis.sqrts = sqrts
+    Analysis.histname = histname    
+    Analysis.label = "Test"
+    Analysis.Top.B[0].vertnumb = 3
+    Analysis.Top.B[0].vertparts = [1,1,0]
+    Analysis.Top.B[1].vertnumb = 2
+    Analysis.Top.B[1].vertparts = [1,0]
+    #Constraints    
+    Analysis.results = {
+"[[W,nu],[ta]]" : "None"
+}
+    ListOfAnalyses.append(Analysis)
+
+# Build list of elements from constraints and conditions with zero weights
+# to be computed later with theoretical weights
+    for Analy in ListOfAnalyses:
+        Analy.GenerateElements() 
     
     
     
