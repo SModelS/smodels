@@ -26,7 +26,7 @@ def load():
     #Constraints
     Analysis.results = {
 #Left-handed sleptons
-"[[L,L],[L,nu]] + [[L,L],[nu,L]]" : "[[L,L],[L,nu]] ~ [[L,L],[nu,L]], [[L,L],[L,nu]] ~ 9.*[[ta,ta],[nu,ta]] ",
+"[[L,L],[L,nu]] + [[L,L],[nu,L]]" : "[[L,L],[L,nu]] ~ [[L,L],[nu,L]], [[L,L],[nu,L]] ~ 9.*[[ta,ta],[nu,ta]] ",
 #Right-handed sleptons
 "[[L,L],[nu,ta]]" : "[[L,L],[nu,ta]] ~ (3./2.)*[[l,l],[nu,ta]]"
 }

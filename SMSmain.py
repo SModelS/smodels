@@ -1,29 +1,39 @@
-import SMSglobals, SMSanalyses, sys, SMSmethods
+import SMSglobals, SMSanalyses, sys, SMSmethods, SMSxsec
+#import SMSxsec
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Initialize global variables:
 SMSglobals.initglob()
 #Creat analyses list:
 SMSanalyses.load()
-
-     
-
-
+#Generate events and compute cross-sections:
 nevts = 10000
-Sqrts = 7
-pytres = {"xsecfb" : 1.}
 slhafile = "AndreSLHA/andrePT4.slha"
-pytres = SMSmethods.runpythia(slhafile,nevts,Sqrts)
+Wv = SMSxsec.pytinit(nevts,slhafile)
+W = Wv["Wdic"]
+lhefile = Wv["lhefile"]
+LHEfile = open(lhefile,"r")
 
-filename = open("./data/fort.68","r")
+
 
 SMSTopList = []     
 #Read events and get topologies (fills SMSTopList)
 for iev in range(nevts):
-    weight = {"7 TeV" : pytres["xsecfb"]/float(nevts), "8 TeV" : pytres["xsecfb"]/float(nevts)}
 
-#Read event    
-    PList = SMSmethods.getNextEvent(filename)  
+##Read event    
+    PList = SMSmethods.getNextEvent(LHEfile) 
+##Get mother PDGs:
+    momPDG = tuple(SMSmethods.getMom(PList))
+#Get event weight list:
+    weight = {}
+    
+    for k in W.keys(): 
+        if W[k].has_key(momPDG):
+            weight.update({k : W[k][momPDG]})
+        else:
+            print "Error getting weight"
+            sys.exit()    
+
 #Get event topology    
     SMSTopListEv = SMSmethods.getEventTop(PList, weight)
 #Add event topology to topology list:  

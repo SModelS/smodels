@@ -29,3 +29,7 @@ Analysis element and identical masses
 
 3) Using the dictionary, the mass entries in each element of the Analysis are combined if they belong to the same averaged mass group. As a result a common mass list (using the averaged masses) is generated for all elements.
 
+
+
+Included Suchita's cross-section code at LO (added SMSxsec.py file)
+

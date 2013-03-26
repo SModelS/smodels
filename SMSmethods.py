@@ -167,7 +167,24 @@ def getNextEvent(filename):
 
     return PartList
 
+#Reads particle list and returns an array with the mother
+#PDG codes:
+def getMom(PList):
 
+    momspdg = []
+    imom = 0
+    for i in range(len(PList)):
+        if PList[i].moms[0] == 1 or PList[i].moms[1] == 1:
+            momspdg.append(PList[i].pdg)
+            imom += 1
+    if momspdg[0] > momspdg[1]:
+        momspdg[0], momspdg[1] = momspdg[1], momspdg[0]
+            
+    if imom != 2:
+        print "getMom: Number of mother particles != 2"
+        return False
+    else:
+        return momspdg
 
 #Reads particle list (PList) from event and generates Topology (GTop)
 #with only one element in ElList, corresponding to the event
@@ -532,7 +549,6 @@ def AddToList(SMSTop,SMSTopList):
 def AddToAnalysis(SMSTopList,Analysis):
     
     masscomp = Analysis.masscomp
-    masscomp = 0.15
     
     for itop in range(len(SMSTopList)):
         NewTop = SMSTopList[itop]    

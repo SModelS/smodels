@@ -24,10 +24,10 @@ for (sms,andrecode) in SMSTranslation.items():
   File = open("regression/%s_1.lhe" % sms,"r")
       
   PList = SMSmethods.getNextEvent(File)
-  weight = [pytres["xsecfb"]/float(nevts),pytres["xsecfb"]/float(nevts)]
+  weight = {"7 TeV" : pytres["xsecfb"]/float(nevts), "8 TeV" : pytres["xsecfb"]/float(nevts)}
   SMSTop = SMSmethods.getEventTop(PList, weight)
-  b1=[ SMSTop.B[0].vertnumb,SMSTop.B[0].vertins,SMSTop.B[0].ElList[0].particles ]
-  b2=[ SMSTop.B[0].vertnumb,SMSTop.B[0].vertins,SMSTop.B[0].ElList[0].particles ]
+  b1=[ SMSTop.B[0].vertnumb,SMSTop.B[0].vertparts,SMSTop.B[0].ElList[0].particles ]
+  b2=[ SMSTop.B[0].vertnumb,SMSTop.B[0].vertparts,SMSTop.B[0].ElList[0].particles ]
   SMSdraw.asciidraw ( SMSTop )
   check=( [ b1, b2 ] == andrecode)
   #print check
