@@ -10,7 +10,7 @@ def draw ( top, filename="bla.pdf", elementnr=0 ):
     # print "branch",ct,branch,"with",branch.vertnumb,"vertices"
     p1 = Point(0, ct)
     lastVertex=p1
-    for ( nvtx,particles) in enumerate(branch.vertins):
+    for ( nvtx,particles) in enumerate(branch.vertparts):
       v1=Vertex ( nvtx+1,ct,mark=CIRCLE)
       f1 = Fermion  ( lastVertex,v1) ## .addLabel ( "x")
       lastVertex=v1
@@ -38,7 +38,7 @@ def asciidraw ( top, elementnr=0, labels=True ):
     # print "branch",branch,"up=",up
     lines=["  ","---"]
     labels="  "
-    for ( nvtx,particles) in enumerate(branch.vertins):
+    for ( nvtx,particles) in enumerate(branch.vertparts):
       lines[1]+="*---"
       if particles==1: 
         labels+=" "+branch.ElList[elementnr].particles[0][0]
