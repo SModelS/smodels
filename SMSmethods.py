@@ -151,6 +151,11 @@ def getNextEvent(filename):
 #Get particles info:            
     line = filename.readline()  
     while line.find("</event>") == -1: 
+        if line.find("#")>-1:
+          line=line[:line.find('#')]
+        if len(line)==0:
+          line=filename.readline()
+          continue
         particle = MParticle()
         linep = [float(x) for x in line.split()]
         particle.pdg = int(linep[0])
