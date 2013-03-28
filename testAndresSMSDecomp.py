@@ -68,6 +68,7 @@ for (sms,andrecode) in SMSTranslation.items():
   Branch2 = SMSTop[0].B[1]
   if (Branch1.vertnumb < Branch2.vertnumb) or (Branch1.vertnumb == Branch2.vertnumb and sum(Branch1.vertparts) < sum(Branch2.vertparts)):
         SMSTop[0].B = [Branch2,Branch1]
+#read branch infortmation
   b1=[ SMSTop[0].B[0].vertnumb,SMSTop[0].B[0].vertparts,SMSTop[0].B[0].ElList[0].particles ]
   b2=[ SMSTop[0].B[1].vertnumb,SMSTop[0].B[1].vertparts,SMSTop[0].B[1].ElList[0].particles ]
   check=( [ b1, b2 ] == andrecode)
