@@ -36,7 +36,7 @@ SMSTranslation = {
   "T5zzlnu": [[3, [2, 1, 0], ['jet', 'jet', 'Z']], [3, [2, 1, 0], ['b', 'b', 'Z']]], #name oder lhe falsch!!?
   "T5zzoff": [[3, [2, 2, 0], ['jet', 'jet', 'jet', 'jet']], [3, [2, 2, 0], ['b', 'b', 'jet','jet']]], # ??? im lhe nur ein teilchen am 2. vtx
   "T6bbzz": [ [3, [1,1,0], ['b', 'Z']], [3, [1,1,0], ['b', 'Z']] ],
-  "TChiChipmSnuSlep": [ [3, [1,1,0], ['l+', 'nu']], [3, [1,1,0], ['l-', 'nu']] ], #stimmt so mit lhe ueberein, aber lhe falsch!?
+  "TChiChipmSnuSlep": [ [3, [1,1,0], ['l+', 'l-']], [3, [1,1,0], ['l-', 'nu']] ], #lhe falsch, es werden zwei geladene chis erzeugt
   "TChiNuSlep": [ [3, [1,1,0], ['l+', 'l-']], [3, [1,1,0], ['l-', 'nu']] ], #lhe falsch, gibt keinen ll zerfall. welche topo??
   "TChipmSnuSlep": [ [3, [1,1,0], ['l+', 'nu']], [3, [1,1,0], ['nu', 'l-']] ], #gibt fehler weil l=tau im lhe
   "TChiStauStau": [ [3, [1,1,0], ['nu', 'ta+']], [3, [1,1,0], ['nu', 'ta-']] ], #ist das richtig? 
