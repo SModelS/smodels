@@ -32,6 +32,10 @@ def getT3(b1,b2):
                 return "T3w"
 	elif pts.count('Z')==1:
 		return "T3z"
+	elif pts.count('l+')==1 and pts.count('l-')==1:
+		return "T3lh"
+	elif pts.count('l+')+pts.count('l-')==1 and pts.count('nu')==1:
+		return "T3lnu"
         else: return "T3?"
 
 def getT5(b1,b2):
@@ -57,7 +61,7 @@ def getT2(b1,b2):
         if pts.count('b')==2:
                 return "T2bb"
 	elif pts.count('b')==1 and pts.count('W+')+pts.count('W-')==1:
-		return "T2bw"
+		return "T2bw" #gibt es so nicht, sollte T6bbww geben?
         elif pts.count('t+')==1 and pts.count('t-')==1:
                 return "T2tt"
         else: return "T2"

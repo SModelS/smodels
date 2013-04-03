@@ -38,13 +38,16 @@ def asciidraw ( top, elementnr=0, labels=True ):
     # print "branch",branch,"up=",up
     lines=["  ","---"]
     labels="  "
+    idx=0
     for ( nvtx,particles) in enumerate(branch.vertparts):
       lines[1]+="*---"
       if particles==1: 
-        labels+=" "+branch.ElList[elementnr].particles[0][0]
+        labels+=" "+branch.ElList[elementnr].particles[idx][0]
+	idx+=1
         lines[0]+=" | "
       if particles==2: 
-        labels+=branch.ElList[elementnr].particles[0][0]+" "+branch.ElList[elementnr].particles[1][0]
+        labels+=branch.ElList[elementnr].particles[idx][0]+" "+branch.ElList[elementnr].particles[idx+1][0]
+	idx+=2
         if up:
           lines[0]+="\ /"
         else:
