@@ -1,6 +1,6 @@
 def draw ( top, filename="bla.pdf", elementnr=0 ):
   """ plot a lessagraph, write into pdf file called <filename> """
-  from pyfeyn.user import FeynDiagram,Vertex,Point,Fermion,Scalar
+  from pyfeyn.user import FeynDiagram,Vertex,Point,Fermion,Scalar,CIRCLE
   fd = FeynDiagram()
 
   nbranches=len(top.B)
