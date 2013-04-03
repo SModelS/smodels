@@ -699,9 +699,11 @@ def MassAvg(equivin, method = "mean"):
         return False
     if N == 1: return equivin[0]
 
+    if type(equivin[0]) != type(list()):
+        equivinBr = [equivin]
 #In case the input has 2 branches of different sizes, average
 #each one individually
-    if len(equivin[0]) == 2 and type(equivin[0][0]) == type(list()):
+    elif len(equivin[0]) == 2 and type(equivin[0][0]) == type(list()):
         if len(equivin[0][0]) != len(equivin[0][1]):
             equivinBr = [[],[]]
             for mass in equivin:

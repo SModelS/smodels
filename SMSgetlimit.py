@@ -2,7 +2,7 @@
 #(I have included the Analysis in the input to get the value of masscomp and in case we want to access some additional info)
 def GetPlotLimit(massarray,plot,Analysis):
     import ROOT
-    from SMSmethods import EqualMasses
+    from SMSmethods import EqualMasses, MassAvg
     
 #Data base directory (will have to be modified/improved later! just an example!!!)
     datadir = "./2012"    
@@ -25,19 +25,19 @@ def GetPlotLimit(massarray,plot,Analysis):
     if not EqualMasses(mLSP[0],mLSP[1],masscomp):
         print "GetPlotLimit: Different LSP masses"    #For now only allow for equal LSP masses
         return False
-    my = (mLSP[0]+mLSP[1])/2.    
+    my = MassAvg(mLSP,"harmonic")    
     mMom = [massarray[0][0],massarray[1][0]]   
     if not EqualMasses(mMom[0],mMom[1],masscomp):
         print "GetPlotLimit: Different mother masses"   #For now only allow for equal mother masses
         return False
-    mx = (mMom[0]+mMom[1])/2.
+    mx = MassAvg(mMom,"harmonic")    
 #Get intermediate masses:
     massI = []
     for imass in range(1,len(massarray[0])):
         if not EqualMasses(massarray[0][imass],massarray[1][imass],masscomp):
             print "GetPlotLimit: Different Intermediate masses"    #For now only allow for equal intermediate masses
             return False
-        massI.append((massarray[0][imass] + massarray[1][imass])/2.)
+        massI.append(MassAvg([massarray[0][imass],massarray[1][imass]],"harmonic"))
 
         
     CMSlabel = plot[0]        #CMS-type label
