@@ -5,18 +5,18 @@
 #event file to be used for SMS decomposition.
 #If runpythia = False, read old fort_8,7.68 files and assumes 
 # total xsec = 1 (only useful for fast debugging)
-def pytinit(nevts,slhafile,runpythia = True):
+def pytinit(nevts,slhafile,rpythia = True):
 
     import SMSmethods, shutil
     
-    if runpythia:
+    if rpythia:
 #run pythia at 8 TeV:
-        D=SMSmethods.runpythia(slhafile,nevts = 10000, Sqrts = 8)
+        D = runpythia(slhafile,nevts,8)
         shutil.copy2("./data/fort.68", "./data/fort_8.68")
         total_cs8 = D["xsecfb"]   
     
 #run pythia at 7 TeV:
-        D=SMSmethods.runpythia(slhafile,nevts = 10000, Sqrts = 7)
+        D = runpythia(slhafile,nevts,7)
         shutil.copy2("./data/fort.68", "./data/fort_7.68")
         total_cs7 = D["xsecfb"]
     else:
@@ -83,4 +83,26 @@ def getprodcs(pdgm1, pdgm2, sigma):
     
     return sigma
 
+def runpythia(slhafile,nevts = 10000, Sqrts = 7):
+    import sys, os
 
+    workdir = os.getcwd()    
+    pyslhadir = workdir + "/pyslha-1.4.3"
+    sys.path.append(pyslhadir)
+    import PMSSM
+
+
+
+    PMSSM.installdir = workdir
+    PMSSM.etcdir= workdir + "/etc"
+    PMSSM.logdir= workdir + "/log"
+
+    PMSSM.verbose=True
+    PMSSM.basedir = workdir
+    PMSSM.datadir = workdir + "/data"
+    
+#run pythia
+    print "running pythia"
+    D = PMSSM.runPythiaLHE(nevts,slhafile, " ",sqrts=Sqrts)
+    print "done running"
+    return D

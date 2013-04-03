@@ -1,4 +1,4 @@
-import SMSglobals, SMSanalyses, sys, SMSmethods, SMSxsec
+import SMSglobals, SMSanalyses, sys, SMSmethods, SMSxsec, SMSgetlimit
 #import SMSxsec
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
@@ -75,20 +75,22 @@ for Analysis in SMSglobals.ListOfAnalyses:
     SMSmethods.AddToAnalysis(SMSTopList,Analysis)
 
 #Print analyses output:
-for Anal in SMSglobals.ListOfAnalyses:
-    print Anal.label
-    for i in range(len(Anal.Top.B[0].ElList)):
-        print Anal.Top.B[0].ElList[i].particles,Anal.Top.B[1].ElList[i].particles
-        for j in range(len(Anal.Top.B[0].ElList[i].masses)):
-            if Anal.Top.WeightList[i][j]["7 TeV"] >= 0.:
-                print Anal.Top.B[0].ElList[i].masses[j],Anal.Top.B[1].ElList[i].masses[j],Anal.Top.WeightList[i][j]
-    print '\n'
+#for Anal in SMSglobals.ListOfAnalyses:
+#    print Anal.label
+#    for i in range(len(Anal.Top.B[0].ElList)):
+#        print Anal.Top.B[0].ElList[i].particles,Anal.Top.B[1].ElList[i].particles
+#        for j in range(len(Anal.Top.B[0].ElList[i].masses)):
+#            if Anal.Top.WeightList[i][j]["7 TeV"] >= 0.:
+#                print Anal.Top.B[0].ElList[i].masses[j],Anal.Top.B[1].ElList[i].masses[j],Anal.Top.WeightList[i][j]
+#    print '\n'
 
 print '\n \n \n'
 
+
+
 #Compute theoretical predictions to analyses results:
 for Analysis in SMSglobals.ListOfAnalyses:
-    print Analysis.label
+    print "---------------Analysis Label = ",Analysis.label
     for i in range(len(Analysis.results)):
         const = Analysis.results.items()[i][0]
         cond = Analysis.results.items()[i][1]
@@ -99,13 +101,21 @@ for Analysis in SMSglobals.ListOfAnalyses:
         try:
             plot = Analysis.plots[const]
         except KeyError:    
-            plot = "bla"
+            plot = []
                 
-        print const,":     ",cond,":"
-        for j in range(len(constRes)):            
-            sigmalimit = SMSmethods.GetPlotLimit(constRes[j][0],plot)
-            print constRes[j][0],constRes[j][1],condRes[j][1]
-        print '\n'        
+        print "Constraint: ",const,"  Conditions: ",cond
+        for j in range(len(constRes)):
+            massarray = []
+            massarray.append([x for x in constRes[j][0][0]])
+            massarray.append([x for x in constRes[j][0][1]])
+            sigmalimit = SMSgetlimit.GetPlotLimit(massarray,plot,Analysis)
+            print "Results for mass array ",constRes[j][0]," :"
+            print "    Theorical value = ",constRes[j][1],"Conditions = ",condRes[j][1]
+            print "    Experimental Limits: ",sigmalimit
+        print '\n'
+    print "-----------------------"
+    print '\n \n'    
+    sys.exit()  # Just print first analysis (avoid too much output)       
 
 
 

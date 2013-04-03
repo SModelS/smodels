@@ -150,7 +150,7 @@ def getNextEvent(filename):
 
 #Get particles info:            
     line = filename.readline()  
-    while line.find("</event>") == -1: 
+    while line.find("</event>") == -1:
         if line.find("#")>-1:
           line=line[:line.find('#')]
         if len(line)==0:
@@ -874,27 +874,3 @@ def Ceval(instring,El):
 
   
     
-
-
-def runpythia(slhafile,nevts = 10000, Sqrts = 7):
-    import sys
-    
-    pyslhadir = "/home/lessa/SMS_pythia/pyslha-1.4.3"
-    sys.path.append(pyslhadir)
-    import PMSSM
-
-
-    workdir = "/home/lessa/SMS_pythia"
-    PMSSM.installdir="%s/Pythia_LHE" % workdir
-    PMSSM.etcdir="%s/Pythia_LHE/etc" % workdir
-    PMSSM.logdir="%s/Pythia_LHE/log" % workdir
-
-    PMSSM.verbose=True
-    PMSSM.basedir = "%s/Pythia_LHE" % workdir
-    PMSSM.datadir = "%s/Pythia_LHE/data" % workdir
-
-#run pythia
-    print "running pythia"
-    D = PMSSM.runPythiaLHE ( nevts, slhafile, " ", sqrts=Sqrts)
-    print "done running"
-    return D
