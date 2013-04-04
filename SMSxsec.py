@@ -23,7 +23,7 @@ def runPythiaLHE ( n, slhafile, sqrts=7 ):
   lines=o.split( "\n" )
   xsecfb=None
   for line in lines:
-    print line
+#    print line
     if line.find("All included subprocesses")>0:
       try:
         xsecfb=float(line[67:78].replace("D","E"))*10**12

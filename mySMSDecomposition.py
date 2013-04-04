@@ -64,7 +64,16 @@ def getT2(b1,b2):
 		return "T2bw" #gibt es so nicht, sollte T6bbww geben?
         elif pts.count('t+')==1 and pts.count('t-')==1:
                 return "T2tt"
-        else: return "T2"
+        elif pts.count('l+')+pts.count('l-'):
+                return "TSlepSlep"
+        elif pts.count('W+')+pts.count('W-')==1 and pts.count('Z')==1:
+                return "TChiwz"
+        elif pts.count('W+')==1 and pts.count('W-')==1:
+                return "TChiww"
+        elif pts.count('Z')==2:
+                return "TChizz"
+
+	else: return "T2"
 
 def getT4(b1,b2):
 	return "T4"
@@ -81,24 +90,12 @@ def getTChi(b1,b2):
         pts=[]
         pts.extend(b1[2])
         pts.extend(b2[2])
-        if pts.count('W+')+pts.count('W-')==1 and pts.count('Z')==1:
-                return "TChiwz"
-	elif pts.count('W+')==1 and pts.count('W-')==1:
-		return "TChiww"
-	elif pts.count('Z')==2:
-		return "TChizz"
 	elif pts.count('l+')+pts.count('l-')==3 and pts.count('nu')==1:
 		return "TChiNuSlep" #same as TChiChipmSnuSlep?
 	elif pts.count('l+')+pts.count('l-')==2 and pts.count('nu')==2:
 		return "TChipmSnuSlep"
         else: return "TChi?"
 
-def getTSlep(b1,b2):
-        pts=[]
-        pts.extend(b1[2])
-        pts.extend(b2[2])
-	if pts.count('l+')+pts.count('l-'):
-		return "TSlepSlep"
 
 
 def getSMS(input_lhe):
@@ -120,29 +117,18 @@ def getSMS(input_lhe):
 #find SMS
 	if b1[0]==1 or b2[0]==1:
 		return "bad input lhe"
-	if b1[3]==1000021 and b2[3]==1000021:
-		if b1[1]==[2,0] and b2[1]==[2,0]:
-			return getT1(b1,b2)
-		if (b1[1]==[2,2,0] or b1[1]==[2,1,0]) and b2[1]==[2,0]:
-			return getT3(b1,b2)
-		if (b1[1]==[2,2,0] and b2[1]==[2,2,0]) or (b1[1]==[2,1,0] and b2[1]==[2,1,0]):
-       			 return getT5(b1,b2)
-		return "T(odd)?"
-	if (1000001<=b1[3]<=1000006 or 2000001<=b1[3]<=2000006) and (1000001<=b2[3]<=1000006 or 2000001<=b2[3]<=2000006):
-	        if b1[1]==[1,0] and b2[1]==[1,0]:
-                        return getT2(b1,b2)
-		if b1[1]==[1,1,0] and b2[1]==[1,0]:
-			return getT4(b1,b2)
-                if b1[1]==[1,1,0] and b2[1]==[1,1,0]:
-                         return getT6(b1,b2)
-                return "T(even)?"
-	if (1000022<=b1[3]<=1000025 or b1[3]==1000035 or b1[3]==1000037) and (1000022<=b2[3]<=1000025 or b2[3]==1000035 or b2[3]==1000037):
-		return getTChi(b1,b2)
-	if ((1000001<=b1[3]<=1000006 or 2000001<=b1[3]<=2000006) and b2[3]==1000021) or ((1000001<=b2[3]<=1000006 or 2000001<=b2[3]<=2000006) and b1[3]==1000021):
-		return "TGQ"
-	if b1[3] and b2[3] in [1000011, 1000013, 1000015, 2000011, 2000013, 2000014]:
-		return getTSlep(b1,b2)
-	return "Topo unknown"
+	if b1[1]==[2,0] and b2[1]==[2,0]:
+		return getT1(b1,b2)
+	if (b1[1]==[2,2,0] or b1[1]==[2,1,0]) and b2[1]==[2,0]:
+		return getT3(b1,b2)
+	if (b1[1]==[2,2,0] and b2[1]==[2,2,0]) or (b1[1]==[2,1,0] and b2[1]==[2,1,0]):
+       		return getT5(b1,b2)
+	if b1[1]==[1,0] and b2[1]==[1,0]:
+                return getT2(b1,b2)
+	if b1[1]==[1,1,0] and b2[1]==[1,0]:
+		return getT4(b1,b2)
+        if b1[1]==[1,1,0] and b2[1]==[1,1,0]:
+                return getT6(b1,b2)
 
 
 def particle ( pid ):
