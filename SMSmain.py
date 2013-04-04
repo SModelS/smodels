@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import SMSglobals, SMSanalyses, sys, SMSmethods, SMSxsec, SMSgetlimit
 #import SMSxsec
 
