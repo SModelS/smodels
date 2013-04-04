@@ -1,4 +1,37 @@
-
+def runPythiaLHE ( n, slhafile, sqrts=7 ):
+  """ run pythia_lhe with n events, at sqrt(s)=sqrts.
+      slhafile is inputfile
+      datadir is where this all should run,
+      installdir is where pythia_lhe is to be found.  """
+  import commands
+  print "try to run pythia_lhe at sqrt(s)=%d with %d events" % (sqrts,n)
+  datadir="data/"
+  etcdir="etc/"
+  o=commands.getoutput ( "cp %s %s/fort.61" % ( slhafile, datadir ) )
+  if len(o)>0:
+    print "[SMSxsec.py] runPythiaLHE error",o
+  f=open(etcdir+"/external_lhe.template") 
+  lines=f.readlines()
+  f.close()
+  g=open(datadir+"/external_lhe.dat","write")
+  for line in lines:
+    out=line.replace("NEVENTS",str(n)).replace("SQRTS",str(1000*sqrts))
+    g.write ( out )
+  g.close()
+  o=commands.getoutput ( "cd %s; ../pythia_lhe < external_lhe.dat" % \
+     ( datadir ) )
+  lines=o.split( "\n" )
+  xsecfb=None
+  for line in lines:
+    print line
+    if line.find("All included subprocesses")>0:
+      try:
+        xsecfb=float(line[67:78].replace("D","E"))*10**12
+      except Exception,e:
+        print "[ResultsTables.py] Exception",e,"xsecfb=",line[67:78]
+        print "  `-- line=",line
+        print "  `-- masterkey=",masterkey
+  return { "xsecfb": xsecfb }
 
 #Runs pythia at 7 and 8 TeV and compute weights for each production
 #process. Returns a dictionary with weights at 7 and 8 TeV and the
@@ -89,20 +122,9 @@ def runpythia(slhafile,nevts = 10000, Sqrts = 7):
     workdir = os.getcwd()    
     pyslhadir = workdir + "/pyslha-1.4.3"
     sys.path.append(pyslhadir)
-    import PMSSM
-
-
-
-    PMSSM.installdir = workdir
-    PMSSM.etcdir= workdir + "/etc"
-    PMSSM.logdir= workdir + "/log"
-
-    PMSSM.verbose=True
-    PMSSM.basedir = workdir
-    PMSSM.datadir = workdir + "/data"
     
-#run pythia
+    #run pythia
     print "running pythia"
-    D = PMSSM.runPythiaLHE(nevts,slhafile, " ",sqrts=Sqrts)
+    D = runPythiaLHE(nevts,slhafile, sqrts=Sqrts )
     print "done running"
     return D
