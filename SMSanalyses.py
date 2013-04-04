@@ -41,7 +41,7 @@ def load():
     "[[jet],[jet]]" : ["T2",["RAZOR","RA2","alphaTb","alphaT"]],
     "[[b],[b]]" : ["T2bb",["RAZORb","alphaTb","alphaT"]],
     "[[t],[t]]" : ["T2tt",["RAZOR","HadronicStop","alphaTb","alphaT","RAZORb","RAZORjets"]],
-    "[[Z],[Z]]" : ["TChizz",[]],
+    "[[Z],[Z]]" : ["TChizz",["MULTILEPTON"]],
     "[[W],[W]]" : ["TChiww",[]],
     "[[W],[Z]]" : ["TChiwz",["MULTILEPTON","LeptonsMT"]],
     "[[l],[l]]" : ["TSlepSlep",[]]}
