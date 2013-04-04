@@ -3,9 +3,10 @@
 def GetPlotLimit(massarray,plot,Analysis):
     import ROOT
     from SMSmethods import EqualMasses, MassAvg
-    
+    import SMSHelpers  
+ 
 #Data base directory (will have to be modified/improved later! just an example!!!)
-    datadir = "./2012"    
+    datadir = SMSHelpers.Base+"./2012"    
 
 #Skip empty plots:
     if len(plot) != 2: return False
@@ -45,7 +46,7 @@ def GetPlotLimit(massarray,plot,Analysis):
 #Now loop over analyses/results and get limits:
     for analyses in CMSanalyses:
         rootfilename = datadir + "/" + analyses + "/sms.root"  #Get Analyses filename
-        try:
+	try:
             rootfile = ROOT.TFile(rootfilename)
         except:
             continue
