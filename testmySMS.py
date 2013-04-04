@@ -10,9 +10,9 @@ reset='\033[;0m'
 
 #topolist.remove('slha')
 
-topolist = ['T1tttt', 'T2tt', 'T1', 'T2', 'TGQ']
+topolist = ['T1','T2','T1tttt', 'T2tt', 'T5ww', 'TChiwz']
 
-print "myTopo, Topo according to filename"
+#print "myTopo, Topo according to filename"
 
 def ok ( A,B ):
   if A==B: return "%sok.%s" % ( green, reset )
