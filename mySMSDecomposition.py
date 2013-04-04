@@ -84,17 +84,12 @@ def getT6(b1,b2):
         pts.extend(b2[2])
         if pts.count('b')==2 and pts.count('Z')==2:
                 return "T6bbzz"
-        else: return "T6?"
-
-def getTChi(b1,b2):
-        pts=[]
-        pts.extend(b1[2])
-        pts.extend(b2[2])
 	elif pts.count('l+')+pts.count('l-')==3 and pts.count('nu')==1:
-		return "TChiNuSlep" #same as TChiChipmSnuSlep?
-	elif pts.count('l+')+pts.count('l-')==2 and pts.count('nu')==2:
-		return "TChipmSnuSlep"
-        else: return "TChi?"
+                return "TChiNuSlep" #same as TChiChipmSnuSlep?
+        elif pts.count('l+')+pts.count('l-')==2 and pts.count('nu')==2:
+                return "TChipmSnuSlep"
+
+        else: return "T6?"
 
 
 
@@ -129,7 +124,7 @@ def getSMS(input_lhe):
 		return getT4(b1,b2)
         if b1[1]==[1,1,0] and b2[1]==[1,1,0]:
                 return getT6(b1,b2)
-
+	return "?"
 
 def particle ( pid ):
   p=int(abs(pid))
