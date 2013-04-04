@@ -2,13 +2,24 @@
 
 import mySMSDecomposition, os
 
-topolist=os.listdir('regression')
+green='\033[0;32m'
+red='\033[0;31m'
+reset='\033[;0m'
 
-topolist.remove('slha')
+#topolist=os.listdir('regression')
+
+#topolist.remove('slha')
+
+topolist = ['T1tttt', 'T2tt', 'T1', 'T2', 'TGQ']
 
 print "myTopo, Topo according to filename"
 
-for topo in topolist:
-	lhe=topo.split('_')[0]
-    	print mySMSDecomposition.getSMS('%s' %lhe),' , ',lhe
+def ok ( A,B ):
+  if A==B: return "%sok.%s" % ( green, reset )
+  return "%sfailed. [%s]%s" % ( red, B, reset )
 
+for topo in topolist:
+#	lhe=topo.split('_')[0]
+#    	print mySMSDecomposition.getSMS('%s' %topo),' , ',topo
+	res = mySMSDecomposition.getSMS('%s' %topo)
+	print "Checking %7s: %s" % ("["+res+"]",ok(res,topo))
