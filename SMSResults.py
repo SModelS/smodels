@@ -128,7 +128,17 @@ def getPAS ( analysis, run=None ):
 
 def getx ( analysis, run=None ):
   """ get the description of the x-values for this analysis """
-  return SMSHelpers.getMetaInfoField ( analysis, "x", run )
+  st = SMSHelpers.getMetaInfoField ( analysis, "x", run )
+  if not st:
+     return None 
+  st = st.split(',')
+  d = {}
+  for i in range(len(st)):
+     l = st[i].split(':')
+     x = l[1].split()
+     d[l[0]] = x
+  return d 
+
 
 def getURL ( analysis, run=None ):
   """ get the URL for this analysis """
