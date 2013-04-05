@@ -126,6 +126,10 @@ def getPAS ( analysis, run=None ):
   """ get the PAS for this analysis """
   return SMSHelpers.getMetaInfoField ( analysis, "pas", run )
 
+def getx ( analysis, run=None ):
+  """ get the description of the x-values for this analysis """
+  return SMSHelpers.getMetaInfoField ( analysis, "x", run )
+
 def getURL ( analysis, run=None ):
   """ get the URL for this analysis """
   ## print "[SMSResults.debug] url for %s=>>>%s<<<<br>" % ( analysis, SMSHelpers.getMetaInfoField ( analysis, "url", run ) )
