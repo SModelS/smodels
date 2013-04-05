@@ -15,7 +15,7 @@ def ResultsForSqrts ( sqrts ):
     return
   if sqrts==8:
     SMSHelpers.runs=[ "8TeV", "ATLAS8TeV" ]
-    SMSResultsCollector.alldirectories=[ "8TeV", "ATLAS8TeV" ] 
+    SMSResultsCollector.alldirectories=[ "8TeV", "ATLAS8TeV" ]
     return
   if sqrts==0 or sqrts==None:
     SMSHelpers.runs=[ "8TeV", "2012", "2011", "ATLAS8TeV" ]
@@ -30,12 +30,19 @@ def verbosity ( level="error" ):
     SMSHelpers.verbose=True
 
 def getExclusion ( analysis, topo, run=None ):
-  """ get the exclusions on the mother particles, 
+  """ get the exclusions on the mother particles,
       for the summary plots """
   run=SMSHelpers.getRun ( analysis, run )
   ex=SMSHelpers.motherParticleExclusions ( analysis, run )
   if not ex.has_key ( topo ): return None
   return ex[topo]
+
+def getExclusionLine(topo,ana,expected=False,plusminussigma=0,extendedinfo=True,xvalue=None,factor=1.0):
+  """ get the exclusion line, as a TGraph """
+  if xvalue==None: xvalue=''
+  import SMSResultsCollector
+  ex=SMSResultsCollector.exclusionline(topo,ana,xvalue,expected,plusminussigma)
+  return ex
 
 def getTopologies ( analysis, run=None ):
   """ return all topologies that this analysis has results for """
@@ -63,15 +70,15 @@ def getAnalyses ( topo, run=None ):
       if os.path.exists ( "%s/%s/%s/info.txt" % ( SMSHelpers.Base, r, ana ) ):
         e=getExclusion ( ana, topo, r )
         if e: analyses[ana]=True
-    
+
   return analyses.keys()
 
 def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None ):
-  """ get the upper limit for run/analysis/topo. 
+  """ get the upper limit for run/analysis/topo.
       return none if it doesnt exist.
       if mx and my are none, return the entire histogram,
       if mx and my are floats, return the upper limit at this
-      point 
+      point
       if png==True, return path of pngfile containing the histogram"""
   run=SMSHelpers.getRun ( analysis, run )
   histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
@@ -84,7 +91,7 @@ def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None ):
   return value
 
 def getEfficiency ( analysis, topo, mx=None, my=None, run=None ):
-  """ get the efficiency for run/analysis/topo. 
+  """ get the efficiency for run/analysis/topo.
       return none if it doesnt exist.
       if mx and my are none, return the entire histogram,
       if mx and my are floats, return the upper limit at this
@@ -99,7 +106,7 @@ def getEfficiency ( analysis, topo, mx=None, my=None, run=None ):
 def getExplanationForLackOfUpperLimit ( analysis, topo, mx=None, my=None, \
                                         run=None, number=False ):
   """ if there's no upper limit, we want to know what's wrong.
-      If number is false, return a text, if number is true 
+      If number is false, return a text, if number is true
       return the error code """
   value=getUpperLimit ( analysis, topo, run=run )
   msg=SMSHelpers.getErrorMessage ( value, mx, my )
@@ -122,6 +129,10 @@ def getLumi ( analysis, run=None ):
   """ get the integrated luminosity for this analysis """
   return SMSHelpers.getMetaInfoField ( analysis, "lumi", run )
 
+def getSqrts ( analysis, run=None ):
+  """ get s_hat for this analysis """
+  return SMSHelpers.getMetaInfoField ( analysis, "sqrts", run )
+
 def getPAS ( analysis, run=None ):
   """ get the PAS for this analysis """
   return SMSHelpers.getMetaInfoField ( analysis, "pas", run )
@@ -130,19 +141,41 @@ def getx ( analysis, run=None ):
   """ get the description of the x-values for this analysis """
   st = SMSHelpers.getMetaInfoField ( analysis, "x", run )
   if not st:
-     return None 
+     return None
   st = st.split(',')
   d = {}
   for i in range(len(st)):
      l = st[i].split(':')
      x = l[1].split()
      d[l[0]] = x
-  return d 
+  return d
 
+def getFigures ( analysis, run=None ):
+  """ get the figure number for this analysis """
+  return SMSHelpers.getMetaInfoField ( analysis, "figures", run )
+
+def getConditions ( analysis, run=None ):
+  """ get the figure number for this analysis """
+  return SMSHelpers.getMetaInfoField ( analysis, "conditions", run )
+
+def getRequirement ( analysis, run=None ):
+  """ any requirements that come with this analysis? (e.g. onshellness) """
+  return SMSHelpers.getMetaInfoField ( analysis, "requires", run )
+
+def getCheckedBy ( analysis, run=None ):
+  """ has the result been validated? """
+  return SMSHelpers.getMetaInfoField ( analysis, "checked", run )
+
+def getJournal ( analysis, run=None ):
+  """ get the journal of this analysis """
+  return SMSHelpers.getMetaInfoField ( analysis, "journal", run )
+
+def getBibtex ( analysis, run=None ):
+  """ get the inspire page with the bibtex entry for this analysis """
+  return SMSHelpers.getMetaInfoField ( analysis, "bibtex", run )
 
 def getURL ( analysis, run=None ):
   """ get the URL for this analysis """
-  ## print "[SMSResults.debug] url for %s=>>>%s<<<<br>" % ( analysis, SMSHelpers.getMetaInfoField ( analysis, "url", run ) )
   return SMSHelpers.getMetaInfoField ( analysis, "url", run )
 
 def hasURL ( analysis, run=None ):
@@ -162,7 +195,7 @@ def particles(topo,plot = 'ROOT'):
      latex code either compatible to ROOT or Python"""
   if SMSHelpers.dicparticle.has_key(topo):
     part = SMSHelpers.dicparticle[topo]
-    if plot == 'ROOT':  
+    if plot == 'ROOT':
       #print "[SMSResults.py] debug",part
       return part
     if plot == 'python':
@@ -219,4 +252,4 @@ def massDecoupling ( topo, plot='ROOT',kerning=True ):
   if plot!='ROOT':
     md = '$' + md.replace('#','\\') + '$'
   return md
-    
+
