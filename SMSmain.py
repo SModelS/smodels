@@ -10,7 +10,7 @@ SMSglobals.initglob()
 #Creat analyses list:
 SMSanalyses.load()
 #Generate events and compute cross-sections:
-nevts = 100
+nevts = 5
 slhafile = "AndreSLHA/T2bb_heavy_ino_param.dat"
 Wv = SMSxsec.pytinit(nevts,slhafile)
 W = Wv["Wdic"]
@@ -43,7 +43,7 @@ for iev in range(nevts):
         SMSmethods.AddToList(TopEv,SMSTopList)
     SMSglobals.evcount +=1
 
-x = PrettyTable(["#Vertices B[0]","#Vertices B[1]", "#Insertions B[0]","#Insertions B[1]", "#Elements", "Sum of weights"])          
+element_table = PrettyTable(["#Vertices B[0]","#Vertices B[1]", "#Insertions B[0]","#Insertions B[1]", "#Elements", "Sum of weights"])          
 
 eltot = 0
 #Print Results:
@@ -60,16 +60,16 @@ for i in range(len(SMSTopList)):
         for w in SMSTopList[i].WeightList[j].keys():
             sumw[w] += SMSTopList[i].WeightList[j][w]            
 #    print "Sum of weights=", sumw,"\n"
-    x.add_row([SMSTopList[i].B[0].vertnumb,SMSTopList[i].B[1].vertnumb,SMSTopList[i].B[0].vertparts,SMSTopList[i].B[1].vertparts,len(SMSTopList[i].B[0].ElList),sumw])
+    element_table.add_row([SMSTopList[i].B[0].vertnumb,SMSTopList[i].B[1].vertnumb,SMSTopList[i].B[0].vertparts,SMSTopList[i].B[1].vertparts,len(SMSTopList[i].B[0].ElList),sumw])
     eltot += len(SMSTopList[i].B[0].ElList)
-    print(x)
+
  
             
 #Print element list for Topology[i]:    
     if i < 0:
         for j in range(len(SMSTopList[i].B[0].ElList)):
             print SMSTopList[i].B[0].ElList[j].masses,SMSTopList[i].B[1].ElList[j].masses,SMSTopList[i].B[0].ElList[j].particles,SMSTopList[i].B[1].ElList[j].particles,SMSTopList[i].WeightList[j]
-
+print(element_table)
 
 print "Total Number of Elements = ",eltot   
 print '\n \n \n'
@@ -91,6 +91,7 @@ for Analysis in SMSglobals.ListOfAnalyses:
 
 print '\n \n \n'
 
+y = PrettyTable(["#Vertices B[0]","#Vertices B[1]", "#Insertions B[0]","#Insertions B[1]", "#Elements", "Sum of weights"])          
 
 #Compute theoretical predictions to analyses results:
 for Analysis in SMSglobals.ListOfAnalyses:
