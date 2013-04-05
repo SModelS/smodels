@@ -73,6 +73,21 @@ def getAnalyses ( topo, run=None ):
 
   return analyses.keys()
 
+def getAllResults ( run=None ):
+  import os
+  """ returns all analyses and the topologies they have results for """
+  runs=SMSHelpers.runs
+  if run: runs= [ run ]
+  ret={}
+  for r in runs:
+    ## so thats the runs I really have to think about
+    dirs=os.listdir ( "%s/%s/" % ( SMSHelpers.Base, r ) )
+    for ana in dirs:
+      if os.path.exists ( "%s/%s/%s/info.txt" % ( SMSHelpers.Base, r, ana ) ):
+        topos=getTopologies ( ana, run )
+        ret[ana]=topos
+  return ret
+
 def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None ):
   """ get the upper limit for run/analysis/topo.
       return none if it doesnt exist.
