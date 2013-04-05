@@ -3,7 +3,7 @@
 def GetPlotLimit(massarray,plot,Analysis):
     import ROOT
     from SMSmethods import EqualMasses, MassAvg
-    import SMSHelpers  
+    import SMSHelpers, SMSResults  
  
 #Data base directory (will have to be modified/improved later! just an example!!!)
     datadir = SMSHelpers.Base+"./2012"    
@@ -45,17 +45,18 @@ def GetPlotLimit(massarray,plot,Analysis):
     CMSanalyses = plot[1]     #CMS list of analyses
 #Now loop over analyses/results and get limits:
     for analyses in CMSanalyses:
-        rootfilename = datadir + "/" + analyses + "/sms.root"  #Get Analyses filename
-	try:
-            rootfile = ROOT.TFile(rootfilename)
-        except:
-            continue
-        histname = "limit_" + CMSlabel   #Get histogram name
-        hist = rootfile.Get(histname)
-        if not hist: continue            
-        
-        b = hist.FindBin(mx, my)
-        limits.append([analyses,hist.GetBinContent(b)])   #Save experimental limit and analyses name
+        limits.append([analyses,SMSResults.getUpperLimit(analyses,CMSlabel,mx, my)])
+#        rootfilename = datadir + "/" + analyses + "/sms.root"  #Get Analyses filename
+#	try:
+#           rootfile = ROOT.TFile(rootfilename)
+#        except:
+#            continue
+#        histname = "limit_" + CMSlabel   #Get histogram name
+#        hist = rootfile.Get(histname)
+#        if not hist: continue            
+#        
+#        b = hist.FindBin(mx, my)
+#        limits.append([analyses,hist.GetBinContent(b)])   #Save experimental limit and analyses name
 
         
     return limits
