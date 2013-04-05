@@ -13,6 +13,7 @@ def load():
     Analysis = EAnalysis()
     Analysis.sqrts = sqrts
     Analysis.masscomp = masscomp
+    Analysis.plotpath = "2012"  #Run label
     Analysis.label = "T2-type" #it can be whatever you want
     Analysis.Top.B[0].vertnumb = 2    #Number of vertices of 1st branch
     Analysis.Top.B[0].vertparts = [1,0] #Number of particle insertions of 1st branch
