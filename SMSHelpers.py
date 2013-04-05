@@ -62,7 +62,7 @@ def parseMetaInfo ( analysis, run ):
   return ret
 
 def motherParticleExclusions ( analysis, run ):
-  """ get all the meta information for a given analysis/run pair """
+  """ get all the exclusion numbers for a given analysis/run pair """
   info="%s/%s/%s/info.txt" % ( Base, run, analysis )
   ret={}
   if not os.path.exists ( info ):
@@ -90,6 +90,35 @@ def motherParticleExclusions ( analysis, run ):
     if len(values)==2:
       values.insert(0,0)
     ret[excls[0]]=values
+  return ret
+
+def conditions ( analysis, run ):
+  """ get all the conditions for a analysis/run pair """
+  info="%s/%s/%s/info.txt" % ( Base, run, analysis )
+  ret={}
+  print "conditions",info
+  if not os.path.exists ( info ):
+    log ("cannot find %s" % info )
+    return ret
+  f=open(info)
+  lines=f.readlines()
+  f.close()
+  for line in lines:
+    tokens=line.split(":",1)
+    if not len(tokens)==2:
+      log ( "cannot parse this line (2): %s in %s" % (line, info) )
+      continue
+    if tokens[0]!="condition":
+      # we're only interested in the conditions
+      continue
+    excl=tokens[1]
+    while excl[0]==" ": excl=excl[1:]
+    if excl[-1]=='\n': excl=excl[:-1]
+    keyvalue=excl.split(" -> ")
+    if len(keyvalue)!=2:
+      log ( "cannot parse the following line: %s" % keyvalue )
+    ret[ keyvalue[0] ] = keyvalue[1]
+    # ret.append(excl)
   return ret
 
 def getUpperLimitHisto ( analysis, topo, run ):
