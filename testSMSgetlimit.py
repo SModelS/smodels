@@ -63,21 +63,29 @@ def GetPlotLimit(massarray,plot,Analysis):
 #Now loop over analyses/results and get limits:
     for analyses in CMSanalyses:
 	xdict = SMSResults.getx(analyses)
-	print xdict
+#	print xdict
         if not xdict or not xdict.has_key(CMSlabel):
 	     limit = SMSResults.getUpperLimit(analyses,CMSlabel,mx, my)
 	     limits.append([analyses, limit])
+	     if massI:
+		print '\033[93m'+"Could not find histograms for different x for",analyses,'\033[0m'
 	     continue
 	if xdict.has_key(CMSlabel):
+	     if massI[0][1]<0.05 or massI[0][1]>0.95:
+		limits.append([analyses, "x value out of range"])
+		continue
 	     y = []
+	     x = []
 	     for k in xdict[CMSlabel]:
 		if k == '050':
                      y.append(SMSResults.getUpperLimit(analyses,CMSlabel,mx, my))
 		else:
 		     y.append(SMSResults.getUpperLimit(analyses,CMSlabel+k,mx, my))
-	     x = map(float,xdict[CMSlabel])
-	     x = [i/100. for i in x]
-	     p = numpy.polyfit(x, y, len(y))
+		x.append(float(k)/100)
+	     print x, y
+	     if len(massI)>1:
+		print "More than one intermediate mass! Use the one that was found first!"
+	     p = numpy.polyfit(x, y, len(y)-1)
 	     limit = numpy.polyval(p, massI[0][1])     
 	     limits.append([analyses, limit]) 
 		
