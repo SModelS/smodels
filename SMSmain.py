@@ -60,7 +60,8 @@ for i in range(len(SMSTopList)):
         for w in SMSTopList[i].WeightList[j].keys():
             sumw[w] += SMSTopList[i].WeightList[j][w]            
 #    print "Sum of weights=", sumw,"\n"
-    element_table.add_row([SMSTopList[i].B[0].vertnumb,SMSTopList[i].B[1].vertnumb,SMSTopList[i].B[0].vertparts,SMSTopList[i].B[1].vertparts,len(SMSTopList[i].B[0].ElList),sumw])
+    sumwstring=str ( [ "%s: %g" % ( k,v) for (k,v) in sumw.items() ] )
+    element_table.add_row([SMSTopList[i].B[0].vertnumb,SMSTopList[i].B[1].vertnumb,SMSTopList[i].B[0].vertparts,SMSTopList[i].B[1].vertparts,len(SMSTopList[i].B[0].ElList),sumwstring])
     eltot += len(SMSTopList[i].B[0].ElList)
 
  
