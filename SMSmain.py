@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import SMSglobals, SMSanalyses, sys, SMSmethods, SMSxsec, SMSgetlimit
+from prettytable import PrettyTable
 #import SMSxsec
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
@@ -9,13 +10,12 @@ SMSglobals.initglob()
 #Creat analyses list:
 SMSanalyses.load()
 #Generate events and compute cross-sections:
-nevts = 10000
-slhafile = "AndreSLHA/andrePT4.slha"
+nevts = 100
+slhafile = "AndreSLHA/T2bb_heavy_ino_param.dat"
 Wv = SMSxsec.pytinit(nevts,slhafile)
 W = Wv["Wdic"]
 lhefile = Wv["lhefile"]
 LHEfile = open(lhefile,"r")
-
 
 
 SMSTopList = []     
@@ -43,6 +43,7 @@ for iev in range(nevts):
         SMSmethods.AddToList(TopEv,SMSTopList)
     SMSglobals.evcount +=1
 
+x = PrettyTable(["#Vertices B[0]","#Vertices B[1]", "#Insertions B[0]","#Insertions B[1]", "#Elements", "Sum of weights"])          
 
 eltot = 0
 #Print Results:
@@ -52,14 +53,16 @@ for i in range(len(SMSTopList)):
     sumw = weight
     for w in sumw.keys():
         sumw[w] = 0.
-    print "Number of vertices = ",SMSTopList[i].B[0].vertnumb,SMSTopList[i].B[1].vertnumb
-    print "Vertice insertions = ",SMSTopList[i].B[0].vertparts,SMSTopList[i].B[1].vertparts
-    print "Number of Elements = ",len(SMSTopList[i].B[0].ElList)
+#    print "Number of vertices = ",SMSTopList[i].B[0].vertnumb,SMSTopList[i].B[1].vertnumb
+#    print "Vertice insertions = ",SMSTopList[i].B[0].vertparts,SMSTopList[i].B[1].vertparts
+#    print "Number of Elements = ",len(SMSTopList[i].B[0].ElList)
     for j in range(len(SMSTopList[i].WeightList)):
         for w in SMSTopList[i].WeightList[j].keys():
             sumw[w] += SMSTopList[i].WeightList[j][w]            
-    print "Sum of weights=", sumw,"\n"
+#    print "Sum of weights=", sumw,"\n"
+    x.add_row([SMSTopList[i].B[0].vertnumb,SMSTopList[i].B[1].vertnumb,SMSTopList[i].B[0].vertparts,SMSTopList[i].B[1].vertparts,len(SMSTopList[i].B[0].ElList),sumw])
     eltot += len(SMSTopList[i].B[0].ElList)
+    print(x)
  
             
 #Print element list for Topology[i]:    
@@ -87,7 +90,6 @@ for Analysis in SMSglobals.ListOfAnalyses:
 #    print '\n'
 
 print '\n \n \n'
-
 
 
 #Compute theoretical predictions to analyses results:
