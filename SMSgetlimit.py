@@ -1,12 +1,12 @@
 #Get upper limit on sigma*BR for a specific array of masses from plot
 #(I have included the Analysis in the input to get the value of masscomp and in case we want to access some additional info)
 def GetPlotLimit(massarray,plot,Analysis):
-    import ROOT
     from SMSmethods import EqualMasses, MassAvg
-    import SMSHelpers, SMSResults  
+    import SMSResults  
  
-#Data base directory (will have to be modified/improved later! just an example!!!)
-    datadir = SMSHelpers.Base+"./2012"    
+#Run label:
+    run = Analysis.plotpath
+    if run == "": run = None   #If run has not been defined, use latest run
 
 #Skip empty plots:
     if len(plot) != 2: return False
@@ -45,7 +45,7 @@ def GetPlotLimit(massarray,plot,Analysis):
     CMSanalyses = plot[1]     #CMS list of analyses
 #Now loop over analyses/results and get limits:
     for analyses in CMSanalyses:
-        limits.append([analyses,SMSResults.getUpperLimit(analyses,CMSlabel,mx, my)])
+        limits.append([analyses,SMSResults.getUpperLimit(analyses,CMSlabel,mx, my, run)])
 #        rootfilename = datadir + "/" + analyses + "/sms.root"  #Get Analyses filename
 #	try:
 #           rootfile = ROOT.TFile(rootfilename)
