@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-""" centralized facility to access the results """
+""" centralized facility to access the SMS results """
 
 import SMSHelpers
 
