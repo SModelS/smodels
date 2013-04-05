@@ -11,7 +11,7 @@ SMSglobals.initglob()
 SMSanalyses.load()
 #Generate events and compute cross-sections:
 nevts = 5
-slhafile = "AndreSLHA/T2bb_heavy_ino_param.dat"
+slhafile = "AndreSLHA/andrePT4.slha"
 Wv = SMSxsec.pytinit(nevts,slhafile)
 W = Wv["Wdic"]
 lhefile = Wv["lhefile"]

@@ -137,8 +137,13 @@ def getPAS ( analysis, run=None ):
   """ get the PAS for this analysis """
   return SMSHelpers.getMetaInfoField ( analysis, "pas", run )
 
-def getx ( analysis, run=None ):
-  """ get the description of the x-values for this analysis """
+def getx ( analysis, topo=None, run=None ):
+  """ get the description of the x-values for this analysis, if you supply a
+      topo, then the return value is the x-values only for this topo """
+  if topo:
+    tmp=getx ( analysis, run )
+    if tmp.has_key ( topo ): return tmp[topo]
+    return None
   st = SMSHelpers.getMetaInfoField ( analysis, "x", run )
   if not st:
      return None
@@ -156,7 +161,9 @@ def getFigures ( analysis, run=None ):
 
 def getConditions ( analysis, run=None ):
   """ get the figure number for this analysis """
-  return SMSHelpers.getMetaInfoField ( analysis, "conditions", run )
+  run=SMSHelpers.getRun ( analysis, run )
+  ret = SMSHelpers.conditions ( analysis, run )
+  return ret
 
 def getRequirement ( analysis, run=None ):
   """ any requirements that come with this analysis? (e.g. onshellness) """
