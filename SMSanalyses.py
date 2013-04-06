@@ -13,7 +13,7 @@ def load():
     Analysis = EAnalysis()
     Analysis.sqrts = sqrts
     Analysis.masscomp = masscomp
-    Analysis.plotpath = "2012"  #Run label
+    Analysis.run = "2012"  #Run label
     Analysis.label = "T2-type" #it can be whatever you want
     Analysis.Top.B[0].vertnumb = 2    #Number of vertices of 1st branch
     Analysis.Top.B[0].vertparts = [1,0] #Number of particle insertions of 1st branch
@@ -81,10 +81,11 @@ def load():
 #Right-handed sleptons
 "[[L,L],[nu,ta]]" : "[[L,L],[nu,ta]] ~ (3./2.)*[[l,l],[nu,ta]]"
 }
-    Analysis.plotpath = "/home/lessa/SMS_pythia/2012/LeptonsMT/"
+    Analysis.run = "/home/lessa/SMS_pythia/2012/LeptonsMT/"
     Analysis.plots  = {
 "[[L,L],[L,nu]] + [[L,L],[nu,L]]" : "plot1",
-"[[L,L],[nu,ta]]" : "plot2"
+"[[L,L],[nu,ta]]" : "plot2",
+"[[L,L],[nu,ta]]" : "plot3"
 }
     ListOfAnalyses.append(Analysis)
 
@@ -106,7 +107,12 @@ def load():
 "[[W],[Z]]" : "None",
 #C1N2_ZZ
 "[[Z],[Z]]" : "None"
-}    
+}
+    Analysis.plots  = {
+"[[W],[Z]]" : "None",
+"[[Z],[Z]]" : "None"
+}
+    
     ListOfAnalyses.append(Analysis)
     
     
@@ -134,7 +140,6 @@ def load():
     #Contraints
     Analysis.results = {
 #Left-handed sleptons
-#"[[L,L],[L,nu]] + [[L,L],[nu,L]]" : "[[L,L],[L,nu]] ~ [[L,L],[nu,L]]",
 "[[L,nu],[L,L]] + [[nu,L],[L,L]]" : "[[L,nu],[L,L]] ~ [[nu,L],[L,L]]",
 #Right-handed sleptons
 "[[L,L],[nu,ta]]" : "None",
@@ -142,6 +147,12 @@ def load():
 "[[ta,ta],[nu,ta]]" : "None",
 #C1C1 production
 "[[L,nu],[nu,L]] + [[L,nu],[L,nu]] + [[nu,L],[nu,L]]" : "[[L,nu],[nu,L]] ~ 2*[[L,nu],[L,nu]], [[L,nu],[nu,L]] ~ 2*[[nu,L],[nu,L]]"
+}
+    Analysis.plots = {
+"[[L,nu],[L,L]] + [[nu,L],[L,L]]" : "None",
+"[[L,L],[nu,ta]]" : "None",
+"[[ta,ta],[nu,ta]]" : "None",
+"[[L,nu],[nu,L]] + [[L,nu],[L,nu]] + [[nu,L],[nu,L]]" : "None"
 }
     ListOfAnalyses.append(Analysis)
     
@@ -166,6 +177,12 @@ def load():
 #SlepSlep
 "[[l+],[l-]]" : "None"
 }
+    Analysis.plots = {
+"[[W],[Z]]" : "None",
+"[[Z],[Z]]" : "None",
+"[[l+],[l-]]" : "None"
+}
+
     ListOfAnalyses.append(Analysis)
     
     
@@ -183,12 +200,18 @@ def load():
     Analysis.results = {
 "[[W,nu],[ta]]" : "None"
 }
+    Analysis.plots = {
+"[[W,nu],[ta]]" : "None"
+}
+
     ListOfAnalyses.append(Analysis)
 
 # Build list of elements from constraints and conditions with zero weights
-# to be computed later with theoretical weights
+# to be computed later with theoretical weights. Check if listed histograms
+# exist and store binning information in masscomp
     for Analy in ListOfAnalyses:
-        Analy.GenerateElements() 
+        Analy.GenerateElements()
+        Analy.GetPlots()
     
     
     

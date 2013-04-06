@@ -4,7 +4,6 @@ def initglob():
     global ncomp         #Overall counter for compressed topologies
     global min_lep_pt, min_tau_pt, min_jet_pt, min_b_pt, min_pt
     global ListOfAnalyses
-    global AnalysesRes
     global evcount,nComp,nInvis
     global minmassgap
     global DoCompress, DoInvisible
@@ -17,5 +16,5 @@ def initglob():
     minmassgap = 1.         #Minimum mass gap (for compression)
     
     ListOfAnalyses = []  #Initialize list of analyses
-    AnalysesRes = []   #Initialize dictionary for all analyses
+
     
