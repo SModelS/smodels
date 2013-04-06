@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import SMSglobals, SMSanalyses, sys, SMSmethods, SMSxsec, SMSgetlimit
+import SMSglobals, SMSanalyses, sys, SMSmethods, SMSxsec, SMSgetlimit, copy
 from prettytable import PrettyTable
 #import SMSxsec
 
@@ -9,8 +9,9 @@ from prettytable import PrettyTable
 SMSglobals.initglob()
 #Creat analyses list:
 SMSanalyses.load()
+
 #Generate events and compute cross-sections:
-nevts = 5
+nevts = 10000
 slhafile = "AndreSLHA/andrePT4.slha"
 Wv = SMSxsec.pytinit(nevts,slhafile)
 W = Wv["Wdic"]
@@ -43,36 +44,39 @@ for iev in range(nevts):
         SMSmethods.AddToList(TopEv,SMSTopList)
     SMSglobals.evcount +=1
 
-element_table = PrettyTable(["#Vertices B[0]","#Vertices B[1]", "#Insertions B[0]","#Insertions B[1]", "#Elements", "Sum of weights"])          
+EvTop_table = PrettyTable(["Topology","#Vertices B[0]","#Vertices B[1]", "#Insertions B[0]","#Insertions B[1]", "#Elements", "Sum of weights"])
+EvElement_table = PrettyTable(["Topology","Element","Particles B[0]","Particles B[1]", "Masses B[0]","Masses B[1]","Element Weight"])
+
+   
 
 eltot = 0
 #Print Results:
-print "Number of Global topologies = ",len(SMSTopList)
 for i in range(len(SMSTopList)):
-    print "Topology ",i    
-    sumw = weight
+    sumw = {}
+    sumw.update(weight)
     for w in sumw.keys():
         sumw[w] = 0.
-#    print "Number of vertices = ",SMSTopList[i].B[0].vertnumb,SMSTopList[i].B[1].vertnumb
-#    print "Vertice insertions = ",SMSTopList[i].B[0].vertparts,SMSTopList[i].B[1].vertparts
-#    print "Number of Elements = ",len(SMSTopList[i].B[0].ElList)
     for j in range(len(SMSTopList[i].WeightList)):
         for w in SMSTopList[i].WeightList[j].keys():
             sumw[w] += SMSTopList[i].WeightList[j][w]            
-#    print "Sum of weights=", sumw,"\n"
-    sumwstring=str ( [ "%s: %g" % ( k,v) for (k,v) in sumw.items() ] )
-    element_table.add_row([SMSTopList[i].B[0].vertnumb,SMSTopList[i].B[1].vertnumb,SMSTopList[i].B[0].vertparts,SMSTopList[i].B[1].vertparts,len(SMSTopList[i].B[0].ElList),sumwstring])
+    EvTop_table.add_row([i,SMSTopList[i].B[0].vertnumb,SMSTopList[i].B[1].vertnumb,SMSTopList[i].B[0].vertparts,SMSTopList[i].B[1].vertparts,len(SMSTopList[i].B[0].ElList),sumw])
     eltot += len(SMSTopList[i].B[0].ElList)
 
  
             
 #Print element list for Topology[i]:    
-    if i < 0:
+    if i >= 0:           
         for j in range(len(SMSTopList[i].B[0].ElList)):
-            print SMSTopList[i].B[0].ElList[j].masses,SMSTopList[i].B[1].ElList[j].masses,SMSTopList[i].B[0].ElList[j].particles,SMSTopList[i].B[1].ElList[j].particles,SMSTopList[i].WeightList[j]
-print(element_table)
+            EvElement_table.add_row([i,j,SMSTopList[i].B[0].ElList[j].particles,SMSTopList[i].B[1].ElList[j].particles,SMSTopList[i].B[0].ElList[j].masses,SMSTopList[i].B[1].ElList[j].masses,SMSTopList[i].WeightList[j]])
+        EvElement_table.add_row(["---","---","---","---","---","---","---"])    
+            
+            
+print "Number of Global topologies = ",len(SMSTopList)          
+print(EvTop_table)
+print "Total Number of Elements = ",eltot
+#print(EvElement_table)
 
-print "Total Number of Elements = ",eltot   
+
 print '\n \n \n'
 
 
@@ -81,47 +85,57 @@ for Analysis in SMSglobals.ListOfAnalyses:
     SMSmethods.AddToAnalysis(SMSTopList,Analysis)
 
 #Print analyses output:
-#for Anal in SMSglobals.ListOfAnalyses:
-#    print Anal.label
-#    for i in range(len(Anal.Top.B[0].ElList)):
-#        print Anal.Top.B[0].ElList[i].particles,Anal.Top.B[1].ElList[i].particles
-#        for j in range(len(Anal.Top.B[0].ElList[i].masses)):
-#            if Anal.Top.WeightList[i][j]["7 TeV"] >= 0.:
-#                print Anal.Top.B[0].ElList[i].masses[j],Anal.Top.B[1].ElList[i].masses[j],Anal.Top.WeightList[i][j]
-#    print '\n'
+AnElement_table = PrettyTable(["Analyses","Element","Masses","Element Weight"])  
+
+for Ana in SMSglobals.ListOfAnalyses:
+    for i in range(len(Ana.Top.B[0].ElList)):
+        for j in range(len(Ana.Top.B[0].ElList[i].masses)):
+            AnElement_table.add_row([Ana.label,[Ana.Top.B[0].ElList[i].particles,Ana.Top.B[1].ElList[i].particles],[Ana.Top.B[0].ElList[i].masses[j],Ana.Top.B[1].ElList[i].masses[j]],Ana.Top.WeightList[i][j]])
+    AnElement_table.add_row(["---","---","---","---"])  
+        
+
+print(AnElement_table)
 
 print '\n \n \n'
 
-y = PrettyTable(["#Vertices B[0]","#Vertices B[1]", "#Insertions B[0]","#Insertions B[1]", "#Elements", "Sum of weights"])          
-
+         
 #Compute theoretical predictions to analyses results:
 for Analysis in SMSglobals.ListOfAnalyses:
     print "---------------Analysis Label = ",Analysis.label
-    for i in range(len(Analysis.results)):
-        const = Analysis.results.items()[i][0]
-        cond = Analysis.results.items()[i][1]
-        constRes = SMSmethods.Aeval(Analysis,const)
-        condRes = SMSmethods.Aeval(Analysis,cond)
-        
+    Results_table = PrettyTable(["Result","Conditions","Mass","Theoretical Value","Experimental Limits"])
+    Results_table.float_format = "4.2"
 
+    for res in Analysis.results.keys():
+        theoRes = SMSmethods.EvalRes(res,Analysis)  #Theoretical values for result and conditions
+#        sys.exit()
         try:
-            plot = Analysis.plots[const]
+            plot = Analysis.plots[res]
         except KeyError:    
             plot = []
                 
-        print "Constraint: ",const,"  Conditions: ",cond
-        for j in range(len(constRes)):
-            massarray = []
-            massarray.append([x for x in constRes[j][0][0]])
-            massarray.append([x for x in constRes[j][0][1]])
+#        print "Constraint: ",res,"  Conditions: ",Analysis.results[res]
+        for imass in range(len(theoRes)):
+            mass = theoRes[imass]['mass']
+            tvalue = theoRes[imass]['result']
+            conds = theoRes[imass]['conditions']
+            massarray = copy.deepcopy(mass)
             sigmalimit = SMSgetlimit.GetPlotLimit(massarray,plot,Analysis)
-            print "Results for mass array ",constRes[j][0]," :"
-            print "    Theorical value = ",constRes[j][1],"Conditions = ",condRes[j][1]
-            print "    Experimental Limits: ",sigmalimit
-        print '\n'
-    print "-----------------------"
-    print '\n \n'    
-    sys.exit()  # Just print first analysis (avoid too much output)       
+            
+            if sigmalimit and len(sigmalimit) > 0:
+                Results_table.add_row([res,conds,mass,tvalue,sigmalimit[0]])
+                for ilim in range(1,len(sigmalimit)):
+                    Results_table.add_row(["","","","",sigmalimit[ilim]])
+            else:
+                Results_table.add_row([res,conds,mass,tvalue,sigmalimit])
+            Results_table.add_row(["---------","---------","---------","---------","---------"])
+#            print "Results for mass array ",mass," :"
+#            print "    Theorical value = ",res,"Conditions = ",conds
+#            print "    Experimental Limits: ",sigmalimit
+#        print '\n'
+#    print "-----------------------"
+#    print '\n \n'    
+    print(Results_table)
+#    sys.exit()  # Just print first analysis (avoid too much output)       
 
 
 
