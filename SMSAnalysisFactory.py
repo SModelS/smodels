@@ -14,19 +14,19 @@ def load():
     Analysis.label = analysis
     Analysis.masscomp = 0.2
     Analysis.run = "2012"
-    condition=SMSResults.getConstraints ( analysis )[topo]
-    condarray=eval(condition)
-    print "condition=",condarray
+    constraint=SMSResults.getConstraints ( analysis )[topo]
+    constrarray=eval(constraint)
+    print "constraint=",constrarray
     #Global Topology:
     for branch in [0,1]:
-      Analysis.Top.B[branch].vertnumb = len(condarray[branch])+1    #Number of vertices of branch
-      vertparts1 = [ len(x) for x in condarray[branch] ]
+      Analysis.Top.B[branch].vertnumb = len(constrarray[branch])+1    #Number of vertices of branch
+      vertparts1 = [ len(x) for x in constrarray[branch] ]
       vertparts1.append(0)
       Analysis.Top.B[branch].vertparts = vertparts1
       print vertparts1
     
-    Analysis.results={ condition: SMSResults.getConditions ( analysis)[topo] }
-    Analysis.plots = { condition: [ topo, [ analysis ] ] }
+    Analysis.results={ constraint: SMSResults.getConditions ( analysis)[topo] }
+    Analysis.plots = { constraint: [ topo, [ analysis ] ] }
     
 #Add analysis to list of analyses:
     SMSglobals.ListOfAnalyses.append(Analysis)
