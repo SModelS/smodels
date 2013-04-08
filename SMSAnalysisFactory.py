@@ -11,7 +11,6 @@ def load():
 
     Analysis = EAnalysis()
     Analysis.sqrts=SMSResults.getSqrts( analysis )
-    Analysis.histname
     Analysis.label = analysis
     Analysis.masscomp = 0.2
     Analysis.run = "2012"
