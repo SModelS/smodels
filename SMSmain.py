@@ -2,7 +2,7 @@
 
 import SMSglobals, SMSanalyses, sys, SMSmethods, SMSxsec, SMSgetlimit, copy
 from prettytable import PrettyTable
-#import SMSxsec
+
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Initialize global variables:
@@ -10,9 +10,10 @@ SMSglobals.initglob()
 #Creat analyses list:
 SMSanalyses.load()
 
+
 #Generate events and compute cross-sections:
 nevts = 10000
-slhafile = "AndreSLHA/andrePT4.slha"
+slhafile = "AndreSLHA/andrePT12.slha"
 Wv = SMSxsec.pytinit(nevts,slhafile)
 W = Wv["Wdic"]
 lhefile = Wv["lhefile"]
@@ -88,9 +89,14 @@ for Analysis in SMSglobals.ListOfAnalyses:
 AnElement_table = PrettyTable(["Analyses","Element","Masses","Element Weight"])  
 
 for Ana in SMSglobals.ListOfAnalyses:
+    label = Ana.label
     for i in range(len(Ana.Top.B[0].ElList)):
+        ptcs = [Ana.Top.B[0].ElList[i].particles,Ana.Top.B[1].ElList[i].particles]
         for j in range(len(Ana.Top.B[0].ElList[i].masses)):
-            AnElement_table.add_row([Ana.label,[Ana.Top.B[0].ElList[i].particles,Ana.Top.B[1].ElList[i].particles],[Ana.Top.B[0].ElList[i].masses[j],Ana.Top.B[1].ElList[i].masses[j]],Ana.Top.WeightList[i][j]])
+            mass = [Ana.Top.B[0].ElList[i].masses[j],Ana.Top.B[1].ElList[i].masses[j]]
+            if i != 0 or j != 0: label = ""
+            if j != 0: ptcs = ""
+            AnElement_table.add_row([label,ptcs,mass,Ana.Top.WeightList[i][j]])
     AnElement_table.add_row(["---","---","---","---"])  
         
 
@@ -103,7 +109,6 @@ print '\n \n \n'
 for Analysis in SMSglobals.ListOfAnalyses:
     print "---------------Analysis Label = ",Analysis.label
     Results_table = PrettyTable(["Result","Conditions","Mass","Theoretical Value","Experimental Limits"])
-    Results_table.float_format = "4.2"
 
     for res in Analysis.results.keys():
         theoRes = SMSmethods.EvalRes(res,Analysis)  #Theoretical values for result and conditions
