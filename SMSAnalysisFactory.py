@@ -29,6 +29,7 @@ def load():
     print "constraint=",constrarray,andreconstraint
     Analysis.results={ andreconstraint: cond }
     analyses=[ x for x in SMSResults.getAnalyses ( Tx ) if SMSResults.getConditions ( x ).has_key(Tx) and SMSResults.getConditions ( x )[Tx] == cond ]
+    print "analyses= ",analyses
     Analysis.plots = { andreconstraint: [ Tx, analyses ] }
     
 #Add analysis to list of analyses:
