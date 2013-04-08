@@ -175,9 +175,15 @@ def getFigures ( analysis, run=None ):
   return SMSHelpers.getMetaInfoField ( analysis, "figures", run )
 
 def getConditions ( analysis, run=None ):
-  """ get the figure number for this analysis """
+  """ get the conditions """
   run=SMSHelpers.getRun ( analysis, run )
   ret = SMSHelpers.conditions ( analysis, run )
+  return ret
+
+def getConstraints ( analysis, run=None ):
+  """ get the constraints """
+  run=SMSHelpers.getRun ( analysis, run )
+  ret = SMSHelpers.constraints ( analysis, run )
   return ret
 
 def getRequirement ( analysis, run=None ):

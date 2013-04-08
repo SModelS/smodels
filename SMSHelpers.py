@@ -92,11 +92,10 @@ def motherParticleExclusions ( analysis, run ):
     ret[excls[0]]=values
   return ret
 
-def conditions ( analysis, run ):
+def getLines ( analysis, run, label="condition" ):
   """ get all the conditions for a analysis/run pair """
   info="%s/%s/%s/info.txt" % ( Base, run, analysis )
   ret={}
-  print "conditions",info
   if not os.path.exists ( info ):
     log ("cannot find %s" % info )
     return ret
@@ -108,7 +107,7 @@ def conditions ( analysis, run ):
     if not len(tokens)==2:
       log ( "cannot parse this line (2): %s in %s" % (line, info) )
       continue
-    if tokens[0]!="condition":
+    if tokens[0]!=label:
       # we're only interested in the conditions
       continue
     excl=tokens[1]
@@ -120,6 +119,14 @@ def conditions ( analysis, run ):
     ret[ keyvalue[0] ] = keyvalue[1]
     # ret.append(excl)
   return ret
+
+def conditions ( analysis, run ):
+  """ get all the conditions for a analysis/run pair """
+  return getLines ( analysis, run, "condition" )
+
+def constraints ( analysis, run ):
+  """ get all the conditions for a analysis/run pair """
+  return getLines ( analysis, run, "constraint" )
 
 def getUpperLimitHisto ( analysis, topo, run ):
   import ROOT
