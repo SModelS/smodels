@@ -39,11 +39,18 @@ class DBranch:
         self.vertnumb = 0
         self.vertparts = []
         self.ElList = []
+    def __str__ ( self ):
+        s="[%d %s %s] " % ( self.vertnumb, self.vertparts, len(self.ElList) )
+        return s
 
 class GTop:
     def __init__(self):
         self.B = [DBranch(),DBranch()]
         self.WeightList = []
+
+    def __str__(self):
+      s=str(self.B[0])+ "," + str ( self.B[1] )
+      return s
 
 #Adds element to ElLists in branches
 #OBS: input must be given with the correct branch ordering!  
@@ -128,6 +135,18 @@ class EAnalysis:
                 self.Top.B[ib].ElList.append(NewEl)
                 self.Top.WeightList.append([])
     
+    def __str__ ( self ): 
+      s="Analysis %s.\n" % self.label
+      s+=" - sqrt(s)=%d.\n" % float(self.sqrts)
+      s+=" - lumi=%f.\n" % float(self.lum)
+      s+=" -  run=%s.\n" % self.run
+      s+=" -   mc=%f.\n" % float(self.masscomp)
+      s+=" - results=%s.\n" % self.results
+      s+=" -   plots=%s.\n" % self.plots 
+      s+=" -   Top=%s.\n" % self.Top
+      #  self.Top = GTop()
+      #  self.plots = {}
+      return s
     
 
 #Check if the plots listed in results exist and 
