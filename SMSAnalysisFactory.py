@@ -16,7 +16,6 @@ def load():
     Analysis.run = "2012"
     constraint=SMSResults.getConstraints ( analysis )[Tx]
     constrarray=eval(constraint)
-    print "constraint=",constrarray
     #Global Topology:
     for branch in [0,1]:
       Analysis.Top.B[branch].vertnumb = len(constrarray[branch])+1    #Number of vertices of branch
@@ -26,9 +25,11 @@ def load():
       print vertparts1
     
     cond=SMSResults.getConditions ( analysis)[Tx]
-    Analysis.results={ constraint: cond }
+    andreconstraint=constraint.replace("'","").replace("[[[","[[").replace("]]]","]]").replace(" ","")
+    print "constraint=",constrarray,andreconstraint
+    Analysis.results={ andreconstraint: cond }
     analyses=[ x for x in SMSResults.getAnalyses ( Tx ) if SMSResults.getConditions ( x ) == cond ]
-    Analysis.plots = { constraint: [ Tx, analyses ] }
+    Analysis.plots = { andreconstraint: [ Tx, analyses ] }
     
 #Add analysis to list of analyses:
     SMSglobals.ListOfAnalyses.append(Analysis)
