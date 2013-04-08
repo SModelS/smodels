@@ -7,14 +7,14 @@ def load():
     import SMSResults, SMSglobals
 
     analysis="alphaT"
-    topo="T1tttt"
+    Tx="T1tttt"
 
     Analysis = EAnalysis()
     Analysis.sqrts=SMSResults.getSqrts( analysis )
     Analysis.label = analysis
     Analysis.masscomp = 0.2
     Analysis.run = "2012"
-    constraint=SMSResults.getConstraints ( analysis )[topo]
+    constraint=SMSResults.getConstraints ( analysis )[Tx]
     constrarray=eval(constraint)
     print "constraint=",constrarray
     #Global Topology:
@@ -25,8 +25,10 @@ def load():
       Analysis.Top.B[branch].vertparts = vertparts1
       print vertparts1
     
-    Analysis.results={ constraint: SMSResults.getConditions ( analysis)[topo] }
-    Analysis.plots = { constraint: [ topo, [ analysis ] ] }
+    cond=SMSResults.getConditions ( analysis)[Tx]
+    Analysis.results={ constraint: cond }
+    analyses=[ x for x in SMSResults.getAnalyses ( Tx ) if SMSResults.getConditions ( x ) == cond ]
+    Analysis.plots = { constraint: [ Tx, analyses ] }
     
 #Add analysis to list of analyses:
     SMSglobals.ListOfAnalyses.append(Analysis)
