@@ -13,7 +13,7 @@ def load():
     Analysis.sqrts=SMSResults.getSqrts( analysis )
     Analysis.label = analysis
     Analysis.masscomp = 0.2
-    Analysis.run = "2012"
+    Analysis.run = SMSResults.getRun ( analysis ) ##  "2012"
     constraint=SMSResults.getConstraints ( analysis )[Tx]
     constrarray=eval(constraint)
     #Global Topology:
