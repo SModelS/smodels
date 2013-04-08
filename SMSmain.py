@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-import SMSglobals, SMSanalyses, sys, SMSmethods, SMSxsec, SMSgetlimit, copy
+import SMSglobals, sys, SMSmethods, SMSxsec, SMSgetlimit, copy
 from prettytable import PrettyTable
+import SMSAnalysisFactory as SMSanalyses
 
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
@@ -13,7 +14,7 @@ SMSanalyses.load()
 
 #Generate events and compute cross-sections:
 nevts = 10000
-slhafile = "AndreSLHA/andrePT12.slha"
+slhafile = "AndreSLHA/T1tttt.dat"
 Wv = SMSxsec.pytinit(nevts,slhafile)
 W = Wv["Wdic"]
 lhefile = Wv["lhefile"]
@@ -75,7 +76,7 @@ for i in range(len(SMSTopList)):
 print "Number of Global topologies = ",len(SMSTopList)          
 print(EvTop_table)
 print "Total Number of Elements = ",eltot
-#print(EvElement_table)
+print(EvElement_table)
 
 
 print '\n \n \n'

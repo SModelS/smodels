@@ -38,7 +38,8 @@ def load():
 # Build list of elements from constraints and conditions with zero weights
 # to be computed later with theoretical weights
     for Analy in SMSglobals.ListOfAnalyses:
-        Analy.GenerateElements() 
+        Analy.GenerateElements()
+        Analy.GetPlots()
     
 if __name__ == "__main__":
   import SMSglobals
