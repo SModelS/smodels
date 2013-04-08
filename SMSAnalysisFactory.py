@@ -28,7 +28,7 @@ def load():
     andreconstraint=constraint.replace("'","").replace("[[[","[[").replace("]]]","]]").replace(" ","")
     print "constraint=",constrarray,andreconstraint
     Analysis.results={ andreconstraint: cond }
-    analyses=[ x for x in SMSResults.getAnalyses ( Tx ) if SMSResults.getConditions ( x ) == cond ]
+    analyses=[ x for x in SMSResults.getAnalyses ( Tx ) if SMSResults.getConditions ( x ).has_key(Tx) and SMSResults.getConditions ( x )[Tx] == cond ]
     Analysis.plots = { andreconstraint: [ Tx, analyses ] }
     
 #Add analysis to list of analyses:
