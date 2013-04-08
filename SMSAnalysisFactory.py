@@ -15,7 +15,7 @@ def load():
     Analysis.label = analysis
     Analysis.masscomp = 0.2
     Analysis.run = "2012"
-    condition=SMSResults.getConditions ( analysis )[topo]
+    condition=SMSResults.getConstraints ( analysis )[topo]
     condarray=eval(condition)
     print "condition=",condarray
     #Global Topology:
@@ -26,7 +26,7 @@ def load():
       Analysis.Top.B[branch].vertparts = vertparts1
       print vertparts1
     
-    Analysis.results={ condition: SMSResults.getConstraints ( analysis)[topo] }
+    Analysis.results={ condition: SMSResults.getConditions ( analysis)[topo] }
     Analysis.plots = { condition: [ topo, [ analysis ] ] }
     
 #Add analysis to list of analyses:
