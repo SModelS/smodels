@@ -281,3 +281,14 @@ def massDecoupling ( topo, plot='ROOT',kerning=True ):
     md = '$' + md.replace('#','\\') + '$'
   return md
 
+
+
+def exists(analysis, topo, run = None):
+  """ check if the histogram run/analysis/sms.root(limit_topo) exists."""
+  
+  run2=SMSHelpers.getRun( analysis, run )
+  histo=SMSHelpers.getUpperLimitHisto(analysis, topo, run2 )
+
+  if not histo: return False
+      
+  return True
