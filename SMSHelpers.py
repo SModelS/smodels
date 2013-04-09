@@ -155,7 +155,7 @@ def getUpperLimitAtPoint ( histo, mx, my ):
   if my==None:
     log ( "inconsistent mx/my, mx=None, my=%s" % my )
     return None
-  if not histo: return None
+  if not histo: return 'no histogram'
   xmax=histo.GetXaxis().GetNbins()
   xbin=histo.GetXaxis().FindBin(mx)
   if xbin==0 or xbin>xmax:
@@ -165,7 +165,9 @@ def getUpperLimitAtPoint ( histo, mx, my ):
   if ybin==0 or ybin>ymax:
     return None
   c=histo.GetBinContent(xbin,ybin)
-  ##print "xmax,xbin,ybin,c=",xmax,xbin,ybin,c
+
+  if c == 0.: c = None
+  
   return c
 
 def getUpperLimitPng(analysis,topo,run):
