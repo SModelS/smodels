@@ -39,18 +39,11 @@ class DBranch:
         self.vertnumb = 0
         self.vertparts = []
         self.ElList = []
-    def __str__ ( self ):
-        s="[%d %s %s] " % ( self.vertnumb, self.vertparts, len(self.ElList) )
-        return s
 
 class GTop:
     def __init__(self):
         self.B = [DBranch(),DBranch()]
         self.WeightList = []
-
-    def __str__(self):
-      s=str(self.B[0])+ "," + str ( self.B[1] )
-      return s
 
 #Adds element to ElLists in branches
 #OBS: input must be given with the correct branch ordering!  
@@ -63,9 +56,15 @@ class GTop:
             if len(masses) != self.B[i].vertnumb:
                 print "AddElement: wrong number of masses"
                 return False
-            if len(particles) != sum(self.B[i].vertparts):
+            if (self.B[i].vertparts[self.B[i].vertnumb-1] == 0 and len(particles) != self.B[i].vertnumb-1) or (self.B[i].vertparts[self.B[i].vertnumb-1] != 0 and len(particles) != self.B[i].vertnumb): 
                 print "AddElement: wrong number of particles"
                 return False
+            else:
+                for ipt in range(len(particles)):
+                    if len(particles[ipt]) != self.B[i].vertparts[ipt]:
+                        print "AddElement: wrong number of particles"
+                        return False
+
             
 #Create elements for each branch and add them to ElList:            
         for ibranch in range(2):
@@ -91,6 +90,7 @@ class EAnalysis:
 #Given the constraints dictionary, automatically fill the element list with the
 #elements corresponding to the strings in the dictionary, skipping repeated ones
     def GenerateElements(self):
+        import sys
        
         ListOfStrs = []
         vertnumb = [self.Top.B[0].vertnumb,self.Top.B[1].vertnumb]
@@ -109,18 +109,19 @@ class EAnalysis:
 
                 con = inelements[iii][ii].replace(" ","")
                 while "[" in con:  #String has element                
-                    st = con[con.find("[["):con.find("]]")+2] #Get duplet
+                    st = con[con.find("[[["):con.find("]]]")+3] #Get duplet
                     con = con.replace(st,"")  # Remove element duplet
                     ptclist = eltostr(st)     # Get particle list
 #Syntax checks:
                     for ib in range(2):
-                        if len(ptclist[ib]) != sum(vertparts[ib]):
-                            print "GenerateElements: Wrong syntax"
-                            return False
-                        for ptc in ptclist[ib]:
-                            if not ptc in Reven.values() and not PtcDic.has_key(ptc):
-                                print "GenerateElements: Unknown particle ",ptc
-                                return False        
+                        for ipt in range(len(ptclist[ib])):
+                            if len(ptclist[ib][ipt]) != vertparts[ib][ipt]:
+                                print "GenerateElements: Wrong syntax2"
+                                return False
+                            for ptc in ptclist[ib][ipt]:
+                                if not ptc in Reven.values() and not PtcDic.has_key(ptc):
+                                    print "GenerateElements: Unknown particle ",ptc
+                                    return False        
                     ListOfStrs.append(st)
                     
                     
@@ -135,18 +136,6 @@ class EAnalysis:
                 self.Top.B[ib].ElList.append(NewEl)
                 self.Top.WeightList.append([])
     
-    def __str__ ( self ): 
-      s="Analysis %s.\n" % self.label
-      s+=" - sqrt(s)=%d.\n" % float(self.sqrts)
-      s+=" - lumi=%f.\n" % float(self.lum)
-      s+=" -  run=%s.\n" % self.run
-      s+=" -   mc=%f.\n" % float(self.masscomp)
-      s+=" - results=%s.\n" % self.results
-      s+=" -   plots=%s.\n" % self.plots 
-      s+=" -   Top=%s.\n" % self.Top
-      #  self.Top = GTop()
-      #  self.plots = {}
-      return s
     
 
 #Check if the plots listed in results exist and 
@@ -170,10 +159,10 @@ class EAnalysis:
             biny = 0.
             xmin = 0.
             ymin = 0.
-#            for ana in analyses:
-#                if not SMSResults.exists(ana,topo,run):
-#                    print "GetPlots: Histogram for ",topo," in ",ana," for run ",run," not found"
-#                    continue
+            for ana in analyses:
+                if not SMSResults.exists(ana,topo,run):
+                    print "GetPlots: Histogram for ",topo," in ",ana," for run ",run," not found"
+                    continue
 #                if binx == 0.:
 #                    binx = SMSResults.getXBinWidth(ana,topo,run)
 #                    biny = SMSResults.getYBinWidth(ana,topo,run)
@@ -287,7 +276,8 @@ def getEventTop(PList, weight = {}):
         while ndaugs > 0:
             ndaugs = 0  
             nmoms = 0
-            nvertparts = 0      
+            nvertparts = 0
+            El.particles.append([])
             for i in range(len(PList)):
                 if PList[i].moms[0] != mother+1 and PList[i].moms[1] != mother+1: continue
                 if abs(PList[i].pdg) in Rodd:
@@ -297,7 +287,7 @@ def getEventTop(PList, weight = {}):
                     nptcs += 1
                 elif abs(PList[i].pdg) in Reven:
                     pname = ptype(PList[i].pdg)
-                    El.particles.append(pname)
+                    El.particles[ETop.B[ib].vertnumb].append(pname)
                     nvertparts +=1
                     ndaugs += 1
                     nptcs += 1
@@ -310,6 +300,9 @@ def getEventTop(PList, weight = {}):
             ETop.B[ib].vertparts.append(nvertparts)
             ETop.B[ib].vertnumb += 1
 
+
+        if El.particles[ETop.B[ib].vertnumb-1] == []:
+            El.particles.pop()     #Remove last empty insertion if LSP is stable
 
         ETop.B[ib].ElList.append(El)    
         ETop.B[ib].ElList[0].momID = momspdg[ib]
@@ -435,69 +428,80 @@ def EqualBranches(B1,B2):
     
 
 #Compare two elements or array of elements.
-#If all masses and particles are equal, retsscurns True,
+#If all masses and particles are equal, returns True,
 #otherwise returns False       
 def EqualEls(El1,El2):
-    El1v = []
-    El2v = []
-    if type(El1) == type(list()):
-        El1v = El1
+    
+    if len(El1) != len(El2): return False
+    
+#If it is an array of elements:    
+    if type(El1) == type(list()) and type(El1[0]) == type(TElement()):
+        if type(El2) != type(list()): return False
+        if type(El2[0]) != type(TElement()): return False                
+        for i in range(len(El1)):
+            if El1[i].particles != El2[i].particles: return False
+            if El1[i].masses != El2[i].masses: return False
+            
+#If it is a single element:            
     else:
-        El1v.append(El1)
-    if type(El2) == type(list()):
-        El2v = El2
-    else:
-        El2v.append(El2)
-    if len(El1v) != len(El2v): return False
-    for i in range(len(El1v)):
-        if El1v[i].particles != El2v[i].particles: return False
-        if El1v[i].masses != El2v[i].masses: return False
+        if El1.particles != El2.particles: return False
+        if El1.masses != El2.masses: return False
+
     return True
 
 #Compare two elements or array of elements.
 #If all masses and particles are similar, returns True,
 #otherwise returns False       
 def SimEls(El1,El2):
-    El1v = []
-    El2v = []
-    if type(El1) == type(list()):
-        El1v = El1
+    
+    if len(El1) != len(El2): return False
+    
+#If it is an array of elements:    
+    if type(El1) == type(list()) and type(El1[0]) == type(TElement()):
+        if type(El2) != type(list()): return False
+        if type(El2[0]) != type(TElement()): return False                
+        for i in range(len(El1)):
+            if not SimParticles(El1[i].particles,El2[i].particles): return False
+            if El1[i].masses != El2[i].masses: return False
+            
+#If it is a single element:            
     else:
-        El1v.append(El1)
-    if type(El2) == type(list()):
-        El2v = El2
-    else:
-        El2v.append(El2)
-    if len(El1v) != len(El2v): return False
-    for i in range(len(El1v)):
-        if len(El1v[i].particles) != len(El2v[i].particles): return False
-        if len(El1v[i].masses) != len(El2v[i].masses): return False
-        if not EqualParticles(El1v[i].particles,El2v[i].particles): return False
-        if El1v[i].masses != El2v[i].masses: return False
+        if not SimParticles(El1.particles,El2.particles): return False
+        if El1.masses != El2.masses: return False
+
     return True
 
 
-#Compares 2 particle names or 2 name arrays. Allows for dictionary labels
+#Compares 2 particle names or 2 nested name arrays. Allows for dictionary labels
 #(Ex: L = l, l+ = l, l = l-,...)
-def EqualParticles(ptype1,ptype2):
-       
-    ptype1v = []
-    ptype2v = []
-    if type(ptype1) == type(list()):
-        if type(ptype1[0]) == type(list()):            
-            ptype1 = ptype1[0] + ptype1[1]
-            ptype2 = ptype2[0] + ptype2[1]
-        if type(ptype1[0]) == type(list()) or type(ptype2[0]) == type(list()):
-            print "EqualParticles: wrong input format"
-            return False
-        ptype1v = ptype1
-        ptype2v = ptype2
-    else:
-        ptype1v.append(ptype1)
-        ptype2v.append(ptype2) 
+def SimParticles(ptype1,ptype2):
 
-    if len(ptype1v) != len(ptype2v):
-        return False
+    ptype1v = [ptype1]
+    ptype2v = [ptype2]
+ 
+#First flatten nested arrays: 
+    isList = True
+    while isList:
+        newptype1v = []
+        newptype2v = []
+        if len(ptype1v) != len(ptype2v): return False        
+        for i in range(len(ptype1v)):
+            if type(ptype1v[i]) == type(list()):
+                if len(ptype1v[i]) != len(ptype2v[i]): return False
+                for j in range(len(ptype1v[i])):
+                    newptype1v.append(ptype1v[i][j])
+                    newptype2v.append(ptype2v[i][j])
+            else:
+                newptype1v.append(ptype1v[i])
+                newptype2v.append(ptype2v[i])
+                
+        ptype1v = newptype1v
+        ptype2v = newptype2v
+        isList = False
+        for i in range(len(ptype1v)):
+            if type(ptype1v[i]) == type(list()): isList = True
+            if type(ptype2v[i]) == type(list()): isList = True
+
         
     for i in range(len(ptype1v)):
         if PtcDic.has_key(ptype1v[i]):
@@ -536,10 +540,12 @@ def AddToList(SMSTop,SMSTopList):
                 OldEl = [SMSTopList[i].B[0].ElList[j],SMSTopList[i].B[1].ElList[j]]
                 if EqualEls(OldEl,NewEl_a):
                     equalels = j
-                    NewEl = NewEl_a                    
+                    NewEl = NewEl_a
+                    break                   
                 elif EqualEls(OldEl,NewEl_b):
                     equalels = j
                     NewEl = NewEl_b
+                    break
                     
                     
 #If element exists, add weight:
@@ -592,7 +598,7 @@ def AddToAnalysis(SMSTopList,Analysis):
                 
                 
 #Check if particles match (independent of branch order)
-                ptcmatch = EqualParticles(newptcs_a,oldptcs) or EqualParticles(newptcs_b,oldptcs)
+                ptcmatch = SimParticles(newptcs_a,oldptcs) or SimParticles(newptcs_b,oldptcs)
                 if not ptcmatch: continue
 
                 weight = {}
@@ -618,12 +624,12 @@ def AddToAnalysis(SMSTopList,Analysis):
 # mass list and nested weight list
 #(check for both branch orderings. If both match, add both mass orderings):
                 if not massmatch:
-                    if EqualParticles(newptcs_a,oldptcs):
+                    if SimParticles(newptcs_a,oldptcs):
                         for ib in range(2):
                             Analysis.Top.B[ib].ElList[jel].masses.append(NewEl_a[ib].masses)                            
                         Analysis.Top.WeightList[jel].append(weight)
                         massmatch = True
-                    if EqualParticles(newptcs_b,oldptcs) and (not massmatch or NewEl_b[0].masses != NewEl_b[1].masses):
+                    if SimParticles(newptcs_b,oldptcs) and (not massmatch or NewEl_b[0].masses != NewEl_b[1].masses):
                         for ib in range(2):
                             Analysis.Top.B[ib].ElList[jel].masses.append(NewEl_b[ib].masses)
                         Analysis.Top.WeightList[jel].append(weight)
@@ -727,7 +733,7 @@ def MassAvg(equivin, method = "mean"):
 
 #Evaluate theoretical predictions for the analysis result and conditions:
 def EvalRes(res,Analysis):
-    import sys,copy
+    import copy
     
     if not Analysis.plots.has_key(res) or not Analysis.results.has_key(res) or not Analysis.masscomp.has_key(res):
         print "EvalRes: Wrong analysis input"
@@ -778,7 +784,7 @@ def EvalRes(res,Analysis):
         for imass in range(len(NewTop.B[0].ElList[iel].masses)):
             mass = [NewTop.B[0].ElList[iel].masses[imass],NewTop.B[1].ElList[iel].masses[imass]]
             Allmasses.append(str(mass))
-            
+      
     if len(Allmasses) == 0: 
         return [{'mass' : [],'result' : 0., 'conditions' : []}]  #Empty result
     
@@ -837,15 +843,16 @@ def EvalRes_aux(instr,InTop):
 #Get ordered list of elements:
     El = []
     iels = 0
-    while "[[" in outstr:  #String has element                
-        st = outstr[outstr.find("[["):outstr.find("]]")+2] #Get duplet        
+    while "[[[" in outstr:  #String has element                
+        st = outstr[outstr.find("[[["):outstr.find("]]]")+3] #Get duplet        
         ptclist = eltostr(st)     # Get particle list
 #Syntax checks:
         for ib in range(2):
-            for ip in range(len(ptclist[ib])):
-                if not ptclist[ib][ip] in Reven.values() and not PtcDic.has_key(ptclist[ib][ip]):
-                    print "EvalRes: Unknown particle ",ptclist[ip]
-                    return False
+            for ptcL in ptclist[ib]:
+                for ptc in ptcL:
+                    if not ptc in Reven.values() and not PtcDic.has_key(ptc):
+                        print "EvalRes: Unknown particle ",ptc
+                        return False
         outstr = outstr.replace(st,"El["+str(iels)+"]")  # Replace element
         El.append(ptclist)   #Store elements
         iels +=1
@@ -887,7 +894,7 @@ def EvalRes_aux(instr,InTop):
                 
 
 
-#Converts an element string to a particle list or vice-versa    
+#Converts an element string to a nested particle list or vice-versa    
 def eltostr(invar):
     if type(invar) == type(list()):
         st = str(invar).replace("'","")
@@ -895,20 +902,28 @@ def eltostr(invar):
         return st
     elif type(invar) == type(str()):
         st = invar.replace(" ","")
-        st = st[st.find("[["):st.find("]]")+2]
-        st_B1 = st[0:st.find("],[")]    
-        st_B2 = st[st.find("],[")+3:]
-        newstr = [st_B1,st_B2]
-        ptclist = []   
-        for k in range(2):    
-            newstr[k] = newstr[k].replace("]","")
-            newstr[k] = newstr[k].replace("[","")
-            newstr[k] = newstr[k].replace(" ","")
-            ptclist.append(newstr[k].rsplit(","))
+        st = st[st.find("[[["):st.find("]]]")+3]
+        st_B = []
+        st_B.append(st[2:st.find("]],[[")+1])
+        st_B.append(st[st.find("]],[[")+4:st.find("]]]")+1])
+
+        ptclist = [[],[]]
+        for ib in range(2):
+            while "[" in st_B[ib] or "]" in st_B[ib]:
+                ptcs = st_B[ib][st_B[ib].find("[")+1:st_B[ib].find("],[")].split(",")
+                
+#Syntax check:                
+                for ptc in ptcs:
+                    if not ptc in Reven.values() and not PtcDic.has_key(ptc):
+                        print "eltostr: Unknown particle:",ptc
+                        return False
+                    
+                ptclist[ib].append(ptcs)
+                sptcs = str(ptcs).replace("'","")
+                sptcs = str(sptcs).replace(" ","")
+                st_B[ib] = st_B[ib].replace(sptcs,"",1)
+
         return ptclist
-    else:
-        print "ElToStr: Wrong input"
-        return False
         
 
             
