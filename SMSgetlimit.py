@@ -10,7 +10,8 @@ def GetPlotLimit(massarray,plot,Analysis):
 #Skip empty plots:
     if len(plot) != 2: return False
     
-        
+#Skip empty mass arrays:
+    if len(massarray) < 1: return False        
 
     limits = []
 #Sanity check:    
