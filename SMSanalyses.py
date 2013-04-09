@@ -91,7 +91,7 @@ def load():
     "2.*([[[L],[L]],[[L],[nu]]] + [[[L],[L]],[[nu],[L]]])" : ["TChiChipmSlepL",["Weakinos8TeV"]],
     "[[[L],[L]],[[nu],[ta]]]" : ["TChiChipmSlepStau",["Weakinos8TeV"]],
     "[[[ta],[ta]],[[nu],[ta]]]" : ["TChiChipmStauStau",["Weakinos8TeV"]],
-    "[[[L+],[nu]],[[L-],[nu]]] + [[[L+],[nu]],[[nu],[L-]]] + [[[L-],[nu]],[[nu],[L+]]] + [[[nu],[L+]],[[nu],[L-]]] + [[[nu],[L-]],[[nu],[L+]]]" : ["???",["Weakinos8TeV"]],
+    "[[[L+],[nu]],[[L-],[nu]]] + [[[L+],[nu]],[[nu],[L-]]] + [[[L-],[nu]],[[nu],[L+]]] + [[[nu],[L+]],[[nu],[L-]]]" : ["???",["Weakinos8TeV"]],
     "[[[b],[W]],[[b],[W]]]" : ["T6bbww",["LeptonicStop8TeV"]]
     }    
 #Add analysis to list of analyses:
