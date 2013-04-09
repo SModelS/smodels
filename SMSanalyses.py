@@ -78,19 +78,19 @@ def load():
     Analysis.results = {
 #TChiChiSlep (Democratic chargino and neutralino decays):    
     "2.*([[[L],[L]],[[L],[nu]]] + [[[L],[L]],[[nu],[L]]])" : "[[[L],[L]],[[L],[nu]]] ~ [[[L],[L]],[[nu],[L]]], [[[L],[L]],[[L],[nu]]] > 2.7*[[[ta],[ta]],[[L],[nu]]], [[[L],[L]],[[L],[nu]]] > 2.7*[[[L],[L]],[[ta],[nu]]], [[[L],[L]],[[nu],[L]]] > 2.7*[[[ta],[ta]],[[nu],[L]]], [[[L],[L]],[[nu],[L]]] > 2.7*[[[L],[L]],[[nu],[ta]]]",
-#TChiChiSlep (tau-dominated chargino decay):    
+#TChiChiSlep (tau-enriched chargino decay):    
     "[[[L],[L]],[[nu],[ta]]]" : "[[[L],[L]],[[nu],[ta]]] > 2.7*[[[ta],[ta]],[[nu],[ta]]]",
 #TChiChiSlep (tau-dominated  chargino and neutralino decays):
     "[[[ta],[ta]],[[nu],[ta]]]" : "None",
 #Chargino-Chargino:
-    "[[[L+],[nu]],[[L-],[nu]]] + [[[L+],[nu]],[[nu],[L-]]] + [[[L-],[nu]],[[nu],[L+]]] + [[[nu],[L+]],[[nu],[L-]]] + [[[nu],[L-]],[[nu],[L+]]]" : "[[[L+],[nu]],[[L-],[nu]]] ~ [[[L+],[nu]],[[nu],[L-]]], [[[L+],[nu]],[[nu],[L-]]] ~ [[[L-],[nu]],[[nu],[L+]]], [[[L-],[nu]],[[nu],[L+]]] ~ [[[nu],[L+]],[[nu],[L-]]], [[[nu],[L+]],[[nu],[L-]]] ~ [[[nu],[L-]],[[nu],[L+]]], [[[L+],[nu]],[[L-],[nu]]] > 2.7*[[[ta+],[nu]],[[L-],[nu]]], [[[L+],[nu]],[[L-],[nu]]] > 2.7*[[[L+],[nu]],[[ta-],[nu]]], [[[L+],[nu]],[[nu],[L-]]] > 2.7*[[[ta+],[nu]],[[nu],[L-]]], [[[L+],[nu]],[[nu],[L-]]] > 2.7*[[[L+],[nu]],[[nu],[ta-]]], [[[L-],[nu]],[[nu],[L+]]] > 2.7*[[[ta-],[nu]],[[nu],[L+]]], [[[L-],[nu]],[[nu],[L+]]] > 2.7*[[[L-],[nu]],[[nu],[ta+]]], [[[nu],[L+]],[[nu],[L-]]] > 2.7*[[[nu],[ta+]],[[nu],[L-]]], [[[nu],[L+]],[[nu],[L-]]] > 2.7*[[[nu],[L+]],[[nu],[ta-]]], [[[nu],[L+]],[[nu],[L-]]] > 2.7*[[[nu],[ta+]],[[nu],[L-]]], [[[nu],[L+]],[[nu],[L-]]] > 2.7*[[[nu],[L+]],[[nu],[ta-]]], [[[nu],[L-]],[[nu],[L+]]] > 2.7*[[[nu],[ta-]],[[nu],[L+]]], [[[nu],[L-]],[[nu],[L+]]] > 2.7*[[[nu],[L-]],[[nu],[ta+]]]",
+    "[[[L+],[nu]],[[L-],[nu]]] + [[[L+],[nu]],[[nu],[L-]]] + [[[L-],[nu]],[[nu],[L+]]] + [[[nu],[L+]],[[nu],[L-]]]" : "[[[L+],[nu]],[[L-],[nu]]] ~ [[[L+],[nu]],[[nu],[L-]]], [[[L+],[nu]],[[nu],[L-]]] ~ [[[L-],[nu]],[[nu],[L+]]], [[[L-],[nu]],[[nu],[L+]]] ~ [[[nu],[L+]],[[nu],[L-]]], [[[L+],[nu]],[[L-],[nu]]] > 2.7*[[[ta+],[nu]],[[L-],[nu]]], [[[L+],[nu]],[[L-],[nu]]] > 2.7*[[[L+],[nu]],[[ta-],[nu]]], [[[L+],[nu]],[[nu],[L-]]] > 2.7*[[[ta+],[nu]],[[nu],[L-]]], [[[L+],[nu]],[[nu],[L-]]] > 2.7*[[[L+],[nu]],[[nu],[ta-]]], [[[L-],[nu]],[[nu],[L+]]] > 2.7*[[[ta-],[nu]],[[nu],[L+]]], [[[L-],[nu]],[[nu],[L+]]] > 2.7*[[[L-],[nu]],[[nu],[ta+]]], [[[nu],[L+]],[[nu],[L-]]] > 2.7*[[[nu],[ta+]],[[nu],[L-]]], [[[nu],[L+]],[[nu],[L-]]] > 2.7*[[[nu],[L+]],[[nu],[ta-]]]",
 #T6bbww (stop pair production)
     "[[[b],[W]],[[b],[W]]]" : "None"    
     }
     Analysis.plots  = {   
-    "2.*([[[L],[L]],[[L],[nu]]] + [[[L],[L]],[[nu],[L]]])" : ["TChipmSlepSnu",["Weakinos8TeV"]],
-    "[[[L],[L]],[[nu],[ta]]]" : ["???",["Weakinos8TeV"]],
-    "[[[ta],[ta]],[[nu],[ta]]]" : ["???",["Weakinos8TeV"]],
+    "2.*([[[L],[L]],[[L],[nu]]] + [[[L],[L]],[[nu],[L]]])" : ["TChiChipmSlepL",["Weakinos8TeV"]],
+    "[[[L],[L]],[[nu],[ta]]]" : ["TChiChipmSlepStau",["Weakinos8TeV"]],
+    "[[[ta],[ta]],[[nu],[ta]]]" : ["TChiChipmStauStau",["Weakinos8TeV"]],
     "[[[L+],[nu]],[[L-],[nu]]] + [[[L+],[nu]],[[nu],[L-]]] + [[[L-],[nu]],[[nu],[L+]]] + [[[nu],[L+]],[[nu],[L-]]] + [[[nu],[L-]],[[nu],[L+]]]" : ["???",["Weakinos8TeV"]],
     "[[[b],[W]],[[b],[W]]]" : ["T6bbww",["LeptonicStop8TeV"]]
     }    
