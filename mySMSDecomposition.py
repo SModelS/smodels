@@ -14,8 +14,8 @@ SMSanalyses.load()
 
 def getT1(b1,b2):
 	pts=[]
-	pts.extend(b1[2])
-	pts.extend(b2[2])
+	pts.extend(b1[2][0])
+	pts.extend(b2[2][0])
 	if pts.count('b')==4:
 		return "T1bbbb"
 	elif pts.count('t+')+pts.count('t-')==4:
@@ -24,9 +24,10 @@ def getT1(b1,b2):
 
 def getT3(b1,b2):
 	pts=[]
-        pts.extend(b1[2])
-        pts.extend(b2[2])
-        if pts.count('W+')+pts.count('W-')==1 and b2[2].count('b')==2:
+        pts.extend(b1[2][0])
+        pts.extend(b1[2][1])
+        pts.extend(b2[2][0])
+        if pts.count('W+')+pts.count('W-')==1 and b2[2][0].count('b')==2:
                 return "T3wb"
         elif pts.count('W+')+pts.count('W-')==1:
                 return "T3w"
@@ -40,8 +41,10 @@ def getT3(b1,b2):
 
 def getT5(b1,b2):
 	pts=[]
-        pts.extend(b1[2])
-        pts.extend(b2[2])
+        pts.extend(b1[2][0])
+        pts.extend(b2[2][0])
+        pts.extend(b1[2][1])
+        pts.extend(b2[2][1])
         if pts.count('photon')==2:
                 return "T5gg"
         elif pts.count('W+')+pts.count('W-')==2:
@@ -56,8 +59,8 @@ def getT5(b1,b2):
 
 def getT2(b1,b2):
         pts=[]
-        pts.extend(b1[2])
-        pts.extend(b2[2])
+        pts.extend(b1[2][0])
+        pts.extend(b2[2][0])
         if pts.count('b')==2:
                 return "T2bb"
 	elif pts.count('b')==1 and pts.count('W+')+pts.count('W-')==1:
@@ -80,8 +83,10 @@ def getT4(b1,b2):
 
 def getT6(b1,b2):
         pts=[]
-        pts.extend(b1[2])
-        pts.extend(b2[2])
+        pts.extend(b1[2][0])
+        pts.extend(b2[2][0])
+	pts.extend(b1[2][1])
+        pts.extend(b2[2][1])
         if pts.count('b')==2 and pts.count('Z')==2:
                 return "T6bbzz"
 	elif pts.count('l+')+pts.count('l-')==3 and pts.count('nu')==1:
