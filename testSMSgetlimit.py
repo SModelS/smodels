@@ -1,6 +1,5 @@
 def GetPlotLimit(massarray,plot,Analysis):
-    """ Get upper limit on sigma*BR for a specific array of masses from plot
-     (I have included the Analysis in the input to get the value of masscomp and in case we want to access some additional info) """
+    """ Get upper limit on sigma*BR for a specific array of masses from plot """
     import SMSResults, numpy 
  
 #Run label:
