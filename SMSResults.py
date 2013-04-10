@@ -157,8 +157,9 @@ def getx ( analysis, topo=None, run=None ):
       topo, then the return value is the x-values only for this topo """
   if topo:
     tmp=getx ( analysis, run )
+    if not tmp or not tmp.has_key ( topo ): return None
     if tmp.has_key ( topo ): return tmp[topo]
-    return None
+    
   st = SMSHelpers.getMetaInfoField ( analysis, "x", run )
   if not st:
      return None
