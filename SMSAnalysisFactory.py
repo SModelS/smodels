@@ -7,6 +7,7 @@ def load():
     import SMSResults, SMSglobals
 
     analysis="alphaT"
+    # for Tx in SMSResults.getTopologies ( analysis ):
     Tx="T1tttt"
 
     Analysis = EAnalysis()
