@@ -175,6 +175,10 @@ def getFigures ( analysis, run=None ):
   """ get the figure number for this analysis """
   return SMSHelpers.getMetaInfoField ( analysis, "figures", run )
 
+def getComment ( analysis, run=None ):
+  """ an option comment? """
+  return SMSHelpers.getMetaInfoField ( analysis, "comment", run )
+
 def getConditions ( analysis, run=None ):
   """ get the conditions """
   run=SMSHelpers.getRun ( analysis, run )
