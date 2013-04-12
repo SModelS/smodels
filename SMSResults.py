@@ -37,6 +37,40 @@ def getExclusion ( analysis, topo, run=None ):
   if not ex.has_key ( topo ): return None
   return ex[topo]
 
+def exists ( analysis, topo, run=None ):
+  """ does a result for analysis/topo/run exist? """
+  run=SMSHelpers.getRun ( analysis, run )
+  histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
+  return histo!=None
+
+def getBinWidthX ( analysis, topo, run=None ):
+  """ get the bin width in X """
+  run=SMSHelpers.getRun ( analysis, run )
+  histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
+  if not histo: return None
+  return histo.GetXaxis().GetBinWidth(1)
+
+def getLowX ( analysis, topo, run=None ):
+  """ get the lower edge of the x axis """
+  run=SMSHelpers.getRun ( analysis, run )
+  histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
+  if not histo: return None
+  return histo.GetXaxis().GetXmin()
+
+def getLowY ( analysis, topo, run=None ):
+  """ get the lower edge of the y axis """
+  run=SMSHelpers.getRun ( analysis, run )
+  histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
+  if not histo: return None
+  return histo.GetYaxis().GetXmin()
+
+def getBinWidthY ( analysis, topo, run=None ):
+  """ get the bin width in Y """
+  run=SMSHelpers.getRun ( analysis, run )
+  histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
+  if not histo: return None
+  return histo.GetYaxis().GetBinWidth(1)
+
 def getExclusionLine(topo,ana,expected=False,plusminussigma=0,extendedinfo=True,xvalue=None,factor=1.0):
   """ get the exclusion line, as a TGraph """
   if xvalue==None: xvalue=''
