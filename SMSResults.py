@@ -226,17 +226,25 @@ def getComment ( analysis, run=None ):
   """ an option comment? """
   return SMSHelpers.getMetaInfoField ( analysis, "comment", run )
 
-def getConditions ( analysis, run=None ):
-  """ get the conditions """
+def getConditions ( analysis, topo="all", run=None ):
+  """ get the conditions. if topo is "all",
+      returns a dictionary, else it returns the condition
+      only for the given topo, None if non-existent. """
   run=SMSHelpers.getRun ( analysis, run )
   ret = SMSHelpers.conditions ( analysis, run )
-  return ret
+  if topo=="all": return ret
+  if not ret.has_key ( topo ): return None
+  return ret[topo]
 
-def getConstraints ( analysis, run=None ):
-  """ get the constraints """
+def getConstraints ( analysis, topo="all", run=None ):
+  """ get the constraints. if topo is "all", 
+      returns a dictionary, else it returns the constraint
+      only for the given topo, None if non-existent. """
   run=SMSHelpers.getRun ( analysis, run )
   ret = SMSHelpers.constraints ( analysis, run )
-  return ret
+  if topo=="all": return ret
+  if not ret.has_key ( topo ): return None
+  return ret[topo]
 
 def getRequirement ( analysis, run=None ):
   """ any requirements that come with this analysis? (e.g. onshellness) """
