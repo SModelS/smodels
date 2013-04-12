@@ -14,6 +14,31 @@ verbose=True
 ## track the open root files
 openFiles={}
 
+useUnits=False
+
+def addunit ( value, unitstring ):
+  """ a function that can add units to values, but also
+      makes it easy to turn this functionality off, in case "units" isnt installed
+      """
+  if not useUnits: return value
+  if useUnits: 
+    import SMSUnits as u
+    import types as t
+    if type(value)!=t.FloatType and type(value)!=t.IntType:
+      return value
+    if unitstring=="GeV":
+      return value * u.GeV
+    if unitstring=="TeV":
+      return value * u.TeV
+    if unitstring=="fb":
+      return value * u.fb
+    if unitstring=="pb":
+      return value * u.pb
+    if unitstring=="fb-1":
+      return value / u.fb
+    print "[SMSHelpers.py] Warning: dont know what to do with unit",unitstring
+  return value
+
 def close():
   """ close all open files """
   for (name,tfile) in openFiles.items():

@@ -4,10 +4,13 @@
 
 import SMSHelpers
 
+def useUnits ( b=True ):
+  SMSHelpers.useUnits = b
+
 def ResultsForSqrts ( sqrts ):
   import SMSResultsCollector
   """ If this is called, only results for a
-      center of mass energy of sqrts will be retrieved.
+      center of mass energy of sqrts in TeV will be retrieved.
       if sqrts is None or 0, then all results will be made available """
   if sqrts==7:
     SMSHelpers.runs=[ "2012", "2011" ]
@@ -48,28 +51,32 @@ def getBinWidthX ( analysis, topo, run=None ):
   run=SMSHelpers.getRun ( analysis, run )
   histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
   if not histo: return None
-  return histo.GetXaxis().GetBinWidth(1)
+  w=histo.GetXaxis().GetBinWidth(1)
+  return SMSHelpers.addunit ( w, "GeV" )
 
 def getLowX ( analysis, topo, run=None ):
   """ get the lower edge of the x axis """
   run=SMSHelpers.getRun ( analysis, run )
   histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
   if not histo: return None
-  return histo.GetXaxis().GetXmin()
+  w=histo.GetXaxis().GetXmin()
+  return SMSHelpers.addunit ( w, "GeV" )
 
 def getLowY ( analysis, topo, run=None ):
   """ get the lower edge of the y axis """
   run=SMSHelpers.getRun ( analysis, run )
   histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
   if not histo: return None
-  return histo.GetYaxis().GetXmin()
+  w=histo.GetYaxis().GetXmin()
+  return SMSHelpers.addunit ( w, "GeV" )
 
 def getBinWidthY ( analysis, topo, run=None ):
   """ get the bin width in Y """
   run=SMSHelpers.getRun ( analysis, run )
   histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
   if not histo: return None
-  return histo.GetYaxis().GetBinWidth(1)
+  w=histo.GetYaxis().GetBinWidth(1)
+  return SMSHelpers.addunit ( w, "GeV" )
 
 def getExclusionLine(topo,ana,expected=False,plusminussigma=0,extendedinfo=True,xvalue=None,factor=1.0):
   """ get the exclusion line, as a TGraph """
@@ -137,7 +144,7 @@ def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None ):
   if mx==None:
     return histo
   value=SMSHelpers.getUpperLimitAtPoint ( histo, mx, my )
-  return value
+  return SMSHelpers.addunit ( value, "pb" )
 
 def getEfficiency ( analysis, topo, mx=None, my=None, run=None ):
   """ get the efficiency for run/analysis/topo.
@@ -176,11 +183,17 @@ def isPublic ( analysis, run=None ):
 
 def getLumi ( analysis, run=None ):
   """ get the integrated luminosity for this analysis """
-  return SMSHelpers.getMetaInfoField ( analysis, "lumi", run )
+  lumifb=float(SMSHelpers.getMetaInfoField ( analysis, "lumi", run ))
+  return SMSHelpers.addunit ( lumifb, "fb-1" )
 
 def getSqrts ( analysis, run=None ):
   """ get s_hat for this analysis """
-  return SMSHelpers.getMetaInfoField ( analysis, "sqrts", run )
+  sqrts=SMSHelpers.getMetaInfoField ( analysis, "sqrts", run )
+  try:
+    return SMSHelpers.addunit ( float(sqrts), "TeV" )
+  except:
+    pass
+  return sqrts
 
 def getPAS ( analysis, run=None ):
   """ get the PAS for this analysis """
