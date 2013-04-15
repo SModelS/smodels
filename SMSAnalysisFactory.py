@@ -7,9 +7,9 @@ def load():
   from SMSmethods import EAnalysis
   import SMSResults, SMSglobals
 
-  for analysis in [ "alphaT", "Weakinos8TeV" ]:
+  for analysis in [ "alphaT", "RA48TeV", "RA2b8TeV" ]:
     for Tx in SMSResults.getTopologies ( analysis ):
-    # for Tx in [ "T2tt" ]:
+      # if Tx=="TChiChipmSlepL": continue
       print "Create analysis object for",analysis,Tx
       Analysis = EAnalysis()
       Analysis.sqrts=SMSResults.getSqrts( analysis )

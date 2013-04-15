@@ -148,7 +148,7 @@ class EAnalysis:
         if run == "": run = None  #If run has not been defined, use latest
         for res in self.results.keys():
             if not self.plots.has_key(res):
-                print "GetPlots: Plot for result",res,"in Analysis",self.label,"not found"
+                print "SMSmethods.py: GetPlots: Plot for result",res,"in Analysis",self.label,"not found"
                 topo = ""
                 ana = []
             else:
@@ -161,7 +161,7 @@ class EAnalysis:
             ymin = 0.
             for ana in analyses:
                 if not SMSResults.exists(ana,topo,run):
-                    print "GetPlots: Histogram for ",topo," in ",ana," for run ",run," not found"
+                    print "SMSmethods.py: GetPlots: Histogram for ",topo," in ",ana," for run ",run," not found"
                     continue
 #                if binx == 0.:
 #                    binx = SMSResults.getXBinWidth(ana,topo,run)
