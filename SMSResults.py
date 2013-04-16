@@ -178,7 +178,7 @@ def isPublic ( analysis, run=None ):
     d=not bool ( int ( value ) )
     return d
   except Exception:
-    print "[SMSNewResults.py] couldnt parse ``private'' field"
+    print "[SMSResults.py] couldnt parse ``private'' field"
   return None
 
 def getLumi ( analysis, run=None ):
