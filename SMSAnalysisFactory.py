@@ -24,7 +24,8 @@ def load():
   from SMSmethods import EAnalysis
   import SMSResults, SMSglobals
 
-  for analysis in [ "alphaT", "RA48TeV", "RA2b8TeV", "Weakinos8TeV" ]:
+  anas=[ "alphaT", "RA48TeV", "RA2b8TeV", "Weakinos8TeV", "alphaT8TeV" ]
+  for analysis in anas:
   #for analysis in [ "Weakinos8TeV" ]:
     for Tx in SMSResults.getTopologies(analysis):
     #for Tx in [ "TChiChipmSlepL" ]:
