@@ -3,9 +3,9 @@
 #event file to be used for SMS decomposition.
 #If runpythia = False, read old fort_8,7.68 files and assumes 
 # total xsec = 1 (only useful for fast debugging)
-def pytinit(nevts,slhafile,rpythia = True):
+def pytinit(nevts,slhafile,rpythia = True, donlo = True):
 
-    import SMSmethods, shutil, sys, NLLxsec
+    import SMSmethods, shutil
     from SMSHelpers import addunit
     
     if rpythia:
@@ -59,28 +59,30 @@ def pytinit(nevts,slhafile,rpythia = True):
         if not sigma_8.has_key(key): sigma_8.update({key : addunit(0.,'fb')})
 
 #Get NLO cross-sections from NLLfast:
-    sigma_8NLO = {}
-    sigma_7NLO = {}
-    for key in sigma_8.keys():
-        nllres = NLLxsec.getNLLresult(key[0],key[1],slhafile)
+    if donlo:
+        import NLLxsec
+        sigma_8NLO = {}
+        sigma_7NLO = {}
+        for key in sigma_8.keys():
+            nllres = NLLxsec.getNLLresult(key[0],key[1],slhafile)
         
-        if nllres[0]['K_NLL_7TeV']:
-            k7 = nllres[0]['K_NLL_7TeV']
-        else:
-            k7 = nllres[0]['K_NLO_7TeV']
-        if nllres[1]['K_NLL_8TeV']:
-            k8 = nllres[1]['K_NLL_8TeV']
-        else:
-            k8 = nllres[1]['K_NLO_8TeV']
-        if not k8: k8 = 1.
-        if not k7: k7 = 1.
+            if nllres[0]['K_NLL_7TeV']:
+                k7 = nllres[0]['K_NLL_7TeV']
+            else:
+                k7 = nllres[0]['K_NLO_7TeV']
+            if nllres[1]['K_NLL_8TeV']:
+                k8 = nllres[1]['K_NLL_8TeV']
+            else:
+                k8 = nllres[1]['K_NLO_8TeV']
+            if not k8: k8 = 1.
+            if not k7: k7 = 1.
 
-        LO7 = sigma_7[key]
-        LO8 = sigma_8[key]
-        NLO7 = LO7*k7
-        NLO8 = LO8*k8
-        sigma_7NLO.update({key : NLO7})
-        sigma_8NLO.update({key : NLO8}) 
+            LO7 = sigma_7[key]
+            LO8 = sigma_8[key]
+            NLO7 = LO7*k7
+            NLO8 = LO8*k8
+            sigma_7NLO.update({key : NLO7})
+            sigma_8NLO.update({key : NLO8}) 
     
 
 
@@ -88,7 +90,10 @@ def pytinit(nevts,slhafile,rpythia = True):
 
 
 #Weight dictionary
-    Wdic = {'7 TeV':sigma_7, '8 TeV':sigma_8, '7 TeV (NLO)':sigma_7NLO, '8 TeV (NLO)':sigma_8NLO}
+    if donlo:
+        Wdic = {'7 TeV':sigma_7, '8 TeV':sigma_8, '7 TeV (NLO)':sigma_7NLO, '8 TeV (NLO)':sigma_8NLO}
+    else:
+        Wdic = {'7 TeV':sigma_7, '8 TeV':sigma_8}
 #LHE event file
     lhefile = "./data/fort_8.68"
 
