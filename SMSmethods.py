@@ -1,3 +1,5 @@
+from SMSHelpers import addunit, rmvunit
+
 #---------------Dictionaries:
 Rodd={ 
 1000021 : "gluino", 1000022: "N1", 1000023 : "N2", 1000025 : "N3", 1000035 : "N4", 1000024 : "C1", 1000037 : "C2", 1000039 : "gravitino",  1000001 : "squark", 1000002 : "squark", 1000003 : "squark", 1000004 : "squark", 2000001 : "squark", 2000002 : "squark", 2000003 : "squark", 2000004 : "squark", 1000005 : "sbottom", 2000005 : "sbottom", 1000006 : "stop", 2000006 : "stop", 1000011 : "slepton", 1000013 : "slepton", 1000015 : "stau", 2000011 : "slepton", 2000013 : "slepton", 2000015 : "stau", 1000012 : "sneutrino", 1000014 : "sneutrino", 1000016 : "sneutrino", 2000012 : "sneutrino", 2000014 : "sneutrino", 2000016 : "sneutrino", -1000021 : "gluino", -1000022: "N1", -1000023 : "N2", -1000025 : "N3", -1000035 : "N4", -1000024 : "C1", -1000037 : "C2", -1000039 : "gravitino",  1000001 : "squark", -1000002 : "squark", -1000003 : "squark", -1000004 : "squark", -2000001 : "squark", -2000002 : "squark", -2000003 : "squark", -2000004 : "squark", -1000005 : "sbottom", -2000005 : "sbottom", -1000006 : "stop", -2000006 : "stop", -1000011 : "slepton", -1000013 : "slepton", -1000015 : "stau", -2000011 : "slepton", -2000013 : "slepton", -2000015 : "stau", -1000012 : "sneutrino", -1000014 : "sneutrino", -1000016 : "sneutrino", -2000012 : "sneutrino", -2000014 : "sneutrino", -2000016 : "sneutrino"  
@@ -90,7 +92,6 @@ class EAnalysis:
 #Given the constraints dictionary, automatically fill the element list with the
 #elements corresponding to the strings in the dictionary, skipping repeated ones
     def GenerateElements(self):
-        import sys
        
         ListOfStrs = []
         vertnumb = [self.Top.B[0].vertnumb,self.Top.B[1].vertnumb]
@@ -142,6 +143,7 @@ class EAnalysis:
 #store bin information in masscomp for combining masses
     def GetPlots(self,verbose=True):
         import SMSResults
+
         
         self.masscomp = {}
         run = self.run        
@@ -155,28 +157,28 @@ class EAnalysis:
                 topo = self.plots[res][0]
                 analyses = self.plots[res][1]
                 
-            binx = 0.
-            biny = 0.
-            xmin = 0.
-            ymin = 0.
+            binx = addunit(0.,'GeV')
+            biny = addunit(0.,'GeV')
+            xmin = addunit(0.,'GeV')
+            ymin = addunit(0.,'GeV')
             for ana in analyses:
                 if not SMSResults.exists(ana,topo,run):
                     if verbose: print "SMSmethods.py: GetPlots: Histogram for ",topo," in ",ana," for run ",run," not found"
                     continue
-#                if binx == 0.:
-#                    binx = SMSResults.getXBinWidth(ana,topo,run)
-#                    biny = SMSResults.getYBinWidth(ana,topo,run)
-#                    xmin = SMSResults.getMinX(ana,topo,run)
-#                    ymin = SMSResults.getMinY(ana,topo,run)
-#                else:    
-#                    binx = min(SMSResults.getXBinWidth(ana,topo,run),binx)
-#                    biny = min(SMSResults.getYBinWidth(ana,topo,run),biny)
-#                    xmin = min(SMSResults.getMinX(ana,topo,run),xmin)
-#                    ymin = min(SMSResults.getMinY(ana,topo,run),ymin)
+                if binx == addunit(0.,'GeV'):
+                    binx = SMSResults.getBinWidthX(ana,topo,run)
+                    biny = SMSResults.getBinWidthY(ana,topo,run)
+                    xmin = SMSResults.getLowX(ana,topo,run)
+                    ymin = SMSResults.getLowY(ana,topo,run)
+                else:    
+                    binx = min(SMSResults.getBinWidthX(ana,topo,run),binx)
+                    biny = min(SMSResults.getBinWidthY(ana,topo,run),biny)
+                    xmin = min(SMSResults.getLowX(ana,topo,run),xmin)
+                    ymin = min(SMSResults.getLowY(ana,topo,run),ymin)
                     
-            if binx == 0.:  #If no histogram has been found, use default values
-                binx = 20.
-                biny = 20.    
+            if binx == addunit(0.,'GeV'):  #If no histogram has been found, use default values
+                binx = addunit(20.,'GeV')
+                biny = addunit(20.,'GeV')
                     
             self.masscomp.update({res: [binx,biny,xmin,ymin]}) #Store bin information
             
@@ -247,7 +249,7 @@ def getMom(PList):
 #compressed topologies with there are small mass gaps and/or neutrinos
 #emitted in the last step of the cascade ("effective LSP")
 def getEventTop(PList, weight = {}):
-    import SMSglobals 
+    import SMSglobals
         
     ETopList = []
     ETop = GTop()
@@ -295,7 +297,7 @@ def getEventTop(PList, weight = {}):
                     print "getEventTop: Unknown particle!"
                     return False
 
-            El.masses.append(PList[mother].mass)
+            El.masses.append(addunit(PList[mother].mass,'GeV'))
             mother = newmom
             ETop.B[ib].vertparts.append(nvertparts)
             ETop.B[ib].vertnumb += 1
@@ -480,8 +482,8 @@ def SimParticles(ptype1,ptype2):
     ptype2v = [ptype2]
  
 #First flatten nested arrays: 
-    isList = True
-    while isList:
+    isNested = True
+    while isNested:
         newptype1v = []
         newptype2v = []
         if len(ptype1v) != len(ptype2v): return False        
@@ -497,10 +499,10 @@ def SimParticles(ptype1,ptype2):
                 
         ptype1v = newptype1v
         ptype2v = newptype2v
-        isList = False
+        isNested = False
         for i in range(len(ptype1v)):
-            if type(ptype1v[i]) == type(list()): isList = True
-            if type(ptype2v[i]) == type(list()): isList = True
+            if type(ptype1v[i]) == type(list()): isNested = True
+            if type(ptype2v[i]) == type(list()): isNested = True
 
         
     for i in range(len(ptype1v)):
@@ -638,7 +640,7 @@ def AddToAnalysis(SMSTopList,Analysis):
 
 #Replace mass array by its binned equivalent using the information
 #in binpars:
-def BinMass(mass,binpars=[20.,20.,0.,0.]):
+def BinMass(mass,binpars=[addunit(20.,'GeV'),addunit(20.,'GeV'),addunit(0.,'GeV'),addunit(0.,'GeV')]):
     
     newmass = [[],[]]
     for ib in range(2):
@@ -646,6 +648,7 @@ def BinMass(mass,binpars=[20.,20.,0.,0.]):
             if imass < len(mass[ib])-1:  #Parameters for mx (mother and intermediate masses)
                 binw = binpars[0]
                 mmin = binpars[2]
+#                if imass > 0: binw = 50.  #Larger bin for intermediate masses
             else:                        #Parameters for LSP
                 binw = binpars[1]
                 mmin = binpars[3]
@@ -653,7 +656,31 @@ def BinMass(mass,binpars=[20.,20.,0.,0.]):
             newmass[ib].append(Nbins*binw + mmin + binw/2.)
             
     return newmass       
-        
+
+#Replace LSP and mother masses by its binned equivalent using the information
+#in binpars (do not modify intermediate masses):
+def BinMass2(mass,binpars=[addunit(20.,'GeV'),addunit(20.,'GeV'),addunit(0.,'GeV'),addunit(0.,'GeV')]):
+    import sys
+    
+    newmass = [[],[]]
+    for ib in range(2):
+        for imass in range(len(mass[ib])):
+            if imass == 0:                     #Parameters for mother
+                binw = binpars[0]
+                mmin = binpars[2]
+            elif imass == len(mass[ib])-1:       #Parameters for LSP
+                binw = binpars[1]
+                mmin = binpars[3]
+            else:
+                binw = addunit(0.,'GeV')
+                
+            if binw != addunit(0.,'GeV'):                   
+                Nbins = int((mass[ib][imass]-mmin)/binw)
+                newmass[ib].append(Nbins*binw + mmin + binw/2.)
+            else:
+                newmass[ib].append(mass[ib][imass])
+            
+    return newmass        
                           
                         
 #For a list of equivalent masses, compute an average mass (or mass array)
@@ -732,8 +759,9 @@ def MassAvg(equivin, method = "mean"):
                     
 
 #Evaluate theoretical predictions for the analysis result and conditions:
-def EvalRes(res,Analysis):
-    import copy
+def EvalRes(res,Analysis,uselimits = False):
+    import copy, SMSgetlimit, sys
+
     
     if not Analysis.plots.has_key(res) or not Analysis.results.has_key(res) or not Analysis.masscomp.has_key(res):
         print "EvalRes: Wrong analysis input"
@@ -742,7 +770,7 @@ def EvalRes(res,Analysis):
     binpars = Analysis.masscomp[res] #Parameters for mass binning
     
     
-#Create new element list with all masses replaced by
+#Create new element list with all mother and LSP masses replaced by
 #their binned values
     NewTop = copy.deepcopy(Analysis.Top)
     for iel in range(len(NewTop.B[0].ElList)):      
@@ -750,11 +778,14 @@ def EvalRes(res,Analysis):
         weightlist = []      
         while len(NewTop.B[0].ElList[iel].masses) > 0:
             mass = [NewTop.B[0].ElList[iel].masses.pop(0),NewTop.B[1].ElList[iel].masses.pop(0)]
-            binmass = BinMass(mass,binpars)
+            if uselimits:
+                binmass = BinMass2(mass,binpars)
+            else:
+                binmass = BinMass(mass,binpars)    
             masslist.append(binmass)
             weightlist.append(NewTop.WeightList[iel].pop(0))
             
-#Now combine all equal masses:
+#Now combine all equal masses (intermediate masses are still kept unchanged):
         newmasslist = []
         neweightlist = []
         while len(masslist) > 0:
@@ -768,6 +799,48 @@ def EvalRes(res,Analysis):
                     weight.update({k: w1[k] + w2[k]})
             newmasslist.append(mass)
             neweightlist.append(weight)
+
+            
+#Now check experimental results sensitivity to intermediate masses:
+#First get all experimental limits for each mass array
+        limits = []
+        plot = Analysis.plots[res]
+        for mass in newmasslist:
+            if not uselimits: break
+            limits.append(SMSgetlimit.GetPlotLimit(mass,plot,Analysis))
+           
+#Then check if two mass arrays with same mother and LSP masses, but with
+# different intermediate masses have similar experimental limits
+        for imass in range(len(newmasslist)-1):
+            if not uselimits: break
+            for jmass in range(imass+1,len(newmasslist)):
+                imoms = [newmasslist[imass][0][0],newmasslist[imass][1][0]]
+                ilsps = [newmasslist[imass][0][len(newmasslist[imass][0])-1],newmasslist[imass][1][len(newmasslist[imass][1])-1]]
+                jmoms = [newmasslist[jmass][0][0],newmasslist[jmass][1][0]]
+                jlsps = [newmasslist[jmass][0][len(newmasslist[jmass][0])-1],newmasslist[jmass][1][len(newmasslist[jmass][1])-1]]
+
+                limdiff = None
+                if imoms == jmoms and ilsps == jlsps:
+                    for ilim in limits[imass]:                     
+                        if not rmvunit(ilim[1],'fb') or type(ilim[1]) == type(str()): continue  #Skip non-existing histograms or None limits
+                        for jlim in limits[jmass]:
+                            if not rmvunit(jlim[1],'fb') or type(jlim[1]) == type(str()): continue
+                            if ilim[0] == jlim[0]:
+                                limdiff = max(float(abs(ilim[1]-jlim[1])/ilim[1]),limdiff)
+                                break
+                            
+#If limits differ by less than 10%, combine weights:
+#                print newmasslist[imass],newmasslist[jmass],limdiff,neweightlist[imass]
+                if limdiff != None and limdiff < 0.1:
+                    w1 = neweightlist[imass]
+                    w2 = neweightlist[jmass]
+                    for k in w1.keys():
+                        neweightlist[imass].update({k: w1[k] + w2[k]})
+#                print "neweight = ",neweightlist[imass]        
+
+#The problem is that a similar procedure has to be used when
+#combining different elements in the final res with different,
+#but equivalent intermediate masses                
             
             
         for imass in range(len(newmasslist)):
@@ -783,14 +856,21 @@ def EvalRes(res,Analysis):
     for iel in range(len(NewTop.B[0].ElList)):
         for imass in range(len(NewTop.B[0].ElList[iel].masses)):
             mass = [NewTop.B[0].ElList[iel].masses[imass],NewTop.B[1].ElList[iel].masses[imass]]
-            Allmasses.append(str(mass))
+            Allmasses.append(mass)
       
     if len(Allmasses) == 0: 
         return [{'mass' : [],'result' : 0., 'conditions' : []}]  #Empty result
     
 #Remove repeated entries:
-    Allmasses = set(Allmasses)
-    Allmasses = [eval(x) for x in Allmasses]
+    Allmasses2 = []
+    for imass in range(len(Allmasses)):
+        isrepeated = False      
+        for jmass in range(imass+1,len(Allmasses)):
+            if Allmasses[imass] == Allmasses[jmass]: isrepeated = True
+        if not isrepeated: Allmasses2.append(Allmasses[imass])
+
+    Allmasses = Allmasses2
+
     
 
 #Get weight format and generate a zero weight dictionary:
@@ -798,7 +878,7 @@ def EvalRes(res,Analysis):
     for iel in range(len(Analysis.Top.WeightList)):
         if len(Analysis.Top.WeightList[iel]) > 0:
             for wk in Analysis.Top.WeightList[iel][0].keys():                
-                zeroweight.update({wk : 0.})
+                zeroweight.update({wk : addunit(0.,'fb')})
             break    
         
         

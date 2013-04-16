@@ -3,6 +3,7 @@
 """ centralized facility to access the SMS results """
 
 import SMSHelpers
+from SMSHelpers import addunit, rmvunit
 
 def useUnits ( b=True ):
   SMSHelpers.useUnits = b
@@ -141,10 +142,10 @@ def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None ):
   if png==True:
     pngfile=SMSHelpers.getUpperLimitPng(analysis,topo,run)
     return pngfile
-  if mx==None:
+  if rmvunit(mx,'GeV') == None:
     return histo
   value=SMSHelpers.getUpperLimitAtPoint ( histo, mx, my )
-  return SMSHelpers.addunit ( value, "pb" )
+  return SMSHelpers.addunit ( value, "fb" )
 
 def getEfficiency ( analysis, topo, mx=None, my=None, run=None ):
   """ get the efficiency for run/analysis/topo.
@@ -202,10 +203,6 @@ def getPAS ( analysis, run=None ):
 def getx ( analysis, topo=None, run=None ):
   """ get the description of the x-values for this analysis, if you supply a
       topo, then the return value is the x-values only for this topo """
-  if topo:
-    tmp=getx ( analysis, run )
-    if not tmp or not tmp.has_key ( topo ): return None
-    if tmp.has_key ( topo ): return tmp[topo]
     
   st = SMSHelpers.getMetaInfoField ( analysis, "x", run )
   if not st:
@@ -215,7 +212,13 @@ def getx ( analysis, topo=None, run=None ):
   for i in range(len(st)):
      l = st[i].split(':')
      x = l[1].split()
-     d[l[0]] = x
+     d[l[0].replace(" ","")] = x
+     
+  if topo:
+    topo = topo.replace(" ","")
+    if not d or not d.has_key ( topo ): return None
+    else: return d[topo]
+       
   return d
 
 def getFigures ( analysis, run=None ):
