@@ -7,7 +7,7 @@ def getArray ( constraint ):
       2*([[['L'],['L']],[['L'],['nu']]] + [[['L'],['L']],[['nu'],['L']]])
       to
       [[['L'],['L']],[['L'],['nu']]] """
-  print "get array for",constraint
+  # print "get array for",constraint
   c=constraint.replace(" ","")
   c=c.strip("1234567890.*%()")
   if c.find("+[")>5:
@@ -32,7 +32,7 @@ def load():
       #print "Create analysis object for",analysis,Tx
       Analysis = EAnalysis()
       Analysis.sqrts=SMSResults.getSqrts( analysis )
-      Analysis.label = analysis
+      Analysis.label = analysis+":"+Tx
       Analysis.masscomp = 0.2
       Analysis.run = SMSResults.getRun ( analysis ) ##  "2012"
       constraint=SMSResults.getConstraints ( analysis, topo=Tx )
@@ -69,11 +69,11 @@ def load():
   for Analy in SMSglobals.ListOfAnalyses:
     #print "Generate",Analy.label
     Analy.GenerateElements()
-    Analy.GetPlots()
+    Analy.GetPlots(True)
     
 if __name__ == "__main__":
   import SMSglobals
   load()
-  print "List of analyses: "
+  print "List of analyses/results: "
   for ana in SMSglobals.ListOfAnalyses:
     print ana.label # .label,ana.sqrts
