@@ -1,6 +1,10 @@
-def GetPlotLimit(massarray,plot,Analysis):
+def GetPlotLimit(inmass,plot,Analysis):
     """ Get upper limit on sigma*BR for a specific array of masses from plot """
-    import SMSResults, numpy 
+    import SMSResults, numpy , copy, sys
+    from SMSHelpers import addunit, rmvunit
+    
+    massarray = copy.deepcopy(inmass)
+ 
  
 #Run label:
     run = Analysis.run
@@ -29,26 +33,35 @@ def GetPlotLimit(massarray,plot,Analysis):
 #Get intermediate masses and corresponding x values:
     massI = []
     
-    for ib in range(len(massarray)):
+    for ib in range(len(massarray)):           
+        if len(massarray[ib])-1 > 1:   #(LSP mass has been removed already)
+            print 'GetPlotLimit: Multi-dimensional fit not available'
+            return False        
+
         for imass in range(1,len(massarray[ib])):            
             mI = massarray[ib][imass]
-            x = (mI-my)/(mx-my)
+            x = float((mI-my)/(mx-my))
             massI.append([mI, x])
-            
-    if len(massI) > 1:
-        print 'GetPlotLimit: Multi-dimensional fit not available'
-        return False        
+
+    if len(massI) == 2 and massI[0][0] == massI[1][0]:
+        massI = [massI.pop()]   #For the case of equal masses, keep just one
 
         
     CMSlabel = plot[0]        #CMS-type label
     CMSanalyses = plot[1]     #CMS list of analyses
 #Now loop over analyses/results and get limits:
-    for analyses in CMSanalyses:        
+    for analyses in CMSanalyses:
+        
+        if not SMSResults.exists(analyses, CMSlabel, run):
+            limits.append([analyses, 'no histogram'])
+            continue
+
         xexp = [SMSResults.getx(analyses, CMSlabel, run)]   #experimenal X values 
         if not xexp[0]: xexp = []
-            
+
 #Sanity check
-        if len(xexp) != len(massI):
+        if len(massI) > 0 and len(xexp) == 0:
+#        if len(xexp) != len(massI):
             print 'GetPlotLimit: Number of intermediate masses do not match histogram'
             limits.append([analyses, False])
             continue
@@ -64,23 +77,29 @@ def GetPlotLimit(massarray,plot,Analysis):
                     ylim = SMSResults.getUpperLimit(analyses,CMSlabel,mx, my)
                 else:
                     ylim = SMSResults.getUpperLimit(analyses,CMSlabel+k,mx, my)
-                    
-                if ylim:       #Do not include "None" results
-                    x.append(float(k)/100.)
-                    y.append(ylim)
+
+                if type(ylim) != type(addunit(1.,'fb')): continue
+
+                x.append(float(k)/100.)
+                y.append(rmvunit(ylim,'fb'))
                 
 #Interpolation checks:
             if len(x) == 1:
-                print  'GetPlotLimit: only one interpolation point'
+                print  'GetPlotLimit: only one interpolation point in',analyses,' for',CMSlabel
                 limits.append([analyses, None])
                 continue
-            if massI[0][1] < min(x) or massI[0][1] > max(x):
-                print  'GetPlotLimit: intermediate mass out of bounds'
-                limits.append([analyses, None])
-                continue
+
+#If intermediate masses differ, use weakest limit (conservative case):
+            limit = addunit(0.,'fb')
+            for mass in massI:
+                if mass[1] < min(x) or mass[1] > max(x):
+                    print  'GetPlotLimit: intermediate mass out of bounds'
+                    limits.append([analyses, None])
+                    break
       
-            p = numpy.polyfit(x, y, len(y)-1)
-            limit = numpy.polyval(p, massI[0][1])
+                p = numpy.polyfit(x, y, len(y)-1)
+                limit = max(limit,addunit(float(numpy.polyval(p, mass[1])),'fb'))
+                
             limits.append([analyses, limit])
                 
 

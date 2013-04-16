@@ -4,6 +4,7 @@
 
 import os
 
+#Base = "/home/lessa/SMS_database/"
 Base = "/afs/hephy.at/user/w/walten/public/sms/"
 
 runs=[ "8TeV", "2012", "2011", "ATLAS8TeV" ]
@@ -38,6 +39,33 @@ def addunit ( value, unitstring ):
       return value / u.fb
     print "[SMSHelpers.py] Warning: dont know what to do with unit",unitstring
   return value
+
+
+def rmvunit ( value, unitstring ):
+  """ a function that can remove units from values, but also
+      makes it easy to turn this functionality off, in case "units" isnt installed
+      """
+  if not useUnits: return value
+  if useUnits: 
+    import SMSUnits as u
+    import types as t
+    if type(value) != type(1.*u.GeV):
+      return value
+    if unitstring=="GeV":
+      return value.asNumber(u.GeV)
+    if unitstring=="TeV":
+      return value.asNumber(u.TeV)
+    if unitstring=="fb":
+      return value.asNumber(u.fb)
+    if unitstring=="pb":
+      return value.asNumber(u.pb)
+    if unitstring=="fb-1":
+      return value.asNumber(1/u.fb)
+
+    print "[SMSHelpers.py] Warning: dont know what to do with unit",unitstring
+    return value
+
+    
 
 def close():
   """ close all open files """
@@ -177,16 +205,17 @@ def getUpperLimitHisto ( analysis, topo, run ):
 def getUpperLimitAtPoint ( histo, mx, my ):
   """ given already a histogram, we get the upper limit for mx and my,
       we return None if we're out of bounds """
-  if my==None:
+
+  if rmvunit(my,'GeV')==None:
     log ( "inconsistent mx/my, mx=None, my=%s" % my )
     return None
   if not histo: return 'no histogram'
   xmax=histo.GetXaxis().GetNbins()
-  xbin=histo.GetXaxis().FindBin(mx)
+  xbin=histo.GetXaxis().FindBin(rmvunit(mx,'GeV'))
   if xbin==0 or xbin>xmax:
     return None
   ymax=histo.GetYaxis().GetNbins()
-  ybin=histo.GetYaxis().FindBin(my)
+  ybin=histo.GetYaxis().FindBin(rmvunit(my,'GeV'))
   if ybin==0 or ybin>ymax:
     return None
   c=histo.GetBinContent(xbin,ybin)

@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
-import SMSglobals, SMSanalyses, sys, SMSmethods, SMSxsec, SMSgetlimit, copy
+import SMSglobals, SMSanalyses, sys, SMSmethods, SMSxsec, SMSgetlimit
 from prettytable import PrettyTable
+from SMSHelpers import addunit
+
 
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
@@ -12,7 +14,7 @@ SMSanalyses.load()
 
 
 #Generate events and compute cross-sections:
-nevts = 10000
+nevts = 100
 slhafile = "AndreSLHA/andrePT4.slha"
 Wv = SMSxsec.pytinit(nevts,slhafile)
 W = Wv["Wdic"]
@@ -57,7 +59,7 @@ for i in range(len(SMSTopList)):
     sumw = {}
     sumw.update(weight)
     for w in sumw.keys():
-        sumw[w] = 0.
+        sumw[w] = addunit(0.,'fb')
     for j in range(len(SMSTopList[i].WeightList)):
         for w in SMSTopList[i].WeightList[j].keys():
             sumw[w] += SMSTopList[i].WeightList[j][w]            
@@ -67,14 +69,14 @@ for i in range(len(SMSTopList)):
  
             
 #Print element list for Topology[i]:    
-    if i >= 0:           
+    if i == 0:           
         for j in range(len(SMSTopList[i].B[0].ElList)):
             EvElement_table.add_row([i,j,SMSTopList[i].B[0].ElList[j].particles,SMSTopList[i].B[1].ElList[j].particles,SMSTopList[i].B[0].ElList[j].masses,SMSTopList[i].B[1].ElList[j].masses,SMSTopList[i].WeightList[j]])
         EvElement_table.add_row(["---","---","---","---","---","---","---"])    
             
             
 print "Number of Global topologies = ",len(SMSTopList)          
-print(EvTop_table)
+#print(EvTop_table)
 print "Total Number of Elements = ",eltot
 #print(EvElement_table)
 
@@ -103,7 +105,7 @@ for Ana in SMSglobals.ListOfAnalyses:
     AnElement_table.add_row(["---","---","---","---"])  
         
 
-print(AnElement_table)
+#print(AnElement_table)
 
 print '\n \n \n'
 
@@ -115,19 +117,17 @@ for Analysis in SMSglobals.ListOfAnalyses:
 
     for res in Analysis.results.keys():
         theoRes = SMSmethods.EvalRes(res,Analysis)  #Theoretical values for result and conditions
-#        sys.exit()
+
         try:
             plot = Analysis.plots[res]
         except KeyError:    
             plot = []
                 
-#        print "Constraint: ",res,"  Conditions: ",Analysis.results[res]
         for imass in range(len(theoRes)):
             mass = theoRes[imass]['mass']
             tvalue = theoRes[imass]['result']
             conds = theoRes[imass]['conditions']
-            massarray = copy.deepcopy(mass)            
-            sigmalimit = SMSgetlimit.GetPlotLimit(massarray,plot,Analysis)
+            sigmalimit = SMSgetlimit.GetPlotLimit(mass,plot,Analysis)
             
             if sigmalimit and len(sigmalimit) > 0:
                 Results_table.add_row([res,conds,mass,tvalue,sigmalimit[0]])
@@ -136,12 +136,7 @@ for Analysis in SMSglobals.ListOfAnalyses:
             else:
                 Results_table.add_row([res,conds,mass,tvalue,sigmalimit])
             Results_table.add_row(["---------","---------","---------","---------","---------"])
-#            print "Results for mass array ",mass," :"
-#            print "    Theorical value = ",res,"Conditions = ",conds
-#            print "    Experimental Limits: ",sigmalimit
-#        print '\n'
-#    print "-----------------------"
-#    print '\n \n'    
+
     print(Results_table)
 #    sys.exit()  # Just print first analysis (avoid too much output)       
 

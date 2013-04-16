@@ -5,6 +5,7 @@ def load():
         
 
 
+
      #Global Topology:
     Analysis = EAnalysis()
     Analysis.label = "T1-simple" #it can be whatever you want
@@ -57,7 +58,7 @@ def load():
     "[[[jet]],[[jet]]]" : ["T2",["alphaT"]],
     "[[[t]],[[t]]]" : ["T2tt",["alphaT","LeptonicStop8TeV"]],
     "[[[b]],[[b]]]" : ["T2bb",["alphaT"]],
-    "[[[W]],[[Z]]]" : ["TChiWZ",["Weakinos8TeV"]],
+    "[[[W]],[[Z]]]" : ["TChiwz",["Weakinos8TeV"]],
 #    "[[Z],[Z]]" : ["TChiZZ",["Weakinos8TeV"]],
     "[[[l+]],[[l-]]]" : ["TSlepSlep",["Weakinos8TeV"]]
     }    
@@ -91,7 +92,7 @@ def load():
     "2.*([[[L],[L]],[[L],[nu]]] + [[[L],[L]],[[nu],[L]]])" : ["TChiChipmSlepL",["Weakinos8TeV"]],
     "[[[L],[L]],[[nu],[ta]]]" : ["TChiChipmSlepStau",["Weakinos8TeV"]],
     "[[[ta],[ta]],[[nu],[ta]]]" : ["TChiChipmStauStau",["Weakinos8TeV"]],
-    "[[[L+],[nu]],[[L-],[nu]]] + [[[L+],[nu]],[[nu],[L-]]] + [[[L-],[nu]],[[nu],[L+]]] + [[[nu],[L+]],[[nu],[L-]]]" : ["???",["Weakinos8TeV"]],
+    "[[[L+],[nu]],[[L-],[nu]]] + [[[L+],[nu]],[[nu],[L-]]] + [[[L-],[nu]],[[nu],[L+]]] + [[[nu],[L+]],[[nu],[L-]]]" : ["TChipChimSlepSnu",["Weakinos8TeV"]],
     "[[[b],[W]],[[b],[W]]]" : ["T6bbww",["LeptonicStop8TeV"]]
     }    
 #Add analysis to list of analyses:
@@ -101,17 +102,7 @@ def load():
     
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+   
     
     
     
