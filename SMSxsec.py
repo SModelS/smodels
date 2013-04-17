@@ -60,22 +60,26 @@ def pytinit(nevts,slhafile,rpythia = True, donlo = True):
 
 #Get NLO cross-sections from NLLfast:
     if donlo:
-        import NLLxsec
+        import NLLxsec,sys
         sigma_8NLO = {}
         sigma_7NLO = {}
+        sumlo = 0.
+        lonllfast = 0.
+
         for key in sigma_8.keys():
+
             nllres = NLLxsec.getNLLresult(key[0],key[1],slhafile)
-        
-            if nllres[0]['K_NLL_7TeV']:
-                k7 = nllres[0]['K_NLL_7TeV']
-            else:
+            k7 = 1.
+            k8 = 1.
+     
+            if nllres[0]['K_NLL_7TeV'] and nllres[0]['K_NLO_7TeV']:
+                k7 = nllres[0]['K_NLL_7TeV']*nllres[0]['K_NLO_7TeV']
+            elif nllres[0]['K_NLO_7TeV']:
                 k7 = nllres[0]['K_NLO_7TeV']
-            if nllres[1]['K_NLL_8TeV']:
-                k8 = nllres[1]['K_NLL_8TeV']
-            else:
+            if nllres[1]['K_NLL_8TeV'] and nllres[1]['K_NLO_8TeV']:
+                k8 = nllres[1]['K_NLL_8TeV']*nllres[1]['K_NLO_8TeV']
+            elif nllres[1]['K_NLO_8TeV']:
                 k8 = nllres[1]['K_NLO_8TeV']
-            if not k8: k8 = 1.
-            if not k7: k7 = 1.
 
             LO7 = sigma_7[key]
             LO8 = sigma_8[key]
@@ -83,7 +87,6 @@ def pytinit(nevts,slhafile,rpythia = True, donlo = True):
             NLO8 = LO8*k8
             sigma_7NLO.update({key : NLO7})
             sigma_8NLO.update({key : NLO8}) 
-    
 
 
 
@@ -91,9 +94,9 @@ def pytinit(nevts,slhafile,rpythia = True, donlo = True):
 
 #Weight dictionary
     if donlo:
-        Wdic = {'7 TeV':sigma_7, '8 TeV':sigma_8, '7 TeV (NLO)':sigma_7NLO, '8 TeV (NLO)':sigma_8NLO}
+        Wdic = {'7 TeV (LO)':sigma_7, '8 TeV (LO)':sigma_8, '7 TeV (NLO)':sigma_7NLO, '8 TeV (NLO)':sigma_8NLO}
     else:
-        Wdic = {'7 TeV':sigma_7, '8 TeV':sigma_8}
+        Wdic = {'7 TeV (LO)':sigma_7, '8 TeV (LO)':sigma_8}
 #LHE event file
     lhefile = "./data/fort_8.68"
 
