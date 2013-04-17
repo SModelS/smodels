@@ -3,7 +3,7 @@
 import SMSglobals, SMSanalyses, sys, SMSmethods, SMSxsec, SMSgetlimit
 from prettytable import PrettyTable
 from SMSHelpers import addunit
-
+from SMSpprint import wrap, MyPrettyPrinter
 
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
@@ -16,7 +16,7 @@ SMSanalyses.load()
 #Generate events and compute cross-sections:
 nevts = 100
 slhafile = "AndreSLHA/andrePT4.slha"
-Wv = SMSxsec.pytinit(nevts,slhafile,rpythia = True, donlo = False)
+Wv = SMSxsec.pytinit(nevts,slhafile,rpythia = True, donlo = True)
 W = Wv["Wdic"]
 lhefile = Wv["lhefile"]
 LHEfile = open(lhefile,"r")
@@ -63,7 +63,7 @@ for i in range(len(SMSTopList)):
     for j in range(len(SMSTopList[i].WeightList)):
         for w in SMSTopList[i].WeightList[j].keys():
             sumw[w] += SMSTopList[i].WeightList[j][w]            
-    EvTop_table.add_row([i,SMSTopList[i].B[0].vertnumb,SMSTopList[i].B[1].vertnumb,SMSTopList[i].B[0].vertparts,SMSTopList[i].B[1].vertparts,len(SMSTopList[i].B[0].ElList),sumw])
+    EvTop_table.add_row([i,SMSTopList[i].B[0].vertnumb,SMSTopList[i].B[1].vertnumb,SMSTopList[i].B[0].vertparts,SMSTopList[i].B[1].vertparts,len(SMSTopList[i].B[0].ElList),wrap(MyPrettyPrinter().pformat(sumw),width=30)])
     eltot += len(SMSTopList[i].B[0].ElList)
 
  
@@ -71,15 +71,14 @@ for i in range(len(SMSTopList)):
 #Print element list for Topology[i]:    
     if i == 0:           
         for j in range(len(SMSTopList[i].B[0].ElList)):
-            EvElement_table.add_row([i,j,SMSTopList[i].B[0].ElList[j].particles,SMSTopList[i].B[1].ElList[j].particles,SMSTopList[i].B[0].ElList[j].masses,SMSTopList[i].B[1].ElList[j].masses,SMSTopList[i].WeightList[j]])
+            EvElement_table.add_row([i,j,SMSTopList[i].B[0].ElList[j].particles,SMSTopList[i].B[1].ElList[j].particles,wrap(MyPrettyPrinter().pformat(SMSTopList[i].B[0].ElList[j].masses),width=25),wrap(MyPrettyPrinter().pformat(SMSTopList[i].B[1].ElList[j].masses),width=25),wrap(MyPrettyPrinter().pformat(SMSTopList[i].WeightList[j]),width=30)])
         EvElement_table.add_row(["---","---","---","---","---","---","---"])    
             
             
 print "Number of Global topologies = ",len(SMSTopList)          
-#print(EvTop_table)
+print(EvTop_table)
 print "Total Number of Elements = ",eltot
-#print(EvElement_table)
-
+print(EvElement_table)
 
 print '\n \n \n'
 
@@ -101,15 +100,16 @@ for Ana in SMSglobals.ListOfAnalyses:
             if not ifirst: label = ""
             if j != 0: ptcs = ""
             ifirst = False
-            AnElement_table.add_row([label,ptcs,mass,Ana.Top.WeightList[i][j]])
+            AnElement_table.add_row([label,ptcs,wrap(MyPrettyPrinter().pformat(mass),width=100),wrap(MyPrettyPrinter().pformat(Ana.Top.WeightList[i][j]),width=30)])
     AnElement_table.add_row(["---","---","---","---"])  
         
 
-#print(AnElement_table)
+print(AnElement_table)
+
 
 print '\n \n \n'
 
-         
+        
 #Compute theoretical predictions to analyses results:
 for Analysis in SMSglobals.ListOfAnalyses:
     print "---------------Analysis Label = ",Analysis.label
@@ -130,11 +130,11 @@ for Analysis in SMSglobals.ListOfAnalyses:
             sigmalimit = SMSgetlimit.GetPlotLimit(mass,plot,Analysis)
             
             if sigmalimit and len(sigmalimit) > 0:
-                Results_table.add_row([res,conds,mass,tvalue,sigmalimit[0]])
+                Results_table.add_row([res,conds,wrap(MyPrettyPrinter().pformat(mass),width=30),wrap(MyPrettyPrinter().pformat(tvalue),width=30),wrap(MyPrettyPrinter().pformat(sigmalimit[0]),width=30)])
                 for ilim in range(1,len(sigmalimit)):
-                    Results_table.add_row(["","","","",sigmalimit[ilim]])
+                    Results_table.add_row(["","","","",wrap(MyPrettyPrinter().pformat(sigmalimit[ilim]),width=30)])
             else:
-                Results_table.add_row([res,conds,mass,tvalue,sigmalimit])
+                Results_table.add_row([wrap(MyPrettyPrinter().pformat(res),width=30),wrap(MyPrettyPrinter().pformat(conds),width=30),wrap(MyPrettyPrinter().pformat(mass),width=30),wrap(MyPrettyPrinter().pformat(tvalue),width=30),wrap(MyPrettyPrinter().pformat(sigmalimit),width=30)])
             Results_table.add_row(["---------","---------","---------","---------","---------"])
 
     print(Results_table)
