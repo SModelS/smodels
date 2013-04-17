@@ -1,7 +1,7 @@
 C*********************************************************************
 C*********************************************************************
 C*                                                                  **
-C*                                                      June 2010   **
+C*                                                       Mar 2011   **
 C*                                                                  **
 C*                       The Lund Monte Carlo                       **
 C*                                                                  **
@@ -1672,7 +1672,7 @@ C...Default values for main switches and parameters. Reset information.
      5  0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
      6  0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
      7  0,    2,    0,    0,    0,    0,    0,    0,    0,    0,
-     8  6,  423, 2010,   06,   09,    0,    0,    0,    0,    0,
+     8  6,  426, 2011,   11,   16,    0,    0,    0,    0,    0,
      9  0,    0,    0,    0,    0,    0,    0,    0,    0,    0/
       DATA (PARP(I),I=1,100)/
      &  0.25D0,  10D0, 8*0D0,
@@ -1750,7 +1750,8 @@ C...Constants for the generation of the various processes.
      2  2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
      3  2,    2,    2,    2,    2,    2,    2,    2,    2, 21*-2,
      6  2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
-     7  2,    2,    2,    2,    2,    2,    2,    2,    2, 21*-2/
+     7  2,    2,    2,    2,    2,    2,    2,    2,    2,   -2,
+     8  2,    2,  18*-2/
       DATA ((KFPR(I,J),J=1,2),I=1,50)/
      &  23,    0,   24,    0,   25,    0,   24,    0,   25,    0,
      &  24,    0,   23,    0,   25,    0,    0,    0,    0,    0,
@@ -3688,7 +3689,7 @@ C...Force no MI if cross section not known: MSTP(81) -> 0 for PYEVOL.
 C...Absolute max pT2 scale for evolution: phase space limit.
             PT2MXS=0.25D0*VINT(2)
 C...Check if more constrained by ISR and MI max scales:
-            PT2MXS=MIN(PT2MXS,MAX(VINT(56),VINT(62)))
+            PT2MXS=MIN(PT2MXS,MAX(MAX(1D0,PARP(67))*VINT(56),VINT(62)))
 C...Loopback point in case of failure in evolution.
             LOOP=0
   130       LOOP=LOOP+1
@@ -4025,7 +4026,7 @@ C...PYSTAT
 C...Prints out information about cross-sections, decay widths, branching
 C...ratios, kinematical limits, status codes and parameter values.
  
-      SUBROUTINE PYSTAT(MSTAT)					!!! User modified !!!!!!
+      SUBROUTINE PYSTAT(MSTAT)
  
 C...Double precision and integer declarations.
       IMPLICIT DOUBLE PRECISION(A-H, O-Z)
@@ -4095,18 +4096,6 @@ C...Cross-sections.
         IF(MINT(121).GT.1) CALL PYSAVE(5,0)
         WRITE(MSTU(11),5000)
         WRITE(MSTU(11),5100)
-
-
-!	IF(MSTAT2.NE.0) THEN					!!! User modified !!!!!!
-!	  WRITE(MSTAT2,*) 'Number of Events Tested:'
-!	  WRITE(MSTAT2,*) NGEN(0,1)
-!	  WRITE(MSTAT2,*) 'Number of Events Generated:'
-!	  WRITE(MSTAT2,*) NGEN(0,3)
-!	  WRITE(MSTAT2,*) 'Total Cross-Section (mb):'
-!	  WRITE(MSTAT2,*) XSEC(0,3)
-!	ENDIF
-
-
         WRITE(MSTU(11),5200) 0,PROC(0),NGEN(0,3),NGEN(0,1),XSEC(0,3)
         DO 100 I=1,500
           IF(MSUB(I).NE.1) GOTO 100
@@ -5235,6 +5224,7 @@ C...Commonblocks.
       SAVE /PYDAT1/,/PYDAT2/,/PYDAT3/,/PYDAT4/,/PYSUBS/,/PYPARS/,
      &/PYINT1/,/PYINT2/,/PYINT4/,/PYINT6/,/PYMSSM/
 C...Local arrays and data.
+      CHARACTER PRTMP*9
       DIMENSION WDTP(0:400),WDTE(0:400,0:5),WDTPM(0:400),
      &WDTEM(0:400,0:5),KCORD(500),PMORD(500)
  
@@ -5461,6 +5451,55 @@ C...Special cases in treatment of WW -> WW: redefine process name.
       ELSEIF(MSTP(45).EQ.3) THEN
         PROC(77)='W+/- + W+/- -> W+/- + W+/-'
       ENDIF
+
+C...Initialize Generic Processes
+      KFGEN=9900001
+      KCGEN=PYCOMP(KFGEN)
+      IF(KCGEN.GT.0) THEN
+        IDCY=MDCY(KCGEN,2)
+        IF(IDCY.GT.0) THEN
+          KFF1=KFDP(IDCY+1,1)
+          KFF2=KFDP(IDCY+1,2)
+          KCF1=PYCOMP(KFF1)
+          KCF2=PYCOMP(KFF2)
+          IJ1=1
+          IJ2=1
+          KCI1=PYCOMP(KFDP(IDCY,1))
+          IF(KFDP(IDCY,1).LT.0) IJ1=2
+          KCI2=PYCOMP(KFDP(IDCY,2))
+          IF(KFDP(IDCY,2).LT.0) IJ2=2
+          ITMP1=0
+ 190      ITMP1=ITMP1+1
+          IF(CHAF(KCI1,IJ1)(ITMP1+1:ITMP1+1).NE.' '.AND.ITMP1.LT.4)
+     &    GOTO 190
+          ITMP2=0
+ 200      ITMP2=ITMP2+1
+          IF(CHAF(KCI2,IJ2)(ITMP2+1:ITMP2+1).NE.' '.AND.ITMP2.LT.4)
+     &    GOTO 200          
+          PRTMP=CHAF(KCI1,IJ1)(1:ITMP1)//'+'//CHAF(KCI2,IJ2)(1:ITMP2)
+          ITMP3=0
+ 205      ITMP3=ITMP3+1
+          IF(PRTMP(ITMP3+1:ITMP3+1).NE.' '.AND.ITMP3.LT.9)
+     &    GOTO 205
+          PROC(481)=PRTMP(1:ITMP3)//' -> '//CHAF(KCGEN,1)
+          IJ1=1
+          IJ2=1
+          IF(KFF1.LT.0) IJ1=2
+          IF(KFF2.LT.0) IJ2=2
+          ITMP1=0
+ 210      ITMP1=ITMP1+1
+          IF(CHAF(KCF1,IJ1)(ITMP1+1:ITMP1+1).NE.' '.AND.ITMP1.LT.8)
+     &    GOTO 210
+          ITMP2=0
+ 220      ITMP2=ITMP2+1
+          IF(CHAF(KCF2,IJ2)(ITMP2+1:ITMP2+1).NE.' '.AND.ITMP2.LT.8)
+     &    GOTO 220          
+          PROC(482)=PRTMP(1:ITMP3)//' -> '//CHAF(KCF1,IJ1)(1:ITMP1)//
+     &    '+'//CHAF(KCF2,IJ2)(1:ITMP2)
+        ENDIF
+      ENDIF
+
+
  
 C...Format for error information.
  5000 FORMAT(1X,'Error: unphysical input tan^2(beta) and m_H ',
@@ -5970,6 +6009,7 @@ C...User process initialization commonblock.
  
 C...Commonblocks and character variables.
       COMMON/PYDAT1/MSTU(200),PARU(200),MSTJ(200),PARJ(200)
+      COMMON/PYDAT2/KCHG(500,4),PMAS(500,4),PARF(2000),VCKM(4,4)
       COMMON/PYDAT3/MDCY(500,3),MDME(8000,2),BRAT(8000),KFDP(8000,5)
       COMMON/PYSUBS/MSEL,MSELPD,MSUB(500),KFIN(2,-40:40),CKIN(200)
       COMMON/PYPARS/MSTP(200),PARP(200),MSTI(200),PARI(200)
@@ -5977,9 +6017,10 @@ C...Commonblocks and character variables.
       COMMON/PYINT2/ISET(500),KFPR(500,2),COEF(500,20),ICOL(40,4,2)
       COMMON/PYINT6/PROC(0:500)
       CHARACTER PROC*28
-      SAVE /PYDAT1/,/PYDAT3/,/PYSUBS/,/PYPARS/,/PYINT1/,/PYINT2/,
-     &/PYINT6/
+      SAVE /PYDAT1/,/PYDAT2/,/PYDAT3/,/PYSUBS/,/PYPARS/,/PYINT1/,
+     &/PYINT2/,/PYINT6/
       CHARACTER CHIPR*10
+
  
 C...Reset processes to be included.
       IF(MSEL.NE.0) THEN
@@ -6784,6 +6825,35 @@ C...Find heaviest new fermion flavour allowed in process 85.
       MINT(56)=KFLFM
       KFPR(85,1)=KFLFM
       KFPR(85,2)=KFLFM
+
+C...Initialize Generic Processes
+      KFGEN=9900001
+      KCGEN=PYCOMP(KFGEN)
+      IF(KCGEN.GT.0) THEN
+        IDCY=MDCY(KCGEN,2)
+        IF(IDCY.GT.0) THEN
+          KFF1=KFDP(IDCY+1,1)
+          KFF2=KFDP(IDCY+1,2)
+          KCF1=PYCOMP(KFF1)
+          KCF2=PYCOMP(KFF2)
+          JCOL1=IABS(KCHG(KCF1,2))
+          IF(JCOL1.EQ.1) THEN
+            KF1=KFF1
+            KF2=KFF2
+          ELSE
+            KF1=KFF2
+            KF2=KFF1
+          ENDIF
+          KFPR(481,1)=KF1
+          KFPR(481,2)=KF2
+          KFPR(482,1)=KF1
+          KFPR(482,2)=KF2
+        ENDIF
+        IF(KFDP(IDCY,1).EQ.21.OR.KFDP(IDCY,2).EQ.21) THEN
+          KFIN(1,0)=1
+          KFIN(2,0)=1
+        ENDIF
+      ENDIF
  
 C...Import relevant information on external user processes.
       IF(MINT(111).GE.11) THEN
@@ -6810,7 +6880,7 @@ C...Switch on process.
           MSUB(IPYPR)=1
   390   CONTINUE
       ENDIF
- 
+
       RETURN
       END
  
@@ -7368,10 +7438,13 @@ C...Find resonances (explicit or implicit in cross-section).
             PMAS(89,1)=PARP(45)
             PMAS(89,2)=PARP(45)**3/(96D0*PARU(1)*PARP(47)**2)
           ENDIF
+        ELSEIF(ISUB.EQ.481) THEN
+          KFR1=9900001
         ENDIF
         CKMX=CKIN(2)
         IF(CKMX.LE.0D0) CKMX=VINT(1)
         KCR1=PYCOMP(KFR1)
+        IF(KCR1.EQ.0) KFR1=0
         IF(KFR1.NE.0) THEN
           IF(CKIN(1).GT.PMAS(KCR1,1)+20D0*PMAS(KCR1,2).OR.
      &    CKMX.LT.PMAS(KCR1,1)-20D0*PMAS(KCR1,2)) KFR1=0
@@ -9433,10 +9506,13 @@ C...Find resonances (explicit or implicit in cross-section).
           PMAS(89,1)=PARP(45)
           PMAS(89,2)=PARP(45)**3/(96D0*PARU(1)*PARP(47)**2)
         ENDIF
+      ELSEIF(ISUB.EQ.481) THEN
+        KFR1=9900001
       ENDIF
       CKMX=CKIN(2)
       IF(CKMX.LE.0D0) CKMX=VINT(1)
       KCR1=PYCOMP(KFR1)
+      IF(KCR1.EQ.0) KFR1=0
       IF(KFR1.NE.0) THEN
         IF(CKIN(1).GT.PMAS(KCR1,1)+20D0*PMAS(KCR1,2).OR.
      &  CKMX.LT.PMAS(KCR1,1)-20D0*PMAS(KCR1,2)) KFR1=0
@@ -12323,7 +12399,7 @@ C...g + g -> ~t_2 + ~t_2bar; th arbitrary
           KCC=MINT(2)+10
         ENDIF
  
-      ELSEIF(ISUB.LE.296) THEN
+      ELSEIF(ISUB.LE.301) THEN
         IF(ISUB.EQ.271.OR.ISUB.EQ.281.OR.ISUB.EQ.291) THEN
 C...qi + qj -> ~qi_L + ~qj_L
           KCC=MINT(2)
@@ -12418,8 +12494,25 @@ C...qj + g -> ~qj_R + ~g
           KCC=MINT(2)+6
           IF(JS.EQ.2) KCC=KCC+2
           KCS=ISIGN(1,I)
-        ENDIF
  
+        ELSEIF(ISUB.EQ.297.OR.ISUB.EQ.298) THEN
+C...q + qbar' -> H+ + H0
+          KCH1=KCHG(IABS(MINT(15)),1)*ISIGN(1,MINT(15))
+          KCH2=KCHG(IABS(MINT(16)),1)*ISIGN(1,MINT(16))
+          IF(MINT(15)*(KCH1+KCH2).GT.0) JS=2
+          MINT(20+JS)=ISIGN(37,KCH1+KCH2)
+          MINT(23-JS)=KFPR(ISUB,2)
+        ELSEIF(ISUB.EQ.299.OR.ISUB.EQ.300) THEN
+C...f + fbar -> A0 + H0; th arbitrary
+          IF(PYR(0).GT.0.5D0) JS=2
+          MINT(20+JS)=KFPR(ISUB,1)
+          MINT(23-JS)=KFPR(ISUB,2)
+        ELSEIF(ISUB.EQ.301) THEN
+C...f + fbar -> H+ H-
+          MINT(21)=ISIGN(KFPR(ISUB,1),KCS)
+          MINT(22)=-MINT(21)
+        ENDIF
+CMRENNA--
       ELSEIF(ISUB.LE.330) THEN
         IF(ISUB.EQ.311)THEN
 C...g + g -> g* + g* (UED)
@@ -12561,28 +12654,7 @@ C   DO I=1,NFLAVOURS
           MINT(22)=-MINT(21)
           KCC=4
         ENDIF
-        
-      ELSEIF(ISUB.LE.340) THEN
- 
-        IF(ISUB.EQ.297.OR.ISUB.EQ.298) THEN
-C...q + qbar' -> H+ + H0
-          KCH1=KCHG(IABS(MINT(15)),1)*ISIGN(1,MINT(15))
-          KCH2=KCHG(IABS(MINT(16)),1)*ISIGN(1,MINT(16))
-          IF(MINT(15)*(KCH1+KCH2).GT.0) JS=2
-          MINT(20+JS)=ISIGN(37,KCH1+KCH2)
-          MINT(23-JS)=KFPR(ISUB,2)
-        ELSEIF(ISUB.EQ.299.OR.ISUB.EQ.300) THEN
-C...f + fbar -> A0 + H0; th arbitrary
-          IF(PYR(0).GT.0.5D0) JS=2
-          MINT(20+JS)=KFPR(ISUB,1)
-          MINT(23-JS)=KFPR(ISUB,2)
-        ELSEIF(ISUB.EQ.301) THEN
-C...f + fbar -> H+ H-
-          MINT(21)=ISIGN(KFPR(ISUB,1),KCS)
-          MINT(22)=-MINT(21)
-        ENDIF
-CMRENNA--
- 
+         
       ELSEIF(ISUB.LE.360) THEN
  
         IF(ISUB.EQ.341.OR.ISUB.EQ.342) THEN
@@ -12853,9 +12925,177 @@ C...[f + fbar -> g + h0; th arbitrary; (q + qbar -> g + h0 only)]
           MINT(20+JS)=21
           MINT(23-JS)=KFPR(ISUBSV,2)
           KCC=17+JS
-        ENDIF
 C...QUARKONIA---
- 
+        ENDIF
+      ELSEIF(ISUB.LE.500) THEN
+        IF(ISUB.EQ.481.OR.ISUB.EQ.482) THEN
+          KFRES=9900001
+          KCRES=PYCOMP(KFRES)
+          MCOL=KCHG(KCRES,2)
+          MCHG=KCHG(KCRES,1)
+          IF(KCRES.EQ.0) 
+     $      CALL PYERRM(21,"No resonance for Generic 2-> 2 Process")
+          IDCY=MDCY(KCRES,2)
+          IF(IDCY.EQ.0)
+     $      CALL PYERRM(21,"No decays for resonance in Generic 2->2")
+          KCI1=PYCOMP(MINT(15))
+          KCI2=PYCOMP(MINT(16))
+          ICOL1=ISIGN(KCHG(KCI1,2),MINT(15))
+          ICOL2=ISIGN(KCHG(KCI2,2),MINT(16))
+          KFF1=KFPR(ISUB,1)
+          KFF2=KFPR(ISUB,2)
+          KCF1=PYCOMP(KFF1)
+          KCF2=PYCOMP(KFF2)
+          JCOL1=SIGN(KCHG(KCF1,2),KFF1)
+          IF(JCOL1.EQ.-2) JCOL1=2
+          JCOL2=SIGN(KCHG(KCF2,2),KFF2)
+          IF(JCOL2.EQ.-2) JCOL2=2
+          KCH1=KCHG(IABS(MINT(15)),1)*ISIGN(1,MINT(15))
+          KCH2=KCHG(IABS(MINT(16)),1)*ISIGN(1,MINT(16))
+          KCHW=KCH1+KCH2
+          KREL=1
+          IF(MCHG.NE.0.AND.KCHW.EQ.-MCHG) KREL=-1
+          IF(KCHG(KCF1,3).NE.0) KFF1=KFF1*KREL
+          IF(KCHG(KCF2,3).NE.0) KFF2=KFF2*KREL
+          IF(JCOL1.EQ.1.OR.JCOL1.EQ.-1) JCOL1=JCOL1*KREL
+          IF(JCOL2.EQ.1.OR.JCOL2.EQ.-1) JCOL2=JCOL2*KREL
+          IF((ICOL1.EQ.1.AND.ICOL2.EQ.-1).OR.
+     $      (ICOL2.EQ.1.AND.ICOL1.EQ.-1)) THEN
+            IF(PYR(0).GT.0.5D0) JS=2
+            MINT(20+JS)=KFF1
+            MINT(23-JS)=KFF2
+            IF(JCOL1.EQ.0.AND.JCOL2.EQ.0) THEN
+
+            ELSEIF(JCOL1.EQ.0.AND.JCOL2.EQ.2) THEN
+              KCC=17+JS
+              MINT(20+JS)=KFF2
+              MINT(23-JS)=KFF1
+            ELSEIF(JCOL1.EQ.2.AND.JCOL2.EQ.0) THEN
+              KCC=17+JS
+              MINT(20+JS)=KFF1
+              MINT(23-JS)=KFF2
+            ELSEIF(JCOL1.EQ.2.AND.JCOL2.EQ.2.AND.MCOL.EQ.0) THEN
+
+            ELSEIF(JCOL1.EQ.2.AND.JCOL2.EQ.2) THEN
+              KCC=MINT(2)+4
+            ELSEIF((JCOL1.EQ.1.AND.JCOL2.EQ.-1).OR.
+     $        (JCOL1.EQ.-1.AND.JCOL2.EQ.1)) THEN
+              IF(ICOL1.EQ.JCOL1) THEN
+                JS=1
+                MINT(21)=KFF1
+                MINT(22)=KFF2
+              ELSE
+                JS=2
+                MINT(21)=KFF2
+                MINT(22)=KFF1
+              ENDIF
+              IF(MCOL.EQ.0) THEN
+        
+              ELSE
+                KCC=4
+              ENDIF
+            ENDIF
+          ELSEIF((ICOL1.EQ.2.AND.(ICOL2.EQ.1.OR.ICOL2.EQ.-1)).OR.
+     $      (ICOL2.EQ.2.AND.(ICOL1.EQ.1.OR.ICOL1.EQ.-1))) THEN
+            IF((JCOL1.EQ.2.AND.ABS(JCOL2).EQ.1).OR.
+     $        (JCOL2.EQ.2.AND.ABS(JCOL1).EQ.1)) THEN
+              IF(MINT(15).EQ.21) JS=2
+              KCC=MINT(2)+6
+              IF(MINT(15).EQ.21) KCC=KCC+2
+              IF(MINT(15).NE.21) KCS=ISIGN(1,MINT(15))
+              IF(MINT(16).NE.21) KCS=ISIGN(1,MINT(16))
+              IF(JCOL1.EQ.2) THEN
+                MINT(20+JS)=KFF2
+                MINT(23-JS)=KFF1
+              ELSE
+                MINT(20+JS)=KFF1
+                MINT(23-JS)=KFF2
+              ENDIF
+            ELSEIF((ABS(JCOL1).EQ.1.AND.JCOL2.EQ.0).OR.
+     $        (ABS(JCOL2).EQ.1.AND.JCOL1.EQ.0)) THEN
+              IF(MINT(15).EQ.21) JS=2
+              KCC=15+JS
+              KCS=ISIGN(1,MINT(14+JS))
+              IF(JCOL1.EQ.0) THEN
+                MINT(23-JS)=KFF1
+                MINT(20+JS)=KFF2
+              ELSE
+                MINT(23-JS)=KFF2
+                MINT(20+JS)=KFF1
+              ENDIF
+            ENDIF
+          ELSEIF(ICOL1.EQ.2.AND.ICOL2.EQ.2.AND.
+     $      JCOL1.EQ.0.AND.JCOL2.EQ.0) THEN
+            IF(PYR(0).GT.0.5D0) JS=2             
+            KCC=21
+            MINT(20+JS)=KFF1
+            MINT(23-JS)=KFF2
+          ELSEIF(ICOL1.EQ.2.AND.ICOL2.EQ.2.AND.
+     $      ((JCOL1.EQ.0.AND.JCOL2.EQ.2).OR.
+     $      ((JCOL2.EQ.0.AND.JCOL1.EQ.2)))) THEN
+            IF(PYR(0).GT.0.5D0) JS=2
+            KCC=22+JS
+            KCS=(-1)**INT(1.5D0+PYR(0))
+            IF(JCOL1.EQ.0) THEN
+              MINT(23-JS)=KFF1
+              MINT(20+JS)=KFF2
+            ELSE
+              MINT(23-JS)=KFF2
+              MINT(20+JS)=KFF1
+            ENDIF
+          ELSEIF(ICOL1.EQ.2.AND.ICOL2.EQ.2.AND.
+     $      ((JCOL1.EQ.1.AND.JCOL2.EQ.-1).OR.
+     $      ((JCOL2.EQ.1.AND.JCOL1.EQ.-1)))) THEN
+C....two choices, 0 or 2 depending upon mother properties
+            IF(MCOL.EQ.2) THEN
+              KCS=(-1)**INT(1.5D0+PYR(0))
+              KCC=MINT(2)+10
+              IF(JCOL1.EQ.1) THEN
+                MINT(21)=KFF1*KCS
+                MINT(22)=KFF2*KCS
+              ELSE
+                MINT(22)=KFF1*KCS
+                MINT(21)=KFF2*KCS
+              ENDIF
+c              MINT(20+JS)=KFF1*KCS
+c              MINT(23-JS)=KFF2*KCS
+            ELSEIF(MCOL.EQ.0) THEN
+              KCC=21
+              MINT(20+JS)=KFF1*KCS
+              MINT(23-JS)=KFF2*KCS
+            ENDIF
+
+          ELSEIF(ICOL1.EQ.2.AND.ICOL2.EQ.2.AND.
+     $      JCOL1.EQ.2.AND.JCOL2.EQ.2) THEN
+C....two choices, 0 or 2 depending upon mother properties
+            IF(MCOL.EQ.0) THEN
+              KCC=21
+              IF(PYR(0).GT.0.5D0) JS=2
+              MINT(20+JS)=KFF1
+              MINT(23-JS)=KFF2               
+            ELSEIF(MCOL.EQ.2) THEN
+              IF(PYR(0).GT.0.5D0) JS=2
+              KCC=MINT(2)+12
+              KCS=(-1)**INT(1.5D0+PYR(0))
+              MINT(20+JS)=KFF1
+              MINT(23-JS)=KFF2
+            ENDIF
+          ELSEIF((ICOL1.EQ.1.AND.ICOL2.EQ.1).OR.
+     $      (ICOL1.EQ.-1.AND.ICOL2.EQ.-1)) THEN
+            KCC=MINT(2) 
+            IF(PYR(0).GT.0.5D0) JS=2
+            MINT(20+JS)=KFF1
+            MINT(23-JS)=KFF2                          
+          ELSEIF(ICOL1.EQ.0.AND.ICOL2.EQ.0.AND.MCOL.EQ.0) THEN
+            KCC=20
+            IF(PYR(0).GT.0.5D0) JS=2
+            MINT(20+JS)=KFF1
+            MINT(23-JS)=KFF2                          
+          ELSE
+            CALL PYERRM(21,"PYSCAT: No recognized Generic Process")
+          ENDIF
+          IF(ISUBSV.EQ.482) KFRES=0
+        ENDIF 
       ENDIF
  
       IF(ISET(ISUB).EQ.11) THEN
@@ -13364,8 +13604,12 @@ C...Commonblocks.
       COMMON/PYISMX/MIMX,JSMX,KFLAMX,KFLCMX,KFBEAM(2),NISGEN(2,240),
      &     PT2MX,PT2AMX,ZMX,RM2CMX,Q2BMX,PHIMX
       COMMON/PYISJN/MJN1MX,MJN2MX,MJOIND(2,240)
+C...Max size of hard system = HEPEUP size
+      INTEGER MAXNUP
+      PARAMETER (MAXNUP=500)
 C...Local arrays and saved variables.
-      DIMENSION VINTSV(11:80),KSAV(4,5),PSAV(4,5),VSAV(4,5),SHAT(240)
+      DIMENSION VINTSV(11:80),KSAV(MAXNUP,5),PSAV(MAXNUP,5),
+     &     VSAV(MAXNUP,5),SHAT(240)
       SAVE NSAV,NPARTS,M15SV,M16SV,M21SV,M22SV,VINTSV,SHAT,ISUBHD,ALAM3
      &     ,PSAV,KSAV,VSAV
  
@@ -13389,7 +13633,7 @@ C...Store hard scattering variables
           VINTSV(J)=VINT(J)
   100   CONTINUE
         DO 120 J=1,5
-          DO 110 IS=1,4
+          DO 110 IS=1,NSAV-MINT(84)
             I=IS+MINT(84)
             PSAV(IS,J)=P(I,J)
             KSAV(IS,J)=K(I,J)
@@ -13429,7 +13673,7 @@ C...Reset hard scattering variables
           VINT(J)=VINTSV(J)
   130   CONTINUE
         DO 150 J=1,5
-          DO 140 IS=1,4
+          DO 140 IS=1,NSAV-MINT(84)
             I=IS+MINT(84)
             P(I,J)=PSAV(IS,J)
             K(I,J)=KSAV(IS,J)
@@ -14691,7 +14935,12 @@ C...No shower for structureless beam
         MI=MINT(36)
         SHAT=VINT(44)
 C...Absolute shower max scale = VINT(56)
-        PT2=MIN(PT2NOW,VINT(56))
+        IF (MSTP(67).NE.0) THEN
+          PT2 = MIN(PT2NOW,VINT(56))
+        ELSE
+C...For MSTP(67)=0, adjust starting scale by PARP(67)
+          PT2=MIN(PT2NOW,PARP(67)*VINT(56))
+        ENDIF
         IF (NISGEN(1,MI).EQ.0.AND.NISGEN(2,MI).EQ.0) SHTNOW(MI)=SHAT
 C...Define for which processes ME corrections have been implemented.
         IF(MSTP(68).EQ.1.OR.MSTP(68).EQ.3) THEN
@@ -14844,6 +15093,7 @@ C...Val and cmp quarks get an extra sqrt(z) to smooth their bumps.
             WTAP(21)=WTGF*WTAP(21)
             WTAPE=WTFF*WTAPE
           ENDIF
+          IF(MSTP(61).EQ.1) WTAPE=0D0
           IF (KSVCB.GE.1) THEN
 C...Kill normal creation but add joining diagrams for cmp quark.
             WTAP(21)=0D0
@@ -15022,7 +15272,7 @@ C...Pick normal pT2 (in overestimated z range).
         KFLC=21
  
 C...Evolve q -> q gamma separately, pick it if larger pT.
-        IF(KFLBA.LE.5) THEN
+        IF(KFLBA.LE.5.AND.MSTP(61).GE.2) THEN
           PT2QED=(PT2OLD+VINT(18))*PYR(0)**(1D0/(AEM2PI*WTAPE))-VINT(18)
           IF(PT2QED.GT.PT2) THEN
             PT2=PT2QED
@@ -16973,13 +17223,20 @@ C...Commonblocks.
      &/PYSUBS/,/PYPARS/,/PYINT1/,/PYINT2/,/PYINT4/,/PYPUED/
 C...Local arrays and complex and character variables.
       DIMENSION IREF(50,8),KDCY(3),KFL1(3),KFL2(3),KFL3(3),KEQL(3),
-     &KCQM(3),KCQ1(3),KCQ2(3),KCQ3(3),NSD(3),PMMN(3),ILIN(6),
+     &KCQM(3),KCQ1(3),KCQ2(3),KCQ3(3),NSD(3),PMMN(4),ILIN(6),
      &HGZ(3,3),COUP(6,4),CORL(2,2,2),PK(6,4),PKK(6,6),CTHE(3),
-     &PHI(3),WDTP(0:400),WDTE(0:400,0:5),DPMO(5),XM(5),VDCY(4),
-     &ITJUNC(3),CTM2(3),KCQ(0:10),IANT(3),ITRI(3),IOCT(3)
+     &PHI(3),WDTP(0:400),WDTE(0:400,0:5),DPMO(5),VDCY(4),
+     &ITJUNC(3),CTM2(3),KCQ(0:10),IANT(4),ITRI(4),IOCT(4),KCQ4(3),
+     &KFL4(3)
       COMPLEX FGK,HA(6,6),HC(6,6)
       REAL TIR,UIR
       CHARACTER CODE*9,MASS*9
+C...Local arrays.
+      DIMENSION PV(10,5),RORD(10),UE(3),BE(3),WTCOR(10)
+      DATA WTCOR/2D0,5D0,15D0,60D0,250D0,1500D0,1.2D4,1.2D5,150D0,16D0/
+  
+C...Functions: momentum in two-particle decays and four-product.
+      PAWT(A,B,C)=SQRT((A**2-(B+C)**2)*(A**2-(B-C)**2))/(2D0*A)
  
 C...The F, Xi and Xj functions of Gunion and Kunszt
 C...(Phys. Rev. D33, 665, plus errata from the authors).
@@ -17168,6 +17425,7 @@ C...Start treatment of one, two or three resonances in parallel.
         KFL1(JT)=0
         KFL2(JT)=0
         KFL3(JT)=0
+        KFL4(JT)=0
         KEQL(JT)=0
         NSD(JT)=ID
         ITJUNC(JT)=0
@@ -17241,12 +17499,14 @@ C...Select decay channel.
         IF(KFB.EQ.KFA) RKFL=RKFL-WDTE(IDL,5)
         IF(IDL.LT.MDCY(KCA,3).AND.RKFL.GT.0D0) GOTO 200
  
+        NPROD=0
 C...Read out flavours and colour charges of decay channel chosen.
         KCQM(JT)=KCHG(KCA,2)*ISIGN(1,K(ID,2))
         IF(KCQM(JT).EQ.-2) KCQM(JT)=2
         KFL1(JT)=KFDP(IDC,1)*ISIGN(1,K(ID,2))
         KFC1A=PYCOMP(IABS(KFL1(JT)))
         IF(KCHG(KFC1A,3).EQ.0) KFL1(JT)=IABS(KFL1(JT))
+        NPROD=NPROD+1
         KCQ1(JT)=KCHG(KFC1A,2)*ISIGN(1,KFL1(JT))
         IF(KCQ1(JT).EQ.-2) KCQ1(JT)=2
         KFL2(JT)=KFDP(IDC,2)*ISIGN(1,K(ID,2))
@@ -17254,13 +17514,24 @@ C...Read out flavours and colour charges of decay channel chosen.
         IF(KCHG(KFC2A,3).EQ.0) KFL2(JT)=IABS(KFL2(JT))
         KCQ2(JT)=KCHG(KFC2A,2)*ISIGN(1,KFL2(JT))
         IF(KCQ2(JT).EQ.-2) KCQ2(JT)=2
+        NPROD=NPROD+1
         KFL3(JT)=KFDP(IDC,3)*ISIGN(1,K(ID,2))
         KCQ3(JT)=0
+        KFL4(JT)=KFDP(IDC,4)*ISIGN(1,K(ID,2))
+        KCQ4(JT)=0        
         IF(KFL3(JT).NE.0) THEN
           KFC3A=PYCOMP(IABS(KFL3(JT)))
           IF(KCHG(KFC3A,3).EQ.0) KFL3(JT)=IABS(KFL3(JT))
           KCQ3(JT)=KCHG(KFC3A,2)*ISIGN(1,KFL3(JT))
           IF(KCQ3(JT).EQ.-2) KCQ3(JT)=2
+          NPROD=NPROD+1
+          IF(KFL4(JT).NE.0) THEN
+            KFC4A=PYCOMP(IABS(KFL4(JT)))
+            IF(KCHG(KFC4A,3).EQ.0) KFL4(JT)=IABS(KFL4(JT))
+            KCQ4(JT)=KCHG(KFC4A,2)*ISIGN(1,KFL4(JT))
+            IF(KCQ4(JT).EQ.-2) KCQ4(JT)=2
+            NPROD=NPROD+1
+          ENDIF
         ENDIF
  
 C...Set/save further info on channel.
@@ -17272,8 +17543,9 @@ C...Set/save further info on channel.
         HGZ(JT,3)=VINT(114)
         JTZ=JT
  
+        PXSUM=0D0
 C...Select masses; to begin with assume resonances narrow.
-        DO 220 I=1,3
+        DO 220 I=1,4
           P(N+I,5)=0D0
           PMMN(I)=0D0
           IF(I.EQ.1) THEN
@@ -17286,8 +17558,13 @@ C...Select masses; to begin with assume resonances narrow.
             IF(KFL3(JT).EQ.0) GOTO 220
             KFLW=IABS(KFL3(JT))
             KCW=KFC3A
+          ELSEIF(I.EQ.4) THEN
+            IF(KFL4(JT).EQ.0) GOTO 220
+            KFLW=IABS(KFL4(JT))
+            KCW=KFC4A
           ENDIF
           P(N+I,5)=PMAS(KCW,1)
+          PXSUM=PXSUM+P(N+I,5)
 CMRENNA++
 C...This prevents SUSY/t particles from becoming too light.
           IF(KFLW/KSUSY1.EQ.1.OR.KFLW/KSUSY1.EQ.2) THEN
@@ -17298,6 +17575,8 @@ C...This prevents SUSY/t particles from becoming too light.
      &              PMAS(PYCOMP(KFDP(IDC,2)),1)
                 IF(KFDP(IDC,3).NE.0) PMSUM=PMSUM+
      &              PMAS(PYCOMP(KFDP(IDC,3)),1)
+                IF(KFDP(IDC,4).NE.0) PMSUM=PMSUM+
+     &              PMAS(PYCOMP(KFDP(IDC,4)),1)
                 PMMN(I)=MIN(PMMN(I),PMSUM)
               ENDIF
  210        CONTINUE
@@ -17330,6 +17609,18 @@ C...Check which two out of three are widest.
             KFLW2=IABS(KFL3(JT))
           ENDIF
         ENDIF
+        IF(KFL4(JT).NE.0) THEN
+          PWID4=PMAS(KFC4A,2)
+          IF(PWID4.GT.PWID1.AND.PWID2.GE.PWID1) THEN
+            IWID1=4
+            PWID1=PWID4
+            KFLW1=IABS(KFL4(JT))
+          ELSEIF(PWID4.GT.PWID2) THEN
+            IWID2=4
+            PWID2=PWID4
+            KFLW2=IABS(KFL4(JT))
+          ENDIF
+        ENDIF
  
 C...If all narrow then only check that masses consistent.
         IF(MSTP(42).LE.0.OR.(PWID1.LT.PARP(41).AND.
@@ -17343,12 +17634,12 @@ C....Handle near degeneracy cases.
             ENDIF
           ENDIF
 CMRENNA--
-          IF(P(N+1,5)+P(N+2,5)+P(N+3,5).GT.P(ID,5)) THEN
+          IF(PXSUM.GT.P(ID,5)) THEN
             CALL PYERRM(13,'(PYRESD:) daughter masses too large')
             MINT(51)=1
             GOTO 720
-          ELSEIF(P(N+1,5)+P(N+2,5)+P(N+3,5)+PARJ(64).GT.P(ID,5)) THEN
-            CALL PYERRM(3,'(PYRESD:) daughter masses too large')
+          ELSEIF(PXSUM+PARJ(64).GT.P(ID,5)) THEN
+            CALL PYERRM(3,'(PYRESD:) masses+PARJ(64) too large')
             MINT(51)=1
             GOTO 720
           ENDIF
@@ -17392,10 +17683,11 @@ C...Begin fill decay products, with colour flow for coloured objects.
         MSTU10=MSTU(10)
         MSTU(10)=1
         MSTU(19)=1
- 
+
+
 C...Three-body decays 
-        IF(KFL3(JT).NE.0) THEN
-          DO 250 I=N+1,N+3
+        IF(KFL3(JT).NE.0.OR.KFL4(JT).NE.0) THEN
+          DO 250 I=N+1,N+NPROD
             DO 240 J=1,5
               K(I,J)=0
               V(I,J)=0D0
@@ -17409,10 +17701,88 @@ C...Three-body decays
           K(N+2,2)=KFL2(JT)
           K(N+3,1)=1
           K(N+3,2)=KFL3(JT)
+          IF(KFL4(JT).NE.0) THEN
+            K(N+4,1)=1
+            K(N+4,2)=KFL4(JT)
+          ENDIF
           IDIN=ID
 
 C...Generate kinematics (default is flat)
-          CALL PYTBDY(IDIN)
+          IF(KFL4(JT).EQ.0) THEN
+            CALL PYTBDY(IDIN)
+          ELSE
+            PS=P(N+1,5)+P(N+2,5)+P(N+3,5)+P(N+4,5)
+            ND=4
+            PV(1,1)=0D0
+            PV(1,2)=0D0
+            PV(1,3)=0D0
+            PV(1,4)=P(IDIN,5)
+            PV(1,5)=P(IDIN,5)
+C...Calculate maximum weight ND-particle decay.
+            PV(ND,5)=P(N+ND,5)
+            WTMAX=1D0/WTCOR(ND-2)
+            PMAX=PV(1,5)-PS+P(N+ND,5)
+            PMIN=0D0
+            DO 381 IL=ND-1,1,-1
+              PMAX=PMAX+P(N+IL,5)
+              PMIN=PMIN+P(N+IL+1,5)
+              WTMAX=WTMAX*PAWT(PMAX,PMIN,P(N+IL,5))
+ 381        CONTINUE
+
+C...M-generator gives weight. If rejected, try again.
+
+ 411        RORD(1)=1D0
+            DO 441 IL1=2,ND-1
+              RSAV=PYR(0)
+              DO 421 IL2=IL1-1,1,-1
+                IF(RSAV.LE.RORD(IL2)) GOTO 431
+                RORD(IL2+1)=RORD(IL2)
+ 421          CONTINUE
+ 431          RORD(IL2+1)=RSAV
+ 441        CONTINUE
+            RORD(ND)=0D0
+            WT=1D0
+            DO 451 IL=ND-1,1,-1
+              PV(IL,5)=PV(IL+1,5)+P(N+IL,5)+(RORD(IL)-RORD(IL+1))*
+     &             (PV(1,5)-PS)
+              WT=WT*PAWT(PV(IL,5),PV(IL+1,5),P(N+IL,5))
+ 451        CONTINUE
+            IF(WT.LT.PYR(0)*WTMAX) GOTO 411
+
+C...Perform two-particle decays in respective CM frame.
+            DO 481 IL=1,ND-1
+              PA=PAWT(PV(IL,5),PV(IL+1,5),P(N+IL,5))
+              UE(3)=2D0*PYR(0)-1D0
+              PHIX=PARU(2)*PYR(0)
+              UE(1)=SQRT(1D0-UE(3)**2)*COS(PHIX)
+              UE(2)=SQRT(1D0-UE(3)**2)*SIN(PHIX)
+              DO 471 J=1,3
+                P(N+IL,J)=PA*UE(J)
+                PV(IL+1,J)=-PA*UE(J)
+ 471          CONTINUE
+              P(N+IL,4)=SQRT(PA**2+P(N+IL,5)**2)
+              PV(IL+1,4)=SQRT(PA**2+PV(IL+1,5)**2)
+ 481        CONTINUE
+
+C...Lorentz transform decay products to lab frame.
+            DO 491 J=1,4
+              P(N+ND,J)=PV(ND,J)
+ 491        CONTINUE
+            DO 531 IL=ND-1,1,-1
+              DO 501 J=1,3
+                BE(J)=PV(IL,J)/PV(IL,4)
+ 501          CONTINUE
+              GA=PV(IL,4)/PV(IL,5)
+              DO 521 I=N+IL,N+ND
+                BEP=BE(1)*P(I,1)+BE(2)*P(I,2)+BE(3)*P(I,3)
+                DO 511 J=1,3
+                  P(I,J)=P(I,J)+GA*(GA*BEP/(1D0+GA)+P(I,4))*BE(J)
+ 511            CONTINUE
+                P(I,4)=GA*(P(I,4)+BEP)
+ 521          CONTINUE
+ 531        CONTINUE
+
+          ENDIF
 
 C...Set generic colour flows whenever unambiguous,
 C...(independently of the order of the decay products)
@@ -17424,7 +17794,8 @@ C...Sum up total colour content
           KCQ(1)=KCQ1(JT)
           KCQ(2)=KCQ2(JT)
           KCQ(3)=KCQ3(JT)
-          DO 255 J=0,3
+          KCQ(4)=KCQ4(JT)
+          DO 255 J=0,NPROD
             IF (KCQ(J).EQ.-1) THEN
               NANT=NANT+1
               IANT(NANT)=N+J
@@ -17545,6 +17916,37 @@ C...1 -> 3 + 3bar + 8 + n(1)
               MCT(IOCT(1),1)=NCT
               MCT(IANT(1),2)=NCT
             ENDIF
+         ELSEIF(NTRI+NANT.EQ.4) THEN
+C...
+            IF (KCQ(0).EQ.1) THEN
+C...3 -> 3 + n(1) -> 3 + 3bar
+              K(ID,4)=K(ID,4)+ITRI(2)
+              K(ITRI(2),1)=3
+              K(ITRI(2),4)=MSTU(5)*ID
+              MCT(ITRI(2),1)=MCT(ID,1)
+              K(ITRI(3),1)=3
+              K(ITRI(3),4)=MSTU(5)*IANT(1)
+              K(IANT(1),1)=3
+              K(IANT(1),5)=MSTU(5)*ITRI(3)
+              NCT=NCT+1
+              MCT(ITRI(3),1)=NCT
+              MCT(IANT(1),2)=NCT
+            ELSEIF (KCQ(0).EQ.-1) THEN
+C...3bar -> 3bar + n(1) -> 3 + 3bar             
+              K(ID,5)=K(ID,5)+IANT(2)
+              K(IANT(2),1)=3
+              K(IANT(2),5)=MSTU(5)*ID
+              MCT(IANT(2),2)=MCT(ID,2)
+              K(ITRI(1),1)=3
+              K(ITRI(1),4)=MSTU(5)*IANT(3)
+              K(IANT(3),1)=3
+              K(IANT(3),5)=MSTU(5)*ITRI(1)
+              NCT=NCT+1
+              MCT(ITRI(1),1)=NCT
+              MCT(IANT(3),2)=NCT
+            ENDIF
+          ELSEIF(KFL4(JT).NE.0) THEN
+            CALL PYERRM(21,'(PYRESD:) unknown 4-bdy decay')
 CPS-- End of generic cases 
 C...(could three octets also be handled?)
 C...(could (some of) the RPV cases be made generic as well?)
@@ -17617,7 +18019,7 @@ CMRENNA--
             K(N+3,9-ISID)=MSTU(5)*(N+2)
           ENDIF
            
-          NSAV=N
+CXXX      NSAV=N
           
 C...Set colour flow in three-body decays with baryon number violation.
 C...Neutralino and chargino decays first.
@@ -17717,7 +18119,7 @@ C...Particle counter should be stepped up one extra for junction.
           ENDIF
  
 C...Update particle counter.
-          N=N+3
+          N=N+NPROD
 
 C...2) Everything else two-body decay.
         ELSE
@@ -17788,7 +18190,7 @@ C...Set colour flow from daughters to junction
               K(II,4) = 0
               K(II,5) = 0
 C...(Anti-)colour mother is junction.
-              K(II,1+ITJUNC(JT)) = MSTU(5)*(N)
+              K(II,1+ITJUNC(JT)) = MSTU(5)*N
   320       CONTINUE
           ENDIF
         ENDIF
@@ -18840,7 +19242,7 @@ C...Obtain correct angular distribution by rejection techniques.
         WTMAX=1D0
       ENDIF
       IF(WT.LT.PYR(0)*WTMAX) GOTO 430
- 
+  
 C...Construct massive four-vectors using angles chosen.
   590 DO 690 JT=1,JTMAX
         IF(KDCY(JT).EQ.0) GOTO 690
@@ -18850,15 +19252,12 @@ C...Construct massive four-vectors using angles chosen.
   600   CONTINUE
         DPMO(4)=SQRT(DPMO(1)**2+DPMO(2)**2+DPMO(3)**2+DPMO(5)**2)
 CMRENNA++
-        IF(KFL3(JT).EQ.0) THEN
-          CALL PYROBO(NSD(JT)+1,NSD(JT)+2,ACOS(CTHE(JT)),PHI(JT),
-     &    DPMO(1)/DPMO(4),DPMO(2)/DPMO(4),DPMO(3)/DPMO(4))
-          N0=NSD(JT)+2
-        ELSE
-          CALL PYROBO(NSD(JT)+1,NSD(JT)+3,ACOS(CTHE(JT)),PHI(JT),
-     &    DPMO(1)/DPMO(4),DPMO(2)/DPMO(4),DPMO(3)/DPMO(4))
-          N0=NSD(JT)+3
-        ENDIF
+        NPROD=2
+        IF(KFL3(JT).NE.0) NPROD=3
+        IF(KFL4(JT).NE.0) NPROD=4
+        CALL PYROBO(NSD(JT)+1,NSD(JT)+NPROD,ACOS(CTHE(JT)),PHI(JT),
+     &       DPMO(1)/DPMO(4),DPMO(2)/DPMO(4),DPMO(3)/DPMO(4))
+        N0=NSD(JT)+NPROD
  
         DO 610 J=1,4
           VDCY(J)=V(ID,J)+V(ID,5)*P(ID,J)/P(ID,5)
@@ -18881,11 +19280,12 @@ C...Mark decayed resonances; trace history.
 C...Do not kill colour flow through coloured resonance!
         ELSE
           K(ID,4)=NSD(JT)+1
-          K(ID,5)=NSD(JT)+2
+          K(ID,5)=NSD(JT)+NPROD
+          IF(ITJUNC(JT).NE.0) K(ID,5)=K(ID,5)+1
 C...If 3-body or 2-body with junction:
-          IF(KFL3(JT).NE.0.OR.ITJUNC(JT).NE.0) K(ID,5)=NSD(JT)+3
+c          IF(KFL3(JT).NE.0.OR.ITJUNC(JT).NE.0) K(ID,5)=NSD(JT)+3
 C...If 3-body with junction:
-          IF(ITJUNC(JT).NE.0.AND.KFL3(JT).NE.0) K(ID,5)=NSD(JT)+4
+c          IF(ITJUNC(JT).NE.0.AND.KFL3(JT).NE.0) K(ID,5)=NSD(JT)+4
         ENDIF
  
 C...Add documentation lines.
@@ -18893,8 +19293,8 @@ C...Add documentation lines.
         IF(IRES.EQ.0.OR.ISET(ISUBRG).EQ.11) THEN
           IDOC=MINT(83)+MINT(4)
 CMRENNA+++
-          IHI=NSD(JT)+2
-          IF(KFL3(JT).NE.0) IHI=IHI+1
+          IHI=NSD(JT)+NPROD
+c          IF(KFL3(JT).NE.0) IHI=IHI+1
           DO 650 I=NSD(JT)+1,IHI
 CMRENNA---
             I1=MINT(83)+MINT(4)+1
@@ -18917,6 +19317,10 @@ C...If 3-body or 2-body with junction:
           IF(KFL3(JT).NE.0.OR.ITJUNC(JT).GT.0) K(NSD(JT)+3,3)=ID
 C...If 3-body with junction:
           IF(KFL3(JT).NE.0.AND.ITJUNC(JT).GT.0) K(NSD(JT)+4,3)=ID
+C...If 4-body or 3-body with junction:
+          IF(KFL4(JT).NE.0.OR.ITJUNC(JT).GT.0) K(NSD(JT)+4,3)=ID
+C...If 4-body with junction:
+          IF(KFL4(JT).NE.0.AND.ITJUNC(JT).GT.0) K(NSD(JT)+5,3)=ID
         ENDIF
  
 C...Do showering of two or three objects.
@@ -18925,20 +19329,22 @@ C...Do showering of two or three objects.
           IF(KFL3(JT).EQ.0) THEN
             CALL PYSHOW(NSD(JT)+1,NSD(JT)+2,P(ID,5))
           ELSE
-            CALL PYSHOW(NSD(JT)+1,-3,P(ID,5))
+            CALL PYSHOW(NSD(JT)+1,-NPROD,P(ID,5))
           ENDIF
  
 c...For pT-ordered shower need set up first, especially colour tags.
 C...(Need to set up colour tags even if MSTP(71) = 0)
         ELSEIF(MINT(35).GE.2) THEN
-          NPART=2
-          IF(KFL3(JT).NE.0) NPART=3
+          NPART=NPROD
+c          IF(KFL3(JT).NE.0) NPART=3
           IPART(1)=NSD(JT)+1
           IPART(2)=NSD(JT)+2
           IPART(3)=NSD(JT)+3
+          IPART(4)=NSD(JT)+4
           PTPART(1)=0.5D0*P(ID,5)
           PTPART(2)=PTPART(1)
           PTPART(3)=PTPART(1)
+          PTPART(4)=PTPART(1)
           IF(KCQ1(JT).EQ.1.OR.KCQ1(JT).EQ.2) THEN
             MOTHER=K(NSD(JT)+1,4)/MSTU(5)
             IF(MOTHER.LE.NSD(JT)) THEN
@@ -18991,6 +19397,17 @@ C...(Need to set up colour tags even if MSTP(71) = 0)
             MOTHER=K(NSD(JT)+3,5)/MSTU(5)
             MCT(NSD(JT)+2,2)=MCT(MOTHER,2)
           ENDIF
+          IF(NPART.EQ.4.AND.MCT(NSD(JT)+4,1).EQ.0.AND.
+     &    (KCQ4(JT).EQ.1.OR. KCQ4(JT).EQ.2)) THEN
+            MOTHER=K(NSD(JT)+4,4)/MSTU(5)
+            MCT(NSD(JT)+4,1)=MCT(MOTHER,1)
+          ENDIF
+          IF(NPART.EQ.4.AND.MCT(NSD(JT)+4,2).EQ.0.AND.
+     &    (KCQ4(JT).EQ.-1.OR.KCQ4(JT).EQ.2)) THEN
+            MOTHER=K(NSD(JT)+4,5)/MSTU(5)
+            MCT(NSD(JT)+4,2)=MCT(MOTHER,2)
+          ENDIF
+
           IF (MSTP(71).GE.1) CALL PYPTFS(2,0.5D0*P(ID,5),0D0,PTGEN)
         ENDIF
         NSHAFT=N
@@ -19000,6 +19417,8 @@ C...Check if decay products moved by shower.
         NSD1=NSD(JT)+1
         NSD2=NSD(JT)+2
         NSD3=NSD(JT)+3
+        NSD4=NSD(JT)+4
+C...4-body decays will only work if one of the products is "inert"
         IF(NSHAFT.GT.NSHBEF) THEN
           IF(K(NSD1,1).GT.10) THEN
             DO 660 I=NSHBEF+1,NSHAFT
@@ -19018,20 +19437,51 @@ C...Check if decay products moved by shower.
      &        I.NE.NSD1.AND.I.NE.NSD2) NSD3=I
   680       CONTINUE
           ENDIF
+          IF(KFL4(JT).NE.0.AND.K(NSD4,1).GT.10) THEN
+            DO 685 I=NSHBEF+1,NSHAFT
+              IF(K(I,1).LT.10.AND.K(I,2).EQ.K(NSD4,2).AND.
+     &        I.NE.NSD1.AND.I.NE.NSD2.AND.I.NE.NSD3) NSD4=I
+  685       CONTINUE
+          ENDIF
         ENDIF
  
 C...Store decay products for further treatment.
-        NP=NP+1
-        IREF(NP,1)=NSD1
-        IREF(NP,2)=NSD2
-        IREF(NP,3)=0
-        IF(KFL3(JT).NE.0) IREF(NP,3)=NSD3
-        IREF(NP,4)=IDOC+1
-        IREF(NP,5)=IDOC+2
-        IREF(NP,6)=0
-        IF(KFL3(JT).NE.0) IREF(NP,6)=IDOC+3
-        IREF(NP,7)=K(IREF(IP,JT),2)
-        IREF(NP,8)=IREF(IP,JT)
+        IF(KFL4(JT).EQ.0) THEN
+          NP=NP+1
+          IREF(NP,1)=NSD1
+          IREF(NP,2)=NSD2
+          IREF(NP,3)=0
+          IF(KFL3(JT).NE.0) IREF(NP,3)=NSD3
+          IREF(NP,4)=IDOC+1
+          IREF(NP,5)=IDOC+2
+          IREF(NP,6)=0
+          IF(KFL3(JT).NE.0) IREF(NP,6)=IDOC+3
+          IREF(NP,7)=K(IREF(IP,JT),2)
+          IREF(NP,8)=IREF(IP,JT)
+        ELSE
+          NSDA=NSD1
+          NSDB=NSD2
+          NSDC=NSD3
+          NP=NP+1
+          IREF(NP,4)=IDOC+1
+          IREF(NP,5)=IDOC+2
+          IREF(NP,6)=IDOC+3
+          IF(K(NSD1,1).EQ.1) THEN
+            NSDA=NSD4
+            IREF(NP,4)=IDOC+4
+          ELSEIF(K(NSD2,1).EQ.1) THEN
+            NSDB=NSD4
+            IREF(NP,5)=IDOC+4
+          ELSEIF(K(NSD3,1).EQ.1) THEN
+            NSDC=NSD4
+            IREF(NP,6)=IDOC+4
+          ENDIF
+          IREF(NP,1)=NSDA
+          IREF(NP,2)=NSDB
+          IREF(NP,3)=NSDC
+          IREF(NP,7)=K(IREF(IP,JT),2)
+          IREF(NP,8)=IREF(IP,JT)
+        ENDIF
   690 CONTINUE
  
  
@@ -19062,13 +19512,14 @@ C...Possibility of colour rearrangement in W+W- events.
      &  PYRECO(IREF(1,1),IREF(1,2),NSD(1),NAFT1)
         IF(MINT(51).NE.0) RETURN
       ENDIF
- 
+
 C...Loop back if needed.
   710 IF(IP.LT.NP) GOTO 170
- 
+
 C...Boost back to standard frame.
   720 IF(IBST.EQ.1) CALL PYROBO(MINT(83)+7,N,THEIN,PHIIN,BEXIN,BEYIN,
      &BEZIN)
+
  
       RETURN
       END
@@ -23544,6 +23995,7 @@ C...  Explicitly zero histogram bin content
           DO 153 IBINY=1,NBINY
             YBINLO = RAPMIN + (IBINY-1)*DRAP
 C...  If bin inside string piece, add 1 in this bin
+C...  (Strictly speaking: if it starts before midpoint and ends after midpoint)
             IF (Y1.LE.YBINLO+0.5*DRAP.AND.Y2.GE.YBINLO+0.5*DRAP)
      &           NSTRY(IBINY) = NSTRY(IBINY) + 1
  153      CONTINUE
@@ -23552,10 +24004,16 @@ C...  Loop over pieces to find individual reconnect probability
         DO 167 IS=1,NCR-1,2
           DNSUM  = 0D0
           DNAVG  = 0D0
-          IBINLO = INT((MIN(RLOPTC(IS),RLOPTC(IS+1))-RAPMIN)/DRAP
-     &         +1.5)
-          IBINHI = INT((MAX(RLOPTC(IS),RLOPTC(IS+1))-RAPMIN)/DRAP
-     &         +0.5)  
+C...Beginning at Y = RAPMIN = -RAPMAX, ending at Y = RAPMAX
+          RBINLO = (MIN(RLOPTC(IS),RLOPTC(IS+1))-RAPMIN)/DRAP + 0.5
+          RBINHI = (MAX(RLOPTC(IS),RLOPTC(IS+1))-RAPMIN)/DRAP + 0.5    
+C...Make sure integer bin numbers lie inside proper range
+          IBINLO = MAX(1,MIN(NBINY,NINT(RBINLO)))
+          IBINHI = MAX(1,MIN(NBINY,NINT(RBINHI)))
+C...Size of rapidity bins (is < DRAP if piece smaller than one bin)
+C...(also smaller than DRAP if a one-unit wide piece is stretched 
+C... over 2 bins, thus making the computation more accurate)
+          DRAPAV = (RBINHI-RBINLO)/(IBINHI-IBINLO+1)*DRAP
 C...  Decide whether to suppress reconnections in high-pT string pieces
           CRMODF = 1D0
           IF (PARP(77).GT.0D0) THEN
@@ -23577,10 +24035,10 @@ C...  Supress reconnection probability by 1/(1+P77*P2AVG)
             CRMODF=1D0/(1D0+PARP(77)**2*PT2AVG)
           ENDIF
           PKEEP = 1.0
-          DO 178 IBINY=MIN(IBINLO,IBINHI),MAX(IBINLO,IBINHI)
+          DO 178 IBINY=IBINLO,IBINHI
 C            DNSUM = DNSUM + 1D0
             DNOVL = MAX(0,NSTRY(IBINY)-1)
-            PKEEP = PKEEP * (1D0-CRMODF*PARP(78))**(DRAP*DNOVL)
+            PKEEP = PKEEP * (1D0-CRMODF*PARP(78))**(DRAPAV*DNOVL)
 C            DNAVG = DNAVG + MAX(1,NSTRY(IBINY))
  178      CONTINUE
 C          DNAVG = DNAVG / DNSUM
@@ -25989,8 +26447,9 @@ C...W'+/-:
           IF(I.LE.20) THEN
             IF(I.LE.16) THEN
 C...W'+/- -> q + qbar'
-              FCOF=3D0*RADC*(PARU(131)**2+PARU(132)**2)*
-     &        VCKM((I-1)/4+1,MOD(I-1,4)+1)
+              CKMFAC = VCKM((I-1)/4+1,MOD(I-1,4)+1)
+              FCOF=3D0*CKMFAC*RADC*(PARU(131)**2+PARU(132)**2)
+              FCOF2=3D0*CKMFAC*RADC*(PARU(131)**2-PARU(132)**2)
               IF(KFLR.GT.0) THEN
                 IF(MOD(I,4).EQ.3) WID2=WIDS(6,2)
                 IF(MOD(I,4).EQ.0) WID2=WIDS(8,2)
@@ -26003,14 +26462,21 @@ C...W'+/- -> q + qbar'
             ELSEIF(I.LE.20) THEN
 C...W'+/- -> l+/- + nu
               FCOF=PARU(133)**2+PARU(134)**2
+              FCOF2=PARU(133)**2-PARU(134)**2
               IF(KFLR.GT.0) THEN
                 IF(I.EQ.20) WID2=WIDS(17,3)*WIDS(18,2)
               ELSE
                 IF(I.EQ.20) WID2=WIDS(17,2)*WIDS(18,3)
               ENDIF
             ENDIF
-            WDTP(I)=FAC*FCOF*0.5D0*(2D0-RM1-RM2-(RM1-RM2)**2)*
-     &      SQRT(MAX(0D0,(1D0-RM1-RM2)**2-4D0*RM1*RM2))
+            WDTP(I)=FAC*0.5*FCOF*(2D0-RM1-RM2-(RM1-RM2)**2)
+     &           *SQRT(MAX(0D0,(1D0-RM1-RM2)**2-4D0*RM1*RM2))            
+            IF (RM1.GT.0D0.AND.RM2.GT.0D0) THEN
+C...PS 28/06/2010
+C...Inserted (gV2-gA2)*sqrt(m1*m2) term (FCOF2), following M. Chizhov
+              WDTP(I)=WDTP(I) + FAC*0.5*6D0*FCOF2*SQRT(RM1*RM2)
+     &             *SQRT(MAX(0D0,(1D0-RM1-RM2)**2-4D0*RM1*RM2))            
+            ENDIF
           ELSEIF(I.EQ.21) THEN
 C...W'+/- -> W+/- + Z0
             WDTP(I)=FAC*PARU(135)**2*0.5D0*XW1*(RM1/RM2)*
@@ -29431,7 +29897,7 @@ C...8 = Universal Extra Dimensions
      4     20*0,
      6    2,  2,  2,  2,  2,  2,  2,  2,  2,  2,
      7    2,  2,  2,  2,  2,  2,  2,  2,  2,  0,
-     8     20*0/
+     8    7,  7,  18*0/ 
  
 C...Reset number of channels and cross-section
       NCHN=0
@@ -30114,7 +30580,7 @@ C...Exotics (Z'/W'/LQ/R/f*/H++/Z_R/W_R/G*).
         CALL PYSGEX(NCHN,SIGS)
       ELSEIF(MAP.EQ.8) THEN
 C... Universal Extra Dimensions
-         CALL PYXUED(NCHN,SIGS)
+        CALL PYXUED(NCHN,SIGS)
       ENDIF
  
 C...Multiply with parton distributions
@@ -35643,7 +36109,8 @@ C...q + qbar -> gluino + ~chi0_1
           GM2=SQM3
           ZM2=SQM4
           DO 280 I=MMINA,MMAXA
-            IF(I.EQ.0.OR.IABS(I).GT.MSTP(58)) GOTO 280
+            IF(I.EQ.0.OR.IABS(I).GT.MSTP(58).OR.
+     &      KFAC(1,I)*KFAC(2,-I).EQ.0) GOTO 280
             EI=KCHG(IABS(I),1)/3D0
             IA=IABS(I)
             XLQC = -TANW*EI*ZMIX(IZID,1)
@@ -35951,7 +36418,8 @@ C...Color factor for e+ e-
             TZZ=TZZ*(SFMIX(6,1)*SFMIX(6,2))**2
             TZZ=TZZ/((1D0-SQMZ/SH)**2+SQMZ*(ZWID/SH)**2)
 C...Factor of 2 for t1 t2bar + t2 t1bar
-            FACQQ1=2D0*COMFAC*AEM**2*TZZ*FCOL*4D0
+C...PS: bug fix 24 Aug 2010. Factor 2 accounted for by the 2 channels.
+            FACQQ1=COMFAC*AEM**2*TZZ*FCOL*4D0
             FACQQ1=FACQQ1*( UH*TH-SQM3*SQM4 )/SH2
             NCHN=NCHN+1
             ISIG(NCHN,1)=I
@@ -36065,7 +36533,8 @@ C...Mrenna...Normalization.and.1/XMT
      &      (UH*TH-SQM3*SQM4)/XMT**2 )*RMSS(42)**2
             FACQQB=COMFAC*AS**2*4D0/9D0*(
      &      (UH*TH-SQM3*SQM4)/SH2 )
-            FACQQI=-COMFAC*AS**2*4D0/27D0*(
+C...Mrenna..Switched sign to agree with Eichten, Dawson, etc.
+            FACQQI=COMFAC*AS**2*4D0/27D0*(
      &      (UH*TH-SQM3*SQM4)/SH/XMT )*RMSS(42)
             FACQQB=FACQQB+FACQQ1+FACQQI
           ELSE
@@ -36146,7 +36615,7 @@ C...if i .eq. j covered in 274
 C...g + g -> ~q_j + ~q_jbar
           XSU=SQM3-UH
           XST=SQM3-TH
-C...5=RKF because ~t ~tbar treated separately
+C...4=RKF because ~t ~tbar and ~b ~bbar treated separately
           FAC0=RKF*COMFAC*AS**2*( 7D0/48D0+3D0*(UH-TH)**2/16D0/SH2 )
           FACQQ1=FAC0*(0.5D0+2D0*SQM3*TH/XST**2 + 2D0*SQM3**2/XSU/XST)
           FACQQ2=FAC0*(0.5D0+2D0*SQM3*UH/XSU**2 + 2D0*SQM3**2/XSU/XST)
@@ -38289,6 +38758,91 @@ C...Propagators: as simulated in PYOFSH and as desired
             ISIG(NCHN,3)=1
             SIGH(NCHN)=FACG
           ENDIF
+        ENDIF
+      ELSEIF(ISUB.LE.500) THEN
+        IF(ISUBSV.EQ.481) ISUB=482
+c...  GENERIC 2->(1)->2
+        IF(ISUB.EQ.482) THEN
+          KFRES=9900001
+          KCRES=PYCOMP(KFRES)
+          IF(KCRES.EQ.0) RETURN
+          IDCY=MDCY(KCRES,2)
+          KCOL=KCHG(KCRES,2)
+          KCEM=KCHG(KCRES,1)
+          FACT=COMFAC
+          KCF1=PYCOMP(KFPR(ISUB,1))
+          KCF2=PYCOMP(KFPR(ISUB,2))
+          IF(ISUBSV.EQ.481) THEN
+            SQMZR=PMAS(KCRES,1)**2
+            CALL PYWIDT(KFRES,SH,WDTP,WDTE)
+            HS=SHR*WDTP(0)
+            FACBW=SH2/((SH-SQMZR)**2+HS**2)
+            FACT=FACT*FACBW
+          ELSE
+            SQMH=PMAS(KCF1,1)**2
+            GMMH=PMAS(KCF1,1)*PMAS(KCF1,2)
+C...Propagators: as simulated in PYOFSH and as desired
+            HBW3=GMMH/((SQM3-SQMH)**2+GMMH**2)
+            CALL PYWIDT(KFPR(ISUB,1),SQM3,WDTP,WDTE)
+            GMMH3=SQRT(SQM3)*WDTP(0)
+            HBW3C=GMMH3/((SQM3-SQMH)**2+GMMH3**2)
+            SQMH=PMAS(KCF2,1)**2
+            GMMH=PMAS(KCF2,1)*PMAS(KCF2,2)
+            HBW4=GMMH/((SQM4-SQMH)**2+GMMH**2)
+            CALL PYWIDT(KFPR(ISUB,2),SQM4,WDTP,WDTE)
+            GMMH4=SQRT(SQM4)*WDTP(0)
+            HBW4C=GMMH4/((SQM4-SQMH)**2+GMMH4**2)
+            FACT=FACT*(HBW3C/HBW3)*(HBW4C/HBW4)
+          ENDIF
+
+          KCI1=ABS(PYCOMP(KFDP(IDCY,1)))
+          KCI2=ABS(PYCOMP(KFDP(IDCY,2)))
+          JCOL1=SIGN(KCHG(KCF1,2),KFPR(ISUB,1))
+          JCOL2=SIGN(KCHG(KCF2,2),KFPR(ISUB,2))
+          IF(KCOL.EQ.0) THEN
+            NCOL=1
+          ELSEIF(KCI1.EQ.21.AND.KCI2.EQ.21.AND.KCOL.EQ.2) THEN
+            IF(JCOL1.EQ.2.AND.JCOL2.EQ.2) THEN
+              NCOL=3
+            ELSE
+              NCOL=2
+            ENDIF
+          ELSEIF(KCOL.EQ.-1.OR.KCOL.EQ.1) THEN
+            NCOL=2
+          ELSEIF(KCI1.EQ.21.AND.KCI2.EQ.21.AND.JCOL1.EQ.0.AND.
+     $      JCOL2.EQ.0) THEN
+            NCOL=1
+          ELSEIF(KCOL.EQ.2.AND.((JCOL1.EQ.0.AND.JCOL2.EQ.2).OR.
+     $      (JCOL1.EQ.2.AND.JCOL2.EQ.0))) THEN
+            NCOL=1
+          ELSE
+            NCOL=2
+          ENDIF
+          DO 440 I=MMIN1,MMAX1
+            IF(KFAC(1,I).EQ.0) GOTO 440
+            IP=I
+            IF(IP.EQ.0) IP=21
+            IA=ABS(IP)
+            DO 430 J=MMIN2,MMAX2
+              IF(KFAC(2,J).EQ.0) GOTO 430
+              JP=J
+              IF(JP.EQ.0) JP=21
+              JA=ABS(JP)
+              IF((IA.EQ.KCI1.AND.JA.EQ.KCI2).OR.
+     $          (JA.EQ.KCI1.AND.IA.EQ.KCI2)) THEN
+                KCHW=KCHG(IA,1)*ISIGN(1,I)+KCHG(JA,1)*ISIGN(1,J)
+                IF(ABS(KCHW).EQ.ABS(KCEM)) THEN
+                  DO II=1,NCOL
+                    NCHN=NCHN+1
+                    ISIG(NCHN,1)=IP
+                    ISIG(NCHN,2)=JP
+                    ISIG(NCHN,3)=II
+                    SIGH(NCHN)=FACT/NCOL
+                  ENDDO
+                ENDIF
+              ENDIF
+ 430        CONTINUE
+ 440      CONTINUE
         ENDIF
       ENDIF
  
@@ -45572,13 +46126,14 @@ C*********************************************************************
 C...PYSLHA
 C...Read/write spectrum or decay data from SLHA standard file(s).
 C...P. Skands
- 
+C...DECAY TABLE writeout by Nils-Erik Bomark (2010)
+
 C...MUPDA=0 : READ QNUMBERS/PARTICLE ON LUN=IMSS(21)
 C...MUPDA=1 : READ SLHA SPECTRUM ON LUN=IMSS(21)
 C...MUPDA=2 : LOOK FOR DECAY TABLE FOR KF=KFORIG ON LUN=IMSS(22)
 C...          (KFORIG=0 : read all decay tables)
 C...MUPDA=3 : WRITE SPECTRUM ON LUN=IMSS(23)
-C...(MUPDA=4 : WRITE DECAY TABLE FOR KF=KFORIG ON LUN=IMSS(24))
+C...MUPDA=4 : WRITE DECAY TABLE FOR KF=KFORIG ON LUN=IMSS(24)
 C...MUPDA=5 : READ MASS FOR KF=KFORIG ONLY
 C...          (KFORIG=0 : read all MASS entries)
  
@@ -45635,7 +46190,7 @@ C...16: SPINFO    17: ALPHA     18: MSOFT     19: QNUMBERS
       INTEGER VERBOS
       SAVE VERBOS
 C...Date of last Change
-      PARAMETER (DOC='13 Jul 2009')
+      PARAMETER (DOC='10 Jun 2010')
 C...Local arrays and initial values
       DIMENSION IDC(5),KFSUSY(50)
       SAVE KFSUSY
@@ -45953,6 +46508,12 @@ C...Set block skip flag and read next line
      &             KF, ' (SLHA read-in not allowed)'
               MERR=16
               GOTO 380
+            ELSEIF (IABS(KF).EQ.6.OR.IABS(KF).EQ.23.OR.IABS(KF).EQ.24) 
+     &        THEN
+C...Set block skip flag and read next line
+              WRITE(MSTU(11),'(A,I9,A,F12.3)')
+     &             ' * (PYSLHA:) Allowing DECAY table for KF =',
+     &             KF, ' but this is NOT recommended.'
             ENDIF
           ELSE
 C...  Add new particle. Actually, this should not happen.
@@ -46067,19 +46628,19 @@ C...Be careful with light SM particles / hadrons
 C...Check Z, W and top masses
                 IF (KF.EQ.23.AND.ABS(PMAS(PYCOMP(23),1)-91.2D0).GT.1D0)
      &               THEN
-                  WRITE(CHTMP,'(F12.3)') PMAS(PYCOMP(23),1)
+                  WRITE(CHTMP,8500) PMAS(PYCOMP(23),1)
                   CALL PYERRM(9,'(PYSLHA:) Note Z boson mass, M ='
      &                 //CHTMP)
                 ENDIF
                 IF (KF.EQ.24.AND.ABS(PMAS(PYCOMP(24),1)-80.4D0).GT.1D0)
      &               THEN
-                  WRITE(CHTMP,'(F12.3)') PMAS(PYCOMP(23),1)
+                  WRITE(CHTMP,8500) PMAS(PYCOMP(24),1)
                   CALL PYERRM(9,'(PYSLHA:) Note W boson mass, M ='
      &                 //CHTMP)
                 ENDIF
                 IF (KF.EQ.6.AND.ABS(PMAS(PYCOMP(6),1)-175D0).GT.25D0)
      &               THEN
-                  WRITE(CHTMP,'(F12.3)') PMAS(PYCOMP(6),1)
+                  WRITE(CHTMP,8500) PMAS(PYCOMP(6),1)
                   CALL PYERRM(9,'(PYSLHA:) Note top quark mass, M ='
      &                 //CHTMP//'GeV')
                 ENDIF
@@ -46359,7 +46920,13 @@ C...  Flip sign if reading antiparticle decays (if antipartner exists)
      &               IDC(IDA)=MPSIGN*IDC(IDA)
   340         CONTINUE
 C...Switch on decay channel, with products ordered in decreasing ABS(KF)
-              MDME(NDC,1)=1
+C             MDME(NDC,1)=1
+              IF(MDME(NDC,1).LT.0.AND.MDME(NDC,1).GE.-5) THEN
+                MDME(NDC,1)=-MDME(NDC,1)
+              ELSE
+                MDME(NDC,1)=1
+              ENDIF
+
               IF (BRAT(NDC).LE.0D0) MDME(NDC,1)=0
               BRSUM=BRSUM+ABS(BRAT(NDC))
               BRAT(NDC)=ABS(BRAT(NDC))
@@ -46730,7 +47297,8 @@ C...SUSY scale
         WRITE(LFN,7020) 'HMIX',RMSUSY,'Higgs parameters'
         WRITE(LFN,7210) 1, RMSS(4),'mu'
         WRITE(LFN,7010) 'ALPHA',' '
-        WRITE(LFN,7210) 1, RMSS(18), 'alpha'
+C       WRITE(LFN,7210) 1, RMSS(18), 'alpha'
+        WRITE(LFN,7200) RMSS(18), 'alpha'
         WRITE(LFN,7020) 'AU',RMSUSY
         WRITE(LFN,7410) 3, 3, RMSS(16), 'A_t'
         WRITE(LFN,7020) 'AD',RMSUSY
@@ -46842,8 +47410,44 @@ C...Print user information about spectrum
         WRITE(MSTU(11),5400)
         WRITE(MSTU(11),6500)
  
+C...DECAY TABLES writeout
+C...Write decay information by Nils-Erik Bomark 3/29/2010
+      ELSEIF (MUPDA.EQ.4) THEN
+        KF = KFORIG
+        KC = PYCOMP(KF)
+        IF (KC.NE.0) THEN
+          WRITE(LFN,7000) ''
+          WRITE(LFN,7000) '         PDG            Width'
+          WRITE(LFN,7500) KF,PMAS(KC,2), CHAF(KC,1)
+          WRITE(LFN,7000) 
+     &   '          BR         NDA      ID1        ID2       ID3'
+          DO 575 I=MDCY(KC,2),MDCY(KC,2)+MDCY(KC,3)-1
+            NDA = 0
+            DO 570 J=1,5
+              IF (KFDP(I,J).NE.0) NDA = NDA+1
+ 570        CONTINUE
+            IF (NDA.EQ.2) 
+     &         WRITE(LFN,7512) BRAT(I),NDA,(KFDP(I,K),K=1,NDA),
+     &           CHAF(KC,1),(CHAF(PYCOMP(KFDP(I,K)),
+     &             (3-KFDP(I,K)/ABS(KFDP(I,K)))/2),K=1,NDA)
+            IF (NDA.EQ.3) 
+     &         WRITE(LFN,7513) BRAT(I),NDA,(KFDP(I,K),K=1,NDA),
+     &           CHAF(KC,1),(CHAF(PYCOMP(KFDP(I,K)),
+     &             (3-KFDP(I,K)/ABS(KFDP(I,K)))/2),K=1,NDA)
+            IF (NDA.EQ.4) 
+     &         WRITE(LFN,7514) BRAT(I),NDA,(KFDP(I,K),K=1,NDA),
+     &           CHAF(KC,1),(CHAF(PYCOMP(KFDP(I,K)),
+     &             (3-KFDP(I,K)/ABS(KFDP(I,K)))/2),K=1,NDA)
+            IF (NDA.EQ.5) 
+     &         WRITE(LFN,7515) BRAT(I),NDA,(KFDP(I,K),K=1,NDA),
+     &           CHAF(KC,1),(CHAF(PYCOMP(KFDP(I,K)),
+     &             (3-KFDP(I,K)/ABS(KFDP(I,K)))/2),K=1,NDA)
+ 575        CONTINUE
+        ENDIF
+C....End of DECAY TABLES writeout
+
       ENDIF
- 
+  
 C...Only rewind when reading
       IF (MUPDA.LE.2.OR.MUPDA.EQ.5) REWIND(LFN)
  
@@ -46871,7 +47475,7 @@ C...Serious error catching
  8500 FORMAT(F16.5)
  
 C...Formats for user information printout.
- 5000 FORMAT(1x,18('*'),1x,'PYSLHA v1.13: SUSY/BSM SPECTRUM '
+ 5000 FORMAT(1x,18('*'),1x,'PYSLHA v1.14: SUSY/BSM SPECTRUM '
      &     ,'INTERFACE',1x,17('*')/1x,'*',1x
      &     ,'(PYSLHA:) Last Change',1x,A,1x,'-',1x,'P.Z. Skands')
  5010 FORMAT(1x,'*',3x,'Wrote spectrum file on unit: ',I3)
@@ -46941,10 +47545,17 @@ C...Single matrix
 C...Double Matrix
  7420 FORMAT(1x,I2,1x,I2,3x,1P,E16.8,3x,E16.8,0P,3x,'#',1x,A)
 C...Write Decay Table
- 7500 FORMAT('Decay',1x,I9,1x,'WIDTH=',1P,E16.8,0P,3x,'#',1x,A)
- 7510 FORMAT(4x,I5,1x,1P,E16.8,0P,3x,I2,3x,'IDA=',1x,5(1x,I9),
-     &    3x,'#',1x,A)
- 
+ 7500 FORMAT('Decay',1x,I9,1x,1P,E16.8,0P,3x,'#',1x,A)
+ 7510 FORMAT(4x,1P,E16.8,0P,3x,I2,3x,'IDA=',1x,5(1x,I9),3x,'#',1x,A)
+ 7512 FORMAT(4x,1P,E16.8,0P,3x,I2,3x,1x,2(1x,I9),13x,
+     &  '#',1x,'BR(',A10,1x,'->',2(1x,A10),')')
+ 7513 FORMAT(4x,1P,E16.8,0P,3x,I2,3x,1x,3(1x,I9),3x,
+     &  '#',1x,'BR(',A10,1x,'->',3(1x,A10),')')
+ 7514 FORMAT(4x,1P,E16.8,0P,3x,I2,3x,1x,4(1x,I9),3x,
+     &  '#',1x,'BR(',A10,1x,'->',4(1x,A10),')')
+ 7515 FORMAT(4x,1P,E16.8,0P,3x,I2,3x,1x,5(1x,I9),3x,
+     &  '#',1x,'BR(',A10,1x,'->',5(1x,A10),')')
+
       END
 
  
@@ -54045,11 +54656,11 @@ C...Commonblocks.
       COMMON/PYDAT1/MSTU(200),PARU(200),MSTJ(200),PARJ(200)
       COMMON/PYDAT2/KCHG(500,4),PMAS(500,4),PARF(2000),VCKM(4,4)
 C     COMMON/PYDAT3/MDCY(500,3),MDME(8000,2),BRAT(8000),KFDP(8000,5)
-C     COMMON/PYPARS/MSTP(200),PARP(200),MSTI(200),PARI(200)
+      COMMON/PYPARS/MSTP(200),PARP(200),MSTI(200),PARI(200)
       COMMON/PYSSMT/ZMIX(4,4),UMIX(2,2),VMIX(2,2),SMZ(4),SMW(2),
      &SFMIX(16,4),ZMIXI(4,4),UMIXI(2,2),VMIXI(2,2)
 C     SAVE /PYJETS/,/PYDAT1/,/PYDAT2/,/PYDAT3/,/PYPARS/,/PYSSMT/
-      SAVE /PYJETS/,/PYDAT1/,/PYDAT2/,/PYSSMT/
+      SAVE /PYJETS/,/PYDAT1/,/PYDAT2/,/PYPARS/,/PYSSMT/
  
 C...Local variables.
       DOUBLE PRECISION XM(5)
@@ -54109,7 +54720,9 @@ C...Mrenna: check that we are indeed decaying a SUSY particle
         T3I=SIGN(1D0,EI+1D-6)/2D0
       ENDIF
 
-      IF(MAX(ABS(IA),ABS(JA)).EQ.6) THEN
+      IF(MSTP(47).EQ.0) THEN
+        ISKIP=0
+      ELSEIF(MAX(ABS(IA),ABS(JA)).EQ.6) THEN
         ISKIP=0
       ELSEIF(IZID1*IZID2.NE.0) THEN
         SQMZ=PMAS(23,1)**2
@@ -60885,7 +61498,7 @@ C...Presets for a few specific underlying-event and min-bias tunes
 C...Note some tunes require external pdfs to be linked (e.g. 105:QW),
 C...others require particular versions of pythia (e.g. the SCI and GAL
 C...models). See below for details.
-      SUBROUTINE PYTUNE(ITUNE)
+      SUBROUTINE PYTUNE(MYTUNE)
 C
 C ITUNE    NAME (detailed descriptions below)
 C     0 Default : No settings changed => defaults.
@@ -60956,10 +61569,31 @@ C   329 Pro-pTO   : Professor pT-ordered tune w. S0 CR model  (Feb 2009)
 C ---- Tunes introduced in 6.4.23:
 C   330 ATLAS MC09 : pT-ordered showers, LO* PDFs             (2009)
 C   331 ATLAS MC09c : pT-ordered showers, LO* PDFs, better CR (2009)
+C   334 Perugia 10 NOCR : Perugia 2010 with no CR, less MPI   (Oct 2010)
 C   335 Pro-pT*   : Professor Tune with LO*                   (Mar 2009)
 C   336 Pro-pT6   : Professor Tune with CTEQ6LL               (Mar 2009)
 C   339 Pro-pT**  : Professor Tune with LO**                  (Mar 2009)
-C   340 AMBT1 : First ATLAS tune including 7 TeV data         (May 2010)
+C   340 AMBT1   : First ATLAS tune including 7 TeV data       (May 2010)
+C   341 Z1      : First CMS tune including 7 TeV data         (Aug 2010)
+C   342 Z1-LEP  : CMS tune Z1, with improved LEP parameters   (Oct 2010)
+C   343 Z2        : Retune of Z1 by Field w CTEQ6L1 PDFs          (2010)
+C   344 Z2-LEP    : Retune of Z1 by Skands w CTEQ6L1 PDFs     (Feb 2011)
+C   350 Perugia 2011 : Retune of Perugia 2010 incl 7-TeV data (Mar 2011)
+C   351 P2011 radHi : Variation with alphaS(pT/2) 
+C   352 P2011 radLo : Variation with alphaS(2pT)
+C   353 P2011 mpiHi : Variation with more semi-hard MPI
+C   354 P2011 noCR  : Variation without color reconnections
+C   355 P2011 LO**  : Perugia 2011 using MSTW LO** PDFs       (Mar 2011)
+C   356 P2011 C6    : Perugia 2011 using CTEQ6L1 PDFs         (Mar 2011)
+C   357 P2011 T16   : Variation with PARP(90)=0.32 away from 7 TeV
+C   358 P2011 T32   : Variation with PARP(90)=0.16 awat from 7 TeV
+C   359 P2011 TeV   : Perugia 2011 optimized for Tevatron     (Mar 2011)
+C   360 S Global    : Schulz-Skands Global fit                (Mar 2011)
+C   361 S 7000      : Schulz-Skands at 7000 GeV               (Mar 2011)
+C   362 S 1960      : Schulz-Skands at 1960 GeV               (Mar 2011)
+C   363 S 1800      : Schulz-Skands at 1800 GeV               (Mar 2011)
+C   364 S 900       : Schulz-Skands at 900 GeV                (Mar 2011)
+C   365 S 630       : Schulz-Skands at 630 GeV                (Mar 2011)
 C
 C ======= The Uppsala models ===========================================
 C   ( NB! must be run with special modified Pythia 6.215 version )
@@ -61215,8 +61849,18 @@ C   Pro-pT** (339). LO** parton distributions
 C...Key feature: Retune of Pro-PTO with MRST LO** PDFs.
 C
 C   AMBT1 (340). LO* parton distributions
-C...Key feature: Good overall agreement with Tevatron and 7-TeV LHC data.
+C...Key feature: First ATLAS tune including 7-TeV LHC data.
 C...Mainly retuned CR and mass distribution with respect to MC09c.
+C...Note: cannot be run standalone since it uses external PDFs.
+C
+C   CMSZ1 (341). CTEQ5L parton distributions
+C...Key feature: First CMS tune including 7-TeV LHC data.
+C...Uses many of the features of AMBT1, but uses CTEQ5L PDFs, 
+C...has a lower pT0 at the Tevatron, which scales faster with energy. 
+C
+C   Z1-LEP (342). CTEQ5L parton distributions
+C...Key feature: CMS tune Z1 with improved LEP parameters, mostly 
+C...taken from the Professor/Perugia tunes, with a few minor updates.
 C
 C=======================================================================
 C OTHER TUNES
@@ -61251,7 +61895,7 @@ C...SAVE statements
 C...Internal parameters
       PARAMETER(MXTUNS=500)
       CHARACTER*8 CHDOC
-      PARAMETER (CHDOC='May 2010')
+      PARAMETER (CHDOC='Nov 2011')
       CHARACTER*16 CHNAMS(0:MXTUNS), CHNAME
       CHARACTER*42 CHMSTJ(50), CHMSTP(100), CHPARP(100),
      &    CHPARJ(100), CHMSTU(101:121), CHPARU(101:121), CH40
@@ -61275,11 +61919,19 @@ C...Internal parameters
       DATA (CHNAMS(I),I=320,329)/
      &    'Perugia 0','Perugia HARD','Perugia SOFT',
      &    'Perugia 3','Perugia NOCR','Perugia LO*',
-     &    'Perugia 6','Perugia 2010','Perugia K','Pro-pTO'/
+     &    'Perugia 6','Perugia 10','Perugia K','Pro-pTO'/
       DATA (CHNAMS(I),I=330,349)/
-     &     'ATLAS MC09','ATLAS MC09c',3*' ','Pro-PT*','Pro-PT6',
-     &     ' ',' ','Pro-PT**',
-     4     'Tune AMBT1',9*' '/
+     &     'ATLAS MC09','ATLAS MC09c',2*' ','Perugia 10 NOCR','Pro-PT*',
+     &     'Pro-PT6',' ',' ','Pro-PT**',
+     4     'Tune AMBT1','Tune Z1','Tune Z1-LEP','Tune Z2','Tune Z2-LEP',
+     4     5*' '/
+      DATA (CHNAMS(I),I=350,359)/
+     &     'Perugia 2011','P2011 radHi','P2011 radLo','P2011 mpiHi',
+     &     'P2011 noCR','P2011 M(LO**)', 'P2011 CTEQ6L1',
+     &     'P2011 T16','P2011 T32','P2011 Tevatron'/
+      DATA (CHNAMS(I),I=360,369)/
+     &     'S Global','S 7000','S 1960','S 1800',
+     &     'S 900','S 630', 4*' '/
       DATA (CHNAMS(I),I=200,229)/
      &    'IM Tune 1','Tune APT',8*' ',
      &    ' ','Tune APT-Pro',8*' ',
@@ -61292,7 +61944,7 @@ C...Internal parameters
       DATA (CHMSTJ(I),I=41,50)/
      &    'FSR type (Q2 or pT) for old framework',9*' '/
       DATA (CHMSTP(I),I=1,10)/
-     &    2*' ','QCD switch for choice of LambdaQCD',7*' '/
+     &    2*' ','INT switch for choice of LambdaQCD',7*' '/
       DATA (CHMSTP(I),I=31,40)/
      &    2*' ','"K" switch for K-factor on/off & type',7*' '/
       DATA (CHMSTP(I),I=51,100)/
@@ -61301,30 +61953,30 @@ C...Internal parameters
      6    'ISR coherence option for 1st emission',
      6    'ISR phase space choice & ME corrections',' ',
      7    'ISR IR regularization scheme',' ',
-     7    'ISR scheme for FSR off ISR',8*' ',
+     7    'IFSR scheme for non-decay FSR',8*' ',
      8    'UE model',
      8    'UE hadron transverse mass distribution',5*' ',
-     8    'BR composite scheme','BR colour scheme',
+     8    'BR composite scheme','BR color scheme',
      9    'BR primordial kT compensation',
      9    'BR primordial kT distribution',
      9    'BR energy partitioning scheme',2*' ',
-     9    'FSI colour (re-)connection model',5*' '/
+     9    'FSI color (re-)connection model',5*' '/
       DATA (CHPARP(I),I=1,10)/
-     &    'ME LambdaQCD',9*' '/
+     &    'ME/UE LambdaQCD',9*' '/
       DATA (CHPARP(I),I=31,40)/
      &    ' ','"K" K-factor',8*' '/
       DATA (CHPARP(I),I=61,100)/
      6     'ISR LambdaQCD','ISR IR cutoff',' ',
      6     'ISR renormalization scale prefactor',
      6     2*' ','ISR Q2max factor',3*' ',
-     7     'FSR Q2max factor for non-s-channel procs',
-     7     'FSR LambdaQCD (non-res)',4*' ',
-     7     'FSI colour reco high-pT damping strength',
-     7     'FSI colour reconnection strength',
+     7     'IFSR Q2max factor in non-s-channel procs',
+     7     'IFSR LambdaQCD (outside resonance decays)',4*' ',
+     7     'FSI color reco high-pT damping strength',
+     7     'FSI color reconnection strength',
      7     'BR composite x enhancement','BR breakup suppression',
      8     2*'UE IR cutoff at reference ecm',
      8     2*'UE mass distribution parameter',
-     8     'UE gg colour correlated fraction','UE total gg fraction',
+     8     'UE gg color correlated fraction','UE total gg fraction',
      8     2*' ',
      8     'UE IR cutoff reference ecm',
      8     'UE IR cutoff ecm scaling power',
@@ -61333,30 +61985,35 @@ C...Internal parameters
       DATA (CHPARJ(I),I=1,30)/
      &     'HAD diquark suppression','HAD strangeness suppression',
      &     'HAD strange diquark suppression',
-     &     'HAD vector diquark suppression',6*' ',
+     &     'HAD vector diquark suppression','HAD P(popcorn)',
+     &     'HAD extra popcorn B(s)-M-B(s) supp',
+     &     'HAD extra popcorn B-M(s)-B supp',
+     &     3*' ',
      1     'HAD P(vector meson), u and d only',
      1     'HAD P(vector meson), contains s',
      1     'HAD P(vector meson), heavy quarks',7*' ',
      2     'HAD fragmentation pT',' ',' ',' ',
      2     'HAD eta0 suppression',"HAD eta0' suppression",4*' '/
       DATA (CHPARJ(I),I=41,90)/
-     4     'HAD string parameter a','HAD string parameter b',3*' ',
+     4     'HAD string parameter a(Meson)','HAD string parameter b',
+     4     2*' ','HAD string a(Baryon)-a(Meson)',
      4     'HAD Lund(=0)-Bowler(=1) rQ (rc)',
      4     'HAD Lund(=0)-Bowler(=1) rb',3*' ',
-     5     3*' ','HAD charm parameter','HAD bottom parameter',5*' ',
+     5     3*' ', 'HAD charm parameter','HAD bottom parameter',5*' ',
      6     10*' ',10*' ',
-     8     'FSR Lambda_QCD scale','FSR IR cutoff',8*' '/
+     8     'FSR LambdaQCD (inside resonance decays)',
+     &     'FSR IR cutoff',8*' '/
       DATA (CHMSTU(I),I=111,120)/
-     1     ' ','QCD nF for LambdaQCD',8*' '/
+     1     ' ','INT n(flavors) for LambdaQCD',8*' '/
       DATA (CHPARU(I),I=111,120)/
-     1     ' ','QCD LambdaQCD',8*' '/
+     1     ' ','INT LambdaQCD',8*' '/
       
 C...1) Shorthand notation
       M13=MSTU(13)
       M11=MSTU(11)
-      IF (ITUNE.LE.MXTUNS.AND.ITUNE.GE.0) THEN
-        CHNAME=CHNAMS(ITUNE)
-        IF (ITUNE.EQ.0) GOTO 9999
+      IF (MYTUNE.LE.MXTUNS.AND.MYTUNE.GE.0) THEN
+        CHNAME=CHNAMS(MYTUNE)
+        IF (MYTUNE.EQ.0) GOTO 9999
       ELSE
         CALL PYERRM(9,'(PYTUNE:) Tune number > max. Using defaults.')
         GOTO 9999
@@ -61375,6 +62032,7 @@ C... No K-factor
       MSTP(33) =  0
 
 C...3) Tune parameters
+      ITUNE = MYTUNE
  
 C=======================================================================
 C...ATLAS MC08
@@ -61475,6 +62133,7 @@ C...Output
           WRITE(M11,5050) 90, PARP(90), CHPARP(90)
           WRITE(M11,5040) 82, MSTP(82), CHMSTP(82)
           WRITE(M11,5050) 83, PARP(83), CHPARP(83)
+          WRITE(M11,5050) 84, PARP(84), CHPARP(84)
           WRITE(M11,5040) 88, MSTP(88), CHMSTP(88)
           WRITE(M11,5040) 89, MSTP(89), CHMSTP(89)
           WRITE(M11,5050) 79, PARP(79), CHPARP(79)
@@ -61492,8 +62151,10 @@ C...Output
  
 C=======================================================================
 C...ATLAS MC09, MC09c, AMBT1
+C...CMS Z1 (R. Field), Z1-LEP
 
-      ELSEIF (ITUNE.EQ.330.OR.ITUNE.EQ.331.OR.ITUNE.EQ.340) THEN
+      ELSEIF (ITUNE.EQ.330.OR.ITUNE.EQ.331.OR.ITUNE.EQ.340.OR.
+     &       ITUNE.GE.341.AND.ITUNE.LE.344) THEN
         
         IF (M13.GE.1) WRITE(M11,5010) ITUNE, CHNAME
         IF (MSTP(181).LE.5.OR.(MSTP(181).EQ.6.AND.MSTP(182).LE.405))THEN
@@ -61502,24 +62163,55 @@ C...ATLAS MC09, MC09c, AMBT1
         ENDIF
 
 C...First set some explicit defaults from 6.4.20
-C...# Old defaults
-        MSTJ(11) = 4
+        IF (ITUNE.LE.341.OR.ITUNE.EQ.343) THEN
+C...  # Old defaults
+          MSTJ(11) = 4
 C...# Old default flavour parameters
-        PARJ(1)  =   0.1
-        PARJ(2)  =   0.3  
-        PARJ(3)  =   0.40 
-        PARJ(4)  =   0.05 
-        PARJ(11) =   0.5  
-        PARJ(12) =   0.6 
-        PARJ(21) = 0.36
-        PARJ(41) = 0.30
-        PARJ(42) = 0.58
-        PARJ(46) = 1.0
-        PARJ(82) = 1.0
+          PARJ(1)  =   0.1
+          PARJ(2)  =   0.3  
+          PARJ(3)  =   0.40 
+          PARJ(4)  =   0.05 
+          PARJ(11) =   0.5  
+          PARJ(12) =   0.6 
+          PARJ(21) = 0.36
+          PARJ(41) = 0.30
+          PARJ(42) = 0.58
+          PARJ(46) = 1.0
+          PARJ(82) = 1.0
+        ELSE
+C...# For Zn-LEP tunes, use tuned flavour parameters from Professor/Perugia
+          PARJ( 1) = 0.08D0
+          PARJ( 2) = 0.21D0
+          PARJ(3)  = 0.94
+          PARJ( 4) = 0.04D0
+          PARJ(11) = 0.35D0
+          PARJ(12) = 0.35D0
+          PARJ(13) = 0.54
+          PARJ(25) = 0.63
+          PARJ(26) = 0.12
+C...# Switch on Bowler:
+          MSTJ(11) = 5
+C...# Fragmentation
+          PARJ(21) = 0.34D0
+          PARJ(41) = 0.35D0
+          PARJ(42) = 0.80D0
+          PARJ(47) = 1.0
+          PARJ(81) = 0.26D0
+          PARJ(82) = 1.0D0
+        ENDIF
 
 C...PDFs: MRST LO* 
         MSTP(52)=2
         MSTP(51)=20650
+        IF (ITUNE.EQ.341.OR.ITUNE.EQ.342) THEN
+C...Z1 uses CTEQ5L
+          MSTP(52)=1
+          MSTP(51)=7
+        ELSEIF (ITUNE.EQ.343.OR.ITUNE.EQ.344) THEN
+C...Z2 uses CTEQ6L
+          MSTP(52)=2
+          MSTP(51)=10042
+        ENDIF
 
 C...UE and ISR switches
         MSTP(81)=21
@@ -61535,7 +62227,12 @@ C...CR:
         IF (ITUNE.EQ.331) THEN
           PARP(78)=0.224          
         ELSEIF (ITUNE.EQ.340) THEN
-          PARP(77)=1D0
+C...AMBT1
+          PARP(77)=1.016D0
+          PARP(78)=0.538D0
+        ELSEIF (ITUNE.GE.341.AND.ITUNE.LE.344) THEN
+C...Z1 and Z2 use the AMBT1 CR values
+          PARP(77)=1.016D0
           PARP(78)=0.538D0
         ENDIF
 
@@ -61553,30 +62250,70 @@ C...MPI:
           PARP(83)=0.356D0
           PARP(84)=0.651
           PARP(90)=0.25D0
+        ELSEIF (ITUNE.EQ.341.OR.ITUNE.EQ.342) THEN
+          PARP(82)=1.932D0
+          PARP(83)=0.356D0
+          PARP(84)=0.651
+          PARP(90)=0.275D0
+        ELSEIF (ITUNE.EQ.343.OR.ITUNE.EQ.344) THEN
+          PARP(82)=1.832D0
+          PARP(83)=0.356D0
+          PARP(84)=0.651
+          PARP(90)=0.275D0
         ENDIF
         
 C...Primordial kT
         PARP(91)=2.0D0
         PARP(93)=5D0
-        IF (ITUNE.EQ.340) THEN
+        IF (ITUNE.GE.340) THEN
           PARP(93)=10D0
+        ENDIF
+
+C...ISR
+        IF (ITUNE.GE.340) THEN
+          PARP(62)=1.025
         ENDIF
 
 C...FSR inside resonance decays
         PARJ(81)=0.29
 
-C...Fragmentation
+C...Fragmentation (org 6.4 defs hardcoded)
         MSTJ(11)=4
         PARJ(41)=0.3
         PARJ(42)=0.58
-        PARJ(46)=0.75
         MSTJ(22)=2
-        
+C...AMBT1 mentions 46 explicitly, but Z1 doesn't ...         
+        PARJ(46)=0.75
+        IF (ITUNE.GE.341.AND.ITUNE.LE.344) THEN
+C...Reset PARJ(46) to org def value for Z1 and Z2
+          PARJ(46)=1.0
+        ENDIF
+
         IF (M13.GE.1) THEN
           IF (ITUNE.LT.340) THEN
             CH60='Tuned by ATLAS, ATL-PHYS-PUB-2010-002'
-          ELSE
+          ELSEIF (ITUNE.EQ.340) THEN
             CH60='Tuned by ATLAS, ATLAS-CONF-2010-031'
+          ELSEIF (ITUNE.EQ.341) THEN
+            CH60='AMBT1 Tuned by ATLAS, ATLAS-CONF-2010-031'
+            WRITE(M11,5030) CH60
+            CH60='Z1 variation tuned by R. D. Field (CMS)'
+          ELSEIF (ITUNE.EQ.342) THEN
+            CH60='AMBT1 Tuned by ATLAS, ATLAS-CONF-2010-031'
+            WRITE(M11,5030) CH60
+            CH60='Z1 variation retuned by R. D. Field (CMS)'
+            WRITE(M11,5030) CH60
+            CH60='Z1-LEP variation retuned by Professor / P. Skands'
+          ELSEIF (ITUNE.EQ.343) THEN
+            CH60='AMBT1 Tuned by ATLAS, ATLAS-CONF-2010-031'
+            WRITE(M11,5030) CH60
+            CH60='Z2 variation retuned by R. D. Field (CMS)'
+          ELSEIF (ITUNE.EQ.344) THEN
+            CH60='AMBT1 Tuned by ATLAS, ATLAS-CONF-2010-031'
+            WRITE(M11,5030) CH60
+            CH60='Z2 variation retuned by R. D. Field (CMS)'
+            WRITE(M11,5030) CH60
+            CH60='Z2-LEP variation retuned by Professor / P. Skands'
           ENDIF
           WRITE(M11,5030) CH60
           CH60='Physics Model: '//
@@ -61612,6 +62349,7 @@ C...Output
           WRITE(M11,5050) 90, PARP(90), CHPARP(90)
           WRITE(M11,5040) 82, MSTP(82), CHMSTP(82)
           WRITE(M11,5050) 83, PARP(83), CHPARP(83)
+          WRITE(M11,5050) 84, PARP(84), CHPARP(84)
           WRITE(M11,5040) 88, MSTP(88), CHMSTP(88)
           WRITE(M11,5040) 89, MSTP(89), CHMSTP(89)
           WRITE(M11,5050) 79, PARP(79), CHPARP(79)
@@ -61632,26 +62370,37 @@ C...S0, S1, S2, S0A, NOCR, Rap,
 C...S0-Pro, S1-Pro, S2-Pro, S0A-Pro, NOCR-Pro, Rap-Pro
 C...Perugia 0, HARD, SOFT, 3, LO*, 6, 2010, K
 C...Pro-pTO, Pro-PT*, Pro-PT6, Pro-PT**
+C...Perugia 2011 (incl variations)
+C...Schulz-Skands tunes
       ELSEIF ((ITUNE.GE.300.AND.ITUNE.LE.305)
      &    .OR.(ITUNE.GE.310.AND.ITUNE.LE.315)
      &    .OR.(ITUNE.GE.320.AND.ITUNE.LE.329)
-     &    .OR.ITUNE.EQ.335.OR.ITUNE.EQ.336.OR.ITUNE.EQ.339) THEN
+     &    .OR.(ITUNE.GE.334.AND.ITUNE.LE.336).OR.ITUNE.EQ.339
+     &    .OR.(ITUNE.GE.350.AND.ITUNE.LE.365)) THEN
         IF (M13.GE.1) WRITE(M11,5010) ITUNE, CHNAME
         IF (MSTP(181).LE.5.OR.(MSTP(181).EQ.6.AND.MSTP(182).LE.405))THEN
           CALL PYERRM(9,'(PYTUNE:) linked PYTHIA version incompatible'//
      &        ' with tune.')
         ELSEIF(ITUNE.GE.320.AND.ITUNE.LE.339.AND.ITUNE.NE.324.AND.
+     &         ITUNE.NE.334.AND.
      &        (MSTP(181).LE.5.OR.(MSTP(181).EQ.6.AND.MSTP(182).LE.419)))
      &        THEN
           CALL PYERRM(9,'(PYTUNE:) linked PYTHIA version incompatible'//
      &        ' with tune.')
-        ELSEIF((ITUNE.EQ.327.OR.ITUNE.EQ.328).AND.
-     &        (MSTP(181).LE.5.OR.(MSTP(181).EQ.6.AND.MSTP(182).LE.422)))
+        ELSEIF((ITUNE.EQ.327.OR.ITUNE.EQ.328.OR.ITUNE.GE.350).AND.
+     &         (MSTP(181).LE.5.OR.
+     &         (MSTP(181).EQ.6.AND.MSTP(182).LE.422)))
      &        THEN
           CALL PYERRM(9,'(PYTUNE:) linked PYTHIA version incompatible'//
      &        ' with tune.')
         ENDIF
  
+C...Use 327 as base tune for 350-359 (Perugia 2011)
+        ITUNSV = ITUNE
+        IF (ITUNE.GE.350.AND.ITUNE.LE.359) ITUNE = 327
+C...Use 320 as base tune for 360+ (Schulz-Skands)
+        IF (ITUNE.GE.360) ITUNE = 320
+
 C...HAD: Use Professor's LEP pars if ITUNE >= 310
 C...(i.e., for S0-Pro, S1-Pro etc, and for Perugia tunes)
         IF (ITUNE.LT.310) THEN
@@ -61702,7 +62451,7 @@ C...     indicated by LEP and RHIC yields.
 C...(only 5% different from Professor values, so should be within acceptable
 C...theoretical uncertainty range)
 C...(No attempt made to retune other flavor parameters post facto)
-          IF (ITUNE.EQ.327.OR.ITUNE.EQ.328) THEN
+          IF (ITUNE.EQ.327.OR.ITUNE.EQ.328.OR.ITUNE.EQ.334) THEN
             PARJ( 1) = 0.08D0
             PARJ( 2) = 0.21D0
             PARJ( 4) = 0.04D0
@@ -61741,7 +62490,7 @@ C...MRST LO** for 339
  
 C...LambdaQCD choice: 327 and 328 use hardcoded, others get from PDF
         MSTP(3)=2
-        IF (ITUNE.EQ.327.OR.ITUNE.EQ.328) THEN
+        IF (ITUNE.EQ.327.OR.ITUNE.EQ.328.OR.ITUNE.EQ.334) THEN
           MSTP(3)   = 1
 C...Hardcode CTEQ5L values for ME and ISR
           MSTU(112) = 4
@@ -61755,8 +62504,8 @@ C...but use LEP value also for non-res FSR
 C...ISR: use Lambda_MSbar with default scale for S0(A)
         MSTP(64)=2
         PARP(64)=1D0
-        IF (ITUNE.EQ.320.OR.ITUNE.EQ.323.OR.ITUNE.EQ.324.OR.
-     &      ITUNE.EQ.326.OR.ITUNE.EQ.327.OR.ITUNE.EQ.328) THEN
+        IF (ITUNE.EQ.320.OR.ITUNE.EQ.323.OR.ITUNE.EQ.324.OR.ITUNE.EQ.334
+     &       .OR.ITUNE.EQ.326.OR.ITUNE.EQ.327.OR.ITUNE.EQ.328) THEN
 C...Use Lambda_MC with muR^2=pT^2 for most central Perugia tunes
           MSTP(64)=3
           PARP(64)=1D0
@@ -61786,10 +62535,10 @@ C...ISR : power-suppressed power showers above s_color (since 6.4.19)
         MSTP(67)=2
         PARP(67)=4D0
 C...Perugia tunes have stronger suppression, except HARD
-        IF (ITUNE.GE.320.AND.ITUNE.LE.328) THEN
+        IF ((ITUNE.GE.320.AND.ITUNE.LE.328).OR.ITUNE.EQ.334) THEN
           PARP(67)=1D0
           IF (ITUNE.EQ.321) PARP(67)=4D0
-          IF (ITUNE.EQ.322) PARP(67)=0.5D0
+          IF (ITUNE.EQ.322) PARP(67)=0.25D0
         ENDIF
  
 C...ISR IR cutoff type and FSR off ISR setting:
@@ -61820,7 +62569,7 @@ C...Perugia 3: sharp ISR, high FSR-off-ISR (with dipole-to-BR radiating)
           MSTP(70)=0
           PARP(62)=1.25D0
           MSTP(72)=2
-        ELSEIF (ITUNE.EQ.327.OR.ITUNE.EQ.328) THEN
+        ELSEIF (ITUNE.EQ.327.OR.ITUNE.EQ.328.OR.ITUNE.EQ.334) THEN
 C...Perugia 2010/K: smooth ISR, high FSR-off-ISR (with dipole-to-BR radiating)
           MSTP(70)=2
           MSTP(72)=2
@@ -61829,7 +62578,7 @@ C...Perugia 2010/K: smooth ISR, high FSR-off-ISR (with dipole-to-BR radiating)
 C...FSR activity: Perugia tunes use a lower PARP(71) as indicated 
 C...by Professor tunes (with HARD and SOFT variations)
         PARP(71)=4D0
-        IF (ITUNE.GE.320.AND.ITUNE.LE.328) THEN 
+        IF ((ITUNE.GE.320.AND.ITUNE.LE.328).OR.ITUNE.EQ.334) THEN 
           PARP(71)=2D0
           IF (ITUNE.EQ.321) PARP(71)=4D0
           IF (ITUNE.EQ.322) PARP(71)=1D0
@@ -61862,15 +62611,17 @@ C...UE: Overlap smoothness (1.0 = exponential; 2.0 = gaussian)
 C...NOCR variants have very smooth distributions
         IF (ITUNEB.EQ.304) PARP(83)=1.8D0
         IF (ITUNEB.EQ.305) PARP(83)=2.0D0
-        IF (ITUNE.GE.320.AND.ITUNE.LE.328) THEN
+        IF ((ITUNE.GE.320.AND.ITUNE.LE.328).OR.ITUNE.EQ.334) THEN
 C...Perugia variants have slightly smoother profiles by default
 C...(to compensate for more tail by added radiation)
 C...Perugia-SOFT has more peaked distribution, NOCR less peaked
           PARP(83)=1.7D0
           IF (ITUNE.EQ.322) PARP(83)=1.5D0
-          IF (ITUNE.EQ.324) PARP(83)=1.8D0
           IF (ITUNE.EQ.327) PARP(83)=1.5D0
           IF (ITUNE.EQ.328) PARP(83)=1.5D0
+C...NOCR variants have smoother mass profiles
+          IF (ITUNE.EQ.324) PARP(83)=1.8D0
+          IF (ITUNE.EQ.334) PARP(83)=1.8D0
         ENDIF
 C...Professor-pT0 also has very smooth distribution
         IF (ITUNE.EQ.329) PARP(83)=1.8
@@ -61884,7 +62635,7 @@ C...UE: pT0 = 1.85 for S0, S0A, 2.0 for Perugia version
         IF (ITUNEB.EQ.302) PARP(82)=1.9D0
         IF (ITUNEB.EQ.304) PARP(82)=2.05D0
         IF (ITUNEB.EQ.305) PARP(82)=1.9D0
-        IF (ITUNE.GE.320.AND.ITUNE.LE.328) THEN
+        IF ((ITUNE.GE.320.AND.ITUNE.LE.328).OR.ITUNE.EQ.334) THEN
 C...Perugia tunes (def is 2.0 GeV, HARD has higher, SOFT has lower,
 C...Perugia-3 has more ISR, so higher pT0, NOCR can be slightly lower,
 C...CTEQ6L1 slightly lower, due to less activity, and LO* needs to be
@@ -61898,6 +62649,7 @@ C...slightly higher, due to increased activity.
           IF (ITUNE.EQ.326) PARP(82)=1.95D0
           IF (ITUNE.EQ.327) PARP(82)=2.05D0
           IF (ITUNE.EQ.328) PARP(82)=2.45D0
+          IF (ITUNE.EQ.334) PARP(82)=2.15D0
         ENDIF
 C...Professor-pT0 maintains low pT0 vaue
         IF (ITUNE.EQ.329) PARP(82)=1.85D0
@@ -61910,7 +62662,7 @@ C...UE: IR cutoff reference energy and default energy scaling pace
         PARP(90)=0.16D0
 C...S0A, S0A-Pro have tune A energy scaling
         IF (ITUNEB.EQ.303) PARP(90)=0.25D0
-        IF (ITUNE.GE.320.AND.ITUNE.LE.328) THEN
+        IF ((ITUNE.GE.320.AND.ITUNE.LE.328).OR.ITUNE.EQ.334) THEN
 C...Perugia tunes explicitly include MB at 630 to fix energy scaling
           PARP(90)=0.26
           IF (ITUNE.EQ.321) PARP(90)=0.30D0
@@ -61984,7 +62736,8 @@ C...S1, S1-Pro: use S1
 C...S2, S2-Pro: use S2
         IF (ITUNEB.EQ.302) MSTP(95)=4
 C...NOCR, NOCR-Pro, Perugia-NOCR: use no CR
-        IF (ITUNE.EQ.304.OR.ITUNE.EQ.314.OR.ITUNE.EQ.324) MSTP(95)=0
+        IF (ITUNE.EQ.304.OR.ITUNE.EQ.314.OR.ITUNE.EQ.324.OR.
+     &       ITUNE.EQ.334) MSTP(95)=0
 C..."Old" and "Old"-Pro: use old CR
         IF (ITUNEB.EQ.305) MSTP(95)=1
 C...Perugia 2010 and K use Paquis model
@@ -61999,9 +62752,9 @@ C...FSI: CR strength and high-pT dampening, default is S0
           IF (ITUNEB.EQ.304) PARP(78)=0.0D0
           IF (ITUNEB.EQ.305) PARP(78)=1.0D0
           IF (ITUNE.EQ.329) PARP(78)=0.17D0
-          IF (ITUNE.EQ.335) PARP(78)=0.14
-          IF (ITUNE.EQ.336) PARP(78)=0.17
-          IF (ITUNE.EQ.339) PARP(78)=0.13
+          IF (ITUNE.EQ.335) PARP(78)=0.14D0
+          IF (ITUNE.EQ.336) PARP(78)=0.17D0
+          IF (ITUNE.EQ.339) PARP(78)=0.13D0
         ELSE
 C...Perugia tunes also use high-pT dampening : default is Perugia 0,*,6
           PARP(78)=0.33
@@ -62018,7 +62771,7 @@ C...SOFT has LOW amount of CR
 C...Scaling variant appears to need slightly more than default
             PARP(78)=0.35D0
             PARP(77)=0.6D0
-          ELSEIF (ITUNE.EQ.324) THEN
+          ELSEIF (ITUNE.EQ.324.OR.ITUNE.EQ.334) THEN
 C...NOCR has no CR
             PARP(78)=0D0
             PARP(77)=0D0
@@ -62033,6 +62786,179 @@ C...K
           ENDIF
         ENDIF
  
+C================
+C...Perugia 2011 tunes 
+C...(written as modifications on top of Perugia 2010)
+C================
+        IF (ITUNSV.GE.350.AND.ITUNSV.LE.359) THEN
+          ITUNE = ITUNSV
+C...  Scale setting for matching applications.
+C...  Switch to 5-flavor CMW LambdaQCD = 0.26 for all shower activity
+C...  (equivalent to a 5-flavor MSbar LambdaQCD = 0.26/1.6 = 0.16)
+          MSTP(64)=2
+          MSTU(112)=5
+C...  This sets the Lambda scale for ISR, IFSR, and FSR
+          PARP(61)=0.26D0
+          PARP(72)=0.26D0
+          PARJ(81)=0.26D0
+C...  This sets the Lambda scale for QCD hard interactions (important for the 
+C...  UE dijet cross sections. Here we still use an MSbar value, rather than 
+C...  a CMW one, in order not to hugely increase the UE jettiness. The CTEQ5L
+C...  value corresponds to a Lambda5 of 0.146 for comparison, so quite close.)
+          PARP(1)=0.16D0
+          PARU(112)=0.16D0
+C...  For matching applications, PARP(71) and PARP(67) = 1
+          PARP(67) = 1D0
+          PARP(71) = 1D0
+C...  Primordial kT: only use 1 GeV
+          MSTP(91)=1
+          PARP(91)=1D0
+C...  ADDITIONAL LESSONS WRT PERUGIA 2010
+C...  ALICE taught us: need less baryon transport than SOFT
+          MSTP(89)=0
+          PARP(80)=0.015
+C...  Small adjustments at LEP (slightly softer frag functions, esp for baryons)
+          PARJ(21)=0.33
+          PARJ(41)=0.35
+          PARJ(42)=0.8
+          PARJ(45)=0.55
+C...  Increase Lambda/K ratio and other strange baryon yields 
+          PARJ(1)=0.087D0
+          PARJ(3)=0.95D0
+          PARJ(4)=0.043D0
+          PARJ(6)=1.0D0
+          PARJ(7)=1.0D0
+C...  Also reduce total strangeness yield a bit, with higher K*/K
+          PARJ(2)=0.19D0
+          PARJ(12)=0.40D0
+C...  Perugia 2011 default is sharp ISR, dipoles to BR radiating, pTmax individual
+          MSTP(70)=0
+          MSTP(72)=2
+          PARP(62)=1.5D0
+C...  Holger taught us a smoother proton is preferred at high energies
+C...  Just use a simple Gaussian 
+          MSTP(82)=3
+C...  Scaling of pt0 cutoff
+          PARP(90)=0.265
+C...  Now retune pT0 to give right UE activity.
+C...  Low CR strength indicated by LHC tunes 
+C...  (also keep low to get <pT>(Nch) a bit down for pT>100MeV samples)
+          PARP(78)=0.036D0
+C...  Choose 7 TeV as new reference scale
+          PARP(89)=7000.0D0
+          PARP(82)=2.93D0          
+C================
+C...  P2011 Variations
+C================
+          IF (ITUNE.EQ.351) THEN
+C...  radHi: high Lambda scale for ISR, IFSR, and FSR
+C...  ( ca 10% more particles at LEP after retune )
+            PARP(61)=0.52D0
+            PARP(72)=0.52D0
+            PARJ(81)=0.52D0
+C...  Retune cutoff scales to compensate partially
+C...  (though higher cutoff causes faster multiplicity drop at low energies)
+            PARP(62)=1.75D0
+            PARJ(82)=1.75D0
+            PARP(82)=3.00D0
+C...  Needs faster cutoff scaling than nominal variant for same <Nch> scaling
+C...  (since more radiation otherwise generates faster mult growth)
+            PARP(90)=0.28  
+          ELSEIF (ITUNE.EQ.352) THEN
+C...  radLo: low Lambda scale for ISR, IFSR, and FSR
+C...  ( ca 10% less particles at LEP after retune )
+            PARP(61)=0.13D0
+            PARP(72)=0.13D0
+            PARJ(81)=0.13D0
+C...  Retune cutoff scales to compensate partially
+            PARP(62)=1.00D0
+            PARJ(82)=0.75D0
+            PARP(82)=2.95D0 
+C...  Needs slower cutoff scaling than nominal variant for same <Nch> scaling
+C...  (since less radiation otherwise generates slower mult growth)
+            PARP(90)=0.24
+          ELSEIF (ITUNE.EQ.353) THEN
+C...  mpiHi: high Lambda scale for MPI
+            PARP(1)=0.26D0
+            PARU(112)=0.26D0
+            PARP(82)=3.35D0
+            PARP(90)=0.26D0
+          ELSEIF (ITUNE.EQ.354) THEN
+            MSTP(95)=0
+            PARP(82)=3.05D0
+          ELSEIF (ITUNE.EQ.355) THEN
+C...  LO**
+            MSTP(52)=2
+            MSTP(51)=20651
+            PARP(62)=1.5D0
+C...  Compensate for higher <pT> with less CR
+            PARP(78)=0.034
+            PARP(82)=3.40D0 
+C...  Need slower energy scaling than CTEQ5L
+            PARP(90)=0.23D0 
+          ELSEIF (ITUNE.EQ.356) THEN
+C...  CTEQ6L1
+            MSTP(52)=2
+            MSTP(51)=10042
+            PARP(82)=2.65D0
+C...  Need slower cutoff scaling than CTEQ5L
+            PARP(90)=0.22D0 
+          ELSEIF (ITUNE.EQ.357) THEN
+C...  T16
+            PARP(90)=0.16
+          ELSEIF (ITUNE.EQ.358) THEN
+C...  T32
+            PARP(90)=0.32
+          ELSEIF (ITUNE.EQ.359) THEN
+C...  Tevatron
+            PARP(89)=1800D0
+            PARP(90)=0.28 
+            PARP(82)=2.10 
+            PARP(78)=0.05 
+          ENDIF
+          
+C================
+C...Schulz-Skands 2011 tunes 
+C...(written as modifications on top of Perugia 0)
+C================
+        ELSEIF (ITUNSV.GE.360.AND.ITUNSV.LE.365) THEN
+          ITUNE = ITUNSV
+
+          IF (ITUNE.EQ.360) THEN
+            PARP(78)=0.40D0
+            PARP(82)=2.19D0
+            PARP(83)=1.45D0
+            PARP(89)=1800.0D0
+            PARP(90)=0.27D0
+          ELSEIF (ITUNE.EQ.361) THEN
+            PARP(78)=0.20D0
+            PARP(82)=2.75D0
+            PARP(83)=1.73D0
+            PARP(89)=7000.0D0
+          ELSEIF (ITUNE.EQ.362) THEN
+            PARP(78)=0.31D0
+            PARP(82)=1.97D0
+            PARP(83)=1.98D0
+            PARP(89)=1960.0D0
+          ELSEIF (ITUNE.EQ.363) THEN
+            PARP(78)=0.35D0
+            PARP(82)=1.91D0
+            PARP(83)=2.02D0
+            PARP(89)=1800.0D0
+          ELSEIF (ITUNE.EQ.364) THEN
+            PARP(78)=0.33D0
+            PARP(82)=1.69D0
+            PARP(83)=1.92D0
+            PARP(89)=900.0D0
+          ELSEIF (ITUNE.EQ.365) THEN
+            PARP(78)=0.47D0
+            PARP(82)=1.61D0
+            PARP(83)=1.50D0
+            PARP(89)=630.0D0
+          ENDIF
+
+        ENDIF
+        
 C...Switch off trial joinings
         MSTP(96)=0
  
@@ -62110,8 +63036,8 @@ C..."Lo FSR" retune (305)
             ENDIF
           ENDIF
  
-C...Perugia Tunes (320-328)
-        ELSEIF(ITUNE.GE.320.AND.ITUNE.LE.328) THEN
+C...Perugia Tunes (320-328 and 334)
+        ELSEIF((ITUNE.GE.320.AND.ITUNE.LE.328).OR.ITUNE.EQ.334) THEN
           IF (M13.GE.1) THEN
             CH60='Tuned by P. Skands, hep-ph/1005.3457'
             WRITE(M11,5030) CH60
@@ -62154,6 +63080,41 @@ C...Professor-pTO (329)
             WRITE(M11,5030) CH60
           ENDIF
  
+C...Perugia 2011 Tunes (350-359)
+        ELSEIF(ITUNE.GE.350.AND.ITUNE.LE.359) THEN
+          IF (M13.GE.1) THEN
+            CH60='Tuned by P. Skands, hep-ph/1005.3457'
+            WRITE(M11,5030) CH60
+            CH60='Physics Model: '//
+     &           'T. Sjostrand & P. Skands, hep-ph/0408302'
+            WRITE(M11,5030) CH60
+            CH60='CR by M. Sandhoff & P. Skands, in hep-ph/0604120'
+            WRITE(M11,5030) CH60
+            IF (ITUNE.EQ.355) THEN
+              CH70='NB! This tune requires MRST LO** pdfs to be '//
+     &            'externally linked'
+              WRITE(M11,5035) CH70
+            ELSEIF (ITUNE.EQ.356) THEN
+              CH70='NB! This tune requires CTEQ6L1 pdfs to be '//
+     &            'externally linked'
+              WRITE(M11,5035) CH70
+            ENDIF
+          ENDIF
+
+C...Schulz-Skands Tunes (360-365)
+        ELSEIF(ITUNE.GE.360.AND.ITUNE.LE.365) THEN
+          IF (M13.GE.1) THEN
+            CH60='Tuned by H. Schulz & P. Skands, MCNET-11-07'
+            WRITE(M11,5030) CH60
+            CH60='Based on Perugia 0, hep-ph/1005.3457'
+            WRITE(M11,5030) CH60
+            CH60='Physics Model: '//
+     &           'T. Sjostrand & P. Skands, hep-ph/0408302'
+            WRITE(M11,5030) CH60
+            CH60='CR by M. Sandhoff & P. Skands, in hep-ph/0604120'
+            WRITE(M11,5030) CH60
+          ENDIF
+ 
         ENDIF
  
 C...Output
@@ -62161,13 +63122,31 @@ C...Output
           WRITE(M11,5030) ' '
           WRITE(M11,5040) 51, MSTP(51), CHMSTP(51)
           WRITE(M11,5040) 52, MSTP(52), CHMSTP(52)
+          IF (MSTP(33).GE.10) THEN
+            WRITE(M11,5050) 32, PARP(32), CHPARP(32)
+          ENDIF
           WRITE(M11,5040)  3, MSTP( 3), CHMSTP( 3)
           IF (MSTP(3).EQ.1) THEN
             WRITE(M11,6100) 112, MSTU(112), CHMSTU(112)
             WRITE(M11,6110) 112, PARU(112), CHPARU(112)
             WRITE(M11,5050)   1, PARP(1)  , CHPARP(  1)
+          ENDIF
+          WRITE(M11,5060) 81, PARJ(81), CHPARJ(81)
+          IF (MSTP(3).EQ.1) 
+     &         WRITE(M11,5050)  72, PARP(72) , CHPARP( 72)
+          IF (MSTP(3).EQ.1) THEN
             WRITE(M11,5050)  61, PARP(61) , CHPARP( 61)
           ENDIF
+          WRITE(M11,5040) 64, MSTP(64), CHMSTP(64)
+          WRITE(M11,5050) 64, PARP(64), CHPARP(64)
+          WRITE(M11,5040) 67, MSTP(67), CHMSTP(67)
+          WRITE(M11,5040) 68, MSTP(68), CHMSTP(68)
+          CH60='(Note: MSTP(68) is not explicitly (re-)set by PYTUNE)'
+          WRITE(M11,5030) CH60
+          WRITE(M11,5050) 67, PARP(67), CHPARP(67)
+          WRITE(M11,5040) 72, MSTP(72), CHMSTP(72)
+          WRITE(M11,5050) 71, PARP(71), CHPARP(71)
+          WRITE(M11,5040) 70, MSTP(70), CHMSTP(70)
           IF (MSTP(70).EQ.0) THEN
             WRITE(M11,5050) 62, PARP(62), CHPARP(62)
           ELSEIF (MSTP(70).EQ.1) THEN
@@ -62175,24 +63154,8 @@ C...Output
             CH60='(Note: PARP(81) replaces PARP(62).)'
             WRITE(M11,5030) CH60
           ENDIF
-          WRITE(M11,5040) 64, MSTP(64), CHMSTP(64)
-          WRITE(M11,5050) 64, PARP(64), CHPARP(64)
-          WRITE(M11,5040) 67, MSTP(67), CHMSTP(67)
-          WRITE(M11,5050) 67, PARP(67), CHPARP(67)
-          WRITE(M11,5040) 68, MSTP(68), CHMSTP(68)
-          CH60='(Note: MSTP(68) is not explicitly (re-)set by PYTUNE)'
-          WRITE(M11,5030) CH60
-          WRITE(M11,5040) 70, MSTP(70), CHMSTP(70)
-          WRITE(M11,5040) 72, MSTP(72), CHMSTP(72)
-          WRITE(M11,5050) 71, PARP(71), CHPARP(71)
-          IF (MSTP(3).EQ.1) 
-     &         WRITE(M11,5050)  72, PARP(72) , CHPARP( 72)
-          WRITE(M11,5060) 81, PARJ(81), CHPARJ(81)
           WRITE(M11,5060) 82, PARJ(82), CHPARJ(82)
           WRITE(M11,5040) 33, MSTP(33), CHMSTP(33)
-          IF (MSTP(33).GE.10) THEN
-            WRITE(M11,5050) 32, PARP(32), CHPARP(32)
-          ENDIF
           WRITE(M11,5040) 81, MSTP(81), CHMSTP(81)
           WRITE(M11,5050) 82, PARP(82), CHPARP(82)
           IF (MSTP(70).EQ.2) THEN
@@ -62202,7 +63165,12 @@ C...Output
           WRITE(M11,5050) 89, PARP(89), CHPARP(89)
           WRITE(M11,5050) 90, PARP(90), CHPARP(90)
           WRITE(M11,5040) 82, MSTP(82), CHMSTP(82)
-          WRITE(M11,5050) 83, PARP(83), CHPARP(83)
+          IF (MSTP(82).EQ.5) THEN
+            WRITE(M11,5050) 83, PARP(83), CHPARP(83)
+          ELSEIF (MSTP(82).EQ.4) THEN
+            WRITE(M11,5050) 83, PARP(83), CHPARP(83)
+            WRITE(M11,5050) 84, PARP(84), CHPARP(84)
+          ENDIF
           WRITE(M11,5040) 88, MSTP(88), CHMSTP(88)
           WRITE(M11,5040) 89, MSTP(89), CHMSTP(89)
           WRITE(M11,5050) 79, PARP(79), CHPARP(79)
@@ -63021,7 +63989,7 @@ C...GAL Recommended settings from Uppsala web page (as per 22/08 2006)
         MSTJ(16) = 0
         PARJ(42) = 0.45
         PARJ(82) = 2.0
-        PARP(62) = 2.0	
+        PARP(62) = 2.0
         MSTP(81) = 1
         MSTP(82) = 1
         PARP(81) = 1.9
@@ -63141,6 +64109,9 @@ C...Output of LEP parameters, common to all models
         WRITE(M11,5060)  2, PARJ( 2), CHPARJ( 2)
         WRITE(M11,5060)  3, PARJ( 3), CHPARJ( 3)
         WRITE(M11,5060)  4, PARJ( 4), CHPARJ( 4)
+        WRITE(M11,5060)  5, PARJ( 5), CHPARJ( 5)
+        WRITE(M11,5060)  6, PARJ( 6), CHPARJ( 6)
+        WRITE(M11,5060)  7, PARJ( 7), CHPARJ( 7)
         
         WRITE(M11,5060) 11, PARJ(11), CHPARJ(11)
         WRITE(M11,5060) 12, PARJ(12), CHPARJ(12)
@@ -63153,6 +64124,7 @@ C...Output of LEP parameters, common to all models
         
         WRITE(M11,5060) 41, PARJ(41), CHPARJ(41)
         WRITE(M11,5060) 42, PARJ(42), CHPARJ(42)
+        WRITE(M11,5060) 45, PARJ(45), CHPARJ(45)
         
         IF (MSTJ(11).LE.3) THEN
           WRITE(M11,5060) 54, PARJ(54), CHPARJ(54)
@@ -63181,8 +64153,8 @@ C...Output of LEP parameters, common to all models
  5080 FORMAT(' *',3x,'----------------------------',42('-'),3x,'*')
  6100 FORMAT(' *',5x,'MSTU(',I3,')= ',I12,3x,A42,3x,'*')
  6110 FORMAT(' *',5x,'PARU(',I3,')= ',F12.4,3x,A42,3x,'*')
- 5140 FORMAT(' *',5x,'MSTP(',I3,')= ',I12,3x,A40,5x,'*')
- 5150 FORMAT(' *',5x,'PARP(',I3,')= ',F12.4,3x,A40,5x,'*')
+C 5140 FORMAT(' *',5x,'MSTP(',I3,')= ',I12,3x,A40,5x,'*')
+C 5150 FORMAT(' *',5x,'PARP(',I3,')= ',F12.4,3x,A40,5x,'*')
  6000 FORMAT(' *',76x,'*'/1x,32('*'),1x,'END OF PYTUNE',1x,31('*'))
  6040 FORMAT(' *',5x,'MSWI(',I1,')  = ',I12,3x,A40,5x,'*')
  6050 FORMAT(' *',5x,'PARSCI(',I1,')= ',F12.4,3x,A40,5x,'*')
@@ -70424,8 +71396,9 @@ C...Local arrays.
      &PT2SAV(2*MAXNUR),ZSAV(2*MAXNUR),SHTSAV(2*MAXNUR),
      &MESYS(MAXNUR,0:2),PSUM(5),DPT(5,4)
 C...Statement functions.
-      SHAT(I,J)=(P(I,4)+P(J,4))**2-(P(I,1)+P(J,1))**2-
-     &(P(I,2)+P(J,2))**2-(P(I,3)+P(J,3))**2
+      SHAT(L,J)=(P(L,4)+P(J,4))**2-(P(L,1)+P(J,1))**2-
+     &(P(L,2)+P(J,2))**2-(P(L,3)+P(J,3))**2
+      DOTP(L,J)=P(L,4)*P(J,4)-P(L,1)*P(J,1)-P(L,2)*P(J,2)-P(L,3)*P(J,3)
  
 C...Initial values. Check that valid system.
       PTGEN=0D0
@@ -70493,13 +71466,13 @@ C...Begin loop to set up showering partons. Sum four-momenta.
  
 C...Find colour and charge, but skip diquarks.
         IF(IABS(K(I,2)).GT.1000.AND.IABS(K(I,2)).LT.10000) GOTO 230
-        KCOL=ISIGN(KCHG(PYCOMP(K(I,2)),2),K(I,2))
-        KCHA=ISIGN(KCHG(PYCOMP(K(I,2)),1),K(I,2))
+        KCOL=PYK(I,12)
+        KCHA=PYK(I,6)
  
 C...QUARKONIA++
         IF (IABS(K(I,2)).GE.9900101.AND.IABS(K(I,2)).LE.9910555) THEN
           IF (MSTP(148).GE.1) THEN
-C...Temporary: force no radiation from quarkonia since not yet treated 
+C...Temporary: force no radiation from quarkonia since not yet treated
             CALL PYERRM(11,'(PYPTFS:) quarkonia showers not yet in'
      &          //' PYPTFS, switched off')
             CALL PYGIVE('MSTP(148)=0')
@@ -70634,8 +71607,8 @@ C...Last resort: pick at random among other primaries.
 C...Trace down if sister branched.
   150         IF(K(IRNEW,1).GT.10) THEN
                 IRTMP=MOD(K(IRNEW,JCOLR),MSTU(5))
-C...If no correct color-daughter found, swap. 
-                IF (IRTMP.EQ.0) THEN 
+C...If no correct color-daughter found, swap.
+                IF (IRTMP.EQ.0) THEN
                   JCOL=9-JCOL
                   JCOLR=9-JCOLR
                   IRTMP=MOD(K(IRNEW,JCOLR),MSTU(5))
@@ -71017,6 +71990,9 @@ C...Basic info on radiator and recoil.
           PM2I=P(I,5)**2
           PM2R=P(IR,5)**2
  
+C...Skip any particles that are "turned off"
+          IF (MSTJ(39).GT.0.AND.IABS(K(I,2)).EQ.MSTJ(39)) GOTO 380
+
 C...Invariant mass of "dipole".Starting value for pT evolution.
           SHTCOR=(SQRT(SHT)-P(IR,5))**2-PM2I
           PT2=MIN(PT2CMX,0.25D0*SHTCOR,PTSCA(IEVOL)**2)
@@ -71047,11 +72023,12 @@ C...Check if part of system for which ME corrections should be applied.
 C...Special flag for colour octet states.
 C...MOCT=1: can do gluon splitting g->qqbar; MOCT=2: cannot.
             MOCT=0
-            IF(K(I,2).EQ.21) MOCT=1
-C...SUSY gluino
-            IF(K(I,2).EQ.KSUSY1+21) MOCT=2
-C...UED KK gluon
-            IF(K(I,2).EQ.5100021) MOCT=2
+            KC = PYCOMP(K(I,2))
+            IF(K(I,2).EQ.21) THEN
+              MOCT=1
+            ELSEIF(KCHG(KC,2).EQ.2) THEN
+              MOCT=2
+            ENDIF
 C...QUARKONIA++
             IF(MSTP(148).GE.1.AND.IABS(K(I,2)).EQ.9900101.AND.
      &          IABS(K(I,2)).LE.9910555) MOCT=2
@@ -71222,7 +72199,7 @@ C...Check if branching has highest pT.
   380 CONTINUE
  
 C...Finished if no more branchings to be done.
-      IF(IMX.EQ.0) GOTO 500
+      IF(IMX.EQ.0) GOTO 520
  
 C...Restore info on hardest branching to be processed.
       I=IPOS(IMX)
@@ -71239,9 +72216,12 @@ C...Restore info on hardest branching to be processed.
  
 C...Special flag for colour octet states.
       MOCT=0
-      IF(K(I,2).EQ.21) MOCT=1
-      IF(K(I,2).EQ.KSUSY1+21) MOCT=2
-      IF(K(I,2).EQ.5100021) MOCT=2
+      KC = PYCOMP(K(I,2))
+      IF(K(I,2).EQ.21) THEN
+        MOCT=1
+      ELSEIF(KCHG(KC,2).EQ.2) THEN
+        MOCT=2
+      ENDIF
 C...QUARKONIA++
       IF(MSTP(148).GE.1.AND.IABS(K(I,2)).GE.9900101.AND.
      &    IABS(K(I,2)).LE.9910555) MOCT=2
@@ -71568,33 +72548,40 @@ C...Vertex information trivial.
   470 CONTINUE
  
 C...Update list of old radiators.
-        DO 480 IEVOL=1,NEVOL
-          IF(IPOS(IEVOL).EQ.I.AND.IREC(IEVOL).EQ.IR) THEN
-            IPOS(IEVOL)=INEW
-            IF(KCOL.NE.0.AND.ISCOL(IEVOL).EQ.KCOL) IPOS(IEVOL)=IGNEW
-            IREC(IEVOL)=IRNEW
-            IFLG(IEVOL)=0
-          ELSEIF(IPOS(IEVOL).EQ.I) THEN
-            IPOS(IEVOL)=INEW
-            IFLG(IEVOL)=0
-          ELSEIF(IPOS(IEVOL).EQ.IR.AND.IREC(IEVOL).EQ.I) THEN
-            IPOS(IEVOL)=IRNEW
-            IREC(IEVOL)=INEW
-            IF(KCOL.NE.0.AND.ISCOL(IEVOL).NE.KCOL) IREC(IEVOL)=IGNEW
-            IFLG(IEVOL)=0
-          ELSEIF(IPOS(IEVOL).EQ.IR) THEN
-            IPOS(IEVOL)=IRNEW
-            IFLG(IEVOL)=0
-          ENDIF
-C...Update links of old connected partons.
-          IF(IREC(IEVOL).EQ.I) THEN
-            IREC(IEVOL)=INEW
-            IFLG(IEVOL)=0
-          ELSEIF(IREC(IEVOL).EQ.IR) THEN
-            IREC(IEVOL)=IRNEW
-            IFLG(IEVOL)=0
-          ENDIF
-  480   CONTINUE
+      DO 480 IEVOL=1,NEVOL
+C...  A) radiator-recoiler mother pair for this branching
+        IF(IPOS(IEVOL).EQ.I.AND.IREC(IEVOL).EQ.IR) THEN
+          IPOS(IEVOL)=INEW
+C...  A2) QCD branching and color side matches, radiated parton follows recoiler
+          IF(KCOL.NE.0.AND.ISCOL(IEVOL).EQ.KCOL) IPOS(IEVOL)=IGNEW
+          IREC(IEVOL)=IRNEW
+          IFLG(IEVOL)=0
+        ELSEIF(IPOS(IEVOL).EQ.I) THEN
+C...  B) other dipoles with I as radiator simply get INEW as new radiator
+          IPOS(IEVOL)=INEW
+          IFLG(IEVOL)=0
+        ELSEIF(IPOS(IEVOL).EQ.IR.AND.IREC(IEVOL).EQ.I) THEN
+C...  C) the "mirror image" of the parent dipole
+          IPOS(IEVOL)=IRNEW
+          IREC(IEVOL)=INEW
+C...  C2) QCD branching and color side matches, radiated parton follows recoiler
+          IF(KCOL.NE.0.AND.ISCOL(IEVOL).NE.KCOL.AND.ISCOL(IEVOL).NE.0)
+     &         IREC(IEVOL)=IGNEW
+          IFLG(IEVOL)=0
+        ELSEIF(IPOS(IEVOL).EQ.IR) THEN
+C...  D) other dipoles with IR as radiator simply get IRNEW as new radiator
+          IPOS(IEVOL)=IRNEW
+          IFLG(IEVOL)=0
+        ENDIF
+C...  Update links of old connected partons.
+        IF(IREC(IEVOL).EQ.I) THEN
+          IREC(IEVOL)=INEW
+          IFLG(IEVOL)=0
+        ELSEIF(IREC(IEVOL).EQ.IR) THEN
+          IREC(IEVOL)=IRNEW
+          IFLG(IEVOL)=0
+        ENDIF
+  480 CONTINUE
  
 C...q->qg or g->gg: create new gluon radiators.
       IF(KCOL.NE.0.AND.KFQ.EQ.0) THEN
@@ -71612,15 +72599,94 @@ C...q->qg or g->gg: create new gluon radiators.
         ISCOL(NEVOL)=-KCOL
         ISCHG(NEVOL)=0
         PTSCA(NEVOL)=PTSCA(NEVOL-1)
+C...g->qqbar: create new photon radiators.
+      ELSEIF(KCOL.EQ.2.AND.KFQ.NE.0) THEN
+        NEVOL=NEVOL+1
+        IPOS(NEVOL)=INEW
+        IREC(NEVOL)=IGNEW
+        IFLG(NEVOL)=0
+        ISCOL(NEVOL)=0
+        ISCHG(NEVOL)=PYK(INEW,6)
+        PTSCA(NEVOL)=SQRT(PT2)
+        NEVOL=NEVOL+1
+        IPOS(NEVOL)=IGNEW
+        IREC(NEVOL)=INEW
+        IFLG(NEVOL)=0
+        ISCOL(NEVOL)=0
+        ISCHG(NEVOL)=PYK(IGNEW,6)
+        PTSCA(NEVOL)=SQRT(PT2)
+        CALL PYLIST(4)
+        print*, 'created new QED dipole ',INEW,'<->',IGNEW
       ENDIF
  
+C...Check color and charge connections,
+C...Rewire if better partners can be found (screening, etc)
+      DO 500 IEVOL=1,NEVOL
+        KCOL  = ISCOL(IEVOL)
+        KCHA  = ISCHG(IEVOL)
+        IRTMP = IREC(IEVOL)
+        ITMP  = IPOS(IEVOL)
+C...Do not modify QED dipoles
+        IF (KCHA.NE.0) THEN
+          GOTO 500
+C...Also skip dipole ends that are switched off
+        ELSEIF (IFLG(IEVOL).LE.-1) THEN
+          GOTO 500
+        ELSEIF (KCOL.NE.0) THEN
+C...QCD dipoles. Check if current recoiler has appropriate color charge
+          KCOLR = PYK(IRTMP,12)
+          IF (KCOLR.EQ.2.OR.KCOLR.EQ.-KCOL) GOTO 500
+C...If not, look for closest recoiler with appropriate color charge
+          RM2MIN = PSUM(5)**2
+          JMX    = 0
+          ISGOOD = 0
+          DO 490 JEVOL=1,NEVOL
+C...Skip self
+            IF (JEVOL.EQ.IEVOL) GOTO 490
+            JTMP = IPOS(JEVOL)
+            IF (JTMP.EQ.ITMP) GOTO 490
+            JCOL = ISCOL(JEVOL)
+C...Skip dipole ends that are switched off
+            IF (IFLG(JEVOL).LE.-1) GOTO 490
+C...Skip QED dipole ends
+            IF (ISCHG(JEVOL).NE.0) GOTO 490
+C...  Skip wrong-color if at least one correct-color partner already found
+            IF (ISGOOD.NE.0.AND.JCOL.NE.-KCOL.AND.JCOL.NE.2) GOTO 490
+C...Accept if smallest m2 so far, or if first with correct color
+            RM2 = DOTP(ITMP,JTMP)
+            ISGNOW = 0
+            IF (JCOL.EQ.-KCOL.OR.JCOL.EQ.2) ISGNOW=1
+            IF (RM2.LT.RM2MIN.OR.ISGNOW.GT.ISGOOD) THEN
+              ISGOOD = ISGNOW
+              RM2MIN = RM2
+              JMX    = JEVOL
+            ENDIF
+  490     CONTINUE
+C...Update recoiler and reset dipole if new best partner found
+          IF (JMX.NE.0) THEN
+            IREC(IEVOL) = IPOS(JMX)             
+            IFLG(IEVOL) = 0
+          ENDIF
+        ENDIF
+  500 CONTINUE
+ 
+C...TMP! print out list of dipoles
+C      DO 580 IEVOL=1,NEVOL
+C        KCHA  = ISCHG(IEVOL)
+C        IF (KCHA.NE.0) THEN
+C          print*, 'qed dip',IPOS(IEVOL),IREC(IEVOL)
+C        ELSE
+C          print*, 'qcd dip',IPOS(IEVOL),IREC(IEVOL)
+C        ENDIF
+C 580  CONTINUE
+ 
 C...Update matrix elements parton list and add new for g/gamma->qqbar.
-      DO 490 IME=1,NMESYS
+      DO 510 IME=1,NMESYS
         IF(MESYS(IME,1).EQ.I) MESYS(IME,1)=INEW
         IF(MESYS(IME,2).EQ.I) MESYS(IME,2)=INEW
         IF(MESYS(IME,1).EQ.IR) MESYS(IME,1)=IRNEW
         IF(MESYS(IME,2).EQ.IR) MESYS(IME,2)=IRNEW
-  490 CONTINUE
+  510 CONTINUE
       IF(KFQ.NE.0) THEN
         NMESYS=NMESYS+1
         MESYS(NMESYS,0)=66
@@ -71647,7 +72713,7 @@ C...Loopback for more emissions if enough space.
       ENDIF
  
 C...Done.
-  500 CONTINUE
+  520 CONTINUE
  
       RETURN
       END
@@ -74356,16 +75422,16 @@ C...Data on months, logo, titles, and references.
      &'P      Y     T   H   H III A   A',
      &'                                ',
      &'This is PYTHIA version x.xxx    ',
-     &'Last date of change: xx xxx 200x',
+     &'Last date of change: xx xxx 201x',
      &'                                ',
-     &'Now is xx xxx 200x at xx:xx:xx  ',
+     &'Now is xx xxx 201x at xx:xx:xx  ',
      &'                                ',
      &'Disclaimer: this program comes  ',
      &'without any guarantees. Beware  ',
      &'of errors and use common sense  ',
      &'when interpreting results.      ',
      &'                                ',
-     &'Copyright T. Sjostrand (2010)   '/
+     &'Copyright T. Sjostrand (2011)   '/
       DATA (REFER(J),J=1,14)/
      &'An archive of program versions and d',
      &'ocumentation is found on the web:   ',
