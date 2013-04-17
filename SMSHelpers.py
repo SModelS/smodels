@@ -4,8 +4,10 @@
 
 import os
 
-#Base = "/home/lessa/SMS_database/"
-Base = "/afs/hephy.at/user/w/walten/public/sms/"
+if 'lessa' in os.getcwd():
+    Base = "/home/lessa/SMS_database/"
+else:
+    Base = "/afs/hephy.at/user/w/walten/public/sms/"
 
 runs=[ "8TeV", "2012", "2011", "ATLAS8TeV" ]
 ## runs=[ "2012" ]
