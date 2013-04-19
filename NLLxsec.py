@@ -50,7 +50,7 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
             if process=='gg': 
                 process='gdcpl'
                 mass = gluinomass
-            elif process=='ss': 
+            elif process=='sb': 
                 process='sdcpl'
                 mass = squarkmass
             else: return Values
@@ -58,7 +58,7 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
             if process=='gg': 
                 process='gdcpl'
                 mass = gluinomass
-            elif process=='ss': 
+            elif process=='sb': 
                 process='sdcpl'
                 mass = squarkmass
             else: return Values
