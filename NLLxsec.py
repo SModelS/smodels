@@ -17,6 +17,9 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
     from string import Template
     
     Values={"sqmass_7TeV":0, "mgmass_7TeV":0,"LOcs_7TeV":False,"NLOcs_7TeV":False,"NLL+NLO_7TeV":False,"K_NLO_7TeV":False,"K_NLL_7TeV":False}
+    Values_7TeV={"sqmass_7TeV":0, "mgmass_7TeV":0,"LOcs_7TeV":False,"NLOcs_7TeV":False,"NLL+NLO_7TeV":False,"K_NLO_7TeV":False,"K_NLL_7TeV":False}
+    Values_8TeV={"sqmass_8TeV":0, "mgmass_8TeV":0,"LOcs_8TeV":False,"NLOcs_8TeV":False,"NLL+NLO_8TeV":False,"K_NLO_8TeV":False,"K_NLL_8TeV":False}
+
     mass = 0
     
     if Energy==8:
@@ -41,27 +44,28 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
     os.chdir("./../../")
     
     
-    if process=='st' and o[1]=='T':
-        Values={"sqmass":0, "mgmass":0,"LOcs":False,"NLOcs":False,"NLL+NLO":False,"K_NLO":False,"K_NLL":False}
-        return Values
+    if process=='st' and o[1]=='T' and Energy == 7:
+        return Values_7TeV
+    elif process=='st' and o[1]=='T' and Energy == 8:
+        return Values_8TeV
     
     if process!='st' and o[1]=='T':
         if Energy == 7: 
-            if process=='gg': 
+            if process=='gg' and squarkmass/gluinomass > 10: 
                 process='gdcpl'
                 mass = gluinomass
-            elif process=='sb': 
+            elif process=='sb' and gluinomass/squarkmass > 10:
                 process='sdcpl'
                 mass = squarkmass
-            else: return Values
+            else: return Values_7TeV
         if Energy == 8: 
-            if process=='gg': 
+            if process=='gg' and squarkmass/gluinomass > 10:  
                 process='gdcpl'
                 mass = gluinomass
-            elif process=='sb': 
+            elif process=='sb'and gluinomass/squarkmass > 10:
                 process='sdcpl'
                 mass = squarkmass
-            else: return Values
+            else: return Values_8TeV
         if Energy==8:
             os.chdir("./nllfast/nllfast-2.1")
             runnll = Template("./nllfast_8TeV $prodproc $in_pdf $prodmass")
@@ -78,9 +82,10 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
 # uncomment this line to see the nll fast output
         #    print "nll fast output is", o
     
-    if o[1]=='T': 
-        Values={"sqmass":0, "mgmass":0,"LOcs":False,"NLOcs":False,"NLL+NLO":False,"K_NLO":False,"K_NLL":False}
-        return Values
+    if o[1]=='T' and Energy  == 7:
+        return Values_7TeV
+    elif o[1]=='T' and Energy  == 8:
+        return Values_8TeV
     
     
     lines=o.split()
@@ -108,6 +113,7 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
         if process == 'st' or process == 'sdcpl':
             Values={"sqmass_7TeV":lines[27], "mgmass_7TeV":0.0,"LOcs_7TeV":lines[28],"NLOcs_7TeV":lines[29],"NLL+NLO_7TeV":lines[30],"K_NLO_7TeV":lines[37],"K_NLL_7TeV":lines[38]}
         elif process == 'gdcpl' :
+            print "gluinos decoupling limit 7 TeV"
             Values={"sqmass_7TeV":0.0, "mgmass_7TeV":lines[27],"LOcs_7TeV":lines[28],"NLOcs_7TeV":lines[29],"NLL+NLO_7TeV":lines[30],"K_NLO_7TeV":lines[37],"K_NLL_7TeV":lines[38]}
         else:
             Values={"sqmass_7TeV":lines[27], "mgmass_7TeV":lines[28],"LOcs_7TeV":lines[29],"NLOcs_7TeV":lines[30],"NLL+NLO_7TeV":lines[31],"K_NLO_7TeV":lines[38],"K_NLL_7TeV":lines[39]}
@@ -115,6 +121,7 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
         if process == 'st' or process == 'sdcpl':
             Values={"sqmass_8TeV":lines[27], "mgmass_8TeV":0.0,"LOcs_8TeV":lines[28],"NLOcs_8TeV":lines[29],"NLL+NLO_8TeV":lines[30],"K_NLO_8TeV":lines[37],"K_NLL_8TeV":lines[38]}
         elif process == 'gdcpl' :
+            print "gluinos decoupling limit 7 TeV"
             Values={"sqmass_8TeV":0.0, "mgmass_8TeV":lines[27],"LOcs_8TeV":lines[28],"NLOcs_8TeV":lines[29],"NLL+NLO_8TeV":lines[30],"K_NLO_8TeV":lines[37],"K_NLL_8TeV":lines[38]}
         else:
             Values={"sqmass_8TeV":lines[27], "mgmass_8TeV":lines[28],"LOcs_8TeV":lines[29],"NLOcs_8TeV":lines[30],"NLL+NLO_8TeV":lines[31],"K_NLO_8TeV":lines[38],"K_NLL_8TeV":lines[39]}
