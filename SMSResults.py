@@ -55,6 +55,8 @@ def exists ( analysis, topo, run=None ):
 def getBinWidthX ( analysis, topo, run=None ):
   """ get the bin width in X """
   run=SMSHelpers.getRun ( analysis, run )
+  if SMSHelpers.hasDictionary ( analysis, run ):
+    return None
   histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
   if not histo: return None
   w=histo.GetXaxis().GetBinWidth(1)
@@ -63,6 +65,9 @@ def getBinWidthX ( analysis, topo, run=None ):
 def getLowX ( analysis, topo, run=None ):
   """ get the lower edge of the x axis """
   run=SMSHelpers.getRun ( analysis, run )
+  if SMSHelpers.hasDictionary ( analysis, run ):
+    print "[SMSResults.py] implement this function"
+    return None
   histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
   if not histo: return None
   w=histo.GetXaxis().GetXmin()
@@ -71,6 +76,9 @@ def getLowX ( analysis, topo, run=None ):
 def getLowY ( analysis, topo, run=None ):
   """ get the lower edge of the y axis """
   run=SMSHelpers.getRun ( analysis, run )
+  if SMSHelpers.hasDictionary ( analysis, run ):
+    print "[SMSResults.py] implement this function"
+    return None
   histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
   if not histo: return None
   w=histo.GetYaxis().GetXmin()
@@ -79,6 +87,8 @@ def getLowY ( analysis, topo, run=None ):
 def getBinWidthY ( analysis, topo, run=None ):
   """ get the bin width in Y """
   run=SMSHelpers.getRun ( analysis, run )
+  if SMSHelpers.hasDictionary ( analysis, run ):
+    return None
   histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
   if not histo: return None
   w=histo.GetYaxis().GetBinWidth(1)
