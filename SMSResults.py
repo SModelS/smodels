@@ -150,13 +150,17 @@ def getClosestValue ( Dict, mx, my ):
         retul=ul
   return retul
 
-def getUpperLimitFromDictionary ( analysis, topo, mx=None, my=None, run=None, png=None ):
+def getUpperLimitFromDictionary ( analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False ):
   """ shouldnt have to call this directly. It's obtaining an upper limit from the python dictionary """
+  if interpolate:
+    print "[SMSResults.py] error: need to implement interpolation function for getUpperLimitFromDictionary"
+    import sys
+    sys.exit(0)
   Dict=SMSHelpers.getUpperLimitDictionary ( analysis, topo, run )
   if mx==None: return Dict
   return getClosestValue ( Dict, mx, my )
 
-def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None ):
+def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False ):
   """ get the upper limit for run/analysis/topo.
       return none if it doesnt exist.
       if mx and my are none, return the entire histogram,
@@ -165,14 +169,14 @@ def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None ):
       if png==True, return path of pngfile containing the histogram"""
   run=SMSHelpers.getRun ( analysis, run )
   if SMSHelpers.hasDictionary ( analysis, run ):
-    return getUpperLimitFromDictionary ( analysis, topo, mx, my, run )
+    return getUpperLimitFromDictionary ( analysis, topo, mx, my, run, interpolate )
   histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
   if png==True:
     pngfile=SMSHelpers.getUpperLimitPng(analysis,topo,run)
     return pngfile
   if rmvunit(mx,'GeV') == None:
     return histo
-  value=SMSHelpers.getUpperLimitAtPoint ( histo, mx, my )
+  value=SMSHelpers.getUpperLimitAtPoint ( histo, mx, my, interpolate=interpolate )
   return SMSHelpers.addunit ( value, "fb" )
 
 def getEfficiency ( analysis, topo, mx=None, my=None, run=None ):
