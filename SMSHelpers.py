@@ -208,7 +208,7 @@ def getUpperLimitHisto ( analysis, topo, run ):
     return None
   return histo
 
-def getUpperLimitAtPoint ( histo, mx, my ):
+def getUpperLimitAtPoint ( histo, mx, my, interpolate=False ):
   """ given already a histogram, we get the upper limit for mx and my,
       we return None if we're out of bounds """
 
@@ -216,6 +216,8 @@ def getUpperLimitAtPoint ( histo, mx, my ):
     log ( "inconsistent mx/my, mx=None, my=%s" % my )
     return None
   if not histo: return 'no histogram'
+  if interpolate:
+    return histo.Interpolate ( mx, my )
   xmax=histo.GetXaxis().GetNbins()
   xbin=histo.GetXaxis().FindBin(rmvunit(mx,'GeV'))
   if xbin==0 or xbin>xmax:
