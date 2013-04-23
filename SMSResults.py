@@ -5,6 +5,11 @@
 import SMSHelpers
 from SMSHelpers import addunit, rmvunit
 
+def setLogLevel ( l=[ "error" ] ):
+  """ defines what is written out, and what isnt """
+  SMSHelpers.logLevel=l
+
+
 def useUnits ( b=True ):
   SMSHelpers.useUnits = b
 
@@ -130,6 +135,27 @@ def getAllResults ( run=None ):
         ret[ana]=topos
   return ret
 
+def getClosestValue ( Dict, mx, my ):
+  """ assuming that Dict is a dictionary of mx,my,ul, get the upper limit
+      of the point in Dict that is closest to mx and my. Later we will interpolate
+      """
+  import math
+  closest=9999999
+  retul=None
+  for (dmx,dmv) in Dict.items():
+    for (dmy,ul) in dmv.items():
+      dist= (mx-dmx)**2 + (my-dmy)**2
+      if dist<closest:
+        closest=dist
+        retul=ul
+  return retul
+
+def getUpperLimitFromDictionary ( analysis, topo, mx=None, my=None, run=None, png=None ):
+  """ shouldnt have to call this directly. It's obtaining an upper limit from the python dictionary """
+  Dict=SMSHelpers.getUpperLimitDictionary ( analysis, topo, run )
+  if mx==None: return Dict
+  return getClosestValue ( Dict, mx, my )
+
 def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None ):
   """ get the upper limit for run/analysis/topo.
       return none if it doesnt exist.
@@ -138,6 +164,8 @@ def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None ):
       point
       if png==True, return path of pngfile containing the histogram"""
   run=SMSHelpers.getRun ( analysis, run )
+  if SMSHelpers.hasDictionary ( analysis, run ):
+    return getUpperLimitFromDictionary ( analysis, topo, mx, my, run )
   histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
   if png==True:
     pngfile=SMSHelpers.getUpperLimitPng(analysis,topo,run)
@@ -199,6 +227,10 @@ def getSqrts ( analysis, run=None ):
 def getPAS ( analysis, run=None ):
   """ get the PAS for this analysis """
   return SMSHelpers.getMetaInfoField ( analysis, "pas", run )
+
+def hasDictionary ( analysis, run=None ):
+  """ are the upper limits available in dictionary format? """
+  return SMSHelpers.hasDictionary ( analysis, run )
 
 def getx ( analysis, topo=None, run=None ):
   """ get the description of the x-values for this analysis, if you supply a
@@ -348,10 +380,14 @@ def massDecoupling ( topo, plot='ROOT',kerning=True ):
 
 def exists(analysis, topo, run = None):
   """ check if the histogram run/analysis/sms.root(limit_topo) exists."""
-  
+  """ or sms.py, if it's stored in dictionaries """
   run2=SMSHelpers.getRun( analysis, run )
+  hasDict=SMSHelpers.hasDictionary ( analysis, run2 )
+  if hasDict:
+    histo=SMSHelpers.getUpperLimitDictionary ( analysis, topo, run2 )
+    if not hist or len(histo)==0: return False
+    return True
   histo=SMSHelpers.getUpperLimitHisto(analysis, topo, run2 )
-
   if not histo: return False
       
   return True

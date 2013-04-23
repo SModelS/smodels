@@ -75,9 +75,12 @@ def close():
     tfile.Close()
   openFiles={}
 
+logLevel= [ "error" ]
+
 def log ( text, level="error" ):
+  if level in logLevel:
+    print "[SMSHelpers.py] %s: %s" % ( level, text )
   return
-  ## print "[SMSHelpers.py] %s: %s" % ( level, text )
 
 def getRun ( analysis, run=None ):
   """ search for an analysis, return the run,
@@ -182,6 +185,7 @@ def conditions ( analysis, run ):
 def constraints ( analysis, run ):
   """ get all the conditions for a analysis/run pair """
   return getLines ( analysis, run, "constraint" )
+
 
 def getUpperLimitHisto ( analysis, topo, run ):
   import ROOT
@@ -302,12 +306,13 @@ def hasMetaInfoField ( analysis, field, run=None ):
   metainfo=parseMetaInfo ( analysis, run )
   return metainfo.has_key ( field )
 
-def getMetaInfoField ( analysis, field, run=None ):
+def getMetaInfoField ( analysis, field, run=None, complain=True ):
   """ get one specific entry of the meta info """
   run=getRun ( analysis, run )
   metainfo=parseMetaInfo ( analysis, run )
   if not metainfo.has_key ( field ):
-    log ( "%s/%s doesnt have a ``%s'' field." % ( run, analysis, field ) )
+    if complain:
+      log ( "%s/%s doesnt have a ``%s'' field." % ( run, analysis, field ) )
     return None
   f=metainfo[field]
   while f[0]==' ': f=f[1:]
@@ -342,3 +347,22 @@ dicparticle = {
    "TChiNuSlep": "#tilde{#chi}^{0}_{2}",
 }
 
+def hasDictionary ( analysis, run=None ):
+  """ are the upper limits available in dictionary format? """
+  hd=getMetaInfoField ( analysis, "dictionary", run, complain=False )
+  if hd:
+    if hd in [ '1', 'True' ]: return True
+  return False
+
+def getUpperLimitDictionary ( analysis, topo, run ):
+  dictfile="%s/%s/%s/sms.py" % ( Base, run, analysis )
+  if not os.path.exists(dictfile):
+    log("dictionary file %s doesnt exist" % dictfile )
+    return None
+  Globals={}
+  execfile(dictfile,Globals)
+  Dict=Globals["Dict"]
+  if not Dict.has_key ( topo ):
+    log("dictionary doesnt have topology"+topo )
+    return None
+  return Dict[topo]
