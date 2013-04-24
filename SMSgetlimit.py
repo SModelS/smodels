@@ -1,9 +1,9 @@
-def GetPlotLimit(inmass,plot,Analysis):
+def GetPlotLimit(inmass,plot,Analysis,complain = False):
     """ Get upper limit on sigma*BR for a specific array of masses from plot """
-    import SMSResults, numpy , copy, sys
+    import SMSResults, numpy , copy
     from SMSHelpers import addunit, rmvunit
     
-    massarray = copy.deepcopy(inmass)
+    massarray = [copy.deepcopy(inmass[0]),copy.deepcopy(inmass[1])]
  
  
 #Run label:
@@ -17,15 +17,15 @@ def GetPlotLimit(inmass,plot,Analysis):
     if len(massarray) < 1: return False        
 
     limits = []
-   
+    
 #Get mother and LSP masses:
-    mLSP = [massarray[0].pop(),massarray[1].pop()]
+    mLSP = [(massarray[0]).pop(),(massarray[1]).pop()]
     if mLSP[0] != mLSP[1]:
-        print "GetPlotLimit: Different LSP masses"    #For now only allow for equal LSP masses
+        if complain: print "GetPlotLimit: Different LSP masses"    #For now only allow for equal LSP masses
         return None
     mMom = [massarray[0][0],massarray[1][0]]   
     if mMom[0] != mMom[1]:
-        print "GetPlotLimit: Different mother masses"   #For now only allow for equal mother masses
+        if complain: print "GetPlotLimit: Different mother masses"   #For now only allow for equal mother masses
         return None
     mx = mMom[0]
     my = mLSP[0]
@@ -34,17 +34,21 @@ def GetPlotLimit(inmass,plot,Analysis):
     massI = []
     
     for ib in range(len(massarray)):           
-        if len(massarray[ib])-1 > 1:   #(LSP mass has been removed already)
-            print 'GetPlotLimit: Multi-dimensional fit not available'
+        if len(massarray[ib]) > 2:   #(LSP mass has been removed already)
+            if complain: print 'GetPlotLimit: Multi-dimensional fit not available'
             return False        
 
         for imass in range(1,len(massarray[ib])):            
             mI = massarray[ib][imass]
             x = float((mI-my)/(mx-my))
             massI.append([mI, x])
-
-    if len(massI) == 2 and massI[0][0] == massI[1][0]:
-        massI = [massI.pop()]   #For the case of equal masses, keep just one
+            
+    if len(massI) == 2:
+        if massI[0][0] != massI[1][0]:
+            if complain: print "GetPlotLimit: Different intermediate masses"   #For now only allow for equal intermediate masses
+            return None
+        else:
+            massI = massI.pop()   #For the case of equal masses, keep just one
 
         
     CMSlabel = plot[0]        #CMS-type label
@@ -61,8 +65,7 @@ def GetPlotLimit(inmass,plot,Analysis):
 
 #Sanity check
         if len(massI) > 0 and len(xexp) == 0:
-#        if len(xexp) != len(massI):
-            print 'GetPlotLimit: Number of intermediate masses do not match histogram'
+            if complain: print 'GetPlotLimit: Number of intermediate masses do not match histogram'
             limits.append([analyses, False])
             continue
 
@@ -78,29 +81,19 @@ def GetPlotLimit(inmass,plot,Analysis):
                 else:
                     ylim = SMSResults.getUpperLimit(analyses,CMSlabel+k,mx, my)
 
-                if type(ylim) != type(addunit(1.,'fb')): continue
+                if type(ylim) != type(addunit(1.,'fb')): continue  #Skip errors
 
                 x.append(float(k)/100.)
                 y.append(rmvunit(ylim,'fb'))
                 
 #Interpolation checks:
-            if len(x) == 1:
-                print  'GetPlotLimit: only one interpolation point in',analyses,' for',CMSlabel
+            if len(x) <= 1:
+                if complain: print  'GetPlotLimit: one interpolation point or less in',analyses,' for',CMSlabel
                 limits.append([analyses, None])
                 continue
-
-#If intermediate masses differ, use weakest limit (conservative case):
-            limit = addunit(0.,'fb')
-            for mass in massI:
-                if mass[1] < min(x) or mass[1] > max(x):
-                    print  'GetPlotLimit: intermediate mass out of bounds'
-                    limits.append([analyses, None])
-                    break
       
-                p = numpy.polyfit(x, y, len(y)-1)
-                limit = max(limit,addunit(float(numpy.polyval(p, mass[1])),'fb'))
-                
-            limits.append([analyses, limit])
+            p = numpy.polyfit(x, y, len(y)-1)
+            limits.append([analyses,addunit(float(numpy.polyval(p, massI[1])),'fb') ])
                 
 
         

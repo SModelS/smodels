@@ -17,7 +17,7 @@ verbose=True
 ## track the open root files
 openFiles={}
 
-useUnits=False
+useUnits=True
 
 def addunit ( value, unitstring ):
   """ a function that can add units to values, but also
@@ -187,7 +187,7 @@ def constraints ( analysis, run ):
   return getLines ( analysis, run, "constraint" )
 
 
-def getUpperLimitHisto ( analysis, topo, run ):
+def getUpperLimitHisto ( analysis, topo, run, complain=False ):
   import ROOT
   rootfile="%s/%s/%s/sms.root" % ( Base, run, analysis )
   if not os.path.exists(rootfile):
@@ -204,7 +204,7 @@ def getUpperLimitHisto ( analysis, topo, run ):
     openFiles[rootfile]=f
   histo=f.Get("limit_%s" % topo )
   if not histo:
-    log("histogram %s not found in %s" % ( topo, rootfile ))
+    if complain: log("histogram %s not found in %s" % ( topo, rootfile ))
     return None
   return histo
 
@@ -308,7 +308,7 @@ def hasMetaInfoField ( analysis, field, run=None ):
   metainfo=parseMetaInfo ( analysis, run )
   return metainfo.has_key ( field )
 
-def getMetaInfoField ( analysis, field, run=None, complain=True ):
+def getMetaInfoField ( analysis, field, run=None, complain=False ):
   """ get one specific entry of the meta info """
   run=getRun ( analysis, run )
   metainfo=parseMetaInfo ( analysis, run )

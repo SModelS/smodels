@@ -76,7 +76,7 @@ class GTop:
         neweight.update(weight)
         self.WeightList.append(neweight)
         return True
-    
+   
 class EAnalysis:    
     def __init__(self):
         self.label = ""
@@ -86,7 +86,7 @@ class EAnalysis:
         self.results = {}
         self.plots = {}
         self.run = ""
-        self.masscomp = 0.001
+        self.masscomp = 0.2
 
 
 #Given the constraints dictionary, automatically fill the element list with the
@@ -139,13 +139,10 @@ class EAnalysis:
     
     
 
-#Check if the plots listed in results exist and 
-#store bin information in masscomp for combining masses
+#Check if the plots listed in results exist
     def GetPlots(self,verbose=True):
         import SMSResults
 
-        
-        self.masscomp = {}
         run = self.run        
         if run == "": run = None  #If run has not been defined, use latest
         for res in self.results.keys():
@@ -157,30 +154,9 @@ class EAnalysis:
                 topo = self.plots[res][0]
                 analyses = self.plots[res][1]
                 
-            binx = addunit(0.,'GeV')
-            biny = addunit(0.,'GeV')
-            xmin = addunit(0.,'GeV')
-            ymin = addunit(0.,'GeV')
             for ana in analyses:
                 if not SMSResults.exists(ana,topo,run):
                     if verbose: print "SMSmethods.py: GetPlots: Histogram for ",topo," in ",ana," for run ",run," not found"
-                    continue
-                if binx == addunit(0.,'GeV'):
-                    binx = SMSResults.getBinWidthX(ana,topo,run)
-                    biny = SMSResults.getBinWidthY(ana,topo,run)
-                    xmin = SMSResults.getLowX(ana,topo,run)
-                    ymin = SMSResults.getLowY(ana,topo,run)
-                else:    
-                    binx = min(SMSResults.getBinWidthX(ana,topo,run),binx)
-                    biny = min(SMSResults.getBinWidthY(ana,topo,run),biny)
-                    xmin = min(SMSResults.getLowX(ana,topo,run),xmin)
-                    ymin = min(SMSResults.getLowY(ana,topo,run),ymin)
-                    
-            if binx == addunit(0.,'GeV'):  #If no histogram has been found, use default values
-                binx = addunit(20.,'GeV')
-                biny = addunit(20.,'GeV')
-                    
-            self.masscomp.update({res: [binx,biny,xmin,ymin]}) #Store bin information
             
 
         
@@ -431,19 +407,27 @@ def EqualBranches(B1,B2):
 
 #Compare two elements or array of elements.
 #If all masses and particles are equal, returns True,
-#otherwise returns False       
-def EqualEls(El1,El2):
+#otherwise returns False
+#If order = False, test both branch orderings (for an element doublet only) 
+def EqualEls(El1,El2,order=True):
     
     if len(El1) != len(El2): return False
     
 #If it is an array of elements:    
     if type(El1) == type(list()) and type(El1[0]) == type(TElement()):
         if type(El2) != type(list()): return False
-        if type(El2[0]) != type(TElement()): return False                
-        for i in range(len(El1)):
-            if El1[i].particles != El2[i].particles: return False
-            if El1[i].masses != El2[i].masses: return False
-            
+        if type(El2[0]) != type(TElement()): return False
+        if len(El1) == 2 and not order:
+            El1_b = [TElement(),TElement()]
+            for ib in range(2):
+                El1_b[ib].masses = El1[(1+ib)%2].masses
+                El1_b[ib].particles = El1[(1+ib)%2].particles                
+                if (El1[ib].particles != El2[ib].particles or El1[ib].masses != El2[ib].masses) and (El1_b[ib].particles != El2[ib].particles or El1_b[ib].masses != El2[ib].masses): return False
+        else:       
+            for i in range(len(El1)):
+                if El1[i].particles != El2[i].particles: return False
+                if El1[i].masses != El2[i].masses: return False
+           
 #If it is a single element:            
     else:
         if El1.particles != El2.particles: return False
@@ -452,25 +436,33 @@ def EqualEls(El1,El2):
     return True
 
 #Compare two elements or array of elements.
-#If all masses and particles are similar, returns True,
-#otherwise returns False       
-def SimEls(El1,El2):
+#If particles are similar and all masses equal, returns True,
+#otherwise returns False
+#If order = False, test both branch orderings (for an element doublet only)
+def SimEls(El1,El2,order=True):
     
     if len(El1) != len(El2): return False
     
 #If it is an array of elements:    
     if type(El1) == type(list()) and type(El1[0]) == type(TElement()):
         if type(El2) != type(list()): return False
-        if type(El2[0]) != type(TElement()): return False                
-        for i in range(len(El1)):
-            if not SimParticles(El1[i].particles,El2[i].particles): return False
-            if El1[i].masses != El2[i].masses: return False
-            
+        if type(El2[0]) != type(TElement()): return False
+        
+        if len(El1) == 2 and not order:
+            El1_b = [TElement(),TElement()]
+            for ib in range(2):
+                El1_b[ib].masses = El1[(1+ib)%2].masses
+                El1_b[ib].particles = El1[(1+ib)%2].particles                
+                if (not SimParticles(El1[ib].particles,El2[ib].particles) or El1[ib].masses != El2[ib].masses) and (not SimParticles(El1_b[ib].particles,El2[ib].particles) or El1_b[ib].masses != El2[ib].masses): return False
+        else:
+            for i in range(len(El1)):
+                if not SimParticles(El1[i].particles,El2[i].particles): return False
+                if El1[i].masses != El2[i].masses: return False
+        
 #If it is a single element:            
     else:
-        if not SimParticles(El1.particles,El2.particles): return False
-        if El1.masses != El2.masses: return False
-
+        if not SimParticles(El1.particles,El2.particles) or  El1.masses == El2.masses: return False
+        
     return True
 
 
@@ -555,8 +547,9 @@ def AddToList(SMSTop,SMSTopList):
             if len(SMSTopList[equaltops].WeightList[equalels]) != len(SMSTop.WeightList[inew]):
                 print "Wrong number of weights"
             else:
-                for w in SMSTop.WeightList[inew].keys():
-                    SMSTopList[equaltops].WeightList[equalels][w] += SMSTop.WeightList[inew][w]
+                w1 = SMSTopList[equaltops].WeightList[equalels]
+                w2 = SMSTop.WeightList[inew]                
+                SMSTopList[equaltops].WeightList[equalels] = sumweights([w1,w2])
                     
     
                     
@@ -581,6 +574,7 @@ def AddToList(SMSTop,SMSTopList):
 #Loop over all elements in SMSTopList and add the weight to the 
 #matching elements in Analysis.
 def AddToAnalysis(SMSTopList,Analysis):
+    import copy
     
     for itop in range(len(SMSTopList)):
         NewTop = SMSTopList[itop]    
@@ -591,96 +585,182 @@ def AddToAnalysis(SMSTopList,Analysis):
         for iel in range(len(NewTop.B[0].ElList)):
 #Loop over analysis elements:
             for jel in range(len(Analysis.Top.B[0].ElList)):
-                NewEl_a = [NewTop.B[0].ElList[iel],NewTop.B[1].ElList[iel]]
-                NewEl_b = [NewTop.B[1].ElList[iel],NewTop.B[0].ElList[iel]]
+                NewEl = [NewTop.B[0].ElList[iel],NewTop.B[1].ElList[iel]]
+                weight = copy.deepcopy(NewTop.WeightList[iel])
+                newptcs = [NewTop.B[0].ElList[iel].particles,NewTop.B[1].ElList[iel].particles]
                 oldptcs = [Analysis.Top.B[0].ElList[jel].particles,Analysis.Top.B[1].ElList[jel].particles]
-                newptcs_a = [NewEl_a[0].particles,NewEl_a[1].particles]
-                newptcs_b = [NewEl_b[0].particles,NewEl_b[1].particles]
-                
-                
-                
-#Check if particles match (independent of branch order)
-                ptcmatch = SimParticles(newptcs_a,oldptcs) or SimParticles(newptcs_b,oldptcs)
-                if not ptcmatch: continue
-
-                weight = {}
-                weight.update(NewTop.WeightList[iel])
-
-                
-#Loop over nested mass list in Analysis element:                
-                massmatch = False
+#Loop over nested mass list in Analysis element:
+                added = False
                 for imass in range(len(Analysis.Top.B[0].ElList[jel].masses)):
                     OldEl = [TElement(),TElement()]
                     for ib in range(2):
-                        OldEl[ib].particles = oldptcs[ib]
+                        OldEl[ib].particles = Analysis.Top.B[ib].ElList[jel].particles
                         OldEl[ib].masses = Analysis.Top.B[ib].ElList[jel].masses[imass]
                         
-                        
-#Check if elements match (with identical masses) and  add weight
-                    if SimEls(NewEl_a,OldEl) or SimEls(NewEl_b,OldEl):
-                        massmatch = True
-                        for w in weight.keys():
-                            Analysis.Top.WeightList[jel][imass][w] += weight[w]
-
-#If particles match, but not masses, add element to nested 
-# mass list and nested weight list
-#(check for both branch orderings. If both match, add both mass orderings):
-                if not massmatch:
-                    if SimParticles(newptcs_a,oldptcs):
+                                            
+#Check if elements match (with identical masses) for any branch ordering
+                    if SimEls(NewEl,OldEl,order=False):
+                        Analysis.Top.WeightList[jel][imass] = sumweights([Analysis.Top.WeightList[jel][imass],weight])
+                        added = True
+                        break   #To avoid double counting only add event to one mass combination
+                    
+                if not added:
+#Check for both branch orderings, but only add one (if matches) to avoid double counting                    
+                    ptcmatch = False
+                    if SimParticles([newptcs[0],newptcs[1]],oldptcs):
+                        ptcmatch = 1
+                    elif SimParticles([newptcs[1],newptcs[0]],oldptcs):
+                        ptcmatch = 2
+                    if ptcmatch:
                         for ib in range(2):
-                            Analysis.Top.B[ib].ElList[jel].masses.append(NewEl_a[ib].masses)                            
+                            Analysis.Top.B[ib].ElList[jel].masses.append(NewEl[(ib+ptcmatch-1)%2].masses)
                         Analysis.Top.WeightList[jel].append(weight)
-                        massmatch = True
-                    if SimParticles(newptcs_b,oldptcs) and (not massmatch or NewEl_b[0].masses != NewEl_b[1].masses):
-                        for ib in range(2):
-                            Analysis.Top.B[ib].ElList[jel].masses.append(NewEl_b[ib].masses)
-                        Analysis.Top.WeightList[jel].append(weight)
-           
 
 
-#Replace mass array by its binned equivalent using the information
-#in binpars:
-def BinMass(mass,binpars=[addunit(20.,'GeV'),addunit(20.,'GeV'),addunit(0.,'GeV'),addunit(0.,'GeV')]):
+#Definition of distance between two mass arrays
+#If Dana is defined, use maximum distance in all analyses
+def MassDist(mass1,mass2):
+    import SMSglobals, SMSgetlimit
     
-    newmass = [[],[]]
-    for ib in range(2):
-        for imass in range(len(mass[ib])):
-            if imass < len(mass[ib])-1:  #Parameters for mx (mother and intermediate masses)
-                binw = binpars[0]
-                mmin = binpars[2]
-#                if imass > 0: binw = 50.  #Larger bin for intermediate masses
-            else:                        #Parameters for LSP
-                binw = binpars[1]
-                mmin = binpars[3]
-            Nbins = int((mass[ib][imass]-mmin)/binw)
-            newmass[ib].append(Nbins*binw + mmin + binw/2.)
+    Dana = SMSglobals.DistAnalyses  #List of analyses to be used
+
+#Get upper bounds for each mass:
+    xmass1 = SMSgetlimit.GetPlotLimit(mass1,Dana[0],Dana[1])
+    xmass2 = SMSgetlimit.GetPlotLimit(mass2,Dana[0],Dana[1])
+    
+    d = -1.
+    for iana in range(len(xmass1)):
+        x1 = rmvunit(xmass1[iana][1],'fb')
+        x2 = rmvunit(xmass2[iana][1],'fb')
+        if type(x1) == type(str()) or type(x1) == type(str()): continue  #Skip analysis error messages
+        if x1 and x2:
+            if xmass1[iana][0] != xmass2[iana][0]:    #Check if analysis label match
+                print "MassDist: Error getting upper limit"
+                return None            
             
-    return newmass       
+            newd = 2.*abs(x1-x2)/(x1+x2)   #Relative distance in "upper limit space"
+            d = max(d,newd)
 
-#Replace LSP and mother masses by its binned equivalent using the information
-#in binpars (do not modify intermediate masses):
-def BinMass2(mass,binpars=[addunit(20.,'GeV'),addunit(20.,'GeV'),addunit(0.,'GeV'),addunit(0.,'GeV')]):
-    import sys
+            
+    if d < 0.: return None   #Skip masses without an upper limit
     
-    newmass = [[],[]]
-    for ib in range(2):
-        for imass in range(len(mass[ib])):
-            if imass == 0:                     #Parameters for mother
-                binw = binpars[0]
-                mmin = binpars[2]
-            elif imass == len(mass[ib])-1:       #Parameters for LSP
-                binw = binpars[1]
-                mmin = binpars[3]
+   #If masses differ by more than 100%, do not define distance
+    if abs(mass1[0][0]-mass2[0][0])/(mass1[0][0]+mass2[0][0]) > 0.5: 
+        return None
+    
+    return d
+
+#Definition of distance two clusters
+#MD = square matrix of distances
+def ClusterDist(cluster1,cluster2,MD):
+    d = 0.
+    if type(cluster1) != type(set()) or type(cluster2) != type(set()):
+        print "ClusterDist: unknown format input"
+        return False
+        
+    for ic in cluster1:
+        for jc in cluster2:
+            if MD[ic][jc] == None: return None
+            d = max(d,MD[ic][jc])
+    return d
+    
+
+#Test if a mass array is "good"
+# = have similar branch masses if branch topologies are equal
+# = have similar mother and LSP masses if branch topologies are different
+#If it is, return an equivalent array with equal masses (= mass avg)
+def GoodMass(mass,Distfunc,dmin):
+    
+    if mass[0] == mass[1]: return mass
+    if len(mass[0]) == len(mass[1]):
+        mass1 = [mass[0],mass[0]]
+        mass2 = [mass[1],mass[1]]
+        MD = Distfunc(mass1,mass2)
+        if MD == None or MD > dmin: 
+            return False
+        else:
+            return MassAvg([mass1,mass2],"harmonic")
+    else:
+        mass1 = mass
+        mass2 = mass
+        mass1[1][0] = mass1[0][0]     #Force mothers and daughters to be equal in each branch
+        mass1[1][len(mass1)-1] = mass1[0][len(mass1)-1]
+        mass2[0][0] = mass2[1][0]
+        mass2[0][len(mass2)-1] = mass2[1][len(mass2)-1]
+        MD = Distfunc(mass1,mass2)
+        if MD == None or MD > dmin: 
+            return False
+        else:
+            return MassAvg([mass1,mass2],"harmonic")
+    
+
+
+#Cluster algorithm (generic for any type of object, as long as the distance function is given):
+def DoCluster(objlist,Distfunc,dmin):
+    import copy
+    
+    MD = []
+#Compute distance matrix
+    for i in range(len(objlist)):
+        line = []
+        for j in range(len(objlist)):
+            if j >= i:
+                line.append(Distfunc(objlist[i],objlist[j]))
             else:
-                binw = addunit(0.,'GeV')
+                line.append(addunit(0.,'GeV'))
+        MD.append(line)
+        
+    for i in range(len(objlist)):
+        for j in range(len(objlist)):
+            if j < i: MD[i][j] = MD[j][i]
+
+#Begin clustering
+    ClusterList = []
+    for i in range(len(objlist)):
+        cluster = set([])
+        for j in range(len(objlist)):
+            if MD[i][j] == None: continue
+            if MD[i][j] <= dmin: cluster.add(j) 
+        if not cluster in ClusterList: ClusterList.append(cluster)   #Zero level clusters (individual masses)
+
+
+    FinalCluster = []
+    newClusters = [0]
+    while len(newClusters) > 0:
+        newClusters = []    
+        for cluster in ClusterList:
+            split = False
+            if len(cluster) > 2:
+                for i in cluster:
+                    ClDist = ClusterDist(set([i]),cluster,MD)
+                    if  ClDist == None or ClDist > dmin:
+                        newcluster = copy.deepcopy(cluster)
+                        newcluster.remove(i)
+                        split = True
+                        if not newcluster in newClusters:
+                            newClusters.append(newcluster)
+                    
+            if not split and not cluster in FinalCluster: FinalCluster.append(cluster)            
+                    
+        ClusterList = newClusters
+        if len(ClusterList) > 1000:    #Check for oversized list of cluster (too time consuming)
+            print "DoCluster: Error clustering. ClusterList >",len(ClusterList)
+            return False
+        
                 
-            if binw != addunit(0.,'GeV'):                   
-                Nbins = int((mass[ib][imass]-mmin)/binw)
-                newmass[ib].append(Nbins*binw + mmin + binw/2.)
-            else:
-                newmass[ib].append(mass[ib][imass])
+#Clean up clusters
+    FinalCluster = FinalCluster + ClusterList
+    i = 0
+    for i in range(len(FinalCluster)):
+        clusterA = FinalCluster[i]
+        for j in range(len(FinalCluster)):
+            clusterB = FinalCluster[j]
+            if i != j and clusterB.issubset(clusterA):
+                FinalCluster[j] = set([])
             
-    return newmass        
+    while FinalCluster.count(set([])) > 0: FinalCluster.remove(set([]))
+    
+    return FinalCluster       
                           
                         
 #For a list of equivalent masses, compute an average mass (or mass array)
@@ -715,10 +795,10 @@ def MassAvg(equivin, method = "mean"):
     
 #Sanity checks:    
         for mass in equivmasses.flat:
-            if mass == 0.:
+            if rmvunit(mass,'GeV') == 0.:
                 print "MassAvg: Zero mass!"
                 return False
-            if mass < 0.:
+            if rmvunit(mass,'GeV') < 0.:
                 print "MassAvg: Negative mass!"
                 return False
 
@@ -755,169 +835,129 @@ def MassAvg(equivin, method = "mean"):
         return massout[0]
     else:
         return massout
+
+#Sum a list of weights
+def sumweights(wlist):
     
+    neweight = {}
+    for wk in wlist[0].keys(): neweight.update({wk : addunit(0.,'fb')})
+    for wk in wlist[0].keys():
+        wsum = addunit(0.,'fb')
+        for weight in wlist: wsum = wsum + weight[wk]
+        neweight.update({wk : wsum})
+        
+    return neweight
+            
                     
 
 #Evaluate theoretical predictions for the analysis result and conditions:
 def EvalRes(res,Analysis,uselimits = False):
-    import copy, SMSgetlimit, sys
+    import SMSglobals, copy
 
-    
-    if not Analysis.plots.has_key(res) or not Analysis.results.has_key(res) or not Analysis.masscomp.has_key(res):
+    output = []
+    if not Analysis.plots.has_key(res) or not Analysis.results.has_key(res):
         print "EvalRes: Wrong analysis input"
         return False
     
-    binpars = Analysis.masscomp[res] #Parameters for mass binning
+#Get minimum distance parameter (it can be analysis dependent)
+    dmin = Analysis.masscomp
+#List of analyses and anlysis itself (necessary to compute distances)    
+    analyses = Analysis.plots[res]
+    SMSglobals.DistAnalyses = [analyses,Analysis]
     
-    
-#Create new element list with all mother and LSP masses replaced by
-#their binned values
-    NewTop = copy.deepcopy(Analysis.Top)
-    for iel in range(len(NewTop.B[0].ElList)):      
-        masslist = []
-        weightlist = []      
-        while len(NewTop.B[0].ElList[iel].masses) > 0:
-            mass = [NewTop.B[0].ElList[iel].masses.pop(0),NewTop.B[1].ElList[iel].masses.pop(0)]
-            if uselimits:
-                binmass = BinMass2(mass,binpars)
-            else:
-                binmass = BinMass(mass,binpars)    
-            masslist.append(binmass)
-            weightlist.append(NewTop.WeightList[iel].pop(0))
-            
-#Now combine all equal masses (intermediate masses are still kept unchanged):
-        newmasslist = []
-        neweightlist = []
-        while len(masslist) > 0:
-            mass = masslist.pop(0)
-            weight = weightlist.pop(0)
-            while masslist.count(mass) > 0:
-                w1 = weight
-                w2 = weightlist.pop(masslist.index(mass))
-                masslist.remove(mass)
-                for k in weight.keys():
-                    weight.update({k: w1[k] + w2[k]})
-            newmasslist.append(mass)
-            neweightlist.append(weight)
-
-            
-#Now check experimental results sensitivity to intermediate masses:
-#First get all experimental limits for each mass array
-        limits = []
-        plot = Analysis.plots[res]
-        for mass in newmasslist:
-            if not uselimits: break
-            limits.append(SMSgetlimit.GetPlotLimit(mass,plot,Analysis))
-           
-#Then check if two mass arrays with same mother and LSP masses, but with
-# different intermediate masses have similar experimental limits
-        for imass in range(len(newmasslist)-1):
-            if not uselimits: break
-            for jmass in range(imass+1,len(newmasslist)):
-                imoms = [newmasslist[imass][0][0],newmasslist[imass][1][0]]
-                ilsps = [newmasslist[imass][0][len(newmasslist[imass][0])-1],newmasslist[imass][1][len(newmasslist[imass][1])-1]]
-                jmoms = [newmasslist[jmass][0][0],newmasslist[jmass][1][0]]
-                jlsps = [newmasslist[jmass][0][len(newmasslist[jmass][0])-1],newmasslist[jmass][1][len(newmasslist[jmass][1])-1]]
-
-                limdiff = None
-                if imoms == jmoms and ilsps == jlsps:
-                    for ilim in limits[imass]:                     
-                        if not rmvunit(ilim[1],'fb') or type(ilim[1]) == type(str()): continue  #Skip non-existing histograms or None limits
-                        for jlim in limits[jmass]:
-                            if not rmvunit(jlim[1],'fb') or type(jlim[1]) == type(str()): continue
-                            if ilim[0] == jlim[0]:
-                                limdiff = max(float(abs(ilim[1]-jlim[1])/ilim[1]),limdiff)
-                                break
-                            
-#If limits differ by less than 10%, combine weights:
-#                print newmasslist[imass],newmasslist[jmass],limdiff,neweightlist[imass]
-                if limdiff != None and limdiff < 0.1:
-                    w1 = neweightlist[imass]
-                    w2 = neweightlist[jmass]
-                    for k in w1.keys():
-                        neweightlist[imass].update({k: w1[k] + w2[k]})
-#                print "neweight = ",neweightlist[imass]        
-
-#The problem is that a similar procedure has to be used when
-#combining different elements in the final res with different,
-#but equivalent intermediate masses                
-            
-            
-        for imass in range(len(newmasslist)):
-            NewTop.B[0].ElList[iel].masses.append(newmasslist[imass][0])
-            NewTop.B[1].ElList[iel].masses.append(newmasslist[imass][1])
-            NewTop.WeightList[iel].append(neweightlist[imass])
-            
-            
-
-
-#Create mass list with all mass elements in analysis:
-    Allmasses = []
-    for iel in range(len(NewTop.B[0].ElList)):
-        for imass in range(len(NewTop.B[0].ElList[iel].masses)):
-            mass = [NewTop.B[0].ElList[iel].masses[imass],NewTop.B[1].ElList[iel].masses[imass]]
-            Allmasses.append(mass)
-      
-    if len(Allmasses) == 0: 
-        return [{'mass' : [],'result' : 0., 'conditions' : []}]  #Empty result
-    
-#Remove repeated entries:
-    Allmasses2 = []
-    for imass in range(len(Allmasses)):
-        isrepeated = False      
-        for jmass in range(imass+1,len(Allmasses)):
-            if Allmasses[imass] == Allmasses[jmass]: isrepeated = True
-        if not isrepeated: Allmasses2.append(Allmasses[imass])
-
-    Allmasses = Allmasses2
-
-    
-
-#Get weight format and generate a zero weight dictionary:
-    zeroweight = {}
-    for iel in range(len(Analysis.Top.WeightList)):
-        if len(Analysis.Top.WeightList[iel]) > 0:
-            for wk in Analysis.Top.WeightList[iel][0].keys():                
-                zeroweight.update({wk : addunit(0.,'fb')})
-            break    
-        
-        
-#Replace mass list for each element by a common mass list with
-#zero weights when necessary
-    for iel in range(len(NewTop.B[0].ElList)):
-        neweightlist = []
-        for imass in range(len(Allmasses)):
-            neweightlist.append({})
-            neweightlist[imass].update(zeroweight)
-            mass = Allmasses[imass]
-            for jmass in range(len(NewTop.B[0].ElList[iel].masses)):
-                if mass == [NewTop.B[0].ElList[iel].masses[jmass],NewTop.B[1].ElList[iel].masses[jmass]]:
-                    neweightlist[imass].update(NewTop.WeightList[iel][jmass])
-                    break
-        NewTop.B[0].ElList[iel].masses = []        
-        NewTop.B[1].ElList[iel].masses = []        
-        NewTop.WeightList[iel] = []
-        for imass in range(len(Allmasses)):
-            NewTop.B[0].ElList[iel].masses.append(Allmasses[imass][0])
-            NewTop.B[1].ElList[iel].masses.append(Allmasses[imass][1])
-            NewTop.WeightList[iel].append(neweightlist[imass])
-
-
-
-#Evaluate result:
-    result = EvalRes_aux(res,NewTop)
-#Evaluate conditions:
-    conditions = EvalRes_aux(Analysis.results[res],NewTop)
+#Create a mass list with all masses appearing in the analysis which have similar branch masses:
+    Goodmasses = []
+    Top = copy.deepcopy(Analysis.Top)
+    for iel in range(len(Top.B[0].ElList)):        
+        for imass in range(len(Top.B[0].ElList[iel].masses)):
+            mass = [Top.B[0].ElList[iel].masses[imass],Top.B[1].ElList[iel].masses[imass]]
+            gmass = GoodMass(mass,MassDist,dmin)
+            if gmass:
+                 Top.B[0].ElList[iel].masses[imass] = gmass[0]
+                 Top.B[1].ElList[iel].masses[imass] = gmass[1]
+                 if not gmass in Goodmasses: Goodmasses.append(gmass)
+                 
+#Cluster masses:
+    MCluster = DoCluster(Goodmasses,MassDist,dmin)
    
-    output = []
-    for imass in range(len(Allmasses)):        
-        output.append({'mass' : Allmasses[imass], 'result' : result[imass], 'conditions' : conditions[imass]})
+#Loop over clusters to evaluate constraints and conditions inside each cluster
+    for cluster in MCluster:
+#Get masses in cluster
+        masscluster = []
+        for ic in cluster: masscluster.append(Goodmasses[ic])
+        
+#Shrink Topology elements to cluster:
+        NewTop = ClusterTop(Top,masscluster)
+
+#Now NewTop contains only elements with a common mass (replaced by the average mass)
+#Evaluate result inside cluster
+        result = Eval_cluster(res,NewTop)
+#Evaluate conditions
+        conditions = Eval_cluster(Analysis.results[res],NewTop)
+        
+#Save cluster result   
+        mavg = [NewTop.B[0].ElList[0].masses,NewTop.B[1].ElList[0].masses]
+        
+#Check if average mass is inside the cluster (exp. limit for average mass ~ exp. limit for individual masses):
+        davg = -1.
+        for mass in masscluster:
+            davg = max(davg,MassDist(mass,mavg))
+        if davg == -1. or davg > dmin:
+            print "EvalRes: Wrong clustering"
+            continue
+                
+                    
+        output.append({'mass' : mavg, 'result' : result, 'conditions' : conditions})
+        
     return output    
-    
+
+
+
+#Given a Topology and the clustered masses, return a new topology 
+#with only the elements belonging to the cluster
+#(all masses are replaced by the average mass and elements with
+#equivalent masses have their weights combined)
+def ClusterTop(Top,masscluster):
+    import copy
+
+#Compute average mass in cluster
+    mavg = MassAvg(masscluster,"harmonic")
+        
+#Keep only elements which belong to the cluster
+    NewTop = copy.deepcopy(Top)
+    NewTop.B[0].ElList = []
+    NewTop.B[1].ElList = []
+    NewTop.WeightList = []
+    for iel in range(len(Top.B[0].ElList)):
+        for imass in range(len(Top.B[0].ElList[iel].masses)):
+            mass = [Top.B[0].ElList[iel].masses[imass],Top.B[1].ElList[iel].masses[imass]]
+            ptc = [Top.B[0].ElList[iel].particles,Top.B[1].ElList[iel].particles]
+            weight = Top.WeightList[iel][imass]
+
+#If mass is in cluster, add element to NewTop:                
+            if mass in masscluster:
+                Elm = [TElement(),TElement()]
+                for ib in range(2):
+                    Elm[ib].masses = mavg[ib]
+                    Elm[ib].particles = ptc[ib]
+                match = False    
+                for iel2 in range(len(NewTop.B[0].ElList)):    
+                    ptcB = [NewTop.B[0].ElList[iel2].particles,NewTop.B[1].ElList[iel2].particles]
+                    if ptcB == ptc:
+                        match = True
+                        oldweight = NewTop.WeightList[iel2]
+                        NewTop.WeightList[iel2] = sumweights([oldweight,weight])
+                        break
+                    
+                if not match:
+                    NewTop.AddElement(Elm,weight)
+                        
+    return NewTop                        
+
 
 #Evaluates string expression in instr using the elements and weights
 #stored in InTop
-def EvalRes_aux(instr,InTop):
+def Eval_cluster(instr,InTop):
         
     outstr = instr.replace(" ","")
 #Get ordered list of elements:
@@ -939,39 +979,37 @@ def EvalRes_aux(instr,InTop):
         
 #Get list of expressions (separated by commas):
     outstrv = outstr.rsplit(",")
-    
-#Find elements in InTop corresponding to elements in El:
-    ieq =[]
+
+#Generate zeroweight entry
+    zeroweight = {}  
+    for wk in InTop.WeightList[0].keys():
+        zeroweight.update({wk : addunit(0.,'fb')})
+        
+#Find elements in InTop corresponding to elements in El and fill Elw with the respective weights: 
+    Elw = []       
     for i in range(len(El)):
+        Elw.append(zeroweight)
         for j in range(len(InTop.B[0].ElList)):
             AEl = [InTop.B[0].ElList[j].particles,InTop.B[1].ElList[j].particles]
-            if El[i] == AEl:
-                ieq.append(j)
+            if El[i] == AEl:                
+                Elw[i] = InTop.WeightList[j]
                 break
-            
-    if len(ieq) != len(El):
-        print "EvalRes_aux: Error evaluating analysis"
-        return False
-    
-#Loop through common masslist and replace element by its weight:
-    Allres = []
-    Allmasses = InTop.B[0].ElList[0].masses
-    for imass in range(len(Allmasses)):
-        resw = {}
-        for w in InTop.WeightList[0][imass].keys():
-            for j in range(len(El)):
-                if len(InTop.WeightList[ieq[j]]) != len(InTop.WeightList[0]):
-                    print "EvalRes_aux: Mismatch in Analysis.ElList"
-                    return False
-                El[j] = InTop.WeightList[ieq[j]][imass][w]
-                
-            eout = [Ceval(x,El) for x in outstrv]
+
+#Evaluate the instr expression (condition or constraint) for each weight entry:
+    result = {}        
+    Els = []
+    if len(Elw) > 0:    
+        for w in Elw[0].keys():
+            Els = [weight[w] for weight in Elw]            
+            eout = [Ceval(x,Els) for x in outstrv]        
             if len(eout) == 1: eout = eout[0]
-            resw.update({w : eout})
-        Allres.append([resw])
+            result.update({w : eout})
+    else:
+        eout = [Ceval(x,Els) for x in outstrv]
+        result = eout
         
-    return Allres      
-                
+        
+    return result      
 
 
 #Converts an element string to a nested particle list or vice-versa    
@@ -1005,10 +1043,6 @@ def eltostr(invar):
 
         return ptclist
         
-
-            
-            
-        
         
 #Defines similar function when comparing two list of numbers.
 #If any of the elements differ by < 10%, returns True
@@ -1032,4 +1066,168 @@ def Ceval(instring,El):
     return eval(run)
 
   
+
+
+
+
+
+
+##Evaluates string expression in instr using the elements and weights
+##stored in InTop
+#def EvalRes_aux(instr,InTop):
+#        
+#    outstr = instr.replace(" ","")
+##Get ordered list of elements:
+#    El = []
+#    iels = 0
+#    while "[[[" in outstr:  #String has element                
+#        st = outstr[outstr.find("[[["):outstr.find("]]]")+3] #Get duplet        
+#        ptclist = eltostr(st)     # Get particle list
+##Syntax checks:
+#        for ib in range(2):
+#            for ptcL in ptclist[ib]:
+#                for ptc in ptcL:
+#                    if not ptc in Reven.values() and not PtcDic.has_key(ptc):
+#                        print "EvalRes: Unknown particle ",ptc
+#                        return False
+#        outstr = outstr.replace(st,"El["+str(iels)+"]")  # Replace element
+#        El.append(ptclist)   #Store elements
+#        iels +=1
+#        
+##Get list of expressions (separated by commas):
+#    outstrv = outstr.rsplit(",")
+#    
+##Find elements in InTop corresponding to elements in El:
+#    ieq =[]
+#    for i in range(len(El)):
+#        for j in range(len(InTop.B[0].ElList)):
+#            AEl = [InTop.B[0].ElList[j].particles,InTop.B[1].ElList[j].particles]
+#            if El[i] == AEl:
+#                ieq.append(j)
+#                break
+#            
+#    if len(ieq) != len(El):
+#        print "EvalRes_aux: Error evaluating analysis"
+#        return False
+#    
+##Loop through common masslist and replace element by its weight:
+#    Allres = []
+#    Allmasses = InTop.B[0].ElList[0].masses
+#    for imass in range(len(Allmasses)):
+#        resw = {}
+#        for w in InTop.WeightList[0][imass].keys():
+#            for j in range(len(El)):
+#                if len(InTop.WeightList[ieq[j]]) != len(InTop.WeightList[0]):
+#                    print "EvalRes_aux: Mismatch in Analysis.ElList"
+#                    return False
+#                El[j] = InTop.WeightList[ieq[j]][imass][w]
+#                
+#            eout = [Ceval(x,El) for x in outstrv]
+#            if len(eout) == 1: eout = eout[0]
+#            resw.update({w : eout})
+#        Allres.append([resw])
+#        
+#    return Allres  
+
+##Replace mass array by its binned equivalent using the information
+##in binpars:
+#def BinMass(mass,binpars=[addunit(20.,'GeV'),addunit(20.,'GeV'),addunit(0.,'GeV'),addunit(0.,'GeV')]):
+#    
+#    newmass = [[],[]]
+#    for ib in range(2):
+#        for imass in range(len(mass[ib])):
+#            if imass < len(mass[ib])-1:  #Parameters for mx (mother and intermediate masses)
+#                binw = binpars[0]
+#                mmin = binpars[2]
+##                if imass > 0: binw = 50.  #Larger bin for intermediate masses
+#            else:                        #Parameters for LSP
+#                binw = binpars[1]
+#                mmin = binpars[3]
+#            Nbins = int((mass[ib][imass]-mmin)/binw)
+#            newmass[ib].append(Nbins*binw + mmin + binw/2.)
+#            
+#    return newmass       
+
+##Replace LSP and mother masses by its binned equivalent using the information
+##in binpars (do not modify intermediate masses):
+#def BinMass2(mass,binpars=[addunit(20.,'GeV'),addunit(20.,'GeV'),addunit(0.,'GeV'),addunit(0.,'GeV')]):
+#    
+#    newmass = [[],[]]
+#    for ib in range(2):
+#        for imass in range(len(mass[ib])):
+#            if imass == 0:                     #Parameters for mother
+#                binw = binpars[0]
+#                mmin = binpars[2]
+#            elif imass == len(mass[ib])-1:       #Parameters for LSP
+#                binw = binpars[1]
+#                mmin = binpars[3]
+#            else:
+#                binw = addunit(0.,'GeV')
+#                
+#            if binw != addunit(0.,'GeV'):                   
+#                Nbins = int((mass[ib][imass]-mmin)/binw)
+#                newmass[ib].append(Nbins*binw + mmin + binw/2.)
+#            else:
+#                newmass[ib].append(mass[ib][imass])
+#            
+#    return newmass
     
+    
+    
+##Insert element to ElLists. If element already exists, add weights, otherwise return False.
+##If sim = True, use SimParticles to compare particles, otherwise use equal particles
+##If sim = True, use nested mass and weightlist
+##OBS: input must be given with the correct branch ordering!
+#    def InsElement(self, NewElement, weight = {}, sim = False):
+#    
+#        anyptcmatch = False
+#        for iel in range(len(self.B[0].ElList)):
+#            oldptcs = [self.B[0].ElList[iel].particles,self.B[1].ElList[iel].particles]
+#            newptcs = [NewElement[0].particles,NewElement[1].particles]
+#            newmass = [NewElement[0].masses,NewElement[1].masses]
+##Check if particles match
+#            if not sim:
+#                ptcmatch = (newptcs == oldptcs)
+#            else:
+#                ptcmatch = SimParticles(newptcs,oldptcs)
+#                
+#            if not ptcmatch: continue
+#            
+#            anyptcmatch = True
+#        
+##Loop over nested mass list in Analysis element and check if masses match:                
+#            massmatch = False
+#            if len(self.B[0].ElList[iel].masses) > 0:
+#                if not type(self.B[0].ElList[iel].masses) == type(list()):   #Only one mass (no nested list)
+#                    oldmass = [self.B[0].ElList[iel].masses,self.B[1].ElList[iel].masses]
+#                    massmatch = (newmass == oldmass)
+#                else:   #Nested mass list
+#                    massmatch = -1
+#                    for imass in range(len(self.B[0].ElList[iel].masses)):
+#                        oldmass = [self.B[0].ElList[iel].masses[imass],self.B[1].ElList[iel].masses[imass]]
+#                        if (newmass == oldmass):
+#                            massmatch = imass
+#                            break
+#                        
+#            if not massmatch or massmatch 
+#                        
+#                        
+##Check if elements match (with identical masses) and  add weight
+#                    if SimEls(NewEl_a,OldEl) or SimEls(NewEl_b,OldEl):
+#                        massmatch = True
+#                        Analysis.Top.WeightList[jel][imass] = sumweights([Analysis.Top.WeightList[jel][imass],weight])
+
+##If particles match, but not masses, add element to nested 
+## mass list and nested weight list
+##(check for both branch orderings. If both match, add both mass orderings):
+#                if not massmatch:
+#                    if SimParticles(newptcs_a,oldptcs):
+#                        for ib in range(2):
+#                            Analysis.Top.B[ib].ElList[jel].masses.append(NewEl_a[ib].masses)                            
+#                        Analysis.Top.WeightList[jel].append(weight)
+#                        massmatch = True
+#                    if SimParticles(newptcs_b,oldptcs) and (not massmatch or NewEl_b[0].masses != NewEl_b[1].masses):
+#                        for ib in range(2):
+#                            Analysis.Top.B[ib].ElList[jel].masses.append(NewEl_b[ib].masses)
+#                        Analysis.Top.WeightList[jel].append(weight)
+#   
