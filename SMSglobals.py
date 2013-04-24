@@ -8,6 +8,7 @@ def initglob():
     global evcount,nComp,nInvis
     global minmassgap
     global DoCompress, DoInvisible
+    global DistAnalyses
 
     DoCompress = False     #Flag to turn on/off compression
     DoInvisible = False    #Flag to turn on/off invisible compression
@@ -15,5 +16,6 @@ def initglob():
     nComp = 0              #Counter for mass compressed topologies
     nInvis = 0             #Counter for invisible compressed topologies
     minmassgap = 1.         #Minimum mass gap (for compression)
+    DistAnalyses = ""      #List of analyses used to compute mass distances (used by MassDist function)
     
     ListOfAnalyses = []  #Initialize list of analyses

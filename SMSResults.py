@@ -205,7 +205,7 @@ def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None, interp
   if rmvunit(mx,'GeV') == None:
     return histo
   value=SMSHelpers.getUpperLimitAtPoint ( histo, mx, my, interpolate=interpolate )
-  return SMSHelpers.addunit ( value, "fb" )
+  return SMSHelpers.addunit ( value, "pb" )
 
 def getEfficiency ( analysis, topo, mx=None, my=None, run=None ):
   """ get the efficiency for run/analysis/topo.
