@@ -165,13 +165,15 @@ def getInterpolatedUpperLimit ( Dict, mx, my ):
   #print "[SMSResults.py] debug closest value is",getClosestValue ( Dict,mx,my)
   # Large=99999.
   # Neighbors=[ [Large,0.],[Large,0.],[Large,0.],[Large,0.] ]
+  Neighbors=[]
   for (dmx,dmv) in Dict.items():
     for (dmy,ul) in dmv.items():
       dist= (dmx-mx)**2 + (dmy-my)**2 
+      if dist==0.: return ul
       Neighbors.append ( [ dist, ul ] )
   Neighbors.sort()
   Neighbors=Neighbors[:4]
-  ret=sum( [ y for (x,y) in Neighbors ] ) / len ( Neighbors )
+  ret=sum( [ y/x for (x,y) in Neighbors ] ) / sum( [ 1./x for (x,y) in Neighbors ] )
   #print "interpolating",Neighbors,ret
   return ret
 
