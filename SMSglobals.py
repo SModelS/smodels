@@ -1,4 +1,5 @@
 #Define some global variables
+from SMSHelpers import addunit
 
 ListOfAnalyses=[]
 
@@ -15,7 +16,7 @@ def initglob():
     evcount = 0
     nComp = 0              #Counter for mass compressed topologies
     nInvis = 0             #Counter for invisible compressed topologies
-    minmassgap = 1.         #Minimum mass gap (for compression)
+    minmassgap = addunit(10.,'GeV')        #Minimum mass gap (for mass compression)
     DistAnalyses = ""      #List of analyses used to compute mass distances (used by MassDist function)
     
     ListOfAnalyses = []  #Initialize list of analyses
