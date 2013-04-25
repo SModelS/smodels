@@ -186,6 +186,12 @@ def constraints ( analysis, run ):
   """ get all the conditions for a analysis/run pair """
   return getLines ( analysis, run, "constraint" )
 
+def getPotentialNames ( topo ):
+  """ If T6bbww doesnt yield a result, try T6bbWW, etc """
+  ret = [ topo ]
+  ret.append ( topo.replace("w","W").replace("z","Z" ) )
+  ret.append ( topo.replace("W","w").replace("Z","z" ) )
+  return ret
 
 def getUpperLimitHisto ( analysis, topo, run, complain=False ):
   import ROOT
