@@ -4,10 +4,10 @@
 
 import os
 
+Base = "/afs/hephy.at/user/w/walten/public/sms/"
+
 if 'lessa' in os.getcwd():
     Base = "/home/lessa/SMS_database/"
-else:
-    Base = "/afs/hephy.at/user/w/walten/public/sms/"
 
 runs=[ "8TeV", "2012", "2011", "ATLAS8TeV" ]
 ## runs=[ "2012" ]
@@ -192,6 +192,11 @@ def getPotentialNames ( topo ):
   ret.append ( topo.replace("w","W").replace("z","Z" ) )
   ret.append ( topo.replace("W","w").replace("Z","z" ) )
   return ret
+
+def getCanonicalName ( topo ):
+  """ define a canonical name: w and z's are uppercase letters, etc """
+  topo=topo.replace("w","W").replace("z","Z" )
+  return topo
 
 def getUpperLimitHisto ( analysis, topo, run, complain=False ):
   import ROOT
