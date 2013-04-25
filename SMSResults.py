@@ -43,8 +43,9 @@ def getExclusion ( analysis, topo, run=None ):
       for the summary plots """
   run=SMSHelpers.getRun ( analysis, run )
   ex=SMSHelpers.motherParticleExclusions ( analysis, run )
-  if not ex.has_key ( topo ): return None
-  return ex[topo]
+  for t in SMSHelpers.getPotentialNames ( topo ):
+    if ex.has_key ( topo ): return ex[topo]
+  return None
 
 def exists ( analysis, topo, run=None ):
   """ does a result for analysis/topo/run exist? """
