@@ -299,81 +299,111 @@ def getEventTop(PList, weight = {}):
 #        print "getEventTop: Error reading event!"
 #        return False
 #    else:
-    ETopList.append(ETop)
-        
-        
-#Check for compressed topologies:
-    if SMSglobals.DoCompress:
-        ETopComp = GTop()
-        neweight = {}
-        neweight.update(weight)
-        ETopComp.WeightList.append(neweight)
-        Comp = False
-#Loop over branches        
-        for ib in range(2):
-            ETopComp.B[ib].ElList.append(TElement())            
-            for i in range(len(ETop.B[ib].ElList[0].masses)):
-                massA = ETop.B[ib].ElList[0].masses[i]
-                if i < len(ETop.B[ib].ElList[0].masses)-1:
-                    massB = ETop.B[ib].ElList[0].masses[i+1]
-                    if abs(massA-massB) < SMSglobals.minmassgap:
-                        Comp  = True
-                        continue           #If compressed, skip this vertex
-              
-                ETopComp.B[ib].ElList[0].masses.append(massA) 
-                vertparts = ETop.B[ib].vertparts
-                ptcs = ETop.B[ib].ElList[0].particles[sum(vertparts[:i]):sum(vertparts[:i+1])]
-                for ptc in ptcs:
-                    ETopComp.B[ib].ElList[0].particles.append(ptc)
-                ETopComp.B[ib].vertnumb += 1
-                ETopComp.B[ib].vertparts.append(len(ptcs))               
-        if Comp:
-            SMSglobals.nComp += 1
-            ETopList.append(ETopComp)
+    ETopList.append(ETop)        
+    added = True
+    
+#Keep compressing the topologies generated so far until no new compressions can happen:
+    while added:        
+        added = False
+#Check for mass compressed topologies        
+        if SMSglobals.DoCompress:
+            for Top in ETopList:
+                ETopComp = False
+                ETopComp = MassCompTop(Top,SMSglobals.minmassgap)
+                if ETopComp:
+                    exists = False
+                    for Topp in ETopList:
+                        if EqualTops(Topp,ETopComp): exists = True 
+                    if not exists:   #Avoid double counting (conservative)
+                        SMSglobals.nComp += 1
+                        ETopList.append(ETopComp)
+                        added = True
+            
+#Check for invisible compressed topologies 
+#(look for effective LSP, such as LSP + neutrino = LSP')          
+        if SMSglobals.DoInvisible:
+            for Top in ETopList:
+                ETopInComp = False
+                ETopInComp = InvCompTop(Top)
+                if ETopInComp:
+                    exists = False
+                    for Topp in ETopList:
+                        if EqualTops(Topp,ETopInComp): exists = True
+                    if not exists:   #Avoid double counting (conservative)
+                        SMSglobals.nInvis += 1
+                        ETopList.append(ETopInComp)
+                        added = True
+    return ETopList
 
-                
-            
-            
-#Check for effective LSPs (LSP + neutrino = LSP'):                   
-    if SMSglobals.DoInvisible:
-        ETopIComp = GTop()
-        neweight = {}
-        neweight.update(weight)
-        ETopIComp.WeightList.append(neweight)
-        if SMSglobals.DoCompress:  #Do invisible compression+mass compression
-            ETopIComp = ETopComp
-        else:    
-            ETopIComp = ETop        #or just invisble compression
-        Icomp = False
+
+#If two masses in InTop are degenerate, return compressed topology
+def MassCompTop(InTop,mingap):
+    import copy    
+       
+    ETopComp = copy.deepcopy(InTop)  
 #Loop over branches        
-        for ib in range(2):
-            nnu = 0
-            ptcs = ETopIComp.B[ib].ElList[0].particles
-            i = len(ptcs)-1
-            nnu = 0
-            while i >= 0 and ptcs[i] == 'nu':   #Count number of nus emitted at the end of the cascade decay
-                nnu += 1
-                i -= 1
-            ilsp = ETopIComp.B[ib].vertnumb    #Position of effective LSP
-            vertin = ETopIComp.B[ib].vertparts[ilsp-1]
-            while nnu >= vertin and ilsp >= 1:                            
-                ilsp -= 1
-                vertin += ETopIComp.B[ib].vertparts[ilsp-1]
+    for ib in range(2):
+        if ETopComp.B[ib].vertnumb < 2: continue
+#Remove all external particles between compressed masses          
+        for ivert in range(ETopComp.B[ib].vertnumb-1):
+            massA = ETopComp.B[ib].ElList[0].masses[ivert]
+            massB = ETopComp.B[ib].ElList[0].masses[ivert+1]
+            if abs(massA-massB) < mingap:
+                ETopComp.B[ib].ElList[0].particles[ivert] = []
+                ETopComp.B[ib].vertparts[ivert] = 0
                 
-   
-            if ilsp < ETopIComp.B[ib].vertnumb-1:
-                Icomp = True    
-                ETopIComp.B[ib].vertnumb = ilsp + 1
-                ETopIComp.B[ib].vertparts = ETopIComp.B[ib].vertparts[:ilsp]
-                ETopIComp.B[ib].vertparts.append(0)
-                ETopIComp.B[ib].ElList[0].particles = ptcs[:sum(ETopIComp.B[ib].vertparts)]
-                ETopIComp.B[ib].ElList[0].masses = ETopIComp.B[ib].ElList[0].masses[:ilsp+1]
+#Remove all vertices and masses with zero particle emissions:
+        while ETopComp.B[ib].vertparts.count(0) > 1:
+            ivert = ETopComp.B[ib].vertparts.index(0)
+            ETopComp.B[ib].vertnumb -= 1
+            massA = ETopComp.B[ib].vertparts.pop(ivert) 
+            massA = ETopComp.B[ib].ElList[0].masses.pop(ivert)
+            massA = ETopComp.B[ib].ElList[0].particles.pop(ivert)    
                 
-        if Icomp:
-            SMSglobals.nInvis += 1
-            ETopList.append(ETopIComp)
             
-    return ETopList           
+    if not EqualTops(ETopComp,InTop):
+        return ETopComp
+    else:
+        return False
+
+
+            
+            
+#If InTop has an effective LSPs (LSP + neutrino = LSP'), return compressed topology
+def InvCompTop(InTop):
+    import copy    
+    
+      
+    ETopComp = copy.deepcopy(InTop)
+#Loop over branches        
+    for ib in range(2):
+        if ETopComp.B[ib].vertnumb < 2: continue
+#Remove all external neutrinos        
+        for ivert in range(ETopComp.B[ib].vertnumb):
+            if ETopComp.B[ib].vertparts[ivert] > 0:
+                ptcs = ETopComp.B[ib].ElList[0].particles[ivert]
+                while ptcs.count('nu') > 0: ptcs.remove('nu')   #Delete neutrinos                
+                ETopComp.B[ib].ElList[0].particles[ivert] = ptcs
+                ETopComp.B[ib].vertparts[ivert] = len(ptcs)
+                
+                
+#First first non-empty vertex at the end of the branch
+        inv  = ETopComp.B[ib].vertnumb-1
+        while inv > 0 and ETopComp.B[ib].vertparts[inv-1] == 0: inv -= 1
+#Remove empty vertices at the end of the branch:
+        ETopComp.B[ib].vertnumb = inv + 1
+        ETopComp.B[ib].vertparts = InTop.B[ib].vertparts[0:inv]
+        ETopComp.B[ib].vertparts.append(0)
+        ETopComp.B[ib].ElList[0].particles = InTop.B[ib].ElList[0].particles[0:inv]
+        ETopComp.B[ib].ElList[0].masses = InTop.B[ib].ElList[0].masses[0:inv+1]
+        
+
+    if not EqualTops(ETopComp,InTop):
+        return ETopComp
+    else:
+        return False
+          
+         
                 
                 
      
@@ -1067,167 +1097,3 @@ def Ceval(instring,El):
 
   
 
-
-
-
-
-
-##Evaluates string expression in instr using the elements and weights
-##stored in InTop
-#def EvalRes_aux(instr,InTop):
-#        
-#    outstr = instr.replace(" ","")
-##Get ordered list of elements:
-#    El = []
-#    iels = 0
-#    while "[[[" in outstr:  #String has element                
-#        st = outstr[outstr.find("[[["):outstr.find("]]]")+3] #Get duplet        
-#        ptclist = eltostr(st)     # Get particle list
-##Syntax checks:
-#        for ib in range(2):
-#            for ptcL in ptclist[ib]:
-#                for ptc in ptcL:
-#                    if not ptc in Reven.values() and not PtcDic.has_key(ptc):
-#                        print "EvalRes: Unknown particle ",ptc
-#                        return False
-#        outstr = outstr.replace(st,"El["+str(iels)+"]")  # Replace element
-#        El.append(ptclist)   #Store elements
-#        iels +=1
-#        
-##Get list of expressions (separated by commas):
-#    outstrv = outstr.rsplit(",")
-#    
-##Find elements in InTop corresponding to elements in El:
-#    ieq =[]
-#    for i in range(len(El)):
-#        for j in range(len(InTop.B[0].ElList)):
-#            AEl = [InTop.B[0].ElList[j].particles,InTop.B[1].ElList[j].particles]
-#            if El[i] == AEl:
-#                ieq.append(j)
-#                break
-#            
-#    if len(ieq) != len(El):
-#        print "EvalRes_aux: Error evaluating analysis"
-#        return False
-#    
-##Loop through common masslist and replace element by its weight:
-#    Allres = []
-#    Allmasses = InTop.B[0].ElList[0].masses
-#    for imass in range(len(Allmasses)):
-#        resw = {}
-#        for w in InTop.WeightList[0][imass].keys():
-#            for j in range(len(El)):
-#                if len(InTop.WeightList[ieq[j]]) != len(InTop.WeightList[0]):
-#                    print "EvalRes_aux: Mismatch in Analysis.ElList"
-#                    return False
-#                El[j] = InTop.WeightList[ieq[j]][imass][w]
-#                
-#            eout = [Ceval(x,El) for x in outstrv]
-#            if len(eout) == 1: eout = eout[0]
-#            resw.update({w : eout})
-#        Allres.append([resw])
-#        
-#    return Allres  
-
-##Replace mass array by its binned equivalent using the information
-##in binpars:
-#def BinMass(mass,binpars=[addunit(20.,'GeV'),addunit(20.,'GeV'),addunit(0.,'GeV'),addunit(0.,'GeV')]):
-#    
-#    newmass = [[],[]]
-#    for ib in range(2):
-#        for imass in range(len(mass[ib])):
-#            if imass < len(mass[ib])-1:  #Parameters for mx (mother and intermediate masses)
-#                binw = binpars[0]
-#                mmin = binpars[2]
-##                if imass > 0: binw = 50.  #Larger bin for intermediate masses
-#            else:                        #Parameters for LSP
-#                binw = binpars[1]
-#                mmin = binpars[3]
-#            Nbins = int((mass[ib][imass]-mmin)/binw)
-#            newmass[ib].append(Nbins*binw + mmin + binw/2.)
-#            
-#    return newmass       
-
-##Replace LSP and mother masses by its binned equivalent using the information
-##in binpars (do not modify intermediate masses):
-#def BinMass2(mass,binpars=[addunit(20.,'GeV'),addunit(20.,'GeV'),addunit(0.,'GeV'),addunit(0.,'GeV')]):
-#    
-#    newmass = [[],[]]
-#    for ib in range(2):
-#        for imass in range(len(mass[ib])):
-#            if imass == 0:                     #Parameters for mother
-#                binw = binpars[0]
-#                mmin = binpars[2]
-#            elif imass == len(mass[ib])-1:       #Parameters for LSP
-#                binw = binpars[1]
-#                mmin = binpars[3]
-#            else:
-#                binw = addunit(0.,'GeV')
-#                
-#            if binw != addunit(0.,'GeV'):                   
-#                Nbins = int((mass[ib][imass]-mmin)/binw)
-#                newmass[ib].append(Nbins*binw + mmin + binw/2.)
-#            else:
-#                newmass[ib].append(mass[ib][imass])
-#            
-#    return newmass
-    
-    
-    
-##Insert element to ElLists. If element already exists, add weights, otherwise return False.
-##If sim = True, use SimParticles to compare particles, otherwise use equal particles
-##If sim = True, use nested mass and weightlist
-##OBS: input must be given with the correct branch ordering!
-#    def InsElement(self, NewElement, weight = {}, sim = False):
-#    
-#        anyptcmatch = False
-#        for iel in range(len(self.B[0].ElList)):
-#            oldptcs = [self.B[0].ElList[iel].particles,self.B[1].ElList[iel].particles]
-#            newptcs = [NewElement[0].particles,NewElement[1].particles]
-#            newmass = [NewElement[0].masses,NewElement[1].masses]
-##Check if particles match
-#            if not sim:
-#                ptcmatch = (newptcs == oldptcs)
-#            else:
-#                ptcmatch = SimParticles(newptcs,oldptcs)
-#                
-#            if not ptcmatch: continue
-#            
-#            anyptcmatch = True
-#        
-##Loop over nested mass list in Analysis element and check if masses match:                
-#            massmatch = False
-#            if len(self.B[0].ElList[iel].masses) > 0:
-#                if not type(self.B[0].ElList[iel].masses) == type(list()):   #Only one mass (no nested list)
-#                    oldmass = [self.B[0].ElList[iel].masses,self.B[1].ElList[iel].masses]
-#                    massmatch = (newmass == oldmass)
-#                else:   #Nested mass list
-#                    massmatch = -1
-#                    for imass in range(len(self.B[0].ElList[iel].masses)):
-#                        oldmass = [self.B[0].ElList[iel].masses[imass],self.B[1].ElList[iel].masses[imass]]
-#                        if (newmass == oldmass):
-#                            massmatch = imass
-#                            break
-#                        
-#            if not massmatch or massmatch 
-#                        
-#                        
-##Check if elements match (with identical masses) and  add weight
-#                    if SimEls(NewEl_a,OldEl) or SimEls(NewEl_b,OldEl):
-#                        massmatch = True
-#                        Analysis.Top.WeightList[jel][imass] = sumweights([Analysis.Top.WeightList[jel][imass],weight])
-
-##If particles match, but not masses, add element to nested 
-## mass list and nested weight list
-##(check for both branch orderings. If both match, add both mass orderings):
-#                if not massmatch:
-#                    if SimParticles(newptcs_a,oldptcs):
-#                        for ib in range(2):
-#                            Analysis.Top.B[ib].ElList[jel].masses.append(NewEl_a[ib].masses)                            
-#                        Analysis.Top.WeightList[jel].append(weight)
-#                        massmatch = True
-#                    if SimParticles(newptcs_b,oldptcs) and (not massmatch or NewEl_b[0].masses != NewEl_b[1].masses):
-#                        for ib in range(2):
-#                            Analysis.Top.B[ib].ElList[jel].masses.append(NewEl_b[ib].masses)
-#                        Analysis.Top.WeightList[jel].append(weight)
-#   

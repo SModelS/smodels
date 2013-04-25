@@ -15,7 +15,6 @@ SMSanalyses.load()
 #Generate events and compute cross-sections:
 nevts = 10000
 slhafile = "AndreSLHA/andrePT4.slha"
-#slhafile = "AndreSLHA/testpt4.slha"
 Wv = SMSxsec.pytinit(nevts,slhafile,rpythia = True, donlo = True)
 W = Wv["Wdic"]
 lhefile = Wv["lhefile"]
@@ -72,7 +71,7 @@ for i in range(len(SMSTopList)):
 print "Number of Global topologies = ",len(SMSTopList)          
 print(EvTop_table)
 print "Total Number of Elements = ",eltot
-#print(EvElement_table)
+print(EvElement_table)
 
 print '\n \n \n'
 
