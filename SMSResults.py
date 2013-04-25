@@ -44,7 +44,7 @@ def getExclusion ( analysis, topo, run=None ):
   run=SMSHelpers.getRun ( analysis, run )
   ex=SMSHelpers.motherParticleExclusions ( analysis, run )
   for t in SMSHelpers.getPotentialNames ( topo ):
-    if ex.has_key ( topo ): return ex[topo]
+    if ex.has_key ( t ): return ex[t]
   return None
 
 def exists ( analysis, topo, run=None ):
