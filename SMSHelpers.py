@@ -9,7 +9,7 @@ Base = "/afs/hephy.at/user/w/walten/public/sms/"
 if 'lessa' in os.getcwd():
     Base = "/home/lessa/SMS_database/"
 
-runs=[ "8TeV", "2012", "2011", "ATLAS8TeV" ]
+runs=[ "8TeV", "2012", "ATLAS8TeV", "2011" ]
 ## runs=[ "2012" ]
 
 verbose=True
