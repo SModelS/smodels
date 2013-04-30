@@ -422,7 +422,7 @@ def exists(analysis, topo, run = None):
   hasDict=SMSHelpers.hasDictionary ( analysis, run2 )
   if hasDict:
     histo=SMSHelpers.getUpperLimitDictionary ( analysis, topo, run2 )
-    if not hist or len(histo)==0: return False
+    if not histo or len(histo)==0: return False
     return True
   histo=SMSHelpers.getUpperLimitHisto(analysis, topo, run2 )
   if not histo: return False
