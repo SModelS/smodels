@@ -148,8 +148,7 @@ def getAllResults ( run=None ):
 
 def getClosestValue ( Dict, mx, my ):
   """ assuming that Dict is a dictionary of mx,my,ul, get the upper limit
-      of the point in Dict that is closest to mx and my. Later we will interpolate
-      """
+      of the point in Dict that is closest to mx and my. """
   import math
   closest=9999999
   retul=None
@@ -188,6 +187,11 @@ def getUpperLimitFromDictionary ( analysis, topo, mx=None, my=None, run=None, pn
   if mx==None: return Dict
   ## return getClosestValue ( Dict, mx, my )
   return getInterpolatedUpperLimit ( Dict, mx, my )
+ 
+def getSmartUpperLimit ( analysis, topo, masses, massesbranch2=None ):
+  """ returns the upper limit for analysis/topo, given an ordered sequence of
+      the mass (mother, intermediate, LSP) """
+  return getUpperLimit ( analysis, topo, mx=masses[0], my=masses[-1], interpolate=True )
 
 def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False ):
   """ get the upper limit for run/analysis/topo.
