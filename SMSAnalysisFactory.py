@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 
+
+def getRealTopo ( Tx ):
+  """ T3w025 -> T3w, etc """
+  ret=Tx
+  ret.replace("050","").replace("x1C180","").replace("025","")
+  if ret.find("x")>-1: ret=ret[:ret.find("x")]
+  return ret
+
 def getArray ( constraint ):
   """ a helper method that is intended to be used to make it possible
       to extract the number of vertices, branches, and insertions from
@@ -34,11 +42,14 @@ def load():
       #print "Create analysis object for",analysis,Tx
       Analysis = EAnalysis()
       Analysis.sqrts=SMSResults.getSqrts( analysis )
-      Analysis.label = analysis+":"+Tx
+      stopo=getRealTopo ( Tx )
+      Analysis.label = analysis+":"+stopo
       Analysis.masscomp = 0.2
       Analysis.run = SMSResults.getRun ( analysis ) ##  "2012"
-      constraint=SMSResults.getConstraints ( analysis, topo=Tx )
-      if not constraint: continue
+      constraint=SMSResults.getConstraints ( analysis, topo=stopo )
+      if not constraint: 
+        print "dont have a constraint for",analysis,Tx,"(",stopo,")"
+        continue
       #print "constraint >>%s<<" % constraint
       constrarray=getArray ( constraint )
       #print "array >>%s<<" % constrarray
@@ -50,16 +61,17 @@ def load():
         Analysis.Top.B[branch].vertparts = vertparts1
         #print vertparts1
       
-      cond=SMSResults.getConditions ( analysis, topo=Tx )
+      cond=SMSResults.getConditions ( analysis, topo=stopo )
+      if cond==None: cond=""
       ## andreconstraint=constraint.replace("'","").replace("[[[","[[").replace("]]]","]]").replace(" ","")
       andreconstraint=constraint.replace("'","").replace(" ","")
       #print "constraint=",constrarray,andreconstraint
       andrecond=cond.replace("'","").replace(" ","")
       #print "cond=",cond
       Analysis.results={ andreconstraint: andrecond }
-      analyses=[ x for x in SMSResults.getAnalyses ( Tx ) if SMSResults.getConditions ( x ).has_key(Tx) and SMSResults.getConditions ( x )[Tx] == cond ]
+      analyses=[ x for x in SMSResults.getAnalyses ( stopo ) if SMSResults.getConditions ( x ).has_key(stopo) and SMSResults.getConditions ( x )[stopo] == cond ]
       #print "analyses= ",analyses
-      Analysis.plots = { andreconstraint: [ Tx, analyses ] }
+      Analysis.plots = { andreconstraint: [ stopo, analyses ] }
       
   #Add analysis to list of analyses:
       SMSglobals.ListOfAnalyses.append(Analysis)
@@ -77,5 +89,5 @@ if __name__ == "__main__":
   import SMSglobals
   load()
   print "List of analyses/results: "
-  for ana in SMSglobals.ListOfAnalyses:
-    print ana.label # .label,ana.sqrts
+  for (ct,ana) in enumerate(SMSglobals.ListOfAnalyses):
+    print ct,ana.label # .label,ana.sqrts
