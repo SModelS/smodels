@@ -45,6 +45,7 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
     
     
     if process=='st' and o[1]=='T' and Energy == 7:
+        print Values_7TeV
         return Values_7TeV
     elif process=='st' and o[1]=='T' and Energy == 8:
         return Values_8TeV
@@ -180,26 +181,26 @@ def getNLLresult(pdgid1,pdgid2,inputfile):
 
 
     
-    if pdgid1 == pdgid2 == 1000005:
+    if abs(pdgid1) == pdgid2 == 1000005:
         squarkmass = abs(readfile[1][1000005].mass)
         Values_7TeV = getNLLfast('st',pdf,squarkmass,gluinomass,7)
         Values_8TeV = getNLLfast('st',pdf,squarkmass,gluinomass,8)
         output = [Values_7TeV,Values_8TeV]
 
 
-    if pdgid1 == pdgid2 == 2000005:
+    if abs(pdgid1) == pdgid2 == 2000005:
         squarkmass = abs(readfile[1][2000005].mass)
         Values_7TeV = getNLLfast('st',pdf,squarkmass,gluinomass,7)
         Values_8TeV = getNLLfast('st',pdf,squarkmass,gluinomass,8)
         output = [Values_7TeV,Values_8TeV]
         
-    if pdgid1 == pdgid2 == 1000006:
+    if abs(pdgid1) == pdgid2 == 1000006:
         squarkmass = abs(readfile[1][1000006].mass)
         Values_7TeV = getNLLfast('st',pdf,squarkmass,gluinomass,7)
         Values_8TeV = getNLLfast('st',pdf,squarkmass,gluinomass,8)
         output = [Values_7TeV,Values_8TeV]
 
-    if pdgid1 == pdgid2 == 2000006:
+    if abs(pdgid1) == pdgid2 == 2000006:
         squarkmass = abs(readfile[1][2000006].mass)
         Values_7TeV = getNLLfast('st',pdf,squarkmass,gluinomass,7)
         Values_8TeV = getNLLfast('st',pdf,squarkmass,gluinomass,8)
