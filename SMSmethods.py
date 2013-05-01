@@ -448,11 +448,18 @@ def EqualEls(El1,El2,order=True):
         if type(El2) != type(list()): return False
         if type(El2[0]) != type(TElement()): return False
         if len(El1) == 2 and not order:
-            El1_b = [TElement(),TElement()]
-            for ib in range(2):
-                El1_b[ib].masses = El1[(1+ib)%2].masses
-                El1_b[ib].particles = El1[(1+ib)%2].particles                
-                if (El1[ib].particles != El2[ib].particles or El1[ib].masses != El2[ib].masses) and (El1_b[ib].particles != El2[ib].particles or El1_b[ib].masses != El2[ib].masses): return False
+            ptcsA = [El2[0].particles,El2[1].particles]
+            massA = [El2[0].masses,El2[1].masses]
+            ptcs = [El1[0].particles,El1[1].particles]
+            mass = [El1[0].masses,El1[1].masses]
+            ptcs_b = [El1[1].particles,El1[0].particles]
+            mass_b = [El1[1].masses,El1[0].masses]
+            if ptcsA == ptcs and mass == massA: 
+                return True
+            elif ptcsA == ptcs_b and mass_b == massA: 
+                return True
+            else:
+                return False
         else:       
             for i in range(len(El1)):
                 if El1[i].particles != El2[i].particles: return False
