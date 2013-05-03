@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 def getRealTopo ( Tx ):
   """ T3w025 -> T3w, etc """
   ret=Tx
@@ -32,7 +31,11 @@ def load():
   from SMSmethods import EAnalysis
   import SMSResults, SMSglobals
 
-  debug=True
+  debug=False
+  if debug:
+    SMSResults.verbosity ( "info" )
+  else:
+    SMSResults.verbosity ( "error" )
   #anas=[ "alphaT", "RA48TeV", "RA2b8TeV", "Weakinos8TeV", "alphaT8TeV", "ATLAS_CONF_2013-024" ]
   anas=SMSResults.getAllResults().keys()
   for analysis in anas:
@@ -74,6 +77,10 @@ def load():
       analyses=[ x for x in SMSResults.getAnalyses ( stopo ) if SMSResults.getConditions ( x ).has_key(stopo) and SMSResults.getConditions ( x )[stopo] == cond ]
       #print "analyses= ",analyses
       Analysis.plots = { andreconstraint: [ stopo, analyses ] }
+
+      print "[SMSAnalysisFactory] test: get upper limit"
+      ul=SMSResults.getUpperLimit ( analysis, Tx, mx=400., my=100., interpolate=True )
+      print "[SMSAnalysisFactory] test: ul=",ul
       
   #Add analysis to list of analyses:
       SMSglobals.ListOfAnalyses.append(Analysis)
@@ -85,7 +92,7 @@ def load():
   for Analy in SMSglobals.ListOfAnalyses:
     #print "Generate",Analy.label
     Analy.GenerateElements()
-    Analy.GetPlots(True)
+    Analy.GetPlots(verbose=debug)
     
 if __name__ == "__main__":
   import SMSglobals
