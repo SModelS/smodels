@@ -295,6 +295,30 @@ def getx ( analysis, topo=None, run=None ):
        
   return d
 
+def getaxes (analysis, topo=None, run=None):
+  st = SMSHelpers.getMetaInfoField (analysis, "axes", run)
+  if not st: return None
+  st = st.split(',')
+  d = {}
+  for i in range(len(st)):
+    l = st[i].split(':')
+    d[l[0]] = []
+    m = l[1].split('-')
+    for j in range(len(m)):
+      n = m[j].split()
+      if len(n)==2:
+	d[l[0]].append({'mx': n[0], 'my': n[1], 'mz': None})
+      else: d[l[0]].append({'mx': n.pop(0), 'my': n.pop(1), 'mz': n})
+      
+  if topo:
+    topo = topo.replace(" ","")
+    if not d or not d.has_key ( topo ): return None
+    else: return d[topo]
+
+  return d 
+	
+      
+	
 def getFigures ( analysis, run=None ):
   """ get the figure number for this analysis """
   return SMSHelpers.getMetaInfoField ( analysis, "figures", run )
