@@ -50,7 +50,7 @@ def getExclusion ( analysis, topo, run=None ):
 def exists ( analysis, topo, run=None ):
   """ does a result for analysis/topo/run exist? """
   run=SMSHelpers.getRun ( analysis, run )
-  histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
+  histo=SMSHelpers.getUpperLimitFromHisto ( analysis, topo, run )
   return histo!=None
 
 def getBinWidthX ( analysis, topo, run=None ):
@@ -58,7 +58,7 @@ def getBinWidthX ( analysis, topo, run=None ):
   run=SMSHelpers.getRun ( analysis, run )
   if SMSHelpers.hasDictionary ( analysis, run ):
     return None
-  histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
+  histo=SMSHelpers.getUpperLimitFromHisto ( analysis, topo, run )
   if not histo: return None
   w=histo.GetXaxis().GetBinWidth(1)
   return SMSHelpers.addunit ( w, "GeV" )
@@ -69,7 +69,7 @@ def getLowX ( analysis, topo, run=None ):
   if SMSHelpers.hasDictionary ( analysis, run ):
     print "[SMSResults.py] implement this function"
     return None
-  histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
+  histo=SMSHelpers.getUpperLimitFromHisto ( analysis, topo, run )
   if not histo: return None
   w=histo.GetXaxis().GetXmin()
   return SMSHelpers.addunit ( w, "GeV" )
@@ -80,7 +80,7 @@ def getLowY ( analysis, topo, run=None ):
   if SMSHelpers.hasDictionary ( analysis, run ):
     print "[SMSResults.py] implement this function"
     return None
-  histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
+  histo=SMSHelpers.getUpperLimitFromHisto ( analysis, topo, run )
   if not histo: return None
   w=histo.GetYaxis().GetXmin()
   return SMSHelpers.addunit ( w, "GeV" )
@@ -90,7 +90,7 @@ def getBinWidthY ( analysis, topo, run=None ):
   run=SMSHelpers.getRun ( analysis, run )
   if SMSHelpers.hasDictionary ( analysis, run ):
     return None
-  histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
+  histo=SMSHelpers.getUpperLimitFromHisto ( analysis, topo, run )
   if not histo: return None
   w=histo.GetYaxis().GetBinWidth(1)
   return SMSHelpers.addunit ( w, "GeV" )
@@ -208,7 +208,7 @@ def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None, interp
   run=SMSHelpers.getRun ( analysis, run )
   if SMSHelpers.hasDictionary ( analysis, run ):
     return getUpperLimitFromDictionary ( analysis, topo, mx, my, run, interpolate )
-  histo=SMSHelpers.getUpperLimitHisto ( analysis, topo, run )
+  histo=SMSHelpers.getUpperLimitFromHisto ( analysis, topo, run )
   if png==True:
     pngfile=SMSHelpers.getUpperLimitPng(analysis,topo,run)
     return pngfile
@@ -453,7 +453,7 @@ def exists(analysis, topo, run = None):
     histo=SMSHelpers.getUpperLimitDictionary ( analysis, topo, run2 )
     if not histo or len(histo)==0: return False
     return True
-  histo=SMSHelpers.getUpperLimitHisto(analysis, topo, run2 )
+  histo=SMSHelpers.getUpperLimitFromHisto(analysis, topo, run2 )
   if not histo: return False
       
   return True
