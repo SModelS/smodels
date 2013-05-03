@@ -4,8 +4,8 @@ import SMSglobals, sys, SMSmethods, SMSxsec, SMSgetlimit
 from prettytable import PrettyTable
 from SMSpprint import wrap, MyPrettyPrinter
 
-import SMSanalyses ## SuK/AL descriptions
-## import SMSAnalysisFactory as SMSanalyses ## UND/WW descriptions
+## import SMSanalyses ## SuK/AL descriptions
+import SMSAnalysisFactory as SMSanalyses ## UND/WW descriptions
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Initialize global variables:
