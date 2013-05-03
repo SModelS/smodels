@@ -186,10 +186,12 @@ def getUpperLimitFromDictionary ( analysis, topo, mx=None, my=None, run=None, pn
     import sys
     sys.exit(0)
   Dict=SMSHelpers.getUpperLimitDictionary ( analysis, topo, run )
+  if Dict==None: return Dict
+  ## Dict=addunit ( Dict, "pb" )
   # print "[SMSResults.py] mx=",mx
   if mx==None: return Dict
   ## return getClosestValue ( Dict, mx, my )
-  return getInterpolatedUpperLimit ( Dict, mx, my )
+  return addunit ( getInterpolatedUpperLimit ( Dict, mx, my ), "pb" )
  
 def getSmartUpperLimit ( analysis, topo, masses, massesbranch2=None ):
   """ returns the upper limit for analysis/topo, given an ordered sequence of

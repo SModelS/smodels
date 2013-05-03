@@ -27,6 +27,16 @@ def addunit ( value, unitstring ):
   if useUnits: 
     import SMSUnits as u
     import types as t
+    ## for convenience, we add units also to tuples, lists, and dictionaries
+    if type(value)==t.ListType:
+      return [ addunit(x,unitstring) for x in value ]
+    if type(value)==t.TupleType:
+      return tuple ( [ addunit(x,unitstring) for x in value ] )
+    if type(value)==t.DictType:
+      ret={}
+      for (k,v) in value.items():
+        ret[k]=addunit(v,unitstring)
+      return ret
     if type(value)!=t.FloatType and type(value)!=t.IntType:
       return value
     if unitstring=="GeV":

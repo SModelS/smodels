@@ -37,7 +37,7 @@ def load():
   else:
     SMSResults.verbosity ( "error" )
   #anas=[ "alphaT", "RA48TeV", "RA2b8TeV", "Weakinos8TeV", "alphaT8TeV", "ATLAS_CONF_2013-024" ]
-  anas=SMSResults.getAllResults().keys()
+  anas=SMSResults.getAllResults( run="ATLAS8TeV" ).keys()
   for analysis in anas:
     if debug:
       print 
@@ -78,9 +78,8 @@ def load():
       #print "analyses= ",analyses
       Analysis.plots = { andreconstraint: [ stopo, analyses ] }
 
-      print "[SMSAnalysisFactory] test: get upper limit"
       ul=SMSResults.getUpperLimit ( analysis, Tx, mx=400., my=100., interpolate=True )
-      print "[SMSAnalysisFactory] test: ul=",ul
+      print "[SMSAnalysisFactory] test: ul(mx=400,my=100)=",ul
       
   #Add analysis to list of analyses:
       SMSglobals.ListOfAnalyses.append(Analysis)
