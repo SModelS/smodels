@@ -109,9 +109,12 @@ def parseMetaInfo ( analysis, run ):
   lines=f.readlines()
   f.close()
   for line in lines:
+    if line.find("#")>-1:
+      line=line[:line.find("#")].strip()
+    if line=="": continue
     tokens=line.split(":",1)
     if not len(tokens)==2:
-      log ( "cannot parse this line (1): %s in %s" % (line, info) )
+      log ( "[117] cannot parse this line (1): %s in %s" % (line, info) )
       continue
     if tokens[0]=="exclusions":
       # we treat these separately
@@ -130,9 +133,12 @@ def motherParticleExclusions ( analysis, run ):
   lines=f.readlines()
   f.close()
   for line in lines:
+    if line.find("#")>-1:
+      line=line[:line.find("#")].strip()
+    if line=="": continue
     tokens=line.split(":",1)
     if not len(tokens)==2:
-      log ( "cannot parse this line (2): %s in %s" % (line, info) )
+      log ( "[141] cannot parse this line (2): %s in %s" % (line, info) )
       continue
     if tokens[0]!="exclusions":
       # we're only interested in the exclusions
@@ -142,7 +148,7 @@ def motherParticleExclusions ( analysis, run ):
     if excl[-1]=='\n': excl=excl[:-1]
     excls=excl.split(" ")
     if len(excls)<2:
-      log ( "cannot parse this line (3): %s in %s" % (line, info) )
+      log ( "[151] cannot parse this line (3): %s in %s" % (line, info) )
       continue
     values=map(int,excls[1:])
     if len(values)==2:
@@ -161,9 +167,12 @@ def getLines ( analysis, run, label="condition" ):
   lines=f.readlines()
   f.close()
   for line in lines:
+    if line.find("#")>-1:
+      line=line[:line.find("#")].strip()
+    if line=="": continue
     tokens=line.split(":",1)
     if not len(tokens)==2:
-      log ( "cannot parse this line (2): %s in %s" % (line, info) )
+      log ( "[172] cannot parse this line (2): %s in %s" % (line, info) )
       continue
     if tokens[0]!=label:
       # we're only interested in the conditions
@@ -173,7 +182,7 @@ def getLines ( analysis, run, label="condition" ):
     if excl[-1]=='\n': excl=excl[:-1]
     keyvalue=excl.split(" -> ")
     if len(keyvalue)!=2:
-      log ( "cannot parse the following line: %s" % keyvalue )
+      log ( "[185] cannot parse the following line: %s" % keyvalue )
     ret[ keyvalue[0] ] = keyvalue[1]
     # ret.append(excl)
   return ret
