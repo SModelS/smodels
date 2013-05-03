@@ -23,6 +23,14 @@ def wrap_onspace(text, width):
                   text.split(' ')
                   )
 
+import math
+def wrap_always(text, width):
+    """A simple word-wrap function that wraps text on exactly width characters.
+       It doesn't split the text in words."""
+    return '\n'.join([ text[width*i:width*(i+1)] \
+                       for i in xrange(int(math.ceil(1.*len(text)/width))) ])
+
+
 import re
 def wrap(text, width):
     """Similar to wrap_onspace, but enforces the width constraint:
