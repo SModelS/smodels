@@ -217,7 +217,7 @@ def getCanonicalName ( topo ):
   topo=topo.replace("w","W").replace("z","Z" )
   return topo
 
-def getUpperLimitHisto ( analysis, topo, run, complain=False ):
+def getUpperLimitFromHisto ( analysis, topo, run, complain=False ):
   import ROOT
   rootfile="%s/%s/%s/sms.root" % ( Base, run, analysis )
   if not os.path.exists(rootfile):

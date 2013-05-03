@@ -79,7 +79,7 @@ def load():
       Analysis.plots = { andreconstraint: [ stopo, analyses ] }
 
       ul=SMSResults.getUpperLimit ( analysis, Tx, mx=400., my=100., interpolate=True )
-      print "[SMSAnalysisFactory] test: ul(mx=400,my=100)=",ul
+      print "[SMSAnalysisFactory] test for %s:%s ul(mx=400,my=100)=%s" % ( analysis, Tx, ul )
       
   #Add analysis to list of analyses:
       SMSglobals.ListOfAnalyses.append(Analysis)
