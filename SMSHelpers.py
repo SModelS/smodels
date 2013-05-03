@@ -211,7 +211,7 @@ def getUpperLimitHisto ( analysis, topo, run, complain=False ):
   import ROOT
   rootfile="%s/%s/%s/sms.root" % ( Base, run, analysis )
   if not os.path.exists(rootfile):
-    log("root file %s doesnt exist" % rootfile )
+    log("root file %s doesnt exist" % rootfile, "warning" )
     return None
   f=None
   if openFiles.has_key ( rootfile ):
@@ -385,6 +385,6 @@ def getUpperLimitDictionary ( analysis, topo, run ):
   execfile(dictfile,Globals)
   Dict=Globals["Dict"]
   if not Dict.has_key ( topo ):
-    log("dictionary doesnt have topology"+topo )
+    log("dictionary doesnt have topology"+topo, "warning" )
     return None
   return Dict[topo]
