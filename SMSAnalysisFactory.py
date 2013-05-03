@@ -32,14 +32,15 @@ def load():
   from SMSmethods import EAnalysis
   import SMSResults, SMSglobals
 
+  debug=True
   #anas=[ "alphaT", "RA48TeV", "RA2b8TeV", "Weakinos8TeV", "alphaT8TeV", "ATLAS_CONF_2013-024" ]
   anas=SMSResults.getAllResults().keys()
   for analysis in anas:
-  #for analysis in [ "Weakinos8TeV" ]:
+    if debug:
+      print 
+      print "Building analysis",analysis
     for Tx in SMSResults.getTopologies(analysis):
-    #for Tx in [ "TChiChipmSlepL" ]:
-      # if Tx=="TChiChipmSlepL": continue
-      #print "Create analysis object for",analysis,Tx
+      if debug: print Tx,
       Analysis = EAnalysis()
       Analysis.sqrts=SMSResults.getSqrts( analysis )
       stopo=getRealTopo ( Tx )
@@ -48,7 +49,8 @@ def load():
       Analysis.run = SMSResults.getRun ( analysis ) ##  "2012"
       constraint=SMSResults.getConstraints ( analysis, topo=stopo )
       if not constraint: 
-        print "dont have a constraint for",analysis,Tx,"(",stopo,")"
+        if debug:
+          print "dont have a constraint for",analysis,Tx,"(",stopo,")"
         continue
       #print "constraint >>%s<<" % constraint
       constrarray=getArray ( constraint )
