@@ -161,7 +161,9 @@ def getClosestValue ( Dict, mx, my ):
   return retul
 
 def getInterpolatedUpperLimit ( Dict, mx, my ):
-  """ get the upper limit, interpolate from (at most) four neighbours """
+  if Dict==None: return None
+  if len(Dict)==0: return None
+  """ get the upper limit, interpolate from (at most) four neighbours in Dict """
   #print "[SMSResults.py] debug closest value is",getClosestValue ( Dict,mx,my)
   # Large=99999.
   # Neighbors=[ [Large,0.],[Large,0.],[Large,0.],[Large,0.] ]
@@ -184,6 +186,7 @@ def getUpperLimitFromDictionary ( analysis, topo, mx=None, my=None, run=None, pn
     import sys
     sys.exit(0)
   Dict=SMSHelpers.getUpperLimitDictionary ( analysis, topo, run )
+  # print "[SMSResults.py] mx=",mx
   if mx==None: return Dict
   ## return getClosestValue ( Dict, mx, my )
   return getInterpolatedUpperLimit ( Dict, mx, my )
