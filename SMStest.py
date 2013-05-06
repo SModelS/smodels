@@ -7,11 +7,10 @@ SMSglobals.initglob()
 SMSanalyses.load()
 
 #Generate events and compute cross-sections:
-nevts = 100
+nevts = 1000
 slhafile = "AndreSLHA/andrePT5.slha"
 Wv = SMSxsec.pytinit(nevts,slhafile,rpythia = True, donlo = True)
 W = Wv["Wdic"]
-W={}
 lhefile = Wv["lhefile"]
 LHEfile = open(lhefile,"r")
 
@@ -34,9 +33,17 @@ for iev in range(nevts):
 
 #Get event topology    
     SMSTopListEv = SMSmethods.getEventTop(PList, weight)
-    for top in SMSTopListEv: print "xxx: ",top,"<br>"
+#    for top in SMSTopListEv: print "xxx: ",top,"<br>"
     
 #Add event topology to topology list:  
     for TopEv in SMSTopListEv:  
         SMSmethods.AddToList(TopEv,SMSTopList)
+    
+for top in SMSTopList: 
+  print "yyy: ",top,"<br>"
 
+for i in SMSTopList:
+  for el in i.B[0].ElList:
+    print el
+  #for el in range ( len ( SMSTopList[i].B[0].ElList ) ):
+  #  print SMSTopList[i].B[0].ElList[el].particles
