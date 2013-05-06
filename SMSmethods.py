@@ -37,12 +37,8 @@ class TElement:
         self.momID = 0
 
     def __str__ ( self ):
-        ret="[Element] particles=["
-        for p in self.particles: 
-          ret+"%s " % type(p)
-        ret+="] masses=["
-        for m in self.masses: ret+="%s " % rmvunit(m,"GeV")
-        ret+="]"
+        ret="(Elmnt) particles=%s masses=%s" % \
+             ( self.particles, [ rmvunit(x,"GeV") for x in self.masses ] )
         return ret
         
 class DBranch:
