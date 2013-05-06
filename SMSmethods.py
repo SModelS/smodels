@@ -52,8 +52,8 @@ class DBranch:
         self.ElList = []
 
     def __str__(self):
-        ret="V#%d VP%s " % ( self.vertnumb, self.vertparts )
-        for i in self.ElList: ret+="  el %s" % i
+        ret="%s insertions " % ( self.vertparts )
+        for i in self.ElList: ret+="  (%s)" % i
         return ret
         
 class GTop:
@@ -62,7 +62,7 @@ class GTop:
         self.WeightList = []
 
     def __str__(self):
-        return "[GTop] B1 "+str(self.B[0])+", B2 "+str(self.B[1])
+        return "[GTop] Branch #1={{"+str(self.B[0])+"}}, Branch #2={{"+str(self.B[1])+"}}"
 
 #Adds element to ElLists in branches
 #OBS: input must be given with the correct branch ordering!  
