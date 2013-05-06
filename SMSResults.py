@@ -215,6 +215,7 @@ def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None, interp
   if rmvunit(mx,'GeV') == None:
     return histo
   value=SMSHelpers.getUpperLimitAtPoint ( histo, mx, my, interpolate=interpolate )
+  if value==0.0: value=None # 0.0 usually means out of bounds
   return SMSHelpers.addunit ( value, "pb" )
 
 def getEfficiency ( analysis, topo, mx=None, my=None, run=None ):
