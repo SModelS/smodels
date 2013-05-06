@@ -246,7 +246,7 @@ def getUpperLimitAtPoint ( histo, mx, my, interpolate=False ):
   if rmvunit(my,'GeV')==None:
     log ( "inconsistent mx/my, mx=None, my=%s" % my )
     return None
-  if not histo: return 'no histogram'
+  if not histo: return None ## 'no histogram'
   if interpolate:
     return histo.Interpolate ( mx, my )
   xmax=histo.GetXaxis().GetNbins()
