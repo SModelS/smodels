@@ -664,13 +664,20 @@ def AddToAnalysis(SMSTopList,Analysis):
 #Definition of distance between two mass arrays
 #If Dana is defined, use maximum distance in all analyses
 def MassDist(mass1,mass2):
+    """ definition of distance between two mass arrays """
     import SMSglobals, SMSgetlimit
     
     Dana = SMSglobals.DistAnalyses  #List of analyses to be used
 
 #Get upper bounds for each mass:
-    xmass1 = SMSgetlimit.GetPlotLimit(mass1,Dana[0],Dana[1])
-    xmass2 = SMSgetlimit.GetPlotLimit(mass2,Dana[0],Dana[1])
+    xmass1 = SMSgetlimit.GetPlotLimit(mass1,Dana[0],Dana[1],complain=True)
+    xmass2 = SMSgetlimit.GetPlotLimit(mass2,Dana[0],Dana[1],complain=True)
+    if xmass1==None or xmass1==False:
+      print "[SMSmethods.MassDist] no limit for plot 1"
+      return None
+    if xmass2==None or xmass2==False:
+      print "[SMSmethods.MassDist] no limit for plot 2"
+      return None
     
     d = -1.
     for iana in range(len(xmass1)):

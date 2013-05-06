@@ -1,4 +1,4 @@
 #!/bin/sh
 
-python SMSAnalysisFactory.py
+python SMSmain.py | tee log
 
