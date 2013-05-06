@@ -23,6 +23,7 @@ def addunit ( value, unitstring ):
   """ a function that can add units to values, but also
       makes it easy to turn this functionality off, in case "units" isnt installed
       """
+  if value==None: return value
   if not useUnits: return value
   if useUnits: 
     import SMSUnits as u
