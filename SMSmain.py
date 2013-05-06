@@ -15,8 +15,9 @@ SMSanalyses.load()
 
 
 #Generate events and compute cross-sections:
-nevts = 10000
-slhafile = "sleptons_debug.slha"
+nevts = 1000
+# slhafile = "sleptons_debug.slha"
+slhafile = "AndreSLHA/andrePT5.slha"
 Wv = SMSxsec.pytinit(nevts,slhafile,rpythia = True, donlo = True)
 W = Wv["Wdic"]
 lhefile = Wv["lhefile"]
