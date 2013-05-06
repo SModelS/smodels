@@ -166,6 +166,7 @@ class EAnalysis:
     
 #Event reader. Returns a list of MParticles
 def getNextEvent(filename): 
+    """ reads LHE file 'filename', returns a list of MParticles """
     
     line = " "
     PartList = []
