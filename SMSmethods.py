@@ -15,9 +15,7 @@ PtcDic={
 "l" : ["l+","l-"], "ta" : ["ta+","ta-"], "W" : ["W+","W-"], "t" : ["t+","t-"], "L+" : ["l+","ta+"], "L-" : ["l-","ta-"], "L" : ["l+","ta+","l-","ta-"]
 }
 
-
 #--------------------Classes:
-    
     
 class MParticle:
     def __init__(self):
@@ -29,12 +27,23 @@ class MParticle:
         self.pz = 0.
         self.e = 0.
         self.mass = 0.
+    def __str__(self):
+        return "particle pdg %d p=(%f,%f,%f,m=%f) st %d" % ( self.pdg, self.px, self.py, self.pz, self.mass, self.status )
       
 class TElement:
     def __init__(self):
         self.masses = []
         self.particles = []
         self.momID = 0
+
+    def __str__ ( self ):
+        ret="[Element] particles=["
+        for p in self.particles: 
+          ret+"%s " % type(p)
+        ret+="] masses=["
+        for m in self.masses: ret+="%s " % rmvunit(m,"GeV")
+        ret+="]"
+        return ret
         
 class DBranch:
     def __init__(self):
@@ -42,10 +51,18 @@ class DBranch:
         self.vertparts = []
         self.ElList = []
 
+    def __str__(self):
+        ret="V#%d VP%s " % ( self.vertnumb, self.vertparts )
+        for i in self.ElList: ret+="  el %s" % i
+        return ret
+        
 class GTop:
     def __init__(self):
         self.B = [DBranch(),DBranch()]
         self.WeightList = []
+
+    def __str__(self):
+        return "[GTop] B1 "+str(self.B[0])+", B2 "+str(self.B[1])
 
 #Adds element to ElLists in branches
 #OBS: input must be given with the correct branch ordering!  
@@ -221,11 +238,11 @@ def getMom(PList):
         return momspdg
 
 def getEventTop(PList, weight = {}):
-  """ Reads particle list (PList) from event (as it is created by .getNextEvent)
-  and generates Topology (GTop) with only one element in ElList, corresponding
-  to the event. If the DoCompress and/or DoInvisible flags are on, also generate
-  compressed topologies with small mass gaps and/or neutrinos emitted
-  in the last step of the cascade ("effective LSP"). """
+    """ Reads particle list (PList) from event (as it is created by .getNextEvent)
+    and generates Topology (GTop) with only one element in ElList, corresponding
+    to the event. If the DoCompress and/or DoInvisible flags are on, also generate
+    compressed topologies with small mass gaps and/or neutrinos emitted
+    in the last step of the cascade ("effective LSP"). """
     import SMSglobals
         
     ETopList = []
