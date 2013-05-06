@@ -178,25 +178,29 @@ class EAnalysis:
 #--------------------Methods:
     
 #Event reader. Returns a list of MParticles
-def getNextEvent(filename): 
-    """ reads LHE file 'filename', returns a list of MParticles """
-    
+def getNextEvent(File): 
+    """ reads LHE file 'File', returns a list of MParticles.
+        File is an open filehandle.  """
     line = " "
     PartList = []
 
 #Find next event
-    while line.find("<event>") == -1: line = filename.readline()
+    while line.find("<event>") == -1:
+      if line=='': 
+        print "[SMSmethods.py] error demanding more events than are available."
+        return PartList
+      line = File.readline()
         
 #Read event info:
-    line = filename.readline()
+    line = File.readline()
 
 #Get particles info:            
-    line = filename.readline()  
+    line = File.readline()  
     while line.find("</event>") == -1:
         if line.find("#")>-1:
           line=line[:line.find('#')]
         if len(line)==0:
-          line=filename.readline()
+          line=File.readline()
           continue
         particle = MParticle()
         linep = [float(x) for x in line.split()]
@@ -210,7 +214,7 @@ def getNextEvent(filename):
         particle.mass = linep[10]
         
         PartList.append(particle)
-        line = filename.readline()  
+        line = File.readline()  
 
     return PartList
 
@@ -239,6 +243,7 @@ def getEventTop(PList, weight = {}):
     to the event. If the DoCompress and/or DoInvisible flags are on, also generate
     compressed topologies with small mass gaps and/or neutrinos emitted
     in the last step of the cascade ("effective LSP"). """
+    if len(PList)==0: return None
     import SMSglobals
         
     ETopList = []

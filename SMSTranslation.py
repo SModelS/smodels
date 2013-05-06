@@ -37,3 +37,7 @@ SMSTranslation = {
   "TSlepSlep": [ [2, [1,0], ['l-']], [2, [1,0], ['l+']]],
   "TSlepSnu": [ [2, [1,0], ['l+']], [2, [1,0], ['l-']]], #was ist der unterschied zu tslepslep?
 }
+
+def getTx ( topo ):
+  """ get the Tx name, given a smodels topology """
+  print "[SMSTranslation.py] looking up Tx for",topo
