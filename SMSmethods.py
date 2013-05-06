@@ -575,10 +575,11 @@ def SimParticles(ptype1,ptype2):
 
 
 
-#Check if elements in SMSTop matches an entry in SMSTopList. If it does, add weight.
-#If the same topology exists, but not the same element, add element.
-#If neither element nor topology exist, add the new topology and all its elements
 def AddToList(SMSTop,SMSTopList):
+    """ Check if elements in SMSTop matches an entry in SMSTopList. If it does,
+    add weight.  If the same topology exists, but not the same element, add
+    element.  If neither element nor topology exist, add the new topology and
+    all its elements """
     
     for inew in range(len(SMSTop.B[0].ElList)):
         NewEl_a = [SMSTop.B[0].ElList[inew],SMSTop.B[1].ElList[inew]]  #Check both orderings
