@@ -303,13 +303,14 @@ def getaxes (analysis, topo=None, run=None):
   d = {}
   for i in range(len(st)):
     l = st[i].split(':')
-    d[l[0]] = []
+    nm = l[0].replace(" ","")
+    d[nm] = []
     m = l[1].split('-')
     for j in range(len(m)):
       n = m[j].split()
       if len(n)==2:
-	d[l[0]].append({'mx': n[0], 'my': n[1], 'mz': None})
-      else: d[l[0]].append({'mx': n.pop(0), 'my': n.pop(1), 'mz': n})
+	d[nm].append({'mx': n[0], 'my': n[1], 'mz': None})
+      else: d[nm].append({'mx': n.pop(0), 'my': n.pop(0), 'mz': n})
       
   if topo:
     topo = topo.replace(" ","")
