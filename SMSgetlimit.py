@@ -4,9 +4,6 @@ def GetPlotLimit(inmass,plot,Analysis,complain = False):
         plot: ['T8ChiSlep', ['ATLAS_CONF_2013_007']]
         Analysis: SMSmethods.EAnalysis
     """
-    print "inmass=",inmass
-    print "plot=",plot
-    print "Analysis=",Analysis
     import SMSResults, numpy , copy
     from SMSHelpers import addunit, rmvunit
 
