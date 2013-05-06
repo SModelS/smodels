@@ -220,12 +220,12 @@ def getMom(PList):
     else:
         return momspdg
 
-#Reads particle list (PList) from event and generates Topology (GTop)
-#with only one element in ElList, corresponding to the event
-#If the DoCompress and/or DoInvisible flags are on, also generate
-#compressed topologies with there are small mass gaps and/or neutrinos
-#emitted in the last step of the cascade ("effective LSP")
 def getEventTop(PList, weight = {}):
+  """ Reads particle list (PList) from event (as it is created by .getNextEvent)
+  and generates Topology (GTop) with only one element in ElList, corresponding
+  to the event. If the DoCompress and/or DoInvisible flags are on, also generate
+  compressed topologies with small mass gaps and/or neutrinos emitted
+  in the last step of the cascade ("effective LSP"). """
     import SMSglobals
         
     ETopList = []
