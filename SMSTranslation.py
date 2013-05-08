@@ -41,3 +41,4 @@ SMSTranslation = {
 def getTx ( topo ):
   """ get the Tx name, given a smodels topology """
   print "[SMSTranslation.py] looking up Tx for",topo
+  return None
