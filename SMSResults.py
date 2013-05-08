@@ -312,6 +312,9 @@ def getx ( analysis, topo=None, run=None ):
   return d
 
 def getaxes (analysis, topo=None, run=None):
+  """ get axes for this analysis: for each topo list of dictionary, each dictionary corresponds
+	to one histogram, the key axes gives string (mx-my), the key mz gives information on other masses,
+	if you supply a topo, returns list for this topo only"""
   st = SMSHelpers.getMetaInfoField (analysis, "axes", run)
   if not st: return None
   st = st.split(',')
@@ -324,8 +327,8 @@ def getaxes (analysis, topo=None, run=None):
     for j in range(len(m)):
       n = m[j].split()
       if len(n)==2:
-	d[nm].append({'mx': n[0], 'my': n[1], 'mz': None})
-      else: d[nm].append({'mx': n.pop(0), 'my': n.pop(0), 'mz': n})
+	d[nm].append({'axes': n[0]+'-'+n[1], 'mz': None})
+      else: d[nm].append({'axes': n.pop(0)+'-'+n.pop(0), 'mz': n})
       
   if topo:
     topo = topo.replace(" ","")
