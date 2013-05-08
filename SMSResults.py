@@ -256,10 +256,14 @@ def isPublic ( analysis, run=None ):
 def hasDataPublished ( analysis, run=None ):
   """ has the analysis published their data in digitized form? """
   value=SMSHelpers.getMetaInfoField ( analysis, "publisheddata", run )
+  if type(value)==type("string"):
+    if value=="None": return None
+    if value=="True" or value=="1": return True
+    if value=="False" or value=="0": return False
   if not value:
     return None
   try:
-    return value
+    return bool(value)
   except Exception,e:
     print "[SMSResults.py] couldnt parse ``publisheddata'' field"
   return None
