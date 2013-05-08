@@ -253,6 +253,17 @@ def isPublic ( analysis, run=None ):
     print "[SMSResults.py] couldnt parse ``private'' field"
   return None
 
+def hasDataPublished ( analysis, run=None ):
+  """ has the analysis published their data in digitized form? """
+  value=SMSHelpers.getMetaInfoField ( analysis, "publisheddata", run )
+  if not value:
+    return None
+  try:
+    return value
+  except Exception,e:
+    print "[SMSResults.py] couldnt parse ``publisheddata'' field"
+  return None
+
 def getLumi ( analysis, run=None ):
   """ get the integrated luminosity for this analysis """
   lumifb=float(SMSHelpers.getMetaInfoField ( analysis, "lumi", run ))
