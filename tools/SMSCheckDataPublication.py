@@ -27,9 +27,9 @@ for analysis in All:
     if published==False: falses[analysis]=True
 
 print len(nones),"analyses are not yet checked:"
-for a in nones.keys(): print a,
+for a in nones.keys(): print "%s:%s" % ( a, SMSResults.getPAS ( a) ),
 print "\n",len(trues),"analyses have published data:"
-for a in trues.keys(): print a,
+for a in trues.keys(): print "%s:%s" % ( a, SMSResults.getPAS ( a) ),
 print "\n",len(falses),"analyses have not published data:"
-for a in falses.keys(): print a,
+for a in falses.keys(): print "%s:%s" % ( a, SMSResults.getPAS ( a) ),
 print
