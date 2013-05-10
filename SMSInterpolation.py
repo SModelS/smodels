@@ -6,6 +6,8 @@ from SMSHelpers import rmvunit, addunit
 def gethistname(topo, mz):
 	if mz == None or mz == "050":
 		return topo
+	elif 'D' in mz:
+		return topo+"LSP"
 	else: return topo+mz
 
 def getxval(mx, my, mz):
@@ -67,8 +69,8 @@ def compareM(masses, d):
 			ml.append(d['mz'][0].find('M1'))
 			ml.append(d['mz'][0].find('M2'))
 			ml.append(d['mz'][0].find('M0'))
-			deltam = d['mz'][0].split('=')[1]
-			deltain = masses[getindex(ml,second=True)]-masses[getindex(ml)]
+			deltam = float(d['mz'][0].split('=')[1])
+			deltain = float(masses[getindex(ml,second=True)]-masses[getindex(ml)])
 			if deltain<0: return 0
 			if abs(deltain-deltam)/(deltain+deltam)<0.1: return True
 			else: return 0
