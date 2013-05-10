@@ -196,7 +196,9 @@ def getUpperLimitFromDictionary ( analysis, topo, mx=None, my=None, run=None, pn
 def getSmartUpperLimit ( analysis, topo, masses, massesbranch2=None ):
   """ returns the upper limit for analysis/topo, given an ordered sequence of
       the mass (mother, intermediate, LSP) """
-  return getUpperLimit ( analysis, topo, mx=masses[0], my=masses[-1], interpolate=True )
+  import SMSInterpolation
+  return SMSInterpolation.UpperLimit(analysis, topo, masses)
+#  return getUpperLimit ( analysis, topo, mx=masses[0], my=masses[-1], interpolate=True )
 
 def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False ):
   """ get the upper limit for run/analysis/topo.
