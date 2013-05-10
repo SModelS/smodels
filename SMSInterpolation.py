@@ -82,8 +82,11 @@ def UpperLimit(ana, topo, masses): #masses: list of masses, with (mother, interm
 	if len(masses)==2 and d[0]['mz']:
 		print "Need intermediate mass input for this topology."
 		return 0
+	if len(masses)>3 or len(d[0]['mz'])>1:
+		print "Cannot find BR for topologies with more than one intermediate mass."
+		return 0
 	if len(masses)>2 and not d[0]['mz']:
-		print "No intermediate mass for this Topology."
+		print "No intermediate mass for this topology."
 		return 0
 	if len(masses)>2 and len(d) == 1:
 		if compareM(masses,d[0]):
