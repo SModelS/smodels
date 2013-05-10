@@ -9,6 +9,8 @@ from unum import Unum
 # sudo easy_install Unum
 # or sth similar
 
+Unum.VALUE_FORMAT = "%0.2E"
+
 fb=Unum.unit('fb')
 pb=Unum.unit('pb', 1000 * fb)
 
