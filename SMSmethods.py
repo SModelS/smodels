@@ -698,6 +698,7 @@ def MassDist(mass1,mass2):
     if xmass2==None or xmass2==False:
       print "[SMSmethods.MassDist] no limit for plot 2"
       return None
+
     
     d = -1.
     for iana in range(len(xmass1)):
@@ -955,8 +956,7 @@ def EvalRes(res,Analysis,uselimits = False):
     for cluster in MCluster:
 #Get masses in cluster
         masscluster = []
-        for ic in cluster: masscluster.append(Goodmasses[ic])
-        
+        for ic in cluster: masscluster.append(Goodmasses[ic])        
 #Shrink Topology elements to cluster:
         NewTop = ClusterTop(Top,masscluster)
 
