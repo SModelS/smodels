@@ -37,7 +37,7 @@ def load():
   else:
     SMSResults.verbosity ( "error" )
   #anas=[ "alphaT", "RA48TeV", "RA2b8TeV", "Weakinos8TeV", "alphaT8TeV", "ATLAS_CONF_2013-024" ]
-  anas=SMSResults.getAllResults( run="ATLAS8TeV" ).keys()
+  anas=SMSResults.getAllResults().keys()
   for analysis in anas:
     if debug:
       print 
