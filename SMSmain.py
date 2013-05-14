@@ -25,34 +25,40 @@ Xsec = Wv["Xsecdic"]
 lhefile = Wv["lhefile"]
 LHEfile = open(lhefile,"r")
 
-sigmacut = addunit(0.1,'fb')  # Maximum cross-section*BR to be included
-SMSTopList = SMSslhaDec.SLHAdecomp(slhafile,Xsec,sigmacut)
+DoSLHAdec = True  #Choose to use SLHA decomposition
 
-#SMSTopList = []     
-##Read events and get topologies (fills SMSTopList)
-#for iev in range(nevts):
+if DoSLHAdec:
+    sigmacut = addunit(0.1,'fb')  # Maximum cross-section*BR to be included
+    SMSTopList = SMSslhaDec.SLHAdecomp(slhafile,Xsec,sigmacut)
+else:
+    SMSTopList = []     
+#Read events and get topologies (fills SMSTopList)
+    for iev in range(nevts):
 
-###Read event    
-#    PList = SMSmethods.getNextEvent(LHEfile) 
-###Get mother PDGs:
-#    momPDG = tuple(SMSmethods.getMom(PList))
-##Get event weight list:
-#    weight = {}
-#    
-#    for k in W.keys(): 
-#        if W[k].has_key(momPDG):
-#            weight.update({k : W[k][momPDG]})
-#        else:
-#            print "Error getting weight"
-#            sys.exit()    
+##Read event    
+        PList = SMSmethods.getNextEvent(LHEfile) 
+##Get mother PDGs:
+        momPDG = tuple(SMSmethods.getMom(PList))
+#Get event weight list:
+        weight = {}
+    
+        for k in W.keys(): 
+            if W[k].has_key(momPDG):
+                weight.update({k : W[k][momPDG]})
+            else:
+                print "Error getting weight"
+                sys.exit()    
 
-##Get event topology    
-#    SMSTopListEv = SMSmethods.getEventTop(PList, weight)
-#    
-##Add event topology to topology list:  
-#    for TopEv in SMSTopListEv:  
-#        SMSmethods.AddToList(TopEv,SMSTopList)
-#    SMSglobals.evcount +=1
+#Get event topology    
+        SMSTopListEv = SMSmethods.getEventTop(PList, weight)
+    
+#Add event topology to topology list:  
+        for TopEv in SMSTopListEv:  
+            SMSmethods.AddToList(TopEv,SMSTopList)
+        SMSglobals.evcount +=1
+        
+        
+        
 
 EvTop_table = PrettyTable(["Topology","#Vertices", "#Insertions", "#Elements", "Sum of weights"])
 EvElement_table = PrettyTable(["Topology","Element","Particles B[0]","Particles B[1]", "Masses B[0]","Masses B[1]","Element Weight"])
