@@ -74,7 +74,7 @@ def GetPlotLimit(inmass,plot,Analysis,complain = False):
 
 #Sanity check
         if len(massI) > 0 and len(xexp) == 0:
-            if complain: print 'GetPlotLimit: Number of intermediate masses do not match histogram'
+            if complain: print 'GetPlotLimit: Number of intermediate masses do not match histogram in',analyses,' for',CMSlabel
             limits.append([analyses, False])
             continue
 
