@@ -22,49 +22,58 @@ def pytinit(nevts,slhafile,rpythia = True, donlo = True):
         total_cs8 = addunit(1.,'fb')
         total_cs7 = addunit(1.,'fb')
 
-    sigma_8={}
-    sigma_7={}
 
 #Get 8 TeV event decomposition:
+    n8_evts={}
     inputfile=open("./data/fort_8.68")
     for iev in range(nevts):
         particles = SMSmethods.getNextEvent(inputfile)
         mompdg=SMSmethods.getMom(particles)
         
-        getprodcs(mompdg[0], mompdg[1], sigma_8)
+        getprodcs(mompdg[0], mompdg[1], n8_evts)
 
-
-    n8_evts = sigma_8.copy()
-    for key in sigma_8.keys(): 
-        sigma_8[key]=total_cs8/nevts
+    weight_8 = {}
+    sigma_8 = {}
+    for key in n8_evts.keys(): 
+        weight_8.update({key : total_cs8/nevts})  #Weight for one event
+        sigma_8.update({key : n8_evts[key]*total_cs8/nevts})   #Production cross-section
           
 
 #Get 7 TeV event decomposition:
+    n7_evts={}
     inputfile=open("./data/fort_7.68")
     for iev in range(nevts):
         particles = SMSmethods.getNextEvent(inputfile)
         mompdg=SMSmethods.getMom(particles)
-        getprodcs(mompdg[0], mompdg[1], sigma_7)
+        getprodcs(mompdg[0], mompdg[1], n7_evts)
 
-    n7_evts = sigma_7.copy()
-    for key in sigma_7.keys(): 
-        if not n8_evts.has_key(key):    #If process was not present at 8 TeV, set to zero weight
-            sigma_7[key]=addunit(0.,'fb')
-        else: 
-            sigma_7[key]=(float(sigma_7[key])*total_cs7)/(nevts*n8_evts[key])
+    weight_7 = {}
+    sigma_7 = {}
+    for key in n7_evts.keys():
+        if not n8_evts.has_key(key):
+            weight_7.update({key : addunit(0.,'fb')})
+            sigma_7.update({key : addunit(0.,'fb')})
+        else:
+            weight_7.update({key : n7_evts[key]*total_cs7/(nevts*n8_evts[key])}) #Weight for one event
+            sigma_7.update({key : n7_evts[key]*total_cs7/nevts})  #Production cross-section
 
+            
 #Make sure both dictionaries have the same number of entries
     for key in sigma_7.keys() + sigma_8.keys():
-        if not sigma_7.has_key(key): sigma_7.update({key : addunit(0.,'fb')})
-        if not sigma_8.has_key(key): sigma_8.update({key : addunit(0.,'fb')})
+        if not sigma_7.has_key(key): 
+            sigma_7.update({key : addunit(0.,'fb')})
+            weight_7.update({key : addunit(0.,'fb')})
+        if not sigma_8.has_key(key): 
+            sigma_8.update({key : addunit(0.,'fb')})
+            weight_8.update({key : addunit(0.,'fb')})
 
 #Get NLO cross-sections from NLLfast:
     if donlo:
-        import NLLxsec,sys
+        import NLLxsec
         sigma_8NLO = {}
         sigma_7NLO = {}
-        sumlo = 0.
-        lonllfast = 0.
+        weight_8NLO = {}
+        weight_7NLO = {}
 
         for key in sigma_8.keys():
 
@@ -81,26 +90,35 @@ def pytinit(nevts,slhafile,rpythia = True, donlo = True):
             elif nllres[1]['K_NLO_8TeV']:
                 k8 = nllres[1]['K_NLO_8TeV']
 
+            LO7 = weight_7[key]
+            LO8 = weight_8[key]
+            NLO7 = LO7*k7
+            NLO8 = LO8*k8
+            weight_7NLO.update({key : NLO7})
+            weight_8NLO.update({key : NLO8}) 
+
             LO7 = sigma_7[key]
             LO8 = sigma_8[key]
             NLO7 = LO7*k7
             NLO8 = LO8*k8
             sigma_7NLO.update({key : NLO7})
-            sigma_8NLO.update({key : NLO8}) 
+            sigma_8NLO.update({key : NLO8})
 
 
 
 
 
-#Weight dictionary
+#Weight and production cross-section dictionaries
+    Wdic = {'7 TeV (LO)':weight_7, '8 TeV (LO)':weight_8}
+    Xsecdic = {'7 TeV (LO)':sigma_7, '8 TeV (LO)':sigma_8}
     if donlo:
-        Wdic = {'7 TeV (LO)':sigma_7, '8 TeV (LO)':sigma_8, '7 TeV (NLO)':sigma_7NLO, '8 TeV (NLO)':sigma_8NLO}
-    else:
-        Wdic = {'7 TeV (LO)':sigma_7, '8 TeV (LO)':sigma_8}
+        Wdic.update({'7 TeV (NLO)':weight_7NLO, '8 TeV (NLO)':weight_8NLO})
+        Xsecdic.update({'7 TeV (NLO)':sigma_7NLO, '8 TeV (NLO)':sigma_8NLO})
+
 #LHE event file
     lhefile = "./data/fort_8.68"
 
-    return {"Wdic" : Wdic, "lhefile" : lhefile}  
+    return {"Wdic" : Wdic, "lhefile" : lhefile, "Xsecdic" : Xsecdic}  
     
     
 
@@ -163,6 +181,6 @@ def runPythiaLHE ( n, slhafile, sqrts=7 ):
       except Exception,e:
         print "[ResultsTables.py] Exception",e,"xsecfb=",line[67:78]
         print "  `-- line=",line
-        print "  `-- masterkey=",masterkey
+#        print "  `-- masterkey=",masterkey
   return { "xsecfb": xsecfb }
 
