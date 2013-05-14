@@ -17,7 +17,7 @@ verbose=True
 ## track the open root files
 openFiles={}
 
-useUnits=False
+useUnits=True
 
 def addunit ( value, unitstring ):
   """ a function that can add units to values, but also

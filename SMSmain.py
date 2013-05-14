@@ -54,7 +54,7 @@ SMSTopList = SMSslhaDec.SLHAdecomp(slhafile,Xsec,sigmacut)
 #        SMSmethods.AddToList(TopEv,SMSTopList)
 #    SMSglobals.evcount +=1
 
-EvTop_table = PrettyTable(["Topology","#Vertices B[0]","#Vertices B[1]", "#Insertions B[0]","#Insertions B[1]", "#Elements", "Sum of weights"])
+EvTop_table = PrettyTable(["Topology","#Vertices", "#Insertions", "#Elements", "Sum of weights"])
 EvElement_table = PrettyTable(["Topology","Element","Particles B[0]","Particles B[1]", "Masses B[0]","Masses B[1]","Element Weight"])
 
    
@@ -63,17 +63,18 @@ eltot = 0
 totweight = []
 #Print Results:
 for i in range(len(SMSTopList)):
-    sumw = SMSmethods.sumweights(SMSTopList[i].WeightList)
+    weightlist = [el.weight for el in SMSTopList[i].ElList]
+    sumw = SMSmethods.sumweights(weightlist)
     totweight.append(sumw)
-    EvTop_table.add_row([i,SMSTopList[i].B[0].vertnumb,SMSTopList[i].B[1].vertnumb,SMSTopList[i].B[0].vertparts,SMSTopList[i].B[1].vertparts,len(SMSTopList[i].B[0].ElList),wrap(MyPrettyPrinter().pformat(sumw),width=30)])
-    eltot += len(SMSTopList[i].B[0].ElList)
+    EvTop_table.add_row([i,SMSTopList[i].vertnumb,SMSTopList[i].vertparts,len(SMSTopList[i].ElList),wrap(MyPrettyPrinter().pformat(sumw),width=30)])
+    eltot += len(SMSTopList[i].ElList)
 
  
             
 #Print element list for Topology[i]:    
     if i == 0:           
-        for j in range(len(SMSTopList[i].B[0].ElList)):
-            EvElement_table.add_row([i,j,SMSTopList[i].B[0].ElList[j].particles,SMSTopList[i].B[1].ElList[j].particles,wrap(MyPrettyPrinter().pformat(SMSTopList[i].B[0].ElList[j].masses),width=25),wrap(MyPrettyPrinter().pformat(SMSTopList[i].B[1].ElList[j].masses),width=25),wrap(MyPrettyPrinter().pformat(SMSTopList[i].WeightList[j]),width=30)])
+        for j in range(len(SMSTopList[i].ElList)):
+            EvElement_table.add_row([i,j,SMSTopList[i].ElList[j].B[0].particles,SMSTopList[i].ElList[j].B[1].particles,wrap(MyPrettyPrinter().pformat(SMSTopList[i].ElList[j].B[0].masses),width=25),wrap(MyPrettyPrinter().pformat(SMSTopList[i].ElList[j].B[1].masses),width=25),wrap(MyPrettyPrinter().pformat(SMSTopList[i].ElList[j].weight),width=30)])
         EvElement_table.add_row(["---","---","---","---","---","---","---"])    
             
             
@@ -81,7 +82,7 @@ print "Number of Global topologies = ",len(SMSTopList)
 print(EvTop_table)
 print "Total Number of Elements = ",eltot
 print "Total weight = ",SMSmethods.sumweights(totweight)
-print(EvElement_table)
+#print(EvElement_table)
 
 print '\n \n \n'
 
@@ -97,14 +98,14 @@ AnElement_table = PrettyTable(["Analyses","Element","Masses","Element Weight"])
 for Ana in SMSglobals.ListOfAnalyses:
     label = Ana.label
     ifirst = True
-    for i in range(len(Ana.Top.B[0].ElList)):
-        ptcs = [Ana.Top.B[0].ElList[i].particles,Ana.Top.B[1].ElList[i].particles]
-        for j in range(len(Ana.Top.B[0].ElList[i].masses)):
-            mass = [Ana.Top.B[0].ElList[i].masses[j],Ana.Top.B[1].ElList[i].masses[j]]
+    for i in range(len(Ana.Top.ElList)):
+        ptcs = [Ana.Top.ElList[i].B[0].particles,Ana.Top.ElList[i].B[1].particles]
+        for j in range(len(Ana.Top.ElList[i].B[0].masses)):
+            mass = [Ana.Top.ElList[i].B[0].masses[j],Ana.Top.ElList[i].B[1].masses[j]]
             if not ifirst: label = ""
             if j != 0: ptcs = ""
             ifirst = False
-            AnElement_table.add_row([label,ptcs,wrap(MyPrettyPrinter().pformat(mass),width=100),wrap(MyPrettyPrinter().pformat(Ana.Top.WeightList[i][j]),width=30)])
+            AnElement_table.add_row([label,ptcs,wrap(MyPrettyPrinter().pformat(mass),width=100),wrap(MyPrettyPrinter().pformat(Ana.Top.ElList[i].weight[j]),width=30)])
     AnElement_table.add_row(["---","---","---","---"])  
         
 
@@ -121,7 +122,7 @@ for Analysis in SMSglobals.ListOfAnalyses:
     Results_table = PrettyTable(["Result","Conditions","Mass","Theoretical Value","Experimental Limits"])
     
     
-    if max(Analysis.Top.B[0].vertnumb,Analysis.Top.B[1].vertnumb) > 3:
+    if max(Analysis.Top.vertnumb) > 3:
         print "Skipping analysis",Analysis.label,"with more than 3 vertices"
         continue
 
