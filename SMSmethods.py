@@ -8,7 +8,7 @@ Rodd={
 
 
 Reven={
- 25 : "higgs", 35 : "H0", 36 : "A0", 37 : "H+", -37 : "H-", 23 : "Z", 22 : "photon", 24 : "W+", -24 : "W-", 16 : "nu", -16 : "nu", 15 : "ta-", -15 : "ta+", 14 : "nu", -14 : "nu", 13 : "l-", -13 : "l+", 12 : "nu", -12 : "nu", 11 : "l-", -11 : "l+", 5 : "b", -5 : "b", 6 : "t+", -6 : "t-", 1 : "jet", 2 : "jet", 3 : "jet", 4 : "jet", 21 : "jet", -1 : "jet", -2 : "jet", -3 : "jet", -4 : "jet", -21 : "jet"
+ 25 : "higgs", -25: "higgs", 35 : "H0", -35 : "H0", 36 : "A0", -36 : "A0", 37 : "H+", -37 : "H-", 23 : "Z", -23 : "Z", 22 : "photon", -22 : "photon", 24 : "W+", -24 : "W-", 16 : "nu", -16 : "nu", 15 : "ta-", -15 : "ta+", 14 : "nu", -14 : "nu", 13 : "l-", -13 : "l+", 12 : "nu", -12 : "nu", 11 : "l-", -11 : "l+", 5 : "b", -5 : "b", 6 : "t+", -6 : "t-", 1 : "jet", 2 : "jet", 3 : "jet", 4 : "jet", 21 : "jet", -1 : "jet", -2 : "jet", -3 : "jet", -4 : "jet", -21 : "jet"
  }
 
 PtcDic={
@@ -690,8 +690,8 @@ def MassDist(mass1,mass2):
     Dana = SMSglobals.DistAnalyses  #List of analyses to be used
 
 #Get upper bounds for each mass:
-    xmass1 = SMSgetlimit.GetPlotLimit(mass1,Dana[0],Dana[1],complain=True)
-    xmass2 = SMSgetlimit.GetPlotLimit(mass2,Dana[0],Dana[1],complain=True)
+    xmass1 = SMSgetlimit.GetPlotLimit(mass1,Dana[0],Dana[1],complain=False)
+    xmass2 = SMSgetlimit.GetPlotLimit(mass2,Dana[0],Dana[1],complain=False)
     if xmass1==None or xmass1==False:
       print "[SMSmethods.MassDist] no limit for plot 1"
       return None
