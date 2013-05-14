@@ -20,6 +20,8 @@ def getT1(b1,b2):
 		return "T1bbbb"
 	elif pts.count('t+')+pts.count('t-')==4:
 		return "T1tttt"
+	elif pts.count('b')==2 and pts.count('t+')+pts.count('t-')==2:
+		return "T1tbtb"
 	else: return "T1"
 
 def getT3(b1,b2):
@@ -28,11 +30,11 @@ def getT3(b1,b2):
         pts.extend(b1[2][1])
         pts.extend(b2[2][0])
         if pts.count('W+')+pts.count('W-')==1 and b2[2][0].count('b')==2:
-                return "T3wb"
+                return "T3Wb"
         elif pts.count('W+')+pts.count('W-')==1:
-                return "T3w"
+                return "T3W"
 	elif pts.count('Z')==1:
-		return "T3z"
+		return "T3Z"
 	elif pts.count('l+')==1 and pts.count('l-')==1:
 		return "T3lh"
 	elif pts.count('l+')+pts.count('l-')==1 and pts.count('nu')==1:
@@ -48,13 +50,15 @@ def getT5(b1,b2):
         if pts.count('photon')==2:
                 return "T5gg"
         elif pts.count('W+')+pts.count('W-')==2:
-                return "T5ww"
+                return "T5WW"
 	elif pts.count('W+')+pts.count('W-')==1 and pts.count('Z')==1:
-		return "T5wz"
+		return "T5WZ"
 	elif pts.count('Z')==2:
-		return "T5zz"
+		return "T5ZZ"
 	elif pts.count('l+')+pts.count('l-')==2 and pts.count('nu')==2:
 		return "T5lnu"
+	elif pts.count('t+')+pts.count('t-')==4:
+		return "T5tttt"
         else: return "T5?"
 
 def getT2(b1,b2):
@@ -64,17 +68,17 @@ def getT2(b1,b2):
         if pts.count('b')==2:
                 return "T2bb"
 	elif pts.count('b')==1 and pts.count('W+')+pts.count('W-')==1:
-		return "T2bw" #gibt es so nicht, sollte T6bbww geben?
+		return "T2bW" #gibt es so nicht, sollte T6bbww geben?
         elif pts.count('t+')==1 and pts.count('t-')==1:
                 return "T2tt"
         elif pts.count('l+')+pts.count('l-'):
                 return "TSlepSlep"
         elif pts.count('W+')+pts.count('W-')==1 and pts.count('Z')==1:
-                return "TChiwz"
+                return "TChiWZ"
         elif pts.count('W+')==1 and pts.count('W-')==1:
-                return "TChiww"
+                return "TChiWW"
         elif pts.count('Z')==2:
-                return "TChizz"
+                return "TChiZZ"
 
 	else: return "T2"
 
@@ -88,12 +92,17 @@ def getT6(b1,b2):
 	pts.extend(b1[2][1])
         pts.extend(b2[2][1])
         if pts.count('b')==2 and pts.count('Z')==2:
-                return "T6bbzz"
+                return "T6bbZZ"
 	elif pts.count('l+')+pts.count('l-')==3 and pts.count('nu')==1:
                 return "TChiNuSlep" #same as TChiChipmSnuSlep?
         elif pts.count('l+')+pts.count('l-')==2 and pts.count('nu')==2:
                 return "TChipmSnuSlep"
-
+	elif pts.count('t')==2 and pts.count('W')==2:
+		return "T6ttWW"
+	elif pts.count('b')==2 and pts.count('W')==2:
+		return "T6bbWW"
+	elif pts.count('t')==2 and pts.count('Z')==2:
+		return "T6ttZZ"
         else: return "T6?"
 
 
