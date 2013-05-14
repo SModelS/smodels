@@ -11,7 +11,7 @@ def SLHAdecomp(slhafile,Xsec,sigcut):
 #Read SLHA file
     res = pyslha.readSLHAFile(slhafile)
     
-#Get list of particles with production cross-section above sigcut and maximum cross-sections
+#Get list of particles with maximum production cross-section above sigcut and maximum cross-sections
     Pdic = {}
     for k in Xsec.keys():
         for k2 in Xsec[k]:
@@ -37,7 +37,7 @@ def SLHAdecomp(slhafile,Xsec,sigcut):
     ElList = []
     WList = []
     for ptc in Pdic.keys():
-        NewEl = SMSmethods.TElement()
+        NewEl = SMSmethods.BElement()
         NewEl.momID = [ptc,ptc]
         NewEl.masses.append(Massdic[ptc])
         weight = Pdic[ptc]
@@ -98,61 +98,26 @@ def SLHAdecomp(slhafile,Xsec,sigcut):
             for jel in range(len(FinalList)):
                 if ptcs[0] == ptcs[1] and jel < iel: continue       #Avoid double counting
 
-                if FinalList[iel].momID == ptcs[0] and FinalList[jel].momID == ptcs[1]:         
-                    Els = [copy.deepcopy(FinalList[iel]),copy.deepcopy(FinalList[jel])]
-                    Top = SMSmethods.GTop()
-                    for ib in range(2):
-                        Top.B[ib].vertnumb = len(Els[ib].masses)
-                        Top.B[ib].vertparts = [len(x) for x in Els[ib].particles]
-                        Top.B[ib].vertparts.append(0)    
-                        Top.B[ib].ElList.append(Els[ib])                                                  
-
-                    if len(Top.B[0].vertparts) != Top.B[0].vertnumb or len(Top.B[1].vertparts) != Top.B[1].vertnumb:
-                        print 'SLHAdecomp: error creating topology'
-                        return False
+                if FinalList[iel].momID == ptcs[0] and FinalList[jel].momID == ptcs[1]:
+                    Els = SMSmethods.EElement()        
+                    Els.B = [copy.deepcopy(FinalList[iel]),copy.deepcopy(FinalList[jel])]
                     weight = {}
                     for w in Xsec.keys():
                         weight.update({w : Xsec[w][ptcs]*WFinal[iel]*WFinal[jel]/(Pdic[ptcs[0]]*Pdic[ptcs[1]])})
-                    Top.WeightList.append(weight)
+                    Els.weight = weight                    
+                    
+                    Einfo = Els.getEinfo()
+                    Top = SMSmethods.GTop()
+                    Top.vertnumb = Einfo["vertnumb"]
+                    Top.vertparts = Einfo["vertparts"]
+                    Top.ElList.append(Els)
+                    for ib in range(len(Top.vertnumb)):
+                        if len(Top.vertparts[ib]) != Top.vertnumb[ib]:
+                            print 'SLHAdecomp: error creating topology'
+                            return False
                     
 #Add topology to topology list:  
                     SMSmethods.AddToList(Top,SMSTopList)
-                    
-                    
-##Run compression on existing topologies/elements:
-##Keep compressing the topologies generated so far until no new compressions can happen:
-#    while added:        
-#        added = False
-##Check for mass compressed topologies        
-#        if SMSglobals.DoCompress:
-#            for Top in ETopList:
-#                ETopComp = False
-#                ETopComp = MassCompTop(Top,SMSglobals.minmassgap)
-#                if ETopComp:
-#                    exists = False
-#                    for Topp in ETopList:
-#                        if EqualTops(Topp,ETopComp): exists = True 
-#                    if not exists:   #Avoid double counting (conservative)
-#                        SMSglobals.nComp += 1
-#                        ETopList.append(ETopComp)
-#                        added = True
-#            
-##Check for invisible compressed topologies 
-##(look for effective LSP, such as LSP + neutrino = LSP')          
-#        if SMSglobals.DoInvisible:
-#            for Top in ETopList:
-#                ETopInComp = False
-#                ETopInComp = InvCompTop(Top)
-#                if ETopInComp:
-#                    exists = False
-#                    for Topp in ETopList:
-#                        if EqualTops(Topp,ETopInComp): exists = True
-#                    if not exists:   #Avoid double counting (conservative)
-#                        SMSglobals.nInvis += 1
-#                        ETopList.append(ETopInComp)
-#                        added = True
-#    return ETopList                    
-                    
                     
            
     return SMSTopList        

@@ -57,13 +57,13 @@ def compareM(masses, d):
 		print x1,x2
 		if abs(x1-x2)/(x1+x2)<0.1:
 			return True
-		else: return None
+		else: return 0
 	except:
 		if d['mz'][0].find('LSP')>-1: #check if histogram for fixed LSP mass, return 1 if my is comparable to LSP mass of the histogram, 0 if not
 			mlsp = float(d['mz'][0][d['mz'][0].find('P')+1:d['mz'][0].find('P')+4])
 			if abs(mlsp-masses[-1])/(mlsp+masses[-1])<0.1:
 				return True
-			else: return None
+			else: return 0
 		elif d['mz'][0].find('D')>-1: #check for fixed deltaM
 			ml = []
 			ml.append(d['mz'][0].find('M1'))
@@ -71,9 +71,9 @@ def compareM(masses, d):
 			ml.append(d['mz'][0].find('M0'))
 			deltam = float(d['mz'][0].split('=')[1])
 			deltain = float(masses[getindex(ml,second=True)]-masses[getindex(ml)])
-			if deltain<0: return None
+			if deltain<0: return 0
 			if abs(deltain-deltam)/(deltain+deltam)<0.1: return True
-			else: return None
+			else: return 0
 
 
 def UpperLimit(ana, topo, masses): #masses: list of masses, with (mother, intermediate(s), LSP)
@@ -83,24 +83,24 @@ def UpperLimit(ana, topo, masses): #masses: list of masses, with (mother, interm
 		return SMSResults.getUpperLimit(ana, topo, masses[getaxis('x',d[0]['axes'])], masses[getaxis('y',d[0]['axes'])])
 	if len(masses)==2 and d[0]['mz']:
 		print "Need intermediate mass input for this topology."
-		return None
+		return 0
 	if len(masses)>3 or len(d[0]['mz'])>1:
 		print "Cannot find BR for topologies with more than one intermediate mass."
-		return None
+		return 0
 	if len(masses)>2 and not d[0]['mz']:
 		print "No intermediate mass for this topology."
-		return None
+		return 0
 	if len(masses)>2 and len(d) == 1:
 		if compareM(masses,d[0]):
 			return SMSResults.getUpperLimit(ana, gethistname(topo,d[0]['mz'][0]),masses[getaxis('x',d[0]['axes'])],masses[getaxis('y',d[0]['axes'])])
 		print "Only one histogram available, cannot interpolate for intermediate mass."
-		return None
+		return 0
 	xsecs = []
 	xvals = []
 	for ds in d:
 		if not ds['mz']:
 			print "No information on intermediate mass availabel."
-			return None
+			return 0
 		if 'LSP' in ds['mz'][0] or 'D' in ds['mz'][0]:
 			if compareM(masses,ds):
 				return SMSResults.getUpperLimit(ana, gethistname(topo,ds['mz'][0]),masses[getaxis('x',ds['axes'])],masses[getaxis('y',ds['axes'])])
@@ -112,7 +112,7 @@ def UpperLimit(ana, topo, masses): #masses: list of masses, with (mother, interm
 	if len(xsecs)<2:
 		if compareM(masses,d[0]): return SMSResults.getUpperLimit(ana, gethistname(topo,d[0]['mz'][0]),masses[getaxis('x',d[0]['axes'])],masses[getaxis('y',d[0]['axes'])])
 		print "Available histograms could not be combined, cannot interpolate"
-		return None
+		return 0
 	print xsecs, xvals
 	p = numpy.polyfit(xvals,xsecs,len(xsecs)-1)
 	X = float(masses[1]-masses[-1])/float(masses[0]-masses[-1])
@@ -120,7 +120,7 @@ def UpperLimit(ana, topo, masses): #masses: list of masses, with (mother, interm
 	print X
 	if X>max(xvals) or X<min(xvals):
 		print "x value out of range, no extrapolation"
-		return None
+		return 0
 #	dix= max(xvals)-min(xvals)
 #	diy=max(xsecs)-min(xsecs)
 #	if (X>max(xvals) and X-max(xvals)>dix) or (X<min(xvals) and min(xvals)-X>dix):

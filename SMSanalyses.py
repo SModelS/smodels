@@ -9,10 +9,8 @@ def load():
      #Global Topology:
     Analysis = EAnalysis()
     Analysis.label = "T1-simple" #it can be whatever you want
-    Analysis.Top.B[0].vertnumb = 2    #Number of vertices of 1st branch
-    Analysis.Top.B[0].vertparts = [2,0] #Number of particle insertions of 1st branch
-    Analysis.Top.B[1].vertnumb = 2    #Number of vertices of 2nd branch
-    Analysis.Top.B[1].vertparts = [2,0] #Number of particle insertions of 2nd branch    
+    Analysis.Top.vertnumb = [2,2]    #Number of vertices 
+    Analysis.Top.vertparts = [[2,0],[2,0]] #Number of particle insertions 
     Analysis.results = {
 #T1    
     "[[[jet,jet]],[[jet,jet]]]" : "None",
@@ -34,10 +32,8 @@ def load():
 #     #Global Topology:
     Analysis = EAnalysis()
     Analysis.label = "T2-simple" #it can be whatever you want
-    Analysis.Top.B[0].vertnumb = 2    #Number of vertices of 1st branch
-    Analysis.Top.B[0].vertparts = [1,0] #Number of particle insertions of 1st branch
-    Analysis.Top.B[1].vertnumb = 2    #Number of vertices of 2nd branch
-    Analysis.Top.B[1].vertparts = [1,0] #Number of particle insertions of 2nd branch    
+    Analysis.Top.vertnumb = [2,2]    #Number of vertices 
+    Analysis.Top.vertparts = [[1,0],[1,0]] #Number of particle insertions 
     Analysis.results = {
 #T2    
     "[[[jet]],[[jet]]]" : "None",
@@ -72,10 +68,8 @@ def load():
     Analysis = EAnalysis()
     Analysis.run = "8TeV"  #Run label
     Analysis.label = "T6-type" #it can be whatever you want
-    Analysis.Top.B[0].vertnumb = 3    #Number of vertices of 1st branch
-    Analysis.Top.B[0].vertparts = [1,1,0] #Number of particle insertions of 1st branch
-    Analysis.Top.B[1].vertnumb = 3    #Number of vertices of 2nd branch
-    Analysis.Top.B[1].vertparts = [1,1,0] #Number of particle insertions of 2nd branch    
+    Analysis.Top.vertnumb = [3,3]    #Number of vertices 
+    Analysis.Top.vertparts = [[1,1,0],[1,1,0]] #Number of particle insertions 
     Analysis.results = {
 #TChiChiSlep (Democratic chargino and neutralino decays):    
     "2.*([[[L],[L]],[[L],[nu]]] + [[[L],[L]],[[nu],[L]]])" : "[[[L],[L]],[[L],[nu]]] ~ [[[L],[L]],[[nu],[L]]], [[[L],[L]],[[L],[nu]]] > 2.7*[[[ta],[ta]],[[L],[nu]]], [[[L],[L]],[[L],[nu]]] > 2.7*[[[L],[L]],[[ta],[nu]]], [[[L],[L]],[[nu],[L]]] > 2.7*[[[ta],[ta]],[[nu],[L]]], [[[L],[L]],[[nu],[L]]] > 2.7*[[[L],[L]],[[nu],[ta]]]",
