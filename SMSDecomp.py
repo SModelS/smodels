@@ -1,3 +1,42 @@
+#Do LHE-based decomposition.
+#lhefile = LHE file with pythia events
+#W = dictionary with event weights
+#nevts = number of generated events
+def LHEdecomp(lhefile,W,nevts):
+    import SMSmethods
+
+    SMSTopList = []
+    LHEfile = open(lhefile,"r")
+    for iev in range(nevts):
+##Read event    
+        PList = SMSmethods.getNextEvent(LHEfile) 
+##Get mother PDGs:
+        momPDG = tuple(SMSmethods.getMom(PList))
+#Get event weight list:
+        weight = {}
+        for k in W.keys(): 
+            if W[k].has_key(momPDG):
+                weight.update({k : W[k][momPDG]})
+            else:
+                print "LHEdecomp: Error getting weight"
+                return False
+
+#Get event topology    
+        SMSTopListEv = SMSmethods.getEventTop(PList, weight)
+    
+#Add event topology to topology list:  
+        for TopEv in SMSTopListEv:  
+            SMSmethods.AddToList(TopEv,SMSTopList)
+            
+    return SMSTopList
+
+
+
+
+#Do SLHA-based decomposition.
+#slhafile = file with mass spectrum and branching ratios
+#Xsec = dictionary with cross-sections for pair production
+#sigcut = minimum sigma*BR to be generated
 def SLHAdecomp(slhafile,Xsec,sigcut):
     import sys, os, copy
 
@@ -105,6 +144,8 @@ def SLHAdecomp(slhafile,Xsec,sigcut):
                     for w in Xsec.keys():
                         weight.update({w : Xsec[w][ptcs]*WFinal[iel]*WFinal[jel]/(Pdic[ptcs[0]]*Pdic[ptcs[1]])})
                     Els.weight = weight                    
+                    
+                    if max(weight.values()) < sigcut: continue
                     
                     Einfo = Els.getEinfo()
                     Top = SMSmethods.GTop()

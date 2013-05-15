@@ -3,7 +3,7 @@
 import SMSglobals, sys, SMSmethods, SMSxsec, SMSgetlimit
 from prettytable import PrettyTable
 from SMSpprint import wrap, MyPrettyPrinter
-import SMSslhaDec
+import SMSDecomp
 from SMSHelpers import addunit
 
 import SMSanalyses ## SuK/AL descriptions
@@ -23,47 +23,19 @@ Wv = SMSxsec.pytinit(nevts,slhafile,rpythia = True, donlo = True)
 W = Wv["Wdic"]
 Xsec = Wv["Xsecdic"]
 lhefile = Wv["lhefile"]
-LHEfile = open(lhefile,"r")
 
-DoSLHAdec = True  #Choose to use SLHA decomposition
+
+DoSLHAdec = False
 
 if DoSLHAdec:
     sigmacut = addunit(0.1,'fb')  # Maximum cross-section*BR to be included
-    SMSTopList = SMSslhaDec.SLHAdecomp(slhafile,Xsec,sigmacut)
+    SMSTopList = SMSDecomp.SLHAdecomp(slhafile,Xsec,sigmacut)
 else:
-    SMSTopList = []     
-#Read events and get topologies (fills SMSTopList)
-    for iev in range(nevts):
+    SMSTopList = SMSDecomp.LHEdecomp(lhefile,W,nevts)    
 
-##Read event    
-        PList = SMSmethods.getNextEvent(LHEfile) 
-##Get mother PDGs:
-        momPDG = tuple(SMSmethods.getMom(PList))
-#Get event weight list:
-        weight = {}
-    
-        for k in W.keys(): 
-            if W[k].has_key(momPDG):
-                weight.update({k : W[k][momPDG]})
-            else:
-                print "Error getting weight"
-                sys.exit()    
-
-#Get event topology    
-        SMSTopListEv = SMSmethods.getEventTop(PList, weight)
-    
-#Add event topology to topology list:  
-        for TopEv in SMSTopListEv:  
-            SMSmethods.AddToList(TopEv,SMSTopList)
-        SMSglobals.evcount +=1
-        
-        
-        
 
 EvTop_table = PrettyTable(["Topology","#Vertices", "#Insertions", "#Elements", "Sum of weights"])
 EvElement_table = PrettyTable(["Topology","Element","Particles B[0]","Particles B[1]", "Masses B[0]","Masses B[1]","Element Weight"])
-
-   
 
 eltot = 0
 totweight = []
@@ -88,7 +60,7 @@ print "Number of Global topologies = ",len(SMSTopList)
 print(EvTop_table)
 print "Total Number of Elements = ",eltot
 print "Total weight = ",SMSmethods.sumweights(totweight)
-#print(EvElement_table)
+print(EvElement_table)
 
 print '\n \n \n'
 
@@ -115,7 +87,7 @@ for Ana in SMSglobals.ListOfAnalyses:
     AnElement_table.add_row(["---","---","---","---"])  
         
 
-#print(AnElement_table)
+print(AnElement_table)
 
 
 print '\n \n \n'
