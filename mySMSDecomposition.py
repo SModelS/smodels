@@ -116,13 +116,19 @@ def getSMS(input_lhe):
 	SMSmethods.GTop()
 	SMSTop = SMSmethods.getEventTop(PList, {})
 #Sort branches
-	Branch1 = SMSTop[0].B[0]
-	Branch2 = SMSTop[0].B[1]
-	if (Branch1.vertnumb < Branch2.vertnumb) or (Branch1.vertnumb == Branch2.vertnumb and sum(Branch1.vertparts) < sum(Branch2.vertparts)):
-      		SMSTop[0].B = [Branch2,Branch1]
+	Branch1 = SMSTop[0].ElList[0].B[0]
+	Branch2 = SMSTop[0].ElList[0].B[1]
+	v1 = SMSTop[0].vertnumb[0]
+        v2 = SMSTop[0].vertnumb[1]
+	p1 = SMSTop[0].vertparts[0]
+	p2 = SMSTop[0].vertparts[1]
+	if v1 < v2 or (v1==v2  and sum(p1)<sum(p2)):
+		Branch1, Branch2 = Branch2, Branch1
+		v1, v2 = v2, v1
+		p1, p2 = p2, p1
 #read branch infortmation
-	b1=[ SMSTop[0].B[0].vertnumb,SMSTop[0].B[0].vertparts,SMSTop[0].B[0].ElList[0].particles,abs(SMSTop[0].B[0].ElList[0].momID) ]
-	b2=[ SMSTop[0].B[1].vertnumb,SMSTop[0].B[1].vertparts,SMSTop[0].B[1].ElList[0].particles,abs(SMSTop[0].B[1].ElList[0].momID) ]
+	b1=[ v1,p1,Branch1.particles ]
+	b2=[ v2,p2,Branch2.particles ]
 #find SMS
 	if b1[0]==1 or b2[0]==1:
 		return "bad input lhe"

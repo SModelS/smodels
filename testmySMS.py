@@ -10,7 +10,7 @@ reset='\033[;0m'
 
 #topolist.remove('slha')
 
-topolist = ['T1','T2','T1tttt', 'T2tt','T3w', 'T5ww', 'TChiwz']
+topolist = ['T1','T2','T1tttt', 'T2tt','T3W', 'T5WW', 'TChiWZ']
 
 #print "myTopo, Topo according to filename"
 
