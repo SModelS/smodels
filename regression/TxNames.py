@@ -1,15 +1,8 @@
 #!/usr/bin/python
-
+import sys
+sys.path.append ( "../" )
 
 import math
-import SMSglobals, SMSanalyses, sys, SMSmethods
-
-#PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
-#Initialize global variables:
-SMSglobals.initglob()
-#Creat analyses list:
-SMSanalyses.load()
-
 
 
 def getT1(b1,b2):
@@ -35,9 +28,9 @@ def getT3(b1,b2):
                 return "T3W"
 	elif pts.count('Z')==1:
 		return "T3Z"
-	elif pts.count('l+')==1 and pts.count('l-')==1:
+	elif (pts.count('e+')==1 and pts.count('e-')==1) or (pts.count('mu+')==1 and pts.count('mu-')==1):
 		return "T3lh"
-	elif pts.count('l+')+pts.count('l-')==1 and pts.count('nu')==1:
+	elif (pts.count('e+')+pts.count('e-')==1 or pts.count('mu+')+pts.count('mu-')==1) and pts.count('nu')==1:
 		return "T3lnu"
         else: return "T3?"
 
@@ -71,7 +64,7 @@ def getT2(b1,b2):
 		return "T2bW" #gibt es so nicht, sollte T6bbww geben?
         elif pts.count('t+')==1 and pts.count('t-')==1:
                 return "T2tt"
-        elif pts.count('l+')+pts.count('l-'):
+        elif pts.count('e+')+pts.count('e-')==2 or pts.count('mu+')+pts.count('mu-')==2:
                 return "TSlepSlep"
         elif pts.count('W+')+pts.count('W-')==1 and pts.count('Z')==1:
                 return "TChiWZ"
@@ -107,21 +100,16 @@ def getT6(b1,b2):
 
 
 
-def getSMS(input_lhe):
-#Get branches from lhe-file
-	File=open("regression/%s_1.lhe" % input_lhe)
-
-	PList = SMSmethods.getNextEvent(File)
-#weight = [pytres["xsecfb"]/float(nevts),pytres["xsecfb"]/float(nevts)]
-	SMSmethods.GTop()
-	SMSTop = SMSmethods.getEventTop(PList, {})
+def getTx(E):
+	"""takes EElement and returns Tx-Name"""
+	Branch1=E.B[0]
+	Branch2=E.B[1]
+	d=E.getEinfo()
+	v1=d["vertnumb"][0]
+	v2=d["vertnumb"][1]
+	p1=d["vertparts"][0]
+	p2=d["vertparts"][1]
 #Sort branches
-	Branch1 = SMSTop[0].ElList[0].B[0]
-	Branch2 = SMSTop[0].ElList[0].B[1]
-	v1 = SMSTop[0].vertnumb[0]
-        v2 = SMSTop[0].vertnumb[1]
-	p1 = SMSTop[0].vertparts[0]
-	p2 = SMSTop[0].vertparts[1]
 	if v1 < v2 or (v1==v2  and sum(p1)<sum(p2)):
 		Branch1, Branch2 = Branch2, Branch1
 		v1, v2 = v2, v1
@@ -131,7 +119,7 @@ def getSMS(input_lhe):
 	b2=[ v2,p2,Branch2.particles ]
 #find SMS
 	if b1[0]==1 or b2[0]==1:
-		return "bad input lhe"
+		return "bad input"
 	if b1[1]==[2,0] and b2[1]==[2,0]:
 		return getT1(b1,b2)
 	if (b1[1]==[2,2,0] or b1[1]==[2,1,0]) and b2[1]==[2,0]:
@@ -146,6 +134,7 @@ def getSMS(input_lhe):
                 return getT6(b1,b2)
 	return "?"
 
+'''
 def particle ( pid ):
   p=int(abs(pid))
   if p==1000021: return "gluino"
@@ -208,3 +197,4 @@ countingvariables=[ "jets", "electron", "muon", "gluino", "squark",
   "pN1", "slepton", "sneutrino", "msugra_m12", "msugra_m0", "?s",
   "psbottom","pstop", "pslepton", "neutrino", "phiggs", "psneutrino"
   ]
+'''
