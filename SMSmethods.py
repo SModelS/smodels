@@ -1,4 +1,5 @@
 from SMSHelpers import addunit, rmvunit
+import sys, copy
 
 #---------------Dictionaries:
 Rodd={ 
@@ -11,8 +12,8 @@ Reven={
  25 : "higgs", -25: "higgs", 35 : "H0", -35 : "H0", 36 : "A0", -36 : "A0", 37 : "H+", -37 : "H-", 23 : "Z", -23 : "Z", 22 : "photon", -22 : "photon", 24 : "W+", -24 : "W-", 16 : "nu", -16 : "nu", 15 : "ta-", -15 : "ta+", 14 : "nu", -14 : "nu", 13 : "mu-", -13 : "mu+", 12 : "nu", -12 : "nu", 11 : "e-", -11 : "e+", 5 : "b", -5 : "b", 6 : "t+", -6 : "t-", 1 : "jet", 2 : "jet", 3 : "jet", 4 : "jet", 21 : "jet", -1 : "jet", -2 : "jet", -3 : "jet", -4 : "jet", -21 : "jet"
  }
 
-PtcDic={
-"l+" : ["e+","mu+"],"l-" : ["e-","mu-"],"l" : ["e-","mu-","e+","mu+"], "ta" : ["ta+","ta-"], "W" : ["W+","W-"], "t" : ["t+","t-"], "L+" : ["e+","mu+","ta+"], "L-" : ["e-","mu-","ta-"], "L" : ["e+","mu+","ta+","e-","mu-","ta-"]
+PtcDic={ 
+"e" : ["e+","e-"], "mu" : ["mu+", "mu-"], "ta" : ["ta+","ta-"], "l+" : ["e+","mu+"],"l-" : ["e-","mu-"],"l" : ["e-","mu-","e+","mu+"], "W" : ["W+","W-"], "t" : ["t+","t-"], "L+" : ["e+","mu+","ta+"], "L-" : ["e-","mu-","ta-"], "L" : ["e+","mu+","ta+","e-","mu-","ta-"]
 }
 
 #--------------------Classes:
@@ -117,7 +118,6 @@ class EAnalysis:
         
         for iii in range(len(inelements)):
             for ii in range(2):    
-
                 con = inelements[iii][ii].replace(" ","")
                 while "[" in con:  #String has element                
                     st = con[con.find("[[["):con.find("]]]")+3] #Get duplet
@@ -134,8 +134,7 @@ class EAnalysis:
                                     print "GenerateElements: Unknown particle ",ptc
                                     return False        
                     ListOfStrs.append(st)
-                    
-                    
+       
 #Remove repeated elements:
         ListOfStrs = set(ListOfStrs)
 #Now add all elements to element list        
@@ -241,7 +240,7 @@ def getEventTop(PList, weight = {}):
     compressed topologies with small mass gaps and/or neutrinos emitted
     in the last step of the cascade ("effective LSP"). """
     if len(PList)==0: return None
-    import SMSglobals, copy
+    import SMSglobals
         
     ETopList = []
     ETop = GTop()
@@ -340,7 +339,6 @@ def getEventTop(PList, weight = {}):
 
 #If two masses in InTop are degenerate, return compressed topology
 def MassCompTop(InTop,mingap):
-    import copy    
        
     ETopComp = copy.deepcopy(InTop)  
 #Loop over branches        
@@ -372,9 +370,7 @@ def MassCompTop(InTop,mingap):
             
             
 #If InTop has an effective LSPs (LSP + neutrino = LSP'), return compressed topology
-def InvCompTop(InTop):
-    import copy    
-    
+def InvCompTop(InTop):    
       
     ETopComp = copy.deepcopy(InTop)
 #Loop over branches        
@@ -455,20 +451,20 @@ def EqualEls(ElA,ElB,order=True):
             mass = [El1[0].masses,El1[1].masses]
             ptcs_b = [El1[1].particles,El1[0].particles]
             mass_b = [El1[1].masses,El1[0].masses]
-            if ptcsA == ptcs and mass == massA: 
+            if SimParticles(ptcsA,ptcs,useDict=False) and mass == massA: 
                 return True
-            elif ptcsA == ptcs_b and mass_b == massA: 
+            elif SimParticles(ptcsA,ptcs_b,useDict=False) and mass_b == massA: 
                 return True
             else:
                 return False
         else:       
             for i in range(len(El1)):
-                if El1[i].particles != El2[i].particles: return False
+                if not SimParticles(El1[i].particles,El2[i].particles,useDict=False): return False
                 if El1[i].masses != El2[i].masses: return False
            
 #If it is a BElement:            
     elif type(ElA) == type(BElement()):
-        if ElA.particles != ElB.particles: return False
+        if SimParticles(ElA.particles,ElB.particles,useDict=False): return False
         if ElA.masses != ElB.masses: return False
     else:
         print "EqualEls: unknown input"
@@ -523,12 +519,17 @@ def SimEls(ElA,ElB,order=True,igmass=False):
 
 #Compares 2 particle names or 2 nested name arrays. Allows for dictionary labels
 #(Ex: L = l, l+ = l, l = l-,...)
-def SimParticles(ptype1,ptype2):
+#For the last nested level ignore particle ordering
+def SimParticles(ptype1,ptype2,useDict=True):
+    
+    if len(ptype1) != len(ptype2): return False 
+    if len(ptype1) == 0: return True   #Empty list    
+   
+    
+    ptype1v = [[ptype1]]
+    ptype2v = [[ptype2]]
 
-    ptype1v = [ptype1]
-    ptype2v = [ptype2]
- 
-#First flatten nested arrays: 
+#First flatten nested arrays until next-to-last level: 
     isNested = True
     while isNested:
         newptype1v = []
@@ -543,27 +544,60 @@ def SimParticles(ptype1,ptype2):
             else:
                 newptype1v.append(ptype1v[i])
                 newptype2v.append(ptype2v[i])
-                
+
         ptype1v = newptype1v
         ptype2v = newptype2v
         isNested = False
         for i in range(len(ptype1v)):
-            if type(ptype1v[i]) == type(list()): isNested = True
-            if type(ptype2v[i]) == type(list()): isNested = True
+            if type(ptype1v[i]) == type(list()) and type(ptype1v[i][0]) == type(list()): isNested = True
+            if type(ptype2v[i]) == type(list()) and type(ptype2v[i][0]) == type(list()): isNested = True
+    
+    if len(ptype1v) != len(ptype2v): return False
 
-        
+#Compare last level lists one by one, ignoring the order:    
     for i in range(len(ptype1v)):
-        if PtcDic.has_key(ptype1v[i]):
-            ptypeA = PtcDic[ptype1v[i]]        
-        else:
-            ptypeA = [ptype1v[i]]
-        if PtcDic.has_key(ptype2v[i]):
-            ptypeB = PtcDic[ptype2v[i]]        
-        else:
-            ptypeB = [ptype2v[i]]
+        if len(ptype1v[i]) != len(ptype2v[i]): return False
+       
+        
+#Check  if lists match, ignoring possible dictionary entries
+        pmatch = True
+        for ptc in ptype1v[i]:
+            if ptype1v[i].count(ptc) != ptype2v[i].count(ptc): pmatch = False            
+        if pmatch: continue
+        elif not useDict: return False
+        
+#If they do not match and useDict=True, generate all possible lists from dictionary entries: 
+        allptcs = [[ptype1v[i]],[ptype2v[i]]]
+        for allpt in allptcs:            
+            ptc0 = copy.deepcopy(allpt[0])
+            for ipt in range(len(ptc0)):
+                if PtcDic.has_key(ptc0[ipt]):
+                    for jpt in range(len(allpt)):
+                        if allpt[jpt] == []: continue
+                        newptc = copy.deepcopy(allpt[jpt])
+                        for ptc in PtcDic[ptc0[ipt]]:
+                            newptc[ipt] = ptc
+                            allpt.append(copy.deepcopy(newptc))
+                        allpt[jpt] = []
+            while allpt.count([]) > 0: allpt.remove([])             
 
-        if set(ptypeA) & set(ptypeB) == set([]): return False
-
+#Now compare all possibilities:
+        match = False
+        iA = 0
+        while not match and iA < len(allptcs[0]):
+            ptcA = allptcs[0][iA]
+            for ptcB in allptcs[1]:
+                if len(ptcA) != len(ptcB): return False
+                pmatch = True
+                for ptc in ptcA:
+                    if ptcA.count(ptc) != ptcB.count(ptc): pmatch = False
+                if pmatch:
+                    match = True
+                    break
+            iA += 1    
+        if not match: return False    
+       
+#if it reached here, entries are similar:
     return True
 
 
@@ -573,7 +607,6 @@ def AddToList(SMSTop,SMSTopList):
     add weight.  If the same topology exists, but not the same element, add
     element.  If neither element nor topology exist, add the new topology and
     all its elements """
-    import copy
     
     for inew in range(len(SMSTop.ElList)):
         NewEl_a = SMSTop.ElList[inew]  
@@ -633,7 +666,6 @@ def AddToList(SMSTop,SMSTopList):
 #Loop over all elements in SMSTopList and add the weight to the 
 #matching elements in Analysis.
 def AddToAnalysis(SMSTopList,Analysis):
-    import copy
     
     for itop in range(len(SMSTopList)):
         NewTop = SMSTopList[itop]    
@@ -759,7 +791,6 @@ def GoodMass(mass,Distfunc,dmin):
 
 #Cluster algorithm (generic for any type of object, as long as the distance function is given):
 def DoCluster(objlist,Distfunc,dmin):
-    import copy
     
     MD = []
 #Compute distance matrix
@@ -914,7 +945,7 @@ def sumweights(wlist):
 
 #Evaluate theoretical predictions for the analysis result and conditions:
 def EvalRes(res,Analysis,uselimits = False):
-    import SMSglobals, copy
+    import SMSglobals
 
     output = []
     if not Analysis.plots.has_key(res) or not Analysis.results.has_key(res):
@@ -1005,7 +1036,7 @@ def ClusterTop(Top,masscluster):
                 match = False    
                 for iel2 in range(len(NewTop.ElList)):    
                     ptcB = [NewTop.ElList[iel2].B[0].particles,NewTop.ElList[iel2].B[1].particles]
-                    if ptcB == ptc:
+                    if SimParticles(ptcB,ptc,useDict=False):
                         match = True
                         oldweight = NewTop.ElList[iel2].weight
                         NewTop.ElList[iel2].weight = sumweights([oldweight,weight])
@@ -1052,7 +1083,7 @@ def Eval_cluster(instr,InTop):
         Elw.append(zeroweight)
         for j in range(len(InTop.ElList)):
             AEl = [InTop.ElList[j].B[0].particles,InTop.ElList[j].B[1].particles]
-            if El[i] == AEl:                
+            if SimParticles(El[i],AEl,useDict=False):                
                 Elw[i] = InTop.ElList[j].weight
                 break
 
