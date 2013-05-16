@@ -47,11 +47,11 @@ def getExclusion ( analysis, topo, run=None ):
     if ex.has_key ( t ): return ex[t]
   return None
 
-def exists ( analysis, topo, run=None ):
-  """ does a result for analysis/topo/run exist? """
-  run=SMSHelpers.getRun ( analysis, run )
-  histo=SMSHelpers.getUpperLimitFromHisto ( analysis, topo, run )
-  return histo!=None
+#def exists ( analysis, topo, run=None ):
+#  """ does a result for analysis/topo/run exist? """
+#  run=SMSHelpers.getRun ( analysis, run )
+#  histo=SMSHelpers.getUpperLimitFromHisto ( analysis, topo, run )
+#  return histo!=None
 
 def getBinWidthX ( analysis, topo, run=None ):
   """ get the bin width in X """

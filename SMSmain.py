@@ -60,7 +60,7 @@ print "Number of Global topologies = ",len(SMSTopList)
 print(EvTop_table)
 print "Total Number of Elements = ",eltot
 print "Total weight = ",SMSmethods.sumweights(totweight)
-print(EvElement_table)
+#print(EvElement_table)
 
 print '\n \n \n'
 
