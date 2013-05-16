@@ -37,7 +37,6 @@ def pytinit(nevts,slhafile,rpythia = True, donlo = True):
     for key in n8_evts.keys(): 
         weight_8.update({key : total_cs8/nevts})  #Weight for one event
         sigma_8.update({key : n8_evts[key]*total_cs8/nevts})   #Production cross-section
-          
 
 #Get 7 TeV event decomposition:
     n7_evts={}
@@ -50,10 +49,7 @@ def pytinit(nevts,slhafile,rpythia = True, donlo = True):
     weight_7 = {}
     sigma_7 = {}
     for key in n7_evts.keys():
-        if not n8_evts.has_key(key):
-            weight_7.update({key : addunit(0.,'fb')})
-            sigma_7.update({key : addunit(0.,'fb')})
-        else:
+        if n8_evts.has_key(key):
             weight_7.update({key : n7_evts[key]*total_cs7/(nevts*n8_evts[key])}) #Weight for one event
             sigma_7.update({key : n7_evts[key]*total_cs7/nevts})  #Production cross-section
 

@@ -145,7 +145,7 @@ def SLHAdecomp(slhafile,Xsec,sigcut):
                         weight.update({w : Xsec[w][ptcs]*WFinal[iel]*WFinal[jel]/(Pdic[ptcs[0]]*Pdic[ptcs[1]])})
                     Els.weight = weight                    
                     
-                    if max(weight.values()) < sigcut: continue
+#                    if max(weight.values()) < sigcut: continue
                     
                     Einfo = Els.getEinfo()
                     Top = SMSmethods.GTop()

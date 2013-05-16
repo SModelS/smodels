@@ -189,7 +189,7 @@ def getUpperLimitFromDictionary ( analysis, topo, mx=None, my=None, run=None, pn
   if Dict==None: return Dict
   ## Dict=addunit ( Dict, "pb" )
   # print "[SMSResults.py] mx=",mx
-  if mx==None: return Dict
+  if rmvunit(mx,'GeV')==None: return Dict
   ## return getClosestValue ( Dict, mx, my )
   return addunit ( getInterpolatedUpperLimit ( Dict, mx, my ), "pb" )
  

@@ -17,15 +17,15 @@ SMSanalyses.load()
 
 
 #Generate events and compute cross-sections:
-nevts = 10000
-slhafile = "AndreSLHA/andrePT4.slha"
+nevts = 100
+slhafile = "AndreSLHA/andrePT13.slha"
 Wv = SMSxsec.pytinit(nevts,slhafile,rpythia = True, donlo = True)
 W = Wv["Wdic"]
 Xsec = Wv["Xsecdic"]
 lhefile = Wv["lhefile"]
 
 
-DoSLHAdec = False
+DoSLHAdec = True
 
 if DoSLHAdec:
     sigmacut = addunit(0.1,'fb')  # Maximum cross-section*BR to be included
@@ -91,7 +91,7 @@ print(AnElement_table)
 
 
 print '\n \n \n'
-#sys.exit()
+sys.exit()
 
         
 #Compute theoretical predictions to analyses results:
