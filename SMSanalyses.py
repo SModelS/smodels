@@ -25,10 +25,10 @@ def load():
     }
     Analysis.plots  = {
     "[[[jet,jet]],[[jet,jet]]]" : ["T1",["alphaT","alphaT8TeV"]],
-    "[[[t,t]],[[t,t]]]" : ["T1tttt",["alphaT","RA48TeV","RA2b8TeV","MultiLepton8TeV","alphaT8TeV","ATLAS_CONF_2013_007"]],
+    "[[[t,t]],[[t,t]]]" : ["T1tttt",["alphaT","RA48TeV","RA2b8TeV","MultiLepton8TeV","alphaT8TeV"]],
     "[[[b,b]],[[b,b]]]" : ["T1bbbb",["alphaT","RA2b8TeV","alphaT8TeV"]],
     "[[[t,b]],[[t,b]]]" : ["T1tbtb",["ATLAS_CONF_2013_007"]],
-    "[[[t+,t-]],[[t+,t-]]]" : ["T1tttt",["ATLAS_CONF_2012_015"]]
+    "[[[t+,t-]],[[t+,t-]]]" : ["T1tttt",["ATLAS_CONF_2012_105"]]
     }    
 #Add analysis to list of analyses:
     ListOfAnalyses.append(Analysis)
@@ -85,10 +85,10 @@ def load():
     "[[[L+],[nu]],[[L-],[nu]]] + [[[L+],[nu]],[[nu],[L-]]] + [[[L-],[nu]],[[nu],[L+]]] + [[[nu],[L+]],[[nu],[L-]]]" : "[[[L+],[nu]],[[L-],[nu]]] ~ [[[L+],[nu]],[[nu],[L-]]], [[[L+],[nu]],[[nu],[L-]]] ~ [[[L-],[nu]],[[nu],[L+]]], [[[L-],[nu]],[[nu],[L+]]] ~ [[[nu],[L+]],[[nu],[L-]]], [[[L+],[nu]],[[L-],[nu]]] > 2.7*[[[ta+],[nu]],[[L-],[nu]]], [[[L+],[nu]],[[L-],[nu]]] > 2.7*[[[L+],[nu]],[[ta-],[nu]]], [[[L+],[nu]],[[nu],[L-]]] > 2.7*[[[ta+],[nu]],[[nu],[L-]]], [[[L+],[nu]],[[nu],[L-]]] > 2.7*[[[L+],[nu]],[[nu],[ta-]]], [[[L-],[nu]],[[nu],[L+]]] > 2.7*[[[ta-],[nu]],[[nu],[L+]]], [[[L-],[nu]],[[nu],[L+]]] > 2.7*[[[L-],[nu]],[[nu],[ta+]]], [[[nu],[L+]],[[nu],[L-]]] > 2.7*[[[nu],[ta+]],[[nu],[L-]]], [[[nu],[L+]],[[nu],[L-]]] > 2.7*[[[nu],[L+]],[[nu],[ta-]]]",
 #T6bbww (stop pair production)
     "[[[b],[W]],[[b],[W]]]" : "None",
-#T6tttt
-    "[[[t],[t]],[[t],[t]]]" : "None",
-#T6ttww
-    "[[[t],[W]],[[t],[W]]]" : "None",
+#T5tttt
+    "[[[t+],[t-]],[[t+],[t-]]] + [[[t-],[t+]],[[t+],[t-]]] + [[[t-],[t+]],[[t-],[t+]]]" : "None",
+#T6ttWW
+    "[[[t+],[W-]],[[t+],[W-]]] + [[[t-],[W+]],[[t+],[W-]]] + [[[t-],[W+]],[[t-],[W+]]]" : "None",
 #T6ttzz    
     "[[[Z],[t]],[[Z],[t]]]" : "None",
 #TChiChiSlepSlep
@@ -104,8 +104,8 @@ def load():
     "[[[ta],[ta]],[[nu],[ta]]]" : ["TChiChipmStauStau",["Weakinos8TeV"]],
     "[[[L+],[nu]],[[L-],[nu]]] + [[[L+],[nu]],[[nu],[L-]]] + [[[L-],[nu]],[[nu],[L+]]] + [[[nu],[L+]],[[nu],[L-]]]" : ["TChipChimSlepSnu",["Weakinos8TeV"]],
     "[[[b],[W]],[[b],[W]]]" : ["T6bbww",["LeptonicStop8TeV","ATLAS_CONF_2013_037","ATLAS_CONF_2012_166"]],
-    "[[[t],[t]],[[t],[t]]]" : ["T6tttt",["ATLAS_CONF_2013_007"]],
-    "[[[t],[W]],[[t],[W]]]" : ["T6ttww",["ATLAS_CONF_2013_007"]],
+    "[[[t+],[t-]],[[t+],[t-]]] + [[[t-],[t+]],[[t+],[t-]]] + [[[t-],[t+]],[[t-],[t+]]]" : ["T5tttt",["ATLAS_CONF_2013_007"]],
+    "[[[t+],[W-]],[[t+],[W-]]] + [[[t-],[W+]],[[t+],[W-]]] + [[[t-],[W+]],[[t-],[W+]]]" : ["T6ttWW",["ATLAS_CONF_2013_007"]],
     "[[[Z],[t]],[[Z],[t]]]" : ["T6ttZZ",["ATLAS_CONF_2013_025"]],
     "[[[l],[l]],[[l],[l]]]" : ["TChiChiSlepSlep",["ATLAS_CONF_2013_036"]],
     "2.*([[[ta+],[ta-]],[[nu],[ta]]] + [[[ta+],[ta-]],[[ta],[nu]]] + [[[ta-],[ta+]],[[nu],[ta]]] + [[[ta-],[ta+]],[[ta],[nu]]])" : ["TChiChipmStauL",["ATLAS_CONF_2013_028"]],
