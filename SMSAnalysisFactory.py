@@ -55,27 +55,22 @@ def load():
         if debug:
           print "dont have a constraint for",analysis,Tx,"(",stopo,")"
         continue
-      #print "constraint >>%s<<" % constraint
       constrarray=getArray ( constraint )
-      #print "array >>%s<<" % constrarray
       #Global Topology:
-      for branch in [0,1]:
-        Analysis.Top.B[branch].vertnumb = len(constrarray[branch])+1    #Number of vertices of branch
-        vertparts1 = [ len(x) for x in constrarray[branch] ]
-        vertparts1.append(0)
-        Analysis.Top.B[branch].vertparts = vertparts1
-        #print vertparts1
+      Analysis.Top.vertnumb = [ len(constrarray[0])+1, len(constrarray[1])+1 ]
+      Analysis.Top.vertparts = [ [ len(x) for x in constrarray[0] ], [ len(x) for x in constrarray[1] ], 0 ]
+      #for branch in [0,1]:
+        # Analysis.Top.B[branch].vertnumb = len(constrarray[branch])+1    #Number of vertices of branch
+        # vertparts1 = [ len(x) for x in constrarray[branch] ]
+      #  vertparts1.append(0)
+      #  Analysis.Top.B[branch].vertparts = vertparts1
       
       cond=SMSResults.getConditions ( analysis, topo=stopo )
       if cond==None: cond=""
-      ## andreconstraint=constraint.replace("'","").replace("[[[","[[").replace("]]]","]]").replace(" ","")
       andreconstraint=constraint.replace("'","").replace(" ","")
-      #print "constraint=",constrarray,andreconstraint
       andrecond=cond.replace("'","").replace(" ","")
-      #print "cond=",cond
       Analysis.results={ andreconstraint: andrecond }
       analyses=[ x for x in SMSResults.getAnalyses ( stopo ) if SMSResults.getConditions ( x ).has_key(stopo) and SMSResults.getConditions ( x )[stopo] == cond ]
-      #print "analyses= ",analyses
       Analysis.plots = { andreconstraint: [ stopo, analyses ] }
 
       ul=SMSResults.getUpperLimit ( analysis, Tx, mx=400., my=100., interpolate=True )
