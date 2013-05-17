@@ -52,7 +52,7 @@ def GetPlotLimit(inmass,plot,Analysis,complain = False):
 
         for imass in range(1,len(massarray[ib])):
             mI = massarray[ib][imass]
-            x = float((mI-my)/(mx-my))
+            x = float((mI-my))/(mx-my)
             massI.append([mI, x])
 
     if len(massI) == 2:
