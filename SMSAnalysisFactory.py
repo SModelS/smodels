@@ -57,7 +57,7 @@ def load():
         continue
       constrarray=getArray ( constraint )
       #Global Topology:
-      Analysis.Top.vertnumb = [ len(constrarray[0])+1, len(constrarray[1])+1 ]
+      Analysis.Top.vertnumb = [ len(constrarray[0]), len(constrarray[1]) ]
       Analysis.Top.vertparts = [ [ len(x) for x in constrarray[0] ], [ len(x) for x in constrarray[1] ], 0 ]
       #for branch in [0,1]:
         # Analysis.Top.B[branch].vertnumb = len(constrarray[branch])+1    #Number of vertices of branch
@@ -82,9 +82,9 @@ def load():
 
 # Build list of elements from constraints and conditions with zero weights
 # to be computed later with theoretical weights
-  print "Now generate elements"
+  print "[SMSAnalysisFactory.py] Now generate elements"
   for Analy in SMSglobals.ListOfAnalyses:
-    #print "Generate",Analy.label
+    print "[SMSAnalysisFactory.py] Generate element ``%s [%s]'' " % ( Analy.label,Analy.run )
     Analy.GenerateElements()
     Analy.GetPlots(verbose=debug)
     
