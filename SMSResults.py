@@ -472,8 +472,9 @@ def exists(analysis, topo, run = None):
   run2=SMSHelpers.getRun( analysis, run )
   hasDict=SMSHelpers.hasDictionary ( analysis, run2 )
   if hasDict:
-    histo=SMSHelpers.getUpperLimitDictionary ( analysis, topo, run2 )
-    if not histo or len(histo)==0: return False
+    #print "BBB 1 ana=%s run=%s run2=%s" % ( analysis,run,run2 )
+    Dict=SMSHelpers.getUpperLimitDictionary ( analysis, topo, run2 )
+    if not Dict or len(Dict)==0: return False
     return True
   histo=SMSHelpers.getUpperLimitFromHisto(analysis, topo, run2 )
   if not histo: return False
