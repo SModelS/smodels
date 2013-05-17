@@ -27,9 +27,11 @@ def getArray ( constraint ):
 def load():
   """ This method creates the analysis objects from the info given in the 
       SMS database.
-      These EAnalysis objects are registered at SMSglobals.ListOfAnalyses """
+      returns ListOfAnalyses """
   from SMSmethods import EAnalysis
-  import SMSResults, SMSglobals
+  import SMSResults
+  
+  ListOfAnalyses = []
 
   debug=False
   if debug:
@@ -74,19 +76,21 @@ def load():
       Analysis.plots = { andreconstraint: [ stopo, analyses ] }
 
       ul=SMSResults.getUpperLimit ( analysis, Tx, mx=400., my=100., interpolate=True )
-      print "[SMSAnalysisFactory] test for %s:%s ul(mx=400,my=100)=%s" % ( analysis, Tx, ul )
+#      print "[SMSAnalysisFactory] test for %s:%s ul(mx=400,my=100)=%s" % ( analysis, Tx, ul )
       
   #Add analysis to list of analyses:
-      SMSglobals.ListOfAnalyses.append(Analysis)
+      ListOfAnalyses.append(Analysis)
       #print "done."
 
 # Build list of elements from constraints and conditions with zero weights
 # to be computed later with theoretical weights
-  print "[SMSAnalysisFactory.py] Now generate elements"
-  for Analy in SMSglobals.ListOfAnalyses:
-    print "[SMSAnalysisFactory.py] Generate element ``%s [%s]'' " % ( Analy.label,Analy.run )
+#  print "[SMSAnalysisFactory.py] Now generate elements"
+  for Analy in ListOfAnalyses:
+#    print "[SMSAnalysisFactory.py] Generate element ``%s [%s]'' " % ( Analy.label,Analy.run )
     Analy.GenerateElements()
     Analy.GetPlots(verbose=debug)
+    
+  return ListOfAnalyses  
     
 if __name__ == "__main__":
   import SMSglobals

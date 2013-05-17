@@ -6,27 +6,32 @@ from SMSpprint import wrap, MyPrettyPrinter
 import SMSDecomp
 from SMSHelpers import addunit
 
-# import SMSanalyses ## SuK/AL descriptions
-import SMSAnalysisFactory as SMSanalyses ## UND/WW descriptions
+import SMSanalyses ## SuK/AL descriptions
+import SMSAnalysisFactory ## UND/WW descriptions
+
+DoFactory = True
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Initialize global variables:
 SMSglobals.initglob()
 #Creat analyses list:
-SMSanalyses.load()
+if DoFactory:
+    SMSglobals.ListOfAnalyses = SMSAnalysisFactory.load()
+else:    
+    SMSglobals.ListOfAnalyses = SMSanalyses.load()
 
 
 #Generate events and compute cross-sections:
-nevts = 100
+nevts = 1000
 # slhafile = "AndreSLHA/andrePT13.slha"
-slhafile = "DESY_stop.slha"
+slhafile = "AndreSLHA/DESY_stop.slha"
 Wv = SMSxsec.pytinit(nevts,slhafile,rpythia = True, donlo = True)
 W = Wv["Wdic"]
 Xsec = Wv["Xsecdic"]
 lhefile = Wv["lhefile"]
 
 
-DoSLHAdec = False
+DoSLHAdec = True
 
 if DoSLHAdec:
     sigmacut = addunit(0.1,'fb')  # Maximum cross-section*BR to be included
@@ -61,7 +66,7 @@ print "Number of Global topologies = ",len(SMSTopList)
 print(EvTop_table)
 print "Total Number of Elements = ",eltot
 print "Total weight = ",SMSmethods.sumweights(totweight)
-#print(EvElement_table)
+print(EvElement_table)
 
 print '\n \n \n'
 
