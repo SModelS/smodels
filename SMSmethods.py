@@ -110,7 +110,7 @@ class EAnalysis:
 #Syntax check:        
         for k in range(len(vertnumb)):
             if len(vertparts[k]) != vertnumb[k]:
-                print "GenerateElements: Wrong syntax"
+                print "GenerateElements: Inconsistent data: ninsertions=%d len(insertions)=%d for ``%s''." % ( vertnumb[k], len(vertparts[k]), self.Top )
                 return False
         
 #Get all element strings:        

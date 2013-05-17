@@ -6,8 +6,8 @@ from SMSpprint import wrap, MyPrettyPrinter
 import SMSDecomp
 from SMSHelpers import addunit
 
-import SMSanalyses ## SuK/AL descriptions
-#import SMSAnalysisFactory as SMSanalyses ## UND/WW descriptions
+# import SMSanalyses ## SuK/AL descriptions
+import SMSAnalysisFactory as SMSanalyses ## UND/WW descriptions
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Initialize global variables:
@@ -18,14 +18,15 @@ SMSanalyses.load()
 
 #Generate events and compute cross-sections:
 nevts = 100
-slhafile = "AndreSLHA/andrePT13.slha"
+# slhafile = "AndreSLHA/andrePT13.slha"
+slhafile = "DESY_stop.slha"
 Wv = SMSxsec.pytinit(nevts,slhafile,rpythia = True, donlo = True)
 W = Wv["Wdic"]
 Xsec = Wv["Xsecdic"]
 lhefile = Wv["lhefile"]
 
 
-DoSLHAdec = True
+DoSLHAdec = False
 
 if DoSLHAdec:
     sigmacut = addunit(0.1,'fb')  # Maximum cross-section*BR to be included
