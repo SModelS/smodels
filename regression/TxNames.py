@@ -4,11 +4,14 @@ sys.path.append ( "../" )
 
 import math
 
-
-def getT1(b1,b2):
+def ptsCount(b1,b2):
 	pts=[]
-	pts.extend(b1[2][0])
-	pts.extend(b2[2][0])
+	b1.extend(b2)
+	for b in b1:
+		pts.extend(b)
+	return pts
+
+def getT1(pts):
 	if pts.count('b')==4:
 		return "T1bbbb"
 	elif pts.count('t+')+pts.count('t-')==4:
@@ -17,11 +20,7 @@ def getT1(b1,b2):
 		return "T1tbtb"
 	else: return "T1"
 
-def getT3(b1,b2):
-	pts=[]
-        pts.extend(b1[2][0])
-        pts.extend(b1[2][1])
-        pts.extend(b2[2][0])
+def getT3(pts, b2):
         if pts.count('W+')+pts.count('W-')==1 and b2[2][0].count('b')==2:
                 return "T3Wb"
         elif pts.count('W+')+pts.count('W-')==1:
@@ -34,12 +33,7 @@ def getT3(b1,b2):
 		return "T3lnu"
         else: return "T3?"
 
-def getT5(b1,b2):
-	pts=[]
-        pts.extend(b1[2][0])
-        pts.extend(b2[2][0])
-        pts.extend(b1[2][1])
-        pts.extend(b2[2][1])
+def getT5(pts):
         if pts.count('photon')==2:
                 return "T5gg"
         elif pts.count('W+')+pts.count('W-')==2:
@@ -54,10 +48,7 @@ def getT5(b1,b2):
 		return "T5tttt"
         else: return "T5?"
 
-def getT2(b1,b2):
-        pts=[]
-        pts.extend(b1[2][0])
-        pts.extend(b2[2][0])
+def getT2(pts):
         if pts.count('b')==2:
                 return "T2bb"
 	elif pts.count('b')==1 and pts.count('W+')+pts.count('W-')==1:
@@ -75,15 +66,10 @@ def getT2(b1,b2):
 
 	else: return "T2"
 
-def getT4(b1,b2):
+def getT4(pts):
 	return "T4"
 
-def getT6(b1,b2):
-        pts=[]
-        pts.extend(b1[2][0])
-        pts.extend(b2[2][0])
-	pts.extend(b1[2][1])
-        pts.extend(b2[2][1])
+def getT6(pts):
         if pts.count('b')==2 and pts.count('Z')==2:
                 return "T6bbZZ"
 	elif pts.count('l+')+pts.count('l-')==3 and pts.count('nu')==1:
@@ -121,17 +107,17 @@ def getTx(E):
 	if b1[0]==1 or b2[0]==1:
 		return "bad input"
 	if b1[1]==[2,0] and b2[1]==[2,0]:
-		return getT1(b1,b2)
+		return getT1(ptsCount(b1[2],b2[2]))
 	if (b1[1]==[2,2,0] or b1[1]==[2,1,0]) and b2[1]==[2,0]:
-		return getT3(b1,b2)
+		return getT3(ptsCount(b1[2],b2[2]), b2)
 	if (b1[1]==[2,2,0] and b2[1]==[2,2,0]) or (b1[1]==[2,1,0] and b2[1]==[2,1,0]):
-       		return getT5(b1,b2)
+       		return getT5(ptsCount(b1[2],b2[2]))
 	if b1[1]==[1,0] and b2[1]==[1,0]:
-                return getT2(b1,b2)
+                return getT2(ptsCount(b1[2],b2[2]))
 	if b1[1]==[1,1,0] and b2[1]==[1,0]:
-		return getT4(b1,b2)
+		return getT4(ptsCount(b1[2],b2[2]))
         if b1[1]==[1,1,0] and b2[1]==[1,1,0]:
-                return getT6(b1,b2)
+                return getT6(ptsCount(b1[2],b2[2]))
 	return "?"
 
 '''
