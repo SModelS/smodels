@@ -534,7 +534,7 @@ def SimParticles(ptype1,ptype2,useDict=True):
     while isNested:
         newptype1v = []
         newptype2v = []
-        if len(ptype1v) != len(ptype2v): return False        
+        if len(ptype1v) != len(ptype2v): return False
         for i in range(len(ptype1v)):
             if type(ptype1v[i]) == type(list()):
                 if len(ptype1v[i]) != len(ptype2v[i]): return False
@@ -549,6 +549,7 @@ def SimParticles(ptype1,ptype2,useDict=True):
         ptype2v = newptype2v
         isNested = False
         for i in range(len(ptype1v)):
+            if len(ptype1v[i]) != len(ptype2v[i]): return False
             if type(ptype1v[i]) == type(list()) and type(ptype1v[i][0]) == type(list()): isNested = True
             if type(ptype2v[i]) == type(list()) and type(ptype2v[i][0]) == type(list()): isNested = True
     
