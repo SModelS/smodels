@@ -523,11 +523,10 @@ def SimEls(ElA,ElB,order=True,igmass=False):
 def SimParticles(ptype1,ptype2,useDict=True):
     
     if len(ptype1) != len(ptype2): return False 
-    if len(ptype1) == 0: return True   #Empty list    
-   
     
     ptype1v = [[ptype1]]
     ptype2v = [[ptype2]]
+    
 
 #First flatten nested arrays until next-to-last level: 
     isNested = True
@@ -549,7 +548,8 @@ def SimParticles(ptype1,ptype2,useDict=True):
         ptype2v = newptype2v
         isNested = False
         for i in range(len(ptype1v)):
-            if len(ptype1v[i]) != len(ptype2v[i]): return False
+            if len(ptype1v[i]) != len(ptype2v[i]): return False    
+            if len(ptype1v[i]) == 0: continue   #Empty list
             if type(ptype1v[i]) == type(list()) and type(ptype1v[i][0]) == type(list()): isNested = True
             if type(ptype2v[i]) == type(list()) and type(ptype2v[i][0]) == type(list()): isNested = True
     
