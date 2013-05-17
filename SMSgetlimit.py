@@ -3,6 +3,9 @@ def GetPlotLimit(inmass,plot,Analysis,complain = False):
         inmass: array of masses in SModelS graph?
         plot: ['T8ChiSlep', ['ATLAS_CONF_2013_007']]
         Analysis: SMSmethods.EAnalysis
+        FIXME in the end this should become no more than a convenience function
+        to facilitate looking up results for Analysis objects. 
+        All the algorithmic code should go into SMSResults plus helper classes.
     """
     import SMSResults, numpy , copy
     from SMSHelpers import addunit, rmvunit
