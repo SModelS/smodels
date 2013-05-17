@@ -101,9 +101,9 @@ def getRun ( analysis, run=None ):
   if run:
     if os.path.exists ( "%s/%s/%s" % ( Base, run, analysis ) ):
       return run
-    else:
-      log ( "dont know about %s/%s" % (run,analysis), "warning" )
-      return None
+#    else:
+#      log ( "dont know about %s/%s" % (run,analysis), "warning" )
+#      return None
   for trun in runs:
     if os.path.exists ( "%s/%s/%s" % ( Base, trun, analysis ) ):
       return trun
@@ -390,7 +390,7 @@ def hasDictionary ( analysis, run=None ):
 def getUpperLimitDictionary ( analysis, topo, run ):
   dictfile="%s/%s/%s/sms.py" % ( Base, run, analysis )
   if not os.path.exists(dictfile):
-    log("dictionary file %s doesnt exist" % dictfile )
+    log("in getUpperLimitDictionary, dictionary file %s doesnt exist" % dictfile )
     return None
   Globals={}
   execfile(dictfile,Globals)
