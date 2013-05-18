@@ -69,8 +69,8 @@ def SLHAdecomp(slhafile,Xsec,sigcut):
 #Get mass list for all particles
     Massdic = {}
     for k in res[1].keys():
-        if k: 
-            Massdic.update({k : addunit(res[1][k].mass,'GeV'), -k : addunit(res[1][k].mass,'GeV')})
+        if k and res[1][k].mass != None:
+            Massdic.update({k : addunit(abs(res[1][k].mass),'GeV'), -k : addunit(abs(res[1][k].mass),'GeV')})
             
 #Loop over all particles and generate all possible 1branch-elements with sigmamax*BR > sigcut
     ElList = []

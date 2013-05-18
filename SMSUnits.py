@@ -10,6 +10,7 @@ from unum import Unum
 # or sth similar
 
 Unum.VALUE_FORMAT = "%0.2E"
+Unum.UNIT_HIDE_EMPTY = True
 
 fb=Unum.unit('fb')
 pb=Unum.unit('pb', 1000 * fb)

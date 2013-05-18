@@ -9,7 +9,8 @@ from SMSHelpers import addunit
 import SMSanalyses ## SuK/AL descriptions
 import SMSAnalysisFactory ## UND/WW descriptions
 
-DoFactory = True
+
+DoFactory = False
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Initialize global variables:
@@ -22,9 +23,9 @@ else:
 
 
 #Generate events and compute cross-sections:
-nevts = 1000
-# slhafile = "AndreSLHA/andrePT13.slha"
-slhafile = "AndreSLHA/DESY_stop.slha"
+nevts = 100
+slhafile = "AndreSLHA/andrePT4.slha"
+#slhafile = "AndreSLHA/DESY_stop.slha"
 Wv = SMSxsec.pytinit(nevts,slhafile,rpythia = True, donlo = True)
 W = Wv["Wdic"]
 Xsec = Wv["Xsecdic"]
@@ -56,7 +57,7 @@ for i in range(len(SMSTopList)):
  
             
 #Print element list for Topology[i]:    
-    if i == 0:           
+    if i == 1:           
         for j in range(len(SMSTopList[i].ElList)):
             EvElement_table.add_row([i,j,SMSTopList[i].ElList[j].B[0].particles,SMSTopList[i].ElList[j].B[1].particles,wrap(MyPrettyPrinter().pformat(SMSTopList[i].ElList[j].B[0].masses),width=25),wrap(MyPrettyPrinter().pformat(SMSTopList[i].ElList[j].B[1].masses),width=25),wrap(MyPrettyPrinter().pformat(SMSTopList[i].ElList[j].weight),width=30)])
         EvElement_table.add_row(["---","---","---","---","---","---","---"])    
@@ -66,7 +67,7 @@ print "Number of Global topologies = ",len(SMSTopList)
 print(EvTop_table)
 print "Total Number of Elements = ",eltot
 print "Total weight = ",SMSmethods.sumweights(totweight)
-print(EvElement_table)
+#print(EvElement_table)
 
 print '\n \n \n'
 
@@ -93,11 +94,11 @@ for Ana in SMSglobals.ListOfAnalyses:
     AnElement_table.add_row(["---","---","---","---"])  
         
 
-print(AnElement_table)
+#print(AnElement_table)
 
 
 print '\n \n \n'
-sys.exit()
+#sys.exit()
 
         
 #Compute theoretical predictions to analyses results:

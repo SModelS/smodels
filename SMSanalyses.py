@@ -74,13 +74,13 @@ def load():
     Analysis.Top.vertparts = [[1,1,0],[1,1,0]] #Number of particle insertions 
     Analysis.results = {
 #TChiChiSlep (Democratic chargino and neutralino decays):    
-    "2.*([[[L],[L]],[[L],[nu]]] + [[[L],[L]],[[nu],[L]]])" : "[[[L],[L]],[[L],[nu]]] ~ [[[L],[L]],[[nu],[L]]], [[[L],[L]],[[L],[nu]]] > 2.7*[[[ta],[ta]],[[L],[nu]]], [[[L],[L]],[[L],[nu]]] > 2.7*[[[L],[L]],[[ta],[nu]]], [[[L],[L]],[[nu],[L]]] > 2.7*[[[ta],[ta]],[[nu],[L]]], [[[L],[L]],[[nu],[L]]] > 2.7*[[[L],[L]],[[nu],[ta]]]",
+    "2.*([[[L],[L]],[[L],[nu]]] + [[[L],[L]],[[nu],[L]]])" : "Csim([[[L],[L]],[[L],[nu]]],[[[L],[L]],[[nu],[L]]]); Cgtr([[[L],[L]],[[L],[nu]]],3.*[[[ta],[ta]],[[L],[nu]]]); Cgtr([[[L],[L]],[[L],[nu]]], 3.*[[[L],[L]],[[ta],[nu]]]); Cgtr([[[L],[L]],[[nu],[L]]],3.*[[[ta],[ta]],[[nu],[L]]]); Cgtr([[[L],[L]],[[nu],[L]]],3.*[[[L],[L]],[[nu],[ta]]])",
 #TChiChiSlep (tau-enriched chargino decay):    
-    "[[[L],[L]],[[nu],[ta]]]" : "[[[L],[L]],[[nu],[ta]]] > 2.7*[[[ta],[ta]],[[nu],[ta]]]",
+    "[[[L],[L]],[[nu],[ta]]]" : "Cgtr([[[L],[L]],[[nu],[ta]]], 3.*[[[ta],[ta]],[[nu],[ta]]])",
 #TChiChiSlep (tau-dominated  chargino and neutralino decays):
     "[[[ta],[ta]],[[nu],[ta]]]" : "None",
 #Chargino-Chargino:
-    "[[[L+],[nu]],[[L-],[nu]]] + [[[L+],[nu]],[[nu],[L-]]] + [[[L-],[nu]],[[nu],[L+]]] + [[[nu],[L+]],[[nu],[L-]]]" : "[[[L+],[nu]],[[L-],[nu]]] ~ [[[L+],[nu]],[[nu],[L-]]], [[[L+],[nu]],[[nu],[L-]]] ~ [[[L-],[nu]],[[nu],[L+]]], [[[L-],[nu]],[[nu],[L+]]] ~ [[[nu],[L+]],[[nu],[L-]]], [[[L+],[nu]],[[L-],[nu]]] > 2.7*[[[ta+],[nu]],[[L-],[nu]]], [[[L+],[nu]],[[L-],[nu]]] > 2.7*[[[L+],[nu]],[[ta-],[nu]]], [[[L+],[nu]],[[nu],[L-]]] > 2.7*[[[ta+],[nu]],[[nu],[L-]]], [[[L+],[nu]],[[nu],[L-]]] > 2.7*[[[L+],[nu]],[[nu],[ta-]]], [[[L-],[nu]],[[nu],[L+]]] > 2.7*[[[ta-],[nu]],[[nu],[L+]]], [[[L-],[nu]],[[nu],[L+]]] > 2.7*[[[L-],[nu]],[[nu],[ta+]]], [[[nu],[L+]],[[nu],[L-]]] > 2.7*[[[nu],[ta+]],[[nu],[L-]]], [[[nu],[L+]],[[nu],[L-]]] > 2.7*[[[nu],[L+]],[[nu],[ta-]]]",
+    "[[[L+],[nu]],[[L-],[nu]]] + [[[L+],[nu]],[[nu],[L-]]] + [[[L-],[nu]],[[nu],[L+]]] + [[[nu],[L+]],[[nu],[L-]]]" : "Csim([[[L+],[nu]],[[L-],[nu]]],[[[L+],[nu]],[[nu],[L-]]], [[[L-],[nu]],[[nu],[L+]]], [[[nu],[L+]],[[nu],[L-]]]); Cgtr([[[L+],[nu]],[[L-],[nu]]], 3.*[[[ta+],[nu]],[[L-],[nu]]]); Cgtr([[[L+],[nu]],[[L-],[nu]]], 3.*[[[L+],[nu]],[[ta-],[nu]]]); Cgtr([[[L+],[nu]],[[nu],[L-]]], 3.*[[[ta+],[nu]],[[nu],[L-]]]); Cgtr([[[L+],[nu]],[[nu],[L-]]], 3.*[[[L+],[nu]],[[nu],[ta-]]]); Cgtr([[[L-],[nu]],[[nu],[L+]]], 3.*[[[ta-],[nu]],[[nu],[L+]]]); Cgtr([[[L-],[nu]],[[nu],[L+]]], 3.*[[[L-],[nu]],[[nu],[ta+]]]); Cgtr([[[nu],[L+]],[[nu],[L-]]], 3.*[[[nu],[ta+]],[[nu],[L-]]]); Cgtr([[[nu],[L+]],[[nu],[L-]]], 3.*[[[nu],[L+]],[[nu],[ta-]]])",
 #T6bbww (stop pair production)
     "[[[b],[W]],[[b],[W]]]" : "None",
 #T5tttt
@@ -96,11 +96,11 @@ def load():
 #T6bbzz    
     "[[[b],[Z]],[[b],[Z]]]" : "None",    
 #TChiChiSlepSlep
-    "[[[l],[l]],[[l],[l]]]" : "[[[e],[l]],[[l],[l]]] < 0.63*[[[l],[l]],[[l],[l]]], [[[l],[e]],[[l],[l]]] < 0.63*[[[l],[l]],[[l],[l]]]",
+    "[[[l],[l]],[[l],[l]]]" : "Cgtr([[[l],[l]],[[l],[l]]],2.*[[[e],[l]],[[l],[l]]]); Cgtr([[[l],[l]],[[l],[l]]],2.*[[[l],[e]],[[l],[l]]])",
 #TChiChipmStauL    
-    "2.*([[[ta+],[ta-]],[[nu],[ta]]] + [[[ta+],[ta-]],[[ta],[nu]]] + [[[ta-],[ta+]],[[nu],[ta]]] + [[[ta-],[ta+]],[[ta],[nu]]])" : "[[[ta+],[ta-]],[[nu],[ta]]] ~ [[[ta+],[ta-]],[[ta],[nu]]], [[[ta+],[ta-]],[[ta],[nu]]] ~ [[[ta-],[ta+]],[[nu],[ta]]], [[[ta-],[ta+]],[[nu],[ta]]] ~  [[[ta-],[ta+]],[[ta],[nu]]]",
+    "2.*([[[ta+],[ta-]],[[nu],[ta]]] + [[[ta+],[ta-]],[[ta],[nu]]] + [[[ta-],[ta+]],[[nu],[ta]]] + [[[ta-],[ta+]],[[ta],[nu]]])" : "Csim([[[ta+],[ta-]],[[nu],[ta]]],[[[ta+],[ta-]],[[ta],[nu]]],[[[ta-],[ta+]],[[nu],[ta]]],[[[ta-],[ta+]],[[ta],[nu]]])",
 #TChipChimStauSnu
-    "[[[ta+],[nu]],[[ta-],[nu]]] + [[[ta+],[nu]],[[nu],[ta-]]] + [[[ta-],[nu]],[[nu],[ta+]]] + [[[nu],[ta+]],[[nu],[ta-]]]" : "[[[ta+],[nu]],[[ta-],[nu]]] ~ [[[ta+],[nu]],[[nu],[ta-]]], [[[ta+],[nu]],[[nu],[ta-]]] ~ [[[ta-],[nu]],[[nu],[ta+]]], [[[ta-],[nu]],[[nu],[ta+]]] ~ [[[nu],[ta+]],[[nu],[ta-]]]"    
+    "[[[ta+],[nu]],[[ta-],[nu]]] + [[[ta+],[nu]],[[nu],[ta-]]] + [[[ta-],[nu]],[[nu],[ta+]]] + [[[nu],[ta+]],[[nu],[ta-]]]" : "Csim([[[ta+],[nu]],[[ta-],[nu]]],[[[ta+],[nu]],[[nu],[ta-]]],[[[ta-],[nu]],[[nu],[ta+]]],[[[nu],[ta+]],[[nu],[ta-]]])"
     }
     Analysis.plots  = {   
     "2.*([[[L],[L]],[[L],[nu]]] + [[[L],[L]],[[nu],[L]]])" : ["TChiChipmSlepL",["Weakinos8TeV","ATLAS_CONF_2013_035"]],
@@ -145,7 +145,7 @@ def load():
     Analysis.Top.vertparts = [[1,1,1,0],[1,1,1,0]] #Number of particle insertions 
     Analysis.results = {
 #T8ChiSlep
-    "1.454545([[[jet],[nu],[L]],[[jet],[nu],[L]]] + [[[jet],[nu],[L]],[[jet],[L],[nu]]] + [[[jet],[nu],[L]],[[jet],[L],[L]]] + [[[jet],[L],[nu]],[[jet],[L],[nu]]] + [[[jet],[L],[nu]],[[jet],[L],[L]]] + [[[jet],[L],[L]],[[jet],[L],[L]]] + [[[jet],[L],[L]],[[jet],[nu],[nu]]])" : "[[[jet],[L],[nu]],[[jet],[L],[nu]]] ~ [[[jet],[nu],[L]],[[jet],[nu],[L]]], [[[jet],[L],[nu]],[[jet],[L],[nu]]] ~ [[[jet],[nu],[nu]],[[jet],[L],[L]]], [[[jet],[L],[nu]],[[jet],[nu],[L]]] ~ 2.*([[[jet],[nu],[L]],[[jet],[nu],[L]]]), 2.*([[[jet],[L],[L]],[[jet],[L],[L]]]) > [[[jet],[nu],[L]],[[jet],[L],[L]]], 2.*([[[jet],[L],[L]],[[jet],[L],[L]]]) > [[[jet],[L],[nu]],[[jet],[L],[L]]], [[[jet],[L],[nu]],[[jet],[L],[L]]] > [[[jet],[nu],[L]],[[jet],[L],[nu]]], [[[jet],[L],[nu]],[[jet],[L],[L]]] > [[[jet],[nu],[L]],[[jet],[nu],[L]]], [[[jet],[L],[nu]],[[jet],[L],[L]]] > [[[jet],[L],[nu]],[[jet],[L],[nu]]], [[[jet],[L],[nu]],[[jet],[L],[L]]] > [[[jet],[L],[L]],[[jet],[nu],[nu]]]",
+    "1.454545([[[jet],[nu],[L]],[[jet],[nu],[L]]] + [[[jet],[nu],[L]],[[jet],[L],[nu]]] + [[[jet],[nu],[L]],[[jet],[L],[L]]] + [[[jet],[L],[nu]],[[jet],[L],[nu]]] + [[[jet],[L],[nu]],[[jet],[L],[L]]] + [[[jet],[L],[L]],[[jet],[L],[L]]] + [[[jet],[L],[L]],[[jet],[nu],[nu]]])" : "Csim([[[jet],[L],[nu]],[[jet],[L],[nu]]], [[[jet],[nu],[L]],[[jet],[nu],[L]]], [[[jet],[nu],[nu]],[[jet],[L],[L]]]); Csim([[[jet],[L],[nu]],[[jet],[nu],[L]]], 2.*([[[jet],[nu],[L]],[[jet],[nu],[L]]])); Cgtr(2.*([[[jet],[L],[L]],[[jet],[L],[L]]]), [[[jet],[nu],[L]],[[jet],[L],[L]]]); Cgtr(2.*([[[jet],[L],[L]],[[jet],[L],[L]]]), [[[jet],[L],[nu]],[[jet],[L],[L]]]); Cgtr([[[jet],[L],[nu]],[[jet],[L],[L]]], [[[jet],[nu],[L]],[[jet],[L],[nu]]]); Cgtr([[[jet],[L],[nu]],[[jet],[L],[L]]], [[[jet],[nu],[L]],[[jet],[nu],[L]]]); Cgtr([[[jet],[L],[nu]],[[jet],[L],[L]]], [[[jet],[L],[nu]],[[jet],[L],[nu]]]); Cgtr([[[jet],[L],[nu]],[[jet],[L],[L]]], [[[jet],[L],[L]],[[jet],[nu],[nu]]])",
     "[[[b],[t],[W]],[[b],[t],[W]]]" : "None"
     }
     Analysis.plots  = {   
@@ -163,7 +163,7 @@ def load():
     Analysis.Top.vertparts = [[2,1,1,0],[2,1,1,0]] #Number of particle insertions 
     Analysis.results = {
 #T7ChiSlep
-    "1.454545([[[jet,jet],[nu],[L]],[[jet,jet],[nu],[L]]] + [[[jet,jet],[nu],[L]],[[jet,jet],[L],[nu]]] + [[[jet,jet],[nu],[L]],[[jet,jet],[L],[L]]] + [[[jet,jet],[L],[nu]],[[jet,jet],[L],[nu]]] + [[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]] + [[[jet,jet],[L],[L]],[[jet,jet],[L],[L]]] + [[[jet,jet],[L],[L]],[[jet,jet],[nu],[nu]]])" : "[[[jet,jet],[L],[nu]],[[jet,jet],[L],[nu]]] ~ [[[jet,jet],[nu],[L]],[[jet,jet],[nu],[L]]], [[[jet,jet],[L],[nu]],[[jet,jet],[L],[nu]]] ~ [[[jet,jet],[nu],[nu]],[[jet,jet],[L],[L]]], [[[jet,jet],[L],[nu]],[[jet,jet],[nu],[L]]] ~ 2.*([[[jet,jet],[nu],[L]],[[jet,jet],[nu],[L]]]), 2.*([[[jet,jet],[L],[L]],[[jet,jet],[L],[L]]]) > [[[jet,jet],[nu],[L]],[[jet,jet],[L],[L]]], 2.*([[[jet,jet],[L],[L]],[[jet,jet],[L],[L]]]) > [[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]], [[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]] > [[[jet,jet],[nu],[L]],[[jet,jet],[L],[nu]]], [[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]] > [[[jet,jet],[nu],[L]],[[jet,jet],[nu],[L]]], [[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]] > [[[jet,jet],[L],[nu]],[[jet,jet],[L],[nu]]], [[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]] > [[[jet,jet],[L],[L]],[[jet,jet],[nu],[nu]]]"       
+     "1.454545([[[jet,jet],[nu],[L]],[[jet,jet],[nu],[L]]] + [[[jet,jet],[nu],[L]],[[jet,jet],[L],[nu]]] + [[[jet,jet],[nu],[L]],[[jet,jet],[L],[L]]] + [[[jet,jet],[L],[nu]],[[jet,jet],[L],[nu]]] + [[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]] + [[[jet,jet],[L],[L]],[[jet,jet],[L],[L]]] + [[[jet,jet],[L],[L]],[[jet,jet],[nu],[nu]]])" : "Csim([[[jet,jet],[L],[nu]],[[jet,jet],[L],[nu]]], [[[jet,jet],[nu],[L]],[[jet,jet],[nu],[L]]], [[[jet,jet],[nu],[nu]],[[jet,jet],[L],[L]]]); Csim([[[jet,jet],[L],[nu]],[[jet,jet],[nu],[L]]], 2.*([[[jet,jet],[nu],[L]],[[jet,jet],[nu],[L]]])); Cgtr(2.*([[[jet,jet],[L],[L]],[[jet,jet],[L],[L]]]), [[[jet,jet],[nu],[L]],[[jet,jet],[L],[L]]]); Cgtr(2.*([[[jet,jet],[L],[L]],[[jet,jet],[L],[L]]]), [[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]]); Cgtr([[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]], [[[jet,jet],[nu],[L]],[[jet,jet],[L],[nu]]]); Cgtr([[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]], [[[jet,jet],[nu],[L]],[[jet,jet],[nu],[L]]]); Cgtr([[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]], [[[jet,jet],[L],[nu]],[[jet,jet],[L],[nu]]]); Cgtr([[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]], [[[jet,jet],[L],[L]],[[jet,jet],[nu],[nu]]])"       
     }
     Analysis.plots  = {   
     "1.454545([[[jet,jet],[nu],[L]],[[jet,jet],[nu],[L]]] + [[[jet,jet],[nu],[L]],[[jet,jet],[L],[nu]]] + [[[jet,jet],[nu],[L]],[[jet,jet],[L],[L]]] + [[[jet,jet],[L],[nu]],[[jet,jet],[L],[nu]]] + [[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]] + [[[jet,jet],[L],[L]],[[jet,jet],[L],[L]]] + [[[jet,jet],[L],[L]],[[jet,jet],[nu],[nu]]])" : ["T7ChiSlep",["ATLAS_CONF_2013_007"]]  

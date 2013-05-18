@@ -42,6 +42,8 @@ def GetPlotLimit(inmass,plot,Analysis,complain = False):
     mx = mMom[0]
     my = mLSP[0]
 
+    mx = rmvunit(mx,'GeV')
+    my = rmvunit(my,'GeV')
 #Get intermediate masses and corresponding x values:
     massI = []
 
@@ -52,6 +54,7 @@ def GetPlotLimit(inmass,plot,Analysis,complain = False):
 
         for imass in range(1,len(massarray[ib])):
             mI = massarray[ib][imass]
+            mI = rmvunit(mI,'GeV')
             x = float((mI-my))/(mx-my)
             massI.append([mI, x])
 
