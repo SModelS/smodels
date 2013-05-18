@@ -182,7 +182,8 @@ def getClosestValue ( Dict, mx, my ):
         retul=ul
   return retul
 
-def getInterpolatedUpperLimit ( Dict, mx, my ):
+def getInterpolatedUpperLimit ( Dict, inmx, inmy ):
+  import sys
   if Dict==None: return None
   if len(Dict)==0: return None
   """ get the upper limit, interpolate from (at most) four neighbours in Dict """
@@ -190,6 +191,8 @@ def getInterpolatedUpperLimit ( Dict, mx, my ):
   # Large=99999.
   # Neighbors=[ [Large,0.],[Large,0.],[Large,0.],[Large,0.] ]
   Neighbors=[]
+  mx = rmvunit(inmx,'GeV')
+  my = rmvunit(inmy,'GeV')
   for (dmx,dmv) in Dict.items():
     for (dmy,ul) in dmv.items():
       dist= (dmx-mx)**2 + (dmy-my)**2 
@@ -198,6 +201,7 @@ def getInterpolatedUpperLimit ( Dict, mx, my ):
   Neighbors.sort()
   Neighbors=Neighbors[:4]
   ret=sum( [ y/x for (x,y) in Neighbors ] ) / sum( [ 1./x for (x,y) in Neighbors ] )
+
   #print "interpolating",Neighbors,ret
   return ret
 

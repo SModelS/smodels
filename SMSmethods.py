@@ -891,9 +891,9 @@ def MassAvg(equivin, method = "mean"):
         for mass in equivmasses.flat:
             if rmvunit(mass,'GeV') == 0.:
                 print "MassAvg: Zero mass!"
-                return False
+                return False            
             if rmvunit(mass,'GeV') < 0.:
-                print "MassAvg: Negative mass!"
+                print "MassAvg: Negative mass!",mass
                 return False
 
         if method == "mean":
@@ -1071,7 +1071,10 @@ def Eval_cluster(instr,InTop):
         iels +=1
         
 #Get list of expressions (separated by commas):
-    outstrv = outstr.rsplit(",")
+    if ";" in outstr or "Csim" in outstr or "Cgtr" in outstr:
+        outstrv = outstr.rsplit(";")
+    else:
+        outstrv = outstr.rsplit(",")
 
 #Generate zeroweight entry
     zeroweight = {}  
@@ -1093,7 +1096,7 @@ def Eval_cluster(instr,InTop):
     Els = []
     if len(Elw) > 0:    
         for w in Elw[0].keys():
-            Els = [weight[w] for weight in Elw]            
+            Els = [weight[w] for weight in Elw]                 
             eout = [Ceval(x,Els) for x in outstrv]        
             if len(eout) == 1: eout = eout[0]
             result.update({w : eout})
@@ -1135,6 +1138,26 @@ def eltostr(invar):
                 st_B[ib] = st_B[ib].replace(sptcs,"",1)
 
         return ptclist
+
+#Defines the auxiliar similar function
+#returns the relative difference between any elements of the list normalized to [0,1] 
+def Csim(*els):
+    res = 0.
+    for i in range(len(els)-1):
+        a = els[i]
+        for j in range(i,len(els)):
+            b = els[j]
+            if a == b: continue
+            res = max(res,abs(a-b)/abs(a+b))
+    return res
+
+#Defines the auxiliary greater function
+#returns a number between 0 and 1 depending on how much it is violated (0 = A > B, 1 = A << B)
+def Cgtr(a,b):
+    if type(b) == type(addunit(1.,'GeV')) and b.asNumber() == 0.: return 0.
+    if type(b) != type(addunit(1.,'GeV')) and b == 0.: return 0.
+    res = (abs(a-b) - (a-b))/(2.*b)
+    return res
         
         
 #Defines similar function when comparing two list of numbers.
