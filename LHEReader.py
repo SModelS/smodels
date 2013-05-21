@@ -29,7 +29,7 @@ class Event:
     momspdg = []
     imom = 0
     for p in self.particles:
-      if if len(p.moms)>1 and p.moms[0] == 1 or p.moms[1] == 1:
+      if len(p.moms)>1 and p.moms[0] == 1 or p.moms[1] == 1:
         momspdg.append( p.pdg)
         imom += 1
     if imom != 2:
