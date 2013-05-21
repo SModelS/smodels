@@ -2,7 +2,8 @@
 
 import sys, argparse
 sys.path.append ( "../" )
-import SMSglobals, SMSmethods
+sys.path.append ( "../regression" )
+import SMSglobals, SMSmethods, TxNames
 
 import SMSAnalysisFactory
 import SMSDecomp
@@ -10,7 +11,7 @@ import SMSDecomp
 SMSglobals.initglob()
 print "loading analyses ...."
 SMSglobals.ListOfAnalyses = SMSAnalysisFactory.load()
-print "done loading analyses"
+print "done loading analyses",len(SMSglobals.ListOfAnalyses)
 
 n=1000
 #slhafile="AndreSLHA/andrePT4.slha"
