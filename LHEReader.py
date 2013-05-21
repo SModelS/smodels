@@ -24,6 +24,22 @@ class Event:
   def add ( self, particle ):
     self.particles.append ( particle )
 
+  def getMom(self):
+    """ returns the pdgs of the mothers, None if a problem occured """
+    momspdg = []
+    imom = 0
+    for p in self.particles:
+      if if len(p.moms)>1 and p.moms[0] == 1 or p.moms[1] == 1:
+        momspdg.append( p.pdg)
+        imom += 1
+    if imom != 2:
+        print "getMom: Number of mother particles != 2"
+        return None
+    if momspdg[0] > momspdg[1]:
+        momspdg[0], momspdg[1] = momspdg[1], momspdg[0]
+    return momspdg
+
+
   def __str__ ( self ):
     ret="\nEvent:\n"
     for p in self.particles:
