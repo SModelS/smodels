@@ -55,11 +55,13 @@ def GetPlotLimit(inmass,plot,Analysis,complain = False):
         for imass in range(1,len(massarray[ib])):
             mI = massarray[ib][imass]
             mI = rmvunit(mI,'GeV')
-            x = float((mI-my))/(mx-my)
-            massI.append([mI, x])
+	    massI.append(mI)	
+#            x = float((mI-my))/(mx-my)
+#           massI.append([mI, x])
 
     if len(massI) == 2:
-        if massI[0][0] != massI[1][0]:
+#        if massI[0][0] != massI[1][0]:
+	if massI[0] != massI[1]:
             if complain: print "GetPlotLimit: Different intermediate masses"   #For now only allow for equal intermediate masses
             return None
         else:
@@ -71,45 +73,45 @@ def GetPlotLimit(inmass,plot,Analysis,complain = False):
 #Now loop over analyses/results and get limits:
     for analyses in CMSanalyses:
 
-        if not SMSResults.exists(analyses, CMSlabel, run):
-            limits.append([analyses, 'no histogram'])
-            continue
+#        if not SMSResults.exists(analyses, CMSlabel, run):
+#            limits.append([analyses, 'no histogram'])
+#            continue
 
-        xexp = [SMSResults.getx(analyses, CMSlabel, run)]   #experimenal X values
-        if not xexp[0]: xexp = []
+#        xexp = [SMSResults.getx(analyses, CMSlabel, run)]   #experimenal X values
+#        if not xexp[0]: xexp = []
 
 #Sanity check
-        if len(massI) > 0 and len(xexp) == 0:
-            if complain: print 'GetPlotLimit: Number of intermediate masses do not match histogram in',analyses,' for',CMSlabel
-            limits.append([analyses, False])
-            continue
+#        if len(massI) > 0 and len(xexp) == 0:
+#            if complain: print 'GetPlotLimit: Number of intermediate masses do not match histogram in',analyses,' for',CMSlabel
+#            limits.append([analyses, False])
+#            continue
 
-        if len(massI) == 0:  #No need for interpolation
-            limits.append([analyses,SMSResults.getUpperLimit(analyses,CMSlabel,mx, my, run)])
+#        if len(massI) == 0:  #No need for interpolation
+#            limits.append([analyses,SMSResults.getUpperLimit(analyses,CMSlabel,mx, my, run)])
 
-        else:
-            x = []    #x values
-            y = []    #sigma limits
-            for k in xexp[0]:
-                if k == '050':
-                    ylim = SMSResults.getUpperLimit(analyses,CMSlabel,mx, my)
-                else:
-                    ylim = SMSResults.getUpperLimit(analyses,CMSlabel+k,mx, my)
-
-                if type(ylim) != type(addunit(1.,'fb')): continue  #Skip errors
-
-                x.append(float(k)/100.)
-                y.append(rmvunit(ylim,'fb'))
+#        else:
+#            x = []    #x values
+#            y = []    #sigma limits
+#            for k in xexp[0]:
+#                if k == '050':
+#                    ylim = SMSResults.getUpperLimit(analyses,CMSlabel,mx, my)
+#                else:
+#                    ylim = SMSResults.getUpperLimit(analyses,CMSlabel+k,mx, my)
+#
+#                if type(ylim) != type(addunit(1.,'fb')): continue  #Skip errors
+#
+#                x.append(float(k)/100.)
+#                y.append(rmvunit(ylim,'fb'))
 
 #Interpolation checks:
-            if len(x) <= 1:
-                if complain: print  'GetPlotLimit: one interpolation point or less in',analyses,' for',CMSlabel
-                limits.append([analyses, None])
-                continue
+#            if len(x) <= 1:
+#                if complain: print  'GetPlotLimit: one interpolation point or less in',analyses,' for',CMSlabel
+#                limits.append([analyses, None])
+#                continue
 
-            p = numpy.polyfit(x, y, len(y)-1)
-            limits.append([analyses,addunit(float(numpy.polyval(p, massI[1])),'fb') ])
-
-
+#           p = numpy.polyfit(x, y, len(y)-1)
+#           limits.append([analyses,addunit(float(numpy.polyval(p, massI[1])),'fb') ])
+	masslist=[mx,massI,my]
+	limits.append([analyses,SMSResults.getSmartUpperLimit(analyses,CMSlabel,masslist,run)])
 
     return limits
