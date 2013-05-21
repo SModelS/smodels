@@ -10,8 +10,10 @@ def gethistname(topo, mz):
 		return topo+"LSP"
 	else: return topo+mz
 
-def getxval(mx, my, mz):
+def getxval(mx, my, mz,mass=False):
 	if mz.find('x')==-1 and mz.find('C')==-1 and mz.find('y')==-1:
+		xfac = float(mz)/100
+		if mass: return xfac*mx+(1-xfac)*my
 		return float(mz)/100
 	if mz.find('x')>-1: tx = float(mz[mz.find('x')+1])
 	else: tx=None
@@ -23,6 +25,7 @@ def getxval(mx, my, mz):
 	if tx: z += tx*my
 	if ty: z += ty*mx
 	if c: z+=c
+	if mass: return z
 	xval = (z-my)/(mx-my)
 	return xval
 
@@ -54,16 +57,16 @@ def compareM(masses, d):
 	try: #check if histogram axes are M1, M0, return 1 if x-value of histogram is comparable to x value for given masses, 0 if not
 		x1=getxval(masses[0],masses[-1],d['mz'][0])
 		x2=float(masses[1]-masses[-1])/(masses[0]-masses[-1])
-		print x1,x2
+#		print x1,x2
 		if abs(x1-x2)/(x1+x2)<0.1:
 			return True
-		else: return 0
+		else: return None
 	except:
 		if d['mz'][0].find('LSP')>-1: #check if histogram for fixed LSP mass, return 1 if my is comparable to LSP mass of the histogram, 0 if not
 			mlsp = float(d['mz'][0][d['mz'][0].find('P')+1:d['mz'][0].find('P')+4])
 			if abs(mlsp-masses[-1])/(mlsp+masses[-1])<0.1:
 				return True
-			else: return 0
+			else: return None
 		elif d['mz'][0].find('D')>-1: #check for fixed deltaM
 			ml = []
 			ml.append(d['mz'][0].find('M1'))
@@ -73,54 +76,58 @@ def compareM(masses, d):
 			deltain = float(masses[getindex(ml,second=True)]-masses[getindex(ml)])
 			if deltain<0: return 0
 			if abs(deltain-deltam)/(deltain+deltam)<0.1: return True
-			else: return 0
+			else: return None
 
 
 def UpperLimit(ana, topo, masses): #masses: list of masses, with (mother, intermediate(s), LSP)
 	d = SMSResults.getaxes(ana, topo)
-	print d
+#	print d
 	if len(masses)==2 and not d[0]['mz']:
 		return SMSResults.getUpperLimit(ana, topo, masses[getaxis('x',d[0]['axes'])], masses[getaxis('y',d[0]['axes'])])
 	if len(masses)==2 and d[0]['mz']:
 		print "Need intermediate mass input for this topology."
-		return 0
+		return None
 	if len(masses)>3 or len(d[0]['mz'])>1:
 		print "Cannot find BR for topologies with more than one intermediate mass."
-		return 0
+		return None
 	if len(masses)>2 and not d[0]['mz']:
 		print "No intermediate mass for this topology."
-		return 0
+		return None
 	if len(masses)>2 and len(d) == 1:
 		if compareM(masses,d[0]):
 			return SMSResults.getUpperLimit(ana, gethistname(topo,d[0]['mz'][0]),masses[getaxis('x',d[0]['axes'])],masses[getaxis('y',d[0]['axes'])])
 		print "Only one histogram available, cannot interpolate for intermediate mass."
-		return 0
+		return None
 	xsecs = []
 	xvals = []
 	for ds in d:
 		if not ds['mz']:
 			print "No information on intermediate mass availabel."
-			return 0
+			return None
 		if 'LSP' in ds['mz'][0] or 'D' in ds['mz'][0]:
 			if compareM(masses,ds):
 				return SMSResults.getUpperLimit(ana, gethistname(topo,ds['mz'][0]),masses[getaxis('x',ds['axes'])],masses[getaxis('y',ds['axes'])])
 			else:
 				d.remove(ds)
 				continue
-		xsecs.append(rmvunit(SMSResults.getUpperLimit(ana, gethistname(topo,ds['mz'][0]),masses[getaxis('x',ds['axes'])],masses[getaxis('y',ds['axes'])]),'pb'))
-		xvals.append(getxval(masses[0],masses[-1],ds['mz'][0]))
+		xs=rmvunit(SMSResults.getUpperLimit(ana, gethistname(topo,ds['mz'][0]),masses[getaxis('x',ds['axes'])],masses[getaxis('y',ds['axes'])]),'pb')
+		if xs: xsecs.append(xs)
+#		xsecs.append(rmvunit(SMSResults.getUpperLimit(ana, gethistname(topo,ds['mz'][0]),masses[getaxis('x',ds['axes'])],masses[getaxis('y',ds['axes'])]),'pb'))
+		if xs: xvals.append(getxval(masses[0],masses[-1],ds['mz'][0]))
+		else: d.remove(ds)
 	if len(xsecs)<2:
+#		print d
 		if compareM(masses,d[0]): return SMSResults.getUpperLimit(ana, gethistname(topo,d[0]['mz'][0]),masses[getaxis('x',d[0]['axes'])],masses[getaxis('y',d[0]['axes'])])
 		print "Available histograms could not be combined, cannot interpolate"
-		return 0
-	print xsecs, xvals
+		return None
+#	print xsecs, xvals
 	p = numpy.polyfit(xvals,xsecs,len(xsecs)-1)
 	X = float(masses[1]-masses[-1])/float(masses[0]-masses[-1])
 	XSec = float(numpy.polyval(p,X))
-	print X
+#	print X
 	if X>max(xvals) or X<min(xvals):
 		print "x value out of range, no extrapolation"
-		return 0
+		return None
 #	dix= max(xvals)-min(xvals)
 #	diy=max(xsecs)-min(xsecs)
 #	if (X>max(xvals) and X-max(xvals)>dix) or (X<min(xvals) and min(xvals)-X>dix):
