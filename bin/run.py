@@ -2,9 +2,8 @@
 
 import sys, argparse
 sys.path.append ( "../" )
-sys.path.append ( "../regression" )
-import SMSglobals, SMSmethods, TxNames
-
+import SMSglobals, SMSmethods, TxNames, LHEReader
+import LHEReader
 import SMSAnalysisFactory
 import SMSDecomp
 
@@ -13,11 +12,12 @@ print "loading analyses ...."
 SMSglobals.ListOfAnalyses = SMSAnalysisFactory.load()
 print "done loading analyses",len(SMSglobals.ListOfAnalyses)
 
-n=1000
-#slhafile="AndreSLHA/andrePT4.slha"
+# n=1000
+# slhafile="AndreSLHA/andrePT4.slha"
 lhefile="../regression/T1_1.lhe"
-File=open(lhefile )
-PList=SMSmethods.getNextEvent(File)
-SMSTop=SMSmethods.getEventTop ( PList )
-print "SMSTop=",SMSTop
-#SMSTopList=SMSDecomp.LHEdecomp ( lhefile, {}, 1000 )
+reader=LHEReader.LHEReader ( lhefile )
+Event=reader.event()
+print Event
+SMSTop=SMSmethods.getEventTop ( Event.particles )
+tx=TxNames.getTx(SMSTop[0].ElList[0])
+print "SMSTop=",SMSTop,"tx=",tx
