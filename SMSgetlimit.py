@@ -111,7 +111,9 @@ def GetPlotLimit(inmass,plot,Analysis,complain = False):
 
 #           p = numpy.polyfit(x, y, len(y)-1)
 #           limits.append([analyses,addunit(float(numpy.polyval(p, massI[1])),'fb') ])
-	masslist=[mx,massI,my]
+	masslist=[mx]
+	if massI: masslist.append(massI)
+	masslist.append(my)
 	limits.append([analyses,SMSResults.getSmartUpperLimit(analyses,CMSlabel,masslist,run)])
 
     return limits
