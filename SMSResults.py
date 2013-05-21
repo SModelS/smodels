@@ -47,12 +47,6 @@ def getExclusion ( analysis, topo, run=None ):
     if ex.has_key ( t ): return ex[t]
   return None
 
-#def exists ( analysis, topo, run=None ):
-#  """ does a result for analysis/topo/run exist? """
-#  run=SMSHelpers.getRun ( analysis, run )
-#  histo=SMSHelpers.getUpperLimitFromHisto ( analysis, topo, run )
-#  return histo!=None
-
 def getBinWidthX ( analysis, topo, run=None ):
   """ get the bin width in X """
   run=SMSHelpers.getRun ( analysis, run )
@@ -340,11 +334,17 @@ def getx ( analysis, topo=None, run=None ):
   return d
 
 def getaxes (analysis, topo=None, run=None):
-  """ get axes for this analysis: for each topo list of dictionary, each dictionary corresponds
-	to one histogram, the key axes gives string (mx-my), the key mz gives information on other masses,
-	if you supply a topo, returns list for this topo only"""
+  """ get information about the histogram axes for this analysis: for each topo
+    list of dictionary, each dictionary corresponds to one histogram, the key
+    axes gives string (mx-my), the key mz gives information on other masses, if
+    you supply a topo, returns list for this topo only. """
+  exists= SMSHelpers.exists ( analysis, topo=None )
+  if not exists: ## analysis is not known, we return None
+    return None
   st = SMSHelpers.getMetaInfoField (analysis, "axes", run)
-  if not st: return None
+  if not st: 
+    # if there is no information about the axes, return the default
+    return [{'axes': 'M1-M0', 'mz': None}]
   st = st.split(',')
   d = {}
   for i in range(len(st)):
@@ -360,7 +360,9 @@ def getaxes (analysis, topo=None, run=None):
       
   if topo:
     topo = topo.replace(" ","")
-    if not d or not d.has_key ( topo ): return None
+    if not d or not d.has_key ( topo ): 
+      ## topology does not exist, we return None
+      return None
     else: return d[topo]
 
   return d 
@@ -494,7 +496,8 @@ def massDecoupling ( topo, plot='ROOT',kerning=True ):
 
 def exists(analysis, topo, run = None):
   """ check if the histogram run/analysis/sms.root(limit_topo) exists."""
-  """ or sms.py, if it's stored in dictionaries """
+  """ or sms.py, if it's stored in dictionaries. If topo==None, simply check
+      if run/analysis/sms.root exists. """
   run2=SMSHelpers.getRun( analysis, run )
   hasDict=SMSHelpers.hasDictionary ( analysis, run2 )
   if hasDict:
