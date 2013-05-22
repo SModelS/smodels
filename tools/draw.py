@@ -1,5 +1,11 @@
 #!/usr/bin/python
 
+""" simple tool that is meant to draw lessagraphs, both as ascii plot 
+    and via pyfeyn """
+
+import sys
+sys.path.append ( "../" )
+
 import SMSglobals, SMSanalyses, sys, SMSmethods, SMSdraw ## , SMSTranslation
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
@@ -24,13 +30,13 @@ pytres = {"xsecfb" : 1.}
 for (sms,andrecode) in SMSTranslation.items():
   print sms,andrecode
 
-  File = open("regression/%s_1.lhe" % sms,"r")
+  File = open("../regression/%s_1.lhe" % sms,"r")
       
   PList = SMSmethods.getNextEvent(File)
   weight = {"7 TeV" : pytres["xsecfb"]/float(nevts), "8 TeV" : pytres["xsecfb"]/float(nevts)}
   SMSTop = SMSmethods.getEventTop(PList, weight)
-  b1=[ SMSTop[0].B[0].vertnumb,SMSTop[0].B[0].vertparts,SMSTop[0].B[0].ElList[0].particles ]
-  b2=[ SMSTop[0].B[1].vertnumb,SMSTop[0].B[1].vertparts,SMSTop[0].B[1].ElList[0].particles ]
+  b1=[ SMSTop[0].vertnumb[0],SMSTop[0].vertparts[0],SMSTop[0].ElList[0].B[0].particles ]
+  b2=[ SMSTop[0].vertnumb[1],SMSTop[0].vertparts[1],SMSTop[0].ElList[0].B[1].particles ]
   print b1, b2
   SMSdraw.asciidraw ( SMSTop[0] )
   SMSdraw.draw ( SMSTop[0] )

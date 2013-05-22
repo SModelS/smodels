@@ -15,14 +15,14 @@ def draw ( top, filename="bla.pdf", elementnr=0 ):
   P2a.addParallelArrow( pos=.44,displace=.0003,length=pyx.unit.length(1.75*f), size=.0001)
   P2a.addParallelArrow( pos=.44,displace=-.0003,length=pyx.unit.length(1.75*f), size=.0001) 
 
-  nbranches=len(top.B)
+  nbranches=len(top.leadingElement().B)
   # print nbranches,"branches"
 
-  for (ct,branch) in enumerate(top.B):
+  for (ct,branch) in enumerate(top.leadingElement().B):
     # print "branch",ct,branch,"with",branch.vertnumb,"vertices"
     # p1 = Point(0, ct)
     lastVertex=vtx1
-    for ( nvtx,particles) in enumerate(branch.vertparts):
+    for ( nvtx,particles) in enumerate(branch.particles):
       mark=None
       if particles>0: mark=CIRCLE
       v1=Vertex ( f*(nvtx+1),f*ct,mark=mark)
@@ -35,10 +35,13 @@ def draw ( top, filename="bla.pdf", elementnr=0 ):
       # print "particles",particles,"ct=",ct
       y=-1.0*f ## y of end point of SM particle
       if ct==1: y=2.*f
-      dx=(particles-1)*(-.5)*f ## delta_x 
-      for i in range(particles):
+      dx=(len(particles)-1)*(-.5)*f ## delta_x 
+      #dx=(particles-1)*(-.5)*f ## delta_x 
+      for i in range(len(particles)):
         p=Point ( f*(nvtx + 1 +  dx + i), f*y )
-        label=branch.ElList[elementnr].particles[i].replace("jet","q")
+        print "branch=",branch
+        label=particles[i].replace("jet","q")
+        #label=branch.ElList[elementnr].particles[i].replace("jet","q")
         ff=Fermion(v1,p).addLabel ( label )
          
     #pl = Point ( nvtx+2,ct )
@@ -49,16 +52,16 @@ def draw ( top, filename="bla.pdf", elementnr=0 ):
 def asciidraw ( top, elementnr=0, labels=True ):
   """ draw a simple ascii graph on the screen """
 
-  nbranches=len(top.B)
+  nbranches=len(top.leadingElement().B)
   # print nbranches,"branches"
 
   def drawBranch ( branch, up, labels ):
     """ draws a single branch """
-    # print "branch",branch,"up=",up
+    print "branch",branch,"up=",up
     lines=["  ","---"]
     labels="  "
     idx=0
-    for ( nvtx,particles) in enumerate(branch.vertparts):
+    for ( nvtx,particles) in enumerate(branch.particles):
       if particles==0: continue
       lines[1]+="*---"
       if particles==1: 
@@ -79,7 +82,7 @@ def asciidraw ( top, elementnr=0, labels=True ):
     for i in order: print lines[i]
     if not up and labels: print labels
 
-  for (ct,branch) in enumerate(top.B):
+  for (ct,branch) in enumerate(top.leadingElement().B):
     up=False
     if ct==0: up=True 
     drawBranch ( branch, up=up, labels=labels )
