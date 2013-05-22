@@ -19,5 +19,6 @@ reader=LHEReader.LHEReader ( lhefile )
 Event=reader.event()
 print Event
 SMSTop=SMSmethods.getEventTop ( Event.particles )
-tx=TxNames.getTx(SMSTop[0].ElList[0])
+element=SMSTop[0].leadingElement()
+tx=TxNames.getTx(element)
 print "SMSTop=",SMSTop,"tx=",tx

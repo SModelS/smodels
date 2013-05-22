@@ -63,15 +63,31 @@ class EElement:
         return ret
         
 class GTop:
+    """ global topology. contains a list of elements, and
+        the number of vertices, and .. FIXME andre? """
+        
     def __init__(self):        
         self.vertnumb = []
         self.vertparts = []
         self.ElList = []
 
+    def leadingElement ( self ):
+        """ often, a topology carries only one element, so
+            we have a special accessor for this """
+        if len(self.ElList)==0: return None
+        return self.ElList[0]
+
     def __str__(self):
         ret="number of vertices=%s number of vertex particles=%s" % \
                 ( self.vertnumb, self.vertparts )
         return ret
+
+    def checkConsistency ( self ):
+        """ the number of vertices and insertions per vertex is 
+            redundant information in a topology, so we can perform
+            an internal consistency check """
+        print "[SMSmethods.py] consistency check not yet implemented"
+        return True
 
 #Adds Eelement to ElList
 #OBS: NewElement must have the correct branch ordering!
