@@ -99,4 +99,4 @@ if __name__ == "__main__":
   print "List of analyses/results: "
   ListOfAnalyses=load()
   for (ct,ana) in enumerate(ListOfAnalyses):
-    print ct,ana.label # .label,ana.sqrts
+    print ct,ana.label,ana.Top.vertnumb # .label,ana.sqrts
