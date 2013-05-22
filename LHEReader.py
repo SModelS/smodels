@@ -1,18 +1,29 @@
 """ A facility to read in lhe files and generate events. 
-    An event is essentially a list of particles """
+    an event is essentially a list of particles """
 
 import SMSEvent
 
 class LHEReader:
-  """ a class that produces Events from lhe files """
+  """ a class that produces events from lhe files """
 
   def __init__ ( self, filename ):
     self.filename=filename
     self.File = open ( filename )
 
+  def next ( self ):
+    """ needed for the iterator """
+    e=self.event()
+    if e==None:
+      raise StopIteration
+    return e
+
+  def __iter__ ( self ):
+    """ iterator, to allow constructs like 'for a in lhereader: print a' """
+    return self
+
   def event ( self ):
-    """ reads LHE file 'File', returns an Event.
-        File is an open filehandle.  """
+    """ reads lhe file 'file', returns an event.
+        file is an open filehandle. returns none if no event is left to be read. """
     line = " "
     ret=SMSEvent.SMSEvent()
     # PartList = []
@@ -20,8 +31,8 @@ class LHEReader:
 #Find next event
     while line.find("<event>") == -1:
       if line=='': 
-        print "[SMSmethods.py] error demanding more events than are available."
-        return ret
+        # print "[SMSmethods.py] error demanding more events than are available."
+        return None
       line = self.File.readline()
         
 #Read event info:
