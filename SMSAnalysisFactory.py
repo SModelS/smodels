@@ -60,8 +60,10 @@ def load():
         continue
       constrarray=getArray ( constraint )
       #Global Topology:
-      Analysis.Top.vertnumb = [ len(constrarray[0]), len(constrarray[1]) ]
-      Analysis.Top.vertparts = [ [ len(x) for x in constrarray[0] ], [ len(x) for x in constrarray[1] ], 0 ]
+      Analysis.Top.vertnumb = [ len(constrarray[0])+1, len(constrarray[1])+1 ]
+      Analysis.Top.vertparts = [ [ len(x) for x in constrarray[0] ], [ len(x) for x in constrarray[1] ] ]
+      Analysis.Top.vertparts[0].append(0)
+      Analysis.Top.vertparts[1].append(0)
       #for branch in [0,1]:
         # Analysis.Top.B[branch].vertnumb = len(constrarray[branch])+1    #Number of vertices of branch
         # vertparts1 = [ len(x) for x in constrarray[branch] ]
@@ -99,4 +101,4 @@ if __name__ == "__main__":
   print "List of analyses/results: "
   ListOfAnalyses=load()
   for (ct,ana) in enumerate(ListOfAnalyses):
-    print ct,ana.label,ana.Top.vertnumb # .label,ana.sqrts
+    print ct,ana.label,ana.Top.vertnumb,ana.Top.vertparts # .label,ana.sqrts
