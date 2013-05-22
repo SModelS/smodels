@@ -2,7 +2,7 @@
 #lhefile = LHE file with pythia events
 #W = dictionary with event weights
 #nevts = number of generated events
-def LHEdecomp(lhefile,W,nevts):
+def LHEdecomp(lhefile,W,nevts,DoCompress=False,DoInvisible=False,minmassgap=-1):
     import SMSmethods
 
     SMSTopList = []
@@ -22,7 +22,7 @@ def LHEdecomp(lhefile,W,nevts):
                 return False
 
 #Get event topology    
-        SMSTopListEv = SMSmethods.getEventTop(PList, weight)
+        SMSTopListEv = SMSmethods.getEventTop(PList, weight, DoCompress, DoInvisible, minmassgap)
     
 #Add event topology to topology list:  
         for TopEv in SMSTopListEv:  
@@ -37,7 +37,7 @@ def LHEdecomp(lhefile,W,nevts):
 #slhafile = file with mass spectrum and branching ratios
 #Xsec = dictionary with cross-sections for pair production
 #sigcut = minimum sigma*BR to be generated
-def SLHAdecomp(slhafile,Xsec,sigcut):
+def SLHAdecomp(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassgap=-1):
     import sys, os, copy
 
     workdir = os.getcwd() 
