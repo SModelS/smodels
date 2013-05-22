@@ -4,7 +4,7 @@ import SMSglobals, sys, SMSmethods, SMSxsec, SMSgetlimit
 from prettytable import PrettyTable
 from SMSpprint import wrap, MyPrettyPrinter
 import SMSDecomp
-from SMSHelpers import addunit
+from SMSHelpers import addunit, rmvunit
 
 import SMSanalyses ## SuK/AL descriptions
 import SMSAnalysisFactory ## UND/WW descriptions
@@ -39,7 +39,12 @@ minmassgap = addunit(10.,'GeV')
 
 DoSLHAdec = True
 if DoSLHAdec:
-  sigmacut = addunit(0.1,'fb')  # Maximum cross-section*BR to be included
+  maxlum = SMSmethods.getMaxLum(SMSglobals.ListOfAnalyses) # Maximum cross-section*BR to be included
+  if rmvunit(maxlum,'fb-1'):    
+    sigmacut = addunit(1./rmvunit(maxlum,'fb-1'),'fb')
+  else:
+    sigmacut = addunit(0.1,'fb')
+  if DoCompress or DoInvisible: sigmacut = sigmacut/10.  #When compression is turned on, relax sigmacut
   SMSTopList = SMSDecomp.SLHAdecomp(slhafile,Xsec,sigmacut,DoCompress,DoInvisible,minmassgap)
 else:
   SMSTopList = SMSDecomp.LHEdecomp(lhefile,W,nevts,DoCompress,DoInvisible,minmassgap)

@@ -11,6 +11,7 @@ def load():
   Analysis = EAnalysis()
   Analysis.label = "T1-simple7TeV" #it can be whatever you want
   Analysis.sqrts = addunit(7.,'TeV')
+  Analysis.lum = addunit(4.98,'fb-1')
   Analysis.Top.vertnumb = [2,2]  #Number of vertices 
   Analysis.Top.vertparts = [[2,0],[2,0]] #Number of particle insertions 
   Analysis.results = {
@@ -32,6 +33,7 @@ def load():
   Analysis = EAnalysis()
   Analysis.label = "T1-simple8TeV" #it can be whatever you want
   Analysis.sqrts = addunit(8.,'TeV')
+  Analysis.lum = addunit(20.7,'fb-1')  #Maximum luminosity
   Analysis.Top.vertnumb = [2,2]  #Number of vertices 
   Analysis.Top.vertparts = [[2,0],[2,0]] #Number of particle insertions 
   Analysis.results = {
@@ -63,6 +65,7 @@ def load():
   Analysis = EAnalysis()
   Analysis.label = "T2-simple7TeV" #it can be whatever you want
   Analysis.sqrts = addunit(7.,'TeV')
+  Analysis.lum = addunit(4.98,'fb-1')  #Maximum luminosity
   Analysis.Top.vertnumb = [2,2]  #Number of vertices 
   Analysis.Top.vertparts = [[1,0],[1,0]] #Number of particle insertions 
   Analysis.results = {
@@ -85,6 +88,7 @@ def load():
   Analysis = EAnalysis()
   Analysis.label = "T2-simple8TeV" #it can be whatever you want
   Analysis.sqrts = addunit(8.,'TeV')
+  Analysis.lum = addunit(20.7,'fb-1')  #Maximum luminosity
   Analysis.Top.vertnumb = [2,2]  #Number of vertices 
   Analysis.Top.vertparts = [[1,0],[1,0]] #Number of particle insertions 
   Analysis.results = {
@@ -117,6 +121,7 @@ def load():
   Analysis = EAnalysis()
   Analysis.label = "T6-type" #it can be whatever you want
   Analysis.sqrts = addunit(8.,'TeV')
+  Analysis.lum = addunit(20.7,'fb-1')  #Maximum luminosity
   Analysis.Top.vertnumb = [3,3]  #Number of vertices 
   Analysis.Top.vertparts = [[1,1,0],[1,1,0]] #Number of particle insertions 
   Analysis.results = {
@@ -173,6 +178,7 @@ def load():
   Analysis = EAnalysis()
   Analysis.label = "T5-type" #it can be whatever you want
   Analysis.sqrts = addunit(8.,'TeV')
+  Analysis.lum = addunit(20.7,'fb-1')  #Maximum luminosity
   Analysis.Top.vertnumb = [3,3]  #Number of vertices 
   Analysis.Top.vertparts = [[2,1,0],[2,1,0]] #Number of particle insertions 
   Analysis.results = {
@@ -190,6 +196,7 @@ def load():
   Analysis = EAnalysis()
   Analysis.label = "T8-type" #it can be whatever you want
   Analysis.sqrts = addunit(8.,'TeV')
+  Analysis.lum = addunit(20.7,'fb-1')  #Maximum luminosity
   Analysis.Top.vertnumb = [4,4]  #Number of vertices 
   Analysis.Top.vertparts = [[1,1,1,0],[1,1,1,0]] #Number of particle insertions 
   Analysis.results = {
@@ -209,6 +216,7 @@ def load():
   Analysis = EAnalysis()
   Analysis.label = "T7-type" #it can be whatever you want
   Analysis.sqrts = addunit(8.,'TeV')
+  Analysis.lum = addunit(20.7,'fb-1')  #Maximum luminosity
   Analysis.Top.vertnumb = [4,4]  #Number of vertices 
   Analysis.Top.vertparts = [[2,1,1,0],[2,1,1,0]] #Number of particle insertions 
   Analysis.results = {
