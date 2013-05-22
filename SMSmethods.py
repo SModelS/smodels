@@ -120,7 +120,7 @@ class EAnalysis:
     self.label = ""
     self.Top = GTop()
     self.sqrts = 0
-    self.lum = 0.
+    self.lum = 0
     self.results = {}
     self.plots = {}
     self.run = ""
@@ -1242,4 +1242,18 @@ def Ceval(instring,El):
   return eval(run)
 
   
+#Goes through all analyses in the list and returns the maximum luminosity.
+#If one of the luminosities has not been define, return None
+def getMaxLum(List):
+  
+  maxlum = addunit(0.,'fb-1')
+  for Ana in List:
+    if type(Ana.lum) == type(1) or type(Ana.lum) == type(1.): Ana.lum = addunit(Ana.lum,'fb-1')
+    if Ana.lum.asNumber():      
+      maxlum = max(maxlum,Ana.lum)
+    else:
+      return None
+  return maxlum
+    
+
 
