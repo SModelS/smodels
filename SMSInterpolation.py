@@ -93,7 +93,7 @@ def UpperLimit(ana, topo, masses):
       If interpolation is not possible: check if masses are comparable to the assumptions in the histogram."""
   d = SMSResults.getaxes(ana, topo)
   if not d:
-    print "No such analysis/topology found."
+    print "[SMSInterpolation] error: %s/%s not found." % ( ana, topo )
     return None
   if len(masses)==2 and not d[0]['mz']:
     return SMSResults.getUpperLimit(ana, topo, masses[getaxis('x',d[0]['axes'])], masses[getaxis('y',d[0]['axes'])])
