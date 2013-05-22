@@ -12,7 +12,8 @@ class MParticle:
         self.e = 0.
         self.mass = 0.
     def __str__(self):
-        return "particle pdg %d p=(%f,%f,%f,m=%f) st %d" % ( self.pdg, self.px, self.py, self.pz, self.mass, self.status )
+        # return "particle pdg %d p=(%f,%f,%f,m=%f) st %d" % ( self.pdg, self.px, self.py, self.pz, self.mass, self.status )
+        return "particle pdg %d p=(%.1f,%.1f,%.1f,m=%.1f) status %d moms %s" % ( self.pdg, self.px, self.py, self.pz, self.mass, self.status, self.moms )
 
 
 class SMSEvent:
