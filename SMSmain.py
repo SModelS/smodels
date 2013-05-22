@@ -10,11 +10,9 @@ import SMSanalyses ## SuK/AL descriptions
 import SMSAnalysisFactory ## UND/WW descriptions
 
 
-DoFactory = False
+DoFactory = True
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
-#Initialize global variables:
-SMSglobals.initglob()
 #Creat analyses list:
 if DoFactory:
     SMSglobals.ListOfAnalyses = SMSAnalysisFactory.load()
@@ -23,18 +21,20 @@ else:
 
 
 #Generate events and compute cross-sections:
-nevts = 10000
-slhafile = "AndreSLHA/andrePT4.slha"
-#slhafile = "AndreSLHA/DESY_stop.slha"
+nevts = 100
+#slhafile = "AndreSLHA/andrePT4.slha"
+slhafile = "AndreSLHA/DESY_stop.slha"
 Wv = SMSxsec.pytinit(nevts,slhafile,rpythia = True, donlo = True)
 W = Wv["Wdic"]
 Xsec = Wv["Xsecdic"]
 lhefile = Wv["lhefile"]
+CMdic = Wv["CMdic"]
+SMSglobals.CMdic = CMdic
 
 
 
-DoCompress = False
-DoInvisible = False
+DoCompress = True
+DoInvisible = True
 minmassgap = addunit(10.,'GeV')
 
 DoSLHAdec = True
