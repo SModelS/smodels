@@ -16,7 +16,8 @@ print "[run.py] done loading %d analyses" % len(SMSglobals.ListOfAnalyses)
 
 # n=1000
 # slhafile="AndreSLHA/andrePT4.slha"
-lhefile="../regression/T2_1.lhe"
+# lhefile="../regression/T2_1.lhe"
+lhefile="T2_100.lhe"
 reader=LHEReader.LHEReader ( lhefile )
 for Event in reader:
   print Event
@@ -26,7 +27,10 @@ for Event in reader:
   print "element=",element,
   print "tx=",tx
 
+SMSTopList=[]
+
 for Analysis in SMSglobals.ListOfAnalyses:
+  SMSmethods.AddToAnalysis ( SMSTopList, Analysis )
   print "---------------Analysis Label = ",Analysis.label   
   for res in Analysis.results.keys():
     theoRes = SMSmethods.EvalRes(res,Analysis)

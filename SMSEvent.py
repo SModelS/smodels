@@ -18,8 +18,9 @@ class MParticle:
 class SMSEvent:
   """ a super-simple event class. Basically, it's a list of MParticles,
       plus some convenience functions """
-  def __init__ ( self ):
+  def __init__ ( self, eventnr=None ):
     self.particles=[]
+    self.eventnr=eventnr
 
   def add ( self, particle ):
     self.particles.append ( particle )
@@ -40,7 +41,9 @@ class SMSEvent:
     return momspdg
 
   def __str__ ( self ):
-    ret="\nEvent:\n"
+    nr=""
+    if self.eventnr!=None: nr=" "+str(self.eventnr)
+    ret="\nEvent%s:\n" % nr
     for p in self.particles:
       ret+=p.__str__()+"\n"
     return ret
