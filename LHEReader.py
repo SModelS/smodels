@@ -6,12 +6,19 @@ import SMSEvent
 class LHEReader:
   """ a class that produces events from lhe files """
 
-  def __init__ ( self, filename ):
+  def __init__ ( self, filename, nmax=None ):
+    """ initiate reader with 'filename'.
+        When using the iterator, then nmax is the maximum number of events to
+        be reader, nmax=None means read till the end of the file. """
     self.filename=filename
+    self.nmax=nmax
+    self.ctr=0
     self.File = open ( filename )
 
   def next ( self ):
     """ needed for the iterator """
+    if self.nmax!=None and self.ctr==self.nmax:
+      raise StopIteration
     e=self.event()
     if e==None:
       raise StopIteration
@@ -25,7 +32,8 @@ class LHEReader:
     """ reads lhe file 'file', returns an event.
         file is an open filehandle. returns none if no event is left to be read. """
     line = " "
-    ret=SMSEvent.SMSEvent()
+    self.ctr+=1
+    ret=SMSEvent.SMSEvent( self.ctr )
     # PartList = []
 
 #Find next event
