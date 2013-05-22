@@ -114,6 +114,6 @@ def GetPlotLimit(inmass,plot,Analysis,complain = False):
 	masslist=[mx]
 	if massI: masslist.append(massI)
 	masslist.append(my)
-	limits.append([analyses,SMSResults.getSmartUpperLimit(analyses,CMSlabel,masslist,run)])
+	limits.append([analyses,SMSResults.getSmartUpperLimit(analyses,CMSlabel,masslist,run,debug=complain)])
 
     return limits
