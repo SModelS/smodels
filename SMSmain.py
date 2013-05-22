@@ -23,7 +23,7 @@ else:
 
 
 #Generate events and compute cross-sections:
-nevts = 100
+nevts = 10000
 slhafile = "AndreSLHA/andrePT4.slha"
 #slhafile = "AndreSLHA/DESY_stop.slha"
 Wv = SMSxsec.pytinit(nevts,slhafile,rpythia = True, donlo = True)
@@ -32,13 +32,17 @@ Xsec = Wv["Xsecdic"]
 lhefile = Wv["lhefile"]
 
 
-DoSLHAdec = True
 
+DoCompress = False
+DoInvisible = False
+minmassgap = addunit(10.,'GeV')
+
+DoSLHAdec = True
 if DoSLHAdec:
     sigmacut = addunit(0.1,'fb')  # Maximum cross-section*BR to be included
-    SMSTopList = SMSDecomp.SLHAdecomp(slhafile,Xsec,sigmacut)
+    SMSTopList = SMSDecomp.SLHAdecomp(slhafile,Xsec,sigmacut,DoCompress,DoInvisible,minmassgap)
 else:
-    SMSTopList = SMSDecomp.LHEdecomp(lhefile,W,nevts)    
+    SMSTopList = SMSDecomp.LHEdecomp(lhefile,W,nevts,DoCompress,DoInvisible,minmassgap)
 
 
 EvTop_table = PrettyTable(["Topology","#Vertices", "#Insertions", "#Elements", "Sum of weights"])
@@ -57,7 +61,7 @@ for i in range(len(SMSTopList)):
  
             
 #Print element list for Topology[i]:    
-    if i == 1:           
+    if i >= 0:           
         for j in range(len(SMSTopList[i].ElList)):
             EvElement_table.add_row([i,j,SMSTopList[i].ElList[j].B[0].particles,SMSTopList[i].ElList[j].B[1].particles,wrap(MyPrettyPrinter().pformat(SMSTopList[i].ElList[j].B[0].masses),width=25),wrap(MyPrettyPrinter().pformat(SMSTopList[i].ElList[j].B[1].masses),width=25),wrap(MyPrettyPrinter().pformat(SMSTopList[i].ElList[j].weight),width=30)])
         EvElement_table.add_row(["---","---","---","---","---","---","---"])    
