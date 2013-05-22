@@ -119,7 +119,7 @@ class EAnalysis:
   def __init__(self):
     self.label = ""
     self.Top = GTop()
-    self.sqrts = 8.
+    self.sqrts = 0
     self.lum = 0.
     self.results = {}
     self.plots = {}
@@ -712,6 +712,12 @@ def AddToList(SMSTop,SMSTopList):
 #Loop over all elements in SMSTopList and add the weight to the 
 #matching elements in Analysis.
 def AddToAnalysis(SMSTopList,Analysis):
+  import SMSglobals
+  
+#Get analysis center of mass energy:
+  sqrts = Analysis.sqrts
+  if type(sqrts) == type(1.) or type(sqrts) == type(1): sqrts = addunit(sqrts,'TeV')
+  CMdic = SMSglobals.CMdic
   
   for itop in range(len(SMSTopList)):
     NewTop = SMSTopList[itop]  
@@ -723,6 +729,15 @@ def AddToAnalysis(SMSTopList,Analysis):
 #Loop over analysis elements:
       for jel in range(len(Analysis.Top.ElList)):
         NewEl = copy.deepcopy(NewTop.ElList[iel])
+        neweight = NewEl.weight
+#Remove weights which do not match the analysis center of mass energy        
+        if sqrts.asNumber() and len(CMdic) > 0:
+          for k in neweight.keys():
+            if CMdic[k] != sqrts: neweight.pop(k)
+          for k in CMdic.keys():
+            if CMdic[k] == sqrts and not neweight.has_key(k):
+              neweight.update({k : addunit(0.,'fb')})
+
         OldEl = copy.deepcopy(Analysis.Top.ElList[jel])
         if not SimEls(NewEl,OldEl,order=False,igmass=True): continue   #Check if particles match
         
@@ -735,7 +750,7 @@ def AddToAnalysis(SMSTopList,Analysis):
             
 #Check if elements match (with identical masses) for any branch ordering
           if SimEls(NewEl,OldEl,order=False):
-            Analysis.Top.ElList[jel].weight[imass] = sumweights([OldEl.weight,NewEl.weight])
+            Analysis.Top.ElList[jel].weight[imass] = sumweights([OldEl.weight,neweight])
             added = True
             break   #To avoid double counting only add event to one mass combination
           
@@ -746,7 +761,7 @@ def AddToAnalysis(SMSTopList,Analysis):
             NewEl.B[1] = NewTop.ElList[iel].B[0]
           for ib in range(len(NewEl.B)):
             Analysis.Top.ElList[jel].B[ib].masses.append(NewEl.B[ib].masses)
-          Analysis.Top.ElList[jel].weight.append(NewEl.weight)
+          Analysis.Top.ElList[jel].weight.append(neweight)
 
 
 #Definition of distance between two mass arrays
