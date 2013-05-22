@@ -213,11 +213,11 @@ def getUpperLimitFromDictionary ( analysis, topo, mx=None, my=None, run=None, pn
   ## return getClosestValue ( Dict, mx, my )
   return addunit ( getInterpolatedUpperLimit ( Dict, mx, my ), "pb" )
  
-def getSmartUpperLimit ( analysis, topo, masses, massesbranch2=None ):
+def getSmartUpperLimit ( analysis, topo, masses, massesbranch2=None, debug=False ):
   """ returns the upper limit for analysis/topo, given an ordered sequence of
       the mass (mother, intermediate, LSP) """
   import SMSInterpolation
-  return SMSInterpolation.UpperLimit(analysis, topo, masses)
+  return SMSInterpolation.UpperLimit(analysis, topo, masses, debug)
 #  return getUpperLimit ( analysis, topo, mx=masses[0], my=masses[-1], interpolate=True )
 
 def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False ):
