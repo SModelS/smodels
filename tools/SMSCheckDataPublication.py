@@ -1,8 +1,12 @@
 #!/usr/bin/python
 
-""" This is a simple tool that I (WW) need to work out with the CMS susy group what digitized results are not yet published """
+""" This is a simple tool that I (WW) need to work out with the CMS susy group
+what digitized results are not yet published """
 
-import SMSResults
+import sys
+sys.path.append ( "../" )
+
+import SMSResults, SMSHelpers
 
 SMSResults.ResultsForSqrts ( 0 )
 
@@ -15,6 +19,8 @@ trues={}
 for analysis in All:
   for topo in All[analysis]:
     if not SMSResults.isPublic ( analysis ): continue
+    sqrts=SMSResults.getSqrts ( analysis )
+    sqrts=SMSHelpers.rmvunit ( sqrts, "TeV" )
     constr=SMSResults.getConstraints ( analysis, topo )
     if not constr: continue
     run=SMSResults.getRun ( analysis )

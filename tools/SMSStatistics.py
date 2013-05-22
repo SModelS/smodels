@@ -1,5 +1,10 @@
 #!/usr/bin/python
 
+""" A simple tool that prints out statistics """
+
+import sys
+sys.path.append ( "../" )
+
 import SMSResults
 
 SMSResults.ResultsForSqrts ( 0 )
