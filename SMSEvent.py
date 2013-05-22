@@ -16,7 +16,8 @@ class MParticle:
 
 
 class SMSEvent:
-  """ a super-simple event class. Basically, it's a list of MParticles """
+  """ a super-simple event class. Basically, it's a list of MParticles,
+      plus some convenience functions """
   def __init__ ( self ):
     self.particles=[]
 
@@ -37,7 +38,6 @@ class SMSEvent:
     if momspdg[0] > momspdg[1]:
         momspdg[0], momspdg[1] = momspdg[1], momspdg[0]
     return momspdg
-
 
   def __str__ ( self ):
     ret="\nEvent:\n"
