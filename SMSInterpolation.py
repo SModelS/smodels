@@ -135,7 +135,8 @@ def UpperLimit(ana, topo, masses,debug=True):
     else:
       d.remove(ds)
   if len(xsecs)<2:
-    if compareM(masses,d[0]): return SMSResults.getUpperLimit(ana, gethistname(topo,d[0]['mz'][0]),masses[getaxis('x',d[0]['axes'])],masses[getaxis('y',d[0]['axes'])])
+    if d:
+      if compareM(masses,d[0]): return SMSResults.getUpperLimit(ana, gethistname(topo,d[0]['mz'][0]),masses[getaxis('x',d[0]['axes'])],masses[getaxis('y',d[0]['axes'])])
     if debug: print "[SMSInterpolation] error: Available histograms for %s/%s could not be combined, cannot interpolate" % ( ana, topo )
     return None
   p = numpy.polyfit(xvals,xsecs,len(xsecs)-1)
