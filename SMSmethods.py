@@ -77,16 +77,27 @@ class GTop:
         if len(self.ElList)==0: return None
         return self.ElList[0]
 
+    def elements ( self ):
+        return self.ElList
+
     def __str__(self):
         ret="number of vertices=%s number of vertex particles=%s" % \
                 ( self.vertnumb, self.vertparts )
         return ret
 
-    def checkConsistency ( self ):
+    def checkConsistency ( self, verbose=False ):
         """ the number of vertices and insertions per vertex is 
             redundant information in a topology, so we can perform
             an internal consistency check """
-        print "[SMSmethods.py] consistency check not yet implemented"
+        for element in self.ElList:
+            info=element.getEinfo()
+            if self.vertnumb!=info["vertnumb"]: 
+              if verbose: print "[SMSmethods.py] inconsistent topology!!!"
+              return False
+            if self.vertparts!=info["vertparts"]: 
+              if verbose: print "[SMSmethods.py] inconsistent topology!!!"
+              return False
+        if verbose: print "[SMSmethods.py] topology is consistent."
         return True
 
 #Adds Eelement to ElList
