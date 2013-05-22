@@ -467,8 +467,8 @@ def exists(analysis, topo, run = None):
       if run/analysis/sms.root or run/analysis/sms.py exists. """
   run2=SMSHelpers.getRun( analysis, run )
   if not topo:
-    import os
-    Base="/afs/hephy.at/user/w/walten/public/sms/"
+    import os    
+    Base = SMSHelpers.Base
     rootfile="%s/%s/%s/sms.root" % ( Base, run2, analysis )
     pydict="%s/%s/%s/sms.py" % ( Base, run2, analysis )
     if os.path.exists(rootfile) or os.path.exists(pydict):
