@@ -86,8 +86,10 @@ def getT6(pts):
 
 
 
-def getTx(E):
+def getTx(element):
 	"""takes EElement and returns Tx-Name"""
+	import copy
+	E=copy.deepcopy(element)
 	Branch1=E.B[0]
 	Branch2=E.B[1]
 	d=E.getEinfo()
