@@ -24,10 +24,12 @@ def getArray ( constraint ):
   ret=eval(c)
   return ret
 
-def load():
+def load( anas = None, topos=None ):
   """ This method creates the analysis objects from the info given in the 
-      SMS database.
-      returns ListOfAnalyses """
+      SMS database, returns ListOfAnalyses. 
+      If anas is given as a list, then we create only objects for these analyses
+      (the database naming convention is used). 
+      If topos is given as a list, then only these topos are considered """
   from SMSmethods import EAnalysis
   import SMSResults
   
@@ -39,12 +41,13 @@ def load():
   else:
     SMSResults.verbosity ( "error" )
   #anas=[ "alphaT", "RA48TeV", "RA2b8TeV", "Weakinos8TeV", "alphaT8TeV", "ATLAS_CONF_2013-024" ]
-  anas=SMSResults.getAllResults().keys()
+  if anas==None: anas=SMSResults.getAllResults().keys()
   for analysis in anas:
     if debug:
       print 
       print "Building analysis",analysis
     for Tx in SMSResults.getTopologies(analysis):
+      if topos!=None and Tx not in topos: continue
       if debug: print Tx,
       # if Tx[:2]!="T2": continue
       Analysis = EAnalysis()
