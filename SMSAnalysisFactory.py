@@ -46,6 +46,7 @@ def load():
       print "Building analysis",analysis
     for Tx in SMSResults.getTopologies(analysis):
       if debug: print Tx,
+      # if Tx[:2]!="T2": continue
       Analysis = EAnalysis()
       Analysis.sqrts=SMSResults.getSqrts( analysis )
       stopo=getRealTopo ( Tx )
@@ -75,7 +76,7 @@ def load():
       analyses=[ x for x in SMSResults.getAnalyses ( stopo ) if SMSResults.getConditions ( x ).has_key(stopo) and SMSResults.getConditions ( x )[stopo] == cond ]
       Analysis.plots = { andreconstraint: [ stopo, analyses ] }
 
-      ul=SMSResults.getUpperLimit ( analysis, Tx, mx=400., my=100., interpolate=True )
+      # ul=SMSResults.getUpperLimit ( analysis, Tx, mx=400., my=100., interpolate=True )
 #      print "[SMSAnalysisFactory] test for %s:%s ul(mx=400,my=100)=%s" % ( analysis, Tx, ul )
       
   #Add analysis to list of analyses:
@@ -96,5 +97,6 @@ if __name__ == "__main__":
   import SMSglobals
   load()
   print "List of analyses/results: "
-  for (ct,ana) in enumerate(SMSglobals.ListOfAnalyses):
+  ListOfAnalyses=load()
+  for (ct,ana) in enumerate(ListOfAnalyses):
     print ct,ana.label # .label,ana.sqrts
