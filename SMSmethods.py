@@ -276,6 +276,10 @@ def getEventTop(PList, weight = {}, DoCompress=False, DoInvisible=False, minmass
   imom = 0
   nptcs = 0    #Particle counter just for sanity checks
   
+  if DoCompress and rmvunit(minmassgap,'GeV') == -1: 
+    print "getEventTop: Please, set minmassgap"
+    return False
+  
 #First get Mothers:  
   for i in range(len(PList)):
     if PList[i].moms[0] == 1 or PList[i].moms[1] == 1:
@@ -327,10 +331,26 @@ def getEventTop(PList, weight = {}, DoCompress=False, DoInvisible=False, minmass
 
 
   ETopList.append(ETop)    
-  added = True
+  
+  #Do compression:
+  if DoCompress or DoInvisible:
+    FinalTopList = CompressTop(ETopList,DoCompress,DoInvisible,minmassgap)
+  else:
+    FinalTopList = ETopList
 
-  if DoCompress and minmassgap == -1: minmassgap = addunit(10.,'GeV')
+  return FinalTopList
+    
+    
+#Given a topology list, keep compressing the element
+#until no new compressions can happen. Returns a list with the old toplogies and the compressed ones.
+#To avoid double counting the input list should have a single element
+def CompressTop(ETopList,DoCompress,DoInvisible,minmassgap):
+
 #Keep compressing the topologies generated so far until no new compressions can happen:
+  if len(ETopList) > 0:
+    added = True
+  else:
+    added = False
   while added:    
     added = False
 #Check for mass compressed topologies    
@@ -415,7 +435,7 @@ def InvCompTop(InTop):
     while inv > 0 and ETopComp.vertparts[ib][inv-1] == 0: inv -= 1
 #Remove empty vertices at the end of the branch:
     ETopComp.vertnumb[ib] = inv + 1
-    ETopComp.vertparts[ib] = InTop.B[ib].vertparts[0:inv]
+    ETopComp.vertparts[ib] = InTop.vertparts[ib][0:inv]
     ETopComp.vertparts[ib].append(0)
     ETopComp.ElList[0].B[ib].particles = InTop.ElList[0].B[ib].particles[0:inv]
     ETopComp.ElList[0].B[ib].masses = InTop.ElList[0].B[ib].masses[0:inv+1]
@@ -1179,9 +1199,9 @@ def Csim(*els):
 #Defines the auxiliary greater function
 #returns a number between 0 and 1 depending on how much it is violated (0 = A > B, 1 = A << B)
 def Cgtr(a,b):
-  if type(b) == type(addunit(1.,'GeV')) and b.asNumber() == 0.: return 0.
-  if type(b) != type(addunit(1.,'GeV')) and b == 0.: return 0.
-  res = (abs(a-b) - (a-b))/(2.*b)
+  if type(a) == type(addunit(1.,'GeV')) and a.asNumber() + b.asNumber()  == 0.: return 'N/A'
+  if type(a) != type(addunit(1.,'GeV')) and a + b == 0.: return 'N/A'
+  res = (abs(a-b) - (a-b))/(2.*(a+b))
   return res
     
     
