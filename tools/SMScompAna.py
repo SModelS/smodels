@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import sys
+sys.path.append ( "../" )
+
 from Experiment import SMSResults, SMSanalyses, SMSAnalysisFactory
 
 #Creat analyses list:
