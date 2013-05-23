@@ -2,9 +2,8 @@
 import sys
 sys.path.append ( "../" )
 
-import TxNames, os
-
-import SMSglobals, SMSanalyses, SMSmethods
+from Experiment import TxNames
+import SMSglobals, SMSanalyses, SMSmethods, os
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Initialize global variables:
