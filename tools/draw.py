@@ -3,9 +3,7 @@
 """ simple tool that is meant to draw lessagraphs, both as ascii plot 
     and via pyfeyn """
 
-import sys
-sys.path.append ( "../" )
-
+import set_path
 from Experiment import SMSanalyses
 from Theory import LHEReader, SMSmethods
 import SMSdraw

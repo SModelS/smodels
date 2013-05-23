@@ -3,9 +3,7 @@
 """ This is a simple tool that I (WW) need to work out with the CMS susy group
 what digitized results are not yet published """
 
-import sys
-sys.path.append ( "../" )
-
+import set_path
 from Experiment import SMSResults, SMSHelpers
 
 SMSResults.ResultsForSqrts ( 0 )
