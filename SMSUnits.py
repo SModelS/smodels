@@ -56,7 +56,7 @@ def addunit ( value, unitstring ):
       return value * pb
     if unitstring=="fb-1":
       return value / fb
-    print "[SMSHelpers.py] Warning: dont know what to do with unit",unitstring
+    print "[SMSUnits.py] Warning: dont know what to do with unit",unitstring
   return value
 
 def rmvunit ( value, unitstring ):
@@ -79,6 +79,6 @@ def rmvunit ( value, unitstring ):
     if unitstring=="fb-1":
       return value.asNumber(1/fb)
 
-    print "[SMSHelpers.py] Warning: dont know what to do with unit",unitstring
+    print "[SMSUnits.py] Warning: dont know what to do with unit",unitstring
     return value
 
