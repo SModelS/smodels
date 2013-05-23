@@ -2,8 +2,8 @@
 
 import sys, argparse
 sys.path.append ( "../" )
-import SMSglobals, SMSmethods
-from Theory import LHEReader, SMSDecomp
+import SMSglobals
+from Theory import LHEReader, SMSDecomp, SMSmethods
 from Experiment import TxNames
 import Experiment.SMSAnalysisFactory as Analyses
 ## import SMSanalyses as Analyses
