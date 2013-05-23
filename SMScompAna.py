@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-import sys, SMSResults
+import sys
+from DatabaseLookup import SMSResults
 import SMSanalyses ## SuK/AL descriptions
 import SMSAnalysisFactory ## UND/WW descriptions
 

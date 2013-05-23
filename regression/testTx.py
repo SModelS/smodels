@@ -8,7 +8,6 @@ import SMSglobals, SMSanalyses, SMSmethods
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Initialize global variables:
-SMSglobals.initglob()
 #Creat analyses list:
 SMSanalyses.load()
 

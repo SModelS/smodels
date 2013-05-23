@@ -44,7 +44,7 @@ def SLHAdecomp(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassga
   pyslhadir = workdir + "/pyslha-1.4.3"
   sys.path.append(pyslhadir)
   import pyslha, SMSmethods
-  from SMSUnits import addunit, rmvunit
+  from DatabaseLookup.SMSUnits import addunit, rmvunit
 
   if DoCompress and rmvunit(minmassgap,'GeV') == -1: 
     print "SLHAdecomp: Please, set minmassgap"
