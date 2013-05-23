@@ -18,7 +18,7 @@ PtcDic={
 
 #--------------------Classes:
   
-class MParticle:
+class Particle:
   def __init__(self):
     self.pdg = 0
     self.status = 0
@@ -200,65 +200,6 @@ class EAnalysis:
 
 #--------------------Methods:
   
-#Event reader. Returns a list of MParticles
-def getNextEvent(File): 
-  """ reads LHE file 'File', returns a list of MParticles.
-    File is an open filehandle.  """
-  line = " "
-  PartList = []
-
-#Find next event
-  while line.find("<event>") == -1:
-    if line=='': 
-      print "[SMSmethods.py] error demanding more events than are available."
-      return PartList
-    line = File.readline()
-    
-#Read event info:
-  line = File.readline()
-
-#Get particles info:      
-  line = File.readline()  
-  while line.find("</event>") == -1:
-    if line.find("#")>-1:
-      line=line[:line.find('#')]
-    if len(line)==0:
-      line=File.readline()
-      continue
-    particle = MParticle()
-    linep = [float(x) for x in line.split()]
-    particle.pdg = int(linep[0])
-    particle.status = int(linep[1])
-    particle.moms = [int(linep[2]),int(linep[3])]
-    particle.px = linep[6]
-    particle.py = linep[7]
-    particle.pz = linep[8]
-    particle.e = linep[9]
-    particle.mass = linep[10]
-    
-    PartList.append(particle)
-    line = File.readline()  
-
-  return PartList
-
-#Reads particle list and returns an array with the mother
-#PDG codes:
-def getMom(PList):
-
-  momspdg = []
-  imom = 0
-  for i in range(len(PList)):
-    if PList[i].moms[0] == 1 or PList[i].moms[1] == 1:
-      momspdg.append(PList[i].pdg)
-      imom += 1
-  if momspdg[0] > momspdg[1]:
-    momspdg[0], momspdg[1] = momspdg[1], momspdg[0]
-      
-  if imom != 2:
-    print "getMom: Number of mother particles != 2"
-    return False
-  else:
-    return momspdg
 
 def getEventTop(PList, weight = {}, DoCompress=False, DoInvisible=False, minmassgap=-1):
   """ Reads particle list (PList) from event (as it is created by .getNextEvent)
@@ -768,7 +709,8 @@ def AddToAnalysis(SMSTopList,Analysis):
 #If Dana is defined, use maximum distance in all analyses
 def MassDist(mass1,mass2):
   """ definition of distance between two mass arrays """
-  import SMSglobals, SMSgetlimit
+  import SMSglobals
+  from  Experiment import SMSgetlimit
   
   Dana = SMSglobals.DistAnalyses  #List of analyses to be used
 
