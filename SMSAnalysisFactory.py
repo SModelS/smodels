@@ -106,7 +106,6 @@ def load( anas = None, topos=None ):
   return ListOfAnalyses  
     
 if __name__ == "__main__":
-  import SMSglobals
   load()
   print "List of analyses/results: "
   ListOfAnalyses=load()
