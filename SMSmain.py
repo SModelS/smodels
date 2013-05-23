@@ -13,9 +13,9 @@ DoFactory = True
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Creat analyses list:
 if DoFactory:
-  SMSglobals.ListOfAnalyses = SMSAnalysisFactory.load()
+  ListOfAnalyses = SMSAnalysisFactory.load()
 else:  
-  SMSglobals.ListOfAnalyses = SMSanalyses.load()
+  ListOfAnalyses = SMSanalyses.load()
 
 
 #Generate events and compute cross-sections:
@@ -37,7 +37,7 @@ minmassgap = addunit(10.,'GeV')
 
 DoSLHAdec = True
 if DoSLHAdec:
-  maxlum = SMSmethods.getMaxLum(SMSglobals.ListOfAnalyses) # Maximum cross-section*BR to be included
+  maxlum = SMSmethods.getMaxLum(ListOfAnalyses) # Maximum cross-section*BR to be included
   if rmvunit(maxlum,'fb-1'):    
     sigmacut = addunit(1./rmvunit(maxlum,'fb-1'),'fb')
   else:
@@ -81,13 +81,13 @@ print '\n \n \n'
 
 #sys.exit()
 #Add event topologies to analyses:
-for Analysis in SMSglobals.ListOfAnalyses:
+for Analysis in ListOfAnalyses:
   SMSmethods.AddToAnalysis(SMSTopList,Analysis)
 
 #Print analyses output:
 AnElement_table = PrettyTable(["Analyses","Element","Masses","Element Weight"])  
 
-for Ana in SMSglobals.ListOfAnalyses:
+for Ana in ListOfAnalyses:
   label = Ana.label
   ifirst = True
   for i in range(len(Ana.Top.ElList)):
@@ -109,7 +109,7 @@ print '\n \n \n'
 
     
 #Compute theoretical predictions to analyses results:
-for Analysis in SMSglobals.ListOfAnalyses:
+for Analysis in ListOfAnalyses:
   print "---------------Analysis Label = ",Analysis.label
   Results_table = PrettyTable(["Result","Conditions","Mass","Theoretical Value","Experimental Limits"])
   
