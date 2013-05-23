@@ -3,7 +3,7 @@
 """ centralized facility to access the SMS results """
 
 import SMSHelpers
-from SMSHelpers import addunit, rmvunit
+from SMSUnits import addunit, rmvunit
 
 def setLogLevel ( l=[ "error" ] ):
   """ defines what is written out, and what isnt """
