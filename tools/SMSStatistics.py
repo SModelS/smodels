@@ -2,9 +2,7 @@
 
 """ A simple tool that prints out statistics """
 
-import sys
-sys.path.append ( "../" )
-
+import set_path
 from Experiment import SMSResults
 
 SMSResults.ResultsForSqrts ( 0 )
