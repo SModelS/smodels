@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
-import SMSglobals, sys, SMSmethods, SMSxsec, SMSgetlimit
+import SMSglobals, sys, SMSmethods, SMSgetlimit
 from prettytable import PrettyTable
 from SMSpprint import wrap, MyPrettyPrinter
 import SMSDecomp
 from Experiment.SMSUnits import addunit, rmvunit
+from Theory import SMSxsec
 
 import SMSanalyses ## SuK/AL descriptions
 import SMSAnalysisFactory ## UND/WW descriptions
