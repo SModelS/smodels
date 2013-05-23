@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import set_path
+import set_path, sys
 from Experiment import SMSResults, SMSanalyses, SMSAnalysisFactory
 
 #Creat analyses list:
