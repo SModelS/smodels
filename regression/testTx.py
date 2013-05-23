@@ -1,13 +1,8 @@
 #!/usr/bin/python
 
 import set_path
-from Experiment import TxNames, SMSanalyses
+from Experiment import TxNames
 from Theory import SMSmethods, LHEReader
-
-#PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
-#Initialize global variables:
-#Creat analyses list:
-# SMSanalyses.load()
 
 green='\033[0;32m'
 red='\033[0;31m'
@@ -23,8 +18,6 @@ for topo in topolist:
         File=open("%s_1.lhe" % topo)
         reader = LHEReader.LHEReader("%s_1.lhe" % topo)
         Event = reader.next()
-        PList = Event.particles
-        SMSmethods.GTop()
-        SMSTop = SMSmethods.getEventTop(PList, {})
+        SMSTop = SMSmethods.getEventTop(Event.particles, {})
 	res = TxNames.getTx(SMSTop[0].ElList[0])
 	print "Checking %7s: %s" % ("["+res+"]",ok(res,topo))
