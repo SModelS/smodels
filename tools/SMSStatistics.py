@@ -5,7 +5,7 @@
 import sys
 sys.path.append ( "../" )
 
-import SMSResults
+from DatabaseLookup import SMSResults
 
 SMSResults.ResultsForSqrts ( 0 )
 

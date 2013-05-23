@@ -7,8 +7,9 @@ def GetPlotLimit(inmass,plot,Analysis,complain = False):
         to facilitate looking up results for Analysis objects. 
         All the algorithmic code should go into SMSResults plus helper classes.
     """
-    import SMSResults, numpy , copy
-    from SMSUnits import addunit, rmvunit
+    import numpy, copy
+    from DatabaseLookup  import SMSResults
+    from DatabaseLookup.SMSUnits import addunit, rmvunit
 
     massarray = [copy.deepcopy(inmass[0]),copy.deepcopy(inmass[1])]
 
