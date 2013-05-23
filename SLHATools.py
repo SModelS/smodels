@@ -1,3 +1,5 @@
+""" A collection of tools needed for use and manipulation of SLHA files """
+
 import pyslha2
 import tempfile
 
