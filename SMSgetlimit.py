@@ -8,7 +8,7 @@ def GetPlotLimit(inmass,plot,Analysis,complain = False):
         All the algorithmic code should go into SMSResults plus helper classes.
     """
     import SMSResults, numpy , copy
-    from SMSHelpers import addunit, rmvunit
+    from SMSUnits import addunit, rmvunit
 
     massarray = [copy.deepcopy(inmass[0]),copy.deepcopy(inmass[1])]
 

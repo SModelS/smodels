@@ -6,7 +6,7 @@
 def pytinit(nevts,slhafile,rpythia = True, donlo = True):
 
   import SMSmethods, shutil
-  from SMSHelpers import addunit
+  from SMSUnits import addunit
   
   if rpythia:
 #run pythia at 8 TeV:

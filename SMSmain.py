@@ -4,7 +4,7 @@ import SMSglobals, sys, SMSmethods, SMSxsec, SMSgetlimit
 from prettytable import PrettyTable
 from SMSpprint import wrap, MyPrettyPrinter
 import SMSDecomp
-from SMSHelpers import addunit, rmvunit
+from SMSUnits import addunit, rmvunit
 
 import SMSanalyses ## SuK/AL descriptions
 import SMSAnalysisFactory ## UND/WW descriptions
