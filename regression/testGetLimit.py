@@ -1,10 +1,9 @@
 #!/usr/bin/python
 
-import sys
-sys.path.append ( "../" )
-
-import ROOT, SMSmethods, SMSgetlimit
-from Experiment import SMSResults, SMSInterpolation
+import set_path
+import ROOT
+from Experiment import SMSResults, SMSInterpolation, SMSgetlimit
+from Theory import SMSmethods
 # from Experiment.SMSUnits import addunit, rmvunit
 
 def recreateHist(ana,topo,mz=None,axes=None, run=''):

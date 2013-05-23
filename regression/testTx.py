@@ -1,7 +1,6 @@
 #!/usr/bin/python
-import sys
-sys.path.append ( "../" )
 
+import set_path
 from Experiment import TxNames
 import SMSanalyses, SMSmethods, LHEReader
 
