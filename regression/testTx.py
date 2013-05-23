@@ -3,7 +3,7 @@ import sys
 sys.path.append ( "../" )
 
 from Experiment import TxNames
-import SMSglobals, SMSanalyses, SMSmethods, os
+import SMSanalyses, SMSmethods, LHEReader
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Initialize global variables:
@@ -22,7 +22,9 @@ def ok ( A,B ):
 
 for topo in topolist:
         File=open("%s_1.lhe" % topo)
-        PList = SMSmethods.getNextEvent(File)
+        reader = LHEReader.LHEReader("%s_1.lhe" % topo)
+        Event = reader.next()
+        PList = Event.particles()
         SMSmethods.GTop()
         SMSTop = SMSmethods.getEventTop(PList, {})
 	res = TxNames.getTx(SMSTop[0].ElList[0])

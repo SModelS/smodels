@@ -1,6 +1,6 @@
 """ Simple classes that encapsulate the information of an event """
 
-class MParticle:
+class Particle:
     """ simple helper class to encapsulate one particle """ 
     def __init__(self):
         self.pdg = 0
@@ -17,7 +17,7 @@ class MParticle:
 
 
 class SMSEvent:
-  """ a super-simple event class. Basically, it's a list of MParticles,
+  """ a super-simple event class. Basically, it's a list of Particles,
       plus some convenience functions """
   def __init__ ( self, eventnr=None ):
     self.particles=[]

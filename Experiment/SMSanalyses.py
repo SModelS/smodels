@@ -50,10 +50,10 @@ def load():
   }
   Analysis.plots  = {
   "[[[jet,jet]],[[jet,jet]]]" : ["T1",["alphaT8TeV"]],
-  "[[[t,t]],[[t,t]]]" : ["T1tttt",["RA48TeV","RA2b8TeV","MultiLepton8TeV","alphaT8TeV","SUS13008"]],
+  "[[[t,t]],[[t,t]]]" : ["T1tttt",["RA48TeV","RA2b8TeV","alphaT8TeV"]],
   "[[[b,b]],[[b,b]]]" : ["T1bbbb",["RA2b8TeV","alphaT8TeV"]],
   "[[[t,b]],[[t,b]]]" : ["T1tbtb",["ATLAS_CONF_2013_007"]],
-  "[[[t+,t-]],[[t+,t-]]]" : ["T1tttt",["ATLAS_CONF_2012_105","ATLAS_CONF_2013_007"]]
+  "[[[t+,t-]],[[t+,t-]]]" : ["T1tttt",["ATLAS_CONF_2012_105","ATLAS_CONF_2013_007","MultiLepton8TeV","SUS13008"]]
   }  
 #Add analysis to list of analyses:
   ListOfAnalyses.append(Analysis)

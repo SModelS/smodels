@@ -54,7 +54,7 @@ class LHEReader:
         if len(line)==0:
           line=self.File.readline()
           continue
-        particle = SMSEvent.MParticle()
+        particle = SMSEvent.Particle()
         linep = [float(x) for x in line.split()]
         particle.pdg = int(linep[0])
         particle.status = int(linep[1])

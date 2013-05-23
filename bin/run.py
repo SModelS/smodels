@@ -2,13 +2,13 @@
 
 import sys, argparse
 sys.path.append ( "../" )
-import SMSglobals, SMSmethods, LHEReader
-import LHEReader
+import SMSglobals, SMSmethods
+from Theory import LHEReader, SMSDecomp
 from Experiment import TxNames
-import SMSAnalysisFactory as Analyses
+import Experiment.SMSAnalysisFactory as Analyses
 ## import SMSanalyses as Analyses
 ## import SMSanalysesTest as Analyses
-import SMSDecomp
+
 
 print "[run.py] loading analyses ...."
 ListOfAnalyses = Analyses.load( topos="T2" )

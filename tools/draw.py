@@ -6,7 +6,9 @@
 import sys
 sys.path.append ( "../" )
 
-import SMSglobals, SMSanalyses, sys, SMSmethods, SMSdraw
+from Experiment import SMSanalyses
+from Theory import LHEReader
+import SMSmethods, SMSdraw
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Initialize global variables:
@@ -26,9 +28,9 @@ pytres = {"xsecfb" : 1.}
 for (sms,andrecode) in SMSTranslation.items():
   print sms,andrecode
 
-  File = open("../regression/%s_1.lhe" % sms,"r")
-      
-  PList = SMSmethods.getNextEvent(File)
+  reader = LHEReader.LHEReader("../regression/%s_1.lhe" % sms,nevts)
+  Event = reader.next()
+  PList = Event.particles
   weight = {"7 TeV" : pytres["xsecfb"]/float(nevts), "8 TeV" : pytres["xsecfb"]/float(nevts)}
   SMSTop = SMSmethods.getEventTop(PList, weight)
   b1=[ SMSTop[0].vertnumb[0],SMSTop[0].vertparts[0],SMSTop[0].ElList[0].B[0].particles ]

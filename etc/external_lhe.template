@@ -33,7 +33,6 @@ MSTP(71)=0     ! No FSR
 MSTP(81)=0     ! No multiple interactions
 MSTP(111)=0    ! No hadronization
 MSTJ(1)=0      ! No fragmentation
-MSTP(42)=0     ! No mass smearing (narrow width approx)
 end
 NEVENTS,0,0,SQRTSD0
 end
