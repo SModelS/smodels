@@ -6,15 +6,12 @@
 import sys
 sys.path.append ( "../" )
 
-import SMSglobals, SMSanalyses, sys, SMSmethods, SMSdraw ## , SMSTranslation
+import SMSglobals, SMSanalyses, sys, SMSmethods, SMSdraw
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Initialize global variables:
 #Creat analyses list:
 SMSanalyses.load()
-
-
-## SMSTranslation = SMSTranslation.SMSTranslation
 
 SMSTranslation = { 
 #  "T1": [ [ 1, [2], ['jet','jet'] ], [ 1, [2], ['jet','jet'] ] ],
