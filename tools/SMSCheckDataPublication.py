@@ -6,7 +6,7 @@ what digitized results are not yet published """
 import sys
 sys.path.append ( "../" )
 
-from DatabaseLookup import SMSResults, SMSHelpers
+from Experiment import SMSResults, SMSHelpers
 
 SMSResults.ResultsForSqrts ( 0 )
 
