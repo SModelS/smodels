@@ -9,7 +9,7 @@ def createSLHAFile(topo, masses, filename = None):
        random filename will be generated. return is the filename in string 
        format"""
 
-   slha = pyslha2.readSLHAFile('regression/slha/%s.slha' %topo)
+   slha = pyslha2.readSLHAFile('slha/%s.slha' %topo)
 
    for pid in masses:
       slha[0]['MASS'].entries[pid] = masses[pid]
