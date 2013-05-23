@@ -3,15 +3,16 @@
 #W = dictionary with event weights
 #nevts = number of generated events
 def LHEdecomp(lhefile,W,nevts,DoCompress=False,DoInvisible=False,minmassgap=-1):
-  import SMSmethods
+  import SMSmethods, LHEReader
 
   SMSTopList = []
-  LHEfile = open(lhefile,"r")
+  reader = LHEReader.LHEReader(lhefile,nevts)
   for iev in range(nevts):
 ##Read event  
-    PList = SMSmethods.getNextEvent(LHEfile) 
+    Event = reader.next()
 ##Get mother PDGs:
-    momPDG = tuple(SMSmethods.getMom(PList))
+    momPDG = tuple(Event.getMom())
+    PList = Event.particles
 #Get event weight list:
     weight = {}
     for k in W.keys(): 

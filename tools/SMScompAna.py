@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
 import sys
-from Experiment import SMSResults
-import SMSanalyses ## SuK/AL descriptions
-import SMSAnalysisFactory ## UND/WW descriptions
+from Experiment import SMSResults, SMSanalyses, SMSAnalysisFactory
 
 #Creat analyses list:
 ListOfAnalysesU = SMSAnalysisFactory.load()

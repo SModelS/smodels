@@ -5,7 +5,7 @@
 # total xsec = 1 (only useful for fast debugging)
 def pytinit(nevts,slhafile,rpythia = True, donlo = True):
 
-  import SMSmethods, shutil
+  import shutil, LHEReader
   from Experiment.SMSUnits import addunit
   
   if rpythia:
@@ -25,11 +25,10 @@ def pytinit(nevts,slhafile,rpythia = True, donlo = True):
 
 #Get 8 TeV event decomposition:
   n8_evts={}
-  inputfile=open("./data/fort_8.68")
+  reader = LHEReader.LHEReader("./data/fort_8.68",nevts)
   for iev in range(nevts):
-    particles = SMSmethods.getNextEvent(inputfile)
-    mompdg=SMSmethods.getMom(particles)
-    
+    Event = reader.next()
+    mompdg = Event.getMom()    
     getprodcs(mompdg[0], mompdg[1], n8_evts)
 
   weight_8 = {}
@@ -40,10 +39,10 @@ def pytinit(nevts,slhafile,rpythia = True, donlo = True):
 
 #Get 7 TeV event decomposition:
   n7_evts={}
-  inputfile=open("./data/fort_7.68")
+  reader = LHEReader.LHEReader("./data/fort_7.68",nevts)
   for iev in range(nevts):
-    particles = SMSmethods.getNextEvent(inputfile)
-    mompdg=SMSmethods.getMom(particles)
+    Event = reader.next()
+    mompdg = Event.getMom()
     getprodcs(mompdg[0], mompdg[1], n7_evts)
 
   weight_7 = {}
