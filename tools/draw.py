@@ -10,7 +10,6 @@ import SMSglobals, SMSanalyses, sys, SMSmethods, SMSdraw ## , SMSTranslation
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Initialize global variables:
-SMSglobals.initglob()
 #Creat analyses list:
 SMSanalyses.load()
 
@@ -18,7 +17,7 @@ SMSanalyses.load()
 ## SMSTranslation = SMSTranslation.SMSTranslation
 
 SMSTranslation = { 
-  "T1": [ [ 1, [2], ['jet','jet'] ], [ 1, [2], ['jet','jet'] ] ],
+#  "T1": [ [ 1, [2], ['jet','jet'] ], [ 1, [2], ['jet','jet'] ] ],
   "T2": [ [ 1, [1], ['jet'] ], [ 1, [1], ['jet'] ] ],
 }
 
@@ -41,6 +40,3 @@ for (sms,andrecode) in SMSTranslation.items():
   SMSdraw.asciidraw ( SMSTop[0] )
   SMSdraw.draw ( SMSTop[0] )
   check=( [ b1, b2 ] == andrecode)
-  #print check
-  #if not check:
-  #  print [ b1, b2 ],andrecode

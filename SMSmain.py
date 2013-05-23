@@ -23,7 +23,7 @@ else:
 #Generate events and compute cross-sections:
 nevts = 10000
 #slhafile = "AndreSLHA/andrePT4.slha"
-slhafile = "AndreSLHA/DESY_stop.slha"
+slhafile = "slha/DESY_stop.slha"
 Wv = SMSxsec.pytinit(nevts,slhafile,rpythia = True, donlo = True)
 W = Wv["Wdic"]
 Xsec = Wv["Xsecdic"]
