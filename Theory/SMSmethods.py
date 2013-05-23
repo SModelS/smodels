@@ -1,5 +1,8 @@
+import sys
+sys.path.append ( "../" )
+
 from Experiment.SMSUnits import addunit, rmvunit
-import sys, copy
+import copy
 
 #---------------Dictionaries:
 Rodd={ 
