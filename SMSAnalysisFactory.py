@@ -83,7 +83,8 @@ def load( anas = None, topos=None ):
       andreconstraint=constraint.replace("'","").replace(" ","")
       andrecond=cond.replace("'","").replace(" ","")
       Analysis.results={ andreconstraint: andrecond }
-      analyses=[ x for x in SMSResults.getAnalyses ( stopo ) if SMSResults.getConditions ( x ).has_key(stopo) and SMSResults.getConditions ( x )[stopo] == cond ]
+      analyses=[ analysis ]
+      ## analyses=[ x for x in SMSResults.getAnalyses ( stopo ) if SMSResults.getConditions ( x ).has_key(stopo) and SMSResults.getConditions ( x )[stopo] == cond ]
       Analysis.plots = { andreconstraint: [ stopo, analyses ] }
 
       # ul=SMSResults.getUpperLimit ( analysis, Tx, mx=400., my=100., interpolate=True )
