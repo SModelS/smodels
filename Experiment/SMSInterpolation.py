@@ -124,7 +124,7 @@ def UpperLimit(ana, topo, masses,debug=True):
       return None
     if 'LSP' in ds['mz'][0] or 'D' in ds['mz'][0]:
       if compareM(masses,ds):
-        if SMSResults.getUpperLimit(ana, gethistname(topo,ds['mz'][0]),masses[getaxis('x',ds['axes'])],masses[getaxis('y',ds['axes'])]):
+        if rmvunit(SMSResults.getUpperLimit(ana, gethistname(topo,ds['mz'][0]),masses[getaxis('x',ds['axes'])],masses[getaxis('y',ds['axes'])]),'pb'):
           return SMSResults.getUpperLimit(ana, gethistname(topo,ds['mz'][0]),masses[getaxis('x',ds['axes'])],masses[getaxis('y',ds['axes'])])
       d.remove(ds)
       continue

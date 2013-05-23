@@ -7,11 +7,12 @@ import ROOT, SMSmethods, SMSgetlimit
 from Experiment import SMSResults, SMSInterpolation
 # from Experiment.SMSUnits import addunit, rmvunit
 
-def recreateHist(ana,topo,mz=None, run=''):
+def recreateHist(ana,topo,mz=None,axes=None, run=''):
   """ recreate ROOT TH2F histogram of a given analysis and topology (only topologies with no intermediate masses) """
   if SMSResults.hasDictionary(ana):
     print "Cannot recreate histogram from dictionary"
     return None
+  print mz, axes
   toponame=topo
   if mz: toponame=SMSInterpolation.gethistname(topo,mz)
   xmin=rmvunit(SMSResults.getLowX(ana,toponame),'GeV')
@@ -35,11 +36,24 @@ def recreateHist(ana,topo,mz=None, run=''):
   x=xmin+bwx/2
   y=ymin+bwy/2
   a=SMSmethods.EAnalysis()
+  D=None
+  L=None
+  if mz.find('D')>-1: D=float(mz.split('=')[1])
+  if mz.find('LSP')>-1: L=float(mz[mz.find('P')+1:mz.find('P')+4])
   while x<xmax:
     while y<ymax:
-      massv = [x]
-      if mz: massv.append(SMSInterpolation.getxval(x,y,mz,mass=True))
-      massv.append(y)
+      if D:
+        massv=[0.,0.,0.]
+        massv[SMSInterpolation.getaxis('x',axes)]=x
+        massv[SMSInterpolation.getaxis('y',axes)]=y
+        if massv[SMSInterpolation.getaxis('x',mz)]==0.: massv[SMSInterpolation.getaxis('x',mz)]=massv[SMSInterpolation.getaxis('y',mz)]+D
+        if massv[SMSInterpolation.getaxis('y',mz)]==0.: massv[SMSInterpolation.getaxis('y',mz)]=massv[SMSInterpolation.getaxis('x',mz)]-D
+      elif L:
+        massv=[0.,0.,L]
+        massv[SMSInterpolation.getaxis('x',axes)]=x
+        massv[SMSInterpolation.getaxis('y',axes)]=y
+      elif mz: massv=[x,SMSInterpolation.getxval(x,y,mz,mass=True),y]
+      else: massv=[x,y]
       v=rmvunit(SMSgetlimit.GetPlotLimit([massv,massv],[topo,[ana]],a)[0][1],'pb')
       if v: h.Fill(x,y,v)
       y+=bwy
