@@ -19,5 +19,5 @@ for topo in topolist:
         reader = LHEReader.LHEReader("%s_1.lhe" % topo)
         Event = reader.next()
         SMSTop = SMSmethods.getEventTop(Event.particles, {})
-	res = TxNames.getTx(SMSTop[0].ElList[0])
+	res = TxNames.getTx(SMSTop[0].leadingElement())
 	print "Checking %7s: %s" % ("["+res+"]",ok(res,topo))
