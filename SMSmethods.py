@@ -1,4 +1,4 @@
-from DatabaseLookup.SMSUnits import addunit, rmvunit
+from Experiment.SMSUnits import addunit, rmvunit
 import sys, copy
 
 #---------------Dictionaries:
@@ -177,7 +177,7 @@ class EAnalysis:
 
 #Check if the plots listed in results exist
   def GetPlots(self,verbose=True):
-    from DatabaseLookup import SMSResults
+    from Experiment import SMSResults
 
     run = self.run    
     if run == "": run = None  #If run has not been defined, use latest

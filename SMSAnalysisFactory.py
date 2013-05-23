@@ -31,7 +31,7 @@ def load( anas = None, topos=None ):
       (the database naming convention is used). 
       If topos is given as a list, then only these topos are considered """
   from SMSmethods import EAnalysis
-  from DatabaseLookup import SMSResults
+  from Experiment import SMSResults
   import types
 
   ## lets make sure the user can also supply a single topo/ana

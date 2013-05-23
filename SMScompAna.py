@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import sys
-from DatabaseLookup import SMSResults
+from Experiment import SMSResults
 import SMSanalyses ## SuK/AL descriptions
 import SMSAnalysisFactory ## UND/WW descriptions
 

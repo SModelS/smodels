@@ -4,8 +4,8 @@ import sys
 sys.path.append ( "../" )
 
 import ROOT, SMSmethods, SMSgetlimit
-from DatabaseLookup import SMSResults, SMSInterpolation
-# from DatabaseLookup.SMSUnits import addunit, rmvunit
+from Experiment import SMSResults, SMSInterpolation
+# from Experiment.SMSUnits import addunit, rmvunit
 
 def recreateHist(ana,topo,mz=None, run=''):
   """ recreate ROOT TH2F histogram of a given analysis and topology (only topologies with no intermediate masses) """

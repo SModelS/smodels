@@ -8,8 +8,8 @@ def GetPlotLimit(inmass,plot,Analysis,complain = False):
         All the algorithmic code should go into SMSResults plus helper classes.
     """
     import numpy, copy
-    from DatabaseLookup  import SMSResults
-    from DatabaseLookup.SMSUnits import addunit, rmvunit
+    from Experiment  import SMSResults
+    from Experiment.SMSUnits import addunit, rmvunit
 
     massarray = [copy.deepcopy(inmass[0]),copy.deepcopy(inmass[1])]
 
