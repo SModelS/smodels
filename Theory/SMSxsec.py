@@ -33,7 +33,7 @@ def pytinit(nevts,slhafile,rpythia = True, donlo = True):
 
   weight_8 = {}
   sigma_8 = {}
-  for key in n8_evts.keys(): 
+  for key in n8_evts.keys():
     weight_8.update({key : total_cs8/nevts})  #Weight for one event
     sigma_8.update({key : n8_evts[key]*total_cs8/nevts})   #Production cross-section
 
