@@ -17,6 +17,9 @@ The plotting script provides output in PDF, EPS and PNG via LaTeX and the TikZ
 graphics package, and as LaTeX/TikZ source for direct embedding into documents or
 user-tweaking of the generated output.
 
+WARNING: This is a version hacked by Doris, she fixes the order of the blocks
+to please pythia!
+
 TODOs:
  * Split writeSLHA into writeSLHA{Blocks,Decays}
  * Identify HERWIG decay matrix element to use in ISAWIG
