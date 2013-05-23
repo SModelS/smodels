@@ -1,4 +1,4 @@
-from SMSHelpers import addunit, rmvunit
+from SMSUnits import addunit, rmvunit
 import sys, copy
 
 #---------------Dictionaries:

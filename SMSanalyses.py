@@ -2,7 +2,7 @@
 
 def load():
   from SMSmethods import EAnalysis
-  from SMSHelpers import addunit
+  from SMSUnits import addunit
   
   ListOfAnalyses = []
   #List analyses and classify in topologies and elements
