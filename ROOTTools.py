@@ -4,7 +4,7 @@ import ROOT
 
 
 def getTGraphfromContour(exclhisto):
-   """ returns the contour of an exculsion histogram as TGraph"""
+   """ returns the contour of an exclusion histogram as TGraph"""
    ROOT.gROOT.SetBatch()
    c1 = ROOT.TCanvas()
    c1.cd()
