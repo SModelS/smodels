@@ -7,8 +7,8 @@ import sys
 sys.path.append ( "../" )
 
 from Experiment import SMSanalyses
-from Theory import LHEReader
-import SMSmethods, SMSdraw
+from Theory import LHEReader, SMSmethods
+import SMSdraw
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Initialize global variables:

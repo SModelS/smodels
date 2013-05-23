@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
-import SMSglobals, sys, SMSmethods
+import SMSglobals, sys
 from prettytable import PrettyTable
 from SMSpprint import wrap, MyPrettyPrinter
-from Theory import SMSDecomp
+from Theory import SMSDecomp, SMSmethods, SMSxsec
 from Experiment.SMSUnits import addunit, rmvunit
-from Theory import SMSxsec
 from  Experiment import SMSanalyses, SMSAnalysisFactory, SMSgetlimit
 
 
@@ -20,7 +19,7 @@ else:
 
 
 #Generate events and compute cross-sections:
-nevts = 100
+nevts = 10000
 #slhafile = "AndreSLHA/andrePT4.slha"
 slhafile = "slha/DESY_stop.slha"
 Wv = SMSxsec.pytinit(nevts,slhafile,rpythia = True, donlo = True)
@@ -36,7 +35,7 @@ DoCompress = True
 DoInvisible = True
 minmassgap = addunit(10.,'GeV')
 
-DoSLHAdec = False
+DoSLHAdec = True
 if DoSLHAdec:
   maxlum = SMSmethods.getMaxLum(SMSglobals.ListOfAnalyses) # Maximum cross-section*BR to be included
   if rmvunit(maxlum,'fb-1'):    

@@ -21,19 +21,7 @@ PtcDic={
 
 #--------------------Classes:
   
-class Particle:
-  def __init__(self):
-    self.pdg = 0
-    self.status = 0
-    self.moms = []
-    self.px = 0.
-    self.py = 0.
-    self.pz = 0.
-    self.e = 0.
-    self.mass = 0.
-  def __str__(self):
-    return "particle pdg %d p=(%f,%f,%f,m=%f) st %d" % ( self.pdg, self.px, self.py, self.pz, self.mass, self.status )
-    
+
 class BElement:
   def __init__(self):
     self.masses = []
