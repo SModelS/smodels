@@ -34,8 +34,8 @@ for analysis in All:
 
 print len(nones),"analyses are not yet checked:"
 for a in nones.keys(): print "%s:%s" % ( a, SMSResults.getPAS ( a) ),
-print "\n",len(trues),"analyses have published data:"
+print "\n",len(trues),"analyses have published their data in digital form:"
 for a in trues.keys(): print "%s:%s" % ( a, SMSResults.getPAS ( a) ),
-print "\n",len(falses),"analyses have not published data:"
+print "\n\n",len(falses),"analyses have not published their data in digital form:"
 for a in falses.keys(): print "%s:%s" % ( a, SMSResults.getPAS ( a) ),
 print
