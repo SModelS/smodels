@@ -478,8 +478,9 @@ def exists(analysis, topo, run = None):
     if os.path.exists(rootfile) or os.path.exists(pydict):
       return True
     else:
-      return None
+      return False
   axes = getaxes(analysis,topo)
+  if not axes: return False
   hasDict=SMSHelpers.hasDictionary ( analysis, run2 )
   for a in axes:
     toponame = SMSInterpolation.gethistname(topo, a['mz'][0])
