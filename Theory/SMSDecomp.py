@@ -3,7 +3,7 @@
 #W = dictionary with event weights
 #nevts = number of generated events
 def LHEdecomp(lhefile,W,nevts,DoCompress=False,DoInvisible=False,minmassgap=-1):
-  import SMSmethods, LHEReader
+  import SMSmethods, LHEReader, TopologyBuilder
 
   SMSTopList = []
   reader = LHEReader.LHEReader(lhefile,nevts)
@@ -44,7 +44,7 @@ def SLHAdecomp(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassga
   workdir = os.getcwd() 
   pyslhadir = workdir + "/pyslha-1.4.3"
   sys.path.append(pyslhadir)
-  import pyslha, SMSmethods
+  import pyslha, SMSmethods, TopologyBuilder
   from Tools.PhysicsUnits import addunit, rmvunit
 
   if DoCompress and rmvunit(minmassgap,'GeV') == -1: 
@@ -168,7 +168,7 @@ def SLHAdecomp(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassga
           TopList.append(Top) 
 #Do compression:          
           if DoCompress or DoInvisible:
-             FinalTopList = SMSmethods.CompressTop(TopList,DoCompress,DoInvisible,minmassgap)
+             FinalTopList = TopologyBuilder.compressTopology(TopList,DoCompress,DoInvisible,minmassgap)
           else:
             FinalTopList = TopList
 #Add topologies to topology list:

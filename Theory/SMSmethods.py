@@ -185,47 +185,6 @@ class EAnalysis:
         if not SMSResults.exists(ana,topo,run):
           if verbose: print "SMSmethods.py: GetPlots: Histogram for ",topo," in ",ana," for run ",run," not found"
       
-#Given a topology list, keep compressing the element
-#until no new compressions can happen. Returns a list with the old toplogies and the compressed ones.
-#To avoid double counting the input list should have a single element
-def CompressTop(ETopList,DoCompress,DoInvisible,minmassgap):
-
-#Keep compressing the topologies generated so far until no new compressions can happen:
-  if len(ETopList) > 0:
-    added = True
-  else:
-    added = False
-  while added:    
-    added = False
-#Check for mass compressed topologies    
-    if DoCompress:
-      for Top in ETopList:
-        ETopComp = False
-        ETopComp = MassCompTop(Top,minmassgap)
-        if ETopComp:
-          exists = False
-          for Topp in ETopList:
-            if EqualTops(Topp,ETopComp): exists = True 
-          if not exists:   #Avoid double counting (conservative)
-            ETopList.append(ETopComp)
-            added = True
-      
-#Check for invisible compressed topologies 
-#(look for effective LSP, such as LSP + neutrino = LSP')      
-    if DoInvisible:
-      for Top in ETopList:
-        ETopInComp = False
-        ETopInComp = InvCompTop(Top)
-        if ETopInComp:
-          exists = False
-          for Topp in ETopList:
-            if EqualTops(Topp,ETopInComp): exists = True
-          if not exists:   #Avoid double counting (conservative)
-            ETopList.append(ETopInComp)
-            added = True
-  return ETopList
-
-
 #If two masses in InTop are degenerate, return compressed topology
 def MassCompTop(InTop,mingap):
      
