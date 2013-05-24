@@ -1,5 +1,6 @@
 from pprint import PrettyPrinter
-class MyPrettyPrinter(PrettyPrinter):
+
+class SMSPrettyPrinter(PrettyPrinter):
     def format(self, object, context, maxlevels, level):
         if isinstance(object, float):
             return ('%.1f' % object), True, False
