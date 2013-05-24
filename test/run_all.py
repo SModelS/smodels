@@ -19,3 +19,9 @@ for script in scripts:
   cmd= "python " + Dir + script + " > /dev/null"
   ret=os.system ( cmd )
   print ok ( 0, ret )
+
+print "\n\nFinally check SMSmain.py:\n"
+os.chdir("..")
+cmd= "python SMSmain.py > /dev/null"
+ret=os.system ( cmd )
+print ok ( 0, ret )
