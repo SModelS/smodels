@@ -2,13 +2,16 @@
 
 import SMSglobals, sys
 from prettytable import PrettyTable
-from SMSpprint import wrap, MyPrettyPrinter
 from Theory import SMSDecomp, SMSmethods, SMSxsec
 from Experiment.SMSUnits import addunit, rmvunit
+from Tools import SMSPrettyPrinter
+from Tools.SMSPrettyPrinter import wrap
 from  Experiment import SMSanalyses, SMSAnalysisFactory, SMSgetlimit
 
 
 DoFactory = True
+
+printer=SMSPrettyPrinter.SMSPrettyPrinter()
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Creat analyses list:
@@ -58,7 +61,7 @@ for i in range(len(SMSTopList)):
   weightlist = [el.weight for el in SMSTopList[i].ElList]
   sumw = SMSmethods.sumweights(weightlist)
   totweight.append(sumw)
-  EvTop_table.add_row([i,SMSTopList[i].vertnumb,SMSTopList[i].vertparts,len(SMSTopList[i].ElList),wrap(MyPrettyPrinter().pformat(sumw),width=30)])
+  EvTop_table.add_row([i,SMSTopList[i].vertnumb,SMSTopList[i].vertparts,len(SMSTopList[i].ElList),wrap(printer.pformat(sumw),width=30)])
   eltot += len(SMSTopList[i].ElList)
 
  
@@ -66,7 +69,7 @@ for i in range(len(SMSTopList)):
 #Print element list for Topology[i]:  
   if i >= 0:       
     for j in range(len(SMSTopList[i].ElList)):
-      EvElement_table.add_row([i,j,SMSTopList[i].ElList[j].B[0].particles,SMSTopList[i].ElList[j].B[1].particles,wrap(MyPrettyPrinter().pformat(SMSTopList[i].ElList[j].B[0].masses),width=25),wrap(MyPrettyPrinter().pformat(SMSTopList[i].ElList[j].B[1].masses),width=25),wrap(MyPrettyPrinter().pformat(SMSTopList[i].ElList[j].weight),width=30)])
+      EvElement_table.add_row([i,j,SMSTopList[i].ElList[j].B[0].particles,SMSTopList[i].ElList[j].B[1].particles,wrap(printer.pformat(SMSTopList[i].ElList[j].B[0].masses),width=25),wrap(printer.pformat(SMSTopList[i].ElList[j].B[1].masses),width=25),wrap(printer.pformat(SMSTopList[i].ElList[j].weight),width=30)])
     EvElement_table.add_row(["---","---","---","---","---","---","---"])  
       
       
@@ -97,7 +100,7 @@ for Ana in ListOfAnalyses:
       if not ifirst: label = ""
       if j != 0: ptcs = ""
       ifirst = False
-      AnElement_table.add_row([label,ptcs,wrap(MyPrettyPrinter().pformat(mass),width=100),wrap(MyPrettyPrinter().pformat(Ana.Top.ElList[i].weight[j]),width=30)])
+      AnElement_table.add_row([label,ptcs,wrap(printer.pformat(mass),width=100),wrap(printer.pformat(Ana.Top.ElList[i].weight[j]),width=30)])
   AnElement_table.add_row(["---","---","---","---"])  
     
 
@@ -135,11 +138,11 @@ for Analysis in ListOfAnalyses:
       sigmalimit = SMSgetlimit.GetPlotLimit(mass,plot,Analysis)
       
       if sigmalimit and len(sigmalimit) > 0:
-        Results_table.add_row([wrap(MyPrettyPrinter().pformat(res),width=30),wrap(MyPrettyPrinter().pformat(conds),width=30),wrap(MyPrettyPrinter().pformat(mass),width=30),wrap(MyPrettyPrinter().pformat(tvalue),width=30),wrap(MyPrettyPrinter().pformat(sigmalimit[0]),width=30)])
+        Results_table.add_row([wrap(printer.pformat(res),width=30),wrap(printer.pformat(conds),width=30),wrap(printer.pformat(mass),width=30),wrap(printer.pformat(tvalue),width=30),wrap(printer.pformat(sigmalimit[0]),width=30)])
         for ilim in range(1,len(sigmalimit)):
-          Results_table.add_row(["","","","",wrap(MyPrettyPrinter().pformat(sigmalimit[ilim]),width=30)])
+          Results_table.add_row(["","","","",wrap(printer.pformat(sigmalimit[ilim]),width=30)])
       else:
-        Results_table.add_row([wrap(MyPrettyPrinter().pformat(res),width=30),wrap(MyPrettyPrinter().pformat(conds),width=30),wrap(MyPrettyPrinter().pformat(mass),width=30),wrap(MyPrettyPrinter().pformat(tvalue),width=30),wrap(MyPrettyPrinter().pformat(sigmalimit),width=30)])
+        Results_table.add_row([wrap(printer.pformat(res),width=30),wrap(printer.pformat(conds),width=30),wrap(printer.pformat(mass),width=30),wrap(printer.pformat(tvalue),width=30),wrap(printer.pformat(sigmalimit),width=30)])
       Results_table.add_row(["---------","---------","---------","---------","---------"])
 
   print(Results_table)
