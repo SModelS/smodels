@@ -26,7 +26,7 @@ def addunit ( value, unitstring ):
   if value==None: return value
   if not useUnits: return value
   if useUnits: 
-    import SMSUnits as u
+    import Tools.PhysicsUnits as u
     import types as t
     ## for convenience, we add units also to tuples, lists, and dictionaries
     if type(value)==t.ListType:
@@ -60,7 +60,7 @@ def rmvunit ( value, unitstring ):
       """
   if not useUnits: return value
   if useUnits: 
-    import SMSUnits as u
+    import Tools.PhysicsUnits as u
     import types as t
     if type(value) != type(1.*u.GeV):
       return value

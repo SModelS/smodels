@@ -9,7 +9,7 @@ def GetPlotLimit(inmass,plot,Analysis,complain = False):
     """
     import copy
     import SMSResults
-    from SMSUnits import rmvunit
+    from Tools.PhysicsUnits import rmvunit
 
     massarray = [copy.deepcopy(inmass[0]),copy.deepcopy(inmass[1])]
 

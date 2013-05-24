@@ -3,7 +3,7 @@
 def fromEvent( Event, weight = {}, DoCompress=False, DoInvisible=False, \
                        minmassgap=None ):
   from SMSmethods import GTop, EElement, BElement, Rodd, Reven, ptype
-  from Experiment.SMSUnits import addunit, rmvunit
+  from Tools.PhysicsUnits import addunit, rmvunit
   """ Create a topology (GTop object) from Event.
       If the DoCompress and/or DoInvisible flags are on, also generate
   compressed topologies with small mass gaps and/or neutrinos emitted

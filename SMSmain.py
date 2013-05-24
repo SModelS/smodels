@@ -3,7 +3,7 @@
 import SMSglobals, sys
 from prettytable import PrettyTable
 from Theory import SMSDecomp, SMSmethods, SMSxsec
-from Experiment.SMSUnits import addunit, rmvunit
+from Tools.PhysicsUnits import addunit, rmvunit
 from Tools import SMSPrettyPrinter
 from Tools.SMSPrettyPrinter import wrap
 from  Experiment import SMSanalyses, SMSAnalysisFactory, SMSgetlimit
