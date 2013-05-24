@@ -1,5 +1,48 @@
 """ A builder to create GTop objects from e.g. SMSEvents """
 
+def compressTopology(ETopList,DoCompress,DoInvisible,minmassgap):
+  """ Given a topology list, keep compressing the element it 
+      can be compressed no more.
+      Returns a list with the old toplogies and the compressed ones.
+      To avoid double counting the input list should have a single element. """
+  import SMSmethods
+
+#Keep compressing the topologies generated so far until no new compressions can happen:
+  if len(ETopList) > 0:
+    added = True
+  else:
+    added = False
+  while added:    
+    added = False
+#Check for mass compressed topologies    
+    if DoCompress:
+      for Top in ETopList:
+        ETopComp = False
+        ETopComp = SMSmethods.MassCompTop(Top,minmassgap)
+        if ETopComp:
+          exists = False
+          for Topp in ETopList:
+            if SMSmethods.EqualTops(Topp,ETopComp): exists = True 
+          if not exists:   #Avoid double counting (conservative)
+            ETopList.append(ETopComp)
+            added = True
+      
+#Check for invisible compressed topologies 
+#(look for effective LSP, such as LSP + neutrino = LSP')      
+    if DoInvisible:
+      for Top in ETopList:
+        ETopInComp = False
+        ETopInComp = SMSmethods.InvCompTop(Top)
+        if ETopInComp:
+          exists = False
+          for Topp in ETopList:
+            if SMSmethods.EqualTops(Topp,ETopInComp): exists = True
+          if not exists:   #Avoid double counting (conservative)
+            ETopList.append(ETopInComp)
+            added = True
+  return ETopList
+
+
 def fromEvent( Event, weight = {}, DoCompress=False, DoInvisible=False, \
                        minmassgap=None ):
   from SMSmethods import GTop, EElement, BElement, Rodd, Reven, ptype
@@ -76,7 +119,7 @@ def fromEvent( Event, weight = {}, DoCompress=False, DoInvisible=False, \
   
   #Do compression:
   if DoCompress or DoInvisible:
-    FinalTopList = CompressTop(ETopList,DoCompress,DoInvisible,minmassgap)
+    FinalTopList = compressTopology(ETopList,DoCompress,DoInvisible,minmassgap)
   else:
     FinalTopList = ETopList
 
