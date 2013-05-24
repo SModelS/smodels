@@ -193,7 +193,7 @@ class EAnalysis:
   
 
 def getEventTop(PList, weight = {}, DoCompress=False, DoInvisible=False, minmassgap=-1):
-  """ Reads particle list (PList) from event (as it is created by .getNextEvent)
+  """ Reads particle list (PList) from SMSEvent 
   and generates Topology (GTop) with only one element in ElList, corresponding
   to the event. If the DoCompress and/or DoInvisible flags are on, also generate
   compressed topologies with small mass gaps and/or neutrinos emitted
