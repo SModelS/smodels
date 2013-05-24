@@ -1,6 +1,12 @@
 """ This unit contains two simple routines that draw feynman graphs """
 
-def draw ( top, filename="bla.pdf", elementnr=0 ):
+def printParticle_ ( label ):
+  """ very simple method to rename a few particles for the asciidraw
+      routine, do not call directly """
+  if label=="jet": return "q"
+  return label
+
+def draw ( element, filename="bla.pdf" ):
   """ plot a lessagraph, write into pdf file called <filename> """
   from pyfeyn.user import FeynDiagram,Vertex,Point,Fermion,Scalar,CIRCLE,SQUARE,\
     HATCHED135,Circle,pyx
@@ -17,16 +23,15 @@ def draw ( top, filename="bla.pdf", elementnr=0 ):
   P2a.addParallelArrow( pos=.44,displace=.0003,length=pyx.unit.length(1.75*f), size=.0001)
   P2a.addParallelArrow( pos=.44,displace=-.0003,length=pyx.unit.length(1.75*f), size=.0001) 
 
-  nbranches=len(top.leadingElement().B)
-  # print nbranches,"branches"
+  # nbranches=len(element.B)
 
-  for (ct,branch) in enumerate(top.leadingElement().B):
+  for (ct,branch) in enumerate(element.B):
     # print "branch",ct,branch,"with",branch.vertnumb,"vertices"
     # p1 = Point(0, ct)
     lastVertex=vtx1
-    for ( nvtx,particles) in enumerate(branch.particles):
+    for ( nvtx,insertions) in enumerate(branch.particles):
       mark=None
-      if particles>0: mark=CIRCLE
+      if len(insertions)>0: mark=CIRCLE
       v1=Vertex ( f*(nvtx+1),f*ct,mark=mark)
       f1 = Scalar  ( lastVertex,v1) ## .addLabel ( "x")
       if nvtx==0:
@@ -37,26 +42,18 @@ def draw ( top, filename="bla.pdf", elementnr=0 ):
       # print "particles",particles,"ct=",ct
       y=-1.0*f ## y of end point of SM particle
       if ct==1: y=2.*f
-      dx=(len(particles)-1)*(-.5)*f ## delta_x 
+      dx=(len(insertions)-1)*(-.5)*f ## delta_x 
       #dx=(particles-1)*(-.5)*f ## delta_x 
-      for i in range(len(particles)):
+      for (i,insertion) in enumerate(insertions):
         p=Point ( f*(nvtx + 1 +  dx + i), f*y )
-        print "branch=",branch
-        label=particles[i].replace("jet","q")
-        #label=branch.ElList[elementnr].particles[i].replace("jet","q")
+        ## print "branch=",branch
+        label=printParticle_ ( insertion )
         ff=Fermion(v1,p).addLabel ( label )
          
-    #pl = Point ( nvtx+2,ct )
-    #fl = Scalar ( lastVertex,pl ) ## .addLabel( "lsp" )
+    pl = Point ( nvtx+2,ct )
+    fl = Scalar ( lastVertex,pl ) ## .addLabel( "lsp" )
 
   fd.draw( filename )
-
-
-def printParticle_ ( label ):
-  """ very simple method to rename a few particles for the asciidraw
-      routine, do not call directly """
-  if label=="jet": return "q"
-  return label
 
 def drawBranch_ ( branch, upwards, labels ):
   """ draws a single branch, should only be used via asciidraw, 
