@@ -6,7 +6,7 @@
 import set_path
 from Experiment import SMSanalyses
 from Theory import LHEReader, SMSmethods
-import SMSdraw
+from Tools import SMSFeynmanGraphs
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Initialize global variables:
@@ -34,6 +34,6 @@ for (sms,andrecode) in SMSTranslation.items():
   b1=[ SMSTop[0].vertnumb[0],SMSTop[0].vertparts[0],SMSTop[0].ElList[0].B[0].particles ]
   b2=[ SMSTop[0].vertnumb[1],SMSTop[0].vertparts[1],SMSTop[0].ElList[0].B[1].particles ]
   print b1, b2
-  SMSdraw.asciidraw ( SMSTop[0] )
-  SMSdraw.draw ( SMSTop[0] )
+  SMSFeynmanGraphs.asciidraw ( SMSTop[0] )
+  SMSFeynmanGraphs.draw ( SMSTop[0] )
   check=( [ b1, b2 ] == andrecode)

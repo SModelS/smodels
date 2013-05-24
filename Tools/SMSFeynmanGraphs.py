@@ -1,3 +1,5 @@
+""" This unit contains two simple routines that draw feynman graphs """
+
 def draw ( top, filename="bla.pdf", elementnr=0 ):
   """ plot a lessagraph, write into pdf file called <filename> """
   from pyfeyn.user import FeynDiagram,Vertex,Point,Fermion,Scalar,CIRCLE,SQUARE,\
