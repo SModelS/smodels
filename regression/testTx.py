@@ -1,5 +1,8 @@
 #!/usr/bin/python
 
+""" starting from a Tx.lhe file, we SmodelS-decompose the event, and 
+obtain its Tx name from the SModelS description of the event: a closure test. """
+
 import set_path
 from Experiment import TxNames
 from Theory import SMSmethods, LHEReader
