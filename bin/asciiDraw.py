@@ -7,7 +7,7 @@ argparser.add_argument ( '-T', nargs='?', help='Tx name, will look up lhe file i
 argparser.add_argument ( '-l', '--lhe', nargs='?', help='lhe file name, supplied directly. Takes precedence over "-T" argument.', type=types.StringType, default='' )
 args=argparser.parse_args()
 
-from Theory import LHEReader, SMSmethods
+from Theory import LHEReader, SMSmethods, TopologyBuilder
 from Tools import SMSFeynmanGraphs
 
 filename="../regression/%s_1.lhe" % args.T
@@ -15,5 +15,5 @@ if args.lhe!="": filename=args.lhe
 
 reader = LHEReader.LHEReader( filename )
 Event = reader.next()
-SMSTop = SMSmethods.getEventTop(Event.particles, {} )
+SMSTop = TopologyBuilder.fromEvent(Event, {} )
 SMSFeynmanGraphs.asciidraw ( SMSTop[0].leadingElement() )

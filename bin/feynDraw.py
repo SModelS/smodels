@@ -8,7 +8,7 @@ argparser.add_argument ( '-l', '--lhe', nargs='?', help='lhe file name, supplied
 argparser.add_argument ( '-o', '--output', nargs='?', help='output file, can be pdf or eps', type=types.StringType, default='out.pdf' )
 args=argparser.parse_args()
 
-from Theory import LHEReader, SMSmethods
+from Theory import LHEReader, SMSmethods, TopologyBuilder
 from Tools import SMSFeynmanGraphs
 
 filename="../regression/%s_1.lhe" % args.T
@@ -16,5 +16,5 @@ if args.lhe!="": filename=args.lhe
 
 reader = LHEReader.LHEReader( filename )
 Event = reader.next()
-SMSTop = SMSmethods.getEventTop(Event.particles, {} )
+SMSTop = TopologyBuilder.fromEvent(Event, {} )
 SMSFeynmanGraphs.draw ( SMSTop[0].leadingElement(), args.output )
