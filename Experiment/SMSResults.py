@@ -344,12 +344,13 @@ def getComment ( analysis, run=None ):
   """ an option comment? """
   return SMSHelpers.getMetaInfoField ( analysis, "comment", run )
 
-def getConditions ( analysis, topo="all", run=None ):
+def getConditions ( analysis, topo="all", fuzzy=True, run=None ):
   """ get the conditions. if topo is "all",
       returns a dictionary, else it returns the condition
       only for the given topo, None if non-existent. """
   run=SMSHelpers.getRun ( analysis, run )
-  ret = SMSHelpers.conditions ( analysis, run )
+  if fuzzy: ret = SMSHelpers.fuzzyconditions ( analysis, run)
+  else: ret = SMSHelpers.conditions ( analysis, run )
   if topo=="all": return ret
   if not ret.has_key ( topo ): return None
   return ret[topo]
@@ -462,9 +463,12 @@ def massDecoupling ( topo, plot='ROOT',kerning=True ):
 
 
 def exists(analysis, topo, run = None):
-  """ check if the histogram run/analysis/sms.root(limit_topo) exists."""
+  """ check if the histogram run/analysis/sms.root(limit_topo) exists.
+        for topologies with intermediate masses, check if all histograms (dictionaries)
+        listed in the axes-information exist."""
   """ or sms.py, if it's stored in dictionaries. If topo==None, simply check
       if run/analysis/sms.root or run/analysis/sms.py exists. """
+  import SMSInterpolation
   run2=SMSHelpers.getRun( analysis, run )
   if not topo:
     import os    
@@ -475,14 +479,17 @@ def exists(analysis, topo, run = None):
       return True
     else:
       return None
+  axes = getaxes(analysis,topo)
   hasDict=SMSHelpers.hasDictionary ( analysis, run2 )
-  if hasDict:
+  for a in axes:
+    toponame = SMSInterpolation.gethistname(topo, a['mz'][0])
+    if hasDict:
     #print "BBB 1 ana=%s run=%s run2=%s" % ( analysis,run,run2 )
-    Dict=SMSHelpers.getUpperLimitDictionary ( analysis, topo, run2 )
-    if not Dict or len(Dict)==0: return False
-    return True
-  histo=SMSHelpers.getUpperLimitFromHisto(analysis, topo, run2 )
-  if not histo: return False
+      Dict=SMSHelpers.getUpperLimitDictionary ( analysis, toponame, run2 )
+      if not Dict or len(Dict)==0: return False
+      continue
+    histo=SMSHelpers.getUpperLimitFromHisto(analysis, toponame, run2 )
+    if not histo: return False
       
   return True
 
