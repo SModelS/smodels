@@ -20,7 +20,7 @@ for script in scripts:
   ret=os.system ( cmd )
   print ok ( 0, ret )
 
-print "\n\nFinally check SMSmain.py:\n"
+print "\nFinally check SMSmain.py: ",
 os.chdir("..")
 cmd= "python SMSmain.py > /dev/null"
 ret=os.system ( cmd )
