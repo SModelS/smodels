@@ -51,70 +51,43 @@ def draw ( top, filename="bla.pdf", elementnr=0 ):
 
   fd.draw( filename )
 
-def asciidraw ( top, elementnr=0, labels=True ):
+
+def printParticle_ ( label ):
+  """ very simple method to rename a few particles for the asciidraw
+      routine, do not call directly """
+  if label=="jet": return "q"
+  return label
+
+def drawBranch_ ( branch, upwards, labels ):
+  """ draws a single branch, should only be used via asciidraw, 
+      not directly """
+  lines=["  ","---"]
+  labels="  "
+  ## for ( nvtx,particles) in enumerate(branch.particles):
+  for insertions in branch.particles:
+    if len(insertions)==0: continue
+    lines[1]+="*---"
+    if len(insertions)==1: 
+      labels+=" "+printParticle_(insertions[0])
+      lines[0]+=" | "
+    if len(insertions)==2: 
+      labels+=printParticle_(insertions[0])+" "+printParticle_(insertions[1])
+      if upwards:
+        lines[0]+="\ /"
+      else:
+        lines[0]+="/ \\"
+    if len(insertions)>2:
+      print "[SMSFeynmanGraphs.py] case for n-body decay, n>3 not yet. implemented. Please implement."
+      sys.exit(0)
+
+  order=[0,1]
+  if not upwards: order=[1,0]
+  if upwards and labels: print labels
+  for i in order: print lines[i]
+  if not upwards and labels: print labels
+
+def asciidraw ( element, labels=True ):
   """ draw a simple ascii graph on the screen """
-
-  nbranches=len(top.leadingElement().B)
-  # print nbranches,"branches"
-
-  def drawBranch ( branch, up, labels ):
-    """ draws a single branch """
-    print "branch",branch,"up=",up
-    lines=["  ","---"]
-    labels="  "
-    idx=0
-    for ( nvtx,particles) in enumerate(branch.particles):
-      if particles==0: continue
-      lines[1]+="*---"
-      if particles==1: 
-        labels+=" "+branch.ElList[elementnr].particles[idx][0]
-	idx+=1
-        lines[0]+=" | "
-      if particles==2: 
-        labels+=branch.ElList[elementnr].particles[idx][0]+" "+branch.ElList[elementnr].particles[idx+1][0]
-	idx+=2
-        if up:
-          lines[0]+="\ /"
-        else:
-          lines[0]+="/ \\"
-
-    order=[0,1]
-    if not up: order=[1,0]
-    if up and labels: print labels
-    for i in order: print lines[i]
-    if not up and labels: print labels
-
-  for (ct,branch) in enumerate(top.leadingElement().B):
-    up=False
-    if ct==0: up=True 
-    drawBranch ( branch, up=up, labels=labels )
+  for (ct,branch) in enumerate(element.B):
+    drawBranch_ ( branch, upwards=(ct==0), labels=labels )
     print 
-
-def simpledraw ( top, filename="bla.pdf", elementnr=0 ):
-  """ plot a simple lessagraph, write into pdf file called <filename> """
-  from pyfeyn.user import FeynDiagram,Vertex,Point,Fermion,Scalar,CIRCLE
-  fd = FeynDiagram()
-
-  nbranches=len(top.B)
-  # print nbranches,"branches"
-
-  for (ct,branch) in enumerate(top.B):
-    # print "branch",ct,branch,"with",branch.vertnumb,"vertices"
-    p1 = Point(0, ct)
-    lastVertex=p1
-    for ( nvtx,particles) in enumerate(branch.vertparts):
-      v1=Vertex ( nvtx+1,ct,mark=None )
-      f1 = Fermion  ( lastVertex,v1) ## .addLabel ( "x")
-      lastVertex=v1
-      # print "particles",particles,"ct=",ct
-      y=-1 ## y of end point of SM particle
-      if ct==1: y=2
-      dx=(particles-1)*(-.5) ## delta_x 
-      for i in range(particles):
-        p=Point ( nvtx + 1 +  dx + i, y )
-        f=Scalar(v1,p).addLabel ( branch.ElList[elementnr].particles[i] )
-         
-    pl = Point ( nvtx+2,ct )
-    fl = Fermion ( lastVertex,pl ) ## .addLabel( "lsp" )
-
-  fd.draw( filename )
