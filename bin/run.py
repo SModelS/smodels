@@ -17,7 +17,7 @@ print "[run.py] done loading %d analyses" % len(ListOfAnalyses)
 
 # n=1000
 # slhafile="AndreSLHA/andrePT4.slha"
-lhefile="../regression/T2_1.lhe"
+lhefile="../lhe/T2_1.lhe"
 # lhefile="T2_100.lhe"
 reader=LHEReader.LHEReader ( lhefile, 1 )
 SMSTopList=[]
