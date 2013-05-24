@@ -4,7 +4,7 @@ import set_path
 import ROOT
 from Experiment import SMSResults, SMSInterpolation, SMSgetlimit
 from Theory import SMSmethods
-from Experiment.SMSUnits import addunit, rmvunit
+from Tools.PhysicsUnits import addunit, rmvunit
 
 def recreateHist(ana,topo,mz=None,axes=None, run=''):
   """ recreate ROOT TH2F histogram of a given analysis and topology (only topologies with no intermediate masses) """
