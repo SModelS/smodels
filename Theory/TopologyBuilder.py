@@ -2,7 +2,7 @@
 
 def fromEvent( Event, weight = {}, DoCompress=False, DoInvisible=False, \
                        minmassgap=None ):
-  from SMSDataObjects import GTop, EElement, BElement, Rodd, Reven, ptype
+  from SMSmethods import GTop, EElement, BElement, Rodd, Reven, ptype
   from Experiment.SMSUnits import addunit, rmvunit
   """ Create a topology (GTop object) from Event.
       If the DoCompress and/or DoInvisible flags are on, also generate
