@@ -137,8 +137,8 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
 def getNLLresult(pdgid1,pdgid2,inputfile):
     
     readfile=pyslha.readSLHAFile(inputfile)
-    gluinomass = abs(readfile[1][1000021].mass)
-    squarkmass = (abs(readfile[1][1000001].mass)+abs(readfile[1][2000001].mass)+abs(readfile[1][1000002].mass)+abs(readfile[1][2000002].mass)+abs(readfile[1][1000003].mass)+abs(readfile[1][2000003].mass)+abs(readfile[1][1000004].mass)+abs(readfile[1][2000004].mass))/8
+    gluinomass = abs(readfile[0]['MASS'].entries[1000021])
+    squarkmass = (abs(readfile[0]['MASS'].entries[1000001])+abs(readfile[0]['MASS'].entries[2000001])+abs(readfile[0]['MASS'].entries[1000002])+abs(readfile[0]['MASS'].entries[2000002])+abs(readfile[0]['MASS'].entries[1000003])+abs(readfile[0]['MASS'].entries[2000003])+abs(readfile[0]['MASS'].entries[1000004])+abs(readfile[0]['MASS'].entries[2000004]))/8
 
     Values_7TeV={"sqmass_7TeV":0, "mgmass_7TeV":0,"LOcs_7TeV":False,"NLOcs_7TeV":False,"NLL+NLO_7TeV":False,"K_NLO_7TeV":False,"K_NLL_7TeV":False}
     Values_8TeV={"sqmass_8TeV":0, "mgmass_8TeV":0,"LOcs_8TeV":False,"NLOcs_8TeV":False,"NLL+NLO_8TeV":False,"K_NLO_8TeV":False,"K_NLL_8TeV":False} 
@@ -150,7 +150,7 @@ def getNLLresult(pdgid1,pdgid2,inputfile):
             if abs(pdgid1) == id1:
                 for id2 in squark:
                     if pdgid2 == id2:
-                        squarkmass = (abs(readfile[1][abs(pdgid1)].mass)+abs(readfile[1][pdgid2].mass))/2
+                        squarkmass = (abs(readfile[0]['MASS'].entries[abs(pdgid1)])+abs(readfile[0]['MASS'].entries[pdgid2]))/2
                         Values_7TeV = getNLLfast('sb',pdf,squarkmass,gluinomass,7)
                         Values_8TeV = getNLLfast('sb',pdf,squarkmass,gluinomass,8)
                         output = [Values_7TeV,Values_8TeV]
@@ -160,7 +160,7 @@ def getNLLresult(pdgid1,pdgid2,inputfile):
         if pdgid1 == id1:
             for id2 in squark:
                 if pdgid2 == id2:
-                    squarkmass = (abs(readfile[1][pdgid1].mass)+abs(readfile[1][pdgid2].mass))/2
+                    squarkmass = (abs(readfile[0]['MASS'].entries[pdgid1])+abs(readfile[0]['MASS'].entries[pdgid2]))/2
                     Values_7TeV = getNLLfast('ss',pdf,squarkmass,gluinomass,7)
                     Values_8TeV = getNLLfast('ss',pdf,squarkmass,gluinomass,8)
                     output = [Values_7TeV,Values_8TeV]
@@ -182,26 +182,26 @@ def getNLLresult(pdgid1,pdgid2,inputfile):
 
     
     if abs(pdgid1) == pdgid2 == 1000005:
-        squarkmass = abs(readfile[1][1000005].mass)
+        squarkmass = abs(readfile[0]['MASS'].entries[1000005])
         Values_7TeV = getNLLfast('st',pdf,squarkmass,gluinomass,7)
         Values_8TeV = getNLLfast('st',pdf,squarkmass,gluinomass,8)
         output = [Values_7TeV,Values_8TeV]
 
 
     if abs(pdgid1) == pdgid2 == 2000005:
-        squarkmass = abs(readfile[1][2000005].mass)
+        squarkmass = abs(readfile[0]['MASS'].entries[2000005])
         Values_7TeV = getNLLfast('st',pdf,squarkmass,gluinomass,7)
         Values_8TeV = getNLLfast('st',pdf,squarkmass,gluinomass,8)
         output = [Values_7TeV,Values_8TeV]
         
     if abs(pdgid1) == pdgid2 == 1000006:
-        squarkmass = abs(readfile[1][1000006].mass)
+        squarkmass = abs(readfile[0]['MASS'].entries[1000006])
         Values_7TeV = getNLLfast('st',pdf,squarkmass,gluinomass,7)
         Values_8TeV = getNLLfast('st',pdf,squarkmass,gluinomass,8)
         output = [Values_7TeV,Values_8TeV]
 
     if abs(pdgid1) == pdgid2 == 2000006:
-        squarkmass = abs(readfile[1][2000006].mass)
+        squarkmass = abs(readfile[0]['MASS'].entries[2000006])
         Values_7TeV = getNLLfast('st',pdf,squarkmass,gluinomass,7)
         Values_8TeV = getNLLfast('st',pdf,squarkmass,gluinomass,8)
         output = [Values_7TeV,Values_8TeV]
