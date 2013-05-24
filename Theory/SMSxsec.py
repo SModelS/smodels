@@ -6,7 +6,7 @@
 def pytinit(nevts,slhafile,rpythia = True, donlo = True):
 
   import shutil, LHEReader
-  from Experiment.SMSUnits import addunit
+  from Tools.PhysicsUnits import addunit
   
   if rpythia:
 #run pythia at 8 TeV:

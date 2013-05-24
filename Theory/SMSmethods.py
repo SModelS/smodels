@@ -1,7 +1,7 @@
 import sys
 sys.path.append ( "../" )
 
-from Experiment.SMSUnits import addunit, rmvunit
+from Tools.PhysicsUnits import addunit, rmvunit
 import copy
 
 #---------------Dictionaries:

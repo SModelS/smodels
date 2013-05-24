@@ -6,7 +6,7 @@ pyslhadir = workdir + "/pyslha-1.4.3"
 sys.path.append(pyslhadir)
 import pyslha
 from string import Template
-from Experiment.SMSUnits import addunit
+from Tools.PhysicsUnits import addunit
 
 #define global variables
 pdf = 'cteq'
