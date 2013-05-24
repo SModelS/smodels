@@ -23,7 +23,7 @@ def LHEdecomp(lhefile,W,nevts,DoCompress=False,DoInvisible=False,minmassgap=-1):
         return False
 
 #Get event topology  
-    SMSTopListEv = SMSmethods.getEventTop(PList, weight, DoCompress, DoInvisible, minmassgap)
+    SMSTopListEv = TopologyBuilder.fromEvent(Event, weight, DoCompress, DoInvisible, minmassgap)
   
 #Add event topology to topology list:  
     for TopEv in SMSTopListEv:  

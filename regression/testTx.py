@@ -5,7 +5,7 @@ obtain its Tx name from the SModelS description of the event: a closure test. ""
 
 import set_path
 from Experiment import TxNames
-from Theory import SMSmethods, LHEReader
+from Theory import SMSmethods, LHEReader, TopologyBuilder
 
 green='\033[0;32m'
 red='\033[0;31m'
@@ -21,6 +21,6 @@ for topo in topolist:
         File=open("%s_1.lhe" % topo)
         reader = LHEReader.LHEReader("%s_1.lhe" % topo)
         Event = reader.next()
-        SMSTop = SMSmethods.getEventTop(Event.particles, {})
+        SMSTop = TopologyBuilder.fromEvent(Event, {})
 	res = TxNames.getTx(SMSTop[0].leadingElement())
 	print "Checking %7s: %s" % ("["+res+"]",ok(res,topo))

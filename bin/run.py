@@ -4,7 +4,7 @@
 
 import set_path
 import SMSglobals, argparse
-from Theory import LHEReader, SMSDecomp, SMSmethods
+from Theory import LHEReader, SMSDecomp, SMSmethods, TopologyBuilder
 from Experiment import TxNames
 import Experiment.SMSAnalysisFactory as Analyses
 ## import SMSanalyses as Analyses
@@ -23,7 +23,7 @@ reader=LHEReader.LHEReader ( lhefile, 1 )
 SMSTopList=[]
 for Event in reader:
   print Event
-  SMSTops=SMSmethods.getEventTop ( Event.particles )
+  SMSTops=TopologyBuilder.fromEvent ( Event )
   print "SMSTops[0].leadingElement=",SMSTops[0].leadingElement()
 
   for SMSTop in SMSTops:
