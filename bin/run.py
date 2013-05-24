@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+""" another sandbox to try things out """
+
 import set_path
 import SMSglobals, argparse
 from Theory import LHEReader, SMSDecomp, SMSmethods
@@ -29,7 +31,7 @@ for Event in reader:
     print "SMSTop.leadingElement=",SMSTop.leadingElement()
     SMSmethods.AddToList ( SMSTop, SMSTopList )
     #  element=SMSTop.leadingElement()
-    for element in SMSTop.ElList:
+    for element in SMSTop.elements():
       print "======================="
       tx=TxNames.getTx(element)
       print "element=",element
