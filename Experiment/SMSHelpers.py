@@ -202,6 +202,10 @@ def conditions ( analysis, run ):
   """ get all the conditions for a analysis/run pair """
   return getLines ( analysis, run, "condition" )
 
+def fuzzyconditions ( analysis, run ):
+  """ get all the fuzzyconditions for an analysis/run pair """
+  return getLines( analysis, run, "fuzzycondition" )
+
 def constraints ( analysis, run ):
   """ get all the conditions for a analysis/run pair """
   return getLines ( analysis, run, "constraint" )
