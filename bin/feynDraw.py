@@ -11,7 +11,7 @@ args=argparser.parse_args()
 from Theory import LHEReader, SMSmethods, TopologyBuilder
 from Tools import SMSFeynmanGraphs
 
-filename="../regression/%s_1.lhe" % args.T
+filename="../lhe/%s_1.lhe" % args.T
 if args.lhe!="": filename=args.lhe
 
 reader = LHEReader.LHEReader( filename )
