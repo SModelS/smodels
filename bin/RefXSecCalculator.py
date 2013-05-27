@@ -10,7 +10,7 @@ import Tools.PhysicsUnits as UNIT
 topo = 'T2bb'
 nevts = 100
 
-SMS.considerRuns(["2011", "2012", "8TeV"])
+SMS.considerRuns(["8TeV", "2012", "2011"])
 analyses = SMS.getAnalyses(topo)
 print analyses
 
