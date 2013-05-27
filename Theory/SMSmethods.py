@@ -426,8 +426,7 @@ def AddToList(SMSTop,SMSTopList):
 
 
 def strtoel(invar):
-  """ Converts an element string to a nested particle list or vice-versa """
-  #print "getting a particle list from ",invar
+  """ Converts an SMS description string to a nested particle list """
   st = invar.replace(" ","")
   st = st[st.find("[[["):st.find("]]]")+3]
   st_B = []
