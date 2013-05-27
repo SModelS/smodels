@@ -4,7 +4,7 @@ import SMSglobals, sys
 from prettytable import PrettyTable
 from Theory import SMSDecomp, SMSmethods, SMSxsec
 from Tools.PhysicsUnits import addunit, rmvunit
-from Tools import SMSPrettyPrinter
+from Tools import SMSPrettyPrinter, VariousHelpers
 from Tools.SMSPrettyPrinter import wrap
 from  Experiment import SMSanalyses, SMSAnalysisFactory, SMSgetlimit
 
@@ -40,7 +40,7 @@ minmassgap = addunit(10.,'GeV')
 
 DoSLHAdec = True
 if DoSLHAdec:
-  maxlum = SMSmethods.getMaxLum(ListOfAnalyses) # Maximum cross-section*BR to be included
+  maxlum = VariousHelpers.getMaxLum(ListOfAnalyses) # Maximum cross-section*BR to be included
   if rmvunit(maxlum,'fb-1'):    
     sigmacut = addunit(1./rmvunit(maxlum,'fb-1'),'fb')
   else:
