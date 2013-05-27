@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import set_path
-import ROOT
+import ROOT, os
 import Theory.SMSxsec as XSEC
 import Theory.SLHATools as SLHA
 import Experiment.SMSResults as SMS
@@ -50,7 +50,11 @@ while i < 2:
 #   print m
    masses = {pidlsp: mlsp, pidmom: m}
    slhafile = SLHA.createSLHAFile(topo, masses)
-   dic = XSEC.pytinit(nevts, slhafile) # im loop fuer mothermass im bin abstand (25 GeV???)
+   wkdir = os.getcwd()
+   os.chdir('../')
+   print wkdir, os.getcwd()
+   dic = XSEC.pytinit(nevts, slhafile)
+   os.chdir(wkdir)
    print dic
    if dic['Xsecdic']['7 TeV (NLO)'].has_key((pdgmom,pdgmom)):
       xs7 = dic['Xsecdic']['7 TeV (NLO)'][(pdgmom,pdgmom)]
