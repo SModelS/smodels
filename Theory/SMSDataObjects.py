@@ -1,6 +1,7 @@
 """ all data classes necessary to create a SModelS description of events """
 
 from SMSmethods import GTop, strtoel, EElement, BElement
+import ClusterTools
 from ParticleNames import Reven, PtcDic
 
 class EAnalysis:  
@@ -86,12 +87,12 @@ class EAnalysis:
   #Loop over all elements in SMSTopList and add the weight to the 
   #matching elements in Analysis.
   def add(self,SMSTopList):
-    import SMSglobals, copy
+    import copy
 
     #Get analysis center of mass energy:
     sqrts = self.sqrts
     if type(sqrts) == type(1.) or type(sqrts) == type(1): sqrts = addunit(sqrts,'TeV')
-    CMdic = SMSglobals.CMdic
+    CMdic = ClusterTools.CMdic
 
     for itop in range(len(SMSTopList)):
       NewTop = SMSTopList[itop]  
@@ -140,7 +141,7 @@ class EAnalysis:
   def evaluateResult(self,res,uselimits = False):
     """ Evaluate theoretical predictions for the analysis result and conditions.
         FIXME what does that mean? """
-    import SMSglobals, copy
+    import copy, ClusterTools
     from ClusterTools import DoCluster, MassDist, GoodMass
 
     output = []
@@ -152,7 +153,7 @@ class EAnalysis:
     dmin = self.masscomp
   #List of analyses and anlysis itself (necessary to compute distances)
     analyses = self.plots[res]
-    SMSglobals.DistAnalyses = [analyses,self]
+    ClusterTools.DistAnalyses = [analyses,self]
 
   #Create a mass list with all masses appearing in the analysis which have similar branch masses:
     Goodmasses = []

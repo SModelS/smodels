@@ -2,8 +2,7 @@
 
 """ another sandbox to try things out """
 
-import set_path
-import SMSglobals, argparse
+import set_path, argparse
 from Theory import LHEReader, SMSDecomp, SMSmethods, TopologyBuilder
 from Experiment import TxNames
 import Experiment.SMSAnalysisFactory as Analyses
