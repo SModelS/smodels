@@ -35,7 +35,7 @@ def ResultsForSqrts ( sqrts ):
 def considerRuns(run = None):
   """ needs runs as a list. if no runs are given, all existing runs will be taken into account"""
   import SMSResultsCollector
-  allruns = ["8TeV", "ATLAS8TeV", "RPV8", "2012", "ATLAS7TeV", "RPV7", "2011"]
+  allruns = ["8TeV", "ATLAS8TeV", "RPV8", "2012", "RPV7", "2011"]
   runsort = []
   if run:
     for r in allruns:
