@@ -85,7 +85,7 @@ print '\n \n \n'
 #sys.exit()
 #Add event topologies to analyses:
 for Analysis in ListOfAnalyses:
-  SMSmethods.AddToAnalysis(SMSTopList,Analysis)
+  Analysis.add(SMSTopList)
 
 #Print analyses output:
 AnElement_table = PrettyTable(["Analyses","Element","Masses","Element Weight"])  

@@ -27,6 +27,22 @@ class BElement:
         self.particles.append ( ptcs )
       print "[SMSmethods] ptcs=",ptcs
 
+  def isEqual ( ElA, elB, order=True ):
+    if SimParticles(ElA.particles,ElB.particles,useDict=False): return False
+    if ElA.masses != ElB.masses: return False
+    return True
+
+  def isSimilar ( self, elB, order=True, igmass=False ):
+    """ compare elB with self.
+        If particles are similar and all masses equal, returns True,
+        otherwise returns False.
+        If order = False, test both branch orderings (for an element doublet only)
+        If igmass = True, only compare particles """
+    if type (elB) != type(self): return False
+    if not SimParticles(self.particles,elB.particles): return False
+    if not igmass and self.masses != elB.masses: return False
+    return True
+
   def __str__ ( self ):
     """ the canonical SModels description of the BElement. """
     st = str(self.particles).replace("'","")
@@ -55,6 +71,65 @@ class EElement:
       if len(vertparts[len(vertparts)-1]) == vertnumb[len(vertnumb)-1]-1:
         vertparts[len(vertparts)-1].append(0)  #Append 0 for stable LSP
     return {"vertnumb" : vertnumb, "vertparts" : vertparts}
+
+  def isSimilar ( ElA, ElB,order=True,igmass=False ):
+    """ Compare two EElements
+        If particles are similar and all masses equal, returns True,
+        otherwise returns False
+        If order = False, test both branch orderings (for an element doublet only)
+        If igmass = True, only compare particles """
+    if type(ElA) != type(ElB): return False
+    El1 = ElA.B
+    El2 = ElB.B
+    if len(El1) == 2 and not order:   
+      ptcsA = [El2[0].particles,El2[1].particles]
+      massA = [El2[0].masses,El2[1].masses]
+      ptcs = [El1[0].particles,El1[1].particles]
+      mass = [El1[0].masses,El1[1].masses]
+      ptcs_b = [El1[1].particles,El1[0].particles]
+      mass_b = [El1[1].masses,El1[0].masses]
+      if igmass:
+        mass = massA
+        mass_b = massA
+      if SimParticles(ptcsA,ptcs) and mass == massA: 
+        return True
+      elif SimParticles(ptcsA,ptcs_b) and mass_b == massA: 
+        return True
+      else:
+        return False
+    else:
+      for i in range(len(El1)):
+        if not SimParticles(El1[i].particles,El2[i].particles): return False
+        if not igmass and El1[i].masses != El2[i].masses: return False
+    return True
+
+  def isEqual ( ElA, ElB,order=True,igmass=False ):
+    """ Compare two BElements or Eelements.
+        If all masses and particles are equal, returns True,
+        otherwise returns False
+        If order = False, test both branch orderings (for an element doublet only) """
+    if type(ElA) != type(ElB): return False
+    El1 = ElA.B
+    El2 = ElB.B
+    if len(El1) == 2 and not order:
+      ptcsA = [El2[0].particles,El2[1].particles]
+      massA = [El2[0].masses,El2[1].masses]
+      ptcs = [El1[0].particles,El1[1].particles]
+      mass = [El1[0].masses,El1[1].masses]
+      ptcs_b = [El1[1].particles,El1[0].particles]
+      mass_b = [El1[1].masses,El1[0].masses]
+      if SimParticles(ptcsA,ptcs,useDict=False) and mass == massA: 
+        return True
+      elif SimParticles(ptcsA,ptcs_b,useDict=False) and mass_b == massA: 
+        return True
+      else:
+        return False
+    else:     
+      for i in range(len(El1)):
+        if not SimParticles(El1[i].particles,El2[i].particles,useDict=False): return False
+        if El1[i].masses != El2[i].masses: return False
+       
+    return True
     
   def __str__ ( self ):
     """ returns the canonical name of the element, e.g. [[jet],[jet]] """
@@ -104,6 +179,23 @@ class GTop:
     if verbose: print "[SMSmethods.py] topology is consistent."
     return True
 
+  def isEqual ( self, Top2, order=False ):
+    """ is this topology equal to Top2?
+        Returns true if they have the same number of vertices and particles.
+        If order=False and each topology has two branches, ignore branch ordering."""
+    if order or len(self.vertnumb) != 2 or len(Top2.vertnumb) != 2:
+      if self.vertnumb != Top2.vertnumb: return False
+      if self.vertparts != Top2.vertparts: return False
+      return True
+    else:
+      x1 = [self.vertnumb[0],self.vertparts[0]]
+      x2 = [self.vertnumb[1],self.vertparts[1]]
+      xA = [Top2.vertnumb[0],Top2.vertparts[0]]
+      xB = [Top2.vertnumb[1],Top2.vertparts[1]]
+      if x1 == xA and x2 == xB: return True
+      if x1 == xB and x2 == xA: return True
+      return False
+
 #Adds Eelement to ElList
 #OBS: NewElement must have the correct branch ordering!
   def AddElement(self, NewElement):
@@ -144,7 +236,7 @@ def MassCompTop(InTop,mingap):
       massA = ETopComp.ElList[0].B[ib].particles.pop(ivert)  
         
       
-  if not EqualTops(ETopComp,InTop):
+  if not ETopComp.isEqual(InTop):
     return ETopComp
   else:
     return False
@@ -179,114 +271,11 @@ def InvCompTop(InTop):
     ETopComp.ElList[0].B[ib].masses = InTop.ElList[0].B[ib].masses[0:inv+1]
     
 
-  if not EqualTops(ETopComp,InTop):
+  if not ETopComp.isEqual(InTop):
     return ETopComp
   else:
     return False
       
-#Compares two global topologies. Returns true if they have the same
-#number of vertices and particles.
-#If order=False and each topology has two branches, ignore branch ordering.
-def EqualTops(Top1,Top2,order=False):
-  if order or len(Top1.vertnumb) != 2 or len(Top2.vertnumb) != 2:
-    if Top1.vertnumb != Top2.vertnumb: return False
-    if Top1.vertparts != Top2.vertparts: return False
-    return True
-  else:
-    x1 = [Top1.vertnumb[0],Top1.vertparts[0]]
-    x2 = [Top1.vertnumb[1],Top1.vertparts[1]]
-    xA = [Top2.vertnumb[0],Top2.vertparts[0]]
-    xB = [Top2.vertnumb[1],Top2.vertparts[1]]
-    if x1 == xA and x2 == xB: return True
-    if x1 == xB and x2 == xA: return True
-    return False
-  
-
-#Compare two BElements or Eelements.
-#If all masses and particles are equal, returns True,
-#otherwise returns False
-#If order = False, test both branch orderings (for an element doublet only) 
-def EqualEls(ElA,ElB,order=True):
-  
-  if type(ElA) != type(ElB): return False
-
-#If it is an Eelement:
-  if type(ElA) == type(EElement()):
-    El1 = ElA.B
-    El2 = ElB.B
-    if len(El1) == 2 and not order:
-      ptcsA = [El2[0].particles,El2[1].particles]
-      massA = [El2[0].masses,El2[1].masses]
-      ptcs = [El1[0].particles,El1[1].particles]
-      mass = [El1[0].masses,El1[1].masses]
-      ptcs_b = [El1[1].particles,El1[0].particles]
-      mass_b = [El1[1].masses,El1[0].masses]
-      if SimParticles(ptcsA,ptcs,useDict=False) and mass == massA: 
-        return True
-      elif SimParticles(ptcsA,ptcs_b,useDict=False) and mass_b == massA: 
-        return True
-      else:
-        return False
-    else:     
-      for i in range(len(El1)):
-        if not SimParticles(El1[i].particles,El2[i].particles,useDict=False): return False
-        if El1[i].masses != El2[i].masses: return False
-       
-#If it is a BElement:      
-  elif type(ElA) == type(BElement()):
-    if SimParticles(ElA.particles,ElB.particles,useDict=False): return False
-    if ElA.masses != ElB.masses: return False
-  else:
-    print "EqualEls: unknown input"
-    return False  
-
-  return True
-
-#Compare two BElements or Eelements
-#If particles are similar and all masses equal, returns True,
-#otherwise returns False
-#If order = False, test both branch orderings (for an element doublet only)
-#If igmass = True, only compare particles
-def SimEls(ElA,ElB,order=True,igmass=False):
-  
-  if type(ElA) != type(ElB): return False
-  
-#If it is an Eelement:
-  if type(ElA) == type(EElement()):
-    El1 = ElA.B
-    El2 = ElB.B
-    if len(El1) == 2 and not order:   
-      ptcsA = [El2[0].particles,El2[1].particles]
-      massA = [El2[0].masses,El2[1].masses]
-      ptcs = [El1[0].particles,El1[1].particles]
-      mass = [El1[0].masses,El1[1].masses]
-      ptcs_b = [El1[1].particles,El1[0].particles]
-      mass_b = [El1[1].masses,El1[0].masses]
-      if igmass:
-        mass = massA
-        mass_b = massA
-      if SimParticles(ptcsA,ptcs) and mass == massA: 
-        return True
-      elif SimParticles(ptcsA,ptcs_b) and mass_b == massA: 
-        return True
-      else:
-        return False
-    else:
-      for i in range(len(El1)):
-        if not SimParticles(El1[i].particles,El2[i].particles): return False
-        if not igmass and El1[i].masses != El2[i].masses: return False
-    
-#If it is an BElement:      
-  elif type(ElA) == type(BElement()):
-    if not SimParticles(ElA.particles,ElB.particles): return False
-    if not igmass and ElA.masses != ElB.masses: return False
-  else:
-    print "SimEls: unknown input"
-    return False     
-    
-  return True
-
-
 #Compares 2 particle names or 2 nested name arrays. Allows for dictionary labels
 #(Ex: L = l, l+ = l, l = l-,...)
 #For the last nested level ignore particle ordering
@@ -389,17 +378,17 @@ def AddToList(SMSTop,SMSTopList):
     i = -1
     while (equaltops < 0 or equalels < 0) and i < len(SMSTopList)-1:
       i += 1
-      if EqualTops(SMSTop,SMSTopList[i],order=False):  #First look for matching topology
+      if SMSTop.isEqual(SMSTopList[i],order=False):  #First look for matching topology
         equaltops = i
       else: continue 
         
       for j in range(len(SMSTopList[i].ElList)):  #Search for matching element
         OldEl = SMSTopList[i].ElList[j]
-        if EqualEls(OldEl,NewEl_a):
+        if OldEl.isEqual(NewEl_a):
           equalels = j
           NewEl = NewEl_a
           break           
-        elif EqualEls(OldEl,NewEl_b):
+        elif OldEl.isEqual(NewEl_b):
           equalels = j
           NewEl = NewEl_b
           break
@@ -425,7 +414,7 @@ def AddToList(SMSTop,SMSTopList):
   if equaltops == -1:
     SMSTopList.append(SMSTop)
   elif equalels == -1:
-    if EqualTops(SMSTop,SMSTopList[equaltops],order=True):
+    if SMSTop.isEqual(SMSTopList[equaltops],order=True):
       NewEl = NewEl_a
     else:
       NewEl = NewEl_b
@@ -433,62 +422,6 @@ def AddToList(SMSTop,SMSTopList):
       print "Error adding element"
       print '\n'
       
-
-#Loop over all elements in SMSTopList and add the weight to the 
-#matching elements in Analysis.
-def AddToAnalysis(SMSTopList,Analysis):
-  import SMSglobals
-  
-#Get analysis center of mass energy:
-  sqrts = Analysis.sqrts
-  if type(sqrts) == type(1.) or type(sqrts) == type(1): sqrts = addunit(sqrts,'TeV')
-  CMdic = SMSglobals.CMdic
-  
-  for itop in range(len(SMSTopList)):
-    NewTop = SMSTopList[itop]  
-#Check if topologies match:
-    if not EqualTops(NewTop,Analysis.Top): continue
-    
-#Loop over (event) element list:
-    for iel in range(len(NewTop.ElList)):
-#Loop over analysis elements:
-      for jel in range(len(Analysis.Top.ElList)):
-        NewEl = copy.deepcopy(NewTop.ElList[iel])
-        neweight = NewEl.weight
-#Remove weights which do not match the analysis center of mass energy        
-        if sqrts.asNumber() and len(CMdic) > 0:
-          for k in neweight.keys():
-            if CMdic[k] != sqrts: neweight.pop(k)
-          for k in CMdic.keys():
-            if CMdic[k] == sqrts and not neweight.has_key(k):
-              neweight.update({k : addunit(0.,'fb')})
-
-        OldEl = copy.deepcopy(Analysis.Top.ElList[jel])
-        if not SimEls(NewEl,OldEl,order=False,igmass=True): continue   #Check if particles match
-        
-#If particles match, descend to nested mass list and look for match
-        added = False
-        for imass in range(len(Analysis.Top.ElList[jel].B[0].masses)):
-          OldEl.weight = Analysis.Top.ElList[jel].weight[imass]
-          for ib in range(len(NewEl.B)):            
-            OldEl.B[ib].masses = copy.deepcopy(Analysis.Top.ElList[jel].B[ib].masses[imass])
-            
-#Check if elements match (with identical masses) for any branch ordering
-          if SimEls(NewEl,OldEl,order=False):
-            Analysis.Top.ElList[jel].weight[imass] = sumweights([OldEl.weight,neweight])
-            added = True
-            break   #To avoid double counting only add event to one mass combination
-          
-        if not added:
-#Check for both branch orderings, but only add one (if matches) to avoid double counting
-          if not SimEls(NewEl,OldEl,order=True,igmass=True):
-            NewEl.B[0] = NewTop.ElList[iel].B[1]
-            NewEl.B[1] = NewTop.ElList[iel].B[0]
-          for ib in range(len(NewEl.B)):
-            Analysis.Top.ElList[jel].B[ib].masses.append(NewEl.B[ib].masses)
-          Analysis.Top.ElList[jel].weight.append(neweight)
-
-
 #Definition of distance between two mass arrays
 #If Dana is defined, use maximum distance in all analyses
 def MassDist(mass1,mass2):
