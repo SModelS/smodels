@@ -31,4 +31,4 @@ print ok ( 0, ret )
 os.chdir("test/")
 import commands
 out=commands.getoutput("diff SMSmain.log %s" % tmpfile)
-print "Diff of the logs: %s" % ok ( "", out )
+print "Diff of the logs: %s" % ok ( "", out, False )
