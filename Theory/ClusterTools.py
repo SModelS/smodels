@@ -1,6 +1,11 @@
 """ the intention of this unit is to have all code that is related to clustering
 and finding average masses """
 
+
+DistAnalyses = "" # List of analyses used to compute mass distances (used by MassDist function)                                 
+CMdic={}
+
+
 def DoCluster(objlist,Distfunc,dmin):
   from Tools.PhysicsUnits import addunit
   """ Cluster algorithm (generic for any type of object, as long as the distance function is given) """
@@ -184,11 +189,10 @@ def sumweights(wlist):
 def MassDist(mass1,mass2):
   """ definition of distance between two mass arrays
   Dana is defined, use maximum distance in all analyses """
-  import SMSglobals
   from  Experiment import SMSgetlimit
   from Tools.PhysicsUnits import rmvunit
 
-  Dana = SMSglobals.DistAnalyses  #List of analyses to be used
+  Dana = DistAnalyses  #List of analyses to be used
 
 #Get upper bounds for each mass:
   xmass1 = SMSgetlimit.GetPlotLimit(mass1,Dana[0],Dana[1],complain=False)

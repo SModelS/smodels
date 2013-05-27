@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-import SMSglobals, sys
+import sys
 from prettytable import PrettyTable
-from Theory import SMSDecomp, SMSmethods, SMSxsec
+from Theory import SMSDecomp, SMSmethods, SMSxsec, ClusterTools
 from Tools.PhysicsUnits import addunit, rmvunit
 from Tools import SMSPrettyPrinter, VariousHelpers
 from Tools.SMSPrettyPrinter import wrap
@@ -30,7 +30,7 @@ W = Wv["Wdic"]
 Xsec = Wv["Xsecdic"]
 lhefile = Wv["lhefile"]
 CMdic = Wv["CMdic"]
-SMSglobals.CMdic = CMdic
+ClusterTools.CMdic = CMdic
 
 
 
