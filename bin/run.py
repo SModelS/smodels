@@ -3,7 +3,7 @@
 """ another sandbox to try things out """
 
 import set_path, argparse
-from Theory import LHEReader, SMSDecomp, SMSmethods, TopologyBuilder
+from Theory import LHEReader, SMSDecomp, SMSmethods, TopologyBuilder, SMSDataObjects
 from Experiment import TxNames
 import Experiment.SMSAnalysisFactory as Analyses
 ## import SMSanalyses as Analyses
@@ -54,7 +54,7 @@ for Analysis in ListOfAnalyses:
   print "    `-- ",Analysis.Top.leadingElement().B[0]
   S=SMSmethods.strtoel ( "[[[jet]],[[jet]]]" )
   ## e=SMSmethods.EElement ( "[[['jet','jet'],['jet']],[['jet']]]" )
-  e=SMSmethods.EElement ( "[[[jet,jet]],[[jet]]]" )
+  e=SMSDataObjects.EElement ( "[[[jet,jet]],[[jet]]]" )
   print "S=",S,"e=",e
   #print "              S=``%s'' -> ``%s''" % ( S, Analysis.Top.leadingElement().B[0] )
 
