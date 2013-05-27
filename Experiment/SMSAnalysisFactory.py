@@ -21,6 +21,7 @@ def getArray ( constraint ):
     c=c[:c.find("+[")]
   if c.find("-[")>5:
     c=c[:c.find("-[")]
+  #print "constraint=",constraint,"c=",c
   ret=eval(c)
   return ret
 
@@ -63,7 +64,7 @@ def load( anas = None, topos=None ):
       Analysis.masscomp = 0.2
       Analysis.run = SMSResults.getRun ( analysis ) ##  "2012"
       constraint=SMSResults.getConstraints ( analysis, topo=stopo )
-      if not constraint: 
+      if not constraint or constraint=="Not yet assigned":
         if debug:
           print "dont have a constraint for",analysis,Tx,"(",stopo,")"
         continue
