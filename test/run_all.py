@@ -27,6 +27,7 @@ cmd= "python SMSmain.py > /tmp/compare"
 ret=os.system ( cmd )
 print ok ( 0, ret )
 
+os.chdir("test/")
 import commands
 out=commands.getoutput("diff /tmp/compare SMSmain.log")
 print "Diff of the logs: %s" % ok ( "", out )
