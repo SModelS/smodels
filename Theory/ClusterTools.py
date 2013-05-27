@@ -5,7 +5,6 @@ and finding average masses """
 DistAnalyses = "" # List of analyses used to compute mass distances (used by MassDist function)                                 
 CMdic={}
 
-
 def DoCluster(objlist,Distfunc,dmin):
   from Tools.PhysicsUnits import addunit
   """ Cluster algorithm (generic for any type of object, as long as the distance function is given) """
