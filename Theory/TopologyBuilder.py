@@ -22,7 +22,7 @@ def compressTopology(ETopList,DoCompress,DoInvisible,minmassgap):
         if ETopComp:
           exists = False
           for Topp in ETopList:
-            if SMSmethods.EqualTops(Topp,ETopComp): exists = True 
+            if Topp.isEqual(ETopComp): exists = True 
           if not exists:   #Avoid double counting (conservative)
             ETopList.append(ETopComp)
             added = True
@@ -36,7 +36,7 @@ def compressTopology(ETopList,DoCompress,DoInvisible,minmassgap):
         if ETopInComp:
           exists = False
           for Topp in ETopList:
-            if SMSmethods.EqualTops(Topp,ETopInComp): exists = True
+            if Topp.isEqual(ETopInComp): exists = True
           if not exists:   #Avoid double counting (conservative)
             ETopList.append(ETopInComp)
             added = True

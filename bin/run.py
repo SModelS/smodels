@@ -51,9 +51,8 @@ for SMSTop in SMSTopList:
 for Analysis in ListOfAnalyses:
   for res in Analysis.results.keys():
     theoRes = SMSmethods.EvalRes(res,Analysis)
-  SMSmethods.AddToAnalysis ( SMSTopList, Analysis )
 for Analysis in ListOfAnalyses:
-  SMSmethods.AddToAnalysis ( SMSTopList, Analysis )
+  Analysis.add ( SMSTopList )
   print "------------- Analysis Label = ",Analysis.label, Analysis.sqrts, Analysis.Top
   print "    `-- element ",Analysis.Top.leadingElement()
   S=SMSmethods.eltostr ( Analysis.Top.leadingElement().B[0].particles )

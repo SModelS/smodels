@@ -81,3 +81,58 @@ class EAnalysis:
       for ana in analyses:
         if not SMSResults.exists(ana,topo,run):
           if verbose: print "SMSmethods.py: GetPlots: Histogram for ",topo," in ",ana," for run ",run," not found"
+
+  #Loop over all elements in SMSTopList and add the weight to the 
+  #matching elements in Analysis.
+  def add(self,SMSTopList):
+    import SMSglobals, copy
+
+    #Get analysis center of mass energy:
+    sqrts = self.sqrts
+    if type(sqrts) == type(1.) or type(sqrts) == type(1): sqrts = addunit(sqrts,'TeV')
+    CMdic = SMSglobals.CMdic
+
+    for itop in range(len(SMSTopList)):
+      NewTop = SMSTopList[itop]  
+    #Check if topologies match:
+      if not NewTop.isEqual ( self.Top): continue
+      
+    #Loop over (event) element list:
+      for iel in range(len(NewTop.ElList)):
+    #Loop over analysis elements:
+        for jel in range(len(self.Top.ElList)):
+          NewEl = copy.deepcopy(NewTop.ElList[iel])
+          neweight = NewEl.weight
+    #Remove weights which do not match the analysis center of mass energy        
+          if sqrts.asNumber() and len(CMdic) > 0:
+            for k in neweight.keys():
+              if CMdic[k] != sqrts: neweight.pop(k)
+            for k in CMdic.keys():
+              if CMdic[k] == sqrts and not neweight.has_key(k):
+                neweight.update({k : addunit(0.,'fb')})
+
+          OldEl = copy.deepcopy(self.Top.ElList[jel])
+          if not NewEl.isSimilar(OldEl,order=False,igmass=True): continue   #Check if particles match
+          
+    #If particles match, descend to nested mass list and look for match
+          added = False
+          for imass in range(len(self.Top.ElList[jel].B[0].masses)):
+            OldEl.weight = self.Top.ElList[jel].weight[imass]
+            for ib in range(len(NewEl.B)):            
+              OldEl.B[ib].masses = copy.deepcopy(self.Top.ElList[jel].B[ib].masses[imass])
+              
+    #Check if elements match (with identical masses) for any branch ordering
+            if NewEl.isSimilar(OldEl,order=False):
+              self.Top.ElList[jel].weight[imass] = sumweights([OldEl.weight,neweight])
+              added = True
+              break   #To avoid double counting only add event to one mass combination
+            
+          if not added:
+    #Check for both branch orderings, but only add one (if matches) to avoid double counting
+            if not NewEl.isSimilar(OldEl,order=True,igmass=True):
+              NewEl.B[0] = NewTop.ElList[iel].B[1]
+              NewEl.B[1] = NewTop.ElList[iel].B[0]
+            for ib in range(len(NewEl.B)):
+              self.Top.ElList[jel].B[ib].masses.append(NewEl.B[ib].masses)
+            self.Top.ElList[jel].weight.append(neweight)
+
