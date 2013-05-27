@@ -47,17 +47,15 @@ for SMSTop in SMSTopList:
   tx=TxNames.getTx(element)
   print "SMSTopList Tx=",tx
   
-
 for Analysis in ListOfAnalyses:
   Analysis.evaluateResults()
-  #for res in Analysis.results.keys():
-    # theoRes = SMSmethods.EvalRes(res,Analysis)
-  #  theoRes = Analysis.evaluateResult ( res )
-for Analysis in ListOfAnalyses:
   Analysis.add ( SMSTopList )
   print "------------- Analysis Label = ",Analysis.label, Analysis.sqrts, Analysis.Top
   print "    `-- element ",Analysis.Top.leadingElement()
   print "    `-- ",Analysis.Top.leadingElement().B[0]
-  #S=SMSmethods.eltostr ( Analysis.Top.leadingElement().B[0].particles )
+  S=SMSmethods.strtoel ( "[[[jet]],[[jet]]]" )
+  ## e=SMSmethods.EElement ( "[[['jet','jet'],['jet']],[['jet']]]" )
+  e=SMSmethods.EElement ( "[[[jet,jet]],[[jet]]]" )
+  print "S=",S,"e=",e
   #print "              S=``%s'' -> ``%s''" % ( S, Analysis.Top.leadingElement().B[0] )
 
