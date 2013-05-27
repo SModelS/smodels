@@ -453,13 +453,6 @@ def strtoel(invar):
   #print "ptclist=",ptclist
   return ptclist
 
-#Converts an element string to a nested particle list or vice-versa
-#def eltostr(invar):
-#  """ Converts a nested particle list to string """
-#  st = str(invar).replace("'","")
-#  st = st.replace(" ","")
-#  return st
-
 #Defines the auxiliar similar function
 #returns the relative difference between any elements of the list normalized to [0,1]
 def Csim(*els):
