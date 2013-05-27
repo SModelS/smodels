@@ -13,3 +13,12 @@ PtcDic={
 "e" : ["e+","e-"], "mu" : ["mu+", "mu-"], "ta" : ["ta+","ta-"], "l+" : ["e+","mu+"],"l-" : ["e-","mu-"],"l" : ["e-","mu-","e+","mu+"], "W" : ["W+","W-"], "t" : ["t+","t-"], "L+" : ["e+","mu+","ta+"], "L-" : ["e-","mu-","ta-"], "L" : ["e+","mu+","ta+","e-","mu-","ta-"]
 }
 
+#Converts pdg number to particle name according to the dictionaries Rodd              
+# and Reven                                                                           
+def ptype(pdg):                                                                       
+  p=int(pdg)                                                                          
+  if p in Rodd: return Rodd[p]                                                        
+  if p in Reven:                                                                      
+    return Reven[p]                                                                   
+  else:                                                                               
+    return False         
