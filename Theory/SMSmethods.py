@@ -3,29 +3,29 @@ sys.path.append ( "../" )
 
 from Tools.PhysicsUnits import addunit, rmvunit
 import copy
-
-#---------------Dictionaries:
-Rodd={ 
-1000021 : "gluino", 1000022: "N1", 1000023 : "N2", 1000025 : "N3", 1000035 : "N4", 1000024 : "C1", 1000037 : "C2", 1000039 : "gravitino",  1000001 : "squark", 1000002 : "squark", 1000003 : "squark", 1000004 : "squark", 2000001 : "squark", 2000002 : "squark", 2000003 : "squark", 2000004 : "squark", 1000005 : "sbottom", 2000005 : "sbottom", 1000006 : "stop", 2000006 : "stop", 1000011 : "slepton", 1000013 : "slepton", 1000015 : "stau", 2000011 : "slepton", 2000013 : "slepton", 2000015 : "stau", 1000012 : "sneutrino", 1000014 : "sneutrino", 1000016 : "sneutrino", 2000012 : "sneutrino", 2000014 : "sneutrino", 2000016 : "sneutrino", -1000021 : "gluino", -1000022: "N1", -1000023 : "N2", -1000025 : "N3", -1000035 : "N4", -1000024 : "C1", -1000037 : "C2", -1000039 : "gravitino",  -1000001 : "squark", -1000002 : "squark", -1000003 : "squark", -1000004 : "squark", -2000001 : "squark", -2000002 : "squark", -2000003 : "squark", -2000004 : "squark", -1000005 : "sbottom", -2000005 : "sbottom", -1000006 : "stop", -2000006 : "stop", -1000011 : "slepton", -1000013 : "slepton", -1000015 : "stau", -2000011 : "slepton", -2000013 : "slepton", -2000015 : "stau", -1000012 : "sneutrino", -1000014 : "sneutrino", -1000016 : "sneutrino", -2000012 : "sneutrino", -2000014 : "sneutrino", -2000016 : "sneutrino"  
-
-}
-
-
-Reven={
- 25 : "higgs", -25: "higgs", 35 : "H0", -35 : "H0", 36 : "A0", -36 : "A0", 37 : "H+", -37 : "H-", 23 : "Z", -23 : "Z", 22 : "photon", -22 : "photon", 24 : "W+", -24 : "W-", 16 : "nu", -16 : "nu", 15 : "ta-", -15 : "ta+", 14 : "nu", -14 : "nu", 13 : "mu-", -13 : "mu+", 12 : "nu", -12 : "nu", 11 : "e-", -11 : "e+", 5 : "b", -5 : "b", 6 : "t+", -6 : "t-", 1 : "jet", 2 : "jet", 3 : "jet", 4 : "jet", 21 : "jet", -1 : "jet", -2 : "jet", -3 : "jet", -4 : "jet", -21 : "jet"
- }
-
-PtcDic={ 
-"e" : ["e+","e-"], "mu" : ["mu+", "mu-"], "ta" : ["ta+","ta-"], "l+" : ["e+","mu+"],"l-" : ["e-","mu-"],"l" : ["e-","mu-","e+","mu+"], "W" : ["W+","W-"], "t" : ["t+","t-"], "L+" : ["e+","mu+","ta+"], "L-" : ["e-","mu-","ta-"], "L" : ["e+","mu+","ta+","e-","mu-","ta-"]
-}
-
+from ParticleNames import Rodd, Reven, PtcDic
 
 class BElement:
   """ A branch-element """
-  def __init__(self):
+
+  def __init__(self, S=None ):
+    """ A branch-element can be constructed from a string S """
     self.masses = []
     self.particles = []
     self.momID = 0
+    if type(S)==type(""):
+      st = S.replace(" ","")
+      print "[SMSmethods.py] Construct a BElement from a string: st=",st
+      while "[" in st or "]" in st:
+        ptcs = st[st.find("[")+1:st.find("],[")].split(",")
+        for ptc in ptcs:
+          if not ptc in Reven.values() and not PtcDic.has_key(ptc):
+            print "[BElement] unknown particle:",ptc
+            return 
+        spcts=str(ptcs).replace("'","").replace(" ","")
+        st=st.replace(spcts,"",1)
+        self.particles.append ( ptcs )
+      print "[SMSmethods] ptcs=",ptcs
 
   def __str__ ( self ):
     """ the canonical SModels description of the BElement. """
@@ -914,6 +914,7 @@ def eltostr(invar):
     st = st.replace(" ","")
     return st
   elif type(invar) == type(str()):
+    print "getting a particle list from ",invar
     st = invar.replace(" ","")
     st = st[st.find("[[["):st.find("]]]")+3]
     st_B = []
@@ -936,6 +937,7 @@ def eltostr(invar):
         sptcs = str(sptcs).replace(" ","")
         st_B[ib] = st_B[ib].replace(sptcs,"",1)
 
+    print "ptclist=",ptclist
     return ptclist
 
 #Defines the auxiliar similar function
