@@ -24,3 +24,89 @@ def ptype(pdg):
     return Reven[p]
   else:
     return False
+
+def simParticles(ptype1,ptype2,useDict=True):
+  """ Compares 2 particle names or 2 nested name arrays. Allows for dictionary labels
+  (Ex: L = l, l+ = l, l = l-,...) 
+  For the last nested level ignore particle ordering """
+  if len(ptype1) != len(ptype2): return False
+  import copy
+
+  ptype1v = [[ptype1]]
+  ptype2v = [[ptype2]]
+
+
+#First flatten nested arrays until next-to-last level:
+  isNested = True
+  while isNested:
+    newptype1v = []
+    newptype2v = []
+    if len(ptype1v) != len(ptype2v): return False
+    for i in range(len(ptype1v)):
+      if type(ptype1v[i]) == type(list()):
+        if len(ptype1v[i]) != len(ptype2v[i]): return False
+        for j in range(len(ptype1v[i])):
+          newptype1v.append(ptype1v[i][j])
+          newptype2v.append(ptype2v[i][j])
+      else:
+        newptype1v.append(ptype1v[i])
+        newptype2v.append(ptype2v[i])
+
+    ptype1v = newptype1v
+    ptype2v = newptype2v
+    isNested = False
+    for i in range(len(ptype1v)):
+      if len(ptype1v[i]) != len(ptype2v[i]): return False
+      if len(ptype1v[i]) == 0: continue   #Empty list
+      if type(ptype1v[i]) == type(list()) and type(ptype1v[i][0]) == type(list()): isNested = True
+      if type(ptype2v[i]) == type(list()) and type(ptype2v[i][0]) == type(list()): isNested = True
+
+  if len(ptype1v) != len(ptype2v): return False
+
+#Compare last level lists one by one, ignoring the order:
+  for i in range(len(ptype1v)):
+    if len(ptype1v[i]) != len(ptype2v[i]): return False
+
+
+#Check  if lists match, ignoring possible dictionary entries
+    pmatch = True
+    for ptc in ptype1v[i]:
+      if ptype1v[i].count(ptc) != ptype2v[i].count(ptc): pmatch = False
+    if pmatch: continue
+    elif not useDict: return False
+
+#If they do not match and useDict=True, generate all possible lists from dictionary entries:
+    allptcs = [[ptype1v[i]],[ptype2v[i]]]
+    for allpt in allptcs:
+      ptc0 = copy.deepcopy(allpt[0])
+      for ipt in range(len(ptc0)):
+        if PtcDic.has_key(ptc0[ipt]):
+          for jpt in range(len(allpt)):
+            if allpt[jpt] == []: continue
+            newptc = copy.deepcopy(allpt[jpt])
+            for ptc in PtcDic[ptc0[ipt]]:
+              newptc[ipt] = ptc
+              allpt.append(copy.deepcopy(newptc))
+            allpt[jpt] = []
+      while allpt.count([]) > 0: allpt.remove([])
+
+#Now compare all possibilities:
+    match = False
+    iA = 0
+    while not match and iA < len(allptcs[0]):
+      ptcA = allptcs[0][iA]
+      for ptcB in allptcs[1]:
+        if len(ptcA) != len(ptcB): return False
+        pmatch = True
+        for ptc in ptcA:
+          if ptcA.count(ptc) != ptcB.count(ptc): pmatch = False
+        if pmatch:
+          match = True
+          break
+      iA += 1
+    if not match: return False
+
+#if it reached here, entries are similar:
+  return True
+
+
