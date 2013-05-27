@@ -43,13 +43,13 @@ def compressTopology(ETopList,DoCompress,DoInvisible,minmassgap):
 
 def fromEvent( Event, weight = {}, DoCompress=False, DoInvisible=False, \
                        minmassgap=None ):
-  from SMSDataObjects import GTop, EElement, BElement
-  from ParticleNames import Rodd, Reven, ptype
-  from Tools.PhysicsUnits import addunit, rmvunit
   """ Create a topology (GTop object) from Event.
       If the DoCompress and/or DoInvisible flags are on, also generate
   compressed topologies with small mass gaps and/or neutrinos emitted
   in the last step of the cascade ("effective LSP"). """
+  from SMSDataObjects import GTop, EElement, BElement
+  from ParticleNames import Rodd, Reven, ptype
+  from Tools.PhysicsUnits import addunit, rmvunit
   PList=Event.particles
   if len(PList)==0: return None
     
