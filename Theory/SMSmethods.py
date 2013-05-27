@@ -3,7 +3,7 @@ sys.path.append ( "../" )
 
 from Tools.PhysicsUnits import addunit, rmvunit
 import copy
-from ParticleNames import Rodd, Reven, PtcDic
+from ParticleNames import Rodd, Reven, PtcDic, ptype
 
 class BElement:
   """ A branch-element """
@@ -184,19 +184,6 @@ def InvCompTop(InTop):
   else:
     return False
       
-     
-        
-#Converts pdg number to particle name according to the dictionaries Rodd
-# and Reven    
-def ptype(pdg):
-  p=int(pdg)
-  if p in Rodd: return Rodd[p]
-  if p in Reven: 
-    return Reven[p]
-  else:
-    return False
-  
-  
 #Compares two global topologies. Returns true if they have the same
 #number of vertices and particles.
 #If order=False and each topology has two branches, ignore branch ordering.
