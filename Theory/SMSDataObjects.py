@@ -1,6 +1,6 @@
 """ all data classes necessary to create a SModelS description of events """
 
-from SMSmethods import GTop, eltostr, EElement, BElement
+from SMSmethods import GTop, strtoel, EElement, BElement
 from ParticleNames import Reven, PtcDic
 
 class EAnalysis:  
@@ -38,7 +38,7 @@ class EAnalysis:
         while "[" in con:  #String has element        
           st = con[con.find("[[["):con.find("]]]")+3] #Get duplet
           con = con.replace(st,"")  # Remove element duplet
-          ptclist = eltostr(st)   # Get particle list
+          ptclist = strtoel(st)   # Get particle list
 #Syntax checks:
           for ib in range(2):
             for ipt in range(len(ptclist[ib])):
@@ -55,7 +55,7 @@ class EAnalysis:
     ListOfStrs = set(ListOfStrs)
 #Now add all elements to element list    
     while len(ListOfStrs) > 0:
-      ptclist = eltostr(ListOfStrs.pop()) 
+      ptclist = strtoel(ListOfStrs.pop()) 
       NewEl = EElement()
       NewEl.B = [BElement(),BElement()]      
       for ib in range(2):
