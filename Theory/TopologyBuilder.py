@@ -43,7 +43,8 @@ def compressTopology(ETopList,DoCompress,DoInvisible,minmassgap):
 
 def fromEvent( Event, weight = {}, DoCompress=False, DoInvisible=False, \
                        minmassgap=None ):
-  from SMSmethods import GTop, EElement, BElement
+  from SMSmethods import EElement, BElement
+  from SMSDataObjects import GTop
   from ParticleNames import Rodd, Reven, ptype
   from Tools.PhysicsUnits import addunit, rmvunit
   """ Create a topology (GTop object) from Event.

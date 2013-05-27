@@ -44,7 +44,7 @@ def SLHAdecomp(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassga
   workdir = os.getcwd() 
   pyslhadir = workdir + "/pyslha-1.4.3"
   sys.path.append(pyslhadir)
-  import pyslha, SMSmethods, TopologyBuilder
+  import pyslha, SMSmethods, TopologyBuilder, SMSDataObjects
   from Tools.PhysicsUnits import addunit, rmvunit
 
   if DoCompress and rmvunit(minmassgap,'GeV') == -1: 
@@ -155,7 +155,7 @@ def SLHAdecomp(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassga
           if max(weight.values()) < sigcut: continue
           
           Einfo = Els.getEinfo()
-          Top = SMSmethods.GTop()
+          Top = SMSDataObjects.GTop()
           Top.vertnumb = Einfo["vertnumb"]
           Top.vertparts = Einfo["vertparts"]
           Top.ElList.append(Els)
