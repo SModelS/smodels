@@ -137,3 +137,71 @@ class EAnalysis:
               self.Top.ElList[jel].B[ib].masses.append(NewEl.B[ib].masses)
             self.Top.ElList[jel].weight.append(neweight)
 
+  def evaluateResult(self,res,uselimits = False):
+    """ Evaluate theoretical predictions for the analysis result and conditions.
+        FIXME what does that mean? """
+    import SMSglobals, copy
+    from ClusterTools import DoCluster, MassDist, GoodMass
+
+    output = []
+    if not self.plots.has_key(res) or not self.results.has_key(res):
+      print "EvalRes: Wrong analysis input"
+      return False
+
+  #Get minimum distance parameter (it can be analysis dependent)
+    dmin = self.masscomp
+  #List of analyses and anlysis itself (necessary to compute distances)
+    analyses = self.plots[res]
+    SMSglobals.DistAnalyses = [analyses,self]
+
+  #Create a mass list with all masses appearing in the analysis which have similar branch masses:
+    Goodmasses = []
+    Top = copy.deepcopy(self.Top)
+    for iel in range(len(Top.ElList)):
+      for imass in range(len(Top.ElList[iel].B[0].masses)):
+        mass = [Top.ElList[iel].B[0].masses[imass],Top.ElList[iel].B[1].masses[imass]]
+        gmass = GoodMass(mass,MassDist,dmin)
+        if gmass:
+           Top.ElList[iel].B[0].masses[imass] = gmass[0]
+           Top.ElList[iel].B[1].masses[imass] = gmass[1]
+           if not gmass in Goodmasses: Goodmasses.append(gmass)
+
+  #Cluster masses:
+    MCluster = DoCluster(Goodmasses,MassDist,dmin)
+
+  #Loop over clusters to evaluate constraints and conditions inside each cluster
+    for cluster in MCluster:
+  #Get masses in cluster
+      masscluster = []
+      for ic in cluster: masscluster.append(Goodmasses[ic])
+  #Shrink Topology elements to cluster:
+      NewTop = Top.clusterTopology(masscluster)
+
+  #Now NewTop contains only elements with a common mass (replaced by the average mass)
+  #Evaluate result inside cluster
+      result = NewTop.evaluateCluster ( res )
+  #Evaluate conditions
+      conditions = NewTop.evaluateCluster ( self.results[res] )
+
+  #Save cluster result
+      mavg = [NewTop.ElList[0].B[0].masses,NewTop.ElList[0].B[1].masses]
+
+  #Check if average mass is inside the cluster (exp. limit for average mass ~ exp. limit for individual masses):
+      davg = -1.
+      for mass in masscluster:
+        davg = max(davg,MassDist(mass,mavg))
+      if davg == -1. or davg > dmin:
+        print "EvalRes: Wrong clustering"
+        continue
+
+
+      output.append({'mass' : mavg, 'result' : result, 'conditions' : conditions})
+
+    return output
+
+  def evaluateResults(self, uselimits = False ):
+    """ evaluate all the analysis'es results """
+    for res in self.results:
+      self.evaluateResult( res, uselimits )
+
+

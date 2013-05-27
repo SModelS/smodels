@@ -123,7 +123,7 @@ for Analysis in ListOfAnalyses:
 
 
   for res in Analysis.results.keys():
-    theoRes = SMSmethods.EvalRes(res,Analysis)  #Theoretical values for result and conditions
+    theoRes = Analysis.evaluateResult(res) #Theoretical values for result and conditions
     
 
     try:
