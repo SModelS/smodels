@@ -35,13 +35,20 @@ def ResultsForSqrts ( sqrts ):
 def considerRuns(run = None):
   """ needs runs as a list. if no runs are given, all existing runs will be taken into account"""
   import SMSResultsCollector
-
+  allruns = ["8TeV", "ATLAS8TeV", "RPV8", "2012", "ATLAS7TeV", "RPV7", "2011"]
+  runsort = []
   if run:
-    SMSHelpers.runs = run
-    SMSResultsCollector.alldirectories = run
+    for r in allruns:
+      if r in run:
+        runsort.append(r)
+    SMSHelpers.runs = runsort
+    SMSResultsCollector.alldirectories = runsort
+    for r in run:
+      if not r in allruns:
+        print "%s is not a run!!!" %r
   else:
-    SMSHelpers.runs = ["2011", "2012", "8TeV", "RPV7", "RPV8", "ATLAS8TeV"]
-    SMSResultsCollector.alldirectories = ["2011", "2012", "8TeV", "RPV7", "RPV8", "ATLAS8TeV"]
+    SMSHelpers.runs = allruns
+    SMSResultsCollector.alldirectories = allruns 
 
 def verbosity ( level="error" ):
   if level=="error":
