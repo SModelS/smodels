@@ -6,8 +6,7 @@ from Theory import SMSDecomp, SMSmethods, SMSxsec, ClusterTools
 from Tools.PhysicsUnits import addunit, rmvunit
 from Tools import SMSPrettyPrinter, VariousHelpers
 from Tools.SMSPrettyPrinter import wrap
-from  Experiment import SMSanalyses, SMSAnalysisFactory, SMSgetlimit
-
+from Experiment import SMSanalyses, SMSAnalysisFactory, SMSgetlimit
 
 DoFactory = True
 
