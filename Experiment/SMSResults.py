@@ -219,17 +219,18 @@ def getInterpolatedUpperLimit ( Dict, inmx, inmy ):
   Neighbors=[]
   mx = rmvunit(inmx,'GeV')
   my = rmvunit(inmy,'GeV')
-  hasNeighbors={ "left": False, "right": False, "up": False, "down": False }
+  if my>mx: return None
+#  hasNeighbors={ "left": False, "right": False, "up": False, "down": False }
   for (dmx,dmv) in Dict.items():
     for (dmy,ul) in dmv.items():
       dist= (dmx-mx)**2 + (dmy-my)**2 
-      if dmx-mx < 0.: hasNeighbors["left"]=True
-      if dmx-mx > 0.: hasNeighbors["right"]=True
-      if dmy-my < 0.: hasNeighbors["down"]=True
-      if dmy-my > 0.: hasNeighbors["up"]=True
+#      if dmx-mx < 0.: hasNeighbors["left"]=True
+#      if dmx-mx > 0.: hasNeighbors["right"]=True
+#      if dmy-my < 0.: hasNeighbors["down"]=True
+#      if dmy-my > 0.: hasNeighbors["up"]=True
       if dist==0.: return ul
       Neighbors.append ( [ dist, ul ] )
-  if False in hasNeighbors: return None
+#  if False in hasNeighbors.values(): return None
   Neighbors.sort()
   Neighbors=Neighbors[:4]
   ret=sum( [ y/x for (x,y) in Neighbors ] ) / sum( [ 1./x for (x,y) in Neighbors ] )
