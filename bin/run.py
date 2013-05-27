@@ -56,3 +56,6 @@ for Analysis in ListOfAnalyses:
   SMSmethods.AddToAnalysis ( SMSTopList, Analysis )
   print "------------- Analysis Label = ",Analysis.label, Analysis.sqrts, Analysis.Top
   print "    `-- element ",Analysis.Top.leadingElement()
+  S=SMSmethods.eltostr ( Analysis.Top.leadingElement().B[0].particles )
+  print "              S=``%s'' -> ``%s''" % ( S, Analysis.Top.leadingElement().B[0] )
+

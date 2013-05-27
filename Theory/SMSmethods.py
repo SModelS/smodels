@@ -27,19 +27,20 @@ class BElement:
     self.particles = []
     self.momID = 0
 
-  def toStr ( self ):
+  def __str__ ( self ):
     """ the canonical SModels description of the BElement. """
     st = str(self.particles).replace("'","")
     st = st.replace(" ","")
     return st
 
-  def __str__ ( self ):
+  def describe ( self ):
+    """ a lengthy description of the BElement """
     ret="particles=%s masses=%s" % \
        ( self.particles, [ rmvunit(x,"GeV") for x in self.masses ] )
     return ret
   
 class EElement:
-  """ Event Element. """
+  """ An Event Element, contains of several branches and weight information """
   def __init__(self):
     self.B = []
     self.weight = []
@@ -56,6 +57,12 @@ class EElement:
     return {"vertnumb" : vertnumb, "vertparts" : vertparts}
     
   def __str__ ( self ):
+    """ returns the canonical name of the element, e.g. [[jet],[jet]] """
+    ret=str(self.B[0])+","+str(self.B[1])
+    return ret
+
+  def describe ( self ):
+    """ returns a lengthy description of the event element """
     ret="Branch #1={{"+str(self.B[0])+"}}, Branch #2={{"+str(self.B[1])+"}}"
     return ret
     
