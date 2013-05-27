@@ -222,7 +222,7 @@ class GTop:
     iels = 0
     while "[[[" in outstr:  #String has element
       st = outstr[outstr.find("[[["):outstr.find("]]]")+3] #Get duplet
-      ptclist = eltostr(st)   # Get particle list
+      ptclist = strtoel(st)   # Get particle list
   #Syntax checks:
       for ib in range(2):
         for ptcL in ptclist[ib]:
@@ -454,11 +454,11 @@ def strtoel(invar):
   return ptclist
 
 #Converts an element string to a nested particle list or vice-versa
-def eltostr(invar):
-  """ Converts a nested particle list to string """
-  st = str(invar).replace("'","")
-  st = st.replace(" ","")
-  return st
+#def eltostr(invar):
+#  """ Converts a nested particle list to string """
+#  st = str(invar).replace("'","")
+#  st = st.replace(" ","")
+#  return st
 
 #Defines the auxiliar similar function
 #returns the relative difference between any elements of the list normalized to [0,1]
