@@ -21,11 +21,17 @@ PtcDic={
 
 
 class BElement:
-  """ FIXME whats a BElement? """
+  """ A branch-element """
   def __init__(self):
     self.masses = []
     self.particles = []
     self.momID = 0
+
+  def toStr ( self ):
+    """ the canonical SModels description of the BElement. """
+    st = str(self.particles).replace("'","")
+    st = st.replace(" ","")
+    return st
 
   def __str__ ( self ):
     ret="particles=%s masses=%s" % \
