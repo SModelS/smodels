@@ -49,8 +49,10 @@ for SMSTop in SMSTopList:
   
 
 for Analysis in ListOfAnalyses:
-  for res in Analysis.results.keys():
-    theoRes = SMSmethods.EvalRes(res,Analysis)
+  Analysis.evaluateResults()
+  #for res in Analysis.results.keys():
+    # theoRes = SMSmethods.EvalRes(res,Analysis)
+  #  theoRes = Analysis.evaluateResult ( res )
 for Analysis in ListOfAnalyses:
   Analysis.add ( SMSTopList )
   print "------------- Analysis Label = ",Analysis.label, Analysis.sqrts, Analysis.Top
