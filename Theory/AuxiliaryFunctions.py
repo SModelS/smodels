@@ -22,6 +22,7 @@ def Cgtr(a,b):
 
 #Defines similar function when comparing two list of numbers.
 #If any of the elements differ by < 10%, returns True
+#FIXME should this go to ClusterTools?
 def similar(els):
   for i in range(len(els)):
     for j in range(i+1,len(els)):
