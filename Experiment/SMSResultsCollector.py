@@ -681,7 +681,7 @@ dicdecay = { "T1": "#tilde{g} #rightarrow q#bar{q} #tilde{#chi}^{0}_{1}",
     "T5tttt":"#tilde{g} #rightarrow t(#tilde{t} #rightarrow t#tilde{#chi}^{0}_{1})",
     "T3tauh":"#tilde{g} #rightarrow q#bar{q}(#tilde{#chi}^{2}#rightarrow #tau #tau #tilde{#chi}^{0}_{1} |#tilde{#chi}^{0}_{1})",
     "T6bbZZ":"#tilde{b} #rightarrow bZ #tilde{#chi}^{0}_{1}",
-    "Rstop":"#tilde{t} #rightarrow tb#tau  #lambda'_{333}",
+    "Rstop":"#tilde{t} #rightarrow b#tau  #lambda'_{333}",
     "Rg3j":"#tilde{g} #rightarrow qqq  #lambda''_{112}",
     "SemiLeptonic231g":"#tilde{g} #rightarrow qbt#mu  #lambda'_{231}",
     "SemiLeptonic231q":"#tilde{g} #rightarrow qbt#mu  #lambda'_{231}"
