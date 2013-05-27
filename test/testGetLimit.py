@@ -2,16 +2,15 @@
 
 import set_path
 import ROOT
-from Experiment import SMSResults, SMSInterpolation, SMSgetlimit
-from Theory import SMSmethods
+from Experiment import SMSResults, SMSInterpolation, SMSgetlimit, ROOTTools
+from Theory import SMSDataObjects
 from Tools.PhysicsUnits import addunit, rmvunit
 
-def recreateHist(ana,topo,mz=None,axes=None, run=''):
-  """ recreate ROOT TH2F histogram of a given analysis and topology (only topologies with no intermediate masses) """
-  if SMSResults.hasDictionary(ana):
-    print "Cannot recreate histogram from dictionary"
-    return None
-  print mz, axes
+def recreateHist(ana,topo,mz=None,axes=None, run='',line=False):
+  """ recreate ROOT TH2F histogram of a given analysis and topology
+        needs mz for a topology with intermediate mass,
+        axes, for histograms with axes different from M1-M0
+        if line=True is selected, returns histogram and exclusion line """
   toponame=topo
   if mz: toponame=SMSInterpolation.gethistname(topo,mz)
   xmin=rmvunit(SMSResults.getLowX(ana,toponame),'GeV')
@@ -32,9 +31,14 @@ def recreateHist(ana,topo,mz=None,axes=None, run=''):
 #  bx=int((xmax-xmin)/bwx)
  #       by=int((ymax-ymin)/bwy)
   h = ROOT.TH2F('h','h',bx,xmin,xmax,by,ymin,ymax)
+  if line: hL = ROOT.TH2F('hL','hL',bx,xmin,xmax,by,ymin,ymax)
   x=xmin+bwx/2
   y=ymin+bwy/2
-  a=SMSmethods.EAnalysis()
+  a=SMSDataObjects.EAnalysis()
+#  if line: limitDict=???????#add dict of ref x secs
+  if line and not limitDict:
+    print "No refXSec dictionary found"
+    return None
   D=None
   L=None
   if mz.find('D')>-1: D=float(mz.split('=')[1])
@@ -55,7 +59,11 @@ def recreateHist(ana,topo,mz=None,axes=None, run=''):
       else: massv=[x,y]
       v=rmvunit(SMSgetlimit.GetPlotLimit([massv,massv],[topo,[ana]],a)[0][1],'pb')
       if v: h.Fill(x,y,v)
+      if line:
+        if v and v<limitDict[x]:
+          hL.Fill(x,y)
       y+=bwy
     y=ymin+bwy/2
     x+=bwx
+  if line: return h, ROOTTools.getTGraphfromContour(hL)
   return h
