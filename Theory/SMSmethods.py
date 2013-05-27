@@ -424,38 +424,41 @@ def AddToList(SMSTop,SMSTopList):
       print "Error adding element"
       print '\n'
 
-#Converts an element string to a nested particle list or vice-versa
-def eltostr(invar):
-  if type(invar) == type(list()):
-    st = str(invar).replace("'","")
-    st = st.replace(" ","")
-    return st
-  elif type(invar) == type(str()):
-    #print "getting a particle list from ",invar
-    st = invar.replace(" ","")
-    st = st[st.find("[[["):st.find("]]]")+3]
-    st_B = []
-    st_B.append(st[2:st.find("]],[[")+1])
-    st_B.append(st[st.find("]],[[")+4:st.find("]]]")+1])
 
-    ptclist = [[],[]]
-    for ib in range(2):
-      while "[" in st_B[ib] or "]" in st_B[ib]:
-        ptcs = st_B[ib][st_B[ib].find("[")+1:st_B[ib].find("],[")].split(",")
+def strtoel(invar):
+  """ Converts an element string to a nested particle list or vice-versa """
+  #print "getting a particle list from ",invar
+  st = invar.replace(" ","")
+  st = st[st.find("[[["):st.find("]]]")+3]
+  st_B = []
+  st_B.append(st[2:st.find("]],[[")+1])
+  st_B.append(st[st.find("]],[[")+4:st.find("]]]")+1])
+
+  ptclist = [[],[]]
+  for ib in range(2):
+    while "[" in st_B[ib] or "]" in st_B[ib]:
+      ptcs = st_B[ib][st_B[ib].find("[")+1:st_B[ib].find("],[")].split(",")
 
 #Syntax check:
-        for ptc in ptcs:
-          if not ptc in Reven.values() and not PtcDic.has_key(ptc):
-            print "eltostr: Unknown particle:",ptc
-            return False
+      for ptc in ptcs:
+        if not ptc in Reven.values() and not PtcDic.has_key(ptc):
+          print "[strtoel]: Unknown particle:",ptc
+          return False
 
-        ptclist[ib].append(ptcs)
-        sptcs = str(ptcs).replace("'","")
-        sptcs = str(sptcs).replace(" ","")
-        st_B[ib] = st_B[ib].replace(sptcs,"",1)
+      ptclist[ib].append(ptcs)
+      sptcs = str(ptcs).replace("'","")
+      sptcs = str(sptcs).replace(" ","")
+      st_B[ib] = st_B[ib].replace(sptcs,"",1)
 
-    #print "ptclist=",ptclist
-    return ptclist
+  #print "ptclist=",ptclist
+  return ptclist
+
+#Converts an element string to a nested particle list or vice-versa
+def eltostr(invar):
+  """ Converts a nested particle list to string """
+  st = str(invar).replace("'","")
+  st = st.replace(" ","")
+  return st
 
 #Defines the auxiliar similar function
 #returns the relative difference between any elements of the list normalized to [0,1]
