@@ -32,6 +32,17 @@ def ResultsForSqrts ( sqrts ):
     return
   print "[SMSResults.py:ResultsForSqrts] error: dont have any results for",sqrts
 
+def considerRuns(run = None):
+  """ needs runs as a list. if no runs are given, all existing runs will be taken into account"""
+  import SMSResultsCollector
+
+  if run:
+    SMSHelpers.runs = run
+    SMSResultsCollector.alldirectories = run
+  else:
+    SMSHelpers.runs = ["2011", "2012", "8TeV", "RPV7", "RPV8", "ATLAS8TeV"]
+    SMSResultsCollector.alldirectories = ["2011", "2012", "8TeV", "RPV7", "RPV8", "ATLAS8TeV"]
+
 def verbosity ( level="error" ):
   if level=="error":
     SMSHelpers.verbose=False
