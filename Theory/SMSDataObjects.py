@@ -1,6 +1,7 @@
 """ all data classes necessary to create a SModelS description of events """
 
-from SMSmethods import GTop, eltostr, Reven, EElement, BElement, PtcDic
+from SMSmethods import GTop, eltostr, EElement, BElement
+from ParticleNames import Reven, PtcDic
 
 class EAnalysis:  
   """ an analysis/topology pair """
