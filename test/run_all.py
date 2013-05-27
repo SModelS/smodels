@@ -23,11 +23,12 @@ for script in scripts:
 print "\nFinally check SMSmain.py: ",
 sys.stdout.flush()
 os.chdir("..")
-cmd= "python SMSmain.py > /tmp/compare"
+tmpfile="/tmp/compare"+os.getlogin()
+cmd= "python SMSmain.py > %s" % tmpfile
 ret=os.system ( cmd )
 print ok ( 0, ret )
 
 os.chdir("test/")
 import commands
-out=commands.getoutput("diff /tmp/compare SMSmain.log")
+out=commands.getoutput("diff SMSmain.log %s" % tmpfile)
 print "Diff of the logs: %s" % ok ( "", out )
