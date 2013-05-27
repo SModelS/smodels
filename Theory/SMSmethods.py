@@ -209,73 +209,64 @@ class GTop:
 #Append element to ElList:    
     self.ElList.append(NewElement)
     return True
-  
-   
 
-#If two masses in InTop are degenerate, return compressed topology
-def MassCompTop(InTop,mingap):
-     
-  ETopComp = copy.deepcopy(InTop)  
-#Loop over branches    
-  for ib in range(len(ETopComp.vertnumb)):
-    if ETopComp.vertnumb[ib] < 2: continue
-#Remove all external particles between compressed masses      
-    for ivert in range(ETopComp.vertnumb[ib]-1):
-      massA = ETopComp.ElList[0].B[ib].masses[ivert]
-      massB = ETopComp.ElList[0].B[ib].masses[ivert+1]
-      if abs(massA-massB) < mingap:
-        ETopComp.ElList[0].B[ib].particles[ivert] = []
-        ETopComp.vertparts[ib][ivert] = 0
-        
-#Remove all vertices and masses with zero particle emissions:
-    while ETopComp.vertparts[ib].count(0) > 1:
-      ivert = ETopComp.vertparts[ib].index(0)
-      ETopComp.vertnumb[ib] -= 1
-      massA = ETopComp.vertparts[ib].pop(ivert) 
-      massA = ETopComp.ElList[0].B[ib].masses.pop(ivert)
-      massA = ETopComp.ElList[0].B[ib].particles.pop(ivert)  
-        
-      
-  if not ETopComp.isEqual(InTop):
-    return ETopComp
-  else:
-    return False
+  def massCompressedTopology ( self, mingap ):
+    """ if two masses in this topology are degenerate, create 
+        a compressed copy of this topology """
+    ETopComp = copy.deepcopy(self)  
+  #Loop over branches    
+    for ib in range(len(ETopComp.vertnumb)):
+      if ETopComp.vertnumb[ib] < 2: continue
+  #Remove all external particles between compressed masses      
+      for ivert in range(ETopComp.vertnumb[ib]-1):
+        massA = ETopComp.ElList[0].B[ib].masses[ivert]
+        massB = ETopComp.ElList[0].B[ib].masses[ivert+1]
+        if abs(massA-massB) < mingap:
+          ETopComp.ElList[0].B[ib].particles[ivert] = []
+          ETopComp.vertparts[ib][ivert] = 0
+          
+  #Remove all vertices and masses with zero particle emissions:
+      while ETopComp.vertparts[ib].count(0) > 1:
+        ivert = ETopComp.vertparts[ib].index(0)
+        ETopComp.vertnumb[ib] -= 1
+        massA = ETopComp.vertparts[ib].pop(ivert) 
+        massA = ETopComp.ElList[0].B[ib].masses.pop(ivert)
+        massA = ETopComp.ElList[0].B[ib].particles.pop(ivert)  
+          
+    if not ETopComp.isEqual(self):
+      return ETopComp
+    else:
+      print "[SMSmethods.py] compressed topology and original topology are equal??"
+      return False
 
+  def invisibleCompressedTopology ( self ):
+    ETopComp = copy.deepcopy(self)
+    #Loop over branches    
+    for ib in range(len(ETopComp.vertnumb)):
+      if ETopComp.vertnumb[ib] < 2: continue
+      #Remove all external neutrinos    
+      for ivert in range(ETopComp.vertnumb[ib]):
+        if ETopComp.vertparts[ib][ivert] > 0:
+          ptcs = ETopComp.ElList[0].B[ib].particles[ivert]
+          while ptcs.count('nu') > 0: ptcs.remove('nu')   #Delete neutrinos        
+          ETopComp.ElList[0].B[ib].particles[ivert] = ptcs
+          ETopComp.vertparts[ib][ivert] = len(ptcs)
+  #First first non-empty vertex at the end of the branch
+      inv  = ETopComp.vertnumb[ib]-1
+      while inv > 0 and ETopComp.vertparts[ib][inv-1] == 0: inv -= 1
+  #Remove empty vertices at the end of the branch:
+      ETopComp.vertnumb[ib] = inv + 1
+      ETopComp.vertparts[ib] = self.vertparts[ib][0:inv]
+      ETopComp.vertparts[ib].append(0)
+      ETopComp.ElList[0].B[ib].particles = self.ElList[0].B[ib].particles[0:inv]
+      ETopComp.ElList[0].B[ib].masses = self.ElList[0].B[ib].masses[0:inv+1]
+      
 
-      
-      
-#If InTop has an effective LSPs (LSP + neutrino = LSP'), return compressed topology
-def InvCompTop(InTop):  
-    
-  ETopComp = copy.deepcopy(InTop)
-#Loop over branches    
-  for ib in range(len(ETopComp.vertnumb)):
-    if ETopComp.vertnumb[ib] < 2: continue
-#Remove all external neutrinos    
-    for ivert in range(ETopComp.vertnumb[ib]):
-      if ETopComp.vertparts[ib][ivert] > 0:
-        ptcs = ETopComp.ElList[0].B[ib].particles[ivert]
-        while ptcs.count('nu') > 0: ptcs.remove('nu')   #Delete neutrinos        
-        ETopComp.ElList[0].B[ib].particles[ivert] = ptcs
-        ETopComp.vertparts[ib][ivert] = len(ptcs)
-        
-        
-#First first non-empty vertex at the end of the branch
-    inv  = ETopComp.vertnumb[ib]-1
-    while inv > 0 and ETopComp.vertparts[ib][inv-1] == 0: inv -= 1
-#Remove empty vertices at the end of the branch:
-    ETopComp.vertnumb[ib] = inv + 1
-    ETopComp.vertparts[ib] = InTop.vertparts[ib][0:inv]
-    ETopComp.vertparts[ib].append(0)
-    ETopComp.ElList[0].B[ib].particles = InTop.ElList[0].B[ib].particles[0:inv]
-    ETopComp.ElList[0].B[ib].masses = InTop.ElList[0].B[ib].masses[0:inv+1]
-    
+    if not ETopComp.isEqual(self):
+      return ETopComp
+    else:
+      return False
 
-  if not ETopComp.isEqual(InTop):
-    return ETopComp
-  else:
-    return False
-      
 #Compares 2 particle names or 2 nested name arrays. Allows for dictionary labels
 #(Ex: L = l, l+ = l, l = l-,...)
 #For the last nested level ignore particle ordering
