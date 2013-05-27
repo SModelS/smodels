@@ -21,6 +21,7 @@ for script in scripts:
   print ok ( 0, ret )
 
 print "\nFinally check SMSmain.py: ",
+sys.stdout.flush()
 os.chdir("..")
 cmd= "python SMSmain.py > /tmp/compare"
 ret=os.system ( cmd )
