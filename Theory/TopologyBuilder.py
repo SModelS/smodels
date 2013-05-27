@@ -17,8 +17,7 @@ def compressTopology(ETopList,DoCompress,DoInvisible,minmassgap):
 #Check for mass compressed topologies    
     if DoCompress:
       for Top in ETopList:
-        ETopComp = False
-        ETopComp = SMSmethods.MassCompTop(Top,minmassgap)
+        ETopComp = Top.massCompressedTopology(minmassgap)
         if ETopComp:
           exists = False
           for Topp in ETopList:
@@ -31,8 +30,7 @@ def compressTopology(ETopList,DoCompress,DoInvisible,minmassgap):
 #(look for effective LSP, such as LSP + neutrino = LSP')      
     if DoInvisible:
       for Top in ETopList:
-        ETopInComp = False
-        ETopInComp = SMSmethods.InvCompTop(Top)
+        ETopInComp = Top.invisibleCompressedTopology()# SMSmethods.InvCompTop(Top)
         if ETopInComp:
           exists = False
           for Topp in ETopList:
