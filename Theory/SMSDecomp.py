@@ -81,7 +81,7 @@ def SLHAdecomp(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassga
   ElList = []
   WList = []
   for ptc in Pdic.keys():
-    NewEl = SMSmethods.BElement()
+    NewEl = SMSDataObjects.BElement()
     NewEl.momID = [ptc,ptc]
     NewEl.masses.append(Massdic[ptc])
     weight = Pdic[ptc]
@@ -145,7 +145,7 @@ def SLHAdecomp(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassga
         if ptcs[0] == ptcs[1] and jel < iel: continue     #Avoid double counting
 
         if FinalList[iel].momID == ptcs[0] and FinalList[jel].momID == ptcs[1]:
-          Els = SMSmethods.EElement()    
+          Els = SMSDataObjects.EElement()    
           Els.B = [copy.deepcopy(FinalList[iel]),copy.deepcopy(FinalList[jel])]
           weight = {}
           for w in Xsec.keys():
