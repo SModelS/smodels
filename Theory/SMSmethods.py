@@ -17,7 +17,7 @@ class BElement:
     self.momID = 0
     if type(S)==type(""):
       st = S.replace(" ","")
-      print "[SMSmethods.py] Construct a BElement from a string: st=",st
+      # print "[SMSmethods.py] Construct a BElement from a string: st=",st
       while "[" in st or "]" in st:
         ptcs = st[st.find("[")+1:st.find("],[")].split(",")
         for ptc in ptcs:
@@ -27,7 +27,7 @@ class BElement:
         spcts=str(ptcs).replace("'","").replace(" ","")
         st=st.replace(spcts,"",1)
         self.particles.append ( ptcs )
-      print "[SMSmethods] ptcs=",ptcs
+      # print "[SMSmethods] ptcs=",ptcs
 
   def isEqual ( ElA, elB, order=True ):
     if simParticles(ElA.particles,ElB.particles,useDict=False): return False
@@ -59,9 +59,17 @@ class BElement:
 
 class EElement:
   """ An Event Element, contains of several branches and weight information """
-  def __init__(self):
+  def __init__(self, S=None ):
+    """ If S != None, an Element is created from a string description """
     self.B = []
     self.weight = []
+    if S:
+      st = S.replace(" ","").replace("'","")
+      st = st[st.find("[[["):st.find("]]]")+3]
+      b1=st[2:st.find("]],[[")+1]
+      b2=st[st.find("]],[[")+4:st.find("]]]")+1]
+      self.B.append ( copy.deepcopy( BElement ( b1 ) ) )
+      self.B.append ( copy.deepcopy ( BElement ( b2 ) ) )
 
 #Get global topology info from element structure
   def getEinfo(self):
@@ -135,7 +143,12 @@ class EElement:
 
   def __str__ ( self ):
     """ returns the canonical name of the element, e.g. [[jet],[jet]] """
-    ret=str(self.B[0])+","+str(self.B[1])
+    ret="["
+    for i in self.B:
+      ret+=str(i)+","
+    if len(ret)>1:
+      ret=ret[:-1]
+    ret+="]"
     return ret
 
   def describe ( self ):
