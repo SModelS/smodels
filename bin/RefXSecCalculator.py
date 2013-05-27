@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import set_path
 import ROOT
 import Theory.SMSxsec as XSEC
 import Theory.SLHATools as SLHA
