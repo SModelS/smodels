@@ -22,6 +22,10 @@ for script in scripts:
 
 print "\nFinally check SMSmain.py: ",
 os.chdir("..")
-cmd= "python SMSmain.py > /dev/null"
+cmd= "python SMSmain.py > /tmp/compare"
 ret=os.system ( cmd )
 print ok ( 0, ret )
+
+import commands
+out=commands.getoutput("diff /tmp/compare SMSmain.log")
+print "Diff of the logs: %s" % ok ( "", out )
