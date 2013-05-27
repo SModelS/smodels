@@ -139,16 +139,12 @@ Total weight =  {'7 TeV (LO)': 1.39E+02 [fb], '8 TeV (LO)': 1.93E+02 [fb], '7 Te
 |                 |            |      3.01E+02 [GeV]]]      |                               |                         |
 |    ---------    | ---------  |         ---------          |           ---------           |        ---------        |
 +-----------------+------------+----------------------------+-------------------------------+-------------------------+
----------------Analysis Label =  ATLAS_CONF_2013_007:T8ChiSlep
-Skipping analysis ATLAS_CONF_2013_007:T8ChiSlep with more than 3 vertices
 ---------------Analysis Label =  ATLAS_CONF_2013_007:T1tttt
 
 ---------------Analysis Label =  ATLAS_CONF_2013_007:T6ttWW
 
 ---------------Analysis Label =  ATLAS_CONF_2013_007:T1tbtb
 
----------------Analysis Label =  ATLAS_CONF_2013_007:T7ChiSlep
-Skipping analysis ATLAS_CONF_2013_007:T7ChiSlep with more than 3 vertices
 ---------------Analysis Label =  ATLAS_CONF_2013_007:T5WW
 
 ---------------Analysis Label =  ATLAS_CONF_2013_028:TChiChipmStauL
