@@ -200,17 +200,74 @@ class GTop:
 
 #Adds Eelement to ElList
 #OBS: NewElement must have the correct branch ordering!
-  def AddElement(self, NewElement):
+  def addElement(self, NewElement):
 
 #First get global topology info from NewElement:
     Einfo = NewElement.getEinfo()
 #Sanity checks:
     if Einfo["vertnumb"] != self.vertnumb or Einfo["vertparts"] != self.vertparts:
-      print "AddElement: wrong element topology"
+      print "[GTop.addElement] wrong element topology"
       return False
 #Append element to ElList:
     self.ElList.append(NewElement)
     return True
+
+  def evaluateCluster(self, instr):
+    """ Evaluates string expression in instr using the elements and weights
+        stored in self. FIXME I dont understand this """
+
+    outstr = instr.replace(" ","")
+  #Get ordered list of elements:
+    El = []
+    iels = 0
+    while "[[[" in outstr:  #String has element
+      st = outstr[outstr.find("[[["):outstr.find("]]]")+3] #Get duplet
+      ptclist = eltostr(st)   # Get particle list
+  #Syntax checks:
+      for ib in range(2):
+        for ptcL in ptclist[ib]:
+          for ptc in ptcL:
+            if not ptc in Reven.values() and not PtcDic.has_key(ptc):
+              print "EvalRes: Unknown particle ",ptc
+              return False
+      outstr = outstr.replace(st,"El["+str(iels)+"]")  # Replace element
+      El.append(ptclist)   #Store elements
+      iels +=1
+
+  #Get list of expressions (separated by commas):
+    if ";" in outstr or "Csim" in outstr or "Cgtr" in outstr:
+      outstrv = outstr.rsplit(";")
+    else:
+      outstrv = outstr.rsplit(",")
+
+  #Generate zeroweight entry
+    zeroweight = {}
+    for wk in self.ElList[0].weight.keys():
+      zeroweight.update({wk : addunit(0.,'fb')})
+
+  #Find elements in self corresponding to elements in El and fill Elw with the respective weights:
+    Elw = []
+    for i in range(len(El)):
+      Elw.append(zeroweight)
+      for j in range(len(self.ElList)):
+        AEl = [self.ElList[j].B[0].particles,self.ElList[j].B[1].particles]
+        if simParticles(El[i],AEl,useDict=False):
+          Elw[i] = self.ElList[j].weight
+          break
+
+  #Evaluate the instr expression (condition or constraint) for each weight entry:
+    result = {}
+    Els = []
+    if len(Elw) > 0:
+      for w in Elw[0].keys():
+        Els = [weight[w] for weight in Elw]
+        eout = [Ceval(x,Els) for x in outstrv]
+        if len(eout) == 1: eout = eout[0]
+        result[w]=eout ## .update({w : eout})
+    else:
+      eout = [Ceval(x,Els) for x in outstrv]
+      result = eout
+    return result
 
   def massCompressedTopology ( self, mingap ):
     """ if two masses in this topology are degenerate, create
@@ -303,7 +360,7 @@ class GTop:
               oldweight = NewTop.ElList[iel2].weight
               NewTop.ElList[iel2].weight = sumweights([oldweight,weight])
               break
-          if not match: NewTop.AddElement(Elm)
+          if not match: NewTop.addElement(Elm)
     return NewTop
 
 
@@ -363,7 +420,7 @@ def AddToList(SMSTop,SMSTopList):
       NewEl = NewEl_a
     else:
       NewEl = NewEl_b
-    if not SMSTopList[equaltops].AddElement(NewEl):
+    if not SMSTopList[equaltops].addElement(NewEl):
       print "Error adding element"
       print '\n'
 
@@ -409,9 +466,9 @@ def EvalRes(res,Analysis,uselimits = False):
 
 #Now NewTop contains only elements with a common mass (replaced by the average mass)
 #Evaluate result inside cluster
-    result = Eval_cluster(res,NewTop)
+    result = NewTop.evaluateCluster ( res )
 #Evaluate conditions
-    conditions = Eval_cluster(Analysis.results[res],NewTop)
+    conditions = NewTop.evaluateCluster ( Analysis.results[res] )
 
 #Save cluster result
     mavg = [NewTop.ElList[0].B[0].masses,NewTop.ElList[0].B[1].masses]
@@ -428,66 +485,6 @@ def EvalRes(res,Analysis,uselimits = False):
     output.append({'mass' : mavg, 'result' : result, 'conditions' : conditions})
 
   return output
-
-#Evaluates string expression in instr using the elements and weights
-#stored in InTop
-def Eval_cluster(instr,InTop):
-
-  outstr = instr.replace(" ","")
-#Get ordered list of elements:
-  El = []
-  iels = 0
-  while "[[[" in outstr:  #String has element
-    st = outstr[outstr.find("[[["):outstr.find("]]]")+3] #Get duplet
-    ptclist = eltostr(st)   # Get particle list
-#Syntax checks:
-    for ib in range(2):
-      for ptcL in ptclist[ib]:
-        for ptc in ptcL:
-          if not ptc in Reven.values() and not PtcDic.has_key(ptc):
-            print "EvalRes: Unknown particle ",ptc
-            return False
-    outstr = outstr.replace(st,"El["+str(iels)+"]")  # Replace element
-    El.append(ptclist)   #Store elements
-    iels +=1
-
-#Get list of expressions (separated by commas):
-  if ";" in outstr or "Csim" in outstr or "Cgtr" in outstr:
-    outstrv = outstr.rsplit(";")
-  else:
-    outstrv = outstr.rsplit(",")
-
-#Generate zeroweight entry
-  zeroweight = {}
-  for wk in InTop.ElList[0].weight.keys():
-    zeroweight.update({wk : addunit(0.,'fb')})
-
-#Find elements in InTop corresponding to elements in El and fill Elw with the respective weights:
-  Elw = []
-  for i in range(len(El)):
-    Elw.append(zeroweight)
-    for j in range(len(InTop.ElList)):
-      AEl = [InTop.ElList[j].B[0].particles,InTop.ElList[j].B[1].particles]
-      if simParticles(El[i],AEl,useDict=False):
-        Elw[i] = InTop.ElList[j].weight
-        break
-
-#Evaluate the instr expression (condition or constraint) for each weight entry:
-  result = {}
-  Els = []
-  if len(Elw) > 0:
-    for w in Elw[0].keys():
-      Els = [weight[w] for weight in Elw]
-      eout = [Ceval(x,Els) for x in outstrv]
-      if len(eout) == 1: eout = eout[0]
-      result.update({w : eout})
-  else:
-    eout = [Ceval(x,Els) for x in outstrv]
-    result = eout
-
-
-  return result
-
 
 #Converts an element string to a nested particle list or vice-versa
 def eltostr(invar):
