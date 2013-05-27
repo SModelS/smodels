@@ -236,7 +236,6 @@ class GTop:
     if not ETopComp.isEqual(self):
       return ETopComp
     else:
-      print "[SMSmethods.py] compressed topology and original topology are equal??"
       return False
 
   def invisibleCompressedTopology ( self ):
@@ -825,7 +824,7 @@ def eltostr(invar):
     st = st.replace(" ","")
     return st
   elif type(invar) == type(str()):
-    print "getting a particle list from ",invar
+    #print "getting a particle list from ",invar
     st = invar.replace(" ","")
     st = st[st.find("[[["):st.find("]]]")+3]
     st_B = []
@@ -848,7 +847,7 @@ def eltostr(invar):
         sptcs = str(sptcs).replace(" ","")
         st_B[ib] = st_B[ib].replace(sptcs,"",1)
 
-    print "ptclist=",ptclist
+    #print "ptclist=",ptclist
     return ptclist
 
 #Defines the auxiliar similar function
