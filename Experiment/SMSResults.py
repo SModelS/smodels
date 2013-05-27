@@ -483,7 +483,10 @@ def exists(analysis, topo, run = None):
   if not axes: return False
   hasDict=SMSHelpers.hasDictionary ( analysis, run2 )
   for a in axes:
-    toponame = SMSInterpolation.gethistname(topo, a['mz'][0])
+    # print "a=",a
+    mzname=None
+    if a['mz'] and len(a['mz']): mzname=a['mz'][0]
+    toponame = SMSInterpolation.gethistname(topo, mzname )
     if hasDict:
     #print "BBB 1 ana=%s run=%s run2=%s" % ( analysis,run,run2 )
       Dict=SMSHelpers.getUpperLimitDictionary ( analysis, toponame, run2 )
