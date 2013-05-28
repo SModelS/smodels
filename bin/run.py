@@ -3,12 +3,9 @@
 """ another sandbox to try things out """
 
 import set_path, argparse
-from Theory import LHEReader, TopologyBuilder, SMSDataObjects
+from Theory import LHEDecomposer, SMSDataObjects
 from Experiment import TxNames
 import Experiment.SMSAnalysisFactory as Analyses
-## import SMSAnalyses as Analyses
-## import SMSAnalysesTest as Analyses
-
 
 print "[run.py] loading analyses ...."
 ListOfAnalyses = Analyses.load( topos="T2" )
@@ -18,18 +15,11 @@ print "[run.py] done loading %d analyses" % len(ListOfAnalyses)
 # slhafile="AndreSLHA/andrePT4.slha"
 lhefile="../lhe/T2_1.lhe"
 # lhefile="T2_100.lhe"
-reader=LHEReader.LHEReader ( lhefile, 1 )
-SMSTopList=SMSDataObjects.TopologyList()
-for Event in reader:
-  print Event
-  SMSTops=TopologyBuilder.fromEvent ( Event )
-  print "SMSTops[0].leadingElement=",SMSTops[0].leadingElement()
-
-  for SMSTop in SMSTops:
-    SMSTop.checkConsistency(verbose=True)
-    print "SMSTop.leadingElement=",SMSTop.leadingElement()
-    SMSTopList.add ( SMSTop )
-    for element in SMSTop.elements():
+topos=LHEDecomposer.decompose ( lhefile, {}, None )
+for topo in topos:
+    topo.checkConsistency(verbose=True)
+    print "topo.leadingElement=",topo.leadingElement()
+    for element in topo.elements():
       print "======================="
       tx=TxNames.getTx(element)
       print "element=",element
@@ -38,16 +28,16 @@ for Event in reader:
 
 print
 print
-for SMSTop in SMSTopList.topos:
-  print "SMSTopList SMS topology",SMSTop
-  element=SMSTop.leadingElement() 
-  print "SMSTopList leading element",element
+for topo in topos.topos:
+  print "topos SMS topology",topo
+  element=topo.leadingElement() 
+  print "topos leading element",element
   tx=TxNames.getTx(element)
-  print "SMSTopList Tx=",tx
+  print "topos Tx=",tx
   
 for Analysis in ListOfAnalyses:
   Analysis.evaluateResults()
-  Analysis.add ( SMSTopList )
+  Analysis.add ( topos )
   print "------------- Analysis Label = ",Analysis.label, Analysis.sqrts, Analysis.Top
   print "    `-- element ",Analysis.Top.leadingElement()
   print "    `-- ",Analysis.Top.leadingElement().B[0]

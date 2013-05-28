@@ -606,7 +606,7 @@ class TopologyList:
   """ implements a list of topologies, knows how to correctly add 
       a topology """
   def __init__ ( self, topos=[] ):
-    """ if List is given, we add all elements of list sequentally """
+    """ if topos are given, we add all of them sequentally """
     self.topos=[]
     for topo in topos:
       self.add ( topo )
