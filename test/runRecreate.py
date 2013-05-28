@@ -6,7 +6,7 @@
 #default sqrt(s) is 8 TeV, set -tev to change to 7 TeV
 
 import set_path
-import argparse, testGetLimit, ROOT
+import argparse, testGetLimit, ROOT, sys
 from Experiment import SMSResults, SMSInterpolation
 
 argparser=argparse.ArgumentParser()
@@ -31,6 +31,10 @@ if args.tev: tevIn=args.tev
 run1=SMSResults.getRun(args.ana)
 
 rootname = testGetLimit.recreateHist(args.ana, args.topo, mz=args.mz, axes=args.axes, line=True, tev=tevIn)
+
+if not rootname:
+  print "Could not run recreateHist, png was not produced."
+  sys.exit()
 
 toponame = args.topo
 if args.mz: toponame = SMSInterpolation.gethistname(args.topo, args.mz)
