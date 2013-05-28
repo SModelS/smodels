@@ -1,4 +1,4 @@
-import NLLxsec
+import NLLXSec
 
 #Runs pythia at 7 and 8 TeV and compute weights for each production
 #process. Returns a dictionary with weights at 7 and 8 TeV and the
@@ -73,7 +73,7 @@ def pytinit(nevts,slhafile,rpythia = True, donlo = True):
 
     for key in sigma_8.keys():
 
-      nllres = NLLxsec.getNLLresult(key[0],key[1],slhafile)
+      nllres = NLLXSec.getNLLresult(key[0],key[1],slhafile)
       k7 = 1.
       k8 = 1.
    
