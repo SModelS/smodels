@@ -168,6 +168,13 @@ def getRun ( analysis, run=None ):
   run=SMSHelpers.getRun ( analysis, run )
   return run
 
+def getPrettyName ( analysis, run=None, latex=False ):
+  value=SMSHelpers.getMetaInfoField ( analysis, "prettyname", run )
+  if value==None or value=="": return analysis
+  if not latex:
+    value=value.replace("\\","#")
+  return value
+
 def getAnalyses ( topo, run=None ):
   import os
   """ return all analyses that have results for topo """

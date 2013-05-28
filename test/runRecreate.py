@@ -68,7 +68,10 @@ legend.Draw()
 
 title = ROOT.TLatex()
 title.SetNDC()
-title.DrawLatex(0.1,0.93, args.ana+', '+str(int(tevIn))+' TeV, NLONLL,')
+title.DrawLatex(0.1,0.93, SMSResults.getPrettyName(args.ana)+', '+str(int(tevIn))+' TeV, NLONLL,')
+#title = ROOT.TMathText()
+#title.SetNDC()
+#title.DrawMathText(0.1,0.93, SMSResults.getPrettyName(args.ana)+', '+str(int(tevIn))+' TeV, NLONLL,')
 
 decay = ROOT.TLatex()
 decay.SetNDC()
