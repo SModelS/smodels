@@ -15,8 +15,9 @@ def compute(nevts,slhafile,rpythia = True, donlo = True, basedir=None,datadir=No
   import os
   if basedir==None:
     basedir=os.getcwd()
-    if basedir.find("SMSDecomposition"):
-      basedir=basedir[:basedir.find("SMSDecomposition")+16]+"/"
+    if basedir[-3:]=="bin": basedir=basedir[:-3]
+    if basedir[-4:]=="test": basedir=basedir[:-4]
+    if basedir[-10:]=="regression": basedir=basedir[:-10]
   if datadir==None:
     datadir=basedir+"/data"
   if not os.path.exists ( datadir ):
