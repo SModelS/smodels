@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+## https://twiki.cern.ch/twiki/bin/view/LHCPhysics/SUSYCrossSections8TeVstopsbottom
+
 import set_path
 import ROOT, os
 import Theory.SMSXSecs as XSEC
