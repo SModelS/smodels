@@ -21,19 +21,19 @@ for script in scripts:
   ret=os.system ( cmd )
   print ok ( 0, ret )
 
-print "\nFinally check SMSmain.py: ",
-sys.stdout.flush()
-os.chdir("..")
-tmpfile="/tmp/compare"+os.getlogin()
-cmd= "python SMSmain.py > %s" % tmpfile
-ret=os.system ( cmd )
-print ok ( 0, ret )
-
-os.chdir("test/")
-import commands
-cmd="diff SMSmain.log %s" % tmpfile
-out=commands.getoutput( cmd )
-ret=ok ( "", out, False )
-print "Diff of the logs: %s" % ret
-if ret.find("failed")>-1: 
-  print "try this:\n%s" % cmd
+#print "\nFinally check SMSmain.py: ",
+#sys.stdout.flush()
+#os.chdir("..")
+#tmpfile="/tmp/compare"+os.getlogin()
+#cmd= "python SMSmain.py > %s" % tmpfile
+#ret=os.system ( cmd )
+#print ok ( 0, ret )
+#
+#os.chdir("test/")
+#import commands
+#cmd="diff SMSmain.log %s" % tmpfile
+#out=commands.getoutput( cmd )
+#ret=ok ( "", out, False )
+#print "Diff of the logs: %s" % ret
+#if ret.find("failed")>-1: 
+#  print "try this:\n%s" % cmd
