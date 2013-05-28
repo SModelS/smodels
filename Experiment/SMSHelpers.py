@@ -352,6 +352,7 @@ def getMetaInfoField ( analysis, field, run=None, complain=False ):
       log ( "%s/%s doesnt have a ``%s'' field." % ( run, analysis, field ) )
     return None
   f=metainfo[field]
+  if len(f)==0: return f
   while f[0]==' ': f=f[1:]
   if f[-1]=='\n': f=f[:-1]
   return f
