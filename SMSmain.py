@@ -57,12 +57,13 @@ EvElement_table = PrettyTable(["Topology","Element","Particles B[0]","Particles 
 eltot = 0
 totweight = []
 #Print Results:
-for i in range(len(SMSTopList)):
-  weightlist = [el.weight for el in SMSTopList[i].ElList]
+# for i in range(len(SMSTopList)):
+for (i,topo) in enumerate(SMSTopList):
+  weightlist = [el.weight for el in topo.ElList]
   sumw = SMSmethods.sumweights(weightlist)
   totweight.append(sumw)
-  EvTop_table.add_row([i,SMSTopList[i].vertnumb,SMSTopList[i].vertparts,len(SMSTopList[i].ElList),wrap(printer.pformat(sumw),width=30)])
-  eltot += len(SMSTopList[i].ElList)
+  EvTop_table.add_row([i,topo.vertnumb,topo.vertparts,len(topo.ElList),wrap(printer.pformat(sumw),width=30)])
+  eltot += len(topo.ElList)
 
  
       
