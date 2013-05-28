@@ -7,7 +7,7 @@
 
 import set_path
 import argparse, testGetLimit, ROOT, sys
-from Experiment import SMSResults, SMSInterpolation
+from Experiment import SMSResults, SMSInterpolation, SMSResultsCollector
 
 argparser=argparse.ArgumentParser()
 argparser.add_argument('-a','--ana',help='input analysis')
@@ -40,26 +40,26 @@ toponame = args.topo
 if args.mz: toponame = SMSInterpolation.gethistname(args.topo, args.mz)
 
 rootfile = ROOT.TFile(rootname)
-orig_rootfile = f2=ROOT.TFile("/afs/hephy.at/user/w/walten/public/sms/%s/%s/sms.root" % (run1, args.ana))
 ul = rootfile.Get('h')
-orig_ul = orig_rootfile.Get('limit_%s' %toponame)
-ul.GetXaxis().SetTitle(orig_ul.GetXaxis().GetTitle())
+orig_ul = SMSResults.getUpperLimit(args.ana, toponame)
+ul.GetXaxis().SetTitle(SMSResultsCollector.particleName(args.topo)+' mass [GeV]')
 ul.GetYaxis().SetTitle(orig_ul.GetYaxis().GetTitle())
-ul.GetZaxis().SetTitle(orig_ul.GetZaxis().GetTitle())
+ul.GetZaxis().SetTitle(orig_ul.GetZaxis().GetTitle().replace('pb','fb'))
 reproduced_exclusion = rootfile.Get('Graph')
 reproduced_exclusion.SetLineColor(ROOT.kRed)
-exclusion = orig_rootfile.Get('exclusion_%s' % toponame)
-exclusionm1= orig_rootfile.Get('exclusionm1_%s' % toponame)
-exclusionp1= orig_rootfile.Get('exclusionp1_%s' % toponame)
+exclusion = SMSResults.getExclusionLine(toponame, args.ana, False, plusminussigma=0)
+exclusionm1= SMSResults.getExclusionLine(toponame, args.ana, False, plusminussigma=-1)
+exclusionp1= SMSResults.getExclusionLine(toponame, args.ana, False, plusminussigma=1)
 
 c1=ROOT.TCanvas()
+c1.SetLogz()
 ul.Draw("COLZ")
 exclusion.Draw("SAME")
 exclusionm1.Draw("SAME")
 exclusionp1.Draw("SAME")
 reproduced_exclusion.Draw("SAME")
 
-legend = ROOT.TLegend(0.45, 0.8, 0.2, 0.65)
+legend = ROOT.TLegend(0.5, 0.85, 0.15, 0.67)
 legend.SetFillStyle(0)
 legend.SetBorderSize(0)
 legend.AddEntry(reproduced_exclusion, "reproduced exclusion",'L')
@@ -67,7 +67,14 @@ legend.AddEntry(exclusion, 'observed exclusion','L')
 legend.AddEntry(exclusionm1, 'observed exclusion #pm 1#sigma','L')
 legend.Draw()
 
+title = ROOT.TLatex()
+title.SetNDC()
+title.DrawLatex(0.1,0.93, args.ana+', '+str(tevIn)+' TeV, NLONLL')
+
+decay = ROOT.TLatex()
+decay.SetNDC()
+decay.DrawLatex(0.55, 0.93, SMSResultsCollector.SMSInfo("decay", args.topo, args.ana))
+
 c1.Print("../plots/%s_%s.png" %(args.ana,toponame))
 
 rootfile.Close()
-orig_rootfile.Close()
