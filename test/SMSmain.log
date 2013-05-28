@@ -1,9 +1,5 @@
-running pythia
 try to run pythia_lhe at sqrt(s)=8 with 10000 events
-done running
-running pythia
 try to run pythia_lhe at sqrt(s)=7 with 10000 events
-done running
 Number of Global topologies =  12
 +----------+-----------+------------------------+-----------+--------------------------------+
 | Topology | #Vertices |      #Insertions       | #Elements |         Sum of weights         |
