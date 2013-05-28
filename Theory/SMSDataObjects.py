@@ -623,11 +623,14 @@ class TopologyList:
     element.  If neither element nor topology exist, add the new topology and
     all its elements """
     import copy
-    for inew in range(len(topo.ElList)):
-      NewEl_a = topo.ElList[inew]
+    for (inew,element) in enumerate(topo.ElList): ## range(len(topo.ElList)):
+      if len(element.B)<2:
+        print "[SMSDataObjects.TopologyList] error: assumed at least two branches"
+        continue
+      NewEl_a = element
       NewEl_b = copy.deepcopy(NewEl_a)
-      NewEl_b.B[1] = topo.ElList[inew].B[0]
-      NewEl_b.B[0] = topo.ElList[inew].B[1]   #Check both orderings
+      NewEl_b.B[1] = element.B[0]
+      NewEl_b.B[0] = element.B[1]   #Check both orderings
       equaltops = -1
       equalels = -1
       i = -1
