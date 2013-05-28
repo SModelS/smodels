@@ -11,7 +11,7 @@ import Experiment.SMSResults as SMS
 import Tools.PhysicsUnits as UNIT
 
 topo = 'T2bb'
-nevts = 10000
+nevts = 10
 pidmom = 1000005 #sbottom
 pidlsp = 1000022 #lsp
 
@@ -47,14 +47,17 @@ step = 25.
 m = 0.
 
 
-rootfile = ROOT.TFile('../data/%s.root' %topo, 'recreate')
-txtfile7 = open('../data/%s7TeV.txt' %topo,'w')
-txtfile8 = open('../data/%s8TeV.txt' %topo,'w')
+rootfile = ROOT.TFile('../data/%s_evts%d.root' %(topo,nevts) , 'recreate')
+txtfile7 = open('../data/%s7TeV_evts%d.txt' %(topo,nevts),'w')
+txtfile8 = open('../data/%s8TeV_evts%d.txt' %(topo,nevts),'w')
 txtfile7.write('mass[%s]      RefXSec[fb]\n' %pidmom)
 txtfile8.write('mass[%s]      RefXSec[fb]\n' %pidmom)
 
 hist7 = ROOT.TH1F('hist7', 'refxsec7', int((x_up-x_low)/step) , x_low, x_up)
 hist8 = ROOT.TH1F('hist8', 'refxsec8', int((x_up-x_low)/step) , x_low, x_up)
+
+
+#x_up=950.
 
 while m < x_up-12.5:
 #while i < 2:
@@ -65,7 +68,8 @@ while m < x_up-12.5:
    slhafile = SLHA.createSLHAFile(topo, masses)
    print "[RefXSecCalculator] compute for",masses
    dic = XSEC.compute(nevts, slhafile)
-#   print dic
+#   if m > 500.:
+#      print dic['Xsecdic']
    if dic['Xsecdic']['7 TeV (NLO)'].has_key((-pidmom,pidmom)):
       xs7 = UNIT.rmvunit(dic['Xsecdic']['7 TeV (NLO)'][(-pidmom,pidmom)], 'fb')
 #      print xs7
@@ -78,6 +82,7 @@ while m < x_up-12.5:
       hist8.Fill(masses[pidmom], xs8)
       txtfile8.write('%f      %f\n' %(masses[pidmom], xs8))
       #txtfile8.flush()
+   os.unlink(slhafile)
 
 txtfile7.close()
 txtfile8.close()
