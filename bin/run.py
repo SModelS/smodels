@@ -6,6 +6,7 @@ import set_path, argparse
 from Theory import LHEDecomposer, SMSDataObjects
 from Experiment import TxNames
 import Experiment.SMSAnalysisFactory as Analyses
+from Tools import SMSFeynmanGraphs
 
 print "[run.py] loading analyses ...."
 ListOfAnalyses = Analyses.load( topos="T2" )
@@ -45,6 +46,7 @@ for Analysis in ListOfAnalyses:
   #d="[[['jet','jet'],['jet']],[['jet']]]"
   # S=SMSmethods.strtoel ( d )
   e=SMSDataObjects.EElement ( d )
+  SMSFeynmanGraphs.asciidraw ( e )
   # print "S=",S,"e=",e,Analysis.Top.leadingElement()==e
   #print "              S=``%s'' -> ``%s''" % ( S, Analysis.Top.leadingElement().B[0] )
 
