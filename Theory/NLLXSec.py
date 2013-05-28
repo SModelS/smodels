@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys, commands, os, pyslha
+import sys, commands, os, pyslha2
 from Tools.PhysicsUnits import addunit
 
 squarks = [1000001,2000001,1000002,2000002,1000003,2000003,1000004,2000004]
@@ -123,7 +123,7 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
 # main method, call this from the xsec routine with pdgid1, pdgid2 in order to get the NLL results. The output will be xecs =False and masses = 0 if the combination of ids don't have any results at NLL.
 def getNLLresult(pdgid1,pdgid2,inputfile,base="../nllfast",pdf="cteq"):
 
-    readfile=pyslha.readSLHAFile(inputfile)
+    readfile=pyslha2.readSLHAFile(inputfile)
     gluinomass = abs(readfile[0]['MASS'].entries[1000021])
     squarkmass = (abs(readfile[0]['MASS'].entries[1000001])+abs(readfile[0]['MASS'].entries[2000001])+abs(readfile[0]['MASS'].entries[1000002])+abs(readfile[0]['MASS'].entries[2000002])+abs(readfile[0]['MASS'].entries[1000003])+abs(readfile[0]['MASS'].entries[2000003])+abs(readfile[0]['MASS'].entries[1000004])+abs(readfile[0]['MASS'].entries[2000004]))/8
 
