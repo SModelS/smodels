@@ -7,7 +7,7 @@ def printParticle_ ( label ):
   return label
 
 def draw ( element, filename="bla.pdf" ):
-  """ plot a lessagraph, write into pdf file called <filename> """
+  """ plot a lessagraph, write into pdf/eps file called <filename> """
   from pyfeyn.user import FeynDiagram,Vertex,Point,Fermion,Scalar,CIRCLE,SQUARE,\
     HATCHED135,Circle,pyx
   fd = FeynDiagram()
