@@ -7,7 +7,7 @@ argparser.add_argument ( '-T', nargs='?', help='Tx name, will look up lhe file i
 argparser.add_argument ( '-l', '--lhe', nargs='?', help='lhe file name, supplied directly. Takes precedence over "-T" argument.', type=types.StringType, default='' )
 args=argparser.parse_args()
 
-from Theory import LHEReader, SMSmethods, TopologyBuilder
+from Theory import LHEReader, TopologyBuilder
 from Tools import SMSFeynmanGraphs
 
 filename="../lhe/%s_1.lhe" % args.T

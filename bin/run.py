@@ -3,7 +3,7 @@
 """ another sandbox to try things out """
 
 import set_path, argparse
-from Theory import LHEReader, SMSDecomp, SMSmethods, TopologyBuilder, SMSDataObjects
+from Theory import LHEReader, SMSDecomp, TopologyBuilder, SMSDataObjects
 from Experiment import TxNames
 import Experiment.SMSAnalysisFactory as Analyses
 ## import SMSanalyses as Analyses
@@ -19,7 +19,7 @@ print "[run.py] done loading %d analyses" % len(ListOfAnalyses)
 lhefile="../lhe/T2_1.lhe"
 # lhefile="T2_100.lhe"
 reader=LHEReader.LHEReader ( lhefile, 1 )
-SMSTopList=[]
+SMSTopList=SMSDataObjects.TopologyList()
 for Event in reader:
   print Event
   SMSTops=TopologyBuilder.fromEvent ( Event )
@@ -28,8 +28,7 @@ for Event in reader:
   for SMSTop in SMSTops:
     SMSTop.checkConsistency(verbose=True)
     print "SMSTop.leadingElement=",SMSTop.leadingElement()
-    SMSmethods.AddToList ( SMSTop, SMSTopList )
-    #  element=SMSTop.leadingElement()
+    SMSTopList.add ( SMSTop )
     for element in SMSTop.elements():
       print "======================="
       tx=TxNames.getTx(element)
@@ -39,7 +38,7 @@ for Event in reader:
 
 print
 print
-for SMSTop in SMSTopList: 
+for SMSTop in SMSTopList.topos:
   print "SMSTopList SMS topology",SMSTop
   element=SMSTop.leadingElement() 
   print "SMSTopList leading element",element

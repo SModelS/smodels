@@ -8,7 +8,7 @@ argparser.add_argument ( '-l', '--lhe', nargs='?', help='lhe file name, supplied
 argparser.add_argument ( '-o', '--output', nargs='?', help='output file, can be pdf or eps', type=types.StringType, default='out.pdf' )
 args=argparser.parse_args()
 
-from Theory import LHEReader, SMSmethods, TopologyBuilder
+from Theory import LHEReader, TopologyBuilder
 from Tools import SMSFeynmanGraphs
 
 filename="../lhe/%s_1.lhe" % args.T
