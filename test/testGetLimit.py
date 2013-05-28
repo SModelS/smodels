@@ -8,7 +8,8 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8):
   """ recreate ROOT TH2F histogram of a given analysis and topology
         needs mz for a topology with intermediate mass,
         axes, for histograms with axes different from M1-M0
-        if line=True is selected, returns histogram and exclusion line """
+        if line=True is selected, produce rootfile with produced histograms
+        and line, return filename"""
 
   toponame=topo
   run1=SMSResults.getRun(ana)
@@ -87,13 +88,5 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8):
     exclusion=ROOTTools.getTGraphfromContour(hL)
     exclusion.Write()
     f1.Close()
-#    f2=ROOT.TFile("/afs/hephy.at/user/w/walten/public/sms/%s/%s/sms.root" % (run1, ana))
-#    orig_exclusion=f2.Get("exclusion_%s" % toponame)
-#    c1=ROOT.TCanvas()
-#    h.Draw("COLZ")
-#    exclusion.Draw("SAME")
-#    orig_exclusion.Draw("SAME")
-#    c1.Print("../plots/%s_%s.png" %(ana,topo))
-#    f2.Close()
     return "%s.root" %topo
   return h
