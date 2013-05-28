@@ -2,6 +2,7 @@
 
 import pyslha2
 import tempfile
+import os
 
 def createSLHAFile(topo, masses, filename = None):
    """ creates an SLHA File for a certain Tx name and certain masses.
@@ -11,7 +12,7 @@ def createSLHAFile(topo, masses, filename = None):
        random filename will be generated. return is the filename in string 
        format"""
 
-   slha = pyslha2.readSLHAFile('slha/%s.slha' %topo)
+   slha = pyslha2.readSLHAFile('../slha/%s.slha' %topo)
 
    for pid in masses:
       slha[0]['MASS'].entries[pid] = masses[pid]
