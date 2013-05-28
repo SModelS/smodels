@@ -2,7 +2,8 @@ def decompose(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassgap
   """ Do SLHA-based decomposition.
   slhafile = file with mass spectrum and branching ratios
   Xsec = dictionary with cross-sections for pair production
-  sigcut = minimum sigma*BR to be generated. """
+  sigcut = minimum sigma*BR to be generated. 
+  output is a TopologyList. """
   import sys, os, copy
 
   workdir = os.getcwd() 
@@ -130,13 +131,12 @@ def decompose(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassgap
 
           TopList = []
           TopList.append(Top) 
-#Do compression:          
+          # Do compression:          
           if DoCompress or DoInvisible:
              FinalTopList = TopologyBuilder.compressTopology(TopList,DoCompress,DoInvisible,minmassgap)
           else:
             FinalTopList = TopList
-#Add topologies to topology list:
-          for Topi in FinalTopList:
-            SMSTopList.add ( Topi )
+          # Add topologies to topology list:
+          SMSTopList.addList ( FinalTopList )
        
   return SMSTopList    
