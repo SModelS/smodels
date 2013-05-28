@@ -6,7 +6,7 @@ from Experiment import SMSResults, SMSInterpolation, SMSgetlimit, ROOTTools
 from Theory import SMSDataObjects
 from Tools.PhysicsUnits import addunit, rmvunit
 
-def recreateHist(ana,topo,mz=None,axes=None, run='',line=False):
+def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8):
   """ recreate ROOT TH2F histogram of a given analysis and topology
         needs mz for a topology with intermediate mass,
         axes, for histograms with axes different from M1-M0
@@ -29,8 +29,10 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False):
 
   if line:
     hL = ROOT.TH2F('hL','hL',bx,xmin,xmax,by,ymin,ymax)
-    f=ROOT.TFile("%s.root" %topo)#insert correct filename!
-    rXs=f.Get("NAME")#insert name of histogram!
+    f=ROOT.TFile("../data/%s.root" %topo)
+    if tev==8: rXsName="hist8"
+    if tev==7:rXsName="hist7"
+    rXs=f.Get(rXsName)
 
   if line and not rXs:
     print "No refXSec histogram found"
@@ -43,8 +45,8 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False):
   D=None
   L=None
 
-  if mz.find('D')>-1: D=float(mz.split('=')[1])
-  if mz.find('LSP')>-1: L=float(mz[mz.find('P')+1:mz.find('P')+4])
+  if mz and mz.find('D')>-1: D=float(mz.split('=')[1])
+  if mz and mz.find('LSP')>-1: L=float(mz[mz.find('P')+1:mz.find('P')+4])
 
   while x<xmax:
     while y<ymax:
