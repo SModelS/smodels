@@ -3,7 +3,7 @@
 """ another sandbox to try things out """
 
 import set_path, argparse
-from Theory import LHEDecomposer, SMSDataObjects, SMSXSecs
+from Theory import LHEDecomposer, SMSDataObjects, XSecComputer
 from Experiment import TxNames
 import Experiment.SMSAnalysisFactory as Analyses
 from Tools import SMSFeynmanGraphs
@@ -15,7 +15,7 @@ print "[run.py] done loading %d analyses" % len(ListOfAnalyses)
 nevts=1000
 # slhafile="AndreSLHA/andrePT4.slha"
 slhafile="../slha/T2.slha"
-Wv=SMSXSecs.computeXSecs(nevts,slhafile,rpythia = True, donlo = True)
+Wv=XSecComputer.compute(nevts,slhafile,rpythia = True, donlo = True)
 print "Wdic=",Wv["Wdic"]
 print Wv["Xsecdic"]
 lhefile="../lhe/T2_1.lhe"
