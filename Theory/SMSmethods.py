@@ -2,7 +2,6 @@ from ParticleNames import Rodd, Reven, PtcDic, ptype, simParticles
 import copy
 from ClusterTools import sumweights
 
-
 def AddToList(SMSTop,SMSTopList):
   """ Check if elements in SMSTop matches an entry in SMSTopList. If it does,
   add weight.  If the same topology exists, but not the same element, add
@@ -62,32 +61,3 @@ def AddToList(SMSTop,SMSTopList):
     if not SMSTopList[equaltops].addElement(NewEl):
       print "Error adding element"
       print '\n'
-
-
-def strtoel(invar):
-  """ Converts an SMS description string to a nested particle list """
-  st = invar.replace(" ","")
-  st = st[st.find("[[["):st.find("]]]")+3]
-  st_B = []
-  st_B.append(st[2:st.find("]],[[")+1])
-  st_B.append(st[st.find("]],[[")+4:st.find("]]]")+1])
-
-  ptclist = [[],[]]
-  for ib in range(2):
-    while "[" in st_B[ib] or "]" in st_B[ib]:
-      ptcs = st_B[ib][st_B[ib].find("[")+1:st_B[ib].find("],[")].split(",")
-
-#Syntax check:
-      for ptc in ptcs:
-        if not ptc in Reven.values() and not PtcDic.has_key(ptc):
-          print "[strtoel]: Unknown particle:",ptc
-          return False
-
-      ptclist[ib].append(ptcs)
-      sptcs = str(ptcs).replace("'","")
-      sptcs = str(sptcs).replace(" ","")
-      st_B[ib] = st_B[ib].replace(sptcs,"",1)
-
-  #print "ptclist=",ptclist
-  return ptclist
-

@@ -1,6 +1,5 @@
 """ all data classes necessary to create a SModelS description of events """
 
-from SMSmethods import strtoel
 import ClusterTools
 from ParticleNames import Reven, PtcDic, simParticles
 from AuxiliaryFunctions import Ceval
@@ -15,7 +14,7 @@ class BElement:
     self.momID = 0
     if type(S)==type(""):
       st = S.replace(" ","")
-      # print "[SMSmethods.py] Construct a BElement from a string: st=",st
+      # print "[SMSDataObjects.py] Construct a BElement from a string: st=",st
       while "[" in st or "]" in st:
         ptcs = st[st.find("[")+1:st.find("],[")].split(",")
         for ptc in ptcs:
@@ -25,12 +24,15 @@ class BElement:
         spcts=str(ptcs).replace("'","").replace(" ","")
         st=st.replace(spcts,"",1)
         self.particles.append ( ptcs )
-      # print "[SMSmethods] ptcs=",ptcs
+      # print "[SMSDataObjects] ptcs=",ptcs
 
   def isEqual ( ElA, elB, order=True ):
     if simParticles(ElA.particles,ElB.particles,useDict=False): return False
     if ElA.masses != ElB.masses: return False
     return True
+
+  def __eq__ ( self, other ):
+    return self.isEqual ( other )
 
   def isSimilar ( self, elB, order=True, igmass=False ):
     """ compare elB with self.
@@ -81,6 +83,13 @@ class EElement:
         vertparts[len(vertparts)-1].append(0)  #Append 0 for stable LSP
     return {"vertnumb" : vertnumb, "vertparts" : vertparts}
 
+  def allParticles ( self ):
+    """ returns all particles from all branches """
+    ret=[]
+    for b in self.B:
+      ret.append ( b.particles )
+    return ret
+
   def isSimilar ( ElA, ElB,order=True,igmass=False ):
     """ Compare two EElements
         If particles are similar and all masses equal, returns True,
@@ -113,7 +122,7 @@ class EElement:
     return True
 
   def isEqual ( ElA, ElB,order=True,igmass=False ):
-    """ Compare two BElements or Eelements.
+    """ Compare two EElements
         If all masses and particles are equal, returns True,
         otherwise returns False
         If order = False, test both branch orderings (for an element doublet only) """
@@ -139,6 +148,9 @@ class EElement:
         if El1[i].masses != El2[i].masses: return False
 
     return True
+
+  def __eq__ ( self, other ):
+    return self.isEqual ( other )
 
   def __str__ ( self ):
     """ returns the canonical name of the element, e.g. [[jet],[jet]] """
@@ -186,12 +198,12 @@ class GTop:
     for element in self.ElList:
       info=element.getEinfo()
       if self.vertnumb!=info["vertnumb"]:
-        if verbose: print "[SMSmethods.py] inconsistent topology!!!"
+        if verbose: print "[SMSDataObjects.py] inconsistent topology!!!"
         return False
       if self.vertparts!=info["vertparts"]:
-        if verbose: print "[SMSmethods.py] inconsistent topology!!!"
+        if verbose: print "[SMSDataObjects.py] inconsistent topology!!!"
         return False
-    if verbose: print "[SMSmethods.py] topology is consistent."
+    if verbose: print "[SMSDataObjects.py] topology is consistent."
     return True
 
   def isEqual ( self, Top2, order=False ):
@@ -210,6 +222,9 @@ class GTop:
       if x1 == xA and x2 == xB: return True
       if x1 == xB and x2 == xA: return True
       return False
+
+  def __eq__ ( self, other ):
+    return self.isEqual ( other )
 
 #Adds Eelement to ElList
 #OBS: NewElement must have the correct branch ordering!
@@ -236,7 +251,9 @@ class GTop:
     iels = 0
     while "[[[" in outstr:  #String has element
       st = outstr[outstr.find("[[["):outstr.find("]]]")+3] #Get duplet
-      ptclist = strtoel(st)   # Get particle list
+      element=EElement ( st )
+      # ptclist = strtoel(st)   # Get particle list
+      ptclist = element.allParticles()
   #Syntax checks:
       for ib in range(2):
         for ptcL in ptclist[ib]:
@@ -415,7 +432,9 @@ class EAnalysis:
         while "[" in con:  #String has element        
           st = con[con.find("[[["):con.find("]]]")+3] #Get duplet
           con = con.replace(st,"")  # Remove element duplet
-          ptclist = strtoel(st)   # Get particle list
+          element=EElement ( st )
+          ptclist = element.allParticles()
+          ## ptclist = strtoel(st)   # Get particle list
 #Syntax checks:
           for ib in range(2):
             for ipt in range(len(ptclist[ib])):
@@ -432,11 +451,12 @@ class EAnalysis:
     ListOfStrs = set(ListOfStrs)
 #Now add all elements to element list    
     while len(ListOfStrs) > 0:
-      ptclist = strtoel(ListOfStrs.pop()) 
-      NewEl = EElement()
-      NewEl.B = [BElement(),BElement()]      
-      for ib in range(2):
-        NewEl.B[ib].particles = ptclist[ib]
+      NewEl=EElement ( ListOfStrs.pop() )
+      #ptclist = strtoel(ListOfStrs.pop()) 
+      #NewEl = EElement()
+      #NewEl.B = [BElement(),BElement()]      
+      #for ib in range(2):
+      #  NewEl.B[ib].particles = ptclist[ib]
       self.Top.ElList.append(NewEl)
   
   
@@ -449,7 +469,7 @@ class EAnalysis:
     if run == "": run = None  #If run has not been defined, use latest
     for res in self.results.keys():
       if not self.plots.has_key(res):
-        if verbose: print "SMSmethods.py: GetPlots: Plot for result",res,"in Analysis",self.label,"not found"
+        if verbose: print "[SMSDataObjects.GetPlots] Plot for result",res,"in Analysis",self.label,"not found"
         topo = ""
         ana = []
       else:
@@ -458,7 +478,7 @@ class EAnalysis:
         
       for ana in analyses:
         if not SMSResults.exists(ana,topo,run):
-          if verbose: print "SMSmethods.py: GetPlots: Histogram for ",topo," in ",ana," for run ",run," not found"
+          if verbose: print "[SMSDataObjects.GetPlots] Histogram for ",topo," in ",ana," for run ",run," not found"
 
   #Loop over all elements in SMSTopList and add the weight to the 
   #matching elements in Analysis.

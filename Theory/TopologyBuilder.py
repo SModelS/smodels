@@ -5,7 +5,6 @@ def compressTopology(ETopList,DoCompress,DoInvisible,minmassgap):
       can be compressed no more.
       Returns a list with the old toplogies and the compressed ones.
       To avoid double counting the input list should have a single element. """
-  import SMSmethods
 
 #Keep compressing the topologies generated so far until no new compressions can happen:
   if len(ETopList) > 0:
@@ -30,7 +29,7 @@ def compressTopology(ETopList,DoCompress,DoInvisible,minmassgap):
 #(look for effective LSP, such as LSP + neutrino = LSP')      
     if DoInvisible:
       for Top in ETopList:
-        ETopInComp = Top.invisibleCompressedTopology()# SMSmethods.InvCompTop(Top)
+        ETopInComp = Top.invisibleCompressedTopology()
         if ETopInComp:
           exists = False
           for Topp in ETopList:
