@@ -617,6 +617,9 @@ class TopologyList:
   def __getitem__ ( self, n ):
     return self.topos[n]
 
+  def addList ( self, List ):
+    for topo in List: self.add ( topo )
+
   def add ( self, topo ):
     """ Check if elements in topo matches an entry in self.topos. If it does,
     add weight.  If the same topology exists, but not the same element, add

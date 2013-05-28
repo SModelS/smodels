@@ -3,7 +3,7 @@
 """ another sandbox to try things out """
 
 import set_path, argparse
-from Theory import LHEReader, SMSDecomp, TopologyBuilder, SMSDataObjects
+from Theory import LHEReader, TopologyBuilder, SMSDataObjects
 from Experiment import TxNames
 import Experiment.SMSAnalysisFactory as Analyses
 ## import SMSanalyses as Analyses
