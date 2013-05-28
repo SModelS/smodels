@@ -72,7 +72,8 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8):
 
       if line:
         if v and v<rXs.GetBinContent(rXs.FindBin(x)):
-          hL.Fill(x,y)
+          hL.Fill(x,y,0)
+        else: hL.Fill(x,y)
 
       y+=bwy
     y=ymin+bwy/2
@@ -86,13 +87,13 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8):
     exclusion=ROOTTools.getTGraphfromContour(hL)
     exclusion.Write()
     f1.Close()
-    f2=ROOT.TFile("/afs/hephy.at/user/w/walten/public/sms/%s/%s/sms.root" % (run1, ana))
-    orig_exclusion=f2.Get("exclusion_%s" % toponame)
-    c1=ROOT.TCanvas()
-    h.Draw("COLZ")
-    exclusion.Draw("SAME")
-    orig_exclusion.Draw("SAME")
-    c1.Print("../plots/%s_%s.png" %(ana,topo))
-    f2.Close()
+#    f2=ROOT.TFile("/afs/hephy.at/user/w/walten/public/sms/%s/%s/sms.root" % (run1, ana))
+#    orig_exclusion=f2.Get("exclusion_%s" % toponame)
+#    c1=ROOT.TCanvas()
+#    h.Draw("COLZ")
+#    exclusion.Draw("SAME")
+#    orig_exclusion.Draw("SAME")
+#    c1.Print("../plots/%s_%s.png" %(ana,topo))
+#    f2.Close()
     return "%s.root" %topo
   return h
