@@ -9,7 +9,7 @@ def decompose(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassgap
   workdir = os.getcwd() 
   pyslhadir = workdir + "/pyslha-1.4.3"
   sys.path.append(pyslhadir)
-  import pyslha, TopologyBuilder, SMSDataObjects, ParticleNames
+  import TopologyBuilder, SMSDataObjects, ParticleNames
   from Tools.PhysicsUnits import addunit, rmvunit
 
   if DoCompress and rmvunit(minmassgap,'GeV') == -1: 
