@@ -50,8 +50,8 @@ def computeXSecs(nevts,slhafile,rpythia = True, donlo = True, basedir=None):
   weight_8 = {}
   sigma_8 = {}
   for key in n8_evts.keys():
-    weight_8.update({key : total_cs8/nevts})  #Weight for one event
-    sigma_8.update({key : n8_evts[key]*total_cs8/nevts})   #Production cross-section
+    weight_8[key]= total_cs8/nevts  #Weight for one event
+    sigma_8[key]=n8_evts[key]*total_cs8/nevts #Production cross-section
 
 #Get 7 TeV event decomposition:
   n7_evts={}
@@ -127,8 +127,6 @@ def computeXSecs(nevts,slhafile,rpythia = True, donlo = True, basedir=None):
   CMdic = {'7 TeV (LO)': addunit(7.,'TeV'), '8 TeV (LO)': addunit(8.,'TeV')}
   if donlo:
     CMdic.update({'7 TeV (NLO)': addunit(7.,'TeV'), '8 TeV (NLO)': addunit(8.,'TeV')})
-  
-
   return {"Wdic" : Wdic, "lhefile" : lhefile, "Xsecdic" : Xsecdic, "CMdic" : CMdic}  
   
   
