@@ -147,11 +147,11 @@ def getBinWidthY ( analysis, topo, run=None ):
   w=histo.GetYaxis().GetBinWidth(1)
   return SMSHelpers.addunit ( w, "GeV" )
 
-def getExclusionLine(topo,ana,expected=False,plusminussigma=0,extendedinfo=True,xvalue=None,factor=1.0):
+def getExclusionLine(topo,ana,expected=False,plusminussigma=0,extendedinfo=False,xvalue=None,factor=1.0):
   """ get the exclusion line, as a TGraph """
   if xvalue==None: xvalue=''
   import SMSResultsCollector
-  ex=SMSResultsCollector.exclusionline(topo,ana,xvalue,expected,plusminussigma)
+  ex=SMSResultsCollector.exclusionline(topo,ana,xvalue,factor=1.0,extendedinfo=extendedinfo,expected=expected,plusminussigma=plusminussigma)
   return ex
 
 def getTopologies ( analysis, run=None ):
