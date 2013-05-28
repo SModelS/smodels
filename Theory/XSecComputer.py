@@ -186,3 +186,15 @@ def runPythia ( slhafile, n, sqrts=7, datadir="./data/", etcdir="./etc/",
 #        print "  `-- masterkey=",masterkey
   return { "xsecfb": xsecfb }
 
+def clean ( datadir ):
+  """ simple routine that can help to clean up after having computed everything """
+  import os
+  for i in os.listdir ( datadir ): 
+    try:
+      os.unlink ( datadir + "/" + i )
+    except Exception,e:
+      print "[XSecComputer] error, cannot unlink %s/%s: %s" % ( datadir, i, e )
+  try:
+    os.rmdir ( datadir )
+  except Exception,e:
+    print "[XSecComputer] error, cannot rmdir %s: %s" % ( datadir, e )
