@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import set_path
 import ROOT
 from Experiment import SMSResults, SMSInterpolation, SMSgetlimit, ROOTTools
@@ -79,5 +77,11 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8):
     y=ymin+bwy/2
     x+=bwx
 
-  if line: return h, ROOTTools.getTGraphfromContour(hL)
+  f.Close()
+  if line:
+    f1=ROOT.TFile("%s.root" % topo,"recreate")
+    h.Write()
+    ROOTTools.getTGraphfromContour(hL).Write()
+    f1.Close()
+    return "%s.root" %topo
   return h
