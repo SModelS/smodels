@@ -5,14 +5,20 @@ from TestTools import ok
 
 def run ( Nr ):
   File="test%d.py" % Nr
-  print "%s" % ( File ),
+  print "%d:" % Nr,
   user=os.getlogin()
   logfile="/tmp/%s%d.log" % ( user, Nr )
-  os.system ( "python %s > %s" % ( File, logfile ) )
+  oldstdout=sys.stdout
+  sys.stdout=open(logfile,"w")
+  exec("import test%d" % Nr)
+  sys.stdout.close()
+  sys.stdout=oldstdout
+  doc=eval("test%d.__doc__" % Nr)
+  # os.system ( "python %s > %s" % ( File, logfile ) )
   cmd="diff %d.log %s" % ( Nr, logfile )
   out=commands.getoutput( cmd )
   ret=ok ( "", out, False )
-  print ret
+  print doc,ret
   if ret.find("failed")>-1:
     print "try this:\n%s" % cmd
   else:
