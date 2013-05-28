@@ -28,6 +28,7 @@ ROOT.gStyle.SetPadRightMargin(0.15)
 
 tevIn=8
 if args.tev: tevIn=args.tev
+tevIn=SMSResultsCollector.getSqrts(args.ana)
 run1=SMSResults.getRun(args.ana)
 
 rootname = testGetLimit.recreateHist(args.ana, args.topo, mz=args.mz, axes=args.axes, line=True, tev=tevIn)
