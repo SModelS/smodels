@@ -4,8 +4,15 @@ import os, sys
 
 def create ( Nr ):
   File="test%d.py" % Nr
-  print "%d -> %s" % ( Nr, File )
-  os.system ( "python %s | tee %d.log" % ( File, Nr ) )
+  print "%d -> %s" % ( Nr, File ),
+  os.system ( "python %s > %d.log" % ( File, Nr ) )
+  oldstdout=sys.stdout
+  sys.stdout=open("/dev/null","w")
+  exec("import test%d" % Nr)
+  sys.stdout.close()
+  sys.stdout=oldstdout
+  doc=eval("test%d.__doc__" % Nr)
+  print doc
 
 if len(sys.argv)>1:
   for i in sys.argv[1:]:
