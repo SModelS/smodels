@@ -2,7 +2,7 @@
 
 """ another sandbox to try things out """
 
-import set_path, argparse
+import set_path, argparse, tempfile
 from Theory import LHEDecomposer, SMSDataObjects, XSecComputer
 from Experiment import TxNames
 import Experiment.SMSAnalysisFactory as Analyses
@@ -15,7 +15,10 @@ print "[run.py] done loading %d analyses" % len(ListOfAnalyses)
 nevts=1000
 # slhafile="AndreSLHA/andrePT4.slha"
 slhafile="../slha/T2.slha"
-Wv=XSecComputer.compute(nevts,slhafile,rpythia = True, donlo = True)
+Tmp=tempfile.mkdtemp()
+print "Tmp=",Tmp
+Wv=XSecComputer.compute(nevts,slhafile,rpythia = True, donlo = True, datadir=Tmp)
+# os.unlink(Tmp)
 print "Wdic=",Wv["Wdic"]
 print Wv["Xsecdic"]
 lhefile="../lhe/T2_1.lhe"

@@ -19,6 +19,9 @@ def compute(nevts,slhafile,rpythia = True, donlo = True, basedir=None,datadir=No
       basedir=basedir[:basedir.find("SMSDecomposition")+16]+"/"
   if datadir==None:
     datadir=basedir+"/data"
+  if not os.path.exists ( datadir ):
+    print "[XSecComputer.py] directory",datadir,"does not exist. Please create."
+    return None
     
   nllbase=basedir+"/nllfast"
   installdir=basedir
