@@ -16,9 +16,8 @@ nevts=1000
 # slhafile="AndreSLHA/andrePT4.slha"
 slhafile="../slha/T2.slha"
 Tmp=tempfile.mkdtemp()
-print "Tmp=",Tmp
 Wv=XSecComputer.compute(nevts,slhafile,rpythia = True, donlo = True, datadir=Tmp)
-# os.unlink(Tmp)
+XSecComputer.clean ( Tmp )
 print "Wdic=",Wv["Wdic"]
 print Wv["Xsecdic"]
 lhefile="../lhe/T2_1.lhe"
