@@ -2,7 +2,7 @@
 
 import sys
 from prettytable import PrettyTable
-from Theory import SMSDecomp, SMSxsec, ClusterTools
+from Theory import LHEDecomposer, SLHADecomposer, SMSxsec, ClusterTools
 from Tools.PhysicsUnits import addunit, rmvunit
 from Tools import SMSPrettyPrinter, VariousHelpers
 from Tools.SMSPrettyPrinter import wrap
@@ -46,9 +46,9 @@ if DoSLHAdec:
   else:
     sigmacut = addunit(0.1,'fb')
   if DoCompress or DoInvisible: sigmacut = sigmacut/10.  #When compression is turned on, relax sigmacut
-  SMSTopList = SMSDecomp.SLHAdecomp(slhafile,Xsec,sigmacut,DoCompress,DoInvisible,minmassgap)
+  SMSTopList = SLHADecomposer.decompose(slhafile,Xsec,sigmacut,DoCompress,DoInvisible,minmassgap)
 else:
-  SMSTopList = SMSDecomp.LHEdecomp(lhefile,W,nevts,DoCompress,DoInvisible,minmassgap)
+  SMSTopList = LHEDecomposer.decompose(lhefile,W,nevts,DoCompress,DoInvisible,minmassgap)
 
 
 EvTop_table = PrettyTable(["Topology","#Vertices", "#Insertions", "#Elements", "Sum of weights"])
