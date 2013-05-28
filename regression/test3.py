@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
-""" starting from a Tx.lhe file, we SmodelS-decompose the event, and 
-obtain its Tx name from the SModelS description of the event: a closure test. """
+""" starting from a Tx.lhe file, we SmodelS-decompose the event, and obtain its
+Tx name from the SModelS description of the event: a closure test. And a
+regression test. """
 
 import set_path
 from Experiment import TxNames

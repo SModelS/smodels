@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+""" This is SMSmain.py, turned into a regression test. """
+
 import sys, set_path
 from prettytable import PrettyTable
 from Theory import LHEDecomposer, SLHADecomposer, XSecComputer, ClusterTools
