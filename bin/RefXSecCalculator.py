@@ -2,7 +2,7 @@
 
 import set_path
 import ROOT, os
-import Theory.SMSxsec as XSEC
+import Theory.SMSXSecs as XSEC
 import Theory.SLHATools as SLHA
 import Experiment.SMSResults as SMS
 import Tools.PhysicsUnits as UNIT
@@ -60,7 +60,7 @@ while m < x_up-12.5:
 #   print m
    masses = {pidlsp: mlsp, pidmom: m}
    slhafile = SLHA.createSLHAFile(topo, masses)
-   dic = XSEC.pytinit(nevts, slhafile)
+   dic = XSEC.computeXSecs(nevts, slhafile)
 #   print dic
    if dic['Xsecdic']['7 TeV (NLO)'].has_key((-pidmom,pidmom)):
       xs7 = UNIT.rmvunit(dic['Xsecdic']['7 TeV (NLO)'][(-pidmom,pidmom)], 'fb')

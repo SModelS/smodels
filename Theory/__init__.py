@@ -2,4 +2,4 @@
     as well as the sms decomposition code and some more tools """
 
 # we import only what we want to be usable from outside this module
-import SLHATools, SMSxsec, LHEReader, LHEDecomposer, SLHADecomposer, ClusterTools, ParticleNames
+import SLHATools, SMSXSecs, LHEReader, LHEDecomposer, SLHADecomposer, ClusterTools, ParticleNames
