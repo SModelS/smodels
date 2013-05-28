@@ -1,5 +1,5 @@
-try to run pythia_lhe at sqrt(s)=8 with 10000 events
-try to run pythia_lhe at sqrt(s)=7 with 10000 events
+[SMSXSecs.runPythia] try to run pythia_lhe at sqrt(s)=8 with 10000 events
+[SMSXSecs.runPythia] try to run pythia_lhe at sqrt(s)=7 with 10000 events
 Number of Global topologies =  12
 +----------+-----------+------------------------+-----------+--------------------------------+
 | Topology | #Vertices |      #Insertions       | #Elements |         Sum of weights         |
