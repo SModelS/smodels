@@ -14,7 +14,7 @@ pidlsp = 1000022 #lsp
 
 SMS.considerRuns(["8TeV", "2012", "2011"])
 analyses = SMS.getAnalyses(topo)
-print analyses
+#print analyses
 
 x_low = 100000.
 y_low = 100000.
@@ -42,21 +42,39 @@ mlsp = 0.
 i = 0.
 step = 25.
 m = 0.
-#y_low, y_up unnoetig weil lsp masse fix angenommen (sinnvolle annahme?)
-#while m < x_up-12.5:
-while i < 2:
+
+
+rootfile = ROOT.TFile('../data/%s.root' %topo, 'recreate')
+txtfile7 = open('../data/%s7TeV.txt' %topo,'w')
+txtfile8 = open('../data/%s8TeV.txt' %topo,'w')
+txtfile7.write('mass[%s]      RefXSec[fb]\n' %pidmom)
+txtfile8.write('mass[%s]      RefXSec[fb]\n' %pidmom)
+
+hist7 = ROOT.TH1F('hist7', 'refxsec7', int((x_up-x_low)/step) , x_low, x_up)
+hist8 = ROOT.TH1F('hist8', 'refxsec8', int((x_up-x_low)/step) , x_low, x_up)
+
+while m < x_up-12.5:
+#  while i < 2:
    m = (x_low+12.5)+step*i
    i += 1
 #   print m
    masses = {pidlsp: mlsp, pidmom: m}
    slhafile = SLHA.createSLHAFile(topo, masses)
-   wkdir = os.getcwd()
-   os.chdir('../')
-   print wkdir, os.getcwd()
    dic = XSEC.pytinit(nevts, slhafile)
-   os.chdir(wkdir)
-   print dic
-   if dic['Xsecdic']['7 TeV (NLO)'].has_key((pdgmom,pdgmom)):
-      xs7 = dic['Xsecdic']['7 TeV (NLO)'][(pdgmom,pdgmom)]
-      print xs7
-   xs8 = dic['Xsecdic']['8 TeV (NLO)'][(pdg1,pdg2)]
+#   print dic
+   if dic['Xsecdic']['7 TeV (NLO)'].has_key((-pidmom,pidmom)):
+      xs7 = UNIT.rmvunit(dic['Xsecdic']['7 TeV (NLO)'][(-pidmom,pidmom)], 'fb')
+#      print xs7
+      hist7.Fill(masses[pidmom], xs7)
+      txtfile7.write('%f      %f\n' %(masses[pidmom], xs7))
+   if dic['Xsecdic']['8 TeV (NLO)'].has_key((-pidmom,pidmom)):
+      xs8 = UNIT.rmvunit(dic['Xsecdic']['8 TeV (NLO)'][(-pidmom,pidmom)], 'fb')
+#      print xs8
+      hist8.Fill(masses[pidmom], xs8)
+      txtfile8.write('%f      %f\n' %(masses[pidmom], xs8))
+
+txtfile7.close()
+txtfile8.close()
+
+hist7.Write()
+hist8.Write()
