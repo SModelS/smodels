@@ -5,7 +5,8 @@
 import set_path
 from Experiment import SMSResults
 
-SMSResults.ResultsForSqrts ( 0 )
+#SMSResults.ResultsForSqrts ( 0 )
+SMSResults.considerRuns()#if not all runs should be considered, give list of runs to be considered as argument
 
 All=SMSResults.getAllResults()
 
