@@ -11,7 +11,7 @@ import Experiment.SMSResults as SMS
 import Tools.PhysicsUnits as UNIT
 
 topo = 'T2bb'
-nevts = 1000
+nevts = 10000
 pidmom = 1000005 #sbottom
 pidlsp = 1000022 #lsp
 
@@ -56,9 +56,6 @@ txtfile8.write('mass[%s]      RefXSec[fb]\n' %pidmom)
 hist7 = ROOT.TH1F('hist7', 'refxsec7', int((x_up-x_low)/step) , x_low, x_up)
 hist8 = ROOT.TH1F('hist8', 'refxsec8', int((x_up-x_low)/step) , x_low, x_up)
 
-
-x_up=950.
-
 while m < x_up-12.5:
 #while i < 2:
    m = (x_low+12.5)+step*i
@@ -74,13 +71,13 @@ while m < x_up-12.5:
 #      print xs7
       hist7.Fill(masses[pidmom], xs7)
       txtfile7.write('%f      %f\n' %(masses[pidmom], xs7))
-      txtfile7.flush()
+      #txtfile7.flush()
    if dic['Xsecdic']['8 TeV (NLO)'].has_key((-pidmom,pidmom)):
       xs8 = UNIT.rmvunit(dic['Xsecdic']['8 TeV (NLO)'][(-pidmom,pidmom)], 'fb')
 #      print xs8
       hist8.Fill(masses[pidmom], xs8)
       txtfile8.write('%f      %f\n' %(masses[pidmom], xs8))
-      txtfile8.flush()
+      #txtfile8.flush()
 
 txtfile7.close()
 txtfile8.close()
