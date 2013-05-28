@@ -2,7 +2,7 @@
 
 import sys
 from prettytable import PrettyTable
-from Theory import LHEDecomposer, SLHADecomposer, SMSXSecs, ClusterTools
+from Theory import LHEDecomposer, SLHADecomposer, XSecComputer, ClusterTools
 from Tools.PhysicsUnits import addunit, rmvunit
 from Tools import SMSPrettyPrinter, VariousHelpers
 from Tools.SMSPrettyPrinter import wrap
@@ -25,7 +25,7 @@ else:
 nevts = 10000
 #slhafile = "AndreSLHA/andrePT4.slha"
 slhafile = "slha/DESY_stop.slha"
-Wv = SMSXSecs.computeXSecs(nevts,slhafile,rpythia = True, donlo = True)
+Wv = XSecComputer.compute(nevts,slhafile,rpythia = True, donlo = True)
 W = Wv["Wdic"]
 Xsec = Wv["Xsecdic"]
 lhefile = Wv["lhefile"]
