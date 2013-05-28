@@ -66,7 +66,7 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8):
 
       else: massv=[x,y]
 
-      v=rmvunit(SMSgetlimit.GetPlotLimit([massv,massv],[topo,[ana]],a)[0][1],'pb')
+      v=rmvunit(SMSgetlimit.GetPlotLimit([massv,massv],[topo,[ana]],a)[0][1],'fb')
 
       if v: h.Fill(x,y,v)
 
@@ -82,6 +82,7 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8):
   if line:
     f1=ROOT.TFile("%s.root" % topo,"recreate")
     h.Write()
+    hL.Write()
     exclusion=ROOTTools.getTGraphfromContour(hL)
     exclusion.Write()
     f1.Close()
