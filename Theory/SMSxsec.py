@@ -1,3 +1,5 @@
+import NLLxsec
+
 #Runs pythia at 7 and 8 TeV and compute weights for each production
 #process. Returns a dictionary with weights at 7 and 8 TeV and the
 #event file to be used for SMS decomposition.
@@ -64,7 +66,6 @@ def pytinit(nevts,slhafile,rpythia = True, donlo = True):
 
 #Get NLO cross-sections from NLLfast:
   if donlo:
-    import NLLxsec
     sigma_8NLO = {}
     sigma_7NLO = {}
     weight_8NLO = {}
