@@ -155,7 +155,7 @@ def runPythia ( slhafile, n, sqrts=7, datadir="./data/", etcdir="./etc/",
       etcdir is where external_lhe.template is to be picked up,
       installdir is where pythia_lhe is to be found.  """
   import commands
-  print "[SMSXSecs.runPythia] try to run pythia_lhe at sqrt(s)=%d with %d events" % (sqrts,n)
+  # print "[SMSXSecs.runPythia] try to run pythia_lhe at sqrt(s)=%d with %d events" % (sqrts,n)
   o=commands.getoutput ( "cp %s %s/fort.61" % ( slhafile, datadir ) )
   if len(o)>0:
     print "[SMSXSecs.py] runPythia error",o
