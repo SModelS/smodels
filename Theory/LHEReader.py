@@ -57,7 +57,8 @@ class LHEReader:
         particle = SMSEvent.Particle()
         linep = [float(x) for x in line.split()]
         if len(linep)<11:
-          print "[LHEReader] dont understand the following line >>%s<<" % line
+          print "[LHEReader] dont understand the following line >>%s<< in %s" % (line, self.filename )
+          line=self.File.readline()
           continue
         particle.pdg = int(linep[0])
         particle.status = int(linep[1])
