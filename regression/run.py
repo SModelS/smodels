@@ -12,8 +12,11 @@ def run ( Nr ):
   cmd="diff %d.log %s" % ( Nr, logfile )
   out=commands.getoutput( cmd )
   ret=ok ( "", out, False )
-  os.unlink ( logfile )
   print ret
+  if ret.find("failed")>-1:
+    print "try this:\n%s" % cmd
+  else:
+    os.unlink ( logfile )
 
 if len(sys.argv)>1:
   for i in sys.argv[1:]:
