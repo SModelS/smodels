@@ -1,13 +1,11 @@
-import NLLXSec
+def computeXSecs(nevts,slhafile,rpythia = True, donlo = True):
+  """ Runs pythia at 7 and 8 TeV and compute weights for each production
+  process. Returns a dictionary with weights at 7 and 8 TeV and the
+  event file to be used for SMS decomposition.
+  If runpythia = False, read old fort_8,7.68 files and assumes 
+  total xsec = 1 (only useful for fast debugging) """
 
-#Runs pythia at 7 and 8 TeV and compute weights for each production
-#process. Returns a dictionary with weights at 7 and 8 TeV and the
-#event file to be used for SMS decomposition.
-#If runpythia = False, read old fort_8,7.68 files and assumes 
-# total xsec = 1 (only useful for fast debugging)
-def pytinit(nevts,slhafile,rpythia = True, donlo = True):
-
-  import shutil, LHEReader
+  import shutil, LHEReader, NLLXSec
   from Tools.PhysicsUnits import addunit
   
   if rpythia:
@@ -162,7 +160,7 @@ def runPythiaLHE ( n, slhafile, sqrts=7 ):
   etcdir="etc/"
   o=commands.getoutput ( "cp %s %s/fort.61" % ( slhafile, datadir ) )
   if len(o)>0:
-    print "[SMSxsec.py] runPythiaLHE error",o
+    print "[SMSXSecs.py] runPythiaLHE error",o
   f=open(etcdir+"/external_lhe.template") 
   lines=f.readlines()
   f.close()
