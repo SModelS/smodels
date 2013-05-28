@@ -52,9 +52,10 @@ for Analysis in ListOfAnalyses:
   print "------------- Analysis Label = ",Analysis.label, Analysis.sqrts, Analysis.Top
   print "    `-- element ",Analysis.Top.leadingElement()
   print "    `-- ",Analysis.Top.leadingElement().B[0]
-  S=SMSmethods.strtoel ( "[[[jet]],[[jet]]]" )
-  ## e=SMSmethods.EElement ( "[[['jet','jet'],['jet']],[['jet']]]" )
-  e=SMSDataObjects.EElement ( "[[[jet,jet]],[[jet]]]" )
-  print "S=",S,"e=",e
+  d="[[[jet]],[[jet]]]"
+  #d="[[['jet','jet'],['jet']],[['jet']]]"
+  # S=SMSmethods.strtoel ( d )
+  e=SMSDataObjects.EElement ( d )
+  # print "S=",S,"e=",e,Analysis.Top.leadingElement()==e
   #print "              S=``%s'' -> ``%s''" % ( S, Analysis.Top.leadingElement().B[0] )
 

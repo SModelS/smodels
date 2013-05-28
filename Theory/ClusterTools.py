@@ -197,10 +197,10 @@ def MassDist(mass1,mass2):
   xmass1 = SMSgetlimit.GetPlotLimit(mass1,Dana[0],Dana[1],complain=False)
   xmass2 = SMSgetlimit.GetPlotLimit(mass2,Dana[0],Dana[1],complain=False)
   if xmass1==None or xmass1==False:
-    print "[SMSmethods.MassDist] no limit for plot 1"
+    print "[ClusterTools.MassDist] no limit for plot 1"
     return None
   if xmass2==None or xmass2==False:
-    print "[SMSmethods.MassDist] no limit for plot 2"
+    print "[ClusterTools.MassDist] no limit for plot 2"
     return None
 
 

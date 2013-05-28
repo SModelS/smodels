@@ -39,7 +39,7 @@ class LHEReader:
 #Find next event
     while line.find("<event>") == -1:
       if line=='': 
-        # print "[SMSmethods.py] error demanding more events than are available."
+        # print "[LHEReader.py] error demanding more events than are available."
         return None
       line = self.File.readline()
         
