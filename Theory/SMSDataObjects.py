@@ -392,7 +392,7 @@ class GTop:
             if simParticles(ptcB,ptc,useDict=False):
               match = True
               oldweight = NewTop.ElList[iel2].weight
-              NewTop.ElList[iel2].weight = sumweights([oldweight,weight])
+              NewTop.ElList[iel2].weight = ClusterTools.sumweights([oldweight,weight])
               break
           if not match: NewTop.addElement(Elm)
     return NewTop
@@ -600,4 +600,80 @@ class EAnalysis:
     """ evaluate all the analysis'es results """
     for res in self.results:
       self.evaluateResult( res, uselimits )
+
+
+class TopologyList:
+  """ implements a list of topologies, knows how to correctly add 
+      a topology """
+  def __init__ ( self, topos=[] ):
+    """ if List is given, we add all elements of list sequentally """
+    self.topos=[]
+    for topo in topos:
+      self.add ( topo )
+
+  def __len__ ( self ): 
+    return len(self.topos)
+
+  def __getitem__ ( self, n ):
+    return self.topos[n]
+
+  def add ( self, topo ):
+    """ Check if elements in topo matches an entry in self.topos. If it does,
+    add weight.  If the same topology exists, but not the same element, add
+    element.  If neither element nor topology exist, add the new topology and
+    all its elements """
+    import copy
+    for inew in range(len(topo.ElList)):
+      NewEl_a = topo.ElList[inew]
+      NewEl_b = copy.deepcopy(NewEl_a)
+      NewEl_b.B[1] = topo.ElList[inew].B[0]
+      NewEl_b.B[0] = topo.ElList[inew].B[1]   #Check both orderings
+      equaltops = -1
+      equalels = -1
+      i = -1
+      while (equaltops < 0 or equalels < 0) and i < len(self.topos)-1:
+        i += 1
+        if topo.isEqual(self.topos[i],order=False):  #First look for matching topology
+          equaltops = i
+        else: continue
+
+        for j in range(len(self.topos[i].ElList)):  #Search for matching element
+          OldEl = self.topos[i].ElList[j]
+          if OldEl.isEqual(NewEl_a):
+            equalels = j
+            NewEl = NewEl_a
+            break
+          elif OldEl.isEqual(NewEl_b):
+            equalels = j
+            NewEl = NewEl_b
+            break
+
+
+  #If element exists, add weight:
+      if equalels >= 0:
+        if len(OldEl.weight) != len(NewEl.weight):
+          print "Wrong number of weights"
+        else:
+          w1 = OldEl.weight
+          w2 = NewEl.weight
+          self.topos[equaltops].ElList[equalels].weight = ClusterTools.sumweights([w1,w2])
+
+
+
+  #When combining elements, keep the smallest set of PDG mother IDs (not used in the analysis, only relevant to set a standard):
+          if min(abs(NewEl.B[0].momID),abs(NewEl.B[1].momID)) < min(abs(OldEl.B[0].momID),abs(OldEl.B[1].momID)):
+            for ib in range(2): self.topos[equaltops].ElList[equalels].B[ib].momID = NewEl.B[ib].momID
+
+
+  #If topology and/or element does not exist, add:
+    if equaltops == -1:
+      self.topos.append(topo)
+    elif equalels == -1:
+      if topo.isEqual(self.topos[equaltops],order=True):
+        NewEl = NewEl_a
+      else:
+        NewEl = NewEl_b
+      if not self.topos[equaltops].addElement(NewEl):
+        print "Error adding element"
+        print '\n'
 

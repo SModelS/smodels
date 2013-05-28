@@ -1,11 +1,12 @@
-#Do LHE-based decomposition.
-#lhefile = LHE file with pythia events
-#W = dictionary with event weights
-#nevts = number of generated events
+""" The unit in which the decomposition code resides """
+
 def LHEdecomp(lhefile,W,nevts,DoCompress=False,DoInvisible=False,minmassgap=-1):
+  """ Do LHE-based decomposition.
+      lhefile = LHE file with pythia events
+      W = dictionary with event weights
+      nevts = number of generated events """
   import LHEReader, TopologyBuilder
 
-  SMSTopList = []
   reader = LHEReader.LHEReader(lhefile,nevts)
   for iev in range(nevts):
 ##Read event  
@@ -25,10 +26,7 @@ def LHEdecomp(lhefile,W,nevts,DoCompress=False,DoInvisible=False,minmassgap=-1):
 #Get event topology  
     SMSTopListEv = TopologyBuilder.fromEvent(Event, weight, DoCompress, DoInvisible, minmassgap)
   
-#Add event topology to topology list:  
-    for TopEv in SMSTopListEv:  
-      SMSmethods.AddToList(TopEv,SMSTopList)
-      
+    SMSTopList=TopologyList ( SMSTopListEv )
   return SMSTopList
 
 
@@ -137,8 +135,8 @@ def SLHAdecomp(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassga
       WList = copy.deepcopy(NewWeight)
             
 
+  SMSTopList = SMSDataObjects.TopologyList()
 #Combine 1branch elements according to production cross-section:
-  SMSTopList = []  
   for ptcs in Xsec[Xsec.keys()[0]].keys():
     for iel in range(len(FinalList)):
       for jel in range(len(FinalList)):
@@ -172,10 +170,7 @@ def SLHAdecomp(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassga
           else:
             FinalTopList = TopList
 #Add topologies to topology list:
-          import SMSmethods
           for Topi in FinalTopList:
-            SMSmethods.AddToList(Topi,SMSTopList)
-          
-          
+            SMSTopList.add ( Topi )
        
   return SMSTopList    

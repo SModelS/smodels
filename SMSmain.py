@@ -2,7 +2,7 @@
 
 import sys
 from prettytable import PrettyTable
-from Theory import SMSDecomp, SMSmethods, SMSxsec, ClusterTools
+from Theory import SMSDecomp, SMSxsec, ClusterTools
 from Tools.PhysicsUnits import addunit, rmvunit
 from Tools import SMSPrettyPrinter, VariousHelpers
 from Tools.SMSPrettyPrinter import wrap
@@ -60,7 +60,7 @@ totweight = []
 # for i in range(len(SMSTopList)):
 for (i,topo) in enumerate(SMSTopList):
   weightlist = [el.weight for el in topo.ElList]
-  sumw = SMSmethods.sumweights(weightlist)
+  sumw = ClusterTools.sumweights(weightlist)
   totweight.append(sumw)
   EvTop_table.add_row([i,topo.vertnumb,topo.vertparts,len(topo.ElList),wrap(printer.pformat(sumw),width=30)])
   eltot += len(topo.ElList)
@@ -77,7 +77,7 @@ for (i,topo) in enumerate(SMSTopList):
 print "Number of Global topologies = ",len(SMSTopList)      
 print(EvTop_table)
 print "Total Number of Elements = ",eltot
-print "Total weight = ",SMSmethods.sumweights(totweight)
+print "Total weight = ",ClusterTools.sumweights(totweight)
 #print(EvElement_table)
 
 print '\n \n \n'
