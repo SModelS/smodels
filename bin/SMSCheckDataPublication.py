@@ -6,7 +6,8 @@ what digitized results are not yet published """
 import set_path
 from Experiment import SMSResults, SMSHelpers
 
-SMSResults.ResultsForSqrts ( 0 )
+#SMSResults.ResultsForSqrts ( 0 )
+SMSResults.considerRuns()#if not all runs are to be considered, give list of runs as argument
 
 All=SMSResults.getAllResults()
 

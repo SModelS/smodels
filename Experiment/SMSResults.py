@@ -13,6 +13,9 @@ def setLogLevel ( l=[ "error" ] ):
 def useUnits ( b=True ):
   SMSHelpers.useUnits = b
 
+'''
+This function should not be used! Use considerRuns() instead!
+
 def ResultsForSqrts ( sqrts ):
   import SMSResultsCollector
   """ If this is called, only results for a
@@ -31,6 +34,7 @@ def ResultsForSqrts ( sqrts ):
     SMSResultsCollector.alldirectories=[ "8TeV", "2012", "2011", "ATLAS8TeV" ]
     return
   print "[SMSResults.py:ResultsForSqrts] error: dont have any results for",sqrts
+'''
 
 def considerRuns(run = None):
   """ needs runs as a list. if no runs are given, all existing runs will be taken into account"""
