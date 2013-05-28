@@ -3,7 +3,7 @@
 """ another sandbox to try things out """
 
 import set_path, argparse
-from Theory import LHEDecomposer, SMSDataObjects
+from Theory import LHEDecomposer, SMSDataObjects, SMSXSecs
 from Experiment import TxNames
 import Experiment.SMSAnalysisFactory as Analyses
 from Tools import SMSFeynmanGraphs
@@ -12,11 +12,16 @@ print "[run.py] loading analyses ...."
 ListOfAnalyses = Analyses.load( topos="T2" )
 print "[run.py] done loading %d analyses" % len(ListOfAnalyses)
 
-# n=1000
+nevts=1000
 # slhafile="AndreSLHA/andrePT4.slha"
+slhafile="../slha/T2.slha"
+Wv=SMSXSecs.computeXSecs(nevts,slhafile,rpythia = True, donlo = True)
+print "Wdic=",Wv["Wdic"]
+print Wv["Xsecdic"]
 lhefile="../lhe/T2_1.lhe"
 # lhefile="T2_100.lhe"
-topos=LHEDecomposer.decompose ( lhefile, {}, None )
+topos=LHEDecomposer.decompose ( lhefile, Wv["Wdic"], None )
+
 for topo in topos:
     topo.checkConsistency(verbose=True)
     print "topo.leadingElement=",topo.leadingElement()
