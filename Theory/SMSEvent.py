@@ -1,21 +1,5 @@
 """ Simple classes that encapsulate the information of an event """
 
-class Particle:
-    """ simple helper class to encapsulate one particle """ 
-    def __init__(self):
-        self.pdg = 0
-        self.status = 0
-        self.moms = []
-        self.px = 0.
-        self.py = 0.
-        self.pz = 0.
-        self.e = 0.
-        self.mass = 0.
-    def __str__(self):
-        # return "particle pdg %d p=(%f,%f,%f,m=%f) st %d" % ( self.pdg, self.px, self.py, self.pz, self.mass, self.status )
-        return "particle pdg %d p=(%.1f,%.1f,%.1f,m=%.1f) status %d moms %s" % ( self.pdg, self.px, self.py, self.pz, self.mass, self.status, self.moms )
-
-
 class SMSEvent:
   """ a super-simple event class. Basically, it's a list of Particles,
       plus some convenience functions """
@@ -48,4 +32,21 @@ class SMSEvent:
     for p in self.particles:
       ret+=p.__str__()+"\n"
     return ret
+
+class Particle:
+    """ simple helper class to encapsulate one particle """ 
+    def __init__(self):
+        self.pdg = 0
+        self.status = 0
+        self.moms = []
+        self.px = 0.
+        self.py = 0.
+        self.pz = 0.
+        self.e = 0.
+        self.mass = 0.
+    def __str__(self):
+        # return "particle pdg %d p=(%f,%f,%f,m=%f) st %d" % ( self.pdg, self.px, self.py, self.pz, self.mass, self.status )
+        return "particle pdg %d p=(%.1f,%.1f,%.1f,m=%.1f) status %d moms %s" % ( self.pdg, self.px, self.py, self.pz, self.mass, self.status, self.moms )
+
+
       
