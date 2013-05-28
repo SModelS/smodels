@@ -54,7 +54,7 @@ hist7 = ROOT.TH1F('hist7', 'refxsec7', int((x_up-x_low)/step) , x_low, x_up)
 hist8 = ROOT.TH1F('hist8', 'refxsec8', int((x_up-x_low)/step) , x_low, x_up)
 
 while m < x_up-12.5:
-#  while i < 2:
+#while i < 2:
    m = (x_low+12.5)+step*i
    i += 1
 #   print m

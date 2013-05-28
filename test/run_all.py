@@ -15,6 +15,7 @@ for script in scripts:
   if script[-3:]!=".py": continue
   if script=="run_all.py": continue
   if script=="set_path.py": continue
+  if script=="RefXSecCalculator.py": continue
   print "%s: " % ( script ),
   cmd= "python " + Dir + script + " > /dev/null"
   ret=os.system ( cmd )
@@ -30,5 +31,9 @@ print ok ( 0, ret )
 
 os.chdir("test/")
 import commands
-out=commands.getoutput("diff SMSmain.log %s" % tmpfile)
-print "Diff of the logs: %s" % ok ( "", out, False )
+cmd="diff SMSmain.log %s" % tmpfile
+out=commands.getoutput( cmd )
+ret=ok ( "", out, False )
+print "Diff of the logs: %s" % ret
+if ret.find("failed")>-1: 
+  print "try this:\n%s" % cmd

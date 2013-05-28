@@ -1,11 +1,6 @@
 #!/usr/bin/env python
 
-import sys, commands, os, random, numpy
-workdir = os.getcwd()    
-pyslhadir = workdir + "/pyslha-1.4.3"
-sys.path.append(pyslhadir)
-import pyslha
-from string import Template
+import sys, commands, os, pyslha
 from Tools.PhysicsUnits import addunit
 
 #define global variables
@@ -13,36 +8,34 @@ pdf = 'cteq'
 
 
 # method to get the NLL fast results. This is the shortest way to code, I found. 
-def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energy = 8 ):
-    from string import Template
-    
+def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energy = 8, base="./nllfast/" ):
     Values={"sqmass_7TeV":0, "mgmass_7TeV":0,"LOcs_7TeV":False,"NLOcs_7TeV":False,"NLL+NLO_7TeV":False,"K_NLO_7TeV":False,"K_NLL_7TeV":False}
     Values_7TeV={"sqmass_7TeV":0, "mgmass_7TeV":0,"LOcs_7TeV":False,"NLOcs_7TeV":False,"NLL+NLO_7TeV":False,"K_NLO_7TeV":False,"K_NLL_7TeV":False}
     Values_8TeV={"sqmass_8TeV":0, "mgmass_8TeV":0,"LOcs_8TeV":False,"NLOcs_8TeV":False,"NLL+NLO_8TeV":False,"K_NLO_8TeV":False,"K_NLL_8TeV":False}
 
     mass = 0
+
+    wd=os.getcwd()
     
-    if Energy==8:
-        if process=="st": 
-            os.chdir("./nllfast/nllfast-2.1")
-            runnll = Template("./nllfast_8TeV $prodproc $in_pdf $prodsq")
-            s=runnll.substitute(prodproc=process, in_pdf = pdf, prodsq=squarkmass)
-        else: 
-            os.chdir("./nllfast/nllfast-2.1")
-            runnll = Template("./nllfast_8TeV $prodproc $in_pdf $prodsq $prodgl")
-            s=runnll.substitute(prodproc=process, in_pdf = pdf, prodsq=squarkmass, prodgl=gluinomass)
-    if Energy==7:
-        if process=="st": 
-            os.chdir("./nllfast/nllfast-1.2")
-            runnll = Template("./nllfast_7TeV $prodproc $in_pdf $prodsq")
-            s=runnll.substitute(prodproc=process, in_pdf = pdf, prodsq=squarkmass)
-        else:
-            os.chdir("./nllfast/nllfast-1.2")
-            runnll = Template("./nllfast_7TeV $prodproc $in_pdf $prodsq $prodgl")
-            s=runnll.substitute(prodproc=process, in_pdf = pdf, prodsq=squarkmass, prodgl=gluinomass)
-    o=commands.getoutput(s)
-    os.chdir("./../../")
-    
+    try:
+      if Energy==8:
+          if process=="st": 
+              os.chdir("%s/nllfast-2.1" % base )
+              s = "./nllfast_8TeV %s %s %s" % ( process, pdf, squarkmass )
+          else: 
+              os.chdir("%s/nllfast-2.1" % base )
+              s = "./nllfast_8TeV %s %s %s %s" % ( process, pdf, squarkmass, gluinomass )
+      if Energy==7:
+          if process=="st": 
+              os.chdir("%s/nllfast-1.2" % base )
+              s = "./nllfast_7TeV %s %s %s" % ( process, pdf, squarkmass )
+          else:
+              os.chdir("%s/nllfast-1.2" % base )
+              s = "./nllfast_7TeV %s %s %s %s" % ( process, pdf, squarkmass, gluinomass )
+      o=commands.getoutput(s)
+    except Exception,e:
+      pass ## make sure we always chdir back!
+    os.chdir(wd) ## back to where we started
     
     if process=='st' and o[1]=='T' and Energy == 7:
         print Values_7TeV
@@ -67,18 +60,17 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
                 process='sdcpl'
                 mass = squarkmass
             else: return Values_8TeV
-        if Energy==8:
-            os.chdir("./nllfast/nllfast-2.1")
-            runnll = Template("./nllfast_8TeV $prodproc $in_pdf $prodmass")
-            s=runnll.substitute(prodproc=process, in_pdf = pdf, prodmass=mass)
-#            print "decoupling regime command is  ", s
-        if Energy==7:
-            os.chdir("./nllfast/nllfast-1.2")
-            runnll = Template("./nllfast_7TeV $prodproc $in_pdf $prodmass")
-            s=runnll.substitute(prodproc=process, in_pdf = pdf, prodmass=mass)
-#            print "decoupling regime command is  ", s
-        o=commands.getoutput(s)
-        os.chdir("./../../")
+        try:
+          if Energy==8:
+              os.chdir("%s/nllfast/nllfast-2.1" % base )
+              s="./nllfast_8TeV  %s %s %s" % ( process, pdf, mass )
+          if Energy==7:
+              os.chdir("%s/nllfast/nllfast-1.2" % base )
+              s="./nllfast_7TeV %s %s %s" % ( process, pdf, mass )
+          o=commands.getoutput(s)
+        except Exception,e:
+          pass
+        os.chdir( wd ) # make sure we always chdir back
 
 # uncomment this line to see the nll fast output
         #    print "nll fast output is", o
@@ -134,7 +126,7 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
 
 
 # main method, call this from the xsec routine with pdgid1, pdgid2 in order to get the NLL results. The output will be xecs =False and masses = 0 if the combination of ids don't have any results at NLL. 
-def getNLLresult(pdgid1,pdgid2,inputfile):
+def getNLLresult(pdgid1,pdgid2,inputfile,base="../nllfast"):
     
     readfile=pyslha.readSLHAFile(inputfile)
     gluinomass = abs(readfile[0]['MASS'].entries[1000021])
@@ -151,8 +143,8 @@ def getNLLresult(pdgid1,pdgid2,inputfile):
                 for id2 in squark:
                     if pdgid2 == id2:
                         squarkmass = (abs(readfile[0]['MASS'].entries[abs(pdgid1)])+abs(readfile[0]['MASS'].entries[pdgid2]))/2
-                        Values_7TeV = getNLLfast('sb',pdf,squarkmass,gluinomass,7)
-                        Values_8TeV = getNLLfast('sb',pdf,squarkmass,gluinomass,8)
+                        Values_7TeV = getNLLfast('sb',pdf,squarkmass,gluinomass,7,base=base)
+                        Values_8TeV = getNLLfast('sb',pdf,squarkmass,gluinomass,8,base=base)
                         output = [Values_7TeV,Values_8TeV]
 
     
@@ -161,49 +153,49 @@ def getNLLresult(pdgid1,pdgid2,inputfile):
             for id2 in squark:
                 if pdgid2 == id2:
                     squarkmass = (abs(readfile[0]['MASS'].entries[pdgid1])+abs(readfile[0]['MASS'].entries[pdgid2]))/2
-                    Values_7TeV = getNLLfast('ss',pdf,squarkmass,gluinomass,7)
-                    Values_8TeV = getNLLfast('ss',pdf,squarkmass,gluinomass,8)
+                    Values_7TeV = getNLLfast('ss',pdf,squarkmass,gluinomass,7,base=base)
+                    Values_8TeV = getNLLfast('ss',pdf,squarkmass,gluinomass,8,base=base)
                     output = [Values_7TeV,Values_8TeV]
 
                             
     if pdgid1 == pdgid2 == 1000021:
-        Values_7TeV = getNLLfast('gg',pdf,squarkmass,gluinomass,7)
-        Values_8TeV = getNLLfast('gg',pdf,squarkmass,gluinomass,8)
+        Values_7TeV = getNLLfast('gg',pdf,squarkmass,gluinomass,7,base=base)
+        Values_8TeV = getNLLfast('gg',pdf,squarkmass,gluinomass,8,base=base)
         output = [Values_7TeV,Values_8TeV]
 
                             
     for id1 in squark:
         if pdgid1 == id1:
             if pdgid2 == 1000021:
-                Values_7TeV = getNLLfast('sg',pdf,squarkmass,gluinomass,7)
-                Values_8TeV = getNLLfast('sg',pdf,squarkmass,gluinomass,8)
+                Values_7TeV = getNLLfast('sg',pdf,squarkmass,gluinomass,7,base=base)
+                Values_8TeV = getNLLfast('sg',pdf,squarkmass,gluinomass,8,base=base)
                 output = [Values_7TeV,Values_8TeV]
 
 
     
     if abs(pdgid1) == pdgid2 == 1000005:
         squarkmass = abs(readfile[0]['MASS'].entries[1000005])
-        Values_7TeV = getNLLfast('st',pdf,squarkmass,gluinomass,7)
-        Values_8TeV = getNLLfast('st',pdf,squarkmass,gluinomass,8)
+        Values_7TeV = getNLLfast('st',pdf,squarkmass,gluinomass,7,base=base)
+        Values_8TeV = getNLLfast('st',pdf,squarkmass,gluinomass,8,base=base)
         output = [Values_7TeV,Values_8TeV]
 
 
     if abs(pdgid1) == pdgid2 == 2000005:
         squarkmass = abs(readfile[0]['MASS'].entries[2000005])
-        Values_7TeV = getNLLfast('st',pdf,squarkmass,gluinomass,7)
-        Values_8TeV = getNLLfast('st',pdf,squarkmass,gluinomass,8)
+        Values_7TeV = getNLLfast('st',pdf,squarkmass,gluinomass,7,base=base)
+        Values_8TeV = getNLLfast('st',pdf,squarkmass,gluinomass,8,base=base)
         output = [Values_7TeV,Values_8TeV]
         
     if abs(pdgid1) == pdgid2 == 1000006:
         squarkmass = abs(readfile[0]['MASS'].entries[1000006])
-        Values_7TeV = getNLLfast('st',pdf,squarkmass,gluinomass,7)
-        Values_8TeV = getNLLfast('st',pdf,squarkmass,gluinomass,8)
+        Values_7TeV = getNLLfast('st',pdf,squarkmass,gluinomass,7,base=base)
+        Values_8TeV = getNLLfast('st',pdf,squarkmass,gluinomass,8,base=base)
         output = [Values_7TeV,Values_8TeV]
 
     if abs(pdgid1) == pdgid2 == 2000006:
         squarkmass = abs(readfile[0]['MASS'].entries[2000006])
-        Values_7TeV = getNLLfast('st',pdf,squarkmass,gluinomass,7)
-        Values_8TeV = getNLLfast('st',pdf,squarkmass,gluinomass,8)
+        Values_7TeV = getNLLfast('st',pdf,squarkmass,gluinomass,7,base=base)
+        Values_8TeV = getNLLfast('st',pdf,squarkmass,gluinomass,8,base=base)
         output = [Values_7TeV,Values_8TeV]
 
     return output
