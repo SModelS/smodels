@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 import set_path, sys
-from Experiment import SMSResults, SMSanalyses, SMSAnalysisFactory
+from Experiment import SMSResults, SMSAnalyses, SMSAnalysisFactory
 
 #Creat analyses list:
 ListOfAnalysesU = SMSAnalysisFactory.load()
-ListOfAnalysesA = SMSanalyses.load()
+ListOfAnalysesA = SMSAnalyses.load()
 
 
 
@@ -105,9 +105,9 @@ for Ana in ListOfAnalysesU:
        
     if not match:
         if SMSResults.isPublic(plotU):
-            print "Analysis",plotU," for ",TxU," missing in SMSanalyses.py"
+            print "Analysis",plotU," for ",TxU," missing in SMSAnalyses.py"
         else:
-            print "Analysis",plotU," for ",TxU," missing in SMSanalyses.py (NOT PUBLIC)"
+            print "Analysis",plotU," for ",TxU," missing in SMSAnalyses.py (NOT PUBLIC)"
 
 
 print "-----------------------------"
@@ -152,7 +152,7 @@ for iAna in range(len(ListOfAnalysesA)-1):
         plots = Ana.plots[key][1]
         for plot in plots:
             if plots.count(plot) > 1:
-                print "Duplicate plot entry",plot,"in Analyses",Ana.label," in SMSanalyses.py"
+                print "Duplicate plot entry",plot,"in Analyses",Ana.label," in SMSAnalyses.py"
                 Acount -= 1
             for jAna in range(len(ListOfAnalysesA)):
                 AnaB = ListOfAnalysesA[jAna]
@@ -162,14 +162,14 @@ for iAna in range(len(ListOfAnalysesA)-1):
                     plotsB = AnaB.plots[key2][1]
                     for plotB in plotsB:
                         if TxAB == TxA and plotB == plot:
-                            print "Duplicate entry for analysis",plot,"and topology",TxA," in SMSanalyses.py"
+                            print "Duplicate entry for analysis",plot,"and topology",TxA," in SMSAnalyses.py"
                             Acount -= 1
 
 
 print "\n"            
 print "-----------------------------"
 print "Total of (non-duplicated) analyses (including possible empty entries) in:"
-print "  SMSanalyses.py = ",Acount
+print "  SMSAnalyses.py = ",Acount
 print "  Factory = ",Ucount
 
 

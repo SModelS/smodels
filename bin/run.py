@@ -6,8 +6,8 @@ import set_path, argparse
 from Theory import LHEReader, TopologyBuilder, SMSDataObjects
 from Experiment import TxNames
 import Experiment.SMSAnalysisFactory as Analyses
-## import SMSanalyses as Analyses
-## import SMSanalysesTest as Analyses
+## import SMSAnalyses as Analyses
+## import SMSAnalysesTest as Analyses
 
 
 print "[run.py] loading analyses ...."
