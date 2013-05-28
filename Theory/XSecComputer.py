@@ -9,7 +9,7 @@ def compute(nevts,slhafile,rpythia = True, donlo = True, basedir=None,datadir=No
   If runpythia = False, read old fort_8,7.68 files and assumes 
   total xsec = 1 (only useful for fast debugging) """
 
-  import shutil, LHEReader, NLLXSec
+  import shutil, LHEReader, NLLXSec, CrossSection
   from Tools.PhysicsUnits import addunit
 
   import os
@@ -27,23 +27,26 @@ def compute(nevts,slhafile,rpythia = True, donlo = True, basedir=None,datadir=No
   installdir=basedir
   etcdir="%s/etc/" % basedir
   
+  #LHE event file
+  lhefile = "%s/fort_8.68" % datadir
+  lhe7file = "%s/fort_7.68" % datadir
+  lhe8file = "%s/fort_8.68" % datadir
   if rpythia:
 #run pythia at 8 TeV:
     D = runPythia( slhafile,nevts,8,
                    datadir=datadir,etcdir=etcdir,installdir=installdir)
-    shutil.copy2("%s/fort.68" % datadir, "%s/fort_8.68" % datadir )
+    shutil.copy2("%s/fort.68" % datadir, lhe8file )
     total_cs8 = addunit(D["xsecfb"],'fb')
   
 #run pythia at 7 TeV:
     D = runPythia(slhafile,nevts,7,
                    datadir=datadir,etcdir=etcdir,installdir=installdir)
 
-    shutil.copy2("%s/fort.68" % datadir, "%s/fort_7.68" % datadir )
+    shutil.copy2("%s/fort.68" % datadir, lhe7file )
     total_cs7 = addunit(D["xsecfb"],'fb')
   else:
     total_cs8 = addunit(1.,'fb')
     total_cs7 = addunit(1.,'fb')
-
 
 #Get 8 TeV event decomposition:
   n8_evts={}
@@ -126,14 +129,11 @@ def compute(nevts,slhafile,rpythia = True, donlo = True, basedir=None,datadir=No
     Wdic.update({'7 TeV (NLO)':weight_7NLO, '8 TeV (NLO)':weight_8NLO})
     Xsecdic.update({'7 TeV (NLO)':sigma_7NLO, '8 TeV (NLO)':sigma_8NLO})
 
-#LHE event file
-  lhefile = "./data/fort_8.68"
-  
 #Weight center of mass energies dictionary
   CMdic = {'7 TeV (LO)': addunit(7.,'TeV'), '8 TeV (LO)': addunit(8.,'TeV')}
   if donlo:
     CMdic.update({'7 TeV (NLO)': addunit(7.,'TeV'), '8 TeV (NLO)': addunit(8.,'TeV')})
-  return {"Wdic" : Wdic, "lhefile" : lhefile, "Xsecdic" : Xsecdic, "CMdic" : CMdic}  
+  return CrossSection.CrossSection ( {"Wdic" : Wdic, "lhefile" : lhefile, "lhe7file" : lhe7file, "lhe8file": lhe8file, "Xsecdic" : Xsecdic, "CMdic" : CMdic} )
   
   
 
