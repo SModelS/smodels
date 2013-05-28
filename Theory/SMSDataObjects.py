@@ -186,10 +186,14 @@ class GTop:
   def elements ( self ):
     return self.ElList
 
-  def __str__(self):
+  def describe(self):
+    """ a lengthy description """
     ret="number of vertices=%s number of vertex particles=%s" % \
         ( self.vertnumb, self.vertparts )
     return ret
+
+  def __str__(self):
+    return str(self.vertparts)
 
   def checkConsistency ( self, verbose=False ):
     """ the number of vertices and insertions per vertex is
