@@ -11,7 +11,7 @@ import Experiment.SMSResults as SMS
 import Tools.PhysicsUnits as UNIT
 
 topo = 'T2bb'
-nevts = 10
+nevts = 10000
 pidmom = 1000005 #sbottom
 pidlsp = 1000022 #lsp
 
@@ -47,9 +47,9 @@ step = 25.
 m = 0.
 
 
-rootfile = ROOT.TFile('../data/%s_evts%d.root' %(topo,nevts) , 'recreate')
-txtfile7 = open('../data/%s7TeV_evts%d.txt' %(topo,nevts),'w')
-txtfile8 = open('../data/%s8TeV_evts%d.txt' %(topo,nevts),'w')
+rootfile = ROOT.TFile('../data/%s_%devts.root' %(topo,nevts) , 'recreate')
+txtfile7 = open('../data/%s7TeV_%devts.txt' %(topo,nevts),'w')
+txtfile8 = open('../data/%s8TeV_%devts.txt' %(topo,nevts),'w')
 txtfile7.write('mass[%s]      RefXSec[fb]\n' %pidmom)
 txtfile8.write('mass[%s]      RefXSec[fb]\n' %pidmom)
 
