@@ -11,6 +11,7 @@ def decompose(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassgap
   sys.path.append(pyslhadir)
   import TopologyBuilder, SMSDataObjects, ParticleNames
   from Tools.PhysicsUnits import addunit, rmvunit
+  import pyslha2
 
   if DoCompress and rmvunit(minmassgap,'GeV') == -1: 
     print "SLHAdecomp: Please, set minmassgap"
@@ -18,7 +19,7 @@ def decompose(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassgap
 
 
 #Read SLHA file
-  res = pyslha.readSLHAFile(slhafile)
+  res = pyslha2.readSLHAFile(slhafile)
   
 #Get list of particles with maximum production cross-section above sigcut and maximum cross-sections
   Pdic = {}
