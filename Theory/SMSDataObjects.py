@@ -408,8 +408,8 @@ class EAnalysis:
     self.Top = GTop()
     self.sqrts = 0
     self.lum = 0
-    self.results = {}
-    self.plots = {}
+    self.results = {} ## pairs of (constraint,condition)
+    self.plots = {} ## pairs of (constraint,???)
     self.run = ""
     self.masscomp = 0.2
 
