@@ -10,9 +10,9 @@ import Theory.SLHATools as SLHA
 import Experiment.SMSResults as SMS
 import Tools.PhysicsUnits as UNIT
 
-topo = 'T2bb'
+topo = 'T1'
 nevts = 10000
-pidmom = 1000005 #sbottom
+pidmom = 1000021 #gluino
 pidlsp = 1000022 #lsp
 
 SMS.considerRuns(["8TeV", "2012", "2011"])
@@ -26,6 +26,10 @@ y_up = 0.
 
 for ana in analyses:
 #   print ana
+#   if not SMS.exists(ana, topo):
+#      continue
+#   if ana == 'DileptonicStop8TeV': #just for T2tt!!
+#      continue
    if x_low > UNIT.rmvunit(SMS.getLowX(ana, topo), 'GeV'):
       x_low = UNIT.rmvunit(SMS.getLowX(ana, topo), 'GeV')
 #   print 'xl',x_low, UNIT.rmvunit(SMS.getLowX(ana, topo), 'GeV')
@@ -69,15 +73,15 @@ while m < x_up-12.5:
    print "[RefXSecCalculator] compute for",masses
    dic = XSEC.compute(nevts, slhafile)
 #   if m > 500.:
-#      print dic['Xsecdic']
-   if dic['Xsecdic']['7 TeV (NLO)'].has_key((-pidmom,pidmom)):
-      xs7 = UNIT.rmvunit(dic['Xsecdic']['7 TeV (NLO)'][(-pidmom,pidmom)], 'fb')
+#   print dic['Xsecdic']
+   if dic['Xsecdic']['7 TeV (NLL)'].has_key((-pidmom,pidmom)):
+      xs7 = UNIT.rmvunit(dic['Xsecdic']['7 TeV (NLL)'][(-pidmom,pidmom)], 'fb')
 #      print xs7
       hist7.Fill(masses[pidmom], xs7)
       txtfile7.write('%f      %f\n' %(masses[pidmom], xs7))
       #txtfile7.flush()
-   if dic['Xsecdic']['8 TeV (NLO)'].has_key((-pidmom,pidmom)):
-      xs8 = UNIT.rmvunit(dic['Xsecdic']['8 TeV (NLO)'][(-pidmom,pidmom)], 'fb')
+   if dic['Xsecdic']['8 TeV (NLL)'].has_key((-pidmom,pidmom)):
+      xs8 = UNIT.rmvunit(dic['Xsecdic']['8 TeV (NLL)'][(-pidmom,pidmom)], 'fb')
 #      print xs8
       hist8.Fill(masses[pidmom], xs8)
       txtfile8.write('%f      %f\n' %(masses[pidmom], xs8))
