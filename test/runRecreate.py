@@ -75,16 +75,15 @@ line.SetLineWidth(exclusionm1.GetLineWidth())
 line.DrawLineNDC(0.21, 0.785, 0.16, 0.785)
 line.DrawLineNDC(0.21, 0.825, 0.16, 0.825)
 
+#title = ROOT.TMathText()
 title = ROOT.TLatex()
 title.SetNDC()
-title.DrawLatex(0.1,0.93, '%s , %s (%s-%s) , %d TeV , NLONLL' %(SMSResults.SMSInfo("decay", args.topo, args.ana),SMSResults.getPrettyName(args.ana),SMSResults.getExperiment(args.ana),SMSResults.getPAS(args.ana),tevIn))
-#title = ROOT.TMathText()
-#title.SetNDC()
-#title.DrawMathText(0.1,0.93, SMSResults.getPrettyName(args.ana)+', '+str(int(tevIn))+' TeV, NLONLL,')
 
-#decay = ROOT.TLatex()
-#decay.SetNDC()
-#decay.DrawLatex(0.55, 0.93, SMSResults.SMSInfo("decay", args.topo, args.ana))
+#title_str='%s , %s (%s-%s) , %d TeV , NLONLL' %(SMSResults.SMSInfo("decay", args.topo, args.ana),SMSResults.getPrettyName(args.ana),SMSResults.getExperiment(args.ana),SMSResults.getPAS(args.ana),tevIn)
+#title.DrawMathText(0.1,0.93,title_str.replace('#','\\'))
+
+title.DrawLatex(0.1,0.93, '%s , %s (%s-%s) , %d TeV , NLONLL' %(SMSResults.SMSInfo("decay", args.topo, args.ana),SMSResults.getPrettyName(args.ana),SMSResults.getExperiment(args.ana),SMSResults.getPAS(args.ana),tevIn))
+
 
 c1.Print("../plots/%s_%s_%devts.png" %(args.ana,toponame,args.nevts))
 #c1.Print("../plots/%s_%s_%devtsROOT.pdf" %(args.ana,toponame,args.nevts))
