@@ -5,7 +5,7 @@
 #for topologies with intermediate masses: give -mz, if needed -axes
 
 import set_path
-import argparse, testGetLimit, ROOT, sys
+import argparse, testGetLimit, ROOT, sys, TestTools, os
 from Experiment import SMSResults, SMSInterpolation
 from Tools.PhysicsUnits import rmvunit
 
@@ -44,7 +44,7 @@ orig_ul = SMSResults.getUpperLimit(args.ana, toponame)
 ul.GetXaxis().SetTitle(SMSResults.particleName(args.topo)+' mass [GeV]')
 ul.GetYaxis().SetTitle(orig_ul.GetYaxis().GetTitle())
 ul.GetZaxis().SetTitle('#splitline{%s}{reported by experiment}' % orig_ul.GetZaxis().GetTitle().replace('pb','fb'))
-ul.GetZaxis().SetTitleOffset(1.3)
+ul.GetZaxis().SetTitleOffset(1.4)
 exclusion = SMSResults.getExclusionLine(toponame, args.ana, False, plusminussigma=0)
 exclusionm1= SMSResults.getExclusionLine(toponame, args.ana, False, plusminussigma=-1)
 exclusionp1= SMSResults.getExclusionLine(toponame, args.ana, False, plusminussigma=1)
@@ -77,7 +77,7 @@ line.DrawLineNDC(0.21, 0.825, 0.16, 0.825)
 
 title = ROOT.TLatex()
 title.SetNDC()
-title.DrawLatex(0.1,0.93, '%s , %s (%s) , %d TeV , NLONLL' %(SMSResults.SMSInfo("decay", args.topo, args.ana),SMSResults.getPrettyName(args.ana),SMSResults.getPAS(args.ana),tevIn))
+title.DrawLatex(0.1,0.93, '%s , %s (%s-%s) , %d TeV , NLONLL' %(SMSResults.SMSInfo("decay", args.topo, args.ana),SMSResults.getPrettyName(args.ana),SMSResults.getExperiment(args.ana),SMSResults.getPAS(args.ana),tevIn))
 #title = ROOT.TMathText()
 #title.SetNDC()
 #title.DrawMathText(0.1,0.93, SMSResults.getPrettyName(args.ana)+', '+str(int(tevIn))+' TeV, NLONLL,')
@@ -87,5 +87,8 @@ title.DrawLatex(0.1,0.93, '%s , %s (%s) , %d TeV , NLONLL' %(SMSResults.SMSInfo(
 #decay.DrawLatex(0.55, 0.93, SMSResults.SMSInfo("decay", args.topo, args.ana))
 
 c1.Print("../plots/%s_%s_%devts.png" %(args.ana,toponame,args.nevts))
+#c1.Print("../plots/%s_%s_%devtsROOT.pdf" %(args.ana,toponame,args.nevts))
+#TestTools.convertROOTpdf("../plots/%s_%s_%devtsROOT.pdf" %(args.ana,toponame,args.nevts), "../plots/%s_%s_%devts.pdf" %(args.ana,toponame,args.nevts),"../plots/%s_%s_%devts.png" %(args.ana,toponame,args.nevts))#convertROOTpdf not working like it should be!
+#os.remove("../plots/%s_%s_%devtsROOT.pdf" %(args.ana,toponame,args.nevts))
 
 rootfile.Close()

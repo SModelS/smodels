@@ -168,6 +168,14 @@ def getRun ( analysis, run=None ):
   run=SMSHelpers.getRun ( analysis, run )
   return run
 
+def getExperiment ( analysis, run=None):
+  """ return experiment name for given analysis
+      for now: check if run is ATLAS8TeV, else return CMS """
+  run1=getRun(analysis,run)
+  if run1 == "ATLAS8TeV": return "ATLAS"
+  else: return "CMS"
+
+
 def getPrettyName ( analysis, run=None, latex=False ):
   value=SMSHelpers.getMetaInfoField ( analysis, "prettyname", run )
   if value==None or value=="": return analysis
