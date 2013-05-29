@@ -9,23 +9,20 @@ import Experiment.SMSAnalysisFactory as Analyses
 from Tools import SMSFeynmanGraphs
 
 print "[run.py] loading analyses ...."
-ListOfAnalyses = Analyses.load( topos="T2" )
+ListOfAnalyses = Analyses.load( topos="T2bb" )
 print "[run.py] done loading %d analyses" % len(ListOfAnalyses)
 
 nevts=1000
-# slhafile="AndreSLHA/andrePT4.slha"
-slhafile="../slha/T2.slha"
+slhafile="../slha/T2bb.slha"
 Tmp=tempfile.mkdtemp()
-print "Tmp=",Tmp
+ 
+print "[run.py] now run pythia"
 Wv=XSecComputer.compute(nevts,slhafile,rpythia = True, donlo = True, datadir=Tmp)
+print "[run.py] done running pythia"
 
-#print "Wdic=",Wv["Wdic"]
-#print Wv["Xsecdic"]
-#lhefile="../lhe/T2_1.lhe"
-# lhefile=Wv["lhefile"]
 lhefile=Wv.lhefile ( 8 )
 # lhefile="T2_100.lhe"
-topos=LHEDecomposer.decompose ( lhefile, Wv.weights(), None )
+topos=LHEDecomposer.decompose ( lhefile, Wv.weights(), nevts=nevts )
 XSecComputer.clean ( Tmp )
 
 for topo in topos:
