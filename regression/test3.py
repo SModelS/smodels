@@ -118,6 +118,7 @@ print '\n \n \n'
 for Analysis in ListOfAnalyses:
   print "---------------Analysis Label = ",Analysis.label
   Results_table = PrettyTable(["Result","Conditions","Mass","Theoretical Value","Experimental Limits"])
+  has_line=False
   
   
   if max(Analysis.Top.vertnumb) > 3:
@@ -141,11 +142,13 @@ for Analysis in ListOfAnalyses:
       sigmalimit = SMSgetlimit.GetPlotLimit(mass,plot,Analysis)
       
       if sigmalimit and len(sigmalimit) > 0:
+        has_line=True
         Results_table.add_row([wrap(printer.pformat(res),width=30),wrap(printer.pformat(conds),width=30),wrap(printer.pformat(mass),width=30),wrap(printer.pformat(tvalue),width=30),wrap(printer.pformat(sigmalimit[0]),width=30)])
         for ilim in range(1,len(sigmalimit)):
           Results_table.add_row(["","","","",wrap(printer.pformat(sigmalimit[ilim]),width=30)])
       else:
+        has_line=True
         Results_table.add_row([wrap(printer.pformat(res),width=30),wrap(printer.pformat(conds),width=30),wrap(printer.pformat(mass),width=30),wrap(printer.pformat(tvalue),width=30),wrap(printer.pformat(sigmalimit),width=30)])
       Results_table.add_row(["---------","---------","---------","---------","---------"])
 
-  print(Results_table)
+  if has_line: print(Results_table)
