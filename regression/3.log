@@ -71,7 +71,6 @@ Total weight =  {'7 TeV (LO)': 1.39E+02 [fb], '8 TeV (LO)': 1.93E+02 [fb], '7 Te
 |    ---------    | ---------  |         ---------          |           ---------           |        ---------        |
 +-----------------+------------+----------------------------+-------------------------------+-------------------------+
 ---------------Analysis Label =  ATLAS_CONF_2013_037:T6bbWW
-
 ---------------Analysis Label =  ATLAS_CONF_2013_024:T2tt
 +-----------------+------------+----------------------------+-------------------------------+-------------------------+
 |      Result     | Conditions |            Mass            |       Theoretical Value       |   Experimental Limits   |
@@ -82,9 +81,7 @@ Total weight =  {'7 TeV (LO)': 1.39E+02 [fb], '8 TeV (LO)': 1.93E+02 [fb], '7 Te
 |    ---------    | ---------  |         ---------          |           ---------           |        ---------        |
 +-----------------+------------+----------------------------+-------------------------------+-------------------------+
 ---------------Analysis Label =  MultiLepton8TeV:T1tttt
-
 ---------------Analysis Label =  RA4LS8TeV:T1tttt
-
 ---------------Analysis Label =  ATLAS_CONF_2012_166:T2tt
 +-----------------+------------+----------------------------+-------------------------------+-------------------------+
 |      Result     | Conditions |            Mass            |       Theoretical Value       |   Experimental Limits   |
@@ -95,11 +92,8 @@ Total weight =  {'7 TeV (LO)': 1.39E+02 [fb], '8 TeV (LO)': 1.93E+02 [fb], '7 Te
 |    ---------    | ---------  |         ---------          |           ---------           |        ---------        |
 +-----------------+------------+----------------------------+-------------------------------+-------------------------+
 ---------------Analysis Label =  ATLAS_CONF_2012_166:T6bbWW
-
 ---------------Analysis Label =  ATLAS_CONF_2013_025:T6ttZZ
-
 ---------------Analysis Label =  alphaT:T1tttt
-
 ---------------Analysis Label =  alphaT:T2tt
 +-----------------+------------+----------------------------+-------------------------------+---------------------------+
 |      Result     | Conditions |            Mass            |       Theoretical Value       |    Experimental Limits    |
@@ -110,11 +104,8 @@ Total weight =  {'7 TeV (LO)': 1.39E+02 [fb], '8 TeV (LO)': 1.93E+02 [fb], '7 Te
 |    ---------    | ---------  |         ---------          |           ---------           |         ---------         |
 +-----------------+------------+----------------------------+-------------------------------+---------------------------+
 ---------------Analysis Label =  alphaT:T1bbbb
-
 ---------------Analysis Label =  alphaT:T2
-
 ---------------Analysis Label =  alphaT:T1
-
 ---------------Analysis Label =  alphaT:T2bb
 +-----------------+------------+----------------------------+-------------------------------+---------------------------+
 |      Result     | Conditions |            Mass            |       Theoretical Value       |    Experimental Limits    |
@@ -134,41 +125,23 @@ Total weight =  {'7 TeV (LO)': 1.39E+02 [fb], '8 TeV (LO)': 1.93E+02 [fb], '7 Te
 |    ---------    | ---------  |         ---------          |           ---------           |        ---------        |
 +-----------------+------------+----------------------------+-------------------------------+-------------------------+
 ---------------Analysis Label =  ATLAS_CONF_2013_007:T1tttt
-
 ---------------Analysis Label =  ATLAS_CONF_2013_007:T6ttWW
-
 ---------------Analysis Label =  ATLAS_CONF_2013_007:T1tbtb
-
 ---------------Analysis Label =  ATLAS_CONF_2013_007:T5WW
-
 ---------------Analysis Label =  ATLAS_CONF_2013_028:TChiChipmStauL
-
 ---------------Analysis Label =  ATLAS_CONF_2013_028:TChipChimStauSnu
-
 ---------------Analysis Label =  Weakinos8TeV:TChiwz
-
 ---------------Analysis Label =  Weakinos8TeV:TChiChipmStauStau
-
 ---------------Analysis Label =  Weakinos8TeV:TSlepSlep
-
 ---------------Analysis Label =  Weakinos8TeV:TChipChimSlepSnu
-
 ---------------Analysis Label =  Weakinos8TeV:TChiChipmSlepL
-
 ---------------Analysis Label =  Weakinos8TeV:TChiChipmSlepStau
-
 ---------------Analysis Label =  SUS13008:T6ttWW
-
 ---------------Analysis Label =  SUS13008:T1tttt
-
 ---------------Analysis Label =  SUS13008:T6ttWW
-
 ---------------Analysis Label =  RA2b8TeV:T1bbbb
-
 ---------------Analysis Label =  RA2b8TeV:T1tttt
-
 ---------------Analysis Label =  alphaT8TeV:T1tttt
-
 ---------------Analysis Label =  alphaT8TeV:T2tt
 +-----------------+------------+----------------------------+-------------------------------+-------------------------------+
 |      Result     | Conditions |            Mass            |       Theoretical Value       |      Experimental Limits      |
@@ -179,11 +152,8 @@ Total weight =  {'7 TeV (LO)': 1.39E+02 [fb], '8 TeV (LO)': 1.93E+02 [fb], '7 Te
 |    ---------    | ---------  |         ---------          |           ---------           |           ---------           |
 +-----------------+------------+----------------------------+-------------------------------+-------------------------------+
 ---------------Analysis Label =  alphaT8TeV:T1bbbb
-
 ---------------Analysis Label =  alphaT8TeV:T2
-
 ---------------Analysis Label =  alphaT8TeV:T1
-
 ---------------Analysis Label =  alphaT8TeV:T2bb
 +-----------------+------------+----------------------------+-------------------------------+-------------------------------+
 |      Result     | Conditions |            Mass            |       Theoretical Value       |      Experimental Limits      |
@@ -194,6 +164,4 @@ Total weight =  {'7 TeV (LO)': 1.39E+02 [fb], '8 TeV (LO)': 1.93E+02 [fb], '7 Te
 |    ---------    | ---------  |         ---------          |           ---------           |           ---------           |
 +-----------------+------------+----------------------------+-------------------------------+-------------------------------+
 ---------------Analysis Label =  ATLAS_CONF_2012_105:T1tttt
-
 ---------------Analysis Label =  RA48TeV:T1tttt
-
