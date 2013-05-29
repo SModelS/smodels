@@ -413,6 +413,8 @@ class EAnalysis:
     self.run = ""
     self.masscomp = 0.2
 
+  def __str__(self):
+    return self.label
 
 #Given the constraints dictionary, automatically fill the element list with the
 #elements corresponding to the strings in the dictionary, skipping repeated ones
