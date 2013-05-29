@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 #produce png-plot of observed and reproduced exclusion lines
-#give ana with -a, topo with -m
+#give ana with -a, topo with -t
 #for topologies with intermediate masses: give -mz, if needed -axes
 
 import set_path
@@ -22,7 +22,7 @@ ROOT.gStyle.SetOptStat(0000)
 ROOT.gStyle.SetOptTitle(0)
 ROOT.gStyle.SetCanvasBorderMode(0)
 #ROOT.gStyle.SetPadLeftMargin(0.16) #set these if needed
-ROOT.gStyle.SetPadRightMargin(0.15)
+ROOT.gStyle.SetPadRightMargin(0.18)
 #ROOT.gStyle.SetPadBottomMargin(0.11)
 #ROOT.gStyle.SetPadTopMargin(0.07)
 
@@ -43,7 +43,8 @@ ul = rootfile.Get('h')
 orig_ul = SMSResults.getUpperLimit(args.ana, toponame)
 ul.GetXaxis().SetTitle(SMSResults.particleName(args.topo)+' mass [GeV]')
 ul.GetYaxis().SetTitle(orig_ul.GetYaxis().GetTitle())
-ul.GetZaxis().SetTitle(orig_ul.GetZaxis().GetTitle().replace('pb','fb'))
+ul.GetZaxis().SetTitle('#splitline{%s}{reported by experiment}' % orig_ul.GetZaxis().GetTitle().replace('pb','fb'))
+ul.GetZaxis().SetTitleOffset(1.3)
 exclusion = SMSResults.getExclusionLine(toponame, args.ana, False, plusminussigma=0)
 exclusionm1= SMSResults.getExclusionLine(toponame, args.ana, False, plusminussigma=-1)
 exclusionp1= SMSResults.getExclusionLine(toponame, args.ana, False, plusminussigma=1)
@@ -62,21 +63,28 @@ reproduced_exclusion.Draw("SAME")
 legend = ROOT.TLegend(0.7, 0.85, 0.15, 0.67)
 legend.SetFillStyle(0)
 legend.SetBorderSize(0)
-legend.AddEntry(exclusion, 'exclusion reported by experiment','L')
-legend.AddEntry(exclusionm1, 'exclusion #pm 1#sigma reported by experiment','L')
+legend.AddEntry(exclusion, 'exclusion reported by experiment (#pm 1#sigma)','L')
+#legend.AddEntry(exclusionm1, 'exclusion #pm 1#sigma reported by experiment','L')
 legend.AddEntry(reproduced_exclusion, "SModelS exclusion",'L')
+legend.SetMargin(0.12)
 legend.Draw()
+
+line = ROOT.TLine()
+line.SetLineStyle(exclusionm1.GetLineStyle())
+line.SetLineWidth(exclusionm1.GetLineWidth())
+line.DrawLineNDC(0.21, 0.785, 0.16, 0.785)
+line.DrawLineNDC(0.21, 0.825, 0.16, 0.825)
 
 title = ROOT.TLatex()
 title.SetNDC()
-title.DrawLatex(0.1,0.93, SMSResults.getPrettyName(args.ana)+', '+str(int(tevIn))+' TeV, NLONLL,')
+title.DrawLatex(0.1,0.93, '%s , %s (%s) , %d TeV , NLONLL' %(SMSResults.SMSInfo("decay", args.topo, args.ana),SMSResults.getPrettyName(args.ana),SMSResults.getPAS(args.ana),tevIn))
 #title = ROOT.TMathText()
 #title.SetNDC()
 #title.DrawMathText(0.1,0.93, SMSResults.getPrettyName(args.ana)+', '+str(int(tevIn))+' TeV, NLONLL,')
 
-decay = ROOT.TLatex()
-decay.SetNDC()
-decay.DrawLatex(0.55, 0.93, SMSResults.SMSInfo("decay", args.topo, args.ana))
+#decay = ROOT.TLatex()
+#decay.SetNDC()
+#decay.DrawLatex(0.55, 0.93, SMSResults.SMSInfo("decay", args.topo, args.ana))
 
 c1.Print("../plots/%s_%s_%devts.png" %(args.ana,toponame,args.nevts))
 
