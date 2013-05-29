@@ -6,4 +6,4 @@ import set_path
 from Theory import XSecComputer
 
 w=XSecComputer.compute( 1000, "../slha/andrePT1.slha" )
-print "w=",w
+print "w=",w.weights()
