@@ -14,17 +14,34 @@ class CrossSection:
   def weights ( self ): return self.data["Wdic"]
   def crossSections ( self ): return self.data["Xsecdic"]
 
-  def crossSectionLightSquarks ( self, order="NLO", sqrts=8 ):
-    return None
-    """
-    squarks=[100001,100002,...]
-    allxsecs=self.crossSections()[order]
+  def getCrossSection( self, pidmom1, pidmom2, order="NLL", sqrts=8 ):
+    k='%d TeV (%s)' %(sqrts, order)
+    allxsecs=self.crossSections()[k]
+    if not allxsecs:
+      print '[CrossSection]: No cross sections for %s at %d TeV.' %(order,sqrts)
+      return None
+    if allxsecs.has_key((pidmom1,pidmom2)):
+      return allxsecs[(pidmom1,pidmom2)]
+    else:
+      print '[CrossSection]: Cross Sections only available for %s' %str(allxsecs.keys())
+      return None
+
+  def crossSectionLightSquarks ( self, order="NLL", sqrts=8 ):
+    from Tools.PhysicsUnits import rmvunit
+    squarks=[1000001,1000002,1000003,1000004,2000001,2000002,2000003,2000004]
+    k='%d TeV (%s)' %(sqrts, order)
+    allxsecs=self.crossSections()[k]
+    if not allxsecs:
+      print '[CrossSection]: No cross sections for %s at %d TeV.' %(order,sqrts)
+      return None
     Sum=0
-    for all (key,value) in allxsecs.items():
+    for (key,value) in allxsecs.items():
       if abs(key[0]) in squarks and abs(key[1]) in squarks:
+        value=rmvunit(value, 'fb')
+#        print 'k:', key, 'v:',value
         Sum+=value
     return Sum
-    """
+
 
   def lhefile ( self, sqrts ):
     from Tools.PhysicsUnits import rmvunit
