@@ -123,17 +123,17 @@ def compute(nevts,slhafile,rpythia = True, donlo = True, basedir=None,datadir=No
       sigma_8NLO[key]=NLO8
 
 
-#Weight and production cross-section dictionaries
+#Weight and production cross-section dictionaries (NLL = NLO+NLL)
   Wdic = {'7 TeV (LO)':weight_7, '8 TeV (LO)':weight_8}
   Xsecdic = {'7 TeV (LO)':sigma_7, '8 TeV (LO)':sigma_8}
   if donlo:
-    Wdic.update({'7 TeV (NLO)':weight_7NLO, '8 TeV (NLO)':weight_8NLO})
-    Xsecdic.update({'7 TeV (NLO)':sigma_7NLO, '8 TeV (NLO)':sigma_8NLO})
+    Wdic.update({'7 TeV (NLL)':weight_7NLO, '8 TeV (NLL)':weight_8NLO})
+    Xsecdic.update({'7 TeV (NLL)':sigma_7NLO, '8 TeV (NLL)':sigma_8NLO})
 
 #Weight center of mass energies dictionary
   CMdic = {'7 TeV (LO)': addunit(7.,'TeV'), '8 TeV (LO)': addunit(8.,'TeV')}
   if donlo:
-    CMdic.update({'7 TeV (NLO)': addunit(7.,'TeV'), '8 TeV (NLO)': addunit(8.,'TeV')})
+    CMdic.update({'7 TeV (NLL)': addunit(7.,'TeV'), '8 TeV (NLL)': addunit(8.,'TeV')})
   return CrossSection.CrossSection ( {"Wdic" : Wdic, "lhefile" : lhefile, "lhe7file" : lhe7file, "lhe8file": lhe8file, "Xsecdic" : Xsecdic, "CMdic" : CMdic} )
   
   
