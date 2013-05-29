@@ -4,7 +4,7 @@ from Experiment import SMSResults, SMSInterpolation, SMSgetlimit, ROOTTools
 from Theory import SMSDataObjects
 from Tools.PhysicsUnits import addunit, rmvunit
 
-def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8):
+def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=10000):
   """ recreate ROOT TH2F histogram of a given analysis and topology
         needs mz for a topology with intermediate mass,
         axes, for histograms with axes different from M1-M0
@@ -29,7 +29,9 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8):
 
   if line:
     hL = ROOT.TH2F('hL','hL',bx,xmin,xmax,by,ymin,ymax)
-    f=ROOT.TFile("../data/%s.root" %topo)
+    prod_mode = topo
+    if topo=="T1tttt" or topo=="T1bbbb": prod_mode = "T1"
+    f=ROOT.TFile("../data/%s_%devts.root" %(prod_mode,nevents))
     if tev==8: rXsName="hist8"
     if tev==7:rXsName="hist7"
     rXs=f.Get(rXsName)
