@@ -8,7 +8,7 @@ from Theory import LHEDecomposer, SLHADecomposer, XSecComputer, ClusterTools
 from Tools.PhysicsUnits import addunit, rmvunit
 from Tools import SMSPrettyPrinter, VariousHelpers
 from Tools.SMSPrettyPrinter import wrap
-from Experiment import SMSAnalyses, SMSAnalysisFactory, SMSgetlimit
+from Experiment import SMSAnalyses, SMSAnalysisFactory, LimitGetter
 
 
 DoFactory = True
@@ -139,7 +139,7 @@ for Analysis in ListOfAnalyses:
       mass = theoRes[imass]['mass']
       tvalue = theoRes[imass]['result']
       conds = theoRes[imass]['conditions']
-      sigmalimit = SMSgetlimit.GetPlotLimit(mass,plot,Analysis)
+      sigmalimit = LimitGetter.GetPlotLimit(mass,plot,Analysis)
       
       if sigmalimit and len(sigmalimit) > 0:
         has_line=True
