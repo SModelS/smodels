@@ -1,15 +1,22 @@
 def limit(analysis):
   """ the next generation limit retrieval function, should get all information
       from the analysis object """
-  return None
-  """
+  import SMSResults
   run=analysis.run
   sqrts=analysis.sqrts
+  lead=analysis.Top.leadingElement()
+  ret={}
   print "[LimitGetter.py] get limit for",analysis,"run=",run
   for (constraint,condition) in analysis.results.items():
-    theoRes=analysis.evaluateResult( constraint )
-  """
-
+    print "[LimitGetter.py] for now I assume theres only one result"
+    Tx0=analysis.plots[constraint][0]
+    ana0=analysis.plots[constraint][1][0]
+    masses=lead.B[0].masses[0] ## ,lead.B[1].masses[0]
+    ul=SMSResults.getSmartUpperLimit(ana0,Tx0,masses)
+    print "[LimitGetter.py] %s %s ul=%s" % ( Tx0, ana0, ul )
+    ret[ana0+Tx0]=ul
+  return ret 
+    
 def GetPlotLimit(inmass,plot,Analysis,complain = False):
     """ Get upper limit on sigma*BR for a specific array of masses from plot
         inmass: array of masses in SModelS graph?
