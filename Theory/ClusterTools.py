@@ -188,14 +188,14 @@ def sumweights(wlist):
 def MassDist(mass1,mass2):
   """ definition of distance between two mass arrays
   Dana is defined, use maximum distance in all analyses """
-  from  Experiment import SMSgetlimit
+  from  Experiment import LimitGetter
   from Tools.PhysicsUnits import rmvunit
 
   Dana = DistAnalyses  #List of analyses to be used
 
 #Get upper bounds for each mass:
-  xmass1 = SMSgetlimit.GetPlotLimit(mass1,Dana[0],Dana[1],complain=False)
-  xmass2 = SMSgetlimit.GetPlotLimit(mass2,Dana[0],Dana[1],complain=False)
+  xmass1 = LimitGetter.GetPlotLimit(mass1,Dana[0],Dana[1],complain=False)
+  xmass2 = LimitGetter.GetPlotLimit(mass2,Dana[0],Dana[1],complain=False)
   if xmass1==None or xmass1==False:
     print "[ClusterTools.MassDist] no limit for plot 1"
     return None

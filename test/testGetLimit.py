@@ -1,6 +1,6 @@
 import set_path
 import ROOT
-from Experiment import SMSResults, SMSInterpolation, SMSgetlimit, ROOTTools
+from Experiment import SMSResults, SMSInterpolation, LimitGetter, ROOTTools
 from Theory import SMSDataObjects
 from Tools.PhysicsUnits import addunit, rmvunit
 
@@ -69,7 +69,7 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
 
       else: massv=[x,y]
 
-      v=rmvunit(SMSgetlimit.GetPlotLimit([massv,massv],[topo,[ana]],a)[0][1],'fb')
+      v=rmvunit(LimitGetter.GetPlotLimit([massv,massv],[topo,[ana]],a)[0][1],'fb')
 
       if v: h.Fill(x,y,v)
 

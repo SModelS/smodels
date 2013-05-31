@@ -19,14 +19,14 @@ def GetPlotLimit(inmass,plot,Analysis,complain = False):
 
 #Skip empty plots:
     if len(plot) != 2:
-      if complain: print "[SMSgetlimit.py] length of plot != 2"
+      if complain: print "[LimitGetter.py] length of plot != 2"
       if len(plot) != 0:
-        print "[SMSgetlimit.py] warning: len of plot is neither 2 nor 0"
+        print "[LimitGetter.py] warning: len of plot is neither 2 nor 0"
       return False
 
 #Skip empty mass arrays:
     if len(massarray) < 1: 
-      if complain: print "[SMSgetlimit.py] length of massarray < 1"
+      if complain: print "[LimitGetter.py] length of massarray < 1"
       return False
 
     limits = []
