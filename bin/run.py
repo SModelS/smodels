@@ -42,4 +42,6 @@ for Analysis in analyses:
     masses=lead.B[0].masses[0] ## ,lead.B[1].masses[0]
     print "[run.py] --    plot 0=",Tx0,ana0,masses
     ul=SMSResults.getSmartUpperLimit(ana0,Tx0,masses)
-    print "[run.py] upper limit=",ul
+    refxsec=theoRes[0]['result']['8 TeV (NLL)']
+    excluded=refxsec>ul
+    print "[run.py] upper limit=",ul,"theory prediction=",refxsec,excluded
