@@ -84,6 +84,13 @@ title.SetNDC()
 
 title.DrawLatex(0.1,0.93, '%s , %s (%s-%s) , %d TeV , NLONLL' %(SMSResults.SMSInfo("decay", args.topo, args.ana),SMSResults.getPrettyName(args.ana),SMSResults.getExperiment(args.ana),SMSResults.getPAS(args.ana),tevIn))
 
+img=ROOT.TImage.Create()
+img.FromPad(c1)
+logo=ROOT.TASImage("../plots/smodels75.png")
+logo.Draw("SAME")
+img.Merge(logo,"alphablend",150,150)
+img.WriteImage("bla.png")
+
 
 c1.Print("../plots/%s_%s_%devts.png" %(args.ana,toponame,args.nevts))
 #c1.Print("../plots/%s_%s_%devtsROOT.pdf" %(args.ana,toponame,args.nevts))
