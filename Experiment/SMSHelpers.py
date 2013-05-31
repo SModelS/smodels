@@ -237,7 +237,7 @@ def getUpperLimitFromHisto ( analysis, topo, run, complain=False ):
       log("root file %s cannot be opened" % rootfile )
       return None
     openFiles[rootfile]=f
-  histo=f.Get("limit_%s" % topo )
+  histo=f.Get("limit_%s" % getCanonicalName(topo) )
   if not histo:
     if complain: log("histogram %s not found in %s" % ( topo, rootfile ))
     return None
