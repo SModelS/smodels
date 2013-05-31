@@ -155,12 +155,18 @@ def getExclusionLine(topo,ana,expected=False,plusminussigma=0,extendedinfo=False
   ex=SMSResultsCollector.exclusionline(topo,ana,xvalue,factor=1.0,extendedinfo=extendedinfo,expected=expected,plusminussigma=plusminussigma)
   return ex
 
-def getTopologies ( analysis, run=None ):
+def getTopologies ( analysis, run=None, allHistos=False ):
   """ return all topologies that this analysis has results for """
   run=SMSHelpers.getRun ( analysis, run )
-  # we used the exclusion info to get the list
-  x=SMSHelpers.motherParticleExclusions ( analysis, run )
-  return x.keys()
+  if allHistos or not getaxes(analysis):
+# we used the exclusion info to get the list
+    x=SMSHelpers.motherParticleExclusions ( analysis, run )
+    return x.keys()
+  topolist=[]
+  axes = getaxes(analysis)
+  for topo in axes.keys():
+    if exists(analysis,topo): topolist.append(topo)
+  return topolist
 
 def getRun ( analysis, run=None ):
   """ tell us, which run the results will be fetched for.
@@ -565,7 +571,8 @@ def getaxes (analysis, topo=None, run=None):
   if not exists(analysis,topo=None): ## analysis is not known, we return None
     return None
   st = SMSHelpers.getMetaInfoField (analysis, "axes", run)
-  if not st: 
+  if not st:
+    if not topo: return None #cannot return default without info on topology
     # if there is no information about the axes, return the default
     return [{'axes': 'M1-M0', 'mz': None}]
   st = st.split(',')
