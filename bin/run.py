@@ -4,7 +4,7 @@
 
 import set_path, tempfile
 from Theory import LHEDecomposer, XSecComputer
-from Experiment import TxNames, SMSAnalysisFactory, SMSResults
+from Experiment import TxNames, SMSAnalysisFactory, SMSResults, LimitGetter
 
 print "[run.py] loading analyses ...."
 analyses = SMSAnalysisFactory.load( anas="alphaT8TeV", topos="T2bb" )
@@ -25,23 +25,12 @@ XSecComputer.clean ( Tmp )
 print
 for Analysis in analyses:
   Analysis.add ( topos )
-  print "========================================="
-  print "[run.py] analysis ",Analysis
-  lead=Analysis.Top.leadingElement()
-  print "[run.py]  element ",lead
-  print "[run.py]   masses ",lead.B[0].masses,lead.B[1].masses
-  print "[run.py]    plots ",Analysis.plots
+  lims=LimitGetter.limit ( Analysis )
+  print "lims=",lims
   for (constraint,condition) in Analysis.results.items():
-    print "[run.py] -- constraint=",constraint,"condition=",condition
-    theoRes=Analysis.evaluateResult( constraint )
-    print "[run.py] -- plot=",Analysis.plots[constraint]
-    print "[run.py] -- len theoRes=",len(theoRes)
-    print "[run.py] --    result 0=",theoRes[0]
     Tx0=Analysis.plots[constraint][0]
     ana0=Analysis.plots[constraint][1][0]
-    masses=lead.B[0].masses[0] ## ,lead.B[1].masses[0]
-    print "[run.py] --    plot 0=",Tx0,ana0,masses
-    ul=SMSResults.getSmartUpperLimit(ana0,Tx0,masses)
+    theoRes=Analysis.evaluateResult( constraint )
     refxsec=theoRes[0]['result']['8 TeV (NLL)']
-    excluded=refxsec>ul
-    print "[run.py] upper limit=",ul,"theory prediction=",refxsec,excluded
+    excluded=refxsec>lims[ana0+Tx0]
+    print "[run.py] upper limit=",lims[ana0+Tx0],"theory prediction=",refxsec,excluded
