@@ -50,10 +50,10 @@ def load():
   }
   Analysis.plots  = {
   "[[[jet,jet]],[[jet,jet]]]" : ["T1",["alphaT8TeV"]],
-  "[[[t,t]],[[t,t]]]" : ["T1tttt",["RA48TeV","RA2b8TeV","alphaT8TeV"]],
+  "[[[t,t]],[[t,t]]]" : ["T1tttt",["RA48TeV","RA2b8TeV","alphaT8TeV","SUS13008"]],
   "[[[b,b]],[[b,b]]]" : ["T1bbbb",["RA2b8TeV","alphaT8TeV"]],
   "[[[t,b]],[[t,b]]]" : ["T1tbtb",["ATLAS_CONF_2013_007"]],
-  "[[[t+,t-]],[[t+,t-]]]" : ["T1tttt",["ATLAS_CONF_2012_105","ATLAS_CONF_2013_007","MultiLepton8TeV","SUS13008"]]
+  "[[[t+,t-]],[[t+,t-]]]" : ["T1tttt",["ATLAS_CONF_2012_105","ATLAS_CONF_2013_007","MultiLepton8TeV"]]
   }  
 #Add analysis to list of analyses:
   ListOfAnalyses.append(Analysis)
@@ -107,7 +107,7 @@ def load():
   "[[[jet]],[[jet]]]" : ["T2",["alphaT8TeV"]],
   "[[[t]],[[t]]]" : ["T2tt",["LeptonicStop8TeV","alphaT8TeV","ATLAS_CONF_2013_024","ATLAS_CONF_2013_037","ATLAS_CONF_2012_166"]],
   "[[[b]],[[b]]]" : ["T2bb",["alphaT8TeV","ATLAS_CONF_2013_001"]],
-  "[[[W]],[[Z]]]" : ["TChiwz",["Weakinos8TeV","ATLAS_CONF_2013_035"]],
+  "[[[W]],[[Z]]]" : ["TChiWZ",["Weakinos8TeV","ATLAS_CONF_2013_035"]],
   "[[[l+]],[[l-]]]" : ["TSlepSlep",["Weakinos8TeV"]]
   }  
 #Add analysis to list of analyses:
@@ -132,7 +132,7 @@ def load():
 #TChiChiSlep (tau-dominated  chargino and neutralino decays):
   "[[[ta],[ta]],[[nu],[ta]]]" : "None",
 #Chargino-Chargino:
-  "[[[L+],[nu]],[[L-],[nu]]] + [[[L+],[nu]],[[nu],[L-]]] + [[[L-],[nu]],[[nu],[L+]]] + [[[nu],[L+]],[[nu],[L-]]]" : "Csim([[[L+],[nu]],[[L-],[nu]]],[[[L+],[nu]],[[nu],[L-]]], [[[L-],[nu]],[[nu],[L+]]], [[[nu],[L+]],[[nu],[L-]]]); Cgtr([[[L+],[nu]],[[L-],[nu]]], 3.*[[[ta+],[nu]],[[L-],[nu]]]); Cgtr([[[L+],[nu]],[[L-],[nu]]], 3.*[[[L+],[nu]],[[ta-],[nu]]]); Cgtr([[[L+],[nu]],[[nu],[L-]]], 3.*[[[ta+],[nu]],[[nu],[L-]]]); Cgtr([[[L+],[nu]],[[nu],[L-]]], 3.*[[[L+],[nu]],[[nu],[ta-]]]); Cgtr([[[L-],[nu]],[[nu],[L+]]], 3.*[[[ta-],[nu]],[[nu],[L+]]]); Cgtr([[[L-],[nu]],[[nu],[L+]]], 3.*[[[L-],[nu]],[[nu],[ta+]]]); Cgtr([[[nu],[L+]],[[nu],[L-]]], 3.*[[[nu],[ta+]],[[nu],[L-]]]); Cgtr([[[nu],[L+]],[[nu],[L-]]], 3.*[[[nu],[L+]],[[nu],[ta-]]])",
+  "[[[L+],[nu]],[[L-],[nu]]] + [[[L+],[nu]],[[nu],[L-]]] + [[[L-],[nu]],[[nu],[L+]]] + [[[nu],[L+]],[[nu],[L-]]]" : "Csim([[[L-],[nu]],[[nu],[L+]]],[[[L+],[nu]],[[nu],[L-]]],[[[L+],[nu]],[[L-],[nu]]],[[[nu],[L+]],[[nu],[L-]]]); Cgtr([[[L+],[nu]],[[L-],[nu]]], 3.*[[[ta+],[nu]],[[L-],[nu]]]); Cgtr([[[L+],[nu]],[[L-],[nu]]], 3.*[[[L+],[nu]],[[ta-],[nu]]]); Cgtr([[[L+],[nu]],[[nu],[L-]]], 3.*[[[ta+],[nu]],[[nu],[L-]]]); Cgtr([[[L+],[nu]],[[nu],[L-]]], 3.*[[[L+],[nu]],[[nu],[ta-]]]); Cgtr([[[L-],[nu]],[[nu],[L+]]], 3.*[[[ta-],[nu]],[[nu],[L+]]]); Cgtr([[[L-],[nu]],[[nu],[L+]]], 3.*[[[L-],[nu]],[[nu],[ta+]]]); Cgtr([[[nu],[L+]],[[nu],[L-]]], 3.*[[[nu],[ta+]],[[nu],[L-]]]); Cgtr([[[nu],[L+]],[[nu],[L-]]], 3.*[[[nu],[L+]],[[nu],[ta-]]])",
 #T6bbww (stop pair production)
   "[[[b],[W]],[[b],[W]]]" : "None",
 #T5tttt
@@ -140,7 +140,7 @@ def load():
 #T5tttt
   "[[[t],[t]],[[t],[t]]]]" : "None",  
 #T6ttWW
-  "[[[t+],[W-]],[[t+],[W-]]] + [[[t-],[W+]],[[t+],[W-]]] + [[[t-],[W+]],[[t-],[W+]]]" : "None",
+  "[[[t+],[W-]],[[t+],[W-]]] + [[[t+],[W-]],[[t-],[W+]]] + [[[t-],[W+]],[[t-],[W+]]]" : "None",
 #T6ttWW
   "[[[t],[W]],[[t],[W]]]" : "None",  
 #T6ttzz  
@@ -150,9 +150,9 @@ def load():
 #TChiChiSlepSlep
   "[[[l],[l]],[[l],[l]]]" : "Cgtr([[[l],[l]],[[l],[l]]],2.*[[[e],[l]],[[l],[l]]]); Cgtr([[[l],[l]],[[l],[l]]],2.*[[[l],[e]],[[l],[l]]])",
 #TChiChipmStauL  
-  "2.*([[[ta+],[ta-]],[[nu],[ta]]] + [[[ta+],[ta-]],[[ta],[nu]]] + [[[ta-],[ta+]],[[nu],[ta]]] + [[[ta-],[ta+]],[[ta],[nu]]])" : "Csim([[[ta+],[ta-]],[[nu],[ta]]],[[[ta+],[ta-]],[[ta],[nu]]],[[[ta-],[ta+]],[[nu],[ta]]],[[[ta-],[ta+]],[[ta],[nu]]])",
+  "2.*([[[nu],[ta]],[[ta+],[ta-]]] + [[[ta],[nu]],[[ta+],[ta-]]] + [[[nu],[ta]],[[ta-],[ta+]]] + [[[ta],[nu]],[[ta-],[ta+]]])" : "Csim([[[nu],[ta]],[[ta+],[ta-]]],[[[ta],[nu]],[[ta+],[ta-]]],[[[nu],[ta]],[[ta-],[ta+]]],[[[ta],[nu]],[[ta-],[ta+]]])",
 #TChipChimStauSnu
-  "[[[ta+],[nu]],[[ta-],[nu]]] + [[[ta+],[nu]],[[nu],[ta-]]] + [[[ta-],[nu]],[[nu],[ta+]]] + [[[nu],[ta+]],[[nu],[ta-]]]" : "Csim([[[ta+],[nu]],[[ta-],[nu]]],[[[ta+],[nu]],[[nu],[ta-]]],[[[ta-],[nu]],[[nu],[ta+]]],[[[nu],[ta+]],[[nu],[ta-]]])"
+  "[[[ta+],[nu]],[[ta-],[nu]]] + [[[ta+],[nu]],[[nu],[ta-]]] + [[[ta-],[nu]],[[nu],[ta+]]] + [[[nu],[ta+]],[[nu],[ta-]]]" : "Csim([[[ta-],[nu]],[[nu],[ta+]]],[[[ta+],[nu]],[[nu],[ta-]]],[[[ta+],[nu]],[[ta-],[nu]]],[[[nu],[ta+]],[[nu],[ta-]]])"
   }
   Analysis.plots  = {   
   "2.*([[[L],[L]],[[L],[nu]]] + [[[L],[L]],[[nu],[L]]])" : ["TChiChipmSlepL",["Weakinos8TeV","ATLAS_CONF_2013_035"]],
@@ -162,12 +162,12 @@ def load():
   "[[[b],[W]],[[b],[W]]]" : ["T6bbWW",["LeptonicStop8TeV","ATLAS_CONF_2013_037","ATLAS_CONF_2012_166"]],
   "[[[t+],[t-]],[[t+],[t-]]] + [[[t-],[t+]],[[t+],[t-]]] + [[[t-],[t+]],[[t-],[t+]]]" : ["T5tttt",["ATLAS_CONF_2013_007"]],
   "[[[t],[t]],[[t],[t]]]]" : ["T5tttt",["SUS13008"]],
-  "[[[t+],[W-]],[[t+],[W-]]] + [[[t-],[W+]],[[t+],[W-]]] + [[[t-],[W+]],[[t-],[W+]]]" : ["T6ttWW",["ATLAS_CONF_2013_007"]],
+  "[[[t+],[W-]],[[t+],[W-]]] + [[[t+],[W-]],[[t-],[W+]]] + [[[t-],[W+]],[[t-],[W+]]]" : ["T6ttWW",["ATLAS_CONF_2013_007"]],
   "[[[t],[W]],[[t],[W]]]" : ["T6ttWW",["SUS13008"]],
   "[[[Z],[t]],[[Z],[t]]]" : ["T6ttZZ",["ATLAS_CONF_2013_025"]],
   "[[[b],[Z]],[[b],[Z]]]" : ["T6bbZZ",["SUS13008"]],
   "[[[l],[l]],[[l],[l]]]" : ["TChiChiSlepSlep",["ATLAS_CONF_2013_036"]],
-  "2.*([[[ta+],[ta-]],[[nu],[ta]]] + [[[ta+],[ta-]],[[ta],[nu]]] + [[[ta-],[ta+]],[[nu],[ta]]] + [[[ta-],[ta+]],[[ta],[nu]]])" : ["TChiChipmStauL",["ATLAS_CONF_2013_028"]],
+  "2.*([[[nu],[ta]],[[ta+],[ta-]]] + [[[ta],[nu]],[[ta+],[ta-]]] + [[[nu],[ta]],[[ta-],[ta+]]] + [[[ta],[nu]],[[ta-],[ta+]]])" : ["TChiChipmStauL",["ATLAS_CONF_2013_028"]],
   "[[[ta+],[nu]],[[ta-],[nu]]] + [[[ta+],[nu]],[[nu],[ta-]]] + [[[ta-],[nu]],[[nu],[ta+]]] + [[[nu],[ta+]],[[nu],[ta-]]]" : ["TChipChimStauSnu",["ATLAS_CONF_2013_028"]]
   }  
 #Add analysis to list of analyses:
@@ -192,42 +192,42 @@ def load():
   ListOfAnalyses.append(Analysis)
   
   
-#     #Global Topology:
-  Analysis = EAnalysis()
-  Analysis.label = "T8-type" #it can be whatever you want
-  Analysis.sqrts = addunit(8.,'TeV')
-  Analysis.lum = addunit(20.7,'fb-1')  #Maximum luminosity
-  Analysis.Top.vertnumb = [4,4]  #Number of vertices 
-  Analysis.Top.vertparts = [[1,1,1,0],[1,1,1,0]] #Number of particle insertions 
-  Analysis.results = {
-#T8ChiSlep
-  "1.454545([[[jet],[nu],[L]],[[jet],[nu],[L]]] + [[[jet],[nu],[L]],[[jet],[L],[nu]]] + [[[jet],[nu],[L]],[[jet],[L],[L]]] + [[[jet],[L],[nu]],[[jet],[L],[nu]]] + [[[jet],[L],[nu]],[[jet],[L],[L]]] + [[[jet],[L],[L]],[[jet],[L],[L]]] + [[[jet],[L],[L]],[[jet],[nu],[nu]]])" : "Csim([[[jet],[L],[nu]],[[jet],[L],[nu]]], [[[jet],[nu],[L]],[[jet],[nu],[L]]], [[[jet],[nu],[nu]],[[jet],[L],[L]]]); Csim([[[jet],[L],[nu]],[[jet],[nu],[L]]], 2.*([[[jet],[nu],[L]],[[jet],[nu],[L]]])); Cgtr(2.*([[[jet],[L],[L]],[[jet],[L],[L]]]), [[[jet],[nu],[L]],[[jet],[L],[L]]]); Cgtr(2.*([[[jet],[L],[L]],[[jet],[L],[L]]]), [[[jet],[L],[nu]],[[jet],[L],[L]]]); Cgtr([[[jet],[L],[nu]],[[jet],[L],[L]]], [[[jet],[nu],[L]],[[jet],[L],[nu]]]); Cgtr([[[jet],[L],[nu]],[[jet],[L],[L]]], [[[jet],[nu],[L]],[[jet],[nu],[L]]]); Cgtr([[[jet],[L],[nu]],[[jet],[L],[L]]], [[[jet],[L],[nu]],[[jet],[L],[nu]]]); Cgtr([[[jet],[L],[nu]],[[jet],[L],[L]]], [[[jet],[L],[L]],[[jet],[nu],[nu]]])",
-  "[[[b],[t],[W]],[[b],[t],[W]]]" : "None"
-  }
-  Analysis.plots  = {   
-  "1.454545([[[jet],[nu],[L]],[[jet],[nu],[L]]] + [[[jet],[nu],[L]],[[jet],[L],[nu]]] + [[[jet],[nu],[L]],[[jet],[L],[L]]] + [[[jet],[L],[nu]],[[jet],[L],[nu]]] + [[[jet],[L],[nu]],[[jet],[L],[L]]] + [[[jet],[L],[L]],[[jet],[L],[L]]] + [[[jet],[L],[L]],[[jet],[nu],[nu]]])" : ["T8ChiSlep",["ATLAS_CONF_2013_007"]],
-  "[[[b],[t],[W]],[[b],[t],[W]]]" : ["T7btbtWW",["SUS13008"]]
-  }  
-#Add analysis to list of analyses:
-  ListOfAnalyses.append(Analysis)   
+##     #Global Topology:
+#  Analysis = EAnalysis()
+#  Analysis.label = "T8-type" #it can be whatever you want
+#  Analysis.sqrts = addunit(8.,'TeV')
+#  Analysis.lum = addunit(20.7,'fb-1')  #Maximum luminosity
+#  Analysis.Top.vertnumb = [4,4]  #Number of vertices 
+#  Analysis.Top.vertparts = [[1,1,1,0],[1,1,1,0]] #Number of particle insertions 
+#  Analysis.results = {
+##T8ChiSlep
+#  "1.454545([[[jet],[nu],[L]],[[jet],[nu],[L]]] + [[[jet],[nu],[L]],[[jet],[L],[nu]]] + [[[jet],[nu],[L]],[[jet],[L],[L]]] + [[[jet],[L],[nu]],[[jet],[L],[nu]]] + [[[jet],[L],[nu]],[[jet],[L],[L]]] + [[[jet],[L],[L]],[[jet],[L],[L]]] + [[[jet],[L],[L]],[[jet],[nu],[nu]]])" : "Csim([[[jet],[L],[nu]],[[jet],[L],[nu]]], [[[jet],[nu],[L]],[[jet],[nu],[L]]], [[[jet],[nu],[nu]],[[jet],[L],[L]]]); Csim([[[jet],[L],[nu]],[[jet],[nu],[L]]], 2.*([[[jet],[nu],[L]],[[jet],[nu],[L]]])); Cgtr(2.*([[[jet],[L],[L]],[[jet],[L],[L]]]), [[[jet],[nu],[L]],[[jet],[L],[L]]]); Cgtr(2.*([[[jet],[L],[L]],[[jet],[L],[L]]]), [[[jet],[L],[nu]],[[jet],[L],[L]]]); Cgtr([[[jet],[L],[nu]],[[jet],[L],[L]]], [[[jet],[nu],[L]],[[jet],[L],[nu]]]); Cgtr([[[jet],[L],[nu]],[[jet],[L],[L]]], [[[jet],[nu],[L]],[[jet],[nu],[L]]]); Cgtr([[[jet],[L],[nu]],[[jet],[L],[L]]], [[[jet],[L],[nu]],[[jet],[L],[nu]]]); Cgtr([[[jet],[L],[nu]],[[jet],[L],[L]]], [[[jet],[L],[L]],[[jet],[nu],[nu]]])",
+#  "[[[b],[t],[W]],[[b],[t],[W]]]" : "None"
+#  }
+#  Analysis.plots  = {   
+#  "1.454545([[[jet],[nu],[L]],[[jet],[nu],[L]]] + [[[jet],[nu],[L]],[[jet],[L],[nu]]] + [[[jet],[nu],[L]],[[jet],[L],[L]]] + [[[jet],[L],[nu]],[[jet],[L],[nu]]] + [[[jet],[L],[nu]],[[jet],[L],[L]]] + [[[jet],[L],[L]],[[jet],[L],[L]]] + [[[jet],[L],[L]],[[jet],[nu],[nu]]])" : ["T8ChiSlep",["ATLAS_CONF_2013_007"]],
+#  "[[[b],[t],[W]],[[b],[t],[W]]]" : ["T7btbtWW",["SUS13008"]]
+#  }  
+##Add analysis to list of analyses:
+#  ListOfAnalyses.append(Analysis)   
   
   
-#     #Global Topology:
-  Analysis = EAnalysis()
-  Analysis.label = "T7-type" #it can be whatever you want
-  Analysis.sqrts = addunit(8.,'TeV')
-  Analysis.lum = addunit(20.7,'fb-1')  #Maximum luminosity
-  Analysis.Top.vertnumb = [4,4]  #Number of vertices 
-  Analysis.Top.vertparts = [[2,1,1,0],[2,1,1,0]] #Number of particle insertions 
-  Analysis.results = {
-#T7ChiSlep
-   "1.454545([[[jet,jet],[nu],[L]],[[jet,jet],[nu],[L]]] + [[[jet,jet],[nu],[L]],[[jet,jet],[L],[nu]]] + [[[jet,jet],[nu],[L]],[[jet,jet],[L],[L]]] + [[[jet,jet],[L],[nu]],[[jet,jet],[L],[nu]]] + [[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]] + [[[jet,jet],[L],[L]],[[jet,jet],[L],[L]]] + [[[jet,jet],[L],[L]],[[jet,jet],[nu],[nu]]])" : "Csim([[[jet,jet],[L],[nu]],[[jet,jet],[L],[nu]]], [[[jet,jet],[nu],[L]],[[jet,jet],[nu],[L]]], [[[jet,jet],[nu],[nu]],[[jet,jet],[L],[L]]]); Csim([[[jet,jet],[L],[nu]],[[jet,jet],[nu],[L]]], 2.*([[[jet,jet],[nu],[L]],[[jet,jet],[nu],[L]]])); Cgtr(2.*([[[jet,jet],[L],[L]],[[jet,jet],[L],[L]]]), [[[jet,jet],[nu],[L]],[[jet,jet],[L],[L]]]); Cgtr(2.*([[[jet,jet],[L],[L]],[[jet,jet],[L],[L]]]), [[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]]); Cgtr([[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]], [[[jet,jet],[nu],[L]],[[jet,jet],[L],[nu]]]); Cgtr([[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]], [[[jet,jet],[nu],[L]],[[jet,jet],[nu],[L]]]); Cgtr([[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]], [[[jet,jet],[L],[nu]],[[jet,jet],[L],[nu]]]); Cgtr([[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]], [[[jet,jet],[L],[L]],[[jet,jet],[nu],[nu]]])"     
-  }
-  Analysis.plots  = {   
-  "1.454545([[[jet,jet],[nu],[L]],[[jet,jet],[nu],[L]]] + [[[jet,jet],[nu],[L]],[[jet,jet],[L],[nu]]] + [[[jet,jet],[nu],[L]],[[jet,jet],[L],[L]]] + [[[jet,jet],[L],[nu]],[[jet,jet],[L],[nu]]] + [[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]] + [[[jet,jet],[L],[L]],[[jet,jet],[L],[L]]] + [[[jet,jet],[L],[L]],[[jet,jet],[nu],[nu]]])" : ["T7ChiSlep",["ATLAS_CONF_2013_007"]]  
-  }  
-#Add analysis to list of analyses:
-  ListOfAnalyses.append(Analysis)   
+##     #Global Topology:
+#  Analysis = EAnalysis()
+#  Analysis.label = "T7-type" #it can be whatever you want
+#  Analysis.sqrts = addunit(8.,'TeV')
+#  Analysis.lum = addunit(20.7,'fb-1')  #Maximum luminosity
+#  Analysis.Top.vertnumb = [4,4]  #Number of vertices 
+#  Analysis.Top.vertparts = [[2,1,1,0],[2,1,1,0]] #Number of particle insertions 
+#  Analysis.results = {
+##T7ChiSlep
+#   "1.454545([[[jet,jet],[nu],[L]],[[jet,jet],[nu],[L]]] + [[[jet,jet],[nu],[L]],[[jet,jet],[L],[nu]]] + [[[jet,jet],[nu],[L]],[[jet,jet],[L],[L]]] + [[[jet,jet],[L],[nu]],[[jet,jet],[L],[nu]]] + [[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]] + [[[jet,jet],[L],[L]],[[jet,jet],[L],[L]]] + [[[jet,jet],[L],[L]],[[jet,jet],[nu],[nu]]])" : "Csim([[[jet,jet],[L],[nu]],[[jet,jet],[L],[nu]]], [[[jet,jet],[nu],[L]],[[jet,jet],[nu],[L]]], [[[jet,jet],[nu],[nu]],[[jet,jet],[L],[L]]]); Csim([[[jet,jet],[L],[nu]],[[jet,jet],[nu],[L]]], 2.*([[[jet,jet],[nu],[L]],[[jet,jet],[nu],[L]]])); Cgtr(2.*([[[jet,jet],[L],[L]],[[jet,jet],[L],[L]]]), [[[jet,jet],[nu],[L]],[[jet,jet],[L],[L]]]); Cgtr(2.*([[[jet,jet],[L],[L]],[[jet,jet],[L],[L]]]), [[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]]); Cgtr([[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]], [[[jet,jet],[nu],[L]],[[jet,jet],[L],[nu]]]); Cgtr([[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]], [[[jet,jet],[nu],[L]],[[jet,jet],[nu],[L]]]); Cgtr([[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]], [[[jet,jet],[L],[nu]],[[jet,jet],[L],[nu]]]); Cgtr([[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]], [[[jet,jet],[L],[L]],[[jet,jet],[nu],[nu]]])"     
+#  }
+#  Analysis.plots  = {   
+#  "1.454545([[[jet,jet],[nu],[L]],[[jet,jet],[nu],[L]]] + [[[jet,jet],[nu],[L]],[[jet,jet],[L],[nu]]] + [[[jet,jet],[nu],[L]],[[jet,jet],[L],[L]]] + [[[jet,jet],[L],[nu]],[[jet,jet],[L],[nu]]] + [[[jet,jet],[L],[nu]],[[jet,jet],[L],[L]]] + [[[jet,jet],[L],[L]],[[jet,jet],[L],[L]]] + [[[jet,jet],[L],[L]],[[jet,jet],[nu],[nu]]])" : ["T7ChiSlep",["ATLAS_CONF_2013_007"]]  
+#  }  
+##Add analysis to list of analyses:
+#  ListOfAnalyses.append(Analysis)   
   
 
 # Build list of elements from constraints and conditions with zero weights
