@@ -172,6 +172,9 @@ def runPythia ( slhafile, n, sqrts=7, datadir="./data/", etcdir="./etc/",
     out=line.replace("NEVENTS",str(n)).replace("SQRTS",str(1000*sqrts))
     g.write ( out )
   g.close()
+  print "[XSecComputer.py] FIXME insert checks here"
+  import sys
+  sys.exit(0)
   o=commands.getoutput ( "cd %s; %s/pythia_lhe < external_lhe.dat" % \
      ( datadir, installdir ) )
   lines=o.split( "\n" )
