@@ -159,7 +159,7 @@ def runPythia ( slhafile, n, sqrts=7, datadir="./data/", etcdir="./etc/",
       datadir is where this all should run,
       etcdir is where external_lhe.template is to be picked up,
       installdir is where pythia_lhe is to be found.  """
-  import commands
+  import commands, os
   # print "[SMSXSecs.runPythia] try to run pythia_lhe at sqrt(s)=%d with %d events" % (sqrts,n)
   o=commands.getoutput ( "cp %s %s/fort.61" % ( slhafile, datadir ) )
   if len(o)>0:
@@ -172,9 +172,15 @@ def runPythia ( slhafile, n, sqrts=7, datadir="./data/", etcdir="./etc/",
     out=line.replace("NEVENTS",str(n)).replace("SQRTS",str(1000*sqrts))
     g.write ( out )
   g.close()
-  print "[XSecComputer.py] FIXME insert checks here"
-  import sys
-  sys.exit(0)
+  if not os.path.isdir( datadir ):
+    print "[XSecComputer.py] error: %s does not exist or is not a directory." % datadir
+    return None
+  if not os.path.isfile ( "%s/pythia_lhe" % installdir ):
+    print "[XSecComputer.py] error: %s/pythia_lhe does not exist." % installdir
+    return None
+  if not os.path.isfile ( "%s/external_lhe.dat" % datadir ):
+    print "[XSecComputer.py] error: %s/external_lhe.dat does not exist." % datadir
+    return None
   o=commands.getoutput ( "cd %s; %s/pythia_lhe < external_lhe.dat" % \
      ( datadir, installdir ) )
   lines=o.split( "\n" )
