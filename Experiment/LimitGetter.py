@@ -8,14 +8,16 @@ def limit(analysis):
   ret={}
   print "[LimitGetter.py] get limit for",analysis,"run=",run
   for (constraint,condition) in analysis.results.items():
-    print "[LimitGetter.py] for now I assume theres only one result"
-    Tx0=analysis.plots[constraint][0]
-    ana0=analysis.plots[constraint][1][0]
-    masses=lead.B[0].masses[0] ## ,lead.B[1].masses[0]
-    ul=SMSResults.getSmartUpperLimit(ana0,Tx0,masses)
-    print "[LimitGetter.py] %s %s ul=%s" % ( Tx0, ana0, ul )
-    ret[ana0+Tx0]=ul
+    print "[LimitGetter.py] for now I assume theres only one result: ",analysis.plots[constraint]
+    Tx=analysis.plots[constraint][0]
+    for ana in analysis.plots[constraint][1]:
+      masses0=lead.B[0].masses[0] ## ,lead.B[1].masses[0]
+      masses1=lead.B[1].masses[0] ## ,lead.B[1].masses[0]
+      ul=SMSResults.getSmartUpperLimit(ana,Tx,masses0)
+      print "[LimitGetter.py] %s %s ul=%s" % ( Tx, ana, ul )
+    ret[ana+Tx]=ul
   return ret 
+
     
 def GetPlotLimit(inmass,plot,Analysis,complain = False):
     """ Get upper limit on sigma*BR for a specific array of masses from plot
