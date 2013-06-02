@@ -17,6 +17,12 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
 
     try:
       if Energy==8:
+          if not os.path.isdir ( "%s/nllfast-2.1" % base ):
+            print "[NLLXsec.py] error: %s/nllfast-2.1 does not exist or is not a directory." % base
+            sys.exit(0)
+          if not os.path.isfile ( "%s/nllfast-2.1/nllfast_8TeV" % base ) or not os.access ( "%s/nllfast-2.1/nllfast_8TeV" % base, os.X_OK ):
+            print "[NLLXsec.py] error: %s/nllfast-2.1/nllfast_8TeV does not exist or is not executable." % base
+            sys.exit(0)
           if process=="st":
               os.chdir("%s/nllfast-2.1" % base )
               s = "./nllfast_8TeV %s %s %s" % ( process, pdf, squarkmass )
@@ -24,6 +30,12 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
               os.chdir("%s/nllfast-2.1" % base )
               s = "./nllfast_8TeV %s %s %s %s" % ( process, pdf, squarkmass, gluinomass )
       if Energy==7:
+          if not os.path.isdir ( "%s/nllfast-1.2" % base ):
+            print "[NLLXsec.py] error: %s/nllfast-1.2 does not exist or is not a directory." % base
+            sys.exit(0)
+          if not os.path.isfile ( "%s/nllfast-1.2/nllfast_7TeV" % base ) or not os.access ( "%s/nllfast-1.2/nllfast_7TeV" % base, os.X_OK ):
+            print "[NLLXsec.py] error: %s/nllfast-1.2/nllfast_7TeV does not exist or is not executable." % base
+            sys.exit(0)
           if process=="st":
               os.chdir("%s/nllfast-1.2" % base )
               s = "./nllfast_7TeV %s %s %s" % ( process, pdf, squarkmass )
