@@ -11,8 +11,8 @@ def compute(nevts,slhafile,rpythia = True, donlo = True, basedir=None,datadir=No
 
   import shutil, LHEReader, NLLXSec, CrossSection
   from Tools.PhysicsUnits import addunit
+  import os, sys
 
-  import os
   if basedir==None:
     basedir=os.getcwd()
     if basedir[-3:]=="bin": basedir=basedir[:-3]
@@ -25,6 +25,12 @@ def compute(nevts,slhafile,rpythia = True, donlo = True, basedir=None,datadir=No
     return None
     
   nllbase=basedir+"/nllfast"
+  if not os.path.isdir ( nllbase ):
+    print "[XSecComputer] error: %s does not exist or is not a directory." % nllbase
+    sys.exit(0)
+  if not os.path.isfile ( slhafile ):
+    print "[XSecComputer] error: %s does not exist or is not a file." % slhafile
+    sys.exit(0)
   installdir=basedir
   etcdir="%s/etc/" % basedir
   
