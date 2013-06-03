@@ -5,7 +5,9 @@ from ParticleNames import Reven, PtcDic
 import ClusterTools, TheoryPrediction
 
 class EAnalysis:  
-  """ an analysis/topology pair """
+  """ FIXME currently an analysis is a container for the association between
+      a topology and n results. Maybe the structure becomes clearer, if the
+      association is made only between a topology and one result? """
   def __init__(self):
     self.label = ""
     self.Top = GTop()
