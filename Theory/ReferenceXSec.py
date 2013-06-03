@@ -1,4 +1,4 @@
-class XSecPrediction:
+class ReferenceXSec:
   """ basically a wrapper around this complicated result dictionary as
       it is obtain from XSecComputer, to make it easier to use this dictionary """
 
