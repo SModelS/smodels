@@ -32,5 +32,5 @@ for Analysis in analyses:
     ana0=Analysis.plots[constraint][1][0]
     theoRes=Analysis.evaluateResult( constraint )
     refxsec=theoRes[0]['result']['8 TeV (NLL)']
-    excluded=refxsec>lims[ana0+Tx0]
+    excluded=refxsec>lims[ana0+Tx0]['ul']
     print "[run.py] upper limit=",lims[ana0+Tx0],"theory prediction=",refxsec,excluded

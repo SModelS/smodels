@@ -31,7 +31,7 @@ def load( anas = None, topos=None ):
       If anas is given as a list, then we create only objects for these analyses
       (the database naming convention is used). 
       If topos is given as a list, then only these topos are considered """
-  from Theory.SMSDataObjects import EAnalysis
+  from Theory.SMSAnalysis import EAnalysis
   from Experiment import SMSResults
   import types
 
