@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 import set_path, sys
-from Experiment import SMSResults, SMSAnalyses, SMSAnalysisFactory
+from Experiment import SMSResults, SMSAnalysisList, SMSAnalysisFactory
 
 #Creat analyses list:
 ListOfAnalysesU = SMSAnalysisFactory.load()
-ListOfAnalysesA = SMSAnalyses.load()
+ListOfAnalysesA = SMSAnalysisList.load()
 
 
 
@@ -34,7 +34,7 @@ for Ana in ListOfAnalysesA:
                             if not diff:
                                 diff = True
                                 print "\nConditions or constraint differ for",TxA
-                                print "from SMSAnalyses.py:"
+                                print "from SMSAnalysisList.py:"
                                 print key.replace(" ","")
                                 for ix in range(len(conA)):
                                     x = conA[ix]
@@ -105,9 +105,9 @@ for Ana in ListOfAnalysesU:
        
     if not match:
         if SMSResults.isPublic(plotU):
-            print "Analysis",plotU," for ",TxU," missing in SMSAnalyses.py"
+            print "Analysis",plotU," for ",TxU," missing in SMSAnalysisList.py"
         else:
-            print "Analysis",plotU," for ",TxU," missing in SMSAnalyses.py (NOT PUBLIC)"
+            print "Analysis",plotU," for ",TxU," missing in SMSAnalysisList.py (NOT PUBLIC)"
 
 
 print "-----------------------------"
@@ -152,7 +152,7 @@ for iAna in range(len(ListOfAnalysesA)-1):
         plots = Ana.plots[key][1]
         for plot in plots:
             if plots.count(plot) > 1:
-                print "Duplicate plot entry",plot,"in Analyses",Ana.label," in SMSAnalyses.py"
+                print "Duplicate plot entry",plot,"in Analyses",Ana.label," in SMSAnalysisList.py"
                 Acount -= 1
             for jAna in range(len(ListOfAnalysesA)):
                 AnaB = ListOfAnalysesA[jAna]
@@ -162,15 +162,15 @@ for iAna in range(len(ListOfAnalysesA)-1):
                     plotsB = AnaB.plots[key2][1]
                     for plotB in plotsB:
                         if TxAB == TxA and plotB == plot:
-                            print "Duplicate entry for analysis",plot,"and topology",TxA," in SMSAnalyses.py"
+                            print "Duplicate entry for analysis",plot,"and topology",TxA," in SMSAnalysisList.py"
                             Acount -= 1
 
 
 print "\n"            
 print "-----------------------------"
 print "Total of (non-duplicated) analyses (including possible empty entries) in:"
-print "  SMSAnalyses.py = ",Acount
-print "  Factory = ",Ucount
+print "  SMSAnalysisList.py = ",Acount
+print "  SMSAnalysisFactory = ",Ucount
 
 
 sys.exit()
