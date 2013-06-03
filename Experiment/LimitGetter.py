@@ -2,8 +2,9 @@ def limit(analysis):
   """ the next generation limit retrieval function, should get all information
       from the analysis object """
   import SMSResults
+  from Tools.PhysicsUnits import rmvunit
   run=analysis.run
-  sqrts=analysis.sqrts
+  sqrts=rmvunit(analysis.sqrts,"TeV")
   lead=analysis.Top.leadingElement()
   ret={}
   print "[LimitGetter.py] get limit for",analysis,"run=",run
@@ -15,8 +16,9 @@ def limit(analysis):
       masses1=lead.B[0].masses[0] ## ,lead.B[1].masses[0]
       masses2=lead.B[1].masses[0] ## ,lead.B[1].masses[0]
       ul=SMSResults.getSmartUpperLimit(ana,Tx,masses1,masses2)
-      print "[LimitGetter.py] %s %s ul=%s" % ( Tx, ana, ul )
-      ret[ana+Tx]={ "ul": ul, "analysis": ana, "Tx": Tx, "m1": masses1, "m2": masses2 }
+      theory=theoRes.predictionFor ( masses1, masses2, sqrts, "NLL", condition )
+      print "[LimitGetter.py] %s %s ul=%s theory xsec=%s" % ( Tx, ana, ul, theory )
+      ret[ana+Tx]={ "ul": ul, "analysis": ana, "Tx": Tx, "m1": masses1, "m2": masses2, "theory": theory }
   return ret 
 
     

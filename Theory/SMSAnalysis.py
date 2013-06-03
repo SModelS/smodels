@@ -2,7 +2,7 @@
 
 from SMSDataObjects import GTop, EElement
 from ParticleNames import Reven, PtcDic
-import ClusterTools
+import ClusterTools, TheoryPrediction
 
 class EAnalysis:  
   """ an analysis/topology pair """
@@ -21,7 +21,7 @@ class EAnalysis:
 
 #Given the constraints dictionary, automatically fill the element list with the
 #elements corresponding to the strings in the dictionary, skipping repeated ones
-  def GenerateElements(self):
+  def generateElements(self):
      
     ListOfStrs = []
     vertnumb = self.Top.vertnumb
@@ -29,7 +29,7 @@ class EAnalysis:
 #Syntax check:    
     for k in range(len(vertnumb)):
       if len(vertparts[k]) != vertnumb[k]:
-        print "GenerateElements: Inconsistent data: ninsertions=%d len(insertions)=%d for ``%s''." % ( vertnumb[k], len(vertparts[k]), self.Top )
+        print "[SMSAnalysis.generateElements]: Inconsistent data: ninsertions=%d len(insertions)=%d for ``%s''." % ( vertnumb[k], len(vertparts[k]), self.Top )
         return False
     
 #Get all element strings:    
@@ -48,7 +48,7 @@ class EAnalysis:
           for ib in range(2):
             for ipt in range(len(ptclist[ib])):
               if len(ptclist[ib][ipt]) != vertparts[ib][ipt]:
-                print "GenerateElements: Wrong syntax2"
+                print "[SMSAnalysis.generateElements]: Wrong syntax2"
                 return False
               for ptc in ptclist[ib][ipt]:
                 if not ptc in Reven.values() and not PtcDic.has_key(ptc):
@@ -71,14 +71,14 @@ class EAnalysis:
   
 
 #Check if the plots listed in results exist
-  def GetPlots(self,verbose=True):
+  def getPlots(self,verbose=True):
     from Experiment import SMSResults
 
     run = self.run    
     if run == "": run = None  #If run has not been defined, use latest
     for res in self.results.keys():
       if not self.plots.has_key(res):
-        if verbose: print "[SMSDataObjects.GetPlots] Plot for result",res,"in Analysis",self.label,"not found"
+        if verbose: print "[SMSAnalysis.getPlots] Plot for result",res,"in Analysis",self.label,"not found"
         topo = ""
         ana = []
       else:
@@ -87,7 +87,7 @@ class EAnalysis:
         
       for ana in analyses:
         if not SMSResults.exists(ana,topo,run):
-          if verbose: print "[SMSDataObjects.GetPlots] Histogram for ",topo," in ",ana," for run ",run," not found"
+          if verbose: print "[SMSAnalysis.getPlots] Histogram for ",topo," in ",ana," for run ",run," not found"
 
   #Loop over all elements in SMSTopList and add the weight to the 
   #matching elements in Analysis.
@@ -203,7 +203,7 @@ class EAnalysis:
 
       output.append({'mass' : mavg, 'result' : result, 'conditions' : conditions})
 
-    return output
+    return TheoryPrediction.TheoryPrediction( output )
 
   def evaluateResults(self, uselimits = False ):
     """ evaluate all the analysis'es results """

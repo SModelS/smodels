@@ -101,8 +101,8 @@ def load( anas = None, topos=None ):
 #  print "[SMSAnalysisFactory.py] Now generate elements"
   for Analy in ListOfAnalyses:
 #    print "[SMSAnalysisFactory.py] Generate element ``%s [%s]'' " % ( Analy.label,Analy.run )
-    Analy.GenerateElements()
-    Analy.GetPlots(verbose=debug)
+    Analy.generateElements()
+    Analy.getPlots(verbose=debug)
     
   return ListOfAnalyses  
     
