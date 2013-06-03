@@ -1,6 +1,6 @@
 class XSecPrediction:
-  """ basically a wrapper around this complicated result dictionary, to 
-      make it easier to use this dictionary """
+  """ basically a wrapper around this complicated result dictionary as
+      it is obtain from XSecComputer, to make it easier to use this dictionary """
 
   def __init__ ( self, data ):
     self.data=data
@@ -15,8 +15,8 @@ class XSecPrediction:
   def crossSections ( self ): return self.data["Xsecdic"]
 
   def getCrossSection ( self, pidmom1, pidmom2, order="NLL", sqrts=8 ):
-    """ returns production cross section for a given production mode (pidmom1, pidmom2)
-        at 7 or 8 TeV in chosen order LO or NLL """
+    """ returns production cross section for a given production mode (pidmom1,
+    pidmom2) at 7 or 8 TeV in chosen order LO or NLL """
     if pidmom1 > pidmom2:
       pidmom1, pidmom2 = pidmom2, pidmom1
     k='%d TeV (%s)' %(sqrts, order)

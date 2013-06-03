@@ -2,7 +2,7 @@
 
 from SMSDataObjects import GTop, EElement
 from ParticleNames import Reven, PtcDic
-import ClusterTools, XSecPrediction
+import ClusterTools
 
 class EAnalysis:  
   """ an analysis/topology pair """
@@ -203,7 +203,7 @@ class EAnalysis:
 
       output.append({'mass' : mavg, 'result' : result, 'conditions' : conditions})
 
-    return XSecPrediction.XSecPrediction(output)
+    return output
 
   def evaluateResults(self, uselimits = False ):
     """ evaluate all the analysis'es results """
