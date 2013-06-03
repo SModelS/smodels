@@ -234,8 +234,8 @@ def load():
 # to be computed later with theoretical weights. Check if listed histograms
 # exist and store binning information in masscomp
   for Analy in ListOfAnalyses:
-    Analy.GenerateElements()
-    Analy.GetPlots()
+    Analy.generateElements()
+    Analy.getPlots()
 
 
   return ListOfAnalyses    
