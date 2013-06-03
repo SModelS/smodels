@@ -8,14 +8,15 @@ def limit(analysis):
   ret={}
   print "[LimitGetter.py] get limit for",analysis,"run=",run
   for (constraint,condition) in analysis.results.items():
-    print "[LimitGetter.py] for now I assume theres only one result: ",analysis.plots[constraint]
+    theoRes=analysis.evaluateResult( constraint )
+    print"[LimitGetter.py] theoRes=",theoRes
     Tx=analysis.plots[constraint][0]
     for ana in analysis.plots[constraint][1]:
-      masses0=lead.B[0].masses[0] ## ,lead.B[1].masses[0]
-      masses1=lead.B[1].masses[0] ## ,lead.B[1].masses[0]
-      ul=SMSResults.getSmartUpperLimit(ana,Tx,masses0)
+      masses1=lead.B[0].masses[0] ## ,lead.B[1].masses[0]
+      masses2=lead.B[1].masses[0] ## ,lead.B[1].masses[0]
+      ul=SMSResults.getSmartUpperLimit(ana,Tx,masses1,masses2)
       print "[LimitGetter.py] %s %s ul=%s" % ( Tx, ana, ul )
-    ret[ana+Tx]=ul
+      ret[ana+Tx]={ "ul": ul, "analysis": ana, "Tx": Tx, "m1": masses1, "m2": masses2 }
   return ret 
 
     

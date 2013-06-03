@@ -1,7 +1,7 @@
 """ Upon 'loading', this unit creates a list of EAnalyses """
 
 def load():
-  from Theory.SMSDataObjects import EAnalysis
+  from Theory.SMSAnalysis import EAnalysis
   from Tools.PhysicsUnits import addunit
   
   ListOfAnalyses = []
