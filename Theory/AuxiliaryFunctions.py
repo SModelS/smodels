@@ -1,3 +1,15 @@
+#!/usr/bin/python
+
+"""
+.. module:: AuxiliaryFunctions
+    :synopsis: ...
+
+.. moduleauthor:: someone <email@example.com>
+
+"""
+
+
+
 #Defines the auxiliar similar function
 #returns the relative difference between any elements of the list normalized to [0,1]
 def Csim(*els):

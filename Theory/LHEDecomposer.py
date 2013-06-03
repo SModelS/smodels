@@ -1,3 +1,13 @@
+#!/usr/bin/python
+
+"""
+.. module:: LHEDecomposition
+    :synopsis: I have no idea ...
+
+.. moduleauthor:: someone <email@example.com>
+
+"""
+
 def decompose(lhefile,W,nevts=None,doCompress=False,doInvisible=False,minmassgap=-1):
   """ Do LHE-based decomposition.  lhefile = LHE file with pythia events, W =
     dictionary with event weights, nevts = (maximum) number of generated events.  

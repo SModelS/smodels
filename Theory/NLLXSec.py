@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 
+"""
+.. module:: NLLXSec
+    :synopsis: ...
+
+.. moduleauthor:: someone <email@example.com>
+
+"""
+
 import sys, commands, os, pyslha2
 from Tools.PhysicsUnits import addunit
 

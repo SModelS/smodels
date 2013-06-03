@@ -1,3 +1,13 @@
+#!/usr/bin/env python
+
+"""
+.. module:: SMSAnalysis
+    :synopsis: ...
+    
+.. moduleauthor:: someone <email@example.com>
+    
+"""
+    
 """ all data classes necessary to create a SModelS description of events """
 
 from SMSDataObjects import GTop, EElement

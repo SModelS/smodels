@@ -1,3 +1,13 @@
+#!/usr/bin/env python
+
+"""
+.. module:: ParticleNames
+    :synopsis: ...
+
+.. moduleauthor:: someone <email@example.com>
+
+"""
+
 """ dictionaries that deal with particle names """
 
 #Converts pdg number to particle name according to the dictionaries Rodd

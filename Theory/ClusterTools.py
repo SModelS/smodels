@@ -1,3 +1,14 @@
+#!/usr/bin/python
+
+"""
+.. module:: ClusterTools
+    :synopsis: I have no idea ...
+
+.. moduleauthor:: someone <email@example.com>
+
+"""
+
+
 """ the intention of this unit is to have all code that is related to clustering
 and finding average masses """
 

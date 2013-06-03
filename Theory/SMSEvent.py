@@ -1,3 +1,13 @@
+#!/usr/bin/env python
+
+"""
+.. module:: SMSEvent
+    :synopsis: ...
+    
+.. moduleauthor:: someone <email@example.com>
+    
+"""
+    
 """ Simple classes that encapsulate the information of an event """
 
 class SMSEvent:

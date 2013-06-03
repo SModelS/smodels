@@ -1,3 +1,13 @@
+#!/usr/bin/env python
+
+"""
+.. module:: TopologyBuilder
+    :synopsis: ...
+    
+.. moduleauthor:: someone <email@example.com>
+    
+"""
+    
 """ A builder to create GTop objects from e.g. SMSEvents """
 
 def fromEvent( Event, weight = {}, DoCompress=False, DoInvisible=False, \

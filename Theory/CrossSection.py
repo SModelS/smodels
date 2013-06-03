@@ -1,3 +1,15 @@
+#!/usr/bin/python
+
+"""
+.. module:: CrossSection
+    :synopsis: ...
+
+.. moduleauthor:: someone <email@example.com>
+
+"""
+
+
+
 class CrossSection:
   """ basically a wrapper around this complicated result dictionary, to 
       make it easier to use this dictionary """

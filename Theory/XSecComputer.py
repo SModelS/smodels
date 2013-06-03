@@ -1,3 +1,13 @@
+#!/usr/bin/env python
+
+"""
+.. module:: XSecComputer
+    :synopsis: ...
+    
+.. moduleauthor:: someone <email@example.com>
+    
+"""
+    
 def compute(nevts,slhafile,rpythia = True, donlo = True, basedir=None,datadir=None):
   """ Runs pythia at 7 and 8 TeV and compute weights for each production
   process. Returns a dictionary with weights at 7 and 8 TeV and the
