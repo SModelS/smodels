@@ -26,11 +26,4 @@ print
 for Analysis in analyses:
   Analysis.add ( topos )
   lims=LimitGetter.limit ( Analysis )
-  print "lims=",lims
-  for (constraint,condition) in Analysis.results.items():
-    Tx0=Analysis.plots[constraint][0]
-    ana0=Analysis.plots[constraint][1][0]
-    theoRes=Analysis.evaluateResult( constraint )
-    refxsec=theoRes[0]['result']['8 TeV (NLL)']
-    excluded=refxsec>lims[ana0+Tx0]['ul']
-    print "[run.py] upper limit=",lims[ana0+Tx0],"theory prediction=",refxsec,excluded
+  print "[run.py] lims=",lims

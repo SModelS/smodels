@@ -1,7 +1,7 @@
 import set_path
 import ROOT
 from Experiment import SMSResults, SMSInterpolation, LimitGetter, ROOTTools
-from Theory import SMSDataObjects
+from Theory import SMSAnalysis
 from Tools.PhysicsUnits import addunit, rmvunit
 
 def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=10000):
@@ -43,7 +43,7 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
   x=xmin+bwx/2
   y=ymin+bwy/2
 
-  a=SMSDataObjects.EAnalysis()
+  a=SMSAnalysis.EAnalysis()
   D=None
   L=None
 
