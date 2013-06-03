@@ -373,6 +373,11 @@ def getPAS ( analysis, run=None ):
   """ get the PAS for this analysis """
   return SMSHelpers.getMetaInfoField ( analysis, "pas", run )
 
+def getOrder ( analysis, run=None ):
+  """ get the order in perturbation theory that the exclusion lines correspond
+      with """
+  return SMSHelpers.getMetaInfoField ( analysis, "order", run )
+
 def hasDictionary ( analysis, run=None ):
   """ are the upper limits available in dictionary format? """
   return SMSHelpers.hasDictionary ( analysis, run )
