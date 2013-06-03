@@ -26,7 +26,7 @@ class TheoryPrediction:
     if sqrts==None and order!=None:
       runs= [ "7 TeV (%s)" % ( order), "8 TeV (%s)" % order ]
 
-    print "[TheoryPrediction] runs=",runs
+    ## print "[TheoryPrediction] runs=",runs
     ret=None
     count=0
     for d in self.data:
@@ -40,7 +40,7 @@ class TheoryPrediction:
         if runs==None or key in runs:
           count+=1
           ret=value
-          print "match:",res
+          # print "[TheoryPrediction.py] match:",res
     if count>1:
       print "[TheoryPrediction.py] error: more than one result matches description."
     if count==0:

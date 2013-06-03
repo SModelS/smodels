@@ -5,20 +5,22 @@ def limit(analysis):
   from Tools.PhysicsUnits import rmvunit
   run=analysis.run
   sqrts=rmvunit(analysis.sqrts,"TeV")
-  lead=analysis.Top.leadingElement()
-  ret={}
-  print "[LimitGetter.py] get limit for",analysis,"run=",run
+  ## lead=analysis.Top.leadingElement()
+  ret=[]
+  ##print "[LimitGetter.py] get limit for",analysis,"run=",run
   for (constraint,condition) in analysis.results.items():
     theoRes=analysis.evaluateResult( constraint )
-    print"[LimitGetter.py] theoRes=",theoRes
+    ##print"[LimitGetter.py] theoRes=",theoRes
     Tx=analysis.plots[constraint][0]
     for ana in analysis.plots[constraint][1]:
-      masses1=lead.B[0].masses[0] ## ,lead.B[1].masses[0]
-      masses2=lead.B[1].masses[0] ## ,lead.B[1].masses[0]
-      ul=SMSResults.getSmartUpperLimit(ana,Tx,masses1,masses2)
-      theory=theoRes.predictionFor ( masses1, masses2, sqrts, "NLL", condition )
-      print "[LimitGetter.py] %s %s ul=%s theory xsec=%s" % ( Tx, ana, ul, theory )
-      ret[ana+Tx]={ "ul": ul, "analysis": ana, "Tx": Tx, "m1": masses1, "m2": masses2, "theory": theory }
+      for (index,element) in enumerate(analysis.Top.elements()):
+        for (mi,masses1) in enumerate(element.B[0].masses):
+        ## masses1=element.B[0].masses[0] ## ,lead.B[1].masses[0]
+          masses2=element.B[1].masses[mi] ## ,lead.B[1].masses[0]
+          ul=SMSResults.getSmartUpperLimit(ana,Tx,masses1,masses2)
+          theory=theoRes.predictionFor ( masses1, masses2, sqrts, "NLL", condition )
+          ##print "[LimitGetter.py] %s %s ul=%s theory xsec=%s" % ( Tx, ana, ul, theory )
+          ret.append ( { "ul": ul, "analysis": ana, "Tx": Tx, "m1": masses1, "m2": masses2, "theory": theory, "excluded": theory>ul, "sqrts": sqrts } )
   return ret 
 
     
