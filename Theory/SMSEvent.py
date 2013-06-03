@@ -38,7 +38,7 @@ class Particle:
     def __init__(self):
         self.pdg = 0
         self.status = 0
-        self.moms = []
+        self.moms = [] ## moms is a list of the indices of the mother particles
         self.px = 0.
         self.py = 0.
         self.pz = 0.
