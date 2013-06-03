@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 """ this module is intended to contain everything related to theory: cross section calculation code, 
     as well as the sms decomposition code and some more tools """
 

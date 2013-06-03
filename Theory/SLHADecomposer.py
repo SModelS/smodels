@@ -1,3 +1,13 @@
+#!/usr/bin/env python
+
+"""
+.. module:: SLHADecomposer
+    :synopsis: ...
+    
+.. moduleauthor:: someone <email@example.com>
+    
+"""
+    
 def decompose(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassgap=-1):
   """ Do SLHA-based decomposition.
   slhafile = file with mass spectrum and branching ratios

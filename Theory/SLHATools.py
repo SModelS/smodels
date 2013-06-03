@@ -1,3 +1,13 @@
+#!/usr/bin/env python
+
+"""
+.. module:: SLHATools
+    :synopsis: ...
+    
+.. moduleauthor:: someone <email@example.com>
+    
+"""
+
 """ A collection of tools needed for use and manipulation of SLHA files """
 
 import pyslha2

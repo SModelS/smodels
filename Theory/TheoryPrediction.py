@@ -1,3 +1,13 @@
+#!/usr/bin/env python
+
+"""
+.. module:: TheoryPrediction
+    :synopsis: ...
+    
+.. moduleauthor:: someone <email@example.com>
+    
+"""
+    
 class TheoryPrediction:
   """ basically a wrapper for the result of EAnalysis.evaluteResult,
       make it easier to access the theoretical xsec prediction for 

@@ -1,3 +1,13 @@
+#!/usr/bin/python
+
+"""
+.. module:: LHEReader
+    :synopsis: I have no idea ...
+
+.. moduleauthor:: someone <email@example.com>
+
+"""
+
 """ A facility to read in lhe files and generate events. 
     an event is essentially a list of particles """
 

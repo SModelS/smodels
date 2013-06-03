@@ -1,5 +1,13 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 
+"""
+.. module:: pyslha2
+    :synopsis: ...
+    
+.. moduleauthor:: someone <email@example.com>
+    
+"""
+    
 """\
 A simple but flexible parser of SUSY Les Houches Accord (SLHA) model and decay files.
 
