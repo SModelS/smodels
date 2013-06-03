@@ -8,7 +8,7 @@ from Theory import LHEDecomposer, SLHADecomposer, XSecComputer, ClusterTools
 from Tools.PhysicsUnits import addunit, rmvunit
 from Tools import SMSPrettyPrinter, VariousHelpers
 from Tools.SMSPrettyPrinter import wrap
-from Experiment import SMSAnalyses, SMSAnalysisFactory, LimitGetter
+from Experiment import SMSAnalysisList, SMSAnalysisFactory, LimitGetter
 
 
 DoFactory = True
@@ -20,7 +20,7 @@ printer=SMSPrettyPrinter.SMSPrettyPrinter()
 if DoFactory:
   ListOfAnalyses = SMSAnalysisFactory.load()
 else:  
-  ListOfAnalyses = SMSAnalyses.load()
+  ListOfAnalyses = SMSAnalysisList.load()
 
 
 #Generate events and compute cross-sections:
