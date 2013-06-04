@@ -122,7 +122,7 @@ class EAnalysis:
         for jel in range(len(self.Top.ElList)):
           NewEl = copy.deepcopy(NewTop.ElList[iel])
           neweight = NewEl.weight
-    #Remove weights which do not match the analysis center of mass energy        
+    #Remove weights which do not match the analysis center of mass energy      
           if sqrts.asNumber() and len(CMdic) > 0:
             for k in neweight.keys():
               if CMdic[k] != sqrts: neweight.pop(k)
@@ -142,7 +142,7 @@ class EAnalysis:
               
     #Check if elements match (with identical masses) for any branch ordering
             if NewEl.isSimilar(OldEl,order=False):
-              self.Top.ElList[jel].weight[imass] = sumweights([OldEl.weight,neweight])
+              self.Top.ElList[jel].weight[imass] = ClusterTools.sumweights([OldEl.weight,neweight])
               added = True
               break   #To avoid double counting only add event to one mass combination
             
