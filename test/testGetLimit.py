@@ -4,7 +4,7 @@ from Experiment import SMSResults, SMSInterpolation, LimitGetter, ROOTTools
 from Theory import SMSAnalysis
 from Tools.PhysicsUnits import addunit, rmvunit
 
-def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=10000):
+def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=10000,binsize=None):
   """ recreate ROOT TH2F histogram of a given analysis and topology
         needs mz for a topology with intermediate mass,
         axes, for histograms with axes different from M1-M0
@@ -14,14 +14,17 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
   toponame=topo
   run1=SMSResults.getRun(ana)
   if mz: toponame=SMSInterpolation.gethistname(topo,mz)
-
+  print toponame
   xmin=rmvunit(SMSResults.getLowX(ana,toponame),'GeV')
   ymin=rmvunit(SMSResults.getLowY(ana,toponame),'GeV')
   xmax=rmvunit(SMSResults.getUpX(ana,toponame),'GeV')
   ymax=rmvunit(SMSResults.getUpY(ana,toponame),'GeV')
   bwx=rmvunit(SMSResults.getBinWidthX(ana,toponame),'GeV')
   bwy=rmvunit(SMSResults.getBinWidthY(ana,toponame),'GeV')
-
+  if binsize:
+    bwx=float(binsize)
+    bwy=float(binsize)
+  print bwx, bwy, xmin, xmax
   bx=int((xmax-xmin)/bwx)
   by=int((ymax-ymin)/bwy)
 
@@ -31,7 +34,9 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
     hL = ROOT.TH2F('hL','hL',bx,xmin,xmax,by,ymin,ymax)
     prod_mode = topo
     if topo=="T1tttt" or topo=="T1bbbb": prod_mode = "T1"
-    f=ROOT.TFile("../data/%s_%devts.root" %(prod_mode,nevents))
+    rootname = "../data/%s_%devts.root" %(prod_mode,nevents)
+    if binsize: rootname =  "../data/%s_%devts_%dGeVbin.root" %(prod_mode,nevents,binsize)
+    f=ROOT.TFile(rootname)
     if tev==8: rXsName="hist8"
     if tev==7:rXsName="hist7"
     rXs=f.Get(rXsName)
@@ -82,13 +87,16 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
     y=ymin+bwy/2
     x+=bwx
 
-  f.Close()
   if line:
-    f1=ROOT.TFile("%s.root" % topo,"recreate")
+    f.Close()
+    rootname_out="%s_%devts.root" % (topo,nevents)
+    if binsize:rootname_out="%s_%devts_%dGeVbin.root" % (topo,nevents,binsize)
+    f1=ROOT.TFile(rootname_out,"recreate")
     h.Write()
     hL.Write()
     exclusion=ROOTTools.getTGraphfromContour(hL)
     exclusion.Write()
     f1.Close()
-    return "%s.root" %topo
+    print rootname_out
+    return rootname_out
   return h
