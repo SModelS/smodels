@@ -9,16 +9,18 @@
 """
     
 def compute(nevts,slhafile,rpythia = True, donlo = True, basedir=None,datadir=None):
-  """ Runs pythia at 7 and 8 TeV and compute weights for each production
-  process. Returns a dictionary with weights at 7 and 8 TeV and the
-  event file to be used for SMS decomposition.
-  :param basedir: directory base. If None, then the we look for the
-  SMSDecomposition directory in the current working directory.
-  nllfast we expect to be in basedir+"/nllfast",
-  the template config we expect to reside in basedir+"/etc"
+  """ Runs pythia at 7 and 8 TeV and compute weights for each production process. 
+
+  :param basedir: directory base. If None, then the we look for the SMSDecomposition \
+    directory in the current working directory. nllfast we expect to be in \
+    basedir+"/nllfast", the template config we expect to reside in basedir+"/etc"
   :type basedir: str
-  :param runpythia: run pythia. If False, read old fort_8,7.68 files and assumes 
-  total xsec = 1 (only useful for fast debugging) """
+  :param runpythia: run pythia. If False, read old fort_8,7.68 files and assumes \
+    total xsec = 1 (only useful for fast debugging) 
+  :returns: a dictionary with weights at 7 and 8 TeV and the event file to be used \
+     for SMS decomposition.
+  
+  """
 
   import shutil, LHEReader, NLLXSec, CrossSection
   from Tools.PhysicsUnits import addunit
