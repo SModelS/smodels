@@ -19,6 +19,8 @@ Wv=XSecComputer.compute(nevts,slhafile,rpythia = True, donlo = True, datadir=Tmp
 print "[run.py] done running pythia"
 
 lhefile=Wv.lhefile ( 8 )
+
+print "weights=",Wv.weights()
 topos=LHEDecomposer.decompose ( lhefile, Wv.weights(), nevts=nevts )
 XSecComputer.clean ( Tmp )
 
