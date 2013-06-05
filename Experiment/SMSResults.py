@@ -10,6 +10,9 @@ def setLogLevel ( l=[ "error" ] ):
   """ defines what is written out, and what isnt """
   SMSHelpers.logLevel=l
 
+def setBase ( base ):
+  """ just sets the base directory of the database """
+  SMSHelpers.Base=base
 
 def useUnits ( b=True ):
   SMSHelpers.useUnits = b
