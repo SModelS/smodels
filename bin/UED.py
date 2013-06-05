@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-""" another sandbox to try things out """
+""" A first UED example """
 
 import set_path, tempfile
 from Theory import LHEDecomposer, XSecComputer
@@ -12,14 +12,16 @@ analyses = SMSAnalysisFactory.load( anas="alphaT8TeV", topos="T2" )
 print "[UED.py] done loading %d analyses" % len(analyses)
 
 nevts=1
-lhefile="../lhe/ued_1.lhe"
+lhefile="../lhe/ued_1.lhe" ## thats the lhe file we're using
 
+## we supply the weight manually
 weights= { '8 TeV (NLL)': { (-6100002, 6100002): .463 * fb } }
 
+## now create the list of topologies
 topos=LHEDecomposer.decompose ( lhefile, weights, nevts=nevts )
 
 print
 for Analysis in analyses:
-  Analysis.add ( topos )
-  lims=LimitGetter.limit ( Analysis )
+  Analysis.add ( topos ) ## add all the theory information to the analysis objcts
+  lims=LimitGetter.limit ( Analysis ) ## obtain the relevant limits
   print "[UED.py] lims=",lims
