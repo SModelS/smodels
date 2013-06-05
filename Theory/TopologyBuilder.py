@@ -63,9 +63,9 @@ def fromEvent( Event, weight = {}, DoCompress=False, DoInvisible=False, \
           pname = ptype(PList[i].pdg)
           El.particles[len(El.particles)-1].append(pname)
           ndaugs += 1
-        else:          
-          print "[TopologyBuilder.py] Unknown particle!"
-          return None
+        else:  # dunno the particle so it must be a BSM thingie
+          newmom = i
+          ndaugs += 1
 
       El.masses.append(addunit(PList[mother].mass,'GeV'))
       mother = newmom
