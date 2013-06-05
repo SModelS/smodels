@@ -83,6 +83,8 @@ Total weight =  {'7 TeV (LO)': 1.39E+02 [fb], '8 TeV (LO)': 1.93E+02 [fb], '7 Te
 +-----------------+------------+----------------------------+-------------------------------+-------------------------+
 ---------------Analysis Label =  MultiLepton8TeV:T1tttt
 ---------------Analysis Label =  RA4LS8TeV:T1tttt
+---------------Analysis Label =  ATLAS_CONF_2013_035:TChiWZ
+---------------Analysis Label =  ATLAS_CONF_2013_035:TChiChipmSlepL
 ---------------Analysis Label =  ATLAS_CONF_2012_166:T2tt
 +-----------------+------------+----------------------------+-------------------------------+-------------------------+
 |      Result     | Conditions |            Mass            |       Theoretical Value       |   Experimental Limits   |
