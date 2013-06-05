@@ -18,6 +18,7 @@ CMdic={}
 
 def DoCluster(objlist,Distfunc,dmin):
   from Tools.PhysicsUnits import addunit
+  import copy
   """ Cluster algorithm (generic for any type of object, as long as the distance function is given) """
   MD = []
 #Compute distance matrix
