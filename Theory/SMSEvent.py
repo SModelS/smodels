@@ -26,7 +26,7 @@ class SMSEvent:
     imom = 0
     for p in self.particles:
       if len(p.moms)>1 and p.moms[0] == 1 or p.moms[1] == 1:
-        momspdg.append( p.pdg)
+        momspdg.append( p.pdg )
         imom += 1
     if imom != 2:
         print "getMom: Number of mother particles != 2"
