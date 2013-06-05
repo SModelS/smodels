@@ -156,7 +156,8 @@ def getExclusionLine(topo,ana,expected=False,plusminussigma=0,extendedinfo=False
   return ex
 
 def getTopologies ( analysis, run=None, allHistos=False ):
-  """ return all topologies that this analysis has results for """
+  """ return all topologies that this analysis has results for
+      if allHistos=True is selected: return all available histograms """
   run=SMSHelpers.getRun ( analysis, run )
   if allHistos or not getaxes(analysis):
 # we used the exclusion info to get the list
@@ -486,7 +487,7 @@ def particleName(topo):
   if topo[:2]=="TGQ": return "associate"
   if topo=="TChiSlep" or topo=="TChiNuSlep": return "chargino neutralino"
   if topo=="TChiSlepSlep": return "chargino neutralino"
-  if topo=="TChiwz": return "chargino neutralino"
+  if topo=="TChiWZ": return "chargino neutralino"
   if not SMSHelpers.dicparticle.has_key(topo):
     return "???"
   part = SMSHelpers.dicparticle[topo].replace("#tilde","").replace("{","").replace("}","")
