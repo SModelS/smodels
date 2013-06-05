@@ -13,6 +13,21 @@ class TheoryPrediction:
       make it easier to access the theoretical xsec prediction for 
       a particular EElement """
 
+  def equal ( self, m1, m2 ):
+    from Tools.PhysicsUnits import rmvunit
+    """ is array of m1 equal to array of m2 """
+    if len(m1)!=len(m2): return False
+    for (i,m) in enumerate(m1):
+      d=abs(rmvunit(m,"GeV")-rmvunit(m2[i],"GeV"))
+      if d>1e-1: return False
+    return True
+
+  def findIn ( self, m1, dmass ):
+    """ search for array of masses m1 in array of array of masses dmass """
+    for m2 in dmass:
+      if self.equal ( m1, m2 ): return True
+    return False
+
   def __init__ ( self, data ):
     self.data=data
   # make it behave much like a dictionary
@@ -36,6 +51,7 @@ class TheoryPrediction:
     if sqrts==None and order!=None:
       runs= [ "7 TeV (%s)" % ( order), "8 TeV (%s)" % order ]
 
+    # print "runs=",runs
     ## print "[TheoryPrediction] runs=",runs
     ret=None
     count=0
@@ -43,8 +59,9 @@ class TheoryPrediction:
       ## check if condition matches, if given
       if condition!="None" and not condition in d['conditions']: continue
       ## check if masses match, if given
-      if m1!=None and not m1 in d['mass']: continue
-      if m2!=None and not m2 in d['mass']: continue
+      if m1!=None and not self.findIn ( m1, d['mass'] ): continue
+      if m2!=None and not self.findIn ( m2, d['mass'] ): continue
+      #print "match!"
       res=d['result']
       for (key,value) in res.items():
         if runs==None or key in runs:
@@ -54,7 +71,7 @@ class TheoryPrediction:
     if count>1:
       print "[TheoryPrediction.py] error: more than one result matches description."
     if count==0:
-      print "[TheoryPrediction.py] error: no result matches description."
+      print "[TheoryPrediction.py] error: no result matches description m1=",m1,"m2=",m2,"sqrts=",sqrts,"order=",order,"condition=",condition
     return ret
 
 
