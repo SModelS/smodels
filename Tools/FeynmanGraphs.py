@@ -3,8 +3,9 @@
 def printParticle_ ( label ):
   """ very simple method to rename a few particles for the asciidraw
       routine, do not call directly """
-  if label=="jet": return "q"
-  return label
+  if label=="jet": label="q"
+  label=label+"   "
+  return label[:3]
 
 def draw ( element, filename="bla.pdf" ):
   """ plot a lessagraph, write into pdf/eps/png file called <filename> """
@@ -70,7 +71,7 @@ def drawBranch_ ( branch, upwards, labels ):
     lines[1]+="*---"
     if len(insertions)==1: 
       labels+=" "+printParticle_(insertions[0])
-      lines[0]+=" | "
+      lines[0]+=" |  "
     if len(insertions)==2: 
       labels+=printParticle_(insertions[0])+" "+printParticle_(insertions[1])
       if upwards:
