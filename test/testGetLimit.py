@@ -1,7 +1,7 @@
 import set_path
 import ROOT
-from Experiment import SMSResults, SMSInterpolation, LimitGetter, ROOTTools
-from Theory import SMSAnalysis
+from Experiment import SMSResults, SMSInterpolation, LimitGetter, ROOTTools, SMSAnalysisFactory
+from Theory import SMSAnalysis, LHEDecomposer
 from Tools.PhysicsUnits import addunit, rmvunit
 
 def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=10000,binsize=None):
@@ -11,10 +11,12 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
         if line=True is selected, produce rootfile with produced histograms
         and line, return filename"""
 
+  lhefile = "../lhe/%s_1.lhe" %topo
+  topos=LHEDecomposer.decompose ( lhefile, {})#create default topologylist with only topo
+
   toponame=topo
   run1=SMSResults.getRun(ana)
   if mz: toponame=SMSInterpolation.gethistname(topo,mz)
-  print toponame
   xmin=rmvunit(SMSResults.getLowX(ana,toponame),'GeV')
   ymin=rmvunit(SMSResults.getLowY(ana,toponame),'GeV')
   xmax=rmvunit(SMSResults.getUpX(ana,toponame),'GeV')
@@ -48,7 +50,7 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
   x=xmin+bwx/2
   y=ymin+bwy/2
 
-  a=SMSAnalysis.EAnalysis()
+#  a=SMSAnalysis.EAnalysis()
   D=None
   L=None
 
@@ -74,7 +76,17 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
 
       else: massv=[x,y]
 
-      v=rmvunit(LimitGetter.GetPlotLimit([massv,massv],[topo,[ana]],a)[0][1],'fb')
+      ana_obj = SMSAnalysisFactory.load( anas=ana, topos=topo )
+      for idx in range(len(massv)):
+        massv[idx]=addunit(massv[idx],'GeV')
+      topos[0].ElList[0].B[0].masses=massv
+      topos[0].ElList[0].B[1].masses=massv #for now only equal branches
+      ana_obj[0].add( topos )
+      lims=LimitGetter.limit(ana_obj[0])
+      v=None
+      if lims: v=rmvunit(lims[0]['ul'],'fb')
+
+#      v=rmvunit(LimitGetter.GetPlotLimit([massv,massv],[topo,[ana]],a)[0][1],'fb')
 
       if v: h.Fill(x,y,v)
 
@@ -97,6 +109,5 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
     exclusion=ROOTTools.getTGraphfromContour(hL)
     exclusion.Write()
     f1.Close()
-    print rootname_out
     return rootname_out
   return h
