@@ -20,6 +20,9 @@ def getxval(mx, my, mz,mass=False):
   """Calculate x-value for one point.
       mx=Mother-mass, my=LSP-mass, mz is information on the intermediate mass as given in the axes-information.
       If mass=True is selected: return intermediate mass instead of x-value."""
+  mx=rmvunit(mx,"GeV")
+  my=rmvunit(my,"GeV")
+  mz=rmvunit(mz,"GeV")
   if mz.find('x')==-1 and mz.find('C')==-1 and mz.find('y')==-1:
     xfac = float(mz)/100
     if mass: return xfac*mx+(1-xfac)*my
@@ -35,6 +38,7 @@ def getxval(mx, my, mz,mass=False):
 #  if ty: z += ty*mx
   if c: z+=c
   if mass: return z
+  print "[SMSInterpolation.py] z=",z,"mx=",mx,"my=",my
   xval = (z-my)/(mx-my)
   return xval
 
@@ -140,7 +144,7 @@ def UpperLimit(ana, topo, masses,debug=True):
     if debug: print "[SMSInterpolation] error: Available histograms for %s/%s could not be combined, cannot interpolate" % ( ana, topo )
     return None
   p = numpy.polyfit(xvals,xsecs,len(xsecs)-1)
-  X = float(masses[1]-masses[-1])/float(masses[0]-masses[-1])
+  X = float(rmvunit(masses[1],"GeV")-rmvunit(masses[-1],"GeV"))/float(rmvunit(masses[0],"GeV")-rmvunit(masses[-1],"GeV"))
   XSec = float(numpy.polyval(p,X))
   if X>max(xvals) or X<min(xvals):
     if debug: print "[SMSInterpolation] error: x value for %s/%s out of range, no extrapolation" % ( ana, topo )
