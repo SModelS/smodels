@@ -1,2 +1,2 @@
-from Experiment import SMSResults
-SMSResults.setBase ( "/home/lessa/SMS_database/" )
+from Experiment import SMSHelpers
+SMSHelpers.Base="/home/lessa/SMS_database/"
