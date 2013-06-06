@@ -7,6 +7,8 @@
 .. moduleauthor:: someone <email@example.com>
 
 """
+""" This module returns SUSY strong production cross-section using NLLfast for 7 and 8 TeV. The return output is a dictionary containing the cross-sections at NLO and NLL+NLO along with the k factors. For the decoupling limit to be obeyed the ratio of the corrospoding partiecles should be > 10. 
+    """
 
 import sys, commands, os, pyslha2
 from Tools.PhysicsUnits import addunit
@@ -27,10 +29,10 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
       if Energy==8:
           if not os.path.isdir ( "%s/nllfast-2.1" % base ):
             print "[NLLXsec.py] error: %s/nllfast-2.1 does not exist or is not a directory." % base
-            sys.exit(0)
+            return Values_8TeV
           if not os.path.isfile ( "%s/nllfast-2.1/nllfast_8TeV" % base ) or not os.access ( "%s/nllfast-2.1/nllfast_8TeV" % base, os.X_OK ):
             print "[NLLXsec.py] error: %s/nllfast-2.1/nllfast_8TeV does not exist or is not executable." % base
-            sys.exit(0)
+            return Values_8TeV
           if process=="st":
               os.chdir("%s/nllfast-2.1" % base )
               s = "./nllfast_8TeV %s %s %s" % ( process, pdf, squarkmass )
@@ -40,10 +42,10 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
       if Energy==7:
           if not os.path.isdir ( "%s/nllfast-1.2" % base ):
             print "[NLLXsec.py] error: %s/nllfast-1.2 does not exist or is not a directory." % base
-            sys.exit(0)
+            return Values_7TeV
           if not os.path.isfile ( "%s/nllfast-1.2/nllfast_7TeV" % base ) or not os.access ( "%s/nllfast-1.2/nllfast_7TeV" % base, os.X_OK ):
             print "[NLLXsec.py] error: %s/nllfast-1.2/nllfast_7TeV does not exist or is not executable." % base
-            sys.exit(0)
+            return Values_7TeV
           if process=="st":
               os.chdir("%s/nllfast-1.2" % base )
               s = "./nllfast_7TeV %s %s %s" % ( process, pdf, squarkmass )
@@ -56,7 +58,6 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
     os.chdir(wd) ## back to where we started
 
     if process=='st' and o[1]=='T' and Energy == 7:
-        print Values_7TeV
         return Values_7TeV
     elif process=='st' and o[1]=='T' and Energy == 8:
         return Values_8TeV
@@ -64,26 +65,38 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
     if process!='st' and o[1]=='T':
         if Energy == 7:
             if process=='gg' and squarkmass/gluinomass > 10:
-                process='gdcpl'
-                mass = gluinomass
+              process='gdcpl'
+              mass = gluinomass
             elif process=='sb' and gluinomass/squarkmass > 10:
-                process='sdcpl'
-                mass = squarkmass
+              process='sdcpl'
+              mass = squarkmass
             else: return Values_7TeV
         if Energy == 8:
             if process=='gg' and squarkmass/gluinomass > 10:
-                process='gdcpl'
-                mass = gluinomass
+              process='gdcpl'
+              mass = gluinomass
             elif process=='sb'and gluinomass/squarkmass > 10:
-                process='sdcpl'
-                mass = squarkmass
+              process='sdcpl'
+              mass = squarkmass
             else: return Values_8TeV
         try:
           if Energy==8:
-              os.chdir("%s/nllfast/nllfast-2.1" % base )
+              if not os.path.isdir ( "%s/nllfast-2.1" % base ):
+                print "[NLLXsec.py] error: %s/nllfast-2.1 does not exist or is not a directory." % base
+                return Values_8TeV
+              if not os.path.isfile ( "%s/nllfast-2.1/nllfast_8TeV" % base ) or not os.access ( "%s/nllfast-2.1/nllfast_8TeV" % base, os.X_OK ):
+                print "[NLLXsec.py] error: %s/nllfast-2.1/nllfast_8TeV does not exist or is not executable." % base
+                return Values_8TeV
               s="./nllfast_8TeV  %s %s %s" % ( process, pdf, mass )
+              os.chdir("%s/nllfast-2.1" % base )
           if Energy==7:
-              os.chdir("%s/nllfast/nllfast-1.2" % base )
+              if not os.path.isdir ( "%s/nllfast-1.2" % base ):
+                print "[NLLXsec.py] error: %s/nllfast-1.2 does not exist or is not a directory." % base
+                sys.exit(0)
+              if not os.path.isfile ( "%s/nllfast-1.2/nllfast_7TeV" % base ) or not os.access ( "%s/nllfast-1.2/nllfast_7TeV" % base, os.X_OK ):
+                print "[NLLXsec.py] error: %s/nllfast-1.2/nllfast_7TeV does not exist or is not executable." % base
+                sys.exit(0)
+              os.chdir("%s/nllfast-1.2" % base )
               s="./nllfast_7TeV %s %s %s" % ( process, pdf, mass )
           o=commands.getoutput(s)
         except Exception,e:
@@ -91,7 +104,7 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
         os.chdir( wd ) # make sure we always chdir back
 
 # uncomment this line to see the nll fast output
-        #    print "nll fast output is", o
+#   print "nllfast output is:  ", o
 
     if o[1]=='T' and Energy  == 7:
         return Values_7TeV
@@ -140,9 +153,9 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
 
     return Values
 
-# main method, call this from the xsec routine with pdgid1, pdgid2 in order to get the NLL results. The output will be xecs =False and masses = 0 if the combination of ids don't have any results at NLL.
 def getNLLresult(pdgid1,pdgid2,inputfile,base="../nllfast",pdf="cteq"):
-
+    """ Main method: call this from the xsec routine with pdgid1, pdgid2 in order to get the NLL results. The output will be xecs =False and masses = 0 if the combination of ids don't have any results at NLL. For the decoupling limit treatement, the ratio of the masses of the particles involved should be > 10, else the results will be xsec = False and masses = 0."""
+    
     readfile=pyslha2.readSLHAFile(inputfile)
     gluinomass = abs(readfile[0]['MASS'].entries[1000021])
     squarkmass = (abs(readfile[0]['MASS'].entries[1000001])+abs(readfile[0]['MASS'].entries[2000001])+abs(readfile[0]['MASS'].entries[1000002])+abs(readfile[0]['MASS'].entries[2000002])+abs(readfile[0]['MASS'].entries[1000003])+abs(readfile[0]['MASS'].entries[2000003])+abs(readfile[0]['MASS'].entries[1000004])+abs(readfile[0]['MASS'].entries[2000004]))/8
@@ -201,7 +214,7 @@ def getNLLresult(pdgid1,pdgid2,inputfile,base="../nllfast",pdf="cteq"):
 
 if __name__ == "__main__":
 
-    print getNLLresult(pdgid1=1000001,pdgid2=1000002,inputfile="./AndreSLHA/andrePT4_var.slha")
+    print getNLLresult(pdgid1=1000021,pdgid2=1000021,inputfile="../addiotionalSLHA/T1.slha")
 #    print getNLLresult(pdgid1=1000021,pdgid2=1000021,inputfile="./AndreSLHA/andrePT4_var.slha")
 #    print getNLLresult(pdgid1=1000006,pdgid2=1000021,inputfile="./AndreSLHA/andrePT4_var.slha")
 #    print getNLLresult(pdgid1=-1000001,pdgid2=1000001,inputfile="./AndreSLHA/andrePT4_var.slha")
