@@ -2,7 +2,7 @@
 
 """
 .. module:: SLHATools
-    :synopsis: ...
+    :synopsis: a collection of tools needed for use and manipulation of SLHA files
     
 .. moduleauthor:: someone <email@example.com>
     
@@ -15,12 +15,14 @@ import tempfile
 import os
 
 def createSLHAFile(topo, masses, filename = None):
-   """ creates an SLHA File for a certain Tx name and certain masses.
-       topo is a string with the Tx name. masses is a dictionary {pid: mass}
-       where pid is an integer and mass is an integer or float (by default
-       the mass is set to 100000.). filename is a string, by default a unique
-       random filename will be generated. return is the filename in string 
-       format"""
+   """ Creates an SLHA File for a certain Tx name and certain masses.
+
+     :param topo: a string with the Tx name
+     :param masses: a dictionary {pid: mass} where pid is an integer and mass is \
+       an integer or float (by default the mass is set to 100000.). 
+     :param filename: a string, by default a unique random filename will be generated. 
+     :returns: the filename in string format
+     """
 
    slha = pyslha2.readSLHAFile('../slha/%s.slha' %topo)
 
