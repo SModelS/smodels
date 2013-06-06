@@ -20,7 +20,11 @@ def limit(analysis):
           ul=SMSResults.getSmartUpperLimit(ana,Tx,masses1,masses2)
           theory=theoRes.predictionFor ( masses1, masses2, sqrts, "NLL", condition )
           ##print "[LimitGetter.py] %s %s ul=%s theory xsec=%s" % ( Tx, ana, ul, theory )
-          ret.append ( { "ul": ul, "analysis": ana, "Tx": Tx, "m1": masses1, "m2": masses2, "theory": theory, "excluded": theory>ul, "sqrts": sqrts } )
+          #          excluded=None
+          #print "theory=",theory,"ul=",ul,"type=",type(theory)
+          #if True: # theory!=None and ul!=None:
+          excluded=rmvunit(theory,"fb")>rmvunit(ul,"fb")
+          ret.append ( { "ul": ul, "analysis": ana, "Tx": Tx, "m1": masses1, "m2": masses2, "theory": theory, "excluded":excluded, "sqrts": sqrts } )
   return ret 
 
     
