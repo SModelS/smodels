@@ -64,9 +64,9 @@ def DoCluster(objlist,Distfunc,dmin):
       if not split and not cluster in FinalCluster: FinalCluster.append(cluster)
 
     ClusterList = newClusters
-    if len(ClusterList) > 1000:  #Check for oversized list of cluster (too time consuming)
+    if len(ClusterList) > 2000:  #Check for oversized list of cluster (too time consuming)
       print "DoCluster: Error clustering. ClusterList >",len(ClusterList)
-      return False
+      return None
 
 
 #Clean up clusters
