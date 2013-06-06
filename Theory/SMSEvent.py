@@ -16,6 +16,12 @@ class SMSEvent:
   def __init__ ( self, eventnr=None ):
     self.particles=[]
     self.eventnr=eventnr
+    self.metainfo={}
+
+  def metaInfo ( self, key ):
+    """ return the meta information of 'key', None if this info doesnt exist """
+    if not self.metainfo.has_key ( key ): return None
+    return self.metainfo[key]
 
   def add ( self, particle ):
     self.particles.append ( particle )
