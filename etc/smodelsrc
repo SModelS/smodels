@@ -1,0 +1,2 @@
+from Experiment import SMSResults
+SMSResults.setBase ( "/home/lessa/SMS_database/" )
