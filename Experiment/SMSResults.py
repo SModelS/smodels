@@ -5,6 +5,7 @@
 import SMSHelpers
 from Tools.PhysicsUnits import addunit, rmvunit
 from SMSResultsCollector import SMSInfo
+from Tools import RCFile
 
 def setLogLevel ( l=[ "error" ] ):
   """ defines what is written out, and what isnt """
