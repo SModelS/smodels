@@ -319,14 +319,15 @@ class GTop:
     """ if two masses in this topology are degenerate, create
         a compressed copy of this topology """
     import copy
+    from Tools.PhysicsUnits import rmvunit
     ETopComp = copy.deepcopy(self)
   #Loop over branches
     for ib in range(len(ETopComp.vertnumb)):
       if ETopComp.vertnumb[ib] < 2: continue
   #Remove all external particles between compressed masses
       for ivert in range(ETopComp.vertnumb[ib]-1):
-        massA = ETopComp.ElList[0].B[ib].masses[ivert]
-        massB = ETopComp.ElList[0].B[ib].masses[ivert+1]
+        massA = rmvunit(ETopComp.ElList[0].B[ib].masses[ivert],"GeV")
+        massB = rmvunit(ETopComp.ElList[0].B[ib].masses[ivert+1],"GeV")
         if abs(massA-massB) < mingap:
           ETopComp.ElList[0].B[ib].particles[ivert] = []
           ETopComp.vertparts[ib][ivert] = 0
