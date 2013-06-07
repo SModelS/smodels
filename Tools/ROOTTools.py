@@ -26,6 +26,12 @@ def useNiceColorPalette( palette="temperature", f=0., ngradientcolors=20 ):
   import ROOT
   foundpalette=False
   stops,red,green,blue=[],[],[],[]
+  if palette=="brown":
+    foundpalette=True
+    stops = [0.0, 0.5, 0.75, 1.0 ]
+    red   = [106./256, 0.38, 1.00, 1.0 ]
+    green = [44. /256, 0.21, 0.81, 0.9 ]
+    blue  = [0.05 , 0.07, 0.05, 0.05 ]
   if palette=="temperature":
     foundpalette=True
     stops = [0.00, 0.34, 0.61, 0.84, 1.00]
