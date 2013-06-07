@@ -83,7 +83,7 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
       topos[0].ElList[0].B[0].masses=massv
       topos[0].ElList[0].B[1].masses=massv #for now only equal branches
       ana_obj[0].add( topos )
-      lims=LimitGetter.limit(ana_obj[0])
+      lims=LimitGetter.limit(ana_obj[0], addTheoryPrediction=False)
       v=None
       if lims: v=rmvunit(lims[0]['ul'],'fb')
 
