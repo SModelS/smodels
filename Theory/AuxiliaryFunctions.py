@@ -32,20 +32,20 @@ def Cgtr(a,b):
   return res
 
 
-#Defines similar function when comparing two list of numbers.
-#If any of the elements differ by < 10%, returns True
-#FIXME should this go to ClusterTools?
 def similar(els):
+  """ Defines similar function when comparing two list of numbers.
+      If any of the elements differ by < 10%, returns True
+      FIXME should this go to ClusterTools? """
   for i in range(len(els)):
     for j in range(i+1,len(els)):
       if els[i] != els[j]:
         if 2.*abs(els[i]-els[j])/abs(els[i]+els[j]) > 0.1: return False
   return True
 
-#Routine to evaluate the analyses conditions and constraints.
-#Flexible version of eval to allow for additional operators,
-#such as ~ (= similar)
 def Ceval(instring,El):
+  """ Routine to evaluate the analyses conditions and constraints.
+      Flexible version of eval to allow for additional operators,
+      such as ~ (= similar) """
   run = instring.replace(" ","")  #Remove blanks
   if "~" in run:
     simels = run.split("~")
