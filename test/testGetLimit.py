@@ -1,7 +1,8 @@
 import set_path
 import ROOT
-from Experiment import SMSResults, SMSInterpolation, LimitGetter, ROOTTools, SMSAnalysisFactory
+from Experiment import SMSResults, SMSInterpolation, LimitGetter, SMSAnalysisFactory
 from Theory import SMSAnalysis, LHEDecomposer
+from Tools import ROOTTools
 from Tools.PhysicsUnits import addunit, rmvunit
 
 def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=10000,binsize=None):
@@ -106,7 +107,7 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
     f1=ROOT.TFile(rootname_out,"recreate")
     h.Write()
     hL.Write()
-    exclusion=ROOTTools.getTGraphfromContour(hL)
+    exclusion=ROOTTools.getTGraphFromContour(hL)
     exclusion.Write()
     f1.Close()
     return rootname_out
