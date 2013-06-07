@@ -30,6 +30,7 @@ def fromEvent( Event, weight = {}, DoCompress=False, DoInvisible=False, \
   imom = 0
   nptcs = 0    #Particle counter just for sanity checks
   
+  minmassgap=rmvunit(minmassgap,"GeV")
   if DoCompress and minmassgap==None: 
     print "[TopologyBuilder.py] Please, set minmassgap"
     return None
