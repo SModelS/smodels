@@ -8,6 +8,7 @@ import set_path
 import argparse, testGetLimit, ROOT, sys, TestTools, os
 from Experiment import SMSResults, SMSInterpolation
 from Tools.PhysicsUnits import rmvunit
+from Tools import ROOTTools
 
 argparser=argparse.ArgumentParser()
 argparser.add_argument('-a','--ana',help='input analysis [alphaT8TeV]',default='alphaT8TeV')
@@ -22,10 +23,11 @@ ROOT.gROOT.SetStyle("Plain")
 ROOT.gStyle.SetOptStat(0000)
 ROOT.gStyle.SetOptTitle(0)
 ROOT.gStyle.SetCanvasBorderMode(0)
-#ROOT.gStyle.SetPadLeftMargin(0.16) #set these if needed
+##ROOT.gStyle.SetPadLeftMargin(0.16) #set these if needed
 ROOT.gStyle.SetPadRightMargin(0.18)
 #ROOT.gStyle.SetPadBottomMargin(0.11)
 #ROOT.gStyle.SetPadTopMargin(0.07)
+ROOTTools.useNiceColorPalette ( "bluepurple", 0.5, 50 ) 
 
 tevIn=rmvunit ( SMSResults.getSqrts(args.ana), "TeV" )
 run1=SMSResults.getRun(args.ana)
@@ -52,6 +54,7 @@ else:
     ul.GetYaxis().SetTitle(SMSInterpolation.getaxis(y,args.axes)+" [GeV]")
   ul.GetZaxis().SetTitle('#splitline{95% CL upper limit on #sigma (fb)}{reported by experiment}')
 ul.GetZaxis().SetTitleOffset(1.4)
+ul.GetYaxis().SetTitleOffset(1.15)
 exclusion = SMSResults.getExclusionLine(toponame, args.ana, False, plusminussigma=0)
 exclusionm1= SMSResults.getExclusionLine(toponame, args.ana, False, plusminussigma=-1)
 exclusionp1= SMSResults.getExclusionLine(toponame, args.ana, False, plusminussigma=1)
