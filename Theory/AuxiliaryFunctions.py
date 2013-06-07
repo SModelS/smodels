@@ -46,10 +46,10 @@ def similar(els):
 #Flexible version of eval to allow for additional operators,
 #such as ~ (= similar)
 def Ceval(instring,El):
-
   run = instring.replace(" ","")  #Remove blanks
   if "~" in run:
     simels = run.split("~")
     run = 'similar(' + str(simels) + ')'
     run = run.replace("'","")
+  if not run or run=="None": return None
   return eval(run)
