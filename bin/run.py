@@ -7,11 +7,12 @@ from Theory import LHEDecomposer, XSecComputer
 from Experiment import TxNames, SMSAnalysisFactory, SMSResults, LimitGetter
 
 print "[run.py] loading analyses ...."
-analyses = SMSAnalysisFactory.load( anas="alphaT8TeV", topos="T2bb" )
+## analyses = SMSAnalysisFactory.load( anas="alphaT8TeV", topos="T2bb" )
+analyses = SMSAnalysisFactory.load( )
 print "[run.py] done loading %d analyses" % len(analyses)
 
 nevts=1000
-slhafile="../slha/T2bb.slha"
+slhafile="../slha/TChiWZ.slha"
 
 Tmp=tempfile.mkdtemp()
 print "[run.py] now run pythia in",Tmp

@@ -1,9 +1,9 @@
 """ collection of tools needed for use and manipulation of ROOT files """
 
 
-def getTGraphfromContour(exclhisto):
-  import ROOT
+def getTGraphFromContour(exclhisto):
   """ returns the contour of an exclusion histogram as TGraph"""
+  import ROOT
   ROOT.gROOT.SetBatch()
   c1 = ROOT.TCanvas()
   c1.cd()
