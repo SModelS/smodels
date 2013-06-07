@@ -95,9 +95,9 @@ title.SetNDC()
 #title.DrawMathText(0.1,0.93,title_str.replace('#','\\'))
 
 if run1!="ATLAS8TeV":
-  title.DrawLatex(0.1,0.93, '%s , %s (%s-%s) , %d TeV , NLONLL' %(SMSResults.SMSInfo("decay", args.topo, args.ana),SMSResults.getPrettyName(args.ana),SMSResults.getExperiment(args.ana),SMSResults.getPAS(args.ana),tevIn))
+  title.DrawLatex(0.1,0.93, '%s, %s (%s-%s), %d TeV, NLO-NLL' %(SMSResults.SMSInfo("decay", args.topo, args.ana),SMSResults.getPrettyName(args.ana),SMSResults.getExperiment(args.ana),SMSResults.getPAS(args.ana),tevIn))
 else:
-  title.DrawLatex(0.1,0.93, '%s (%s) , %d TeV , NLONLL' %(SMSResults.SMSInfo("decay", args.topo, args.ana),SMSResults.getPAS(args.ana),tevIn))
+  title.DrawLatex(0.1,0.93, '%s (%s), %d TeV, NLO-NLL' %(SMSResults.SMSInfo("decay", args.topo, args.ana),SMSResults.getPAS(args.ana),tevIn))
 
 img=ROOT.TImage.Create()
 img.FromPad(c1)
@@ -108,6 +108,7 @@ if not args.binsize:
   plotname= "../plots/%s_%s_%devts.png" %(args.ana,toponame,args.nevts)
 else:
   plotname= "../plots/%s_%s_%devts_%dGeVbin.png" %(args.ana,toponame,args.nevts,args.binsize)
+print "[runRecreate.py] now write",plotname
 img.WriteImage(plotname)
 
 
