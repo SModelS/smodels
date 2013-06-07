@@ -8,7 +8,7 @@
 
 """
 
-def decompose(lhefile,W,nevts=None,doCompress=False,doInvisible=False,minmassgap=-1):
+def decompose(lhefile,W,nevts=None,doCompress=False,doInvisible=False,minmassgap=None):
   """ Do LHE-based decomposition. 
 
     :param lhefile: LHE file with e.g. pythia events

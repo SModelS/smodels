@@ -320,6 +320,7 @@ class GTop:
         a compressed copy of this topology """
     import copy
     from Tools.PhysicsUnits import rmvunit
+    mingap=rmvunit ( mingap, "GeV" )
     ETopComp = copy.deepcopy(self)
   #Loop over branches
     for ib in range(len(ETopComp.vertnumb)):
