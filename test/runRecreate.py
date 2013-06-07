@@ -10,11 +10,11 @@ from Experiment import SMSResults, SMSInterpolation
 from Tools.PhysicsUnits import rmvunit
 
 argparser=argparse.ArgumentParser()
-argparser.add_argument('-a','--ana',help='input analysis',default='alphaT8TeV')
-argparser.add_argument('-t','--topo',help='input topology',default='T2bb')
+argparser.add_argument('-a','--ana',help='input analysis [alphaT8TeV]',default='alphaT8TeV')
+argparser.add_argument('-t','--topo',help='input topology [T2bb]',default='T2bb')
 argparser.add_argument('-mz','--mz',help='intermediate mass information')
 argparser.add_argument('-axes','--axes',help='axes information')
-argparser.add_argument('-n','--nevts',help='number of events per point in refXSec', type=int, default=10000)
+argparser.add_argument('-n','--nevts',help='number of events per point in refXSec [10000]', type=int, default=10000)
 argparser.add_argument('-b','--binsize',help='binsize in GeV', type=int)
 args=argparser.parse_args()
 
@@ -72,7 +72,8 @@ legend.SetFillStyle(0)
 legend.SetBorderSize(0)
 if exclusion: legend.AddEntry(exclusion, 'exclusion reported by experiment (#pm 1#sigma)','L')
 #legend.AddEntry(exclusionm1, 'exclusion #pm 1#sigma reported by experiment','L')
-legend.AddEntry(reproduced_exclusion, "SModelS exclusion",'L')
+#legend.AddEntry(reproduced_exclusion, "SModelS exclusion",'L')
+legend.AddEntry(reproduced_exclusion, "                exclusion",'L')
 legend.SetMargin(0.12)
 legend.Draw()
 
@@ -99,7 +100,7 @@ img=ROOT.TImage.Create()
 img.FromPad(c1)
 logo=ROOT.TASImage("../plots/smodels75.png")
 logo.Draw("SAME")
-img.Merge(logo,"alphablend",150,150)
+img.Merge(logo,"alphablend",147,123)
 if not args.binsize:
   plotname= "../plots/%s_%s_%devts.png" %(args.ana,toponame,args.nevts)
 else:
