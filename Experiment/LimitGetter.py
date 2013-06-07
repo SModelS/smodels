@@ -1,4 +1,4 @@
-def limit(analysis):
+def limit(analysis, addTheoryPrediction=True):
   """ the next generation limit retrieval function, should get all information
       from the analysis object """
   import SMSResults
@@ -9,7 +9,7 @@ def limit(analysis):
   ret=[]
   ##print "[LimitGetter.py] get limit for",analysis,"run=",run
   for (constraint,condition) in analysis.results.items():
-    theoRes=analysis.evaluateResult( constraint )
+    if addTheoryPrediction: theoRes=analysis.evaluateResult( constraint )
     ##print"[LimitGetter.py] theoRes=",theoRes
     Tx=analysis.plots[constraint][0]
     for ana in analysis.plots[constraint][1]:
@@ -18,13 +18,15 @@ def limit(analysis):
         ## masses1=element.B[0].masses[0] ## ,lead.B[1].masses[0]
           masses2=element.B[1].masses[mi] ## ,lead.B[1].masses[0]
           ul=SMSResults.getSmartUpperLimit(ana,Tx,masses1,masses2)
-          theory=theoRes.predictionFor ( masses1, masses2, sqrts, "NLL", condition )
-          ##print "[LimitGetter.py] %s %s ul=%s theory xsec=%s" % ( Tx, ana, ul, theory )
-          #          excluded=None
-          #print "theory=",theory,"ul=",ul,"type=",type(theory)
-          #if True: # theory!=None and ul!=None:
-          excluded=rmvunit(theory,"fb")>rmvunit(ul,"fb")
-          ret.append ( { "ul": ul, "analysis": ana, "Tx": Tx, "m1": masses1, "m2": masses2, "theory": theory, "excluded":excluded, "sqrts": sqrts } )
+          if addTheoryPrediction:
+            theory=theoRes.predictionFor ( masses1, masses2, sqrts, "NLL", condition )
+            ##print "[LimitGetter.py] %s %s ul=%s theory xsec=%s" % ( Tx, ana, ul, theory )
+            #          excluded=None
+            #print "theory=",theory,"ul=",ul,"type=",type(theory)
+            #if True: # theory!=None and ul!=None:
+            excluded=rmvunit(theory,"fb")>rmvunit(ul,"fb")
+            ret.append ( { "ul": ul, "analysis": ana, "Tx": Tx, "m1": masses1, "m2": masses2, "theory": theory, "excluded":excluded, "sqrts": sqrts } )
+          else: ret.append ( { "ul": ul, "analysis": ana, "Tx": Tx, "m1": masses1, "m2": masses2, "sqrts": sqrts } )    
   return ret 
 
     
