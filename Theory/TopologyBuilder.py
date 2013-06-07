@@ -34,6 +34,9 @@ def fromEvent( Event, weight = {}, DoCompress=False, DoInvisible=False, \
   if DoCompress and minmassgap==None: 
     print "[TopologyBuilder.py] Please, set minmassgap"
     return None
+  if DoCompress and minmassgap==-1: 
+    print "[TopologyBuilder.py] Please, set minmassgap"
+    return None
   
 #First get Mothers:  
   for i in range(len(PList)):
@@ -100,6 +103,8 @@ def compressTopology(ETopList,DoCompress,DoInvisible,minmassgap):
       can be compressed no more.
       Returns a list with the old toplogies and the compressed ones.
       To avoid double counting the input list should have a single element. """
+  from Tools.PhysicsUnits import rmvunit
+  minmassgap=rmvunit ( minmassgap, "GeV" )
 
 #Keep compressing the topologies generated so far until no new compressions can happen:
   if len(ETopList) > 0:
