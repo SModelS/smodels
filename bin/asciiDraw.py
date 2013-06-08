@@ -8,7 +8,7 @@ argparser.add_argument ( '-l', '--lhe', nargs='?', help='lhe file name, supplied
 args=argparser.parse_args()
 
 from Theory import LHEReader, TopologyBuilder
-from Tools import SMSFeynmanGraphs
+from Tools import FeynmanGraphs
 
 filename="../lhe/%s_1.lhe" % args.T
 if args.lhe!="": filename=args.lhe
@@ -16,4 +16,4 @@ if args.lhe!="": filename=args.lhe
 reader = LHEReader.LHEReader( filename )
 Event = reader.next()
 SMSTop = TopologyBuilder.fromEvent(Event, {} )
-SMSFeynmanGraphs.asciidraw ( SMSTop[0].leadingElement() )
+FeynmanGraphs.asciidraw ( SMSTop[0].leadingElement() )
