@@ -24,6 +24,7 @@ class LHEReader:
     self.nmax=nmax
     self.ctr=0
     self.File = open ( filename )
+    self.metainfo={}
 
   def next ( self ):
     """ needed for the iterator """
@@ -51,6 +52,15 @@ class LHEReader:
       if line=='': 
         # print "[LHEReader.py] error demanding more events than are available."
         return None
+      if line.find ( "Number of Events        :" ) > -1:
+        nevts=int(line.split()[-1])
+        # print "Found madgraph nevents",nevts
+      if line.find ( "Integrated weight (pb)") > -1:
+        iwght=float(line.split()[-1])
+        ## print "Found madgraph integrated weight",iwght
+        self.metainfo["iweight"]=iwght
+        ret.metainfo["iweight"]=iwght
+
       line = self.File.readline()
         
 #Read event info:
