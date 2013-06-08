@@ -44,7 +44,10 @@ class SMSEvent:
   def __str__ ( self ):
     nr=""
     if self.eventnr!=None: nr=" "+str(self.eventnr)
-    ret="\nEvent%s:\n" % nr
+    metainfo=""
+    for (key,value) in self.metainfo.items():
+      metainfo+=" %s:%s" % ( key,value )
+    ret="\nEvent%s:%s\n" % nr
     for p in self.particles:
       ret+=p.__str__()+"\n"
     return ret
