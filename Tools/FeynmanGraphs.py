@@ -11,12 +11,20 @@ def draw ( element, filename="bla.pdf" ):
   """ plot a lessagraph, write into pdf/eps/png file called <filename> """
   from pyfeyn.user import FeynDiagram,Vertex,Point,Fermion,Scalar,CIRCLE,SQUARE,\
     HATCHED135,Circle,pyx
+  #from pyx import text
+  #import os
+  #text.set(mode="latex")
+  #text.set(fontmaps="ttfonts.map" ) 
+  #text.preamble(r"\usepackage[T1]{fontenc}")
+  #text.preamble(r"\font\ttfgeorgia georgia at10pt")
+  #text.preamble(r"\usepackage{times}")
   fd = FeynDiagram()
   f=1.0
 
   in1  = Point(-1*f, -.75*f)
   in2  = Point(-1*f, 1.75*f)
   vtx1 = Circle(0,.5*f, radius=0.3*f).setFillStyle(HATCHED135)
+  #P1a = Fermion(in1, vtx1 ).addLabel("\\ttfgeorgia P$_1$")
   P1a = Fermion(in1, vtx1 ).addLabel("P$_1$")
   P1a.addParallelArrow( pos=.44,displace=.0003,length=pyx.unit.length(1.75*f), size=.0001)
   P1a.addParallelArrow( pos=.44,displace=-.0003,length=pyx.unit.length(1.75*f), size=.0001)
