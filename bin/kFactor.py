@@ -30,14 +30,16 @@ hstaustau=S.getUpperLimit ( a, "TChiChipmStauStau" )
 print hstaustau
 
 hk=hslepstau.Clone()
-for x in arange ( xRange[0]-xWidth, xRange[1]+xWidth, xWidth ):
-  for y in arange ( yRange[0]-yWidth, yRange[1]+yWidth, yWidth ):
+for x in arange ( xRange[0]+xWidth/2., xRange[1]+xWidth, xWidth ):
+  for y in arange ( yRange[0]+yWidth/2., yRange[1]+yWidth, yWidth ):
     Bin=hk.FindBin(x,y)
     Binhstaustau=hstaustau.FindBin(x,y)
     numerator=hk.GetBinContent(Bin )
     denom=hstaustau.GetBinContent(Binhstaustau)
     if denom>0.:
       hk.SetBinContent ( Bin, numerator / denom )
+    else:
+      hk.SetBinContent ( Bin, 0. )
 
 hk.GetZaxis().SetRangeUser(0.,2.)
 hk.Draw("colz")
