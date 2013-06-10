@@ -2,9 +2,9 @@
 
 """
 .. module:: LHEDecomposer
-    :synopsis: I have no idea ...
+    :synopsis: smodels-decomposes LHE events, creating TopologyLists 
 
-.. moduleauthor:: someone <email@example.com>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
 """
 
