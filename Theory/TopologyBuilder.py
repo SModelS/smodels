@@ -12,10 +12,15 @@
 
 def fromEvent( Event, weight = {}, DoCompress=False, DoInvisible=False, \
                        minmassgap=None ):
-  """ Create a topology (GTop object) from Event.
-      If the DoCompress and/or DoInvisible flags are on, also generate
-  compressed topologies with small mass gaps and/or neutrinos emitted
-  in the last step of the cascade ("effective LSP"). """
+  """ Create a topology from an event.
+
+    :type Event: SMSEvent
+    :param minmassgap: FIXME
+    :param DoCompress: generate compressed topology, compressing small mass gaps
+    :param DoInvisible: generate compressed topology, combine LSP with neutrinos in last step of the cascade into an effective LSP
+    :param weight: a dictionary of event weights, pdgids of mothers are keys of dictionary. Alternatively, a single float can be given as a global weight for all events
+    :Returns: GTop
+  """
   from SMSDataObjects import GTop, EElement, BElement
   from ParticleNames import Rodd, Reven, ptype
   from Tools.PhysicsUnits import addunit, rmvunit
