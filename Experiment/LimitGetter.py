@@ -38,9 +38,8 @@ def GetPlotLimit(inmass,plot,Analysis,complain = False):
         FIXME in the end this should become no more than a convenience function
         to facilitate looking up results for Analysis objects. 
         All the algorithmic code should go into SMSResults plus helper classes.
-        FIXME this should be obsolete, replaced by LimitGetter.limit?
+        FIXME this is needed for clustering. Do we need the analysis object?
     """
-    print "[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit"
     import copy
     import SMSResults
     from Tools.PhysicsUnits import rmvunit
