@@ -225,3 +225,23 @@ class EAnalysis:
     """ evaluate all the analysis'es results """
     for res in self.results:
       self.evaluateResult( res, uselimits )
+      
+  def Split(self):
+    """ if the analysis contains more than one result or plot, splits in a list of simple analyses
+    with a single result/plot. Returns a list of simple analyses. If the analysis is already
+    simple, return the a one element list with itself"""
+    import copy
+    
+    
+    SplitList = []
+    for key in self.results.keys():
+      for plot in self.plots[key][1]:
+        NewAnalysis = copy.deepcopy(self)
+        NewAnalysis.label = plot + ":" + self.plots[key][0]
+        NewAnalysis.results = {key : self.results[key]}
+        NewAnalysis.plots = {key : [self.plots[key][0],[plot]]}
+        SplitList.append(NewAnalysis)
+        
+    return SplitList
+        
+        
