@@ -6,7 +6,7 @@
 #an interpolation is performed.
 
 import SMSResults, numpy, SMSHelpers, copy
-from SMSHelpers import rmvunit, addunit
+from Tools.PhysicsUnits import rmvunit, addunit
 
 def gethistname(topo, mz):
   """Build histogram name for given topology and mz information (mz as given in the axes-information)."""

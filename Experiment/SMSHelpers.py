@@ -3,6 +3,7 @@
 """ some helper functions that are not to be used by the end user """
 
 import os
+from Tools.PhysicsUnits import rmvunit
 
 Base = "/afs/hephy.at/user/w/walten/public/sms/"
 
@@ -18,69 +19,6 @@ verbose=True
 
 ## track the open root files
 openFiles={}
-
-useUnits=True
-
-def addunit ( value, unitstring ):
-  """ a function that can add units to values, but also
-      makes it easy to turn this functionality off, in case "units" isnt installed
-      """
-  if value==None: return value
-  if not useUnits: return value
-  if useUnits: 
-    import Tools.PhysicsUnits as u
-    import types as t
-    ## for convenience, we add units also to tuples, lists, and dictionaries
-    if type(value)==t.ListType:
-      return [ addunit(x,unitstring) for x in value ]
-    if type(value)==t.TupleType:
-      return tuple ( [ addunit(x,unitstring) for x in value ] )
-    if type(value)==t.DictType:
-      ret={}
-      for (k,v) in value.items():
-        ret[k]=addunit(v,unitstring)
-      return ret
-    if type(value)!=t.FloatType and type(value)!=t.IntType:
-      return value
-    if unitstring=="GeV":
-      return value * u.GeV
-    if unitstring=="TeV":
-      return value * u.TeV
-    if unitstring=="fb":
-      return value * u.fb
-    if unitstring=="pb":
-      return value * u.pb
-    if unitstring=="fb-1":
-      return value / u.fb
-    print "[SMSHelpers.py] Warning: dont know what to do with unit",unitstring
-  return value
-
-
-def rmvunit ( value, unitstring ):
-  """ a function that can remove units from values, but also
-      makes it easy to turn this functionality off, in case "units" isnt installed
-      """
-  if not useUnits: return value
-  if useUnits: 
-    import Tools.PhysicsUnits as u
-    import types as t
-    if type(value) != type(1.*u.GeV):
-      return value
-    if unitstring=="GeV":
-      return value.asNumber(u.GeV)
-    if unitstring=="TeV":
-      return value.asNumber(u.TeV)
-    if unitstring=="fb":
-      return value.asNumber(u.fb)
-    if unitstring=="pb":
-      return value.asNumber(u.pb)
-    if unitstring=="fb-1":
-      return value.asNumber(1/u.fb)
-
-    print "[SMSHelpers.py] Warning: dont know what to do with unit",unitstring
-    return value
-
-    
 
 def close():
   """ close all open files """
