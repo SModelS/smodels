@@ -27,7 +27,7 @@ ROOT.gStyle.SetCanvasBorderMode(0)
 ROOT.gStyle.SetPadRightMargin(0.18)
 #ROOT.gStyle.SetPadBottomMargin(0.11)
 #ROOT.gStyle.SetPadTopMargin(0.07)
-ROOTTools.useNiceColorPalette ( "bluepurple", 0.5, 50 ) 
+ROOTTools.useNiceColorPalette ( "temperature", 0.5, 50 ) 
 
 tevIn=rmvunit ( SMSResults.getSqrts(args.ana), "TeV" )
 run1=SMSResults.getRun(args.ana)
