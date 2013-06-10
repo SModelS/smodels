@@ -26,7 +26,7 @@ print "wx,wy=",xWidth,yWidth
 
 hslepstau=S.getUpperLimit ( a, tslep )
 print hslepstau
-hstaustau=S.getUpperLimit ( a, "TChiChipmStauStau" )
+hstaustau=S.getUpperLimit ( a, tstau )
 print hstaustau
 
 hk=hslepstau.Clone()
