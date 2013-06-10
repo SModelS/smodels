@@ -228,7 +228,15 @@ def load():
 #  }  
 ##Add analysis to list of analyses:
 #  ListOfAnalyses.append(Analysis)   
-  
+
+
+#Split combined analysis objects into single result/plot analysis
+  NewList = []
+  for Analy in ListOfAnalyses:
+    for Ana in Analy.Split():
+      NewList.append(Ana)
+      
+  ListOfAnalyses = NewList  
 
 # Build list of elements from constraints and conditions with zero weights
 # to be computed later with theoretical weights. Check if listed histograms
