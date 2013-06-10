@@ -18,7 +18,7 @@ args=argparser.parse_args()
 
 anas = SMSResults.getAnalyses(args.topo)
 
-ourAnas = ["alphaT", "alphaT8TeV", "Weakinos8TeV", "RA48TeV", "RA2b8TeV", "LeptonicStop8TeV", "MultiLepton8TeV", "SUS13008"]
+ourAnas = ["alphaT", "alphaT8TeV", "Weakinos8TeV", "RA48TeV", "RA2b8TeV", "LeptonicStop8TeV", "MultiLepton8TeV", "SUS13008", "ATLAS_CONF_2013_024", "ATLAS_CONF_2013_037", "ATLAS_CONF_2013_007", "ATLAS_CONF_2013_001", "ATLAS_CONF_2012_105", "ATLAS_CONF_2012_166"]
 
 toponame = args.topo
 if args.mz: toponame = SMSInterpolation.gethistname(args.topo, args.mz)
