@@ -55,7 +55,7 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
               s = "./nllfast_7TeV %s %s %s %s" % ( process, pdf, squarkmass, gluinomass )
       o=commands.getoutput(s)
     except Exception,e:
-      pass ## make sure we always chdir back!
+      print "[NLLXsec.py] caught exception",e
     os.chdir(wd) ## back to where we started
 
     if process=='st' and o[1]=='T' and Energy == 7:
@@ -101,17 +101,18 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
               s="./nllfast_7TeV %s %s %s" % ( process, pdf, mass )
           o=commands.getoutput(s)
         except Exception,e:
-          pass
+          print "[NLLXSec.py 2] caught",e
         os.chdir( wd ) # make sure we always chdir back
 
 # uncomment this line to see the nll fast output
 #   print "nllfast output is:  ", o
 
     if o[1]=='T' and Energy  == 7:
+        print "[NLLXSec.py] how can I end up here? A. o=",o
         return Values_7TeV
     elif o[1]=='T' and Energy  == 8:
+        print "[NLLXSec.py] how can I end up here? B. o=",o
         return Values_8TeV
-
 
     lines=o.split()
 
