@@ -63,11 +63,6 @@ Total weight =  {'7 TeV (LO)': 1.39E+02 [fb], '8 TeV (LO)': 1.93E+02 [fb], '7 Te
 
 ---------------Analysis Label =  ATLAS_CONF_2013_036:TChiChiSlepSlep
 ---------------Analysis Label =  ATLAS_CONF_2013_037:T2tt
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
 +-----------------+------------+----------------------------+-------------------------------+-------------------------+
 |      Result     | Conditions |            Mass            |       Theoretical Value       |   Experimental Limits   |
 +-----------------+------------+----------------------------+-------------------------------+-------------------------+
@@ -78,11 +73,6 @@ Total weight =  {'7 TeV (LO)': 1.39E+02 [fb], '8 TeV (LO)': 1.93E+02 [fb], '7 Te
 +-----------------+------------+----------------------------+-------------------------------+-------------------------+
 ---------------Analysis Label =  ATLAS_CONF_2013_037:T6bbWW
 ---------------Analysis Label =  ATLAS_CONF_2013_024:T2tt
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
 +-----------------+------------+----------------------------+-------------------------------+-------------------------+
 |      Result     | Conditions |            Mass            |       Theoretical Value       |   Experimental Limits   |
 +-----------------+------------+----------------------------+-------------------------------+-------------------------+
@@ -93,11 +83,6 @@ Total weight =  {'7 TeV (LO)': 1.39E+02 [fb], '8 TeV (LO)': 1.93E+02 [fb], '7 Te
 +-----------------+------------+----------------------------+-------------------------------+-------------------------+
 ---------------Analysis Label =  MultiLepton8TeV:T1tttt
 ---------------Analysis Label =  LeptonicStop8TeV:T2tt
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
 +-----------------+------------+----------------------------+-------------------------------+-------------------------------+
 |      Result     | Conditions |            Mass            |       Theoretical Value       |      Experimental Limits      |
 +-----------------+------------+----------------------------+-------------------------------+-------------------------------+
@@ -111,11 +96,6 @@ Total weight =  {'7 TeV (LO)': 1.39E+02 [fb], '8 TeV (LO)': 1.93E+02 [fb], '7 Te
 ---------------Analysis Label =  ATLAS_CONF_2013_035:TChiWZ
 ---------------Analysis Label =  ATLAS_CONF_2013_035:TChiChipmSlepL
 ---------------Analysis Label =  ATLAS_CONF_2012_166:T2tt
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
 +-----------------+------------+----------------------------+-------------------------------+-------------------------+
 |      Result     | Conditions |            Mass            |       Theoretical Value       |   Experimental Limits   |
 +-----------------+------------+----------------------------+-------------------------------+-------------------------+
@@ -128,11 +108,6 @@ Total weight =  {'7 TeV (LO)': 1.39E+02 [fb], '8 TeV (LO)': 1.93E+02 [fb], '7 Te
 ---------------Analysis Label =  ATLAS_CONF_2013_025:T6ttZZ
 ---------------Analysis Label =  alphaT:T1bbbb
 ---------------Analysis Label =  alphaT:T2tt
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
 +-----------------+------------+----------------------------+-------------------------------+---------------------------+
 |      Result     | Conditions |            Mass            |       Theoretical Value       |    Experimental Limits    |
 +-----------------+------------+----------------------------+-------------------------------+---------------------------+
@@ -144,16 +119,7 @@ Total weight =  {'7 TeV (LO)': 1.39E+02 [fb], '8 TeV (LO)': 1.93E+02 [fb], '7 Te
 ---------------Analysis Label =  alphaT:T1tttt
 ---------------Analysis Label =  alphaT:T2
 ---------------Analysis Label =  alphaT:T1
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
 ---------------Analysis Label =  alphaT:T2bb
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
 +-----------------+------------+----------------------------+-------------------------------+---------------------------+
 |      Result     | Conditions |            Mass            |       Theoretical Value       |    Experimental Limits    |
 +-----------------+------------+----------------------------+-------------------------------+---------------------------+
@@ -163,11 +129,6 @@ Total weight =  {'7 TeV (LO)': 1.39E+02 [fb], '8 TeV (LO)': 1.93E+02 [fb], '7 Te
 |    ---------    | ---------  |         ---------          |           ---------           |         ---------         |
 +-----------------+------------+----------------------------+-------------------------------+---------------------------+
 ---------------Analysis Label =  ATLAS_CONF_2013_001:T2bb
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
 +-----------------+------------+----------------------------+-------------------------------+-------------------------+
 |      Result     | Conditions |            Mass            |       Theoretical Value       |   Experimental Limits   |
 +-----------------+------------+----------------------------+-------------------------------+-------------------------+
@@ -199,11 +160,6 @@ Skipping analysis SUS13008:T7btbtWW with more than 3 vertices
 ---------------Analysis Label =  RA2b8TeV:T1tttt
 ---------------Analysis Label =  alphaT8TeV:T1bbbb
 ---------------Analysis Label =  alphaT8TeV:T2tt
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
 +-----------------+------------+----------------------------+-------------------------------+-------------------------------+
 |      Result     | Conditions |            Mass            |       Theoretical Value       |      Experimental Limits      |
 +-----------------+------------+----------------------------+-------------------------------+-------------------------------+
@@ -215,16 +171,7 @@ Skipping analysis SUS13008:T7btbtWW with more than 3 vertices
 ---------------Analysis Label =  alphaT8TeV:T1tttt
 ---------------Analysis Label =  alphaT8TeV:T2
 ---------------Analysis Label =  alphaT8TeV:T1
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
 ---------------Analysis Label =  alphaT8TeV:T2bb
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
-[LimitGetter.GetPlotLimit] this method is obsolete, use LimitGetter.limit
 +-----------------+------------+----------------------------+-------------------------------+-------------------------------+
 |      Result     | Conditions |            Mass            |       Theoretical Value       |      Experimental Limits      |
 +-----------------+------------+----------------------------+-------------------------------+-------------------------------+
