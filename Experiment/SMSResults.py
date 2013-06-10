@@ -5,7 +5,7 @@
 import SMSHelpers
 from Tools.PhysicsUnits import addunit, rmvunit
 from SMSResultsCollector import SMSInfo
-from Tools import RCFile
+from Tools import RCFile, PhysicsUnits
 
 def setLogLevel ( l=[ "error" ] ):
   """ defines what is written out, and what isnt """
@@ -16,7 +16,7 @@ def setBase ( base ):
   SMSHelpers.Base=base
 
 def useUnits ( b=True ):
-  SMSHelpers.useUnits = b
+  PhysicsUnits.useUnits = b
 
 '''
 This function should not be used! Use considerRuns() instead!
@@ -78,11 +78,11 @@ def getBinWidthX ( analysis, topo, run=None ):
   """ get the bin width in X """
   run=SMSHelpers.getRun ( analysis, run )
   if SMSHelpers.hasDictionary ( analysis, run ):
-    return SMSHelpers.addunit(25,"GeV")
+    return addunit(25,"GeV")
   histo=SMSHelpers.getUpperLimitFromHisto ( analysis, topo, run )
   if not histo: return None
   w=histo.GetXaxis().GetBinWidth(1)
-  return SMSHelpers.addunit ( w, "GeV" )
+  return addunit ( w, "GeV" )
 
 def getLowX ( analysis, topo, run=None ):
   """ get the lower edge of the x axis """
@@ -91,11 +91,11 @@ def getLowX ( analysis, topo, run=None ):
     dic=SMSHelpers.getUpperLimitDictionary(analysis, topo, run)
     if not dic: return None
     minx=min(dic.keys())-12.5
-    return SMSHelpers.addunit (minx,"GeV")
+    return addunit (minx,"GeV")
   histo=SMSHelpers.getUpperLimitFromHisto ( analysis, topo, run )
   if not histo: return None
   w=histo.GetXaxis().GetBinLowEdge(histo.GetXaxis().GetFirst())
-  return SMSHelpers.addunit ( w, "GeV" )
+  return addunit ( w, "GeV" )
 
 def getUpX( analysis, topo, run=None ):
   """ get the upper edge of the x axis """
@@ -104,11 +104,11 @@ def getUpX( analysis, topo, run=None ):
     dic=SMSHelpers.getUpperLimitDictionary(analysis, topo, run)
     if not dic: return None
     maxx=max(dic.keys())+12.5
-    return SMSHelpers.addunit (maxx,"GeV")
+    return addunit (maxx,"GeV")
   histo=SMSHelpers.getUpperLimitFromHisto ( analysis, topo, run )
   if not histo: return None
   w=histo.GetXaxis().GetBinUpEdge(histo.GetXaxis().GetLast())
-  return SMSHelpers.addunit ( w, "GeV" )
+  return addunit ( w, "GeV" )
 
 def getLowY ( analysis, topo, run=None ):
   """ get the lower edge of the y axis """
@@ -120,11 +120,11 @@ def getLowY ( analysis, topo, run=None ):
     for ydic in dic.values():
       ylist.extend(ydic.keys())
     miny=min(ylist)-12.5
-    return SMSHelpers.addunit(miny,"GeV")
+    return addunit(miny,"GeV")
   histo=SMSHelpers.getUpperLimitFromHisto ( analysis, topo, run )
   if not histo: return None
   w=histo.GetYaxis().GetBinLowEdge(histo.GetYaxis().GetFirst())
-  return SMSHelpers.addunit ( w, "GeV" )
+  return addunit ( w, "GeV" )
 
 def getUpY ( analysis, topo, run=None ):
   """ get the upper edge of the y axis """
@@ -136,21 +136,21 @@ def getUpY ( analysis, topo, run=None ):
     for ydic in dic.values():
       ylist.extend(ydic.keys())
     maxy=max(ylist)+12.5
-    return SMSHelpers.addunit(maxy,"GeV")
+    return addunit(maxy,"GeV")
   histo=SMSHelpers.getUpperLimitFromHisto ( analysis, topo, run )
   if not histo: return None
   w=histo.GetYaxis().GetBinUpEdge(histo.GetYaxis().GetLast())
-  return SMSHelpers.addunit ( w, "GeV" )
+  return addunit ( w, "GeV" )
 
 def getBinWidthY ( analysis, topo, run=None ):
   """ get the bin width in Y """
   run=SMSHelpers.getRun ( analysis, run )
   if SMSHelpers.hasDictionary ( analysis, run ):
-    return SMSHelpers.addunit (25, "GeV")
+    return addunit (25, "GeV")
   histo=SMSHelpers.getUpperLimitFromHisto ( analysis, topo, run )
   if not histo: return None
   w=histo.GetYaxis().GetBinWidth(1)
-  return SMSHelpers.addunit ( w, "GeV" )
+  return addunit ( w, "GeV" )
 
 def getExclusionLine(topo,ana,expected=False,plusminussigma=0,extendedinfo=False,xvalue=None,factor=1.0):
   """ get the exclusion line, as a TGraph """
@@ -318,7 +318,7 @@ def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None, interp
     return histo
   value=SMSHelpers.getUpperLimitAtPoint ( histo, mx, my, interpolate=interpolate )
   if value==0.0: value=None # 0.0 usually means out of bounds
-  return SMSHelpers.addunit ( value, "pb" )
+  return addunit ( value, "pb" )
 
 def getEfficiency ( analysis, topo, mx=None, my=None, run=None ):
   """ get the efficiency for run/analysis/topo.
@@ -373,13 +373,13 @@ def hasDataPublished ( analysis, run=None ):
 def getLumi ( analysis, run=None ):
   """ get the integrated luminosity for this analysis """
   lumifb=float(SMSHelpers.getMetaInfoField ( analysis, "lumi", run ))
-  return SMSHelpers.addunit ( lumifb, "fb-1" )
+  return addunit ( lumifb, "fb-1" )
 
 def getSqrts ( analysis, run=None ):
   """ get s_hat for this analysis """
   sqrts=SMSHelpers.getMetaInfoField ( analysis, "sqrts", run )
   try:
-    return SMSHelpers.addunit ( float(sqrts), "TeV" )
+    return addunit ( float(sqrts), "TeV" )
   except:
     pass
   return sqrts
