@@ -33,7 +33,7 @@ hk=hslepstau.Clone()
 for x in arange ( xRange[0]-xWidth, xRange[1]+xWidth, xWidth ):
   for y in arange ( yRange[0]-yWidth, yRange[1]+yWidth, yWidth ):
     Bin=hk.FindBin(x,y)
-    Binhstaustau=hk.FindBin(x,y)
+    Binhstaustau=hstaustau.FindBin(x,y)
     numerator=hk.GetBinContent(Bin )
     denom=hstaustau.GetBinContent(Binhstaustau)
     if denom>0.:
