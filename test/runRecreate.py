@@ -10,6 +10,11 @@ from Experiment import SMSResults, SMSInterpolation
 from Tools.PhysicsUnits import rmvunit
 from Tools import ROOTTools
 
+def zero(x,y):
+  if (x+2)%4==0 and (y+2)%4==0: return False                                   
+  if x%4!=0 or y%4!=0: return True                                              
+  return False
+
 argparser=argparse.ArgumentParser()
 argparser.add_argument('-a','--ana',help='input analysis [alphaT8TeV]',default='alphaT8TeV')
 argparser.add_argument('-t','--topo',help='input topology [T2bb]',default='T2bb')
@@ -17,6 +22,8 @@ argparser.add_argument('-mz','--mz',help='intermediate mass information')
 argparser.add_argument('-axes','--axes',help='axes information')
 argparser.add_argument('-n','--nevts',help='number of events per point in refXSec [10000]', type=int, default=10000)
 argparser.add_argument('-b','--binsize',help='binsize in GeV', type=int)
+argparser.add_argument('-text','--text',help='print upper limit each 100 GeV',action='store_true')
+
 args=argparser.parse_args()
 
 ROOT.gROOT.SetStyle("Plain")
@@ -69,6 +76,15 @@ if exclusion: exclusion.Draw("SAME")
 if exclusionm1: exclusionm1.Draw("SAME")
 if exclusionp1: exclusionp1.Draw("SAME")
 reproduced_exclusion.Draw("SAME")
+
+if args.text:
+  ulText = ul.Clone("ulText")
+  for x in range(1,ulText.GetXaxis().GetLast()+1):
+    for y in range(1,ulText.GetYaxis().GetLast()+1):
+      bincontent=ulText.GetBinContent(x,y)
+      if zero(x,y): bincontent=0
+      ulText.SetBinContent(x,y,bincontent)
+  ulText.Draw("SAMETEXT") 
 
 legend = ROOT.TLegend(0.7, 0.85, 0.15, 0.67)
 legend.SetFillStyle(0)
