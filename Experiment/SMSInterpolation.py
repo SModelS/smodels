@@ -88,8 +88,9 @@ def compareM(masses, d):
       ml.append(d['mz'][0].find('M1'))
       ml.append(d['mz'][0].find('M2'))
       ml.append(d['mz'][0].find('M0'))
+      from Tools.PhysicsUnits import rmvunit
       deltam = float(d['mz'][0].split('=')[1])
-      deltain = float(masses[getindex(ml,second=True)]-masses[getindex(ml)])
+      deltain = rmvunit(masses[getindex(ml,second=True)],"GeV")-rmvunit(masses[getindex(ml)],"GeV")
       if deltain<0: return None
       if abs(deltain-deltam)/(deltain+deltam)<0.1: return True
       else: return None
