@@ -47,7 +47,7 @@ class SMSEvent:
     metainfo=""
     for (key,value) in self.metainfo.items():
       metainfo+=" %s:%s" % ( key,value )
-    ret="\nEvent%s:%s\n" % nr
+    ret="\nEvent%s:%s\n" % (nr,metainfo)
     for p in self.particles:
       ret+=p.__str__()+"\n"
     return ret

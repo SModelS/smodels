@@ -22,6 +22,7 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
     Values_8TeV={"sqmass_8TeV":0, "mgmass_8TeV":0,"LOcs_8TeV":False,"NLOcs_8TeV":False,"NLL+NLO_8TeV":False,"K_NLO_8TeV":False,"K_NLL_8TeV":False}
 
     mass = 0
+    o=None
 
     wd=os.getcwd()
 
