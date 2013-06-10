@@ -22,19 +22,19 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
   ymin=rmvunit(SMSResults.getLowY(ana,toponame),'GeV')
   xmax=rmvunit(SMSResults.getUpX(ana,toponame),'GeV')
   ymax=rmvunit(SMSResults.getUpY(ana,toponame),'GeV')
-  bwx=rmvunit(SMSResults.getBinWidthX(ana,toponame),'GeV')
-  bwy=rmvunit(SMSResults.getBinWidthY(ana,toponame),'GeV')
+  bwx=float(rmvunit(SMSResults.getBinWidthX(ana,toponame),'GeV'))
+  bwy=float(rmvunit(SMSResults.getBinWidthY(ana,toponame),'GeV'))
   if binsize:
     bwx=float(binsize)
     bwy=float(binsize)
-  print bwx, bwy, xmin, xmax
+  print bwx, bwy, xmin, xmax, ymin, ymax
   bx=int((xmax-xmin)/bwx)
   by=int((ymax-ymin)/bwy)
 
-  h = ROOT.TH2F('h','h',bx,xmin,xmax,by,ymin,ymax)
+  h = ROOT.TH2F('h','h',bx,xmin,xmin+bx*bwx,by,ymin,ymin+by*bwy)
 
   if line:
-    hL = ROOT.TH2F('hL','hL',bx,xmin,xmax,by,ymin,ymax)
+    hL = ROOT.TH2F('hL','hL',bx,xmin,xmin+bx*bwx,by,ymin,ymin+by*bwy)
     prod_mode = topo
     if topo=="T1tttt" or topo=="T1bbbb": prod_mode = "T1"
     rootname = "../data/%s_%devts.root" %(prod_mode,nevents)

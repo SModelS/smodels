@@ -239,6 +239,16 @@ def getClosestValue ( Dict, mx, my ):
         retul=ul
   return retul
 
+def inConvexHull(Dict, mx, my):
+  import numpy, scipy.spatial
+  pointlist=[]
+  for k in Dict.keys():
+    for ki in Dict[k].keys():
+      pointlist.append([k,ki])
+  p=numpy.array(pointlist)
+  dela=scipy.spatial.Delaunay(p)
+  return dela.find_simplex((mx, my))>=0
+
 def getInterpolatedUpperLimit ( Dict, inmx, inmy ):
   import sys
   if Dict==None: return None
@@ -250,7 +260,7 @@ def getInterpolatedUpperLimit ( Dict, inmx, inmy ):
   Neighbors=[]
   mx = rmvunit(inmx,'GeV')
   my = rmvunit(inmy,'GeV')
-  if my>mx: return None
+  if not inConvexHull(Dict,mx, my): return None
 #  hasNeighbors={ "left": False, "right": False, "up": False, "down": False }
   for (dmx,dmv) in Dict.items():
     for (dmy,ul) in dmv.items():
