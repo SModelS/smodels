@@ -18,7 +18,7 @@ def fromEvent( Event, weight = {}, DoCompress=False, DoInvisible=False, \
     :param minmassgap: FIXME
     :param DoCompress: generate compressed topology, compressing small mass gaps
     :param DoInvisible: generate compressed topology, combine LSP with neutrinos in last step of the cascade into an effective LSP
-    :param weight: a dictionary of event weights, pdgids of mothers are keys of dictionary. Alternatively, a single float can be given as a global weight for all events
+    :param weight: a dictionary of event weights, pdgids of mothers are keys of dictionary.
     :Returns: GTop
   """
   from SMSDataObjects import GTop, EElement, BElement
