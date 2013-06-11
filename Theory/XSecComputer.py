@@ -15,11 +15,11 @@ def loFromLHE( lhefile, totalxsec, nevts=None ):
   :param lhefile: name of the lhe file
   :type lhefile: str
   :param totalxsec: total cross section, in fb
-  :type totalxsec: float or unum
+  :type totalxsec: cross section 
   :param nevts: maximum number of events to read. None means 'read all'.
-  :returns: a dictionary with weights at sqrts
+  :returns: an array of dictionaries: weights, xsecs, nevts
   """
-  total_cs = rmvunit ( totalxsec,"fb")
+  import LHEReader
   #Get event decomposition:
   n_evts={}
   reader = LHEReader.LHEReader( lhefile, nevts )
@@ -29,11 +29,13 @@ def loFromLHE( lhefile, totalxsec, nevts=None ):
     getprodcs(mompdg[0], mompdg[1], n_evts)
 
   weight, sigma = {}, {}
+  # print "[XSecComputer] lhe",lhefile
   for (key,xsec) in n_evts.items():
-    weight[key]= total_cs / nevts # weight for one event
-    sigma[key]=xsec * total_cs / nevts # production cross-section
+    weight[key]= totalxsec / float(nevts) # weight for one event
+    sigma[key]=xsec * totalxsec / float(nevts) # production cross-section
+    #print "[XSecComputer] moms=%s n=%d ntot=%d w=%s" % ( key,xsec,nevts, weight[key] )
 
-  return [ weight, sigma ]
+  return [ weight, sigma, n_evts ]
     
 
 def compute(nevts,slhafile,rpythia = True, donlo = True, basedir=None,datadir=None):
@@ -50,7 +52,7 @@ def compute(nevts,slhafile,rpythia = True, donlo = True, basedir=None,datadir=No
   
   """
 
-  import shutil, LHEReader, NLLXSec, CrossSection
+  import shutil, NLLXSec, CrossSection, LHEReader
   from Tools.PhysicsUnits import addunit
   import os, sys
 
@@ -96,23 +98,10 @@ def compute(nevts,slhafile,rpythia = True, donlo = True, basedir=None,datadir=No
     total_cs8 = addunit(1.,'fb')
     total_cs7 = addunit(1.,'fb')
 
-#Get 8 TeV event decomposition:
-  n8_evts={}
-  reader = LHEReader.LHEReader("%s/fort_8.68" % datadir,nevts)
-  for event in reader:
-    mompdg = event.getMom()    
-    if not mompdg: continue
-    getprodcs(mompdg[0], mompdg[1], n8_evts)
-
-  weight_8 = {}
-  sigma_8 = {}
-  for key in n8_evts.keys():
-    weight_8[key]= total_cs8/nevts  #Weight for one event
-    sigma_8[key]=n8_evts[key]*total_cs8/nevts #Production cross-section
-
+  weight_8, sigma_8, n8_evts = loFromLHE ( lhe8file, total_cs8, nevts )
 #Get 7 TeV event decomposition:
   n7_evts={}
-  reader = LHEReader.LHEReader("%s/fort_7.68" % datadir,nevts)
+  reader = LHEReader.LHEReader( lhe7file,nevts)
   for event in reader:
     mompdg = event.getMom()
     getprodcs(mompdg[0], mompdg[1], n7_evts)
