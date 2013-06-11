@@ -21,7 +21,7 @@ print "[run.py] done running pythia"
 
 lhefile=Wv.lhefile ( 8 )
 
-print "weights=",Wv.weights()
+## print "[run.py] weights=",Wv.weights()
 topos=LHEDecomposer.decompose ( lhefile, Wv.weights(), nevts=nevts )
 XSecComputer.clean ( Tmp )
 
@@ -29,4 +29,5 @@ print
 for Analysis in analyses:
   Analysis.add ( topos )
   lims=LimitGetter.limit ( Analysis )
-  print "[run.py] lims=",lims
+  if len(lims)==0: continue
+  print "[run.py] analysis=",Analysis,"lims=",lims
