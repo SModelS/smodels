@@ -22,7 +22,7 @@ def fromEvent( Event, weight = {}, DoCompress=False, DoInvisible=False, \
     :Returns: GTop
   """
   from SMSDataObjects import GTop, EElement, BElement
-  from ParticleNames import Rodd, Reven, ptype
+  from ParticleNames import Rodd, Reven, getName
   from Tools.PhysicsUnits import addunit, rmvunit
   PList=Event.particles
   if len(PList)==0: return None
@@ -69,7 +69,7 @@ def fromEvent( Event, weight = {}, DoCompress=False, DoInvisible=False, \
           newmom = i
           ndaugs += 1
         elif abs(PList[i].pdg) in Reven:
-          pname = ptype(PList[i].pdg)
+          pname = getName(PList[i].pdg)
           El.particles[len(El.particles)-1].append(pname)
           ndaugs += 1
         else:  # dunno the particle so it must be a BSM thingie

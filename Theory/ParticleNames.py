@@ -12,9 +12,12 @@
 
 #Converts pdg number to particle name according to the dictionaries Rodd
 # and Reven
-def ptype(pdg):
+def getName(pdg):
   """ Converts pdg number to particle name 
-      according to the dictionaries Rodd and Reven """
+    according to the dictionaries Rodd and Reven 
+
+    :type pdg: int
+  """
   p=int(pdg)
   if p in Rodd: return Rodd[p]
   if p in Reven:
