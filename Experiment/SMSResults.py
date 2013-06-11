@@ -205,8 +205,9 @@ def getAnalyses ( topo, run=None ):
     dirs=os.listdir ( "%s/%s/" % ( SMSHelpers.Base, r ) )
     for ana in dirs:
       if os.path.exists ( "%s/%s/%s/info.txt" % ( SMSHelpers.Base, r, ana ) ):
-        e=getExclusion ( ana, topo, r )
-        if e: analyses[ana]=True
+#        e=getExclusion ( ana, topo, r )
+#        if e: analyses[ana]=True
+        if exists(ana, topo, r): analyses[ana]=True
 
   return analyses.keys()
 
