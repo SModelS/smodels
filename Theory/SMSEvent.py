@@ -2,14 +2,12 @@
 
 """
 .. module:: SMSEvent
-    :synopsis: ...
+    :synopsis: class that encapsulates an (e.g. LHE) event.
     
-.. moduleauthor:: someone <email@example.com>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>, Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
     
 """
     
-""" Simple classes that encapsulate the information of an event """
-
 class SMSEvent:
   """ a super-simple event class. Basically, it's a list of Particles,
       plus some convenience functions """
