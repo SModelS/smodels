@@ -44,5 +44,5 @@ for x in arange ( xRange[0]+xWidth/2., xRange[1]+xWidth, xWidth ):
 hk.GetZaxis().SetRangeUser(0.,2.)
 hk.Draw("colz")
 
-ROOT.c1.Print("k.png")
+# ROOT.c1.Print("k.png")
 
