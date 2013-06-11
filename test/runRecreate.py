@@ -29,6 +29,7 @@ args=argparser.parse_args()
 ROOT.gROOT.SetStyle("Plain")
 ROOT.gStyle.SetOptStat(0000)
 ROOT.gStyle.SetOptTitle(0)
+ROOT.gStyle.SetPaintTextFormat(".0f")
 ROOT.gStyle.SetCanvasBorderMode(0)
 ##ROOT.gStyle.SetPadLeftMargin(0.16) #set these if needed
 ROOT.gStyle.SetPadRightMargin(0.18)
