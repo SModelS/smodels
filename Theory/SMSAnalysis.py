@@ -188,9 +188,10 @@ class EAnalysis:
     MCluster = DoCluster(Goodmasses,MassDist,dmin)
 
     if MCluster == None or MCluster == False:
-      print "[SMSAnalysis.py] FIXME andre, what do we do if the clusterer decides that we dont do clustering? "
-      import sys
-      sys.exit(0)
+      MCluster = []
+      for i in range(len(Goodmasses)): MCluster.append(set([i]))
+      print "[SMSAnalysis.py] Cluster failed, using unclustered masses"
+      
   #Loop over clusters to evaluate constraints and conditions inside each cluster
     for cluster in MCluster:
   #Get masses in cluster
