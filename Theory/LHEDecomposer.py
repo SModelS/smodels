@@ -13,8 +13,7 @@ def decompose(lhefile,W,nevts=None,doCompress=False,doInvisible=False,minmassgap
 
     :param lhefile: LHE file with e.g. pythia events
     :param W: Dictionary with event weights, the pdgids of the mothers being the \
-      keys. Alternatively, a single float can also be supplied, in that case 
-      the float is a global weight that is attributed to all events.
+      keys.
     :param nevts: (maximum) number of generated events. If None, all events from \
       file are processed.
     :returns: a TopologyList object 
@@ -27,17 +26,13 @@ def decompose(lhefile,W,nevts=None,doCompress=False,doInvisible=False,minmassgap
     momPDG = tuple(Event.getMom())
     # Get event weight list:
     weight = {}
-    if type(W)==types.DictType:
-      for k in W.keys(): 
-        if W[k].has_key(momPDG):
-          weight[k]=W[k][momPDG]
-        else:
-          print "[LHEDecomposer] Error getting weight for",k,momPDG
-          # weight[k]=0.
-          # return None
-    if type(W)==types.FloatType:
-      ## a global weight
-      weight=W
+    for k in W.keys(): 
+      if W[k].has_key(momPDG):
+        weight[k]=W[k][momPDG]
+      else:
+        print "[LHEDecomposer] Error getting weight for",k,momPDG
+        # weight[k]=0.
+        # return None
 
     # Get event topology  
     SMSTopListEv = TopologyBuilder.fromEvent(Event, weight, doCompress, doInvisible, minmassgap)
