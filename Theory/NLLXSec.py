@@ -2,21 +2,24 @@
 
 """
 .. module:: NLLXSec
-    :synopsis: ...
+    :synopsis: This module returns SUSY strong production cross-section using \
+    NLLfast for 7 and 8 TeV. The return output is a dictionary containing the \
+    cross-sections at NLO and NLL+NLO along with the k factors. For the \
+    decoupling limit to be obeyed the ratio of the corrospoding partiecles \
+    should be > 10. 
 
-.. moduleauthor:: someone <email@example.com>
+.. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
 
 """
-""" This module returns SUSY strong production cross-section using NLLfast for 7 and 8 TeV. The return output is a dictionary containing the cross-sections at NLO and NLL+NLO along with the k factors. For the decoupling limit to be obeyed the ratio of the corrospoding partiecles should be > 10. 
-    """
 
 import sys, commands, os, pyslha2
 from Tools.PhysicsUnits import addunit
 
 squarks = [1000001,2000001,1000002,2000002,1000003,2000003,1000004,2000004]
 
-# method to get the NLL fast results. This is the shortest way to code, I found.
 def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energy = 8, base="./nllfast/" ):
+   """ method to get the NLL fast results. 
+       This is the shortest way to code, I found. """
     Values={"sqmass_7TeV":0, "mgmass_7TeV":0,"LOcs_7TeV":False,"NLOcs_7TeV":False,"NLL+NLO_7TeV":False,"K_NLO_7TeV":False,"K_NLL_7TeV":False}
     Values_7TeV={"sqmass_7TeV":0, "mgmass_7TeV":0,"LOcs_7TeV":False,"NLOcs_7TeV":False,"NLL+NLO_7TeV":False,"K_NLO_7TeV":False,"K_NLL_7TeV":False}
     Values_8TeV={"sqmass_8TeV":0, "mgmass_8TeV":0,"LOcs_8TeV":False,"NLOcs_8TeV":False,"NLL+NLO_8TeV":False,"K_NLO_8TeV":False,"K_NLL_8TeV":False}
@@ -156,7 +159,20 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
     return Values
 
 def getNLLresult(pdgid1,pdgid2,inputfile,base="../nllfast",pdf="cteq"):
-    """ Main method: call this from the xsec routine with pdgid1, pdgid2 in order to get the NLL results. The output will be xecs =False and masses = 0 if the combination of ids don't have any results at NLL. For the decoupling limit treatement, the ratio of the masses of the particles involved should be > 10, else the results will be xsec = False and masses = 0."""
+    """ obtain the nll xsecs for pdgid1/pdgid2 production.
+
+       :param pdgid1: pdg id of first mother
+       :param pdgid2: pdg id of second mother
+       :param inputfile: slha file name
+       :type inputfile: str
+       :param base: base of nllfast installation
+       :param pdf: pdf tag
+       :returns: an array of two dictionaries, one for 7, one for 8 tev. if for \
+       the given mothers no results can be obtained, the dictionary \
+         { "xsecs": False, masses=0 } will be returned. \
+         the same is true if the masses of the decoupled particles in the \
+         input file are too light (ratio to mothers must be < 10 )
+    """ 
     
     readfile=pyslha2.readSLHAFile(inputfile)
     gluinomass = abs(readfile[0]['MASS'].entries[1000021])
