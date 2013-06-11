@@ -37,6 +37,7 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
     hL = ROOT.TH2F('hL','hL',bx,xmin,xmin+bx*bwx,by,ymin,ymin+by*bwy)
     prod_mode = topo
     if topo=="T1tttt" or topo=="T1bbbb": prod_mode = "T1"
+    if topo=="TChiChipmSlepL" or topo=="TChiChipmSlepStau" or topo=="TChiChipmStauStau": prod_mode = "TChiWZ"
     rootname = "../data/%s_%devts.root" %(prod_mode,nevents)
     if binsize: rootname =  "../data/%s_%devts_%dGeVbin.root" %(prod_mode,nevents,binsize)
     f=ROOT.TFile(rootname)
