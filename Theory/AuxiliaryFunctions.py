@@ -2,9 +2,9 @@
 
 """
 .. module:: AuxiliaryFunctions
-    :synopsis: ...
+    :synopsis: a collection of functions used in the conditions
 
-.. moduleauthor:: someone <email@example.com>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
 """
 
