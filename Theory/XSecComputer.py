@@ -14,12 +14,14 @@ def loFromLHE( lhefile, totalxsec, nevts=None ):
 
   :param lhefile: name of the lhe file
   :type lhefile: str
-  :param totalxsec: total cross section, in fb
+  :param totalxsec: total cross section, in fb. If the total cross section can be \
+    obtained from the lhe file (from the madgraph banner), then set totalxsec=None
+    to pick up the lhe cross section.
   :type totalxsec: cross section 
   :param nevts: maximum number of events to read. None means 'read all'.
   :returns: an array of dictionaries: weights, xsecs, nevts
   """
-  import LHEReader
+  import LHEReader, types
   #Get event decomposition:
   n_evts={}
   reader = LHEReader.LHEReader( lhefile, nevts )
@@ -29,6 +31,14 @@ def loFromLHE( lhefile, totalxsec, nevts=None ):
     mompdg = event.getMom()    
     if not mompdg: continue
     getprodcs(mompdg[0], mompdg[1], n_evts)
+
+  ##print "reader metainfo=",reader.metainfo
+  if type(totalxsec)==types.NoneType:
+    if not reader.metainfo.has_key ( "totalxsec" ):
+      print "[XSecComputer.py] error: totalxsec=None, but no xsec can be picked up from lhe reader"
+      return None
+    else:
+      totalxsec=reader.metainfo["totalxsec"]
 
   weight, sigma = {}, {}
   # print "[XSecComputer] lhe",lhefile

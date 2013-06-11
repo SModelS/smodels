@@ -16,7 +16,7 @@ nevts=1
 lhefile="../lhe/ued_2.lhe" ## thats the lhe file we're using
 
 ## we supply the weight manually
-Wv=XSecComputer.loFromLHE ( lhefile, totalxsec = .463 * fb ) 
+Wv=XSecComputer.loFromLHE ( lhefile, totalxsec = None ) 
 weights={ '8 TeV (LO)': Wv[0] }
 print "weights=",weights
 
