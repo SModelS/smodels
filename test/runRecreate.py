@@ -110,10 +110,13 @@ title.SetNDC()
 #title_str='%s , %s (%s-%s) , %d TeV , NLONLL' %(SMSResults.SMSInfo("decay", args.topo, args.ana),SMSResults.getPrettyName(args.ana),SMSResults.getExperiment(args.ana),SMSResults.getPAS(args.ana),tevIn)
 #title.DrawMathText(0.1,0.93,title_str.replace('#','\\'))
 
+order=SMSResults.getOrder ( args.ana )
+if order=="nlonll":
+  order="NLO-NLL"
 if run1!="ATLAS8TeV":
-  title.DrawLatex(0.1,0.93, '%s, %s (%s-%s), %d TeV, NLO-NLL' %(SMSResults.SMSInfo("decay", args.topo, args.ana),SMSResults.getPrettyName(args.ana),SMSResults.getExperiment(args.ana),SMSResults.getPAS(args.ana),tevIn))
+  title.DrawLatex(0.1,0.93, '%s, %s (%s-%s), %d TeV, %s' %(SMSResults.SMSInfo("decay", args.topo, args.ana),SMSResults.getPrettyName(args.ana),SMSResults.getExperiment(args.ana),SMSResults.getPAS(args.ana),tevIn, order))
 else:
-  title.DrawLatex(0.1,0.93, '%s (%s), %d TeV, NLO-NLL' %(SMSResults.SMSInfo("decay", args.topo, args.ana),SMSResults.getPAS(args.ana),tevIn))
+  title.DrawLatex(0.1,0.93, '%s (%s), %d TeV, %s' %(SMSResults.SMSInfo("decay", args.topo, args.ana),SMSResults.getPAS(args.ana),tevIn, order ))
 
 img=ROOT.TImage.Create()
 img.FromPad(c1)
