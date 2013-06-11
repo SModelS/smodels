@@ -8,7 +8,34 @@
 .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
     
 """
+
+def loFromLHE( lhefile, totalxsec, nevts=None ):
+  """ compute LO weights for each production process from LHE file.
+
+  :param lhefile: name of the lhe file
+  :type lhefile: str
+  :param totalxsec: total cross section, in fb
+  :type totalxsec: float or unum
+  :param nevts: maximum number of events to read. None means 'read all'.
+  :returns: a dictionary with weights at sqrts
+  """
+  total_cs = rmvunit ( totalxsec,"fb")
+  #Get event decomposition:
+  n_evts={}
+  reader = LHEReader.LHEReader( lhefile, nevts )
+  for event in reader:
+    mompdg = event.getMom()    
+    if not mompdg: continue
+    getprodcs(mompdg[0], mompdg[1], n_evts)
+
+  weight, sigma = {}, {}
+  for (key,xsec) in n_evts.items():
+    weight[key]= total_cs / nevts # weight for one event
+    sigma[key]=xsec * total_cs / nevts # production cross-section
+
+  return [ weight, sigma ]
     
+
 def compute(nevts,slhafile,rpythia = True, donlo = True, basedir=None,datadir=None):
   """ Runs pythia at 7 and 8 TeV and compute weights for each production process. 
 
@@ -39,10 +66,10 @@ def compute(nevts,slhafile,rpythia = True, donlo = True, basedir=None,datadir=No
     return None
     
   nllbase=basedir+"/nllfast"
-  if not os.path.isdir ( nllbase ):
+  if donlo and not os.path.isdir ( nllbase ):
     print "[XSecComputer] error: %s does not exist or is not a directory." % nllbase
     sys.exit(0)
-  if not os.path.isfile ( slhafile ):
+  if donlo and not os.path.isfile ( slhafile ):
     print "[XSecComputer] error: %s does not exist or is not a file." % slhafile
     sys.exit(0)
   installdir=basedir
@@ -175,10 +202,12 @@ def getprodcs(pdgm1, pdgm2, sigma):
 def runPythia ( slhafile, n, sqrts=7, datadir="./data/", etcdir="./etc/",
                 installdir="./" ):
   """ run pythia_lhe with n events, at sqrt(s)=sqrts.
-      slhafile is inputfile
-      datadir is where this all should run,
-      etcdir is where external_lhe.template is to be picked up,
-      installdir is where pythia_lhe is to be found.  """
+    :param slhafile: inputfile
+    :type slhafile: str
+    :param datadir: directory where this all should run
+    :param etcdir: is where external_lhe.template is to be picked up
+    :param installdir: is where pythia_lhe is to be found.  
+  """
   import commands, os, sys
   # print "[SMSXSecs.runPythia] try to run pythia_lhe at sqrt(s)=%d with %d events" % (sqrts,n)
   o=commands.getoutput ( "cp %s %s/fort.61" % ( slhafile, datadir ) )
