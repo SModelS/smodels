@@ -19,7 +19,7 @@ lhefile="../lhe/ued_2.lhe" ## thats the lhe file we're using
 ## we create the correct object manually
 Wv=XSecComputer.loFromLHE ( lhefile, totalxsec = None ) 
 weights={ '8 TeV (LO)': Wv[0] }
-print "weights=",weights
+print "[UED.py] weights=",Wv[0]
 
 ## now create the list of topologies
 topos=LHEDecomposer.decompose ( lhefile, weights, nevts=nevts )
