@@ -16,7 +16,9 @@ nevts=1
 lhefile="../lhe/ued_2.lhe" ## thats the lhe file we're using
 
 ## we supply the weight manually
-weights= { '8 TeV (NLL)': { (-6100002, 6100002): .463 * fb } }
+Wv=XSecComputer.loFromLHE ( lhefile, totalxsec = .463 * fb ) 
+weights={ '8 TeV (LO)': Wv[0] }
+print "weights=",weights
 
 ## now create the list of topologies
 topos=LHEDecomposer.decompose ( lhefile, weights, nevts=nevts )
