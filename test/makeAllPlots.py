@@ -7,6 +7,13 @@
 import os, argparse, set_path
 from Experiment import SMSResults, SMSInterpolation
 
+def getmz(an,top):
+  mzList=[]
+  axesList = SMSResults.getaxes(an, top)
+  for dic in axesList:
+    mzList.append(dic['mz'][0])
+  return mzList
+
 argparser=argparse.ArgumentParser()
 argparser.add_argument('-t','--topo',help='input topology [T2bb]',default='T2bb')
 argparser.add_argument('-mz','--mz',help='intermediate mass information')
@@ -25,6 +32,9 @@ if args.mz: toponame = SMSInterpolation.gethistname(args.topo, args.mz)
 
 for ana in anas:
   if ana not in ourAnas: continue
+  if args.mz:
+    print getmz(ana,args.topo)
+    if args.mz not in getmz(ana,args.topo): continue
   options="-t %s -a %s" %(args.topo, ana)
   if args.mz: options=options+" -mz %s" % args.mz
   if args.axes: options=options+" -axes %s" % args.axes
