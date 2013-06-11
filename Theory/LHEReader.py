@@ -56,12 +56,14 @@ class LHEReader:
         return None
       if line.find ( "Number of Events        :" ) > -1:
         nevts=int(line.split()[-1])
+        self.metainfo["nevents"]=nevts
+        ret.metainfo["nevents"]=nevts
         # print "Found madgraph nevents",nevts
       if line.find ( "Integrated weight (pb)") > -1:
         iwght=float(line.split()[-1])
         ## print "Found madgraph integrated weight",iwght
-        self.metainfo["iweight"]=iwght
-        ret.metainfo["iweight"]=iwght
+        self.metainfo["totalxsec"]=iwght
+        ret.metainfo["totalxsec"]=iwght
 
       line = self.File.readline()
         
