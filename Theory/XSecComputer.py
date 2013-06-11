@@ -23,7 +23,9 @@ def loFromLHE( lhefile, totalxsec, nevts=None ):
   #Get event decomposition:
   n_evts={}
   reader = LHEReader.LHEReader( lhefile, nevts )
+  ntrueevents=0
   for event in reader:
+    ntrueevents+=1
     mompdg = event.getMom()    
     if not mompdg: continue
     getprodcs(mompdg[0], mompdg[1], n_evts)
@@ -31,8 +33,8 @@ def loFromLHE( lhefile, totalxsec, nevts=None ):
   weight, sigma = {}, {}
   # print "[XSecComputer] lhe",lhefile
   for (key,xsec) in n_evts.items():
-    weight[key]= totalxsec / float(nevts) # weight for one event
-    sigma[key]=xsec * totalxsec / float(nevts) # production cross-section
+    weight[key]= totalxsec / float(ntrueevents) # weight for one event
+    sigma[key]=xsec * totalxsec / float(ntrueevents) # production cross-section
     #print "[XSecComputer] moms=%s n=%d ntot=%d w=%s" % ( key,xsec,nevts, weight[key] )
 
   return [ weight, sigma, n_evts ]
