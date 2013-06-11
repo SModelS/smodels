@@ -7,11 +7,6 @@ from Tools.PhysicsUnits import rmvunit
 
 Base = "/afs/hephy.at/user/w/walten/public/sms/"
 
-if 'lessa' in os.getcwd():
-    print "[SMSHelpers.py] the lessa-check has become obsolete."
-    print "[SMSHelpers.py] copy etc/smodelsrc to ~/.smodelsrc instead."
-    Base = "/home/lessa/SMS_database/"
-
 runs=[ "8TeV", "2012", "ATLAS8TeV", "2011", "RPV8", "RPV7" ]
 ## runs=[ "2012" ]
 
