@@ -2,9 +2,10 @@
 
 """
 .. module:: XSecComputer
-    :synopsis: ...
+    :synopsis: The unit responsible for the computation of reference ("theory") \
+      production cross sections
     
-.. moduleauthor:: someone <email@example.com>
+.. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
     
 """
     
