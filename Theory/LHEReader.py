@@ -44,6 +44,9 @@ class LHEReader:
     line = " "
     self.ctr+=1
     ret=SMSEvent.SMSEvent( self.ctr )
+    for (key,value) in self.metainfo.items():
+      # pass metainfo from file to event
+      ret[key]=value
     # PartList = []
 
 #Find next event
