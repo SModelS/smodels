@@ -179,8 +179,8 @@ class EElement:
 
 
 class GTop:
-  """ global topology. contains a list of elements, and
-    the number of vertices, and .. FIXME andre? """
+  """ global topology. contains a list of elements,
+    the number of vertices and the number of particle insertions in each vertex"""
 
   def __init__(self):
     self.vertnumb = []
@@ -255,8 +255,8 @@ class GTop:
     return True
 
   def evaluateCluster(self, instr):
-    """ Evaluates string expression in instr using the elements and weights
-        stored in self. FIXME I dont understand this """
+    """ Given a mathematical expression in string format involving elements, it evaluates the expression
+    using the respective theoretical predictions for each element."""
     from Tools.PhysicsUnits import addunit
 
     outstr = instr.replace(" ","")
@@ -289,7 +289,6 @@ class GTop:
     zeroweight = {}
     for wk in self.ElList[0].weight.keys():
       zeroweight[wk]=addunit(0.,'fb')
-      # zeroweight.update({wk : addunit(0.,'fb')})
 
   #Find elements in self corresponding to elements in El and fill Elw with the respective weights:
     Elw = []
