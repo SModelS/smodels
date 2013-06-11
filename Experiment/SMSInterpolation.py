@@ -71,16 +71,17 @@ def getaxis(w,a):
   
 def compareM(masses, d):
   """Check if input masses are comparable to masses in the histogram corresponding to the information given in axes-dictionary d."""
+  from Tools.PhysicsUnits import rmvunit
   try: #check if histogram axes are M1, M0, return 1 if x-value of histogram is comparable to x value for given masses, 0 if not
     x1=getxval(masses[0],masses[-1],d['mz'][0])
-    x2=float(masses[1]-masses[-1])/(masses[0]-masses[-1])
+    x2=float(rmvunit(masses[1],"GeV")-rmvunit(masses[-1],"GeV"))/(rmvunit(masses[0],"GeV")-rmvunit(masses[-1],"GeV"))
     if abs(x1-x2)/(x1+x2)<0.1:
       return True
     else: return None
   except:
     if d['mz'][0].find('LSP')>-1: #check if histogram for fixed LSP mass, return 1 if my is comparable to LSP mass of the histogram, 0 if not
       mlsp = float(d['mz'][0][d['mz'][0].find('P')+1:d['mz'][0].find('P')+4])
-      if abs(mlsp-masses[-1])/(mlsp+masses[-1])<0.1:
+      if abs(mlsp-rmvunit(masses[-1],"GeV"))/(mlsp+rmvunit(masses[-1],"GeV"))<0.1:
         return True
       else: return None
     elif d['mz'][0].find('D')>-1: #check for fixed deltaM
@@ -88,7 +89,6 @@ def compareM(masses, d):
       ml.append(d['mz'][0].find('M1'))
       ml.append(d['mz'][0].find('M2'))
       ml.append(d['mz'][0].find('M0'))
-      from Tools.PhysicsUnits import rmvunit
       deltam = float(d['mz'][0].split('=')[1])
       deltain = rmvunit(masses[getindex(ml,second=True)],"GeV")-rmvunit(masses[getindex(ml)],"GeV")
       if deltain<0: return None
