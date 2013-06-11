@@ -2,24 +2,22 @@
 
 """
 .. module:: LHEReader
-    :synopsis: I have no idea ...
+    :synopsis: a class that creates SMSEvents from LHE files
 
-.. moduleauthor:: someone <email@example.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
-
-""" A facility to read in lhe files and generate events. 
-    an event is essentially a list of particles """
 
 import SMSEvent
 
 class LHEReader:
-  """ a class that produces events from lhe files """
-
   def __init__ ( self, filename, nmax=None ):
-    """ initiate reader with 'filename'.
-        When using the iterator, then nmax is the maximum number of events to
-        be reader, nmax=None means read till the end of the file. """
+    """ constructor.
+
+      :param filename: LHE file name
+      :param nmax: when using the iterator, then nmax is the maximum number of \ 
+      events to be reader, nmax=None means read till the end of the file. 
+    """
     self.filename=filename
     self.nmax=nmax
     self.ctr=0
@@ -40,8 +38,9 @@ class LHEReader:
     return self
 
   def event ( self ):
-    """ reads lhe file 'file', returns an event.
-        file is an open filehandle. returns none if no event is left to be read. """
+    """ get next event.
+      :returns: an SMSEvent; None if no event is left to be read.
+    """
     line = " "
     self.ctr+=1
     ret=SMSEvent.SMSEvent( self.ctr )
