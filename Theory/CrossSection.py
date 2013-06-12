@@ -2,16 +2,16 @@
 
 """
 .. module:: CrossSection
-    :synopsis: ...
+    :synopsis: A class that encapsulates the result of the computation of the reference cross section.
 
-.. moduleauthor:: someone <email@example.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
 
 
 
 class CrossSection:
-  """ basically a wrapper around this complicated result dictionary, to 
+  """ A wrapper around this complicated result dictionary, to 
       make it easier to use this dictionary """
 
   def __init__ ( self, data ):
