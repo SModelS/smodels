@@ -1,4 +1,8 @@
 """ This unit contains two simple routines that draw feynman graphs """
+#from pyfeyn.user import FeynDiagram,Vertex,Point,Fermion,Scalar,CIRCLE,SQUARE,\
+#  HATCHED135,Circle,pyx
+from pyfeyn.user import *
+import numpy, math
 
 def printParticle_ ( label ):
   """ very simple method to rename a few particles for the asciidraw
@@ -6,11 +10,41 @@ def printParticle_ ( label ):
   if label=="jet": label="q"
   label=label+"   "
   return label[:3]
+  
+def segment ( p1, p2, spin, Bend ):
+  l=NamedLine[spin](p1,p2).bend(Bend)
+  return l
 
-def draw ( element, filename="bla.pdf" ):
+def connect ( p1, p2, straight=True, label=None, spin="fermion", bend=True ):
+  """ simple: draw a line from p1 to p2 
+  """
+  if straight:
+    fl=NamedLine[spin](p1,p2)
+    if label: fl.addLabel ( label, pos=0.1, displace=+.05 )
+    return fl
+
+  fl=Fermion(p1,p2)
+  fl.setStyles( [ WHITE ] )
+  n=int ( math.floor( numpy.random.uniform(1.5,3.75) ) )
+  points = [ p1 ]
+  f=.0001
+  for i in range (1,n):
+    pt=fl.fracpoint( float(i) / float(n) )
+    pt.setX ( pt.x() + numpy.random.normal( 0, f) )
+    pt.setY ( pt.y() + numpy.random.normal( 0, f) )
+    points.append ( pt )
+  points.append ( p2 )
+  b=.015
+  a=numpy.random.normal ( 0, 1 )
+  if a<0.: b=-b
+  segs=[]
+  for i in range(n):
+    segs.append ( segment(points[i],points[i+1],spin,b * (-1)**i ) )
+  if label: segs[-1].addLabel ( label, pos=0.7, displace=-.08 )
+  return segs[-1]
+
+def draw ( element, filename="bla.pdf", straight=False ):
   """ plot a lessagraph, write into pdf/eps/png file called <filename> """
-  from pyfeyn.user import FeynDiagram,Vertex,Point,Fermion,Scalar,CIRCLE,SQUARE,\
-    HATCHED135,Circle,pyx
   #from pyx import text
   #import os
   #text.set(mode="latex")
@@ -42,10 +76,11 @@ def draw ( element, filename="bla.pdf" ):
       mark=None
       if len(insertions)>0: mark=CIRCLE
       v1=Vertex ( f*(nvtx+1),f*ct,mark=mark)
-      f1 = Scalar  ( lastVertex,v1) ## .addLabel ( "x")
+      # f1 = Scalar  ( lastVertex,v1) ## .addLabel ( "x")
+      f1 = connect ( lastVertex,v1, straight=True, spin="scalar" )
       if nvtx==0:
-        b=.25
-        if ct==1: b=-.25
+        b=.10
+        if ct==1: b=-.2
         f1.bend(b)
       lastVertex=v1
       # print "particles",particles,"ct=",ct
@@ -57,10 +92,13 @@ def draw ( element, filename="bla.pdf" ):
         p=Point ( f*(nvtx + 1 +  dx + i), f*y )
         ## print "branch=",branch
         label=printParticle_ ( insertion )
-        ff=Fermion(v1,p).addLabel ( label )
+        ## ff=Fermion(v1,p).addLabel ( label )
+        connect ( v1, p, straight=straight, label=label )
          
     pl = Point ( nvtx+2,ct )
-    fl = Scalar ( lastVertex,pl ) ## .addLabel( "lsp" )
+    # fl = Scalar ( lastVertex,pl ) ## .addLabel( "lsp" )
+    connect ( lastVertex,pl, straight=straight, spin="scalar" )
+    
 
   pdffile=filename.replace("png","pdf")
   fd.draw( pdffile )
