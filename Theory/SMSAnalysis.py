@@ -156,11 +156,14 @@ class EAnalysis:
             self.Top.ElList[jel].weight.append(neweight)
 
   def evaluateResult(self,res,uselimits = False):
-    """ Main method for evaluating the theoretical predictions to the analysis given the cross-section
-       times branching ratio to specific final states. It combines equivalent masses using the Cluster tools
-       and calls evaluateCluster to compute the theoretical predictions for each cluster. Returns a list of
-       dictionaries with the cluster average mass and theoretical values for the result and the condition(s) in
-       the analysis."""
+    """ Main method for evaluating the theoretical predictions to the analysis \
+        given the cross-section times branching ratio to specific final states. \
+        It combines equivalent masses using the Cluster tools and calls \
+        evaluateCluster to compute the theoretical predictions for each cluster. \
+
+      :returns: a list of dictionaries with the cluster average mass and \
+        theoretical values for the result and the condition(s) in the analysis.
+    """
     import copy, ClusterTools
     from ClusterTools import DoCluster, MassDist, GoodMass
 
