@@ -73,7 +73,7 @@ def connect ( canvas, p1, p2, straight=True, label=None, spin="fermion", bend=Tr
   # if label: segs[-1].addLabel ( label, pos=0.7, displace=displace )
   if label:
     filename="../plots/%s.jpg" % label.replace(" ","").replace("_","").replace("$","").upper().replace("+","").replace("-","")
-    print "filename=",filename
+    #print "filename=",filename
     if not os.path.exists ( filename ):
       filename="../plots/questionmark.jpg" 
     jpg = bitmap.jpegimage( filename )
@@ -90,7 +90,8 @@ def connect ( canvas, p1, p2, straight=True, label=None, spin="fermion", bend=Tr
 def draw ( element, filename="bla.pdf", straight=False ):
   """ plot a lessagraph, write into pdf/eps/png file called <filename> """
   from pyx import text, bitmap, unit
-  from pyfeyn.user import FeynDiagram, Point, Circle, HATCHED135, CIRCLE, Vertex
+  from pyfeyn.user import FeynDiagram, Point, Circle, HATCHED135, CIRCLE, Vertex,\
+    WHITE
   #import os
   if not straight:
     text.set(mode="latex")
@@ -101,13 +102,13 @@ def draw ( element, filename="bla.pdf", straight=False ):
   fd = FeynDiagram()
   # jpg = bitmap.jpegimage("/home/walten/propaganda/cms/traverse.jpeg")
   import os
-  #jpg = bitmap.jpegimage("../plots/blob1.jpg")
-  #fd.currentCanvas.insert(bitmap.bitmap(0, 0, jpg, compressmode=None))
   f=1.0
 
   in1  = Point(-1*f, -.75*f)
   in2  = Point(-1*f, 1.75*f)
   vtx1 = Circle(0,.5*f, radius=0.3*f).setFillStyle(HATCHED135)
+  # vtx1 = Circle(0,.5*f, radius=0.3*f).setFillStyle(WHITE)
+  #vtx1 = Point(0,.5*f )
   c=fd.currentCanvas
   # vtx1.setStrokeStyle ( HATCHED135 )
   #P1a = Fermion(in1, vtx1 ).addLabel("\\ttfgeorgia P$_1$")
@@ -135,7 +136,11 @@ def draw ( element, filename="bla.pdf", straight=False ):
     lastVertex=vtx1
     for ( nvtx,insertions) in enumerate(branch.particles):
       mark=None
-      if len(insertions)>0: mark=CIRCLE
+      if len(insertions)>0: 
+        #mark=None
+        #jpg = bitmap.jpegimage( "../plots/blob2.jpg" )
+        #c.insert(bitmap.bitmap( f*(nvtx+1)-.1,f*ct-.14 , jpg, compressmode=None))
+        mark=CIRCLE
       # mark=None
       v1=Vertex ( f*(nvtx+1),f*ct,mark=mark)
       # f1 = Scalar  ( lastVertex,v1) ## .addLabel ( "x")
@@ -162,6 +167,8 @@ def draw ( element, filename="bla.pdf", straight=False ):
     connect ( c, lastVertex,pl, straight=straight, spin="scalar" )
     
 
+  #jpg = bitmap.jpegimage("../plots/blob1.jpg")
+  #fd.currentCanvas.insert(bitmap.bitmap(0-.5, 0.5-.5, jpg, compressmode=None))
   # zero()
   pdffile=filename.replace("png","pdf")
   fd.draw( pdffile )
