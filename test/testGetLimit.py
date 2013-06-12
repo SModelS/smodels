@@ -39,7 +39,7 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
     if topo=="T1tttt" or topo=="T1bbbb": prod_mode = "T1"
     if topo=="TChiChipmSlepL" or topo=="TChiChipmSlepStau" or topo=="TChiChipmStauStau": prod_mode = "TChiWZ"
     rootname = "../data/%s_%devts.root" %(prod_mode,nevents)
-    if binsize: rootname =  "../data/%s_%devts_%dGeVbin.root" %(prod_mode,nevents,binsize)
+    if binsize: rootname =  "../data/%s_%devts_%sGeVbin.root" %(prod_mode,nevents,binsize)
     f=ROOT.TFile(rootname)
     if tev==8: rXsName="hist8"
     if tev==7:rXsName="hist7"
@@ -104,7 +104,7 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
   if line:
     f.Close()
     rootname_out="%s_%devts.root" % (topo,nevents)
-    if binsize:rootname_out="%s_%devts_%dGeVbin.root" % (topo,nevents,binsize)
+    if binsize:rootname_out="%s_%devts_%sGeVbin.root" % (topo,nevents,binsize)
     f1=ROOT.TFile(rootname_out,"recreate")
     h.Write()
     hL.Write()
