@@ -23,7 +23,7 @@ argparser.add_argument('-axes','--axes',help='axes information')
 argparser.add_argument('-n','--nevts',help='number of events per point in refXSec [10000]', type=int, default=10000)
 argparser.add_argument('-b','--binsize',help='binsize in GeV')
 argparser.add_argument('-text','--text',help='print upper limit each 100 GeV',action='store_true')
-
+argparser.add_argument('-s','--fromSlha',help='get input lhe from slha file', action='store_true')
 args=argparser.parse_args()
 
 ROOT.gROOT.SetStyle("Plain")
@@ -35,12 +35,12 @@ ROOT.gStyle.SetCanvasBorderMode(0)
 ROOT.gStyle.SetPadRightMargin(0.18)
 #ROOT.gStyle.SetPadBottomMargin(0.11)
 #ROOT.gStyle.SetPadTopMargin(0.07)
-ROOTTools.useNiceColorPalette ( "temperature", 0.5, 50 ) 
+ROOTTools.useNiceColorPalette ( "temperature", 0.5, 50 )
 
 tevIn=rmvunit ( SMSResults.getSqrts(args.ana), "TeV" )
 run1=SMSResults.getRun(args.ana)
 binsize=args.binsize
-rootname = testGetLimit.recreateHist(args.ana, args.topo, mz=args.mz, axes=args.axes, line=True, tev=tevIn, nevents=args.nevts, binsize=args.binsize)
+rootname = testGetLimit.recreateHist(args.ana, args.topo, mz=args.mz, axes=args.axes, line=True, tev=tevIn, nevents=args.nevts, binsize=args.binsize,fromSlha=args.fromSlha)
 
 if not rootname:
   print "Could not run recreateHist, png was not produced."

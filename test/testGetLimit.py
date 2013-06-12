@@ -5,7 +5,7 @@ from Theory import SMSAnalysis, LHEDecomposer
 from Tools import ROOTTools
 from Tools.PhysicsUnits import addunit, rmvunit
 
-def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=10000,binsize=None):
+def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=10000,binsize=None, fromSlha=True):
   """ recreate ROOT TH2F histogram of a given analysis and topology
         needs mz for a topology with intermediate mass,
         axes, for histograms with axes different from M1-M0
@@ -13,6 +13,11 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
         and line, return filename"""
 
   lhefile = "../lhe/%s_1.lhe" %topo
+  if fromSlha:
+    import os
+    os.system("cp ../slha/%s.slha fort.61" %topo)
+    os.system("../pythia_lhe < pyIn.dat") #run with 20 events
+    lhefile = "fort.68" 
   topos=LHEDecomposer.decompose ( lhefile, {})#create default topologylist with only topo
 
   toponame=topo
