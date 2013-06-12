@@ -105,7 +105,7 @@ def UpperLimit(ana, topo, masses,debug=True):
     if debug: print "[SMSInterpolation] error: %s/%s not found." % ( ana, topo )
     return None
   if len(masses)==2 and not d[0]['mz']:
-    return SMSResults.getUpperLimit(ana, topo, masses[getaxis('x',d[0]['axes'])], masses[getaxis('y',d[0]['axes'])])
+    return SMSResults.getUpperLimit(ana, topo, masses[getaxis('x',d[0]['axes'])], masses[getaxis('y',d[0]['axes'])], interpolate=True)
   if len(masses)==2 and d[0]['mz']:
     if debug: print "[SMSInterpolation] error: Need intermediate mass input for %s/%s." % ( ana, topo )
     return None
@@ -117,7 +117,7 @@ def UpperLimit(ana, topo, masses,debug=True):
     return None
   if len(masses)>2 and len(d) == 1:
     if compareM(masses,d[0]):
-      return SMSResults.getUpperLimit(ana, gethistname(topo,d[0]['mz'][0]),masses[getaxis('x',d[0]['axes'])],masses[getaxis('y',d[0]['axes'])])
+      return SMSResults.getUpperLimit(ana, gethistname(topo,d[0]['mz'][0]),masses[getaxis('x',d[0]['axes'])],masses[getaxis('y',d[0]['axes'])],interpolate=True)
     if debug: print "[SMSInterpolation] error: Only one histogram available for %s/%s, cannot interpolate for intermediate mass." % ( ana, topo )
     return None
   xsecs = []
@@ -129,11 +129,11 @@ def UpperLimit(ana, topo, masses,debug=True):
       return None
     if 'LSP' in ds['mz'][0] or 'D' in ds['mz'][0]:
       if compareM(masses,ds):
-        if rmvunit(SMSResults.getUpperLimit(ana, gethistname(topo,ds['mz'][0]),masses[getaxis('x',ds['axes'])],masses[getaxis('y',ds['axes'])]),'pb'):
-          return SMSResults.getUpperLimit(ana, gethistname(topo,ds['mz'][0]),masses[getaxis('x',ds['axes'])],masses[getaxis('y',ds['axes'])])
+        if rmvunit(SMSResults.getUpperLimit(ana, gethistname(topo,ds['mz'][0]),masses[getaxis('x',ds['axes'])],masses[getaxis('y',ds['axes'])],interpolate=True),'pb'):
+          return SMSResults.getUpperLimit(ana, gethistname(topo,ds['mz'][0]),masses[getaxis('x',ds['axes'])],masses[getaxis('y',ds['axes'])],interpolate=True)
       d.remove(ds)
       continue
-    xs=rmvunit(SMSResults.getUpperLimit(ana, gethistname(topo,ds['mz'][0]),masses[getaxis('x',ds['axes'])],masses[getaxis('y',ds['axes'])]),'pb')
+    xs=rmvunit(SMSResults.getUpperLimit(ana, gethistname(topo,ds['mz'][0]),masses[getaxis('x',ds['axes'])],masses[getaxis('y',ds['axes'])],interpolate=True),'pb')
     if xs:
       xsecs.append(xs)
       xvals.append(getxval(masses[0],masses[-1],ds['mz'][0]))
@@ -141,7 +141,7 @@ def UpperLimit(ana, topo, masses,debug=True):
       d.remove(ds)
   if len(xsecs)<2:
     if d:
-      if compareM(masses,d[0]): return SMSResults.getUpperLimit(ana, gethistname(topo,d[0]['mz'][0]),masses[getaxis('x',d[0]['axes'])],masses[getaxis('y',d[0]['axes'])])
+      if compareM(masses,d[0]): return SMSResults.getUpperLimit(ana, gethistname(topo,d[0]['mz'][0]),masses[getaxis('x',d[0]['axes'])],masses[getaxis('y',d[0]['axes'])],interpolate=True)
     if debug: print "[SMSInterpolation] error: Available histograms for %s/%s could not be combined, cannot interpolate" % ( ana, topo )
     return None
   p = numpy.polyfit(xvals,xsecs,len(xsecs)-1)
