@@ -12,7 +12,7 @@ analyses = SMSAnalysisFactory.load( )
 print "[run.py] done loading %d analyses" % len(analyses)
 
 nevts=1000
-slhafile="../slha/TChiWZ.slha"
+slhafile="../slha/TChiNuSlep.slha"
 
 Tmp=tempfile.mkdtemp()
 print "[run.py] now run pythia in",Tmp
@@ -30,4 +30,10 @@ for Analysis in analyses:
   Analysis.add ( topos )
   lims=LimitGetter.limit ( Analysis )
   if len(lims)==0: continue
+  print "[run.py] -------------------------------------------------"
   print "[run.py] analysis=",Analysis,"lims=",lims
+  for res in Analysis.results.keys():
+    theoRes=Analysis.evaluateResult(res)
+    if len(theoRes)==0: continue
+    print "[run.py] ****"
+    print "[run.py] theoRes=",theoRes
