@@ -21,6 +21,7 @@ argparser.add_argument('-axes','--axes',help='axes information')
 argparser.add_argument('-n','--nevts',help='number of events per point in refXSec [10000]', type=int, default=10000)
 argparser.add_argument('-b','--binsize',help='binsize in GeV')
 argparser.add_argument('-text','--text',help='write numbers in 100 GeV distances',action='store_true')
+argparser.add_argument('-s','--fromSlha',help='get input lhe from slha file', action='store_true')
 args=argparser.parse_args()
 
 anas = SMSResults.getAnalyses(args.topo)
@@ -41,6 +42,7 @@ for ana in anas:
   if args.nevts: options=options+" -n %d" % args.nevts
   if args.binsize: options=options+" -b %s" % args.binsize
   if args.text: options=options+" -text"
+  if args.fromSlha: options=options+" -s"
   os.system("./runRecreate.py %s" % options)
   if not args.binsize:
     plotname= "%s_%s_%devts.png" %(ana,toponame,args.nevts)
