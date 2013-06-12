@@ -39,11 +39,15 @@ def connect ( canvas, p1, p2, straight=True, label=None, spin="fermion", bend=Tr
   import math, random, os
   from pyfeyn.user import NamedLine, Fermion, Scalar, WHITE
   from pyx import bitmap
+  from Tools import VariousHelpers
   if straight:
     fl=NamedLine[spin](p1,p2)
     if displace==None: displace=.05
-    if label: fl.addLabel ( label, pos=0.1, displace=displace )
-    return fl
+    if label: 
+      label=label.replace("nu",r"$\nu$").replace("+","$^{+}$").replace("-","$^{-}$")
+      label=label.replace("tau",r"$\tau$").replace("mu",r"$\mu$")
+      fl.addLabel ( label, pos=0.9, displace=displace )
+    return [ fl ]
 
   fl=Fermion(p1,p2)
   fl.setStyles( [ WHITE ] )
@@ -72,10 +76,10 @@ def connect ( canvas, p1, p2, straight=True, label=None, spin="fermion", bend=Tr
   if displace==None: displace=-.08
   # if label: segs[-1].addLabel ( label, pos=0.7, displace=displace )
   if label:
-    filename="../plots/%s.jpg" % label.replace(" ","").replace("_","").replace("$","").upper().replace("+","").replace("-","")
+    filename="%s/plots/%s.jpg" % ( VariousHelpers.getInstallationBase(), label.replace(" ","").replace("_","").replace("$","").upper().replace("+","").replace("-","") )
     #print "filename=",filename
     if not os.path.exists ( filename ):
-      filename="../plots/questionmark.jpg" 
+      filename="%s/plots/questionmark.jpg"  %  VariousHelpers.getInstallationBase()
     jpg = bitmap.jpegimage( filename )
     y1=segs[-1].fracpoint(1.0).y()
     y2=segs[-1].fracpoint(0.0).y()
@@ -91,14 +95,15 @@ def draw ( element, filename="bla.pdf", straight=False ):
   """ plot a lessagraph, write into pdf/eps/png file called <filename> """
   from pyx import text, bitmap, unit
   from pyfeyn.user import FeynDiagram, Point, Circle, HATCHED135, CIRCLE, Vertex,\
-    WHITE
+    WHITE, Fermion
+  # from Tools import VariousHelpers
   #import os
-  if not straight:
-    text.set(mode="latex")
+  #if True:
+    #text.set(mode="latex")
     #text.preamble(r"\usepackage[pyx]{color,graphicx}")
     # text.preamble(r"\usepackage[T1]{fontenc}")
     #text.preamble(r"\font\xkcd xkcd at10pt")
-    # text.preamble(r"\usepackage{times}")
+    #text.preamble(r"\usepackage{times}")
   fd = FeynDiagram()
   # jpg = bitmap.jpegimage("/home/walten/propaganda/cms/traverse.jpeg")
   import os
@@ -111,22 +116,25 @@ def draw ( element, filename="bla.pdf", straight=False ):
   #vtx1 = Point(0,.5*f )
   c=fd.currentCanvas
   # vtx1.setStrokeStyle ( HATCHED135 )
-  #P1a = Fermion(in1, vtx1 ).addLabel("\\ttfgeorgia P$_1$")
-  # P1a = Fermion(in1, vtx1 ).addLabel("P$_1$")
-  P1a = connect ( c, vtx1, in1, straight=straight, label="P$_1$", displace=.42 )
-  for i in P1a:
-    a1=i.addParallelArrow( pos=.44,displace=.0003,length=unit.length(1.60*f / float(len(P1a))), size=.0001)
-    a2=i.addParallelArrow( pos=.44,displace=-.0003,length=unit.length(1.60*f / float(len(P1a))), size=.0001)
-  #  i.setStyles ( [ BLUE ] )
-  # P1a.addParallelArrow( pos=.44,displace=.0003,length=pyx.unit.length(1.75*f), size=.0001)
-  # P1a.addParallelArrow( pos=.44,displace=-.0003,length=pyx.unit.length(1.75*f), size=.0001)
-  # P2a = Fermion(in2, vtx1 ).addLabel("P$_2$",displace=.3)
-  P2a = connect ( c, vtx1, in2, straight=straight, label="P$_2$", displace=.3 )
-  for i in P2a:
-    a1=i.addParallelArrow( pos=.44,displace=.0003,length=unit.length(1.60*f / float(len(P2a))), size=.0001)
-    a2=i.addParallelArrow( pos=.44,displace=-.0003,length=unit.length(1.60*f / float(len(P2a))), size=.0001)
-  #P2a.addParallelArrow( pos=.44,displace=.0003,length=pyx.unit.length(1.75*f), size=.0001)
-  #P2a.addParallelArrow( pos=.44,displace=-.0003,length=pyx.unit.length(1.75*f), size=.0001) 
+  if straight:
+    P1a = Fermion(in1, vtx1 ).addLabel("P$_1$")
+    P1a.addParallelArrow( pos=.44,displace=.0003,length=unit.length(1.75*f), size=.0001)
+    P1a.addParallelArrow( pos=.44,displace=-.0003,length=unit.length(1.75*f), size=.0001)
+  else:
+    P1a = connect ( c, vtx1, in1, straight=straight, label="P$_1$", displace=.42 )
+  
+    for i in P1a:
+      a1=i.addParallelArrow( pos=.44,displace=.0003,length=unit.length(1.60*f / float(len(P1a))), size=.0001)
+      a2=i.addParallelArrow( pos=.44,displace=-.0003,length=unit.length(1.60*f / float(len(P1a))), size=.0001)
+  if straight:
+    P2a = Fermion(in2, vtx1 ).addLabel("P$_2$",displace=.3)
+    P2a.addParallelArrow( pos=.44,displace=.0003,length=unit.length(1.75*f), size=.0001)
+    P2a.addParallelArrow( pos=.44,displace=-.0003,length=unit.length(1.75*f), size=.0001) 
+  else:
+    P2a = connect ( c, vtx1, in2, straight=straight, label="P$_2$", displace=.3 )
+    for i in P2a:
+      a1=i.addParallelArrow( pos=.44,displace=.0003,length=unit.length(1.60*f / float(len(P2a))), size=.0001)
+      a2=i.addParallelArrow( pos=.44,displace=-.0003,length=unit.length(1.60*f / float(len(P2a))), size=.0001)
 
   # nbranches=len(element.B)
 
@@ -138,17 +146,18 @@ def draw ( element, filename="bla.pdf", straight=False ):
       mark=None
       if len(insertions)>0: 
         #mark=None
-        #jpg = bitmap.jpegimage( "../plots/blob2.jpg" )
+        #jpg = bitmap.jpegimage( "%s/plots/blob2.jpg" % VariousHelpers.getInstallationBase() )
         #c.insert(bitmap.bitmap( f*(nvtx+1)-.1,f*ct-.14 , jpg, compressmode=None))
         mark=CIRCLE
       # mark=None
       v1=Vertex ( f*(nvtx+1),f*ct,mark=mark)
       # f1 = Scalar  ( lastVertex,v1) ## .addLabel ( "x")
       f1 = connect ( c, lastVertex,v1, straight=straight, spin="scalar", bend=True, verbose=False, nspec=3 )
-      if nvtx==0:
-        b=.10
-        if ct==1: b=-.1
-        #for xf in f1: xf.bend(b)
+      if straight:
+        if nvtx==0:
+          b=.10
+          if ct==1: b=-.1
+          for xf in f1: xf.bend(b)
       lastVertex=v1
       # print "particles",particles,"ct=",ct
       y=-1.0*f ## y of end point of SM particle
@@ -167,7 +176,7 @@ def draw ( element, filename="bla.pdf", straight=False ):
     connect ( c, lastVertex,pl, straight=straight, spin="scalar" )
     
 
-  #jpg = bitmap.jpegimage("../plots/blob1.jpg")
+  #jpg = bitmap.jpegimage("%s/plots/blob1.jpg" % VariousHelpers.getInstallationBase() )
   #fd.currentCanvas.insert(bitmap.bitmap(0-.5, 0.5-.5, jpg, compressmode=None))
   # zero()
   pdffile=filename.replace("png","pdf")
