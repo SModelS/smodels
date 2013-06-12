@@ -187,7 +187,7 @@ def getUpperLimitAtPoint ( histo, mx, my, interpolate=False ):
     return None
   if not histo: return None ## 'no histogram'
   if interpolate:
-    return histo.Interpolate ( mx, my )
+    return histo.Interpolate ( rmvunit(mx,'GeV'), rmvunit(my,'GeV') )
   xmax=histo.GetXaxis().GetNbins()
   xbin=histo.GetXaxis().FindBin(rmvunit(mx,'GeV'))
   if xbin==0 or xbin>xmax:
