@@ -500,9 +500,10 @@ def particleName(topo):
   """return the production mode for a given topology:
      write out the name in plain letters, no latex """
   if topo[:2]=="TGQ": return "associate"
-  if topo=="TChiSlep" or topo=="TChiNuSlep": return "chargino neutralino"
-  if topo=="TChiSlepSlep": return "chargino neutralino"
-  if topo=="TChiWZ": return "chargino neutralino"
+  if topo=="TChiSlep" or topo=="TChiNuSlep": return "chargino/neutralino"
+  if topo=="TChiSlepSlep": return "chargino/neutralino"
+  if topo=="TChiWZ": return "chargino/neutralino"
+  if topo[:4]=="TChi": return "chargino/neutralino"
   if not SMSHelpers.dicparticle.has_key(topo):
     return "???"
   part = SMSHelpers.dicparticle[topo].replace("#tilde","").replace("{","").replace("}","")
