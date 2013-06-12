@@ -21,7 +21,7 @@ argparser.add_argument('-t','--topo',help='input topology [T2bb]',default='T2bb'
 argparser.add_argument('-mz','--mz',help='intermediate mass information')
 argparser.add_argument('-axes','--axes',help='axes information')
 argparser.add_argument('-n','--nevts',help='number of events per point in refXSec [10000]', type=int, default=10000)
-argparser.add_argument('-b','--binsize',help='binsize in GeV', type=int)
+argparser.add_argument('-b','--binsize',help='binsize in GeV')
 argparser.add_argument('-text','--text',help='print upper limit each 100 GeV',action='store_true')
 
 args=argparser.parse_args()
@@ -127,7 +127,7 @@ img.Merge(logo,"alphablend",147,123)
 if not args.binsize:
   plotname= "../plots/%s_%s_%devts.png" %(args.ana,toponame,args.nevts)
 else:
-  plotname= "../plots/%s_%s_%devts_%dGeVbin.png" %(args.ana,toponame,args.nevts,args.binsize)
+  plotname= "../plots/%s_%s_%devts_%sGeVbin.png" %(args.ana,toponame,args.nevts,args.binsize)
 print "[runRecreate.py] now write",plotname
 img.WriteImage(plotname)
 
