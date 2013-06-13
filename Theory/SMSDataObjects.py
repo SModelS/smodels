@@ -444,7 +444,11 @@ class TopologyList:
     """ Check if elements in topo matches an entry in self.topos. If it does,
     add weight.  If the same topology exists, but not the same element, add
     element.  If neither element nor topology exist, add the new topology and
-    all its elements """
+    all its elements 
+
+    :type topo: GTop
+    
+    """
     import copy
     for (inew,element) in enumerate(topo.ElList): ## range(len(topo.ElList)):
       if len(element.B)<2:
