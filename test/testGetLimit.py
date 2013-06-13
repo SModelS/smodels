@@ -18,7 +18,7 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
     os.system("cp ../slha/%s.slha fort.61" %topo)
     os.system("../pythia_lhe < pyIn.dat") #run with 20 events
     lhefile = "fort.68" 
-  topoList=LHEDecomposer.decompose ( lhefile, {})#create default topologylist with only topo
+  topoList=LHEDecomposer.decompose ( lhefile, {})#create default topologylist with only topo (is list of GTop objects)
 
 
   toponame=topo
@@ -85,18 +85,15 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
 
       else: massv=[x,y]
 
-      ana_obj = SMSAnalysisFactory.load( anas=ana, topos=topo )
+      ana_obj = SMSAnalysisFactory.load( anas=ana, topos=topo ) #create list of analysis objects, but give one analysis, one topo, so list has one entry only!
       for idx in range(len(massv)):
         massv[idx]=addunit(massv[idx],'GeV')
-      for eachtopo in topoList:
-        for eachEl in eachtopo.ElList:
-          if len(eachEl.B[0].masses)==len(eachEl.B[1].masses)==len(massv):
+      for eachtopo in topoList: #loop over GTop objects (different number of insertions)
+        for eachEl in eachtopo.ElList: #loop over EElement objects (different particles at insertion)
+          if len(eachEl.B[0].masses)==len(eachEl.B[1].masses)==len(massv): #if number of SUSY particles same as for the given topology: set masses
             eachEl.B[0].masses=massv
             eachEl.B[1].masses=massv #for now only equal branches
-      ana_obj[0].add( topoList )
-#      print topos, topos[0].ElList[0].B[0].masses, ana_obj[0].Top
-#      ana_obj[0].Top.ElList[0].B[0].masses=massv
-#      ana_obj[0].Top.ElList[0].B[1].masses=massv
+      ana_obj[0].add( topoList ) # the list ana_obj has only one entry here!, all EElements consisten with the constraints for this topology are added to the EAnalysis object
       lims=LimitGetter.limit(ana_obj[0], addTheoryPrediction=False)
       v=None
       if lims: v=rmvunit(lims[0]['ul'],'fb')
