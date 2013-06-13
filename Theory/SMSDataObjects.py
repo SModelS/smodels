@@ -2,13 +2,11 @@
 
 """
 .. module:: SMSDataObjects
-    :synopsis: ...
+    :synopsis: our basic data objects: TopologyList, GTop, EElement, BElement
     
-.. moduleauthor:: someone <email@example.com>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>, Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
     
 """
-    
-""" all data classes necessary to create a SModelS description of events """
 
 import ClusterTools
 from ParticleNames import Reven, PtcDic, simParticles
@@ -183,9 +181,9 @@ class GTop:
     the number of vertices and the number of particle insertions in each vertex"""
 
   def __init__(self):
-    self.vertnumb = []
-    self.vertparts = []
-    self.ElList = []
+    self.vertnumb = [] ## number of vertices per branch, e.g. [2,2]
+    self.vertparts = [] ##  number of insertions per vertex per branch, e.g. [[1,0],[1,0]] for T2
+    self.ElList = [] # list of EElements
 
   def leadingElement ( self ):
     """ often, a topology carries only one element, so
@@ -203,7 +201,7 @@ class GTop:
     return ret
 
   def __str__(self):
-    return str(self.vertparts)
+    return str(self.vertparts).replace(" ","")
 
   def checkConsistency ( self, verbose=False ):
     """ the number of vertices and insertions per vertex is
@@ -429,6 +427,18 @@ class TopologyList:
 
   def addList ( self, List ):
     for topo in List: self.add ( topo )
+
+  def __str__ ( self ):
+    s="TopologyList:\n" 
+    for topo in self.topos:
+      s+=str(topo)+"\n"
+    return s
+
+  def describe( self ):
+    s="TopologyList:\n" 
+    for topo in self.topos:
+      s+=str(topo)+"\n"
+    return s
 
   def add ( self, topo ):
     """ Check if elements in topo matches an entry in self.topos. If it does,
