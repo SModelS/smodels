@@ -61,6 +61,7 @@ class BElement:
 
   def describe ( self ):
     """ a lengthy description of the BElement """
+    from Tools.PhysicsUnits import rmvunit
     ret="particles=%s masses=%s" % \
        ( self.particles, [ rmvunit(x,"GeV") for x in self.masses ] )
     return ret

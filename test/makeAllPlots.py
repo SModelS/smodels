@@ -21,12 +21,15 @@ argparser.add_argument('-axes','--axes',help='axes information')
 argparser.add_argument('-n','--nevts',help='number of events per point in refXSec [10000]', type=int, default=10000)
 argparser.add_argument('-b','--binsize',help='binsize in GeV')
 argparser.add_argument('-text','--text',help='write numbers in 100 GeV distances',action='store_true')
-argparser.add_argument('-s','--fromSlha',help='get input lhe from slha file', action='store_true')
+argparser.add_argument('-s','--fromSlha',help='get input lhe from slha file [True]', action='store_true',default=True)
 args=argparser.parse_args()
 
 anas = SMSResults.getAnalyses(args.topo)
 print anas
 ourAnas = ["alphaT", "alphaT8TeV", "Weakinos8TeV", "RA48TeV", "RA2b8TeV", "LeptonicStop8TeV", "MultiLepton8TeV", "SUS13008", "ATLAS_CONF_2013_024", "ATLAS_CONF_2013_037", "ATLAS_CONF_2013_007","ATLAS_CONF_2013_035","ATLAS_CONF_2013_025","ATLAS_CONF_2013_036","ATLAS_CONF_2013_028", "ATLAS_CONF_2013_001", "ATLAS_CONF_2012_105", "ATLAS_CONF_2012_166"]
+
+ourAnas.append("RA2")
+ourAnas.append("RAZOR")
 
 toponame = args.topo
 if args.mz: toponame = SMSInterpolation.gethistname(args.topo, args.mz)

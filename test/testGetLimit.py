@@ -1,5 +1,5 @@
 import set_path
-import ROOT
+import ROOT,sys
 from Experiment import SMSResults, SMSInterpolation, LimitGetter, SMSAnalysisFactory
 from Theory import SMSAnalysis, LHEDecomposer
 from Tools import ROOTTools
@@ -18,7 +18,8 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
     os.system("cp ../slha/%s.slha fort.61" %topo)
     os.system("../pythia_lhe < pyIn.dat") #run with 20 events
     lhefile = "fort.68" 
-  topos=LHEDecomposer.decompose ( lhefile, {})#create default topologylist with only topo
+  topoList=LHEDecomposer.decompose ( lhefile, {})#create default topologylist with only topo
+
 
   toponame=topo
   run1=SMSResults.getRun(ana)
@@ -42,13 +43,14 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
     hL = ROOT.TH2F('hL','hL',bx,xmin,xmin+bx*bwx,by,ymin,ymin+by*bwy)
     prod_mode = topo
     if topo=="T1tttt" or topo=="T1bbbb": prod_mode = "T1"
-    if topo=="TChiChipmSlepL" or topo=="TChiChipmSlepStau" or topo=="TChiChipmStauStau": prod_mode = "TChiWZ"
+    if topo=="TChiChipmSlepL" or topo=="TChiChipmSlepStau" or topo=="TChiChipmStauStau": prod_mode = "TChiWZ_Wino"
     rootname = "../data/%s_%devts.root" %(prod_mode,nevents)
     if binsize: rootname =  "../data/%s_%devts_%sGeVbin.root" %(prod_mode,nevents,binsize)
     f=ROOT.TFile(rootname)
     if tev==8: rXsName="hist8"
     if tev==7:rXsName="hist7"
     rXs=f.Get(rXsName)
+    print rootname
 
   if line and not rXs:
     print "No refXSec histogram found"
@@ -86,9 +88,15 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
       ana_obj = SMSAnalysisFactory.load( anas=ana, topos=topo )
       for idx in range(len(massv)):
         massv[idx]=addunit(massv[idx],'GeV')
-      topos[0].ElList[0].B[0].masses=massv
-      topos[0].ElList[0].B[1].masses=massv #for now only equal branches
-      ana_obj[0].add( topos )
+      for eachtopo in topoList:
+        for eachEl in eachtopo.ElList:
+          if len(eachEl.B[0].masses)==len(eachEl.B[1].masses)==len(massv):
+            eachEl.B[0].masses=massv
+            eachEl.B[1].masses=massv #for now only equal branches
+      ana_obj[0].add( topoList )
+#      print topos, topos[0].ElList[0].B[0].masses, ana_obj[0].Top
+#      ana_obj[0].Top.ElList[0].B[0].masses=massv
+#      ana_obj[0].Top.ElList[0].B[1].masses=massv
       lims=LimitGetter.limit(ana_obj[0], addTheoryPrediction=False)
       v=None
       if lims: v=rmvunit(lims[0]['ul'],'fb')
