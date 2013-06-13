@@ -1,0 +1,51 @@
+\subsection{SMS decomposition: The procedure}
+\label{ssec:decomp}
+
+Starting point of the SMS decomposition is an SLHA file which contains the
+mass spectrum and decay table of a specific MSSM parameter point.
+Next, the SLHA file is passed to pythia to generate 10000 events. 
+As an output format we chose the LHE file format.
+Per event, we then count the SUSY particles, with the SUSY ``mothers'' (i.e.
+the first SUSY particles in the decay chains) playing a special role.
+Assuming $\chiz$ to always be the LSP  and taking into account conservation of
+R-parity, we found the categorization scheme given in
+Tab.~\ref{tab:classmothers} to be sufficient. 
+Within these categories the events are further categorized based on the 
+remaining SUSY particle content. Tabs.~\ref{tab:classgluinos},\ref{tab:classsquarks},\ref{tab:classstops},\ref{tab:classsbottoms},\ref{tab:classweakinos} 
+discuss these subcategories. The events' requirements on the particle content is listed, in order for the event to be classified as a specific simplified model.
+The requirement on the SUSY mothers and the requirement on the LSPs are not listed.
+Fig.~\ref{fig:smsdecomposition} shows an overview of the whole procedure of SMS decomposition.
+
+\begin{table}[h!t]\centering
+\begin{tabular}{|c|c|c|}
+\hline
+Requirement on  & SMS & discussed \\
+SUSY mothers  & case  & in Sec. \\
+\hline
+two gluinos & ``gluinos'' & Sec.~\ref{ssec:gluinocase} \\
+two squarks (\first, \second gen) & ``squarks'' & Sec.~\ref{ssec:squarkcase} \\
+one gluino, one squark (any generation) & ``associate'' & not discussed \\
+two stops & ``stops'' & Sec.~\ref{ssec:thirdcase} \\
+two sbottoms & ``sbottoms'' & Sec.~\ref{ssec:thirdcase} \\
+two weakinos & ``weakinos'' & Sec.~\ref{ssec:weakinocase} \\
+two sleptons & ``sleptons'' & not discussed \\
+\hline
+\end{tabular}
+\caption{Classification of events according to SUSY mothers}
+\label{tab:classmothers}
+\end{table}
+
+\begin{figure}[h!t]\centering
+\input{dot.tex}
+\label{fig:smsdecomposition}
+\caption{Schematics of the whole SMS decomposition procedure}
+\end{figure}
+
+
+Note, that SMS decomposition can also be performed on the SLHA files directly.
+In this note, we chose an SMS decomposition procedure based on LHE files; for a
+first document attempt at SMS decomposition this seemed to be the safer
+approach. For later studies we envisage employing a SLHA-based SMS decomposition,
+in addition to the LHE-based approach.
+
+\FloatBarrier
