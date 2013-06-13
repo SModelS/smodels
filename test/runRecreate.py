@@ -76,6 +76,8 @@ ul.Draw("COLZ")
 if exclusion: exclusion.Draw("SAME")
 if exclusionm1: exclusionm1.Draw("SAME")
 if exclusionp1: exclusionp1.Draw("SAME")
+if args.ana=="LeptonicStop8TeV" and args.topo=="T2tt":
+  SMSResults.getExclusionLine(args.topo+"_offshelltop", args.ana, False, plusminussigma=0).Draw("SAME")
 reproduced_exclusion.Draw("SAME")
 
 if args.text:
