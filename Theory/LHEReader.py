@@ -39,6 +39,7 @@ class LHEReader:
 
   def event ( self ):
     """ get next event.
+
       :returns: an SMSEvent; None if no event is left to be read.
     """
     line = " "
