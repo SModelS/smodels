@@ -197,8 +197,8 @@ class GTop:
 
   def describe(self):
     """ a lengthy description """
-    ret="number of vertices=%s number of vertex particles=%s" % \
-        ( self.vertnumb, self.vertparts )
+    ret="number of vertices=%s number of vertex particles=%s number of elements=%d" % \
+        ( self.vertnumb, self.vertparts, len(self.ElList) )
     return ret
 
   def __str__(self):
