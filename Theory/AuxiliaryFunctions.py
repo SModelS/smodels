@@ -1,8 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 """
 .. module:: AuxiliaryFunctions
-    :synopsis: a collection of functions used in the conditions
+    :synopsis: A collection of functions used in the conditions.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 

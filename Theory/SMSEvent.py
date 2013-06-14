@@ -2,9 +2,10 @@
 
 """
 .. module:: SMSEvent
-    :synopsis: class that encapsulates an (e.g. LHE) event.
+    :synopsis: Class that encapsulates an (e.g. LHE) event.
     
-.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>, Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
     
 """
     

@@ -2,9 +2,9 @@
 
 """
 .. module:: TheoryPrediction
-    :synopsis: ...
+    :synopsis: missing
     
-.. moduleauthor:: someone <email@example.com>
+.. moduleauthor:: missing <email@example.com>
     
 """
 

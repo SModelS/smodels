@@ -1,4 +1,13 @@
-""" This unit contains two simple routines that draw feynman graphs """
+#!/usr/bin/env python
+
+"""
+.. module:: FeynmanGraphs
+    :synopsis: This unit contains two simple routines that draw feynman graphs.
+
+.. moduleauthor:: missing <email@example.com>
+
+"""
+
 
 def printParticle_ ( label ):
   """ very simple method to rename a few particles for the asciidraw

@@ -2,13 +2,13 @@
 
 """
 .. module:: pyslha2
-    :synopsis: ...
+    :synopsis: missing
     
-.. moduleauthor:: someone <email@example.com>
+.. moduleauthor:: missing <email@example.com>
     
 """
     
-"""\
+"""
 A simple but flexible parser of SUSY Les Houches Accord (SLHA) model and decay files.
 
 pyslha is a parser/writer module for particle physics SUSY Les Houches Accord

@@ -1,6 +1,13 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
-""" getting information from "/afs/hephy.at/user/w/walten/public/sms/ """
+"""
+.. module:: SMSResultsCollector
+    :synopsis: Getting information from "/afs/hephy.at/user/w/walten/public/sms/
+
+.. moduleauthor:: missing <email@example.com>
+
+"""
+
 
 import os, ROOT, sys, types
 

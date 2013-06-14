@@ -1,6 +1,13 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
-""" some helper functions that are not to be used by the end user """
+"""
+.. module:: SMSHelpers
+    :synopsis: Some helper functions that are not to be used by the end user.
+
+.. moduleauthor:: missing <email@example.com>
+
+"""
+
 
 import os
 from Tools.PhysicsUnits import rmvunit

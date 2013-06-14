@@ -1,4 +1,13 @@
-""" various helper classes """
+#!/usr/bin/env python
+
+"""
+.. module:: VariousHelpers
+    :synopsis: Various helper classes.
+
+.. moduleauthor:: missing <email@example.com>
+
+"""
+
 
 def getMaxLum(List):
   """ Goes through all analyses in the list and returns the maximum luminosity.

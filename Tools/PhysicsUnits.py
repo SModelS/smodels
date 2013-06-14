@@ -1,6 +1,16 @@
+#!/usr/bin/env python
+
+"""
+.. module:: PhysicsUnits
+    :synopsis: This introduces physical units (GeV,fb) to the framework
+
+.. moduleauthor:: missing <email@example.com>
+
+"""
+
+
 from unum import Unum
 
-""" this introduces physical units (GeV,fb) to the framework """
 
 # description see
 # http://home.scarlet.be/be052320/Unum.html

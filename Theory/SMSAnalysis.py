@@ -2,16 +2,15 @@
 
 """
 .. module:: SMSAnalysis
-    :synopsis: encapsulates all data around one result of one analysis, i.e.
+    :synopsis: Encapsulates all data around one result of one analysis, i.e.
       the association with one plot, one reference cross section result, etc
       FIXME is this true?
-    
     
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
     
 """
     
-""" all data classes necessary to create a SModelS description of events """
+""" All data classes necessary to create a SModelS description of events """
 
 from SMSDataObjects import GTop, EElement
 from ParticleNames import Reven, PtcDic

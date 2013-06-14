@@ -1,6 +1,13 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
-""" centralized facility to access the SMS results """
+"""
+.. module:: SMSResults
+    :synopsis: Centralized facility to access the SMS results.
+
+.. moduleauthor:: missing <email@example.com>
+
+"""
+
 
 import SMSHelpers
 from Tools.PhysicsUnits import addunit, rmvunit

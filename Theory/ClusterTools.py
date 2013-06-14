@@ -1,15 +1,15 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 """
 .. module:: ClusterTools
-    :synopsis: I have no idea ...
+    :synopsis: missing
 
-.. moduleauthor:: someone <email@example.com>
+.. moduleauthor:: missing <email@example.com>
 
 """
 
 
-""" the intention of this unit is to have all code that is related to clustering
+""" The intention of this unit is to have all code that is related to clustering
 and finding average masses """
 
 CMdic={}
