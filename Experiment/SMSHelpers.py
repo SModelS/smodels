@@ -186,8 +186,16 @@ def getUpperLimitAtPoint ( histo, mx, my, interpolate=False ):
     log ( "inconsistent mx/my, mx=None, my=%s" % my )
     return None
   if not histo: return None ## 'no histogram'
-  if interpolate:
-    return histo.Interpolate ( rmvunit(mx,'GeV'), rmvunit(my,'GeV') )
+  if interpolate: #for interpolation: set empty bins to the last finite value to avoid zeros in the interpolation, set result=None if the corresponding bin in the original histogram was empty
+    hInf = histo.Clone()
+    lastBinContent=0
+    for bx in range(1,hInf.GetXaxis().GetNbins()+1):
+      for by in range(1,hInf.GetYaxis().GetNbins()+1):
+        if not hInf.GetBinContent(bx,by): hInf.SetBinContent(bx,by,lastBinContent)
+        else: lastBinContent=hInf.GetBinContent(bx,by)
+    if histo.GetBinContent(histo.GetXaxis().FindBin(rmvunit(mx,'GeV')),histo.GetYaxis().FindBin(rmvunit(my,'GeV'))):
+      return hInf.Interpolate ( rmvunit(mx,'GeV'), rmvunit(my,'GeV') )
+    else: return None
   xmax=histo.GetXaxis().GetNbins()
   xbin=histo.GetXaxis().FindBin(rmvunit(mx,'GeV'))
   if xbin==0 or xbin>xmax:
