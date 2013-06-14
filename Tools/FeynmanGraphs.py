@@ -1,7 +1,4 @@
 """ This unit contains two simple routines that draw feynman graphs """
-#from pyfeyn.user import FeynDiagram,Vertex,Point,Fermion,Scalar,CIRCLE,SQUARE,\
-#  HATCHED135,Circle,pyx
-#from pyfeyn.user import *
 
 def printParticle_ ( label ):
   """ very simple method to rename a few particles for the asciidraw
@@ -93,9 +90,13 @@ def connect ( canvas, p1, p2, straight=True, label=None, spin="fermion", bend=Tr
 
 def draw ( element, filename="bla.pdf", straight=False ):
   """ plot a lessagraph, write into pdf/eps/png file called <filename> """
-  from pyx import text, bitmap, unit
-  from pyfeyn.user import FeynDiagram, Point, Circle, HATCHED135, CIRCLE, Vertex,\
-    WHITE, Fermion
+  try:
+    from pyx import text, bitmap, unit
+    from pyfeyn.user import FeynDiagram, Point, Circle, HATCHED135, CIRCLE, Vertex,\
+      WHITE, Fermion
+  except ImportError,e:
+    print "[FeynmanGraphs.py] cannot draw, pyfeyn not installed?",e
+    return
   # from Tools import VariousHelpers
   #import os
   #if True:
