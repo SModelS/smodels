@@ -12,10 +12,10 @@ class ClusterOutput:
   """ a wrapper to store the theory predictions from evaluateCluster """
 
   def __init__ (self):
-    self.result_dic = {}
-    self.conditions_dic = {}
-    self.mass = None
-    self.explimit = None
+    self.result_dic = {} ## dictionary of the results, keys are conditions, values are  TheoryPredicitions
+    self.conditions_dic = {} ## FIXME whats this?
+    self.mass = None ## FIXME whats this?
+    self.explimit = None ## FIXME whats this?
     
   def oldformat(self):
     """ Returns a dictionary with the old output format """
@@ -34,12 +34,14 @@ class ClusterOutput:
 
 
   def predictionFor ( self, m1=None, m2=None, sqrts=None, order=None, condition=None ):
-    """ get the theory prediction FIXME (simplified version with new output. What is missing?) """
+    """ get the theory prediction FIXME (simplified version with new output. What is missing?) 
+
+      :returns: cross section prediction, with units
+    """
 
     return self.result_dic.values()[0]
 
 
-    
 class TheoryPrediction:
   """ a wrapper for the result of EAnalysis.evaluteResult,
       make it easier to access the theoretical xsec prediction for 
