@@ -23,6 +23,7 @@ def getTGraphFromContour(exclhisto):
 
 def useNiceColorPalette( palette="temperature", f=0., ngradientcolors=20 ):
   """ create a fine-grained temperature color palette,
+
       :param palette: which palette. values are temperature, blackwhite, darkbody, deepsea, blueyellow, rainbow, inverteddarkbody, yellowpurple, greenpurple, bluepurple
       :type palette: str
       :param ngradientcolors: how many colors

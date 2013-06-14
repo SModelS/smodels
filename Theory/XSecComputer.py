@@ -203,6 +203,7 @@ def getprodcs(pdgm1, pdgm2, sigma):
 def runPythia ( slhafile, n, sqrts=7, datadir="./data/", etcdir="./etc/",
                 installdir="./" ):
   """ run pythia_lhe with n events, at sqrt(s)=sqrts.
+
     :param slhafile: inputfile
     :type slhafile: str
     :param datadir: directory where this all should run
