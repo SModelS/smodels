@@ -130,7 +130,7 @@ for Analysis in ListOfAnalyses:
   if len(Analysis.ResultList) == 0: continue
 
   for cluster in Analysis.ResultList:
-    theoRes = cluster.oldformat()
+    theoRes = cluster.oldformat()   #Convert to old format (except for small change in conditions output)
     mass = theoRes['mass']
     tvalue = theoRes['result']
     conds = theoRes['conditions']
