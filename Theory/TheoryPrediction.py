@@ -12,10 +12,10 @@ class ClusterOutput:
   """ a wrapper to store the theory predictions from evaluateCluster """
 
   def __init__ (self):
-    self.result_dic = {} ## dictionary of the results, keys are conditions, values are  TheoryPredicitions
-    self.conditions_dic = {} ## FIXME whats this?
-    self.mass = None ## FIXME whats this?
-    self.explimit = None ## FIXME whats this?
+    self.result_dic = {} ## dictionary of the results, keys are the constraints, values are  TheoryPredicitions
+    self.conditions_dic = {} ## dictionary of the conditions, keys are conditions, values are  TheoryPredicitions
+    self.mass = None ## average mass inside the cluster
+    self.explimit = None ## experimental limit for the average mass
     
   def oldformat(self):
     """ Returns a dictionary with the old output format """
