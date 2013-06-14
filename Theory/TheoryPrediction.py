@@ -7,6 +7,38 @@
 .. moduleauthor:: someone <email@example.com>
     
 """
+
+class ClusterOutput:
+  """ a wrapper to store the theory predictions from evaluateCluster """
+
+  def __init__ (self):
+    self.result_dic = {}
+    self.conditions_dic = {}
+    self.mass = None
+    self.explimit = None
+    
+  def oldformat(self):
+    """ Returns a dictionary with the old output format """
+    resdic = {}
+    resdic['mass'] = self.mass
+    resdic['result'] = self.result_dic.values()[0]
+    resdic['conditions'] = {}
+    conds = self.conditions_dic.values()
+    for weight in conds[0].keys():
+      resdic['conditions'].update({weight : []})
+    for cond in conds:
+      for weight in cond:
+        resdic['conditions'][weight].append(cond[weight])
+
+    return resdic
+
+
+  def predictionFor ( self, m1=None, m2=None, sqrts=None, order=None, condition=None ):
+    """ get the theory prediction FIXME (simplified version with new output. What is missing?) """
+
+    return self.result_dic.values()[0]
+
+
     
 class TheoryPrediction:
   """ basically a wrapper for the result of EAnalysis.evaluteResult,

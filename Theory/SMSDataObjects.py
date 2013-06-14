@@ -34,7 +34,7 @@ class BElement:
         self.particles.append ( ptcs )
       # print "[SMSDataObjects] ptcs=",ptcs
 
-  def isEqual ( ElA, elB, order=True ):
+  def isEqual ( ElA, ElB, order=True ):
     if simParticles(ElA.particles,ElB.particles,useDict=False): return False
     if ElA.masses != ElB.masses: return False
     return True
@@ -253,65 +253,82 @@ class GTop:
     self.ElList.append(NewElement)
     return True
 
-  def evaluateCluster(self, instr):
-    """ Given a mathematical expression in string format involving elements, it evaluates the expression
-    using the respective theoretical predictions for each element."""
+  def evaluateCluster(self,results):
+    """ Evaluates the constraints and conditions in results
+    using the respective theoretical predictions for each element. Returns a TheoryPrediction object"""
     from Tools.PhysicsUnits import addunit
-
-    outstr = instr.replace(" ","")
-  #Get ordered list of elements:
-    El = []
-    iels = 0
-    while "[[[" in outstr:  #String has element
-      st = outstr[outstr.find("[[["):outstr.find("]]]")+3] #Get duplet
-      element=EElement ( st )
-      # ptclist = strtoel(st)   # Get particle list
-      ptclist = element.allParticles()
-  #Syntax checks:
-      for ib in range(2):
-        for ptcL in ptclist[ib]:
-          for ptc in ptcL:
-            if not ptc in Reven.values() and not PtcDic.has_key(ptc):
-              print "EvalRes: Unknown particle ",ptc
-              return False
-      outstr = outstr.replace(st,"El["+str(iels)+"]")  # Replace element
-      El.append(ptclist)   #Store elements
-      iels +=1
-
-  #Get list of expressions (separated by commas):
-    if ";" in outstr or "Csim" in outstr or "Cgtr" in outstr:
-      outstrv = outstr.rsplit(";")
+    from AuxiliaryFunctions import getelements, eltonum
+    import TheoryPrediction
+  
+  #To store the result:
+    ClusterResult = TheoryPrediction.ClusterOutput()  
+    ClusterResult.mass = [self.ElList[0].B[0].masses,self.ElList[0].B[1].masses]
+    
+  #Get constraints and conditions:
+    consts = results.keys()
+    if len(consts) > 1:
+      print "evaluateCluster: Analysis",self.label,"contains more than one entry"
+      return False    
+    conds = results.values()[0]
+    if ";" in conds or "Csim" in conds or "Cgtr" in conds:
+      conds = conds.rsplit(";")
     else:
-      outstrv = outstr.rsplit(",")
-
-  #Generate zeroweight entry
+      conds = conds.rsplit(",")
+      
+  #Get a list of all elements appearing in results:
+    allEl = set(getelements(consts) + getelements(conds))
+    
+  #Generate zeroweight and list of numerical elements with zero weights
     zeroweight = {}
-    for wk in self.ElList[0].weight.keys():
-      zeroweight[wk]=addunit(0.,'fb')
+    for wk in self.ElList[0].weight.keys(): zeroweight[wk]=addunit(0.,'fb')
+    nEll = [zeroweight]*len(allEl)  
+  #Build a dictionay to map the relevant elements to its respective numerical element and the element to its weight
+    thdic = {}
+    eldic = {}
+    iel = 0
+    for el in allEl:
+      ptcsA = EElement(el).allParticles()
+      nel = "nEl["+str(iel)+"]"
+      thdic[el] = nel
+      for El in self.ElList:
+        ptcsB = [El.B[0].particles,El.B[1].particles]
+        if simParticles(ptcsA,ptcsB,useDict=False):
+          nEll[iel] = El.weight
+      iel += 1
 
-  #Find elements in self corresponding to elements in El and fill Elw with the respective weights:
-    Elw = []
-    for i in range(len(El)):
-      Elw.append(zeroweight)
-      for j in range(len(self.ElList)):
-        AEl = [self.ElList[j].B[0].particles,self.ElList[j].B[1].particles]
-        if simParticles(El[i],AEl,useDict=False):
-          Elw[i] = self.ElList[j].weight
-          break
+  #Replace string elements by their respective numerical element (nEl):
+    consts_num = {}
+    conds_num = {}
+    for const in consts: consts_num[const] = eltonum(const,thdic)
+    for cond in conds: conds_num[cond] = eltonum(cond,thdic)
+    
+  #Loop over weights and
+    const_res = {}
+    cond_res = {}
+  #Evaluate each constraint
+    for ckey in consts_num.keys():
+      const = consts_num[ckey]
+      res = {}
+      for weight in zeroweight.keys():
+        nEl = []
+        for el in nEll: nEl.append(el[weight])  #Select weight
+        res[weight] = Ceval(const,nEl)
+      const_res[ckey] = res
+  #Evaluate each condition   
+      for ckey in conds_num.keys():
+        cond = conds_num[ckey]
+        res = {}
+        for weight in zeroweight.keys():
+          nEl = []
+          for el in nEll: nEl.append(el[weight])  #Select weight
+          res[weight] = Ceval(cond,nEl)
+        cond_res[ckey] = res   
+      
+    ClusterResult.conditions_dic = cond_res
+    ClusterResult.result_dic = const_res
 
-  #Evaluate the instr expression (condition or constraint) for each weight entry:
-    result = {}
-    Els = []
-    if len(Elw) > 0:
-      for w in Elw[0].keys():
-        Els = [weight[w] for weight in Elw]
-        eout = [Ceval(x,Els) for x in outstrv]
-        if len(eout) == 1: eout = eout[0]
-        result[w]=eout ## .update({w : eout})
-    else:
-      eout = [Ceval(x,Els) for x in outstrv]
-      result = eout
-    return result
+
+    return ClusterResult
 
   def massCompressedTopology ( self, mingap ):
     """ if two masses in this topology are degenerate, create

@@ -12,8 +12,6 @@
 """ the intention of this unit is to have all code that is related to clustering
 and finding average masses """
 
-
-DistAnalyses = "" # List of analyses used to compute mass distances (used by MassDist function)                                 
 CMdic={}
 
 def DoCluster(objlist,Distfunc,dmin):
@@ -197,46 +195,6 @@ def sumweights(wlist):
     neweight[wk]=wsum
   return neweight
 
-def MassDist(mass1,mass2):
-  """ definition of distance between two mass arrays
-  Dana is defined, use maximum distance in all analyses """
-  from  Experiment import LimitGetter
-  from Tools.PhysicsUnits import rmvunit
-
-  Dana = DistAnalyses  #List of analyses to be used
-
-#Get upper bounds for each mass:
-  xmass1 = LimitGetter.GetPlotLimit(mass1,Dana[0],Dana[1],complain=False)
-  xmass2 = LimitGetter.GetPlotLimit(mass2,Dana[0],Dana[1],complain=False)
-  if xmass1==None or xmass1==False:
-    print "[ClusterTools.MassDist] no limit for plot 1"
-    return None
-  if xmass2==None or xmass2==False:
-    print "[ClusterTools.MassDist] no limit for plot 2"
-    return None
-
-
-  d = -1.
-  for iana in range(len(xmass1)):
-    x1 = rmvunit(xmass1[iana][1],'fb')
-    x2 = rmvunit(xmass2[iana][1],'fb')
-    if type(x1) == type(str()) or type(x1) == type(str()): continue  #Skip analysis error messages
-    if x1 and x2:
-      if xmass1[iana][0] != xmass2[iana][0]:  #Check if analysis label match
-        print "MassDist: Error getting upper limit"
-        return None
-
-      newd = 2.*abs(x1-x2)/(x1+x2)   #Relative distance in "upper limit space"
-      d = max(d,newd)
-
-
-  if d < 0.: return None   #Skip masses without an upper limit
-
-   #If masses differ by more than 100%, do not define distance
-  if abs(mass1[0][0]-mass2[0][0])/(mass1[0][0]+mass2[0][0]) > 0.5:
-    return None
-
-  return d
 
 def ClusterDist(cluster1,cluster2,MD):
   """ Definition of distance two clusters, MD = square matrix of distances """

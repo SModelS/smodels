@@ -69,12 +69,10 @@ def compute(nevts,slhafile,rpythia = True, donlo = True, basedir=None,datadir=No
   import os, sys
 
   if basedir==None:
-    from Tools.VariousHelpers import getInstallationBase
-    basedir=getInstallationBase()
-    #basedir=os.getcwd()
-    #if basedir[-3:]=="bin": basedir=basedir[:-3]
-    #if basedir[-4:]=="test": basedir=basedir[:-4]
-    #if basedir[-10:]=="regression": basedir=basedir[:-10]
+    basedir=os.getcwd()
+    if basedir[-3:]=="bin": basedir=basedir[:-3]
+    if basedir[-4:]=="test": basedir=basedir[:-4]
+    if basedir[-10:]=="regression": basedir=basedir[:-10]
   if datadir==None:
     datadir=basedir+"/data"
   if not os.path.exists ( datadir ):

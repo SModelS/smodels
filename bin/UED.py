@@ -27,8 +27,6 @@ topos=LHEDecomposer.decompose ( lhefile, weights, nevts=nevts )
 for topo in topos:
   for element in topo.elements():
     FeynmanGraphs.asciidraw( element )
-    FeynmanGraphs.draw( element, filename="straight.pdf", straight=True )
-    FeynmanGraphs.draw( element, filename="xkcd.pdf", straight=False )
 
 print
 for Analysis in analyses:

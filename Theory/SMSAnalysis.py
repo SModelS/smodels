@@ -12,7 +12,8 @@
 
 from SMSDataObjects import GTop, EElement
 from ParticleNames import Reven, PtcDic
-import ClusterTools, TheoryPrediction
+import ClusterTools
+from Tools.PhysicsUnits import addunit, rmvunit
 
 class EAnalysis:  
   """ FIXME currently an analysis is a container for the association between
@@ -24,9 +25,10 @@ class EAnalysis:
     self.sqrts = 0
     self.lum = 0
     self.results = {} ## pairs of (constraint,condition)
-    self.plots = {} ## pairs of (constraint,???)
+    self.plots = {} ## pairs of (constraint,plots/analyses)
     self.run = ""
     self.masscomp = 0.2
+    self.ResultList = []
 
   def __str__(self):
     return self.label
@@ -55,7 +57,6 @@ class EAnalysis:
           con = con.replace(st,"")  # Remove element duplet
           element=EElement ( st )
           ptclist = element.allParticles()
-          ## ptclist = strtoel(st)   # Get particle list
 #Syntax checks:
           for ib in range(2):
             for ipt in range(len(ptclist[ib])):
@@ -155,7 +156,7 @@ class EAnalysis:
               self.Top.ElList[jel].B[ib].masses.append(NewEl.B[ib].masses)
             self.Top.ElList[jel].weight.append(neweight)
 
-  def evaluateResult(self,res,uselimits = False):
+  def evaluateResult(self):
     """ Main method for evaluating the theoretical predictions to the analysis \
         given the cross-section times branching ratio to specific final states. \
         It combines equivalent masses using the Cluster tools and calls \
@@ -164,34 +165,26 @@ class EAnalysis:
       :returns: a list of dictionaries with the cluster average mass and \
         theoretical values for the result and the condition(s) in the analysis.
     """
-    import copy, ClusterTools
-    from ClusterTools import DoCluster, MassDist, GoodMass
+    import copy
+    from ClusterTools import DoCluster, GoodMass
+    from Experiment import LimitGetter
 
-    output = []
-    if not self.plots.has_key(res) or not self.results.has_key(res):
-      print "EvalRes: Wrong analysis input"
-      return False
-
-  #Get minimum distance parameter (it can be analysis dependent)
     dmin = self.masscomp
-  #List of analyses and anlysis itself (necessary to compute distances)
-    analyses = self.plots[res]
-    ClusterTools.DistAnalyses = [analyses,self]
-
+    output = []
   #Create a mass list with all masses appearing in the analysis which have similar branch masses:
     Goodmasses = []
     Top = copy.deepcopy(self.Top)
     for iel in range(len(Top.ElList)):
       for imass in range(len(Top.ElList[iel].B[0].masses)):
         mass = [Top.ElList[iel].B[0].masses[imass],Top.ElList[iel].B[1].masses[imass]]
-        gmass = GoodMass(mass,MassDist,dmin)
+        gmass = GoodMass(mass,self.MassDist,dmin)
         if gmass:
            Top.ElList[iel].B[0].masses[imass] = gmass[0]
            Top.ElList[iel].B[1].masses[imass] = gmass[1]
            if not gmass in Goodmasses: Goodmasses.append(gmass)
 
   #Cluster masses:
-    MCluster = DoCluster(Goodmasses,MassDist,dmin)
+    MCluster = DoCluster(Goodmasses,self.MassDist,dmin)
 
     if MCluster == None or MCluster == False:
       MCluster = []
@@ -199,6 +192,7 @@ class EAnalysis:
       print "[SMSAnalysis.py] Cluster failed, using unclustered masses"
       
   #Loop over clusters to evaluate constraints and conditions inside each cluster
+    self.ResultList = []  # Clear out results
     for cluster in MCluster:
   #Get masses in cluster
       masscluster = []
@@ -207,33 +201,25 @@ class EAnalysis:
       NewTop = Top.clusterTopology(masscluster)
 
   #Now NewTop contains only elements with a common mass (replaced by the average mass)
-  #Evaluate result inside cluster
-      result = NewTop.evaluateCluster ( res )
-  #Evaluate conditions
-      conditions = NewTop.evaluateCluster ( self.results[res] )
-
-  #Save cluster result
-      mavg = [NewTop.ElList[0].B[0].masses,NewTop.ElList[0].B[1].masses]
+  #Evaluate theoretical predictions for analysis inside cluster
+      ClusterResult = NewTop.evaluateCluster ( self.results )
+      ClusterResult.explimit = LimitGetter.GetPlotLimit(ClusterResult.mass,self,complain=False)
 
   #Check if average mass is inside the cluster (exp. limit for average mass ~ exp. limit for individual masses):
+      mavg = [NewTop.ElList[0].B[0].masses,NewTop.ElList[0].B[1].masses]
       davg = -1.
       for mass in masscluster:
-        davg = max(davg,MassDist(mass,mavg))
+        davg = max(davg,self.MassDist(mass,mavg))
       if davg == -1. or davg > dmin:
         print "EvalRes: Wrong clustering"
         continue
 
-
-      output.append({'mass' : mavg, 'result' : result, 'conditions' : conditions})
-
-    return TheoryPrediction.TheoryPrediction( output )
-
-  def evaluateResults(self, uselimits = False ):
-    """ evaluate all the analysis'es results """
-    for res in self.results:
-      self.evaluateResult( res, uselimits )
+      self.ResultList.append(ClusterResult)
       
-  def Split(self):
+    return True
+
+      
+  def split(self):
     """ if the analysis contains more than one result or plot, splits in a list of simple analyses
     with a single result/plot. Returns a list of simple analyses. If the analysis is already
     simple, return the a one element list with itself"""
@@ -250,5 +236,36 @@ class EAnalysis:
         SplitList.append(NewAnalysis)
         
     return SplitList
+  
+  
+  def MassDist(self,mass1,mass2):
+    """ definition of distance between two mass arrays. The function is defined so it uses the analysis
+    experimental limits to define distance """
+    from  Experiment import LimitGetter
+
+  
+  #If masses differ by more than 100%, do not define distance
+    if abs(mass1[0][0]-mass2[0][0])/(mass1[0][0]+mass2[0][0]) > 0.5:
+      return None
+
+#Get upper bounds for each mass:
+    xmass1 = LimitGetter.GetPlotLimit(mass1,self,complain=False)
+    xmass2 = LimitGetter.GetPlotLimit(mass2,self,complain=False)
+
+    if type(xmass1) != type(addunit(1.,'pb')) and (xmass1==None or xmass1==False):
+      print "[SMSAnalysis.MassDist] no limit for plot 1"
+      return None
+    if type(xmass2) != type(addunit(1.,'pb')) and (xmass2==None or xmass2==False):
+      print "[SMSAnalysis.MassDist] no limit for plot 2"
+      return None
+
+    x1 = rmvunit(xmass1,'fb')
+    x2 = rmvunit(xmass2,'fb')
+    d = 2.*abs(x1-x2)/(x1+x2)
+
+    if d < 0.: return None   #Skip masses without an upper limit
+
+    return d
+
         
         
