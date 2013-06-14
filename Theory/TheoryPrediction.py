@@ -41,7 +41,7 @@ class ClusterOutput:
 
     
 class TheoryPrediction:
-  """ basically a wrapper for the result of EAnalysis.evaluteResult,
+  """ a wrapper for the result of EAnalysis.evaluteResult,
       make it easier to access the theoretical xsec prediction for 
       a particular EElement """
 
@@ -69,12 +69,15 @@ class TheoryPrediction:
   def __str__ ( self ): return str(self.data)
 
   def predictionFor ( self, m1=None, m2=None, sqrts=None, order=None, condition=None ):
-    """ get the theory prediction for specific conditions:
+    """ get the theory xsec prediction for specific conditions:
         m1: get it for this array of masses 
         m2: specify also second array of masses for other branch.
         sqrts: 7 or 8 
         order: LO or NLO
-        condition: the condition as is in the database """
+        condition: the condition as is in the database 
+
+        :returns: cross section, with units, None if no result available.
+    """
     runs=None
     if sqrts!=None and order!=None:
       runs = [ "%d TeV (%s)" % ( int(sqrts), order ) ]
