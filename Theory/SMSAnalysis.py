@@ -2,9 +2,12 @@
 
 """
 .. module:: SMSAnalysis
-    :synopsis: ...
+    :synopsis: encapsulates all data around one result of one analysis, i.e.
+      the association with one plot, one reference cross section result, etc
+      FIXME is this true?
     
-.. moduleauthor:: someone <email@example.com>
+    
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
     
 """
     
@@ -28,7 +31,7 @@ class EAnalysis:
     self.plots = {} ## pairs of (constraint,plots/analyses)
     self.run = ""
     self.masscomp = 0.2
-    self.ResultList = []
+    self.ResultList = [] ## a list of FIXME what?
 
   def __str__(self):
     return self.label
