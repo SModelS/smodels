@@ -139,7 +139,8 @@ for Analysis in ListOfAnalyses:
       mass = theoRes[imass]['mass']
       tvalue = theoRes[imass]['result']
       conds = theoRes[imass]['conditions']
-      sigmalimit = LimitGetter.GetPlotLimit(mass,plot,Analysis)
+      sigmalimit = LimitGetter.GetPlotLimit(mass,Analysis)
+      sigmalimit = [Analysis.plots.values()[0][1][0],sigmalimit]
       
       if sigmalimit and len(sigmalimit) > 0:
         has_line=True

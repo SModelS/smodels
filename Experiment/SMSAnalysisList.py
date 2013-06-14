@@ -233,7 +233,7 @@ def load():
 #Split combined analysis objects into single result/plot analysis
   NewList = []
   for Analy in ListOfAnalyses:
-    for Ana in Analy.Split():
+    for Ana in Analy.split():
       NewList.append(Ana)
       
   ListOfAnalyses = NewList  

@@ -43,7 +43,7 @@ for SMSTop in SMSTopList.topos:
   print "SMSTopList Tx=",tx
   
 for Analysis in ListOfAnalyses:
-  Analysis.evaluateResults()
+  Analysis.evaluateResult()
   Analysis.add ( SMSTopList )
   print "------------- Analysis Label = ",Analysis.label, Analysis.sqrts, Analysis.Top
   print "    `-- element ",Analysis.Top.leadingElement()

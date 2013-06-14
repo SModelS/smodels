@@ -32,8 +32,9 @@ for Analysis in analyses:
   if len(lims)==0: continue
   print "[run.py] -------------------------------------------------"
   print "[run.py] analysis=",Analysis,"lims=",lims
-  for res in Analysis.results.keys():
-    theoRes=Analysis.evaluateResult(res)
-    if len(theoRes)==0: continue
+  Analysis.evaluateResult()
+  if len(Analysis.ResultList)==0: continue
+  for cluster in Analysis.ResultList:
+    theoRes=cluster.result_dic
     print "[run.py] ****"
     print "[run.py] theoRes=",theoRes

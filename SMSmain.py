@@ -123,28 +123,22 @@ for Analysis in ListOfAnalyses:
     continue
 
 
-  for res in Analysis.results.keys():
-    theoRes = Analysis.evaluateResult(res) #Theoretical values for result and conditions
-    
+  if not Analysis.evaluateResult(): continue #Theoretical values for result and conditions
 
-    try:
-      plot = Analysis.plots[res]
-    except KeyError:  
-      plot = []
-        
-    for imass in range(len(theoRes)):
-      mass = theoRes[imass]['mass']
-      tvalue = theoRes[imass]['result']
-      conds = theoRes[imass]['conditions']
-      sigmalimit = LimitGetter.GetPlotLimit(mass,plot,Analysis)
-      
-      if sigmalimit and len(sigmalimit) > 0:
-        Results_table.add_row([wrap(printer.pformat(res),width=30),wrap(printer.pformat(conds),width=30),wrap(printer.pformat(mass),width=30),wrap(printer.pformat(tvalue),width=30),wrap(printer.pformat(sigmalimit[0]),width=30)])
-        for ilim in range(1,len(sigmalimit)):
-          Results_table.add_row(["","","","",wrap(printer.pformat(sigmalimit[ilim]),width=30)])
-      else:
-        Results_table.add_row([wrap(printer.pformat(res),width=30),wrap(printer.pformat(conds),width=30),wrap(printer.pformat(mass),width=30),wrap(printer.pformat(tvalue),width=30),wrap(printer.pformat(sigmalimit),width=30)])
-      Results_table.add_row(["---------","---------","---------","---------","---------"])
+  res = Analysis.results.keys()[0]  
+
+  if len(Analysis.ResultList) == 0: continue
+
+  for cluster in Analysis.ResultList:
+    theoRes = cluster.oldformat()
+    mass = theoRes['mass']
+    tvalue = theoRes['result']
+    conds = theoRes['conditions']
+    sigmalimit = [Analysis.plots.values()[0][1][0],cluster.explimit]
+
+    Results_table.add_row([wrap(printer.pformat(res),width=30),wrap(printer.pformat(conds),width=30),wrap(printer.pformat(mass),width=30),wrap(printer.pformat(tvalue),width=30),wrap(printer.pformat(sigmalimit),width=30)])
+
+    Results_table.add_row(["---------","---------","---------","---------","---------"])
 
   print(Results_table)
 

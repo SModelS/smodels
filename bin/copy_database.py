@@ -13,9 +13,9 @@ DB="/afs/hephy.at/user/w/walten/public/sms"
 
 Dirs=[ "2011", "2012", "RPV7", "RPV8", "ATLAS8TeV","8TeV" ]
 
+cmd="scp -r"
 for Dir in Dirs:
-  cmd="scp -r smodels.hephy.at:"
-  cmd+="%s/%s " % (DB, Dir)
-  cmd+= dest
-  print cmd
-  os.system ( cmd )
+  cmd+=" %s/%s " % (DB, Dir)
+cmd+= dest
+print cmd
+os.system ( cmd )
