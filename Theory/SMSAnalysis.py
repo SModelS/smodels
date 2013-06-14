@@ -30,7 +30,7 @@ class EAnalysis:
     self.plots = {} ## pairs of (constraint,plots/analyses)
     self.run = ""
     self.masscomp = 0.2
-    self.ResultList = [] ## a list of FIXME what?
+    self.ResultList = [] ## a list of result objects (TheoryPrediction.ClusterOutput)
 
   def __str__(self):
     return self.label
