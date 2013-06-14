@@ -2,9 +2,9 @@
 
 """
 .. module:: SLHATools
-    :synopsis: a collection of tools needed for use and manipulation of SLHA files
+    :synopsis: A collection of tools needed for use and manipulation of SLHA files
     
-.. moduleauthor:: someone <email@example.com>
+.. moduleauthor:: missing <email@example.com>
     
 """
 

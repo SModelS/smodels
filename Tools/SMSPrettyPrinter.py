@@ -1,3 +1,13 @@
+#!/usr/bin/env python
+
+"""
+.. module:: SMSPrettyPrinter
+    :synopsis: missing
+
+.. moduleauthor:: missing <email@example.com>
+
+"""
+
 from pprint import PrettyPrinter
 
 class SMSPrettyPrinter(PrettyPrinter):

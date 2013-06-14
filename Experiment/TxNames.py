@@ -1,3 +1,13 @@
+#!/usr/bin/env python
+
+"""
+.. module:: TxNames
+    :synopsis: missing
+
+.. moduleauthor:: missing <email@example.com>
+
+"""
+
 def getTx(element):
 	"""takes EElement and returns Tx-Name"""
 	import copy

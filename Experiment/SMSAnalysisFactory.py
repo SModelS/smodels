@@ -1,5 +1,15 @@
 #!/usr/bin/env python
 
+"""
+.. module:: SMSAnalysisFactory
+    :synopsis: missing
+
+.. moduleauthor:: missing <email@example.com>
+
+"""
+
+
+
 def getRealTopo ( Tx ):
   """ T3w025 -> T3w, etc """
   ret=Tx

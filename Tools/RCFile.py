@@ -1,3 +1,13 @@
+#!/usr/bin/env python
+
+"""
+.. module:: RCFile
+    :synopsis: missing
+
+.. moduleauthor:: missing <email@example.com>
+
+"""
+
 
 import os
 

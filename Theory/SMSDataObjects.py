@@ -2,9 +2,10 @@
 
 """
 .. module:: SMSDataObjects
-    :synopsis: our basic data objects: TopologyList, GTop, EElement, BElement
+    :synopsis: Our basic data objects: TopologyList, GTop, EElement, BElement
     
-.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>, Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
     
 """
 

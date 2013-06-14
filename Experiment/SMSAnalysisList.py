@@ -1,4 +1,13 @@
-""" Upon 'loading', this unit creates a list of EAnalyses """
+#!/usr/bin/env python
+
+"""
+.. module:: SMSAnalysisList
+    :synopsis: Upon 'loading', this unit creates a list of EAnalyses
+
+.. moduleauthor:: missing <email@example.com>
+
+"""
+
 
 def load():
   from Theory.SMSAnalysis import EAnalysis

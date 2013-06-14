@@ -1,8 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 """
 .. module:: LHEReader
-    :synopsis: a class that creates SMSEvents from LHE files
+    :synopsis: A class that creates SMSEvents from LHE files.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 

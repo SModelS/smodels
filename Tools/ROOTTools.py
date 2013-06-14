@@ -1,4 +1,12 @@
-""" collection of tools needed for use and manipulation of ROOT files """
+#!/usr/bin/env python
+
+"""
+.. module:: ROOTTools
+    :synopsis: Collection of tools needed for use and manipulation of ROOT files.
+
+.. moduleauthor:: missing <email@example.com>
+
+"""
 
 
 def getTGraphFromContour(exclhisto):

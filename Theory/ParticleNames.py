@@ -2,13 +2,13 @@
 
 """
 .. module:: ParticleNames
-    :synopsis: ...
+    :synopsis: missing
 
-.. moduleauthor:: someone <email@example.com>
+.. moduleauthor:: missing <email@example.com>
 
 """
 
-""" dictionaries that deal with particle names """
+""" Dictionaries that deal with particle names """
 
 #Converts pdg number to particle name according to the dictionaries Rodd
 # and Reven

@@ -1,3 +1,13 @@
+#!/usr/bin/env python
+
+"""
+.. module:: LimitGetter
+    :synopsis: missing
+
+.. moduleauthor:: missing <email@example.com>
+
+"""
+
 def limit(analysis, addTheoryPrediction=True):
   """ the next generation limit retrieval function, should get all information
       from the analysis object """

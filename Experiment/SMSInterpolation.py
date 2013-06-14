@@ -1,9 +1,18 @@
-#SMSInterpolation is called by SMSResults.getSmartUpperLimit.
-#UpperLimit takes arbitrary input masses and checks if there is a
-#corresponding upper limit for the given analysis and topology.
-#The upper limit is returned in 'pb'.
-#If several histograms with different x-values are available,
-#an interpolation is performed.
+#!/usr/bin/env python
+
+"""
+.. module:: SMSInterpolation
+    :synopsis: SMSInterpolation is called by SMSResults.getSmartUpperLimit.
+        UpperLimit takes arbitrary input masses and checks if there is a
+        corresponding upper limit for the given analysis and topology.
+        The upper limit is returned in 'pb'.
+        If several histograms with different x-values are available,
+        an interpolation is performed.
+
+.. moduleauthor:: missing <email@example.com>
+
+"""
+
 
 import SMSResults, numpy, SMSHelpers, copy
 from Tools.PhysicsUnits import rmvunit, addunit
