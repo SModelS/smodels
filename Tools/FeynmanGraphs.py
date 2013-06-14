@@ -32,6 +32,7 @@ def zero ():
 def connect ( canvas, p1, p2, straight=True, label=None, spin="fermion", bend=True, \
               verbose=False, nspec=None, displace=None ):
   """ simple: draw a line from p1 to p2 
+
       :param canvas: the pyx canvas to draw on
       :param p1: starting point
       :param p2: end point
