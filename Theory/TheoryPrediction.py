@@ -2,9 +2,9 @@
 
 """
 .. module:: TheoryPrediction
-    :synopsis: missing
+    :synopsis: Classes encapsulating the results of the computation of reference cross sections
     
-.. moduleauthor:: missing <email@example.com>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
     
 """
 
