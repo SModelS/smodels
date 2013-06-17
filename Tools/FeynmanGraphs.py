@@ -47,6 +47,9 @@ def connect ( canvas, p1, p2, straight=True, label=None, spin="fermion", bend=Tr
   from pyfeyn.user import NamedLine, Fermion, Scalar, WHITE
   from pyx import bitmap
   from Tools import VariousHelpers
+
+  if spin=="scalar" and not NamedLine.has_key ( spin ) and NamedLine.has_key ( "higgs" ):
+    spin="higgs"
   if straight:
     fl=NamedLine[spin](p1,p2)
     if displace==None: displace=.05
@@ -195,6 +198,7 @@ def draw ( element, filename="bla.pdf", straight=False ):
   if pdffile!=filename:
     import os
     os.system ( "convert %s %s" % ( pdffile, filename ) )
+  print "[FeynmanGraphs.py] %s created." % ( filename )
 
 def drawBranch_ ( branch, upwards, labels ):
   """ draws a single branch, should only be used via asciidraw, 
