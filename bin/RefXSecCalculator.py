@@ -13,8 +13,8 @@ import Tools.PhysicsUnits as UNIT
 topo = 'T2'
 nevts = 10000
 pidmom = [1000001, 1000002, 1000003, 1000004, 1000005, 2000001, 2000002, 2000003, 2000004, 2000005] #lightsquarks
-#pidmom = [1000005, 2000005] #sbottoms
-#pidmom = [1000006, 2000006] #stops
+#pidmom = [1000005] #sbottoms
+#pidmom = [1000006] #stops
 #pidmom = [1000021] #gluino
 #pidmom = [1000024, 1000023] #chi1+, chi20
 pidlsp = 1000022 #lsp
