@@ -101,7 +101,7 @@ def connect ( canvas, p1, p2, straight=True, label=None, spin="fermion", bend=Tr
     canvas.insert(bitmap.bitmap(pt.x()+displace, pt.y(), jpg, compressmode=None))
   return segs
 
-def draw ( element, filename="bla.pdf", straight=False ):
+def draw ( element, filename="bla.pdf", straight=False, inparts=True ):
   """ plot a lessagraph, write into pdf/eps/png file called <filename> """
   try:
     from pyx import text, bitmap, unit
@@ -123,6 +123,7 @@ def draw ( element, filename="bla.pdf", straight=False ):
   import os
   f=1.0
 
+  
   in1  = Point(-1*f, -.75*f)
   in2  = Point(-1*f, 1.75*f)
   vtx1 = Circle(0,.5*f, radius=0.3*f).setFillStyle(HATCHED135)
@@ -130,25 +131,26 @@ def draw ( element, filename="bla.pdf", straight=False ):
   #vtx1 = Point(0,.5*f )
   c=fd.currentCanvas
   # vtx1.setStrokeStyle ( HATCHED135 )
-  if straight:
-    P1a = Fermion(in1, vtx1 ).addLabel("P$_1$")
-    P1a.addParallelArrow( pos=.44,displace=.0003,length=unit.length(1.75*f), size=.0001)
-    P1a.addParallelArrow( pos=.44,displace=-.0003,length=unit.length(1.75*f), size=.0001)
-  else:
-    P1a = connect ( c, vtx1, in1, straight=straight, label="P$_1$", displace=.42 )
+  if inparts:
+    if straight:
+      P1a = Fermion(in1, vtx1 ).addLabel("P$_1$")
+      P1a.addParallelArrow( pos=.44,displace=.0003,length=unit.length(1.75*f), size=.0001)
+      P1a.addParallelArrow( pos=.44,displace=-.0003,length=unit.length(1.75*f), size=.0001)
+    else:
+      P1a = connect ( c, vtx1, in1, straight=straight, label="P$_1$", displace=.42 )
   
-    for i in P1a:
-      a1=i.addParallelArrow( pos=.44,displace=.0003,length=unit.length(1.60*f / float(len(P1a))), size=.0001)
-      a2=i.addParallelArrow( pos=.44,displace=-.0003,length=unit.length(1.60*f / float(len(P1a))), size=.0001)
-  if straight:
-    P2a = Fermion(in2, vtx1 ).addLabel("P$_2$",displace=.3)
-    P2a.addParallelArrow( pos=.44,displace=.0003,length=unit.length(1.75*f), size=.0001)
-    P2a.addParallelArrow( pos=.44,displace=-.0003,length=unit.length(1.75*f), size=.0001) 
-  else:
-    P2a = connect ( c, vtx1, in2, straight=straight, label="P$_2$", displace=.3 )
-    for i in P2a:
-      a1=i.addParallelArrow( pos=.44,displace=.0003,length=unit.length(1.60*f / float(len(P2a))), size=.0001)
-      a2=i.addParallelArrow( pos=.44,displace=-.0003,length=unit.length(1.60*f / float(len(P2a))), size=.0001)
+      for i in P1a:
+        a1=i.addParallelArrow( pos=.44,displace=.0003,length=unit.length(1.60*f / float(len(P1a))), size=.0001)
+        a2=i.addParallelArrow( pos=.44,displace=-.0003,length=unit.length(1.60*f / float(len(P1a))), size=.0001)
+    if straight:
+      P2a = Fermion(in2, vtx1 ).addLabel("P$_2$",displace=.3)
+      P2a.addParallelArrow( pos=.44,displace=.0003,length=unit.length(1.75*f), size=.0001)
+      P2a.addParallelArrow( pos=.44,displace=-.0003,length=unit.length(1.75*f), size=.0001) 
+    else:
+      P2a = connect ( c, vtx1, in2, straight=straight, label="P$_2$", displace=.3 )
+      for i in P2a:
+        a1=i.addParallelArrow( pos=.44,displace=.0003,length=unit.length(1.60*f / float(len(P2a))), size=.0001)
+        a2=i.addParallelArrow( pos=.44,displace=-.0003,length=unit.length(1.60*f / float(len(P2a))), size=.0001)
 
   # nbranches=len(element.B)
 
