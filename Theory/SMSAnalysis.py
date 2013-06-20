@@ -166,6 +166,7 @@ class EAnalysis:
 
       :returns: a list of dictionaries with the cluster average mass and \
         theoretical values for the result and the condition(s) in the analysis.
+      FIXME will generate the ResultList, return True (return None if list is empty)
     """
     import copy
     from ClusterTools import DoCluster, GoodMass
@@ -217,7 +218,8 @@ class EAnalysis:
         continue
 
       self.ResultList.append(ClusterResult)
-      
+
+    if not self.ResultList: return None      
     return True
 
       
