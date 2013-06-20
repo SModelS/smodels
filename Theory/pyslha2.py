@@ -318,24 +318,24 @@ def writeSLHA(f, ignorenobr=False, precision=8):
 #            out += sep + s + "\n"
 #        out += "\n"
     ## Decays
-    for dname in listDecays:
-        pid = dname
-        out += ("DECAY %d " + fmte + "\n") % (decays[pid].pid, decays[pid].totalwidth or -1)
-        for d in sorted(decays[pid].decays):
-            if d.br > 0.0 or not ignorenobr:
-                products_str = "   ".join(map(str, d.ids))
-                out += sep + fmte % d.br + sep + "%d" % len(d.ids) + sep + products_str + "\n"
-        out += "\n"
-    return out
-
-#    for pid, particle in sorted(decays.iteritems()):
-#        out += ("DECAY %d " + fmte + "\n") % (particle.pid, particle.totalwidth or -1)
-#        for d in sorted(particle.decays):
-#           if d.br > 0.0 or not ignorenobr:
+#    for dname in listDecays:
+#        pid = dname
+#        out += ("DECAY %d " + fmte + "\n") % (decays[pid].pid, decays[pid].totalwidth or -1)
+#        for d in sorted(decays[pid].decays):
+#            if d.br > 0.0 or not ignorenobr:
 #                products_str = "   ".join(map(str, d.ids))
 #                out += sep + fmte % d.br + sep + "%d" % len(d.ids) + sep + products_str + "\n"
 #        out += "\n"
 #    return out
+
+    for pid, particle in sorted(decays.iteritems()):
+        out += ("DECAY %d " + fmte + "\n") % (particle.pid, particle.totalwidth or -1)
+        for d in sorted(particle.decays):
+           if d.br > 0.0 or not ignorenobr:
+                products_str = "   ".join(map(str, d.ids))
+                out += sep + fmte % d.br + sep + "%d" % len(d.ids) + sep + products_str + "\n"
+        out += "\n"
+    return out
 
 
 
