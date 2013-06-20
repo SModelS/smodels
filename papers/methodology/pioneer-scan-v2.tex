@@ -18,6 +18,7 @@
 \usepackage{indentfirst} % activate indent in the first paragraph
 \usepackage{epstopdf}
 \usepackage{tikz}
+\usepackage{longtable,multirow}
 \usetikzlibrary{shapes,arrows}
 
 \bibliographystyle{utphys}
@@ -67,7 +68,8 @@ preprint numbers
 %B.~Dumont$^{1}$\footnote[2]{Email: dumont@lpsc.in2p3.fr},
 Sabine~Kraml$^{1}$\footnote[1]{Email: sabine.kraml@lpsc.in2p3.fr},
 Suchita~Kulkarni$^{1}$\footnote[2]{Email: suchita.kulkarni@lpsc.in2p3.fr},
-Wolfgang Waltenberger$^{2}$\footnote[3]{Email: wolfgang.waltenberger@oeaw.ac.at}
+Andre~Lessa$^{2}$\footnote[3]{Email: lessa@if.usp.br},
+Wolfgang Waltenberger$^{3}$\footnote[4]{Email: wolfgang.waltenberger@oeaw.ac.at}
 } 
 
 \renewcommand{\thefootnote}{\arabic{footnote}}
@@ -76,13 +78,19 @@ Wolfgang Waltenberger$^{2}$\footnote[3]{Email: wolfgang.waltenberger@oeaw.ac.at}
 {\normalsize \it 
 $^1\,$Laboratoire de Physique Subatomique et de Cosmologie, UJF Grenoble 1,
 CNRS/IN2P3, INPG, 53 Avenue des Martyrs, F-38026 Grenoble, France\\[2mm]
-$^2\,$Institut f\"ur Hochenergiephysik,  \"Osterreichische Akademie der Wissenschaften,\\ Nikolsdorfer Gasse 18, 1050 Wien, Austria\\[1mm]
+$^2\,$Instituto de F\'isica, Universidade de S\~ao Paulo, S\~ao Paulo - SP, Brazil\\[2mm]
+$^3\,$Institut f\"ur Hochenergiephysik,  \"Osterreichische Akademie der Wissenschaften,\\ Nikolsdorfer Gasse 18, 1050 Wien, Austria\\[1mm]
 }
 
 \vspace{1cm}
 
 \begin{abstract}
-  Abstract
+We present a general procedure to decompose any Beyond the Standard Model (BSM) collider signatures presenting
+a $\mathbb{Z}_2$ symmetry into Simplified Model Spectrum topologies. Our method provides a way
+to cast any BSM predictions for the LHC in a model independent framework, which can be directly
+confronted with experimental constraints. As a show-case example we apply
+our procedure to 7-parameter realization of the MSSM and discuss some of the consequences
+of the current LHC constraints.
 \end{abstract}
 
 \end{center}
@@ -94,11 +102,11 @@ $^2\,$Institut f\"ur Hochenergiephysik,  \"Osterreichische Akademie der Wissensc
 \section{Introduction}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Searches at the ATLAS and CMS experiments at the LHC show no signs of new physics whatsoever. 
+Searches at the ATLAS and CMS experiments at the LHC show no signs of physics beyond the
+Standard Model (BSM). 
 After the first phase of LHC operation at centre-of-mass energies of 7--8~TeV in 2010--2012, 
-the limits for the masses of supersymmetric particles, in particular of  squarks and gluinos, 
-have been pushed well into the TeV range~\cite{atlas:susy:twiki,cms:susy:twiki}. 
-%See \cite{atlas:susy:twiki,cms:susy:twiki} for the latest results.
+the limits for the masses of supersymmetric particles, in particular of 1st/2nd generation
+ squarks and gluinos, have been pushed well into the TeV range~\cite{atlas:susy:twiki,cms:susy:twiki}. 
 Likewise, precision measurements in the flavor sector, in particular in $B$-physics, 
 are well consistent with Standard Model (SM) expectations~\cite{Amhis:2012bh,lhcb:2012ct} 
 and show no sign, or need, of new physics. 
@@ -112,7 +120,7 @@ So, the Higgs has very likely been discovered---but where is supersymmetry?
 Looking closely \cite{Sekmen:2011cz,Arbey:2011un,Papucci:2011wy,CahillRowley:2012kx,Dreiner:2012gx,Mahbubani:2012qq} 
 one soon realizes that many of the current limits on SUSY particles are based 
 on severe model assumptions, which impose particular relations between particle masses, decay 
-branching rations, {\it etc}. The prime example is the interpretation of the search results within the 
+branching ratios, {\it etc}. The prime example is the interpretation of the search results within the 
 Constrained Minimal Supersymmetric Standard Model (CMSSM). Another approach, which   
 has become quite standard for the experiments, is to interpret the results 
 within so-called Simplified Model Spectra \cite{Okawa:2011xg,cms:2013wc}.  
@@ -123,10 +131,13 @@ On the whole, a large variety of results on searches in many different channels\
 
 In this paper, we present a method to decompose the signal of an arbitrary SUSY spectrum into simplified model  
 topologies and thus test it against all the existing bounds derived in the SMS context. 
-As we will show, this allows a vast survey of general and less general SUSY models, and enormously simplifies the task of designing the regions of parameter space which are still allowed, and/or have not yet been explored, by the current searches.
+As we will show, this allows a vast survey of general and less general SUSY models, and enormously simplifies the task of designing the regions of parameter space which are still allowed by the current searches.
+Our method also allows us to discuss the current coverage of the simplified models considered so far
+by the ATLAS and CMS searches. We can, for instance, identify possible regions 
+of parameter space which are not tested by any of the simplified models assumed by the current searches.
 A scan over a 7-parameter realization of the MSSM is used as a show-case example to demonstrate the power of our method. 
 Even in this example of limited complexity (as compared to, \eg, the 19-parameter phenomenological MSSM or the completely general MSSM with more than 100 free parameters) it turns out that large regions of interesting parameter space with SUSY particles below 1~TeV %survive the current bounds. 
-remain unchallenged by the current bounds.
+remain unchallenged by the current bounds. 
 
 %The question what we really know about SUSY in general has been adressed in \cite{Sekmen:2011cz,Arbey:2011un,Papucci:2011wy,CahillRowley:2012kx} and some loopholes for evading the mainstream limits have been pointed out in, \eg, \cite{Dreiner:2012gx,Mahbubani:2012qq}. A recast of SMS limits onto minimal supergravity was attempted in \cite{Gutschow:2012pw}.
 
