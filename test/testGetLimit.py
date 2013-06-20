@@ -43,7 +43,8 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
     hL = ROOT.TH2F('hL','hL',bx,xmin,xmin+bx*bwx,by,ymin,ymin+by*bwy)
     prod_mode = topo
     if topo=="T1tttt" or topo=="T1bbbb": prod_mode = "T1"
-    if topo=="TChiChipmSlepL" or topo=="TChiChipmSlepStau" or topo=="TChiChipmStauStau": prod_mode = "TChiWZ_Wino"
+    if topo=="TChiChipmSlepL" or topo=="TChiChipmSlepStau" or topo=="TChiChipmStauStau" or topo=="TChiChipmStauL" or topo=="TChiWZ": prod_mode = "TChiWZ_Wino"
+    if topo=="T2": prod_mode = "T24sq"
     rootname = "../data/%s_%devts.root" %(prod_mode,nevents)
     if binsize: rootname =  "../data/%s_%devts_%sGeVbin.root" %(prod_mode,nevents,binsize)
     f=ROOT.TFile(rootname)

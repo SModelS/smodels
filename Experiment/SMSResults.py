@@ -289,10 +289,10 @@ def getInterpolatedUpperLimit ( Dict, inmx, inmy ):
 
 def getUpperLimitFromDictionary ( analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False ):
   """ shouldnt have to call this directly. It's obtaining an upper limit from the python dictionary """
-  if interpolate:
-    print "[SMSResults.py] error: need to implement interpolation function for getUpperLimitFromDictionary"
-    import sys
-    sys.exit(0)
+#  if interpolate:
+#    print "[SMSResults.py] error: need to implement interpolation function for getUpperLimitFromDictionary"
+#    import sys
+#    sys.exit(0)
   Dict=SMSHelpers.getUpperLimitDictionary ( analysis, topo, run )
   if Dict==None: return Dict
   ## Dict=addunit ( Dict, "pb" )
@@ -317,7 +317,7 @@ def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None, interp
       if png==True, return path of pngfile containing the histogram"""
   run=SMSHelpers.getRun ( analysis, run )
   if SMSHelpers.hasDictionary ( analysis, run ):
-    return getUpperLimitFromDictionary ( analysis, topo, mx, my, run, interpolate )
+    return getUpperLimitFromDictionary ( analysis, topo, mx, my, run, interpolate=interpolate )
   histo=SMSHelpers.getUpperLimitFromHisto ( analysis, topo, run )
   if png==True:
     pngfile=SMSHelpers.getUpperLimitPng(analysis,topo,run)
