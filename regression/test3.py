@@ -127,8 +127,8 @@ for Analysis in ListOfAnalyses:
 
 
   for res in Analysis.results.keys():
-    theoRes = Analysis.evaluateResult(res) #Theoretical values for result and conditions
-    
+    theoRes = Analysis.evaluateResult() #Theoretical values for result and conditions
+    if not theoRes: continue
 
     try:
       plot = Analysis.plots[res]
