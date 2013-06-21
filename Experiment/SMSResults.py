@@ -258,10 +258,41 @@ def inConvexHull(Dict, mx, my):
   return dela.find_simplex((mx, my))>=0
 
 def getInterpolatedUpperLimit ( Dict, inmx, inmy ):
+  """ get interpolated upper limit from dictionary at point (inmx, inmy)
+      :param Dict: dictionray (sms.py), contains upper limits of one analysis and one topology
+      :param inmx: mass point on x-axis
+      :param inmy: mass point on y-axis
+      :returns: interpolated upper limit at point (inmx, inmy) """
+  import numpy as np
+  import scipy.interpolate as ip
+  mx = rmvunit(inmx,'GeV')
+  my = rmvunit(inmy,'GeV')
+  if not inConvexHull(Dict, mx, my):
+    print "[SMSResults.getInterpolatedUpperLimit] Can\'t interpolate for (%f,%f), point is not in convex hull." %(inmx, inmy)
+    return None
+  n = 0
+  for k in Dict:
+    n += len(Dict[k])
+  points = np.zeros((n, 2))
+  values = np.zeros((n))
+  i = 0
+  for x in Dict:
+    for y in Dict[x]:
+      points[i] = [x,y]
+      values[i] = Dict[x][y]
+      i += 1
+  grid_x = np.zeros((1,1))
+  grid_y = np.zeros((1,1))
+  grid_x = mx
+  grid_y = my
+  return float(ip.griddata(points, values, (grid_x, grid_y), method='linear'))
+
+"""
+def getInterpolatedUpperLimit ( Dict, inmx, inmy ):
   import sys
   if Dict==None: return None
   if len(Dict)==0: return None
-  """ get the upper limit, interpolate from (at most) four neighbours in Dict """
+  """""" get the upper limit, interpolate from (at most) four neighbours in Dict """"""
   #print "[SMSResults.py] debug closest value is",getClosestValue ( Dict,mx,my)
   # Large=99999.
   # Neighbors=[ [Large,0.],[Large,0.],[Large,0.],[Large,0.] ]
@@ -286,6 +317,7 @@ def getInterpolatedUpperLimit ( Dict, inmx, inmy ):
 
   #print "interpolating",Neighbors,ret
   return ret
+"""
 
 def getUpperLimitFromDictionary ( analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False ):
   """ shouldnt have to call this directly. It's obtaining an upper limit from the python dictionary """
