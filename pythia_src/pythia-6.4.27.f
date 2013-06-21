@@ -4863,7 +4863,7 @@ C...Check that no odd resonance left undecayed.
       NFIX=N
       DO 120 I=MINT(84)+1,NFIX
         IF(K(I,1).GE.1.AND.K(I,1).LE.10.AND.K(I,2).NE.21.AND.
-     &  K(I,2).NE.22) THEN
+     &  K(I,2).NE.22.AND.MSTP(41).GE.1) THEN                        !!!!!! Modified by user (added MSTP(41) > 0)
           KCA=PYCOMP(K(I,2))
           IF(MWID(KCA).NE.0.AND.MDCY(KCA,1).GE.1) THEN
             CALL PYRESD(I)
@@ -17269,6 +17269,7 @@ C...(Phys. Rev. D33, 665, plus errata from the authors).
       DJGK(DT,DU)=8D0*(D34+D56)**2-8D0*(D34+D56)*(DT+DU)-6D0*DT*DU-
      &2D0*DT*DU*(DT*DU/(D34*D56)-2D0*(1D0/D34+1D0/D56)*(DT+DU)+
      &2D0*(D34/D56+D56/D34))
+
  
 C...Some general constants.
       XW=PARU(102)
