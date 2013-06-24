@@ -68,18 +68,18 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
 
     if process!='st' and o[1]=='T':
         if Energy == 7:
-            if process=='gg' and squarkmass/gluinomass > 10:
+            if process=='gg' and gluinomass > 0. and squarkmass/gluinomass > 10:
               process='gdcpl'
               mass = gluinomass
-            elif process=='sb' and gluinomass/squarkmass > 10:
+            elif process=='sb' and squarkmass > 0. and gluinomass/squarkmass > 10:
               process='sdcpl'
               mass = squarkmass
             else: return Values_7TeV
         if Energy == 8:
-            if process=='gg' and squarkmass/gluinomass > 10:
+            if process=='gg' and gluinomass > 0. and squarkmass/gluinomass > 10:
               process='gdcpl'
               mass = gluinomass
-            elif process=='sb'and gluinomass/squarkmass > 10:
+            elif process=='sb' and squarkmass > 0. and gluinomass/squarkmass > 10:
               process='sdcpl'
               mass = squarkmass
             else: return Values_8TeV
@@ -108,7 +108,7 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
         os.chdir( wd ) # make sure we always chdir back
 
 # uncomment this line to see the nll fast output
-#   print "nllfast output is:  ", o
+#    print "nllfast output is:  ", o
 
     if o[1]=='T' and Energy  == 7:
         print "[NLLXSec.py] how can I end up here? A. o=",o
