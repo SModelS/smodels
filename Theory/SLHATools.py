@@ -10,7 +10,7 @@
 
 """ A collection of tools needed for use and manipulation of SLHA files """
 
-import pyslha2
+import pyslha
 import tempfile
 import os
 
@@ -32,7 +32,7 @@ def createSLHAFile(topo, masses = None, filename = None, branching = None, total
      :returns: the filename in string format
      """
 
-   slha = pyslha2.readSLHAFile('../slha/%s.slha' %topo)
+   slha = pyslha.readSLHAFile('../slha/%s.slha' %topo)
 
    if masses:
       for pid in masses:
@@ -49,7 +49,7 @@ def createSLHAFile(topo, masses = None, filename = None, branching = None, total
             del slha[1][pid].decays[k]
       for pid in branching:
          if not slha[1].has_key(pid):
-            slha[1][pid] = pyslha2.Particle(pid)
+            slha[1][pid] = pyslha.Particle(pid)
             print "[SLHATools.py] Created new decay object for pid %d" %pid
 #         print 'number of decays:', len(slha[1][pid].decays)
          for decay in branching[pid]:
@@ -61,13 +61,13 @@ def createSLHAFile(topo, masses = None, filename = None, branching = None, total
    if totalwidth:
       for pid in totalwidth:
          if not slha[1].has_key(pid):
-            slha[1][pid] = pyslha2.Particle(pid)
+            slha[1][pid] = pyslha.Particle(pid)
          slha[1][pid].totalwidth = totalwidth[pid]
 
    if filename:
-      pyslha2.writeSLHAFile(filename, slha)
+      pyslha.writeSLHAFile(filename, slha[0], slha[1])
       return filename
    else:
       filename = tempfile.mkstemp()
-      pyslha2.writeSLHAFile(filename[1], slha)
+      pyslha.writeSLHAFile(filename[1], slha[0], slha[1])
       return filename[1]

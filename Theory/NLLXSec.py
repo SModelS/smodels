@@ -12,7 +12,7 @@
 
 """
 
-import sys, commands, os, pyslha2
+import sys, commands, os, pyslha
 from Tools.PhysicsUnits import addunit
 
 squarks = [1000001,2000001,1000002,2000002,1000003,2000003,1000004,2000004]
@@ -174,7 +174,7 @@ def getNLLresult(pdgid1,pdgid2,inputfile,base="../nllfast",pdf="cteq"):
          input file are too light (ratio to mothers must be < 10 )
     """ 
     
-    readfile=pyslha2.readSLHAFile(inputfile)
+    readfile=pyslha.readSLHAFile(inputfile)
     gluinomass = abs(readfile[0]['MASS'].entries[1000021])
     squarkmass = (abs(readfile[0]['MASS'].entries[1000001])+abs(readfile[0]['MASS'].entries[2000001])+abs(readfile[0]['MASS'].entries[1000002])+abs(readfile[0]['MASS'].entries[2000002])+abs(readfile[0]['MASS'].entries[1000003])+abs(readfile[0]['MASS'].entries[2000003])+abs(readfile[0]['MASS'].entries[1000004])+abs(readfile[0]['MASS'].entries[2000004]))/8
 
