@@ -14,6 +14,17 @@ from Tools.PhysicsUnits import addunit, rmvunit
 from SMSResultsCollector import SMSInfo
 from Tools import RCFile, PhysicsUnits
 
+def getAllHistNames (ana, topo, run=None):
+  """ for a given analysis, topology, return list of all available histograms"""
+  import SMSInterpolation
+  ret = []
+  dic_list = getaxes(ana,topo,run)
+  if not dic_list: return None #topology not found
+  if len(dic_list)==1 and not dic_list[0]['mz']: return [SMSInterpolation.gethistname(topo,None)]
+  for dic in dic_list:
+    ret.append(SMSInterpolation.gethistname(topo,dic["mz"][0]))
+  return ret
+
 def setLogLevel ( l=[ "error" ] ):
   """ defines what is written out, and what isnt """
   SMSHelpers.logLevel=l
