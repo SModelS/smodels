@@ -64,10 +64,10 @@ def parseMetaInfo ( analysis, run ):
   for line in lines:
     if line.find("#")>-1:
       line=line[:line.find("#")].strip()
-    if line=="": continue
+    if line=="" or line=="\n": continue
     tokens=line.split(":",1)
     if not len(tokens)==2:
-      log ( "[117] cannot parse this line (1): %s in %s" % (line, info) )
+      log ( "[117] cannot parse this line (1): ``%s'' in ``%s''" % (line, info) )
       continue
     if tokens[0]=="exclusions":
       # we treat these separately
