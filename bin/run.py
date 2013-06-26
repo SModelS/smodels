@@ -31,10 +31,11 @@ for Analysis in analyses:
   lims=LimitGetter.limit ( Analysis )
   if len(lims)==0: continue
   print "[run.py] -------------------------------------------------"
-  print "[run.py] analysis=",Analysis,"lims=",lims
-  Analysis.evaluateResult()
+  print "[run.py] analysis=",Analysis ## ,"lims=",lims
+  Ret=Analysis.evaluateResult()
   if len(Analysis.ResultList)==0: continue
   for cluster in Analysis.ResultList:
+    print "type.cluster=",type(cluster)
     theoRes=cluster.result_dic
-    print "[run.py] ****"
-    print "[run.py] theoRes=",theoRes
+    #print "[run.py] ****"
+    #print "[run.py] theoRes=",theoRes
