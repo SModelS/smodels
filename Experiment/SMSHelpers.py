@@ -111,12 +111,16 @@ def motherParticleExclusions ( analysis, run ):
     ret[excls[0]]=values
   return ret
 
+mlines={}
 def getLines ( analysis, run, label="condition" ):
   """ get all the conditions for a analysis/run pair """
+  key=analysis+run+label
+  if mlines.has_key ( key ): return mlines[key]
   info="%s/%s/%s/info.txt" % ( Base, run, analysis )
   ret={}
   if not os.path.exists ( info ):
     log ("cannot find %s" % info )
+    mlines[key]=ret
     return ret
   f=open(info)
   lines=f.readlines()
@@ -140,6 +144,7 @@ def getLines ( analysis, run, label="condition" ):
       log ( "[185] cannot parse the following line: %s" % keyvalue )
     ret[ keyvalue[0] ] = keyvalue[1]
     # ret.append(excl)
+  mlines[key]=ret
   return ret
 
 def conditions ( analysis, run ):
@@ -234,11 +239,15 @@ def getUpperLimitPng(analysis,topo,run):
     return None
   return pngfile
 
+effhistos={}
 def getEfficiencyHisto ( analysis, topo, run ):
+  key=analysis+topo+str(run)
+  if effhistos.has_key ( key ): return effhistos[key]
   import ROOT
   rootfile="%s/%s/%s/sms.root" % ( Base, run, analysis )
   if not os.path.exists(rootfile):
     log("root file %s doesnt exist" % rootfile )
+    effhistos[key]=None
     return None
   f=None
   if openFiles.has_key ( rootfile ):
@@ -247,12 +256,15 @@ def getEfficiencyHisto ( analysis, topo, run ):
     f=ROOT.TFile(rootfile)
     if not f or not f.IsOpen():
       log("root file %s cannot be opened" % rootfile )
+      effhistos[key]=None
       return None
     openFiles[rootfile]=f
   histo=f.Get("efficiency_%s" % topo )
   if not histo:
     log("histogram %s not found in %s" % ( topo, rootfile ))
+    effhistos[key]=None
     return None
+  effhistos[key]=histo
   return histo
 
 def getEfficiencyAtPoint ( histo, mx, my ):
