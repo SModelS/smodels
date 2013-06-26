@@ -4,7 +4,7 @@
 .. module:: SMSHelpers
     :synopsis: Some helper functions that are not to be used by the end user.
 
-.. moduleauthor:: missing <email@example.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>, Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>, Doris Proschofsky <Doris.Proschofsky@assoc.oeaw.ac.at>
 
 """
 
