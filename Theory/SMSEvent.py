@@ -34,7 +34,7 @@ class SMSEvent:
         momspdg.append( p.pdg )
         imom += 1
     if imom != 2:
-        print "getMom: Number of mother particles != 2"
+        print "[SMSEvent.getMom]: Number of mother particles %d != 2" % imom
         return None
     if momspdg[0] > momspdg[1]:
         momspdg[0], momspdg[1] = momspdg[1], momspdg[0]
