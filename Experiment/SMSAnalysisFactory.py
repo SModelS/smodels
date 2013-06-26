@@ -2,13 +2,11 @@
 
 """
 .. module:: SMSAnalysisFactory
-    :synopsis: missing
+    :synopsis:  unit that creates a list of EAnalysis objects from a results database
 
-.. moduleauthor:: missing <email@example.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
-
-
 
 def getRealTopo ( Tx ):
   """ T3w025 -> T3w, etc """
@@ -35,14 +33,17 @@ def getArray ( constraint ):
   ret=eval(c)
   return ret
 
-def load( anas = None, topos=None ):
+def load( anas = None, topos=None, sqrts= [ 7, 8 ] ):
   """ This method creates the analysis objects from the info given in the 
       SMS database, returns ListOfAnalyses. 
       If anas is given as a list, then we create only objects for these analyses
       (the database naming convention is used). 
-      If topos is given as a list, then only these topos are considered """
+      If topos is given as a list, then only these topos are considered.
+      :param sqrts: array of center-of-mass energies of the analyses that are to be considered.
+  """
   from Theory.SMSAnalysis import EAnalysis
   from Experiment import SMSResults
+  from Tools.PhysicsUnits import rmvunit
   import types
 
   ## lets make sure the user can also supply a single topo/ana
@@ -63,6 +64,13 @@ def load( anas = None, topos=None ):
     if debug:
       print 
       print "Building analysis",analysis
+    Ss=rmvunit(SMSResults.getSqrts( analysis ),"TeV")
+    if Ss==None:
+      print "SS=",Ss,analysis
+      continue
+    Ss=int(Ss)
+    if not Ss in sqrts:
+      continue
     for Tx in SMSResults.getTopologies(analysis):
       if topos!=None and Tx not in topos: continue
       if debug: print Tx,
