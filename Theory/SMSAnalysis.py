@@ -257,10 +257,10 @@ class EAnalysis:
     xmass2 = LimitGetter.GetPlotLimit(mass2,self,complain=False)
 
     if type(xmass1) != type(addunit(1.,'pb')) and (xmass1==None or xmass1==False):
-      print "[SMSAnalysis.MassDist] no limit for plot 1"
+      print "[SMSAnalysis.MassDist] no limit for plot 1, masses=",mass1
       return None
     if type(xmass2) != type(addunit(1.,'pb')) and (xmass2==None or xmass2==False):
-      print "[SMSAnalysis.MassDist] no limit for plot 2"
+      print "[SMSAnalysis.MassDist] no limit for plot 2, masses=",mass2
       return None
 
     x1 = rmvunit(xmass1,'fb')
