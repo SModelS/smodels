@@ -35,28 +35,38 @@ def log ( text, level="error" ):
     print "[SMSHelpers.py] %s: %s" % ( level, text )
   return
 
+runs_={}
 def getRun ( analysis, run=None ):
   """ search for an analysis, return the run,
       or return None if not found anywhere.
       if a specific run is given, then just check
       if we really have results. """
+  key=analysis+str(run)
+  if runs_.has_key ( key ): return runs_[key]
   if run:
     if os.path.exists ( "%s/%s/%s" % ( Base, run, analysis ) ):
+      runs_[key]=run
       return run
 #    else:
 #      log ( "dont know about %s/%s" % (run,analysis), "warning" )
 #      return None
   for trun in runs:
     if os.path.exists ( "%s/%s/%s" % ( Base, trun, analysis ) ):
+      runs_[key]=trun
       return trun
+  runs_[key]=None
   return None
 
+pMI_={}
 def parseMetaInfo ( analysis, run ):
   """ get all the meta information for a given analysis/run pair """
+  key=analysis+run
+  if pMI_.has_key ( key ): return pMI_[key]
   info="%s/%s/%s/info.txt" % ( Base, run, analysis )
   ret={}
   if not os.path.exists ( info ):
     log ( "cannot find %s" % info, "warning" )
+    pMI_[key]=ret
     return ret
   f=open(info)
   lines=f.readlines()
@@ -75,6 +85,7 @@ def parseMetaInfo ( analysis, run ):
       # we treat these separately
       continue
     ret[tokens[0]]=tokens[1]
+  pMI_[key]=ret
   return ret
 
 def motherParticleExclusions ( analysis, run ):
