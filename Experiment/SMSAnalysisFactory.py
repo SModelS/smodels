@@ -34,12 +34,14 @@ def getArray ( constraint ):
   return ret
 
 def load( anas = None, topos=None, sqrts= [ 7, 8 ] ):
-  """ This method creates the analysis objects from the info given in the 
-      SMS database, returns ListOfAnalyses. 
-      If anas is given as a list, then we create only objects for these analyses
-      (the database naming convention is used). 
-      If topos is given as a list, then only these topos are considered.
-      :param sqrts: array of center-of-mass energies of the analyses that are to be considered.
+  """ This method creates the analysis objects from the info given in the SMS
+    results database.
+
+    :param anas: if given as a list, then we create only objects for these analyses
+    (the database naming convention is used).
+    :param topos: if given as a list, then only these topos are considered.
+    :param sqrts: array of center-of-mass energies of the analyses that are to be considered.
+    :returns: list of EAnalyses
   """
   from Theory.SMSAnalysis import EAnalysis
   from Experiment import SMSResults
@@ -50,7 +52,7 @@ def load( anas = None, topos=None, sqrts= [ 7, 8 ] ):
   ## without having to code an array
   if type(topos)==types.StringType: topos = [ topos ]
   if type(anas)==types.StringType: anas = [ anas ]
-  
+
   ListOfAnalyses = []
 
   debug=False
@@ -62,7 +64,7 @@ def load( anas = None, topos=None, sqrts= [ 7, 8 ] ):
   if anas==None: anas=SMSResults.getAllResults().keys()
   for analysis in anas:
     if debug:
-      print 
+      print
       print "Building analysis",analysis
     Ss=rmvunit(SMSResults.getSqrts( analysis ),"TeV")
     if Ss==None:
@@ -97,7 +99,7 @@ def load( anas = None, topos=None, sqrts= [ 7, 8 ] ):
         # vertparts1 = [ len(x) for x in constrarray[branch] ]
       #  vertparts1.append(0)
       #  Analysis.Top.B[branch].vertparts = vertparts1
-      
+
       cond=SMSResults.getConditions ( analysis, topo=stopo )
       if cond==None: cond=""
       andreconstraint=constraint.replace("'","").replace(" ","")
@@ -109,7 +111,7 @@ def load( anas = None, topos=None, sqrts= [ 7, 8 ] ):
 
       # ul=SMSResults.getUpperLimit ( analysis, Tx, mx=400., my=100., interpolate=True )
 #      print "[SMSAnalysisFactory] test for %s:%s ul(mx=400,my=100)=%s" % ( analysis, Tx, ul )
-      
+
   #Add analysis to list of analyses:
       ListOfAnalyses.append(Analysis)
       #print "done."
@@ -121,9 +123,9 @@ def load( anas = None, topos=None, sqrts= [ 7, 8 ] ):
 #    print "[SMSAnalysisFactory.py] Generate element ``%s [%s]'' " % ( Analy.label,Analy.run )
     Analy.generateElements()
     Analy.getPlots(verbose=debug)
-    
-  return ListOfAnalyses  
-    
+
+  return ListOfAnalyses
+
 if __name__ == "__main__":
   load()
   print "List of analyses/results: "
