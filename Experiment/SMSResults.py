@@ -4,7 +4,7 @@
 .. module:: SMSResults
     :synopsis: Centralized facility to access the SMS results.
 
-.. moduleauthor:: missing <email@example.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>, Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>, Doris Proschofsky <Doris.Proschofsky@assoc.oeaw.ac.at>
 
 """
 
