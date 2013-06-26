@@ -166,11 +166,16 @@ def getCanonicalName ( topo ):
   topo=topo.replace("w","W").replace("z","Z" )
   return topo
 
+upperLimitHisto={}
 def getUpperLimitFromHisto ( analysis, topo, run, complain=False ):
+  key=analysis+topo+str(run)
+  if upperLimitHisto.has_key ( key ): return upperLimitHisto[key]
+
   import ROOT
   rootfile="%s/%s/%s/sms.root" % ( Base, run, analysis )
   if not os.path.exists(rootfile):
     log("root file %s doesnt exist" % rootfile, "warning" )
+    upperLimitHisto[key]=None
     return None
   f=None
   if openFiles.has_key ( rootfile ):
@@ -179,12 +184,15 @@ def getUpperLimitFromHisto ( analysis, topo, run, complain=False ):
     f=ROOT.TFile(rootfile)
     if not f or not f.IsOpen():
       log("root file %s cannot be opened" % rootfile )
+      upperLimitHisto[key]=None
       return None
     openFiles[rootfile]=f
   histo=f.Get("limit_%s" % getCanonicalName(topo) )
   if not histo:
     if complain: log("histogram %s not found in %s" % ( topo, rootfile ))
+    upperLimitHisto[key]=None
     return None
+  upperLimitHisto[key]=histo
   return histo
 
 def getUpperLimitAtPoint ( histo, mx, my, interpolate=False ):
@@ -295,18 +303,25 @@ def hasMetaInfoField ( analysis, field, run=None ):
   metainfo=parseMetaInfo ( analysis, run )
   return metainfo.has_key ( field )
 
+infoFields={}
 def getMetaInfoField ( analysis, field, run=None, complain=False ):
   """ get one specific entry of the meta info """
+  key=analysis+field+str(run)
+  if infoFields.has_key ( key ): return infoFields[key]
   run=getRun ( analysis, run )
   metainfo=parseMetaInfo ( analysis, run )
   if not metainfo.has_key ( field ):
     if complain:
       log ( "%s/%s doesnt have a ``%s'' field." % ( run, analysis, field ) )
+    infoFields[key]=None
     return None
   f=metainfo[field]
-  if len(f)==0: return f
+  if len(f)==0: 
+    infoFields[key]=f
+    return f
   while f[0]==' ': f=f[1:]
   if f[-1]=='\n': f=f[:-1]
+  infoFields[key]=f
   return f
 
 dicparticle = { 
@@ -344,15 +359,21 @@ def hasDictionary ( analysis, run=None ):
     if hd in [ '1', 'True' ]: return True
   return False
 
+upperLimitDict={}
 def getUpperLimitDictionary ( analysis, topo, run ):
+  key=analysis+topo+str(run)
+  if upperLimitDict.has_key ( key ): return upperLimitDict[key]
   dictfile="%s/%s/%s/sms.py" % ( Base, run, analysis )
   if not os.path.exists(dictfile):
     log("in getUpperLimitDictionary, dictionary file %s doesnt exist" % dictfile )
+    upperLimitDict[key]=None
     return None
   Globals={}
   execfile(dictfile,Globals)
   Dict=Globals["Dict"]
   if not Dict.has_key ( topo ):
     log("dictionary doesnt have topology"+topo, "warning" )
+    upperLimitDict[key]=None
     return None
+  upperLimitDict[key]=Dict[topo]
   return Dict[topo]

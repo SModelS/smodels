@@ -211,9 +211,14 @@ def getAnalyses ( topo, run=None ):
 
   return analyses.keys()
 
+allresults={}
+
 def getAllResults ( run=None ):
   import os
   """ returns all analyses and the topologies they have results for """
+  key=str(run)
+  if allresults.has_key ( key ):
+    return allresults[key]
   runs=SMSHelpers.runs
   if run: runs= [ run ]
   ret={}
@@ -224,6 +229,7 @@ def getAllResults ( run=None ):
       if os.path.exists ( "%s/%s/%s/info.txt" % ( SMSHelpers.Base, r, ana ) ):
         topos=getTopologies ( ana, run )
         ret[ana]=topos
+  allresults[key]=ret
   return ret
 
 def getClosestValue ( Dict, mx, my ):
@@ -430,25 +436,43 @@ def getComment ( analysis, run=None ):
   """ an option comment? """
   return SMSHelpers.getMetaInfoField ( analysis, "comment", run )
 
+conditions={}
+
 def getConditions ( analysis, topo="all", fuzzy=True, run=None ):
   """ get the conditions. if topo is "all",
       returns a dictionary, else it returns the condition
       only for the given topo, None if non-existent. """
+  key=analysis+topo+str(fuzzy)+str(run)
+  if conditions.has_key ( key ): return conditions[key]
   run=SMSHelpers.getRun ( analysis, run )
   if fuzzy: ret = SMSHelpers.fuzzyconditions ( analysis, run)
   else: ret = SMSHelpers.conditions ( analysis, run )
-  if topo=="all": return ret
-  if not ret.has_key ( topo ): return None
+  if topo=="all": 
+    conditions[key]=ret
+    return ret
+  if not ret.has_key ( topo ): 
+    conditions[key]=None
+    return None
+  conditions[key]=ret[topo]
   return ret[topo]
+
+constraints={}
 
 def getConstraints ( analysis, topo="all", run=None ):
   """ get the constraints. if topo is "all", 
       returns a dictionary, else it returns the constraint
       only for the given topo, None if non-existent. """
+  key=analysis+topo+str(run)
+  if constraints.has_key ( key ): return constraints[key]
   run=SMSHelpers.getRun ( analysis, run )
   ret = SMSHelpers.constraints ( analysis, run )
-  if topo=="all": return ret
-  if not ret.has_key ( topo ): return None
+  if topo=="all": 
+    constraints[key]=ret
+    return ret
+  if not ret.has_key ( topo ): 
+    constraints[key]=None
+    return None
+  constraints[key]=ret[topo]
   return ret[topo]
 
 def getRequirement ( analysis, run=None ):
