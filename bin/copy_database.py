@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+""" a simple script that downloads the results database to a target directory, either locally via 'cp' (needs an afs installation on this machine), or via scp to smodels """
+
 import os, sys
 
 def usage():
