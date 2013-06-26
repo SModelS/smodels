@@ -36,31 +36,13 @@ def setBase ( base ):
 def useUnits ( b=True ):
   PhysicsUnits.useUnits = b
 
-'''
-This function should not be used! Use considerRuns() instead!
-
-def ResultsForSqrts ( sqrts ):
-  import SMSResultsCollector
-  """ If this is called, only results for a
-      center of mass energy of sqrts in TeV will be retrieved.
-      if sqrts is None or 0, then all results will be made available """
-  if sqrts==7:
-    SMSHelpers.runs=[ "2012", "2011" ]
-    SMSResultsCollector.alldirectories=[ "2011", "2012" ]
-    return
-  if sqrts==8:
-    SMSHelpers.runs=[ "8TeV", "ATLAS8TeV" ]
-    SMSResultsCollector.alldirectories=[ "8TeV", "ATLAS8TeV" ]
-    return
-  if sqrts==0 or sqrts==None:
-    SMSHelpers.runs=[ "8TeV", "2012", "2011", "ATLAS8TeV" ]
-    SMSResultsCollector.alldirectories=[ "8TeV", "2012", "2011", "ATLAS8TeV" ]
-    return
-  print "[SMSResults.py:ResultsForSqrts] error: dont have any results for",sqrts
-'''
-
 def considerRuns(run = None):
-  """ needs runs as a list. if no runs are given, all existing runs will be taken into account"""
+  """ 
+    defines what runs are to be considered when asking for results.
+
+    :param run: a list of runs to be considered, e.g. [ '2012', '8TeV' ]). If None, all runs are taken into account.
+    :type run: list or NoneType
+  """
   import SMSResultsCollector
   allruns = ["8TeV", "ATLAS8TeV", "RPV8", "2012", "RPV7", "2011"]
   runsort = []
@@ -297,38 +279,6 @@ def getInterpolatedUpperLimit ( Dict, inmx, inmy ):
   grid_x = mx
   grid_y = my
   return float(ip.griddata(points, values, (grid_x, grid_y), method='linear'))
-
-"""
-def getInterpolatedUpperLimit ( Dict, inmx, inmy ):
-  import sys
-  if Dict==None: return None
-  if len(Dict)==0: return None
-  """""" get the upper limit, interpolate from (at most) four neighbours in Dict """"""
-  #print "[SMSResults.py] debug closest value is",getClosestValue ( Dict,mx,my)
-  # Large=99999.
-  # Neighbors=[ [Large,0.],[Large,0.],[Large,0.],[Large,0.] ]
-  Neighbors=[]
-  mx = rmvunit(inmx,'GeV')
-  my = rmvunit(inmy,'GeV')
-  if not inConvexHull(Dict,mx, my): return None
-#  hasNeighbors={ "left": False, "right": False, "up": False, "down": False }
-  for (dmx,dmv) in Dict.items():
-    for (dmy,ul) in dmv.items():
-      dist= (dmx-mx)**2 + (dmy-my)**2 
-#      if dmx-mx < 0.: hasNeighbors["left"]=True
-#      if dmx-mx > 0.: hasNeighbors["right"]=True
-#      if dmy-my < 0.: hasNeighbors["down"]=True
-#      if dmy-my > 0.: hasNeighbors["up"]=True
-      if dist==0.: return ul
-      Neighbors.append ( [ dist, ul ] )
-#  if False in hasNeighbors.values(): return None
-  Neighbors.sort()
-  Neighbors=Neighbors[:4]
-  ret=sum( [ y/x for (x,y) in Neighbors ] ) / sum( [ 1./x for (x,y) in Neighbors ] )
-
-  #print "interpolating",Neighbors,ret
-  return ret
-"""
 
 def getUpperLimitFromDictionary ( analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False ):
   """ shouldnt have to call this directly. It's obtaining an upper limit from the python dictionary """
