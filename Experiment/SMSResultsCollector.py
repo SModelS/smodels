@@ -2,9 +2,9 @@
 
 """
 .. module:: SMSResultsCollector
-    :synopsis: Getting information from "/afs/hephy.at/user/w/walten/public/sms/
+    :synopsis: Getting information from the results database, should not be used directly. Use SMSResults.
 
-.. moduleauthor:: missing <email@example.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>, Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>, Doris Proschofsky <Doris.Proschofsky@assoc.oeaw.ac.at>
 
 """
 
