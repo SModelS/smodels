@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+""" run a modified version of SMSmain.py """
+
 import sys, set_path
 from prettytable import PrettyTable
 from Theory import LHEDecomposer, SLHADecomposer, XSecComputer, ClusterTools

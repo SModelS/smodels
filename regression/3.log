@@ -65,7 +65,7 @@ Total weight =  {'7 TeV (LO)': 1.39E+02 [fb], '8 TeV (LO)': 1.93E+02 [fb], '7 Te
 ---------------Analysis Label =  ATLAS_CONF_2013_037:T2tt
 [SMSResults.getInterpolatedUpperLimit] Can't interpolate for (648.255292,300.681405), point is not in convex hull.
 [SMSResults.getInterpolatedUpperLimit] Can't interpolate for (648.255292,300.681405), point is not in convex hull.
-[SMSAnalysis.MassDist] no limit for plot 1
+[SMSAnalysis.MassDist] no limit for plot 1, masses= [[6.48E+02 [GeV], 3.01E+02 [GeV]], [6.48E+02 [GeV], 3.01E+02 [GeV]]]
 ---------------Analysis Label =  ATLAS_CONF_2013_037:T6bbWW
 ---------------Analysis Label =  ATLAS_CONF_2013_024:T2tt
 +-----------------+-------------------------------+----------------------------+-------------------------------+-------------------------+
@@ -93,7 +93,7 @@ Total weight =  {'7 TeV (LO)': 1.39E+02 [fb], '8 TeV (LO)': 1.93E+02 [fb], '7 Te
 ---------------Analysis Label =  ATLAS_CONF_2012_166:T2tt
 [SMSResults.getInterpolatedUpperLimit] Can't interpolate for (648.255292,300.681405), point is not in convex hull.
 [SMSResults.getInterpolatedUpperLimit] Can't interpolate for (648.255292,300.681405), point is not in convex hull.
-[SMSAnalysis.MassDist] no limit for plot 1
+[SMSAnalysis.MassDist] no limit for plot 1, masses= [[6.48E+02 [GeV], 3.01E+02 [GeV]], [6.48E+02 [GeV], 3.01E+02 [GeV]]]
 ---------------Analysis Label =  ATLAS_CONF_2012_166:T6bbWW
 ---------------Analysis Label =  RAZOR:T2
 ---------------Analysis Label =  ATLAS_CONF_2013_025:T6ttZZ
@@ -110,8 +110,8 @@ Total weight =  {'7 TeV (LO)': 1.39E+02 [fb], '8 TeV (LO)': 1.93E+02 [fb], '7 Te
 ---------------Analysis Label =  alphaT:T1tttt
 ---------------Analysis Label =  alphaT:T2
 ---------------Analysis Label =  alphaT:T1
-[SMSAnalysis.MassDist] no limit for plot 1
-[SMSAnalysis.MassDist] no limit for plot 1
+[SMSAnalysis.MassDist] no limit for plot 1, masses= [[3.04E+02 [GeV], 3.01E+02 [GeV]], [3.04E+02 [GeV], 3.01E+02 [GeV]]]
+[SMSAnalysis.MassDist] no limit for plot 1, masses= [[3.04E+02 [GeV], 3.01E+02 [GeV]], [3.04E+02 [GeV], 3.01E+02 [GeV]]]
 ---------------Analysis Label =  alphaT:T2bb
 +-----------------+-------------------------------+----------------------------+-------------------------------+---------------------------+
 |      Result     |           Conditions          |            Mass            |       Theoretical Value       |    Experimental Limits    |
@@ -165,8 +165,8 @@ Skipping analysis SUS13008:T7btbtWW with more than 3 vertices
 ---------------Analysis Label =  alphaT8TeV:T1tttt
 ---------------Analysis Label =  alphaT8TeV:T2
 ---------------Analysis Label =  alphaT8TeV:T1
-[SMSAnalysis.MassDist] no limit for plot 1
-[SMSAnalysis.MassDist] no limit for plot 1
+[SMSAnalysis.MassDist] no limit for plot 1, masses= [[3.04E+02 [GeV], 3.01E+02 [GeV]], [3.04E+02 [GeV], 3.01E+02 [GeV]]]
+[SMSAnalysis.MassDist] no limit for plot 1, masses= [[3.04E+02 [GeV], 3.01E+02 [GeV]], [3.04E+02 [GeV], 3.01E+02 [GeV]]]
 ---------------Analysis Label =  alphaT8TeV:T2bb
 +-----------------+-------------------------------+----------------------------+-------------------------------+-------------------------------+
 |      Result     |           Conditions          |            Mass            |       Theoretical Value       |      Experimental Limits      |
