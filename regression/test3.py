@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-""" SMSmain.py, turned into a regression test """
-
 import sys, set_path
 from prettytable import PrettyTable
 from Theory import LHEDecomposer, SLHADecomposer, XSecComputer, ClusterTools
@@ -118,7 +116,6 @@ print '\n \n \n'
 for Analysis in ListOfAnalyses:
   print "---------------Analysis Label = ",Analysis.label
   Results_table = PrettyTable(["Result","Conditions","Mass","Theoretical Value","Experimental Limits"])
-  has_line=False
   
   
   if max(Analysis.Top.vertnumb) > 3:
@@ -130,26 +127,19 @@ for Analysis in ListOfAnalyses:
     theoRes = Analysis.evaluateResult() #Theoretical values for result and conditions
     if not theoRes: continue
 
-    try:
-      plot = Analysis.plots[res]
-    except KeyError:  
-      plot = []
-        
-    for imass in range(len(theoRes)):
-      mass = theoRes[imass]['mass']
-      tvalue = theoRes[imass]['result']
-      conds = theoRes[imass]['conditions']
-      sigmalimit = LimitGetter.GetPlotLimit(mass,Analysis)
-      sigmalimit = [Analysis.plots.values()[0][1][0],sigmalimit]
-      
-      if sigmalimit and len(sigmalimit) > 0:
-        has_line=True
-        Results_table.add_row([wrap(printer.pformat(res),width=30),wrap(printer.pformat(conds),width=30),wrap(printer.pformat(mass),width=30),wrap(printer.pformat(tvalue),width=30),wrap(printer.pformat(sigmalimit[0]),width=30)])
-        for ilim in range(1,len(sigmalimit)):
-          Results_table.add_row(["","","","",wrap(printer.pformat(sigmalimit[ilim]),width=30)])
-      else:
-        has_line=True
-        Results_table.add_row([wrap(printer.pformat(res),width=30),wrap(printer.pformat(conds),width=30),wrap(printer.pformat(mass),width=30),wrap(printer.pformat(tvalue),width=30),wrap(printer.pformat(sigmalimit),width=30)])
-      Results_table.add_row(["---------","---------","---------","---------","---------"])
+  res = Analysis.results.keys()[0]  
 
-  if has_line: print(Results_table)
+  if len(Analysis.ResultList) == 0: continue
+
+  for cluster in Analysis.ResultList:
+    theoRes = cluster.oldformat()   #Convert to old format (except for small change in conditions output)
+    mass = theoRes['mass']
+    tvalue = theoRes['result']
+    conds = theoRes['conditions']
+    sigmalimit = [Analysis.plots.values()[0][1][0],cluster.explimit]
+
+    Results_table.add_row([wrap(printer.pformat(res),width=30),wrap(printer.pformat(conds),width=30),wrap(printer.pformat(mass),width=30),wrap(printer.pformat(tvalue),width=30),wrap(printer.pformat(sigmalimit),width=30)])
+
+    Results_table.add_row(["---------","---------","---------","---------","---------"])
+
+  print(Results_table)
