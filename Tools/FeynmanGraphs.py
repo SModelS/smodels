@@ -207,9 +207,11 @@ def drawBranch_ ( branch, upwards, labels ):
       not directly """
   lines=["  ","---"]
   labels="  "
-  ## for ( nvtx,particles) in enumerate(branch.particles):
   for insertions in branch.particles:
-    if len(insertions)==0: continue
+    if len(insertions)==0: 
+      lines[0]+=" "
+      lines[1]+="*"
+      continue
     lines[1]+="*---"
     if len(insertions)==1: 
       labels+=" "+printParticle_(insertions[0])
