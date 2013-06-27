@@ -22,6 +22,7 @@ def loFromLHE( lhefile, totalxsec, nevts=None ):
   :returns: an array of dictionaries: weights, xsecs, nevts
   """
   import LHEReader, types
+  from Tools.PhysicsUnits import addunit
   #Get event decomposition:
   n_evts={}
   reader = LHEReader.LHEReader( lhefile, nevts )
@@ -38,7 +39,7 @@ def loFromLHE( lhefile, totalxsec, nevts=None ):
       print "[XSecComputer.py] error: totalxsec=None, but no xsec can be picked up from lhe reader"
       return None
     else:
-      totalxsec=reader.metainfo["totalxsec"]
+      totalxsec=addunit ( reader.metainfo["totalxsec"], 'fb' )
 
   weight, sigma = {}, {}
   # print "[XSecComputer] lhe",lhefile
