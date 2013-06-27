@@ -77,7 +77,7 @@ class TheoryPrediction:
         order: LO or NLO
         condition: the condition as is in the database 
 
-        :returns: cross section, with units, None if no result available.
+        :returns: reference cross section, with units, None if no result available.
     """
     runs=None
     if sqrts!=None and order!=None:
