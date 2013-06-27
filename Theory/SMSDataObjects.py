@@ -258,6 +258,9 @@ class GTop:
     """ Evaluates the constraints and conditions in results
       using the respective theoretical predictions for each element. 
 
+      :type results: a dictionary with the constraints and the conditions \
+         of the experiment results
+
       :returns: a TheoryPrediction object
     """
     from Tools.PhysicsUnits import addunit

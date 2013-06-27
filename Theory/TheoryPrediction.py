@@ -15,7 +15,7 @@ class ClusterOutput:
     self.result_dic = {} ## dictionary of the results, keys are the constraints, values are  TheoryPredicitions
     self.conditions_dic = {} ## dictionary of the conditions, keys are conditions, values are  TheoryPredicitions
     self.mass = None ## average mass inside the cluster
-    self.explimit = None ## experimental limit for the average mass
+    self.explimit = None ## experimental limit on production cross section for the average mass
     
   def oldformat(self):
     """ Returns a dictionary with the old output format """
@@ -32,14 +32,13 @@ class ClusterOutput:
 
     return resdic
 
-
-  def predictionFor ( self, m1=None, m2=None, sqrts=None, order=None, condition=None ):
-    """ get the theory prediction FIXME (simplified version with new output. What is missing?) 
-
-      :returns: cross section prediction, with units
-    """
-
-    return self.result_dic.values()[0]
+#  def predictionFor ( self, m1=None, m2=None, sqrts=None, order=None, condition=None ):
+#    """ get the theory prediction FIXME (simplified version with new output. What is missing?)  FIXME m1, m2, etc not used???
+#
+#      :returns: cross section prediction, with units
+#    """
+#
+#    return self.result_dic.values()[0]
 
 
 class TheoryPrediction:
@@ -49,7 +48,7 @@ class TheoryPrediction:
 
   def equal ( self, m1, m2 ):
     from Tools.PhysicsUnits import rmvunit
-    """ is array of m1 equal to array of m2 """
+    """ is array of masses m1 equal to array m2? """
     if len(m1)!=len(m2): return False
     for (i,m) in enumerate(m1):
       d=abs(rmvunit(m,"GeV")-rmvunit(m2[i],"GeV"))
