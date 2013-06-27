@@ -32,13 +32,13 @@ class ClusterOutput:
 
     return resdic
 
-#  def predictionFor ( self, m1=None, m2=None, sqrts=None, order=None, condition=None ):
-#    """ get the theory prediction FIXME (simplified version with new output. What is missing?)  FIXME m1, m2, etc not used???
-#
-#      :returns: cross section prediction, with units
-#    """
-#
-#    return self.result_dic.values()[0]
+  def prediction ( self ):
+    """ get the theory prediction FIXME (simplified version with new output. What is missing?)  FIXME m1, m2, etc not used???
+
+      :returns: cross section prediction, with units
+    """
+
+    return self.result_dic.values()[0]
 
 
 class TheoryPrediction:
