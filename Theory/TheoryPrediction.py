@@ -14,8 +14,33 @@ class ClusterOutput:
   def __init__ (self):
     self.result_dic = {} ## dictionary of the results, keys are the constraints, values are  TheoryPredicitions
     self.conditions_dic = {} ## dictionary of the conditions, keys are conditions, values are  TheoryPredicitions
-    self.mass = None ## average mass inside the cluster
+    self.mass = None ## array of average masses inside the cluster
     self.explimit = None ## experimental limit on production cross section for the average mass
+  def __str__ ( self ):
+    from Tools.PhysicsUnits import rmvunit
+    s=""
+    for (key,value) in self.result_dic.items():
+      m="None"
+      if self.mass and len(self.mass)>0:
+        m=str( [ rmvunit( x, "GeV" ) for x in self.mass[0] ] )+" GeV"
+      onevalue=value
+      sovs= [ "7 TeV (LO)", "8 TeV (LO)", "7 TeV (NLO)", "8 TeV (NLO)" ]
+      for sov in sovs:
+        if value.has_key ( sov ): onevalue=value[sov]
+      s+="sigma_ref=%s {%s} for %s: " % ( onevalue, sov, key)
+      s+="m=%s. {exp ul=%s}\n" % ( m, self.explimit )
+    return s
+
+  def describe ( self ):
+    s="TheoryPrediction for m=%s:\n" % self.mass
+    s+="================================="
+    s+="experimental ul=%s\n" % self.explimit
+    for (key,value) in self.result_dic.items():
+      s+=">> %s: %s\n" % (key, value)
+    s+"\n"
+    for (key,value) in self.conditions_dic.items():
+      s+="+>> %s: %s\n" % (key, value)
+    return s
     
   def oldformat(self):
     """ Returns a dictionary with the old output format """
