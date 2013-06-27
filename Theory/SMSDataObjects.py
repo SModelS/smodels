@@ -268,8 +268,15 @@ class GTop:
     import TheoryPrediction
   
   #To store the result:
-    ClusterResult = TheoryPrediction.ClusterOutput()  
+    ClusterResult = TheoryPrediction.ClusterOutput()
+  #Make sure all elements have a common mass
     ClusterResult.mass = [self.ElList[0].B[0].masses,self.ElList[0].B[1].masses]
+    for el in self.ElList:
+      mass = [el.B[0].masses,el.B[1].masses]
+      if mass != ClusterResult.mass:
+        print "evaluateCluster: multiple masses in cluster"
+        return False
+
     
   #Get constraints and conditions:
     consts = results.keys()
