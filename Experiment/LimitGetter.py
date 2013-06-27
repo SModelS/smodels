@@ -30,15 +30,17 @@ def limit(analysis, addTheoryPrediction=True):
         ## masses1=element.B[0].masses[0] ## ,lead.B[1].masses[0]
           masses2=element.B[1].masses[mi] ## ,lead.B[1].masses[0]
           ul=SMSResults.getSmartUpperLimit(ana,Tx,masses1,masses2)
+          tmp={ "ul": ul, "analysis": ana, "Tx": Tx, "m1": masses1, "m2": masses2, "sqrts": sqrts }
           if addTheoryPrediction:
-            theory=theoRes.predictionFor ( masses1, masses2, sqrts, "NLL", condition )
+            ## theory=theoRes.predictionFor ( masses1, masses2, sqrts, "NLL", condition )
+            theory=theoRes.prediction ( )
             ##print "[LimitGetter.py] %s %s ul=%s theory xsec=%s" % ( Tx, ana, ul, theory )
             #          excluded=None
             #print "theory=",theory,"ul=",ul,"type=",type(theory)
             #if True: # theory!=None and ul!=None:
             excluded=rmvunit(theory,"fb")>rmvunit(ul,"fb")
-            ret.append ( { "ul": ul, "analysis": ana, "Tx": Tx, "m1": masses1, "m2": masses2, "theory": theory, "excluded":excluded, "sqrts": sqrts } )
-          else: ret.append ( { "ul": ul, "analysis": ana, "Tx": Tx, "m1": masses1, "m2": masses2, "sqrts": sqrts } )    
+            tmp["theory"]=theory
+          ret.append ( tmp )
   return ret 
 
     
