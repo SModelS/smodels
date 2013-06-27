@@ -7,12 +7,13 @@ from Theory import LHEDecomposer, XSecComputer
 from Experiment import TxNames, SMSAnalysisFactory, SMSResults, LimitGetter
 
 print "[run.py] loading analyses ...."
-## analyses = SMSAnalysisFactory.load( anas="alphaT8TeV", topos="T2bb" )
-analyses = SMSAnalysisFactory.load( )
+# analyses = SMSAnalysisFactory.load( )
+analyses = SMSAnalysisFactory.load( anas="alphaT8TeV", topos="T2bb" )
 print "[run.py] done loading %d analyses" % len(analyses)
 
 nevts=1000
-slhafile="../slha/TChiNuSlep.slha"
+# slhafile="../slha/TChiNuSlep.slha"
+slhafile="../slha/T2bb.slha"
 
 Tmp=tempfile.mkdtemp()
 print "[run.py] now run pythia in",Tmp
@@ -28,14 +29,14 @@ XSecComputer.clean ( Tmp )
 print
 for Analysis in analyses:
   Analysis.add ( topos )
-  lims=LimitGetter.limit ( Analysis )
-  if len(lims)==0: continue
+  Ret=Analysis.evaluateResult()
+  # lims=LimitGetter.limit ( Analysis )
+  #lims=[]
+  #if len(lims)==0: continue
   print "[run.py] -------------------------------------------------"
   print "[run.py] analysis=",Analysis ## ,"lims=",lims
-  Ret=Analysis.evaluateResult()
+  #for lim in lims:
+  #  print "[run.py] limit=",lim
   if len(Analysis.ResultList)==0: continue
   for cluster in Analysis.ResultList:
-    print "type.cluster=",type(cluster)
-    theoRes=cluster.result_dic
-    #print "[run.py] ****"
-    #print "[run.py] theoRes=",theoRes
+    print "[run.py]",cluster
