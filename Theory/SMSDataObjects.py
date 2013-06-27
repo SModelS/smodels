@@ -255,8 +255,8 @@ class GTop:
     return True
 
   def evaluateCluster(self,results):
-    """ Evaluates the constraints and conditions in results
-      using the respective theoretical predictions for each element. 
+    """ Evaluates the constraints and conditions in results using the
+      respective theoretical cross section predictions for each element. 
 
       :type results: a dictionary with the constraints and the conditions \
          of the experiment results
