@@ -2,22 +2,20 @@
 
 """
 .. module:: ClusterTools
-    :synopsis: missing
+    :synopsis: methods that deal with clustering masses and finding average masses
 
-.. moduleauthor:: missing <email@example.com>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>, Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
 
-
-""" The intention of this unit is to have all code that is related to clustering
-and finding average masses """
-
-CMdic={}
+CMdic={} ## FIXME whats this?
 
 def DoCluster(objlist,Distfunc,dmin):
+  """ Cluster algorithm (generic for any type of object, as long as the distance function is given) 
+    :returns: FIXME
+  """
   from Tools.PhysicsUnits import addunit
   import copy
-  """ Cluster algorithm (generic for any type of object, as long as the distance function is given) """
   MD = []
 #Compute distance matrix
   for i in range(len(objlist)):
