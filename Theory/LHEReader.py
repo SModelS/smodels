@@ -42,6 +42,7 @@ class LHEReader:
 
       :returns: an SMSEvent; None if no event is left to be read.
     """
+    from Tools.PhysicsUnits import addunit
     line = " "
     self.ctr+=1
     ret=SMSEvent.SMSEvent( self.ctr )
@@ -61,7 +62,7 @@ class LHEReader:
         ret.metainfo["nevents"]=nevts
         # print "Found madgraph nevents",nevts
       if line.find ( "Integrated weight (pb)") > -1:
-        iwght=float(line.split()[-1])
+        iwght=addunit(float(line.split()[-1]),'pb')
         ## print "Found madgraph integrated weight",iwght
         self.metainfo["totalxsec"]=iwght
         ret.metainfo["totalxsec"]=iwght

@@ -39,7 +39,7 @@ def loFromLHE( lhefile, totalxsec, nevts=None ):
       print "[XSecComputer.py] error: totalxsec=None, but no xsec can be picked up from lhe reader"
       return None
     else:
-      totalxsec=addunit ( reader.metainfo["totalxsec"], 'fb' )
+      totalxsec=reader.metainfo["totalxsec"]
 
   weight, sigma = {}, {}
   # print "[XSecComputer] lhe",lhefile
