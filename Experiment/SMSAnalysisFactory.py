@@ -52,6 +52,8 @@ def load( anas = None, topos=None, sqrts= [ 7, 8 ] ):
   ## without having to code an array
   if type(topos)==types.StringType: topos = [ topos ]
   if type(anas)==types.StringType: anas = [ anas ]
+  if type(sqrts)==types.IntType: sqrts = [ sqrts ]
+  if type(sqrts)==types.FloatType: sqrts = [ int(sqrts) ]
 
   ListOfAnalyses = []
 
