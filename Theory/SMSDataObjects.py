@@ -256,7 +256,10 @@ class GTop:
 
   def evaluateCluster(self,results):
     """ Evaluates the constraints and conditions in results
-    using the respective theoretical predictions for each element. Returns a TheoryPrediction object"""
+      using the respective theoretical predictions for each element. 
+
+      :returns: a TheoryPrediction object
+    """
     from Tools.PhysicsUnits import addunit
     from AuxiliaryFunctions import getelements, eltonum
     import TheoryPrediction
