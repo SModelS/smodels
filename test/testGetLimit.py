@@ -1,9 +1,22 @@
 import set_path
-import ROOT,sys
+import ROOT,sys, os, tempfile
 from Experiment import SMSResults, SMSInterpolation, LimitGetter, SMSAnalysisFactory
-from Theory import SMSAnalysis, LHEDecomposer
+from Theory import SMSAnalysis, LHEDecomposer, SLHATools, SLHADecomposer, XSecComputer
 from Tools import ROOTTools
 from Tools.PhysicsUnits import addunit, rmvunit
+
+pid_dic = {"T1": [[1000021], [1000022]],
+           "T1tttt": [[1000021], [1000022]],
+           "T2": [[1000001, 1000002, 1000003, 1000004, 1000005, 2000001, 2000002, 2000003, 2000004, 2000005], [1000022]],
+           "T2bb": [[1000005],[1000022]],
+           "T2tt": [[1000006],[1000022]],
+           "TChiWZ": [[1000024, 1000023], [1000022]],
+           "TChiChipmSlepL": [[1000024, 1000023], [1000011, 1000012, 1000013, 1000014, 1000015, 1000016], [1000022]],
+           "TChiChipmSlepStau": [[1000024, 1000023], [1000011, 1000012, 1000013, 1000014, 1000015, 1000016], [1000022]],#??set all slepton masses here
+           "TChiChipmStauStau": [[1000024, 1000023], [1000011, 1000012, 1000013, 1000014, 1000015, 1000016], [1000022]] }#??set all slepton masses here
+
+diff_dic = {"T1tttt": 360., "T2bb": 5.}
+
 
 def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=10000,binsize=None, fromSlha=True):
   """ recreate ROOT TH2F histogram of a given analysis and topology
@@ -12,13 +25,16 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
         if line=True is selected, produce rootfile with produced histograms
         and line, return filename"""
 
-  lhefile = "../lhe/%s_1.lhe" %topo
-  if fromSlha:
-    import os
-    os.system("cp ../slha/%s.slha fort.61" %topo)
-    os.system("../pythia_lhe < pyIn.dat") #run with 20 events
-    lhefile = "fort.68" 
-  topoList=LHEDecomposer.decompose ( lhefile, {})#create default topologylist with only topo (is list of GTop objects)
+#  lhefile = "../lhe/%s_1.lhe" %topo
+#  if fromSlha:
+#    import os
+#    os.system("cp ../slha/%s.slha fort.61" %topo)
+#    os.system("../pythia_lhe < pyIn.dat") #run with 20 events
+#    lhefile = "fort.68" 
+#  topoList=LHEDecomposer.decompose ( lhefile, {})#create default topologylist with only topo (is list of GTop objects)
+
+
+  Tmp = tempfile.mkdtemp()
 
 
   toponame=topo
@@ -41,6 +57,9 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
 
   if line:
     hL = ROOT.TH2F('hL','hL',bx,xmin,xmin+bx*bwx,by,ymin,ymin+by*bwy)
+    hUL = ROOT.TH2F('hUL','hUL',bx,xmin,xmin+bx*bwx,by,ymin,ymin+by*bwy)
+    hTheory = ROOT.TH2F('hTheory','hTheory',bx,xmin,xmin+bx*bwx,by,ymin,ymin+by*bwy)
+    hLine = ROOT.TH2F('hLine','hLine',bx,xmin,xmin+bx*bwx,by,ymin,ymin+by*bwy)
     prod_mode = topo
     if topo=="T1tttt" or topo=="T1bbbb": prod_mode = "T1"
     if topo=="TChiChipmSlepL" or topo=="TChiChipmSlepStau" or topo=="TChiChipmStauStau" or topo=="TChiChipmStauL" or topo=="TChiWZ": prod_mode = "TChiWZ_Wino"
@@ -68,7 +87,9 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
   if mz and mz.find('LSP')>-1: L=float(mz[mz.find('P')+1:mz.find('P')+4])
 
   while x<xmax:
-    while y<ymax:
+    while y<ymax and y<x-diff_dic[topo]:
+
+      print x, y
 
       if D:
         massv=[0.,0.,0.]
@@ -87,13 +108,19 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
       else: massv=[x,y]
 
       ana_obj = SMSAnalysisFactory.load( anas=ana, topos=topo ) #create list of analysis objects, but give one analysis, one topo, so list has one entry only!
-      for idx in range(len(massv)):
-        massv[idx]=addunit(massv[idx],'GeV')
-      for eachtopo in topoList: #loop over GTop objects (different number of insertions)
-        for eachEl in eachtopo.ElList: #loop over EElement objects (different particles at insertion)
-          if len(eachEl.B[0].masses)==len(eachEl.B[1].masses)==len(massv): #if number of SUSY particles same as for the given topology: set masses
-            eachEl.B[0].masses=massv
-            eachEl.B[1].masses=massv #for now only equal branches
+
+      slha_dic = {}
+      for ii in range(len(pid_dic[topo])):
+        for ent in pid_dic[topo][ii]:
+          slha_dic[ent]=massv[ii]
+
+      sigmacut = addunit(0.1,'fb')
+      slha_name = SLHATools.createSLHAFile(topo, slha_dic)
+      xsec_dic = XSecComputer.compute(nevents, slha_name, datadir = Tmp)
+      XSec = xsec_dic.crossSections()
+      topoList = SLHADecomposer.decompose(slha_name, XSec, sigmacut)
+      os.unlink(slha_name)
+
       ana_obj[0].add( topoList ) # the list ana_obj has only one entry here!, all EElements consisten with the constraints for this topology are added to the EAnalysis object
       lims=LimitGetter.limit(ana_obj[0], addTheoryPrediction=False)
       v=None
@@ -104,13 +131,31 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
       if v: h.Fill(x,y,v)
 
       if line:
+        sumTheory=0.
         if v and v<rXs.GetBinContent(rXs.FindBin(x)):
           hL.Fill(x,y,0)
         else: hL.Fill(x,y)
+        if ana_obj[0].evaluateResult():
+          hUL.Fill(x,y,rmvunit(ana_obj[0].ResultList[0].explimit,'fb'))
+          for values in ana_obj[0].ResultList[0].result_dic.values():
+            hTheory.Fill(x,y,rmvunit(values['8 TeV (NLL)'],'fb'))
+            sumTheory+=rmvunit(values['8 TeV (NLL)'],'fb')
+          if rmvunit(ana_obj[0].ResultList[0].explimit,'fb') and rmvunit(ana_obj[0].ResultList[0].explimit,'fb')<sumTheory:
+            hLine.Fill(x,y,0)
+          else: hLine.Fill(x,y)
+        else: hLine.Fill(x,y)
 
       y+=bwy
+
+    while y < ymax:
+      hL.Fill(x,y)
+      hLine.Fill(x,y)
+      y+=bwy
+
     y=ymin+bwy/2
     x+=bwx
+
+  XSecComputer.clean(Tmp)
 
   if line:
     f.Close()
@@ -119,8 +164,13 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
     f1=ROOT.TFile(rootname_out,"recreate")
     h.Write()
     hL.Write()
+    hUL.Write()
+    hTheory.Write()
+    hLine.Write()
     exclusion=ROOTTools.getTGraphFromContour(hL)
     exclusion.Write()
+    exclusionER=ROOTTools.getTGraphFromContour(hLine)
+    exclusionER.Write()
     f1.Close()
     return rootname_out
   return h
