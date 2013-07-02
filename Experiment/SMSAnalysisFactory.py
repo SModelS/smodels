@@ -38,7 +38,7 @@ def load( anas = None, topos=None, sqrts= [ 7, 8 ] ):
     results database.
 
     :param anas: if given as a list, then we create only objects for these analyses
-    (the database naming convention is used).
+       (the database naming convention is used).
     :param topos: if given as a list, then only these topos are considered.
     :param sqrts: array of center-of-mass energies of the analyses that are to be considered.
     :returns: list of EAnalyses
