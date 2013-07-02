@@ -42,6 +42,7 @@ def load( anas = None, topos=None, sqrts= [ 7, 8 ] ):
     :param topos: if given as a list, then only these topos are considered.
     :param sqrts: array of center-of-mass energies of the analyses that are to be considered.
     :returns: list of EAnalyses
+
   """
   from Theory.SMSAnalysis import EAnalysis
   from Experiment import SMSResults
