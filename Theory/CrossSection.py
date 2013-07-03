@@ -22,6 +22,7 @@ class CrossSection:
   def __getitem__ ( self, i ): return self.data[i]
   def items ( self ): return self.data.items()
   def __str__ ( self ): return str(self.data)
+  def keys ( self ): return self.data.keys()  
 
   def weights ( self ): return self.data["Wdic"]
   def crossSections ( self ): return self.data["Xsecdic"]
