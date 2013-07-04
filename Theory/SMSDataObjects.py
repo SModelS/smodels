@@ -36,7 +36,7 @@ class BElement:
       # print "[SMSDataObjects] ptcs=",ptcs
 
   def isEqual ( ElA, ElB, order=True ):
-    if simParticles(ElA.particles,ElB.particles,useDict=False): return False
+    if not simParticles(ElA.particles,ElB.particles,useDict=False): return False
     if ElA.masses != ElB.masses: return False
     return True
 
@@ -131,7 +131,7 @@ class EElement:
         if not igmass and El1[i].masses != El2[i].masses: return False
     return True
 
-  def isEqual ( ElA, ElB,order=True,igmass=False ):
+  def isEqual ( ElA, ElB,order=True):
     """ Compare two EElements
         If all masses and particles are equal, returns True,
         otherwise returns False
