@@ -19,7 +19,7 @@ from Tools.PhysicsUnits import rmvunit, addunit
 
 def gethistname(topo, mz):
   """Build histogram name for given topology and mz information (mz as given in the axes-information)."""
-  if mz == None or mz == "050":
+  if mz == None:
     return topo
   elif 'D' in mz:
     return topo+'D'+mz.split('=')[1]
