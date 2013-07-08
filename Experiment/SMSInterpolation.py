@@ -9,7 +9,7 @@
         If several histograms with different x-values are available,
         an interpolation is performed.
 
-.. moduleauthor:: missing <email@example.com>
+.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
 
 """
 
