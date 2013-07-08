@@ -38,7 +38,10 @@ def limit(analysis, addTheoryPrediction=True):
             #          excluded=None
             #print "theory=",theory,"ul=",ul,"type=",type(theory)
             #if True: # theory!=None and ul!=None:
-            excluded=rmvunit(theory,"fb")>rmvunit(ul,"fb")
+            excluded7=rmvunit(theory['7 TeV (NLL)'],"fb")>rmvunit(ul,"fb")
+            excluded8=rmvunit(theory['8 TeV (NLL)'],"fb")>rmvunit(ul,"fb")
+            if excluded7 or excluded8: tmp["excluded"]=True
+            else: tmp["excluded"]=False
             tmp["theory"]=theory
           ret.append ( tmp )
   return ret 
