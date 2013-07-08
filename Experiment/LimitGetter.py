@@ -2,9 +2,11 @@
 
 """
 .. module:: LimitGetter
-    :synopsis: missing
+    :synopsis: some code to access the right experimental limits, given analysis objects
 
-.. moduleauthor:: missing <email@example.com>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
 
 """
 
