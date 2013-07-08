@@ -2,14 +2,18 @@
 
 """
 .. module:: TxNames
-    :synopsis: missing
+    :synopsis: some methods around the Tx naming convention, e.g. get a generic Tx name for an EElement
 
-.. moduleauthor:: missing <email@example.com>
+.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
 
 """
 
 def getTx(element):
-	"""takes EElement and returns Tx-Name"""
+	"""takes EElement and returns Tx-Name
+
+    :type element: EElement
+    :returns: Tx name of element
+  """
 	import copy
 	E=copy.deepcopy(element)
 	Branch1=E.B[0]
