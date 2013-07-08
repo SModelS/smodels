@@ -10,9 +10,13 @@
 
 """
 
-def limit(analysis, addTheoryPrediction=True):
+def limit(analysis, addTheoryPredictions=[]):
   """ the next generation limit retrieval function, should get all information
-      from the analysis object """
+      from the analysis object 
+
+    :param addTheoryPredictions: list of theory predictions to add, e.g. [ '7 TeV (NLL)', '7 TeV (LO)' ]
+    :type addTheoryPredictions: list of strings
+  """
   import SMSResults
   from Tools.PhysicsUnits import rmvunit
   run=analysis.run
@@ -21,7 +25,7 @@ def limit(analysis, addTheoryPrediction=True):
   ret=[]
   ##print "[LimitGetter.py] get limit for",analysis,"run=",run
   for (constraint,condition) in analysis.results.items():
-    if addTheoryPrediction:
+    if len(addTheoryPredictions)>0:
       if not analysis.evaluateResult() or len(analysis.ResultList) == 0: continue
       theoRes=analysis.ResultList[0]
     ##print"[LimitGetter.py] theoRes=",theoRes
@@ -33,18 +37,15 @@ def limit(analysis, addTheoryPrediction=True):
           masses2=element.B[1].masses[mi] ## ,lead.B[1].masses[0]
           ul=SMSResults.getSmartUpperLimit(ana,Tx,masses1,masses2)
           tmp={ "ul": ul, "analysis": ana, "Tx": Tx, "m1": masses1, "m2": masses2, "sqrts": sqrts }
-          if addTheoryPrediction:
-            ## theory=theoRes.predictionFor ( masses1, masses2, sqrts, "NLL", condition )
+          if len(addTheoryPredictions)>0:
             theory=theoRes.prediction ( )
-            ##print "[LimitGetter.py] %s %s ul=%s theory xsec=%s" % ( Tx, ana, ul, theory )
-            #          excluded=None
-            #print "theory=",theory,"ul=",ul,"type=",type(theory)
-            #if True: # theory!=None and ul!=None:
-            excluded7=rmvunit(theory['7 TeV (NLL)'],"fb")>rmvunit(ul,"fb")
-            excluded8=rmvunit(theory['8 TeV (NLL)'],"fb")>rmvunit(ul,"fb")
-            if excluded7 or excluded8: tmp["excluded"]=True
-            else: tmp["excluded"]=False
             tmp["theory"]=theory
+            allexcl=False
+            for t in addTheoryPredictions:
+              excl=rmvunit(theory[t],"fb")>rmvunit(ul,"fb")
+              tmp["excl_%s" % t ] = excl
+              allexcl= allexcl or excl
+            tmp["excluded"]=allexcl
           ret.append ( tmp )
   return ret 
 
