@@ -182,6 +182,11 @@ def getCanonicalName ( topo ):
   topo=topo.replace("w","W").replace("z","Z" )
   return topo
 
+def getRootFileName ( analysis, run=None ):
+  """ returns the root file name, but does not check if it exists """
+  if not run: run=getRun ( analysis )
+  return "%s/%s/%s/sms.root" % ( Base, run, analysis )
+
 upperLimitHisto={}
 def getUpperLimitFromHisto ( analysis, topo, run, complain=False ):
   key=analysis+topo+str(run)
