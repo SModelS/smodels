@@ -10,8 +10,6 @@
     
 """
     
-""" All data classes necessary to create a SModelS description of events """
-
 from SMSDataObjects import GTop, EElement
 from ParticleNames import Reven, PtcDic
 import ClusterTools
