@@ -1,5 +1,5 @@
 #!/usr/bin/python
 
-""" run the slha decomposition test """
+""" test the SLHA decomposition """
 
 import testSLHADecomposer
