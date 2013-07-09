@@ -15,6 +15,7 @@ def getName(pdg):
     according to the dictionaries Rodd and Reven 
 
     :type pdg: int
+    :returns: particle name (e.g. gluino, mu-, ...)
   """
   p=int(pdg)
   if p in Rodd: return Rodd[p]
@@ -24,9 +25,19 @@ def getName(pdg):
     return False
 
 def simParticles(ptype1,ptype2,useDict=True):
-  """ Compares 2 particle names or 2 nested name arrays. Allows for dictionary labels
-  (Ex: L = l, l+ = l, l = l-,...) 
-  For the last nested level ignore particle ordering """
+  """ Compares 2 particle names or 2 nested name arrays. \
+      Allows for dictionary labels
+      (Ex: L = l, l+ = l, l = l-,...) 
+      For the last nested level ignore particle ordering 
+      FIXME nesting? 
+
+    :param ptype1: first (nested) list of particle names, e.g. ['l','jet']
+    :param ptype2: second (nested) list of particle names
+
+    :param useDict: use the dictionary, i.e. allow for e=(e+,e-),l+=(e+,mu+), etc
+
+    :returns: boolean
+  """
   if len(ptype1) != len(ptype2): return False
   import copy
 
