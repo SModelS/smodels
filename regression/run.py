@@ -41,3 +41,5 @@ for File in os.listdir("."):
 Files.sort()
 for Nr in Files:
   run ( Nr )
+
+# os.system ( "./testSLHADecomposer.py" )
