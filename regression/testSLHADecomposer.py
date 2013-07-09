@@ -2,7 +2,7 @@
 
 """regression test for SLHADecomposer """
 
-import pickle
+import pickle, math
 import set_path
 import Theory.SLHADecomposer as DEC
 import Tools.PhysicsUnits as UNIT
@@ -19,8 +19,6 @@ sigmacut = UNIT.addunit(0.1,'fb')
 slhafile = "../slha/T2_600_375_xsec.slha"
 
 cs = dic.crossSections()
-print 'original'
-print cs
 gtopo = pickle.load(file("TopologyList.pkl"))
 gtopo_new = DEC.decompose( slhafile ) 
 
@@ -38,12 +36,13 @@ for g in gtopo_new:
       print 'EElement',el, '%sOK!%s' %( green, reset )
     else:
       print 'EElement',el, '%sfailed!%s' %( red, reset )
-    if el.weight == gtopo[i].ElList[j].weight:           #compares weight
-      print 'weight for EElement',el,'%sOK!%s' %( green, reset ) 
-    else:
-      print 'different weight for EElement', el, '.%sfailed!%s' %( red, reset )
-      print 'weight_orig:', gtopo[i].ElList[j].weight
-      print 'weight_new:', el.weight
+    for key in el.weight:
+      if math.fabs(UNIT.rmvunit(el.weight[key], 'fb')-UNIT.rmvunit(gtopo[i].ElList[j].weight[key],'fb'))> 0.00001:
+        print 'different weight for EElement', el, '.%sfailed!%s' %( red, reset )
+        print 'weight_orig:', gtopo[i].ElList[j].weight
+        print 'weight_new:', el.weight
+      else:
+        print 'weight for EElement',el,'%sOK!%s' %( green, reset ) 
     k = 0
     for b in el.B:
 #      print 'branch:', b, b.describe()
