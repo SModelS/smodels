@@ -110,8 +110,10 @@ def GoodMass(mass,Distfunc,dmin):
 def MassAvg(equivin, method = "mean"):
   """ For a list of equivalent masses, compute an average mass (or mass array)
   using the defined method.
-  harmonic = harmonic mean
-  mean = standard mean """
+    :param method: the method employed: "harmonic" = harmonic means, "mean" = algebaric (standard) mean
+
+    :returns: the average mass
+  """
   import numpy
   from Tools.PhysicsUnits import rmvunit
 
