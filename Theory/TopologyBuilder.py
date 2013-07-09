@@ -2,14 +2,13 @@
 
 """
 .. module:: TopologyBuilder
-    :synopsis: missing
+    :synopsis: A builder to create GTop objects from e.g. SMSEvents
     
-.. moduleauthor:: missing <email@example.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
     
 """
     
-""" A builder to create GTop objects from e.g. SMSEvents """
-
 def fromEvent( Event, weight = {}, DoCompress=False, DoInvisible=False, \
                        minmassgap=None ):
   """ Create a topology from an event.
