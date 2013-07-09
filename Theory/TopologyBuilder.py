@@ -106,7 +106,7 @@ def fromEvent( Event, weight = {}, DoCompress=False, DoInvisible=False, \
 def compressTopology(ETopList,DoCompress,DoInvisible,minmassgap):
   """ Given a topology list, keep compressing the element it 
       can be compressed no more.
-      Returns a list with the old toplogies and the compressed ones.
+      Returns a list with the old topologies and the compressed ones.
       To avoid double counting the input list should have a single element. """
   from Tools.PhysicsUnits import rmvunit
   minmassgap=rmvunit ( minmassgap, "GeV" )
