@@ -8,8 +8,6 @@
     
 """
 
-""" A collection of tools needed for use and manipulation of SLHA files """
-
 import pyslha
 import tempfile
 import os
