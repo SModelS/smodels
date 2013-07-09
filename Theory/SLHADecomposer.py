@@ -2,22 +2,24 @@
 
 """
 .. module:: SLHADecomposer
-    :synopsis: missing
+    :synopsis: SLHA-based SMS decomposition
     
-.. moduleauthor:: missing <email@example.com>
+.. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
     
 """
     
 def decompose(slhafile,Xsec=None,sigcut=None,DoCompress=False,DoInvisible=False,minmassgap=-1):
   """ Do SLHA-based decomposition.
       FIXME currently using pyslha2 because we need this hack to handle SLHA files with XSECTION blocks.
-  :param slhafile: file with mass spectrum and branching ratios and optionally with cross-sections
-  :param Xsec: optionally a dictionary with cross-sections for pair production, by default reading the cross sections from the SLHA file.
-  :param sigcut: minimum sigma*BR to be generated, by default sigcut = 0.1 fb
-  :param DoCompress: FIXME
-  :param DoInvisible: FIXME
-  :param minmassgap: FIXME
-  :returns: a TopologyList. """
+
+    :param slhafile: file with mass spectrum and branching ratios and optionally with cross-sections
+    :param Xsec: optionally a dictionary with cross-sections for pair production, by default reading the cross sections from the SLHA file.
+    :param sigcut: minimum sigma*BR to be generated, by default sigcut = 0.1 fb
+    :param DoCompress: FIXME
+    :param DoInvisible: FIXME
+    :param minmassgap: FIXME
+    :returns: a TopologyList. 
+  """
   import sys, os, copy
 
   workdir = os.getcwd() 
