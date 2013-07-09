@@ -29,7 +29,7 @@ XSecComputer.clean ( Tmp )
 print
 for Analysis in analyses:
   Analysis.add ( topos )
-  Ret=Analysis.evaluateResult()
+  Ret=Analysis.computeTheoryPredictions()
   # lims=LimitGetter.limit ( Analysis )
   #lims=[]
   #if len(lims)==0: continue

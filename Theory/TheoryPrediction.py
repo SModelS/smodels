@@ -8,7 +8,7 @@
     
 """
 
-class ClusterOutput:
+class XSecPredictionForCluster:
   """ a wrapper to store the theory predictions from evaluateCluster """
 
   def __init__ (self):

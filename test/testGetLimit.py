@@ -135,7 +135,7 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
         if v and v<rXs.GetBinContent(rXs.FindBin(x)):
           hL.Fill(x,y,0)
         else: hL.Fill(x,y)
-        if ana_obj[0].evaluateResult():
+        if ana_obj[0].computeTheoryPredictions():
           hUL.Fill(x,y,rmvunit(ana_obj[0].ResultList[0].explimit,'fb'))
           for values in ana_obj[0].ResultList[0].result_dic.values():
             hTheory.Fill(x,y,rmvunit(values['8 TeV (NLL)'],'fb'))
