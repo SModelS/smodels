@@ -33,8 +33,11 @@ Files=[]
 for File in os.listdir("."):
   if File[-3:]!=".py": continue
   if File[:4]!="test": continue
-  Nr=int(File[4:-3])
-  Files.append(Nr)
+  try:
+    Nr=int(File[4:-3])
+    Files.append(Nr)
+  except Exception,e:
+    pass
 Files.sort()
 for Nr in Files:
   run ( Nr )
