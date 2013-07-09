@@ -8,12 +8,16 @@
     
 """
     
-def decompose(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassgap=-1):
+def decompose(slhafile,Xsec=None,sigcut=None,DoCompress=False,DoInvisible=False,minmassgap=-1):
   """ Do SLHA-based decomposition.
-  slhafile = file with mass spectrum and branching ratios
-  Xsec = dictionary with cross-sections for pair production
-  sigcut = minimum sigma*BR to be generated. 
-  output is a TopologyList. """
+      FIXME currently using pyslha2 because we need this hack to handle SLHA files with XSECTION blocks.
+  :param slhafile: file with mass spectrum and branching ratios and optionally with cross-sections
+  :param Xsec: optionally a dictionary with cross-sections for pair production, by default reading the cross sections from the SLHA file.
+  :param sigcut: minimum sigma*BR to be generated, by default sigcut = 0.1 fb
+  :param DoCompress: FIXME
+  :param DoInvisible: FIXME
+  :param minmassgap: FIXME
+  :returns: a TopologyList. """
   import sys, os, copy
 
   workdir = os.getcwd() 
@@ -21,13 +25,48 @@ def decompose(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassgap
   sys.path.append(pyslhadir)
   import TopologyBuilder, SMSDataObjects, ParticleNames
   from Tools.PhysicsUnits import addunit, rmvunit
-  import pyslha
+  import pyslha2 as pyslha
 
   if DoCompress and rmvunit(minmassgap,'GeV') == -1: 
-    print "SLHAdecomp: Please, set minmassgap"
+    print "[SLHAdecomposer] Please, set minmassgap"
     return False
 
+#sigcut by default 0.1 fb
+  if not rmvunit(sigcut, 'fb'):
+    sigcut = addunit(0.1, 'fb')
 
+#creates Xsec dictionary
+  if not Xsec:
+    Xsec = {'7 TeV (LO)':{}, '8 TeV (LO)':{}, '7 TeV (NLL)':{}, '8 TeV (NLL)':{}}
+    slha = open(slhafile, 'r')
+    lines = slha.readlines()
+    currentblock = None
+    for l in lines:
+      if l.startswith("#"):
+         continue
+      if 'XSECTION' in l:
+         currentblock = 'XSECTION'
+         sqrt = l.split()[1]
+         pids = [int(l.split()[2]), int(l.split()[3])]
+         pids.sort()
+      elif ('BLOCK' in l) or ('DECAY' in l):
+         currentblock = 'BLOCK'
+      else:
+         if currentblock == 'BLOCK':          #ignores BLOCK and DECAY entries
+           continue
+         elif currentblock == 'XSECTION':
+           if l.split()[1] == '0':
+             key = (pids[0],pids[1])
+             Xsec['%s TeV (LO)'%sqrt][key] = addunit(float(l.split()[6]),'fb')
+           elif l.split()[1] =='2':
+             key = (pids[0],pids[1])
+             Xsec['%s TeV (NLL)'%sqrt][key] = addunit(float(l.split()[6]),'fb')
+           else:
+             print '[SLHADecomposer] unknown sqrt in XSECTION line', l
+         else:
+           print '[SLHADecomposer] unknown Block in XSECTION line', l
+
+  print Xsec
 #Read SLHA file
   res = pyslha.readSLHAFile(slhafile)
   
@@ -44,9 +83,10 @@ def decompose(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassgap
   BRdic = {}
   for k in res[1].keys():
     brs = copy.deepcopy(res[1][abs(k)].decays)
-    for i in range(len(brs)):
-      brs[i].ids = [-x for x in brs[i].ids]
+    for br in brs:
+      br.ids = [-x for x in br.ids]
     BRdic.update({k : res[1][abs(k)].decays, -k : brs})
+
 #Get mass list for all particles
   Massdic = {}
   for k in res[1].keys():
@@ -93,14 +133,14 @@ def decompose(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassgap
             mass.append(Massdic[x])
             NewEl.momID.append(x)
           else:
-            print 'SLHAdecomp: unknown particle:',x
+            print '[SLHAdecomposer] unknown particle:',x
             return False
           
         NewEl.particles.append(vertparts)
         if len(mass) == 1:
           NewEl.masses.append(mass[0])
         else:
-          print 'SLHAdecomp: unknown decay (R-parity violation?)'
+          print '[SLHAdecomp] unknown decay (R-parity violation?)'
           return False
         
         if weight*BR.br > sigcut:
@@ -127,9 +167,9 @@ def decompose(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassgap
           for w in Xsec.keys():
             weight.update({w : Xsec[w][ptcs]*WFinal[iel]*WFinal[jel]/(Pdic[ptcs[0]]*Pdic[ptcs[1]])})
           Els.weight = weight          
-          
+        
           if max(weight.values()) < sigcut: continue
-          
+        
           Einfo = Els.getEinfo()
           Top = SMSDataObjects.GTop()
           Top.vertnumb = Einfo["vertnumb"]
@@ -137,17 +177,19 @@ def decompose(slhafile,Xsec,sigcut,DoCompress=False,DoInvisible=False,minmassgap
           Top.ElList.append(Els)
           for ib in range(len(Top.vertnumb)):
             if len(Top.vertparts[ib]) != Top.vertnumb[ib]:
-              print 'SLHAdecomp: error creating topology'
+              print '[SLHAdecomposer] error creating topology'
               return False
 
           TopList = []
           TopList.append(Top) 
           # Do compression:          
           if DoCompress or DoInvisible:
-             FinalTopList = TopologyBuilder.compressTopology(TopList,DoCompress,DoInvisible,minmassgap)
+            FinalTopList = TopologyBuilder.compressTopology(TopList,DoCompress,DoInvisible,minmassgap)
           else:
             FinalTopList = TopList
           # Add topologies to topology list:
           SMSTopList.addList ( FinalTopList )
-       
+
+      
   return SMSTopList    
+
