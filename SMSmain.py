@@ -123,7 +123,7 @@ for Analysis in ListOfAnalyses:
     continue
 
 
-  if not Analysis.evaluateResult(): continue #Theoretical values for result and conditions
+  if not Analysis.computeTheoryPredictions(): continue #Theoretical values for result and conditions
 
   res = Analysis.results.keys()[0]  
 

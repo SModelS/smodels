@@ -2,7 +2,7 @@
 
 """
 .. module:: SMSDataObjects
-    :synopsis: Our basic data objects: TopologyList, GTop, EElement, BElement
+   :synopsis: Our basic data objects: TopologyList, GTop, EElement, BElement
     
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
@@ -268,7 +268,7 @@ class GTop:
     import TheoryPrediction
   
   #To store the result:
-    ClusterResult = TheoryPrediction.ClusterOutput()
+    ClusterResult = TheoryPrediction.XSecPredictionForCluster()
   #Make sure all elements have a common mass
     ClusterResult.mass = [self.ElList[0].B[0].masses,self.ElList[0].B[1].masses]
     for el in self.ElList:

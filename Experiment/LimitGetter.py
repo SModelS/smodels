@@ -26,7 +26,7 @@ def limit(analysis, addTheoryPredictions=[]):
   ##print "[LimitGetter.py] get limit for",analysis,"run=",run
   for (constraint,condition) in analysis.results.items():
     if len(addTheoryPredictions)>0:
-      if not analysis.evaluateResult() or len(analysis.ResultList) == 0: continue
+      if not analysis.computeTheoryPredictions() or len(analysis.ResultList) == 0: continue
       theoRes=analysis.ResultList[0]
     ##print"[LimitGetter.py] theoRes=",theoRes
     Tx=analysis.plots[constraint][0]

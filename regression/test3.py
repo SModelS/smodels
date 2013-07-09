@@ -126,7 +126,7 @@ for Analysis in ListOfAnalyses:
 
 
   for res in Analysis.results.keys():
-    theoRes = Analysis.evaluateResult() #Theoretical values for result and conditions
+    theoRes = Analysis.computeTheoryPredictions() #Theoretical values for result and conditions
     if not theoRes: continue
 
   res = Analysis.results.keys()[0]  

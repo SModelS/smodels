@@ -156,7 +156,7 @@ class EAnalysis:
               self.Top.ElList[jel].B[ib].masses.append(NewEl.B[ib].masses)
             self.Top.ElList[jel].weight.append(neweight)
 
-  def evaluateResult(self):
+  def computeTheoryPredictions(self):
     """ Main method for evaluating the theoretical predictions to the analysis \
         given the cross-section times branching ratio to specific final states. \
         It combines equivalent masses using the Cluster tools and calls \
