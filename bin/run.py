@@ -35,8 +35,12 @@ for Analysis in analyses:
   #if len(lims)==0: continue
   print "[run.py] -------------------------------------------------"
   print "[run.py] analysis=",Analysis ## ,"lims=",lims
+  print "[run.py] plots=",Analysis.plots
+  print "[run.py] v=",Analysis.plots.values()[0][1][0]
   #for lim in lims:
   #  print "[run.py] limit=",lim
   if len(Analysis.ResultList)==0: continue
   for cluster in Analysis.ResultList:
-    print "[run.py]",cluster
+    print "[run.py] cluster",cluster
+    theoRes=cluster.oldformat()
+    print "[run.py] cluster",theoRes
