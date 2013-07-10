@@ -17,7 +17,7 @@ class BElement:
   """ A branch-element """
 
   def __init__(self, S=None ):
-    """ A branch-element can be constructed from a string S """
+    """ A branch-element can be constructed from a string S (e.g. ('[b,b],[W]')"""
     self.masses = []
     self.particles = []
     self.momID = 0
