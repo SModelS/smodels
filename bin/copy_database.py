@@ -6,7 +6,7 @@ import os, sys
 
 def usage():
   print "Usage:",sys.argv[0]," [-h] [-r] [-scp] <destination_directory>"
-  print "        -scp: use scp to smodels instead of local cp"
+  print "        -scp: use scp to smodels instead of local cp (from afs)"
   print "        -h: show this help"
   print "        -r: remove old local database, if exists"
   sys.exit(0)
