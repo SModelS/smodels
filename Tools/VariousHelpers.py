@@ -30,3 +30,6 @@ def getInstallationBase():
     n=-len(i)
     if basedir[n:]==i: basedir=basedir[:n]
   return basedir
+
+import logging 
+logging.basicConfig(level=logging.INFO)
