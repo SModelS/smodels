@@ -47,7 +47,7 @@ class XSecPredictionForCluster:
     """ Returns a dictionary with the old output format """
     import logging
     log = logging.getLogger(__name__)
-    log.warning('XSecPredictionForCluster.oldformat() is obsolete')
+    log.warning('method is obsolete')
     resdic = {}
     resdic['mass'] = self.mass
     resdic['result'] = self.result_dic.values()[0]
