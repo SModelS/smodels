@@ -33,4 +33,6 @@ def getInstallationBase():
   return basedir
 
 import logging 
-logging.basicConfig(level=logging.INFO)
+FORMAT = '%(levelname)s in %(module)s.%(funcName)s(): %(message)s'
+# http://docs.python.org/2/library/logging.html#logging.Formatter
+logging.basicConfig(level=logging.INFO,format=FORMAT)
