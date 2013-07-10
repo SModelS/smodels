@@ -2,9 +2,9 @@
 
 """
 .. module:: ReferenceXSec
-    :synopsis: missing
+    :synopsis: a data class to encapsulate the result obtained from the XSecComputer
 
-.. moduleauthor:: missing <email@example.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
 
@@ -25,8 +25,18 @@ class ReferenceXSec:
   def crossSections ( self ): return self.data["Xsecdic"]
 
   def getCrossSection ( self, pidmom1, pidmom2, order="NLL", sqrts=8 ):
-    """ returns production cross section for a given production mode (pidmom1,
-    pidmom2) at 7 or 8 TeV in chosen order LO or NLL """
+    """ computes production cross section for a given production mode.
+
+      :param pidmom1: pdg of first mother
+      :type pidmom1: int
+      :param pidmom2: pdg of second mother
+      :type pidmom2: int
+      :param order: perturbation order ("LO","NLO", "NLL")
+      :param sqrts: sqrts, in TeV, without units
+      :type sqrts: float or int
+
+      :returns: production cross section (with unit)
+    """
     if pidmom1 > pidmom2:
       pidmom1, pidmom2 = pidmom2, pidmom1
     k='%d TeV (%s)' %(sqrts, order)
@@ -45,8 +55,16 @@ class ReferenceXSec:
 
   def getSumOfCrossSections ( self, pidmoms, order="NLL", sqrts=8 ):
     """ takes a list of pids and returns the integrated production cross section
-        for all combinations of pids from the given list at 7 or 8TeV 
-        with order = LO or NLL """
+        for all combinations of pids from the given list.
+
+      :param order: perturbation order ("LO", "NLO", "NLL" )
+      :param pidmoms: list of pids
+      :type pidmoms: list
+      :param sqrts: sqrts, in TeV, without units
+      :type sqrts: float or int
+
+      :returns: integrated production cross section
+    """
     from Tools.PhysicsUnits import rmvunit
     k='%d TeV (%s)' %(sqrts, order)
     if not self.crossSections().has_key(k):
@@ -71,6 +89,7 @@ class ReferenceXSec:
     return self.getSumOfCrossSections ( squarks, order, sqrts )
 
   def lhefile ( self, sqrts ):
+    """ returns the name of the lhe file """
     from Tools.PhysicsUnits import rmvunit
     sqrts=rmvunit(sqrts,"TeV")
     if sqrts==7: return self.data["lhe7file"]
