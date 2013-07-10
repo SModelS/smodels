@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import set_path, ROOT
+import set_path, ROOT, sys
 ROOT.gROOT.SetBatch()
 
 from numpy import arange
@@ -26,10 +26,12 @@ print "wx,wy=",xWidth,yWidth
 
 hslepstau=S.getUpperLimit ( a, tslep )
 print hslepstau
+if not hslepstau: sys.exit(0)
+hk=hslepstau.Clone()
+
 hstaustau=S.getUpperLimit ( a, tstau )
 print hstaustau
 
-hk=hslepstau.Clone()
 for x in arange ( xRange[0]+xWidth/2., xRange[1]+xWidth, xWidth ):
   for y in arange ( yRange[0]+yWidth/2., yRange[1]+yWidth, yWidth ):
     Bin=hk.FindBin(x,y)
