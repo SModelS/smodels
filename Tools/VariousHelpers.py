@@ -4,7 +4,8 @@
 .. module:: VariousHelpers
     :synopsis: Various helper classes.
 
-.. moduleauthor:: missing <email@example.com>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
 
