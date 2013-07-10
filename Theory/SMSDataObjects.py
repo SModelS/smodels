@@ -261,7 +261,7 @@ class GTop:
       :type results: a dictionary with the constraints and the conditions \
          of the experiment results
 
-      :returns: a TheoryPrediction object
+      :returns: an XSecPredictionForCluster object
     """
     from Tools.PhysicsUnits import addunit
     from AuxiliaryFunctions import getelements, eltonum
@@ -340,7 +340,6 @@ class GTop:
       
     ClusterResult.conditions_dic = cond_res
     ClusterResult.result_dic = const_res
-
 
     return ClusterResult
 
