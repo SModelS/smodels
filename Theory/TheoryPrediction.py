@@ -5,6 +5,7 @@
     :synopsis: Classes encapsulating the results of the computation of reference cross sections
     
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
     
 """
 
@@ -67,7 +68,7 @@ class XSecPredictionForCluster:
 
 
 class TheoryPrediction:
-  """ a wrapper for the result of EAnalysis.evaluteResult,
+  """ a wrapper for the result of EAnalysis.computeTheoryPredictions,
       make it easier to access the theoretical xsec prediction for 
       a particular EElement """
 
