@@ -61,6 +61,13 @@ class XSecPredictionForCluster:
 
     return resdic
 
+  def getCondition ( self, order="NLL", sqrts=8 ):
+    """ get the condition that has been met, None if not available """
+    key="%d TeV (%s)" % ( int(sqrts), order)
+    if not self.conditions_dic.has_key ( key ):
+      return None
+    return self.conditions_dic[key]
+
   def prediction ( self ):
     """ get the theory prediction FIXME (simplified version with new output. What is missing?)  FIXME m1, m2, etc not used???
 
