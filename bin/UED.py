@@ -7,6 +7,7 @@ from Theory import LHEDecomposer, XSecComputer
 from Experiment import TxNames, SMSAnalysisFactory, SMSResults, LimitGetter, SMSHelpers
 from Tools.PhysicsUnits import fb
 from Tools import FeynmanGraphs
+from Tools.VariousHelpers import logging
 
 ## SMSHelpers.Base="/home/lisa/daten/smodels"
 
