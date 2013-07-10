@@ -160,11 +160,10 @@ class EAnalysis:
     """ Main method for evaluating the theoretical predictions to the analysis \
       given the cross-section times branching ratio to specific final states. \
       It combines equivalent masses using the Cluster tools and calls \
-      evaluateCluster to compute the theoretical predictions for each cluster.
+      evaluateCluster to compute the theoretical predictions for each cluster. \
+      Produces self.ResultsList.
 
-      :returns: a list of dictionaries with the cluster average mass and \
-        theoretical values for the result and the condition(s) in the analysis.
-      FIXME will generate the ResultList, return True (return None if list is empty)
+      :returns: True if successful, None if list is empty.
     """
     import copy
     from ClusterTools import DoCluster, GoodMass
