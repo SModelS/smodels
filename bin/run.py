@@ -5,20 +5,23 @@
 import set_path, tempfile
 from Theory import LHEDecomposer, XSecComputer
 from Experiment import TxNames, SMSAnalysisFactory, SMSResults, LimitGetter
+from Tools.VariousHelpers import logging
 
-print "[run.py] loading analyses ...."
+log = logging.getLogger(__name__)
+
+log.info ( "loading analyses" )
 # analyses = SMSAnalysisFactory.load( )
 analyses = SMSAnalysisFactory.load( anas="alphaT8TeV", topos="T2bb" )
-print "[run.py] done loading %d analyses" % len(analyses)
+log.info ( "done loading %d analyses" % len(analyses) )
 
 nevts=1000
 # slhafile="../slha/TChiNuSlep.slha"
 slhafile="../slha/T2bb.slha"
 
 Tmp=tempfile.mkdtemp()
-print "[run.py] now run pythia in",Tmp
+log.info ( "now run pythia in "+Tmp )
 Wv=XSecComputer.compute(nevts,slhafile,rpythia = True, donlo = True, datadir=Tmp)
-print "[run.py] done running pythia"
+log.info ( "done running pythia" )
 
 lhefile=Wv.lhefile ( 8 )
 
@@ -33,14 +36,15 @@ for Analysis in analyses:
   # lims=LimitGetter.limit ( Analysis )
   #lims=[]
   #if len(lims)==0: continue
-  print "[run.py] -------------------------------------------------"
-  print "[run.py] analysis=",Analysis ## ,"lims=",lims
-  print "[run.py] plots=",Analysis.plots
-  print "[run.py] v=",Analysis.plots.values()[0][1][0]
+  log.info ( "-------------------------------------------------" )
+  log.info ( "analysis="+str(Analysis) ) 
+  log.info ( "plots="+str(Analysis.plots) )
+  log.info ( "v="+str(Analysis.plots.values()[0][1][0]) )
   #for lim in lims:
   #  print "[run.py] limit=",lim
   if len(Analysis.ResultList)==0: continue
   for cluster in Analysis.ResultList:
-    print "[run.py] cluster",cluster
+    log.info ( "cluster"+str(cluster) )
+    log.info ( "cluster class %s" % str ( cluster.__class__ ) )
     theoRes=cluster.oldformat()
-    print "[run.py] cluster",theoRes
+    log.info ( "cluster oldformat"+str(theoRes) )
