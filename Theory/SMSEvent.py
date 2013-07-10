@@ -52,7 +52,7 @@ class SMSEvent:
     return ret
 
 class Particle:
-    """ simple helper class to encapsulate one particle """ 
+    """ simple helper class that represents one particle """ 
     def __init__(self):
         self.pdg = 0
         self.status = 0
