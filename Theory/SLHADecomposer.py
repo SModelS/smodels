@@ -37,14 +37,14 @@ def decompose(slhafile,Xsec=None,sigcut=None,DoCompress=False,DoInvisible=False,
   if not rmvunit(sigcut, 'fb'):
     sigcut = addunit(0.1, 'fb')
 
-#creates Xsec dictionary
+#creates Xsec dictionary if Xsec=None
   if not Xsec:
     Xsec = {'7 TeV (LO)':{}, '8 TeV (LO)':{}, '7 TeV (NLL)':{}, '8 TeV (NLL)':{}}
     slha = open(slhafile, 'r')
     lines = slha.readlines()
     currentblock = None
     for l in lines:
-      if l.startswith("#"):
+      if l.startswith("#") or len(l)<2:
          continue
       if 'XSECTION' in l:
          currentblock = 'XSECTION'
@@ -68,7 +68,6 @@ def decompose(slhafile,Xsec=None,sigcut=None,DoCompress=False,DoInvisible=False,
          else:
            print '[SLHADecomposer] unknown Block in XSECTION line', l
 
-  print Xsec
 #Read SLHA file
   res = pyslha.readSLHAFile(slhafile)
   
