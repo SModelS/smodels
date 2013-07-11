@@ -35,7 +35,7 @@ class BElement:
         self.particles.append ( ptcs )
       # print "[SMSDataObjects] ptcs=",ptcs
 
-  def isEqual ( ElA, ElB, order=True ):
+  def isEqual ( self, ElA, ElB, order=True ):
     if not simParticles(ElA.particles,ElB.particles,useDict=False): return False
     if ElA.masses != ElB.masses: return False
     return True
@@ -100,7 +100,7 @@ class EElement:
       ret.append ( b.particles )
     return ret
 
-  def isSimilar ( ElA, ElB,order=True,igmass=False ):
+  def isSimilar ( self, ElA, ElB,order=True,igmass=False ):
     """ Compare two EElements
         If particles are similar and all masses equal, returns True,
         otherwise returns False
@@ -131,7 +131,7 @@ class EElement:
         if not igmass and El1[i].masses != El2[i].masses: return False
     return True
 
-  def isEqual ( ElA, ElB,order=True):
+  def isEqual ( self, ElA, ElB,order=True):
     """ Compare two EElements
         If all masses and particles are equal, returns True,
         otherwise returns False
