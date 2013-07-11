@@ -16,7 +16,7 @@ from AuxiliaryFunctions import Ceval
 class BElement:
   """ A branch-element """
 
-  def __init__(self, S=None ):
+  def __init__( self, S=None ):
     """ A branch-element can be constructed from a string S (e.g. ('[b,b],[W]')"""
     self.masses = []
     self.particles = []
@@ -35,7 +35,7 @@ class BElement:
         self.particles.append ( ptcs )
       # print "[SMSDataObjects] ptcs=",ptcs
 
-  def isEqual ( self, ElA, ElB, order=True ):
+  def isEqual ( ElA, ElB, order=True ):
     if not simParticles(ElA.particles,ElB.particles,useDict=False): return False
     if ElA.masses != ElB.masses: return False
     return True
@@ -69,7 +69,7 @@ class BElement:
 
 class EElement:
   """ An Event Element, contains of several branches and weight information """
-  def __init__(self, S=None ):
+  def __init__( self, S=None ):
     """ If S != None, an Element is created from a string description """
     self.B = []
     self.weight = []
@@ -83,7 +83,7 @@ class EElement:
       self.B.append ( copy.deepcopy ( BElement ( b2 ) ) )
 
 #Get global topology info from element structure
-  def getEinfo(self):
+  def getEinfo( self ):
     vertnumb = []
     vertparts = []
     for el in self.B:
@@ -100,7 +100,7 @@ class EElement:
       ret.append ( b.particles )
     return ret
 
-  def isSimilar ( self, ElA, ElB,order=True,igmass=False ):
+  def isSimilar ( ElA, ElB,order=True,igmass=False ):
     """ Compare two EElements
         If particles are similar and all masses equal, returns True,
         otherwise returns False
@@ -131,7 +131,7 @@ class EElement:
         if not igmass and El1[i].masses != El2[i].masses: return False
     return True
 
-  def isEqual ( self, ElA, ElB,order=True):
+  def isEqual ( ElA, ElB,order=True):
     """ Compare two EElements
         If all masses and particles are equal, returns True,
         otherwise returns False
