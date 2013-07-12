@@ -10,17 +10,12 @@ from Tools.VariousHelpers import logging
 from Experiment import SMSAnalysisList, SMSAnalysisFactory, LimitGetter
 
 
-DoFactory = True
-
 printer=SMSPrettyPrinter.SMSPrettyPrinter()
 
-
-
-
 #Generate events and compute cross-sections:
-nevts = 100
+nevts = 10000
 #slhafile = "AndreSLHA/andrePT4.slha"
-slhafile = "slha/andrePT4.slha"
+slhafile = "slha/DESY_stop.slha"
 Wv = XSecComputer.compute(nevts,slhafile,rpythia = True, donlo = True)
 W = Wv["Wdic"]
 Xsec = Wv["Xsecdic"]
@@ -30,10 +25,13 @@ ClusterTools.CMdic = CMdic
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Creat analyses list:
+DoFactory = True
 if DoFactory:
   ListOfAnalyses = SMSAnalysisFactory.load()
 else:  
   ListOfAnalyses = SMSAnalysisList.load()
+
+
 
 
 DoCompress = True
@@ -90,20 +88,23 @@ print '\n \n \n'
 for Analysis in ListOfAnalyses:
   Analysis.add(SMSTopList)
 
+
 #Print analyses output:
 AnElement_table = PrettyTable(["Analyses","Element","Masses","Element Weight"])  
+
+
 
 for Ana in ListOfAnalyses:
   label = Ana.label
   ifirst = True
-  for i in range(len(Ana.Top.ElList)):
-    ptcs = str([Ana.Top.ElList[i].B[0].particles,Ana.Top.ElList[i].B[1].particles]).replace("'","").replace(" ","")
-    for j in range(len(Ana.Top.ElList[i].B[0].masses)):
-      mass = [Ana.Top.ElList[i].B[0].masses[j],Ana.Top.ElList[i].B[1].masses[j]]
+  for iel,El in enumerate(Ana.Top.ElList):
+    ptcs = El.ParticleStr
+    for im,massweight in enumerate(El.MassWeightList):
+      mass = massweight.mass
       if not ifirst: label = ""
-      if j != 0: ptcs = ""
+      if im != 0: ptcs = ""
       ifirst = False
-      AnElement_table.add_row([label,ptcs,wrap(printer.pformat(mass),width=100),wrap(printer.pformat(Ana.Top.ElList[i].weight[j]),width=30)])
+      AnElement_table.add_row([label,ptcs,wrap(printer.pformat(mass),width=100),wrap(printer.pformat(massweight.weight),width=30)])
   AnElement_table.add_row(["---","---","---","---"])  
     
 
@@ -111,7 +112,7 @@ for Ana in ListOfAnalyses:
 
 
 #print '\n \n \n'
-
+#sys.exit()
 
     
 #Compute theoretical predictions to analyses results:
