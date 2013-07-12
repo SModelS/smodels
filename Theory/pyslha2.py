@@ -347,7 +347,7 @@ class Particle(object):
 ###############################################################################
 ## SLHA parsing and writing functions
 
-def readSLHA(spcstr, ignorenobr=False):
+def readSLHA(spcstr, ignorenobr=False, ignorenomass=False ):
     """
     Read an SLHA definition from a string, returning dictionaries of blocks and
     decays.
@@ -422,7 +422,8 @@ def readSLHA(spcstr, ignorenobr=False):
             if decays.has_key(pid):
                 decays[pid].mass = blocks["MASS"][pid]
     except:
-        raise ParseError("No MASS block found: cannot populate particle masses")
+        if not ignorenomass:
+            raise ParseError("No MASS block found: cannot populate particle masses")
 
     return blocks, decays
 
