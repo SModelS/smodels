@@ -347,7 +347,7 @@ class Particle(object):
 ###############################################################################
 ## SLHA parsing and writing functions
 
-def readSLHA(spcstr, ignorenobr=False, ignorenomass=False ):
+def readSLHA(spcstr, D ): ## ignorenobr=False, ignorenomass=False ):
     """
     Read an SLHA definition from a string, returning dictionaries of blocks and
     decays.
@@ -355,6 +355,10 @@ def readSLHA(spcstr, ignorenobr=False, ignorenomass=False ):
     If the ignorenobr parameter is True, do not store decay entries with a
     branching ratio of zero.
     """
+    ignorenobr=False
+    ignorenomass=False
+    if D.has_key ( "ignorenobr" ): ignorenobr=D["ignorenobr"]
+    if D.has_key ( "ignorenomass" ): ignorenomass=D["ignorenomass"]
     blocks = _mkdict()
     decays = _mkdict()
     #
