@@ -129,3 +129,81 @@ def writeXSECTIONToSLHAFile( slhafile, nevts=10000 ):
 
   XSEC.clean(Tmp)
   return
+
+def num_in_base(val, base=62, min_digits=1, complement=False,
+       digits="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"):
+    """Convert number to string in specified base
+       If minimum number of digits is specified, pads result to at least
+       that length.
+       If complement is True, prints negative numbers in complement
+       format based on the specified number of digits.
+       Non-standard digits can be used. This can also allow bases greater
+       than 36.
+    """
+    if base < 2: raise ValueError("Minimum base is 2")
+    if base > len(digits): raise ValueError("Not enough digits for base")
+    # Deal with negative numbers
+    negative = val < 0
+    val = abs(val)
+    if complement:
+        sign = ""
+        max = base**min_digits
+        if (val > max) or (not negative and val == max):
+            raise ValueError("Value out of range for complemented format")
+        if negative:
+            val = (max - val)
+    else:
+        sign = "-" * negative
+    # Calculate digits
+    val_digits = []
+    while val:
+        val, digit = divmod(val, base)
+        val_digits.append(digits[digit])
+    result = "".join(reversed(val_digits))
+    leading_digits = (digits[0] * (min_digits - len(result)))
+    return sign + leading_digits + result
+
+def uniqueName ( slhafile, blocks= { "MINPAR": [3], "EXTPAR": [ 31, 32, 33, 34, 35, 36, 41, 42, 43, 44, 45, 46, 47, 48, 49, 23, 26 ] } ):
+  """ create a unique name for an slha file.
+
+    :param blocks: dictionary of the slha blocks that are used; \
+      values in dictionary are lists of indices, that are to be used, \
+      or None if all indices are to be considered.
+    :returns: unique name for slha file
+  """
+
+  ## for some values (e.g. angles, we want to multiply with a factor,
+  ## before truncating them
+  factors={} 
+  factors["MINPAR"]={ 3: 100. } ## tanbeta
+
+  import logging
+  log = logging.getLogger(__name__)
+  name=""
+  try:
+    import pyslha2
+    f=pyslha2.readSLHAFile ( slhafile, ignorenomass=True )
+    if not f or len(f)==0:
+      log.error ( "couldnt read %s." % ( slhafile ) )
+      return None
+    bnr=0 # block number
+    for (key,block) in f[0].items():
+      if not key in blocks.keys(): continue
+      bnr+=1
+      considerIndices=blocks[key]
+      if considerIndices==None: # consider all indices, if none are given
+        considerIndices=block.keys()
+      for (index,value) in block.items():
+        if index not in considerIndices: continue
+        #print "block %s bnr %d, variable #%d %f" % ( block.name,bnr,index,value)
+        if factors.has_key ( block.name ) and factors[block.name].has_key ( index ):
+          value=value*factors[block.name][index]
+        t=int(value)
+        if t<0: t=1000000+abs(t)
+        name+=str(t)
+        
+    ret=num_in_base ( long(name) )
+    return ret 
+  except IOError,e:
+    log.error ( "couldnt read %s: %s" % ( slhafile, e ) )
+  return None
