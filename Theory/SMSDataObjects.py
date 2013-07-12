@@ -323,7 +323,7 @@ class CTop:
 
 #Consistency checks:
     for OldEl in self.ElList:
-      if type(OldElement) != type(CElement()):
+      if type(OldEl) != type(CElement()):
         print "[SMSDataObjects.py] wrong input! Elements in ATop must be an AElement object"
         return False
       if OldEl.getEinfo() != NewElement.getEinfo(): return False
@@ -340,7 +340,7 @@ class CTop:
   #If mass is in cluster, add element to Cluster Topology
       match = False
       for OldEl in self.ElList:
-        oldparticles = OldElement.getParticleList()
+        oldparticles = OldEl.getParticleList()
         if simParticles(oldparticles,newparticles,useDict=False):
           match = True
           oldweight = OldEl.Weight
@@ -464,12 +464,6 @@ class ATop:
   def __eq__ ( self, other ):
     return self.isEqual ( other )
 
-  def leadingElement ( self ):
-    """ often, a topology carries only one element, so
-      we have a special accessor for this """
-    if len(self.ElList)==0: return None
-    return self.ElList[0]
-
   def addEventElement(self,NewElement):
     """  Adds an event element (EElement) to the corresponding analysis elements (AElements) in ElList\
          The event element and analysis elements DO NOT need to have the same branch ordering"""
@@ -490,7 +484,7 @@ class ATop:
 
       oldparticles = OldElement.getParticleList()
 #Check if particles match
-      if not simParticles(newparticles_a,oldparticles) and not simParticles(newparticles_b,oldparticles): return False
+      if not simParticles(newparticles_a,oldparticles) and not simParticles(newparticles_b,oldparticles): continue
 #Format the new weight to the analysis-dependent format (remove weights which do not match the analysis format and add zero to missing weights)
       neweight = copy.deepcopy(NewElement.weight)
       for key in OldElement.WeightFormat.keys()+neweight.keys():
