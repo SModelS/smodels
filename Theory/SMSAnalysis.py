@@ -128,18 +128,26 @@ class EAnalysis:
     from ClusterTools import DoCluster, GoodMass
     from Experiment import LimitGetter
 
+
+    if self.label == "Weakinos8TeV:TChiChipmSlepL":
+      print "\n\n"
+      for El in self.Top.ElList:
+        print "Ptc=",El.ParticleStr
+        for mw in El.MassWeightList: print mw.mass,mw.weight
+      print "\n\n"
+
     dmin = self.masscomp
     output = []
   #Create a mass list with all masses appearing in the analysis elements which have similar branch masses:
     Goodmasses = []
-    Top = copy.deepcopy(self.Top)
-    for El in Top.ElList:
+    for El in self.Top.ElList:
       for massweight in El.MassWeightList:
         gmass = GoodMass(massweight.mass,self.MassDist,dmin)
         if gmass:
            massweight.mass = gmass
            if not gmass in Goodmasses: Goodmasses.append(gmass)
 
+    
   #Cluster masses:
     MCluster = DoCluster(Goodmasses,self.MassDist,dmin)
 
