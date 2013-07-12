@@ -28,6 +28,7 @@ def decompose(slhafile,Xsec=None,sigcut=None,DoCompress=False,DoInvisible=False,
   import TopologyBuilder, SMSDataObjects, ParticleNames
   from Tools.PhysicsUnits import addunit, rmvunit
   import pyslha2 as pyslha
+  import ClusterTools
 
   if DoCompress and rmvunit(minmassgap,'GeV') == -1: 
     print "[SLHAdecomposer] Please, set minmassgap"
@@ -39,34 +40,36 @@ def decompose(slhafile,Xsec=None,sigcut=None,DoCompress=False,DoInvisible=False,
 
 #creates Xsec dictionary if Xsec=None
   if not Xsec:
-    Xsec = {'7 TeV (LO)':{}, '8 TeV (LO)':{}, '7 TeV (NLL)':{}, '8 TeV (NLL)':{}}
+    CMdic = {}
+    Xsec = {}
     slha = open(slhafile, 'r')
     lines = slha.readlines()
-    currentblock = None
+    xsecblock = False
     for l in lines:
-      if l.startswith("#") or len(l)<2:
-         continue
+      if l.startswith("#") or len(l)<2: continue
       if 'XSECTION' in l:
-         currentblock = 'XSECTION'
-         sqrt = l.split()[1]
-         pids = [int(l.split()[2]), int(l.split()[3])]
-         pids.sort()
-      elif ('BLOCK' in l) or ('DECAY' in l):
-         currentblock = 'BLOCK'
+        xsecblock = True
+        sqrtS =  eval(l.split()[1])
+        pids = (eval(l.split()[5]),eval(l.split()[6]))
+        continue
+      if not xsecblock: continue  #ignores other entries
+      cs_order = eval(l.split()[1])
+      cs = addunit(eval(l.split()[6]),'fb')
+      wlabel = str(int(sqrtS))+' TeV'
+      if cs_order == 0: wlabel += ' (LO)'
+      elif cs_order == 1: wlabel += ' (NLO)'
+      elif cs_order == 2: wlabel += ' (NLL)'
       else:
-         if currentblock == 'BLOCK':          #ignores BLOCK and DECAY entries
-           continue
-         elif currentblock == 'XSECTION':
-           if l.split()[1] == '0':
-             key = (pids[0],pids[1])
-             Xsec['%s TeV (LO)'%sqrt][key] = addunit(float(l.split()[6]),'fb')
-           elif l.split()[1] =='2':
-             key = (pids[0],pids[1])
-             Xsec['%s TeV (NLL)'%sqrt][key] = addunit(float(l.split()[6]),'fb')
-           else:
-             print '[SLHADecomposer] unknown sqrt in XSECTION line', l
-         else:
-           print '[SLHADecomposer] unknown Block in XSECTION line', l
+        print '[SLHADecomposer] unknown QCD order in XSECTION line', l
+        return False
+
+      CMdic[wlabel] = addunit(sqrtS,'TeV')
+      if not wlabel in Xsec.keys(): Xsec[wlabel] = {}
+      Xsec[wlabel][pids] = cs
+
+
+#Save CM dictionary
+    ClusterTools.CMdic = CMdic
 
 #Read SLHA file
   res = pyslha.readSLHAFile(slhafile)
