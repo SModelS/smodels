@@ -5,6 +5,7 @@
     :synopsis: A collection of tools needed for use and manipulation of SLHA files
     
 .. moduleauthor:: Doris Proschofsky <Doris.Proschofsky@assoc.oeaw.ac.at>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
     
 """
 
