@@ -107,7 +107,7 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
 
       else: massv=[x,y]
 
-      ana_obj = SMSAnalysisFactory.load( anas=ana, topos=topo ) #create list of analysis objects, but give one analysis, one topo, so list has one entry only!
+#      ana_obj = SMSAnalysisFactory.load( anas=ana, topos=topo ) #create list of analysis objects, but give one analysis, one topo, so list has one entry only!
 
       slha_dic = {}
       for ii in range(len(pid_dic[topo])):
@@ -121,10 +121,20 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
       topoList = SLHADecomposer.decompose(slha_name, XSec, sigmacut)
       os.unlink(slha_name)
 
+      ana_obj = SMSAnalysisFactory.load( anas=ana, topos=topo ) #create list of analysis objects, but give one analysis, one topo, so list has one entry only!
+
       ana_obj[0].add( topoList ) # the list ana_obj has only one entry here!, all EElements consisten with the constraints for this topology are added to the EAnalysis object
-      lims=LimitGetter.limit(ana_obj[0], addTheoryPrediction=False)
-      v=None
-      if lims: v=rmvunit(lims[0]['ul'],'fb')
+
+#      print ana_obj[0].Top.ElList[0].B[0].masses
+#      lims=LimitGetter.limit(ana_obj[0], addTheoryPredictions=[])
+      if not ana_obj[0].computeTheoryPredictions():
+        hL.Fill(x,y)
+        hLine.Fill(x,y)
+        y+=bwy
+        continue
+
+#      v=None
+      v=rmvunit(ana_obj[0].ResultList[0].explimit,'fb')
 
 #      v=rmvunit(LimitGetter.GetPlotLimit([massv,massv],[topo,[ana]],a)[0][1],'fb')
 
@@ -135,14 +145,19 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
         if v and v<rXs.GetBinContent(rXs.FindBin(x)):
           hL.Fill(x,y,0)
         else: hL.Fill(x,y)
-        if ana_obj[0].computeTheoryPredictions():
-          hUL.Fill(x,y,rmvunit(ana_obj[0].ResultList[0].explimit,'fb'))
-          for values in ana_obj[0].ResultList[0].result_dic.values():
-            hTheory.Fill(x,y,rmvunit(values['8 TeV (NLL)'],'fb'))
-            sumTheory+=rmvunit(values['8 TeV (NLL)'],'fb')
-          if rmvunit(ana_obj[0].ResultList[0].explimit,'fb') and rmvunit(ana_obj[0].ResultList[0].explimit,'fb')<sumTheory:
-            hLine.Fill(x,y,0)
-          else: hLine.Fill(x,y)
+#        if ana_obj[0].computeTheoryPredictions():
+        hUL.Fill(x,y,rmvunit(ana_obj[0].ResultList[0].explimit,'fb'))
+        print "THEORY XSEC",ana_obj[0].ResultList[0].result_dic.values()
+#        for values in ana_obj[0].ResultList[0].result_dic.values():
+#          hTheory.Fill(x,y,rmvunit(values['8 TeV (NLL)'],'fb'))
+#          sumTheory+=rmvunit(values['8 TeV (NLL)'],'fb')
+#        theoRes = ana_obj[0].ResultList[0].oldformat()
+#        if theoRes['result']:
+        hTheory.Fill(x,y,rmvunit(ana_obj[0].ResultList[0].result_dic.values()[0]['8 TeV (NLL)'],'fb'))
+        sumTheory+=rmvunit(ana_obj[0].ResultList[0].result_dic.values()[0]['8 TeV (NLL)'],'fb')
+        print "THEORY XSEC",ana_obj[0].ResultList[0].result_dic.values()[0]['8 TeV (NLL)']
+        if rmvunit(ana_obj[0].ResultList[0].explimit,'fb') and rmvunit(ana_obj[0].ResultList[0].explimit,'fb')<sumTheory:
+          hLine.Fill(x,y,0)
         else: hLine.Fill(x,y)
 
       y+=bwy
