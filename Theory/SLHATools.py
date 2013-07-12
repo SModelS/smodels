@@ -83,31 +83,47 @@ def writeXSECTIONToSLHAFile( slhafile, nevts=10000 ):
   import Tools.PhysicsUnits as UNIT
 
   fstate = "  " #final state, if necessary can be read out from DECAY block
+  fstate = "# Nevts="+str(nevts) #additional information?
 
   Tmp = tempfile.mkdtemp()
 
+  fin = open(slhafile, 'r')
+  chck = fin.read()
+  fin.close()
+  if 'XSECTION' in chck: return False
+
   #computes production cross sections
-  dic = XSEC.compute(nevts, slhafile, datadir = Tmp)   
+  dic = XSEC.compute(nevts, slhafile, datadir = Tmp)
+
+  #get CM dictionary
+  CMdic = dic.CMdic()
 
   #write production cross sections to XSECTION block in SLHA file.
   writtenpids = []   #list of pids (keys) already written to the SLHA file, to avoid doubles
   f = open(slhafile, 'a')
-  for k in dic.crossSections():
-    for pids in dic.crossSections()[k]:
-      if pids in writtenpids:    #to avoid doubles
-        continue
-      else:
-        writtenpids.append(pids)      
-        for sqrt in [7,8]:
-          csLO = UNIT.rmvunit(dic.getCrossSection(pids[0], pids[1], order="LO" , sqrts = sqrt),'fb')
-          csNLL = UNIT.rmvunit(dic.getCrossSection(pids[0], pids[1], order="NLL" , sqrts = sqrt),'fb')
-          if csLO or csNLL:
-            f.write("\n")
-            f.write("XSECTION  %d  %d  %d  %s\n" %(sqrt, pids[0], pids[1], fstate))
-          if csLO:
-            f.write("0  0  0  0  0  0  %f XSecComputer 1.0\n" %csLO)
-          if csNLL:
-           f.write("0  2  0  0  0  0  %f XSecComputer 1.0\n" %csNLL)
+  XsecDic = dic.crossSections()
+  allpids = XsecDic[XsecDic.keys()[0]].keys()
+  for pids in allpids:
+    pid_xsecs = {}
+#Collect all cross-sections for the pid pair
+    for k in XsecDic:
+      sqrtS = UNIT.rmvunit(CMdic[k],'TeV')
+      if "(LO)" in k:
+        cs_order = 0
+      elif "(NLO)" in k:
+        cs_order = 1
+      elif "(NLL)" in k:
+        cs_order = 2
+      cs = dic.crossSections()[k][pids]
+      cs = UNIT.rmvunit(cs,'fb')
+      if not sqrtS in pid_xsecs.keys(): pid_xsecs[sqrtS] = []
+      pid_xsecs[sqrtS].append([cs_order,cs])
+#Write cross-sections grouped by sqrtS:
+    for sqrtS in pid_xsecs.keys():
+      f.write("\nXSECTION  %f  %d  %d  %d  %d  %d  %s\n" %(sqrtS, 2212, 2212, 2, pids[0], pids[1], fstate))
+      for line_cs in pid_xsecs[sqrtS]:
+        f.write("0  %d  0  0  0  0  %f XSecComputer 1.0\n" %(line_cs[0],line_cs[1]))
+
 
   f.close
 
