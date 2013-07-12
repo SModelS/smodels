@@ -14,18 +14,13 @@ DoFactory = True
 
 printer=SMSPrettyPrinter.SMSPrettyPrinter()
 
-#PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
-#Creat analyses list:
-if DoFactory:
-  ListOfAnalyses = SMSAnalysisFactory.load()
-else:  
-  ListOfAnalyses = SMSAnalysisList.load()
+
 
 
 #Generate events and compute cross-sections:
-nevts = 10000
+nevts = 100
 #slhafile = "AndreSLHA/andrePT4.slha"
-slhafile = "slha/DESY_stop.slha"
+slhafile = "slha/andrePT4.slha"
 Wv = XSecComputer.compute(nevts,slhafile,rpythia = True, donlo = True)
 W = Wv["Wdic"]
 Xsec = Wv["Xsecdic"]
@@ -33,6 +28,12 @@ lhefile = Wv["lhefile"]
 CMdic = Wv["CMdic"]
 ClusterTools.CMdic = CMdic
 
+#PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
+#Creat analyses list:
+if DoFactory:
+  ListOfAnalyses = SMSAnalysisFactory.load()
+else:  
+  ListOfAnalyses = SMSAnalysisList.load()
 
 
 DoCompress = True
@@ -96,7 +97,7 @@ for Ana in ListOfAnalyses:
   label = Ana.label
   ifirst = True
   for i in range(len(Ana.Top.ElList)):
-    ptcs = [Ana.Top.ElList[i].B[0].particles,Ana.Top.ElList[i].B[1].particles]
+    ptcs = str([Ana.Top.ElList[i].B[0].particles,Ana.Top.ElList[i].B[1].particles]).replace("'","").replace(" ","")
     for j in range(len(Ana.Top.ElList[i].B[0].masses)):
       mass = [Ana.Top.ElList[i].B[0].masses[j],Ana.Top.ElList[i].B[1].masses[j]]
       if not ifirst: label = ""
@@ -109,8 +110,8 @@ for Ana in ListOfAnalyses:
 #print(AnElement_table)
 
 
-print '\n \n \n'
-#sys.exit()
+#print '\n \n \n'
+
 
     
 #Compute theoretical predictions to analyses results:

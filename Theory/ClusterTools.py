@@ -8,7 +8,7 @@
 
 """
 
-CMdic={} ## FIXME whats this?
+CMdic={} # This stores a dictionary to relate the weight labels to their respective sqrts values ( '7 TeV (NLL)' : 7 TeV, '8 TeV (LO)' : 8 TeV, etc)
 
 def DoCluster(objlist,Distfunc,dmin):
   """ Cluster algorithm (generic for any type of object, as long as the distance function is given) 

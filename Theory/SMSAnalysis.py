@@ -10,18 +10,16 @@
     
 """
     
-from SMSDataObjects import GTop, EElement
+from SMSDataObjects import ATop, AElement, CTop
 from ParticleNames import Reven, PtcDic
 import ClusterTools
 from Tools.PhysicsUnits import addunit, rmvunit
+import sys
 
 class EAnalysis:  
-  """ FIXME currently an analysis is a container for the association between
-      a topology and n results. Maybe the structure becomes clearer, if the
-      association is made only between a topology and one result? """
   def __init__(self):
     self.label = ""
-    self.Top = GTop()
+    self.Top = ATop()
     self.sqrts = 0
     self.lum = 0
     self.results = {} ## pairs of (constraint,condition)
@@ -33,9 +31,10 @@ class EAnalysis:
   def __str__(self):
     return self.label
 
-#Given the constraints dictionary, automatically fill the element list with the
-#elements corresponding to the strings in the dictionary, skipping repeated ones
+
   def generateElements(self):
+    """ Given the results dictionary, fills the analysis topology list with the \
+    analysis elements corresponding to the strings in the dictionary, skipping repeated ones"""
      
     ListOfStrs = []
     vertnumb = self.Top.vertnumb
@@ -45,25 +44,30 @@ class EAnalysis:
       if len(vertparts[k]) != vertnumb[k]:
         print "[SMSAnalysis.generateElements]: Inconsistent data: ninsertions=%d len(insertions)=%d for ``%s''." % ( vertnumb[k], len(vertparts[k]), self.Top )
         return False
-    
+
+#Define weight format according to CM energy and CMdic:  
+    zeroweight = {}
+    for key in ClusterTools.CMdic.keys():
+      if self.sqrts == ClusterTools.CMdic[key]: zeroweight[key] = addunit(0., 'fb')
+
 #Get all element strings:    
     inelements = self.results.items()
-    
     for iii in range(len(inelements)):
       for ii in range(2):  
         con = inelements[iii][ii].replace(" ","")
         while "[" in con:  #String has element        
           st = con[con.find("[[["):con.find("]]]")+3] #Get duplet
           con = con.replace(st,"")  # Remove element duplet
-          element=EElement ( st )
-          ptclist = element.allParticles()
+          element=AElement(st)
+          ptclist = element.getParticleList()
+
 #Syntax checks:
-          for ib in range(2):
-            for ipt in range(len(ptclist[ib])):
-              if len(ptclist[ib][ipt]) != vertparts[ib][ipt]:
+          for ib,branch in enumerate(ptclist):
+            for iv,vertex in enumerate(branch):
+              if len(vertex) != vertparts[ib][iv]:
                 print "[SMSAnalysis.generateElements]: Wrong syntax2"
                 return False
-              for ptc in ptclist[ib][ipt]:
+              for ptc in vertex:
                 if not ptc in Reven.values() and not PtcDic.has_key(ptc):
                   print "GenerateElements: Unknown particle ",ptc
                   return False    
@@ -71,14 +75,9 @@ class EAnalysis:
      
 #Remove repeated elements:
     ListOfStrs = set(ListOfStrs)
-#Now add all elements to element list    
+#Now add all elements to the element list    
     while len(ListOfStrs) > 0:
-      NewEl=EElement ( ListOfStrs.pop() )
-      #ptclist = strtoel(ListOfStrs.pop()) 
-      #NewEl = EElement()
-      #NewEl.B = [BElement(),BElement()]      
-      #for ib in range(2):
-      #  NewEl.B[ib].particles = ptclist[ib]
+      NewEl=AElement(PartStr=ListOfStrs.pop(),zeroweight=zeroweight)
       self.Top.ElList.append(NewEl)
   
   
@@ -102,59 +101,19 @@ class EAnalysis:
         if not SMSResults.exists(ana,topo,run):
           if verbose: print "[SMSAnalysis.getPlots] Histogram for ",topo," in ",ana," for run ",run," not found"
 
-  #Loop over all elements in SMSTopList and add the weight to the 
-  #matching elements in Analysis.
+  #Loop over all topologies in SMSTopList and add their elements to the matching topology in Analysis.
   def add(self,SMSTopList):
-    import copy
-
-    #Get analysis center of mass energy:
-    sqrts = self.sqrts
-    if type(sqrts) == type(1.) or type(sqrts) == type(1): sqrts = addunit(sqrts,'TeV')
-    CMdic = ClusterTools.CMdic
-
-    for itop in range(len(SMSTopList)):
-      NewTop = SMSTopList[itop]  
+    """ Main method for matching decomposition generated topologies to the analysis topology \
+      Add the elements in the topology list to the analysis elements\
+      :returns: True if successful
+    """
+    for NewTop in SMSTopList:
     #Check if topologies match:
-      if not NewTop.isEqual ( self.Top): continue
-      
+      if not NewTop == self.Top: continue   
     #Loop over (event) element list:
-      for iel in range(len(NewTop.ElList)):
-    #Loop over analysis elements:
-        for jel in range(len(self.Top.ElList)):
-          NewEl = copy.deepcopy(NewTop.ElList[iel])
-          neweight = NewEl.weight
-    #Remove weights which do not match the analysis center of mass energy      
-          if sqrts.asNumber() and len(CMdic) > 0:
-            for k in neweight.keys():
-              if CMdic[k] != sqrts: neweight.pop(k)
-            for k in CMdic.keys():
-              if CMdic[k] == sqrts and not neweight.has_key(k):
-                neweight.update({k : addunit(0.,'fb')})
+      for NewElement in NewTop.ElList: self.Top.addEventElement(NewElement)
 
-          OldEl = copy.deepcopy(self.Top.ElList[jel])
-          if not NewEl.isSimilar(OldEl,order=False,igmass=True): continue   #Check if particles match
-          
-    #If particles match, descend to nested mass list and look for match
-          added = False
-          for imass in range(len(self.Top.ElList[jel].B[0].masses)):
-            OldEl.weight = self.Top.ElList[jel].weight[imass]
-            for ib in range(len(NewEl.B)):            
-              OldEl.B[ib].masses = copy.deepcopy(self.Top.ElList[jel].B[ib].masses[imass])
-              
-    #Check if elements match (with identical masses) for any branch ordering
-            if NewEl.isSimilar(OldEl,order=False):
-              self.Top.ElList[jel].weight[imass] = ClusterTools.sumweights([OldEl.weight,neweight])
-              added = True
-              break   #To avoid double counting only add event to one mass combination
-            
-          if not added:
-    #Check for both branch orderings, but only add one (if matches) to avoid double counting
-            if not NewEl.isSimilar(OldEl,order=True,igmass=True):
-              NewEl.B[0] = NewTop.ElList[iel].B[1]
-              NewEl.B[1] = NewTop.ElList[iel].B[0]
-            for ib in range(len(NewEl.B)):
-              self.Top.ElList[jel].B[ib].masses.append(NewEl.B[ib].masses)
-            self.Top.ElList[jel].weight.append(neweight)
+    return True
 
   def computeTheoryPredictions(self):
     """ Main method for evaluating the theoretical predictions to the analysis \
@@ -171,16 +130,14 @@ class EAnalysis:
 
     dmin = self.masscomp
     output = []
-  #Create a mass list with all masses appearing in the analysis which have similar branch masses:
+  #Create a mass list with all masses appearing in the analysis elements which have similar branch masses:
     Goodmasses = []
     Top = copy.deepcopy(self.Top)
-    for iel in range(len(Top.ElList)):
-      for imass in range(len(Top.ElList[iel].B[0].masses)):
-        mass = [Top.ElList[iel].B[0].masses[imass],Top.ElList[iel].B[1].masses[imass]]
-        gmass = GoodMass(mass,self.MassDist,dmin)
+    for El in Top.ElList:
+      for massweight in El.MassWeightList:
+        gmass = GoodMass(massweight.mass,self.MassDist,dmin)
         if gmass:
-           Top.ElList[iel].B[0].masses[imass] = gmass[0]
-           Top.ElList[iel].B[1].masses[imass] = gmass[1]
+           massweight.mass = gmass
            if not gmass in Goodmasses: Goodmasses.append(gmass)
 
   #Cluster masses:
@@ -197,16 +154,17 @@ class EAnalysis:
   #Get masses in cluster
       masscluster = []
       for ic in cluster: masscluster.append(Goodmasses[ic])
-  #Shrink Topology elements to cluster:
-      NewTop = Top.clusterTopology(masscluster)
+  #Create clustered topology from the analysis topology elements belonging to cluster:
+      NewTop = CTop(self.Top,masscluster)
 
   #Now NewTop contains only elements with a common mass (replaced by the average mass)
   #Evaluate theoretical predictions for analysis inside cluster
-      ClusterResult = NewTop.evaluateCluster ( self.results )
+      ClusterResult = NewTop.evaluateCluster( self.results )
+      ClusterResult.mass = NewTop.clustermass
       ClusterResult.explimit = LimitGetter.GetPlotLimit(ClusterResult.mass,self,complain=False)
 
   #Check if average mass is inside the cluster (exp. limit for average mass ~ exp. limit for individual masses):
-      mavg = [NewTop.ElList[0].B[0].masses,NewTop.ElList[0].B[1].masses]
+      mavg = NewTop.clustermass
       davg = -1.
       for mass in masscluster:
         davg = max(davg,self.MassDist(mass,mavg))

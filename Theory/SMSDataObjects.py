@@ -12,6 +12,7 @@
 import ClusterTools
 from ParticleNames import Reven, PtcDic, simParticles
 from AuxiliaryFunctions import Ceval
+from Tools.PhysicsUnits import addunit, rmvunit
 
 class BElement:
   """ A branch-element """
@@ -23,7 +24,6 @@ class BElement:
     self.momID = 0
     if type(S)==type(""):
       st = S.replace(" ","")
-      # print "[SMSDataObjects.py] Construct a BElement from a string: st=",st
       while "[" in st or "]" in st:
         ptcs = st[st.find("[")+1:st.find("],[")].split(",")
         for ptc in ptcs:
@@ -33,7 +33,7 @@ class BElement:
         spcts=str(ptcs).replace("'","").replace(" ","")
         st=st.replace(spcts,"",1)
         self.particles.append ( ptcs )
-      # print "[SMSDataObjects] ptcs=",ptcs
+
 
   def isEqual ( ElA, ElB, order=True ):
     if not simParticles(ElA.particles,ElB.particles,useDict=False): return False
@@ -177,9 +177,347 @@ class EElement:
     ret="Branch #1={{"+str(self.B[0])+"}}, Branch #2={{"+str(self.B[1])+"}}"
     return ret
 
+class AElement:
+  """ An Analysis Element, contains a string with the particle list, a dictionary with mass arrays and the respective weights and the\
+   analysis-dependent weight format """
+
+  def __init__( self, PartStr=None, zeroweight = None ):
+    """ If PartStr != None, the Element is created with particle string \
+        If zeroweight != None, fill the weight format with the analysis-dependent weight"""
+    self.ParticleStr = ""
+    self.MassWeightList = []
+    self.WeightFormat = {}
+    if PartStr: self.ParticleStr = PartStr
+    if zeroweight: self.WeightFormat = zeroweight
+
+  def getParticleList(self):
+    """ Converts the particle string in self.ParticleStr to a list of particles"""
+
+    if self.ParticleStr == "": return None
+    particles = [[],[]]
+    S = self.ParticleStr
+    st = S.replace(" ","").replace("'","")
+    st = st[st.find("[[["):st.find("]]]")+3]
+    branches=[st[2:st.find("]],[[")+1],st[st.find("]],[[")+4:st.find("]]]")+1]]
+    for ib,branch in enumerate(branches):
+      st = branch
+      while "[" in st or "]" in st:
+        ptcs = st[st.find("[")+1:st.find("],[")].split(",")
+        for ptc in ptcs:
+          if not ptc in Reven.values() and not PtcDic.has_key(ptc):
+            print "[AElement] unknown particle:",ptc
+            return False
+        spcts=str(ptcs).replace("'","").replace(" ","")
+        st=st.replace(spcts,"",1)
+        particles[ib].append(ptcs)
+
+    return particles
+
+  def getEinfo( self ):
+    """ Get global topology info from particle string """
+    vertnumb = []
+    vertparts = []
+    ptcs = self.getParticleList()
+    for branch in ptcs:
+      vertnumb.append(len(branch))
+      vertparts.append([len(v) for v in branch])
+      if len(vertparts[len(vertparts)-1]) == vertnumb[len(vertnumb)-1]-1:
+        vertparts[len(vertparts)-1].append(0)  #Append 0 for stable LSP
+    return {"vertnumb" : vertnumb, "vertparts" : vertparts}
+
+
+class CElement:
+  """ A Cluster Element, contains a simple string with the particle list and its weight """
+
+  def __init__( self, PartStr=None, weight = None ):
+    """ If PartStr != None, the Element is created with particle string \
+        If zeroweight != None, fill the weight format with the analysis-dependent weight"""
+    self.ParticleStr = ""
+    self.Weight = {}
+    if PartStr: self.ParticleStr = PartStr
+    if weight: self.Weight = weight
+
+  def getParticleList(self):
+    """ Converts the particle string in self.ParticleStr to a list of particles"""
+
+    if self.ParticleStr == "": return None
+    particles = [[],[]]
+    S = self.ParticleStr
+    st = S.replace(" ","").replace("'","")
+    st = st[st.find("[[["):st.find("]]]")+3]
+    branches=[st[2:st.find("]],[[")+1],st[st.find("]],[[")+4:st.find("]]]")+1]]
+    for ib,branch in enumerate(branches):
+      st = branch
+      while "[" in st or "]" in st:
+        ptcs = st[st.find("[")+1:st.find("],[")].split(",")
+        for ptc in ptcs:
+          if not ptc in Reven.values() and not PtcDic.has_key(ptc):
+            print "[AElement] unknown particle:",ptc
+            return False
+        spcts=str(ptcs).replace("'","").replace(" ","")
+        st=st.replace(spcts,"",1)
+        particles[ib].append(ptcs)
+
+    return particles
+
+  def getEinfo( self ):
+    """ Get global topology info from particle string """
+    vertnumb = []
+    vertparts = []
+    ptcs = self.getParticleList()
+    for branch in ptcs:
+      vertnumb.append(len(branch))
+      vertparts.append([len(v) for v in branch])
+      if len(vertparts[len(vertparts)-1]) == vertnumb[len(vertnumb)-1]-1:
+        vertparts[len(vertparts)-1].append(0)  #Append 0 for stable LSP
+    return {"vertnumb" : vertnumb, "vertparts" : vertparts}
+
+
+class MassWeight:
+  """ A simple object holding a mass array and its respective weight """
+  def __init__( self, mass=None, weight = None ):
+    self.mass = []
+    self.weight = {}
+    if mass: self.mass = mass
+    if weight: self.weight = weight
+
+class CTop:
+  """ cluster global topology. contains a list of cluster elements (CElements),
+    the number of vertices and the number of particle insertions in each vertex and the cluster mass"""
+
+  def __init__(self,Top=None,masscluster=None):
+    """ if Top != None and masscluster != None creates a cluster topology
+        from just the elements in Top.ElList belonging to the masscluster
+        (all masses are replaced by the average mass and elements with
+        equivalent masses have their weights combined) """
+
+    self.vertnumb = [] ## number of vertices per branch, e.g. [2,2]
+    self.vertparts = [] ##  number of insertions per vertex per branch, e.g. [[1,0],[1,0]] for T2
+    self.clustermass = None
+    self.ElList = [] # list of AElements
+
+    if Top and masscluster:
+      if type(Top) != type(ATop()):
+        print "[SMSDataObjects.CTop] Input must be an analysis topology (ATop) !"
+        return False
+      if type(masscluster) != type([]):
+        print "[SMSDataObjects.CTop] Input masscluster must be a list !"
+        return False
+#Compute average mass in cluster
+      self.clustermass = ClusterTools.MassAvg(masscluster,"harmonic")
+      self.vertnumb = Top.vertnumb
+      self.vertparts = Top.vertparts
+#Add elements to cluster
+      for El in Top.ElList: self.addAnalysisElement(El,masscluster)
+
+
+
+  def addAnalysisElement(self,NewElement,masscluster):
+    """  Adds an analysis element (AElement) to the corresponding cluster elements (CElements) in ElList \
+         Both the particles and branch orderings must be identical!"""
+    import copy
+
+    if type(NewElement) != type(AElement()):
+      print "[SMSDataObjects.py] wrong input! Must be an AElement object"
+      return False
+
+#Consistency checks:
+    for OldEl in self.ElList:
+      if type(OldElement) != type(CElement()):
+        print "[SMSDataObjects.py] wrong input! Elements in ATop must be an AElement object"
+        return False
+      if OldEl.getEinfo() != NewElement.getEinfo(): return False
+    if self.clustermass != ClusterTools.MassAvg(masscluster,"harmonic"):
+        print "[SMSDataObjects.py] wrong masscluster input!"
+        return False
+
+    newparticles = NewElement.getParticleList()
+
+    for massweight in NewElement.MassWeightList:
+      mass = massweight.mass
+      weight = massweight.weight
+      if not mass in masscluster: continue
+  #If mass is in cluster, add element to Cluster Topology
+      match = False
+      for OldEl in self.ElList:
+        oldparticles = OldElement.getParticleList()
+        if simParticles(oldparticles,newparticles,useDict=False):
+          match = True
+          oldweight = OldEl.Weight
+          OldEl.Weight = ClusterTools.sumweights([oldweight,weight])
+          break
+
+      if not match:
+        NewEl = CElement(NewElement.ParticleStr,weight)        
+        self.ElList.append(NewEl)
+    return True
+
+  def evaluateCluster(self,results):
+    """ Evaluates the constraints and conditions in results using the
+      respective theoretical cross section predictions for each element in the cluster topology. 
+
+      :type results: a dictionary with the constraints and the conditions \
+         of the experiment results
+
+      :returns: an XSecPredictionForCluster object
+    """
+    from Tools.PhysicsUnits import addunit
+    from AuxiliaryFunctions import getelements, eltonum
+    import TheoryPrediction
+  
+  #To store the result:
+    ClusterResult = TheoryPrediction.XSecPredictionForCluster()
+   
+  #Get constraints and conditions:
+    consts = results.keys()
+    if len(consts) > 1:
+      print "evaluateCluster: Analysis contains more than one entry"
+      return False    
+    conds = results.values()[0]
+    if ";" in conds or "Csim" in conds or "Cgtr" in conds:
+      conds = conds.rsplit(";")
+    else:
+      conds = conds.rsplit(",")
+      
+  #Get a list of all elements appearing in results:
+    allEl = set(getelements(consts) + getelements(conds))
+    
+  #Generate zeroweight and list of numerical elements with zero weights
+    zeroweight = {}
+    for wk in self.ElList[0].Weight.keys(): zeroweight[wk]=addunit(0.,'fb')
+    nEll = [zeroweight]*len(allEl)  
+  #Build a dictionary to map the relevant elements to its respective numerical element and the element to its weight
+    thdic = {}
+    eldic = {}
+    iel = 0
+    for el in allEl:
+      ptcsA = CElement(el).getParticleList()
+      nel = "nEl["+str(iel)+"]"
+      thdic[el] = nel
+      for El in self.ElList:
+        ptcsB = El.getParticleList()
+        if simParticles(ptcsA,ptcsB,useDict=False): nEll[iel] = El.Weight
+      iel += 1
+
+  #Replace string elements by their respective numerical element (nEl):
+    consts_num = {}
+    conds_num = {}
+    for const in consts: consts_num[const] = eltonum(const,thdic)
+    for cond in conds: conds_num[cond] = eltonum(cond,thdic)
+    
+  #Loop over weights and
+    const_res = {}
+    cond_res = {}
+  #Evaluate each constraint
+    for ckey in consts_num.keys():
+      const = consts_num[ckey]
+      res = {}
+      for weight in zeroweight.keys():
+        nEl = []
+        for el in nEll: nEl.append(el[weight])  #Select weight
+        res[weight] = Ceval(const,nEl)
+      const_res[ckey] = res
+  #Evaluate each condition   
+      for ckey in conds_num.keys():
+        cond = conds_num[ckey]
+        res = {}
+        for weight in zeroweight.keys():
+          nEl = []
+          for el in nEll: nEl.append(el[weight])  #Select weight
+          res[weight] = Ceval(cond,nEl)
+        cond_res[ckey] = res   
+      
+    ClusterResult.conditions_dic = cond_res
+    ClusterResult.result_dic = const_res
+
+    return ClusterResult
+
+
+
+
+class ATop:
+  """ analysis global topology. contains a list of analysis elements (AElements),
+    the number of vertices and the number of particle insertions in each vertex"""
+
+  def __init__(self):
+    self.vertnumb = [] ## number of vertices per branch, e.g. [2,2]
+    self.vertparts = [] ##  number of insertions per vertex per branch, e.g. [[1,0],[1,0]] for T2
+    self.ElList = [] # list of AElements
+
+  def isEqual ( self, Top2, order=False ):
+    """ is this topology equal to Top2?
+        Returns true if they have the same number of vertices and particles.
+        If order=False and each topology has two branches, ignore branch ordering."""
+    if order or len(self.vertnumb) != 2 or len(Top2.vertnumb) != 2:
+      if self.vertnumb != Top2.vertnumb: return False
+      if self.vertparts != Top2.vertparts: return False
+      return True
+    else:
+      x1 = [self.vertnumb[0],self.vertparts[0]]
+      x2 = [self.vertnumb[1],self.vertparts[1]]
+      xA = [Top2.vertnumb[0],Top2.vertparts[0]]
+      xB = [Top2.vertnumb[1],Top2.vertparts[1]]
+      if x1 == xA and x2 == xB: return True
+      if x1 == xB and x2 == xA: return True
+      return False
+
+  def __eq__ ( self, other ):
+    return self.isEqual ( other )
+
+  def addEventElement(self,NewElement):
+    """  Adds an event element (EElement) to the corresponding analysis elements (AElements) in ElList\
+         The event element and analysis elements DO NOT need to have the same branch ordering"""
+
+    import copy
+
+    if type(NewElement) != type(EElement()):
+      print "[SMSDataObjects.py] wrong input! Must be an EElement object"
+      return False
+
+    newparticles_a = [NewElement.B[0].particles,NewElement.B[1].particles]
+    newparticles_b = [NewElement.B[1].particles,NewElement.B[0].particles]
+
+    for OldElement in self.ElList:
+      if type(OldElement) != type(AElement()):
+        print "[SMSDataObjects.py] wrong input! Elements in ATop must be an AElement object"
+        return False
+
+      oldparticles = OldElement.getParticleList()
+#Check if particles match
+      if not simParticles(newparticles_a,oldparticles) and not simParticles(newparticles_b,oldparticles): return False
+#Format the new weight to the analysis-dependent format (remove weights which do not match the analysis format and add zero to missing weights)
+      neweight = copy.deepcopy(NewElement.weight)
+      for key in OldElement.WeightFormat.keys()+neweight.keys():
+        if not neweight.has_key(key): neweight[key] = addunit(0.,'fb')
+        if not OldElement.WeightFormat.has_key(key): neweight.pop(key)
+    
+#Check if masses match
+      added = False
+      OldEl = EElement(OldElement.ParticleStr)  #Create temporary EElement for easy comparison
+      for massweight in OldElement.MassWeightList:
+        OldEl.B[0].masses = massweight.mass[0]
+        OldEl.B[1].masses = massweight.mass[1]
+        OldEl.weight = massweight.weight
+        if NewElement.isSimilar(OldEl,order=False):
+          massweight.weight = ClusterTools.sumweights([OldEl.weight,neweight])
+          added = True
+          break   #To avoid double counting only add the event weight to one mass combination
+
+#If no identical mass was found, add entry to mass-weight dictionary
+      if not added:
+        newmass = [NewElement.B[0].masses,NewElement.B[1].masses]
+        if not NewElement.isSimilar(OldEl,order=True,igmass=True): newmass = [newmass[1],newmass[0]] #Check for correct branch ordering
+        newmassweight = MassWeight(newmass,neweight)
+        OldElement.MassWeightList.append(newmassweight)
+
+
+    return True
+
+
+
 
 class GTop:
-  """ global topology. contains a list of elements,
+  """ global topology. contains a list of event elements (EElements),
     the number of vertices and the number of particle insertions in each vertex"""
 
   def __init__(self):
@@ -254,94 +592,6 @@ class GTop:
     self.ElList.append(NewElement)
     return True
 
-  def evaluateCluster(self,results):
-    """ Evaluates the constraints and conditions in results using the
-      respective theoretical cross section predictions for each element. 
-
-      :type results: a dictionary with the constraints and the conditions \
-         of the experiment results
-
-      :returns: an XSecPredictionForCluster object
-    """
-    from Tools.PhysicsUnits import addunit
-    from AuxiliaryFunctions import getelements, eltonum
-    import TheoryPrediction
-  
-  #To store the result:
-    ClusterResult = TheoryPrediction.XSecPredictionForCluster()
-  #Make sure all elements have a common mass
-    ClusterResult.mass = [self.ElList[0].B[0].masses,self.ElList[0].B[1].masses]
-    for el in self.ElList:
-      mass = [el.B[0].masses,el.B[1].masses]
-      if mass != ClusterResult.mass:
-        print "evaluateCluster: multiple masses in cluster"
-        return False
-
-    
-  #Get constraints and conditions:
-    consts = results.keys()
-    if len(consts) > 1:
-      print "evaluateCluster: Analysis",self.label,"contains more than one entry"
-      return False    
-    conds = results.values()[0]
-    if ";" in conds or "Csim" in conds or "Cgtr" in conds:
-      conds = conds.rsplit(";")
-    else:
-      conds = conds.rsplit(",")
-      
-  #Get a list of all elements appearing in results:
-    allEl = set(getelements(consts) + getelements(conds))
-    
-  #Generate zeroweight and list of numerical elements with zero weights
-    zeroweight = {}
-    for wk in self.ElList[0].weight.keys(): zeroweight[wk]=addunit(0.,'fb')
-    nEll = [zeroweight]*len(allEl)  
-  #Build a dictionay to map the relevant elements to its respective numerical element and the element to its weight
-    thdic = {}
-    eldic = {}
-    iel = 0
-    for el in allEl:
-      ptcsA = EElement(el).allParticles()
-      nel = "nEl["+str(iel)+"]"
-      thdic[el] = nel
-      for El in self.ElList:
-        ptcsB = [El.B[0].particles,El.B[1].particles]
-        if simParticles(ptcsA,ptcsB,useDict=False):
-          nEll[iel] = El.weight
-      iel += 1
-
-  #Replace string elements by their respective numerical element (nEl):
-    consts_num = {}
-    conds_num = {}
-    for const in consts: consts_num[const] = eltonum(const,thdic)
-    for cond in conds: conds_num[cond] = eltonum(cond,thdic)
-    
-  #Loop over weights and
-    const_res = {}
-    cond_res = {}
-  #Evaluate each constraint
-    for ckey in consts_num.keys():
-      const = consts_num[ckey]
-      res = {}
-      for weight in zeroweight.keys():
-        nEl = []
-        for el in nEll: nEl.append(el[weight])  #Select weight
-        res[weight] = Ceval(const,nEl)
-      const_res[ckey] = res
-  #Evaluate each condition   
-      for ckey in conds_num.keys():
-        cond = conds_num[ckey]
-        res = {}
-        for weight in zeroweight.keys():
-          nEl = []
-          for el in nEll: nEl.append(el[weight])  #Select weight
-          res[weight] = Ceval(cond,nEl)
-        cond_res[ckey] = res   
-      
-    ClusterResult.conditions_dic = cond_res
-    ClusterResult.result_dic = const_res
-
-    return ClusterResult
 
   def massCompressedTopology ( self, mingap ):
     """ if two masses in this topology are degenerate, create
@@ -403,43 +653,6 @@ class GTop:
     else:
       return False
 
-  def clusterTopology ( self, masscluster ):
-    """ Given this object and the clustered masses, return a new topology
-        with only the elements belonging to the cluster
-        (all masses are replaced by the average mass and elements with
-        equivalent masses have their weights combined) """
-  #Compute average mass in cluster
-    mavg = ClusterTools.MassAvg(masscluster,"harmonic")
-
-  #Keep only elements which belong to the cluster
-    NewTop = GTop()
-    NewTop.vertnumb = self.vertnumb
-    NewTop.vertparts = self.vertparts
-
-    for iel in range(len(self.ElList)):
-      for imass in range(len(self.ElList[iel].B[0].masses)):
-        mass = [self.ElList[iel].B[0].masses[imass],self.ElList[iel].B[1].masses[imass]]
-        ptc = [self.ElList[iel].B[0].particles,self.ElList[iel].B[1].particles]
-        weight = self.ElList[iel].weight[imass]
-
-  #If mass is in cluster, add element to NewTop:
-        if mass in masscluster:
-          Elm = EElement()
-          Elm.weight = weight
-          for ib in range(len(mavg)):
-            Elm.B.append(BElement())
-            Elm.B[ib].masses = mavg[ib]
-            Elm.B[ib].particles = ptc[ib]
-          match = False
-          for iel2 in range(len(NewTop.ElList)):
-            ptcB = [NewTop.ElList[iel2].B[0].particles,NewTop.ElList[iel2].B[1].particles]
-            if simParticles(ptcB,ptc,useDict=False):
-              match = True
-              oldweight = NewTop.ElList[iel2].weight
-              NewTop.ElList[iel2].weight = ClusterTools.sumweights([oldweight,weight])
-              break
-          if not match: NewTop.addElement(Elm)
-    return NewTop
 
 class TopologyList:
   """ implements a list of topologies, knows how to correctly add 
