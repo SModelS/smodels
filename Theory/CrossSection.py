@@ -26,6 +26,7 @@ class CrossSection:
 
   def weights ( self ): return self.data["Wdic"]
   def crossSections ( self ): return self.data["Xsecdic"]
+  def CMdic ( self ): return self.data["CMdic"]
 
   def getCrossSection ( self, pidmom1, pidmom2, order="NLL", sqrts=8 ):
     """ returns production cross section for a given production mode (pidmom1, pidmom2)
