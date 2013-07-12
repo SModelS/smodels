@@ -464,6 +464,12 @@ class ATop:
   def __eq__ ( self, other ):
     return self.isEqual ( other )
 
+  def leadingElement ( self ):
+    """ often, a topology carries only one element, so
+      we have a special accessor for this """
+    if len(self.ElList)==0: return None
+    return self.ElList[0]
+
   def addEventElement(self,NewElement):
     """  Adds an event element (EElement) to the corresponding analysis elements (AElements) in ElList\
          The event element and analysis elements DO NOT need to have the same branch ordering"""

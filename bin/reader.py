@@ -47,7 +47,7 @@ for Analysis in ListOfAnalyses:
   Analysis.add ( SMSTopList )
   print "------------- Analysis Label = ",Analysis.label, Analysis.sqrts, Analysis.Top
   print "    `-- element ",Analysis.Top.leadingElement()
-  print "    `-- ",Analysis.Top.leadingElement().B[0]
+  print "    `-- ",Analysis.Top.leadingElement().ParticleStr
   d="[[[jet]],[[jet]]]"
   #d="[[['jet','jet'],['jet']],[['jet']]]"
   # S=SMSmethods.strtoel ( d )
