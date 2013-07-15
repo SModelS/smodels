@@ -128,14 +128,6 @@ class EAnalysis:
     from ClusterTools import DoCluster, GoodMass
     from Experiment import LimitGetter
 
-
-    if self.label == "Weakinos8TeV:TChiChipmSlepL":
-      print "\n\n"
-      for El in self.Top.ElList:
-        print "Ptc=",El.ParticleStr
-        for mw in El.MassWeightList: print mw.mass,mw.weight
-      print "\n\n"
-
     dmin = self.masscomp
     output = []
   #Create a mass list with all masses appearing in the analysis elements which have similar branch masses:
@@ -147,7 +139,6 @@ class EAnalysis:
            massweight.mass = gmass
            if not gmass in Goodmasses: Goodmasses.append(gmass)
 
-    
   #Cluster masses:
     MCluster = DoCluster(Goodmasses,self.MassDist,dmin)
 
@@ -177,7 +168,7 @@ class EAnalysis:
       for mass in masscluster:
         davg = max(davg,self.MassDist(mass,mavg))
       if davg == -1. or davg > dmin:
-        print "EvalRes: Wrong clustering"
+        print "computeTheoryPredictions: Wrong clustering"
         continue
 
       self.ResultList.append(ClusterResult)

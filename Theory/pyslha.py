@@ -51,8 +51,11 @@ TODOs:
 __author__ = "Andy Buckley <andy.buckley@cern.ch>"
 __version__ = "2.1.2"
 
-
-
+"""
+!!!hacked version: is able to read SLHA Files with an additional XSECTION block by ignoring it.
+   NOT able to read, modify or write the XSECTION block!!!
+   modifications only in readSLHA()
+"""
 ###############################################################################
 ## Private utility functions
 
@@ -344,7 +347,7 @@ class Particle(object):
 ###############################################################################
 ## SLHA parsing and writing functions
 
-def readSLHA(spcstr, ignorenobr=False):
+def readSLHA(spcstr, D ): ## ignorenobr=False, ignorenomass=False ):
     """
     Read an SLHA definition from a string, returning dictionaries of blocks and
     decays.
@@ -352,12 +355,17 @@ def readSLHA(spcstr, ignorenobr=False):
     If the ignorenobr parameter is True, do not store decay entries with a
     branching ratio of zero.
     """
+    ignorenobr=False
+    ignorenomass=False
+    if D.has_key ( "ignorenobr" ): ignorenobr=D["ignorenobr"]
+    if D.has_key ( "ignorenomass" ): ignorenomass=D["ignorenomass"]
     blocks = _mkdict()
     decays = _mkdict()
     #
     import re
     currentblock = None
     currentdecay = None
+    currentxsec = None                  #new switch added
     for line in spcstr.splitlines():
         ## Handle (ignore) comment lines
         # TODO: Store block/entry comments
@@ -378,6 +386,7 @@ def readSLHA(spcstr, ignorenobr=False):
                 qstr = qstr[qstr.find("=")+1:].strip()
             currentblock = blockname
             currentdecay = None
+            currentxsec = None                   #new switch
             blocks[blockname] = Block(blockname, q=qstr)
         elif line.upper().startswith("DECAY"):
             match = re.match(r"DECAY\s+(-?\d+)\s+([\d\.E+-]+|NAN).*", line.upper())
@@ -387,22 +396,29 @@ def readSLHA(spcstr, ignorenobr=False):
             width = float(match.group(2)) if match.group(2) != "NAN" else None
             currentblock = "DECAY"
             currentdecay = pdgid
+            currentxsec = None                #new switch
             decays[pdgid] = Particle(pdgid, width)
+        elif line.upper().startswith("XSECTION"):   #new 'elif' to  identify the XSECTION block
+            currentxsec = "XSECTION"
+            currentblock = None
+            currentdecay = None
         else:
             ## In-block line
             if currentblock is not None:
                 items = line.split()
                 if len(items) < 1:
                     continue
-                if currentblock != "DECAY":
+                if currentblock != "DECAY" and currentblock != "XSECTION":  #only for BLOCK blocks
                     blocks[currentblock].add_entry(items)
-                else:
+                elif currentblock == "DECAY":                          #'elif' instead of 'else', just DECAY block
+#                else:
                     br = float(items[0]) if items[0].upper() != "NAN" else None
                     nda = int(items[1])
                     ids = map(int, items[2:])
                     if br > 0.0 or not ignorenobr: # br == None is < 0
                         decays[currentdecay].add_decay(br, nda, ids)
-
+                else:                                               #ignore XSECTION block
+                    continue
     ## Try to populate Particle masses from the MASS block
     # print blocks.keys()
     try:
@@ -410,7 +426,8 @@ def readSLHA(spcstr, ignorenobr=False):
             if decays.has_key(pid):
                 decays[pid].mass = blocks["MASS"][pid]
     except:
-        raise ParseError("No MASS block found: cannot populate particle masses")
+        if not ignorenomass:
+            raise ParseError("No MASS block found: cannot populate particle masses")
 
     return blocks, decays
 
