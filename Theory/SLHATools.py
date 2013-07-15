@@ -71,7 +71,7 @@ def createSLHAFile(topo, masses = None, filename = None, branching = None, total
       pyslha.writeSLHAFile(filename[1], slha[0], slha[1])
       return filename[1]
 
-def writeXSECTIONToSLHAFile( slhafile, nevts=10000 ):
+def writeXSecToSLHAFile( slhafile, nevts=10000 ):
   """ calculates the production cross sections and writes it as XSECTION block in the SLHA file 
 
       :param slhafile: path of SLHA file
