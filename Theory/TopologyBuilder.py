@@ -103,7 +103,7 @@ def fromEvent( Event, weight = {}, DoCompress=False, DoInvisible=False, \
     
 
 def compressTopology(ETopList,DoCompress,DoInvisible,minmassgap):
-  """ Given a topology list, keep compressing the element it 
+  """ Given a topology list, keep compressing the element till it 
       can be compressed no more.
       Returns a list with the old topologies and the compressed ones.
       To avoid double counting the input list should have a single element. """

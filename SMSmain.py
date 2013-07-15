@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
 import sys
 from prettytable import PrettyTable
@@ -15,7 +15,8 @@ printer=SMSPrettyPrinter.SMSPrettyPrinter()
 #Generate events and compute cross-sections:
 nevts = 10000
 #slhafile = "AndreSLHA/andrePT4.slha"
-slhafile = "slha/DESY_stop.slha"
+#slhafile = "slha/DESY_stop.slha"
+slhafile = "slha/susyhit_slha.out"
 Wv = XSecComputer.compute(nevts,slhafile,rpythia = True, donlo = True)
 W = Wv["Wdic"]
 Xsec = Wv["Xsecdic"]
