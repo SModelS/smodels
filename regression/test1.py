@@ -2,7 +2,7 @@
 
 """ check the output of the cross section computer """
 
-import set_path
+import setPath
 from Theory import XSecComputer
 
 w=XSecComputer.compute( 1000, "../slha/andrePT1.slha" )

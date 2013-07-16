@@ -2,7 +2,7 @@
 
 """ check the unique naming facility for slha files """
 
-import set_path
+import setPath
 from Tools.VariousHelpers import logging
 from Theory import SLHATools
 slhafile="../slha/andrePT1.slha"

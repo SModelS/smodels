@@ -2,7 +2,7 @@
 
 """ run a modified version of SMSmain.py """
 
-import sys, set_path
+import setPath
 from prettytable import PrettyTable
 from Theory import LHEDecomposer, SLHADecomposer, XSecComputer, ClusterTools
 from Tools.PhysicsUnits import addunit, rmvunit
