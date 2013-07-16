@@ -21,7 +21,8 @@ def loFromLHE( lhefile, totalxsec, nevts=None ):
   :param nevts: maximum number of events to read. None means 'read all'.
   :returns: an array of dictionaries: weights, xsecs, nevts
   """
-  import LHEReader, types
+  from Theory import LHEReader
+  import  types
   from Tools.PhysicsUnits import addunit
   #Get event decomposition:
   n_evts={}
@@ -65,7 +66,8 @@ def compute(nevts,slhafile,rpythia = True, donlo = True, basedir=None,datadir=No
   
   """
 
-  import shutil, NLLXSec, CrossSection, LHEReader
+  import shutil
+  from Theory import NLLXSec, CrossSection, LHEReader
   from Tools.PhysicsUnits import addunit
   import os, sys
 
