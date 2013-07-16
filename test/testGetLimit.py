@@ -117,8 +117,6 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
       sigmacut = addunit(0.1,'fb')
       slha_name = SLHATools.createSLHAFile(topo, slha_dic)
       xsec_dic = XSecComputer.compute(nevents, slha_name, datadir = Tmp)
-      CMdic = xsec_dic["CMdic"]
-      ClusterTools.CMdic = CMdic
       XSec = xsec_dic.crossSections()
       topoList = SLHADecomposer.decompose(slha_name, XSec, sigmacut)
       os.unlink(slha_name)

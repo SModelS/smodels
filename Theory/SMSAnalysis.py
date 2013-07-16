@@ -12,9 +12,8 @@
     
 from SMSDataObjects import ATop, AElement, CTop
 from ParticleNames import Reven, PtcDic
-import ClusterTools
 from Tools.PhysicsUnits import addunit, rmvunit
-import sys
+import CrossSection
 
 class EAnalysis:  
   def __init__(self):
@@ -34,7 +33,9 @@ class EAnalysis:
 
   def generateElements(self):
     """ Given the results dictionary, fills the analysis topology list with the \
-    analysis elements corresponding to the strings in the dictionary, skipping repeated ones"""
+    analysis elements corresponding to the strings in the dictionary, skipping repeated ones \
+    Information about theoretical cross-sections can be passed through CrossSection.XSectionInfo (CrossSection.XSecInfoList object).\
+    If CrossSection.XSectionInfo is not defined default values will be used and stored in CrossSection.XSectionInfo."""
      
     ListOfStrs = []
     vertnumb = self.Top.vertnumb
@@ -45,10 +46,23 @@ class EAnalysis:
         print "[SMSAnalysis.generateElements]: Inconsistent data: ninsertions=%d len(insertions)=%d for ``%s''." % ( vertnumb[k], len(vertparts[k]), self.Top )
         return False
 
-#Define weight format according to CM energy and CMdic:  
+#Define weight format according to information in XsecsInfo:  
     zeroweight = {}
-    for key in ClusterTools.CMdic.keys():
-      if self.sqrts == ClusterTools.CMdic[key]: zeroweight[key] = addunit(0., 'fb')
+    XsecsInfo=None
+    try:
+      XsecsInfo = CrossSection.XSectionInfo  #Check if cross-section information has been defined
+    except:
+      pass
+    if not XsecsInfo:
+      XsecsInfo = CrossSection.XSecInfoList()   #If not, define default cross-sections
+      CrossSection.XSectionInfo = XsecsInfo
+      import logging
+      log = logging.getLogger(__name__)
+      log.warning ( "Cross-section information not found. Using default values" )
+    for xsec in XsecsInfo.xsecs:
+      if self.sqrts == xsec.sqrts: zeroweight[xsec.label] = addunit(0., 'fb')
+
+    if not zeroweight: return False    #Skip analyses with unwanted sqrts
 
 #Get all element strings:    
     inelements = self.results.items()
@@ -75,7 +89,7 @@ class EAnalysis:
      
 #Remove repeated elements:
     ListOfStrs = set(ListOfStrs)
-#Now add all elements to the element list    
+#Now add all elements to the element list with zero weight
     while len(ListOfStrs) > 0:
       NewEl=AElement(PartStr=ListOfStrs.pop(),zeroweight=zeroweight)
       self.Top.ElList.append(NewEl)
@@ -124,12 +138,10 @@ class EAnalysis:
 
       :returns: True if successful, None if list is empty.
     """
-    import copy
     from ClusterTools import DoCluster, GoodMass
     from Experiment import LimitGetter
 
     dmin = self.masscomp
-    output = []
   #Create a mass list with all masses appearing in the analysis elements which have similar branch masses:
     Goodmasses = []
     for El in self.Top.ElList:

@@ -8,6 +8,8 @@
 .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
     
 """
+from Tools.PhysicsUnits import addunit, rmvunit
+
 
 def loFromLHE( lhefile, totalxsec, nevts=None ):
   """ compute LO weights for each production process from LHE file.
@@ -23,7 +25,8 @@ def loFromLHE( lhefile, totalxsec, nevts=None ):
   """
   from Theory import LHEReader
   import  types
-  from Tools.PhysicsUnits import addunit
+
+
   #Get event decomposition:
   n_evts={}
   reader = LHEReader.LHEReader( lhefile, nevts )
@@ -52,7 +55,7 @@ def loFromLHE( lhefile, totalxsec, nevts=None ):
   return [ weight, sigma, n_evts ]
     
 
-def compute(nevts,slhafile,rpythia = True, donlo = True, basedir=None,datadir=None):
+def compute(nevts,slhafile,rpythia = True, basedir=None,datadir=None, XsecsInfo=None, tmpfiles=False):
   """ Runs pythia at 7 and 8 TeV and compute weights for each production process. 
 
   :param basedir: directory base. If None, then the we look for the SMSDecomposition \
@@ -60,7 +63,11 @@ def compute(nevts,slhafile,rpythia = True, donlo = True, basedir=None,datadir=No
     basedir+"/nllfast", the template config we expect to reside in basedir+"/etc"
   :type basedir: str
   :param runpythia: run pythia. If False, read old fort_8,7.68 files and assumes \
-    total xsec = 1 (only useful for fast debugging) 
+    total xsec = 1 (only useful for fast debugging)
+  :param XsecsInfo: optional information about cross-sections to be computed. \
+    If not defined and not found in CrossSection.XSectionInfo, use default values.
+  :param tmpfile: If True, it will generate temporary lhe files. If False, use standard \
+    file name (fort_sqrts.68) and replace existing files
   :returns: a dictionary with weights at 7 and 8 TeV and the event file to be used \
      for SMS decomposition.
   
@@ -68,8 +75,24 @@ def compute(nevts,slhafile,rpythia = True, donlo = True, basedir=None,datadir=No
 
   import shutil
   from Theory import NLLXSec, CrossSection, LHEReader
-  from Tools.PhysicsUnits import addunit
   import os, sys
+  import tempfile
+  import copy
+
+  if XsecsInfo is None:
+    try:
+      XsecsInfo = CrossSection.XSectionInfo  #Check if cross-section information has been defined
+    except:
+      pass
+  if not XsecsInfo:
+    XsecsInfo = CrossSection.XSecInfoList()   #If not, define default cross-sections
+    CrossSection.XSectionInfo = XsecsInfo
+    import logging
+    log = logging.getLogger(__name__)
+    log.warning ( "Cross-section information not found. Using default values" )
+
+  XsecsInfo.sort(reverse=True)  #Sort by sqrts (the highest sqrts at the first entry will be used for LHE decomposition and weight calculation)
+  donlo = max([xsec.order for xsec in XsecsInfo.xsecs])   # =0 if only LO cross-sections are required
 
   if basedir==None:
     basedir=os.getcwd()
@@ -92,100 +115,92 @@ def compute(nevts,slhafile,rpythia = True, donlo = True, basedir=None,datadir=No
   installdir=basedir
   etcdir="%s/etc/" % basedir
   
-  #LHE event file
-  lhefile = "%s/fort_8.68" % datadir
-  lhe7file = "%s/fort_7.68" % datadir
-  lhe8file = "%s/fort_8.68" % datadir
-  if rpythia:
-#run pythia at 8 TeV:
-    D = runPythia( slhafile,nevts,8,
-                   datadir=datadir,etcdir=etcdir,installdir=installdir)
-    shutil.copy2("%s/fort.68" % datadir, lhe8file )
-    total_cs8 = addunit(D["xsecfb"],'fb')
+
   
-#run pythia at 7 TeV:
-    D = runPythia(slhafile,nevts,7,
-                   datadir=datadir,etcdir=etcdir,installdir=installdir)
+  #Get sqrts:
+  Allsqrts = XsecsInfo.getSqrts()
+  #LHE event files
+  lhefiles = []
+  for sqrts in Allsqrts:
+    if tmpfiles:
+      lhefiles.append(tempfile.mkstemp(suffix="_"+str(rmvunit(sqrts,'TeV'))+'TeV', dir=datadir)[1])
+    else:
+      lhefiles.append(datadir+"/fort_"+str(int(rmvunit(sqrts,'TeV')))+".68")
 
-    shutil.copy2("%s/fort.68" % datadir, lhe7file )
-    total_cs7 = addunit(D["xsecfb"],'fb')
-  else:
-    total_cs8 = addunit(1.,'fb')
-    total_cs7 = addunit(1.,'fb')
-
-  weight_8, sigma_8, n8_evts = loFromLHE ( lhe8file, total_cs8, nevts )
-#Get 7 TeV event decomposition:
-  n7_evts={}
-  reader = LHEReader.LHEReader( lhe7file,nevts)
-  for event in reader:
-    mompdg = event.getMom()
-    getprodcs(mompdg[0], mompdg[1], n7_evts)
-
-  weight_7 = {}
-  sigma_7 = {}
-  for key in n7_evts.keys():
-    if n8_evts.has_key(key):
-      weight_7[key]=n7_evts[key]*total_cs7/(nevts*n8_evts[key])
-      sigma_7[key]=n7_evts[key]*total_cs7/nevts # Production cross-section
-
-  #Make sure both dictionaries have the same number of entries
-  for key in sigma_7.keys() + sigma_8.keys():
-    if not sigma_7.has_key(key): 
-      sigma_7[key]=addunit(0.,'fb')
-      weight_7[key]=addunit(0.,'fb')
-    if not sigma_8.has_key(key): 
-      sigma_8[key]=addunit(0.,'fb')
-      weight_8[key]=addunit(0.,'fb')
-
-  #Get NLO cross-sections from NLLfast:
-  if donlo:
-    sigma_8NLO = {}
-    sigma_7NLO = {}
-    weight_8NLO = {}
-    weight_7NLO = {}
-
-    for key in sigma_8.keys():
-
-      nllres = NLLXSec.getNLLresult(key[0],key[1],slhafile,base=nllbase)
-      k7 = 1.
-      k8 = 1.
    
-      if nllres[0]['K_NLL_7TeV'] and nllres[0]['K_NLO_7TeV']:
-        k7 = nllres[0]['K_NLL_7TeV']*nllres[0]['K_NLO_7TeV']
-      elif nllres[0]['K_NLO_7TeV']:
-        k7 = nllres[0]['K_NLO_7TeV']
-      if nllres[1]['K_NLL_8TeV'] and nllres[1]['K_NLO_8TeV']:
-        k8 = nllres[1]['K_NLL_8TeV']*nllres[1]['K_NLO_8TeV']
-      elif nllres[1]['K_NLO_8TeV']:
-        k8 = nllres[1]['K_NLO_8TeV']
+  total_cs = []
+  weights = []
+  sigmas = []
+  n_evts = []
+#Compute LO cross-sections:
+  for isqrts,sqrts in enumerate(Allsqrts):
+    if rpythia:
+      D = runPythia( slhafile,nevts,rmvunit(sqrts,'TeV'),datadir=datadir,etcdir=etcdir,installdir=installdir)
+      shutil.copy2("%s/fort.68" % datadir, lhefiles[isqrts])
+      total_cs.append(addunit(D["xsecfb"],'fb'))
+    else:
+      total_cs.append(addunit(1.,'fb'))
+    
+    weight, sigma, n_evt = loFromLHE ( lhefiles[isqrts], total_cs[isqrts], nevts )
+    weights.append(weight)
+    sigmas.append(sigma)
+    n_evts.append(n_evt)
 
-      LO7 = weight_7[key]
-      LO8 = weight_8[key]
-      NLO7 = LO7*k7
-      NLO8 = LO8*k8
-      weight_7NLO[key]=NLO7
-      weight_8NLO[key]=NLO8
+#Reweight all LO weights by the highest sqrtS event file and remove weights/cross-sections not present in the highest sqrtS event file
+  for isqrts,sqrts in enumerate(Allsqrts):    
+    for key in n_evts[isqrts].keys():
+      if n_evts[0].has_key(key):
+        weights[isqrts][key]=n_evts[isqrts][key]*total_cs[isqrts]/(nevts*n_evts[0][key])
+      else:
+        weights[isqrts].pop(key)
+        sigmas[isqrts].pop(key)
 
-      LO7 = sigma_7[key]
-      LO8 = sigma_8[key]
-      NLO7 = LO7*k7
-      NLO8 = LO8*k8
-      sigma_7NLO[key]=NLO7
-      sigma_8NLO[key]=NLO8
+  #Make sure all dictionaries have the same number of entries
+  allkeys = []
+  for sigma in sigmas: allkeys += sigma.keys()
+  allkeys = list(set(allkeys))
+  for key in allkeys:
+    for isqrts,sqrts in enumerate(Allsqrts):
+      if not sigmas[isqrts].has_key(key): 
+        sigmas[isqrts][key]=addunit(0.,'fb')
+        weights[isqrts][key]=addunit(0.,'fb')
 
 
-#Weight and production cross-section dictionaries (NLL = NLO+NLL)
-  Wdic = {'7 TeV (LO)':weight_7, '8 TeV (LO)':weight_8}
-  Xsecdic = {'7 TeV (LO)':sigma_7, '8 TeV (LO)':sigma_8}
-  if donlo:
-    Wdic.update({'7 TeV (NLL)':weight_7NLO, '8 TeV (NLL)':weight_8NLO})
-    Xsecdic.update({'7 TeV (NLL)':sigma_7NLO, '8 TeV (NLL)':sigma_8NLO})
+  #Compute NLO/NLL cross-sections (if required) and store all required cross-sections in the results dictionaries:
+  Wdic = {}
+  Xsecdic = {}
+  for xsec in XsecsInfo.xsecs:
+    iS = 0
+    Sigma = {}
+    Weight = {}
+    for isqrts,sqrts in enumerate(Allsqrts):
+      if xsec.sqrts == sqrts: 
+        Weight = copy.deepcopy(weights[isqrts])
+        Sigma = copy.deepcopy(sigmas[isqrts])        #Get LO cross-section
 
-#Weight center of mass energies dictionary
-  CMdic = {'7 TeV (LO)': addunit(7.,'TeV'), '8 TeV (LO)': addunit(8.,'TeV')}
-  if donlo:
-    CMdic.update({'7 TeV (NLL)': addunit(7.,'TeV'), '8 TeV (NLL)': addunit(8.,'TeV')})
-  return CrossSection.CrossSection ( {"Wdic" : Wdic, "lhefile" : lhefile, "lhe7file" : lhe7file, "lhe8file": lhe8file, "Xsecdic" : Xsecdic, "CMdic" : CMdic} )
+    if xsec.order > 0:
+      for key in Sigma.keys():
+        k = 1. 
+        nllres = NLLXSec.getNLLresult(key[0],key[1],slhafile,base=nllbase)             
+        klabel = str(int(rmvunit(xsec.sqrts,'TeV')))+'TeV'        
+        for nll in nllres:
+          if nll.has_key('K_NLO_'+klabel) and nll['K_NLO_'+klabel]:  k = k*nll['K_NLO_'+klabel]              #NLO k-factor (or NLL+NLO k-factor if there is no NLL result)
+          if xsec.order == 2 and nll.has_key('K_NLL_'+klabel) and nll['K_NLL_'+klabel]: k = k*nll['K_NLL_'+klabel]            #NLL+NLO k-factor (or NLL k-factor if there is no NLO result)
+
+        Weight[key] = Weight[key]*k
+        Sigma[key] = Sigma[key]*k
+        
+    Wdic[xsec.label] = Weight
+    Xsecdic[xsec.label] = Sigma
+
+#Save lhe file names associated with each cross-section:
+  LHEfiles = {}
+  for xsec in XsecsInfo.xsecs:
+    for isqrts,sqrts in enumerate(Allsqrts):
+      if xsec.sqrts == sqrts: LHEfiles[xsec.label] = lhefiles[isqrts]
+
+  
+  return CrossSection.CrossSection ( {"Wdic" : Wdic, "lhefile" : lhefiles[0], "lhefiles" : LHEfiles, "Xsecdic" : Xsecdic, "XsecList" : XsecsInfo} )
   
   
 
