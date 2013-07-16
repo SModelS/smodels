@@ -25,7 +25,7 @@ class EAnalysis:
     self.results = {} ## pairs of (constraint,condition)
     self.plots = {} ## pairs of (constraint,plots/analyses)
     self.run = ""
-    self.masscomp = 0.2
+    self.masscomp = 0.2 ## maximum relative allowed difference in upper limits for clustering to be acceptable
     self.ResultList = [] ## a list of result objects (TheoryPrediction.ClusterOutput)
 
   def __str__(self):
@@ -168,7 +168,9 @@ class EAnalysis:
       for mass in masscluster:
         davg = max(davg,self.MassDist(mass,mavg))
       if davg == -1. or davg > dmin:
-        print "computeTheoryPredictions: Wrong clustering"
+        import logging
+        log = logging.getLogger(__name__)
+        log.warning ( "Upper limit for average mass is not similar to upper limit for constituent masses (davg=%s, dmin=%s). Wont cluster." % ( davg, dmin ) )
         continue
 
       self.ResultList.append(ClusterResult)
