@@ -2,4 +2,4 @@
 
 """ test the SLHA decomposition """
 
-import testSLHADecomposer
+import testSLHADecomposer_orig

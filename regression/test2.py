@@ -2,7 +2,7 @@
 
 """ Closure: Tx -> SModelS description -> Tx """
 
-import set_path
+import setPath
 from Experiment import TxNames
 from Theory import LHEReader, TopologyBuilder
 from TestTools import ok
