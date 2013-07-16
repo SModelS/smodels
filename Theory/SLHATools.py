@@ -94,7 +94,7 @@ def writeXSecToSLHAFile( slhafile, nevts=10000 ):
   if 'XSECTION' in chck: return False
 
   #computes production cross sections
-  dic = XSEC.compute(nevts, slhafile, datadir = Tmp)
+  dic = XSEC.compute(nevts, slhafile, datadir=Tmp)
 
   #get CM dictionary
   CMdic = dic.CMdic()
@@ -121,7 +121,7 @@ def writeXSecToSLHAFile( slhafile, nevts=10000 ):
       pid_xsecs[sqrtS].append([cs_order,cs])
 #Write cross-sections grouped by sqrtS:
     for sqrtS in pid_xsecs.keys():
-      f.write("\nXSECTION  %f  %d  %d  %d  %d  %d  %s\n" %(sqrtS, 2212, 2212, 2, pids[0], pids[1], fstate))
+      f.write("#\nXSECTION  %f  %d  %d  %d  %d  %d  %s\n" %(sqrtS*1000, 2212, 2212, 2, pids[0], pids[1], fstate)) #sqrts in GeV
       for line_cs in pid_xsecs[sqrtS]:
         f.write("0  %d  0  0  0  0  %f XSecComputer 1.0\n" %(line_cs[0],line_cs[1]))
 
