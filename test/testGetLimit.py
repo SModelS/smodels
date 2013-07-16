@@ -1,7 +1,7 @@
 import set_path
 import ROOT,sys, os, tempfile
 from Experiment import SMSResults, SMSInterpolation, LimitGetter, SMSAnalysisFactory
-from Theory import SMSAnalysis, LHEDecomposer, SLHATools, SLHADecomposer, XSecComputer
+from Theory import SMSAnalysis, LHEDecomposer, SLHATools, SLHADecomposer, XSecComputer, ClusterTools
 from Tools import ROOTTools
 from Tools.PhysicsUnits import addunit, rmvunit
 
@@ -117,6 +117,8 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
       sigmacut = addunit(0.1,'fb')
       slha_name = SLHATools.createSLHAFile(topo, slha_dic)
       xsec_dic = XSecComputer.compute(nevents, slha_name, datadir = Tmp)
+      CMdic = xsec_dic["CMdic"]
+      ClusterTools.CMdic = CMdic
       XSec = xsec_dic.crossSections()
       topoList = SLHADecomposer.decompose(slha_name, XSec, sigmacut)
       os.unlink(slha_name)
@@ -147,7 +149,6 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
         else: hL.Fill(x,y)
 #        if ana_obj[0].computeTheoryPredictions():
         hUL.Fill(x,y,rmvunit(ana_obj[0].ResultList[0].explimit,'fb'))
-        print "THEORY XSEC",ana_obj[0].ResultList[0].result_dic.values()
 #        for values in ana_obj[0].ResultList[0].result_dic.values():
 #          hTheory.Fill(x,y,rmvunit(values['8 TeV (NLL)'],'fb'))
 #          sumTheory+=rmvunit(values['8 TeV (NLL)'],'fb')
@@ -155,7 +156,6 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
 #        if theoRes['result']:
         hTheory.Fill(x,y,rmvunit(ana_obj[0].ResultList[0].result_dic.values()[0]['8 TeV (NLL)'],'fb'))
         sumTheory+=rmvunit(ana_obj[0].ResultList[0].result_dic.values()[0]['8 TeV (NLL)'],'fb')
-        print "THEORY XSEC",ana_obj[0].ResultList[0].result_dic.values()[0]['8 TeV (NLL)']
         if rmvunit(ana_obj[0].ResultList[0].explimit,'fb') and rmvunit(ana_obj[0].ResultList[0].explimit,'fb')<sumTheory:
           hLine.Fill(x,y,0)
         else: hLine.Fill(x,y)
