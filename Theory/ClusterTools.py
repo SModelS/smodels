@@ -2,17 +2,18 @@
 
 """
 .. module:: ClusterTools
-    :synopsis: methods that deal with clustering masses and finding average masses
+   :synopsis: methods that deal with clustering masses and finding average masses
 
-.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>, Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
 
 CMdic={} # This stores a dictionary to relate the weight labels to their respective sqrts values ( '7 TeV (NLL)' : 7 TeV, '8 TeV (LO)' : 8 TeV, etc)
 
 def DoCluster(objlist,Distfunc,dmin):
-  """ Cluster algorithm (generic for any type of object, as long as the distance function is given) 
-    :returns: FIXME
+  """Cluster algorithm (generic for any type of object, as long as the distance function is given) 
+     :returns: FIXME
   """
   from Tools.PhysicsUnits import addunit
   import copy
@@ -80,10 +81,10 @@ def DoCluster(objlist,Distfunc,dmin):
   return FinalCluster
 
 def GoodMass(mass,Distfunc,dmin):
-  """ Test if a mass array is "good"
-   = have similar branch masses if branch topologies are equal
-   = have similar mother and LSP masses if branch topologies are different
-   If it is, return an equivalent array with equal masses (= mass avg) """
+  """Test if a mass array is "good"
+     = have similar branch masses if branch topologies are equal
+     = have similar mother and LSP masses if branch topologies are different
+     If it is, return an equivalent array with equal masses (= mass avg)"""
 
   if mass[0] == mass[1]: return mass
   if len(mass[0]) == len(mass[1]):
@@ -108,11 +109,11 @@ def GoodMass(mass,Distfunc,dmin):
       return MassAvg([mass1,mass2],"harmonic")
 
 def MassAvg(equivin, method = "mean"):
-  """ For a list of equivalent masses, compute an average mass (or mass array)
-  using the defined method.
-    :param method: the method employed: "harmonic" = harmonic means, "mean" = algebaric (standard) mean
+  """For a list of equivalent masses, compute an average mass (or mass array)
+     using the defined method.
+     :param method: the method employed: "harmonic" = harmonic means, "mean" = algebaric (standard) mean
 
-    :returns: the average mass
+     :returns: the average mass
   """
   import numpy
   from Tools.PhysicsUnits import rmvunit
@@ -184,7 +185,7 @@ def MassAvg(equivin, method = "mean"):
     return massout
 
 def sumweights(wlist):
-  """ Sum a list of weights """
+  """Sum a list of weights"""
   from Tools.PhysicsUnits import addunit
   neweight = {}
   for wk in wlist[0].keys(): neweight[wk]=addunit(0.,'fb')# .update({wk : addunit(0.,'fb')})
@@ -197,7 +198,7 @@ def sumweights(wlist):
 
 
 def ClusterDist(cluster1,cluster2,MD):
-  """ Definition of distance two clusters, MD = square matrix of distances """
+  """Definition of distance two clusters, MD = square matrix of distances"""
   d = 0.
   if type(cluster1) != type(set()) or type(cluster2) != type(set()):
     print "ClusterDist: unknown format input"
