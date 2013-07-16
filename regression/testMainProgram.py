@@ -37,12 +37,10 @@ class Test(unittest.TestCase):
         nevts = 10000
         #slhafile = "AndreSLHA/andrePT4.slha"
         slhafile = "../slha/DESY_stop.slha"
-        Wv = XSecComputer.compute(nevts,slhafile,rpythia = True, donlo = True)
+        Wv = XSecComputer.compute(nevts,slhafile,rpythia = True)
         W = Wv["Wdic"]
         Xsec = Wv["Xsecdic"]
         lhefile = Wv["lhefile"]
-        CMdic = Wv["CMdic"]
-        ClusterTools.CMdic = CMdic
         
         
         
@@ -106,14 +104,14 @@ class Test(unittest.TestCase):
         for Ana in ListOfAnalyses:
             label = Ana.label
             ifirst = True
-            for i in range(len(Ana.Top.ElList)):
-                ptcs = [Ana.Top.ElList[i].B[0].particles,Ana.Top.ElList[i].B[1].particles]
-                for j in range(len(Ana.Top.ElList[i].B[0].masses)):
-                    mass = [Ana.Top.ElList[i].B[0].masses[j],Ana.Top.ElList[i].B[1].masses[j]]
+            for El in Ana.Top.ElList:
+                ptcs = El.getParticleList()
+                for imassw,massweight in enumerate(El.MassWeightList):
+                    mass = massweight.mass
                     if not ifirst: label = ""
-                    if j != 0: ptcs = ""
+                    if imassw != 0: ptcs = ""
                     ifirst = False
-                    AnElement_table.add_row([label,ptcs,wrap(printer.pformat(mass),width=100),wrap(printer.pformat(Ana.Top.ElList[i].weight[j]),width=30)])
+                    AnElement_table.add_row([label,ptcs,wrap(printer.pformat(mass),width=100),wrap(printer.pformat(massweight.weight),width=30)])
             AnElement_table.add_row(["---","---","---","---"])    
             
         

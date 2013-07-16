@@ -20,10 +20,10 @@ slhafile="../slha/T2bb.slha"
 
 Tmp=tempfile.mkdtemp()
 log.info ( "now run pythia in "+Tmp )
-Wv=XSecComputer.compute(nevts,slhafile,rpythia = True, donlo = True, datadir=Tmp)
+Wv=XSecComputer.compute(nevts,slhafile,rpythia = True, datadir=Tmp)
 log.info ( "done running pythia" )
 
-lhefile=Wv.lhefile ( 8 )
+lhefile=Wv.lhefile ( sqrts=8 )
 
 ## print "[run.py] weights=",Wv.weights()
 topos=LHEDecomposer.decompose ( lhefile, Wv.weights(), nevts=nevts )

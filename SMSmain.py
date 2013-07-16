@@ -2,7 +2,7 @@
 
 import sys
 from prettytable import PrettyTable
-from Theory import LHEDecomposer, SLHADecomposer, XSecComputer, ClusterTools
+from Theory import LHEDecomposer, SLHADecomposer, XSecComputer, ClusterTools, CrossSection
 from Tools.PhysicsUnits import addunit, rmvunit
 from Tools import SMSPrettyPrinter, VariousHelpers
 from Tools.SMSPrettyPrinter import wrap
@@ -12,17 +12,21 @@ from Experiment import SMSAnalysisList, SMSAnalysisFactory, LimitGetter
 
 printer=SMSPrettyPrinter.SMSPrettyPrinter()
 
+#Example of how to define cross-sections. If not defined, default values
+#will be generated and stored in CrossSection.XSectionInfo the first
+#time this information is needed 
+#XSectionInfo = CrossSection.XSecInfoList('8 TeV (NLL), 8 TeV (lo), 7 tev (nlo)')
+#CrossSection.XSectionInfo = XSectionInfo
+
 #Generate events and compute cross-sections:
 nevts = 10000
 #slhafile = "AndreSLHA/andrePT4.slha"
-#slhafile = "slha/DESY_stop.slha"
-slhafile = "slha/susyhit_slha.out"
-Wv = XSecComputer.compute(nevts,slhafile,rpythia = True, donlo = True)
+slhafile = "slha/DESY_stop.slha"
+#slhafile = "slha/susyhit_slha.out"
+Wv = XSecComputer.compute(nevts,slhafile,rpythia = True)
 W = Wv["Wdic"]
 Xsec = Wv["Xsecdic"]
 lhefile = Wv["lhefile"]
-CMdic = Wv["CMdic"]
-ClusterTools.CMdic = CMdic
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Creat analyses list:
@@ -148,4 +152,3 @@ for Analysis in ListOfAnalyses:
 
 
 sys.exit()
-

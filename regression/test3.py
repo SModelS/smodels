@@ -27,12 +27,10 @@ else:
 nevts = 10000
 #slhafile = "AndreSLHA/andrePT4.slha"
 slhafile = "../slha/DESY_stop.slha"
-Wv = XSecComputer.compute(nevts,slhafile,rpythia = True, donlo = True)
+Wv = XSecComputer.compute(nevts,slhafile,rpythia = True)
 W = Wv["Wdic"]
 Xsec = Wv["Xsecdic"]
 lhefile = Wv["lhefile"]
-CMdic = Wv["CMdic"]
-ClusterTools.CMdic = CMdic
 
 
 

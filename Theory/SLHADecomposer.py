@@ -8,16 +8,20 @@
     
 """
     
-def decompose(slhafile,Xsec=None,sigcut=None,DoCompress=False,DoInvisible=False,minmassgap=-1):
-  """ Do SLHA-based decomposition.
+def decompose(slhafile,Xsec=None,sigcut=None,DoCompress=False,DoInvisible=False,minmassgap=-1,XsecsInfo=None):
+  """Do SLHA-based decomposition.
       FIXME currently using pyslha2 because we need this hack to handle SLHA files with XSECTION blocks.
 
     :param slhafile: file with mass spectrum and branching ratios and optionally with cross-sections
     :param Xsec: optionally a dictionary with cross-sections for pair production, by default reading the cross sections from the SLHA file.
+    :param XsecsInfo: information about the cross-sections (sqrts, order and label). Only relevant for Xsec=None (reading from slha file).\
+       If defined as input or in CrossSection.XSectionInfo restricts the cross-sections values in the SLHA file to the ones in XsecsInfo. \
+       If not defined, it will be generated from the SLHA file and stored in CrossSection.XSectionInfo.
+Only generated if cross-sections are read from SLHA file and not previously created
     :param sigcut: minimum sigma*BR to be generated, by default sigcut = 0.1 fb
-    :param DoCompress: FIXME
-    :param DoInvisible: FIXME
-    :param minmassgap: FIXME
+    :param DoCompress: turn mass compressed topologies on/off
+    :param DoInvisible: turn invisibly compressed topologies on/off
+    :param minmassgap: maximum value for considering two R-odd particles degenerate (only revelant for DoCompress=True)
     :returns: a TopologyList. 
   """
   import sys, os, copy
@@ -29,6 +33,7 @@ def decompose(slhafile,Xsec=None,sigcut=None,DoCompress=False,DoInvisible=False,
   from Tools.PhysicsUnits import addunit, rmvunit
   import pyslha2 as pyslha
   import ClusterTools
+  import CrossSection
 
   if DoCompress and rmvunit(minmassgap,'GeV') == -1: 
     print "[SLHAdecomposer] Please, set minmassgap"
@@ -38,9 +43,10 @@ def decompose(slhafile,Xsec=None,sigcut=None,DoCompress=False,DoInvisible=False,
   if not rmvunit(sigcut, 'fb'):
     sigcut = addunit(0.1, 'fb')
 
-#creates Xsec dictionary if Xsec=None
+ #creates Xsec dictionary if Xsec=None and store cross-section information if not previously defined
   if not Xsec:
-    CMdic = {}
+    XsecsInfoFile = CrossSection.XSecInfoList('')  #To store information about all cross-sections in the SLHA file
+    allLabels = []
     Xsec = {}
     slha = open(slhafile, 'r')
     lines = slha.readlines()
@@ -62,18 +68,35 @@ def decompose(slhafile,Xsec=None,sigcut=None,DoCompress=False,DoInvisible=False,
       else:
         print '[SLHADecomposer] unknown QCD order in XSECTION line', l
         return False
-
-      CMdic[wlabel] = addunit(sqrtS,'TeV')
-      if not wlabel in Xsec.keys(): Xsec[wlabel] = {}
+      xsInfo = CrossSection.SingleXSecInfo()
+      xsInfo.sqrts = addunit(sqrtS,'TeV')
+      xsInfo.order = cs_order
+      xsInfo.label = wlabel
+      if not wlabel in Xsec.keys():
+        Xsec[wlabel] = {}
+        XsecsInfoFile.xsecs.append(xsInfo)
       Xsec[wlabel][pids] = cs
+   
 
+    if XsecsInfo is None:
+      try:
+        XsecsInfo = CrossSection.XSectionInfo  #Check if cross-section information has been defined
+      except:
+        pass
+    if not XsecsInfo:
+      XsecsInfo = XsecsInfoFile              #Store information from file
+      CrossSection.XSectionInfo = XsecsInfo
+      import logging
+      log = logging.getLogger(__name__)
+      log.warning ( "Cross-section information not found. Using values from SLHA file" )
+    else:
+      for xsec in XsecsInfoFile.xsecs:
+        if not xsec in XsecsInfo.xsecs: Xsec.pop(xsec.label)    #Remove entries which do not match the previously defined cross-sections
 
-#Save CM dictionary
-    ClusterTools.CMdic = CMdic
 
 #Read SLHA file
   res = pyslha.readSLHAFile(slhafile)
-  
+
 #Get list of particles with maximum production cross-section above sigcut and maximum cross-sections
   Pdic = {}
   for k in Xsec.keys():
@@ -194,6 +217,6 @@ def decompose(slhafile,Xsec=None,sigcut=None,DoCompress=False,DoInvisible=False,
           # Add topologies to topology list:
           SMSTopList.addList ( FinalTopList )
 
-      
+
   return SMSTopList    
 
