@@ -93,18 +93,18 @@ for Analysis in ListOfAnalyses:
 #Print analyses output:
 AnElement_table = PrettyTable(["Analyses","Element","Masses","Element Weight"])  
 
-for Ana in ListOfAnalyses:
-  label = Ana.label
-  ifirst = True
-  for i in range(len(Ana.Top.ElList)):
-    ptcs = [Ana.Top.ElList[i].B[0].particles,Ana.Top.ElList[i].B[1].particles]
-    for j in range(len(Ana.Top.ElList[i].B[0].masses)):
-      mass = [Ana.Top.ElList[i].B[0].masses[j],Ana.Top.ElList[i].B[1].masses[j]]
-      if not ifirst: label = ""
-      if j != 0: ptcs = ""
-      ifirst = False
-      AnElement_table.add_row([label,ptcs,wrap(printer.pformat(mass),width=100),wrap(printer.pformat(Ana.Top.ElList[i].weight[j]),width=30)])
-  AnElement_table.add_row(["---","---","---","---"])  
+for Ana in ListOfAnalyses:                                                            
+  label = Ana.label                                                                   
+  ifirst = True                                                                       
+  for iel,El in enumerate(Ana.Top.ElList):                                            
+    ptcs = El.ParticleStr                                                             
+    for im,massweight in enumerate(El.MassWeightList):                                
+      mass = massweight.mass                                                          
+      if not ifirst: label = ""                                                       
+      if im != 0: ptcs = ""                                                           
+      ifirst = False                                                                  
+      AnElement_table.add_row([label,ptcs,wrap(printer.pformat(mass),width=100),wrap(printer.pformat(massweight.weight),width=30)])                                         
+  AnElement_table.add_row(["---","---","---","---"])      
     
 
 #print(AnElement_table)
