@@ -25,7 +25,7 @@ class EAnalysis:
     self.results = {} ## pairs of (constraint,condition)
     self.plots = {} ## pairs of (constraint,plots/analyses)
     self.run = ""
-    self.masscomp = 0.2 ## maximum relative allowed difference in upper limits for clustering to be acceptable
+    self.masscomp = 0.2 ## maximum allowed relative difference in upper limits for considering two mass arrays similar
     self.ResultList = [] ## a list of result objects (TheoryPrediction.ClusterOutput)
 
   def __str__(self):
