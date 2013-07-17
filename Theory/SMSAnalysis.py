@@ -13,7 +13,6 @@
 from SMSDataObjects import ATop, AElement, CTop
 from ParticleNames import Reven, PtcDic
 from Tools.PhysicsUnits import addunit, rmvunit
-import CrossSection
 
 class EAnalysis:  
   def __init__(self):
@@ -46,23 +45,6 @@ class EAnalysis:
         print "[SMSAnalysis.generateElements]: Inconsistent data: ninsertions=%d len(insertions)=%d for ``%s''." % ( vertnumb[k], len(vertparts[k]), self.Top )
         return False
 
-#Define weight format according to information in XsecsInfo:  
-    zeroweight = {}
-    XsecsInfo=None
-    try:
-      XsecsInfo = CrossSection.XSectionInfo  #Check if cross-section information has been defined
-    except:
-      pass
-    if not XsecsInfo:
-      XsecsInfo = CrossSection.XSecInfoList()   #If not, define default cross-sections
-      CrossSection.XSectionInfo = XsecsInfo
-      import logging
-      log = logging.getLogger(__name__)
-      log.warning ( "Cross-section information not found. Using default values" )
-    for xsec in XsecsInfo.xsecs:
-      if self.sqrts == xsec.sqrts: zeroweight[xsec.label] = addunit(0., 'fb')
-
-    if not zeroweight: return False    #Skip analyses with unwanted sqrts
 
 #Get all element strings:    
     inelements = self.results.items()
@@ -91,7 +73,7 @@ class EAnalysis:
     ListOfStrs = set(ListOfStrs)
 #Now add all elements to the element list with zero weight
     while len(ListOfStrs) > 0:
-      NewEl=AElement(PartStr=ListOfStrs.pop(),zeroweight=zeroweight)
+      NewEl=AElement(PartStr=ListOfStrs.pop())
       self.Top.ElList.append(NewEl)
   
   
@@ -125,7 +107,7 @@ class EAnalysis:
     #Check if topologies match:
       if not NewTop == self.Top: continue   
     #Loop over (event) element list:
-      for NewElement in NewTop.ElList: self.Top.addEventElement(NewElement)
+      for NewElement in NewTop.ElList: self.Top.addEventElement(NewElement,self.sqrts)
 
     return True
 

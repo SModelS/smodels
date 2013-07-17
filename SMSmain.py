@@ -15,8 +15,8 @@ printer=SMSPrettyPrinter.SMSPrettyPrinter()
 #Example of how to define cross-sections. If not defined, default values
 #will be generated and stored in CrossSection.XSectionInfo the first
 #time this information is needed 
-#XSectionInfo = CrossSection.XSecInfoList('8 TeV (NLL), 8 TeV (lo), 7 tev (nlo)')
-#CrossSection.XSectionInfo = XSectionInfo
+XSectionInfo = CrossSection.XSecInfoList('8 TeV (NLL), 8 TeV (nlo)')
+CrossSection.XSectionInfo = XSectionInfo
 
 #Generate events and compute cross-sections:
 nevts = 10000
