@@ -33,9 +33,9 @@ def getPdg(name):
     :returns: particle pdg, None if name couldnt be resolved
   """
   for (pdg,pname) in Rodd.items():
-    if name==pname: return pdg
+    if name==pname: return abs(pdg)
   for (pdg,pname) in Reven.items():
-    if name==pname: return pdg
+    if name==pname: return abs(pdg)
   return None
 
 def simParticles(ptype1,ptype2,useDict=True):
