@@ -24,6 +24,20 @@ def getName(pdg):
   else:
     return False
 
+
+def getPdg(name):
+  """ Converts a name to the pdg number
+    according to the dictionaries Rodd and Reven
+
+    :type name: string
+    :returns: particle pdg, None if name couldnt be resolved
+  """
+  for (pdg,pname) in Rodd.items():
+    if name==pname: return pdg
+  for (pdg,pname) in Reven.items():
+    if name==pname: return pdg
+  return None
+
 def simParticles(ptype1,ptype2,useDict=True):
   """ Compares 2 particle names or 2 nested name arrays. \
       Allows for dictionary labels
