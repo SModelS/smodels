@@ -9,7 +9,7 @@
 """
 from ParticleNames import simParticles
 from Tools.PhysicsUnits import addunit
-from Theory import ClusterTools, TheoryPrediction
+from Theory import ClusterTools, TheoryPrediction, CrossSection
 from AuxiliaryFunctions import getelements, eltonum, Ceval
 import copy
 import logging
@@ -187,11 +187,32 @@ class ATop(Topology):
     the number of vertices and the number of particle insertions in each vertex
     """
 
-    def addEventElement(self,NewElement):
+    def addEventElement(self,NewElement,sqrts):
         """
         Adds an event element (EElement) to the corresponding analysis elements (AElements) in ElList\
-        The event element and analysis elements DO NOT need to have the same branch ordering
+        The event element and analysis elements DO NOT need to have the same branch ordering\
+        sqrts = analysis center of mass energy (necessary for adding only the relevant theoretical cross-sections)
         """
+        
+        
+        #Get cross-section information    
+        XsecsInfo=None
+        try:
+          XsecsInfo = CrossSection.XSectionInfo  #Check if cross-section information has been defined
+        except:
+          pass
+        if not XsecsInfo:
+          XsecsInfo = CrossSection.XSecInfoList()   #If not, define default cross-sections
+          CrossSection.XSectionInfo = XsecsInfo
+          log = logging.getLogger(__name__)
+          log.warning ( "Cross-section information not found. Using default values" )
+
+#Restrict weight to the cross-section labels corresponding to sqrts
+        zeroweight = {}     
+        for xsec in XsecsInfo.xsecs:    #If not only add the weight labels corresponding to the analysis sqrts
+          if sqrts == xsec.sqrts: zeroweight[xsec.label] = addunit(0., 'fb')          
+        if not zeroweight: return False    #Skip analyses with unwanted sqrts
+        
     
         if type(NewElement) != type(EElement()):
             print "[SMSDataObjects.py] wrong input! Must be an EElement object"
@@ -209,9 +230,9 @@ class ATop(Topology):
             if not simParticles(newparticles_a,oldparticles) and not simParticles(newparticles_b,oldparticles): continue
             #Format the new weight to the analysis-dependent format (remove weights which do not match the analysis format and add zero to missing weights)
             neweight = copy.deepcopy(NewElement.weight)
-            for key in OldElement.WeightFormat.keys()+neweight.keys():
+            for key in zeroweight.keys()+neweight.keys():
                 if not neweight.has_key(key): neweight[key] = addunit(0.,'fb')
-                if not OldElement.WeightFormat.has_key(key): neweight.pop(key)      
+                if not zeroweight.has_key(key): neweight.pop(key)      
                 #Check if masses match
             added = False
             OldEl = EElement(OldElement.ParticleStr)  #Create temporary EElement for easy comparison

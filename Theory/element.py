@@ -70,12 +70,11 @@ class AElement(Element):
     analysis-dependent weight format
     """
     
-    def __init__(self, particleString="", weightFormat={}):
+    def __init__(self, particleString=""):
         """
         Constructor
         """
         self.MassWeightList = []
-        self.WeightFormat = weightFormat
         super(particleString)
         
         

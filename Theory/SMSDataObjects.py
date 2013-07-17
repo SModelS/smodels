@@ -62,7 +62,6 @@ class BElement:
 
   def describe ( self ):
     """ a lengthy description of the BElement """
-    from Tools.PhysicsUnits import rmvunit
     ret="particles=%s masses=%s" % \
        ( self.particles, [ rmvunit(x,"GeV") for x in self.masses ] )
     return ret
@@ -181,14 +180,10 @@ class AElement:
   """ An Analysis Element, contains a string with the particle list, a dictionary with mass arrays and the respective weights and the\
    analysis-dependent weight format """
 
-  def __init__( self, PartStr=None, zeroweight = None ):
-    """ If PartStr != None, the Element is created with particle string \
-        If zeroweight != None, fill the weight format with the analysis-dependent weight"""
-    self.ParticleStr = ""
+  def __init__( self, PartStr=""):
+    """ If PartStr != None, the Element is created with particle string """
+    self.ParticleStr = PartStr
     self.MassWeightList = []
-    self.WeightFormat = {}
-    if PartStr: self.ParticleStr = PartStr
-    if zeroweight: self.WeightFormat = zeroweight
 
   def getParticleList(self):
     """ Converts the particle string in self.ParticleStr to a list of particles"""
@@ -315,7 +310,6 @@ class CTop:
   def addAnalysisElement(self,NewElement,masscluster):
     """  Adds an analysis element (AElement) to the corresponding cluster elements (CElements) in ElList \
          Both the particles and branch orderings must be identical!"""
-    import copy
 
     if type(NewElement) != type(AElement()):
       print "[SMSDataObjects.py] wrong input! Must be an AElement object"
@@ -361,7 +355,6 @@ class CTop:
 
       :returns: an XSecPredictionForCluster object
     """
-    from Tools.PhysicsUnits import addunit
     from AuxiliaryFunctions import getelements, eltonum
     import TheoryPrediction
   
@@ -388,7 +381,6 @@ class CTop:
     nEll = [zeroweight]*len(allEl)  
   #Build a dictionary to map the relevant elements to its respective numerical element and the element to its weight
     thdic = {}
-    eldic = {}
     iel = 0
     for el in allEl:
       ptcsA = CElement(el).getParticleList()
@@ -471,11 +463,33 @@ class ATop:
     return self.ElList[0]
   
 
-  def addEventElement(self,NewElement):
+  def addEventElement(self,NewElement,sqrts):
     """  Adds an event element (EElement) to the corresponding analysis elements (AElements) in ElList\
-         The event element and analysis elements DO NOT need to have the same branch ordering"""
+         The event element and analysis elements DO NOT need to have the same branch ordering.\
+         sqrts = analysis center of mass energy (necessary for adding only the relevant theoretical cross-sections)"""
 
     import copy
+    import CrossSection
+
+#Get cross-section information    
+    XsecsInfo=None
+    try:
+      XsecsInfo = CrossSection.XSectionInfo  #Check if cross-section information has been defined
+    except:
+      pass
+    if not XsecsInfo:
+      XsecsInfo = CrossSection.XSecInfoList()   #If not, define default cross-sections
+      CrossSection.XSectionInfo = XsecsInfo
+      import logging
+      log = logging.getLogger(__name__)
+      log.warning ( "Cross-section information not found. Using default values" )
+
+#Restrict weight to the cross-section labels corresponding to sqrts
+    zeroweight = {}     
+    for xsec in XsecsInfo.xsecs:    #If not only add the weight labels corresponding to the analysis sqrts
+      if sqrts == xsec.sqrts: zeroweight[xsec.label] = addunit(0., 'fb')          
+    if not zeroweight: return False    #Skip analyses with unwanted sqrts
+      
 
     if type(NewElement) != type(EElement()):
       print "[SMSDataObjects.py] wrong input! Must be an EElement object"
@@ -488,15 +502,16 @@ class ATop:
       if type(OldElement) != type(AElement()):
         print "[SMSDataObjects.py] wrong input! Elements in ATop must be an AElement object"
         return False
+      
 
       oldparticles = OldElement.getParticleList()
 #Check if particles match
       if not simParticles(newparticles_a,oldparticles) and not simParticles(newparticles_b,oldparticles): continue
 #Format the new weight to the analysis-dependent format (remove weights which do not match the analysis format and add zero to missing weights)
       neweight = copy.deepcopy(NewElement.weight)
-      for key in OldElement.WeightFormat.keys()+neweight.keys():
+      for key in zeroweight.keys()+neweight.keys():
         if not neweight.has_key(key): neweight[key] = addunit(0.,'fb')
-        if not OldElement.WeightFormat.has_key(key): neweight.pop(key)
+        if not zeroweight.has_key(key): neweight.pop(key)
     
 #Check if masses match
       added = False
