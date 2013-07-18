@@ -70,7 +70,7 @@ def createSLHAFile(topo, masses = None, filename = None, branching = None, total
       pyslha.writeSLHAFile(filename[1], slha[0], slha[1])
       return filename[1]
 
-def writeXSecToSLHAFile( slhafile, nevts=10000, XsecsInfo=None):
+def writeXSecToSLHAFile( slhafile, nevts=10000,basedir=None, XsecsInfo=None):
   """ calculates the production cross sections and writes it as XSECTION block in the SLHA file 
 
       :param slhafile: path of SLHA file
@@ -101,7 +101,7 @@ def writeXSecToSLHAFile( slhafile, nevts=10000, XsecsInfo=None):
       pass
 
   Tmp = tempfile.mkdtemp()
-  dic = XSEC.compute(nevts, slhafile, datadir = Tmp, XsecsInfo=XsecsInfo)
+  dic = XSEC.compute(nevts, slhafile, datadir = Tmp, basedir = basedir, XsecsInfo=XsecsInfo)
   XsecsInfo = dic.crossSectionsInfo()  #Get information about cross-sections  
 
   #write production cross sections to XSECTION block in SLHA file.

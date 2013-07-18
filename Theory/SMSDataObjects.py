@@ -417,6 +417,11 @@ class CTop:
           nEl = []
           for el in nEll: nEl.append(el[weight])  #Select weight
           res[weight] = Ceval(cond,nEl)
+        try:                                           #Try to convert from unitless Unum to number
+          if type(res) == type(addunit(1,'fb')) and res == res.asNumber():
+            res = res.asNumber()
+        except:
+          pass
         cond_res[ckey] = res   
       
     ClusterResult.conditions_dic = cond_res

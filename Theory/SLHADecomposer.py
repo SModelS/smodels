@@ -32,7 +32,6 @@ Only generated if cross-sections are read from SLHA file and not previously crea
   import TopologyBuilder, SMSDataObjects, ParticleNames
   from Tools.PhysicsUnits import addunit, rmvunit
   import pyslha2 as pyslha
-  import ClusterTools
   import CrossSection
 
   if DoCompress and rmvunit(minmassgap,'GeV') == -1: 
@@ -46,7 +45,6 @@ Only generated if cross-sections are read from SLHA file and not previously crea
  #creates Xsec dictionary if Xsec=None and store cross-section information if not previously defined
   if not Xsec:
     XsecsInfoFile = CrossSection.XSecInfoList('')  #To store information about all cross-sections in the SLHA file
-    allLabels = []
     Xsec = {}
     slha = open(slhafile, 'r')
     lines = slha.readlines()
@@ -55,7 +53,7 @@ Only generated if cross-sections are read from SLHA file and not previously crea
       if l.startswith("#") or len(l)<2: continue
       if 'XSECTION' in l:
         xsecblock = True
-        sqrtS =  eval(l.split()[1])
+        sqrtS =  eval(l.split()[1])/1000.    #Values in the SLHA file are in GeV
         pids = (eval(l.split()[5]),eval(l.split()[6]))
         continue
       if not xsecblock: continue  #ignores other entries
