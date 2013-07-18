@@ -83,7 +83,7 @@ class XSecPredictionForCluster:
   def getMaxCondition(self,wlabel = ''):
     """ get the maximum condition value, None if not available """
 
-    conds = self.getCondition(wlabel)
+    conds = self.getConditionValues(wlabel)
     if conds is None: return None
     if 'N/A' in conds: return 'N/A'
     maxcond = 0.
