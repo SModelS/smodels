@@ -60,89 +60,48 @@ class XSecPredictionForCluster:
         resdic['conditions'][weight].append(cond[weight])
 
     return resdic
+  
+    def getCondition ( self, order="NLL", sqrts=8 ):
+      """ get the condition that has been met, None if not available"""
+      key="%d TeV (%s)" % ( int(sqrts), order)
+      if not self.conditions_dic.has_key ( key ):
+        return None
+      return self.conditions_dic[key]
+  
 
-  def getCondition ( self, order="NLL", sqrts=8 ):
-    """ get the condition that has been met, None if not available """
-    key="%d TeV (%s)" % ( int(sqrts), order)
-    if not self.conditions_dic.has_key ( key ):
+  def getConditionValues ( self, wlabel = ''):
+    """ get the list of condition values for the cross-section label wlabel. Return None if not available """
+    conds = self.conditions_dic.values()
+    if not conds[0].has_key ( wlabel ):
       return None
-    return self.conditions_dic[key]
+    else:
+      res = []
+      for cond in conds:
+        res.append(cond[wlabel])
+    return res
+  
+  def getMaxCondition(self,wlabel = ''):
+    """ get the maximum condition value, None if not available """
 
-  def prediction ( self ):
-    """ get the theory prediction FIXME (simplified version with new output. What is missing?)  FIXME m1, m2, etc not used???
+    conds = self.getCondition(wlabel)
+    if conds is None: return None
+    if 'N/A' in conds: return 'N/A'
+    maxcond = 0.
+    for tvalue in conds:
+      if type(tvalue) == type(1.): maxcond = max(maxcond,tvalue)
+    return maxcond
 
+  def prediction ( self, wlabel = None ):
+    """ get the theory prediction for all cross-sections if
+    wlabel = None or for the specific cross-section label if wlabel = label. Assumes a single result per analysis.
       :returns: cross section prediction, with units
     """
-
-    return self.result_dic.values()[0]
-
-# FIXME obsolete??
-#class TheoryPrediction:
-#  """ a wrapper for the result of EAnalysis.computeTheoryPredictions,
-#      make it easier to access the theoretical xsec prediction for 
-#      a particular EElement """
-#
-#  def equal ( self, m1, m2 ):
-#    from Tools.PhysicsUnits import rmvunit
-#    """ is array of masses m1 equal to array m2? """
-#    if len(m1)!=len(m2): return False
-#    for (i,m) in enumerate(m1):
-#      d=abs(rmvunit(m,"GeV")-rmvunit(m2[i],"GeV"))
-#      if d>1e-1: return False
-#    return True
-#
-#  def findIn ( self, m1, dmass ):
-#    """ search for array of masses m1 in array of array of masses dmass """
-#    for m2 in dmass:
-#      if self.equal ( m1, m2 ): return True
-#    return False
-#
-#  def __init__ ( self, data ):
-#    self.data=data
-#  # make it behave much like a dictionary
-#  def __len__ ( self ): return len(self.data)
-#  def __getitem__ ( self, i ): return self.data[i]
-#  def items ( self ): return self.data.items()
-#  def __str__ ( self ): return str(self.data)
-#
-#  def predictionFor ( self, m1=None, m2=None, sqrts=None, order=None, condition=None ):
-#    """ get the theory xsec prediction for specific conditions:
-#        m1: get it for this array of masses 
-#        m2: specify also second array of masses for other branch.
-#        sqrts: 7 or 8 
-#        order: LO or NLO
-#        condition: the condition as is in the database 
-#
-#        :returns: reference cross section, with units, None if no result available.
-#    """
-#    runs=None
-#    if sqrts!=None and order!=None:
-#      runs = [ "%d TeV (%s)" % ( int(sqrts), order ) ]
-#    if sqrts!=None and order==None:
-#      runs= [ "%d TeV (NLL)" % ( int(sqrts) ), "%d TeV (LO)" % int (sqrts) ]
-#    if sqrts==None and order!=None:
-#      runs= [ "7 TeV (%s)" % ( order), "8 TeV (%s)" % order ]
-#
-#    # print "runs=",runs
-#    ## print "[TheoryPrediction] runs=",runs
-#    ret=None
-#    count=0
-#    for d in self.data:
-#      ## check if condition matches, if given
-#      if condition!="None" and not condition in d['conditions']: continue
-#      ## check if masses match, if given
-#      if m1!=None and not self.findIn ( m1, d['mass'] ): continue
-#      if m2!=None and not self.findIn ( m2, d['mass'] ): continue
-#      #print "match!"
-#      res=d['result']
-#      for (key,value) in res.items():
-#        if runs==None or key in runs:
-#          count+=1
-#          ret=value
-#          # print "[TheoryPrediction.py] match:",res
-#    if count>1:
-#      print "[TheoryPrediction.py] error: more than one result matches description."
-#    if count==0:
-#      print "[TheoryPrediction.py] error: no result matches description m1=",m1,"m2=",m2,"sqrts=",sqrts,"order=",order,"condition=",condition
-#    return ret
-#
+    if len(self.result_dic.values()) > 1:
+      return "[TheoryPrediction]: unknown result_dic format"
+    if wlabel is None:
+      return self.result_dic.values()[0]
+    elif not self.result_dic.values()[0].has_key(wlabel):
+      return None
+    else:
+      return self.result_dic.values()[0][wlabel]
+  
