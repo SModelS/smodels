@@ -16,12 +16,16 @@ class LHEReader:
 
       :param filename: LHE file name
       :param nmax: when using the iterator, then nmax is the maximum number of \ 
-      events to be reader, nmax=None means read till the end of the file. 
+      events to be reader, nmax=None means read till the end of the file. \
+      if filename is not a string, assume it is already a File object and do not open it
     """
     self.filename=filename
     self.nmax=nmax
     self.ctr=0
-    self.File = open ( filename )
+    if type(filename) == type('str'):
+      self.File = open ( filename )
+    else:
+      self.File = filename
     self.metainfo={}
 
   def next ( self ):

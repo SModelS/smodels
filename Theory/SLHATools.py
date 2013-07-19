@@ -70,7 +70,7 @@ def createSLHAFile(topo, masses = None, filename = None, branching = None, total
       pyslha.writeSLHAFile(filename[1], slha[0], slha[1])
       return filename[1]
 
-def writeXSecToSLHAFile( slhafile, nevts=10000,basedir=None, XsecsInfo=None):
+def writeXSecToSLHAFile( slhafile, nevts=10000,basedir=None, XsecsInfo=None, printLHE=True):
   """ calculates the production cross sections and writes it as XSECTION block in the SLHA file 
 
       :param slhafile: path of SLHA file
@@ -80,6 +80,7 @@ def writeXSecToSLHAFile( slhafile, nevts=10000,basedir=None, XsecsInfo=None):
       :param XsecsInfo: optional information about cross-sections to be computed (sqrts, order and label) \
         If not defined and not found in CrossSection.XSectionInfo, use default values
       :type XsecsInfo: CrossSection.XSecInfoList
+      :param printLHE: chooses if LHE event file is written to disk or not
   """
   import tempfile
   import Theory.XSecComputer as XSEC
@@ -100,8 +101,8 @@ def writeXSecToSLHAFile( slhafile, nevts=10000,basedir=None, XsecsInfo=None):
     except:
       pass
 
-  Tmp = tempfile.mkdtemp()
-  dic = XSEC.compute(nevts, slhafile, datadir = Tmp, basedir = basedir, XsecsInfo=XsecsInfo)
+  Tmp = tempfile.mkdtemp(dir=basedir)
+  dic = XSEC.compute(nevts, slhafile, datadir = Tmp, basedir = basedir, XsecsInfo=XsecsInfo, printLHE=printLHE)
   XsecsInfo = dic.crossSectionsInfo()  #Get information about cross-sections  
 
   #write production cross sections to XSECTION block in SLHA file.
