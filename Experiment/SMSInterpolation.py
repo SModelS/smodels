@@ -23,6 +23,8 @@ def gethistname(topo, mz):
     return topo
   elif 'D' in mz:
     return topo+'D'+mz.split('=')[1]
+  elif 'LSP' in mz:
+    return topo+"LSP"
   else: return topo+mz
 
 def getxval(mx, my, mz,mass=False):

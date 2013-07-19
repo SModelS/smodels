@@ -597,6 +597,7 @@ def exists(analysis, topo, run = None):
     # print "a=",a
     mzname=None
     if a['mz'] and len(a['mz']): mzname=a['mz'][0]
+    if a['mz'] and len(a['mz'])>1: mzname=a['mz'][1]
     toponame = SMSInterpolation.gethistname(topo, mzname )
     if hasDict:
     #print "BBB 1 ana=%s run=%s run2=%s" % ( analysis,run,run2 )
