@@ -55,7 +55,7 @@ def loFromLHE( lhefile, totalxsec, nevts=None ):
   return [ weight, sigma, n_evts ]
     
 
-def compute(nevts,slhafile,rpythia = True, basedir=None,datadir=None, XsecsInfo=None, tmpfiles=False):
+def compute(nevts,slhafile,rpythia = True, basedir=None,datadir=None, XsecsInfo=None, tmpfiles=False, printLHE=True):
   """ Runs pythia at 7 and 8 TeV and compute weights for each production process. 
 
   :param basedir: directory base. If None, then the we look for the SMSDecomposition \
@@ -68,6 +68,7 @@ def compute(nevts,slhafile,rpythia = True, basedir=None,datadir=None, XsecsInfo=
     If not defined and not found in CrossSection.XSectionInfo, use default values.
   :param tmpfile: If True, it will generate temporary lhe files. If False, use standard \
     file name (fort_sqrts.68) and replace existing files
+  :param printLHE: If False, will not write the LHE event file to disk. It will keep it in memory and delete it at the end.
   :returns: a dictionary with weights at 7 and 8 TeV and the event file to be used \
      for SMS decomposition.
   
@@ -78,6 +79,7 @@ def compute(nevts,slhafile,rpythia = True, basedir=None,datadir=None, XsecsInfo=
   import os, sys
   import tempfile
   import copy
+  import cStringIO
 
   if XsecsInfo is None:
     try:
@@ -120,12 +122,15 @@ def compute(nevts,slhafile,rpythia = True, basedir=None,datadir=None, XsecsInfo=
   #Get sqrts:
   Allsqrts = XsecsInfo.getSqrts()
   #LHE event files
-  lhefiles = []
+  lhefiles = []  
   for sqrts in Allsqrts:
-    if tmpfiles:
-      lhefiles.append(tempfile.mkstemp(suffix="_"+str(rmvunit(sqrts,'TeV'))+'TeV', dir=datadir)[1])
+    if printLHE:
+      if tmpfiles:
+        lhefiles.append(tempfile.mkstemp(suffix="_"+str(rmvunit(sqrts,'TeV'))+'TeV', dir=datadir)[1])
+      else:
+        lhefiles.append(datadir+"/fort_"+str(int(rmvunit(sqrts,'TeV')))+".68")
     else:
-      lhefiles.append(datadir+"/fort_"+str(int(rmvunit(sqrts,'TeV')))+".68")
+        lhefiles.append(None)
 
    
   total_cs = []
@@ -135,11 +140,15 @@ def compute(nevts,slhafile,rpythia = True, basedir=None,datadir=None, XsecsInfo=
 #Compute LO cross-sections:
   for isqrts,sqrts in enumerate(Allsqrts):
     if rpythia:
-      D = runPythia( slhafile,nevts,rmvunit(sqrts,'TeV'),datadir=datadir,etcdir=etcdir,installdir=installdir)
-      shutil.copy2("%s/fort.68" % datadir, lhefiles[isqrts])
+      D = runPythia( slhafile,nevts,rmvunit(sqrts,'TeV'),datadir=datadir,etcdir=etcdir,installdir=installdir,printLHE=printLHE)
+      if lhefiles[isqrts]:
+        shutil.copy2("%s/fort.68" % datadir, lhefiles[isqrts])   #Use file on disk as event file (here lhefiles is a string)
+      else:
+        lhefiles[isqrts] = cStringIO.StringIO(D["LHEevents"])    #Use memory string as event file (here lhefiles is a file unit)
       total_cs.append(addunit(D["xsecfb"],'fb'))
     else:
       total_cs.append(addunit(1.,'fb'))
+
     
     weight, sigma, n_evt = loFromLHE ( lhefiles[isqrts], total_cs[isqrts], nevts )
     weights.append(weight)
@@ -197,7 +206,11 @@ def compute(nevts,slhafile,rpythia = True, basedir=None,datadir=None, XsecsInfo=
   LHEfiles = {}
   for xsec in XsecsInfo.xsecs:
     for isqrts,sqrts in enumerate(Allsqrts):
-      if xsec.sqrts == sqrts: LHEfiles[xsec.label] = lhefiles[isqrts]
+      if xsec.sqrts == sqrts:
+        if not printLHE:
+          lhefiles[isqrts].close()
+          lhefiles[isqrts] = None
+        LHEfiles[xsec.label] = lhefiles[isqrts]
 
   
   return CrossSection.CrossSection ( {"Wdic" : Wdic, "lhefile" : lhefiles[0], "lhefiles" : LHEfiles, "Xsecdic" : Xsecdic, "XsecList" : XsecsInfo} )
@@ -219,14 +232,15 @@ def getprodcs(pdgm1, pdgm2, sigma):
   return sigma
 
 def runPythia ( slhafile, n, sqrts=7, datadir="./data/", etcdir="./etc/",
-                installdir="./" ):
+                installdir="./", printLHE=True ):
   """ run pythia_lhe with n events, at sqrt(s)=sqrts.
 
     :param slhafile: inputfile
     :type slhafile: str
     :param datadir: directory where this all should run
     :param etcdir: is where external_lhe.template is to be picked up
-    :param installdir: is where pythia_lhe is to be found.  
+    :param installdir: is where pythia_lhe is to be found.
+    :param printLHE: choose if LHE event file is written to disk or not. If False, returns the events as a string with key LHEevents
   """
   import commands, os, sys
   # print "[SMSXSecs.runPythia] try to run pythia_lhe at sqrt(s)=%d with %d events" % (sqrts,n)
@@ -238,6 +252,7 @@ def runPythia ( slhafile, n, sqrts=7, datadir="./data/", etcdir="./etc/",
   f.close()
   g=open(datadir+"/external_lhe.dat","write")
   for line in lines:
+    if not printLHE and "MSTP(163)=" in line: line = "MSTP(163)=6\n"  #Switches output to screen, so no file is written to disk
     out=line.replace("NEVENTS",str(n)).replace("SQRTS",str(1000*sqrts))
     g.write ( out )
   g.close()
@@ -253,7 +268,13 @@ def runPythia ( slhafile, n, sqrts=7, datadir="./data/", etcdir="./etc/",
     sys.exit(0)
   o=commands.getoutput ( "cd %s; %s < external_lhe.dat" % \
      ( datadir, executable ) )
-  lines=o.split( "\n" )
+  try:
+    lines = o[:o.find("<LesHouchesEvents")]
+    LHEevents = o[o.find("<LesHouchesEvents"):]
+  except:
+    lines = o
+    LHEevents = None
+  lines=lines.split( "\n" )
   xsecfb=None
   for line in lines:
 #    print line
@@ -264,7 +285,7 @@ def runPythia ( slhafile, n, sqrts=7, datadir="./data/", etcdir="./etc/",
         print "[ResultsTables.py] Exception",e,"xsecfb=",line[67:78]
         print "  `-- line=",line
 #        print "  `-- masterkey=",masterkey
-  return { "xsecfb": xsecfb }
+  return { "xsecfb": xsecfb, "LHEevents" : LHEevents }
 
 def clean ( datadir ):
   """ simple routine that can help to clean up after having computed everything """

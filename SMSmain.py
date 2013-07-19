@@ -21,8 +21,8 @@ printer=SMSPrettyPrinter.SMSPrettyPrinter()
 #Generate events and compute cross-sections:
 nevts = 10000
 #slhafile = "AndreSLHA/andrePT4.slha"
-slhafile = "slha/DESY_stop.slha"
-#slhafile = "slha/susyhit_slha.out"
+#slhafile = "slha/DESY_stop.slha"
+slhafile = "slha/input2.slha"
 Wv = XSecComputer.compute(nevts,slhafile,rpythia = True)
 W = Wv["Wdic"]
 Xsec = Wv["Xsecdic"]
