@@ -231,6 +231,8 @@ DECAY   2000004     1.00000000E+00   # scharm_L decays
 #          BR         NDA      ID1       ID2
      1.00000000E+00    2     1000022         4   # BR(~c_R -> ~chi_10 c)
 #         PDG            Width
+DECAY   1000006     0.00000000E+00   # stop1 decays
+DECAY   2000006     0.00000000E+00   # stop2 decays
 DECAY   1000005     1.00000000E+00   # sbottom1 decays
 #          BR         NDA      ID1       ID2
      1.00000000E+00    2     1000022         5   # BR(~b_1 -> ~chi_10 b)
@@ -238,9 +240,6 @@ DECAY   1000005     1.00000000E+00   # sbottom1 decays
 DECAY  2000005     1.00000000E+00   # sbottom2 decays 
 #          BR         NDA      ID1       ID2
      1.00000000E+00    2     1000022         5   # BR(~b_2 -> ~chi_10 b)
-#         PDG            Width
-DECAY   1000006     0.00000000E+00   # stop1 decays
-DECAY   2000006     0.00000000E+00   # stop2 decays
 #
 #         PDG            Width
 DECAY   1000011     0.00000000E+00   # selectron_L decays
@@ -289,93 +288,317 @@ DECAY   1000037     0.00000000E+00   # chargino2+ decays
 DECAY   1000022     0.00000000E+00   # neutralino1 decays
 DECAY   1000025     0.00000000E+00   # neutralino3 decays
 DECAY   1000035     0.00000000E+00   # neutralino4 decays
-#
-#
-#
-XSECTION  7  1000001  -1000001   
-0  0  0  0  0  0  10.590000  SLHAFileCreator 1.0
-0  2  0  0  0  0  19.983330  SLHAFileCreator 1.0
-#
-XSECTION  8  1000001  -1000001   
-0  0  0  0  0  0  12.250000  SLHAFileCreator 1.0
-0  2  0  0  0  0  22.491000  SLHAFileCreator 1.0
-#
-XSECTION  7  1000001  1000022
-0  0  0  0  0  0  0  SLHAFileCreator 1.0
-0  2  0  0  0  0  0  SLHAFileCreator 1.0
-#
-XSECTION  8  1000001  1000022   
-0  0  0  0  0  0  12.250000  SLHAFileCreator 1.0
-0  2  0  0  0  0  12.250000  SLHAFileCreator 1.0
-#
-XSECTION  7  1000002  -1000002   
-0  0  0  0  0  0  10.590000  SLHAFileCreator 1.0
-0  2  0  0  0  0  19.983330  SLHAFileCreator 1.0
-#
-XSECTION  8  1000002  -1000002   
-0  0  0  0  0  0  12.250000  SLHAFileCreator 1.0
-0  2  0  0  0  0  22.491000  SLHAFileCreator 1.0
-#
-XSECTION  7  1000003  -1000003   
-0  0  0  0  0  0  10.590000  SLHAFileCreator 1.0
-0  2  0  0  0  0  19.983330  SLHAFileCreator 1.0
-#
-XSECTION  8  1000003  -1000003   
-0  0  0  0  0  0  12.250000  SLHAFileCreator 1.0
-0  2  0  0  0  0  22.491000  SLHAFileCreator 1.0
-#
-XSECTION  7  1000004  -1000004   
-0  0  0  0  0  0  21.180000  SLHAFileCreator 1.0
-0  2  0  0  0  0  39.966660  SLHAFileCreator 1.0
-#
-XSECTION  8  1000004  -1000004   
-0  0  0  0  0  0  12.250000  SLHAFileCreator 1.0
-0  2  0  0  0  0  22.491000  SLHAFileCreator 1.0
-#
-XSECTION  7  2000001  -2000001
-0  0  0  0  0  0  0  SLHAFileCreator 1.0
-0  2  0  0  0  0  0  SLHAFileCreator 1.0
-#
-XSECTION  8  2000001  -2000001   
-0  0  0  0  0  0  12.250000  SLHAFileCreator 1.0
-0  2  0  0  0  0  22.491000  SLHAFileCreator 1.0
-#
-XSECTION  7  2000002  1000022   
-0  0  0  0  0  0  21.180000  SLHAFileCreator 1.0
-0  2  0  0  0  0  21.180000  SLHAFileCreator 1.0
-#
-XSECTION  8  2000002  1000022   
-0  0  0  0  0  0  36.750000  SLHAFileCreator 1.0
-0  2  0  0  0  0  36.750000  SLHAFileCreator 1.0
-#
-XSECTION  7  2000003  -2000003   
-0  0  0  0  0  0  21.180000  SLHAFileCreator 1.0
-0  2  0  0  0  0  39.966660  SLHAFileCreator 1.0
-#
-XSECTION  8  2000003  -2000003   
-0  0  0  0  0  0  24.500000  SLHAFileCreator 1.0
-0  2  0  0  0  0  44.982000  SLHAFileCreator 1.0
-#
-XSECTION  7  2000004  -2000004   
-0  0  0  0  0  0  10.590000  SLHAFileCreator 1.0
-0  2  0  0  0  0  19.983330  SLHAFileCreator 1.0
-#
-XSECTION  8  2000004  -2000004   
-0  0  0  0  0  0  36.750000  SLHAFileCreator 1.0
-0  2  0  0  0  0  67.473000  SLHAFileCreator 1.0
-#
-XSECTION  7  2000005  -2000005   
-0  0  0  0  0  0  21.180000  SLHAFileCreator 1.0
-0  2  0  0  0  0  41.364540  SLHAFileCreator 1.0
-#
-XSECTION  8  2000005  -2000005   
-0  0  0  0  0  0  12.250000  SLHAFileCreator 1.0
-0  2  0  0  0  0  23.023875  SLHAFileCreator 1.0
-#
-XSECTION  7  1000022  1000022   
-0  0  0  0  0  0  921.330000  SLHAFileCreator 1.0
-0  2  0  0  0  0  921.330000  SLHAFileCreator 1.0
-#
-XSECTION  8  1000022  1000022   
-0  0  0  0  0  0  1041.250000  SLHAFileCreator 1.0
-0  2  0  0  0  0  1041.250000  SLHAFileCreator 1.0
+
+
+
+XSECTION  8000.000000  2212  2212  2  1000022  2000003  # Nevts=10000
+0  0  0  0  0  0  0.100310 XSecComputer 1.0
+0  2  0  0  0  0  0.100310 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  1000022  2000003  # Nevts=10000
+0  0  0  0  0  0  0.037475 XSecComputer 1.0
+0  2  0  0  0  0  0.037475 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -2000002  1000002  # Nevts=10000
+0  0  0  0  0  0  0.014330 XSecComputer 1.0
+0  2  0  0  0  0  0.026310 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -2000002  1000002  # Nevts=10000
+0  0  0  0  0  0  0.007495 XSecComputer 1.0
+0  2  0  0  0  0  0.014143 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -1000003  1000022  # Nevts=10000
+0  0  0  0  0  0  0.042990 XSecComputer 1.0
+0  2  0  0  0  0  0.042990 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -1000003  1000022  # Nevts=10000
+0  0  0  0  0  0  0.022485 XSecComputer 1.0
+0  2  0  0  0  0  0.022485 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  1000022  2000004  # Nevts=10000
+0  0  0  0  0  0  0.143300 XSecComputer 1.0
+0  2  0  0  0  0  0.143300 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  1000022  2000004  # Nevts=10000
+0  0  0  0  0  0  0.097435 XSecComputer 1.0
+0  2  0  0  0  0  0.097435 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -1000001  1000022  # Nevts=10000
+0  0  0  0  0  0  0.100310 XSecComputer 1.0
+0  2  0  0  0  0  0.100310 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -1000001  1000022  # Nevts=10000
+0  0  0  0  0  0  0.029980 XSecComputer 1.0
+0  2  0  0  0  0  0.029980 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  1000002  1000022  # Nevts=10000
+0  0  0  0  0  0  0.243610 XSecComputer 1.0
+0  2  0  0  0  0  0.243610 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  1000002  1000022  # Nevts=10000
+0  0  0  0  0  0  0.104930 XSecComputer 1.0
+0  2  0  0  0  0  0.104930 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -1000001  2000002  # Nevts=10000
+0  0  0  0  0  0  0.014330 XSecComputer 1.0
+0  2  0  0  0  0  0.026310 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -1000001  2000002  # Nevts=10000
+0  0  0  0  0  0  0.007495 XSecComputer 1.0
+0  2  0  0  0  0  0.014143 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -2000003  2000003  # Nevts=10000
+0  0  0  0  0  0  12.581740 XSecComputer 1.0
+0  2  0  0  0  0  23.100075 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -2000003  2000003  # Nevts=10000
+0  0  0  0  0  0  6.797965 XSecComputer 1.0
+0  2  0  0  0  0  12.827760 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  1000001  1000002  # Nevts=10000
+0  0  0  0  0  0  0.057320 XSecComputer 1.0
+0  2  0  0  0  0  0.057320 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  1000001  1000002  # Nevts=10000
+0  0  0  0  0  0  0.037475 XSecComputer 1.0
+0  2  0  0  0  0  0.037475 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -2000004  1000022  # Nevts=10000
+0  0  0  0  0  0  0.128970 XSecComputer 1.0
+0  2  0  0  0  0  0.128970 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -2000004  1000022  # Nevts=10000
+0  0  0  0  0  0  0.044970 XSecComputer 1.0
+0  2  0  0  0  0  0.044970 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -2000002  1000022  # Nevts=10000
+0  0  0  0  0  0  0.401240 XSecComputer 1.0
+0  2  0  0  0  0  0.401240 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -2000002  1000022  # Nevts=10000
+0  0  0  0  0  0  0.217355 XSecComputer 1.0
+0  2  0  0  0  0  0.217355 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  2000002  2000002  # Nevts=10000
+0  0  0  0  0  0  0.071650 XSecComputer 1.0
+0  2  0  0  0  0  0.071650 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  2000002  2000002  # Nevts=10000
+0  0  0  0  0  0  0.029980 XSecComputer 1.0
+0  2  0  0  0  0  0.029980 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  1000005  1000022  # Nevts=10000
+0  0  0  0  0  0  0.014330 XSecComputer 1.0
+0  2  0  0  0  0  0.014330 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  1000005  1000022  # Nevts=10000
+0  0  0  0  0  0  0.014990 XSecComputer 1.0
+0  2  0  0  0  0  0.014990 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  1000002  1000002  # Nevts=10000
+0  0  0  0  0  0  0.014330 XSecComputer 1.0
+0  2  0  0  0  0  0.014330 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  1000002  1000002  # Nevts=10000
+0  0  0  0  0  0  0.014990 XSecComputer 1.0
+0  2  0  0  0  0  0.014990 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  1000022  2000001  # Nevts=10000
+0  0  0  0  0  0  0.874130 XSecComputer 1.0
+0  2  0  0  0  0  0.874130 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  1000022  2000001  # Nevts=10000
+0  0  0  0  0  0  0.599600 XSecComputer 1.0
+0  2  0  0  0  0  0.599600 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -2000005  2000005  # Nevts=10000
+0  0  0  0  0  0  12.925660 XSecComputer 1.0
+0  2  0  0  0  0  24.293778 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -2000005  2000005  # Nevts=10000
+0  0  0  0  0  0  6.460690 XSecComputer 1.0
+0  2  0  0  0  0  12.617728 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -1000001  -1000001  # Nevts=10000
+0  0  0  0  0  0  0.014330 XSecComputer 1.0
+0  2  0  0  0  0  0.014330 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -1000001  -1000001  # Nevts=10000
+0  0  0  0  0  0  0.000000 XSecComputer 1.0
+0  2  0  0  0  0  0.000000 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -1000001  2000001  # Nevts=10000
+0  0  0  0  0  0  0.014330 XSecComputer 1.0
+0  2  0  0  0  0  0.026310 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -1000001  2000001  # Nevts=10000
+0  0  0  0  0  0  0.007495 XSecComputer 1.0
+0  2  0  0  0  0  0.014143 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  2000001  2000002  # Nevts=10000
+0  0  0  0  0  0  0.042990 XSecComputer 1.0
+0  2  0  0  0  0  0.042990 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  2000001  2000002  # Nevts=10000
+0  0  0  0  0  0  0.044970 XSecComputer 1.0
+0  2  0  0  0  0  0.044970 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -2000002  2000002  # Nevts=10000
+0  0  0  0  0  0  13.111950 XSecComputer 1.0
+0  2  0  0  0  0  24.073540 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -2000002  2000002  # Nevts=10000
+0  0  0  0  0  0  6.363255 XSecComputer 1.0
+0  2  0  0  0  0  12.007462 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -1000002  1000002  # Nevts=10000
+0  0  0  0  0  0  12.911330 XSecComputer 1.0
+0  2  0  0  0  0  23.705202 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -1000002  1000002  # Nevts=10000
+0  0  0  0  0  0  6.760490 XSecComputer 1.0
+0  2  0  0  0  0  12.757045 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -2000003  1000022  # Nevts=10000
+0  0  0  0  0  0  0.057320 XSecComputer 1.0
+0  2  0  0  0  0  0.057320 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -2000003  1000022  # Nevts=10000
+0  0  0  0  0  0  0.014990 XSecComputer 1.0
+0  2  0  0  0  0  0.014990 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -2000001  1000022  # Nevts=10000
+0  0  0  0  0  0  0.114640 XSecComputer 1.0
+0  2  0  0  0  0  0.114640 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -2000001  1000022  # Nevts=10000
+0  0  0  0  0  0  0.074950 XSecComputer 1.0
+0  2  0  0  0  0  0.074950 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  1000022  2000002  # Nevts=10000
+0  0  0  0  0  0  9.844710 XSecComputer 1.0
+0  2  0  0  0  0  9.844710 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  1000022  2000002  # Nevts=10000
+0  0  0  0  0  0  5.711190 XSecComputer 1.0
+0  2  0  0  0  0  5.711190 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -1000005  1000005  # Nevts=10000
+0  0  0  0  0  0  13.470200 XSecComputer 1.0
+0  2  0  0  0  0  25.317241 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -1000005  1000005  # Nevts=10000
+0  0  0  0  0  0  6.782975 XSecComputer 1.0
+0  2  0  0  0  0  13.247150 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  2000001  2000001  # Nevts=10000
+0  0  0  0  0  0  0.014330 XSecComputer 1.0
+0  2  0  0  0  0  0.014330 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  2000001  2000001  # Nevts=10000
+0  0  0  0  0  0  0.000000 XSecComputer 1.0
+0  2  0  0  0  0  0.000000 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -1000002  2000002  # Nevts=10000
+0  0  0  0  0  0  0.014330 XSecComputer 1.0
+0  2  0  0  0  0  0.026310 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -1000002  2000002  # Nevts=10000
+0  0  0  0  0  0  0.000000 XSecComputer 1.0
+0  2  0  0  0  0  0.000000 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -1000004  1000004  # Nevts=10000
+0  0  0  0  0  0  12.639060 XSecComputer 1.0
+0  2  0  0  0  0  23.205314 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -1000004  1000004  # Nevts=10000
+0  0  0  0  0  0  6.738005 XSecComputer 1.0
+0  2  0  0  0  0  12.714615 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  1000001  1000022  # Nevts=10000
+0  0  0  0  0  0  0.501550 XSecComputer 1.0
+0  2  0  0  0  0  0.501550 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  1000001  1000022  # Nevts=10000
+0  0  0  0  0  0  0.299800 XSecComputer 1.0
+0  2  0  0  0  0  0.299800 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  1000003  1000022  # Nevts=10000
+0  0  0  0  0  0  0.014330 XSecComputer 1.0
+0  2  0  0  0  0  0.014330 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  1000003  1000022  # Nevts=10000
+0  0  0  0  0  0  0.014990 XSecComputer 1.0
+0  2  0  0  0  0  0.014990 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  1000022  1000022  # Nevts=10000
+0  0  0  0  0  0  0.229280 XSecComputer 1.0
+0  2  0  0  0  0  0.229280 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  1000022  1000022  # Nevts=10000
+0  0  0  0  0  0  0.187375 XSecComputer 1.0
+0  2  0  0  0  0  0.187375 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -1000003  1000003  # Nevts=10000
+0  0  0  0  0  0  13.240920 XSecComputer 1.0
+0  2  0  0  0  0  24.310329 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -1000003  1000003  # Nevts=10000
+0  0  0  0  0  0  7.112755 XSecComputer 1.0
+0  2  0  0  0  0  13.421769 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -2000004  2000004  # Nevts=10000
+0  0  0  0  0  0  13.126280 XSecComputer 1.0
+0  2  0  0  0  0  24.099850 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -2000004  2000004  # Nevts=10000
+0  0  0  0  0  0  6.820450 XSecComputer 1.0
+0  2  0  0  0  0  12.870189 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -1000002  1000022  # Nevts=10000
+0  0  0  0  0  0  0.014330 XSecComputer 1.0
+0  2  0  0  0  0  0.014330 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -1000002  1000022  # Nevts=10000
+0  0  0  0  0  0  0.000000 XSecComputer 1.0
+0  2  0  0  0  0  0.000000 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -2000003  1000002  # Nevts=10000
+0  0  0  0  0  0  0.028660 XSecComputer 1.0
+0  2  0  0  0  0  0.052620 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -2000003  1000002  # Nevts=10000
+0  0  0  0  0  0  0.007495 XSecComputer 1.0
+0  2  0  0  0  0  0.014143 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -1000001  1000001  # Nevts=10000
+0  0  0  0  0  0  12.939990 XSecComputer 1.0
+0  2  0  0  0  0  23.757822 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -1000001  1000001  # Nevts=10000
+0  0  0  0  0  0  6.595600 XSecComputer 1.0
+0  2  0  0  0  0  12.445897 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  2000002  2000004  # Nevts=10000
+0  0  0  0  0  0  0.014330 XSecComputer 1.0
+0  2  0  0  0  0  0.014330 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  2000002  2000004  # Nevts=10000
+0  0  0  0  0  0  0.000000 XSecComputer 1.0
+0  2  0  0  0  0  0.000000 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -2000005  1000022  # Nevts=10000
+0  0  0  0  0  0  0.028660 XSecComputer 1.0
+0  2  0  0  0  0  0.028660 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -2000005  1000022  # Nevts=10000
+0  0  0  0  0  0  0.000000 XSecComputer 1.0
+0  2  0  0  0  0  0.000000 XSecComputer 1.0
+
+XSECTION  8000.000000  2212  2212  2  -2000001  2000001  # Nevts=10000
+0  0  0  0  0  0  13.183600 XSecComputer 1.0
+0  2  0  0  0  0  24.205090 XSecComputer 1.0
+
+XSECTION  7000.000000  2212  2212  2  -2000001  2000001  # Nevts=10000
+0  0  0  0  0  0  6.812955 XSecComputer 1.0
+0  2  0  0  0  0  12.856046 XSecComputer 1.0
