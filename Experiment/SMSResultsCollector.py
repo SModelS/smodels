@@ -622,11 +622,11 @@ dicdecay = { "T1": "#tilde{g} #rightarrow q#bar{q} #tilde{#chi}^{0}_{1}",
     "T2FVttcc": "#tilde{t} #rightarrow c #tilde{#chi}^{0}_{1}",
     "T6ttww": "#tilde{b} #rightarrow tW #tilde{#chi}^{0}_{1}",
     "T2ttww": "#tilde{b} #rightarrow tW #tilde{#chi}^{0}_{1}",
-    "TChiwz":"#tilde{#chi}^{#pm}_{1} #tilde{#chi}^{0}_{2} #rightarrow W Z #tilde{#chi}^{0}_{1} #tilde{#chi}^{0}_{1}",
+    "TChiwz":"#tilde{#chi}^{#pm} #tilde{#chi}^{0}_{2} #rightarrow W Z #tilde{#chi}^{0}_{1} #tilde{#chi}^{0}_{1}",
     "TChizz":"#tilde{#chi}^{0}_{3} #tilde{#chi}^{0}_{2} #rightarrow Z Z #tilde{#chi}^{0}_{1} #tilde{#chi}^{0}_{1}",
     "T6ttWW": "#tilde{b} #rightarrow tW #tilde{#chi}^{0}_{1}",
     "T2ttWW": "#tilde{b} #rightarrow tW #tilde{#chi}^{0}_{1}",
-    "TChiWZ":"#tilde{#chi}^{#pm}_{1} #tilde{#chi}^{0}_{2} #rightarrow W Z #tilde{#chi}^{0}_{1} #tilde{#chi}^{0}_{1}",
+    "TChiWZ":"#tilde{#chi}^{#pm} #tilde{#chi}^{0}_{2} #rightarrow W Z #tilde{#chi}^{0}_{1} #tilde{#chi}^{0}_{1}",
     "TChiZZ":"#tilde{#chi}^{0}_{3} #tilde{#chi}^{0}_{2} #rightarrow Z Z #tilde{#chi}^{0}_{1} #tilde{#chi}^{0}_{1}",
     "TChiSlep":"#tilde{#chi}^{0}_{2} #tilde{#chi}^{#pm}_{1} #rightarrow l l l #nu #tilde{#chi}^{0}_{1} #tilde{#chi}^{0}_{1} ",
     "TChiNuSlep":"#tilde{#chi}^{0}_{2} #tilde{#chi}^{#pm}_{1} #rightarrow l l l #nu #tilde{#chi}^{0}_{1} #tilde{#chi}^{0}_{1} ",
@@ -702,7 +702,11 @@ dicdecay = { "T1": "#tilde{g} #rightarrow q#bar{q} #tilde{#chi}^{0}_{1}",
     "Rstop":"#tilde{t} #rightarrow b#tau  #lambda'_{333}",
     "Rg3j":"#tilde{g} #rightarrow qqq  #lambda''_{112}",
     "SemiLeptonic231g":"#tilde{g} #rightarrow qbt#mu  #lambda'_{231}",
-    "SemiLeptonic231q":"#tilde{g} #rightarrow qbt#mu  #lambda'_{231}"
+    "SemiLeptonic231q":"#tilde{q} #rightarrow qbt#mu  #lambda'_{231}",
+    "T5WW":"#tilde{g} #rightarrow q#bar{q}(#tilde{#chi}^{#pm}_{1}#rightarrow W#tilde{#chi}^{0}_{1})",
+    "T7btbtWW":"#tilde{g} #rightarrow b(#tilde{b} #rightarrow t(#tilde{#chi}^{#pm} #rightarrow W#tilde{#chi}^{0}_{1}))",
+    "Gluino113/223":"#tilde{g} #rightarrow qqb  #lambda''_{113/223}",
+    "Gluino323":"#tilde{g} #rightarrow tbs  #lambda''_{323}"
 }
 
 
