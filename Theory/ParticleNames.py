@@ -52,18 +52,27 @@ def simParticles(ptype1,ptype2,useDict=True):
 
     :returns: boolean
   """
-  import copy
+  import copy,sys
   
+  wrongFormat = False
   if type(ptype1) != type(ptype2): return False
 #Check for nested arrays (should be in the standard notation [[[]],[[]]]):  
   if type(ptype1) == type([]):
     if len(ptype1) != len(ptype2): return False
-    try:
-      if type(ptype1[0][0][0]) != type(ptype2[0][0][0]): return False
-      if type(ptype1[0][0][0]) != type('str'): return False
-    except:
-      print "[ParticleNames.simParticles]: Wrong input format!",ptype1,ptype2
-      return False
+    for ib,br in enumerate(ptype1):
+      if type(br) != type(ptype2[ib]) or type(br) != type([]): wrongFormat = True
+      if len(ptype1[ib]) != len(ptype2[ib]): return False  #Check number of vertices in branch
+      for iv,vt in enumerate(br):
+        if type(vt) != type(ptype2[ib][iv]) or type(vt) != type([]): wrongFormat = True
+        if len(ptype1[ib][iv]) != len(ptype2[ib][iv]): return False #Check number of particles in vertex
+        for ptc in ptype1[ib][iv]+ptype2[ib][iv]:
+          if not ptc in PtcDic.keys()+Reven.values(): wrongFormat = True
+          
+     
+  if wrongFormat:   
+    print "[ParticleNames.simParticles]: Wrong input format!",ptype1,ptype2
+    return False
+            
   
 #Put input in standard notation
   if type(ptype1) == type("str"):
@@ -74,9 +83,7 @@ def simParticles(ptype1,ptype2,useDict=True):
     ptype2v = copy.deepcopy(ptype2)
 
   for ibr,br in enumerate(ptype1v): #Loop through branches
-    if len(ptype1v[ibr]) != len(ptype2v[ibr]): return False  #Check number of vertices in branch
     for iv,vt in enumerate(br): #Loop over vertices  
-      if len(ptype1v[ibr][iv]) != len(ptype2v[ibr][iv]): return False #Check number of particles in vertex
 #Check  if lists match, ignoring possible dictionary entries
       pmatch = True
       for ptc in ptype1v[ibr][iv]:

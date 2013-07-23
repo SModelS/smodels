@@ -108,11 +108,11 @@ class EElement:
     if type(ElA) != type(ElB): return False
     El1 = ElA.B
     El2 = ElB.B
-    if len(El1) == 2 and not order:
-      ptcsA = [El2[0].particles,El2[1].particles]
-      massA = [El2[0].masses,El2[1].masses]
-      ptcs = [El1[0].particles,El1[1].particles]
-      mass = [El1[0].masses,El1[1].masses]
+    ptcs = [El1[0].particles,El1[1].particles]
+    mass = [El1[0].masses,El1[1].masses]
+    ptcsA = [El2[0].particles,El2[1].particles]
+    massA = [El2[0].masses,El2[1].masses]
+    if not order:
       ptcs_b = [El1[1].particles,El1[0].particles]
       mass_b = [El1[1].masses,El1[0].masses]
       if igmass:
@@ -125,9 +125,8 @@ class EElement:
       else:
         return False
     else:
-      for i in range(len(El1)):
-        if not simParticles(El1[i].particles,El2[i].particles): return False
-        if not igmass and El1[i].masses != El2[i].masses: return False
+      if not simParticles(ptcsA,ptcs): return False
+      if not igmass and mass != massA: return False
     return True
 
   def isEqual ( ElA, ElB,order=True):
@@ -138,11 +137,11 @@ class EElement:
     if type(ElA) != type(ElB): return False
     El1 = ElA.B
     El2 = ElB.B
-    if len(El1) == 2 and not order:
-      ptcsA = [El2[0].particles,El2[1].particles]
-      massA = [El2[0].masses,El2[1].masses]
-      ptcs = [El1[0].particles,El1[1].particles]
-      mass = [El1[0].masses,El1[1].masses]
+    ptcs = [El1[0].particles,El1[1].particles]
+    mass = [El1[0].masses,El1[1].masses]
+    ptcsA = [El2[0].particles,El2[1].particles]
+    massA = [El2[0].masses,El2[1].masses]
+    if not order:
       ptcs_b = [El1[1].particles,El1[0].particles]
       mass_b = [El1[1].masses,El1[0].masses]
       if simParticles(ptcsA,ptcs,useDict=False) and mass == massA:
@@ -152,9 +151,8 @@ class EElement:
       else:
         return False
     else:
-      for i in range(len(El1)):
-        if not simParticles(El1[i].particles,El2[i].particles,useDict=False): return False
-        if El1[i].masses != El2[i].masses: return False
+      if not simParticles(ptcs,ptcsA,useDict=False): return False
+      if mass != massA: return False
 
     return True
 
