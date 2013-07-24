@@ -181,13 +181,12 @@ Only generated if cross-sections are read from SLHA file and not previously crea
   SMSTopList = SMSDataObjects.TopologyList()
 #Combine 1branch elements according to production cross-section:
   for ptcs in Xsec[Xsec.keys()[0]].keys():
-    for iel in range(len(FinalList)):
-      for jel in range(len(FinalList)):
-        if ptcs[0] == ptcs[1] and jel < iel: continue     #Avoid double counting
+    for iel,El1 in enumerate(FinalList):
+      for jel,El2 in enumerate(FinalList):
 
-        if FinalList[iel].momID == ptcs[0] and FinalList[jel].momID == ptcs[1]:
+        if El1.momID == ptcs[0] and El2.momID == ptcs[1]:
           Els = SMSDataObjects.EElement()    
-          Els.B = [copy.deepcopy(FinalList[iel]),copy.deepcopy(FinalList[jel])]
+          Els.B = [copy.deepcopy(El1),copy.deepcopy(El2)]
           weight = {}
           for w in Xsec.keys():
             weight.update({w : Xsec[w][ptcs]*WFinal[iel]*WFinal[jel]/(Pdic[ptcs[0]]*Pdic[ptcs[1]])})
