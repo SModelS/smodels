@@ -23,7 +23,7 @@ argparser.add_argument('-axes','--axes',help='axes information')
 argparser.add_argument('-n','--nevts',help='number of events per point in refXSec [10000]', type=int, default=10000)
 argparser.add_argument('-b','--binsize',help='binsize in GeV')
 argparser.add_argument('-text','--text',help='print upper limit each 100 GeV',action='store_true')
-argparser.add_argument('-s','--fromSlha',help='get input lhe from slha file', action='store_true')
+argparser.add_argument('-s','--fromSLHA',help='get input lhe from slha file', action='store_true')
 args=argparser.parse_args()
 
 ROOT.gROOT.SetStyle("Plain")
@@ -40,7 +40,7 @@ ROOTTools.useNiceColorPalette ( "temperature", 0.5, 50 )
 tevIn=rmvunit ( SMSResults.getSqrts(args.ana), "TeV" )
 run1=SMSResults.getRun(args.ana)
 binsize=args.binsize
-rootname = testGetLimit.recreateHist(args.ana, args.topo, mz=args.mz, axes=args.axes, line=True, tev=tevIn, nevents=args.nevts, binsize=args.binsize,fromSlha=args.fromSlha)
+rootname = testGetLimit.recreateHist(args.ana, args.topo, mz=args.mz, axes=args.axes, line=True, tev=tevIn, nevents=args.nevts, binsize=args.binsize,fromSLHA=args.fromSLHA)
 
 if not rootname:
   print "Could not run recreateHist, png was not produced."
@@ -66,7 +66,8 @@ ul.GetYaxis().SetTitleOffset(1.15)
 exclusion = SMSResults.getExclusionLine(toponame, args.ana, False, plusminussigma=0)
 exclusionm1= SMSResults.getExclusionLine(toponame, args.ana, False, plusminussigma=-1)
 exclusionp1= SMSResults.getExclusionLine(toponame, args.ana, False, plusminussigma=1)
-reproduced_exclusion = rootfile.Get('Graph')
+print 'rootfile:', rootfile
+reproduced_exclusion = rootfile.Get('Graph_slha')
 reproduced_exclusion.SetLineWidth(3)
 reproduced_exclusion.SetLineColor(ROOT.kRed)
 
