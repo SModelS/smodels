@@ -15,10 +15,10 @@ pid_dic = {"T1": [[1000021], [1000022]],
            "TChiChipmSlepStau": [[1000024, 1000023], [1000011, 1000012, 1000013, 1000014, 1000015, 1000016], [1000022]],#??set all slepton masses here
            "TChiChipmStauStau": [[1000024, 1000023], [1000011, 1000012, 1000013, 1000014, 1000015, 1000016], [1000022]] }#??set all slepton masses here
 
-diff_dic = {"T1tttt": 360., "T2bb": 5.}
+diff_dic = {"T1tttt": 360., "T2bb": 5., "T1": 0.}
 
 
-def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=10000,binsize=None, fromSlha=True):
+def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=10000,binsize=None, fromSLHA=True):
   """ recreate ROOT TH2F histogram of a given analysis and topology
         needs mz for a topology with intermediate mass,
         axes, for histograms with axes different from M1-M0
@@ -26,7 +26,7 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
         and line, return filename"""
 
 #  lhefile = "../lhe/%s_1.lhe" %topo
-#  if fromSlha:
+#  if fromSLHA:
 #    import os
 #    os.system("cp ../slha/%s.slha fort.61" %topo)
 #    os.system("../pythia_lhe < pyIn.dat") #run with 20 events
@@ -34,7 +34,7 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
 #  topoList=LHEDecomposer.decompose ( lhefile, {})#create default topologylist with only topo (is list of GTop objects)
 
 
-  Tmp = tempfile.mkdtemp()
+ # Tmp = tempfile.mkdtemp()
 
 
   toponame=topo
@@ -64,17 +64,17 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
     if topo=="T1tttt" or topo=="T1bbbb": prod_mode = "T1"
     if topo=="TChiChipmSlepL" or topo=="TChiChipmSlepStau" or topo=="TChiChipmStauStau" or topo=="TChiChipmStauL" or topo=="TChiWZ": prod_mode = "TChiWZ_Wino"
     if topo=="T2": prod_mode = "T24sq"
-    rootname = "../data/%s_%devts.root" %(prod_mode,nevents)
-    if binsize: rootname =  "../data/%s_%devts_%sGeVbin.root" %(prod_mode,nevents,binsize)
-    f=ROOT.TFile(rootname)
-    if tev==8: rXsName="hist8"
-    if tev==7:rXsName="hist7"
-    rXs=f.Get(rXsName)
-    print rootname
+#    rootname = "../data/%s_%devts.root" %(prod_mode,nevents)
+#    if binsize: rootname =  "../data/%s_%devts_%sGeVbin.root" %(prod_mode,nevents,binsize)
+#    f=ROOT.TFile(rootname)
+ ##   if tev==8: rXsName="hist8"
+ #   if tev==7:rXsName="hist7"
+ #   rXs=f.Get(rXsName)
+ #   print rootname
 
-  if line and not rXs:
-    print "No refXSec histogram found"
-    return None
+ # if line and not rXs:
+ #   print "No refXSec histogram found"
+ #   return None
 
   x=xmin+bwx/2
   y=ymin+bwy/2
@@ -109,23 +109,26 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
 
 #      ana_obj = SMSAnalysisFactory.load( anas=ana, topos=topo ) #create list of analysis objects, but give one analysis, one topo, so list has one entry only!
 
-      slha_dic = {}
-      for ii in range(len(pid_dic[topo])):
-        for ent in pid_dic[topo][ii]:
-          slha_dic[ent]=massv[ii]
+#      slha_dic = {}
+#      for ii in range(len(pid_dic[topo])):
+#        for ent in pid_dic[topo][ii]:
+#          slha_dic[ent]=massv[ii]
 
-      sigmacut = addunit(0.1,'fb')
-      slha_name = SLHATools.createSLHAFile(topo, slha_dic)
-      xsec_dic = XSecComputer.compute(nevents, slha_name, datadir = Tmp)
-      XSec = xsec_dic.crossSections()
-      topoList = SLHADecomposer.decompose(slha_name, XSec, sigmacut)
-      os.unlink(slha_name)
+ #     sigmacut = addunit(0.1,'fb')
+ #     slha_name = SLHATools.createSLHAFile(topo, slha_dic)
+ #     xsec_dic = XSecComputer.compute(nevents, slha_name, datadir = Tmp)
+ #     XSec = xsec_dic.crossSections()
+ #     topoList = SLHADecomposer.decompose(slha_name, XSec, sigmacut)
+#      os.unlink(slha_name)
+      slha_name = "../slha_xsec/%s_%d_%d.slha" %(prod_mode, massv[0], massv[1])
+      print slha_name
+      topoList = SLHADecomposer.decompose( slha_name, sigcut=addunit(0.00001, 'fb') )
 
       ana_obj = SMSAnalysisFactory.load( anas=ana, topos=topo ) #create list of analysis objects, but give one analysis, one topo, so list has one entry only!
 
       ana_obj[0].add( topoList ) # the list ana_obj has only one entry here!, all EElements consisten with the constraints for this topology are added to the EAnalysis object
 
-#      print ana_obj[0].Top.ElList[0].B[0].masses
+#      print ana_obj[0].Top.ElList[0].MassWeightList
 #      lims=LimitGetter.limit(ana_obj[0], addTheoryPredictions=[])
       if not ana_obj[0].computeTheoryPredictions():
         hL.Fill(x,y)
@@ -134,15 +137,46 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
         continue
 
 #      v=None
-      v=rmvunit(ana_obj[0].ResultList[0].explimit,'fb')
+#      v=rmvunit(ana_obj[0].ResultList[0].explimit,'fb')
 
-#      v=rmvunit(LimitGetter.GetPlotLimit([massv,massv],[topo,[ana]],a)[0][1],'fb')
+      v=rmvunit(LimitGetter.GetPlotLimit([massv,massv], ana_obj[0]),'fb')
+      fslha = open(slha_name, 'r')
+      slha_lines = fslha.readlines()
+     
+      xsectionblock = False
+      l_tev = False
+      for slha_l in slha_lines:
+        if len(slha_l) < 2:
+          continue
+        if 'XSECTION' in slha_l:
+          xsectionblock = True
+          l = slha_l.split()
+          if float(l[1])/1000 == float(tev) and int(l[5]) in pid_dic[topo][0] and int(l[6]) in pid_dic[topo][0]:
+            l_tev = True
+          elif float(l[1])/1000 == float(tev-1) or float(l[1])/1000 == float(tev+1):
+            l_tev = False
+          elif not int(l[5]) in pid_dic[topo][0] or not int(l[6]) in pid_dic[topo][0]:
+            l_tev = False
+        elif 'BLOCK' in slha_l or 'DECAY' in slha_l:
+          xsectionblock = False
+        else:
+          if xsectionblock == True:
+            l = slha_l.split()
+            if l_tev == True:
+              if l[1] == '0':
+                xsec_lo = float(l[6])
+              elif l[1] == '2':
+                xsec_nll = float(l[6])
+              else:
+                print 'unknown order', l[6]
+
 
       if v: h.Fill(x,y,v)
 
       if line:
         sumTheory=0.
-        if v and v<rXs.GetBinContent(rXs.FindBin(x)):
+        if v and v<xsec_nll:
+#        if v and v<rXs.GetBinContent(rXs.FindBin(x)):
           hL.Fill(x,y,0)
         else: hL.Fill(x,y)
 #        if ana_obj[0].computeTheoryPredictions():
@@ -168,10 +202,10 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
     y=ymin+bwy/2
     x+=bwx
 
-  XSecComputer.clean(Tmp)
+#  XSecComputer.clean(Tmp)
 
   if line:
-    f.Close()
+#    f.Close()
     rootname_out="%s_%devts.root" % (topo,nevents)
     if binsize:rootname_out="%s_%devts_%sGeVbin.root" % (topo,nevents,binsize)
     f1=ROOT.TFile(rootname_out,"recreate")
@@ -181,8 +215,12 @@ def recreateHist(ana,topo,mz=None,axes=None, run='',line=False,tev=8,nevents=100
     hTheory.Write()
     hLine.Write()
     exclusion=ROOTTools.getTGraphFromContour(hL)
+    exclusion.SetName("Graph_slha")
+    exclusion.SetTitle("Graph_slha")
     exclusion.Write()
     exclusionER=ROOTTools.getTGraphFromContour(hLine)
+    exclusionER.SetName("Graph_smodels")
+    exclusionER.SetTitle("Graph_smodels")
     exclusionER.Write()
     f1.Close()
     return rootname_out
