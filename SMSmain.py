@@ -2,7 +2,7 @@
 
 import sys
 from prettytable import PrettyTable
-from Theory import LHEDecomposer, SLHADecomposer, XSecComputer, ClusterTools, CrossSection
+from Theory import LHEDecomposer, SLHADecomposer, XSecComputer, ClusterTools, CrossSection, SLHATools
 from Tools.PhysicsUnits import addunit, rmvunit
 from Tools import SMSPrettyPrinter, VariousHelpers
 from Tools.SMSPrettyPrinter import wrap
@@ -21,11 +21,17 @@ printer=SMSPrettyPrinter.SMSPrettyPrinter()
 #Generate events and compute cross-sections:
 nevts = 10000
 #slhafile = "slha/andrePT4.slha"
-slhafile = "slha/DESY_stop.slha"
-Wv = XSecComputer.compute(nevts,slhafile,rpythia = True)
-W = Wv["Wdic"]
-Xsec = Wv["Xsecdic"]
-lhefile = Wv["lhefile"]
+slhafile = "test.slha"
+
+WriteToFile = True
+if not WriteToFile:
+  Wv = XSecComputer.compute(nevts,slhafile,rpythia = True)
+  W = Wv["Wdic"]
+  Xsec = Wv["Xsecdic"]
+  lhefile = Wv["lhefile"]
+else:
+  Xsec=None
+  SLHATools.writeXSecToSLHAFile(slhafile,nevts,printLHE=False)
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Creat analyses list:
