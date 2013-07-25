@@ -207,7 +207,7 @@ def compute(nevts,slhafile,rpythia = True, basedir=None,datadir=None, XsecsInfo=
   for xsec in XsecsInfo.xsecs:
     for isqrts,sqrts in enumerate(Allsqrts):
       if xsec.sqrts == sqrts:
-        if not printLHE:
+        if not printLHE and lhefiles[isqrts]:
           lhefiles[isqrts].close()
           lhefiles[isqrts] = None
         LHEfiles[xsec.label] = lhefiles[isqrts]
