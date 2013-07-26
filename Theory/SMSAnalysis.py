@@ -120,7 +120,7 @@ class EAnalysis:
 
       :returns: True if successful, None if list is empty.
     """
-    from ClusterTools import DoCluster, GoodMass
+    from ClusterTools import DoCluster, GoodMass, MassAvg
     from Experiment import LimitGetter
 
     dmin = self.masscomp
@@ -134,7 +134,7 @@ class EAnalysis:
            if not gmass in Goodmasses: Goodmasses.append(gmass)
 
   #Cluster masses:
-    MCluster = DoCluster(Goodmasses,self.MassDist,dmin)
+    MCluster = DoCluster(Goodmasses,self.MassDist,dmin,MassAvg)
 
     if MCluster == None or MCluster == False:
       MCluster = []
@@ -155,6 +155,7 @@ class EAnalysis:
       ClusterResult = NewTop.evaluateCluster( self.results )
       ClusterResult.mass = NewTop.clustermass
       ClusterResult.explimit = LimitGetter.GetPlotLimit(ClusterResult.mass,self,complain=False)
+
 
   #Check if average mass is inside the cluster (exp. limit for average mass ~ exp. limit for individual masses):
       mavg = NewTop.clustermass
