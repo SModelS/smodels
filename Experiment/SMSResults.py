@@ -213,7 +213,7 @@ def getAnalyses ( topo, run=None ):
 
 allresults={}
 
-def getAllResults ( run=None ):
+def getAllResults ( run=None, allHistos=False ):
   import os
   """ returns all analyses and the topologies they have results for """
   key=str(run)
@@ -227,7 +227,7 @@ def getAllResults ( run=None ):
     dirs=os.listdir ( "%s/%s/" % ( SMSHelpers.Base, r ) )
     for ana in dirs:
       if os.path.exists ( "%s/%s/%s/info.txt" % ( SMSHelpers.Base, r, ana ) ):
-        topos=getTopologies ( ana, run )
+        topos=getTopologies ( ana, run, allHistos=allHistos )
         ret[ana]=topos
   allresults[key]=ret
   return ret
