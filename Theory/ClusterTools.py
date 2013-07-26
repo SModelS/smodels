@@ -90,9 +90,10 @@ def GoodMass(mass,Distfunc,dmin):
   """Test if a mass array is "good"
      = have similar branch masses if branch topologies are equal
      = have similar mother and LSP masses if branch topologies are different
+     AND has an experimental limit
      If it is, return an equivalent array with equal masses (= mass avg)"""
 
-  if mass[0] == mass[1]: return mass
+  if mass[0] == mass[1] and Distfunc(mass,mass) == 0.: return mass
   if len(mass[0]) == len(mass[1]):
     mass1 = [mass[0],mass[0]]
     mass2 = [mass[1],mass[1]]
