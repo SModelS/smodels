@@ -9,7 +9,7 @@
 
 """
 
-def DoCluster(objlist,Distfunc,dmin):
+def DoCluster(objlist,Distfunc,dmin,AvgFunc=None):
   """Cluster algorithm (generic for any type of object, as long as the distance function is given) 
     :returns: a list of indexes with the clustered objects according to the order\
     in objlist
@@ -38,7 +38,7 @@ def DoCluster(objlist,Distfunc,dmin):
     for j in range(len(objlist)):
       if MD[i][j] == None: continue
       if MD[i][j] <= dmin: cluster.add(j)
-    if not cluster in ClusterList: ClusterList.append(cluster)   #Zero level clusters (individual masses)
+    if not cluster in ClusterList: ClusterList.append(cluster)   #Zero level (maximal) clusters
 
 
   FinalCluster = []
@@ -48,9 +48,16 @@ def DoCluster(objlist,Distfunc,dmin):
     for cluster in ClusterList:
       split = False
       if len(cluster) > 2:
+        if AvgFunc:       #Optional check to see if the cluster average falls inside the cluster
+          obj_cluster = [objlist[ic] for ic in cluster]
+          obj_avg = AvgFunc(obj_cluster)
+          DistAvg = max([Distfunc(obj,obj_avg) for obj in obj_cluster])
+        else:
+          DistAvg = 0.
+
         for i in cluster:
           ClDist = ClusterDist(set([i]),cluster,MD)
-          if  ClDist == None or ClDist > dmin:
+          if  ClDist == None or ClDist > dmin or DistAvg > dmin:    #If object or cluster average falls outside the cluster, remove object
             newcluster = copy.deepcopy(cluster)
             newcluster.remove(i)
             split = True
@@ -65,16 +72,16 @@ def DoCluster(objlist,Distfunc,dmin):
       return None
 
 
-#Clean up clusters
   FinalCluster = FinalCluster + ClusterList
+#Add clusters of individual masses (just to be safe)
+  for ic in range(len(objlist)): FinalCluster.append(set([ic]))
+
+#Clean up clusters (remove redundant clusters)
   i = 0
-  for i in range(len(FinalCluster)):
-    clusterA = FinalCluster[i]
-    for j in range(len(FinalCluster)):
-      clusterB = FinalCluster[j]
+  for i,clusterA in enumerate(FinalCluster):
+    for j,clusterB in enumerate(FinalCluster):
       if i != j and clusterB.issubset(clusterA):
         FinalCluster[j] = set([])
-
   while FinalCluster.count(set([])) > 0: FinalCluster.remove(set([]))
 
   return FinalCluster
@@ -107,7 +114,7 @@ def GoodMass(mass,Distfunc,dmin):
     else:
       return MassAvg([mass1,mass2],"harmonic")
 
-def MassAvg(equivin, method = "mean"):
+def MassAvg(equivin, method = "harmonic"):
   """For a list of equivalent masses, compute an average mass (or mass array)
      using the defined method.
      :param method: the method employed: "harmonic" = harmonic means, "mean" = algebaric (standard) mean
