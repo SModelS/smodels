@@ -20,6 +20,8 @@ squarks = [1000001,2000001,1000002,2000002,1000003,2000003,1000004,2000004]
 def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energy = 8, base="./nllfast/" ):
     """ method to get the NLL fast results. 
         This is the shortest way to code, I found. """
+    import logging
+    log = logging.getLogger(__name__)
     Values={"sqmass_7TeV":0, "mgmass_7TeV":0,"LOcs_7TeV":False,"NLOcs_7TeV":False,"NLL+NLO_7TeV":False,"K_NLO_7TeV":False,"K_NLL_7TeV":False}
     Values_7TeV={"sqmass_7TeV":0, "mgmass_7TeV":0,"LOcs_7TeV":False,"NLOcs_7TeV":False,"NLL+NLO_7TeV":False,"K_NLO_7TeV":False,"K_NLL_7TeV":False}
     Values_8TeV={"sqmass_8TeV":0, "mgmass_8TeV":0,"LOcs_8TeV":False,"NLOcs_8TeV":False,"NLL+NLO_8TeV":False,"K_NLO_8TeV":False,"K_NLL_8TeV":False}
@@ -118,6 +120,9 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
         return Values_8TeV
 
     lines=o.split()
+    if len(lines)<37:
+      log.error ( "when parsing nllfast output, I have only %d lines. I guess something is wrong. Maybe sth is wrong with the nll binary?" % len(lines) )
+      log.error ( "the lines are" + str(lines) )
 
 #Convert from strings to values whenever possible:
     for il in range(len(lines)):
