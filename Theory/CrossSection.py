@@ -49,7 +49,7 @@ class CrossSection:
       return None
 
 #Get label: 
-    for xsec in self.crossSectionsInfo.xsecs:
+    for xsec in self.crossSectionsInfo().xsecs:
       if xsec.order != order: continue
       if xsec.sqrts != sqrts: continue
       k = xsec.label
@@ -221,3 +221,5 @@ class XSecInfoList:
     for xsec in self.xsecs:
       if not xsec.sqrts in allsqrts: allsqrts.append(xsec.sqrts)
     return allsqrts
+
+XsecsInfo = XSecInfoList() ## define the default
