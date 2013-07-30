@@ -3,16 +3,11 @@
 """ another sandbox to try things out """
 
 import set_path, tempfile
-from Theory import LHEDecomposer, XSecComputer
+from Theory import LHEDecomposer, XSecComputer, ClusterTools
 from Experiment import TxNames, SMSAnalysisFactory, SMSResults, LimitGetter
 from Tools.VariousHelpers import logging
 
 log = logging.getLogger(__name__)
-
-log.info ( "loading analyses" )
-# analyses = SMSAnalysisFactory.load( )
-analyses = SMSAnalysisFactory.load( anas="alphaT8TeV", topos="T2bb" )
-log.info ( "done loading %d analyses" % len(analyses) )
 
 nevts=1000
 # slhafile="../slha/TChiNuSlep.slha"
@@ -22,12 +17,20 @@ Tmp=tempfile.mkdtemp()
 log.info ( "now run pythia in "+Tmp )
 Wv=XSecComputer.compute(nevts,slhafile,rpythia = True, datadir=Tmp)
 log.info ( "done running pythia" )
+# print "cmdic=",ClusterTools.CMdic
 
 lhefile=Wv.lhefile ( sqrts=8 )
 
 ## print "[run.py] weights=",Wv.weights()
 topos=LHEDecomposer.decompose ( lhefile, Wv.weights(), nevts=nevts )
 XSecComputer.clean ( Tmp )
+
+print "topos=",topos
+
+log.info ( "loading analyses" )
+# analyses = SMSAnalysisFactory.load( )
+analyses = SMSAnalysisFactory.load( anas="alphaT8TeV", topos="T2bb" )
+log.info ( "done loading %d analyses" % len(analyses) )
 
 print
 for Analysis in analyses:
