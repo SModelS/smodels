@@ -8,6 +8,8 @@ from Theory import LHEDecomposer, SLHADecomposer, XSecComputer, ClusterTools
 from Tools.PhysicsUnits import addunit, rmvunit
 from Tools import SMSPrettyPrinter, VariousHelpers
 from Tools.SMSPrettyPrinter import wrap
+from Experiment import SMSHelpers
+SMSHelpers.Base="../testdatabase/"
 from Experiment import SMSAnalysisList, SMSAnalysisFactory, LimitGetter
 
 
