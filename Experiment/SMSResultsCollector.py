@@ -9,7 +9,7 @@
 """
 
 
-import os, ROOT, sys, types
+import os, sys, types
 
 dicpath, lumis, dicexclusions = {},{},{}
 
@@ -226,7 +226,8 @@ def SMSObjects(obj,topo,ana,xvalue='',name=None):
     filename=Base + year + "/" + ana + '/sms.root'
     if not os.path.exists(filename):
       continue
-    f = ROOT.TFile(filename)
+    from ROOT import TFile
+    f = TFile(filename)
     if not f or not f.IsOpen():
       if verbose:
         print "[SMSResultsCollector.py] error: cannot open",filename
