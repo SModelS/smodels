@@ -314,7 +314,11 @@ def getInterpolatedUpperLimit ( Dict, inmx, inmy ):
   grid_y = np.zeros((1,1))
   grid_x = mx
   grid_y = my
-  return float(ip.griddata(points, values, (grid_x, grid_y), method='linear'))
+  try:
+    return float(ip.griddata(points, values, (grid_x, grid_y), method='linear'))
+  except Exception,e:
+    log.error ( "cannot interpolate: %s. use closest value." % str(e) )
+    return getClosestValue ( Dict, inmx, inmy )
 
 def getUpperLimitFromDictionary ( analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False ):
   """ shouldnt have to call this directly. It's obtaining an upper limit from the python dictionary """
