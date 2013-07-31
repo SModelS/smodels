@@ -12,7 +12,9 @@
 import SMSHelpers
 from Tools.PhysicsUnits import addunit, rmvunit
 from SMSResultsCollector import SMSInfo
-from Tools import RCFile, PhysicsUnits
+from Tools import RCFile, PhysicsUnits, VariousHelpers
+import logging
+log = logging.getLogger(__name__)
 
 def getAllHistNames (ana, topo, run=None):
   """ for a given analysis, topology, return list of all available histograms"""
@@ -247,14 +249,18 @@ def getClosestValue ( Dict, mx, my ):
   return retul
 
 def inConvexHull(Dict, mx, my):
-  import numpy, scipy.spatial
-  pointlist=[]
-  for k in Dict.keys():
-    for ki in Dict[k].keys():
-      pointlist.append([k,ki])
-  p=numpy.array(pointlist)
-  dela=scipy.spatial.Delaunay(p)
-  return dela.find_simplex((mx, my))>=0
+  try:
+    import numpy, scipy.spatial
+    pointlist=[]
+    for k in Dict.keys():
+      for ki in Dict[k].keys():
+        pointlist.append([k,ki])
+    p=numpy.array(pointlist)
+    dela=scipy.spatial.Delaunay(p)
+    return dela.find_simplex((mx, my))>=0
+  except ImportError,e:
+    log.error("inConvexHull, cant import module: "+str(e) )
+    return False
 
 def getInterpolatedUpperLimit ( Dict, inmx, inmy ):
   """ get interpolated upper limit from dictionary at point (inmx, inmy)
