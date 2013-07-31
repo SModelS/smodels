@@ -249,18 +249,42 @@ def getClosestValue ( Dict, mx, my ):
   return retul
 
 def inConvexHull(Dict, mx, my):
+  pointlist=[]
+  for k in Dict.keys():
+    for ki in Dict[k].keys():
+      pointlist.append([k,ki])
   try:
-    import numpy, scipy.spatial
-    pointlist=[]
-    for k in Dict.keys():
-      for ki in Dict[k].keys():
-        pointlist.append([k,ki])
+    import numpy
     p=numpy.array(pointlist)
-    dela=scipy.spatial.Delaunay(p)
+    from scipy.spatial import Delaunay
+    dela=Delaunay(p)
     return dela.find_simplex((mx, my))>=0
   except ImportError,e:
-    log.error("inConvexHull, cant import module: "+str(e) )
-    return False
+    """ some very poor workaround for the missing convex hull,
+        checks if we're out of bounds in mx and my separately,
+        and if the mass splitting is smaller than in the smallest 
+        case """
+    log.error( str(e) )
+    mxmin=min(Dict.keys())
+    if mx < mxmin: 
+      return False
+    mxmax=max(Dict.keys())
+    if mx > mxmax: 
+      return False
+    ymin=99999.
+    ymax=0.
+    dmin=99999.
+    for point in pointlist:
+      if point[1]<ymin: ymin=point[1]
+      if point[1]>ymax: ymax=point[1]
+      dm=point[0]-point[1]
+      if dm<dmin: dmin=dm
+    if my<ymin:
+      return False
+    if my>ymax:
+      return False
+    if (mx-my) < dmin: return False
+    return True
 
 def getInterpolatedUpperLimit ( Dict, inmx, inmy ):
   """ get interpolated upper limit from dictionary at point (inmx, inmy)
