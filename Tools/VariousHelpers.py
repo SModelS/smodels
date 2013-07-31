@@ -34,5 +34,9 @@ def getInstallationBase():
 
 import logging 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s(): %(message)s'
+import sys
+## workaround for python2.4
+if sys.version_info[0]<3 and sys.version_info[1]<5:
+  FORMAT = '%(levelname)s in %(module)s.s(): %(message)s'
 # http://docs.python.org/2/library/logging.html#logging.Formatter
 logging.basicConfig(level=logging.INFO,format=FORMAT)
