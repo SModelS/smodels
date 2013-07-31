@@ -47,7 +47,7 @@ def DoCluster(objlist,Distfunc,dmin,AvgFunc=None):
     newClusters = []
     for cluster in ClusterList:
       split = False
-      if len(cluster) > 2:
+      if len(cluster) > 1:
         if AvgFunc:       #Optional check to see if the cluster average falls inside the cluster
           obj_cluster = [objlist[ic] for ic in cluster]
           obj_avg = AvgFunc(obj_cluster)
@@ -67,7 +67,7 @@ def DoCluster(objlist,Distfunc,dmin,AvgFunc=None):
       if not split and not cluster in FinalCluster: FinalCluster.append(cluster)
 
     ClusterList = newClusters
-    if len(ClusterList) > 2000:  #Check for oversized list of cluster (too time consuming)
+    if len(ClusterList) > 2000 or (AvgFunc and len(ClusterList) > 500):  #Check for oversized list of cluster (too time consuming)
       print "DoCluster: Error clustering. ClusterList >",len(ClusterList)
       return None
 
