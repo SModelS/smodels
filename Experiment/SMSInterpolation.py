@@ -49,7 +49,7 @@ def getxval(mx, my, mz,mass=False):
 #  if ty: z += ty*mx
   if c: z+=c
   if mass: return z
-  print "[SMSInterpolation.py] z=",z,"mx=",mx,"my=",my
+  # print "[SMSInterpolation.py] z=",z,"mx=",mx,"my=",my
   xval = (z-my)/(mx-my)
   return xval
 
