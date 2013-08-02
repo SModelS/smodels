@@ -222,4 +222,4 @@ class XSecInfoList:
       if not xsec.sqrts in allsqrts: allsqrts.append(xsec.sqrts)
     return allsqrts
 
-XsecsInfo = XSecInfoList() ## define the default
+## XsecsInfo = XSecInfoList() ## define the default
