@@ -297,7 +297,7 @@ def getInterpolatedUpperLimit ( Dict, inmx, inmy ):
   mx = rmvunit(inmx,'GeV')
   my = rmvunit(inmy,'GeV')
   if not inConvexHull(Dict, mx, my):
-    print "[SMSResults.getInterpolatedUpperLimit] Can\'t interpolate for (%f,%f), point is not in convex hull." %(inmx, inmy)
+    log.debug ( "Can\'t interpolate for (%f,%f), point is not in convex hull." %(inmx, inmy) )
     return None
   n = 0
   for k in Dict:
@@ -323,7 +323,7 @@ def getInterpolatedUpperLimit ( Dict, inmx, inmy ):
 def getUpperLimitFromDictionary ( analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False ):
   """ shouldnt have to call this directly. It's obtaining an upper limit from the python dictionary """
 #  if interpolate:
-#    print "[SMSResults.py] error: need to implement interpolation function for getUpperLimitFromDictionary"
+#   print "[SMSResults.py] error: need to implement interpolation function for getUpperLimitFromDictionary"
 #    import sys
 #    sys.exit(0)
   Dict=SMSHelpers.getUpperLimitDictionary ( analysis, topo, run )
