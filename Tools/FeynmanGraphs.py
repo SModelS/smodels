@@ -102,7 +102,10 @@ def connect ( canvas, p1, p2, straight=True, label=None, spin="fermion", bend=Tr
   return segs
 
 def draw ( element, filename="bla.pdf", straight=False, inparts=True ):
-  """ plot a lessagraph, write into pdf/eps/png file called <filename> """
+  """ plot a lessagraph, write into pdf/eps/png file called <filename> 
+    :param straight: draw straight lines, or xkcd style
+    :param inparts: draw the incoming lines and the big production blob?
+  """
   try:
     from pyx import text, bitmap, unit
     from pyfeyn.user import FeynDiagram, Point, Circle, HATCHED135, CIRCLE, Vertex,\
