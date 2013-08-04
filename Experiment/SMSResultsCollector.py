@@ -469,7 +469,7 @@ def particles(topo,plot = 'ROOT'):
 
 def production(topo,plot='ROOT'):
   a=particles(topo)
-  pair=a+" "+a
+  pair=str(a)+" "+str(a)
   if topo=="TGQ":
     pair=particles("T1")+" "+particles("T2")
   if topo=="TChiSlep":
@@ -505,6 +505,9 @@ dicparticle = {
    "T2tt": "#tilde{t}",
    "T2FVttcc": "#tilde{t}",
    "T6ttww": "#tilde{b}",
+   "T6ttWW": "#tilde{b}",
+   "T6bbWW": "#tilde{t}",
+   "T6bbZZ": "#tilde{b}",
    "T2ttww": "#tilde{b}",
    "T3w": "#tilde{g}",
    "T3lh": "#tilde{g}",
