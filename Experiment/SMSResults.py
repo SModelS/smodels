@@ -16,9 +16,11 @@ from Tools import RCFile, PhysicsUnits, VariousHelpers
 import logging
 log = logging.getLogger(__name__)
 
-def describeTx ( topo ):
+def describeTx ( topo, short=True ):
   """ describe a Tx name, e.g. T2tt -> "#tilde{t} -> t #tilde{#chi}^{0} """
-  return description ( topo )
+  ret=topo+": "+description ( topo, plot='ROOT', kerning=False, short=short ).replace("pp #rightarrow ","")
+  ret=ret[:ret.find(";")]
+  return ret
 
 def getAllHistNames (ana, topo, run=None):
   """ for a given analysis, topology, return list of all available histograms"""
