@@ -246,6 +246,8 @@ def getClosestValue ( Dict, mx, my ):
       if dist<closest:
         closest=dist
         retul=ul
+  if closest > 20.**2: ## if we're more than 20 gev from the closest point, we return False
+    return False
   return retul
 
 def inConvexHull(Dict, mx, my):
@@ -264,6 +266,7 @@ def inConvexHull(Dict, mx, my):
         checks if we're out of bounds in mx and my separately,
         and if the mass splitting is smaller than in the smallest 
         case """
+    log.error ("scipy.spatial.Delaunay not there, using poor mans convex hull implementation. fix this.")
     log.error( str(e) )
     mxmin=min(Dict.keys())
     if mx < mxmin: 
@@ -292,32 +295,33 @@ def getInterpolatedUpperLimit ( Dict, inmx, inmy ):
       :param inmx: mass point on x-axis
       :param inmy: mass point on y-axis
       :returns: interpolated upper limit at point (inmx, inmy) """
-  import numpy as np
-  import scipy.interpolate as ip
-  mx = rmvunit(inmx,'GeV')
-  my = rmvunit(inmy,'GeV')
-  if not inConvexHull(Dict, mx, my):
-    log.debug ( "Can\'t interpolate for (%f,%f), point is not in convex hull." %(inmx, inmy) )
-    return None
-  n = 0
-  for k in Dict:
-    n += len(Dict[k])
-  points = np.zeros((n, 2))
-  values = np.zeros((n))
-  i = 0
-  for x in Dict:
-    for y in Dict[x]:
-      points[i] = [x,y]
-      values[i] = Dict[x][y]
-      i += 1
-  grid_x = np.zeros((1,1))
-  grid_y = np.zeros((1,1))
-  grid_x = mx
-  grid_y = my
   try:
+    import numpy as np
+    import scipy.interpolate as ip
+    mx = rmvunit(inmx,'GeV')
+    my = rmvunit(inmy,'GeV')
+    if not inConvexHull(Dict, mx, my):
+      log.debug ( "Can\'t interpolate for (%f,%f), point is not in convex hull." %(inmx, inmy) )
+      return None
+    n = 0
+    for k in Dict:
+      n += len(Dict[k])
+    points = np.zeros((n, 2))
+    values = np.zeros((n))
+    i = 0
+    for x in Dict:
+      for y in Dict[x]:
+        points[i] = [x,y]
+        values[i] = Dict[x][y]
+        i += 1
+    grid_x = np.zeros((1,1))
+    grid_y = np.zeros((1,1))
+    grid_x = mx
+    grid_y = my
     return float(ip.griddata(points, values, (grid_x, grid_y), method='linear'))
   except Exception,e:
     log.error ( "cannot interpolate: %s. use closest value." % str(e) )
+    if not inConvexHull ( Dict, inmx, inmy ): return False
     return getClosestValue ( Dict, inmx, inmy )
 
 def getUpperLimitFromDictionary ( analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False ):
