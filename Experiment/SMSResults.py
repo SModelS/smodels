@@ -11,10 +11,14 @@
 
 import SMSHelpers
 from Tools.PhysicsUnits import addunit, rmvunit
-from SMSResultsCollector import SMSInfo
+from SMSResultsCollector import SMSInfo, description
 from Tools import RCFile, PhysicsUnits, VariousHelpers
 import logging
 log = logging.getLogger(__name__)
+
+def describeTx ( topo ):
+  """ describe a Tx name, e.g. T2tt -> "#tilde{t} -> t #tilde{#chi}^{0} """
+  return description ( topo )
 
 def getAllHistNames (ana, topo, run=None):
   """ for a given analysis, topology, return list of all available histograms"""
