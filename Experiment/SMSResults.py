@@ -295,7 +295,7 @@ def inConvexHull(Dict, mx, my):
     if (mx-my) < dmin: return False
     return True
 
-def getInterpolatedUpperLimit ( Dict, inmx, inmy ):
+def getInterpolatedUpperLimitDelaunay ( Dict, inmx, inmy ):
   """ get interpolated upper limit from dictionary at point (inmx, inmy)
       :param Dict: dictionray (sms.py), contains upper limits of one analysis and one topology
       :param inmx: mass point on x-axis
@@ -329,6 +329,43 @@ def getInterpolatedUpperLimit ( Dict, inmx, inmy ):
     log.error ( "cannot interpolate: %s. use closest value." % str(e) )
     if not inConvexHull ( Dict, inmx, inmy ): return False
     return getClosestValue ( Dict, inmx, inmy )
+
+def getInterpolatedUpperLimit ( Dict, inmx, inmy ):
+  """ get interpolated upper limit from dictionary at point (inmx, inmy)
+      :param Dict: dictionray (sms.py), contains upper limits of one analysis and one topology
+      :param inmx: mass point on x-axis
+      :param inmy: mass point on y-axis
+      :returns: interpolated upper limit at point (inmx, inmy) """
+  import numpy as np
+  import scipy.interpolate as ip
+  mx = rmvunit(inmx,'GeV')
+  my = rmvunit(inmy,'GeV')
+  cv=getClosestValue ( Dict, inmx, inmy )
+  xV,yV,zV=[],[],[]
+  keys=Dict.keys()
+  keys.sort()
+  for xvalue in keys:
+    yvalues=Dict[xvalue]
+    for (yvalue,zvalue) in yvalues.items():
+      xV.append ( xvalue )
+      yV.append ( yvalue )
+      zV.append ( zvalue )
+  #for i in range(len(xV)):
+  #  print xV[i],yV[i],zV[i]
+  try:
+    ip2d=ip.interpolate.interp2d ( xV, yV, zV, kind='cubic', fill_value=999999. )
+    tmp = ip2d( mx, my )
+    if len(tmp)!=1:
+      log.warning ("return value of interpolation is not a single-element array?" )
+      return None
+    if abs ( tmp[0] - cv ) / cv < 0.3: return tmp[0]
+    log.warning ( "when interpolating, would have had to interpolate too much. returning None." )
+    return None
+  except Exception,e:
+    log.warning ("when interpolating, caught exception: "+str(e) )
+    return None
+    
+  #print "mx=",mx,"my=",my,"res=",ip2d( mx, my )
 
 def getUpperLimitFromDictionary ( analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False ):
   """ shouldnt have to call this directly. It's obtaining an upper limit from the python dictionary """
