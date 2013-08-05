@@ -70,10 +70,12 @@ class CrossSection:
       
     return None
 
-  def getSumOfCrossSections ( self, pidmoms, order="NLL", sqrts=8 ):
+  def getSumOfCrossSections ( self, pidmoms=None, order="NLL", sqrts=8 ):
     """takes a list of pids and returns the integrated production cross section
        for all combinations of pids from the given list at 7 or 8TeV 
-       with order = LO or NLL"""
+       with order = LO or NLL.
+       pidmoms=None means we sum over all mothers.
+    """
     from Tools.PhysicsUnits import addunit, rmvunit
     
     if type(order) == type('str'):
@@ -91,7 +93,7 @@ class CrossSection:
       return None
   
   #Get label: 
-    for xsec in self.crossSectionsInfo.xsecs:
+    for xsec in self.crossSectionsInfo().xsecs:
       if xsec.order != order: continue
       if xsec.sqrts != sqrts: continue
       k = xsec.label
@@ -107,7 +109,7 @@ class CrossSection:
       return None
     Sum=0
     for (key,value) in allxsecs.items():
-      if abs(key[0]) in pidmoms and abs(key[1]) in pidmoms:
+      if pidmoms==None or (abs(key[0]) in pidmoms and abs(key[1]) in pidmoms):
         value=rmvunit(value, 'fb')
 #        print 'k:', key, 'v:',value
         Sum+=value
