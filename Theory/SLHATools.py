@@ -82,54 +82,64 @@ def writeXSecToSLHAFile( slhafile, nevts=10000,basedir=None, XsecsInfo=None, pri
       :type XsecsInfo: CrossSection.XSecInfoList
       :param printLHE: chooses if LHE event file is written to disk or not
   """
-  import tempfile
-  import Theory.XSecComputer as XSEC
-  import Tools.PhysicsUnits as UNIT
+  import logging
+  log = logging.getLogger(__name__)
+  try:
+    import tempfile
+    import Theory.XSecComputer as XSEC
+    import Tools.PhysicsUnits as UNIT
 
-  fstate = "  " #final state, if necessary can be read out from DECAY block
-  fstate = "# Nevts="+str(nevts) #additional information?
+    fstate = "  " #final state, if necessary can be read out from DECAY block
+    fstate = "# Nevts="+str(nevts) #additional information?
 
-  fin = open(slhafile, 'r')
-  chck = fin.read()
-  fin.close()
-  if 'XSECTION' in chck: return False
+    fin = open(slhafile, 'r')
+    chck = fin.read()
+    fin.close()
+    if 'XSECTION' in chck: 
+      log.error ("already found xsecs in file, when trying to write xsecs to file.")
+      return False
 
-  #computes production cross sections
-  if XsecsInfo is None:
-    try:
-      XsecsInfo = CrossSection.XSectionInfo  #Check if cross-section information has been defined
-    except:
-      pass
+    #computes production cross sections
+    if XsecsInfo is None:
+      try:
+        XsecsInfo = CrossSection.XSectionInfo  #Check if cross-section information has been defined
+      except:
+        pass
 
-  Tmp = tempfile.mkdtemp(dir=basedir)
-  dic = XSEC.compute(nevts, slhafile, datadir = Tmp, basedir = basedir, XsecsInfo=XsecsInfo, printLHE=printLHE)
-  XsecsInfo = dic.crossSectionsInfo()  #Get information about cross-sections
+    Tmp = tempfile.mkdtemp(dir=basedir)
+    dic = XSEC.compute(nevts, slhafile, datadir = Tmp, basedir = basedir, XsecsInfo=XsecsInfo, printLHE=printLHE)
+    XsecsInfo = dic.crossSectionsInfo()  #Get information about cross-sections
 
-  #write production cross sections to XSECTION block in SLHA file.
-  f = open(slhafile, 'a')
-  XsecDic = dic.crossSections()
-  allpids = XsecDic[XsecDic.keys()[0]].keys()
-  for pids in allpids:
-    pid_xsecs = {}
-#Collect all cross-sections for the pid pair
-    for xsec in XsecsInfo.xsecs:
-      sqrtS = UNIT.rmvunit(xsec.sqrts,'TeV')
-      cs_order = xsec.order
-      cs = XsecDic[xsec.label][pids]
-      cs = UNIT.rmvunit(cs,'fb')
-      if not sqrtS in pid_xsecs.keys(): pid_xsecs[sqrtS] = []
-      pid_xsecs[sqrtS].append([cs_order,cs])
-#Write cross-sections grouped by sqrtS:
-    for sqrtS in pid_xsecs.keys():
-      f.write("\nXSECTION  %f  %d  %d  %d  %d  %d  %s\n" %(sqrtS*1000, 2212, 2212, 2, pids[0], pids[1], fstate)) #sqrts in GeV
-      for line_cs in pid_xsecs[sqrtS]:
-        f.write("0  %d  0  0  0  0  %f SModelS 1.0\n" %(line_cs[0],line_cs[1]))
+    #write production cross sections to XSECTION block in SLHA file.
+    f = open(slhafile, 'a')
+    XsecDic = dic.crossSections()
+    if len(XsecDic.keys())==0:
+      log.error ( "waarning: I dont have keys in the cross section dictionary." )
+      return
+    allpids = XsecDic[XsecDic.keys()[0]].keys()
+    for pids in allpids:
+      pid_xsecs = {}
+  #Collect all cross-sections for the pid pair
+      for xsec in XsecsInfo.xsecs:
+        sqrtS = UNIT.rmvunit(xsec.sqrts,'TeV')
+        cs_order = xsec.order
+        cs = XsecDic[xsec.label][pids]
+        cs = UNIT.rmvunit(cs,'fb')
+        if not sqrtS in pid_xsecs.keys(): pid_xsecs[sqrtS] = []
+        pid_xsecs[sqrtS].append([cs_order,cs])
+  #Write cross-sections grouped by sqrtS:
+      for sqrtS in pid_xsecs.keys():
+        f.write("\nXSECTION  %f  %d  %d  %d  %d  %d  %s\n" %(sqrtS*1000, 2212, 2212, 2, pids[0], pids[1], fstate)) #sqrts in GeV
+        for line_cs in pid_xsecs[sqrtS]:
+          f.write("0  %d  0  0  0  0  %f SModelS 1.0\n" %(line_cs[0],line_cs[1]))
 
 
-  f.close
+    f.close
 
-  XSEC.clean(Tmp)
-  return
+    XSEC.clean(Tmp)
+    return
+  except Exception,e:
+    log.error ( "could not write xsec: "+str(e) )
 
 def num_in_base(val, base=62, min_digits=1, complement=False,
        digits="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"):
@@ -219,6 +229,8 @@ def xSecFromSLHAFile (  slhafile ):
      XsecsInfo = CrossSection.XSectionInfo 
   except:
      pass
+  if not XsecsInfo: #If not, define default cross-sections
+     XsecsInfo = CrossSection.XSecInfoList()
   from Tools.PhysicsUnits import addunit, rmvunit
   Xsec = {}
   slha = open(slhafile, 'r')
