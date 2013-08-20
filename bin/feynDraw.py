@@ -17,4 +17,4 @@ if args.lhe!="": filename=args.lhe
 reader = LHEReader.LHEReader( filename )
 Event = reader.next()
 SMSTop = TopologyBuilder.fromEvent(Event, {} )
-FeynmanGraphs.draw ( SMSTop[0].leadingElement(), args.output )
+FeynmanGraphs.draw ( SMSTop[0].leadingElement(), args.output, straight=False, inparts=False )
