@@ -806,7 +806,23 @@ def exclusionline(topo,ana,xvalue='',factor=1.0,extendedinfo=True,expected=False
     Type+="m1"
   ret=SMSObjects(Type,topo,ana,xvalue)
   if not extendedinfo:
-    if not ret: return None
+    if not ret:
+      import SMSResults
+      xinfo = SMSResults.getaxes(ana, topo)
+      if not xinfo:
+        print '[SMSResultsCollector] No exclusion line and no further information available for  %s %s. Check the name of the analysis and the topology!!' %(topo, ana) 
+        return None
+      else:
+        available_x = ''
+        for ent in xinfo:
+          if ent['mz'] == None:
+            available_x += ''
+            print '[SMSResultsCollector] No exclusion line available for the given x value. %s doesn\'t have intermediate masses.' %topo
+            return None
+          else:
+            available_x += ent['mz'][0] +' '
+        print '[SMSResultsCollector] No exclusion line found, available xvalues are %s.' %available_x
+        return None
     if xvalue == '':
       key = '050'
     else:
