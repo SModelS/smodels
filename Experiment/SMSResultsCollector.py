@@ -197,12 +197,11 @@ def SMSObjects(obj,topo,ana,xvalue='',name=None):
     xvalue='050'
 
   if topo != 'T5zz':
-    if xvalue == '':
-      x = ['025','','075']
-    elif xvalue == '050':
-      x = ['']
-    else:
-      x = [xvalue]
+#    if xvalue == '':
+#      x = ['025','','075']
+#    elif xvalue == '050':
+#      x = ['']
+    x = [xvalue]
   if topo == 'T5zz':
     if xvalue == '':
       x = ['l','','h']
@@ -791,7 +790,9 @@ def upperlimit(topo,ana,xvalue=''):
   return exclusions(topo,ana,xvalue)
 
 def exclusionline(topo,ana,xvalue='',factor=1.0,extendedinfo=True,expected=False,plusminussigma=0):
-  """ get the exclusion line (TGraph) """
+  """ get the exclusion line (TGraph)
+     extendedinfo = True returns a list [run, {xvalue: exclusionline}] (if there is no xvalue e.g. T1 the key is 050),
+     extendedinfo = False returns just the exclusionline """
   Type="exclusion"
   if abs(factor-3.0)<0.1:
     Type="exclusion3"
@@ -806,7 +807,11 @@ def exclusionline(topo,ana,xvalue='',factor=1.0,extendedinfo=True,expected=False
   ret=SMSObjects(Type,topo,ana,xvalue)
   if not extendedinfo:
     if not ret: return None
-    return ret[1]['050']
+    if xvalue == '':
+      key = '050'
+    else:
+      key = xvalue
+    return ret[1][key]
   return ret
 
 def efficiency ( topo,analysis,xfrac,histo='efficiency' ):
