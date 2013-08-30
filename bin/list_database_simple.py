@@ -7,7 +7,7 @@ import set_path
 from Experiment import SMSResults, SMSHelpers
 from Tools.PhysicsUnits import rmvunit
   
-Fields= [ "analysis", "sqrts", "lumi", "topologies", "constraints" ]
+Fields= [ "analysis", "sqrts", "lumi" ]
 NiceName= { "nick name": "nick name", "analysis": "analysis", "sqrts":"$\sqrt{s}$", "topologies": "topologies", "constraints":"constraints", "lumi": "lumi" }
 
 
@@ -22,6 +22,7 @@ def begintable ( File ):
     flds+="l|"
   flds=flds[:-1]
   flds+="}"
+  File.write ( "\\begin{center}\n" )
   File.write ( "\\begin{tabular}%s\n" % flds )
   for (ct,F) in enumerate(Fields):
     File.write ( "{\\bf %s} " % NiceName[F] )
@@ -31,24 +32,26 @@ def begintable ( File ):
 
 
 def header ( File ):
-  File.write ( "\\documentclass[8pt]{article}\n" )
-  File.write ( "\\usepackage{multirow}\n" )
-  File.write ( "\\begin{document}\n" )
-  File.write ( "\\thispagestyle{empty}\n" )
+  #File.write ( "\\documentclass[8pt]{article}\n" )
+  #File.write ( "\\usepackage{multirow}\n" )
+  #File.write ( "\\begin{document}\n" )
+  #File.write ( "\\thispagestyle{empty}\n" )
   begintable ( File )
 
-def endtable ( File ):
+def endtable ( File, caption ):
   File.write ( "\\end{tabular}\n" )
+  File.write ( "\\caption{%s}\n" % caption )
+  File.write ( "\\end{center}\n" )
   File.write ( "\\end{table}\n" )
 
-def footer ( File ):
-  endtable ( File )
-  File.write ( "\\end{document}" )
+def footer ( File, caption ):
+  endtable ( File, caption )
+  #File.write ( "\\end{document}" )
 
-def line ( File ):
+def line ( File, caption ):
   # going from ATLAS to CMS
-  endtable ( File )
-  File.write ( "\\newpage\n \\thispagestyle{empty}\n" )
+  endtable ( File, caption )
+  #File.write ( "\\newpage\n \\thispagestyle{empty}\n" )
   begintable ( File )
 
 def compileTex ( Filename="database.tex" ):
@@ -62,27 +65,18 @@ def pprint ( constr ):
     constr=constr[:37]+"..."
   return constr
 
-def printFirstTopo ( File, analysis, topo ):
+def printFirstTopo ( File, analysis ):
   sqrts=int(rmvunit(SMSResults.getSqrts ( analysis ),"TeV"))
   lumi=SMSResults.getLumi ( analysis ).asNumber()
-  constr=pprint ( SMSResults.getConstraints ( analysis, topo ) )
   pas=SMSResults.getPAS ( analysis )
-  File.write ( "%s & %s & %s & %s & %s \\\\ \n" % ( pas, sqrts, lumi, topo, constr ) ) 
-
-def printNextTopo ( File, analysis, topo ):
-  constr=pprint ( SMSResults.getConstraints ( analysis, topo ) )
-  File.write ( " & & & %s & %s \\\\ \n" % ( topo, constr ) ) 
+  File.write ( "%s & %s & %s \\\\ \n" % ( pas, sqrts, lumi ) ) 
 
 def printAnalysis ( File, analysis, topos ):
-  first=True
   for topo in topos:
     constr=SMSResults.getConstraints ( analysis, topo )
     if not constr or constr=="Not yet assigned": continue
-    if first:
-      printFirstTopo ( File, analysis, topo )
-      first=False
-    else:
-      printNextTopo ( File, analysis, topo )
+    printFirstTopo ( File, analysis )
+    break
 
 def run( ):
   results={}
@@ -106,11 +100,11 @@ def run( ):
   for analysis in keys:
     topos=results[analysis]
     if wasATLAS and not isATLAS ( analysis ):
-      line( File )
+      line( File, "List of ATLAS analyses used by SModelS" )
       wasATLAS=False
     printAnalysis ( File, analysis, topos )
-  footer ( File )
+  footer ( File, "List of CMS analyses used by SModelS" )
   File.close()
-  compileTex()
+#  compileTex()
 
 run()
