@@ -338,7 +338,6 @@ def getInterpolatedUpperLimit ( Dict, inmx, inmy ):
             :param inmx: mass point on x-axis
             :param inmy: mass point on y-axis
             :returns: interpolated upper limit at point (inmx, inmy) """
-    import numpy as np
     import scipy.interpolate as ip
     mx = rmvunit(inmx,'GeV')
     my = rmvunit(inmy,'GeV')
@@ -441,7 +440,7 @@ def isPrivate(analysis, run=None):
        :returns: True, if analysis is flagged as private, else False
     """
     try:
-        return bool(SMSHelpers.getMetaInfoField(analysis, "private", run))
+        return bool(int(SMSHelpers.getMetaInfoField(analysis, "private", run)))
     except Exception as e:
         logger.error("Could not parse field 'private': " + e)
         return False
@@ -466,8 +465,8 @@ def hasDataPublished ( analysis, run=None ):
         return None
     try:
         return bool(value)
-    except Exception,e:
-        print "[SMSResults.py] couldnt parse ``publisheddata'' field"
+    except Exception as e:
+        logger.error("Could not parse field 'publisheddata': " + e)
     return None
 
 def getLumi ( analysis, run=None ):
@@ -503,13 +502,13 @@ def getx ( analysis, topo=None, run=None ):
         
     st = SMSHelpers.getMetaInfoField ( analysis, "x", run )
     if not st:
-         return None
+        return None
     st = st.split(',')
     d = {}
     for i in range(len(st)):
-         l = st[i].split(':')
-         x = l[1].split()
-         d[l[0].replace(" ","")] = x
+        l = st[i].split(':')
+        x = l[1].split()
+        d[l[0].replace(" ","")] = x
          
     if topo:
         topo = topo.replace(" ","")
@@ -724,7 +723,7 @@ def getaxes (analysis, topo=None, run=None):
         for j in range(len(m)):
             n = m[j].split()
             if len(n)==2:
-    d[nm].append({'axes': n[0]+'-'+n[1], 'mz': None})
+                d[nm].append({'axes': n[0]+'-'+n[1], 'mz': None})
             else: d[nm].append({'axes': n.pop(0)+'-'+n.pop(0), 'mz': n})
             
     if topo:
