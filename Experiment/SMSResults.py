@@ -372,13 +372,13 @@ def getInterpolatedUpperLimit ( Dict, inmx, inmy ):
         
     #print "mx=",mx,"my=",my,"res=",ip2d( mx, my )
 
-def getUpperLimitFromDictionary ( analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False ):
+def getUpperLimitFromDictionary ( analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False, expected=False ):
     """ shouldnt have to call this directly. It's obtaining an upper limit from the python dictionary """
 #    if interpolate:
 #     print "[SMSResults.py] error: need to implement interpolation function for getUpperLimitFromDictionary"
 #        import sys
 #        sys.exit(0)
-    Dict=SMSHelpers.getUpperLimitDictionary ( analysis, topo, run )
+    Dict=SMSHelpers.getUpperLimitDictionary ( analysis, topo, run, expected=expected )
     if Dict==None: return Dict
     ## Dict=addunit ( Dict, "pb" )
     # print "[SMSResults.py] mx=",mx
@@ -393,7 +393,7 @@ def getSmartUpperLimit ( analysis, topo, masses, massesbranch2=None, debug=False
     return SMSInterpolation.UpperLimit(analysis, topo, masses, debug)
 #    return getUpperLimit ( analysis, topo, mx=masses[0], my=masses[-1], interpolate=True )
 
-def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False ):
+def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False, expected=False ):
     """ get the upper limit for run/analysis/topo.
             return none if it doesnt exist.
             if mx and my are none, return the entire histogram,
@@ -402,8 +402,9 @@ def getUpperLimit ( analysis, topo, mx=None, my=None, run=None, png=None, interp
             if png==True, return path of pngfile containing the histogram"""
     run=SMSHelpers.getRun ( analysis, run )
     if SMSHelpers.hasDictionary ( analysis, run ):
-        return getUpperLimitFromDictionary ( analysis, topo, mx, my, run, interpolate=interpolate )
-    histo=SMSHelpers.getUpperLimitFromHisto ( analysis, topo, run )
+        print 'has dictionary'
+        return getUpperLimitFromDictionary ( analysis, topo, mx, my, run, interpolate=interpolate, expected=expected )
+    histo=SMSHelpers.getUpperLimitFromHisto ( analysis, topo, run, expected=expected )
     if png==True:
         pngfile=SMSHelpers.getUpperLimitPng(analysis,topo,run)
         return pngfile
