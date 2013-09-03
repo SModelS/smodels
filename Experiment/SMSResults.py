@@ -11,11 +11,13 @@
 
 """
 
-import SMSHelpers
+from Experiment import SMSHelpers
 from Tools.PhysicsUnits import addunit, rmvunit
-from SMSResultsCollector import description
+from Experiment.SMSResultsCollector import description
 from Tools import PhysicsUnits
 import logging
+from Experiment.experimentExceptions import MetaInfoError
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def describeTx ( topo, short=True ):
@@ -26,7 +28,7 @@ def describeTx ( topo, short=True ):
 
 def getAllHistNames (ana, topo, run=None):
     """ for a given analysis, topology, return list of all available histograms"""
-    import SMSInterpolation
+    from Experiment import SMSInterpolation
     ret = []
     dic_list = getaxes(ana,topo,run)
     if not dic_list: return None #topology not found
@@ -53,7 +55,7 @@ def considerRuns(run = None):
         :param run: a list of runs to be considered, e.g. [ '2012', '8TeV' ]). If None, all runs are taken into account.
         :type run: list or NoneType
     """
-    import SMSResultsCollector
+    from Experiment import SMSResultsCollector
     allruns = ["8TeV", "ATLAS8TeV", "RPV8", "2012", "RPV7", "2011"]
     runsort = []
     if run:
@@ -165,8 +167,8 @@ def getBinWidthY ( analysis, topo, run=None ):
 def getExclusionLine(topo,ana,expected=False,plusminussigma=0,extendedinfo=False,xvalue=None,factor=1.0):
     """ get the exclusion line, as a TGraph """
     if xvalue==None: xvalue=''
-    import SMSResultsCollector
-    ex=SMSResultsCollector.exclusionline(topo,ana,xvalue,factor=1.0,extendedinfo=extendedinfo,expected=expected,plusminussigma=plusminussigma)
+    from Experiment import SMSResultsCollector
+    ex=SMSResultsCollector.exclusionline(topo,ana,xvalue,factor,extendedinfo=extendedinfo,expected=expected,plusminussigma=plusminussigma)
     return ex
 
 def getTopologies ( analysis, run=None, allHistos=False ):
@@ -205,8 +207,9 @@ def getPrettyName ( analysis, run=None, latex=False ):
     return value
 
 def getAnalyses ( topo, run=None ):
+    """return all analyses that have results for topo
+    """
     import os
-    """ return all analyses that have results for topo """
     runs=SMSHelpers.runs
     if run: runs= [ run ]
     analyses={}
@@ -224,8 +227,9 @@ def getAnalyses ( topo, run=None ):
 allresults={}
 
 def getAllResults ( run=None, allHistos=False ):
+    """returns all analyses and the topologies they have results for
+    """
     import os
-    """ returns all analyses and the topologies they have results for """
     key=str(run)
     if allresults.has_key ( key ):
         return allresults[key]
@@ -327,7 +331,7 @@ def getInterpolatedUpperLimitDelaunay ( Dict, inmx, inmy ):
         grid_x = mx
         grid_y = my
         return float(ip.griddata(points, values, (grid_x, grid_y), method='linear'))
-    except Exception,e:
+    except Exception as e:
         logger.error ( "cannot interpolate: %s. use closest value." % str(e) )
         if not inConvexHull ( Dict, inmx, inmy ): return False
         return getClosestValue ( Dict, inmx, inmy )
@@ -436,14 +440,29 @@ def isPrivate(analysis, run=None):
     """Check if analysis is flagged as private.
          
        :param analysis: analysis to be checked for its public/private state
-       :param run: specific run of the analysis to be checked (default: None)
+       :param run: run to be selected (default: None)
        :returns: True, if analysis is flagged as private, else False
     """
     try:
         return bool(int(SMSHelpers.getMetaInfoField(analysis, "private", run)))
-    except Exception as e:
-        logger.error("Could not parse field 'private': " + e)
-        return False
+    except MetaInfoError:
+        logger.exception("Could not parse field 'private'.")
+    
+def isPrivateTopology(analysis, topology, run=None):
+    """Check if topology of analysis is flagged as private.
+    
+       :param analysis: analysis to be selected
+       :param topology: topology to be checked for its public/private state
+       :param run: run to be selected (default: None)
+       :returns: True, if analysis or topology is selected, else False
+    """
+    if isPrivate(analysis, run):
+        return True
+    else:
+        try:
+            return topology in list(SMSHelpers.getMetaInfoField(analysis, "private_topology", run))
+        except MetaInfoError:
+            logger.exception("Could not parse filed 'private topology'.")
 
 def isPublic(analysis, run=None):
     """DEPRECATED - Check if analysis is NOT flagged as private.
@@ -465,8 +484,8 @@ def hasDataPublished ( analysis, run=None ):
         return None
     try:
         return bool(value)
-    except Exception as e:
-        logger.error("Could not parse field 'publisheddata': " + e)
+    except Exception:
+        logger.exception("Could not parse field 'publisheddata'.")
     return None
 
 def getLumi ( analysis, run=None ):
