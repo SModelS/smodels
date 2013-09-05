@@ -189,15 +189,19 @@ def getRootFileName ( analysis, run=None ):
     return "%s/%s/%s/sms.root" % ( Base, run, analysis )
 
 upperLimitHisto={}
+expupperLimitHisto={}
 def getUpperLimitFromHisto ( analysis, topo, run, complain=False, expected=False ):
     key=analysis+topo+str(run)
-    if upperLimitHisto.has_key ( key ): return upperLimitHisto[key]
-
+    if expected:
+        if expupperLimitHisto.has_key ( key ): return expupperLimitHisto[key] 
+    else:
+        if upperLimitHisto.has_key ( key ): return upperLimitHisto[key]
     import ROOT
     rootfile="%s/%s/%s/sms.root" % ( Base, run, analysis )
     if not os.path.exists(rootfile):
         log("root file %s doesnt exist" % rootfile, "warning" )
         upperLimitHisto[key]=None
+        expupperLimitHisto[key]=None
         return None
     f=None
     if openFiles.has_key ( rootfile ):
@@ -207,17 +211,23 @@ def getUpperLimitFromHisto ( analysis, topo, run, complain=False, expected=False
         if not f or not f.IsOpen():
             log("root file %s cannot be opened" % rootfile )
             upperLimitHisto[key]=None
+            expupperLimitHisto[key]=None
             return None
         openFiles[rootfile]=f
     if expected:
         histo=f.Get("expectedlimit_%s" % getCanonicalName(topo) )
+        if not histo:
+            if complain: log("expected upper limit histogram %s not found in %s" % ( topo, rootfile ))
+            expupperLimitHisto[key]=None
+            return None
+        expupperLimitHisto[key]=histo
     else:
         histo=f.Get("limit_%s" % getCanonicalName(topo) )
-    if not histo:
-        if complain: log("histogram %s not found in %s" % ( topo, rootfile ))
-        upperLimitHisto[key]=None
-        return None
-    upperLimitHisto[key]=histo
+        if not histo:
+            if complain: log("histogram %s not found in %s" % ( topo, rootfile ))
+            upperLimitHisto[key]=None
+            return None
+        upperLimitHisto[key]=histo
     return histo
 
 def getUpperLimitAtPoint ( histo, mx, my, interpolate=False ):
@@ -401,6 +411,17 @@ def hasDictionary(analysis, run=None):
 #    if hd:
 #        if hd in [ '1', 'True' ]: return True
 #    return False
+
+def hasHistogram(analysis, run=None):
+    """are the upper limits available as ROOT histogram?
+    """
+    if not run:
+        run=getRun(analysis)
+    rootfile="%s/%s/%s/sms.root" % ( Base, run, analysis )
+    if os.path.exists(rootfile):
+        return True
+    log("ROOT file %s doesnt exist" % rootfile )
+    return False
 
 upperLimitDict={}
 expupperLimitDict={}
