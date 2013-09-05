@@ -402,17 +402,19 @@ def getUpperLimit (analysis, topo, mx=None, my=None, run=None, png=None, interpo
             if png==True, return path of pngfile containing the histogram"""
     run = SMSHelpers.getRun (analysis, run)
     if SMSHelpers.hasDictionary (analysis, run):
-        print 'has dictionary'
         return getUpperLimitFromDictionary (analysis, topo, mx, my, run, interpolate=interpolate, expected=expected)
-    histo = SMSHelpers.getUpperLimitFromHisto (analysis, topo, run, expected=expected)
     if png == True:
         pngfile = SMSHelpers.getUpperLimitPng(analysis, topo, run)
         return pngfile
-    if rmvunit(mx, 'GeV') == None:
-        return histo
-    value = SMSHelpers.getUpperLimitAtPoint (histo, mx, my, interpolate=interpolate)
-    if value == 0.0: value = None    # 0.0 usually means out of bounds
-    return addunit (value, "pb")
+    if SMSHelpers.hasHistogram (analysis, run):
+        histo = SMSHelpers.getUpperLimitFromHisto (analysis, topo, run, expected=expected)
+        if rmvunit(mx, 'GeV') == None:
+            return histo
+        value = SMSHelpers.getUpperLimitAtPoint (histo, mx, my, interpolate=interpolate)
+        if value == 0.0: value = None    # 0.0 usually means out of bounds
+        return addunit (value, "pb")
+    logger.warning ("no upper limits found for %s" %analysis)
+    return None 
 
 def getEfficiency (analysis, topo, mx=None, my=None, run=None):
     """ get the efficiency for run/analysis/topo.
