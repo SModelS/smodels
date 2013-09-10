@@ -356,7 +356,7 @@ def getMetaInfoField(analysis, field, run=None):
     metainfo = parseMetaInfo(analysis, run)
     if not metainfo.has_key(field):
         infoFields[key]=None
-        raise MetaInfoError
+        raise MetaInfoError("key %s not found" %key)
     f=metainfo[field]
     if len(f) == 0: 
         infoFields[key] = f
