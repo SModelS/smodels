@@ -220,7 +220,10 @@ def getAnalyses (topo, run=None):
             if os.path.exists ("%s/%s/%s/info.txt" % (SMSHelpers.Base, r, ana)):
 #                e=getExclusion ( ana, topo, r )
 #                if e: analyses[ana]=True
-                if exists(ana, topo, r): analyses[ana] = True
+                try:
+                    if exists(ana, topo, r): analyses[ana] = True
+                except MetaInfoError:
+                    logger.exception("Meta info field 'axes' does not exist.")
 
     return analyses.keys()
 
