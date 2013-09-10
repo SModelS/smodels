@@ -223,7 +223,7 @@ def getAnalyses (topo, run=None):
                 try:
                     if exists(ana, topo, r): analyses[ana] = True
                 except MetaInfoError:
-                    logger.exception("Meta info field 'axes' does not exist.")
+                    logger.error("Meta info field 'axes' does not exist in %s." %ana)
 
     return analyses.keys()
 
