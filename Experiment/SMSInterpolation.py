@@ -14,7 +14,9 @@
 """
 
 
-import SMSResults, numpy, SMSHelpers, copy
+import SMSResults, SMSHelpers, copy
+import numpy as np
+from scipy.interpolate import griddata
 from Tools.PhysicsUnits import rmvunit, addunit
 
 def gethistname(topo, mz):
@@ -56,7 +58,7 @@ def getxval(mx, my, mz,mass=False):
 def getindex(ls, second=False):
   """Find index of list element with maximum value. If the last element is the maximum, return -1.
       If second=True, find second largest list element."""
-  ind = numpy.argmax(ls)
+  ind = np.argmax(ls)
   if second:
     v=0
     for i in range(len(ls)):
@@ -107,11 +109,12 @@ def compareM(masses, d):
       else: return None
 
 
-def UpperLimit(ana, topo, masses,debug=True):
+def UpperLimit(ana, topo, masses,debug=True,run=None):
   """Returns upper limit for ana, topo, for given masses. masses: list of masses, with (mother, intermediate(s), LSP).
       For intermediate masses: if possible do interpolation over upper limits for different x-values.
       If interpolation is not possible: check if masses are comparable to the assumptions in the histogram."""
   d = SMSResults.getaxes(ana, topo)
+  if not run: run=SMSHelpers.getRun(ana)
   if not d:
     if debug: print "[SMSInterpolation] error: %s/%s not found." % ( ana, topo )
     return None
@@ -131,6 +134,64 @@ def UpperLimit(ana, topo, masses,debug=True):
       return SMSResults.getUpperLimit(ana, gethistname(topo,d[0]['mz'][0]),masses[getaxis('x',d[0]['axes'])],masses[getaxis('y',d[0]['axes'])],interpolate=True)
     if debug: print "[SMSInterpolation] error: Only one histogram available for %s/%s, cannot interpolate for intermediate mass." % ( ana, topo )
     return None
+
+
+  masslist=[]
+  ullist=[]
+
+
+  for ds in d:
+    if not ds['mz']:
+      if debug: print "[SMSInterpolation] error: No information on intermediate mass availabel for %s/%s." % ( ana, topo )
+      return None
+
+    D=None
+    L=None
+
+    if ds['mz'][0].find('D')>-1: D=float(ds['mz'][0].split('=')[1])
+    if ds['mz'][0].find('LSP')>-1: L=float(ds['mz'][0][ds['mz'][0].find('P')+1:ds['mz'][0].find('P')+4])
+
+    ul_dict=SMSHelpers.getUpperLimitDictionary(ana,gethistname(topo,ds['mz'][0]),run)
+
+    for x in ul_dict:
+      for y in ul_dict[x]:
+
+        if D:
+          massv=[0.,0.,0.]
+          massv[getaxis('x',ds['axes'])]=x
+          massv[getaxis('y',ds['axes'])]=y
+          if massv[getaxis('x',ds['mz'][0])]==0.: massv[getaxis('x',ds['mz'][0])]=massv[getaxis('y',ds['mz'][0])]+D
+          if massv[getaxis('y',ds['mz'][0])]==0.: massv[getaxis('y',ds['mz'][0])]=massv[getaxis('x',ds['mz'][0])]-D
+
+        elif L:
+          massv=[0.,0.,L]
+          massv[getaxis('x',ds['axes'])]=x
+          massv[getaxis('y',ds['axes'])]=y
+
+        else: massv=[x,getxval(x,y,ds['mz'][0],mass=True),y]
+
+        masslist.append(massv)
+        ullist.append(ul_dict[x][y])
+
+  p=np.array(masslist)
+  v=np.array(ullist)
+
+  r=griddata(p,v,(masses[0],masses[1],masses[2]),method="linear")
+  r_nearest=griddata(p,v,(masses[0],masses[1],masses[2]),method="nearest")
+
+  if np.isnan(r):
+    if debug: print "[SMSInterpolation] error: masses out of range for %s/%s (no extrapolation)" % ( ana, topo )
+    return None
+
+  if 2*abs(float(r)-float(r_nearest))/(float(r)+float(r_nearest))>0.5:
+    if debug: print "[SMSInterpolation] error: interpolation not safe for %s/%s" % ( ana, topo )
+    return None
+
+  return addunit(float(r),'pb')
+
+
+
+'''
   xsecs = []
   xvals = []
   d_it=copy.deepcopy(d)
@@ -173,3 +234,5 @@ def UpperLimit(ana, topo, masses,debug=True):
 #    print "Negative crosssection, cannot extrapolate"
 #    return 0
   return addunit(XSec,'pb')
+
+'''
