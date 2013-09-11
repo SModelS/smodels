@@ -431,6 +431,9 @@ def hasDictionary(analysis, run=None):
 def hasHistogram(analysis, run=None):
     """are the upper limits available as ROOT histogram?
     """
+    if not useRoot:
+      logger.info ( "usage of ROOT is turned off." )
+      return False
     if not run:
         run=getRun(analysis)
     rootfile="%s/%s/%s/sms.root" % ( Base, run, analysis )
