@@ -38,19 +38,20 @@ def header ( File ):
   #File.write ( "\\thispagestyle{empty}\n" )
   begintable ( File )
 
-def endtable ( File, caption ):
+def endtable ( File, caption, experiment ):
   File.write ( "\\end{tabular}\n" )
   File.write ( "\\caption{%s}\n" % caption )
+  File.write ( "\\label{list_%s}\n" % experiment )
   File.write ( "\\end{center}\n" )
   File.write ( "\\end{table}\n" )
 
-def footer ( File, caption ):
-  endtable ( File, caption )
+def footer ( File, caption, experiment ):
+  endtable ( File, caption, experiment )
   #File.write ( "\\end{document}" )
 
-def line ( File, caption ):
+def line ( File, caption, experiment ):
   # going from ATLAS to CMS
-  endtable ( File, caption )
+  endtable ( File, caption, experiment )
   #File.write ( "\\newpage\n \\thispagestyle{empty}\n" )
   begintable ( File )
 
@@ -100,10 +101,10 @@ def run( ):
   for analysis in keys:
     topos=results[analysis]
     if wasATLAS and not isATLAS ( analysis ):
-      line( File, "List of ATLAS analyses used by SModelS" )
+      line( File, "List of ATLAS analyses used by SModelS", "ATLAS" )
       wasATLAS=False
     printAnalysis ( File, analysis, topos )
-  footer ( File, "List of CMS analyses used by SModelS" )
+  footer ( File, "List of CMS analyses used by SModelS", "CMS" )
   File.close()
 #  compileTex()
 
