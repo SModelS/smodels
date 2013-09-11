@@ -220,10 +220,7 @@ def getAnalyses (topo, run=None):
             if os.path.exists ("%s/%s/%s/info.txt" % (SMSHelpers.Base, r, ana)):
 #                e=getExclusion ( ana, topo, r )
 #                if e: analyses[ana]=True
-                try:
-                    if exists(ana, topo, r): analyses[ana] = True
-                except MetaInfoError:
-                    logger.error("Meta info field 'axes' does not exist in %s." %ana)
+                if exists(ana, topo, r): analyses[ana] = True
 
     return analyses.keys()
 
@@ -734,7 +731,11 @@ def getaxes (analysis, topo=None, run=None):
         you supply a topo, returns list for this topo only. """
     if not exists(analysis, topo=None):    # # analysis is not known, we return None
         return None
-    st = SMSHelpers.getMetaInfoField (analysis, "axes", run)
+    try:
+        st = SMSHelpers.getMetaInfoField (analysis, "axes", run)
+    except MetaInfoError:
+        logger.error("Meta info field 'axes' does not exist in %s." %analysis)
+        st = None
     if not st:
         if not topo: return None    # cannot return default without info on topology
         # if there is no information about the axes, return the default
