@@ -14,11 +14,9 @@
 from Experiment import SMSHelpers
 from Tools.PhysicsUnits import addunit, rmvunit
 from Experiment.SMSResultsCollector import description
-from Tools import PhysicsUnits
-import logging
+from Tools import PhysicsUnits, VariousHelpers
 from Experiment.experimentExceptions import MetaInfoError
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = VariousHelpers.logging.getLogger(__name__)
 
 def describeTx (topo, short=True):
     """ describe a Tx name, e.g. T2tt -> "#tilde{t} -> t #tilde{#chi}^{0} """

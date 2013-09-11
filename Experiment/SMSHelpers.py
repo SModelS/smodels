@@ -8,10 +8,11 @@
 
 """
 
-
 import os
 from Tools.PhysicsUnits import rmvunit
+from Tools import VariousHelpers
 from Experiment.experimentExceptions import MetaInfoError
+logger = VariousHelpers.logging.getLogger(__name__)
 
 Base = "/afs/hephy.at/user/w/walten/public/sms/"
 
@@ -19,9 +20,17 @@ runs=[ "8TeV", "2012", "ATLAS8TeV", "2011", "RPV8", "RPV7" ]
 ## runs=[ "2012" ]
 
 verbose=True
+useRoot=True
 
 ## track the open root files
 openFiles={}
+
+def useROOT ( b ):
+  """ True: use also root dictionaries
+      False: make no use of ROOT whatsoever """
+  logger.info ( "setting root usage to "+str(b) )
+  global useRoot
+  useRoot=b
 
 def close():
     """ close all open files """
@@ -191,6 +200,9 @@ def getRootFileName ( analysis, run=None ):
 upperLimitHisto={}
 expupperLimitHisto={}
 def getUpperLimitFromHisto ( analysis, topo, run, complain=False, expected=False ):
+    if not useRoot: 
+      logger.info ( "usage of ROOT is turned off." )
+      return None
     key=analysis+topo+str(run)
     if expected:
         if expupperLimitHisto.has_key ( key ): return expupperLimitHisto[key] 
@@ -271,6 +283,9 @@ def getUpperLimitPng(analysis,topo,run):
 
 effhistos={}
 def getEfficiencyHisto ( analysis, topo, run ):
+    if not useRoot:
+      logger.info ( "usage of ROOT is turned off." )
+      return None
     key=analysis+topo+str(run)
     if effhistos.has_key ( key ): return effhistos[key]
     import ROOT
