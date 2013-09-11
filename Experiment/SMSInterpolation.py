@@ -176,8 +176,12 @@ def UpperLimit(ana, topo, masses,debug=True,run=None):
   p=np.array(masslist)
   v=np.array(ullist)
 
-  r=griddata(p,v,(masses[0],masses[1],masses[2]),method="linear")
-  r_nearest=griddata(p,v,(masses[0],masses[1],masses[2]),method="nearest")
+  mx=rmvunit(masses[0],"GeV")
+  my=rmvunit(masses[1],"GeV")
+  mz=rmvunit(masses[2],"GeV")
+
+  r=griddata(p,v,(mx,my,mz),method="linear")
+  r_nearest=griddata(p,v,(mx,my,mz),method="nearest")
 
   if np.isnan(r):
     if debug: print "[SMSInterpolation] error: masses out of range for %s/%s (no extrapolation)" % ( ana, topo )
