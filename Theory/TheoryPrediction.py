@@ -61,19 +61,20 @@ class XSecPredictionForCluster:
 
     return resdic
   
-    def getCondition ( self, order="NLL", sqrts=8 ):
-      """ get the condition that has been met, None if not available"""
-      key="%d TeV (%s)" % ( int(sqrts), order)
-      if not self.conditions_dic.has_key ( key ):
-        return None
-      return self.conditions_dic[key]
+#  def getCondition ( self, order="NLL", sqrts=8 ):
+#    """ get the condition that has been met, False if not available"""
+#    key="%d TeV (%s)" % ( int(sqrts), order)
+
+#    if not self.conditions_dic.has_key ( key ):
+#      return False
+#    return self.conditions_dic[key]
   
 
   def getConditionValues ( self, wlabel = ''):
-    """ get the list of condition values for the cross-section label wlabel. Return None if not available """
+    """ get the list of condition values for the cross-section label wlabel. Return False if not available """
     conds = self.conditions_dic.values()
     if not conds[0].has_key ( wlabel ):
-      return None
+      return False
     else:
       res = []
       for cond in conds:
@@ -81,10 +82,11 @@ class XSecPredictionForCluster:
     return res
   
   def getMaxCondition(self,wlabel = ''):
-    """ get the maximum condition value, None if not available """
+    """ get the maximum condition value, False if not available """
 
     conds = self.getConditionValues(wlabel)
-    if conds is None: return None
+    if conds is False: return False
+    if conds is None or conds == [None]: return None
     if 'N/A' in conds: return 'N/A'
     maxcond = 0.
     for tvalue in conds:
