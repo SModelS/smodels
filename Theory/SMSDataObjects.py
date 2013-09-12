@@ -174,6 +174,22 @@ class EElement:
     ret="Branch #1={{"+str(self.B[0])+"}}, Branch #2={{"+str(self.B[1])+"}}"
     return ret
 
+  def isInAnalysis(self, Analysis, igmass=False):
+    """ checks if the element is present in the Analysis element list. If igmass=False also check if
+    the analysis has the element mass array"""
+
+    for AEl in Analysis.Top.ElList:
+      EEl = EElement(AEl.ParticleStr)
+      if self.isSimilar(EEl,order=False,igmass=True):
+        if igmass: return True
+        for massweight in AEl.MassWeightList:
+          EEl.B[0].masses = massweight.mass[0]
+          EEl.B[1].masses = massweight.mass[1]
+          if self.isSimilar(EEl,order=False,igmass=False): return True
+
+    return False
+
+
 class AElement:
   """ An Analysis Element, contains a string with the particle list, a dictionary with mass arrays and the respective weights and the\
    analysis-dependent weight format """
