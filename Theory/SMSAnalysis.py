@@ -131,8 +131,6 @@ class EAnalysis:
     for El in self.Top.ElList:
       for massweight in El.MassWeightList:
         gmass = GoodMass(massweight.mass,self.MassDist,dmin)
-#        print massweight.mass
-#        print gmass,dmin,"\n"
         if gmass:
            massweight.mass = gmass
            if not gmass in Goodmasses: Goodmasses.append(gmass)
