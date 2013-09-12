@@ -179,8 +179,8 @@ def UpperLimit(ana, topo, masses,debug=True,run=None):
 
         elif M1:
           massv=[M1,0., 0.]
-          massv[getaxis('x',ds['axes']+1)]=x
-          massv[getaxis('y',ds['axes'])+1]=y
+          massv[getaxis('x',ds['axes'])]=x
+          massv[getaxis('y',ds['axes'])]=y
 
 
         else: massv=[x,getxval(x,y,ds['mz'][0],mass=True),y]
