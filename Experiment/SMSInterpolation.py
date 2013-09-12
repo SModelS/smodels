@@ -107,6 +107,12 @@ def compareM(masses, d):
       if deltain<0: return None
       if abs(deltain-deltam)/(deltain+deltam)<0.1: return True
       else: return None
+    elif d['mz'][0].find('M1')>-1: #check for fixed m_mother
+      mmother=float(d['mz'][0][d['mz'][0].find('M1')+2:d['mz'][0].find('M1')+5])
+      if abs(mmother-rmvunit(masses[0],"GeV"))/(mmother+rmvunit(masses[0],"GeV"))<0.1:
+        return True
+      else: return None
+
 
 
 def UpperLimit(ana, topo, masses,debug=True,run=None):
@@ -147,9 +153,12 @@ def UpperLimit(ana, topo, masses,debug=True,run=None):
 
     D=None
     L=None
+    M1=None
 
     if ds['mz'][0].find('D')>-1: D=float(ds['mz'][0].split('=')[1])
-    if ds['mz'][0].find('LSP')>-1: L=float(ds['mz'][0][ds['mz'][0].find('P')+1:ds['mz'][0].find('P')+4])
+    elif ds['mz'][0].find('LSP')>-1: L=float(ds['mz'][0][ds['mz'][0].find('P')+1:ds['mz'][0].find('P')+4])
+    elif ds['mz'][0].find('M1')>-1: M1=float(ds['mz'][0][ds['mz'][0].find('M1')+2:ds['mz'][0].find('M1')+5])
+
 
     ul_dict=SMSHelpers.getUpperLimitDictionary(ana,gethistname(topo,ds['mz'][0]),run)
 
@@ -167,6 +176,12 @@ def UpperLimit(ana, topo, masses,debug=True,run=None):
           massv=[0.,0.,L]
           massv[getaxis('x',ds['axes'])]=x
           massv[getaxis('y',ds['axes'])]=y
+
+        elif M1:
+          massv=[M1,0., 0.]
+          massv[getaxis('x',ds['axes']+1)]=x
+          massv[getaxis('y',ds['axes'])+1]=y
+
 
         else: massv=[x,getxval(x,y,ds['mz'][0],mass=True),y]
 
