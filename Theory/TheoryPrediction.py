@@ -15,7 +15,8 @@ class XSecPredictionForCluster:
   def __init__ (self):
     self.result_dic = {} ## dictionary of the results, keys are the constraints, values are  TheoryPredicitions
     self.conditions_dic = {} ## dictionary of the conditions, keys are conditions, values are  TheoryPredicitions
-    self.mass = None ## array of average masses inside the cluster
+    self.mass = None ## average cluster mass
+    self.allmasses = None ## array to store original masses inside the cluster (if required by the user)
     self.explimit = None ## experimental limit on production cross section for the average mass
   def __str__ ( self ):
     from Tools.PhysicsUnits import rmvunit
