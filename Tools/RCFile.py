@@ -17,6 +17,7 @@ def yesno ( B ):
 
 rcfile=os.path.expanduser("~")+"/.smodelsrc"
 
+print 'from rC=',rcfile
 exists=os.path.exists ( rcfile )
 #print "[RCFile.py] Check to see if %s exists: %s" % ( rcfile, yesno(exists))
 if exists:

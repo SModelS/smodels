@@ -14,7 +14,7 @@
 from Experiment import SMSHelpers
 from Tools.PhysicsUnits import addunit, rmvunit
 from Experiment.SMSResultsCollector import description
-from Tools import PhysicsUnits, VariousHelpers
+from Tools import PhysicsUnits, VariousHelpers, RCFile
 from Experiment.experimentExceptions import MetaInfoError
 logger = VariousHelpers.logging.getLogger(__name__)
 
