@@ -25,7 +25,7 @@ class EAnalysis:
     self.run = ""
     self.masscomp = 0.2 ## maximum allowed relative difference in upper limits for considering two mass arrays similar
     self.ResultList = [] ## a list of result objects (TheoryPrediction.ClusterOutput)
-    self.goodmasses = {} ## a dictionary to store masses and their equivalent goodmass value
+    self.goodmasses = {} ## a dictionary to store masses and their equivalent goodmass value (if required by the user)
 
   def __str__(self):
     return self.label
@@ -114,7 +114,7 @@ class EAnalysis:
 
     return True
 
-  def computeTheoryPredictions(self):
+  def computeTheoryPredictions(self,keepMassInfo=False):
     """ Main method for evaluating the theoretical predictions to the analysis \
       given the cross-section times branching ratio to specific final states. \
       It combines equivalent masses using the Cluster tools and calls \
@@ -132,7 +132,7 @@ class EAnalysis:
     for El in self.Top.ElList:
       for massweight in El.MassWeightList:
         gmass = GoodMass(massweight.mass,self.MassDist,dmin)
-        self.goodmasses[str(massweight.mass)] = gmass
+        if keepMassInfo: self.goodmasses[str(massweight.mass)] = gmass
         if gmass:
            massweight.mass = gmass
            if not gmass in Goodmasses: Goodmasses.append(gmass)
@@ -159,6 +159,7 @@ class EAnalysis:
       ClusterResult = NewTop.evaluateCluster( self.results )
       ClusterResult.mass = NewTop.clustermass
       ClusterResult.explimit = LimitGetter.GetPlotLimit(ClusterResult.mass,self,complain=False)
+      if keepMassInfo: ClusterResult.allmasses = masscluster
 
 
   #Check if average mass is inside the cluster (exp. limit for average mass ~ exp. limit for individual masses):
