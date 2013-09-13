@@ -7,7 +7,7 @@ from Tools.PhysicsUnits import addunit, rmvunit
 from Tools import SMSPrettyPrinter, VariousHelpers
 from Tools.SMSPrettyPrinter import wrap
 from Tools.VariousHelpers import logging
-from Experiment import SMSAnalysisList, SMSAnalysisFactory, LimitGetter
+from Experiment import SMSAnalysisList, SMSAnalysisFactory, LimitGetter, SMSHelpers
 
 
 printer=SMSPrettyPrinter.SMSPrettyPrinter()
