@@ -271,33 +271,6 @@ def inConvexHull(Dict, mx, my):
     from scipy.spatial import Delaunay
     dela = Delaunay(p)
     return dela.find_simplex((mx, my)) >= 0
-#    except ImportError,e:
-#        """ some very poor workaround for the missing convex hull,
-#                checks if we're out of bounds in mx and my separately,
-#                and if the mass splitting is smaller than in the smallest
-#                case """
-#        logger.error ("scipy.spatial.Delaunay not there, using poor mans convex hull implementation. fix this.")
-#        logger.error( str(e) )
-#        mxmin=min(Dict.keys())
-#        if mx < mxmin:
-#            return False
-#        mxmax=max(Dict.keys())
-#        if mx > mxmax:
-#            return False
-#        ymin=99999.
-#        ymax=0.
-#        dmin=99999.
-#        for point in pointlist:
-#            if point[1]<ymin: ymin=point[1]
-#            if point[1]>ymax: ymax=point[1]
-#            dm=point[0]-point[1]
-#            if dm<dmin: dmin=dm
-#        if my<ymin:
-#            return False
-#        if my>ymax:
-#            return False
-#        if (mx-my) < dmin: return False
-#        return True
 
 def getInterpolatedUpperLimitDelaunay (Dict, inmx, inmy):
     """ get interpolated upper limit from dictionary at point (inmx, inmy)
