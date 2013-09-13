@@ -25,6 +25,7 @@ class EAnalysis:
     self.run = ""
     self.masscomp = 0.2 ## maximum allowed relative difference in upper limits for considering two mass arrays similar
     self.ResultList = [] ## a list of result objects (TheoryPrediction.ClusterOutput)
+    self.goodmasses = {} ## a dictionary to store masses and their equivalent goodmass value
 
   def __str__(self):
     return self.label
@@ -61,7 +62,7 @@ class EAnalysis:
           for ib,branch in enumerate(ptclist):
             for iv,vertex in enumerate(branch):
               if len(vertex) != vertparts[ib][iv]:
-                print "[SMSAnalysis.generateElements]: element does not match analysis topology (combining different topologies in the same analysis is not allowed)"
+                print "[SMSAnalysis.generateElements]: Wrong syntax2"
                 return False
               for ptc in vertex:
                 if not ptc in Reven.values() and not PtcDic.has_key(ptc):
@@ -131,6 +132,7 @@ class EAnalysis:
     for El in self.Top.ElList:
       for massweight in El.MassWeightList:
         gmass = GoodMass(massweight.mass,self.MassDist,dmin)
+        self.goodmasses[str(massweight.mass)] = gmass
         if gmass:
            massweight.mass = gmass
            if not gmass in Goodmasses: Goodmasses.append(gmass)
