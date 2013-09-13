@@ -81,10 +81,20 @@ class XSecPredictionForCluster:
         res.append(cond[wlabel])
     return res
   
-  def getMaxCondition(self,wlabel = ''):
-    """ get the maximum condition value, False if not available """
+  def getMaxCondition(self,wlabel = None):
+    """ get the maximum condition value, False if wlabel does not exist. If wlabel = None, get the maximum condition
+        over all weight labels"""
 
-    conds = self.getConditionValues(wlabel)
+    if wlabel is None:
+      all_conds = []
+      conds = self.conditions_dic.values()
+      for cond in conds:
+        all_conds.extend(cond.values())  #Has all condition values, for all weight labels
+
+      conds = list(set(all_conds))   #Remove repeated entries
+    else:
+      conds = self.getConditionValues(wlabel)
+
     if conds is False: return False
     if conds is None or conds == [None]: return None
     if 'N/A' in conds: return 'N/A'

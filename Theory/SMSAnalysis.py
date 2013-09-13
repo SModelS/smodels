@@ -61,7 +61,7 @@ class EAnalysis:
           for ib,branch in enumerate(ptclist):
             for iv,vertex in enumerate(branch):
               if len(vertex) != vertparts[ib][iv]:
-                print "[SMSAnalysis.generateElements]: Wrong syntax2"
+                print "[SMSAnalysis.generateElements]: element does not match analysis topology (combining different topologies in the same analysis is not allowed)"
                 return False
               for ptc in vertex:
                 if not ptc in Reven.values() and not PtcDic.has_key(ptc):
