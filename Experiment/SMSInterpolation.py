@@ -202,9 +202,9 @@ def UpperLimit(ana, topo, masses,debug=True,run=None):
     if debug: print "[SMSInterpolation] error: masses out of range for %s/%s (no extrapolation)" % ( ana, topo )
     return None
 
-  if 2*abs(float(r)-float(r_nearest))/(float(r)+float(r_nearest))>0.5:
-    if debug: print "[SMSInterpolation] error: interpolation not safe for %s/%s" % ( ana, topo )
-    return None
+#  if 2*abs(float(r)-float(r_nearest))/(float(r)+float(r_nearest))>0.5:
+#    if debug: print "[SMSInterpolation] error: interpolation not safe for %s/%s" % ( ana, topo )
+#    return None
 
   return addunit(float(r),'pb')
 
