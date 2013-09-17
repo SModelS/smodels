@@ -9,35 +9,35 @@
 
 """
 
-def DoCluster(objlist,Distfunc,dmin,AvgFunc=None):
-  """Cluster algorithm (generic for any type of object, as long as the distance function is given) 
+def DoCluster(objlist,Distfunc,dmin,AvgFunc=None,Posfunc=None):
+  """Cluster algorithm (generic for any type of object, as long as the distance function is given)
     :returns: a list of indexes with the clustered objects according to the order\
     in objlist
+    If AvgFunc is defined, this function is used to compute the cluster center and check if all objects are close to the center
+    If Posfunc is defined, uses it to store obj positions (saves time if computing distances is expensive)
   """
   from Tools.PhysicsUnits import addunit
   import copy
-  MD = []
+  MD = [[None]*len(objlist)]*len(objlist)  #object distances
+  MX = None  #object positions
 #Compute distance matrix
-  for i in range(len(objlist)):
-    line = []
-    for j in range(len(objlist)):
-      if j >= i:
-        line.append(Distfunc(objlist[i],objlist[j]))
-      else:
-        line.append(addunit(0.,'GeV'))
-    MD.append(line)
+  if Posfunc: MX = [Posfunc(obj) for obj in objlist]
 
-  for i in range(len(objlist)):
-    for j in range(len(objlist)):
-      if j < i: MD[i][j] = MD[j][i]
+  for iob,obj1 in enumerate(objlist):
+    for job,obj2 in enumerate(objlist):
+      if MX:
+        MD[iob][job] = Distfunc(MX[iob],MX[job])
+      else:
+        MD[iob][job] = Distfunc(obj1,obj2)
+
 
 #Begin clustering
   ClusterList = []
-  for i in range(len(objlist)):
+  for iob,obj1 in enumerate(objlist):
     cluster = set([])
-    for j in range(len(objlist)):
-      if MD[i][j] == None: continue
-      if MD[i][j] <= dmin: cluster.add(j)
+    for job,obj2 in enumerate(objlist):
+      if MD[iob][job] == None: continue
+      if MD[iob][job] <= dmin: cluster.add(job)
     if not cluster in ClusterList: ClusterList.append(cluster)   #Zero level (maximal) clusters
 
 
@@ -51,7 +51,11 @@ def DoCluster(objlist,Distfunc,dmin,AvgFunc=None):
         if AvgFunc:       #Optional check to see if the cluster average falls inside the cluster
           obj_cluster = [objlist[ic] for ic in cluster]
           obj_avg = AvgFunc(obj_cluster)
-          DistAvg = max([Distfunc(obj,obj_avg) for obj in obj_cluster])
+          if PosFunc:
+            x_avg = PosFunc(obj_avg)
+            DistAvg = max([Distfunc(MX[ic],x_avg) for ic in cluster])
+          else:
+            DistAvg = max([Distfunc(obj,obj_avg) for obj in obj_cluster])
         else:
           DistAvg = 0.
 

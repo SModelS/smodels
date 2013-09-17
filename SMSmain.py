@@ -20,8 +20,8 @@ printer=SMSPrettyPrinter.SMSPrettyPrinter()
 
 #Generate events and compute cross-sections:
 nevts = 10000
-#slhafile = "slha/andrePT4.slha"
-slhafile = "slha/DESY_stop.slha"
+slhafile = "slha/andrePT4.slha"
+#slhafile = "slha/DESY_stop.slha"
 
 WriteToFile = True
 if not WriteToFile:

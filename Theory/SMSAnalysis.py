@@ -138,7 +138,7 @@ class EAnalysis:
            if not gmass in Goodmasses: Goodmasses.append(gmass)
 
   #Cluster masses:
-    MCluster = DoCluster(Goodmasses,self.MassDist,dmin,MassAvg)
+    MCluster = DoCluster(Goodmasses,self.MassDist,dmin,MassAvg,self.MassPosition)
 
     if MCluster == None or MCluster == False:
       MCluster = []
@@ -204,28 +204,33 @@ class EAnalysis:
     from  Experiment import LimitGetter
 
   
-  #If masses differ by more than 100%, do not define distance
-    if abs(mass1[0][0]-mass2[0][0])/(mass1[0][0]+mass2[0][0]) > 0.5:
-      return None
 
-#Get upper bounds for each mass:
-    xmass1 = LimitGetter.GetPlotLimit(mass1,self,complain=False)
-    xmass2 = LimitGetter.GetPlotLimit(mass2,self,complain=False)
+#Get upper bounds for each mass if input are not numbers:
+    if type(mass1) != type(1.) or type(mass2) != type(1.):
+#If masses differ by more than 100%, do not define distance
+      if abs(mass1[0][0]-mass2[0][0])/(mass1[0][0]+mass2[0][0]) > 0.5: return None
+      xmass1 = self.MassPosition(mass1)
+      xmass2 = self.MassPosition(mass2)
+    else:
+      xmass1 = mass1
+      xmass2 = mass2
 
-    if type(xmass1) != type(addunit(1.,'pb')) and (xmass1==None or xmass1==False):
-      #print "[SMSAnalysis.MassDist] no limit for",self.label,"plot 1, masses=",mass1
-      return None
-    if type(xmass2) != type(addunit(1.,'pb')) and (xmass2==None or xmass2==False):
-      #print "[SMSAnalysis.MassDist] no limit for",self.label,"plot 2, masses=",mass2
-      return None
+    if xmass1 is None or xmass2 is None: return None
 
-    x1 = rmvunit(xmass1,'fb')
-    x2 = rmvunit(xmass2,'fb')
-    d = 2.*abs(x1-x2)/(x1+x2)
+    d = 2.*abs(xmass1-xmass2)/(xmass1+xmass2)
 
     if d < 0.: return None   #Skip masses without an upper limit
 
     return d
 
+
+  def MassPosition(self,mass,nounit=True):
+    """ gives the mass position in upper limit space, using the analysis experimental limit data.
+        If nounit=True, the result is given as number assuming fb units """
+    from  Experiment import LimitGetter
+    xmass = LimitGetter.GetPlotLimit(mass,self,complain=False)
+    if type(xmass) != type(addunit(1.,'pb')): return None
+    if nounit: xmass = rmvunit(xmass,'fb')
+    return xmass
         
         
