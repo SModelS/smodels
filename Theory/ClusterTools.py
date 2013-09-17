@@ -9,19 +9,19 @@
 
 """
 
-def DoCluster(objlist,Distfunc,dmin,AvgFunc=None,Posfunc=None):
+def DoCluster(objlist,Distfunc,dmin,AvgFunc=None,PosFunc=None):
   """Cluster algorithm (generic for any type of object, as long as the distance function is given)
     :returns: a list of indexes with the clustered objects according to the order\
     in objlist
     If AvgFunc is defined, this function is used to compute the cluster center and check if all objects are close to the center
-    If Posfunc is defined, uses it to store obj positions (saves time if computing distances is expensive)
+    If PosFunc is defined, uses it to store obj positions (saves time if computing distances is expensive)
   """
   from Tools.PhysicsUnits import addunit
   import copy
   MD = [[None]*len(objlist)]*len(objlist)  #object distances
   MX = None  #object positions
 #Compute distance matrix
-  if Posfunc: MX = [Posfunc(obj) for obj in objlist]
+  if PosFunc: MX = [PosFunc(obj) for obj in objlist]
 
   for iob,obj1 in enumerate(objlist):
     for job,obj2 in enumerate(objlist):
