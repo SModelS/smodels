@@ -121,7 +121,7 @@ class Test(unittest.TestCase):
         #print '\n \n \n'
         #sys.exit()
         
-        results = []
+        results = ""
             
         #Compute theoretical predictions to analyses results:
         for Analysis in ListOfAnalyses:
@@ -150,17 +150,12 @@ class Test(unittest.TestCase):
                 sigmalimit = [Analysis.plots.values()[0][1][0],cluster.explimit]            
                 Results_table.add_row([wrap(printer.pformat(res),width=30),wrap(printer.pformat(conds),width=30),wrap(printer.pformat(mass),width=30),wrap(printer.pformat(tvalue),width=30),wrap(printer.pformat(sigmalimit),width=30)])        
                 Results_table.add_row(["---------","---------","---------","---------","---------"])
-            
-            results += Results_table
-            
-        resultsMerge = []
-        for r in results:
-            resultsMerge =+ r
+            results = Results_table.get_string()
             
         with open('3.log', 'r') as logFile:
             data = logFile.read().replace('\n', '')
         
-        self.assertEqual(resultsMerge, data)
+        self.assertEqual(results, data)
 
 
 if __name__ == "__main__":
