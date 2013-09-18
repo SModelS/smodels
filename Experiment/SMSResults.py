@@ -434,10 +434,10 @@ def isPrivateTopology(analysis, topology, run=None):
     if isPrivate(analysis, run):
         return True
     else:
-        try:
-            return topology in SMSHelpers.getMetaInfoField(analysis, "private_topologies", run).split()
-        except MetaInfoError:
-            logger.exception("Could not parse field 'private_topologies'.")
+        field = SMSHelpers.getMetaInfoField(analysis, "private_topologies", run)
+        if field:
+            return topology in field.split()
+        return False
 
 def isPublic(analysis, run=None):
     """DEPRECATED - Check if analysis is NOT flagged as private.
