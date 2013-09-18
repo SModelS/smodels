@@ -621,6 +621,7 @@ def particleName(topo):
     if part == "b": part = "sbottom"
     if part == "t": part = "stop"
     if part == "q": part = "squark"
+    if part == "l": part = "slepton"
     return part
 
 def massDecoupling_ (topo):
@@ -692,6 +693,20 @@ def exists(analysis, topo, run=None):
         histo = SMSHelpers.getUpperLimitFromHisto(analysis, toponame, run2)
         if not histo: return False
 
+    return True
+
+def hasExclusionLine (ana, topo):
+    """ check if the exclusion line run/analysis/sms.root(exclusion_topo) exists.
+            for topologies with intermediate masses: check for all available results
+            listed in the axes-information."""
+    import SMSInterpolation
+    axes = getaxes(ana, topo)
+    if not axes: return False
+    for a in axes:
+        mzname = None
+        if a['mz'] and len(a['mz']): mzname = a['mz'][0]
+        toponame = SMSInterpolation.gethistname(topo, mzname)
+        if not getExclusionLine(toponame,ana): return False
     return True
 
 
