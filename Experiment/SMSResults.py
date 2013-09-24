@@ -244,6 +244,36 @@ def getAllResults (run=None, allHistos=False):
     allresults[key] = ret
     return ret
 
+dbresults = {}
+
+def getDatabaseResults (run=None, category=None):
+    """ returns all public analyses and the topologies we have constraints for """
+    import os, copy
+    key = str(run)+str(category)
+    if dbresults.has_key (key):
+        return dbresults[key]
+    runs = SMSHelpers.runs
+    if run: runs = [ run ]
+    ret = {}
+    for r in runs:
+        # # so thats the runs I really have to think about
+        dirs = os.listdir ("%s/%s/" % (SMSHelpers.Base, r))
+        for ana in dirs:
+            if os.path.exists ("%s/%s/%s/info.txt" % (SMSHelpers.Base, r, ana)):
+                topos = getConstraints (ana, run=r).keys()
+                if not topos: continue
+                if category:
+                    if isPrivate(ana): continue
+                    newTopos=copy.deepcopy(topos)
+                    for t in newTopos:
+                        if category not in getCategories(ana, topo=t):
+                            topos.remove(t)
+                if not topos: continue
+                ret[ana] = topos
+    dbresults[key] = ret
+    return ret
+
+
 def getClosestValue (Dict, mx, my):
     """assuming that Dict is a dictionary of mx,my,ul, get the upper limit
        of the point in Dict that is closest to mx and my.
@@ -481,6 +511,10 @@ def getPAS (analysis, run=None):
     """ get the PAS for this analysis """
     return SMSHelpers.getMetaInfoField (analysis, "pas", run)
 
+def isSuperseded (analysis, run=None):
+    """ check if analysis is superseded, if yes, return analysis name of newer analysis """
+    return SMSHelpers.getMetaInfoField (analysis, "superseded_by", run)
+
 def getOrder (analysis, run=None):
     """ get the order in perturbation theory that the exclusion lines correspond
             with """
@@ -559,6 +593,25 @@ def getConstraints (analysis, topo="all", run=None):
         constraints[key] = None
         return None
     constraints[key] = ret[topo]
+    return ret[topo]
+
+categories = {}
+
+def getCategories (analysis, topo="all", run=None):
+    """ get the categories. if topo is "all", 
+            returns a dictionary, else it returns the constraint
+            only for the given topo, None if non-existent. """
+    key = analysis + topo + str(run)
+    if categories.has_key (key): return categories[key]
+    run = SMSHelpers.getRun (analysis, run)
+    ret = SMSHelpers.categories (analysis, run)
+    if topo == "all":
+        categories[key] = ret
+        return ret
+    if not ret.has_key (topo):
+        categories[key] = None
+        return None
+    categories[key] = ret[topo]
     return ret[topo]
 
 def getRequirement (analysis, run=None):
