@@ -2,226 +2,286 @@
 
 """
 .. module:: CrossSection
-    :synopsis: A class that encapsulates the result of the computation of the reference cross section.
+        :synopsis: A class that encapsulates the result of the computation of the reference cross section.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
 
-class CrossSection:
-  """ A wrapper around this complicated result dictionary, to 
-      make it easier to use this dictionary """
+from Tools.PhysicsUnits import addunit, rmvunit
+import copy
+import logging
+logger = logging.getLogger(__name__)
 
-  def __init__ ( self, data ):
-    self.data=data
+UseXSecs = None
 
-  # make it behave much like a dictionary
-  def __len__ ( self ): return len(self.data)
-  def __getitem__ ( self, i ): return self.data[i]
-  def items ( self ): return self.data.items()
-  def __str__ ( self ): return str(self.data)
-  def keys ( self ): return self.data.keys()  
+class XSectionInfo:
+    """A simple class to store information about the cross-section (center of mass, order and label)"""
+    def __init__ (self):
+        self.sqrts = None
+        self.order = None
+        self.label = None
 
-  def weights ( self ): return self.data["Wdic"]
-  def crossSections ( self ): return self.data["Xsecdic"]
-  def crossSectionsInfo ( self ): return self.data["XsecList"]
+    def __eq__(self,other):     
+        if type(other) != type(XSectionInfo()): return False
+        if other.sqrts != self.sqrts: return False
+        if other.order != self.order: return False
+        return True
+ 
+    def __ne__(self,other):     
+        if type(other) != type(XSectionInfo()): return True
+        if other.sqrts != self.sqrts: return True
+        if other.order != self.order: return True
+        return False
 
-  def getCrossSection ( self, pidmom1, pidmom2, order="NLL", sqrts=8 ):
-    """ returns production cross section for a given production mode (pidmom1, pidmom2)
-        at 7 or 8 TeV in chosen order LO or NLL """
+
+class XSection:
+    """A simple class to store the information about a single cross-section (value, paritcle ids, center of mass, order and label)
+         order = 0 (LO), 1 (NLO) or 2 (NLL)."""
+    def __init__ (self):
+        self.info = XSectionInfo()
+        self.value = None
+        self.pid = (None,None)
+
+    def __mul__(self,other):
+        newXsec = copy.deepcopy(self)
+        if type(other) == type(1.):
+            newXsec.value = newXsec.value*other
+        else:
+            print "[XSection.mul]: Xsections can only be multiplied by floats"
+            return False
+        return newXsec
         
-    from Tools.PhysicsUnits import addunit        
-    if pidmom1 > pidmom2:
-      pidmom1, pidmom2 = pidmom2, pidmom1
+    def __add__(self,other):
+        if type(other) == type(XSection()):
+            if self.info == other.info:
+                res = copy.deepcopy(self)
+                res.value += other.value
+                return res
+        print "[XSection.add]: Trying to add",type(other),"to a XSection objetc"
+        return False
 
-    if type(order) == type('str'):
-      if order.lower() == "nll": order = 2
-      elif order.lower() == "nlo": order = 1
-      elif order.lower() == "lo": order = 0
-    if type(order) != type(1):
-      print '[CrossSection]: Unknown cross section order:',order
-      return None
+    def __eq__(self,other):
+        if type(other) != type(XSection()): return False
+        if other.info != self.info: return False
+        if other.value != self.value: return False
+        if other.pid != self.pid: return False
+        return True
 
-    if type(sqrts) == type(1) or type(sqrts) == type(1.):
-      sqrts = addunit(float(sqrts),'TeV')
-    if type(sqrts) != type(addunit(1.,'TeV')):
-      print '[CrossSection]: Unknown sqrts value:',sqrts
-      return None
+    def __ne__(self,other):
+        if type(other) != type(XSection()): return True
+        if other.info != self.info: return True
+        if other.value != self.value: return True
+        if other.pid != self.pid: return True
+        return False    
 
-#Get label: 
-    for xsec in self.crossSectionsInfo().xsecs:
-      if xsec.order != order: continue
-      if xsec.sqrts != sqrts: continue
-      k = xsec.label
-      break
-      
-    if not k or not self.crossSections().has_key(k):
-        print '[CrossSection]: No cross sections found for',k
-        return None
-    allxsecs=self.crossSections()[k]
-    if not allxsecs:
-      print '[CrossSection]: No cross sections for ',k
-      return None
-    if allxsecs.has_key((pidmom1,pidmom2)):
-      return allxsecs[(pidmom1,pidmom2)]
-    else:
-      print '[CrossSection]: Cross Sections only available for %s' %str(allxsecs.keys())
-      return None
-      
-    return None
-
-  def getSumOfCrossSections ( self, pidmoms=None, order="NLL", sqrts=8 ):
-    """takes a list of pids and returns the integrated production cross section
-       for all combinations of pids from the given list at 7 or 8TeV 
-       with order = LO or NLL.
-       pidmoms=None means we sum over all mothers.
-    """
-    from Tools.PhysicsUnits import addunit, rmvunit
+    def __str__ (self):
+        """cross-section information in string format"""
+        st = 'label: '+self.info.label+', value:'+str(self.value)
+        return st
     
-    if type(order) == type('str'):
-      if order.lower() == "nll": order = 2
-      elif order.lower() == "nlo": order = 1
-      elif order.lower() == "lo": order = 0
-    if type(order) != type(1):
-      print '[CrossSection]: Unknown cross section order:',order
-      return None
+    def zeroXSec(self):
+        """
+        Replaces the cross-section value by zero
+        """
+        self.values = addunit(0., 'fb')
 
-    if type(sqrts) == type(1) or type(sqrts) == type(1.):
-      sqrts = addunit(float(sqrts),'TeV')
-    if type(sqrts) != type(addunit(1.,'TeV')):
-      print '[CrossSection]: Unknown sqrts value:',sqrts
-      return None
-  
-  #Get label: 
-    for xsec in self.crossSectionsInfo().xsecs:
-      if xsec.order != order: continue
-      if xsec.sqrts != sqrts: continue
-      k = xsec.label
-      break
-  
+         
+class XSectionList:
+    """A simple class to store the list of cross-sections to be used"""        
     
-    if not k or not self.crossSections().has_key(k):
-      print '[CrossSection]: No cross sections for ',k
-      return None
-    allxsecs=self.crossSections()[k]
-    if not allxsecs:
-      print '[CrossSection]: No cross sections for',k
-      return None
-    Sum=0
-    for (key,value) in allxsecs.items():
-      if pidmoms==None or (abs(key[0]) in pidmoms and abs(key[1]) in pidmoms):
-        value=rmvunit(value, 'fb')
-#        print 'k:', key, 'v:',value
-        Sum+=value
-    return Sum
+    def __init__ (self,infoList=None):
+        """Creates a list of XSection objects from the input string with None cross-section values.
+        If infoList is defined, create entries with zero cross-sections according to infoList"""
+        self.XSections=[]
+        
+        if infoList:
+           for info in infoList:
+                newentry = XSection()
+                newentry.value = addunit(0.,'fb')
+                newentry.pid = (None,None)
+                newentry.info = copy.deepcopy(info)
+                self.XSections.append(newentry)
+                
 
-  def crossSectionLightSquarks ( self, order="NLL", sqrts=8 ):
-    """returns the integrated production cross section of all light squarks productions
-       at sqrts and order = order"""
-    squarks=[1000001,1000002,1000003,1000004,2000001,2000002,2000003,2000004]
-    return self.getSumOfCrossSections ( squarks, order, sqrts )
+    def __mul__(self,other):
+        newList = copy.deepcopy(self)
+        for ixsec,xsec in enumerate(newList.XSections): newList.XSections[ixsec] = xsec*other
+        return newList
 
-  def lhefile ( self, sqrts=8, order=0 ):
-    from Tools.PhysicsUnits import addunit
+    def __str__(self):
+        return str(self.getDictionary())
+
+
+    def getXsecsFor(self,item):
+        """ Returns a list of XSection objects for item (label, pid, sqrts) """
+        xsecList = XSectionList()
+        for xsec in self.XSections:
+            if type(item) == type(xsec.info.label) and item == xsec.info.label:
+                xsecList.XSections.append(xsec)
+            elif type(item) == type(xsec.info.sqrts) and item == xsec.info.sqrts:    
+                xsecList.XSections.append(xsec)
+            elif type(item) == type(xsec.pid) and item == xsec.pid:    
+                xsecList.XSections.append(xsec)
+            elif type(item) == type(1) and (item in xsec.pid):
+                xsecList.XSections.append(xsec)
+
+        return xsecList
     
-    if type(sqrts) == type(1) or type(sqrts) == type(1.):
-      sqrts = addunit(float(sqrts),'TeV')
-    if type(sqrts) != type(addunit(1.,'TeV')):
-      print '[CrossSection]: Unknown sqrts value:',sqrts
-      return None
-  
-    #Get label:
-    for xsec in self.crossSectionsInfo().xsecs:
-      if xsec.order != order: continue
-      if xsec.sqrts != sqrts: continue
-      k = xsec.label
-      break
-    
-    if not k or not self.data["lhefiles"].has_key(k):
-      print "[CrossSection.py] lhefile for",sqrts,"does not exist."
-      return None
-    else:    
-      return self.data["lhefiles"][k]
+    def zeroXSecs(self):
+        """
+        Replaces the cross-section values in the list by zero
+        """
+        for xsec in self.XSections:  xsec.value = addunit(0.,'fb')
 
-class SingleXSecInfo:
-  """A simple class to store the information about a single cross-section (center of mass, order and label)
-     order = 0 (LO), 1 (NLO) or 2 (NLL). If Str != None, creates from string (format = 7 tev NLO, 8 TeV (NLL),..)"""
-  def __init__ (self, Str=None ):
-    from Tools.PhysicsUnits import addunit
-    self.sqrts=None
-    self.order=None
-    self.label=None
-    if Str:
-      orders = ['lo','nlo','nll']
-      inputerror = False
-      inStr = Str.replace(' ','').lower()
-      for iorder,order in enumerate(orders):
-        if order in inStr: self.order = iorder
-      if self.order is None or not 'tev' in inStr: inputerror = True
-      sqrt=inStr[:inStr.index('tev')]
-      iS = 1
-      sqrtS = 0.
-      while iS and iS <= len(sqrt):
-        try:
-          sqrtS = eval(sqrt[-iS:])
-          iS += 1
-        except:
-          iS = 0
-      if type(sqrtS) != type(1.) and type(sqrtS) != type(1): inputerror = True
-      if inputerror:
-        print "[XSecComputer.py] Unknown input cross-section format, ignoring",inStr
-        return
-      else:
-        self.sqrts = addunit(abs(float(sqrtS)),'TeV')
-        self.label = Str.lstrip().rstrip()
+    def delete(self,XSec):
+        """Deletes the cross-section entry from the list"""
+        for ixsec,xsec in enumerate(self.XSections):
+            if xsec == XSec: self.XSections.pop(ixsec)
 
-  def __eq__(self,other):
-    if type(other) != type(SingleXSecInfo()): return False
-    if other.sqrts != self.sqrts: return False
-    if other.order != self.order: return False
-    return True
+    def getInfo(self):
+        """Gets the basic info about the cross-sections appearing in the list (order,value and label). Returns a list of XSectionInfo objects """
+        allInfo = []
+        for xsec in self.XSections:
+            info = xsec.info
+            if not info in allInfo: allInfo.append(info)
+        return allInfo
 
-  def __str__ ( self ):
-    """cross-section information in string format"""
-    from Tools.PhysicsUnits import rmvunit
-    st = 'label: '+self.label+', sqrts: '+str(rmvunit(self.sqrts,'TeV'))+' TeV, order: '+str(self.order)
-    return st
+    def getLabels(self):
+        """Gets all the labels appearing in the list."""
+        allLabels = []
+        allInfo = self.getInfo()
+        for info in allInfo: allLabels.append(info.label)
+        return list(set(allLabels)) 
 
-      
-class XSecInfoList:
-  """A simple class to store the list of cross-sections to be used"""    
-  
-  def __init__ (self, Str='7 TeV (LO), 8 TeV (LO), 7 TeV (NLL), 8 TeV (NLL)'):
-    """Creates a list of SingleXSecInfo objects from the input string. All cross-sections must be in TeV!"""
-    self.xsecs=[]
-    if Str:
-      inStrs = Str.split(',')
-    else:
-      inStrs = []
-    for inStr in inStrs:
-      try:
-        Xsec = SingleXSecInfo(inStr)
-        if type(Xsec) == type(SingleXSecInfo()): self.xsecs.append(Xsec)
-      except:
-        pass        
+    def getPIDpairs(self):
+        """Gets all the particle ID pairs appearing in the list."""
+        allPidPairs = []
+        for xsec in self.XSections: allPidPairs.append(xsec.pid)
+        return list(set(allPidPairs)) 
+
+    def getPIDs(self):
+        """Gets all the particle IDs appearing in the list."""
+        allPids = []
+        for xsec in self.XSections: allPids.extend(xsec.pid)
+        return list(set(allPids)) 
+
+
+    def getMaxXsec(self):
+        """Gets the maximum cross-section value appearing in the list."""
+        maxxsec= addunit(0.,'fb')
+        for xsec in self.XSections:
+            if xsec.value > maxxsec: maxxsec = xsec.value
+        return maxxsec
+
+    def makeUniformLabels(self):
+        """ Fills the cross-section list with zero cross-section entries, so all particles have cross-section entries for all labels """
+
+        global UseXSecs
+
+        if UseXSecs is None:
+            logger.error("[CrossSection.makeUniformLabels]: the standard cross-section format has to be defined!")
+            return False
+        else:
+            allInfo = UseXSecs
           
-  def __getitem__ ( self, label=None ):
-    """Return the SingleXSecInfo object with the respective label"""
-    if not label: return None
-    for xsec in self.xsecs:
-      if xsec.label == label: return xsec
-    return None
-          
-  def sort(self,reverse=False):
-    """Sort cross-sections by center of mass energy"""
-    self.xsecs = sorted(self.xsecs, key=lambda xsec: xsec.sqrts, reverse=reverse)
-    return True
+        allPids = self.getPIDpairs()        
+        for pid in allPids:
+            Xsecs = self.getXsecsFor(pid)
+            hasLabels = [info.label for info in Xsecs.getInfo()]
+            for info in allInfo:
+                if not info.label in hasLabels:
+                     newentry = XSection()
+                     newentry.value = addunit(0.,'fb')
+                     newentry.pid = pid
+                     newentry.info = info
+                     self.XSections.append(newentry)
 
-  def getSqrts(self):
-    """Return a list with all sqrts values appearinf in xsecs"""
-    allsqrts = []
-    for xsec in self.xsecs:
-      if not xsec.sqrts in allsqrts: allsqrts.append(xsec.sqrts)
-    return allsqrts
 
-## XsecsInfo = XSecInfoList() ## define the default
+    def getDictionary(self,groupBy="pids"):
+        """ Converts the list of XSection objects to a nested dictionary. First level keys are the particles IDs (if groupBy=pids) or labels
+        (if groupBy=labels) and values are the cross-section labels or particle IDs and the cross-section value.
+        If groupBy=pids and a single pid is present, return a simple dictionary with the cross-sections for the pid"""
+
+        XsecDic = {}
+        self.makeUniformLabels()    #Make sure all particles have entries for all labels
+
+        if groupBy == "pids":
+            allPids = self.getPIDpairs()
+            for pid in allPids:
+                XsecDic[pid] = {}
+                Xsecs = self.getXsecsFor(pid)
+                for xsec in Xsecs.XSections: XsecDic[pid][xsec.info.label] = xsec.value
+            if len(allPids) == 1: XsecDic = XsecDic[allPids[0]]  #Return standard weight dictionary                
+
+        elif groupBy == "labels":
+            allLabels = self.getLabels()
+            for label in allLabels:
+                XsecDic[label] = {}
+                Xsecs = self.getXsecsFor(label)
+                for xsec in Xsecs.XSections:
+                    XsecDic[label][xsec.pid] = xsec.value
+                    
+
+        return XsecDic
+    
+    def combineWith(self,newList):
+        """ Adds a new list of cross-sections. If the new cross-sections already appear (have same order and sqrts), add its
+        value to the original value, otherwise append it to the list.
+        The particle IDs are ignored when adding cross-sections. Hence they are set to (None,None) if any cross-sections are combined"""
+                        
+        for newXsec in newList.XSections:
+            if not newXsec.info in self.getInfo():
+                newList.XSections.append(newXsec)                
+            else:    
+                for oldXsec in self.XSections:
+                    if newXsec.info == oldXsec.info:
+                        oldXsec.value = copy.deepcopy(oldXsec.value + newXsec.value)
+                        oldXsec.pid = (None,None)
+        
+
+def getXsecFromFile(slhafile):
+    """ obtain dictionary cross-sections from input SLHA file. """
+
+    global UseXSecs
+
+    XsecsInFile = XSectionList()    #To store information about all cross-sections in the SLHA file
+    slha = open(slhafile, 'r')
+    lines = slha.readlines()
+    xsecblock = False
+    for l in lines:
+        if l.startswith("#") or len(l)<2: continue
+        if 'XSECTION' in l:
+            xsecblock = True
+            sqrtS =    eval(l.split()[1])/1000.        #Values in the SLHA file are in GeV
+            pids = (eval(l.split()[5]),eval(l.split()[6]))
+            continue
+        if not xsecblock: continue    #ignores other entries
+        cs_order = eval(l.split()[1])
+        cs = addunit(eval(l.split()[6]),'fb')
+        wlabel = str(int(sqrtS))+' TeV'
+        if cs_order == 0: wlabel += ' (LO)'
+        elif cs_order == 1: wlabel += ' (NLO)'
+        elif cs_order == 2: wlabel += ' (NLL)'
+        else:
+            print '[SLHADecomposer] unknown QCD order in XSECTION line', l
+            return False
+        xsec = XSection()
+        xsec.info.sqrts = addunit(sqrtS,'TeV')
+        xsec.info.order = cs_order
+        xsec.info.label = wlabel
+        xsec.value = cs
+        xsec.pid = pids
+        XsecsInFile.XSections.append(xsec)
+
+    slha.close()
+
+    if UseXSecs is None:
+        UseXSecs = XsecsInFile.getInfo()
+        log = logging.getLogger(__name__)
+        log.warning ( "Cross-section information not found. Using values from SLHA file" )
+    else:
+        for xsec in XsecsInFile.XSections:
+            if not xsec.info in UseXSecs: XsecsInFile.XSections.delete(xsec)     #Remove entries which do not match the previously defined cross-sections
+
+    return XsecsInFile

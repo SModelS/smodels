@@ -180,10 +180,6 @@ def constraints ( analysis, run ):
     """ get all the conditions for a analysis/run pair """
     return getLines ( analysis, run, "constraint" )
 
-def categories ( analysis, run ):
-    """ get categories for all topologies in an analysis/run pair """
-    return getLines ( analysis, run, "category")
-
 def getPotentialNames ( topo ):
     """ If T6bbww doesnt yield a result, try T6bbWW, etc """
     ret = [ topo ]
@@ -415,7 +411,6 @@ dicparticle = {
      "TChiSlep": "#tilde{#chi}^{0}_{2}",
      "TChiSlepSlep": "#tilde{#chi}^{0}_{2}#tilde{#chi}^{#pm}_{1}",
      "TChiNuSlep": "#tilde{#chi}^{0}_{2}",
-     "TSlepSlep":"#tilde{l}",
 }
 
 def hasDictionary(analysis, run=None):
