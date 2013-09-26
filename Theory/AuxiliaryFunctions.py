@@ -32,34 +32,17 @@ def Cgtr(a,b):
   res = (abs(a-b) - (a-b))/(2.*(a+b))
   return res
 
-
-def similar(els):
-  """ Defines similar function when comparing two list of numbers.
-      If any of the elements differ by < 10%, returns True
-      FIXME should this go to ClusterTools? """
-  for i in range(len(els)):
-    for j in range(i+1,len(els)):
-      if els[i] != els[j]:
-        if 2.*abs(els[i]-els[j])/abs(els[i]+els[j]) > 0.1: return False
-  return True
-
 def Ceval(instring,nEl):
-  """ Routine to evaluate the analyses conditions and constraints.
-      Flexible version of eval to allow for additional operators,
-      such as ~ (= similar) """
+  """ Routine to evaluate the analyses conditions and constraints."""
    
   run = instring.replace(" ","")  #Remove blanks
-  if "~" in run:
-    simels = run.split("~")
-    run = 'similar(' + str(simels) + ')'
-    run = run.replace("'","")
   if not run or run=="None": return None
   return eval(run)
 
 def getelements(instring):
   """ Parses instring (or a list of strings) and return a list of elements (in string format) appearing
   in instring"""
-  import copy, SMSDataObjects
+  import copy, element
   from ParticleNames import Reven, PtcDic
   
   if type(instring) == type('st'):
@@ -78,7 +61,7 @@ def getelements(instring):
   outstr = outstr.replace(" ","")
   while "[[[" in outstr:  #String has element
       st = outstr[outstr.find("[[["):outstr.find("]]]")+3] #Get duplet
-      element = SMSDataObjects.EElement ( st )
+      element = element.Element ( st )
       ptclist = element.allParticles()
   #Syntax checks:
       for ib in range(2):

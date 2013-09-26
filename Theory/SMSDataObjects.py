@@ -2,7 +2,7 @@
 
 """
 .. module:: SMSDataObjects
-   :synopsis: Our basic data objects: TopologyList, GTop, EElement, BElement
+   :synopsis: Our basic data objects: TopologyList, GTop, Element, Branch
     
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
@@ -13,60 +13,10 @@ import ClusterTools
 from ParticleNames import Reven, PtcDic, simParticles
 from AuxiliaryFunctions import Ceval
 from Tools.PhysicsUnits import addunit, rmvunit
-
-class BElement:
-  """ A branch-element """
-
-  def __init__( self, S=None ):
-    """ A branch-element can be constructed from a string S (e.g. ('[b,b],[W]')"""
-    self.masses = []
-    self.particles = []
-    self.momID = 0
-    if type(S)==type(""):
-      st = S.replace(" ","")
-      while "[" in st or "]" in st:
-        ptcs = st[st.find("[")+1:st.find("],[")].split(",")
-        for ptc in ptcs:
-          if not ptc in Reven.values() and not PtcDic.has_key(ptc):
-            print "[BElement] unknown particle:",ptc
-            return
-        spcts=str(ptcs).replace("'","").replace(" ","")
-        st=st.replace(spcts,"",1)
-        self.particles.append ( ptcs )
+import copy
 
 
-  def isEqual ( ElA, ElB, order=True ):
-    if not simParticles(ElA.particles,ElB.particles,useDict=False): return False
-    if ElA.masses != ElB.masses: return False
-    return True
-
-  def __eq__ ( self, other ):
-    return self.isEqual ( other )
-
-  def isSimilar ( self, elB, order=True, igmass=False ):
-    """ compare elB with self.
-        If particles are similar and all masses equal, returns True,
-        otherwise returns False.
-        If order = False, test both branch orderings (for an element doublet only)
-        If igmass = True, only compare particles """
-    if type (elB) != type(self): return False
-    if not simParticles(self.particles,elB.particles): return False
-    if not igmass and self.masses != elB.masses: return False
-    return True
-
-  def __str__ ( self ):
-    """ the canonical SModels description of the BElement. """
-    st = str(self.particles).replace("'","")
-    st = st.replace(" ","")
-    return st
-
-  def describe ( self ):
-    """ a lengthy description of the BElement """
-    ret="particles=%s masses=%s" % \
-       ( self.particles, [ rmvunit(x,"GeV") for x in self.masses ] )
-    return ret
-
-class EElement:
+class Element:
   """ An Event Element, contains of several branches and weight information """
   def __init__( self, S=None ):
     """ If S != None, an Element is created from a string description """
@@ -78,8 +28,8 @@ class EElement:
       b1=st[2:st.find("]],[[")+1]
       b2=st[st.find("]],[[")+4:st.find("]]]")+1]
       import copy
-      self.B.append ( copy.deepcopy( BElement ( b1 ) ) )
-      self.B.append ( copy.deepcopy ( BElement ( b2 ) ) )
+      self.B.append ( copy.deepcopy( Branch ( b1 ) ) )
+      self.B.append ( copy.deepcopy ( Branch ( b2 ) ) )
 
 #Get global topology info from element structure
   def getEinfo( self ):
@@ -92,7 +42,7 @@ class EElement:
         vertparts[len(vertparts)-1].append(0)  #Append 0 for stable LSP
     return {"vertnumb" : vertnumb, "vertparts" : vertparts}
 
-  def allParticles ( self ):
+  def getParticles ( self ):
     """ returns all particles from all branches """
     ret=[]
     for b in self.B:
@@ -179,7 +129,7 @@ class EElement:
     the analysis has the element mass array"""
 
     for AEl in Analysis.Top.ElList:
-      EEl = EElement(AEl.ParticleStr)
+      EEl = Element(AEl.ParticleStr)
       if self.isSimilar(EEl,order=False,igmass=True):
         if igmass: return True
         for massweight in AEl.MassWeightList:
@@ -483,35 +433,30 @@ class ATop:
   
 
   def addEventElement(self,NewElement,sqrts):
-    """  Adds an event element (EElement) to the corresponding analysis elements (AElements) in ElList\
+    """  Adds an event element (Element) to the corresponding analysis elements (AElements) in ElList\
          The event element and analysis elements DO NOT need to have the same branch ordering.\
          sqrts = analysis center of mass energy (necessary for adding only the relevant theoretical cross-sections)"""
 
     import copy
     import CrossSection
+    import logging
 
 #Get cross-section information    
-    XsecsInfo=None
-    try:
-      XsecsInfo = CrossSection.XSectionInfo  #Check if cross-section information has been defined
-    except:
-      pass
-    if not XsecsInfo:
-      XsecsInfo = CrossSection.XSecInfoList()   #If not, define default cross-sections
-      CrossSection.XSectionInfo = XsecsInfo
-      import logging
+    if CrossSection.UseXSecs is None:
+      UseXSecs = CrossSection.XSecInfoList()   #If not, define default cross-sections
+      CrossSection.UseXSecs = UseXSecs
       log = logging.getLogger(__name__)
       log.warning ( "Cross-section information not found. Using default values" )
 
 #Restrict weight to the cross-section labels corresponding to sqrts
     zeroweight = {}     
-    for xsec in XsecsInfo.xsecs:    #If not only add the weight labels corresponding to the analysis sqrts
-      if sqrts == xsec.sqrts: zeroweight[xsec.label] = addunit(0., 'fb')          
+    for info in CrossSection.UseXSecs:    #If not only add the weight labels corresponding to the analysis sqrts
+      if sqrts == info.sqrts: zeroweight[info.label] = addunit(0., 'fb')          
     if not zeroweight: return False    #Skip analyses with unwanted sqrts
       
 
-    if type(NewElement) != type(EElement()):
-      print "[SMSDataObjects.py] wrong input! Must be an EElement object"
+    if type(NewElement) != type(Element()):
+      print "[SMSDataObjects.py] wrong input! Must be an Element object"
       return False
 
     newparticles_a = [NewElement.B[0].particles,NewElement.B[1].particles]
@@ -534,7 +479,7 @@ class ATop:
     
 #Check if masses match
       added = False
-      OldEl = EElement(OldElement.ParticleStr)  #Create temporary EElement for easy comparison
+      OldEl = Element(OldElement.ParticleStr)  #Create temporary Element for easy comparison
       for massweight in OldElement.MassWeightList:
         OldEl.B[0].masses = massweight.mass[0]
         OldEl.B[1].masses = massweight.mass[1]
@@ -588,6 +533,12 @@ class GTop:
     """ the number of vertices and insertions per vertex is
       redundant information in a topology, so we can perform
       an internal consistency check """
+
+    for ibranch, vnumb in enumerate(self.vertnumb):
+      if len(self.vertparts[ibranch]) != vnumb:
+        if verbose: print "[SMSDataObjects.py] inconsistent topology!!!"
+        return False
+
     for element in self.ElList:
       info=element.getEinfo()
       if self.vertnumb!=info["vertnumb"]:

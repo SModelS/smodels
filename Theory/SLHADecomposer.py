@@ -2,218 +2,133 @@
 
 """
 .. module:: SLHADecomposer
-    :synopsis: SLHA-based SMS decomposition
-    
-.. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
-    
+        :synopsis: SLHA-based SMS decomposition
+        
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
+        
 """
-    
-def decompose(slhafile,Xsec=None,sigcut=None,DoCompress=False,DoInvisible=False,minmassgap=-1,XsecsInfo=None):
-  """Do SLHA-based decomposition.
-      FIXME currently using pyslha2 because we need this hack to handle SLHA files with XSECTION blocks.
 
-    :param slhafile: file with mass spectrum and branching ratios and optionally with cross-sections
-    :param Xsec: optionally a dictionary with cross-sections for pair production, by default reading the cross sections from the SLHA file.
-    :param XsecsInfo: information about the cross-sections (sqrts, order and label). Only relevant for Xsec=None (reading from slha file).\
-       If defined as input or in CrossSection.XSectionInfo restricts the cross-sections values in the SLHA file to the ones in XsecsInfo. \
-       If not defined, it will be generated from the SLHA file and stored in CrossSection.XSectionInfo.
+import sys, os, copy
+import element, topology, ParticleNames
+from Tools.PhysicsUnits import addunit, rmvunit
+import pyslha2 as pyslha
+import CrossSection
+from branch import Branch
+
+import time
+        
+def decompose(slhafile,sigcut=0.1,DoCompress=False,DoInvisible=False,minmassgap=-1):
+    """Do SLHA-based decomposition.
+            FIXME currently using pyslha2 because we need this hack to handle SLHA files with XSECTION blocks.
+
+        :param slhafile: file with mass spectrum and branching ratios and optionally with cross-sections
+        :param Xsec: optionally a dictionary with cross-sections for pair production, by default reading the cross sections from the SLHA file.
+        :param XsecsInfo: information about the cross-sections (sqrts, order and label). Only relevant for Xsec=None (reading from slha file).\
+             If defined as input or in CrossSection.XSectionInfo restricts the cross-sections values in the SLHA file to the ones in XsecsInfo. \
+             If not defined, it will be generated from the SLHA file and stored in CrossSection.XSectionInfo.
 Only generated if cross-sections are read from SLHA file and not previously created
-    :param sigcut: minimum sigma*BR to be generated, by default sigcut = 0.1 fb
-    :param DoCompress: turn mass compressed topologies on/off
-    :param DoInvisible: turn invisibly compressed topologies on/off
-    :param minmassgap: maximum value for considering two R-odd particles degenerate (only revelant for DoCompress=True)
-    :returns: a TopologyList. 
-  """
-  import sys, os, copy
-
-  workdir = os.getcwd() 
-  pyslhadir = workdir + "/pyslha-1.4.3"
-  sys.path.append(pyslhadir)
-  import TopologyBuilder, SMSDataObjects, ParticleNames
-  from Tools.PhysicsUnits import addunit, rmvunit
-  import pyslha2 as pyslha
-  import CrossSection
-
-  if DoCompress and rmvunit(minmassgap,'GeV') == -1: 
-    print "[SLHAdecomposer] Please, set minmassgap"
-    return False
-
-#sigcut by default 0.1 fb
-  if not rmvunit(sigcut, 'fb'):
-    sigcut = addunit(0.1, 'fb')
-
- #creates Xsec dictionary if Xsec=None and store cross-section information if not previously defined
-  if not Xsec:
-    XsecsInfoFile = CrossSection.XSecInfoList('')  #To store information about all cross-sections in the SLHA file
-    Xsec = {}
-    slha = open(slhafile, 'r')
-    lines = slha.readlines()
-    xsecblock = False
-    for l in lines:
-      if l.startswith("#") or len(l)<2: continue
-      if 'XSECTION' in l:
-        xsecblock = True
-        sqrtS =  eval(l.split()[1])/1000.    #Values in the SLHA file are in GeV
-        pids = (eval(l.split()[5]),eval(l.split()[6]))
-        continue
-      if not xsecblock: continue  #ignores other entries
-      cs_order = eval(l.split()[1])
-      cs = addunit(eval(l.split()[6]),'fb')
-      wlabel = str(int(sqrtS))+' TeV'
-      if cs_order == 0: wlabel += ' (LO)'
-      elif cs_order == 1: wlabel += ' (NLO)'
-      elif cs_order == 2: wlabel += ' (NLL)'
-      else:
-        print '[SLHADecomposer] unknown QCD order in XSECTION line', l
-        return False
-      xsInfo = CrossSection.SingleXSecInfo()
-      xsInfo.sqrts = addunit(sqrtS,'TeV')
-      xsInfo.order = cs_order
-      xsInfo.label = wlabel
-      if not wlabel in Xsec.keys():
-        Xsec[wlabel] = {}
-        XsecsInfoFile.xsecs.append(xsInfo)
-      Xsec[wlabel][pids] = cs
-   
-
-    if XsecsInfo is None:
-      try:
-        XsecsInfo = CrossSection.XSectionInfo  #Check if cross-section information has been defined
-      except:
-        pass
-    if not XsecsInfo:
-      XsecsInfo = XsecsInfoFile              #Store information from file
-      CrossSection.XSectionInfo = XsecsInfo
-      import logging
-      log = logging.getLogger(__name__)
-      log.warning ( "Cross-section information not found. Using values from SLHA file" )
-    else:
-      for xsec in XsecsInfoFile.xsecs:
-        if not xsec in XsecsInfo.xsecs: Xsec.pop(xsec.label)    #Remove entries which do not match the previously defined cross-sections
-
-
-#Read SLHA file
-  res = pyslha.readSLHAFile(slhafile)
-
-#Get list of particles with maximum production cross-section above sigcut and maximum cross-sections
-  Pdic = {}
-  for k in Xsec.keys():
-    for k2 in Xsec[k]:
-      if Xsec[k][k2] > sigcut:
-        for ip in range(2):
-          if not Pdic.has_key(k2[ip]) or Pdic[k2[ip]] < Xsec[k][k2]: 
-            Pdic.update({k2[ip] : Xsec[k][k2]})
-
-#Get list of branching ratios for all particles:
-  BRdic = {}
-  for k in res[1].keys():
-    brs = copy.deepcopy(res[1][abs(k)].decays)
-    for br in brs:
-      br.ids = [-x for x in br.ids]
-    BRdic.update({k : res[1][abs(k)].decays, -k : brs})
-
-#Get mass list for all particles
-  Massdic = {}
-  for k in res[1].keys():
-    if k and res[1][k].mass != None:
-      Massdic.update({k : addunit(abs(res[1][k].mass),'GeV'), -k : addunit(abs(res[1][k].mass),'GeV')})
-      
-#Loop over all particles and generate all possible 1branch-elements with sigmamax*BR > sigcut
-  ElList = []
-  WList = []
-  for ptc in Pdic.keys():
-    NewEl = SMSDataObjects.BElement()
-    NewEl.momID = [ptc,ptc]
-    NewEl.masses.append(Massdic[ptc])
-    weight = Pdic[ptc]
-    ElList.append(NewEl)
-    WList.append(weight)
+        :param sigcut: minimum sigma*BR to be generated, by default sigcut = 0.1 fb
+        :param DoCompress: turn mass compressed topologies on/off
+        :param DoInvisible: turn invisibly compressed topologies on/off
+        :param minmassgap: maximum value for considering two R-odd particles degenerate (only revelant for DoCompress=True)
+        :returns: a TopologyList. 
+    """
     
-  FinalList = []
-  WFinal = []
-  newel = True  
-  while newel:
-    newel = False
-    NewList = []
-    NewWeight = []
-    for iel in range(len(ElList)):
-      BaseEl = ElList[iel]
-      ptc = BaseEl.momID.pop()
-      weight = WList[iel]
-      
-      if len(BRdic[ptc]) == 0:     # Stable final state (LSP)
-        BaseEl.momID = BaseEl.momID[0]
-        FinalList.append(BaseEl)
-        WFinal.append(weight)
-        continue
-      
-      for BR in BRdic[ptc]:
-        NewEl = copy.deepcopy(BaseEl)
-        vertparts = []
-        mass = []
-        for x in BR.ids:
-          if x in ParticleNames.Reven:
-            vertparts.append(ParticleNames.Reven[x])
-          elif x in ParticleNames.Rodd:
-            mass.append(Massdic[x])
-            NewEl.momID.append(x)
-          else:
-            print '[SLHAdecomposer] unknown particle:',x
-            return False
-          
-        NewEl.particles.append(vertparts)
-        if len(mass) == 1:
-          NewEl.masses.append(mass[0])
-        else:
-          print '[SLHAdecomp] unknown decay (R-parity violation?)'
-          return False
-        
-        if weight*BR.br > sigcut:
-          NewList.append(NewEl)
-          NewWeight.append(weight*BR.br)
-          newel = True
-                
-    if newel:
-      ElList = copy.deepcopy(NewList)
-      WList = copy.deepcopy(NewWeight)
-            
 
-  SMSTopList = SMSDataObjects.TopologyList()
-#Combine 1branch elements according to production cross-section:
-  for ptcs in Xsec[Xsec.keys()[0]].keys():
-    for iel,El1 in enumerate(FinalList):
-      for jel,El2 in enumerate(FinalList):
+    if DoCompress and rmvunit(minmassgap,'GeV') == -1: 
+        print "[SLHAdecomposer] Please, set minmassgap"
+        return False
 
-        if El1.momID == ptcs[0] and El2.momID == ptcs[1]:
-          Els = SMSDataObjects.EElement()    
-          Els.B = [copy.deepcopy(El1),copy.deepcopy(El2)]
-          weight = {}
-          for w in Xsec.keys():
-            weight.update({w : Xsec[w][ptcs]*WFinal[iel]*WFinal[jel]/(Pdic[ptcs[0]]*Pdic[ptcs[1]])})
-          Els.weight = weight          
-        
-          if max(weight.values()) < sigcut: continue
-        
-          Einfo = Els.getEinfo()
-          Top = SMSDataObjects.GTop()
-          Top.vertnumb = Einfo["vertnumb"]
-          Top.vertparts = Einfo["vertparts"]
-          Top.ElList.append(Els)
-          for ib in range(len(Top.vertnumb)):
-            if len(Top.vertparts[ib]) != Top.vertnumb[ib]:
-              print '[SLHAdecomposer] error creating topology'
-              return False
+    if type(sigcut) == type(1.): sigcut = addunit(sigcut, 'fb')
 
-          TopList = []
-          TopList.append(Top) 
-          # Do compression:          
-          if DoCompress or DoInvisible:
-            FinalTopList = TopologyBuilder.compressTopology(TopList,DoCompress,DoInvisible,minmassgap)
-          else:
-            FinalTopList = TopList
-          # Add topologies to topology list:
-          SMSTopList.addList ( FinalTopList )
+#get cross-section from file
+    XSectionList = CrossSection.getXsecFromFile(slhafile) 
+#get BRs and masses from file
+    BRdic, Massdic = getDictionariesFromSLHA(slhafile)
+
+#Remove all cross-sections below sigcut:
+    for xsec in XSectionList.XSections:
+        if xsec.value < sigcut: XSectionList.delete(xsec)
+#Get maximum cross-sections (weights) for single particles (irrespective of sqrtS):
+    maxWeight = {}
+    for pid in XSectionList.getPIDs(): maxWeight[pid] = XSectionList.getXsecsFor(pid).getMaxXsec()
+           
+#Construct 1-particle branches with all possible mothers
+    branchList = []
+    for pid in maxWeight:
+        branchList.append(Branch())
+        branchList[-1].momID = pid
+        branchList[-1].daughterID = pid
+        branchList[-1].masses = [Massdic[pid]]
+        branchList[-1].maxWeight = maxWeight[pid]
+
+    allDecayed = False
+#Now loop over branches and keep adding all decay possibilities till the end of the cascade decay
+    while not allDecayed:        
+        newBranchList = []
+        allDecayed = True
+        for branch in branchList:
+            brs = BRdic[branch.daughterID]    #List of possible decays (BRs) for daughter in branch
+            if len(brs) != 0: allDecayed = False  #False as long as there are unstable daughters
+            newBranches = branch.addDecays(brs,Massdic)  #Add all possible decays to the original branch
+            newBranchList.extend(newBranches)
+
+        branchList = []
+        for newbranch in newBranchList:
+            if newbranch.maxWeight > sigcut: branchList.append(copy.deepcopy(newbranch))  #Just keep the branches above sigcut
+
+    SMSTopList = topology.TopologyList()
+    SMSTopListCompressed = topology.TopologyList()
+#Combine pairs of branches into Eelements according to production cross-section list:
+    for pids in XSectionList.getPIDpairs():
+        for branch1 in branchList:
+            for branch2 in branchList:
+                if branch1.momID == pids[0] and branch2.momID == pids[1]:
+                    FinalBR = branch1.maxWeight*branch2.maxWeight/(maxWeight[pids[0]]*maxWeight[pids[1]])
+                    if type(FinalBR) == type(addunit(1.,'fb')): FinalBR = FinalBR.asNumber()                 
+                    weightList = XSectionList.getXsecsFor(pids)*FinalBR
+                    weightList.makeUniformLabels()                  # Adds zeros to non-existing cross-sections
+                    if weightList.getMaxXsec() < sigcut: continue   #skip elements with xsec below sigcut
+
+                    newElement = element.Element([branch1,branch2])
+                    newElement.weight = weightList            
+                    Top = topology.Topology(newElement)                 
+                    SMSTopList.addList([Top])                       
+                                        
+                    #Do compression:
+                    if DoCompress or DoInvisible:
+                        compElements = newElement.compressElement(DoCompress,DoInvisible,minmassgap)
+                        compTopList = [topology.Topology(el) for el in compElements]
+                        SMSTopListCompressed.addList(compTopList)
+
+#Combine compressed topologies with the original ones
+    SMSTopList.addList(SMSTopListCompressed)
+
+    return SMSTopList        
 
 
-  return SMSTopList    
+def getDictionariesFromSLHA(slhafile):
+    """ Read a SLHA file and get the mass and BR dictionaries  """
+
+    workdir = os.getcwd() 
+    pyslhadir = workdir + "/pyslha-1.4.3"
+    sys.path.append(pyslhadir)
+    res = pyslha.readSLHAFile(slhafile)
+
+#Get mass and branching ratios for all particles:
+    BRdic = {}
+    for pid in res[1].keys():
+        brs = copy.deepcopy(res[1][pid].decays)
+        brs_conj = copy.deepcopy(brs)
+        for br in brs_conj:    br.ids = [-x for x in br.ids]
+        BRdic[pid] = brs
+        BRdic[-pid] = brs_conj
+#Get mass list for all particles
+    Massdic = {}
+    for pid in res[1].keys():
+        if pid and res[1][pid].mass != None:
+            Massdic[pid] = addunit(abs(res[1][pid].mass),'GeV')
+            Massdic[-pid] = addunit(abs(res[1][pid].mass),'GeV')
+
+    return BRdic,Massdic
 

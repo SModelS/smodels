@@ -244,36 +244,6 @@ def getAllResults (run=None, allHistos=False):
     allresults[key] = ret
     return ret
 
-dbresults = {}
-
-def getDatabaseResults (run=None, category=None):
-    """ returns all public analyses and the topologies we have constraints for """
-    import os, copy
-    key = str(run)+str(category)
-    if dbresults.has_key (key):
-        return dbresults[key]
-    runs = SMSHelpers.runs
-    if run: runs = [ run ]
-    ret = {}
-    for r in runs:
-        # # so thats the runs I really have to think about
-        dirs = os.listdir ("%s/%s/" % (SMSHelpers.Base, r))
-        for ana in dirs:
-            if os.path.exists ("%s/%s/%s/info.txt" % (SMSHelpers.Base, r, ana)):
-                topos = getConstraints (ana, run=r).keys()
-                if not topos: continue
-                if category:
-                    if isPrivate(ana): continue
-                    newTopos=copy.deepcopy(topos)
-                    for t in newTopos:
-                        if category not in getCategories(ana, topo=t):
-                            topos.remove(t)
-                if not topos: continue
-                ret[ana] = topos
-    dbresults[key] = ret
-    return ret
-
-
 def getClosestValue (Dict, mx, my):
     """assuming that Dict is a dictionary of mx,my,ul, get the upper limit
        of the point in Dict that is closest to mx and my.
@@ -464,10 +434,10 @@ def isPrivateTopology(analysis, topology, run=None):
     if isPrivate(analysis, run):
         return True
     else:
-        field = SMSHelpers.getMetaInfoField(analysis, "private_topologies", run)
-        if field:
-            return topology in field.split()
-        return False
+        try:
+            return topology in SMSHelpers.getMetaInfoField(analysis, "private_topologies", run).split()
+        except MetaInfoError:
+            logger.exception("Could not parse field 'private_topologies'.")
 
 def isPublic(analysis, run=None):
     """DEPRECATED - Check if analysis is NOT flagged as private.
@@ -510,10 +480,6 @@ def getSqrts (analysis, run=None):
 def getPAS (analysis, run=None):
     """ get the PAS for this analysis """
     return SMSHelpers.getMetaInfoField (analysis, "pas", run)
-
-def isSuperseded (analysis, run=None):
-    """ check if analysis is superseded, if yes, return analysis name of newer analysis """
-    return SMSHelpers.getMetaInfoField (analysis, "superseded_by", run)
 
 def getOrder (analysis, run=None):
     """ get the order in perturbation theory that the exclusion lines correspond
@@ -595,25 +561,6 @@ def getConstraints (analysis, topo="all", run=None):
     constraints[key] = ret[topo]
     return ret[topo]
 
-categories = {}
-
-def getCategories (analysis, topo="all", run=None):
-    """ get the categories. if topo is "all", 
-            returns a dictionary, else it returns the constraint
-            only for the given topo, None if non-existent. """
-    key = analysis + topo + str(run)
-    if categories.has_key (key): return categories[key]
-    run = SMSHelpers.getRun (analysis, run)
-    ret = SMSHelpers.categories (analysis, run)
-    if topo == "all":
-        categories[key] = ret
-        return ret
-    if not ret.has_key (topo):
-        categories[key] = None
-        return None
-    categories[key] = ret[topo]
-    return ret[topo]
-
 def getRequirement (analysis, run=None):
     """ any requirements that come with this analysis? (e.g. onshellness) """
     return SMSHelpers.getMetaInfoField (analysis, "requires", run)
@@ -674,7 +621,6 @@ def particleName(topo):
     if part == "b": part = "sbottom"
     if part == "t": part = "stop"
     if part == "q": part = "squark"
-    if part == "l": part = "slepton"
     return part
 
 def massDecoupling_ (topo):
@@ -746,20 +692,6 @@ def exists(analysis, topo, run=None):
         histo = SMSHelpers.getUpperLimitFromHisto(analysis, toponame, run2)
         if not histo: return False
 
-    return True
-
-def hasExclusionLine (ana, topo):
-    """ check if the exclusion line run/analysis/sms.root(exclusion_topo) exists.
-            for topologies with intermediate masses: check for all available results
-            listed in the axes-information."""
-    import SMSInterpolation
-    axes = getaxes(ana, topo)
-    if not axes: return False
-    for a in axes:
-        mzname = None
-        if a['mz'] and len(a['mz']): mzname = a['mz'][0]
-        toponame = SMSInterpolation.gethistname(topo, mzname)
-        if not getExclusionLine(toponame,ana): return False
     return True
 
 
