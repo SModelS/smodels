@@ -254,6 +254,7 @@ def getDatabaseResults (run=None, category=None):
         return dbresults[key]
     runs = SMSHelpers.runs
     if run: runs = [ run ]
+    print "runs=",runs
     ret = {}
     for r in runs:
         # # so thats the runs I really have to think about
