@@ -113,7 +113,7 @@ def compareM(masses, d):
         return True
       else: return None
 
-def dogriddata(ana,topo,d,debug=True,run=None):
+def dogriddata(ana,topo,masses,d,debug=True,run=None):
   """ make np.array and use scipy.griddata funciton for ana, topo """
   masslist=[]
   ullist=[]
@@ -213,10 +213,10 @@ def UpperLimit(ana, topo, masses,debug=True,run=None):
       xsecs.append(xs)
       xvals.append(getxval(masses[0],masses[-1],ds['mz'][0]))
   if len(xsecs)<3:
-    return dogriddata(ana,topo,d,debug,run)
-  p = numpy.polyfit(xvals,xsecs,len(xsecs)-1)
+    return dogriddata(ana,topo,masses,d,debug,run)
+  p = np.polyfit(xvals,xsecs,len(xsecs)-1)
   X = float(rmvunit(masses[1],"GeV")-rmvunit(masses[-1],"GeV"))/float(rmvunit(masses[0],"GeV")-rmvunit(masses[-1],"GeV"))
-  XSec = float(numpy.polyval(p,X))
+  XSec = float(np.polyval(p,X))
   if X>max(xvals) or X<min(xvals):
     if debug: print "[SMSInterpolation] error: x value for %s/%s out of range, no extrapolation" % ( ana, topo )
     return None
