@@ -333,7 +333,7 @@ def getInterpolatedUpperLimitDelaunay (Dict, inmx, inmy):
         grid_x = mx
         grid_y = my
         return float(ip.griddata(points, values, (grid_x, grid_y), method='linear'))
-    except Exception as e:
+    except Exception, e:
         logger.error ("cannot interpolate: %s. use closest value." % str(e))
         if not inConvexHull (Dict, inmx, inmy): return False
         return getClosestValue (Dict, inmx, inmy)
