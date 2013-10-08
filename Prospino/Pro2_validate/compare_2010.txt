@@ -1,0 +1,6 @@
+ng: change in the t and u channel mass, difference okay
+hh: change in the Higgs mass of the validation file, difference okay
+ht: dto
+nn: rounding errors, okay
+tb: change in the scale logs, difference okay
+bb: dto
