@@ -605,6 +605,7 @@ def getCategories (analysis, topo="all", run=None):
     if categories.has_key (key): return categories[key]
     run = SMSHelpers.getRun (analysis, run)
     ret = SMSHelpers.categories (analysis, run)
+    if not ret: return None
     if topo == "all":
         categories[key] = ret
         return ret
