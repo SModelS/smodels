@@ -212,7 +212,7 @@ def UpperLimit(ana, topo, masses,debug=True,run=None):
     if xs:
       xsecs.append(xs)
       xvals.append(getxval(masses[0],masses[-1],ds['mz'][0]))
-  if len(xsecs)<3:
+  if len(xsecs)<4:
     return dogriddata(ana,topo,masses,d,debug,run)
   p = np.polyfit(xvals,xsecs,len(xsecs)-1)
   X = float(rmvunit(masses[1],"GeV")-rmvunit(masses[-1],"GeV"))/float(rmvunit(masses[0],"GeV")-rmvunit(masses[-1],"GeV"))
