@@ -197,25 +197,25 @@ def UpperLimit(ana, topo, masses,debug=True,run=None):
       return SMSResults.getUpperLimit(ana, gethistname(topo,d[0]['mz'][0]),masses[getaxis('x',d[0]['axes'])],masses[getaxis('y',d[0]['axes'])],interpolate=True)
     if debug: print "[SMSInterpolation] error: Only one histogram available for %s/%s, cannot interpolate for intermediate mass." % ( ana, topo )
     return None
-
-  xsecs = []
-  xvals = []
-  for ds in d:
-    if not ds['mz']:
-      if debug: print "[SMSInterpolation] error: No information on intermediate mass availabel for %s/%s." % ( ana, topo )
-      return None
-    if 'LSP' in ds['mz'][0] or 'D' in ds['mz'][0] or "M1" in ds['mz'][0]:
-      continue
-    xs=rmvunit(SMSResults.getUpperLimit(ana, gethistname(topo,ds['mz'][0]),masses[getaxis('x',ds['axes'])],masses[getaxis('y',ds['axes'])],interpolate=True),'pb')
-    if xs:
-      xsecs.append(xs)
-      xvals.append(getxval(masses[0],masses[-1],ds['mz'][0]))
-  if len(xsecs)<3:
-    return dogriddata(ana,topo,masses,d,debug,run)
-  p = np.polyfit(xvals,xsecs,len(xsecs)-1)
-  X = float(rmvunit(masses[1],"GeV")-rmvunit(masses[-1],"GeV"))/float(rmvunit(masses[0],"GeV")-rmvunit(masses[-1],"GeV"))
-  XSec = float(np.polyval(p,X))
-  if X>max(xvals) or X<min(xvals):
-    if debug: print "[SMSInterpolation] error: x value for %s/%s out of range, no extrapolation" % ( ana, topo )
-    return None
-  return addunit(XSec,'pb')
+  return dogriddata(ana,topo,masses,d,debug,run)
+#  xsecs = []
+#  xvals = []
+#  for ds in d:
+#    if not ds['mz']:
+#      if debug: print "[SMSInterpolation] error: No information on intermediate mass availabel for %s/%s." % ( ana, topo )
+#      return None
+#    if 'LSP' in ds['mz'][0] or 'D' in ds['mz'][0] or "M1" in ds['mz'][0]:
+#      continue
+#    xs=rmvunit(SMSResults.getUpperLimit(ana, gethistname(topo,ds['mz'][0]),masses[getaxis('x',ds['axes'])],masses[getaxis('y',ds['axes'])],interpolate=True),'pb')
+#    if xs:
+#      xsecs.append(xs)
+#      xvals.append(getxval(masses[0],masses[-1],ds['mz'][0]))
+#  if len(xsecs)<3:
+#    return dogriddata(ana,topo,masses,d,debug,run)
+#  p = np.polyfit(xvals,xsecs,len(xsecs)-1)
+#  X = float(rmvunit(masses[1],"GeV")-rmvunit(masses[-1],"GeV"))/float(rmvunit(masses[0],"GeV")-rmvunit(masses[-1],"GeV"))
+#  XSec = float(np.polyval(p,X))
+#  if X>max(xvals) or X<min(xvals):
+#    if debug: print "[SMSInterpolation] error: x value for %s/%s out of range, no extrapolation" % ( ana, topo )
+#    return None
+#  return addunit(XSec,'pb')
