@@ -561,6 +561,26 @@ def getConstraints (analysis, topo="all", run=None):
     constraints[key] = ret[topo]
     return ret[topo]
 
+categories = {}
+
+def getCategories (analysis, topo="all", run=None):
+    """ get the categories. if topo is "all", 
+            returns a dictionary, else it returns the constraint
+            only for the given topo, None if non-existent. """
+    key = analysis + topo + str(run)
+    if categories.has_key (key): return categories[key]
+    run = SMSHelpers.getRun (analysis, run)
+    ret = SMSHelpers.categories (analysis, run)
+    if not ret: return None
+    if topo == "all":
+        categories[key] = ret
+        return ret
+    if not ret.has_key (topo):
+        categories[key] = None
+        return None
+    categories[key] = ret[topo]
+    return ret[topo]
+
 def getRequirement (analysis, run=None):
     """ any requirements that come with this analysis? (e.g. onshellness) """
     return SMSHelpers.getMetaInfoField (analysis, "requires", run)
