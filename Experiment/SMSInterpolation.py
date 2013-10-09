@@ -25,8 +25,6 @@ def gethistname(topo, mz):
     return topo
   elif 'D' in mz:
     return topo+'D'+mz.split('=')[1]
-  elif 'LSP' in mz:
-    return topo+"LSP"
   else: return topo+mz
 
 def getxval(mx, my, mz,mass=False):
@@ -206,7 +204,7 @@ def UpperLimit(ana, topo, masses,debug=True,run=None):
     if not ds['mz']:
       if debug: print "[SMSInterpolation] error: No information on intermediate mass availabel for %s/%s." % ( ana, topo )
       return None
-    if 'LSP' in ds['mz'][0] or 'D' in ds['mz'][0]:
+    if 'LSP' in ds['mz'][0] or 'D' in ds['mz'][0] or "M1" in ds['mz'][0]:
       continue
     xs=rmvunit(SMSResults.getUpperLimit(ana, gethistname(topo,ds['mz'][0]),masses[getaxis('x',ds['axes'])],masses[getaxis('y',ds['axes'])],interpolate=True),'pb')
     if xs:
