@@ -18,6 +18,7 @@ else:
 
 
 for slhafile in slhafileList:
+  print slhafile
   
 #  infile = open(slhafile,'r')
 #  lines = infile.readlines()
@@ -52,7 +53,7 @@ for slhafile in slhafileList:
 #Generate events and compute cross-sections:
   nevts = 10000
   SLHATools.writeXSecToSLHAFile(slhafile,nevts,printLHE=False)
-  sys.exit()
+  continue
 
   DoCompress = False
   DoInvisible = False
