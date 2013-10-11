@@ -230,6 +230,7 @@ class EAnalysis:
         If nounit=True, the result is given as number assuming fb units """
     from  Experiment import LimitGetter
     xmass = LimitGetter.GetPlotLimit(mass,self,complain=False)
+        
     if type(xmass) != type(addunit(1.,'pb')): return None
     if nounit: xmass = rmvunit(xmass,'fb')
     return xmass

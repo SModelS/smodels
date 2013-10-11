@@ -32,7 +32,7 @@ program main
 !----------------------------------------------------------------------------
 
 !----------------------------------------------------------------------------
-  final_state_in = 'll'                                                     !
+  final_state_in = 'sg'                                                     !
 !                                                                           !
 !                   ng     neutralino/chargino + gluino                     !
 !                   ns     neutralino/chargino + squark                     !
