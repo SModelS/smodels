@@ -242,6 +242,7 @@ def runPythia ( slhafile, n, sqrts=7, datadir="./data/", etcdir="./etc/",
     :param installdir: is where pythia_lhe is to be found.
     :param printLHE: choose if LHE event file is written to disk or not. If False, returns the events as a string with key LHEevents
   """
+    
   import commands, os, sys
   # print "[SMSXSecs.runPythia] try to run pythia_lhe at sqrt(s)=%d with %d events" % (sqrts,n)
   o=commands.getoutput ( "cp %s %s/fort.61" % ( slhafile, datadir ) )
