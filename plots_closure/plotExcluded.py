@@ -49,7 +49,7 @@ if metadata['Kfactor']:
 
 #Get data:
 for pt in pts:
-  x,y,res,lim,tot = pt.split()  
+  x,y,res,lim,tot = pt.split()    
 #  R = float(eval(tot))/float(eval(lim))
   R = float(eval(res))/float(eval(lim))
   x = eval(x)
@@ -91,14 +91,18 @@ if metadata['Root file'] and os.path.isfile(metadata['Root file'][0]):
     if 'expected' in ob.GetName(): continue
     if metadata['Root tag']:
       for rootTag in metadata['Root tag']:
-        if rootTag[0] in ob.GetName():  add = rootTag
+        Tag = rootTag
+        if type(Tag) == type([]) and len(Tag) > 1: Tag = Tag[0]
+        if Tag in ob.GetName():  add = rootTag
     else:
       add = 'Official Exclusion'
     if add:
       exp = Tob
+      exp.Sort()
       exp.SetLineStyle(len(base.GetListOfGraphs())-2)
       base.Add(exp,"L")
-      if len(add) == 2: leg.AddEntry(exp,add[1],"L")
+      if type(add) == type([]): leg.AddEntry(exp,add[1],"L")
+      else: leg.AddEntry(exp,add,"L")
 
         
         

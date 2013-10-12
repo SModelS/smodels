@@ -847,5 +847,6 @@
 title: #tilde{#chi}_{1}^{#pm} #tilde{#chi}_{2}^{0} #rightarrow ll#tau#nu #tilde{#chi}_{1}^{0} #tilde{#chi}_{1}^{0}, x=0.6, SUS-13-006, 8 TeV, LO
 Out file: TChiChipmSlepStau060.png
 Root file: /home/lessa/SMS_database/8TeV/SUS13006/sms.root
-Root tag: exclusion_TChiChipmSlepStau
+Root tag: exclusion_TChiChipmSlepStau050: #scale[0.85]{Official Exclusion (x=0.5)}
+Root tag: exclusion_TChiChipmSlepStau095: #scale[0.85]{Official Exclusion (x=0.95)}
 Kfactor: 1.2
