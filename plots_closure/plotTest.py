@@ -21,7 +21,7 @@ info = data[data.find('#END'):].split('\n')
 
 #Get data:
 for pt in pts:
-  x,y,res,lim = pt.split()    
+  x,y,res,lim,tot = pt.split()    
   x = eval(x)
   y = eval(y)
   res = eval(res)
@@ -50,12 +50,14 @@ AuxPlot.set_palette(gStyle)
 c1 = TCanvas()
 c1.SetLogz()
 exp_limit.Draw('COLZ')
-c2 = TCanvas()
-c2.SetLogz()
-exp_data.Draw('COLZ')
+exp_limit.GetZaxis().SetLimits(1.,10.**3)
+#c2 = TCanvas()
+#c2.SetLogz()
+#exp_data.Draw('COLZ')
 c3 = TCanvas()
 c3.SetLogz()
 theo.Draw('COLZ')
+theo.GetZaxis().SetLimits(1.,10.**3)
 
 
 
