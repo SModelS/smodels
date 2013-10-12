@@ -36,8 +36,7 @@ metadata = {}
 if len(info) > 0:
   for line in info:
     for tag in tags:
-      if tag in line:
-        metadata[tag] = line.lstrip(tag+' :').rstrip()
+      if tag in line: metadata[tag] = line.lstrip(tag+' :').rstrip()
 Rmax = 1.
 if 'Kfactor' in metadata.keys():
   Rmax = Rmax/eval(metadata['Kfactor'])
@@ -46,8 +45,8 @@ if 'Kfactor' in metadata.keys():
 #Get data:
 for pt in pts:
   x,y,res,lim,tot = pt.split()  
-  R = float(eval(tot))/float(eval(lim))
-#  R = float(eval(res))/float(eval(lim))
+#  R = float(eval(tot))/float(eval(lim))
+  R = float(eval(res))/float(eval(lim))
   x = eval(x)
   y = eval(y)
   lim = eval(lim)
@@ -78,6 +77,7 @@ if 'Root file' in metadata.keys() and os.path.isfile(metadata['Root file']):
     Tob = ob.ReadObj()
     if type(Tob) == type(TGraph()):
       if not 'Root tag' in metadata.keys() or metadata['Root tag'] in ob.GetName():
+        if 'expected' in ob.GetName(): continue
         exp = Tob
         base.Add(exp,"L")
 
@@ -95,7 +95,7 @@ AuxPlot.Default(leg,"Legend")
 leg.AddEntry(exc,"Excluded","P")
 leg.AddEntry(allow,"Allowed","P")
 leg.AddEntry(not_tested,"Not Tested","P")
-if 'Root file' in metadata.keys(): leg.AddEntry(exp,"Official Exclusion","L")
+#if 'Root file' in metadata.keys(): leg.AddEntry(exp,"Official Exclusion","L")
 leg.Draw()
 
 
