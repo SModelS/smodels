@@ -51,4 +51,5 @@
 title: #tilde{b}_{1} #rightarrow t (#tilde{#chi}_{1}^{#pm} #rightarrow W#tilde{#chi}_{1}^{0}), m_{#tilde{#chi}_{1}^{0}}/m_{#tilde{#chi}_{1}^{#pm}}=0.6, SUS-13-008, 8 TeV, NLL
 Out file: T6ttWW060.png
 Root file: /home/lessa/SMS_database/8TeV/SUS13008/sms.root
-Root tag: exclusion_T6ttWWx
+Root tag: exclusion_T6ttWWx200: #scale[0.8]{#splitline{Official Exclusion}{m_{#tilde{#chi}_{1}^{0}}/m_{#tilde{#chi}_{1}^{#pm}}=0.5}}
+Root tag: exclusion_T6ttWWx125: #scale[0.8]{#splitline{Official Exclusion}{m_{#tilde{#chi}_{1}^{0}}/m_{#tilde{#chi}_{1}^{#pm}}=0.8}}
