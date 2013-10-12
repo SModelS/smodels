@@ -33,14 +33,19 @@ data = infile.read()
 pts = data[:data.find('#END')-1].split('\n')
 info = data[data.find('#END'):].split('\n')
 metadata = {}
+for tag in tags: metadata[tag] = None
 if len(info) > 0:
   for line in info:
     for tag in tags:
-      if tag in line: metadata[tag] = line.lstrip(tag+' :').rstrip()
+      if tag in line:
+        if not metadata[tag]: metadata[tag] = []
+        entry = line.lstrip(tag+' :').rstrip()
+        if ':' in entry: entry = entry.split(':')
+        metadata[tag].append(entry)
 Rmax = 1.
-if 'Kfactor' in metadata.keys():
-  Rmax = Rmax/eval(metadata['Kfactor'])
-  metadata['title'] += '*'+metadata['Kfactor']
+if metadata['Kfactor']:
+  Rmax = Rmax/eval(metadata['Kfactor'][0])
+  metadata['title'][0] += '*'+metadata['Kfactor'][0]
 
 #Get data:
 for pt in pts:
@@ -68,18 +73,35 @@ base.Add(exc,"P")
 base.Add(allow,"P")
 base.Add(not_tested,"P")
 
+leg = TLegend(0.6325287,0.7408994,0.9827586,1)
+AuxPlot.Default(leg,"Legend")
+leg.AddEntry(exc,"Excluded","P")
+leg.AddEntry(allow,"Allowed","P")
+leg.AddEntry(not_tested,"Not Tested","P")
+
    
 #Get experimental curve
-if 'Root file' in metadata.keys() and os.path.isfile(metadata['Root file']):
-  rootfile = TFile(metadata['Root file'],"read")
-  objs =  gDirectory.GetListOfKeys()  
+if metadata['Root file'] and os.path.isfile(metadata['Root file'][0]):
+  rootfile = TFile(metadata['Root file'][0],"read")
+  objs =  gDirectory.GetListOfKeys()
   for ob in objs:
+    add = False
     Tob = ob.ReadObj()
-    if type(Tob) == type(TGraph()):
-      if not 'Root tag' in metadata.keys() or metadata['Root tag'] in ob.GetName():
-        if 'expected' in ob.GetName(): continue
-        exp = Tob
-        base.Add(exp,"L")
+    if type(Tob) != type(TGraph()): continue
+    if 'expected' in ob.GetName(): continue
+    if metadata['Root tag']:
+      for rootTag in metadata['Root tag']:
+        if rootTag[0] in ob.GetName():  add = rootTag
+    else:
+      add = 'Official Exclusion'
+    if add:
+      exp = Tob
+      exp.SetLineStyle(len(base.GetListOfGraphs())-2)
+      base.Add(exp,"L")
+      if len(add) == 2: leg.AddEntry(exp,add[1],"L")
+
+        
+        
 
 plane = TCanvas("c1", "c1",0,0,800,500)
 AuxPlot.Default(plane,"TCanvas")
@@ -89,18 +111,11 @@ base.GetXaxis().SetTitle("M (GeV)")
 base.GetYaxis().SetTitle("m_{LSP} (GeV)")
 base.GetYaxis().SetTitleOffset(0.75)
 gPad.RedrawAxis()  
-
-leg = TLegend(0.6325287,0.7408994,0.9827586,1)
-AuxPlot.Default(leg,"Legend")
-leg.AddEntry(exc,"Excluded","P")
-leg.AddEntry(allow,"Allowed","P")
-leg.AddEntry(not_tested,"Not Tested","P")
-#if 'Root file' in metadata.keys(): leg.AddEntry(exp,"Official Exclusion","L")
 leg.Draw()
 
 
-if 'title' in metadata.keys():
-  title = metadata['title']  
+if metadata['title']:
+  title = metadata['title'][0]
   tit = TPaveLabel(0.054253,0.8308351,0.5948276,0.9486081,title,"NDC")
   tit.SetBorderSize(4)
   tit.SetFillColor(0)
@@ -111,7 +126,7 @@ if 'title' in metadata.keys():
 #exp_limit.Draw('COLZ')
 #exc.Draw("AP")
 
-if 'Out file' in metadata.keys(): c1.Print(metadata['Out file'])
+if metadata['Out file']: c1.Print(metadata['Out file'][0])
 ans = raw_input("Hit any key to close\n")
 
   

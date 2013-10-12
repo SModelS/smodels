@@ -577,3 +577,10 @@
 725.0 50.0 1.30757489539 1.39296246149 67.7499998488
 825.0 625.0 0.563781954897 15.1251322463 1.03199993442
 525.0 375.0 8.56892731449 26.4403965502 16.1799989911
+#END
+title: #tilde{#chi}_{1}^{#pm} #tilde{#chi}_{2}^{0} #rightarrow lll#nu #tilde{#chi}_{1}^{0} #tilde{#chi}_{1}^{0}, x=0.25, SUS-13-006, 8 TeV, LO
+Out file: TChiChipmSlepL025.png
+Root file: /home/lessa/SMS_database/8TeV/SUS13006/sms.root
+Root tag: exclusion_TChiChipmSlepL005:Official Exclusion x=0.05
+Root tag: exclusion_TChiChipmSlepL050:Official Exclusion x=0.5
+Kfactor: 1.2
