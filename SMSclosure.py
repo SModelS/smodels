@@ -12,10 +12,14 @@ if os.path.isfile(sys.argv[1]):
   slhafileList = [sys.argv[1]]  
 else:
   slhafileList = glob.glob(sys.argv[1]+'*.slha')
-  outfile = open(sys.argv[1][sys.argv[1].rfind('/')+1:]+'.dat','w')
+  if len(sys.argv) > 4:
+    outfile = open(sys.argv[4],'w')
+  else:
+    outfile = open(sys.argv[1][sys.argv[1].rfind('/')+1:]+'.dat','w')
 
 
 for slhafile in slhafileList:
+  print slhafile
   res = 0.
   DoCompress = False
   DoInvisible = False

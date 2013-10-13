@@ -36,6 +36,12 @@
 500.0 75.0 9.89883320809 4.58346462498 53.0199988051
 650.0 225.0 2.36027981118 5.44945000567 15.1299997157
 500.0 150.0 9.81820721454 6.67710320946 52.5599988031
+#END
+title: #tilde{#chi}_{1}^{#pm} #tilde{#chi}_{2}^{0} #rightarrow lll#nu #tilde{#chi}_{1}^{0} #tilde{#chi}_{1}^{0}, x=0.5, Weakino, 8 TeV, LO
+Out file: TChiChipmSlepL050Weakino.png
+Root file: /home/lessa/SMS_database/8TeV/Weakino8TeV/sms.root
+Root tag: exclusion_TChiChipmSlepL050:Official Exclusion x=0.5
+Kfactor: 1.2
 450.0 100.0 16.4326786854 6.66809169343 84.3999980048
 650.0 125.0 2.349967812 3.51715937654 15.219999714
 625.0 125.0 2.96722976262 3.89278242882 18.4299996349
