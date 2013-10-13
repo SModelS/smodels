@@ -577,3 +577,10 @@
 725.0 500.0 1.30336889573 18.0053148419 2.62300184808
 600.0 400.0 4.11897167048 21.911908493 8.338000521
 500.0 375.0 11.1195231104 56.415380979 20.2799986938
+#END
+title: #tilde{#chi}_{1}^{#pm} #tilde{#chi}_{2}^{0} #rightarrow lll#nu #tilde{#chi}_{1}^{0} #tilde{#chi}_{1}^{0}, x=0.25, Weakinos, 8 TeV, LO
+Out file: TChiChipmSlepL025Weakinos.png
+Root file: /home/lessa/SMS_database/8TeV/Weakinos8TeV/sms.root
+Root tag: exclusion_TChiChipmSlepL005:Official Exclusion x=0.05
+Root tag: exclusion_TChiChipmSlepL050:Official Exclusion x=0.5
+Kfactor: 1.2
