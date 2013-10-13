@@ -2791,3 +2791,8 @@
 825.0 225.0 17.902435 26.6735479236 22.471495
 400.0 125.0 2661.524501 742.554664612 2857.828901
 1350.0 0.0 -1.0 1.0 0.474107
+#END
+title: #tilde{q} #rightarrow q #tilde{#chi}_{1}^{0}, RA2, 8 TeV, NLL
+Out file: T2RA2.png
+Root file: /home/lessa/SMS_database/8TeV/RA28TeV/sms.root
+Root tag: exclusion_T2: Official Exclusion

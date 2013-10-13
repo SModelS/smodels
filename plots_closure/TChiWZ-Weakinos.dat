@@ -1027,3 +1027,9 @@
 410.0 90.0 -1.0 1.0 43.5
 430.0 100.0 -1.0 1.0 34.58
 375.0 150.0 44.38435 96.3094681501 65.95
+#END
+title: #tilde{#chi}_{1}^{#pm} #tilde{#chi}_{2}^{0} #rightarrow WZ #tilde{#chi}_{1}^{0} #tilde{#chi}_{1}^{0}, Weakinos, 8 TeV, LO
+Out file: TChiWZWeakinos.png
+Root file: /home/lessa/SMS_database/8TeV/Weakinos8TeV/sms.root
+Root tag: exclusion_TChiWZ: Official Exclusion
+Kfactor: 1.2

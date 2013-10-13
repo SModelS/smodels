@@ -2757,3 +2757,8 @@
 900.0 150.0 -1.0 1.0 1.127819
 825.0 100.0 -1.0 1.0 2.29437
 1925.0 275.0 -1.0 1.0 0.000453
+#END
+title: #tilde{t}_{1} #rightarrow t #tilde{#chi}_{1}^{0}, LeptonicStop, 8 TeV, NLL
+Out file: T2tt-Leptonic.png
+Root file: /home/lessa/SMS_database/8TeV/LeptonicStop8TeV/sms.root
+Root tag: exclusion_T2tt: Official Exclusion
