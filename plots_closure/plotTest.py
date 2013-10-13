@@ -50,14 +50,14 @@ AuxPlot.set_palette(gStyle)
 c1 = TCanvas()
 c1.SetLogz()
 exp_limit.Draw('COLZ')
-exp_limit.GetZaxis().SetLimits(1.,10.**3)
+exp_limit.GetZaxis().SetRangeUser(0.5,10.**3)
 #c2 = TCanvas()
 #c2.SetLogz()
 #exp_data.Draw('COLZ')
 c3 = TCanvas()
 c3.SetLogz()
 theo.Draw('COLZ')
-theo.GetZaxis().SetLimits(1.,10.**3)
+theo.GetZaxis().SetRangeUser(0.5,10.**3)
 
 
 

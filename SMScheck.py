@@ -19,36 +19,7 @@ else:
 
 for slhafile in slhafileList:
   print slhafile
-  
-#  infile = open(slhafile,'r')
-#  lines = infile.readlines()
-#  for line in lines:
-#    if '1000021' in line and len(line.split()) == 2: mM = eval(line.split()[1])  #Gluino
-#    if '1000022' in line and len(line.split()) == 2: m = eval(line.split()[1])   #N1
-#    if '1000024' in line and len(line.split()) == 2: mI = eval(line.split()[1])  #C1
-#  
-#  x = (mI-m)/(mM-m)
-#  if mI-m < 81.:
-#    print slhafile
-#    os.remove(slhafile)
-#  elif abs(x-0.7) < 0.01 and not '070' in slhafile:
-#    print slhafile,x
-#  elif abs(x-0.5) < 0.01 and '070' in slhafile:
-#    print slhafile,x
-#  elif abs(x-0.7) > 0.01 and abs(x-0.5) > 0.01:
-#    print slhafile,x    
-#  continue
-    
-  
-#  fname = slhafile[slhafile.rfind('/'):]
-#  mM = eval(fname[fname.find('_')+1:fname.rfind('_')])
-#  m = eval(fname[fname.rfind('_')+1:fname.rfind('.')])
-#  if mM-m < 116:
-#    print slhafile
-#    os.remove(slhafile)
-#  continue
-
-  
+ 
 
 #Generate events and compute cross-sections:
   nevts = 10000

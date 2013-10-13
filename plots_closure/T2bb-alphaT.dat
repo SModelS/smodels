@@ -2718,3 +2718,8 @@
 1025.0 600.0 -1.0 1.0 0.365083
 1950.0 425.0 -1.0 1.0 0.000369
 1550.0 100.0 -1.0 1.0 0.009495
+#END
+title: #tilde{b}_{1} #rightarrow b #tilde{#chi}_{1}^{0}, alphaT, 8 TeV, NLL
+Out file: T2bb.png
+Root file: /home/lessa/SMS_database/8TeV/alphaT8TeV/sms.root
+Root tag: exclusion_T2bb: Official Exclusion

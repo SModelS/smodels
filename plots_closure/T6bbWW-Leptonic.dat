@@ -457,3 +457,8 @@
 425.0 150.0 230.192309 82.6754420996 298.651079
 625.0 275.0 18.351715 34.4873033464 26.935459
 300.0 50.0 1778.92043 520.622611046 2304.18303
+#END
+title: #tilde{t}_{1} #rightarrow b (#tilde{#chi}_{1}^{#pm} #rightarrow W#tilde{#chi}_{1}^{0}), x=0.5, LeptonicStop, 8 TeV, NLL
+Out file: T6bbWW050.png
+Root file: /home/lessa/SMS_database/8TeV/LeptonicStop8TeV/sms.root
+Root tag: exclusion_T6bbWW050: #scale[0.8]{Official Exclusion (x=0.5)}
