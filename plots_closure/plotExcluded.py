@@ -99,7 +99,7 @@ if metadata['Root file'] and os.path.isfile(metadata['Root file'][0]):
     if add:
       print ob.GetName()
       exp = Tob
-#      exp.Sort()
+      exp.Sort()
       exp.SetLineStyle(len(base.GetListOfGraphs())-2)
       base.Add(exp,"L")
       if type(add) == type([]): leg.AddEntry(exp,add[1],"L")
