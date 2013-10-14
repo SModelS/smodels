@@ -49,9 +49,11 @@ if metadata['Kfactor']:
 
 #Get data:
 for pt in pts:
-  x,y,res,lim,tot = pt.split()    
+  x,y,res,lim,cond,tot = pt.split()    
 #  R = float(eval(tot))/float(eval(lim))
   R = float(eval(res))/float(eval(lim))
+  if eval(res) < 0.: continue
+  if cond == 'None': cond = '0.'
   x = eval(x)
   y = eval(y)
   lim = eval(lim)
@@ -65,8 +67,6 @@ for pt in pts:
   else:
     print 'Unknown R value',R
     sys.exit()
-    
-
 
 base = TMultiGraph()
 base.Add(exc,"P")
@@ -80,7 +80,6 @@ leg.AddEntry(allow,"Allowed","P")
 leg.AddEntry(not_tested,"Not Tested","P")
 
    
-#Get experimental curve
 if metadata['Root file'] and os.path.isfile(metadata['Root file'][0]):
   rootfile = TFile(metadata['Root file'][0],"read")
   objs =  gDirectory.GetListOfKeys()
@@ -88,18 +87,16 @@ if metadata['Root file'] and os.path.isfile(metadata['Root file'][0]):
     add = False
     Tob = ob.ReadObj()
     if type(Tob) != type(TGraph()): continue
-    if 'expected' in ob.GetName(): continue
     if metadata['Root tag']:
       for rootTag in metadata['Root tag']:
         Tag = rootTag
         if type(Tag) == type([]) and len(Tag) > 1: Tag = Tag[0]
-        if Tag in ob.GetName():  add = rootTag
+        if Tag == ob.GetName():  add = rootTag
     else:
       add = 'Official Exclusion'
     if add:
-      print ob.GetName()
       exp = Tob
-      exp.Sort()
+#      exp.Sort()
       exp.SetLineStyle(len(base.GetListOfGraphs())-2)
       base.Add(exp,"L")
       if type(add) == type([]): leg.AddEntry(exp,add[1],"L")
@@ -128,8 +125,6 @@ if metadata['title']:
   tit.SetTextSize(0.2727273)
   tit.Draw()
 
-#exp_limit.Draw('COLZ')
-#exc.Draw("AP")
 
 if metadata['Out file']: c1.Print(metadata['Out file'][0])
 ans = raw_input("Hit any key to close\n")

@@ -1,6 +1,10 @@
 #!/usr/bin/python
 
+
 import sys, glob, os
+smsdir = os.getcwd() + '/SMSfrozen/'
+sys.path.append(smsdir)
+
 from Theory import SLHADecomposer, CrossSection, ClusterTools
 from Tools.PhysicsUnits import addunit, rmvunit
 from Experiment import SMSAnalysisFactory
@@ -12,10 +16,7 @@ if os.path.isfile(sys.argv[1]):
   slhafileList = [sys.argv[1]]  
 else:
   slhafileList = glob.glob(sys.argv[1]+'*.slha')
-  if len(sys.argv) > 4:
-    outfile = open(sys.argv[4],'w')
-  else:
-    outfile = open(sys.argv[1][sys.argv[1].rfind('/')+1:]+'.dat','w')
+  outfile = open(sys.argv[4],'w')
 
 
 for slhafile in slhafileList:
@@ -51,17 +52,14 @@ for slhafile in slhafileList:
   elif len(Analysis.ResultList) == 0:
     res = -1.
     limit = 1.  #dummy
+    cond = -1. #dummy
   else:      
     cluster = Analysis.ResultList[0]
     res = rmvunit(cluster.result_dic.values()[0].values()[0],'fb')
     limit = rmvunit(cluster.explimit,'fb')
-    if res/rmvunit(totxsec.values()[0],'fb') < 0.03: print slhafile
+    cond = cluster.getMaxCondition()
 #Print result:
-  try:
-    outfile.write(str(Mmass)+" "+str(LSPmass)+" "+str(res)+" "+str(limit)+" "+str(rmvunit(totxsec.values()[0],'fb'))+"\n")
-  except:    
-    print str(Mmass)+" "+str(LSPmass)+" "+str(res)+" "+str(limit)+" "+str(rmvunit(totxsec.values()[0],'fb'))+"\n"
+  outfile.write(str(Mmass)+" "+str(LSPmass)+" "+str(res)+" "+str(limit)+" "+str(cond)+" "+str(rmvunit(totxsec.values()[0],'fb'))+"\n")
 
-try: outfile.close()
-except: pass  
+outfile.close()
 sys.exit()

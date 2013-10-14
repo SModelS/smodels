@@ -22,7 +22,7 @@ printer=SMSPrettyPrinter.SMSPrettyPrinter()
 nevts = 10000
 slhafile = "slha/andrePT4.slha"
 slhafile = "TGQ_1600_200.slha"
-slhafile = "slha_xsec/T6ttWW_500_425_LSP50.slha"
+slhafile = "slha_xsec/TChiChipmSlepStau_775_25.slha"
 
 WriteToFile = True
 if not WriteToFile:
