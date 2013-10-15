@@ -3,31 +3,35 @@
 import argparse
 import os, sys
 
-argparser = argparse.ArgumentParser(description='plots the exclusion region and envelope')
-argparser.add_argument( 'input', help='input data file (mother_mass,LSP_mass,R)')
-args=argparser.parse_args()
-
 from ROOT import *
 import AuxPlot
 
+inputOn= 'TChiWZ-ATLAS.dat'
+inputOff= 'TChiWZoff-ATLAS.dat'
 #Define metadata tags:
 tags = ['title','Root file','Out file','Kfactor','Root tag']
 #Get metadata:
-if not os.path.isfile(args.input):
-  print 'Input file not found'
-  sys.exit()
-metadata = AuxPlot.getMetadata(args.input,tags)
+metadata = AuxPlot.getMetadata(inputOn,tags)
 Rmax = 1.
 if metadata['Kfactor']:
   Rmax = Rmax/eval(metadata['Kfactor'][0])
   metadata['title'][0] += '*'+metadata['Kfactor'][0]
 
-#Get data:
-results = AuxPlot.getData(args.input,Rmax)
-exc = results['exc']
-xv = results['xv']
-yv = results['yv']
-zv = results['limv']
+#Get data for on and off-shell and combine:
+resultsOn = AuxPlot.getData(inputOn,Rmax)
+resultsOff = AuxPlot.getData(inputOff,Rmax)
+excOn = resultsOn['exc']
+excOff = resultsOff['exc']
+exc = TGraph()
+for ipt in range(excOff.GetN()+excOn.GetN()):
+  x,y = Double(), Double()
+  if ipt < excOn.GetN(): excOn.GetPoint(ipt,x,y)
+  else: excOff.GetPoint(ipt-excOn.GetN(),x,y)
+  exc.SetPoint(ipt,x,y)
+  
+xv = resultsOn['xv'] + resultsOff['xv']
+yv = resultsOn['yv'] + resultsOff['yv']
+zv = resultsOn['limv'] + resultsOff['limv']
 #Get exclusion envelope:
 exc_curve = AuxPlot.getEnvelope(exc)
 #Get root plots
@@ -39,13 +43,13 @@ zvS = sorted(set(zv))
 
 xmax,ymax,zmax = max(xvS),max(yvS),max(zvS)
 xmin,ymin,zmin = min(xvS),min(yvS),min(zvS)
-dxmin = min([abs(xvS[i]-xvS[i+1]) for i in range(len(xvS)-1)])*1.1
-dymin = min([abs(yvS[i]-yvS[i+1]) for i in range(len(yvS)-1)])*1.1
+dxmin = min([abs(xvS[i]-xvS[i+1]) for i in range(len(xvS)-1)])*3.
+dymin = min([abs(yvS[i]-yvS[i+1]) for i in range(len(yvS)-1)])*3.
 exp_limit = TH2F("","",int((xmax-xmin)/dxmin),xmin,xmax,int((ymax-ymin)/dymin),ymin,ymax)
 for ilim,lim in enumerate(zv):
   if exp_limit.GetBinContent(exp_limit.FindBin(xv[ilim],yv[ilim])) < lim:
     exp_limit.SetBinContent(exp_limit.FindBin(xv[ilim],yv[ilim]),lim)
-
+    
 
 #Canvas
 AuxPlot.set_palette(gStyle)
@@ -56,7 +60,7 @@ plane.SetTopMargin(0.05296053)
 plane.SetBottomMargin(0.16796053)
 
 exp_limit.Draw('COLZ')
-for plot in rootPlots.keys(): rootPlots[plot].Draw("SAMEL")
+for plot in rootPlots.keys(): rootPlots[plot].Draw("SAMEP")
 exc_curve.Draw("SAMEL")
 #Set options
 exp_limit.SetStats(kFALSE)
@@ -75,6 +79,8 @@ for iplot,plot in enumerate(rootPlots.keys()):
   rootPlots[plot].SetLineStyle(iplot+1)
   rootPlots[plot].SetLineWidth(3)
   rootPlots[plot].SetLineColor(kBlack)  
+  rootPlots[plot].SetMarkerStyle(20)
+  rootPlots[plot].SetMarkerSize(0.9)  
 gPad.RedrawAxis()
 
 #Legend
@@ -91,11 +97,11 @@ if metadata['title']:
   tit.SetBorderSize(4)
   tit.SetFillColor(0)
   tit.SetTextFont(42)
-  tit.SetTextSize(0.2727273)
+  tit.SetTextSize(0.3127273)
   tit.Draw()
 
 gPad.Update()
-#if metadata['Out file']: c1.Print('2D-'+metadata['Out file'][0])
+c1.Print('2D-'+'TChiWZonoff.pdf')
 ans = raw_input("Hit any key to close\n")
 
   

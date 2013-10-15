@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-import os,sys
-from ROOT import TTree,TColor,TCanvas,TF1,TGraph
+import os,sys,copy
+from ROOT import TTree,TColor,TCanvas,TF1,TGraph,Double,TFile,gDirectory
 
 
 Var_dic = {'So4_mass': "m_{#tilde{#chi}^{0}_{4}} (GeV)", 'pSI': "#sigma(p,SI) (pb)", 'H3_mass': "m_{A} (GeV)", 'SmL_mass': "m_{#tilde{e}_{L}} (GeV)", 'Mr1': "#tilde{m}_{#tilde{e}_{R}} (GeV)", 'pSD': "#sigma(p,SD) (pb)", 'Mr3': "#tilde{m}_{#tilde{#tau}_{R}} (GeV)", 'Ml2': "#tilde{m}_{#tilde{#mu}_{L}} (GeV)", 'Ml3': "#tilde{m}_{#tilde{#tau}_{L}} (GeV)", 'MG1': "M_{1} (GeV)", 'Ml1':  "#tilde{m}_{#tilde{e}_{L}} (GeV)", 'SmR_mass': "m_{#tilde{e}_{LR} (GeV)", 'bsmumu': "BR(B_{s} #rightarrow #mu #mu)", 'Bsmumu': "BR(B_{s} #rightarrow #mu #mu)", 'gmuon': "a_{#mu}",'Gmuon': "#Deltaa_{#mu}", 'h_mass': "m_{h} (GeV)", 'Mq1': "#tilde{m}_{#tilde{Q}}(1)} (GeV)", 'Mq3':  "#tilde{m}_{#tilde{Q}}(3)} (GeV)", 'Mq2':  "#tilde{m}_{#tilde{Q}}(2)} (GeV)", 'Am': 'A_{#tilde{#mu}} (GeV)', 'Md2':  "#tilde{m}_{#tilde{d}}(2)} (GeV)", 'Md3': "#tilde{m}_{#tilde{d}}(3)} (GeV)", 'Md1': "#tilde{m}_{#tilde{d}}(1)} (GeV)", 'Omega': "#Omega_{#tilde{#chi}_{1}^{0}} h^{2}", 'MH3': "M_{A} (GeV)", 'So2_mass': "m_{#tilde{#chi}^{0}_{2}} (GeV)", 'Mu1': "#tilde{m}_{#tilde{u}}(1)} (GeV)", 'Mu3': "#tilde{m}_{#tilde{u}}(3)} (GeV)", 'Mu2': "#tilde{m}_{#tilde{u}}(2)} (GeV)", 'Mtp': "m_{top} (GeV)", 'Ab': 'A_{b} (GeV)', 'So1_mass': "m_{#tilde{#chi}^{0}_{1}} (GeV)", 'MG3': "M_{3} (GeV)", 'Snm_mass': "m_{#tilde{#nu}_{#mu}} (GeV)", 'MG2': "M_{2} (GeV)", 'tb': "tan#beta", 'So3_mass': "m_{#tilde{#chi}^{0}_{3}} (GeV)", 'Al': 'A_{l} (GeV)', 'mu': '#mu (GeV)', 'C1p_mass': "m_{#tilde{#chi}^{#pm}_{1}} (GeV)", 'At': 'A_{t} (GeV)', 'Mr2': "#tilde{m}_{#tilde{#mu}_{R}} (GeV)", 'Bsgm': "BR(b #rightarrow s #gamma)", 'bsgmm': "BR(b #rightarrow s #gamma)", 'C2p_mass': "m_{#tilde{#chi}^{#pm}_{2}} (GeV)","epRat" : "#epsilon^{MSSM}/#epsilon^{SM}", "epMSSM" : "#epsilon^{MSSM}", "epSM" : "#epsilon^{SM}", "Smu1_mass": "m_{#tilde{#mu}_{1}} (GeV)", "pSI_eff" : "#sigma(p,SI)^{eff} (pb)", "mC1-mN1" : "m_{#tilde{#chi}^{#pm}_{1}}-m_{#tilde{#chi}^{0}_{1}} (GeV)","mSmu1-mN1" : "m_{#tilde{#mu}_{1}}-m_{#tilde{#chi}^{0}_{1}} (GeV)","mSlep-mN1" : "m_{#tilde{l}}-m_{#tilde{#chi}^{0}_{1}} (GeV)", "mSl1-mN1" : "m_{#tilde{#tau}_{1}}-m_{#tilde{#chi}^{0}_{1}} (GeV)"}  
@@ -249,4 +249,123 @@ def getContours(gROOT,vals,hist,fit=None):
     canv.Clear()
 
     return res
+
+def getData(fname,Rmax=1.,condmax=0.001):
+  infile = open(fname,'r')
+  data = infile.read()
+  pts = data[:data.find('#END')-1].split('\n')
+  not_tested = TGraph()
+  exc = TGraph()
+  allow = TGraph()
+  not_cond = TGraph()
+  
+  xv = []
+  yv = []
+  limv = []
+  condv = []
+  resv = []
+  for pt in pts:
+    x,y,res,lim,cond,tot = pt.split()    
+    R = float(eval(res))/float(eval(lim))
+    if eval(res) < 0.: continue
+    if cond == 'None': cond = '0.'
+    x = eval(x)
+    y = eval(y)
+    lim = eval(lim)
+    cond = eval(cond)
+    xv.append(x)
+    yv.append(y)
+    limv.append(lim)
+    condv.append(cond)
+    if cond > condmax: not_cond.SetPoint(not_cond.GetN(),x,y)
+    if R < 0.:
+      not_tested.SetPoint(not_tested.GetN(),x,y)
+    elif R >= Rmax:
+      exc.SetPoint(exc.GetN(),x,y)
+    elif R < Rmax:
+      allow.SetPoint(allow.GetN(),x,y)
+    else:
+      print 'Unknown R value',R
+      sys.exit()
+      
+  infile.close()      
+  return {'exc' : exc, 'not_tested' : not_tested, 'not_cond' : not_cond, 'allow' : allow, 'xv' : xv, 'yv' : yv, 'resv' : resv, 'limv' : limv, 'condv' : condv}
+
+def getEnvelope(excluded,consecutive_bins=3):
+
+  exc_curve = TGraph()
+  exc = copy.deepcopy(excluded)
+  exc.Sort()
+  x1,y1 = Double(), Double()
+  exc.GetPoint(0,x1,y1)
+  yline = []
+  for ipt in range(exc.GetN()+1): 
+    x,y = Double(), Double()
+    dmin = 0.
+    if ipt < exc.GetN(): exc.GetPoint(ipt,x,y)
+    if ipt != exc.GetN() and x == x1: yline.append(y)
+    else:
+      yline = sorted(yline,reverse=True)
+      dy = [abs(yline[i]-yline[i+1]) for i in range(len(yline)-1)]
+      if len(yline) <= 3 or exc_curve.GetN() == 0:
+        newy = max(yline)
+        if len(dy) > 2: dmin = min([abs(yline[i]-yline[i+1]) for i in range(len(yline)-1)])
+      else:
+        newy = max(yline)     
+#        dmin = min(dy)
+        dmin = sum(dy)/float(len(dy))
+        for iD in range(len(dy)-1):
+          if dy[iD] <= dmin and dy[iD+1] <= dmin:
+            newy = yline[iD]
+            break
+      exc_curve.SetPoint(exc_curve.GetN(),x1,newy+dmin/2.)
+      x1 = x
+      yline = [y]
+
+  x2,y2 = Double(), Double()
+  exc_curve.GetPoint(exc_curve.GetN()-1,x2,y2)
+  exc_curve.SetPoint(exc_curve.GetN(),x2,0.)  #Close exclusion curve at zero
+  return exc_curve
+
+
+def getMetadata(filename,tags):
+  infile = open(filename,'r')
+  data = infile.read()
+  info = data[data.find('#END'):].split('\n')
+  metadata = {}
+  for tag in tags: metadata[tag] = None
+  if len(info) > 0:
+    for line in info:
+      for tag in tags:
+        if tag in line:
+          if not metadata[tag]: metadata[tag] = []
+          entry = line.lstrip(tag+' :').rstrip()
+          if ':' in entry: entry = entry.split(':')
+          metadata[tag].append(entry)
+
+  infile.close()
+  return metadata
+
+
+def getRootPlots(metadata):  
+  plots = {}
+  if metadata['Root file'] and os.path.isfile(metadata['Root file'][0]):
+    rootfile = TFile(metadata['Root file'][0],"read")
+    objs =  gDirectory.GetListOfKeys()
+    for ob in objs:
+      add = False
+      Tob = ob.ReadObj()
+      if type(Tob) != type(TGraph()): continue
+      if metadata['Root tag']:
+        for rootTag in metadata['Root tag']:
+          Tag = rootTag
+          if type(Tag) == type([]) and len(Tag) > 1: Tag = Tag[0]
+          if Tag == ob.GetName():  add = rootTag
+      else:
+        add = 'Official Exclusion'
+      if add:
+        if type(add) == type([]): add = add[1]
+        plots[add] = copy.deepcopy(Tob)
+        
+  return plots
 
