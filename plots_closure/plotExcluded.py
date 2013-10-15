@@ -11,6 +11,7 @@ from ROOT import *
 import AuxPlot
 
 exc = TGraph()
+exc_curve = TGraph()
 allow = TGraph()
 not_tested = TGraph()
 exp_limit = TH2F("","",100,0.,2500.,100,0.,2000.)
@@ -20,6 +21,9 @@ allow.SetMarkerStyle(20)
 allow.SetMarkerColor(kAzure-9)
 not_tested.SetMarkerStyle(20)
 not_tested.SetMarkerColor(kRed-10)
+exc_curve.SetLineColor(kRed)
+exc_curve.SetLineStyle(9)
+exc_curve.SetLineWidth(3)
 
 
 #Define metadata tags:
@@ -67,11 +71,44 @@ for pt in pts:
   else:
     print 'Unknown R value',R
     sys.exit()
-
+    
 base = TMultiGraph()
 base.Add(exc,"P")
 base.Add(allow,"P")
-base.Add(not_tested,"P")
+base.Add(not_tested,"P")    
+
+exc.Sort()
+x1,y1 = Double(), Double()
+exc.GetPoint(0,x1,y1)
+yline = []
+for ipt in range(exc.GetN()+1): 
+  x,y = Double(), Double()
+  dmin = 0.
+  if ipt < exc.GetN(): exc.GetPoint(ipt,x,y)
+  if ipt != exc.GetN() and x == x1: yline.append(y)
+  else:
+    yline = sorted(yline,reverse=True)
+    dy = [abs(yline[i]-yline[i+1]) for i in range(len(yline)-1)]
+    if len(yline) <= 3 or exc_curve.GetN() == 0:
+      newy = max(yline)
+      if len(dy) > 2: dmin = min([abs(yline[i]-yline[i+1]) for i in range(len(yline)-1)])
+    else:
+      newy = max(yline)     
+      dmin = min(dy)
+      for iD in range(len(dy)-1):
+        if dy[iD] == dmin and dy[iD+1] == dmin:
+          newy = yline[iD]
+          break
+    exc_curve.SetPoint(exc_curve.GetN(),x1,newy+dmin/2.)
+    x1 = x
+    yline = [y]
+
+x2,y2 = Double(), Double()
+exc_curve.GetPoint(exc_curve.GetN()-1,x2,y2)
+exc_curve.SetPoint(exc_curve.GetN(),x2,0.)
+if exc_curve.GetN() > 0:  base.Add(exc_curve,"L")
+
+
 
 leg = TLegend(0.6325287,0.7408994,0.9827586,1)
 AuxPlot.Default(leg,"Legend")
@@ -97,13 +134,11 @@ if metadata['Root file'] and os.path.isfile(metadata['Root file'][0]):
     if add:
       exp = Tob
 #      exp.Sort()
-      exp.SetLineStyle(len(base.GetListOfGraphs())-2)
+      exp.SetLineStyle(len(base.GetListOfGraphs())-3)
       base.Add(exp,"L")
       if type(add) == type([]): leg.AddEntry(exp,add[1],"L")
       else: leg.AddEntry(exp,add,"L")
 
-        
-        
 
 plane = TCanvas("c1", "c1",0,0,800,500)
 AuxPlot.Default(plane,"TCanvas")
@@ -127,6 +162,6 @@ if metadata['title']:
 
 
 if metadata['Out file']: c1.Print(metadata['Out file'][0])
-ans = raw_input("Hit any key to close\n")
+#ans = raw_input("Hit any key to close\n")
 
   
