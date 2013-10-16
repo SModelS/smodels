@@ -75,6 +75,8 @@ for iplot,plot in enumerate(rootPlots.keys()):
   rootPlots[plot].SetLineStyle(iplot+1)
   rootPlots[plot].SetLineWidth(3)
   rootPlots[plot].SetLineColor(kBlack)  
+  rootPlots[plot].SetMarkerStyle(20)
+  rootPlots[plot].SetMarkerSize(0.9) 
 gPad.RedrawAxis()
 
 #Legend
@@ -87,11 +89,11 @@ leg.Draw()
 #Title
 if metadata['title']:
   title = metadata['title'][0]
-  tit = TPaveLabel(0.01005025,0.8672377,0.5150754,0.9807281,title,"brNDC")
+  tit = TPaveLabel(0.01005025,0.8672377,0.5850754,0.9807281,title,"brNDC")
   tit.SetBorderSize(4)
   tit.SetFillColor(0)
   tit.SetTextFont(42)
-  tit.SetTextSize(0.2727273)
+  tit.SetTextSize(0.3127273)
   tit.Draw()
 
 gPad.Update()
