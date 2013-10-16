@@ -50,7 +50,7 @@ Only generated if cross-sections are read from SLHA file and not previously crea
     lines = slha.readlines()
     xsecblock = False
     for l in lines:
-      if l.startswith("#") or len(l)<2: continue
+      if l.startswith("#") or len(l.replace('\n',''))<2: continue
       if 'XSECTION' in l:
         xsecblock = True
         sqrtS =  eval(l.split()[1])/1000.    #Values in the SLHA file are in GeV

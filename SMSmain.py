@@ -21,7 +21,7 @@ printer=SMSPrettyPrinter.SMSPrettyPrinter()
 #Generate events and compute cross-sections:
 nevts = 10000
 slhafile = "slha/andrePT4.slha"
-#slhafile = "slha/DESY_stop.slha"
+
 
 WriteToFile = True
 if not WriteToFile:
@@ -54,12 +54,11 @@ if DoSLHAdec:
   if rmvunit(maxlum,'fb-1'):    
     sigmacut = addunit(1./rmvunit(maxlum,'fb-1'),'fb')
   else:
-    sigmacut = addunit(0.1,'fb')
+    sigmacut = addunit(0.01,'fb')
   if DoCompress or DoInvisible: sigmacut = sigmacut/10.  #When compression is turned on, relax sigmacut
   SMSTopList = SLHADecomposer.decompose(slhafile,Xsec,sigmacut,DoCompress,DoInvisible,minmassgap)
 else:
   SMSTopList = LHEDecomposer.decompose(lhefile,W,nevts,DoCompress,DoInvisible,minmassgap)
-
 
 EvTop_table = PrettyTable(["Topology","#Vertices", "#Insertions", "#Elements", "Sum of weights"])
 EvElement_table = PrettyTable(["Topology","Element","Particles B[0]","Particles B[1]", "Masses B[0]","Masses B[1]","Element Weight"])
@@ -116,7 +115,7 @@ for Ana in ListOfAnalyses:
       ifirst = False
       AnElement_table.add_row([label,ptcs,wrap(printer.pformat(mass),width=100),wrap(printer.pformat(massweight.weight),width=30)])
   AnElement_table.add_row(["---","---","---","---"])  
-    
+
 
 #print(AnElement_table)
 
