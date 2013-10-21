@@ -144,6 +144,9 @@ class EAnalysis:
       MCluster = []
       for i in range(len(Goodmasses)): MCluster.append(set([i]))
       print "[SMSAnalysis.py] Cluster failed, using unclustered masses"
+      ClusterFailed = True
+    else:
+      ClusterFailed = False
       
   #Loop over clusters to evaluate constraints and conditions inside each cluster
     self.ResultList = []  # Clear out results
@@ -175,7 +178,8 @@ class EAnalysis:
 
       self.ResultList.append(ClusterResult)
 
-    if not self.ResultList: return None      
+    if not self.ResultList: return None
+    if ClusterFailed: return 'Cluster Failed'  
     return True
 
       
