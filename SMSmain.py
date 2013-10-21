@@ -21,7 +21,8 @@ printer=SMSPrettyPrinter.SMSPrettyPrinter()
 #Generate events and compute cross-sections:
 nevts = 10000
 slhafile = "slha/andrePT4.slha"
-
+slhafile = 'U6R3ciIHwZxDS.slha'
+slhafile='sms.slha'
 
 WriteToFile = True
 if not WriteToFile:
@@ -46,16 +47,17 @@ else:
 
 DoCompress = True
 DoInvisible = True
-minmassgap = addunit(10.,'GeV')
+minmassgap = addunit(5.,'GeV')
 
 DoSLHAdec = True
 if DoSLHAdec:
   maxlum = VariousHelpers.getMaxLum(ListOfAnalyses) # Maximum cross-section*BR to be included
+  maxlum = addunit(50.,'fb-1')
   if rmvunit(maxlum,'fb-1'):    
     sigmacut = addunit(1./rmvunit(maxlum,'fb-1'),'fb')
   else:
     sigmacut = addunit(0.01,'fb')
-  if DoCompress or DoInvisible: sigmacut = sigmacut/10.  #When compression is turned on, relax sigmacut
+#  if DoCompress or DoInvisible: sigmacut = sigmacut/10.  #When compression is turned on, relax sigmacut
   SMSTopList = SLHADecomposer.decompose(slhafile,Xsec,sigmacut,DoCompress,DoInvisible,minmassgap)
 else:
   SMSTopList = LHEDecomposer.decompose(lhefile,W,nevts,DoCompress,DoInvisible,minmassgap)
@@ -135,7 +137,14 @@ for Analysis in ListOfAnalyses:
     continue
 
 
-  if not Analysis.computeTheoryPredictions(): continue #Theoretical values for result and conditions
+#  if not Analysis.computeTheoryPredictions(): continue #Theoretical values for result and conditions
+  th = Analysis.computeTheoryPredictions()
+  if not th: continue
+  elif th == 'Cluster Failed':
+    print th
+    continue
+  
+  
 
   res = Analysis.results.keys()[0]  
 
