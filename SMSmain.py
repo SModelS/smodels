@@ -21,8 +21,6 @@ printer=SMSPrettyPrinter.SMSPrettyPrinter()
 #Generate events and compute cross-sections:
 nevts = 10000
 slhafile = "slha/andrePT4.slha"
-slhafile = 'U6R3ciIHwZxDS.slha'
-slhafile='sms.slha'
 
 WriteToFile = True
 if not WriteToFile:
@@ -57,7 +55,7 @@ if DoSLHAdec:
     sigmacut = addunit(1./rmvunit(maxlum,'fb-1'),'fb')
   else:
     sigmacut = addunit(0.01,'fb')
-#  if DoCompress or DoInvisible: sigmacut = sigmacut/10.  #When compression is turned on, relax sigmacut
+  if DoCompress or DoInvisible: sigmacut = sigmacut/10.  #When compression is turned on, relax sigmacut
   SMSTopList = SLHADecomposer.decompose(slhafile,Xsec,sigmacut,DoCompress,DoInvisible,minmassgap)
 else:
   SMSTopList = LHEDecomposer.decompose(lhefile,W,nevts,DoCompress,DoInvisible,minmassgap)
