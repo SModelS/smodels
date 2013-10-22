@@ -7,6 +7,8 @@
 .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
     
 """
+
+import logging
     
 def decompose(slhafile,Xsec=None,sigcut=None,DoCompress=False,DoInvisible=False,minmassgap=-1,XsecsInfo=None):
   """Do SLHA-based decomposition.
@@ -84,7 +86,6 @@ Only generated if cross-sections are read from SLHA file and not previously crea
     if not XsecsInfo:
       XsecsInfo = XsecsInfoFile              #Store information from file
       CrossSection.XSectionInfo = XsecsInfo
-      import logging
       log = logging.getLogger(__name__)
       log.warning ( "Cross-section information not found. Using values from SLHA file" )
     else:
@@ -111,6 +112,7 @@ Only generated if cross-sections are read from SLHA file and not previously crea
     for br in brs:
       br.ids = [-x for x in br.ids]
     BRdic.update({k : res[1][abs(k)].decays, -k : brs})
+
 
 #Get mass list for all particles
   Massdic = {}
@@ -148,6 +150,9 @@ Only generated if cross-sections are read from SLHA file and not previously crea
         continue
       
       for BR in BRdic[ptc]:
+        if BR.br < 0.:
+          log.warning ("Ignoring negative BRs" )
+          continue
         NewEl = copy.deepcopy(BaseEl)
         vertparts = []
         mass = []
