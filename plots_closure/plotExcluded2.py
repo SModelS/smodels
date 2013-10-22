@@ -51,7 +51,7 @@ for ilim,lim in enumerate(zv):
 AuxPlot.set_palette(gStyle)
 plane = TCanvas("c1", "c1",0,0,800,500)
 AuxPlot.Default(plane,"TCanvas")
-plane.SetRightMargin(0.14700422)
+plane.SetRightMargin(0.15700422)
 plane.SetTopMargin(0.05296053)
 plane.SetBottomMargin(0.16796053)
 
@@ -82,7 +82,7 @@ gPad.RedrawAxis()
 #Legend
 leg = TLegend(0.6934673,0.8051392,0.9886935,0.99)
 AuxPlot.Default(leg,"Legend")  
-leg.AddEntry(exc_curve,'SmodelS',"L")
+leg.AddEntry(exc_curve,'SModelS',"L")
 for plot in rootPlots.keys(): leg.AddEntry(rootPlots[plot],plot,"L")
 leg.Draw()
 
@@ -97,7 +97,7 @@ if metadata['title']:
   tit.Draw()
 
 gPad.Update()
-#if metadata['Out file']: c1.Print('2D-'+metadata['Out file'][0])
+if metadata['Out file']: c1.Print('2D-'+metadata['Out file'][0])
 ans = raw_input("Hit any key to close\n")
 
   

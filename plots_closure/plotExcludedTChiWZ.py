@@ -86,7 +86,7 @@ gPad.RedrawAxis()
 #Legend
 leg = TLegend(0.6934673,0.8051392,0.9886935,0.99)
 AuxPlot.Default(leg,"Legend")  
-leg.AddEntry(exc_curve,'SmodelS',"L")
+leg.AddEntry(exc_curve,'SModelS',"L")
 for plot in rootPlots.keys(): leg.AddEntry(rootPlots[plot],plot,"L")
 leg.Draw()
 
@@ -101,7 +101,7 @@ if metadata['title']:
   tit.Draw()
 
 gPad.Update()
-c1.Print('2D-'+'TChiWZonoff.pdf')
+c1.Print('2D-'+'TChiWZonoff.png')
 ans = raw_input("Hit any key to close\n")
 
   
