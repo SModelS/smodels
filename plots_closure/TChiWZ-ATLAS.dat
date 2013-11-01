@@ -938,7 +938,7 @@
 370.0 270.0 47.211234 742.324389742 None 70.14
 400.0 190.0 33.04272 110.836954793 None 49.2
 #END
-title: #tilde{#chi}_{1}^{#pm} #tilde{#chi}_{2}^{0} #rightarrow WZ #tilde{#chi}_{1}^{0} #tilde{#chi}_{1}^{0}, ATLAS-CONF-2013-035, 8 TeV, LO
+title: #splitline{#tilde{#chi}_{1}^{#pm} #tilde{#chi}_{2}^{0} #rightarrow WZ #tilde{#chi}_{1}^{0} #tilde{#chi}_{1}^{0}}{ATLAS-CONF-2013-035, 8 TeV, LO}
 Out file: TChiWZATLAS.png
 Root file: /home/lessa/SMS_database/ATLAS8TeV/ATLAS_CONF_2013_035/sms.root
 Root tag: exclusion_TChiWZ: Official Exclusion

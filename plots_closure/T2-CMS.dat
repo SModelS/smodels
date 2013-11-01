@@ -2792,7 +2792,7 @@
 1075.0 875.0 -1.0 1.0 -1.0 1.971703
 1500.0 875.0 -1.0 1.0 -1.0 0.073571
 #END
-title: #tilde{q} #rightarrow q #tilde{#chi}_{1}^{0}, RA2, 8 TeV, NLL
+title: #splitline{#tilde{q}#tilde{q}, #tilde{q} #rightarrow q #tilde{#chi}_{1}^{0}}{SUS-13-012, 8 TeV, NLL}
 Out file: T2RA2.png
 Root file: /home/lessa/SMS_database/8TeV/RA28TeV/sms.root
 Root tag: exclusion_T2: Official Exclusion

@@ -844,7 +844,7 @@
 900.0 850.0 -1.0 1.0 -1.0 0.431800988309
 575.0 325.0 5.2674877893 11.3533269614 0.0 7.7599997893
 #END
-title: #tilde{#chi}_{1}^{#pm} #tilde{#chi}_{2}^{0} #rightarrow ll#tau#nu #tilde{#chi}_{1}^{0} #tilde{#chi}_{1}^{0}, x=0.95, SUS-13-006, 8 TeV, LO
+title: #splitline{#tilde{#chi}_{1}^{#pm} #tilde{#chi}_{2}^{0} #rightarrow ll#tau#nu #tilde{#chi}_{1}^{0} #tilde{#chi}_{1}^{0}, x=0.95}{SUS-13-006, 8 TeV, LO}
 Out file: TChiChipmSlepStau095.png
 Root file: /home/lessa/SMS_database/8TeV/SUS13006/sms.root
 Root tag: exclusion_TChiChipmSlepStau095: Official Exclusion
