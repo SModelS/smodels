@@ -1469,7 +1469,7 @@
 1525.0 300.0 -1.0 1.0 -1.0 0.499809
 1225.0 350.0 3.85976 6.001787125 None 4.230019
 #END
-title: #tilde{g} #rightarrow qq (#tilde{#chi}_{1}^{#pm} #rightarrow W#tilde{#chi}_{1}^{0}), x=0.5, ATLAS-CONF-2013-047, 8 TeV, NLL
+title: #splitline{#tilde{g}#tilde{g}, #tilde{g} #rightarrow qq (#tilde{#chi}_{1}^{#pm} #rightarrow W#tilde{#chi}_{1}^{0}), x=0.5}{ATLAS-CONF-2013-047, 8 TeV, NLL}
 Out file: T5WW050.png
 Root file: /home/lessa/SMS_database/ATLAS8TeV/ATLAS_CONF_2013_047/sms.root
-Root tag: exclusion_T5WW050: #scale[0.8]{Official Exclusion (x=0.5)}
+Root tag: exclusion_T5WW050: #scale[0.8]{Official Exclusion}

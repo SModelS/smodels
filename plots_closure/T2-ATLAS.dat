@@ -2792,7 +2792,7 @@
 1075.0 875.0 1.839311 328.424737778 None 1.971703
 1500.0 875.0 0.056287 33.2700986667 None 0.073571
 #END
-title: #tilde{q} #rightarrow q #tilde{#chi}_{1}^{0} ATLAS-CONF-2013-047, 8 TeV, NLL
+title: #splitline{#tilde{q}#tilde{q}, #tilde{q} #rightarrow q #tilde{#chi}_{1}^{0}}{ATLAS-CONF-2013-047, 8 TeV, NLL}
 Out file: T2.png
 Root file: /home/lessa/SMS_database/ATLAS8TeV/ATLAS_CONF_2013_047/sms.root
 Root tag: exclusion_T2: Official Exclusion

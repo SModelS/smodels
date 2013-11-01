@@ -3175,7 +3175,7 @@
 435.0 120.0 -1.0 1.0 -1.0 0.5977
 310.0 85.0 3.141999 3.07740036495 None 3.141999
 #END
-title:#tilde{l} #rightarrow l #tilde{#chi}_{1}^{0} ATLAS-CONF-2013-049, 8 TeV, LO
+title: #splitline{#scale[1.2]{#tilde{l}#tilde{l}, #tilde{l} #rightarrow l #tilde{#chi}_{1}^{0}}}{ATLAS-CONF-2013-049, 8 TeV, LO}
 Root file:/home/lessa/SMS_database/ATLAS8TeV/ATLAS_CONF_2013_049/sms.root
 Root tag: exclusion_TSlepSlep: Official Exclusion
 Out file:TSlepSlep.png

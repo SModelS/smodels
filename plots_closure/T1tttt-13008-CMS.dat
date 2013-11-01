@@ -2074,7 +2074,7 @@
 1425.0 1050.0 -1.0 1.0 -1.0 0.78803
 1625.0 300.0 -1.0 1.0 -1.0 0.162164
 #END
-title: #tilde{g} #rightarrow tt #tilde{#chi}_{1}^{0}, SUS-13-008, 8 TeV, NLL
+title: #splitline{#tilde{g}#tilde{g}, #tilde{g} #rightarrow tt #tilde{#chi}_{1}^{0}}{SUS-13-008, 8 TeV, NLL}
 Out file: T1tttt.png
 Root file: /home/lessa/SMS_database/8TeV/SUS13008/sms.root
 Root tag: exclusion_T1tttt: Official Exclusion
