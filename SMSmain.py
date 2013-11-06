@@ -15,22 +15,27 @@ printer=SMSPrettyPrinter.SMSPrettyPrinter()
 #Example of how to define cross-sections. If not defined, default values
 #will be generated and stored in CrossSection.XSectionInfo the first
 #time this information is needed 
-#XSectionInfo = CrossSection.XSecInfoList('8 TeV (NLL), 8 TeV (nlo)')
-#CrossSection.XSectionInfo = XSectionInfo
+XSectionInfo = CrossSection.XSecInfoList('8 TeV (LO)')
+CrossSection.XSectionInfo = XSectionInfo
 
 #Generate events and compute cross-sections:
-nevts = 10000
+nevts = 50000
 slhafile = "slha/andrePT4.slha"
 
-WriteToFile = True
-if not WriteToFile:
-  Wv = XSecComputer.compute(nevts,slhafile,rpythia = True)
-  W = Wv["Wdic"]
-  Xsec = Wv["Xsecdic"]
-  lhefile = Wv["lhefile"]
+Compute_xsecs = False
+if Compute_xsecs:
+  WriteToFile = False
+  if not WriteToFile:
+    Wv = XSecComputer.compute(nevts,slhafile,rpythia = True)
+    W = Wv["Wdic"]
+    Xsec = Wv["Xsecdic"]
+    lhefile = Wv["lhefile"]
+  else:
+    Xsec=None
+    SLHATools.writeXSecToSLHAFile(slhafile,nevts,printLHE=False)
 else:
-  Xsec=None
-  SLHATools.writeXSecToSLHAFile(slhafile,nevts,printLHE=False)
+    W = None
+    Xsec = None    
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Creat analyses list:
@@ -41,16 +46,14 @@ else:
   ListOfAnalyses = SMSAnalysisList.load()
 
 
-
-
-DoCompress = True
-DoInvisible = True
+DoCompress = False
+DoInvisible = False
 minmassgap = addunit(5.,'GeV')
 
 DoSLHAdec = True
 if DoSLHAdec:
   maxlum = VariousHelpers.getMaxLum(ListOfAnalyses) # Maximum cross-section*BR to be included
-  maxlum = addunit(50.,'fb-1')
+  maxlum = addunit(100.,'fb-1')
   if rmvunit(maxlum,'fb-1'):    
     sigmacut = addunit(1./rmvunit(maxlum,'fb-1'),'fb')
   else:
