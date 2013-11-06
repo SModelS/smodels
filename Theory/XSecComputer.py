@@ -149,7 +149,6 @@ def compute(nevts,slhafile,rpythia = True, basedir=None,datadir=None, XsecsInfo=
     else:
       total_cs.append(addunit(1.,'fb'))
 
-    
     weight, sigma, n_evt = loFromLHE ( lhefiles[isqrts], total_cs[isqrts], nevts )
     weights.append(weight)
     sigmas.append(sigma)

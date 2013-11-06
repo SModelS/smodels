@@ -90,7 +90,6 @@ def fromEvent( Event, weight = {}, DoCompress=False, DoInvisible=False, \
   ETop.vertnumb = Einfo["vertnumb"]
   ETop.vertparts = Einfo["vertparts"]
 
-
   ETopList.append(ETop)    
   
   #Do compression:
