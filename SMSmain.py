@@ -15,11 +15,11 @@ printer=SMSPrettyPrinter.SMSPrettyPrinter()
 #Example of how to define cross-sections. If not defined, default values
 #will be generated and stored in CrossSection.XSectionInfo the first
 #time this information is needed 
-XSectionInfo = CrossSection.XSecInfoList('8 TeV (LO)')
-CrossSection.XSectionInfo = XSectionInfo
+#XSectionInfo = CrossSection.XSecInfoList('8 TeV (LO)')
+#CrossSection.XSectionInfo = XSectionInfo
 
 #Generate events and compute cross-sections:
-nevts = 50000
+nevts = 10000
 slhafile = "slha/andrePT4.slha"
 
 Compute_xsecs = False
@@ -53,7 +53,7 @@ minmassgap = addunit(5.,'GeV')
 DoSLHAdec = True
 if DoSLHAdec:
   maxlum = VariousHelpers.getMaxLum(ListOfAnalyses) # Maximum cross-section*BR to be included
-  maxlum = addunit(100.,'fb-1')
+  maxlum = addunit(50.,'fb-1')
   if rmvunit(maxlum,'fb-1'):    
     sigmacut = addunit(1./rmvunit(maxlum,'fb-1'),'fb')
   else:
