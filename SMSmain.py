@@ -15,7 +15,7 @@ printer=SMSPrettyPrinter.SMSPrettyPrinter()
 #Example of how to define cross-sections. If not defined, default values
 #will be generated and stored in CrossSection.XSectionInfo the first
 #time this information is needed 
-#XSectionInfo = CrossSection.XSecInfoList('8 TeV (LO)')
+#XSectionInfo = CrossSection.XSecInfoList('8 TeV (NLL),8 TeV (nlo)' )
 #CrossSection.XSectionInfo = XSectionInfo
 
 #Generate events and compute cross-sections:
@@ -26,7 +26,7 @@ Compute_xsecs = False
 if Compute_xsecs:
   WriteToFile = False
   if not WriteToFile:
-    Wv = XSecComputer.compute(nevts,slhafile,rpythia = True)
+    Wv = XSecComputer.compute(nevts,slhafile)
     W = Wv["Wdic"]
     Xsec = Wv["Xsecdic"]
     lhefile = Wv["lhefile"]
@@ -46,8 +46,8 @@ else:
   ListOfAnalyses = SMSAnalysisList.load()
 
 
-DoCompress = False
-DoInvisible = False
+DoCompress = True
+DoInvisible = True
 minmassgap = addunit(5.,'GeV')
 
 DoSLHAdec = True
