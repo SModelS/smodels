@@ -8,7 +8,6 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
     
 """
-import sys
     
 def fromEvent( Event, weight = {}, DoCompress=False, DoInvisible=False, \
                        minmassgap=None ):
