@@ -23,7 +23,7 @@ def decompose(lhefile,W=None,nevts=None,doCompress=False,doInvisible=False,minma
   SMSTopList=SMSDataObjects.TopologyList ( )
   for Event in reader:
     ## Get mother PDGs:
-    momPDG = tuple(Event.getMom())  
+    momPDG = tuple(Event.getMom())
     # Get event weight list:
     weight = {}
     if not W is None:
