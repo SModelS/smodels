@@ -49,7 +49,7 @@ for ilim,lim in enumerate(zv):
 
 #Canvas
 AuxPlot.set_palette(gStyle)
-plane = TCanvas("c1", "c1",0,0,800,700)
+plane = TCanvas("c1", "c1",0,0,800,550)
 AuxPlot.Default(plane,"TCanvas")
 plane.SetLeftMargin(0.15700422)
 plane.SetRightMargin(0.15700422)
@@ -81,7 +81,7 @@ for iplot,plot in enumerate(rootPlots.keys()):
 gPad.RedrawAxis()
 
 #Legend
-leg = TLegend(0.571608,0.7645306,0.9824121,0.9850969)
+leg = TLegend(0.5062814,0.7466151,0.8278894,0.967118)
 AuxPlot.Default(leg,"Legend")  
 leg.AddEntry(exc_curve,'SModelS',"L")
 for plot in rootPlots.keys(): leg.AddEntry(rootPlots[plot],plot,"L")
@@ -90,15 +90,16 @@ leg.Draw()
 #Title
 if metadata['title']:
   title = metadata['title'][0]
-  tit = TPaveLabel(0.01005025,0.8301043,0.5226131,0.9821162,title,"brNDC")
+  tit = TPaveLabel(0.01130653,0.8375242,0.4610553,0.9883946,title,"brNDC")
   tit.SetBorderSize(4)
   tit.SetFillColor(0)
   tit.SetTextFont(42)
-  tit.SetTextSize(0.2327273)
+  tit.SetTextSize(0.2627273)
   tit.Draw()
 
 gPad.Update()
 c1.Print('2D-'+'TSlepSlep.eps')
+c1.Print('2D-'+'TSlepSlep.root')
 ans = raw_input("Hit any key to close\n")
 
   
