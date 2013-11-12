@@ -21,6 +21,7 @@ printer=SMSPrettyPrinter.SMSPrettyPrinter()
 #Generate events and compute cross-sections:
 nevts = 10000
 slhafile = "slha/andrePT4.slha"
+slhafile = "escaped/escaped_gluino/1HLP577dl70JIKW.slha"
 
 Compute_xsecs = False
 if Compute_xsecs:
@@ -35,7 +36,7 @@ if Compute_xsecs:
     SLHATools.writeXSecToSLHAFile(slhafile,nevts,printLHE=False)
 else:
     W = None
-    Xsec = None    
+    Xsec = None
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Creat analyses list:
@@ -52,13 +53,7 @@ minmassgap = addunit(5.,'GeV')
 
 DoSLHAdec = True
 if DoSLHAdec:
-  maxlum = VariousHelpers.getMaxLum(ListOfAnalyses) # Maximum cross-section*BR to be included
-  maxlum = addunit(50.,'fb-1')
-  if rmvunit(maxlum,'fb-1'):    
-    sigmacut = addunit(1./rmvunit(maxlum,'fb-1'),'fb')
-  else:
-    sigmacut = addunit(0.01,'fb')
-  if DoCompress or DoInvisible: sigmacut = sigmacut/10.  #When compression is turned on, relax sigmacut
+  sigmacut = addunit(0.1,'fb')
   SMSTopList = SLHADecomposer.decompose(slhafile,Xsec,sigmacut,DoCompress,DoInvisible,minmassgap)
 else:
   SMSTopList = LHEDecomposer.decompose(lhefile,W,nevts,DoCompress,DoInvisible,minmassgap)
@@ -80,7 +75,7 @@ for (i,topo) in enumerate(SMSTopList):
  
       
 #Print element list for Topology[i]:  
-  if i >= 0:       
+  if i == 23:       
     for j in range(len(SMSTopList[i].ElList)):
       EvElement_table.add_row([i,j,SMSTopList[i].ElList[j].B[0].particles,SMSTopList[i].ElList[j].B[1].particles,wrap(printer.pformat(SMSTopList[i].ElList[j].B[0].masses),width=25),wrap(printer.pformat(SMSTopList[i].ElList[j].B[1].masses),width=25),wrap(printer.pformat(SMSTopList[i].ElList[j].weight),width=30)])
     EvElement_table.add_row(["---","---","---","---","---","---","---"])  
@@ -90,7 +85,7 @@ print "Number of Global topologies = ",len(SMSTopList)
 print(EvTop_table)
 print "Total Number of Elements = ",eltot
 print "Total weight = ",ClusterTools.sumweights(totweight)
-#print(EvElement_table)
+print(EvElement_table)
 
 print '\n \n \n'
 
