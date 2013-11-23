@@ -9,14 +9,14 @@ from ROOT import *
 energy = 8
 
 hk = TH2F("","",100,0.,10000.,100,0.,10000.)
-grid = open('grid_gg.dat','w')
+grid = open('grid_sb.dat','w')
 
 for squarkmass in range(50,10000,100):
   for gluinomass in range(50,3000,100):
 #for squarkmass in range(5000,5100,100):
 #  for gluinomass in range(1000,1100,100):
   
-    res = NLLXSec.getNLLfast(process = "gg", pdf = 'cteq', squarkmass=float(squarkmass), gluinomass=float(gluinomass), Energy = energy, base="./nllfast/", interpolate=True )
+    res = NLLXSec.getNLLfast(process = "sb", pdf = 'cteq', squarkmass=float(squarkmass), gluinomass=float(gluinomass), Energy = energy, base="./nllfast/", interpolate=True )
     kfactor = res['K_NLL_8TeV']*res['K_NLO_8TeV']
     hk.Fill(float(squarkmass),float(gluinomass),kfactor)
     grid.write(str(float(squarkmass))+' '+str(float(gluinomass))+' '+str(kfactor)+'\n')
