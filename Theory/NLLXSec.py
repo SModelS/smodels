@@ -87,22 +87,22 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
       log.error ( "the lines are" + str(lines) )
     elif len(lines) == 39: lines.insert(27,0.)  #Make sure all output have the same format
 
-#Try to interpolate    
-    if 'dcpl' in process and interpolate:
+#Try to interpolate if decoupling limit is not satisfied (M/m < 10):
+    if 'dcpl' in process and interpolate and max(squarkmass,gluinomass)/min(squarkmass,gluinomass) < 10.:
         lines.insert
         os.chdir(nllpath)
         xmass = max(squarkmass,gluinomass)  #Decoupled mass
         ymass = min(squarkmass,gluinomass)  #Non-decoupled mass
-        xpts = []
-        ypts = []
+        xpts = [10.*ymass]                          #Use the decoupled value (valid for xmass > 10*ymass) as one of the points for interpolation
+        ypts = [lines[29:40]]
         while len(xpts) < 2 and xmass > 500.:
           xmass -= 100.
           if ymass == squarkmass: s = "./nllfast_"+energy+" %s %s %s %s" % ( inprocess, pdf, ymass, xmass )
           else: s = "./nllfast_"+energy+" %s %s %s %s" % ( inprocess, pdf, xmass, ymass )
           o=commands.getoutput(s)
           if o[1] =='T': continue
-          xpts.append(xmass)
-          ypts.append([eval(x) for x in o.split()[29:40]])
+          xpts.append(xmass)                            #Get points in the non-decoupling regime for interpolation
+          ypts.append([eval(x) for x in o.split()[29:40]])   #Use absolute values of x (does not affect xsec and k-factor interpolation)
 
         if len(xpts) > 1:
           xmass = max(squarkmass,gluinomass)
