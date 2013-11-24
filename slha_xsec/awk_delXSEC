@@ -1,0 +1,2 @@
+for i in *slha; do awk '{if ($1=="XSECTION") exit; else print $0;}' $i > $i"_new"; done
+for i in *_new; do mv $i ${i/_new/}; done
