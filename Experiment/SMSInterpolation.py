@@ -42,7 +42,7 @@ def getxval(mx, my, mz,mass=False):
   else: tx=None
 #  if mz.find('y')>-1: ty = float(mz[mz.find('y')+1])
 #  else: ty=None
-  if mz.find('C')>-1: c = float(mz[mz.find('C')+1:mz.find('C')+4])
+  if mz.find('C')>-1: c = float(mz.split("C")[1])
   else: c=None
   z = 0.
   if tx: z += tx*my/100
@@ -91,7 +91,7 @@ def compareM(masses, d):
     else: return None
   except:
     if d['mz'][0].find('LSP')>-1: #check if histogram for fixed LSP mass, return 1 if my is comparable to LSP mass of the histogram, 0 if not
-      mlsp = float(d['mz'][0][d['mz'][0].find('P')+1:d['mz'][0].find('P')+4])
+      mlsp = float(d['mz'][0].split("LSP")[1])
       if abs(mlsp-rmvunit(masses[-1],"GeV"))/(mlsp+rmvunit(masses[-1],"GeV"))<0.1:
         return True
       else: return None
@@ -106,7 +106,7 @@ def compareM(masses, d):
       if abs(deltain-deltam)/(deltain+deltam)<0.1: return True
       else: return None
     elif d['mz'][0].find('M1')>-1: #check for fixed m_mother
-      mmother=float(d['mz'][0][d['mz'][0].find('M1')+2:d['mz'][0].find('M1')+5])
+      mmother=float(d['mz'][0].split("M1")[1])
       if abs(mmother-rmvunit(masses[0],"GeV"))/(mmother+rmvunit(masses[0],"GeV"))<0.1:
         return True
       else: return None
@@ -126,8 +126,8 @@ def dogriddata(ana,topo,masses,d,debug=True,run=None):
     M1=None
 
     if ds['mz'][0].find('D')>-1: D=float(ds['mz'][0].split('=')[1])
-    elif ds['mz'][0].find('LSP')>-1: L=float(ds['mz'][0][ds['mz'][0].find('P')+1:ds['mz'][0].find('P')+4])
-    elif ds['mz'][0].find('M1')>-1: M1=float(ds['mz'][0][ds['mz'][0].find('M1')+2:ds['mz'][0].find('M1')+5])
+    elif ds['mz'][0].find('LSP')>-1: L=float(ds['mz'][0].split("LSP")[1])
+    elif ds['mz'][0].find('M1')>-1: M1=float(ds['mz'][0].split("M1")[1])
 
     ul_dict=SMSHelpers.getUpperLimitDictionary(ana,gethistname(topo,ds['mz'][0]),run)
 
