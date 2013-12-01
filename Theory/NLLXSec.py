@@ -18,7 +18,7 @@ import numpy
 
 squarks = [1000001,2000001,1000002,2000002,1000003,2000003,1000004,2000004]
 
-def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energy = 8, base="./nllfast/", interpolate=False ):
+def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energy = 8, base="./nllfast/", interpolate=True ):
     """ method to get the NLL fast results. 
         This is the shortest way to code, I found. """
     import logging
@@ -27,7 +27,7 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
     NoValues={"sqmass_"+energy:0, "mgmass_"+energy:0,"LOcs_"+energy:False,"NLOcs_"+energy:False,"NLL+NLO_"+energy:False,"K_NLO_"+energy:False,"K_NLL_"+energy:False}
 
     mass = 0
-    o=None
+    o=None   
     
     inprocess = process
 
@@ -161,8 +161,9 @@ def getNLLresult(pdgid1,pdgid2,inputfile,base="../nllfast",pdf="cteq"):
       process = 'st'
       squarkmass = abs(readfile[0]['MASS'].entries[abs(pdgid1)])
 
-    Values_7TeV = getNLLfast(process,pdf,squarkmass,gluinomass,7,base=base)
-    Values_8TeV = getNLLfast(process,pdf,squarkmass,gluinomass,8,base=base)
+    if process:
+      Values_7TeV = getNLLfast(process,pdf,squarkmass,gluinomass,7,base=base)
+      Values_8TeV = getNLLfast(process,pdf,squarkmass,gluinomass,8,base=base)
 
     output = [Values_7TeV,Values_8TeV]
 
