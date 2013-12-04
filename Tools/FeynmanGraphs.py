@@ -76,7 +76,7 @@ def connect ( canvas, p1, p2, straight=True, label=None, spin="fermion", bend=Tr
   a=random.gauss ( 0, 1 )
   if a<0.: b=-b
   segs=[]
-  if verbose: print "[FeynmanGraphs.py] ----- "
+  if verbose: print "[FeynmanGraphs.py] "
   for i in range(n):
     br=b * (-1)**i
     if not bend: br=None
@@ -107,9 +107,16 @@ def draw ( element, filename="bla.pdf", straight=False, inparts=True ):
     :param inparts: draw the incoming lines and the big production blob?
   """
   try:
+    print "here"
+    import os
+    f = open(os.devnull, 'w')
+    copy=sys.stdout
+    sys.stdout = f
     from pyx import text, bitmap, unit
     from pyfeyn.user import FeynDiagram, Point, Circle, HATCHED135, CIRCLE, Vertex,\
       WHITE, Fermion
+    sys.stdout=copy
+    print "there"
   except ImportError,e:
     print "[FeynmanGraphs.py] cannot draw, pyfeyn not installed?",e
     return
@@ -205,8 +212,8 @@ def draw ( element, filename="bla.pdf", straight=False, inparts=True ):
     os.system ( "convert %s %s" % ( pdffile, filename ) )
   print "[FeynmanGraphs.py] %s created." % ( filename )
 
-def drawBranch_ ( branch, upwards, labels ):
-  """ draws a single branch, should only be used via asciidraw, 
+def drawBranch_ ( branch, upwards, labels, html ):
+  """ draws a single branch, should only be used via .asciidraw, 
       not directly """
   lines=["  ","---"]
   labels="  "
@@ -231,12 +238,16 @@ def drawBranch_ ( branch, upwards, labels ):
 
   order=[0,1]
   if not upwards: order=[1,0]
+  HTML="<br>"
+  if html: print HTML
   if upwards and labels: print labels
+  if html: print HTML
   for i in order: print lines[i]
+  if html: print HTML
   if not upwards and labels: print labels
+  if html: print HTML
 
-def asciidraw ( element, labels=True ):
+def asciidraw ( element, labels=True, html=False ):
   """ draw a simple ascii graph on the screen """
   for (ct,branch) in enumerate(element.B):
-    drawBranch_ ( branch, upwards=(ct==0), labels=labels )
-    print 
+    drawBranch_ ( branch, upwards=(ct==0), labels=labels, html=html )
