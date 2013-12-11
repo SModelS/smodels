@@ -140,6 +140,7 @@ Only generated if cross-sections are read from SLHA file and not previously crea
     NewWeight = []
     for iel in range(len(ElList)):
       BaseEl = ElList[iel]
+      if not BaseEl.momID: continue
       ptc = BaseEl.momID.pop()
       weight = WList[iel]
       
@@ -159,24 +160,18 @@ Only generated if cross-sections are read from SLHA file and not previously crea
         for x in BR.ids:
           if x in ParticleNames.Reven:
             vertparts.append(ParticleNames.Reven[x])
-          elif x in ParticleNames.Rodd:
+          else:
             mass.append(Massdic[x])
             NewEl.momID.append(x)
-          else:
-            print '[SLHAdecomposer] unknown particle:',x
-            return False
           
         NewEl.particles.append(vertparts)
-        if len(mass) == 1:
-          NewEl.masses.append(mass[0])
-        else:
-          print '[SLHAdecomp] unknown decay (R-parity violation?)'
-          return False
+        if len(mass) == 1: NewEl.masses.append(mass[0])
         
         if weight*BR.br > sigcut:
           NewList.append(NewEl)
           NewWeight.append(weight*BR.br)
           newel = True
+
                 
     if newel:
       ElList = copy.deepcopy(NewList)
