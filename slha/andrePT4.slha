@@ -475,9 +475,6 @@ DECAY   1000037     6.27972592E+00   # chargino2+ decays
      2.47861957E-01    2     1000024        25   # BR(~chi_2+ -> ~chi_1+  h )
 #
 #         PDG            Width
-DECAY   1000022     0.00000000E+00   # neutralino1 decays
-#
-#         PDG            Width
 DECAY   1000023     4.84054022E+00   # neutralino2 decays
 #          BR         NDA      ID1       ID2
      6.79765904E-05    2     1000022        23   # BR(~chi_20 -> ~chi_10   Z )
@@ -665,6 +662,12 @@ DECAY        37     3.58953518E+01   # H+ decays
      1.80200874E-03    2    -2000015   1000016   # BR(H+ -> ~tau_2+ ~nu_tauL)
      3.23824706E-03    2     1000006  -1000005   # BR(H+ -> ~t_1    ~b_1*  )
      2.22611705E-01    2     1000006  -2000005   # BR(H+ -> ~t_1    ~b_2*  )
+#         PDG            Width
+DECAY   1000022     1.00000000E+00   # neutralino1 decays
+#          BR         NDA      ID1
+     1.00000000E+00    1       666   # BR(~chi_10 -> chgtck )
+
+
 
 XSECTION  8000.000000  2212  2212  2  -1000012  1000012  # Nevts=10000
 0  0  0  0  0  0  8.351420 SModelS 1.0
