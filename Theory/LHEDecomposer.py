@@ -21,18 +21,14 @@ def decompose(lhefile,W=None,nevts=None,doCompress=False,doInvisible=False,minma
   import LHEReader, TopologyBuilder, topology, types
   reader = LHEReader.LHEReader(lhefile,nevts)
   SMSTopList=topology.TopologyList ( )
-  for Event in reader:
-    ## Get mother PDGs:
-    momPDG = tuple(Event.getMom())
-    # Get event weight list:
+  for Event in reader:    
+    momPDG = tuple(Event.getMom())  # Get mother PDGs    
     weight = {}
-    for k in W.keys(): 
-      if W[k].has_key(momPDG):
-        weight[k]=W[k][momPDG]
+    for k in W.keys():              # Get event weight
+      if W[k].has_key(momPDG): weight[k]=W[k][momPDG]
       else:
         print "[LHEDecomposer] Error getting weight for",k,momPDG
-        # weight[k]=0.
-        # return None
+        return False
 
     # Get event topology  
     SMSTopListEv = TopologyBuilder.fromEvent(Event, weight, doCompress, doInvisible, minmassgap)
