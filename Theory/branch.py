@@ -60,19 +60,17 @@ class Branch(object):
         newBranch = copy.deepcopy(self)
         newparticles = []
         newmass = []
+        newBranch.daughterID = None
 
         for partID in BR.ids:
             if partID in ParticleNames.Reven:
                 newparticles.append(ParticleNames.Reven[partID])
-            elif partID in ParticleNames.Rodd:
+            else:
                 newmass.append(Massdic[partID])
                 newBranch.daughterID = partID
-            else:
-                print '[addDecay] unknown particle:',partID
-                return False
 
-        if len(newmass) != 1:
-            print '[addDecay] R-parity violating decay:',BR
+        if len(newmass) > 1:
+            print '[addDecay] multiple R-odd particles in the final state:',BR
             return False
 
         newBranch.particles.append(newparticles)
@@ -88,3 +86,8 @@ class Branch(object):
         newBranches = []
         for br in BRs: newBranches.append(self.addDecay(br,Massdic))
         return newBranches
+
+    def getLength(self):
+        """ Returns the branch length (= number of R-odd masses) """
+        
+        return len(self.masses)
