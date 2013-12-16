@@ -664,9 +664,6 @@ DECAY        37     3.58953518E+01   # H+ decays
      2.22611705E-01    2     1000006  -2000005   # BR(H+ -> ~t_1    ~b_2*  )
 #         PDG            Width
 DECAY   1000022     1.00000000E+00   # neutralino1 decays
-#          BR         NDA      ID1
-     1.00000000E+00    1       666   # BR(~chi_10 -> chgtck )
-
 
 
 XSECTION  8000.000000  2212  2212  2  -1000012  1000012  # Nevts=10000

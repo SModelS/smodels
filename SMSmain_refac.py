@@ -46,7 +46,7 @@ for (i,topo) in enumerate(SMSTopList):
  
       
 #Print element list for Topology[i]:  
-  if i == 0:       
+  if i == 0:
     for j,el in enumerate(topo.ElList):
       EvElement_table.add_row([i,j,el.getParticles()[0],el.getParticles()[1],wrap(printer.pformat(el.getMasses()[0]),width=25),wrap(printer.pformat(el.getMasses()[1]),width=25),wrap(printer.pformat(el.weight.getDictionary()),width=30)])
     EvElement_table.add_row(["---","---","---","---","---","---","---"])  
