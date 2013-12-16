@@ -5,6 +5,7 @@
         :synopsis: A class that encapsulates the result of the computation of the reference cross section.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
 """
 
@@ -191,11 +192,11 @@ class XSectionList:
             hasLabels = [info.label for info in Xsecs.getInfo()]
             for info in allInfo:
                 if not info.label in hasLabels:
-                     newentry = XSection()
-                     newentry.value = addunit(0.,'fb')
-                     newentry.pid = pid
-                     newentry.info = info
-                     self.XSections.append(newentry)
+                    newentry = XSection()
+                    newentry.value = addunit(0.,'fb')
+                    newentry.pid = pid
+                    newentry.info = info
+                    self.XSections.append(newentry)
 
 
     def getDictionary(self,groupBy="pids"):
@@ -240,7 +241,7 @@ class XSectionList:
                         oldXsec.pid = (None,None)
         
 
-def getXsecFromFile(slhafile):
+def getXsecFromSLHAFile(slhafile):
     """ obtain dictionary cross-sections from input SLHA file. """
 
     global UseXSecs
@@ -275,6 +276,60 @@ def getXsecFromFile(slhafile):
         XsecsInFile.XSections.append(xsec)
 
     slha.close()
+
+    if UseXSecs is None:
+        UseXSecs = XsecsInFile.getInfo()
+        log = logging.getLogger(__name__)
+        log.warning ( "Cross-section information not found. Using values from SLHA file" )
+    else:
+        for xsec in XsecsInFile.XSections:
+            if not xsec.info in UseXSecs: XsecsInFile.XSections.delete(xsec)     #Remove entries which do not match the previously defined cross-sections
+
+    return XsecsInFile
+
+
+def getXsecFromLHEFile(lhefile):
+    """ obtain dictionary cross-sections from input LHE file. Use maximum cross-section information in file and"""
+
+    global UseXSecs
+
+    XsecsInFile = XSectionList()    #To store information about all cross-sections in the LHE file
+    reader = LHEReader.LHEReader(lhefile,nevts)
+    if not reader.metainfo["totalxsec"]:
+        log.error("Cross-section information not found in LHE file.")
+        return False
+    elif not reader.metainfo["nevents"]:
+        log.error("Total number of events information not found in LHE file.")
+        return False
+    elif not reader.metainfo["sqrts"]:
+        log.error("Center-of-mass energy information not found in LHE file.")
+        return False    
+
+#Common cross-section info
+    totxsec = reader.metainfo["totalxsec"]
+    nevts = reader.metainfo["nevents"]
+    sqrtS = reader.metainfo["sqrts"]
+    event_cs = totxsec/float(nevts)
+    
+#Get all mom pids:
+    allpids = []    
+    for Event in reader: allpids.append(tuple(Event.getMom()))
+    allpids = set(allpids)    
+    for pids in allpids:
+        xsec = XSection()
+        xsec.info.sqrts = sqrtS
+        if reader.metainfo.has_key("cs_order"): xsec.info.order = reader.metainfo["cs_order"]
+        else: xsec.info.order = 0  #Assume LO xsecs, if not defined in the reader
+        wlabel = str(int(sqrtS))+' TeV'
+        if cs_order == 0: wlabel += ' (LO)'
+        elif cs_order == 1: wlabel += ' (NLO)'
+        elif cs_order == 2: wlabel += ' (NLL)'
+        xsec.info.label = wlabel
+        xsec.value = event_cs
+        xsec.pid = pids
+        XsecsInFile.XSections.append(xsec)
+
+    reader.close()
 
     if UseXSecs is None:
         UseXSecs = XsecsInFile.getInfo()
