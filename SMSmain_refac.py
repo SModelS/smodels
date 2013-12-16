@@ -2,7 +2,7 @@
 
 import sys
 from prettytable import PrettyTable
-from Theory import SLHADecomposer, SLHATools, CrossSection
+from Theory import slhaDecomposer, SLHATools, CrossSection
 from Tools.PhysicsUnits import addunit, rmvunit
 from Tools import SMSPrettyPrinter, VariousHelpers
 from Tools.SMSPrettyPrinter import wrap
@@ -29,7 +29,7 @@ DoCompress = True
 DoInvisible = True
 minmassgap = addunit(5.,'GeV')
 sigmacut = addunit(0.1,'fb')
-SMSTopList = SLHADecomposer.decompose(slhafile,sigmacut,DoCompress,DoInvisible,minmassgap)
+SMSTopList = slhaDecomposer.decompose(slhafile,sigmacut,DoCompress,DoInvisible,minmassgap)
 
 EvTop_table = PrettyTable(["Topology","#Vertices", "#Insertions", "#Elements", "Sum of weights"])
 EvElement_table = PrettyTable(["Topology","Element","Particles B[0]","Particles B[1]", "Masses B[0]","Masses B[1]","Element Weight"])
