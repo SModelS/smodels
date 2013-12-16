@@ -170,6 +170,11 @@ class Element(object):
                 vertparts[len(vertparts)-1].append(0)  #Append 0 for stable LSP
         return {"vertnumb" : vertnumb, "vertparts" : vertparts}
     
+    def getLength(self):
+        """ Returns the maximum of the two branch lengths """
+        
+        return max(self.branches[0].getLength(),self.branches[1].getLength())
+    
     def hasTopInList(self,elementList):
         """
         Checks if the element topology matches any of the topologies in the element list

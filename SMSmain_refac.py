@@ -27,7 +27,7 @@ Xsec=None
 SLHATools.writeXSecToSLHAFile(slhafile,nevts,printLHE=False)
 DoCompress = True
 DoInvisible = True
-minmassgap = addunit(10.,'GeV')
+minmassgap = addunit(5.,'GeV')
 sigmacut = addunit(0.1,'fb')
 SMSTopList = SLHADecomposer.decompose(slhafile,sigmacut,DoCompress,DoInvisible,minmassgap)
 
