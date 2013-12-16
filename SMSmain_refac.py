@@ -29,7 +29,6 @@ DoCompress = True
 DoInvisible = True
 minmassgap = addunit(10.,'GeV')
 sigmacut = addunit(0.1,'fb')
-if DoCompress or DoInvisible: sigmacut = sigmacut/10.  #When compression is turned on, relax sigmacut
 SMSTopList = SLHADecomposer.decompose(slhafile,sigmacut,DoCompress,DoInvisible,minmassgap)
 
 EvTop_table = PrettyTable(["Topology","#Vertices", "#Insertions", "#Elements", "Sum of weights"])
