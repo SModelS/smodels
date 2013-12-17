@@ -54,8 +54,7 @@ class Branch(object):
 
     
     def addDecay(self,BR,Massdic):
-        """ Generates a new branch adding a 1-step cascade decay described by the BR object, with particle masses given by Massdic"""
-        import copy
+        """ Generates a new branch adding a 1-step cascade decay described by the BR object, with particle masses given by Massdic"""        
         import ParticleNames
         newBranch = copy.deepcopy(self)
         newparticles = []

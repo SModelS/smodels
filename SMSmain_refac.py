@@ -2,11 +2,10 @@
 
 import sys
 from prettytable import PrettyTable
-from Theory import slhaDecomposer, SLHATools, CrossSection
-from Tools.PhysicsUnits import addunit, rmvunit
-from Tools import SMSPrettyPrinter, VariousHelpers
+from Theory import slhaDecomposer, lheDecomposer, SLHATools, crossSection
+from Tools.PhysicsUnits import addunit
+from Tools import SMSPrettyPrinter
 from Tools.SMSPrettyPrinter import wrap
-from Tools.VariousHelpers import logging
 from Experiment import SMSAnalysisFactory
 from Theory.theoryPrediction import PredictionForAnalysis
 
@@ -14,22 +13,20 @@ from Theory.theoryPrediction import PredictionForAnalysis
 # useXsec.sqrts = addunit(8,'TeV')
 # useXsec.order = 2
 # useXsec.label = 'tev8'
-# CrossSection.UseXSecs = [useXsec]
+# UseXSecs = [useXsec]
 
 listOfAnalyses = SMSAnalysisFactory.load()
-
 printer=SMSPrettyPrinter.SMSPrettyPrinter()
-
 slhafile = "slha/andrePT4.slha"
+lhefile = "lhe/ued_1.lhe"
 nevts = 10000
-
-Xsec=None
 SLHATools.writeXSecToSLHAFile(slhafile,nevts,printLHE=False)
 DoCompress = True
 DoInvisible = True
 minmassgap = addunit(5.,'GeV')
 sigmacut = addunit(0.1,'fb')
-SMSTopList = slhaDecomposer.decompose(slhafile,sigmacut,DoCompress,DoInvisible,minmassgap)
+# SMSTopList = slhaDecomposer.decompose(slhafile,sigmacut,DoCompress,DoInvisible,minmassgap)
+SMSTopList = lheDecomposer.decompose(lhefile,None,DoCompress,DoInvisible,minmassgap)
 
 EvTop_table = PrettyTable(["Topology","#Vertices", "#Insertions", "#Elements", "Sum of weights"])
 EvElement_table = PrettyTable(["Topology","Element","Particles B[0]","Particles B[1]", "Masses B[0]","Masses B[1]","Element Weight"])
