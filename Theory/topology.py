@@ -7,11 +7,8 @@
 .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
     
 """
-from ParticleNames import simParticles
 from Tools.PhysicsUnits import addunit
-from Theory import CrossSection
-from AuxiliaryFunctions import getelements, eltonum, Ceval
-import copy
+from Theory import crossSection
 import logging
 from Theory.element import Element
 logging.basicConfig(level=logging.INFO)
@@ -34,10 +31,9 @@ class Topology(object):
         self.ElList = []
         
         if elements:
-            if type(elements) == type(Element()):
-                self.addElement(elements)              
+            if type(elements) == type(Element()): self.addElement(elements)              
             elif type(elements) == type([]):
-                for element in elementList: self.addElement(element)
+                for element in elements: self.addElement(element)
 
 
     def __eq__(self,other):
@@ -126,7 +122,7 @@ class Topology(object):
               
         added = False
         #Include element to ElList:
-        for iel,element in enumerate(self.ElList):
+        for element in self.ElList:
             if element == newelement:
                 added = True
                 element.weight.combineWith(newelement.weight)
@@ -141,7 +137,7 @@ class Topology(object):
         if added: return True
         #If element has not been found add to list (OBS: if both branch orderings are good, add the original one)
         tryelements = [newelement,newelement.switchBranches()]  #Check both branch orderings
-        for iel,newel in enumerate(tryelements):
+        for newel in tryelements:
             info = newel.getEinfo()
             if info["vertnumb"] != self.vertnumb or info["vertparts"] != self.vertparts: continue
             self.ElList.append(newel)
@@ -155,9 +151,8 @@ class Topology(object):
         """
         if len(self.ElList) == 0: return None
         
-        sumw = CrossSection.XSectionList(self.ElList[0].weight.getInfo()) #Create zero weight list
-        for weight in sumw.XSections: weight.value = addunit(0.,'fb')
-        for element in self.ElList:  sumw.combineWith(element.weight)
+        sumw = crossSection.XSectionList()        
+        for element in self.ElList: sumw.combineWith(element.weight)
            
         return sumw    
  
@@ -230,7 +225,7 @@ class TopologyList(object):
             if topoweight:  sumwtopos.append(topoweight)
         
         if len(sumwtopos) == 0: return None
-        sumw = CrossSection.XSectionList(sumwtopos[0].getInfo())  #Create zero weight list 
+        sumw = crossSection.XSectionList(sumwtopos[0].getInfo())  #Create zero weight list 
         for weight in sumwtopos:  sumw.combineWith(weight)
         
         return sumw    

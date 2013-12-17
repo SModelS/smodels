@@ -69,7 +69,6 @@ Only generated if cross-sections are read from SLHA file and not previously crea
                     FinalBR = branch1.maxWeight*branch2.maxWeight/(maxWeight[pids[0]]*maxWeight[pids[1]])
                     if type(FinalBR) == type(addunit(1.,'fb')): FinalBR = FinalBR.asNumber()                 
                     weightList = XSectionList.getXsecsFor(pids)*FinalBR
-#                     weightList.makeUniformLabels()                  # Adds zeros to non-existing cross-sections
                     
                     newElement = element.Element([branch1,branch2])
                     newElement.weight = weightList

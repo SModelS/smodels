@@ -27,8 +27,9 @@ class LHEReader:
         self.metainfo = {"nevents" : None, "totalxsec" : None, "sqrts" : None}
         
 #Get header information from file (cross-section sqrts, total cross-section, total number of events)
-        self.File.rewind()        
-        while None in self.metainfo.values():
+        self.File.seek(0)
+        gotAllInfo = False   
+        while not gotAllInfo:
             line = self.File.readline()
             if line == "": break             #Exit if reached end of file
             if line.find("Number of Events        :") > -1:
@@ -39,9 +40,13 @@ class LHEReader:
                 self.metainfo["totalxsec"] = iwght
             elif line.find("<init>") > -1:
                 line = self.File.readline()
-                self.metainfo["sqrts"] = addunit(line.split()[2] + line.split()[3],'GeV')
+                self.metainfo["sqrts"] = addunit(eval(line.split()[2]) + eval(line.split()[3]),'GeV')
+            
+            gotAllInfo = True  #Check if all relevant information has been collected
+            for val in self.metainfo.values():
+                if val is None: gotAllInfo = False
         
-        self.File.rewind()  #Return file to initial reader position
+        self.File.seek(0)  #Return file to initial reader position
         
         
     def next ( self ):

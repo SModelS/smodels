@@ -9,7 +9,7 @@
 
 """
 
-from Tools.PhysicsUnits import addunit
+from Tools.PhysicsUnits import addunit, rmvunit
 import copy
 import logging
 logger = logging.getLogger(__name__)
@@ -108,15 +108,18 @@ class XSectionList:
         newList = copy.deepcopy(self)
         for ixsec,xsec in enumerate(newList.XSections): newList.XSections[ixsec] = xsec*other
         return newList
+    
+    def __iter__(self):
+        return iter(self.XSections)
 
     def __str__(self):
-        return str(self.getDictionary())
+        return str([str(xsec) for xsec in self])
 
 
     def getXsecsFor(self,item):
         """ Returns a list of XSection objects for item (label, pid, sqrts) """
         xsecList = XSectionList()
-        for xsec in self.XSections:
+        for xsec in self:
             if type(item) == type(xsec.info.label) and item == xsec.info.label:
                 xsecList.XSections.append(xsec)
             elif type(item) == type(xsec.info.sqrts) and item == xsec.info.sqrts:    
@@ -132,7 +135,7 @@ class XSectionList:
         """
         Replaces the cross-section values in the list by zero
         """
-        for xsec in self.XSections:  xsec.value = addunit(0.,'fb')
+        for xsec in self:  xsec.value = addunit(0.,'fb')
 
     def delete(self,XSec):
         """Deletes the cross-section entry from the list"""
@@ -142,7 +145,7 @@ class XSectionList:
     def getInfo(self):
         """Gets the basic info about the cross-sections appearing in the list (order,value and label). Returns a list of XSectionInfo objects """
         allInfo = []
-        for xsec in self.XSections:
+        for xsec in self:
             info = xsec.info
             if not info in allInfo: allInfo.append(info)
         return allInfo
@@ -157,45 +160,22 @@ class XSectionList:
     def getPIDpairs(self):
         """Gets all the particle ID pairs appearing in the list."""
         allPidPairs = []
-        for xsec in self.XSections: allPidPairs.append(xsec.pid)
+        for xsec in self: allPidPairs.append(xsec.pid)
         return list(set(allPidPairs)) 
 
     def getPIDs(self):
         """Gets all the particle IDs appearing in the list."""
         allPids = []
-        for xsec in self.XSections: allPids.extend(xsec.pid)
+        for xsec in self: allPids.extend(xsec.pid)
         return list(set(allPids)) 
 
 
     def getMaxXsec(self):
         """Gets the maximum cross-section value appearing in the list."""
         maxxsec= addunit(0.,'fb')
-        for xsec in self.XSections:
+        for xsec in self:
             if xsec.value > maxxsec: maxxsec = xsec.value
         return maxxsec
-
-#     def makeUniformLabels(self):
-#         """ Fills the cross-section list with zero cross-section entries, so all particles have cross-section entries for all labels """
-# 
-#         global UseXSecs
-# 
-#         if UseXSecs is None:
-#             logger.error("[CrossSection.makeUniformLabels]: the standard cross-section format has to be defined!")
-#             return False
-#         else:
-#             allInfo = UseXSecs
-#           
-#         allPids = self.getPIDpairs()        
-#         for pid in allPids:
-#             Xsecs = self.getXsecsFor(pid)
-#             hasLabels = [info.label for info in Xsecs.getInfo()]
-#             for info in allInfo:
-#                 if not info.label in hasLabels:
-#                     newentry = XSection()
-#                     newentry.value = addunit(0.,'fb')
-#                     newentry.pid = pid
-#                     newentry.info = info
-#                     self.XSections.append(newentry)
 
 
     def getDictionary(self,groupBy="pids"):
@@ -204,14 +184,13 @@ class XSectionList:
         If groupBy=pids and a single pid is present, return a simple dictionary with the cross-sections for the pid"""
 
         XsecDic = {}
-        self.makeUniformLabels()    #Make sure all particles have entries for all labels
 
         if groupBy == "pids":
             allPids = self.getPIDpairs()
             for pid in allPids:
                 XsecDic[pid] = {}
                 Xsecs = self.getXsecsFor(pid)
-                for xsec in Xsecs.XSections: XsecDic[pid][xsec.info.label] = xsec.value
+                for xsec in Xsecs: XsecDic[pid][xsec.info.label] = xsec.value
             if len(allPids) == 1: XsecDic = XsecDic[allPids[0]]  #Return standard weight dictionary                
 
         elif groupBy == "labels":
@@ -219,7 +198,7 @@ class XSectionList:
             for label in allLabels:
                 XsecDic[label] = {}
                 Xsecs = self.getXsecsFor(label)
-                for xsec in Xsecs.XSections:
+                for xsec in Xsecs:
                     XsecDic[label][xsec.pid] = xsec.value
                     
 
@@ -229,12 +208,12 @@ class XSectionList:
         """ Adds a new list of cross-sections. If the new cross-sections already appear (have same order and sqrts), add its
         value to the original value, otherwise append it to the list.
         The particle IDs are ignored when adding cross-sections. Hence they are set to (None,None) if any cross-sections are combined"""
-                        
-        for newXsec in newList.XSections:
+        
+        for newXsec in newList:
             if not newXsec.info in self.getInfo():
-                newList.XSections.append(newXsec)                
+                self.XSections.append(newXsec)                
             else:    
-                for oldXsec in self.XSections:
+                for oldXsec in self:
                     if newXsec.info == oldXsec.info:
                         oldXsec.value = copy.deepcopy(oldXsec.value + newXsec.value)
                         oldXsec.pid = (None,None)
@@ -293,13 +272,13 @@ def getXsecFromLHEFile(lhefile):
 
     XsecsInFile = XSectionList()    #To store information about all cross-sections in the LHE file
     reader = LHEReader.LHEReader(lhefile)
-    if not reader.metainfo["totalxsec"]:
+    if not rmvunit(reader.metainfo["totalxsec"],'fb'):
         logger.error("Cross-section information not found in LHE file.")
         return False
     elif not reader.metainfo["nevents"]:
         logger.error("Total number of events information not found in LHE file.")
         return False
-    elif not reader.metainfo["sqrts"]:
+    elif not rmvunit(reader.metainfo["sqrts"],'TeV'):
         logger.error("Center-of-mass energy information not found in LHE file.")
         return False    
 
@@ -318,7 +297,7 @@ def getXsecFromLHEFile(lhefile):
         xsec.info.sqrts = sqrtS
         if reader.metainfo.has_key("cs_order"): xsec.info.order = reader.metainfo["cs_order"]
         else: xsec.info.order = 0  #Assume LO xsecs, if not defined in the reader
-        wlabel = str(int(sqrtS))+' TeV'
+        wlabel = str(int(rmvunit(sqrtS,'TeV')))+' TeV'
         if xsec.info.order == 0: wlabel += ' (LO)'
         elif xsec.info.order == 1: wlabel += ' (NLO)'
         elif xsec.info.order == 2: wlabel += ' (NLL)'

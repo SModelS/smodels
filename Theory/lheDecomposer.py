@@ -31,7 +31,9 @@ def decompose(lhefile,inputXsecs=None,nevts=None,DoCompress=False,DoInvisible=Fa
     SMSTopList=topology.TopologyList ( )
 #get cross-section from file
     if not inputXsecs:  XSectionList = crossSection.getXsecFromLHEFile(lhefile)
-    else: XSectionList = inputXsecs 
+    else: XSectionList = inputXsecs
+    
+    print XSectionList
 
 #Loop over events and decompose 
     for Event in reader:    

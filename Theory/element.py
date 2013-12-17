@@ -9,10 +9,8 @@
     
 """
 from ParticleNames import PtcDic, Reven, simParticles
-from Tools.PhysicsUnits import rmvunit
 from branch import Branch
-from CrossSection import XSectionList
-import copy,sys
+import copy
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -28,7 +26,7 @@ class Element(object):
         Constructor
         """
         self.branches = [Branch(),Branch()]
-        self.weight = XSectionList()
+        self.weight = None
                 
         if info:
             if type(info) == type('string'):   #Creates element from particle string
@@ -283,7 +281,6 @@ class Element(object):
         #Loop over branches
         for ib,branch in enumerate(self.branches):
             if vertnumb[ib] < 2: continue
-            masses = branch.masses
             particles = branch.particles            
             for ivertex in range(vertnumb[ib]-2,-1,-1):
                 if particles[ivertex].count('nu') == len(particles[ivertex]):
