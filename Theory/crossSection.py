@@ -9,12 +9,11 @@
 
 """
 
-from Tools.PhysicsUnits import addunit, rmvunit
+from Tools.PhysicsUnits import addunit
 import copy
 import logging
 logger = logging.getLogger(__name__)
-
-UseXSecs = None
+import LHEReader
 
 class XSectionInfo:
     """A simple class to store information about the cross-section (center of mass, order and label)"""
@@ -89,7 +88,7 @@ class XSection:
 
          
 class XSectionList:
-    """A simple class to store the list of cross-sections to be used"""        
+    """A simple class to store a list of cross-sections to be used"""        
     
     def __init__ (self,infoList=None):
         """Creates a list of XSection objects from the input string with None cross-section values.
@@ -97,7 +96,7 @@ class XSectionList:
         self.XSections=[]
         
         if infoList:
-           for info in infoList:
+            for info in infoList:
                 newentry = XSection()
                 newentry.value = addunit(0.,'fb')
                 newentry.pid = (None,None)
@@ -175,28 +174,28 @@ class XSectionList:
             if xsec.value > maxxsec: maxxsec = xsec.value
         return maxxsec
 
-    def makeUniformLabels(self):
-        """ Fills the cross-section list with zero cross-section entries, so all particles have cross-section entries for all labels """
-
-        global UseXSecs
-
-        if UseXSecs is None:
-            logger.error("[CrossSection.makeUniformLabels]: the standard cross-section format has to be defined!")
-            return False
-        else:
-            allInfo = UseXSecs
-          
-        allPids = self.getPIDpairs()        
-        for pid in allPids:
-            Xsecs = self.getXsecsFor(pid)
-            hasLabels = [info.label for info in Xsecs.getInfo()]
-            for info in allInfo:
-                if not info.label in hasLabels:
-                    newentry = XSection()
-                    newentry.value = addunit(0.,'fb')
-                    newentry.pid = pid
-                    newentry.info = info
-                    self.XSections.append(newentry)
+#     def makeUniformLabels(self):
+#         """ Fills the cross-section list with zero cross-section entries, so all particles have cross-section entries for all labels """
+# 
+#         global UseXSecs
+# 
+#         if UseXSecs is None:
+#             logger.error("[CrossSection.makeUniformLabels]: the standard cross-section format has to be defined!")
+#             return False
+#         else:
+#             allInfo = UseXSecs
+#           
+#         allPids = self.getPIDpairs()        
+#         for pid in allPids:
+#             Xsecs = self.getXsecsFor(pid)
+#             hasLabels = [info.label for info in Xsecs.getInfo()]
+#             for info in allInfo:
+#                 if not info.label in hasLabels:
+#                     newentry = XSection()
+#                     newentry.value = addunit(0.,'fb')
+#                     newentry.pid = pid
+#                     newentry.info = info
+#                     self.XSections.append(newentry)
 
 
     def getDictionary(self,groupBy="pids"):
@@ -241,10 +240,14 @@ class XSectionList:
                         oldXsec.pid = (None,None)
         
 
-def getXsecFromSLHAFile(slhafile):
-    """ obtain dictionary cross-sections from input SLHA file. """
+def getXsecFromSLHAFile(slhafile,UseXSecs=None):
+    """ obtain cross-sections from input SLHA file. 
+        :param slhafile: SLHA input file with cross-sections
+        :param UseXsecs: if defined enables the user to select cross-sections to use./
+        Must be a XSecInfoList object
+        :returns: a XSectionList object     
+    """
 
-    global UseXSecs
 
     XsecsInFile = XSectionList()    #To store information about all cross-sections in the SLHA file
     slha = open(slhafile, 'r')
@@ -273,36 +276,31 @@ def getXsecFromSLHAFile(slhafile):
         xsec.info.label = wlabel
         xsec.value = cs
         xsec.pid = pids
-        XsecsInFile.XSections.append(xsec)
+#Do not add xsecs which do not match the user required ones:        
+        if UseXSecs and not xsec.info in UseXSecs: continue 
+        else: XsecsInFile.XSections.append(xsec)
 
     slha.close()
-
-    if UseXSecs is None:
-        UseXSecs = XsecsInFile.getInfo()
-        log = logging.getLogger(__name__)
-        log.warning ( "Cross-section information not found. Using values from SLHA file" )
-    else:
-        for xsec in XsecsInFile.XSections:
-            if not xsec.info in UseXSecs: XsecsInFile.XSections.delete(xsec)     #Remove entries which do not match the previously defined cross-sections
 
     return XsecsInFile
 
 
 def getXsecFromLHEFile(lhefile):
-    """ obtain dictionary cross-sections from input LHE file. Use maximum cross-section information in file and"""
-
-    global UseXSecs
+    """ obtain cross-sections from input LHE file. 
+        :param lhefile: LHE input file with unweighted MC events        
+        :returns: a XSectionList object     
+    """                       
 
     XsecsInFile = XSectionList()    #To store information about all cross-sections in the LHE file
-    reader = LHEReader.LHEReader(lhefile,nevts)
+    reader = LHEReader.LHEReader(lhefile)
     if not reader.metainfo["totalxsec"]:
-        log.error("Cross-section information not found in LHE file.")
+        logger.error("Cross-section information not found in LHE file.")
         return False
     elif not reader.metainfo["nevents"]:
-        log.error("Total number of events information not found in LHE file.")
+        logger.error("Total number of events information not found in LHE file.")
         return False
     elif not reader.metainfo["sqrts"]:
-        log.error("Center-of-mass energy information not found in LHE file.")
+        logger.error("Center-of-mass energy information not found in LHE file.")
         return False    
 
 #Common cross-section info
@@ -321,22 +319,14 @@ def getXsecFromLHEFile(lhefile):
         if reader.metainfo.has_key("cs_order"): xsec.info.order = reader.metainfo["cs_order"]
         else: xsec.info.order = 0  #Assume LO xsecs, if not defined in the reader
         wlabel = str(int(sqrtS))+' TeV'
-        if cs_order == 0: wlabel += ' (LO)'
-        elif cs_order == 1: wlabel += ' (NLO)'
-        elif cs_order == 2: wlabel += ' (NLL)'
+        if xsec.info.order == 0: wlabel += ' (LO)'
+        elif xsec.info.order == 1: wlabel += ' (NLO)'
+        elif xsec.info.order == 2: wlabel += ' (NLL)'
         xsec.info.label = wlabel
         xsec.value = event_cs
         xsec.pid = pids
         XsecsInFile.XSections.append(xsec)
 
     reader.close()
-
-    if UseXSecs is None:
-        UseXSecs = XsecsInFile.getInfo()
-        log = logging.getLogger(__name__)
-        log.warning ( "Cross-section information not found. Using values from SLHA file" )
-    else:
-        for xsec in XsecsInFile.XSections:
-            if not xsec.info in UseXSecs: XsecsInFile.XSections.delete(xsec)     #Remove entries which do not match the previously defined cross-sections
 
     return XsecsInFile

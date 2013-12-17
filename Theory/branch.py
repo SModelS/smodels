@@ -94,3 +94,24 @@ class Branch(object):
         """ Returns the branch length (= number of R-odd masses) """
         
         return len(self.masses)
+    
+
+def decayBranches(branchList,BRdic,Massdic,sigcut=0.):
+    """ Decay all branches from branchList until all R-odd particles have decayed.
+    :param branchList: list of Branch() objects containing the initial mothers
+    :param BRdic: branching ratio dictionary for all particles appearing in the decays
+    :param Massdic: mass dictionary for all particles appearing in the decays
+    :param sigcut: minimum sigma*BR to be generated, by default sigcut = 0. (all branches are kept
+    """
+    
+    finalBranchList = [] 
+    while branchList:   
+        newBranchList = []  #Store branches after adding one step cascade decay     
+        for branch in branchList:
+            if branch.maxWeight < sigcut: continue #Remove the branches above sigcut and with length > topmax
+            newBranches = branch.decayDaughter(BRdic,Massdic)  #Add all possible decays of the R-odd daughter to the original branch (if any)
+            if newBranches: newBranchList.extend(newBranches)  #New branches were generated, add them for next iteration
+            else: finalBranchList.append(branch)               #All particles have already decayed, store final branch
+        branchList = newBranchList   #Use new branches (if any) for next iteration step
+        
+    return finalBranchList
