@@ -404,7 +404,7 @@ def getUpperLimit (analysis, topo, mx=None, my=None, run=None, png=None, interpo
             if png==True, return path of pngfile containing the histogram"""
     run = SMSHelpers.getRun (analysis, run)
     if SMSHelpers.hasDictionary (analysis, run):
-        return getUpperLimitFromDictionary (analysis, topo, mx, my, run, interpolate=interpolate, expected=expected)
+        return  getUpperLimitFromDictionary (analysis, topo, mx, my, run, interpolate=interpolate, expected=expected)
     if png == True:
         pngfile = SMSHelpers.getUpperLimitPng(analysis, topo, run)
         return pngfile

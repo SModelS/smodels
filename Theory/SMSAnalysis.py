@@ -207,7 +207,6 @@ class EAnalysis:
     experimental limits to define distance """
     from  Experiment import LimitGetter
 
-  
 
 #Get upper bounds for each mass if input are not numbers:
     if type(mass1) != type(1.) or type(mass2) != type(1.):
@@ -219,6 +218,8 @@ class EAnalysis:
       xmass1 = mass1
       xmass2 = mass2
 
+    if xmass1 == 0.: xmass1 = None
+    if xmass2 == 0.: xmass2 = None
     if xmass1 is None or xmass2 is None: return None
 
     d = 2.*abs(xmass1-xmass2)/(xmass1+xmass2)
@@ -233,6 +234,7 @@ class EAnalysis:
         If nounit=True, the result is given as number assuming fb units """
     from  Experiment import LimitGetter
     xmass = LimitGetter.GetPlotLimit(mass,self,complain=False)
+        
     if type(xmass) != type(addunit(1.,'pb')): return None
     if nounit: xmass = rmvunit(xmass,'fb')
     return xmass
