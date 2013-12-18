@@ -1,0 +1,731 @@
+
+C   25/02/93 404211828  MEMBER NAME  VEGASINT (MACROS)      FVS
+
+************************************************************************
+*                                                                      *
+*     SUBROUTINE INTEG (CALLING VEGAS):                                *
+*     ---------------------------------                                *
+*                                                                      *
+*     IDIM-DIMENSIONAL MONTE CARLO INTEGRATION OF FUNCTION "FUNCT"     *
+*     1ST RUN (VEGAS) : IPOINT  CALLS, ITER  ITERATIONS                *
+*     2ND RUN (VEGAS1): IPOINT1 CALLS, ITER1 ITERATIONS                *
+*     RESULT "RES" IS RETURNED WITH DESIRED ACCURACY "ACC"             *
+*                                                                      *
+************************************************************************
+*                                                                      *
+*     NEW VERSION WITH ARRAYS AS INPUT:                                *
+*     1ST RUN (VEGAS) : IVEGAS(1) CALLS, IVEGAS(2) ITERATIONS          *
+*     2ND RUN (VEGAS1) : IVEGAS(3) CALLS, IVEGAS(4) ITERATIONS         *
+*                                                                      *
+************************************************************************
+*                                                                      *
+*     NEW VERSION WITH A CHOICE OF RANDOM NUMBER GENERATORS            *
+*                                                                      *
+*     RNG determines which random-number generator is used:            *
+*       1 uses Fortran's ran(...) function                             *
+*       2 uses a Faure quasi-random sequence                           *
+*       3 uses a Sobol quasi-random sequence (default)                 *
+*       4 uses the usual random number generator                       *
+*                                                                      *
+************************************************************************
+      subroutine INTEG(fxn,idim,ivegas,acc,res,rel)
+
+      implicit real*8 (a-h,k-z)
+      integer iprint, ivegas(1:4)
+
+      common/result/s1,s2,s3,s4
+
+      external fxn
+
+      ipoint = ivegas(1)
+      iter = ivegas(2) 
+      ipoint1 = ivegas(3)
+      iter1 = ivegas(4)
+
+ctp      acc = min(acc,1.d-4)
+      acc = 1.d-5
+      iprint = 10
+
+      call VEGAS(fxn,acc,idim,ipoint,iter,iprint,0)
+      call VEGAS1(fxn,acc,idim,ipoint1,iter1,iprint,0)
+
+      res = s1
+      rel = abs(s2/s1)
+
+      return
+      end
+
+
+c-----------------------------------------------------------------------
+      SUBROUTINE VEGAS(FXN,BCC,NDIM,NCALL,ITMX,NPRN,IGRAPH)
+
+      IMPLICIT REAL*8 (A-H,O-Z)
+
+      real*8 array(ndim)
+
+      dimension xi(50,10),inxi(50,10),d(50,10),di(50,10)
+      DIMENSION XIN(50),R(50),DX(10),IA(10),KG(10),DT(10)
+      DIMENSION XL(10),XU(10),QRAN(10),X(10)
+
+      COMMON/RESULT/S1,S2,S3,S4
+
+      EXTERNAL FXN
+
+      DATA XL,XU/10*0.D0,10*1.D0/
+      DATA NDMX/50/,ALPH/1.5D0/,ONE/1.D0/,MDS/1/
+
+c replaces the hard coded cutoff 1.d-70 by joerg zunft
+      parameter(tiny = 1.d-36)
+      parameter(nrg = 4)
+c end of change 
+
+c         factor 10*2 because first call is vegas, not vegas1
+      maxnum = 10*2*ncall*itmx
+      if (nrg.eq.1) then 
+         call INIRANDOM_1(maxnum,ndim)
+      else if (nrg.eq.2) then 
+         call INIRANDOM_2(maxnum,ndim)
+      else if (nrg.eq.3) then 
+         call INIRANDOM_3(maxnum,ndim)
+      else if (nrg.eq.4) then 
+         call INIRANDOM_4(maxnum,ndim)
+      else 
+         print*, " nrg wrong, set to 4 ",nrg
+         call INIRANDOM_4(maxnum,ndim)
+      end if
+
+      IPR=1
+      IF(NPRN.GT.0)IPR=0
+      INDO=1
+      DO 1 J=1,NDIM
+1     XI(1,J)=ONE
+      ENTRY VEGAS1(FXN,BCC,NDIM,NCALL,ITMX,NPRN,IGRAPH)
+      NOW=IGRAPH
+C---  NEXT LINE TAKEN OUT ON 04/06/92 BY J. ZUNFT
+C---  IF(IGRAPH.GT.0)CALL INPLOT(NOW,F1,W)
+      IT=0
+c---  copy it to it_common 9/14/02 by tp
+      it_common=it
+      SI=0.D0
+      SI2=SI
+      SWGT=SI
+      SCHI=SI
+      SCALLS=SI
+      ENTRY VEGAS2(FXN,BCC,NDIM,NCALL,ITMX,NPRN,IGRAPH)
+      ND=NDMX
+      NG=1
+      IF(MDS.EQ.0) GO TO 2
+      NG=(NCALL*0.5D0)**(1.D0/NDIM)
+      MDS=1
+      IF((2*NG-NDMX).LT.0) GO TO 2
+      MDS=-1
+      NPG=NG/NDMX+1
+      ND=NG/NPG
+      NG=NPG*ND
+2     K=NG**NDIM
+      NPG=NCALL/K
+      IF(NPG.LT.2)NPG=2
+      CALLS=NPG*K
+      DXG=ONE/NG
+      DV2G=DXG**(2*NDIM)/NPG/NPG/(NPG-ONE)
+      XND=ND
+      NDM=ND-1
+      DXG=DXG*XND
+      XJAC=ONE
+      DO 3 J=1,NDIM
+      DX(J)=XU(J)-XL(J)
+3     XJAC=XJAC*DX(J)
+      IF(ND.EQ.INDO) GO TO 8
+      RC=INDO/XND
+      DO 7 J=1,NDIM
+      K=0
+      XN=0.D0
+      DR=XN
+      I=K
+4     K=K+1
+      DR=DR+ONE
+      XO=XN
+      XN=XI(K,J)
+5     IF(RC.GT.DR) GO TO 4
+      I=I+1
+      DR=DR-RC
+      XIN(I)=XN-(XN-XO)*DR
+      IF(I.LT.NDM) GO TO 5
+      DO 6  I=1,NDM
+6     XI(I,J)=XIN(I)
+7     XI(ND,J)=ONE
+      INDO=ND
+      ACC=BCC
+8     IF(NPRN.NE.0.AND.NPRN.NE.10)PRINT 200,NDIM,CALLS,IT,ITMX
+     1,ACC,MDS,ND
+      IF(NPRN.EQ.10)PRINT 290,NDIM,CALLS,ITMX,ACC
+ctp      IF(NPRN.EQ.10)PRINT 290,NDIM,CALLS,ITMX,ACC,MDS,ND
+      ENTRY VEGAS3(FXN,BCC,NDIM,NCALL,ITMX,NPRN,IGRAPH)
+9     IT=IT+1
+c---  copy it to it_common 9/14/02 by tp
+      it_common=it
+      TI=0.D0
+      TSI=TI
+C---  NEXT LINE TAKEN OUT ON 04/06/92 BY J. ZUNFT
+C---  IF(IGRAPH.GT.0)CALL REPLOT(NOW,F1,W)
+      DO 10 J=1,NDIM
+      KG(J)=1
+      DO 10 I=1,ND
+      INXI(I,J)=0
+      D(I,J)=TI
+10    DI(I,J)=TI
+11    FB=0.D0
+      F2B=FB
+      K=0
+12    K=K+1
+ctp      DO 121 J=1,NDIM
+ctp121   QRAN(J)=DBLE(UNIV())
+      do j=1,ndim
+         if (nrg.eq.1) then 
+            call GETRANDOM_1(array)
+         else if (nrg.eq.2) then 
+            call GETRANDOM_2(array)
+         else if (nrg.eq.3) then 
+            call GETRANDOM_3(array)
+         else if (nrg.eq.4) then 
+            call GETRANDOM_4(array)
+         else 
+            print*, " nrg wrong, set to 4 ",nrg
+            call GETRANDOM_4(array)
+         end if
+         qran(j)=array(1)
+      end do
+      WGT=XJAC
+      DO 15 J=1,NDIM
+      XN=(KG(J)-QRAN(J))*DXG+ONE
+      IA(J)=XN
+      IAJ=IA(J)
+      IAJ1=IAJ-1
+      IF(IAJ.GT.1) GO TO 13
+      XO=XI(IAJ,J)
+      RC=(XN-IAJ)*XO
+      GO TO 14
+13    XO=XI(IAJ,J)-XI(IAJ1,J)
+      RC=XI(IAJ1,J)+(XN-IAJ)*XO
+14    X(J)=XL(J)+RC*DX(J)
+15    WGT=WGT*XO*XND
+      F=FXN(X)*WGT
+      F1=F/CALLS
+      W=WGT/CALLS
+C---  NEXT LINE TAKEN OUT ON 04/06/92 BY J. ZUNFT
+C---  IF(IGRAPH.GT.0)CALL XPLOT(NOW,F1,W)
+      F2=F*F
+      FB=FB+F
+      F2B=F2B+F2
+      DO 16 J=1,NDIM
+      IAJ=IA(J)
+      INXI(IAJ,J)=INXI(IAJ,J)+1
+      DI(IAJ,J)=DI(IAJ,J)+F/CALLS
+16    IF(MDS.GE.0)  D(IAJ,J)=D(IAJ,J)+F2
+      IF(K.LT.NPG) GO TO 12
+      F2B=F2B*NPG
+      F2B=SQRT(F2B)
+      F2B=(F2B-FB)*(F2B+FB)
+      TI=TI+FB
+      TSI=TSI+F2B
+      IF(MDS.GE.0) GO TO 18
+      DO 17 J=1,NDIM
+      IAJ=IA(J)
+17    D(IAJ,J)=D(IAJ,J)+F2B
+18    K=NDIM
+19    KG(K)=MOD(KG(K),NG)+1
+      IF(KG(K).NE.1) GO TO 11
+      K=K-1
+      IF(K.GT.0) GO TO 19
+      TI=TI/CALLS
+      TSI=TSI*DV2G
+      TI2=TI*TI
+C--------- CHANGE BY J. ZUNFT, 05/06/92------------------
+      IF (ABS(TSI).LT.tiny) TSI = SIGN(tiny,TSI)
+C--------------------------------------------------------
+      WGT=TI2/TSI
+      SI=SI+TI*WGT
+      SI2=SI2+TI2
+      SWGT=SWGT+WGT
+      SCHI=SCHI+TI2*WGT
+      SCALLS=SCALLS+CALLS
+C--------- CHANGE BY J. ZUNFT, 05/06/92------------------
+      IF (ABS(SWGT).LT.tiny) SWGT = SIGN(tiny,SWGT)
+      IF (ABS(SI2) .LT.tiny) SI2  = SIGN(tiny,SI2)
+C--------------------------------------------------------
+      AVGI=SI/SWGT
+      SD=SWGT*IT/SI2
+      CHI2A=0.
+      IF(IT.GT.1)CHI2A=SD*(SCHI/SWGT-AVGI*AVGI)/(IT-1)
+      SD=ONE/SD
+C--------- CHANGE BY J. ZUNFT, 04/14/92-----------------
+      IF (SD.LT.0.D0) THEN
+      PRINT *,' SD  = ',SD,' < 0: SIGN CHANGED'
+      SD = ABS(SD)
+      END IF
+      IF (TSI.LT.0.D0) THEN
+      PRINT *,' TSI = ',TSI,' < 0: SIGN CHANGED'
+ctp      TSI = ABS(TSI)
+      tsi = tiny
+      END IF
+C-------------------------------------------------------
+      SD=SQRT(SD)
+      IF(NPRN.EQ.0) GO TO 21
+      TSI=SQRT(TSI)
+c      IF(NPRN.NE.10)PRINT 201,IPR,IT,TI,TSI,AVGI,SD,CHI2A
+c      IF(NPRN.EQ.10)PRINT 203,IT,TI,TSI,AVGI,SD,CHI2A
+      IF(NPRN.NE.10)PRINT 201,IPR,IT,TI,TSI,AVGI,SD/abs(avgi)
+      IF(NPRN.EQ.10)PRINT 203,IT,TI,TSI,AVGI,SD/abs(avgi)
+      IF(NPRN.GE.0) GO TO 21
+      DO 20 J=1,NDIM
+      PRINT 202,J
+20    PRINT 204,(XI(I,J),DI(I,J),D(I,J),I=1,ND)
+C--------- CHANGE BY J. ZUNFT, 05/06/92------------------
+21    IF (ABS(AVGI).LT.tiny) AVGI = SIGN(tiny,AVGI)
+C--------------------------------------------------------
+ctp      IF(ABS(SD/AVGI).LE.ABS(ACC).OR.IT.GE.ITMX)NOW=2
+      S1=AVGI
+      S2=SD
+      S3=TI
+      S4=TSI
+C---  NEXT LINE TAKEN OUT ON 04/06/92 BY J. ZUNFT
+C---  IF(IGRAPH.GT.0)CALL PLOTIT(NOW,F1,W)
+C      DO 23 J=1,NDIM
+C      XO=D(1,J)
+C      XN=D(2,J)
+C      D(1,J)=(XO+XN)*0.5D0
+C      DT(J)=D(1,J)
+C      DO 22 I=2,NDM
+C      D(I,J)=XO+XN
+C      XO=XN
+C      XN=D(I+1,J)
+C      D(I,J)=(D(I,J)+XN)/3.D0
+C22    DT(J)=DT(J)+D(I,J)
+C      D(ND,J)=(XN+XO)*0.5D0
+C23    DT(J)=DT(J)+D(ND,J)
+C-----THIS PART OF THE VEGAS-ALGORITHM IS UNSTABLE
+C-----IT SHOULD BE REPLACED BY
+      DO 23 J=1,NDIM
+      DT(J)=0.D0
+      DO 23 I=1,ND
+      IF(INXI(I,J).GT.0)D(I,J)=D(I,J)/INXI(I,J)
+23    DT(J)=DT(J)+D(I,J)
+      DO 28 J=1,NDIM
+      RC=0.D0
+      DO 24 I=1,ND
+      R(I)=0.D0
+C--------- CHANGE BY J. ZUNFT, 04/15/92 ---------
+C---  IF(D(I,J).LE.0.D0)GO TO 24
+      IF(D(I,J).EQ.0.D0.OR.DT(J)/D(I,J).LE.0.D0) GO TO 24
+C------------------------------------------------
+      XO=DT(J)/D(I,J)
+C--------- CHANGE BY J. ZUNFT, 05/06/92 ---------
+ctp      IF (XO.EQ.1.D0) XO = 0.99999999999999999D0
+c--------- change by t. plehn, 07/31/01 ---------
+      IF (XO.EQ.1.D0) XO = 0.999999999D0
+C------------------------------------------------
+      R(I)=((XO-ONE)/XO/LOG(XO))**ALPH
+24    RC=RC+R(I)
+      RC=RC/XND
+      K=0
+ 285  XN=0.D0
+      DR=XN
+      I=K
+25    K=K+1
+      DR=DR+R(K)
+      XO=XN
+      XN=XI(K,J)
+26    IF(RC.GT.DR) GO TO 25
+      I=I+1
+      DR=DR-RC
+C----------- CHANGE BY J. ZUNFT, 04/14/92 --------------
+C---  XIN(I)=XN-(XN-XO)*DR/R(K)
+      IF (DR.EQ.0.D0) THEN
+      XIN(I)=XN
+      ELSE
+      XIN(I)=XN-(XN-XO)*DR/R(K)
+      END IF
+C-------------------------------------------------------
+      IF(I.LT.NDM) GO TO 26
+      DO 27 I=1,NDM
+27    XI(I,J)=XIN(I)
+28    XI(ND,J)=ONE
+      if ( (it.lt.itmx) .and.
+     &     (abs(sd/avgi).gt.acc) ) go to 9
+200   FORMAT(35H0INPUT PARAMETERS FOR VEGAS   NDIM=,I3
+     1,8H  NCALL=,F8.0/28X,5H  IT=,I5,8H  ITMX =,I5/28X
+     2,6H  ACC=,G9.3/28X,6H  MDS=,I3,6H   ND=,I4//)
+ctp290   FORMAT(13H VEGAS  ndim=,I3,8H  ncall=,F8.0,8H  itmx =,I5
+ctp     1,6H  ACC=,G9.3,6H  MDS=,I3,6H   ND=,I4)
+290   FORMAT(13H Vegas, ndim=, I3,8H  ncall=,F8.0,8H  itmx =,I5
+     1,6H  acc=,G9.3)
+201   FORMAT(/I1,20HINTEGRATION BY VEGAS/13H0ITERATION NO,I3,
+     114H.   INTEGRAL =,G14.8/20X,10HSTD DEV  =,G10.4/
+     234H ACCUMULATED RESULTS.   INTEGRAL =,G14.8/
+     324X,10HSTD DEV  =,G10.4 / 24X,18HCHI**2 PER ITN   =,G10.4)
+202   FORMAT(14H0DATA FOR AXIS,I2 / 7X,1HX,7X,10H  DELT I  ,
+     12X,11H CONVCE    ,11X,1HX,7X,10H  DELT I  ,2X,11H CONVCE
+     2,11X,1HX,7X,10H  DELT I  ,2X,11H CONVCE     /)
+204   FORMAT(1X,3G12.4,5X,3G12.4,5X,3G12.4)
+203   FORMAT(1H ,I3,G20.8,G12.4,G20.8,G12.4,G12.4)
+C---  NEXT 3 LINES TAKEN OUT ON 04/06/92 BY J. ZUNFT
+C---  S1=AVGI
+C---  S2=SD
+C---  S3=CHI2A
+      RETURN
+      END
+
+c-----------------------------------------------------------------------
+      subroutine GETRANDOM_4(array)
+      real*8 array(*)
+
+      real u(97)
+      common /rngdata_4/ u,c,cd,cm,i,j
+
+      univ=u(i)-u(j)
+      if(univ.lt.0.) univ=univ+1.
+      u(i)=univ
+      i=i-1
+      if(i.eq.0) i=97
+      j=j-1
+      if(j.eq.0) j=97
+      c=c-cd
+      if(c.lt.0.) c=c+cm
+      univ=univ-c
+      if(univ.lt.0.) univ=univ+1
+      
+      array(1) = univ
+      
+      return
+      end
+
+
+      subroutine INIRANDOM_4(maxnum,ndim)
+      
+      integer maxnum, ndim
+      real u(97)
+      common /rngdata_4/ u,c,cd,cm,istart,jstart
+      
+      istart=97
+      jstart=33
+      idum = 12
+      jdum = 34
+      kdum = 56
+      ldum = 78
+      
+      do ii=1,97
+         s=0.
+         t=.5
+         do jj=1,24
+            m=mod(mod(idum*jdum,179)*kdum,179)
+            idum=jdum
+            jdum=kdum
+            kdum=m
+            ldum=mod(53*ldum+1,169)
+            if(mod(ldum*m,64).ge.32) s=s+t
+            t=.5*t
+         end do
+         u(ii)=s
+      end do
+      c=362436./16777216.
+      cd=7654321./16777216.
+      cm=16777213./16777216.
+
+      return
+      end
+      
+
+************************************************************************
+** inirandom sets up the random-number generator to produce at most
+** max dims-dimensional quasi-random vectors
+
+	subroutine inirandom_1(max, dims)
+	implicit none
+	integer max, dims
+
+	integer ndim
+	common /rngdata_1/ ndim
+
+	ndim = dims
+	end
+
+
+************************************************************************
+** getrandom is a subtractive Mitchell-Moore random-number generator.
+** The algorithm is n(i) = (n(i - 24) - n(i - 55)) mod m, implemented
+** as a circular array with n(i + 55) = n(i) and m = 2^30 in this
+** version. The array n has been initialized by setting n(i) = i and
+** running the algorithm 100,000 times. Code by Ronald Kleiss.
+
+	subroutine getrandom_1(array)
+	implicit none
+	double precision array(*)
+
+	integer ndim
+	common /rngdata_1/ ndim
+
+	integer dim, j, k, l, m, n(55)
+	parameter (m = 2**30)
+	data k /55/, l /31/
+	data n /
+     +    980629335, 889272121, 422278310,1042669295, 531256381,
+     +    335028099,  47160432, 788808135, 660624592, 793263632,
+     +    998900570, 470796980, 327436767, 287473989, 119515078,
+     +    575143087, 922274831,  21914605, 923291707, 753782759,
+     +    254480986, 816423843, 931542684, 993691006, 343157264,
+     +    272972469, 733687879, 468941742, 444207473, 896089285,
+     +    629371118, 892845902, 163581912, 861580190,  85601059,
+     +    899226806, 438711780, 921057966, 794646776, 417139730,
+     +    343610085, 737162282,1024718389,  65196680, 954338580,
+     +    642649958, 240238978, 722544540, 281483031,1024570269,
+     +    602730138, 915220349, 651571385, 405259519, 145115737 /
+
+	do dim = 1, ndim
+	  k = mod(k, 55) + 1
+	  l = mod(l, 55) + 1
+	  j = n(l) - n(k)
+	  if(j .lt. 0) j = j + m
+	  n(k) = j
+	  array(dim) = dble(j)/m
+	enddo
+	end
+
+ctp #elif RNG == 2
+
+************************************************************************
+** inirandom sets up the random-number generator to produce a Faure
+** sequence of at most max dims-dimensional quasi-random vectors.
+** Adapted from ACM TOMS algorithm 659, see
+** http://www.acm.org/pubs/citations/journals/toms/1988-14-1/p88-bratley
+
+	subroutine inirandom_2(max, dims)
+	implicit none
+	integer max, dims
+
+	integer coeff(0:19, 0:19)
+	integer ndim, prime, nextn, testn, digits
+	common /rngdata_2/ coeff, ndim, prime, nextn, testn, digits
+
+	integer i, j, h
+
+	integer primes(40)
+	save primes
+
+	data primes /
+     +    1, 2, 3, 5, 5, 7, 7, 11, 11, 11, 11,
+     +    13, 13, 17, 17, 17, 17, 19, 19,
+     +    23, 23, 23, 23, 29, 29, 29, 29,
+     +    29, 29, 31, 31, 37, 37, 37, 37,
+     +    37, 37, 41, 41, 41 /
+
+	ndim = dims
+	prime = primes(dims)
+	testn = prime**4
+	nextn = testn - 1
+	digits = 3
+
+	h = nint(log(dble(max + testn))/log(dble(prime)))
+	coeff(0, 0) = 1
+	do j = 1, h
+	  coeff(j, 0) = 1
+	  coeff(j, j) = 1
+	enddo
+	do j = 1, h
+	  do i = j + 1, h
+	    coeff(i, j) =
+     +        mod(coeff(i - 1, j) + coeff(i - 1, j - 1), prime)
+	  enddo
+	enddo
+	end
+
+
+************************************************************************
+** getrandom generates a vector of random numbers
+
+	subroutine getrandom_2(array)
+	implicit none
+	double precision array(*)
+
+	integer coeff(0:19, 0:19)
+	integer ndim, prime, nextn, testn, digits
+	common /rngdata_2/ coeff, ndim, prime, nextn, testn, digits
+
+	integer y(0:19), digit, dim, d, k, p
+	double precision r
+
+	p = testn
+	k = nextn
+	do digit = digits, 0, -1
+	  p = p/prime
+	  d = mod(k, p)
+	  y(digit) = (k - d)/p
+	  k = d
+	enddo
+
+	r = 0
+	do digit = digits, 0, -1
+	  r = (r + y(digit))/prime
+	enddo
+	array(1) = r
+
+	do dim = 2, ndim
+	  r = 0
+	  p = 1
+	  do digit = 0, digits
+	    k = 0
+	    do d = digit, digits
+	      k = k + coeff(d, digit)*y(d)
+	    enddo
+	    y(digit) = mod(k, prime)
+	    p = p*prime
+	    r = r + dble(y(digit))/p
+	  enddo
+	  array(dim) = r
+	enddo
+
+	nextn = nextn + 1
+	if(nextn .eq. testn) then
+	   testn = testn*prime
+	   digits = digits + 1
+	endif
+	end
+
+ctp #else
+
+************************************************************************
+** inirandom sets up the random-number generator to produce a Sobol
+** sequence of at most max dims-dimensional quasi-random vectors.
+** Adapted from ACM TOMS algorithm 659, see
+** http://www.acm.org/pubs/citations/journals/toms/1988-14-1/p88-bratley
+
+	subroutine inirandom_3(max, dims)
+	implicit none
+	integer max, dims
+
+	integer v(40, 30), lastq(40)
+	integer ndim, count, norm
+	common /rngdata_3/ v, lastq, ndim, count, norm
+
+	integer bits, powers, degree, newv, dim, bit, deg, k
+
+	integer poly(2:40), vinit(2:40, 1:8)
+	save poly, vinit
+
+	data poly / 3, 7, 11, 13, 19, 25, 37, 59, 47,
+     +    61, 55, 41, 67, 97, 91, 109, 103, 115, 131,
+     +    193, 137, 145, 143, 241, 157, 185, 167, 229, 171,
+     +    213, 191, 253, 203, 211, 239, 247, 285, 369, 299 /
+
+	data (vinit(dim, 1), dim = 2, 40) / 39*1 /
+	data (vinit(dim, 2), dim = 3, 40) /
+     +          1, 3, 1, 3, 1, 3, 3, 1,
+     +    3, 1, 3, 1, 3, 1, 1, 3, 1, 3,
+     +    1, 3, 1, 3, 3, 1, 3, 1, 3, 1,
+     +    3, 1, 1, 3, 1, 3, 1, 3, 1, 3 /
+	data (vinit(dim, 3), dim = 4, 40) /
+     +             7, 5, 1, 3, 3, 7, 5,
+     +    5, 7, 7, 1, 3, 3, 7, 5, 1, 1,
+     +    5, 3, 3, 1, 7, 5, 1, 3, 3, 7,
+     +    5, 1, 1, 5, 7, 7, 5, 1, 3, 3 /
+	data (vinit(dim, 4), dim = 6, 40) /
+     +                  1, 7, 9, 13, 11,
+     +    1, 3, 7, 9, 5, 13, 13, 11, 3, 15,
+     +    5, 3, 15, 7, 9, 13, 9, 1, 11, 7,
+     +    5, 15, 1, 15, 11, 5, 3, 1, 7, 9 /
+	data (vinit(dim, 5), dim = 8, 40) /
+     +                            9, 3, 27,
+     +    15, 29, 21, 23, 19, 11, 25, 7, 13, 17,
+     +    1, 25, 29, 3, 31, 11, 5, 23, 27, 19,
+     +    21, 5, 1, 17, 13, 7, 15, 9, 31, 9 /
+	data (vinit(dim, 6), dim = 14, 40) /
+     +            37, 33, 7, 5, 11, 39, 63,
+     +    27, 17, 15, 23, 29, 3, 21, 13, 31, 25,
+     +    9, 49, 33, 19, 29, 11, 19, 27, 15, 25 /
+	data (vinit(dim, 7), dim = 20, 40) /
+     +                                  13,
+     +    33, 115, 41, 79, 17, 29, 119, 75, 73, 105,
+     +    7, 59, 65, 21, 3, 113, 61, 89, 45, 107 /
+	data (vinit(dim, 8), dim = 38, 40) / 7, 23, 39 /
+
+	k = max
+	bits = 0
+	do while(k .ne. 0)
+	  bits = bits + 1
+	  k = ishft(k, -1)
+	enddo
+
+	do bit = 1, bits
+	  v(1, bit) = 1
+	enddo
+
+	do dim = 2, dims
+	  powers = poly(dim)
+
+	  k = powers
+	  degree = -1
+	  do while(k .ne. 0)
+	    degree = degree + 1
+	    k = ishft(k, -1)
+	  enddo
+
+	  do bit = 1, degree
+	    v(dim, bit) = vinit(dim, bit)
+	  enddo
+
+	  do bit = degree + 1, bits
+	    newv = v(dim, bit - degree)
+	    k = powers
+	    do deg = degree, 1, -1
+	      if(btest(k, 0))
+     +          newv = ieor(newv, ishft(v(dim, bit - deg), deg))
+	      k = ishft(k, -1)
+	    enddo
+	    v(dim, bit) = newv
+	  enddo
+	enddo
+
+	do bit = 1, bits - 1
+	  do dim = 1, dims
+	    v(dim, bit) = ishft(v(dim, bit), bits - bit)
+	  enddo
+	enddo
+	norm = ishft(1, bits)
+
+	count = 0
+	ndim = dims
+	do dim = 1, dims
+	  lastq(dim) = 0
+	enddo
+	end
+
+
+************************************************************************
+** getrandom generates a vector of random numbers
+
+	subroutine getrandom_3(array)
+	implicit none
+	double precision array(*)
+
+	integer v(40, 30), lastq(40)
+	integer ndim, count, norm
+	common /rngdata_3/ v, lastq, ndim, count, norm
+
+	integer c, zerobit, dim
+
+	c = count
+	zerobit = 1
+	do while(btest(c, 0))
+	  zerobit = zerobit + 1
+	  c = ishft(c, -1)
+	enddo
+
+	do dim = 1, ndim
+	  lastq(dim) = ieor(lastq(dim), v(dim, zerobit))
+	  array(dim) = dble(lastq(dim))/norm
+	enddo
+
+	count = count + 1
+	end
+
+ctp #endif
+

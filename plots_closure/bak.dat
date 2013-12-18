@@ -1,0 +1,34 @@
+bak/T1-alphaT.dat T1-CMS.dat
+bak/T1tttt-alphaT.dat T1tttt-CMS.dat
+bak/T1tttt-RA4.dat T1tttt-RA4-CMS.dat T1tttt-RA4-CMS.dat
+bak/T1tttt-SUS13008.dat T1tttt-13008-CMS.dat
+bak/T2-alphaT.dat
+bak/T2bb-alphaT.dat T2bb-CMS.dat
+bak/T2-RA2.dat T2-CMS.dat
+bak/T2tt-alphaT.dat
+bak/T2tt-Leptonic.dat T2tt-CMS.dat
+bak/T2_.dat T2-ATLAS.dat
+bak/T5WW070_.dat T5WW070-ATLAS.dat
+bak/T5WW_.dat T5WW-ATLAS.dat
+bak/T6bbWW037-Leptonic.dat T6bbWW037-CMS.dat
+bak/T6bbWW-Leptonic.dat T6bbWW050-CMS.dat
+bak/T6bbWWoffD17.dat T6bbWWoffD17-ATLAS.dat
+bak/T6bbWWoffD5.dat T6bbWWoffD5-ATLAS.dat
+bak/T6ttWW060.dat T6ttWWx060-CMS.dat
+bak/T6ttWW_.dat
+bak/T6ttWWLSP50.dat T6ttWWLSP50-CMS.dat
+bak/T6WWLSP50.dat
+bak/TChiChipmSlepL025_.dat TChiChipmSlepL025-CMS.dat
+bak/TChiChipmSlepL025Weakino_.dat
+bak/TChiChipmSlepL050.dat TChiChipmSlepL050-CMS.dat
+bak/TChiChipmSlepL_.dat
+bak/TChiChipmSlepLWeakino_.dat
+bak/TChiChipmSlepStau060_.dat TChiChipmSlepStau060-CMS.dat
+bak/TChiChipmSlepStau095_.dat TChiChipmSlepStau095-CMS.dat
+bak/TChiWZ-ATLAS.dat TChiWZ-ATLAS.dat
+bak/TChiWZoff-ATLAS.dat TChiWZoff-ATLAS.dat
+bak/TChiWZ-Weakinos.dat TChiWZ-CMS.dat
+bak/TGQ_.dat TGQ-ATLAS.dat
+bak/TGQdata.dat
+bak/TGQSb_.dat TGQAll-ATLAS.dat
+bak/TSlepSlep_.dat TSlepSlep-ATLAS.dat
