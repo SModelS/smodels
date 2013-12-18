@@ -1,0 +1,15 @@
+###
+# condor_submit description
+###
+
+notification	= always
+universe	= standard
+requirements	= Pool=="Theory"
+input		= 
+output		= test.out
+error		= test.err
+
+initialdir	= .
+executable	= validate.run
+Queue
+

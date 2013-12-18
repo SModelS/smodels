@@ -70,7 +70,7 @@ def getRun ( analysis, run=None ):
 pMI_={}
 def parseMetaInfo ( analysis, run ):
     """ get all the meta information for a given analysis/run pair """
-    key=analysis+run
+    key=analysis+str(run)
     if pMI_.has_key ( key ): return pMI_[key]
     info="%s/%s/%s/info.txt" % ( Base, run, analysis )
     ret={}

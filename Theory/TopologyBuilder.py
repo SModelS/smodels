@@ -49,5 +49,3 @@ def compressTopology(ETopList,DoCompress,DoInvisible,minmassgap):
             ETopList.append(ETopInComp)
             added = True
   return ETopList
-
-
