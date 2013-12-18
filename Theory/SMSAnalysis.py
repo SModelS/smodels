@@ -129,4 +129,3 @@ class EAnalysis:
     if nounit: xmass = rmvunit(xmass,'fb')
     return xmass
         
-        

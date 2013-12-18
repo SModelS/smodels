@@ -244,6 +244,38 @@ def getAllResults (run=None, allHistos=False):
     allresults[key] = ret
     return ret
 
+
+dbresults = {}
+
+def getDatabaseResults (run=None, category=None):
+    """ returns all public analyses and the topologies we have constraints for """
+    import os, copy
+    key = str(run)+str(category)
+    if dbresults.has_key (key):
+        return dbresults[key]
+    runs = SMSHelpers.runs
+    if run: runs = [ run ]
+    print "runs=",runs
+    ret = {}
+    for r in runs:
+        # # so thats the runs I really have to think about
+        dirs = os.listdir ("%s/%s/" % (SMSHelpers.Base, r))
+        for ana in dirs:
+            if os.path.exists ("%s/%s/%s/info.txt" % (SMSHelpers.Base, r, ana)):
+                topos = getConstraints (ana, run=r).keys()
+                if not topos: continue
+                if category:
+                    if isPrivate(ana): continue
+                    newTopos=copy.deepcopy(topos)
+                    for t in newTopos:
+                        if category not in getCategories(ana, topo=t):
+                            topos.remove(t)
+                if not topos: continue
+                ret[ana] = topos
+    dbresults[key] = ret
+    return ret
+
+
 def getClosestValue (Dict, mx, my):
     """assuming that Dict is a dictionary of mx,my,ul, get the upper limit
        of the point in Dict that is closest to mx and my.
@@ -373,7 +405,7 @@ def getUpperLimit (analysis, topo, mx=None, my=None, run=None, png=None, interpo
             if png==True, return path of pngfile containing the histogram"""
     run = SMSHelpers.getRun (analysis, run)
     if SMSHelpers.hasDictionary (analysis, run):
-        return getUpperLimitFromDictionary (analysis, topo, mx, my, run, interpolate=interpolate, expected=expected)
+        return  getUpperLimitFromDictionary (analysis, topo, mx, my, run, interpolate=interpolate, expected=expected)
     if png == True:
         pngfile = SMSHelpers.getUpperLimitPng(analysis, topo, run)
         return pngfile

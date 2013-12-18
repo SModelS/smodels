@@ -1,0 +1,1222 @@
+C ======================================================================
+
+      SUBROUTINE CHECKINPUT_SS
+      IMPLICIT REAL*8 (A-H,M-Z)
+      IMPLICIT INTEGER (I,J)
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/CONST2/SCALE,SCAFAC,ICOLL,ISCAPT
+      COMMON/CONST5/ILO,INLO,IONLYLO
+      COMMON/CUT1/PTMIN,PTMAX
+      COMMON/CUT2/YMIN,YMAX
+      COMMON/FLAVOR/IFLAVOR,ITOTAL
+
+
+C***  CHECK MS,MG AND MT ( SHOULD BE ABOVE 1 GEV )
+      IF (MS.LT.1D0) THEN
+         MS = 1D0
+         PRINT *,'MS CHANGED TO 1.'
+      END IF
+      IF (MG.LT.1D0) THEN
+         MG = 1D0
+         PRINT *,'MG CHANGED TO 1.'
+      END IF
+      IF (MT.LT.1D0) THEN
+         MT = 1D0
+         PRINT *,'MT CHANGED TO 1.'
+      END IF
+
+C***  CHECK ICOLL
+      IF ((ICOLL.LT.0).OR.(ICOLL.GT.1)) THEN
+         PRINT *,'COLLIDER TYPE SPECIFIED INCORRECTLY; ICOLL = ',ICOLL
+         PRINT *,'PROGRAM ABORTED'
+         call HARD_STOP
+      END IF
+
+C***  CHECK ENERGY ( SHOULD BE ABOVE PRODUCTION THRESHOLD )
+      IF (ENERGY.LT.2*MS) THEN
+         PRINT *,'ENERGY TOO SMALL TO PRODUCE SQUARK-SQUARK'
+         PRINT *,'PROGRAM ABORTED'
+         call HARD_STOP
+      END IF
+
+C***  CHECK IFLAVOR
+      IF ((IFLAVOR.LT.0).OR.(IFLAVOR.GT.5)) THEN
+         PRINT *,'IFLAVOR IN THE WRONG RANGE; IFLAVOR = ',IFLAVOR
+         PRINT *,'IFLAVOR CHANGED TO 0 (ALL)'
+         IFLAVOR = 0
+      END IF
+
+C***  CHECK ITOTAL
+      IF ((ITOTAL.LT.0).OR.(ITOTAL.GT.1)) THEN
+         PRINT *,'ITOTAL IN THE WRONG RANGE; ITOTAL = ',ITOTAL
+         PRINT *,'ITOTAL CHANGED TO 1'
+         ITOTAL = 1
+      END IF
+
+C***  CHECK ISCAPT AND SCAFAC
+      IF ((ISCAPT.LT.0).OR.(ISCAPT.GT.1)) THEN
+         PRINT *,'ISCAPT IN THE WRONG RANGE; ISCAPT = ',ISCAPT
+         PRINT *,'ISCAPT CHANGED TO 0'
+         ISCAPT = 0
+      END IF
+      IF (SCAFAC.LT.1D-2) THEN
+         PRINT *, 'SCAFAC TOO SMALL'
+         PRINT *, 'SCAFAC CHANGED TO 1.'
+         SCAFAC = 1.D0
+      END IF
+      IF ((ITOTAL.EQ.1).AND.(ISCAPT.EQ.1)) THEN
+         PRINT *,'WARNING: TRANSVERSE MASS IS NOT USED AS A SCALE'
+      END IF
+
+C***  CHECK PTMIN AND PTMAX
+      IF (PTMIN.LT.0D0) THEN
+         PTMIN = 0D0
+         PRINT *,'PTMIN NEGATIVE'
+         PRINT *,'PTMIN CHANGED TO 0.'
+      END IF
+      IF (PTMAX.LT.0D0) THEN
+         PTMAX = 0D0
+         PRINT *,'PTMAX NEGATIVE'
+         PRINT *,'PTMAX CHANGED TO 0.'
+      END IF
+      IF (PTMAX.LT.PTMIN) THEN
+         PTMAX = PTMIN
+         PRINT *,'PTMAX SMALLER THAN PTMIN'
+         PRINT *,'PTMAX CHANGED TO PTMIN'
+      END IF
+      IF ((PTMAX.EQ.PTMIN).AND.(PTMAX.EQ.0D0)) THEN
+         PTMAX = 0.1D0
+         PTMIN = 0.1D0
+         PRINT *,'PTMAX = PTMIN CHANGED TO 0.1'
+      END IF
+
+C***  CHECK YMIN AND YMAX
+      IF (YMIN.LT.0D0) THEN
+         YMIN = 0D0
+         PRINT *,'YMIN NEGATIVE'
+         PRINT *,'YMIN CHANGED TO 0.'
+      END IF
+      IF (YMAX.LT.0D0) THEN
+         YMAX = 0D0
+         PRINT *,'YMAX NEGATIVE'
+         PRINT *,'YMAX CHANGED TO 0.'
+      END IF
+      IF (YMAX.LT.YMIN) THEN
+         YMAX = YMIN
+         PRINT *,'YMAX SMALLER THAN YMIN'
+         PRINT *,'YMAX CHANGED TO YMIN'
+      END IF
+
+C***  CHECK IONLYLO
+      IF ((IONLYLO.LT.0).OR.(IONLYLO.GT.1)) THEN
+         PRINT *,'IONLYLO IN THE WRONG RANGE'
+         PRINT *,'IONLYLO CHANGED TO 0'
+         IONLYLO = 0
+      END IF
+
+C***  CHECK ILO, INLO
+      IF (ILO.LT.10) THEN
+         ILO = 10
+         PRINT *,'ILO CHANGED TO 10'
+      END IF
+      IF (INLO.LT.10) THEN
+         INLO = 10
+         PRINT *,'INLO CHANGED TO 10'
+      END IF
+
+      RETURN
+      END
+
+
+C ======================================================================
+
+
+      SUBROUTINE INTEGSS(RESLO,ERRLO,RESNLO,ERRNLO)
+      IMPLICIT REAL*8 (A-H,M-Z)
+      IMPLICIT INTEGER (I,J)
+      integer  ivegas(1:4)
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/CONST5/ILO,INLO,IONLYLO
+
+      EXTERNAL SIGLOSS, SIGNLOSS
+
+      CALL CHECKINPUT_SS
+
+      S = ENERGY**2
+
+      CALL INILO(ivegas)
+      idim = 3
+      acc = 1.d-4
+      call INTEG(SIGLOSS,idim,ivegas,acc,reslo,errlo)
+
+      IF (IONLYLO.EQ.0) THEN
+         CALL ININLO(ivegas)
+         idim = 5 
+         call INTEG(SIGNLOSS,idim,ivegas,acc,resnlo,errnlo)
+      ELSE 
+         RESNLO = 0D0
+         ERRNLO = 0D0
+      END IF
+
+      RETURN
+      END
+
+C ======================================================================
+C***  THE CROSS-SECTION IN LO
+
+      REAL*8 FUNCTION SIGLOSS(VAR)
+      IMPLICIT REAL*8 (A-H,M-Z)
+      IMPLICIT INTEGER (I,J)
+      DIMENSION VAR(3)
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/CONST2/SCALE,SCAFAC,ICOLL,ISCAPT
+      COMMON/PTYSS/PT,PREPT,MTRANS,YVAL,PREY
+      COMMON/FLAVOR/IFLAVOR,ITOTAL
+
+      CALL DVEGLO_SS(VAR)
+      IF (ITOTAL.EQ.0) THEN
+         CALL DPTYSS
+         CALL DEFSCASS
+         CALL DDILOSS
+         SIGLOSS2 = ESSQQLO()
+
+C***     SUM OVER POSITIVE AND NEGATIVE RAPIDITY
+         SIGLOSS2 = 2 * SIGLOSS2
+      ELSE
+         CALL DEFSCASS
+         CALL DTOLOSS
+         SIGLOSS2 = FSSQQLO()
+      END IF
+      SIGLOSS =  SUMLOSS(SIGLOSS2,IFLAVOR)
+
+      RETURN
+      END
+
+C ======================================================================
+C***  THE CROSS-SECTION IN NLO
+
+      REAL*8 FUNCTION SIGNLOSS(VAR)
+      IMPLICIT REAL*8 (A-H,M-Z)
+      IMPLICIT INTEGER (I,J)
+      DIMENSION VAR(5)
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/CONST2/SCALE,SCAFAC,ICOLL,ISCAPT
+      COMMON/PTYSS/PT,PREPT,MTRANS,YVAL,PREY
+      COMMON/FLAVOR/IFLAVOR,ITOTAL
+
+      CALL DVEGNLO_SS(VAR)
+      CALL DMINLSS
+      IF (ITOTAL.EQ.0) THEN
+         CALL DPTYSS
+         CALL DEFSCASS
+         CALL DDINLSS
+         CALL DD4NLSS
+         CALL DD3NLSS
+         SIGNLOSS1 = 0D0
+         IF ((IFLAVOR.EQ.0).OR.(IFLAVOR.EQ.2).OR.(IFLAVOR.EQ.4)) 
+     +        SIGNLOSS2 = ESSQQNLO()
+         IF ((IFLAVOR.EQ.0).OR.(IFLAVOR.EQ.3).OR.(IFLAVOR.EQ.5))
+     +        SIGNLOSS3 = ESSQGNLO()
+
+C***     SUM OVER POSITIVE AND NEGATIVE RAPIDITY
+            SIGNLOSS2 = 2 * SIGNLOSS2
+            SIGNLOSS3 = 2 * SIGNLOSS3 
+      ELSE
+         CALL DEFSCASS
+         CALL DTONLSS
+         CALL DTSNLSS
+         SIGNLOSS1 = 0D0
+         IF ((IFLAVOR.EQ.0).OR.(IFLAVOR.EQ.2).OR.(IFLAVOR.EQ.4)) 
+     +        SIGNLOSS2 = FSSQQNLO()
+         IF ((IFLAVOR.EQ.0).OR.(IFLAVOR.EQ.3).OR.(IFLAVOR.EQ.5)) 
+     +        SIGNLOSS3 = FSSQGNLO()
+      END IF
+      SIGNLOSS =  SUMNLOSS(SIGNLOSS1,SIGNLOSS2,SIGNLOSS3,IFLAVOR)
+
+      RETURN
+      END
+
+C ======================================================================
+
+      SUBROUTINE DVEGLO_SS(VAR)
+C***  FILLS UP THE COMMON BLOCK VARVEGAS WITH 3 VARIABLES
+      IMPLICIT REAL*8 (A-H,M-Z)
+      DIMENSION VAR(3)
+      COMMON/VARVEGAS/Y1,Y2,Y3,Y4,Y5
+      Y1 = VAR(1)
+      Y2 = VAR(2)
+      Y3 = VAR(3)
+      RETURN
+      END
+
+C ======================================================================
+
+      SUBROUTINE DVEGNLO_SS(VAR)
+C***  FILLS UP THE COMMON BLOCK VARVEGAS WITH 5 VARIABLES
+      IMPLICIT REAL*8 (A-H,M-Z)
+      DIMENSION VAR(5)
+      COMMON/VARVEGAS/Y1,Y2,Y3,Y4,Y5
+      Y1 = VAR(1)
+      Y2 = VAR(2)
+      Y3 = VAR(3)
+      Y4 = VAR(4)
+      Y5 = VAR(5)
+      RETURN
+      END
+
+C ======================================================================
+
+      SUBROUTINE DEFSCASS()
+C***  DEFINES THE RENORMALIZATION AND FACTORIZATION SCALE
+C***  FILLS UP PART OF THE COMMON BLOCKS CONST1 AND CONST2
+      IMPLICIT REAL*8 (A-H,M-Z)
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/CONST2/SCALE,SCAFAC,ICOLL,ISCAPT
+      COMMON/PTYSS/PT,PREPT,MTRANS,YVAL,PREY
+      COMMON/FLAVOR/IFLAVOR,ITOTAL
+
+      IF ((ITOTAL.EQ.0).AND.(ISCAPT.EQ.1)) THEN
+         SCALE = MTRANS * SCAFAC
+      ELSE 
+         SCALE = MS * SCAFAC
+      END IF
+
+C***  THE SCALE SHOULD BE BELOW 1 TEV, BECAUSE SOME PARTON DENSITIES
+C***  ARE RESTRICTED TO THIS REGION
+
+      IF (SCALE.GE.1000D0) SCALE = 1000D0
+
+      IF (SCALE.LE.5D0) SCALE = 5D0
+
+      ALPHAS = ALPS(SCALE)
+
+      RETURN
+      END
+
+C ======================================================================
+
+      SUBROUTINE DPTYSS()
+C***  DEFINES PT AND Y (INCLUDING CUTS) 
+C***  FILLS UP THE COMMON BLOCK PTYSS
+      IMPLICIT REAL*8 (A-H,M-Z)
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/CUT1/PTMINC,PTMAXC
+      COMMON/CUT2/YMINC,YMAXC
+      COMMON/VARVEGAS/Y1,Y2,Y3,Y4,Y5
+      COMMON/PTYSS/PT,PREPT,MTRANS,YVAL,PREY
+      PT2MAX = S/4.D0 -MS**2
+      PTMAX = SQRT( DMIN1(PT2MAX,PTMAXC**2) )
+      PTMIN = PTMINC
+      IF (PTMAX.GT.PTMIN) THEN
+         PT = (PTMAX-PTMIN) * Y1 +PTMIN
+         PREPT = 2.D0 * PT * (PTMAX -PTMIN)
+      ELSE IF (PTMAX.EQ.PTMIN) THEN
+         PT = PTMIN
+         PREPT = 2.D0 * PT
+      ELSE IF (PTMAX.LT.PTMIN) THEN 
+         PT = 0D0
+         PREPT = 0D0
+      END IF
+      MTRANS = SQRT(PT**2 +MS**2)
+      YMAXK = +DACOSH(SQRT(S)/2.D0/MTRANS)
+      YMINK = -DACOSH(SQRT(S)/2.D0/MTRANS)
+      YMAX = DMIN1( YMAXK, YMAXC)
+      YMIN = DMAX1( YMINK, YMINC, 0D0)
+      IF (YMAX.GT.YMIN) THEN
+         YVAL = (YMAX -YMIN) * Y2 + YMIN
+         PREY = YMAX - YMIN
+      ELSE IF (YMAX.EQ.YMIN) THEN         
+         YVAL = YMIN
+         PREY = 1.D0
+      ELSE IF (YMAX.LT.YMIN) THEN
+         YVAL = 0D0
+         PREY = 0D0
+      END IF
+      RETURN
+      END
+
+C ======================================================================
+
+      SUBROUTINE DDILOSS()
+C***  DEFINES THE KINEMATICS FOR DIFFERENTIAL CROSS-SECTIONS IN LO
+C***  FILLS UP THE COMMON BLOCK DILOSS AND PDLOSS
+      IMPLICIT REAL*8 (A-H,M-Z)
+      COMMON/VARVEGAS/Y1,Y2,Y3,Y4,Y5
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/PTYSS/PT,PREPT,MTRANS,YVAL,PREY
+      COMMON/DILOSS/SHATB,T1HATB,U1HATB,PREFB,X1,X2B
+      COMMON/PDLOSS/PDQQB,PDQQPB
+      T1 = -SQRT(S)*MTRANS*DEXP(+YVAL)
+      U1 = -SQRT(S)*MTRANS*DEXP(-YVAL)
+      X1MIN = -T1/(S+U1)
+      X1 = X1MIN ** Y3
+      X2B= -X1*U1/(X1*S +T1)
+      SHATB  = X1 *X2B*S
+      T1HATB = X2B*T1
+      U1HATB = X1 *U1
+      PREFB = S * PREPT * PREY *LOG(X1MIN)*(-X1*X2B)/(-X1*U1)
+      CALL PDFLOSS(X1,X2B)
+      RETURN
+      END
+
+C ======================================================================
+
+      SUBROUTINE DTOLOSS()
+C***  DEFINES THE KINEMATICS FOR TOTAL CROSS-SECTIONS IN LO
+C***  FILLS UP THE COMMON BLOCK TOLOSS AND PDLOSS
+      IMPLICIT REAL*8 (A-H,M-Z)
+      COMMON/VARVEGAS/Y1,Y2,Y3,Y4,Y5
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/TOLOSS/SHAT,T1HAT,PREF,X1,X2
+      COMMON/PDLOSS/PDQQB,PDQQPB
+      X1 = (4*MS**2/S) ** Y1
+      X2 = (4*MS**2/S/X1) ** Y2
+      SHAT = X1*X2*S
+      BETA = SQRT(1D0 -4*MS**2/SHAT)
+      T1HAT = -SHAT/2D0 +(Y3 -0.5D0)*SHAT*BETA
+      PREF = SHAT*BETA *LOG(4*MS**2/S)*LOG(4*MS**2/S/X1)
+      CALL PDFLOSS(X1,X2)
+      RETURN
+      END
+
+C ======================================================================
+
+      REAL*8 FUNCTION ESSQQLO()
+C***  CALCULATES THE DIFFERENTIAL CROSS-SECTION IN LO FOR Q Q
+      IMPLICIT REAL*8 (A-H,M-Z)
+      COMMON/PDLOSS/PDQQB,PDQQPB
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/DILOSS/SHATB,T1HATB,U1HATB,PREFB,X1,X2B
+
+C***  SYMMETRIZE WITH RESPECT TO BOTH SQUARKS
+      PDQQPB = PDQQPB / 2D0
+
+      ESSQQLO = 
+     +     + PDQQB  *PREFB *DSSQQB(ALPHAS,SHATB,T1HATB,MS,MG,1) 
+     +     
+     +     + PDQQPB *PREFB *DSSQQB(ALPHAS,SHATB,T1HATB,MS,MG,0)
+     +     + PDQQPB *PREFB *DSSQQB(ALPHAS,SHATB,u1HATB,MS,MG,0)
+
+      RETURN
+      END
+
+C ======================================================================
+
+      REAL*8 FUNCTION FSSQQLO()
+C***  CALCULATES THE TOTAL CROSS-SECTION IN LO FOR Q Q
+      IMPLICIT REAL*8 (A-H,M-Z)
+      COMMON/PDLOSS/PDQQB,PDQQPB
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/TOLOSS/SHAT,T1HAT,PREF,X1,X2
+      FSSQQLO = 
+     +     +  PDQQB  * PREF*DSSQQB(ALPHAS,SHAT,T1HAT,MS,MG,1) 
+     +     +  PDQQPB * PREF*DSSQQB(ALPHAS,SHAT,T1HAT,MS,MG,0) 
+      RETURN
+      END
+
+C ======================================================================
+
+      REAL*8 FUNCTION SUMLOSS(SIGLOSS2,IFLAVOR)
+C***  SUMS UP DIFFERENT FLAVOR STATES FOR CROSS-SECTION IN LO
+      IMPLICIT REAL*8 (A-H,M-Z)
+      IMPLICIT INTEGER (I)
+      IF ((IFLAVOR.EQ.0).OR.(IFLAVOR.EQ.2).OR.(IFLAVOR.EQ.4)) 
+     +     SUMLOSS = SIGLOSS2
+      IF ((IFLAVOR.EQ.1).OR.(IFLAVOR.EQ.3).OR.(IFLAVOR.EQ.5)) 
+     +     SUMLOSS = 0D0
+      RETURN
+      END
+
+C ======================================================================
+
+      SUBROUTINE DMINLSS()
+C***  DEFINES SOME MISCELLANEOUS VARIABLES FOR CROSS-SECTION IN NLO
+C***  FILLS UP THE COMMON BLOCK MINLSS
+      IMPLICIT REAL*8 (A-H,M-Z)
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/CONST2/SCALE,SCAFAC,ICOLL,ISCAPT
+      COMMON/MINLSS/EPS,DEL,SCA,M2,GAM
+C***  EPS = ( GAMMA(GLUINO)/MASS(GLUINO) )**2
+      EPS = 1.D-5
+      DEL = 1.D-4 * MS**2 
+      SCA = SCALE**2/MS**2
+      M2 = MG**2 -MS**2
+      GAM = SQRT(EPS)*MG**2
+      RETURN
+      END
+
+C ======================================================================
+
+      SUBROUTINE DDINLSS()
+C***  DEFINES THE KINEMATICS FOR DIFFERENTIAL CROSS-SECTIONS IN NLO
+C***  FILLS UP THE COMMON BLOCK DINLSS1-2 AND PDLOSS, PDNLSS1
+      IMPLICIT REAL*8 (A-H,M-Z)
+      COMMON/VARVEGAS/Y1,Y2,Y3,Y4,Y5
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/PTYSS/PT,PREPT,MTRANS,YVAL,PREY
+      COMMON/MINLSS/EPS,DEL,SCA,M2,GAM
+      COMMON/DINLSS1/SHATB,T1HATB,U1HATB,PREFB,X1,X2B
+      COMMON/DINLSS2/SHAT,T1HAT,U1HAT,S4,PREF,X2,S4MAX
+      COMMON/PDLOSS/PDQQB,PDQQPB
+      COMMON/PDNLSS1/ PDQQ ,PDQQP
+
+      T1 = -SQRT(S)*MTRANS*DEXP(+YVAL)
+      U1 = -SQRT(S)*MTRANS*DEXP(-YVAL)
+      X1MIN = -T1/(S+U1)
+      X1 = X1MIN ** Y3
+      S4MAX = X1 * (S+U1) +T1
+      S4 = (S4MAX -DEL)* Y4 +DEL
+      X2 = (S4 -X1*U1)/(X1*S +T1)
+      X2B= -X1*U1/(X1*S +T1)
+      SHAT   = X1 *X2 *S
+      SHATB  = X1 *X2B*S
+      T1HAT  = X2 *T1
+      T1HATB = X2B*T1
+      U1HAT  = X1 *U1
+      U1HATB = X1 *U1
+      PREF  = S * PREPT * PREY *LOG(X1MIN)*(-X1*X2 )
+     +     *(S4MAX -DEL)/(S4-X1*U1)
+      PREFB = S * PREPT * PREY *LOG(X1MIN)*(-X1*X2B)/(-X1*U1)
+      CALL PDFNLOSS1(X1,X2,X2B)
+      RETURN
+      END
+
+C ======================================================================
+
+      SUBROUTINE DD4NLSS()
+C***  DEFINES THE KINEMATICS FOR DIFFERENTIAL CROSS-SECTIONS IN NLO
+C***  INCLUDING SUBTRACTION IN S4
+C***  FILLS UP THE COMMON BLOCKS DINLSS3-4 
+      IMPLICIT REAL*8 (A-H,M-Z)
+      COMMON/VARVEGAS/Y1,Y2,Y3,Y4,Y5
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/PTYSS/PT,PREPT,MTRANS,YVAL,PREY
+      COMMON/MINLSS/EPS,DEL,SCA,M2,GAM
+      COMMON/DINLSS3/SHAT0,T1HAT0,U1HAT0,S40,X10,X20,PREF0,S4G02
+      COMMON/DINLSS4/SHAT1,T1HAT1,U1HAT1,S41,X11,X21,PREF1,S4UP
+
+      T1 = -SQRT(S)*MTRANS*DEXP(+YVAL)
+      U1 = -SQRT(S)*MTRANS*DEXP(-YVAL)
+      S4MAX0 = S + T1 +U1
+      TYMIN = ATAN(-M2/GAM)
+      TYMAX = ATAN((S4MAX0-M2)/GAM)
+      TY = (TYMAX -TYMIN) * Y3 + TYMIN 
+      PREFTY = (TYMAX -TYMIN)/GAM 
+      S40 = GAM*TAN(TY) + M2
+      S41 = M2
+
+      X1MIN0 = (S40 -T1)/(S +U1)
+      X1MIN1 = (S41 -T1)/(S +U1)
+      X10 = X1MIN0**Y4
+      X11 = X1MIN1**Y4
+      X20 = (S40 -X10*U1)/(X10*S +T1)
+      X21 = (S41 -X11*U1)/(X11*S +T1)
+      SHAT0  = X10 * X20 * S
+      SHAT1  = X11 * X21 * S
+      T1HAT0 = X20 * T1
+      T1HAT1 = X21 * T1
+      U1HAT0 = X10 * U1
+      U1HAT1 = X11 * U1
+      S4G02  = (S40 -MG**2 +MS**2)**2 + EPS * MG**4
+      S4UP   = SHAT1 - 2D0*SQRT(SHAT1*MS**2)
+      PREF0  = S * PREPT * PREY * LOG(X1MIN0)*(-X10*X20)/(S40-X10*U1)
+     +     *PREFTY
+      PREF1  = S * PREPT * PREY * LOG(X1MIN1)*(-X11*X21)/(S41-X11*U1)
+     +     *PREFTY
+
+      RETURN
+      END
+
+C ======================================================================
+
+      SUBROUTINE DD3NLSS()
+C***  DEFINES THE KINEMATICS FOR DIFFERENTIAL CROSS-SECTIONS IN NLO
+C***  INCLUDING SUBTRACTION IN S3
+C***  FILLS UP THE COMMON BLOCKS DINLSS5-7
+      IMPLICIT REAL*8 (A-H,M-Z)
+      COMMON/MINLSS/EPS,DEL,SCA,M2,GAM
+      COMMON/VARVEGAS/Y1,Y2,Y3,Y4,Y5
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/PTYSS/PT,PREPT,MTRANS,YVAL,PREY
+      COMMON/DINLSS5/SHAT2,T1HAT2,U1HAT2,S42,X12,X22,PREF2,S3G2,S32
+      COMMON/DINLSS6/SHAT3,T1HAT3,U1HAT3,S43,X13,X23,PREF3,S3G3,S3UP
+      COMMON/DINLSS7/SHAT4,T1HAT4,U1HAT4,S4MAX4,PREF4,X14,X24
+
+      COMMON/PDNLSS3/PDQG2,PDQG3,PDGQ2,PDGQ3 
+      T1 = -SQRT(S)*MTRANS*DEXP(+YVAL)
+      U1 = -SQRT(S)*MTRANS*DEXP(-YVAL)
+      S3MAX2 = (S+T1+U1)/2D0/(S+T1+U1+MS**2) * 
+     +     (-T1 -U1 -2*MS**2 +SQRT((T1+U1)**2 -4*MS**2 *S))
+
+      TZMIN = ATAN(-M2/GAM)
+      TZMAX = ATAN((S3MAX2-M2)/GAM)
+      TZ = (TZMAX -TZMIN) * Y3 + TZMIN 
+      PREFTZ = (TZMAX -TZMIN)/GAM 
+      S32 = GAM*TAN(TZ) + M2
+      S33 = M2
+
+      X1MIN2 = -(2*MS**2*S*S32 +S*S32**2 +2*MS**2*S*T1 +S*S32*T1 
+     +     +2*MS**2*S32*U1 +S32**2*U1 +2*MS**2*T1*U1 +2*S32*T1*U1
+     +     +S32*SQRT(4*MS**2*S**2*S32 +S**2*S32**2 +4*MS**2*S**2*T1 
+     +     +2*S**2*S32*T1 +S**2*T1**2 +4*MS**2*S*S32*U1 +2*S*S32**2*U1 
+     +     +4*MS**2*S*T1*U1 +2*S*S32*T1*U1 +S32**2*U1**2))/
+     +     2D0/(S+U1)/(MS**2*S+MS**2*U1 +S32*U1)
+
+      X1MIN3 = -(2*MS**2*S*S33 +S*S33**2 +2*MS**2*S*T1 +S*S33*T1 
+     +     +2*MS**2*S33*U1 +S33**2*U1 +2*MS**2*T1*U1 +2*S33*T1*U1
+     +     +S33*SQRT(4*MS**2*S**2*S33 +S**2*S33**2 +4*MS**2*S**2*T1 
+     +     +2*S**2*S33*T1 +S**2*T1**2 +4*MS**2*S*S33*U1 +2*S*S33**2*U1 
+     +     +4*MS**2*S*T1*U1 +2*S*S33*T1*U1 +S33**2*U1**2))/
+     +     2D0/(S+U1)/(MS**2*S+MS**2*U1 +S33*U1)
+
+      X12 = X1MIN2**Y4
+      X13 = X1MIN3**Y4
+
+      SQRS42 = SQRT(
+     +  (-2*MS**2*T1 -S32*T1 -2*MS**2*X12*S -X12*S*S32 -X12**2*S*U1)**2 
+     +  -4*MS**2*(T1+S*X12)*(MS**2*T1 +S32*T1 +MS**2*X12*S) )
+      SQRS43 = SQRT(
+     +  (-2*MS**2*T1 -S33*T1 -2*MS**2*X13*S -X13*S*S33 -X13**2*S*U1)**2 
+     +  -4*MS**2*(T1+S*X13)*(MS**2*T1 +S33*T1 +MS**2*X13*S) )
+
+      S42MIN = S32/2D0/(MS**2*(T1+X12*S) +S32*T1) * 
+     +     (-2*MS**2*T1 -S32*T1 -2*MS**2*X12*S -X12*S*S32 -X12**2*S*U1 
+     +     -SQRS42 )
+
+      S43MIN = S33/2D0/(MS**2*(T1+X13*S) +S33*T1) * 
+     +     (-2*MS**2*T1 -S33*T1 -2*MS**2*X13*S -X13*S*S33 -X13**2*S*U1 
+     +     -SQRS43 )
+
+      S32DEC = (T1 +S*X12 +U1*X12)/2D0/(T1 +S*X12 +U1*X12 +MS**2) * (
+     +     -2*MS**2 -T1 -X12*U1 -SQRT((T1+U1*X12)**2 -4*MS**2*S*X12))
+      S33DEC = (T1 +S*X13 +U1*X13)/2D0/(T1 +S*X13 +U1*X13 +MS**2) * (
+     +     -2*MS**2 -T1 -X13*U1 -SQRT((T1+U1*X13)**2 -4*MS**2*S*X13))
+      
+      IF (S32.GE.S32DEC) THEN
+         S42MAX = X12*(S+U1) +T1
+      ELSE 
+         S42MAX = S32/2D0/(MS**2*(T1+X12*S) +S32*T1) * 
+     +     (-2*MS**2*T1 -S32*T1 -2*MS**2*X12*S -X12*S*S32 -X12**2*S*U1 
+     +     +SQRS42 )
+      END IF
+      IF (S33.GE.S33DEC) THEN
+         S43MAX = X13*(S+U1) +T1
+      ELSE 
+         S43MAX = S33/2D0/(MS**2*(T1+X13*S) +S33*T1) * 
+     +     (-2*MS**2*T1 -S33*T1 -2*MS**2*X13*S -X13*S*S33 -X13**2*S*U1 
+     +     +SQRS43 )
+      END IF
+
+      PREFS42 = S42MAX -S42MIN
+      PREFS43 = S43MAX -S43MIN
+      S42 = PREFS42 * Y5 +S42MIN
+      S43 = PREFS43 * Y5 +S43MIN
+
+      S3G2 = S32 - M2
+      S3G3 = 0D0
+      S3G22 = S3G2**2 + EPS*MG**4
+
+      X22 = (S42 -X12*U1)/(X12*S +T1)
+      X23 = (S43 -X13*U1)/(X13*S +T1)
+      SHAT2 = X12 * X22 * S
+      SHAT3 = X13 * X23 * S
+      T1HAT2 = X22 * T1
+      T1HAT3 = X23 * T1
+      U1HAT2 = X12 * U1
+      U1HAT3 = X13 * U1
+      PREX2 = S42/2D0/(S42+MS**2)*SQRT((SHAT2-S42)**2-4*MS**2*SHAT2)
+      PREX3 = S43/2D0/(S43+MS**2)*SQRT((SHAT3-S43)**2-4*MS**2*SHAT3)
+      S3UP   = SHAT3 - 2D0*SQRT(SHAT3*MS**2)
+
+      PREF2  = S * PREPT * PREY * PREFTZ/PREX2 * LOG(X1MIN2)*(-X12*X22)
+     +    * PREFS42/(S42-X12*U1)
+      PREF3  = S * PREPT * PREY * PREFTZ/PREX3 * LOG(X1MIN3)*(-X13*X23)
+     +    * PREFS43/(S43-X13*U1)
+
+      X1MIN = -T1/(S+U1)
+      X1 = X1MIN ** Y3
+      X1MIN4 = X1MIN
+      X14 = X1
+      X24 = (M2 -X14*U1)/(X14*S +T1)
+      SHAT4  = X14 * X24 * S
+      T1HAT4 = X24 * T1
+      U1HAT4 = X14 * U1
+      S4MAX4 = X14*(S+U1)+T1
+
+      PREF4 = S * PREPT * PREY *LOG(X1MIN4)*(-X14*X24)/(M2 -X14*U1)
+
+
+      RETURN
+      END
+
+C ======================================================================
+
+      SUBROUTINE DTONLSS()
+C***  DEFINES THE KINEMATICS FOR TOTAL CROSS-SECTIONS IN NLO
+C***  FILLS UP THE COMMON BLOCKS DINLSS1-2 AND PDNLSST
+      IMPLICIT REAL*8 (A-H,M-Z)
+      COMMON/MINLSS/EPS,DEL,SCA,M2,GAM
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/VARVEGAS/Y1,Y2,Y3,Y4,Y5
+      COMMON/DINLSS1/SHATB,T1HATB,U1HATB,PREFB,X1,X2B
+      COMMON/DINLSS2/SHAT,T1HAT,U1HAT,S4,PREF,X2,S4MAX
+      COMMON/PDNLSST/ PDQQT, PDQQPT, PDGQT
+      X1 = (4*MS**2/S) ** Y1
+      X2 = (4*MS**2/S/X1) ** Y2
+      SHAT = X1*X2*S
+      DEL = 1.D-4 * MS**2 * (1D0 -4*MS**2/SHAT)
+      BETA = SQRT(1D0 -4*MS**2/SHAT)
+      T1HAT = 
+     +   -(SHAT -DEL)/2D0 +(Y3 -0.5D0)*SQRT((SHAT-DEL)**2-4*MS**2*SHAT)
+      S4MAX = SHAT +T1HAT +SHAT*MS**2/T1HAT
+      S4 = (S4MAX -DEL)*Y4 +DEL
+      PREF  = SHAT*BETA *S4MAX*LOG(4*MS**2/S)*LOG(4*MS**2/S/X1)
+      PREFB = SHAT*BETA *      LOG(4*MS**2/S)*LOG(4*MS**2/S/X1)
+      CALL PDFNLOSST(X1,X2)
+      RETURN
+      END
+
+C ======================================================================
+
+      SUBROUTINE DTSNLSS()
+C***  DEFINES THE KINEMATICS FOR TOTAL CROSS-SECTIONS IN NLO
+C***  INCLUDING SUBTRACTION
+C***  FILLS UP THE COMMON BLOCK DINLSS3-7
+      IMPLICIT REAL*8 (A-H,M-Z)
+      COMMON/VARVEGAS/Y1,Y2,Y3,Y4,Y5
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/MINLSS/EPS,DEL,SCA,M2,GAM
+      COMMON/DINLSS1/SHATB,T1HATB,U1HATB,PREFB,X1,X2B
+      COMMON/DINLSS2/SHAT,T1HAT,U1HAT,S4,PREF,X2,S4MAX
+      COMMON/DINLSS3/SHAT0,T1HAT0,U1HAT0,S40,X10,X20,PREF0,S4G02
+      COMMON/DINLSS4/SHAT1,T1HAT1,U1HAT1,S41,X11,X21,PREF1,S4UP
+      COMMON/DINLSS5/SHAT2,T1HAT2,U1HAT2,S42,X12,X22,PREF2,S3G2,S32
+      COMMON/DINLSS6/SHAT3,T1HAT3,U1HAT3,S43,X13,X23,PREF3,S3G3,S3UP
+      COMMON/DINLSS7/SHAT4,T1HAT4,U1HAT4,S4MAX4,PREF4,X14,X24
+
+      S4MAX0 = SHAT - 2.D0*SQRT(SHAT*MS**2)
+      TYMIN = ATAN(-M2/GAM)
+      TYMAX = ATAN((S4MAX0-M2)/GAM)
+      TY = (TYMAX -TYMIN) * Y3 + TYMIN 
+      PREFTY = (TYMAX -TYMIN)/GAM 
+      S40 = GAM*TAN(TY) + M2
+      S41 = M2
+      PRET10 = SQRT( (SHAT-S40)**2 -4*MS**2*SHAT )
+      PRET11 = 1
+      IF((SHAT-S41)**2 -4*MS**2*SHAT.GT.0.D0)THEN
+       PRET11 = SQRT( (SHAT-S41)**2 -4*MS**2*SHAT )
+      ENDIF
+      T1HAT0 = -(SHAT-S40)/2.D0 +(Y4 -0.5D0)*PRET10
+      T1HAT1 = -(SHAT-S41)/2.D0 +(Y4 -0.5D0)*PRET11
+      PREF0 = PRET10 * PREFTY*LOG(4*MS**2/S)*LOG(4*MS**2/S/X1)
+      PREF1 = PRET11 * PREFTY*LOG(4*MS**2/S)*LOG(4*MS**2/S/X1)
+
+      S3MAX0 = SHAT - 2.D0*SQRT(SHAT*MS**2)
+      TZMIN = ATAN(-M2/GAM)
+      TZMAX = ATAN((S3MAX0-M2)/GAM)
+      TZ = (TZMAX -TZMIN) * Y3 + TZMIN 
+      PREFTZ = (TZMAX -TZMIN)/GAM 
+      S32 = GAM*TAN(TZ) + M2
+      S33 = M2
+
+      PRES42 = S32/(S32+MS**2)*SQRT((SHAT-S32)**2 -4*MS**2*SHAT)
+      PRES43 = 1
+      IF((SHAT-S33)**2 -4*MS**2*SHAT.GT.0.D0)THEN
+       PRES43 = S33/(S33+MS**2)*SQRT((SHAT-S33)**2 -4*MS**2*SHAT)
+      ENDIF
+      S42 =S32/2D0/(S32+MS**2)*(SHAT -S32 -2*MS**2) +PRES42 *(Y4 -0.5D0)
+      S43 =S33/2D0/(S33+MS**2)*(SHAT -S33 -2*MS**2) +PRES43 *(Y4 -0.5D0)
+      PRET12 = SQRT( (SHAT-S42)**2 -4*MS**2*SHAT)
+      PRET13 = 1
+      IF((SHAT-S43)**2 -4*MS**2*SHAT.GT.0.D0)THEN
+       PRET13 = SQRT( (SHAT-S43)**2 -4*MS**2*SHAT )
+      ENDIF
+      T1HAT2 = -(SHAT-S42)/2.D0 +(Y5 -0.5D0)*PRET12
+      T1HAT3 = -(SHAT-S43)/2.D0 +(Y5 -0.5D0)*PRET13
+
+      PREX2 = S42/2D0/(S42+MS**2)*SQRT((SHAT-S42)**2-4*MS**2*SHAT)
+      PREX3 = 1
+      IF((SHAT-S43)**2-4*MS**2*SHAT.GT.0.D0)THEN
+       PREX3 = S43/2D0/(S43+MS**2)*SQRT((SHAT-S43)**2-4*MS**2*SHAT)
+      ENDIF
+      PREF2 = PRES42 *PRET12 /PREX2 * PREFTZ * 
+     +     LOG(4*MS**2/S)*LOG(4*MS**2/S/X1)
+      PREF3 = PRES43 *PRET13 /PREX3 * PREFTZ * 
+     +     LOG(4*MS**2/S)*LOG(4*MS**2/S/X1)
+      S3G2  = S32 -M2
+      S3G3  = 0D0
+
+      SBHAT4 = SHAT * SQRT(1.D0 -4.D0*MS**2/SHAT)
+      T1HAT4 = SQRT(SHAT**2 -4*MS**2*SHAT)*(Y3 -1.D0/2.D0) -SHAT/2.D0
+      S4MAX4 = SHAT +T1HAT4 +MS**2*SHAT/T1HAT4
+      PREF4  = SBHAT4 * LOG(4*MS**2/S)*LOG(4*MS**2/S/X1)
+
+
+      RETURN
+      END
+
+C ======================================================================
+
+      REAL*8 FUNCTION ESSQQNLO()
+C***  CALCULATES THE DIFFERENTIAL CROSS-SECTION IN NLO FOR Q Q
+      IMPLICIT REAL*8 (A-H,M-Z)
+      COMMON/MINLSS/EPS,DEL,SCA,M2,GAM
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/DINLSS1/SHATB,T1HATB,U1HATB,PREFB,X1,X2B
+      COMMON/DINLSS2/SHAT,T1HAT,U1HAT,S4,PREF,X2,S4MAX
+      COMMON/PDLOSS/PDQQB,PDQQPB
+      COMMON/PDNLSS1/ PDQQ ,PDQQP
+
+C***  SYMMETRIZE WITH RESPECT TO BOTH SQUARKS
+      PDQQPB = PDQQPB / 2D0
+      PDQQP  = PDQQP  / 2D0
+
+      ESSQQNLO = 
+     +        +PDQQB * PREFB * DSSQQB(ALPHAS,SHATB,T1HATB,MS,MG,1) 
+     +        +PDQQB * PREFB * DSSQQV(ALPHAS,SHATB,T1HATB,MS,MG,MT,1) 
+     +        +PDQQB * PREFB * DSSQQ1(ALPHAS,SHATB,T1HATB,MS,MG,SCA,1) 
+     +        +PDQQB * PREFB * 
+     +        DSSQQD(ALPHAS,SHATB,T1HATB,S4,MS,MG,DEL,S4MAX,1)
+     +        +PDQQB * PREFB * 
+     +        DSSQQ2(ALPHAS,SHATB,T1HATB,S4,MS,MG,DEL,S4MAX,SCA,1)
+     +        +PDQQ  * PREF  * 
+     +        DSSQQH(ALPHAS,SHAT,T1HAT,S4,MS,MG,1) 
+     +        +PDQQ  * PREF  * 
+     +        DSSQQ3(ALPHAS,SHAT,T1HAT,S4,MS,MG,SCA,1) 
+
+      ESSQQNLO = ESSQQNLO
+     +        +PDQQPB* PREFB * DSSQQB(ALPHAS,SHATB,T1HATB,MS,MG,0) 
+     +        +PDQQPB* PREFB * DSSQQV(ALPHAS,SHATB,T1HATB,MS,MG,MT,0) 
+     +        +PDQQPB* PREFB * DSSQQ1(ALPHAS,SHATB,T1HATB,MS,MG,SCA,0) 
+     +        +PDQQPB* PREFB * 
+     +        DSSQQD(ALPHAS,SHATB,T1HATB,S4,MS,MG,DEL,S4MAX,0)
+     +        +PDQQPB* PREFB * 
+     +        DSSQQ2(ALPHAS,SHATB,T1HATB,S4,MS,MG,DEL,S4MAX,SCA,0)
+     +        +PDQQP  * PREF  * 
+     +        DSSQQH(ALPHAS,SHAT,T1HAT,S4,MS,MG,0) 
+     +        +PDQQP  * PREF  * 
+     +        DSSQQ3(ALPHAS,SHAT,T1HAT,S4,MS,MG,SCA,0) 
+
+      ESSQQNLO = ESSQQNLO
+     +        +PDQQPB* PREFB * DSSQQB(ALPHAS,SHATB,U1HATB,MS,MG,0) 
+     +        +PDQQPB* PREFB * DSSQQV(ALPHAS,SHATB,U1HATB,MS,MG,MT,0) 
+     +        +PDQQPB* PREFB * DSSQQ1(ALPHAS,SHATB,U1HATB,MS,MG,SCA,0) 
+     +        +PDQQPB* PREFB * 
+     +        DSSQQD(ALPHAS,SHATB,U1HATB,S4,MS,MG,DEL,S4MAX,0)
+     +        +PDQQPB* PREFB * 
+     +        DSSQQ2(ALPHAS,SHATB,U1HATB,S4,MS,MG,DEL,S4MAX,SCA,0)
+     +        +PDQQP  * PREF  * 
+     +        DSSQQH(ALPHAS,SHAT,U1HAT,S4,MS,MG,0) 
+     +        +PDQQP  * PREF  * 
+     +        DSSQQ3(ALPHAS,SHAT,U1HAT,S4,MS,MG,SCA,0) 
+
+      RETURN
+      END
+
+C ======================================================================
+
+      REAL*8 FUNCTION ESSQGNLO()
+C***  CALCULATES THE DIFFERENTIAL CROSS-SECTION IN NLO FOR Q G
+      IMPLICIT REAL*8 (A-H,M-Z)
+      ESSQGNLO = 
+     +     ESSQGNLOA() + ESSQGNLOB() + ESSQGNLOC() + ESSQGNLOD()
+      RETURN
+      END
+
+C ======================================================================
+
+      REAL*8 FUNCTION ESSQGNLOA()
+C***  CALCULATES PART OF THE DIFFERENTIAL CROSS-SECTION IN NLO FOR Q G
+      IMPLICIT REAL*8 (A-H,M-Z)
+      COMMON/MINLSS/EPS,DEL,SCA,M2,GAM
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/DINLSS3/SHAT0,T1HAT0,U1HAT0,S40,X10,X20,PREF0,S4G02
+      COMMON/DINLSS4/SHAT1,T1HAT1,U1HAT1,S41,X11,X21,PREF1,S4UP
+      COMMON/PDNLSS2/ PDGQ0,PDGQ1,PDQG0,PDQG1
+
+      CALL PDFNLOSS2(X10,X20,X11,X21)
+
+      SIGNLOSS3A = 
+     +     + PDGQ0 * PREF0 * S4G02 *
+     +     DSSGQH(ALPHAS,SHAT0,T1HAT0,S40,MS,MG,EPS)
+     +     + PDGQ0 * PREF0 * S4G02 * 
+     +     DSSGQ3(ALPHAS,SHAT0,T1HAT0,S40,MS,MG,SCA)
+     +     
+     +     + PDQG0 * PREF0 * S4G02 *
+     +     DSSGQH(ALPHAS,SHAT0,U1HAT0,S40,MS,MG,EPS)
+     +     + PDQG0 * PREF0 * S4G02 * 
+     +     DSSGQ3(ALPHAS,SHAT0,U1HAT0,S40,MS,MG,SCA)
+      
+      ESSQGNLOA = SIGNLOSS3A
+      RETURN
+      END
+
+C ======================================================================
+
+      REAL*8 FUNCTION ESSQGNLOB()
+C***  CALCULATES PART OF THE DIFFERENTIAL CROSS-SECTION IN NLO FOR Q G
+      IMPLICIT REAL*8 (A-H,M-Z)
+      COMMON/MINLSS/EPS,DEL,SCA,M2,GAM
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/DINLSS3/SHAT0,T1HAT0,U1HAT0,S40,X10,X20,PREF0,S4G02
+      COMMON/DINLSS4/SHAT1,T1HAT1,U1HAT1,S41,X11,X21,PREF1,S4UP
+      COMMON/PDNLSS2/ PDGQ0,PDGQ1,PDQG0,PDQG1
+
+      IF ((SHAT1.GT.(MS+MG)**2).AND.(MG.GT.MS).AND.(S40.LE.S4UP)) 
+     +     THEN
+         SIGNLOSS3B = 
+     +        + PDGQ0 * PREF0 * 
+     +        DSSGQS(ALPHAS,SHAT0,T1HAT0,S40,MS,MG,EPS)
+     +        - PDGQ1 * PREF1 * 
+     +        DSSGQS(ALPHAS,SHAT1,T1HAT1,S41,MS,MG,EPS)
+     +        
+     +        + PDQG0 * PREF0 * 
+     +        DSSGQS(ALPHAS,SHAT0,U1HAT0,S40,MS,MG,EPS)
+     +        - PDQG1 * PREF1 * 
+     +        DSSGQS(ALPHAS,SHAT1,U1HAT1,S41,MS,MG,EPS)
+      ELSE
+         SIGNLOSS3B = 
+     +     + PDGQ0 * PREF0 *  
+     +     DSSGQS(ALPHAS,SHAT0,T1HAT0,S40,MS,MG,EPS)
+     +     
+     +     + PDQG0 * PREF0 * 
+     +     DSSGQS(ALPHAS,SHAT0,U1HAT0,S40,MS,MG,EPS)
+         
+      END IF
+
+      ESSQGNLOB = SIGNLOSS3B 
+      RETURN
+      END
+
+C ======================================================================
+
+      REAL*8 FUNCTION ESSQGNLOC()
+C***  CALCULATES PART OF THE DIFFERENTIAL CROSS-SECTION IN NLO FOR Q G
+      IMPLICIT REAL*8 (A-H,M-Z)
+      COMMON/MINLSS/EPS,DEL,SCA,M2,GAM
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/DINLSS5/SHAT2,T1HAT2,U1HAT2,S42,X12,X22,PREF2,S3G2,S32
+      COMMON/DINLSS6/SHAT3,T1HAT3,U1HAT3,S43,X13,X23,PREF3,S3G3,S3UP
+      COMMON/PDNLSS2/ PDGQ0,PDGQ1,PDQG0,PDQG1
+
+      CALL PDFNLOSS2(X12,X22,X13,X23)
+      
+      IF ((SHAT3.GT.(MS+MG)**2).AND.(MG.GT.MS).AND.(S32.LE.S3UP)) 
+     +     THEN
+         SIGNLOSS3C = 
+     +        + PDGQ0 * PREF2 *
+     +        DSSGQT(ALPHAS,SHAT2,T1HAT2,S42,S3G2,MS,MG,EPS) 
+     +        - PDGQ1 * PREF3 *
+     +        DSSGQT(ALPHAS,SHAT3,T1HAT3,S43,S3G3,MS,MG,EPS) 
+     +        
+     +        + PDQG0 * PREF2 *
+     +        DSSGQT(ALPHAS,SHAT2,U1HAT2,S42,S3G2,MS,MG,EPS) 
+     +        - PDQG1 * PREF3 *
+     +        DSSGQT(ALPHAS,SHAT3,U1HAT3,S43,S3G3,MS,MG,EPS) 
+      ELSE
+         SIGNLOSS3C = 
+     +        + PDGQ0 * PREF2 *
+     +        DSSGQT(ALPHAS,SHAT2,T1HAT2,S42,S3G2,MS,MG,EPS)      
+     +        
+     +        + PDQG0 * PREF2 *
+     +        DSSGQT(ALPHAS,SHAT2,U1HAT2,S42,S3G2,MS,MG,EPS) 
+      END IF
+      
+      ESSQGNLOC = SIGNLOSS3C
+      RETURN
+      END
+
+C ======================================================================
+
+      REAL*8 FUNCTION ESSQGNLOD()
+C***  CALCULATES PART OF THE DIFFERENTIAL CROSS-SECTION IN NLO FOR Q G
+      IMPLICIT REAL*8 (A-H,M-Z)
+      COMMON/MINLSS/EPS,DEL,SCA,M2,GAM
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/DINLSS7/SHAT4,T1HAT4,U1HAT4,S4MAX4,PREF4,X14,X24
+      COMMON/PDNLSS2/ PDGQ0,PDGQ1,PDQG0,PDQG1
+
+      IF ((SHAT4.GT.(MS+MG)**2).AND.(MG.GT.MS).AND.(S4MAX4.GE.M2)) 
+     +     THEN
+         CALL PDFNLOSS2(X14,X24,X13,X23)
+         SIGNLOSS3D = 
+     +        + PDGQ0 * PREF4*
+     +        DSSGQU(ALPHAS,SHAT4,T1HAT4,+M2,MS,MG,EPS)
+     +        
+     +        + PDQG0 * PREF4*
+     +        DSSGQU(ALPHAS,SHAT4,U1HAT4,+M2,MS,MG,EPS)
+         
+      ELSE
+         SIGNLOSS3D = 0D0
+      END IF
+      
+      ESSQGNLOD = SIGNLOSS3D
+      RETURN
+      END
+
+C ======================================================================
+
+      REAL*8 FUNCTION FSSQQNLO()
+C***  CALCULATES THE TOTAL CROSS-SECTION IN NLO FOR Q Q
+      IMPLICIT REAL*8 (A-H,M-Z)
+      COMMON/PDNLSST/ PDQQT, PDQQPT, PDGQT
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/MINLSS/EPS,DEL,SCA,M2,GAM
+      COMMON/DINLSS1/SHATB,T1HATB,U1HATB,PREFB,X1,X2B
+      COMMON/DINLSS2/SHAT,T1HAT,U1HAT,S4,PREF,X2,S4MAX
+      FSSQQNLO = 
+     +        +PDQQT * PREFB * DSSQQB(ALPHAS,SHAT,T1HAT,MS,MG,1) 
+     +        +PDQQT * PREFB * DSSQQV(ALPHAS,SHAT,T1HAT,MS,MG,MT,1) 
+     +        +PDQQT * PREFB * DSSQQ1(ALPHAS,SHAT,T1HAT,MS,MG,SCA,1) 
+     +        +PDQQT * PREFB * 
+     +        DSSQQD(ALPHAS,SHAT,T1HAT,S4,MS,MG,DEL,S4MAX,1)
+     +        +PDQQT * PREFB * 
+     +        DSSQQ2(ALPHAS,SHAT,T1HAT,S4,MS,MG,DEL,S4MAX,SCA,1)
+     +        +PDQQT * PREF  * 
+     +        DSSQQH(ALPHAS,SHAT,T1HAT,S4,MS,MG,1) 
+     +        +PDQQT * PREF  * 
+     +        DSSQQ3(ALPHAS,SHAT,T1HAT,S4,MS,MG,SCA,1) 
+
+      FSSQQNLO = FSSQQNLO
+     +        +PDQQPT* PREFB * DSSQQB(ALPHAS,SHAT,T1HAT,MS,MG,0) 
+     +        +PDQQPT* PREFB * DSSQQV(ALPHAS,SHAT,T1HAT,MS,MG,MT,0) 
+     +        +PDQQPT* PREFB * DSSQQ1(ALPHAS,SHAT,T1HAT,MS,MG,SCA,0) 
+     +        +PDQQPT* PREFB * 
+     +        DSSQQD(ALPHAS,SHAT,T1HAT,S4,MS,MG,DEL,S4MAX,0)
+     +        +PDQQPT* PREFB * 
+     +        DSSQQ2(ALPHAS,SHAT,T1HAT,S4,MS,MG,DEL,S4MAX,SCA,0)
+     +        +PDQQPT * PREF  * 
+     +        DSSQQH(ALPHAS,SHAT,T1HAT,S4,MS,MG,0) 
+     +        +PDQQPT * PREF  * 
+     +        DSSQQ3(ALPHAS,SHAT,T1HAT,S4,MS,MG,SCA,0) 
+
+      RETURN
+      END
+
+C ======================================================================
+
+      REAL*8 FUNCTION FSSQGNLO()
+C***  CALCULATES THE TOTAL CROSS-SECTION IN NLO FOR Q G
+      IMPLICIT REAL*8 (A-H,M-Z)
+      COMMON/PDNLSST/ PDQQT, PDQQPT, PDGQT
+      COMMON/CONST1/S,ENERGY,ALPHAS,MS,MG,MT
+      COMMON/MINLSS/EPS,DEL,SCA,M2,GAM
+      COMMON/DINLSS1/SHATB,T1HATB,U1HATB,PREFB,X1,X2B
+      COMMON/DINLSS2/SHAT,T1HAT,U1HAT,S4,PREF,X2,S4MAX
+      COMMON/DINLSS3/SHAT0,T1HAT0,U1HAT0,S40,X10,X20,PREF0,S4G02
+      COMMON/DINLSS4/SHAT1,T1HAT1,U1HAT1,S41,X11,X21,PREF1,S4UP
+      COMMON/DINLSS5/SHAT2,T1HAT2,U1HAT2,S42,X12,X22,PREF2,S3G2,S32
+      COMMON/DINLSS6/SHAT3,T1HAT3,U1HAT3,S43,X13,X23,PREF3,S3G3,S3UP
+      COMMON/DINLSS7/SHAT4,T1HAT4,U1HAT4,S4MAX4,PREF4,X14,X24
+      
+      IF ((MG.GT.MS).AND.(SHAT.GT.(MS+MG)**2)) THEN
+         SIGNLOSS3 = 
+     +        +PDGQT * PREF *
+     +        DSSGQH(ALPHAS,SHAT,T1HAT,S4,MS,MG,EPS)
+     +        +PDGQT * PREF *
+     +        DSSGQ3(ALPHAS,SHAT,T1HAT,S4,MS,MG,SCA)
+     +        +PDGQT * PREF0 * 
+     +        DSSGQS(ALPHAS,SHAT,T1HAT0,S40,MS,MG,EPS)
+     +        -PDGQT * PREF1 * 
+     +        DSSGQS(ALPHAS,SHAT,T1HAT1,S41,MS,MG,EPS)
+     +        +PDGQT * PREF2 *
+     +        DSSGQT(ALPHAS,SHAT,T1HAT2,S42,S3G2,MS,MG,EPS)
+     +        -PDGQT * PREF3 *
+     +        DSSGQT(ALPHAS,SHAT,T1HAT3,S43,0.D0,MS,MG,EPS)
+         
+      ELSE
+         SIGNLOSS3 = 
+     +        +PDGQT * PREF *
+     +        DSSGQH(ALPHAS,SHAT,T1HAT,S4,MS,MG,EPS)
+     +        +PDGQT * PREF *
+     +        DSSGQ3(ALPHAS,SHAT,T1HAT,S4,MS,MG,SCA)
+     +        +PDGQT * PREF0 * 
+     +        DSSGQS(ALPHAS,SHAT,T1HAT0,S40,MS,MG,EPS)
+     +        +PDGQT * PREF2 *
+     +        DSSGQT(ALPHAS,SHAT,T1HAT2,S42,S3G2,MS,MG,EPS)
+      END IF
+      
+      IF ((S4MAX4.GE.M2).AND.(MG.GT.MS).AND.(SHAT.GT.(MS+MG)**2))
+     +     SIGNLOSS3 = SIGNLOSS3 + PDGQT * PREF4*
+     +     DSSGQU(ALPHAS,SHAT,T1HAT4,+M2,MS,MG,EPS)
+      
+      FSSQGNLO = SIGNLOSS3
+      RETURN
+      END
+
+C ======================================================================
+
+
+      REAL*8 FUNCTION SUMNLOSS(SIGNLOSS1,SIGNLOSS2,SIGNLOSS3,IFLAVOR)
+C***  SUMS UP DIFFERENT FLAVOR STATES FOR CROSS-SECTION IN NLO
+      IMPLICIT REAL*8 (A-H,M-Z)
+      IMPLICIT INTEGER (I)
+      IF (IFLAVOR.EQ.0) SUMNLOSS = SIGNLOSS1 +SIGNLOSS2 +SIGNLOSS3
+      IF (IFLAVOR.EQ.1) SUMNLOSS = SIGNLOSS1
+      IF (IFLAVOR.EQ.2) SUMNLOSS = SIGNLOSS2
+      IF (IFLAVOR.EQ.3) SUMNLOSS = SIGNLOSS3
+      IF (IFLAVOR.EQ.4) SUMNLOSS = SIGNLOSS1 +SIGNLOSS2
+      IF (IFLAVOR.EQ.5) SUMNLOSS = SIGNLOSS3
+      IF (.NOT.(ABS(SUMNLOSS).LT.1.D35)) THEN
+         SUMNLOSS = 0.D0
+         PRINT *,'NAN'
+      END IF
+      RETURN
+      END
+      
+C ======================================================================
+
+      SUBROUTINE PDFLOSS(X1,X2)
+      IMPLICIT REAL*8 (A-H,M-Z)
+      IMPLICIT INTEGER (I,J)
+      DIMENSION XPDF(-6:6)
+      DIMENSION YPDF(-6:6)
+      COMMON/CONST2/SCALE,SCAFAC,ICOLL,ISCAPT
+      COMMON/PDLOSS/PDQQB,PDQQPB
+
+      CALL PARTONDF(X1,SCALE,XPDF)
+      CALL PARTONDF(X2,SCALE,YPDF)
+
+      PDQQB = 0D0
+      PDQQPB= 0D0
+
+      IF (ICOLL.EQ.0) THEN
+         DO 1000 I= 1,5
+            PDQQB = PDQQB + XPDF( I) * YPDF(-I) + XPDF(-I) * YPDF( I) 
+            DO 1000 J =1,5
+               IF (I.NE.J) PDQQPB  = PDQQPB  
+     +              + XPDF( I) * YPDF(-J) + XPDF(-I) * YPDF( J) 
+ 1000    CONTINUE
+      ELSE IF (ICOLL.EQ.1) THEN
+         DO 1010 I= 1,5
+            PDQQB = PDQQB + XPDF( I) * YPDF( I) + XPDF(-I) * YPDF(-I) 
+            DO 1010 J =1,5
+               IF (I.NE.J) PDQQPB  = PDQQPB  
+     +              + XPDF( I) * YPDF( J) + XPDF(-I) * YPDF(-J) 
+ 1010    CONTINUE
+
+      END IF
+      RETURN
+      END
+
+C ======================================================================
+
+      SUBROUTINE PDFNLOSST(X1,X2)
+      IMPLICIT REAL*8 (A-H,M-Z)
+      IMPLICIT INTEGER (I,J)
+      DIMENSION XPDF(-6:6)
+      DIMENSION YPDF(-6:6)
+      COMMON/CONST2/SCALE,SCAFAC,ICOLL,ISCAPT
+      COMMON/PDNLSST/ PDQQT, PDQQPT, PDGQT
+
+      CALL PARTONDF(X1,SCALE,XPDF)
+      CALL PARTONDF(X2,SCALE,YPDF)
+
+      PDQQT = 0D0
+      PDQQPT= 0D0
+      PDGQT = 0D0
+
+      IF (ICOLL.EQ.0) THEN
+         DO 1000 I= 1,5
+            PDQQT = PDQQT + XPDF( I) * YPDF(-I) + XPDF(-I) * YPDF( I) 
+            PDGQT = PDGQT + XPDF(0)  * YPDF(-I) + XPDF( I) * YPDF( 0) 
+     +                    + XPDF(0)  * YPDF(I)  + XPDF(-I) * YPDF( 0) 
+            DO 1000 J =1,5
+               IF (I.NE.J) PDQQPT  = PDQQPT  
+     +              + XPDF( I) * YPDF(-J) + XPDF(-I) * YPDF( J) 
+ 1000    CONTINUE
+      ELSE IF (ICOLL.EQ.1) THEN
+         DO 1010 I= 1,5
+            PDQQT = PDQQT + XPDF( I) * YPDF( I) + XPDF(-I) * YPDF(-I) 
+            PDGQT = PDGQT + XPDF(0)  * YPDF(-I) + XPDF( I) * YPDF(0) 
+     +                    + XPDF(0)  * YPDF(I)  + XPDF(-I) * YPDF(0) 
+            DO 1010 J =1,5
+               IF (I.NE.J) PDQQPT  = PDQQPT  
+     +              + XPDF( I) * YPDF( J) + XPDF(-I) * YPDF(-J) 
+ 1010    CONTINUE
+      END IF
+      RETURN
+      END
+
+C ======================================================================
+
+      SUBROUTINE PDFNLOSS1(X1,X2,X2B)
+      IMPLICIT REAL*8 (A-H,M-Z)
+      IMPLICIT INTEGER (I,J)
+      DIMENSION XPDF(-6:6)
+      DIMENSION YPDF(-6:6)
+      DIMENSION ZPDF(-6:6)
+      COMMON/CONST2/SCALE,SCAFAC,ICOLL,ISCAPT
+      COMMON/PDLOSS/PDQQB,PDQQPB
+      COMMON/PDNLSS1/ PDQQ ,PDQQP
+
+      CALL PARTONDF(X1 ,SCALE,XPDF)
+      CALL PARTONDF(X2B,SCALE,YPDF)
+      CALL PARTONDF(X2 ,SCALE,ZPDF)
+
+
+      PDQQB = 0D0
+      PDQQ  = 0D0
+      PDQQPB= 0D0
+      PDQQP = 0D0
+
+      IF (ICOLL.EQ.0) THEN
+         DO 1000 I= 1,5
+            PDQQB = PDQQB + XPDF( I) * YPDF(-I) + XPDF(-I) * YPDF( I) 
+            PDQQ  = PDQQ  + XPDF( I) * ZPDF(-I) + XPDF(-I) * ZPDF( I) 
+            DO 1000 J =1,5
+               IF (I.NE.J) PDQQPB  = PDQQPB  
+     +              + XPDF( I) * YPDF(-J) + XPDF(-I) * YPDF( J) 
+               IF (I.NE.J) PDQQP   = PDQQP   
+     +              + XPDF( I) * ZPDF(-J) + XPDF(-I) * ZPDF( J) 
+ 1000    CONTINUE
+      ELSE IF (ICOLL.EQ.1) THEN
+         DO 1010 I= 1,5
+            PDQQB = PDQQB + XPDF( I) * YPDF( I) + XPDF(-I) * YPDF(-I) 
+            PDQQ  = PDQQ  + XPDF( I) * ZPDF( I) + XPDF(-I) * ZPDF(-I) 
+            DO 1010 J =1,5
+               IF (I.NE.J) PDQQPB  = PDQQPB  
+     +              + XPDF( I) * YPDF( J) + XPDF(-I) * YPDF(-J) 
+               IF (I.NE.J) PDQQP   = PDQQP  
+     +              + XPDF( I) * ZPDF( J) + XPDF(-I) * ZPDF(-J) 
+
+ 1010    CONTINUE
+      END IF
+      RETURN
+      END
+
+C ======================================================================
+
+      SUBROUTINE PDFNLOSS2(X10,X20,X11,X21)
+      IMPLICIT REAL*8 (A-H,M-Z)
+      IMPLICIT INTEGER (I,J)
+      DIMENSION WPDF(-6:6)
+      DIMENSION XPDF(-6:6)
+      DIMENSION YPDF(-6:6)
+      DIMENSION ZPDF(-6:6)
+      COMMON/CONST2/SCALE,SCAFAC,ICOLL,ISCAPT
+      COMMON/PDNLSS2/ PDGQ0,PDGQ1,PDQG0,PDQG1
+
+      CALL PARTONDF(X10,SCALE,WPDF)
+      CALL PARTONDF(X20,SCALE,XPDF)
+      CALL PARTONDF(X11,SCALE,YPDF)
+      CALL PARTONDF(X21,SCALE,ZPDF)
+
+      PDGQ0 = 0D0
+      PDGQ1 = 0D0
+      PDQG0 = 0D0
+      PDQG1 = 0D0
+
+C***  INDEPENDENT OF COLLIDER TYPE (ICOLL)
+      DO 1000 I= 1,5
+         PDGQ0 = PDGQ0 + WPDF( 0) * XPDF(-I) + WPDF( 0) * XPDF( I) 
+         PDGQ1 = PDGQ1 + YPDF( 0) * ZPDF(-I) + YPDF( 0) * ZPDF( I) 
+         PDQG0 = PDQG0 + WPDF( I) * XPDF( 0) + WPDF(-I) * XPDF( 0) 
+         PDQG1 = PDQG1 + YPDF( I) * ZPDF( 0) + YPDF(-I) * ZPDF( 0) 
+ 1000 CONTINUE
+
+      RETURN
+      END
+
+C ======================================================================
+

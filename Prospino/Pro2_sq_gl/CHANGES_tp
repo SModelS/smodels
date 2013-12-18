@@ -1,0 +1,17 @@
+1/27/04
+integral.f:  error message PI2$6 -> PI2_6
+integral.f:  real -> dreal in old line 1446 (D0 function)
+
+2/14/04
+hadron**.f:            change names of subroutines
+hadron**.f, initpdf.f: eliminate ipdfset and common block const3
+hadron**.f:            eliminate iprint and common block iout
+hadronst.f:            common block const1 chagned to const6
+hadron**.f:            change the actual integration call to new vegas format
+
+2/15/04
+initpdf.f: adjust the number of points and vegas iterations            
+
+10/9/04
+hadrons*.f:           maximum number of continuation lines accomodated
+all files:            removed dreal, dlog, dabs, dsqrt for automatic conversion (NAG f95 compiler)
