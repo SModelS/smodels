@@ -4,7 +4,7 @@
 .. module:: FeynmanGraphs
     :synopsis: This unit contains two simple routines that draw feynman graphs.
 
-.. moduleauthor:: missing <email@example.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
 
@@ -101,13 +101,12 @@ def connect ( canvas, p1, p2, straight=True, label=None, spin="fermion", bend=Tr
     canvas.insert(bitmap.bitmap(pt.x()+displace, pt.y(), jpg, compressmode=None))
   return segs
 
-def draw ( element, filename="bla.pdf", straight=False, inparts=True ):
+def draw ( element, filename="bla.pdf", straight=False, inparts=True, verbose=False ):
   """ plot a lessagraph, write into pdf/eps/png file called <filename> 
     :param straight: draw straight lines, or xkcd style
     :param inparts: draw the incoming lines and the big production blob?
   """
   try:
-    print "here"
     import os, sys
     f = open(os.devnull, 'w')
     copy=sys.stdout
@@ -116,7 +115,6 @@ def draw ( element, filename="bla.pdf", straight=False, inparts=True ):
     from pyfeyn.user import FeynDiagram, Point, Circle, HATCHED135, CIRCLE, Vertex,\
       WHITE, Fermion
     sys.stdout=copy
-    print "there"
   except ImportError,e:
     print "[FeynmanGraphs.py] cannot draw, pyfeyn not installed?",e
     return
@@ -188,10 +186,10 @@ def draw ( element, filename="bla.pdf", straight=False, inparts=True ):
       # print "particles",particles,"ct=",ct
       y=-1.0*f ## y of end point of SM particle
       if ct==1: y=2.*f
-      dx=(len(insertions)-1)*(-.5)*f ## delta_x 
+      dx=(len(insertions)-1)*(-.25)*f ## delta_x 
       #dx=(particles-1)*(-.5)*f ## delta_x 
       for (i,insertion) in enumerate(insertions):
-        p=Point ( f*(nvtx + 1 +  dx + i), f*y )
+        p=Point ( f*(nvtx + 1 +  dx + 0.5*i), f*y )
         ## print "branch=",branch
         label=printParticle_ ( insertion )
         ## ff=Fermion(v1,p).addLabel ( label )

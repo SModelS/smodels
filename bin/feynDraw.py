@@ -7,6 +7,7 @@ argparser.add_argument ( '-T', nargs='?', help='Tx name, will look up lhe file i
 argparser.add_argument ( '-l', '--lhe', nargs='?', help='lhe file name, supplied directly. Takes precedence over "-T" argument.', type=types.StringType, default='' )
 argparser.add_argument ( '-o', '--output', nargs='?', help='output file, can be pdf or eps or png (via convert)', type=types.StringType, default='out.pdf' )
 argparser.add_argument ( '-s', '--straight', help='straight, not xkcd style', action='store_true' )
+argparser.add_argument ( '-v', '--verbose', help='be verbose', action='store_true' )
 args=argparser.parse_args()
 
 from Theory import LHEReader, TopologyBuilder
@@ -18,4 +19,4 @@ if args.lhe!="": filename=args.lhe
 reader = LHEReader.LHEReader( filename )
 Event = reader.next()
 SMSTop = TopologyBuilder.fromEvent(Event, {} )
-FeynmanGraphs.draw ( SMSTop[0].leadingElement(), args.output, straight=args.straight, inparts=False )
+FeynmanGraphs.draw ( SMSTop[0].leadingElement(), args.output, straight=args.straight, inparts=False, verbose=args.verbose )
