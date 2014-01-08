@@ -14,7 +14,7 @@ def printParticle_ ( label ):
       routine, do not call directly """
   if label=="jet": label="q"
   label=label+"   "
-  return label[:3]
+  return label[:2]
   
 def segment ( p1, p2, spin, Bend=None ):
   from pyfeyn.user import NamedLine
@@ -108,7 +108,7 @@ def draw ( element, filename="bla.pdf", straight=False, inparts=True ):
   """
   try:
     print "here"
-    import os
+    import os, sys
     f = open(os.devnull, 'w')
     copy=sys.stdout
     sys.stdout = f
@@ -215,23 +215,23 @@ def draw ( element, filename="bla.pdf", straight=False, inparts=True ):
 def drawBranch_ ( branch, upwards, labels, html ):
   """ draws a single branch, should only be used via .asciidraw, 
       not directly """
-  lines=["  ","---"]
-  labels="  "
+  lines=["   ","----"]
+  labels="   "
   for insertions in branch.particles:
     if len(insertions)==0: 
       lines[0]+=" "
       lines[1]+="*"
       continue
-    lines[1]+="*---"
+    lines[1]+="*----"
     if len(insertions)==1: 
-      labels+=" "+printParticle_(insertions[0])
-      lines[0]+=" |  "
+      labels+=" "+printParticle_(insertions[0])+"  "
+      lines[0]+=" |   "
     if len(insertions)==2: 
       labels+=printParticle_(insertions[0])+" "+printParticle_(insertions[1])
       if upwards:
-        lines[0]+="\ /"
+        lines[0]+="\\ /  "
       else:
-        lines[0]+="/ \\"
+        lines[0]+="/ \\  "
     if len(insertions)>2:
       print "[SMSFeynmanGraphs.py] case for n-body decay, n>3 not yet. implemented. Please implement."
       sys.exit(0)
