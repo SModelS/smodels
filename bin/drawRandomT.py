@@ -21,7 +21,7 @@ while T.find("_")!=-1:
   T=T[:T.find("_")]
 
 print 
-print "Today's Random Topology: ``%s''" % T
+print "Today's Random Topology is ``%s'':" % T
 print
 
 reader = LHEReader.LHEReader( filename )
