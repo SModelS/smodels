@@ -229,7 +229,7 @@ class Block(object):
                     i_first_nonint = i
                     break
             if i_first_nonint == 0:
-                raise AccessError("Attempted to set a block entry with a non-integer(s) index")
+                raise AccessError("XXX Attempted to set a block entry with a non-integer(s) index"+str(args))
             else:
                 self.entries[_autotuple(args[:i_first_nonint])] = _autotuple(args[i_first_nonint:])
 
@@ -264,7 +264,7 @@ class Block(object):
 
     def __setitem__(self, key, value):
         if key is not None and type(key) is not int and not all(type(x) is int for x in key):
-            raise AccessError("Attempted to set a block entry with a non-integer(s) index")
+            raise AccessError("YYY Attempted to set a block entry with a non-integer(s) index")
         self.entries[key] = value
 
     def __cmp__(self, other):
@@ -381,6 +381,12 @@ def readSLHA(spcstr, D ): ## ignorenobr=False, ignorenomass=False ):
             if not match:
                 continue
             blockname = match.group(1)
+            if blockname in [ "HIGGSBOUNDSINPUTHIGGSCOUPLINGSFERMIONS", \
+                              "HIGGSBOUNDSINPUTHIGGSCOUPLINGSBOSONS",
+                              "SPHENOLOWENERGY" ]:
+              ## FIXME trino FIX, ignore this block!
+              currentblock=None
+              continue
             qstr = match.group(2)
             if qstr is not None:
                 qstr = qstr[qstr.find("=")+1:].strip()

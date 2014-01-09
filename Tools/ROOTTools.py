@@ -8,12 +8,36 @@
 
 """
 
-def getRootVersion ( astuple=False ):
+def getRootVersionFromConfig_ ( astuple=False ):
+  """ get the ROOT version, via root-config --version
+
+    :param astuple: false returns string, true returns tuple of integers.
+    :returns: ROOT version
+  """
+  from VariousHelpers import logging
+  log = logging.getLogger(__name__)
+  try:
+    import commands
+    S=commands.getoutput("root-config --prefix")
+    if S.find("not found")>-1:
+      log.error ( S )
+      return None
+    if not astuple: return S
+    T,C=S.split("/")
+    A,B=T.split(".")
+    return (int(A),int(B),int(C))
+  except Exception,e:
+    log.error ( e )
+    return None
+
+
+def getRootVersion ( astuple=False, useconfig=False ):
   """ get the ROOT version.
 
     :param astuple: false returns string, true returns tuple of integers.
     :returns: ROOT version
   """
+  if useconfig: return getRootVersionFromConfig_ ( astuple )
   from VariousHelpers import logging
   log = logging.getLogger(__name__)
   try:
