@@ -8,8 +8,29 @@
 
 """
 
-def getRootVersion ( astuple=False ):
-  """ get the ROOT version.
+def getRootVersion ( astuple=False, useimport=False ):
+  """ get the ROOT version from root-config
+
+    :param astuple: false returns string, true returns tuple of integers.
+    :returns: ROOT version
+  """
+  if useimport: return getRootVersionFromImport_(astuple)
+  from VariousHelpers import logging
+  log = logging.getLogger(__name__)
+  try:
+    import commands
+    S=commands.getoutput("root-config --version")
+    if S.find("not found")>-1:
+      log.error ( S )
+      return None
+    if not astuple: return S
+    return tupelizeVersion ( S )
+  except Exception,e:
+    log.error ( e )
+    return None
+
+def getRootVersionFromImport_ ( astuple=False ):
+  """ get the ROOT version from python import.
 
     :param astuple: false returns string, true returns tuple of integers.
     :returns: ROOT version
@@ -20,12 +41,16 @@ def getRootVersion ( astuple=False ):
     import ROOT
     S=ROOT.gROOT.GetVersion()
     if not astuple: return S
-    T,C=S.split("/")
-    A,B=T.split(".")
-    return (int(A),int(B),int(C))
+    return tupelizeVersion ( S )
   except Exception,e:
     log.error ( e )
     return None
+
+
+def tupelizeVersion ( S ):
+  T,C=S.split("/")
+  A,B=T.split(".")
+  return (int(A),int(B),int(C))
     
 def getRootPath ( ):
   """ get the ROOT path, first try via root-config, then query ROOTSYS
