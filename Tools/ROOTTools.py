@@ -2,13 +2,80 @@
 
 """
 .. module:: ROOTTools
-    :synopsis: Collection of tools needed for use and manipulation of ROOT files.
+    :synopsis: Collection of methods used in the context of ROOT
 
-.. moduleauthor:: missing <email@example.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
 
+def getRootVersion ( astuple=False ):
+  """ get the ROOT version.
 
+    :param astuple: false returns string, true returns tuple of integers.
+    :returns: ROOT version
+  """
+  from VariousHelpers import logging
+  log = logging.getLogger(__name__)
+  try:
+    import ROOT
+    S=ROOT.gROOT.GetVersion()
+    if not astuple: return S
+    T,C=S.split("/")
+    A,B=T.split(".")
+    return (int(A),int(B),int(C))
+  except Exception,e:
+    log.error ( e )
+    return None
+    
+def getRootPath ( ):
+  """ get the ROOT path, first try via root-config, then query ROOTSYS
+    :returns: ROOT path
+  """
+  import logging
+  log = logging.getLogger(__name__)
+  try:
+    import commands
+    out=commands.getoutput("root-config --prefix")
+    if out.find("not found")>-1:
+      log.info ( out )
+      import os
+      ret=os.getenv("ROOTSYS")
+      if not ret:
+        log.error ( "ROOTSYS not set, either" )
+      return None
+    else:
+      return out
+  except Exception,e:
+    log.error ( e )
+    return None
+      
+def getRootLibraryPath ( ):
+  """ get the ROOT library path, first try via root-config, then systematically
+      try candidate paths.
+
+    :returns: ROOT path
+  """
+  import logging
+  log = logging.getLogger(__name__)
+  try:
+    import commands
+    out=commands.getoutput("root-config --libdir")
+    if out.find("not found")>-1:
+      log.info ( out )
+      import os
+      ret=os.getenv("ROOTSYS")
+      for Dir in [ "lib/x86_64-linux-gnu", "lib64/root", "lib/root" ]:
+        F="%s/%s/libRint.so" % ( ret, Dir )
+        if os.path.exists ( F ):
+          return F
+      log.error ( "no suitable libdir found." )
+      return None
+    else:
+      return out
+  except Exception,e:
+    log.error ( e )
+    return None
+    
 def getTGraphFromContour(exclhisto):
   """ returns the contour of an exclusion histogram as TGraph"""
   import ROOT
