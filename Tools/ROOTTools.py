@@ -53,7 +53,7 @@ def getRootLibraryPath ( ):
   """ get the ROOT library path, first try via root-config, then systematically
       try candidate paths.
 
-    :returns: ROOT path
+    :returns: ROOT library path
   """
   import logging
   log = logging.getLogger(__name__)
@@ -75,6 +75,23 @@ def getRootLibraryPath ( ):
   except Exception,e:
     log.error ( e )
     return None
+
+def getRootPythonPath ( ):
+  """ get the ROOT python path, via .getRootLibraryPath() and .getRootVersion().
+
+    :returns: ROOT python path
+  """
+  import os
+  version = getRootVersion(True)
+  libpath = getRootLibraryPath()
+  if not version or not libpath:
+    return None
+  V=str(version[0])+"."+str(version[1])
+  for SubDir in [ V, "root"+V ]:
+    Dir=libpath+"/"+SubDir
+    if os.path.exists ( Dir+"/ROOT.py" ):
+      return Dir 
+  return None
     
 def getTGraphFromContour(exclhisto):
   """ returns the contour of an exclusion histogram as TGraph"""
