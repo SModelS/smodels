@@ -71,7 +71,7 @@ def load( anas = None, topos=None, sqrts= [ 7, 8 ] ):
       print "Building analysis",analysis
     Ss=rmvunit(SMSResults.getSqrts( analysis ),"TeV")
     if Ss==None:
-      print "SS=",Ss,analysis
+      # print "SS=",Ss,analysis
       continue
     Ss=int(Ss)
     if not Ss in sqrts:
