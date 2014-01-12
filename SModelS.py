@@ -10,7 +10,7 @@
 def installdir():
   """ return the software installation directory, by looking at location of this method """
   import os, inspect
-  return os.path.dirname ( inspect.getfile(installdir) )
+  return os.path.dirname ( inspect.getabsfile(installdir) )
 
 def version( astuple=False ):
   """ prints out version number of SModelS framework """
