@@ -35,8 +35,8 @@ class LHEReader:
             if line.find("Number of Events        :") > -1:
                 nevts = int(line.split()[-1])
                 self.metainfo["nevents"] = nevts       
-            elif line.find("Integrated weight (pb)") > -1:
-                iwght = addunit(float(line.split()[-1]),'pb')
+            elif line.find("Integrated weight (pb)") > -1:                
+                iwght = addunit(float(line.split()[-1]),'pb')                
                 self.metainfo["totalxsec"] = iwght
             elif line.find("<init>") > -1:
                 line = self.File.readline()

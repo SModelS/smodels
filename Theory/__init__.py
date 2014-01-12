@@ -8,4 +8,4 @@
 """
 
 # we import only what we want to be usable from outside this module
-import SLHATools, XSecComputer, LHEReader, LHEDecomposer, SLHADecomposer, ClusterTools, ParticleNames, CrossSection, NLLXSec
+import SLHATools, XSecComputer, LHEReader, lheDecomposer, slhaDecomposer, ClusterTools, ParticleNames, crossSection, NLLXSec
