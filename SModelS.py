@@ -17,6 +17,8 @@ def version( astuple=False ):
   f=open("%s/version" % installdir() )
   l=f.readline()
   f.close()
+  l=l.replace("\n","")
+  l.strip()
   if not astuple: return l
   T,C=l.split("/")
   A,B=T.split(".")
