@@ -18,7 +18,8 @@ from Theory.theoryPrediction import PredictionForAnalysis
 listOfAnalyses = SMSAnalysisFactory.load()
 printer=SMSPrettyPrinter.SMSPrettyPrinter()
 slhafile = "slha/andrePT4.slha"
-lhefile = "lhe/ued_1.lhe"
+lhefile = "lhe/ued_2.lhe"
+lhefile = "lhe/TChiChipmSlepL_1.lhe"
 nevts = 10000
 SLHATools.writeXSecToSLHAFile(slhafile,nevts,printLHE=False)
 DoCompress = True
@@ -26,7 +27,7 @@ DoInvisible = True
 minmassgap = addunit(5.,'GeV')
 sigmacut = addunit(0.1,'fb')
 # SMSTopList = slhaDecomposer.decompose(slhafile,sigmacut,DoCompress,DoInvisible,minmassgap)
-SMSTopList = lheDecomposer.decompose(lhefile,None,DoCompress,DoInvisible,minmassgap)
+SMSTopList = lheDecomposer.decompose(lhefile,None,None,DoCompress,DoInvisible,minmassgap)
 
 EvTop_table = PrettyTable(["Topology","#Vertices", "#Insertions", "#Elements", "Sum of weights"])
 EvElement_table = PrettyTable(["Topology","Element","Particles B[0]","Particles B[1]", "Masses B[0]","Masses B[1]","Element Weight"])

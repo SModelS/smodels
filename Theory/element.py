@@ -230,7 +230,7 @@ class Element(object):
             added = False
             #Check for mass compressed topologies   
             if DoCompress:
-                for element in newElements:                    
+                for element in newElements:             
                     newel = element.massCompress(minmassgap)
                     if newel and not newel.hasTopInList(newElements): #Avoids double counting (conservative)
                         newElements.append(newel) 

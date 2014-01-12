@@ -58,7 +58,7 @@ Only generated if cross-sections are read from SLHA file and not previously crea
         branchList[-1].maxWeight = maxWeight[pid]
 
 #Generate final branches (after all R-odd particles have decayed)
-    finalBranchList = decayBranches(branchList,BRdic,Massdic,sigcut)            
+    finalBranchList = decayBranches(branchList,BRdic,Massdic,sigcut)      
 
     SMSTopList = topology.TopologyList()    
 #Combine pairs of branches into elements according to production cross-section list:
@@ -97,7 +97,7 @@ def getDictionariesFromSLHA(slhafile):
     for pid in res[1].keys():
         brs = copy.deepcopy(res[1][pid].decays)
         brs_conj = copy.deepcopy(brs)
-        for br in brs_conj:    br.ids = [-x for x in br.ids]
+        for br in brs_conj: br.ids = [-x for x in br.ids]
         BRdic[pid] = brs
         BRdic[-pid] = brs_conj
 #Get mass list for all particles

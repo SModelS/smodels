@@ -9,8 +9,9 @@
 """
 
 
-import LHEReader, topology, crossSection, element, pyslha2, branch
-import logging
+import LHEReader, topology, crossSection, element, pyslha2, branch, ParticleNames
+from Tools.PhysicsUnits import addunit
+import logging, copy
 logger = logging.getLogger(__name__)
 
 def decompose(lhefile,inputXsecs=None,nevts=None,DoCompress=False,DoInvisible=False,minmassgap=None):
@@ -29,30 +30,29 @@ def decompose(lhefile,inputXsecs=None,nevts=None,DoCompress=False,DoInvisible=Fa
   
     reader = LHEReader.LHEReader(lhefile,nevts)
     SMSTopList=topology.TopologyList ( )
-#get cross-section from file
+#get cross-section from file (= event weight, assuming a common weight for all events)
     if not inputXsecs:  XSectionList = crossSection.getXsecFromLHEFile(lhefile)
     else: XSectionList = inputXsecs
-    
-    print XSectionList
 
 #Loop over events and decompose 
-    for Event in reader:    
+    for Event in reader:
         momPDG = tuple(Event.getMom())  # Get mother PDGs
-        eventweight = XSectionList.getXsecsFor(momPDG)   
-# Get event element
-        newElement = elementFromEvent(Event,eventweight)
-#Do compression:
-        if DoCompress or DoInvisible: compElements = newElement.compressElement(DoCompress,DoInvisible,minmassgap)
+        eventweight = XSectionList.getXsecsFor(momPDG)        
+# Get event element        
+        newElement = elementFromEvent(Event,eventweight)    
+#Do compression:        
+        if DoCompress or DoInvisible:
+            compElements = newElement.compressElement(DoCompress,DoInvisible,minmassgap)
         allElements = [newElement] + compElements
         for el in allElements:
-            Top = topology.Topology(el)            
-            SMSTopList.addList([Top])                       
+            Top = topology.Topology(el)                      
+            SMSTopList.addList([Top])                   
 
     return SMSTopList
 
 
 def elementFromEvent(Event,weight):
-    """ Creates a element from a LHE event and the corresponding event weight
+    """ Creates an element from a LHE event and the corresponding event weight
     :param Event: LHE event
     :param weight: event weight. Must be a XSectionList object (usually with a single entry)
     :returns: element
@@ -61,32 +61,30 @@ def elementFromEvent(Event,weight):
     if not Event.particles:
         logger.error('[lheDecomposer]: Empty event!')
         return None
-   
+          
 #Get simple BR and Mass dictionaries for each branch
-    branchBRs, Massdic = getDictionariesFromEvent(Event)   
+    BRdic, Massdic = getDictionariesFromEvent(Event)   
    
-#Creates branch list (list of mothers)
-    momBranches = {}
-    for ip,particle in enumerate(Event.particles):
-        if 1 in particle.moms:    # 1 means particle came from initial state
-            newBranch = branch.Branch()            
-            newBranch.momID = particle.pdg
-            newBranch.daughterID = particle.pdg
-            newBranch.masses = [particle.mass]
-            momBranches[ip] = newBranch
+#Creates branch list (list of mothers branches)
+    branchList = []
+    for particle in Event.particles:
+        if 1 in particle.moms:  # Means particle came from initial state (primary mother)
+            branchList.append(branch.Branch())
+            branchList[-1].momID = particle.pdg
+            branchList[-1].daughterID = particle.pdg
+            branchList[-1].masses = [Massdic[particle.pdg]]
+            branchList[-1].maxWeight = copy.deepcopy(weight)
 
 #Generate final branches (after all R-odd particles have decayed)
-    finalBranchList = []
-    for momPos in momBranches:
-        BRdic = branchBRs[momPos]
-        finalBranchList.append(branch.decayBranches([momBranches[momPos]],BRdic,Massdic))
+    finalBranchList = branch.decayBranches(branchList,BRdic,Massdic,sigcut=0.)      
     
     if len(finalBranchList) != 2:
         logger.error("[lheDecomposer]: "+str(len(finalBranchList))+" branches found in event. R-parity violation?")
         return False
 #Finally create element from Event:
     newElement = element.Element(finalBranchList)
-    
+    newElement.weight = copy.deepcopy(weight)
+
     return newElement    
 
 def getDictionariesFromEvent(Event):
@@ -98,26 +96,23 @@ def getDictionariesFromEvent(Event):
 #Get mass and branching ratios for all particles:
     BRdic = {}
     Massdic = {}
-    branchBRs = {}
-    for ip,particle in enumerate(Event.particles):                
-        Massdic[particle.pdg] = particle.mass
-        parent =particle
-        while not 1 in parent.moms:   #Stop when primary mother has been found
-            if parent.moms[0] != parent.moms[1]:
-                logger.error("[lheDecomposer]: More than one parent particle found!")
-                return False
-            momPos = parent.moms[0]  #Mother position
-            parent = Event.particles[momPos]
-        if not momPos in branchBRs: branchBRs[momPos] = {}
-        BRdic = branchBRs[momPos]   #Store BRs for this specific branch
-        BRdic[particle.pdg] = []
-        daughterIDs = []
-        for particle2 in Event.particles:
-            if ip in particle2.moms: daughterIDs.append(particle2.pdg)
-#Remove possible repetition of entries in event list:            
-        if len(daughterIDs) == 1 and  daughterIDs[0] == particle.pdg: continue
-        BRdic[particle.pdg] = [pyslha2.Decay(1.,len(daughterIDs),daughterIDs)]  #Store single decay
-
-    return branchBRs,Massdic
+    for particle in Event.particles:
+        if particle.pdg in ParticleNames.Reven: continue   #Ignore R-even particles        
+        Massdic[particle.pdg] = addunit(particle.mass,'GeV')        
+        BRdic[particle.pdg] = [pyslha2.Decay(0.,0,[],particle.pdg)]   #Empty  BRs
+        
+    for particle in Event.particles:
+        if particle.status == -1: continue  #Ignore initial state particles
+        if Event.particles[particle.moms[0]].status == -1: continue #Ignore initial mothers
+        if particle.moms[0] != particle.moms[1] and min(particle.moms) != 0:
+            logger.error("[lheDecomposer]: More than one parent particle found!")
+            return False        
+        mom_pdg = Event.particles[max(particle.moms)-1].pdg
+        if mom_pdg in ParticleNames.Reven: continue   # Ignore R-even decays
+        BRdic[mom_pdg][0].br = 1.   #BR = 1 always for an event
+        BRdic[mom_pdg][0].nda += 1
+        BRdic[mom_pdg][0].ids.append(particle.pdg)
+        
+    return BRdic,Massdic
     
     
