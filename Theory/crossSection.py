@@ -26,6 +26,7 @@ class XSectionInfo:
         if type(other) != type(XSectionInfo()): return False
         if other.sqrts != self.sqrts: return False
         if other.order != self.order: return False
+        if other.label != self.label: return False
         return True
  
     def __ne__(self,other):     
