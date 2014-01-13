@@ -26,7 +26,7 @@ class Test(object):
     def runScript(self, script):
         cmd = "python " + self.directory + script + " > /dev/null"
         ret = os.system(cmd)
-        #self.assertEqual(ret, 0)
+#self.assertEqual(ret, 0)
         assert ret == 0
   
 

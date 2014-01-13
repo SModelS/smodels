@@ -1,86 +1,152 @@
 from Experiment import LimitGetter
+import crossSection
+import numpy as np
+from scipy import stats
+import logging,copy
+from Tools.PhysicsUnits import addunit,rmvunit
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-clusterAnalysis = None  #Stores the analysis to be used for the calculation of mass distances (only accessed by massPosition)
+class Cluster(object):
+    """Main class to store the relevant information about a cluster of elements and to manipulate it"""
+    
+    def __init__(self):
+        self.elements = []
+        
+    def getTotalXSec(self):
+        """Returns the sum over the cross-sections of all elements belonging to the cluster""" 
+               
+        totxsec = crossSection.XSectionList()
+        for el in self.elements: totxsec.combineWith(el.weight)
+        return totxsec
+    
+    def getAvgMass(self,method='harmonic'):
+        """Returns the average mass of all elements belonging to the cluster using the defined method.
+         :param method: the method employed: "harmonic" = harmonic means, "mean" = algebaric (standard) mean
+         :returns: the average mass """
+          
+        massList = [el.getMasses() for el in self.elements]
+        return massAvg(massList)
+    
 
-def massPosition(mass,nounit=True):
+def massPosition(mass,Analysis,nounit=True):
     """ gives the mass position in upper limit space, using the analysis experimental limit data.
     If nounit=True, the result is given as number assuming fb units """
-    global clusterAnalysis
 
-    xmass = LimitGetter.GetPlotLimit(mass,clusterAnalysis,complain=False)
+    xmass = LimitGetter.GetPlotLimit(mass,Analysis,complain=False)
     if type(xmass) != type(addunit(1.,'pb')): return None
     if nounit: xmass = rmvunit(xmass,'fb')
     return xmass
 
 
-def massDistance(mass1,mass2):
-    """ definition of distance between two mass arrays. The function is defined so it uses the analysis
-    experimental limits to define distance """
-#Get mass positions for each mass if input are not numbers:
-    if type(mass1) != type(1.) or type(mass2) != type(1.):
-#If masses differ by more than 100%, do not define distance
-        if abs(mass1[0][0]-mass2[0][0])/(mass1[0][0]+mass2[0][0]) > 0.5: return None
-        xmass1 = massPosition(mass1)
-        xmass2 = massPosition(mass2)
-    else:
-        xmass1 = mass1
-        xmass2 = mass2
+def massDistance(xmass1,xmass2):
+    """ Definition of distance between two mass positions."""
 
     if xmass1 is None or xmass2 is None: return None
     distance = 2.*abs(xmass1-xmass2)/(xmass1+xmass2)
-    if distance < 0.: return None         #Skip masses without an upper limit
+    if distance < 0.: return None #Skip masses without an upper limit
     return distance
 
-def getMassPositions(massList):
-    """ Computes the positions for all masses appearing in massList"""
-    massPos = []
-    for mass in massList: massPos.append(massPosition(mass))            
-    return massPos
 
-def getMassDistances(massList,massPositions=None):
-    """ Computes the mass distance matrix for all masses appearing in massList"""
-    
-    if massPositions:
-        massPos = massPositions
-    else:
-        massPos = getMassPositions(massList)
-    massDist = [[None]*len(massList)]*len(massList)
-    
-    for iel,el1 in enumerate(massList):
-        for jel,el2 in enumerate(massList):                
-            massDist[iel][jel] = massDistance(massPos[iel],massPos[jel])
-    
-    return massDist
-
-def ClusterDist(cluster1,cluster2,massDist):
-  """Definition of distance two clusters, massDist = square matrix of distances"""
-  d = 0.
-  if type(cluster1) != type(set()) or type(cluster2) != type(set()):
-    print "ClusterDist: unknown format input"
-    return False
-
-  for ic in cluster1:
-    for jc in cluster2:
-      if massDist[ic][jc] == None: return None
-      d = max(d,massDist[ic][jc])
-  return d
-
-
-def doCluster(massList,dmin):
-    """Cluster algorithm to cluster the masses in massList
-    :returns: a list of indexes with the clustered masses according to the order\
-    in massList
-    """
+def massAvg(massList,method='harmonic'):
+    """Computes the average mass of massList, according to method (harmonic or mean).
+    If massList contains a zero mass, switch method to mean"""
         
-    massPos = getMassPositions(massList) # Mass positions in upper limit space
-    massDist = getMassDistances(massList,massPos)  #Mass distance matrix in upper limit space
+    flatList = [rmvunit(mass,'GeV') for mass in np.hstack(massList)]
+    if method == 'harmonic' and 0. in flatList: method = 'mean'
+    
+    for mass in massList:
+        if len(mass) != len(massList[0]) or len(mass[0]) != len(massList[0]) or len(mass[1]) != len(massList[1]):  
+            logger.error('[getAvgMass]: mass shapes do not match in mass list:\n'+str(massList))
+            return False
+    
+    avgmass = copy.deepcopy(massList[0])
+    for ib,branch in enumerate(massList[0]):
+        for ival,v in enumerate(branch):
+            vals = [rmvunit(mass[ib][ival],'GeV') for mass in massList]
+            if method == 'mean': avg = np.mean(vals)
+            elif method == 'harmonic': avg = stats.hmean(vals)
+            avgmass[ib][ival] = addunit(float(avg),'GeV')        
+    return avgmass    
+    
+    
+def getGoodMasses(elements,massPos,maxDist):
+    """ Get the list of good masses appearing elements according to the Analysis distance.
+    Return a dictionary with keys = old mass, values = equivalent good mass"""
+    goodMasses = {}
+    for element in elements:
+        mass = element.getMasses()
+        if mass[0] == mass[1] and not massPos[mass]: continue   #skip masses out of bounds
+        elif mass[0] == mass[1]: goodMasses[mass] = mass
+        else:
+            mass1 = [mass[0],mass[0]]
+            mass2 = [mass[1],mass[1]]
+            if massDistance(massPos[mass1],massPos[mass2]) < maxDist: goodMasses[mass] = massAvg([mass1,mass2])
+    return goodMasses    
+
+
+def groupAll(elements):
+    """Creates a single cluster containing all the elements"""
+    
+    cluster = Cluster()
+    cluster.elements = elements
+    return cluster
+
+
+def clusterElements(elements,Analysis,maxDist,keepMassInfo=False):
+    """ Cluster the original elements according to their mass distance and return the list of clusters.
+        If keepMassInfo, saves the original masses and their cluster value in massDict """
+        
+#First compute all relevant mass positions:
+    massPos = {}
+    for element in elements:
+        mass = element.getMasses()
+        if mass[0] == mass[1]: massPos[mass] = massPosition(mass,Analysis)
+        else:
+            massPos[[mass[0],mass[0]]] = massPosition([mass[0],mass[0]],Analysis)  #Compute positions for asymmetric masses
+            massPos[[mass[1],mass[1]]] = massPosition([mass[1],mass[1]],Analysis)
+       
+#Get elements with good masses and replace their masses by their 'good' value:    
+    goodMasses = getGoodMasses(elements,massPos,maxDist)
+    for mass in goodMasses:
+        if not mass in massPos: massPos[mass] = massPosition(mass,Analysis)  #Include possible new masses
+    goodElements = []
+    for el in elements:
+        if el.getMasses() in goodMasses:
+            element = el.copy()
+            element.setMasses(goodMasses[el.getMasses()])
+            goodElements.append(element)             
+       
+#Cluster elements by their mass:
+    clusters = doCluster(goodElements,massPos,maxDist)
+    return clusters
+
+
+
+def doCluster(elements,massPos,maxDist):
+    """Cluster algorithm to cluster elements
+    :returns: a list of indexes with the clustered masses according to the order\
+    in elements
+    """
+
+    #Store all distances     
+    MD = [] #Mass distance matrix in upper limit space
+    massList = [el.getMasses() for el in elements]
+    for i,mass1 in massList:
+        MD.append([])
+        for j,mass2 in massList:
+            if j == i: MD[i].append(0.)
+            elif j < i: MD[i].append(MD[j][i])
+            else:                
+                MD[i].append(massDistance(massPos[mass1],massPos[mass2]))  
+                                   
     #Begin clustering
     ClusterList = []
     for imass,mass1 in enumerate(massList):
         cluster = set([])
         for jmass,mass2 in enumerate(massList):
             if MD[imass][jmass] == None: continue
-            if MD[imass][jmass] <= dmin: cluster.add(jmass)
+            if MD[imass][jmass] <= maxDist: cluster.add(jmass)
         if not cluster in ClusterList: ClusterList.append(cluster)   #Zero level (maximal) clusters
 
 
@@ -95,8 +161,8 @@ def doCluster(massList,dmin):
                 avgPos = massPosition(clusterMass)
                 distAvg = max([massDistance(massPos[imass],avgPos) for imass in cluster])
             for imass in cluster:
-                clusterDist = clusterDist(set([imass]),cluster,massDist)
-                if  clusterDist == None or clusterDist > dmin or DistAvg > dmin:    #If object or cluster average falls outside the cluster, remove object
+                clusterDist = ClusterDist(set([imass]),cluster,MD)
+                if  clusterDist == None or clusterDist > maxDist or distAvg > maxDist:    #If object or cluster average falls outside the cluster, remove object
                     newcluster = copy.deepcopy(cluster)
                     newcluster.remove(imass)
                     split = True
@@ -122,115 +188,30 @@ def doCluster(massList,dmin):
             if i != j and clusterB.issubset(clusterA): FinalCluster[j] = set([])
     while FinalCluster.count(set([])) > 0: FinalCluster.remove(set([]))
 
-    return FinalCluster
+    clusterList = []
+    for icluster in FinalCluster:
+        cluster = Cluster()
+        for iel in icluster: cluster.elements.append(elements[iel])
+        clusterList.append(cluster)
+    
+    return clusterList
 
 
 
-def goodMass(mass,dmin):
-  """Test if a mass array is "good"
-     = have similar branch masses if branch topologies are equal
-     = have similar mother and LSP masses if branch topologies are different
-     AND has an experimental limit
-     If it is, return an equivalent array with equal masses (= mass avg)"""
-
-  if mass[0] == mass[1] and massDistance(mass,mass) == 0.: return mass
-  if len(mass[0]) == len(mass[1]):
-    mass1 = [mass[0],mass[0]]
-    mass2 = [mass[1],mass[1]]
-    massDist = massDistance(mass1,mass2)
-    if massDist == None or massDist > dmin:
-      return False
-    else:
-      return massAvg([mass1,mass2],"harmonic")
-  else:
-    mass1 = mass
-    mass2 = mass
-    mass1[1][0] = mass1[0][0]   #Force mothers and daughters to be equal in each branch
-    mass1[1][len(mass1)-1] = mass1[0][len(mass1)-1]
-    mass2[0][0] = mass2[1][0]
-    mass2[0][len(mass2)-1] = mass2[1][len(mass2)-1]
-    massDist = massDistance(mass1,mass2)
-    if massDist == None or massDist > dmin:
-      return False
-    else:
-      return massAvg([mass1,mass2],"harmonic")
-  
-  
-
-  
-
-def massAvg(massList, method = "harmonic"):
-  """For a list of equivalent masses, compute an average mass (or mass array)
-     using the defined method.
-     :param method: the method employed: "harmonic" = harmonic means, "mean" = algebaric (standard) mean
-
-     :returns: the average mass
-  """
-  import numpy
-  from Tools.PhysicsUnits import rmvunit
-
-  N = len(massList)
-  if N == 0:
-    print "MassAvg: Empty array"
-    return False
-  if N == 1: return massList[0]
-
-  if type(massList[0]) != type(list()):
-    equivinBr = [massList]
-#In case the input has 2 branches of different sizes, average
-#each one individually
-  elif len(massList[0]) == 2 and type(massList[0][0]) == type(list()):
-    if len(massList[0][0]) != len(massList[0][1]):
-      equivinBr = [[],[]]
-      for mass in massList:
-        equivinBr[0].append(mass[0])
-        equivinBr[1].append(mass[1])
-    else:
-      equivinBr = [massList]
-
-  massout = []
-  for ib in range(len(equivinBr)):
-    equivmasses = numpy.array(equivinBr[ib])  #Generate numpy array
-
-#Sanity checks:
-    for mass in equivmasses.flat:
-      if rmvunit(mass,'GeV') == 0.:
-        print "MassAvg: Zero mass!"
-        return False
-      if rmvunit(mass,'GeV') < 0.:
-        print "MassAvg: Negative mass!",mass
+def ClusterDist(cluster1,cluster2,massDist):
+    """Returns the distance between two clusters = maximum distance between two elements of each cluster.
+    massDist = square matrix of distances."""
+    
+    d = 0.
+    if type(cluster1) != type(set()) or type(cluster2) != type(set()):
+        logger.warning("[ClusterDist]: unknown format input")
         return False
 
-    if method == "mean":
-      massavg = equivmasses[0]
-    elif method == "harmonic":
-      massavg = 1./equivmasses[0]
-    else:
-      print "MassAvg: Unknown method"
-      return False
+    for ic in cluster1:
+        for jc in cluster2:
+            if massDist[ic][jc] == None: return None
+            d = max(d,massDist[ic][jc])
+            return d
 
-    for imass in range(1,N):
-      mass = equivmasses[imass]
-      if mass.shape != massavg.shape:    #Sanity check
-        print "MassAvg: Wrong input"
-        return False
-      if method == "mean":
-        massavg = massavg + mass
-      elif method == "harmonic":
-        massavg = massavg + 1./mass
 
-    if method == "mean":
-      massavg = massavg/float(N)
-    elif method == "harmonic":
-      massavg = float(N)/massavg
 
-    if massavg.shape != equivmasses[0].shape:
-      print "MassAvg: Error computing average"
-      return False
-
-    massout.append(massavg.tolist())
-
-  if len(massout) == 1:
-    return massout[0]
-  else:
-    return massout

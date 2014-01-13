@@ -31,7 +31,7 @@ class LHEReader:
         gotAllInfo = False   
         while not gotAllInfo:
             line = self.File.readline()
-            if line == "": break             #Exit if reached end of file
+            if line == "": break     #Exit if reached end of file
             if line.find("Number of Events        :") > -1:
                 nevts = int(line.split()[-1])
                 self.metainfo["nevents"] = nevts       

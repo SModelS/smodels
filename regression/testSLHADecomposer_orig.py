@@ -24,7 +24,7 @@ gtopo_new = DEC.decompose( slhafile )
 
 for g in gtopo_new:
 #  print 'gtopology:',g, g.describe()
-  if g.isEqual( gtopo[i] ):           #compares GTop
+  if g.isEqual( gtopo[i] ):   #compares GTop
     print 'GTop',g, '%sOK!%s' %( green, reset )
   else:
     print 'GTop',g,'%sfailed!%s' %( red, reset ) 

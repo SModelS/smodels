@@ -212,7 +212,7 @@ def getAnalyses (topo, run=None):
     if run: runs = [ run ]
     analyses = {}
     for r in runs:
-        # # so thats the runs I really have to think about
+# # so thats the runs I really have to think about
         dirs = os.listdir ("%s/%s/" % (SMSHelpers.Base, r))
         for ana in dirs:
             if os.path.exists ("%s/%s/%s/info.txt" % (SMSHelpers.Base, r, ana)):
@@ -235,7 +235,7 @@ def getAllResults (run=None, allHistos=False):
     if run: runs = [ run ]
     ret = {}
     for r in runs:
-        # # so thats the runs I really have to think about
+# # so thats the runs I really have to think about
         dirs = os.listdir ("%s/%s/" % (SMSHelpers.Base, r))
         for ana in dirs:
             if os.path.exists ("%s/%s/%s/info.txt" % (SMSHelpers.Base, r, ana)):
@@ -258,7 +258,7 @@ def getDatabaseResults (run=None, category=None):
     print "runs=",runs
     ret = {}
     for r in runs:
-        # # so thats the runs I really have to think about
+# # so thats the runs I really have to think about
         dirs = os.listdir ("%s/%s/" % (SMSHelpers.Base, r))
         for ana in dirs:
             if os.path.exists ("%s/%s/%s/info.txt" % (SMSHelpers.Base, r, ana)):
@@ -651,7 +651,7 @@ def particles(topo, plot='ROOT'):
     if SMSHelpers.dicparticle.has_key(topo):
         part = SMSHelpers.dicparticle[topo]
         if plot == 'ROOT':
-            # print "[SMSResults.py] debug",part
+    # print "[SMSResults.py] debug",part
             return part
         if plot == 'python':
             return part.replace('#', '\\')
@@ -683,14 +683,14 @@ def massDecoupling_ (topo):
     if topo == "T2bb":
         return "m(#tilde{g},#tilde{q})>>m(#tilde{b})"
     if topo == "TChiSlep":
-        # return "m(#tilde{g}),m(#tilde{q})>>m(#tilde{#chi}^{0}_{2}),m(#tilde{#chi}^{#pm})"
+# return "m(#tilde{g}),m(#tilde{q})>>m(#tilde{#chi}^{0}_{2}),m(#tilde{#chi}^{#pm})"
         return "m(#tilde{g},m(#tilde{q})>>m(#tilde{#chi}^{0}_{2},#tilde{#chi}^{#pm})"
     if topo == "TChiSlepSlep":
 # return "m(#tilde{g}),m(#tilde{q})>>m(#tilde{#chi}^{0}_{2})"
         return "m(#tilde{g},#tilde{q})>>m(#tilde{#chi}^{0}_{2},#tilde{#chi}^{#pm})"
     if topo == "TChiNuSlep":
         return "m(#tilde{g},#tilde{q})>>m(#tilde{#chi}^{0}_{2},#tilde{#chi}^{#pm})"
-        # return "m(#tilde{g}),m(#tilde{q})>>m(#tilde{#chi}^{0}_{2}),m(#tilde{#chi}^{#pm})"
+# return "m(#tilde{g}),m(#tilde{q})>>m(#tilde{#chi}^{0}_{2}),m(#tilde{#chi}^{#pm})"
     if topo == "TChiwz":
         return "m(#tilde{g},#tilde{q})>>m(#tilde{#chi}^{0}_{2},#tilde{#chi}^{#pm})"
     T2 = topo[:2]
@@ -732,12 +732,12 @@ def exists(analysis, topo, run=None):
     if not axes: return False
     hasDict = SMSHelpers.hasDictionary (analysis, run2)
     for a in axes:
-        # print "a=",a
+# print "a=",a
         mzname = None
         if a['mz'] and len(a['mz']): mzname = a['mz'][0]
         toponame = SMSInterpolation.gethistname(topo, mzname)
         if hasDict:
-        # print "BBB 1 ana=%s run=%s run2=%s" % ( analysis,run,run2 )
+# print "BBB 1 ana=%s run=%s run2=%s" % ( analysis,run,run2 )
             Dict = SMSHelpers.getUpperLimitDictionary (analysis, toponame, run2)
             if not Dict or len(Dict) == 0: return False
             continue
@@ -761,7 +761,7 @@ def getaxes (analysis, topo=None, run=None):
         st = None
     if not st:
         if not topo: return None    # cannot return default without info on topology
-        # if there is no information about the axes, return the default
+# if there is no information about the axes, return the default
         return [{'axes': 'M1-M0', 'mz': None}]
     st = st.split(',')
     d = {}
@@ -779,7 +779,7 @@ def getaxes (analysis, topo=None, run=None):
     if topo:
         topo = topo.replace(" ", "")
         if not d or not d.has_key (topo):
-            # # topology does not exist, we return None
+    # # topology does not exist, we return None
             return None
         else: return d[topo]
 

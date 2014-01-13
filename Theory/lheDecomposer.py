@@ -73,10 +73,10 @@ def elementFromEvent(Event,weight):
             branchList[-1].momID = particle.pdg
             branchList[-1].daughterID = particle.pdg
             branchList[-1].masses = [Massdic[particle.pdg]]
-            branchList[-1].maxWeight = copy.deepcopy(weight)
-
+            branchList[-1].maxWeight = weight.getMaxXsec()            
+            
 #Generate final branches (after all R-odd particles have decayed)
-    finalBranchList = branch.decayBranches(branchList,BRdic,Massdic,sigcut=0.)      
+    finalBranchList = branch.decayBranches(branchList,BRdic,Massdic,sigcut=addunit(0.,'fb'))     
     
     if len(finalBranchList) != 2:
         logger.error("[lheDecomposer]: "+str(len(finalBranchList))+" branches found in event. R-parity violation?")

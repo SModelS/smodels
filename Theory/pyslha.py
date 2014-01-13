@@ -168,15 +168,15 @@ class Block(object):
         types when possible. For the treatment of the resulting iterable see the
         set_value method.
         """
-        ## If the argument is a single string, split it and proceed
+## If the argument is a single string, split it and proceed
         if type(args) is str:
             args = args.split()
-        ## Check that the arg is an iterable
+## Check that the arg is an iterable
         if not hasattr(args, "__iter__"):
             raise AccessError("Block entries must be iterable")
-        ## Auto-convert the types in the list
+## Auto-convert the types in the list
         args = map(_autotype, args)
-        ## Re-join consecutive strings into single entries
+## Re-join consecutive strings into single entries
         i = 0
         while i < len(args)-1:
             if type(args[i]) is str and type(args[i+1]) is str:
@@ -184,7 +184,7 @@ class Block(object):
                 del args[i+1]
                 continue
             i += 1
-        ## Add the entry to the map, with appropriate indices
+## Add the entry to the map, with appropriate indices
         self.set_value(*args)
 
     def is_single_valued(self):
@@ -222,7 +222,7 @@ class Block(object):
                 raise AccessError("Tried to set a unique value on a multi-value block")
             self.entries[None] = args[0]
         else:
-            ## Find the first non-integer -- all previous items are indices
+    ## Find the first non-integer -- all previous items are indices
             i_first_nonint = -1
             for i, x in enumerate(args):
                 if type(x) is not int:
@@ -365,18 +365,18 @@ def readSLHA(spcstr, D ): ## ignorenobr=False, ignorenomass=False ):
     import re
     currentblock = None
     currentdecay = None
-    currentxsec = None                  #new switch added
+    currentxsec = None          #new switch added
     for line in spcstr.splitlines():
-        ## Handle (ignore) comment lines
-        # TODO: Store block/entry comments
+## Handle (ignore) comment lines
+# TODO: Store block/entry comments
         if line.startswith("#"):
             continue
         if "#" in line:
             line = line[:line.index("#")]
 
-        ## Handle BLOCK/DECAY start lines
+## Handle BLOCK/DECAY start lines
         if line.upper().startswith("BLOCK"):
-            #print line
+    #print line
             match = re.match(r"BLOCK\s+(\w+)(\s+Q\s*=\s*.+)?", line.upper())
             if not match:
                 continue
@@ -386,7 +386,7 @@ def readSLHA(spcstr, D ): ## ignorenobr=False, ignorenomass=False ):
                 qstr = qstr[qstr.find("=")+1:].strip()
             currentblock = blockname
             currentdecay = None
-            currentxsec = None                   #new switch
+            currentxsec = None           #new switch
             blocks[blockname] = Block(blockname, q=qstr)
         elif line.upper().startswith("DECAY"):
             match = re.match(r"DECAY\s+(-?\d+)\s+([\d\.E+-]+|NAN).*", line.upper())
@@ -396,28 +396,28 @@ def readSLHA(spcstr, D ): ## ignorenobr=False, ignorenomass=False ):
             width = float(match.group(2)) if match.group(2) != "NAN" else None
             currentblock = "DECAY"
             currentdecay = pdgid
-            currentxsec = None                #new switch
+            currentxsec = None        #new switch
             decays[pdgid] = Particle(pdgid, width)
         elif line.upper().startswith("XSECTION"):   #new 'elif' to  identify the XSECTION block
             currentxsec = "XSECTION"
             currentblock = None
             currentdecay = None
         else:
-            ## In-block line
+    ## In-block line
             if currentblock is not None:
                 items = line.split()
                 if len(items) < 1:
                     continue
                 if currentblock != "DECAY" and currentblock != "XSECTION":  #only for BLOCK blocks
                     blocks[currentblock].add_entry(items)
-                elif currentblock == "DECAY":                          #'elif' instead of 'else', just DECAY block
+                elif currentblock == "DECAY":                  #'elif' instead of 'else', just DECAY block
 #                else:
                     br = float(items[0]) if items[0].upper() != "NAN" else None
                     nda = int(items[1])
                     ids = map(int, items[2:])
                     if br > 0.0 or not ignorenobr: # br == None is < 0
                         decays[currentdecay].add_decay(br, nda, ids)
-                else:                                               #ignore XSECTION block
+                else:                                       #ignore XSECTION block
                     continue
     ## Try to populate Particle masses from the MASS block
     # print blocks.keys()
@@ -709,14 +709,14 @@ def readISAWIG(isastr, ignorenobr=False):
     def getnextvalidline():
         while LINES:
             s = LINES.pop(0).strip()
-            # print "*", s, "*"
-            ## Return None if EOF reached
+    # print "*", s, "*"
+    ## Return None if EOF reached
             if len(s) == 0:
                 continue
-            ## Strip comments
+    ## Strip comments
             if "#" in s:
                 s = s[:s.index("#")].strip()
-            ## Return if non-empty
+    ## Return if non-empty
             if len(s) > 0:
                 return s
 
@@ -732,14 +732,14 @@ def readISAWIG(isastr, ignorenobr=False):
         pdgid = herwigid2pdgid(hwid)
         masses[pdgid] = mass
         decays[pdgid] = Particle(pdgid, width, mass)
-        #print pdgid, mass, width
+#print pdgid, mass, width
     blocks["MASS"] = masses
 
     ## Populate decays
     for n in xrange(numentries):
         numdecays = int(getnextvalidline())
         for d in xrange(numdecays):
-            #print n, numentries-1, d, numdecays-1
+    #print n, numentries-1, d, numdecays-1
             decayitems = getnextvalidlineitems()
             hwid = decayitems[0]
             pdgid = herwigid2pdgid(hwid)
@@ -751,7 +751,7 @@ def readISAWIG(isastr, ignorenobr=False):
                 if hw != 0:
                     daughter_pdgids.append(herwigid2pdgid(hw))
             if not decays.has_key(pdgid):
-                #print "Decay for unlisted particle %d, %d" % (hwid, pdgid)
+        #print "Decay for unlisted particle %d, %d" % (hwid, pdgid)
                 decays[pdgid] = Particle(pdgid)
             decays[pdgid].add_decay(br, len(daughter_pdgids), daughter_pdgids)
 
@@ -865,28 +865,28 @@ def writeISAWIG(blocks, decays, ignorenobr=False, precision=8):
     ## the decay mode. NME is a code for the matrix element to be used, either from the
     ## SUSY elements or the main HERWIG MEs. IDKPRD are the HERWIG identity codes of the decay products.
     for i, pid in enumerate(decays.keys()):
-        # if not decays.has_key(pid):
-        #     continue
+# if not decays.has_key(pid):
+#     continue
         hwid = pdgid2herwigid(pid)
         decayout = ""
-        #decayout += "@@@@ %d %d %d\n" % (i, pid, hwid)
+#decayout += "@@@@ %d %d %d\n" % (i, pid, hwid)
         for i_d, d in enumerate(decays[pid].decays):
-            ## Skip decay if it has no branching ratio
+    ## Skip decay if it has no branching ratio
             if ignorenobr and d.br == 0:
                 continue
 
-            ## Identify decay matrix element to use
-            ## From std HW docs, or from this pair:
-            ## Two new matrix element codes have been added for these new decays:
-            ##    NME =	200 	3 body top quark via charged Higgs
-            ##    	300 	3 body R-parity violating gaugino and gluino decays
+    ## Identify decay matrix element to use
+    ## From std HW docs, or from this pair:
+    ## Two new matrix element codes have been added for these new decays:
+    ##    NME =	200 	3 body top quark via charged Higgs
+    ##    	300 	3 body R-parity violating gaugino and gluino decays
             nme = 0
-            # TODO: Get correct condition for using ME 100... this guessed from some ISAWIG output
+    # TODO: Get correct condition for using ME 100... this guessed from some ISAWIG output
             if abs(pid) in (6, 12):
                 nme = 100
-            ## Extra SUSY MEs
+    ## Extra SUSY MEs
             if len(d.ids) == 3:
-                # TODO: How to determine the conditions for using 200 and 300 MEs? Enumeration of affected decays?
+        # TODO: How to determine the conditions for using 200 and 300 MEs? Enumeration of affected decays?
                 pass
             decayout += ("%d " % hwid) + _autostr(d.br, precision) + (" %d " % nme)
 
@@ -922,8 +922,8 @@ def writeISAWIG(blocks, decays, ignorenobr=False, precision=8):
 
             absids = map(abs, d.ids)
 
-            ## Order decay products as required by HERWIG
-            ## Top
+    ## Order decay products as required by HERWIG
+    ## Top
             if abs(pid) == 6:
                 def cmp_bottomlast(a, b):
                     """Comparison function which always puts b/bbar last"""
@@ -933,19 +933,19 @@ def writeISAWIG(blocks, decays, ignorenobr=False, precision=8):
                         return False
                     return cmp(a, b)
                 if len(absids) == 2:
-                    ## 2 body mode, to Higgs: Higgs; Bottom
+            ## 2 body mode, to Higgs: Higgs; Bottom
                     if (25 in absids or 26 in absids) and 5 in absids:
                         d.ids = sorted(d.ids, cmp=cmp_bottomlast)
                 elif len(absids) == 3:
-                    ## 3 body mode, via charged Higgs/W: quarks or leptons from W/Higgs; Bottom
+            ## 3 body mode, via charged Higgs/W: quarks or leptons from W/Higgs; Bottom
                     if 37 in absids or 23 in absids:
                         d.ids = sorted(d.ids, cmp=cmp_bottomlast)
-            ## Gluino
+    ## Gluino
             elif abs(pid) == 1000021:
                 if len(absids) == 2:
-                    ## 2 body mode
-                    ## without gluon: any order
-                    ## with gluon: gluon; colour neutral
+            ## 2 body mode
+            ## without gluon: any order
+            ## with gluon: gluon; colour neutral
                     if 21 in absids:
                         def cmp_gluonfirst(a, b):
                             """Comparison function which always puts gluon first"""
@@ -956,7 +956,7 @@ def writeISAWIG(blocks, decays, ignorenobr=False, precision=8):
                             return cmp(a, b)
                         d.ids = sorted(d.ids, cmp=cmp_gluonfirst)
                 elif len(absids) == 3:
-                    ## 3-body modes, R-parity conserved: colour neutral; q or qbar
+            ## 3-body modes, R-parity conserved: colour neutral; q or qbar
                     def cmp_quarkslast(a, b):
                         """Comparison function which always puts quarks last"""
                         if is_quark(a):
@@ -965,7 +965,7 @@ def writeISAWIG(blocks, decays, ignorenobr=False, precision=8):
                             return False
                         return cmp(a, b)
                     d.ids = sorted(d.ids, cmp=cmp_quarkslast)
-            ## Squark/Slepton
+    ## Squark/Slepton
             elif is_squark(pid) or is_slepton(pid):
                 def cmp_susy_quark_lepton(a, b):
                     if is_susy(a):
@@ -977,22 +977,22 @@ def writeISAWIG(blocks, decays, ignorenobr=False, precision=8):
                     if is_quark(b):
                         return True
                     return cmp(a, b)
-                ##   2 body modes: Gaugino/Gluino with Quark/Lepton     Gaugino      quark
-                ##                                                      Gluino       lepton
-                ##   3 body modes: Weak                                 sparticle    particles from W decay
-                ## Squark
-                ##   2 body modes: Lepton Number Violated               quark     lepton
-                ##                 Baryon number violated               quark     quark
-                ## Slepton
-                ##   2 body modes: Lepton Number Violated               q or qbar
+        ##   2 body modes: Gaugino/Gluino with Quark/Lepton     Gaugino      quark
+        ##                                                      Gluino       lepton
+        ##   3 body modes: Weak                                 sparticle    particles from W decay
+        ## Squark
+        ##   2 body modes: Lepton Number Violated               quark     lepton
+        ##                 Baryon number violated               quark     quark
+        ## Slepton
+        ##   2 body modes: Lepton Number Violated               q or qbar
                 d.ids = sorted(d.ids, cmp=cmp_bottomlast)
-            ## Higgs
+    ## Higgs
             elif pid in (25, 26):
-                # TODO: Includes SUSY Higgses?
-                ## Higgs
-                ##   2 body modes: (s)quark-(s)qbar                     (s)q or (s)qbar
-                ##                 (s)lepton-(s)lepton                  (s)l or (s)lbar
-                ##   3 body modes:                                      colour neutral       q or qbar
+        # TODO: Includes SUSY Higgses?
+        ## Higgs
+        ##   2 body modes: (s)quark-(s)qbar                     (s)q or (s)qbar
+        ##                 (s)lepton-(s)lepton                  (s)l or (s)lbar
+        ##   3 body modes:                                      colour neutral       q or qbar
                 if len(absids) == 3:
                     def cmp_quarkslast(a, b):
                         """Comparison function which always puts quarks last"""
@@ -1003,13 +1003,13 @@ def writeISAWIG(blocks, decays, ignorenobr=False, precision=8):
                         return cmp(a, b)
                     d.ids = sorted(d.ids, cmp=cmp_quarkslast)
             elif is_gaugino(pid):
-                # TODO: Is there actually anything to do here?
-                ## Gaugino
-                ##   2 body modes: Squark-quark                         q or sq
-                ##                 Slepton-lepton                       l or sl
-                ##
-                ##   3 body modes: R-parity conserved                   colour neutral       q or qbar
-                ##                                                                           l or lbar
+        # TODO: Is there actually anything to do here?
+        ## Gaugino
+        ##   2 body modes: Squark-quark                         q or sq
+        ##                 Slepton-lepton                       l or sl
+        ##
+        ##   3 body modes: R-parity conserved                   colour neutral       q or qbar
+        ##                                                                           l or lbar
                 if len(absids) == 3:
                     def cmp_quarkslast(a, b):
                         """Comparison function which always puts quarks last"""
@@ -1020,10 +1020,10 @@ def writeISAWIG(blocks, decays, ignorenobr=False, precision=8):
                         return cmp(a, b)
                     d.ids = sorted(d.ids, cmp=cmp_quarkslast)
 
-            # TODO: Gaugino/Gluino
-            ##   3 body modes:  R-parity violating:   Particles in the same order as the R-parity violating superpotential
+    # TODO: Gaugino/Gluino
+    ##   3 body modes:  R-parity violating:   Particles in the same order as the R-parity violating superpotential
 
-            ## Pad out IDs list with zeros
+    ## Pad out IDs list with zeros
             ids = [0,0,0,0,0]
             for i, pid in enumerate(d.ids):
                 ids[i] = pid

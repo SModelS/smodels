@@ -64,7 +64,7 @@ class Particle:
         self.mass = 0.
         self.position = None  # position in the event list of particles
     def __str__(self):
-        # return "particle pdg %d p=(%f,%f,%f,m=%f) st %d" % ( self.pdg, self.px, self.py, self.pz, self.mass, self.status )
+# return "particle pdg %d p=(%f,%f,%f,m=%f) st %d" % ( self.pdg, self.px, self.py, self.pz, self.mass, self.status )
         return "particle pdg %d p=(%.1f,%.1f,%.1f,m=%.1f) status %d moms %s" % ( self.pdg, self.px, self.py, self.pz, self.mass, self.status, self.moms )
 
 

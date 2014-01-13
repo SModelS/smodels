@@ -33,7 +33,7 @@ def limit(analysis, addTheoryPredictions=[]):
     for ana in analysis.plots[constraint][1]:
       for (index,element) in enumerate(analysis.Top.elements()):
         for (mi,masses1) in enumerate(element.B[0].masses):
-        ## masses1=element.B[0].masses[0] ## ,lead.B[1].masses[0]
+## masses1=element.B[0].masses[0] ## ,lead.B[1].masses[0]
           masses2=element.B[1].masses[mi] ## ,lead.B[1].masses[0]
           ul=SMSResults.getSmartUpperLimit(ana,Tx,masses1,masses2)
           tmp={ "ul": ul, "analysis": ana, "Tx": Tx, "m1": masses1, "m2": masses2, "sqrts": sqrts }

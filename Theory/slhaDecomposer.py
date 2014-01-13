@@ -72,7 +72,7 @@ Only generated if cross-sections are read from SLHA file and not previously crea
                     
                     newElement = element.Element([branch1,branch2])
                     newElement.weight = weightList
-                    #Do compression:
+            #Do compression:
                     if DoCompress or DoInvisible: compElements = newElement.compressElement(DoCompress,DoInvisible,minmassgap)
                     allElements = [newElement] + compElements
                     

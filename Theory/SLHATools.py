@@ -206,7 +206,7 @@ def uniqueName ( slhafile, blocks= { "MINPAR": [3], "EXTPAR": [ 31, 32, 33, 34, 
         considerIndices=block.keys()
       for (index,value) in block.items():
         if index not in considerIndices: continue
-        #print "block %s bnr %d, variable #%d %f" % ( block.name,bnr,index,value)
+#print "block %s bnr %d, variable #%d %f" % ( block.name,bnr,index,value)
         if factors.has_key ( block.name ) and factors[block.name].has_key ( index ):
           value=value*factors[block.name][index]
         t=int(value)
