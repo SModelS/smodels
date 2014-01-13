@@ -92,7 +92,7 @@ def parseMetaInfo ( analysis, run ):
             log ( "[117] cannot parse this line (1): ``%s'' in ``%s''" % (line, info) )
             continue
         if tokens[0]=="exclusions":
-            # we treat these separately
+    # we treat these separately
             continue
         ret[tokens[0]]=tokens[1]
     pMI_[key]=ret
@@ -117,7 +117,7 @@ def motherParticleExclusions ( analysis, run ):
             log ( "[141] cannot parse this line (2): %s in %s" % (line, info) )
             continue
         if tokens[0]!="exclusions":
-            # we're only interested in the exclusions
+    # we're only interested in the exclusions
             continue
         excl=tokens[1]
         while excl[0]==" ": excl=excl[1:]
@@ -155,7 +155,7 @@ def getLines ( analysis, run, label="condition" ):
             log ( "[172] cannot parse this line (2): %s in %s" % (line, info) )
             continue
         if tokens[0]!=label:
-            # we're only interested in the conditions
+    # we're only interested in the conditions
             continue
         excl=tokens[1]
         while excl[0]==" ": excl=excl[1:]
@@ -164,7 +164,7 @@ def getLines ( analysis, run, label="condition" ):
         if len(keyvalue)!=2:
             log ( "[185] cannot parse the following line: %s" % keyvalue )
         ret[ keyvalue[0] ] = keyvalue[1]
-        # ret.append(excl)
+# ret.append(excl)
     mlines[key]=ret
     return ret
 
@@ -372,7 +372,7 @@ def getMetaInfoField(analysis, field, run=None):
     if not metainfo.has_key(field):
         infoFields[key]=None
         return infoFields[key]
-        # raise MetaInfoError("field ``%s'' not found for ``%s''" % (field,analysis) )
+# raise MetaInfoError("field ``%s'' not found for ``%s''" % (field,analysis) )
     f=metainfo[field]
     if len(f) == 0: 
         infoFields[key] = f

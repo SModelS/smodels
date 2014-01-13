@@ -74,12 +74,12 @@ class Topology(object):
         for element in self.ElList:
             info=element.getEinfo()
             if self.vertnumb!=info["vertnumb"]:
-                if verbose: print "[SMSDataObjects.py] inconsistent topology!!!"
+                if verbose: print "[topology.py] inconsistent topology!!!"
                 return False
             if self.vertparts!=info["vertparts"]:
-                if verbose: print "[SMSDataObjects.py] inconsistent topology!!!"
+                if verbose: print "[topology.py] inconsistent topology!!!"
                 return False
-        if verbose: print "[SMSDataObjects.py] topology is consistent."
+        if verbose: print "[topology.py] topology is consistent."
         return True
     
     def getTinfo(self):
@@ -108,11 +108,11 @@ class Topology(object):
         If order=False, try both branch orderings        
         """
                 
-        #If the topology info has not been set yet, set it using the element info
+#If the topology info has not been set yet, set it using the element info
         if not self.vertparts: self.vertparts = newelement.getEinfo()["vertparts"]
         if not self.vertnumb: self.vertnumb = newelement.getEinfo()["vertnumb"]
         
-        #Check if newelement matches the topology structure:
+#Check if newelement matches the topology structure:
         info = newelement.getEinfo()
         info_b = newelement.switchBranches().getEinfo()
         if info != self.getTinfo() and info_b != self.getTinfo():
@@ -121,7 +121,7 @@ class Topology(object):
         
               
         added = False
-        #Include element to ElList:
+#Include element to ElList:
         for element in self.ElList:
             if element == newelement:
                 added = True
@@ -135,7 +135,7 @@ class Topology(object):
                 
                 
         if added: return True
-        #If element has not been found add to list (OBS: if both branch orderings are good, add the original one)
+#If element has not been found add to list (OBS: if both branch orderings are good, add the original one)
         tryelements = [newelement,newelement.switchBranches()]  #Check both branch orderings
         for newel in tryelements:
             info = newel.getEinfo()
@@ -143,7 +143,7 @@ class Topology(object):
             self.ElList.append(newel)
             return True
         
-        #If element does not match topology info, return False
+#If element does not match topology info, return False
         return False
     
     def getTotalWeight(self):
@@ -210,7 +210,7 @@ class TopologyList(object):
         topmatch = False        
         for itopo,topo in enumerate(self.topos):
             if topo == newtopo: topmatch = itopo
-        #If no pre-existing topologies match, append it to list of topologies
+#If no pre-existing topologies match, append it to list of topologies
         if topmatch is False:
             self.topos.append(newtopo)
         else:

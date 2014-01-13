@@ -1,6 +1,8 @@
 HouchesEvents version="1.0">
 <!--
 File generated with PYTHIA 6.427
+#  Number of Events        :           1
+#  Integrated weight (pb)  :  .13448E+02
 -->
 <init>
     2212    2212  3.500000E+03  3.500000E+03     0     0     7     7     3    13

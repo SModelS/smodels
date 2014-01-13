@@ -93,7 +93,7 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
         os.chdir(nllpath)
         xmass = max(squarkmass,gluinomass)  #Decoupled mass
         ymass = min(squarkmass,gluinomass)  #Non-decoupled mass
-        xpts = [10.*ymass]                          #Use the decoupled value (valid for xmass > 10*ymass) as one of the points for interpolation
+        xpts = [10.*ymass]                  #Use the decoupled value (valid for xmass > 10*ymass) as one of the points for interpolation
         ypts = [lines[29:40]]
         while len(xpts) < 2 and xmass > 500.:
           xmass -= 100.
@@ -101,7 +101,7 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
           else: s = "./nllfast_"+energy+" %s %s %s %s" % ( inprocess, pdf, xmass, ymass )
           o=commands.getoutput(s)
           if o[1] =='T': continue
-          xpts.append(xmass)                            #Get points in the non-decoupling regime for interpolation
+          xpts.append(xmass)                    #Get points in the non-decoupling regime for interpolation
           ypts.append([eval(x) for x in o.split()[29:40]])   #Use absolute values of x (does not affect xsec and k-factor interpolation)
 
         if len(xpts) > 1:
@@ -111,7 +111,7 @@ def getNLLfast(process = "gg", pdf = 'cteq', squarkmass=0., gluinomass=0., Energ
             newval = 0.
             for ip,coeff in enumerate(coeffs[i]): newval += coeff*xmass**(len(xpts)-1-ip)
             if i < 9 and lines[i+29] > 0.: lines[i+29] = max(0.,newval)   #Only interpolate for entries with positive values (xsecs)
-            else: lines[i+29] = max(1.,newval)          #Force k-factors >= 1
+            else: lines[i+29] = max(1.,newval)  #Force k-factors >= 1
 
     os.chdir( wd ) # make sure we always chdir back
 #Add units

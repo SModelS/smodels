@@ -225,10 +225,10 @@ class Element(object):
 
         added = True
         newElements = [copy.deepcopy(self)]        
-        #Keep compressing the new topologies generated so far until no new compressions can happen:
+#Keep compressing the new topologies generated so far until no new compressions can happen:
         while added:
             added = False
-            #Check for mass compressed topologies   
+    #Check for mass compressed topologies   
             if DoCompress:
                 for element in newElements:             
                     newel = element.massCompress(minmassgap)
@@ -236,7 +236,7 @@ class Element(object):
                         newElements.append(newel) 
                         added = True
       
-            #Check for invisible compressed topologies (look for effective LSP, such as LSP + neutrino = LSP')      
+    #Check for invisible compressed topologies (look for effective LSP, such as LSP + neutrino = LSP')      
             if DoInvisible:
                 for element in newElements:
                     newel = element.invisibleCompress()
@@ -256,7 +256,7 @@ class Element(object):
         newelement = copy.deepcopy(self)
         vertnumb = self.getEinfo()["vertnumb"]
         if max(vertnumb) < 2: return None   #Nothing to be compressed           
-        #Loop over branches
+#Loop over branches
         for ib,branch in enumerate(self.branches):
             if vertnumb[ib] < 2: continue
             masses = branch.masses
@@ -278,7 +278,7 @@ class Element(object):
         newelement = copy.deepcopy(self)        
         vertnumb = self.getEinfo()["vertnumb"]
         if max(vertnumb) < 2: return None   #Nothing to be compressed        
-        #Loop over branches
+#Loop over branches
         for ib,branch in enumerate(self.branches):
             if vertnumb[ib] < 2: continue
             particles = branch.particles            
