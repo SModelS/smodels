@@ -2,7 +2,7 @@
 
 """
 .. module:: auxiliaryFunctions
-    :synopsis: A collection of functions used in the conditions.
+    :synopsis: A collection of functions used to evaluate fuzzy the conditions.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
@@ -29,19 +29,20 @@ def Csim(*weights):
 
 #Make sure both xsec lists have the same entries (add zero xsecs for the missing entries)
     infoList = []
-    for weight in weights:  infoList.extend(weight.getInfo())
-    infoList = set(infoList)
+    for weight in weights:
+        for info in weight.getInfo():
+            if not info in infoList: infoList.append(info)
+    
     zeros = crossSection.XSectionList(infoList)
     result =  crossSection.XSectionList(infoList)
-    for zero in zeros:
-        for weight in weights: weight.combineWith(zero)
+    for weight in weights: weight.combineWith(zeros)
     for info in infoList:
         res = 0.        
-        xsecRes = result.getXsecsFor(info.label)[0]
+        xsecRes = result.getXsecsFor(info.label).XSections[0]
         for weightA in weights:
             for weightB in weights:
-                a = rmvunit(weightA.getXsecsFor(info.label).value,'fb')
-                b = rmvunit(weightB.getXsecsFor(info.label).value,'fb')
+                a = rmvunit(weightA.getXsecsFor(info.label).XSections[0].value,'fb')
+                b = rmvunit(weightB.getXsecsFor(info.label).XSections[0].value,'fb')
                 if a + b == 0.: continue
                 res = max(res,abs(a-b)/abs(a+b))                  
         xsecRes.value = res
@@ -61,16 +62,18 @@ def Cgtr(weightA,weightB):
         return False
 
 #Make sure both xsec lists have the same entries (add zero xsecs for the missing entries)   
-    infoList = set(weightA.getInfo().extend(weightB.getInfo()))
+    infoList = weightA.getInfo()
+    for info in weightB.getInfo():
+        if not info in infoList:infoList.append(info)        
+    
     zeros = crossSection.XSectionList(infoList)
     result =  crossSection.XSectionList(infoList)
-    for zero in zeros:
-        weightA.combineWith(zero)
-        weightB.combineWith(zero)
+    weightA.combineWith(zeros)
+    weightB.combineWith(zeros)
     for info in infoList:
-        a = rmvunit(weightA.getXsecsFor(info.label).value,'fb')
-        b = rmvunit(weightB.getXsecsFor(info.label).value,'fb')
-        xsecRes = result.getXsecsFor(info.label)[0]  
+        a = rmvunit(weightA.getXsecsFor(info.label).XSections[0].value,'fb')
+        b = rmvunit(weightB.getXsecsFor(info.label).XSections[0].value,'fb')
+        xsecRes = result.getXsecsFor(info.label).XSections[0]
         if a + b == 0.: xsecRes.value = 'N/A'
         else: xsecRes.value = (abs(a-b) - (a-b))/(2.*(a+b))
         
