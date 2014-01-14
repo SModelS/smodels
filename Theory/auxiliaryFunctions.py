@@ -11,7 +11,7 @@
 from Tools.PhysicsUnits import rmvunit
 import crossSection, element
 import logging
-import copy
+import copy, itertools
 from ParticleNames import Reven, PtcDic
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -111,3 +111,24 @@ def elementsInStr(instring):
     return elements    
 
     
+def flattenList(inlist):
+    """An auxliary function to completely flatten a multi-dimensional nested list.
+    The output ordering is: [first level objects, second level objects,...] """
+    
+    if type(inlist) != type(list()): return inlist
+    try: flat = list(itertools.chain(*inlist))
+    except: flat = copy.deepcopy(inlist)
+    go = True
+    while go:
+        go = False
+        try: flat = list(itertools.chain(*flat))
+        except: pass
+        if len(flat) > 0:    
+            for ival,val in enumerate(flat):
+                if type(val) ==  type(list()):
+                    go = True
+                    try: val = list(itertools.chain(*val))
+                    except: pass
+                    flat.pop(ival)                
+                    flat.extend(val)
+    return flat

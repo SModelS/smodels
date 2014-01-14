@@ -167,9 +167,7 @@ class TopologyList(object):
         If topos are given, we add all of them sequentially.
         """
         self.topos = []
-        for topo in topos:
-            self.add ( topo )
-
+        for topo in topos: self.add ( topo )
 
     def __len__ ( self ): 
         return len(self.topos)
@@ -228,4 +226,11 @@ class TopologyList(object):
         sumw = crossSection.XSectionList(sumwtopos[0].getInfo())  #Create zero weight list 
         for weight in sumwtopos:  sumw.combineWith(weight)
         
-        return sumw    
+        return sumw
+    
+    def getElements(self):
+        """ Returns a list with all the elements in all the topologies """
+        
+        elements = []
+        for top in self.topos: elements.extend(top.ElList)
+        return elements 

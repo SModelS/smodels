@@ -82,10 +82,10 @@ class Element(object):
         if type(self) != type(other): return False
         ptcs = self.getParticles()
         ptcsA = other.getParticles()
-        if simParticles(ptcsA,ptcs,useDict): return True
+        if simParticles(ptcs,ptcsA,useDict): return True
         if not order:
-            ptcs_b = other.switchBranches().getParticles()   
-            if simParticles(ptcsA,ptcs_b,useDict): return True
+            ptcsB = other.switchBranches().getParticles()   
+            if simParticles(ptcs,ptcsB,useDict): return True
         
         return False
     

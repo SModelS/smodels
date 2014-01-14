@@ -2,12 +2,13 @@ from Experiment import LimitGetter
 import crossSection
 import numpy as np
 from scipy import stats
-import logging,copy
+import logging,copy,time
 from Tools.PhysicsUnits import addunit,rmvunit
+from auxiliaryFunctions import flattenList
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class Cluster(object):
+class ElementCluster(object):
     """Main class to store the relevant information about a cluster of elements and to manipulate it"""
     
     def __init__(self):
@@ -24,22 +25,102 @@ class Cluster(object):
         """Returns the average mass of all elements belonging to the cluster using the defined method.
          :param method: the method employed: "harmonic" = harmonic means, "mean" = algebaric (standard) mean
          :returns: the average mass """
-          
-        massList = [el.getMasses() for el in self.elements]
+        
+        massList = [el.getMasses() for el in self.elements]                
         return massAvg(massList)
+
+    
+class IndexCluster(object):
+    """Auxiliary class to store element indexes and positions in upper limit space.
+    Used by the clustering algorithm"""
+    
+    def __init__(self,massMap=None,posMap=None,indices=set([]),analysis=None):
+        self.indices = indices
+        self.avgPosition = None
+        self.massMap = massMap  #Stores the element mass list (for all elements)
+        self.positionMap = posMap   #Stores the element mass position in upper limit space list (for all elements)
+        self.analysis = analysis
+                
+        if massMap and posMap and len(self.indices) > 0: self.avgPosition = self.getAvgPosition()
+        
+    def __eq__(self,other):
+        
+        if type(self) != type(other): return False
+        elif set(self.indices) != set(other.indices): return False
+        else: return True
+    
+    def __iter__(self):
+        return iter(list(self.indices))
+    
+    def __getitem__(self,iel):
+        return list(self.indices)[iel]
+        
+    def add(self,iels):
+        """Adds an index or a list of indices to the list of indices and update the avgPosition value """
+        if type(iels) == type(int()): ilist = [iels]
+        else: ilist = iels
+        
+        indices = list(self.indices).extend(ilist)
+        self.indices = set(indices)
+        self.avgPosition = self.getAvgPosition()
+        
+    def remove(self,iels):
+        """Remove an index or a list of indices to the list of indices and update the avgPosition value """
+        if type(iels) == type(int()): ilist = [iels]
+        else: ilist = iels
+        
+        indices = list(self.indices)
+        for iel in ilist: indices.remove(iel)
+        self.indices = set(indices)
+        self.avgPosition = self.getAvgPosition()
+        
+    
+    def getAvgPosition(self,method='harmonic'):
+        """Returns the average position in upper limit space for all indices belonging to the cluster 
+        using the defined method."""        
+        
+        if len(list(self.indices)) == 1: return self.positionMap[self.indices[0]]
+        clusterMass = massAvg([self.massMap[iel] for iel in self])    
+        avgPos = massPosition(clusterMass,self.analysis)
+        return avgPos
+    
+    def getDistanceTo(self,obj):
+        """Returns the maximal distance between any elements belonging to the cluster and the object obj.
+        The object can be a position in upper limit space or an element index"""
+        
+        dmax = 0.
+        if type(obj) == type(int()) and obj >= 0 and obj < len(self.positionMap): pos = self.positionMap[obj]
+        elif type(obj) == type(float()): pos = obj
+        else:
+            logging.error("[getDistanceTo]: Unknown object type (must be an element index or position)")
+            return False
+        
+        for jel in self: dmax = max(dmax,distance(pos,self.positionMap[jel]))
+        return dmax
+    
+    def getMaxInternalDist(self):
+        """Returns the maximal distance between any pair of elements belonging to the cluster as well as
+        the cluster center and any element."""
+        
+        dmax = 0.
+        if self.avgPosition == None: self.avgPosition = self.getAvgPosition()
+        for iel in self:
+            dmax = max(dmax,distance(self.positionMap[iel],self.avgPosition))
+            dmax = max(dmax,self.getDistanceTo(iel))
+        return dmax
     
 
-def massPosition(mass,Analysis,nounit=True):
+def massPosition(mass,Analysis):
     """ gives the mass position in upper limit space, using the analysis experimental limit data.
     If nounit=True, the result is given as number assuming fb units """
-
+    
     xmass = LimitGetter.GetPlotLimit(mass,Analysis,complain=False)
     if type(xmass) != type(addunit(1.,'pb')): return None
-    if nounit: xmass = rmvunit(xmass,'fb')
+    xmass = rmvunit(xmass,'fb')    
     return xmass
 
 
-def massDistance(xmass1,xmass2):
+def distance(xmass1,xmass2):
     """ Definition of distance between two mass positions."""
 
     if xmass1 is None or xmass2 is None: return None
@@ -51,167 +132,139 @@ def massDistance(xmass1,xmass2):
 def massAvg(massList,method='harmonic'):
     """Computes the average mass of massList, according to method (harmonic or mean).
     If massList contains a zero mass, switch method to mean"""
-        
-    flatList = [rmvunit(mass,'GeV') for mass in np.hstack(massList)]
+
+#Checks:    
+    if not massList: return massList
+    if len(massList) == 1: return massList[0]               
+    flatList = [rmvunit(mass,'GeV') for mass in flattenList(massList)]
     if method == 'harmonic' and 0. in flatList: method = 'mean'
     
     for mass in massList:
-        if len(mass) != len(massList[0]) or len(mass[0]) != len(massList[0]) or len(mass[1]) != len(massList[1]):  
-            logger.error('[getAvgMass]: mass shapes do not match in mass list:\n'+str(massList))
+        if len(mass) != len(massList[0]) or len(mass[0]) != len(massList[0][0]) or len(mass[1]) != len(massList[0][1]):  
+            logger.error('[massAvg]: mass shape mismatch in mass list:\n'+str(mass)+' and '+str(massList[0]))
             return False
     
     avgmass = copy.deepcopy(massList[0])
     for ib,branch in enumerate(massList[0]):
-        for ival,v in enumerate(branch):
-            vals = [rmvunit(mass[ib][ival],'GeV') for mass in massList]
+        for ival in enumerate(branch):
+            vals = [rmvunit(mass[ib][ival[0]],'GeV') for mass in massList]
             if method == 'mean': avg = np.mean(vals)
             elif method == 'harmonic': avg = stats.hmean(vals)
-            avgmass[ib][ival] = addunit(float(avg),'GeV')        
+            avgmass[ib][ival[0]] = addunit(float(avg),'GeV')   
     return avgmass    
     
     
-def getGoodMasses(elements,massPos,maxDist):
+def getGoodElements(elements,Analysis,maxDist):
     """ Get the list of good masses appearing elements according to the Analysis distance.
-    Return a dictionary with keys = old mass, values = equivalent good mass"""
-    goodMasses = {}
+    Returns a list of elements with good masses with their masses replaced by the branch average.
+    A mass is good if the mass distance between the branches is less than maxDist and if the
+    element mass (or mass avg) falls inside the upper limit plane."""
+    
+    goodElements = []  
     for element in elements:
         mass = element.getMasses()
-        if mass[0] == mass[1] and not massPos[mass]: continue   #skip masses out of bounds
-        elif mass[0] == mass[1]: goodMasses[mass] = mass
+        goodmass = None
+        if mass[0] == mass[1]:
+            if massPosition(mass,Analysis): goodmass = mass
         else:
             mass1 = [mass[0],mass[0]]
             mass2 = [mass[1],mass[1]]
-            if massDistance(massPos[mass1],massPos[mass2]) < maxDist: goodMasses[mass] = massAvg([mass1,mass2])
-    return goodMasses    
+            mP1 = massPosition(mass1,Analysis)
+            mP2 = massPosition(mass2,Analysis)
+            if not mP1 or not mP2: continue
+            if distance(mP1,mP2) < maxDist: goodmass = massAvg([mass1,mass2])
+        if goodmass and massPosition(goodmass,Analysis):
+            goodElements.append(element.copy())
+            goodElements[-1].setMasses(goodmass) 
+    
+    return goodElements
 
 
 def groupAll(elements):
-    """Creates a single cluster containing all the elements"""
-    
-    cluster = Cluster()
+    """Creates a single cluster containing all the elements"""    
+    cluster = ElementCluster()
     cluster.elements = elements
     return cluster
 
 
-def clusterElements(elements,Analysis,maxDist,keepMassInfo=False):
-    """ Cluster the original elements according to their mass distance and return the list of clusters.
+def clusterElements(elements,Analysis,maxDist):
+    """ ElementCluster the original elements according to their mass distance and return the list of clusters.
         If keepMassInfo, saves the original masses and their cluster value in massDict """
-        
-#First compute all relevant mass positions:
-    massPos = {}
-    for element in elements:
-        mass = element.getMasses()
-        if mass[0] == mass[1]: massPos[mass] = massPosition(mass,Analysis)
-        else:
-            massPos[[mass[0],mass[0]]] = massPosition([mass[0],mass[0]],Analysis)  #Compute positions for asymmetric masses
-            massPos[[mass[1],mass[1]]] = massPosition([mass[1],mass[1]],Analysis)
        
-#Get elements with good masses and replace their masses by their 'good' value:    
-    goodMasses = getGoodMasses(elements,massPos,maxDist)
-    for mass in goodMasses:
-        if not mass in massPos: massPos[mass] = massPosition(mass,Analysis)  #Include possible new masses
-    goodElements = []
-    for el in elements:
-        if el.getMasses() in goodMasses:
-            element = el.copy()
-            element.setMasses(goodMasses[el.getMasses()])
-            goodElements.append(element)             
-       
-#Cluster elements by their mass:
-    clusters = doCluster(goodElements,massPos,maxDist)
+#Get the list of elements with good masses (with the masses replaced by their 'good' value):   
+    print 'Starting goodElements at',time.strftime("%a, %d %b %Y %H:%M:%S",time.localtime()) 
+    goodElements = getGoodElements(elements,Analysis,maxDist)    
+    if len(goodElements) == 0: return []    
+#ElementCluster elements by their mass:
+    print 'Starting doCluster at',time.strftime("%a, %d %b %Y %H:%M:%S",time.localtime())
+    clusters = doCluster(goodElements,Analysis,maxDist)
+    print 'Done docluster at',time.strftime("%a, %d %b %Y %H:%M:%S",time.localtime()),'\n'
     return clusters
 
 
-
-def doCluster(elements,massPos,maxDist):
-    """Cluster algorithm to cluster elements
-    :returns: a list of indexes with the clustered masses according to the order\
-    in elements
+def doCluster(elements,Analysis,maxDist):
+    """ElementCluster algorithm to cluster elements
+    :returns: a list of ElementCluster objects containing the elements belonging to the cluster
     """
+        
+#First build the element:mass and element:position in UL space dictionaries
+    massMap = {}
+    posMap = {}
+    for iel,el in enumerate(elements):
+        massMap[iel] = el.getMasses()
+        posMap[iel] = massPosition(massMap[iel],Analysis)
+                                         
+#Start with maximal clusters
+    clusterList = []
+    for iel in posMap:
+        indices = [iel]             
+        for jel in posMap:
+            if distance(posMap[iel],posMap[jel]) <= maxDist: indices.append(jel)
+        indexCluster = IndexCluster(massMap,posMap,set(indices),Analysis)
+        clusterList.append(indexCluster)
 
-    #Store all distances     
-    MD = [] #Mass distance matrix in upper limit space
-    massList = [el.getMasses() for el in elements]
-    for i,mass1 in massList:
-        MD.append([])
-        for j,mass2 in massList:
-            if j == i: MD[i].append(0.)
-            elif j < i: MD[i].append(MD[j][i])
-            else:                
-                MD[i].append(massDistance(massPos[mass1],massPos[mass2]))  
-                                   
-    #Begin clustering
-    ClusterList = []
-    for imass,mass1 in enumerate(massList):
-        cluster = set([])
-        for jmass,mass2 in enumerate(massList):
-            if MD[imass][jmass] == None: continue
-            if MD[imass][jmass] <= maxDist: cluster.add(jmass)
-        if not cluster in ClusterList: ClusterList.append(cluster)   #Zero level (maximal) clusters
-
-
-    FinalCluster = []
-    newClusters = [0]
-    while len(newClusters) > 0:
+#Split the maximal clusters until all elements inside each cluster are less than maxDist apart from each other
+#and the cluster average position is less than maxDist apart from all elements
+    finalClusters = []
+    newClusters = True
+    while newClusters:
         newClusters = []
-        for cluster in ClusterList:
-            split = False
-            if len(cluster) > 1:
-                clusterMass = massAvg([massList[imass] for imass in cluster])          
-                avgPos = massPosition(clusterMass)
-                distAvg = max([massDistance(massPos[imass],avgPos) for imass in cluster])
-            for imass in cluster:
-                clusterDist = ClusterDist(set([imass]),cluster,MD)
-                if  clusterDist == None or clusterDist > maxDist or distAvg > maxDist:    #If object or cluster average falls outside the cluster, remove object
-                    newcluster = copy.deepcopy(cluster)
-                    newcluster.remove(imass)
-                    split = True
+        for indexCluster in clusterList:            
+            if indexCluster.getMaxInternalDist() < maxDist:  #cluster is good
+                if not indexCluster in finalClusters: finalClusters.append(indexCluster)
+                continue
+            distAvg = indexCluster.getDistanceTo(indexCluster.avgPosition) #Distance to cluster center (average)
+            
+#Loop over cluster elements and if element distance or cluster average distance falls outside the cluster, remove element            
+            for iel in indexCluster:
+                dist = indexCluster.getDistanceTo(iel)                                
+                if max(dist,distAvg) > maxDist:
+                    newcluster = indexCluster
+                    newcluster.remove(iel)
                     if not newcluster in newClusters: newClusters.append(newcluster)
 
-            if not split and not cluster in FinalCluster: FinalCluster.append(cluster)
-
-        ClusterList = newClusters
-        if len(ClusterList) > 500:  #Check for oversized list of cluster (too time consuming)
-            logger.warning("[clusterElements] Cluster failed, using unclustered masses")
-            FinalCluster = []  
-            ClusterList = []
+        clusterList = newClusters
+        if len(clusterList) > 100:  #Check for oversized list of indexCluster (too time consuming)
+            logger.warning("[clusterElements] ElementCluster failed, using unclustered masses")
+            finalClusters = []  
+            clusterList = []
             
 
-    FinalCluster = FinalCluster + ClusterList
+#     finalClusters = finalClusters + clusterList
     #Add clusters of individual masses (just to be safe)
-    for imass,mass in enumerate(massList): FinalCluster.append(set([imass]))
+    for iel in massMap: finalClusters.append(IndexCluster(massMap,posMap,set([iel]),Analysis))
 
-    #Clean up clusters (remove redundant clusters)
-    i = 0
-    for i,clusterA in enumerate(FinalCluster):
-        for j,clusterB in enumerate(FinalCluster):
-            if i != j and clusterB.issubset(clusterA): FinalCluster[j] = set([])
-    while FinalCluster.count(set([])) > 0: FinalCluster.remove(set([]))
+    #Clean up clusters (remove redundant clusters)    
+    for ic,clusterA in enumerate(finalClusters):
+        for jc,clusterB in enumerate(finalClusters):
+            if ic != jc and clusterB.indices.issubset(clusterA.indices): finalClusters[jc] = None
+    while finalClusters.count(None) > 0: finalClusters.remove(None)
 
+    #Transform index clusters to element clusters:
     clusterList = []
-    for icluster in FinalCluster:
-        cluster = Cluster()
-        for iel in icluster: cluster.elements.append(elements[iel])
+    for indexCluster in finalClusters:
+        cluster = ElementCluster()
+        for iel in indexCluster: cluster.elements.append(elements[iel])
         clusterList.append(cluster)
     
     return clusterList
-
-
-
-def ClusterDist(cluster1,cluster2,massDist):
-    """Returns the distance between two clusters = maximum distance between two elements of each cluster.
-    massDist = square matrix of distances."""
-    
-    d = 0.
-    if type(cluster1) != type(set()) or type(cluster2) != type(set()):
-        logger.warning("[ClusterDist]: unknown format input")
-        return False
-
-    for ic in cluster1:
-        for jc in cluster2:
-            if massDist[ic][jc] == None: return None
-            d = max(d,massDist[ic][jc])
-            return d
-
-
-
