@@ -78,7 +78,7 @@ class XSection:
 
     def __str__ (self):
         """cross-section information in string format"""
-        st = 'label: '+self.info.label+', value:'+str(self.value)
+        st = self.info.label+':'+str(self.value)
         return st
     
     def zeroXSec(self):

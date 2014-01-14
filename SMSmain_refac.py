@@ -6,8 +6,8 @@ from Theory import slhaDecomposer, lheDecomposer, SLHATools, crossSection
 from Tools.PhysicsUnits import addunit
 from Tools import SMSPrettyPrinter
 from Tools.SMSPrettyPrinter import wrap
-from Experiment import SMSAnalysisFactory
-from Theory.theoryPrediction import PredictionForAnalysis
+from Experiment import smsanalysisFactory
+from Theory.theoryPrediction import theoryPredictionFor
 
 # useXsec = CrossSection.XSectionInfo()
 # useXsec.sqrts = addunit(8,'TeV')
@@ -15,7 +15,7 @@ from Theory.theoryPrediction import PredictionForAnalysis
 # useXsec.label = 'tev8'
 # UseXSecs = [useXsec]
 
-listOfAnalyses = SMSAnalysisFactory.load()
+listOfAnalyses = smsanalysisFactory.load()
 printer=SMSPrettyPrinter.SMSPrettyPrinter()
 slhafile = "slha/andrePT4.slha"
 lhefile = "lhe/ued_1.lhe"
@@ -37,17 +37,17 @@ totweight = []
 #Print Results:
 # for i in range(len(SMSTopList)):
 for (i,topo) in enumerate(SMSTopList):
-  sumw = topo.getTotalWeight().getDictionary()
-  EvTop_table.add_row([i,topo.vertnumb,topo.vertparts,len(topo.ElList),wrap(printer.pformat(sumw),width=30)])
-  eltot += len(topo.ElList)
+    sumw = topo.getTotalWeight().getDictionary()
+    EvTop_table.add_row([i,topo.vertnumb,topo.vertparts,len(topo.ElList),wrap(printer.pformat(sumw),width=30)])
+    eltot += len(topo.ElList)
 
  
       
 #Print element list for Topology[i]:  
-  if i == 0:
-    for j,el in enumerate(topo.ElList):
-      EvElement_table.add_row([i,j,el.getParticles()[0],el.getParticles()[1],wrap(printer.pformat(el.getMasses()[0]),width=25),wrap(printer.pformat(el.getMasses()[1]),width=25),wrap(printer.pformat(el.weight.getDictionary()),width=30)])
-    EvElement_table.add_row(["---","---","---","---","---","---","---"])  
+    if i == 0:
+        for j,el in enumerate(topo.ElList):
+            EvElement_table.add_row([i,j,el.getParticles()[0],el.getParticles()[1],wrap(printer.pformat(el.getMasses()[0]),width=25),wrap(printer.pformat(el.getMasses()[1]),width=25),wrap(printer.pformat(el.weight.getDictionary()),width=30)])
+        EvElement_table.add_row(["---","---","---","---","---","---","---"])  
 
      
 print "Number of Global topologies = ",len(SMSTopList)      
@@ -59,13 +59,15 @@ print "Total weight = ",SMSTopList.getTotalWeight()
 print '\n \n \n'
 
  
-for ana in enumerate(listOfAnalyses):    
-    print ana.label,ana.listOfPlots[0].label,ana.sqrts    
-    preds = PredictionForAnalysis(ana,SMSTopList)
+for ana in listOfAnalyses:    
+    preds = theoryPredictionFor(ana,SMSTopList)
+    if not preds: continue
+    print ana.label,ana.conditions
     for pred in preds:
         print pred.value
         print pred.conditions
-        print pred.mass
+        print pred.mass,'\n'
+    sys.exit()
 
 sys.exit()
 

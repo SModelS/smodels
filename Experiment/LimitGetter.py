@@ -55,13 +55,15 @@ def GetPlotLimit(inmass,Analysis,complain = False):
         inmass: array of masses in SModelS graph
         Analysis: SMSDataObjects.EAnalysis"""
   from Tools.PhysicsUnits import rmvunit
-  import copy, SMSResults
+  import copy, SMSResults, sys
 
   massarray = copy.deepcopy(inmass)
 
 #Skip empty mass arrays:
-  if len(massarray) < 1: 
-    if complain: print "[LimitGetter.py] length of massarray < 1"
+  if len(massarray) < 2: 
+    print 'M=',massarray
+    sys.exit()
+    if complain: print "[LimitGetter.py] length of massarray < 2"
     return False
 
 #Make sure the two branches have equal masses:
@@ -74,10 +76,8 @@ def GetPlotLimit(inmass,Analysis,complain = False):
 #Run label:
   run = Analysis.run
   if run == "": run = None   #If run has not been defined, use latest run
-
-  CMSlabel = Analysis.plots.values()[0][0]   #CMS-type label
-  analysis = Analysis.plots.values()[0][1][0]  #analysis name
-  
+   
+  analysis, CMSlabel = Analysis.label.split(':')  
   limit = SMSResults.getSmartUpperLimit(analysis,CMSlabel,masslist,run,debug=complain)
  
   return limit

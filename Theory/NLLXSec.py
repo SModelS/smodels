@@ -12,7 +12,8 @@
 
 """
 
-import sys, commands, os, pyslha
+import sys, commands, os
+import pyslha2 as pyslha
 from Tools.PhysicsUnits import addunit
 import numpy
 
