@@ -7,7 +7,6 @@
 .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
     
 """
-from Tools.PhysicsUnits import addunit
 from Theory import crossSection
 import logging
 from Theory.element import Element
@@ -167,28 +166,27 @@ class TopologyList(object):
         If topos are given, we add all of them sequentially.
         """
         self.topos = []
-        for topo in topos: self.add ( topo )
+        for topo in topos: self.add(topo)
 
-    def __len__ ( self ): 
-        return len(self.topos)
+    def __len__ (self): 
+        return len(self.topos)    
+
+    def __getitem__(self,index):
+        return self.topos[index]
     
-
-    def __getitem__ ( self, n ):
-        return self.topos[n]
-
-
-    def addList ( self, List ):
-        for topo in List: self.add ( topo )
-
-
-    def __str__ ( self ):
+    def __iter__ (self):
+        return iter(self.topos)
+    
+    def __str__(self):
         s="TopologyList:\n" 
         for topo in self.topos:
             s+=str(topo)+"\n"
         return s
 
+    def addList(self,List):
+        for topo in List: self.add(topo)
 
-    def describe( self ):
+    def describe(self):
         s="TopologyList:\n" 
         for topo in self.topos:
             s+=str(topo)+"\n"
@@ -217,15 +215,10 @@ class TopologyList(object):
     def getTotalWeight(self):
         """ Returns the sum of all topologies total weights
         """
-        sumwtopos = []
-        for topo in self.topos:
+        sumw = crossSection.XSectionList()
+        for topo in self:
             topoweight = topo.getTotalWeight()
-            if topoweight:  sumwtopos.append(topoweight)
-        
-        if len(sumwtopos) == 0: return None
-        sumw = crossSection.XSectionList(sumwtopos[0].getInfo())  #Create zero weight list 
-        for weight in sumwtopos:  sumw.combineWith(weight)
-        
+            if topoweight: sumw.combineWith(topoweight)       
         return sumw
     
     def getElements(self):

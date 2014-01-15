@@ -9,7 +9,9 @@
     
 """
 from ParticleNames import PtcDic, Reven, simParticles
+from auxiliaryFunctions import elementsInStr
 from branch import Branch
+import crossSection
 import copy
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -26,16 +28,22 @@ class Element(object):
         Constructor
         """
         self.branches = [Branch(),Branch()]
-        self.weight = None
+        self.weight = crossSection.XSectionList()
                 
         if info:
-            if type(info) == type('string'):   #Creates element from particle string
-                st = info.replace(" ","").replace("'","")
-                st = st[st.find("[[["):st.find("]]]")+3]
-                b1=st[2:st.find("]],[[")+1]
-                b2=st[st.find("]],[[")+4:st.find("]]]")+1]
-                self.branches[0] = copy.deepcopy(Branch(b1))
-                self.branches[1] = copy.deepcopy(Branch(b2))
+            if type(info) == type(str()):   #Creates element from particle string
+                elements = elementsInStr(info)
+                if not elements or len(elements) > 1:
+                    logging.error("[Element()]: wrong input string "+info)
+                    return False                
+                else:
+                    el = elements[0]
+                    branches = elementsInStr(el[1:-1])
+                    if not branches or len(branches) != 2:
+                        logging.error("[Element()]: wrong input string "+info)
+                        return False 
+                    self.branches = []
+                    for branch in branches: self.branches.append(Branch(branch))
             elif type(info) == type([]) and type(info[0]) == type(Branch()): #Creates element from branch pair
                 for ib,branch in enumerate(info): self.branches[ib] = copy.deepcopy(branch) 
 
@@ -94,9 +102,8 @@ class Element(object):
         Creates a copy of itself (faster than deepcopy)
         """
         elcopy = Element()
-        elcopy.branches = self.branches
-        elcopy.weight = self.weight
-        
+        elcopy.branches = self.branches                
+        elcopy.weight.combineWith(self.weight)
         return elcopy
     
     def setMasses(self,mass,same_order=True,oppos_order=False):
@@ -122,7 +129,6 @@ class Element(object):
 
     def switchBranches(self):
         """ If the element contains a pair of branches, switches them"""
-#         newEl = copy.deepcopy(self)
         newEl = self.copy()
         if len(self.branches) == 2: newEl.branches = [newEl.branches[1],newEl.branches[0]]
         return newEl
