@@ -2,6 +2,7 @@
 
 import sys, os, random
 sys.path.append("/usr/local/smodels/")
+# sys.path.append("../")
 from Theory import LHEReader, TopologyBuilder
 from Tools import FeynmanGraphs
 
@@ -27,4 +28,4 @@ print
 reader = LHEReader.LHEReader( filename )
 Event = reader.next()
 SMSTop = TopologyBuilder.fromEvent(Event, {} )
-FeynmanGraphs.asciidraw ( SMSTop[0].leadingElement() )
+FeynmanGraphs.asciidraw ( SMSTop[0].leadingElement(), border=True )
