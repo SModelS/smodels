@@ -210,7 +210,7 @@ def draw ( element, filename="bla.pdf", straight=False, inparts=True, verbose=Fa
     os.system ( "convert %s %s" % ( pdffile, filename ) )
   print "[FeynmanGraphs.py] %s created." % ( filename )
 
-def drawBranch_ ( branch, upwards, labels, html, border ):
+def drawBranch_ ( branch, upwards, labels, html, border, L ):
   """ draws a single branch, should only be used via .asciidraw, 
       not directly """
   length=0
@@ -245,11 +245,16 @@ def drawBranch_ ( branch, upwards, labels, html, border ):
   order=[0,1]
   if not upwards: order=[1,0]
   HTML="<br>"
+  lengthdiff=L-len(lines[0])/5
   if border: 
-    labels+="  |"
-    lines[0]+="  |"
-    lines[1]+=" |"
-  if border and upwards: print " /"+"-"*(len(labels)-3 )+"\\"
+    if L==2:
+      lines[0]+=" "
+      lines[1]+=" "
+      labels+=" "
+    labels+=" "+" "*(5*lengthdiff)+" |"
+    lines[0]+=" "*(5*lengthdiff+0)+"  |"
+    lines[1]+=" "*(5*lengthdiff+0)+" |"
+  if border and upwards: print " /"+"-"*(4*L+4)+"\\"
   if html: print HTML
   if upwards and labels: print labels
   if html: print HTML
@@ -257,9 +262,12 @@ def drawBranch_ ( branch, upwards, labels, html, border ):
   if html: print HTML
   if not upwards and labels: print labels
   if html: print HTML
-  if border and not upwards: print " \\"+"-"*(len(labels)-3)+"/"
+  if border and not upwards: print " \\"+"-"*(4*L+4)+"/"
 
 def asciidraw ( element, labels=True, html=False, border=False ):
   """ draw a simple ascii graph on the screen """
+  L=[]
   for (ct,branch) in enumerate(element.B):
-    drawBranch_ ( branch, upwards=(ct==0), labels=labels, html=html, border=border )
+    L.append ( int( str(branch).count("[") ) )
+  for (ct,branch) in enumerate(element.B):
+    drawBranch_ ( branch, upwards=(ct==0), labels=labels, html=html, border=border, L=max(L) )
