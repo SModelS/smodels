@@ -1,5 +1,5 @@
 import crossSection
-import logging,time
+import logging,time,sys
 from auxiliaryFunctions import massAvg, massPosition, distance
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -151,9 +151,7 @@ def clusterElements(elements,Analysis,maxDist):
         If keepMassInfo, saves the original masses and their cluster value in massDict """
        
 #Get the list of elements with good masses (with the masses replaced by their 'good' value):
-    t1 = time.time()    
     goodElements = getGoodElements(elements,Analysis,maxDist)
-    print 'getGoodElements done in',time.time()-t1,'s'
     if len(goodElements) == 0: return []    
 #ElementCluster elements by their mass: 
     t1 = time.time()   
@@ -210,7 +208,7 @@ def doCluster(elements,Analysis,maxDist):
             clusterList = []
             
 
-#     finalClusters = finalClusters + clusterList
+#    finalClusters = finalClusters + clusterList
     #Add clusters of individual masses (just to be safe)
     for iel in massMap: finalClusters.append(IndexCluster(massMap,posMap,set([iel]),Analysis))
 
