@@ -217,11 +217,11 @@ def drawBranch_ ( branch, upwards, labels, html, border ):
   lines=["   ","----"]
   labels="   "
   if border and upwards:
-    lines=["|    ","| ----"]
-    labels="|    "
+    lines=[" |    "," | ----"]
+    labels=" |    "
   if border and not upwards:
-    lines=["|    ","| ----"]
-    labels="|    "
+    lines=[" |    "," | ----"]
+    labels=" |    "
 
   for insertions in branch.particles:
     if len(insertions)==0: 
@@ -249,7 +249,7 @@ def drawBranch_ ( branch, upwards, labels, html, border ):
     labels+="  |"
     lines[0]+="  |"
     lines[1]+=" |"
-  if border and upwards: print "/"+"-"*(len(labels)-2 )+"\\"
+  if border and upwards: print " /"+"-"*(len(labels)-3 )+"\\"
   if html: print HTML
   if upwards and labels: print labels
   if html: print HTML
@@ -257,7 +257,7 @@ def drawBranch_ ( branch, upwards, labels, html, border ):
   if html: print HTML
   if not upwards and labels: print labels
   if html: print HTML
-  if border and not upwards: print "\\"+"-"*(len(labels)-2)+"/"
+  if border and not upwards: print " \\"+"-"*(len(labels)-3)+"/"
 
 def asciidraw ( element, labels=True, html=False, border=False ):
   """ draw a simple ascii graph on the screen """
