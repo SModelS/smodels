@@ -4,7 +4,7 @@
 .. module:: PhysicsUnits
     :synopsis: This introduces physical units (GeV,fb) to the framework
 
-.. moduleauthor:: missing <email@example.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
 

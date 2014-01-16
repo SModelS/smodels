@@ -9,7 +9,6 @@
 
 """
 
-
 def getMaxLum(List):
   """ Goes through all analyses in the list and returns the maximum luminosity.
   If one of the luminosities has not been define, return None. """
