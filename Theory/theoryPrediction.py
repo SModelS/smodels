@@ -8,7 +8,7 @@
         
 """
 
-import copy, time
+import copy, time,sys
 import clusterTools
 import crossSection, element, analysis
 import logging
@@ -30,16 +30,11 @@ def theoryPredictionFor(Analysis,SMSTopList,maxMassDist=0.2):
     """Main method to compute theory predictions. Collects the elements and efficiencies, combine the masses
     (if needed) and compute the conditions (if any). Returns a list of TheoryPrediction objects"""
 
-#Select elements constrained by analysis and apply efficiencies
-    t1 = time.time()                        
-    elements = getElementsFrom(SMSTopList,Analysis)
-    print 'getElementsFrom done in',time.time()-t1,'s'   
+#Select elements constrained by analysis and apply efficiencies                       
+    elements = getElementsFrom(SMSTopList,Analysis)   
     if len(elements) == 0: return None      
 #Combine masses
-    t1 = time.time()
-    print 'nels=',len(elements)    
-    clusters = combineElements(elements,Analysis,maxDist=maxMassDist)
-    print 'combineElements done in',time.time()-t1,'s'
+    clusters = combineElements(elements,Analysis,maxDist=maxMassDist)    
 #Collect results and evaluate conditions:
     predictions = []
     for cluster in clusters:
@@ -60,6 +55,9 @@ def getElementsFrom(SMSTopList,Analysis):
     
     elements = []
     for el in SMSTopList.getElements():
+        if el.getParticles() == [[['b','b']],[['b','b']]]:
+            print 'in=',el.getParticles(),el.getMasses()    
+
         eff = Analysis.getEfficiencyFor(el)
         if eff == 0.: continue
         element = el.copy()
@@ -67,6 +65,10 @@ def getElementsFrom(SMSTopList,Analysis):
         for xsec in el.weight:
             if xsec.info.sqrts == Analysis.sqrts: element.weight.add(copy.deepcopy(xsec*eff))
         if len(element.weight) > 0: elements.append(element)
+
+    for el in elements:
+        if el.getParticles() != [[['b','b']],[['b','b']]]: continue
+        print 'out=',el.getParticles(),el.getMasses()    
             
     return elements
 

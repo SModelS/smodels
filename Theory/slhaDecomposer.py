@@ -8,13 +8,13 @@
         
 """
 
-import sys, os, copy
+import sys, os, copy, time
 import element, topology
 from Tools.PhysicsUnits import addunit, rmvunit
 import pyslha2 as pyslha
 import crossSection
 from branch import Branch, decayBranches
-        
+   
 def decompose(slhafile,sigcut=0.1,DoCompress=False,DoInvisible=False,minmassgap=-1,UseXSecs=None):
     """Do SLHA-based decomposition.
             FIXME currently using pyslha2 because we need this hack to handle SLHA files with XSECTION blocks.
@@ -32,6 +32,7 @@ Only generated if cross-sections are read from SLHA file and not previously crea
         :returns: a TopologyList. 
     """
     
+    t0 = time.time()
 
     if DoCompress and rmvunit(minmassgap,'GeV') == -1: 
         print "[SLHAdecomposer] Please, set minmassgap"
@@ -58,10 +59,10 @@ Only generated if cross-sections are read from SLHA file and not previously crea
         branchList[-1].maxWeight = maxWeight[pid]
 
 #Generate final branches (after all R-odd particles have decayed)
-    finalBranchList = decayBranches(branchList,BRdic,Massdic,sigcut)      
-
+    finalBranchList = decayBranches(branchList,BRdic,Massdic,sigcut)
+    
     SMSTopList = topology.TopologyList()    
-#Combine pairs of branches into elements according to production cross-section list:
+#Combine pairs of branches into elements according to production cross-section list:    
     for pids in XSectionList.getPIDpairs():
         for branch1 in finalBranchList:
             for branch2 in finalBranchList:

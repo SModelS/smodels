@@ -15,7 +15,7 @@ from Theory.theoryPrediction import theoryPredictionFor
 # useXsec.label = 'tev8'
 # UseXSecs = [useXsec]
 
-listOfAnalyses = smsanalysisFactory.load('ATLAS_CONF_2013_061','T1bbbb')
+listOfAnalyses = smsanalysisFactory.load()
 printer=SMSPrettyPrinter.SMSPrettyPrinter()
 slhafile = "slha/test.slha"
 lhefile = "lhe/ued_1.lhe"
@@ -46,6 +46,7 @@ for i,topo in enumerate(SMSTopList):
 #Print element list for Topology[i]:  
     if i == 0:
         for j,el in enumerate(topo.ElList):
+            if el.getParticles() != [[['b','b']],[['b','b']]]: continue
             EvElement_table.add_row([i,j,el.getParticles()[0],el.getParticles()[1],wrap(printer.pformat(el.getMasses()[0]),width=25),wrap(printer.pformat(el.getMasses()[1]),width=25),wrap(printer.pformat(el.weight.getDictionary()),width=30)])
         EvElement_table.add_row(["---","---","---","---","---","---","---"])  
 
@@ -54,7 +55,7 @@ print "Number of Global topologies = ",len(SMSTopList)
 print(EvTop_table)
 print "Total Number of Elements = ",eltot
 print "Total weight = ",SMSTopList.getTotalWeight()
-# print(EvElement_table)
+print(EvElement_table)
 
 print '\n \n \n'
 print 'slhaDecomposer done in',time.time()-t1,'s'
