@@ -34,6 +34,14 @@ class XSectionInfo(object):
         if other.sqrts != self.sqrts: return True
         if other.order != self.order: return True
         return False
+    
+    def copy(self):
+        """Generates an independent copy of itself. Faster than deepcopy. """
+        newinfo = XSectionInfo()
+        newinfo.sqrts = self.sqrts
+        newinfo.order = self.order
+        newinfo.label = self.label[:]
+        return newinfo
 
 
 class XSection(object):
@@ -45,7 +53,7 @@ class XSection(object):
         self.pid = (None,None)
 
     def __mul__(self,other):
-        newXsec = copy.deepcopy(self)
+        newXsec = self.copy()
         if type(other) == type(1.):
             newXsec.value = newXsec.value*other
         else:
@@ -59,7 +67,7 @@ class XSection(object):
     def __add__(self,other):
         if type(other) == type(XSection()):
             if self.info == other.info:
-                res = copy.deepcopy(self)
+                res = self.copy()
                 res.value += other.value
                 return res
         print "[XSection.add]: Trying to add",type(other),"to a XSection objetc"
@@ -84,6 +92,14 @@ class XSection(object):
         st = self.info.label+':'+str(self.value)
         return st
     
+    def copy(self):
+        """Generates an independent copy of itself. Faster than deepcopy. """
+        newXsec = XSection()
+        newXsec.info = self.info.copy()
+        newXsec.value = self.value
+        newXsec.pid = tuple(list(self.pid)[:])
+        return newXsec
+    
     def zeroXSec(self):
         """
         Replaces the cross-section value by zero
@@ -104,12 +120,12 @@ class XSectionList(object):
                 newentry = XSection()
                 newentry.value = addunit(0.,'fb')
                 newentry.pid = (None,None)
-                newentry.info = copy.deepcopy(info)
+                newentry.info = info.copy()
                 self.add(newentry)
                 
 
     def __mul__(self,other):
-        newList = copy.deepcopy(self)
+        newList = self.copy()
         for ixsec,xsec in enumerate(newList): newList[ixsec] = xsec*other
         return newList
     
@@ -134,16 +150,20 @@ class XSectionList(object):
     def __str__(self):
         return str([str(xsec) for xsec in self])
     
+    
+    def copy(self):
+        """Generates an independent copy of itself. Faster than deepcopy. """
+        newList = XSectionList()
+        for xsec in self.XSections: newList.XSections.append(xsec.copy())
+        return newList    
+    
     def add(self,xsec):
         """ Adds a XSection object to the list """
         if type(xsec) != type(XSection()):
             logger.error("[XSectionList.add] input object must be a XSection() object")
             return False
         else:
-            newxsec = XSection()
-            newxsec.info = xsec.info
-            newxsec.pid = xsec.pid
-            newxsec.value = copy.deepcopy(xsec.value)
+            newxsec = xsec.copy()
             self.XSections.append(newxsec)
 
 
@@ -241,7 +261,7 @@ class XSectionList(object):
             else:    
                 for oldXsec in self:
                     if newXsec.info == oldXsec.info:                        
-                        oldXsec.value = copy.deepcopy(oldXsec.value + newXsec.value)
+                        oldXsec.value = oldXsec.value + newXsec.value
                         oldXsec.pid = (None,None)
         
 

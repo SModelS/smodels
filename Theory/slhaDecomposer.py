@@ -14,7 +14,7 @@ from Tools.PhysicsUnits import addunit, rmvunit
 import pyslha2 as pyslha
 import crossSection
 from branch import Branch, decayBranches
-   
+ 
 def decompose(slhafile,sigcut=0.1,DoCompress=False,DoInvisible=False,minmassgap=-1,UseXSecs=None):
     """Do SLHA-based decomposition.
             FIXME currently using pyslha2 because we need this hack to handle SLHA files with XSECTION blocks.

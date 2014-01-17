@@ -8,10 +8,8 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
         
 """
-from ParticleNames import PtcDic, Reven, simParticles
-from auxiliaryFunctions import elementsInStr
+from ParticleNames import PtcDic, Reven, simParticles, elementsInStr
 from Tools.PhysicsUnits import addunit
-import copy
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -62,12 +60,23 @@ class Branch(object):
         if not simParticles(self.particles,other.particles,useDict): return False
         if self.masses != other.masses: return False
         return True
+    
+    def copy(self):
+        """Generates an independent copy of itself. Faster than deepcopy."""
+        
+        newbranch = Branch()
+        newbranch.masses = self.masses[:]
+        newbranch.particles = self.particles[:]
+        newbranch.momID = self.momID
+        newbranch.daughterID = self.daughterID
+        if not self.maxWeight is None: newbranch.maxWeight = self.maxWeight.copy()
+        return newbranch     
 
     
     def addDecay(self,BR,Massdic):
         """ Generates a new branch adding a 1-step cascade decay described by the BR object, with particle masses given by Massdic"""        
         import ParticleNames
-        newBranch = copy.deepcopy(self)
+        newBranch = self.copy()
         newparticles = []
         newmass = []
         newBranch.daughterID = None

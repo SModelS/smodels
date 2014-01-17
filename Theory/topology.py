@@ -98,7 +98,7 @@ class Topology(object):
     def elements ( self ):
         return self.ElList
 
-    
+     
     def addElement(self, newelement):
         """
         Adds an Element object to the ElList.

@@ -10,13 +10,13 @@
 
 from functools import wraps
 import crossSection
-import logging
 import copy, itertools
-from ParticleNames import Reven, PtcDic
 from Experiment import LimitGetter
 from Tools.PhysicsUnits import addunit,rmvunit
 import numpy as np
 from scipy import stats
+from collections import Iterable
+import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -66,7 +66,7 @@ def massAvg(massList,method='harmonic'):
             logger.error('[massAvg]: mass shape mismatch in mass list:\n'+str(mass)+' and '+str(massList[0]))
             return False
     
-    avgmass = copy.deepcopy(massList[0])
+    avgmass = massList[0][:]
     for ib,branch in enumerate(massList[0]):
         for ival in enumerate(branch):
             vals = [rmvunit(mass[ib][ival[0]],'GeV') for mass in massList]
@@ -144,51 +144,22 @@ def Cgtr(weightA,weightB):
         
     return result
 
-def elementsInStr(instring):
-    """ Parses instring (or a list of strings) and return a list of elements (in string format) appearing in instring"""
-  
-    if type(instring) == type('st'): outstr = instring
-    elif type(instring) == type([]):
-        outstr = ""
-        for st in instring:
-            if type(st) != type('st'):
-                logger.error("[elementsInStr]: Input must be a string or a list of strings")
-                return False        
-            outstr += st    #Combines list of strings in a single string
-  
-    elements = []
-    outstr = outstr.replace(" ","").replace("'","")
-    elStr = ""
-    nc = 0
-#Parses the string and looks for matching ['s and ]'s, when the matching is complete, store element    
-    for c in outstr:
-        delta = 0
-        if c == '[':  delta = -1
-        elif c == ']': delta = 1
-        nc += delta
-        if nc != 0: elStr += c
-        if nc == 0 and delta != 0:
-            elements.append(elStr+c)
-            elStr = ""
-            #Syntax checks:
-            ptclist = elements[-1].replace(']',',').replace('[',',').split(',')
-            for ptc in ptclist:
-                if not ptc: continue
-                if not ptc in Reven.values() and not PtcDic.has_key(ptc):
-                    logger.error("[elementsInStr]: Unknown particle "+ptc)
-                    return False
-
-#Check if there are not unmatched ['s and/or ]'s in the string:        
-    if nc != 0:
-        logger.error("[elementsInStr]: wrong input (incomplete elements?) "+instring)
-        return False     
-      
-    return elements
-
     
-def flattenList(inlist):
+def flattenList(inlist,dims=None):
     """An auxliary function to completely flatten a multi-dimensional nested list.
-    The output ordering is: [first level objects, second level objects,...] """
+    The output ordering is: [first level objects, second level objects,...] 
+    If dims = [], include dimensions of nested list to it (useful when comparing lists)"""
+
+    flat = []
+    for item in inlist:
+        if isinstance(item, Iterable) and not isinstance(item, basestring):
+            if not dims is None: dims.append(len(item))
+            for x in flattenList(item,dims):
+                flat.append(x)
+        else:        
+            flat.append(item)             
+    return flat
+    
     
     if type(inlist) != type(list()): return inlist
     try: flat = list(itertools.chain(*inlist))
