@@ -8,8 +8,6 @@
 
 """
 
-import os
-
 class ExternalTool:
   """ an external tool encapsulates a tool that we call via commands.getoutput.
       An ExternalTool defines how the tool is checked for proper installation,
@@ -18,57 +16,31 @@ class ExternalTool:
   def pathOfExecutable ( self ):
     return self.executable_path
 
+  def absPath ( self, path ):
+    """ return the absolute path of <path>, replacing <install> with
+        the install directory """
+    if None: return None
+    import os, inspect
+    installdir=os.path.dirname (  inspect.getabsfile( self.absPath) )
+    path=path.replace("<install>",installdir)
+    path=os.path.abspath( path )
+    path=path.replace("Tools/","")
+    return path
 
-class ToolBox:
-  def __init__ ( self ):
-    self.tools={}
-
-  def add ( self, instance ):
-    """ add a tool by passing an instance to this method """
-    self.tools[instance.name]=instance
-
-  def installationOk ( self, ok, colors ):
-    import types
-    green='\033[0;32m'
-    red='\033[0;31m'
-    reset='\033[;0m'
-    if ok==True: 
-      ret="installation ok!"
-      if colors: ret="%s%s%s" % ( green, ret, reset )
-      return ret
-    ret="problem with installation"
-    if type(ok)==types.StringType: ret+=" (%s)" % ok
-    if colors: ret="%s%s%s" % ( red, ret, reset )
-    return ret
-
-  def checkInstallation ( self, colors=False ):
-    ret="The following tools are found in the Toolbox:\n"
-    for (name,instance) in self.tools.items():
-      ok=instance.checkInstallation()
-      ret+= "%-12s [%10s]:  %s\n" % ( name, instance.pathOfExecutable(), self.installationOk ( ok, colors ) )
-    print ret
-
-  def get ( self, tool ):
-    """ get instance of tool from the toolbox """
-    if not self.tools.has_key ( tool ): 
-      print "[ToolBox] error: asking for non-existent tool ``%s''" % tool
-      return None
-    return self.tools[tool]
 
 class ExternalPythia(ExternalTool):
-  def __init__ ( self, executable_path="../pythia_lhe", test_params_path="../etc/external_lhe.test", 
-                 src_path="../pythia_src", verbose=False ):
+  def __init__ ( self, executable_path="<install>/pythia_lhe", 
+                 test_params_path="<install>/etc/external_lhe.test", 
+                 src_path="<install>/pythia_src", verbose=False ):
     """ 
       :param executable_path: location of executable, full path (pythia_lhe)
       :param test_params_path: location of the test config file, full path (external_lhe.test)
     """ 
     self.name="pythia"
-    self.executable_path=os.path.abspath(executable_path)
-    self.test_params_path=None
-    if test_params_path: self.test_params_path=os.path.abspath ( test_params_path )
-    self.src_path=None
+    self.executable_path=self.absPath ( executable_path )
+    self.test_params_path=self.absPath ( test_params_path )
+    self.src_path=self.absPath ( src_path )
     self.verbose=False
-    if src_path: self.src_path=os.path.abspath(src_path)
 
   def pathOfExecutable ( self ):
     return self.executable_path
@@ -90,6 +62,7 @@ class ExternalPythia(ExternalTool):
   def checkInstallation ( self ):
     """ checks if installation of tool looks ok by
         looking for executable and running it """
+    import os
     if not os.path.exists( self.executable_path ): return "executable ``%s'' not found" % ( self.executable_path )
     if not os.path.exists( self.test_params_path ): return "config file ``%s'' not found" % ( self.test_params_path )
     if not os.access ( self.executable_path, os.X_OK ): return "%s is not executabloe" % self.executable
@@ -110,12 +83,12 @@ class ExternalNllFast7(ExternalTool):
       :param test_params_path: location of the test config file, full path (external_lhe.test)
     """ 
     self.name="nllfast7"
-    self.executable_path=os.path.abspath(executable_path)
+    self.executable_path=self.absPath (executable_path)
     self.cd_path=cd_path
     self.test_params=test_params
     self.verbose=verbose
     self.src_path=None
-    if src_path: self.src_path=os.path.abspath(src_path)
+    if src_path: self.src_path=self.absPath(src_path)
 
   def compile ( self ):
     """ try to compile tool """
@@ -138,6 +111,7 @@ class ExternalNllFast7(ExternalTool):
   def checkInstallation ( self ):
     """ checks if installation of tool looks ok by
         looking for executable and running it """
+    import os
     if not os.path.exists( self.executable_path ): return "executable ``%s'' not found" % ( self.executable_path )
     if not os.access ( self.executable_path, os.X_OK ): return "%s is not executabloe" % self.executable
     out=self.run ( self.test_params )
@@ -148,6 +122,3 @@ class ExternalNllFast7(ExternalTool):
     return True
 
 
-toolBox=ToolBox()
-toolBox.add ( ExternalPythia( ) )
-toolBox.add ( ExternalNllFast7( ) )
