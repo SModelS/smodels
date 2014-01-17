@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
-import set_path
-
-from Tools import ExternalTools
-
-ExternalTools.toolBox.checkInstallation(colors=True )
+if __name__ == "__main__":
+  import set_path, argparse, types
+  from Tools import ToolBox
+  argparser = argparse.ArgumentParser(description='simple script to check if the tools are installed and compiled')
+  ToolBox.toolBox.checkInstallation(colors=True )
