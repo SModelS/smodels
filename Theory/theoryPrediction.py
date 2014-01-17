@@ -8,11 +8,12 @@
         
 """
 
-import copy, time,sys
+import copy
 import clusterTools
 import crossSection, element, analysis
 import logging
-from auxiliaryFunctions import elementsInStr, Csim, Cgtr
+from ParticleNames import elementsInStr
+from auxiliaryFunctions import Csim, Cgtr
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -55,9 +56,6 @@ def getElementsFrom(SMSTopList,Analysis):
     
     elements = []
     for el in SMSTopList.getElements():
-        if el.getParticles() == [[['b','b']],[['b','b']]]:
-            print 'in=',el.getParticles(),el.getMasses()    
-
         eff = Analysis.getEfficiencyFor(el)
         if eff == 0.: continue
         element = el.copy()
@@ -65,10 +63,6 @@ def getElementsFrom(SMSTopList,Analysis):
         for xsec in el.weight:
             if xsec.info.sqrts == Analysis.sqrts: element.weight.add(copy.deepcopy(xsec*eff))
         if len(element.weight) > 0: elements.append(element)
-
-    for el in elements:
-        if el.getParticles() != [[['b','b']],[['b','b']]]: continue
-        print 'out=',el.getParticles(),el.getMasses()    
             
     return elements
 

@@ -8,11 +8,9 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
     
 """
-from ParticleNames import PtcDic, Reven, simParticles
-from auxiliaryFunctions import elementsInStr
+from ParticleNames import PtcDic, Reven, simParticles, elementsInStr
 from branch import Branch
 import crossSection
-import copy
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -45,7 +43,7 @@ class Element(object):
                     self.branches = []
                     for branch in branches: self.branches.append(Branch(branch))
             elif type(info) == type([]) and type(info[0]) == type(Branch()): #Creates element from branch pair
-                for ib,branch in enumerate(info): self.branches[ib] = copy.deepcopy(branch) 
+                for ib,branch in enumerate(info): self.branches[ib] = branch.copy() 
 
 
     def __eq__ (self, other):
@@ -101,10 +99,11 @@ class Element(object):
         """
         Creates a copy of itself (faster than deepcopy)
         """
-        elcopy = Element()
-        elcopy.branches = self.branches                
-        elcopy.weight.combineWith(self.weight)
-        return elcopy
+        newel = Element()
+        newel.branches = []
+        for branch in self.branches: newel.branches.append(branch.copy())                
+        newel.weight = self.weight.copy()
+        return newel
     
     def setMasses(self,mass,same_order=True,oppos_order=False):
         """
@@ -123,9 +122,11 @@ class Element(object):
         else:
             logger.error('[Element.setMasses]: called with no possible ordering!')
             return False
-        
-        self.branches[0].masses = copy.deepcopy(newmass[0])
-        self.branches[1].masses = copy.deepcopy(newmass[1])
+        if len(newmass) != len(self.branches):
+            logger.error('[Element.setMasses]: called with wrong number of mass branches!')
+            return False
+               
+        for i,mass in enumerate(newmass): self.branches[i].masses = mass[:]
 
     def switchBranches(self):
         """ If the element contains a pair of branches, switches them"""
@@ -230,7 +231,7 @@ class Element(object):
 
 
         added = True
-        newElements = [copy.deepcopy(self)]        
+        newElements = [self.copy()]   
 #Keep compressing the new topologies generated so far until no new compressions can happen:
         while added:
             added = False
@@ -259,7 +260,7 @@ class Element(object):
         """ if two masses in this topology are degenerate, returns a compressed copy of the element. If no compression is
         possible, return None. """
         
-        newelement = copy.deepcopy(self)
+        newelement = self.copy()
         vertnumb = self.getEinfo()["vertnumb"]
         if max(vertnumb) < 2: return None   #Nothing to be compressed           
 #Loop over branches
@@ -281,7 +282,7 @@ class Element(object):
         possible, return None. """
         
         
-        newelement = copy.deepcopy(self)        
+        newelement = self.copy()        
         vertnumb = self.getEinfo()["vertnumb"]
         if max(vertnumb) < 2: return None   #Nothing to be compressed        
 #Loop over branches

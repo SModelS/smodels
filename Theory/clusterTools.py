@@ -223,7 +223,6 @@ def doCluster(elements,Analysis,maxDist):
     #Transform index clusters to element clusters:
     clusterList = []
     for indexCluster in finalClusters:
-        print indexCluster.indices
         cluster = ElementCluster()
         for iel in indexCluster: cluster.elements.append(elements[iel])
         clusterList.append(cluster)

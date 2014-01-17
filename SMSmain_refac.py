@@ -55,7 +55,7 @@ print "Number of Global topologies = ",len(SMSTopList)
 print(EvTop_table)
 print "Total Number of Elements = ",eltot
 print "Total weight = ",SMSTopList.getTotalWeight()
-print(EvElement_table)
+# print(EvElement_table)
 
 print '\n \n \n'
 print 'slhaDecomposer done in',time.time()-t1,'s'

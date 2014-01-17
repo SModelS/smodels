@@ -8,6 +8,12 @@
 
 """
 
+import auxiliaryFunctions
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
 #Converts pdg number to particle name according to the dictionaries Rodd
 # and Reven
 def getName(pdg):
@@ -37,6 +43,86 @@ def getPdg(name):
     for (pdg,pname) in Reven.items():
         if name==pname: return abs(pdg)
     return None
+
+def elementsInStr(instring):
+    """ Parses instring (or a list of strings) and return a list of elements (in string format) appearing in instring"""
+  
+    if type(instring) == type('st'): outstr = instring
+    elif type(instring) == type([]):
+        outstr = ""
+        for st in instring:
+            if type(st) != type('st'):
+                logger.error("[elementsInStr]: Input must be a string or a list of strings")
+                return False        
+            outstr += st    #Combines list of strings in a single string
+  
+    elements = []
+    outstr = outstr.replace(" ","").replace("'","")
+    elStr = ""
+    nc = 0
+#Parses the string and looks for matching ['s and ]'s, when the matching is complete, store element    
+    for c in outstr:
+        delta = 0
+        if c == '[':  delta = -1
+        elif c == ']': delta = 1
+        nc += delta
+        if nc != 0: elStr += c
+        if nc == 0 and delta != 0:
+            elements.append(elStr+c)
+            elStr = ""
+            #Syntax checks:
+            ptclist = elements[-1].replace(']',',').replace('[',',').split(',')
+            for ptc in ptclist:
+                if not ptc: continue
+                if not ptc in Reven.values() and not PtcDic.has_key(ptc):
+                    logger.error("[elementsInStr]: Unknown particle "+ptc)
+                    return False
+
+#Check if there are not unmatched ['s and/or ]'s in the string:        
+    if nc != 0:
+        logger.error("[elementsInStr]: wrong input (incomplete elements?) "+instring)
+        return False     
+      
+    return elements
+ 
+# def simParticles(ptype1,ptype2,useDict=True):
+#     """ Compares 2 particle names or 2 nested name arrays. \
+#         Allows for dictionary labels
+#         (Ex: L = l, l+ = l, l = l-,...) 
+#         For the last nested level ignore particle ordering 
+#             FIXME nesting? 
+# 
+#         :param ptype1: first (nested) list of particle names, e.g. ['l','jet']
+#         :param ptype2: second (nested) list of particle names
+# 
+#         :param useDict: use the translation dictionary, i.e. allow e to stand for e+ or e-, l+ to stand for e+ or mu+, etc
+# 
+#         :returns: boolean
+#     """
+#        
+#     if ptype1 == ptype2: return True
+#     if type(ptype1) != type(ptype2): return False
+#     if type(ptype1) == type(str()):
+#         ptype1v = [ptype1]
+#         ptype2v = [ptype2]
+#  
+#     dims1, dims2 = [],[]
+#     ptcs1 = auxiliaryFunctions.flattenList(ptype1v,dims1)
+#     ptcs2 = auxiliaryFunctions.flattenList(ptype2v,dims2)
+#     if dims1 != dims2: return False
+#     if ptcs1 == ptcs2: return True
+#     elif not useDict: return False
+# #Check dictionaries to see if particles are similar:
+#     for ip,ptc1 in enumerate(ptcs1):
+#         ptc2 = ptcs2[ip]
+#         if PtcDic.has_key(ptc1): all1 = set(PtcDic[ptc1])
+#         else: all1 = set([ptc1]) 
+#         if PtcDic.has_key(ptc2): all2 = set(PtcDic[ptc2])
+#         else: all2 = set([ptc2])
+#         if not all1.intersection(all2): return False
+#     
+#     return True
+
 
 def simParticles(ptype1,ptype2,useDict=True):
     """ Compares 2 particle names or 2 nested name arrays. \
@@ -73,11 +159,11 @@ def simParticles(ptype1,ptype2,useDict=True):
     
 #Put input in standard notation
     if type(ptype1) == type("str"):
-        ptype1v = copy.deepcopy([[[ptype1]],[[ptype1]]])
-        ptype2v = copy.deepcopy([[[ptype2]],[[ptype2]]])
+        ptype1v = [[[ptype1]],[[ptype1]]]
+        ptype2v = [[[ptype2]],[[ptype2]]]
     else:
-        ptype1v = copy.deepcopy(ptype1)
-        ptype2v = copy.deepcopy(ptype2)
+        ptype1v = ptype1[:]
+        ptype2v = ptype2[:]
 
     for ibr,br in enumerate(ptype1v): #Loop through branches
         for iv,vt in enumerate(br): #Loop over vertices    
