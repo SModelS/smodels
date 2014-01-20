@@ -16,12 +16,19 @@ class ExternalTool:
   def pathOfExecutable ( self ):
     return self.executable_path
 
+  def basePath ( self ):
+    """ get the base install path """
+    import os, inspect
+    base=os.path.dirname (  inspect.getabsfile( self.basePath) )
+    return base
+ 
+
   def absPath ( self, path ):
     """ return the absolute path of <path>, replacing <install> with
         the install directory """
     if None: return None
-    import os, inspect
-    installdir=os.path.dirname (  inspect.getabsfile( self.absPath) )
+    import os
+    installdir=self.basePath()
     path=path.replace("<install>",installdir)
     path=os.path.abspath( path )
     path=path.replace("Tools/","")
@@ -50,14 +57,26 @@ class ExternalPythia(ExternalTool):
       :params cfg_file: config file used
       :returns: stdout and stderr, or error message
     """
+    import os, commands
     cfg=os.path.abspath ( cfg_file )
     if not os.path.exists( cfg ): 
       return "config file ``%s'' not found" % ( cfg )
-    import commands
     cmd="%s < %s" % ( self.executable_path, cfg_file )
     Out=commands.getoutput ( cmd )
     out=Out.split("\n")
     return out
+
+  def compile ( self ):
+     """ compile pythia_lhe """
+     print "[ExternalPythia] trying to compile pythia:"
+     cmd="cd %s; make" % self.src_path
+     import commands
+     out=commands.getoutput ( cmd )
+     print out
+
+  def fetch ( self ):
+    """ fetch and unpack tarball """
+    print "[ExternalPythia] automatic fetching not implemented. See http://smodels.hephy.at/externaltools/pythia/"
 
   def checkInstallation ( self ):
     """ checks if installation of tool looks ok by
@@ -75,16 +94,16 @@ class ExternalPythia(ExternalTool):
     return True
 
 class ExternalNllFast7(ExternalTool):
-  def __init__ ( self, executable_path="../nllfast/nllfast-1.2/nllfast_7TeV", 
-                 cd_path="../nllfast/nllfast-1.2/",
-                 test_params="gg cteq 500 600", src_path="../nllfast/nllfast-1.2/", verbose=False ):
+  def __init__ ( self, executable_path="<install>/nllfast/nllfast-1.2/nllfast_7TeV", 
+                 cd_path="<install>/nllfast/nllfast-1.2/",
+                 test_params="gg cteq 500 600", src_path="<install>/nllfast/nllfast-1.2/", verbose=False ):
     """ 
       :param executable_path: location of executable, full path (pythia_lhe)
       :param test_params_path: location of the test config file, full path (external_lhe.test)
     """ 
     self.name="nllfast7"
     self.executable_path=self.absPath (executable_path)
-    self.cd_path=cd_path
+    self.cd_path=self.absPath(cd_path)
     self.test_params=test_params
     self.verbose=verbose
     self.src_path=None
@@ -92,18 +111,25 @@ class ExternalNllFast7(ExternalTool):
 
   def compile ( self ):
     """ try to compile tool """
+    print "[ExternalNllfast7] trying to compile nllfast7:"
     cmd="cd %s; make" % self.src_path
     import commands
     out=commands.getoutput ( cmd )
-    return out
+    print out
+    return True
+  
+  def fetch ( self ):
+    """ fetch and unpack tarball """
+    print "[ExternalPythia] automatic fetching not implemented. See http://smodels.hephy.at/externaltools/nllfast-1.2/"
 
   def run ( self, params ):
-    """ run pythia
+    """ run nllfast7
       :params cfg_file: config file used
       :returns: stdout and stderr, or error message
     """
     import commands
     cmd="cd %s; %s %s" % ( self.cd_path, self.executable_path, params )
+    # print "cmd=",cmd
     Out=commands.getoutput ( cmd )
     out=Out.split("\n")
     return out
