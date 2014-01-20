@@ -18,9 +18,10 @@ class ToolBox:
 
   def initSingleton ( self ):
     """ intialise singleton instance (done only once for the entire class) """
-    from ExternalTools import ExternalPythia, ExternalNllFast7
+    from ExternalTools import ExternalPythia, ExternalNllFast7, ExternalNllFast8 
     self.add ( ExternalPythia( ) )
     self.add ( ExternalNllFast7( ) )
+    self.add ( ExternalNllFast8( ) )
 
   def add ( self, instance ):
     """ add a tool by passing an instance to this method """
@@ -44,17 +45,25 @@ class ToolBox:
     if colors: ret="%s%s%s" % ( red, ret, reset )
     return ret
 
-  def checkInstallation ( self, colors=True ):
+  def checkInstallation ( self, colors=True, make=False ):
     ret="The following tools are found in the Toolbox:\n"
+    has_made=False
     for (name,instance) in self.tools.items():
       ok=instance.checkInstallation()
       ret+= "%-12s [%10s]:  %s\n" % ( name, instance.pathOfExecutable(), self.installationOk ( ok, colors ) )
+      if ok!=True and make: 
+        has_made=True
+        instance.compile()
+    if make and has_made:
+      ret+="Check again:\n"
+      ret+=self.checkInstallation ( self, colors, make=False )
     print ret
 
   def compile ( self ):
+    print "compile all:",self.tools
     for (name,instance) in self.tools.items():
       install_ok=instance.checkInstallation()
-      if install_ok: continue
+      if install_ok==True: continue
       print "[ToolBox] installation of",name,"not correct. Trying to compile."
       ok=instance.compile()
 
@@ -72,5 +81,5 @@ if __name__ == "__main__":
   argparser.add_argument('-m','--make',help='compile packages if needed', action='store_true')
   args=argparser.parse_args()
   tmp=ToolBox()
-  tmp.compile()
+  if args.make: tmp.compile()
   tmp.checkInstallation(colors=not args.nocolors )
