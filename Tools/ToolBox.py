@@ -2,19 +2,33 @@
 
 """
 .. module:: ToolBox
-    :synopsis: A singleton class that keeps track of all external tools
+    :synopsis: A singleton-like class that keeps track of all external tools
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
 
 class ToolBox:
+  __shared_state = { "tools":{} }
   def __init__ ( self ):
-    self.tools={}
+    # a shared state.
+    # print "len",len( self.__shared_state["tools"] )
+    self.__dict__ = self.__shared_state # instead of making this a singleton, we introduce
+    if len( self.__shared_state["tools"] )==0: self.initSingleton()
+
+  def initSingleton ( self ):
+    """ intialise singleton instance (done only once for the entire class) """
+    from ExternalTools import ExternalPythia, ExternalNllFast7
+    self.add ( ExternalPythia( ) )
+    self.add ( ExternalNllFast7( ) )
 
   def add ( self, instance ):
     """ add a tool by passing an instance to this method """
     self.tools[instance.name]=instance
+
+  def listOfTools ( self ):
+    """ returns a simple list with the tool names """
+    return self.tools.keys()
 
   def installationOk ( self, ok, colors ):
     import types
@@ -30,7 +44,7 @@ class ToolBox:
     if colors: ret="%s%s%s" % ( red, ret, reset )
     return ret
 
-  def checkInstallation ( self, colors=False ):
+  def checkInstallation ( self, colors=True ):
     ret="The following tools are found in the Toolbox:\n"
     for (name,instance) in self.tools.items():
       ok=instance.checkInstallation()
@@ -51,18 +65,12 @@ class ToolBox:
       return None
     return self.tools[tool]
 
-from ExternalTools import ExternalPythia, ExternalNllFast7
-
-toolBox=ToolBox()
-
-toolBox.add ( ExternalPythia( ) )
-toolBox.add ( ExternalNllFast7( ) )
-
 if __name__ == "__main__":
   import argparse, types
   argparser = argparse.ArgumentParser(description='simple script to check if the tools are installed and compiled')
-  argparser.add_argument('-c','--colors',help='colorful output', action='store_true')
+  argparser.add_argument('-n','--nocolors',help='turn off colors', action='store_true')
   argparser.add_argument('-m','--make',help='compile packages if needed', action='store_true')
   args=argparser.parse_args()
-  toolBox.compile()
-  toolBox.checkInstallation(colors=args.colors )
+  tmp=ToolBox()
+  tmp.compile()
+  tmp.checkInstallation(colors=not args.nocolors )
