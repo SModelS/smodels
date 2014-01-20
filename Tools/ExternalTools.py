@@ -66,6 +66,13 @@ class ExternalPythia(ExternalTool):
     out=Out.split("\n")
     return out
 
+
+  def clean ( self ):
+    """ remote fort.61 and fort.68 """
+    import os
+    for File in [ "fort.61", "fort.68" ]:
+      if os.path.exists ( File ): os.unlink ( File )
+
   def compile ( self ):
      """ compile pythia_lhe """
      print "[ExternalPythia] trying to compile pythia:"
@@ -91,6 +98,7 @@ class ExternalPythia(ExternalTool):
     for (nr, line) in lines.items():
       if out[nr].find(line)==-1:
         return "Something is wrong with the setup: "+str(out)
+    self.clean()
     return True
 
 class ExternalNllFast7(ExternalTool):
@@ -122,9 +130,17 @@ class ExternalNllFast7(ExternalTool):
     """ fetch and unpack tarball """
     print "[ExternalPythia] automatic fetching not implemented. See http://smodels.hephy.at/externaltools/nllfast-1.2/"
 
+
+  def unlink ( self, File ): 
+    """ remove File.out """
+    import os
+    Fname="%s/%s.out" % ( self.cd_path, File )
+    if os.path.exists ( Fname ):
+      os.unlink ( Fname )
+
   def run ( self, params ):
     """ run nllfast7
-      :params cfg_file: config file used
+      :params params: parameters used (e.g. gg cteq5 .... ) FIXME could have a fancier interface
       :returns: stdout and stderr, or error message
     """
     import commands
@@ -145,6 +161,7 @@ class ExternalNllFast7(ExternalTool):
     for (nr, line) in lines.items():
       if out[nr].find(line)==-1:
         return "Something is wrong with the setup: "+str(out)
+    self.unlink ( "gg" )
     return True
 
 
