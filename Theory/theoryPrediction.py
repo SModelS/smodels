@@ -8,11 +8,12 @@
         
 """
 
-import copy,time
+import copy
 import clusterTools
-import crossSection, analysis, element
+import crossSection, element, analysis
 import logging
-from auxiliaryFunctions import elementsInStr, Csim, Cgtr
+from ParticleNames import elementsInStr
+from auxiliaryFunctions import Csim, Cgtr
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -30,14 +31,11 @@ def theoryPredictionFor(Analysis,SMSTopList,maxMassDist=0.2):
     """Main method to compute theory predictions. Collects the elements and efficiencies, combine the masses
     (if needed) and compute the conditions (if any). Returns a list of TheoryPrediction objects"""
 
-    
-    print 'Starting prediction for',Analysis.label,'at',time.strftime("%a, %d %b %Y %H:%M:%S",time.localtime())
-#Select elements constrained by analysis and apply efficiencies                        
-    elements = getElementsFrom(SMSTopList,Analysis)
-    if len(elements) == 0: return None  
+#Select elements constrained by analysis and apply efficiencies                       
+    elements = getElementsFrom(SMSTopList,Analysis)   
+    if len(elements) == 0: return None      
 #Combine masses
-    print 'Starting cluster at',time.strftime("%a, %d %b %Y %H:%M:%S",time.localtime())
-    clusters = combineElements(elements,Analysis,maxDist=maxMassDist)
+    clusters = combineElements(elements,Analysis,maxDist=maxMassDist)    
 #Collect results and evaluate conditions:
     predictions = []
     for cluster in clusters:
@@ -46,7 +44,8 @@ def theoryPredictionFor(Analysis,SMSTopList,maxMassDist=0.2):
         theoPrediction.conditions = evalConditions(cluster,Analysis)
         theoPrediction.mass = cluster.getAvgMass()
         predictions.append(theoPrediction)
-        
+
+    if len(predictions) == 0: return None
     return predictions
 
 
@@ -62,8 +61,8 @@ def getElementsFrom(SMSTopList,Analysis):
         element = el.copy()
         element.weight = crossSection.XSectionList()
         for xsec in el.weight:
-            if xsec.info.sqrts == Analysis.sqrts: element.weight.XSections.append(copy.deepcopy(xsec))
-        elements.append(element)
+            if xsec.info.sqrts == Analysis.sqrts: element.weight.add(copy.deepcopy(xsec*eff))
+        if len(element.weight) > 0: elements.append(element)
             
     return elements
 
@@ -78,6 +77,7 @@ def combineElements(elements,Analysis,maxDist):
         clusters = clusterTools.clusterElements(elements,Analysis,maxDist)
     return clusters
 
+
 def evalConditions(cluster,Analysis):
     """If analysis type = upper limit, evaluates the analysis conditions inside an element cluster.
     If  analysis type = signal region, returns None"""
@@ -91,11 +91,11 @@ def evalConditions(cluster,Analysis):
             condElements = [element.Element(el_str) for el_str in elementsInStr(cond)]  #Get elements appearing in conditions            
             newcond = cond
             for iel,el in enumerate(condElements):
-                el.weight = crossSection.XSectionList()
-                newcond = newcond.replace(str(el),"Elweight["+str(iel)+"].weight")
-            for el1 in cluster.elements:
-                for el2 in condElements:
-                    if el1.particlesMatch(el2): el2.weight.combineWith(el1.weight)
+                newcond = newcond.replace(str(el),"condElements["+str(iel)+"].weight")
+                for el1 in cluster.elements:   
+                    if el1.particlesMatch(el):                        
+                        el.weight.combineWith(el1.weight)
+                   
             conditions[cond] = eval(newcond)
             
         return conditions

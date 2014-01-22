@@ -8,32 +8,40 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
         
 """
-from ParticleNames import PtcDic, Reven, simParticles
+from ParticleNames import PtcDic, Reven, simParticles, elementsInStr
 from Tools.PhysicsUnits import addunit
-import copy
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class Branch(object):
     """ A branch """
 
-    def __init__( self, S=None ):
+    def __init__( self, info=None ):
         """ A branch-element can be constructed from a string S (e.g. ('[b,b],[W]')"""
         self.masses = []
         self.particles = []
         self.momID = None
         self.daughterID = None
         self.maxWeight = None
-        if type(S)==type(""):
-            st = S.replace(" ","")
-            while "[" in st or "]" in st:
-                ptcs = st[st.find("[")+1:st.find("],[")].split(",")
-                for ptc in ptcs:
-                    if not ptc in Reven.values() and not PtcDic.has_key(ptc):
-                        print "[Branch] unknown particle:",ptc
-                        return
-                spcts=str(ptcs).replace("'","").replace(" ","")
-                st=st.replace(spcts,"",1)
-                self.particles.append ( ptcs )
-                
+        if type(info)==type(str()):
+            branch = elementsInStr(info)
+            if not branch or len(branch) > 1:
+                logging.error("[Branch()]: wrong input string "+info)
+                return False                
+            else:
+                branch = branch[0]
+                vertices = elementsInStr(branch[1:-1])
+                for vertex in vertices:
+                    ptcs = vertex[1:-1].split(',')
+                    #Syntax check:
+                    for ptc in ptcs:
+                        if not ptc in Reven.values() and not PtcDic.has_key(ptc):
+                            logger.error("[elementsInStr]: Unknown particle "+ptc)
+                            return False
+                    self.particles.append(ptcs)
+                    
+                        
     def __str__ ( self ):
         """ the canonical SModels description of the Branch. """
         st = str(self.particles).replace("'","")
@@ -52,12 +60,23 @@ class Branch(object):
         if not simParticles(self.particles,other.particles,useDict): return False
         if self.masses != other.masses: return False
         return True
+    
+    def copy(self):
+        """Generates an independent copy of itself. Faster than deepcopy."""
+        
+        newbranch = Branch()
+        newbranch.masses = self.masses[:]
+        newbranch.particles = self.particles[:]
+        newbranch.momID = self.momID
+        newbranch.daughterID = self.daughterID
+        if not self.maxWeight is None: newbranch.maxWeight = self.maxWeight.copy()
+        return newbranch     
 
     
     def addDecay(self,BR,Massdic):
         """ Generates a new branch adding a 1-step cascade decay described by the BR object, with particle masses given by Massdic"""        
         import ParticleNames
-        newBranch = copy.deepcopy(self)
+        newBranch = self.copy()
         newparticles = []
         newmass = []
         newBranch.daughterID = None

@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
-import sys
+import sys, time
 from prettytable import PrettyTable
-from Theory import slhaDecomposer, lheDecomposer, SLHATools, crossSection
+from Theory import slhaDecomposer, lheDecomposer
 from Tools.PhysicsUnits import addunit
 from Tools import SMSPrettyPrinter
 from Tools.SMSPrettyPrinter import wrap
@@ -17,15 +17,15 @@ from Theory.theoryPrediction import theoryPredictionFor
 
 listOfAnalyses = smsanalysisFactory.load()
 printer=SMSPrettyPrinter.SMSPrettyPrinter()
-slhafile = "slha/andrePT4.slha"
+slhafile = "slha/test.slha"
 lhefile = "lhe/ued_1.lhe"
 lhefile = "lhe/TChiChipmSlepL_1.lhe"
 nevts = 10000
-SLHATools.writeXSecToSLHAFile(slhafile,nevts,printLHE=False)
 DoCompress = True
 DoInvisible = True
 minmassgap = addunit(5.,'GeV')
 sigmacut = addunit(0.1,'fb')
+t1 = time.time()
 SMSTopList = slhaDecomposer.decompose(slhafile,sigmacut,DoCompress,DoInvisible,minmassgap)
 # SMSTopList = lheDecomposer.decompose(lhefile,None,None,DoCompress,DoInvisible,minmassgap)
 
@@ -36,7 +36,7 @@ eltot = 0
 totweight = []
 #Print Results:
 # for i in range(len(SMSTopList)):
-for (i,topo) in enumerate(SMSTopList):
+for i,topo in enumerate(SMSTopList):
     sumw = topo.getTotalWeight().getDictionary()
     EvTop_table.add_row([i,topo.vertnumb,topo.vertparts,len(topo.ElList),wrap(printer.pformat(sumw),width=30)])
     eltot += len(topo.ElList)
@@ -46,6 +46,7 @@ for (i,topo) in enumerate(SMSTopList):
 #Print element list for Topology[i]:  
     if i == 0:
         for j,el in enumerate(topo.ElList):
+            if el.getParticles() != [[['b','b']],[['b','b']]]: continue
             EvElement_table.add_row([i,j,el.getParticles()[0],el.getParticles()[1],wrap(printer.pformat(el.getMasses()[0]),width=25),wrap(printer.pformat(el.getMasses()[1]),width=25),wrap(printer.pformat(el.weight.getDictionary()),width=30)])
         EvElement_table.add_row(["---","---","---","---","---","---","---"])  
 
@@ -57,17 +58,21 @@ print "Total weight = ",SMSTopList.getTotalWeight()
 # print(EvElement_table)
 
 print '\n \n \n'
+print 'slhaDecomposer done in',time.time()-t1,'s'
 
- 
 for ana in listOfAnalyses:    
     preds = theoryPredictionFor(ana,SMSTopList)
     if not preds: continue
-    print ana.label,ana.conditions
+    print ana.label
     for pred in preds:
-        print pred.value
-        print pred.conditions
-        print pred.mass,'\n'
-    sys.exit()
+        print 'mass=',pred.mass
+        print 'theory prediction=',pred.value
+        print 'theory conditions:'
+        if not pred.conditions: print pred.conditions
+        else:
+            for cond in pred.conditions: print pred.conditions[cond]
+        print '\n'
+    
 
 sys.exit()
 
