@@ -79,7 +79,7 @@ class IndexCluster(object):
         """Returns the average position in upper limit space for all indices belonging to the cluster 
         using the defined method."""        
         
-        if len(list(self.indices)) == 1: return self.positionMap[self.indices[0]]
+        if len(list(self.indices)) == 1: return self.positionMap[self[0]]
         clusterMass = massAvg([self.massMap[iel] for iel in self])    
         avgPos = massPosition(clusterMass,self.analysis)
         return avgPos
@@ -257,8 +257,8 @@ def doCluster(elements,Analysis,maxDist):
     #Clean up clusters (remove redundant clusters)    
     for ic,clusterA in enumerate(finalClusters):
         for jc,clusterB in enumerate(finalClusters):
-            if ic != jc and clusterB.indices.issubset(clusterA.indices): finalClusters[jc] = None
-    while finalClusters.count(None) > 0: finalClusters.remove(None)
+            if ic != jc and clusterB.indices.issubset(clusterA.indices): finalClusters[jc] = set([])
+    while finalClusters.count(set([])) > 0: finalClusters.remove(set([]))
 
     #Transform index clusters to element clusters:
     clusterList = []
