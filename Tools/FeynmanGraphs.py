@@ -166,6 +166,7 @@ def draw ( element, filename="bla.pdf", straight=False, inparts=True, verbose=Fa
     # print "branch",ct,branch,"with",branch.vertnumb,"vertices"
     # p1 = Point(0, ct)
     lastVertex=vtx1
+    nvtx=0
     for ( nvtx,insertions) in enumerate(branch.particles):
       mark=None
       if len(insertions)>0: 
@@ -208,7 +209,7 @@ def draw ( element, filename="bla.pdf", straight=False, inparts=True, verbose=Fa
   if pdffile!=filename:
     import os
     os.system ( "convert %s %s" % ( pdffile, filename ) )
-  print "[FeynmanGraphs.py] %s created." % ( filename )
+  # print "[FeynmanGraphs.py] %s created." % ( filename )
 
 def drawBranch_ ( branch, upwards, labels, html, border, L ):
   """ draws a single branch, should only be used via .asciidraw, 
