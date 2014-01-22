@@ -15,7 +15,7 @@ import logging
 logger = logging.getLogger(__name__)
 import LHEReader
 
-class XSectionInfo:
+class XSectionInfo(object):
     """A simple class to store information about the cross-section (center of mass, order and label)"""
     def __init__ (self):
         self.sqrts = None
@@ -34,9 +34,17 @@ class XSectionInfo:
         if other.sqrts != self.sqrts: return True
         if other.order != self.order: return True
         return False
+    
+    def copy(self):
+        """Generates an independent copy of itself. Faster than deepcopy. """
+        newinfo = XSectionInfo()
+        newinfo.sqrts = self.sqrts
+        newinfo.order = self.order
+        newinfo.label = self.label[:]
+        return newinfo
 
 
-class XSection:
+class XSection(object):
     """A simple class to store the information about a single cross-section (value, paritcle ids, center of mass, order and label)
          order = 0 (LO), 1 (NLO) or 2 (NLL)."""
     def __init__ (self):
@@ -45,18 +53,21 @@ class XSection:
         self.pid = (None,None)
 
     def __mul__(self,other):
-        newXsec = copy.deepcopy(self)
+        newXsec = self.copy()
         if type(other) == type(1.):
             newXsec.value = newXsec.value*other
         else:
             print "[XSection.mul]: Xsections can only be multiplied by floats"
             return False
         return newXsec
+    
+    def __rmul__(self,other):
+        return self*other
         
     def __add__(self,other):
         if type(other) == type(XSection()):
             if self.info == other.info:
-                res = copy.deepcopy(self)
+                res = self.copy()
                 res.value += other.value
                 return res
         print "[XSection.add]: Trying to add",type(other),"to a XSection objetc"
@@ -81,14 +92,22 @@ class XSection:
         st = self.info.label+':'+str(self.value)
         return st
     
+    def copy(self):
+        """Generates an independent copy of itself. Faster than deepcopy. """
+        newXsec = XSection()
+        newXsec.info = self.info.copy()
+        newXsec.value = self.value
+        newXsec.pid = tuple(list(self.pid)[:])
+        return newXsec
+    
     def zeroXSec(self):
         """
         Replaces the cross-section value by zero
         """
-        self.values = addunit(0., 'fb')
+        self.value = addunit(0., 'fb')
 
          
-class XSectionList:
+class XSectionList(object):
     """A simple class to store a list of cross-sections to be used"""        
     
     def __init__ (self,infoList=None):
@@ -101,34 +120,61 @@ class XSectionList:
                 newentry = XSection()
                 newentry.value = addunit(0.,'fb')
                 newentry.pid = (None,None)
-                newentry.info = copy.deepcopy(info)
-                self.XSections.append(newentry)
+                newentry.info = info.copy()
+                self.add(newentry)
                 
 
     def __mul__(self,other):
-        newList = copy.deepcopy(self)
-        for ixsec,xsec in enumerate(newList.XSections): newList.XSections[ixsec] = xsec*other
+        newList = self.copy()
+        for ixsec,xsec in enumerate(newList): newList[ixsec] = xsec*other
         return newList
+    
+    def __rmul__(self,other):
+        return self*other
     
     def __iter__(self):
         return iter(self.XSections)
+    
+    def __getitem__(self,index):
+        return self.XSections[index]
+    
+    def __setitem__(self,index,xsec):
+        if type(xsec) != type(XSection()):
+            logger.error("[XSectionList.add] input object must be a XSection() object")
+            return False
+        else: self.XSections[index] = xsec
+    
+    def __len__(self):
+        return len(self.XSections)        
 
     def __str__(self):
         return str([str(xsec) for xsec in self])
+    
+    
+    def copy(self):
+        """Generates an independent copy of itself. Faster than deepcopy. """
+        newList = XSectionList()
+        for xsec in self.XSections: newList.XSections.append(xsec.copy())
+        return newList    
+    
+    def add(self,xsec):
+        """ Adds a XSection object to the list """
+        if type(xsec) != type(XSection()):
+            logger.error("[XSectionList.add] input object must be a XSection() object")
+            return False
+        else:
+            newxsec = xsec.copy()
+            self.XSections.append(newxsec)
 
 
     def getXsecsFor(self,item):
         """ Returns a list of XSection objects for item (label, pid, sqrts) """
         xsecList = XSectionList()
         for xsec in self:
-            if type(item) == type(xsec.info.label) and item == xsec.info.label:
-                xsecList.XSections.append(xsec)
-            elif type(item) == type(xsec.info.sqrts) and item == xsec.info.sqrts:    
-                xsecList.XSections.append(xsec)
-            elif type(item) == type(xsec.pid) and item == xsec.pid:    
-                xsecList.XSections.append(xsec)
-            elif type(item) == type(1) and (item in xsec.pid):
-                xsecList.XSections.append(xsec)
+            if type(item) == type(xsec.info.label) and item == xsec.info.label: xsecList.add(xsec)
+            elif type(item) == type(xsec.info.sqrts) and item == xsec.info.sqrts: xsecList.add(xsec)
+            elif type(item) == type(xsec.pid) and item == xsec.pid: xsecList.add(xsec)
+            elif type(item) == type(1) and (item in xsec.pid): xsecList.add(xsec)
 
         return xsecList
     
@@ -140,7 +186,7 @@ class XSectionList:
 
     def delete(self,XSec):
         """Deletes the cross-section entry from the list"""
-        for ixsec,xsec in enumerate(self.XSections):
+        for ixsec,xsec in enumerate(self):
             if xsec == XSec: self.XSections.pop(ixsec)
 
     def getInfo(self):
@@ -211,12 +257,11 @@ class XSectionList:
         The particle IDs are ignored when adding cross-sections. Hence they are set to (None,None) if any cross-sections are combined"""
         
         for newXsec in newList:
-            if not newXsec.info in self.getInfo():
-                self.XSections.append(newXsec)                
+            if not newXsec.info in self.getInfo(): self.add(newXsec)                
             else:    
                 for oldXsec in self:
-                    if newXsec.info == oldXsec.info:
-                        oldXsec.value = copy.deepcopy(oldXsec.value + newXsec.value)
+                    if newXsec.info == oldXsec.info:                        
+                        oldXsec.value = oldXsec.value + newXsec.value
                         oldXsec.pid = (None,None)
         
 
@@ -258,7 +303,7 @@ def getXsecFromSLHAFile(slhafile,UseXSecs=None):
         xsec.pid = pids
 #Do not add xsecs which do not match the user required ones:        
         if UseXSecs and not xsec.info in UseXSecs: continue 
-        else: XsecsInFile.XSections.append(xsec)
+        else: XsecsInFile.add(xsec)
 
     slha.close()
 
@@ -305,7 +350,7 @@ def getXsecFromLHEFile(lhefile):
         xsec.info.label = wlabel
         xsec.value = event_cs
         xsec.pid = pids
-        XsecsInFile.XSections.append(xsec)
+        XsecsInFile.add(xsec)
 
     reader.close()
 

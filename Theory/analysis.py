@@ -32,23 +32,6 @@ class ULanalysis(object):
         for el in self.elementsEff:
             if element.particlesMatch(el): return self.elementsEff[el]
         return 0.       #Return zero, if element is not found
-        
-                
-    def split(self):
-        """ if the analysis contains more than one result or plot, splits in a list of simple analyses
-        with a single result/plot. Returns a list of simple analyses. If the analysis is already
-        simple, return the a one element list with itself"""
-        
-        SplitList = []
-        for key in self.results.keys():
-            for plot in self.plots[key][1]:
-                NewAnalysis = copy.deepcopy(self)
-                NewAnalysis.label = plot + ":" + self.plots[key][0]
-                NewAnalysis.results = {key : self.results[key]}
-                NewAnalysis.plots = {key : [self.plots[key][0],[plot]]}
-                SplitList.append(NewAnalysis)
-                
-        return SplitList
     
 
 class SRanalysis(object):
