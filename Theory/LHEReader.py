@@ -26,25 +26,23 @@ class LHEReader:
         else: self.File = filename
         self.metainfo = {"nevents" : None, "totalxsec" : None, "sqrts" : None}
         
-#Get header information from file (cross-section sqrts, total cross-section, total number of events)
+#Get global information from file (cross-section sqrts, total cross-section, total number of events)
         self.File.seek(0)
-        gotAllInfo = False   
-        while not gotAllInfo:
-            line = self.File.readline()
-            if line == "": break     #Exit if reached end of file
-            if line.find("Number of Events        :") > -1:
-                nevts = int(line.split()[-1])
-                self.metainfo["nevents"] = nevts       
-            elif line.find("Integrated weight (pb)") > -1:                
-                iwght = addunit(float(line.split()[-1]),'pb')                
-                self.metainfo["totalxsec"] = iwght
-            elif line.find("<init>") > -1:
+        line = self.File.readline()
+        nevts = 0
+        while not "</LesHouchesEvents>" in line:   #Exit if reached end of file
+            if "<init>" in line:
                 line = self.File.readline()
                 self.metainfo["sqrts"] = addunit(eval(line.split()[2]) + eval(line.split()[3]),'GeV')
-            
-            gotAllInfo = True  #Check if all relevant information has been collected
-            for val in self.metainfo.values():
-                if val is None: gotAllInfo = False
+                totxsec = addunit(0.,'pb')
+                line = self.File.readline()
+                while not "</init>" in line:
+                    totxsec += addunit(eval(line.split()[0]),'pb')
+                    line = self.File.readline()                    
+                self.metainfo["totalxsec"] = totxsec
+            elif "<event>" in line: nevts += 1
+            line = self.File.readline()
+        self.metainfo["nevents"] = nevts
         
         self.File.seek(0)  #Return file to initial reader position
         
@@ -98,7 +96,7 @@ class LHEReader:
             particle.e = linep[9]
             particle.mass = linep[10]
         
-            ret.add(particle)
+            ret.append(particle)
             line = self.File.readline()  
 
         return ret

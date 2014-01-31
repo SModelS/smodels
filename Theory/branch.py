@@ -27,7 +27,7 @@ class Branch(object):
         if type(info)==type(str()):
             branch = elementsInStr(info)
             if not branch or len(branch) > 1:
-                logging.error("[Branch()]: wrong input string "+info)
+                logging.error("Wrong input string "+info)
                 return False                
             else:
                 branch = branch[0]
@@ -37,7 +37,7 @@ class Branch(object):
                     #Syntax check:
                     for ptc in ptcs:
                         if not ptc in Reven.values() and not PtcDic.has_key(ptc):
-                            logger.error("[elementsInStr]: Unknown particle "+ptc)
+                            logger.error("Unknown particle "+ptc)
                             return False
                     self.particles.append(ptcs)
                     

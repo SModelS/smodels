@@ -115,7 +115,7 @@ class Topology(object):
         info = newelement.getEinfo()
         info_b = newelement.switchBranches().getEinfo()
         if info != self.getTinfo() and info_b != self.getTinfo():
-            logger.warning('[Topology.addElement] : element to be added does not match topology')
+            logger.warning('Element to be added does not match topology')
             return False
         
               
