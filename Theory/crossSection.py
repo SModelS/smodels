@@ -10,7 +10,6 @@
 """
 
 from Tools.PhysicsUnits import addunit, rmvunit
-import copy
 import logging
 logger = logging.getLogger(__name__)
 import LHEReader

@@ -1,5 +1,5 @@
 import crossSection
-import logging,time,sys
+import logging
 from auxiliaryFunctions import massAvg, massPosition, distance
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -24,9 +24,8 @@ class ElementCluster(object):
         for el in self.elements: totxsec.combineWith(el.weight)
         return totxsec
     
-    def getAvgMass(self,method='harmonic'):
-        """Returns the average mass of all elements belonging to the cluster using the defined method.
-         :param method: the method employed: "harmonic" = harmonic means, "mean" = algebaric (standard) mean
+    def getAvgMass(self):
+        """Returns the average mass of all elements belonging to the cluster.
          :returns: the average mass """
         
         massList = [el.getMasses() for el in self.elements]                
@@ -78,9 +77,8 @@ class IndexCluster(object):
         self.avgPosition = self.getAvgPosition()
         
     
-    def getAvgPosition(self,method='harmonic'):
-        """Returns the average position in upper limit space for all indices belonging to the cluster 
-        using the defined method."""        
+    def getAvgPosition(self):
+        """Returns the average position in upper limit space for all indices belonging to the cluster."""        
         
         if len(list(self.indices)) == 1: return self.positionMap[self[0]]
         clusterMass = massAvg([self.massMap[iel] for iel in self])    
@@ -153,10 +151,8 @@ def clusterElements(elements,Analysis,maxDist):
 #Get the list of elements with good masses (with the masses replaced by their 'good' value):
     goodElements = getGoodElements(elements,Analysis,maxDist)
     if len(goodElements) == 0: return []    
-#ElementCluster elements by their mass: 
-    t1 = time.time()   
+#ElementCluster elements by their mass:  
     clusters = doCluster(goodElements,Analysis,maxDist)
-    print 'doCluster done in',time.time()-t1,'s'
     return clusters
 
 

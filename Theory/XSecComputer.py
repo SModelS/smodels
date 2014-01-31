@@ -140,7 +140,7 @@ def compute(nevts,slhafile,rpythia = True, basedir=None,datadir=None, XsecsInfo=
 #Compute LO cross-sections:
   for isqrts,sqrts in enumerate(Allsqrts):
     if rpythia:
-      D = runPythia( slhafile,nevts,rmvunit(sqrts,'TeV'),datadir=datadir,etcdir=etcdir,installdir=installdir,printLHE=printLHE)
+      D = runPythia( slhafile,nevts,rmvunit(sqrts,'TeV'),datadir=datadir,etcdir=etcdir,basedir=installdir,printLHE=printLHE)
       if lhefiles[isqrts]:
         shutil.copy2("%s/fort.68" % datadir, lhefiles[isqrts])   #Use file on disk as event file (here lhefiles is a string)
       else:
@@ -231,14 +231,14 @@ def getprodcs(pdgm1, pdgm2, sigma):
   return sigma
 
 def runPythia ( slhafile, n, sqrts=7, datadir="./data/", etcdir="./etc/",
-                installdir="./", printLHE=True ):
+                basedir="./", printLHE=True ):
   """ run pythia_lhe with n events, at sqrt(s)=sqrts.
 
     :param slhafile: inputfile
     :type slhafile: str
     :param datadir: directory where this all should run
     :param etcdir: is where external_lhe.template is to be picked up
-    :param installdir: is where pythia_lhe is to be found.
+    :param basedir: is where pythia_lhe is to be found.
     :param printLHE: choose if LHE event file is written to disk or not. If False, returns the events as a string with key LHEevents
   """
   logfile = open('out.dat','w')  
@@ -259,7 +259,7 @@ def runPythia ( slhafile, n, sqrts=7, datadir="./data/", etcdir="./etc/",
   if not os.path.isdir( datadir ):
     print "[XSecComputer.py] error: %s does not exist or is not a directory." % datadir
     sys.exit(0)
-  executable="%s/pythia_lhe" % installdir
+  executable="%s/pythia_lhe" % basedir
   if not os.path.isfile ( executable ) or not os.access(executable,os.X_OK):
     print "[XSecComputer.py] error: %s does not exist." % executable
     sys.exit(0)
