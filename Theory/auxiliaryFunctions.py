@@ -63,7 +63,7 @@ def massAvg(massList,method='harmonic'):
     
     for mass in massList:
         if len(mass) != len(massList[0]) or len(mass[0]) != len(massList[0][0]) or len(mass[1]) != len(massList[0][1]):  
-            logger.error('[massAvg]: mass shape mismatch in mass list:\n'+str(mass)+' and '+str(massList[0]))
+            logger.error('Mass shape mismatch in mass list:\n'+str(mass)+' and '+str(massList[0]))
             return False
     
     avgmass = massList[0][:]
@@ -84,7 +84,7 @@ def Csim(*weights):
     
     for weight in weights:
         if type(weight) != type(crossSection.XSectionList()):
-            logger.error("[Csim]: Trying to evaluate non-xsection objects")
+            logger.error("Trying to evaluate non-xsection objects")
             return False
 
 #Make sure both xsec lists have the same entries (add zero xsecs for the missing entries)
@@ -119,7 +119,7 @@ def Cgtr(weightA,weightB):
     Returns a XSectioList object with the values for each label"""
     
     if type(weightA) != type(crossSection.XSectionList()) or type(weightB) != type(crossSection.XSectionList()):
-        logger.error("[Cgtr]: Trying to evaluate non-xsection objects")
+        logger.error("Trying to evaluate non-xsection objects")
         return False
 
 #Make sure both xsec lists have the same entries (add zero xsecs for the missing entries)   

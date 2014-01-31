@@ -31,7 +31,7 @@ def decompose(lhefile,inputXsecs=None,nevts=None,DoCompress=False,DoInvisible=Fa
     reader = LHEReader.LHEReader(lhefile,nevts)
     SMSTopList=topology.TopologyList ( )
 #get cross-section from file (= event weight, assuming a common weight for all events)
-    if not inputXsecs:  XSectionList = crossSection.getXsecFromLHEFile(lhefile)
+    if not inputXsecs:  XSectionList = crossSection.getXsecFromLHEFile(lhefile,addEvents=False)
     else: XSectionList = inputXsecs
 
 #Loop over events and decompose 
@@ -59,7 +59,7 @@ def elementFromEvent(Event,weight):
     """
 
     if not Event.particles:
-        logger.error('[lheDecomposer]: Empty event!')
+        logger.error('Empty event!')
         return None
           
 #Get simple BR and Mass dictionaries for each branch
@@ -79,7 +79,7 @@ def elementFromEvent(Event,weight):
     finalBranchList = branch.decayBranches(branchList,BRdic,Massdic,sigcut=addunit(0.,'fb'))     
     
     if len(finalBranchList) != 2:
-        logger.error("[lheDecomposer]: "+str(len(finalBranchList))+" branches found in event. R-parity violation?")
+        logger.error(str(len(finalBranchList))+" branches found in event. R-parity violation?")
         return False
 #Finally create element from Event:
     newElement = element.Element(finalBranchList)
@@ -105,7 +105,7 @@ def getDictionariesFromEvent(Event):
         if particle.status == -1: continue  #Ignore initial state particles
         if Event.particles[particle.moms[0]].status == -1: continue #Ignore initial mothers
         if particle.moms[0] != particle.moms[1] and min(particle.moms) != 0:
-            logger.error("[lheDecomposer]: More than one parent particle found!")
+            logger.error("More than one parent particle found!")
             return False        
         mom_pdg = Event.particles[max(particle.moms)-1].pdg
         if mom_pdg in ParticleNames.Reven: continue   # Ignore R-even decays

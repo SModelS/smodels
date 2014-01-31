@@ -32,13 +32,13 @@ class Element(object):
             if type(info) == type(str()):   #Creates element from particle string
                 elements = elementsInStr(info)
                 if not elements or len(elements) > 1:
-                    logging.error("[Element()]: wrong input string "+info)
+                    logging.error("Wrong input string "+info)
                     return False                
                 else:
                     el = elements[0]
                     branches = elementsInStr(el[1:-1])
                     if not branches or len(branches) != 2:
-                        logging.error("[Element()]: wrong input string "+info)
+                        logging.error("Wrong input string "+info)
                         return False 
                     self.branches = []
                     for branch in branches: self.branches.append(Branch(branch))
@@ -120,10 +120,10 @@ class Element(object):
         elif oppos_order:
             newmass = [mass[1],mass[0]]
         else:
-            logger.error('[Element.setMasses]: called with no possible ordering!')
+            logger.error('Called with no possible ordering!')
             return False
         if len(newmass) != len(self.branches):
-            logger.error('[Element.setMasses]: called with wrong number of mass branches!')
+            logger.error('Called with wrong number of mass branches!')
             return False
                
         for i,mass in enumerate(newmass): self.branches[i].masses = mass[:]
@@ -216,11 +216,11 @@ class Element(object):
         for ib,branch in enumerate(self.branches):            
             for iv,vertex in enumerate(branch.particles):
                 if len(vertex) != info['vertparts'][ib][iv]:
-                    logger.error("[Element.checkConsistency]: Wrong syntax")
+                    logger.error("Wrong syntax")
                     return False
                 for ptc in vertex:
                     if not ptc in Reven.values() and not PtcDic.has_key(ptc):
-                        logger.error("[Element.checkConsistency]: unknown particle"+ptc)
+                        logger.error("Unknown particle"+ptc)
                         return False
         return True    
     
@@ -320,7 +320,7 @@ def smallerMass(mass1,mass2):
     except:
         pass
     
-    logger.error('[smallerMasses]: invalid input')
+    logger.error('Invalid input')
     return False
         
         

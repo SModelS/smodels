@@ -139,7 +139,7 @@ class XSectionList(object):
     
     def __setitem__(self,index,xsec):
         if type(xsec) != type(XSection()):
-            logger.error("[XSectionList.add] input object must be a XSection() object")
+            logger.error("Input object must be a XSection() object")
             return False
         else: self.XSections[index] = xsec
     
@@ -156,14 +156,27 @@ class XSectionList(object):
         for xsec in self.XSections: newList.XSections.append(xsec.copy())
         return newList    
     
-    def add(self,xsec):
-        """ Adds a XSection object to the list """
-        if type(xsec) != type(XSection()):
-            logger.error("[XSectionList.add] input object must be a XSection() object")
+    def add(self,newxsec):
+        """ Append a XSection object to the list """
+        if type(newxsec) != type(XSection()):
+            logger.error("Input object must be a XSection() object")
             return False
         else:
-            newxsec = xsec.copy()
-            self.XSections.append(newxsec)
+            self.XSections.append(newxsec.copy())
+            
+    def addValue(self,newxsec):
+        """ Adds a XSection object to the list. If the XSection object already exists, add to its values,
+        otherwise append the object."""
+        if type(newxsec) != type(XSection()):
+            logger.error("Input object must be a XSection() object")
+            return False
+        else:
+            exists = False
+            for iXSec,XSec in enumerate(self.XSections):
+                if XSec.info == newxsec.info and XSec.pid == newxsec.pid:
+                    self.XSections[iXSec].value = XSec.value + newxsec.value
+                    break
+            if not exists: self.add(newxsec)    
 
 
     def getXsecsFor(self,item):
@@ -250,11 +263,13 @@ class XSectionList(object):
 
         return XsecDic
     
-    def combineWith(self,newList):
+    def combineWith(self,newXsecs):
         """ Adds a new list of cross-sections. If the new cross-sections already appear (have same order and sqrts), add its
         value to the original value, otherwise append it to the list.
         The particle IDs are ignored when adding cross-sections. Hence they are set to (None,None) if any cross-sections are combined"""
         
+        newList = newXsecs
+        if type(newXsecs) == type(XSection()): newList = [newXsecs]
         for newXsec in newList:
             if not newXsec.info in self.getInfo(): self.add(newXsec)                
             else:    
@@ -309,9 +324,11 @@ def getXsecFromSLHAFile(slhafile,UseXSecs=None):
     return XsecsInFile
 
 
-def getXsecFromLHEFile(lhefile):
+def getXsecFromLHEFile(lhefile,addEvents=True):
     """ obtain cross-sections from input LHE file. 
-        :param lhefile: LHE input file with unweighted MC events        
+        :param lhefile: LHE input file with unweighted MC events
+        :param addEvents: if True, add cross-sections with the same mothers, otherwise
+        return the event weight for each pair of mothers
         :returns: a XSectionList object     
     """                       
 
@@ -348,8 +365,9 @@ def getXsecFromLHEFile(lhefile):
         elif xsec.info.order == 2: wlabel += ' (NLL)'
         xsec.info.label = wlabel
         xsec.value = event_cs
-        xsec.pid = pids
-        XsecsInFile.add(xsec)
+        xsec.pid = sorted(pids)
+        if addEvents: XsecsInFile.addValue(xsec)
+        else: XsecsInFile.add(xsec)
 
     reader.close()
 

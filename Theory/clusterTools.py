@@ -93,7 +93,7 @@ class IndexCluster(object):
         if type(obj) == type(int()) and obj >= 0 and obj < len(self.positionMap): pos = self.positionMap[obj]
         elif type(obj) == type(float()): pos = obj
         else:
-            logging.error("[getDistanceTo]: Unknown object type (must be an element index or position)")
+            logging.error("Unknown object type (must be an element index or position)")
             return False
         
         for jel in self: dmax = max(dmax,distance(pos,self.positionMap[jel]))
@@ -199,7 +199,7 @@ def doCluster(elements,Analysis,maxDist):
 
         clusterList = newClusters
         if len(clusterList) > 100:  #Check for oversized list of indexCluster (too time consuming)
-            logger.warning("[clusterElements] ElementCluster failed, using unclustered masses")
+            logger.warning("ElementCluster failed, using unclustered masses")
             finalClusters = []  
             clusterList = []
             

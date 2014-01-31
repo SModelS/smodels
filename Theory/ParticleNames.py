@@ -71,7 +71,7 @@ def elementsInStr(instring):
         outstr = ""
         for st in instring:
             if type(st) != type('st'):
-                logger.error("[elementsInStr]: Input must be a string or a list of strings")
+                logger.error("Input must be a string or a list of strings")
                 return False        
             outstr += st    #Combines list of strings in a single string
   
@@ -94,12 +94,12 @@ def elementsInStr(instring):
             for ptc in ptclist:
                 if not ptc: continue
                 if not ptc in Reven.values() and not PtcDic.has_key(ptc):
-                    logger.error("[elementsInStr]: Unknown particle "+ptc)
+                    logger.error("Unknown particle "+ptc)
                     return False
 
 #Check if there are not unmatched ['s and/or ]'s in the string:        
     if nc != 0:
-        logger.error("[elementsInStr]: wrong input (incomplete elements?) "+instring)
+        logger.error("Wrong input (incomplete elements?) "+instring)
         return False     
       
     return elements
@@ -113,7 +113,7 @@ def vertInStr(instring):
         outstr = ""
         for st in instring:
             if type(st) != type('st'):
-                logger.error("[vertInStr]: Input must be a string or a list of strings")
+                logger.error("Input must be a string or a list of strings")
                 return False        
             outstr += st    #Combines list of strings in a single string
   
@@ -135,13 +135,13 @@ def vertInStr(instring):
             for ptc in vertices[-1]:
                 if not ptc: continue
                 if not ptc in Reven.values() and not PtcDic.has_key(ptc):
-                    logger.error("[elementsInStr]: Unknown particle "+ptc)
+                    logger.error("Unknown particle "+ptc)
                     return False
             vertStr = ""
 
 #Check if there are not unmatched ['s and/or ]'s in the string:        
     if nc != 0:
-        logger.error("[vertInStr]: wrong input (incomplete elements?) "+instring)
+        logger.error("Wrong input (incomplete elements?) "+instring)
         return False     
       
     return vertices
