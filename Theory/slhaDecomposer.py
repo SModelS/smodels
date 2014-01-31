@@ -8,7 +8,7 @@
         
 """
 
-import sys, os, copy, time
+import sys, os, copy
 import element, topology
 from Tools.PhysicsUnits import addunit, rmvunit
 import pyslha2 as pyslha
@@ -31,8 +31,6 @@ Only generated if cross-sections are read from SLHA file and not previously crea
         :param minmassgap: maximum value for considering two R-odd particles degenerate (only revelant for DoCompress=True)        
         :returns: a TopologyList. 
     """
-    
-    t0 = time.time()
 
     if DoCompress and rmvunit(minmassgap,'GeV') == -1: 
         print "[SLHAdecomposer] Please, set minmassgap"

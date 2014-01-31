@@ -8,8 +8,6 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
         
 """
-        
-import copy
 
 class ULanalysis(object):
     """Class to store upper limit-type analyses. Stores the conditions and the elements constrained by the analysis
@@ -47,5 +45,6 @@ class SRanalysis(object):
         return self.label
 
     def getEfficiencyFor(self,element):
-        """ function to be used to get the efficiency from a database (dummy for now) """      
+        """ function to be used to get the efficiency from a database (dummy for now) """
+        if not element: return False      
         return False
