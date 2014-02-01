@@ -93,21 +93,21 @@ def getKfactorsFor(pIDs,sqrts,slhafile,basedir="./nllfast",pdf='cteq'):
     while len(kFacsVector) < 2 and xmass > 500.:
         xmass -= 100.  #Reduce decoupled mass, until NLLfast produces results
         if squark_dcp: nll_run = "./nllfast_"+energy+" %s %s %s %s" % (process,pdf,xmass,gluinomass)
-        elif gluino_dcp: nll_run = "./nllfast_"+energy+" %s %s %s %s" % (process,pdf,squarkmass,xmass)
-        nll_output = runNLLfast(nll_run,nllpath)
+        elif gluino_dcp: nll_run = "./nllfast_"+energy+" %s %s %s %s" % (process,pdf,squarkmass,xmass)        
+        nll_output = runNLLfast(nll_run,nllpath)        
         if "K_NLO" in nll_output:
-            kFacs = getKfactorsFrom(nll_output)
-            if kFacs and min(kFacs) > 0.: kFacsVector.append([xmass,kFacs])
+            kfacs = getKfactorsFrom(nll_output)
+            if kfacs and min(kfacs) > 0.: kFacsVector.append([xmass,kfacs])
             
     if len(kFacsVector) < 2:
         logger.warning("Not enough points for interpolation in the decoupling limit")
         return (1.,1.)
     else:
+        print 'going int'
         if kFacsVector[0][0]/min(squarkmass,gluinomass) > 10.:
             kFacs = kFacsVector[0][1]  #Decoupling limit is satisfied, do not interpolate
         else:
             kFacs = interpolateKfactors(kFacsVector,max(squarkmass,gluinomass))  #Interpolate k-factors
-
     return kFacs
 
 
@@ -143,7 +143,7 @@ def runNLLfast(nll_run,nllpath):
     
 def getKfactorsFrom(output):
     """Simple method to read NLLfast output and return the k-factors."""
-            
+    
 #First check if run was successful:
     if not output: return False
     else:
@@ -152,15 +152,15 @@ def getKfactorsFrom(output):
         line = lines[il]
         while not "K_NLO" in line and il < len(lines)-2:
             if "process" in line: process = line[line.find("process:")+8:].replace(" ","")
-            ++il
-            line = lines[il]
+            il += 1
+            line = lines[il]            
         if not process: return False
+        line = lines[il+1]  #Line with header
+        nmass = line.count('GeV')  #Count number of mass entries
         line = lines[il+2]  #Line with values
-        data = [eval(x) for x in line.split()]        
-        if process == "st" and len(data) < 12: return False
-        else: kFacs = data[10:12]
-        if process != "st" and len(data) < 13: return False
-        else: kFacs = data[11:13]
+        data = [eval(x) for x in line.split()]
+        if len(data) != nmass + 11: return False
+        else: kFacs = data[9+nmass:]
 
     return kFacs
 
