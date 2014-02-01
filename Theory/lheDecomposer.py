@@ -36,7 +36,7 @@ def decompose(lhefile,inputXsecs=None,nevts=None,DoCompress=False,DoInvisible=Fa
 
 #Loop over events and decompose 
     for Event in reader:
-        momPDG = tuple(Event.getMom())  # Get mother PDGs
+        momPDG = tuple(sorted(Event.getMom()))  # Get mother PDGs
         eventweight = XSectionList.getXsecsFor(momPDG)        
 # Get event element        
         newElement = elementFromEvent(Event,eventweight)    

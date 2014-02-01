@@ -173,7 +173,7 @@ class XSectionList(object):
         else:
             exists = False
             for iXSec,XSec in enumerate(self.XSections):
-                if XSec.info == newxsec.info and XSec.pid == newxsec.pid:
+                if XSec.info == newxsec.info and sorted(XSec.pid) == sorted(newxsec.pid):
                     self.XSections[iXSec].value = XSec.value + newxsec.value
                     break
             if not exists: self.add(newxsec)    
@@ -352,9 +352,10 @@ def getXsecFromLHEFile(lhefile,addEvents=True):
     
 #Get all mom pids:
     allpids = []    
-    for Event in reader: allpids.append(tuple(Event.getMom()))
-    allpids = set(allpids)    
-    for pids in allpids:
+    for Event in reader: allpids.append(tuple(sorted(Event.getMom())))
+    pids = set(allpids)        
+#Generate zero cross-sections for all independent pids    
+    for pid in pids:
         xsec = XSection()
         xsec.info.sqrts = sqrtS
         if reader.metainfo.has_key("cs_order"): xsec.info.order = reader.metainfo["cs_order"]
@@ -364,11 +365,17 @@ def getXsecFromLHEFile(lhefile,addEvents=True):
         elif xsec.info.order == 1: wlabel += ' (NLO)'
         elif xsec.info.order == 2: wlabel += ' (NLL)'
         xsec.info.label = wlabel
-        xsec.value = event_cs
-        xsec.pid = sorted(pids)
-        if addEvents: XsecsInFile.addValue(xsec)
-        else: XsecsInFile.add(xsec)
-
+        xsec.value = addunit(0.,'fb')        
+        xsec.pid = pid
+#If addEvents = False, set cross-section value to event weight
+        if not addEvents: xsec.value = event_cs 
+        XsecsInFile.add(xsec)      
+#If addEvents = True, sum up event weights with same mothers:
+    if addEvents:
+        for pid in allpids:
+            for ixsec,xsec in enumerate(XsecsInFile.XSections):
+                if xsec.pid == pid: XsecsInFile.XSections[ixsec].value += event_cs
+    
     reader.close()
 
     return XsecsInFile

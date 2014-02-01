@@ -17,7 +17,7 @@ from Theory.theoryPrediction import theoryPredictionFor
 
 listOfAnalyses = smsanalysisFactory.load()
 printer=SMSPrettyPrinter.SMSPrettyPrinter()
-slhafile = "slha/andrePT4.slha"
+slhafile = "tksUUKBHw11gBk.slha"
 lhefile = "lhe/ued_1.lhe"
 lhefile = "lhe/TChiChipmSlepL_1.lhe"
 nevts = 10000

@@ -30,7 +30,7 @@ class LHEReader:
         self.File.seek(0)
         line = self.File.readline()
         nevts = 0
-        while not "</LesHouchesEvents>" in line:   #Exit if reached end of file
+        while not "</LesHouchesEvents>" in line and line != "":   #Exit if reached end of events or file
             if "<init>" in line:
                 line = self.File.readline()
                 self.metainfo["sqrts"] = addunit(eval(line.split()[2]) + eval(line.split()[3]),'GeV')
@@ -41,7 +41,7 @@ class LHEReader:
                     line = self.File.readline()                    
                 self.metainfo["totalxsec"] = totxsec
             elif "<event>" in line: nevts += 1
-            line = self.File.readline()
+            line = self.File.readline()        
         self.metainfo["nevents"] = nevts
         
         self.File.seek(0)  #Return file to initial reader position
@@ -96,7 +96,7 @@ class LHEReader:
             particle.e = linep[9]
             particle.mass = linep[10]
         
-            ret.append(particle)
+            ret.add(particle)
             line = self.File.readline()  
 
         return ret

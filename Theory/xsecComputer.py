@@ -45,14 +45,12 @@ def addXSecToFile(sqrts,maxOrder,nevts,slhafile,lhefile=None,basedir=None):
     slhadata = infile.read()
     infile.close()
     if 'XSECTION' in slhadata:
-        logger.warning("SLHA file already contains a XSECTION block.")
-        return None
+        logger.warning("SLHA file already contains a XSECTION block. Appending new cross-sections.")
 
 #Check i lhefile exists:    
     if lhefile:
         if os.path.isfile(lhefile): logger.warning("Using LO cross-sections from "+lhefile)                        
-        else: logger.warning("Writing pythia LHE output to "+lhefile)
- 
+        else: logger.warning("Writing pythia LHE output to "+lhefile) 
 #Get file with lhe Events:
     if not lhefile or not os.path.isfile(lhefile):
         lheFile = runPythia(slhafile,nevts,rmvunit(sqrts,'TeV'),lhefile,basedir)      
@@ -62,7 +60,14 @@ def addXSecToFile(sqrts,maxOrder,nevts,slhafile,lhefile=None,basedir=None):
 #Get LO cross-sections from LHE events     
     LOxsecs = crossSection.getXsecFromLHEFile(lheFile)
     xsecs = LOxsecs
-    for xsec in xsecs: print xsec.pid,xsec.value
+#Set cross-section label and order:
+    wlabel = str(int(rmvunit(sqrts,'TeV')))+' TeV'
+    if maxOrder == 0:  wlabel += ' (LO)'
+    elif maxOrder == 1: wlabel += ' (NLO)'
+    elif maxOrder == 2: wlabel += ' (NLL)'
+    for ixsec,xsec in enumerate(xsecs):
+        xsecs[ixsec].info.label = wlabel
+        xsecs[ixsec].info.order = maxOrder
 #If maxOrder > 0, apply k-factors:
     if maxOrder > 0:
         pIDs = LOxsecs.getPIDpairs()   # Get particle ID pairs for all xsecs
@@ -70,17 +75,18 @@ def addXSecToFile(sqrts,maxOrder,nevts,slhafile,lhefile=None,basedir=None):
             k = 1.
             kNLO,kNLL = nllFast.getKfactorsFor(pID,sqrts,slhafile)
             if maxOrder == 1 and kNLO: k = kNLO
-            elif maxOrder == 2 and kNLL: k = kNLO*kNLL
+            elif maxOrder == 2 and kNLL and kNLO: k = kNLO*kNLL
             else:
                 logger.warning("Unkown xsec order, using NLL+NLO k-factor (if available)")
                 k = kNLO*kNLL
+            k = float(k)
             for i,xsec in enumerate(xsecs):
                 if set(xsec.pid) == set(pID): xsecs[i] = xsec*k   #Apply k-factor
 
-#Write cross-sections to file
+#Write cross-sections to file    
     outfile = open(slhafile,'append')
     for xsec in xsecs: outfile.write(xsecToBlock(xsec,inPDGs=(2212,2212),comment="Nevts="+str(nevts))+"\n")
-    outfile.close()
+    outfile.close()    
     
     return True
 
