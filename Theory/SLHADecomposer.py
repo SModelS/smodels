@@ -33,7 +33,7 @@ Only generated if cross-sections are read from SLHA file and not previously crea
   sys.path.append(pyslhadir)
   import TopologyBuilder, SMSDataObjects, ParticleNames
   from Tools.PhysicsUnits import addunit, rmvunit
-  import pyslha2 as pyslha
+  import pyslha
   import CrossSection
 
   if DoCompress and rmvunit(minmassgap,'GeV') == -1: 
