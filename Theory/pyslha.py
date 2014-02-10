@@ -409,7 +409,13 @@ def readSLHA(spcstr, D ): ## ignorenobr=False, ignorenomass=False ):
                 if len(items) < 1:
                     continue
                 if currentblock != "DECAY" and currentblock != "XSECTION":  #only for BLOCK blocks
-                    blocks[currentblock].add_entry(items)
+                    try: blocks[currentblock].add_entry(items)
+                    except: #ignore BLOCKS that cannot be read
+                        from Tools.VariousHelpers import logging
+                        log = logging.getLogger(__name__)
+                        log.info("BLOCK %s ignored" %currentblock)
+                        del blocks[currentblock]
+                        currentblock = None
                 elif currentblock == "DECAY":                          #'elif' instead of 'else', just DECAY block
 #                else:
                     br = float(items[0]) if items[0].upper() != "NAN" else None

@@ -192,8 +192,8 @@ def uniqueName ( slhafile, blocks= { "MINPAR": [3], "EXTPAR": [ 31, 32, 33, 34, 
   log = logging.getLogger(__name__)
   name=""
   try:
-    import pyslha2
-    f=pyslha2.readSLHAFile ( slhafile, ignorenomass=True )
+    import pyslha
+    f=pyslha.readSLHAFile ( slhafile, ignorenomass=True )
     if not f or len(f)==0:
       log.error ( "couldnt read %s." % ( slhafile ) )
       return None
