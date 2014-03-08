@@ -1,29 +1,29 @@
-#!/usr/bin/env python
-
 """
-.. module:: Theory.Element
+.. module:: Theory.element
    :synopsis: missing
     
-.. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
     
 """
+
 from ParticleNames import PtcDic, Reven, simParticles, elementsInStr
 from branch import Branch
 import crossSection
 import logging
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class Element(object):
     """
-    Element class. Holds a pair of branches and the element weight (cross-section*BR)
+    Element class. Holds a pair of branches and the element weight
+    (cross-section*BR).
+    
     """
-
-
     def __init__(self, info=None):
         """
-        Constructor
+        Constructor.
+        
         """
         self.branches = [Branch(),Branch()]
         self.weight = crossSection.XSectionList()
@@ -49,22 +49,28 @@ class Element(object):
     def __eq__ (self, other):
         return self.isEqual(other)
     
+    
     def __ne__ (self, other):
         return not self.isEqual(other)    
     
+    
     def __str__ ( self ):
-        """ returns the canonical name of the element, e.g. [[jet],[jet]] """
+        """
+        Returns the canonical name of the element, e.g. [[jet],[jet]].
+        
+        """
         particleString = str(self.getParticles()).replace(" ","").replace("'","")
         return particleString
 
 
     def isEqual(self,other,order=False,useDict=True):
-        """ Compare two Elements
-        If all masses and particles are equal, returns True,
-        otherwise returns False
-        If order = False, test both branch orderings (for an element doublet only) 
-        If useDict=True, allow for inclusive particle labels"""
-                           
+        """
+        Compare two Elements. If all masses and particles are equal, returns
+        True, otherwise returns False. If order = False, test both branch
+        orderings (for an element doublet only). If useDict=True, allow for
+        inclusive particle labels.
+        
+        """                           
         if type(self) != type(other): return False
         mass = self.getMasses()
         massA = other.getMasses()
@@ -79,12 +85,13 @@ class Element(object):
     
 
     def particlesMatch(self,other,order=False,useDict=True):
-        """ Compare two Elements
-        If particles match, returns True,
-        otherwise returns False
-        If order = False, test both branch orderings (for an element doublet only) 
-        If useDict=True, allow for inclusive particle labels"""
+        """
+        Compare two Elements. If particles match, returns True, otherwise
+        returns False. If order = False, test both branch orderings (for an
+        element doublet only). If useDict=True, allow for inclusive particle
+        labels.
         
+        """        
         if type(self) != type(other): return False
         ptcs = self.getParticles()
         ptcsA = other.getParticles()
@@ -95,9 +102,11 @@ class Element(object):
         
         return False
     
+    
     def copy(self):
         """
-        Creates a copy of itself (faster than deepcopy)
+        Creates a copy of itself (faster than deepcopy).
+        
         """
         newel = Element()
         newel.branches = []
@@ -105,14 +114,15 @@ class Element(object):
         newel.weight = self.weight.copy()
         return newel
     
+    
     def setMasses(self,mass,same_order=True,oppos_order=False):
         """
-        Sets the element masses to the input mass array.
-        If same_order, set the masses to the same branch ordering.
-        If oppos_order, set the masses to the opposite branch ordering.
-        If both same_order and oppos_order, set the masses to the smaller of the two orderings
-        """
-                
+        Sets the element masses to the input mass array. If same_order, set
+        the masses to the same branch ordering. If oppos_order, set the masses
+        to the opposite branch ordering. If both same_order and oppos_order,
+        set the masses to the smaller of the two orderings.
+        
+        """                
         if same_order and oppos_order:
             newmass = smallerMass(mass)
         elif same_order:
@@ -128,43 +138,59 @@ class Element(object):
                
         for i,mass in enumerate(newmass): self.branches[i].masses = mass[:]
 
+
     def switchBranches(self):
-        """ If the element contains a pair of branches, switches them"""
+        """
+        If the element contains a pair of branches, switches them.
+                
+        """
         newEl = self.copy()
         if len(self.branches) == 2: newEl.branches = [newEl.branches[1],newEl.branches[0]]
         return newEl
 
+
     def getParticles(self):
         """
-        Returns the array of particles in the element
+        Returns the array of particles in the element.   
+             
         """
         ptcarray = []
         for branch in self.branches: ptcarray.append(branch.particles)
         return ptcarray
     
+    
     def getMasses(self):
         """
-        Returns the array of masses in the element
+        Returns the array of masses in the element.   
+             
         """
         massarray = []
         for branch in self.branches: massarray.append(branch.masses)
         return massarray
     
+    
     def getDaughters(self):
         """
-        Return the pair of daughter IDs (can be None, if the element does not have a definite daughter)    
+        Return the pair of daughter IDs (can be None, if the element does not
+        have a definite daughter).      
+           
         """        
         return (self.branches[0].daughterID,self.branches[1].daughterID)
     
+    
     def getMothers(self):
         """
-        Return the pair of mother IDs (can be None, if the element does not have a mother daughter)    
+        Return the pair of mother IDs (can be None, if the element does not.
+        have a mother daughter).
+        
         """        
         return (self.branches[0].momID,self.branches[1].momID)
+    
     
     def getEinfo(self):
         """
         Get global topology info from particle string.
+        
         """
         vertnumb = []
         vertparts = []
@@ -175,14 +201,20 @@ class Element(object):
                 vertparts[len(vertparts)-1].append(0)  #Append 0 for stable LSP
         return {"vertnumb" : vertnumb, "vertparts" : vertparts}
     
+    
     def getLength(self):
-        """ Returns the maximum of the two branch lengths """
+        """
+        Returns the maximum of the two branch lengths.
         
+        """        
         return max(self.branches[0].getLength(),self.branches[1].getLength())
+    
     
     def hasTopInList(self,elementList):
         """
-        Checks if the element topology matches any of the topologies in the element list
+        Checks if the element topology matches any of the topologies in the
+        element list.
+        
         """
         if type(elementList) != type([]) or len(elementList) == 0: return False
         for element in elementList:
@@ -196,9 +228,11 @@ class Element(object):
         
       
     def isInList(self, listOfElements, igmass=False, useDict=True):
-        """ checks if the element is present in the element list. If igmass=False also check if
-        the analysis has the element mass array"""
-
+        """
+        Checks if the element is present in the element list. Ifigmass=False
+        also check if the analysis has the element mass array.
+        
+        """
         for el in listOfElements:
             if igmass:
                 if self.particlesMatch(el,useDict): return True
@@ -207,11 +241,13 @@ class Element(object):
 
         return False
     
+    
     def checkConsistency(self):
         """
-        Checks if the particles defined in the element exist and are consistent with the element info
+        Checks if the particles defined in the element exist and are consistent
+        with the element info.
+        
         """
-
         info = self.getEinfo()
         for ib,branch in enumerate(self.branches):            
             for iv,vertex in enumerate(branch.particles):
@@ -226,16 +262,17 @@ class Element(object):
     
     
     def compressElement(self,DoCompress,DoInvisible,minmassgap):
-        """ Keep compressing they original element and the derived ones till they can be compressed no more.
-            Returns a list with the compressed elements."""
-
-
+        """
+        Keep compressing they original element and the derived ones till they
+        can be compressed no more. Returns a list with the compressed elements.
+        
+        """
         added = True
         newElements = [self.copy()]   
-#Keep compressing the new topologies generated so far until no new compressions can happen:
+        # Keep compressing the new topologies generated so far until no new compressions can happen:
         while added:
             added = False
-    #Check for mass compressed topologies   
+            # Check for mass compressed topologies   
             if DoCompress:
                 for element in newElements:             
                     newel = element.massCompress(minmassgap)
@@ -243,7 +280,7 @@ class Element(object):
                         newElements.append(newel) 
                         added = True
       
-    #Check for invisible compressed topologies (look for effective LSP, such as LSP + neutrino = LSP')      
+            # Check for invisible compressed topologies (look for effective LSP, such as LSP + neutrino = LSP')      
             if DoInvisible:
                 for element in newElements:
                     newel = element.invisibleCompress()
@@ -252,18 +289,20 @@ class Element(object):
                         added = True
 
                          
-        newElements.pop(0)  #Remove original element                            
+        newElements.pop(0)  # Remove original element                            
         return newElements
     
          
     def massCompress(self,mingap):
-        """ if two masses in this topology are degenerate, returns a compressed copy of the element. If no compression is
-        possible, return None. """
+        """
+        If two masses in this topology are degenerate, returns a compressed
+        copy of the element. If no compression is possible, return None.
         
+        """        
         newelement = self.copy()
         vertnumb = self.getEinfo()["vertnumb"]
-        if max(vertnumb) < 2: return None   #Nothing to be compressed           
-#Loop over branches
+        if max(vertnumb) < 2: return None   # Nothing to be compressed           
+        # Loop over branches
         for ib,branch in enumerate(self.branches):
             if vertnumb[ib] < 2: continue
             masses = branch.masses
@@ -277,15 +316,16 @@ class Element(object):
         else:
             return newelement
         
+        
     def invisibleCompress(self):
-        """ compress cascade decays ending with neutrinos + daughter If no compression is
-        possible, return None. """
-        
-        
+        """
+        Compress cascade decays ending with neutrinos + daughter If no
+        compression is possible, return None.
+        """
         newelement = self.copy()        
         vertnumb = self.getEinfo()["vertnumb"]
-        if max(vertnumb) < 2: return None   #Nothing to be compressed        
-#Loop over branches
+        if max(vertnumb) < 2: return None   # Nothing to be compressed        
+        # Loop over branches
         for ib,branch in enumerate(self.branches):
             if vertnumb[ib] < 2: continue
             particles = branch.particles            
@@ -295,7 +335,6 @@ class Element(object):
                     newelement.branches[ib].particles.pop(ivertex)
                 else:
                     break
-
                     
         if newelement.isEqual(self):
             return None
@@ -305,7 +344,9 @@ class Element(object):
 
 def smallerMass(mass1,mass2):
     """
-    Uses an ordering criterium (machine-independent) to select the smaller of the two mass arrays
+    Uses an ordering criterium (machine-independent) to select the smaller of
+    the two mass arrays.
+    
     """
     mass1List = []
     mass2List = []
@@ -322,5 +363,3 @@ def smallerMass(mass1,mass2):
     
     logger.error('Invalid input')
     return False
-        
-        
