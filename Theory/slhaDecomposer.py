@@ -15,6 +15,7 @@ from branch import Branch, decayBranches
 import logging
 
 logger = logging.getLogger(__name__)
+
  
 def decompose(slhafile,sigcut=0.1,DoCompress=False,DoInvisible=False,minmassgap=-1,UseXSecs=None):
     """Do SLHA-based decomposition.
@@ -42,7 +43,7 @@ def decompose(slhafile,sigcut=0.1,DoCompress=False,DoInvisible=False,minmassgap=
      
     """
     if DoCompress and rmvunit(minmassgap,'GeV') == -1: 
-        print "[SLHAdecomposer] Please, set minmassgap"
+        logger.error("Please set minmassgap.")
         return False
 
     if type(sigcut) == type(1.):

@@ -6,11 +6,12 @@
 
 """
 
-
 import LHEReader, topology, crossSection, element, pyslha2, branch, ParticleNames
 from Tools.PhysicsUnits import addunit
 import logging, copy
+
 logger = logging.getLogger(__name__)
+
 
 def decompose(lhefile,inputXsecs=None,nevts=None,DoCompress=False,DoInvisible=False,minmassgap=None):
     """

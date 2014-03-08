@@ -10,3 +10,7 @@ import lheDecomposer
 import slhaDecomposer
 import clusterTools
 import crossSection
+import logging.config
+
+logging.config.fileConfig('../logging.conf')
+logger = logging.getLogger(__name__)

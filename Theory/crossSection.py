@@ -10,8 +10,10 @@
 
 from Tools.PhysicsUnits import addunit, rmvunit
 import logging
-logger = logging.getLogger(__name__)
 import LHEReader
+
+logger = logging.getLogger(__name__)
+
 
 class XSectionInfo(object):
     """
@@ -78,7 +80,7 @@ class XSection(object):
         if type(other) == type(1.):
             newXsec.value = newXsec.value*other
         else:
-            print "[XSection.mul]: Xsections can only be multiplied by floats"
+            logger.error("[XSection.mul]: Xsections can only be multiplied by floats")
             return False
         return newXsec
     
@@ -93,7 +95,7 @@ class XSection(object):
                 res = self.copy()
                 res.value += other.value
                 return res
-        print "[XSection.add]: Trying to add",type(other),"to a XSection objetc"
+        logger.error("[XSection.add]: Trying to add",type(other),"to a XSection objetc")
         return False
 
 
@@ -436,7 +438,7 @@ def getXsecFromSLHAFile(slhafile,UseXSecs=None):
         elif cs_order == 2:
             wlabel += ' (NLL)'
         else:
-            print '[SLHADecomposer] unknown QCD order in XSECTION line', l
+            logger.error("[SLHADecomposer] unknown QCD order in XSECTION line", l)
             return False
         xsec = XSection()
         xsec.info.sqrts = addunit(sqrtS,'TeV')

@@ -10,7 +10,7 @@
 from Theory import crossSection
 import logging
 from Theory.element import Element
-logging.basicConfig(level=logging.INFO)
+
 logger = logging.getLogger(__name__)
 
 
