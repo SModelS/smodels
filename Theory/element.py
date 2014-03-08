@@ -11,8 +11,8 @@ from branch import Branch
 import crossSection
 import logging
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class Element(object):
     """

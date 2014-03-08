@@ -13,8 +13,8 @@ import crossSection, element
 import logging
 from ParticleNames import elementsInStr
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class TheoryPrediction(object):
     """

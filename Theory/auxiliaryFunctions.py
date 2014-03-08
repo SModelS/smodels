@@ -17,7 +17,6 @@ from scipy import stats
 from collections import Iterable
 import logging
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 

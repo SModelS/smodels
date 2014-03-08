@@ -10,8 +10,8 @@ import crossSection
 import logging
 from auxiliaryFunctions import massAvg, massPosition, distance
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class ElementCluster(object):
     """
