@@ -1,8 +1,7 @@
-#!/usr/bin/env python
-
 """
-.. module:: TheoryPrediction
-        :synopsis: Classes encapsulating the results of the computation of reference cross sections and related methods
+.. module:: Theory.theoryPrediction
+   :synopsis: Classes encapsulating the results of the computation of reference
+   cross sections and related methods
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
         
@@ -10,16 +9,19 @@
 
 import copy
 import clusterTools
-import crossSection, element, analysis
+import crossSection, element
 import logging
 from ParticleNames import elementsInStr
-from auxiliaryFunctions import Csim, Cgtr
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class TheoryPrediction(object):
-    """Main class to store the results of the theory prediction for a given analysis."""
+    """
+    Main class to store the results of the theory prediction for a given
+    analysis.
     
+    """    
     def __init__(self):
         self.analysis = None
         self.value = None
@@ -27,21 +29,24 @@ class TheoryPrediction(object):
         self.mass = None
 
 
-def theoryPredictionFor(Analysis,SMSTopList,maxMassDist=0.2):
-    """Main method to compute theory predictions. Collects the elements and efficiencies, combine the masses
-    (if needed) and compute the conditions (if any). Returns a list of TheoryPrediction objects"""
-
-#Select elements constrained by analysis and apply efficiencies                       
-    elements = getElementsFrom(SMSTopList,Analysis)   
+def theoryPredictionFor(analysis,SMSTopList,maxMassDist=0.2):
+    """
+    Main method to compute theory predictions. Collects the elements and
+    efficiencies, combine the masses (if needed) and compute the conditions (if
+    any). Returns a list of TheoryPrediction objects.
+    
+    """
+    # Select elements constrained by analysis and apply efficiencies                       
+    elements = getElementsFrom(SMSTopList,analysis)   
     if len(elements) == 0: return None      
-#Combine masses
-    clusters = combineElements(elements,Analysis,maxDist=maxMassDist)    
-#Collect results and evaluate conditions:
+    # Combine masses
+    clusters = combineElements(elements,analysis,maxDist=maxMassDist)    
+    # Collect results and evaluate conditions:
     predictions = []
     for cluster in clusters:
         theoPrediction = TheoryPrediction()
         theoPrediction.value = cluster.getTotalXSec()
-        theoPrediction.conditions = evalConditions(cluster,Analysis)
+        theoPrediction.conditions = evalConditions(cluster,analysis)
         theoPrediction.mass = cluster.getAvgMass()
         predictions.append(theoPrediction)
 
@@ -49,46 +54,59 @@ def theoryPredictionFor(Analysis,SMSTopList,maxMassDist=0.2):
     return predictions
 
 
-def getElementsFrom(SMSTopList,Analysis):
-    """ Loops over all elements in SMSTopList and returns the elements which are constrained by the analysis (have
-    efficiency != 0). The elements weights are multiplied by their respective efficiency and the cross-sections not
-    matching the analysis sqrts are removed."""
+def getElementsFrom(SMSTopList,analysis):
+    """
+    Loops over all elements in SMSTopList and returns the elements which are
+    constrained by the analysis (have efficiency != 0). The elements weights
+    are multiplied by their respective efficiency and the cross-sections not
+    matching the analysis sqrts are removed.
     
+    """    
     elements = []
     for el in SMSTopList.getElements():
-        eff = Analysis.getEfficiencyFor(el)
-        if eff == 0.: continue
+        eff = analysis.getEfficiencyFor(el)
+        if eff == 0.:
+            continue
         element = el.copy()
         element.weight = crossSection.XSectionList()
         for xsec in el.weight:
-            if xsec.info.sqrts == Analysis.sqrts: element.weight.add(copy.deepcopy(xsec*eff))
-        if len(element.weight) > 0: elements.append(element)
+            if xsec.info.sqrts == analysis.sqrts:
+                element.weight.add(copy.deepcopy(xsec*eff))
+        if len(element.weight) > 0:
+            elements.append(element)
             
     return elements
 
 
-def combineElements(elements,Analysis,maxDist):
-    """ Combines elements according to the Analysis type. If Analysis = upper limit type, group elements
-    into mass clusters. If Analysis = signal region type, group all elements into a single cluster"""
+def combineElements(elements,analysis,maxDist):
+    """
+    Combines elements according to the analysis type. If analysis = upper limit
+    type, group elements into mass clusters. If analysis = signal region type,
+    group all elements into a single cluster.
     
-    if type(Analysis) == type(analysis.SRanalysis()):
+    """    
+    if type(analysis) == type(analysis.SRanalysis()):
         clusters = [clusterTools.groupAll(elements)]
-    elif type(Analysis) == type(analysis.ULanalysis()):
-        clusters = clusterTools.clusterElements(elements,Analysis,maxDist)
+    elif type(analysis) == type(analysis.ULanalysis()):
+        clusters = clusterTools.clusterElements(elements,analysis,maxDist)
     return clusters
 
 
-def evalConditions(cluster,Analysis):
-    """If analysis type = upper limit, evaluates the analysis conditions inside an element cluster.
-    If  analysis type = signal region, returns None"""
-        
-    if type(Analysis) == type(analysis.SRanalysis()): return None
-    elif type(Analysis) == type(analysis.ULanalysis()):
-        if not Analysis.conditions: return Analysis.conditions
+def evalConditions(cluster,analysis):
+    """
+    If analysis type = upper limit, evaluates the analysis conditions inside an
+    element cluster. If  analysis type = signal region, returns None.
+    
+    """        
+    if type(analysis) == type(analysis.SRanalysis()):
+        return None
+    elif type(analysis) == type(analysis.ULanalysis()):
+        if not analysis.conditions:
+            return analysis.conditions
         conditions = {}
-#Loop over conditions        
-        for cond in Analysis.conditions:
-            condElements = [element.Element(el_str) for el_str in elementsInStr(cond)]  #Get elements appearing in conditions            
+        # Loop over conditions        
+        for cond in analysis.conditions:
+            condElements = [element.Element(el_str) for el_str in elementsInStr(cond)]  # Get elements appearing in conditions            
             newcond = cond
             for iel,el in enumerate(condElements):
                 newcond = newcond.replace(str(el),"condElements["+str(iel)+"].weight")
@@ -99,5 +117,3 @@ def evalConditions(cluster,Analysis):
             conditions[cond] = eval(newcond)
             
         return conditions
-    
-
