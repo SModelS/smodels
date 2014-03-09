@@ -8,6 +8,9 @@ from Tools import SMSPrettyPrinter
 from Tools.SMSPrettyPrinter import wrap
 from Experiment import smsanalysisFactory
 from Theory.theoryPrediction import theoryPredictionFor
+import logging
+
+logger = logging.getLogger(__name__)
 
 def main():
     # useXsec = CrossSection.XSectionInfo()
@@ -75,10 +78,5 @@ def main():
             print '\n'
     
 
-if __name__ == '__main__':    
-    import logging.config
-    
-    logging.config.fileConfig('logging.conf')
-    logger = logging.getLogger(__name__)
-
+if __name__ == '__main__':
     main()
