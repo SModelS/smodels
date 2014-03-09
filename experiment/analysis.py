@@ -9,8 +9,8 @@
         
 """
         
-from Theory.ParticleNames import Reven, PtcDic
-from Tools.PhysicsUnits import addunit, rmvunit
+from theory.ParticleNames import Reven, PtcDic
+from tools.PhysicsUnits import addunit, rmvunit
 import SMSInterpolation
 import logging, copy
 

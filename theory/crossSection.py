@@ -1,5 +1,5 @@
 """
-.. module:: Theory.crossSection
+.. module:: theory.crossSection
    :synopsis: A class that encapsulates the result of the computation of the
    reference cross section.
 
@@ -8,7 +8,7 @@
 
 """
 
-from Tools.PhysicsUnits import addunit, rmvunit
+from tools.PhysicsUnits import addunit, rmvunit
 import logging
 import LHEReader
 

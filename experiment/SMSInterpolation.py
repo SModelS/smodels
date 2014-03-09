@@ -17,7 +17,7 @@
 import SMSResults, SMSHelpers, copy
 import numpy as np
 from scipy.interpolate import griddata
-from Tools.PhysicsUnits import rmvunit, addunit
+from tools.PhysicsUnits import rmvunit, addunit
 
 def gethistname(topo, mz):
   """Build histogram name for given topology and mz information (mz as given in the axes-information)."""
@@ -82,7 +82,7 @@ def getaxis(w,a):
   
 def compareM(masses, d):
   """Check if input masses are comparable to masses in the histogram corresponding to the information given in axes-dictionary d."""
-  from Tools.PhysicsUnits import rmvunit
+  from tools.PhysicsUnits import rmvunit
   try: #check if histogram axes are M1, M0, return 1 if x-value of histogram is comparable to x value for given masses, 0 if not
     x1=getxval(masses[0],masses[-1],d['mz'][0])
     x2=float(rmvunit(masses[1],"GeV")-rmvunit(masses[-1],"GeV"))/(rmvunit(masses[0],"GeV")-rmvunit(masses[-1],"GeV"))

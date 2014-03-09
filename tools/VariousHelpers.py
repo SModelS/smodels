@@ -27,7 +27,7 @@ def getInstallationBase():
   """ return directory name of the base of the installation of SMSDecomposition """
   import os
   basedir=os.getcwd()
-  for i in  [ "bin", "test", "regression", "Tools", "Theory", "Experiment", "data" ]:
+  for i in  [ "bin", "test", "regression", "tools", "theory", "experiment", "data" ]:
     n=-len(i)
     if basedir[n:]==i: basedir=basedir[:n]
   return basedir

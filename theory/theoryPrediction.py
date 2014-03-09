@@ -1,5 +1,5 @@
 """
-.. module:: Theory.theoryPrediction
+.. module:: theory.theoryPrediction
    :synopsis: Classes encapsulating the results of the computation of reference
    cross sections and related methods
         

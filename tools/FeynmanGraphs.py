@@ -46,7 +46,7 @@ def connect ( canvas, p1, p2, straight=True, label=None, spin="fermion", bend=Tr
   import math, random, os
   from pyfeyn.user import NamedLine, Fermion, Scalar, WHITE
   from pyx import bitmap
-  from Tools import VariousHelpers
+  from tools import VariousHelpers
 
   if spin=="scalar" and not NamedLine.has_key ( spin ) and NamedLine.has_key ( "higgs" ):
     spin="higgs"

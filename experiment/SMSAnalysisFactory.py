@@ -9,7 +9,7 @@
 """
 
 import SMSResults
-from Tools.PhysicsUnits import rmvunit
+from tools.PhysicsUnits import rmvunit
 import types
 
 def getRealTopo ( Tx ):

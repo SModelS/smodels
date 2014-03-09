@@ -1,5 +1,5 @@
 """
-.. module:: Theory.auxiliaryFunctions
+.. module:: theory.auxiliaryFunctions
    :synopsis: A collection of functions used to evaluate fuzzy the conditions.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -10,8 +10,8 @@ from functools import wraps
 import crossSection
 import copy
 import itertools
-from Experiment import LimitGetter
-from Tools.PhysicsUnits import addunit,rmvunit
+from experiment import LimitGetter
+from tools.PhysicsUnits import addunit,rmvunit
 import numpy as np
 from scipy import stats
 from collections import Iterable

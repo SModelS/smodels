@@ -2,12 +2,12 @@
 
 import time
 from prettytable import PrettyTable
-from Theory import slhaDecomposer
-from Tools.PhysicsUnits import addunit
-from Tools import SMSPrettyPrinter
-from Tools.SMSPrettyPrinter import wrap
-from Experiment import smsanalysisFactory
-from Theory.theoryPrediction import theoryPredictionFor
+from theory import slhaDecomposer
+from tools.PhysicsUnits import addunit
+from tools import SMSPrettyPrinter
+from tools.SMSPrettyPrinter import wrap
+from experiment import smsanalysisFactory
+from theory.theoryPrediction import theoryPredictionFor
 import logging
 
 logger = logging.getLogger(__name__)

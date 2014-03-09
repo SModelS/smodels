@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 """
-.. module:: Experiment.experimentExceptions
-   :synopsis: This module contains exception classes for Experiment-specific use.
+.. module:: experiment.experimentExceptions
+   :synopsis: This module contains exception classes for experiment-specific use.
     
 .. moduleauthor:: Wolfgang magerl <wolfgang.magerl@gmail.com>
     

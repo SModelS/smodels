@@ -1,5 +1,5 @@
 """
-.. module:: Theory.branch
+.. module:: theory.branch
    :synopsis: missing
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -7,7 +7,7 @@
 """
 
 from ParticleNames import PtcDic, Reven, simParticles, elementsInStr
-from Tools.PhysicsUnits import addunit
+from tools.PhysicsUnits import addunit
 import logging
 
 logger = logging.getLogger(__name__)

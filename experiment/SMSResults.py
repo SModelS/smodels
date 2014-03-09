@@ -11,11 +11,11 @@
 
 """
 
-from Experiment import SMSHelpers
-from Tools.PhysicsUnits import addunit, rmvunit
-from Experiment.SMSResultsCollector import description
-from Tools import PhysicsUnits, VariousHelpers, RCFile
-from Experiment.experimentExceptions import MetaInfoError
+from experiment import SMSHelpers
+from tools.PhysicsUnits import addunit, rmvunit
+from experiment.SMSResultsCollector import description
+from tools import PhysicsUnits, VariousHelpers, RCFile
+from experiment.experimentExceptions import MetaInfoError
 logger = VariousHelpers.logging.getLogger(__name__)
 
 def describeTx (topo, short=True):
@@ -26,7 +26,7 @@ def describeTx (topo, short=True):
 
 def getAllHistNames (ana, topo, run=None):
     """ for a given analysis, topology, return list of all available histograms"""
-    from Experiment import SMSInterpolation
+    from experiment import SMSInterpolation
     ret = []
     dic_list = getaxes(ana, topo, run)
     if not dic_list: return None    # topology not found
@@ -53,7 +53,7 @@ def considerRuns(run=None):
         :param run: a list of runs to be considered, e.g. [ '2012', '8TeV' ]). If None, all runs are taken into account.
         :type run: list or NoneType
     """
-    from Experiment import SMSResultsCollector
+    from experiment import SMSResultsCollector
     allruns = ["8TeV", "ATLAS8TeV", "RPV8", "2012", "RPV7", "2011"]
     runsort = []
     if run:
@@ -165,7 +165,7 @@ def getBinWidthY (analysis, topo, run=None):
 def getExclusionLine(topo, ana, expected=False, plusminussigma=0, extendedinfo=False, xvalue=None, factor=1.0):
     """ get the exclusion line, as a TGraph """
     if xvalue == None: xvalue = ''
-    from Experiment import SMSResultsCollector
+    from experiment import SMSResultsCollector
     ex = SMSResultsCollector.exclusionline(topo, ana, xvalue, factor, extendedinfo=extendedinfo, expected=expected, plusminussigma=plusminussigma)
     return ex
 

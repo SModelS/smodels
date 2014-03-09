@@ -18,7 +18,7 @@ def limit(analysis, addTheoryPredictions=[]):
     :type addTheoryPredictions: list of strings
   """
   import SMSResults
-  from Tools.PhysicsUnits import rmvunit
+  from tools.PhysicsUnits import rmvunit
   run=analysis.run
   sqrts=rmvunit(analysis.sqrts,"TeV")
   ## lead=analysis.Top.leadingElement()
@@ -54,7 +54,7 @@ def GetPlotLimit(inmass,Analysis,complain = False):
   """ Get upper limit on sigma*BR for a specific array of masses from plot
         inmass: array of masses in SModelS graph
         Analysis: SMSDataObjects.EAnalysis"""
-  from Tools.PhysicsUnits import rmvunit
+  from tools.PhysicsUnits import rmvunit
   import copy, SMSResults, sys
 
   massarray = copy.deepcopy(inmass)

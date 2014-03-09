@@ -1,5 +1,5 @@
 """
-.. module:: Theory.lheDecomposer
+.. module:: theory.lheDecomposer
 :synopsis: smodels-decomposes LHE events, creating TopologyLists 
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -7,7 +7,7 @@
 """
 
 import LHEReader, topology, crossSection, element, pyslha2, branch, ParticleNames
-from Tools.PhysicsUnits import addunit
+from tools.PhysicsUnits import addunit
 import logging, copy
 
 logger = logging.getLogger(__name__)

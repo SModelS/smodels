@@ -1,5 +1,5 @@
 """
-.. module:: Theory.slhaDecomposer
+.. module:: theory.slhaDecomposer
    :synopsis: SLHA-based SMS decomposition
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -8,7 +8,7 @@
 
 import sys, os, copy
 import element, topology
-from Tools.PhysicsUnits import addunit, rmvunit
+from tools.PhysicsUnits import addunit, rmvunit
 import pyslha2 as pyslha
 import crossSection
 from branch import Branch, decayBranches

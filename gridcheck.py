@@ -3,7 +3,7 @@
 import sys
 sys.path.append('/home/lessa/Pioneer/plots/')
 import AuxPlot
-from Theory import NLLXSec
+from theory import NLLXSec
 from ROOT import *
 
 energy = 8

@@ -1,5 +1,5 @@
 """
-.. module:: Theory.analysis
+.. module:: theory.analysis
    :synopsis: Encapsulates all data around one result of one analysis, i.e.
    the association with one plot and one reference cross section result.
         
