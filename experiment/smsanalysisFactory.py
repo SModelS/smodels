@@ -9,9 +9,9 @@
 """
 
 import SMSResults
-from Tools.PhysicsUnits import rmvunit
+from tools.PhysicsUnits import rmvunit
 import types
-from Theory import analysis, element
+from theory import analysis, element
 
 def getRealTopo(Tx):
     """ T3w025 -> T3w, etc """

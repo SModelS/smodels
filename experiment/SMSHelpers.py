@@ -9,9 +9,9 @@
 """
 
 import os
-from Tools.PhysicsUnits import rmvunit
-from Tools import VariousHelpers
-from Experiment.experimentExceptions import MetaInfoError
+from tools.PhysicsUnits import rmvunit
+from tools import VariousHelpers
+from experiment.experimentExceptions import MetaInfoError
 logger = VariousHelpers.logging.getLogger(__name__)
 
 Base = "/afs/hephy.at/user/w/walten/public/sms/"

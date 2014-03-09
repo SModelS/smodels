@@ -1,5 +1,5 @@
 """
-.. module:: Theory.clusterTools
+.. module:: theory.clusterTools
    :synopsis: missing
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>

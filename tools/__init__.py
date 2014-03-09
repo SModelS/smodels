@@ -1,6 +1,6 @@
 """
 This package contains all code that cannot be classified as being part of
-*Experiment* or *Theory*.
+*experiment* or *theory*.
 """
 
 import FeynmanGraphs

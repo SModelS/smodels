@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 
 """
-.. module:: Theory.Topology
+.. module:: theory.Topology
    :synopsis: missing
     
 .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
     
 """
-from Theory import crossSection
+from theory import crossSection
 import logging
-from Theory.element import Element
+from theory.element import Element
 
 logger = logging.getLogger(__name__)
 

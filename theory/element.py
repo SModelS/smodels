@@ -1,5 +1,5 @@
 """
-.. module:: Theory.element
+.. module:: theory.element
    :synopsis: missing
     
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
