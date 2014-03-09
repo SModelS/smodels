@@ -8,7 +8,7 @@
 """
 
 import logging
-from theory import topology
+import theory.topology as topology
 from prettytable import PrettyTable
 from tools import SMSPrettyPrinter
 from tools.SMSPrettyPrinter import wrap
