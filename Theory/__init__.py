@@ -10,4 +10,3 @@ import lheDecomposer
 import slhaDecomposer
 import clusterTools
 import crossSection
-import testWithALongerName
