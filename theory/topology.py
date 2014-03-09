@@ -10,6 +10,7 @@
 from theory import crossSection
 import logging
 from theory.element import Element
+import printer
 
 logger = logging.getLogger(__name__)
 
@@ -156,7 +157,7 @@ class Topology(object):
         return sumw    
  
     
-class TopologyList(object):
+class TopologyList(object, printer):
     """
     Implements a list of topologies, knows how to correctly add a topology.
     """
