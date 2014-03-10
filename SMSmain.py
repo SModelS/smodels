@@ -65,18 +65,18 @@ totweight = []
 #Print Results:
 # for i in range(len(SMSTopList)):
 for (i,topo) in enumerate(SMSTopList):
-  weightlist = [el.weight for el in topo.ElList]
+  weightlist = [el.weight for el in topo.elList]
   sumw = ClusterTools.sumweights(weightlist)
   totweight.append(sumw)
-  EvTop_table.add_row([i,topo.vertnumb,topo.vertparts,len(topo.ElList),wrap(printer.pformat(sumw),width=30)])
-  eltot += len(topo.ElList)
+  EvTop_table.add_row([i,topo.vertnumb,topo.vertparts,len(topo.elList),wrap(printer.pformat(sumw),width=30)])
+  eltot += len(topo.elList)
 
  
       
 #Print element list for Topology[i]:  
   if i >= 0:       
-    for j in range(len(SMSTopList[i].ElList)):
-      EvElement_table.add_row([i,j,SMSTopList[i].ElList[j].B[0].particles,SMSTopList[i].ElList[j].B[1].particles,wrap(printer.pformat(SMSTopList[i].ElList[j].B[0].masses),width=25),wrap(printer.pformat(SMSTopList[i].ElList[j].B[1].masses),width=25),wrap(printer.pformat(SMSTopList[i].ElList[j].weight),width=30)])
+    for j in range(len(SMSTopList[i].elList)):
+      EvElement_table.add_row([i,j,SMSTopList[i].elList[j].B[0].particles,SMSTopList[i].elList[j].B[1].particles,wrap(printer.pformat(SMSTopList[i].elList[j].B[0].masses),width=25),wrap(printer.pformat(SMSTopList[i].elList[j].B[1].masses),width=25),wrap(printer.pformat(SMSTopList[i].elList[j].weight),width=30)])
     EvElement_table.add_row(["---","---","---","---","---","---","---"])  
       
       

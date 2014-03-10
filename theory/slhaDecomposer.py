@@ -6,7 +6,10 @@
         
 """
 
-import sys, os, copy
+import sys
+import os
+import copy
+import time
 import element, topology
 from tools.PhysicsUnits import addunit, rmvunit
 import pyslha2 as pyslha
@@ -42,6 +45,8 @@ def decompose(slhafile,sigcut=0.1,DoCompress=False,DoInvisible=False,minmassgap=
     :returns: a TopologyList.
      
     """
+    t1 = time.time()
+    
     if DoCompress and rmvunit(minmassgap,'GeV') == -1: 
         logger.error("Please set minmassgap.")
         return False
@@ -94,6 +99,7 @@ def decompose(slhafile,sigcut=0.1,DoCompress=False,DoInvisible=False,minmassgap=
                             continue    # skip elements with xsec below sigcut                       
                         Top = topology.Topology(el)            
                         SMSTopList.addList([Top])                       
+    logger.debug("slhaDecomposer done in " + str(time.time()-t1) + " s.")
 
     return SMSTopList        
 
