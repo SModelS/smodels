@@ -16,7 +16,7 @@ def getTestComposition(SMSTopList,ListOfAnalyses,maxcond):
   
 
   for Top in SMSTopList:
-    for EEl in Top.ElList:
+    for EEl in Top.elList:
       isLong = False
       isAsy = False  
       if max(Top.vertnumb) > 3: isLong = True

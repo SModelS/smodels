@@ -86,7 +86,7 @@ def fromEvent( Event, weight = {}, DoCompress=False, DoInvisible=False, \
   import copy
   NewEl.weight = copy.deepcopy(weight)
   Einfo = NewEl.getEinfo()
-  ETop.ElList.append(NewEl)
+  ETop.elList.append(NewEl)
   ETop.vertnumb = Einfo["vertnumb"]
   ETop.vertparts = Einfo["vertparts"]
 

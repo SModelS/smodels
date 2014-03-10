@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import time
 from theory import slhaDecomposer
 from tools.PhysicsUnits import addunit
 from tools import SMSPrettyPrinter
@@ -22,21 +21,17 @@ def main():
     # lhefile = "lhe/ued_1.lhe"
     # lhefile = "lhe/TChiChipmSlepL_1.lhe"
     # nevts = 10000
-    DoCompress = True
-    DoInvisible = True
+    doCompress = True
+    doInvisible = True
     minmassgap = addunit(5.,'GeV')
     sigmacut = addunit(0.1,'fb')
-    t1 = time.time()
-    SMSTopList = slhaDecomposer.decompose(slhafile,sigmacut,DoCompress,DoInvisible,minmassgap)
-    # SMSTopList = lheDecomposer.decompose(lhefile,None,None,DoCompress,DoInvisible,minmassgap)
+    smsTopList = slhaDecomposer.decompose(slhafile,sigmacut,doCompress,doInvisible,minmassgap)
+    # smsTopList = lheDecomposer.decompose(lhefile,None,None,doCompress,doInvisible,minmassgap)
 
-    SMSTopList.printout()
-
-    print '\n \n \n'
-    print 'slhaDecomposer done in',time.time()-t1,'s'
+    smsTopList.printout()
     
     for ana in listOfAnalyses:    
-        preds = theoryPredictionFor(ana,SMSTopList)
+        preds = theoryPredictionFor(ana,smsTopList)
         if not preds:
             continue
         print ana.label
