@@ -10,6 +10,9 @@
 from theory import crossSection
 import logging
 from theory.element import Element
+from printer import Printer
+from prettytable import PrettyTable
+from tools import SMSPrettyPrinter
 
 logger = logging.getLogger(__name__)
 
@@ -156,7 +159,7 @@ class Topology(object):
         return sumw    
  
     
-class TopologyList(object):
+class TopologyList(Printer):
     """
     Implements a list of topologies, knows how to correctly add a topology.
     """
@@ -226,4 +229,37 @@ class TopologyList(object):
         
         elements = []
         for top in self.topos: elements.extend(top.ElList)
-        return elements 
+        return elements
+    
+    def prepareData(self):
+        output = ""
+        
+        printer=SMSPrettyPrinter.SMSPrettyPrinter()
+        EvTop_table = PrettyTable(["Topology","#Vertices", "#Insertions", "#Elements", "Sum of weights"])
+        EvElement_table = PrettyTable(["Topology","Element","Particles B[0]","Particles B[1]", "Masses B[0]","Masses B[1]","Element Weight"])
+        
+        eltot = 0
+        # totweight = []
+        # Print Results:
+        # for i in range(len(SMSTopList)):
+        for i,topo in enumerate(self):
+            sumw = topo.getTotalWeight().getDictionary()
+            EvTop_table.add_row([i,topo.vertnumb,topo.vertparts,len(topo.ElList),SMSPrettyPrinter.wrap(printer.pformat(sumw),width=30)])
+            eltot += len(topo.ElList)
+        
+        #Print element list for Topology[i]:  
+            if i == 0:
+                for j,el in enumerate(topo.ElList):
+                    if el.getParticles() != [[['b','b']],[['b','b']]]:
+                        continue
+                    EvElement_table.add_row([i,j,el.getParticles()[0],el.getParticles()[1],SMSPrettyPrinter.wrap(printer.pformat(el.getMasses()[0]),width=25),SMSPrettyPrinter.wrap(printer.pformat(el.getMasses()[1]),width=25),SMSPrettyPrinter.wrap(printer.pformat(el.weight.getDictionary()),width=30)])
+                EvElement_table.add_row(["---","---","---","---","---","---","---"])  
+                     
+        output += "Number of Global topologies = " + str(len(self)) + "\n"     
+        output += str(EvTop_table) + "\n"
+        output += "Total Number of Elements = " + str(eltot) + "\n"
+        output += "Total weight = " + str(self.getTotalWeight()) + "\n"
+        # output += EvElement_table + "\n"
+        
+        return output
+        
