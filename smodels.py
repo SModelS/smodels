@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 
+"""
+SModelS basic use case.
+
+"""
+
 from theory import slhaDecomposer
 from tools.PhysicsUnits import addunit
-from tools import SMSPrettyPrinter
 from experiment import smsanalysisFactory
 from theory.theoryPrediction import theoryPredictionFor
 import logging
@@ -10,6 +14,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 def main():
+    """
+    Main program. Displays basic use case.
+    
+    """
     # useXsec = CrossSection.XSectionInfo()
     # useXsec.sqrts = addunit(8,'TeV')
     # useXsec.order = 2
@@ -25,19 +33,21 @@ def main():
     doInvisible = True
     minmassgap = addunit(5.,'GeV')
     sigmacut = addunit(0.1,'fb')
-    smsTopList = slhaDecomposer.decompose(slhafile,sigmacut,doCompress,doInvisible,minmassgap)
-    # smsTopList = lheDecomposer.decompose(lhefile,None,None,doCompress,doInvisible,minmassgap)
+    smsTopList = slhaDecomposer.decompose(slhafile, sigmacut, doCompress,
+                                          doInvisible, minmassgap)
+    # smsTopList = lheDecomposer.decompose(lhefile, None, None, doCompress,
+    #                                      doInvisible, minmassgap)
 
     smsTopList.printout()
     
     for ana in listOfAnalyses:    
-        preds = theoryPredictionFor(ana,smsTopList)
+        preds = theoryPredictionFor(ana, smsTopList)
         if not preds:
             continue
         print ana.label
         for pred in preds:
-            print 'mass=',pred.mass
-            print 'theory prediction=',pred.value
+            print 'mass=', pred.mass
+            print 'theory prediction=', pred.value
             print 'theory conditions:'
             if not pred.conditions:
                 print pred.conditions
