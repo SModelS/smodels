@@ -11,7 +11,7 @@ import crossSection
 import copy
 import itertools
 from experiment import LimitGetter
-from tools.PhysicsUnits import addunit,rmvunit
+from tools.PhysicsUnits import addunit, rmvunit
 import numpy as np
 from scipy import stats
 from collections import Iterable
@@ -29,6 +29,10 @@ def memoize(func):
     cache = {}
     @wraps(func)
     def wrap(*args):
+        """
+        missing
+        
+        """
         if str(args) not in cache:
             cache[str(args)] = func(*args)
         return cache[str(args)]
@@ -36,21 +40,21 @@ def memoize(func):
 
 
 @memoize
-def massPosition(mass,Analysis):
+def massPosition(mass, analysis):
     """
     Gives the mass position in upper limit space, using the analysis
     experimental limit data. If nounit=True, the result is given as number
     assuming fb units.
     
     """    
-    xmass = LimitGetter.GetPlotLimit(mass,Analysis,complain=False)
+    xmass = LimitGetter.GetPlotLimit(mass, analysis, complain=False)
     if type(xmass) != type(addunit(1.,'pb')):
         return None
     xmass = rmvunit(xmass,'fb')    
     return xmass
 
 
-def distance(xmass1,xmass2):
+def distance(xmass1, xmass2):
     """
     Definition of distance between two mass positions.
     
@@ -63,7 +67,7 @@ def distance(xmass1,xmass2):
     return distance
 
 
-def massAvg(massList,method='harmonic'):
+def massAvg(massList, method='harmonic'):
     """
     Computes the average mass of massList, according to method (harmonic or
     mean). If massList contains a zero mass, switch method to mean.
@@ -75,17 +79,20 @@ def massAvg(massList,method='harmonic'):
         return massList
     if len(massList) == 1:
         return massList[0]               
-    flatList = [rmvunit(mass,'GeV') for mass in flattenList(massList)]
+    flatList = [rmvunit(mass, 'GeV') for mass in flattenList(massList)]
     if method == 'harmonic' and 0. in flatList:
         method = 'mean'
     
     for mass in massList:
-        if len(mass) != len(massList[0]) or len(mass[0]) != len(massList[0][0]) or len(mass[1]) != len(massList[0][1]):  
-            logger.error('Mass shape mismatch in mass list:\n'+str(mass)+' and '+str(massList[0]))
+        if len(mass) != len(massList[0]) \
+                or len(mass[0]) != len(massList[0][0]) \
+                or len(mass[1]) != len(massList[0][1]):  
+            logger.error('Mass shape mismatch in mass list:\n'+str(mass)
+                         +' and '+str(massList[0]))
             return False
     
     avgmass = massList[0][:]
-    for ib,branch in enumerate(massList[0]):
+    for ib, branch in enumerate(massList[0]):
         for ival in enumerate(branch):
             vals = [rmvunit(mass[ib][ival[0]],'GeV') for mass in massList]
             if method == 'mean':
@@ -96,7 +103,7 @@ def massAvg(massList,method='harmonic'):
     return avgmass    
 
 
-def Csim(*weights):
+def cSim(*weights):
     """
     Defines the auxiliar similar function.
     
@@ -111,7 +118,8 @@ def Csim(*weights):
             logger.error("Trying to evaluate non-xsection objects")
             return False
 
-    # Make sure both xsec lists have the same entries (add zero xsecs for the missing entries)
+    # Make sure both xsec lists have the same entries (add zero xsecs for the
+    # missing entries)
     infoList = []
     for weight in weights:
         for info in weight.getInfo():
@@ -133,14 +141,14 @@ def Csim(*weights):
                 b = rmvunit(weightB.getXsecsFor(info.label)[0].value,'fb')
                 if a + b == 0.:
                     continue
-                res = max(res,abs(a-b)/abs(a+b))                  
+                res = max(res, abs(a-b)/abs(a+b))                  
         xsecRes.value = res
         result.add(xsecRes)
         
     return result 
 
 
-def Cgtr(weightA,weightB):
+def cGtr(weightA, weightB):
     """
     Defines the auxiliary greater function returns a number  between 0 and 1
     depending on how much it is violated (0 = A > B, 1 = A << B).
@@ -153,7 +161,8 @@ def Cgtr(weightA,weightB):
         logger.error("Trying to evaluate non-xsection objects")
         return False
 
-    # Make sure both xsec lists have the same entries (add zero xsecs for the missing entries)   
+    # Make sure both xsec lists have the same entries (add zero xsecs for the
+    # missing entries)   
     infoList = weightA.getInfo()
     for info in weightB.getInfo():
         if not info in infoList:
@@ -180,7 +189,7 @@ def Cgtr(weightA,weightB):
     return result
 
     
-def flattenList(inlist,dims=None):
+def flattenList(inlist, dims=None):
     """
     An auxliary function to completely flatten a multi-dimensional nested
     list. The output ordering is: [first level objects, second level objects,
@@ -195,7 +204,7 @@ def flattenList(inlist,dims=None):
         if isinstance(item, Iterable) and not isinstance(item, basestring):
             if not dims is None:
                 dims.append(len(item))
-            for x in flattenList(item,dims):
+            for x in flattenList(item, dims):
                 flat.append(x)
         else:        
             flat.append(item)             
@@ -215,7 +224,7 @@ def flattenList(inlist,dims=None):
         except:
             pass
         if len(flat) > 0:    
-            for ival,val in enumerate(flat):
+            for ival, val in enumerate(flat):
                 if type(val) ==  type(list()):
                     go = True
                     try:

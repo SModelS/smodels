@@ -29,41 +29,43 @@ class TheoryPrediction(object):
         self.mass = None
 
 
-def theoryPredictionFor(analysis,SMSTopList,maxMassDist=0.2):
+def theoryPredictionFor(analysis, smsTopList, maxMassDist=0.2):
     """
     Main method to compute theory predictions. Collects the elements and
     efficiencies, combine the masses (if needed) and compute the conditions (if
     any). Returns a list of TheoryPrediction objects.
     
     """
-    # Select elements constrained by analysis and apply efficiencies                       
-    elements = getElementsFrom(SMSTopList,analysis)   
-    if len(elements) == 0: return None      
+    # Select elements constrained by analysis and apply efficiencies
+    elements = getElementsFrom(smsTopList, analysis)   
+    if len(elements) == 0:
+        return None      
     # Combine masses
-    clusters = combineElements(elements,analysis,maxDist=maxMassDist)    
+    clusters = combineElements(elements, analysis, maxDist=maxMassDist)    
     # Collect results and evaluate conditions:
     predictions = []
     for cluster in clusters:
         theoPrediction = TheoryPrediction()
         theoPrediction.value = cluster.getTotalXSec()
-        theoPrediction.conditions = evalConditions(cluster,analysis)
+        theoPrediction.conditions = evalConditions(cluster, analysis)
         theoPrediction.mass = cluster.getAvgMass()
         predictions.append(theoPrediction)
 
-    if len(predictions) == 0: return None
+    if len(predictions) == 0:
+        return None
     return predictions
 
 
-def getElementsFrom(SMSTopList,analysis):
+def getElementsFrom(smsTopList, analysis):
     """
-    Loops over all elements in SMSTopList and returns the elements which are
+    Loops over all elements in smsTopList and returns the elements which are
     constrained by the analysis (have efficiency != 0). The elements weights
     are multiplied by their respective efficiency and the cross-sections not
     matching the analysis sqrts are removed.
     
     """    
     elements = []
-    for el in SMSTopList.getElements():
+    for el in smsTopList.getElements():
         eff = analysis.getEfficiencyFor(el)
         if eff == 0.:
             continue
@@ -78,7 +80,7 @@ def getElementsFrom(SMSTopList,analysis):
     return elements
 
 
-def combineElements(elements,analysis,maxDist):
+def combineElements(elements, analysis, maxDist):
     """
     Combines elements according to the analysis type. If analysis = upper limit
     type, group elements into mass clusters. If analysis = signal region type,
@@ -88,11 +90,11 @@ def combineElements(elements,analysis,maxDist):
     if type(analysis) == type(analysis.SRanalysis()):
         clusters = [clusterTools.groupAll(elements)]
     elif type(analysis) == type(analysis.ULanalysis()):
-        clusters = clusterTools.clusterElements(elements,analysis,maxDist)
+        clusters = clusterTools.clusterElements(elements, analysis, maxDist)
     return clusters
 
 
-def evalConditions(cluster,analysis):
+def evalConditions(cluster, analysis):
     """
     If analysis type = upper limit, evaluates the analysis conditions inside an
     element cluster. If  analysis type = signal region, returns None.
@@ -106,10 +108,13 @@ def evalConditions(cluster,analysis):
         conditions = {}
         # Loop over conditions        
         for cond in analysis.conditions:
-            condElements = [element.Element(el_str) for el_str in elementsInStr(cond)]  # Get elements appearing in conditions            
+            # Get elements appearing in conditions            
+            condElements = [element.Element(elStr) \
+                            for elStr in elementsInStr(cond)]
             newcond = cond
-            for iel,el in enumerate(condElements):
-                newcond = newcond.replace(str(el),"condElements["+str(iel)+"].weight")
+            for iel, el in enumerate(condElements):
+                newcond = newcond.replace(str(el), "condElements["+str(iel)+
+                                          "].weight")
                 for el1 in cluster.elements:   
                     if el1.particlesMatch(el):                        
                         el.weight.combineWith(el1.weight)

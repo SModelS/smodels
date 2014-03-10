@@ -25,11 +25,12 @@ class Element(object):
         Constructor.
         
         """
-        self.branches = [Branch(),Branch()]
+        self.branches = [Branch(), Branch()]
         self.weight = crossSection.XSectionList()
                 
         if info:
-            if type(info) == type(str()):   #Creates element from particle string
+            # Creates element from particle string
+            if type(info) == type(str()):
                 elements = elementsInStr(info)
                 if not elements or len(elements) > 1:
                     logging.error("Wrong input string "+info)
@@ -41,29 +42,33 @@ class Element(object):
                         logging.error("Wrong input string "+info)
                         return False 
                     self.branches = []
-                    for branch in branches: self.branches.append(Branch(branch))
-            elif type(info) == type([]) and type(info[0]) == type(Branch()): #Creates element from branch pair
-                for ib,branch in enumerate(info): self.branches[ib] = branch.copy() 
+                    for branch in branches:
+                        self.branches.append(Branch(branch))
+            # Creates element from branch pair
+            elif type(info) == type([]) and type(info[0]) == type(Branch()):
+                for ib, branch in enumerate(info):
+                    self.branches[ib] = branch.copy() 
 
 
-    def __eq__ (self, other):
+    def __eq__(self, other):
         return self.isEqual(other)
     
     
-    def __ne__ (self, other):
+    def __ne__(self, other):
         return not self.isEqual(other)    
     
     
-    def __str__ ( self ):
+    def __str__(self):
         """
         Returns the canonical name of the element, e.g. [[jet],[jet]].
         
         """
-        particleString = str(self.getParticles()).replace(" ","").replace("'","")
+        particleString = str(self.getParticles()).replace(" ", "").\
+                replace("'", "")
         return particleString
 
 
-    def isEqual(self,other,order=False,useDict=True):
+    def isEqual(self, other, order=False, useDict=True):
         """
         Compare two Elements. If all masses and particles are equal, returns
         True, otherwise returns False. If order = False, test both branch
@@ -71,20 +76,25 @@ class Element(object):
         inclusive particle labels.
         
         """                           
-        if type(self) != type(other): return False
+        if type(self) != type(other):
+            return False
         mass = self.getMasses()
         massA = other.getMasses()
                    
-        if self.particlesMatch(other,order=True,useDict=useDict) and mass == massA: return True               
+        if self.particlesMatch(other, order=True, useDict=useDict) \
+                and mass == massA:
+            return True               
         if not order:
-            other_b = other.switchBranches()            
-            mass_b = other_b.getMasses()
-            if self.particlesMatch(other_b,order=True,useDict=useDict) and mass == mass_b: return True
+            otherB = other.switchBranches()            
+            massB = otherB.getMasses()
+            if self.particlesMatch(otherB, order=True, useDict=useDict) \
+                    and mass == massB:
+                return True
    
         return False
     
 
-    def particlesMatch(self,other,order=False,useDict=True):
+    def particlesMatch(self, other, order=False, useDict=True):
         """
         Compare two Elements. If particles match, returns True, otherwise
         returns False. If order = False, test both branch orderings (for an
@@ -92,13 +102,16 @@ class Element(object):
         labels.
         
         """        
-        if type(self) != type(other): return False
+        if type(self) != type(other):
+            return False
         ptcs = self.getParticles()
         ptcsA = other.getParticles()
-        if simParticles(ptcs,ptcsA,useDict): return True
+        if simParticles(ptcs, ptcsA, useDict):
+            return True
         if not order:
             ptcsB = other.switchBranches().getParticles()   
-            if simParticles(ptcs,ptcsB,useDict): return True
+            if simParticles(ptcs, ptcsB, useDict):
+                return True
         
         return False
     
@@ -110,25 +123,26 @@ class Element(object):
         """
         newel = Element()
         newel.branches = []
-        for branch in self.branches: newel.branches.append(branch.copy())                
+        for branch in self.branches:
+            newel.branches.append(branch.copy())                
         newel.weight = self.weight.copy()
         return newel
     
     
-    def setMasses(self,mass,same_order=True,oppos_order=False):
+    def setMasses(self, mass, sameOrder=True, opposOrder=False):
         """
-        Sets the element masses to the input mass array. If same_order, set
-        the masses to the same branch ordering. If oppos_order, set the masses
-        to the opposite branch ordering. If both same_order and oppos_order,
+        Sets the element masses to the input mass array. If sameOrder, set
+        the masses to the same branch ordering. If opposOrder, set the masses
+        to the opposite branch ordering. If both sameOrder and opposOrder,
         set the masses to the smaller of the two orderings.
         
         """                
-        if same_order and oppos_order:
+        if sameOrder and opposOrder:
             newmass = smallerMass(mass)
-        elif same_order:
+        elif sameOrder:
             newmass = mass
-        elif oppos_order:
-            newmass = [mass[1],mass[0]]
+        elif opposOrder:
+            newmass = [mass[1], mass[0]]
         else:
             logger.error('Called with no possible ordering!')
             return False
@@ -136,7 +150,8 @@ class Element(object):
             logger.error('Called with wrong number of mass branches!')
             return False
                
-        for i,mass in enumerate(newmass): self.branches[i].masses = mass[:]
+        for i, mass in enumerate(newmass):
+            self.branches[i].masses = mass[:]
 
 
     def switchBranches(self):
@@ -145,7 +160,8 @@ class Element(object):
                 
         """
         newEl = self.copy()
-        if len(self.branches) == 2: newEl.branches = [newEl.branches[1],newEl.branches[0]]
+        if len(self.branches) == 2:
+            newEl.branches = [newEl.branches[1], newEl.branches[0]]
         return newEl
 
 
@@ -155,7 +171,8 @@ class Element(object):
              
         """
         ptcarray = []
-        for branch in self.branches: ptcarray.append(branch.particles)
+        for branch in self.branches:
+            ptcarray.append(branch.particles)
         return ptcarray
     
     
@@ -165,7 +182,8 @@ class Element(object):
              
         """
         massarray = []
-        for branch in self.branches: massarray.append(branch.masses)
+        for branch in self.branches:
+            massarray.append(branch.masses)
         return massarray
     
     
@@ -175,7 +193,7 @@ class Element(object):
         have a definite daughter).      
            
         """        
-        return (self.branches[0].daughterID,self.branches[1].daughterID)
+        return (self.branches[0].daughterID, self.branches[1].daughterID)
     
     
     def getMothers(self):
@@ -184,7 +202,7 @@ class Element(object):
         have a mother daughter).
         
         """        
-        return (self.branches[0].momID,self.branches[1].momID)
+        return (self.branches[0].momID, self.branches[1].momID)
     
     
     def getEinfo(self):
@@ -194,7 +212,7 @@ class Element(object):
         """
         vertnumb = []
         vertparts = []
-        for branch in self.branches:            
+        for branch in self.branches:
             vertnumb.append(len(branch.masses))
             vertparts.append([len(ptcs) for ptcs in branch.particles])
             if len(vertparts[len(vertparts)-1]) == vertnumb[len(vertnumb)-1]-1:
@@ -207,22 +225,25 @@ class Element(object):
         Returns the maximum of the two branch lengths.
         
         """        
-        return max(self.branches[0].getLength(),self.branches[1].getLength())
+        return max(self.branches[0].getLength(), self.branches[1].getLength())
     
     
-    def hasTopInList(self,elementList):
+    def hasTopInList(self, elementList):
         """
         Checks if the element topology matches any of the topologies in the
         element list.
         
         """
-        if type(elementList) != type([]) or len(elementList) == 0: return False
+        if type(elementList) != type([]) or len(elementList) == 0:
+            return False
         for element in elementList:
-            if type(element) != type(self): continue
+            if type(element) != type(self):
+                continue
             info1 = self.getEinfo()
             info2 = element.getEinfo()
-            info2_b = element.switchBranches().getEinfo()
-            if info1 == info2 or info1 == info2_b: return True
+            info2B = element.switchBranches().getEinfo()
+            if info1 == info2 or info1 == info2B:
+                return True
         
         return False
         
@@ -235,9 +256,11 @@ class Element(object):
         """
         for el in listOfElements:
             if igmass:
-                if self.particlesMatch(el,useDict): return True
+                if self.particlesMatch(el, useDict):
+                    return True
             else:
-                if self.isEqual(el,useDict): return True
+                if self.isEqual(el, useDict):
+                    return True
 
         return False
     
@@ -249,8 +272,8 @@ class Element(object):
         
         """
         info = self.getEinfo()
-        for ib,branch in enumerate(self.branches):            
-            for iv,vertex in enumerate(branch.particles):
+        for ib, branch in enumerate(self.branches):
+            for iv, vertex in enumerate(branch.particles):
                 if len(vertex) != info['vertparts'][ib][iv]:
                     logger.error("Wrong syntax")
                     return False
@@ -261,7 +284,7 @@ class Element(object):
         return True    
     
     
-    def compressElement(self,DoCompress,DoInvisible,minmassgap):
+    def compressElement(self, doCompress, doInvisible, minmassgap):
         """
         Keep compressing they original element and the derived ones till they
         can be compressed no more. Returns a list with the compressed elements.
@@ -269,31 +292,35 @@ class Element(object):
         """
         added = True
         newElements = [self.copy()]   
-        # Keep compressing the new topologies generated so far until no new compressions can happen:
+        # Keep compressing the new topologies generated so far until no new
+        # compressions can happen:
         while added:
             added = False
             # Check for mass compressed topologies   
-            if DoCompress:
+            if doCompress:
                 for element in newElements:             
                     newel = element.massCompress(minmassgap)
-                    if newel and not newel.hasTopInList(newElements): #Avoids double counting (conservative)
+                    # Avoids double counting (conservative)
+                    if newel and not newel.hasTopInList(newElements): 
                         newElements.append(newel) 
                         added = True
       
-            # Check for invisible compressed topologies (look for effective LSP, such as LSP + neutrino = LSP')      
-            if DoInvisible:
+            # Check for invisible compressed topologies (look for effective
+            # LSP, such as LSP + neutrino = LSP')      
+            if doInvisible:
                 for element in newElements:
                     newel = element.invisibleCompress()
-                    if newel and not newel.hasTopInList(newElements): #Avoids double counting (conservative)
+                    # Avoids double counting (conservative)
+                    if newel and not newel.hasTopInList(newElements): 
                         newElements.append(newel) 
                         added = True
 
                          
-        newElements.pop(0)  # Remove original element                            
+        newElements.pop(0)  # Remove original element
         return newElements
     
          
-    def massCompress(self,mingap):
+    def massCompress(self, mingap):
         """
         If two masses in this topology are degenerate, returns a compressed
         copy of the element. If no compression is possible, return None.
@@ -301,10 +328,13 @@ class Element(object):
         """        
         newelement = self.copy()
         vertnumb = self.getEinfo()["vertnumb"]
-        if max(vertnumb) < 2: return None   # Nothing to be compressed           
+        # Nothing to be compressed
+        if max(vertnumb) < 2:
+            return None   
         # Loop over branches
-        for ib,branch in enumerate(self.branches):
-            if vertnumb[ib] < 2: continue
+        for ib, branch in enumerate(self.branches):
+            if vertnumb[ib] < 2:
+                continue
             masses = branch.masses
             for ivertex in range(vertnumb[ib]-1):
                 if abs(masses[ivertex]-masses[ivertex+1]) < mingap:
@@ -324,12 +354,15 @@ class Element(object):
         """
         newelement = self.copy()        
         vertnumb = self.getEinfo()["vertnumb"]
-        if max(vertnumb) < 2: return None   # Nothing to be compressed        
+        # Nothing to be compressed 
+        if max(vertnumb) < 2:
+            return None       
         # Loop over branches
-        for ib,branch in enumerate(self.branches):
-            if vertnumb[ib] < 2: continue
+        for ib, branch in enumerate(self.branches):
+            if vertnumb[ib] < 2:
+                continue
             particles = branch.particles            
-            for ivertex in range(vertnumb[ib]-2,-1,-1):
+            for ivertex in range(vertnumb[ib]-2, -1, -1):
                 if particles[ivertex].count('nu') == len(particles[ivertex]):
                     newelement.branches[ib].masses.pop(ivertex+1)
                     newelement.branches[ib].particles.pop(ivertex)
@@ -342,7 +375,7 @@ class Element(object):
             return newelement
 
 
-def smallerMass(mass1,mass2):
+def smallerMass(mass1, mass2):
     """
     Uses an ordering criterium (machine-independent) to select the smaller of
     the two mass arrays.
@@ -350,14 +383,19 @@ def smallerMass(mass1,mass2):
     """
     mass1List = []
     mass2List = []
-    if mass1 == mass2: return mass1
+    if mass1 == mass2:
+        return mass1
     try:    
-        for branch in mass1: mass1List.extend(branch)
-        for branch in mass2: mass2List.extend(branch)
+        for branch in mass1:
+            mass1List.extend(branch)
+        for branch in mass2:
+            mass2List.extend(branch)
         if len(mass1List) == len(mass2List):
-            for im,m1 in enumerate(mass1List):
-                if m1 < mass2List[im]: return mass1
-                if m1 > mass2List[im]: return mass2
+            for im, m1 in enumerate(mass1List):
+                if m1 < mass2List[im]:
+                    return mass1
+                if m1 > mass2List[im]:
+                    return mass2
     except:
         pass
     
