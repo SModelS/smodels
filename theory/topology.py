@@ -77,7 +77,7 @@ class Topology(object):
             return False
     
     
-    def checkConsistency ( self, verbose=False ):
+    def checkConsistency(self):
         """
         The number of vertices and insertions per vertex is redundant
         information in a topology, so we can perform an internal consistency
@@ -87,15 +87,12 @@ class Topology(object):
         for element in self.elList:
             info=element.getEinfo()
             if self.vertnumb!=info["vertnumb"]:
-                if verbose:
-                    print "[topology.py] inconsistent topology!!!"
+                logger.error("Inconsistent topology.")
                 return False
             if self.vertparts!=info["vertparts"]:
-                if verbose:
-                    print "[topology.py] inconsistent topology!!!"
+                logger.error("Inconsistent topology.")
                 return False
-        if verbose:
-            print "[topology.py] topology is consistent."
+        logger.info("Consistent topology.")
         return True
     
     
