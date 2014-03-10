@@ -32,7 +32,7 @@ class ULanalysis(object):
     def __str__(self):
         return self.label
 
-    def getEfficiencyFor(self,element):
+    def getEfficiencyFor(self, element):
         """
         Get (simple) efficiency for element. Equals zero if element is not
         constrained by the analysis or the element multiplicative factor if it
@@ -63,7 +63,7 @@ class SRanalysis(object):
     def __str__(self):
         return self.label
 
-    def getEfficiencyFor(self,element):
+    def getEfficiencyFor(self, element):
         """
         Function to be used to get the efficiency from a database (dummy
         for now).

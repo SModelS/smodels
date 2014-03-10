@@ -22,7 +22,7 @@ class Topology(object):
     Topology.
     
     """
-    def __init__(self,elements=None):
+    def __init__(self, elements=None):
         """
         Constructor. If elements is defined, create the topology from it. 
         If elements it is a list, all elements must share a common global
@@ -41,11 +41,11 @@ class Topology(object):
                     self.addElement(element)
 
 
-    def __eq__(self,other):
+    def __eq__(self, other):
         return self.isEqual(other)
     
     
-    def __ne__(self,other):
+    def __ne__(self, other):
         return not self.isEqual(other)
     
     
@@ -66,10 +66,10 @@ class Topology(object):
                 return False
             return True
         else:
-            x1 = [self.vertnumb[0],self.vertparts[0]]
-            x2 = [self.vertnumb[1],self.vertparts[1]]
-            xA = [other.vertnumb[0],other.vertparts[0]]
-            xB = [other.vertnumb[1],other.vertparts[1]]
+            x1 = [self.vertnumb[0], self.vertparts[0]]
+            x2 = [self.vertnumb[1], self.vertparts[1]]
+            xA = [other.vertnumb[0], other.vertparts[0]]
+            xB = [other.vertnumb[1], other.vertparts[1]]
             if x1 == xA and x2 == xB:
                 return True
             if x1 == xB and x2 == xA:
@@ -85,11 +85,11 @@ class Topology(object):
         
         """
         for element in self.elList:
-            info=element.getEinfo()
-            if self.vertnumb!=info["vertnumb"]:
+            info = element.getEinfo()
+            if self.vertnumb != info["vertnumb"]:
                 logger.error("Inconsistent topology.")
                 return False
-            if self.vertparts!=info["vertparts"]:
+            if self.vertparts != info["vertparts"]:
                 logger.error("Inconsistent topology.")
                 return False
         logger.info("Consistent topology.")
@@ -107,12 +107,17 @@ class Topology(object):
     
     def describe(self):
         """ a lengthy description """
-        ret="number of vertices=%s number of vertex particles=%s number of elements=%d" % \
+        ret = "number of vertices=%s number of vertex particles=%s number of \
+               elements=%d" % \
               ( self.vertnumb, self.vertparts, len(self.elList) )
         return ret
     
     
-    def elements ( self ):
+    def elements(self):
+        """
+        missing
+        
+        """
         return self.elList
 
      
@@ -124,7 +129,8 @@ class Topology(object):
         orderings.
         
         """                
-        # If the topology info has not been set yet, set it using the element info
+        # If the topology info has not been set yet, set it using the element
+        # info
         if not self.vertparts:
             self.vertparts = newelement.getEinfo()["vertparts"]
         if not self.vertnumb:
@@ -132,8 +138,8 @@ class Topology(object):
         
         # Check if newelement matches the topology structure:
         info = newelement.getEinfo()
-        info_b = newelement.switchBranches().getEinfo()
-        if info != self.getTinfo() and info_b != self.getTinfo():
+        infoB = newelement.switchBranches().getEinfo()
+        if info != self.getTinfo() and infoB != self.getTinfo():
             logger.warning('Element to be added does not match topology')
             return False
         
@@ -144,21 +150,28 @@ class Topology(object):
             if element == newelement:
                 added = True
                 element.weight.combineWith(newelement.weight)
-                if element.getMothers() != newelement.getMothers(): # When combining elements with different mothers, erase mother info
+                # When combining elements with different mothers, erase mother
+                # info
+                if element.getMothers() != newelement.getMothers(): 
                     element.branches[0].momID = None
                     element.branches[1].momID = None
-                if element.getDaughters() != newelement.getDaughters(): # When combining elements with different daughters, erase daughter info
+                # When combining elements with different daughters, erase
+                # daughter info
+                if element.getDaughters() != newelement.getDaughters(): 
                     element.branches[0].daughterID = None
                     element.branches[1].daughterID = None
                 
                 
         if added:
             return True
-        # If element has not been found add to list (OBS: if both branch orderings are good, add the original one)
-        tryelements = [newelement,newelement.switchBranches()]  #Check both branch orderings
+        # If element has not been found add to list (OBS: if both branch
+        # orderings are good, add the original one)
+        # Check both branch orderings
+        tryelements = [newelement, newelement.switchBranches()]  
         for newel in tryelements:
             info = newel.getEinfo()
-            if info["vertnumb"] != self.vertnumb or info["vertparts"] != self.vertparts:
+            if info["vertnumb"] != self.vertnumb or info["vertparts"] != \
+                    self.vertparts:
                 continue
             self.elList.append(newel)
             return True
@@ -201,7 +214,7 @@ class TopologyList(Printer):
         return len(self.topos)    
 
 
-    def __getitem__(self,index):
+    def __getitem__(self, index):
         return self.topos[index]
     
     
@@ -216,30 +229,38 @@ class TopologyList(Printer):
         return s
 
 
-    def addList(self,List):
-        for topo in List:
+    def addList(self, parList):
+        """
+        missing
+        
+        """
+        for topo in parList:
             self.add(topo)
 
 
     def describe(self):
+        """
+        missing
+        
+        """
         s = "TopologyList:\n" 
         for topo in self.topos:
             s += str(topo)+"\n"
         return s
 
 
-    def add(self,newtopo):
+    def add(self, newtopo):
         """
-        Check if elements in newtopo matches an entry in self.topos. If it does,
-        add weight.  If the same topology exists, but not the same element, add
-        element.  If neither element nor topology exist, add the new topology and
-        all its elements 
+        Check if elements in newtopo matches an entry in self.topos. If it
+        does, add weight. If the same topology exists, but not the same
+        element, add element. If neither element nor topology exist, add the
+        new topology and all its elements .
 
         :type topo: Topology    
         
         """        
         topmatch = False        
-        for itopo,topo in enumerate(self.topos):
+        for itopo, topo in enumerate(self.topos):
             if topo == newtopo:
                 topmatch = itopo
         # If no pre-existing topologies match, append it to list of topologies
@@ -264,8 +285,10 @@ class TopologyList(Printer):
     
     
     def getElements(self):
-        """ Returns a list with all the elements in all the topologies """
+        """
+        Returns a list with all the elements in all the topologies.
         
+        """        
         elements = []
         for top in self.topos:
             elements.extend(top.elList)
@@ -273,34 +296,52 @@ class TopologyList(Printer):
     
     
     def prepareData(self):
+        """
+        missing
+        
+        """
         output = ""
         
-        printer=SMSPrettyPrinter.SMSPrettyPrinter()
-        EvTop_table = PrettyTable(["Topology","#Vertices", "#Insertions", "#Elements", "Sum of weights"])
-        EvElement_table = PrettyTable(["Topology","Element","Particles B[0]","Particles B[1]", "Masses B[0]","Masses B[1]","Element Weight"])
+        printer = SMSPrettyPrinter.SMSPrettyPrinter()
+        evTopTable = PrettyTable(["Topology", "#Vertices", "#Insertions",
+                                   "#Elements", "Sum of weights"])
+        evElementTable = PrettyTable(["Topology", "Element", "Particles B[0]",
+                                       "Particles B[1]", "Masses B[0]",
+                                       "Masses B[1]", "Element Weight"])
         
         eltot = 0
         # totweight = []
         # Print Results:
         # for i in range(len(SMSTopList)):
-        for i,topo in enumerate(self):
+        for i, topo in enumerate(self):
             sumw = topo.getTotalWeight().getDictionary()
-            EvTop_table.add_row([i,topo.vertnumb,topo.vertparts,len(topo.elList),SMSPrettyPrinter.wrap(printer.pformat(sumw),width=30)])
+            evTopTable.add_row([i, topo.vertnumb, topo.vertparts,
+                                 len(topo.elList),
+                                 SMSPrettyPrinter.wrap(printer.pformat(sumw), 
+                                                       width=30)])
             eltot += len(topo.elList)
         
         #Print element list for Topology[i]:  
             if i == 0:
-                for j,el in enumerate(topo.elList):
-                    if el.getParticles() != [[['b','b']],[['b','b']]]:
+                for j, el in enumerate(topo.elList):
+                    if el.getParticles() != [[['b', 'b']], [['b', 'b']]]:
                         continue
-                    EvElement_table.add_row([i,j,el.getParticles()[0],el.getParticles()[1],SMSPrettyPrinter.wrap(printer.pformat(el.getMasses()[0]),width=25),SMSPrettyPrinter.wrap(printer.pformat(el.getMasses()[1]),width=25),SMSPrettyPrinter.wrap(printer.pformat(el.weight.getDictionary()),width=30)])
-                EvElement_table.add_row(["---","---","---","---","---","---","---"])  
+                    evElementTable.add_row([
+                            i, j, el.getParticles()[0], el.getParticles()[1],
+                            SMSPrettyPrinter.wrap(printer.pformat(
+                                    el.getMasses()[0]), width=25),
+                            SMSPrettyPrinter.wrap(printer.pformat(
+                                    el.getMasses()[1]), width=25),
+                            SMSPrettyPrinter.wrap(printer.pformat(
+                                    el.weight.getDictionary()), width=30)])
+                evElementTable.add_row(["---", "---", "---", "---", "---",
+                                         "---", "---"])  
                      
-        output += "Number of Global topologies = " + str(len(self)) + "\n\n"     
-        output += str(EvTop_table) + "\n\n"
+        output += "Number of Global topologies = " + str(len(self)) + "\n\n"
+        output += str(evTopTable) + "\n\n"
         output += "Total Number of Elements = " + str(eltot) + "\n"
         output += "Total weight = " + str(self.getTotalWeight()) + "\n"
-        # output += EvElement_table + "\n"
+        # output += evElementTable + "\n"
         
         return output
         
