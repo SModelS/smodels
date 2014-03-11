@@ -12,7 +12,7 @@ import clusterTools
 import crossSection, element
 import logging
 from ParticleNames import elementsInStr
-from auxiliaryFunctions import cSim, cGtr
+from auxiliaryFunctions import cSim, cGtr, Csim, Cgtr
 from analysis import SRanalysis,ULanalysis
 
 logger = logging.getLogger(__name__)
