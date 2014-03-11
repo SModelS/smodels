@@ -5,7 +5,7 @@ SModelS basic use case.
 
 """
 
-from theory import slhaDecomposer
+from theory import slhaDecomposer, lheDecomposer
 from tools.PhysicsUnits import addunit
 from experiment import smsanalysisFactory
 from theory.theoryPrediction import theoryPredictionFor
@@ -18,32 +18,24 @@ def main():
     Main program. Displays basic use case.
     
     """
-    # useXsec = CrossSection.XSectionInfo()
-    # useXsec.sqrts = addunit(8,'TeV')
-    # useXsec.order = 2
-    # useXsec.label = 'tev8'
-    # UseXSecs = [useXsec]
-    
-    listOfAnalyses = smsanalysisFactory.load()
-    slhafile = "slha/andrePT4.slha"
-    # lhefile = "lhe/ued_1.lhe"
-    # lhefile = "lhe/TChiChipmSlepL_1.lhe"
-    # nevts = 10000
-    doCompress = True
-    doInvisible = True
-    minmassgap = addunit(5.,'GeV')
-    sigmacut = addunit(0.1,'fb')
-    smsTopList = slhaDecomposer.decompose(slhafile, sigmacut, doCompress,
-                                          doInvisible, minmassgap)
-    # smsTopList = lheDecomposer.decompose(lhefile, None, None, doCompress,
-    #                                      doInvisible, minmassgap)
 
+#Decompose model (SLHA or LHE input):    
+    slhafile = "slha/andrePT4bb.slha"
+    lhefile = "lhe/ued_1.lhe"
+    mingap = addunit(5.,'GeV')
+    sigmacut = addunit(0.1,'fb')
+    smsTopList = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=True
+                                          , doInvisible=True, minmassgap=mingap)
+#     smsTopList = lheDecomposer.decompose(lhefile, doCompress=True, doInvisible=True, minmassgap=mingap)
+#Print decomposition summary
     smsTopList.printout()
     
-    for ana in listOfAnalyses:    
+#Load analyses
+    listOfAnalyses = smsanalysisFactory.load()
+#Get theory prediction for each analysis and print basic output       
+    for ana in listOfAnalyses:
         preds = theoryPredictionFor(ana, smsTopList)
-        if not preds:
-            continue
+        if not preds: continue
         print ana.label
         for pred in preds:
             print 'mass=', pred.mass

@@ -103,7 +103,7 @@ def massAvg(massList, method='harmonic'):
     return avgmass    
 
 
-def cSim(*weights):
+def Csim(*weights):
     """
     Defines the auxiliar similar function.
     
@@ -148,7 +148,7 @@ def cSim(*weights):
     return result 
 
 
-def cGtr(weightA, weightB):
+def Cgtr(weightA, weightB):
     """
     Defines the auxiliary greater function returns a number  between 0 and 1
     depending on how much it is violated (0 = A > B, 1 = A << B).
