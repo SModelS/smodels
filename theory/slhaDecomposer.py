@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
  
 def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False, 
-              minmassgap=-1, UseXSecs=None):
+              minmassgap=-1, useXSecs=None):
     """
     Do SLHA-based decomposition.
     
@@ -58,15 +58,15 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
         sigcut = addunit(sigcut, 'fb')
 
     # get cross-section from file
-    XSectionList = crossSection.getXsecFromSLHAFile(slhafile,UseXSecs)
+    xSectionList = crossSection.getXsecFromSLHAFile(slhafile, useXSecs)
     # get BRs and masses from file
-    BRdic, Massdic = getDictionariesFromSLHA(slhafile)
+    brDic, massDic = getDictionariesFromSLHA(slhafile)
     
     # Get maximum cross-sections (weights) for single particles (irrespective
     # of sqrtS):
     maxWeight = {}
-    for pid in XSectionList.getPIDs():
-        maxWeight[pid] = XSectionList.getXsecsFor(pid).getMaxXsec()
+    for pid in xSectionList.getPIDs():
+        maxWeight[pid] = xSectionList.getXsecsFor(pid).getMaxXsec()
            
     # Create 1-particle branches with all possible mothers
     branchList = []
@@ -74,26 +74,26 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
         branchList.append(Branch())
         branchList[-1].momID = pid
         branchList[-1].daughterID = pid
-        branchList[-1].masses = [Massdic[pid]]
+        branchList[-1].masses = [massDic[pid]]
         branchList[-1].maxWeight = maxWeight[pid]
 
     # Generate final branches (after all R-odd particles have decayed)
-    finalBranchList = decayBranches(branchList,BRdic,Massdic,sigcut)
+    finalBranchList = decayBranches(branchList, brDic, massDic, sigcut)
     
-    SMSTopList = topology.TopologyList()    
+    smsTopList = topology.TopologyList()    
     # Combine pairs of branches into elements according to production
     # cross-section list:    
-    for pids in XSectionList.getPIDpairs():
+    for pids in xSectionList.getPIDpairs():
         for branch1 in finalBranchList:
             for branch2 in finalBranchList:
                 if branch1.momID == pids[0] and branch2.momID == pids[1]:
-                    FinalBR = branch1.maxWeight*branch2.maxWeight/(
+                    finalBR = branch1.maxWeight*branch2.maxWeight/(
                             maxWeight[pids[0]]*maxWeight[pids[1]])
-                    if type(FinalBR) == type(addunit(1.,'fb')):
-                        FinalBR = FinalBR.asNumber()                 
-                    weightList = XSectionList.getXsecsFor(pids)*FinalBR
+                    if type(finalBR) == type(addunit(1.,'fb')):
+                        finalBR = finalBR.asNumber()                 
+                    weightList = xSectionList.getXsecsFor(pids)*finalBR
                     
-                    newElement = element.Element([branch1,branch2])
+                    newElement = element.Element([branch1, branch2])
                     newElement.weight = weightList
                     # Do compression:
                     if doCompress or doInvisible:
@@ -106,11 +106,11 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
                         if el.weight.getMaxXsec() < sigcut:
                             # skip elements with xsec below sigcut 
                             continue                          
-                        Top = topology.Topology(el)            
-                        SMSTopList.addList([Top])                       
+                        top = topology.Topology(el)            
+                        smsTopList.addList([top])                       
     logger.debug("slhaDecomposer done in " + str(time.time()-t1) + " s.")
 
-    return SMSTopList        
+    return smsTopList        
 
 
 def getDictionariesFromSLHA(slhafile):
@@ -124,19 +124,19 @@ def getDictionariesFromSLHA(slhafile):
     res = pyslha.readSLHAFile(slhafile)
 
     # Get mass and branching ratios for all particles:
-    BRdic = {}
+    brDic = {}
     for pid in res[1].keys():
         brs = copy.deepcopy(res[1][pid].decays)
-        brs_conj = copy.deepcopy(brs)
-        for br in brs_conj:
+        brsConj = copy.deepcopy(brs)
+        for br in brsConj:
             br.ids = [-x for x in br.ids]
-        BRdic[pid] = brs
-        BRdic[-pid] = brs_conj
+        brDic[pid] = brs
+        brDic[-pid] = brsConj
     # Get mass list for all particles
-    Massdic = {}
+    massDic = {}
     for pid in res[1].keys():
         if pid and res[1][pid].mass != None:
-            Massdic[pid] = addunit(abs(res[1][pid].mass),'GeV')
-            Massdic[-pid] = addunit(abs(res[1][pid].mass),'GeV')
+            massDic[pid] = addunit(abs(res[1][pid].mass), 'GeV')
+            massDic[-pid] = addunit(abs(res[1][pid].mass), 'GeV')
 
-    return BRdic,Massdic
+    return brDic, massDic

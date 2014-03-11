@@ -344,7 +344,7 @@ class XSectionList(object):
         Gets the maximum cross-section value appearing in the list.
         
         """
-        maxxsec= addunit(0., 'fb')
+        maxxsec = addunit(0., 'fb')
         for xsec in self:
             if xsec.value > maxxsec:
                 maxxsec = xsec.value
@@ -380,7 +380,7 @@ class XSectionList(object):
                 xSecDictionary[label] = {}
                 xSecs = self.getXsecsFor(label)
                 for xsec in xSecs:
-                    xSecDictionary[label][xsec.pid] = xsec.value                    
+                    xSecDictionary[label][xsec.pid] = xsec.value
 
         return xSecDictionary
     
