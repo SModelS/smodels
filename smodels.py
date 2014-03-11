@@ -20,7 +20,7 @@ def main():
     """
 
 #Decompose model (SLHA or LHE input):    
-    slhafile = "slha/andrePT4bb.slha"
+    slhafile = "slha/andrePT4.slha"
     lhefile = "lhe/ued_1.lhe"
     mingap = addunit(5.,'GeV')
     sigmacut = addunit(0.1,'fb')
