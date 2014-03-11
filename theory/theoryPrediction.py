@@ -12,6 +12,8 @@ import clusterTools
 import crossSection, element
 import logging
 from ParticleNames import elementsInStr
+from auxiliaryFunctions import Csim, Cgtr
+from analysis import SRanalysis,ULanalysis
 
 logger = logging.getLogger(__name__)
 
@@ -87,9 +89,9 @@ def combineElements(elements, analysis, maxDist):
     group all elements into a single cluster.
     
     """    
-    if type(analysis) == type(analysis.SRanalysis()):
+    if type(analysis) == type(SRanalysis()):
         clusters = [clusterTools.groupAll(elements)]
-    elif type(analysis) == type(analysis.ULanalysis()):
+    elif type(analysis) == type(ULanalysis()):
         clusters = clusterTools.clusterElements(elements, analysis, maxDist)
     return clusters
 
@@ -100,9 +102,9 @@ def evalConditions(cluster, analysis):
     element cluster. If  analysis type = signal region, returns None.
     
     """        
-    if type(analysis) == type(analysis.SRanalysis()):
+    if type(analysis) == type(SRanalysis()):
         return None
-    elif type(analysis) == type(analysis.ULanalysis()):
+    elif type(analysis) == type(ULanalysis()):
         if not analysis.conditions:
             return analysis.conditions
         conditions = {}

@@ -28,14 +28,9 @@ class XSectionInfo(object):
 
 
     def __eq__(self, other):     
-        if type(other) != type(XSectionInfo()):
-            return False
-        if other.sqrts != self.sqrts:
-            return False
-        if other.order != self.order:
-            return False
-        if other.label != self.label:
-            return False
+        if type(other) != type(XSectionInfo()): return False
+        if other.sqrts != self.sqrts: return False
+        if other.order != self.order: return False
         return True
  
  
@@ -452,10 +447,8 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None):
         xsec.value = cs
         xsec.pid = pids
         # Do not add xsecs which do not match the user required ones:
-        if useXSecs and not xsec.info in useXSecs:
-            continue 
-        else:
-            xSecsInFile.add(xsec)
+        if useXSecs and not xsec.info in useXSecs: continue 
+        else: xSecsInFile.add(xsec)
 
     slha.close()
 
@@ -492,6 +485,7 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
     nevts = reader.metainfo["nevents"]
     sqrtS = reader.metainfo["sqrts"]
     eventCs = totxsec/float(nevts)
+
     
     # Get all mom pids
     allpids = []    
@@ -506,8 +500,8 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
             xsec.info.order = reader.metainfo["cs_order"]
         else:
             # Assume LO xsecs, if not defined in the reader
-            xsec.info.order = 0  
-        wlabel = str(int(rmvunit(sqrtS,'TeV')))+' TeV'
+            xsec.info.order = 0        
+        wlabel = str(rmvunit(sqrtS,'TeV'))+' TeV'
         if xsec.info.order == 0:
             wlabel += ' (LO)'
         elif xsec.info.order == 1:
@@ -529,5 +523,6 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
                     xSecsInFile.xSections[ixsec].value += eventCs
     
     reader.close()
+
 
     return xSecsInFile
