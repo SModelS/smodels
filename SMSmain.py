@@ -2,12 +2,12 @@
 
 import sys
 from prettytable import PrettyTable
-from Theory import LHEDecomposer, SLHADecomposer, XSecComputer, ClusterTools, CrossSection, SLHATools
-from Tools.PhysicsUnits import addunit, rmvunit
-from Tools import SMSPrettyPrinter, VariousHelpers
-from Tools.SMSPrettyPrinter import wrap
-from Tools.VariousHelpers import logging
-from Experiment import SMSAnalysisList, SMSAnalysisFactory, LimitGetter, SMSHelpers
+from theory import LHEDecomposer, SLHADecomposer, XSecComputer, ClusterTools, CrossSection, SLHATools, TheoryPrediction
+from tools.PhysicsUnits import addunit, rmvunit
+from tools import SMSPrettyPrinter, VariousHelpers
+from tools.SMSPrettyPrinter import wrap
+from tools.VariousHelpers import logging
+from experiment import SMSAnalysisList, SMSAnalysisFactory, LimitGetter, SMSHelpers
 
 
 printer=SMSPrettyPrinter.SMSPrettyPrinter()
@@ -21,21 +21,17 @@ printer=SMSPrettyPrinter.SMSPrettyPrinter()
 #Generate events and compute cross-sections:
 nevts = 10000
 slhafile = "slha/andrePT4.slha"
+#slhafile = "slha/DESY_stop.slha"
 
-Compute_xsecs = False
-if Compute_xsecs:
-  WriteToFile = False
-  if not WriteToFile:
-    Wv = XSecComputer.compute(nevts,slhafile)
-    W = Wv["Wdic"]
-    Xsec = Wv["Xsecdic"]
-    lhefile = Wv["lhefile"]
-  else:
-    Xsec=None
-    SLHATools.writeXSecToSLHAFile(slhafile,nevts,printLHE=False)
+WriteToFile = True
+if not WriteToFile:
+  Wv = XSecComputer.compute(nevts,slhafile,rpythia = True)
+  W = Wv["Wdic"]
+  Xsec = Wv["Xsecdic"]
+  lhefile = Wv["lhefile"]
 else:
-    W = None
-    Xsec = None
+  Xsec=None
+  SLHATools.writeXSecToSLHAFile(slhafile,nevts,printLHE=False)
 
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Creat analyses list:
@@ -46,16 +42,20 @@ else:
   ListOfAnalyses = SMSAnalysisList.load()
 
 
+
+
 DoCompress = True
 DoInvisible = True
-minmassgap = addunit(5.,'GeV')
+minmassgap = addunit(10.,'GeV')
 
 DoSLHAdec = True
 if DoSLHAdec:
   sigmacut = addunit(0.1,'fb')
-  SMSTopList = SLHADecomposer.decompose(slhafile,Xsec,sigmacut,DoCompress,DoInvisible,minmassgap)
+  if DoCompress or DoInvisible: sigmacut = sigmacut/10.  #When compression is turned on, relax sigmacut
+  SMSTopList = SLHADecomposer.decompose(slhafile,sigmacut,DoCompress,DoInvisible,minmassgap)
 else:
   SMSTopList = LHEDecomposer.decompose(lhefile,W,nevts,DoCompress,DoInvisible,minmassgap)
+
 
 EvTop_table = PrettyTable(["Topology","#Vertices", "#Insertions", "#Elements", "Sum of weights"])
 EvElement_table = PrettyTable(["Topology","Element","Particles B[0]","Particles B[1]", "Masses B[0]","Masses B[1]","Element Weight"])
@@ -65,18 +65,18 @@ totweight = []
 #Print Results:
 # for i in range(len(SMSTopList)):
 for (i,topo) in enumerate(SMSTopList):
-  weightlist = [el.weight for el in topo.ElList]
+  weightlist = [el.weight for el in topo.elList]
   sumw = ClusterTools.sumweights(weightlist)
   totweight.append(sumw)
-  EvTop_table.add_row([i,topo.vertnumb,topo.vertparts,len(topo.ElList),wrap(printer.pformat(sumw),width=30)])
-  eltot += len(topo.ElList)
+  EvTop_table.add_row([i,topo.vertnumb,topo.vertparts,len(topo.elList),wrap(printer.pformat(sumw),width=30)])
+  eltot += len(topo.elList)
 
  
       
 #Print element list for Topology[i]:  
-  if i == 23:       
-    for j in range(len(SMSTopList[i].ElList)):
-      EvElement_table.add_row([i,j,SMSTopList[i].ElList[j].B[0].particles,SMSTopList[i].ElList[j].B[1].particles,wrap(printer.pformat(SMSTopList[i].ElList[j].B[0].masses),width=25),wrap(printer.pformat(SMSTopList[i].ElList[j].B[1].masses),width=25),wrap(printer.pformat(SMSTopList[i].ElList[j].weight),width=30)])
+  if i >= 0:       
+    for j in range(len(SMSTopList[i].elList)):
+      EvElement_table.add_row([i,j,SMSTopList[i].elList[j].B[0].particles,SMSTopList[i].elList[j].B[1].particles,wrap(printer.pformat(SMSTopList[i].elList[j].B[0].masses),width=25),wrap(printer.pformat(SMSTopList[i].elList[j].B[1].masses),width=25),wrap(printer.pformat(SMSTopList[i].elList[j].weight),width=30)])
     EvElement_table.add_row(["---","---","---","---","---","---","---"])  
       
       
@@ -84,37 +84,12 @@ print "Number of Global topologies = ",len(SMSTopList)
 print(EvTop_table)
 print "Total Number of Elements = ",eltot
 print "Total weight = ",ClusterTools.sumweights(totweight)
-print(EvElement_table)
+#print(EvElement_table)
 
 print '\n \n \n'
 
 
 #sys.exit()
-#Add event topologies to analyses:
-for Analysis in ListOfAnalyses:
-  Analysis.add(SMSTopList)
-
-
-#Print analyses output:
-AnElement_table = PrettyTable(["Analyses","Element","Masses","Element Weight"])  
-
-
-
-for Ana in ListOfAnalyses:
-  label = Ana.label
-  ifirst = True
-  for iel,El in enumerate(Ana.Top.ElList):
-    ptcs = El.ParticleStr
-    for im,massweight in enumerate(El.MassWeightList):
-      mass = massweight.mass
-      if not ifirst: label = ""
-      if im != 0: ptcs = ""
-      ifirst = False
-      AnElement_table.add_row([label,ptcs,wrap(printer.pformat(mass),width=100),wrap(printer.pformat(massweight.weight),width=30)])
-  AnElement_table.add_row(["---","---","---","---"])  
-
-
-#print(AnElement_table)
 
 
 #print '\n \n \n'
@@ -131,26 +106,17 @@ for Analysis in ListOfAnalyses:
     print "Skipping analysis",Analysis.label,"with more than 3 vertices"
     continue
 
+  result = TheoryPrediction.TheoryPrediction()
+  if not result.computeTheoryPredictions(Analysis,SMSTopList): continue #Theoretical values for result and conditions
 
-#  if not Analysis.computeTheoryPredictions(): continue #Theoretical values for result and conditions
-  th = Analysis.computeTheoryPredictions()
-  if not th: continue
-  elif th == 'Cluster Failed':
-    print th
-    continue
-  
-  
+  if len(result.clusterResults) == 0: continue
 
-  res = Analysis.results.keys()[0]  
-
-  if len(Analysis.ResultList) == 0: continue
-
-  for cluster in Analysis.ResultList:
-    theoRes = cluster.oldformat()   #Convert to old format (except for small change in conditions output)
-    mass = theoRes['mass']
-    tvalue = theoRes['result']
-    conds = theoRes['conditions']
-    sigmalimit = [Analysis.plots.values()[0][1][0],cluster.explimit]
+  for cluster in result.clusterResults:
+    mass = cluster.mass
+    res = cluster.result_dic.keys()[0]
+    tvalue = cluster.result_dic.values()
+    conds = cluster.conditions_dic.values()
+    sigmalimit = [result.analysis.label,cluster.explimit]
 
     Results_table.add_row([wrap(printer.pformat(res),width=30),wrap(printer.pformat(conds),width=30),wrap(printer.pformat(mass),width=30),wrap(printer.pformat(tvalue),width=30),wrap(printer.pformat(sigmalimit),width=30)])
 

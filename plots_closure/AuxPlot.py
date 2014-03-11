@@ -199,7 +199,7 @@ def set_palette(gStyle,name="none", ncontours=999):
         green = [1.00, 0.84, 0.61, 0.34, 0.00]
         blue  = [1.00, 0.84, 0.61, 0.34, 0.00]
     else:
-        # default palette, looks cool
+# default palette, looks cool
         stops = [0.00, 0.34, 0.61, 0.84, 1.00]
         red   = [0.00, 0.00, 0.87, 1.00, 0.51]
         green = [0.00, 0.81, 1.00, 0.20, 0.00]

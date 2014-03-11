@@ -1,9 +1,9 @@
 #!/usr/bin/python
 
 import sys
-from Theory import SLHADecomposer
-from Tools.PhysicsUnits import addunit
-from Experiment import SMSAnalysisFactory
+from theory import SLHADecomposer
+from tools.PhysicsUnits import addunit
+from experiment import SMSAnalysisFactory
 
 #Basic input for decomposition:
 slhafile = "slha/andrePT4.slha"
