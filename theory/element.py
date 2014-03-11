@@ -138,7 +138,7 @@ class Element(object):
         
         """                
         if sameOrder and opposOrder:
-            newmass = smallerMass(mass)
+            newmass = smallerMass(mass[0], mass[1])
         elif sameOrder:
             newmass = mass
         elif opposOrder:
