@@ -5,9 +5,9 @@ import sys, glob, os
 smsdir = os.getcwd() + '/SMSfrozen/'
 sys.path.append(smsdir)
 
-from Theory import SLHADecomposer, CrossSection, ClusterTools
-from Tools.PhysicsUnits import addunit, rmvunit
-from Experiment import SMSAnalysisFactory
+from theory import SLHADecomposer, CrossSection, ClusterTools
+from tools.PhysicsUnits import addunit, rmvunit
+from experiment import SMSAnalysisFactory
 
 XSectionInfo = CrossSection.XSecInfoList('8 TeV (NLL)')
 CrossSection.XSectionInfo = XSectionInfo
@@ -30,7 +30,7 @@ for slhafile in slhafileList:
 #Get total cross-section
   totweight = []
   for topo in SMSTopList:
-    weightlist = [el.weight for el in topo.ElList]
+    weightlist = [el.weight for el in topo.elList]
     sumw = ClusterTools.sumweights(weightlist)
     totweight.append(sumw)
   totxsec = ClusterTools.sumweights(totweight)
@@ -44,8 +44,8 @@ for slhafile in slhafileList:
 
 #Get the result:
   Analysis = ListOfAnalyses[0]
-  Mmass = Analysis.Top.ElList[0].MassWeightList[0].mass[0][0].asNumber()
-  LSPmass = Analysis.Top.ElList[0].MassWeightList[0].mass[0][-1].asNumber()
+  Mmass = Analysis.Top.elList[0].MassWeightList[0].mass[0][0].asNumber()
+  LSPmass = Analysis.Top.elList[0].MassWeightList[0].mass[0][-1].asNumber()
   if len(Analysis.ResultList) > 1:
     print 'more than one cluster in',slhafile
     sys.exit()

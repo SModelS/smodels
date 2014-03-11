@@ -2,4 +2,5 @@
 *.swp
 .project
 .pydevproject
-pythia_lhe
+smodels.log
+
