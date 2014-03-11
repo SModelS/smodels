@@ -205,6 +205,7 @@ class TopologyList(Printer):
         If topos are given, we add all of them sequentially.
         
         """
+        super(TopologyList, self).__init__()
         self.topos = []
         for topo in topos:
             self.add(topo)
