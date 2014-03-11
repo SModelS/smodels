@@ -216,29 +216,4 @@ def flattenList(inlist, dims=None):
                 flat.append(x)
         else:        
             flat.append(item)             
-    return flat    
-    
-    if type(inlist) != type(list()):
-        return inlist
-    try:
-        flat = list(itertools.chain(*inlist))
-    except:
-        flat = copy.deepcopy(inlist)
-    go = True
-    while go:
-        go = False
-        try:
-            flat = list(itertools.chain(*flat))
-        except:
-            pass
-        if len(flat) > 0:    
-            for ival, val in enumerate(flat):
-                if type(val) ==  type(list()):
-                    go = True
-                    try:
-                        val = list(itertools.chain(*val))
-                    except:
-                        pass
-                    flat.pop(ival)                
-                    flat.extend(val)
     return flat
