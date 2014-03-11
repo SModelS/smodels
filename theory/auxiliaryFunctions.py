@@ -100,7 +100,11 @@ def massAvg(massList, method='harmonic'):
             elif method == 'harmonic':
                 avg = stats.hmean(vals)
             avgmass[ib][ival[0]] = addunit(float(avg),'GeV')   
-    return avgmass    
+    return avgmass
+
+
+def Csim(*weights):
+    return cSim(*weights)
 
 
 def cSim(*weights):
@@ -146,6 +150,10 @@ def cSim(*weights):
         result.add(xsecRes)
         
     return result 
+
+
+def Cgtr(weightA, weightB):
+    return cGtr(weightA, weightB)
 
 
 def cGtr(weightA, weightB):
