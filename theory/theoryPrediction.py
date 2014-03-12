@@ -12,7 +12,7 @@ import clusterTools
 import crossSection, element
 import logging
 from ParticleNames import elementsInStr
-from auxiliaryFunctions import cSim, cGtr, Csim, Cgtr
+from auxiliaryFunctions import cSim, cGtr
 from analysis import SRanalysis,ULanalysis
 
 logger = logging.getLogger(__name__)
@@ -120,7 +120,16 @@ def evalConditions(cluster, analysis):
                 for el1 in cluster.elements:   
                     if el1.particlesMatch(el):                        
                         el.weight.combineWith(el1.weight)
-                   
+                        
+            
+            if newcond.find("Cgtr") >= 0:
+                newcond = newcond.replace("Cgtr", "cGtr")
+                logger.warning(analysis.label + " using deprecated function 'Cgtr'. Auto-replacing with 'cGtr'.")
+                
+            if newcond.find("Csim") >= 0:
+                newcond = newcond.replace("Csim", "cSim")
+                logger.warning(analysis.label + " using deprecated function 'Csim'. Auto-replacing with 'cSim'.")
+            
             conditions[cond] = eval(newcond)
             
         return conditions
