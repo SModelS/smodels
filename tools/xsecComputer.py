@@ -108,11 +108,6 @@ def xsecToBlock(xsec,inPDGs=(2212,2212),comment=None):
     
     return header + "\n" + entry
     
-
-def version():
-    """Returns SModelS version. To be replaced with a proper version method."""
-    return "1.0"
-
 def runPythia(slhafile,nevts,sqrts,lhefile=None,basedir=None):
     """ run pythia_lhe with n events, at sqrt(s)=sqrts. Returns a file object with the lhe events
         :param slhafile: input SLHA file

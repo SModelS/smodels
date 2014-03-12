@@ -3,10 +3,10 @@
 """ A first UED example """
 
 import set_path, tempfile
-from theory import LHEDecomposer, XSecComputer
+from theory import lheDecomposer
 from experiment import TxNames, SMSAnalysisFactory, SMSResults, LimitGetter, SMSHelpers
 from tools.PhysicsUnits import fb
-from tools import FeynmanGraphs
+from tools import FeynmanGraphs, xsecComputer
 from tools.VariousHelpers import logging
 
 ## SMSHelpers.Base="/home/lisa/daten/smodels"
@@ -24,12 +24,12 @@ lhefile="../lhe/ued_2.lhe" ## thats the lhe file we're using
 
 
 ## we create the correct object manually
-Wv=XSecComputer.loFromLHE ( lhefile, totalxsec = None ) 
+Wv=xsecComputer.loFromLHE ( lhefile, totalxsec = None ) 
 weights={ '8 TeV (LO)': Wv[0] }
 print "[UED.py] weights=",Wv[0]
 
 ## now create the list of topologies
-topos=LHEDecomposer.decompose ( lhefile, weights, nevts=nevts )
+topos=lheDecomposer.decompose ( lhefile, weights, nevts=nevts )
 for topo in topos: FeynmanGraphs.asciidraw ( topo.leadingElement() )
 
 for topo in topos:
