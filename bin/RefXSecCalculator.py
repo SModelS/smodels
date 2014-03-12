@@ -5,7 +5,7 @@
 
 import set_path
 import ROOT, os, tempfile
-import theory.XSecComputer as XSEC
+import tools.xsecComputer as XSEC
 import theory.SLHATools as SLHA
 import experiment.SMSResults as SMS
 import tools.PhysicsUnits as UNIT
