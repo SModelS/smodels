@@ -9,7 +9,6 @@
 
 """
 
-
 def getMaxLum(List):
   """ Goes through all analyses in the list and returns the maximum luminosity.
   If one of the luminosities has not been define, return None. """
@@ -25,9 +24,10 @@ def getMaxLum(List):
 
 def getInstallationBase():
   """ return directory name of the base of the installation of SMSDecomposition """
+  ## fixme should maybe use inspection? 
   import os
   basedir=os.getcwd()
-  for i in  [ "bin", "test", "regression", "tools", "theory", "experiment", "data" ]:
+  for i in  [ "cgi-bin", "bin", "test", "regression", "tools", "theory", "experiment", "data" ]:
     n=-len(i)
     if basedir[n:]==i: basedir=basedir[:n]
   return basedir
