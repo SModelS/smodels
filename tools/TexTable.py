@@ -70,7 +70,7 @@ def GenAnalysisTable(ListOfAnalyses, texfile=None, wd=0.15, fig_dir=None):
 def PrintAnalysisGraphs(Analysis,pdf_prefix=None):
   """ Generateres pdf files with the graph for the SMS Topologies being constrained by the analysis.
   If pdf_prefix=None, uses the analysis label as a prefix for the files."""
-  from theory.AuxiliaryFunctions import getelements
+  from theory.auxiliaryFunctions import getelements
   from tools import FeynmanGraphs
   from theory.SMSDataObjects import EElement
   
