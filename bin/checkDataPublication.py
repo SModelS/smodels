@@ -4,7 +4,7 @@
 what digitized results are not yet published """
 
 import set_path
-from Experiment import SMSResults, SMSHelpers
+from experiment import SMSResults, SMSHelpers
 
 SMSResults.considerRuns()#if not all runs are to be considered, give list of runs as argument
 

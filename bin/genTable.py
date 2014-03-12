@@ -6,8 +6,8 @@ argparser.add_argument ( '-o', '--output', nargs='?', help='output file', type=t
 argparser.add_argument ( '-D', '--Dir', nargs='?', help='figure folder', type=types.StringType, default='figures/')
 args=argparser.parse_args()
 
-from Experiment import SMSAnalysisList, SMSAnalysisFactory
-from Tools import TexTable
+from experiment import SMSAnalysisList, SMSAnalysisFactory
+from tools import TexTable
 
 DoFactory = True
 #Creat analyses list:

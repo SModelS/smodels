@@ -3,9 +3,9 @@
 """ another sandbox to try things out """
 
 import set_path, tempfile
-from Theory import LHEDecomposer, XSecComputer, ClusterTools
-from Experiment import TxNames, SMSAnalysisFactory, SMSResults, LimitGetter
-from Tools.VariousHelpers import logging
+from theory import LHEDecomposer, XSecComputer, ClusterTools
+from experiment import TxNames, SMSAnalysisFactory, SMSResults, LimitGetter
+from tools.VariousHelpers import logging
 
 log = logging.getLogger(__name__)
 
