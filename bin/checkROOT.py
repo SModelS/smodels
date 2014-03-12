@@ -2,7 +2,7 @@
 
 import set_path
 import SModelS
-from Tools import ROOTTools
+from tools import ROOTTools
 
 print "ROOTTools.getRootVersion():",ROOTTools.getRootVersion()
 print "ROOTTools.getRootVersion(true):",ROOTTools.getRootVersion(True)
