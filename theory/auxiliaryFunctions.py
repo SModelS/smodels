@@ -103,10 +103,6 @@ def massAvg(massList, method='harmonic'):
     return avgmass
 
 
-def Csim(*weights):
-    return cSim(*weights)
-
-
 def cSim(*weights):
     """
     Defines the auxiliar similar function.
@@ -149,11 +145,7 @@ def cSim(*weights):
         xsecRes.value = res
         result.add(xsecRes)
         
-    return result 
-
-
-def Cgtr(weightA, weightB):
-    return cGtr(weightA, weightB)
+    return result
 
 
 def cGtr(weightA, weightB):
