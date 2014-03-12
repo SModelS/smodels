@@ -10,8 +10,8 @@ argparser.add_argument ( '-s', '--straight', help='straight, not xkcd style', ac
 argparser.add_argument ( '-v', '--verbose', help='be verbose', action='store_true' )
 args=argparser.parse_args()
 
-from Theory import LHEReader, TopologyBuilder
-from Tools import FeynmanGraphs
+from theory import LHEReader, TopologyBuilder
+from tools import FeynmanGraphs
 
 filename="../lhe/%s_1.lhe" % args.T
 if args.lhe!="": filename=args.lhe
