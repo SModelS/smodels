@@ -31,7 +31,7 @@ class ExternalTool:
     installdir=self.basePath()
     path=path.replace("<install>",installdir)
     path=os.path.abspath( path )
-    path=path.replace("Tools/","")
+    path=path.replace("tools/","")
     return path
 
 
