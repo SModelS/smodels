@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: XSecComputer
+.. module:: xsecComputer
         :synopsis: The unit responsible for the computation of reference ("theory") \
             production cross sections
         
