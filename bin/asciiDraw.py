@@ -8,8 +8,8 @@ argparser.add_argument ( '-l', '--lhe', nargs='?', help='lhe file name, supplied
 argparser.add_argument ( '-b', '--border', help='draw a border around the graph', action='store_true' )
 args=argparser.parse_args()
 
-from Theory import LHEReader, TopologyBuilder
-from Tools import FeynmanGraphs
+from theory import LHEReader, TopologyBuilder
+from tools import FeynmanGraphs
 
 filename="../lhe/%s_1.lhe" % args.T
 if args.lhe!="": filename=args.lhe

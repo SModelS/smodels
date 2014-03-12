@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import set_path, sys
-from Experiment import SMSResults, SMSAnalysisList, SMSAnalysisFactory
+from experiment import SMSResults, SMSAnalysisList, SMSAnalysisFactory
 
 #Creat analyses list:
 ListOfAnalysesU = SMSAnalysisFactory.load()

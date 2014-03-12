@@ -4,8 +4,8 @@
 what digitized results are not yet published """
 
 import set_path
-from Experiment import SMSResults, SMSHelpers
-from Tools.PhysicsUnits import rmvunit
+from experiment import SMSResults, SMSHelpers
+from tools.PhysicsUnits import rmvunit
   
 Fields= [ "analysis", "sqrts", "lumi" ]
 NiceName= { "nick name": "nick name", "analysis": "analysis", "sqrts":"$\sqrt{s}$", "topologies": "topologies", "constraints":"constraints", "lumi": "lumi" }

@@ -3,9 +3,9 @@
 """ another sandbox to try things out """
 
 import set_path, argparse
-from Theory import LHEReader, TopologyBuilder, SMSDataObjects
-from Experiment import TxNames
-import Experiment.SMSAnalysisFactory as Analyses
+from theory import LHEReader, TopologyBuilder, SMSDataObjects
+from experiment import TxNames
+import experiment.SMSAnalysisFactory as Analyses
 
 print "[run.py] loading analyses ...."
 ListOfAnalyses = Analyses.load( topos="T2" )

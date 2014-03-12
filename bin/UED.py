@@ -3,11 +3,11 @@
 """ A first UED example """
 
 import set_path, tempfile
-from Theory import LHEDecomposer, XSecComputer
-from Experiment import TxNames, SMSAnalysisFactory, SMSResults, LimitGetter, SMSHelpers
-from Tools.PhysicsUnits import fb
-from Tools import FeynmanGraphs
-from Tools.VariousHelpers import logging
+from theory import LHEDecomposer, XSecComputer
+from experiment import TxNames, SMSAnalysisFactory, SMSResults, LimitGetter, SMSHelpers
+from tools.PhysicsUnits import fb
+from tools import FeynmanGraphs
+from tools.VariousHelpers import logging
 
 ## SMSHelpers.Base="/home/lisa/daten/smodels"
 

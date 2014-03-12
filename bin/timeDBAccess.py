@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 import set_path, argparse, types
-from Experiment import SMSResults, SMSHelpers
-from Tools import RCFile
+from experiment import SMSResults, SMSHelpers
+from tools import RCFile
 from timeit import timeit
 
 argparser = argparse.ArgumentParser(description='simple tool that times the database access') 

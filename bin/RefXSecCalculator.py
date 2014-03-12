@@ -5,10 +5,10 @@
 
 import set_path
 import ROOT, os, tempfile
-import Theory.XSecComputer as XSEC
-import Theory.SLHATools as SLHA
-import Experiment.SMSResults as SMS
-import Tools.PhysicsUnits as UNIT
+import theory.XSecComputer as XSEC
+import theory.SLHATools as SLHA
+import experiment.SMSResults as SMS
+import tools.PhysicsUnits as UNIT
 
 topo = 'T2'
 nevts = 10000

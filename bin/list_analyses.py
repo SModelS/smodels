@@ -4,8 +4,8 @@
 what digitized results are not yet published """
 
 import set_path
-from Experiment import SMSResults, SMSHelpers
-from Tools.PhysicsUnits import rmvunit
+from experiment import SMSResults, SMSHelpers
+from tools.PhysicsUnits import rmvunit
 
 canas={ "cms": {}, "atlas": {} }
 
