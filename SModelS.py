@@ -26,3 +26,8 @@ def version( astuple=False ):
     A,B=T.split(".")
     return (int(A),int(B),C.strip())
 
+def license():
+    f=open(installdir()+"COPYING")
+    lines=f.readlines()
+    f.close()
+    return "".join(lines)
