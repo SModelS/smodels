@@ -50,7 +50,11 @@ class ToolBox:
     has_made=False
     for (name,instance) in self.tools.items():
       ok=instance.checkInstallation()
-      ret+= "%-12s [%10s]:  %s\n" % ( name, instance.pathOfExecutable(), self.installationOk ( ok, colors ) )
+      exe=instance.pathOfExecutable()
+      maxl=45
+      if len(exe)>maxl+4:
+        exe="... "+instance.pathOfExecutable()[-maxl:]
+      ret+= "%-12s [%-50s]:  %s\n" % ( name, exe, self.installationOk ( ok, colors ) )
       if ok!=True and make: 
         has_made=True
         instance.compile()
