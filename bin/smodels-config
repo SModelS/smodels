@@ -4,8 +4,8 @@
 
 def installdir():
   import os, inspect
-  ret=os.path.dirname ( inspect.getabsfile(installdir) )
-  ret=ret.replace("bin","")
+  ret=os.path.realpath ( inspect.getabsfile(installdir) )
+  ret=ret.replace("bin/smodels-config","")
   print ret
 
 def help():
