@@ -65,13 +65,13 @@ def decompose(lhefile, inputXsecs=None, nevts=None, doCompress=False,
     return smsTopList
 
 
-def elementFromEvent(event, weight):
+def elementFromEvent(event, weight=None):
     """
     Creates an element from a LHE event and the corresponding event weight.
     
     :param event: LHE event
     :param weight: event weight. Must be a XSectionList object (usually with a
-    single entry)
+    single entry) or None if not specified.
     :returns: element
     
     """
@@ -102,8 +102,8 @@ def elementFromEvent(event, weight):
                      "R-parity violation?")
         return False
     # Finally create element from event:
-    newElement = element.Element(finalBranchList)
-    newElement.weight = copy.deepcopy(weight)
+    newElement = element.Element(finalBranchList)    
+    if weight: newElement.weight = copy.deepcopy(weight)
 
     return newElement
 
