@@ -8,8 +8,8 @@
     
 """
 import unittest
-import setPath
-from Theory import XSecComputer
+import set_path
+from theory import XSecComputer
 
 
 class Test(unittest.TestCase):

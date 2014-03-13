@@ -8,13 +8,13 @@
     
 """
 import unittest
-import setPath
+import set_path
 from prettytable import PrettyTable
-from Theory import LHEDecomposer, SLHADecomposer, XSecComputer, ClusterTools
-from Tools.PhysicsUnits import addunit, rmvunit
-from Tools import SMSPrettyPrinter, VariousHelpers
-from Tools.SMSPrettyPrinter import wrap
-from Experiment import SMSAnalysisList, SMSAnalysisFactory, LimitGetter
+from theory import LHEDecomposer, SLHADecomposer, XSecComputer, ClusterTools
+from tools.PhysicsUnits import addunit, rmvunit
+from tools import SMSPrettyPrinter, VariousHelpers
+from tools.SMSPrettyPrinter import wrap
+from experiment import SMSAnalysisList, SMSAnalysisFactory, LimitGetter
 
 
 class Test(unittest.TestCase):
