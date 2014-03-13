@@ -8,7 +8,7 @@
     
 """
 import unittest
-import setPath
+import set_path
 from Experiment import TxNames
 from Theory import LHEReader, TopologyBuilder
 

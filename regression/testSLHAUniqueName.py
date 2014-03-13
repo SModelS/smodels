@@ -8,9 +8,9 @@
     
 """
 import unittest
-import setPath
-from Tools.VariousHelpers import logging
-from Theory import SLHATools
+import set_path
+from tools.VariousHelpers import logging
+from theory import SLHATools
 
 
 class Test(unittest.TestCase):

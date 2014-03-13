@@ -2,9 +2,9 @@
 
 """ check the output of the cross section computer """
 
-import setPath
-from Tools import VariousHelpers
-from Theory import XSecComputer
+import set_path
+from tools import VariousHelpers
+from theory import XSecComputer
 
 w=XSecComputer.compute( 1000, "../slha/andrePT1.slha" )
 print "w=",w.weights()

@@ -2,9 +2,9 @@
 
 """ Closure: Tx -> SModelS description -> Tx """
 
-import setPath
-from Experiment import TxNames
-from Theory import LHEReader, TopologyBuilder
+import set_path
+from experiment import TxNames
+from theory import LHEReader, TopologyBuilder
 from TestTools import ok
 
 topolist = ['T1','T2','T1tttt', 'T2tt','T3W', 'T5WW', 'TChiWZ', 'T1bbbb', 'T2bb', 'T5WZ', 'T3Wb', 'T3Z', 'T5ZZ', 'T6bbZZ', 'TChiWW', 'TSlepSlep']

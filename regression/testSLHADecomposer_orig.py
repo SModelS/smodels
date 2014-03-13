@@ -4,8 +4,8 @@
 
 import pickle, math
 import set_path
-import Theory.SLHADecomposer as DEC
-import Tools.PhysicsUnits as UNIT
+import theory.SLHADecomposer as DEC
+import tools.PhysicsUnits as UNIT
 
 i = 0
 j = 0

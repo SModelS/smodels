@@ -8,10 +8,10 @@
     
 """
 import unittest
-import setPath
+import set_path
 import pickle, math
-import Theory.SLHADecomposer as DEC
-import Tools.PhysicsUnits as UNIT
+import theory.SLHADecomposer as DEC
+import tools.PhysicsUnits as UNIT
 
 class Test(unittest.TestCase):
 
