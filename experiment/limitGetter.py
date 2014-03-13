@@ -17,7 +17,7 @@ def limit(analysis, addTheoryPredictions=[]):
     :param addTheoryPredictions: list of theory predictions to add, e.g. [ '7 TeV (NLL)', '7 TeV (LO)' ]
     :type addTheoryPredictions: list of strings
   """
-  import SMSResults
+  import smsResults
   from tools.PhysicsUnits import rmvunit
   run=analysis.run
   sqrts=rmvunit(analysis.sqrts,"TeV")
@@ -35,7 +35,7 @@ def limit(analysis, addTheoryPredictions=[]):
         for (mi,masses1) in enumerate(element.B[0].masses):
 ## masses1=element.B[0].masses[0] ## ,lead.B[1].masses[0]
           masses2=element.B[1].masses[mi] ## ,lead.B[1].masses[0]
-          ul=SMSResults.getSmartUpperLimit(ana,Tx,masses1,masses2)
+          ul=smsResults.getSmartUpperLimit(ana,Tx,masses1,masses2)
           tmp={ "ul": ul, "analysis": ana, "Tx": Tx, "m1": masses1, "m2": masses2, "sqrts": sqrts }
           if len(addTheoryPredictions)>0:
             theory=theoRes.prediction ( )
@@ -55,7 +55,7 @@ def GetPlotLimit(inmass,Analysis,complain = False):
         inmass: array of masses in SModelS graph
         Analysis: SMSDataObjects.EAnalysis"""
   from tools.PhysicsUnits import rmvunit
-  import copy, SMSResults, sys
+  import copy, smsResults, sys
 
   massarray = copy.deepcopy(inmass)
 
@@ -78,7 +78,7 @@ def GetPlotLimit(inmass,Analysis,complain = False):
   if run == "": run = None   #If run has not been defined, use latest run
    
   analysis, CMSlabel = Analysis.label.split(':')  
-  limit = SMSResults.getSmartUpperLimit(analysis,CMSlabel,masslist,run,debug=complain)
+  limit = smsResults.getSmartUpperLimit(analysis,CMSlabel,masslist,run,debug=complain)
  
   return limit
 

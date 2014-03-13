@@ -8,7 +8,7 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 """
 
-import SMSResults
+import smsResults
 from tools.PhysicsUnits import rmvunit
 import types
 from theory import analysis, element
@@ -80,32 +80,32 @@ def load(anas=None, topos=None, sqrts=[ 7, 8 ]):
 
     debug = False
     if debug:
-        SMSResults.verbosity ("info")
+        smsResults.verbosity ("info")
     else:
-        SMSResults.verbosity ("error")
+        smsResults.verbosity ("error")
     
-    if anas == None: anas = SMSResults.getAllResults().keys()
+    if anas == None: anas = smsResults.getAllResults().keys()
     for ana in anas:
         if debug:
             print
             print "Building ana", ana
-        Ss = rmvunit(SMSResults.getSqrts(ana), "TeV")
+        Ss = rmvunit(smsResults.getSqrts(ana), "TeV")
         if Ss == None:
             print "SS=", Ss, ana
             continue
         Ss = int(Ss)
         if not Ss in sqrts:
             continue
-        for Tx in SMSResults.getTopologies(ana):
+        for Tx in smsResults.getTopologies(ana):
             if topos != None and Tx not in topos: continue
             if debug: print Tx,                        
             newAnalysis = analysis.ULanalysis()
-            newAnalysis.sqrts = SMSResults.getSqrts(ana)
+            newAnalysis.sqrts = smsResults.getSqrts(ana)
             stopo = getRealTopo (Tx)
             newAnalysis.label = ana+":"+Tx
-            newAnalysis.run = SMSResults.getRun (ana)    # #    "2012"
-            constraint = SMSResults.getConstraints (ana, topo=stopo)
-            cond = SMSResults.getConditions(ana, topo=stopo)
+            newAnalysis.run = smsResults.getRun (ana)    # #    "2012"
+            constraint = smsResults.getConstraints (ana, topo=stopo)
+            cond = smsResults.getConditions(ana, topo=stopo)
             if not constraint or constraint == "Not yet assigned":
                 if debug:
                     print "dont have a constraint for", ana, Tx, "(", stopo, ")"

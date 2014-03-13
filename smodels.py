@@ -7,7 +7,7 @@ SModelS basic use case.
 
 from theory import slhaDecomposer, lheDecomposer
 from tools.PhysicsUnits import addunit
-from experiment import smsanalysisFactory
+from experiment import smsAnalysisFactory
 from theory.theoryPrediction import theoryPredictionFor
 import logging
 
@@ -31,7 +31,7 @@ def main():
     smsTopList.printout()
     
 #Load analyses
-    listOfAnalyses = smsanalysisFactory.load()
+    listOfAnalyses = smsAnalysisFactory.load()
 #Get theory prediction for each analysis and print basic output       
     for ana in listOfAnalyses:
         preds = theoryPredictionFor(ana, smsTopList)
