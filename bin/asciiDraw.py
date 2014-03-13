@@ -8,7 +8,7 @@ argparser.add_argument ( '-l', '--lhe', nargs='?', help='lhe file name, supplied
 argparser.add_argument ( '-b', '--border', help='draw a border around the graph', action='store_true' )
 args=argparser.parse_args()
 
-from theory import LHEReader, TopologyBuilder
+from theory import LHEReader, lheDecomposer, crossSection
 from tools import FeynmanGraphs
 
 filename="../lhe/%s_1.lhe" % args.T
@@ -16,5 +16,5 @@ if args.lhe!="": filename=args.lhe
 
 reader = LHEReader.LHEReader( filename )
 Event = reader.next()
-SMSTop = TopologyBuilder.fromEvent(Event, {} )
+SMSTop = lheDecomposer.elementFromEvent( Event, crossSection.XSectionList() )
 FeynmanGraphs.asciidraw ( SMSTop[0].leadingElement(), border=args.border )
