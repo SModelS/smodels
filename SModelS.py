@@ -9,16 +9,16 @@
 
 """
 
-def installdir():
+def installDirectory():
     """ return the software installation directory, by looking at location of this method """
     import os, inspect
-    ret=os.path.realpath ( inspect.getabsfile(installdir) )
+    ret=os.path.realpath ( inspect.getabsfile(installDirectory) )
     ret=ret.replace("SModelS.py","")
     return ret
 
 def version( astuple=False ):
     """ prints out version number of SModelS framework """
-    f=open("%s/version" % installdir() )
+    f=open("%s/version" % installDirectory() )
     l=f.readline()
     f.close()
     l=l.replace("\n","")
