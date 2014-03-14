@@ -4,13 +4,14 @@
 
 import set_path
 from prettytable import PrettyTable
-from theory import LHEDecomposer, SLHADecomposer, XSecComputer, ClusterTools
+from theory import lheDecomposer, SLHADecomposer, ClusterTools
 from tools.PhysicsUnits import addunit, rmvunit
-from tools import SMSPrettyPrinter, VariousHelpers
+from tools import SMSPrettyPrinter, xsecComputer
 from tools.SMSPrettyPrinter import wrap
-from experiment import SMSHelpers
+from regression import testHelpers
+from experiment import smsHelpers
 SMSHelpers.Base="../testdatabase/"
-from experiment import SMSAnalysisList, SMSAnalysisFactory, LimitGetter
+from experiment import smsAnalysisList, smsAnalysisFactory, limitGetter
 
 
 DoFactory = True
