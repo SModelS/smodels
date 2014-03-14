@@ -79,6 +79,7 @@ def asciidraw ( element, labels=True, html=False, border=False ):
 
 if __name__ == "__main__":
     import set_path, argparse, types
+    import SModelS
 
     argparser = argparse.ArgumentParser(description='simple tool that is meant to draw lessagraphs, as an ascii plot') 
     argparser.add_argument ( '-T', nargs='?', help='Tx name, will look up lhe file in ../regression/Tx_1.lhe. Will be overriden by the "--lhe" argument', type=types.StringType, default='T1' )
@@ -88,7 +89,7 @@ if __name__ == "__main__":
 
     from theory import LHEReader, lheDecomposer, crossSection
 
-    filename="../lhe/%s_1.lhe" % args.T
+    filename="%s/lhe/%s_1.lhe" % (SModelS.installdir(), args.T )
     if args.lhe!="": filename=args.lhe
 
     reader = LHEReader.LHEReader( filename )
