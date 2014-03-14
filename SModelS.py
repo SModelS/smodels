@@ -41,12 +41,6 @@ def license():
     f.close()
     return "".join(lines)
 
-def installdir():
-  import os, inspect
-  ret=os.path.realpath ( inspect.getabsfile(installdir) )
-  ret=ret.replace("bin/smodels-config","").replace("SModelS.py","")
-  print ret
-
 def help():
   import sys
   print sys.argv[0]+": --help --installdir"
