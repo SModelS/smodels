@@ -89,7 +89,7 @@ if __name__ == "__main__":
 
     from theory import LHEReader, lheDecomposer, crossSection
 
-    filename="%s/lhe/%s_1.lhe" % (SModelS.installdir(), args.T )
+    filename="%s/lhe/%s_1.lhe" % (SModelS.installDirectory(), args.T )
     if args.lhe!="": filename=args.lhe
 
     reader = LHEReader.LHEReader( filename )
