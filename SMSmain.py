@@ -4,9 +4,8 @@ import sys
 from prettytable import PrettyTable
 from theory import LHEDecomposer, SLHADecomposer, XSecComputer, ClusterTools, CrossSection, SLHATools, TheoryPrediction
 from tools.PhysicsUnits import addunit, rmvunit
-from tools import SMSPrettyPrinter, VariousHelpers
+from tools import SMSPrettyPrinter
 from tools.SMSPrettyPrinter import wrap
-from tools.VariousHelpers import logging
 from experiment import SMSAnalysisList, SMSAnalysisFactory, LimitGetter, SMSHelpers
 
 

@@ -4,7 +4,7 @@
 .. module:: testMainProgram
    :synopsis: Compares the output of a modified version of SMSmain.py with a given value.
     
-.. moduleauthor:: Wolfgang magerl <wolfgang.magerl@gmail.com>
+.. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
     
 """
 import unittest
@@ -12,9 +12,10 @@ import set_path
 from prettytable import PrettyTable
 from theory import LHEDecomposer, SLHADecomposer, XSecComputer, ClusterTools
 from tools.PhysicsUnits import addunit, rmvunit
-from tools import SMSPrettyPrinter, VariousHelpers
+from tools import SMSPrettyPrinter
 from tools.SMSPrettyPrinter import wrap
 from experiment import SMSAnalysisList, SMSAnalysisFactory, LimitGetter
+from regression import testHelpers
 
 
 class Test(unittest.TestCase):
@@ -50,7 +51,7 @@ class Test(unittest.TestCase):
         
         DoSLHAdec = True
         if DoSLHAdec:
-            maxlum = VariousHelpers.getMaxLum(ListOfAnalyses) # Maximum cross-section*BR to be included
+            maxlum = testHelpers.getMaxLum(ListOfAnalyses) # Maximum cross-section*BR to be included
             if rmvunit(maxlum,'fb-1'):    
                 sigmacut = addunit(1./rmvunit(maxlum,'fb-1'),'fb')
             else:
