@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 .. module:: SModelS
     :synopsis: Intended as a potential main entry point, currently just for
@@ -31,3 +33,25 @@ def license():
     lines=f.readlines()
     f.close()
     return "".join(lines)
+
+def installdir():
+  import os, inspect
+  ret=os.path.realpath ( inspect.getabsfile(installdir) )
+  ret=ret.replace("bin/smodels-config","").replace("SModelS.py","")
+  print ret
+
+def help():
+  import sys
+  print sys.argv[0]+": --help --installdir"
+  print "--help: show this message"
+  print "--installdir: print SModelS installation directory"
+  sys.exit(0)
+
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv)<2: help()
+    for i in sys.argv[1:]:
+        if i=="--help": help()
+        if i=="--installdir": installdir()
+

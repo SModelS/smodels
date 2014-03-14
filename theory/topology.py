@@ -12,10 +12,7 @@ from theory.element import Element
 from printer import Printer
 from prettytable import PrettyTable
 from tools import SMSPrettyPrinter
-import logging
-
-logger = logging.getLogger(__name__)
-
+from theory import logger
 
 class Topology(object):
     """

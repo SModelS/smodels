@@ -22,16 +22,6 @@ def getMaxLum(List):
       return None
   return maxlum
 
-def getInstallationBase():
-  """ return directory name of the base of the installation of SMSDecomposition """
-  ## fixme should maybe use inspection? 
-  import os
-  basedir=os.getcwd()
-  for i in  [ "cgi-bin", "bin", "test", "regression", "tools", "theory", "experiment", "data" ]:
-    n=-len(i)
-    if basedir[n:]==i: basedir=basedir[:n]
-  return basedir
-
 def nCPUs():
   """ obtain the number of CPU cores on the machine, for several
       platforms and python version """
@@ -53,14 +43,11 @@ def nCPUs():
     pass
   return None
 
-
-
-
-import logging 
-FORMAT = '%(levelname)s in %(module)s.%(funcName)s(): %(message)s'
-import sys
-## workaround for python2.4
-if sys.version_info[0]<3 and sys.version_info[1]<5:
-  FORMAT = '%(levelname)s in %(module)s.s(): %(message)s'
-# http://docs.python.org/2/library/logging.html#logging.Formatter
-logging.basicConfig(level=logging.INFO,format=FORMAT)
+##import logging 
+##FORMAT = '%(levelname)s in %(module)s.%(funcName)s(): %(message)s'
+##import sys
+#### workaround for python2.4
+##if sys.version_info[0]<3 and sys.version_info[1]<5:
+##  FORMAT = '%(levelname)s in %(module)s.s(): %(message)s'
+### http://docs.python.org/2/library/logging.html#logging.Formatter
+##logging.basicConfig(level=logging.INFO,format=FORMAT)

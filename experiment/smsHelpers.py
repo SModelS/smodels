@@ -4,15 +4,16 @@
 .. module:: SMSHelpers
         :synopsis: Some helper functions that are not to be used by the end user.
 
-.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>, Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>, Doris Proschofsky <Doris.Proschofsky@assoc.oeaw.ac.at>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
+.. moduleauthor:: Doris Proschofsky <Doris.Proschofsky@assoc.oeaw.ac.at>
 
 """
 
 import os
 from tools.PhysicsUnits import rmvunit
-from tools import VariousHelpers
+from experiment import logger
 from experiment.experimentExceptions import MetaInfoError
-logger = VariousHelpers.logging.getLogger(__name__)
 
 Base = "/afs/hephy.at/user/w/walten/public/sms/"
 
@@ -38,13 +39,6 @@ def close():
         tfile.Close()
     openFiles={}
 
-logLevel= [ "error" ]
-
-def log ( text, level="error" ):
-    if level in logLevel:
-        print "[SMSHelpers.py] %s: %s" % ( level, text )
-    return
-
 runs_={}
 def getRun ( analysis, run=None ):
     """ search for an analysis, return the run,
@@ -57,9 +51,6 @@ def getRun ( analysis, run=None ):
         if os.path.exists ( "%s/%s/%s" % ( Base, run, analysis ) ):
             runs_[key]=run
             return run
-#        else:
-#            log ( "dont know about %s/%s" % (run,analysis), "warning" )
-#            return None
     for trun in runs:
         if os.path.exists ( "%s/%s/%s" % ( Base, trun, analysis ) ):
             runs_[key]=trun
@@ -75,7 +66,7 @@ def parseMetaInfo ( analysis, run ):
     info="%s/%s/%s/info.txt" % ( Base, run, analysis )
     ret={}
     if not os.path.exists ( info ):
-        log ( "cannot find %s" % info, "warning" )
+        logger.warn ( "cannot find %s" % info )
         pMI_[key]=ret
         return ret
     f=open(info)
@@ -103,7 +94,7 @@ def motherParticleExclusions ( analysis, run ):
     info="%s/%s/%s/info.txt" % ( Base, run, analysis )
     ret={}
     if not os.path.exists ( info ):
-        log ("cannot find %s" % info )
+        logger.warn ("cannot find %s" % info )
         return ret
     f=open(info)
     lines=f.readlines()
@@ -114,7 +105,7 @@ def motherParticleExclusions ( analysis, run ):
         if line=="": continue
         tokens=line.split(":",1)
         if not len(tokens)==2:
-            log ( "[141] cannot parse this line (2): %s in %s" % (line, info) )
+            logger.warn ( "[141] cannot parse this line (2): %s in %s" % (line, info) )
             continue
         if tokens[0]!="exclusions":
     # we're only interested in the exclusions
@@ -124,7 +115,7 @@ def motherParticleExclusions ( analysis, run ):
         if excl[-1]=='\n': excl=excl[:-1]
         excls=excl.split(" ")
         if len(excls)<2:
-            log ( "[151] cannot parse this line (3): %s in %s" % (line, info) )
+            logger.warn ( "[151] cannot parse this line (3): %s in %s" % (line, info) )
             continue
         values=map(int,excls[1:])
         if len(values)==2:
@@ -140,7 +131,7 @@ def getLines ( analysis, run, label="condition" ):
     info="%s/%s/%s/info.txt" % ( Base, run, analysis )
     ret={}
     if not os.path.exists ( info ):
-        log ("cannot find %s" % info )
+        logger.warn ("cannot find %s" % info )
         mlines[key]=ret
         return ret
     f=open(info)
@@ -152,7 +143,7 @@ def getLines ( analysis, run, label="condition" ):
         if line=="": continue
         tokens=line.split(":",1)
         if not len(tokens)==2:
-            log ( "[172] cannot parse this line (2): %s in %s" % (line, info) )
+            logger.warn ( "[172] cannot parse this line (2): %s in %s" % (line, info) )
             continue
         if tokens[0]!=label:
     # we're only interested in the conditions
@@ -162,7 +153,7 @@ def getLines ( analysis, run, label="condition" ):
         if excl[-1]=='\n': excl=excl[:-1]
         keyvalue=excl.split(" -> ")
         if len(keyvalue)!=2:
-            log ( "[185] cannot parse the following line: %s" % keyvalue )
+            logger.warn ( "[185] cannot parse the following line: %s" % keyvalue )
         ret[ keyvalue[0] ] = keyvalue[1]
 # ret.append(excl)
     mlines[key]=ret
@@ -180,23 +171,6 @@ def constraints ( analysis, run ):
     """ get all the conditions for a analysis/run pair """
     return getLines ( analysis, run, "constraint" )
 
-def getPotentialNames ( topo ):
-    """ If T6bbww doesnt yield a result, try T6bbWW, etc """
-    ret = [ topo ]
-    ret.append ( topo.replace("w","W").replace("z","Z" ) )
-    ret.append ( topo.replace("W","w").replace("Z","z" ) )
-    return ret
-
-def getCanonicalName ( topo ):
-    """ define a canonical name: w and z's are uppercase letters, etc """
-    topo=topo.replace("w","W").replace("z","Z" )
-    return topo
-
-def getRootFileName ( analysis, run=None ):
-    """ returns the root file name, but does not check if it exists """
-    if not run: run=getRun ( analysis )
-    return "%s/%s/%s/sms.root" % ( Base, run, analysis )
-
 upperLimitHisto={}
 expupperLimitHisto={}
 def getUpperLimitFromHisto ( analysis, topo, run, complain=False, expected=False ):
@@ -211,7 +185,7 @@ def getUpperLimitFromHisto ( analysis, topo, run, complain=False, expected=False
     import ROOT
     rootfile="%s/%s/%s/sms.root" % ( Base, run, analysis )
     if not os.path.exists(rootfile):
-        log("root file %s doesnt exist" % rootfile, "warning" )
+        logger.warn("root file %s doesnt exist" % rootfile )
         upperLimitHisto[key]=None
         expupperLimitHisto[key]=None
         return None
@@ -221,7 +195,7 @@ def getUpperLimitFromHisto ( analysis, topo, run, complain=False, expected=False
     else:
         f=ROOT.TFile(rootfile)
         if not f or not f.IsOpen():
-            log("root file %s cannot be opened" % rootfile )
+            logger.warn("root file %s cannot be opened" % rootfile )
             upperLimitHisto[key]=None
             expupperLimitHisto[key]=None
             return None
@@ -229,14 +203,14 @@ def getUpperLimitFromHisto ( analysis, topo, run, complain=False, expected=False
     if expected:
         histo=f.Get("expectedlimit_%s" % getCanonicalName(topo) )
         if not histo:
-            if complain: log("expected upper limit histogram %s not found in %s" % ( topo, rootfile ))
+            if complain: logger.warn("expected upper limit histogram %s not found in %s" % ( topo, rootfile ))
             expupperLimitHisto[key]=None
             return None
         expupperLimitHisto[key]=histo
     else:
         histo=f.Get("limit_%s" % getCanonicalName(topo) )
         if not histo:
-            if complain: log("histogram %s not found in %s" % ( topo, rootfile ))
+            if complain: logger.warn("histogram %s not found in %s" % ( topo, rootfile ))
             upperLimitHisto[key]=None
             return None
         upperLimitHisto[key]=histo
@@ -247,7 +221,7 @@ def getUpperLimitAtPoint ( histo, mx, my, interpolate=False ):
             we return None if we're out of bounds """
 
     if rmvunit(my,'GeV')==None:
-        log ( "inconsistent mx/my, mx=None, my=%s" % my )
+        logger.warn ( "inconsistent mx/my, mx=None, my=%s" % my )
         return None
     if not histo: return None ## 'no histogram'
     if interpolate: #for interpolation: set empty bins to the last finite value to avoid zeros in the interpolation, set result=None if the corresponding bin in the original histogram was empty
@@ -274,13 +248,6 @@ def getUpperLimitAtPoint ( histo, mx, my, interpolate=False ):
     
     return c
 
-def getUpperLimitPng(analysis,topo,run):
-    pngfile="%s/%s/%s/results/h_limit_%s_%s.png" % ( Base, run, analysis, topo, analysis )
-    if not os.path.exists(pngfile):
-        log("png file %s doesnt exist" % rootfile )
-        return None
-    return pngfile
-
 effhistos={}
 def getEfficiencyHisto ( analysis, topo, run ):
     if not useRoot:
@@ -291,7 +258,7 @@ def getEfficiencyHisto ( analysis, topo, run ):
     import ROOT
     rootfile="%s/%s/%s/sms.root" % ( Base, run, analysis )
     if not os.path.exists(rootfile):
-        log("root file %s doesnt exist" % rootfile )
+        logger.warn("root file %s doesnt exist" % rootfile )
         effhistos[key]=None
         return None
     f=None
@@ -300,13 +267,13 @@ def getEfficiencyHisto ( analysis, topo, run ):
     else:
         f=ROOT.TFile(rootfile)
         if not f or not f.IsOpen():
-            log("root file %s cannot be opened" % rootfile )
+            logger.warn("root file %s cannot be opened" % rootfile )
             effhistos[key]=None
             return None
         openFiles[rootfile]=f
     histo=f.Get("efficiency_%s" % topo )
     if not histo:
-        log("histogram %s not found in %s" % ( topo, rootfile ))
+        logger.warn("histogram %s not found in %s" % ( topo, rootfile ))
         effhistos[key]=None
         return None
     effhistos[key]=histo
@@ -316,7 +283,7 @@ def getEfficiencyAtPoint ( histo, mx, my ):
     """ given already a histogram, we get the efficiency for mx and my,
             we return None if we're out of bounds """
     if my==None:
-        log ( "inconsistent mx/my, mx=None, my=%s" % my )
+        logger.warn ( "inconsistent mx/my, mx=None, my=%s" % my )
         return None
     if not histo: return None
     xmax=histo.GetXaxis().GetNbins()
@@ -384,35 +351,6 @@ def getMetaInfoField(analysis, field, run=None):
     infoFields[key] = f
     return f
 
-dicparticle = { 
-     "T1": "#tilde{g}",
-     "T1bbbb": "#tilde{g}",
-     "T1tttt": "#tilde{g}",
-     "T1lg": "#tilde{g}",
-     "T1gg": "#tilde{g}",
-     "T5gg": "#tilde{g}",
-     "T5Wg": "#tilde{g}",
-     "T2": "#tilde{q}",
-     "T2bb": "#tilde{b}",
-     "T2tt": "#tilde{t}",
-     "T2ttww": "#tilde{b}",
-     "T3w": "#tilde{g}",
-     "T3lh": "#tilde{g}",
-     "T5zz": "#tilde{g}",
-     "T5zzInc": "#tilde{g}", 
-     #"T5zzh": "#tilde{g}", 
-     #"T5zzl": "#tilde{g}", 
-     "T5lnu": "#tilde{g}",
-     "T5zzgmsb": "#tilde{g}",
-     "T6bbWW": "#tilde{t}", 
-     "TChiwz": "#tilde{#chi}^{0}_{2}#tilde{#chi}^{#pm}_{1}",
-     #"TChiwz": "#tilde{#chi}^{0}",
-     "TChizz": "#tilde{#chi}^{0}_{2}",
-     "TChiSlep": "#tilde{#chi}^{0}_{2}",
-     "TChiSlepSlep": "#tilde{#chi}^{0}_{2}#tilde{#chi}^{#pm}_{1}",
-     "TChiNuSlep": "#tilde{#chi}^{0}_{2}",
-}
-
 def hasDictionary(analysis, run=None):
     """are the upper limits available in dictionary format?
     """
@@ -421,12 +359,8 @@ def hasDictionary(analysis, run=None):
     dictfile="%s/%s/%s/sms.py" % ( Base, run, analysis )
     if os.path.exists(dictfile):
         return True
-    log("Dictionary file %s doesnt exist" % dictfile )
+    logger.warn("Dictionary file %s doesnt exist" % dictfile )
     return False
-#    hd = getMetaInfoField(analysis, "dictionary", run)
-#    if hd:
-#        if hd in [ '1', 'True' ]: return True
-#    return False
 
 def hasHistogram(analysis, run=None):
     """are the upper limits available as ROOT histogram?
@@ -439,7 +373,7 @@ def hasHistogram(analysis, run=None):
     rootfile="%s/%s/%s/sms.root" % ( Base, run, analysis )
     if os.path.exists(rootfile):
         return True
-    log("ROOT file %s doesnt exist" % rootfile )
+    logger.warn("ROOT file %s doesnt exist" % rootfile )
     return False
 
 upperLimitDict={}
@@ -452,7 +386,7 @@ def getUpperLimitDictionary ( analysis, topo, run, expected=False ):
         if upperLimitDict.has_key ( key ): return upperLimitDict[key]
     dictfile="%s/%s/%s/sms.py" % ( Base, run, analysis )
     if not os.path.exists(dictfile):
-        log("in getUpperLimitDictionary, dictionary file %s doesnt exist" % dictfile )
+        logger.warn("in getUpperLimitDictionary, dictionary file %s doesnt exist" % dictfile )
         upperLimitDict[key]=None
         return None
     Globals={}
@@ -460,14 +394,14 @@ def getUpperLimitDictionary ( analysis, topo, run, expected=False ):
     if expected:
         Dict=Globals["ExpectedDict"]
         if not Dict.has_key ( topo ):
-            log("dictionary doesnt have topology"+topo, "warning" )
+            logger.warn("dictionary doesnt have topology"+topo )
             expupperLimitDict[key]=None
             return None
         expupperLimitDict[key]=Dict[topo]
     else:
         Dict=Globals["Dict"]
         if not Dict.has_key ( topo ):
-            log("dictionary doesnt have topology"+topo, "warning" )
+            logger.warn("dictionary doesnt have topology"+topo )
             upperLimitDict[key]=None
             return None
         upperLimitDict[key]=Dict[topo]

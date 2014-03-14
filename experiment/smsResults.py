@@ -14,9 +14,9 @@
 from experiment import smsHelpers
 from tools.PhysicsUnits import addunit, rmvunit
 from experiment.smsResultsCollector import description
-from tools import PhysicsUnits, VariousHelpers, RCFile
+from tools import PhysicsUnits, RCFile
+from experiment import logger
 from experiment.experimentExceptions import MetaInfoError
-logger = VariousHelpers.logging.getLogger(__name__)
 
 def describeTx (topo, short=True):
     """ describe a Tx name, e.g. T2tt -> "#tilde{t} -> t #tilde{#chi}^{0} """
@@ -30,9 +30,9 @@ def getAllHistNames (ana, topo, run=None):
     ret = []
     dic_list = getaxes(ana, topo, run)
     if not dic_list: return None    # topology not found
-    if len(dic_list) == 1 and not dic_list[0]['mz']: return [smsInterpolation.gethistname(topo, None)]
+    if len(dic_list) == 1 and not dic_list[0]['mz']: return [smsInterpolation.getHistName(topo, None)]
     for dic in dic_list:
-        ret.append(smsInterpolation.gethistname(topo, dic["mz"][0]))
+        ret.append(smsInterpolation.getHistName(topo, dic["mz"][0]))
     return ret
 
 def setLogLevel (l=[ "error" ]):
@@ -393,7 +393,7 @@ def getSmartUpperLimit (analysis, topo, masses, massesbranch2=None, debug=False)
     """ returns the upper limit for analysis/topo, given an ordered sequence of
             the mass (mother, intermediate, LSP) """
     import smsInterpolation
-    return smsInterpolation.UpperLimit(analysis, topo, masses, debug)
+    return smsInterpolation.upperLimit(analysis, topo, masses, debug)
 #    return getUpperLimit ( analysis, topo, mx=masses[0], my=masses[-1], interpolate=True )
 
 def getUpperLimit (analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False, expected=False):
@@ -735,7 +735,7 @@ def exists(analysis, topo, run=None):
 # print "a=",a
         mzname = None
         if a['mz'] and len(a['mz']): mzname = a['mz'][0]
-        toponame = smsInterpolation.gethistname(topo, mzname)
+        toponame = smsInterpolation.getHistName(topo, mzname)
         if hasDict:
 # print "BBB 1 ana=%s run=%s run2=%s" % ( analysis,run,run2 )
             Dict = smsHelpers.getUpperLimitDictionary (analysis, toponame, run2)
