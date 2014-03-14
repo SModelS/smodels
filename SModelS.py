@@ -16,17 +16,24 @@ def installDirectory():
     ret=ret.replace("SModelS.py","")
     return ret
 
-def version( astuple=False ):
+def version( astuple=False, addCodeName=True ):
     """ prints out version number of SModelS framework """
     f=open("%s/version" % installDirectory() )
     l=f.readline()
     f.close()
     l=l.replace("\n","")
     l.strip()
-    if not astuple: return l
+    if not astuple:
+        if addCodeName: return l
+        p=l.find("/")
+        if p>-1: return l[:p]
     T,C=l.split("/")
     A,B=T.split(".")
-    return (int(A),int(B),C.strip())
+    if addCodeName:
+        return (int(A),int(B),C.strip())
+    else:
+        return (int(A),int(B))
+        
 
 def license():
     f=open(installdir()+"COPYING")
