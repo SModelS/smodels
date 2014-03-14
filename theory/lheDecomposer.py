@@ -91,7 +91,7 @@ def elementFromEvent(event, weight=None):
             branchList[-1].momID = particle.pdg
             branchList[-1].daughterID = particle.pdg
             branchList[-1].masses = [massdic[particle.pdg]]
-            branchList[-1].maxWeight = weight.getMaxXsec()            
+            if weight: branchList[-1].maxWeight = weight.getMaxXsec()            
             
     # Generate final branches (after all R-odd particles have decayed)
     finalBranchList = branch.decayBranches(branchList, brDic, massdic,
