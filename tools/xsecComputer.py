@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 def addXSecToFile(sqrts,maxOrder,nevts,slhafile,lhefile=None,basedir=None):
     """ Runs pythia at sqrts and compute SUSY cross-sections for the input SLHA file.
-    Write cross-sections to file
+    Writes cross-sections to slha file.
     :param sqrts: sqrt{s} to run Pythia
     :param maxOrder: maximum order to compute the cross-section
     if maxOrder = 0, compute only LO pythia xsecs
@@ -74,7 +74,7 @@ def addXSecToFile(sqrts,maxOrder,nevts,slhafile,lhefile=None,basedir=None):
         pIDs = LOxsecs.getPIDpairs()   # Get particle ID pairs for all xsecs
         for pID in pIDs:
             k = 1.
-            kNLO,kNLL = nllFast.getKfactorsFor(pID,sqrts,slhafile)
+            kNLO,kNLL = nllFast.getKfactorsFor(pID,sqrts,slhafile,basedir+"/nllfast/")
             if maxOrder == 1 and kNLO: k = kNLO
             elif maxOrder == 2 and kNLL and kNLO: k = kNLO*kNLL
             else:
@@ -104,7 +104,8 @@ def xsecToBlock(xsec,inPDGs=(2212,2212),comment=None):
     header += " "+str(len(xsec.pid))   #Number of outgoing states
     for pid in xsec.pid: header += " "+str(pid)  #PDGs of outgoing states
     header += "   # "+str(comment)   #Comment
-    entry = "0  "+str(xsec.info.order)+"  0  0  0  0  "+str(rmvunit(xsec.value,'fb'))+" SModelS "+version()
+    import SModelS
+    entry = "0  "+str(xsec.info.order)+"  0  0  0  0  "+str(rmvunit(xsec.value,'fb'))+" SModelS "+SModelS.version()
     
     return header + "\n" + entry
     
