@@ -39,6 +39,8 @@ def setBase (base):
 def useUnits (b=True):
     PhysicsUnits.useUnits = b
 
+alldirectories = ['8TeV', 'ATLAS8TeV', '2012', '2011']
+
 def considerRuns(run=None):
     """ 
         defines what runs are to be considered when asking for results.
@@ -46,7 +48,6 @@ def considerRuns(run=None):
         :param run: a list of runs to be considered, e.g. [ '2012', '8TeV' ]). If None, all runs are taken into account.
         :type run: list or NoneType
     """
-    from experiment import smsResultsCollector
     allruns = ["8TeV", "ATLAS8TeV", "RPV8", "2012", "RPV7", "2011"]
     runsort = []
     if run:
@@ -54,13 +55,13 @@ def considerRuns(run=None):
             if r in run:
                 runsort.append(r)
         smsHelpers.runs = runsort
-        smsResultsCollector.alldirectories = runsort
+        alldirectories = runsort
         for r in run:
             if not r in allruns:
                 print "%s is not a run!!!" % r
     else:
         smsHelpers.runs = allruns
-        smsResultsCollector.alldirectories = allruns
+        alldirectories = allruns
 
 def verbosity (level="error"):
     if level == "error":
