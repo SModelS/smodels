@@ -13,31 +13,9 @@
 
 from experiment import smsHelpers
 from tools.PhysicsUnits import addunit, rmvunit
-from experiment.smsResultsCollector import description
 from tools import PhysicsUnits, RCFile
 from experiment import logger
 from experiment.experimentExceptions import MetaInfoError
-
-def describeTx (topo, short=True):
-    """ describe a Tx name, e.g. T2tt -> "#tilde{t} -> t #tilde{#chi}^{0} """
-    ret = topo + ": " + description (topo, plot='ROOT', kerning=False, short=short).replace("pp #rightarrow ", "")
-    ret = ret[:ret.find(";")]
-    return ret
-
-def getAllHistNames (ana, topo, run=None):
-    """ for a given analysis, topology, return list of all available histograms"""
-    from experiment import smsInterpolation
-    ret = []
-    dic_list = getaxes(ana, topo, run)
-    if not dic_list: return None    # topology not found
-    if len(dic_list) == 1 and not dic_list[0]['mz']: return [smsInterpolation.getHistName(topo, None)]
-    for dic in dic_list:
-        ret.append(smsInterpolation.getHistName(topo, dic["mz"][0]))
-    return ret
-
-def setLogLevel (l=[ "error" ]):
-    """ defines what is written out, and what isnt """
-    smsHelpers.logLevel = l
 
 def setBase (base):
     """ just sets the base directory of the database """
@@ -46,6 +24,8 @@ def setBase (base):
 def useUnits (b=True):
     PhysicsUnits.useUnits = b
 
+alldirectories = ['8TeV', 'ATLAS8TeV', '2012', '2011']
+
 def considerRuns(run=None):
     """ 
         defines what runs are to be considered when asking for results.
@@ -53,7 +33,6 @@ def considerRuns(run=None):
         :param run: a list of runs to be considered, e.g. [ '2012', '8TeV' ]). If None, all runs are taken into account.
         :type run: list or NoneType
     """
-    from experiment import smsResultsCollector
     allruns = ["8TeV", "ATLAS8TeV", "RPV8", "2012", "RPV7", "2011"]
     runsort = []
     if run:
@@ -61,127 +40,19 @@ def considerRuns(run=None):
             if r in run:
                 runsort.append(r)
         smsHelpers.runs = runsort
-        smsResultsCollector.alldirectories = runsort
+        alldirectories = runsort
         for r in run:
             if not r in allruns:
                 print "%s is not a run!!!" % r
     else:
         smsHelpers.runs = allruns
-        smsResultsCollector.alldirectories = allruns
+        alldirectories = allruns
 
-def verbosity (level="error"):
-    if level == "error":
-        smsHelpers.verbose = False
-    else:
-        smsHelpers.verbose = True
-
-def getExclusion (analysis, topo, run=None):
-    """ get the exclusions on the mother particles,
-            for the summary plots """
+def getTopologies (analysis, run=None ):
+    """ return all topologies that this analysis has constraints for """
     run = smsHelpers.getRun (analysis, run)
-    ex = smsHelpers.motherParticleExclusions (analysis, run)
-    for t in smsHelpers.getPotentialNames (topo):
-        if ex.has_key (t): return ex[t]
-    return None
-
-def getBinWidthX (analysis, topo, run=None):
-    """ get the bin width in X """
-    run = smsHelpers.getRun (analysis, run)
-    if smsHelpers.hasDictionary (analysis, run):
-        return addunit(25, "GeV")
-    histo = smsHelpers.getUpperLimitFromHisto (analysis, topo, run)
-    if not histo: return None
-    w = histo.GetXaxis().GetBinWidth(1)
-    return addunit (w, "GeV")
-
-def getLowX (analysis, topo, run=None):
-    """ get the lower edge of the x axis """
-    run = smsHelpers.getRun (analysis, run)
-    if smsHelpers.hasDictionary (analysis, run):
-        dic = smsHelpers.getUpperLimitDictionary(analysis, topo, run)
-        if not dic: return None
-        minx = min(dic.keys()) - 12.5
-        return addunit (minx, "GeV")
-    histo = smsHelpers.getUpperLimitFromHisto (analysis, topo, run)
-    if not histo: return None
-    w = histo.GetXaxis().GetBinLowEdge(histo.GetXaxis().GetFirst())
-    return addunit (w, "GeV")
-
-def getUpX(analysis, topo, run=None):
-    """ get the upper edge of the x axis """
-    run = smsHelpers.getRun (analysis, run)
-    if smsHelpers.hasDictionary (analysis, run):
-        dic = smsHelpers.getUpperLimitDictionary(analysis, topo, run)
-        if not dic: return None
-        maxx = max(dic.keys()) + 12.5
-        return addunit (maxx, "GeV")
-    histo = smsHelpers.getUpperLimitFromHisto (analysis, topo, run)
-    if not histo: return None
-    w = histo.GetXaxis().GetBinUpEdge(histo.GetXaxis().GetLast())
-    return addunit (w, "GeV")
-
-def getLowY (analysis, topo, run=None):
-    """ get the lower edge of the y axis """
-    run = smsHelpers.getRun (analysis, run)
-    if smsHelpers.hasDictionary (analysis, run):
-        dic = smsHelpers.getUpperLimitDictionary(analysis, topo, run)
-        if not dic: return None
-        ylist = []
-        for ydic in dic.values():
-            ylist.extend(ydic.keys())
-        miny = min(ylist) - 12.5
-        return addunit(miny, "GeV")
-    histo = smsHelpers.getUpperLimitFromHisto (analysis, topo, run)
-    if not histo: return None
-    w = histo.GetYaxis().GetBinLowEdge(histo.GetYaxis().GetFirst())
-    return addunit (w, "GeV")
-
-def getUpY (analysis, topo, run=None):
-    """ get the upper edge of the y axis """
-    run = smsHelpers.getRun (analysis, run)
-    if smsHelpers.hasDictionary (analysis, run):
-        dic = smsHelpers.getUpperLimitDictionary(analysis, topo, run)
-        if not dic: return None
-        ylist = []
-        for ydic in dic.values():
-            ylist.extend(ydic.keys())
-        maxy = max(ylist) + 12.5
-        return addunit(maxy, "GeV")
-    histo = smsHelpers.getUpperLimitFromHisto (analysis, topo, run)
-    if not histo: return None
-    w = histo.GetYaxis().GetBinUpEdge(histo.GetYaxis().GetLast())
-    return addunit (w, "GeV")
-
-def getBinWidthY (analysis, topo, run=None):
-    """ get the bin width in Y """
-    run = smsHelpers.getRun (analysis, run)
-    if smsHelpers.hasDictionary (analysis, run):
-        return addunit (25, "GeV")
-    histo = smsHelpers.getUpperLimitFromHisto (analysis, topo, run)
-    if not histo: return None
-    w = histo.GetYaxis().GetBinWidth(1)
-    return addunit (w, "GeV")
-
-def getExclusionLine(topo, ana, expected=False, plusminussigma=0, extendedinfo=False, xvalue=None, factor=1.0):
-    """ get the exclusion line, as a TGraph """
-    if xvalue == None: xvalue = ''
-    from experiment import smsResultsCollector
-    ex = smsResultsCollector.exclusionline(topo, ana, xvalue, factor, extendedinfo=extendedinfo, expected=expected, plusminussigma=plusminussigma)
-    return ex
-
-def getTopologies (analysis, run=None, allHistos=False):
-    """ return all topologies that this analysis has results for
-            if allHistos=True is selected: return all available histograms """
-    run = smsHelpers.getRun (analysis, run)
-    if allHistos or not getaxes(analysis):
-# we used the exclusion info to get the list
-        x = smsHelpers.motherParticleExclusions (analysis, run)
-        return x.keys()
-    topolist = []
-    axes = getaxes(analysis)
-    for topo in axes.keys():
-        if exists(analysis, topo): topolist.append(topo)
-    return topolist
+    x = getConstraints (analysis, run=run)
+    return x.keys()
 
 def getRun (analysis, run=None):
     """ tell us, which run the results will be fetched for.
@@ -224,7 +95,7 @@ def getAnalyses (topo, run=None):
 
 allresults = {}
 
-def getAllResults (run=None, allHistos=False):
+def getAllResults (run=None ):
     """returns all analyses and the topologies they have results for
     """
     import os
@@ -239,42 +110,10 @@ def getAllResults (run=None, allHistos=False):
         dirs = os.listdir ("%s/%s/" % (smsHelpers.Base, r))
         for ana in dirs:
             if os.path.exists ("%s/%s/%s/info.txt" % (smsHelpers.Base, r, ana)):
-                topos = getTopologies (ana, run, allHistos=allHistos)
+                topos = getTopologies (ana, run )
                 ret[ana] = topos
     allresults[key] = ret
     return ret
-
-
-dbresults = {}
-
-def getDatabaseResults (run=None, category=None):
-    """ returns all public analyses and the topologies we have constraints for """
-    import os, copy
-    key = str(run)+str(category)
-    if dbresults.has_key (key):
-        return dbresults[key]
-    runs = smsHelpers.runs
-    if run: runs = [ run ]
-    print "runs=",runs
-    ret = {}
-    for r in runs:
-# # so thats the runs I really have to think about
-        dirs = os.listdir ("%s/%s/" % (smsHelpers.Base, r))
-        for ana in dirs:
-            if os.path.exists ("%s/%s/%s/info.txt" % (smsHelpers.Base, r, ana)):
-                topos = getConstraints (ana, run=r).keys()
-                if not topos: continue
-                if category:
-                    if isPrivate(ana): continue
-                    newTopos=copy.deepcopy(topos)
-                    for t in newTopos:
-                        if category not in getCategories(ana, topo=t):
-                            topos.remove(t)
-                if not topos: continue
-                ret[ana] = topos
-    dbresults[key] = ret
-    return ret
-
 
 def getClosestValue (Dict, mx, my):
     """assuming that Dict is a dictionary of mx,my,ul, get the upper limit
@@ -442,59 +281,6 @@ def getExplanationForLackOfUpperLimit (analysis, topo, mx=None, my=None, run=Non
     if number: return msg[0]
     return msg[1]
 
-def isPrivate(analysis, run=None):
-    """Check if analysis is flagged as private.
-         
-       :param analysis: analysis to be checked for its public/private state
-       :param run: run to be selected (default: None)
-       :returns: True, if analysis is flagged as private, else False
-    """
-    try:
-        return bool(int(smsHelpers.getMetaInfoField(analysis, "private", run)))
-    except MetaInfoError:
-        logger.exception("Could not parse field 'private'.")
-
-
-def isPrivateTopology(analysis, topology, run=None):
-    """Check if topology of analysis is flagged as private.
-    
-       :param analysis: analysis to be selected
-       :param topology: topology to be checked for its public/private state
-       :param run: run to be selected (default: None)
-       :returns: True, if analysis or topology is selected, else False
-    """
-    if isPrivate(analysis, run):
-        return True
-    else:
-        try:
-            return topology in smsHelpers.getMetaInfoField(analysis, "private_topologies", run).split()
-        except MetaInfoError:
-            logger.exception("Could not parse field 'private_topologies'.")
-
-def isPublic(analysis, run=None):
-    """DEPRECATED - Check if analysis is NOT flagged as private.
-         
-       :param analysis: analysis to be checked for its public/private state
-       :param run: specific run of the analysis to be checked (default: None)
-       :returns: True, if analysis is NOT flagged as private, else False
-    """
-    return not isPrivate(analysis, run)
-
-def hasDataPublished (analysis, run=None):
-    """ has the analysis published their data in digitized form? """
-    value = smsHelpers.getMetaInfoField (analysis, "publisheddata", run)
-    if type(value) == type("string"):
-        if value == "None": return None
-        if value == "True" or value == "1": return True
-        if value == "False" or value == "0": return False
-    if not value:
-        return None
-    try:
-        return bool(value)
-    except Exception:
-        logger.exception("Could not parse field 'publisheddata'.")
-    return None
-
 def getLumi (analysis, run=None):
     """ get the integrated luminosity for this analysis """
     lumifb = float(smsHelpers.getMetaInfoField (analysis, "lumi", run))
@@ -512,11 +298,6 @@ def getSqrts (analysis, run=None):
 def getPAS (analysis, run=None):
     """ get the PAS for this analysis """
     return smsHelpers.getMetaInfoField (analysis, "pas", run)
-
-def getOrder (analysis, run=None):
-    """ get the order in perturbation theory that the exclusion lines correspond
-            with """
-    return smsHelpers.getMetaInfoField (analysis, "order", run)
 
 def hasDictionary (analysis, run=None):
     """ are the upper limits available in dictionary format? """
@@ -593,34 +374,6 @@ def getConstraints (analysis, topo="all", run=None):
     constraints[key] = ret[topo]
     return ret[topo]
 
-categories = {}
-
-def getCategories (analysis, topo="all", run=None):
-    """ get the categories. if topo is "all", 
-            returns a dictionary, else it returns the constraint
-            only for the given topo, None if non-existent. """
-    key = analysis + topo + str(run)
-    if categories.has_key (key): return categories[key]
-    run = smsHelpers.getRun (analysis, run)
-    ret = smsHelpers.categories (analysis, run)
-    if not ret: return None
-    if topo == "all":
-        categories[key] = ret
-        return ret
-    if not ret.has_key (topo):
-        categories[key] = None
-        return None
-    categories[key] = ret[topo]
-    return ret[topo]
-
-def getRequirement (analysis, run=None):
-    """ any requirements that come with this analysis? (e.g. onshellness) """
-    return smsHelpers.getMetaInfoField (analysis, "requires", run)
-
-def getCheckedBy (analysis, run=None):
-    """ has the result been validated? """
-    return smsHelpers.getMetaInfoField (analysis, "checked", run)
-
 def getJournal (analysis, run=None):
     """ get the journal of this analysis """
     return smsHelpers.getMetaInfoField (analysis, "journal", run)
@@ -637,86 +390,13 @@ def hasURL (analysis, run=None):
     """ see if an URL is known """
     return smsHelpers.hasMetaInfoField (analysis, "url", run)
 
-def getContact (analysis, run=None):
-    """ get the contact for this analysis """
-    return smsHelpers.getMetaInfoField (analysis, "contact", run)
-
-def getPerturbationOrder (analysis, run=None):
-    """ get the contact for this analysis """
-    return smsHelpers.getMetaInfoField (analysis, "order", run)
-
-def particles(topo, plot='ROOT'):
-    """return the production mode for a given topology:
-         latex code either compatible to ROOT or Python"""
-    if smsHelpers.dicparticle.has_key(topo):
-        part = smsHelpers.dicparticle[topo]
-        if plot == 'ROOT':
-    # print "[SMSResults.py] debug",part
-            return part
-        if plot == 'python':
-            return part.replace('#', '\\')
-    else:
-        return None
-
-def particleName(topo):
-    """return the production mode for a given topology:
-         write out the name in plain letters, no latex """
-    if topo[:2] == "TGQ": return "associate"
-    if topo == "TChiSlep" or topo == "TChiNuSlep": return "chargino/neutralino"
-    if topo == "TChiSlepSlep": return "chargino/neutralino"
-    if topo == "TChiWZ": return "chargino/neutralino"
-    if topo[:4] == "TChi": return "chargino/neutralino"
-    if not smsHelpers.dicparticle.has_key(topo):
-        return "???"
-    part = smsHelpers.dicparticle[topo].replace("#tilde", "").replace("{", "").replace("}", "")
-    if part == "g": part = "gluino"
-    if part == "b": part = "sbottom"
-    if part == "t": part = "stop"
-    if part == "q": part = "squark"
-    return part
-
-def massDecoupling_ (topo):
-    if topo == "T2tt":
-        return "m(#tilde{g},#tilde{q})>>m(#tilde{t})"
-    if topo == "T2FVttcc":
-        return "m(#tilde{g},#tilde{q})>>m(#tilde{t})"
-    if topo == "T2bb":
-        return "m(#tilde{g},#tilde{q})>>m(#tilde{b})"
-    if topo == "TChiSlep":
-# return "m(#tilde{g}),m(#tilde{q})>>m(#tilde{#chi}^{0}_{2}),m(#tilde{#chi}^{#pm})"
-        return "m(#tilde{g},m(#tilde{q})>>m(#tilde{#chi}^{0}_{2},#tilde{#chi}^{#pm})"
-    if topo == "TChiSlepSlep":
-# return "m(#tilde{g}),m(#tilde{q})>>m(#tilde{#chi}^{0}_{2})"
-        return "m(#tilde{g},#tilde{q})>>m(#tilde{#chi}^{0}_{2},#tilde{#chi}^{#pm})"
-    if topo == "TChiNuSlep":
-        return "m(#tilde{g},#tilde{q})>>m(#tilde{#chi}^{0}_{2},#tilde{#chi}^{#pm})"
-# return "m(#tilde{g}),m(#tilde{q})>>m(#tilde{#chi}^{0}_{2}),m(#tilde{#chi}^{#pm})"
-    if topo == "TChiwz":
-        return "m(#tilde{g},#tilde{q})>>m(#tilde{#chi}^{0}_{2},#tilde{#chi}^{#pm})"
-    T2 = topo[:2]
-    if T2 == "T1" or T2 == "T3" or T2 == "T5":
-        return "m(#tilde{q})>>m(#tilde{g})"
-    if T2 == "T2" or T2 == "T4" or T2 == "T6":
-        return "m(#tilde{g})>>m(#tilde{q})"
-    return ""
-
-def massDecoupling (topo, plot='ROOT', kerning=True):
-    """ describe the assumed mass decoupling """
-    md = massDecoupling_ (topo)
-    if kerning:
-        md = md.replace(">>", ">#kern[-.2]{>}")
-    if plot != 'ROOT':
-        md = '$' + md.replace('#', '\\') + '$'
-    return md
-
-
-
 def exists(analysis, topo, run=None):
-    """ check if the histogram run/analysis/sms.root(limit_topo) exists.
-                for topologies with intermediate masses, check if all histograms (dictionaries)
-                listed in the axes-information exist."""
-    """ or sms.py, if it's stored in dictionaries. If topo==None, simply check
-            if run/analysis/sms.root or run/analysis/sms.py exists. """
+    """ check if the histogram ``limit_topo'' in 
+     run/analysis/sms.py|root exists.
+     For topologies with intermediate masses, check if all histograms (dictionaries)
+     listed in the axes-information exist.
+     If topo==None, simply check
+     if run/analysis/sms.py|root exists. """
     import smsInterpolation
     run2 = smsHelpers.getRun(analysis, run)
     if not topo:

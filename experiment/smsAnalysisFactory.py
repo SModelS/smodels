@@ -79,10 +79,13 @@ def load(anas=None, topos=None, sqrts=[ 7, 8 ]):
     listOfAnalyses = []
 
     debug = False
+    from experiment import logger
+    import logging
     if debug:
-        smsResults.verbosity ("info")
+        logger.setLevel ( logging.DEBUG )
     else:
-        smsResults.verbosity ("error")
+        from experiment import logger
+        logger.setLevel ( logging.WARN )
     
     if anas == None: anas = smsResults.getAllResults().keys()
     for ana in anas:
