@@ -7,6 +7,8 @@
         
 """
 
+from experiment import limitGetter
+
 class ULanalysis(object):
     """
     Class to store upper limit-type analyses. Stores the conditions and the
@@ -46,6 +48,18 @@ class ULanalysis(object):
                 return self.elementsEff[el]
         return 0.
     
+    def getUpperLimitFor(self,mass):
+        """
+        Get the experimental upper limit for a specific mass array.
+        
+        :param mass: mass vector for computing the upper limit
+        :returns: experimental upper limit for cross-section times BR
+        
+        """
+        
+        return limitGetter.GetPlotLimit(mass, self, complain=False)
+        
+    
 
 class SRanalysis(object):
     """
@@ -72,3 +86,14 @@ class SRanalysis(object):
         if not element:
             return False      
         return False
+    
+    def getLimitFor(self):
+        """
+        Get the experimental limit for a cross-section in a specific signal region.
+        (dummy for now)
+        
+        :returns: experimental upper limit for cross-section in the signal region
+        
+        """        
+        return False
+    

@@ -25,8 +25,8 @@ def main():
     lhefile = "lhe/ued_1.lhe"
     mingap = addunit(5.,'GeV')
     sigmacut = addunit(0.1,'fb')
-    smsTopList = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=False
-                                          , doInvisible=False, minmassgap=mingap)
+    smsTopList = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=True
+                                          , doInvisible=True, minmassgap=mingap)
 #     smsTopList = lheDecomposer.decompose(lhefile, doCompress=True, doInvisible=True, minmassgap=mingap)
 #Print decomposition summary
     smsTopList.printout()
@@ -47,6 +47,7 @@ def main():
             else:
                 for cond in pred.conditions:
                     print pred.conditions[cond]
+            print 'experimental limit=',ana.getUpperLimitFor(pred.mass)
             print '\n'
     
 
