@@ -78,23 +78,23 @@ def elementFromEvent(event, weight=None):
     if not event.particles:
         logger.error('Empty event!')
         return None
+
+    brDic, massDic = getDictionariesFromEvent(event)
           
-    # Get simple BR and Mass dictionaries for each branch
-    brDic, massdic = getDictionariesFromEvent(event)   
-   
-    # Creates branch list (list of mothers branches)
-    branchList = []
-    for particle in event.particles:
+    # Creates branch list
+    finalBranchList = []
+    for ip,particle in enumerate(event.particles):
         # Means particle came from initial state (primary mother)
         if 1 in particle.moms:
-            branchList.append(branch.Branch())
-            branchList[-1].momID = particle.pdg
-            branchList[-1].daughterID = particle.pdg
-            branchList[-1].masses = [massdic[particle.pdg]]
-            if weight: branchList[-1].maxWeight = weight.getMaxXsec()            
-            
-    # Generate final branches (after all R-odd particles have decayed)
-    finalBranchList = branch.decayBranches(branchList, brDic, massdic,
+            mombranch = branch.Branch()
+            mombranch.momID = particle.pdg
+            mombranch.daughterID = particle.pdg
+            if weight: mombranch.maxWeight = weight.getMaxXsec()            
+            # Get simple BR and Mass dictionaries for the corresponding branch
+            branchBR = brDic[ip]
+            branchMass = massDic[ip]
+            # Generate final branches (after all R-odd particles have decayed)
+            finalBranchList += branch.decayBranches([mombranch], branchBR, branchMass,
                                            sigcut=addunit(0., 'fb'))     
     
     if len(finalBranchList) != 2:
@@ -110,42 +110,66 @@ def elementFromEvent(event, weight=None):
 
 def getDictionariesFromEvent(event):
     """
-    Read an event and create simple mass and BR dictionaries for a single
-    branch (mother).
+    Read an event and create simple mass and BR dictionaries 
+    for each branch in the event
     
     :param event: LHE event
-    :returns: one BR dictionary for each branch and a common Mass dictionary
+    :returns: BR and Mass dictionaries for the branches in the event
     
     """
-    # Get mass and branching ratios for all particles:
-    brDic = {}
-    massdic = {}
-    for particle in event.particles:
-        if particle.pdg in ParticleNames.Reven:
-            # Ignore R-even particles
-            continue
-        massdic[particle.pdg] = addunit(particle.mass, 'GeV')       
-        # Empty BRs 
-        brDic[particle.pdg] = [pyslha2.Decay(0., 0, [], particle.pdg)]
+    
+    particles = event.particles
+    
+    # Identify and label individual branches:
+    branchDic = {}
+    for ip,particle in enumerate(particles):
+        if particle.status == -1: continue
+        if particles[particle.moms[0]].status == -1:
+            #If a primary mother, the branch index is its own position
+            initMom = ip
+        else:
+            #If not a primary mother, check if particle has a single parent (as it should)
+            if particle.moms[0] != particle.moms[1] and min(particle.moms) != 0: 
+                logger.error("More than one parent particle found!")
+                return False        
+            initMom = max(particle.moms)-1
+            while particles[particles[initMom].moms[0]].status != -1:
+                #Find primary mother (labels the branch)
+                initMom = max(particles[initMom].moms)-1
+        branchDic[ip] = initMom           
         
-    for particle in event.particles:
+    # Get mass and BR dictionaries for all branches:
+    massDic = {}
+    brDic = {}
+    for ibranch in branchDic.values():
+        massDic[ibranch] = {}
+        brDic[ibranch] = {}
+    for ip,particle in enumerate(particles):        
+        if particle.pdg in ParticleNames.Reven or particle.status == -1:
+            # Ignore R-even particles and initial state particles
+            continue
+        ibranch = branchDic[ip]  #Get particle branch
+        massDic[ibranch][particle.pdg] = addunit(particle.mass, 'GeV')       
+    # Create empty BRs    
+        brDic[ibranch][particle.pdg] = [pyslha2.Decay(0., 0, [], particle.pdg)]
+    
+    # Get BRs from event       
+    for ip,particle in enumerate(particles):        
         if particle.status == -1:
             # Ignore initial state particles
             continue
-        if event.particles[particle.moms[0]].status == -1:
+        if particles[particle.moms[0]].status == -1:
             # Ignore initial mothers
-            continue
-        if particle.moms[0] != particle.moms[1] and min(particle.moms) != 0:
-            logger.error("More than one parent particle found!")
-            return False        
-        momPdg = event.particles[max(particle.moms)-1].pdg
+            continue        
+        ibranch = branchDic[ip]
+        momPdg = particles[max(particle.moms)-1].pdg
         if momPdg in ParticleNames.Reven:
             # Ignore R-even decays
             continue
-        # BR = 1 always for an event
-        brDic[momPdg][0].br = 1.
-        brDic[momPdg][0].nda += 1
-        brDic[momPdg][0].ids.append(particle.pdg)
-        
-    return brDic, massdic
+        # BR = 1 always for an event        
+        brDic[ibranch][momPdg][0].br = 1.
+        brDic[ibranch][momPdg][0].nda += 1
+        brDic[ibranch][momPdg][0].ids.append(particle.pdg)
+
+    return brDic, massDic
     

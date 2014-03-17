@@ -116,14 +116,14 @@ class Branch(object):
                 newBranch.daughterID = partID
 
         if len(newmass) > 1:
-            logger.warning("Multiple R-odd particles in the final state:", br)
+            logger.warning("Multiple R-odd particles in the final state:"+str(br))
             return False
        
         if newparticles:
             newBranch.particles.append(newparticles)
         if newmass:
             newBranch.masses.append(newmass[0])
-        newBranch.maxWeight = self.maxWeight*br.br
+        if self.maxWeight: newBranch.maxWeight = self.maxWeight*br.br
                 
         return newBranch
     
@@ -172,23 +172,24 @@ def decayBranches(branchList, brDictionary, massDictionary,
     (all branches are kept)
     
     """
+    
     finalBranchList = []
     while branchList:
         # Store branches after adding one step cascade decay
         newBranchList = []
-        for branch in branchList:            
-            if branch.maxWeight < sigcut:
+        for inbranch in branchList:      
+            if sigcut.asNumber() > 0. and inbranch.maxWeight < sigcut:
                 # Remove the branches above sigcut and with length > topmax
-                continue    
+                continue
             # Add all possible decays of the R-odd daughter to the original
             # branch (if any)
-            newBranches = branch.decayDaughter(brDictionary, massDictionary)
+            newBranches = inbranch.decayDaughter(brDictionary, massDictionary)
             if newBranches:
                 # New branches were generated, add them for next iteration
                 newBranchList.extend(newBranches)
             else:
                 # All particles have already decayed, store final branch
-                finalBranchList.append(branch)
+                finalBranchList.append(inbranch)
         # Use new branches (if any) for next iteration step
         branchList = newBranchList  
     return finalBranchList
