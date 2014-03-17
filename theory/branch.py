@@ -119,8 +119,8 @@ class Branch(object):
         if newparticles:
             newBranch.particles.append(newparticles)
         if newmass:
-            newBranch.masses.append(newmass[0])
-        if self.maxWeight: newBranch.maxWeight = self.maxWeight*br.br
+            newBranch.masses.append(newmass[0])        
+        if not self.maxWeight is None: newBranch.maxWeight = self.maxWeight*br.br
                 
         return newBranch
     
