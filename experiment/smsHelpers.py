@@ -89,40 +89,6 @@ def parseMetaInfo ( analysis, run ):
     pMI_[key]=ret
     return ret
 
-def motherParticleExclusions ( analysis, run ):
-    """ get all the exclusion numbers for a given analysis/run pair """
-    info="%s/%s/%s/info.txt" % ( Base, run, analysis )
-    ret={}
-    if not os.path.exists ( info ):
-        logger.warn ("cannot find %s" % info )
-        return ret
-    f=open(info)
-    lines=f.readlines()
-    f.close()
-    for line in lines:
-        if line.find("#")>-1:
-            line=line[:line.find("#")].strip()
-        if line=="": continue
-        tokens=line.split(":",1)
-        if not len(tokens)==2:
-            logger.warn ( "[141] cannot parse this line (2): %s in %s" % (line, info) )
-            continue
-        if tokens[0]!="exclusions":
-    # we're only interested in the exclusions
-            continue
-        excl=tokens[1]
-        while excl[0]==" ": excl=excl[1:]
-        if excl[-1]=='\n': excl=excl[:-1]
-        excls=excl.split(" ")
-        if len(excls)<2:
-            logger.warn ( "[151] cannot parse this line (3): %s in %s" % (line, info) )
-            continue
-        values=map(int,excls[1:])
-        if len(values)==2:
-            values.insert(0,0)
-        ret[excls[0]]=values
-    return ret
-
 mlines={}
 def getLines ( analysis, run, label="condition" ):
     """ get all the conditions for a analysis/run pair """
