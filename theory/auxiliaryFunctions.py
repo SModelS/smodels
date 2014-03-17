@@ -8,9 +8,6 @@
 
 from functools import wraps
 import crossSection
-import copy
-import itertools
-from experiment import limitGetter
 from tools.PhysicsUnits import addunit, rmvunit
 import numpy as np
 from scipy import stats
@@ -47,7 +44,7 @@ def massPosition(mass, analysis):
     assuming fb units.
     
     """    
-    xmass = limitGetter.GetPlotLimit(mass, analysis, complain=False)
+    xmass = analysis.getUpperLimitFor(mass)
     if type(xmass) != type(addunit(1.,'pb')):
         return None
     xmass = rmvunit(xmass,'fb')    
