@@ -20,7 +20,6 @@ Base = "/afs/hephy.at/user/w/walten/public/sms/"
 runs=[ "8TeV", "2012", "ATLAS8TeV", "2011", "RPV8", "RPV7" ]
 ## runs=[ "2012" ]
 
-verbose=True
 useRoot=True
 
 ## track the open root files
@@ -80,7 +79,7 @@ def parseMetaInfo ( analysis, run ):
         if line=="": continue
         tokens=line.split(":",1)
         if not len(tokens)==2:
-            log ( "[117] cannot parse this line (1): ``%s'' in ``%s''" % (line, info) )
+            logger.error ( "[117] cannot parse this line (1): ``%s'' in ``%s''" % (line, info) )
             continue
         if tokens[0]=="exclusions":
     # we treat these separately
@@ -91,7 +90,8 @@ def parseMetaInfo ( analysis, run ):
 
 mlines={}
 def getLines ( analysis, run, label="condition" ):
-    """ get all the conditions for a analysis/run pair """
+    """ get all <label> lines in info.txt for an analysis/run pair 
+    """
     key=analysis+run+label
     if mlines.has_key ( key ): return mlines[key]
     info="%s/%s/%s/info.txt" % ( Base, run, analysis )
