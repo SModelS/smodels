@@ -95,12 +95,12 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
                     
                     newElement = element.Element([branch1, branch2])
                     newElement.weight = weightList
+                    allElements = [newElement]
                     # Do compression:
                     if doCompress or doInvisible:
-                        compElements = newElement.compressElement(doCompress,
+                        allElements += newElement.compressElement(doCompress,
                                                                   doInvisible,
                                                                   minmassgap)
-                    allElements = [newElement] + compElements
                     
                     for el in allElements:
                         if el.weight.getMaxXsec() < sigcut:
