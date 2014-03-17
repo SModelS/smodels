@@ -72,9 +72,9 @@ def drawBranch_ ( branch, upwards, labels, html, border, L ):
 def asciidraw ( element, labels=True, html=False, border=False ):
   """ draw a simple ascii graph on the screen """
   L=[]
-  for (ct,branch) in enumerate(element.B):
+  for (ct,branch) in enumerate(element.branches):
     L.append ( int( str(branch).count("[") ) )
-  for (ct,branch) in enumerate(element.B):
+  for (ct,branch) in enumerate(element.branches):
     drawBranch_ ( branch, upwards=(ct==0), labels=labels, html=html, border=border, L=max(L) )
 
 if __name__ == "__main__":
@@ -94,6 +94,6 @@ if __name__ == "__main__":
 
     reader = LHEReader.LHEReader( filename )
     Event = reader.next()
-    SMSTop = lheDecomposer.elementFromEvent( Event, crossSection.XSectionList() )
-    asciidraw ( SMSTop[0].leadingElement(), border=args.border )
+    element = lheDecomposer.elementFromEvent( Event, crossSection.XSectionList() )
+    asciidraw ( element, border=args.border )
             
