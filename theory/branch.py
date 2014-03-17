@@ -8,10 +8,7 @@
 
 from ParticleNames import PtcDic, Reven, simParticles, elementsInStr
 from tools.PhysicsUnits import addunit
-import logging
-
-logger = logging.getLogger(__name__)
-
+from theory import logger
 
 class Branch(object):
     """
@@ -116,7 +113,7 @@ class Branch(object):
                 newBranch.daughterID = partID
 
         if len(newmass) > 1:
-            logger.warning("Multiple R-odd particles in the final state:"+str(br))
+            logger.warning("Multiple R-odd particles in the final state: %s" % br)
             return False
        
         if newparticles:
