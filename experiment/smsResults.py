@@ -146,19 +146,11 @@ def getBinWidthY (analysis, topo, run=None):
     w = histo.GetYaxis().GetBinWidth(1)
     return addunit (w, "GeV")
 
-def getTopologies (analysis, run=None, allHistos=False):
-    """ return all topologies that this analysis has results for
-            if allHistos=True is selected: return all available histograms """
+def getTopologies (analysis, run=None ):
+    """ return all topologies that this analysis has constraints for """
     run = smsHelpers.getRun (analysis, run)
-    if allHistos or not getaxes(analysis):
-# we used the exclusion info to get the list
-        x = smsHelpers.motherParticleExclusions (analysis, run)
-        return x.keys()
-    topolist = []
-    axes = getaxes(analysis)
-    for topo in axes.keys():
-        if exists(analysis, topo): topolist.append(topo)
-    return topolist
+    x = getConstraints (analysis, run=run)
+    return x.keys()
 
 def getRun (analysis, run=None):
     """ tell us, which run the results will be fetched for.
@@ -201,7 +193,7 @@ def getAnalyses (topo, run=None):
 
 allresults = {}
 
-def getAllResults (run=None, allHistos=False):
+def getAllResults (run=None ):
     """returns all analyses and the topologies they have results for
     """
     import os
@@ -216,7 +208,7 @@ def getAllResults (run=None, allHistos=False):
         dirs = os.listdir ("%s/%s/" % (smsHelpers.Base, r))
         for ana in dirs:
             if os.path.exists ("%s/%s/%s/info.txt" % (smsHelpers.Base, r, ana)):
-                topos = getTopologies (ana, run, allHistos=allHistos)
+                topos = getTopologies (ana, run )
                 ret[ana] = topos
     allresults[key] = ret
     return ret
@@ -489,11 +481,6 @@ def getSqrts (analysis, run=None):
 def getPAS (analysis, run=None):
     """ get the PAS for this analysis """
     return smsHelpers.getMetaInfoField (analysis, "pas", run)
-
-def getOrder (analysis, run=None):
-    """ get the order in perturbation theory that the exclusion lines correspond
-            with """
-    return smsHelpers.getMetaInfoField (analysis, "order", run)
 
 def hasDictionary (analysis, run=None):
     """ are the upper limits available in dictionary format? """
