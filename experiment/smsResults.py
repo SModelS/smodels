@@ -13,16 +13,9 @@
 
 from experiment import smsHelpers
 from tools.PhysicsUnits import addunit, rmvunit
-from experiment.smsResultsCollector import description
 from tools import PhysicsUnits, RCFile
 from experiment import logger
 from experiment.experimentExceptions import MetaInfoError
-
-def describeTx (topo, short=True):
-    """ describe a Tx name, e.g. T2tt -> "#tilde{t} -> t #tilde{#chi}^{0} """
-    ret = topo + ": " + description (topo, plot='ROOT', kerning=False, short=short).replace("pp #rightarrow ", "")
-    ret = ret[:ret.find(";")]
-    return ret
 
 def getAllHistNames (ana, topo, run=None):
     """ for a given analysis, topology, return list of all available histograms"""
@@ -74,15 +67,6 @@ def verbosity (level="error"):
         smsHelpers.verbose = False
     else:
         smsHelpers.verbose = True
-
-def getExclusion (analysis, topo, run=None):
-    """ get the exclusions on the mother particles,
-            for the summary plots """
-    run = smsHelpers.getRun (analysis, run)
-    ex = smsHelpers.motherParticleExclusions (analysis, run)
-    for t in smsHelpers.getPotentialNames (topo):
-        if ex.has_key (t): return ex[t]
-    return None
 
 def getBinWidthX (analysis, topo, run=None):
     """ get the bin width in X """
@@ -161,13 +145,6 @@ def getBinWidthY (analysis, topo, run=None):
     if not histo: return None
     w = histo.GetYaxis().GetBinWidth(1)
     return addunit (w, "GeV")
-
-def getExclusionLine(topo, ana, expected=False, plusminussigma=0, extendedinfo=False, xvalue=None, factor=1.0):
-    """ get the exclusion line, as a TGraph """
-    if xvalue == None: xvalue = ''
-    from experiment import smsResultsCollector
-    ex = smsResultsCollector.exclusionline(topo, ana, xvalue, factor, extendedinfo=extendedinfo, expected=expected, plusminussigma=plusminussigma)
-    return ex
 
 def getTopologies (analysis, run=None, allHistos=False):
     """ return all topologies that this analysis has results for
