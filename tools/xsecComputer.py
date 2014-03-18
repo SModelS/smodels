@@ -9,6 +9,7 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
         
 """
+import set_path
 from physicsUnits import rmvunit
 import os, commands, shutil
 from theory import crossSection
@@ -167,4 +168,36 @@ def runPythia(slhafile,nevts,sqrts,lhefile=None,basedir=None):
         lheFile = cStringIO.StringIO(lhedata)   #Creates memory only file object
 
     return lheFile
+
+if __name__ == "__main__":
+    """ called as script, we compute the cross section of a given slha file """
+    import argparse, types, sys
+    argparser = argparse.ArgumentParser(description='computes the cross section of a file')
+    argparser.add_argument('file', type=types.StringType, nargs=1,
+                               help='the slha file to compute cross section for')
+    argparser.add_argument('-f','--tofile',help='write cross sections also to file', action='store_true')
+    argparser.add_argument('-s','--slha',help='input file is slha file', action='store_true')
+    argparser.add_argument('-n','--NLO',help='compute at the NLO level (default is LO)', action='store_true')
+    argparser.add_argument('-N','--NLL',help='compute at the NLL level (takes precedence over NLL, default is LO)', action='store_true')
+    argparser.add_argument('-l','--lhe',help='input file is lhe file', action='store_true')
+    args=argparser.parse_args()
+    File=args.file[0]
+    if not os.path.exists ( File ):
+        print "Error: file ``%s'' does not exist." % File
+        sys.exit(1)
+    print "Computing cross section for",File
+    if File[-5:].lower()==".slha" or args.slha:
+        if args.tofile:
+            print "compute slha cross section, and add to file"
+            sys.exit(0)
+        else:
+            print "compute slha cross section, print out, but dont add to file"
+            sys.exit(0)
+    if File[-4:].lower()==".lhe" or args.lhe:
+        if args.tofile:
+            print "compute lhe section, and add to file. FIXME I guess we dont need this case?"
+            sys.exit(0)
+        else:
+            print "compute lhe section, print out, but dont add to file."
+            sys.exit(0)
 
