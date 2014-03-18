@@ -5,7 +5,7 @@
 import set_path
 from prettytable import PrettyTable
 from theory import lheDecomposer, SLHADecomposer, ClusterTools
-from tools.PhysicsUnits import addunit, rmvunit
+from tools.physicsUnits import addunit, rmvunit
 from tools import SMSPrettyPrinter, xsecComputer
 from tools.SMSPrettyPrinter import wrap
 from regression import testHelpers

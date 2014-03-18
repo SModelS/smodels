@@ -6,7 +6,7 @@ smsdir = os.getcwd() + '/SMSfrozen/'
 sys.path.append(smsdir)
 
 from theory import SLHADecomposer, CrossSection, ClusterTools
-from tools.PhysicsUnits import addunit, rmvunit
+from tools.physicsUnits import addunit, rmvunit
 from experiment import SMSAnalysisFactory
 
 XSectionInfo = CrossSection.XSecInfoList('8 TeV (NLL)')

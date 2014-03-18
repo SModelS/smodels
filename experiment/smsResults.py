@@ -12,8 +12,8 @@
 """
 
 from experiment import smsHelpers
-from tools.PhysicsUnits import addunit, rmvunit
-from tools import PhysicsUnits, rcFile
+from tools.physicsUnits import addunit, rmvunit
+from tools import physicsUnits, rcFile
 from experiment import logger
 from experiment.experimentExceptions import MetaInfoError
 from experiment.smsHelpers import databaseVersion, getRun
@@ -23,7 +23,7 @@ def setBase (base):
     smsHelpers.Base = base
 
 def useUnits (b=True):
-    PhysicsUnits.useUnits = b
+    physicsUnits.useUnits = b
 
 alldirectories = ['8TeV', 'ATLAS8TeV', '2012', '2011']
 

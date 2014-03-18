@@ -11,7 +11,7 @@ import unittest
 import set_path
 import pickle, math
 import theory.SLHADecomposer as DEC
-import tools.PhysicsUnits as UNIT
+import tools.physicsUnits as UNIT
 
 class Test(unittest.TestCase):
 

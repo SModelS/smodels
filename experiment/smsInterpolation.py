@@ -16,7 +16,7 @@
 import smsResults, smsHelpers
 import numpy as np
 from scipy.interpolate import griddata
-from tools.PhysicsUnits import rmvunit, addunit
+from tools.physicsUnits import rmvunit, addunit
 
 def getxval(mx, my, mz,mass=False):
   """Calculate x-value for one point.
@@ -121,7 +121,7 @@ def getAxis(w,a):
 
 def compareMasses(masses, d):
   """Check if input masses are comparable to masses in the histogram corresponding to the information given in axes-dictionary d."""
-  from tools.PhysicsUnits import rmvunit
+  from tools.physicsUnits import rmvunit
   try: #check if histogram axes are M1, M0, return 1 if x-value of histogram is comparable to x value for given masses, 0 if not
     x1=getxval(masses[0],masses[-1],d['mz'][0])
     x2=float(rmvunit(masses[1],"GeV")-rmvunit(masses[-1],"GeV"))/(rmvunit(masses[0],"GeV")-rmvunit(masses[-1],"GeV"))

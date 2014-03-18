@@ -7,7 +7,7 @@
 """
 
 from ParticleNames import PtcDic, Reven, simParticles, elementsInStr
-from tools.PhysicsUnits import addunit
+from tools.physicsUnits import addunit
 from theory import logger
 
 class Branch(object):

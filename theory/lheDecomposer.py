@@ -13,7 +13,7 @@ import element
 import pyslha2
 import branch
 import ParticleNames
-from tools.PhysicsUnits import addunit
+from tools.physicsUnits import addunit
 import logging
 import copy
 

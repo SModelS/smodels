@@ -8,7 +8,7 @@ import ROOT, os, tempfile
 import tools.xsecComputer as XSEC
 import theory.SLHATools as SLHA
 import experiment.SMSResults as SMS
-import tools.PhysicsUnits as UNIT
+import tools.physicsUnits as UNIT
 
 topo = 'T2'
 nevts = 10000

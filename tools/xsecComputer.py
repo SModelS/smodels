@@ -9,7 +9,7 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
         
 """
-from PhysicsUnits import rmvunit
+from physicsUnits import rmvunit
 import os, commands, shutil
 from theory import crossSection
 import nllFast

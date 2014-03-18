@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: PhysicsUnits
+.. module:: physicsUnits
     :synopsis: This introduces physical units (GeV,fb) to the framework
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
@@ -10,6 +10,8 @@
 
 
 from unum import Unum
+import set_path
+from tools import logger
 
 
 # description see
@@ -66,7 +68,7 @@ def addunit ( value, unitstring ):
       return value * pb
     if unitstring=="fb-1":
       return value / fb
-    print "[PhysicsUnits.py] Warning: dont know what to do with unit",unitstring
+    logger.warning ( "dont know what to do with unit "+unitstring )
   return value
 
 def rmvunit ( value, unitstring ):
@@ -89,6 +91,6 @@ def rmvunit ( value, unitstring ):
     if unitstring=="fb-1":
       return value.asNumber(1/fb)
 
-    print "[PhysicsUnits.py] Warning: dont know what to do with unit",unitstring
+    logger.warning ( "dont know what to do with unit "+unitstring )
     return value
 

@@ -22,7 +22,7 @@ def fromEvent( Event, weight = {}, DoCompress=False, DoInvisible=False, \
   """
   from SMSDataObjects import GTop, EElement, BElement
   from ParticleNames import Rodd, Reven, getName
-  from tools.PhysicsUnits import addunit, rmvunit
+  from tools.physicsUnits import addunit, rmvunit
   PList=Event.particles
   if len(PList)==0: return None
     
@@ -106,7 +106,7 @@ def compressTopology(ETopList,DoCompress,DoInvisible,minmassgap):
       can be compressed no more.
       Returns a list with the old topologies and the compressed ones.
       To avoid double counting the input list should have a single element. """
-  from tools.PhysicsUnits import rmvunit
+  from tools.physicsUnits import rmvunit
   minmassgap=rmvunit ( minmassgap, "GeV" )
 
 #Keep compressing the topologies generated so far until no new compressions can happen:

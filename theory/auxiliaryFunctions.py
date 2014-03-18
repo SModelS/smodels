@@ -8,7 +8,7 @@
 
 from functools import wraps
 import crossSection
-from tools.PhysicsUnits import addunit, rmvunit
+from tools.physicsUnits import addunit, rmvunit
 import numpy as np
 from scipy import stats
 from collections import Iterable

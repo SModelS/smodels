@@ -11,7 +11,7 @@
 """
 
 import os
-from tools.PhysicsUnits import rmvunit
+from tools.physicsUnits import rmvunit
 from experiment import logger
 from experiment.experimentExceptions import MetaInfoError
 

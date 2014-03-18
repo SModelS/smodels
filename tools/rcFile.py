@@ -27,7 +27,8 @@ parseRCFile()
 if __name__ == "__main__":
     """ called as script, we check if there is a smodelsrc file """
     T=parseRCFile()
+    print "Checking if a ~/.smodelsrc file exists:",
     if not T:
-        print "No ~/.smodelsrc file found."
+        print "no ~/.smodelsrc file found."
     else:
-        print "Found ~/.smodelsrc file."
+        print "found ~/.smodelsrc file."
