@@ -373,3 +373,20 @@ def getUpperLimitDictionary ( analysis, topo, run, expected=False ):
         upperLimitDict[key]=Dict[topo]
     return Dict[topo]
 
+def databaseVersion( astuple=False, addCodeName=True ):
+    """ prints out version number of the *database* """
+    f=open("%s/version" % Base )
+    l=f.readline()
+    f.close()
+    l=l.replace("\n","")
+    l.strip()
+    if not astuple:
+        if addCodeName: return l
+        p=l.find("/")
+        if p>-1: return l[:p]
+    T,C=l.split("/")
+    A,B=T.split(".")
+    if addCodeName:
+        return (int(A),int(B),C.strip())
+    else:
+        return (int(A),int(B))
