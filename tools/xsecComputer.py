@@ -7,18 +7,16 @@
         
 .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
         
 """
 import set_path
-from physicsUnits import rmvunit
+from physicsUnits import rmvunit,addunit
 import os, commands, shutil
 from theory import crossSection
 import nllFast
 import cStringIO
-import logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
+from tools import logger
 
 def addXSecToFile(sqrts,maxOrder,nevts,slhafile,lhefile=None,basedir=None):
     """ Runs pythia at sqrts and compute SUSY cross-sections for the input SLHA file.
@@ -175,20 +173,39 @@ if __name__ == "__main__":
     argparser = argparse.ArgumentParser(description='computes the cross section of a file')
     argparser.add_argument('file', type=types.StringType, nargs=1,
                                help='the slha file to compute cross section for')
+    argparser.add_argument ( '-s', '--sqrts', nargs='+', action='append', help='sqrt(s) [TeV]. Can supply more than one value.', type=int, default=[] )
+    argparser.add_argument ( '-e', '--nevents', nargs='+', help='number of events to be simulated.', type=int, default=100 )
     argparser.add_argument('-f','--tofile',help='write cross sections also to file', action='store_true')
-    argparser.add_argument('-s','--slha',help='input file is slha file', action='store_true')
+    argparser.add_argument('-S','--slha',help='input file is slha file', action='store_true')
     argparser.add_argument('-n','--NLO',help='compute at the NLO level (default is LO)', action='store_true')
     argparser.add_argument('-N','--NLL',help='compute at the NLL level (takes precedence over NLL, default is LO)', action='store_true')
-    argparser.add_argument('-l','--lhe',help='input file is lhe file', action='store_true')
+    argparser.add_argument('-L','--lhe',help='input file is lhe file', action='store_true')
     args=argparser.parse_args()
+
+    import SModelS
+
+    sqrtses=[item for sublist in args.sqrts for item in sublist]
+    if len(sqrtses)==0: sqrtses=[8] ## default is: we compute for 8 tev! 
+    sqrtses.sort()
+    sqrtses=set(sqrtses) ## unique values!
+    for sqrts in sqrtses:
+      if sqrts not in [ 7,8,13,14,30,100]:
+        print "[xsecComputer.py] error: cannot compute xsec for sqrts=%d TeV!" % sqrts
+        sqrtses.remove(sqrts)
+    order=0
+    if args.NLO: order=1
+    if args.NLL: order=2
     File=args.file[0]
     if not os.path.exists ( File ):
         print "Error: file ``%s'' does not exist." % File
         sys.exit(1)
-    print "Computing cross section for",File
+    # print "[xsecComputer.py] compute cross section for",File
     if File[-5:].lower()==".slha" or args.slha:
         if args.tofile:
-            print "compute slha cross section, and add to file"
+            print "[xsecComputer.py] Compute slha cross section from %s, and add to slha file." % File
+            for s in sqrtses:
+              ss=addunit(s,'TeV')
+              addXSecToFile ( ss,order,args.nevents,File,basedir=SModelS.installDirectory() )
             sys.exit(0)
         else:
             print "compute slha cross section, print out, but dont add to file"
