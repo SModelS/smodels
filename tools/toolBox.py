@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
 """
-.. module:: ToolBox
-    :synopsis: A singleton-like class that keeps track of all external tools
+.. module:: toolBox
+    :synopsis: Contains a singleton-like class that keeps track of all external tools
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
 
 class ToolBox:
+  """ A singleton-like class that keeps track of all external tools """
   __shared_state = { "tools":{} }
   def __init__ ( self ):
     # a shared state.
@@ -18,7 +19,7 @@ class ToolBox:
 
   def initSingleton ( self ):
     """ intialise singleton instance (done only once for the entire class) """
-    from ExternalTools import ExternalPythia, ExternalNllFast7, ExternalNllFast8 
+    from externalTools import ExternalPythia, ExternalNllFast7, ExternalNllFast8 
     self.add ( ExternalPythia( ) )
     self.add ( ExternalNllFast7( ) )
     self.add ( ExternalNllFast8( ) )
