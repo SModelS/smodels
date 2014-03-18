@@ -26,18 +26,19 @@ from tools import logger
 # can be switched off with a single switch
 useUnits=True
 
-if len(Unum.getUnitTable())==0: # make sure we define only once
-    Unum.VALUE_FORMAT = "%0.2E"
-    Unum.UNIT_HIDE_EMPTY = True
+#if len(Unum.getUnitTable())==0: # make sure we define only once
+Unum.reset()
+Unum.VALUE_FORMAT = "%0.2E"
+Unum.UNIT_HIDE_EMPTY = True
 
-    fb=Unum.unit('fb')
-    pb=Unum.unit('pb', 1000 * fb)
+fb=Unum.unit('fb')
+pb=Unum.unit('pb', 1000 * fb)
 
-    eV=Unum.unit('eV')
-    keV=Unum.unit('keV',10**3*eV)
-    MeV=Unum.unit('MeV',10**6*eV)
-    GeV=Unum.unit('GeV',10**9*eV)
-    TeV=Unum.unit('TeV',10**12*eV)
+eV=Unum.unit('eV')
+keV=Unum.unit('keV',10**3*eV)
+MeV=Unum.unit('MeV',10**6*eV)
+GeV=Unum.unit('GeV',10**9*eV)
+TeV=Unum.unit('TeV',10**12*eV)
 
 def addunit ( value, unitstring ):
   """ a function that can add units to values, but also
