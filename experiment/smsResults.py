@@ -16,6 +16,7 @@ from tools.PhysicsUnits import addunit, rmvunit
 from tools import PhysicsUnits, RCFile
 from experiment import logger
 from experiment.experimentExceptions import MetaInfoError
+from experiment.smsHelpers import databaseVersion, getRun
 
 def setBase (base):
     """ just sets the base directory of the database """
@@ -53,12 +54,6 @@ def getTopologies (analysis, run=None ):
     run = smsHelpers.getRun (analysis, run)
     x = getConstraints (analysis, run=run)
     return x.keys()
-
-def getRun (analysis, run=None):
-    """ tell us, which run the results will be fetched for.
-            None if the request cannot be met """
-    run = smsHelpers.getRun (analysis, run)
-    return run
 
 def getExperiment (analysis, run=None):
     """ return experiment name for given analysis
@@ -324,9 +319,6 @@ def getx (analysis, topo=None, run=None):
 
     return d
 
-
-
-
 def getFigures (analysis, run=None):
     """ get the figure number for this analysis """
     return smsHelpers.getMetaInfoField (analysis, "figures", run)
@@ -464,3 +456,4 @@ def getaxes (analysis, topo=None, run=None):
         else: return d[topo]
 
     return d
+
