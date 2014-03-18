@@ -13,7 +13,7 @@
 
 from experiment import smsHelpers
 from tools.PhysicsUnits import addunit, rmvunit
-from tools import PhysicsUnits, RCFile
+from tools import PhysicsUnits, rcFile
 from experiment import logger
 from experiment.experimentExceptions import MetaInfoError
 from experiment.smsHelpers import databaseVersion, getRun

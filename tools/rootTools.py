@@ -217,6 +217,7 @@ def useNiceColorPalette( palette="temperature", f=0., ngradientcolors=20 ):
 
         
 if __name__ == "__main__":
+   """ as a script, we simply print out the paths """
    print "We're using ROOT version",getRootVersion()
    print "ROOT path",getRootPath()
    print "ROOT library path",getRootLibraryPath()
