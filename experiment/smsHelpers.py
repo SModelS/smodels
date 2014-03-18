@@ -20,18 +20,6 @@ Base = "/afs/hephy.at/user/w/walten/public/sms/"
 runs=[ "8TeV", "2012", "ATLAS8TeV", "2011", "RPV8", "RPV7" ]
 ## runs=[ "2012" ]
 
-useRoot=True
-
-## track the open root files
-openFiles={}
-
-def useROOT ( b ):
-  """ True: use also root dictionaries
-      False: make no use of ROOT whatsoever """
-  logger.info ( "setting root usage to "+str(b) )
-  global useRoot
-  useRoot=b
-
 def close():
     """ close all open files """
     for (name,tfile) in openFiles.items():
@@ -137,157 +125,6 @@ def constraints ( analysis, run ):
     """ get all the conditions for a analysis/run pair """
     return getLines ( analysis, run, "constraint" )
 
-upperLimitHisto={}
-expupperLimitHisto={}
-def getUpperLimitFromHisto ( analysis, topo, run, complain=False, expected=False ):
-    if not useRoot: 
-      logger.info ( "usage of ROOT is turned off." )
-      return None
-    key=analysis+topo+str(run)
-    if expected:
-        if expupperLimitHisto.has_key ( key ): return expupperLimitHisto[key] 
-    else:
-        if upperLimitHisto.has_key ( key ): return upperLimitHisto[key]
-    import ROOT
-    rootfile="%s/%s/%s/sms.root" % ( Base, run, analysis )
-    if not os.path.exists(rootfile):
-        logger.warn("root file %s doesnt exist" % rootfile )
-        upperLimitHisto[key]=None
-        expupperLimitHisto[key]=None
-        return None
-    f=None
-    if openFiles.has_key ( rootfile ):
-        f=openFiles[rootfile]
-    else:
-        f=ROOT.TFile(rootfile)
-        if not f or not f.IsOpen():
-            logger.warn("root file %s cannot be opened" % rootfile )
-            upperLimitHisto[key]=None
-            expupperLimitHisto[key]=None
-            return None
-        openFiles[rootfile]=f
-    if expected:
-        histo=f.Get("expectedlimit_%s" % getCanonicalName(topo) )
-        if not histo:
-            if complain: logger.warn("expected upper limit histogram %s not found in %s" % ( topo, rootfile ))
-            expupperLimitHisto[key]=None
-            return None
-        expupperLimitHisto[key]=histo
-    else:
-        histo=f.Get("limit_%s" % getCanonicalName(topo) )
-        if not histo:
-            if complain: logger.warn("histogram %s not found in %s" % ( topo, rootfile ))
-            upperLimitHisto[key]=None
-            return None
-        upperLimitHisto[key]=histo
-    return histo
-
-def getUpperLimitAtPoint ( histo, mx, my, interpolate=False ):
-    """ given already a histogram, we get the upper limit for mx and my,
-            we return None if we're out of bounds """
-
-    if rmvunit(my,'GeV')==None:
-        logger.warn ( "inconsistent mx/my, mx=None, my=%s" % my )
-        return None
-    if not histo: return None ## 'no histogram'
-    if interpolate: #for interpolation: set empty bins to the last finite value to avoid zeros in the interpolation, set result=None if the corresponding bin in the original histogram was empty
-        hInf = histo.Clone()
-        lastBinContent=0
-        for bx in range(1,hInf.GetXaxis().GetNbins()+1):
-            for by in range(1,hInf.GetYaxis().GetNbins()+1):
-                if not hInf.GetBinContent(bx,by): hInf.SetBinContent(bx,by,lastBinContent)
-                else: lastBinContent=hInf.GetBinContent(bx,by)
-        if histo.GetBinContent(histo.GetXaxis().FindBin(rmvunit(mx,'GeV')),histo.GetYaxis().FindBin(rmvunit(my,'GeV'))):
-            return hInf.Interpolate ( rmvunit(mx,'GeV'), rmvunit(my,'GeV') )
-        else: return None
-    xmax=histo.GetXaxis().GetNbins()
-    xbin=histo.GetXaxis().FindBin(rmvunit(mx,'GeV'))
-    if xbin==0 or xbin>xmax:
-        return None
-    ymax=histo.GetYaxis().GetNbins()
-    ybin=histo.GetYaxis().FindBin(rmvunit(my,'GeV'))
-    if ybin==0 or ybin>ymax:
-        return None
-    c=histo.GetBinContent(xbin,ybin)
-
-    if c == 0.: c = None
-    
-    return c
-
-effhistos={}
-def getEfficiencyHisto ( analysis, topo, run ):
-    if not useRoot:
-      logger.info ( "usage of ROOT is turned off." )
-      return None
-    key=analysis+topo+str(run)
-    if effhistos.has_key ( key ): return effhistos[key]
-    import ROOT
-    rootfile="%s/%s/%s/sms.root" % ( Base, run, analysis )
-    if not os.path.exists(rootfile):
-        logger.warn("root file %s doesnt exist" % rootfile )
-        effhistos[key]=None
-        return None
-    f=None
-    if openFiles.has_key ( rootfile ):
-        f=openFiles[rootfile]
-    else:
-        f=ROOT.TFile(rootfile)
-        if not f or not f.IsOpen():
-            logger.warn("root file %s cannot be opened" % rootfile )
-            effhistos[key]=None
-            return None
-        openFiles[rootfile]=f
-    histo=f.Get("efficiency_%s" % topo )
-    if not histo:
-        logger.warn("histogram %s not found in %s" % ( topo, rootfile ))
-        effhistos[key]=None
-        return None
-    effhistos[key]=histo
-    return histo
-
-def getEfficiencyAtPoint ( histo, mx, my ):
-    """ given already a histogram, we get the efficiency for mx and my,
-            we return None if we're out of bounds """
-    if my==None:
-        logger.warn ( "inconsistent mx/my, mx=None, my=%s" % my )
-        return None
-    if not histo: return None
-    xmax=histo.GetXaxis().GetNbins()
-    xbin=histo.GetXaxis().FindBin(mx)
-    if xbin==0 or xbin>xmax:
-        return None
-    ymax=histo.GetYaxis().GetNbins()
-    ybin=histo.GetYaxis().FindBin(my)
-    if ybin==0 or ybin>ymax:
-        return None
-    c=histo.GetBinContent(xbin,ybin)
-    if not c>=0. or not c<=1.:
-        print "[SMSHelpers.py] warning efficiency not between 0 and 1? c=",c
-    return c
-
-def getErrorMessage ( histo, mx, my ):
-    """ return an explication for why we have no result at mx, my """
-    if not histo:
-        return [ 1, "No 2d histogram available" ]
-    xbin=histo.GetXaxis().FindBin(mx)
-    titlex=histo.GetXaxis().GetTitle().replace("NLO","").replace( "NLL", "").replace("[GeV]","").replace("_","").replace("7TeV","").replace("8TeV","").replace(" mass ","")
-    titley=histo.GetYaxis().GetTitle().replace("NLO","").replace( "NLL", "").replace("[GeV]","").replace("_","").replace("7TeV","").replace("8TeV","").replace(" mass ","")
-    if xbin==0:
-        return [ 2, "m("+titlex+") too low" ]
-    xmax=histo.GetXaxis().GetNbins()
-    if xbin>xmax:
-        return [ 3, "m("+titlex+") too high" ]
-    ybin=histo.GetYaxis().FindBin(my)
-    if ybin==0:
-        return [ 4, "m("+titley+") too low" ]
-    ymax=histo.GetYaxis().GetNbins()
-    if ybin>ymax:
-        return [ 5, "m("+titley+") too high" ]
-    c=histo.GetBinContent(xbin,ybin)
-    if c==0.:
-        return [ 6, "out of histogram bounds" ]
-    return [ 0, str(c) ]
-
 def hasMetaInfoField ( analysis, field, run=None ):
     run=getRun ( analysis, run )
     metainfo=parseMetaInfo ( analysis, run )
@@ -317,6 +154,10 @@ def getMetaInfoField(analysis, field, run=None):
     infoFields[key] = f
     return f
 
+def getErrorMessage ( Dict, mx, my ):
+    logger.error("error message not implemented.")
+    return ""
+
 def hasDictionary(analysis, run=None):
     """are the upper limits available in dictionary format?
     """
@@ -326,20 +167,6 @@ def hasDictionary(analysis, run=None):
     if os.path.exists(dictfile):
         return True
     logger.warn("Dictionary file %s doesnt exist" % dictfile )
-    return False
-
-def hasHistogram(analysis, run=None):
-    """are the upper limits available as ROOT histogram?
-    """
-    if not useRoot:
-      logger.info ( "usage of ROOT is turned off." )
-      return False
-    if not run:
-        run=getRun(analysis)
-    rootfile="%s/%s/%s/sms.root" % ( Base, run, analysis )
-    if os.path.exists(rootfile):
-        return True
-    logger.warn("ROOT file %s doesnt exist" % rootfile )
     return False
 
 upperLimitDict={}

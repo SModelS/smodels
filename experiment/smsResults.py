@@ -211,16 +211,14 @@ def getInterpolatedUpperLimit (Dict, inmx, inmy):
 
 def getUpperLimitFromDictionary (analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False, expected=False):
     """ shouldnt have to call this directly. It's obtaining an upper limit from the python dictionary """
-#    if interpolate:
-#     print "[SMSResults.py] error: need to implement interpolation function for getUpperLimitFromDictionary"
-#        import sys
-#        sys.exit(0)
     Dict = smsHelpers.getUpperLimitDictionary (analysis, topo, run, expected=expected)
     if Dict == None: return Dict
-    # # Dict=addunit ( Dict, "pb" )
-    # print "[SMSResults.py] mx=",mx
+    if mx==None and my==None:
+      return Dict
+    if mx==None or my==None:
+      logger.error ( "asking for upper limits for mx=%s my=%s" % ( mx, my ) )
+      return None
     if rmvunit(mx, 'GeV') == None: return Dict
-    # # return getClosestValue ( Dict, mx, my )
     return addunit (getInterpolatedUpperLimitDelaunay (Dict, mx, my), "pb")
 
 def getSmartUpperLimit (analysis, topo, masses, massesbranch2=None, debug=False):
@@ -230,26 +228,16 @@ def getSmartUpperLimit (analysis, topo, masses, massesbranch2=None, debug=False)
     return smsInterpolation.upperLimit(analysis, topo, masses, debug)
 #    return getUpperLimit ( analysis, topo, mx=masses[0], my=masses[-1], interpolate=True )
 
-def getUpperLimit (analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False, expected=False):
+def getUpperLimit (analysis, topo, mx=None, my=None, run=None, interpolate=False, expected=False):
     """ get the upper limit for run/analysis/topo.
             return none if it doesnt exist.
-            if mx and my are none, return the entire histogram,
+            if mx and my are none, return the entire dictionary,
             if mx and my are floats, return the upper limit at this
             point
-            if png==True, return path of pngfile containing the histogram"""
+    """
     run = smsHelpers.getRun (analysis, run)
     if smsHelpers.hasDictionary (analysis, run):
         return  getUpperLimitFromDictionary (analysis, topo, mx, my, run, interpolate=interpolate, expected=expected)
-    if png == True:
-        pngfile = smsHelpers.getUpperLimitPng(analysis, topo, run)
-        return pngfile
-    if smsHelpers.hasHistogram (analysis, run):
-        histo = smsHelpers.getUpperLimitFromHisto (analysis, topo, run, expected=expected)
-        if rmvunit(mx, 'GeV') == None:
-            return histo
-        value = smsHelpers.getUpperLimitAtPoint (histo, mx, my, interpolate=interpolate)
-        if value == 0.0: value = None    # 0.0 usually means out of bounds
-        return addunit (value, "pb")
     logger.warning ("no upper limits found for %s" %analysis)
     return None 
 
@@ -259,12 +247,8 @@ def getEfficiency (analysis, topo, mx=None, my=None, run=None):
             if mx and my are none, return the entire histogram,
             if mx and my are floats, return the upper limit at this
             point """
-    run = smsHelpers.getRun (analysis, run)
-    histo = smsHelpers.getEfficiencyHisto (analysis, topo, run)
-    if mx == None:
-        return histo
-    value = smsHelpers.getEfficiencyAtPoint (histo, mx, my)
-    return value
+    logger.error ( "efficiencies not yet implemented" )
+    return None
 
 def getExplanationForLackOfUpperLimit (analysis, topo, mx=None, my=None, run=None, number=False):
     """if there's no upper limit, we want to know what's wrong.
@@ -383,20 +367,19 @@ def hasURL (analysis, run=None):
     return smsHelpers.hasMetaInfoField (analysis, "url", run)
 
 def exists(analysis, topo, run=None):
-    """ check if the histogram ``limit_topo'' in 
-     run/analysis/sms.py|root exists.
-     For topologies with intermediate masses, check if all histograms (dictionaries)
+    """ check if the dictioanary ``limit_topo'' in 
+     run/analysis/sms.py exists.
+     For topologies with intermediate masses, check if all dictionaries
      listed in the axes-information exist.
      If topo==None, simply check
-     if run/analysis/sms.py|root exists. """
+     if run/analysis/sms.py exists. """
     import smsInterpolation
     run2 = smsHelpers.getRun(analysis, run)
     if not topo:
         import os
         Base = smsHelpers.Base
-        rootfile = "%s/%s/%s/sms.root" % (Base, run2, analysis)
         pydict = "%s/%s/%s/sms.py" % (Base, run2, analysis)
-        if os.path.exists(rootfile) or os.path.exists(pydict):
+        if os.path.exists(pydict):
             return True
         else:
             return False
@@ -413,8 +396,8 @@ def exists(analysis, topo, run=None):
             Dict = smsHelpers.getUpperLimitDictionary (analysis, toponame, run2)
             if not Dict or len(Dict) == 0: return False
             continue
-        histo = smsHelpers.getUpperLimitFromHisto(analysis, toponame, run2)
-        if not histo: return False
+        else:
+            return False
 
     return True
 
