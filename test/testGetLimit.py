@@ -3,7 +3,7 @@ import ROOT,sys, os, tempfile
 from Experiment import SMSResults, SMSInterpolation, LimitGetter, SMSAnalysisFactory
 from Theory import SMSAnalysis, LHEDecomposer, SLHATools, SLHADecomposer, XSecComputer, ClusterTools
 from Tools import ROOTTools
-from Tools.PhysicsUnits import addunit, rmvunit
+from Tools.physicsUnits import addunit, rmvunit
 
 pid_dic = {"T1": [[1000021], [1000022]],
            "T1tttt": [[1000021], [1000022]],

@@ -4,7 +4,7 @@ import set_path, ROOT, sys
 ROOT.gROOT.SetBatch()
 
 from numpy import arange
-from tools import PhysicsUnits
+from tools import physicsUnits
 from experiment import SMSResults as S
 S.useUnits(False)
 a="Weakinos8TeV"

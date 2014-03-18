@@ -8,7 +8,7 @@ SModelS basic use case.
 import tools.loggingConfiguration
 tools.loggingConfiguration.configure()
 from theory import slhaDecomposer, lheDecomposer
-from tools.PhysicsUnits import addunit
+from tools.physicsUnits import addunit
 from experiment import smsAnalysisFactory
 from theory.theoryPrediction import theoryPredictionFor
 import logging

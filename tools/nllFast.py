@@ -11,7 +11,7 @@
 
 import commands, os, sys
 from theory import pyslha2 as pyslha
-from tools.PhysicsUnits import rmvunit
+from tools.physicsUnits import rmvunit
 import numpy
 import logging
 logging.basicConfig(level=logging.INFO)

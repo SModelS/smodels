@@ -5,7 +5,7 @@ what digitized results are not yet published """
 
 import set_path
 from experiment import SMSResults, SMSHelpers
-from tools.PhysicsUnits import rmvunit
+from tools.physicsUnits import rmvunit
 
 canas={ "cms": {}, "atlas": {} }
 

@@ -7,7 +7,7 @@
 import set_path
 import argparse, testGetLimit, ROOT, sys, TestTools, os
 from Experiment import SMSResults, SMSInterpolation
-from Tools.PhysicsUnits import rmvunit
+from Tools.physicsUnits import rmvunit
 from Tools import ROOTTools
 
 def zero(x,y):

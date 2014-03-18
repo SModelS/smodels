@@ -5,7 +5,7 @@
 import set_path, tempfile
 from theory import lheDecomposer
 from experiment import TxNames, SMSAnalysisFactory, SMSResults, LimitGetter, SMSHelpers
-from tools.PhysicsUnits import fb
+from tools.physicsUnits import fb
 from tools import FeynmanGraphs, xsecComputer
 from tools.VariousHelpers import logging
 

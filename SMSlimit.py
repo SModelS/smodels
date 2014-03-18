@@ -2,7 +2,7 @@
 
 import sys, glob, os
 from theory import SLHADecomposer, CrossSection, SLHATools
-from tools.PhysicsUnits import addunit
+from tools.physicsUnits import addunit
 from experiment import SMSAnalysisFactory, LimitGetter
 from numpy import arange
 

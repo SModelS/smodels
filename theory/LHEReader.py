@@ -9,7 +9,7 @@
 """
 
 import SMSEvent
-from tools.PhysicsUnits import addunit
+from tools.physicsUnits import addunit
 
 class LHEReader:
     def __init__ ( self, filename, nmax=None ):

@@ -9,7 +9,7 @@
 """
 
 import smsResults
-from tools.PhysicsUnits import rmvunit
+from tools.physicsUnits import rmvunit
 import types
 from theory import analysis, element
 

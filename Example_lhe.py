@@ -3,7 +3,7 @@
 import sys
 from prettytable import PrettyTable
 from theory import lheDecomposer, SLHADecomposer, XSecComputer, ClusterTools, CrossSection, SLHATools
-from tools.PhysicsUnits import addunit, rmvunit
+from tools.physicsUnits import addunit, rmvunit
 from tools import SMSPrettyPrinter, VariousHelpers
 from tools.SMSPrettyPrinter import wrap
 from Experiment import SMSAnalysisList, SMSAnalysisFactory, LimitGetter, SMSHelpers

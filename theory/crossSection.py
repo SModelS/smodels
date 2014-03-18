@@ -8,7 +8,7 @@
 
 """
 
-from tools.PhysicsUnits import addunit, rmvunit
+from tools.physicsUnits import addunit, rmvunit
 import logging
 import LHEReader
 

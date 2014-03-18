@@ -11,7 +11,7 @@ import unittest
 import set_path
 from prettytable import PrettyTable
 from theory import LHEDecomposer, SLHADecomposer, XSecComputer, ClusterTools
-from tools.PhysicsUnits import addunit, rmvunit
+from tools.physicsUnits import addunit, rmvunit
 from tools import SMSPrettyPrinter
 from tools.SMSPrettyPrinter import wrap
 from experiment import SMSAnalysisList, SMSAnalysisFactory, LimitGetter

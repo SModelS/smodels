@@ -2,7 +2,7 @@
 
 import sys
 from theory import SLHADecomposer
-from tools.PhysicsUnits import addunit
+from tools.physicsUnits import addunit
 from experiment import SMSAnalysisFactory
 
 #Basic input for decomposition:
