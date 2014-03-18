@@ -19,5 +19,15 @@ def parseRCFile():
     #print "[RCFile.py] Check to see if %s exists: %s" % ( rcfile, yesno(exists))
     if exists:
       execfile ( rcfile )
+      return True
+    return False
 
 parseRCFile()
+
+if __name__ == "__main__":
+    """ called as script, we check if there is a smodelsrc file """
+    T=parseRCFile()
+    if not T:
+        print "No ~/.smodelsrc file found."
+    else:
+        print "Found ~/.smodelsrc file."
