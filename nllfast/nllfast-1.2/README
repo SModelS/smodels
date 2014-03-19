@@ -1,0 +1,15 @@
+NLL-fast is based on results obtained by many authors over the years. In alphabetical order, the contributions were provided by: Wim Beenakker, Silja Brensing-Thewes, Christoph Borschensky, Michael Krämer, Anna Kulesza, Leszek Motyka, Eric Laenen and Irene Niessen. Additionally, NLL-fast uses NLO results obtained with Prospino. Therefore we ask to cite the following papers when referring to NLL-fast:
+
+Squark and gluino production:
+
+    Squark and Gluino Production at Hadron Colliders, W. Beenakker, R. Höpker, M. Spira, P.M. Zerwas, Nucl. Phys. B492 (1997) 51-103
+    Threshold resummation for squark-antisquark and gluino-pair production at the LHC, A. Kulesza, L. Motyka, Phys. Rev. Lett. 102 (2009) 111802
+    Soft gluon resummation for the production of gluino-gluino and squark-antisquark pairs at the LHC, A. Kulesza, L. Motyka, Phys. Rev. D80 (2009) 095004
+    Soft-gluon resummation for squark and gluino hadroproduction, Wim Beenakker, Silja Brensing, Michael Krämer, Anna Kulesza, Eric Laenen, Irene Niessen, JHEP 0912 (2009) 041
+    Squark and gluino hadroproduction, W. Beenakker, S. Brensing, M. Krämer, A. Kulesza, E. Laenen, L. Motyka, I. Niessen, Int. J. Mod. Phys. A26 (2011) 2637-2664 
+
+Stop (sbottom) production:
+
+    Stop Production at Hadron Colliders, W. Beenakker, M. Krämer, T. Plehn, M. Spira, P.M. Zerwas, Nucl.Phys. B515 (1998) 3-14
+    Supersymmetric top and bottom squark production at hadron colliders, Wim Beenakker, Silja Brensing, Michael Krämer, Anna Kulesza, Eric Laenen, Irene Niessen, JHEP 1008(2010)098
+    Squark and gluino hadroproduction, W. Beenakker, S. Brensing, M. Krämer, A. Kulesza, E. Laenen, L. Motyka, I. Niessen, Int. J. Mod. Phys. A26 (2011) 2637-2664 
