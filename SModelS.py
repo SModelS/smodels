@@ -36,7 +36,7 @@ def version( astuple=False, addCodeName=True ):
         
 
 def license():
-    f=open(installdir()+"COPYING")
+    f=open(installDirectory()+"COPYING")
     lines=f.readlines()
     f.close()
     return "".join(lines)
@@ -54,5 +54,5 @@ if __name__ == "__main__":
     if len(sys.argv)<2: help()
     for i in sys.argv[1:]:
         if i=="--help": help()
-        if i=="--installdir": installdir()
+        if i=="--installdir": print installDirectory()
 
