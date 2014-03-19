@@ -1,4 +1,4 @@
-all: nllfast12 nllfast21
+all: nllfast12 nllfast21 nllfast30
 
 
 tarballs:
@@ -10,3 +10,6 @@ nllfast12:
 
 nllfast21:
 	cd nllfast-2.1 && make
+
+nllfast30:
+	cd nllfast-3.0 && make

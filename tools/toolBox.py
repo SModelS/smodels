@@ -19,10 +19,11 @@ class ToolBox:
 
   def initSingleton ( self ):
     """ intialise singleton instance (done only once for the entire class) """
-    from externalTools import ExternalPythia, ExternalNllFast7, ExternalNllFast8 
+    from externalTools import ExternalPythia, ExternalNllFast7, ExternalNllFast8, ExternalNllFast13
     self.add ( ExternalPythia( ) )
     self.add ( ExternalNllFast7( ) )
     self.add ( ExternalNllFast8( ) )
+    self.add ( ExternalNllFast13( ) )
 
   def add ( self, instance ):
     """ add a tool by passing an instance to this method """
