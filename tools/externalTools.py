@@ -402,7 +402,7 @@ class ExternalNllFast13(ExternalTool):
     if not os.path.exists( self.executable_path ): return "executable ``%s'' not found" % ( self.executable_path )
     if not os.access ( self.executable_path, os.X_OK ): return "%s is not executabloe" % self.executable
     out=self.run_ ( self.test_params )
-    lines={ -1: "500.     600.    0.193E+00  0.450E+00  0.497E+00" }
+    lines={ -1: "500.     600.    0.394E+01  0.690E+01  0.731E+01" }
     for (nr, line) in lines.items():
       if out[nr].find(line)==-1:
         return "Something is wrong with the setup: "+str(out)
