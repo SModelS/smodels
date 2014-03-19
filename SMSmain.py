@@ -2,11 +2,12 @@
 
 import sys
 from prettytable import PrettyTable
-from theory import LHEDecomposer, SLHADecomposer, XSecComputer, ClusterTools, CrossSection, SLHATools, TheoryPrediction
+from theory import clusterTools, crossSection, theoryPrediction
+# , SLHATools, TheoryPrediction
 from tools.physicsUnits import addunit, rmvunit
-from tools import SMSPrettyPrinter
+from tools import SMSPrettyPrinter, xsecComputer
 from tools.SMSPrettyPrinter import wrap
-from experiment import SMSAnalysisList, SMSAnalysisFactory, LimitGetter, SMSHelpers
+from experiment import smsAnalysisList, smsAnalysisFactory
 
 
 printer=SMSPrettyPrinter.SMSPrettyPrinter()
@@ -36,9 +37,9 @@ else:
 #Creat analyses list:
 DoFactory = True
 if DoFactory:
-  ListOfAnalyses = SMSAnalysisFactory.load()
+  ListOfAnalyses = smsAnalysisFactory.load()
 else:  
-  ListOfAnalyses = SMSAnalysisList.load()
+  ListOfAnalyses = smsAnalysisList.load()
 
 
 
@@ -65,7 +66,7 @@ totweight = []
 # for i in range(len(SMSTopList)):
 for (i,topo) in enumerate(SMSTopList):
   weightlist = [el.weight for el in topo.elList]
-  sumw = ClusterTools.sumweights(weightlist)
+  sumw = clusterTools.sumweights(weightlist)
   totweight.append(sumw)
   EvTop_table.add_row([i,topo.vertnumb,topo.vertparts,len(topo.elList),wrap(printer.pformat(sumw),width=30)])
   eltot += len(topo.elList)
@@ -105,7 +106,7 @@ for Analysis in ListOfAnalyses:
     print "Skipping analysis",Analysis.label,"with more than 3 vertices"
     continue
 
-  result = TheoryPrediction.TheoryPrediction()
+  result = theoryPrediction.TheoryPrediction()
   if not result.computeTheoryPredictions(Analysis,SMSTopList): continue #Theoretical values for result and conditions
 
   if len(result.clusterResults) == 0: continue

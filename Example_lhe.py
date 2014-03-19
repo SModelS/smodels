@@ -2,11 +2,12 @@
 
 import sys
 from prettytable import PrettyTable
-from theory import lheDecomposer, SLHADecomposer, XSecComputer, ClusterTools, CrossSection, SLHATools
+from theory import lheDecomposer, slhaDecomposer, clusterTools, crossSection
+# , SLHATools
 from tools.physicsUnits import addunit, rmvunit
-from tools import SMSPrettyPrinter, VariousHelpers
+from tools import SMSPrettyPrinter, xsecComputer
 from tools.SMSPrettyPrinter import wrap
-from Experiment import SMSAnalysisList, SMSAnalysisFactory, LimitGetter, SMSHelpers
+from Experiment import smsAnalysisList, smsAnalysisFactory, limitGetter, smsHelpers
 
 
 printer=SMSPrettyPrinter.SMSPrettyPrinter()
