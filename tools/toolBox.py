@@ -66,7 +66,7 @@ class ToolBox:
     print ret
 
   def compile ( self ):
-    print "compile all:",self.tools
+    # print "compile all:",self.tools
     for (name,instance) in self.tools.items():
       install_ok=instance.checkInstallation()
       if install_ok==True: continue
