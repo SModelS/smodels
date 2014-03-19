@@ -202,19 +202,20 @@ if __name__ == "__main__":
     # print "[xsecComputer.py] compute cross section for",File
     if File[-5:].lower()==".slha" or args.slha:
         if args.tofile:
-            print "[xsecComputer.py] Compute slha cross section from %s, and add to slha file." % File
+            print "[xsecComputer.py] Computing slha cross section from %s, and adding to slha file." % File,
             for s in sqrtses:
               ss=addunit(s,'TeV')
               addXSecToFile ( ss,order,args.nevents,File,basedir=SModelS.installDirectory() )
+            print "done."
             sys.exit(0)
         else:
-            print "compute slha cross section, print out, but dont add to file"
+            print "[xsecComputer.py] compute slha cross section, print out, but dont add to file. FIXME not yet implemented."
             sys.exit(0)
     if File[-4:].lower()==".lhe" or args.lhe:
         if args.tofile:
-            print "compute lhe section, and add to file. FIXME I guess we dont need this case?"
+            print "[xsecComputer.py] compute lhe section, and add to file. FIXME I guess we dont need this case?"
             sys.exit(0)
         else:
-            print "compute lhe section, print out, but dont add to file."
+            print "[xsecComputer.py] compute lhe section, print out, but dont add to file. FIXME not yet implemented."
             sys.exit(0)
 

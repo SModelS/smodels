@@ -3,8 +3,8 @@
 import sys
 sys.path.append('/home/lessa/Pioneer/plots/')
 import AuxPlot
-from theory import NLLXSec
-from ROOT import *
+from tools import nllFast
+from ROOT import TH2F, TCanvas
 
 energy = 8
 

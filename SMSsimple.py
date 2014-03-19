@@ -1,9 +1,9 @@
 #!/usr/bin/python
 
 import sys
-from theory import SLHADecomposer
+from theory import slhaDecomposer
 from tools.physicsUnits import addunit
-from experiment import SMSAnalysisFactory
+from experiment import smsAnalysisFactory
 
 #Basic input for decomposition:
 slhafile = "slha/andrePT4.slha"
@@ -11,10 +11,10 @@ DoCompress = True
 DoInvisible = True
 minmassgap = addunit(10.,'GeV')
 sigmacut = addunit(0.01,'fb')
-SMSTopList = SLHADecomposer.decompose(slhafile,None,sigmacut,DoCompress,DoInvisible,minmassgap)
+SMSTopList = slhaDecomposer.decompose(slhafile,None,sigmacut,DoCompress,DoInvisible,minmassgap)
 
 #Load analysis
-ListOfAnalyses = SMSAnalysisFactory.load()
+ListOfAnalyses = smsAnalysisFactory.load()
 for Analysis in ListOfAnalyses: Analysis.add(SMSTopList)
 #Compute theoretical predictions to analyses results:
 for Analysis in ListOfAnalyses: Analysis.computeTheoryPredictions()

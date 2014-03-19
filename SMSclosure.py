@@ -5,12 +5,12 @@ import sys, glob, os
 smsdir = os.getcwd() + '/SMSfrozen/'
 sys.path.append(smsdir)
 
-from theory import SLHADecomposer, CrossSection, ClusterTools
+from theory import slhaDecomposer, crossSection, clusterTools
 from tools.physicsUnits import addunit, rmvunit
-from experiment import SMSAnalysisFactory
+from experiment import smsAnalysisFactory
 
-XSectionInfo = CrossSection.XSecInfoList('8 TeV (NLL)')
-CrossSection.XSectionInfo = XSectionInfo
+XSectionInfo = crossSection.XSecInfoList('8 TeV (NLL)')
+crossSection.XSectionInfo = XSectionInfo
 #Basic input for decomposition:
 if os.path.isfile(sys.argv[1]):
   slhafileList = [sys.argv[1]]  

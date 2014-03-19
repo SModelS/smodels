@@ -1,12 +1,12 @@
 #!/usr/bin/python
 
 import sys, glob, os
-from theory import SLHADecomposer, CrossSection, SLHATools
+from theory import slhaDecomposer, crossSection, SLHATools
 from tools.physicsUnits import addunit
-from experiment import SMSAnalysisFactory, LimitGetter
+from experiment import smsAnalysisFactory, limitGetter
 
-XSectionInfo = CrossSection.XSecInfoList('8 TeV (NLL)')
-CrossSection.XSectionInfo = XSectionInfo
+XSectionInfo = crossSection.XSecInfoList('8 TeV (NLL)')
+crossSection.XSectionInfo = XSectionInfo
 #Basic input for decomposition:
 if os.path.isfile(sys.argv[1]):
   slhafileList = [sys.argv[1]]
