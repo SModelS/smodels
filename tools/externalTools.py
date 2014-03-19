@@ -410,3 +410,197 @@ class ExternalNllFast13(ExternalTool):
     return True
 
 
+class ExternalNllFast14(ExternalTool):
+  def __init__ ( self, executable_path="<install>/nllfast/nllfast-4.01dcpl/nllfast_14TeV", 
+                 cd_path="<install>/nllfast/nllfast-4.01dcpl/",
+                 test_params="gdcpl cteq 500 600", src_path="<install>/nllfast/nllfast-4.01dcpl/", verbose=False ):
+    """ 
+      :param executable_path: location of executable, full path (pythia_lhe)
+      :param test_params_path: location of the test config file, full path (external_lhe.test)
+    """ 
+    self.name="nllfast14"
+    self.executable_path=self.absPath (executable_path)
+    self.cd_path=self.absPath(cd_path)
+    self.test_params=test_params
+    self.verbose=verbose
+    self.src_path=None
+    if src_path: self.src_path=self.absPath(src_path)
+
+  def compile ( self ):
+    """ try to compile tool """
+    print "[ExternalNllfast14] trying to compile nllfast14:"
+    cmd="cd %s; make" % self.src_path
+    import commands
+    out=commands.getoutput ( cmd )
+    print out
+    return True
+  
+  def fetch ( self, verbose=True ):
+    """ fetch and unpack tarball """
+    import urllib, tarfile
+    tempfile="/tmp/nllfast14.tar.gz"
+    f=open( tempfile,"w")
+    if verbose: print "[ExternalNllfast7] fetching tarball ...",
+    R=urllib.urlopen("http://pauli.uni-muenster.de/~akule_01/nllfast/nllfast-3.0.tar.gz")
+    l=R.readlines()
+    for line in l:
+      f.write ( line )
+    R.close()
+    f.close()
+    if verbose:
+      print "done."
+      print "[ExternalNllfast14] untarring ...",
+    tar=tarfile.open( tempfile )
+    for item in tar:
+      # print item,self.src_path,
+      tar.extract ( item, self.src_path+ "/" )
+    if verbose: print "done."
+
+
+  def unlink ( self, File ): 
+    """ remove File.out """
+    import os
+    Fname="%s/%s.out" % ( self.cd_path, File )
+    if os.path.exists ( Fname ):
+      os.unlink ( Fname )
+
+  def run_ ( self, params ):
+    """ run nllfast14
+      :params params: parameters used (e.g. gg cteq5 .... ) FIXME could have a fancier interface
+      :returns: stdout and stderr, or error message
+    """
+    import commands
+    cmd="cd %s; %s %s" % ( self.cd_path, self.executable_path, params )
+    # print "cmd=",cmd
+    Out=commands.getoutput ( cmd )
+    out=Out.split("\n")
+    return out
+
+  def run ( self,  process, pdf, squarkmass, gluinomass ):
+    """ run nllfast14
+      :params process: which process: st, sb, gg, gdcpl, sdcpl, ss, sg, tot
+      :params pdf: cteq=cteq6, mstw2008 
+      :params squarkmass: squarkmass, None if squark decoupled
+      :params gluinomass: gluinomass, None if gluino decoupled
+      :returns: stdout and stderr, or error message
+    """
+    if not process in [ "st", "sb", "gg", "gdcpl", "sdcpl", "ss", "sg", "tot" ]:
+      return None
+    if not pdf in [ "cteq", "cteq6", "mstw", "mstw2008" ]: return None
+    if not squarkmass: 
+      return run_("%s %s %s") % ( process, pdf, gluinomass )
+    if not gluinomass: 
+      return run_("%s %s %s") % ( process, pdf, squarkmass )
+    return run_("%s %s %s %s") % ( process, pdf, squarkmass, gluinomass )
+
+  def checkInstallation ( self ):
+    """ checks if installation of tool looks ok by
+        looking for executable and running it """
+    import os
+    if not os.path.exists( self.executable_path ): return "executable ``%s'' not found" % ( self.executable_path )
+    if not os.access ( self.executable_path, os.X_OK ): return "%s is not executabloe" % self.executable
+    out=self.run_ ( self.test_params )
+    lines={ -1: "500.    0.235E+02  0.346E+02  0.362E+02" }
+    for (nr, line) in lines.items():
+      if out[nr].find(line)==-1:
+        return "Something is wrong with the setup: "+str(out)
+    self.unlink ( "gg" )
+    return True
+
+class ExternalNllFast33(ExternalTool):
+  def __init__ ( self, executable_path="<install>/nllfast/nllfast-5.01dcpl/nllfast_33TeV", 
+                 cd_path="<install>/nllfast/nllfast-5.01dcpl/",
+                 test_params="gdcpl cteq 500 600", src_path="<install>/nllfast/nllfast-3.0/", verbose=False ):
+    """ 
+      :param executable_path: location of executable, full path (pythia_lhe)
+      :param test_params_path: location of the test config file, full path (external_lhe.test)
+    """ 
+    self.name="nllfast33"
+    self.executable_path=self.absPath (executable_path)
+    self.cd_path=self.absPath(cd_path)
+    self.test_params=test_params
+    self.verbose=verbose
+    self.src_path=None
+    if src_path: self.src_path=self.absPath(src_path)
+
+  def compile ( self ):
+    """ try to compile tool """
+    print "[ExternalNllfast33] trying to compile nllfast33:"
+    cmd="cd %s; make" % self.src_path
+    import commands
+    out=commands.getoutput ( cmd )
+    print out
+    return True
+  
+  def fetch ( self, verbose=True ):
+    """ fetch and unpack tarball """
+    import urllib, tarfile
+    tempfile="/tmp/nllfast33.tar.gz"
+    f=open( tempfile,"w")
+    if verbose: print "[ExternalNllfast7] fetching tarball ...",
+    R=urllib.urlopen("http://pauli.uni-muenster.de/~akule_01/nllfast/nllfast-3.0.tar.gz")
+    l=R.readlines()
+    for line in l:
+      f.write ( line )
+    R.close()
+    f.close()
+    if verbose:
+      print "done."
+      print "[ExternalNllfast33] untarring ...",
+    tar=tarfile.open( tempfile )
+    for item in tar:
+      # print item,self.src_path,
+      tar.extract ( item, self.src_path+ "/" )
+    if verbose: print "done."
+
+
+  def unlink ( self, File ): 
+    """ remove File.out """
+    import os
+    Fname="%s/%s.out" % ( self.cd_path, File )
+    if os.path.exists ( Fname ):
+      os.unlink ( Fname )
+
+  def run_ ( self, params ):
+    """ run nllfast33
+      :params params: parameters used (e.g. gg cteq5 .... ) FIXME could have a fancier interface
+      :returns: stdout and stderr, or error message
+    """
+    import commands
+    cmd="cd %s; %s %s" % ( self.cd_path, self.executable_path, params )
+    # print "cmd=",cmd
+    Out=commands.getoutput ( cmd )
+    out=Out.split("\n")
+    return out
+
+  def run ( self,  process, pdf, squarkmass, gluinomass ):
+    """ run nllfast33
+      :params process: which process: st, sb, gg, gdcpl, sdcpl, ss, sg, tot
+      :params pdf: cteq=cteq6, mstw2008 
+      :params squarkmass: squarkmass, None if squark decoupled
+      :params gluinomass: gluinomass, None if gluino decoupled
+      :returns: stdout and stderr, or error message
+    """
+    if not process in [ "st", "sb", "gg", "gdcpl", "sdcpl", "ss", "sg", "tot" ]:
+      return None
+    if not pdf in [ "cteq", "cteq6", "mstw", "mstw2008" ]: return None
+    if not squarkmass: 
+      return run_("%s %s %s") % ( process, pdf, gluinomass )
+    if not gluinomass: 
+      return run_("%s %s %s") % ( process, pdf, squarkmass )
+    return run_("%s %s %s %s") % ( process, pdf, squarkmass, gluinomass )
+
+  def checkInstallation ( self ):
+    """ checks if installation of tool looks ok by
+        looking for executable and running it """
+    import os
+    if not os.path.exists( self.executable_path ): return "executable ``%s'' not found" % ( self.executable_path )
+    if not os.access ( self.executable_path, os.X_OK ): return "%s is not executabloe" % self.executable
+    out=self.run_ ( self.test_params )
+    lines={ -1: "500.    0.257E+03  0.383E+03  0.393E+03" }
+    for (nr, line) in lines.items():
+      if out[nr].find(line)==-1:
+        return "Something is wrong with the setup: "+str(out)
+    self.unlink ( "gg" )
+    return True
+
