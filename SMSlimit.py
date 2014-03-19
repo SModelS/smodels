@@ -1,9 +1,10 @@
 #!/usr/bin/python
 
 import sys, glob, os
-from theory import SLHADecomposer, CrossSection, SLHATools
+from theory import slhaDecomposer, crossSection
+# from theory import, SLHATools
 from tools.physicsUnits import addunit
-from experiment import SMSAnalysisFactory, LimitGetter
+from experiment import smsAnalysisFactory, limitGetter
 from numpy import arange
 
 #ListOfAnalyses = SMSAnalysisFactory.load(sys.argv[1],sys.argv[2])
