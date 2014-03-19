@@ -41,7 +41,7 @@ def license():
     f.close()
     return "".join(lines)
 
-def help():
+def printHelp():
   import sys
   print sys.argv[0]+": --help --installdir"
   print "--help: show this message"
@@ -51,8 +51,11 @@ def help():
 
 if __name__ == "__main__":
     import sys
-    if len(sys.argv)<2: help()
+    if len(sys.argv)<2: printHelp()
     for i in sys.argv[1:]:
-        if i=="--help": help()
-        if i=="--installdir": print installDirectory()
+        if i=="--help": printHelp()
+        if i=="--installdir": 
+            print installDirectory()
+            sys.exit(0)
 
+    printHelp()
