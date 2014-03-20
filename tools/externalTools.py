@@ -29,16 +29,18 @@ class ExternalTool:
     if None: return None
     import os
     installdir=self.basePath()
+    installdir=installdir.replace("tools","")
     path=path.replace("<install>",installdir)
     path=os.path.abspath( path )
-    path=path.replace("tools/","")
+    # path=path.replace("tools/","tools/external/")
+    # path=path.replace("tools/","")
     return path
 
 
 class ExternalPythia(ExternalTool):
-  def __init__ ( self, executable_path="<install>/pythia_lhe", 
-                 test_params_path="<install>/etc/external_lhe.test", 
-                 src_path="<install>/pythia_src", verbose=False ):
+  def __init__ ( self, executable_path="<install>/tools/external/pythia6/pythia_lhe", 
+                 test_params_path="<install>/etc/pythia6_test.cfg", 
+                 src_path="<install>/pythia6/", verbose=False ):
     """ 
       :param executable_path: location of executable, full path (pythia_lhe)
       :param test_params_path: location of the test config file, full path (external_lhe.test)
@@ -118,9 +120,9 @@ class ExternalPythia(ExternalTool):
     return True
 
 class ExternalNllFast7(ExternalTool):
-  def __init__ ( self, executable_path="<install>/nllfast/nllfast-1.2/nllfast_7TeV", 
-                 cd_path="<install>/nllfast/nllfast-1.2/",
-                 test_params="gg cteq 500 600", src_path="<install>/nllfast/nllfast-1.2/", verbose=False ):
+  def __init__ ( self, executable_path="<install>/tools/external/nllfast/nllfast-1.2/nllfast_7TeV", 
+                 cd_path="<install>/tools/external/nllfast/nllfast-1.2/",
+                 test_params="gg cteq 500 600", src_path="<install>/tools/external/nllfast/nllfast-1.2/", verbose=False ):
     """ 
       :param executable_path: location of executable, full path (pythia_lhe)
       :param test_params_path: location of the test config file, full path (external_lhe.test)
@@ -216,9 +218,9 @@ class ExternalNllFast7(ExternalTool):
 
 
 class ExternalNllFast8(ExternalTool):
-  def __init__ ( self, executable_path="<install>/nllfast/nllfast-2.1/nllfast_8TeV", 
-                 cd_path="<install>/nllfast/nllfast-2.1/",
-                 test_params="gg cteq 500 600", src_path="<install>/nllfast/nllfast-2.1/", verbose=False ):
+  def __init__ ( self, executable_path="<install>/tools/external/nllfast/nllfast-2.1/nllfast_8TeV", 
+                 cd_path="<install>/tools/external/nllfast/nllfast-2.1/",
+                 test_params="gg cteq 500 600", src_path="<install>/tools/external/nllfast/nllfast-2.1/", verbose=False ):
     """ 
       :param executable_path: location of executable, full path (pythia_lhe)
       :param test_params_path: location of the test config file, full path (external_lhe.test)
@@ -313,9 +315,9 @@ class ExternalNllFast8(ExternalTool):
     return True
 
 class ExternalNllFast13(ExternalTool):
-  def __init__ ( self, executable_path="<install>/nllfast/nllfast-3.0/nllfast_13TeV", 
-                 cd_path="<install>/nllfast/nllfast-3.0/",
-                 test_params="gg cteq 500 600", src_path="<install>/nllfast/nllfast-3.0/", verbose=False ):
+  def __init__ ( self, executable_path="<install>/tools/external/nllfast/nllfast-3.0/nllfast_13TeV", 
+                 cd_path="<install>/tools/external/nllfast/nllfast-3.0/",
+                 test_params="gg cteq 500 600", src_path="<install>/tools/external/nllfast/nllfast-3.0/", verbose=False ):
     """ 
       :param executable_path: location of executable, full path (pythia_lhe)
       :param test_params_path: location of the test config file, full path (external_lhe.test)
@@ -411,9 +413,9 @@ class ExternalNllFast13(ExternalTool):
 
 
 class ExternalNllFast14(ExternalTool):
-  def __init__ ( self, executable_path="<install>/nllfast/nllfast-4.01dcpl/nllfast_14TeV", 
-                 cd_path="<install>/nllfast/nllfast-4.01dcpl/",
-                 test_params="gdcpl cteq 500 600", src_path="<install>/nllfast/nllfast-4.01dcpl/", verbose=False ):
+  def __init__ ( self, executable_path="<install>/tools/external/nllfast/nllfast-4.01dcpl/nllfast_14TeV", 
+                 cd_path="<install>/tools/external/nllfast/nllfast-4.01dcpl/",
+                 test_params="gdcpl cteq 500 600", src_path="<install>/tools/external/nllfast/nllfast-4.01dcpl/", verbose=False ):
     """ 
       :param executable_path: location of executable, full path (pythia_lhe)
       :param test_params_path: location of the test config file, full path (external_lhe.test)
@@ -508,9 +510,9 @@ class ExternalNllFast14(ExternalTool):
     return True
 
 class ExternalNllFast33(ExternalTool):
-  def __init__ ( self, executable_path="<install>/nllfast/nllfast-5.01dcpl/nllfast_33TeV", 
-                 cd_path="<install>/nllfast/nllfast-5.01dcpl/",
-                 test_params="gdcpl cteq 500 600", src_path="<install>/nllfast/nllfast-3.0/", verbose=False ):
+  def __init__ ( self, executable_path="<install>/tools/external/nllfast/nllfast-5.01dcpl/nllfast_33TeV", 
+                 cd_path="<install>/tools/external/nllfast/nllfast-5.01dcpl/",
+                 test_params="gdcpl cteq 500 600", src_path="<install>/tools/external/nllfast/nllfast-3.0/", verbose=False ):
     """ 
       :param executable_path: location of executable, full path (pythia_lhe)
       :param test_params_path: location of the test config file, full path (external_lhe.test)
