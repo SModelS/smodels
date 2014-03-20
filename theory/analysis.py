@@ -57,7 +57,7 @@ class ULanalysis(object):
         
         """
         
-        return limitGetter.GetPlotLimit(mass, self, complain=False)
+        return limitGetter.getPlotLimit(mass, self, complain=False)
         
     
 
