@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: LimitGetter
+.. module:: limitGetter
     :synopsis: some code to access the right experimental limits, given analysis objects
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
