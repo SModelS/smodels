@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: SMSAnalysisFactory
+.. module:: smsAnalysisFactory
         :synopsis:    unit that creates a list of Analysis objects from a results database
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>

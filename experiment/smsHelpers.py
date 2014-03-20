@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: SMSHelpers
+.. module:: smsHelpers
         :synopsis: Some helper functions that are not to be used by the end user.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: SMSResults
+.. module:: smsResults
    :synopsis: Centralized facility to access the SMS results.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
