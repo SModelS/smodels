@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-"""
-SModelS basic use case.
+"""SModelS basic use case.
+
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
 """
 
