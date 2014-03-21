@@ -57,6 +57,7 @@ def decompose(lhefile, inputXsecs=None, nevts=None, doCompress=False,
         # Do compression:        
         if doCompress or doInvisible:
             allElements += newElement.compressElement(doCompress, doInvisible,
+                                                      minmassgap)
 
         for el in allElements:
             top = topology.Topology(el)                      
