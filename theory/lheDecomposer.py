@@ -10,7 +10,7 @@ import LHEReader
 import topology
 import crossSection
 import element
-import pyslha2
+import pyslha
 import branch
 import ParticleNames
 from tools.physicsUnits import addunit
@@ -151,7 +151,7 @@ def getDictionariesFromEvent(event):
         ibranch = branchDic[ip]  #Get particle branch
         massDic[ibranch][particle.pdg] = addunit(particle.mass, 'GeV')       
     # Create empty BRs    
-        brDic[ibranch][particle.pdg] = [pyslha2.Decay(0., 0, [], particle.pdg)]
+        brDic[ibranch][particle.pdg] = [pyslha.Decay(0., 0, [], particle.pdg)]
     
     # Get BRs from event       
     for ip,particle in enumerate(particles):        
