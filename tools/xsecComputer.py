@@ -73,7 +73,7 @@ def addXSecToFile(sqrts,maxOrder,nevts,slhafile,lhefile=None,externaldir=None):
         pIDs = LOxsecs.getPIDpairs()   # Get particle ID pairs for all xsecs
         for pID in pIDs:
             k = 1.
-            kNLO,kNLL = nllFast.getKfactorsFor(pID,sqrts,slhafile,externaldir+"/nllfast/")
+            kNLO,kNLL = nllFast.getKfactorsFor(pID,sqrts,slhafile)
             if maxOrder == 1 and kNLO: k = kNLO
             elif maxOrder == 2 and kNLL and kNLO: k = kNLO*kNLL
             else:
@@ -170,7 +170,7 @@ if __name__ == "__main__":
     import argparse, types, sys
     argparser = argparse.ArgumentParser(description='computes the cross section of a file')
     argparser.add_argument('file', type=types.StringType, nargs=1,
-                               help='the slha file to compute cross section for')
+                           help='the slha or lhe file to compute cross section for')
     argparser.add_argument ( '-s', '--sqrts', nargs='+', action='append', help='sqrt(s) [TeV]. Can supply more than one value.', type=int, default=[] )
     argparser.add_argument ( '-e', '--nevents', help='number of events to be simulated.', type=int, default=100 )
     argparser.add_argument('-f','--tofile',help='write cross sections also to file', action='store_true')

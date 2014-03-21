@@ -2,30 +2,37 @@
 
 """
 .. module:: nllFast
-    :synopsis: This module provides methods to access the nllfast grid and compute k-factors (when available)
-    to SUSY pair production cross-sections
+    :synopsis: This module provides methods to access the nllfast grid and
+    compute k-factors (when available) to SUSY pair production cross-sections
 
-.. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>, Andre Lessa <lessa.a.p@gmail.com>
+.. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
 """
 
 import commands, os, sys
+import set_path
 from theory import pyslha2 as pyslha
 from tools.physicsUnits import rmvunit
 import numpy
 import logging
+import operator
+from tools import toolBox
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 squarks = [1000001,2000001,1000002,2000002,1000003,2000003,1000004,2000004]
-antisquarks = [-1000001,-2000001,-1000002,-2000002,-1000003,-2000003,-1000004,-2000004]
+antisquarks = map ( operator.neg, squarks )
 third = [1000005,2000005,1000006,2000006]
 gluinos = [1000021]
 
-def getKfactorsFor(pIDs,sqrts,slhafile,basedir="./nllfast",pdf='cteq'):
-    """Reads the NLLfast grid and returns a pair of k-factors (NLO and NLL) for the production of a pID pair.
-    If NLLfast does not contain the process, return k-factors = 1.
-    Uses the slhafile to obtain the SUSY spectrum."""
+def getKfactorsFor(pIDs,sqrts,slhafile,pdf='cteq'):
+    """Reads the NLLfast grid and returns a pair of k-factors (NLO and NLL) for
+        the production of a pID pair.  If NLLfast does not contain the process,
+        return k-factors = 1.  Uses the slhafile to obtain the SUSY
+        spectrum.
+    """
+
 
     if not os.path.isfile(slhafile):
         logger.error("SLHA file %s not found" %slhafile)
@@ -44,20 +51,30 @@ def getKfactorsFor(pIDs,sqrts,slhafile,basedir="./nllfast",pdf='cteq'):
     elif pid1 in squarks and pid2 in squarks: squarkmass = (abs(readfile[0]['MASS'].entries[pid1])+abs(readfile[0]['MASS'].entries[pid2]))/2
     elif abs(pid1) == pid2 and pid2 in third: squarkmass = abs(readfile[0]['MASS'].entries[abs(pid1)])
 
-#Set up NLLfast run
+    # Set up NLLfast run, the old way
     sqrtS = float(rmvunit(sqrts,'TeV'))
     energy = str(int(sqrtS))+'TeV'
-    if sqrtS == 8.: nllpath = basedir + "/nllfast-2.1"
-    elif sqrtS == 7.: nllpath = basedir + "/nllfast-1.2"
-    else:
-        logger.warning("No NLLfast data for sqrts = " + energy)
+    #if sqrtS == 8.: nllpath = basedir + "/nllfast-2.1"
+    #elif sqrtS == 7.: nllpath = basedir + "/nllfast-1.2"
+    #else:
+    #    logger.warning("No NLLfast data for sqrts = " + energy)
+    #    return (1.,1.)
+    toolname="nllfast%d" % int(sqrtS)
+    box=toolBox.ToolBox()
+    tool=box.get(toolname)
+    if tool==None:
+        logger.warning("No NLLfast data for sqrts = " + str(sqrts) )
         return (1.,1.)
-    nllexec = nllpath + "/nllfast_"+energy
+    nllpath=tool.installationPath()
+    nllexec=tool.pathOfExecutable()
     if not os.path.isfile(nllexec):
         logger.error("Missing NLL executable: " + nllexec)
         return False
-    if process == "st": nll_run = "./nllfast_"+energy+" %s %s %s" % (process,pdf,squarkmass)
-    else: nll_run ="./nllfast_"+energy+" %s %s %s %s" % (process,pdf,squarkmass,gluinomass)
+    if process == "st": 
+        nll_run = "./nllfast_"+energy+" %s %s %s" % (process,pdf,squarkmass)
+    else: 
+        nll_run ="./nllfast_"+energy+" %s %s %s %s" % \
+                    (process,pdf,squarkmass,gluinomass)
 
 #Run NLLfast
     nll_output = runNLLfast(nll_run,nllpath)
@@ -150,7 +167,8 @@ def getKfactorsFrom(output):
         il = 0
         line = lines[il]
         while not "K_NLO" in line and il < len(lines)-2:
-            if "process" in line: process = line[line.find("process:")+8:].replace(" ","")
+            if "process" in line: 
+                process = line[line.find("process:")+8:].replace(" ","")
             il += 1
             line = lines[il]        
         if not process: return False
@@ -165,7 +183,8 @@ def getKfactorsFrom(output):
 
 
 def interpolateKfactors(kFacsVector,xval):
-    """Simple method to interpolate a list of k-factor values from kFacsVector = [[x0,[k1,k2,..]], [x1,[k1,k2,..],...].
+    """Simple method to interpolate a list of k-factor 
+        values from kFacsVector = [[x0,[k1,k2,..]], [x1,[k1,k2,..],...].
     Returns the list of interpolated k-factor values at x-value xval."""
     
     kFacs = []
@@ -180,7 +199,12 @@ def interpolateKfactors(kFacsVector,xval):
         kFacs.append(kfac)
     
     return kFacs
-    
 
-
-
+if __name__ == "__main__":
+    """ called as script, we get the k factors for some pid pair """
+    import set_path
+    import SModelS
+    from physicsUnits import addunit
+    slhaF=SModelS.installDirectory()+"inputFiles/slha/T1.slha"
+    kNLO,kNLL = getKfactorsFor((1000021,1000021),addunit(8.,"TeV"),slhaF)
+    print "nlo,nll=",kNLO,kNLL

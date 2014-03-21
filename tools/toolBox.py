@@ -75,10 +75,10 @@ class ToolBox:
       print "[ToolBox] installation of",name,"not correct. Trying to compile."
       ok=instance.compile()
 
-  def get ( self, tool ):
+  def get ( self, tool, verbose=True ):
     """ get instance of tool from the toolbox """
     if not self.tools.has_key ( tool ):
-      print "[ToolBox] error: asking for non-existent tool ``%s''" % tool
+      if verbose: print "[ToolBox] error: asking for non-existent tool ``%s''" % tool
       return None
     return self.tools[tool]
 

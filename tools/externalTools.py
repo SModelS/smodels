@@ -13,6 +13,12 @@ class ExternalTool:
       An ExternalTool defines how the tool is checked for proper installation,
       and how the tool is executed. """
 
+  def installationPath ( self ):
+    T=self.executable_path
+    P=T.rfind("/")
+    if P==-1: return ""
+    return self.executable_path[:P]
+
   def pathOfExecutable ( self ):
     return self.executable_path
 
@@ -51,8 +57,8 @@ class ExternalPythia(ExternalTool):
     self.src_path=self.absPath ( src_path )
     self.verbose=False
 
-  def pathOfExecutable ( self ):
-    return self.executable_path
+  #def pathOfExecutable ( self ):
+  #  return self.executable_path
 
   def run ( self, cfg_file ):
     """ run pythia
@@ -120,12 +126,15 @@ class ExternalPythia(ExternalTool):
     return True
 
 class ExternalNllFast7(ExternalTool):
-  def __init__ ( self, executable_path="<install>/tools/external/nllfast/nllfast-1.2/nllfast_7TeV", 
-                 cd_path="<install>/tools/external/nllfast/nllfast-1.2/",
-                 test_params="gg cteq 500 600", src_path="<install>/tools/external/nllfast/nllfast-1.2/", verbose=False ):
+  def __init__ ( self, 
+        executable_path="<install>/tools/external/nllfast/nllfast-1.2/nllfast_7TeV", 
+        cd_path="<install>/tools/external/nllfast/nllfast-1.2/",
+        test_params="gg cteq 500 600", 
+        src_path="<install>/tools/external/nllfast/nllfast-1.2/", verbose=False ):
     """ 
       :param executable_path: location of executable, full path (pythia_lhe)
-      :param test_params_path: location of the test config file, full path (external_lhe.test)
+      :param test_params_path: location of the test config file, 
+                               full path (external_lhe.test)
     """ 
     self.name="nllfast7"
     self.executable_path=self.absPath (executable_path)
