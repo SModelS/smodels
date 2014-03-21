@@ -65,11 +65,12 @@ def getKfactorsFor(pIDs,sqrts,slhafile,pdf='cteq'):
     if tool==None:
         logger.warning("No NLLfast data for sqrts = " + str(sqrts) )
         return (1.,1.)
-    nllpath=tool.installationPath()
+    nllpath=tool.installDirectory()
     nllexec=tool.pathOfExecutable()
-    if not os.path.isfile(nllexec):
-        logger.error("Missing NLL executable: " + nllexec)
-        return False
+    ret=tool.checkInstallation()
+    #if not os.path.isfile(nllexec):
+    #    logger.error("Missing NLL executable: " + nllexec)
+    #    return False
     if process == "st": 
         nll_run = "./nllfast_"+energy+" %s %s %s" % (process,pdf,squarkmass)
     else: 
@@ -207,4 +208,4 @@ if __name__ == "__main__":
     from physicsUnits import addunit
     slhaF=SModelS.installDirectory()+"inputFiles/slha/T1.slha"
     kNLO,kNLL = getKfactorsFor((1000021,1000021),addunit(8.,"TeV"),slhaF)
-    print "nlo,nll=",kNLO,kNLL
+    print "[nllFast.py] nlo,nll=",kNLO,kNLL
