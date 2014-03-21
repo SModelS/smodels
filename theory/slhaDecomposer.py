@@ -115,9 +115,7 @@ def getDictionariesFromSLHA(slhafile):
     Read a SLHA file and get the mass and BR dictionaries.
     
     """
-    workdir = os.getcwd() 
-    pyslhadir = workdir + "/pyslha-1.4.3"
-    sys.path.append(pyslhadir)
+
     res = pyslha.readSLHAFile(slhafile)
 
     # Get mass and branching ratios for all particles:
