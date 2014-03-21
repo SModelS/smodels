@@ -207,5 +207,5 @@ if __name__ == "__main__":
     import SModelS
     from physicsUnits import addunit
     slhaF=SModelS.installDirectory()+"inputFiles/slha/T1.slha"
-    kNLO,kNLL = getKfactorsFor((1000021,1000021),addunit(8.,"TeV"),slhaF)
+    kNLO,kNLL = getKfactorsFor((1000021,1000021),addunit(13.,"TeV"),slhaF)
     print "[nllFast.py] nlo,nll=",kNLO,kNLL

@@ -119,7 +119,7 @@ def runPythia(slhafile,nevts,sqrts,lhefile=None):
     import toolBox
     box=toolBox.ToolBox()
     tool=box.get("pythia6")
-    pythiadir=tool.installationPath()+"/"
+    pythiadir=tool.installDirectory()+"/"
     tool.checkInstallation()
 
 #Check if slhafile, pythia_lhe, data and etc folders exist in pythiadir:
