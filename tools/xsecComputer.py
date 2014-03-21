@@ -4,11 +4,11 @@
 .. module:: xsecComputer
         :synopsis: The unit responsible for the computation of reference ("theory") \
             production cross sections
-        
+
 .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
-        
+
 """
 import set_path
 from physicsUnits import rmvunit,addunit
@@ -26,7 +26,7 @@ def addXSecToFile(sqrts,maxOrder,nevts,slhafile,lhefile=None,externaldir=None):
     if maxOrder = 0, compute only LO pythia xsecs
     if maxOrder = 1, apply NLO K-factors fron NLLfast (if available)
     if maxOrder = 2, apply NLO+NLL K-factors fron NLLfast (if available)
-    :param nevts: number of events for pythia run  
+    :param nevts: number of events for pythia run
     :param lhefile: LHE file. If None, do not write pythia output to file \
     if file does not exist, write pythia output to this file name \
     if file exists, read LO xsecs from this file (does not run pythia)
@@ -47,17 +47,17 @@ def addXSecToFile(sqrts,maxOrder,nevts,slhafile,lhefile=None,externaldir=None):
     if 'XSECTION' in slhadata:
         logger.warning("SLHA file already contains a XSECTION block. Appending new cross-sections.")
 
-#Check i lhefile exists:    
+#Check i lhefile exists:
     if lhefile:
-        if os.path.isfile(lhefile): logger.warning("Using LO cross-sections from "+lhefile)                        
-        else: logger.warning("Writing pythia LHE output to "+lhefile) 
+        if os.path.isfile(lhefile): logger.warning("Using LO cross-sections from "+lhefile)
+        else: logger.warning("Writing pythia LHE output to "+lhefile)
 #Get file with lhe Events:
     if not lhefile or not os.path.isfile(lhefile):
-        lheFile = runPythia(slhafile,nevts,rmvunit(sqrts,'TeV'),lhefile,pythiadir=externaldir+'/pythia6/')      
+        lheFile = runPythia(slhafile,nevts,rmvunit(sqrts,'TeV'),lhefile)
     else:
         lheFile = open(lhefile,'r')
-            
-#Get LO cross-sections from LHE events     
+
+#Get LO cross-sections from LHE events
     LOxsecs = crossSection.getXsecFromLHEFile(lheFile)
     xsecs = LOxsecs
 #Set cross-section label and order:
@@ -79,22 +79,22 @@ def addXSecToFile(sqrts,maxOrder,nevts,slhafile,lhefile=None,externaldir=None):
             else:
                 logger.warning("Unkown xsec order, using NLL+NLO k-factor (if available)")
                 k = kNLO*kNLL
-            k = float(k)            
+            k = float(k)
             for i,xsec in enumerate(xsecs):
                 if set(xsec.pid) == set(pID): xsecs[i] = xsec*k   #Apply k-factor
 
-#Write cross-sections to file    
+#Write cross-sections to file
     outfile = open(slhafile,'append')
     for xsec in xsecs: outfile.write(xsecToBlock(xsec,inPDGs=(2212,2212),comment="Nevts="+str(nevts))+"\n")
-    outfile.close()    
-    
+    outfile.close()
+
     return True
 
 def xsecToBlock(xsec,inPDGs=(2212,2212),comment=None):
     """Generates a string for a XSECTION block in the SLHA format from a XSection() object.
     inPDGs defines the PDGs of the incoming states (default = 2212,2212).
     comment is added at the end of the header as a comment"""
-    
+
     if type(xsec) != type(crossSection.XSection()):
         logger.error("Wrong input")
         return False
@@ -105,51 +105,53 @@ def xsecToBlock(xsec,inPDGs=(2212,2212),comment=None):
     header += "   # "+str(comment)   #Comment
     import SModelS
     entry = "0  "+str(xsec.info.order)+"  0  0  0  0  "+str(rmvunit(xsec.value,'fb'))+" SModelS "+SModelS.version()
-    
+
     return header + "\n" + entry
-    
-def runPythia(slhafile,nevts,sqrts,lhefile=None,pythiadir=None):
+
+def runPythia(slhafile,nevts,sqrts,lhefile=None):
     """ run pythia_lhe with n events, at sqrt(s)=sqrts. Returns a file object with the lhe events
         :param slhafile: input SLHA file
         :param nevts: number of events to be generated
         :param sqrts: center of mass sqrt{s} (in TeV)
         :param lhefile: option to write LHE output to file. If None, do not write output to disk
-        :param pythiadir: is where pythia_lhe is to be found, as well as the pythia.card file
-        if not defined, it is set as current folder
     """
-    
-    if not pythiadir: pythiadir = os.getcwd() + "external/pythia6/"
-      
+
+    import toolBox
+    box=toolBox.ToolBox()
+    tool=box.get("pythia6")
+    pythiadir=tool.installationPath()+"/"
+    tool.checkInstallation()
+
 #Check if slhafile, pythia_lhe, data and etc folders exist in pythiadir:
     if not os.path.isfile(slhafile):
         logger.error("File %s no found."%slhafile)
-        return False        
-    else:
-        shutil.copyfile(slhafile, pythiadir+"fort.61") 
-    if not os.path.isdir(pythiadir):
-        logger.error("pythia folder " + pythiadir +" not found in ")
-        return False          
-    elif not os.path.isfile(pythiadir+"/pythia_lhe") or not os.access(pythiadir+"/pythia_lhe",os.X_OK):
-        logger.error("pythia_lhe file no found in "+pythiadir)
         return False
-    elif not os.path.isfile(pythiadir+"pythia.card"):
-        logger.error("pythia.card file no found in "+pythiadir)
-        return False    
-    
-#Read pythia options:    
+    else:
+        shutil.copyfile(slhafile, pythiadir+"fort.61")
+    #if not os.path.isdir(pythiadir):
+    #    logger.error("pythia folder " + pythiadir +" not found in ")
+    #    return False
+    #elif not os.path.isfile(pythiadir+"/pythia_lhe") or not os.access(pythiadir+"/pythia_lhe",os.X_OK):
+    #    logger.error("pythia_lhe file no found in "+pythiadir)
+    #    return False
+    #elif not os.path.isfile(pythiadir+"pythia.card"):
+    #    logger.error("pythia.card file no found in "+pythiadir)
+    #    return False
+
+#Read pythia options:
     f=open(pythiadir+"pythia.card")
     pythiaOpts = f.readlines()
     f.close()
-#Create pythia par file with options    
+#Create pythia par file with options
     pythiaParFile = open(pythiadir+"pythia_card.dat","w")
     for option in pythiaOpts:
         if "MSTP(163)=" in option: option = "MSTP(163)=6\n"    #Switches output to screen, so no file is written to disk
         option = option.replace("NEVENTS",str(nevts)).replace("SQRTS",str(1000*sqrts))
         pythiaParFile.write(option)
     pythiaParFile.close()
-    
+
     executable="%s/pythia_lhe" % pythiadir
-    lhedata = commands.getoutput("cd %s; %s < pythia_card.dat" % (pythiadir, executable))    
+    lhedata = commands.getoutput("cd %s; %s < pythia_card.dat" % (pythiadir, executable))
     if not "<LesHouchesEvents" in lhedata:
         logger.error("LHE events not found in pythia output")
         return False
@@ -159,7 +161,7 @@ def runPythia(slhafile,nevts,sqrts,lhefile=None,pythiadir=None):
         lheFile = open(lhefile,'w')
         lheFile.write(lhedata)
         lheFile.close()
-        lheFile = open(lhefile,'r')       
+        lheFile = open(lhefile,'r')
     else:
         lheFile = cStringIO.StringIO(lhedata)   #Creates memory only file object
 
@@ -184,7 +186,7 @@ if __name__ == "__main__":
 
 
     sqrtses=[item for sublist in args.sqrts for item in sublist]
-    if len(sqrtses)==0: sqrtses=[8] ## default is: we compute for 8 tev! 
+    if len(sqrtses)==0: sqrtses=[8] ## default is: we compute for 8 tev!
     sqrtses.sort()
     sqrtses=set(sqrtses) ## unique values!
     order=0
@@ -195,7 +197,7 @@ if __name__ == "__main__":
         if not sqrts in [ 7,8,13,14,30,100]:
           print "[xsecComputer.py] error: cannot compute NLO or NLL xsecs for sqrts=%d TeV!" % sqrts
           sqrtses.remove(sqrts)
-    
+
     File=args.file[0]
     if not os.path.exists ( File ):
         print "Error: file ``%s'' does not exist." % File
