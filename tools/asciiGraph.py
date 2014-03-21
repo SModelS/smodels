@@ -29,14 +29,14 @@ def drawBranch_(branch, upwards, labels, htmlFormat, border, l):
     
     """
     length = 0
-    lines = ["     ","----"]
-    labels = "     "
+    lines=["   ","----"] 
+    labels="   "
     if border and upwards:
-        lines = [" |        "," | ----"]
-        labels = " |        "
+        lines=[" |    "," | ----"]
+        labels=" |    "
     if border and not upwards:
-        lines = [" |        "," | ----"]
-        labels = " |        "
+        lines=[" |    "," | ----"]
+        labels=" |    "
 
     for insertions in branch.particles:
         if len(insertions) == 0:
@@ -45,15 +45,15 @@ def drawBranch_(branch, upwards, labels, htmlFormat, border, l):
             continue
         lines[1] += "*----"
         if len(insertions) == 1:
-            labels += " " + printParticle_(insertions[0]) + "    "
-            lines[0] += " |     "
+            labels += " " + printParticle_(insertions[0]) + "  "
+            lines[0] += " |   "
         if len(insertions) == 2:
             labels += printParticle_(insertions[0]) + " " + \
                     printParticle_(insertions[1])
             if upwards:
-                lines[0] += "\\ /    "
+                lines[0]+="\\ /  "
             else:
-                lines[0] += "/ \\    "
+                lines[0]+="/ \\  "
         if len(insertions) > 2:
             logger.error("case for n-body decay, n>3 not yet. implemented. \
                           Please implement.")
@@ -69,7 +69,7 @@ def drawBranch_(branch, upwards, labels, htmlFormat, border, l):
             lines[1] += " "
             labels += " "
         labels += " " + " "*(5*lengthdiff) + " |"
-        lines[0] += " "*(5*lengthdiff + 0) + "    |"
+        lines[0] += " "*(5*lengthdiff + 0) + "  |"
         lines[1] += " "*(5*lengthdiff + 0) + " |"
     if border and upwards:
         print " /" + "-"*(4*l + 4) + "\\"
