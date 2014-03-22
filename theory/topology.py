@@ -10,7 +10,6 @@
 from theory import crossSection
 from theory.element import Element
 from printer import Printer
-from prettytable import PrettyTable
 from tools import SMSPrettyPrinter
 from theory import logger
 
@@ -298,6 +297,7 @@ class TopologyList(Printer):
         missing
         
         """
+        from prettytable import PrettyTable
         output = ""
         
         printer = SMSPrettyPrinter.SMSPrettyPrinter()
