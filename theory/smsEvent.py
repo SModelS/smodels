@@ -1,5 +1,5 @@
 """
-.. module:: SmsEvent
+.. module:: smsEvent
    :synopsis: Class that encapsulates an (e.g. LHE) event.
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -11,7 +11,7 @@ import logging
 
 logger = logging.getLogger(__name__)
         
-class SmsEvent:
+class smsEvent:
     """
     Event class featuring a list of particles and some convenience functions.
     
