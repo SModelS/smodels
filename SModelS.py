@@ -10,6 +10,7 @@
 """
 
 from __future__ import print_function
+import sys
 import os
 import inspect
 
@@ -19,41 +20,43 @@ def installDirectory():
     method.
     
     """
-    ret=os.path.realpath ( inspect.getabsfile(installDirectory) )
-    ret=ret.replace("SModelS.py","")
+    ret = os.path.realpath(inspect.getabsfile(installDirectory))
+    ret = ret.replace("SModelS.py", "")
     return ret
+
 
 def version(astuple=False, addCodeName=True):
     """
     Prints out version number of SModelS framework.
     
     """
-    f = open("%s/version" % installDirectory() )
+    f = open("%s/version" % installDirectory())
     l = f.readline()
     f.close()
     l = l.replace("\n","")
     l.strip()
     if not astuple:
-        if addCodeName: return l
+        if addCodeName:
+            return l
         p = l.find("/")
-        if p>-1: return l[:p]
-    T,C = l.split("/")
-    A,B = T.split(".")
+        if p > -1:
+            return l[:p]
+    t, c = l.split("/")
+    a, b = t.split(".")
     if addCodeName:
-        return (int(A),int(B),C.strip())
+        return (int(a), int(b), c.strip())
     else:
-        return (int(A),int(B))
+        return (int(a), int(b))
         
 
 def license():
     f = open(installDirectory() + "COPYING")
-    lines=f.readlines()
+    lines = f.readlines()
     f.close()
     return "".join(lines)
 
 
 def printHelp():
-    import sys
     print(sys.argv[0] + ": --help --installdir")
     print("--help: show this message")
     print("--installdir: print SModelS installation directory")
@@ -61,7 +64,6 @@ def printHelp():
 
 
 if __name__ == "__main__":
-    import sys
     if len(sys.argv) < 2:
         printHelp()
     for i in sys.argv[1:]:
