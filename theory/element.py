@@ -6,7 +6,7 @@
     
 """
 
-from .particleNames import PtcDic, Reven, simParticles, elementsInStr
+from .particleNames import ptcDic, rEven, simParticles, elementsInStr
 from .branch import Branch
 from . import crossSection
 import logging
@@ -285,7 +285,7 @@ class Element(object):
                     logger.error("Wrong syntax")
                     return False
                 for ptc in vertex:
-                    if not ptc in Reven.values() and not ptc in PtcDic:
+                    if not ptc in rEven.values() and not ptc in ptcDic:
                         logger.error("Unknown particle"+ptc)
                         return False
         return True    
