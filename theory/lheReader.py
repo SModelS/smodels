@@ -6,7 +6,7 @@
 
 """
 
-from . import smsEvent
+from . import SmsEvent
 from tools.physicsUnits import addunit
 import logging
 
@@ -77,12 +77,12 @@ class lheReader:
         """
         Get next event.
         
-        :returns: an smsEvent; None if no event is left to be read.
+        :returns: an SmsEvent; None if no event is left to be read.
         
         """        
         line = " "
         self.ctr+=1
-        ret=smsEvent.smsEvent(self.ctr)
+        ret=SmsEvent.SmsEvent(self.ctr)
         # pass metainfo from file to event
         for (key,value) in self.metainfo.items(): ret.metainfo[key]=value
         # Find next event
@@ -100,7 +100,7 @@ class lheReader:
             if len(line) == 0:
                 line = self.File.readline()
                 continue
-            particle = smsEvent.Particle()
+            particle = SmsEvent.Particle()
             linep = [float(x) for x in line.split()]
             if len(linep)<11:
                 logger.error("Line >>%s<< in %s cannot be parsed" % \
