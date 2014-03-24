@@ -47,7 +47,7 @@ def drawBranch_(branch, upwards, labels, htmlFormat, border, l):
             continue
         lines[1] += "*----"
         if len(insertions) == 1:
-            labels += " " + printParticle_(insertions[0]) + "   "
+            labels += " " + printParticle_(insertions[0]) + "  "
             lines[0] += " |   "
         if len(insertions) == 2:
             labels += printParticle_(insertions[0]) + " " + \
