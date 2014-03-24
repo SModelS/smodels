@@ -12,8 +12,10 @@
 
 import os
 from tools.physicsUnits import rmvunit
-from experiment import logger
 from experiment.experimentExceptions import MetaInfoError
+import logging
+
+logger = logging.getLogger(__name__)
 
 Base = "/afs/hephy.at/user/w/walten/public/sms/"
 
