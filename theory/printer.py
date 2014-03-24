@@ -12,6 +12,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class Printer(object):
     """
     Printer class.
@@ -22,7 +23,7 @@ class Printer(object):
         Constructor.
         
         """
-        pass
+        self.output = None
     
 
     def printout(self, target="stdout"):
@@ -45,4 +46,10 @@ class Printer(object):
         
         
     def prepareData(self):
+        """
+        Prepares the data of the derived object. Has to be implemented in the
+        derived object.
+        
+        :raises: NotImplementedError        
+        """
         raise NotImplementedError
