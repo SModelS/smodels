@@ -12,9 +12,9 @@ from theory import lheDecomposer
 from tools.physicsUnits import addunit
 from experiment import smsAnalysisFactory
 from theory.theoryPrediction import theoryPredictionFor
-import tools.loggingConfiguration
+import logging
 
-tools.loggingConfiguration.configure()
+logger = logging.getLogger(__name__)
 
 def main():
     """
