@@ -7,7 +7,7 @@
 """
 
 from functools import wraps
-import crossSection
+from . import crossSection
 from tools.physicsUnits import addunit, rmvunit
 import numpy as np
 from scipy import stats
