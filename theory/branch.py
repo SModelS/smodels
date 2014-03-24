@@ -6,7 +6,7 @@
         
 """
 
-from .particleNames import PtcDic, Reven, simParticles, elementsInStr
+from .particleNames import ptcDic, rEven, simParticles, elementsInStr
 from tools.physicsUnits import addunit
 import logging
 
@@ -40,8 +40,8 @@ class Branch(object):
                     ptcs = vertex[1:-1].split(',')
                     #Syntax check:
                     for ptc in ptcs:
-                        if not ptc in Reven.values() \
-                                and not ptc in PtcDic:
+                        if not ptc in rEven.values() \
+                                and not ptc in ptcDic:
                             logger.error("Unknown particle " + ptc)
                             return False
                     self.particles.append(ptcs)
@@ -107,8 +107,8 @@ class Branch(object):
 
         for partID in br.ids:
             # Add R-even particles to final state
-            if partID in Reven:
-                newparticles.append(Reven[partID])
+            if partID in rEven:
+                newparticles.append(rEven[partID])
             else:
                 # Add masses of non R-even particles to mass vector
                 newmass.append(massDictionary[partID])
