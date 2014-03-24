@@ -14,9 +14,11 @@
 from experiment import smsHelpers
 from tools.physicsUnits import addunit, rmvunit
 from tools import physicsUnits, rcFile
-from experiment import logger
 from experiment.experimentExceptions import MetaInfoError
 from experiment.smsHelpers import databaseVersion, getRun
+import logging                                                                  
+                                                                                
+logger = logging.getLogger(__name__)
 
 def setBase (base):
     """ just sets the base directory of the database """
