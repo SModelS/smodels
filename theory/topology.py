@@ -12,7 +12,7 @@ from theory import crossSection
 from theory.element import Element
 from .printer import Printer
 from prettytable import PrettyTable
-from tools import SMSPrettyPrinter
+from tools import smsPrettyPrinter
 from theory import logger
 
 class Topology(object):
@@ -301,7 +301,7 @@ class TopologyList(Printer):
         """
         output = ""
         
-        printer = SMSPrettyPrinter.SMSPrettyPrinter()
+        printer = smsPrettyPrinter.SmsPrettyPrinter()
         evTopTable = PrettyTable(["Topology", "#Vertices", "#Insertions",
                                    "#Elements", "Sum of weights"])
         evElementTable = PrettyTable(["Topology", "Element", "Particles B[0]",
@@ -316,7 +316,7 @@ class TopologyList(Printer):
             sumw = topo.getTotalWeight().getDictionary()
             evTopTable.add_row([i, topo.vertnumb, topo.vertparts,
                                  len(topo.elList),
-                                 SMSPrettyPrinter.wrap(printer.pformat(sumw), 
+                                 smsPrettyPrinter.wrap(printer.pformat(sumw), 
                                                        width=30)])
             eltot += len(topo.elList)
         
@@ -327,11 +327,11 @@ class TopologyList(Printer):
                         continue
                     evElementTable.add_row([
                             i, j, el.getParticles()[0], el.getParticles()[1],
-                            SMSPrettyPrinter.wrap(printer.pformat(
+                            smsPrettyPrinter.wrap(printer.pformat(
                                     el.getMasses()[0]), width=25),
-                            SMSPrettyPrinter.wrap(printer.pformat(
+                            smsPrettyPrinter.wrap(printer.pformat(
                                     el.getMasses()[1]), width=25),
-                            SMSPrettyPrinter.wrap(printer.pformat(
+                            smsPrettyPrinter.wrap(printer.pformat(
                                     el.weight.getDictionary()), width=30)])
                 evElementTable.add_row(["---", "---", "---", "---", "---",
                                          "---", "---"])  
