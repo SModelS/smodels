@@ -11,12 +11,14 @@
 
 """
 
-from experiment import smsHelpers
+from . import smsHelpers
 from tools.physicsUnits import addunit, rmvunit
 from tools import physicsUnits, rcFile
-from experiment import logger
-from experiment.experimentExceptions import MetaInfoError
-from experiment.smsHelpers import databaseVersion, getRun
+from .experimentExceptions import MetaInfoError
+from .smsHelpers import databaseVersion, getRun
+import logging                                                                  
+                                                                                
+logger = logging.getLogger(__name__)
 
 def setBase (base):
     """ just sets the base directory of the database """
@@ -383,18 +385,22 @@ def exists(analysis, topo, run=None):
     if not axes:
         return False
     hasDict = smsHelpers.hasDictionary (analysis, run2)
-    for a in axes:
-        mzname = None
-        if a['mz'] and len(a['mz']): mzname = a['mz'][0]
-        toponame = smsInterpolation.getHistName(topo, mzname)
-        if hasDict:
-            Dict = smsHelpers.getUpperLimitDictionary (analysis, toponame, run2)
-            if not Dict or len(Dict) == 0:
-                return False
-            continue
-        else:
-            return False
-    return True
+    if not hasDict: return False
+    return smsHelpers.hasDictionary (analysis, run2, topo )
+    ### FIXME why so complicated???
+    #for a in axes:
+    #    mzname = None
+    #    if a['mz'] and len(a['mz']): mzname = a['mz'][0]
+    #    if hasDict:
+    #        toponame = smsInterpolation.getHistName(topo, mzname)
+    #        Dict = smsHelpers.getUpperLimitDictionary (analysis, toponame, run2)
+    #        if not Dict or len(Dict) == 0: 
+    #            return False
+    #        continue
+    #    else:
+    #        return False
+
+    #return True
 
 
 def getaxes(analysis, topo=None, run=None):
