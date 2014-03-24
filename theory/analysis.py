@@ -48,7 +48,7 @@ class ULanalysis(object):
                 return self.elementsEff[el]
         return 0.
     
-    def getUpperLimitFor(self,mass):
+    def getUpperLimitFor(self, mass):
         """
         Get the experimental upper limit for a specific mass array.
         
