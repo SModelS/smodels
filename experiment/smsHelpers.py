@@ -33,7 +33,7 @@ def getRun ( analysis, run=None ):
             if a specific run is given, then just check
             if we really have results. """
     key=analysis+str(run)
-    if runs_.has_key ( key ): return runs_[key]
+    if key in runs_: return runs_[key]
     if run:
         if os.path.exists ( "%s/%s/%s" % ( Base, run, analysis ) ):
             runs_[key]=run
@@ -49,7 +49,7 @@ pMI_={}
 def parseMetaInfo ( analysis, run ):
     """ get all the meta information for a given analysis/run pair """
     key=analysis+str(run)
-    if pMI_.has_key ( key ): return pMI_[key]
+    if key in pMI_: return pMI_[key]
     info="%s/%s/%s/info.txt" % ( Base, run, analysis )
     ret={}
     if not os.path.exists ( info ):
@@ -81,7 +81,7 @@ def getLines ( analysis, run, label="condition" ):
     """ get all <label> lines in info.txt for an analysis/run pair 
     """
     key=analysis+run+label
-    if mlines.has_key ( key ): return mlines[key]
+    if key in mlines: return mlines[key]
     info="%s/%s/%s/info.txt" % ( Base, run, analysis )
     ret={}
     if not os.path.exists ( info ):
@@ -128,18 +128,18 @@ def constraints ( analysis, run ):
 def hasMetaInfoField ( analysis, field, run=None ):
     run=getRun ( analysis, run )
     metainfo=parseMetaInfo ( analysis, run )
-    return metainfo.has_key ( field )
+    return field in metainfo
 
 infoFields={}
 def getMetaInfoField(analysis, field, run=None):
     """get one specific entry of the meta info
     """
     key = analysis + field + str(run)
-    if infoFields.has_key(key):
+    if key in infoFields:
         return infoFields[key]
     run = getRun(analysis, run)
     metainfo = parseMetaInfo(analysis, run)
-    if not metainfo.has_key(field):
+    if not field in metainfo:
         infoFields[key]=None
         return infoFields[key]
 # raise MetaInfoError("field ``%s'' not found for ``%s''" % (field,analysis) )
@@ -174,9 +174,9 @@ expupperLimitDict={}
 def getUpperLimitDictionary ( analysis, topo, run, expected=False ):
     key=analysis+topo+str(run)
     if expected:
-        if expupperLimitDict.has_key ( key ): return expupperLimitDict[key]
+        if key in expupperLimitDict: return expupperLimitDict[key]
     else:
-        if upperLimitDict.has_key ( key ): return upperLimitDict[key]
+        if key in upperLimitDict: return upperLimitDict[key]
     dictfile="%s/%s/%s/sms.py" % ( Base, run, analysis )
     if not os.path.exists(dictfile):
         logger.warn("in getUpperLimitDictionary, dictionary file %s doesnt exist" % dictfile )
@@ -186,14 +186,14 @@ def getUpperLimitDictionary ( analysis, topo, run, expected=False ):
     execfile(dictfile,Globals)
     if expected:
         Dict=Globals["ExpectedDict"]
-        if not Dict.has_key ( topo ):
+        if not topo in Dict:
             logger.warn("dictionary doesnt have topology"+topo )
             expupperLimitDict[key]=None
             return None
         expupperLimitDict[key]=Dict[topo]
     else:
         Dict=Globals["Dict"]
-        if not Dict.has_key ( topo ):
+        if not topo in Dict:
             logger.warn("dictionary doesnt have topology"+topo )
             upperLimitDict[key]=None
             return None
