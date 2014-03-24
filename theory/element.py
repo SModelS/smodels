@@ -6,9 +6,9 @@
     
 """
 
-from ParticleNames import PtcDic, Reven, simParticles, elementsInStr
-from branch import Branch
-import crossSection
+from .particleNames import PtcDic, Reven, simParticles, elementsInStr
+from .branch import Branch
+from . import crossSection
 import logging
 
 logger = logging.getLogger(__name__)
@@ -19,7 +19,7 @@ class Element(object):
     Element class. Holds a pair of branches and the element weight
     (cross-section*BR).
     
-    """
+    """    
     def __init__(self, info=None):
         """
         Constructor.
@@ -52,6 +52,10 @@ class Element(object):
 
     def __eq__(self, other):
         return self.isEqual(other)
+    
+    
+    def __hash__(self):
+        return object.__hash__(self)
     
     
     def __ne__(self, other):
@@ -281,7 +285,7 @@ class Element(object):
                     logger.error("Wrong syntax")
                     return False
                 for ptc in vertex:
-                    if not ptc in Reven.values() and not PtcDic.has_key(ptc):
+                    if not ptc in Reven.values() and not ptc in PtcDic:
                         logger.error("Unknown particle"+ptc)
                         return False
         return True    
