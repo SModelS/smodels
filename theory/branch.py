@@ -112,14 +112,16 @@ class Branch(object):
                 newBranch.daughterID = partID
 
         if len(newmass) > 1:
-            logger.warning("Multiple R-odd particles in the final state: %s" % br)
+            logger.warning("Multiple R-odd particles in the final state: %s" \
+                           % br)
             return False
        
         if newparticles:
             newBranch.particles.append(newparticles)
         if newmass:
             newBranch.masses.append(newmass[0])        
-        if not self.maxWeight is None: newBranch.maxWeight = self.maxWeight*br.br
+        if not self.maxWeight is None:
+            newBranch.maxWeight = self.maxWeight * br.br
                 
         return newBranch
     
@@ -161,9 +163,10 @@ def decayBranches(branchList, brDictionary, massDictionary,
     decayed.
     
     :param branchList: list of Branch() objects containing the initial mothers
-    :param brDictionary: branching ratio dictionary for all particles appearing in the
+    :param brDictionary: branching ratio dictionary for all particles appearing
+    in the decays
+    :param massDictionary: mass dictionary for all particles appearing in the
     decays
-    :param massDictionary: mass dictionary for all particles appearing in the decays
     :param sigcut: minimum sigma*BR to be generated, by default sigcut = 0.
     (all branches are kept)
     
