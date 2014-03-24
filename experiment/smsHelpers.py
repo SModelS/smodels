@@ -12,8 +12,10 @@
 
 import os
 from tools.physicsUnits import rmvunit
-from experiment import logger
 from experiment.experimentExceptions import MetaInfoError
+import logging                                                                  
+                                                                                
+logger = logging.getLogger(__name__)
 
 Base = "/afs/hephy.at/user/w/walten/public/sms/"
 
@@ -187,14 +189,14 @@ def getUpperLimitDictionary ( analysis, topo, run, expected=False ):
     if expected:
         Dict=Globals["ExpectedDict"]
         if not Dict.has_key ( topo ):
-            logger.warn("dictionary doesnt have topology"+topo )
+            logger.warn("dictionary doesnt have topology "+topo )
             expupperLimitDict[key]=None
             return None
         expupperLimitDict[key]=Dict[topo]
     else:
         Dict=Globals["Dict"]
         if not Dict.has_key ( topo ):
-            logger.warn("dictionary doesnt have topology"+topo )
+            logger.warn("dictionary doesnt have topology "+topo )
             upperLimitDict[key]=None
             return None
         upperLimitDict[key]=Dict[topo]
