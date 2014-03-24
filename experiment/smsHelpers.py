@@ -160,14 +160,21 @@ def getErrorMessage ( Dict, mx, my ):
     logger.error("error message not implemented.")
     return ""
 
-def hasDictionary(analysis, run=None):
+def hasDictionary(analysis, run=None,topo=None):
     """are the upper limits available in dictionary format?
     """
     if not run:
         run=getRun(analysis)
     dictfile="%s/%s/%s/sms.py" % ( Base, run, analysis )
     if os.path.exists(dictfile):
-        return True
+        if topo==None: return True
+        Locals={}
+        execfile(dictfile,Locals)
+        Dict=Locals["Dict"]
+        if Dict.has_key ( topo ):
+          return True
+        return False
+
     logger.warn("Dictionary file %s doesnt exist" % dictfile )
     return False
 
@@ -184,17 +191,17 @@ def getUpperLimitDictionary ( analysis, topo, run, expected=False ):
         logger.warn("in getUpperLimitDictionary, dictionary file %s doesnt exist" % dictfile )
         upperLimitDict[key]=None
         return None
-    Globals={}
-    execfile(dictfile,Globals)
+    Locals={}
+    execfile(dictfile,Locals)
     if expected:
-        Dict=Globals["ExpectedDict"]
+        Dict=Locals["ExpectedDict"]
         if not Dict.has_key ( topo ):
             logger.warn("dictionary doesnt have topology "+topo )
             expupperLimitDict[key]=None
             return None
         expupperLimitDict[key]=Dict[topo]
     else:
-        Dict=Globals["Dict"]
+        Dict=Locals["Dict"]
         if not Dict.has_key ( topo ):
             logger.warn("dictionary doesnt have topology "+topo )
             upperLimitDict[key]=None
