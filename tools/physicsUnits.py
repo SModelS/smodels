@@ -9,7 +9,9 @@
 """
 
 import unum
-from tools import logger
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # description see
@@ -24,7 +26,8 @@ from tools import logger
 # can be switched off with a single switch
 useUnits = True
 
-#if len(Unum.getUnitTable())==0: # make sure we define only once
+# make sure we define only once
+# if len(Unum.getUnitTable())==0:
 unum.Unum.reset()
 unum.VALUE_FORMAT = "%0.2E"
 unum.UNIT_HIDE_EMPTY = True
@@ -33,10 +36,10 @@ fb = unum.Unum.unit('fb')
 pb = unum.Unum.unit('pb', 1000 * fb)
 
 eV = unum.Unum.unit('eV')
-keV = unum.Unum.unit('keV',10**3*eV)
-MeV = unum.Unum.unit('MeV',10**6*eV)
-GeV = unum.Unum.unit('GeV',10**9*eV)
-TeV = unum.Unum.unit('TeV',10**12*eV)
+keV = unum.Unum.unit('keV', 10**3*eV)
+MeV = unum.Unum.unit('MeV', 10**6*eV)
+GeV = unum.Unum.unit('GeV', 10**9*eV)
+TeV = unum.Unum.unit('TeV', 10**12*eV)
 
 
 def addunit(value, unitstring):
@@ -52,13 +55,13 @@ def addunit(value, unitstring):
     if useUnits:
         # for convenience, we add units also to tuples, lists, and dictionaries
         if isinstance(value, list):
-            return [addunit(x,unitstring) for x in value]
+            return [addunit(x, unitstring) for x in value]
         if isinstance(value, tuple):
-            return tuple([addunit(x,unitstring) for x in value])
+            return tuple([addunit(x, unitstring) for x in value])
         if isinstance(value, dict):
             ret = {}
             for (k, v) in value.items():
-                ret[k] = addunit(v,unitstring)
+                ret[k] = addunit(v, unitstring)
             return ret
         if not isinstance(value, float) and not isinstance(value, int):
             return value
@@ -105,7 +108,7 @@ if __name__ == "__main__":
     Called as script, will print some physicsUnits.
     
     """
-    three = addunit(3.0,"fb")
+    three = addunit(3.0, "fb")
     print(three, "=", three.asUnit(pb))
-    seven = addunit(7.,"TeV")
+    seven = addunit(7., "TeV")
     print(seven, "=", seven.asUnit(GeV))

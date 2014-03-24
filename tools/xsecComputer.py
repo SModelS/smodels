@@ -10,13 +10,16 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
-import set_path
+from tools import setPath
 from physicsUnits import rmvunit,addunit
 import os, commands, shutil
 from theory import crossSection
 import nllFast
 import cStringIO
-from tools import logger
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def addXSecToFile(sqrts,maxOrder,nevts,slhafile,lhefile=None,externaldir=None):
     """ Runs pythia at sqrts and compute SUSY cross-sections for the input SLHA file.
@@ -193,33 +196,31 @@ if __name__ == "__main__":
     if args.NLO: order=1
     if args.NLL: order=2
     if order > 0:
-      for sqrts in sqrtses:
-        if not sqrts in [ 7,8,13,14,30,100]:
-          print "[xsecComputer.py] error: cannot compute NLO or NLL xsecs for sqrts=%d TeV!" % sqrts
-          sqrtses.remove(sqrts)
-
+        for sqrts in sqrtses:
+            if not sqrts in [ 7,8,13,14,30,100]:
+                logger.error("Cannot compute NLO or NLL xsecs for sqrts = %d TeV!" % sqrts)
+                sqrtses.remove(sqrts)
     File=args.file[0]
-    if not os.path.exists ( File ):
-        print "Error: file ``%s'' does not exist." % File
+    if not os.path.exists(File):
+        logger.error("File ``%s'' does not exist." % File)
         sys.exit(1)
-    # print "[xsecComputer.py] compute cross section for",File
     if File[-5:].lower()==".slha" or args.slha:
         if args.tofile:
-            print "[xsecComputer.py] Computing slha cross section from %s, and adding to slha file." % File,
+            logger.info("Computing slha cross section from %s, and adding to slha file." % File)
             for s in sqrtses:
-              ss=addunit(s,'TeV')
-              external_dir = SModelS.installDirectory() + "/tools/external"
-              addXSecToFile ( ss,order,args.nevents,File,externaldir=external_dir )
-            print "done."
+                ss=addunit(s, 'TeV')
+                external_dir = SModelS.installDirectory() + "/tools/external"
+                addXSecToFile ( ss,order,args.nevents,File,externaldir=external_dir)
+            logger.info("done.")
             sys.exit(0)
         else:
-            print "[xsecComputer.py] compute slha cross section, print out, but dont add to file. FIXME not yet implemented."
+            logger.error("compute slha cross section, print out, but dont add to file. FIXME not yet implemented.")
             sys.exit(0)
     if File[-4:].lower()==".lhe" or args.lhe:
         if args.tofile:
-            print "[xsecComputer.py] compute lhe section, and add to file. FIXME I guess we dont need this case?"
+            logger.error("Compute lhe section, and add to file. FIXME I guess we dont need this case?")
             sys.exit(0)
         else:
-            print "[xsecComputer.py] compute lhe section, print out, but dont add to file. FIXME not yet implemented."
+            logger.error("Compute lhe section, print out, but dont add to file. FIXME not yet implemented.")
             sys.exit(0)
 
