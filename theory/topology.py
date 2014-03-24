@@ -7,9 +7,10 @@
 .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
     
 """
+
 from theory import crossSection
 from theory.element import Element
-from printer import Printer
+from .printer import Printer
 from prettytable import PrettyTable
 from tools import SMSPrettyPrinter
 from theory import logger
