@@ -10,7 +10,7 @@
 
 from tools.physicsUnits import addunit, rmvunit
 import logging
-import LHEReader
+from . import lheReader
 
 logger = logging.getLogger(__name__)
 
@@ -467,7 +467,7 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
     """
     # To store information about all cross-sections in the LHE file
     xSecsInFile = XSectionList()    
-    reader = LHEReader.LHEReader(lhefile)
+    reader = lheReader.lheReader(lhefile)
     if not rmvunit(reader.metainfo["totalxsec"],'fb'):
         logger.error("Cross-section information not found in LHE file.")
         return False
@@ -496,7 +496,7 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
     for pid in pids:
         xsec = XSection()
         xsec.info.sqrts = sqrtS
-        if reader.metainfo.has_key("cs_order"):
+        if 'cs_order' in reader.metainfo:
             xsec.info.order = reader.metainfo["cs_order"]
         else:
             # Assume LO xsecs, if not defined in the reader
