@@ -6,16 +6,14 @@
         
 """
 
-import sys
-import os
 import copy
 import time
-import element
-import topology
+from . import element
+from . import topology
+from . import pyslha
+from . import crossSection
+from .branch import Branch, decayBranches
 from tools.physicsUnits import addunit, rmvunit
-import pyslha
-import crossSection
-from branch import Branch, decayBranches
 import logging
 
 logger = logging.getLogger(__name__)
