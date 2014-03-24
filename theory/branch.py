@@ -8,7 +8,10 @@
 
 from .particleNames import PtcDic, Reven, simParticles, elementsInStr
 from tools.physicsUnits import addunit
-from . import logger
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class Branch(object):
     """
