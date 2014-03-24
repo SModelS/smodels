@@ -6,9 +6,9 @@
         
 """
 
-from ParticleNames import PtcDic, Reven, simParticles, elementsInStr
+from .particleNames import PtcDic, Reven, simParticles, elementsInStr
 from tools.physicsUnits import addunit
-from theory import logger
+from . import logger
 
 class Branch(object):
     """
@@ -28,7 +28,7 @@ class Branch(object):
         if type(info)==type(str()):
             branch = elementsInStr(info)
             if not branch or len(branch) > 1:
-                logging.error("Wrong input string " + info)
+                logger.error("Wrong input string " + info)
                 return False                
             else:
                 branch = branch[0]
@@ -38,7 +38,7 @@ class Branch(object):
                     #Syntax check:
                     for ptc in ptcs:
                         if not ptc in Reven.values() \
-                                and not PtcDic.has_key(ptc):
+                                and not ptc in PtcDic:
                             logger.error("Unknown particle " + ptc)
                             return False
                     self.particles.append(ptcs)
@@ -96,8 +96,7 @@ class Branch(object):
         Generates a new branch adding a 1-step cascade decay described by
         the br object, with particle masses given by massDictionary.
         
-        """        
-        import ParticleNames
+        """
         newBranch = self.copy()
         newparticles = []
         newmass = []
@@ -105,8 +104,8 @@ class Branch(object):
 
         for partID in br.ids:
             # Add R-even particles to final state
-            if partID in ParticleNames.Reven:
-                newparticles.append(ParticleNames.Reven[partID])
+            if partID in Reven:
+                newparticles.append(Reven[partID])
             else:
                 # Add masses of non R-even particles to mass vector
                 newmass.append(massDictionary[partID])
