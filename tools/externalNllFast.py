@@ -8,8 +8,8 @@
 
 """
 
+import setPath
 from externalTool import ExternalTool
-from tools import setPath
 from tools import logger
 
 class ExternalNllFast(ExternalTool):
@@ -118,31 +118,31 @@ class ExternalNllFast7(ExternalNllFast):
     def __init__ ( self ):
         ExternalNllFast.__init__( self, 7, "1.2",
             test_params="gg cteq 500 600", 
-            test_condition="500.         600.        0.193E+00    0.450E+00    0.497E+00" )
+            test_condition="500.     600.    0.193E+00  0.450E+00  0.497E+00" )
 
 class ExternalNllFast8(ExternalNllFast):
     def __init__ ( self ):
         ExternalNllFast.__init__( self, 8, "2.1",
             test_params="gg cteq 500 600", 
-            test_condition="500.         600.        0.406E+00    0.873E+00    0.953E+00" )
+            test_condition="500.     600.    0.406E+00  0.873E+00  0.953E+00" )
 
 class ExternalNllFast13(ExternalNllFast):
     def __init__ ( self ):
         ExternalNllFast.__init__( self, 13, "3.0",
             test_params="gg cteq 500 600", 
-            test_condition="500.         600.        0.394E+01    0.690E+01    0.731E+01" )
+            test_condition="500.     600.    0.394E+01  0.690E+01  0.731E+01" )
 
 class ExternalNllFast14(ExternalNllFast):
     def __init__ ( self ):
         ExternalNllFast.__init__( self, 14, "4.01dcpl",
             test_params="gdcpl cteq 500 600", 
-            test_condition="500.        0.235E+02    0.346E+02    0.362E+02" )
+            test_condition="500.    0.235E+02  0.346E+02  0.362E+02" )
 
 class ExternalNllFast33(ExternalNllFast):
     def __init__ ( self ):
         ExternalNllFast.__init__( self, 33, "5.01dcpl", 
             test_params="gdcpl cteq 500 600", 
-            test_condition="500.        0.257E+03    0.383E+03    0.393E+03" )
+            test_condition="500.    0.257E+03  0.383E+03  0.393E+03" )
 
 nllFastTools={ 7:ExternalNllFast7(), 8:ExternalNllFast8(),
                             13:ExternalNllFast13(), 14:ExternalNllFast14(), 
