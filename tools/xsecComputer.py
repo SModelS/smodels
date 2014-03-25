@@ -53,7 +53,7 @@ def addXSecToFile(sqrts,maxOrder,nevts,slhafile,lhefile=None,externaldir=None):
 #Check i lhefile exists:
     if lhefile:
         if os.path.isfile(lhefile): logger.warning("Using LO cross-sections from "+lhefile)
-        else: logger.warning("Writing pythia LHE output to "+lhefile)
+        else: logger.info("Writing pythia LHE output to "+lhefile)
 #Get file with lhe Events:
     if not lhefile or not os.path.isfile(lhefile):
         lheFile = runPythia(slhafile,nevts,rmvunit(sqrts,'TeV'),lhefile)
