@@ -7,9 +7,8 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
-
+import setPath
 from externalTool import ExternalTool
-from tools import setPath
 from tools import logger
 
 class ExternalPythia6(ExternalTool):
@@ -102,7 +101,7 @@ class ExternalPythia6(ExternalTool):
             return False
         out=self.run ( self.test_params_path )
         out.pop()
-        lines={ -1: " ********* Fraction of events that fail fragmentation cuts =    0.00000 *********" }
+        lines={ -1: " ********* Fraction of events that fail fragmentation cuts =  0.00000 *********" }
         for (nr, line) in lines.items():
             if out[nr].find(line)==-1:
                 logger.error("Something is wrong with the setup: " + str(out))
