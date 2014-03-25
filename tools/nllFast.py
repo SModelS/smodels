@@ -13,7 +13,7 @@
 import commands
 import os
 from tools import setPath
-from theory import pyslha
+from tools import modpyslha as pyslha
 from tools.physicsUnits import rmvunit
 import numpy
 import operator
