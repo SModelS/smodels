@@ -35,6 +35,8 @@ Only generated if cross-sections are read from SLHA file and not previously crea
   from Tools.PhysicsUnits import addunit, rmvunit
   import pyslha2 as pyslha
   import CrossSection
+  
+  log = logging.getLogger(__name__)
 
   if DoCompress and rmvunit(minmassgap,'GeV') == -1: 
     print "[SLHAdecomposer] Please, set minmassgap"
@@ -86,7 +88,6 @@ Only generated if cross-sections are read from SLHA file and not previously crea
     if not XsecsInfo:
       XsecsInfo = XsecsInfoFile              #Store information from file
       CrossSection.XSectionInfo = XsecsInfo
-      log = logging.getLogger(__name__)
       log.warning ( "Cross-section information not found. Using values from SLHA file" )
     else:
       for xsec in XsecsInfoFile.xsecs:
