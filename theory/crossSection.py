@@ -407,7 +407,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None):
     Obtain cross-sections from input SLHA file. 
     
     :param slhafile: SLHA input file with cross-sections
-    :param UseXsecs: if defined enables the user to select cross-sections to
+    :param useXSecs: if defined enables the user to select cross-sections to
     use. Must be a XSecInfoList object
     :returns: a XSectionList object    
      
