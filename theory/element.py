@@ -33,13 +33,15 @@ class Element(object):
             if type(info) == type(str()):
                 elements = elementsInStr(info)
                 if not elements or len(elements) > 1:
-                    logging.error("Wrong input string "+info)
+                    nel=0
+                    if elements: nel=len(elements)
+                    logging.error("Malformed input string. Number of elements is %d, expected 1: in ``%s''"% (nel,info))
                     return False                
                 else:
                     el = elements[0]
                     branches = elementsInStr(el[1:-1])
                     if not branches or len(branches) != 2:
-                        logging.error("Wrong input string "+info)
+                        logging.error("Malformed input string. Number of branches is %d, expected 2: in ``%s''" % ( len(branches), info) )
                         return False 
                     self.branches = []
                     for branch in branches:
