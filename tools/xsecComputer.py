@@ -10,7 +10,7 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
-from tools import setPath
+import setPath
 from physicsUnits import rmvunit,addunit
 import os, commands, shutil
 from theory import crossSection
@@ -21,35 +21,28 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def addXSecToFile(sqrts,maxOrder,nevts,slhafile,lhefile=None,externaldir=None):
+def computeXSec(sqrts,maxOrder,nevts,slhafile,lhefile=None,externaldir=None):
     """ Runs pythia at sqrts and compute SUSY cross-sections for the input SLHA file.
-    Writes cross-sections to slha file.
+    Returns a XSectionList object
     :param sqrts: sqrt{s} to run Pythia
     :param maxOrder: maximum order to compute the cross-section
     if maxOrder = 0, compute only LO pythia xsecs
     if maxOrder = 1, apply NLO K-factors fron NLLfast (if available)
     if maxOrder = 2, apply NLO+NLL K-factors fron NLLfast (if available)
     :param nevts: number of events for pythia run
+    :param slhafile: input SLHA file
     :param lhefile: LHE file. If None, do not write pythia output to file \
     if file does not exist, write pythia output to this file name \
     if file exists, read LO xsecs from this file (does not run pythia)
     :param externaldir: location of pythia6 and nllfast folders
     if not defined, it is set as current folder
-    """
+    """    
 
     if not externaldir: externaldir = os.getcwd() + '/external/'
-
 #Check if SLHA file exists
     if not os.path.isfile(slhafile):
         logger.error("SLHA file not found.")
         return None
-#Check if file already contain cross-section blocks:
-    infile = open(slhafile,'r')
-    slhadata = infile.read()
-    infile.close()
-    if 'XSECTION' in slhadata:
-        logger.warning("SLHA file already contains a XSECTION block. Appending new cross-sections.")
-
 #Check i lhefile exists:
     if lhefile:
         if os.path.isfile(lhefile): logger.warning("Using LO cross-sections from "+lhefile)
@@ -86,9 +79,30 @@ def addXSecToFile(sqrts,maxOrder,nevts,slhafile,lhefile=None,externaldir=None):
             for i,xsec in enumerate(xsecs):
                 if set(xsec.pid) == set(pID): xsecs[i] = xsec*k   #Apply k-factor
 
+    return xsecs
+
+
+def addXSecToFile(xsecs,slhafile,comment=None):
+    """ Writes cross-sections to slha file.
+    :param xsecs: a XSectionList object containing the cross-sections
+    :param slhafile: target file for writing the cross-sections in SLHA format
+    :param comment: optional comment to be added to each cross-section block    
+    """
+
+#Check if SLHA file exists
+    if not os.path.isfile(slhafile):
+        logger.error("SLHA file not found.")
+        return None
+#Check if file already contain cross-section blocks:
+    infile = open(slhafile,'r')
+    slhadata = infile.read()
+    infile.close()
+    if 'XSECTION' in slhadata:
+        logger.warning("SLHA file already contains a XSECTION block. Appending new cross-sections.")
+
 #Write cross-sections to file
     outfile = open(slhafile,'append')
-    for xsec in xsecs: outfile.write(xsecToBlock(xsec,inPDGs=(2212,2212),comment="Nevts="+str(nevts))+"\n")
+    for xsec in xsecs: outfile.write(xsecToBlock(xsec,(2212,2212),comment)+"\n")
     outfile.close()
 
     return True
@@ -105,8 +119,7 @@ def xsecToBlock(xsec,inPDGs=(2212,2212),comment=None):
     for pdg in inPDGs: header += " "+str(pdg)  #PDGs of incoming states
     header += " "+str(len(xsec.pid))   #Number of outgoing states
     for pid in xsec.pid: header += " "+str(pid)  #PDGs of outgoing states
-    header += "   # "+str(comment)   #Comment
-    import SModelS
+    header += "   # "+str(comment)   #Comment    
     entry = "0  "+str(xsec.info.order)+"  0  0  0  0  "+str(rmvunit(xsec.value,'fb'))+" SModelS "+SModelS.version()
 
     return header + "\n" + entry
@@ -210,7 +223,9 @@ if __name__ == "__main__":
             for s in sqrtses:
                 ss=addunit(s, 'TeV')
                 external_dir = SModelS.installDirectory() + "/tools/external"
-                addXSecToFile ( ss,order,args.nevents,File,externaldir=external_dir)
+                xsecs = computeXSec(ss,order,args.nevents,File,externaldir=external_dir)
+                comment = "Nevts="+str(args.nevents)
+                addXSecToFile(xsecs,File,comment)
             logger.info("done.")
             sys.exit(0)
         else:
