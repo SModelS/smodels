@@ -17,6 +17,7 @@ from theory import crossSection
 import nllFast
 import cStringIO
 import logging
+import SModelS
 
 logger = logging.getLogger(__name__)
 
