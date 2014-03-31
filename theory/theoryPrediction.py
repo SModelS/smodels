@@ -8,12 +8,14 @@
 """
 
 import copy
-import clusterTools
-import crossSection, element
+from . import clusterTools
+from . import crossSection
+from . import element
 import logging
-from ParticleNames import elementsInStr
-from auxiliaryFunctions import cSim, cGtr
-from analysis import SRanalysis,ULanalysis
+from theory.particleNames import elementsInStr
+from .auxiliaryFunctions import cSim
+from .auxiliaryFunctions import cGtr
+from .analysis import SRanalysis, ULanalysis
 
 logger = logging.getLogger(__name__)
 
@@ -124,11 +126,13 @@ def evalConditions(cluster, analysis):
             
             if newcond.find("Cgtr") >= 0:
                 newcond = newcond.replace("Cgtr", "cGtr")
-                logger.warning(analysis.label + " using deprecated function 'Cgtr'. Auto-replacing with 'cGtr'.")
+                logger.warning(analysis.label + " using deprecated function \
+                        'Cgtr'. Auto-replacing with 'cGtr'.")
                 
             if newcond.find("Csim") >= 0:
                 newcond = newcond.replace("Csim", "cSim")
-                logger.warning(analysis.label + " using deprecated function 'Csim'. Auto-replacing with 'cSim'.")
+                logger.warning(analysis.label + " using deprecated function \
+                        'Csim'. Auto-replacing with 'cSim'.")
             
             conditions[cond] = eval(newcond)
             

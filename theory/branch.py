@@ -6,9 +6,12 @@
         
 """
 
-from ParticleNames import PtcDic, Reven, simParticles, elementsInStr
+from .particleNames import ptcDic, rEven, simParticles, elementsInStr
 from tools.physicsUnits import addunit
-from theory import logger
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class Branch(object):
     """
@@ -28,7 +31,7 @@ class Branch(object):
         if type(info)==type(str()):
             branch = elementsInStr(info)
             if not branch or len(branch) > 1:
-                logging.error("Wrong input string " + info)
+                logger.error("Wrong input string " + info)
                 return False                
             else:
                 branch = branch[0]
@@ -37,8 +40,8 @@ class Branch(object):
                     ptcs = vertex[1:-1].split(',')
                     #Syntax check:
                     for ptc in ptcs:
-                        if not ptc in Reven.values() \
-                                and not PtcDic.has_key(ptc):
+                        if not ptc in rEven.values() \
+                                and not ptc in ptcDic:
                             logger.error("Unknown particle " + ptc)
                             return False
                     self.particles.append(ptcs)
@@ -96,8 +99,7 @@ class Branch(object):
         Generates a new branch adding a 1-step cascade decay described by
         the br object, with particle masses given by massDictionary.
         
-        """        
-        import ParticleNames
+        """
         newBranch = self.copy()
         newparticles = []
         newmass = []
@@ -105,22 +107,24 @@ class Branch(object):
 
         for partID in br.ids:
             # Add R-even particles to final state
-            if partID in ParticleNames.Reven:
-                newparticles.append(ParticleNames.Reven[partID])
+            if partID in rEven:
+                newparticles.append(rEven[partID])
             else:
                 # Add masses of non R-even particles to mass vector
                 newmass.append(massDictionary[partID])
                 newBranch.daughterID = partID
 
         if len(newmass) > 1:
-            logger.warning("Multiple R-odd particles in the final state: %s" % br)
+            logger.warning("Multiple R-odd particles in the final state: %s" \
+                           % br)
             return False
        
         if newparticles:
             newBranch.particles.append(newparticles)
         if newmass:
             newBranch.masses.append(newmass[0])        
-        if not self.maxWeight is None: newBranch.maxWeight = self.maxWeight*br.br
+        if not self.maxWeight is None:
+            newBranch.maxWeight = self.maxWeight * br.br
                 
         return newBranch
     
@@ -162,9 +166,10 @@ def decayBranches(branchList, brDictionary, massDictionary,
     decayed.
     
     :param branchList: list of Branch() objects containing the initial mothers
-    :param brDictionary: branching ratio dictionary for all particles appearing in the
+    :param brDictionary: branching ratio dictionary for all particles appearing
+    in the decays
+    :param massDictionary: mass dictionary for all particles appearing in the
     decays
-    :param massDictionary: mass dictionary for all particles appearing in the decays
     :param sigcut: minimum sigma*BR to be generated, by default sigcut = 0.
     (all branches are kept)
     

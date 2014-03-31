@@ -9,10 +9,11 @@
 
 """
 
-import smsResults
+from __future__ import print_function
+from . import smsResults
 from tools.physicsUnits import rmvunit
-import types
-from theory import analysis, element
+from theory import analysis
+from theory import element
 import logging
 
 logger = logging.getLogger(__name__)
@@ -75,42 +76,35 @@ def load(anas=None, topos=None, sqrts=[7, 8]):
     Creates the Analysis objects from the info given in the SMS results
     database.
 
-    :param anas: if given as a list, then we create only objects for these analyses
-    (the database naming convention is used).
+    :param anas: if given as a list, then we create only objects for these
+    analyses (the database naming convention is used).
     :param topos: if given as a list, then only these topos are considered.
-    :param sqrts: array of center-of-mass energies of the analyses that are to be considered.
+    :param sqrts: array of center-of-mass energies of the analyses that are to
+    be considered.
     :returns: list of Analyses
     
     """   
     # lets make sure the user can also supply a single topo/ana without having
     # to code an array
-    if type(topos) == types.StringType:
+    if isinstance(topos, str):
         topos = [topos]
-    if type(anas) == types.StringType:
+    if isinstance(anas, str):
         anas = [anas]
-    if type(sqrts) == types.IntType:
+    if isinstance(sqrts, int):
         sqrts = [sqrts]
-    if type(sqrts) == types.FloatType:
+    if isinstance(sqrts, float):
         sqrts = [int(sqrts)]
 
     listOfAnalyses = []
 
-    debug = False
-    if debug:
-        logger.setLevel(logging.DEBUG)
-    else:
-        from experiment import logger
-        logger.setLevel(logging.INFO)
-    
+        
     if anas == None:
         anas = smsResults.getAllResults().keys()
     for ana in anas:
-        if debug:
-            print
-            print "Building ana", ana
+        logger.debug("Building ana " + str(ana))
         ss = rmvunit(smsResults.getSqrts(ana), "TeV")
         if ss == None:
-            print "SS=", ss, ana
+            logger.debug("SS = " + str(ss) + str(ana))
             continue
         ss = int(ss)
         if not ss in sqrts:
@@ -118,8 +112,7 @@ def load(anas=None, topos=None, sqrts=[7, 8]):
         for tx in smsResults.getTopologies(ana):
             if topos != None and tx not in topos:
                 continue
-            if debug:
-                print tx,                        
+            logger.debug(str(tx))                        
             newAnalysis = analysis.ULanalysis()
             newAnalysis.sqrts = smsResults.getSqrts(ana)
             stopo = getRealTopo (tx)
@@ -129,9 +122,8 @@ def load(anas=None, topos=None, sqrts=[7, 8]):
             constraint = smsResults.getConstraints(ana, topo=stopo)
             cond = smsResults.getConditions(ana, topo=stopo)
             if not constraint or constraint == "Not yet assigned":
-                if debug:
-                    print "dont have a constraint for", ana, tx, "(", stopo, \
-                            ")"
+                logger.debug("dont have a constraint for " + str(ana) + \
+                            str(tx) + "(" + str(stopo) + ")")
                 continue
             
             if cond:
@@ -147,8 +139,8 @@ def load(anas=None, topos=None, sqrts=[7, 8]):
 
 if __name__ == "__main__":
     load()
-    print "List of analyses/results: "
+    print("List of analyses/results: ")
     listOfAnalyses = load()
     for (ct, ana) in enumerate(listOfAnalyses):
         # .label, ana.sqrts
-        print ct, ana.label, ana.Top.vertnumb, ana.Top.vertparts
+        print(ct, ana.label, ana.Top.vertnumb, ana.Top.vertparts)

@@ -7,9 +7,11 @@
    .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
 """
 
+from __future__ import print_function
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 class Printer(object):
     """
@@ -21,7 +23,7 @@ class Printer(object):
         Constructor.
         
         """
-        pass
+        self.output = None
     
 
     def printout(self, target="stdout"):
@@ -33,10 +35,21 @@ class Printer(object):
         :returns: None
         
         """        
-        #Branch, Element, Topology, TopologyList, Analysis, AnalysisList, Cluster
+        # Branch, Element, Topology, TopologyList, Analysis, AnalysisList,
+        # Cluster
         self.output = self.prepareData()        
             
         if target == "stdout":
-            print self.output
+            print(self.output)
         elif target == "file":
             pass
+        
+        
+    def prepareData(self):
+        """
+        Prepares the data of the derived object. Has to be implemented in the
+        derived object.
+        
+        :raises: NotImplementedError        
+        """
+        raise NotImplementedError
