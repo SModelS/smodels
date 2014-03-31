@@ -347,8 +347,13 @@ class Element(object):
             masses = branch.masses
             for ivertex in range(vertnumb[ib]-1):
                 if abs(masses[ivertex]-masses[ivertex+1]) < mingap:
-                    newelement.branches[ib].particles.pop(ivertex)
-                    newelement.branches[ib].masses.pop(ivertex)
+                    newelement.branches[ib].particles[ivertex] = None
+                    newelement.branches[ib].masses[ivertex] = None
+            while newelement.branches[ib].particles.count(None) > 0:
+                iNone = newelement.branches[ib].particles.index(None)
+                newelement.branches[ib].particles.pop(iNone)
+                newelement.branches[ib].masses.pop(iNone)
+
 
         if newelement.isEqual(self):
             return None
