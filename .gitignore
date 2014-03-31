@@ -25,6 +25,12 @@ tools/external/nllfast/nllfast-2.1/fort.21
 tools/external/nllfast/nllfast-3.0/gg.out
 tools/external/nllfast/nllfast-4.01dcpl/gdcpl.out
 tools/external/nllfast/nllfast-5.01dcpl/gdcpl.out
+tools/external/nllfast/nllfast-3.0/sb.out
+tools/external/nllfast/nllfast-3.0/sg.out
+tools/external/nllfast/nllfast-3.0/ss.out
+tools/external/nllfast/nllfast-3.0/st.out
+tools/external/nllfast/nllfast-4.01dcpl/st.out
+tools/external/nllfast/nllfast-5.01dcpl/st.out
 tools/external/pythia6/fort.61
 tools/external/pythia6/pythia_card.dat
 old/
