@@ -10,20 +10,21 @@
 
 """
 
-import commands, os, sys
-import set_path
-from theory import pyslha2 as pyslha
+import commands
+import os
+from tools import setPath
+from tools import modpyslha as pyslha
 from tools.physicsUnits import rmvunit
 import numpy
-import logging
 import operator
 from tools import toolBox
-logging.basicConfig(level=logging.INFO)
+import logging
+
 logger = logging.getLogger(__name__)
 
-squarks = [1000001,2000001,1000002,2000002,1000003,2000003,1000004,2000004]
-antisquarks = map ( operator.neg, squarks )
-third = [1000005,2000005,1000006,2000006]
+squarks = [1000001, 2000001, 1000002, 2000002, 1000003, 2000003, 1000004, 2000004]
+antisquarks = map(operator.neg, squarks)
+third = [1000005, 2000005, 1000006, 2000006]
 gluinos = [1000021]
 
 def getKfactorsFor(pIDs,sqrts,slhafile,pdf='cteq'):
@@ -44,12 +45,12 @@ def getKfactorsFor(pIDs,sqrts,slhafile,pdf='cteq'):
 
 #Obtain relevant masses:
     readfile=pyslha.readSLHAFile(slhafile)
-    gluinomass = abs(readfile[0]['MASS'].entries[1000021])
-    squarkmass = sum([abs(readfile[0]['MASS'].entries[pid]) for pid in squarks])/8.
+    gluinomass = abs(readfile.blocks['MASS'].entries[1000021])
+    squarkmass = sum([abs(readfile.blocks['MASS'].entries[pid]) for pid in squarks])/8.
     pid1,pid2 = sorted(pIDs)    
-    if pid1 in antisquarks and pid2 in squarks: squarkmass = (abs(readfile[0]['MASS'].entries[abs(pid1)])+abs(readfile[0]['MASS'].entries[pid2]))/2        
-    elif pid1 in squarks and pid2 in squarks: squarkmass = (abs(readfile[0]['MASS'].entries[pid1])+abs(readfile[0]['MASS'].entries[pid2]))/2
-    elif abs(pid1) == pid2 and pid2 in third: squarkmass = abs(readfile[0]['MASS'].entries[abs(pid1)])
+    if pid1 in antisquarks and pid2 in squarks: squarkmass = (abs(readfile.blocks['MASS'].entries[abs(pid1)])+abs(readfile.blocks['MASS'].entries[pid2]))/2        
+    elif pid1 in squarks and pid2 in squarks: squarkmass = (abs(readfile.blocks['MASS'].entries[pid1])+abs(readfile.blocks['MASS'].entries[pid2]))/2
+    elif abs(pid1) == pid2 and pid2 in third: squarkmass = abs(readfile.blocks['MASS'].entries[abs(pid1)])
 
     # Set up NLLfast run, the old way
     sqrtS = float(rmvunit(sqrts,'TeV'))
@@ -195,17 +196,19 @@ def interpolateKfactors(kFacsVector,xval):
     coeffs = numpy.matrix.transpose(numpy.polyfit(xpts, ypts, len(xpts)-1))    
     for ik in range(len(ypts[0])):
         kfac = 0.
-        for ip,coeff in enumerate(coeffs[ik]): kfac += coeff*xval**(len(xpts)-1-ip)
-        if kfac <= 0.: kfac = 1.
+        for ip,coeff in enumerate(coeffs[ik]):
+            kfac += coeff*xval**(len(xpts)-1-ip)
+        if kfac <= 0.:
+            kfac = 1.
         kFacs.append(kfac)
     
     return kFacs
 
 if __name__ == "__main__":
     """ called as script, we get the k factors for some pid pair """
-    import set_path
+    from tools import setPath
     import SModelS
     from physicsUnits import addunit
-    slhaF=SModelS.installDirectory()+"inputFiles/slha/T1.slha"
-    kNLO,kNLL = getKfactorsFor((1000021,1000021),addunit(13.,"TeV"),slhaF)
-    print "[nllFast.py] nlo,nll=",kNLO,kNLL
+    slhaF = SModelS.installDirectory() + "inputFiles/slha/T1.slha"
+    kNLO, kNLL = getKfactorsFor((1000021,1000021), addunit(13., "TeV"), slhaF)
+    logger.info("nlo, nll = " + str(kNLO) + ", " + str(kNLL))

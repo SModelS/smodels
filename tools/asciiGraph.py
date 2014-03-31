@@ -8,6 +8,8 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
+
+from __future__ import print_function
 import sys
 import logging
 
@@ -29,14 +31,14 @@ def drawBranch_(branch, upwards, labels, htmlFormat, border, l):
     
     """
     length = 0
-    lines = ["     ","----"]
-    labels = "     "
+    lines = ["   ", "----"]
+    labels = "   "
     if border and upwards:
-        lines = [" |        "," | ----"]
-        labels = " |        "
+        lines = [" |    ", " | ----"]
+        labels = " |    "
     if border and not upwards:
-        lines = [" |        "," | ----"]
-        labels = " |        "
+        lines = [" |    ", " | ----"]
+        labels = " |    "
 
     for insertions in branch.particles:
         if len(insertions) == 0:
@@ -45,15 +47,15 @@ def drawBranch_(branch, upwards, labels, htmlFormat, border, l):
             continue
         lines[1] += "*----"
         if len(insertions) == 1:
-            labels += " " + printParticle_(insertions[0]) + "    "
-            lines[0] += " |     "
+            labels += " " + printParticle_(insertions[0]) + "  "
+            lines[0] += " |   "
         if len(insertions) == 2:
             labels += printParticle_(insertions[0]) + " " + \
                     printParticle_(insertions[1])
             if upwards:
-                lines[0] += "\\ /    "
+                lines[0] += "\\ /  "
             else:
-                lines[0] += "/ \\    "
+                lines[0] += "/ \\  "
         if len(insertions) > 2:
             logger.error("case for n-body decay, n>3 not yet. implemented. \
                           Please implement.")
@@ -69,26 +71,26 @@ def drawBranch_(branch, upwards, labels, htmlFormat, border, l):
             lines[1] += " "
             labels += " "
         labels += " " + " "*(5*lengthdiff) + " |"
-        lines[0] += " "*(5*lengthdiff + 0) + "    |"
+        lines[0] += " "*(5*lengthdiff + 0) + "  |"
         lines[1] += " "*(5*lengthdiff + 0) + " |"
     if border and upwards:
-        print " /" + "-"*(4*l + 4) + "\\"
+        print(" /" + "-"*(4*l + 4) + "\\")
     if htmlFormat:
-        print html
+        print(html)
     if upwards and labels:
-        print labels
+        print(labels)
     if htmlFormat:
-        print html
+        print(html)
     for i in order:
-        print lines[i]
+        print(lines[i])
     if htmlFormat:
-        print html
+        print(html)
     if not upwards and labels:
-        print labels
+        print(labels)
     if htmlFormat:
-        print html
+        print(html)
     if border and not upwards:
-        print " \\" + "-"*(4*l + 4) + "/"
+        print(" \\" + "-"*(4*l + 4) + "/")
 
 def asciidraw(element, labels=True, html=False, border=False):
     """
@@ -103,9 +105,9 @@ def asciidraw(element, labels=True, html=False, border=False):
                     border=border, l=max(l))
 
 if __name__ == "__main__":
-    import set_path, argparse, types
+    import setPath, argparse, types
     import SModelS
-    from theory import LHEReader, lheDecomposer, crossSection
+    from theory import lheReader, lheDecomposer, crossSection
 
     argparser = argparse.ArgumentParser(description = 'simple tool that is \
             meant to draw lessagraphs, as an ascii plot') 
@@ -119,11 +121,12 @@ if __name__ == "__main__":
             graph', action='store_true')
     args = argparser.parse_args()
 
-    filename = "%s/lhe/%s_1.lhe" % (SModelS.installDirectory(), args.T)
+    filename = "%sinputFiles/lhe/%s_1.lhe" % (SModelS.installDirectory(),
+                                              args.T)
     if args.lhe != "":
         filename = args.lhe
 
-    reader = LHEReader.LHEReader(filename)
+    reader = lheReader.lheReader(filename)
     Event = reader.next()
     element = lheDecomposer.elementFromEvent(Event,
                                              crossSection.XSectionList())

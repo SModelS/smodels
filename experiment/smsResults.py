@@ -11,12 +11,14 @@
 
 """
 
-from experiment import smsHelpers
+from . import smsHelpers
 from tools.physicsUnits import addunit, rmvunit
 from tools import physicsUnits, rcFile
-from experiment import logger
-from experiment.experimentExceptions import MetaInfoError
-from experiment.smsHelpers import databaseVersion, getRun
+from .experimentExceptions import MetaInfoError
+from .smsHelpers import databaseVersion, getRun
+import logging                                                                  
+                                                                                
+logger = logging.getLogger(__name__)
 
 def setBase (base):
     """ just sets the base directory of the database """
@@ -44,7 +46,7 @@ def considerRuns(run=None):
         alldirectories = runsort
         for r in run:
             if not r in allruns:
-                print "%s is not a run!!!" % r
+                logger.info("%s is not a run!" % r)
     else:
         smsHelpers.runs = allruns
         alldirectories = allruns
@@ -95,7 +97,7 @@ def getAllResults (run=None ):
     """
     import os
     key = str(run)
-    if allresults.has_key (key):
+    if key in allresults:
         return allresults[key]
     runs = smsHelpers.runs
     if run: runs = [ run ]
@@ -168,7 +170,7 @@ def getInterpolatedUpperLimitDelaunay (Dict, inmx, inmy):
         grid_x = mx
         grid_y = my
         return float(ip.griddata(points, values, (grid_x, grid_y), method='linear'))
-    except Exception, e:
+    except Exception as e:
         logger.error ("cannot interpolate: %s. use closest value." % str(e))
         if not inConvexHull (Dict, inmx, inmy): return False
         return getClosestValue (Dict, inmx, inmy)
@@ -192,8 +194,6 @@ def getInterpolatedUpperLimit (Dict, inmx, inmy):
             xV.append (xvalue)
             yV.append (yvalue)
             zV.append (zvalue)
-    # for i in range(len(xV)):
-    #    print xV[i],yV[i],zV[i]
     try:
         ip2d = ip.interpolate.interp2d (xV, yV, zV, kind='cubic', fill_value=999999.)
         tmp = ip2d(mx, my)
@@ -203,23 +203,21 @@ def getInterpolatedUpperLimit (Dict, inmx, inmy):
         if abs (tmp[0] - cv) / cv < 0.3: return tmp[0]
         logger.warning ("when interpolating, would have had to interpolate too much. returning None.")
         return None
-    except Exception, e:
+    except Exception as e:
         logger.warning ("when interpolating, caught exception: " + str(e))
         return None
-
-    # print "mx=",mx,"my=",my,"res=",ip2d( mx, my )
 
 def getUpperLimitFromDictionary (analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False, expected=False):
     """ shouldnt have to call this directly. It's obtaining an upper limit from the python dictionary """
     Dict = smsHelpers.getUpperLimitDictionary (analysis, topo, run, expected=expected)
     if Dict == None: return Dict
     if mx==None and my==None:
-      return Dict
+        return Dict
     if mx==None or my==None:
-      logger.error ( "asking for upper limits for mx=%s my=%s" % ( mx, my ) )
-      return None
+        logger.error("asking for upper limits for mx=%s my=%s" % (mx, my))
+        return None
     if rmvunit(mx, 'GeV') == None: return Dict
-    return addunit (getInterpolatedUpperLimitDelaunay (Dict, mx, my), "pb")
+    return addunit(getInterpolatedUpperLimitDelaunay(Dict, mx, my), "pb")
 
 def getSmartUpperLimit (analysis, topo, masses, massesbranch2=None, debug=False):
     """ returns the upper limit for analysis/topo, given an ordered sequence of
@@ -298,7 +296,7 @@ def getx (analysis, topo=None, run=None):
 
     if topo:
         topo = topo.replace(" ", "")
-        if not d or not d.has_key (topo): return None
+        if not d or not topo in d: return None
         else: return d[topo]
 
     return d
@@ -318,14 +316,14 @@ def getConditions (analysis, topo="all", fuzzy=True, run=None):
             returns a dictionary, else it returns the condition
             only for the given topo, None if non-existent. """
     key = analysis + topo + str(fuzzy) + str(run)
-    if conditions.has_key (key): return conditions[key]
+    if key in conditions: return conditions[key]
     run = smsHelpers.getRun (analysis, run)
     if fuzzy: ret = smsHelpers.fuzzyconditions (analysis, run)
     else: ret = smsHelpers.conditions (analysis, run)
     if topo == "all":
         conditions[key] = ret
         return ret
-    if not ret.has_key (topo):
+    if not topo in ret:
         conditions[key] = None
         return None
     conditions[key] = ret[topo]
@@ -338,13 +336,13 @@ def getConstraints (analysis, topo="all", run=None):
             returns a dictionary, else it returns the constraint
             only for the given topo, None if non-existent. """
     key = analysis + topo + str(run)
-    if constraints.has_key (key): return constraints[key]
+    if key in constraints: return constraints[key]
     run = smsHelpers.getRun (analysis, run)
     ret = smsHelpers.constraints (analysis, run)
     if topo == "all":
         constraints[key] = ret
         return ret
-    if not ret.has_key (topo):
+    if not topo in ret:
         constraints[key] = None
         return None
     constraints[key] = ret[topo]
@@ -384,25 +382,28 @@ def exists(analysis, topo, run=None):
         else:
             return False
     axes = getaxes(analysis, topo)
-    if not axes: return False
+    if not axes:
+        return False
     hasDict = smsHelpers.hasDictionary (analysis, run2)
-    for a in axes:
-# print "a=",a
-        mzname = None
-        if a['mz'] and len(a['mz']): mzname = a['mz'][0]
-        toponame = smsInterpolation.getHistName(topo, mzname)
-        if hasDict:
-# print "BBB 1 ana=%s run=%s run2=%s" % ( analysis,run,run2 )
-            Dict = smsHelpers.getUpperLimitDictionary (analysis, toponame, run2)
-            if not Dict or len(Dict) == 0: return False
-            continue
-        else:
-            return False
+    if not hasDict: return False
+    return smsHelpers.hasDictionary (analysis, run2, topo )
+    ### FIXME why so complicated???
+    #for a in axes:
+    #    mzname = None
+    #    if a['mz'] and len(a['mz']): mzname = a['mz'][0]
+    #    if hasDict:
+    #        toponame = smsInterpolation.getHistName(topo, mzname)
+    #        Dict = smsHelpers.getUpperLimitDictionary (analysis, toponame, run2)
+    #        if not Dict or len(Dict) == 0: 
+    #            return False
+    #        continue
+    #    else:
+    #        return False
 
-    return True
+    #return True
 
 
-def getaxes (analysis, topo=None, run=None):
+def getaxes(analysis, topo=None, run=None):
     """ get information about the histogram axes for this analysis: for each topo
         list of dictionary, each dictionary corresponds to one histogram, the key
         axes gives string (mx-my), the key mz gives information on other masses, if
@@ -433,7 +434,7 @@ def getaxes (analysis, topo=None, run=None):
 
     if topo:
         topo = topo.replace(" ", "")
-        if not d or not d.has_key (topo):
+        if not d or not topo in d:
     # # topology does not exist, we return None
             return None
         else: return d[topo]

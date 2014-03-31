@@ -11,7 +11,9 @@ to plot the mass spectrum and decay chains.
 The current release supports SLHA version 1, and as far as I'm aware is also
 fully compatible with SLHA2: the block structures are read and accessed
 generically. If you have any problems, please provide an example input file and
-I'll happily investigate.
+I'll happily investigate. SLHA3 is not yet supported (or standardised) but in
+recent releases the new structures will not crash the parser. Support will be
+added once the format is standardised (and in response to demand!)
 
 The plotting script provides output in PDF, EPS and PNG via LaTeX and the TikZ
 graphics package, and as LaTeX/TikZ source for direct embedding into documents or
@@ -33,34 +35,34 @@ please cite the paper: http://arxiv.org/abs/1305.4194
 
 TODOs:
 
-  For 2.1.3:
-   * In set_value, if first item is non-int, treat as None-indexed
+  For 3.0.x:
+   * Add handling of XSECTION if/when standardised.
+   * In set_value, if first item is non-int, treat as None-indexed.
    * Refine value string heuristic for strings with ints in them?
+   * Use Doc to handle document-level header comments.
+   * Add block and decay summary comments to the OrderedDict (wrap OrderedDict as DataStore?)
 
-  For 2.2.0:
-   * Add Sphinx docs.
-   * Preserve comments from read -> write (needs full-line/inline comment
+  For 3.1.x:
+   * Preserve inline comments from read -> write (needs full-line/inline comment
      separation). Can use separate comment dicts in Block and Decay, and
      attach a multiline .comment attr to the returned/written dicts.
 
   Later/maybe:
-   * Identify HERWIG decay matrix element to use in ISAWIG
-   * Handle RPV SUSY in ISAWIG
+   * Add Sphinx docs.
+   * Identify HERWIG decay matrix element to use in ISAWIG.
+   * Handle RPV SUSY in ISAWIG.
 """
 
 __author__ = "Andy Buckley <andy.buckley@cern.ch>"
-__version__ = "2.1.2"
+__version__ = "3.0.0"
 
-"""
-!!!hacked version: is able to read SLHA Files with an additional XSECTION block by ignoring it.
-   NOT able to read, modify or write the XSECTION block!!!
-   modifications only in readSLHA()
-"""
+
+
 ###############################################################################
 ## Private utility functions
 
 def _mkdict():
-    """Try to return an empty ordered dict, but fall back to normal dict if necessary"""
+    """Return an OrderedDict if possible, or a normal dict if not."""
     try:
         from collections import OrderedDict
         return OrderedDict()
@@ -70,6 +72,21 @@ def _mkdict():
             return OrderedDict()
         except:
             return dict()
+
+_d = _mkdict()
+class _dict(type(_d)):
+    """A cosmetic wrapper on an OrderedDict if possible, or a normal dict if not."""
+
+    def __init__(self, name=None):
+        super(_dict, self).__init__()
+        self.name = name
+
+    def __repr__(self):
+        s = ""
+        if self.name:
+            s += self.name + "\n"
+        s += "\n  ".join(str(val) for val in self.values())
+        return s
 
 def _autotype(var):
     """Automatically convert strings to numerical types if possible."""
@@ -98,6 +115,29 @@ def _autotuple(a):
         return a[0]
     return tuple(a)
 
+def _read(f):
+    """Read a file's contents, autodetecting whether the arg is a file or filename,
+    and treating '-' as as indication to read from stdin."""
+    if type(f) is str:
+        if f == "-":
+            return sys.stdin.read()
+        else:
+            with open(f, "r") as ff:
+                return ff.read()
+    else:
+        return f.read()
+
+def _write(f, txt):
+    """Write to a file, autodetecting whether the arg is a file or filename,
+    and treating '-' as as indication to write to stdout."""
+    if type(f) is str:
+        if f == "-":
+            sys.stdout.write(txt)
+        else:
+            with open(f, "w") as ff:
+                f.write(txt)
+    else:
+        f.write(txt)
 
 
 ###############################################################################
@@ -117,6 +157,37 @@ class ParseError(Exception):
     def __str__(self):
         return self.msg
 
+
+###############################################################################
+## The Doc top-level container object
+
+
+class Doc(object):
+    "Top level container for everything in an SLHA record"
+    def __init__(self, blocks, decays=None, xsections=None):
+        self.blocks = blocks
+        self.decays = decays
+        self.xsections = xsections
+        self.comment = ""
+
+    def write(self, filename=None, ignorenobr=False, precision=8):
+        """
+        Convenient method for converting an SLHA Doc object to SLHA format,
+        either returned as a string or written to a file depending on whether
+        the filename variable is None.
+        """
+        if filename is None:
+            return writeSLHA(self, ignorenobr, precision)
+        else:
+            write(filename, self, ignorenobr, precision)
+
+    def __repr__(self):
+        s = "<PySLHA Doc: %d blocks, %d decays, %d xsections" % \
+            (len(self.blocks or []), len(self.decays or []), len(self.xsections or []))
+        if self.comment:
+            s += " %s" % self.comment
+        s += ">"
+        return s
 
 
 ###############################################################################
@@ -153,7 +224,7 @@ class Block(object):
     """
     def __init__(self, name, q=None, entries=None):
         self.name = name
-        self.entries = _mkdict()
+        self.entries = _dict()
         if entries is not None:
             self.entries.update(entries)
         self.q = _autotype(q)
@@ -168,15 +239,15 @@ class Block(object):
         types when possible. For the treatment of the resulting iterable see the
         set_value method.
         """
-## If the argument is a single string, split it and proceed
+        ## If the argument is a single string, split it and proceed
         if type(args) is str:
             args = args.split()
-## Check that the arg is an iterable
+        ## Check that the arg is an iterable
         if not hasattr(args, "__iter__"):
             raise AccessError("Block entries must be iterable")
-## Auto-convert the types in the list
+        ## Auto-convert the types in the list
         args = map(_autotype, args)
-## Re-join consecutive strings into single entries
+        ## Re-join consecutive strings into single entries
         i = 0
         while i < len(args)-1:
             if type(args[i]) is str and type(args[i+1]) is str:
@@ -184,7 +255,7 @@ class Block(object):
                 del args[i+1]
                 continue
             i += 1
-## Add the entry to the map, with appropriate indices
+        ## Add the entry to the map, with appropriate indices
         self.set_value(*args)
 
     def is_single_valued(self):
@@ -192,15 +263,20 @@ class Block(object):
         'value()' attribute may be used in that case without an argument."""
         return len(self.entries) == 1 and self.entries.keys()[0] is None
 
-    def value(self, key=None):
+    def value(self, key=None, default=1):
         """Get a value from the block with the supplied key.
 
         If no key is given, then the block must contain only one non-indexed
         value otherwise an AccessError exception will be raised.\
         """
-        if key == None and not self.is_single_valued():
+        if key is None and not self.is_single_valued():
             raise AccessError("Tried to access unique value of multi-value block")
+        if not self.has_key(key):
+            return default
         return self.entries[key]
+
+    "Alias"
+    get = value
 
     def set_value(self, *args):
         """Set a value in the block via supplied key/value arguments.
@@ -222,16 +298,19 @@ class Block(object):
                 raise AccessError("Tried to set a unique value on a multi-value block")
             self.entries[None] = args[0]
         else:
-    ## Find the first non-integer -- all previous items are indices
+            ## Find the first non-integer -- all previous items are indices
             i_first_nonint = -1
             for i, x in enumerate(args):
                 if type(x) is not int:
                     i_first_nonint = i
                     break
             if i_first_nonint == 0:
-                raise AccessError("Attempted to set a block entry with a non-integer(s) index")
+                pass
             else:
                 self.entries[_autotuple(args[:i_first_nonint])] = _autotuple(args[i_first_nonint:])
+
+    "Alias"
+    set = set_value
 
     def has_key(self, key):
         """Does the block have the given key?"""
@@ -347,78 +426,90 @@ class Particle(object):
 ###############################################################################
 ## SLHA parsing and writing functions
 
-def readSLHA(spcstr, D ): ## ignorenobr=False, ignorenomass=False ):
+def readSLHA(spcstr, ignorenobr=False, ignorenomass=False, ignoreblocks=[]):
     """
     Read an SLHA definition from a string, returning dictionaries of blocks and
     decays.
 
     If the ignorenobr parameter is True, do not store decay entries with a
     branching ratio of zero.
+
+    If the ignorenomass parameter is True, parse file even if mass block is
+    absent in the file (default is to raise a ParseError).
     """
-    ignorenobr=False
-    ignorenomass=False
-    if D.has_key ( "ignorenobr" ): ignorenobr=D["ignorenobr"]
-    if D.has_key ( "ignorenomass" ): ignorenomass=D["ignorenomass"]
-    blocks = _mkdict()
-    decays = _mkdict()
+    blocks = _dict("Blocks")
+    decays = _dict("Decays")
     #
     import re
     currentblock = None
     currentdecay = None
-    currentxsec = None          #new switch added
     for line in spcstr.splitlines():
-## Handle (ignore) comment lines
-# TODO: Store block/entry comments
+        ## Handle (ignore) comment lines
+        # TODO: Store block/entry comments
         if line.startswith("#"):
             continue
         if "#" in line:
             line = line[:line.index("#")]
+        ## Ignore empty lines (after comment removal and whitespace trimming)
+        if not line.strip():
+            continue
 
-## Handle BLOCK/DECAY start lines
-        if line.upper().startswith("BLOCK"):
-    #print line
-            match = re.match(r"BLOCK\s+(\w+)(\s+Q\s*=\s*.+)?", line.upper())
-            if not match:
-                continue
-            blockname = match.group(1)
-            qstr = match.group(2)
-            if qstr is not None:
-                qstr = qstr[qstr.find("=")+1:].strip()
-            currentblock = blockname
-            currentdecay = None
-            currentxsec = None           #new switch
-            blocks[blockname] = Block(blockname, q=qstr)
-        elif line.upper().startswith("DECAY"):
-            match = re.match(r"DECAY\s+(-?\d+)\s+([\d\.E+-]+|NAN).*", line.upper())
-            if not match:
-                continue
-            pdgid = int(match.group(1))
-            width = float(match.group(2)) if match.group(2) != "NAN" else None
-            currentblock = "DECAY"
-            currentdecay = pdgid
-            currentxsec = None        #new switch
-            decays[pdgid] = Particle(pdgid, width)
-        elif line.upper().startswith("XSECTION"):   #new 'elif' to  identify the XSECTION block
-            currentxsec = "XSECTION"
-            currentblock = None
-            currentdecay = None
+        ## Section header lines start with a non-whitespace character, data lines have a whitespace indent
+        # TODO: Are tabs also allowed for indents? Check the SLHA standard.
+        if not line.startswith(" "):
+            # TODO: Should we now strip the line to remove any trailing whitespace?
+
+            ## Handle BLOCK start lines
+            if line.upper().startswith("BLOCK"):
+                #print line
+                match = re.match(r"BLOCK\s+(\w+)(\s+Q\s*=\s*.+)?", line.upper())
+                if not match:
+                    continue
+                blockname = match.group(1)
+                if blockname in ignoreblocks:
+                    currentblock = None
+                    currentdecay = None
+                else:
+                    qstr = match.group(2)
+                    if qstr is not None:
+                        qstr = qstr[qstr.find("=")+1:].strip()
+                    currentblock = blockname
+                    currentdecay = None
+                    blocks[blockname] = Block(blockname, q=qstr)
+            ## Handle DECAY start lines
+            elif line.upper().startswith("DECAY"):
+                match = re.match(r"DECAY\s+(-?\d+)\s+([\d\.E+-]+|NAN).*", line.upper())
+                if not match:
+                    continue
+                pdgid = int(match.group(1))
+                width = float(match.group(2)) if match.group(2) != "NAN" else None
+                currentblock = "DECAY"
+                currentdecay = pdgid
+                decays[pdgid] = Particle(pdgid, width)
+            ## Handle unknown section type start lines (and continue ignoring until a non-header line is found)
+            elif type(_autotype(line.split()[0])) is str:
+                import sys
+                sys.stderr.write("Ignoring unknown section type: %s\n" % line.split()[0])
+                currentblock = None
+                currentdecay = None
+
+        ## This non-empty line starts with an indent, hence must be an in-section data line
         else:
-    ## In-block line
+            # TODO: Should we now strip the line to remove the indent (and any trailing whitespace)?
             if currentblock is not None:
                 items = line.split()
                 if len(items) < 1:
                     continue
-                if currentblock != "DECAY" and currentblock != "XSECTION":  #only for BLOCK blocks
+                if currentblock != "DECAY":
                     blocks[currentblock].add_entry(items)
-                elif currentblock == "DECAY":                  #'elif' instead of 'else', just DECAY block
-#                else:
+                # TODO: Add handling of XSECTION if/when standardised
+                else:
                     br = float(items[0]) if items[0].upper() != "NAN" else None
                     nda = int(items[1])
                     ids = map(int, items[2:])
                     if br > 0.0 or not ignorenobr: # br == None is < 0
                         decays[currentdecay].add_decay(br, nda, ids)
-                else:                                       #ignore XSECTION block
-                    continue
+
     ## Try to populate Particle masses from the MASS block
     # print blocks.keys()
     try:
@@ -429,8 +520,8 @@ def readSLHA(spcstr, D ): ## ignorenobr=False, ignorenomass=False ):
         if not ignorenomass:
             raise ParseError("No MASS block found: cannot populate particle masses")
 
-    return blocks, decays
-
+    rtn = Doc(blocks, decays)
+    return rtn
 
 
 def writeSLHABlocks(blocks, precision=8):
@@ -444,7 +535,7 @@ def writeSLHABlocks(blocks, precision=8):
         blockstr = "BLOCK %s\n" % namestr
         entrystrs = []
         for k, v in b.items():
-            entrystr = ""
+            entrystr = sep
             if type(k) == tuple:
                 entrystr += sep.join(_autostr(i, precision) for i in k)
             elif k is not None:
@@ -475,9 +566,9 @@ def writeSLHADecays(decays, ignorenobr=False, precision=8):
 
 
 
-def writeSLHA(blocks, decays, ignorenobr=False, precision=8):
+def writeSLHA(doc, ignorenobr=False, precision=8):
     """Return an SLHA definition as a string, from the supplied blocks and decays dicts."""
-    ss = [x for x in (writeSLHABlocks(blocks, precision), writeSLHADecays(decays, ignorenobr, precision)) if x]
+    ss = [x for x in (writeSLHABlocks(doc.blocks, precision), writeSLHADecays(doc.decays, ignorenobr, precision)) if x]
     return "\n\n".join(ss)
 
 
@@ -702,21 +793,21 @@ def readISAWIG(isastr, ignorenobr=False):
     branching ratio of zero.
     """
 
-    blocks = _mkdict()
-    decays = _mkdict()
+    blocks = _dict("Blocks")
+    decays = _dict("Decays")
     LINES = isastr.splitlines()
 
     def getnextvalidline():
         while LINES:
             s = LINES.pop(0).strip()
-    # print "*", s, "*"
-    ## Return None if EOF reached
+            # print "*", s, "*"
+            ## Return None if EOF reached
             if len(s) == 0:
                 continue
-    ## Strip comments
+            ## Strip comments
             if "#" in s:
                 s = s[:s.index("#")].strip()
-    ## Return if non-empty
+            ## Return if non-empty
             if len(s) > 0:
                 return s
 
@@ -732,14 +823,14 @@ def readISAWIG(isastr, ignorenobr=False):
         pdgid = herwigid2pdgid(hwid)
         masses[pdgid] = mass
         decays[pdgid] = Particle(pdgid, width, mass)
-#print pdgid, mass, width
+        #print pdgid, mass, width
     blocks["MASS"] = masses
 
     ## Populate decays
     for n in xrange(numentries):
         numdecays = int(getnextvalidline())
         for d in xrange(numdecays):
-    #print n, numentries-1, d, numdecays-1
+            #print n, numentries-1, d, numdecays-1
             decayitems = getnextvalidlineitems()
             hwid = decayitems[0]
             pdgid = herwigid2pdgid(hwid)
@@ -751,7 +842,7 @@ def readISAWIG(isastr, ignorenobr=False):
                 if hw != 0:
                     daughter_pdgids.append(herwigid2pdgid(hw))
             if not decays.has_key(pdgid):
-        #print "Decay for unlisted particle %d, %d" % (hwid, pdgid)
+                #print "Decay for unlisted particle %d, %d" % (hwid, pdgid)
                 decays[pdgid] = Particle(pdgid)
             decays[pdgid].add_decay(br, len(daughter_pdgids), daughter_pdgids)
 
@@ -816,10 +907,10 @@ def readISAWIG(isastr, ignorenobr=False):
 
     # TODO: Parse RPV boolean and couplings into SLHA2 blocks
 
-    return blocks, decays
+    return Doc(blocks, decays)
 
 
-def writeISAWIG(blocks, decays, ignorenobr=False, precision=8):
+def writeISAWIG(doc, ignorenobr=False, precision=8):
     """
     Return a SUSY spectrum definition in the format produced by ISAWIG for inut to HERWIG
     as a string, from the supplied SLHA blocks and decays dicts.
@@ -830,6 +921,10 @@ def writeISAWIG(blocks, decays, ignorenobr=False, precision=8):
     If the ignorenobr parameter is True, do not write decay entries with a
     branching ratio of zero.
     """
+
+    blocks = doc.blocks
+    decays = doc.decays
+
     masses = blocks["MASS"]
 
     ## Init output string
@@ -865,28 +960,28 @@ def writeISAWIG(blocks, decays, ignorenobr=False, precision=8):
     ## the decay mode. NME is a code for the matrix element to be used, either from the
     ## SUSY elements or the main HERWIG MEs. IDKPRD are the HERWIG identity codes of the decay products.
     for i, pid in enumerate(decays.keys()):
-# if not decays.has_key(pid):
-#     continue
+        # if not decays.has_key(pid):
+        #     continue
         hwid = pdgid2herwigid(pid)
         decayout = ""
-#decayout += "@@@@ %d %d %d\n" % (i, pid, hwid)
+        #decayout += "@@@@ %d %d %d\n" % (i, pid, hwid)
         for i_d, d in enumerate(decays[pid].decays):
-    ## Skip decay if it has no branching ratio
+            ## Skip decay if it has no branching ratio
             if ignorenobr and d.br == 0:
                 continue
 
-    ## Identify decay matrix element to use
-    ## From std HW docs, or from this pair:
-    ## Two new matrix element codes have been added for these new decays:
-    ##    NME =	200 	3 body top quark via charged Higgs
-    ##    	300 	3 body R-parity violating gaugino and gluino decays
+            ## Identify decay matrix element to use
+            ## From std HW docs, or from this pair:
+            ## Two new matrix element codes have been added for these new decays:
+            ##    NME =	200 	3 body top quark via charged Higgs
+            ##    	300 	3 body R-parity violating gaugino and gluino decays
             nme = 0
-    # TODO: Get correct condition for using ME 100... this guessed from some ISAWIG output
+            # TODO: Get correct condition for using ME 100... this guessed from some ISAWIG output
             if abs(pid) in (6, 12):
                 nme = 100
-    ## Extra SUSY MEs
+            ## Extra SUSY MEs
             if len(d.ids) == 3:
-        # TODO: How to determine the conditions for using 200 and 300 MEs? Enumeration of affected decays?
+                # TODO: How to determine the conditions for using 200 and 300 MEs? Enumeration of affected decays?
                 pass
             decayout += ("%d " % hwid) + _autostr(d.br, precision) + (" %d " % nme)
 
@@ -922,8 +1017,8 @@ def writeISAWIG(blocks, decays, ignorenobr=False, precision=8):
 
             absids = map(abs, d.ids)
 
-    ## Order decay products as required by HERWIG
-    ## Top
+            ## Order decay products as required by HERWIG
+            ## Top
             if abs(pid) == 6:
                 def cmp_bottomlast(a, b):
                     """Comparison function which always puts b/bbar last"""
@@ -933,19 +1028,19 @@ def writeISAWIG(blocks, decays, ignorenobr=False, precision=8):
                         return False
                     return cmp(a, b)
                 if len(absids) == 2:
-            ## 2 body mode, to Higgs: Higgs; Bottom
+                    ## 2 body mode, to Higgs: Higgs; Bottom
                     if (25 in absids or 26 in absids) and 5 in absids:
                         d.ids = sorted(d.ids, cmp=cmp_bottomlast)
                 elif len(absids) == 3:
-            ## 3 body mode, via charged Higgs/W: quarks or leptons from W/Higgs; Bottom
+                    ## 3 body mode, via charged Higgs/W: quarks or leptons from W/Higgs; Bottom
                     if 37 in absids or 23 in absids:
                         d.ids = sorted(d.ids, cmp=cmp_bottomlast)
-    ## Gluino
+            ## Gluino
             elif abs(pid) == 1000021:
                 if len(absids) == 2:
-            ## 2 body mode
-            ## without gluon: any order
-            ## with gluon: gluon; colour neutral
+                    ## 2 body mode
+                    ## without gluon: any order
+                    ## with gluon: gluon; colour neutral
                     if 21 in absids:
                         def cmp_gluonfirst(a, b):
                             """Comparison function which always puts gluon first"""
@@ -956,7 +1051,7 @@ def writeISAWIG(blocks, decays, ignorenobr=False, precision=8):
                             return cmp(a, b)
                         d.ids = sorted(d.ids, cmp=cmp_gluonfirst)
                 elif len(absids) == 3:
-            ## 3-body modes, R-parity conserved: colour neutral; q or qbar
+                    ## 3-body modes, R-parity conserved: colour neutral; q or qbar
                     def cmp_quarkslast(a, b):
                         """Comparison function which always puts quarks last"""
                         if is_quark(a):
@@ -965,7 +1060,7 @@ def writeISAWIG(blocks, decays, ignorenobr=False, precision=8):
                             return False
                         return cmp(a, b)
                     d.ids = sorted(d.ids, cmp=cmp_quarkslast)
-    ## Squark/Slepton
+            ## Squark/Slepton
             elif is_squark(pid) or is_slepton(pid):
                 def cmp_susy_quark_lepton(a, b):
                     if is_susy(a):
@@ -977,22 +1072,22 @@ def writeISAWIG(blocks, decays, ignorenobr=False, precision=8):
                     if is_quark(b):
                         return True
                     return cmp(a, b)
-        ##   2 body modes: Gaugino/Gluino with Quark/Lepton     Gaugino      quark
-        ##                                                      Gluino       lepton
-        ##   3 body modes: Weak                                 sparticle    particles from W decay
-        ## Squark
-        ##   2 body modes: Lepton Number Violated               quark     lepton
-        ##                 Baryon number violated               quark     quark
-        ## Slepton
-        ##   2 body modes: Lepton Number Violated               q or qbar
+                ##   2 body modes: Gaugino/Gluino with Quark/Lepton     Gaugino      quark
+                ##                                                      Gluino       lepton
+                ##   3 body modes: Weak                                 sparticle    particles from W decay
+                ## Squark
+                ##   2 body modes: Lepton Number Violated               quark     lepton
+                ##                 Baryon number violated               quark     quark
+                ## Slepton
+                ##   2 body modes: Lepton Number Violated               q or qbar
                 d.ids = sorted(d.ids, cmp=cmp_bottomlast)
-    ## Higgs
+            ## Higgs
             elif pid in (25, 26):
-        # TODO: Includes SUSY Higgses?
-        ## Higgs
-        ##   2 body modes: (s)quark-(s)qbar                     (s)q or (s)qbar
-        ##                 (s)lepton-(s)lepton                  (s)l or (s)lbar
-        ##   3 body modes:                                      colour neutral       q or qbar
+                # TODO: Includes SUSY Higgses?
+                ## Higgs
+                ##   2 body modes: (s)quark-(s)qbar                     (s)q or (s)qbar
+                ##                 (s)lepton-(s)lepton                  (s)l or (s)lbar
+                ##   3 body modes:                                      colour neutral       q or qbar
                 if len(absids) == 3:
                     def cmp_quarkslast(a, b):
                         """Comparison function which always puts quarks last"""
@@ -1003,13 +1098,13 @@ def writeISAWIG(blocks, decays, ignorenobr=False, precision=8):
                         return cmp(a, b)
                     d.ids = sorted(d.ids, cmp=cmp_quarkslast)
             elif is_gaugino(pid):
-        # TODO: Is there actually anything to do here?
-        ## Gaugino
-        ##   2 body modes: Squark-quark                         q or sq
-        ##                 Slepton-lepton                       l or sl
-        ##
-        ##   3 body modes: R-parity conserved                   colour neutral       q or qbar
-        ##                                                                           l or lbar
+                # TODO: Is there actually anything to do here?
+                ## Gaugino
+                ##   2 body modes: Squark-quark                         q or sq
+                ##                 Slepton-lepton                       l or sl
+                ##
+                ##   3 body modes: R-parity conserved                   colour neutral       q or qbar
+                ##                                                                           l or lbar
                 if len(absids) == 3:
                     def cmp_quarkslast(a, b):
                         """Comparison function which always puts quarks last"""
@@ -1020,10 +1115,10 @@ def writeISAWIG(blocks, decays, ignorenobr=False, precision=8):
                         return cmp(a, b)
                     d.ids = sorted(d.ids, cmp=cmp_quarkslast)
 
-    # TODO: Gaugino/Gluino
-    ##   3 body modes:  R-parity violating:   Particles in the same order as the R-parity violating superpotential
+            # TODO: Gaugino/Gluino
+            ##   3 body modes:  R-parity violating:   Particles in the same order as the R-parity violating superpotential
 
-    ## Pad out IDs list with zeros
+            ## Pad out IDs list with zeros
             ids = [0,0,0,0,0]
             for i, pid in enumerate(d.ids):
                 ids[i] = pid
@@ -1079,78 +1174,101 @@ def writeISAWIG(blocks, decays, ignorenobr=False, precision=8):
 ###############################################################################
 ## File-level read/write functions
 
-def readSLHAFile(spcfilename, **kwargs):
+
+def read(spcfile, **kwargs):
+    """
+    Read an SLHA or ISAWIG file (or stdin).
+
+    spcfile may either be a string filename or a file object.
+    If a s string, the assumed file format is based from the
+    filename; if a file it is assumed to be SLHA format.
+
+    Other keyword parameters are passed to readSLHA/readISAWIG.
+    """
+    txt = _read(spcfile)
+    if type(spcfile) is str and spcfile.endswith(".isa"):
+        return readISAWIG(txt, **kwargs)
+    else:
+        return readSLHA(txt, **kwargs)
+
+def readSLHAFile(spcfile, **kwargs):
     """
     Read an SLHA file, returning dictionaries of blocks and decays.
 
     Other keyword parameters are passed to readSLHA.
     """
-    f = open(spcfilename, "r")
-    rtn = readSLHA(f.read(), kwargs)
-    f.close()
-    return rtn
+    return readSLHA(_read(spcfile), **kwargs)
 
-
-def writeSLHAFile(spcfilename, blocks, decays, **kwargs):
-    """
-    Write an SLHA file from the supplied blocks and decays dicts.
-
-    Other keyword parameters are passed to writeSLHA.
-    """
-    f = open(spcfilename, "w")
-    f.write(writeSLHA(blocks, decays, kwargs))
-    f.close()
-
-
-def readISAWIGFile(isafilename, **kwargs):
+def readISAWIGFile(isafile, **kwargs):
     """
     Read a spectrum definition from a file in the ISAWIG format, returning
     dictionaries of blocks and decays. While this is not an SLHA format, it is
     informally supported as a useful mechanism for converting ISAWIG spectra to
     SLHA.
 
-    Other keyword parameters are passed to readSLHA.
+    isafile may either be a string filename or a file object.
+
+    Other keyword parameters are passed to readISAWIG.
     """
-    f = open(isafilename, "r")
-    rtn = readISAWIG(f.read(), kwargs)
-    f.close()
-    return rtn
+    return readISAWIG(_read(isafile), **kwargs)
 
 
-def writeISAWIGFile(isafilename, blocks, decays, **kwargs):
+def write(spcfile, doc, **kwargs):
+    """
+    Write to an SLHA or ISAWIG file (or stdout).
+
+    spcfile may either be a string filename or a file object.
+    If a s string, the assumed file format is based from the
+    filename; if a file it is assumed to be SLHA format.
+
+    Other keyword parameters are passed to writeSLHA/writeISAWIG.
+    """
+    if type(spcfile) is str and spcfile.endswith(".isa"):
+        writeISAWIG(spcfile, doc, **kwargs)
+    else:
+        writeSLHA(spcfile, doc, **kwargs)
+
+def writeSLHAFile(spcfile, doc, **kwargs):
+    """
+    Write an SLHA file from the supplied blocks and decays dicts.
+
+    Other keyword parameters are passed to writeSLHA.
+    """
+    _write(spcfile, writeSLHA(doc, **kwargs))
+
+def writeISAWIGFile(isafile, doc, **kwargs):
     """
     Write an ISAWIG file from the supplied blocks and decays dicts.
 
+    isafile may either be a string filename or a file object.
+
     Other keyword parameters are passed to writeISAWIG.
     """
-    f = open(isafilename, "w")
-    f.write(writeISAWIG(blocks, decays, kwargs))
-    f.close()
-
+    _write(isafile, writeISAWIG(doc, **kwargs))
 
 
 ###############################################################################
 ## Main function for module testing
 
 if __name__ == "__main__":
+
     import sys
     for a in sys.argv[1:]:
-        if a.endswith(".isa"):
-            blocks, decays = readISAWIGFile(a)
-        else:
-            blocks, decays = readSLHAFile(a)
+        doc = read(a)
+        print doc
+        print
 
-        for bname, b in sorted(blocks.iteritems()):
+        for bname, b in sorted(doc.blocks.iteritems()):
             print b
             print
 
-        print blocks.keys()
+        print doc.blocks.keys()
 
-        print blocks["MASS"][25]
+        print doc.blocks["MASS"].get(25)
         print
 
-        for p in sorted(decays.values()):
+        for p in sorted(doc.decays.values()):
             print p
             print
 
-        print writeSLHA(blocks, decays, ignorenobr=True)
+        print writeSLHA(doc, ignorenobr=True)

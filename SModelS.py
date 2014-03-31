@@ -2,60 +2,74 @@
 
 """
 .. module:: SModelS
-    :synopsis: Intended as a potential main entry point, currently just for
-               returning the SModelS version number.
+   :synopsis: Intended as a potential main entry point, currently just for
+   returning the SModelS version number.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
 
+from __future__ import print_function
+import sys
+import os
+import inspect
+
 def installDirectory():
-    """ return the software installation directory, by looking at location of this method """
-    import os, inspect
-    ret=os.path.realpath ( inspect.getabsfile(installDirectory) )
-    ret=ret.replace("SModelS.py","")
+    """
+    Return the software installation directory, by looking at location of this
+    method.
+    
+    """
+    ret = os.path.realpath(inspect.getabsfile(installDirectory))
+    ret = ret.replace("SModelS.py", "")
     return ret
 
-def version( astuple=False, addCodeName=True ):
-    """ prints out version number of SModelS framework """
-    f=open("%s/version" % installDirectory() )
-    l=f.readline()
+
+def version(astuple=False, addCodeName=True):
+    """
+    Prints out version number of SModelS framework.
+    
+    """
+    f = open("%s/version" % installDirectory())
+    l = f.readline()
     f.close()
-    l=l.replace("\n","")
+    l = l.replace("\n","")
     l.strip()
     if not astuple:
-        if addCodeName: return l
-        p=l.find("/")
-        if p>-1: return l[:p]
-    T,C=l.split("/")
-    A,B=T.split(".")
+        if addCodeName:
+            return l
+        p = l.find("/")
+        if p > -1:
+            return l[:p]
+    t, c = l.split("/")
+    a, b = t.split(".")
     if addCodeName:
-        return (int(A),int(B),C.strip())
+        return (int(a), int(b), c.strip())
     else:
-        return (int(A),int(B))
+        return (int(a), int(b))
         
 
 def license():
-    f=open(installDirectory()+"COPYING")
-    lines=f.readlines()
+    f = open(installDirectory() + "COPYING")
+    lines = f.readlines()
     f.close()
     return "".join(lines)
 
+
 def printHelp():
-  import sys
-  print sys.argv[0]+": --help --installdir"
-  print "--help: show this message"
-  print "--installdir: print SModelS installation directory"
-  sys.exit(0)
+    print(sys.argv[0] + ": --help --installdir")
+    print("--help: show this message")
+    print("--installdir: print SModelS installation directory")
+    sys.exit(0)
 
 
 if __name__ == "__main__":
-    import sys
-    if len(sys.argv)<2: printHelp()
+    if len(sys.argv) < 2:
+        printHelp()
     for i in sys.argv[1:]:
-        if i=="--help": printHelp()
-        if i=="--installdir": 
-            print installDirectory()
+        if i == "--help":
+            printHelp()
+        if i == "--installdir": 
+            print(installDirectory())
             sys.exit(0)
-
     printHelp()

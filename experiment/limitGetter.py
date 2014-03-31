@@ -8,7 +8,7 @@
 
 """
 
-import smsResults
+from . import smsResults
 from tools.physicsUnits import rmvunit
 import copy
 import sys
@@ -69,7 +69,7 @@ def getPlotLimit(inmass, analysis, complain=False):
 
     # Skip empty mass arrays:
     if len(massarray) < 2: 
-        print 'M=', massarray
+        logger.info('M = ' + str(massarray))
         sys.exit()
         if complain:
             logger.error("Length of massarray < 2.")

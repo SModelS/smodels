@@ -6,9 +6,9 @@
     
 """
 
-from ParticleNames import PtcDic, Reven, simParticles, elementsInStr
-from branch import Branch
-import crossSection
+from .particleNames import ptcDic, rEven, simParticles, elementsInStr
+from .branch import Branch
+from . import crossSection
 import logging
 
 logger = logging.getLogger(__name__)
@@ -19,7 +19,7 @@ class Element(object):
     Element class. Holds a pair of branches and the element weight
     (cross-section*BR).
     
-    """
+    """    
     def __init__(self, info=None):
         """
         Constructor.
@@ -33,13 +33,15 @@ class Element(object):
             if type(info) == type(str()):
                 elements = elementsInStr(info)
                 if not elements or len(elements) > 1:
-                    logging.error("Wrong input string "+info)
+                    nel=0
+                    if elements: nel=len(elements)
+                    logging.error("Malformed input string. Number of elements is %d, expected 1: in ``%s''"% (nel,info))
                     return False                
                 else:
                     el = elements[0]
                     branches = elementsInStr(el[1:-1])
                     if not branches or len(branches) != 2:
-                        logging.error("Wrong input string "+info)
+                        logging.error("Malformed input string. Number of branches is %d, expected 2: in ``%s''" % ( len(branches), info) )
                         return False 
                     self.branches = []
                     for branch in branches:
@@ -52,6 +54,10 @@ class Element(object):
 
     def __eq__(self, other):
         return self.isEqual(other)
+    
+    
+    def __hash__(self):
+        return object.__hash__(self)
     
     
     def __ne__(self, other):
@@ -281,7 +287,7 @@ class Element(object):
                     logger.error("Wrong syntax")
                     return False
                 for ptc in vertex:
-                    if not ptc in Reven.values() and not PtcDic.has_key(ptc):
+                    if not ptc in rEven.values() and not ptc in ptcDic:
                         logger.error("Unknown particle"+ptc)
                         return False
         return True    

@@ -6,16 +6,14 @@
         
 """
 
-import sys
-import os
 import copy
 import time
-import element
-import topology
+from . import element
+from . import topology
+from tools import modpyslha as pyslha
+from . import crossSection
+from .branch import Branch, decayBranches
 from tools.physicsUnits import addunit, rmvunit
-import pyslha2 as pyslha
-import crossSection
-from branch import Branch, decayBranches
 import logging
 
 logger = logging.getLogger(__name__)
@@ -26,9 +24,6 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
     """
     Do SLHA-based decomposition.
     
-    .. todo:: currently using pyslha2 because we need this hack to handle SLHA
-    files with XSECTION blocks.
-
     :param slhafile: file with mass spectrum and branching ratios and
     optionally with cross-sections
     :param Xsec: optionally a dictionary with cross-sections for pair
@@ -118,15 +113,13 @@ def getDictionariesFromSLHA(slhafile):
     Read a SLHA file and get the mass and BR dictionaries.
     
     """
-    workdir = os.getcwd() 
-    pyslhadir = workdir + "/pyslha-1.4.3"
-    sys.path.append(pyslhadir)
+
     res = pyslha.readSLHAFile(slhafile)
 
     # Get mass and branching ratios for all particles:
     brDic = {}
-    for pid in res[1].keys():
-        brs = copy.deepcopy(res[1][pid].decays)
+    for pid in res.decays.keys():
+        brs = copy.deepcopy(res.decays[pid].decays)
         brsConj = copy.deepcopy(brs)
         for br in brsConj:
             br.ids = [-x for x in br.ids]
@@ -134,9 +127,9 @@ def getDictionariesFromSLHA(slhafile):
         brDic[-pid] = brsConj
     # Get mass list for all particles
     massDic = {}
-    for pid in res[1].keys():
-        if pid and res[1][pid].mass != None:
-            massDic[pid] = addunit(abs(res[1][pid].mass), 'GeV')
-            massDic[-pid] = addunit(abs(res[1][pid].mass), 'GeV')
+    for pid in res.decays.keys():
+        if pid and res.decays[pid].mass != None:
+            massDic[pid] = addunit(abs(res.decays[pid].mass), 'GeV')
+            massDic[-pid] = addunit(abs(res.decays[pid].mass), 'GeV')
 
     return brDic, massDic

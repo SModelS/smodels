@@ -10,8 +10,8 @@
 
 """
 
-import smsResults
-import smsHelpers
+from . import smsResults
+from . import smsHelpers
 import numpy as np
 from scipy.interpolate import griddata
 from tools.physicsUnits import rmvunit, addunit

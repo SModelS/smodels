@@ -6,8 +6,8 @@
         
 """
 
-import crossSection
-from auxiliaryFunctions import massAvg, massPosition, distance
+from . import crossSection
+from .auxiliaryFunctions import massAvg, massPosition, distance
 import logging
 
 logger = logging.getLogger(__name__)
