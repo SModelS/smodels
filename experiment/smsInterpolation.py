@@ -79,12 +79,12 @@ def doGridData(ana, topo, masses, dPar, debug=True, run=None):
         l = None
         m1 = None
 
-        if ds['mz'][0].find('d') > -1:
+        if ds['mz'][0].find('D') > -1:
             d = float(ds['mz'][0].split('=')[1])
         elif ds['mz'][0].find('LSP')>-1:
             l = float(ds['mz'][0].split("LSP")[1])
-        elif ds['mz'][0].find('m1')>-1:
-            m1 = float(ds['mz'][0].split("m1")[1])
+        elif ds['mz'][0].find('M1')>-1:
+            m1 = float(ds['mz'][0].split("M1")[1])
 
         ulDict = smsHelpers.getUpperLimitDictionary(ana, getHistName(topo,
                                                           ds['mz'][0]), run)
