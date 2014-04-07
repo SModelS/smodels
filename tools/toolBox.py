@@ -9,8 +9,10 @@
 """
 
 import logging
-
+FORMAT = '%(levelname)s in %(module)s.%(funcName)s(): %(message)s'
+logging.basicConfig(format=FORMAT)
 logger = logging.getLogger(__name__)
+logger.setLevel ( level=logging.INFO )
 
 class ToolBox:
     """
@@ -84,7 +86,8 @@ class ToolBox:
         if make and hasMade:
             ret += "Check again:\n"
             ret += self.checkInstallation(self, colors, make=False)
-        logger.info(ret)
+        ## logger.info(ret)
+        print (ret)
 
     def compile(self):
         for(name, instance) in self.tools.items():
