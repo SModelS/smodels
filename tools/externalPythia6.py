@@ -58,14 +58,6 @@ class ExternalPythia6(ExternalTool):
         self.unlink ()
         return out
 
-
-    def clean(self):
-        """ remote fort.61 and fort.68 """
-        import os
-        for File in [ "fort.61", "fort.68" ]:
-            if os.path.exists ( File ): os.unlink ( File )
-            
-
     def compile(self):
         """ compile pythia_lhe """
         logger.info("Trying to compile pythia:")
@@ -118,11 +110,13 @@ class ExternalPythia6(ExternalTool):
             if out[nr].find(line)==-1:
                 logger.error("Something is wrong with the setup: " + str(out))
                 return False
-        self.clean()
+        self.unlink()
         return True
     
 
 if __name__ == "__main__":
     tool=ExternalPythia6()
-    logger.info("installed:" + str(tool.installDirectory()))
-    logger.info("check:" + str(tool.checkInstallation()))
+    print("installed:" + str(tool.installDirectory()))
+    print("check:" + str(tool.checkInstallation()))
+    print("run:")
+    tool.run ( "../etc/pythia6_test.cfg" )
