@@ -150,4 +150,4 @@ nllFastTools={ 7:ExternalNllFast7(), 8:ExternalNllFast8(),
 
 if __name__ == "__main__":
     for (sqrts,tool) in nllFastTools.items():
-        logger.info("%s: installed in %s" % (tool.name,tool.installDirectory()))
+        print("%s: installed in %s" % (tool.name,tool.installDirectory()))
