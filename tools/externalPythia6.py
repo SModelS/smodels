@@ -10,6 +10,7 @@
 import setPath
 from externalTool import ExternalTool
 from tools import logger
+import tempfile
 
 class ExternalPythia6(ExternalTool):
     def __init__(self,
@@ -27,7 +28,16 @@ class ExternalPythia6(ExternalTool):
         self.test_params_path=self.absPath ( test_params_path )
         self.src_path=self.absPath ( src_path )
         self.verbose=False
+        self.tempdir=tempfile.mkdtemp()
 
+    def unlink( self ): ## remove cruft
+        import os
+        logger.debug ( "unlinking %s " % self.tempdir )
+        for File in [ "fort.61", "fort.68" ]:
+            if os.path.exists ( self.tempdir + "/" + File ):
+                os.unlink ( self.tempdir + "/" + File )
+        if os.path.exists ( self.tempdir ):
+            os.rmdir ( self.tempdir )
 
     def run(self, cfg_file):
         """
@@ -41,9 +51,11 @@ class ExternalPythia6(ExternalTool):
         cfg=os.path.abspath ( cfg_file )
         if not os.path.exists( cfg ): 
             return "config file ``%s'' not found" % ( cfg )
-        cmd="%s < %s" % ( self.executable_path, cfg_file )
+        cmd="cd %s ; %s < %s" % ( self.tempdir, self.executable_path, cfg_file )
+        # cmd="%s < %s" % ( self.executable_path, cfg_file )
         Out=commands.getoutput ( cmd )
         out=Out.split("\n")
+        self.unlink ()
         return out
 
 
