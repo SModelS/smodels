@@ -194,6 +194,9 @@ def getUpperLimitDictionary ( analysis, topo, run, expected=False ):
     Locals={}
     execfile(dictfile,Locals)
     if expected:
+        if not Locals.has_key("ExpectedDict"):
+            logger.warn("expected dictionary is missing for analysis "+analysis)
+            return None
         Dict=Locals["ExpectedDict"]
         if not Dict.has_key ( topo ):
             logger.warn("dictionary doesnt have topology "+topo )
@@ -201,6 +204,9 @@ def getUpperLimitDictionary ( analysis, topo, run, expected=False ):
             return None
         expupperLimitDict[key]=Dict[topo]
     else:
+        if not Locals.has_key("Dict"):
+            logger.warn("observed dictionary is missing for analysis "+analysis)
+            return None
         Dict=Locals["Dict"]
         if not Dict.has_key ( topo ):
             logger.warn("dictionary doesnt have topology "+topo )
