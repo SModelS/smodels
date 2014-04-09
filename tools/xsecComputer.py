@@ -136,39 +136,13 @@ def runPythia(slhafile,nevts,sqrts,lhefile=None):
     import toolBox
     box=toolBox.ToolBox()
     tool=box.get("pythia6")
-    pythiadir=tool.installDirectory()+"/"
     tool.checkInstallation()
+    tool.replaceInCfgFile ( { "NEVENTS": nevts, "SQRTS":1000*sqrts } )
+    tool.setParameter ( "MSTP(163)", "6" )
 
-#Check if slhafile, pythia_lhe, data and etc folders exist in pythiadir:
-    if not os.path.isfile(slhafile):
-        logger.error("File %s no found."%slhafile)
-        return False
-    else:
-        shutil.copyfile(slhafile, pythiadir+"fort.61")
-    #if not os.path.isdir(pythiadir):
-    #    logger.error("pythia folder " + pythiadir +" not found in ")
-    #    return False
-    #elif not os.path.isfile(pythiadir+"/pythia_lhe") or not os.access(pythiadir+"/pythia_lhe",os.X_OK):
-    #    logger.error("pythia_lhe file no found in "+pythiadir)
-    #    return False
-    #elif not os.path.isfile(pythiadir+"pythia.card"):
-    #    logger.error("pythia.card file no found in "+pythiadir)
-    #    return False
-
-#Read pythia options:
-    f=open(pythiadir+"pythia.card")
-    pythiaOpts = f.readlines()
-    f.close()
-#Create pythia par file with options
-    pythiaParFile = open(pythiadir+"pythia_card.dat","w")
-    for option in pythiaOpts:
-        if "MSTP(163)=" in option: option = "MSTP(163)=6\n"    #Switches output to screen, so no file is written to disk
-        option = option.replace("NEVENTS",str(nevts)).replace("SQRTS",str(1000*sqrts))
-        pythiaParFile.write(option)
-    pythiaParFile.close()
-
-    executable="%s/pythia_lhe" % pythiadir
-    lhedata = commands.getoutput("cd %s; %s < pythia_card.dat" % (pythiadir, executable))
+    lhedata=tool.run ( slhafile )
+    ## executable="%s/pythia_lhe" % pythiadir
+    #lhedata = commands.getoutput("cd %s; %s < pythia_card.dat" % (pythiadir, executable))
     if not "<LesHouchesEvents" in lhedata:
         logger.error("LHE events not found in pythia output")
         return False

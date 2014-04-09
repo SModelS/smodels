@@ -62,7 +62,7 @@ class ExternalPythia6(ExternalTool):
             if os.path.exists ( self.tempdir ):
                 os.rmdir ( self.tempdir )
 
-    def replaceInCfgFile ( self, replacements = { "NEVENTS": 10000, "SQRTS":8 } ):
+    def replaceInCfgFile ( self, replacements = { "NEVENTS": 10000, "SQRTS":8000 } ):
         """ replace certain strings in the cfg file by other strings,
             similar to setParameter.
             this is introduced as a simple mechanism to make certain
