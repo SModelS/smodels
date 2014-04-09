@@ -93,6 +93,13 @@ Only generated if cross-sections are read from SLHA file and not previously crea
       for xsec in XsecsInfoFile.xsecs:
         if not xsec in XsecsInfo.xsecs: Xsec.pop(xsec.label)    #Remove entries which do not match the previously defined cross-sections
 
+#Make sure there are cross-sections for all labels and for all processes
+  processes = []
+  for label in Xsec:
+    processes += Xsec[label].keys()
+  for label in Xsec:
+    for proc in processes:
+      if not Xsec[label].has_key(proc): Xsec[label][proc] = addunit(0.,'fb')
 
 #Read SLHA file
   res = pyslha.readSLHAFile(slhafile)
@@ -114,12 +121,11 @@ Only generated if cross-sections are read from SLHA file and not previously crea
       br.ids = [-x for x in br.ids]
     BRdic.update({k : res[1][abs(k)].decays, -k : brs})
 
-
 #Get mass list for all particles
   Massdic = {}
-  for k in res[1].keys():
-    if k and res[1][k].mass != None:
-      Massdic.update({k : addunit(abs(res[1][k].mass),'GeV'), -k : addunit(abs(res[1][k].mass),'GeV')})
+  for k in res[0]['MASS'].keys():
+    if k and res[0]['MASS'][k] != None:
+      Massdic.update({k : addunit(abs(res[0]['MASS'][k]),'GeV'), -k : addunit(abs(res[0]['MASS'][k]),'GeV')})
   
 #Loop over all particles and generate all possible 1branch-elements with sigmamax*BR > sigcut
   ElList = []
@@ -145,7 +151,7 @@ Only generated if cross-sections are read from SLHA file and not previously crea
       ptc = BaseEl.momID.pop()
       weight = WList[iel]
       
-      if len(BRdic[ptc]) == 0:     # Stable final state (LSP)
+      if not BRdic.has_key(ptc) or len(BRdic[ptc]) == 0:     # Stable final state
         BaseEl.momID = BaseEl.momID[0]
         FinalList.append(BaseEl)
         WFinal.append(weight)
