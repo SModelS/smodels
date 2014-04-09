@@ -136,7 +136,7 @@ def runPythia(slhafile,nevts,sqrts,lhefile=None):
     import toolBox
     box=toolBox.ToolBox()
     tool=box.get("pythia6")
-    tool.checkInstallation()
+    # tool.checkInstallation()
     tool.replaceInCfgFile ( { "NEVENTS": nevts, "SQRTS":1000*sqrts } )
     tool.setParameter ( "MSTP(163)", "6" )
 
