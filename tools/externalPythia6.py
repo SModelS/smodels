@@ -30,16 +30,23 @@ class ExternalPythia6(ExternalTool):
         self.verbose=False
         self.tempdir=tempfile.mkdtemp()
 
-    def unlink( self ): ## remove cruft
+    def tempDirectory( self ): 
+        """ simply returns the temporary directory name """
+        return self.tempdir
+
+    def unlink( self, unlinkdir=True ):
+        """ remove temporary files.
+            :param unlinkdir: remove temp directory completely
+        """
         import os
         logger.debug ( "unlinking %s " % self.tempdir )
-        for File in [ "fort.61", "fort.68" ]:
+        for File in [ "fort.61", "fort.68", "temp.cfg" ]:
             if os.path.exists ( self.tempdir + "/" + File ):
                 os.unlink ( self.tempdir + "/" + File )
-        if os.path.exists ( self.tempdir ):
+        if unlinkdir and os.path.exists ( self.tempdir ):
             os.rmdir ( self.tempdir )
 
-    def run(self, cfg_file):
+    def run(self, cfg_file, slhafile ):
         """
         Run Pythia.
         
@@ -47,15 +54,24 @@ class ExternalPythia6(ExternalTool):
         :returns: stdout and stderr, or error message
         
         """
-        import os, commands
+        import os, commands, shutil
         cfg=os.path.abspath ( cfg_file )
         if not os.path.exists( cfg ): 
-            return "config file ``%s'' not found" % ( cfg )
-        cmd="cd %s ; %s < %s" % ( self.tempdir, self.executable_path, cfg_file )
+            raise IOError ( "config file ``%s'' not found" % ( cfg ) )
+        slha=os.path.abspath ( slhafile )
+        if not os.path.exists( slha ): 
+            raise IOError ( "slha file ``%s'' not found" % ( slha ) )
+        tempcfg=self.tempdir+"/temp.cfg" 
+        shutil.copy ( cfg, tempcfg )
+        shutil.copy ( slha, self.tempdir+"/fort.61" )
+        cmd="cd %s ; %s < %s" % \
+             ( self.tempdir, self.executable_path, tempcfg )
+        logger.debug ( "Now running %s " % cmd )
         # cmd="%s < %s" % ( self.executable_path, cfg_file )
         Out=commands.getoutput ( cmd )
+        logger.debug ( "output: %s" % str(Out) ) 
         out=Out.split("\n")
-        self.unlink ()
+        self.unlink ( unlinkdir=False )
         return out
 
     def compile(self):
@@ -103,20 +119,30 @@ class ExternalPythia6(ExternalTool):
         if not os.access(self.executable_path, os.X_OK ): 
             logger.error("%s is not executabloe" % self.executable)
             return False
-        out=self.run ( self.test_params_path )
-        out.pop()
-        lines={ -1: " ********* Fraction of events that fail fragmentation cuts =  0.00000 *********" }
-        for (nr, line) in lines.items():
-            if out[nr].find(line)==-1:
-                logger.error("Something is wrong with the setup: " + str(out))
-                return False
-        self.unlink()
+        import SModelS
+        slhafile=SModelS.installDirectory()+"/inputFiles/slha/andrePT4.slha"
+        try:
+            out=self.run ( self.test_params_path, slhafile )
+            out.pop()
+            lines={ -1: " ********* Fraction of events that fail fragmentation cuts =  0.00000 *********" }
+            for (nr, line) in lines.items():
+                if out[nr].find(line)==-1:
+                    logger.error("Something is wrong with the setup: " + str(out))
+                    return False
+        except Exception,e:
+            logger.error ( "Something is wrong with the setup: exception %s" % e )
         return True
     
 
 if __name__ == "__main__":
     tool=ExternalPythia6()
     print("installed:" + str(tool.installDirectory()))
+    import os
+    td_exists=os.path.exists ( tool.tempDirectory() )
+    print("temporary directory: %s: %d"  % ( str(tool.tempDirectory() ), td_exists ) )
     print("check:" + str(tool.checkInstallation()))
+    import SModelS
     print("run:")
-    tool.run ( "../etc/pythia6_test.cfg" )
+    slhafile=SModelS.installDirectory()+"/inputFiles/slha/andrePT4.slha" 
+    tool.run ( "../etc/pythia6_test.cfg", slhafile )
+    tool.unlink()
