@@ -32,6 +32,14 @@ def Cgtr(a,b):
   res = (abs(a-b) - (a-b))/(2.*(a+b))
   return res
 
+def cGtr(a,b):
+  """Identical to Cgtr (needed for compabtibility with new database)"""
+  return Cgtr(a,b)
+
+def cSim(*els):
+  """Identical to Csim (needed for compabtibility with new database)"""
+  return Csim(els)
+
 
 def similar(els):
   """ Defines similar function when comparing two list of numbers.

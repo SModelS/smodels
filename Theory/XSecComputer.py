@@ -80,7 +80,7 @@ def compute(nevts,slhafile,rpythia = True, basedir=None,datadir=None, XsecsInfo=
   import tempfile
   import copy
   import cStringIO
-
+  
   if XsecsInfo is None:
     try:
       XsecsInfo = CrossSection.XSectionInfo  #Check if cross-section information has been defined
@@ -117,7 +117,6 @@ def compute(nevts,slhafile,rpythia = True, basedir=None,datadir=None, XsecsInfo=
   installdir=basedir
   etcdir="%s/etc/" % basedir
   
-
   
   #Get sqrts:
   Allsqrts = XsecsInfo.getSqrts()
@@ -188,12 +187,12 @@ def compute(nevts,slhafile,rpythia = True, basedir=None,datadir=None, XsecsInfo=
 
     if xsec.order > 0:
       for key in Sigma.keys():
-        k = 1. 
+        k = 0. 
         nllres = NLLXSec.getNLLresult(key[0],key[1],slhafile,base=nllbase)             
         klabel = str(int(rmvunit(xsec.sqrts,'TeV')))+'TeV'        
         for nll in nllres:
-          if nll.has_key('K_NLO_'+klabel) and nll['K_NLO_'+klabel]:  k = k*nll['K_NLO_'+klabel]              #NLO k-factor (or NLL+NLO k-factor if there is no NLL result)
-          if xsec.order == 2 and nll.has_key('K_NLL_'+klabel) and nll['K_NLL_'+klabel]: k = k*nll['K_NLL_'+klabel]            #NLL+NLO k-factor (or NLL k-factor if there is no NLO result)
+          if xsec.order == 1 and nll.has_key('K_NLO_'+klabel) and nll['K_NLO_'+klabel]: k = nll['K_NLO_'+klabel]   #NLO k-factor
+          elif xsec.order == 2 and nll.has_key('K_NLL_'+klabel) and nll['K_NLL_'+klabel]: k = nll['K_NLO_'+klabel]*nll['K_NLL_'+klabel]   #NLL+NLO k-factor
 
         Weight[key] = Weight[key]*k
         Sigma[key] = Sigma[key]*k

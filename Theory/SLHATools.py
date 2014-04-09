@@ -131,6 +131,7 @@ def writeXSecToSLHAFile( slhafile, nevts=10000,basedir=None, XsecsInfo=None, pri
       for sqrtS in pid_xsecs.keys():
         f.write("\nXSECTION  %f  %d  %d  %d  %d  %d  %s\n" %(sqrtS*1000, 2212, 2212, 2, pids[0], pids[1], fstate)) #sqrts in GeV
         for line_cs in pid_xsecs[sqrtS]:
+          if not line_cs[1]: continue
           f.write("0  %d  0  0  0  0  %f SModelS 1.0\n" %(line_cs[0],line_cs[1]))
 
 
