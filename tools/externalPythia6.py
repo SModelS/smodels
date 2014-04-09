@@ -9,9 +9,10 @@
 """
 import setPath
 from externalTool import ExternalTool
-from tools import logger
 import tempfile
 import os, shutil
+import logging
+logger = logging.getLogger(__name__)
 
 class ExternalPythia6(ExternalTool):
     def __init__(self,
@@ -111,7 +112,7 @@ class ExternalPythia6(ExternalTool):
         cfg=self.tempdir+"/temp.cfg"
         if cfgfile!=None:
             cfg=self.absPath ( cfgfile )
-            logger.info ( "running with %s" % cfg )
+            logger.debug ( "running with %s" % cfg )
         shutil.copy ( slha, self.tempdir+"/fort.61" )
         cmd="cd %s ; %s < %s" % \
              ( self.tempdir, self.executable_path, cfg )
