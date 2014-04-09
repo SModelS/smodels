@@ -211,4 +211,4 @@ if __name__ == "__main__":
     from physicsUnits import addunit
     slhaF = SModelS.installDirectory() + "inputFiles/slha/T1.slha"
     kNLO, kNLL = getKfactorsFor((1000021,1000021), addunit(13., "TeV"), slhaF)
-    logger.info("nlo, nll = " + str(kNLO) + ", " + str(kNLL))
+    print("nlo, nll = " + str(kNLO) + ", " + str(kNLL))
