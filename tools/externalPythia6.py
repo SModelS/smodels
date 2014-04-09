@@ -118,10 +118,10 @@ class ExternalPythia6(ExternalTool):
         logger.debug ( "Now running %s " % cmd )
         # cmd="%s < %s" % ( self.executable_path, cfg_file )
         Out=commands.getoutput ( cmd )
-        logger.debug ( "output: %s" % str(Out) ) 
-        out=Out.split("\n")
+        # logger.debug ( "output: %s" % str(Out) ) 
+        ## out=Out.split("\n")
         self.unlink ( unlinkdir=False )
-        return out
+        return Out
 
     def compile(self):
         """ compile pythia_lhe """
@@ -168,7 +168,9 @@ class ExternalPythia6(ExternalTool):
         import SModelS
         slhafile=SModelS.installDirectory()+"/inputFiles/slha/andrePT4.slha"
         try:
-            out=self.run ( slhafile, "<install>/etc/pythia_test.card" )
+            Out=self.run ( slhafile, "<install>/etc/pythia_test.card" )
+            out=Out.split("\n")
+
             out.pop()
             lines={ -1: " ********* Fraction of events that fail fragmentation cuts =  0.00000 *********" }
             for (nr, line) in lines.items():
