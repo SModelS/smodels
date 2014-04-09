@@ -14,6 +14,7 @@ import os
 from tools.physicsUnits import rmvunit
 from experiment.experimentExceptions import MetaInfoError
 import logging
+import git
 
 logger = logging.getLogger(__name__)
 
@@ -124,7 +125,7 @@ def fuzzyconditions ( analysis, run ):
     return getLines( analysis, run, "fuzzycondition" )
 
 def constraints ( analysis, run ):
-    """ get all the conditions for a analysis/run pair """
+    """ get all the constraints for a analysis/run pair """
     return getLines ( analysis, run, "constraint" )
 
 def hasMetaInfoField ( analysis, field, run=None ):
@@ -217,6 +218,12 @@ def getUpperLimitDictionary ( analysis, topo, run, expected=False ):
 
 def databaseVersion( astuple=False, addCodeName=True ):
     """ prints out version number of the *database* """
+    try:
+        rep = git.Repo(Base)
+        if rep.tags: return str(rep.tags[0])
+        else: logger.warn("could not find git tag")
+    except (git.exc.InvalidGitRepositoryError, git.exc.NoSuchPathError):
+        logger.warn("database in %s is not a git version" %Base)
     f=open("%s/version" % Base )
     l=f.readline()
     f.close()
