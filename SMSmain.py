@@ -22,9 +22,9 @@ printer=SMSPrettyPrinter.SMSPrettyPrinter()
 nevts = 10000
 slhafile = "slha/andrePT4.slha"
 
-Compute_xsecs = False
+Compute_xsecs = True
 if Compute_xsecs:
-  WriteToFile = False
+  WriteToFile = True
   if not WriteToFile:
     Wv = XSecComputer.compute(nevts,slhafile)
     W = Wv["Wdic"]
@@ -36,7 +36,7 @@ if Compute_xsecs:
 else:
     W = None
     Xsec = None
-
+    
 #PYTHIA must have MSTP(42)=0 ! no mass smearing (narrow width approximation)
 #Creat analyses list:
 DoFactory = True

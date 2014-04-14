@@ -93,11 +93,18 @@ def writeXSecToSLHAFile( slhafile, nevts=10000,basedir=None, XsecsInfo=None, pri
     fstate = "# Nevts="+str(nevts) #additional information?
 
     fin = open(slhafile, 'r')
-    chck = fin.read()
+    lines = fin.readlines()
     fin.close()
-    if 'XSECTION' in chck: 
-      log.error ("already found xsecs in file, when trying to write xsecs to file.")
-      return False
+    processesInFile = []
+    for l in lines:
+      if l.startswith("#") or len(l.replace('\n',''))<2: continue
+      if 'XSECTION' in l:
+        pids = [eval(l.split()[5]),eval(l.split()[6])]
+        pids.sort()
+        processesInFile.append(tuple(pids))
+
+    if processesInFile: 
+      log.warning ("XSecs found in file. Adding missing cross-sections")
 
     #computes production cross sections
     if XsecsInfo is None:
@@ -114,10 +121,14 @@ def writeXSecToSLHAFile( slhafile, nevts=10000,basedir=None, XsecsInfo=None, pri
     f = open(slhafile, 'a')
     XsecDic = dic.crossSections()
     if len(XsecDic.keys())==0:
-      log.error ( "waarning: I dont have keys in the cross section dictionary." )
+      log.error ( "warning: I dont have keys in the cross section dictionary." )
       return
     allpids = XsecDic[XsecDic.keys()[0]].keys()
     for pids in allpids:
+      newpids = list(pids)
+      newpids.sort()
+      newpids = tuple(newpids)
+      if newpids in processesInFile: continue   #Ignore processes already present in file
       pid_xsecs = {}
   #Collect all cross-sections for the pid pair
       for xsec in XsecsInfo.xsecs:
