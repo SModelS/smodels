@@ -18,7 +18,8 @@ def DoCluster(objlist,Distfunc,dmin,AvgFunc=None,PosFunc=None):
   """
   from Tools.PhysicsUnits import addunit
   import copy
-  MD = [[None]*len(objlist)]*len(objlist)  #object distances
+  MD = [None]*len(objlist) #object distances
+  for i in range(len(objlist)): MD[i] = [None]*len(objlist)
   MX = None  #object positions
 #Compute distance matrix
   if PosFunc: MX = [PosFunc(obj) for obj in objlist]
@@ -29,7 +30,6 @@ def DoCluster(objlist,Distfunc,dmin,AvgFunc=None,PosFunc=None):
         MD[iob][job] = Distfunc(MX[iob],MX[job])
       else:
         MD[iob][job] = Distfunc(obj1,obj2)
-
 
 #Begin clustering
   ClusterList = []
