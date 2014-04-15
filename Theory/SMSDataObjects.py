@@ -381,7 +381,7 @@ class CTop:
       print "evaluateCluster: Analysis contains more than one entry"
       return False    
     conds = results.values()[0]
-    if ";" in conds or "Csim" in conds or "Cgtr" in conds:
+    if ";" in conds or "Csim" in conds or "Cgtr" in conds or "cSim" in conds or "cGtr" in conds:
       conds = conds.rsplit(";")
     else:
       conds = conds.rsplit(",")

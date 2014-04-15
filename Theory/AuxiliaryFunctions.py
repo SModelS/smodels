@@ -21,6 +21,7 @@ def Csim(*els):
       b = els[j]
       if a == b: continue
       res = max(res,abs(a-b)/abs(a+b))
+      
   return res
 
 #Defines the auxiliary greater function
@@ -38,7 +39,8 @@ def cGtr(a,b):
 
 def cSim(*els):
   """Identical to Csim (needed for compabtibility with new database)"""
-  return Csim(els)
+  
+  return Csim(*els)
 
 
 def similar(els):

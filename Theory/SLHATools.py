@@ -139,7 +139,8 @@ def writeXSecToSLHAFile( slhafile, nevts=10000,basedir=None, XsecsInfo=None, pri
         if not sqrtS in pid_xsecs.keys(): pid_xsecs[sqrtS] = []
         pid_xsecs[sqrtS].append([cs_order,cs])
   #Write cross-sections grouped by sqrtS:
-      for sqrtS in pid_xsecs.keys():
+      for sqrtS in pid_xsecs:
+        if not sum([xsec[1] for xsec in pid_xsecs[sqrtS]]): continue  #Avoid blocks with no entries (zero xsecs)
         f.write("\nXSECTION  %f  %d  %d  %d  %d  %d  %s\n" %(sqrtS*1000, 2212, 2212, 2, pids[0], pids[1], fstate)) #sqrts in GeV
         for line_cs in pid_xsecs[sqrtS]:
           if not line_cs[1]: continue

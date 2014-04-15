@@ -22,7 +22,7 @@ printer=SMSPrettyPrinter.SMSPrettyPrinter()
 nevts = 10000
 slhafile = "slha/andrePT4.slha"
 
-Compute_xsecs = True
+Compute_xsecs = False
 if Compute_xsecs:
   WriteToFile = True
   if not WriteToFile:
