@@ -56,6 +56,9 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
     xSectionList = crossSection.getXsecFromSLHAFile(slhafile, useXSecs)
     # get BRs and masses from file
     brDic, massDic = getDictionariesFromSLHA(slhafile)
+    #Only use the highest order cross-sections for each process:
+    xSectionList.removeLowerOrder()
+
     
     # Get maximum cross-sections (weights) for single particles (irrespective
     # of sqrtS):

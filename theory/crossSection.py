@@ -28,7 +28,7 @@ class XSectionInfo(object):
 
 
     def __eq__(self, other):     
-        if type(other) != type(XSectionInfo()): return False
+        if type(other) != type(self): return False
         if other.sqrts != self.sqrts: return False
         if other.order != self.order: return False
         return True
@@ -345,6 +345,18 @@ class XSectionList(object):
                 maxxsec = xsec.value
         return maxxsec
 
+    def getMinXsec(self):
+        """
+        Gets the minimum cross-section value appearing in the list.
+        
+        """
+        if len(self) > 0: minxsec = self.xSections[0].value
+        else: return False
+        for xsec in self:
+            if xsec.value < minxsec:
+                minxsec = xsec.value
+        return minxsec
+
 
     def getDictionary(self, groupBy="pids"):
         """
@@ -400,6 +412,40 @@ class XSectionList(object):
                     if newXsec.info == oldXsec.info:
                         oldXsec.value = oldXsec.value + newXsec.value
                         oldXsec.pid = (None, None)
+
+                        
+    def removeLowerOrder(self):
+        """
+        For each process in the list, keep only the highest order cross-section.
+        Remove order information and set default labels.
+        """
+        
+        newList = XSectionList()
+        for pids in self.getPIDpairs():
+            xsecs = self.getXsecsFor(pids)
+            for i,ixsec in enumerate(xsecs):
+                newxsec = ixsec.copy()
+                removeXsec = False
+                isqrts = ixsec.info.sqrts
+                iorder = ixsec.info.order
+#Check if the xsec appear with the same sqrts but at a higher order:                
+                for j,jxsec in enumerate(xsecs):
+                    if i == j: continue
+                    jsqrts = jxsec.info.sqrts
+                    jorder = jxsec.info.order                 
+                    if jsqrts == isqrts and jorder > iorder:
+                        removeXsec = True
+                        break
+                if not removeXsec:
+                    newxsec.info.label = str(newxsec.info.sqrts)   #Erase cross-section labels and information
+                    newxsec.info.order = None
+                    newList.add(newxsec)
+        
+        if len(self) != len(newList):
+            logger.warning("Removing %i lower order cross-sections" %(len(self) - len(newList)))
+            self.xSections = newList.xSections
+                    
+        
         
 
 def getXsecFromSLHAFile(slhafile, useXSecs=None):

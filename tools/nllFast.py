@@ -30,7 +30,7 @@ gluinos = [1000021]
 def getKfactorsFor(pIDs,sqrts,slhafile,pdf='cteq'):
     """Reads the NLLfast grid and returns a pair of k-factors (NLO and NLL) for
         the production of a pID pair.  If NLLfast does not contain the process,
-        return k-factors = 1.  Uses the slhafile to obtain the SUSY
+        return k-factors = None.  Uses the slhafile to obtain the SUSY
         spectrum.
     """
 
@@ -41,7 +41,7 @@ def getKfactorsFor(pIDs,sqrts,slhafile,pdf='cteq'):
         
 #Get process name (in NLLfast notation)
     process = getProcessName(pIDs)
-    if not process: return (1.,1.)  #Return k-factors =1, if NLLfast does not have the process
+    if not process:  return (None,None)  #Return k-factors = None, if NLLfast does not have the process
 
 #Obtain relevant masses:
     readfile=pyslha.readSLHAFile(slhafile)
@@ -65,7 +65,7 @@ def getKfactorsFor(pIDs,sqrts,slhafile,pdf='cteq'):
     tool=box.get(toolname)
     if tool==None:
         logger.warning("No NLLfast data for sqrts = " + str(sqrts) )
-        return (1.,1.)
+        return (None,None)
     nllpath=tool.installDirectory()
     nllexec=tool.pathOfExecutable()
     ret=tool.checkInstallation()
@@ -86,12 +86,12 @@ def getKfactorsFor(pIDs,sqrts,slhafile,pdf='cteq'):
         kFacs = getKfactorsFrom(nll_output)  #NLLfast ran ok, try to get the k-factors 
         if not kFacs or min(kFacs) <= 0.:
             logger.warning("Error obtaining k-factors")
-            return (1.,1.)
+            return (None,None)
         else: return kFacs
 #If run was not successful, check for decoupling error messages:
     elif not "too low/high" in nll_output.lower():
         logger.warning("Error running NLLfast")
-        return (1.,1.)
+        return (None,None)
      
 #Deal with decoupling regimes:
     gluino_dcp,squark_dcp = False,False
@@ -101,10 +101,10 @@ def getKfactorsFor(pIDs,sqrts,slhafile,pdf='cteq'):
 #If produced particles are too heavy, return k-factors = 1        
     if gluino_dcp and ('g' in process or gluinomass < 500.):
         logger.warning("Gluino mass out of NLLfast grid for " + process)
-        return (1.,1.)
+        return (None,None)
     elif squark_dcp and (process != 'gg' or squarkmass < 500.):
         logger.warning("Squark mass out of NLLfast grid for " + process)
-        return (1.,1.)
+        return (None,None)
 
 #If virtual particles are too heavy, interpolate to the decoupling limit        
     kFacsVector = []
@@ -120,7 +120,7 @@ def getKfactorsFor(pIDs,sqrts,slhafile,pdf='cteq'):
 
     if len(kFacsVector) < 2:
         logger.warning("Not enough points for interpolation in the decoupling limit")
-        return (1.,1.)
+        return (None,None)
     else:
         if kFacsVector[0][0]/min(squarkmass,gluinomass) > 10.:
             kFacs = kFacsVector[0][1]  #Decoupling limit is satisfied, do not interpolate
@@ -139,7 +139,7 @@ def getProcessName(pIDs):
     
 #Obtain the type of process:
 #gluino-gluino production = gg, squark-antisquark = sb, squark-squark = ss, squark-gluino = sg, 
-#stop-stop or sbottom-sbottom = st   
+#antistop-stop or antisbottom-sbottom = st   
     if pid1 in antisquarks and pid2 in squarks: process = 'sb'      
     elif pid1 in squarks and pid2 in squarks: process = 'ss'
     elif pid1 == pid2 and pid1 in gluinos: process = 'gg'

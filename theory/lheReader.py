@@ -41,8 +41,8 @@ class lheReader:
         while not "</LesHouchesEvents>" in line and line != "":   
             if "<init>" in line:
                 line = self.File.readline()
-                self.metainfo["sqrts"] = addunit(eval(line.split()[2]) + \
-                                                 eval(line.split()[3]),'GeV')
+                sqrts = addunit((eval(line.split()[2]) + eval(line.split()[3]))/1000.,'TeV')
+                self.metainfo["sqrts"] = sqrts
                 totxsec = addunit(0.,'pb')
                 line = self.File.readline()
                 while not "</init>" in line:
