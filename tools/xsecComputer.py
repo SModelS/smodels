@@ -39,6 +39,7 @@ def computeXSec(sqrts,maxOrder,nevts,slhafile,lhefile=None,externaldir=None):
     if not defined, it is set as current folder
     """    
 
+
     if not externaldir: externaldir = os.getcwd() + '/external/'
 #Check if SLHA file exists
     if not os.path.isfile(slhafile):
@@ -55,13 +56,13 @@ def computeXSec(sqrts,maxOrder,nevts,slhafile,lhefile=None,externaldir=None):
         lheFile = open(lhefile,'r')
 
 #Get LO cross-sections from LHE events
-    LOxsecs = crossSection.getXsecFromLHEFile(lheFile)
-    xsecs = LOxsecs
+    LOxsecs = crossSection.getXsecFromLHEFile(lheFile)    
+    xsecs = LOxsecs    
 #Set cross-section label and order:
     wlabel = str(int(rmvunit(sqrts,'TeV')))+' TeV'
     if maxOrder == 0:  wlabel += ' (LO)'
     elif maxOrder == 1: wlabel += ' (NLO)'
-    elif maxOrder == 2: wlabel += ' (NLL)'
+    elif maxOrder == 2: wlabel += ' (NLO+NLL)'
     for ixsec,xsec in enumerate(xsecs):
         xsecs[ixsec].info.label = wlabel
         xsecs[ixsec].info.order = maxOrder
@@ -69,17 +70,24 @@ def computeXSec(sqrts,maxOrder,nevts,slhafile,lhefile=None,externaldir=None):
     if maxOrder > 0:
         pIDs = LOxsecs.getPIDpairs()   # Get particle ID pairs for all xsecs
         for pID in pIDs:
-            k = 1.
+            k = 0.
             kNLO,kNLL = nllFast.getKfactorsFor(pID,sqrts,slhafile)
             if maxOrder == 1 and kNLO: k = kNLO
             elif maxOrder == 2 and kNLL and kNLO: k = kNLO*kNLL
-            else:
+            elif maxOrder > 2:
                 logger.warning("Unkown xsec order, using NLL+NLO k-factor (if available)")
                 k = kNLO*kNLL
             k = float(k)
             for i,xsec in enumerate(xsecs):
                 if set(xsec.pid) == set(pID): xsecs[i] = xsec*k   #Apply k-factor
 
+#Remove zero cross-sections
+    while len(xsecs) > 0 and xsecs.getMinXsec() == addunit(0.,'fb'):        
+        for xsec in xsecs:
+            if xsec.value == addunit(0.,'fb'):
+                xsecs.delete(xsec)
+                break
+            
     return xsecs
 
 
@@ -95,15 +103,19 @@ def addXSecToFile(xsecs,slhafile,comment=None):
         logger.error("SLHA file not found.")
         return None
 #Check if file already contain cross-section blocks:
-    infile = open(slhafile,'r')
-    slhadata = infile.read()
-    infile.close()
-    if 'XSECTION' in slhadata:
-        logger.warning("SLHA file already contains a XSECTION block. Appending new cross-sections.")
+    xSectionList = crossSection.getXsecFromSLHAFile(slhafile)
+    if xSectionList:
+        logger.warning("SLHA file already contains XSECTION blocks. Adding missing cross-sections.")    
 
-#Write cross-sections to file
+#Write cross-sections to file (if they do not overlap any cross-section in the file)
     outfile = open(slhafile,'append')
-    for xsec in xsecs: outfile.write(xsecToBlock(xsec,(2212,2212),comment)+"\n")
+    for xsec in xsecs:
+        writeXsec = True        
+        for oldxsec in xSectionList:
+            if oldxsec.info == xsec.info and set(oldxsec.pid) == set(xsec.pid):
+                writeXsec = False
+                break
+        if writeXsec: outfile.write(xsecToBlock(xsec,(2212,2212),comment)+"\n")
     outfile.close()
 
     return True
