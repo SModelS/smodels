@@ -501,7 +501,13 @@ def readSLHA(spcstr, ignorenobr=False, ignorenomass=False, ignoreblocks=[]):
                 if len(items) < 1:
                     continue
                 if currentblock != "DECAY":
-                    blocks[currentblock].add_entry(items)
+                    try:
+                      blocks[currentblock].add_entry(items)
+                    except:
+                      import sys
+                      sys.stderr.write("Ignoring badly formatted block: %s\n" % currentblock)
+                      del blocks[currentblock]
+                      currentblock = None
                 # TODO: Add handling of XSECTION if/when standardised
                 else:
                     br = float(items[0]) if items[0].upper() != "NAN" else None
