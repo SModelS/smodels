@@ -2,7 +2,7 @@
 
 """
 .. module:: smsAnalysisFactory
-   :synopsis: Creates a list of Analysis objects from a results database.
+   :synopsis: Create a list of analysis objects from a results database.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -17,90 +17,36 @@ from theory import element
 import logging
 
 logger = logging.getLogger(__name__)
-
-def getRealTopo(tx):
-    """
-    T3w025 -> T3w, etc.
-    
-    """
-    ret = tx
-    ret.replace("050","").replace("x1C180","").replace("025","")
-    if ret.find("x") > -1:
-        ret = ret[:ret.find("x")]
-    return ret
-
-
-def getArray(constraint):
-    """
-    Extracts the number of vertices, branches and insertions from the
-    constraint string. It maps, e.g.,
-    2*([[['L'],['L']],[['L'],['nu']]] + [[['L'],['L']],[['nu'],['L']]])
-    to
-    [[['L'],['L']],[['L'],['nu']]]
-    
-    """
-    c = constraint.replace(" ", "")
-    c = c.replace("'", "")
-    elStrings = []
-    while "[[[" in c:
-        el = c[c.find("[[["):c.find("]]]") + 3]        
-        c = c.replace(el, "", 1)
-        elStrings.append(el)    
-    return elStrings
-
-
-def getElementsEffs(constraint):
-    """
-    Generates a dictionary of elements with their simple efficiencies as values
-    for an upper limit-type of analysis. Equals the element multiplicative
-    factor appearing in the constraint.
-    
-    """      
-    # Get element strings appearing in constraint
-    elStrings = getArray(constraint)
-    cons = constraint.replace(" ", "")
-    cons = cons.replace("'", "")
-    elementsEff = {}
-    for el in elStrings:
-        newcons = cons.replace(el, "1.", 1)
-        for el2 in elStrings:
-            if el2 != el:
-                newcons = newcons.replace(el2, "0.", 1)
-        elEff = eval(newcons)
-        elementsEff[element.Element(el)] = elEff        
-    return elementsEff        
           
 
-def load(anas=None, topos=None, sqrts=[7, 8]):
+def load(analyses=None, topologies=None, sqrts=[7, 8]):
     """
-    Creates the Analysis objects from the info given in the SMS results
-    database.
+    Create an analysis objects from the info given in the SMS results database.
 
-    :param anas: if given as a list, then we create only objects for these
-    analyses (the database naming convention is used).
-    :param topos: if given as a list, then only these topos are considered.
-    :param sqrts: array of center-of-mass energies of the analyses that are to
+    :param analyses: If a list of analyses is passed, create only objects for
+    these analyses (the database naming convention is used).
+    :param topologies: If a list of topologies is passed, only these topologies
+    are considered.
+    :param sqrts: Array of center-of-mass energies of the analyses that are to
     be considered.
-    :returns: list of Analyses
+    :returns: list of analyses
     
     """   
-    # lets make sure the user can also supply a single topo/ana without having
-    # to code an array
-    if isinstance(topos, str):
-        topos = [topos]
-    if isinstance(anas, str):
-        anas = [anas]
+    # Enable supplying a single analysis/topology
+    if isinstance(topologies, str):
+        topologies = [topologies]
+    if isinstance(analyses, str):
+        analyses = [analyses]
     if isinstance(sqrts, int):
         sqrts = [sqrts]
     if isinstance(sqrts, float):
         sqrts = [int(sqrts)]
 
     listOfAnalyses = []
-
         
-    if anas == None:
-        anas = smsResults.getAllResults().keys()
-    for ana in anas:
+    if analyses == None:
+        analyses = smsResults.getAllResults().keys()
+    for ana in analyses:
         logger.debug("Building ana " + str(ana))
         ss = rmvunit(smsResults.getSqrts(ana), "TeV")
         if ss == None:
@@ -110,7 +56,7 @@ def load(anas=None, topos=None, sqrts=[7, 8]):
         if not ss in sqrts:
             continue
         for tx in smsResults.getTopologies(ana):
-            if topos != None and tx not in topos:
+            if topologies != None and tx not in topologies:
                 continue
             logger.debug(str(tx))                        
             newAnalysis = analysis.ULanalysis()
@@ -137,10 +83,63 @@ def load(anas=None, topos=None, sqrts=[7, 8]):
     return listOfAnalyses
 
 
+def getRealTopo(tx):
+    """
+    Get real topology, e.g., T3w025 -> T3w, etc.
+    
+    """
+    ret = tx
+    ret.replace("050","").replace("x1C180","").replace("025","")
+    if ret.find("x") > -1:
+        ret = ret[:ret.find("x")]
+    return ret
+
+
+def getElementsEffs(constraint):
+    """
+    Generate a dictionary of elements with their simple efficiencies as values
+    for an upper limit-type of analysis. Equals the element multiplicative
+    factor appearing in the constraint.
+    
+    """      
+    # Get element strings appearing in constraint
+    elStrings = getArray(constraint)
+    cons = constraint.replace(" ", "")
+    cons = cons.replace("'", "")
+    elementsEff = {}
+    for el in elStrings:
+        newcons = cons.replace(el, "1.", 1)
+        for el2 in elStrings:
+            if el2 != el:
+                newcons = newcons.replace(el2, "0.", 1)
+        elEff = eval(newcons)
+        elementsEff[element.Element(el)] = elEff        
+    return elementsEff
+
+
+def getArray(constraint):
+    """
+    Extract the number of vertices, branches and insertions from the constraint
+    string. It maps, e.g.,
+    2*([[['L'],['L']],[['L'],['nu']]] + [[['L'],['L']],[['nu'],['L']]])
+    to
+    [[['L'],['L']],[['L'],['nu']]]
+    
+    """
+    c = constraint.replace(" ", "")
+    c = c.replace("'", "")
+    elStrings = []
+    while "[[[" in c:
+        el = c[c.find("[[["):c.find("]]]") + 3]        
+        c = c.replace(el, "", 1)
+        elStrings.append(el)    
+    return elStrings
+
+
 if __name__ == "__main__":
     load()
     print("List of analyses/results: ")
-    listOfAnalyses = load()
-    for (ct, ana) in enumerate(listOfAnalyses):
+    _listOfAnalyses = load()
+    for (ct, _ana) in enumerate(_listOfAnalyses):
         # .label, ana.sqrts
-        print(ct, ana.label, ana.Top.vertnumb, ana.Top.vertparts)
+        print(ct, _ana.label, _ana.Top.vertnumb, _ana.Top.vertparts)
