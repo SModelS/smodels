@@ -15,6 +15,7 @@ from tools.physicsUnits import rmvunit
 from theory import analysis
 from theory import element
 import logging
+from experiment import smsHelpers
 
 logger = logging.getLogger(__name__)
           
@@ -64,9 +65,9 @@ def load(analyses=None, topologies=None, sqrts=[7, 8]):
             stopo = getRealTopo (tx)
             newAnalysis.label = ana + ":" + tx
             # "2012"
-            newAnalysis.run = smsResults.getRun(ana)
-            constraint = smsResults.getConstraints(ana, topo=stopo)
-            cond = smsResults.getConditions(ana, topo=stopo)
+            newAnalysis.run = smsHelpers.getRun(ana)
+            constraint = smsResults.getConstraints(ana, topology=stopo)
+            cond = smsResults.getConditions(ana, topology=stopo)
             if not constraint or constraint == "Not yet assigned":
                 logger.debug("dont have a constraint for " + str(ana) + \
                             str(tx) + "(" + str(stopo) + ")")

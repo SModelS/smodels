@@ -60,7 +60,7 @@ def getxval(mx, my, mz, mass=False):
     return xval
 
 
-def doGridData(ana, topo, masses, dPar, debug=True, run=None):
+def doGridData(ana, topo, masses, dPar, run=None):
     """
     Creates np.array and uses scipy.griddata function for ana, topo.
     
@@ -70,9 +70,8 @@ def doGridData(ana, topo, masses, dPar, debug=True, run=None):
 
     for ds in dPar:
         if not ds['mz']:
-            if debug:
-                logger.error("No information on intermediate mass available \
-                        for %s/%s." % (ana, topo))
+            logger.error("No information on intermediate mass available for \
+                          %s/%s." % (ana, topo))
             return None
 
         d = None
@@ -86,8 +85,8 @@ def doGridData(ana, topo, masses, dPar, debug=True, run=None):
         elif ds['mz'][0].find('M1')>-1:
             m1 = float(ds['mz'][0].split("M1")[1])
 
-        ulDict = smsHelpers.getUpperLimitDictionary(ana, getHistName(topo,
-                                                          ds['mz'][0]), run)
+        ulDict = smsHelpers.getUpperLimitDictionary(ana,
+                                        getHistName(topo, ds['mz'][0]), run)
         for x in ulDict:
             for y in ulDict[x]:
 
@@ -129,9 +128,8 @@ def doGridData(ana, topo, masses, dPar, debug=True, run=None):
     r = griddata(p, v, (mx, my, mz), method = "linear")
 
     if np.isnan(r):
-        if debug:
-            logger.error("Masses out of range for %s/%s (no extrapolation)" \
-                         % (ana, topo))
+        logger.error("Masses out of range for %s/%s (no extrapolation)" \
+                      % (ana, topo))
         return None
 
     return addunit(float(r), 'pb')
@@ -238,9 +236,9 @@ def getHistName(topo, mz):
     else:
         return topo + mz
 
-def upperLimit(ana, topo, masses, debug=True, run=None):
+def upperLimit(analysis, topology, masses, run=None):
     """
-    Returns upper limit for ana, topo, for given masses. 
+    Returns upper limit for analysis, topology, for given masses. 
     
     :param masses: list of masses, with (mother, intermediate(s), LSP). For
     intermediate masses: if possible do interpolation over upper limits for
@@ -248,42 +246,37 @@ def upperLimit(ana, topo, masses, debug=True, run=None):
     comparable to the assumptions in the histogram.
     
     """
-    d = smsResults.getaxes(ana, topo)
+    d = smsResults.getaxes(analysis, topology)
     if not run:
-        run = smsHelpers.getRun(ana)
+        run = smsHelpers.getRun(analysis)
     if not d:
-        if debug:
-            logger.error("%s/%s not found." % (ana, topo))
+        logger.error("%s/%s not found." % (analysis, topology))
         return None
     if len(masses) == 2 and not d[0]['mz']:
-        return smsResults.getUpperLimit(ana, topo,
+        return smsResults.getUpperLimit(analysis, topology,
                                         masses[getAxis('x', d[0]['axes'])],
                                         masses[getAxis('y', d[0]['axes'])],
                                         interpolate=True)
     if len(masses) == 2 and d[0]['mz']:
-        if debug:
-            logger.error("Need intermediate mass input for %s/%s." \
-                         % (ana, topo))
+        logger.error("Need intermediate mass input for %s/%s." \
+                         % (analysis, topology))
         return None
     if len(masses) > 2 and not d[0]['mz']:
-        if debug:
-            logger.error("No intermediate mass in %s/%s." % (ana, topo))
+        logger.error("No intermediate mass in %s/%s." % (analysis, topology))
         return None
     if len(masses) > 3 or len(d[0]['mz']) > 1:
-        if debug:
-            logger.error("More than one intermediate mass in %s/%s. Cannot \
-                          find upper limit for topologies with more than one \
-                          intermediate mass." % (ana, topo))
+        logger.error("More than one intermediate mass in %s/%s. Cannot find \
+                      upper limit for topologies with more than one \
+                      intermediate mass." % (analysis, topology))
         return None
     if len(masses) > 2 and len(d) == 1:
         if compareMasses(masses, d[0]):
-            return smsResults.getUpperLimit(ana, getHistName(topo,
+            logger.error("Only one histogram available for %s/%s, cannot \
+                          interpolate for intermediate mass." % (analysis, topology))
+            return smsResults.getUpperLimit(analysis, getHistName(topology,
                                          d[0]['mz'][0]),
                                          masses[getAxis('x', d[0]['axes'])],
                                          masses[getAxis('y', d[0]['axes'])],
                                          interpolate=True)
-        if debug:
-            logger.error("Only one histogram available for %s/%s, cannot \
-                          interpolate for intermediate mass." % (ana, topo))
         return None
-    return doGridData(ana, topo, masses, d, debug, run)
+    return doGridData(analysis, topology, masses, d, run)

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """
 .. module:: smsResults
    :synopsis: Centralized facility to access the SMS results.
@@ -13,87 +11,30 @@
 
 from . import smsHelpers
 from tools.physicsUnits import addunit, rmvunit
-from tools import physicsUnits, rcFile
-from .experimentExceptions import MetaInfoError
-from .smsHelpers import databaseVersion, getRun
-import logging                                                                  
-                                                                                
+import logging
+from experiment.experimentExceptions import MetaInfoError
+
 logger = logging.getLogger(__name__)
 
-def setBase (base):
-    """ just sets the base directory of the database """
-    smsHelpers.Base = base
-
-def useUnits (b=True):
-    physicsUnits.useUnits = b
-
-alldirectories = ['8TeV', 'ATLAS8TeV', '2012', '2011']
-
-def considerRuns(run=None):
-    """ 
-        defines what runs are to be considered when asking for results.
-
-        :param run: a list of runs to be considered, e.g. [ '2012', '8TeV' ]). If None, all runs are taken into account.
-        :type run: list or NoneType
-    """
-    allruns = ["8TeV", "ATLAS8TeV", "RPV8", "2012", "RPV7", "2011"]
-    runsort = []
-    if run:
-        for r in allruns:
-            if r in run:
-                runsort.append(r)
-        smsHelpers.runs = runsort
-        alldirectories = runsort
-        for r in run:
-            if not r in allruns:
-                logger.info("%s is not a run!" % r)
-    else:
-        smsHelpers.runs = allruns
-        alldirectories = allruns
-
-def getTopologies (analysis, run=None ):
-    """ return all topologies that this analysis has constraints for """
-    run = smsHelpers.getRun (analysis, run)
-    x = getConstraints (analysis, run=run)
-    return x.keys()
-
-def getExperiment (analysis, run=None):
-    """ return experiment name for given analysis
-            for now: check if run is ATLAS8TeV, else return CMS """
-    run1 = getRun(analysis, run)
-    if run1 == "ATLAS8TeV": return "ATLAS"
-    else: return "CMS"
-
-
-def getPrettyName (analysis, run=None, latex=False):
-    value = smsHelpers.getMetaInfoField (analysis, "prettyname", run)
-    if value == None or value == "": return analysis
-    if not latex:
-        value = value.replace("\\", "#")
-    return value
-
-def getAnalyses (topo, run=None):
-    """return all analyses that have results for topo
-    """
-    import os
-    runs = smsHelpers.runs
-    if run: runs = [ run ]
-    analyses = {}
-    for r in runs:
-# # so thats the runs I really have to think about
-        dirs = os.listdir ("%s/%s/" % (smsHelpers.Base, r))
-        for ana in dirs:
-            if os.path.exists ("%s/%s/%s/info.txt" % (smsHelpers.Base, r, ana)):
-#                e=getExclusion ( ana, topo, r )
-#                if e: analyses[ana]=True
-                if exists(ana, topo, r): analyses[ana] = True
-
-    return analyses.keys()
-
 allresults = {}
+constraints = {}
+conditions = {}
 
-def getAllResults (run=None ):
-    """returns all analyses and the topologies they have results for
+
+def getSmartUpperLimit(analysis, topo, masses):
+    """
+    Return the upper limit for analysis-topology pair, given an ordered
+    sequence of the mass (mother, intermediate, LSP).
+    
+    """
+    import smsInterpolation
+    return smsInterpolation.upperLimit(analysis, topo, masses)
+
+
+def getAllResults(run=None):
+    """
+    Return all analyses and the topologies they have results for.
+    
     """
     import os
     key = str(run)
@@ -103,7 +44,6 @@ def getAllResults (run=None ):
     if run: runs = [ run ]
     ret = {}
     for r in runs:
-# # so thats the runs I really have to think about
         dirs = os.listdir ("%s/%s/" % (smsHelpers.Base, r))
         for ana in dirs:
             if os.path.exists ("%s/%s/%s/info.txt" % (smsHelpers.Base, r, ana)):
@@ -112,47 +52,195 @@ def getAllResults (run=None ):
     allresults[key] = ret
     return ret
 
-def getClosestValue (Dict, mx, my):
-    """assuming that Dict is a dictionary of mx,my,ul, get the upper limit
-       of the point in Dict that is closest to mx and my.
+
+def getTopologies(analysis, run=None):
     """
-    closest = 9999999
-    retul = None
-    for (dmx, dmv) in Dict.items():
-        for (dmy, ul) in dmv.items():
-            dist = (mx - dmx) ** 2 + (my - dmy) ** 2
-            if dist < closest:
-                closest = dist
-                retul = ul
-    if closest > 20.**2:    # # if we're more than 20 gev from the closest point, we return False
+    Return all topologies that this analysis has constraints for.
+    
+    """
+    run = smsHelpers.getRun(analysis, run)
+    x = getConstraints (analysis, run=run)
+    return x.keys()
+
+
+def getConstraints(analysis, topology="all", run=None):
+    """
+    Get constraints of an analysis. If topology is "all", return a dictionary,
+    else return the constraint only for the given topology, None if
+    non-existent.
+    
+    """
+    key = analysis + topology + str(run)
+    if key in constraints: return constraints[key]
+    run = smsHelpers.getRun(analysis, run)
+    ret = smsHelpers.constraints(analysis, run)
+    if topology == "all":
+        constraints[key] = ret
+        return ret
+    if not topology in ret:
+        constraints[key] = None
+        return None
+    constraints[key] = ret[topology]
+    return ret[topology]
+
+
+def getSqrts(analysis, run=None):
+    """ TODO: what is s_hat?
+    Get s_hat for this analysis.
+    
+    """
+    sqrts = smsHelpers.getMetaInfoField(analysis, "sqrts", run)
+    try:
+        return addunit(float(sqrts), "TeV")
+    except: # TODO: except what?
+        pass
+    return sqrts
+
+
+def getConditions (analysis, topology="all", fuzzy=True, run=None):
+    """
+    Get conditions of an analysis. if topology is "all", return a dictionary,
+    else return the condition only for the given topology, None if
+    non-existent.
+    
+    """
+    key = analysis + topology + str(fuzzy) + str(run)
+    if key in conditions: return conditions[key]
+    run = smsHelpers.getRun (analysis, run)
+    if fuzzy: ret = smsHelpers.fuzzyconditions(analysis, run)
+    else: ret = smsHelpers.conditions(analysis, run)
+    if topology == "all":
+        conditions[key] = ret
+        return ret
+    if not topology in ret:
+        conditions[key] = None
+        return None
+    conditions[key] = ret[topology]
+    return ret[topology]
+
+
+def getaxes(analysis, topology=None, run=None):
+    """ TODO: improve docstring
+    Get information about the histogram axes for an analysis.
+    
+    For each topology list of dictionary, each dictionary corresponds to one
+    histogram. The key axes gives string (mx-my), the key mz gives information
+    on other masses, if you supply a topology, returns list for this topology
+    only.
+    
+    """
+    if not exists(analysis, topology=None):    # analysis is not known, we return None
+        return None
+    try:
+        st = smsHelpers.getMetaInfoField (analysis, "axes", run)
+    except MetaInfoError:
+        logger.error("Meta info field 'axes' does not exist in %s." %analysis)
+        st = None
+    if not st:
+        if not topology: return None    # cannot return default without info on topology
+# if there is no information about the axes, return the default
+        return [{'axes': 'M1-M0', 'mz': None}]
+    st = st.split(',')
+    d = {}
+    for i in range(len(st)):
+        l = st[i].split(':')
+        nm = l[0].replace(" ", "")
+        d[nm] = []
+        m = l[1].split('-')
+        for j in range(len(m)):
+            n = m[j].split()
+            if len(n) == 2:
+                d[nm].append({'axes': n[0] + '-' + n[1], 'mz': None})
+            else: d[nm].append({'axes': n.pop(0) + '-' + n.pop(0), 'mz': n})
+
+    if topology:
+        topology = topology.replace(" ", "")
+        if not d or not topology in d:
+    # # topology does not exist, we return None
+            return None
+        else: return d[topology]
+
+    return d
+
+
+def exists(analysis, topology, run=None):
+    """
+    Check if the dictioanary 'limit_topo' in run/analysis/sms.py exists.
+    
+    For topologies with intermediate masses, check if all dictionaries listed
+    in the axes-information exist. If topology==None, simply check if
+    run/analysis/sms.py exists.
+    
+    """
+    run2 = smsHelpers.getRun(analysis, run)
+    if not topology:
+        import os
+        Base = smsHelpers.Base
+        pydict = "%s/%s/%s/sms.py" % (Base, run2, analysis)
+        if os.path.exists(pydict):
+            return True
+        else:
+            return False
+    axes = getaxes(analysis, topology)
+    if not axes:
         return False
-    return retul
+    hasDict = smsHelpers.hasDictionary (analysis, run2)
+    if not hasDict: return False
+    return smsHelpers.hasDictionary (analysis, run2, topology )
 
-def inConvexHull(Dict, mx, my):
-    pointlist = []
-    for k in Dict.keys():
-        for ki in Dict[k].keys():
-            pointlist.append([k, ki])
-#    try:
-    import numpy
-    p = numpy.array(pointlist)
-    from scipy.spatial import Delaunay
-    dela = Delaunay(p)
-    return dela.find_simplex((mx, my)) >= 0
 
-def getInterpolatedUpperLimitDelaunay (Dict, inmx, inmy):
-    """ get interpolated upper limit from dictionary at point (inmx, inmy)
-            :param Dict: dictionray (sms.py), contains upper limits of one analysis and one topology
-            :param inmx: mass point on x-axis
-            :param inmy: mass point on y-axis
-            :returns: interpolated upper limit at point (inmx, inmy) """
+def getUpperLimit (analysis, topo, mx=None, my=None, run=None, interpolate=False, expected=False):
+    """
+    Get the upper limit for run/analysis/topo.
+    
+    :returns: None, if it does not exist. If mx and my are None, return the
+    entire dictionary, if mx and my are floats, return the upper limit at this
+    point.
+    
+    """
+    run = smsHelpers.getRun(analysis, run)
+    if smsHelpers.hasDictionary(analysis, run):
+        return getUpperLimitFromDictionary (analysis, topo, mx, my, run, interpolate=interpolate, expected=expected)
+    logger.warning ("no upper limits found for %s" %analysis)
+    return None
+
+
+def getUpperLimitFromDictionary (analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False, expected=False):
+    """
+    Get an upper limit from the python dictionary.
+    
+    """
+    Dict = smsHelpers.getUpperLimitDictionary(analysis, topo, run, expected=expected)
+    if Dict == None:
+        return Dict
+    if mx == None and my == None:
+        return Dict
+    if mx == None or my == None:
+        logger.error("Requesting upper limits for mx = %s and my = %s" % (mx, my))
+        return None
+    if rmvunit(mx, 'GeV') == None: return Dict
+    return addunit(getInterpolatedUpperLimitDelaunay(Dict, mx, my), "pb")
+
+
+def getInterpolatedUpperLimitDelaunay(Dict, inmx, inmy):
+    """
+    Get interpolated upper limit from dictionary at point (inmx, inmy).
+    
+    :param Dict: dictionary (sms.py), contains upper limits of one analysis and
+    one topology
+    :param inmx: mass point on x-axis
+    :param inmy: mass point on y-axis
+    :returns: interpolated upper limit at point (inmx, inmy)
+    
+    """
     try:
         import numpy as np
         import scipy.interpolate as ip
         mx = rmvunit(inmx, 'GeV')
         my = rmvunit(inmy, 'GeV')
         if not inConvexHull(Dict, mx, my):
-            logger.debug ("Can\'t interpolate for (%f,%f), point is not in convex hull." % (inmx, inmy))
+            logger.debug("Cannot interpolate for (%f, %f), point is not in \
+                          convex hull." % (inmx, inmy))
             return None
         n = 0
         for k in Dict:
@@ -170,274 +258,41 @@ def getInterpolatedUpperLimitDelaunay (Dict, inmx, inmy):
         grid_x = mx
         grid_y = my
         return float(ip.griddata(points, values, (grid_x, grid_y), method='linear'))
-    except Exception as e:
-        logger.error ("cannot interpolate: %s. use closest value." % str(e))
-        if not inConvexHull (Dict, inmx, inmy): return False
-        return getClosestValue (Dict, inmx, inmy)
-
-def getInterpolatedUpperLimit (Dict, inmx, inmy):
-    """ get interpolated upper limit from dictionary at point (inmx, inmy)
-            :param Dict: dictionray (sms.py), contains upper limits of one analysis and one topology
-            :param inmx: mass point on x-axis
-            :param inmy: mass point on y-axis
-            :returns: interpolated upper limit at point (inmx, inmy) """
-    import scipy.interpolate as ip
-    mx = rmvunit(inmx, 'GeV')
-    my = rmvunit(inmy, 'GeV')
-    cv = getClosestValue (Dict, inmx, inmy)
-    xV, yV, zV = [], [], []
-    keys = Dict.keys()
-    keys.sort()
-    for xvalue in keys:
-        yvalues = Dict[xvalue]
-        for (yvalue, zvalue) in yvalues.items():
-            xV.append (xvalue)
-            yV.append (yvalue)
-            zV.append (zvalue)
-    try:
-        ip2d = ip.interpolate.interp2d (xV, yV, zV, kind='cubic', fill_value=999999.)
-        tmp = ip2d(mx, my)
-        if len(tmp) != 1:
-            logger.warning ("return value of interpolation is not a single-element array?")
-            return None
-        if abs (tmp[0] - cv) / cv < 0.3: return tmp[0]
-        logger.warning ("when interpolating, would have had to interpolate too much. returning None.")
-        return None
-    except Exception as e:
-        logger.warning ("when interpolating, caught exception: " + str(e))
-        return None
-
-def getUpperLimitFromDictionary (analysis, topo, mx=None, my=None, run=None, png=None, interpolate=False, expected=False):
-    """ shouldnt have to call this directly. It's obtaining an upper limit from the python dictionary """
-    Dict = smsHelpers.getUpperLimitDictionary (analysis, topo, run, expected=expected)
-    if Dict == None: return Dict
-    if mx==None and my==None:
-        return Dict
-    if mx==None or my==None:
-        logger.error("asking for upper limits for mx=%s my=%s" % (mx, my))
-        return None
-    if rmvunit(mx, 'GeV') == None: return Dict
-    return addunit(getInterpolatedUpperLimitDelaunay(Dict, mx, my), "pb")
-
-def getSmartUpperLimit (analysis, topo, masses, massesbranch2=None, debug=False):
-    """ returns the upper limit for analysis/topo, given an ordered sequence of
-            the mass (mother, intermediate, LSP) """
-    import smsInterpolation
-    return smsInterpolation.upperLimit(analysis, topo, masses, debug)
-#    return getUpperLimit ( analysis, topo, mx=masses[0], my=masses[-1], interpolate=True )
-
-def getUpperLimit (analysis, topo, mx=None, my=None, run=None, interpolate=False, expected=False):
-    """ get the upper limit for run/analysis/topo.
-            return none if it doesnt exist.
-            if mx and my are none, return the entire dictionary,
-            if mx and my are floats, return the upper limit at this
-            point
-    """
-    run = smsHelpers.getRun (analysis, run)
-    if smsHelpers.hasDictionary (analysis, run):
-        return  getUpperLimitFromDictionary (analysis, topo, mx, my, run, interpolate=interpolate, expected=expected)
-    logger.warning ("no upper limits found for %s" %analysis)
-    return None 
-
-def getEfficiency (analysis, topo, mx=None, my=None, run=None):
-    """ get the efficiency for run/analysis/topo.
-            return none if it doesnt exist.
-            if mx and my are none, return the entire histogram,
-            if mx and my are floats, return the upper limit at this
-            point """
-    logger.error ( "efficiencies not yet implemented" )
-    return None
-
-def getExplanationForLackOfUpperLimit (analysis, topo, mx=None, my=None, run=None, number=False):
-    """if there's no upper limit, we want to know what's wrong.
-       If number is false, return a text, if number is true
-       return the error code
-    """
-    value = getUpperLimit (analysis, topo, run=run)
-    msg = smsHelpers.getErrorMessage (value, mx, my)
-    if number: return msg[0]
-    return msg[1]
-
-def getLumi (analysis, run=None):
-    """ get the integrated luminosity for this analysis """
-    lumifb = float(smsHelpers.getMetaInfoField (analysis, "lumi", run))
-    return addunit (lumifb, "fb-1")
-
-def getSqrts (analysis, run=None):
-    """ get s_hat for this analysis """
-    sqrts = smsHelpers.getMetaInfoField (analysis, "sqrts", run)
-    try:
-        return addunit (float(sqrts), "TeV")
-    except:
-        pass
-    return sqrts
-
-def getPAS (analysis, run=None):
-    """ get the PAS for this analysis """
-    return smsHelpers.getMetaInfoField (analysis, "pas", run)
-
-def hasDictionary (analysis, run=None):
-    """ are the upper limits available in dictionary format? """
-    return smsHelpers.hasDictionary (analysis, run)
-
-def getx (analysis, topo=None, run=None):
-    """ get the description of the x-values for this analysis, if you supply a
-            topo, then the return value is the x-values only for this topo """
-
-    st = smsHelpers.getMetaInfoField (analysis, "x", run)
-    if not st:
-        return None
-    st = st.split(',')
-    d = {}
-    for i in range(len(st)):
-        l = st[i].split(':')
-        x = l[1].split()
-        d[l[0].replace(" ", "")] = x
-
-    if topo:
-        topo = topo.replace(" ", "")
-        if not d or not topo in d: return None
-        else: return d[topo]
-
-    return d
-
-def getFigures (analysis, run=None):
-    """ get the figure number for this analysis """
-    return smsHelpers.getMetaInfoField (analysis, "figures", run)
-
-def getComment (analysis, run=None):
-    """ an option comment? """
-    return smsHelpers.getMetaInfoField (analysis, "comment", run)
-
-conditions = {}
-
-def getConditions (analysis, topo="all", fuzzy=True, run=None):
-    """ get the conditions. if topo is "all",
-            returns a dictionary, else it returns the condition
-            only for the given topo, None if non-existent. """
-    key = analysis + topo + str(fuzzy) + str(run)
-    if key in conditions: return conditions[key]
-    run = smsHelpers.getRun (analysis, run)
-    if fuzzy: ret = smsHelpers.fuzzyconditions (analysis, run)
-    else: ret = smsHelpers.conditions (analysis, run)
-    if topo == "all":
-        conditions[key] = ret
-        return ret
-    if not topo in ret:
-        conditions[key] = None
-        return None
-    conditions[key] = ret[topo]
-    return ret[topo]
-
-constraints = {}
-
-def getConstraints (analysis, topo="all", run=None):
-    """ get the constraints. if topo is "all", 
-            returns a dictionary, else it returns the constraint
-            only for the given topo, None if non-existent. """
-    key = analysis + topo + str(run)
-    if key in constraints: return constraints[key]
-    run = smsHelpers.getRun (analysis, run)
-    ret = smsHelpers.constraints (analysis, run)
-    if topo == "all":
-        constraints[key] = ret
-        return ret
-    if not topo in ret:
-        constraints[key] = None
-        return None
-    constraints[key] = ret[topo]
-    return ret[topo]
-
-def getJournal (analysis, run=None):
-    """ get the journal of this analysis """
-    return smsHelpers.getMetaInfoField (analysis, "journal", run)
-
-def getBibtex (analysis, run=None):
-    """ get the inspire page with the bibtex entry for this analysis """
-    return smsHelpers.getMetaInfoField (analysis, "bibtex", run)
-
-def getURL (analysis, run=None):
-    """ get the URL for this analysis """
-    return smsHelpers.getMetaInfoField (analysis, "url", run)
-
-def hasURL (analysis, run=None):
-    """ see if an URL is known """
-    return smsHelpers.hasMetaInfoField (analysis, "url", run)
-
-def exists(analysis, topo, run=None):
-    """ check if the dictioanary ``limit_topo'' in 
-     run/analysis/sms.py exists.
-     For topologies with intermediate masses, check if all dictionaries
-     listed in the axes-information exist.
-     If topo==None, simply check
-     if run/analysis/sms.py exists. """
-    import smsInterpolation
-    run2 = smsHelpers.getRun(analysis, run)
-    if not topo:
-        import os
-        Base = smsHelpers.Base
-        pydict = "%s/%s/%s/sms.py" % (Base, run2, analysis)
-        if os.path.exists(pydict):
-            return True
-        else:
+    except Exception as e: # TODO: which exception?
+        logger.error("Cannot interpolate %s. Using closest value instead." % str(e))
+        if not inConvexHull(Dict, inmx, inmy):
             return False
-    axes = getaxes(analysis, topo)
-    if not axes:
+        return getClosestValue(Dict, inmx, inmy)
+    
+
+def inConvexHull(Dict, mx, my):
+    pointlist = []
+    for k in Dict.keys():
+        for ki in Dict[k].keys():
+            pointlist.append([k, ki])
+#    try:
+    import numpy
+    p = numpy.array(pointlist)
+    from scipy.spatial import Delaunay
+    dela = Delaunay(p)
+    return dela.find_simplex((mx, my)) >= 0
+
+
+def getClosestValue (Dict, mx, my):
+    """
+    Get the upper limit of the point in Dict that is closest to mx and my,
+    assuming that Dict is a dictionary of mx,my,ul.
+    
+    """
+    closest = 9999999
+    retul = None
+    for (dmx, dmv) in Dict.items():
+        for (dmy, ul) in dmv.items():
+            dist = (mx - dmx) ** 2 + (my - dmy) ** 2
+            if dist < closest:
+                closest = dist
+                retul = ul
+    if closest > 20.**2:    # # if we're more than 20 gev from the closest point, we return False
         return False
-    hasDict = smsHelpers.hasDictionary (analysis, run2)
-    if not hasDict: return False
-    return smsHelpers.hasDictionary (analysis, run2, topo )
-    ### FIXME why so complicated???
-    #for a in axes:
-    #    mzname = None
-    #    if a['mz'] and len(a['mz']): mzname = a['mz'][0]
-    #    if hasDict:
-    #        toponame = smsInterpolation.getHistName(topo, mzname)
-    #        Dict = smsHelpers.getUpperLimitDictionary (analysis, toponame, run2)
-    #        if not Dict or len(Dict) == 0: 
-    #            return False
-    #        continue
-    #    else:
-    #        return False
-
-    #return True
-
-
-def getaxes(analysis, topo=None, run=None):
-    """ get information about the histogram axes for this analysis: for each topo
-        list of dictionary, each dictionary corresponds to one histogram, the key
-        axes gives string (mx-my), the key mz gives information on other masses, if
-        you supply a topo, returns list for this topo only. """
-    if not exists(analysis, topo=None):    # # analysis is not known, we return None
-        return None
-    try:
-        st = smsHelpers.getMetaInfoField (analysis, "axes", run)
-    except MetaInfoError:
-        logger.error("Meta info field 'axes' does not exist in %s." %analysis)
-        st = None
-    if not st:
-        if not topo: return None    # cannot return default without info on topology
-# if there is no information about the axes, return the default
-        return [{'axes': 'M1-M0', 'mz': None}]
-    st = st.split(',')
-    d = {}
-    for i in range(len(st)):
-        l = st[i].split(':')
-        nm = l[0].replace(" ", "")
-        d[nm] = []
-        m = l[1].split('-')
-        for j in range(len(m)):
-            n = m[j].split()
-            if len(n) == 2:
-                d[nm].append({'axes': n[0] + '-' + n[1], 'mz': None})
-            else: d[nm].append({'axes': n.pop(0) + '-' + n.pop(0), 'mz': n})
-
-    if topo:
-        topo = topo.replace(" ", "")
-        if not d or not topo in d:
-    # # topology does not exist, we return None
-            return None
-        else: return d[topo]
-
-    return d
+    return retul
 
