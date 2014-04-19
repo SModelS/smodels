@@ -126,13 +126,13 @@ def evalConditions(cluster, analysis):
             
             if newcond.find("Cgtr") >= 0:
                 newcond = newcond.replace("Cgtr", "cGtr")
-                logger.warning(analysis.label + " using deprecated function \
-                        'Cgtr'. Auto-replacing with 'cGtr'.")
+                logger.warning(analysis.label + " using deprecated function "
+                        "'Cgtr'. Auto-replacing with 'cGtr'.")
                 
             if newcond.find("Csim") >= 0:
                 newcond = newcond.replace("Csim", "cSim")
-                logger.warning(analysis.label + " using deprecated function \
-                        'Csim'. Auto-replacing with 'cSim'.")
+                logger.warning(analysis.label + " using deprecated function "
+                        "'Csim'. Auto-replacing with 'cSim'.")
             
             conditions[cond] = eval(newcond)
             
