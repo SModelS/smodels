@@ -18,12 +18,11 @@ logger = logging.getLogger(__name__)
 
 def limit(analysis, addTheoryPredictions=[]):
     """
-    The next generation limit retrieval function, should get all information
-    from the analysis object.
+    Get limit from an analysis object.
 
     :param addTheoryPredictions: list of theory predictions to add, e.g.,
     [ '7 TeV (NLL)', '7 TeV (LO)' ]
-    :type addTheoryPredictions: list of strings
+    :type addTheoryPredictions: [String]
     """
     sqrts = rmvunit(analysis.sqrts,"TeV")
     # lead=analysis.Top.leadingElement()
@@ -59,31 +58,31 @@ def limit(analysis, addTheoryPredictions=[]):
         
 def getPlotLimit(inmass, analysis, complain=False):
     """
-    Get upper limit on sigma*BR for a specific array of masses from plot
+    Get upper limit on sigma*BR for a specific array of masses from plot.
     
-    :param inmass: Array of masses in SModelS graph
-    :param analysis: SMSDataObjects.EAnalysis
+    :param inmass: Array of masses in SModelS graph.
+    :param analysis: experiment.analysis.ULanalysis.
     
     """
-    massarray = copy.deepcopy(inmass)
+    massArray = copy.deepcopy(inmass)
 
-    # Skip empty mass arrays:
-    if len(massarray) < 2: 
-        logger.info('M = ' + str(massarray))
+    # Skip empty mass arrays
+    if len(massArray) < 2: 
+        logger.info('M = ' + str(massArray))
         sys.exit()
         if complain:
-            logger.error("Length of massarray < 2.")
+            logger.error("Length of mass-array < 2.")
         return False
 
-    # Make sure the two branches have equal masses:
-    if massarray[0] != massarray[1]:
+    # Make sure the two branches have equal masses
+    if massArray[0] != massArray[1]:
         if complain:
             logger.error("Masses differ between branches.")
         return False
 
-    masslist = [rmvunit(mass,'GeV') for mass in massarray[0]]
+    masslist = [rmvunit(mass,'GeV') for mass in massArray[0]]
 
-    # Run label:
+    # Run label
     run = analysis.run
     # If run has not been defined, use latest run
     if run == "":
