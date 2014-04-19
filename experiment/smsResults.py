@@ -44,9 +44,9 @@ def getAllResults(run=None):
     if run: runs = [ run ]
     ret = {}
     for r in runs:
-        dirs = os.listdir ("%s/%s/" % (smsHelpers.Base, r))
+        dirs = os.listdir ("%s/%s/" % (smsHelpers.base, r))
         for ana in dirs:
-            if os.path.exists ("%s/%s/%s/info.txt" % (smsHelpers.Base, r, ana)):
+            if os.path.exists ("%s/%s/%s/info.txt" % (smsHelpers.base, r, ana)):
                 topos = getTopologies (ana, run )
                 ret[ana] = topos
     allresults[key] = ret
@@ -107,8 +107,10 @@ def getConditions (analysis, topology="all", fuzzy=True, run=None):
     key = analysis + topology + str(fuzzy) + str(run)
     if key in conditions: return conditions[key]
     run = smsHelpers.getRun (analysis, run)
-    if fuzzy: ret = smsHelpers.fuzzyconditions(analysis, run)
-    else: ret = smsHelpers.conditions(analysis, run)
+    if fuzzy:
+        ret = smsHelpers.getLines(analysis, run, "fuzzycondition")
+    else:
+        ret = smsHelpers.getLines(analysis, run, "condition")
     if topology == "all":
         conditions[key] = ret
         return ret
@@ -175,8 +177,8 @@ def exists(analysis, topology, run=None):
     run2 = smsHelpers.getRun(analysis, run)
     if not topology:
         import os
-        Base = smsHelpers.Base
-        pydict = "%s/%s/%s/sms.py" % (Base, run2, analysis)
+        base = smsHelpers.base
+        pydict = "%s/%s/%s/sms.py" % (base, run2, analysis)
         if os.path.exists(pydict):
             return True
         else:

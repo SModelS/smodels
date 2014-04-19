@@ -16,7 +16,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-Base = "/afs/hephy.at/user/w/walten/public/sms/"
+base = "/afs/hephy.at/user/w/walten/public/sms/"
 runs = ["8TeV", "2012", "ATLAS8TeV", "2011", "RPV8", "RPV7"]
 runs_ = {}
 mlines = {}
@@ -37,11 +37,11 @@ def getRun(analysis, run=None):
     key=analysis+str(run)
     if key in runs_: return runs_[key]
     if run:
-        if os.path.exists ( "%s/%s/%s" % ( Base, run, analysis ) ):
+        if os.path.exists ( "%s/%s/%s" % ( base, run, analysis ) ):
             runs_[key]=run
             return run
     for trun in runs:
-        if os.path.exists ( "%s/%s/%s" % ( Base, trun, analysis ) ):
+        if os.path.exists ( "%s/%s/%s" % ( base, trun, analysis ) ):
             runs_[key]=trun
             return trun
     runs_[key]=None
@@ -64,7 +64,7 @@ def getLines(analysis, run, label="condition"):
     key = analysis + run + label
     if key in mlines:
         return mlines[key]
-    info = "%s/%s/%s/info.txt" % (Base, run, analysis)
+    info = "%s/%s/%s/info.txt" % (base, run, analysis)
     ret = {}
     if not os.path.exists(info):
         logger.warn("Cannot find %s." % info)
@@ -132,7 +132,7 @@ def parseMetaInfo ( analysis, run ):
     key = analysis + str(run)
     if key in pMI_:
         return pMI_[key]
-    info = "%s/%s/%s/info.txt" % (Base, run, analysis)
+    info = "%s/%s/%s/info.txt" % (base, run, analysis)
     ret = {}
     if not os.path.exists(info):
         logger.warn("cannot find %s" % info)
@@ -160,22 +160,6 @@ def parseMetaInfo ( analysis, run ):
     return ret
 
 
-def fuzzyconditions(analysis, run):
-    """
-    Get all fuzzyconditions for an analysis-run pair.
-    
-    """
-    return getLines(analysis, run, "fuzzycondition")
-
-
-def conditions(analysis, run):
-    """
-    Get all conditions for an analysis-run pair.
-    
-    """
-    return getLines(analysis, run, "condition")
-
-
 def getUpperLimitDictionary(analysis, topo, run, expected=False):
     """
     TODO: write docstring
@@ -188,7 +172,7 @@ def getUpperLimitDictionary(analysis, topo, run, expected=False):
     else:
         if key in upperLimitDict:
             return upperLimitDict[key]
-    dictfile="%s/%s/%s/sms.py" % (Base, run, analysis)
+    dictfile="%s/%s/%s/sms.py" % (base, run, analysis)
     if not os.path.exists(dictfile):
         logger.warn("Dictionary file %s does not exist." % dictfile)
         upperLimitDict[key] = None
@@ -225,7 +209,7 @@ def hasDictionary(analysis, run=None, topo=None):
     """
     if not run:
         run = getRun(analysis)
-    dictfile = "%s/%s/%s/sms.py" % (Base, run, analysis)
+    dictfile = "%s/%s/%s/sms.py" % (base, run, analysis)
     if os.path.exists(dictfile):
         if topo == None:
             return True
