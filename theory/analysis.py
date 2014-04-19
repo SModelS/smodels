@@ -57,7 +57,7 @@ class ULanalysis(object):
         :returns: experimental upper limit for cross-section times BR
         
         """        
-        return limitGetter.getPlotLimit(mass, self, complain=False)
+        return limitGetter.getPlotLimit(mass, self)
         
     
 class SRanalysis(object):

@@ -27,7 +27,7 @@ def limit(analysis, addTheoryPredictions=[]):
     sqrts = rmvunit(analysis.sqrts,"TeV")
     # lead=analysis.Top.leadingElement()
     ret = []
-    for (constraint, condition) in analysis.results.items():
+    for (constraint, _) in analysis.results.items():
         if len(addTheoryPredictions) > 0:
             if not analysis.computeTheoryPredictions() or \
                     len(analysis.ResultList) == 0:
@@ -35,7 +35,7 @@ def limit(analysis, addTheoryPredictions=[]):
             theoRes = analysis.ResultList[0]
         tx = analysis.plots[constraint][0]
         for ana in analysis.plots[constraint][1]:
-            for (index, element) in enumerate(analysis.Top.elements()):
+            for (_, element) in enumerate(analysis.Top.elements()):
                 for (mi, masses1) in enumerate(element.B[0].masses):
                     # masses1=element.B[0].masses[0] # ,lead.B[1].masses[0]
                     masses2 = element.B[1].masses[mi] # ,lead.B[1].masses[0]
@@ -56,7 +56,7 @@ def limit(analysis, addTheoryPredictions=[]):
     return ret
 
         
-def getPlotLimit(inmass, analysis, complain=False):
+def getPlotLimit(inmass, analysis):
     """
     Get upper limit on sigma*BR for a specific array of masses from plot.
     
@@ -67,17 +67,13 @@ def getPlotLimit(inmass, analysis, complain=False):
     massArray = copy.deepcopy(inmass)
 
     # Skip empty mass arrays
-    if len(massArray) < 2: 
-        logger.info('M = ' + str(massArray))
+    if len(massArray) < 2:
+        logger.error("Length of mass-array < 2 (M = " + str(massArray) + ").")
         sys.exit()
-        if complain:
-            logger.error("Length of mass-array < 2.")
-        return False
 
     # Make sure the two branches have equal masses
     if massArray[0] != massArray[1]:
-        if complain:
-            logger.error("Masses differ between branches.")
+        logger.error("Masses differ between branches.")
         return False
 
     masslist = [rmvunit(mass,'GeV') for mass in massArray[0]]
@@ -89,6 +85,6 @@ def getPlotLimit(inmass, analysis, complain=False):
         run = None
      
     analysis, cmsLabel = analysis.label.split(':')    
-    limit = smsResults.getSmartUpperLimit(analysis, cmsLabel, masslist, run,
-                                          debug=complain) 
-    return limit
+    upperLimit = smsResults.getSmartUpperLimit(analysis, cmsLabel, masslist,
+                                               run) 
+    return upperLimit
