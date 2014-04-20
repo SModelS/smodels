@@ -1,7 +1,7 @@
 """
 .. module:: theory.crossSection
-   :synopsis: A class that encapsulates the result of the computation of the
-   reference cross section.
+   :synopsis: Encapsulates the result of the computation of the reference
+   cross section.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -17,7 +17,9 @@ logger = logging.getLogger(__name__)
 
 class XSectionInfo(object):
     """
-    A simple class to store information about the cross-section (center of
+    An instance of this class represents information regarding a cross-section.
+    
+    This class is used to store information of a cross-section (center of
     mass, order and label).
     
     """
@@ -46,7 +48,9 @@ class XSectionInfo(object):
     
     def copy(self):
         """
-        Generates an independent copy of itself. Faster than deepcopy.
+        Generate an independent copy of self.
+        
+        Faster than deepcopy.
         
         """
         newinfo = XSectionInfo()
@@ -58,7 +62,9 @@ class XSectionInfo(object):
 
 class XSection(object):
     """
-    A simple class to store the information about a single cross-section
+    An instance of this class represents a cross-section.
+    
+    This class is used to store the information of a single cross-section
     (value, paritcle ids, center of mass, order and label).
     
     order = 0 (LO), 1 (NLO) or 2 (NLL).
@@ -90,7 +96,7 @@ class XSection(object):
                 res = self.copy()
                 res.value += other.value
                 return res
-        logger.error("Trying to add", type(other), "to a XSection objetc")
+        logger.error("Trying to add", type(other), "to a XSection object")
         return False
 
 
@@ -120,7 +126,7 @@ class XSection(object):
 
     def __str__ (self):
         """
-        Cross-section information in string format.
+        Generate cross-section information in string format.
         
         """
         st = self.info.label+':'+str(self.value)
@@ -129,7 +135,9 @@ class XSection(object):
     
     def copy(self):
         """
-        Generates an independent copy of itself. Faster than deepcopy.
+        Generates an independent copy of self.
+        
+        Faster than deepcopy.
         
         """
         newXsec = XSection()
@@ -141,7 +149,7 @@ class XSection(object):
     
     def zeroXSec(self):
         """
-        Replaces the cross-section value by zero.
+        Replace the cross-section value by zero.
         
         """
         self.value = addunit(0., 'fb')
@@ -149,14 +157,18 @@ class XSection(object):
          
 class XSectionList(object):
     """
-    A simple class to store a list of cross-sections to be used.
+    An instance of this class represents a list of cross-sections.
+    
+    This class is used to store a list of cross-sections.
     
     """
     def __init__ (self, infoList=None):
         """
-        Creates a list of XSection objects from the input string with None
-        cross-section values. If infoList is defined, create entries with zero
-        cross-sections according to infoList.
+        Create a list of XSection objects from the input string with None
+        cross-section values.
+        
+        If infoList is defined, create entries with zero cross-sections
+        according to infoList.
         
         """
         self.xSections=[]
@@ -230,8 +242,10 @@ class XSectionList(object):
         
     def addValue(self, newxsec):
         """
-        Adds a XSection object to the list. If the XSection object already
-        exists, add to its values, otherwise append the object.
+        Add a XSection object to the list.
+        
+        If the XSection object already exists, add to its values, otherwise
+        append the object.
         
         """
         if type(newxsec) != type(XSection()):
@@ -250,7 +264,7 @@ class XSectionList(object):
 
     def getXsecsFor(self, item):
         """
-        Returns a list of XSection objects for item (label, pid, sqrts).
+        Return a list of XSection objects for item (label, pid, sqrts).
         
         """
         xsecList = XSectionList()
@@ -269,7 +283,7 @@ class XSectionList(object):
     
     def zeroXSecs(self):
         """
-        Replaces the cross-section values in the list by zero.
+        Replace the cross-section values in the list by zero.
         
         """
         for xsec in self:
@@ -278,7 +292,7 @@ class XSectionList(object):
 
     def delete(self, xSec):
         """
-        Deletes the cross-section entry from the list.
+        Delete the cross-section entry from the list.
         
         """
         for ixsec, xsec in enumerate(self):
@@ -288,9 +302,11 @@ class XSectionList(object):
 
     def getInfo(self):
         """
-        Gets the basic info about the cross-sections appearing in the list
-        (order, value and label). Returns a list of XSectionInfo objects.
+        Get basic info about the cross-sections appearing in the list (order,
+        value and label).
         
+        :returns: list of XSectionInfo objects
+                
         """
         allInfo = []
         for xsec in self:
@@ -302,7 +318,7 @@ class XSectionList(object):
 
     def getLabels(self):
         """
-        Gets all the labels appearing in the list.
+        Get all labels appearing in the list.
         
         """
         allLabels = []
@@ -314,7 +330,7 @@ class XSectionList(object):
 
     def getPIDpairs(self):
         """
-        Gets all the particle ID pairs appearing in the list.
+        Get all particle ID pairs appearing in the list.
         
         """
         allPidPairs = []
@@ -325,7 +341,7 @@ class XSectionList(object):
 
     def getPIDs(self):
         """
-        Gets all the particle IDs appearing in the list.
+        Get all particle IDs appearing in the list.
         
         """
         allPids = []
@@ -336,7 +352,7 @@ class XSectionList(object):
 
     def getMaxXsec(self):
         """
-        Gets the maximum cross-section value appearing in the list.
+        Get the maximum cross-section value appearing in the list.
         
         """
         maxxsec = addunit(0., 'fb')
@@ -347,7 +363,7 @@ class XSectionList(object):
 
     def getMinXsec(self):
         """
-        Gets the minimum cross-section value appearing in the list.
+        Get minimum cross-section value appearing in the list.
         
         """
         if len(self) > 0: minxsec = self.xSections[0].value
@@ -360,12 +376,13 @@ class XSectionList(object):
 
     def getDictionary(self, groupBy="pids"):
         """
-        Converts the list of XSection objects to a nested dictionary. First
-        level keys are the particles IDs (if groupBy=pids) or labels
-        (if groupBy=labels) and values are the cross-section labels or particle
-        IDs and the cross-section value. If groupBy=pids and a single pid is
-        present, return a simple dictionary with the cross-sections for the
-        pid.
+        Convert the list of XSection objects to a nested dictionary.
+        
+        First level keys are the particles IDs (if groupBy == pids) or labels
+        (if groupBy == labels) and values are the cross-section labels or
+        particle IDs and the cross-section value. If groupBy == pids and a
+        single pid is present, return a simple dictionary with the
+        cross-sections for the pid.
         
         """
         xSecDictionary = {}
@@ -394,11 +411,12 @@ class XSectionList(object):
     
     def combineWith(self, newXsecs):
         """
-        Adds a new list of cross-sections. If the new cross-sections already
-        appear (have same order and sqrts), add its value to the original
-        value, otherwise append it to the list. The particle IDs are ignored
-        when adding cross-sections. Hence they are set to (None, None) if any
-        cross-sections are combined.
+        Add a new list of cross-sections.
+        
+        If the new cross-sections already appear (have same order and sqrts),
+        add its value to the original value, otherwise append it to the list.
+        The particle IDs are ignored when adding cross-sections. Hence, they
+        are set to (None, None) if any cross-sections are combined.
         
         """        
         newList = newXsecs
@@ -416,8 +434,10 @@ class XSectionList(object):
                         
     def removeLowerOrder(self):
         """
-        For each process in the list, keep only the highest order cross-section.
+        Keep only the highest order cross-section for each process in the list.
+        
         Remove order information and set default labels.
+        
         """
         
         newList = XSectionList()
@@ -428,7 +448,8 @@ class XSectionList(object):
                 removeXsec = False
                 isqrts = ixsec.info.sqrts
                 iorder = ixsec.info.order
-#Check if the xsec appear with the same sqrts but at a higher order:                
+                # Check if the xsec appear with the same sqrts but at a higher
+                # order                
                 for j,jxsec in enumerate(xsecs):
                     if i == j: continue
                     jsqrts = jxsec.info.sqrts
@@ -437,16 +458,15 @@ class XSectionList(object):
                         removeXsec = True
                         break
                 if not removeXsec:
-                    newxsec.info.label = str(newxsec.info.sqrts)   #Erase cross-section labels and information
+                    # Erase cross-section labels and information
+                    newxsec.info.label = str(newxsec.info.sqrts)
                     newxsec.info.order = None
                     newList.add(newxsec)
         
         if len(self) != len(newList):
             logger.warning("Removing %i lower order cross-sections" %(len(self) - len(newList)))
             self.xSections = newList.xSections
-                    
-        
-        
+
 
 def getXsecFromSLHAFile(slhafile, useXSecs=None):
     """
@@ -458,7 +478,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None):
     :returns: a XSectionList object    
      
     """
-    # To store information about all cross-sections in the SLHA file
+    # Store information about all cross-sections in the SLHA file
     xSecsInFile = XSectionList()    
     slha = open(slhafile, 'r')
     lines = slha.readlines()
@@ -473,7 +493,8 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None):
             pids = (eval(l.split()[5]), eval(l.split()[6]))
             continue
         if not xsecblock:
-            continue    #ignores other entries
+            # Ignore other entries
+            continue    
         csOrder = eval(l.split()[1])
         cs = addunit(eval(l.split()[6]), 'fb')
         wlabel = str(int(sqrtS))+' TeV'
@@ -511,7 +532,7 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
     :returns: a XSectionList object
     
     """
-    # To store information about all cross-sections in the LHE file
+    # Store information about all cross-sections in the LHE file
     xSecsInFile = XSectionList()    
     reader = lheReader.lheReader(lhefile)
     if not rmvunit(reader.metainfo["totalxsec"],'fb'):
@@ -569,6 +590,5 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
                     xSecsInFile.xSections[ixsec].value += eventCs
     
     reader.close()
-
 
     return xSecsInFile
