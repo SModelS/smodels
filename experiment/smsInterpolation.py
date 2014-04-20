@@ -1,10 +1,12 @@
 """
-.. module:: smsInterpolation
-   :synopsis: smsInterpolation is called by smsResults.getSmartUpperLimit.
-   UpperLimit takes arbitrary input masses and checks if there is a
-   corresponding upper limit for the given analysis and topology. The upper
-   limit is returned in 'pb'. If several histograms with different x-values are
-   available, an interpolation is performed.
+.. module:: experiment.smsInterpolation
+   :synopsis: TODO: write synopsis
+   
+   smsInterpolation is called by smsResults.getSmartUpperLimit. UpperLimit
+   takes arbitrary input masses and checks if there is a corresponding upper
+   limit for the given analysis and topology. The upper limit is returned in
+   'pb'. If several histograms with different x-values are available, an
+   interpolation is performed.
 
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
 
@@ -17,12 +19,14 @@ from scipy.interpolate import griddata
 from tools.physicsUnits import rmvunit, addunit
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
+
 
 def getxval(mx, my, mz, mass=False):
     """
-    Calculate x-value for one point. If mass=True is selected: return
-    intermediate mass instead of x-value.
+    Calculate x-value for one point.
+    
+    If mass == True is selected, return intermediate mass instead of x-value.
     
     :param mx: Mother-mass
     :param my: LSP-mass
@@ -60,9 +64,9 @@ def getxval(mx, my, mz, mass=False):
     return xval
 
 
-def doGridData(ana, topo, masses, dPar, run=None):
+def doGridData(analysis, topology, masses, dPar, run=None):
     """
-    Creates np.array and uses scipy.griddata function for ana, topo.
+    Create np.array and uses scipy.griddata function for analysis-topology.
     
     """
     masslist = []
@@ -70,8 +74,8 @@ def doGridData(ana, topo, masses, dPar, run=None):
 
     for ds in dPar:
         if not ds['mz']:
-            logger.error("No information on intermediate mass available for \
-                          %s/%s." % (ana, topo))
+            logger.error("No information on intermediate mass available for "
+                         "%s/%s." % (analysis, topology))
             return None
 
         d = None
@@ -85,8 +89,8 @@ def doGridData(ana, topo, masses, dPar, run=None):
         elif ds['mz'][0].find('M1')>-1:
             m1 = float(ds['mz'][0].split("M1")[1])
 
-        ulDict = smsHelpers.getUpperLimitDictionary(ana,
-                                        getHistName(topo, ds['mz'][0]), run)
+        ulDict = smsHelpers.getUpperLimitDictionary(analysis,
+                                        getHistName(topology, ds['mz'][0]), run)
         for x in ulDict:
             for y in ulDict[x]:
 
@@ -129,7 +133,7 @@ def doGridData(ana, topo, masses, dPar, run=None):
 
     if np.isnan(r):
         logger.error("Masses out of range for %s/%s (no extrapolation)" \
-                      % (ana, topo))
+                      % (analysis, topology))
         return None
 
     return addunit(float(r), 'pb')
@@ -137,8 +141,9 @@ def doGridData(ana, topo, masses, dPar, run=None):
 
 def getAxis(w, a):
     """
-    For w=x,y, find according index in the masses-list, using the
-    axes-information a=(mx-my).
+    Find according index in the masses-list for w == x, y.
+    
+    Use the axes-information a == (mx - my).
     
     """
     ml = []
@@ -153,11 +158,13 @@ def getAxis(w, a):
 
 def compareMasses(masses, d):
     """
-    Check if input masses are comparable to masses in the histogram
-    corresponding to the information given in axes-dictionary d.
+    Check if input masses are comparable to masses in the histogram.
+    
+    Masses are comparable corresponding to the information given in
+    axes-dictionary d.
     
     """
-    # check if histogram axes are M1, M0, return 1 if x-value of histogram is
+    # Check if histogram axes are M1, M0, return 1 if x-value of histogram is
     # comparable to x value for given masses, 0 if not
     try: 
         x1 = getxval(masses[0], masses[-1], d['mz'][0])
@@ -167,8 +174,8 @@ def compareMasses(masses, d):
             return True
         else:
             return None
-    except:
-        # check if histogram for fixed LSP mass, return 1 if my is comparable
+    except: # TODO: which exception?
+        # Check if histogram for fixed LSP mass, return 1 if my is comparable
         # to LSP mass of the histogram, 0 if not
         if d['mz'][0].find('LSP') > -1:
             mlsp = float(d['mz'][0].split("LSP")[1])
@@ -177,7 +184,7 @@ def compareMasses(masses, d):
                 return True
             else:
                 return None
-        # check for fixed deltaM
+        # Check for fixed deltaM
         elif d['mz'][0].find('D') > -1: 
             ml = []
             ml.append(d['mz'][0].find('M1'))
@@ -192,7 +199,7 @@ def compareMasses(masses, d):
                 return True
             else:
                 return None
-        # check for fixed m_mother
+        # Check for fixed m_mother
         elif d['mz'][0].find('M1') > -1:
             mmother = float(d['mz'][0].split("M1")[1])
             if abs(mmother - rmvunit(masses[0], "GeV")) / \
@@ -203,8 +210,10 @@ def compareMasses(masses, d):
 
 def getIndex(ls, second = False):
     """
-    Find index of list element with maximum value. If the last element is the
-    maximum, return -1. If second=True, find second largest list element.
+    Find index of list element with maximum value.
+    
+    If the last element is the maximum, return -1. If second == True, find
+    second largest list element.
     
     """
     ind = np.argmax(ls)
@@ -225,8 +234,9 @@ def getIndex(ls, second = False):
 
 def getHistName(topo, mz):
     """
-    Build histogram name for given topology and mz information (mz as given in
-    the axes-information).
+    Build histogram name for given topology and mz information.
+    
+    :param mz: given in the axes-information
     
     """
     if mz == None:
@@ -236,9 +246,10 @@ def getHistName(topo, mz):
     else:
         return topo + mz
 
+
 def upperLimit(analysis, topology, masses, run=None):
     """
-    Returns upper limit for analysis, topology, for given masses. 
+    Return upper limit for analysis-topology for given masses. 
     
     :param masses: list of masses, with (mother, intermediate(s), LSP). For
     intermediate masses: if possible do interpolation over upper limits for
@@ -265,14 +276,15 @@ def upperLimit(analysis, topology, masses, run=None):
         logger.error("No intermediate mass in %s/%s." % (analysis, topology))
         return None
     if len(masses) > 3 or len(d[0]['mz']) > 1:
-        logger.error("More than one intermediate mass in %s/%s. Cannot find \
-                      upper limit for topologies with more than one \
-                      intermediate mass." % (analysis, topology))
+        logger.error("More than one intermediate mass in %s/%s. Cannot find "
+                     "upper limit for topologies with more than one "
+                     "intermediate mass." % (analysis, topology))
         return None
     if len(masses) > 2 and len(d) == 1:
         if compareMasses(masses, d[0]):
-            logger.error("Only one histogram available for %s/%s, cannot \
-                          interpolate for intermediate mass." % (analysis, topology))
+            logger.error("Only one histogram available for %s/%s, cannot "
+                         "interpolate for intermediate mass." \
+                         % (analysis, topology))
             return smsResults.getUpperLimit(analysis, getHistName(topology,
                                          d[0]['mz'][0]),
                                          masses[getAxis('x', d[0]['axes'])],

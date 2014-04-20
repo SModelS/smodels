@@ -1,5 +1,5 @@
 """
-.. module:: limitGetter
+.. module:: experiment.limitGetter
    :synopsis: Access the proper experimental limits to given analysis objects.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>

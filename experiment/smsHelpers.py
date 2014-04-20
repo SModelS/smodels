@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
 """
-.. module:: smsHelpers
-   :synopsis: Contains helper functions that are not to be used by the end
-   user.
+.. module:: experiment.smsHelpers
+   :synopsis: Contains private helper functions to access the SMS results.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>

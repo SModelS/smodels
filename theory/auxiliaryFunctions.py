@@ -14,20 +14,22 @@ from scipy import stats
 from collections import Iterable
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
 
 
 def memoize(func):
     """
-    A wrapping to store in cache the results of massPosition, since this is
-    an expensive function.
+    Cache the results of massPosition.
+    
+    Serves as a wrapper to cache the results of massPosition, since this is a
+    computationally expensive function.
     
     """    
     cache = {}
     @wraps(func)
     def wrap(*args):
         """
-        missing
+        TODO: write docstring
         
         """
         if str(args) not in cache:
@@ -38,40 +40,43 @@ def memoize(func):
 
 @memoize
 def massPosition(mass, analysis):
-    """
-    Gives the mass position in upper limit space, using the analysis
-    experimental limit data. If nounit=True, the result is given as number
-    assuming fb units.
+    """ TODO: clarify nounit
+    Give mass position in upper limit space.
+    
+    Use the analysis experimental limit data. If nounit == True, the result is
+    given as number assuming fb units.
     
     """    
     xmass = analysis.getUpperLimitFor(mass)
-    if type(xmass) != type(addunit(1.,'pb')):
+    if type(xmass) != type(addunit(1., 'pb')):
         return None
-    xmass = rmvunit(xmass,'fb')    
+    xmass = rmvunit(xmass, 'fb')    
     return xmass
 
 
 def distance(xmass1, xmass2):
     """
-    Definition of distance between two mass positions.
+    Define distance between two mass positions.
     
     """
     if xmass1 is None or xmass2 is None:
         return None
-    distance = 2.*abs(xmass1-xmass2)/(xmass1+xmass2)
-    if distance < 0.:
-        return None # Skip masses without an upper limit
-    return distance
+    distanceValue = 2.*abs(xmass1 - xmass2)/(xmass1 + xmass2)
+    if distanceValue < 0.:
+        # Skip masses without an upper limit
+        return None
+    return distanceValue
 
 
 def massAvg(massList, method='harmonic'):
     """
-    Computes the average mass of massList, according to method (harmonic or
-    mean). If massList contains a zero mass, switch method to mean.
+    Compute the average mass of massList according to method.
     
-    """
-
-    # Checks:    
+    If massList contains a zero mass, switch method to mean.
+    
+    :param method: possible values: harmonic, mean
+    
+    """  
     if not massList:
         return massList
     if len(massList) == 1:
@@ -84,8 +89,8 @@ def massAvg(massList, method='harmonic'):
         if len(mass) != len(massList[0]) \
                 or len(mass[0]) != len(massList[0][0]) \
                 or len(mass[1]) != len(massList[0][1]):  
-            logger.error('Mass shape mismatch in mass list:\n'+str(mass)
-                         +' and '+str(massList[0]))
+            logger.error('Mass shape mismatch in mass list:\n' + str(mass) +
+                         ' and ' + str(massList[0]))
             return False
     
     avgmass = massList[0][:]
@@ -102,12 +107,12 @@ def massAvg(massList, method='harmonic'):
 
 def cSim(*weights):
     """
-    Defines the auxiliar similar function.
+    Define the auxiliar similar function.
     
-    Returns the maximum relative difference between any element weights of the
+    Return the maximum relative difference between any element weights of the
     list, normalized to [0,1].
     
-    Returns a XSectioList object with the values for each label.
+    :returns: XSectionList object with the values for each label.
     
     """    
     for weight in weights:
@@ -147,10 +152,12 @@ def cSim(*weights):
 
 def cGtr(weightA, weightB):
     """
-    Defines the auxiliary greater function returns a number  between 0 and 1
-    depending on how much it is violated (0 = A > B, 1 = A << B).
+    Define the auxiliary greater function.
     
-    Returns a XSectioList object with the values for each label.
+    Return a number between 0 and 1 depending on how much it is violated
+    (0 = A > B, 1 = A << B).
+    
+    :returns: XSectioList object with the values for each label.
     
     """    
     if type(weightA) != type(crossSection.XSectionList()) or \
@@ -165,12 +172,13 @@ def cGtr(weightA, weightB):
         if not info in infoList:
             infoList.append(info)
     if not infoList:
-        return 'N/A'    # If there are no cross-sections, can not evaluate   
+        # If there are no cross-sections, can not evaluate  
+        return 'N/A' 
     zeros = crossSection.XSectionList(infoList)    
     weightA.combineWith(zeros)
     weightB.combineWith(zeros)
 
-    # valuate the inequality for each cross-section info    
+    # Evaluate the inequality for each cross-section info    
     result =  crossSection.XSectionList()        
     for info in infoList:
         a = rmvunit(weightA.getXsecsFor(info.label)[0].value,'fb')
@@ -188,11 +196,11 @@ def cGtr(weightA, weightB):
     
 def flattenList(inlist, dims=None):
     """
-    An auxliary function to completely flatten a multi-dimensional nested
-    list. The output ordering is: [first level objects, second level objects,
-    ...].    
+    Flatten a multi-dimensional nested list.
     
-    If dims = [], include dimensions of nested list to it (useful when 
+    Output ordering: [first level objects, second level objects, ...].    
+    
+    If dims == [], include dimensions of nested list to it. This is useful when
     comparing lists).
     
     """

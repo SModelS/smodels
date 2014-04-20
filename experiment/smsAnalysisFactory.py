@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: smsAnalysisFactory
+.. module:: experiment.smsAnalysisFactory
    :synopsis: Create a list of analysis objects from a results database.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
@@ -98,9 +98,10 @@ def getRealTopo(tx):
 
 def getElementsEffs(constraint):
     """
-    Generate a dictionary of elements with their simple efficiencies as values
-    for an upper limit-type of analysis. Equals the element multiplicative
-    factor appearing in the constraint.
+    Generate a dictionary of elements with their simple efficiencies as values.
+    
+    Efficiencies are the values for an upper limit-type of analysis. This
+    equals the element multiplicative factor appearing in the constraint.
     
     """      
     # Get element strings appearing in constraint
@@ -120,8 +121,9 @@ def getElementsEffs(constraint):
 
 def getArray(constraint):
     """
-    Extract the number of vertices, branches and insertions from the constraint
-    string. It maps, e.g.,
+    Get number of vertices, branches and insertions from a constraint string.
+    
+    This maps, e.g.,
     2*([[['L'],['L']],[['L'],['nu']]] + [[['L'],['L']],[['nu'],['L']]])
     to
     [[['L'],['L']],[['L'],['nu']]]
@@ -142,5 +144,4 @@ if __name__ == "__main__":
     print("List of analyses/results: ")
     _listOfAnalyses = load()
     for (ct, _ana) in enumerate(_listOfAnalyses):
-        # .label, ana.sqrts
         print(ct, _ana.label, _ana.Top.vertnumb, _ana.Top.vertparts)
