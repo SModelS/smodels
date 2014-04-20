@@ -14,7 +14,7 @@ import copy
 import sys
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
 
 def limit(analysis, addTheoryPredictions=[]):
     """
@@ -25,7 +25,6 @@ def limit(analysis, addTheoryPredictions=[]):
     :type addTheoryPredictions: [String]
     """
     sqrts = rmvunit(analysis.sqrts,"TeV")
-    # lead=analysis.Top.leadingElement()
     ret = []
     for (constraint, _) in analysis.results.items():
         if len(addTheoryPredictions) > 0:
@@ -37,8 +36,7 @@ def limit(analysis, addTheoryPredictions=[]):
         for ana in analysis.plots[constraint][1]:
             for (_, element) in enumerate(analysis.Top.elements()):
                 for (mi, masses1) in enumerate(element.B[0].masses):
-                    # masses1=element.B[0].masses[0] # ,lead.B[1].masses[0]
-                    masses2 = element.B[1].masses[mi] # ,lead.B[1].masses[0]
+                    masses2 = element.B[1].masses[mi]
                     ul = smsInterpolation.upperLimit(ana, tx, masses1)
                     tmp = {"ul": ul, "analysis": ana, "tx": tx, "m1": masses1,
                            "m2": masses2, "sqrts": sqrts}
