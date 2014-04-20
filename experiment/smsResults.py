@@ -67,7 +67,7 @@ def getConstraints(analysis, topology="all", run=None):
     if key in constraints:
         return constraints[key]
     run = smsHelpers.getRun(analysis, run)
-    ret = smsHelpers.constraints(analysis, run)
+    ret = smsHelpers.getLines(analysis, run, "constraint")
     if topology == "all":
         constraints[key] = ret
         return ret
