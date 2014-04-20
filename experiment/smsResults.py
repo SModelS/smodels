@@ -1,5 +1,5 @@
 """
-.. module:: smsResults
+.. module:: experiment.smsResults
    :synopsis: Centralized facility to access the SMS results.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>

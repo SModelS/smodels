@@ -1,4 +1,4 @@
-"""
+""" TODO: write synopsis
 .. module:: theory.branch
    :synopsis: missing
         

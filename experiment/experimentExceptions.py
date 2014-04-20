@@ -2,10 +2,9 @@
 
 """
 .. module:: experiment.experimentExceptions
-   :synopsis: This module contains exception classes for experiment-specific
-   use.
+   :synopsis: Provides exception classes for the experiment package.
     
-.. moduleauthor:: Wolfgang magerl <wolfgang.magerl@gmail.com>
+.. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
     
 """
 

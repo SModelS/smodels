@@ -1,7 +1,7 @@
 """
 .. module:: theory.analysis
-   :synopsis: Encapsulates all data around one result of one analysis, i.e.
-   the association with one plot and one reference cross section result.
+   :synopsis: Encapsulates all data types around one result of one analysis,
+   i.e. the association with one plot and one reference cross section result.
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
         
@@ -12,8 +12,10 @@ from experiment import limitGetter
 
 class ULanalysis(object):
     """
-    Class to store upper limit-type analyses. Stores the conditions and the
-    elements constrained by the analysis as well as basic analysis info.
+    Class to store upper limit-type analyses.
+    
+    Stores the conditions and the elements constrained by the analysis as well
+    as basic analysis info.
     
     self.conditions -- List of condition strings
     
@@ -37,9 +39,10 @@ class ULanalysis(object):
 
     def getEfficiencyFor(self, element):
         """
-        Get (simple) efficiency for element. Equals zero if element is not
-        constrained by the analysis or the element multiplicative factor if it
-        is.
+        Get (simple) efficiency for element.
+        
+        Returns zero if element is not constrained by the analysis or the
+        element multiplicative factor if it is.
         
         :returns: float -- zero, if element is not found
         
@@ -63,6 +66,7 @@ class ULanalysis(object):
 class SRanalysis(object):
     """
     Class to store signal region-type of analyses with efficiency maps.
+    
     Stores the basic analysis info and contains a method for obtaining the
     efficiency from the database.
     
@@ -77,9 +81,8 @@ class SRanalysis(object):
         return self.label
 
     def getEfficiencyFor(self, element):
-        """
-        Function to be used to get the efficiency from a database (dummy
-        for now).
+        """ TODO: remove before release?
+        Get efficiency from a database (dummy for now).
         
         """
         if not element:
@@ -87,9 +90,9 @@ class SRanalysis(object):
         return False
     
     def getLimitFor(self):
-        """
-        Get the experimental limit for a cross-section in a specific signal
-        region. (dummy for now)
+        """ TODO: remove before release?
+        Get experimental limit for a cross-section in a specific signal region.
+        (dummy for now)
         
         :returns: experimental upper limit for cross-section in the signal
         region
