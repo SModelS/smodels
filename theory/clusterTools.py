@@ -1,4 +1,4 @@
-"""
+""" TODO: write synopsis
 .. module:: theory.clusterTools
    :synopsis: missing
         
@@ -10,13 +10,15 @@ from . import crossSection
 from .auxiliaryFunctions import massAvg, massPosition, distance
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
 
 
 class ElementCluster(object):
     """
-    Main class to store the relevant information about a cluster of elements
-    and to manipulate it.
+    An instance of this class represents a cluster.
+    
+    This class is used to store the relevant information about a cluster of
+    elements and to manipulate this information.
     
     """    
     def __init__(self):
@@ -33,7 +35,7 @@ class ElementCluster(object):
         
     def getTotalXSec(self):
         """
-        Returns the sum over the cross-sections of all elements belonging to
+        Return the sum over the cross-sections of all elements belonging to
         the cluster.
         
         """
@@ -44,9 +46,9 @@ class ElementCluster(object):
     
     def getAvgMass(self):
         """
-        Returns the average mass of all elements belonging to the cluster.
+        Return the average mass of all elements belonging to the cluster.
         
-        :returns: the average mass
+        :returns: average mass
          
         """        
         massList = [el.getMasses() for el in self.elements]                
@@ -55,17 +57,19 @@ class ElementCluster(object):
     
 class IndexCluster(object):
     """
-    Auxiliary class to store element indexes and positions in upper limit
-    space. Used by the clustering algorithm.
+    An instance of this class represents a cluster storing element indices.
+    
+    This auxiliary class is used to store element indices and positions in
+    upper limit space. It is used by the clustering algorithm.
     
     """    
     def __init__(self, massMap=None, posMap=None, indices=set([]), 
                  analysis=None):
         self.indices = indices
         self.avgPosition = None
-        # Stores the element mass list (for all elements)
+        # Store the element mass list (for all elements)
         self.massMap = massMap  
-        # Stores the element mass position in upper limit space list (for all
+        # Store the element mass position in upper limit space list (for all
         # elements)
         self.positionMap = posMap
         self.analysis = analysis
@@ -93,7 +97,7 @@ class IndexCluster(object):
         
     def add(self, iels):
         """
-        Adds an index or a list of indices to the list of indices and update
+        Add an index or a list of indices to the list of indices and update
         the avgPosition value.
         
         """
@@ -127,7 +131,7 @@ class IndexCluster(object):
     
     def getAvgPosition(self):
         """
-        Returns the average position in upper limit space for all indices
+        Return the average position in upper limit space for all indices
         belonging to the cluster.
         
         """        
@@ -140,9 +144,10 @@ class IndexCluster(object):
     
     def getDistanceTo(self, obj):
         """
-        Returns the maximal distance between any elements belonging to the
-        cluster and the object obj. The object can be a position in upper limit
-        space or an element index.
+        Return the maximum distance between any elements belonging to the
+        cluster and the object obj.
+        
+        obj can be a position in upper limit space or an element index.
         
         """        
         dmax = 0.
@@ -152,8 +157,8 @@ class IndexCluster(object):
         elif type(obj) == type(float()):
             pos = obj
         else:
-            logging.error("Unknown object type (must be an element index or "+
-                          "position)")
+            logger.error("Unknown object type (must be an element index or "
+                         "position)")
             return False
         
         for jel in self:
@@ -163,7 +168,7 @@ class IndexCluster(object):
     
     def getMaxInternalDist(self):
         """
-        Returns the maximal distance between any pair of elements belonging
+        Return the maximum distance between any pair of elements belonging
         to the cluster as well as the cluster center and any element.
         
         """        
@@ -179,10 +184,12 @@ class IndexCluster(object):
 def getGoodElements(elements, analysis, maxDist):
     """
     Get the list of good masses appearing elements according to the analysis
-    distance. Returns a list of elements with good masses with their masses
-    replaced by the branch average. A mass is good if the mass distance between
-    the branches is less than maxDist and if the element mass (or mass avg)
-    falls inside the upper limit plane.
+    distance.
+    
+    :returns: list of elements with good masses with their masses replaced by
+    the branch average. A mass is good if the mass distance between the
+    branches is less than maxDist and if the element mass (or mass avg) falls
+    inside the upper limit plane.
     
     """    
     goodElements = []  
@@ -210,17 +217,20 @@ def getGoodElements(elements, analysis, maxDist):
 
 def groupAll(elements):
     """
-    Creates a single cluster containing all the elements"""    
+    Create a single cluster containing all the elements.
+    
+    """    
     cluster = ElementCluster()
     cluster.elements = elements
     return cluster
 
 
 def clusterElements(elements, analysis, maxDist):
-    """
-    ElementCluster the original elements according to their mass distance
-    and return the list of clusters. If keepMassInfo, saves the original masses
-    and their cluster value in massDict.
+    """ TODO: where is keepMassInfo?
+    Cluster the original elements according to their mass distance.
+    
+    :returns: list of clusters; If keepMassInfo == True, saves the original
+    masses and their cluster value in massDict.
     
     """       
     # Get the list of elements with good masses (with the masses replaced by
@@ -235,7 +245,7 @@ def clusterElements(elements, analysis, maxDist):
 
 def doCluster(elements, analysis, maxDist):
     """
-    ElementCluster algorithm to cluster elements.
+    Cluster algorithm to cluster elements.
     
     :returns: a list of ElementCluster objects containing the elements
     belonging to the cluster
