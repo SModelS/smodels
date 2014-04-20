@@ -8,7 +8,7 @@
 
 """
 
-from . import smsResults
+from . import smsInterpolation
 from tools.physicsUnits import rmvunit
 import copy
 import sys
@@ -39,7 +39,7 @@ def limit(analysis, addTheoryPredictions=[]):
                 for (mi, masses1) in enumerate(element.B[0].masses):
                     # masses1=element.B[0].masses[0] # ,lead.B[1].masses[0]
                     masses2 = element.B[1].masses[mi] # ,lead.B[1].masses[0]
-                    ul = smsResults.getSmartUpperLimit(ana, tx, masses1)
+                    ul = smsInterpolation.upperLimit(ana, tx, masses1)
                     tmp = {"ul": ul, "analysis": ana, "tx": tx, "m1": masses1,
                            "m2": masses2, "sqrts": sqrts}
                     if len(addTheoryPredictions) > 0:
@@ -84,5 +84,5 @@ def getPlotLimit(inmass, analysis):
         run = None
      
     analysis, cmsLabel = analysis.label.split(':')    
-    upperLimit = smsResults.getSmartUpperLimit(analysis, cmsLabel, masslist) 
+    upperLimit = smsInterpolation.upperLimit(analysis, cmsLabel, masslist) 
     return upperLimit

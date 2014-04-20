@@ -21,19 +21,9 @@ constraints = {}
 conditions = {}
 
 
-def getSmartUpperLimit(analysis, topo, masses):
-    """
-    Return the upper limit for analysis-topology pair, given an ordered
-    sequence of the mass (mother, intermediate, LSP).
-    
-    """
-    import smsInterpolation
-    return smsInterpolation.upperLimit(analysis, topo, masses)
-
-
 def getAllResults(run=None):
     """
-    Return all analyses and the topologies they have results for.
+    Get all analyses and topologies that have results.
     
     """
     import os
@@ -55,7 +45,7 @@ def getAllResults(run=None):
 
 def getTopologies(analysis, run=None):
     """
-    Return all topologies that this analysis has constraints for.
+    Get all topologies of an analysis that has constraints.
     
     """
     run = smsHelpers.getRun(analysis, run)
@@ -65,9 +55,11 @@ def getTopologies(analysis, run=None):
 
 def getConstraints(analysis, topology="all", run=None):
     """
-    Get constraints of an analysis. If topology is "all", return a dictionary,
-    else return the constraint only for the given topology, None if
-    non-existent.
+    Get constraints of an analysis.
+    
+    :returns: dictionary of constraints, if topology == "all"; single
+    constraint for the passed topology, if only one topology is passed; None if
+    non-existent
     
     """
     key = analysis + topology + str(run)
@@ -97,11 +89,13 @@ def getSqrts(analysis, run=None):
     return sqrts
 
 
-def getConditions (analysis, topology="all", fuzzy=True, run=None):
+def getConditions(analysis, topology="all", fuzzy=True, run=None):
     """
-    Get conditions of an analysis. if topology is "all", return a dictionary,
-    else return the condition only for the given topology, None if
-    non-existent.
+    Get conditions of an analysis.
+    
+    :returns: dictionary of conditions, if topology == "all"; single condition
+    for the passed topology, if only one topology is passed; None if
+    non-existent
     
     """
     key = analysis + topology + str(fuzzy) + str(run)
@@ -283,7 +277,7 @@ def inConvexHull(Dict, mx, my):
 def getClosestValue (Dict, mx, my):
     """
     Get the upper limit of the point in Dict that is closest to mx and my,
-    assuming that Dict is a dictionary of mx,my,ul.
+    assuming that Dict is a dictionary of mx, my, ul.
     
     """
     closest = 9999999
