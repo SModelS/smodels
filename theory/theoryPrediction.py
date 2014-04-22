@@ -12,16 +12,17 @@ from . import clusterTools
 from . import crossSection
 from . import element
 import logging
-from theory.particleNames import elementsInStr
+from .particleNames import elementsInStr
 from .auxiliaryFunctions import cSim # pylint: disable-msg=W0611
 from .auxiliaryFunctions import cGtr # pylint: disable-msg=W0611
 from .analysis import SRanalysis
 from .analysis import ULanalysis
+from .printer import Printer
 
 logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
 
 
-class TheoryPrediction(object):
+class TheoryPrediction(Printer):
     """
     An instance of this class represents the results of the theory prediction
     for an analysis.
@@ -32,6 +33,14 @@ class TheoryPrediction(object):
         self.value = None
         self.conditions = None
         self.mass = None
+        
+        
+    def prepareData(self):
+        """
+        Select data preparation method through dynamic binding.
+        
+        """
+        return Printer.prepareTheoryPredictionData(self)
 
 
 def theoryPredictionFor(analysis, smsTopList, maxMassDist=0.2):
