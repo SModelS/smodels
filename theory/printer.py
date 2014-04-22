@@ -104,3 +104,22 @@ class Printer(object):
         # output += evElementTable + "\n"
         
         return output
+    
+    
+    def prepareTheoryPredictionData(self):
+        """
+        Prepare data of a TheoryPrediction object.
+        
+        """
+        for theoryPrediction in self:
+            print("mass:", theoryPrediction.mass)
+            print("theory prediction:", theoryPrediction.value)
+            print("theory conditions:")
+            if not theoryPrediction.conditions:
+                print(theoryPrediction.conditions)
+            else:
+                for cond in theoryPrediction.conditions:
+                    print(theoryPrediction.conditions[cond])
+            print("experimental limit:",
+                  self.analysis.getUpperLimitFor(theoryPrediction.mass))
+            print("\n")
