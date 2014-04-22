@@ -27,7 +27,7 @@ def installDirectory():
 
 def version(astuple=False, addCodeName=True):
     """
-    Prints out version number of SModelS framework.
+    Print version number of the SModelS framework.
     
     """
     f = open("%s/version" % installDirectory())
@@ -50,6 +50,10 @@ def version(astuple=False, addCodeName=True):
         
 
 def license():
+    """
+    Print license information of the SModelS framework.
+    
+    """
     f = open(installDirectory() + "COPYING")
     lines = f.readlines()
     f.close()
@@ -57,6 +61,10 @@ def license():
 
 
 def printHelp():
+    """
+    Print usage information of this module.
+    
+    """
     print(sys.argv[0] + ": --help --installdir")
     print("--help: show this message")
     print("--installdir: print SModelS installation directory")
