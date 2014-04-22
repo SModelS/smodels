@@ -126,7 +126,7 @@ if __name__ == "__main__":
     if args.lhe != "":
         filename = args.lhe
 
-    reader = lheReader.lheReader(filename)
+    reader = lheReader.LheReader(filename)
     Event = reader.next()
     element = lheDecomposer.elementFromEvent(Event,
                                              crossSection.XSectionList())

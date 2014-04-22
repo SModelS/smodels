@@ -1,6 +1,6 @@
 """
 .. module:: theory.lheDecomposer
-:synopsis: smodels-decomposes LHE events, creating TopologyLists 
+:synopsis: Decomposition of LHE events and creation of TopologyLists 
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
@@ -17,13 +17,13 @@ from tools.physicsUnits import addunit
 import copy
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
 
 
 def decompose(lhefile, inputXsecs=None, nevts=None, doCompress=False, 
               doInvisible=False, minmassgap=None):
     """
-    Do LHE-based decomposition. 
+    Perform LHE-based decomposition. 
 
     :param lhefile: LHE file with e.g. pythia events
     :param inputXsecs: xSectionList object with cross-sections for the mothers
@@ -34,12 +34,12 @@ def decompose(lhefile, inputXsecs=None, nevts=None, doCompress=False,
     :param doInvisible: invisible compression option (True/False)
     :param minmassgap: minimum mass gap for mass compression (only used if
     doCompress=True)
-    :returns: a TopologyList object 
+    :returns: TopologyList object 
     
     """
-    reader = lheReader.lheReader(lhefile, nevts)
+    reader = lheReader.LheReader(lhefile, nevts)
     smsTopList = topology.TopologyList ( )
-    # get cross-section from file (= event weight, assuming a common weight for
+    # Get cross-section from file (= event weight, assuming a common weight for
     # all events)
     if not inputXsecs:
         xSectionList = crossSection.getXsecFromLHEFile(lhefile, 
@@ -53,7 +53,7 @@ def decompose(lhefile, inputXsecs=None, nevts=None, doCompress=False,
         eventweight = xSectionList.getXsecsFor(momPDG)        
         # Get event element        
         newElement = elementFromEvent(event, eventweight)    
-        # Do compression:        
+        # Perform compression       
         if doCompress or doInvisible:
             compElements = newElement.compressElement(doCompress, doInvisible,
                                                       minmassgap)
@@ -76,15 +76,15 @@ def elementFromEvent(event, weight=None):
     
     """
     if not event.particles:
-        logger.error('Empty event!')
+        logger.error("Empty event")
         return None
 
     brDic, massDic = getDictionariesFromEvent(event)
           
-    # Creates branch list
+    # Create branch list
     finalBranchList = []
     for ip, particle in enumerate(event.particles):
-        # Means particle came from initial state (primary mother)
+        # Particle came from initial state (primary mother)
         if 1 in particle.moms:
             mombranch = branch.Branch()
             mombranch.momID = particle.pdg
@@ -100,10 +100,10 @@ def elementFromEvent(event, weight=None):
                                                     sigcut=addunit(0., 'fb'))
     
     if len(finalBranchList) != 2:
-        logger.error(str(len(finalBranchList))+" branches found in event. " +
-                     "R-parity violation?")
+        logger.error(str(len(finalBranchList)) + " branches found in event; "
+                     "Possible R-parity violation")
         return False
-    # Finally create element from event:
+    # Create element from event
     newElement = element.Element(finalBranchList)    
     if weight:
         newElement.weight = copy.deepcopy(weight)
@@ -113,30 +113,29 @@ def elementFromEvent(event, weight=None):
 
 def getDictionariesFromEvent(event):
     """
-    Read an event and create simple mass and BR dictionaries 
-    for each branch in the event
+    Create mass and BR dictionaries for each branch in an event.
     
     :param event: LHE event
-    :returns: BR and Mass dictionaries for the branches in the event
+    :returns: BR and mass dictionaries for the branches in the event
     
     """
     
     particles = event.particles
     
-    # Identify and label individual branches:
+    # Identify and label individual branches
     branchDic = {}
     for ip, particle in enumerate(particles):
         if particle.status == -1:
             continue
         if particles[particle.moms[0]].status == -1:
-            #If a primary mother, the branch index is its own position
+            # If a primary mother, the branch index is its own position
             initMom = ip
         else:
             # If not a primary mother, check if particle has a single parent
             # (as it should)
             if particle.moms[0] != particle.moms[1] and \
                     min(particle.moms) != 0: 
-                logger.error("More than one parent particle found!")
+                logger.error("More than one parent particle found")
                 return False        
             initMom = max(particle.moms) - 1
             while particles[particles[initMom].moms[0]].status != -1:

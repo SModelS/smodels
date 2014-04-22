@@ -2,8 +2,8 @@
 
 """
 .. module:: ParticleNames
-   :synopsis: Methods for getting particle names from pdg ids, and other
-   helpers.
+   :synopsis: Provides functions for getting particle names from pdg ids, and
+   other helpers.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
@@ -11,16 +11,17 @@
 
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
 
 
 def getName(pdg):
     """
-    Converts pdg number to particle name  according to the dictionaries rOdd
-    and rEven 
+    Convert pdg number to particle name according to the dictionaries rOdd and
+    rEven.
 
     :type pdg: int
     :returns: particle name (e.g. gluino, mu-, ...)
+    
     """
     p = int(pdg)
     if p in rOdd:
@@ -32,11 +33,13 @@ def getName(pdg):
 
 
 def getPdg(name):
-    """ Converts a name to the pdg number
-        according to the dictionaries rOdd and rEven
+    """
+    Convert a name to the pdg number according to the dictionaries rOdd and
+    rEven.
 
-        :type name: string
-        :returns: particle pdg, None if name couldnt be resolved
+    :type name: string
+    :returns: particle pdg; None, if name could not be resolved
+    
     """
     for (pdg, pname) in rOdd.items():
         if name == pname:
@@ -46,29 +49,14 @@ def getPdg(name):
             return abs(pdg)
     return None
 
-#class Part(object):
-#  
-#    def __init__(self,ptc=""):
-#        self.label = ptc
-#    
-#    def __str__(self):
-#        return self.label
-#  
-#    def __eq__(self,other):
-#        if self.label == other.label: return True
-#        else:
-#            if ptcDic.has_key(self.label): ptcs = set(ptcDic[self.label])
-#            else: ptcs = set([self.label])
-#            if ptcDic.has_key(other.label): ptcs2 = set(ptcDic[other.label])
-#            else: ptcs2 = set([other.label])
-#            if ptcs.intersection(ptcs2): return True
-#            else: return False
-
 
 def elementsInStr(instring):
     """
-    Parses instring (or a list of strings) and return a list of elements (in
-    string format) appearing in instring.
+    Parse instring and return a list of elements appearing in instring.
+    
+    instring can also be a list of strings.
+    
+    :returns: list of elements appearing in instring in string format
     
     """  
     if type(instring) == type('st'):
@@ -79,7 +67,7 @@ def elementsInStr(instring):
             if type(st) != type('st'):
                 logger.error("Input must be a string or a list of strings")
                 return False
-            # Combines list of strings in a single string
+            # Combine list of strings in a single string
             outstr += st
   
     elements = []
@@ -100,7 +88,7 @@ def elementsInStr(instring):
         if nc == 0 and delta != 0:
             elements.append(elStr + c)
             elStr = ""
-            # Syntax checks:
+            # Syntax checks
             ptclist = elements[-1].replace(']',',').replace('[',',').split(',')
             for ptc in ptclist:
                 if not ptc:
@@ -109,7 +97,7 @@ def elementsInStr(instring):
                     logger.error("Unknown particle " + ptc)
                     return False
 
-    # Check if there are not unmatched ['s and/or ]'s in the string:
+    # Check if there are not unmatched ['s and/or ]'s in the string
     if nc != 0:
         logger.error("Wrong input (incomplete elements?) " + instring)
         return False     
@@ -162,48 +150,12 @@ def vertInStr(instring):
                     return False
             vertStr = ""
 
-    # Check if there are not unmatched ['s and/or ]'s in the string:
+    # Check if there are not unmatched ['s and/or ]'s in the string
     if nc != 0:
         logger.error("Wrong input (incomplete elements?) " + instring)
         return False     
       
     return vertices
- 
-#def simParticles(ptype1,ptype2,useDict=True):
-#    """ Compares 2 particle names or 2 nested name arrays. \
-#        Allows for dictionary labels
-#        (Ex: L = l, l+ = l, l = l-,...) 
-#        For the last nested level ignore particle ordering 
-#        :param ptype1: first (nested) list of particle names, e.g. ['l','jet']
-#        :param ptype2: second (nested) list of particle names
-# 
-#        :param useDict: use the translation dictionary, i.e. allow e to stand
-#        for e+ or e-, l+ to stand for e+ or mu+, etc
-# 
-#        :returns: boolean
-#    """
-#        
-#    if ptype1 == ptype2: return True
-#    if type(ptype1) != type(ptype2): return False
-#    if type(ptype1) == type(str()):
-#        ptype1v = [ptype1]
-#        ptype2v = [ptype2]
-#  
-#    dims1, dims2 = [],[]
-#    ptcs1 = auxiliaryFunctions.flattenList(ptype1v,dims1)
-#    ptcs2 = auxiliaryFunctions.flattenList(ptype2v,dims2)
-#    if dims1 != dims2: return False
-#    if ptcs1 == ptcs2: return True
-#    elif not useDict: return False
-##Check dictionaries to see if particles are similar:
-#    vertices1 = vertInStr(str(ptcs1))
-#    vertices2 = vertInStr(str(ptcs2))
-#    for iv,v1 in enumerate(vertices1):
-#        v2 = vertices2[iv]
-#        if v1 == v2: continue
-#        
-#     
-#    return True
 
 
 def simParticles(ptype1, ptype2, useDict=True):
@@ -224,7 +176,7 @@ def simParticles(ptype1, ptype2, useDict=True):
     wrongFormat = False
     if type(ptype1) != type(ptype2):
         return False
-    # Check for nested arrays (should be in the standard notation [[[]],[[]]]):
+    # Check for nested arrays (should be in the standard notation [[[]],[[]]])
     if type(ptype1) == type([]):
         if len(ptype1) != len(ptype2):
             return False
@@ -247,7 +199,7 @@ def simParticles(ptype1, ptype2, useDict=True):
         logger.error("Wrong input format!" + str(ptype1) + " " + str(ptype2))
         return False
      
-#Put input in standard notation
+    # Put input in standard notation
     if type(ptype1) == type("str"):
         ptype1v = [[[ptype1]], [[ptype1]]]
         ptype2v = [[[ptype2]], [[ptype2]]]
@@ -269,7 +221,7 @@ def simParticles(ptype1, ptype2, useDict=True):
             elif not useDict:
                 return False        
             # If they do not match and useDict=True, generate all possible
-            #  lists from dictionary entries:
+            # lists from dictionary entries:
             allptcs = [[ptype1v[ibr][iv]], [ptype2v[ibr][iv]]]
             for allpt in allptcs:
                 ptc0 = copy.deepcopy(allpt[0])
@@ -286,7 +238,7 @@ def simParticles(ptype1, ptype2, useDict=True):
                 while allpt.count([]) > 0:
                     allpt.remove([])
                  
-            # Now compare all possibilities:
+            # Compare all possibilities
             match = False
             iA = 0
             while not match and iA < len(allptcs[0]):
@@ -304,11 +256,11 @@ def simParticles(ptype1, ptype2, useDict=True):
                 iA += 1
             if not match:
                 return False 
-    # if it reached here, entries are similar:
+    # Entries are similar
     return True
 
 
-rOdd = {
+rOdd = { # pylint: disable-msg=C0103
      1000021 : "gluino",
      1000022: "N1",
      1000023 : "N2",
@@ -375,7 +327,7 @@ rOdd = {
     -2000016 : "sneutrino"
 }
 
-rEven = {
+rEven = { # pylint: disable-msg=C0103
      25 : "higgs", 
     -25: "higgs", 
      35 : "H0", 
@@ -416,9 +368,9 @@ rEven = {
      -3 : "jet", 
      -4 : "jet", 
     -21 : "jet" 
- }
+}
 
-ptcDic = {
+ptcDic = { # pylint: disable-msg=C0103
     "e" : ["e+", "e-"], 
     "mu" : ["mu+", "mu-"], 
     "ta" : ["ta+", "ta-"], 
@@ -431,4 +383,3 @@ ptcDic = {
     "L-" : ["e-", "mu-", "ta-"], 
     "L" : ["e+", "mu+", "ta+", "e-", "mu-", "ta-"]
 }
-

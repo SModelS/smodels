@@ -1,6 +1,6 @@
 """
 .. module:: theory.slhaDecomposer
-   :synopsis: SLHA-based SMS decomposition
+   :synopsis: Decomposition of SLHA events and creation of TopologyLists.
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
         
@@ -12,17 +12,19 @@ from . import element
 from . import topology
 from tools import modpyslha as pyslha
 from . import crossSection
-from .branch import Branch, decayBranches
-from tools.physicsUnits import addunit, rmvunit
+from .branch import Branch
+from .branch import decayBranches
+from tools.physicsUnits import addunit
+from tools.physicsUnits import rmvunit
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
 
  
 def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False, 
               minmassgap=-1, useXSecs=None):
     """
-    Do SLHA-based decomposition.
+    Perform SLHA-based decomposition.
     
     :param slhafile: file with mass spectrum and branching ratios and
     optionally with cross-sections
@@ -40,7 +42,7 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
     :param doInvisible: turn invisibly compressed topologies on/off
     :param minmassgap: maximum value for considering two R-odd particles
     degenerate (only revelant for doCompress=True)        
-    :returns: a TopologyList.
+    :returns: TopologyList
      
     """
     t1 = time.time()
@@ -52,16 +54,16 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
     if type(sigcut) == type(1.):
         sigcut = addunit(sigcut, 'fb')
 
-    # get cross-section from file
+    # Get cross-section from file
     xSectionList = crossSection.getXsecFromSLHAFile(slhafile, useXSecs)
-    # get BRs and masses from file
+    # Get BRs and masses from file
     brDic, massDic = getDictionariesFromSLHA(slhafile)
-    #Only use the highest order cross-sections for each process:
+    # Only use the highest order cross-sections for each process
     xSectionList.removeLowerOrder()
 
     
     # Get maximum cross-sections (weights) for single particles (irrespective
-    # of sqrtS):
+    # of sqrtS)
     maxWeight = {}
     for pid in xSectionList.getPIDs():
         maxWeight[pid] = xSectionList.getXsecsFor(pid).getMaxXsec()
@@ -80,7 +82,7 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
     
     smsTopList = topology.TopologyList()    
     # Combine pairs of branches into elements according to production
-    # cross-section list:    
+    # cross-section list  
     for pids in xSectionList.getPIDpairs():
         for branch1 in finalBranchList:
             for branch2 in finalBranchList:
@@ -94,7 +96,7 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
                     newElement = element.Element([branch1, branch2])
                     newElement.weight = weightList
                     allElements = [newElement]
-                    # Do compression:
+                    # Perform compression
                     if doCompress or doInvisible:
                         allElements += newElement.compressElement(doCompress,
                                                                   doInvisible,
@@ -102,7 +104,7 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
                     
                     for el in allElements:
                         if el.weight.getMaxXsec() < sigcut:
-                            # skip elements with xsec below sigcut 
+                            # Skip elements with xsec below sigcut 
                             continue                          
                         top = topology.Topology(el)            
                         smsTopList.addList([top])                       
@@ -113,13 +115,13 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
 
 def getDictionariesFromSLHA(slhafile):
     """
-    Read a SLHA file and get the mass and BR dictionaries.
+    Create mass and BR dictionaries from an SLHA file.
     
     """
 
     res = pyslha.readSLHAFile(slhafile)
 
-    # Get mass and branching ratios for all particles:
+    # Get mass and branching ratios for all particles
     brDic = {}
     for pid in res.decays.keys():
         brs = copy.deepcopy(res.decays[pid].decays)
