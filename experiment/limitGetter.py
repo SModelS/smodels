@@ -16,6 +16,7 @@ import logging
 
 logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
 
+
 def limit(analysis, addTheoryPredictions=[]):
     """
     Get limit from an analysis object.

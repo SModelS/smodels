@@ -10,9 +10,9 @@ from . import lheReader
 from . import topology
 from . import crossSection
 from . import element
-from tools import modpyslha as pyslha
 from . import branch
 from . import particleNames
+from tools import modpyslha as pyslha
 from tools.physicsUnits import addunit
 import copy
 import logging

@@ -10,6 +10,7 @@
 .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
 
 """
+
 from os.path import os
 import logging
 

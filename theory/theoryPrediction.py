@@ -11,13 +11,13 @@ import copy
 from . import clusterTools
 from . import crossSection
 from . import element
-import logging
 from .particleNames import elementsInStr
 from .auxiliaryFunctions import cSim # pylint: disable-msg=W0611
 from .auxiliaryFunctions import cGtr # pylint: disable-msg=W0611
 from .analysis import SRanalysis
 from .analysis import ULanalysis
 from .printer import Printer
+import logging
 
 logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
 

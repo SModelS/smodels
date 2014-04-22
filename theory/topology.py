@@ -8,10 +8,13 @@
     
 """
 
-from theory import crossSection
-from theory.element import Element
+from . import crossSection
+from .element import Element
 from .printer import Printer
-from theory import logger
+import logging
+
+logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
+
 
 class Topology(object):
     """

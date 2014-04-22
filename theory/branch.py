@@ -6,7 +6,10 @@
         
 """
 
-from .particleNames import ptcDic, rEven, simParticles, elementsInStr
+from .particleNames import ptcDic
+from .particleNames import rEven
+from .particleNames import simParticles
+from .particleNames import elementsInStr
 from tools.physicsUnits import addunit
 import logging
 

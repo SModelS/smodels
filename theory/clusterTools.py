@@ -7,7 +7,9 @@
 """
 
 from . import crossSection
-from .auxiliaryFunctions import massAvg, massPosition, distance
+from .auxiliaryFunctions import massAvg
+from .auxiliaryFunctions import massPosition
+from .auxiliaryFunctions import distance
 import logging
 
 logger = logging.getLogger(__name__) # pylint: disable-msg=C0103

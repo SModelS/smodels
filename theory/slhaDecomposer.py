@@ -10,10 +10,10 @@ import copy
 import time
 from . import element
 from . import topology
-from tools import modpyslha as pyslha
 from . import crossSection
 from .branch import Branch
 from .branch import decayBranches
+from tools import modpyslha as pyslha
 from tools.physicsUnits import addunit
 from tools.physicsUnits import rmvunit
 import logging
