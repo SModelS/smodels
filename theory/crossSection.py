@@ -8,11 +8,12 @@
 
 """
 
-from tools.physicsUnits import addunit, rmvunit
-import logging
+from tools.physicsUnits import addunit
+from tools.physicsUnits import rmvunit
 from . import lheReader
+import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
 
 
 class XSectionInfo(object):

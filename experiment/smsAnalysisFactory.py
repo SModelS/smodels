@@ -14,10 +14,10 @@ from . import smsResults
 from tools.physicsUnits import rmvunit
 from theory import analysis
 from theory import element
-import logging
 from experiment import smsHelpers
+import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
           
 
 def load(analyses=None, topologies=None, sqrts=[7, 8]):

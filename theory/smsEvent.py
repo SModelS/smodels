@@ -10,7 +10,8 @@
 import logging
 
 logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
-        
+
+
 class SmsEvent:
     """
     Event class featuring a list of particles and some convenience functions.

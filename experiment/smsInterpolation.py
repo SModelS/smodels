@@ -16,7 +16,8 @@ from . import smsResults
 from . import smsHelpers
 import numpy as np
 from scipy.interpolate import griddata
-from tools.physicsUnits import rmvunit, addunit
+from tools.physicsUnits import rmvunit
+from tools.physicsUnits import addunit
 import logging
 
 logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
