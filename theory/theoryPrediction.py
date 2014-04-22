@@ -62,11 +62,12 @@ def theoryPredictionFor(analysis, smsTopList, maxMassDist=0.2):
     # Collect results and evaluate conditions
     predictions = []
     for cluster in clusters:
-        theoPrediction = TheoryPrediction()
-        theoPrediction.value = cluster.getTotalXSec()
-        theoPrediction.conditions = evalConditions(cluster, analysis)
-        theoPrediction.mass = cluster.getAvgMass()
-        predictions.append(theoPrediction)
+        theoryPrediction = TheoryPrediction()
+        theoryPrediction.analysis = analysis
+        theoryPrediction.value = cluster.getTotalXSec()
+        theoryPrediction.conditions = evalConditions(cluster, analysis)
+        theoryPrediction.mass = cluster.getAvgMass()
+        predictions.append(theoryPrediction)
 
     if len(predictions) == 0:
         return None

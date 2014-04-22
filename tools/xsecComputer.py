@@ -2,8 +2,7 @@
 
 """
 .. module:: xsecComputer
-        :synopsis: The unit responsible for the computation of reference ("theory") \
-            production cross sections
+   :synopsis: Computation of reference ("theory") production cross sections.
 
 .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -11,8 +10,11 @@
 
 """
 import setPath
-from physicsUnits import rmvunit,addunit
-import os, commands, shutil
+from physicsUnits import rmvunit
+from physicsUnits import addunit
+import os
+import commands
+import shutil
 from theory import crossSection
 import nllFast
 import cStringIO
