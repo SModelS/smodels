@@ -534,7 +534,7 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
     """
     # Store information about all cross-sections in the LHE file
     xSecsInFile = XSectionList()    
-    reader = lheReader.lheReader(lhefile)
+    reader = lheReader.LheReader(lhefile)
     if not rmvunit(reader.metainfo["totalxsec"],'fb'):
         logger.error("Cross-section information not found in LHE file.")
         return False

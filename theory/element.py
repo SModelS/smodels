@@ -1,4 +1,4 @@
-"""
+""" TODO: write synopsis
 .. module:: theory.element
    :synopsis: missing
     
@@ -6,47 +6,52 @@
     
 """
 
-from .particleNames import ptcDic, rEven, simParticles, elementsInStr
+from .particleNames import ptcDic
+from .particleNames import rEven
+from .particleNames import simParticles
+from .particleNames import elementsInStr
 from .branch import Branch
 from . import crossSection
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
 
 
 class Element(object):
     """
-    Element class. Holds a pair of branches and the element weight
-    (cross-section*BR).
+    An instance of this class represents an element.
+    
+    This class possesses a pair of branches and the element weight
+    (cross-section * BR).
     
     """    
     def __init__(self, info=None):
-        """
-        Constructor.
-        
-        """
         self.branches = [Branch(), Branch()]
         self.weight = crossSection.XSectionList()
                 
         if info:
-            # Creates element from particle string
+            # Create element from particle string
             if type(info) == type(str()):
                 elements = elementsInStr(info)
                 if not elements or len(elements) > 1:
-                    nel=0
-                    if elements: nel=len(elements)
-                    logging.error("Malformed input string. Number of elements is %d, expected 1: in ``%s''"% (nel,info))
+                    nel = 0
+                    if elements:
+                        nel = len(elements)
+                    logging.error("Malformed input string. Number of elements "
+                                  "is %d, expected 1: in ``%s''", nel, info)
                     return False                
                 else:
                     el = elements[0]
                     branches = elementsInStr(el[1:-1])
                     if not branches or len(branches) != 2:
-                        logging.error("Malformed input string. Number of branches is %d, expected 2: in ``%s''" % ( len(branches), info) )
+                        logging.error("Malformed input string. Number of "
+                                      "branches is %d, expected 2: in ``%s''",
+                                      len(branches), info)
                         return False 
                     self.branches = []
                     for branch in branches:
                         self.branches.append(Branch(branch))
-            # Creates element from branch pair
+            # Create element from branch pair
             elif type(info) == type([]) and type(info[0]) == type(Branch()):
                 for ib, branch in enumerate(info):
                     self.branches[ib] = branch.copy() 
@@ -66,7 +71,7 @@ class Element(object):
     
     def __str__(self):
         """
-        Returns the canonical name of the element, e.g. [[jet],[jet]].
+        Create the canonical name of the element, e.g. [[jet],[jet]].
         
         """
         particleString = str(self.getParticles()).replace(" ", "").\
@@ -76,10 +81,12 @@ class Element(object):
 
     def isEqual(self, other, order=False, useDict=True):
         """
-        Compare two Elements. If all masses and particles are equal, returns
-        True, otherwise returns False. If order = False, test both branch
-        orderings (for an element doublet only). If useDict=True, allow for
-        inclusive particle labels.
+        Compare two Elements for equality.
+        
+        If order == False, test both branch orderings (for an element doublet
+        only). If useDict == True, allow for nclusive particle labels.
+        
+        :returns: True, if all masses and particles are equal; False, else;        
         
         """                           
         if type(self) != type(other):
@@ -102,10 +109,12 @@ class Element(object):
 
     def particlesMatch(self, other, order=False, useDict=True):
         """
-        Compare two Elements. If particles match, returns True, otherwise
-        returns False. If order = False, test both branch orderings (for an
-        element doublet only). If useDict=True, allow for inclusive particle
-        labels.
+        Compare two Elements for matching particles.
+        
+        If order == False, test both branch orderings (for an element doublet
+        only). If useDict == True, allow for inclusive particle abels.
+        
+        :returns: True, if particles match; False, else;
         
         """        
         if type(self) != type(other):
@@ -124,7 +133,9 @@ class Element(object):
     
     def copy(self):
         """
-        Creates a copy of itself (faster than deepcopy).
+        Create a copy of self.
+        
+        Faster than deepcopy.
         
         """
         newel = Element()
@@ -137,10 +148,12 @@ class Element(object):
     
     def setMasses(self, mass, sameOrder=True, opposOrder=False):
         """
-        Sets the element masses to the input mass array. If sameOrder, set
-        the masses to the same branch ordering. If opposOrder, set the masses
-        to the opposite branch ordering. If both sameOrder and opposOrder,
-        set the masses to the smaller of the two orderings.
+        Set the element masses to the input mass array.
+        
+        If sameOrder == True, set the masses to the same branch ordering. If
+        opposOrder == True, set the masses to the opposite branch ordering. If
+        both sameOrder == True and opposOrder == True, set the masses to the
+        smaller of the two orderings.
         
         """                
         if sameOrder and opposOrder:
@@ -153,10 +166,10 @@ class Element(object):
         elif opposOrder:
             newmass = [mass[1], mass[0]]
         else:
-            logger.error('Called with no possible ordering!')
+            logger.error("Called with no possible ordering")
             return False
         if len(newmass) != len(self.branches):
-            logger.error('Called with wrong number of mass branches!')
+            logger.error("Called with wrong number of mass branches")
             return False
                
         for i, mass in enumerate(newmass):
@@ -165,7 +178,7 @@ class Element(object):
 
     def switchBranches(self):
         """
-        If the element contains a pair of branches, switches them.
+        Switch branches, if the element contains a pair of them.
                 
         """
         newEl = self.copy()
@@ -176,7 +189,7 @@ class Element(object):
 
     def getParticles(self):
         """
-        Returns the array of particles in the element.   
+        Get the array of particles in the element.   
              
         """
         ptcarray = []
@@ -187,7 +200,7 @@ class Element(object):
     
     def getMasses(self):
         """
-        Returns the array of masses in the element.   
+        Get the array of masses in the element.   
              
         """
         massarray = []
@@ -198,8 +211,9 @@ class Element(object):
     
     def getDaughters(self):
         """
-        Return the pair of daughter IDs (can be None, if the element does not
-        have a definite daughter).      
+        Get a pair of daughter IDs.
+        
+        Can be None, if the element does not have a definite daughter.      
            
         """        
         return (self.branches[0].daughterID, self.branches[1].daughterID)
@@ -207,8 +221,9 @@ class Element(object):
     
     def getMothers(self):
         """
-        Return the pair of mother IDs (can be None, if the element does not.
-        have a mother daughter).
+        Get a pair of mother IDs.
+        
+        Can be None, if the element does not have a mother daughter.
         
         """        
         return (self.branches[0].momID, self.branches[1].momID)
@@ -231,7 +246,7 @@ class Element(object):
     
     def getLength(self):
         """
-        Returns the maximum of the two branch lengths.
+        Get the maximum of the two branch lengths.
         
         """        
         return max(self.branches[0].getLength(), self.branches[1].getLength())
@@ -239,7 +254,7 @@ class Element(object):
     
     def hasTopInList(self, elementList):
         """
-        Checks if the element topology matches any of the topologies in the
+        Check if the element topology matches any of the topologies in the
         element list.
         
         """
@@ -259,8 +274,10 @@ class Element(object):
       
     def isInList(self, listOfElements, igmass=False, useDict=True):
         """
-        Checks if the element is present in the element list. Ifigmass=False
-        also check if the analysis has the element mass array.
+        Check if the element is present in the element list.
+        
+        If igmass == False also check if the analysis has the element mass
+        array.
         
         """
         for el in listOfElements:
@@ -276,7 +293,7 @@ class Element(object):
     
     def checkConsistency(self):
         """
-        Checks if the particles defined in the element exist and are consistent
+        Check if the particles defined in the element exist and are consistent
         with the element info.
         
         """
@@ -296,7 +313,9 @@ class Element(object):
     def compressElement(self, doCompress, doInvisible, minmassgap):
         """
         Keep compressing they original element and the derived ones till they
-        can be compressed no more. Returns a list with the compressed elements.
+        can be compressed no more.
+        
+        :returns: list with the compressed elements
         
         """
         added = True
@@ -331,8 +350,10 @@ class Element(object):
          
     def massCompress(self, mingap):
         """
-        If two masses in this topology are degenerate, returns a compressed
-        copy of the element. If no compression is possible, return None.
+        Perform mass compression.
+        
+        :returns: compressed copy of the element, if two masses in this
+        topology are degenerate; None, if compression is not possible;
         
         """        
         newelement = self.copy()
@@ -363,8 +384,10 @@ class Element(object):
         
     def invisibleCompress(self):
         """
-        Compress cascade decays ending with neutrinos + daughter If no
-        compression is possible, return None.
+        Compress cascade decays ending with neutrinos and daughter.
+        
+        If no compression is possible, return None.
+        
         """
         newelement = self.copy()        
         vertnumb = self.getEinfo()["vertnumb"]
@@ -391,8 +414,9 @@ class Element(object):
 
 def smallerMass(mass1, mass2):
     """
-    Uses an ordering criterium (machine-independent) to select the smaller of
-    the two mass arrays.
+    Select the smaller of two mass arrays.
+    
+    Use an ordering criterion (machine-independent) for selection.
     
     """
     mass1List = []
@@ -410,8 +434,8 @@ def smallerMass(mass1, mass2):
                     return mass1
                 if m1 > mass2List[im]:
                     return mass2
-    except:
+    except: # TODO: except what?
         pass
     
-    logger.error('Invalid input')
+    logger.error("Invalid input")
     return False

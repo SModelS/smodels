@@ -1,7 +1,7 @@
 """
 .. module:: theory.theoryPrediction
-   :synopsis: Classes encapsulating the results of the computation of reference
-   cross sections and related methods
+   :synopsis: Provides a class to encapsulate the results of the computation of
+   reference cross sections and related functions.
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
         
@@ -13,17 +13,18 @@ from . import crossSection
 from . import element
 import logging
 from theory.particleNames import elementsInStr
-from .auxiliaryFunctions import cSim
-from .auxiliaryFunctions import cGtr
-from .analysis import SRanalysis, ULanalysis
+from .auxiliaryFunctions import cSim # pylint: disable-msg=W0611
+from .auxiliaryFunctions import cGtr # pylint: disable-msg=W0611
+from .analysis import SRanalysis
+from .analysis import ULanalysis
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
 
 
 class TheoryPrediction(object):
     """
-    Main class to store the results of the theory prediction for a given
-    analysis.
+    An instance of this class represents the results of the theory prediction
+    for an analysis.
     
     """    
     def __init__(self):
@@ -35,9 +36,12 @@ class TheoryPrediction(object):
 
 def theoryPredictionFor(analysis, smsTopList, maxMassDist=0.2):
     """
-    Main method to compute theory predictions. Collects the elements and
-    efficiencies, combine the masses (if needed) and compute the conditions (if
-    any). Returns a list of TheoryPrediction objects.
+    Compute theory predictions.
+    
+    Collect elements and efficiencies, combine the masses (if needed) and
+    compute the conditions (if existing).
+    
+    :returns: list of TheoryPrediction objects
     
     """
     # Select elements constrained by analysis and apply efficiencies
@@ -46,7 +50,7 @@ def theoryPredictionFor(analysis, smsTopList, maxMassDist=0.2):
         return None      
     # Combine masses
     clusters = combineElements(elements, analysis, maxDist=maxMassDist)    
-    # Collect results and evaluate conditions:
+    # Collect results and evaluate conditions
     predictions = []
     for cluster in clusters:
         theoPrediction = TheoryPrediction()
@@ -62,7 +66,9 @@ def theoryPredictionFor(analysis, smsTopList, maxMassDist=0.2):
 
 def getElementsFrom(smsTopList, analysis):
     """
-    Loops over all elements in smsTopList and returns the elements which are
+    Get elements, that are constrained by the analysis.
+    
+    Loop over all elements in smsTopList and returns the elements which are
     constrained by the analysis (have efficiency != 0). The elements weights
     are multiplied by their respective efficiency and the cross-sections not
     matching the analysis sqrts are removed.
@@ -86,9 +92,10 @@ def getElementsFrom(smsTopList, analysis):
 
 def combineElements(elements, analysis, maxDist):
     """
-    Combines elements according to the analysis type. If analysis = upper limit
-    type, group elements into mass clusters. If analysis = signal region type,
-    group all elements into a single cluster.
+    Combine elements according to the analysis type.
+    
+    If analysis == upper limit type, group elements into mass clusters. If
+    analysis == signal region type, group all elements into a single cluster.
     
     """    
     if type(analysis) == type(SRanalysis()):
@@ -100,8 +107,12 @@ def combineElements(elements, analysis, maxDist):
 
 def evalConditions(cluster, analysis):
     """
-    If analysis type = upper limit, evaluates the analysis conditions inside an
-    element cluster. If  analysis type = signal region, returns None.
+    Evaluate the analysis conditions inside an element cluster.
+    
+    If analysis type == upper limit, evaluates the analysis conditions inside
+    an element cluster.
+    
+    :retunrs: None, if analysis type == signal region
     
     """        
     if type(analysis) == type(SRanalysis()):

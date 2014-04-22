@@ -34,7 +34,7 @@ def limit(analysis, addTheoryPredictions=[]):
             theoRes = analysis.ResultList[0]
         tx = analysis.plots[constraint][0]
         for ana in analysis.plots[constraint][1]:
-            for (_, element) in enumerate(analysis.Top.elements()):
+            for (_, element) in enumerate(analysis.Top.getElements()):
                 for (mi, masses1) in enumerate(element.B[0].masses):
                     masses2 = element.B[1].masses[mi]
                     ul = smsInterpolation.upperLimit(ana, tx, masses1)
