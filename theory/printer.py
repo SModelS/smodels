@@ -32,7 +32,7 @@ class Printer(object):
         """        
         # Branch, Element, Topology, TopologyList, Analysis, AnalysisList,
         # Cluster
-        self.output = self.prepareData()        
+        self.output = self.prepareData()
             
         if target == "stdout":
             print(self.output)
@@ -121,5 +121,5 @@ class Printer(object):
                 for cond in theoryPrediction.conditions:
                     print(theoryPrediction.conditions[cond])
             print("experimental limit:",
-                  self.analysis.getUpperLimitFor(theoryPrediction.mass))
+                  theoryPrediction.analysis.getUpperLimitFor(theoryPrediction.mass))
             print("\n")

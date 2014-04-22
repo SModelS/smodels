@@ -22,7 +22,7 @@ from .printer import Printer
 logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
 
 
-class TheoryPrediction(Printer):
+class TheoryPrediction(object):
     """
     An instance of this class represents the results of the theory prediction
     for an analysis.
@@ -33,8 +33,23 @@ class TheoryPrediction(Printer):
         self.value = None
         self.conditions = None
         self.mass = None
+    
+    
+class TheoryPredictionList(Printer):
+    """
+    An instance of this class represents the a collection of theory prediction
+    objects.
+    
+    """
+    def __init__(self, theoryPredictions):
+        self._theoryPredictions = theoryPredictions
         
-        
+
+    def __iter__(self):
+        for theoryPrediction in self._theoryPredictions:
+            yield theoryPrediction
+            
+            
     def prepareData(self):
         """
         Select data preparation method through dynamic binding.
@@ -71,7 +86,7 @@ def theoryPredictionFor(analysis, smsTopList, maxMassDist=0.2):
 
     if len(predictions) == 0:
         return None
-    return predictions
+    return TheoryPredictionList(predictions)
 
 
 def getElementsFrom(smsTopList, analysis):
