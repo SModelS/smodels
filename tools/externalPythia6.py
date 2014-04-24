@@ -33,9 +33,13 @@ class ExternalPythia6(ExternalTool):
         self.src_path=self.absPath ( src_path )
         self.verbose=False
         self.tempdir=tempfile.mkdtemp()
-        cfgfile=self.checkFileExists ( config_file )
-        shutil.copy ( cfgfile, self.tempdir+"/temp.cfg" )
+        self.cfgfile=self.checkFileExists ( config_file )
+        self.reset()
 
+    def reset ( self ):
+        """ copy the original config file again """
+        shutil.copy ( self.cfgfile, self.tempdir+"/temp.cfg" )
+        
     def checkFileExists ( self, File ):
         """ check if file exists, raise an IOError if it doesnt.
             return absolute file name if it does. """
