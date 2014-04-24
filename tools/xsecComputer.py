@@ -41,7 +41,6 @@ def computeXSec(sqrts,maxOrder,nevts,slhafile,lhefile=None,externaldir=None):
     if not defined, it is set as current folder
     """    
 
-
     if not externaldir: externaldir = os.getcwd() + '/external/'
 #Check if SLHA file exists
     if not os.path.isfile(slhafile):
@@ -134,7 +133,8 @@ def xsecToBlock(xsec,inPDGs=(2212,2212),comment=None):
     for pdg in inPDGs: header += " "+str(pdg)  #PDGs of incoming states
     header += " "+str(len(xsec.pid))   #Number of outgoing states
     for pid in xsec.pid: header += " "+str(pid)  #PDGs of outgoing states
-    header += "   # "+str(comment)   #Comment    
+    if comment:
+        header += "   # "+str(comment)   #Comment    
     entry = "0  "+str(xsec.info.order)+"  0  0  0  0  "+str(rmvunit(xsec.value,'fb'))+" SModelS "+SModelS.version()
 
     return header + "\n" + entry
@@ -150,6 +150,7 @@ def runPythia(slhafile,nevts,sqrts,lhefile=None):
     import toolBox
     box=toolBox.ToolBox()
     tool=box.get("pythia6")
+    tool.reset() ## make sure we have the template config file
     # tool.checkInstallation()
     tool.replaceInCfgFile ( { "NEVENTS": nevts, "SQRTS":1000*sqrts } )
     tool.setParameter ( "MSTP(163)", "6" )
