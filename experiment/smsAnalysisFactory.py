@@ -14,7 +14,7 @@ from . import smsResults
 from tools.physicsUnits import rmvunit
 from theory import analysis
 from theory import element
-from experiment import smsHelpers
+from . import smsHelpers
 import logging
 
 logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
@@ -62,7 +62,7 @@ def load(analyses=None, topologies=None, sqrts=[7, 8]):
             logger.debug(str(tx))                        
             newAnalysis = analysis.ULanalysis()
             newAnalysis.sqrts = smsResults.getSqrts(ana)
-            stopo = getRealTopo (tx)
+            stopo = _getRealTopo (tx)
             newAnalysis.label = ana + ":" + tx
             # "2012"
             newAnalysis.run = smsHelpers.getRun(ana)
@@ -77,14 +77,14 @@ def load(analyses=None, topologies=None, sqrts=[7, 8]):
                 cond = cond.replace("'", "").replace(" ", "").split(';')
             newAnalysis.constraint = constraint
             newAnalysis.conditions = cond
-            newAnalysis.elementsEff = getElementsEffs(constraint)
+            newAnalysis.elementsEff = _getElementsEffs(constraint)
             # Add ana to list of analyses:
             listOfAnalyses.append(newAnalysis)
 
     return listOfAnalyses
 
 
-def getRealTopo(tx):
+def _getRealTopo(tx):
     """
     Get real topology, e.g., T3w025 -> T3w, etc.
     
@@ -96,7 +96,7 @@ def getRealTopo(tx):
     return ret
 
 
-def getElementsEffs(constraint):
+def _getElementsEffs(constraint):
     """
     Generate a dictionary of elements with their simple efficiencies as values.
     
@@ -105,7 +105,7 @@ def getElementsEffs(constraint):
     
     """      
     # Get element strings appearing in constraint
-    elStrings = getArray(constraint)
+    elStrings = _getArray(constraint)
     cons = constraint.replace(" ", "")
     cons = cons.replace("'", "")
     elementsEff = {}
@@ -119,7 +119,7 @@ def getElementsEffs(constraint):
     return elementsEff
 
 
-def getArray(constraint):
+def _getArray(constraint):
     """
     Get number of vertices, branches and insertions from a constraint string.
     

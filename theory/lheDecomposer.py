@@ -79,7 +79,7 @@ def elementFromEvent(event, weight=None):
         logger.error("Empty event")
         return None
 
-    brDic, massDic = getDictionariesFromEvent(event)
+    brDic, massDic = _getDictionariesFromEvent(event)
           
     # Create branch list
     finalBranchList = []
@@ -111,7 +111,7 @@ def elementFromEvent(event, weight=None):
     return newElement
 
 
-def getDictionariesFromEvent(event):
+def _getDictionariesFromEvent(event):
     """
     Create mass and BR dictionaries for each branch in an event.
     

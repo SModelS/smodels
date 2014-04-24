@@ -157,7 +157,7 @@ class Element(object):
         
         """                
         if sameOrder and opposOrder:
-            if mass[0] == smallerMass(mass[0], mass[1]):
+            if mass[0] == _smallerMass(mass[0], mass[1]):
                 newmass = mass
             else:
                 newmass = [mass[1], mass[0]]
@@ -244,32 +244,12 @@ class Element(object):
         return {"vertnumb" : vertnumb, "vertparts" : vertparts}
     
     
-    def getLength(self):
+    def _getLength(self):
         """
         Get the maximum of the two branch lengths.
         
         """        
         return max(self.branches[0].getLength(), self.branches[1].getLength())
-    
-    
-    def hasTopInList(self, elementList):
-        """
-        Check if the element topology matches any of the topologies in the
-        element list.
-        
-        """
-        if type(elementList) != type([]) or len(elementList) == 0:
-            return False
-        for element in elementList:
-            if type(element) != type(self):
-                continue
-            info1 = self.getEinfo()
-            info2 = element.getEinfo()
-            info2B = element.switchBranches().getEinfo()
-            if info1 == info2 or info1 == info2B:
-                return True
-        
-        return False
         
       
     def isInList(self, listOfElements, igmass=False, useDict=True):
@@ -327,9 +307,9 @@ class Element(object):
             # Check for mass compressed topologies   
             if doCompress:
                 for element in newElements:             
-                    newel = element.massCompress(minmassgap)
+                    newel = element._massCompress(minmassgap)
                     # Avoids double counting (conservative)
-                    if newel and not newel.hasTopInList(newElements): 
+                    if newel and not newel._hasTopInList(newElements): 
                         newElements.append(newel) 
                         added = True
       
@@ -337,18 +317,17 @@ class Element(object):
             # LSP, such as LSP + neutrino = LSP')      
             if doInvisible:
                 for element in newElements:
-                    newel = element.invisibleCompress()
+                    newel = element._invisibleCompress()
                     # Avoids double counting (conservative)
-                    if newel and not newel.hasTopInList(newElements): 
+                    if newel and not newel._hasTopInList(newElements): 
                         newElements.append(newel) 
                         added = True
-
                          
         newElements.pop(0)  # Remove original element
         return newElements
     
          
-    def massCompress(self, mingap):
+    def _massCompress(self, mingap):
         """
         Perform mass compression.
         
@@ -380,9 +359,28 @@ class Element(object):
             return None
         else:
             return newelement
+    
+    
+    def _hasTopInList(self, elementList):
+        """
+        Check if the element topology matches any of the topologies in the
+        element list.
+        
+        """
+        if type(elementList) != type([]) or len(elementList) == 0:
+            return False
+        for element in elementList:
+            if type(element) != type(self):
+                continue
+            info1 = self.getEinfo()
+            info2 = element.getEinfo()
+            info2B = element.switchBranches().getEinfo()
+            if info1 == info2 or info1 == info2B:
+                return True        
+        return False
         
         
-    def invisibleCompress(self):
+    def _invisibleCompress(self):
         """
         Compress cascade decays ending with neutrinos and daughter.
         
@@ -412,7 +410,7 @@ class Element(object):
             return newelement
 
 
-def smallerMass(mass1, mass2):
+def _smallerMass(mass1, mass2):
     """
     Select the smaller of two mass arrays.
     
