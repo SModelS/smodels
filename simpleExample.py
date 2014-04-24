@@ -18,15 +18,16 @@ import logging
 
 logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
 
+slhafile = 'inputFiles/slha/andrePT4.slha'
+lhefile = 'inputFiles/lhe/ued_1.lhe'
+
 
 def main():
     """
     Main program. Displays basic use case.
     
     """
-    # Decompose model (SLHA or LHE input):    
-    slhafile = 'inputFiles/slha/andrePT4.slha'
-    lhefile = 'inputFiles/lhe/ued_1.lhe'
+    # Decompose model (SLHA or LHE input):
     sigmacut = addunit(0.1,'fb')
     mingap = addunit(5.,'GeV')
     
