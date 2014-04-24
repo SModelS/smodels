@@ -12,7 +12,7 @@
 from . import smsHelpers
 from tools.physicsUnits import addunit, rmvunit
 import logging
-from experiment.experimentExceptions import MetaInfoError
+from .experimentExceptions import MetaInfoError
 
 logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
 
@@ -128,7 +128,7 @@ def getaxes(analysis, topology=None, run=None):
     only.
     
     """
-    if not exists(analysis, topology=None):
+    if not _exists(analysis, topology=None):
         return None
     try:
         st = smsHelpers.getMetaInfoField (analysis, "axes", run)
@@ -166,7 +166,7 @@ def getaxes(analysis, topology=None, run=None):
     return d
 
 
-def exists(analysis, topology, run=None):
+def _exists(analysis, topology, run=None):
     """
     Check if the dictionary 'limit_topo' in <run>/<analysis>/sms.py exists.
     

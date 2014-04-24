@@ -101,7 +101,7 @@ def getMetaInfoField(analysis, field, run=None):
     if key in infoFields:
         return infoFields[key]
     run = getRun(analysis, run)
-    metainfo = parseMetaInfo(analysis, run)
+    metainfo = _parseMetaInfo(analysis, run)
     if not field in metainfo:
         infoFields[key] = None
         return infoFields[key]
@@ -117,7 +117,7 @@ def getMetaInfoField(analysis, field, run=None):
     return f
 
 
-def parseMetaInfo ( analysis, run ):
+def _parseMetaInfo(analysis, run):
     """
     Get all the meta information for a given analysis-run pair.
     

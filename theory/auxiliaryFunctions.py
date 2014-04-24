@@ -18,7 +18,7 @@ import logging
 logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
 
 
-def memoize(func):
+def _memoize(func):
     """
     Cache the results of massPosition.
     
@@ -28,7 +28,7 @@ def memoize(func):
     """    
     cache = {}
     @wraps(func)
-    def wrap(*args):
+    def _wrap(*args):
         """
         TODO: write docstring
         
@@ -36,10 +36,10 @@ def memoize(func):
         if str(args) not in cache:
             cache[str(args)] = func(*args)
         return cache[str(args)]
-    return wrap
+    return _wrap
 
 
-@memoize
+@_memoize
 def massPosition(mass, analysis):
     """ TODO: clarify nounit
     Give mass position in upper limit space.
@@ -82,7 +82,7 @@ def massAvg(massList, method='harmonic'):
         return massList
     if len(massList) == 1:
         return massList[0]               
-    flatList = [rmvunit(mass, 'GeV') for mass in flattenList(massList)]
+    flatList = [rmvunit(mass, 'GeV') for mass in _flattenList(massList)]
     if method == 'harmonic' and 0. in flatList:
         method = 'mean'
     
@@ -195,7 +195,7 @@ def cGtr(weightA, weightB):
     return result
 
     
-def flattenList(inlist, dims=None):
+def _flattenList(inlist, dims=None):
     """
     Flatten a multi-dimensional nested list.
     
@@ -210,7 +210,7 @@ def flattenList(inlist, dims=None):
         if isinstance(item, Iterable) and not isinstance(item, basestring):
             if not dims is None:
                 dims.append(len(item))
-            for x in flattenList(item, dims):
+            for x in _flattenList(item, dims):
                 flat.append(x)
         else:        
             flat.append(item)             
