@@ -25,7 +25,7 @@ def installDirectory():
     return ret
 
 
-def version(astuple=False, addCodeName=True):
+def version(astuple=False):
     """
     Print version number of the SModelS framework.
     
@@ -36,17 +36,9 @@ def version(astuple=False, addCodeName=True):
     l = l.replace("\n","")
     l.strip()
     if not astuple:
-        if addCodeName:
-            return l
-        p = l.find("/")
-        if p > -1:
-            return l[:p]
-    t, c = l.split("/")
-    a, b = t.split(".")
-    if addCodeName:
-        return (int(a), int(b), c.strip())
-    else:
-        return (int(a), int(b))
+        return l
+    a, b = l.split(".")
+    return (int(a), int(b))
         
 
 def license():
