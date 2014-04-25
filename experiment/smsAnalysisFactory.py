@@ -47,30 +47,30 @@ def load(analyses=None, topologies=None, sqrts=[7, 8]):
         
     if analyses == None:
         analyses = smsResults.getAllResults().keys()
-    for analysis in analyses:
-        logger.debug("Building analysis %s." % str(analysis))
-        ss = rmvunit(smsResults.getSqrts(analysis), "TeV")
+    for ana in analyses:
+        logger.debug("Building analysis %s." % str(ana))
+        ss = rmvunit(smsResults.getSqrts(ana), "TeV")
         if ss == None:
-            logger.debug("SS: " + str(ss) + str(analysis))
+            logger.debug("SS: " + str(ss) + str(ana))
             continue
         ss = int(ss)
         if not ss in sqrts:
             continue
-        for tx in smsResults.getTopologies(analysis):
+        for tx in smsResults.getTopologies(ana):
             if topologies != None and tx not in topologies:
                 continue
             logger.debug(str(tx))                        
             newAnalysis = analysis.ULanalysis()
-            newAnalysis.sqrts = smsResults.getSqrts(analysis)
+            newAnalysis.sqrts = smsResults.getSqrts(ana)
             stopo = _getRealTopo (tx)
-            newAnalysis.label = analysis + ":" + tx
+            newAnalysis.label = ana + ":" + tx
             # "2012"
-            newAnalysis.run = smsHelpers.getRun(analysis)
-            constraint = smsResults.getConstraints(analysis, topology=stopo)
-            cond = smsResults.getConditions(analysis, topology=stopo)
+            newAnalysis.run = smsHelpers.getRun(ana)
+            constraint = smsResults.getConstraints(ana, topology=stopo)
+            cond = smsResults.getConditions(ana, topology=stopo)
             if not constraint or constraint == "Not yet assigned":
                 logger.debug("Constraint for %s %s (%s) does not exist."
-                             % (analysis, tx, stopo))
+                             % (ana, tx, stopo))
                 continue
             
             if cond:
