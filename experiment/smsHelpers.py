@@ -29,11 +29,11 @@ expupperLimitDict = {} # pylint: disable-msg=C0103
 def getRun(analysis, run=None):
     """
     Search for an analysis.
-    
+
     If a specific run is given, check if results are present.
 
     :returns: run; None, if not found;
-    
+
     """
     key = analysis + str(run)
     if key in runs_:
@@ -53,7 +53,7 @@ def getRun(analysis, run=None):
 def getLines(analysis, run, label="condition"):
     """
     Get all <label> lines in info.txt for an analysis-run pair.
-    
+
     """
     key = analysis + run + label
     if key in mlines:
@@ -95,7 +95,7 @@ def getLines(analysis, run, label="condition"):
 def getMetaInfoField(analysis, field, run=None):
     """
     Get one specific entry of the meta info.
-    
+
     """
     key = analysis + field + str(run)
     if key in infoFields:
@@ -106,7 +106,7 @@ def getMetaInfoField(analysis, field, run=None):
         infoFields[key] = None
         return infoFields[key]
     f = metainfo[field]
-    if len(f) == 0: 
+    if len(f) == 0:
         infoFields[key] = f
         return f
     while f[0] == ' ':
@@ -120,7 +120,7 @@ def getMetaInfoField(analysis, field, run=None):
 def _parseMetaInfo(analysis, run):
     """
     Get all the meta information for a given analysis-run pair.
-    
+
     """
     key = analysis + str(run)
     if key in pMI_:
@@ -156,7 +156,7 @@ def _parseMetaInfo(analysis, run):
 def getUpperLimitDictionary(analysis, topology, run, expected=False):
     """
     TODO: write docstring
-    
+
     """
     key = analysis + topology + str(run)
     if expected:
@@ -200,7 +200,7 @@ def getUpperLimitDictionary(analysis, topology, run, expected=False):
 def hasDictionary(analysis, run=None, topology=None):
     """
     Check if available upper limits are in dictionary format.
-    
+
     """
     if not run:
         run = getRun(analysis)
@@ -217,3 +217,15 @@ def hasDictionary(analysis, run=None, topology=None):
 
     logger.warn("Dictionary file %s does not exist." % dictfile)
     return False
+
+def databaseVersion( astuple=False ):
+    """ prints out version number of the *database* """
+    f=open("%s/version" % base )
+    l=f.readline()
+    f.close()
+    l=l.replace("\n","")
+    l.strip()
+    if not astuple:
+        return l
+    A,B=l.split(".")
+    return (int(A),int(B))
