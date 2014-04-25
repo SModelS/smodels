@@ -182,7 +182,7 @@ def hasURL (analysis, run=None):
 
 def getPAS (analysis, run=None):
     """ get the PAS for this analysis """
-    logger.info ( "getPAS is deprecat" )
+    logger.info ( "getPAS is deprecated" )
     return smsHelpers.getMetaInfoField (analysis, "pas", run)
 
 def getJournal (analysis, run=None):
