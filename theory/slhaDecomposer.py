@@ -57,7 +57,7 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
     # Get cross-section from file
     xSectionList = crossSection.getXsecFromSLHAFile(slhafile, useXSecs)
     # Get BRs and masses from file
-    brDic, massDic = getDictionariesFromSLHA(slhafile)
+    brDic, massDic = _getDictionariesFromSLHA(slhafile)
     # Only use the highest order cross-sections for each process
     xSectionList.removeLowerOrder()
 
@@ -113,7 +113,7 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
     return smsTopList        
 
 
-def getDictionariesFromSLHA(slhafile):
+def _getDictionariesFromSLHA(slhafile):
     """
     Create mass and BR dictionaries from an SLHA file.
     

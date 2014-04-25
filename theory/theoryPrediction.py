@@ -69,18 +69,18 @@ def theoryPredictionFor(analysis, smsTopList, maxMassDist=0.2):
     
     """
     # Select elements constrained by analysis and apply efficiencies
-    elements = getElementsFrom(smsTopList, analysis)   
+    elements = _getElementsFrom(smsTopList, analysis)   
     if len(elements) == 0:
         return None      
     # Combine masses
-    clusters = combineElements(elements, analysis, maxDist=maxMassDist)    
+    clusters = _combineElements(elements, analysis, maxDist=maxMassDist)    
     # Collect results and evaluate conditions
     predictions = []
     for cluster in clusters:
         theoryPrediction = TheoryPrediction()
         theoryPrediction.analysis = analysis
         theoryPrediction.value = cluster.getTotalXSec()
-        theoryPrediction.conditions = evalConditions(cluster, analysis)
+        theoryPrediction.conditions = _evalConditions(cluster, analysis)
         theoryPrediction.mass = cluster.getAvgMass()
         predictions.append(theoryPrediction)
 
@@ -89,7 +89,7 @@ def theoryPredictionFor(analysis, smsTopList, maxMassDist=0.2):
     return TheoryPredictionList(predictions)
 
 
-def getElementsFrom(smsTopList, analysis):
+def _getElementsFrom(smsTopList, analysis):
     """
     Get elements, that are constrained by the analysis.
     
@@ -115,7 +115,7 @@ def getElementsFrom(smsTopList, analysis):
     return elements
 
 
-def combineElements(elements, analysis, maxDist):
+def _combineElements(elements, analysis, maxDist):
     """
     Combine elements according to the analysis type.
     
@@ -130,7 +130,7 @@ def combineElements(elements, analysis, maxDist):
     return clusters
 
 
-def evalConditions(cluster, analysis):
+def _evalConditions(cluster, analysis):
     """
     Evaluate the analysis conditions inside an element cluster.
     

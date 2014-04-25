@@ -130,7 +130,7 @@ if __name__ == "__main__":
         filename = args.lhe # pylint: disable-msg=C0103
 
     reader = lheReader.LheReader(filename) # pylint: disable-msg=C0103
-    Event = reader.next() # pylint: disable-msg=C0103
-    element = lheDecomposer.elementFromEvent(Event, # pylint: disable-msg=C0103
+    event = reader.next() # pylint: disable-msg=C0103
+    element = lheDecomposer.elementFromEvent(event, # pylint: disable-msg=C0103
                                              crossSection.XSectionList())
     asciidraw(element, border=args.border)                    
