@@ -13,6 +13,8 @@ from . import smsHelpers
 from tools.physicsUnits import addunit, rmvunit
 import logging
 from .experimentExceptions import MetaInfoError
+from .smsHelpers import getRun
+
 
 logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
 
@@ -24,7 +26,7 @@ conditions = {} # pylint: disable-msg=C0103
 def getAllResults(run=None):
     """
     Get all analyses and topologies that have results.
-    
+
     """
     import os
     key = str(run)
@@ -47,7 +49,7 @@ def getAllResults(run=None):
 def getTopologies(analysis, run=None):
     """
     Get all topologies of an analysis with constraints.
-    
+
     """
     run = smsHelpers.getRun(analysis, run)
     x = getConstraints(analysis, run=run)
@@ -57,11 +59,11 @@ def getTopologies(analysis, run=None):
 def getConstraints(analysis, topology="all", run=None):
     """
     Get constraints of an analysis.
-    
+
     :returns: dictionary of constraints, if topology == "all"; single
     constraint for the passed topology, if only one topology is passed; None if
     non-existent;
-    
+
     """
     key = analysis + topology + str(run)
     if key in constraints:
@@ -79,9 +81,7 @@ def getConstraints(analysis, topology="all", run=None):
 
 
 def getSqrts(analysis, run=None):
-    """ TODO: what is s_hat?
-    Get s_hat for this analysis.
-    
+    """ get the center-of-mass energy of the analysis.
     """
     sqrts = smsHelpers.getMetaInfoField(analysis, "sqrts", run)
     try:
@@ -94,11 +94,11 @@ def getSqrts(analysis, run=None):
 def getConditions(analysis, topology="all", fuzzy=True, run=None):
     """
     Get conditions of an analysis.
-    
+
     :returns: dictionary of conditions, if topology == "all"; single condition
     for the passed topology, if only one topology is passed; None if
     non-existent
-    
+
     """
     key = analysis + topology + str(fuzzy) + str(run)
     if key in conditions:
@@ -121,12 +121,12 @@ def getConditions(analysis, topology="all", fuzzy=True, run=None):
 def getaxes(analysis, topology=None, run=None):
     """ TODO: improve docstring
     Get information about the histogram axes for an analysis.
-    
+
     For each topology list of dictionary, each dictionary corresponds to one
     histogram. The key axes gives string (mx-my), the key mz gives information
     on other masses, if you supply a topology, returns list for this topology
     only.
-    
+
     """
     if not _exists(analysis, topology=None):
         return None
@@ -165,15 +165,62 @@ def getaxes(analysis, topology=None, run=None):
 
     return d
 
+def setBase ( base ):
+    """ set the base directory of the database
+    """
+    smsHelpers.base=base
+
+def getURL (analysis, run=None):
+    """ get the URL for this analysis """
+    logger.info ( "getURL is deprecated" )
+    return smsHelpers.getMetaInfoField (analysis, "url", run)
+
+def hasURL (analysis, run=None):
+    """ see if an URL is known """
+    logger.info ( "hasURL is deprecated" )
+    return smsHelpers.hasMetaInfoField (analysis, "url", run)
+
+def getPAS (analysis, run=None):
+    """ get the PAS for this analysis """
+    logger.info ( "getPAS is deprecat" )
+    return smsHelpers.getMetaInfoField (analysis, "pas", run)
+
+def getJournal (analysis, run=None):
+    """ get the journal of this analysis """
+    logger.info ( "getJournal is deprecated" )
+    return smsHelpers.getMetaInfoField (analysis, "journal", run)
+
+def getLumi (analysis, run=None):
+    """ get the integrated luminosity for this analysis """
+    logger.info ( "getLumi is deprecated" )
+    lumifb = float(smsHelpers.getMetaInfoField (analysis, "lumi", run))
+    return addunit (lumifb, "fb-1")
+
+def getExperiment (analysis, run=None):
+    """ return experiment name for given analysis
+        for now: check if run is ATLAS8TeV, else return CMS """
+    logger.info ( "getExperiment is deprecated" )
+    run1 = getRun(analysis, run)
+    if run1.find("ATLAS")>-1:
+        return "ATLAS"
+    return "CMS"
+
+def getComment (analysis, run=None):
+    """ an option comment? """
+    logger.info ( "getComment is deprecated" )
+    return smsHelpers.getMetaInfoField (analysis, "comment", run)
+
+def considerRuns ( runs ):
+    smsHelpers.runs = runs
 
 def _exists(analysis, topology, run=None):
     """
     Check if the dictionary 'limit_topo' in <run>/<analysis>/sms.py exists.
-    
+
     For topologies with intermediate masses, check if all dictionaries listed
     in the axes-information exist. If topology == None, check if
     <run>/<analysis>/sms.py exists.
-    
+
     """
     run2 = smsHelpers.getRun(analysis, run)
     if not topology:
@@ -197,10 +244,10 @@ def getUpperLimit (analysis, topology, mx=None, my=None, run=None,
                    interpolate=False, expected=False):
     """
     Get the upper limit for run/analysis/topology.
-    
+
     :returns: None, if it does not exist; entire dictionary, if mx and my are
     None; upper limit at mx/my, if mx and my are floats;
-    
+
     """
     run = smsHelpers.getRun(analysis, run)
     if smsHelpers.hasDictionary(analysis, run):
@@ -216,7 +263,7 @@ def getUpperLimitFromDictionary (analysis, topology, mx=None, my=None,
                                  expected=False):
     """ TODO: unused arguments png and interpolate
     Get an upper limit from the python dictionary.
-    
+
     """
     dictionary = smsHelpers.getUpperLimitDictionary(analysis, topology, run,
                                               expected=expected)
@@ -236,17 +283,17 @@ def getUpperLimitFromDictionary (analysis, topology, mx=None, my=None,
 def getInterpolatedUpperLimitDelaunay(dictionary, inmx, inmy):
     """
     Get interpolated upper limit from dictionary at point (inmx, inmy).
-    
+
     :param dictionary: dictionary (sms.py), contains upper limits of one
     analysis and one topology
     :param inmx: mass point on x-axis
     :param inmy: mass point on y-axis
     :returns: interpolated upper limit at point (inmx, inmy)
-    
+
     """
     import numpy as np
     import scipy.interpolate as ip
-    
+
     try:
         mx = rmvunit(inmx, 'GeV')
         my = rmvunit(inmy, 'GeV')
@@ -277,16 +324,16 @@ def getInterpolatedUpperLimitDelaunay(dictionary, inmx, inmy):
         if not inConvexHull(dictionary, inmx, inmy):
             return False
         return getClosestValue(dictionary, inmx, inmy)
-    
+
 
 def inConvexHull(dictionary, mx, my):
     """
     TODO: write docstring
-    
+
     """
     import numpy
     from scipy.spatial import Delaunay
-    
+
     pointlist = []
     for k in dictionary.keys():
         for ki in dictionary[k].keys():
@@ -300,7 +347,7 @@ def getClosestValue (dictionary, mx, my):
     """
     Get the upper limit of the point in dictionary that is closest to mx and
     my, assuming that dictionary is a dictionary of mx, my, ul.
-    
+
     """
     closest = 9999999
     retul = None
