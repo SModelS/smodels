@@ -61,10 +61,13 @@ class ExternalNllFast(ExternalTool):
 
     def unlink ( self, File ): 
         """ remove File.out """
+        return
+              """
         import os
         Fname="%s/%s.out" % ( self.cd_path, File )
         if os.path.exists ( Fname ):
             os.unlink ( Fname )
+            """
 
     def run_ ( self, params ):
         """ run nllfast7
