@@ -77,7 +77,7 @@ class IndexCluster(object):
         self.analysis = analysis
                 
         if massMap and posMap and len(self.indices) > 0:
-            self.avgPosition = self.getAvgPosition()
+            self.avgPosition = self._getAvgPosition()
         
         
     def __eq__(self, other):        
@@ -110,7 +110,7 @@ class IndexCluster(object):
         
         indices = list(self.indices).extend(ilist)
         self.indices = set(indices)
-        self.avgPosition = self.getAvgPosition()
+        self.avgPosition = self._getAvgPosition()
         
         
     def remove(self, iels):
@@ -128,10 +128,10 @@ class IndexCluster(object):
         for iel in ilist:
             indices.remove(iel)
         self.indices = set(indices)
-        self.avgPosition = self.getAvgPosition()
+        self.avgPosition = self._getAvgPosition()
         
     
-    def getAvgPosition(self):
+    def _getAvgPosition(self):
         """
         Return the average position in upper limit space for all indices
         belonging to the cluster.
@@ -144,7 +144,7 @@ class IndexCluster(object):
         return avgPos
     
     
-    def getDistanceTo(self, obj):
+    def _getDistanceTo(self, obj):
         """
         Return the maximum distance between any elements belonging to the
         cluster and the object obj.
@@ -168,7 +168,7 @@ class IndexCluster(object):
         return dmax
     
     
-    def getMaxInternalDist(self):
+    def _getMaxInternalDist(self):
         """
         Return the maximum distance between any pair of elements belonging
         to the cluster as well as the cluster center and any element.
@@ -176,45 +176,11 @@ class IndexCluster(object):
         """        
         dmax = 0.
         if self.avgPosition == None:
-            self.avgPosition = self.getAvgPosition()
+            self.avgPosition = self._getAvgPosition()
         for iel in self:
             dmax = max(dmax, distance(self.positionMap[iel], self.avgPosition))
-            dmax = max(dmax, self.getDistanceTo(iel))
+            dmax = max(dmax, self._getDistanceTo(iel))
         return dmax
-    
-    
-def getGoodElements(elements, analysis, maxDist):
-    """
-    Get the list of good masses appearing elements according to the analysis
-    distance.
-    
-    :returns: list of elements with good masses with their masses replaced by
-    the branch average. A mass is good if the mass distance between the
-    branches is less than maxDist and if the element mass (or mass avg) falls
-    inside the upper limit plane.
-    
-    """    
-    goodElements = []  
-    for element in elements:
-        mass = element.getMasses()
-        goodmass = None
-        if mass[0] == mass[1]:
-            if massPosition(mass, analysis):
-                goodmass = mass
-        else:
-            mass1 = [mass[0], mass[0]]
-            mass2 = [mass[1], mass[1]]
-            mP1 = massPosition(mass1, analysis)
-            mP2 = massPosition(mass2, analysis)
-            if not mP1 or not mP2:
-                continue
-            if distance(mP1, mP2) < maxDist:
-                goodmass = massAvg([mass1, mass2])
-        if goodmass and massPosition(goodmass, analysis):            
-            goodElements.append(element.copy())
-            goodElements[-1].setMasses(goodmass) 
-    
-    return goodElements
 
 
 def groupAll(elements):
@@ -237,15 +203,15 @@ def clusterElements(elements, analysis, maxDist):
     """       
     # Get the list of elements with good masses (with the masses replaced by
     # their 'good' value):
-    goodElements = getGoodElements(elements, analysis, maxDist)
+    goodElements = _getGoodElements(elements, analysis, maxDist)
     if len(goodElements) == 0:
         return []    
     # ElementCluster elements by their mass:  
-    clusters = doCluster(goodElements, analysis, maxDist)
+    clusters = _doCluster(goodElements, analysis, maxDist)
     return clusters
 
 
-def doCluster(elements, analysis, maxDist):
+def _doCluster(elements, analysis, maxDist):
     """
     Cluster algorithm to cluster elements.
     
@@ -280,17 +246,17 @@ def doCluster(elements, analysis, maxDist):
         newClusters = []
         for indexCluster in clusterList:
             # cluster is good
-            if indexCluster.getMaxInternalDist() < maxDist:
+            if indexCluster._getMaxInternalDist() < maxDist:
                 if not indexCluster in finalClusters:
                     finalClusters.append(indexCluster)
                 continue
             # Distance to cluster center (average)
-            distAvg = indexCluster.getDistanceTo(indexCluster.avgPosition) 
+            distAvg = indexCluster._getDistanceTo(indexCluster.avgPosition) 
             
             """Loop over cluster elements and if element distance or cluster
             average distance falls outside the cluster, remove element"""
             for iel in indexCluster:
-                dist = indexCluster.getDistanceTo(iel)
+                dist = indexCluster._getDistanceTo(iel)
                 if max(dist, distAvg) > maxDist:
                     newcluster = indexCluster
                     newcluster.remove(iel)
@@ -331,3 +297,37 @@ def doCluster(elements, analysis, maxDist):
         clusterList.append(cluster)
     
     return clusterList
+    
+    
+def _getGoodElements(elements, analysis, maxDist):
+    """
+    Get the list of good masses appearing elements according to the analysis
+    distance.
+    
+    :returns: list of elements with good masses with their masses replaced by
+    the branch average. A mass is good if the mass distance between the
+    branches is less than maxDist and if the element mass (or mass avg) falls
+    inside the upper limit plane.
+    
+    """    
+    goodElements = []  
+    for element in elements:
+        mass = element.getMasses()
+        goodmass = None
+        if mass[0] == mass[1]:
+            if massPosition(mass, analysis):
+                goodmass = mass
+        else:
+            mass1 = [mass[0], mass[0]]
+            mass2 = [mass[1], mass[1]]
+            mP1 = massPosition(mass1, analysis)
+            mP2 = massPosition(mass2, analysis)
+            if not mP1 or not mP2:
+                continue
+            if distance(mP1, mP2) < maxDist:
+                goodmass = massAvg([mass1, mass2])
+        if goodmass and massPosition(goodmass, analysis):            
+            goodElements.append(element.copy())
+            goodElements[-1].setMasses(goodmass) 
+    
+    return goodElements

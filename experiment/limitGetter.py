@@ -66,7 +66,7 @@ def getPlotLimit(inmass, analysis):
 
     # Skip empty mass arrays
     if len(massArray) < 2:
-        logger.error("Length of mass-array < 2 (M = " + str(massArray) + ").")
+        logger.error("Length of mass-array < 2 (M: " + str(massArray) + ").")
         sys.exit()
 
     # Make sure the two branches have equal masses

@@ -35,10 +35,10 @@ class Topology(object):
         
         if elements:
             if type(elements) == type(Element()):
-                self.addElement(elements)              
+                self._addElement(elements)              
             elif type(elements) == type([]):
                 for element in elements:
-                    self.addElement(element)
+                    self._addElement(element)
 
 
     def __eq__(self, other):
@@ -101,14 +101,6 @@ class Topology(object):
         return True
     
     
-    def getTinfo(self):
-        """
-        Return a dictionary with the topology number of vertices and vertparts.
-        
-        """        
-        return {'vertnumb' : self.vertnumb, 'vertparts' : self.vertparts}
-    
-    
     def describe(self):
         """
         Create a detailed description of the topology.
@@ -128,7 +120,7 @@ class Topology(object):
         return self.elementList
 
      
-    def addElement(self, newelement):
+    def _addElement(self, newelement):
         """
         Add an Element object to the elementList.
         
@@ -147,7 +139,7 @@ class Topology(object):
         # Check if newelement matches the topology structure
         info = newelement.getEinfo()
         infoB = newelement.switchBranches().getEinfo()
-        if info != self.getTinfo() and infoB != self.getTinfo():
+        if info != self._getTinfo() and infoB != self._getTinfo():
             logger.warning('Element to be added does not match topology')
             return False
         
@@ -186,6 +178,14 @@ class Topology(object):
         
         # If element does not match topology info, return False
         return False
+    
+    
+    def _getTinfo(self):
+        """
+        Return a dictionary with the topology number of vertices and vertparts.
+        
+        """        
+        return {'vertnumb' : self.vertnumb, 'vertparts' : self.vertparts}
     
     
     def getTotalWeight(self):
@@ -278,7 +278,7 @@ class TopologyList(Printer):
             self.topos.append(newTopology)
         else:
             for newelement in newTopology.elementList:
-                self.topos[topmatch].addElement(newelement)
+                self.topos[topmatch]._addElement(newelement)
             
             
     def getTotalWeight(self):

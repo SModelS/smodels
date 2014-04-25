@@ -148,7 +148,7 @@ class XSection(object):
         return newXsec
     
     
-    def zeroXSec(self):
+    def _zeroXSec(self):
         """
         Replace the cross-section value by zero.
         
@@ -241,7 +241,7 @@ class XSectionList(object):
             self.xSections.append(newxsec.copy())
             
         
-    def addValue(self, newxsec):
+    def _addValue(self, newxsec):
         """
         Add a XSection object to the list.
         
@@ -282,7 +282,7 @@ class XSectionList(object):
         return xsecList
     
     
-    def zeroXSecs(self):
+    def _zeroXSecs(self):
         """
         Replace the cross-section values in the list by zero.
         
@@ -317,7 +317,7 @@ class XSectionList(object):
         return allInfo
 
 
-    def getLabels(self):
+    def _getLabels(self):
         """
         Get all labels appearing in the list.
         
@@ -400,7 +400,7 @@ class XSectionList(object):
                 xSecDictionary = xSecDictionary[allPids[0]]                   
 
         elif groupBy == "labels":
-            allLabels = self.getLabels()
+            allLabels = self._getLabels()
             for label in allLabels:
                 xSecDictionary[label] = {}
                 xSecs = self.getXsecsFor(label)

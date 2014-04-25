@@ -101,7 +101,7 @@ def getMetaInfoField(analysis, field, run=None):
     if key in infoFields:
         return infoFields[key]
     run = getRun(analysis, run)
-    metainfo = parseMetaInfo(analysis, run)
+    metainfo = _parseMetaInfo(analysis, run)
     if not field in metainfo:
         infoFields[key] = None
         return infoFields[key]
@@ -117,7 +117,7 @@ def getMetaInfoField(analysis, field, run=None):
     return f
 
 
-def parseMetaInfo ( analysis, run ):
+def _parseMetaInfo(analysis, run):
     """
     Get all the meta information for a given analysis-run pair.
     
@@ -128,7 +128,7 @@ def parseMetaInfo ( analysis, run ):
     info = "%s/%s/%s/info.txt" % (base, run, analysis)
     ret = {}
     if not os.path.exists(info):
-        logger.warn("cannot find %s" % info)
+        logger.warn("Cannot find %s." % info)
         pMI_[key] = ret
         return ret
     f = open(info)
@@ -174,23 +174,23 @@ def getUpperLimitDictionary(analysis, topology, run, expected=False):
     execfile(dictfile, localsDictionary)
     if expected:
         if not localsDictionary.has_key("ExpectedDict"):
-            logger.warn("Expected dictionary is missing for analysis %s" % \
-                        analysis)
+            logger.warn("Expected dictionary is missing for analysis %s."
+                        % analysis)
             return None
         dictionary = localsDictionary["ExpectedDict"]
         if not dictionary.has_key(topology):
-            logger.warn("Dictionary does not have topology %s" % topology)
+            logger.warn("Dictionary does not have topology %s." % topology)
             expupperLimitDict[key] = None
             return None
         expupperLimitDict[key] = dictionary[topology]
     else:
         if not localsDictionary.has_key("Dict"):
-            logger.warn("Observed dictionary is missing for analysis %s" % \
-                        analysis)
+            logger.warn("Observed dictionary is missing for analysis %s."
+                        % analysis)
             return None
         dictionary = localsDictionary["Dict"]
         if not dictionary.has_key(topology):
-            logger.warn("Dictionary does not have topology %s" % topology)
+            logger.warn("Dictionary does not have topology %s." % topology)
             upperLimitDict[key] = None
             return None
         upperLimitDict[key] = dictionary[topology]

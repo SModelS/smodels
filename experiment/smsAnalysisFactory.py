@@ -14,7 +14,7 @@ from . import smsResults
 from tools.physicsUnits import rmvunit
 from theory import analysis
 from theory import element
-from experiment import smsHelpers
+from . import smsHelpers
 import logging
 
 logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
@@ -47,44 +47,44 @@ def load(analyses=None, topologies=None, sqrts=[7, 8]):
         
     if analyses == None:
         analyses = smsResults.getAllResults().keys()
-    for ana in analyses:
-        logger.debug("Building ana " + str(ana))
-        ss = rmvunit(smsResults.getSqrts(ana), "TeV")
+    for analysis in analyses:
+        logger.debug("Building analysis %s." % str(analysis))
+        ss = rmvunit(smsResults.getSqrts(analysis), "TeV")
         if ss == None:
-            logger.debug("SS = " + str(ss) + str(ana))
+            logger.debug("SS: " + str(ss) + str(analysis))
             continue
         ss = int(ss)
         if not ss in sqrts:
             continue
-        for tx in smsResults.getTopologies(ana):
+        for tx in smsResults.getTopologies(analysis):
             if topologies != None and tx not in topologies:
                 continue
             logger.debug(str(tx))                        
             newAnalysis = analysis.ULanalysis()
-            newAnalysis.sqrts = smsResults.getSqrts(ana)
-            stopo = getRealTopo (tx)
-            newAnalysis.label = ana + ":" + tx
+            newAnalysis.sqrts = smsResults.getSqrts(analysis)
+            stopo = _getRealTopo (tx)
+            newAnalysis.label = analysis + ":" + tx
             # "2012"
-            newAnalysis.run = smsHelpers.getRun(ana)
-            constraint = smsResults.getConstraints(ana, topology=stopo)
-            cond = smsResults.getConditions(ana, topology=stopo)
+            newAnalysis.run = smsHelpers.getRun(analysis)
+            constraint = smsResults.getConstraints(analysis, topology=stopo)
+            cond = smsResults.getConditions(analysis, topology=stopo)
             if not constraint or constraint == "Not yet assigned":
-                logger.debug("dont have a constraint for " + str(ana) + \
-                            str(tx) + "(" + str(stopo) + ")")
+                logger.debug("Constraint for %s %s (%s) does not exist."
+                             % (analysis, tx, stopo))
                 continue
             
             if cond:
                 cond = cond.replace("'", "").replace(" ", "").split(';')
             newAnalysis.constraint = constraint
             newAnalysis.conditions = cond
-            newAnalysis.elementsEff = getElementsEffs(constraint)
-            # Add ana to list of analyses:
+            newAnalysis.elementsEff = _getElementsEffs(constraint)
+            # Add analysis to list of analyses:
             listOfAnalyses.append(newAnalysis)
 
     return listOfAnalyses
 
 
-def getRealTopo(tx):
+def _getRealTopo(tx):
     """
     Get real topology, e.g., T3w025 -> T3w, etc.
     
@@ -96,7 +96,7 @@ def getRealTopo(tx):
     return ret
 
 
-def getElementsEffs(constraint):
+def _getElementsEffs(constraint):
     """
     Generate a dictionary of elements with their simple efficiencies as values.
     
@@ -105,7 +105,7 @@ def getElementsEffs(constraint):
     
     """      
     # Get element strings appearing in constraint
-    elStrings = getArray(constraint)
+    elStrings = _getArray(constraint)
     cons = constraint.replace(" ", "")
     cons = cons.replace("'", "")
     elementsEff = {}
@@ -119,7 +119,7 @@ def getElementsEffs(constraint):
     return elementsEff
 
 
-def getArray(constraint):
+def _getArray(constraint):
     """
     Get number of vertices, branches and insertions from a constraint string.
     
