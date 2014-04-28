@@ -30,8 +30,8 @@ def computeXSec(sqrts,maxOrder,nevts,slhafile,lhefile=None,externaldir=None):
     :param sqrts: sqrt{s} to run Pythia
     :param maxOrder: maximum order to compute the cross-section
     if maxOrder = 0, compute only LO pythia xsecs
-    if maxOrder = 1, apply NLO K-factors fron NLLfast (if available)
-    if maxOrder = 2, apply NLO+NLL K-factors fron NLLfast (if available)
+    if maxOrder = 1, apply NLO K-factors from NLLfast (if available)
+    if maxOrder = 2, apply NLO+NLL K-factors from NLLfast (if available)
     :param nevts: number of events for pythia run
     :param slhafile: input SLHA file
     :param lhefile: LHE file. If None, do not write pythia output to file \
@@ -44,7 +44,7 @@ def computeXSec(sqrts,maxOrder,nevts,slhafile,lhefile=None,externaldir=None):
     if not externaldir: externaldir = os.getcwd() + '/external/'
 #Check if SLHA file exists
     if not os.path.isfile(slhafile):
-        logger.error("SLHA file not found.")
+        logger.error("SLHA file %s not found." % slhafile )
         return None
 #Check i lhefile exists:
     if lhefile:
