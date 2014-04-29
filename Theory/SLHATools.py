@@ -9,7 +9,7 @@
 
 """
 
-import pyslha
+import pyslha2 as pyslha
 import tempfile
 
 def createSLHAFile(topo, masses = None, filename = None, branching = None, totalwidth = None):
