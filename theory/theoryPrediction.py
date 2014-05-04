@@ -12,14 +12,14 @@ from . import clusterTools
 from . import crossSection
 from . import element
 from .particleNames import elementsInStr
-from .auxiliaryFunctions import cSim # pylint: disable-msg=W0611
-from .auxiliaryFunctions import cGtr # pylint: disable-msg=W0611
+from .auxiliaryFunctions import cSim  # pylint: disable=W0611
+from .auxiliaryFunctions import cGtr  # pylint: disable=W0611
 from .analysis import SRanalysis
 from .analysis import ULanalysis
 from .printer import Printer
 import logging
 
-logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
+logger = logging.getLogger(__name__)
 
 
 class TheoryPrediction(object):
@@ -27,14 +27,14 @@ class TheoryPrediction(object):
     An instance of this class represents the results of the theory prediction
     for an analysis.
     
-    """    
+    """
     def __init__(self):
         self.analysis = None
         self.value = None
         self.conditions = None
         self.mass = None
-    
-    
+
+
 class TheoryPredictionList(Printer):
     """
     An instance of this class represents the a collection of theory prediction
@@ -43,13 +43,13 @@ class TheoryPredictionList(Printer):
     """
     def __init__(self, theoryPredictions):
         self._theoryPredictions = theoryPredictions
-        
+
 
     def __iter__(self):
         for theoryPrediction in self._theoryPredictions:
             yield theoryPrediction
-            
-            
+
+
     def prepareData(self):
         """
         Select data preparation method through dynamic binding.
@@ -69,11 +69,11 @@ def theoryPredictionFor(analysis, smsTopList, maxMassDist=0.2):
     
     """
     # Select elements constrained by analysis and apply efficiencies
-    elements = _getElementsFrom(smsTopList, analysis)   
+    elements = _getElementsFrom(smsTopList, analysis)
     if len(elements) == 0:
-        return None      
+        return None
     # Combine masses
-    clusters = _combineElements(elements, analysis, maxDist=maxMassDist)    
+    clusters = _combineElements(elements, analysis, maxDist=maxMassDist)
     # Collect results and evaluate conditions
     predictions = []
     for cluster in clusters:
@@ -98,7 +98,7 @@ def _getElementsFrom(smsTopList, analysis):
     are multiplied by their respective efficiency and the cross-sections not
     matching the analysis sqrts are removed.
     
-    """    
+    """
     elements = []
     for el in smsTopList.getElements():
         eff = analysis.getEfficiencyFor(el)
@@ -108,10 +108,10 @@ def _getElementsFrom(smsTopList, analysis):
         element.weight = crossSection.XSectionList()
         for xsec in el.weight:
             if xsec.info.sqrts == analysis.sqrts:
-                element.weight.add(copy.deepcopy(xsec*eff))
+                element.weight.add(copy.deepcopy(xsec * eff))
         if len(element.weight) > 0:
             elements.append(element)
-            
+
     return elements
 
 
@@ -122,7 +122,7 @@ def _combineElements(elements, analysis, maxDist):
     If analysis == upper limit type, group elements into mass clusters. If
     analysis == signal region type, group all elements into a single cluster.
     
-    """    
+    """
     if type(analysis) == type(SRanalysis()):
         clusters = [clusterTools.groupAll(elements)]
     elif type(analysis) == type(ULanalysis()):
@@ -139,37 +139,37 @@ def _evalConditions(cluster, analysis):
     
     :retunrs: None, if analysis type == signal region
     
-    """        
+    """
     if type(analysis) == type(SRanalysis()):
         return None
     elif type(analysis) == type(ULanalysis()):
         if not analysis.conditions:
             return analysis.conditions
         conditions = {}
-        # Loop over conditions        
+        # Loop over conditions
         for cond in analysis.conditions:
-            # Get elements appearing in conditions            
+            # Get elements appearing in conditions
             condElements = [element.Element(elStr) \
                             for elStr in elementsInStr(cond)]
             newcond = cond
             for iel, el in enumerate(condElements):
-                newcond = newcond.replace(str(el), "condElements["+str(iel)+
+                newcond = newcond.replace(str(el), "condElements[" + str(iel) +
                                           "].weight")
-                for el1 in cluster.elements:   
-                    if el1.particlesMatch(el):                        
+                for el1 in cluster.elements:
+                    if el1.particlesMatch(el):
                         el.weight.combineWith(el1.weight)
-                        
-            
+
+
             if newcond.find("Cgtr") >= 0:
                 newcond = newcond.replace("Cgtr", "cGtr")
                 logger.warning(analysis.label + " using deprecated function "
-                        "'Cgtr'. Auto-replacing with 'cGtr'.")
-                
+                               "'Cgtr'. Auto-replacing with 'cGtr'.")
+
             if newcond.find("Csim") >= 0:
                 newcond = newcond.replace("Csim", "cSim")
                 logger.warning(analysis.label + " using deprecated function "
-                        "'Csim'. Auto-replacing with 'cSim'.")
-            
+                               "'Csim'. Auto-replacing with 'cSim'.")
+
             conditions[cond] = eval(newcond)
-            
+
         return conditions

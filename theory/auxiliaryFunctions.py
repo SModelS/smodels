@@ -15,7 +15,7 @@ from scipy import stats
 from collections import Iterable
 import logging
 
-logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
+logger = logging.getLogger(__name__)
 
 
 def _memoize(func):
@@ -25,7 +25,7 @@ def _memoize(func):
     Serves as a wrapper to cache the results of massPosition, since this is a
     computationally expensive function.
     
-    """    
+    """
     cache = {}
     @wraps(func)
     def _wrap(*args):
@@ -47,11 +47,11 @@ def massPosition(mass, analysis):
     Use the analysis experimental limit data. If nounit == True, the result is
     given as number assuming fb units.
     
-    """    
+    """
     xmass = analysis.getUpperLimitFor(mass)
     if type(xmass) != type(addunit(1., 'pb')):
         return None
-    xmass = rmvunit(xmass, 'fb')    
+    xmass = rmvunit(xmass, 'fb')
     return xmass
 
 
@@ -62,7 +62,7 @@ def distance(xmass1, xmass2):
     """
     if xmass1 is None or xmass2 is None:
         return None
-    distanceValue = 2.*abs(xmass1 - xmass2)/(xmass1 + xmass2)
+    distanceValue = 2.*abs(xmass1 - xmass2) / (xmass1 + xmass2)
     if distanceValue < 0.:
         # Skip masses without an upper limit
         return None
@@ -77,32 +77,32 @@ def massAvg(massList, method='harmonic'):
     
     :param method: possible values: harmonic, mean
     
-    """  
+    """
     if not massList:
         return massList
     if len(massList) == 1:
-        return massList[0]               
+        return massList[0]
     flatList = [rmvunit(mass, 'GeV') for mass in _flattenList(massList)]
     if method == 'harmonic' and 0. in flatList:
         method = 'mean'
-    
+
     for mass in massList:
         if len(mass) != len(massList[0]) \
                 or len(mass[0]) != len(massList[0][0]) \
-                or len(mass[1]) != len(massList[0][1]):  
+                or len(mass[1]) != len(massList[0][1]):
             logger.error('Mass shape mismatch in mass list:\n' + str(mass) +
                          ' and ' + str(massList[0]))
             return False
-    
+
     avgmass = massList[0][:]
     for ib, branch in enumerate(massList[0]):
         for ival in enumerate(branch):
-            vals = [rmvunit(mass[ib][ival[0]],'GeV') for mass in massList]
+            vals = [rmvunit(mass[ib][ival[0]], 'GeV') for mass in massList]
             if method == 'mean':
                 avg = np.mean(vals)
             elif method == 'harmonic':
                 avg = stats.hmean(vals)
-            avgmass[ib][ival[0]] = addunit(float(avg),'GeV')   
+            avgmass[ib][ival[0]] = addunit(float(avg), 'GeV')
     return avgmass
 
 
@@ -115,7 +115,7 @@ def cSim(*weights):
     
     :returns: XSectionList object with the values for each label.
     
-    """    
+    """
     for weight in weights:
         if type(weight) != type(crossSection.XSectionList()):
             logger.error("Trying to evaluate non-xsection objects")
@@ -127,27 +127,27 @@ def cSim(*weights):
     for weight in weights:
         for info in weight.getInfo():
             if not info in infoList:
-                infoList.append(info)    
-    zeros = crossSection.XSectionList(infoList)   
+                infoList.append(info)
+    zeros = crossSection.XSectionList(infoList)
     for weight in weights:
         weight.combineWith(zeros)
- 
-    # Evaluate the inequality for each cross-section info   
-    result =  crossSection.XSectionList()
+
+    # Evaluate the inequality for each cross-section info
+    result = crossSection.XSectionList()
     for info in infoList:
-        res = 0.       
+        res = 0.
         xsecRes = crossSection.XSection()
-        xsecRes.info = info     
+        xsecRes.info = info
         for weightA in weights:
             for weightB in weights:
-                a = rmvunit(weightA.getXsecsFor(info.label)[0].value,'fb')
-                b = rmvunit(weightB.getXsecsFor(info.label)[0].value,'fb')
+                a = rmvunit(weightA.getXsecsFor(info.label)[0].value, 'fb')
+                b = rmvunit(weightB.getXsecsFor(info.label)[0].value, 'fb')
                 if a + b == 0.:
                     continue
-                res = max(res, abs(a-b)/abs(a+b))                  
+                res = max(res, abs(a - b) / abs(a + b))
         xsecRes.value = res
         result.add(xsecRes)
-        
+
     return result
 
 
@@ -160,41 +160,41 @@ def cGtr(weightA, weightB):
     
     :returns: XSectioList object with the values for each label.
     
-    """    
+    """
     if type(weightA) != type(crossSection.XSectionList()) or \
             type(weightB) != type(crossSection.XSectionList()):
         logger.error("Trying to evaluate non-xsection objects")
         return False
 
     # Make sure both xsec lists have the same entries (add zero xsecs for the
-    # missing entries)   
+    # missing entries)
     infoList = weightA.getInfo()
     for info in weightB.getInfo():
         if not info in infoList:
             infoList.append(info)
     if not infoList:
-        # If there are no cross-sections, can not evaluate  
-        return 'N/A' 
-    zeros = crossSection.XSectionList(infoList)    
+        # If there are no cross-sections, can not evaluate
+        return 'N/A'
+    zeros = crossSection.XSectionList(infoList)
     weightA.combineWith(zeros)
     weightB.combineWith(zeros)
 
-    # Evaluate the inequality for each cross-section info    
-    result =  crossSection.XSectionList()        
+    # Evaluate the inequality for each cross-section info
+    result = crossSection.XSectionList()
     for info in infoList:
-        a = rmvunit(weightA.getXsecsFor(info.label)[0].value,'fb')
-        b = rmvunit(weightB.getXsecsFor(info.label)[0].value,'fb')
+        a = rmvunit(weightA.getXsecsFor(info.label)[0].value, 'fb')
+        b = rmvunit(weightB.getXsecsFor(info.label)[0].value, 'fb')
         xsecRes = crossSection.XSection()
-        xsecRes.info = info                        
+        xsecRes.info = info
         if a + b == 0.:
             xsecRes.value = 'N/A'
         else:
-            xsecRes.value = (abs(a-b) - (a-b))/(2.*(a+b))
+            xsecRes.value = (abs(a - b) - (a - b)) / (2.*(a + b))
         result.add(xsecRes)
-        
+
     return result
 
-    
+
 def _flattenList(inlist, dims=None):
     """
     Flatten a multi-dimensional nested list.
@@ -212,6 +212,6 @@ def _flattenList(inlist, dims=None):
                 dims.append(len(item))
             for x in _flattenList(item, dims):
                 flat.append(x)
-        else:        
-            flat.append(item)             
+        else:
+            flat.append(item)
     return flat

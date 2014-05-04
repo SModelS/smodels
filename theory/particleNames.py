@@ -11,7 +11,7 @@
 
 import logging
 
-logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
+logger = logging.getLogger(__name__)
 
 
 def getName(pdg):
@@ -58,7 +58,7 @@ def elementsInStr(instring):
     
     :returns: list of elements appearing in instring in string format
     
-    """  
+    """
     if type(instring) == type('st'):
         outstr = instring
     elif type(instring) == type([]):
@@ -69,9 +69,9 @@ def elementsInStr(instring):
                 return False
             # Combine list of strings in a single string
             outstr += st
-  
+
     elements = []
-    outstr = outstr.replace(" ","").replace("'","")
+    outstr = outstr.replace(" ", "").replace("'", "")
     elStr = ""
     nc = 0
     # Parse the string and looks for matching ['s and ]'s, when the matching is
@@ -89,7 +89,8 @@ def elementsInStr(instring):
             elements.append(elStr + c)
             elStr = ""
             # Syntax checks
-            ptclist = elements[-1].replace(']',',').replace('[',',').split(',')
+            ptclist = elements[-1].replace(']', ',').replace('[', ',').\
+                    split(',')
             for ptc in ptclist:
                 if not ptc:
                     continue
@@ -100,8 +101,8 @@ def elementsInStr(instring):
     # Check if there are not unmatched ['s and/or ]'s in the string
     if nc != 0:
         logger.error("Wrong input (incomplete elements?) " + instring)
-        return False     
-      
+        return False
+
     return elements
 
 
@@ -110,7 +111,7 @@ def vertInStr(instring):
     Parses instring (or a list of strings) and returns the list of particle
     vertices appearing in instring.
     
-    """  
+    """
     if type(instring) == type('st'):
         outstr = instring
     elif type(instring) == type([]):
@@ -121,9 +122,9 @@ def vertInStr(instring):
                 return False
             # Combine list of strings in a single string
             outstr += st
-  
+
     vertices = []
-    outstr = outstr.replace(" ","").replace("'","")
+    outstr = outstr.replace(" ", "").replace("'", "")
     vertStr = ""
     nc = 0
     # Parse the string and looks for matching ['s and ]'s, when the matching is
@@ -140,8 +141,8 @@ def vertInStr(instring):
         if nc != 0 and c != '[' and c != ']':
             vertStr += c
         if delta > 0 and vertStr:
-            vertices.append(vertStr.split(','))            
-            #Syntax checks:
+            vertices.append(vertStr.split(','))
+            # Syntax checks:
             for ptc in vertices[-1]:
                 if not ptc:
                     continue
@@ -153,8 +154,8 @@ def vertInStr(instring):
     # Check if there are not unmatched ['s and/or ]'s in the string
     if nc != 0:
         logger.error("Wrong input (incomplete elements?) " + instring)
-        return False     
-      
+        return False
+
     return vertices
 
 
@@ -172,7 +173,7 @@ def simParticles(ptype1, ptype2, useDict=True):
     
     """
     import copy
-     
+
     wrongFormat = False
     if type(ptype1) != type(ptype2):
         return False
@@ -185,20 +186,20 @@ def simParticles(ptype1, ptype2, useDict=True):
                 wrongFormat = True
             # Check number of vertices in branch
             if len(ptype1[ib]) != len(ptype2[ib]):
-                return False    
+                return False
             for iv, vt in enumerate(br):
                 if type(vt) != type(ptype2[ib][iv]) or type(vt) != type([]):
                     wrongFormat = True
                 # Check number of particles in vertex
                 if len(ptype1[ib][iv]) != len(ptype2[ib][iv]):
-                    return False 
+                    return False
                 for ptc in ptype1[ib][iv] + ptype2[ib][iv]:
                     if not ptc in ptcDic.keys() + rEven.values():
                         wrongFormat = True
-    if wrongFormat:     
+    if wrongFormat:
         logger.error("Wrong input format!" + str(ptype1) + " " + str(ptype2))
         return False
-     
+
     # Put input in standard notation
     if type(ptype1) == type("str"):
         ptype1v = [[[ptype1]], [[ptype1]]]
@@ -206,11 +207,11 @@ def simParticles(ptype1, ptype2, useDict=True):
     else:
         ptype1v = ptype1[:]
         ptype2v = ptype2[:]
-        
+
     # Loop over branches
-    for ibr, br in enumerate(ptype1v): 
+    for ibr, br in enumerate(ptype1v):
         # Loop over vertices
-        for iv, vt in enumerate(br): 
+        for iv, vt in enumerate(br):
             # Check if lists match, ignoring possible dictionary entries
             pmatch = True
             for ptc in ptype1v[ibr][iv]:
@@ -219,7 +220,7 @@ def simParticles(ptype1, ptype2, useDict=True):
             if pmatch:
                 continue
             elif not useDict:
-                return False        
+                return False
             # If they do not match and useDict=True, generate all possible
             # lists from dictionary entries:
             allptcs = [[ptype1v[ibr][iv]], [ptype2v[ibr][iv]]]
@@ -237,7 +238,7 @@ def simParticles(ptype1, ptype2, useDict=True):
                             allpt[jpt] = []
                 while allpt.count([]) > 0:
                     allpt.remove([])
-                 
+
             # Compare all possibilities
             match = False
             iA = 0
@@ -255,131 +256,125 @@ def simParticles(ptype1, ptype2, useDict=True):
                         break
                 iA += 1
             if not match:
-                return False 
+                return False
     # Entries are similar
     return True
 
 
-rOdd = { # pylint: disable-msg=C0103
-     1000021 : "gluino",
-     1000022: "N1",
-     1000023 : "N2",
-     1000025 : "N3",
-     1000035 : "N4", 
-     1000024 : "C1",
-     1000037 : "C2",
-     1000039 : "gravitino",
-     1000001 : "squark",
-     1000002 : "squark", 
-     1000003 : "squark",
-     1000004 : "squark",
-     2000001 : "squark",
-     2000002 : "squark",
-     2000003 : "squark", 
-     2000004 : "squark",
-     1000005 : "sbottom",
-     2000005 : "sbottom",
-     1000006 : "stop",
-     2000006 : "stop", 
-     1000011 : "slepton",
-     1000013 : "slepton",
-     1000015 : "stau",
-     2000011 : "slepton",
-     2000013 : "slepton", 
-     2000015 : "stau",
-     1000012 : "sneutrino",
-     1000014 : "sneutrino",
-     1000016 : "sneutrino", 
-     2000012 : "sneutrino",
-     2000014 : "sneutrino",
-     2000016 : "sneutrino",
-    -1000021 : "gluino", 
-    -1000022 : "N1",
-    -1000023 : "N2",
-    -1000025 : "N3",
-    -1000035 : "N4", 
-    -1000024 : "C1",
-    -1000037 : "C2",
-    -1000039 : "gravitino",
-    -1000001 : "squark",
-    -1000002 : "squark",
-    -1000003 : "squark",
-    -1000004 : "squark", 
-    -2000001 : "squark",
-    -2000002 : "squark",
-    -2000003 : "squark",
-    -2000004 : "squark", 
-    -1000005 : "sbottom",
-    -2000005 : "sbottom",
-    -1000006 : "stop",
-    -2000006 : "stop", 
-    -1000011 : "slepton",
-    -1000013 : "slepton",
-    -1000015 : "stau",
-    -2000011 : "slepton", 
-    -2000013 : "slepton",
-    -2000015 : "stau",
-    -1000012 : "sneutrino",
-    -1000014 : "sneutrino", 
-    -1000016 : "sneutrino",
-    -2000012 : "sneutrino",
-    -2000014 : "sneutrino",
-    -2000016 : "sneutrino"
-}
+rOdd = {1000021 : "gluino",
+        1000022 : "N1",
+        1000023 : "N2",
+        1000025 : "N3",
+        1000035 : "N4",
+        1000024 : "C1",
+        1000037 : "C2",
+        1000039 : "gravitino",
+        1000001 : "squark",
+        1000002 : "squark",
+        1000003 : "squark",
+        1000004 : "squark",
+        2000001 : "squark",
+        2000002 : "squark",
+        2000003 : "squark",
+        2000004 : "squark",
+        1000005 : "sbottom",
+        2000005 : "sbottom",
+        1000006 : "stop",
+        2000006 : "stop",
+        1000011 : "slepton",
+        1000013 : "slepton",
+        1000015 : "stau",
+        2000011 : "slepton",
+        2000013 : "slepton",
+        2000015 : "stau",
+        1000012 : "sneutrino",
+        1000014 : "sneutrino",
+        1000016 : "sneutrino",
+        2000012 : "sneutrino",
+        2000014 : "sneutrino",
+        2000016 : "sneutrino",
+        - 1000021 : "gluino",
+        - 1000022 : "N1",
+        - 1000023 : "N2",
+        - 1000025 : "N3",
+        - 1000035 : "N4",
+        - 1000024 : "C1",
+        - 1000037 : "C2",
+        - 1000039 : "gravitino",
+        - 1000001 : "squark",
+        - 1000002 : "squark",
+        - 1000003 : "squark",
+        - 1000004 : "squark",
+        - 2000001 : "squark",
+        - 2000002 : "squark",
+        - 2000003 : "squark",
+        - 2000004 : "squark",
+        - 1000005 : "sbottom",
+        - 2000005 : "sbottom",
+        - 1000006 : "stop",
+        - 2000006 : "stop",
+        - 1000011 : "slepton",
+        - 1000013 : "slepton",
+        - 1000015 : "stau",
+        - 2000011 : "slepton",
+        - 2000013 : "slepton",
+        - 2000015 : "stau",
+        - 1000012 : "sneutrino",
+        - 1000014 : "sneutrino",
+        - 1000016 : "sneutrino",
+        - 2000012 : "sneutrino",
+        - 2000014 : "sneutrino",
+        - 2000016 : "sneutrino"}
 
-rEven = { # pylint: disable-msg=C0103
-     25 : "higgs", 
-    -25: "higgs", 
-     35 : "H0", 
-    -35 : "H0",
-     36 : "A0", 
-    -36 : "A0", 
-     37 : "H+", 
-    -37 : "H-", 
-     23 : "Z", 
-    -23 : "Z", 
-     22 : "photon", 
-    -22 : "photon", 
-     24 : "W+", 
-    -24 : "W-", 
-     16 : "nu", 
-    -16 : "nu", 
-     15 : "ta-", 
-    -15 : "ta+", 
-     14 : "nu", 
-    -14 : "nu", 
-     13 : "mu-", 
-    -13 : "mu+", 
-     12 : "nu", 
-    -12 : "nu", 
-     11 : "e-", 
-    -11 : "e+", 
-      5 : "b", 
-     -5 : "b", 
-      6 : "t+", 
-     -6 : "t-", 
-      1 : "jet", 
-      2 : "jet", 
-      3 : "jet", 
-      4 : "jet", 
-     21 : "jet", 
-     -1 : "jet", 
-     -2 : "jet", 
-     -3 : "jet", 
-     -4 : "jet", 
-    -21 : "jet" 
-}
+rEven = {25 : "higgs",
+         - 25: "higgs",
+         35 : "H0",
+         - 35: "H0",
+         36 : "A0",
+         - 36: "A0",
+         37 : "H+",
+         - 37: "H-",
+         23 : "Z",
+         - 23: "Z",
+         22 : "photon",
+         - 22: "photon",
+         24 : "W+",
+         - 24: "W-",
+         16 : "nu",
+         - 16: "nu",
+         15 : "ta-",
+         - 15: "ta+",
+         14 : "nu",
+         - 14: "nu",
+         13 : "mu-",
+         - 13: "mu+",
+         12 : "nu",
+         - 12: "nu",
+         11 : "e-",
+         - 11: "e+",
+         5  : "b",
+         - 5 : "b",
+         6  : "t+",
+         - 6 : "t-",
+         1  : "jet",
+         2  : "jet",
+         3  : "jet",
+         4  : "jet",
+         21 : "jet",
+         - 1 : "jet",
+         - 2 : "jet",
+         - 3 : "jet",
+         - 4 : "jet",
+         - 21: "jet"}
 
-ptcDic = { # pylint: disable-msg=C0103
-    "e" : ["e+", "e-"], 
-    "mu" : ["mu+", "mu-"], 
-    "ta" : ["ta+", "ta-"], 
-    "l+" : ["e+", "mu+"],
-    "l-" : ["e-", "mu-"],
-    "l" : ["e-", "mu-", "e+", "mu+"], 
-    "W" : ["W+", "W-"], 
-    "t" : ["t+", "t-"], 
-    "L+" : ["e+", "mu+", "ta+"], 
-    "L-" : ["e-", "mu-", "ta-"], 
-    "L" : ["e+", "mu+", "ta+", "e-", "mu-", "ta-"]
-}
+ptcDic = {"e" : ["e+", "e-"],
+          "mu" : ["mu+", "mu-"],
+          "ta" : ["ta+", "ta-"],
+          "l+" : ["e+", "mu+"],
+          "l-" : ["e-", "mu-"],
+          "l" : ["e-", "mu-", "e+", "mu+"],
+          "W" : ["W+", "W-"],
+          "t" : ["t+", "t-"],
+          "L+" : ["e+", "mu+", "ta+"],
+          "L-" : ["e-", "mu-", "ta-"],
+          "L" : ["e+", "mu+", "ta+", "e-", "mu-", "ta-"]}
