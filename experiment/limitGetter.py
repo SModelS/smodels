@@ -14,7 +14,7 @@ import copy
 import sys
 import logging
 
-logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
+logger = logging.getLogger(__name__)
 
 
 def limit(analysis, addTheoryPredictions=[]):
@@ -25,7 +25,7 @@ def limit(analysis, addTheoryPredictions=[]):
     [ '7 TeV (NLL)', '7 TeV (LO)' ]
     :type addTheoryPredictions: [String]
     """
-    sqrts = rmvunit(analysis.sqrts,"TeV")
+    sqrts = rmvunit(analysis.sqrts, "TeV")
     ret = []
     for (constraint, _) in analysis.results.items():
         if len(addTheoryPredictions) > 0:
@@ -53,7 +53,7 @@ def limit(analysis, addTheoryPredictions=[]):
                     ret.append(tmp)
     return ret
 
-        
+
 def getPlotLimit(inmass, analysis):
     """
     Get upper limit on sigma*BR for a specific array of masses from plot.
@@ -74,14 +74,14 @@ def getPlotLimit(inmass, analysis):
         logger.error("Masses differ between branches.")
         return False
 
-    masslist = [rmvunit(mass,'GeV') for mass in massArray[0]]
+    masslist = [rmvunit(mass, 'GeV') for mass in massArray[0]]
 
     # Run label
     run = analysis.run
     # If run has not been defined, use latest run
     if run == "":
         run = None
-     
-    analysis, cmsLabel = analysis.label.split(':')    
-    upperLimit = smsInterpolation.upperLimit(analysis, cmsLabel, masslist) 
+
+    analysis, cmsLabel = analysis.label.split(':')
+    upperLimit = smsInterpolation.upperLimit(analysis, cmsLabel, masslist)
     return upperLimit

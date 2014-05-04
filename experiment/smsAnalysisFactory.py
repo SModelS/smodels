@@ -17,8 +17,8 @@ from theory import element
 from . import smsHelpers
 import logging
 
-logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
-          
+logger = logging.getLogger(__name__)
+
 
 def load(analyses=None, topologies=None, sqrts=[7, 8]):
     """
@@ -32,7 +32,7 @@ def load(analyses=None, topologies=None, sqrts=[7, 8]):
     be considered.
     :returns: list of analyses
     
-    """   
+    """
     # Enable supplying a single analysis/topology
     if isinstance(topologies, str):
         topologies = [topologies]
@@ -44,11 +44,11 @@ def load(analyses=None, topologies=None, sqrts=[7, 8]):
         sqrts = [int(sqrts)]
 
     listOfAnalyses = []
-        
+
     if analyses == None:
         analyses = smsResults.getAllResults().keys()
     for ana in analyses:
-        logger.debug("Building analysis %s." % str(ana))
+        logger.debug("Building analysis %s.", str(ana))
         ss = rmvunit(smsResults.getSqrts(ana), "TeV")
         if ss == None:
             logger.debug("SS: " + str(ss) + str(ana))
@@ -59,20 +59,20 @@ def load(analyses=None, topologies=None, sqrts=[7, 8]):
         for tx in smsResults.getTopologies(ana):
             if topologies != None and tx not in topologies:
                 continue
-            logger.debug(str(tx))                        
+            logger.debug(str(tx))
             newAnalysis = analysis.ULanalysis()
             newAnalysis.sqrts = smsResults.getSqrts(ana)
-            stopo = _getRealTopo (tx)
+            stopo = _getRealTopo(tx)
             newAnalysis.label = ana + ":" + tx
             # "2012"
             newAnalysis.run = smsHelpers.getRun(ana)
             constraint = smsResults.getConstraints(ana, topology=stopo)
             cond = smsResults.getConditions(ana, topology=stopo)
             if not constraint or constraint == "Not yet assigned":
-                logger.debug("Constraint for %s %s (%s) does not exist."
-                             % (ana, tx, stopo))
+                logger.debug("Constraint for %s %s (%s) does not exist.",
+                             str(ana), str(tx), str(stopo))
                 continue
-            
+
             if cond:
                 cond = cond.replace("'", "").replace(" ", "").split(';')
             newAnalysis.constraint = constraint
@@ -90,7 +90,7 @@ def _getRealTopo(tx):
     
     """
     ret = tx
-    ret.replace("050","").replace("x1C180","").replace("025","")
+    ret.replace("050", "").replace("x1C180", "").replace("025", "")
     if ret.find("x") > -1:
         ret = ret[:ret.find("x")]
     return ret
@@ -103,7 +103,7 @@ def _getElementsEffs(constraint):
     Efficiencies are the values for an upper limit-type of analysis. This
     equals the element multiplicative factor appearing in the constraint.
     
-    """      
+    """
     # Get element strings appearing in constraint
     elStrings = _getArray(constraint)
     cons = constraint.replace(" ", "")
@@ -115,7 +115,7 @@ def _getElementsEffs(constraint):
             if el2 != el:
                 newcons = newcons.replace(el2, "0.", 1)
         elEff = eval(newcons)
-        elementsEff[element.Element(el)] = elEff        
+        elementsEff[element.Element(el)] = elEff
     return elementsEff
 
 
@@ -133,9 +133,9 @@ def _getArray(constraint):
     c = c.replace("'", "")
     elStrings = []
     while "[[[" in c:
-        el = c[c.find("[[["):c.find("]]]") + 3]        
+        el = c[c.find("[[["):c.find("]]]") + 3]
         c = c.replace(el, "", 1)
-        elStrings.append(el)    
+        elStrings.append(el)
     return elStrings
 
 
