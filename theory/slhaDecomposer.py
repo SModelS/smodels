@@ -18,10 +18,10 @@ from tools.physicsUnits import addunit
 from tools.physicsUnits import rmvunit
 import logging
 
-logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
+logger = logging.getLogger(__name__)
 
- 
-def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False, 
+
+def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
               minmassgap=-1, useXSecs=None):
     """
     Perform SLHA-based decomposition.
@@ -46,8 +46,8 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
      
     """
     t1 = time.time()
-    
-    if doCompress and rmvunit(minmassgap,'GeV') == -1: 
+
+    if doCompress and rmvunit(minmassgap, 'GeV') == -1:
         logger.error("Please set minmassgap.")
         return False
 
@@ -61,13 +61,13 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
     # Only use the highest order cross-sections for each process
     xSectionList.removeLowerOrder()
 
-    
+
     # Get maximum cross-sections (weights) for single particles (irrespective
     # of sqrtS)
     maxWeight = {}
     for pid in xSectionList.getPIDs():
         maxWeight[pid] = xSectionList.getXsecsFor(pid).getMaxXsec()
-           
+
     # Create 1-particle branches with all possible mothers
     branchList = []
     for pid in maxWeight:
@@ -79,20 +79,20 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
 
     # Generate final branches (after all R-odd particles have decayed)
     finalBranchList = decayBranches(branchList, brDic, massDic, sigcut)
-    
-    smsTopList = topology.TopologyList()    
+
+    smsTopList = topology.TopologyList()
     # Combine pairs of branches into elements according to production
-    # cross-section list  
+    # cross-section list
     for pids in xSectionList.getPIDpairs():
         for branch1 in finalBranchList:
             for branch2 in finalBranchList:
                 if branch1.momID == pids[0] and branch2.momID == pids[1]:
-                    finalBR = branch1.maxWeight*branch2.maxWeight/(
-                            maxWeight[pids[0]]*maxWeight[pids[1]])
-                    if type(finalBR) == type(addunit(1.,'fb')):
-                        finalBR = finalBR.asNumber()                 
-                    weightList = xSectionList.getXsecsFor(pids)*finalBR
-                    
+                    finalBR = branch1.maxWeight * branch2.maxWeight / \
+                            (maxWeight[pids[0]] * maxWeight[pids[1]])
+                    if type(finalBR) == type(addunit(1., 'fb')):
+                        finalBR = finalBR.asNumber()
+                    weightList = xSectionList.getXsecsFor(pids) * finalBR
+
                     newElement = element.Element([branch1, branch2])
                     newElement.weight = weightList
                     allElements = [newElement]
@@ -101,16 +101,16 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
                         allElements += newElement.compressElement(doCompress,
                                                                   doInvisible,
                                                                   minmassgap)
-                    
+
                     for el in allElements:
                         if el.weight.getMaxXsec() < sigcut:
-                            # Skip elements with xsec below sigcut 
-                            continue                          
-                        top = topology.Topology(el)            
-                        smsTopList.addList([top])                       
-    logger.debug("slhaDecomposer done in " + str(time.time()-t1) + " s.")
+                            # Skip elements with xsec below sigcut
+                            continue
+                        top = topology.Topology(el)
+                        smsTopList.addList([top])
+    logger.debug("slhaDecomposer done in " + str(time.time() - t1) + " s.")
 
-    return smsTopList        
+    return smsTopList
 
 
 def _getDictionariesFromSLHA(slhafile):

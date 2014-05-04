@@ -9,10 +9,10 @@
 
 import logging
 
-logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
+logger = logging.getLogger(__name__)
 
 
-class SmsEvent:
+class SmsEvent(object):
     """
     Event class featuring a list of particles and some convenience functions.
     
@@ -21,7 +21,7 @@ class SmsEvent:
         self.particles = []
         self.eventnr = eventnr
         self.metainfo = {}
-        
+
 
     def metaInfo(self, key):
         """
@@ -38,7 +38,7 @@ class SmsEvent:
         
         """
         self.particles.append(particle)
-        
+
 
     def getMom(self):
         """
@@ -57,7 +57,7 @@ class SmsEvent:
         if momspdg[0] > momspdg[1]:
             momspdg[0], momspdg[1] = momspdg[1], momspdg[0]
         return momspdg
-    
+
 
     def __str__(self):
         nr = ""
@@ -70,30 +70,30 @@ class SmsEvent:
         for p in self.particles:
             ret += p.__str__() + "\n"
         return ret
-    
 
-class Particle:
+
+class Particle(object):
     """
     An instance of this class represents a particle.
     
-    """ 
+    """
     def __init__(self):
         self.pdg = 0
         self.status = 0
         # moms is a list of the indices of the mother particles
-        self.moms = [] 
+        self.moms = []
         self.px = 0.
         self.py = 0.
         self.pz = 0.
         self.e = 0.
         self.mass = 0.
         # position in the event list of particles
-        self.position = None    
-        
+        self.position = None
+
     def __str__(self):
         return "particle pdg %d p=(%.1f,%.1f,%.1f,m=%.1f) status %d moms %s" \
                 % (self.pdg, self.px, self.py, self.pz, self.mass,
                    self.status, self.moms)
 
 
-            
+

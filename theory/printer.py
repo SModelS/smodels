@@ -9,7 +9,7 @@
 from __future__ import print_function
 import logging
 
-logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
+logger = logging.getLogger(__name__)
 
 
 class Printer(object):
@@ -19,7 +19,7 @@ class Printer(object):
     """
     def __init__(self):
         self.output = None
-    
+
 
     def printout(self, target="stdout"):
         """
@@ -29,17 +29,17 @@ class Printer(object):
         Default: stdout.
         :returns: None
         
-        """        
+        """
         # Branch, Element, Topology, TopologyList, Analysis, AnalysisList,
         # Cluster
         self.output = self.prepareData()
-            
+
         if target == "stdout":
             print(self.output)
         elif target == "file":
             pass
-        
-        
+
+
     def prepareData(self):
         """
         Prepare data of the derived object.
@@ -51,8 +51,8 @@ class Printer(object):
               
         """
         raise NotImplementedError
-    
-    
+
+
     def prepareTopologyListData(self):
         """
         Prepare data of a TopologyList object.
@@ -61,14 +61,14 @@ class Printer(object):
         from tools import smsPrettyPrinter
         from prettytable import PrettyTable
         output = ""
-        
+
         printer = smsPrettyPrinter.SmsPrettyPrinter()
         evTopTable = PrettyTable(["Topology", "#Vertices", "#Insertions",
-                                   "#Elements", "Sum of weights"])
+                                  "#Elements", "Sum of weights"])
         evElementTable = PrettyTable(["Topology", "Element", "Particles B[0]",
-                                       "Particles B[1]", "Masses B[0]",
-                                       "Masses B[1]", "Element Weight"])
-        
+                                      "Particles B[1]", "Masses B[0]",
+                                      "Masses B[1]", "Element Weight"])
+
         eltot = 0
         # totweight = []
         # Print Results:
@@ -76,36 +76,36 @@ class Printer(object):
         for i, topo in enumerate(self):
             sumw = topo.getTotalWeight().getDictionary()
             evTopTable.add_row([i, topo.vertnumb, topo.vertparts,
-                                 len(topo.elementList),
-                                 smsPrettyPrinter.wrap(printer.pformat(sumw), 
-                                                       width=30)])
+                                len(topo.elementList),
+                                smsPrettyPrinter.wrap(printer.pformat(sumw),
+                                                      width=30)])
             eltot += len(topo.elementList)
-        
-        #Print element list for Topology[i]:  
+
+        # Print element list for Topology[i]:
             if i == 0:
                 for j, el in enumerate(topo.elementList):
                     if el.getParticles() != [[['b', 'b']], [['b', 'b']]]:
                         continue
-                    evElementTable.add_row([
-                            i, j, el.getParticles()[0], el.getParticles()[1],
-                            smsPrettyPrinter.wrap(printer.pformat(
-                                    el.getMasses()[0]), width=25),
-                            smsPrettyPrinter.wrap(printer.pformat(
-                                    el.getMasses()[1]), width=25),
-                            smsPrettyPrinter.wrap(printer.pformat(
-                                    el.weight.getDictionary()), width=30)])
+                    m1 = printer.pformat(el.getMasses()[0])
+                    m2 = printer.pformat(el.getMasses()[1])
+                    dc = printer.pformat(el.weight.getDictionary())
+                    row = [i, j, el.getParticles()[0], el.getParticles()[1],
+                           smsPrettyPrinter.wrap(m1, width=25),
+                           smsPrettyPrinter.wrap(m2, width=25),
+                           smsPrettyPrinter.wrap(dc, width=30)]
+                    evElementTable.add_row(row)
                 evElementTable.add_row(["---", "---", "---", "---", "---",
-                                         "---", "---"])  
-                     
+                                        "---", "---"])
+
         output += "Number of Global topologies = " + str(len(self)) + "\n\n"
         output += str(evTopTable) + "\n\n"
         output += "Total Number of Elements = " + str(eltot) + "\n"
         output += "Total weight = " + str(self.getTotalWeight()) + "\n"
         # output += evElementTable + "\n"
-        
+
         return output
-    
-    
+
+
     def prepareTheoryPredictionData(self):
         """
         Prepare data of a TheoryPrediction object.
@@ -121,5 +121,6 @@ class Printer(object):
                 for cond in theoryPrediction.conditions:
                     print(theoryPrediction.conditions[cond])
             print("experimental limit:",
-                  theoryPrediction.analysis.getUpperLimitFor(theoryPrediction.mass))
+                  theoryPrediction.analysis.getUpperLimitFor(theoryPrediction.\
+                                                             mass))
             print("\n")

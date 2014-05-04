@@ -14,7 +14,7 @@ from .branch import Branch
 from . import crossSection
 import logging
 
-logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
+logger = logging.getLogger(__name__)
 
 
 class Element(object):
@@ -24,11 +24,11 @@ class Element(object):
     This class possesses a pair of branches and the element weight
     (cross-section * BR).
     
-    """    
+    """
     def __init__(self, info=None):
         self.branches = [Branch(), Branch()]
         self.weight = crossSection.XSectionList()
-                
+
         if info:
             # Create element from particle string
             if type(info) == type(str()):
@@ -39,7 +39,7 @@ class Element(object):
                         nel = len(elements)
                     logging.error("Malformed input string. Number of elements "
                                   "is %d, expected 1: in ``%s''", nel, info)
-                    return False                
+                    return False
                 else:
                     el = elements[0]
                     branches = elementsInStr(el[1:-1])
@@ -47,28 +47,28 @@ class Element(object):
                         logging.error("Malformed input string. Number of "
                                       "branches is %d, expected 2: in ``%s''",
                                       len(branches), info)
-                        return False 
+                        return False
                     self.branches = []
                     for branch in branches:
                         self.branches.append(Branch(branch))
             # Create element from branch pair
             elif type(info) == type([]) and type(info[0]) == type(Branch()):
                 for ib, branch in enumerate(info):
-                    self.branches[ib] = branch.copy() 
+                    self.branches[ib] = branch.copy()
 
 
     def __eq__(self, other):
         return self.isEqual(other)
-    
-    
+
+
     def __hash__(self):
         return object.__hash__(self)
-    
-    
+
+
     def __ne__(self, other):
-        return not self.isEqual(other)    
-    
-    
+        return not self.isEqual(other)
+
+
     def __str__(self):
         """
         Create the canonical name of the element, e.g. [[jet],[jet]].
@@ -88,24 +88,24 @@ class Element(object):
         
         :returns: True, if all masses and particles are equal; False, else;        
         
-        """                           
+        """
         if type(self) != type(other):
             return False
         mass = self.getMasses()
         massA = other.getMasses()
-                   
+
         if self.particlesMatch(other, order=True, useDict=useDict) \
                 and mass == massA:
-            return True               
+            return True
         if not order:
-            otherB = other.switchBranches()            
+            otherB = other.switchBranches()
             massB = otherB.getMasses()
             if self.particlesMatch(otherB, order=True, useDict=useDict) \
                     and mass == massB:
                 return True
-   
+
         return False
-    
+
 
     def particlesMatch(self, other, order=False, useDict=True):
         """
@@ -116,7 +116,7 @@ class Element(object):
         
         :returns: True, if particles match; False, else;
         
-        """        
+        """
         if type(self) != type(other):
             return False
         ptcs = self.getParticles()
@@ -124,13 +124,13 @@ class Element(object):
         if simParticles(ptcs, ptcsA, useDict):
             return True
         if not order:
-            ptcsB = other.switchBranches().getParticles()   
+            ptcsB = other.switchBranches().getParticles()
             if simParticles(ptcs, ptcsB, useDict):
                 return True
-        
+
         return False
-    
-    
+
+
     def copy(self):
         """
         Create a copy of self.
@@ -141,11 +141,11 @@ class Element(object):
         newel = Element()
         newel.branches = []
         for branch in self.branches:
-            newel.branches.append(branch.copy())                
+            newel.branches.append(branch.copy())
         newel.weight = self.weight.copy()
         return newel
-    
-    
+
+
     def setMasses(self, mass, sameOrder=True, opposOrder=False):
         """
         Set the element masses to the input mass array.
@@ -155,7 +155,7 @@ class Element(object):
         both sameOrder == True and opposOrder == True, set the masses to the
         smaller of the two orderings.
         
-        """                
+        """
         if sameOrder and opposOrder:
             if mass[0] == _smallerMass(mass[0], mass[1]):
                 newmass = mass
@@ -171,7 +171,7 @@ class Element(object):
         if len(newmass) != len(self.branches):
             logger.error("Called with wrong number of mass branches")
             return False
-               
+
         for i, mass in enumerate(newmass):
             self.branches[i].masses = mass[:]
 
@@ -196,8 +196,8 @@ class Element(object):
         for branch in self.branches:
             ptcarray.append(branch.particles)
         return ptcarray
-    
-    
+
+
     def getMasses(self):
         """
         Get the array of masses in the element.   
@@ -207,28 +207,28 @@ class Element(object):
         for branch in self.branches:
             massarray.append(branch.masses)
         return massarray
-    
-    
+
+
     def getDaughters(self):
         """
         Get a pair of daughter IDs.
         
         Can be None, if the element does not have a definite daughter.      
            
-        """        
+        """
         return (self.branches[0].daughterID, self.branches[1].daughterID)
-    
-    
+
+
     def getMothers(self):
         """
         Get a pair of mother IDs.
         
         Can be None, if the element does not have a mother daughter.
         
-        """        
+        """
         return (self.branches[0].momID, self.branches[1].momID)
-    
-    
+
+
     def getEinfo(self):
         """
         Get global topology info from particle string.
@@ -239,19 +239,21 @@ class Element(object):
         for branch in self.branches:
             vertnumb.append(len(branch.masses))
             vertparts.append([len(ptcs) for ptcs in branch.particles])
-            if len(vertparts[len(vertparts)-1]) == vertnumb[len(vertnumb)-1]-1:
-                vertparts[len(vertparts)-1].append(0)  #Append 0 for stable LSP
+            if len(vertparts[len(vertparts) - 1]) == \
+                    vertnumb[len(vertnumb) - 1] - 1:
+                # Append 0 for stable LSP
+                vertparts[len(vertparts) - 1].append(0)
         return {"vertnumb" : vertnumb, "vertparts" : vertparts}
-    
-    
+
+
     def _getLength(self):
         """
         Get the maximum of the two branch lengths.
         
-        """        
+        """
         return max(self.branches[0].getLength(), self.branches[1].getLength())
-        
-      
+
+
     def isInList(self, listOfElements, igmass=False, useDict=True):
         """
         Check if the element is present in the element list.
@@ -269,8 +271,8 @@ class Element(object):
                     return True
 
         return False
-    
-    
+
+
     def checkConsistency(self):
         """
         Check if the particles defined in the element exist and are consistent
@@ -285,11 +287,11 @@ class Element(object):
                     return False
                 for ptc in vertex:
                     if not ptc in rEven.values() and not ptc in ptcDic:
-                        logger.error("Unknown particle"+ptc)
+                        logger.error("Unknown particle" + ptc)
                         return False
-        return True    
-    
-    
+        return True
+
+
     def compressElement(self, doCompress, doInvisible, minmassgap):
         """
         Keep compressing they original element and the derived ones till they
@@ -299,54 +301,54 @@ class Element(object):
         
         """
         added = True
-        newElements = [self.copy()]   
+        newElements = [self.copy()]
         # Keep compressing the new topologies generated so far until no new
         # compressions can happen:
         while added:
             added = False
-            # Check for mass compressed topologies   
+            # Check for mass compressed topologies
             if doCompress:
-                for element in newElements:             
-                    newel = element._massCompress(minmassgap)
+                for element in newElements:
+                    newel = element.massCompress(minmassgap)
                     # Avoids double counting (conservative)
-                    if newel and not newel._hasTopInList(newElements): 
-                        newElements.append(newel) 
+                    if newel and not newel.hasTopInList(newElements):
+                        newElements.append(newel)
                         added = True
-      
+
             # Check for invisible compressed topologies (look for effective
-            # LSP, such as LSP + neutrino = LSP')      
+            # LSP, such as LSP + neutrino = LSP')
             if doInvisible:
                 for element in newElements:
-                    newel = element._invisibleCompress()
+                    newel = element.invisibleCompress()
                     # Avoids double counting (conservative)
-                    if newel and not newel._hasTopInList(newElements): 
-                        newElements.append(newel) 
+                    if newel and not newel.hasTopInList(newElements):
+                        newElements.append(newel)
                         added = True
-                         
+
         newElements.pop(0)  # Remove original element
         return newElements
-    
-         
-    def _massCompress(self, mingap):
+
+
+    def massCompress(self, mingap):
         """
         Perform mass compression.
         
         :returns: compressed copy of the element, if two masses in this
         topology are degenerate; None, if compression is not possible;
         
-        """        
+        """
         newelement = self.copy()
         vertnumb = self.getEinfo()["vertnumb"]
         # Nothing to be compressed
         if max(vertnumb) < 2:
-            return None   
+            return None
         # Loop over branches
         for ib, branch in enumerate(self.branches):
             if vertnumb[ib] < 2:
                 continue
             masses = branch.masses
-            for ivertex in range(vertnumb[ib]-1):
-                if abs(masses[ivertex]-masses[ivertex+1]) < mingap:
+            for ivertex in range(vertnumb[ib] - 1):
+                if abs(masses[ivertex] - masses[ivertex + 1]) < mingap:
                     newelement.branches[ib].particles[ivertex] = None
                     newelement.branches[ib].masses[ivertex] = None
             while newelement.branches[ib].particles.count(None) > 0:
@@ -359,9 +361,9 @@ class Element(object):
             return None
         else:
             return newelement
-    
-    
-    def _hasTopInList(self, elementList):
+
+
+    def hasTopInList(self, elementList):
         """
         Check if the element topology matches any of the topologies in the
         element list.
@@ -376,34 +378,34 @@ class Element(object):
             info2 = element.getEinfo()
             info2B = element.switchBranches().getEinfo()
             if info1 == info2 or info1 == info2B:
-                return True        
+                return True
         return False
-        
-        
-    def _invisibleCompress(self):
+
+
+    def invisibleCompress(self):
         """
         Compress cascade decays ending with neutrinos and daughter.
         
         If no compression is possible, return None.
         
         """
-        newelement = self.copy()        
+        newelement = self.copy()
         vertnumb = self.getEinfo()["vertnumb"]
-        # Nothing to be compressed 
+        # Nothing to be compressed
         if max(vertnumb) < 2:
-            return None       
+            return None
         # Loop over branches
         for ib, branch in enumerate(self.branches):
             if vertnumb[ib] < 2:
                 continue
-            particles = branch.particles            
-            for ivertex in range(vertnumb[ib]-2, -1, -1):
+            particles = branch.particles
+            for ivertex in range(vertnumb[ib] - 2, -1, -1):
                 if particles[ivertex].count('nu') == len(particles[ivertex]):
-                    newelement.branches[ib].masses.pop(ivertex+1)
+                    newelement.branches[ib].masses.pop(ivertex + 1)
                     newelement.branches[ib].particles.pop(ivertex)
                 else:
                     break
-                    
+
         if newelement.isEqual(self):
             return None
         else:
@@ -421,7 +423,7 @@ def _smallerMass(mass1, mass2):
     mass2List = []
     if mass1 == mass2:
         return mass1
-    try:    
+    try:
         for branch in mass1:
             mass1List.extend(branch)
         for branch in mass2:
@@ -432,8 +434,8 @@ def _smallerMass(mass1, mass2):
                     return mass1
                 if m1 > mass2List[im]:
                     return mass2
-    except: # TODO: except what?
+    except:  # TODO: except what?
         pass
-    
+
     logger.error("Invalid input")
     return False

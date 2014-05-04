@@ -13,7 +13,7 @@ from .element import Element
 from .printer import Printer
 import logging
 
-logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
+logger = logging.getLogger(__name__)
 
 
 class Topology(object):
@@ -32,23 +32,23 @@ class Topology(object):
         self.vertnumb = []
         self.vertparts = []
         self.elementList = []
-        
+
         if elements:
             if type(elements) == type(Element()):
-                self._addElement(elements)              
+                self.addElement(elements)
             elif type(elements) == type([]):
                 for element in elements:
-                    self._addElement(element)
+                    self.addElement(element)
 
 
     def __eq__(self, other):
         return self.isEqual(other)
-    
-    
+
+
     def __ne__(self, other):
         return not self.isEqual(other)
-    
-    
+
+
     def isEqual(self, other, order=False):
         """
         Check for equality of two topologies.
@@ -59,7 +59,7 @@ class Topology(object):
         :returns: True, if both topologies have the same number of vertices and
         particles.
         
-        """        
+        """
         if type(self) != type(other):
             return False
         if order or len(self.vertnumb) != 2 or len(other.vertnumb) != 2:
@@ -78,8 +78,8 @@ class Topology(object):
             if x1 == xB and x2 == xA:
                 return True
             return False
-    
-    
+
+
     def checkConsistency(self):
         """
         Perform a consistency check.
@@ -99,8 +99,8 @@ class Topology(object):
                 return False
         logger.info("Consistent topology.")
         return True
-    
-    
+
+
     def describe(self):
         """
         Create a detailed description of the topology.
@@ -110,8 +110,8 @@ class Topology(object):
                "number of elements: %d" % \
                (self.vertnumb, self.vertparts, len(self.elementList)))
         return ret
-    
-    
+
+
     def getElements(self):
         """
         Get list of elements of the topology.
@@ -119,8 +119,8 @@ class Topology(object):
         """
         return self.elementList
 
-     
-    def _addElement(self, newelement):
+
+    def addElement(self, newelement):
         """
         Add an Element object to the elementList.
         
@@ -128,22 +128,22 @@ class Topology(object):
         weight. If no pre-existing elements match the new one, add it to the
         list. If order == False, try both branch orderings.
         
-        """                
+        """
         # If the topology info has not been set yet, set it using the element
         # info
         if not self.vertparts:
             self.vertparts = newelement.getEinfo()["vertparts"]
         if not self.vertnumb:
             self.vertnumb = newelement.getEinfo()["vertnumb"]
-        
+
         # Check if newelement matches the topology structure
         info = newelement.getEinfo()
         infoB = newelement.switchBranches().getEinfo()
         if info != self._getTinfo() and infoB != self._getTinfo():
             logger.warning('Element to be added does not match topology')
             return False
-        
-              
+
+
         added = False
         # Include element to elementList
         for element in self.elementList:
@@ -152,22 +152,22 @@ class Topology(object):
                 element.weight.combineWith(newelement.weight)
                 # When combining elements with different mothers, erase mother
                 # info
-                if element.getMothers() != newelement.getMothers(): 
+                if element.getMothers() != newelement.getMothers():
                     element.branches[0].momID = None
                     element.branches[1].momID = None
                 # When combining elements with different daughters, erase
                 # daughter info
-                if element.getDaughters() != newelement.getDaughters(): 
+                if element.getDaughters() != newelement.getDaughters():
                     element.branches[0].daughterID = None
                     element.branches[1].daughterID = None
-                
-                
+
+
         if added:
             return True
         # If element has not been found add to list (OBS: if both branch
         # orderings are good, add the original one)
         # Check both branch orderings
-        tryelements = [newelement, newelement.switchBranches()]  
+        tryelements = [newelement, newelement.switchBranches()]
         for newel in tryelements:
             info = newel.getEinfo()
             if info["vertnumb"] != self.vertnumb or info["vertparts"] != \
@@ -175,19 +175,19 @@ class Topology(object):
                 continue
             self.elementList.append(newel)
             return True
-        
+
         # If element does not match topology info, return False
         return False
-    
-    
+
+
     def _getTinfo(self):
         """
         Return a dictionary with the topology number of vertices and vertparts.
         
-        """        
+        """
         return {'vertnumb' : self.vertnumb, 'vertparts' : self.vertparts}
-    
-    
+
+
     def getTotalWeight(self):
         """
         Return the sum of all elements weights.
@@ -195,19 +195,19 @@ class Topology(object):
         """
         if len(self.elementList) == 0:
             return None
-        
-        sumw = crossSection.XSectionList()        
+
+        sumw = crossSection.XSectionList()
         for element in self.elementList:
             sumw.combineWith(element.weight)
-           
-        return sumw    
- 
-    
+
+        return sumw
+
+
 class TopologyList(Printer):
     """
     An instance of this class represents an iterable collection of topologies.
     
-    """    
+    """
     def __init__(self, topologies=[]):
         """
         Add topologies sequentially, if provided.
@@ -219,20 +219,20 @@ class TopologyList(Printer):
             self.add(topo)
 
 
-    def __len__ (self): 
-        return len(self.topos)    
+    def __len__(self):
+        return len(self.topos)
 
 
     def __getitem__(self, index):
         return self.topos[index]
-    
-    
-    def __iter__ (self):
+
+
+    def __iter__(self):
         return iter(self.topos)
-    
-    
+
+
     def __str__(self):
-        s = "TopologyList:\n" 
+        s = "TopologyList:\n"
         for topo in self.topos:
             s += str(topo) + "\n"
         return s
@@ -252,9 +252,9 @@ class TopologyList(Printer):
         TODO: write docstring
         
         """
-        s = "TopologyList:\n" 
+        s = "TopologyList:\n"
         for topo in self.topos:
-            s += str(topo)+"\n"
+            s += str(topo) + "\n"
         return s
 
 
@@ -268,8 +268,8 @@ class TopologyList(Printer):
 
         :type topo: Topology    
         
-        """        
-        topmatch = False        
+        """
+        topmatch = False
         for itopo, topo in enumerate(self.topos):
             if topo == newTopology:
                 topmatch = itopo
@@ -278,9 +278,9 @@ class TopologyList(Printer):
             self.topos.append(newTopology)
         else:
             for newelement in newTopology.elementList:
-                self.topos[topmatch]._addElement(newelement)
-            
-            
+                self.topos[topmatch].addElement(newelement)
+
+
     def getTotalWeight(self):
         """
         Return the sum of all topologies total weights.
@@ -290,25 +290,25 @@ class TopologyList(Printer):
         for topo in self:
             topoweight = topo.getTotalWeight()
             if topoweight:
-                sumw.combineWith(topoweight)       
+                sumw.combineWith(topoweight)
         return sumw
-    
-    
+
+
     def getElements(self):
         """
         Return a list with all the elements in all the topologies.
         
-        """        
+        """
         elements = []
         for top in self.topos:
             elements.extend(top.elementList)
         return elements
-    
-    
+
+
     def prepareData(self):
         """
         Select data preparation method through dynamic binding.
         
         """
         return Printer.prepareTopologyListData(self)
-        
+

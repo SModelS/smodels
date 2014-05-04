@@ -10,10 +10,10 @@ from . import smsEvent
 from tools.physicsUnits import addunit
 import logging
 
-logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
+logger = logging.getLogger(__name__)
 
 
-class LheReader:
+class LheReader(object):
     """
     An instance of this class represents a reader for LHE files.
     
@@ -36,33 +36,33 @@ class LheReader:
             self.file = open(filename, 'r')
         else: self.file = filename
         self.metainfo = {"nevents" : None, "totalxsec" : None, "sqrts" : None}
-        
+
         # Get global information from file (cross-section sqrts, total
         # cross-section, total number of events)
         self.file.seek(0)
         line = self.file.readline()
         nevts = 0
         # Exit if reached end of events or file
-        while not "</LesHouchesEvents>" in line and line != "":   
+        while not "</LesHouchesEvents>" in line and line != "":
             if "<init>" in line:
                 line = self.file.readline()
                 sqrts = addunit((eval(line.split()[2]) + \
-                                 eval(line.split()[3]))/1000., 'TeV')
+                                 eval(line.split()[3])) / 1000., 'TeV')
                 self.metainfo["sqrts"] = sqrts
                 totxsec = addunit(0., 'pb')
                 line = self.file.readline()
                 while not "</init>" in line:
                     totxsec += addunit(eval(line.split()[0]), 'pb')
-                    line = self.file.readline()                    
+                    line = self.file.readline()
                 self.metainfo["totalxsec"] = totxsec
             elif "<event>" in line:
                 nevts += 1
-            line = self.file.readline()        
+            line = self.file.readline()
         self.metainfo["nevents"] = nevts
         # Return file to initial reader position
-        self.file.seek(0)  
-        
-        
+        self.file.seek(0)
+
+
     def next(self):
         """
         Get next element in iteration.
@@ -76,7 +76,7 @@ class LheReader:
         if e == None:
             raise StopIteration
         return e
-    
+
 
     def __iter__(self):
         """
@@ -86,7 +86,7 @@ class LheReader:
         
         """
         return self
-    
+
 
     def event(self):
         """
@@ -94,7 +94,7 @@ class LheReader:
         
         :returns: SmsEvent; None if no event is left to be read.
         
-        """        
+        """
         line = " "
         self.ctr += 1
         ret = smsEvent.SmsEvent(self.ctr)
@@ -109,8 +109,8 @@ class LheReader:
         # Read event info
         line = self.file.readline()
 
-        # Get particles info         
-        line = self.file.readline()  
+        # Get particles info
+        line = self.file.readline()
         while line.find("</event>") == -1:
             if line.find("#") > -1:
                 line = line[:line.find('#')]
@@ -132,15 +132,15 @@ class LheReader:
             particle.pz = linep[8]
             particle.e = linep[9]
             particle.mass = linep[10]
-        
+
             ret.add(particle)
             line = self.file.readline()
         return ret
-    
-    
+
+
     def close(self):
         """
         Close the lhe file, if open.
         
-        """        
+        """
         self.file.close()
