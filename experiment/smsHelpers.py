@@ -14,16 +14,16 @@
 from os.path import os
 import logging
 
-logger = logging.getLogger(__name__) # pylint: disable-msg=C0103
+logger = logging.getLogger(__name__)
 
-base = "/afs/hephy.at/user/w/walten/public/sms/" # pylint: disable-msg=C0103
-runs = ["8TeV", "2012", "ATLAS8TeV", "2011", "RPV8", "RPV7"] # pylint: disable-msg=C0103
-runs_ = {} # pylint: disable-msg=C0103
-mlines = {} # pylint: disable-msg=C0103
-infoFields = {} # pylint: disable-msg=C0103
-pMI_ = {} # pylint: disable-msg=C0103
-upperLimitDict = {} # pylint: disable-msg=C0103
-expupperLimitDict = {} # pylint: disable-msg=C0103
+base = "/afs/hephy.at/user/w/walten/public/sms/"
+runs = ["8TeV", "2012", "ATLAS8TeV", "2011", "RPV8", "RPV7"]
+runs_ = {}
+mlines = {}
+infoFields = {}
+pMI_ = {}
+upperLimitDict = {}
+expupperLimitDict = {}
 
 
 def getRun(analysis, run=None):
@@ -61,7 +61,7 @@ def getLines(analysis, run, label="condition"):
     info = "%s/%s/%s/info.txt" % (base, run, analysis)
     ret = {}
     if not os.path.exists(info):
-        logger.warn("Cannot find %s." % info)
+        logger.warn("Cannot find %s.", info)
         mlines[key] = ret
         return ret
     f = open(info)
@@ -74,7 +74,7 @@ def getLines(analysis, run, label="condition"):
             continue
         tokens = line.split(":", 1)
         if not len(tokens) == 2:
-            logger.warn("Cannot parse line: %s in %s" % (line, info))
+            logger.warn("Cannot parse line: %s in %s", line, info)
             continue
         if tokens[0] != label:
             # Ignore everything but conditions
@@ -86,7 +86,7 @@ def getLines(analysis, run, label="condition"):
             excl = excl[:-1]
         keyvalue = excl.split(" -> ")
         if len(keyvalue) != 2:
-            logger.warn("Cannot parse line: %s" % keyvalue)
+            logger.warn("Cannot parse line: %s", keyvalue)
         ret[keyvalue[0]] = keyvalue[1]
     mlines[key] = ret
     return ret
@@ -128,7 +128,7 @@ def _parseMetaInfo(analysis, run):
     info = "%s/%s/%s/info.txt" % (base, run, analysis)
     ret = {}
     if not os.path.exists(info):
-        logger.warn("Cannot find %s." % info)
+        logger.warn("Cannot find %s.", info)
         pMI_[key] = ret
         return ret
     f = open(info)
@@ -143,7 +143,7 @@ def _parseMetaInfo(analysis, run):
             continue
         tokens = line.split(":", 1)
         if not len(tokens) == 2:
-            logger.error("Cannot parse line: '%s' in '%s'" % (line, info))
+            logger.error("Cannot parse line: '%s' in '%s'", line, info)
             continue
         if tokens[0] == "exclusions":
             # Ignore exclusions
@@ -167,30 +167,30 @@ def getUpperLimitDictionary(analysis, topology, run, expected=False):
             return upperLimitDict[key]
     dictfile = "%s/%s/%s/sms.py" % (base, run, analysis)
     if not os.path.exists(dictfile):
-        logger.warn("Dictionary file %s does not exist." % dictfile)
+        logger.warn("Dictionary file %s does not exist.", dictfile)
         upperLimitDict[key] = None
         return None
     localsDictionary = {}
     execfile(dictfile, localsDictionary)
     if expected:
         if not localsDictionary.has_key("ExpectedDict"):
-            logger.warn("Expected dictionary is missing for analysis %s."
-                        % analysis)
+            logger.warn("Expected dictionary is missing for analysis %s.",
+                        analysis)
             return None
         dictionary = localsDictionary["ExpectedDict"]
         if not dictionary.has_key(topology):
-            logger.warn("Dictionary does not have topology %s." % topology)
+            logger.warn("Dictionary does not have topology %s.", topology)
             expupperLimitDict[key] = None
             return None
         expupperLimitDict[key] = dictionary[topology]
     else:
         if not localsDictionary.has_key("Dict"):
-            logger.warn("Observed dictionary is missing for analysis %s."
-                        % analysis)
+            logger.warn("Observed dictionary is missing for analysis %s.",
+                        analysis)
             return None
         dictionary = localsDictionary["Dict"]
         if not dictionary.has_key(topology):
-            logger.warn("Dictionary does not have topology %s." % topology)
+            logger.warn("Dictionary does not have topology %s.", topology)
             upperLimitDict[key] = None
             return None
         upperLimitDict[key] = dictionary[topology]
@@ -215,17 +215,17 @@ def hasDictionary(analysis, run=None, topology=None):
             return True
         return False
 
-    logger.warn("Dictionary file %s does not exist." % dictfile)
+    logger.warn("Dictionary file %s does not exist.", dictfile)
     return False
 
-def databaseVersion( astuple=False ):
+def databaseVersion(astuple=False):
     """ prints out version number of the *database* """
-    f=open("%s/version" % base )
-    l=f.readline()
+    f = open("%s/version" % base)
+    l = f.readline()
     f.close()
-    l=l.replace("\n","")
+    l = l.replace("\n", "")
     l.strip()
     if not astuple:
         return l
-    A,B=l.split(".")
-    return (int(A),int(B))
+    A, B = l.split(".")
+    return (int(A), int(B))
