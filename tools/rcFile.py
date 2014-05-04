@@ -14,12 +14,20 @@ import logging
 logger = logging.getLogger(__name__)
 
 def yesno(B):
+    """
+    TODO: write docstring
+    
+    """
     if B:
         return "yes"
     return "no"
 
 def parseRCFile():
-    rcfile = os.path.expanduser("~")+"/.smodelsrc"
+    """
+    TODO: write docstring
+    
+    """
+    rcfile = os.path.expanduser("~") + "/.smodelsrc"
     exists = os.path.exists(rcfile)
     if exists:
         execfile(rcfile)
@@ -32,7 +40,7 @@ parseRCFile()
 
 if __name__ == "__main__":
     """
-    Checks if there is a smodelsrc file.
+    Check if there is a smodelsrc file.
     
     """
     T = parseRCFile()

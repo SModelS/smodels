@@ -24,35 +24,40 @@ inputFiles = ['inputFiles/slha/andrePT4.slha',
 
 
 def main():
+    """
+    Executes pycallgraph to create call graphs of simpleExample.
+    
+    """
     synopsis = "Call pycallgraph to create call graphs of simpleExample."
     desc = ("Maximum stack depth to trace. Any calls made past this stack "
             "depth are not included in the trace.")
-    
+
     parser = argparse.ArgumentParser(description=synopsis)
-    parser.add_argument('--max-depth', type=int, choices=[2, 3, 4, 5], help=desc)
+    parser.add_argument('--max-depth', type=int, choices=[2, 3, 4, 5],
+                        help=desc)
     args = parser.parse_args()
-    
+
     depth = ""
     if args.max_depth:
         depth = '--max-depth ' + str(args.max_depth) + ' '
-        
+
     arguments = ('--include "theory.*" --include "experiment.*" '
                  '--include "tools.*" ' + depth + 'graphviz -- '
                  './simpleExample.py')
-    
+
     for inputFile in inputFiles:
         simpleExample.slhafile = inputFile
-        
+
         print("calling pycallgraph:")
         print("    input file:", inputFile)
         print("     arguments:", str(arguments))
-        
+
         os.system('pycallgraph ' + arguments)
-        
+
         filename = os.path.splitext(os.path.basename(inputFile))[0] + ".png"
 
         print("renaming output file to", filename)
-        
+
         cwd = os.getcwd()
         oldFile = os.path.join(cwd, 'pycallgraph.png')
         newFile = os.path.join(cwd, filename)
