@@ -9,18 +9,16 @@
 """
 
 import logging
-FORMAT = '%(levelname)s in %(module)s.%(funcName)s(): %(message)s'
-logging.basicConfig(format=FORMAT)
 logger = logging.getLogger(__name__)
-logger.setLevel ( level=logging.INFO )
 
-class ToolBox:
+
+class ToolBox(object):
     """
     A singleton-like class that keeps track of all external tools.
     
     """
     __shared_state = {"tools" : {}}
-    
+
     def __init__(self):
         # instead of making this a singleton, we introduce
         self.__dict__ = self.__shared_state
@@ -32,8 +30,8 @@ class ToolBox:
         Intialize singleton instance (done only once for the entire class).
         
         """
-        import externalPythia6
-        import externalNllFast
+        from . import externalPythia6
+        from . import externalNllFast
         self.add(externalPythia6.ExternalPythia6())
         for(sqrts, tool) in externalNllFast.nllFastTools.items():
                 self.add(tool)
@@ -43,7 +41,7 @@ class ToolBox:
         Adds a tool by passing an instance to this method.
         
         """
-        self.tools[instance.name]=instance
+        self.tools[instance.name] = instance
 
     def listOfTools(self):
         """
@@ -60,7 +58,7 @@ class ToolBox:
         if ok == True:
             ret = "installation ok!"
             if colors:
-                ret="%s%s%s" % (green, ret, reset)
+                ret = "%s%s%s" % (green, ret, reset)
             return ret
         ret = "problem with installation"
         if type(ok) == types.StringType:
@@ -80,13 +78,13 @@ class ToolBox:
                 exe = "... " + instance.pathOfExecutable()[-maxl:]
             ret += "%-12s [%-50s]:    %s\n" % (name, exe,
                                                self.installationOk(ok, colors))
-            if not ok and make: 
+            if not ok and make:
                 hasMade = True
                 instance.compile()
         if make and hasMade:
             ret += "Check again:\n"
             ret += self.checkInstallation(self, colors, make=False)
-        ## logger.info(ret)
+        # # logger.info(ret)
         print (ret)
 
     def compile(self):

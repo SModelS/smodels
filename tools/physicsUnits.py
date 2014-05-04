@@ -36,16 +36,17 @@ fb = unum.Unum.unit('fb')
 pb = unum.Unum.unit('pb', 1000 * fb)
 
 eV = unum.Unum.unit('eV')
-keV = unum.Unum.unit('keV', 10**3*eV)
-MeV = unum.Unum.unit('MeV', 10**6*eV)
-GeV = unum.Unum.unit('GeV', 10**9*eV)
-TeV = unum.Unum.unit('TeV', 10**12*eV)
+keV = unum.Unum.unit('keV', 10 ** 3 * eV)
+MeV = unum.Unum.unit('MeV', 10 ** 6 * eV)
+GeV = unum.Unum.unit('GeV', 10 ** 9 * eV)
+TeV = unum.Unum.unit('TeV', 10 ** 12 * eV)
 
 
 def addunit(value, unitstring):
     """
-    Adds units to values, but also makes it easy to turn this functionality
-    off, in case "units" isn't installed.
+    Add units to values.
+    
+    Allow to turn this functionality off, in case "units" is not installed.
     
     """
     if value == None:
@@ -79,14 +80,16 @@ def addunit(value, unitstring):
     return value
 
 
-def rmvunit ( value, unitstring ):
+def rmvunit(value, unitstring):
     """
-    Removes units from values, but also makes it easy to turn this
-    functionality off, in case "units" isn't installed.
+    Remove units from values.
+    
+    Allow to turn this functionality off, in case "units" is not installed.
     
     """
-    if not useUnits: return value
-    if useUnits: 
+    if not useUnits:
+        return value
+    if useUnits:
         if type(value) != type(1.*GeV):
             return value
         if unitstring == "GeV":
@@ -98,7 +101,7 @@ def rmvunit ( value, unitstring ):
         if unitstring == "pb":
             return value.asNumber(pb)
         if unitstring == "fb-1":
-            return value.asNumber(1/fb)
+            return value.asNumber(1 / fb)
         logger.warning("Unknown unit: " + unitstring)
         return value
 

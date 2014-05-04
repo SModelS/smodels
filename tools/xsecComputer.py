@@ -9,223 +9,277 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
-import setPath
-from physicsUnits import rmvunit
-from physicsUnits import addunit
+from . import setPath  # pylint: disable=W0611
+from . import toolBox
+from .physicsUnits import rmvunit
+from .physicsUnits import addunit
 import os
-import commands
-import shutil
 from theory import crossSection
-import nllFast
+from . import nllFast
 import cStringIO
 import logging
 import SModelS
+import argparse
+import types
+import sys
 
 logger = logging.getLogger(__name__)
 
 
-def computeXSec(sqrts,maxOrder,nevts,slhafile,lhefile=None,externaldir=None):
-    """ Runs pythia at sqrts and compute SUSY cross-sections for the input SLHA file.
-    Returns a XSectionList object
+def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None,
+                externaldir=None):
+    """
+    Run pythia and compute SUSY cross-sections for the input SLHA file.
+    
     :param sqrts: sqrt{s} to run Pythia
     :param maxOrder: maximum order to compute the cross-section
     if maxOrder = 0, compute only LO pythia xsecs
     if maxOrder = 1, apply NLO K-factors from NLLfast (if available)
     if maxOrder = 2, apply NLO+NLL K-factors from NLLfast (if available)
     :param nevts: number of events for pythia run
-    :param slhafile: input SLHA file
-    :param lhefile: LHE file. If None, do not write pythia output to file \
-    if file does not exist, write pythia output to this file name \
-    if file exists, read LO xsecs from this file (does not run pythia)
-    :param externaldir: location of pythia6 and nllfast folders
-    if not defined, it is set as current folder
-    """    
+    :param slhafile: SLHA file
+    :param lhefile: LHE file. If None, do not write pythia output to file. If
+    file does not exist, write pythia output to this file name. If file exists,
+    read LO xsecs from this file (does not run pythia)
+    :param externaldir: location of pythia6 and nllfast folders. If not
+    defined, it is set as current folder
+    :returns: XSectionList object
+    
+    """
 
-    if not externaldir: externaldir = os.getcwd() + '/external/'
-#Check if SLHA file exists
+    if not externaldir:
+        externaldir = os.getcwd() + '/external/'
     if not os.path.isfile(slhafile):
-        logger.error("SLHA file %s not found." % slhafile )
+        logger.error("SLHA file %s not found.", slhafile)
         return None
-#Check i lhefile exists:
     if lhefile:
-        if os.path.isfile(lhefile): logger.warning("Using LO cross-sections from "+lhefile)
-        else: logger.info("Writing pythia LHE output to "+lhefile)
-#Get file with lhe Events:
+        if os.path.isfile(lhefile):
+            logger.warning("Using LO cross-sections from " + lhefile)
+        else:
+            logger.info("Writing pythia LHE output to " + lhefile)
     if not lhefile or not os.path.isfile(lhefile):
-        lheFile = runPythia(slhafile,nevts,rmvunit(sqrts,'TeV'),lhefile)
+        lheFile = runPythia(slhafile, nevts, rmvunit(sqrts, 'TeV'), lhefile)
     else:
-        lheFile = open(lhefile,'r')
+        lheFile = open(lhefile, 'r')
 
-#Get LO cross-sections from LHE events
-    LOxsecs = crossSection.getXsecFromLHEFile(lheFile)    
-    xsecs = LOxsecs    
-#Set cross-section label and order:
-    wlabel = str(int(rmvunit(sqrts,'TeV')))+' TeV'
-    if maxOrder == 0:  wlabel += ' (LO)'
-    elif maxOrder == 1: wlabel += ' (NLO)'
-    elif maxOrder == 2: wlabel += ' (NLO+NLL)'
-    for ixsec,xsec in enumerate(xsecs):
+    loXsecs = crossSection.getXsecFromLHEFile(lheFile)
+    xsecs = loXsecs
+    wlabel = str(int(rmvunit(sqrts, 'TeV'))) + ' TeV'
+    if maxOrder == 0:
+        wlabel += ' (LO)'
+    elif maxOrder == 1:
+        wlabel += ' (NLO)'
+    elif maxOrder == 2:
+        wlabel += ' (NLO+NLL)'
+    for ixsec, xsec in enumerate(xsecs):
         xsecs[ixsec].info.label = wlabel
         xsecs[ixsec].info.order = maxOrder
-#If maxOrder > 0, apply k-factors:
+
     if maxOrder > 0:
-        pIDs = LOxsecs.getPIDpairs()   # Get particle ID pairs for all xsecs
+        pIDs = loXsecs.getPIDpairs()
         for pID in pIDs:
             k = 0.
-            kNLO,kNLL = nllFast.getKfactorsFor(pID,sqrts,slhafile)
-            if maxOrder == 1 and kNLO: k = kNLO
-            elif maxOrder == 2 and kNLL and kNLO: k = kNLO*kNLL
+            kNLO, kNLL = nllFast.getKfactorsFor(pID, sqrts, slhafile)
+            if maxOrder == 1 and kNLO:
+                k = kNLO
+            elif maxOrder == 2 and kNLL and kNLO:
+                k = kNLO * kNLL
             elif maxOrder > 2:
-                logger.warning("Unkown xsec order, using NLL+NLO k-factor (if available)")
-                k = kNLO*kNLL
+                logger.warning("Unkown xsec order, using NLL+NLO k-factor, "
+                               "if available")
+                k = kNLO * kNLL
             k = float(k)
-            for i,xsec in enumerate(xsecs):
-                if set(xsec.pid) == set(pID): xsecs[i] = xsec*k   #Apply k-factor
+            for i, xsec in enumerate(xsecs):
+                if set(xsec.pid) == set(pID):
+                    # Apply k-factor
+                    xsecs[i] = xsec * k
 
-#Remove zero cross-sections
-    while len(xsecs) > 0 and xsecs.getMinXsec() == addunit(0.,'fb'):        
+    # Remove zero cross-sections
+    while len(xsecs) > 0 and xsecs.getMinXsec() == addunit(0., 'fb'):
         for xsec in xsecs:
-            if xsec.value == addunit(0.,'fb'):
+            if xsec.value == addunit(0., 'fb'):
                 xsecs.delete(xsec)
                 break
-            
     return xsecs
 
 
-def addXSecToFile(xsecs,slhafile,comment=None):
-    """ Writes cross-sections to slha file.
+def addXSecToFile(xsecs, slhafile, comment=None):
+    """
+    Write cross-sections to an SLHA filei.
+    
     :param xsecs: a XSectionList object containing the cross-sections
     :param slhafile: target file for writing the cross-sections in SLHA format
     :param comment: optional comment to be added to each cross-section block    
+    
     """
-
-#Check if SLHA file exists
     if not os.path.isfile(slhafile):
         logger.error("SLHA file not found.")
         return None
-#Check if file already contain cross-section blocks:
+    # Check if file already contain cross-section blocks
     xSectionList = crossSection.getXsecFromSLHAFile(slhafile)
     if xSectionList:
-        logger.warning("SLHA file already contains XSECTION blocks. Adding missing cross-sections.")    
+        logger.warning("SLHA file already contains XSECTION blocks. Adding "
+                       "missing cross-sections.")
 
-#Write cross-sections to file (if they do not overlap any cross-section in the file)
-    outfile = open(slhafile,'append')
+    # Write cross-sections to file, if they do not overlap any cross-section in
+    # the file
+    outfile = open(slhafile, 'a')
     for xsec in xsecs:
-        writeXsec = True        
+        writeXsec = True
         for oldxsec in xSectionList:
             if oldxsec.info == xsec.info and set(oldxsec.pid) == set(xsec.pid):
                 writeXsec = False
                 break
-        if writeXsec: outfile.write(xsecToBlock(xsec,(2212,2212),comment)+"\n")
+        if writeXsec:
+            outfile.write(xsecToBlock(xsec, (2212, 2212), comment) + "\n")
     outfile.close()
 
     return True
 
-def xsecToBlock(xsec,inPDGs=(2212,2212),comment=None):
-    """Generates a string for a XSECTION block in the SLHA format from a XSection() object.
-    inPDGs defines the PDGs of the incoming states (default = 2212,2212).
-    comment is added at the end of the header as a comment"""
 
+def xsecToBlock(xsec, inPDGs=(2212, 2212), comment=None):
+    """
+    Generate a string for a XSECTION block in the SLHA format from a XSection
+    object.
+    
+    :param inPDGs: defines the PDGs of the incoming states
+    (default = 2212,2212)
+    :param comment: is added at the end of the header as a comment
+    
+    """
     if type(xsec) != type(crossSection.XSection()):
         logger.error("Wrong input")
         return False
-    header = "XSECTION  "+str(rmvunit(xsec.info.sqrts,'GeV'))  #Sqrt(s) in GeV
-    for pdg in inPDGs: header += " "+str(pdg)  #PDGs of incoming states
-    header += " "+str(len(xsec.pid))   #Number of outgoing states
-    for pid in xsec.pid: header += " "+str(pid)  #PDGs of outgoing states
+    # Sqrt(s) in GeV
+    header = "XSECTION  " + str(rmvunit(xsec.info.sqrts, 'GeV'))
+    for pdg in inPDGs:
+        # PDGs of incoming states
+        header += " " + str(pdg)
+    # Number of outgoing states
+    header += " " + str(len(xsec.pid))
+    for pid in xsec.pid:
+        # PDGs of outgoing states
+        header += " " + str(pid)
     if comment:
-        header += "   # "+str(comment)   #Comment    
-    entry = "0  "+str(xsec.info.order)+"  0  0  0  0  "+str(rmvunit(xsec.value,'fb'))+" SModelS "+SModelS.version()
+        header += "   # " + str(comment)  # Comment
+    entry = "0  " + str(xsec.info.order) + "  0  0  0  0  " + \
+            str(rmvunit(xsec.value, 'fb')) + " SModelS " + SModelS.version()
 
     return header + "\n" + entry
 
-def runPythia(slhafile,nevts,sqrts,lhefile=None):
-    """ run pythia_lhe with n events, at sqrt(s)=sqrts. Returns a file object with the lhe events
-        :param slhafile: input SLHA file
-        :param nevts: number of events to be generated
-        :param sqrts: center of mass sqrt{s} (in TeV)
-        :param lhefile: option to write LHE output to file. If None, do not write output to disk
+
+def runPythia(slhafile, nevts, sqrts, lhefile=None):
     """
+    Execute pythia_lhe with n events, at sqrt(s)=sqrts.
+    
+    :param slhafile: input SLHA file
+    :param nevts: number of events to be generated
+    :param sqrts: center of mass sqrt{s} (in TeV)
+    :param lhefile: option to write LHE output to file; ff None, do not write
+    output to disk
+    :returns: file object with the LHE events
+    
+    """
+    box = toolBox.ToolBox()
+    tool = box.get("pythia6")
+    # Check if template config file exists
+    tool.reset()
+    tool.replaceInCfgFile({"NEVENTS": nevts, "SQRTS":1000 * sqrts})
+    tool.setParameter("MSTP(163)", "6")
 
-    import toolBox
-    box=toolBox.ToolBox()
-    tool=box.get("pythia6")
-    tool.reset() ## make sure we have the template config file
-    # tool.checkInstallation()
-    tool.replaceInCfgFile ( { "NEVENTS": nevts, "SQRTS":1000*sqrts } )
-    tool.setParameter ( "MSTP(163)", "6" )
-
-    lhedata=tool.run ( slhafile )
-    ## executable="%s/pythia_lhe" % pythiadir
-    #lhedata = commands.getoutput("cd %s; %s < pythia_card.dat" % (pythiadir, executable))
+    lhedata = tool.run(slhafile)
     if not "<LesHouchesEvents" in lhedata:
         logger.error("LHE events not found in pythia output")
         return False
 
-#Generates file object with lhe events:
+    # Generate file object with lhe events
     if lhefile:
-        lheFile = open(lhefile,'w')
+        lheFile = open(lhefile, 'w')
         lheFile.write(lhedata)
         lheFile.close()
-        lheFile = open(lhefile,'r')
+        lheFile = open(lhefile, 'r')
     else:
-        lheFile = cStringIO.StringIO(lhedata)   #Creates memory only file object
+        # Create memory only file object
+        lheFile = cStringIO.StringIO(lhedata)
 
     return lheFile
 
+
 if __name__ == "__main__":
-    """ called as script, we compute the cross section of a given slha file """
-    import argparse, types, sys
-    argparser = argparse.ArgumentParser(description='computes the cross section of a file')
+    """
+    Compute the cross section of a given SLHA file.
+    
+    """
+    desc = "compute the cross section of a file"
+    argparser = argparse.ArgumentParser(description=desc)
     argparser.add_argument('file', type=types.StringType, nargs=1,
-                           help='the slha or lhe file to compute cross section for')
-    argparser.add_argument ( '-s', '--sqrts', nargs='+', action='append', help='sqrt(s) [TeV]. Can supply more than one value.', type=int, default=[] )
-    argparser.add_argument ( '-e', '--nevents', help='number of events to be simulated.', type=int, default=100 )
-    argparser.add_argument('-f','--tofile',help='write cross sections also to file', action='store_true')
-    argparser.add_argument('-S','--slha',help='input file is slha file', action='store_true')
-    argparser.add_argument('-n','--NLO',help='compute at the NLO level (default is LO)', action='store_true')
-    argparser.add_argument('-N','--NLL',help='compute at the NLL level (takes precedence over NLL, default is LO)', action='store_true')
-    argparser.add_argument('-L','--lhe',help='input file is lhe file', action='store_true')
-    args=argparser.parse_args()
+                           help="SLHA or LHE file to compute cross section "
+                           "for")
+    argparser.add_argument('-s', '--sqrts', nargs='+', action='append',
+                           help="sqrt(s) TeV. Can supply more than one value.",
+                           type=int, default=[])
+    argparser.add_argument('-e', '--nevents', type=int, default=100,
+                           help="number of events to be simulated.")
+    argparser.add_argument('-f', '--tofile', action='store_true',
+                           help="write cross sections to file")
+    argparser.add_argument('-S', '--slha', action='store_true',
+                           help="input file is an SLHA file")
+    argparser.add_argument('-L', '--lhe', action='store_true',
+                           help="input file is an LHE file")
+    argparser.add_argument('-n', '--NLO', action='store_true',
+                           help="compute at the NLO level (default is LO)")
+    argparser.add_argument('-N', '--NLL',
+                           help="compute at the NLL level (takes precedence "
+                           "over NLL, default is LO)",
+                           action='store_true')
+    args = argparser.parse_args()
 
-    import SModelS
 
 
-    sqrtses=[item for sublist in args.sqrts for item in sublist]
-    if len(sqrtses)==0: sqrtses=[8] ## default is: we compute for 8 tev!
+    sqrtses = [item for sublist in args.sqrts for item in sublist]
+    if len(sqrtses) == 0:
+        sqrtses = [8]
     sqrtses.sort()
-    sqrtses=set(sqrtses) ## unique values!
-    order=0
-    if args.NLO: order=1
-    if args.NLL: order=2
+    sqrtses = set(sqrtses)
+    order = 0
+    if args.NLO:
+        order = 1
+    if args.NLL:
+        order = 2
     if order > 0:
         for sqrts in sqrtses:
-            if not sqrts in [ 7,8,13,14,30,100]:
-                logger.error("Cannot compute NLO or NLL xsecs for sqrts = %d TeV!" % sqrts)
+            if not sqrts in [7, 8, 13, 14, 30, 100]:
+                logger.error("Cannot compute NLO or NLL xsecs for sqrts = %d "
+                             "TeV!", sqrts)
                 sqrtses.remove(sqrts)
-    File=args.file[0]
-    if not os.path.exists(File):
-        logger.error("File ``%s'' does not exist." % File)
+    inputFile = args.file[0]
+    if not os.path.exists(inputFile):
+        logger.error("File '%s' does not exist.", inputFile)
         sys.exit(1)
-    if File[-5:].lower()==".slha" or args.slha:
+    if inputFile[-5:].lower() == ".slha" or args.slha:
         if args.tofile:
-            logger.info("Computing slha cross section from %s, and adding to slha file." % File)
+            logger.info("Computing SLHA cross section from %s and adding to "
+                        "SLHA file...", inputFile)
             for s in sqrtses:
-                ss=addunit(s, 'TeV')
+                ss = addunit(s, 'TeV')
                 external_dir = SModelS.installDirectory() + "/tools/external"
-                xsecs = computeXSec(ss,order,args.nevents,File,externaldir=external_dir)
-                comment = "Nevts="+str(args.nevents)
-                addXSecToFile(xsecs,File,comment)
-            logger.info("done.")
+                xsecs = computeXSec(ss, order, args.nevents, inputFile,
+                                    externaldir=external_dir)
+                comment = "Nevts: " + str(args.nevents)
+                addXSecToFile(xsecs, inputFile, comment)
+            logger.info("... done.")
             sys.exit(0)
         else:
-            logger.error("compute slha cross section, print out, but dont add to file. FIXME not yet implemented.")
+            logger.error("Compute SLHA cross section, print out, but do not "
+                         "add to file. TODO: not yet implemented.")
             sys.exit(0)
-    if File[-4:].lower()==".lhe" or args.lhe:
+    if inputFile[-4:].lower() == ".lhe" or args.lhe:
         if args.tofile:
-            logger.error("Compute lhe section, and add to file. FIXME I guess we dont need this case?")
+            logger.error("Compute LHE section, and add to file. TODO: I guess "
+                         "we do not need this case?")
             sys.exit(0)
         else:
-            logger.error("Compute lhe section, print out, but dont add to file. FIXME not yet implemented.")
+            logger.error("Compute LHE section, print out, but do not add to "
+                         "file. TODO: not yet implemented.")
             sys.exit(0)
 

@@ -12,11 +12,19 @@ from pprint import PrettyPrinter
 
 
 class SmsPrettyPrinter(PrettyPrinter):
-    def format(self, object, context, maxlevels, level):
-        if isinstance(object, float):
-            return ('%.1f' % object), True, False
+    """
+    An instance of this class represents a printing facility."
+    
+    """
+    def format(self, entity, context, maxlevels, level):
+        """
+        TODO: write docstring
+        
+        """
+        if isinstance(entity, float):
+            return ('%.1f' % entity), True, False
         else:
-            return PrettyPrinter.format(self, object, context, maxlevels,
+            return PrettyPrinter.format(self, entity, context, maxlevels,
                                         level)
 
 
@@ -37,8 +45,8 @@ def wrapAlways(text, width):
     Wraps text on exactly width characters. It doesn't split the text in words.
     
     """
-    return '\n'.join([ text[width*i:width*(i + 1)] \
-                       for i in xrange(int(math.ceil(1.*len(text)/width))) ])
+    return '\n'.join([text[width * i:width * (i + 1)] \
+                      for i in xrange(int(math.ceil(1.*len(text) / width)))])
 
 
 def wrap(text, width):
