@@ -2,7 +2,7 @@
 
 """
 .. module:: callGraph
-   :synopsis: Call pycallgraph to create call graphs of simple_example for
+   :synopsis: Call pycallgraph to create call graphs of simpleExample for
    different input files.
    
    Usage: has to be invoked in the SModelS root directory:
@@ -17,7 +17,7 @@
 from __future__ import print_function
 import argparse
 import setPath
-from smodels import simple_example
+from smodels import simpleExample
 from os.path import os
 
 inputFiles = ['inputFiles/slha/andrePT4.slha',
@@ -26,10 +26,10 @@ inputFiles = ['inputFiles/slha/andrePT4.slha',
 
 def main():
     """
-    Executes pycallgraph to create call graphs of simple_example.
+    Executes pycallgraph to create call graphs of simpleExample.
     
     """
-    synopsis = "Call pycallgraph to create call graphs of simple_example."
+    synopsis = "Call pycallgraph to create call graphs of simpleExample."
     desc = ("Maximum stack depth to trace. Any calls made past this stack "
             "depth are not included in the trace.")
 
@@ -44,10 +44,10 @@ def main():
 
     arguments = ('--include "theory.*" --include "experiment.*" '
                  '--include "tools.*" ' + depth + 'graphviz -- '
-                 './simple_example.py')
+                 './simpleExample.py')
 
     for inputFile in inputFiles:
-        simple_example.slhafile = inputFile
+        simpleExample.slhafile = inputFile
 
         print("calling pycallgraph:")
         print("    input file:", inputFile)
