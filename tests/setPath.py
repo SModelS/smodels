@@ -16,14 +16,17 @@ import os
 
 def configure():
     """
-    Gets the path name of this file, remove set_path.py, remove the last
-    subdir, the remaining string should be the base path name.
+    Get the path name of this file, remove set_path.py, remove the last
+    subdir.
+    
+    The remaining string should be the base path name.
     
     """
     base = os.path.dirname(os.path.realpath(inspect.getabsfile(configure)))
     pos = base.rfind("/")
-    base = base[:pos+1]
+    base = base[:pos + 1]
     sys.path.append(base)
+    sys.path.append(base[:-9])
     return base
 
 
@@ -32,7 +35,7 @@ configure()
 
 if __name__ == "__main__":
     """
-    Called as a script, we simply print out the path.
+    Called as a script, print out the path.
     
     """
     print("The following string is appended to the path variable:",
