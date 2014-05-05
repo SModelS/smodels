@@ -33,7 +33,7 @@ def version(astuple=False):
     f = open("%s/version" % installDirectory())
     l = f.readline()
     f.close()
-    l = l.replace("\n","")
+    l = l.replace("\n", "")
     l.strip()
     if not astuple:
         return l
