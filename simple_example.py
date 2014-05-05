@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: simpleExample
+.. module:: simple_example
    :synopsis: Basic use case for the SModelS framework.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
