@@ -9,11 +9,14 @@
 """
 
 from __future__ import print_function
-from theory import slhaDecomposer
+import sys
+sys.path.append("../")
+## from smodels import SModelS
+from smodels.theory import slhaDecomposer
 ## from theory import lheDecomposer
-from tools.physicsUnits import addunit
-from experiment import smsAnalysisFactory
-from theory.theoryPrediction import theoryPredictionFor
+from smodels.tools.physicsUnits import addunit
+from smodels.experiment import smsAnalysisFactory
+from smodels.theory.theoryPrediction import theoryPredictionFor
 ## import logging
 
 def main():
