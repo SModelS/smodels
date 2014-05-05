@@ -104,13 +104,13 @@ def asciidraw(element, labels=True, html=False, border=False):
                     border=border, l=max(l))
 
 if __name__ == "__main__":
-    from . import setPath  # pylint: disable=W0611
+    import setPath  # pylint: disable=W0611
     import argparse
     import types
-    import SModelS
-    from theory import lheReader
-    from theory import lheDecomposer
-    from theory import crossSection
+    from smodels import SModelS
+    from smodels.theory import lheReader
+    from smodels.theory import lheDecomposer
+    from smodels.theory import crossSection
 
     argparser = argparse.ArgumentParser(description="simple tool that is "
                                         "meant to draw lessagraphs, as an "

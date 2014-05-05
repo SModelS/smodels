@@ -27,6 +27,7 @@ def parseRCFile():
     TODO: write docstring
     
     """
+    import setPath
     rcfile = os.path.expanduser("~") + "/.smodelsrc"
     exists = os.path.exists(rcfile)
     if exists:
@@ -36,7 +37,6 @@ def parseRCFile():
 
 
 parseRCFile()
-
 
 if __name__ == "__main__":
     """

@@ -30,8 +30,9 @@ class ToolBox(object):
         Intialize singleton instance (done only once for the entire class).
         
         """
-        from . import externalPythia6
-        from . import externalNllFast
+        import setPath
+        from smodels.tools import externalPythia6
+        from smodels.tools import externalNllFast
         self.add(externalPythia6.ExternalPythia6())
         for(sqrts, tool) in externalNllFast.nllFastTools.items():
                 self.add(tool)

@@ -9,16 +9,15 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
-from . import setPath  # pylint: disable=W0611
-from . import toolBox
-from .physicsUnits import rmvunit
-from .physicsUnits import addunit
+import setPath  # pylint: disable=W0611
+from smodels import SModelS
+from smodels.tools import toolBox
+from smodels.tools.physicsUnits import rmvunit, addunit
+from smodels.theory import crossSection
+from smodels.tools import nllFast
 import os
-from theory import crossSection
-from . import nllFast
 import cStringIO
 import logging
-import SModelS
 import argparse
 import types
 import sys

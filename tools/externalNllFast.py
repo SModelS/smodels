@@ -8,8 +8,8 @@
 
 """
 
-from . import setPath  # pylint: disable=W0611
-from .externalTool import ExternalTool
+import setPath  # pylint: disable=W0611
+from smodels.tools.externalTool import ExternalTool
 import commands
 import os
 import logging

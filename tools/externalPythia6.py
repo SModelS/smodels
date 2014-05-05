@@ -8,13 +8,13 @@
 
 """
 
-from . import setPath
-from externalTool import ExternalTool
+import setPath
+from smodels.tools.externalTool import ExternalTool
 import tempfile
 import os
 import shutil
 import commands
-import SModelS
+from smodels import SModelS
 import urllib
 import tarfile
 import logging

@@ -21,7 +21,7 @@ class ExternalTool(object):
     
     """
     def __init__(self):
-        self.executablePath = ""
+        self.executable_path = ""
 
 
     def installDirectory(self):
@@ -29,19 +29,19 @@ class ExternalTool(object):
         TODO: write docstring
         
         """
-        T = self.executablePath
+        T = self.executable_path
         P = T.rfind("/")
         if P == -1:
             return ""
-        return self.executablePath[:P]
+        return self.executable_path[:P]
 
 
     def pathOfExecutable(self):
         """
-        TODO: write docstring
+        :returns: path of executable
         
         """
-        return self.executablePath
+        return self.executable_path
 
 
     def basePath(self):
