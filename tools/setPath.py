@@ -26,6 +26,7 @@ def configure():
     pos = base.rfind("/")
     base = base[:pos + 1]
     sys.path.append(base)
+    sys.path.append(base[:-9])
     return base
 
 

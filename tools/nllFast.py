@@ -12,15 +12,14 @@
 
 import commands
 import os
-from . import setPath
-from . import toolBox
-from . import modpyslha as pyslha
-from .physicsUnits import rmvunit
-from .physicsUnits import addunit
+import setPath
+from smodels.tools import toolBox
+from smodels.tools import modpyslha as pyslha
+from smodels.tools.physicsUnits import rmvunit, addunit
 import numpy
 import operator
 
-import SModelS
+from smodels import SModelS
 import logging
 
 logger = logging.getLogger(__name__)
