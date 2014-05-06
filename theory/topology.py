@@ -8,9 +8,9 @@
     
 """
 
-from . import crossSection
-from .element import Element
-from .printer import Printer
+from smodels.theory import crossSection
+from smodels.theory.element import Element
+from smodels.theory.printer import Printer
 import logging
 
 logger = logging.getLogger(__name__)
