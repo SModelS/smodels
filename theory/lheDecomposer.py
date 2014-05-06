@@ -6,14 +6,10 @@
 
 """
 
-from . import lheReader
-from . import topology
-from . import crossSection
-from . import element
-from . import branch
-from . import particleNames
-from tools import modpyslha as pyslha
-from tools.physicsUnits import addunit
+from smodels.theory import lheReader, topology, crossSection, element
+from smodels.theory import branch, particleNames
+from smodels.tools import modpyslha as pyslha
+from smodels.tools.physicsUnits import addunit
 import copy
 import logging
 

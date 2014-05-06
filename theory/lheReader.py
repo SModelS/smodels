@@ -6,8 +6,8 @@
 
 """
 
-from . import smsEvent
-from tools.physicsUnits import addunit
+from smodels.theory import smsEvent
+from smodels.tools.physicsUnits import addunit
 import logging
 
 logger = logging.getLogger(__name__)

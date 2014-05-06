@@ -8,14 +8,10 @@
 
 import copy
 import time
-from . import element
-from . import topology
-from . import crossSection
-from .branch import Branch
-from .branch import decayBranches
-from tools import modpyslha as pyslha
-from tools.physicsUnits import addunit
-from tools.physicsUnits import rmvunit
+from smodels.theory import element, topology, crossSection
+from smodels.theory.branch import Branch, decayBranches
+from smodels.tools import modpyslha as pyslha
+from smodels.tools.physicsUnits import addunit, rmvunit
 import logging
 
 logger = logging.getLogger(__name__)

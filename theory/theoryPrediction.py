@@ -8,15 +8,12 @@
 """
 
 import copy
-from . import clusterTools
-from . import crossSection
-from . import element
-from .particleNames import elementsInStr
-from .auxiliaryFunctions import cSim  # pylint: disable=W0611
-from .auxiliaryFunctions import cGtr  # pylint: disable=W0611
-from .analysis import SRanalysis
-from .analysis import ULanalysis
-from .printer import Printer
+from smodels.theory import clusterTools, crossSection, element
+from smodels.theory.particleNames import elementsInStr
+from smodels.theory.auxiliaryFunctions import cSim, cGtr  # pylint: disable=W0611
+from smodels.theory.analysis import SRanalysis
+from smodels.theory.analysis import ULanalysis
+from smodels.theory.printer import Printer
 import logging
 
 logger = logging.getLogger(__name__)

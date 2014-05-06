@@ -8,9 +8,9 @@
 
 """
 
-from tools.physicsUnits import addunit
-from tools.physicsUnits import rmvunit
-from . import lheReader
+from smodels.tools.physicsUnits import addunit
+from smodels.tools.physicsUnits import rmvunit
+from smodels.theory import lheReader
 import logging
 
 logger = logging.getLogger(__name__)

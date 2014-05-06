@@ -7,7 +7,7 @@
         
 """
 
-from experiment import limitGetter
+from smodels.experiment import limitGetter
 
 
 class ULanalysis(object):

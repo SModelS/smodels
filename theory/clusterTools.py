@@ -6,10 +6,8 @@
         
 """
 
-from . import crossSection
-from .auxiliaryFunctions import massAvg
-from .auxiliaryFunctions import massPosition
-from .auxiliaryFunctions import distance
+from smodels.theory import crossSection
+from smodels.theory.auxiliaryFunctions import massAvg, massPosition, distance
 import logging
 
 logger = logging.getLogger(__name__)
