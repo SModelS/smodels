@@ -14,7 +14,7 @@ sys.path.append("../")
 ## from smodels import SModelS
 from smodels.theory import slhaDecomposer
 ## from theory import lheDecomposer
-from smodels.tools.physicsUnits import addunit
+from smodels.tools.physicsUnits import fb, GeV
 from smodels.experiment import smsAnalysisFactory
 from smodels.theory.theoryPrediction import theoryPredictionFor
 ## import logging
@@ -28,8 +28,8 @@ def main():
     # lhefile = 'inputFiles/lhe/ued_1.lhe'
 
     # Decompose model (SLHA or LHE input):
-    sigmacut = addunit(0.1, 'fb')
-    mingap = addunit(5., 'GeV')
+    sigmacut = 0.1 * fb
+    mingap = 5. * GeV
 
     smstoplist = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=True,
                                           doInvisible=True, minmassgap=mingap)
