@@ -30,6 +30,7 @@ def _drawBranch(branch, upwards, labels, htmlFormat, border, l):
     Draw a single branch.
     
     """
+    ret=""
     lines = ["   ", "----"]
     labels = "   "
     if border and upwards:
@@ -73,35 +74,38 @@ def _drawBranch(branch, upwards, labels, htmlFormat, border, l):
         lines[0] += " "*(5 * lengthdiff + 0) + "  |"
         lines[1] += " "*(5 * lengthdiff + 0) + " |"
     if border and upwards:
-        print(" /" + "-"*(4 * l + 4) + "\\")
+        ret+=" /" + "-"*(4 * l + 4) + "\\\n"
     if htmlFormat:
-        print(html)
+        ret+=html+"\n"
     if upwards and labels:
-        print(labels)
+        ret+=labels+"\n"
     if htmlFormat:
-        print(html)
+        ret+=html+"\n"
     for i in order:
-        print(lines[i])
+        ret+=lines[i]+"\n"
     if htmlFormat:
-        print(html)
+        ret+=html+"\n"
     if not upwards and labels:
-        print(labels)
+        ret+=labels+"\n"
     if htmlFormat:
-        print(html)
+        ret+=html+"\n"
     if border and not upwards:
-        print(" \\" + "-"*(4 * l + 4) + "/")
+        ret+=" \\" + "-"*(4 * l + 4) + "/\n"
+    return ret
 
 def asciidraw(element, labels=True, html=False, border=False):
     """
     Draw a simple ASCII graph on the screen.
     
     """
+    ret=""
     l = []
     for (ct, branch) in enumerate(element.branches):
         l.append(int(str(branch).count("[")))
     for (ct, branch) in enumerate(element.branches):
-        _drawBranch(branch, upwards=(ct == 0), labels=labels, htmlFormat=html,
+        ret+=_drawBranch(branch, upwards=(ct == 0), labels=labels, htmlFormat=html,
                     border=border, l=max(l))
+    return ret
 
 if __name__ == "__main__":
     import setPath  # pylint: disable=W0611
@@ -137,4 +141,4 @@ if __name__ == "__main__":
     event = reader.next()
     element = lheDecomposer.elementFromEvent(event,
                                              crossSection.XSectionList())
-    asciidraw(element, border=args.border)
+    print(asciidraw(element, border=args.border) )
