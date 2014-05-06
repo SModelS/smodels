@@ -10,11 +10,10 @@
 """
 
 from __future__ import print_function
-from . import smsResults
-from tools.physicsUnits import rmvunit
-from theory import analysis
-from theory import element
-from . import smsHelpers
+from smodels.experiment import smsResults, smsHelpers
+from smodels.tools.physicsUnits import rmvunit
+from smodels.theory import analysis
+from smodels.theory import element
 import logging
 
 logger = logging.getLogger(__name__)
