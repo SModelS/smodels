@@ -8,8 +8,8 @@
 
 """
 
-from . import smsInterpolation
-from tools.physicsUnits import rmvunit
+from smodels.experiment import smsInterpolation
+from smodels.tools.physicsUnits import rmvunit
 import copy
 import sys
 import logging

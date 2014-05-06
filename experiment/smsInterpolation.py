@@ -12,12 +12,10 @@
 
 """
 
-from . import smsResults
-from . import smsHelpers
+from smodels.experiment import smsResults, smsHelpers
+from smodels.tools.physicsUnits import rmvunit, addunit
 import numpy as np
 from scipy.interpolate import griddata
-from tools.physicsUnits import rmvunit
-from tools.physicsUnits import addunit
 import logging
 
 logger = logging.getLogger(__name__)

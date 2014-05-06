@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """
 .. module:: experiment.experimentExceptions
    :synopsis: Provides exception classes for the experiment package.

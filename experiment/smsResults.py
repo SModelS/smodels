@@ -9,11 +9,11 @@
 
 """
 
-from . import smsHelpers
-from tools.physicsUnits import addunit, rmvunit
+from smodels.tools.physicsUnits import addunit, rmvunit
+from smodels.experiment import smsHelpers
+from smodels.experiment.experimentExceptions import MetaInfoError
+from smodels.experiment.smsHelpers import getRun
 import logging
-from .experimentExceptions import MetaInfoError
-from .smsHelpers import getRun
 
 
 logger = logging.getLogger(__name__)
