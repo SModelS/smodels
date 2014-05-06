@@ -11,7 +11,7 @@
 import unittest
 import setPath
 
-class XSecTest(unittest.TestCase):
+class AsciiTest(unittest.TestCase):
     def orig(self):
         return """ /------------\\
  |    q  q    |
