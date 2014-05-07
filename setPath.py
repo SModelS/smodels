@@ -16,7 +16,7 @@ import os
 
 def configure():
     """
-    Get the path name of this file, remove set_path.py, remove the last
+    Get the path name of this file, remove setPath.py, remove the last
     subdir.
     
     The remaining string should be the base path name.
@@ -26,7 +26,7 @@ def configure():
     pos = base.rfind("/")
     base = base[:pos + 1]
     sys.path.append(base)
-    sys.path.append(base[:-9])
+    # sys.path.append(base[:-9])
     return base
 
 
