@@ -24,6 +24,15 @@ def installDirectory():
     ret = ret.replace("SModelS.py", "")
     return ret
 
+def pythonDirectory():
+    """
+    Return the python installation directory, by looking at location of this
+    method. Same as installDirectory(), but trailing "smodels/" removed.
+    
+    """
+    ret = installDirectory()
+    ret = ret.replace("/smodels/", "/")
+    return ret
 
 def version(astuple=False):
     """
@@ -71,5 +80,8 @@ if __name__ == "__main__":
             printHelp()
         if i == "--installdir": 
             print(installDirectory())
+            sys.exit(0)
+        if i == "--pythondir": 
+            print(pythonDirectory())
             sys.exit(0)
     printHelp()
