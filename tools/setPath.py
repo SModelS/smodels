@@ -2,7 +2,7 @@
 
 """                                                                                   
 .. module:: setPath
-   :synopsis: Sets the path such that e.g. "from tools import rootTools" works
+   :synopsis: Sets the path such that e.g. "from smodels.tools import toolBox" works
    correctly. Called as a script, the path is printed.
                                                                                       
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>             
