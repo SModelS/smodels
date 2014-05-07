@@ -213,7 +213,6 @@ def getLumi(analysis, run=None):
     Get the integrated luminosity for an analysis.
     
     """
-    logger.warning("getLumi is deprecated")
     lumifb = float(smsHelpers.getMetaInfoField(analysis, "lumi", run))
     return addunit(lumifb, "fb-1")
 
