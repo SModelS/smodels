@@ -9,8 +9,7 @@
 """
 
 from __future__ import print_function
-import sys
-sys.path.append("../")
+import setPath ## set to python path for smodels
 ## from smodels import SModelS
 from smodels.theory import slhaDecomposer
 ## from theory import lheDecomposer
