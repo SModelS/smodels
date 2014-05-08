@@ -9,10 +9,10 @@
     
 """
 
+import setPath
 from smodels.tools import xsecComputer
 import unittest
 import logging
-import setPath
 import logging.config
 
 class XSecTest(unittest.TestCase):
