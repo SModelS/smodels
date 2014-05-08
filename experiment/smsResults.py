@@ -10,7 +10,7 @@
 """
 
 from smodels.tools.physicsUnits import addunit, rmvunit
-from smodels.tools import rcFile
+## from smodels.tools import rcFile
 from smodels.experiment import smsHelpers
 from smodels.experiment.experimentExceptions import MetaInfoError
 from smodels.experiment.smsHelpers import getRun
