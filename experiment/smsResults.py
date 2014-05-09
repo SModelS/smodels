@@ -9,6 +9,7 @@
 
 """
 
+import setPath
 from smodels.tools.physicsUnits import addunit, rmvunit
 from smodels.tools import rcFile
 from smodels.experiment import smsHelpers
@@ -167,13 +168,19 @@ def getaxes(analysis, topology=None, run=None):
 
     return d
 
-
 def setBase(base):
     """
     Set the base directory of the database.
     
     """
     smsHelpers.base = base
+
+def getBase():
+    """
+    Return the base directory of the database.
+    
+    """
+    return smsHelpers.base
 
 def getURL(analysis, run=None):
     """
