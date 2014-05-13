@@ -25,12 +25,13 @@ class Element(object):
     def __init__(self, info=None):
         self.branches = [Branch(), Branch()]
         self.weight = crossSection.XSectionList()
-        self.mother = None 
+        self.mothers = [ "self" ]
         """ elements that come from compression can have mother elements.
-            None means: element is not due to compression. """
-        self.compressionAlgorithm = None 
-        """ if element is due to compression, what compression produced
-            the element? A string, e.g. "invisible", or "mass". """
+            "self": element is not due to compression. """
+        self.compressionAlgorithms = [ "direct" ]
+        """ what compressions if any produced
+            the element? Strings: "direct" (i.e. no compression), 
+            "invisible", "mass". """
 
         if info:
             # Create element from particle string
@@ -341,8 +342,8 @@ class Element(object):
         
         """
         newelement = self.copy()
-        newelement.compressionAlgorithm="mass"
-        newelement.mother = self.copy()
+        newelement.mothers = [ self.copy() ]
+        newelement.compressionAlgorithms = [ "mass" ]
 
         vertnumb = self.getEinfo()["vertnumb"]
         # Nothing to be compressed
@@ -396,8 +397,8 @@ class Element(object):
         
         """
         newelement = self.copy()
-        newelement.compressionAlgorithm="invisible"
-        newelement.mother = self.copy()
+        newelement.mothers = [ self.copy() ]
+        newelement.compressionAlgorithms = [ "invisible" ]
 
         vertnumb = self.getEinfo()["vertnumb"]
         # Nothing to be compressed

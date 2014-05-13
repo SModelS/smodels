@@ -27,9 +27,11 @@ class CompressionTest(unittest.TestCase):
             for element in topo.elementList:
                 if str(element)!="[[],[[nu],[ta+]]]":
                     continue
-                # print element,"mother:",element.mother,element.compressionAlgorithm
-                self.assertEqual ( str(element.mother),"[[[nu],[nu]],[[nu],[ta+]]]" )
-                self.assertEqual ( str(element.compressionAlgorithm),"invisible" )
+                print element,"mother:",element.mothers[0],element.compressionAlgorithms
+                self.assertEqual ( str(element.mothers[0]),"[[[nu],[nu]],[[nu],[ta+]]]" )
+                self.assertEqual ( len(element.mothers), 1 )
+                self.assertEqual ( str(element.compressionAlgorithms[0]),"invisible" )
+                self.assertEqual ( len(element.compressionAlgorithms), 1 )
 
     def testInvisibleNegative(self):
         """ test the invisible compression, a negative example """
@@ -38,12 +40,13 @@ class CompressionTest(unittest.TestCase):
         for topo in topos:
             if str(topo)!="[0][1,1,0]":
                 continue
-            for element in topo.elementList:
-                if str(element)!="[[],[[nu],[mu-]]]":
+            for e in topo.elementList:
+                if str(e)!="[[],[[nu],[mu-]]]":
                     continue
-                ## print element,"mother:",element.mother,element.compressionAlgorithm
-                self.assertEqual ( str(element.mother),"None" )
-                self.assertEqual ( str(element.compressionAlgorithm),"None" )
+                ## print element,"mother:",element.mothers,element.compressionAlgorithm
+                self.assertEqual ( str(e.mothers[0]),"self" )
+                self.assertEqual ( len(e.mothers),1 )
+                self.assertEqual ( str(e.compressionAlgorithms[0]),"direct" )
 
     def testMass(self):
         """ test the mass compression, a positive and negative example """
@@ -52,13 +55,14 @@ class CompressionTest(unittest.TestCase):
         for topo in topos:
             if str(topo)!="[1,1,0][1,0]":
                 continue
-            for element in topo.elementList:
-                if str(element)!="[[[e-],[nu]],[[ta+]]]":
+            for e in topo.elementList:
+                if str(e)!="[[[e-],[nu]],[[ta+]]]":
                     continue
-                masses=element.mother.getMasses()
+                masses=e.mothers[0].getMasses()
                 dm=(masses[1][1]-masses[1][2])/GeV
-                self.assertEqual ( str(element.mother),"[[[e-],[nu]],[[ta+],[ta-]]]")
-                self.assertEqual ( str(element.compressionAlgorithm),"mass" )
+                self.assertEqual(str(e.mothers[0]),"[[[e-],[nu]],[[ta+],[ta-]]]")
+                self.assertEqual(len(e.mothers),1 )
+                self.assertEqual(str(e.compressionAlgorithms[0]),"mass" )
                 self.assertTrue ( dm < 5.0 )
 
 if __name__ == "__main__":
