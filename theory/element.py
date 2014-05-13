@@ -153,6 +153,9 @@ class Element(object):
         for branch in self.branches:
             newel.branches.append(branch.copy())
         newel.weight = self.weight.copy()
+        import copy
+        newel.motherElements = copy.deepcopy( self.motherElements )
+        newel.compressionAlgorithms = copy.deepcopy( self.compressionAlgorithms )
         return newel
 
 
