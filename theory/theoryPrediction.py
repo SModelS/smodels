@@ -155,7 +155,7 @@ def _evalConditions(cluster, analysis):
                 for el1 in cluster.elements:
                     if el1.particlesMatch(el):
                         el.weight.combineWith(el1.weight)
-                        el.combinedMothers ( el1 ) ## keep track of all mothers
+                        el.combineMotherElements ( el1 ) ## keep track of all mothers
 
 
             if newcond.find("Cgtr") >= 0:
