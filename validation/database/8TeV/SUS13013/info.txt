@@ -1,0 +1,47 @@
+sqrts: 8.00
+lumi: 19.50
+exclusions: T7btbtWWM3300 1075 1075
+exclusions: T6ttWWx125 387 512
+exclusions: T5ttttLSP050 1042 1036
+exclusions: T1tttt 400 1059
+exclusions: T5WW020 700 945
+exclusions: T7btbtWWM3150 1075 1025
+exclusions: T6ttWWLSP050 537 537
+exclusions: T6ttWWx200 312 512
+exclusions: T5WW050 375 917
+expectedexclusions: T7btbtWWM3300 1070 1070
+expectedexclusions: T6ttWWx125 387 510
+expectedexclusions: T5ttttLSP050 1023 1036
+expectedexclusions: T1tttt 400 1046
+expectedexclusions: T5WW020 675 907
+expectedexclusions: T7btbtWWM3150 1075 1022
+expectedexclusions: T6ttWWLSP050 555 562
+expectedexclusions: T6ttWWx200 312 537
+expectedexclusions: T5WW050 375 916
+contact: Marc Dunser <marc.dunser@cern.ch>
+pas: SUS-13-013
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13013
+checked: 
+publisheddata: False
+private: 0
+condition: T6ttWW -> None
+condition: T5tttt -> None
+condition: T7btbtWW -> Not yet assigned
+condition: T1tttt -> None
+condition: T5WW -> None
+fuzzycondition: T6ttWW -> None
+fuzzycondition: T5tttt -> None
+fuzzycondition: T7btbtWW -> Not yet assigned
+fuzzycondition: T1tttt -> None
+fuzzycondition: T5WW -> None
+constraint: T6ttWW -> [[['t+'],['W-']],[['t+'],['W-']]]+[[['t-'],['W+']],[['t-'],['W+']]]+[[['t+'],['W-']],[['t-'],['W+']]]
+constraint: T5tttt -> [[['t+'],['t-']],[['t+'],['t-']]]+[[['t-'],['t+']],[['t-'],['t+']]]+[[['t+'],['t-']],[['t-'],['t+']]]
+constraint: T7btbtWW -> Not yet assigned
+constraint: T1tttt -> [[['t+','t-']],[['t+','t-']]]
+constraint: T5WW -> [[['jet','jet'],['W']],[['jet','jet'],['W']]]
+category: T6ttWW -> thirdgen
+category: T5tttt -> hadronic, thirdgen
+category: T7btbtWW -> hadronic, thirdgen
+category: T1tttt -> hadronic
+category: T5WW -> hadronic
+axes: T1tttt: M1 M0, T5tttt: M1 M2 LSP050, T6ttWW: M1 M2 LSP050 - M1 M0 x200 - M1 M0 x125, T7btbtWW: M1 M2 M3150 LSP050 - M1 M2 M3300 LSP050, T5WW: M1 M0 020 - M1 M0 050

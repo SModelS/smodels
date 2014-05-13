@@ -1,0 +1,11 @@
+sqrts: 8.00
+lumi: 20.30
+contact: ?
+pas: ATLAS-CONF-2013-068
+prettyname: ATLAS monojet-like + c-tagging
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-068
+checked: 
+private: 0
+order: nlonll
+dictionary: 1
+axes: T2cc: M1 M0

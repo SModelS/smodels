@@ -1,0 +1,15 @@
+sqrts: 8.00
+lumi: 20.30
+contact: ?
+pas: SUSY-2013-04
+prettyname: ATLAS \ge 7 jets
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-04/
+checked: 
+private: 0
+dictionary: 1
+journal: arXiv:1308.1841
+condition: T1tttt -> None
+fuzzycondition: T1tttt -> None
+constraint: T1tttt -> [[['t','t']],[['t','t']]]
+category: T1tttt -> hadronic
+axes: T1tttt: M1 M0

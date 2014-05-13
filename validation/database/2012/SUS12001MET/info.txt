@@ -1,0 +1,10 @@
+sqrts: 7.00
+lumi: 4.98
+exclusions: T5gg 1043 1023
+expectedexclusions: T5gg 1028 1005
+exclusionsp1: T5gg 1080 1060
+exclusionsm1: T5gg 1007 983
+contact: Christian Autermann <christian.autermann@cern.ch>
+pas: SUS-12-001
+private: 1
+order: nlo

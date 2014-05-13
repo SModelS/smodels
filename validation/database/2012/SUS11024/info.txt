@@ -1,0 +1,24 @@
+sqrts: 7.00
+lumi: 4.70
+exclusions: T1bbbb 712 1062
+exclusions: T2tt 300 390 436
+exclusions: T1tttt 712 1086
+exclusions: T2bb 418 418
+expectedexclusions: T1bbbb 659 735
+expectedexclusions: T2tt 362 362
+expectedexclusions: T1tttt 663 938
+expectedexclusions: T2bb 346 346
+exclusionsp1: T1bbbb 735 1136
+exclusionsp1: T2tt 411 452
+exclusionsp1: T1tttt 712 1212
+exclusionsp1: T2bb 441 441
+exclusionsm1: T1bbbb 712 1004
+exclusionsm1: T2tt 381 431
+exclusionsm1: T1tttt 712 998
+exclusionsm1: T2bb 401 404
+contact: Maurizio Pierini, Christopher Rogan
+pas: SUS-11-024 SUS-12-005
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS11024
+publisheddata: True
+private: 0
+order: nlonll

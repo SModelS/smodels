@@ -1,0 +1,15 @@
+sqrts: 8.00
+lumi: 20.70
+contact: ?
+pas: ATLAS-CONF-2013-025
+prettyname: ATLAS heavy stop
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-025/
+x: T6ttZZ: x1C180
+checked: AL
+private: 0
+order: nlonll
+condition: T6ttZZ -> None
+fuzzycondition: T6ttZZ -> None
+constraint: T6ttZZ -> [[['Z'],['t']],[['Z'],['t']]]
+category: T6ttZZ -> thirdgen
+axes: T6ttZZ: M1 M0 x100C180

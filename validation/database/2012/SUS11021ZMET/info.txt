@@ -1,0 +1,15 @@
+sqrts: 7.00
+lumi: 4.98
+exclusions: T5ZZ075 812 950
+exclusions: T5ZZgmsb 912 687
+exclusions: T5ZZ050 612 912
+exclusions: T5ZZ025 612 837
+contact: Frederic Ronga <Frederic.Ronga@cern.ch>
+pas: SUS-11-021
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS11021
+private: 0
+order: nlo
+figures: T5ZZ: https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS11021/SMS_T5zz_2jets.pdf T5zzl: https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS11021/SMS_T5zzl_2jets.png, T5zzh: https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS11021/SMS_T5zzh.png
+journal: Physics Letters B, Volume 716, Issue 2, 19 September 2012, Pages 260-284. (http://www.sciencedirect.com/science/article/pii/S0370269312008635)
+bibtex: http://www.hephy.at/user/walten/zmet.bib
+axes: T5ZZ: M1 M0 025 - M1 M0 050 - M1 M0 075 - M1 M0 gmsb

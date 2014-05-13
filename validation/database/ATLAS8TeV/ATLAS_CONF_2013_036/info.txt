@@ -1,0 +1,15 @@
+sqrts: 8.00
+lumi: 20.70
+contact: ?
+pas: ATLAS-CONF-2013-036
+prettyname: ATLAS multileptons
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-036/
+x: TChiChiSlepSlep: 050
+private: 0
+order: nlonll
+dictionary: 1
+condition: TChiChiSlepSlep -> [[['l+'],['l-']],[['l+'],['l-']]] ~ [[['l-'],['l+']],[['l-'],['l+']]], 2.*[[['l+'],['l-']],[['l+'],['l-']]] ~ [[['l+'],['l-']],[['l-'],['l+']]], [[['mu+'],['mu-']],[['e+'],['e-']]] ~ 2.*[[['mu+'],['mu-']],[['mu+'],['mu-']]], [[['mu+'],['mu-']],[['e+'],['e-']]] ~ 2.*[[['e+'],['e-']],[['e+'],['e-']]], [[['mu-'],['mu+']],[['e-'],['e+']]] ~ 2.*[[['e-'],['e+']],[['e-'],['e+']]], [[['mu-'],['mu+']],[['e-'],['e+']]] ~ 2.*[[['mu-'],['mu+']],[['mu-'],['mu+']]], [[['mu+'],['mu-']],[['e-'],['e+']]] ~ 2.*[[['e+'],['e-']],[['e-'],['e+']]], [[['mu+'],['mu-']],[['e-'],['e+']]] ~ 2.*[[['mu+'],['mu-']],[['mu-'],['mu+']]]
+fuzzycondition: TChiChiSlepSlep -> cSim([[['l+'],['l-']],[['l+'],['l-']]],[[['l-'],['l+']],[['l-'],['l+']]],0.5*[[['l+'],['l-']],[['l-'],['l+']]]); cSim([[['mu+'],['mu-']],[['e+'],['e-']]],2.*[[['mu+'],['mu-']],[['mu+'],['mu-']]],2.*[[['e+'],['e-']],[['e+'],['e-']]]); cSim([[['mu-'],['mu+']],[['e-'],['e+']]],2.*[[['e-'],['e+']],[['e-'],['e+']]],2.*[[['mu-'],['mu+']],[['mu-'],['mu+']]]); cSim([[['mu+'],['mu-']],[['e-'],['e+']]],2.*[[['e+'],['e-']],[['e-'],['e+']]],2.*[[['mu+'],['mu-']],[['mu-'],['mu+']]])
+constraint: TChiChiSlepSlep -> [[['l+'],['l-']],[['l+'],['l-']]]+[[['l-'],['l+']],[['l-'],['l+']]]+[[['l+'],['l-']],[['l-'],['l+']]]
+category: TChiChiSlepSlep -> eweakino
+axes: TChiChiSlepSlep: M1 M0 050 - M1 M2 D(M1/M0)=080

@@ -1,0 +1,12 @@
+sqrts: 8.00
+lumi: 13.00
+exclusions: T2llnunubb 500 650
+exclusions: T2FVttcc 0 0
+expectedexclusions: T2llnunubb 500 500
+expectedexclusions: T2FVttcc 300 300
+contact: Sezen (ARC),  Sarah Alam Malik, Robyn Lucas, Anwar Bhatti
+pas: SUS-13-009 (EXO-12-048)
+url: https://twiki.cern.ch/twiki/bin/view/CMS/SUS13009
+private: 1
+order: nlonll
+comment: not yet pre-approved

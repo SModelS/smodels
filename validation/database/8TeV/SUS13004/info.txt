@@ -1,0 +1,23 @@
+sqrts: 8.00
+lumi: 19.30
+expectedexclusions: T2tt 300 325 737
+expectedexclusions: T1bbbb 300 850 1359
+expectedexclusions: T1tttt 300 400 1257
+contact: Maurizio Pierini <Maurizio.Pierini@cern.ch>, Javier Duarte <jduarte@caltech.edu>
+pas: SUS-13-004
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13004
+publisheddata: True
+private: 0
+condition: T2tt -> None
+condition: T1bbbb -> None
+condition: T1tttt -> None
+fuzzycondition: T2tt -> None
+fuzzycondition: T1bbbb -> None
+fuzzycondition: T1tttt -> None
+constraint: T1bbbb -> [[['b','b']],[['b','b']]]
+constraint: T2tt -> [[['t']],[['t']]]
+constraint: T1tttt -> [[['t','t']],[['t','t']]]
+category: T2tt -> thirdgen
+category: T1bbbb -> hadronic
+category: T1tttt -> hadronic
+axes: T2tt: M1 M0, T1tttt: M1 M0, T1bbbb: M1 M0
