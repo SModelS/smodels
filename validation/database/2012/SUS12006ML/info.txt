@@ -1,7 +1,0 @@
-sqrts: 7.00
-lumi: 4.98
-exclusions: TChiChipmSlepL 100 390 497
-expectedexclusions: TChiChipmSlepL 100 430 513
-contact: Fedor Ratnikov <fedor.ratnikov@gmail.com>??
-pas: SUS-12-006
-private: 0
