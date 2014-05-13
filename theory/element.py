@@ -25,12 +25,12 @@ class Element(object):
     def __init__(self, info=None):
         self.branches = [Branch(), Branch()]
         self.weight = crossSection.XSectionList()
-        self.motherElements = [ "self" ]
+        self.motherElements = [ "uncompressed" ]
         """ elements that come from compression can have mother elements.
-            "self": element is not due to compression. """
-        self.compressionAlgorithms = [ "direct" ]
+            "uncompressed": element is not due to compression. """
+        self.compressionAlgorithms = [ "none" ]
         """ what compressions if any produced
-            the element? Strings: "direct" (i.e. no compression), 
+            the element? Strings: "none" (i.e. no compression), 
             "invisible", "mass". """
 
         if info:

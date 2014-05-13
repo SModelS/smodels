@@ -44,11 +44,11 @@ class CompressionTest(unittest.TestCase):
             for e in topo.elementList:
                 if str(e)!="[[[nu],[mu-]],[[mu+],[mu-]]]":
                     continue
-                #if len(e.motherElements)==1 and e.motherElements[0]=="self":
+                #if len(e.motherElements)==1 and e.motherElements[0]=="uncompressed":
                 #    print topo,e,e.motherElements
-                self.assertEqual ( str(e.motherElements[0]),"self" )
+                self.assertEqual ( str(e.motherElements[0]),"uncompressed" )
                 self.assertEqual ( len(e.motherElements),1 )
-                self.assertEqual ( str(e.compressionAlgorithms[0]),"direct" )
+                self.assertEqual ( str(e.compressionAlgorithms[0]),"none" )
 
     def testMass(self):
         """ test the mass compression, a positive and negative example """
