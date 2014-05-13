@@ -1,0 +1,15 @@
+sqrts: 7.00
+lumi: 4.98
+exclusions: TChiChipmSlepL025 450 500
+exclusions: TChiChipmSlepL075 450 500
+exclusions: TChiChipmSlepL050 475 500
+expectedexclusions: TChiChipmSlepL025 450 500
+expectedexclusions: TChiChipmSlepL075 425 475
+expectedexclusions: TChiChipmSlepL050 450 500
+contact: Benjamin Hooberman <hooberman@gmail.com>, Marc Dunser <marc.dunser@cern.ch>
+pas: SUS-12-006
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS12006
+private: 0
+order: lo
+figures: TChiChipmSlepL: 8b, TChiChipmSlepL025: 8a, TChiChipmSlepL075: 8c (twiki)
+axes: TChiChipmSlepL: M1 M0 025 - M1 M0 050 - M1 M0 075

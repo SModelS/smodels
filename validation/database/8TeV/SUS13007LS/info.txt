@@ -1,0 +1,11 @@
+sqrts: 8.00
+lumi: 19.30
+exclusions: T1tttt 300 495 1225
+expectedexclusions: T1tttt 300 755 1228
+contact: Christopher West <christopher.alan.west@cern.ch>, Paul Geffert <pbgeff@cern.ch>
+pas: SUS-13-007
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13007
+private: 1
+comment: is part of the RA4 result, thats why I made it private
+condition: T1tttt -> None
+constraint: T1tttt -> [[['t','t']],[['t','t']]]

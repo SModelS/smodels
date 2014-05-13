@@ -1,0 +1,17 @@
+sqrts: 8.00
+lumi: 9.20
+exclusions: T1tttt 300 555 555
+expectedexclusions: T1tttt 300 796 925
+contact: Peter Thomassen <thomassen@physics.rutgers.edu>, Sunil Somalwar <somalwar@physics.rutgers.edu>
+pas: SUS-12-026
+prettyname: multileptons
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS12026
+checked: AL
+publisheddata: True
+private: 0
+superseded_by: SUS13002 (more data)
+condition: T1tttt -> None
+fuzzycondition: T1tttt -> None
+constraint: T1tttt -> [[['t+','t-']],[['t+','t-']]]
+category: T1tttt -> hadronic
+axes: T1tttt: M1 M0

@@ -1,0 +1,8 @@
+sqrts: 8.00
+lumi: 4.04
+contact: David Mason
+pas: SUS-12-018
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS12018
+private: 0
+order: nlonll
+journal: http://cds.cern.ch/record/1460385

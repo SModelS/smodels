@@ -1,0 +1,48 @@
+sqrts: 8.00
+lumi: 19.50
+exclusions: T7btbtWWM3300 300 1075 1075
+exclusions: T6ttWWx125 300 437 562
+exclusions: T5ttttLSP050 300 1030 1012
+exclusions: T1tttt 300 495 495
+exclusions: T7btbtWWM3150 300 1075 1025
+exclusions: T6ttWWLSP050 300 607 612
+exclusions: T6bbZZD110 300 412 462
+exclusions: T6ttWWx200 300 312 612
+exclusions: T1ttttPieter 300 762 1036
+expectedexclusions: T7btbtWWM3300 300 1025 1025
+expectedexclusions: T6ttWWx125 300 387 487
+expectedexclusions: T5ttttLSP050 300 987 987
+expectedexclusions: T1tttt 300 887 587
+expectedexclusions: T7btbtWWM3150 300 1025 1025
+expectedexclusions: T6ttWWLSP050 300 530 537
+expectedexclusions: T6bbZZD110 300 362 387
+expectedexclusions: T6ttWWx200 300 312 512
+expectedexclusions: T1ttttPieter 300 712 1003
+contact: Lesya Shchutska <lesya.shchutska@cern.ch>
+pas: SUS-13-008
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13008
+publisheddata: True
+private: 0
+private_topologies: T1ttttPieter
+journal: http://cds.cern.ch/record/1547560
+condition: T6ttWW -> None
+condition: T1tttt -> None
+condition: T6bbZZ -> None
+condition: T7btbtWW -> None
+condition: T5tttt -> None
+fuzzycondition: T6ttWW -> None
+fuzzycondition: T1tttt -> None
+fuzzycondition: T6bbZZ -> None
+fuzzycondition: T7btbtWW -> None
+fuzzycondition: T5tttt -> None
+constraint: T6ttWW -> [[['t'],['W']],[['t'],['W']]]
+constraint: T1tttt -> [[['t','t']],[['t','t']]]
+constraint: T6bbZZ -> [[['b'],['Z']],[['b'],['Z']]]
+constraint: T7btbtWW -> [[['b'],['t'],['W']],[['b'],['t'],['W']]]
+constraint: T5tttt -> [[['t'],['t']],[['t'],['t']]]
+category: T6ttWW -> thirdgen
+category: T1tttt -> hadronic
+category: T6bbZZ -> thirdgen
+category: T7btbtWW -> hadronic, thirdgen
+category: T5tttt -> hadronic, thirdgen
+axes: T1tttt: M1 M0, T5tttt: M1 M2 LSP050, T6ttWW: M1 M2 LSP050 - M1 M0 x200 - M1 M0 x125, T7btbtWW: M1 M2 M3150 LSP050 - M1 M2 M3300 LSP050, T6bbZZ: M1 M2 D(M2/M0)=110

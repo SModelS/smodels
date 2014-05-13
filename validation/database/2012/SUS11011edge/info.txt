@@ -1,0 +1,11 @@
+sqrts: 7.00
+lumi: 4.98
+exclusions: T3lh 825 962
+expectedexclusions: T3lh 850 1087
+exclusionsp1: T3lh 875 1012
+exclusionsm1: T3lh 800 912
+contact: Daniel Sprenger, Niklas Mohr, Ben Hooberman
+pas: SUS-11-011
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS11011
+private: 0
+order: nlonll

@@ -1,0 +1,18 @@
+lumi: 4.98
+exclusions: T3W 500 750
+exclusions: T3W025 425 725
+exclusions: T3W075 475 775
+expectedexclusions: T3W 475 750
+expectedexclusions: T3W025 425 700
+expectedexclusions: T3W075 475 725
+exclusionsp1: T3W 475 725
+exclusionsp1: T3W025 400 675
+exclusionsp1: T3W075 475 750
+exclusionsm1: T3W 475 725
+exclusionsm1: T3W025 400 675
+exclusionsm1: T3W075 475 750
+contact: Loukas Gouskos <Loukas.Gouskos@cern.ch>
+pas: SUS-12-010
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS12010, arxiv:1212.6428
+private: 1
+order: nlonll

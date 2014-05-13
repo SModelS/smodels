@@ -1,0 +1,12 @@
+sqrts: 7.00
+lumi: 4.93
+exclusions: T5gg 1066 1024
+exclusions: T5Wg 881 765
+exclusionsm1: T5Wg 864 759
+contact: Christian Autermann <christian.autermann@cern.ch>, Manfred Paulini
+pas: SUS-12-001
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS12001
+private: 0
+order: nlo
+figures: arXiv:1211.4784 Figure 6 left(T5wg) right(T5gg)
+journal: arXiv:1211.4784

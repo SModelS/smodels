@@ -1,0 +1,11 @@
+sqrts: 7.00
+lumi: 4.98
+exclusions: T3lh 700 800
+expectedexclusions: T3lh 687 800
+exclusionsp1: T3lh 712 850
+exclusionsm1: T3lh 650 775
+contact: Ben Hooberman and who?
+pas: SUS-11-011
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS110115fb
+private: 1
+order: nlonll

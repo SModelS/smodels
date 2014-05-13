@@ -1,0 +1,10 @@
+sqrts: 7.00
+lumi: 4.98
+exclusions: TChiChipmSlepL 100 390 497
+expectedexclusions: TChiChipmSlepL 100 430 513
+contact: Benjamin Hooberman <hooberman@gmail.com>, Marc Dunser <marc.dunser@cern.ch>
+pas: SUS-12-006
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS12006
+private: 0
+order: nlo
+comment: Upper limit for TChiChipmSlepL consists of two histograms (limit, limit2), just saved "limit" as python dict. Analysis not important for SModels because it's just a part of COMBLEPTONS which has better limits

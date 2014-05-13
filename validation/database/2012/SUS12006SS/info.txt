@@ -1,0 +1,9 @@
+sqrts: 7.00
+lumi: 4.98
+exclusions: TChiChipmSlepL 312 423
+expectedexclusions: TChiChipmSlepL 312 423
+contact: Marc Duenser <marc.dunser@cern.ch>
+pas: SUS-12-006
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS12006
+private: 0
+order: nlo
