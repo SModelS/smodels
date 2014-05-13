@@ -14,7 +14,7 @@ from smodels.tools.physicsUnits import addunit, rmvunit
 from smodels.tools import rcFile
 from smodels.experiment import smsHelpers
 from smodels.experiment.experimentExceptions import MetaInfoError
-from smodels.experiment.smsHelpers import getRun
+from smodels.experiment.smsHelpers import base, getRun, runs
 import logging
 
 logger = logging.getLogger(__name__)
@@ -181,6 +181,21 @@ def getBase():
     
     """
     return smsHelpers.base
+
+def setRuns(runs):
+    """
+    Set the runs used.
+    
+    """
+    smsHelpers.runs = runs
+
+def get():
+    """
+    Return the base directory of the database.
+    
+    """
+    return smsHelpers.base
+
 
 def getURL(analysis, run=None):
     """
