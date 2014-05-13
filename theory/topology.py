@@ -3,9 +3,9 @@
 """
 .. module:: theory.Topology
    :synopsis: Provides a Topology class and a TopologyList collection type.
-    
+
 .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
-    
+
 """
 
 from smodels.theory import crossSection
@@ -19,15 +19,15 @@ logger = logging.getLogger(__name__)
 class Topology(object):
     """
     An instance of this class represents a topology.
-    
+
     """
     def __init__(self, elements=None):
         """
         Constructor.
-        
+
         If elements is defined, create the topology from it. If elements it is
         a list, all elements must share a common global topology.
-        
+
         """
         self.vertnumb = []
         self.vertparts = []
@@ -40,6 +40,16 @@ class Topology(object):
                 for element in elements:
                     self.addElement(element)
 
+    def __str__(self):
+        """
+        Return string with numbers of particles per vertex, e.g.
+        [1,0],[2,1,0]
+
+        """
+        ret=""
+        for p in self.vertparts:
+            ret+="%s" % str(p).replace(" ","")
+        return ret
 
     def __eq__(self, other):
         return self.isEqual(other)
@@ -52,13 +62,13 @@ class Topology(object):
     def isEqual(self, other, order=False):
         """
         Check for equality of two topologies.
-        
+
         If order == False and each topology has two branches, ignore branch
         ordering.
-        
+
         :returns: True, if both topologies have the same number of vertices and
                   particles.
-        
+
         """
         if type(self) != type(other):
             return False
@@ -83,11 +93,11 @@ class Topology(object):
     def checkConsistency(self):
         """
         Perform a consistency check.
-        
+
         The number of vertices and insertions per vertex is redundant
         information in a topology, so we can perform an internal consistency
         check.
-        
+
         """
         for element in self.elementList:
             info = element.getEinfo()
@@ -104,7 +114,7 @@ class Topology(object):
     def describe(self):
         """
         Create a detailed description of the topology.
-        
+
         """
         ret = ("number of vertices: %s, number of vertex particles: %s, "
                "number of elements: %d" % \
@@ -115,7 +125,7 @@ class Topology(object):
     def getElements(self):
         """
         Get list of elements of the topology.
-        
+
         """
         return self.elementList
 
@@ -123,11 +133,11 @@ class Topology(object):
     def addElement(self, newelement):
         """
         Add an Element object to the elementList.
-        
+
         For all the pre-existing elements, which match the new element, add
         weight. If no pre-existing elements match the new one, add it to the
         list. If order == False, try both branch orderings.
-        
+
         """
         # If the topology info has not been set yet, set it using the element
         # info
@@ -183,7 +193,7 @@ class Topology(object):
     def _getTinfo(self):
         """
         Return a dictionary with the topology number of vertices and vertparts.
-        
+
         """
         return {'vertnumb' : self.vertnumb, 'vertparts' : self.vertparts}
 
@@ -191,7 +201,7 @@ class Topology(object):
     def getTotalWeight(self):
         """
         Return the sum of all elements weights.
-        
+
         """
         if len(self.elementList) == 0:
             return None
@@ -206,12 +216,12 @@ class Topology(object):
 class TopologyList(Printer):
     """
     An instance of this class represents an iterable collection of topologies.
-    
+
     """
     def __init__(self, topologies=[]):
         """
         Add topologies sequentially, if provided.
-        
+
         """
         super(TopologyList, self).__init__()
         self.topos = []
@@ -241,7 +251,7 @@ class TopologyList(Printer):
     def addList(self, parList):
         """
         TODO: write docstring
-        
+
         """
         for topo in parList:
             self.add(topo)
@@ -250,7 +260,7 @@ class TopologyList(Printer):
     def describe(self):
         """
         TODO: write docstring
-        
+
         """
         s = "TopologyList:\n"
         for topo in self.topos:
@@ -261,13 +271,13 @@ class TopologyList(Printer):
     def add(self, newTopology):
         """
         Check if elements in newTopology matches an entry in self.topos.
-        
+
         If it does, add weight. If the same topology exists, but not the same
         element, add element. If neither element nor topology exist, add the
         new topology and all its elements.
 
-        :type topo: Topology    
-        
+        :type topo: Topology
+
         """
         topmatch = False
         for itopo, topo in enumerate(self.topos):
@@ -284,7 +294,7 @@ class TopologyList(Printer):
     def getTotalWeight(self):
         """
         Return the sum of all topologies total weights.
-        
+
         """
         sumw = crossSection.XSectionList()
         for topo in self:
@@ -297,7 +307,7 @@ class TopologyList(Printer):
     def getElements(self):
         """
         Return a list with all the elements in all the topologies.
-        
+
         """
         elements = []
         for top in self.topos:
@@ -308,7 +318,7 @@ class TopologyList(Printer):
     def prepareData(self):
         """
         Select data preparation method through dynamic binding.
-        
+
         """
         return Printer.prepareTopologyListData(self)
 
