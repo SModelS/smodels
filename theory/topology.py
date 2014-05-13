@@ -160,6 +160,7 @@ class Topology(object):
             if element == newelement:
                 added = True
                 element.weight.combineWith(newelement.weight)
+                element.combineMotherElements(newelement)
                 # When combining elements with different mothers, erase mother
                 # info
                 if element.getMothers() != newelement.getMothers():

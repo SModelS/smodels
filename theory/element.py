@@ -25,7 +25,7 @@ class Element(object):
     def __init__(self, info=None):
         self.branches = [Branch(), Branch()]
         self.weight = crossSection.XSectionList()
-        self.mothers = [ "self" ]
+        self.motherElements = [ "self" ]
         """ elements that come from compression can have mother elements.
             "self": element is not due to compression. """
         self.compressionAlgorithms = [ "direct" ]
@@ -60,6 +60,12 @@ class Element(object):
                 for ib, branch in enumerate(info):
                     self.branches[ib] = branch.copy()
 
+    def combineMotherElements ( self, el2 ):
+        """ combine mother elements from self and el1 into self """
+        for m in el2.motherElements:
+            self.motherElements.append ( m )
+        for a in el2.compressionAlgorithms:
+            self.compressionAlgorithms.append ( a )
 
     def __eq__(self, other):
         return self.isEqual(other)
@@ -342,7 +348,7 @@ class Element(object):
         
         """
         newelement = self.copy()
-        newelement.mothers = [ self.copy() ]
+        newelement.motherElements = [ self.copy() ]
         newelement.compressionAlgorithms = [ "mass" ]
 
         vertnumb = self.getEinfo()["vertnumb"]
@@ -397,7 +403,7 @@ class Element(object):
         
         """
         newelement = self.copy()
-        newelement.mothers = [ self.copy() ]
+        newelement.motherElements = [ self.copy() ]
         newelement.compressionAlgorithms = [ "invisible" ]
 
         vertnumb = self.getEinfo()["vertnumb"]
