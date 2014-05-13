@@ -39,11 +39,13 @@ class CompressionTest(unittest.TestCase):
         slhafile="../inputFiles/slha/andrePT4.slha"
         topos = slhaDecomposer.decompose ( slhafile, .1*fb, False, True, 5.*GeV )
         for topo in topos:
-            if str(topo)!="[1,0][1,1,0]":
+            if str(topo)!="[1,1,0][1,1,0]":
                 continue
             for e in topo.elementList:
-                if str(e)!="[[[ta+]],[[nu],[ta-]]]":
+                if str(e)!="[[[nu],[mu-]],[[mu+],[mu-]]]":
                     continue
+                #if len(e.motherElements)==1 and e.motherElements[0]=="self":
+                #    print topo,e,e.motherElements
                 self.assertEqual ( str(e.motherElements[0]),"self" )
                 self.assertEqual ( len(e.motherElements),1 )
                 self.assertEqual ( str(e.compressionAlgorithms[0]),"direct" )
