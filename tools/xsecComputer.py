@@ -24,6 +24,9 @@ import sys
 
 logger = logging.getLogger(__name__)
 
+LO=0
+NLO=1
+NLL=2
 
 def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None,
                 externaldir=None):
