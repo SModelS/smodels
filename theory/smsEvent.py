@@ -1,5 +1,5 @@
 """
-.. module:: SmsEvent
+.. module:: smsEvent
    :synopsis: Provides a class that encapsulates an LHE or SLHA event.
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>

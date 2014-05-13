@@ -3,7 +3,8 @@
 """
 .. module:: nllFast
    :synopsis: This module provides methods to access the nllfast grid and
-   compute k-factors (when available) to SUSY pair production cross-sections.
+              compute k-factors (when available) to SUSY pair 
+              production cross-sections.
 
 .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -45,7 +46,7 @@ def getKfactorsFor(pIDs, sqrts, slhafile, pdf='cteq'):
     pair.
 
     :returns: k-factors = None, if NLLfast does not contain the process; uses
-    the slhafile to obtain the SUSY spectrum.
+              the slhafile to obtain the SUSY spectrum.
     
     """
     if not os.path.isfile(slhafile):

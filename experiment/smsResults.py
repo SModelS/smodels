@@ -14,7 +14,7 @@ from smodels.tools.physicsUnits import addunit, rmvunit
 from smodels.tools import rcFile
 from smodels.experiment import smsHelpers
 from smodels.experiment.experimentExceptions import MetaInfoError
-from smodels.experiment.smsHelpers import base, getRun, runs
+from smodels.experiment.smsHelpers import getRun
 import logging
 
 logger = logging.getLogger(__name__)
@@ -64,8 +64,8 @@ def getConstraints(analysis, topology="all", run=None):
     Get constraints of an analysis.
 
     :returns: dictionary of constraints, if topology == "all"; single
-    constraint for the passed topology, if only one topology is passed; None if
-    non-existent;
+              constraint for the passed topology, if only one topology is passed; 
+              None if non-existent;
 
     """
     key = analysis + topology + str(run)
@@ -99,8 +99,8 @@ def getConditions(analysis, topology="all", fuzzy=True, run=None):
     Get conditions of an analysis.
 
     :returns: dictionary of conditions, if topology == "all"; single condition
-    for the passed topology, if only one topology is passed; None if
-    non-existent
+              for the passed topology, if only one topology is passed; None if
+              non-existent.
 
     """
     key = analysis + topology + str(fuzzy) + str(run)
@@ -181,21 +181,6 @@ def getBase():
     
     """
     return smsHelpers.base
-
-def setRuns(runs):
-    """
-    Set the runs used.
-    
-    """
-    smsHelpers.runs = runs
-
-def get():
-    """
-    Return the base directory of the database.
-    
-    """
-    return smsHelpers.base
-
 
 def getURL(analysis, run=None):
     """
@@ -302,7 +287,7 @@ def getUpperLimit(analysis, topology, mx=None, my=None, run=None,
     Get the upper limit for run/analysis/topology.
 
     :returns: None, if it does not exist; entire dictionary, if mx and my are
-    None; upper limit at mx/my, if mx and my are floats;
+              None; upper limit at mx/my, if mx and my are floats;
 
     """
     run = smsHelpers.getRun(analysis, run)
@@ -340,7 +325,7 @@ def getInterpolatedUpperLimitDelaunay(dictionary, inmx, inmy):
     Get interpolated upper limit from dictionary at point (inmx, inmy).
 
     :param dictionary: dictionary (sms.py), contains upper limits of one
-    analysis and one topology
+                       analysis and one topology
     :param inmx: mass point on x-axis
     :param inmy: mass point on y-axis
     :returns: interpolated upper limit at point (inmx, inmy)

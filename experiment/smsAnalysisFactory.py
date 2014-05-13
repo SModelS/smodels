@@ -24,11 +24,11 @@ def load(analyses=None, topologies=None, sqrts=[7, 8]):
     Create an analysis objects from the info given in the SMS results database.
 
     :param analyses: If a list of analyses is passed, create only objects for
-    these analyses (the database naming convention is used).
+                     these analyses (the database naming convention is used).
     :param topologies: If a list of topologies is passed, only these topologies
-    are considered.
+                       are considered.
     :param sqrts: Array of center-of-mass energies of the analyses that are to
-    be considered.
+                  be considered.
     :returns: list of analyses
     
     """

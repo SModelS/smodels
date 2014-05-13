@@ -1,9 +1,9 @@
 """
-.. module:: AuxiliaryFunctions
+.. module:: printer
    :synopsis: Facility used in classes to derive from and be able to print
-   different data types in different forms.
+              different data types in different forms.
 
-   .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
+.. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
 """
 
 from __future__ import print_function
@@ -26,7 +26,7 @@ class Printer(object):
         Print the content of the data structure to the target.
 
         :param target: The target to print to. Possible values: stdout, html.
-        Default: stdout.
+                       Default: stdout.
         :returns: None
         
         """

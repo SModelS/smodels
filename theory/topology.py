@@ -57,7 +57,7 @@ class Topology(object):
         ordering.
         
         :returns: True, if both topologies have the same number of vertices and
-        particles.
+                  particles.
         
         """
         if type(self) != type(other):

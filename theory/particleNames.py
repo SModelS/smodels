@@ -3,7 +3,7 @@
 """
 .. module:: ParticleNames
    :synopsis: Provides functions for getting particle names from pdg ids, and
-   other helpers.
+              other helpers.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
@@ -168,7 +168,7 @@ def simParticles(ptype1, ptype2, useDict=True):
     :param ptype1: first (nested) list of particle names, e.g. ['l','jet']
     :param ptype2: second (nested) list of particle names 
     :param useDict: use the translation dictionary, i.e. allow e to stand for
-    e+ or e-, l+ to stand for e+ or mu+, etc 
+                    e+ or e-, l+ to stand for e+ or mu+, etc 
     :returns: boolean
     
     """

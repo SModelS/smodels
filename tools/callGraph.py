@@ -3,12 +3,10 @@
 """
 .. module:: callGraph
    :synopsis: Call pycallgraph to create call graphs of simpleExample for
-   different input files.
-   
-   Usage: has to be invoked in the SModelS root directory:
-   
-   >>> python -m tools.callGraph
-   >>> python -m tools.callGraph --max-depth 3
+              different input files.
+              Usage: has to be invoked in the SModelS root directory:
+              >>> python -m tools.callGraph
+              >>> python -m tools.callGraph --max-depth 3
 
 .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
 

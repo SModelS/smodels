@@ -1,6 +1,6 @@
-""" TODO: write synopsis
+"""
 .. module:: theory.element
-   :synopsis: missing
+   :synopsis: missing TODO write synopsis
     
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
     
@@ -331,7 +331,7 @@ class Element(object):
         Perform mass compression.
         
         :returns: compressed copy of the element, if two masses in this
-        topology are degenerate; None, if compression is not possible;
+                  topology are degenerate; None, if compression is not possible;
         
         """
         newelement = self.copy()

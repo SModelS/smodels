@@ -1,6 +1,6 @@
-""" TODO: write synopsis
+"""
 .. module:: theory.branch
-   :synopsis: missing
+   :synopsis: missing TODO write it
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
         
@@ -167,11 +167,11 @@ def decayBranches(branchList, brDictionary, massDictionary,
     
     :param branchList: list of Branch() objects containing the initial mothers
     :param brDictionary: branching ratio dictionary for all particles appearing
-    in the decays
+                         in the decays
     :param massDictionary: mass dictionary for all particles appearing in the
-    decays
+                           decays
     :param sigcut: minimum sigma*BR to be generated, by default sigcut = 0.
-    (all branches are kept)
+                   (all branches are kept)
     
     """
 

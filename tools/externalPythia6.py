@@ -102,8 +102,8 @@ class ExternalPythia6(ExternalTool):
         parameter file.
         
         :param replacements: dictionary of strings and values; the strings will
-        be replaced with the values; the dictionary keys must be strings
-        present in the config file
+                             be replaced with the values; the dictionary keys 
+                             must be strings present in the config file
         
         """
         f = open(self.tempdir + "/temp.cfg")
@@ -141,8 +141,9 @@ class ExternalPythia6(ExternalTool):
         
         :param slhafile: SLHA file
         :param cfgfile: optionally supply a new config file; if not supplied,
-        use the one supplied at construction time; this config file will not be
-        touched or copied;  it will be taken as is
+                        use the one supplied at construction time; 
+                        this config file will not be touched or copied;  
+                        it will be taken as is
         :returns: stdout and stderr, or error message
         
         """
