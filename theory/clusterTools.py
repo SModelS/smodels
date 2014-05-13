@@ -1,6 +1,6 @@
-""" TODO: write synopsis
+"""
 .. module:: theory.clusterTools
-   :synopsis: missing
+   :synopsis: missing TODO write it
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
         
@@ -196,7 +196,7 @@ def clusterElements(elements, analysis, maxDist):
     Cluster the original elements according to their mass distance.
     
     :returns: list of clusters; If keepMassInfo == True, saves the original
-    masses and their cluster value in massDict.
+              masses and their cluster value in massDict.
     
     """
     # Get the list of elements with good masses (with the masses replaced by

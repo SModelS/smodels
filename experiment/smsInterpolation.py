@@ -1,12 +1,10 @@
 """
 .. module:: experiment.smsInterpolation
-   :synopsis: TODO: write synopsis
-   
-   smsInterpolation is called by smsResults.getSmartUpperLimit. UpperLimit
-   takes arbitrary input masses and checks if there is a corresponding upper
-   limit for the given analysis and topology. The upper limit is returned in
-   'pb'. If several histograms with different x-values are available, an
-   interpolation is performed.
+   :synopsis: smsInterpolation is called by smsResults.getSmartUpperLimit. UpperLimit
+       takes arbitrary input masses and checks if there is a corresponding upper
+       limit for the given analysis and topology. The upper limit is returned in
+       'pb'. If several histograms with different x-values are available, an
+       interpolation is performed.
 
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
 
@@ -26,9 +24,9 @@ def upperLimit(analysis, topology, masses, run=None):
     Return upper limit for analysis-topology for given masses. 
     
     :param masses: list of masses, with (mother, intermediate(s), LSP). For
-    intermediate masses: if possible do interpolation over upper limits for
-    different x-values. If interpolation is not possible: check if masses are
-    comparable to the assumptions in the histogram.
+           intermediate masses: if possible do interpolation over upper limits for
+           different x-values. If interpolation is not possible: check if masses are
+           comparable to the assumptions in the histogram.
     
     """
     d = smsResults.getaxes(analysis, topology)

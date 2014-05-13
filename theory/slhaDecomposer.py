@@ -23,21 +23,22 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
     Perform SLHA-based decomposition.
     
     :param slhafile: file with mass spectrum and branching ratios and
-    optionally with cross-sections
+                     optionally with cross-sections
     :param Xsec: optionally a dictionary with cross-sections for pair
-    production, by default reading the cross sections from the SLHA file.
+                 production, by default reading the cross sections 
+                 from the SLHA file.
     :param XsecsInfo: information about the cross-sections (sqrts, order and
-    label). Only relevant for Xsec=None (reading from slha file). If defined as
-    input or in crossSection.XSectionInfo restricts the cross-sections values
-    in the SLHA file to the ones in XsecsInfo. If not defined, it will be
-    generated from the SLHA file and stored in crossSection.XSectionInfo. Only
-    generated if cross-sections are read from SLHA file and not previously
-    created
+           label). Only relevant for Xsec=None (reading from slha file). If defined 
+           as input or in crossSection.XSectionInfo restricts the 
+           cross-sections values in the SLHA file to the ones in XsecsInfo. 
+           If not defined, it will be generated from the SLHA file and stored in 
+           crossSection.XSectionInfo. Only generated if cross-sections are read 
+           from SLHA file and not previously created
     :param sigcut: minimum sigma*BR to be generated, by default sigcut = 0.1 fb
     :param doCompress: turn mass compressed topologies on/off
     :param doInvisible: turn invisibly compressed topologies on/off
     :param minmassgap: maximum value for considering two R-odd particles
-    degenerate (only revelant for doCompress=True)        
+                       degenerate (only revelant for doCompress=True)        
     :returns: TopologyList
      
     """

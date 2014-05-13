@@ -22,7 +22,7 @@ def limit(analysis, addTheoryPredictions=[]):
     Get limit from an analysis object.
 
     :param addTheoryPredictions: list of theory predictions to add, e.g.,
-    [ '7 TeV (NLL)', '7 TeV (LO)' ]
+                                 [ '7 TeV (NLL)', '7 TeV (LO)' ]
     :type addTheoryPredictions: [String]
     """
     sqrts = rmvunit(analysis.sqrts, "TeV")

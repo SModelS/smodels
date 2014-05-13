@@ -1,7 +1,8 @@
 """
 .. module:: theory.analysis
    :synopsis: Encapsulates all data types around one result of one analysis,
-   i.e. the association with one plot and one reference cross section result.
+              i.e. the association with one plot and one 
+              reference cross section result.
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
         
@@ -95,7 +96,7 @@ class SRanalysis(object):
         (dummy for now)
         
         :returns: experimental upper limit for cross-section in the signal
-        region
+                  region
         
         """
         return False

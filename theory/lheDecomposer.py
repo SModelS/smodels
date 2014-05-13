@@ -1,6 +1,6 @@
 """
 .. module:: theory.lheDecomposer
-:synopsis: Decomposition of LHE events and creation of TopologyLists 
+   :synopsis: Decomposition of LHE events and creation of TopologyLists 
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
@@ -23,13 +23,13 @@ def decompose(lhefile, inputXsecs=None, nevts=None, doCompress=False,
 
     :param lhefile: LHE file with e.g. pythia events
     :param inputXsecs: xSectionList object with cross-sections for the mothers
-    appearing in the LHE file. If None, use information from file.
+           appearing in the LHE file. If None, use information from file.
     :param nevts: (maximum) number of events used in the decomposition. If
-    None, all events from file are processed.
+                  None, all events from file are processed.
     :param doCompress: mass compression option (True/False)
     :param doInvisible: invisible compression option (True/False)
     :param minmassgap: minimum mass gap for mass compression (only used if
-    doCompress=True)
+                       doCompress=True)
     :returns: TopologyList object 
     
     """
@@ -67,7 +67,7 @@ def elementFromEvent(event, weight=None):
     
     :param event: LHE event
     :param weight: event weight. Must be a XSectionList object (usually with a
-    single entry) or None if not specified.
+                   single entry) or None if not specified.
     :returns: element
     
     """

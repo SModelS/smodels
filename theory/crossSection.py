@@ -1,7 +1,7 @@
 """
 .. module:: theory.crossSection
    :synopsis: Encapsulates the result of the computation of the reference
-   cross section.
+              cross section.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -481,7 +481,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None):
     
     :param slhafile: SLHA input file with cross-sections
     :param useXSecs: if defined enables the user to select cross-sections to
-    use. Must be a XSecInfoList object
+                     use. Must be a XSecInfoList object
     :returns: a XSectionList object    
      
     """
@@ -536,7 +536,7 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
     
     :param lhefile: LHE input file with unweighted MC events
     :param addEvents: if True, add cross-sections with the same mothers,
-    otherwise return the event weight for each pair of mothers
+                      otherwise return the event weight for each pair of mothers
     :returns: a XSectionList object
     
     """

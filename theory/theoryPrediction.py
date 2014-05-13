@@ -1,7 +1,7 @@
 """
 .. module:: theory.theoryPrediction
    :synopsis: Provides a class to encapsulate the results of the computation of
-   reference cross sections and related functions.
+              reference cross sections and related functions.
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
         
