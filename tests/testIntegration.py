@@ -2,8 +2,8 @@
 
 """
 .. module:: testIntegration
-   :synopsis: Integration test, tests a simple but
-              complete use case.
+   :synopsis: Integration test, tests a simple but complete use case.
+              Uses the database in smodels/validation/database.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
@@ -49,7 +49,9 @@ class IntegrationTest(unittest.TestCase):
         from smodels.SModelS import installDirectory
         from smodels.tools.physicsUnits import fb, GeV
         from smodels.theory import slhaDecomposer
-        from smodels.experiment import smsAnalysisFactory
+        from smodels.experiment import smsAnalysisFactory, smsHelpers
+        smsHelpers.base = installDirectory() + 'validation/database/'
+        smsHelpers.runs = [ "2012" ]
         slhafile = installDirectory()+'inputFiles/slha/andrePT4.slha'
         self.configureLogger()
         smstoplist = slhaDecomposer.decompose(slhafile, .1*fb, doCompress=True,

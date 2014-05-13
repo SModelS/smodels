@@ -1,7 +1,0 @@
-sqrts: 7.00
-lumi: 4.98
-exclusions: T3lh 650 800
-contact: ?
-pas: SUS-11-011
-private: 0
-order: nlo

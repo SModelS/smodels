@@ -1,9 +1,0 @@
-sqrts: 7.00
-lumi: 4.98
-exclusions: T1tttt 400 625 975
-exclusionsp1: T1tttt 400 650 1000
-exclusionsm1: T1tttt 400 600 925
-contact: WW
-pas: SUS-11-027
-private: 0
-order: nlonll

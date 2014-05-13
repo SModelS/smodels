@@ -1,8 +1,0 @@
-sqrts: 8.00
-lumi: 19.50
-exclusions: T1tttt 300 775 1358
-expectedexclusions: T1tttt 300 775 1325
-pas: 
-private: 1
-order: nlonll
-axes: T1tttt: M1 M0
