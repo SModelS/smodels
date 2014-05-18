@@ -29,7 +29,6 @@ def configure():
     # sys.path.append(base[:-9])
     return base
 
-
 configure()
 
 if __name__ == "__main__":

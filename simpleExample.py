@@ -18,11 +18,13 @@ from smodels.experiment import smsAnalysisFactory
 from smodels.theory.theoryPrediction import theoryPredictionFor
 ## import logging
 
+
 def main():
     """
     Main program. Displays basic use case.
 
     """
+    
     slhafile = 'inputFiles/slha/andrePT4.slha'
     # lhefile = 'inputFiles/lhe/ued_1.lhe'
 

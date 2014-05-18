@@ -8,7 +8,7 @@
 
 import copy
 import time
-from smodels.theory import element, topology, crossSection
+from smodels.theory import element, topology, crossSection, particleNames
 from smodels.theory.branch import Branch, decayBranches
 from smodels.tools import modpyslha as pyslha
 from smodels.tools.physicsUnits import addunit, rmvunit
@@ -113,15 +113,33 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
 def _getDictionariesFromSLHA(slhafile):
     """
     Create mass and BR dictionaries from an SLHA file.
+    Ignore decay blocks with R-parity violating or unknown decays
     
     """
 
     res = pyslha.readSLHAFile(slhafile)
+    
+    rOdd = particleNames.rOdd.keys()
+    rEven = particleNames.rEven.keys()
+    knownParticles = rOdd + rEven
 
     # Get mass and branching ratios for all particles
     brDic = {}
     for pid in res.decays.keys():
-        brs = copy.deepcopy(res.decays[pid].decays)
+        if pid in rEven:
+            logger.warning("Ignoring %s decays",particleNames.rEven[pid])
+            continue
+        brs = []
+        for decay in res.decays[pid].decays:
+            nEven = nOdd = 0.
+            for id in decay.ids:
+                if id in rOdd: nOdd += 1
+                elif id in rEven: nEven += 1
+            if nOdd + nEven == len(decay.ids) and nOdd == 1:
+                brs.append(decay)
+            else:
+                logger.warning("Ignoring decay: %i -> [%s]",pid,decay.ids)
+
         brsConj = copy.deepcopy(brs)
         for br in brsConj:
             br.ids = [-x for x in br.ids]
