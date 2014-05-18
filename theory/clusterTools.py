@@ -93,6 +93,21 @@ class IndexCluster(object):
 
     def __getitem__(self, iel):
         return list(self.indices)[iel]
+    
+    def copy(self):
+      
+      newcluster = IndexCluster()
+      newcluster.indices = set(list(self.indices)[:])
+      newcluster.avgPosition = self.avgPosition
+      if type(self.positionMap) == type(dict()):
+          newcluster.positionMap = dict(self.positionMap.items())
+      else: newcluster.positionMap = None
+      if type(self.massMap) == type(dict()):
+          newcluster.massMap = dict(self.massMap.items())
+      else: newcluster.massMap = None
+      newcluster.analysis = self.analysis
+      
+      return newcluster
 
 
     def add(self, iels):
@@ -229,9 +244,9 @@ def _doCluster(elements, analysis, maxDist):
     clusterList = []
     for iel in posMap:
         indices = [iel]
-        for jel in posMap:
+        for jel in posMap:            
             if distance(posMap[iel], posMap[jel]) <= maxDist:
-                indices.append(jel)
+                indices.append(jel)        
         indexCluster = IndexCluster(massMap, posMap, set(indices), analysis)
         clusterList.append(indexCluster)
 
@@ -256,7 +271,7 @@ def _doCluster(elements, analysis, maxDist):
             for iel in indexCluster:
                 dist = indexCluster._getDistanceTo(iel)
                 if max(dist, distAvg) > maxDist:
-                    newcluster = indexCluster
+                    newcluster = indexCluster.copy()
                     newcluster.remove(iel)
                     if not newcluster in newClusters:
                         newClusters.append(newcluster)

@@ -40,12 +40,8 @@ def _memoize(func):
 
 @_memoize
 def massPosition(mass, analysis):
-    """ TODO: clarify nounit
-    Give mass position in upper limit space.
-    
-    Use the analysis experimental limit data. If nounit == True, the result is
-    given as number assuming fb units.
-    
+    """ Give mass position in upper limit space.    
+    Use the analysis experimental limit data.    
     """
     xmass = analysis.getUpperLimitFor(mass)
     if type(xmass) != type(addunit(1., 'pb')):
@@ -65,6 +61,7 @@ def distance(xmass1, xmass2):
     if distanceValue < 0.:
         # Skip masses without an upper limit
         return None
+    
     return distanceValue
 
 
