@@ -26,12 +26,14 @@ class Element(object):
         self.branches = [Branch(), Branch()]
         self.weight = crossSection.XSectionList()
         self.motherElements = []
-        """ elements that come from compression can have mother elements.
-            "uncompressed": element is not due to compression. """
-        self.compressionAlgorithms = []
-        """ what compressions if any produced
-            the element? Strings: "none" (i.e. no compression), 
-            "invisible", "mass". """
+        """ Elements that arise from compression have mother elements.
+            Mother elements are pairs of ( whence, element ),
+            'whence' describing what the element is from 
+            (mass compression, invisible compression, etc),
+            while 'element' is the actual object.
+            If element is not due to compression, 
+            then list remains empty.
+        """
 
         if info:
             # Create element from particle string
@@ -61,11 +63,17 @@ class Element(object):
                     self.branches[ib] = branch.copy()
 
     def combineMotherElements ( self, el2 ):
-        """ combine mother elements from self and el1 into self """
+        """ combine mother elements from self and el2 into self """
+        if len(self.motherElements)==0: 
+            # no mothers? then you yourself are mother!
+            tmp=self.copy()
+            self.motherElements.append ( ("combine", tmp) )
         for m in el2.motherElements:
-            self.motherElements.append ( m.copy() )
-        for a in el2.compressionAlgorithms:
-            self.compressionAlgorithms.append ( a )
+            self.motherElements.append ( (m[0], m[1].copy()) )
+        if len(el2.motherElements)==0: 
+            # no mothers? then yo yourself are mother now
+            tmp=el2.copy()
+            self.motherElements.append ( ("combine", tmp) )
 
     def __eq__(self, other):
         return self.isEqual(other)
@@ -154,8 +162,8 @@ class Element(object):
             newel.branches.append(branch.copy())
         newel.weight = self.weight.copy()
         import copy
-        newel.motherElements = copy.deepcopy( self.motherElements )
-        newel.compressionAlgorithms = copy.deepcopy( self.compressionAlgorithms )
+        # if len(self.motherElements)>=0:
+        newel.motherElements = copy.deepcopy( self.motherElements ) 
         return newel
 
 
@@ -351,8 +359,7 @@ class Element(object):
         
         """
         newelement = self.copy()
-        newelement.motherElements = [ self.copy() ]
-        newelement.compressionAlgorithms = [ "mass" ]
+        newelement.motherElements = [ ("mass", self.copy()) ]
 
         vertnumb = self.getEinfo()["vertnumb"]
         # Nothing to be compressed
@@ -406,8 +413,7 @@ class Element(object):
         
         """
         newelement = self.copy()
-        newelement.motherElements = [ self.copy() ]
-        newelement.compressionAlgorithms = [ "invisible" ]
+        newelement.motherElements = [ ("invisible", self.copy()) ]
 
         vertnumb = self.getEinfo()["vertnumb"]
         # Nothing to be compressed

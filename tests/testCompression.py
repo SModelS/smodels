@@ -28,11 +28,10 @@ class CompressionTest(unittest.TestCase):
                 if str(element)!="[[],[[nu],[ta+]]]":
                     continue
                 # print element,"mother:",element.motherElements,element.compressionAlgorithms,element.weight
-                self.assertEqual ( str(element.motherElements[0]),"[[[nu],[nu]],[[nu],[ta+]]]" )
+                self.assertEqual ( str(element.motherElements[0][1]),"[[[nu],[nu]],[[nu],[ta+]]]" )
                 ## 6 neutrino flavors get added!
                 self.assertEqual ( len(element.motherElements), 6 ) 
-                self.assertEqual ( str(element.compressionAlgorithms[0]),"invisible" )
-                self.assertEqual ( len(element.compressionAlgorithms), 6 )
+                self.assertEqual ( str(element.motherElements[0][0]),"invisible" )
 
     def testInvisibleNegative(self):
         """ test the invisible compression, a negative example """
@@ -60,11 +59,11 @@ class CompressionTest(unittest.TestCase):
             for e in topo.elementList:
                 if str(e)!="[[[e-],[nu]],[[ta+]]]":
                     continue
-                masses=e.motherElements[0].getMasses()
+                masses=e.motherElements[0][1].getMasses()
                 dm=(masses[1][1]-masses[1][2])/GeV
-                self.assertEqual(str(e.motherElements[0]),"[[[e-],[nu]],[[ta+],[ta-]]]")
+                self.assertEqual(str(e.motherElements[0][1]),"[[[e-],[nu]],[[ta+],[ta-]]]")
                 self.assertEqual(len(e.motherElements),1 )
-                self.assertEqual(str(e.compressionAlgorithms[0]),"mass" )
+                self.assertEqual(str(e.motherElements[0][0]),"mass" )
                 self.assertTrue ( dm < 5.0 )
 
 if __name__ == "__main__":
