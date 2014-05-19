@@ -25,10 +25,10 @@ class Element(object):
     def __init__(self, info=None):
         self.branches = [Branch(), Branch()]
         self.weight = crossSection.XSectionList()
-        self.motherElements = [ "uncompressed" ]
+        self.motherElements = []
         """ elements that come from compression can have mother elements.
             "uncompressed": element is not due to compression. """
-        self.compressionAlgorithms = [ "none" ]
+        self.compressionAlgorithms = []
         """ what compressions if any produced
             the element? Strings: "none" (i.e. no compression), 
             "invisible", "mass". """
@@ -63,7 +63,7 @@ class Element(object):
     def combineMotherElements ( self, el2 ):
         """ combine mother elements from self and el1 into self """
         for m in el2.motherElements:
-            self.motherElements.append ( m )
+            self.motherElements.append ( m.copy() )
         for a in el2.compressionAlgorithms:
             self.compressionAlgorithms.append ( a )
 
