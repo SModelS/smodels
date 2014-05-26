@@ -163,7 +163,8 @@ class Element(object):
         newel.weight = self.weight.copy()
         import copy
         # if len(self.motherElements)>=0:
-        newel.motherElements = copy.deepcopy( self.motherElements ) 
+        ## newel.motherElements = copy.deepcopy( self.motherElements ) 
+        newel.motherElements = self.motherElements[:]
         return newel
 
 
