@@ -61,18 +61,25 @@ def getKfactorsFor(pIDs, sqrts, slhafile, pdf='cteq'):
 
     # Obtain relevant masses
     readfile = pyslha.readSLHAFile(slhafile)
-    gluinomass = abs(readfile.blocks['MASS'].entries[1000021])
-    squarkmass = sum([abs(readfile.blocks['MASS'].entries[pid])
+    masses=readfile.blocks['MASS']
+    check_pids=squarks+gluinos+third
+    for check in check_pids:
+      if not check in masses.entries:
+          logger.error ( "cannot compute k factor for pdgid %d: " \
+              " no particle mass given. will set mass to inf." % check )
+          masses.entries[check]=1.e10
+
+    gluinomass = abs(masses.entries[1000021])
+    squarkmass = sum([abs(masses.entries[pid])
                       for pid in squarks]) / 8.
     pid1, pid2 = sorted(pIDs)
     if pid1 in antisquarks and pid2 in squarks:
-        squarkmass = (abs(readfile.blocks['MASS'].entries[abs(pid1)]) +
-                      abs(readfile.blocks['MASS'].entries[pid2])) / 2
+        squarkmass = (abs(masses.entries[abs(pid1)]) +
+                      abs(masses.entries[pid2])) / 2.
     elif pid1 in squarks and pid2 in squarks:
-        squarkmass = (abs(readfile.blocks['MASS'].entries[pid1]) +
-                      abs(readfile.blocks['MASS'].entries[pid2])) / 2
+        squarkmass = (abs(masses.entries[pid1]) + abs(masses.entries[pid2])) / 2.
     elif abs(pid1) == pid2 and pid2 in third:
-        squarkmass = abs(readfile.blocks['MASS'].entries[abs(pid1)])
+        squarkmass = abs(masses.entries[abs(pid1)])
 
     # Set up NLLfast run, the old way
     sqrtS = float(rmvunit(sqrts, 'TeV'))
