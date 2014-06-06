@@ -33,8 +33,11 @@ class ToolBox(object):
         import setPath
         from smodels.tools import externalPythia6
         from smodels.tools import externalNllFast
+        from smodels.tools import externalPythonTools
         self.add(externalPythia6.ExternalPythia6())
         for(sqrts, tool) in externalNllFast.nllFastTools.items():
+                self.add(tool)
+        for(name, tool) in externalPythonTools.pythonTools.items():
                 self.add(tool)
 
     def add(self, instance):
