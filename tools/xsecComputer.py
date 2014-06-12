@@ -28,8 +28,7 @@ LO=0
 NLO=1
 NLL=2
 
-def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None,
-                externaldir=None):
+def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True ):
     """
     Run pythia and compute SUSY cross-sections for the input SLHA file.
     
@@ -43,14 +42,11 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None,
     :param lhefile: LHE file. If None, do not write pythia output to file. If
                     file does not exist, write pythia output to this file name. If
                     file exists, read LO xsecs from this file (does not run pythia).
-    :param externaldir: location of pythia6 and nllfast folders. If not
-                        defined, it is set as current folder
+    :param unlink: Clean up temp directory after running pythia
     :returns: XSectionList object
     
     """
 
-    if not externaldir:
-        externaldir = os.getcwd() + '/external/'
     if not os.path.isfile(slhafile):
         logger.error("SLHA file %s not found.", slhafile)
         return None
@@ -60,7 +56,7 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None,
         else:
             logger.info("Writing pythia LHE output to " + lhefile)
     if not lhefile or not os.path.isfile(lhefile):
-        lheFile = runPythia(slhafile, nevts, rmvunit(sqrts, 'TeV'), lhefile)
+        lheFile = runPythia(slhafile, nevts, rmvunit(sqrts, 'TeV'), lhefile, unlink=unlink)
     else:
         lheFile = open(lhefile, 'r')
 
@@ -171,7 +167,7 @@ def xsecToBlock(xsec, inPDGs=(2212, 2212), comment=None):
     return header + "\n" + entry
 
 
-def runPythia(slhafile, nevts, sqrts, lhefile=None):
+def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True ):
     """
     Execute pythia_lhe with n events, at sqrt(s)=sqrts.
     
@@ -180,6 +176,7 @@ def runPythia(slhafile, nevts, sqrts, lhefile=None):
     :param sqrts: center of mass sqrt{s} (in TeV)
     :param lhefile: option to write LHE output to file; ff None, do not write
                     output to disk.
+    :param unlink: Clean up temp directory after running pythia
     :returns: file object with the LHE events
     
     """
@@ -190,7 +187,9 @@ def runPythia(slhafile, nevts, sqrts, lhefile=None):
     tool.replaceInCfgFile({"NEVENTS": nevts, "SQRTS":1000 * sqrts})
     tool.setParameter("MSTP(163)", "6")
 
-    lhedata = tool.run(slhafile)
+    if unlink==False:
+        logger.info ( "keeping temporary directory at %s" % tool.tempDirectory() )
+    lhedata = tool.run(slhafile, do_unlink=unlink )
     if not "<LesHouchesEvents" in lhedata:
         logger.error("LHE events not found in pythia output")
         return False
@@ -229,6 +228,8 @@ if __name__ == "__main__":
                            help="input file is an SLHA file")
     argparser.add_argument('-L', '--lhe', action='store_true',
                            help="input file is an LHE file")
+    argparser.add_argument('-k', '--keep', action='store_true',
+                           help="do not unlink temporary directory")
     argparser.add_argument('-n', '--NLO', action='store_true',
                            help="compute at the NLO level (default is LO)")
     argparser.add_argument('-N', '--NLL',
@@ -262,12 +263,10 @@ if __name__ == "__main__":
     if inputFile[-5:].lower() == ".slha" or args.slha:
         if args.tofile:
             logger.info("Computing SLHA cross section from %s and adding to "
-                        "SLHA file...", inputFile)
+                        "SLHA file ...", inputFile)
             for s in sqrtses:
                 ss = addunit(s, 'TeV')
-                external_dir = SModelS.installDirectory() + "/tools/external"
-                xsecs = computeXSec(ss, order, args.nevents, inputFile,
-                                    externaldir=external_dir)
+                xsecs = computeXSec(ss, order, args.nevents, inputFile, unlink=(not args.keep) )
                 comment = "Nevts: " + str(args.nevents)
                 addXSecToFile(xsecs, inputFile, comment)
             logger.info("... done.")
