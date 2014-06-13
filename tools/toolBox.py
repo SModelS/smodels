@@ -39,6 +39,9 @@ class ToolBox(object):
                 self.add(tool)
         for(name, tool) in externalPythonTools.pythonTools.items():
                 self.add(tool)
+        # from smodels.tools import externalPythia8
+        # self.add(externalPythia8.ExternalPythia8())
+        
 
     def add(self, instance):
         """
