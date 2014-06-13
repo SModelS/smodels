@@ -46,7 +46,7 @@ class ExternalPythia8(ExternalTool):
                 if a==None:
                     logger.error ( "could not find library lib%s.so" % i )
                     return False
-                # ctypes.cdll.LoadLibrary("lib%s.so" % i )
+                d=ctypes.CDLL ( "lib%s.so" % i, ctypes.RTLD_GLOBAL )
             except OSError,e:
                 logger.error("could not load library lib%s.so: %s" % (i,e) )
                 return False
