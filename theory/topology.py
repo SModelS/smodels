@@ -316,10 +316,10 @@ class TopologyList(Printer):
         return elements
 
 
-    def prepareData(self):
+    def formatData(self):
         """
         Select data preparation method through dynamic binding.
 
         """
-        return Printer.prepareTopologyListData(self)
+        return Printer.formatTopologyListData(self)
 

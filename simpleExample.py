@@ -9,14 +9,14 @@
 """
 
 from __future__ import print_function
-import setPath ## set to python path for smodels
-## from smodels import SModelS
+import setPath  # # set to python path for smodels
+# from smodels import SModelS
 from smodels.theory import slhaDecomposer
-## from smodels.theory import lheDecomposer
+# from smodels.theory import lheDecomposer
 from smodels.tools.physicsUnits import fb, GeV
 from smodels.experiment import smsAnalysisFactory
 from smodels.theory.theoryPrediction import theoryPredictionFor
-## import logging
+# import logging
 
 
 def main():
@@ -24,7 +24,7 @@ def main():
     Main program. Displays basic use case.
 
     """
-    
+
     slhafile = 'inputFiles/slha/andrePT4.slha'
     # lhefile = 'inputFiles/lhe/ued_1.lhe'
 
@@ -48,7 +48,6 @@ def main():
         theorypredictions = theoryPredictionFor(analysis, smstoplist)
         if not theorypredictions:
             continue
-        print(analysis.label)
         theorypredictions.printout()
 
 
