@@ -30,6 +30,14 @@ class TheoryPrediction(object):
         self.value = None
         self.conditions = None
         self.mass = None
+        
+    def getmaxCondition(self):      
+        maxcond = 0.
+        for value in self.conditions.values():
+          if value == 'N/A': return value
+          if value == None: continue
+          maxcond = max(maxcond,value)
+        return maxcond        
 
 
 class TheoryPredictionList(Printer):
@@ -168,6 +176,12 @@ def _evalConditions(cluster, analysis):
                 logger.warning(analysis.label + " using deprecated function "
                                "'Csim'. Auto-replacing with 'cSim'.")
 
-            conditions[cond] = eval(newcond)
-
+            conditionvalue = eval(newcond)
+            if type(conditionvalue) == type(crossSection.XSectionList()):
+                if len(conditionvalue) != 1:
+                  logger.error("Evaluation of conditions returned multiple values.")
+                conditions[cond] = conditionvalue[0].value
+            else:
+                conditions[cond] = conditionvalue
+                
         return conditions
