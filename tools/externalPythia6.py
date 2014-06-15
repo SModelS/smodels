@@ -83,7 +83,7 @@ class ExternalPythia6(ExternalTool):
         
         """
         logger.debug("Unlinking " + self.tempdir)
-        for inputFile in ["fort.61", "fort.68"]:
+        for inputFile in ["fort.61", "fort.68", "log" ]:
             if os.path.exists(self.tempdir + "/" + inputFile):
                 os.unlink(self.tempdir + "/" + inputFile)
         if unlinkdir:
@@ -135,7 +135,7 @@ class ExternalPythia6(ExternalTool):
         f.close()
 
 
-    def run(self, slhafile, cfgfile=None):
+    def run(self, slhafile, cfgfile=None, do_unlink=True):
         """
         Run Pythia.
         
@@ -144,6 +144,7 @@ class ExternalPythia6(ExternalTool):
                         use the one supplied at construction time; 
                         this config file will not be touched or copied;  
                         it will be taken as is
+        :param do_unlink: clean up temporary files after run?
         :returns: stdout and stderr, or error message
         
         """
@@ -157,7 +158,13 @@ class ExternalPythia6(ExternalTool):
              (self.tempdir, self.executable_path, cfg)
         logger.debug("Now running " + str(cmd))
         Out = commands.getoutput(cmd)
-        self.unlink(unlinkdir=False)
+        if do_unlink:
+            self.unlink(unlinkdir=False)
+        else:
+            f=open( self.tempdir + "/log","w")
+            f.write ( cmd + "\n\n\n" )
+            f.write ( Out + "\n" )
+            f.close()
         return Out
 
 

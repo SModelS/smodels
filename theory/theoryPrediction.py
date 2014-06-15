@@ -55,12 +55,12 @@ class TheoryPredictionList(Printer):
             yield theoryPrediction
 
 
-    def prepareData(self):
+    def formatData(self):
         """
         Select data preparation method through dynamic binding.
         
         """
-        return Printer.prepareTheoryPredictionData(self)
+        return Printer.formatTheoryPredictionData(self)
 
 
 def theoryPredictionFor(analysis, smsTopList, maxMassDist=0.2):
