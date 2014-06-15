@@ -32,7 +32,7 @@ class Printer(object):
         """
         # Branch, Element, Topology, TopologyList, Analysis, AnalysisList,
         # Cluster
-        self.output = self.prepareData()
+        self.output = self.formatData()
 
         if target == "stdout":
             print(self.output)
@@ -40,9 +40,9 @@ class Printer(object):
             pass
 
 
-    def prepareData(self):
+    def formatData(self):
         """
-        Prepare data of the derived object.
+        Format data of the derived object.
         
         Has to be implemented in the derived object. The real implementation is
         selected through dynamic binding.
@@ -53,9 +53,9 @@ class Printer(object):
         raise NotImplementedError
 
 
-    def prepareTopologyListData(self):
+    def formatTopologyListData(self):
         """
-        Prepare data of a TopologyList object.
+        Format data of a TopologyList object.
         
         """
         from tools import smsPrettyPrinter
@@ -97,6 +97,7 @@ class Printer(object):
                 evElementTable.add_row(["---", "---", "---", "---", "---",
                                         "---", "---"])
 
+        output += "\n"
         output += "Number of Global topologies = " + str(len(self)) + "\n\n"
         output += str(evTopTable) + "\n\n"
         output += "Total Number of Elements = " + str(eltot) + "\n"
@@ -106,21 +107,28 @@ class Printer(object):
         return output
 
 
-    def prepareTheoryPredictionData(self):
+    def formatTheoryPredictionData(self):
         """
-        Prepare data of a TheoryPrediction object.
+        Format data of a TheoryPrediction object.
         
         """
+        output = ""
+
         for theoryPrediction in self:
-            print("mass:", theoryPrediction.mass)
-            print("theory prediction:", theoryPrediction.value)
-            print("theory conditions:")
+            output += "\n"
+            output += "analysis: " + str(theoryPrediction.analysis) + "\n"
+            output += "mass: " + str(theoryPrediction.mass) + "\n"
+            output += "theory prediction: " + str(theoryPrediction.value) + \
+                      "\n"
+            output += "theory conditions:\n"
             if not theoryPrediction.conditions:
-                print(theoryPrediction.conditions)
+                output += "  " + theoryPrediction.conditions + "\n"
             else:
                 for cond in theoryPrediction.conditions:
-                    print(theoryPrediction.conditions[cond])
-            print("experimental limit:",
-                  theoryPrediction.analysis.getUpperLimitFor(theoryPrediction.\
-                                                             mass))
-            print("\n")
+                    output += "  " + str(theoryPrediction.conditions[cond]) + \
+                              "\n"
+            experimentalLimit = theoryPrediction.analysis.getUpperLimitFor(
+                    theoryPrediction.mass)
+            output += "experimental limit: " + str(experimentalLimit) + "\n"
+
+        return output
