@@ -132,3 +132,40 @@ class Printer(object):
             output += "experimental limit: " + str(experimentalLimit) + "\n"
 
         return output
+
+    def formatStatusData(self):
+        """
+        Format data of the output status object.
+        """
+        output = ""
+
+        output += "SLHA status: " + str(self.slhastatus) + "\n"
+        output += "Decomposition output status: "+str(self.status)+" "+status_strings[self.status] + "\n" #FIXME where should status strings go?
+        if slhastatus < 0: output += str(self.warnings) + "\n"
+        output += "================================================================================\n"
+
+        return output
+
+
+    def formatResultsData(self):
+        """
+        Format data of the final output object.
+        """
+        output = ""
+
+        if self.bestresultonly:
+            output += "The result with highest R value is\n"
+            self.outputarray = self.bestresult
+
+        output += "#Analysis  Topology  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r\n\n"
+        for op in self.outputarray:
+            output += "%19s %16s %4s %5s %10.3E %10.3E %10.3E\n"%(op.aname, op.topo, op.sqrts, op.cond, op.tval, op.exptval, op.rval)
+            if self.describeTopo: output += "#" + str(op.topo_description) + "\n"
+            if not op == self.outputarray[-1]: output += "--------------------------------------------------------------------------------\n"
+
+        for op in self.bestresult:
+            output += "\n \n"
+            output += "================================================================================\n"
+            output += "The highest R value is r_ratio = " + str(op.rval) + "\n"
+
+        return output
