@@ -169,3 +169,20 @@ class Printer(object):
             output += "The highest R value is r_ratio = " + str(op.rval) + "\n"
 
         return output
+
+    def formatSLHAData(self, maxcond):
+        """
+        Format data of the slha checks output object.
+        """
+        output = ""
+
+        output += "Input file: " + self.filename + "\n"
+        output += "Sigmacut: " + str(self.sigmacut) + "\n"
+        output += "Minmassgap: " + str(self.massgap) + "\n"
+        output += "Maxcond: " + str(maxcond) + "\n"
+        output += "LSP PID, mass: " + str(self.findLSP(returnmass=True)) + "\n"
+        output += "NLSP PID, mass: " + str(slhaStatus.findNLSP(returnmass=True)) + "\n"
+        output += "================================================================================\n"
+
+        return output
+
