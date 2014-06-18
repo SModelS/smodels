@@ -175,7 +175,11 @@ def _evalConditions(cluster, analysis):
         conditions = {}
         # Loop over conditions
         for cond in analysis.conditions:
-            conditions[cond] = _evalExpression(cond,cluster,analysis)
+            exprvalue = _evalExpression(cond,cluster,analysis)
+            if type(exprvalue) == type(crossSection.XSectionList()):
+                conditions[cond] = exprvalue[0].value
+            else:
+                conditions[cond] = exprvalue
                 
         return conditions    
         
@@ -212,6 +216,6 @@ def _evalExpression(stringExpr,cluster,analysis):
     if type(exprvalue) == type(crossSection.XSectionList()):
         if len(exprvalue) != 1:
             logger.error("Evaluation of expression "+expr+" returned multiple values.")
-        return exprvalue[0].value
+        return exprvalue
     else:
         return exprvalue
