@@ -195,6 +195,16 @@ class XSectionList(object):
 
     def __rmul__(self, other):
         return self * other
+      
+      
+    def __add__(self,other):
+        newList = self.copy()
+        if type(other) != type(self):
+            logger.warning("Trying to add a XSectionList and a "+str(type(other)))
+            return self
+      
+        newList.combineWith(other)
+        return  newList
 
 
     def __iter__(self):

@@ -12,6 +12,7 @@
 from __future__ import print_function
 from smodels.experiment import smsResults, smsHelpers
 from smodels.tools.physicsUnits import rmvunit
+from smodels.theory.particleNames import elementsInStr
 from smodels.theory import analysis
 from smodels.theory import element
 import logging
@@ -76,7 +77,7 @@ def load(analyses=None, topologies=None, sqrts=[7, 8]):
                 cond = cond.replace("'", "").replace(" ", "").split(';')
             newAnalysis.constraint = constraint
             newAnalysis.conditions = cond
-            newAnalysis.elementsEff = _getElementsEffs(constraint)
+            newAnalysis.elementsEff = _getElementsEffs(constraint,cond)
             # Add analysis to list of analyses:
             listOfAnalyses.append(newAnalysis)
 
@@ -95,27 +96,23 @@ def _getRealTopo(tx):
     return ret
 
 
-def _getElementsEffs(constraint):
+def _getElementsEffs(constraint,conditions):
     """
-    Generate a dictionary of elements with their simple efficiencies as values.
-    
-    Efficiencies are the values for an upper limit-type of analysis. This
-    equals the element multiplicative factor appearing in the constraint.
+    Generate a dictionary of elements with their simple efficiencies as values.    
+    Efficiencies are = 1. if the element appears in the constraint or conditions.
     
     """
     # Get element strings appearing in constraint
-    elStrings = _getArray(constraint)
-    cons = constraint.replace(" ", "")
-    cons = cons.replace("'", "")
+    elStrings = elementsInStr(constraint)
+    if conditions:
+        for cond in conditions: elStrings += elementsInStr(cond)
     elementsEff = {}
-    for el in elStrings:
-        newcons = cons.replace(el, "1.", 1)
-        for el2 in elStrings:
-            if el2 != el:
-                newcons = newcons.replace(el2, "0.", 1)
-        elEff = eval(newcons)
-        elementsEff[element.Element(el)] = elEff
+    elStrings = set(elStrings)
+    for elstr in elStrings:
+        el = element.Element(elstr)
+        elementsEff[el] = 1.
     return elementsEff
+
 
 
 def _getArray(constraint):

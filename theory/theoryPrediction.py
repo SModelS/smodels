@@ -84,7 +84,7 @@ def theoryPredictionFor(analysis, smsTopList, maxMassDist=0.2):
     for cluster in clusters:
         theoryPrediction = TheoryPrediction()
         theoryPrediction.analysis = analysis
-        theoryPrediction.value = cluster.getTotalXSec()
+        theoryPrediction.value = _evalConstraint(cluster,analysis)
         theoryPrediction.conditions = _evalConditions(cluster, analysis)
         theoryPrediction.mass = cluster.getAvgMass()
         predictions.append(theoryPrediction)
@@ -135,6 +135,27 @@ def _combineElements(elements, analysis, maxDist):
     return clusters
 
 
+def _evalConstraint(cluster, analysis):
+    """
+    Evaluate the analysis constraint inside an element cluster.
+    
+    If analysis type == upper limit, evaluates the analysis constraint inside
+    an element cluster.
+    
+    :retunrs: total cluster cross-section, if analysis type == signal region
+    
+    """    
+    
+    if type(analysis) == type(SRanalysis()):
+        return cluster.getTotalXSec()
+    elif type(analysis) == type(ULanalysis()):
+        if not analysis.constraint:
+            return analysis.constraint
+        
+        exprvalue = _evalExpression(analysis.constraint,cluster,analysis)
+        return exprvalue
+    
+
 def _evalConditions(cluster, analysis):
     """
     Evaluate the analysis conditions inside an element cluster.
@@ -144,7 +165,8 @@ def _evalConditions(cluster, analysis):
     
     :retunrs: None, if analysis type == signal region
     
-    """
+    """    
+    
     if type(analysis) == type(SRanalysis()):
         return None
     elif type(analysis) == type(ULanalysis()):
@@ -153,35 +175,43 @@ def _evalConditions(cluster, analysis):
         conditions = {}
         # Loop over conditions
         for cond in analysis.conditions:
-            # Get elements appearing in conditions
-            condElements = [element.Element(elStr) \
-                            for elStr in elementsInStr(cond)]
-            newcond = cond
-            for iel, el in enumerate(condElements):
-                newcond = newcond.replace(str(el), "condElements[" + str(iel) +
-                                          "].weight")
-                for el1 in cluster.elements:
-                    if el1.particlesMatch(el):
-                        el.weight.combineWith(el1.weight)
-                        el.combineMotherElements ( el1 ) ## keep track of all mothers
-
-
-            if newcond.find("Cgtr") >= 0:
-                newcond = newcond.replace("Cgtr", "cGtr")
-                logger.warning(analysis.label + " using deprecated function "
-                               "'Cgtr'. Auto-replacing with 'cGtr'.")
-
-            if newcond.find("Csim") >= 0:
-                newcond = newcond.replace("Csim", "cSim")
-                logger.warning(analysis.label + " using deprecated function "
-                               "'Csim'. Auto-replacing with 'cSim'.")
-
-            conditionvalue = eval(newcond)
-            if type(conditionvalue) == type(crossSection.XSectionList()):
-                if len(conditionvalue) != 1:
-                  logger.error("Evaluation of conditions returned multiple values.")
-                conditions[cond] = conditionvalue[0].value
-            else:
-                conditions[cond] = conditionvalue
+            conditions[cond] = _evalExpression(cond,cluster,analysis)
                 
-        return conditions
+        return conditions    
+        
+        
+def _evalExpression(stringExpr,cluster,analysis):
+    """
+    Auxiliary method to evaluate a string expression using the weights of the elements in the cluster.
+    
+    :return: cross-section value for the expression or expression value if it is not numerical (None,string,...)
+    """
+
+#Generate elements appearing in the string expression with zero cross-sections:
+    elements = []
+    for elStr in elementsInStr(stringExpr):
+        el = element.Element(elStr)      
+        elements.append(el)
+
+#Replace elements in strings by their weights and add weights from cluster to the elements list:
+    expr = stringExpr[:].replace("'","")           
+    for iel, el in enumerate(elements):        
+        expr = expr.replace(str(el), "elements["+ str(iel) +"].weight")        
+        for el1 in cluster.elements:                    
+            if el1.particlesMatch(el):
+                el.weight.combineWith(el1.weight)
+                el.combineMotherElements(el1) ## keep track of all mothers
+
+    if expr.find("Cgtr") >= 0 or expr.find("Csim") >= 0:
+        expr = expr.replace("Cgtr", "cGtr")
+        expr = expr.replace("Csim", "cSim")
+        logger.warning(analysis.label + " using deprecated functions "
+                               "'Cgtr'/'Csim'. Auto-replacing with 'cGtr'/'cSim'.")
+    
+    exprvalue = eval(expr)
+    if type(exprvalue) == type(crossSection.XSectionList()):
+        if len(exprvalue) != 1:
+            logger.error("Evaluation of expression "+expr+" returned multiple values.")
+        return exprvalue[0].value
+    else:
+        return exprvalue
