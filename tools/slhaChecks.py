@@ -13,7 +13,6 @@ from __future__ import print_function
 import setPath
 from smodels.tools import modpyslha as pyslha
 
-
 class SlhaStatus:
     """
     An instance of this class represents the status of an SLHA file.
@@ -22,19 +21,27 @@ class SlhaStatus:
     and -2 in case of formal problems, e.g. missing decay blocks, in the file
     The parameter maxFlightlength is specified in meters. 
     """
-    def __init__(self, filename, maxFlightlength=3., findMissingDecays=True,
+    def __init__(self, filename, maxFlightlength=3., maxDisplacement=.1, sigmacut=.01,
+                 findMissingDecays=True, findDisplaced=True, massgap=5.,
                  findEmptyDecays=True, checkXsec=True, checkLSP=True,
                  checkFlightlength=True, model="MSSM"):
         self.filename = filename
         self.model = model
         self.slha = self.read()
+        if not self.slha:
+            self.status = -3, "Could not read input slha"
+            return
         self.maxFlightlength = maxFlightlength
+        self.maxDisplacement = maxDisplacement
+        self.sigmacut = sigmacut
+        self.massgap = massgap
         self.lsp = self.findLSP()
         self.lspStatus = self.testLSP(checkLSP)
         self.ctauStatus = self.checkCtau(checkFlightlength)
         self.missingDecays = self.checkDecayBlock(findMissingDecays)
         self.emptyDecays = self.findEmptyDecay(findEmptyDecays)
         self.xsec = self.hasXsec(checkXsec)
+        self.vertexStatus = self.findDisplacedVertices(findDisplaced)
         self.status = self.evaluateStatus()
 
 
@@ -43,7 +50,8 @@ class SlhaStatus:
         Get pyslha output object.
         
         """
-        return pyslha.readSLHAFile(self.filename)
+        try: return pyslha.readSLHAFile(self.filename)
+        except: return None
 
 
     def evaluateStatus(self):
@@ -53,6 +61,8 @@ class SlhaStatus:
         :returns: a status flag and a message for explanation
 
         """
+        if not self.slha:
+            return -3, "Could not read input slha file"
         ret = 0
         retMes = "#Warnings:\n"
         for st, message in [self.missingDecays, self.emptyDecays,
@@ -62,14 +72,15 @@ class SlhaStatus:
                 retMes = retMes + "#" + message + ".\n"
             elif st == 1 and not ret == -2:
                 ret = 1
-        for st, message in [self.lspStatus, self.ctauStatus]:
+        for st, message in [self.lspStatus, self.ctauStatus,
+                            self.vertexStatus]:
             if st < 0:
                 ret = -1
                 retMes = retMes + "#" + message + ".\n"
         if ret == 0:
             return 0, "No checks performed"
         if ret == -1:
-            return -1, "#ERROR: charged lsp or long-lived NLSP.\n" + retMes
+            return -1, "#ERROR: special signatures in this point.\n" + retMes
         if ret == -2:
             return -2, retMes
         return ret, "Input file ok" 
@@ -159,7 +170,7 @@ class SlhaStatus:
         for line in f:
             if "XSECTION" in line:
                 return 1, "XSECTION table present"
-        return -1, "XSECTION table missing"
+        return -1, "XSECTION table missing, will be computed by SModelS"
 
 
     def testLSP(self, checkLSP):
@@ -224,7 +235,7 @@ class SlhaStatus:
         Calculate the sum of all branching ratios for particle with pid.
         
         """
-        decaylist = self.slha[1][pid].decays
+        decaylist = self.slha.decays[pid].decays
         totalBR = 0.
         for entry in decaylist:
             totalBR += entry.br
@@ -297,6 +308,66 @@ class SlhaStatus:
         nlsp = self.findNLSP()
         return self.deltaMass(lsp, nlsp)
 
+    def findDisplacedVertices(self, findDisplaced):
+        """
+        find meta-stable particles that decay via leptons or higgs
+        """
+        if not findDisplaced:
+            return 0, "Did not check for displaced vertices"
+
+        particlelist = [1, 2, 3, 4, 5, 6, 11, 13, 15, 25, 35, 36, 37]
+        ok = 1
+        msg = "Found displaced vertices:\n"
+        for particle,block in self.slha.decays.items():
+            if particle <= 50: continue
+            if particle == self.findLSP(): continue
+            if self.slha.blocks["MASS"][particle] - self.slha.blocks["MASS"][self.findLSP()] < self.massgap: continue
+            lt = self.getLifetime(particle, ctau=True)
+            if lt<self.maxDisplacement: continue
+            pcs = 0.
+            brvalue = 0.
+            old = 0.
+            daughters = []
+            for decay in block.decays:
+                for pid in decay.ids:
+                    if abs(pid) in particlelist:
+                        if not pcs: pcs = self.getXSEC(particle)
+                        brvalue += decay.br
+                        daughters.append(decay.ids)
+                        break
+            if pcs*brvalue*brvalue > self.sigmacut:
+                if lt < 1.: msg = msg + "#Displaced vertex: "
+                elif lt < 3.: msg = msg + "#Metastable particle: "
+                else: msg = msg + "#Longlived particle decay: "
+                ok = -1
+                msg = msg + "%s is decaying to %s\n" %(particle, str(daughters))
+        if ok == 1: msg = "no displaced vertices found"
+        return ok, msg
+
+    def getXSEC(self, pid, sqrts=8000.):
+        """
+        get crosssection for pair production, read last line
+        """
+        inblock = None
+        xsec = 0.
+        pid = abs(int(pid))
+        for line in open(self.filename):
+            line=line.split('#')[0]
+            if not line.strip(): continue
+            lineelements = line.split()
+            if lineelements[0]=="XSECTION":
+                if float(lineelements[1])==sqrts:
+                    if abs(int(lineelements[-1]))==abs(int(lineelements[-2]))==pid:
+                        inblock = True
+                        continue
+                    else: inblock = None
+                else: inblock = None
+            if not inblock: continue
+            if not line.strip():
+                inblock=None
+                continue
+            xsec += float(line.split()[-3])
+        return xsec
 
     def degenerateChi(self):
         """
@@ -320,7 +391,7 @@ class Qnumbers:
     
     """
     def __init__(self, pid, model="MSSM"):
-        exec("from smodels.tools.%s_qNumbers import qNumbers" %model)
+        exec("from tools.%s_qNumbers import qNumbers" %model)
         self.pid = pid
         self.model = model
         if not pid in qNumbers.keys():
@@ -358,9 +429,21 @@ if __name__ == "__main__":
     argparser.add_argument('-m', '--model',
                            help = 'give input model, e.g. MSSM',
                            default = 'MSSM')
+    argparser.add_argument('-maxDisp', '--displacement',
+                           help = 'give maximum displacement of secondary vertex in m',
+                           default = .001)
+    argparser.add_argument('-sigmacut','--sigmacut',
+                           help = 'give sigmacut in fb', #FIXME is that true? of pb?
+                           default = .01)
+    argparser.add_argument('-fD', '--displaced',
+                           help = 'find displaced vertices',
+                           action = 'store_false')
+    argparser.add_argument('-mg', '--massgap',
+                           help= 'give massgap for mass compression in GeV',
+                           default = 5.)
     args = argparser.parse_args() # pylint: disable-msg=C0103
-    status = SlhaStatus(args.filename, args.flightlength, args.decays,
-                        args.empty, args.xsec, args.lsp, args.ctau,
+    status = SlhaStatus(args.filename, args.flightlength, args.displacement, args.sigmacut, args.decays,
+                        args.displaced, args.massgap, args.empty, args.xsec, args.lsp, args.ctau,
                         args.model)
     # pylint: disable-msg=C0103
     print(status.status)
