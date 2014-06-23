@@ -69,6 +69,7 @@ def printHelp():
     print(sys.argv[0] + ": --help --installdir")
     print("--help: show this message")
     print("--installdir: print SModelS installation directory")
+    print("--pythondir: print SModelS python path")
     sys.exit(0)
 
 
