@@ -12,8 +12,9 @@
 from __future__ import print_function
 import setPath
 from smodels.tools import modpyslha as pyslha
+from smodels.theory.printer import Printer
 
-class SlhaStatus:
+class SlhaStatus(Printer):
     """
     An instance of this class represents the status of an SLHA file.
     The output status is 0 if the file is not checked, 1 if the check is ok
@@ -43,6 +44,9 @@ class SlhaStatus:
         self.xsec = self.hasXsec(checkXsec)
         self.vertexStatus = self.findDisplacedVertices(findDisplaced)
         self.status = self.evaluateStatus()
+
+    def formatData(self, maxcond):
+        return formatSLHAData(self, maxcond)
 
 
     def read(self):
