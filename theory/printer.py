@@ -140,8 +140,8 @@ class Printer(object):
         output = ""
 
         output += "SLHA status: " + str(self.slhastatus) + "\n"
-        output += "Decomposition output status: "+str(self.status)+" "+status_strings[self.status] + "\n" #FIXME where should status strings go?
-        if slhastatus < 0: output += str(self.warnings) + "\n"
+        output += "Decomposition output status: "+str(self.status)+" "+self.statusStrings[self.status] + "\n" #FIXME where should status strings go?
+        if self.slhastatus < 0: output += str(self.warnings) + "\n"
         output += "================================================================================\n"
 
         return output
@@ -185,4 +185,17 @@ class Printer(object):
         output += "================================================================================\n"
 
         return output
+
+    def formatMissingData(self):
+        """
+        Format data of missing topology list.
+        """
+        output = ""
+
+        output += "\n================================================================================\n"
+        output += "Missing topologies with high cross sections:\n"
+        output += "Sqrts (TeV)   Weight (fb)        Topology description\n"
+
+        for topo in self.topos:
+            output += "%5s %10.3E    # %45s" % (topo.sqrts, topo.weight, topo.topo) #FIXME need rmvunit, str() here?!
 
