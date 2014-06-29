@@ -43,6 +43,10 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
                     file does not exist, write pythia output to this file name. If
                     file exists, read LO xsecs from this file (does not run pythia).
     :param unlink: Clean up temp directory after running pythia
+    
+    :param loFromSlha: If True, uses the LO xsecs from the SLHA file to compute the 
+                       higher order xsecs
+    
     :returns: XSectionList object
     
     """
@@ -56,16 +60,16 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
         else:
             logger.info("Writing pythia LHE output to " + lhefile)
     if loFromSlha:
-        info = crossSection.XSectionInfo()
-        info.sqrts = sqrts
-        info.order = 0
-        loXsecs = crossSection.getXsecFromSLHAFile(slhafile, [info])
+        logger.info("Using LO cross-sections from " + slhafile)
+        xsecsInfile = crossSection.getXsecFromSLHAFile(slhafile)        
+        loXsecs = crossSection.XSectionList()
+        for xsec in xsecsInfile:
+            if xsec.info.order == 0: loXsecs.add(xsec)
     else:
         if not lhefile or not os.path.isfile(lhefile):
             lheFile = runPythia(slhafile, nevts, rmvunit(sqrts, 'TeV'), lhefile, unlink=unlink)
         else:
             lheFile = open(lhefile, 'r')
-
         loXsecs = crossSection.getXsecFromLHEFile(lheFile)
 
     xsecs = loXsecs
