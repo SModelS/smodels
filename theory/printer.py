@@ -122,7 +122,7 @@ class Printer(object):
                       "\n"
             output += "theory conditions:\n"
             if not theoryPrediction.conditions:
-                output += "  " + theoryPrediction.conditions + "\n"
+                output += "  " + str(theoryPrediction.conditions) + "\n"
             else:
                 for cond in theoryPrediction.conditions:
                     output += "  " + str(theoryPrediction.conditions[cond]) + \
