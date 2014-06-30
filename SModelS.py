@@ -60,6 +60,16 @@ def license():
     f.close()
     return "".join(lines)
 
+def banner():
+    """
+    Print SModelS banner.
+    
+    """
+    f = open(installDirectory() + "BANNER")
+    lines = f.readlines()
+    f.close()
+    return "".join(lines)
+
 
 def printHelp():
     """
