@@ -1,3 +1,3 @@
 import SModelS
 
-print ( SModelS.banner() )
+# print ( SModelS.banner() )
