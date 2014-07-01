@@ -21,12 +21,13 @@ class Printer(object):
         self.output = None
 
 
-    def printout(self, target="stdout"):
+    def printout(self, target="stdout", filename=""):
         """
         Print the content of the data structure to the target.
 
-        :param target: The target to print to. Possible values: stdout, html.
+        :param target: The target to print to. Possible values: stdout, file.
                        Default: stdout.
+        :param filename: Filename to which the output is written
         :returns: None
         
         """
@@ -37,7 +38,9 @@ class Printer(object):
         if target == "stdout":
             print(self.output)
         elif target == "file":
-            pass
+            if not filename: return #FIXME need error message here!
+            f = open(filename,"a")
+            f.write(self.output)
 
 
     def formatData(self):
