@@ -51,7 +51,7 @@ class OutputStatus(Printer):
         to access printout format
         """
         return self.formatStatusData()
-
+'''
 class InputParameters():
     """
     Object holding all input parameters, __init__ sets default values, then use setFromFile to change parameters according to textfile
@@ -59,6 +59,7 @@ class InputParameters():
     def __init__(self):
         self.doSLHAdec =True
         self.addMissingXsecs = False
+        self.addnll = False
         self.nevts = 50000
         self.doInvisible = True
         self.doCompress = True
@@ -115,6 +116,8 @@ class InputParameters():
 
         self.__dict__.update(io_dict)
         return True
+'''
+
 
 class MissingTopo():
     """
