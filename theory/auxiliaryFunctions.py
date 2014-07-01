@@ -13,6 +13,7 @@ import numpy as np
 from scipy import stats
 from collections import Iterable
 import logging
+import copy
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +91,7 @@ def massAvg(massList, method='harmonic'):
                          ' and ' + str(massList[0]))
             return False
 
-    avgmass = massList[0][:]
+    avgmass = copy.deepcopy(massList[0])
     for ib, branch in enumerate(massList[0]):
         for ival in enumerate(branch):
             vals = [rmvunit(mass[ib][ival[0]], 'GeV') for mass in massList]
