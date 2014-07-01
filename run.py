@@ -48,7 +48,7 @@ slhastat, warnings = slhaStatus.status
 if slhastat == -1 or slhastat == -3:
     status = -2
     outputStatus = ioObjects.OutputStatus(status, slhastat, warnings)
-    outputStatus.printout() #FIXME wie in ein bestimmtes file anhaengen?
+    outputStatus.printout("file","summary.txt") #FIXME wie in ein bestimmtes file anhaengen?
     sys.exit()
 
 writeXsecs = True #set this true by default, switch to false only in case of lhe decomposition
@@ -95,13 +95,13 @@ try:
 except:
     status = -1
     outputStatus = ioObjects.OutputStatus(status, slhastat, warnings)
-    outputStatus.printout()
+    outputStatus.printout("file","summary.txt")
     sys.exit()
 
 if not smstoplist:
     status = -3
     outputStatus = ioObjects.OutputStatus(status, slhastat, warnings)
-    outputStatus.printout()
+    outputStatus.printout("file","summary.txt")
     sys.exit()
 
 # Print decomposition summary
@@ -128,15 +128,15 @@ results.findBest()
 if not results.bestresult:
     status = 0
     outputStatus = ioObjects.OutputStatus(status, slhastat, warnings)
-    outputStatus.printout()
+    outputStatus.printout("file","summary.txt")
 else:
     status = 1
     outputStatus = ioObjects.OutputStatus(status, slhastat, warnings)
-    outputStatus.printout()
-    results.printout()
+    outputStatus.printout("file","summary.txt")
+    results.printout("file","summary.txt")
 
 mt = ioObjects.MissingTopoList()
 
 mt.findMissingTopos(smstoplist, listofanalyses, sigmacut, addunit(ioPar.minmassgap,"GeV"))
 
-mt.printout()
+mt.printout("file","summary.txt")
