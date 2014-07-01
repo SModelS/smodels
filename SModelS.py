@@ -60,13 +60,23 @@ def license():
     f.close()
     return "".join(lines)
 
+def banner():
+    """
+    Print SModelS banner.
+    
+    """
+    f = open(installDirectory() + "BANNER")
+    lines = f.readlines()
+    f.close()
+    return "".join(lines)
+
 
 def printHelp():
     """
     Print usage information of this module.
     
     """
-    print(sys.argv[0] + ": --help --installdir")
+    print(sys.argv[0] + " [--help] [--installdir] [--pythondir]:")
     print("--help: show this message")
     print("--installdir: print SModelS installation directory")
     print("--pythondir: print SModelS python path")
@@ -74,6 +84,7 @@ def printHelp():
 
 
 if __name__ == "__main__":
+    print( banner() )
     if len(sys.argv) < 2:
         printHelp()
     for i in sys.argv[1:]:
