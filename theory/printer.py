@@ -197,5 +197,6 @@ class Printer(object):
         output += "Sqrts (TeV)   Weight (fb)        Topology description\n"
 
         for topo in self.topos:
-            output += "%5s %10.3E    # %45s" % (topo.sqrts, topo.weight, topo.topo) #FIXME need rmvunit, str() here?!
-
+            output += str(topo.weight) + " # " + str(topo.topo) + "\n"
+#            output += "%5s %10.3E    # %45s" % (topo.sqrts, topo.weight, topo.topo) #FIXME need rmvunit, str() here?!
+        return output
