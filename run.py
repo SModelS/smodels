@@ -120,7 +120,7 @@ for analysis in listofanalyses:
     theorypredictions.printout() # again, check print function
 
     for theoryprediction in theorypredictions:
-        res = ioObjects.ExptResults(theoryprediction.analysis.label.split(":")[0], theoryprediction.analysis.label.split(":")[1], rmvunit(sqrts,"TeV"), theoryprediction.getmaxCondition(), rmvunit(theoryprediction.value[0].value,"fb"), rmvunit(theoryprediction.analysis.getUpperLimitFor(theoryprediction.mass),"fb"),smsResults.getConstraints(theoryprediction.analysis.label.split(":")[0], theoryprediction.analysis.label.split(":")[1]),rmvunit(theoryprediction.mass[0][0],"GeV"),rmvunit(theoryprediction.mass[0][-1],"GeV"))
+        res = ioObjects.ExptResults(theoryprediction.analysis.label.split(":")[0], theoryprediction.analysis.label.split(":")[1], rmvunit(theoryprediction.analysis.sqrts,"TeV"), theoryprediction.getmaxCondition(), rmvunit(theoryprediction.value[0].value,"fb"), rmvunit(theoryprediction.analysis.getUpperLimitFor(theoryprediction.mass),"fb"),smsResults.getConstraints(theoryprediction.analysis.label.split(":")[0], theoryprediction.analysis.label.split(":")[1]),rmvunit(theoryprediction.mass[0][0],"GeV"),rmvunit(theoryprediction.mass[0][-1],"GeV"))
         results.addResult(res)
 
 results.findBest()
@@ -135,3 +135,8 @@ else:
     outputStatus.printout()
     results.printout()
 
+mt = ioObjects.MissingTopoList()
+
+mt.findMissingTopos(smstoplist, listofanalyses, sigmacut, addunit(ioPar.minmassgap,"GeV"))
+
+mt.printout()

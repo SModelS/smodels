@@ -136,10 +136,9 @@ class MissingTopo():
     """
     Object to describe one missing topology result
     """
-    def __init__(self, topo, weight, sqrts):
+    def __init__(self, topo, weight):
         self.topo = topo
         self.weight = weight
-        self.sqrts = sqrts
 
 class MissingTopoList(Printer):
     """
@@ -151,6 +150,37 @@ class MissingTopoList(Printer):
     def formatData(self):
         return self.formatMissingData()
 
-    def findMissingTopos(self):
-        return None #FIXME adapt IO to develop here
+    def addToTopos(self, el):
+        name = self.orderbranches(self.generalName(el.__str__()))
+        for topo in self.topos:
+            if name == topo.topo: #FIXME need to give correct format of el, plus need general name function!
+                topo.weight.__add__(el.weight)
+                return
+        self.topos.append(MissingTopo(name, el.weight))
+        return
+
+    def generalName(self,instr):
+        from smodels.theory.particleNames import ptcDic
+        exch = ["W", "l", "t", "ta"]
+        for pn in exch:
+            for on in ptcDic[pn]: instr = instr.replace(on, pn)
+        return instr
+
+    def orderbranches(self,instr):
+        from smodels.theory.element import Element
+        li = Element(instr).getParticles()
+        li.sort()
+        return str(li).replace("'","").replace(" ","")
+
+    def findMissingTopos(self, smstoplist, listOfAnalyses, sigmacut, minmassgap):
+        for el in smstoplist:
+            for sel in el.elementList:
+                 if sel.compressElement(True, True, minmassgap): continue
+                 covered = None
+                 for ana in listOfAnalyses:
+                     if not ana.getEfficiencyFor(sel) == 0: covered = True
+                 if not covered: self.addToTopos(sel)
+        return
+        
+
 
