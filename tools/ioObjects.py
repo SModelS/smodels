@@ -5,14 +5,14 @@ class ExptResults:
     """
     A class to store all relevant information for one result
     """
-    def __init__(self, aname, topo, sqrts, cond, tval, exptval, rval, topo_description, mmother, mlsp):
+    def __init__(self, aname, topo, sqrts, cond, tval, exptval, topo_description, mmother, mlsp):
         self.aname = aname
         self.topo = topo
         self.sqrts = sqrts
         self.cond = cond
         self.tval = tval
         self.exptval = exptval
-        self.rval = rval
+        self.rval = tval/exptval
         self.topo_description = topo_description
         self.mmother = mmother
         self.mlsp = mlsp
@@ -21,10 +21,23 @@ class ResultList(Printer):
     """
     Class that collects ExptResults objects and has a predefined printout
     """
-    def __init__(self, outputarray = [], bestresult = [], bestresultonly = None):
-        self.outputarray = outputarry
+    def __init__(self, outputarray = [], bestresult = [], bestresultonly = None, describeTopo = None):
+        self.outputarray = outputarray
         self.bestresult = bestresult
         self.bestresultonly = bestresultonly
+        self.describeTopo = describeTopo
+
+    def addResult(self,res):
+        self.outputarray.append(res)
+        return
+
+    def findBest(self):
+        best = None
+        for res in self.outputarray:
+            if not best or best.rval<res.rval:
+                best = res
+        if best: self.bestresult = [best]
+        return
 
     def formatData(self):
         """
