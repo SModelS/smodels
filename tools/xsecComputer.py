@@ -28,7 +28,7 @@ LO=0
 NLO=1
 NLL=2
 
-def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True ):
+def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loFromSlha=None ):
     """
     Run pythia and compute SUSY cross-sections for the input SLHA file.
     
@@ -43,6 +43,10 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True ):
                     file does not exist, write pythia output to this file name. If
                     file exists, read LO xsecs from this file (does not run pythia).
     :param unlink: Clean up temp directory after running pythia
+    
+    :param loFromSlha: If True, uses the LO xsecs from the SLHA file to compute the 
+                       higher order xsecs
+    
     :returns: XSectionList object
     
     """
@@ -55,12 +59,19 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True ):
             logger.warning("Using LO cross-sections from " + lhefile)
         else:
             logger.info("Writing pythia LHE output to " + lhefile)
-    if not lhefile or not os.path.isfile(lhefile):
-        lheFile = runPythia(slhafile, nevts, rmvunit(sqrts, 'TeV'), lhefile, unlink=unlink)
+    if loFromSlha:
+        logger.info("Using LO cross-sections from " + slhafile)
+        xsecsInfile = crossSection.getXsecFromSLHAFile(slhafile)        
+        loXsecs = crossSection.XSectionList()
+        for xsec in xsecsInfile:
+            if xsec.info.order == 0: loXsecs.add(xsec)
     else:
-        lheFile = open(lhefile, 'r')
+        if not lhefile or not os.path.isfile(lhefile):
+            lheFile = runPythia(slhafile, nevts, rmvunit(sqrts, 'TeV'), lhefile, unlink=unlink)
+        else:
+            lheFile = open(lhefile, 'r')
+        loXsecs = crossSection.getXsecFromLHEFile(lheFile)
 
-    loXsecs = crossSection.getXsecFromLHEFile(lheFile)
     xsecs = loXsecs
     wlabel = str(int(rmvunit(sqrts, 'TeV'))) + ' TeV'
     if maxOrder == 0:
