@@ -198,7 +198,7 @@ def _evalExpression(stringExpr,cluster,analysis):
         elements.append(el)
 
 #Replace elements in strings by their weights and add weights from cluster to the elements list:
-    expr = stringExpr[:].replace("'","")           
+    expr = stringExpr[:].replace("'","").replace(" ","") 
     for iel, el in enumerate(elements):        
         expr = expr.replace(str(el), "elements["+ str(iel) +"].weight")        
         for el1 in cluster.elements:                    
@@ -211,7 +211,6 @@ def _evalExpression(stringExpr,cluster,analysis):
         expr = expr.replace("Csim", "cSim")
         logger.warning(analysis.label + " using deprecated functions "
                                "'Cgtr'/'Csim'. Auto-replacing with 'cGtr'/'cSim'.")
-    
     exprvalue = eval(expr)
     if type(exprvalue) == type(crossSection.XSectionList()):
         if len(exprvalue) != 1:

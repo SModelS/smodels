@@ -135,7 +135,7 @@ else:
     outputStatus.printout("file","summary.txt")
     results.printout("file","summary.txt")
 
-mt = ioObjects.MissingTopoList()
+mt = ioObjects.MissingTopoList(sqrts)
 
 mt.findMissingTopos(smstoplist, listofanalyses, sigmacut, addunit(ioPar.minmassgap,"GeV"))
 

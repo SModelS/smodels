@@ -135,15 +135,17 @@ class MissingTopo():
     """
     Object to describe one missing topology result
     """
-    def __init__(self, topo, weight):
+    def __init__(self, topo, weights):
         self.topo = topo
-        self.weight = weight
+        self.weights = weights
+        self.value = None
 
 class MissingTopoList(Printer):
     """
     Object to find and collect MissingTopo objects, plus printout functionality
     """
-    def __init__(self):
+    def __init__(self, sqrts):
+        self.sqrts = sqrts
         self.topos = []
         
     def formatData(self):
@@ -153,7 +155,7 @@ class MissingTopoList(Printer):
         name = self.orderbranches(self.generalName(el.__str__()))
         for topo in self.topos:
             if name == topo.topo: #FIXME need to give correct format of el, plus need general name function!
-                topo.weight.__add__(el.weight)
+                topo.weights.__add__(el.weight)
                 return
         self.topos.append(MissingTopo(name, el.weight))
         return
@@ -172,6 +174,7 @@ class MissingTopoList(Printer):
         return str(li).replace("'","").replace(" ","")
 
     def findMissingTopos(self, smstoplist, listOfAnalyses, sigmacut, minmassgap):
+        from smodels.tools.physicsUnits import rmvunit, addunit
         for el in smstoplist:
             for sel in el.elementList:
                  if sel.compressElement(True, True, minmassgap): continue
@@ -179,6 +182,8 @@ class MissingTopoList(Printer):
                  for ana in listOfAnalyses:
                      if not ana.getEfficiencyFor(sel) == 0: covered = True
                  if not covered: self.addToTopos(sel)
+        for topo in self.topos:
+            topo.value = rmvunit(topo.weights.getXsecsFor(self.sqrts)[0].value,"fb")
         return
         
 
