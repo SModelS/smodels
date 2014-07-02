@@ -193,13 +193,14 @@ class Printer(object):
         """
         Format data of missing topology list.
         """
+        from smodels.tools.physicsUnits import rmvunit, addunit
+
         output = ""
 
         output += "\n================================================================================\n"
         output += "Missing topologies with high cross sections:\n"
         output += "Sqrts (TeV)   Weight (fb)        Topology description\n"
 
-        for topo in self.topos:
-            output += str(topo.weight) + " # " + str(topo.topo) + "\n"
-#            output += "%5s %10.3E    # %45s" % (topo.sqrts, topo.weight, topo.topo) #FIXME need rmvunit, str() here?!
+        for topo in sorted(self.topos, key=lambda x: x.value, reverse=True)[:10]:
+            output += "%5s %10.3E    # %45s\n" % (str(rmvunit(self.sqrts,"TeV")), topo.value, str(topo.topo))
         return output
