@@ -89,7 +89,7 @@ class InputParameters():
         self.topologies = None
         self.describeTopo = True
         self.printAnaEl = False
-        self.parameters = ['printGtop', 'minmassgap','printResults', 'doCompress', 'describeTopo', 'topologies', 'doInvisible', 'addMissingXsecs', 'maxcond', 'expandedSummary', 'doSLHAdec', 'evaluateResults', 'printThEl', 'printAnaEl', 'nevts', 'analyses', 'sigmacut', 'addnlo', 'adnll']
+        self.parameters = ['printGtop', 'minmassgap','printResults', 'doCompress', 'describeTopo', 'topologies', 'doInvisible', 'addMissingXsecs', 'maxcond', 'expandedSummary', 'doSLHAdec', 'evaluateResults', 'printThEl', 'printAnaEl', 'nevts', 'analyses', 'sigmacut', 'addnlo', 'addnll']
 
 
     def setFromFile(self, filename = "parameters.in"):
