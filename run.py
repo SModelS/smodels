@@ -13,25 +13,25 @@ log = logging.getLogger(__name__)
 #get name of input slha file (and parameter file)
 argparser = argparse.ArgumentParser()
 argparser.add_argument('-f', '--filename', help = 'filename of input slha', required=True)
-argparser.add_argument('-p', '--parameterfile', help = 'filename of parameter file')
+argparser.add_argument('-p', '--parameterfile', help = 'filename of parameter file', default="parameters.in")
 args = argparser.parse_args() # pylint: disable-msg=C0103
 
 slhafile = args.filename #get input filename
-#ioPar = ioObjects.InputParameters()
-#if not ioPar.setFromFile(args.parameterfile): #read parameters from input file
-#    log.error("Could not read %s" %args.parameterfile)
-#    sys.exit()
-
-try:
-    if not args.parameterfile: import ioPar
-    else: exec("import %s as ioPar" %args.parameterfile.split(".")[0]) #use parameter file given as argument
-except: 
-    log.error("Could not read parameter file")
+ioPar = ioObjects.InputParameters()
+if not ioPar.setFromFile(args.parameterfile): #read parameters from input file
+    log.error("Could not read %s" %args.parameterfile)
     sys.exit()
 
+#or as a modul...
+#try:
+#    if not args.parameterfile: import ioPar
+#    else: exec("import %s as ioPar" %args.parameterfile.split(".")[0]) #use parameter file given as argument
+#except: 
+#    log.error("Could not read parameter file")
+#    sys.exit()
 # if all anas, topos are selected, set parameter to None
-if not hasattr(ioPar,"analyses") or ioPar.analyses == all: ioPar.analyses = None
-if not hasattr(ioPar,"topologies") or ioPar.topologies == all: ioPar.topologies = None
+#if not hasattr(ioPar,"analyses") or ioPar.analyses == all: ioPar.analyses = None
+#if not hasattr(ioPar,"topologies") or ioPar.topologies == all: ioPar.topologies = None
 
 if os.path.exists("summary.txt"): #remove old output file
     log.warning("Remove old output file in summary.txt")
