@@ -31,7 +31,7 @@ def pythonDirectory():
     
     """
     ret = installDirectory()
-    ret = ret.replace("/smodels/", "/")
+    # ret = ret.replace("/smodels/", "/")
     return ret
 
 def version(astuple=False):
