@@ -64,7 +64,7 @@ class OutputStatus(Printer):
         to access printout format
         """
         return self.formatStatusData()
-'''
+
 class InputParameters():
     """
     Object holding all input parameters, __init__ sets default values, then use setFromFile to change parameters according to textfile
@@ -72,6 +72,7 @@ class InputParameters():
     def __init__(self):
         self.doSLHAdec =True
         self.addMissingXsecs = False
+        self.addnlo = False
         self.addnll = False
         self.nevts = 50000
         self.doInvisible = True
@@ -86,9 +87,9 @@ class InputParameters():
         self.expandedSummary = True
         self.analyses = None
         self.topologies = None
-        self.describe_topo = True
+        self.describeTopo = True
         self.printAnaEl = False
-        self.parameters = ['printGtop', 'minmassgap','printResults', 'doCompress', 'describe_topo', 'topologies', 'doInvisible', 'addMissingXsecs', 'maxcond', 'expandedSummary', 'doSLHAdec', 'evaluateResults', 'printThEl', 'printAnaEl', 'nevts', 'analyses', 'sigmacut']
+        self.parameters = ['printGtop', 'minmassgap','printResults', 'doCompress', 'describeTopo', 'topologies', 'doInvisible', 'addMissingXsecs', 'maxcond', 'expandedSummary', 'doSLHAdec', 'evaluateResults', 'printThEl', 'printAnaEl', 'nevts', 'analyses', 'sigmacut', 'addnlo', 'adnll']
 
 
     def setFromFile(self, filename = "parameters.in"):
@@ -129,8 +130,6 @@ class InputParameters():
 
         self.__dict__.update(io_dict)
         return True
-'''
-
 
 class MissingTopo():
     """
