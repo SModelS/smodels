@@ -42,13 +42,14 @@ bestresult = []
 outputarray = []
 
 #get status, warnings from slhaChecks
-slhaStatus = slhaChecks.SlhaStatus(slhafile, sigmacut=ioPar.sigmacut, maxDisplacement=.001, checkXsec=not ioPar.addMissingXsecs)
+slhaStatus = slhaChecks.SlhaStatus(slhafile, sigmacut=ioPar.sigmacut, maxDisplacement=.001, checkXsec=not ioPar.addMissingXsecs, massgap=ioPar.minmassgap, maxcond=ioPar.maxcond)
 slhastat, warnings = slhaStatus.status
 
 if slhastat == -1 or slhastat == -3:
     status = -2
     outputStatus = ioObjects.OutputStatus(status, slhastat, warnings)
-    outputStatus.printout("file","summary.txt") #FIXME wie in ein bestimmtes file anhaengen?
+    outputStatus.printout("file","summary.txt")
+    slhaStatus.printout("file","summary.txt")
     sys.exit()
 
 writeXsecs = True #set this true by default, switch to false only in case of lhe decomposition
@@ -96,12 +97,14 @@ except:
     status = -1
     outputStatus = ioObjects.OutputStatus(status, slhastat, warnings)
     outputStatus.printout("file","summary.txt")
+    slhaStatus.printout("file","summary.txt")
     sys.exit()
 
 if not smstoplist:
     status = -3
     outputStatus = ioObjects.OutputStatus(status, slhastat, warnings)
     outputStatus.printout("file","summary.txt")
+    slhaStatus.printout("file","summary.txt")
     sys.exit()
 
 # Print decomposition summary
@@ -129,10 +132,12 @@ if not results.bestresult:
     status = 0
     outputStatus = ioObjects.OutputStatus(status, slhastat, warnings)
     outputStatus.printout("file","summary.txt")
+    slhaStatus.printout("file","summary.txt")
 else:
     status = 1
     outputStatus = ioObjects.OutputStatus(status, slhastat, warnings)
     outputStatus.printout("file","summary.txt")
+    slhaStatus.printout("file","summary.txt")
     results.printout("file","summary.txt")
 
 mt = ioObjects.MissingTopoList(sqrts)

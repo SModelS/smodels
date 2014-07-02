@@ -173,7 +173,7 @@ class Printer(object):
 
         return output
 
-    def formatSLHAData(self, maxcond):
+    def formatSLHAData(self):
         """
         Format data of the slha checks output object.
         """
@@ -182,9 +182,9 @@ class Printer(object):
         output += "Input file: " + self.filename + "\n"
         output += "Sigmacut: " + str(self.sigmacut) + "\n"
         output += "Minmassgap: " + str(self.massgap) + "\n"
-        output += "Maxcond: " + str(maxcond) + "\n"
+        output += "Maxcond: " + str(self.maxcond) + "\n"
         output += "LSP PID, mass: " + str(self.findLSP(returnmass=True)) + "\n"
-        output += "NLSP PID, mass: " + str(slhaStatus.findNLSP(returnmass=True)) + "\n"
+        output += "NLSP PID, mass: " + str(self.findNLSP(returnmass=True)) + "\n"
         output += "================================================================================\n"
 
         return output

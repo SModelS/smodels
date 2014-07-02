@@ -23,7 +23,7 @@ class SlhaStatus(Printer):
     The parameter maxFlightlength is specified in meters. 
     """
     def __init__(self, filename, maxFlightlength=3., maxDisplacement=.1, sigmacut=.01,
-                 findMissingDecays=True, findDisplaced=True, massgap=5.,
+                 findMissingDecays=True, findDisplaced=True, massgap=5., maxcond=.2,
                  findEmptyDecays=True, checkXsec=True, checkLSP=True,
                  checkFlightlength=True, model="MSSM"):
         self.filename = filename
@@ -36,6 +36,7 @@ class SlhaStatus(Printer):
         self.maxDisplacement = maxDisplacement
         self.sigmacut = sigmacut
         self.massgap = massgap
+        self.maxcond = maxcond
         self.lsp = self.findLSP()
         self.lspStatus = self.testLSP(checkLSP)
         self.ctauStatus = self.checkCtau(checkFlightlength)
@@ -45,9 +46,8 @@ class SlhaStatus(Printer):
         self.vertexStatus = self.findDisplacedVertices(findDisplaced)
         self.status = self.evaluateStatus()
 
-    def formatData(self, maxcond):
-        return formatSLHAData(self, maxcond)
-
+    def formatData(self):
+        return self.formatSLHAData()
 
     def read(self):
         """
