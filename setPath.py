@@ -24,7 +24,7 @@ def configure():
     """
     base = os.path.dirname(os.path.realpath(inspect.getabsfile(configure)))
     pos = base.rfind("/")
-    base = base[:pos + 1]
+    # base = base[:pos + 1]
     sys.path.append(base)
     # sys.path.append(base[:-9])
     return base

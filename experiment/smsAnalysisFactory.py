@@ -20,7 +20,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def load(analyses=None, topologies=None, sqrts=[7, 8]):
+def load(analyses=None, topologies=None, sqrts=[7, 8], usePrivate=None):
     """
     Create an analysis objects from the info given in the SMS results database.
 
@@ -30,6 +30,7 @@ def load(analyses=None, topologies=None, sqrts=[7, 8]):
                        are considered.
     :param sqrts: Array of center-of-mass energies of the analyses that are to
                   be considered.
+    :param usePrivate: Include analyses flagged as private.
     :returns: list of analyses
     
     """
@@ -48,6 +49,9 @@ def load(analyses=None, topologies=None, sqrts=[7, 8]):
     if analyses == None:
         analyses = smsResults.getAllResults().keys()
     for ana in analyses:
+        if smsResults.isPrivate(ana) and not usePrivate:
+            logger.warning("Skipping private analysis %s.",str(ana))
+            continue
         logger.debug("Building analysis %s.", str(ana))
         ss = rmvunit(smsResults.getSqrts(ana), "TeV")
         if ss == None:

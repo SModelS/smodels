@@ -112,13 +112,14 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
     return xsecs
 
 
-def addXSecToFile(xsecs, slhafile, comment=None):
+def addXSecToFile(xsecs, slhafile, comment=None, complain=True):
     """
     Write cross-sections to an SLHA filei.
     
     :param xsecs: a XSectionList object containing the cross-sections
     :param slhafile: target file for writing the cross-sections in SLHA format
     :param comment: optional comment to be added to each cross-section block    
+    :param complain: complain if there are already cross sections in file
     
     """
     if not os.path.isfile(slhafile):
@@ -126,7 +127,7 @@ def addXSecToFile(xsecs, slhafile, comment=None):
         return None
     # Check if file already contain cross-section blocks
     xSectionList = crossSection.getXsecFromSLHAFile(slhafile)
-    if xSectionList:
+    if xSectionList and complain:
         logger.warning("SLHA file already contains XSECTION blocks. Adding "
                        "missing cross-sections.")
 

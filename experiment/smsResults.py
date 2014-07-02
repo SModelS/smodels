@@ -225,6 +225,13 @@ def getLumi(analysis, run=None):
     return addunit(lumifb, "fb-1")
 
 
+def isPrivate(analysis, run=None):
+    """
+    Check if analysis is flagged as private.
+    """
+    return bool(int(smsHelpers.getMetaInfoField(analysis, "private", run)))
+
+
 def getExperiment(analysis, run=None):
     """
     Check if run is ATLAS8TeV, else return CMS.

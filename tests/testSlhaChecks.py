@@ -23,7 +23,7 @@ class SlhaTest(unittest.TestCase):
     def testBadFile(self):
         filename = "%sinputFiles/slha/nobdecay.slha" % (installDirectory() )
         st=slhaChecks.SlhaStatus(filename)
-        self.assertEquals (st.status, (-1, '#ERROR: charged lsp or long-lived NLSP.\n#Warnings:\n#Empty decay block for PIDs, 1000005.\n#XSECTION table missing.\n#Charged NLSP is stable.\n'))
+        self.assertEquals (st.status, (-1, '#ERROR: special signatures in this point.\n#Warnings:\n#Empty decay block for PIDs, 1000005.\n#XSECTION table missing, will be computed by SModelS.\n#Charged NLSP is stable.\n'))
 
 if __name__ == "__main__":
     unittest.main()
