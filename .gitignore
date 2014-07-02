@@ -1,6 +1,8 @@
 *.pyc
 *.swp
 .project
+recipes/recipe*.py
+recipes/recipe*.html
 .pydevproject
 smodels.log
 pythia_lhe
