@@ -105,6 +105,9 @@ class IndexCluster(object):
       if type(self.massMap) == type(dict()):
           newcluster.massMap = dict(self.massMap.items())
       else: newcluster.massMap = None
+      if type(self.weightMap) == type(dict()):
+          newcluster.weightMap = dict(self.weightMap.items())
+      else: newcluster.weightMap = None
       newcluster.analysis = self.analysis
       
       return newcluster
