@@ -66,19 +66,25 @@ def distance(xmass1, xmass2):
     return distanceValue
 
 
-def massAvg(massList, method='harmonic'):
+def massAvg(massList, method='weighted', weights=None):
     """
     Compute the average mass of massList according to method.
-    
+
+    If method=weighted but weights were not properly defined,
+    switch method to harmonic.    
     If massList contains a zero mass, switch method to mean.
     
-    :param method: possible values: harmonic, mean
+    :param method: possible values: harmonic, mean, weighted
+    :param weights: weights of elements (only for weighted average)
     
     """
     if not massList:
         return massList
     if len(massList) == 1:
         return massList[0]
+
+    if method == 'weighted' and (not weights or len(weights) != len(massList)):
+        method = 'harmonic'
     flatList = [rmvunit(mass, 'GeV') for mass in _flattenList(massList)]
     if method == 'harmonic' and 0. in flatList:
         method = 'mean'
@@ -99,7 +105,10 @@ def massAvg(massList, method='harmonic'):
                 avg = np.mean(vals)
             elif method == 'harmonic':
                 avg = stats.hmean(vals)
-            avgmass[ib][ival[0]] = addunit(float(avg), 'GeV')
+            elif method == 'weighted':
+                avg = np.average(vals,weights=weights)                
+            avgmass[ib][ival[0]] = addunit(float(avg), 'GeV')    
+
     return avgmass
 
 

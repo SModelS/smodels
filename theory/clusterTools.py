@@ -8,6 +8,7 @@
 
 from smodels.theory import crossSection
 from smodels.theory.auxiliaryFunctions import massAvg, massPosition, distance
+from smodels.tools.physicsUnits import rmvunit
 import logging
 
 logger = logging.getLogger(__name__)
@@ -52,7 +53,8 @@ class ElementCluster(object):
          
         """
         massList = [el.getMasses() for el in self.elements]
-        return massAvg(massList)
+        weights = [rmvunit(el.weight.getMaxXsec(),'fb') for el in self.elements]
+        return massAvg(massList,weights=weights)
 
 
 class IndexCluster(object):
@@ -63,7 +65,7 @@ class IndexCluster(object):
     upper limit space. It is used by the clustering algorithm.
     
     """
-    def __init__(self, massMap=None, posMap=None, indices=set([]),
+    def __init__(self, massMap=None, posMap=None, wMap=None, indices=set([]),
                  analysis=None):
         self.indices = indices
         self.avgPosition = None
@@ -72,9 +74,11 @@ class IndexCluster(object):
         # Store the element mass position in upper limit space list (for all
         # elements)
         self.positionMap = posMap
+        self.weightMap = wMap
         self.analysis = analysis
 
-        if massMap and posMap and len(self.indices) > 0:
+
+        if massMap and posMap and wMap and len(self.indices) > 0:
             self.avgPosition = self._getAvgPosition()
 
 
@@ -155,7 +159,9 @@ class IndexCluster(object):
         """
         if len(list(self.indices)) == 1:
             return self.positionMap[self[0]]
-        clusterMass = massAvg([self.massMap[iel] for iel in self])
+        masses = [self.massMap[iel] for iel in self]
+        weights = [self.weightMap[iel] for iel in self]
+        clusterMass = massAvg(masses,weights=weights)
         avgPos = massPosition(clusterMass, self.analysis)
         return avgPos
 
@@ -169,8 +175,7 @@ class IndexCluster(object):
         
         """
         dmax = 0.
-        if type(obj) == type(int()) and obj >= 0 \
-                and obj < len(self.positionMap):
+        if type(obj) == type(int()) and obj >= 0:
             pos = self.positionMap[obj]
         elif type(obj) == type(float()):
             pos = obj
@@ -235,13 +240,20 @@ def _doCluster(elements, analysis, maxDist):
     belonging to the cluster
     
     """
-    # First build the element:mass and element:position in UL space
-    # dictionaries
+    # First build the element:mass, element:position in UL space
+    # and element:maxWeight (in fb) dictionaries
+    #(Combine elements with identical masses)
     massMap = {}
     posMap = {}
+    weightMap = {}
     for iel, el in enumerate(elements):
-        massMap[iel] = el.getMasses()
-        posMap[iel] = massPosition(massMap[iel], analysis)
+        if not el.getMasses() in massMap.values():
+            massMap[iel] = el.getMasses()
+            posMap[iel] = massPosition(massMap[iel], analysis)
+            weightMap[iel] = rmvunit(el.weight.getMaxXsec(),'fb')
+        else:
+            j = massMap.keys()[massMap.values().index(el.getMasses())] 
+            weightMap[j] += rmvunit(el.weight.getMaxXsec(),'fb')
 
     # Start with maximal clusters
     clusterList = []
@@ -250,7 +262,7 @@ def _doCluster(elements, analysis, maxDist):
         for jel in posMap:            
             if distance(posMap[iel], posMap[jel]) <= maxDist:
                 indices.append(jel)        
-        indexCluster = IndexCluster(massMap, posMap, set(indices), analysis)
+        indexCluster = IndexCluster(massMap, posMap, weightMap, set(indices), analysis)
         clusterList.append(indexCluster)
 
     """Split the maximal clusters until all elements inside each cluster are
@@ -289,8 +301,8 @@ def _doCluster(elements, analysis, maxDist):
     # finalClusters = finalClusters + clusterList
     # Add clusters of individual masses (just to be safe)
     for iel in massMap:
-        finalClusters.append(IndexCluster(massMap, posMap, set([iel]),
-                                          analysis))
+        finalClusters.append(IndexCluster(massMap, posMap, weightMap,
+                                           set([iel]),analysis))
 
     # Clean up clusters (remove redundant clusters)
     for ic, clusterA in enumerate(finalClusters):
@@ -308,8 +320,10 @@ def _doCluster(elements, analysis, maxDist):
     clusterList = []
     for indexCluster in finalClusters:
         cluster = ElementCluster()
-        for iel in indexCluster:
-            cluster.elements.append(elements[iel])
+        masses = [massMap[iel] for iel in indexCluster]
+        for el in elements:
+            if el.getMasses() in masses:
+                cluster.elements.append(el)
         clusterList.append(cluster)
 
     return clusterList
@@ -341,7 +355,7 @@ def _getGoodElements(elements, analysis, maxDist):
             if not mP1 or not mP2:
                 continue
             if distance(mP1, mP2) < maxDist:
-                goodmass = massAvg([mass1, mass2])
+                goodmass = massAvg([mass1, mass2], method='harmonic')
         if goodmass and massPosition(goodmass, analysis):
             goodElements.append(element.copy())
             goodElements[-1].setMasses(goodmass)
