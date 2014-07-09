@@ -16,11 +16,16 @@ argparser.add_argument('-f', '--filename', help = 'filename of input slha', requ
 argparser.add_argument('-p', '--parameterfile', help = 'filename of parameter file', default="parameters.in")
 args = argparser.parse_args() # pylint: disable-msg=C0103
 
+print smsHelpers.base
+smsHelpers.base="/home/laa/smodels-database/"
+print smsHelpers.base
+
 slhafile = args.filename #get input filename
 ioPar = ioObjects.InputParameters()
 if not ioPar.setFromFile(args.parameterfile): #read parameters from input file
     log.error("Could not read %s" %args.parameterfile)
     sys.exit()
+
 
 #or as a modul...
 #try:
@@ -85,9 +90,6 @@ if ioPar.addnlo:
 if ioPar.addnll:
     xsecs_nll = xsecComputer.computeXSec(sqrts, 2, ioPar.nevts, slhafile, loFromSlha=True)
     xsecComputer.addXSecToFile(xsecs_nll, slhafile) #FIXME also: comment?
-
-#set database adress
-smsHelpers.base = "/home/laa/smodels-database" #FIXME check if this is right syntax in develop
 
 #decomposition
 sigmacut = addunit(ioPar.sigmacut,"fb")
