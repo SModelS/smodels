@@ -34,10 +34,6 @@ def load(analyses=None, topologies=None, sqrts=[7, 8], usePrivate=None):
     :returns: list of analyses
     
     """
-    print(smsHelpers.base)
-    import sys
-    sys.exit()
-
     # Enable supplying a single analysis/topology
     if isinstance(topologies, str):
         topologies = [topologies]

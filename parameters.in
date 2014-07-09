@@ -1,4 +1,10 @@
 # If some of the input variables are missing in this file, default values will be assumed. 
+
+#
+#Database address
+#
+database = /home/laa/smodels-database #Give path to database directory
+
 #
 #Basic input
 #

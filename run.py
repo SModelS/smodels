@@ -2,10 +2,10 @@
 
 import sys, os, argparse, logging
 import setPath
-from tools.physicsUnits import rmvunit, addunit
-from tools import slhaChecks, ioObjects, xsecComputer
-from experiment import smsHelpers, smsAnalysisFactory, smsResults
-from theory import slhaDecomposer
+from smodels.tools.physicsUnits import rmvunit, addunit
+from smodels.tools import slhaChecks, ioObjects, xsecComputer
+from smodels.experiment import smsHelpers, smsAnalysisFactory, smsResults
+from smodels.theory import slhaDecomposer
 from smodels.theory.theoryPrediction import theoryPredictionFor
 
 log = logging.getLogger(__name__)
@@ -15,10 +15,6 @@ argparser = argparse.ArgumentParser()
 argparser.add_argument('-f', '--filename', help = 'filename of input slha', required=True)
 argparser.add_argument('-p', '--parameterfile', help = 'filename of parameter file', default="parameters.in")
 args = argparser.parse_args() # pylint: disable-msg=C0103
-
-print smsHelpers.base
-smsHelpers.base="/home/laa/smodels-database/"
-print smsHelpers.base
 
 slhafile = args.filename #get input filename
 ioPar = ioObjects.InputParameters()
@@ -111,6 +107,9 @@ if not smstoplist:
 
 # Print decomposition summary
 if ioPar.printThEl: smstoplist.printout() #not my print function, check what this is doing, FIXME add function for printing GTops?
+
+# Set database address
+smsHelpers.base = ioPar.database
 
 # Load analyses
 listofanalyses = smsAnalysisFactory.load()
