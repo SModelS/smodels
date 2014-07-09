@@ -4,4 +4,4 @@ from smodels.experiment import smsHelpers
 import os
 
 ## this defines where the database resides
-smsHelpers.Base=os.environ["HOME"]+"/SMS_database/"
+smsHelpers.base=os.environ["HOME"]+"/SMS_database/"
