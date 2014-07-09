@@ -22,9 +22,9 @@ maxcond = 0.2 #Maximum relative violation of conditions for valid results
 #
 
 #stdout
-printGtop = True #Set True to print table of global topologies, False elsewise
-printThEl = True #Set True to print table of elements after theoretical decomposition, False elsewise. Note that not all the elements appearing in this table are constrained by experiments.
-printAnaEl = True #Set True to print table of elements, constrained by available experimental analyses, False elsewise
+printGtop = False #Set True to print table of global topologies, False elsewise
+printThEl = False #Set True to print table of elements after theoretical decomposition, False elsewise. Note that not all the elements appearing in this table are constrained by experiments.
+printAnaEl = False #Set True to print table of elements, constrained by available experimental analyses, False elsewise
 evaluateResults = True #Set True to evaluate results (cross sections, experimental upper limits)
 printResults = True #Set True to print table of results, False elsewise
 
