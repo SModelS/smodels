@@ -14,6 +14,7 @@ log = logging.getLogger(__name__)
 argparser = argparse.ArgumentParser()
 argparser.add_argument('-f', '--filename', help = 'filename of input slha', required=True)
 argparser.add_argument('-p', '--parameterfile', help = 'filename of parameter file', default="parameters.in")
+argparser.add_argument('-o', '--outputfile', help = 'filename of output file', default='summary.txt')
 args = argparser.parse_args() # pylint: disable-msg=C0103
 
 slhafile = args.filename #get input filename
@@ -34,9 +35,9 @@ if not ioPar.setFromFile(args.parameterfile): #read parameters from input file
 #if not hasattr(ioPar,"analyses") or ioPar.analyses == all: ioPar.analyses = None
 #if not hasattr(ioPar,"topologies") or ioPar.topologies == all: ioPar.topologies = None
 
-if os.path.exists("summary.txt"): #remove old output file
-    log.warning("Remove old output file in summary.txt")
-    os.remove("summary.txt")
+if os.path.exists(args.outputfile): #remove old output file
+    log.warning("Remove old output file in "+args.outputfile)
+    os.remove(args.outputfile)
 
 #lists to store results
 bestresult = []
@@ -49,8 +50,8 @@ slhastat, warnings = slhaStatus.status
 if slhastat == -1 or slhastat == -3:
     status = -2
     outputStatus = ioObjects.OutputStatus(status, slhastat, warnings)
-    outputStatus.printout("file","summary.txt")
-    slhaStatus.printout("file","summary.txt")
+    outputStatus.printout("file",args.outputfile)
+    slhaStatus.printout("file",args.outputfile)
     sys.exit()
 
 writeXsecs = True #set this true by default, switch to false only in case of lhe decomposition
@@ -68,10 +69,8 @@ else:
         computeXsecs = True
     else: computeXsecs = None
 
-
-#for now define some input parameters form xsection calcultaion, maybe later put them in parameter.in also?
-sqrts = addunit(8,"TeV")
-maxOrder = 2 # comput at NLL FIXME is not used at the moment! how to handle all different input options?
+# sqrts from parameter input file
+sqrts = addunit(ioPar.sqrts,"TeV")
 
 if computeXsecs:
     #first compute at LO
@@ -94,15 +93,15 @@ try:
 except:
     status = -1
     outputStatus = ioObjects.OutputStatus(status, slhastat, warnings)
-    outputStatus.printout("file","summary.txt")
-    slhaStatus.printout("file","summary.txt")
+    outputStatus.printout("file",args.outputfile)
+    slhaStatus.printout("file",args.outputfile)
     sys.exit()
 
 if not smstoplist:
     status = -3
     outputStatus = ioObjects.OutputStatus(status, slhastat, warnings)
-    outputStatus.printout("file","summary.txt")
-    slhaStatus.printout("file","summary.txt")
+    outputStatus.printout("file",args.outputfile)
+    slhaStatus.printout("file",args.outputfile)
     sys.exit()
 
 # Print decomposition summary
@@ -132,17 +131,17 @@ results.findBest()
 if not results.bestresult:
     status = 0
     outputStatus = ioObjects.OutputStatus(status, slhastat, warnings)
-    outputStatus.printout("file","summary.txt")
-    slhaStatus.printout("file","summary.txt")
+    outputStatus.printout("file",args.outputfile)
+    slhaStatus.printout("file",args.outputfile)
 else:
     status = 1
     outputStatus = ioObjects.OutputStatus(status, slhastat, warnings)
-    outputStatus.printout("file","summary.txt")
-    slhaStatus.printout("file","summary.txt")
-    results.printout("file","summary.txt")
+    outputStatus.printout("file",args.outputfile)
+    slhaStatus.printout("file",args.outputfile)
+    results.printout("file",args.outputfile)
 
 mt = ioObjects.MissingTopoList(sqrts)
 
 mt.findMissingTopos(smstoplist, listofanalyses, sigmacut, addunit(ioPar.minmassgap,"GeV"))
 
-mt.printout("file","summary.txt")
+mt.printout("file",args.outputfile)
