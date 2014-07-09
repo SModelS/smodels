@@ -3,6 +3,7 @@
 .project
 recipes/recipe*.py
 recipes/recipe*.html
+recipes/.ipynb_checkpoints
 .pydevproject
 smodels.log
 pythia_lhe
