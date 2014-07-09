@@ -70,6 +70,7 @@ class InputParameters():
     Object holding all input parameters, __init__ sets default values, then use setFromFile to change parameters according to textfile
     """
     def __init__(self):
+        self.database = "~/smodels-database/"
         self.doSLHAdec =True
         self.addMissingXsecs = False
         self.addnlo = False
@@ -89,7 +90,7 @@ class InputParameters():
         self.topologies = None
         self.describeTopo = True
         self.printAnaEl = False
-        self.parameters = ['printGtop', 'minmassgap','printResults', 'doCompress', 'describeTopo', 'topologies', 'doInvisible', 'addMissingXsecs', 'maxcond', 'expandedSummary', 'doSLHAdec', 'evaluateResults', 'printThEl', 'printAnaEl', 'nevts', 'analyses', 'sigmacut', 'addnlo', 'addnll']
+        self.parameters = ['database','printGtop', 'minmassgap','printResults', 'doCompress', 'describeTopo', 'topologies', 'doInvisible', 'addMissingXsecs', 'maxcond', 'expandedSummary', 'doSLHAdec', 'evaluateResults', 'printThEl', 'printAnaEl', 'nevts', 'analyses', 'sigmacut', 'addnlo', 'addnll']
 
 
     def setFromFile(self, filename = "parameters.in"):
@@ -114,7 +115,7 @@ class InputParameters():
             elif "[" in v or "]" in v:
                 v = v.replace("[", "").replace("]", "")
                 v = v.split(",")
-            else:
+            elif not "/" in v:
                 v = float(v)
             io_dict[k] = v
         checkNotSet = []
