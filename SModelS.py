@@ -84,7 +84,7 @@ def printHelp():
 
 
 if __name__ == "__main__":
-    print( banner() )
+    # print( banner() )
     if len(sys.argv) < 2:
         printHelp()
     for i in sys.argv[1:]:
