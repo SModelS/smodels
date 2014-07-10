@@ -58,16 +58,20 @@ class Printer(object):
         Format data of a TopologyList object.
         
         """
-        from tools import smsPrettyPrinter
-        from prettytable import PrettyTable
-        output = ""
+
+        from smodels.tools import smsPrettyPrinter
+        from smodels.tools.physicsUnits import fb
+        #from prettytable import PrettyTable
+        output = "\n"
+        output += "Number of Global topologies = " + str(len(self)) + "\n\n"
 
         printer = smsPrettyPrinter.SmsPrettyPrinter()
-        evTopTable = PrettyTable(["Topology", "#Vertices", "#Insertions",
-                                  "#Elements", "Sum of weights"])
-        evElementTable = PrettyTable(["Topology", "Element", "Particles B[0]",
-                                      "Particles B[1]", "Masses B[0]",
-                                      "Masses B[1]", "Element Weight"])
+        #evTopTable = PrettyTable(["Topology", "#Vertices", "#Insertions",
+        #                          "#Elements", "Sum of weights"])
+        output += "  # #vrtces #insertions        #els   #sum(weights) [fb]\n"
+        # evElementTable = PrettyTable(["Topology", "Element", "Particles B[0]",
+        #                              "Particles B[1]", "Masses B[0]",
+        #                              "Masses B[1]", "Element Weight"])
 
         eltot = 0
         # totweight = []
@@ -75,10 +79,21 @@ class Printer(object):
         # for i in range(len(SMSTopList)):
         for i, topo in enumerate(self):
             sumw = topo.getTotalWeight().getDictionary()
-            evTopTable.add_row([i, topo.vertnumb, topo.vertparts,
-                                len(topo.elementList),
-                                smsPrettyPrinter.wrap(printer.pformat(sumw),
-                                                      width=30)])
+            #evTopTable.add_row([i, topo.vertnumb, topo.vertparts,
+            #                    len(topo.elementList),
+            #                    smsPrettyPrinter.wrap(printer.pformat(sumw),
+            #                                          width=22)])
+            vn=str(topo.vertnumb).replace(" ","") 
+            vp=str(topo.vertparts).replace(" ","") 
+            ne=len(topo.elementList)
+            output+="%3d  %-5s  %-18s %3d   " % (i, vn, vp, ne )
+            # sw=smsPrettyPrinter.wrap(printer.pformat(sumw),width=22)
+            for (key,value) in sumw.items():
+                skey=key.replace(" [TeV]","")
+                svalue=float ( value / fb )
+                output+="%2d TeV: %6.2f " % ( int(float(skey)), svalue )
+               # output+="\n key %s value %s \n" % ( key,value)
+            output+="\n"
             eltot += len(topo.elementList)
 
         # Print element list for Topology[i]:
@@ -92,14 +107,12 @@ class Printer(object):
                     row = [i, j, el.getParticles()[0], el.getParticles()[1],
                            smsPrettyPrinter.wrap(m1, width=25),
                            smsPrettyPrinter.wrap(m2, width=25),
-                           smsPrettyPrinter.wrap(dc, width=30)]
-                    evElementTable.add_row(row)
-                evElementTable.add_row(["---", "---", "---", "---", "---",
-                                        "---", "---"])
+                           smsPrettyPrinter.wrap(dc, width=25)]
+        #            evElementTable.add_row(row)
+        #        evElementTable.add_row(["---", "---", "---", "---", "---",
+        #                                "---", "---"])
 
-        output += "\n"
-        output += "Number of Global topologies = " + str(len(self)) + "\n\n"
-        output += str(evTopTable) + "\n\n"
+        #output += str(evTopTable) + "\n\n"
         output += "Total Number of Elements = " + str(eltot) + "\n"
         output += "Total weight = " + str(self.getTotalWeight()) + "\n"
         # output += evElementTable + "\n"
