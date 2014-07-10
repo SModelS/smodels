@@ -34,9 +34,9 @@ class TheoryPrediction(object):
     def getmaxCondition(self):      
         maxcond = 0.
         for value in self.conditions.values():
-          if value == 'N/A': return value
-          if value == None: continue
-          maxcond = max(maxcond,value)
+            if value == 'N/A': return value
+            if value == None: continue
+            maxcond = max(maxcond,value)
         return maxcond        
 
 
