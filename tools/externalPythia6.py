@@ -222,6 +222,10 @@ class ExternalPythia6(ExternalTool):
         try:
             out = self.run(slhafile, "<install>/etc/pythia_test.card")
             out = out.split("\n")
+            if out[-1].find("The following floating-point")>-1:
+                ## in the last versions I have this line issued by fortran
+                ## I skip the line
+                out.pop()
 
             out.pop()
             val = (" ********* Fraction of events that fail fragmentation "
