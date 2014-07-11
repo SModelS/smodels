@@ -56,17 +56,9 @@ class ExternalPythia8(ExternalTool):
 if __name__ == "__main__":
     tool = ExternalPythia8()
     print("installed: " + str(tool.installDirectory()))
-    def ok(B):
-        """
-        TODO: write docstring
-        
-        """
-        if B:
-            return "ok"
-        return "error"
     #print("temporary directory: %s: %s" % (str(tool.tempDirectory()),
     #                                      td_exists))
-    print("check: " + ok(tool.checkInstallation()))
+    print("check: " + tool.ok(tool.checkInstallation()))
     #print("run:")
     #slhafile = SModelS.installDirectory() + "/inputFiles/slha/andrePT4.slha"
     #out = tool.run(slhafile)

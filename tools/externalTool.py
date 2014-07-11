@@ -65,3 +65,12 @@ class ExternalTool(object):
         path = path.replace("<install>", installdir)
         path = os.path.abspath(path)
         return path
+
+    def ok(self,B):
+        """
+        return 'ok', B is True. Else, return 'error'
+        
+        """
+        if B:
+            return "ok"
+        return "error"
