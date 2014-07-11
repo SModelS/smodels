@@ -43,6 +43,12 @@ class ExternalPythia6(ExternalTool):
         self.verbose = False
         self.tempdir = tempfile.mkdtemp()
         self.cfgfile = self.checkFileExists(config_file)
+        self.keepTempDir=False ## do we keep the temp directory for debugging?
+        self.nevents=None ## keep track of how many events we run over
+        ## for each event we only allow a certain computation time
+        ## if self.secondsPerEvent * self.nevents > CPU time, we terminate
+        ## pythia.
+        self.secondsPerEvent=10 
         self.reset()
 
 
@@ -82,6 +88,9 @@ class ExternalPythia6(ExternalTool):
         :param unlinkdir: remove temp directory completely
         
         """
+        if self.keepTempDir:
+            logger.warn("Keeping everything in " + self.tempdir )
+            return
         logger.debug("Unlinking " + self.tempdir)
         for inputFile in ["fort.61", "fort.68", "log" ]:
             if os.path.exists(self.tempdir + "/" + inputFile):
@@ -112,6 +121,8 @@ class ExternalPythia6(ExternalTool):
         f = open(self.tempdir + "/temp.cfg", "w")
         for line in lines:
             for (key, value) in replacements.items():
+                if key=="NEVENTS":
+                    self.nevents=int(value)
                 line = line.replace(key, str(value))
             f.write(line)
         f.close()
@@ -243,22 +254,17 @@ class ExternalPythia6(ExternalTool):
 
 if __name__ == "__main__":
     tool = ExternalPythia6()
+    # tool.keepTempDir=True
     print("installed: " + str(tool.installDirectory()))
-    def ok(B):
-        """
-        TODO: write docstring
-        
-        """
-        if B:
-            return "ok"
-        return "error"
-    td_exists = ok(os.path.exists(tool.tempDirectory()))
+    td_exists = tool.ok(os.path.exists(tool.tempDirectory()))
     print("temporary directory: %s: %s" % (str(tool.tempDirectory()),
                                            td_exists))
-    print("check: " + ok(tool.checkInstallation()))
+    print("check: " + tool.ok(tool.checkInstallation()))
+    print("seconds per event: %d" % tool.secondsPerEvent )
     tool.replaceInCfgFile({"NEVENTS": 1, "SQRTS":8000})
     tool.setParameter("MSTP(163)", "6")
-    print("run:")
     slhafile = SModelS.installDirectory() + "/inputFiles/slha/andrePT4.slha"
     out = tool.run(slhafile)
+    isok= ( len ( out.split("\n") ) > 570 )
+    print("run: "+tool.ok ( isok ) )
     tool.unlink()
