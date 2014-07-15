@@ -106,10 +106,10 @@ if not smstoplist:
     slhaStatus.printout("file", args.outputfile)
     sys.exit()
 
-smstoplist.printout()
+#smstoplist.printout()
 # This is my porposed format for element tabel
 
-for (i,topo) in enumerate(smstoplist):
+'''for (i,topo) in enumerate(smstoplist):
     print '\n'
     print "====================================================================="
     print "====================================================================="
@@ -127,17 +127,17 @@ for (i,topo) in enumerate(smstoplist):
         print "The element weights are:"
         for k in el.weight.getDictionary():
             print "Sqrts:", k, "\t Weights:", el.weight.getDictionary()[k]
-    print "====================================================================="
-    print "====================================================================="
-    print "The list ends here" 
-    print "====================================================================="
-    print "====================================================================="
+print "====================================================================="
+print "====================================================================="
+print "The list ends here" 
+print "====================================================================="
+print "====================================================================="'''
 
 # Set database address
 smsHelpers.base = ioPar.database
 
 # Load analyses
-listofanalyses = smsAnalysisFactory.load(io_dict.analyses, io_dict.topologies)
+listofanalyses = smsAnalysisFactory.load(ioPar.analyses, ioPar.topologies)
 
 #<< What is this?>>
 results = ioObjects.ResultList(bestresultonly = not ioPar.expandedSummary, describeTopo = ioPar.describeTopo)
@@ -145,10 +145,11 @@ results = ioObjects.ResultList(bestresultonly = not ioPar.expandedSummary, descr
 constrainedElements = []
 
 for analysis in listofanalyses:
+    print analysis
     elements = _getElementsFrom(smstoplist, analysis)
     if len(elements) == 0: continue
     # This is my porposed format for analyses elements table
-    print "========================================================"
+    '''print "========================================================"
     print "Analysis Name:", analysis.label.split(":")[0]
     print "Analysis Topology:", analysis.label.split(":")[1]
     print "Analysis Sqrts:", analysis.sqrts
@@ -164,7 +165,7 @@ for analysis in listofanalyses:
         for k in el.weight.getDictionary():
             print "\t Sqrts:", k, "\t Weights:", el.weight.getDictionary()[k]
         print "\t ........................................................"
-    sys.exit(10)
+    sys.exit(10)'''
 
 sys.exit(10)
 
