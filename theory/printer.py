@@ -84,7 +84,6 @@ class Printer(object):
         """
             Format data of to print an element object.
         """
-        print("reached the printer")
         '''output = ""
         output += "Particles in topology:" + srt(self.getParticles())
         output += '\n'
@@ -195,10 +194,7 @@ class Printer(object):
         return output
 
 
-    def formatElementsList(self):
-        """
-        Format data of a TheoryPrediction object.
-        """
+    '''def formatElementList(self):
         output = ""
         for (i,topo) in enumerate(self):
             output += '\n'
@@ -220,4 +216,4 @@ class Printer(object):
                 output += "The element weights are:"
                 for k in el.weight.getDictionary():
                     output += "Sqrts:", k, "\t Weights:", el.weight.getDictionary()[k]
-        return output
+        return output'''
