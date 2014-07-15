@@ -119,6 +119,7 @@ for (i,topo) in enumerate(smstoplist):
     for j, el in enumerate(topo.elementList):
         print "........................................................................."
         print "........................................................................."
+        #el.printout()
         print "Particles in topology:", el.getParticles()
         print 'The element masses are'
         for item in range(len(el.getMasses())):

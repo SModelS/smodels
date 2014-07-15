@@ -439,7 +439,6 @@ class Element(object):
             return newelement
 
 '''class Element(Printer):
-    print("will look for a printer now")
     def formatData(self):
         return Printer.formatElementData(self)'''
 
