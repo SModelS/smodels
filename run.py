@@ -105,7 +105,7 @@ if not smstoplist:
     slhaStatus.printout("file", args.outputfile)
     sys.exit()
 
-#smstoplist.printout()
+smstoplist.printout()
 # This is my porposed format for element tabel
 
 '''for (i,topo) in enumerate(smstoplist):
