@@ -1,3 +1,13 @@
+#!/usr/bin/env python
+
+"""
+    .. module:: ioObjects
+    :synopsis: Definitions of input/output parameters which are read from parameter.in
+    
+    .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>    
+    .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
+"""
+
 from smodels.theory.printer import Printer
 
 

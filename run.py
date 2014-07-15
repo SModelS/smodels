@@ -43,7 +43,6 @@ outputarray = []
 slhaStatus = slhaChecks.SlhaStatus(slhafile, sigmacut = ioPar.sigmacut, maxDisplacement = .001, checkXsec = not ioPar.addMissingXsecs, massgap = ioPar.minmassgap, maxcond = ioPar.maxcond)
 slhastat, warnings = slhaStatus.status
 
-
 if slhastat == -1 or slhastat == -3:
     status = -2
     outputStatus = ioObjects.OutputStatus(status, slhastat, warnings)
@@ -145,7 +144,6 @@ results = ioObjects.ResultList(bestresultonly = not ioPar.expandedSummary, descr
 constrainedElements = []
 
 for analysis in listofanalyses:
-    print analysis
     elements = _getElementsFrom(smstoplist, analysis)
     if len(elements) == 0: continue
     # This is my porposed format for analyses elements table
@@ -167,8 +165,6 @@ for analysis in listofanalyses:
         print "\t ........................................................"
     sys.exit(10)'''
 
-sys.exit(10)
-
 #Get theory prediction for each analysis and print basic output
 for analysis in listofanalyses:
     theorypredictions = theoryPredictionFor(analysis, smstoplist)
@@ -176,6 +172,8 @@ for analysis in listofanalyses:
         continue
     print "================================================================================"
     theorypredictions.printout() # again, check print function
+        #    for theoryprediction in theorypredictions:
+#        print theoryprediction.conditions
     print "................................................................................"
 
     # Create a list of results, to determine the best result

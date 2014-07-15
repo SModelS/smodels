@@ -1,15 +1,16 @@
 """
-.. module:: printer
-   :synopsis: Facility used in classes to derive from and be able to print
-              different data types in different forms.
+    .. module:: printer
+       :synopsis: Facility used in classes to derive from and be able to print
+                  different data types in different forms.
 
-.. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
+        .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
+        .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>    
+        .. moduleauthor:: Suchita Kulkanri <suchita.kulkarni@gmail.com>
 """
 
 from __future__ import print_function
 import logging
 from smodels.tools.physicsUnits import addunit
-import unum
 from smodels.theory import crossSection
 
 logger = logging.getLogger(__name__)
@@ -88,8 +89,8 @@ class Printer(object):
         output += "Particles in topology:" + srt(self.getParticles())
         output += '\n'
         output += 'The element masses are'
-        for item in range(len(self.getMasses())):
-            output += "Masses branch %i:" %item + str(self.getMasses()[item])
+        for i, el in enumerate(self.getMasses()):
+            output += "Masses in branch %i: " %i+ str(el) + "\n"
         output += "\n"
         output += "The element weights are:"
         for k in self.weight.getDictionary():
@@ -109,16 +110,18 @@ class Printer(object):
             output += "---------------Analysis Label = " + str(theoryPrediction.analysis.label) + "\n"
             output += "Analysis sqrts: " + str(theoryPrediction.value[0].info.label) + \
                     "\n"
-            output += "Mass: " + str(theoryPrediction.mass) + "\n"
+            for i, el in enumerate(theoryPrediction.mass):
+                output += "Masses in branch %i: " %i+ str(el) + "\n"
             output += "Theory prediction: " + str(theoryPrediction.value[0].value) + \
                       "\n"
             output += "Theory conditions:"
             if not theoryPrediction.conditions:
                 output += "  " + str(theoryPrediction.conditions) + "\n"
             else:
+                condlist = []
                 for cond in theoryPrediction.conditions:
-                    output += "  " + str(theoryPrediction.conditions[cond]) + \
-                              "\n"
+                    condlist.append(theoryPrediction.conditions[cond])
+                output += str(condlist) + '\n'
             experimentalLimit = theoryPrediction.analysis.getUpperLimitFor(
                     theoryPrediction.mass)            
             output += "Experimental limit: " + str(experimentalLimit) + "\n"
