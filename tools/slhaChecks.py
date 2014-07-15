@@ -13,6 +13,7 @@ from __future__ import print_function
 import setPath
 from smodels.tools import modpyslha as pyslha
 from smodels.theory.printer import Printer
+from smodels.tools.physicsUnits import addunit
 
 class SlhaStatus(Printer):
     """
@@ -45,7 +46,7 @@ class SlhaStatus(Printer):
         self.xsec = self.hasXsec(checkXsec)
         self.vertexStatus = self.findDisplacedVertices(findDisplaced)
         self.status = self.evaluateStatus()
-
+    
     def formatData(self):
         return self.formatSLHAData()
 
@@ -135,8 +136,8 @@ class SlhaStatus(Printer):
             return -1, "Charged NLSP is stable"
         if ct > self.maxFlightlength:
             if c == "neutral":
-                 return 1, "Neutral NLSP is long-lived, c*tau = " + str(ct)
-            return -1, "Charged NLSP is long-lived, c*tau = " + str(ct)
+                 return 1, "Neutral NLSP is long-lived, c*tau = " + str(addunit(ct),"m")
+            return -1, "Charged NLSP is long-lived, c*tau = " + str(addunit(ct), "m")
         return 1, "Prompt NLSP (%s) decay" % c
 
 
@@ -211,7 +212,7 @@ class SlhaStatus(Printer):
             if mass < minmass:
                 pid, minmass = particle, mass
         if returnmass:
-            return pid, minmass
+            return pid, addunit(minmass, "GeV")
         return pid
 
 
@@ -276,7 +277,7 @@ class SlhaStatus(Printer):
             if mass < minmass:
                 pid, minmass = particle, mass
         if returnmass:
-            return pid, minmass
+            return pid, addunit(minmass, "GeV")
         return pid
     
 

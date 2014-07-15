@@ -8,8 +8,12 @@
 
 from __future__ import print_function
 import logging
+from smodels.tools.physicsUnits import addunit
+import unum
+from smodels.theory import crossSection
 
 logger = logging.getLogger(__name__)
+
 
 
 class Printer(object):
@@ -58,58 +62,42 @@ class Printer(object):
 
     def formatTopologyListData(self):
         """
-        Format data of a TopologyList object.
-        
+        Format data of to print Global topologies object.
         """
-        from tools import smsPrettyPrinter
-        from prettytable import PrettyTable
+        import sys
         output = ""
-
-        printer = smsPrettyPrinter.SmsPrettyPrinter()
-        evTopTable = PrettyTable(["Topology", "#Vertices", "#Insertions",
-                                  "#Elements", "Sum of weights"])
-        evElementTable = PrettyTable(["Topology", "Element", "Particles B[0]",
-                                      "Particles B[1]", "Masses B[0]",
-                                      "Masses B[1]", "Element Weight"])
-
-        eltot = 0
-        # totweight = []
-        # Print Results:
-        # for i in range(len(SMSTopList)):
-        for i, topo in enumerate(self):
-            sumw = topo.getTotalWeight().getDictionary()
-            evTopTable.add_row([i, topo.vertnumb, topo.vertparts,
-                                len(topo.elementList),
-                                smsPrettyPrinter.wrap(printer.pformat(sumw),
-                                                      width=30)])
-            eltot += len(topo.elementList)
-
-        # Print element list for Topology[i]:
-            if i == 0:
-                for j, el in enumerate(topo.elementList):
-                    if el.getParticles() != [[['b', 'b']], [['b', 'b']]]:
-                        continue
-                    m1 = printer.pformat(el.getMasses()[0])
-                    m2 = printer.pformat(el.getMasses()[1])
-                    dc = printer.pformat(el.weight.getDictionary())
-                    row = [i, j, el.getParticles()[0], el.getParticles()[1],
-                           smsPrettyPrinter.wrap(m1, width=25),
-                           smsPrettyPrinter.wrap(m2, width=25),
-                           smsPrettyPrinter.wrap(dc, width=30)]
-                    evElementTable.add_row(row)
-                evElementTable.add_row(["---", "---", "---", "---", "---",
-                                        "---", "---"])
-
-        output += "\n"
-        output += "Number of Global topologies = " + str(len(self)) + "\n\n"
-        output += str(evTopTable) + "\n\n"
-        output += "Total Number of Elements = " + str(eltot) + "\n"
-        output += "Total weight = " + str(self.getTotalWeight()) + "\n"
-        # output += evElementTable + "\n"
-
+        output += "===================================================== \n"
+        for (i,topo) in enumerate(self):
+            output += "Number of vertices:" + str(topo.vertnumb) + ' \n'
+            output += "Number of vertex parts:" + str(topo.vertparts) + '\n'
+            totxsec = crossSection.XSectionList()
+            for el in topo.elementList:
+                totxsec.combineWith(el.weight)
+            output += "Total Global topology weight:\n" 
+            for k in totxsec.getDictionary():
+                output += "\t Sqrts: " + str(k) + "\t Weights: " + str(totxsec.getDictionary()[k]) + '\n'
+            output += "-------------------------------------------------- \n"
+            output += "===================================================== \n"    
         return output
 
+    def formatElementData(self):
+        """
+            Format data of to print an element object.
+        """
+        print("reached the printer")
+        '''output = ""
+        output += "Particles in topology:" + srt(self.getParticles())
+        output += '\n'
+        output += 'The element masses are'
+        for item in range(len(self.getMasses())):
+            output += "Masses branch %i:" %item + str(self.getMasses()[item])
+        output += "\n"
+        output += "The element weights are:"
+        for k in self.weight.getDictionary():
+            output += "Sqrts:" + str(k) + "\t Weights:" + str(self.weight.getDictionary()[k])
 
+        return output'''  
+    
     def formatTheoryPredictionData(self):
         """
         Format data of a TheoryPrediction object.
@@ -119,11 +107,13 @@ class Printer(object):
 
         for theoryPrediction in self:
             output += "\n"
-            output += "analysis: " + str(theoryPrediction.analysis) + "\n"
-            output += "mass: " + str(theoryPrediction.mass) + "\n"
-            output += "theory prediction: " + str(theoryPrediction.value) + \
+            output += "---------------Analysis Label = " + str(theoryPrediction.analysis.label) + "\n"
+            output += "Analysis sqrts: " + str(theoryPrediction.value[0].info.label) + \
+                    "\n"
+            output += "Mass: " + str(theoryPrediction.mass) + "\n"
+            output += "Theory prediction: " + str(theoryPrediction.value[0].value) + \
                       "\n"
-            output += "theory conditions:\n"
+            output += "Theory conditions:"
             if not theoryPrediction.conditions:
                 output += "  " + str(theoryPrediction.conditions) + "\n"
             else:
@@ -131,8 +121,8 @@ class Printer(object):
                     output += "  " + str(theoryPrediction.conditions[cond]) + \
                               "\n"
             experimentalLimit = theoryPrediction.analysis.getUpperLimitFor(
-                    theoryPrediction.mass)
-            output += "experimental limit: " + str(experimentalLimit) + "\n"
+                    theoryPrediction.mass)            
+            output += "Experimental limit: " + str(experimentalLimit) + "\n"
 
         return output
 
@@ -148,7 +138,6 @@ class Printer(object):
         output += "================================================================================\n"
 
         return output
-
 
     def formatResultsData(self):
         """
@@ -180,8 +169,8 @@ class Printer(object):
         output = ""
 
         output += "Input file: " + self.filename + "\n"
-        output += "Sigmacut: " + str(self.sigmacut) + "\n"
-        output += "Minmassgap: " + str(self.massgap) + "\n"
+        output += "Sigmacut: " + str(addunit(self.sigmacut, "fb")) + "\n"
+        output += "Minmassgap: " + str(addunit(self.massgap, "GeV")) + "\n"
         output += "Maxcond: " + str(self.maxcond) + "\n"
         output += "LSP PID, mass: " + str(self.findLSP(returnmass=True)) + "\n"
         output += "NLSP PID, mass: " + str(self.findNLSP(returnmass=True)) + "\n"
@@ -203,4 +192,32 @@ class Printer(object):
 
         for topo in sorted(self.topos, key=lambda x: x.value, reverse=True)[:10]:
             output += "%5s %10.3E    # %45s\n" % (str(rmvunit(self.sqrts,"TeV")), topo.value, str(topo.topo))
+        return output
+
+
+    def formatElementsList(self):
+        """
+        Format data of a TheoryPrediction object.
+        """
+        output = ""
+        for (i,topo) in enumerate(self):
+            output += '\n'
+            output += "====================================================================="
+            output += "====================================================================="
+            output += "A new global topoloy starts here" 
+            output += "====================================================================="
+            output += "====================================================================="
+            for j, el in enumerate(topo.elementList):
+                output += "........................................................................."
+                output += "........................................................................."
+                output += '\n'
+                output += "Particles in topology:", el.getParticles()
+                output += '\n'
+                output += 'The element masses are'
+                for item in range(len(el.getMasses())):
+                    output += "Masses branch %i:" %item, el.getMasses()[item]
+                output += "\n"
+                output += "The element weights are:"
+                for k in el.weight.getDictionary():
+                    output += "Sqrts:", k, "\t Weights:", el.weight.getDictionary()[k]
         return output
