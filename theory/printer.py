@@ -86,13 +86,13 @@ class Printer(object):
             Format data of to print an element object.
         """
         output = ""
-        output += "Particles in topology:" + srt(self.getParticles())
+        output += "Particles in topology:" + str(self.getParticles())
         output += '\n'
-        output += 'The element masses are'
+        output += 'The element masses are \n'
         for i, el in enumerate(self.getMasses()):
             output += "Masses in branch %i: " %i+ str(el) + "\n"
         output += "\n"
-        output += "The element weights are:"
+        output += "The element weights are: \n"
         for k in self.weight.getDictionary():
             output += "Sqrts:" + str(k) + "\t Weights:" + str(self.weight.getDictionary()[k])
 

@@ -108,31 +108,6 @@ if not smstoplist:
 smstoplist.printout()
 # This is my porposed format for element tabel
 
-'''for (i,topo) in enumerate(smstoplist):
-    print '\n'
-    print "====================================================================="
-    print "====================================================================="
-    print "A new global topoloy starts here" 
-    print "====================================================================="
-    print "====================================================================="
-    for j, el in enumerate(topo.elementList):
-        print "........................................................................."
-        print "........................................................................."
-        #el.printout()
-        print "Particles in topology:", el.getParticles()
-        print 'The element masses are'
-        for item in range(len(el.getMasses())):
-            print "Masses branch %i:" %item, el.getMasses()[item]
-        print "The element weights are:"
-        for k in el.weight.getDictionary():
-            print "Sqrts:", k, "\t Weights:", el.weight.getDictionary()[k]
-print "====================================================================="
-print "====================================================================="
-print "The list ends here" 
-print "====================================================================="
-print "====================================================================="'''
-
-
 for (i,topo) in enumerate(smstoplist):
     print '\n'
     print "====================================================================="
@@ -144,12 +119,11 @@ for (i,topo) in enumerate(smstoplist):
         print "........................................................................."
         print "........................................................................."
         el.printout()
-    print "====================================================================="
-    print "====================================================================="
-    print "The list ends here" 
-    print "====================================================================="
-    print "====================================================================="
-
+print "====================================================================="
+print "====================================================================="
+print "The list ends here" 
+print "====================================================================="
+print "====================================================================="
 
 # Set database address
 smsHelpers.base = ioPar.database
@@ -166,10 +140,12 @@ for analysis in listofanalyses:
     elements = _getElementsFrom(smstoplist, analysis)
     if len(elements) == 0: continue
     # This is my porposed format for analyses elements table
-    '''print "========================================================"
+    print "========================================================"
     print "Analysis Name:", analysis.label.split(":")[0]
     print "Analysis Topology:", analysis.label.split(":")[1]
     print "Analysis Sqrts:", analysis.sqrts
+    print "Analysis conditions:", analysis.conditions
+    print "Analysis constraint:", analysis.constraint
     print "========================================================"
     ref_el = None
     for el in elements:
@@ -182,7 +158,7 @@ for analysis in listofanalyses:
         for k in el.weight.getDictionary():
             print "\t Sqrts:", k, "\t Weights:", el.weight.getDictionary()[k]
         print "\t ........................................................"
-    sys.exit(10)'''
+    sys.exit(10)
 
 #Get theory prediction for each analysis and print basic output
 for analysis in listofanalyses:

@@ -15,7 +15,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Element(object):
+class Element(Printer):
     """
     An instance of this class represents an element.
     
@@ -438,9 +438,12 @@ class Element(object):
         else:
             return newelement
 
-class Element(Printer):
     def formatData(self):
+        """
+        Select data preparation method through dynamic binding.
+        """
         return Printer.formatElementData(self)
+
 
 def _smallerMass(mass1, mass2):
     """
