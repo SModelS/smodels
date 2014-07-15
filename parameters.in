@@ -46,6 +46,7 @@ describeTopo = True #Set True for a summary including all excluding results, Fal
 analyses = all #Set all to use all analyses included in the database
 #to use only specific analyses, give a list of the names, e.g.
 #analyses = [SUS13008,SUS13013,ATLAS_CONF_2013_024,SUSY_2013_04]
+analyses = [SUS12028]
 topologies= all #Set all to use all topologies included in the database
 #to use only specific topologies, give a list of the names, e.g.
-#topologies = [T1tttt,TChiWZ]
+topologies = [T2]

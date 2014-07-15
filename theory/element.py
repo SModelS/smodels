@@ -438,9 +438,9 @@ class Element(object):
         else:
             return newelement
 
-'''class Element(Printer):
+class Element(Printer):
     def formatData(self):
-        return Printer.formatElementData(self)'''
+        return Printer.formatElementData(self)
 
 def _smallerMass(mass1, mass2):
     """
