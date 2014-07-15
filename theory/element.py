@@ -9,6 +9,7 @@
 from smodels.theory.particleNames import ptcDic, rEven, simParticles, elementsInStr
 from smodels.theory.branch import Branch
 from smodels.theory import crossSection
+from smodels.theory.printer import Printer
 import logging
 
 logger = logging.getLogger(__name__)
@@ -34,7 +35,7 @@ class Element(object):
             If element is not due to compression, 
             then list remains empty.
         """
-
+        
         if info:
             # Create element from particle string
             if type(info) == type(str()):
@@ -437,6 +438,10 @@ class Element(object):
         else:
             return newelement
 
+'''class Element(Printer):
+    print("will look for a printer now")
+    def formatData(self):
+        return Printer.formatElementData(self)'''
 
 def _smallerMass(mass1, mass2):
     """

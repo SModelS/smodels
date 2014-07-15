@@ -3,7 +3,7 @@
 #
 #Database address
 #
-database = /home/laa/smodels-database #Give path to database directory
+database = /Users/kulkarni/smodels-database #Give path to database directory
 
 #
 #Basic input
@@ -11,7 +11,7 @@ database = /home/laa/smodels-database #Give path to database directory
 
 #Select running mode
 doSLHAdec = True #Set True for SLHA decomposition, False for LHE decomposition
-addMissingXsecs = False #Set True if SModelS should add cross sections not given in the input SLHA
+addMissingXsecs = True #Set True if SModelS should add cross sections not given in the input SLHA
 sqrts = 8. #Give sqrts in TeV
 addnlo = False #Given LO cross sections in the input slha, compute NLO with nllfast
 addnll = False #Given LO cross sections in the input slha, compute NLL with nllfast
@@ -20,7 +20,7 @@ doInvisible = True #Set True if invisible compression should be performed, False
 doCompress = True #Set True if mass compression should be performed, False elsewise
 
 #Select input parameters
-sigmacut = 0.01 #Give minimum cross section value [fb] considered in SLHA decomposition (only relevant for SLHA decompositon)
+sigmacut = 0.01 #Give minimum cross section value [fb] considered in SLHA decomposition (only relevant for SLHA decomposition)
 minmassgap = 5. #Give minimum mass gap [GeV] for mass compression
 maxcond = 0.2 #Maximum relative violation of conditions for valid results
 
@@ -29,16 +29,16 @@ maxcond = 0.2 #Maximum relative violation of conditions for valid results
 #
 
 #stdout
-printGtop = False #Set True to print table of global topologies, False elsewise
+printGtop = True #Set True to print table of global topologies, False elsewise
 printThEl = False #Set True to print table of elements after theoretical decomposition, False elsewise. Note that not all the elements appearing in this table are constrained by experiments.
-printAnaEl = False #Set True to print table of elements, constrained by available experimental analyses, False elsewise
+printAnaEl = True #Set True to print table of elements, constrained by available experimental analyses, False elsewise
 evaluateResults = True #Set True to evaluate results (cross sections, experimental upper limits)
 printResults = True #Set True to print table of results, False elsewise
 
 #output file
 expandedSummary = True #Set True for a summary including all excluding results, False for only the strongest result
 
-describeTopo = False #Set True for a summary including all excluding results, False for only the strongest result
+describeTopo = True #Set True for a summary including all excluding results, False for only the strongest result
 #
 #Advanced settings
 #
