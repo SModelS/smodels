@@ -137,7 +137,7 @@ for (i,topo) in enumerate(smstoplist):
 smsHelpers.base = ioPar.database
 
 # Load analyses
-listofanalyses = smsAnalysisFactory.load()
+listofanalyses = smsAnalysisFactory.load(io_dict.analyses, io_dict.topologies)
 
 #<< What is this?>>
 results = ioObjects.ResultList(bestresultonly = not ioPar.expandedSummary, describeTopo = ioPar.describeTopo)
