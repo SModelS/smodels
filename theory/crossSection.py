@@ -168,11 +168,8 @@ class XSectionList(object):
     """
     def __init__(self, infoList=None):
         """
-        Create a list of XSection objects from the input string with None
-        cross-section values.
-        
         If infoList is defined, create entries with zero cross-sections
-        according to infoList.
+        according to infoList. infoList must be a list of XSectionInfo objects.
         
         """
         self.xSections = []
