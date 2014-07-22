@@ -112,14 +112,10 @@ if ioPar.printGtop:
 if ioPar.printThEl:
     for (i,topo) in enumerate(smstoplist):
         print '\n'
-        print "====================================================================="
-        print "====================================================================="
         print "A new global topoloy starts here" 
         print "====================================================================="
-        print "====================================================================="
         for j, el in enumerate(topo.elementList):
-            print "........................................................................."
-            print "........................................................................."
+            print "\t ........................................................................."
             el.printout()
     print "====================================================================="
     print "====================================================================="
@@ -147,8 +143,6 @@ if ioPar.printAnaEl:
         print "Analysis Name:", analysis.label.split(":")[0]
         print "Analysis Topology:", analysis.label.split(":")[1]
         print "Analysis Sqrts:", analysis.sqrts
-        print "Analysis conditions:", analysis.conditions
-        print "Analysis constraint:", analysis.constraint
         print "========================================================"
         ref_el = None
         for el in elements:
@@ -164,8 +158,6 @@ for analysis in listofanalyses:
     if ioPar.printResults:
         print "================================================================================"
         theorypredictions.printout() # again, check print function
-        #    for theoryprediction in theorypredictions:
-#        print theoryprediction.conditions
     print "................................................................................"
 
     # Create a list of results, to determine the best result
