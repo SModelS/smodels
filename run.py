@@ -105,25 +105,27 @@ if not smstoplist:
     slhaStatus.printout("file", args.outputfile)
     sys.exit()
 
-smstoplist.printout()
-# This is my porposed format for element tabel
+if ioPar.printGtop:
+    smstoplist.printout()
 
-for (i,topo) in enumerate(smstoplist):
-    print '\n'
+# This is my porposed format for element tabel
+if ioPar.printThEl:
+    for (i,topo) in enumerate(smstoplist):
+        print '\n'
+        print "====================================================================="
+        print "====================================================================="
+        print "A new global topoloy starts here" 
+        print "====================================================================="
+        print "====================================================================="
+        for j, el in enumerate(topo.elementList):
+            print "........................................................................."
+            print "........................................................................."
+            el.printout()
     print "====================================================================="
     print "====================================================================="
-    print "A new global topoloy starts here" 
+    print "The list ends here" 
     print "====================================================================="
     print "====================================================================="
-    for j, el in enumerate(topo.elementList):
-        print "........................................................................."
-        print "........................................................................."
-        el.printout()
-print "====================================================================="
-print "====================================================================="
-print "The list ends here" 
-print "====================================================================="
-print "====================================================================="
 
 # Set database address
 smsHelpers.base = ioPar.database
@@ -136,37 +138,32 @@ results = ioObjects.ResultList(bestresultonly = not ioPar.expandedSummary, descr
 
 constrainedElements = []
 
-for analysis in listofanalyses:
-    elements = _getElementsFrom(smstoplist, analysis)
-    if len(elements) == 0: continue
-    # This is my porposed format for analyses elements table
-    print "========================================================"
-    print "Analysis Name:", analysis.label.split(":")[0]
-    print "Analysis Topology:", analysis.label.split(":")[1]
-    print "Analysis Sqrts:", analysis.sqrts
-    print "Analysis conditions:", analysis.conditions
-    print "Analysis constraint:", analysis.constraint
-    print "========================================================"
-    ref_el = None
-    for el in elements:
-        if el != ref_el:
-            print "\t Element is:", el
-        ref_el = el
-        for item in range(len(el.getMasses())):
-            print "\t Element masses in branch %i are:" %item, el.getMasses()[item]
-        print "\t The element weights are:"
-        for k in el.weight.getDictionary():
-            print "\t Sqrts:", k, "\t Weights:", el.weight.getDictionary()[k]
-        print "\t ........................................................"
-    sys.exit(10)
+if ioPar.printAnaEl:
+    for analysis in listofanalyses:
+        elements = _getElementsFrom(smstoplist, analysis)
+        if len(elements) == 0: continue
+        # This is my porposed format for analyses elements table
+        print "========================================================"
+        print "Analysis Name:", analysis.label.split(":")[0]
+        print "Analysis Topology:", analysis.label.split(":")[1]
+        print "Analysis Sqrts:", analysis.sqrts
+        print "Analysis conditions:", analysis.conditions
+        print "Analysis constraint:", analysis.constraint
+        print "========================================================"
+        ref_el = None
+        for el in elements:
+            el.printout()
+            print "........................................................"
+#    sys.exit(10)
 
 #Get theory prediction for each analysis and print basic output
 for analysis in listofanalyses:
     theorypredictions = theoryPredictionFor(analysis, smstoplist)
     if not theorypredictions:
         continue
-    print "================================================================================"
-    theorypredictions.printout() # again, check print function
+    if ioPar.printResults:
+        print "================================================================================"
+        theorypredictions.printout() # again, check print function
         #    for theoryprediction in theorypredictions:
 #        print theoryprediction.conditions
     print "................................................................................"

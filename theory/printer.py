@@ -66,19 +66,27 @@ class Printer(object):
         Format data of to print Global topologies object.
         """
         import sys
+        old_vertices = ""
         output = ""
-        output += "===================================================== \n"
+        output += "   ======================================================= \n"
+        output += " || \t \t\t\t\t\t\t || \n"
+        output += " || \t \t Global topologies table \t \t ||\n"
+        output += " || \t \t\t\t\t\t\t || \n"
+        output += "   ======================================================= \n"
         for (i,topo) in enumerate(self):
-            output += "Number of vertices:" + str(topo.vertnumb) + ' \n'
-            output += "Number of vertex parts:" + str(topo.vertparts) + '\n'
+            if old_vertices == str(topo.vertnumb):
+                output += "\t .................................................. \n"
+            else:
+                output += "===================================================== \n"    
+                output += "Number of vertices: " + str(topo.vertnumb) + ' \n'
+                old_vertices = str(topo.vertnumb)
+            output += "\t Number of vertex parts: " + str(topo.vertparts) + '\n'
             totxsec = crossSection.XSectionList()
             for el in topo.elementList:
                 totxsec.combineWith(el.weight)
-            output += "Total Global topology weight:\n" 
+            output += "\t Total Global topology weight:\n" 
             for k in totxsec.getDictionary():
                 output += "\t Sqrts: " + str(k) + "\t Weights: " + str(totxsec.getDictionary()[k]) + '\n'
-            output += "-------------------------------------------------- \n"
-            output += "===================================================== \n"    
         return output
 
     def formatElementData(self):
