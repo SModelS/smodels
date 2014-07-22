@@ -12,6 +12,7 @@ from __future__ import print_function
 import logging
 from smodels.tools.physicsUnits import addunit
 from smodels.theory import crossSection
+from smodels.tools.physicsUnits import rmvunit
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +63,7 @@ class Printer(object):
 
 
     def formatTopologyListData(self):
+        from smodels.tools.physicsUnits import rmvunit
         """
         Format data of to print Global topologies object.
         """
@@ -86,7 +88,7 @@ class Printer(object):
                 totxsec.combineWith(el.weight)
             output += "\t Total Global topology weight:\n" 
             for k in totxsec.getDictionary():
-                output += "\t Sqrts: " + str(k) + "\t Weights: " + str(totxsec.getDictionary()[k]) + '\n'
+                    output += "\t Sqrts: " + str(rmvunit(k, "TeV")) + "\t Weight: " + str(self.weight.getDictionary()[k]) + "\n"
         return output
 
     def formatElementData(self):
@@ -94,15 +96,14 @@ class Printer(object):
             Format data of to print an element object.
         """
         output = ""
-        output += "Particles in topology:" + str(self.getParticles())
+        output += "\t Particles in topology: " + str(self.getParticles())
         output += '\n'
-        output += 'The element masses are \n'
+        output += '\t The element masses are \n'
         for i, el in enumerate(self.getMasses()):
-            output += "Masses in branch %i: " %i+ str(el) + "\n"
-        output += "\n"
-        output += "The element weights are: \n"
+            output += "\t Branch %i: " %i+ str(el) + "\n"
+        output += "\t The element weights are: \n"
         for k in self.weight.getDictionary():
-            output += "Sqrts:" + str(k) + "\t Weights:" + str(self.weight.getDictionary()[k])
+            output += "\t Sqrts: " + str(rmvunit(k, "TeV")) + "\t Weight: " + str(self.weight.getDictionary()[k]) + "\n"
 
         return output
     
