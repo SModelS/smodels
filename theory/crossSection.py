@@ -86,7 +86,8 @@ class XSection(object):
             newXsec.value = newXsec.value * other
         else:
             logger.error("Xsections can only be multiplied by floats")
-            return False
+            import sys
+            sys.exit()
         return newXsec
 
 
@@ -101,7 +102,8 @@ class XSection(object):
                 res.value += other.value
                 return res
         logger.error("Trying to add " + type(other) + " to a XSection object")
-        return False
+        import sys
+        sys.exit()
 
 
     def __eq__(self, other):
@@ -215,7 +217,8 @@ class XSectionList(object):
     def __setitem__(self, index, xsec):
         if type(xsec) != type(XSection()):
             logger.error("Input object must be a XSection() object")
-            return False
+            import sys
+            sys.exit()
         else:
             self.xSections[index] = xsec
 
@@ -246,7 +249,8 @@ class XSectionList(object):
         """
         if type(newxsec) != type(XSection()):
             logger.error("Input object must be a XSection() object")
-            return False
+            import sys
+            sys.exit()
         else:
             self.xSections.append(newxsec.copy())
 
@@ -261,7 +265,8 @@ class XSectionList(object):
         """
         if type(newxsec) != type(XSection()):
             logger.error("Input object must be a XSection() object")
-            return False
+            import sys
+            sys.exit()
         else:
             exists = False
             for iXSec, xSec in enumerate(self.xSections):
@@ -520,7 +525,8 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None):
             wlabel += ' (NLL)'
         else:
             logger.error("Unknown QCD order in XSECTION line " + l)
-            return False
+            import sys
+            sys.exit()
         xsec = XSection()
         xsec.info.sqrts = addunit(sqrtS, 'TeV')
         xsec.info.order = csOrder
@@ -552,15 +558,18 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
     reader = lheReader.LheReader(lhefile)
     if not rmvunit(reader.metainfo["totalxsec"], 'fb'):
         logger.error("Cross-section information not found in LHE file.")
-        return False
+        import sys
+        sys.exit()
     elif not reader.metainfo["nevents"]:
         logger.error("Total number of events information not found in LHE " +
                      "file.")
-        return False
+        import sys
+        sys.exit()
     elif not rmvunit(reader.metainfo["sqrts"], 'TeV'):
         logger.error("Center-of-mass energy information not found in LHE " +
                      "file.")
-        return False
+        import sys
+        sys.exit()
 
     # Common cross-section info
     totxsec = reader.metainfo["totalxsec"]

@@ -92,7 +92,8 @@ def massAvg(massList, method='weighted', weights=None):
                 or len(mass[1]) != len(massList[0][1]):
             logger.error('Mass shape mismatch in mass list:\n' + str(mass) +
                          ' and ' + str(massList[0]))
-            return False
+            import sys
+            sys.exit()
 
     avgmass = copy.deepcopy(massList[0])
     for ib, branch in enumerate(massList[0]):
@@ -122,7 +123,8 @@ def cSim(*weights):
     for weight in weights:
         if type(weight) != type(crossSection.XSectionList()):
             logger.error("Trying to evaluate non-xsection objects")
-            return False
+            import sys
+            sys.exit()
 
     # Make sure both xsec lists have the same entries (add zero xsecs for the
     # missing entries)
@@ -167,7 +169,8 @@ def cGtr(weightA, weightB):
     if type(weightA) != type(crossSection.XSectionList()) or \
             type(weightB) != type(crossSection.XSectionList()):
         logger.error("Trying to evaluate non-xsection objects")
-        return False
+        import sys
+        sys.exit()
 
     # Make sure both xsec lists have the same entries (add zero xsecs for the
     # missing entries)
