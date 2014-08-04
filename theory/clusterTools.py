@@ -1,6 +1,7 @@
 """
 .. module:: theory.clusterTools
-   :synopsis: missing TODO write it
+   :synopsis: Module holding the ElementCluster class and cluster methods used to combine similar elements according
+   to the analysis.
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
         
@@ -215,8 +216,7 @@ def groupAll(elements):
 
 
 def clusterElements(elements, analysis, maxDist):
-    """ TODO: where is keepMassInfo?
-    Cluster the original elements according to their mass distance.
+    """ Cluster the original elements according to their mass distance.
     
     :returns: list of clusters; If keepMassInfo == True, saves the original
               masses and their cluster value in massDict.

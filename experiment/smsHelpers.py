@@ -155,7 +155,8 @@ def _parseMetaInfo(analysis, run):
 
 def getUpperLimitDictionary(analysis, topology, run, expected=False):
     """
-    TODO: write docstring
+    Returns a dictionary containing the raw Upper Limit data for the analysis
+    and topology. 
 
     """
     key = analysis + topology + str(run)

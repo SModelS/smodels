@@ -236,7 +236,7 @@ def _compareMasses(masses, d):
             return True
         else:
             return None
-    except:  # TODO: which exception?
+    except:
         # Check if histogram for fixed LSP mass, return 1 if my is comparable
         # to LSP mass of the histogram, 0 if not
         if d['mz'][0].find('LSP') > -1:

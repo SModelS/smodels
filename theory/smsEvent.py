@@ -34,7 +34,7 @@ class SmsEvent(object):
 
     def add(self, particle):
         """
-        TODO: write docstring
+        Add particle to the event.
         
         """
         self.particles.append(particle)

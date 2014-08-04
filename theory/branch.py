@@ -1,6 +1,6 @@
 """
 .. module:: theory.branch
-   :synopsis: missing TODO write it
+   :synopsis: Module holding the branch class and methods.
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
         
@@ -64,8 +64,8 @@ class Branch(object):
 
 
     def isEqual(self, other, useDict=True):
-        """ TODO: write docstring
-        
+        """ Compare the branch with other. If particles are similar
+        and masses are equal, return True. Otherwise, return False.        
         """
         if type (other) != type(self):
             return False

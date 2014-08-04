@@ -89,7 +89,7 @@ def getSqrts(analysis, run=None):
     sqrts = smsHelpers.getMetaInfoField(analysis, "sqrts", run)
     try:
         return addunit(float(sqrts), "TeV")
-    except:  # TODO: except what?
+    except:
         pass
     return sqrts
 
@@ -122,8 +122,7 @@ def getConditions(analysis, topology="all", fuzzy=True, run=None):
 
 
 def getaxes(analysis, topology=None, run=None):
-    """ TODO: improve docstring
-    Get information about the histogram axes for an analysis.
+    """Get information about the histogram axes for an analysis.
 
     For each topology list of dictionary, each dictionary corresponds to one
     histogram. The key axes gives string (mx-my), the key mz gives information
@@ -255,7 +254,7 @@ def getComment(analysis, run=None):
 
 def considerRuns(runs):
     """
-    TODO: write docstring
+    Define the run labels to be considered.
     
     """
     smsHelpers.runs = runs
@@ -309,7 +308,7 @@ def getUpperLimit(analysis, topology, mx=None, my=None, run=None,
 def getUpperLimitFromDictionary(analysis, topology, mx=None, my=None,
                                 run=None, png=None, interpolate=False,
                                 expected=False):
-    """ TODO: unused arguments png and interpolate
+    """
     Get an upper limit from the python dictionary.
 
     """
@@ -365,7 +364,7 @@ def getInterpolatedUpperLimitDelaunay(dictionary, inmx, inmy):
         gridY = my
         return float(ip.griddata(points, values, (gridX, gridY),
                                  method='linear'))
-    except Exception as e:  # TODO: which exception?
+    except Exception as e:
         logger.error("Cannot interpolate %s. Using closest value instead.", e)
         if not inConvexHull(dictionary, inmx, inmy):
             return False
@@ -374,7 +373,7 @@ def getInterpolatedUpperLimitDelaunay(dictionary, inmx, inmy):
 
 def inConvexHull(dictionary, mx, my):
     """
-    TODO: write docstring
+    Check if (mx,my) point is in the data dictionary.
 
     """
     import numpy

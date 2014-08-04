@@ -82,17 +82,14 @@ class SRanalysis(object):
         return self.label
 
     def getEfficiencyFor(self, element):
-        """ TODO: remove before release?
-        Get efficiency from a database (dummy for now).
-        
+        """ Get efficiency from a database (dummy for now).        
         """
         if not element:
             return False
         return False
 
     def getLimitFor(self):
-        """ TODO: remove before release?
-        Get experimental limit for a cross-section in a specific signal region.
+        """ Get experimental limit for a cross-section in a specific signal region.
         (dummy for now)
         
         :returns: experimental upper limit for cross-section in the signal

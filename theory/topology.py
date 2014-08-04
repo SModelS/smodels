@@ -249,9 +249,9 @@ class TopologyList(Printer):
         return s
 
 
-    def addList(self, parList):
+    def addList(self, topoList):
         """
-        TODO: write docstring
+        Adds topologies in topoList using the add method.
 
         """
         for topo in parList:
@@ -260,7 +260,7 @@ class TopologyList(Printer):
 
     def describe(self):
         """
-        TODO: write docstring
+        Returns string with basic information about the topology list.
 
         """
         s = "TopologyList:\n"
