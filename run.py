@@ -29,17 +29,11 @@ if os.path.exists(args.outputfile): #remove old output file
     log.warning("Removing old output file in "+args.outputfile)
     os.remove(args.outputfile)
 
-#lists to store results
-bestresult = []
-outputarray = []
-
 #get status, warnings from slhaChecks
-
 #slhatstat == 0, the file is not checked
 #slhastat == 1, the check is ok
 #slhastat == -1, physical problem in scenario, e.g. charged LSP,
 #slhastat == -2  formal problems in the file, e.g. missing decay blocks
-
 slhaStatus = slhaChecks.SlhaStatus(slhafile, sigmacut = ioPar.sigmacut, maxDisplacement = .001, checkXsec = not ioPar.addMissingXsecs, massgap = ioPar.minmassgap, maxcond = ioPar.maxcond)
 slhastat, warnings = slhaStatus.status
 
@@ -49,6 +43,10 @@ if slhastat == -1 or slhastat == -3:
     outputStatus.printout("file",args.outputfile)
     slhaStatus.printout("file",args.outputfile)
     sys.exit()
+
+#lists to store results
+bestresult = []
+outputarray = []
 
 # << there should be some automated mechanism to check this thing?>>
 writeXsecs = True #set this true by default, switch to false only in case of lhe decomposition

@@ -3,7 +3,7 @@
 #
 #Database address
 #
-database = /Users/kulkarni/smodels-database #Give path to database directory
+database = /home/lessa/smodels-database #Give path to database directory
 
 #
 #Basic input
