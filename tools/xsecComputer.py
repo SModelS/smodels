@@ -110,6 +110,8 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
             if xsec.value == addunit(0., 'fb'):
                 xsecs.delete(xsec)
                 break
+    if maxOrder > 0 and len(xsecs) == 0:
+        logger.warning("No NLO or NLL cross-sections available.")
     return xsecs
 
 
@@ -125,6 +127,10 @@ def addXSecToFile(xsecs, slhafile, comment=None, complain=True):
     """
     if not os.path.isfile(slhafile):
         logger.error("SLHA file not found.")
+        import sys
+        sys.exit()
+    if len(xsecs) == 0:
+        logger.warning("No cross-sections available.")
         import sys
         sys.exit()
     # Check if file already contain cross-section blocks
@@ -279,11 +285,11 @@ if __name__ == "__main__":
     if inputFile[-5:].lower() == ".slha" or args.slha:
         if args.tofile:
             logger.info("Computing SLHA cross section from %s and adding to "
-                        "SLHA file ...", inputFile)
+                        "SLHA file ...", inputFile)           
             for s in sqrtses:
                 ss = addunit(s, 'TeV')
                 xsecs = computeXSec(ss, order, args.nevents, inputFile, unlink=(not args.keep) )
-                comment = "Nevts: " + str(args.nevents) + "xsec unit: fb" 
+                comment = "Nevts: " + str(args.nevents) + " xsec unit: fb" 
                 addXSecToFile(xsecs, inputFile, comment)
             logger.info("... done.")
             sys.exit(0)
