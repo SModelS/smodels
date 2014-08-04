@@ -53,7 +53,8 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
 
     if not os.path.isfile(slhafile):
         logger.error("SLHA file %s not found.", slhafile)
-        return None
+        import sys
+        sys.exit()
     if lhefile:
         if os.path.isfile(lhefile):
             logger.warning("Using LO cross-sections from " + lhefile)
@@ -124,7 +125,8 @@ def addXSecToFile(xsecs, slhafile, comment=None, complain=True):
     """
     if not os.path.isfile(slhafile):
         logger.error("SLHA file not found.")
-        return None
+        import sys
+        sys.exit()
     # Check if file already contain cross-section blocks
     xSectionList = crossSection.getXsecFromSLHAFile(slhafile)
     if xSectionList and complain:
@@ -160,7 +162,8 @@ def xsecToBlock(xsec, inPDGs=(2212, 2212), comment=None):
     """
     if type(xsec) != type(crossSection.XSection()):
         logger.error("Wrong input")
-        return False
+        import sys
+        sys.exit()
     # Sqrt(s) in GeV
     header = "XSECTION  " + str(rmvunit(xsec.info.sqrts, 'GeV'))
     for pdg in inPDGs:
@@ -204,7 +207,8 @@ def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True ):
     lhedata = tool.run(slhafile, do_unlink=unlink )
     if not "<LesHouchesEvents" in lhedata:
         logger.error("LHE events not found in pythia output")
-        return False
+        import sys
+        sys.exit()
 
     # Generate file object with lhe events
     if lhefile:
@@ -265,7 +269,7 @@ if __name__ == "__main__":
     if order > 0:
         for sqrts in sqrtses:
             if not sqrts in [7, 8, 13, 14, 30, 100]:
-                logger.error("Cannot compute NLO or NLL xsecs for sqrts = %d "
+                logger.warning("Cannot compute NLO or NLL xsecs for sqrts = %d "
                              "TeV!", sqrts)
                 sqrtses.remove(sqrts)
     inputFile = args.file[0]
@@ -279,7 +283,7 @@ if __name__ == "__main__":
             for s in sqrtses:
                 ss = addunit(s, 'TeV')
                 xsecs = computeXSec(ss, order, args.nevents, inputFile, unlink=(not args.keep) )
-                comment = "Nevts: " + str(args.nevents)
+                comment = "Nevts: " + str(args.nevents) + "xsec unit: fb" 
                 addXSecToFile(xsecs, inputFile, comment)
             logger.info("... done.")
             sys.exit(0)
