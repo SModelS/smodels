@@ -30,7 +30,8 @@ class Branch(object):
             branch = elementsInStr(info)
             if not branch or len(branch) > 1:
                 logger.error("Wrong input string " + info)
-                return False
+                import sys
+                sys.exit()
             else:
                 branch = branch[0]
                 vertices = elementsInStr(branch[1:-1])
@@ -41,7 +42,8 @@ class Branch(object):
                         if not ptc in rEven.values() \
                                 and not ptc in ptcDic:
                             logger.error("Unknown particle " + ptc)
-                            return False
+                            import sys
+                            sys.exit()
                     self.particles.append(ptcs)
 
 

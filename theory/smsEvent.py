@@ -53,7 +53,8 @@ class SmsEvent(object):
                 imom += 1
         if imom != 2:
             logger.error("Number of mother particles %d != 2", imom)
-            return None
+            import sys
+            sys.exit()
         if momspdg[0] > momspdg[1]:
             momspdg[0], momspdg[1] = momspdg[1], momspdg[0]
         return momspdg

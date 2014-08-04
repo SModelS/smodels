@@ -183,7 +183,8 @@ class IndexCluster(object):
         else:
             logger.error("Unknown object type (must be an element index or "
                          "position)")
-            return False
+            import sys
+            sys.exit()
 
         for jel in self:
             dmax = max(dmax, distance(pos, self.positionMap[jel]))

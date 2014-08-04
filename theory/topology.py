@@ -103,10 +103,12 @@ class Topology(object):
             info = element.getEinfo()
             if self.vertnumb != info["vertnumb"]:
                 logger.error("Inconsistent topology.")
-                return False
+                import sys
+                sys.exit()
             if self.vertparts != info["vertparts"]:
                 logger.error("Inconsistent topology.")
-                return False
+                import sys
+                sys.exit()
         logger.info("Consistent topology.")
         return True
 

@@ -46,7 +46,8 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
 
     if doCompress and rmvunit(minmassgap, 'GeV') == -1:
         logger.error("Please set minmassgap.")
-        return False
+        import sys
+        sys.exit()
 
     if type(sigcut) == type(1.):
         sigcut = addunit(sigcut, 'fb')

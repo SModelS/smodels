@@ -98,7 +98,8 @@ def elementFromEvent(event, weight=None):
     if len(finalBranchList) != 2:
         logger.error(str(len(finalBranchList)) + " branches found in event; "
                      "Possible R-parity violation")
-        return False
+        import sys
+        sys.exit()
     # Create element from event
     newElement = element.Element(finalBranchList)
     if weight:
@@ -132,7 +133,8 @@ def _getDictionariesFromEvent(event):
             if particle.moms[0] != particle.moms[1] and \
                     min(particle.moms) != 0:
                 logger.error("More than one parent particle found")
-                return False
+                import sys
+                sys.exit()
             initMom = max(particle.moms) - 1
             while particles[particles[initMom].moms[0]].status != -1:
                 # Find primary mother (labels the branch)

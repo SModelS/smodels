@@ -189,10 +189,12 @@ class Element(object):
             newmass = [mass[1], mass[0]]
         else:
             logger.error("Called with no possible ordering")
-            return False
+            import sys
+            sys.exit()
         if len(newmass) != len(self.branches):
             logger.error("Called with wrong number of mass branches")
-            return False
+            import sys
+            sys.exit()
 
         for i, mass in enumerate(newmass):
             self.branches[i].masses = mass[:]
@@ -306,11 +308,13 @@ class Element(object):
             for iv, vertex in enumerate(branch.particles):
                 if len(vertex) != info['vertparts'][ib][iv]:
                     logger.error("Wrong syntax")
-                    return False
+                    import sys
+                    sys.exit()
                 for ptc in vertex:
                     if not ptc in rEven.values() and not ptc in ptcDic:
                         logger.error("Unknown particle" + ptc)
-                        return False
+                        import sys
+                        sys.exit()
         return True
 
 
@@ -464,4 +468,5 @@ def _smallerMass(mass1, mass2):
         pass
 
     logger.error("Invalid input")
-    return False
+    import sys
+    sys.exit()
