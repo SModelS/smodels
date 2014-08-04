@@ -7,9 +7,10 @@
 """
 
 from smodels.theory import lheReader, topology, crossSection, element
-from smodels.theory import branch, particleNames
+from smodels.theory import branch
 from smodels.tools import modpyslha as pyslha
 from smodels.tools.physicsUnits import addunit
+import smodels.particles
 import copy
 import logging
 
@@ -148,7 +149,7 @@ def _getDictionariesFromEvent(event):
         massDic[ibranch] = {}
         brDic[ibranch] = {}
     for ip, particle in enumerate(particles):
-        if particle.pdg in particleNames.rEven or particle.status == -1:
+        if particle.pdg in smodels.particles.rEven or particle.status == -1:
             # Ignore R-even particles and initial state particles
             continue
         ibranch = branchDic[ip]  # Get particle branch
@@ -166,7 +167,7 @@ def _getDictionariesFromEvent(event):
             continue
         ibranch = branchDic[ip]
         momPdg = particles[max(particle.moms) - 1].pdg
-        if momPdg in particleNames.rEven:
+        if momPdg in smodels.particles.rEven:
             # Ignore R-even decays
             continue
         # BR = 1 always for an event
