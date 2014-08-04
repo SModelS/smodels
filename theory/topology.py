@@ -256,7 +256,7 @@ class TopologyList(Printer):
         Adds topologies in topoList using the add method.
 
         """
-        for topo in parList:
+        for topo in topoList:
             self.add(topo)
 
 

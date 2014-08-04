@@ -8,10 +8,11 @@
 
 import copy
 import time
-from smodels.theory import element, topology, crossSection, particleNames
+from smodels.theory import element, topology, crossSection
 from smodels.theory.branch import Branch, decayBranches
 from smodels.tools import modpyslha as pyslha
 from smodels.tools.physicsUnits import addunit, rmvunit
+import smodels.particles
 import logging
 
 logger = logging.getLogger(__name__)
@@ -120,15 +121,15 @@ def _getDictionariesFromSLHA(slhafile):
 
     res = pyslha.readSLHAFile(slhafile)
     
-    rOdd = particleNames.rOdd.keys()
-    rEven = particleNames.rEven.keys()
+    rOdd = smodels.particles.rOdd.keys()
+    rEven = smodels.particles.rEven.keys()
     knownParticles = rOdd + rEven
 
     # Get mass and branching ratios for all particles
     brDic = {}
     for pid in res.decays.keys():
         if pid in rEven:
-            logger.warning("Ignoring %s decays",particleNames.rEven[pid])
+            logger.warning("Ignoring %s decays",smodels.particles.rEven[pid])
             continue
         brs = []
         for decay in res.decays[pid].decays:

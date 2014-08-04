@@ -6,9 +6,10 @@
         
 """
 
-from smodels.theory.particleNames import ptcDic, rEven, simParticles, elementsInStr
+from smodels.theory.particleNames import simParticles, elementsInStr
 from smodels.tools.physicsUnits import addunit
 import logging
+from smodels.particles import rEven, ptcDic
 
 logger = logging.getLogger(__name__)
 
