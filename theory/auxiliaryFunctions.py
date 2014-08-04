@@ -29,10 +29,7 @@ def _memoize(func):
     cache = {}
     @wraps(func)
     def _wrap(*args):
-        """
-        TODO: write docstring
-        
-        """
+
         if str(args) not in cache:
             cache[str(args)] = func(*args)
         return cache[str(args)]

@@ -1,6 +1,6 @@
 """
 .. module:: theory.element
-   :synopsis: missing TODO write synopsis
+   :synopsis: Module holding the Element class and its methods.
     
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
     
@@ -460,7 +460,7 @@ def _smallerMass(mass1, mass2):
                     return mass1
                 if m1 > mass2List[im]:
                     return mass2
-    except:  # TODO: except what?
+    except:
         pass
 
     logger.error("Invalid input")
