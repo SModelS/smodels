@@ -126,10 +126,10 @@ def getKfactorsFor(pIDs, sqrts, slhafile, pdf='cteq'):
 
     # If produced particles are too heavy, return k-factors = 1
     if gluino_dcp and ('g' in process or gluinomass < 500.):
-        logger.warning("Gluino mass out of NLLfast grid for " + process)
+        logger.warning("Gluino mass %s out of NLLfast grid for " %gluinomass + process)
         return (None, None)
     elif squark_dcp and (process != 'gg' or squarkmass < 500.):
-        logger.warning("Squark mass out of NLLfast grid for " + process)
+        logger.warning("Squark mass %s out of NLLfast grid for " %squarkmass + process)
         return (None, None)
 
     # If virtual particles are too heavy, interpolate to the decoupling limit
