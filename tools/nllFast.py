@@ -64,10 +64,10 @@ def getKfactorsFor(pIDs, sqrts, slhafile, pdf='cteq'):
     masses=readfile.blocks['MASS']
     check_pids=squarks+gluinos+third
     for check in check_pids:
-      if not check in masses.entries:
-          logger.error ( "cannot compute k factor for pdgid %d: " \
+        if not check in masses.entries:
+            logger.error ( "cannot compute k factor for pdgid %d: " \
               " no particle mass given. will set mass to inf." % check )
-          masses.entries[check]=1.e10
+            masses.entries[check]=1.e10
 
     gluinomass = abs(masses.entries[1000021])
     squarkmass = sum([abs(masses.entries[pid])
@@ -117,50 +117,51 @@ def getKfactorsFor(pIDs, sqrts, slhafile, pdf='cteq'):
         logger.warning("Error running NLLfast")
         return (None, None)
 
-    # Deal with decoupling regimes
-    gluino_dcp, squark_dcp = False, False
-    if "too low/high gluino" in nll_output.lower():
-        gluino_dcp = True
+    # Check for decoupling cases with a decoupling grid (only for sb and gg)
+    doDecoupling = False
+    if "too low/high gluino" in nll_output.lower():        
+        if gluinomass > 500. and process == 'sb': 
+            doDecoupling = True
+            dcpl_mass = gluinomass
     elif "too low/high squark" in nll_output.lower():
-        squark_dcp = True
+        if squarkmass > 500. and process == 'gg':
+            doDecoupling = True
+            dcpl_mass = squarkmass
 
-    # If produced particles are too heavy, return k-factors = 1
-    if gluino_dcp and ('g' in process or gluinomass < 500.):
-        logger.warning("Gluino mass %s out of NLLfast grid for " %gluinomass + process)
-        return (None, None)
-    elif squark_dcp and (process != 'gg' or squarkmass < 500.):
-        logger.warning("Squark mass %s out of NLLfast grid for " %squarkmass + process)
+    # If process do not have decoupled grids, return None:
+    if not doDecoupling:
+        logger.warning("Masses out of NLLfast grid for " + process)
         return (None, None)
 
-    # If virtual particles are too heavy, interpolate to the decoupling limit
-    kFacsVector = []
-    xmass = max(squarkmass, gluinomass)  # To be interpolated
-    while len(kFacsVector) < 2 and xmass > 500.:
-        xmass -= 100.  # Reduce decoupled mass, until NLLfast produces results
-        if squark_dcp:
-            nll_run = "./nllfast_" + energy + " %s %s %s %s" % \
-                      (process, pdf, xmass, gluinomass)
-        elif gluino_dcp:
-            nll_run = "./nllfast_" + energy + " %s %s %s %s" % \
-                      (process, pdf, squarkmass, xmass)
-        nll_output = runNLLfast(nll_run, nllpath)
-        if "K_NLO" in nll_output:
-            kfacs = getKfactorsFrom(nll_output)
-            if kfacs and min(kfacs) > 0.:
-                kFacsVector.append([xmass, kfacs])
+    # Obtain k-factors from the NLLfast decoupled grid
+    kfacs = getDecoupledKfactors(nllpath,process,energy,pdf,min(gluinomass,squarkmass))
+    # Decoupling limit is satisfied, do not interpolate
+    if not kfacs:
+        logger.warning("Error obtaining k-factors from the NLLfast decoupled grid for " + process)
+        return (None, None)
+    elif dcpl_mass/min(gluinomass,squarkmass) > 10.:    
+        return kfacs
+    # Interpolate between the non-decoupled and decoupled grids
+    else:
+        kFacsVector = [[10.*min(gluinomass,squarkmass),kfacs]]  #First point for interpolation (decoupled grid)
+        kfacs = None        
+        while not kfacs and dcpl_mass > 500.:
+            dcpl_mass -= 100.  # Reduce decoupled mass, until NLLfast produces results
+            if process == 'sb': nllinput = (process, pdf, squarkmass, dcpl_mass)
+            else:  nllinput = (process, pdf, dcpl_mass, gluinomass)
+            nll_run = "./nllfast_" + energy + " %s %s %s %s" % nllinput
+            nll_output = runNLLfast(nll_run, nllpath)
+            kfacs = getKfactorsFrom(nll_output)        
+        kFacsVector.append([dcpl_mass, kfacs]) #Second point for interpolation (non-decoupled grid)
 
     if len(kFacsVector) < 2:
         logger.warning("Not enough points for interpolation in the decoupling "
                        "limit")
         return (None, None)
     else:
-        if kFacsVector[0][0] / min(squarkmass, gluinomass) > 10.:
-            # Decoupling limit is satisfied, do not interpolate
-            kFacs = kFacsVector[0][1]
-        else:
-            # Interpolate k-factors
-            kFacs = interpolateKfactors(kFacsVector,
-                                        max(squarkmass, gluinomass))
+        # Interpolate k-factors
+        kFacs = interpolateKfactors(kFacsVector,
+                        max(squarkmass, gluinomass))
     return kFacs
 
 
@@ -223,6 +224,7 @@ def getKfactorsFrom(output):
         lines = output.split('\n')
         il = 0
         line = lines[il]
+        process = False
         while not "K_NLO" in line and il < len(lines) - 2:
             if "process" in line:
                 process = line[line.find("process:") + 8:].replace(" ", "")
@@ -267,6 +269,23 @@ def interpolateKfactors(kFacsVector, xval):
         kFacs.append(kfac)
 
     return kFacs
+
+def getDecoupledKfactors(nllpath,process,energy,pdf,mass):
+    """
+    Compute k-factors in the decoupled (squark or gluino) regime for the process.
+    If a decoupled grid does not exist for the process, return None
+    """
+        
+    if process != 'sb' and process != 'gg': return None
+    elif process == 'sb': process_dcpl = 'sdcpl'
+    elif process == 'gg': process_dcpl = 'gdcpl'    
+    nll_run = "./nllfast_" + energy + " %s %s %s" % \
+                      (process_dcpl, pdf, mass)
+    nll_output = runNLLfast(nll_run, nllpath)
+    if "K_NLO" in nll_output:
+        return getKfactorsFrom(nll_output)
+    else: return None
+
 
 
 if __name__ == "__main__":
