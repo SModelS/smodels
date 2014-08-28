@@ -152,7 +152,7 @@ def _doGridData(analysis, topology, masses, dPar, run=None):
     r = griddata(p, v, (mx, my, mz), method="linear")
 
     if np.isnan(r):
-        logger.error("Masses out of range for %s/%s (no extrapolation)",
+        logger.info("Masses out of range for %s/%s (no extrapolation)",
                      analysis, topology)
         return None
 
