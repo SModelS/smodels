@@ -53,7 +53,6 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
 
     if not os.path.isfile(slhafile):
         logger.error("SLHA file %s not found.", slhafile)
-        import sys
         sys.exit()
     if lhefile:
         if os.path.isfile(lhefile):
