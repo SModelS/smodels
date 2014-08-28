@@ -1,3 +1,5 @@
+! Pythia6 template configuration used when running smodels, for
+! the computation of the LO cross sections. 
 IMSS(1)=11             ! Spectrum from external SLHA file
 MSTP(47)=0
 MSTP(161)=66
@@ -22,13 +24,13 @@ PARP(90)=0.16  ! Multiple interactions: rescaling power
 PARP(67)=2.5    ! amount of initial-state radiation
 PARP(85)=1.0  ! gluon prod. mechanism in MI
 PARP(86)=1.0  ! gluon prod. mechanism in MI
-PARP(62)=1.25   ! 
-PARP(64)=0.2    ! 
+PARP(62)=1.25   !
+PARP(64)=0.2    !
 MSTP(91)=1      !
 PARP(91)=2.1   ! kt distribution
-PARP(93)=15.0  ! 
+PARP(93)=15.0  !
 MSTP(61)=0     ! No ISR
-MSTP(71)=0     ! No FSR 
+MSTP(71)=0     ! No FSR
 MSTP(111)=0    ! No hadronization
 MSTJ(1)=0      ! No fragmentation
 MSEL=0         ! Select each process manually
