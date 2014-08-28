@@ -1,3 +1,5 @@
+! Pythia6 configuration used for testing the installation.
+! For what is done when running pythia, see "pythia.card"
 IMSS(1)=11             ! Spectrum from external SLHA file
 MSTP(47)=0
 MSTP(161)=66
