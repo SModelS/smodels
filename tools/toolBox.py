@@ -74,11 +74,14 @@ class ToolBox(object):
             ret = "%s%s%s" % (red, ret, reset)
         return ret
 
-    def checkInstallation(self, colors=True, make=False):
+    def checkInstallation(self, colors=True, make=False, printit=True ):
         ret = "The following tools are found in the Toolbox:\n"
         hasMade = False
+        allOk=True
         for(name, instance) in self.tools.items():
             ok = instance.checkInstallation()
+            if not ok:
+                allOk=False
             exe = instance.pathOfExecutable()
             maxl = 45
             if len(exe) > maxl + 4:
@@ -92,7 +95,9 @@ class ToolBox(object):
             ret += "Check again:\n"
             ret += self.checkInstallation(self, colors, make=False)
         # # logger.info(ret)
-        print (ret)
+        if printit:
+            print (ret)
+        return allOk
 
     def compile(self):
         for(name, instance) in self.tools.items():
@@ -126,4 +131,4 @@ if __name__ == "__main__":
     tmp = ToolBox()
     if args.make:
         tmp.compile()
-    tmp.checkInstallation(colors=not args.nocolors)
+    tmp.checkInstallation(colors=not args.nocolors, printit=True )
