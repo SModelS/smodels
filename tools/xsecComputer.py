@@ -12,7 +12,7 @@
 import setPath  # pylint: disable=W0611
 from smodels import SModelS
 from smodels.tools import toolBox
-from smodels.tools.physicsUnits import rmvunit, addunit
+from smodels.tools.physicsUnits import rmvunit, addunit, fb, TeV
 from smodels.theory import crossSection
 from smodels.tools import nllFast
 import os
@@ -31,7 +31,7 @@ NLL=2
 def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loFromSlha=None ):
     """
     Run pythia and compute SUSY cross-sections for the input SLHA file.
-    
+
     :param sqrts: sqrt{s} to run Pythia
     :param maxOrder: maximum order to compute the cross-section
                 if maxOrder = 0, compute only LO pythia xsecs
@@ -43,12 +43,12 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
                     file does not exist, write pythia output to this file name. If
                     file exists, read LO xsecs from this file (does not run pythia).
     :param unlink: Clean up temp directory after running pythia
-    
-    :param loFromSlha: If True, uses the LO xsecs from the SLHA file to compute the 
+
+    :param loFromSlha: If True, uses the LO xsecs from the SLHA file to compute the
                        higher order xsecs
-    
+
     :returns: XSectionList object
-    
+
     """
 
     if not os.path.isfile(slhafile):
@@ -61,7 +61,7 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
             logger.info("Writing pythia LHE output to " + lhefile)
     if loFromSlha:
         logger.info("Using LO cross-sections from " + slhafile)
-        xsecsInfile = crossSection.getXsecFromSLHAFile(slhafile)        
+        xsecsInfile = crossSection.getXsecFromSLHAFile(slhafile)
         loXsecs = crossSection.XSectionList()
         for xsec in xsecsInfile:
             if xsec.info.order == 0: loXsecs.add(xsec)
@@ -117,12 +117,12 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
 def addXSecToFile(xsecs, slhafile, comment=None, complain=True):
     """
     Write cross-sections to an SLHA filei.
-    
+
     :param xsecs: a XSectionList object containing the cross-sections
     :param slhafile: target file for writing the cross-sections in SLHA format
-    :param comment: optional comment to be added to each cross-section block    
+    :param comment: optional comment to be added to each cross-section block
     :param complain: complain if there are already cross sections in file
-    
+
     """
     if not os.path.isfile(slhafile):
         logger.error("SLHA file not found.")
@@ -136,7 +136,7 @@ def addXSecToFile(xsecs, slhafile, comment=None, complain=True):
     xSectionList = crossSection.getXsecFromSLHAFile(slhafile)
     if xSectionList and complain:
         logger.warning("SLHA file already contains XSECTION blocks. Adding "
-                       "missing cross-sections.")
+                       "only missing cross-sections.")
 
     # Write cross-sections to file, if they do not overlap any cross-section in
     # the file
@@ -158,12 +158,12 @@ def xsecToBlock(xsec, inPDGs=(2212, 2212), comment=None):
     """
     Generate a string for a XSECTION block in the SLHA format from a XSection
     object.
-    
+
     :param inPDGs: defines the PDGs of the incoming states
                    (default = 2212,2212)
 
     :param comment: is added at the end of the header as a comment
-    
+
     """
     if type(xsec) != type(crossSection.XSection()):
         logger.error("Wrong input")
@@ -190,7 +190,7 @@ def xsecToBlock(xsec, inPDGs=(2212, 2212), comment=None):
 def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True ):
     """
     Execute pythia_lhe with n events, at sqrt(s)=sqrts.
-    
+
     :param slhafile: input SLHA file
     :param nevts: number of events to be generated
     :param sqrts: center of mass sqrt{s} (in TeV)
@@ -198,7 +198,7 @@ def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True ):
                     output to disk.
     :param unlink: Clean up temp directory after running pythia
     :returns: file object with the LHE events
-    
+
     """
     box = toolBox.ToolBox()
     tool = box.get("pythia6")
@@ -231,7 +231,7 @@ def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True ):
 if __name__ == "__main__":
     """
     Compute the cross section of a given SLHA file.
-    
+
     """
     desc = "compute the cross section of a file"
     argparser = argparse.ArgumentParser(description=desc)
@@ -273,28 +273,39 @@ if __name__ == "__main__":
         order = 2
     if order > 0:
         for sqrts in sqrtses:
-            if not sqrts in [7, 8, 13, 14, 30, 100]:
-                logger.warning("Cannot compute NLO or NLL xsecs for sqrts = %d "
-                             "TeV!", sqrts)
-                sqrtses.remove(sqrts)
+            allowedsqrtses=[7, 8, 13, 14, 33, 100]
+            if not sqrts in allowedsqrtses:
+                logger.error("Cannot compute NLO or NLL xsecs for sqrts = %d "
+                             "TeV! Available are: %s TeV." % 
+                             (sqrts, allowedsqrtses ))
+                sys.exit(0)
+                # sqrtses.remove(sqrts)
     inputFile = args.file[0]
     if not os.path.exists(inputFile):
         logger.error("File '%s' does not exist.", inputFile)
         sys.exit(1)
     if inputFile[-5:].lower() == ".slha" or args.slha:
         if args.tofile:
-            logger.info("Computing SLHA cross section from %s and adding to "
-                        "SLHA file ...", inputFile)           
+            logger.info("Computing SLHA cross section from %s, adding to "
+                        "SLHA file." % inputFile )
             for s in sqrtses:
-                ss = addunit(s, 'TeV')
+                ss = s*TeV # addunit(s, 'TeV')
                 xsecs = computeXSec(ss, order, args.nevents, inputFile, unlink=(not args.keep) )
-                comment = "Nevts: " + str(args.nevents) + " xsec unit: fb" 
+                comment = "Nevts: " + str(args.nevents) + " xsec unit: fb"
                 addXSecToFile(xsecs, inputFile, comment)
-            logger.info("... done.")
             sys.exit(0)
         else:
-            logger.error("Compute SLHA cross section, print out, but do not "
-                         "add to file. TODO: not yet implemented.")
+            logger.info("Computing SLHA cross section from %s." % inputFile )
+            print
+            print "     Cross sections:"
+            print "======================="
+            for s in sqrtses:
+                ss = s*TeV # addunit(s, 'TeV')
+                xsecs = computeXSec(ss, order, args.nevents, inputFile, \
+                            unlink=(not args.keep) )
+                for xsec in xsecs: 
+                    print "%s %20s:  %5.2f fb" % ( xsec.info.label,xsec.pid,xsec.value/fb )
+            print
             sys.exit(0)
     if inputFile[-4:].lower() == ".lhe" or args.lhe:
         if args.tofile:
