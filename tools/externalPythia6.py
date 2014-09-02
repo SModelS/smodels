@@ -51,7 +51,6 @@ class ExternalPythia6(ExternalTool):
         self.secondsPerEvent=10 
         self.reset()
 
-
     def reset(self):
         """
         Copy the original config file again.
@@ -80,6 +79,16 @@ class ExternalPythia6(ExternalTool):
         """
         return self.tempdir
 
+    def __str__(self):
+        """ 
+        Describe the current status 
+
+        """
+        ret="tool: %s\n" % ( self.name )
+        ret+="executable: %s\n" % ( self.executable_path )
+        ret+="temp dir: %s\n" % self.tempdir
+        ret+="nevents: %d\n" % self.nevents
+        return ret
 
     def unlink(self, unlinkdir=True):
         """
