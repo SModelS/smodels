@@ -169,10 +169,10 @@ class ExternalPythia6(ExternalTool):
         
         """
         slha = self.checkFileExists(slhafile)
-        cfg = self.tempdir + "/temp.cfg"
-        if cfgfile != None:
-            cfg = self.absPath(cfgfile)
-            logger.debug("running with " + str(cfg))
+        # cfg = self.tempdir + "/temp.cfg"
+        # if cfgfile != None:
+        cfg = self.absPath(cfgfile)
+        logger.debug("running with " + str(cfg))
         shutil.copy(slha, self.tempdir + "/fort.61")
         cmd = "cd %s ; %s < %s" % \
              (self.tempdir, self.executable_path, cfg)
