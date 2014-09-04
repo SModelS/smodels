@@ -58,8 +58,8 @@ class ExternalTool(object):
         installation directory.
         
         """
-        if None:
-            return None
+        if path==None:
+            return self.tempdir + "/temp.cfg"
         installdir = self.basePath()
         installdir = installdir.replace("tools", "")
         path = path.replace("<install>", installdir)
