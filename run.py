@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys, os, argparse, logging
+import sys, os, commands, argparse, logging
 import setPath
 from smodels.tools.physicsUnits import rmvunit, addunit
 from smodels.tools import slhaChecks, ioObjects, xsecComputer
@@ -29,11 +29,17 @@ if os.path.exists(args.outputfile): #remove old output file
     log.warning("Removing old output file in "+args.outputfile)
     os.remove(args.outputfile)
 
+#lists to store results
+bestresult = []
+outputarray = []
+
 #get status, warnings from slhaChecks
+
 #slhatstat == 0, the file is not checked
 #slhastat == 1, the check is ok
 #slhastat == -1, physical problem in scenario, e.g. charged LSP,
 #slhastat == -2  formal problems in the file, e.g. missing decay blocks
+
 slhaStatus = slhaChecks.SlhaStatus(slhafile, sigmacut = ioPar.sigmacut, maxDisplacement = .001, checkXsec = not ioPar.addMissingXsecs, massgap = ioPar.minmassgap, maxcond = ioPar.maxcond)
 slhastat, warnings = slhaStatus.status
 
@@ -44,12 +50,30 @@ if slhastat == -1 or slhastat == -3:
     slhaStatus.printout("file",args.outputfile)
     sys.exit()
 
-#lists to store results
-bestresult = []
-outputarray = []
-
 # << there should be some automated mechanism to check this thing?>>
-writeXsecs = True #set this true by default, switch to false only in case of lhe decomposition
+#writeXsecs = True #set this true by default, switch to false only in case of lhe decomposition
+
+#set cross section computation bools according to input parameters, slha
+'''if not ioPar.doSLHAdec:
+    commands.getoutput("./tools/xsecComputer.py %s -S -k -e %i -s %d " %(slhafile,ioPar.nevts, ioPar.sqrts))
+else:
+    if ioPar.addMissingXsecs:
+        commands.getoutput("./tools/xsecComputer.py %s -S -e %i -s %d -N -f %s " %(slhafile,ioPar.nevts, ioPar.sqrts, slhafile))
+    elif slhaStatus.xsec:
+        log.warning("Input file does not contain cross sections, set computeXsecs = True")
+        warnings = warnings + "#Cross sections computed by SModelS\n"
+        commands.getoutput("./tools/xsecComputer.py %s -S -e %i -s %d -N -f %s " %(slhafile,ioPar.nevts, ioPar.sqrts, slhafile))
+    else: computeXsecs = None
+
+if ioPar.addnlo:
+    print "Now computing NLO"
+    xsecs_nlo = xsecComputer.computeXSec(sqrts, 1, ioPar.nevts, slhafile, loFromSlha=True)
+    xsecComputer.addXSecToFile(xsecs_nlo, slhafile) #FIXME should there be a comment << YES >>
+if ioPar.addnll:
+    xsecs_nll = xsecComputer.computeXSec(sqrts, 2, ioPar.nevts, slhafile, loFromSlha=True)
+    xsecComputer.addXSecToFile(xsecs_nll, slhafile) #FIXME also: comment? << YES >>
+
+sys.exit(10)'''
 
 #set cross section computation bools according to input parameters, slha
 if not ioPar.doSLHAdec:
@@ -58,10 +82,10 @@ if not ioPar.doSLHAdec:
 else:
     if ioPar.addMissingXsecs:
         computeXsecs = True
-    elif not slhaStatus.xsec:
+    elif slhaStatus.xsec:
         log.warning("Input file does not contain cross sections, set computeXsecs = True")
         warnings = warnings + "#Cross sections computed by SModelS\n"
-        computeXsecs = True
+        ioPar.addnll = True
     else: computeXsecs = None
 
 # sqrts from parameter input file
@@ -74,6 +98,7 @@ if computeXsecs:
     xsecComputer.addXSecToFile(xsecs, slhafile, comment)
 
 if ioPar.addnlo:
+    print "Now computing NLO"
     xsecs_nlo = xsecComputer.computeXSec(sqrts, 1, ioPar.nevts, slhafile, loFromSlha=True)
     xsecComputer.addXSecToFile(xsecs_nlo, slhafile) #FIXME should there be a comment << YES >>
 
@@ -146,7 +171,6 @@ if ioPar.printAnaEl:
         for el in elements:
             el.printout()
             print "........................................................"
-#    sys.exit(10)
 
 #Get theory prediction for each analysis and print basic output
 for analysis in listofanalyses:

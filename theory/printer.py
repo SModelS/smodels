@@ -88,7 +88,7 @@ class Printer(object):
                 totxsec.combineWith(el.weight)
             output += "\t Total Global topology weight:\n" 
             for k in totxsec.getDictionary():
-                    output += "\t Sqrts: " + str(rmvunit(k, "TeV")) + "\t Weight: " + str(self.weight.getDictionary()[k]) + "\n"
+                output += "\t Sqrts: " + str(rmvunit(k, "TeV")) + "\t Weight: " + str(totxsec.getDictionary()[k]) + "\n"
         return output
 
     def formatElementData(self):
@@ -97,8 +97,8 @@ class Printer(object):
         """
         output = ""
         output += "\t Particles in topology: " + str(self.getParticles())
-        output += '\n'
-        output += '\t The element masses are \n'
+        output += "\n"
+        output += "\t The element masses are \n"
         for i, el in enumerate(self.getMasses()):
             output += "\t Branch %i: " %i+ str(el) + "\n"
         output += "\t The element weights are: \n"
@@ -130,7 +130,7 @@ class Printer(object):
                 condlist = []
                 for cond in theoryPrediction.conditions:
                     condlist.append(theoryPrediction.conditions[cond])
-                output += str(condlist) + '\n'
+                output += str(condlist) + "\n"
             experimentalLimit = theoryPrediction.analysis.getUpperLimitFor(
                     theoryPrediction.mass)            
             output += "Experimental limit: " + str(experimentalLimit) + "\n"
