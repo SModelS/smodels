@@ -183,8 +183,10 @@ class Printer(object):
         output += "Sigmacut: " + str(addunit(self.sigmacut, "fb")) + "\n"
         output += "Minmassgap: " + str(addunit(self.massgap, "GeV")) + "\n"
         output += "Maxcond: " + str(self.maxcond) + "\n"
-        output += "LSP PID, mass: " + str(self.findLSP(returnmass=True)) + "\n"
-        output += "NLSP PID, mass: " + str(self.findNLSP(returnmass=True)) + "\n"
+        if not self.status[0] == -3:
+        #cannot add this information in case the input file is not slha format
+            output += "LSP PID, mass: " + str(self.findLSP(returnmass=True)) + "\n"
+            output += "NLSP PID, mass: " + str(self.findNLSP(returnmass=True)) + "\n"
         output += "================================================================================\n"
 
         return output
