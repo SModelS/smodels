@@ -30,15 +30,15 @@ class SlhaStatus(Printer):
                  checkFlightlength=True, model="MSSM"):
         self.filename = filename
         self.model = model
-        self.slha = self.read()
-        if not self.slha:
-            self.status = -3, "Could not read input slha"
-            return
         self.maxFlightlength = maxFlightlength
         self.maxDisplacement = maxDisplacement
         self.sigmacut = sigmacut
         self.massgap = massgap
         self.maxcond = maxcond
+        self.slha = self.read()
+        if not self.slha:
+            self.status = -3, "Could not read input slha"
+            return
         self.lsp = self.findLSP()
         self.lspStatus = self.testLSP(checkLSP)
         self.ctauStatus = self.checkCtau(checkFlightlength)
