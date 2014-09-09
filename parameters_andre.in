@@ -8,8 +8,8 @@ database = /home/lessa/smodels-database #Give path to database directory
 #
 ####Basic input
 inputType = SLHA #SLHA or LHE for a slha or lhe input file
-doInvisible = True #Set True if invisible compression should be performed during decomposition, False otherwise
-doCompress = True #Set True if mass compression should be performed during decomposition, False otherwise
+doInvisible = False #Set True if invisible compression should be performed during decomposition, False otherwise
+doCompress = False #Set True if mass compression should be performed during decomposition, False otherwise
 evaluateResults = True #Set True to evaluate results (compute experimental upper limits)
 ##########################################
 ####Output settings
@@ -31,7 +31,7 @@ minmassgap = 5. #Give minimum mass gap (in GeV) for mass compression (only relev
 
 #SLHA Decomposition (only relevant if inputType = SLHA)
 sigmacut = 0.01 #Give minimum cross section value [fb] considered in SLHA decomposition (only relevant for a SLHA input file)
-computeXSecs = True #Set True if SModelS should compute cross-sections (only relevant for a SLHA input file)
+computeXSecs = True #Set True if SModelS should compute cross-sections (only relevant for the MSSM an a SLHA input file)
 
 #Cross-section calculation (only relevant if computeXSecs = True)
 sqrts = 8. #Center of mass energy for computing cross-sections (in TeV)
