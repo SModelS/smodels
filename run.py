@@ -13,9 +13,9 @@ log = logging.getLogger(__name__)
 
 #get the name of input slha file (and parameter file)
 argparser = argparse.ArgumentParser()
-argparser.add_argument('-f', '--filename', help = 'filename of input slha, necessary input', required = True)
-argparser.add_argument('-p', '--parameterfile', help = 'filename of parameter file, optional input, default file = ./parameters.in', default = 'parameters.in')
-argparser.add_argument('-o', '--outputfile', help = 'filename of output file, optional input, default outputfile = ./summary.txt', default = 'summary.txt')
+argparser.add_argument('-f', '--filename', help = 'name of SLHA or LHE input file, necessary input', required = True)
+argparser.add_argument('-p', '--parameterfile', help = 'name of parameter file, optional input, default file = ./parameters.in', default = 'parameters.in')
+argparser.add_argument('-o', '--outputfile', help = 'name of output file, optional input, default outputfile = ./summary.txt', default = 'summary.txt')
 args = argparser.parse_args() # pylint: disable-msg=C0103
 
 slhafile = args.filename #get input filename
