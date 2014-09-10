@@ -116,8 +116,8 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
 
 def addXSecToFile(xsecs, slhafile, comment=None, complain=True):
     """
-    Write cross-sections to an SLHA filei.
-
+    Write cross-sections to an SLHA file.
+    
     :param xsecs: a XSectionList object containing the cross-sections
     :param slhafile: target file for writing the cross-sections in SLHA format
     :param comment: optional comment to be added to each cross-section block
@@ -182,9 +182,9 @@ def xsecToBlock(xsec, inPDGs=(2212, 2212), comment=None):
     if comment:
         header += "   # " + str(comment)  # Comment
     entry = "0  " + str(xsec.info.order) + "  0  0  0  0  " + \
-            str(rmvunit(xsec.value, 'fb')) + " SModelS " + installation.version()
+            str("%16.8E" %rmvunit(xsec.value, 'fb')) + " SModelS " + installation.version()
 
-    return header + "\n" + entry
+    return "\n" + header + "\n" + entry
 
 
 def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True ):

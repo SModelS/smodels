@@ -211,7 +211,6 @@ def _evalExpression(stringExpr,cluster,analysis):
         expr = expr.replace("Csim", "cSim")
         logger.warning(analysis.label + " using deprecated functions "
                                "'Cgtr'/'Csim'. Auto-replacing with 'cGtr'/'cSim'.")
-    
     exprvalue = eval(expr)
     if type(exprvalue) == type(crossSection.XSectionList()):
         if len(exprvalue) != 1:

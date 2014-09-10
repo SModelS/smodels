@@ -217,10 +217,12 @@ DECAY   1000012     0.00000000E+00   # snu_elL decays
 DECAY   1000014     0.00000000E+00   # snu_muL decays
 DECAY   1000016     0.00000000E+00   # snu_tauL decays
 #         PDG            Width
-DECAY   1000021     1.00000000E+00   # chargino1+ decays
+DECAY   1000021     1.00000000E+00   # gluino decays
 #           BR         NDA      ID1       ID2       ID3
       0.50000000E+00    3     1000022        -1         1   # BR(~gl -> N1 dbar d)
       0.50000000E+00    3     1000022        -2         2   # BR(~gl -> N1 ubar u)
 ########################################################################
 DECAY   1000022     0.00000000E+00   # neutralino1 decays
 
+XSECTION  8000.0 2212 2212 2 1000021 1000021   # Nevts: 10000.0
+0  0  0  0  0  0  262.1161 SModelS 1.0
