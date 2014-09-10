@@ -24,8 +24,11 @@ class SlhaDecompositionTest(unittest.TestCase):
         slhafile="../inputFiles/slha/andrePT4.slha"
         topos = slhaDecomposer.decompose ( slhafile, .1*fb, False, False, 5.*GeV )
         self.assertEqual ( len(topos), 2 )
-        self.assertEqual ( len(topos[0].elementList), 12 )
-        self.assertEqual ( len(topos[1].elementList), 120 )
+        e1,e2=len(topos[0].elementList),len(topos[1].elementList)
+        if e1>e2:
+            e1,e2=e2,e1
+        self.assertEqual ( e1, 12 )
+        self.assertEqual ( e2, 120 )
 
 if __name__ == "__main__":
     unittest.main()
