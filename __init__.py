@@ -1,3 +1,3 @@
-import SModelS
+import installation
 
-# print ( SModelS.banner() )
+# print ( installation.banner() )

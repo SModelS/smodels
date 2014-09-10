@@ -20,7 +20,7 @@ from smodels.tools.physicsUnits import rmvunit, addunit
 import numpy
 import operator
 
-from smodels import SModelS
+from smodels import installation
 import logging
 
 logger = logging.getLogger(__name__)
@@ -293,6 +293,6 @@ if __name__ == "__main__":
     Calculate k factors for a pid pair.
     
     """
-    slhaF = SModelS.installDirectory() + "inputFiles/slha/T1.slha"
+    slhaF = installation.installDirectory() + "inputFiles/slha/T1.slha"
     kNLO, kNLL = getKfactorsFor((1000021, 1000021), addunit(13., "TeV"), slhaF)
     print("nlo, nll = " + str(kNLO) + ", " + str(kNLL))

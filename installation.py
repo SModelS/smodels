@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
 """
-.. module:: SModelS
-   :synopsis: Intended as a potential main entry point, currently just for
-   returning the SModelS version number.
+.. module:: installation
+   :synopsis: a module for returning installation paths and version numbers.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
@@ -21,7 +20,7 @@ def installDirectory():
     
     """
     ret = os.path.realpath(inspect.getabsfile(installDirectory))
-    ret = ret.replace("SModelS.py", "")
+    ret = ret.replace("installation.py", "")
     return ret
 
 def pythonDirectory():

@@ -14,7 +14,7 @@ import tempfile
 import os
 import shutil
 import commands
-from smodels import SModelS
+from smodels import installation
 import urllib
 import tarfile
 import logging
@@ -238,7 +238,7 @@ class ExternalPythia6(ExternalTool):
             logger.error("%s is not executable", self.executable)
             return False
         inputFile = "/inputFiles/slha/andrePT4.slha"
-        slhafile = SModelS.installDirectory() + inputFile
+        slhafile = installation.installDirectory() + inputFile
         try:
             out = self.run(slhafile, "<install>/etc/pythia_test.card")
             out = out.split("\n")
@@ -272,7 +272,7 @@ if __name__ == "__main__":
     print("seconds per event: %d" % tool.secondsPerEvent )
     tool.replaceInCfgFile({"NEVENTS": 1, "SQRTS":8000})
     tool.setParameter("MSTP(163)", "6")
-    slhafile = SModelS.installDirectory() + "/inputFiles/slha/andrePT4.slha"
+    slhafile = installation.installDirectory() + "/inputFiles/slha/andrePT4.slha"
     out = tool.run(slhafile)
     isok= ( len ( out.split("\n") ) > 570 )
     print("run: "+tool.ok ( isok ) )

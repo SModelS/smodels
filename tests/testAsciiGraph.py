@@ -27,7 +27,7 @@ class AsciiTest(unittest.TestCase):
         """ draw ascii graph """
         from smodels.tools import asciiGraph
         from smodels.theory import lheReader, lheDecomposer, crossSection
-        from smodels.SModelS import installDirectory
+        from smodels.installation import installDirectory
 
         filename = "%sinputFiles/lhe/T1_1.lhe" % (installDirectory() )
         reader = lheReader.LheReader(filename)

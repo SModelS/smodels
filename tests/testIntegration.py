@@ -46,7 +46,7 @@ class IntegrationTest(unittest.TestCase):
             ## print ( "Pred mass",pred.mass)
 
     def testIntegration(self):
-        from smodels.SModelS import installDirectory
+        from smodels.installation import installDirectory
         from smodels.tools.physicsUnits import fb, GeV
         from smodels.theory import slhaDecomposer
         from smodels.experiment import smsAnalysisFactory, smsHelpers

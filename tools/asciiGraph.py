@@ -111,7 +111,7 @@ if __name__ == "__main__":
     import setPath  # pylint: disable=W0611
     import argparse
     import types
-    from smodels import SModelS
+    from smodels import installation
     from smodels.theory import lheReader
     from smodels.theory import lheDecomposer
     from smodels.theory import crossSection
@@ -133,7 +133,7 @@ if __name__ == "__main__":
     args = argparser.parse_args()
 
     filename = ("%sinputFiles/lhe/%s_1.lhe"
-                % (SModelS.installDirectory(), args.T))
+                % (installation.installDirectory(), args.T))
     if args.lhe != "":
         filename = args.lhe
 
