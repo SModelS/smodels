@@ -10,7 +10,7 @@
 """
 import unittest
 import setPath
-from smodels.SModelS import installDirectory
+from smodels.installation import installDirectory
 from smodels.tools import slhaChecks
 
 class SlhaTest(unittest.TestCase):

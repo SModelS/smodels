@@ -10,7 +10,7 @@
 
 """
 import setPath  # pylint: disable=W0611
-from smodels import SModelS
+from smodels import installation
 from smodels.tools import toolBox
 from smodels.tools.physicsUnits import rmvunit, addunit, fb, TeV
 from smodels.theory import crossSection
@@ -182,7 +182,7 @@ def xsecToBlock(xsec, inPDGs=(2212, 2212), comment=None):
     if comment:
         header += "   # " + str(comment)  # Comment
     entry = "0  " + str(xsec.info.order) + "  0  0  0  0  " + \
-            str(rmvunit(xsec.value, 'fb')) + " SModelS " + SModelS.version()
+            str(rmvunit(xsec.value, 'fb')) + " SModelS " + installation.version()
 
     return header + "\n" + entry
 
