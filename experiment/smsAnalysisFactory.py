@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 def load(analyses=None, topologies=None, sqrts=[7, 8], usePrivate=None):
     """
     Create an analysis objects from the info given in the SMS results database.
-
+)
     :param analyses: If a list of analyses is passed, create only objects for
                      these analyses (the database naming convention is used).
     :param topologies: If a list of topologies is passed, only these topologies

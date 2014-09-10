@@ -1,11 +1,12 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 """
-.. module:: slhaChecks
-   :synopsis: Check SLHA file for integrity.
+    .. module:: slhaChecks
+       :synopsis: Check SLHA file for integrity.
 
-.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
-.. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
+        .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
+        .. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
+        .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
 
 """
 
@@ -13,6 +14,7 @@ from __future__ import print_function
 import setPath
 from smodels.tools import modpyslha as pyslha
 from smodels.theory.printer import Printer
+from smodels.tools.physicsUnits import addunit
 
 class SlhaStatus(Printer):
     """
@@ -23,19 +25,20 @@ class SlhaStatus(Printer):
     The parameter maxFlightlength is specified in meters. 
     """
     def __init__(self, filename, maxFlightlength=3., maxDisplacement=.1, sigmacut=.01,
-                 findMissingDecays=True, findDisplaced=True, massgap=5.,
+                 findMissingDecays=True, findDisplaced=True, massgap=5., maxcond=.2,
                  findEmptyDecays=True, checkXsec=True, checkLSP=True,
                  checkFlightlength=True, model="MSSM"):
         self.filename = filename
         self.model = model
-        self.slha = self.read()
-        if not self.slha:
-            self.status = -3, "Could not read input slha"
-            return
         self.maxFlightlength = maxFlightlength
         self.maxDisplacement = maxDisplacement
         self.sigmacut = sigmacut
         self.massgap = massgap
+        self.maxcond = maxcond
+        self.slha = self.read()
+        if not self.slha:
+            self.status = -3, "Could not read input slha"
+            return
         self.lsp = self.findLSP()
         self.lspStatus = self.testLSP(checkLSP)
         self.ctauStatus = self.checkCtau(checkFlightlength)
@@ -44,10 +47,9 @@ class SlhaStatus(Printer):
         self.xsec = self.hasXsec(checkXsec)
         self.vertexStatus = self.findDisplacedVertices(findDisplaced)
         self.status = self.evaluateStatus()
-
-    def formatData(self, maxcond):
-        return formatSLHAData(self, maxcond)
-
+    
+    def formatData(self):
+        return self.formatSLHAData()
 
     def read(self):
         """
@@ -135,8 +137,8 @@ class SlhaStatus(Printer):
             return -1, "Charged NLSP is stable"
         if ct > self.maxFlightlength:
             if c == "neutral":
-                 return 1, "Neutral NLSP is long-lived, c*tau = " + str(ct)
-            return -1, "Charged NLSP is long-lived, c*tau = " + str(ct)
+                 return 1, "Neutral NLSP is long-lived, c*tau = " + str(addunit(ct),"m")
+            return -1, "Charged NLSP is long-lived, c*tau = " + str(addunit(ct), "m")
         return 1, "Prompt NLSP (%s) decay" % c
 
 
@@ -211,7 +213,7 @@ class SlhaStatus(Printer):
             if mass < minmass:
                 pid, minmass = particle, mass
         if returnmass:
-            return pid, minmass
+            return pid, addunit(minmass, "GeV")
         return pid
 
 
@@ -276,7 +278,7 @@ class SlhaStatus(Printer):
             if mass < minmass:
                 pid, minmass = particle, mass
         if returnmass:
-            return pid, minmass
+            return pid, addunit(minmass, "GeV")
         return pid
     
 
