@@ -29,8 +29,8 @@ useUnits = True
 # make sure we define only once
 # if len(Unum.getUnitTable())==0:
 unum.Unum.reset()
-unum.VALUE_FORMAT = "%0.2E"
-unum.UNIT_HIDE_EMPTY = True
+unum.Unum.VALUE_FORMAT = "%0.2E"
+unum.Unum.UNIT_HIDE_EMPTY = True
 
 fb = unum.Unum.unit('fb')
 pb = unum.Unum.unit('pb', 1000 * fb)
