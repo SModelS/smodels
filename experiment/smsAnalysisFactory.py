@@ -34,6 +34,11 @@ def load(analyses=None, topologies=None, sqrts=[7, 8], usePrivate=None):
     :returns: list of analyses
     
     """
+
+    #to have readable input, we can give all instead of None
+    if topologies == "all": topologies = None
+    if analyses == "all": analyses = None
+
     # Enable supplying a single analysis/topology
     if isinstance(topologies, str):
         topologies = [topologies]

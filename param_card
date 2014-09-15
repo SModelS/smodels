@@ -1,0 +1,52 @@
+# If some of the input variables are missing in this file, default values will be assumed. 
+
+#
+#Database address
+#
+database = '../../smodels-database/' #Give path to database directory
+
+#
+#Basic input
+#
+
+#Select running mode
+doSLHAdec = True #Set True for SLHA decomposition, False for LHE decomposition
+addMissingXsecs = False #Set True if SModelS should add cross sections not given in the input SLHA
+sqrts = 8. #Give sqrts in TeV
+addnlo = False #Given LO cross sections in the input slha, compute NLO with nllfast
+addnll = False #Given LO cross sections in the input slha, compute NLL with nllfast
+nevts = 10000 #number of events for event generation/cross section calculation
+doInvisible = True #Set True if invisible compression should be performed, False elsewise
+doCompress = True #Set True if mass compression should be performed, False elsewise
+
+#Select input parameters
+sigmacut = 0.03 #Give minimum cross section value [fb] considered in SLHA decomposition (only relevant for SLHA decomposition)
+minmassgap = 5. #Give minimum mass gap [GeV] for mass compression
+maxcond = 0.2 #Maximum relative violation of conditions for valid results
+
+#
+#Output settings
+#
+
+#stdout
+printGtop = True #Set True to print table of global topologies, False elsewise
+printThEl = True #Set True to print table of elements after theoretical decomposition, False elsewise. Note that not all the elements appearing in this table are constrained by experiments.
+printAnaEl = True #Set True to print table of elements, constrained by available experimental analyses, False elsewise
+evaluateResults = True #Set True to evaluate results (cross sections, experimental upper limits)
+printResults = True #Set True to print table of results, False elsewise
+
+#output file
+expandedSummary = True #Set True for a summary including all excluding results, False for only the strongest result
+
+describeTopo = True #Set True for a summary including all excluding results, False for only the strongest result
+#
+#Advanced settings
+#
+
+analyses = "all" #Set all to use all analyses included in the database
+#to use only specific analyses, give a list of the names, e.g.
+#analyses = ["SUS13008","SUS13013","ATLAS_CONF_2013_024","SUSY_2013_04"]
+#analyses = ["SUS12028"]
+topologies= "all" #Set all to use all topologies included in the database
+#to use only specific topologies, give a list of the names, e.g.
+#topologies = ["T2"]
