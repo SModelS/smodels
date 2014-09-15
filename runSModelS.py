@@ -14,16 +14,24 @@ log = logging.getLogger(__name__)
 #get the name of input slha file (and parameter file)
 argparser = argparse.ArgumentParser()
 argparser.add_argument('-f', '--filename', help = 'name of SLHA or LHE input file, necessary input', required = True)
-argparser.add_argument('-p', '--parameterfile', help = 'name of parameter file, optional argument, default is: ./etc/parameters.in', default = './etc/parameters.in')
+argparser.add_argument('-p', '--parameterfile', help = 'name of parameter file, optional argument, default is: ./param_card', default = './param_card')
 argparser.add_argument('-o', '--outputfile', help = 'name of output file, optional argument, default is: ./summary.txt', default = 'summary.txt')
 args = argparser.parse_args() # pylint: disable-msg=C0103
 
 slhafile = args.filename #get input filename
-ioPar = ioObjects.InputParameters()
 
-if not ioPar.setFromFile(args.parameterfile): #read parameters from input file
-    log.error("Could not read %s" %args.parameterfile)
+#get default parameters
+#exit if file is damaged or not found
+try:
+    execfile('./etc/param_card_default')
+except:
+    log.error("Need default parameter settings in ./etc/param_card_default to run runSModelS")
     sys.exit()
+
+#if the user gives a modified parameter file, reset the parameters
+if os.path.isfile(args.parameterfile):
+    execfile(args.parameterfile)
+else: log.warning("Could not find parameter file in %s, use ./param_card_default instead")
 
 if os.path.exists(args.outputfile): #remove old output file
     log.warning("Removing old output file in "+args.outputfile)
@@ -40,7 +48,7 @@ outputarray = []
 #slhastat == -1, physical problem in scenario, e.g. charged LSP,
 #slhastat == -2  formal problems in the file, e.g. missing decay blocks
 
-slhaStatus = slhaChecks.SlhaStatus(slhafile, sigmacut = ioPar.sigmacut, maxDisplacement = .001, checkXsec = not ioPar.addMissingXsecs, massgap = ioPar.minmassgap, maxcond = ioPar.maxcond)
+slhaStatus = slhaChecks.SlhaStatus(slhafile, sigmacut = sigmacut, maxDisplacement = .001, checkXsec = not addMissingXsecs, massgap = minmassgap, maxcond = maxcond)
 slhastat, warnings = slhaStatus.status
 
 if slhastat == -1 or slhastat == -3:
@@ -76,43 +84,44 @@ if ioPar.addnll:
 sys.exit(10)'''
 
 #set cross section computation bools according to input parameters, slha
-if not ioPar.doSLHAdec:
+if not doSLHAdec:
     computeXsecs = True
     writeXsecs = None
 else:
-    if ioPar.addMissingXsecs:
+    if addMissingXsecs:
         computeXsecs = True
-    elif slhaStatus.xsec:
+    elif slhaStatus.xsec[0]==-1:
         log.warning("Input file does not contain cross sections, set computeXsecs = True")
         warnings = warnings + "#Cross sections computed by SModelS\n"
-        ioPar.addnll = True
+        computeXsecs = True
+        addnll = True
     else: computeXsecs = None
 
 # sqrts from parameter input file
-sqrts = addunit(ioPar.sqrts,"TeV")
+sqrts = addunit(sqrts,"TeV")
 
 if computeXsecs:
     #first compute at LO
-    xsecs = xsecComputer.computeXSec(sqrts, 0, int(ioPar.nevts), slhafile)
-    comment = "Nevts: " + str(ioPar.nevts)
+    xsecs = xsecComputer.computeXSec(sqrts, 0, int(nevts), slhafile)
+    comment = "Nevts: " + str(nevts)
     xsecComputer.addXSecToFile(xsecs, slhafile, comment)
 
-if ioPar.addnlo:
+if addnlo:
     print "Now computing NLO"
-    xsecs_nlo = xsecComputer.computeXSec(sqrts, 1, ioPar.nevts, slhafile, loFromSlha=True)
+    xsecs_nlo = xsecComputer.computeXSec(sqrts, 1, nevts, slhafile, loFromSlha=True)
     xsecComputer.addXSecToFile(xsecs_nlo, slhafile) #FIXME should there be a comment << YES >>
 
-if ioPar.addnll:
-    xsecs_nll = xsecComputer.computeXSec(sqrts, 2, ioPar.nevts, slhafile, loFromSlha=True)
+if addnll:
+    xsecs_nll = xsecComputer.computeXSec(sqrts, 2, nevts, slhafile, loFromSlha=True)
     xsecComputer.addXSecToFile(xsecs_nll, slhafile) #FIXME also: comment? << YES >>
 
 #decomposition
 #sigmacut = minimum value of cross-section for an element to be considered eligible for decomposition. Too small sigmacut leads to too large deocmposition time. 
-sigmacut = addunit(ioPar.sigmacut,"fb")
+sigmacut = addunit(sigmacut,"fb")
 
 try:
     # Decompose input SLHA file, store the output elements in smstoplist
-    smstoplist = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=ioPar.doCompress, doInvisible=ioPar.doInvisible, minmassgap=addunit(ioPar.minmassgap,"GeV"))
+    smstoplist = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=doCompress, doInvisible=doInvisible, minmassgap=addunit(minmassgap,"GeV"))
 except:
     status = -1 #<< is this a decomposition status? >>
     outputStatus = ioObjects.OutputStatus(status, slhastat, warnings)
@@ -128,11 +137,11 @@ if not smstoplist:
     slhaStatus.printout("file", args.outputfile)
     sys.exit()
 
-if ioPar.printGtop:
+if printGtop:
     smstoplist.printout()
 
 # This is my porposed format for element tabel
-if ioPar.printThEl:
+if printThEl:
     for (i,topo) in enumerate(smstoplist):
         print '\n'
         print "A new global topoloy starts here" 
@@ -147,17 +156,17 @@ if ioPar.printThEl:
     print "====================================================================="
 
 # Set database address
-smsHelpers.base = ioPar.database
+smsHelpers.base = database
 
 # Load analyses
-listofanalyses = smsAnalysisFactory.load(ioPar.analyses, ioPar.topologies)
+listofanalyses = smsAnalysisFactory.load(analyses, topologies)
 
 #<< What is this?>>
-results = ioObjects.ResultList(bestresultonly = not ioPar.expandedSummary, describeTopo = ioPar.describeTopo)
+results = ioObjects.ResultList(bestresultonly = not expandedSummary, describeTopo = describeTopo)
 
 constrainedElements = []
 
-if ioPar.printAnaEl:
+if printAnaEl:
     for analysis in listofanalyses:
         elements = _getElementsFrom(smstoplist, analysis)
         if len(elements) == 0: continue
@@ -177,7 +186,7 @@ for analysis in listofanalyses:
     theorypredictions = theoryPredictionFor(analysis, smstoplist)
     if not theorypredictions:
         continue
-    if ioPar.printResults:
+    if printResults:
         print "================================================================================"
         theorypredictions.printout() # again, check print function
     print "................................................................................"
@@ -212,6 +221,6 @@ else:
 
 missingtopos = ioObjects.MissingTopoList(sqrts)
 
-missingtopos.findMissingTopos(smstoplist, listofanalyses, sigmacut, addunit(ioPar.minmassgap,"GeV"))
+missingtopos.findMissingTopos(smstoplist, listofanalyses, sigmacut, addunit(minmassgap,"GeV"))
 
 missingtopos.printout("file", args.outputfile)
