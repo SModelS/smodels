@@ -1,5 +1,6 @@
 *.pyc
 *.swp
+build/
 .project
 recipes/recipe*.py
 recipes/recipe*.html
