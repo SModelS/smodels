@@ -12,7 +12,7 @@ def read(fname):
 
 setup(
     name = "smodels",
-    version = "1.0.0",
+    version = "1.0",
     author = "Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Wolfgang Magerl, Doris Proschofsky, Wolfgang Waltenberger",
     author_email = "smodels-developers@lists.oeaw.ac.at ",
     scripts = [ "bin/smodels-config" ],
