@@ -20,6 +20,7 @@ def installDirectory():
     
     """
     ret = os.path.realpath(inspect.getabsfile(installDirectory))
+    ret = ret.replace("EGG-INFO/scripts/smodels-config","")
     ret = ret.replace("installation.py", "")
     return ret
 

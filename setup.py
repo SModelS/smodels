@@ -11,17 +11,21 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
-    name = "SModelS -- A tool for interpreting simplified-model results from the LHC",
+    name = "smodels",
     version = "1.0.0",
     author = "Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Wolfgang Magerl, Doris Proschofsky, Wolfgang Waltenberger",
     author_email = "smodels-developers@lists.oeaw.ac.at ",
     scripts = [ "bin/smodels-config" ],
-    install_requires = ['docutils>=0.3'],
+    install_requires = ['docutils>=0.3', 'numpy', 'scipy', 'unum' ],
+    data_files = [ ( "etc/", [ "smodels/etc/logging.conf" ] ) ],
     description = ("A tool for interpreting simplified-model results from the LHC"),
     license = "GPLv3",
+    # use_2to3 = True,
     keywords = "simplified models LHC BSM theories interpretation supersymmetry universal extra dimensions",
     url = "http://smodels.hephy.at/",
-    packages=['experiment', 'theory', 'tools' ],
+    # packages=['experiment', 'theory', 'tools' ],
+    packages=[ 'smodels', 'smodels.theory', 'smodels.tools', 'smodels.experiment' ],
+    test_suite = 'smodels.tests',
     long_description=read('README'),
     classifiers=[
         "Development Status :: 3 - Alpha",
