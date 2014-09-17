@@ -89,8 +89,12 @@ def getSqrts(analysis, run=None):
     sqrts = smsHelpers.getMetaInfoField(analysis, "sqrts", run)
     try:
         return addunit(float(sqrts), "TeV")
-    except:
-        pass
+        
+    except ValueError:
+        try:
+            return addunit(float(sqrts.split()[0]), sqrts.split()[1])
+        except:
+            pass
     return sqrts
 
 
@@ -220,8 +224,15 @@ def getLumi(analysis, run=None):
     Get the integrated luminosity for an analysis.
     
     """
-    lumifb = float(smsHelpers.getMetaInfoField(analysis, "lumi", run))
-    return addunit(lumifb, "fb-1")
+    lumifb = smsHelpers.getMetaInfoField(analysis, "lumi", run)
+    try:
+        return addunit(float(lumifb), "fb-1")
+    except ValueError:
+        try:
+            return addunit(float(lumifb.split()[0]), lumifb.split()[1])
+        except:
+            pass
+    return lumifb
 
 
 def isPrivate(analysis, run=None):
