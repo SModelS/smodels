@@ -63,7 +63,9 @@ class ExternalTool(object):
         installdir = self.basePath()
         installdir = installdir.replace("tools", "")
         path = path.replace("<install>", installdir)
+        path = path.replace(".egg/smodels",".egg/")
         path = os.path.abspath(path)
+        ## print "installdir=",path
         return path
 
     def ok(self,B):
