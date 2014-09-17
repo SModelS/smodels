@@ -24,7 +24,7 @@ slhafile = args.filename #get input filename
 #use ConfigParser to read input parameters
 parser = SafeConfigParser()
 #first, read defaults
-parser.read('./etc/parameters_defalt.ini')
+parser.read('etc/parameters_default.ini')
 #then, set parameters given in input file
 parser.read(args.parameterfile)
 
