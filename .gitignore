@@ -1,6 +1,8 @@
 *.pyc
 *.swp
 build/
+smodels.egg-info/
+dist/
 .project
 recipes/recipe*.py
 recipes/recipe*.html
