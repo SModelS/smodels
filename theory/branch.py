@@ -128,7 +128,7 @@ class Branch(object):
 
         if len(newmass) > 1:
             logger.warning("Multiple R-odd particles in the final state: " +
-                           br)
+                           str(br.ids))
             return False
 
         if newparticles:
