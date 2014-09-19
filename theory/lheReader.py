@@ -58,7 +58,7 @@ class LheReader(object):
                     totxsec += addunit(eval(line.split()[0]), 'pb')
                     line = self.file.readline()
                 self.metainfo["totalxsec"] = totxsec
-            elif "<event>" in line:
+            elif "<event>" in line:                
                 nevts += 1
             line = self.file.readline()
         self.metainfo["nevents"] = nevts
