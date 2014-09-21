@@ -22,6 +22,10 @@ class Branch(object):
     
     """
     def __init__(self, info=None):
+        """
+        Initializes the branch. If info is defined, tries to generate
+        the branch using it. info must be a string description of the branch.
+        """
         self.masses = []
         self.particles = []
         self.momID = None
@@ -50,8 +54,7 @@ class Branch(object):
 
     def __str__(self):
         """
-        Create the canonical SModels description of the Branch.
-        
+        Create the canonical SModels description of the Branch.        
         """
         st = str(self.particles).replace("'", "")
         st = st.replace(" ", "")
@@ -59,10 +62,16 @@ class Branch(object):
 
 
     def __eq__(self, other):
+        """
+        Use the branch isEqual function to compare two branches.
+        """
         return self.isEqual(other)
 
 
     def __ne__(self, other):
+        """
+        Use the branch isEqual function to compare two branches.
+        """
         return not self.isEqual(other)
 
 

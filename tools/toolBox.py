@@ -58,6 +58,10 @@ class ToolBox(object):
         return self.tools.keys()
 
     def installationOk(self, ok, colors):
+        """
+        Returns color coded string to signal installation issues.
+        """
+        
         import types
         green = '\033[0;32m'
         red = '\033[0;31m'
@@ -75,6 +79,9 @@ class ToolBox(object):
         return ret
 
     def checkInstallation(self, colors=True, make=False, printit=True ):
+        """
+        Checks if the tools listed are installed and returns True/False
+        """
         ret = "The following tools are found in the Toolbox:\n"
         hasMade = False
         allOk=True
@@ -100,6 +107,9 @@ class ToolBox(object):
         return allOk
 
     def compile(self):
+        """
+        If tools has not being installed, try to compile it.
+        """
         for(name, instance) in self.tools.items():
             installOk = instance.checkInstallation()
             if installOk == True:

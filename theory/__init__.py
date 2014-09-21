@@ -1,5 +1,5 @@
 """
-This Package is intended to contain everything related to theory:
+.. module:: This Package is intended to contain everything related to theory:
 
    * cross section calculation code
    * sms decomposition code (LHE-based, SLHA-based)

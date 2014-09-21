@@ -19,10 +19,12 @@ class ExternalPythonTool(object):
     """
     An instance of this class represents the installation of unum.
     As it is python-only, we need this only for installation,
-    not for running (contrary to nllfast or pythia).
-    
+    not for running (contrary to nllfast or pythia).    
     """
     def __init__(self, importname ):
+        """
+        Initializes the ExternalPythonTool object. Useful for installation. 
+        """
         self.name=importname
         self.python_path = ""
         try:
@@ -32,9 +34,15 @@ class ExternalPythonTool(object):
             logger.error("could not find %s: %s" % (importname,e) )
 
     def pathOfExecutable ( self ):
+        """
+        Just returns the python_path variable
+        """
         return self.python_path
 
     def installDirectory(self):
+        """
+        Just returns the python_path variable
+        """
         return self.python_path
 
     def checkInstallation(self):

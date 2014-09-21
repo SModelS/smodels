@@ -9,6 +9,9 @@ import setPath
 # README file and 2) it's easier to type in the README file than to put a raw
 # string in below ...
 def read(fname):
+    """
+    Simple method to read a file (fname) located in the current folder.
+    """
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 #nllfast={ "1.2": "nllfast_7TeV", "2.1": "nllfast_8TeV", "3.0": "nllfast_13TeV",

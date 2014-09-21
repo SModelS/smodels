@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 
-"""\
+"""
+.. module:: modpyslha
+   :synopsis: Modified pyslha reader.
 A simple but flexible handler of the SUSY Les Houches Accord (SLHA) data format.
 
 pyslha is a parser/writer module for particle physics SUSY Les Houches Accord
@@ -78,10 +80,16 @@ class _dict(type(_d)):
     """A cosmetic wrapper on an OrderedDict if possible, or a normal dict if not."""
 
     def __init__(self, name=None):
+        """
+        Initializes the dict class with name=name.
+        """
         super(_dict, self).__init__()
         self.name = name
 
     def __repr__(self):
+        """
+        Generates a string representation of self.
+        """        
         s = ""
         if self.name:
             s += self.name + "\n"
@@ -89,7 +97,9 @@ class _dict(type(_d)):
         return s
 
 def _autotype(var):
-    """Automatically convert strings to numerical types if possible."""
+    """
+    Automatically convert strings to numerical types if possible.
+    """
     if type(var) is not str:
         return var
     if var.isdigit() or (var.startswith("-") and var[1:].isdigit()):
@@ -144,14 +154,18 @@ def _write(f, txt):
 ## Exceptions
 
 class AccessError(Exception):
-    "Exception object to be raised when a SLHA block is accessed in an invalid way"
+    """
+    Exception object to be raised when a SLHA block is accessed in an invalid way
+    """
     def __init__(self, errmsg):
         self.msg = errmsg
     def __str__(self):
         return self.msg
 
 class ParseError(Exception):
-    "Exception object to be raised when a spectrum file/string is malformed"
+    """
+    Exception object to be raised when a spectrum file/string is malformed
+    """
     def __init__(self, errmsg):
         self.msg = errmsg
     def __str__(self):
@@ -163,8 +177,13 @@ class ParseError(Exception):
 
 
 class Doc(object):
-    "Top level container for everything in an SLHA record"
+    """
+    Top level container for everything in an SLHA record
+    """
     def __init__(self, blocks, decays=None, xsections=None):
+        """
+        Initializes the Doc object with the info given.
+        """
         self.blocks = blocks
         self.decays = decays
         self.xsections = xsections
@@ -335,7 +354,7 @@ class Block(object):
     def __len__(self):
         return len(self.entries)
 
-    def __iter(self):
+    def __iter__(self):
         return self.entries.__iter__()
 
     def __getitem__(self, key):
@@ -402,6 +421,9 @@ class Particle(object):
         self.decays = []
 
     def add_decay(self, br, nda, ids):
+        """
+        Adds the decay entry to the Particle object.
+        """
         self.decays.append(Decay(br, nda, ids))
         self.decays.sort()
 
@@ -806,6 +828,9 @@ def readISAWIG(isastr, ignorenobr=False):
     LINES = isastr.splitlines()
 
     def getnextvalidline():
+        """
+        Returns the next line which is not empty nor a comment.
+        """
         while LINES:
             s = LINES.pop(0).strip()
             # print "*", s, "*"
@@ -820,6 +845,9 @@ def readISAWIG(isastr, ignorenobr=False):
                 return s
 
     def getnextvalidlineitems():
+        """
+        Returns the map of next line which is not empty nor a comment.
+        """
         return map(_autotype, getnextvalidline().split())
 
     ## Populate MASS block and create decaying particle objects
@@ -994,12 +1022,21 @@ def writeISAWIG(doc, ignorenobr=False, precision=8):
             decayout += ("%d " % hwid) + _autostr(d.br, precision) + (" %d " % nme)
 
             def is_quark(pid):
+                """
+                Checks if the input pid belongs to the quark pids
+                """
                 return (abs(pid) in range(1, 7))
 
             def is_lepton(pid):
+                """
+                Checks if the input pid belongs to the lepton pids
+                """
                 return (abs(pid) in range(11, 17))
 
             def is_squark(pid):
+                """
+                Checks if the input pid belongs to the squark pids
+                """
                 if abs(pid) in range(1000001, 1000007):
                     return True
                 if abs(pid) in range(2000001, 2000007):
@@ -1007,6 +1044,9 @@ def writeISAWIG(doc, ignorenobr=False, precision=8):
                 return False
 
             def is_slepton(pid):
+                """
+                Checks if the input pid belongs to the slepton pids
+                """
                 if abs(pid) in range(1000011, 1000017):
                     return True
                 if abs(pid) in range(2000011, 2000016, 2):
@@ -1014,6 +1054,9 @@ def writeISAWIG(doc, ignorenobr=False, precision=8):
                 return False
 
             def is_gaugino(pid):
+                """
+                Checks if the input pid belongs to the gaugino pids
+                """
                 if abs(pid) in range(1000022, 1000026):
                     return True
                 if abs(pid) in (1000035, 1000037):
@@ -1021,6 +1064,10 @@ def writeISAWIG(doc, ignorenobr=False, precision=8):
                 return False
 
             def is_susy(pid):
+                """
+                Checks if the input pid belongs to the squark, slepton,
+                gaugino or gluino pids
+                """
                 return (is_squark(pid) or is_slepton(pid) or is_gaugino(pid) or pid == 1000021)
 
             absids = map(abs, d.ids)
@@ -1071,6 +1118,7 @@ def writeISAWIG(doc, ignorenobr=False, precision=8):
             ## Squark/Slepton
             elif is_squark(pid) or is_slepton(pid):
                 def cmp_susy_quark_lepton(a, b):
+                    """Compares if a and b is susy/quark/lepton."""
                     if is_susy(a):
                         return False
                     if is_susy(b):
