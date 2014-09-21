@@ -37,7 +37,7 @@ for fname in sorted(matches):
     else: idoc = 'oddBlocks'
     fdata = fdata.split('"""')
     if len(fdata) < 2:
-        info[fname]['docstrings'] = None
+        info[fname]['docstrings'] = []
     else:
         for iblock,block in enumerate(fdata):
             pblock = 'odd'
@@ -103,8 +103,9 @@ for fname in sorted(info.keys()):
 print '\n\n\n'
 print 'Number of files = ',len(info)
 print 'Number of bad files = ',len(badFiles)
+print 'Number of docstrings = ',sum([len(info[fname]['docstrings']) for fname in info.keys()])
 print 'Number of missing docstrings = ',nmissing
 print 'Number of short docstrings = ',nshort
 print '\n Bad files:\n'
-for f in sorted(badFiles): print f            
+for f in sorted(badFiles): print f
             
