@@ -20,8 +20,7 @@ logger = logging.getLogger(__name__)
 
 class Printer(object):
     """
-    Printer class.
-    
+    Printer class for defining specific print options and format for objects.    
     """
     def __init__(self):
         self.output = None

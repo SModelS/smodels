@@ -100,22 +100,25 @@ class IndexCluster(object):
         return list(self.indices)[iel]
     
     def copy(self):
+        """
+        Returns a copy of the index cluster (faster than deepcopy).
+        """    
       
-      newcluster = IndexCluster()
-      newcluster.indices = set(list(self.indices)[:])
-      newcluster.avgPosition = self.avgPosition
-      if type(self.positionMap) == type(dict()):
-          newcluster.positionMap = dict(self.positionMap.items())
-      else: newcluster.positionMap = None
-      if type(self.massMap) == type(dict()):
-          newcluster.massMap = dict(self.massMap.items())
-      else: newcluster.massMap = None
-      if type(self.weightMap) == type(dict()):
-          newcluster.weightMap = dict(self.weightMap.items())
-      else: newcluster.weightMap = None
-      newcluster.analysis = self.analysis
+        newcluster = IndexCluster()
+        newcluster.indices = set(list(self.indices)[:])
+        newcluster.avgPosition = self.avgPosition
+        if type(self.positionMap) == type(dict()):
+            newcluster.positionMap = dict(self.positionMap.items())
+        else: newcluster.positionMap = None
+        if type(self.massMap) == type(dict()):
+            newcluster.massMap = dict(self.massMap.items())
+        else: newcluster.massMap = None
+        if type(self.weightMap) == type(dict()):
+            newcluster.weightMap = dict(self.weightMap.items())
+        else: newcluster.weightMap = None
+        newcluster.analysis = self.analysis
       
-      return newcluster
+        return newcluster
 
 
     def add(self, iels):
@@ -266,9 +269,9 @@ def _doCluster(elements, analysis, maxDist):
         indexCluster = IndexCluster(massMap, posMap, weightMap, set(indices), analysis)
         clusterList.append(indexCluster)
 
-    """Split the maximal clusters until all elements inside each cluster are
-    less than maxDist apart from each other and the cluster average position
-    is less than maxDist apart from all elements"""
+    #Split the maximal clusters until all elements inside each cluster are
+    #less than maxDist apart from each other and the cluster average position
+    #is less than maxDist apart from all elements
     finalClusters = []
     newClusters = True
     while newClusters:
@@ -282,8 +285,8 @@ def _doCluster(elements, analysis, maxDist):
             # Distance to cluster center (average)
             distAvg = indexCluster._getDistanceTo(indexCluster.avgPosition)
 
-            """Loop over cluster elements and if element distance or cluster
-            average distance falls outside the cluster, remove element"""
+            #Loop over cluster elements and if element distance or cluster
+            #average distance falls outside the cluster, remove element
             for iel in indexCluster:
                 dist = indexCluster._getDistanceTo(iel)
                 if max(dist, distAvg) > maxDist:

@@ -75,12 +75,20 @@ class XSection(object):
     
     """
     def __init__(self):
+        """
+        Initializes the object to store a cross-section value. All initial info is set to None.
+        """        
         self.info = XSectionInfo()
         self.value = None
         self.pid = (None, None)
 
 
     def __mul__(self, other):
+        """
+        Multiplies the value of the cross-section by the factor other (should be a float).        
+        """
+
+        
         newXsec = self.copy()
         if type(other) == type(1.):
             newXsec.value = newXsec.value * other
@@ -92,10 +100,17 @@ class XSection(object):
 
 
     def __rmul__(self, other):
+        """
+        Right multiplication (see left multiplication).        
+        """        
         return self * other
 
 
     def __add__(self, other):
+        """
+        Returns a copy of self with the value of other added to its value.        
+        """
+
         if type(other) == type(XSection()):
             if self.info == other.info:
                 res = self.copy()
@@ -107,6 +122,10 @@ class XSection(object):
 
 
     def __eq__(self, other):
+        """
+        Compare two XSection objects. Returns True if .info and type and value and pid are equal.        
+        """
+
         if type(other) != type(XSection()):
             return False
         if other.info != self.info:
@@ -119,6 +138,10 @@ class XSection(object):
 
 
     def __ne__(self, other):
+        """
+        Compare two XSection objects. Returns True if .info or type or value or pid is not equal.        
+        """
+
         if type(other) != type(XSection()):
             return True
         if other.info != self.info:
@@ -132,8 +155,7 @@ class XSection(object):
 
     def __str__(self):
         """
-        Generate cross-section information in string format.
-        
+        Generate cross-section information in string format.        
         """
         st = self.info.label + ':' + str(self.value)
         return st

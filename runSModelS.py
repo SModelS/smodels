@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+"""
+.. module:: Main code for running smodels
+"""
+
+
 import sys, os, commands, argparse, logging
 import setPath
 from smodels.tools.physicsUnits import rmvunit, addunit

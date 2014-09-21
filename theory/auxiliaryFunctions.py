@@ -29,6 +29,9 @@ def _memoize(func):
     cache = {}
     @wraps(func)
     def _wrap(*args):
+        """
+        Wrapper for the function to be memoized
+        """ 
 
         if str(args) not in cache:
             cache[str(args)] = func(*args)
