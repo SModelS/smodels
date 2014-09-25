@@ -10,30 +10,12 @@
 
 from smodels.theory.printer import Printer
 
-
-class ExptResults:
-    """
-    A class to store all relevant information for one result
-    """
-    def __init__(self, aname, topo, sqrts, cond, tval, exptval, topo_description, mmother, mlsp):
-        self.aname = aname
-        self.topo = topo
-        self.sqrts = sqrts
-        self.cond = cond
-        self.tval = tval
-        self.exptval = exptval
-        self.rval = tval / exptval
-        self.topo_description = topo_description
-        self.mmother = mmother
-        self.mlsp = mlsp
-
 class ResultList(Printer):
     """
-    Class that collects ExptResults objects and has a predefined printout
+    Class that collects experimental constraints and has a predefined printout
     """
-    def __init__(self, outputarray=[], bestresult=[], bestresultonly=None, describeTopo=None):
+    def __init__(self, outputarray = [], bestresultonly = None, describeTopo = None):
         self.outputarray = outputarray
-        self.bestresult = bestresult
         self.bestresultonly = bestresultonly
         self.describeTopo = describeTopo
 
@@ -41,13 +23,23 @@ class ResultList(Printer):
         self.outputarray.append(res)
         return
 
-    def findBest(self):
-        best = None
-        for res in self.outputarray:
-            if not best or best.rval < res.rval:
-                best = res
-        if best: self.bestresult = [best]
+    def getR(self, res):
+        #calculate R value
+        return res.value[0].value / res.analysis.getUpperLimitFor(res.mass)
+
+    def sort(self):
+        #reverse sort outputarray by R value
+        self.outputarray = sorted(self.outputarray, key=self.getR, reverse=True)
         return
+
+    def getBestResult(self):
+        #return best result
+        self.sort()
+        return self.outputarray[0]
+
+    def isEmpty(self):
+        #check if outputarray is empty
+        return len(self.outputarray)==0
 
     def formatData(self):
         """
@@ -59,15 +51,29 @@ class OutputStatus(Printer):
     """
     Object that holds all status information and has a predefined printout 
     """
-    def __init__(self, status, slhastatus, warnings):
-        self.status = status
+    def __init__(self, slhastatus, warnings, databaseVersion):
         self.slhastatus = slhastatus
         self.warnings = warnings
+        self.databaseVersion = databaseVersion
         self.statusStrings = {-1: "#could not run the decomposition",
                               -3: "#no cross sections above sigmacut found",
+                              -4: "#database not found",
                               -2: "#bad input slha, did not run decomposition",
                                0: "#no matching experimental results",
                                1: "#decomposition was successful"}
+        self.status = self.initiateStatus()
+
+    def initiateStatus(self):
+        """
+        evaluate initial status from slhastatus
+        """
+        if not self.databaseVersion: return -4
+        if self.slhastatus == -1 or self.slhastatus == -3: return -2
+        return 0
+
+    def updateStatus(self, status):
+        self.status = status
+        return
 
     def formatData(self):
         """
@@ -98,7 +104,7 @@ class MissingTopoList(Printer):
     def addToTopos(self, el):
         name = self.orderbranches(self.generalName(el.__str__()))
         for topo in self.topos:
-            if name == topo.topo:  # FIXME need to give correct format of el, plus need general name function!
+            if name == topo.topo:
                 topo.weights.__add__(el.weight)
                 return
         self.topos.append(MissingTopo(name, el.weight))
@@ -133,6 +139,5 @@ class MissingTopoList(Printer):
         for topo in self.topos:
             topo.value = rmvunit(topo.weights.getXsecsFor(self.sqrts)[0].value, "fb")
         return
-
 
 
