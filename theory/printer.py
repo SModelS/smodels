@@ -12,6 +12,7 @@ from __future__ import print_function
 import logging
 from smodels.tools.physicsUnits import addunit
 from smodels.theory import crossSection
+from smodels.experiment import smsResults
 from smodels.tools.physicsUnits import rmvunit
 
 logger = logging.getLogger(__name__)
@@ -145,6 +146,7 @@ class Printer(object):
 
         output += "SLHA status: " + str(self.slhastatus) + "\n"
         output += "Decomposition output status: "+str(self.status)+" "+self.statusStrings[self.status] + "\n" #FIXME where should status strings go?
+        if self.databaseVersion: output += "Database version: %s\n" % self.databaseVersion
         if self.slhastatus < 0: output += str(self.warnings) + "\n"
         output += "================================================================================\n"
 
@@ -156,20 +158,25 @@ class Printer(object):
         """
         output = ""
 
+        bestresult = self.getBestResult()
+
         if self.bestresultonly:
             output += "The result with highest R value is\n"
-            self.outputarray = self.bestresult
+            self.outputarray = [bestresult]
 
         output += "#Analysis  Topology  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r\n\n"
         for op in self.outputarray:
-            output += "%19s %16s %4s %5s %10.3E %10.3E %10.3E\n"%(op.aname, op.topo, op.sqrts, op.cond, op.tval, op.exptval, op.rval)
-            if self.describeTopo: output += "#" + str(op.topo_description) + "\n"
+            output += "%19s %16s " %(op.analysis.label.split(":")[0], op.analysis.label.split(":")[1]) # ana, topo
+            output += "%4s " % rmvunit(op.analysis.sqrts,"TeV") # sqrts
+            output += "%5s " % op.getmaxCondition() # condition violation
+            output += "%10.3E %10.3E " % (rmvunit(op.value[0].value,"fb"),rmvunit(op.analysis.getUpperLimitFor(op.mass),"fb")) # theory cross section , expt upper limit
+            output += "%10.3E\n" % self.getR(op)
+            if self.describeTopo: output += "#" + str(smsResults.getConstraints(op.analysis.label.split(":")[0],op.analysis.label.split(":")[1])) + "\n"
             if not op == self.outputarray[-1]: output += "--------------------------------------------------------------------------------\n"
 
-        for op in self.bestresult:
-            output += "\n \n"
-            output += "================================================================================\n"
-            output += "The highest R value is r_ratio = " + str(op.rval) + "\n"
+        output += "\n \n"
+        output += "================================================================================\n"
+        output += "The highest R value is r_ratio = " + str(self.getR(bestresult)) + "\n"
 
         return output
 
