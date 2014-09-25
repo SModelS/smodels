@@ -25,9 +25,9 @@ class SlhaStatus(Printer):
     The parameter maxFlightlength is specified in meters. 
     """
     def __init__(self, filename, maxFlightlength=3., maxDisplacement=.1, sigmacut=.01,
-                 findMissingDecays=True, findDisplaced=True, massgap=5., maxcond=.2,
-                 findEmptyDecays=True, checkXsec=True, checkLSP=True,
-                 checkFlightlength=True, model="MSSM"):
+                 findMissingDecays=True, findIllegalDecays=False, findDisplaced=True,
+                 massgap=5., maxcond=.2, findEmptyDecays=True, checkXsec=True,
+                 checkLSP=True, checkFlightlength=True, model="MSSM"):
         self.filename = filename
         self.model = model
         self.maxFlightlength = maxFlightlength
@@ -43,6 +43,7 @@ class SlhaStatus(Printer):
         self.lspStatus = self.testLSP(checkLSP)
         self.ctauStatus = self.checkCtau(checkFlightlength)
         self.missingDecays = self.checkDecayBlock(findMissingDecays)
+        self.illegalDecays = self.findIllegalDecay(findIllegalDecays)
         self.emptyDecays = self.findEmptyDecay(findEmptyDecays)
         self.xsec = self.hasXsec(checkXsec)
         self.vertexStatus = self.findDisplacedVertices(findDisplaced)
@@ -79,7 +80,7 @@ class SlhaStatus(Printer):
             elif st == 1 and not ret == -2:
                 ret = 1
         for st, message in [self.lspStatus, self.ctauStatus,
-                            self.vertexStatus]:
+                            self.vertexStatus, self.illegalDecays]:
             if st < 0:
                 ret = -1
                 retMes = retMes + "#" + message + ".\n"
@@ -164,6 +165,29 @@ class SlhaStatus(Printer):
             stableParticles = "No empty decay blocks"
         return st, stableParticles
 
+    def findIllegalDecay(self, findIllegal):
+        """
+        Find decays for which the sum of daughter masses excels the mother mass
+        """
+        if not findIllegal:
+            return 0, "Did not check for illegal decays"
+        from smodels.tools import smMasses
+        st = 1
+        badDecay = "Illegal decay for PIDs"
+        for particle, block in self.slha.decays.items():
+            if not particle in self.slha.blocks["MASS"].keys(): continue
+            mMom = abs(self.slha.blocks["MASS"][particle])
+            for dcy in block.decays:
+                mDau = 0.
+                for ptc in dcy.ids:
+                    ptc = abs(ptc)
+                    if ptc in smMasses.masses: mDau += smMasses.masses[ptc]
+                    elif ptc in self.slha.blocks["MASS"].keys(): mDau += abs(self.slha.blocks["MASS"][ptc])
+                    else: return -2, "Unknown PID %s in decay of %s" %(str(ptc),str(particle)) # FIXME unknown pid, what to do??
+                if mDau > mMom: st = -1; badDecay += str(particle)+ " "; print(mDau,mMom,particle,dcy.ids)
+        if st == 1:
+            badDecay = "No illegal decay blocks"
+        return st, badDecay
 
     def hasXsec(self, checkXsec):
         """
