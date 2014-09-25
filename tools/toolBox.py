@@ -2,7 +2,9 @@
 
 """
 .. module:: toolBox
-   :synopsis: Contains a singleton-like class that keeps track of all external tools
+   :synopsis: Contains a singleton-like class that keeps track of all external
+   "HEP" tools, such as pythia, nllfast, etc. 
+   Used primarily for installation and deployment.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
@@ -15,11 +17,15 @@ logger = logging.getLogger(__name__)
 class ToolBox(object):
     """
     A singleton-like class that keeps track of all external tools.
+    Intended to make installation and deployment easier.
     
     """
     __shared_state = {"tools" : {}}
 
     def __init__(self):
+        """
+        Constructor creates the singleton.
+        """
         # instead of making this a singleton, we introduce
         self.__dict__ = self.__shared_state
         if len(self.__shared_state["tools"]) == 0:
@@ -27,7 +33,7 @@ class ToolBox(object):
 
     def initSingleton(self):
         """
-        Intialize singleton instance (done only once for the entire class).
+        Initializes singleton instance (done only once for the entire class).
         
         """
         import setPath
@@ -80,7 +86,8 @@ class ToolBox(object):
 
     def checkInstallation(self, colors=True, make=False, printit=True ):
         """
-        Checks if the tools listed are installed and returns True/False
+        Checks if all tools listed are installed properly, 
+        returns True if everything is ok, False otherwise.
         """
         ret = "The following tools are found in the Toolbox:\n"
         hasMade = False
@@ -108,7 +115,8 @@ class ToolBox(object):
 
     def compile(self):
         """
-        If tools has not being installed, try to compile it.
+        Tries to compile and install tools that are not yet marked
+        as 'installed'.
         """
         for(name, instance) in self.tools.items():
             installOk = instance.checkInstallation()
@@ -130,9 +138,10 @@ class ToolBox(object):
         return self.tools[tool]
 
 if __name__ == "__main__":
+    """ Run as a script we report on the status of the installation. """
     import argparse
     argparser = argparse.ArgumentParser(description='simple script to check \
-            if the tools are installed and compiled')
+            if all external "HEP" tools are installed and compiled')
     argparser.add_argument('-n', '--nocolors', help='turn off colors',
                            action='store_true')
     argparser.add_argument('-m', '--make', help='compile packages if needed',
