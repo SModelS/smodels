@@ -1,7 +1,7 @@
 all: externaltools
 
 externaltools:
-	cd tools/external && make
+	cd lib && make
 
 regression: .PHONY
 	cd regression && ./run.py
