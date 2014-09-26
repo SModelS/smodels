@@ -11,7 +11,7 @@
 from __future__ import print_function
 import sys
 import os
-import inspect
+
 
 def installDirectory():
     """
@@ -19,10 +19,13 @@ def installDirectory():
     method.
     
     """
-    ret = os.path.realpath(inspect.getabsfile(installDirectory))
-    ret = ret.replace("EGG-INFO/scripts/smodels-config","")
-    ret = ret.replace("installation.py", "")
-    return ret
+    #path = os.path.abspath(os.path.join(os.path.realpath(__file__), os.pardir))
+    path = os.path.abspath(__file__)
+    path = os.path.abspath(os.path.join(path, '../..'))
+    #path = path.replace("EGG-INFO/scripts/smodels-config", "")
+    #path = path.replace("installation.py", "")
+    return path + "/"
+
 
 def pythonDirectory():
     """
@@ -30,9 +33,10 @@ def pythonDirectory():
     method. Same as installDirectory(), but trailing "smodels/" removed.
     
     """
-    ret = installDirectory()
-    # ret = ret.replace("/smodels/", "/")
-    return ret
+    path = installDirectory()
+    # path = path.replace("/smodels/", "/")
+    return path
+
 
 def version(astuple=False):
     """
@@ -48,7 +52,7 @@ def version(astuple=False):
         return l
     a, b = l.split(".")
     return (int(a), int(b))
-        
+
 
 def license():
     """
@@ -59,6 +63,7 @@ def license():
     lines = f.readlines()
     f.close()
     return "".join(lines)
+
 
 def banner():
     """
@@ -90,10 +95,10 @@ if __name__ == "__main__":
     for i in sys.argv[1:]:
         if i == "--help":
             printHelp()
-        if i == "--installdir": 
+        if i == "--installdir":
             print(installDirectory())
             sys.exit(0)
-        if i == "--pythondir": 
+        if i == "--pythondir":
             print(pythonDirectory())
             sys.exit(0)
     printHelp()
