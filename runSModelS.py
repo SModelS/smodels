@@ -14,7 +14,8 @@ from smodels.theory.theoryPrediction import theoryPredictionFor,  _getElementsFr
 from smodels.theory import crossSection
 from smodels.installation import installDirectory
 
-def run(filename, parameterfile=None, outputfile="summary.txt"):
+
+def main(filename, parameterfile=None, outputfile="summary.txt"):
 
     log = logging.getLogger(__name__)
 
@@ -205,4 +206,4 @@ if __name__ == "__main__":
     args = argparser.parse_args() # pylint: disable-msg=C0103
 
     # execute run function
-    run(args.filename, args.parameterfile, args.outputfile)
+    main(args.filename, args.parameterfile, args.outputfile)
