@@ -9,7 +9,6 @@
 
 """
 import unittest
-import setPath
 from smodels.installation import installDirectory
 from smodels.tools import slhaChecks
 

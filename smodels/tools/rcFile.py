@@ -13,6 +13,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def yesno(B):
     """
     TODO: write docstring
@@ -22,12 +23,12 @@ def yesno(B):
         return "yes"
     return "no"
 
+
 def parseRCFile():
     """
     TODO: write docstring
     
     """
-    import setPath
     rcfile = os.path.expanduser("~") + "/.smodelsrc"
     exists = os.path.exists(rcfile)
     if exists:
@@ -35,8 +36,6 @@ def parseRCFile():
         return True
     return False
 
-
-parseRCFile()
 
 if __name__ == "__main__":
     """

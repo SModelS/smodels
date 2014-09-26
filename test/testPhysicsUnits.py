@@ -8,7 +8,6 @@
 
 """
 import unittest
-import setPath
 from smodels.tools.physicsUnits import addunit, rmvunit, GeV, TeV, eV, fb
 
 class PhysicsUnitsTest(unittest.TestCase):

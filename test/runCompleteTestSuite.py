@@ -10,7 +10,6 @@
 """
 
 import unittest
-import setPath
 import os
 
 def testScript ( filename ):

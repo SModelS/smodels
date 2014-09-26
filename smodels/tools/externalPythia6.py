@@ -8,15 +8,14 @@
 
 """
 
-# import setPath
 from __future__ import print_function
 from smodels.tools.externalTool import ExternalTool
 from smodels.tools import externalTool
+from smodels import installation
 import tempfile
 import os
 import shutil
 import commands
-from smodels import installation
 import urllib
 import tarfile
 import logging

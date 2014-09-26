@@ -8,7 +8,6 @@
     
 """
 
-import setPath
 from smodels.tools import toolBox
 import unittest
 import logging

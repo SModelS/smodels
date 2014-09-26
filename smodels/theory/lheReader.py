@@ -8,7 +8,6 @@
 
 """
 
-import setPath
 from smodels.theory import smsEvent
 from smodels.tools.physicsUnits import addunit
 import logging
@@ -151,7 +150,8 @@ class LheReader(object):
 if __name__ == "__main__":
     import argparse
     argparser = argparse.ArgumentParser( "The LHE file reader class." )
-    argparser.add_argument('-f', '--filename',help = 'filename of input lhe file')
+    argparser.add_argument('-f', '--filename',
+                           help = 'filename of input lhe file')
     args = argparser.parse_args()
     reader = LheReader ( args.filename )
     print "Reading",reader.filename

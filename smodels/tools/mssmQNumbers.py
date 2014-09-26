@@ -1,6 +1,6 @@
 """
-.. module:: MSSM_qNumbers
-   :synopsis: The quantum numbers of particles in the MSSM
+.. module:: mssmQNumbers
+   :synopsis: The quantum numbers of particles in the MSSM.
 
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
 

@@ -9,7 +9,6 @@
 
 """
 import unittest
-import setPath
 
 class AsciiTest(unittest.TestCase):
     def orig(self):

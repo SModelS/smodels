@@ -10,7 +10,13 @@
 
 """
 
+import argparse
+import types
+from smodels.tools import externalPythia6
+from smodels.tools import externalNllFast
+from smodels.tools import externalPythonTools
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -22,6 +28,7 @@ class ToolBox(object):
     """
     __shared_state = {"tools" : {}}
 
+
     def __init__(self):
         """
         Constructor creates the singleton.
@@ -31,22 +38,17 @@ class ToolBox(object):
         if len(self.__shared_state["tools"]) == 0:
             self.initSingleton()
 
+
     def initSingleton(self):
         """
         Initializes singleton instance (done only once for the entire class).
         
         """
-        import setPath
-        from smodels.tools import externalPythia6
-        from smodels.tools import externalNllFast
-        from smodels.tools import externalPythonTools
         self.add(externalPythia6.ExternalPythia6())
         for(sqrts, tool) in externalNllFast.nllFastTools.items():
                 self.add(tool)
         for(name, tool) in externalPythonTools.pythonTools.items():
                 self.add(tool)
-        # from smodels.tools import externalPythia8
-        # self.add(externalPythia8.ExternalPythia8())
         
 
     def add(self, instance):
@@ -56,6 +58,7 @@ class ToolBox(object):
         """
         self.tools[instance.name] = instance
 
+
     def listOfTools(self):
         """
         Returns a simple list with the tool names.
@@ -63,12 +66,11 @@ class ToolBox(object):
         """
         return self.tools.keys()
 
+
     def installationOk(self, ok, colors):
         """
         Returns color coded string to signal installation issues.
         """
-        
-        import types
         green = '\033[0;32m'
         red = '\033[0;31m'
         reset = '\033[;0m'
@@ -83,6 +85,7 @@ class ToolBox(object):
         if colors:
             ret = "%s%s%s" % (red, ret, reset)
         return ret
+
 
     def checkInstallation(self, colors=True, make=False, printit=True ):
         """
@@ -113,6 +116,7 @@ class ToolBox(object):
             print (ret)
         return allOk
 
+
     def compile(self):
         """
         Tries to compile and install tools that are not yet marked
@@ -126,6 +130,7 @@ class ToolBox(object):
                         Trying to compile.")
             instance.compile()
 
+
     def get(self, tool, verbose=True):
         """
         Gets instance of tool from the toolbox.
@@ -137,9 +142,9 @@ class ToolBox(object):
             return None
         return self.tools[tool]
 
+
 if __name__ == "__main__":
     """ Run as a script we report on the status of the installation. """
-    import argparse
     argparser = argparse.ArgumentParser(description='simple script to check \
             if all external "HEP" tools are installed and compiled')
     argparser.add_argument('-n', '--nocolors', help='turn off colors',
