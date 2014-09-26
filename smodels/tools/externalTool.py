@@ -10,6 +10,8 @@
 
 import os
 import inspect
+from smodels import installation
+
 
 class ExternalTool(object):
     """
@@ -21,7 +23,8 @@ class ExternalTool(object):
     
     """
     def __init__(self):
-        self.executable_path = ""
+        self.executablePath = ""
+        self.tempdir = ""
 
 
     def installDirectory(self):
@@ -29,11 +32,11 @@ class ExternalTool(object):
         TODO: write docstring
         
         """
-        T = self.executable_path
-        P = T.rfind("/")
-        if P == -1:
+        t = self.executablePath
+        p = t.rfind("/")
+        if p == -1:
             return ""
-        return self.executable_path[:P]
+        return self.executablePath[:p]
 
 
     def pathOfExecutable(self):
@@ -41,7 +44,7 @@ class ExternalTool(object):
         :returns: path of executable
         
         """
-        return self.executable_path
+        return self.executablePath
 
 
     def basePath(self):
@@ -58,21 +61,20 @@ class ExternalTool(object):
         installation directory.
         
         """
-        if path==None:
+        if path == None:
             return self.tempdir + "/temp.cfg"
-        installdir = self.basePath()
-        installdir = installdir.replace("tools", "")
+        installdir = installation.installDirectory()
         path = path.replace("<install>", installdir)
-        path = path.replace(".egg/smodels",".egg/")
+        path = path.replace(".egg/smodels", ".egg/")
         path = os.path.abspath(path)
-        ## print "installdir=",path
         return path
 
-    def ok(self,B):
-        """
-        return 'ok', B is True. Else, return 'error'
-        
-        """
-        if B:
-            return "ok"
-        return "error"
+
+def ok(b):
+    """
+    :returns: 'ok' if b is True, else, return 'error'.
+    
+    """
+    if b:
+        return "ok"
+    return "error"
