@@ -14,8 +14,7 @@
 
 from __future__ import print_function
 import argparse
-import setPath
-from smodels import simpleExample
+import simpleExample
 from os.path import os
 
 inputFiles = ['inputFiles/slha/andrePT4.slha',
