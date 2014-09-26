@@ -15,7 +15,7 @@
 from __future__ import print_function
 import argparse
 import simpleExample
-from os.path import os
+import os
 
 inputFiles = ['inputFiles/slha/andrePT4.slha',
               'inputFiles/slha/T1.slha']
