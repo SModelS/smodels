@@ -10,6 +10,13 @@
 
 from __future__ import print_function
 import sys
+import os
+import argparse
+import types
+from smodels import installation
+from smodels.theory import lheReader
+from smodels.theory import lheDecomposer
+from smodels.theory import crossSection
 import logging
 
 logger = logging.getLogger(__name__)
@@ -24,6 +31,7 @@ def _printParticle(label):
         label = "q"
     label = label + "     "
     return label[:2]
+
 
 def _drawBranch(branch, upwards, labels, htmlFormat, border, l):
     """
@@ -93,6 +101,7 @@ def _drawBranch(branch, upwards, labels, htmlFormat, border, l):
         ret+=" \\" + "-"*(4 * l + 4) + "/\n"
     return ret
 
+
 def asciidraw(element, labels=True, html=False, border=False):
     """
     Draw a simple ASCII graph on the screen.
@@ -107,15 +116,8 @@ def asciidraw(element, labels=True, html=False, border=False):
                     border=border, l=max(l))
     return ret
 
-if __name__ == "__main__":
-    import setPath  # pylint: disable=W0611
-    import argparse
-    import types
-    from smodels import installation
-    from smodels.theory import lheReader
-    from smodels.theory import lheDecomposer
-    from smodels.theory import crossSection
 
+if __name__ == "__main__":
     argparser = argparse.ArgumentParser(description="simple tool that is "
                                         "meant to draw lessagraphs, as an "
                                         "ascii plot")
@@ -132,8 +134,8 @@ if __name__ == "__main__":
                            help="draw a border around the graph")
     args = argparser.parse_args()
 
-    filename = ("%sinputFiles/lhe/%s_1.lhe"
-                % (installation.installDirectory(), args.T))
+    path = os.path.join(installation.installDirectory(), "inputFiles/lhe/")
+    filename = os.path.join(path, args.T + "_1.lhe")
     if args.lhe != "":
         filename = args.lhe
 
