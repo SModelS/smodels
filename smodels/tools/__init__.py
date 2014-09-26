@@ -7,7 +7,7 @@
 import os
 import logging.config
 
-basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 if basepath.find(".egg")>0:
     basepath=basepath[:-7]
 logging.config.fileConfig('%s/etc/logging.conf' % basepath,
