@@ -8,10 +8,8 @@
     
 """
 
-import setPath
 import unittest
 import time
-import logging
 import logging.config
 from smodels.tools import externalPythia6
 

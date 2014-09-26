@@ -6,18 +6,19 @@
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
-   :parameter rOdd: dictionary with PDG codes for the rOdd (Z2-odd) particles and their respective labels
-   :parameter rEven: dictionary with PDG codes for the rEven (Z2-eveb) particles and their respective labels
-   :parameter ptcDic: dictionary with inclusive labels to help defining group of particles in the analysis database
+   :parameter rOdd: dictionary with PDG codes for the rOdd (Z2-odd) particles
+   and their respective labels
+   :parameter rEven: dictionary with PDG codes for the rEven (Z2-eveb)
+   particles and their respective labels
+   :parameter ptcDic: dictionary with inclusive labels to help defining group
+   of particles in the analysis database
    
-   HOW TO ADD NEW PARTICLES: simply add a new entry in rOdd (rEven) if the particle is Z2-odd (Z2-even).
-   For now all decays of Z2-even particles are ignored. Z2-odd particles are decayed assuming Z2 convervation.
+   HOW TO ADD NEW PARTICLES: simply add a new entry in rOdd (rEven) if the
+   particle is Z2-odd (Z2-even). For now all decays of Z2-even particles are
+   ignored. Z2-odd particles are decayed assuming Z2 convervation.
 
 """
 
-import logging
-
-logger = logging.getLogger(__name__)
 
 rOdd = {1000021 : "gluino",
         1000022 : "N1",

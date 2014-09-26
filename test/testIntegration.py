@@ -9,7 +9,6 @@
 
 """
 import unittest
-import setPath
 from smodels.tools.physicsUnits import fb, GeV
 
 class IntegrationTest(unittest.TestCase):

@@ -9,17 +9,16 @@
 
 """
 
-import setPath
 from smodels.tools.physicsUnits import addunit, rmvunit
 from smodels.tools import rcFile
 from smodels.experiment import smsHelpers
 from smodels.experiment.experimentExceptions import MetaInfoError
 from smodels.experiment.smsHelpers import getRun
+from smodels.tools.uniqueLogFilter import UniqueFilter
 import logging
 
 logger = logging.getLogger(__name__)
-from smodels.tools.uniqueLogFilter import UniqueFilter
-logger.addFilter ( UniqueFilter() )
+logger.addFilter(UniqueFilter())
 
 allresults = {}
 constraints = {}
@@ -89,7 +88,7 @@ def getSqrts(analysis, run=None):
     sqrts = smsHelpers.getMetaInfoField(analysis, "sqrts", run)
     try:
         return addunit(float(sqrts), "TeV")
-        
+
     except ValueError:
         try:
             return addunit(float(sqrts.split()[0]), sqrts.split()[1])
@@ -190,7 +189,7 @@ def getURL(analysis, run=None):
     Get the URL of an analysis.
     
     """
-    logger.warning ( "getURL is deprecated" )
+    logger.warning ("getURL is deprecated")
     return smsHelpers.getMetaInfoField(analysis, "url", run)
 
 
@@ -206,7 +205,7 @@ def getPAS(analysis, run=None):
     Get the PAS of an analysis.
     
     """
-    logger.warning("getPAS is deprecated" )
+    logger.warning("getPAS is deprecated")
     return smsHelpers.getMetaInfoField(analysis, "pas", run)
 
 
@@ -215,7 +214,7 @@ def getJournal(analysis, run=None):
     Get the journal of an analysis.
     
     """
-    logger.warning ("getJournal is deprecated") 
+    logger.warning ("getJournal is deprecated")
     return smsHelpers.getMetaInfoField(analysis, "journal", run)
 
 
@@ -247,7 +246,7 @@ def getExperiment(analysis, run=None):
     Check if run is ATLAS8TeV, else return CMS.
     
     """
-    logger.warning("getExperiment is deprecated" )
+    logger.warning("getExperiment is deprecated")
     run1 = getRun(analysis, run)
     if run1.find("ATLAS") > -1:
         return "ATLAS"
@@ -259,7 +258,7 @@ def getComment(analysis, run=None):
     Get the comment of an analysis.
     
     """
-    logger.warning ( "getComment is deprecated" )
+    logger.warning ("getComment is deprecated")
     return smsHelpers.getMetaInfoField(analysis, "comment", run)
 
 

@@ -11,10 +11,12 @@
 """
 
 from __future__ import print_function
-import setPath
+import argparse
 from smodels.tools import modpyslha as pyslha
 from smodels.theory.printer import Printer
 from smodels.tools.physicsUnits import addunit
+from smodels.tools import smMasses
+
 
 class SlhaStatus(Printer):
     """
@@ -49,8 +51,10 @@ class SlhaStatus(Printer):
         self.vertexStatus = self.findDisplacedVertices(findDisplaced)
         self.status = self.evaluateStatus()
     
+    
     def formatData(self):
         return self.formatSLHAData()
+
 
     def read(self):
         """
@@ -134,11 +138,11 @@ class SlhaStatus(Printer):
         #if NLSP is charged it should decay prompt
         if ct < 0:
             if c == "neutral":
-                 return 1, "Neutral NLSP is stable"
+                return 1, "Neutral NLSP is stable"
             return -1, "Charged NLSP is stable"
         if ct > self.maxFlightlength:
             if c == "neutral":
-                 return 1, "Neutral NLSP is long-lived, c*tau = " + str(addunit(ct),"m")
+                return 1, "Neutral NLSP is long-lived, c*tau = " + str(addunit(ct),"m")
             return -1, "Charged NLSP is long-lived, c*tau = " + str(addunit(ct), "m")
         return 1, "Prompt NLSP (%s) decay" % c
 
@@ -165,13 +169,13 @@ class SlhaStatus(Printer):
             stableParticles = "No empty decay blocks"
         return st, stableParticles
 
+
     def findIllegalDecay(self, findIllegal):
         """
         Find decays for which the sum of daughter masses excels the mother mass
         """
         if not findIllegal:
             return 0, "Did not check for illegal decays"
-        from smodels.tools import smMasses
         st = 1
         badDecay = "Illegal decay for PIDs"
         for particle, block in self.slha.decays.items():
@@ -188,6 +192,7 @@ class SlhaStatus(Printer):
         if st == 1:
             badDecay = "No illegal decay blocks"
         return st, badDecay
+
 
     def hasXsec(self, checkXsec):
         """
@@ -338,6 +343,7 @@ class SlhaStatus(Printer):
         nlsp = self.findNLSP()
         return self.deltaMass(lsp, nlsp)
 
+
     def findDisplacedVertices(self, findDisplaced):
         """
         find meta-stable particles that decay via leptons or higgs
@@ -374,6 +380,7 @@ class SlhaStatus(Printer):
         if ok == 1: msg = "no displaced vertices found"
         return ok, msg
 
+
     def getXSEC(self, pid, sqrts=8000.):
         """
         get crosssection for pair production, read last line
@@ -399,6 +406,7 @@ class SlhaStatus(Printer):
             xsec += float(line.split()[-3])
         return xsec
 
+
     def degenerateChi(self):
         """
         Check if chi01 is lsp and chipm1 is NLSP. If so, check mass splitting.
@@ -421,7 +429,8 @@ class Qnumbers:
     
     """
     def __init__(self, pid, model="MSSM"):
-        exec("from tools.%s_qNumbers import qNumbers" %model)
+        #exec("from tools.%s_qNumbers import qNumbers" %model)
+        from smodels.tools.mssmQNumbers import qNumbers
         self.pid = pid
         self.model = model
         if not pid in qNumbers.keys():
@@ -434,7 +443,6 @@ class Qnumbers:
 
 
 if __name__ == "__main__":
-    import argparse
     argparser = argparse.ArgumentParser() # pylint: disable-msg=C0103
     argparser.add_argument('-f', '--filename',
                            help = 'filename of input slha')
@@ -472,8 +480,8 @@ if __name__ == "__main__":
                            help= 'give massgap for mass compression in GeV',
                            default = 5.)
     args = argparser.parse_args() # pylint: disable-msg=C0103
-    status = SlhaStatus(args.filename, args.flightlength, args.displacement, args.sigmacut, args.decays,
-                        args.displaced, args.massgap, args.empty, args.xsec, args.lsp, args.ctau,
-                        args.model)
-    # pylint: disable-msg=C0103
+    status = SlhaStatus(args.filename, args.flightlength, args.displacement,
+                        args.sigmacut, args.decays, args.displaced,
+                        args.massgap, args.empty, args.xsec, args.lsp,
+                        args.ctau, args.model) # pylint: disable-msg=C0103
     print(status.status)

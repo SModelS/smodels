@@ -13,7 +13,6 @@
 
 import commands
 import os
-import setPath
 from smodels.tools import toolBox
 from smodels.tools import modpyslha as pyslha
 from smodels.tools.physicsUnits import rmvunit, addunit

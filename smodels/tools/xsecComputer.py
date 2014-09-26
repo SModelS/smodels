@@ -9,7 +9,6 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
-import setPath  # pylint: disable=W0611
 from smodels import installation
 from smodels.tools import toolBox
 from smodels.tools.physicsUnits import rmvunit, addunit, fb, TeV

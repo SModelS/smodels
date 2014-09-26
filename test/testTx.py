@@ -8,7 +8,6 @@
     
 """
 
-import setPath
 from smodels.theory import slhaDecomposer
 from smodels.tools import xsecComputer
 from smodels.tools.xsecComputer import NLL

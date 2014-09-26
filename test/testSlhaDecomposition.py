@@ -8,7 +8,6 @@
     
 """
 
-import setPath
 from smodels.theory import slhaDecomposer
 from smodels.tools.physicsUnits import GeV, fb
 import unittest

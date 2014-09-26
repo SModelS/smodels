@@ -5,6 +5,7 @@
 """
 
 import sys, os, logging
+import argparse
 from ConfigParser import SafeConfigParser
 from smodels.tools.physicsUnits import rmvunit, addunit
 from smodels.tools import slhaChecks, ioObjects, xsecComputer
@@ -196,8 +197,6 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
     missingtopos.printout("file", outputfile)
 
 if __name__ == "__main__":
-    import argparse
-    import setPath
     #get the name of input slha file (and parameter file)
     argparser = argparse.ArgumentParser()
     argparser.add_argument('-f', '--filename', help = 'name of SLHA or LHE input file, necessary input', required = True)

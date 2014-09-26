@@ -10,13 +10,12 @@
 
 from __future__ import print_function
 import logging
-from smodels.tools.physicsUnits import addunit
 from smodels.theory import crossSection
 from smodels.experiment import smsResults
+from smodels.tools.physicsUnits import addunit
 from smodels.tools.physicsUnits import rmvunit
 
 logger = logging.getLogger(__name__)
-
 
 
 class Printer(object):
