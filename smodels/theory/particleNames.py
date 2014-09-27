@@ -9,11 +9,12 @@
 
 """
 
+import sys
+import copy
 import logging
+from smodels.particles import rEven, rOdd, ptcDic
 
 logger = logging.getLogger(__name__)
-
-from smodels.particles import rEven, rOdd, ptcDic
 
 
 def getName(pdg):
@@ -68,7 +69,6 @@ def elementsInStr(instring):
         for st in instring:
             if type(st) != type('st'):
                 logger.error("Input must be a string or a list of strings")
-                import sys
                 sys.exit()
             # Combine list of strings in a single string
             outstr += st
@@ -99,13 +99,11 @@ def elementsInStr(instring):
                     continue
                 if not ptc in rEven.values() and not ptc in ptcDic:
                     logger.error("Unknown particle " + ptc)
-                    import sys
                     sys.exit()
 
     # Check if there are not unmatched ['s and/or ]'s in the string
     if nc != 0:
         logger.error("Wrong input (incomplete elements?) " + instring)
-        import sys
         sys.exit()
 
     return elements
@@ -124,7 +122,6 @@ def vertInStr(instring):
         for st in instring:
             if type(st) != type('st'):
                 logger.error("Input must be a string or a list of strings")
-                import sys
                 sys.exit()
             # Combine list of strings in a single string
             outstr += st
@@ -154,14 +151,12 @@ def vertInStr(instring):
                     continue
                 if not ptc in rEven.values() and not ptc in ptcDic:
                     logger.error("Unknown particle " + ptc)
-                    import sys
                     sys.exit()
             vertStr = ""
 
     # Check if there are not unmatched ['s and/or ]'s in the string
     if nc != 0:
         logger.error("Wrong input (incomplete elements?) " + instring)
-        import sys
         sys.exit()
 
     return vertices
@@ -180,7 +175,6 @@ def simParticles(ptype1, ptype2, useDict=True):
     :returns: boolean
     
     """
-    import copy
 
     wrongFormat = False
     if type(ptype1) != type(ptype2):
@@ -206,7 +200,6 @@ def simParticles(ptype1, ptype2, useDict=True):
                         wrongFormat = True
     if wrongFormat:
         logger.error("Wrong input format!" + str(ptype1) + " " + str(ptype2))
-        import sys
         sys.exit()
 
     # Put input in standard notation
