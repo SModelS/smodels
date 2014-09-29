@@ -169,7 +169,7 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
 
         # Create a list of results, to determine the best result
         for theoryprediction in theorypredictions:
-            results.addResult(theoryprediction)
+            results.addResult(theoryprediction, maxcond = parser.getfloat("parameters","maxcond"))
 
     # If there is no best result, this means that there are no matching experimental results for the point.
     # Decomposition status has following flags:

@@ -19,7 +19,10 @@ class ResultList(Printer):
         self.bestresultonly = bestresultonly
         self.describeTopo = describeTopo
 
-    def addResult(self, res):
+    def addResult(self, res, maxcond):
+        mCond = res.getmaxCondition()
+        if mCond == 'N/A': return
+        if mCond > maxcond: return
         self.outputarray.append(res)
         return
 
