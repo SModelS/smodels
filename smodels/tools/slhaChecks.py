@@ -142,8 +142,8 @@ class SlhaStatus(Printer):
             return -1, "Charged NLSP is stable"
         if ct > self.maxFlightlength:
             if c == "neutral":
-                return 1, "Neutral NLSP is long-lived, c*tau = " + str(addunit(ct),"m")
-            return -1, "Charged NLSP is long-lived, c*tau = " + str(addunit(ct), "m")
+                return 1, "Neutral NLSP is long-lived, c*tau = " + str(addunit(ct,"m"))
+            return -1, "Charged NLSP is long-lived, c*tau = " + str(addunit(ct, "m"))
         return 1, "Prompt NLSP (%s) decay" % c
 
 
