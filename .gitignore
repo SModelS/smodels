@@ -9,6 +9,7 @@ old/
 .project
 .pydevproject
 smodels.log
+summary.txt
 pythia_lhe
 recipes/recipe*.py
 recipes/recipe*.html
