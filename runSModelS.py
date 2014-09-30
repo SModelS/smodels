@@ -8,7 +8,7 @@ import sys, os, logging
 import argparse
 from ConfigParser import SafeConfigParser
 from smodels.tools.physicsUnits import rmvunit, addunit
-from smodels.tools import slhaChecks, ioObjects, xsecComputer
+from smodels.tools import slhaChecks, ioObjects, xsecComputer, missingTopologies
 from smodels.experiment import smsHelpers, smsAnalysisFactory, smsResults
 from smodels.theory import slhaDecomposer
 from smodels.theory.theoryPrediction import theoryPredictionFor,  _getElementsFrom
@@ -192,7 +192,7 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
     if outputStatus.status == 1: results.printout("file", outputfile)
 
     #look for missing topologies, add them to the output file
-    missingtopos = ioObjects.MissingTopoList(sqrts)
+    missingtopos = missingTopologies.MissingTopoList(sqrts)
     missingtopos.findMissingTopos(smstoplist, listofanalyses, sigmacut, addunit(parser.getfloat("parameters","minmassgap"),"GeV"))
     missingtopos.printout("file", outputfile)
 
