@@ -20,7 +20,7 @@ def installDirectory():
     
     """
     #path = os.path.abspath(os.path.join(os.path.realpath(__file__), os.pardir))
-    path = os.path.abspath(__file__)
+    path = os.path.abspath(os.path.realpath(__file__))
     path = os.path.abspath(os.path.join(path, '../..'))
     #path = path.replace("EGG-INFO/scripts/smodels-config", "")
     #path = path.replace("installation.py", "")
@@ -67,7 +67,7 @@ def license():
 
 def banner():
     """
-    Print SModelS banner.
+    Returns SModelS banner.
     
     """
     f = open(installDirectory() + "BANNER")
@@ -75,16 +75,19 @@ def banner():
     f.close()
     return "".join(lines)
 
-
 def printHelp():
     """
     Print usage information of this module.
     
     """
-    print(sys.argv[0] + " [--help] [--installdir] [--pythondir]:")
-    print("--help: show this message")
+    print("Usage: " + sys.argv[0] + " [--help|-h] [--installdir|-i] [--pythondir|-p]")
+    print("                      [--version|-v] [--banner|-b] [--license|--copyright|-c]:")
+    print("--help:       show this message")
     print("--installdir: print SModelS installation directory")
-    print("--pythondir: print SModelS python path")
+    print("--pythondir:  print SModelS python path")
+    print("--version:    print SModelS version number")
+    print("--banner:     print SModelS banner")
+    print("--copyright:  print SModelS copyright")
     sys.exit(0)
 
 
@@ -93,12 +96,23 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         printHelp()
     for i in sys.argv[1:]:
-        if i == "--help":
-            printHelp()
-        if i == "--installdir":
+        if i in [ "--installdir", "-i" ]:
             print(installDirectory())
             sys.exit(0)
-        if i == "--pythondir":
+        if i in [ "--pythondir", "-p" ]:
             print(pythonDirectory())
             sys.exit(0)
+        if i in [ "--version", "-v" ]:
+            print(version())
+            sys.exit(0)
+        if i in [ "--banner", "-b" ]:
+            print(banner())
+            sys.exit(0)
+        if i in [ "--help", "-h" ]:
+            printHelp()
+            sys.exit(0)
+        if i in [ "--license", "--copyright", "-c" ]:
+            print(license())
+            sys.exit(0)
+    print("Error: cannot parse %s.\n" % i )
     printHelp()
