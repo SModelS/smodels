@@ -31,7 +31,7 @@ class ExternalPythia6(ExternalTool):
     def __init__(self,
                  configFile="<install>/etc/pythia.card",
                  executablePath="<install>/lib/pythia6/pythia_lhe",
-                 srcPath="<install>/pythia6/"):
+                 srcPath="<install>/lib/pythia6/"):
         """ 
         :param configFile: Location of the config file, full path; copy this
         file and provide tools to change its content and to provide a template
@@ -193,6 +193,19 @@ class ExternalPythia6(ExternalTool):
             f.close()
         return Out
 
+    def chmod(self):
+        """ 
+        chmod 755 on pythia executable, if it exists.
+        Do nothing, if it doesnt exist.
+        """
+        if not os.path.exists ( self.executablePath ):
+            logger.error("%s doesnt exist" % self.executablePath )
+            return False
+        import stat
+        mode = stat.S_IRWXU | stat.S_IRWXG | stat.S_IXOTH | stat.S_IROTH
+        os.chmod ( self.executablePath, mode )
+        return True
+
 
     def compile(self):
         """
@@ -228,17 +241,24 @@ class ExternalPythia6(ExternalTool):
         logger.debug("... done.")
 
 
-    def checkInstallation(self):
+    def checkInstallation(self, fix=False ):
         """
         Check if installation of tool is correct by looking for executable and
         running it.
+
+        :param compile: should it try to fix the situation, if something is wrong?
+
+        :returns: True, if everything is ok
         
         """
         if not os.path.exists(self.executablePath):
             logger.error("executable '%s' not found", self.executablePath)
+            if fix:
+                self.compile()
             return False
         if not os.access(self.executablePath, os.X_OK):
             logger.error("%s is not executable", self.executable)
+            self.chmod()
             return False
         slhaFile = "/inputFiles/slha/andrePT4.slha"
         slhaPath = installation.installDirectory() + slhaFile
