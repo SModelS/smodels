@@ -1,7 +1,8 @@
-all: pythia nllfast
+all: pythia6 nllfast
 nllfast: nllfast-1.2 nllfast-2.1 nllfast-3.0 nllfast-4.01dcpl nllfast-5.01dcpl
+pythia: pythia6
 
-pythia:
+pythia6:
 	cd pythia6 && make
 nllfast-1.2:
 	cd nllfast/nllfast-1.2 && make
