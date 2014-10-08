@@ -7,7 +7,7 @@
 import sys, os, logging
 import argparse
 from ConfigParser import SafeConfigParser
-from smodels.tools.physicsUnits import rmvunit, addunit
+from smodels.tools.physicsUnits import GeV, fb, TeV
 from smodels.tools import slhaChecks, ioObjects, xsecComputer, missingTopologies
 from smodels.experiment import smsHelpers, smsAnalysisFactory, smsResults
 from smodels.theory import slhaDecomposer
@@ -69,7 +69,7 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
     #FIXME can I automatize calling the printout functions and the sys.exit?
 
     # sqrts from parameter input file
-    sqrts = addunit(parser.getfloat("options","sqrts"),"TeV")
+    sqrts = parser.getfloat("options","sqrts")*TeV
 
     #cross section computation
     #if addMissingXsecs is set True, SModelS calculates LO cross sections
@@ -93,11 +93,11 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
 
     #decomposition
     #sigmacut = minimum value of cross-section for an element to be considered eligible for decomposition. Too small sigmacut leads to too large deocmposition time. 
-    sigmacut = addunit(parser.getfloat("parameters","sigmacut"),"fb")
+    sigmacut = parser.getfloat("parameters","sigmacut")*fb
 
     try:
         # Decompose input SLHA file, store the output elements in smstoplist
-        smstoplist = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=parser.getboolean("options","doCompress"), doInvisible=parser.getboolean("options","doInvisible"), minmassgap=addunit(parser.getfloat("parameters","minmassgap"),"GeV"))
+        smstoplist = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=parser.getboolean("options","doCompress"), doInvisible=parser.getboolean("options","doInvisible"), minmassgap=parser.getfloat("parameters","minmassgap")*GeV)
     except:
         # If the decomposition does not go through, update status, write output file, stop running
         outputStatus.updateStatus(-1)
@@ -197,7 +197,7 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
 
     #look for missing topologies, add them to the output file
     missingtopos = missingTopologies.MissingTopoList(sqrts)
-    missingtopos.findMissingTopos(smstoplist, listofanalyses, sigmacut, addunit(parser.getfloat("parameters","minmassgap"),"GeV"))
+    missingtopos.findMissingTopos(smstoplist, listofanalyses, sigmacut, parser.getfloat("parameters","minmassgap")*GeV)
     missingtopos.printout("file", outputfile)
 
 if __name__ == "__main__":
