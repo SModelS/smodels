@@ -167,7 +167,8 @@ class ExternalPythia6(ExternalTool):
                " or file a complaint at smodels-users@lists.oeaw.ac.at" )
         sys.exit(0)
 
-    def run(self, slhaFile, cfgfile=None, do_unlink=True, do_compile=False ):
+    def run(self, slhaFile, cfgfile=None, do_unlink=True, do_compile=False,
+            do_check=True ):
         """
         Run Pythia.
         
@@ -181,17 +182,19 @@ class ExternalPythia6(ExternalTool):
         :returns: stdout and stderr, or error message
         
         """
-        ci=self.checkInstallation()
-        if not ci:
-            if not do_compile:
-                logger.error("couldnt find pythia6 binary." )
-                self.complain()
-            logger.warning("couldnt find pythia6 binary. I have been asked to try to compile it, though. Lets see.")
-            self.compile()
-            ci=self.checkInstallation( fix=False )
+        if do_check:
+            ci=self.checkInstallation()
             if not ci:
-                logger.error("still cannot find pythia6 binary, even after compiling.")
+                if not do_compile:
+                    logger.error("couldnt find pythia6 binary." )
+                    self.complain()
+                logger.warning("couldnt find pythia6 binary. I have been asked to try to compile it, though. Lets see.")
                 self.complain()
+            #    self.compile()
+            #    ci=self.checkInstallation( fix=False )
+            #    if not ci:
+            #        logger.error("still cannot find pythia6 binary, even after compiling.")
+        #        self.complain()
         slha = self.checkFileExists(slhaFile)
         # cfg = self.tempdir + "/temp.cfg"
         # if cfgfile != None:
@@ -282,7 +285,7 @@ class ExternalPythia6(ExternalTool):
         slhaPath = installation.installDirectory() + slhaFile
         try:
             output = self.run(slhaPath, "<install>/etc/pythia_test.card",
-                    do_compile=False ) 
+                    do_compile=False, do_check=False ) 
             output = output.split("\n")
             if output[-1].find("The following floating-point") > -1:
                 output.pop()
