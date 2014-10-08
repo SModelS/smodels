@@ -161,7 +161,13 @@ class ExternalPythia6(ExternalTool):
         f.close()
 
 
-    def run(self, slhaFile, cfgfile=None, do_unlink=True):
+    def complain ( self ):
+        import sys
+        logger.error("please fix manually, e.g. try 'make' in smodels/lib, " \
+               " or file a complaint at smodels-users@lists.oeaw.ac.at" )
+        sys.exit(0)
+
+    def run(self, slhaFile, cfgfile=None, do_unlink=True, do_compile=False ):
         """
         Run Pythia.
         
@@ -171,9 +177,21 @@ class ExternalPythia6(ExternalTool):
                         this config file will not be touched or copied;  
                         it will be taken as is
         :param do_unlink: clean up temporary files after run?
+        :param do_compile: if true, we try to compile binary if it isnt installed.
         :returns: stdout and stderr, or error message
         
         """
+        ci=self.checkInstallation()
+        if not ci:
+            if not do_compile:
+                logger.error("couldnt find pythia6 binary." )
+                self.complain()
+            logger.warning("couldnt find pythia6 binary. I have been asked to try to compile it, though. Lets see.")
+            self.compile()
+            ci=self.checkInstallation( fix=False )
+            if not ci:
+                logger.error("still cannot find pythia6 binary, even after compiling.")
+                self.complain()
         slha = self.checkFileExists(slhaFile)
         # cfg = self.tempdir + "/temp.cfg"
         # if cfgfile != None:
@@ -263,7 +281,8 @@ class ExternalPythia6(ExternalTool):
         slhaFile = "/inputFiles/slha/andrePT4.slha"
         slhaPath = installation.installDirectory() + slhaFile
         try:
-            output = self.run(slhaPath, "<install>/etc/pythia_test.card")
+            output = self.run(slhaPath, "<install>/etc/pythia_test.card",
+                    do_compile=False ) 
             output = output.split("\n")
             if output[-1].find("The following floating-point") > -1:
                 output.pop()
