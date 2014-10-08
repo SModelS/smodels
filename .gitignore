@@ -3,6 +3,7 @@
 *.out
 *.tar.gz
 build/
+test/unitTestOutput.txt
 smodels.egg-info/
 dist/
 old/

@@ -26,7 +26,7 @@ class TimeoutTest(unittest.TestCase):
         ret=self.pythia.run ( "../inputFiles/slha/T1.slha" )
         lines=ret.split("\n")
         dt=time.time()-t0
-        print "dt=",dt
+        # print "dt=",dt
         subprocesses=lines[-12]
         self.assertTrue( dt > .03 )
         self.assertTrue( subprocesses.find("All included")>-1) 
