@@ -10,12 +10,14 @@
 """
 import unittest
 from smodels.tools.physicsUnits import fb, GeV
+import inspect
+import os
 
 class IntegrationTest(unittest.TestCase):
     def configureLogger(self):
         import logging.config
-        logging.config.fileConfig( "/home/walten/git/smodels/tests/integration.conf",
-               disable_existing_loggers=False )
+        fc= inspect.getabsfile(self.configureLogger).replace ( "testIntegration.py", "integration.conf" )
+        logging.config.fileConfig( fname=fc, disable_existing_loggers=False )
 
     def predictions(self):
         return { 'SUS13006:TSlepSlep371': 2.42154060952*fb,
