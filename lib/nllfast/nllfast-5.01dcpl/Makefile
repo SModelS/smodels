@@ -5,3 +5,6 @@ tarball:
 
 compile:
 	gfortran -o nllfast_33TeV nllfast-5.01dcpl-33TeV.f
+
+clean:
+	rm -f nllfast_33TeV

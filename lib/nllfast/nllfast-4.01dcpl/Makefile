@@ -5,3 +5,6 @@ tarball:
 
 compile:
 	gfortran -o nllfast_14TeV nllfast-4.01dcpl-14TeV.f
+
+clean:
+	rm -rf nllfast_14TeV

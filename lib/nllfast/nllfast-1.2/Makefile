@@ -5,3 +5,6 @@ tarball:
 
 compile:
 	gfortran -o nllfast_7TeV nllfast-1.2.f
+
+clean:
+	rm -f nllfast_7TeV

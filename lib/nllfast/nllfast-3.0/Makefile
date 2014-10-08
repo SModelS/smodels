@@ -5,3 +5,6 @@ tarball:
 
 compile:
 	gfortran -o nllfast_13TeV nllfast-3.0-13TeV.f
+
+clean:
+	rm -f nllfast_13TeV
