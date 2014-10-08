@@ -46,6 +46,10 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
     #set database address
     smsHelpers.base = parser.get("path","database")
 
+    for i in [ "$HOME", "$(HOME)", "${HOME}" ]:
+        # we use a $HOME variable, for convenience
+        smsHelpers.base = smsHelpers.base.replace( i,os.environ["HOME"] )
+
     #check if database directory exists, read database version
     try:
         databaseVersion = smsHelpers.databaseVersion()
@@ -200,7 +204,7 @@ if __name__ == "__main__":
     #get the name of input slha file (and parameter file)
     argparser = argparse.ArgumentParser()
     argparser.add_argument('-f', '--filename', help = 'name of SLHA or LHE input file, necessary input', required = True)
-    argparser.add_argument('-p', '--parameterfile', help = 'name of parameter file, optional argument, if not set use all parameters from etc/parameters_default.ini')
+    argparser.add_argument('-p', '--parameterfile', help = 'name of parameter file, optional argument, if not set, use all parameters from etc/parameters_default.ini. For directory names, "$HOME" can be used for the user home directory.')
     argparser.add_argument('-o', '--outputfile', help = 'name of output file, optional argument, default is: ./summary.txt', default = 'summary.txt')
     args = argparser.parse_args() # pylint: disable-msg=C0103
 
