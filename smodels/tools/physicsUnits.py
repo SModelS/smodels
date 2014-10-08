@@ -49,6 +49,7 @@ def addunit(value, unitstring):
     Allow to turn this functionality off, in case "units" is not installed.
     
     """
+    logger.warning("physicsUnits.addunit has been deprecated. Please multiply directly with the unit." )
     if value == None:
         return value
     if not useUnits:
@@ -87,6 +88,7 @@ def rmvunit(value, unitstring):
     Allow to turn this functionality off, in case "units" is not installed.
     
     """
+    logger.warning("physicsUnits.rmvunit has been deprecated. Please divide directly with the unit." )
     if not useUnits:
         return value
     if useUnits:
