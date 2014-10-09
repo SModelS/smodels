@@ -14,7 +14,7 @@ from __future__ import print_function
 import argparse
 from smodels.tools import modpyslha as pyslha
 from smodels.theory.printer import Printer
-from smodels.tools.physicsUnits import addunit
+from smodels.tools.physicsUnits import m, GeV
 from smodels.tools import smMasses
 
 
@@ -142,8 +142,8 @@ class SlhaStatus(Printer):
             return -1, "Charged NLSP is stable"
         if ct > self.maxFlightlength:
             if c == "neutral":
-                return 1, "Neutral NLSP is long-lived, c*tau = " + str(addunit(ct,"m"))
-            return -1, "Charged NLSP is long-lived, c*tau = " + str(addunit(ct, "m"))
+                return 1, "Neutral NLSP is long-lived, c*tau = " + str(ct*m) 
+            return -1, "Charged NLSP is long-lived, c*tau = " + str(ct*m)
         return 1, "Prompt NLSP (%s) decay" % c
 
 
@@ -242,7 +242,7 @@ class SlhaStatus(Printer):
             if mass < minmass:
                 pid, minmass = particle, mass
         if returnmass:
-            return pid, addunit(minmass, "GeV")
+            return pid, minmass*GeV 
         return pid
 
 
@@ -307,7 +307,7 @@ class SlhaStatus(Printer):
             if mass < minmass:
                 pid, minmass = particle, mass
         if returnmass:
-            return pid, addunit(minmass, "GeV")
+            return pid, minmass*GeV
         return pid
     
 
