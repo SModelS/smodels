@@ -195,6 +195,9 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
     # add experimental constraints if found
     if outputStatus.status == 1: results.printout("file", outputfile)
 
+    sqrtsValues = [xsec.info.sqrts for xsec in smstoplist.getTotalWeight()]
+    if not sqrts in sqrtsValues: sqrts = max(sqrtsValues)
+
     if parser.getboolean("options","findMissingTopos"):
         #look for missing topologies, add them to the output file
         missingtopos = missingTopologies.MissingTopoList(sqrts)
