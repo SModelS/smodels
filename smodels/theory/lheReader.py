@@ -9,7 +9,7 @@
 """
 
 from smodels.theory import smsEvent
-from smodels.tools.physicsUnits import addunit
+from smodels.tools.physicsUnits import TeV, pb
 import logging
 
 logger = logging.getLogger(__name__)
@@ -48,13 +48,13 @@ class LheReader(object):
         while not "</LesHouchesEvents>" in line and line != "":
             if "<init>" in line:
                 line = self.file.readline()
-                sqrts = addunit((eval(line.split()[2]) + \
-                                 eval(line.split()[3])) / 1000., 'TeV')
+                sqrts = (eval(line.split()[2]) + \
+                                 eval(line.split()[3])) / 1000. * TeV
                 self.metainfo["sqrts"] = sqrts
-                totxsec = addunit(0., 'pb')
+                totxsec = 0. * pb 
                 line = self.file.readline()
                 while not "</init>" in line:
-                    totxsec += addunit(eval(line.split()[0]), 'pb')
+                    totxsec += eval(line.split()[0])* pb
                     line = self.file.readline()
                 self.metainfo["totalxsec"] = totxsec
             elif "<event>" in line:                

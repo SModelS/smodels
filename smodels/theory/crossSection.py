@@ -8,8 +8,7 @@
 
 """
 
-from smodels.tools.physicsUnits import addunit
-from smodels.tools.physicsUnits import rmvunit
+from smodels.tools.physicsUnits import rmvunit, fb, TeV
 from smodels.theory import lheReader
 import logging
 
@@ -180,7 +179,7 @@ class XSection(object):
         Replace the cross-section value by zero.
         
         """
-        self.value = addunit(0., 'fb')
+        self.value = 0. * fb
 
 
 class XSectionList(object):
@@ -201,7 +200,7 @@ class XSectionList(object):
         if infoList:
             for info in infoList:
                 newentry = XSection()
-                newentry.value = addunit(0., 'fb')
+                newentry.value = 0. * fb
                 newentry.pid = (None, None)
                 newentry.info = info.copy()
                 self.add(newentry)
@@ -325,7 +324,7 @@ class XSectionList(object):
         
         """
         for xsec in self:
-            xsec.value = addunit(0., 'fb')
+            xsec.value = 0. * fb
 
 
     def delete(self, xSec):
@@ -393,7 +392,7 @@ class XSectionList(object):
         Get the maximum cross-section value appearing in the list.
         
         """
-        maxxsec = addunit(0., 'fb')
+        maxxsec = 0. * fb
         for xsec in self:
             if xsec.value > maxxsec:
                 maxxsec = xsec.value
@@ -537,7 +536,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None):
             # Ignore other entries
             continue
         csOrder = eval(l.split()[1])
-        cs = addunit(eval(l.split()[6]), 'fb')
+        cs = eval(l.split()[6]) * fb
         wlabel = str(int(sqrtS)) + ' TeV'
         if csOrder == 0:
             wlabel += ' (LO)'
@@ -550,7 +549,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None):
             import sys
             sys.exit()
         xsec = XSection()
-        xsec.info.sqrts = addunit(sqrtS, 'TeV')
+        xsec.info.sqrts = sqrtS * TeV
         xsec.info.order = csOrder
         xsec.info.label = wlabel
         xsec.value = cs
@@ -622,7 +621,7 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
         elif xsec.info.order == 2:
             wlabel += ' (NLL)'
         xsec.info.label = wlabel
-        xsec.value = addunit(0., 'fb')
+        xsec.value = 0. * fb
         xsec.pid = pid
         # If addEvents = False, set cross-section value to event weight
         if not addEvents:
