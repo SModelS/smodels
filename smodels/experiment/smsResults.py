@@ -9,7 +9,7 @@
 
 """
 
-from smodels.tools.physicsUnits import addunit, rmvunit
+from smodels.tools.physicsUnits import rmvunit, TeV, pb, fb
 from smodels.tools import rcFile
 from smodels.experiment import smsHelpers
 from smodels.experiment.experimentExceptions import MetaInfoError
@@ -90,11 +90,11 @@ def getSqrts(analysis, run=None):
     """
     sqrts = smsHelpers.getMetaInfoField(analysis, "sqrts", run)
     try:
-        return addunit(float(sqrts), "TeV")
+        return float(sqrts) * TeV
 
     except ValueError:
         try:
-            return addunit(float(sqrts.split()[0]), sqrts.split()[1])
+            return addunit(float(sqrts.split()[0]), sqrts.split()[1], False)
         except:
             pass
     return sqrts
@@ -228,10 +228,10 @@ def getLumi(analysis, run=None):
     """
     lumifb = smsHelpers.getMetaInfoField(analysis, "lumi", run)
     try:
-        return addunit(float(lumifb), "fb-1")
+        return float(lumifb) / fb
     except ValueError:
         try:
-            return addunit(float(lumifb.split()[0]), lumifb.split()[1])
+            return addunit(float(lumifb.split()[0]), lumifb.split()[1], False)
         except:
             pass
     return lumifb
@@ -336,7 +336,7 @@ def getUpperLimitFromDictionary(analysis, topology, mx=None, my=None,
         return None
     if rmvunit(mx, 'GeV') == None:
         return dictionary
-    return addunit(getInterpolatedUpperLimitDelaunay(dictionary, mx, my), "pb")
+    return getInterpolatedUpperLimitDelaunay(dictionary, mx, my) * pb
 
 
 def getInterpolatedUpperLimitDelaunay(dictionary, inmx, inmy):

@@ -9,7 +9,7 @@
 from smodels.theory import lheReader, topology, crossSection, element
 from smodels.theory import branch
 from smodels.tools import modpyslha as pyslha
-from smodels.tools.physicsUnits import addunit
+from smodels.tools.physicsUnits import fb, GeV
 import smodels.particles
 import copy
 import logging
@@ -93,8 +93,7 @@ def elementFromEvent(event, weight=None):
             branchMass = massDic[ip]
             # Generate final branches (after all R-odd particles have decayed)
             finalBranchList += branch.decayBranches([mombranch], branchBR,
-                                                    branchMass,
-                                                    sigcut=addunit(0., 'fb'))
+                                                    branchMass, sigcut=0. * fb )
 
     if len(finalBranchList) != 2:
         logger.error(str(len(finalBranchList)) + " branches found in event; "
@@ -153,7 +152,7 @@ def _getDictionariesFromEvent(event):
             # Ignore R-even particles and initial state particles
             continue
         ibranch = branchDic[ip]  # Get particle branch
-        massDic[ibranch][particle.pdg] = addunit(particle.mass, 'GeV')
+        massDic[ibranch][particle.pdg] = particle.mass* GeV
         # Create empty BRs
         brDic[ibranch][particle.pdg] = [pyslha.Decay(0., 0, [], particle.pdg)]
 
