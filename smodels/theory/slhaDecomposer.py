@@ -11,7 +11,7 @@ import time
 from smodels.theory import element, topology, crossSection
 from smodels.theory.branch import Branch, decayBranches
 from smodels.tools import modpyslha as pyslha
-from smodels.tools.physicsUnits import addunit, rmvunit
+from smodels.tools.physicsUnits import rmvunit, fb, GeV
 import smodels.particles
 import logging
 
@@ -51,7 +51,7 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
         sys.exit()
 
     if type(sigcut) == type(1.):
-        sigcut = addunit(sigcut, 'fb')
+        sigcut = sigcut * fb
 
     # Get cross-section from file
     xSectionList = crossSection.getXsecFromSLHAFile(slhafile, useXSecs)
@@ -88,7 +88,7 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
                 if branch1.momID == pids[0] and branch2.momID == pids[1]:
                     finalBR = branch1.maxWeight * branch2.maxWeight / \
                             (maxWeight[pids[0]] * maxWeight[pids[1]])
-                    if type(finalBR) == type(addunit(1., 'fb')):
+                    if type(finalBR) == type( 1. * fb):
                         finalBR = finalBR.asNumber()
                     weightList = xSectionList.getXsecsFor(pids) * finalBR
 
@@ -151,7 +151,7 @@ def _getDictionariesFromSLHA(slhafile):
     massDic = {}
     for pid in res.decays.keys():
         if pid and res.decays[pid].mass != None:
-            massDic[pid] = addunit(abs(res.decays[pid].mass), 'GeV')
-            massDic[-pid] = addunit(abs(res.decays[pid].mass), 'GeV')
+            massDic[pid] = abs(res.decays[pid].mass)* GeV
+            massDic[-pid] = abs(res.decays[pid].mass) * GeV
 
     return brDic, massDic
