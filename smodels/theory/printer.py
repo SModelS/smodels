@@ -86,7 +86,9 @@ class Printer(object):
                 totxsec.combineWith(el.weight)
             output += "\t Total Global topology weight:\n" 
             for k in totxsec.getDictionary():
-                output += "\t Sqrts: " + str( k / TeV) + "\t Weight: " + str(totxsec.getDictionary()[k]) + "\n"
+                pos=k.find(" " )
+                sqrts=str( float(k[:pos]) / TeV) 
+                output += "\t Sqrts: " + sqrts + "\t Weight: " + str(totxsec.getDictionary()[k]) + "\n"
         return output
 
     def formatElementData(self):
@@ -101,7 +103,9 @@ class Printer(object):
             output += "\t Branch %i: " %i+ str(el) + "\n"
         output += "\t The element weights are: \n"
         for k in self.weight.getDictionary():
-            output += "\t Sqrts: " + str(k / TeV) + "\t Weight: " + str(self.weight.getDictionary()[k]) + "\n"
+            pos=k.find(" " )
+            sqrts=str( float(k[:pos]) / TeV) 
+            output += "\t Sqrts: " + sqrts + "\t Weight: " + str(self.weight.getDictionary()[k]) + "\n"
 
         return output
     
