@@ -45,14 +45,15 @@ GeV = unum.Unum.unit('GeV', 10 ** 9 * eV)
 TeV = unum.Unum.unit('TeV', 10 ** 12 * eV)
 
 
-def addunit(value, unitstring):
+def addunit(value, unitstring, deprecated=True ):
     """
     Add units to values.
     
     Allow to turn this functionality off, in case "units" is not installed.
     
     """
-    logger.warning("physicsUnits.addunit has been deprecated. Please multiply directly with the unit." )
+    if deprecated:
+        logger.warning("physicsUnits.addunit has been deprecated. Please multiply directly with the unit." )
     if value == None:
         return value
     if not useUnits:
@@ -60,13 +61,13 @@ def addunit(value, unitstring):
     if useUnits:
         # for convenience, we add units also to tuples, lists, and dictionaries
         if isinstance(value, list):
-            return [addunit(x, unitstring) for x in value]
+            return [addunit(x, unitstring, deprecated ) for x in value]
         if isinstance(value, tuple):
-            return tuple([addunit(x, unitstring) for x in value])
+            return tuple([addunit(x, unitstring, deprecated ) for x in value])
         if isinstance(value, dict):
             ret = {}
             for (k, v) in value.items():
-                ret[k] = addunit(v, unitstring)
+                ret[k] = addunit(v, unitstring, deprecated )
             return ret
         if not isinstance(value, float) and not isinstance(value, int):
             return value

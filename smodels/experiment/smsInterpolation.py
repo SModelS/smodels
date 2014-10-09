@@ -11,7 +11,7 @@
 """
 
 from smodels.experiment import smsResults, smsHelpers
-from smodels.tools.physicsUnits import rmvunit, addunit
+from smodels.tools.physicsUnits import rmvunit, pb, GeV
 import numpy as np
 from scipy.interpolate import griddata
 import logging
@@ -156,7 +156,7 @@ def _doGridData(analysis, topology, masses, dPar, run=None):
                      analysis, topology)
         return None
 
-    return addunit(float(r), 'pb')
+    return float(r) * pb 
 
 
 def _getAxis(w, a):

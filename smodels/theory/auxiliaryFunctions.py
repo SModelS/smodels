@@ -8,7 +8,7 @@
 
 from functools import wraps
 from smodels.theory import crossSection
-from smodels.tools.physicsUnits import addunit, rmvunit
+from smodels.tools.physicsUnits import rmvunit, pb, GeV
 import numpy as np
 from scipy import stats
 from collections import Iterable
@@ -45,7 +45,7 @@ def massPosition(mass, analysis):
     Use the analysis experimental limit data.    
     """
     xmass = analysis.getUpperLimitFor(mass)
-    if type(xmass) != type(addunit(1., 'pb')):
+    if type(xmass) != type(1.*pb):
         return None
     xmass = rmvunit(xmass, 'fb')
     return xmass
@@ -108,7 +108,7 @@ def massAvg(massList, method='weighted', weights=None):
                 avg = stats.hmean(vals)
             elif method == 'weighted':
                 avg = np.average(vals,weights=weights)                
-            avgmass[ib][ival[0]] = addunit(float(avg), 'GeV')    
+            avgmass[ib][ival[0]] = float(avg)*GeV
 
     return avgmass
 

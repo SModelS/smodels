@@ -7,7 +7,7 @@
 """
 
 from smodels.theory.particleNames import simParticles, elementsInStr
-from smodels.tools.physicsUnits import addunit
+from smodels.tools.physicsUnits import fb
 import logging
 from smodels.particles import rEven, ptcDic
 
@@ -173,7 +173,7 @@ class Branch(object):
 
 
 def decayBranches(branchList, brDictionary, massDictionary,
-                  sigcut=addunit(0., 'fb')):
+                  sigcut=0. *fb):
     """
     Decay all branches from branchList until all R-odd particles have decayed.
     
