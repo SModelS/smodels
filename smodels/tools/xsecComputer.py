@@ -11,7 +11,7 @@
 """
 from smodels import installation
 from smodels.tools import toolBox
-from smodels.tools.physicsUnits import rmvunit, fb, TeV
+from smodels.tools.physicsUnits import fb, TeV
 from smodels.theory import crossSection
 from smodels.tools import nllFast
 import os
@@ -66,13 +66,13 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
             if xsec.info.order == 0: loXsecs.add(xsec)
     else:
         if not lhefile or not os.path.isfile(lhefile):
-            lheFile = runPythia(slhafile, nevts, rmvunit(sqrts, 'TeV'), lhefile, unlink=unlink)
+            lheFile = runPythia(slhafile, nevts, sqrts / TeV, lhefile, unlink=unlink)
         else:
             lheFile = open(lhefile, 'r')
         loXsecs = crossSection.getXsecFromLHEFile(lheFile)
 
     xsecs = loXsecs
-    wlabel = str(int(rmvunit(sqrts, 'TeV'))) + ' TeV'
+    wlabel = str(int(sqrts / TeV)) + ' TeV'
     if maxOrder == 0:
         wlabel += ' (LO)'
     elif maxOrder == 1:
@@ -169,7 +169,7 @@ def xsecToBlock(xsec, inPDGs=(2212, 2212), comment=None):
         import sys
         sys.exit()
     # Sqrt(s) in GeV
-    header = "XSECTION  " + str(rmvunit(xsec.info.sqrts, 'GeV'))
+    header = "XSECTION  " + str(xsec.info.sqrts / GeV)
     for pdg in inPDGs:
         # PDGs of incoming states
         header += " " + str(pdg)
@@ -181,7 +181,7 @@ def xsecToBlock(xsec, inPDGs=(2212, 2212), comment=None):
     if comment:
         header += "   # " + str(comment)  # Comment
     entry = "0  " + str(xsec.info.order) + "  0  0  0  0  " + \
-            str("%16.8E" %rmvunit(xsec.value, 'fb')) + " SModelS " + installation.version()
+            str("%16.8E" % (xsec.value / fb) ) + " SModelS " + installation.version()
 
     return "\n" + header + "\n" + entry
 
