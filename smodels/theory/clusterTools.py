@@ -9,7 +9,7 @@
 
 from smodels.theory import crossSection
 from smodels.theory.auxiliaryFunctions import massAvg, massPosition, distance
-from smodels.tools.physicsUnits import rmvunit
+from smodels.tools.physicsUnits import fb
 import logging
 
 logger = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ class ElementCluster(object):
          
         """
         massList = [el.getMasses() for el in self.elements]
-        weights = [rmvunit(el.weight.getMaxXsec(),'fb') for el in self.elements]
+        weights = [el.weight.getMaxXsec() / fb for el in self.elements]
         return massAvg(massList,weights=weights)
 
 
@@ -254,10 +254,10 @@ def _doCluster(elements, analysis, maxDist):
         if not el.getMasses() in massMap.values():
             massMap[iel] = el.getMasses()
             posMap[iel] = massPosition(massMap[iel], analysis)
-            weightMap[iel] = rmvunit(el.weight.getMaxXsec(),'fb')
+            weightMap[iel] = el.weight.getMaxXsec() / fb
         else:
             j = massMap.keys()[massMap.values().index(el.getMasses())] 
-            weightMap[j] += rmvunit(el.weight.getMaxXsec(),'fb')
+            weightMap[j] += el.weight.getMaxXsec() / fb
 
     # Start with maximal clusters
     clusterList = []
