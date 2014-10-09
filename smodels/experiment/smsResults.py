@@ -39,6 +39,9 @@ def getAllResults(run=None):
         runs = [run]
     ret = {}
     for r in runs:
+        if not os.path.exists("%s/%s/" % (smsHelpers.base, r)):
+            logger.warning("Expected directory %s was not found in the database at %s" % (r, smsHelpers.base))
+            continue
         dirs = os.listdir("%s/%s/" % (smsHelpers.base, r))
         for ana in dirs:
             if os.path.exists("%s/%s/%s/info.txt" % (smsHelpers.base, r, ana)):
