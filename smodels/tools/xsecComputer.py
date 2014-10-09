@@ -11,7 +11,7 @@
 """
 from smodels import installation
 from smodels.tools import toolBox
-from smodels.tools.physicsUnits import rmvunit, addunit, fb, TeV
+from smodels.tools.physicsUnits import rmvunit, fb, TeV
 from smodels.theory import crossSection
 from smodels.tools import nllFast
 import os
@@ -103,9 +103,9 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
                     xsecs[i] = xsec * k
 
     # Remove zero cross-sections
-    while len(xsecs) > 0 and xsecs.getMinXsec() == addunit(0., 'fb'):
+    while len(xsecs) > 0 and xsecs.getMinXsec() == 0. * fb:
         for xsec in xsecs:
-            if xsec.value == addunit(0., 'fb'):
+            if xsec.value == 0. * fb:
                 xsecs.delete(xsec)
                 break
     if maxOrder > 0 and len(xsecs) == 0:
@@ -288,7 +288,7 @@ if __name__ == "__main__":
         logger.info("Computing SLHA cross section from %s, adding to "
                     "SLHA file." % inputFile )
         for s in sqrtses:
-            ss = s*TeV # addunit(s, 'TeV')
+            ss = s*TeV 
             xsecs = computeXSec( ss, order, args.nevents, inputFile, 
                                  unlink=(not args.keep) )
             comment = "Nevts: " + str(args.nevents) + " xsec unit: fb"
@@ -300,7 +300,7 @@ if __name__ == "__main__":
         print "     Cross sections:"
         print "======================="
         for s in sqrtses:
-            ss = s*TeV # addunit(s, 'TeV')
+            ss = s*TeV 
             xsecs = computeXSec(ss, order, args.nevents, inputFile, \
                         unlink=(not args.keep) )
             for xsec in xsecs: 

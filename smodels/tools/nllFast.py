@@ -15,7 +15,7 @@ import commands
 import os
 from smodels.tools import toolBox
 from smodels.tools import modpyslha as pyslha
-from smodels.tools.physicsUnits import rmvunit, addunit
+from smodels.tools.physicsUnits import TeV
 import numpy
 import operator
 
@@ -81,7 +81,7 @@ def getKfactorsFor(pIDs, sqrts, slhafile, pdf='cteq'):
         squarkmass = abs(masses.entries[abs(pid1)])
 
     # Set up NLLfast run, the old way
-    sqrtS = float(rmvunit(sqrts, 'TeV'))
+    sqrtS = float(sqrts/TeV)
     energy = str(int(sqrtS)) + 'TeV'
     toolname = "nllfast%d" % int(sqrtS)
     box = toolBox.ToolBox()
@@ -293,5 +293,5 @@ if __name__ == "__main__":
     
     """
     slhaF = installation.installDirectory() + "inputFiles/slha/T1.slha"
-    kNLO, kNLL = getKfactorsFor((1000021, 1000021), addunit(13., "TeV"), slhaF)
+    kNLO, kNLL = getKfactorsFor((1000021, 1000021), 13.*TeV, slhaF)
     print("nlo, nll = " + str(kNLO) + ", " + str(kNLL))
