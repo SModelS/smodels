@@ -195,10 +195,11 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
     # add experimental constraints if found
     if outputStatus.status == 1: results.printout("file", outputfile)
 
-    #look for missing topologies, add them to the output file
-    missingtopos = missingTopologies.MissingTopoList(sqrts)
-    missingtopos.findMissingTopos(smstoplist, listofanalyses, sigmacut, parser.getfloat("parameters","minmassgap")*GeV)
-    missingtopos.printout("file", outputfile)
+    if parser.getboolean("options","findMissingTopos"):
+        #look for missing topologies, add them to the output file
+        missingtopos = missingTopologies.MissingTopoList(sqrts)
+        missingtopos.findMissingTopos(smstoplist, listofanalyses, sigmacut, parser.getfloat("parameters","minmassgap")*GeV)
+        missingtopos.printout("file", outputfile)
 
 if __name__ == "__main__":
     #get the name of input slha file (and parameter file)
