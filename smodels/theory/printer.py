@@ -1,19 +1,19 @@
 """
-    .. module:: printer
-       :synopsis: Facility used in classes to derive from and be able to print
-                  different data types in different forms.
+.. module:: printer
+   :synopsis: Facility used in classes to derive from and be able to print
+              different data types in different forms.
 
-        .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
-        .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>    
-        .. moduleauthor:: Suchita Kulkanri <suchita.kulkarni@gmail.com>
+.. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
+.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>    
+.. moduleauthor:: Suchita Kulkanri <suchita.kulkarni@gmail.com>
+
 """
 
 from __future__ import print_function
 import logging
 from smodels.theory import crossSection
 from smodels.experiment import smsResults
-from smodels.tools.physicsUnits import addunit
-from smodels.tools.physicsUnits import rmvunit
+from smodels.tools.physicsUnits import rmvunit, GeV, fb
 
 logger = logging.getLogger(__name__)
 
@@ -185,8 +185,8 @@ class Printer(object):
         output = ""
 
         output += "Input file: " + self.filename + "\n"
-        output += "Sigmacut: " + str(addunit(self.sigmacut, "fb")) + "\n"
-        output += "Minmassgap: " + str(addunit(self.massgap, "GeV")) + "\n"
+        output += "Sigmacut: " + str(self.sigmacut* fb) + "\n"
+        output += "Minmassgap: " + str(self.massgap*GeV) + "\n"
         output += "Maxcond: " + str(self.maxcond) + "\n"
         if not self.status[0] == -3:
         #cannot add this information in case the input file is not slha format
@@ -200,7 +200,7 @@ class Printer(object):
         """
         Format data of missing topology list.
         """
-        from smodels.tools.physicsUnits import rmvunit, addunit
+        from smodels.tools.physicsUnits import rmvunit
 
         output = ""
 
