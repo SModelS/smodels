@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
 """
-    .. module:: slhaChecks
-       :synopsis: Check SLHA file for integrity.
+.. module:: slhaChecks
+   :synopsis: Check SLHA file for integrity.
 
-        .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
-        .. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
-        .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
+.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
+.. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
+.. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
 
 """
 
