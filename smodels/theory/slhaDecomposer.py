@@ -11,7 +11,7 @@ import time
 from smodels.theory import element, topology, crossSection
 from smodels.theory.branch import Branch, decayBranches
 from smodels.tools import modpyslha as pyslha
-from smodels.tools.physicsUnits import rmvunit, fb, GeV
+from smodels.tools.physicsUnits import fb, GeV
 import smodels.particles
 import logging
 
@@ -45,7 +45,7 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
     """
     t1 = time.time()
 
-    if doCompress and rmvunit(minmassgap, 'GeV') == -1:
+    if doCompress and minmassgap / GeV == -1:
         logger.error("Please set minmassgap.")
         import sys
         sys.exit()
