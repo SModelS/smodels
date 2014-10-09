@@ -66,6 +66,7 @@ class MissingTopoList(Printer):
                 if not covered:
                     self.addToTopos(sel)
         for topo in self.topos:
+            if not topo.weights.getXsecsFor(self.sqrts): continue
             topo.value = topo.weights.getXsecsFor(self.sqrts)[0].value / fb
         return
 
