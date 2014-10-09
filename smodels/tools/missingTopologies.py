@@ -54,7 +54,7 @@ class MissingTopoList(Printer):
         return str(li).replace("'", "").replace(" ", "")
 
     def findMissingTopos(self, smstoplist, listOfAnalyses, sigmacut, minmassgap):
-        from smodels.tools.physicsUnits import rmvunit, addunit
+        from smodels.tools.physicsUnits import fb
         for el in smstoplist:
             for sel in el.elementList:
                 if sel.compressElement(True, True, minmassgap):
@@ -66,7 +66,7 @@ class MissingTopoList(Printer):
                 if not covered:
                     self.addToTopos(sel)
         for topo in self.topos:
-            topo.value = rmvunit(topo.weights.getXsecsFor(self.sqrts)[0].value, "fb")
+            topo.value = topo.weights.getXsecsFor(self.sqrts)[0].value / fb
         return
 
 

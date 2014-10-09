@@ -116,7 +116,7 @@ if __name__ == "__main__":
     Called as script, will print some physicsUnits.
     
     """
-    three = addunit(3.0, "fb")
+    three = 3.0 * fb
     print(three, "=", three.asUnit(pb))
-    seven = addunit(7., "TeV")
+    seven = 7.0 * TeV
     print(seven, "=", seven.asUnit(GeV))
