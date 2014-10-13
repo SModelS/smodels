@@ -11,7 +11,7 @@
 """
 from smodels import installation
 from smodels.tools import toolBox
-from smodels.tools.physicsUnits import fb, TeV
+from smodels.tools.physicsUnits import fb, TeV, GeV
 from smodels.theory import crossSection
 from smodels.tools import nllFast
 import os

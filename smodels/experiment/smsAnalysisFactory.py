@@ -82,8 +82,11 @@ def load(analyses=None, topologies=None, sqrts=[7, 8], usePrivate=None):
                              str(ana), str(tx), str(stopo))
                 continue
 
-            if cond:
-                cond = cond.replace("'", "").replace(" ", "").split(';')
+            if not cond:
+                logger.warning("Skipping %s %s (%s), Condition does not exist.",
+                               str(ana), str(tx), str(stopo))
+                continue
+            cond = cond.replace("'", "").replace(" ", "").split(';')
             newAnalysis.constraint = constraint
             newAnalysis.conditions = cond
             newAnalysis.elementsEff = _getElementsEffs(constraint,cond)

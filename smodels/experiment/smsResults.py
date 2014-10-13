@@ -336,6 +336,7 @@ def getUpperLimitFromDictionary(analysis, topology, mx=None, my=None,
         return None
     if rmvunit(mx, 'GeV') == None:
         return dictionary
+    if not getInterpolatedUpperLimitDelaunay(dictionary, mx, my): return None
     return getInterpolatedUpperLimitDelaunay(dictionary, mx, my) * pb
 
 
