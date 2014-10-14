@@ -26,6 +26,9 @@ journal: http://arxiv.org/abs/1207.1898
 condition: T2 -> None
 fuzzycondition: T2 -> None
 constraint: T2 -> [[['jet']],[['jet']]]
+condition: T1 -> None
+fuzzycondition: T1 -> None
+constraint: T1 -> [[['jet','jet']],[['jet','jet']]]
 category: T5ZZInc -> hadronic
 category: T2 -> hadronic
 category: T1 -> hadronic

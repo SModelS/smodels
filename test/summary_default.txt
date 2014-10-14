@@ -1,36 +1,27 @@
-SLHA status: 1
+SLHA status: -2
 Decomposition output status: 1 #decomposition was successful
-Database version: master
+Database version: validation
+#Warnings:
+#Missing decay block for PIDs, 1000001, 2000001, 1000002, 2000002, 1000003, 2000003, 1000004, 2000004, 1000023, 1000025, 1000035, 1000024, 1000037.
+#Empty decay block for PIDs, 1000006, 2000006, 1000005, 2000005, 1000011, 2000011, 1000013, 2000013, 1000015, 2000015, 1000012, 1000014, 1000016.
+
 ================================================================================
-Input file: /home/laa/smodels/inputFiles/slha/andrePT4.slha
+Input file: $HOME/smodels/inputFiles/slha/T1_7TeV.slha
 Sigmacut: 3.00E-02 [fb]
 Minmassgap: 5.00E+00 [GeV]
 Maxcond: 0.2
-LSP PID, mass: (1000022, 1.78E+02 [GeV])
-NLSP PID, mass: (1000015, 1.81E+02 [GeV])
+LSP PID, mass: (1000022, 2.50E+02 [GeV])
+NLSP PID, mass: (1000021, 6.75E+02 [GeV])
 ================================================================================
 #Analysis  Topology  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r
 
-           SUS13006        TSlepSlep  8.0   0.0  2.421E+00  4.115E+00  5.883E-01
-#[[['l+']],[['l-']]]
---------------------------------------------------------------------------------
-           SUS13006        TSlepSlep  8.0   0.0  2.468E-01  2.250E+00  1.097E-01
-#[[['l+']],[['l-']]]
+           SUS12011               T1 7.00E+00    0.0  2.957E+02  1.151E+02  2.568E+00
+#[[['jet','jet']],[['jet','jet']]]
 
  
 ================================================================================
-The highest R value is r_ratio = 5.88E-01 
+The highest R value is r_ratio = 2.57E+00 
 
 ================================================================================
 Missing topologies with high cross sections:
 Sqrts (TeV)   Weight (fb)        Topology description
-  8.0  6.124E-01    #                               [[[ta]],[[ta]]]
-  8.0  6.088E-01    #                                [[[l]],[[ta]]]
-  8.0  6.063E-01    #                                   [[],[[ta]]]
-  8.0  6.058E-01    #                                [[],[[l],[l]]]
-  8.0  6.027E-01    #                                    [[],[[l]]]
-  8.0  6.002E-01    #                                       [[],[]]
-  8.0  5.275E-01    #                           [[[nu],[l]],[[ta]]]
-  8.0  5.244E-01    #                            [[[l]],[[nu],[l]]]
-  8.0  5.222E-01    #                               [[],[[nu],[l]]]
-  8.0  4.621E-01    #                            [[[l],[l]],[[ta]]]
