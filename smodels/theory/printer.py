@@ -168,7 +168,7 @@ class Printer(object):
         output += "#Analysis  Topology  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r\n\n"
         for op in self.outputarray:
             output += "%19s %16s " %(op.analysis.label.split(":")[0], op.analysis.label.split(":")[1]) # ana, topo
-            output += "%4s " % op.analysis.sqrts / TeV # sqrts
+            output += "%4s " % (op.analysis.sqrts / TeV) # sqrts
             output += "%5s " % op.getmaxCondition() # condition violation
             output += "%10.3E %10.3E " % (op.value[0].value / fb,op.analysis.getUpperLimitFor(op.mass) / fb) # theory cross section , expt upper limit
             output += "%10.3E\n" % self.getR(op)
