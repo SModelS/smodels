@@ -40,7 +40,8 @@ setup(
     author_email = "smodels-developers@lists.oeaw.ac.at ",
     scripts = ["bin/smodels-config",
                "tools/external/nllfast/nllfast-4.01dcpl/nllfast_14TeV"],
-    install_requires = ['docutils>=0.3', 'numpy', 'scipy>=0.9.0', 'unum'],
+    install_requires = [ 'docutils>=0.3', 'numpy', 'scipy>=0.9.0', \
+                         'unum', 'argparse'],
     data_files = dataFiles() ,
     description = ("A tool for interpreting simplified-model results from the "
                    "LHC"),
