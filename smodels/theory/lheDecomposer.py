@@ -50,11 +50,12 @@ def decompose(lhefile, inputXsecs=None, nevts=None, doCompress=False,
         eventweight = xSectionList.getXsecsFor(momPDG)
         # Get event element
         newElement = elementFromEvent(event, eventweight)
+        allElements = [newElement]
         # Perform compression
         if doCompress or doInvisible:
-            compElements = newElement.compressElement(doCompress, doInvisible,
+            allElements += newElement.compressElement(doCompress, doInvisible,
                                                       minmassgap)
-        allElements = [newElement] + compElements
+
         for el in allElements:
             top = topology.Topology(el)
             smsTopList.addList([top])
