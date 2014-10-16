@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import os
-from setuptools import setup
+from setuptools import setup, Extension
 
 # Utility function to read the README file.
 # Used for the long_description.  It's nice, because now 1) we have a top level
@@ -17,11 +17,21 @@ def read(fname):
 #          "4.01dcpl": "nllfast_14TeV", "5.01dcpl": "nllfast_33TeV" }
 
 def dataFiles ():
-    """ obtain all data files dynamically """
-    ret = [("etc/", ["etc/logging.conf", "etc/pythia.card"])]
-    from smodels.tools import toolBox
-    box = toolBox.ToolBox()
-    print box.listOfTools()
+    """ list all config files, but also binaries
+        (since we make them via a Makefile, so theyre not built with
+         setup.py) """
+    ## first comes configuration
+    ret = [("etc", ["etc/logging.conf", "etc/pythia.card"])]
+
+    ## then the binaries
+    ret.append ( ( "bin", [ "lib/nllfast/nllfast-1.2/nllfast_7TeV",
+                            "lib/nllfast/nllfast-2.1/nllfast_8TeV" ] ) )
+
+    return ret
+
+    # from smodels.tools import toolBox
+    # box = toolBox.ToolBox()
+    # print "dataFiles()", box.listOfTools()
     # for (k,v) in nllfast.items():
     #    pth="tools/external/nllfast/nllfast-%s/" % k
     #    ret.append( ( pth, [  pth + v ] ) )
@@ -30,16 +40,20 @@ def dataFiles ():
     #        if fle[-5:]!=".grid": continue
     #        ## print fle
     #        ret.append( ( pth, [  pth + fle ] ) )
-    return ret
 
+def compile():
+    """ compile our external tools by calling make """
+    import subprocess
+    subprocess.call( ["make","-C","lib" ] )
+
+compile()
 setup(
     name = "smodels",
     version = "1.0",
     author = ("Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, "
               "Wolfgang Magerl, Doris Proschofsky, Wolfgang Waltenberger"),
     author_email = "smodels-developers@lists.oeaw.ac.at ",
-    scripts = ["bin/smodels-config",
-               "tools/external/nllfast/nllfast-4.01dcpl/nllfast_14TeV"],
+    scripts = [ "bin/smodels-config", "runSModelS.py" ],
     install_requires = [ 'docutils>=0.3', 'numpy', 'scipy>=0.9.0', \
                          'unum', 'argparse'],
     data_files = dataFiles() ,
@@ -60,5 +74,5 @@ setup(
         "Development Status :: 3 - Alpha",
         "Topic :: Scientific/Engineering :: Physics",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-    ],
+    ]
 )
