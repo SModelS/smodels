@@ -87,7 +87,7 @@ class Printer(object):
             output += "\t Total Global topology weight:\n" 
             for k in totxsec.getDictionary():
                 pos=k.find(" " )
-                sqrts=str( float(k[:pos]) / TeV) 
+                sqrts=str( float(k[:pos]) * TeV) 
                 output += "\t Sqrts: " + sqrts + "\t Weight: " + str(totxsec.getDictionary()[k]) + "\n"
         return output
 
@@ -104,7 +104,7 @@ class Printer(object):
         output += "\t The element weights are: \n"
         for k in self.weight.getDictionary():
             pos=k.find(" " )
-            sqrts=str( float(k[:pos]) / TeV) 
+            sqrts=str( float(k[:pos]) * TeV) 
             output += "\t Sqrts: " + sqrts + "\t Weight: " + str(self.weight.getDictionary()[k]) + "\n"
 
         return output
