@@ -94,7 +94,7 @@ def getSqrts(analysis, run=None):
 
     except ValueError:
         try:
-            return addunit(float(sqrts.split()[0]), sqrts.split()[1], False)
+            return eval(sqrts)
         except:
             pass
     return sqrts
@@ -231,7 +231,7 @@ def getLumi(analysis, run=None):
         return float(lumifb) / fb
     except ValueError:
         try:
-            return addunit(float(lumifb.split()[0]), lumifb.split()[1], False)
+            return eval(lumifb)
         except:
             pass
     return lumifb
