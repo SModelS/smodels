@@ -8,7 +8,7 @@
 
 """
 
-from smodels.tools.physicsUnits import rmvunit, fb, TeV
+from smodels.tools.physicsUnits import fb, TeV, pb
 from smodels.theory import lheReader
 import logging
 
@@ -577,7 +577,7 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
     # Store information about all cross-sections in the LHE file
     xSecsInFile = XSectionList()
     reader = lheReader.LheReader(lhefile)
-    if not rmvunit(reader.metainfo["totalxsec"], 'fb'):
+    if not type ( reader.metainfo["totalxsec"] ) == type ( pb) :
         logger.error("Cross-section information not found in LHE file.")
         import sys
         sys.exit()
@@ -586,7 +586,7 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
                      "file.")
         import sys
         sys.exit()
-    elif not rmvunit(reader.metainfo["sqrts"], 'TeV'):
+    elif not type ( reader.metainfo["sqrts"] ) == type ( TeV ):
         logger.error("Center-of-mass energy information not found in LHE " +
                      "file.")
         import sys
@@ -613,7 +613,7 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
         else:
             # Assume LO xsecs, if not defined in the reader
             xsec.info.order = 0
-        wlabel = str(rmvunit(sqrtS, 'TeV')) + ' TeV'
+        wlabel = str( sqrtS / TeV ) + ' TeV'
         if xsec.info.order == 0:
             wlabel += ' (LO)'
         elif xsec.info.order == 1:
