@@ -25,3 +25,11 @@ lib/nllfast/nllfast-1.2/old/
 lib/nllfast/nllfast-2.1/fort.21
 lib/pythia6/fort.61
 lib/pythia6/pythia_card.dat
+debian/files
+debian/python-module-stampdir/
+debian/smodels.debhelper.log
+debian/smodels.postinst.debhelper
+debian/smodels.prerm.debhelper
+debian/smodels.substvars
+debian/smodels/
+
