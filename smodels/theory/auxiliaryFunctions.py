@@ -8,7 +8,7 @@
 
 from functools import wraps
 from smodels.theory import crossSection
-from smodels.tools.physicsUnits import rmvunit, pb, GeV
+from smodels.tools.physicsUnits import pb, GeV, fb
 import numpy as np
 from scipy import stats
 from collections import Iterable
@@ -47,7 +47,7 @@ def massPosition(mass, analysis):
     xmass = analysis.getUpperLimitFor(mass)
     if type(xmass) != type(1.*pb):
         return None
-    xmass = rmvunit(xmass, 'fb')
+    xmass = xmass / fb
     return xmass
 
 
@@ -85,7 +85,7 @@ def massAvg(massList, method='weighted', weights=None):
 
     if method == 'weighted' and (not weights or len(weights) != len(massList)):
         method = 'harmonic'
-    flatList = [rmvunit(mass, 'GeV') for mass in _flattenList(massList)]
+    flatList = [ mass / GeV for mass in _flattenList(massList)]
     if method == 'harmonic' and 0. in flatList:
         method = 'mean'
 
@@ -101,7 +101,7 @@ def massAvg(massList, method='weighted', weights=None):
     avgmass = copy.deepcopy(massList[0])
     for ib, branch in enumerate(massList[0]):
         for ival in enumerate(branch):
-            vals = [rmvunit(mass[ib][ival[0]], 'GeV') for mass in massList]
+            vals = [ mass[ib][ival[0]] / GeV for mass in massList]
             if method == 'mean':
                 avg = np.mean(vals)
             elif method == 'harmonic':
@@ -148,8 +148,8 @@ def cSim(*weights):
         xsecRes.info = info
         for weightA in weights:
             for weightB in weights:
-                a = rmvunit(weightA.getXsecsFor(info.label)[0].value, 'fb')
-                b = rmvunit(weightB.getXsecsFor(info.label)[0].value, 'fb')
+                a = weightA.getXsecsFor(info.label)[0].value / fb
+                b = weightB.getXsecsFor(info.label)[0].value / fb
                 if a + b == 0.:
                     continue
                 res = max(res, abs(a - b) / abs(a + b))
@@ -191,8 +191,8 @@ def cGtr(weightA, weightB):
     # Evaluate the inequality for each cross-section info
     result = crossSection.XSectionList()
     for info in infoList:
-        a = rmvunit(weightA.getXsecsFor(info.label)[0].value, 'fb')
-        b = rmvunit(weightB.getXsecsFor(info.label)[0].value, 'fb')
+        a = weightA.getXsecsFor(info.label)[0].value / fb
+        b = weightB.getXsecsFor(info.label)[0].value / fb
         xsecRes = crossSection.XSection()
         xsecRes.info = info
         if a + b == 0.:

@@ -349,7 +349,8 @@ def _getGoodElements(elements, analysis, maxDist):
         mass = element.getMasses()
         goodmass = None
         if mass[0] == mass[1]:
-            if massPosition(mass, analysis):
+            p=massPosition(mass, analysis)
+            if type(p)==type(fb):
                 goodmass = mass
         else:
             mass1 = [mass[0], mass[0]]
@@ -360,7 +361,7 @@ def _getGoodElements(elements, analysis, maxDist):
                 continue
             if distance(mP1, mP2) < maxDist:
                 goodmass = massAvg([mass1, mass2], method='harmonic')
-        if goodmass and massPosition(goodmass, analysis):
+        if goodmass and type(massPosition(goodmass, analysis))==type(fb):
             goodElements.append(element.copy())
             goodElements[-1].setMasses(goodmass)
 
