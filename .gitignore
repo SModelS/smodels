@@ -9,6 +9,7 @@ dist/
 old/
 .project
 .pydevproject
+.pybuild
 smodels.log
 summary.txt
 pythia_lhe
