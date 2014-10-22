@@ -11,7 +11,7 @@
 """
 
 from smodels.experiment import smsResults, smsHelpers
-from smodels.tools.physicsUnits import rmvunit, pb, GeV
+from smodels.tools.physicsUnits import pb, GeV
 import numpy as np
 from scipy.interpolate import griddata
 import logging
@@ -145,9 +145,9 @@ def _doGridData(analysis, topology, masses, dPar, run=None):
     p = np.array(masslist)
     v = np.array(ullist)
 
-    mx = rmvunit(masses[0], "GeV")
-    my = rmvunit(masses[1], "GeV")
-    mz = rmvunit(masses[2], "GeV")
+    mx = masses[0] / GeV
+    my = masses[1] / GeV
+    mz = masses[2] / GeV
 
     r = griddata(p, v, (mx, my, mz), method="linear")
 
@@ -188,9 +188,9 @@ def _getxval(mx, my, mz, mass=False):
     axes-information.
     
     """
-    mx = rmvunit(mx, "GeV")
-    my = rmvunit(my, "GeV")
-    mz = rmvunit(mz, "GeV")
+    mx = mx / GeV
+    my = my / GeV
+    mz = mz / GeV
     if mz.find('x') == -1 and mz.find('C') == -1 and mz.find('y') == -1:
         xfac = float(mz) / 100
         if mass:
@@ -230,8 +230,8 @@ def _compareMasses(masses, d):
     # comparable to x value for given masses, 0 if not
     try:
         x1 = _getxval(masses[0], masses[-1], d['mz'][0])
-        x2 = float(rmvunit(masses[1], "GeV") - rmvunit(masses[-1], "GeV")) / \
-                (rmvunit(masses[0], "GeV") - rmvunit(masses[-1], "GeV"))
+        x2 = float(masses[1] / GeV - masses[-1] / GeV) / \
+                (masses[0] /GeV - masses[-1] / GeV  )
         if abs(x1 - x2) / (x1 + x2) < 0.1:
             return True
         else:
@@ -241,8 +241,8 @@ def _compareMasses(masses, d):
         # to LSP mass of the histogram, 0 if not
         if d['mz'][0].find('LSP') > -1:
             mlsp = float(d['mz'][0].split("LSP")[1])
-            if abs(mlsp - rmvunit(masses[-1], "GeV")) / \
-                    (mlsp + rmvunit(masses[-1], "GeV")) < 0.1:
+            if abs(mlsp - masses[-1] / GeV  ) / \
+                    (mlsp + masses[-1] / GeV  ) < 0.1:
                 return True
             else:
                 return None
@@ -253,8 +253,8 @@ def _compareMasses(masses, d):
             ml.append(d['mz'][0].find('M2'))
             ml.append(d['mz'][0].find('M0'))
             deltam = float(d['mz'][0].split('=')[1])
-            deltain = rmvunit(masses[_getIndex(ml, second=True)], "GeV") - \
-                    rmvunit(masses[_getIndex(ml)], "GeV")
+            deltain = masses[_getIndex(ml, second=True)] / GeV - \
+                    masses[_getIndex(ml)] / GeV
             if deltain < 0:
                 return None
             if abs(deltain - deltam) / (deltain + deltam) < 0.1:
@@ -264,8 +264,8 @@ def _compareMasses(masses, d):
         # Check for fixed m_mother
         elif d['mz'][0].find('M1') > -1:
             mmother = float(d['mz'][0].split("M1")[1])
-            if abs(mmother - rmvunit(masses[0], "GeV")) / \
-                    (mmother + rmvunit(masses[0], "GeV")) < 0.1:
+            if abs(mmother - masses[0] / GeV) / \
+                    (mmother + masses[0] / GeV  ) < 0.1:
                 return True
             else:
                 return None

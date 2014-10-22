@@ -9,7 +9,7 @@
 """
 
 from smodels.experiment import smsInterpolation
-from smodels.tools.physicsUnits import rmvunit
+from smodels.tools.physicsUnits import TeV, GeV, fb
 import copy
 import sys
 import logging
@@ -25,7 +25,7 @@ def limit(analysis, addTheoryPredictions=[]):
                                  [ '7 TeV (NLL)', '7 TeV (LO)' ]
     :type addTheoryPredictions: [String]
     """
-    sqrts = rmvunit(analysis.sqrts, "TeV")
+    sqrts = analysis.sqrts / TeV
     ret = []
     for (constraint, _) in analysis.results.items():
         if len(addTheoryPredictions) > 0:
@@ -46,7 +46,7 @@ def limit(analysis, addTheoryPredictions=[]):
                         tmp["theory"] = theory
                         allexcl = False
                         for t in addTheoryPredictions:
-                            excl = rmvunit(theory[t], "fb") > rmvunit(ul, "fb")
+                            excl = ( theory[t] / fb ) > ( ul / fb )
                             tmp["excl_%s" % t] = excl
                             allexcl = allexcl or excl
                         tmp["excluded"] = allexcl
@@ -74,7 +74,7 @@ def getPlotLimit(inmass, analysis):
         logger.error("Masses differ between branches.")
         return False
 
-    masslist = [rmvunit(mass, 'GeV') for mass in massArray[0]]
+    masslist = [mass / GeV for mass in massArray[0]]
 
     # Run label
     run = analysis.run
