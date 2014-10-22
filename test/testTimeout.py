@@ -26,11 +26,11 @@ class TimeoutTest(unittest.TestCase):
         ret=self.pythia.run ( "../inputFiles/slha/T1.slha" )
         lines=ret.split("\n")
         dt=time.time()-t0
-        # print "dt=",dt
-        subprocesses=lines[-12]
+        subprocesses1=lines[-13]
+        subprocesses2=lines[-12]
         self.assertTrue( dt > .03 )
-        self.assertTrue( subprocesses.find("All included")>-1) 
-        self.assertTrue( subprocesses.find("1000")>-1) 
+        self.assertTrue( subprocesses1.find("All included")>-1 or subprocesses2.find("All included")>-1 )
+        self.assertTrue( subprocesses1.find("1000")>-1 or subprocesses2.find("1000")>-1  )
 
     def mestPositive(self):
         t0=time.time()
