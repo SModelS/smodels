@@ -16,12 +16,26 @@ def read(fname):
 # nllfast={"1.2": "nllfast_7TeV", "2.1": "nllfast_8TeV", "3.0":"nllfast_13TeV",
 #          "4.01dcpl": "nllfast_14TeV", "5.01dcpl": "nllfast_33TeV" }
 
+def listDirectory ( dirname ):
+    if dirname[-1]=="/":
+        dirname=dirname[:-1]
+    files= os.listdir ( dirname )
+    ret=[]
+    for file in files:
+        ret.append ( dirname + "/" + file )
+    return ret
+
 def dataFiles ():
     """ list all config files, but also binaries
         (since we make them via a Makefile, so theyre not built with
          setup.py) """
     ## first comes configuration
     ret = [("etc", ["etc/logging.conf", "etc/pythia.card"])]
+    ret.append ( ("", ["BANNER", "README", "COPYING" ] ) )
+    lst = listDirectory ( "inputFiles/slha" )
+    ret.append ( ("inputFiles/slha", lst ) )
+    lst = listDirectory ( "inputFiles/lhe" )
+    ret.append ( ("inputFiles/lhe", lst ) )
 
     ## then the binaries
     ret.append ( ( "bin", [ "lib/nllfast/nllfast-1.2/nllfast_7TeV",
