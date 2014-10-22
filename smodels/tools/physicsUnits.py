@@ -45,13 +45,12 @@ GeV = unum.Unum.unit('GeV', 10 ** 9 * eV)
 TeV = unum.Unum.unit('TeV', 10 ** 12 * eV)
 
 
+"""
 def addunit(value, unitstring, deprecated=True ):
-    """
     Add units to values.
     
     Allow to turn this functionality off, in case "units" is not installed.
     
-    """
     if deprecated:
         logger.warning("physicsUnits.addunit has been deprecated. Please multiply directly with the unit." )
     if value == None:
@@ -84,14 +83,11 @@ def addunit(value, unitstring, deprecated=True ):
         logger.warning("Unknown unit: " + unitstring)
     return value
 
-
 def rmvunit(value, unitstring):
-    """
     Remove units from values.
     
     Allow to turn this functionality off, in case "units" is not installed.
     
-    """
     logger.warning("physicsUnits.rmvunit has been deprecated. Please divide directly with the unit." )
     if not useUnits:
         return value
@@ -110,6 +106,7 @@ def rmvunit(value, unitstring):
             return value.asNumber(1 / fb)
         logger.warning("Unknown unit: " + unitstring)
         return value
+"""
 
 
 if __name__ == "__main__":
