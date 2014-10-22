@@ -30,7 +30,7 @@ def dataFiles ():
         (since we make them via a Makefile, so theyre not built with
          setup.py) """
     ## first comes configuration
-    ret = [ ("", ["BANNER", "README", "COPYING" ] ) ]
+    ret = [ ("", ["BANNER", "README", "COPYING", "version" ] ) ]
     ## reta. = [("etc", ["etc/logging.conf", "etc/pythia.card"])]
 
     for directory in [ "inputFiles/slha/", "inputFiles/lhe/", 
