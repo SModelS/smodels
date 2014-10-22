@@ -1,0 +1,4 @@
+python:Versions=2.7
+python:Depends=python, python-support (>= 0.90.0), python2.7
+shlibs:Depends=libc6 (>= 2.14), libgcc1 (>= 1:4.1.1), libgfortran3 (>= 4.6)
+misc:Depends=
