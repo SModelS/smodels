@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 5), make, python-argparse, python-numpy, python-sci
 
 Package: smodels
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-numpy, python-scipy, python-argparse 
 Description: SModelS -- A tool for interpreting simplified-model results from the LHC, see http://smodels.hephy.at.
  .
  SModelS is based on a general procedure to decompose Beyond the Standard Model (BSM)
@@ -20,3 +20,7 @@ Description: SModelS -- A tool for interpreting simplified-model results from th
    - the decomposition of the BSM spectrum into SMS topologies
    - a database of experimental SMS results
    - the interface between decomposition and results database (to check limits)
+
+ If you use it in a scientific publication, please cite: EPJC May 2014, 74:2868.
+
+
