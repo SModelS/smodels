@@ -30,21 +30,24 @@ def dataFiles ():
         (since we make them via a Makefile, so theyre not built with
          setup.py) """
     ## first comes configuration
-    ret = [("etc", ["etc/logging.conf", "etc/pythia.card"])]
-    ret.append ( ("", ["BANNER", "README", "COPYING" ] ) )
-    lst = listDirectory ( "inputFiles/slha" )
-    ret.append ( ("inputFiles/slha", lst ) )
-    lst = listDirectory ( "inputFiles/lhe" )
-    ret.append ( ("inputFiles/lhe", lst ) )
+    ret = [ ("", ["BANNER", "README", "COPYING" ] ) ]
+    ## reta. = [("etc", ["etc/logging.conf", "etc/pythia.card"])]
+
+    for directory in [ "inputFiles/slha/", "inputFiles/lhe/", 
+                       "lib/nllfast/nllfast-1.2/",
+                       "lib/nllfast/nllfast-2.1/",
+                       "lib/nllfast/nllfast-3.0/",
+                       "lib/nllfast/nllfast-4.01dcpl/",
+                       "lib/nllfast/nllfast-5.01dcpl/",
+                       "lib/pythia6/", "etc" ]:
+        ret.append ( ( directory, listDirectory ( directory ) ) )
 
     ## then the binaries
-    ret.append ( ( "bin", [ "lib/nllfast/nllfast-1.2/nllfast_7TeV",
-                            "lib/nllfast/nllfast-2.1/nllfast_8TeV" ] ) )
+    #ret.append ( ( "lib/nllfast/nllfast-1.2/", 
+    #             [ "lib/nllfast/nllfast-1.2/nllfast_7TeV" ] )  )
 
     return ret
 
-    # from smodels.tools import toolBox
-    # box = toolBox.ToolBox()
     # print "dataFiles()", box.listOfTools()
     # for (k,v) in nllfast.items():
     #    pth="tools/external/nllfast/nllfast-%s/" % k
