@@ -11,7 +11,7 @@
 
 from __future__ import print_function
 from smodels.experiment import smsResults, smsHelpers
-from smodels.tools.physicsUnits import rmvunit
+from smodels.tools.physicsUnits import TeV
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory import analysis
 from smodels.theory import element
@@ -58,7 +58,7 @@ def load(analyses=None, topologies=None, sqrts=[7, 8], usePrivate=None):
             logger.warning("Skipping private analysis %s.",str(ana))
             continue
         logger.debug("Building analysis %s.", str(ana))
-        ss = rmvunit(smsResults.getSqrts(ana), "TeV")
+        ss = smsResults.getSqrts(ana) / TeV
         if ss == None:
             logger.debug("SS: " + str(ss) + str(ana))
             continue

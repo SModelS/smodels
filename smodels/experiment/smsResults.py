@@ -9,7 +9,7 @@
 
 """
 
-from smodels.tools.physicsUnits import rmvunit, TeV, pb, fb
+from smodels.tools.physicsUnits import TeV, pb, fb, GeV
 from smodels.tools import rcFile
 from smodels.experiment import smsHelpers
 from smodels.experiment.experimentExceptions import MetaInfoError
@@ -334,7 +334,7 @@ def getUpperLimitFromDictionary(analysis, topology, mx=None, my=None,
     if mx == None or my == None:
         logger.error("Requesting upper limits for mx = %s and my = %s", mx, my)
         return None
-    if rmvunit(mx, 'GeV') == None:
+    if not (type(mx) == type(1.) or type(mx) == type(GeV)):
         return dictionary
     if not getInterpolatedUpperLimitDelaunay(dictionary, mx, my): return None
     return getInterpolatedUpperLimitDelaunay(dictionary, mx, my) * pb
@@ -355,8 +355,8 @@ def getInterpolatedUpperLimitDelaunay(dictionary, inmx, inmy):
     import scipy.interpolate as ip
 
     try:
-        mx = rmvunit(inmx, 'GeV')
-        my = rmvunit(inmy, 'GeV')
+        mx = inmx / GeV
+        my = inmy / GeV
         if not inConvexHull(dictionary, mx, my):
             logger.debug("Cannot interpolate for (%f, %f), point is not in "
                          "convex hull.", inmx, inmy)
