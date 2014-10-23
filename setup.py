@@ -59,7 +59,16 @@ def dataFiles ():
     #        ret.append( ( pth, [  pth + fle ] ) )
 
 def compile():
-    """ compile our external tools by calling make """
+    """ compile our external tools by calling make,
+        but only for certain tasks """
+    import sys
+    if len(sys.argv)<2:
+        return
+    if not sys.argv[1] in [ "build", "build_ext", "build_clib", "install", 
+          "install_lib", "bdist", "bdist_rpm", "bdist_dumb", "bdist_wininst",
+          "bdist_wheel", "develop" ]:
+        return 
+    # print "compile",len(sys.argv)
     import subprocess
     subprocess.call( ["make","-C","lib" ] )
 
