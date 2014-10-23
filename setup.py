@@ -64,10 +64,14 @@ def compile():
     import sys
     if len(sys.argv)<2:
         return
-    if not sys.argv[1] in [ "build", "build_ext", "build_clib", "install", 
-          "install_lib", "bdist", "bdist_rpm", "bdist_dumb", "bdist_wininst",
-          "bdist_wheel", "develop" ]:
-        return 
+    needs_build=False
+    for i in sys.argv[1:]:
+        if i in [ "build", "build_ext", "build_clib", "install", 
+                  "install_lib", "bdist", "bdist_rpm", "bdist_dumb", "bdist_wininst",
+                  "bdist_wheel", "develop" ]:
+            needs_build=True
+    if not needs_build:
+        return
     # print "compile",len(sys.argv)
     import subprocess
     subprocess.call( ["make","-C","lib" ] )
