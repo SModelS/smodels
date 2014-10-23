@@ -1,9 +1,11 @@
+#!/usr/bin/env python
+
 """
 .. module:: theory.slhaDecomposer
    :synopsis: Decomposition of SLHA events and creation of TopologyLists.
-        
+
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
-        
+
 """
 
 import copy
@@ -22,30 +24,20 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
               minmassgap=-1, useXSecs=None):
     """
     Perform SLHA-based decomposition.
-    
-    :param slhafile: file with mass spectrum and branching ratios and
-                     optionally with cross-sections
-    :param Xsec: optionally a dictionary with cross-sections for pair
-                 production, by default reading the cross sections 
-                 from the SLHA file.
-    :param XsecsInfo: information about the cross-sections (sqrts, order and
-           label). Only relevant for Xsec=None (reading from slha file). If defined 
-           as input or in crossSection.XSectionInfo restricts the 
-           cross-sections values in the SLHA file to the ones in XsecsInfo. 
-           If not defined, it will be generated from the SLHA file and stored in 
-           crossSection.XSectionInfo. Only generated if cross-sections are read 
-           from SLHA file and not previously created
     :param sigcut: minimum sigma*BR to be generated, by default sigcut = 0.1 fb
     :param doCompress: turn mass compressed topologies on/off
     :param doInvisible: turn invisibly compressed topologies on/off
     :param minmassgap: maximum value for considering two R-odd particles
-                       degenerate (only revelant for doCompress=True)        
+                       degenerate (only revelant for doCompress=True)
+    :param useXSecs: optionally a dictionary with cross-sections for pair
+                 production, by default reading the cross sections
+                 from the SLHA file.
     :returns: TopologyList
-     
+
     """
     t1 = time.time()
 
-    if doCompress and minmassgap / GeV == -1:
+    if doCompress and minmassgap / GeV < 0.:
         logger.error("Please set minmassgap.")
         import sys
         sys.exit()
@@ -116,11 +108,11 @@ def _getDictionariesFromSLHA(slhafile):
     """
     Create mass and BR dictionaries from an SLHA file.
     Ignore decay blocks with R-parity violating or unknown decays
-    
+
     """
 
     res = pyslha.readSLHAFile(slhafile)
-    
+
     rOdd = smodels.particles.rOdd.keys()
     rEven = smodels.particles.rEven.keys()
     knownParticles = rOdd + rEven
@@ -155,3 +147,38 @@ def _getDictionariesFromSLHA(slhafile):
             massDic[-pid] = abs(res.decays[pid].mass) * GeV
 
     return brDic, massDic
+
+if __name__ == "__main__":
+    """
+    Decomposes a given SLHA file.
+
+    """
+    import argparse
+    import types
+    argparser = argparse.ArgumentParser(description="Decomposes a given SLHA file.")
+    argparser.add_argument('file', type=types.StringType, nargs=1,
+                           help="SLHA file to decompose." )
+    argparser.add_argument('-c', '--compress', action='store_true',
+                           help="turn mass compressed topologies on." )
+    argparser.add_argument('-i', '--invisible', action='store_true',
+                           help="turn invisibly compressed topologies on." )
+    argparser.add_argument('-s', '--sigmacut', type=float, default=0.1,
+                           help="minimum sigma*BR to be generated, in fb" )       
+    argparser.add_argument('-m', '--minmassgap', type=float, default=-1.,
+                           help="minimum sigma*BR to be generated, in fb" )       
+
+    args = argparser.parse_args()
+    File=args.file[0]
+    def boolean(b):
+        if b: return "true"
+        return "false"
+    print "Now trying to decompose:",File
+    print "                         compression=%s" % boolean(args.compress)
+    print "                         invisible=%s" % boolean(args.invisible)
+    print "                         sigmacut=%.2f" % args.sigmacut
+    print "                         minmassgap=%.2f" % args.minmassgap
+    topolist=decompose ( File, args.sigmacut, args.compress, args.invisible,
+            args.minmassgap )
+    print len(topolist)
+    for e in topolist:
+        print e
