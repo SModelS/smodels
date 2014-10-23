@@ -179,6 +179,7 @@ if __name__ == "__main__":
     print "                         minmassgap=%.2f" % args.minmassgap
     topolist=decompose ( File, args.sigmacut, args.compress, args.invisible,
             args.minmassgap )
-    print len(topolist)
-    for e in topolist:
-        print e
+    if len(topolist)>0:
+        print "Found the following topologies: "
+        for e in topolist:
+            print e
