@@ -21,14 +21,14 @@ logger = logging.getLogger(__name__)
 
 
 def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
-              minmassgap=-1, useXSecs=None):
+              minmassgap=-1.*GeV, useXSecs=None):
     """
     Perform SLHA-based decomposition.
     :param sigcut: minimum sigma*BR to be generated, by default sigcut = 0.1 fb
     :param doCompress: turn mass compressed topologies on/off
     :param doInvisible: turn invisibly compressed topologies on/off
     :param minmassgap: maximum value for considering two R-odd particles
-                       degenerate (only revelant for doCompress=True)
+                       degenerate (only revelant for doCompress=True )
     :param useXSecs: optionally a dictionary with cross-sections for pair
                  production, by default reading the cross sections
                  from the SLHA file.
@@ -38,7 +38,7 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
     t1 = time.time()
 
     if doCompress and minmassgap / GeV < 0.:
-        logger.error("Please set minmassgap.")
+        logger.error("Asked for compression without specifying minmassgap. Please set minmassgap.")
         import sys
         sys.exit()
 
@@ -162,6 +162,10 @@ if __name__ == "__main__":
                            help="turn mass compressed topologies on." )
     argparser.add_argument('-i', '--invisible', action='store_true',
                            help="turn invisibly compressed topologies on." )
+    argparser.add_argument('-x', '--crosssections', action='store_true',
+                           help="print the production cross sections." )
+    argparser.add_argument('-M', '--masses', action='store_true',
+                           help="print the masses." )
     argparser.add_argument('-s', '--sigmacut', type=float, default=0.1,
                            help="minimum sigma*BR to be generated, in fb" )       
     argparser.add_argument('-m', '--minmassgap', type=float, default=-1.,
@@ -173,13 +177,21 @@ if __name__ == "__main__":
         if b: return "true"
         return "false"
     print "Now trying to decompose:",File
-    print "                         compression=%s" % boolean(args.compress)
-    print "                         invisible=%s" % boolean(args.invisible)
-    print "                         sigmacut=%.2f" % args.sigmacut
-    print "                         minmassgap=%.2f" % args.minmassgap
+    print "                       - compression=%s" % boolean(args.compress)
+    print "                       - invisible=%s" % boolean(args.invisible)
+    print "                       - sigmacut=%.2f" % args.sigmacut
+    print "                       - minmassgap=%.2f" % args.minmassgap
     topolist=decompose ( File, args.sigmacut, args.compress, args.invisible,
-            args.minmassgap )
+            args.minmassgap * GeV )
     if len(topolist)>0:
         print "Found the following topologies: "
-        for e in topolist:
-            print e
+        for t in topolist:
+            print
+            print t
+            for el in t.getElements():
+                print el, ## ,el.getMasses()
+                if args.masses:
+                    print el.getMasses(),
+                if args.crosssections:
+                    print el.weight,
+                print
