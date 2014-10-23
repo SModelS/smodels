@@ -53,6 +53,12 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
     if not os.path.isfile(slhafile):
         logger.error("SLHA file %s not found.", slhafile)
         sys.exit()
+    from smodels.tools import modpyslha
+    try:
+        f=modpyslha.readSLHAFile(slhafile)
+    except modpyslha.ParseError,e:
+        logger.error("File cannot be parsed as SLHA file: %s" % e )
+        sys.exit()
     if lhefile:
         if os.path.isfile(lhefile):
             logger.warning("Using LO cross-sections from " + lhefile)
