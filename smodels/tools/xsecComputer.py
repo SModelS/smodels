@@ -23,7 +23,7 @@ import sys
 
 logger = logging.getLogger(__name__)
 
-LO=0
+LO= 0  ## simple variables used to increase readability the perturbation order 
 NLO=1
 NLL=2
 
@@ -31,11 +31,11 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
     """
     Run pythia and compute SUSY cross-sections for the input SLHA file.
 
-    :param sqrts: sqrt{s} to run Pythia
-    :param maxOrder: maximum order to compute the cross-section
-                if maxOrder = 0, compute only LO pythia xsecs
-                if maxOrder = 1, apply NLO K-factors from NLLfast (if available)
-                if maxOrder = 2, apply NLO+NLL K-factors from NLLfast (if available)
+    :param sqrts: sqrt{s} to run Pythia, given as a unum (e.g. 7.*TeV)
+    :param maxOrder: maximum order to compute the cross-section, given as an integer
+                if maxOrder == 0, compute only LO pythia xsecs
+                if maxOrder == 1, apply NLO K-factors from NLLfast (if available)
+                if maxOrder == 2, apply NLO+NLL K-factors from NLLfast (if available)
     :param nevts: number of events for pythia run
     :param slhafile: SLHA file
     :param lhefile: LHE file. If None, do not write pythia output to file. If
@@ -59,6 +59,16 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
     except modpyslha.ParseError,e:
         logger.error("File cannot be parsed as SLHA file: %s" % e )
         sys.exit()
+
+    if type(sqrts)==type(float) or type(sqrts)==type(int):
+        logger.warning("sqrt(s) given as scalar, will add TeV as unit." )
+        sqrts=float(sqrts)*TeV
+
+    smaxorder={ "LO": 0, "NLO": 1, "NLL": 2 }
+    if maxOrder in smaxorder.keys():
+        logger.warning("maxorder given as string, please supply integer.")
+        maxOrder=smaxorder[maxOrder]
+
     if lhefile:
         if os.path.isfile(lhefile):
             logger.warning("Using LO cross-sections from " + lhefile)
