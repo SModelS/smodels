@@ -5,6 +5,7 @@
    :synopsis: Decomposition of SLHA events and creation of TopologyLists.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
 
@@ -20,14 +21,14 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
+def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
               minmassgap=-1.*GeV, useXSecs=None):
     """
     Perform SLHA-based decomposition.
     :param sigcut: minimum sigma*BR to be generated, by default sigcut = 0.1 fb
     :param doCompress: turn mass compressed topologies on/off
     :param doInvisible: turn invisibly compressed topologies on/off
-    :param minmassgap: maximum value for considering two R-odd particles
+    :param minmassgap: maximum value (in GeV) for considering two R-odd particles
                        degenerate (only revelant for doCompress=True )
     :param useXSecs: optionally a dictionary with cross-sections for pair
                  production, by default reading the cross sections
@@ -44,6 +45,14 @@ def decompose(slhafile, sigcut=0.1, doCompress=False, doInvisible=False,
 
     if type(sigcut) == type(1.):
         sigcut = sigcut * fb
+
+    from smodels.tools import modpyslha
+    try:
+        f=modpyslha.readSLHAFile ( slhafile )
+    except modpyslha.ParseError,e:
+        logger.error ( "This file cannot be parsed as an SLHA file: %s" % e )
+        import sys
+        sys.exit()
 
     # Get cross-section from file
     xSectionList = crossSection.getXsecFromSLHAFile(slhafile, useXSecs)
@@ -181,7 +190,7 @@ if __name__ == "__main__":
     print "                       - invisible=%s" % boolean(args.invisible)
     print "                       - sigmacut=%.2f" % args.sigmacut
     print "                       - minmassgap=%.2f" % args.minmassgap
-    topolist=decompose ( File, args.sigmacut, args.compress, args.invisible,
+    topolist=decompose ( File, args.sigmacut * fb, args.compress, args.invisible,
             args.minmassgap * GeV )
     if len(topolist)>0:
         print "Found the following topologies: "
