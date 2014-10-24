@@ -66,13 +66,13 @@ def compile():
         return
     needs_build=False
     for i in sys.argv[1:]:
-        if i in [ "build", "build_ext", "build_clib", "install", 
-                  "install_lib", "bdist", "bdist_rpm", "bdist_dumb", "bdist_wininst",
+        if i in [ "build", "build_ext", "build_clib", "install", "install_lib", 
+                  "bdist", "bdist_rpm", "bdist_dumb", "bdist_wininst",
                   "bdist_wheel", "develop" ]:
             needs_build=True
-    if not needs_build:
+    if not needs_build: 
+        # call make only when needed
         return
-    # print "compile",len(sys.argv)
     import subprocess
     subprocess.call( ["make","-C","lib" ] )
 
@@ -81,7 +81,8 @@ setup(
     name = "smodels",
     version = "1.0",
     author = ("Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, "
-              "Wolfgang Magerl, Doris Proschofsky, Wolfgang Waltenberger"),
+              "Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, "
+              "Jory Sonneveld, Michael Traub, Wolfgang Waltenberger"),
     author_email = "smodels-developers@lists.oeaw.ac.at ",
     scripts = [ "bin/smodels-config", "runSModelS.py" ],
     install_requires = [ 'docutils>=0.3', 'numpy', 'scipy>=0.9.0', \
@@ -92,7 +93,7 @@ setup(
     license = "GPLv3",
     # use_2to3 = True,
     keywords = ("simplified models LHC BSM theories interpretation "
-                "supersymmetry universal extra dimensions"),
+                "supersymmetry UEDs"),
     url = "http://smodels.hephy.at/",
     packages = ['smodels',
                 'smodels.theory',
