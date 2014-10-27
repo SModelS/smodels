@@ -80,6 +80,10 @@ class OutputStatus(Printer):
         self.status = status
         return
 
+    def updateSLHAStatus(self, status):
+        self.slhastatus = status
+        return
+
     def addWarning(self, warning):
         self.warnings += warning
         return
