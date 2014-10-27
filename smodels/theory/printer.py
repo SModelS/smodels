@@ -145,8 +145,8 @@ class Printer(object):
         """
         output = ""
 
-        output += "SLHA status: " + str(self.slhastatus) + "\n"
-        output += "Decomposition output status: "+str(self.status)+" "+self.statusStrings[self.status] + "\n" #FIXME where should status strings go?
+        output += "Input status: " + str(self.slhastatus) + "\n"
+        output += "Decomposition output status: "+str(self.status)+" "+self.statusStrings[self.status] + "\n"
         if self.databaseVersion: output += "Database version: %s\n" % self.databaseVersion
         if self.slhastatus < 0: output += str(self.warnings) + "\n"
         output += "================================================================================\n"
@@ -195,6 +195,19 @@ class Printer(object):
         #cannot add this information in case the input file is not slha format
             output += "LSP PID, mass: " + str(self.findLSP(returnmass=True)) + "\n"
             output += "NLSP PID, mass: " + str(self.findNLSP(returnmass=True)) + "\n"
+        output += "================================================================================\n"
+
+        return output
+
+    def formatLHEData(self):
+        """
+        Format data of lhe status, analog to slha status.
+        """
+        output = ""
+
+        output += "Input file: " + self.filename + "\n"
+        output += "Minmassgap: " + str(self.massgap*GeV) + "\n"
+        output += "Maxcond: " + str(self.maxcond) + "\n"
         output += "================================================================================\n"
 
         return output

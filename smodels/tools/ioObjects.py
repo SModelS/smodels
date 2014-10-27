@@ -8,6 +8,8 @@
     .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
 """
 
+import os
+from smodels.theory import lheReader
 from smodels.theory.printer import Printer
 
 class ResultList(Printer):
@@ -78,9 +80,37 @@ class OutputStatus(Printer):
         self.status = status
         return
 
+    def addWarning(self, warning):
+        self.warnings += warning
+        return
+
     def formatData(self):
         """
         to access printout format
         """
         return self.formatStatusData()
 
+
+class LheStatus(Printer):
+    """
+    Object to check if input lhe file is ok
+    """
+
+    def __init__(self, filename, massgap=None, maxcond=None):
+        self.filename = filename
+        #additional information for printer output
+        self.massgap = massgap
+        self.maxcond = maxcond
+        self.status = self.evaluateStatus()
+
+    def formatData(self):
+        return self.formatLHEData()
+
+    def evaluateStatus(self):
+        if not os.path.exists(self.filename):
+            #set status flag to -3, as in slha checks for missing input file
+            return -3, "Inputfile %s not found" %self.filename
+        lhe = lheReader.LheReader(self.filename)
+        if not lhe.metainfo["nevents"]:
+            return -1, "No events found in inputfile %s" %self.filename
+        return 1, "Input file ok"
