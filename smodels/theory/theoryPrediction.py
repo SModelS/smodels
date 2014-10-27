@@ -54,6 +54,8 @@ class TheoryPredictionList(Printer):
         for theoryPrediction in self._theoryPredictions:
             yield theoryPrediction
 
+    def __len__(self):
+        return len(self._theoryPredictions)
 
     def formatData(self):
         """

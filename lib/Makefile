@@ -6,7 +6,7 @@ clean_nllfast: clean_nllfast-1.2 clean_nllfast-2.1 clean_nllfast-3.0 clean_nllfa
 pythia: pythia6
 clean_pythia: clean_pythia6
 
-pythia6:
+pythia6: .PHONY
 	cd pythia6 && make
 clean_pythia6:
 	cd pythia6 && make clean

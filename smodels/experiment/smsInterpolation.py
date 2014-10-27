@@ -190,7 +190,7 @@ def _getxval(mx, my, mz, mass=False):
     """
     mx = mx / GeV
     my = my / GeV
-    mz = mz / GeV
+    mz = mz # not actually a mass, no unit!
     if mz.find('x') == -1 and mz.find('C') == -1 and mz.find('y') == -1:
         xfac = float(mz) / 100
         if mass:
