@@ -10,7 +10,7 @@ from ConfigParser import SafeConfigParser
 from smodels.tools.physicsUnits import GeV, fb, TeV
 from smodels.tools import slhaChecks, ioObjects, xsecComputer, missingTopologies
 from smodels.experiment import smsHelpers, smsAnalysisFactory, smsResults
-from smodels.theory import slhaDecomposer
+from smodels.theory import slhaDecomposer, lheDecomposer
 from smodels.theory.theoryPrediction import theoryPredictionFor,  _getElementsFrom
 from smodels.theory import crossSection
 from smodels.installation import installDirectory
@@ -20,7 +20,7 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
 
     log = logging.getLogger(__name__)
 
-    slhafile = filename #get input filename
+    inputFile = filename #get input filename
 
     #use ConfigParser to read input parameters
     parser = SafeConfigParser()
@@ -39,9 +39,17 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
     #slhastat == 1, the check is ok
     #slhastat == -1, physical problem in scenario, e.g. charged LSP,
     #slhastat == -2  formal problems in the file, e.g. missing decay blocks
+    #slhastat == -3 missing input file
 
-    slhaStatus = slhaChecks.SlhaStatus(slhafile, sigmacut = parser.getfloat("parameters","sigmacut"), maxDisplacement = .001, checkXsec = not parser.getboolean("options","addMissingXsecs"), massgap = parser.getfloat("parameters","minmassgap"), maxcond = parser.getfloat("parameters","maxcond"))
-    slhastat, warnings = slhaStatus.status
+    if parser.getboolean("options","doSLHAdec"):
+        inputStatus = slhaChecks.SlhaStatus(inputFile, sigmacut = parser.getfloat("parameters","sigmacut"), maxDisplacement = .001, checkXsec = not parser.getboolean("options","addMissingXsecs"), massgap = parser.getfloat("parameters","minmassgap"), maxcond = parser.getfloat("parameters","maxcond"))
+    else:
+        #for input lhe, check if file exists and has correct format
+        inputStatus = ioObjects.LheStatus(inputFile, massgap=parser.getfloat("parameters","minmassgap"), maxcond=parser.getfloat("parameters","maxcond"))
+
+    print(inputStatus)
+
+    inStat, warnings = inputStatus.status
 
     #set database address
     smsHelpers.base = parser.get("path","database")
@@ -61,12 +69,12 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
         databaseVersion = None
 
     #initialize output status
-    outputStatus = ioObjects.OutputStatus(slhastat, warnings, databaseVersion)
+    outputStatus = ioObjects.OutputStatus(inStat, warnings, databaseVersion)
 
     if outputStatus.status == -2 or outputStatus.status == -4:
         #do not continue decompostion for bad input files, or in case database is not found
         outputStatus.printout("file",outputfile)
-        slhaStatus.printout("file",outputfile)
+        inputStatus.printout("file",outputfile)
         sys.exit()
 
     #FIXME can I automatize calling the printout functions and the sys.exit?
@@ -78,41 +86,59 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
     #if addMissingXsecs is set True, SModelS calculates LO cross sections
     #production processes not yet covered in the input file are added
     #else, if the input slha does not contain cross sections, SModelS will add LO cross sections
-    if parser.getboolean("options","addMissingXsecs") or slhaStatus.xsec[0]==-1:
-        xsecs = xsecComputer.computeXSec(sqrts, 0, parser.getint("options","nevts"), slhafile)
+    if parser.getboolean("options","doSLHAdec") and (parser.getboolean("options","addMissingXsecs") or inputStatus.xsec[0]==-1):
+        xsecs = xsecComputer.computeXSec(sqrts, 0, parser.getint("options","nevts"), inputFile)
         comment = "Nevts: " + parser.get("options","nevts")
-        xsecComputer.addXSecToFile(xsecs, slhafile, comment)
+        xsecComputer.addXSecToFile(xsecs, inputFile, comment)
 
     #option of adding NLO and NLL cross sections from nllFast
     #using LO cross sections written in the input slha file
-    if parser.getboolean("options","addnlo"):
+    if parser.getboolean("options","doSLHAdec") and parser.getboolean("options","addnlo"):
         #read LO from input file, compute NLO
-        xsecs_nlo = xsecComputer.computeXSec(sqrts, 1, parser.getint("options","nevts"), slhafile, loFromSlha=True)
-        xsecComputer.addXSecToFile(xsecs_nlo, slhafile) #FIXME comment! (to be printed to slha file)
+        xsecs_nlo = xsecComputer.computeXSec(sqrts, 1, parser.getint("options","nevts"), inputFile, loFromSlha=True)
+        if xsecs_nlo: xsecComputer.addXSecToFile(xsecs_nlo, inputFile) #FIXME comment! (to be printed to slha file)
 
-    if parser.getboolean("options","addnll"):
-        xsecs_nll = xsecComputer.computeXSec(sqrts, 2, parser.getint("options","nevts"), slhafile, loFromSlha=True)
-        xsecComputer.addXSecToFile(xsecs_nll, slhafile) #FIXME comment!
+    if parser.getboolean("options","doSLHAdec") and parser.getboolean("options","addnll"):
+        xsecs_nll = xsecComputer.computeXSec(sqrts, 2, parser.getint("options","nevts"), inputFile, loFromSlha=True)
+        if xsecs_nll: xsecComputer.addXSecToFile(xsecs_nll, inputFile) #FIXME comment!
+
+    #after cross section computation, re-evaluate slha file for displaced vertices of high cross section
+    if parser.getboolean("options","doSLHAdec"):
+        s, m = inputStatus.reEvaluateDisplaced()
+        if s == -1:
+            outputStatus.addWarning(m)
+            outputStatus.updateStatus(-2)
+            outputStatus.printout("file", outputfile)
+            inputStatus.printout("file", outputfile)
+            sys.exit()
+
 
     #decomposition
-    #sigmacut = minimum value of cross-section for an element to be considered eligible for decomposition. Too small sigmacut leads to too large deocmposition time. 
-    sigmacut = parser.getfloat("parameters","sigmacut")*fb
+
+    if parser.getboolean("options","doSLHAdec"):
+
+        #sigmacut = minimum value of cross-section for an element to be considered eligible for decomposition. Too small sigmacut leads to too large deocmposition time. 
+        sigmacut = parser.getfloat("parameters","sigmacut")*fb
 
     try:
         # Decompose input SLHA file, store the output elements in smstoplist
-        smstoplist = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=parser.getboolean("options","doCompress"), doInvisible=parser.getboolean("options","doInvisible"), minmassgap=parser.getfloat("parameters","minmassgap")*GeV)
+        if parser.getboolean("options","doSLHAdec"):
+            smstoplist = slhaDecomposer.decompose(inputFile, sigmacut, doCompress=parser.getboolean("options","doCompress"),
+                         doInvisible=parser.getboolean("options","doInvisible"), minmassgap=parser.getfloat("parameters","minmassgap")*GeV)
+        else:
+            smstoplist = lheDecomposer.decompose(inputFile, doCompress=parser.getboolean("options","doCompress"),
+                         doInvisible=parser.getboolean("options","doInvisible"), minmassgap=parser.getfloat("parameters","minmassgap")*GeV)   
     except:
-        # If the decomposition does not go through, update status, write output file, stop running
         outputStatus.updateStatus(-1)
         outputStatus.printout("file", outputfile)
-        slhaStatus.printout("file", outputfile)
+        inputStatus.printout("file", outputfile)
         sys.exit()
 
     # If no topologies with sigma > sigmacut are found, update status, write output file, stop running
     if not smstoplist:
         outputStatus.updateStatus(-3)
         outputStatus.printout("file", outputfile)
-        slhaStatus.printout("file", outputfile)
+        inputStatus.printout("file", outputfile)
         sys.exit()
 
     if parser.getboolean("stdout","printGtop"):
@@ -194,7 +220,7 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
 
     # write output file
     outputStatus.printout("file", outputfile)
-    slhaStatus.printout("file", outputfile)
+    inputStatus.printout("file", outputfile)
     # add experimental constraints if found
     if outputStatus.status == 1: results.printout("file", outputfile)
 
@@ -206,6 +232,8 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
         missingtopos = missingTopologies.MissingTopoList(sqrts)
         missingtopos.findMissingTopos(smstoplist, listofanalyses, sigmacut, parser.getfloat("parameters","minmassgap")*GeV)
         missingtopos.printout("file", outputfile)
+
+
 
 if __name__ == "__main__":
     #get the name of input slha file (and parameter file)
