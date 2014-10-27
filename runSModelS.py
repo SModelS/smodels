@@ -47,8 +47,6 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
         #for input lhe, check if file exists and has correct format
         inputStatus = ioObjects.LheStatus(inputFile, massgap=parser.getfloat("parameters","minmassgap"), maxcond=parser.getfloat("parameters","maxcond"))
 
-    print(inputStatus)
-
     inStat, warnings = inputStatus.status
 
     #set database address
@@ -107,6 +105,7 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
         s, m = inputStatus.reEvaluateDisplaced()
         if s == -1:
             outputStatus.addWarning(m)
+            outputStatus.updateSLHAStatus(-1)
             outputStatus.updateStatus(-2)
             outputStatus.printout("file", outputfile)
             inputStatus.printout("file", outputfile)
