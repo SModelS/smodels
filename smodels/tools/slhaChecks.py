@@ -61,8 +61,10 @@ class SlhaStatus(Printer):
         Get pyslha output object.
         
         """
-        try: return pyslha.readSLHAFile(self.filename)
+        try: ret = pyslha.readSLHAFile(self.filename)
         except: return None
+        if not ret.blocks["MASS"]: return None
+        return ret
 
 
     def evaluateStatus(self):
