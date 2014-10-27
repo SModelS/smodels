@@ -97,6 +97,15 @@ class SlhaStatus(Printer):
         return ret, "Input file ok" 
 
 
+    def reEvaluateDisplaced(self):
+        """
+        Re-read the input file and evaluate the status in case changes
+        were made in the input file
+        """
+
+        self.slha = self.read()
+        return self.findDisplacedVertices(True)
+
     def checkDecayBlock(self, findMissingDecays):
         """
         Check if there is a decay table for each particle with pid > 50 given
