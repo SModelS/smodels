@@ -241,7 +241,9 @@ def isPrivate(analysis, run=None):
     """
     Check if analysis is flagged as private.
     """
-    return bool(int(smsHelpers.getMetaInfoField(analysis, "private", run)))
+    field=smsHelpers.getMetaInfoField(analysis, "private", run)
+    if field==None: return False
+    return bool(int(field))
 
 
 def getExperiment(analysis, run=None):
