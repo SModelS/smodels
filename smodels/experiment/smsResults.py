@@ -329,9 +329,9 @@ def getUpperLimitFromDictionary(analysis, topology, mx=None, my=None,
                                                     expected=expected)
     if dictionary == None:
         return dictionary
-    if mx == None and my == None:
+    if type(mx) == type(None) and type(my) == type(None):
         return dictionary
-    if mx == None or my == None:
+    if type(mx) == type(None) or type(my) == type(None):
         logger.error("Requesting upper limits for mx = %s and my = %s", mx, my)
         return None
     if not (type(mx) == type(1.) or type(mx) == type(GeV)):
@@ -358,8 +358,8 @@ def getInterpolatedUpperLimitDelaunay(dictionary, inmx, inmy):
         mx = inmx / GeV
         my = inmy / GeV
         if not inConvexHull(dictionary, mx, my):
-            logger.debug("Cannot interpolate for (%f, %f), point is not in "
-                         "convex hull.", inmx, inmy)
+            logger.debug("Cannot interpolate for (%s, %s), point is not in "
+                         "convex hull.", str(inmx), str(inmy))
             return None
         n = 0
         for k in dictionary:
