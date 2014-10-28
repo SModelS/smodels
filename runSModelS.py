@@ -115,8 +115,8 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
     #decomposition
 
     if parser.getboolean("options","doSLHAdec"):
-
-        #sigmacut = minimum value of cross-section for an element to be considered eligible for decomposition. Too small sigmacut leads to too large decomposition time. 
+        #sigmacut = minimum value of cross-section for an element to be considered eligible for decomposition.
+        #Too small sigmacut leads to too large decomposition time.
         sigmacut = parser.getfloat("parameters","sigmacut")*fb
 
     try:
