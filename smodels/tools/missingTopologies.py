@@ -53,7 +53,7 @@ class MissingTopoList(Printer):
         li.sort()
         return str(li).replace("'", "").replace(" ", "")
 
-    def findMissingTopos(self, smstoplist, listOfAnalyses, sigmacut, minmassgap):
+    def findMissingTopos(self, smstoplist, listOfAnalyses, minmassgap):
         from smodels.tools.physicsUnits import fb
         for el in smstoplist:
             for sel in el.elementList:
