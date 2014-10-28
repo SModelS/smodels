@@ -1,4 +1,7 @@
 # copy this file to ~/.smodelsrc
 
-from Experiment import SMSHelpers
-SMSHelpers.Base="/home/lessa/SMS_database/"
+from smodels.experiment import smsHelpers
+import os
+
+## this defines where the database resides
+smsHelpers.base=os.environ["HOME"]+"/SMS_database/"

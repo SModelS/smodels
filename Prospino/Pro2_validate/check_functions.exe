@@ -1,7 +1,0 @@
-grep dlog  * ;
-grep dsqrt * ;
-grep dreal * ;
-grep datan * ;
-grep dabs  * ;
-grep dsign * ;
-
