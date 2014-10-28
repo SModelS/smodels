@@ -35,6 +35,9 @@ def upperLimit(analysis, topology, masses, run=None):
     if not d:
         logger.error("%s/%s not found.", analysis, topology)
         return None
+    if len(masses) < 2:
+        logger.error("No results for single mass entry")
+        return None
     if len(masses) == 2 and not d[0]['mz']:
         return smsResults.getUpperLimit(analysis, topology,
                                         masses[_getAxis('x', d[0]['axes'])],
