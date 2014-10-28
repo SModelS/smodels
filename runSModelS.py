@@ -70,7 +70,7 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
     outputStatus = ioObjects.OutputStatus(inStat, warnings, databaseVersion)
 
     if outputStatus.status == -2 or outputStatus.status == -4:
-        #do not continue decompostion for bad input files, or in case database is not found
+        #do not continue decomposition for bad input files, or in case database is not found
         outputStatus.printout("file",outputfile)
         inputStatus.printout("file",outputfile)
         sys.exit()
