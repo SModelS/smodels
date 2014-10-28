@@ -357,7 +357,7 @@ def _getGoodElements(elements, analysis, maxDist):
             mass2 = [mass[1], mass[1]]
             mP1 = massPosition(mass1, analysis)
             mP2 = massPosition(mass2, analysis)
-            if not mP1 or not mP2:
+            if type(mP1)==type(None) or type(mP2)==type(None):
                 continue
             if distance(mP1, mP2) < maxDist:
                 goodmass = massAvg([mass1, mass2], method='harmonic')

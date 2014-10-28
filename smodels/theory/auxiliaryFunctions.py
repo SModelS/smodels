@@ -101,12 +101,13 @@ def massAvg(massList, method='weighted', weights=None):
     avgmass = copy.deepcopy(massList[0])
     for ib, branch in enumerate(massList[0]):
         for ival in enumerate(branch):
-            vals = [ mass[ib][ival[0]] / GeV for mass in massList]
+            vals = [ float(mass[ib][ival[0]] / GeV) for mass in massList]
             if method == 'mean':
                 avg = np.mean(vals)
             elif method == 'harmonic':
                 avg = stats.hmean(vals)
             elif method == 'weighted':
+                weights = [ float(weight) for weight in weights ]
                 avg = np.average(vals,weights=weights)                
             avgmass[ib][ival[0]] = float(avg)*GeV
 

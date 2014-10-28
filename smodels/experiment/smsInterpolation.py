@@ -179,7 +179,7 @@ def _getAxis(w, a):
 def _getxval(mx, my, mz, mass=False):
     """
     Calculate x-value for one point.
-    
+    Note: all masses have to be without units!
     If mass == True is selected, return intermediate mass instead of x-value.
     
     :param mx: Mother-mass
@@ -188,9 +188,6 @@ def _getxval(mx, my, mz, mass=False):
     axes-information.
     
     """
-    mx = mx / GeV
-    my = my / GeV
-    mz = mz # not actually a mass, no unit!
     if mz.find('x') == -1 and mz.find('C') == -1 and mz.find('y') == -1:
         xfac = float(mz) / 100
         if mass:
@@ -229,7 +226,7 @@ def _compareMasses(masses, d):
     # Check if histogram axes are M1, M0, return 1 if x-value of histogram is
     # comparable to x value for given masses, 0 if not
     try:
-        x1 = _getxval(masses[0], masses[-1], d['mz'][0])
+        x1 = _getxval(masses[0] / GeV, masses[-1] / GeV, d['mz'][0])
         x2 = float(masses[1] / GeV - masses[-1] / GeV) / \
                 (masses[0] /GeV - masses[-1] / GeV  )
         if abs(x1 - x2) / (x1 + x2) < 0.1:

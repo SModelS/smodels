@@ -74,14 +74,14 @@ def getPlotLimit(inmass, analysis):
         logger.error("Masses differ between branches.")
         return False
 
-    masslist = [mass / GeV for mass in massArray[0]]
+#    masslist = [mass / GeV for mass in massArray[0]]
+    masslist = massArray[0]
 
     # Run label
     run = analysis.run
     # If run has not been defined, use latest run
     if run == "":
         run = None
-
     analysis, cmsLabel = analysis.label.split(':')
     upperLimit = smsInterpolation.upperLimit(analysis, cmsLabel, masslist)
     return upperLimit
