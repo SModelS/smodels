@@ -217,13 +217,17 @@ class Printer(object):
         Format data of missing topology list.
         """
 
+        nprint = 10 #Number of missing topologies to be printed (ordered by cross-sections)
+        
         output = ""
-
         output += "\n================================================================================\n"
-        output += "Missing topologies with high cross sections:\n"
+        if len(self.topos) == 0: return output + "No missing topologies found\n"
+
+        
+        output += "Missing topologies with the highest cross-sections (up to "+str(nprint)+"):\n"
         output += "Sqrts (TeV)   Weight (fb)        Topology description\n"
 
-        for topo in sorted(self.topos, key=lambda x: x.value, reverse=True)[:10]:
+        for topo in sorted(self.topos, key=lambda x: x.value, reverse=True)[:nprint]:
             output += "%5s %10.3E    # %45s\n" % (str(self.sqrts / TeV), topo.value, str(topo.topo))
         return output
 
