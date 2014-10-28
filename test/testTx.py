@@ -1,18 +1,37 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
-""" starting from a Tx.lhe file, we SmodelS-decompose the event, and 
-obtain its Tx name from the SModelS description of the event: a closure test. """
+"""
+.. module:: testTx
+   :synopsis: Tests with Tx slha input files.
+    
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+    
+"""
 
-import set_path
-from Experiment import TxNames
-from Theory import LHEReader, TopologyBuilder
-from TestTools import ok
+from smodels.theory import slhaDecomposer
+from smodels.tools import xsecComputer
+from smodels.tools.xsecComputer import NLL
+from smodels.tools.physicsUnits import GeV, fb, TeV
+import unittest
+import logging
 
-topolist = ['T1','T2','T1tttt', 'T2tt','T3W', 'T5WW', 'TChiWZ', 'T1bbbb', 'T2bb', 'T5WZ', 'T3Wb', 'T3Z', 'T5ZZ', 'T6bbZZ', 'TChiWW', 'TSlepSlep']
+class TxTest(unittest.TestCase):
+    logger = logging.getLogger(__name__)
 
-for topo in topolist:
-  reader = LHEReader.LHEReader("../lhe/%s_1.lhe" % topo)
-  Event = reader.next()
-  SMSTop = TopologyBuilder.fromEvent(Event, {})
-  res = TxNames.getTx(SMSTop[0].leadingElement())
-  print "Checking %7s: %s" % ("["+res+"]",ok(res,topo))
+    def testT1(self):
+        self.logger.info ( "T1" )
+        """ test with the T1 slha input file """
+        slhafile="../inputFiles/slha/T1xsecs.slha"
+        topos = slhaDecomposer.decompose ( slhafile, .1*fb, False, False, 5.*GeV )
+        for topo in topos:
+            for element in topo.elementList:
+                masses=element.getMasses()
+                # print "e=",element,"masses=",masses
+                mgluino=masses[0][0]
+                mLSP=masses[0][1]
+                self.assertEqual ( str(element), "[[[jet,jet]],[[jet,jet]]]" )
+                self.assertEqual ( int ( mgluino / GeV ), 675 )
+                self.assertEqual ( int ( mLSP / GeV ), 600 )
+
+if __name__ == "__main__":
+    unittest.main()

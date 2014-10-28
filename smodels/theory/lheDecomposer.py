@@ -1,0 +1,235 @@
+#!/usr/bin/env python
+
+"""
+.. module:: theory.lheDecomposer
+   :synopsis: Decomposition of LHE events and creation of TopologyLists 
+
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
+
+"""
+
+from smodels.theory import lheReader, topology, crossSection, element
+from smodels.theory import branch
+from smodels.tools import modpyslha as pyslha
+from smodels.tools.physicsUnits import fb, GeV
+import smodels.particles
+import copy
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def decompose(lhefile, inputXsecs=None, nevts=None, doCompress=False,
+              doInvisible=False, minmassgap=-1. * GeV ):
+    """
+    Perform LHE-based decomposition. 
+
+    :param lhefile: LHE file with e.g. pythia events
+    :param inputXsecs: xSectionList object with cross-sections for the mothers
+           appearing in the LHE file. If None, use information from file.
+    :param nevts: (maximum) number of events used in the decomposition. If
+                  None, all events from file are processed.
+    :param doCompress: mass compression option (True/False)
+    :param doInvisible: invisible compression option (True/False)
+    :param minmassgap: minimum mass gap for mass compression (only used if
+                       doCompress=True)
+    :returns: TopologyList object 
+    
+    """
+
+    if doCompress and minmassgap < 0. * GeV:
+        logger.error("Asked for compression without specifying minmassgap. Please set minmassgap.")
+        import sys
+        sys.exit()
+
+    reader = lheReader.LheReader(lhefile, nevts)
+    smsTopList = topology.TopologyList()
+    # Get cross-section from file (= event weight, assuming a common weight for
+    # all events)
+    if not inputXsecs:
+        xSectionList = crossSection.getXsecFromLHEFile(lhefile,
+                                                       addEvents=False)
+    else:
+        xSectionList = inputXsecs
+
+    # Loop over events and decompose
+    for event in reader:
+        momPDG = tuple(sorted(event.getMom()))  # Get mother PDGs
+        eventweight = xSectionList.getXsecsFor(momPDG)
+        # Get event element
+        newElement = elementFromEvent(event, eventweight)
+        allElements = [newElement]
+        # Perform compression
+        if doCompress or doInvisible:
+            allElements += newElement.compressElement(doCompress, doInvisible,
+                                                      minmassgap)
+
+        for el in allElements:
+            top = topology.Topology(el)
+            smsTopList.addList([top])
+
+    return smsTopList
+
+
+def elementFromEvent(event, weight=None):
+    """
+    Creates an element from a LHE event and the corresponding event weight.
+    
+    :param event: LHE event
+    :param weight: event weight. Must be a XSectionList object (usually with a
+                   single entry) or None if not specified.
+    :returns: element
+    
+    """
+    if not event.particles:
+        logger.error("Empty event")
+        return None
+
+    brDic, massDic = _getDictionariesFromEvent(event)
+    
+    # Create branch list
+    finalBranchList = []
+    for ip, particle in enumerate(event.particles):
+        # Particle came from initial state (primary mother)
+        if 1 in particle.moms:
+            mombranch = branch.Branch()
+            mombranch.momID = particle.pdg
+            mombranch.daughterID = particle.pdg            
+            if weight:
+                mombranch.maxWeight = weight.getMaxXsec()
+            # Get simple BR and Mass dictionaries for the corresponding branch
+            branchBR = brDic[ip]
+            branchMass = massDic[ip]
+            mombranch.masses = [branchMass[mombranch.momID]]
+            # Generate final branches (after all R-odd particles have decayed)
+            finalBranchList += branch.decayBranches([mombranch], branchBR,
+                                                    branchMass, sigcut=0. * fb )
+
+    if len(finalBranchList) != 2:
+        logger.error(str(len(finalBranchList)) + " branches found in event; "
+                     "Possible R-parity violation")
+        import sys
+        sys.exit()
+    # Create element from event
+    newElement = element.Element(finalBranchList)
+    if weight:
+        newElement.weight = copy.deepcopy(weight)
+
+    return newElement
+
+
+def _getDictionariesFromEvent(event):
+    """
+    Create mass and BR dictionaries for each branch in an event.
+    
+    :param event: LHE event
+    :returns: BR and mass dictionaries for the branches in the event
+    
+    """
+
+    particles = event.particles
+
+    # Identify and label to which branch each particle belongs 
+    #(the branch label is the position of the primary mother)
+    branches = {}
+    for ip, particle in enumerate(particles):
+        if particle.status == -1:
+            continue
+        if particles[particle.moms[0]].status == -1:
+            # If a primary mother, the branch index is its own position
+            initMom = ip
+        else:
+            # If not a primary mother, check if particle has a single parent
+            # (as it should)
+            if particle.moms[0] != particle.moms[1] and \
+                    min(particle.moms) != 0:
+                logger.error("More than one parent particle found")
+                import sys
+                sys.exit()
+            initMom = max(particle.moms) - 1
+            while particles[particles[initMom].moms[0]].status != -1:
+                # Find primary mother (labels the branch)
+                initMom = max(particles[initMom].moms) - 1
+        branches[ip] = initMom
+
+    # Get mass and BR dictionaries for all branches:
+    massDic = {}
+    brDic = {}
+    for ibranch in branches.values():  #ibranch = position of primary mother
+        massDic[ibranch] = {}
+        brDic[ibranch] = {}
+    for ip, particle in enumerate(particles):
+        if particle.pdg in smodels.particles.rEven or particle.status == -1:
+            # Ignore R-even particles and initial state particles
+            continue
+        ibranch = branches[ip]  # Get particle branch
+        massDic[ibranch][particle.pdg] = particle.mass* GeV
+        # Create empty BRs
+        brDic[ibranch][particle.pdg] = [pyslha.Decay(0., 0, [], particle.pdg)]
+
+    # Get BRs from event
+    for ip, particle in enumerate(particles):
+        if particle.status == -1:
+            # Ignore initial state particles
+            continue
+        if particles[particle.moms[0]].status == -1:
+            # Ignore initial mothers
+            continue
+        ibranch = branches[ip]
+        momPdg = particles[max(particle.moms) - 1].pdg
+        if momPdg in smodels.particles.rEven:
+            # Ignore R-even decays
+            continue
+        # BR = 1 always for an event
+        brDic[ibranch][momPdg][0].br = 1.
+        brDic[ibranch][momPdg][0].nda += 1
+        brDic[ibranch][momPdg][0].ids.append(particle.pdg)
+
+    return brDic, massDic
+
+if __name__ == "__main__":
+    """
+    Decomposes a given LHE file.
+
+    """
+    import argparse
+    import types
+    argparser = argparse.ArgumentParser(description="Decomposes a given LHE file.")
+    argparser.add_argument('file', type=types.StringType, nargs=1,
+                           help="LHE file to decompose." )
+    argparser.add_argument('-c', '--compress', action='store_true',
+                           help="turn mass compressed topologies on." )
+    argparser.add_argument('-i', '--invisible', action='store_true',
+                           help="turn invisibly compressed topologies on." )
+    argparser.add_argument('-x', '--crosssections', action='store_true',
+                           help="print the production cross sections." )
+    argparser.add_argument('-M', '--masses', action='store_true',
+                           help="print the masses." )
+    argparser.add_argument('-n', '--nevents', type=int, default=-1,
+                           help="number of events to be checked for, -1 means all events in file." )       
+    argparser.add_argument('-m', '--minmassgap', type=float, default=-1.,
+                           help="minimum sigma*BR to be generated, in fb" )       
+
+    args = argparser.parse_args()
+    File=args.file[0]
+    def boolean(b):
+        if b: return "true"
+        return "false"
+    print "Now trying to decompose:",File
+    print "                       - compression=%s" % boolean(args.compress)
+    print "                       - invisible=%s" % boolean(args.invisible)
+    print "                       - minmassgap=%.2f" % args.minmassgap
+    topolist=decompose ( File, None, args.nevents, args.compress, args.invisible,
+            args.minmassgap * GeV )
+    if len(topolist)>0:
+        print "Found the following topologies: "
+        for t in topolist:
+            print
+            print t
+            for el in t.getElements():
+                print el, ## ,el.getMasses()
+                if args.masses:
+                    print el.getMasses(),
+                if args.crosssections:
+                    print el.weight,
+                print
