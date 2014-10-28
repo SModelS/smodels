@@ -86,7 +86,7 @@ def elementFromEvent(event, weight=None):
         return None
 
     brDic, massDic = _getDictionariesFromEvent(event)
-
+    
     # Create branch list
     finalBranchList = []
     for ip, particle in enumerate(event.particles):
@@ -94,12 +94,13 @@ def elementFromEvent(event, weight=None):
         if 1 in particle.moms:
             mombranch = branch.Branch()
             mombranch.momID = particle.pdg
-            mombranch.daughterID = particle.pdg
+            mombranch.daughterID = particle.pdg            
             if weight:
                 mombranch.maxWeight = weight.getMaxXsec()
             # Get simple BR and Mass dictionaries for the corresponding branch
             branchBR = brDic[ip]
             branchMass = massDic[ip]
+            mombranch.masses = [branchMass[mombranch.momID]]
             # Generate final branches (after all R-odd particles have decayed)
             finalBranchList += branch.decayBranches([mombranch], branchBR,
                                                     branchMass, sigcut=0. * fb )
@@ -128,8 +129,9 @@ def _getDictionariesFromEvent(event):
 
     particles = event.particles
 
-    # Identify and label individual branches
-    branchDic = {}
+    # Identify and label to which branch each particle belongs 
+    #(the branch label is the position of the primary mother)
+    branches = {}
     for ip, particle in enumerate(particles):
         if particle.status == -1:
             continue
@@ -148,19 +150,19 @@ def _getDictionariesFromEvent(event):
             while particles[particles[initMom].moms[0]].status != -1:
                 # Find primary mother (labels the branch)
                 initMom = max(particles[initMom].moms) - 1
-        branchDic[ip] = initMom
+        branches[ip] = initMom
 
     # Get mass and BR dictionaries for all branches:
     massDic = {}
     brDic = {}
-    for ibranch in branchDic.values():
+    for ibranch in branches.values():  #ibranch = position of primary mother
         massDic[ibranch] = {}
         brDic[ibranch] = {}
     for ip, particle in enumerate(particles):
         if particle.pdg in smodels.particles.rEven or particle.status == -1:
             # Ignore R-even particles and initial state particles
             continue
-        ibranch = branchDic[ip]  # Get particle branch
+        ibranch = branches[ip]  # Get particle branch
         massDic[ibranch][particle.pdg] = particle.mass* GeV
         # Create empty BRs
         brDic[ibranch][particle.pdg] = [pyslha.Decay(0., 0, [], particle.pdg)]
@@ -173,7 +175,7 @@ def _getDictionariesFromEvent(event):
         if particles[particle.moms[0]].status == -1:
             # Ignore initial mothers
             continue
-        ibranch = branchDic[ip]
+        ibranch = branches[ip]
         momPdg = particles[max(particle.moms) - 1].pdg
         if momPdg in smodels.particles.rEven:
             # Ignore R-even decays
