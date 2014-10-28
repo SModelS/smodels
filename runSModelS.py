@@ -114,9 +114,11 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
 
     #decomposition
 
-    if parser.getboolean("options","doSLHAdec"):
+    if parser.getboolean("options","doSLHAdec") or parser.getboolean("options","findMissingTopos"):
 
-        #sigmacut = minimum value of cross-section for an element to be considered eligible for decomposition. Too small sigmacut leads to too large deocmposition time. 
+        #sigmacut = minimum value of cross-section for an element to be considered eligible for decomposition.
+        #Too small sigmacut leads to too large deocmposition time.
+        #sigmacut also used to find relevant missing topologies
         sigmacut = parser.getfloat("parameters","sigmacut")*fb
 
     try:
