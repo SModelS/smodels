@@ -35,6 +35,10 @@ def upperLimit(analysis, topology, masses, run=None):
     if not d:
         logger.error("%s/%s not found.", analysis, topology)
         return None
+    for entry in masses:
+        if not type(entry)==type(1*GeV):
+            logger.error("Please give input masses with unum units.")
+            return None
     if len(masses) < 2:
         logger.error("No results for single mass entry")
         return None
