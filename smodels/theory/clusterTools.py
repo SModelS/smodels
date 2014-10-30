@@ -222,8 +222,7 @@ def groupAll(elements):
 def clusterElements(elements, analysis, maxDist):
     """ Cluster the original elements according to their mass distance.
     
-    :returns: list of clusters; If keepMassInfo == True, saves the original
-              masses and their cluster value in massDict.
+    :returns: list of clusters; 
     
     """
     # Get the list of elements with good masses (with the masses replaced by
