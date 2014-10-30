@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 """
-.. module:: testAsciiGraph
-   :synopsis: Tests the ascii grapher.
-              Depends also on lheReader, lheDecomposer.
+.. module:: testLheReader
+   :synopsis: Tests the lheReader
+              Depends also on lheDecomposer.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
@@ -12,7 +12,7 @@ import unittest
 
 class LheReaderTest(unittest.TestCase):
     def testReader(self):
-        """ draw ascii graph """
+        """ test the LheReader """
         from smodels.theory import lheReader, lheDecomposer, crossSection
         from smodels.installation import installDirectory
         from smodels.tools.physicsUnits import GeV
@@ -23,7 +23,6 @@ class LheReaderTest(unittest.TestCase):
         element = lheDecomposer.elementFromEvent(event,
                                              crossSection.XSectionList())
         s=str(element)
-        print s
         assert ( s == "[[[jet,jet]],[[jet,jet]]]" )
         b0=element.branches[0]
         sb0=str(b0)
