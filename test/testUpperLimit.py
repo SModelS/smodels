@@ -19,11 +19,11 @@ class UpperLimitTest(unittest.TestCase):
 
     def testDirectDecay(self):
         ul = float(upperLimit("SUS12011","T2",[400*GeV,100*GeV])/pb)
-        self.assertEquals(ul, 0.506043016910553)
+        self.assertTrue( (ul - 0.506043016910553) < 0.00001 )
 
     def testCascadeDecay(self):
         ul = float(upperLimit("ATLAS_CONF_2013_048","T6bbWW",[500*GeV,400*GeV,100*GeV])/pb)
-        self.assertEquals(ul, 0.10152592613065325)
+        self.assertTrue ( ( ul - 0.10152592613065325) < 0.000001 )
 
     def testMissingUnits(self):
         ul = upperLimit("ATLAS_CONF_2013_048", "T6bbWW", [500, 400, 100])
