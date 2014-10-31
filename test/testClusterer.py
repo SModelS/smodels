@@ -38,8 +38,8 @@ class ClustererTest(unittest.TestCase):
         # yes, this is a very strange example :)
         newel=clusterTools.groupAll ( [e0,e1] )
         newmasses=newel.getAvgMass()
-        assert ( newmasses[0][0] -474*GeV ) < 0.1*GeV
-        assert ( newmasses[0][1] -325*GeV ) < 0.1*GeV
+        self.assertAlmostEquals ( newmasses[0][0]/GeV, 474.008385295 ) 
+        self.assertAlmostEquals ( newmasses[0][1]/GeV, 325. )
 
 if __name__ == "__main__":
     unittest.main()
