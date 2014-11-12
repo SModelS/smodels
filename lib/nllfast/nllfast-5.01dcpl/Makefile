@@ -1,14 +1,12 @@
-all: compile chmod
+PROGRAM=nllfast_33TeV
 
-tarball:
-	tar czvf nllfast33.tar.gz nllfast-5.01dcpl.f *.grid Makefile
+all: $(PROGRAM) gg.out sb.out sg.out ss.out st.out gdcpl.out sdcpl.out
 
-compile:
-	gfortran -o nllfast_33TeV nllfast-5.01dcpl-33TeV.f
-
-chmod:                                                                                
-	touch gg.out sb.out sg.out ss.out st.out gdcpl.out sdcpl.out                        
-	chmod 666 *.out
+$(PROGRAM):
+	gfortran -o $(PROGRAM) nllfast-*.f
+%.out:
+	touch $@
+	chmod 666 $@
 
 clean:
-	rm -f nllfast_33TeV
+	rm -f $(PROGRAM) *.out
