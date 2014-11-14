@@ -274,7 +274,7 @@ def main(args):
         for s in sqrtses:
             ss = s*TeV 
             xsecs = computeXSec( ss, order, args.nevents, inputFile, 
-                                 unlink=(not args.keep) )
+                                 unlink=(not args.keep), loFromSlha=args.LOfromSLHA)
             comment = "Nevts: " + str(args.nevents) + " xsec unit: fb"
             addXSecToFile(xsecs, inputFile, comment)
         sys.exit(0)
@@ -331,6 +331,11 @@ if __name__ == "__main__":
                            help="compute at the NLL level (takes precedence "
                            "over NLL, default is LO)",
                            action='store_true')
+    argparser.add_argument('-O', '--LOfromSLHA',
+                           help="use LO cross-sections from file to compute" 
+                           " the NLO or NLL cross-sections (only for -N or -n)",
+                           action='store_true')
+    
     args = argparser.parse_args()
 
     main()
