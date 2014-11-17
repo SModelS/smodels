@@ -10,6 +10,7 @@
 
 from smodels.tools.physicsUnits import fb, TeV, pb
 from smodels.theory import lheReader
+import smodels.particles
 import logging
 
 logger = logging.getLogger(__name__)
@@ -510,7 +511,7 @@ class XSectionList(object):
 
 def getXsecFromSLHAFile(slhafile, useXSecs=None):
     """
-    Obtain cross-sections from input SLHA file. 
+    Obtain cross-sections for pair production of R-odd particles from input SLHA file. 
     
     :param slhafile: SLHA input file with cross-sections
     :param useXSecs: if defined enables the user to select cross-sections to
@@ -524,7 +525,8 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None):
     lines = slha.readlines()
     xsecblock = False
     for l in lines:
-        if l.startswith("#") or len(l) < 2:
+        skipXsec = False
+        if l.startswith("#") or len(l) < 2 or not l.strip():
             continue
         if 'XSECTION' in l:
             xsecblock = True
@@ -535,6 +537,11 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None):
         if not xsecblock:
             # Ignore other entries
             continue
+        for pid in pids:
+            if not pid in smodels.particles.rOdd.keys():
+                skipXsec = True
+                logger.warning("Ignoring cross-section for "+str(pids)+" production") #Ignore production of R-Even particles                
+                break        
         csOrder = eval(l.split()[1])
         cs = eval(l.split()[6]) * fb
         wlabel = str(int(sqrtS)) + ' TeV'
@@ -555,7 +562,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None):
         xsec.value = cs
         xsec.pid = pids
         # Do not add xsecs which do not match the user required ones:
-        if useXSecs and not xsec.info in useXSecs:
+        if (useXSecs and not xsec.info in useXSecs) or skipXsec:
             continue
         else: xSecsInFile.add(xsec)
 
