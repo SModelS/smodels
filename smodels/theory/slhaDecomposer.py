@@ -124,8 +124,7 @@ def _getDictionariesFromSLHA(slhafile):
 
     rOdd = smodels.particles.rOdd.keys()
     rEven = smodels.particles.rEven.keys()
-    knownParticles = rOdd + rEven
-
+    
     # Get mass and branching ratios for all particles
     brDic = {}
     for pid in res.decays.keys():
@@ -135,9 +134,9 @@ def _getDictionariesFromSLHA(slhafile):
         brs = []
         for decay in res.decays[pid].decays:
             nEven = nOdd = 0.
-            for id in decay.ids:
-                if id in rOdd: nOdd += 1
-                elif id in rEven: nEven += 1
+            for pidd in decay.ids:
+                if pidd in rOdd: nOdd += 1
+                elif pidd in rEven: nEven += 1
             if nOdd + nEven == len(decay.ids) and nOdd == 1:
                 brs.append(decay)
             else:
