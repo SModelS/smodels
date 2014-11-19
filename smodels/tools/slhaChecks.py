@@ -89,7 +89,7 @@ class SlhaStatus(Printer):
                             self.vertexStatus, self.illegalDecays]:
             if st < 0:
                 ret = -1
-                retMes = retMes + "#" + message + ".\n"
+                retMes = retMes + "#" + message + "\n"
         if ret == 0:
             return 0, "No checks performed"
         if ret == -1:
@@ -127,35 +127,36 @@ class SlhaStatus(Printer):
                 st = -1
         if st == 1:
             missing = "No missing decay blocks"
+        missing += "\n"
         return st, missing
 
 
     def checkCtau(self, checkFlightlength):
         """
-        Check if c*tau of NLSP is larger than given maximum.
-        Report error for long lived, charged NLSP.
+        Check if c*tau of particles with pid > 50 is larger than maximum given in maxFlightlength.
+        Report error for stable or long lived charged particles.
 
         """
         if not checkFlightlength:
-            return 0, "Did not check c*tau of NLSP"
-        ct = self.getLifetime(self.findNLSP(), ctau = True)
-        qn = Qnumbers(self.findNLSP(), self.model)
-        if qn.pid == 0:
-            return -1, "NLSP pid " + str(self.lsp) + " is not known"
-        if qn.charge3 != 0 or qn.cdim != 1:
-            c = "charged"
-        else:
-            c = "neutral"
-        #if NLSP is charged it should decay prompt
-        if ct < 0:
-            if c == "neutral":
-                return 1, "Neutral NLSP is stable"
-            return -1, "Charged NLSP is stable"
-        if ct > self.maxFlightlength:
-            if c == "neutral":
-                return 1, "Neutral NLSP is long-lived, c*tau = " + str(ct*m) 
-            return -1, "Charged NLSP is long-lived, c*tau = " + str(ct*m)
-        return 1, "Prompt NLSP (%s) decay" % c
+            return 0, "Did not check c*tau of new particles"
+        st = 1
+        msg = ""
+        for particle,block in self.slha.decays.items():
+            if particle <= 50: continue
+            if particle == self.findLSP(): continue
+            ct = self.getLifetime(particle, ctau = True)
+            if ct < 0:
+                if self.visible(particle):
+                    st = -1
+                    msg += "Charged stable particle " + str(particle) + "\n"
+                else: msg += "Additional neutral stable particle " + str(particle) + "\n"
+            elif ct > self.maxFlightlength:
+                if self.visible(particle):
+                    st = -1
+                    msg += "Charged long lived particle " + str(particle) + " (c*tau = %s)" % str(ct) + "\n"
+                else: msg += "Neutral long lived particle " + str(particle) + " (c*tau = %s)" % str(ct) + "\n"
+        if not msg: "No additional stable or long lived particles found\n" 
+        return st, msg
 
 
     def findEmptyDecay(self, findEmpty):
@@ -188,8 +189,9 @@ class SlhaStatus(Printer):
         if not findIllegal:
             return 0, "Did not check for illegal decays"
         st = 1
-        badDecay = "Illegal decay for PIDs"
+        badDecay = "Illegal decay for PIDs "
         for particle, block in self.slha.decays.items():
+            if particle < 50 : continue
             if not particle in self.slha.blocks["MASS"].keys(): continue
             mMom = abs(self.slha.blocks["MASS"][particle])
             for dcy in block.decays:
@@ -199,7 +201,9 @@ class SlhaStatus(Printer):
                     if ptc in smMasses.masses: mDau += smMasses.masses[ptc]
                     elif ptc in self.slha.blocks["MASS"].keys(): mDau += abs(self.slha.blocks["MASS"][ptc])
                     else: return -2, "Unknown PID %s in decay of %s" %(str(ptc),str(particle)) # FIXME unknown pid, what to do??
-                if mDau > mMom: st = -1; badDecay += str(particle)+ " "; print(mDau,mMom,particle,dcy.ids)
+                if mDau > mMom:
+                    st = -1
+                    if not str(particle) in badDecay: badDecay += str(particle)+ " "
         if st == 1:
             badDecay = "No illegal decay blocks"
         return st, badDecay
@@ -228,10 +232,10 @@ class SlhaStatus(Printer):
             return 0, "Did not check for charged lsp"
         qn = Qnumbers(self.lsp, self.model)
         if qn.pid == 0:
-            return -1, "lsp pid " + str(self.lsp) + " is not known"
+            return -1, "lsp pid " + str(self.lsp) + " is not known\n"
         if qn.charge3 != 0 or qn.cdim != 1:
             return -1, "lsp has 3*electrical charge = " + str(qn.charge3) + \
-                       " and color dimension = " + str(qn.cdim)
+                       " and color dimension = " + str(qn.cdim) + "\n"
         return 1, "lsp is neutral"
 
 
@@ -245,7 +249,7 @@ class SlhaStatus(Printer):
         pid = 0
         minmass = None
         for particle, mass in self.slha.blocks["MASS"].items():
-            if particle <= 50:
+            if particle <= 50 or 3000054<=particle<=3000056:
                 continue
             mass = abs(mass)
             if minmass == None:
@@ -311,7 +315,7 @@ class SlhaStatus(Printer):
         minmass = None
         for particle, mass in self.slha.blocks["MASS"].items():
             mass = abs(mass)
-            if particle == lsp or particle <= 50:
+            if particle == lsp or particle <= 50 or 3000054<=particle<=3000056:
                 continue
             if minmass == None:
                 pid, minmass = particle, mass
@@ -357,18 +361,18 @@ class SlhaStatus(Printer):
 
     def findDisplacedVertices(self, findDisplaced):
         """
-        find meta-stable particles that decay via leptons or higgs
+        find meta-stable particles that decay to visible particles
         """
         if not findDisplaced:
             return 0, "Did not check for displaced vertices"
 
-        particlelist = [1, 2, 3, 4, 5, 6, 11, 13, 15, 25, 35, 36, 37]
         ok = 1
         msg = "Found displaced vertices:\n"
         for particle,block in self.slha.decays.items():
             if particle <= 50: continue
             if particle == self.findLSP(): continue
-            if self.slha.blocks["MASS"][particle] - self.slha.blocks["MASS"][self.findLSP()] < self.massgap: continue
+            #FIXME disabled check for mass splitting, should this be tested?
+            #if self.slha.blocks["MASS"][particle] - self.slha.blocks["MASS"][self.findLSP()] < self.massgap: continue
             lt = self.getLifetime(particle, ctau=True)
             if lt<self.maxDisplacement: continue
             pcs = 0.
@@ -377,7 +381,7 @@ class SlhaStatus(Printer):
             daughters = []
             for decay in block.decays:
                 for pid in decay.ids:
-                    if abs(pid) in particlelist:
+                    if self.visible(abs(pid), decay=True):
                         if not pcs: pcs = self.getXSEC(particle)
                         brvalue += decay.br
                         daughters.append(decay.ids)
@@ -387,7 +391,7 @@ class SlhaStatus(Printer):
                 elif lt < 3.: msg = msg + "#Metastable particle: "
                 else: msg = msg + "#Longlived particle decay: "
                 ok = -1
-                msg = msg + "%s is decaying to %s\n" %(particle, str(daughters))
+                msg = msg + "%s (c*tau = %s) is decaying to %s\n" %(particle,str(lt), str(daughters))
         if ok == 1: msg = "no displaced vertices found"
         return ok, msg
 
@@ -431,6 +435,25 @@ class SlhaStatus(Printer):
                 return True
         return None
 
+    def visible(self, pid, decay=None):
+        """
+        Check if pid is detectable
+        If pid is not known, consider it as visible
+        If pid not SM particle and decay = True, check if particle or decay products are visible
+        """
+        if pid in smMasses.visible: return True
+        if pid in smMasses.invisible: return False
+        qn = Qnumbers(pid, self.model)
+        if qn.pid == 0:
+            return True
+        if qn.charge3 != 0 or qn.cdim != 1:
+            return True
+        if decay:
+            for decay in self.slha.decays[pid].decays:
+                for pids in decay.ids:
+                    if self.visible(pids, decay=True): return True
+        return False
+
 
 class Qnumbers:
     """
@@ -451,6 +474,7 @@ class Qnumbers:
             self.spin2 = self.l[0]
             self.charge3 = self.l[1]
             self.cdim = self.l[2]
+  
 
 
 if __name__ == "__main__":
@@ -482,7 +506,7 @@ if __name__ == "__main__":
                            help = 'give maximum displacement of secondary vertex in m',
                            default = .001)
     argparser.add_argument('-sigmacut','--sigmacut',
-                           help = 'give sigmacut in fb', #FIXME is that true? of pb?
+                           help = 'give sigmacut in fb', #FIXME is that true? or pb?
                            default = .01)
     argparser.add_argument('-fD', '--displaced',
                            help = 'find displaced vertices',
