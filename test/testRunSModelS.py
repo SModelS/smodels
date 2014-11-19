@@ -16,7 +16,7 @@ from runSModelS import main
 class RunSModelSTest(unittest.TestCase):
     def testGoodFile(self):
 
-        filename = "%s/inputFiles/slha/T1_7TeV.slha" % (installDirectory() )
+        filename = "%s/inputFiles/slha/strong.slha" % (installDirectory() )
         print "filename=",filename
         main(filename, 
              parameterfile="%s/test/testParameters.ini" %installDirectory(), 
