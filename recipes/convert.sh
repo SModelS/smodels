@@ -1,6 +1,6 @@
 #!/bin/sh
 
-for i in `ls recipe*.ipynb`; do
+for i in `ls *.ipynb`; do
 	echo 
 	echo
 	echo $i;
