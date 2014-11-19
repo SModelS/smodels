@@ -79,10 +79,10 @@ def compile():
 compile()
 setup(
     name = "smodels",
-    version = "1.0",
+    version = "0.99",
     author = ("Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, "
               "Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, "
-              "Jory Sonneveld, Michael Traub, Wolfgang Waltenberger"),
+              "Michael Traub, Wolfgang Waltenberger"),
     author_email = "smodels-developers@lists.oeaw.ac.at ",
     scripts = [ "bin/smodels-config", "runSModelS.py" ],
     install_requires = [ 'docutils>=0.3', 'numpy', 'scipy>=0.9.0', \
