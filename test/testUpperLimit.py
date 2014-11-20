@@ -13,7 +13,8 @@ from smodels.experiment.smsInterpolation import upperLimit
 from smodels.experiment import smsHelpers
 from smodels.installation import installDirectory
 
-smsHelpers.base = installDirectory() + 'test/database/'
+## smsHelpers.base = installDirectory() + 'test/database/'
+smsHelpers.base =  './database/'
 
 class UpperLimitTest(unittest.TestCase):
 
@@ -27,7 +28,7 @@ class UpperLimitTest(unittest.TestCase):
 
     def testMissingUnits(self):
         ul = upperLimit("ATLAS_CONF_2013_048", "T6bbWW", [500, 400, 100])
-        self.assertIsNone(ul)
+        self.assertTrue(ul==None)
 
 if __name__ == "__main__":
     unittest.main()
