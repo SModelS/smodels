@@ -96,6 +96,7 @@ def _doGridData(analysis, topology, masses, dPar, run=None):
     """
     masslist = []
     ullist = []
+    cter = 0
 
     for ds in dPar:
         if not ds['mz']:
@@ -118,6 +119,8 @@ def _doGridData(analysis, topology, masses, dPar, run=None):
                                                     _getHistName(topology,
                                                                  ds['mz'][0]),
                                                     run)
+        if not ulDict: continue
+        cter += 1
         for x in ulDict:
             for y in ulDict[x]:
 
@@ -149,8 +152,12 @@ def _doGridData(analysis, topology, masses, dPar, run=None):
                 masslist.append(massv)
                 ullist.append(ulDict[x][y])
 
-    if not masslist or not ullist:
+    if cter==0:
         logger.warning("Could not find results for %s/%s", analysis, topology)
+        return None
+
+    if cter==1:
+        logger.error("Only one histogram available for %s/%s, cannot interpolate for intermediate mass.", analysis, topology)
         return None
 
     p = np.array(masslist)
