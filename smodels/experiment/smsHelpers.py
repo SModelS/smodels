@@ -16,7 +16,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-base = "/afs/hephy.at/user/w/walten/public/sms/"
+base = "/database/path/not/set"
 runs = ["8TeV", "2012", "ATLAS8TeV", "2011", "RPV8", "RPV7"]
 runs_ = {}
 mlines = {}
