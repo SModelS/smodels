@@ -1,0 +1,8 @@
+## on slc6 machines we had to install the following packages
+
+yum install gcc-c++ libstdc++-devel libevent-devel python-devel lapack lapack-devel blas blas-devel libgfortran python-distutils-extra
+
+## then in the system or in a virtualenv we installed the following:
+
+export LC_ALL=C; export LANG=C; pip install --upgrade nose scipy numpy unum argparse pymc setuptools
+
