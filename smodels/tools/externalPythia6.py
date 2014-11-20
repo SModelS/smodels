@@ -281,7 +281,7 @@ class ExternalPythia6(ExternalTool):
             logger.error("%s is not executable", self.executable)
             self.chmod()
             return False
-        slhaFile = "/inputFiles/slha/andrePT4.slha"
+        slhaFile = "/inputFiles/slha/lightSquarks.slha"
         slhaPath = installation.installDirectory() + slhaFile
         try:
             output = self.run(slhaPath, "<install>/etc/pythia_test.card",

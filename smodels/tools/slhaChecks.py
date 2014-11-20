@@ -376,8 +376,7 @@ class SlhaStatus(Printer):
             lt = self.getLifetime(particle, ctau=True)
             if lt<self.maxDisplacement: continue
             pcs = 0.
-            brvalue = 0.
-            old = 0.
+            brvalue = 0.            
             daughters = []
             for decay in block.decays:
                 for pid in decay.ids:

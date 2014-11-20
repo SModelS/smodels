@@ -41,11 +41,15 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
     #slhastat == -2  formal problems in the file, e.g. missing decay blocks
     #slhastat == -3 missing input file
 
-    if parser.getboolean("options","doSLHAdec"):
+    inputType = parser.get("options","inputType").lower()
+    if inputType == 'slha':
         inputStatus = slhaChecks.SlhaStatus(inputFile, sigmacut = parser.getfloat("parameters","sigmacut"), checkXsec = not parser.getboolean("options","addMissingXsecs"), massgap = parser.getfloat("parameters","minmassgap"), maxcond = parser.getfloat("parameters","maxcond"))
-    else:
+    elif inputType == 'lhe':
         #for input lhe, check if file exists and has correct format
         inputStatus = ioObjects.LheStatus(inputFile, massgap=parser.getfloat("parameters","minmassgap"), maxcond=parser.getfloat("parameters","maxcond"))
+    else:
+        log.error("Unknown input type (must be SLHA or LHE): %s" % inputType)
+        sys.exit()
 
     inStat, warnings = inputStatus.status
 
@@ -84,24 +88,24 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
     #if addMissingXsecs is set True, SModelS calculates LO cross sections
     #production processes not yet covered in the input file are added
     #else, if the input slha does not contain cross sections, SModelS will add LO cross sections
-    if parser.getboolean("options","doSLHAdec") and (parser.getboolean("options","addMissingXsecs") or inputStatus.xsec[0]==-1):
+    if inputType == 'slha' and (parser.getboolean("options","addMissingXsecs") or inputStatus.xsec[0]==-1):
         xsecs = xsecComputer.computeXSec(sqrts, 0, parser.getint("options","nevts"), inputFile)
         comment = "Nevts: " + parser.get("options","nevts")
         xsecComputer.addXSecToFile(xsecs, inputFile, comment)
 
     #option of adding NLO and NLL cross sections from nllFast
     #using LO cross sections written in the input slha file
-    if parser.getboolean("options","doSLHAdec") and parser.getboolean("options","addnlo"):
+    if inputType == 'slha' and parser.getboolean("options","addnlo"):
         #read LO from input file, compute NLO
         xsecs_nlo = xsecComputer.computeXSec(sqrts, 1, parser.getint("options","nevts"), inputFile, loFromSlha=True)
         if xsecs_nlo: xsecComputer.addXSecToFile(xsecs_nlo, inputFile) #FIXME comment! (to be printed to slha file)
 
-    if parser.getboolean("options","doSLHAdec") and parser.getboolean("options","addnll"):
+    if inputType == 'slha' and parser.getboolean("options","addnll"):
         xsecs_nll = xsecComputer.computeXSec(sqrts, 2, parser.getint("options","nevts"), inputFile, loFromSlha=True)
         if xsecs_nll: xsecComputer.addXSecToFile(xsecs_nll, inputFile) #FIXME comment!
 
     #after cross section computation, re-evaluate slha file for displaced vertices of high cross section
-    if parser.getboolean("options","doSLHAdec"):
+    if inputType == 'slha':
         s, m = inputStatus.reEvaluateDisplaced()
         if s == -1:
             outputStatus.addWarning(m)
@@ -114,14 +118,14 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
 
     #decomposition
 
-    if parser.getboolean("options","doSLHAdec"):
+    if inputType == 'slha':
         #sigmacut = minimum value of cross-section for an element to be considered eligible for decomposition.
         #Too small sigmacut leads to too large decomposition time.
         sigmacut = parser.getfloat("parameters","sigmacut")*fb
 
     try:
         # Decompose input SLHA file, store the output elements in smstoplist
-        if parser.getboolean("options","doSLHAdec"):
+        if inputType == 'slha':
             smstoplist = slhaDecomposer.decompose(inputFile, sigmacut, doCompress=parser.getboolean("options","doCompress"),
                          doInvisible=parser.getboolean("options","doInvisible"), minmassgap=parser.getfloat("parameters","minmassgap")*GeV)
         else:
