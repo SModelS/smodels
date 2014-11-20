@@ -16,6 +16,9 @@
    HOW TO ADD NEW PARTICLES: simply add a new entry in rOdd (rEven) if the
    particle is Z2-odd (Z2-even). For now all decays of Z2-even particles are
    ignored. Z2-odd particles are decayed assuming Z2 convervation.
+   
+   If you want to use slhaChecks to verify your input file (in the case of SLHA input
+   only), also include the quantum numbers of the new particles in the qNumbers dictionary below.
 
 """
 
@@ -246,3 +249,39 @@ ptcDic = {"e"  : ["e+",  "e-"],
           "L+" : ["e+",  "mu+", "ta+"],
           "L-" : ["e-",  "mu-", "ta-"],
           "L"  : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-"]}
+
+#Quantum numbers for the new particles. Just used by tools.slhaChecks
+#PDG: (spin*2, electrical charge*3, color dimension)
+qNumbers={
+ 35:[0,0,1],
+ 36:[0,0,1],
+ 37:[0,3,1],
+ 1000024:[1,3,1],
+ 1000037:[1,3,1],
+ 1000022:[1,0,1],
+ 1000023:[1,0,1],
+ 1000025:[1,0,1],
+ 1000035:[1,0,1],
+ 1000021:[1,0,8],
+ 1000011:[0,-3,1],
+ 2000011:[0,-3,1],
+ 1000013:[0,-3,1],
+ 2000013:[0,-3,1],
+ 1000015:[0,-3,1],
+ 2000015:[0,-3,1],
+ 1000012:[0,0,1],
+ 1000014:[0,0,1],
+ 1000016:[0,0,1],
+ 1000002:[0,2,3],
+ 2000002:[0,2,3],
+ 1000001:[0,-1,3],
+ 2000001:[0,-1,3],
+ 1000004:[0,2,3],
+ 2000004:[0,2,3],
+ 1000003:[0,-1,3],
+ 2000003:[0,-1,3],
+ 1000006:[0,2,3],
+ 2000006:[0,2,3],
+ 1000005:[0,-1,3],
+ 2000005:[0,-1,3],
+}
