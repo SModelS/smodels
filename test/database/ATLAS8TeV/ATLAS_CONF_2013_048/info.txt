@@ -1,13 +1,7 @@
 sqrts: 8.00
 lumi: 20.30
-contact: ?
 pas: ATLAS-CONF-2013-048
-prettyname: ATLAS dileptonic stop
 url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-048/
-checked: 
-publisheddata: True
-private: 0
-dictionary: 1
 condition: T2bbWW -> None
 condition: T6bbWW -> None
 fuzzycondition: T2bbWW -> None
