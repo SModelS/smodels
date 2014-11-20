@@ -1,32 +1,8 @@
 sqrts: 7.00
 lumi: 4.70
-exclusions: T2tt 300 364 384
-exclusions: T1tttt 662 861
-exclusions: T2 587 839
-exclusions: T1 712 1062
-expectedexclusions: T2tt 341 364
-expectedexclusions: T1tttt 663 836
-expectedexclusions: T2 621 890
-expectedexclusions: T1 737 1112
-exclusionsp1: T2tt 386 403
-exclusionsp1: T1tttt 687 887
-exclusionsp1: T2 612 887
-exclusionsp1: T1 735 1110
-exclusionsm1: T1tttt 662 787
-exclusionsm1: T2 360 362
-exclusionsm1: T1 712 985
-contact: Maurizio Pierini <Maurizio.Pierini@cern.ch>, Christopher Rogan <crogan@cern.ch>
 pas: SUS-12-005 SUS-11-024
 url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS12005
-requires: none
-publisheddata: True
-private: 0
-order: nll
-figures: T2tt: https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS12005/sigma_combined_limit_T2tt_incl.jpg T1tttt: https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS12005/sigma_combined_limit_T1tttt_incl.jpg, T2: https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS12005/sigma_combined_limit_T2.jpg, T1: https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS12005/sigma_combined_limit_T1.jpg
 condition: T2 -> None
 fuzzycondition: T2 -> None
 constraint: T2 -> [[['jet']],[['jet']]]
-category: T2tt -> thirdgen
-category: T1tttt -> hadronic
 category: T2 -> hadronic
-category: T1 -> hadronic
