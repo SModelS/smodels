@@ -149,6 +149,10 @@ def _doGridData(analysis, topology, masses, dPar, run=None):
                 masslist.append(massv)
                 ullist.append(ulDict[x][y])
 
+    if not masslist or not ullist:
+        logger.warning("Could not find results for %s/%s", analysis, topology)
+        return None
+
     p = np.array(masslist)
     v = np.array(ullist)
 
