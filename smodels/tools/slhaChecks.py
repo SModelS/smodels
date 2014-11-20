@@ -26,7 +26,7 @@ class SlhaStatus(Printer):
     and -2 in case of formal problems, e.g. missing decay blocks, in the file
     The parameter maxFlightlength is specified in meters. 
     """
-    def __init__(self, filename, maxFlightlength=3., maxDisplacement=.1, sigmacut=.01,
+    def __init__(self, filename, maxFlightlength=1., maxDisplacement=.01, sigmacut=.01,
                  findMissingDecays=True, findIllegalDecays=False, findDisplaced=True,
                  massgap=5., maxcond=.2, findEmptyDecays=True, checkXsec=True,
                  checkLSP=True, checkFlightlength=True, model="MSSM"):
@@ -388,8 +388,7 @@ class SlhaStatus(Printer):
                         break
             if pcs*brvalue*brvalue > self.sigmacut:
                 if lt < 1.: msg = msg + "#Displaced vertex: "
-                elif lt < 3.: msg = msg + "#Metastable particle: "
-                else: msg = msg + "#Longlived particle decay: "
+                else: msg = msg + "#Longlived particle: "
                 ok = -1
                 msg = msg + "%s (c*tau = %s) is decaying to %s\n" %(particle,str(lt), str(daughters))
         if ok == 1: msg = "no displaced vertices found"
