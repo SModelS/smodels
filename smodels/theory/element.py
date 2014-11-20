@@ -443,11 +443,13 @@ class Element(Printer):
         else:
             return newelement
 
-    def formatData(self):
+    def formatData(self,outputLevel):
         """
         Select data preparation method through dynamic binding.
+        :param outputLevel: general control for the output depth to be printed 
+                            (0 = no output, 1 = basic output, 2 = detailed output,...
         """
-        return Printer.formatElementData(self)
+        return Printer.formatElementData(self,outputLevel)
 
 
 def _smallerMass(mass1, mass2):

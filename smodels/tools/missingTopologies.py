@@ -27,8 +27,8 @@ class MissingTopoList(Printer):
         self.sqrts = sqrts
         self.topos = []
 
-    def formatData(self):
-        return self.formatMissingData()
+    def formatData(self,outputLevel):
+        return self.formatMissingData(outputLevel)
 
     def addToTopos(self, el):
         name = self.orderbranches(self.generalName(el.__str__()))

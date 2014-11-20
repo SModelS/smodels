@@ -26,29 +26,36 @@ class Printer(object):
         self.output = None
 
 
-    def printout(self, target="stdout", filename=""):
+    def printout(self, target="stdout", filename="", outputLevel=1):
         """
         Print the content of the data structure to the target.
 
         :param target: The target to print to. Possible values: stdout, file.
                        Default: stdout.
         :param filename: Filename to which the output is written
+        :param outputLevel: general control for the output depth to be printed 
+                            (0 = no output, 1 = basic output, 2 = detailed output,...)
         :returns: None
         
         """
         # Branch, Element, Topology, TopologyList, Analysis, AnalysisList,
         # Cluster
-        self.output = self.formatData()
+        if outputLevel:
+            self.output = self.formatData(outputLevel)
 
-        if target == "stdout":
-            print(self.output)
-        elif target == "file":
-            if not filename: return #FIXME need error message here!
-            f = open(filename,"a")
-            f.write(self.output)
+            if target == "stdout":
+                print(self.output)
+            elif target == "file":
+                if not filename:
+                    logger.error("Output filename not defined")
+                    return
+                f = open(filename,"a")
+                f.write(self.output)
+            elif target == "string":
+                return self.output
 
 
-    def formatData(self):
+    def formatData(self,outputLevel):
         """
         Format data of the derived object.
         
@@ -61,11 +68,16 @@ class Printer(object):
         raise NotImplementedError
 
 
-    def formatTopologyListData(self):
+    def formatTopologyListData(self,outputLevel):
         """
-        Format data of to print Global topologies object.
+        Format data of to print Global topologies object.        
+        :param outputLevel: general control for the output depth to be printed 
+                            (0 = no output, 1 = basic output, 2 = detailed output,...)
+        
         """
-        import sys
+                
+        if not outputLevel: return None
+        
         old_vertices = ""
         output = ""
         output += "   ======================================================= \n"
@@ -73,47 +85,69 @@ class Printer(object):
         output += " || \t \t Global topologies table \t \t ||\n"
         output += " || \t \t\t\t\t\t\t || \n"
         output += "   ======================================================= \n"
-        for (i,topo) in enumerate(self):
+        for topo in self:
             if old_vertices == str(topo.vertnumb):
                 output += "\t .................................................. \n"
             else:
-                output += "===================================================== \n"    
+                output += "===================================================== \n"
+                output += "Topology:\n"  
                 output += "Number of vertices: " + str(topo.vertnumb) + ' \n'
                 old_vertices = str(topo.vertnumb)
-            output += "\t Number of vertex parts: " + str(topo.vertparts) + '\n'
+            output += "Number of vertex parts: " + str(topo.vertparts) + '\n'
             totxsec = crossSection.XSectionList()
             for el in topo.elementList:
                 totxsec.combineWith(el.weight)
-            output += "\t Total Global topology weight:\n" 
+            output += "Total Global topology weight:\n" 
             for k in totxsec.getDictionary():
                 pos=k.find(" " )
                 sqrts=str( float(k[:pos]) * TeV) 
-                output += "\t Sqrts: " + sqrts + "\t Weight: " + str(totxsec.getDictionary()[k]) + "\n"
-        return output
-
-    def formatElementData(self):
-        """
-            Format data of to print an element object.
-        """
-        output = ""
-        output += "\t Particles in topology: " + str(self.getParticles())
-        output += "\n"
-        output += "\t The element masses are \n"
-        for i, el in enumerate(self.getMasses()):
-            output += "\t Branch %i: " %i+ str(el) + "\n"
-        output += "\t The element weights are: \n"
-        for k in self.weight.getDictionary():
-            pos=k.find(" " )
-            sqrts=str( float(k[:pos]) * TeV) 
-            output += "\t Sqrts: " + sqrts + "\t Weight: " + str(self.weight.getDictionary()[k]) + "\n"
+                output += "Sqrts: " + sqrts + "\t Weight: " + str(totxsec.getDictionary()[k]) + "\n"
+            output += "Total Number of Elements: " + str(len(topo.elementList)) + '\n' 
+            if outputLevel == 2:                
+                for el in topo.elementList:
+                    output += "\t\t .........................................................................\n"
+                    output += "\t\t Element: \n"
+                    output += el.printout(target="string") + "\n"
 
         return output
     
-    def formatTheoryPredictionData(self):
+    
+    
+    # This is my porposed format for element tabel
+    
+    def formatElementData(self,outputLevel):
+        """
+            Format data of to print an element object.
+            :param outputLevel: general control for the output depth to be printed 
+                            (0 = no output, 1 = basic output, 2 = detailed output,...)
+        """
+        
+        if not outputLevel: return None
+        
+        output = ""
+        output += "\t\t Particles in element: " + str(self.getParticles())
+        output += "\n"
+        output += "\t\t The element masses are \n"
+        for i, el in enumerate(self.getMasses()):
+            output += "\t\t Branch %i: " %i+ str(el) + "\n"
+        output += "\t\t The element weights are: \n"
+        for k in self.weight.getDictionary():
+            pos=k.find(" " )
+            sqrts=str( float(k[:pos]) * TeV) 
+            output += "\t\t Sqrts: " + sqrts + "\t Weight: " + str(self.weight.getDictionary()[k]) + "\n"
+
+        return output
+    
+    def formatTheoryPredictionData(self,outputLevel):
         """
         Format data of a TheoryPrediction object.
+        :param outputLevel: general control for the output depth to be printed 
+                            (0 = no output, 1 = basic output, 2 = detailed output,...)
         
         """
+        
+        if not outputLevel: return None
+        
         output = ""
 
         for theoryPrediction in self:
@@ -139,10 +173,15 @@ class Printer(object):
 
         return output
 
-    def formatStatusData(self):
+    def formatStatusData(self,outputLevel):
         """
         Format data of the output status object.
+        :param outputLevel: general control for the output depth to be printed 
+                            (0 = no output, 1 = basic output, 2 = detailed output,...)
         """
+        
+        if not outputLevel: return None
+        
         output = ""
 
         output += "Input status: " + str(self.slhastatus) + "\n"
@@ -153,10 +192,15 @@ class Printer(object):
 
         return output
 
-    def formatResultsData(self):
+    def formatResultsData(self,outputLevel):
         """
         Format data of the final output object.
+        :param outputLevel: general control for the output depth to be printed 
+                            (0 = no output, 1 = basic output, 2 = detailed output,...)
         """
+        
+        if not outputLevel: return None
+        
         output = ""
 
         bestresult = self.getBestResult()
@@ -181,10 +225,15 @@ class Printer(object):
 
         return output
 
-    def formatSLHAData(self):
+    def formatSLHAData(self,outputLevel):
         """
         Format data of the slha checks output object.
+        :param outputLevel: general control for the output depth to be printed 
+                            (0 = no output, 1 = basic output, 2 = detailed output,...)
         """
+        
+        if not outputLevel: return None
+        
         output = ""
 
         output += "Input file: " + self.filename + "\n"
@@ -199,10 +248,15 @@ class Printer(object):
 
         return output
 
-    def formatLHEData(self):
+    def formatLHEData(self,outputLevel):
         """
         Format data of lhe status, analog to slha status.
+        :param outputLevel: general control for the output depth to be printed 
+                            (0 = no output, 1 = basic output, 2 = detailed output,...)
         """
+        
+        if not outputLevel: return None
+        
         output = ""
 
         output += "Input file: " + self.filename + "\n"
@@ -212,10 +266,14 @@ class Printer(object):
 
         return output
 
-    def formatMissingData(self):
+    def formatMissingData(self,outputLevel):
         """
         Format data of missing topology list.
+        :param outputLevel: general control for the output depth to be printed 
+                            (0 = no output, 1 = basic output, 2 = detailed output,...)
         """
+        
+        if not outputLevel: return None
 
         nprint = 10 #Number of missing topologies to be printed (ordered by cross-sections)
         

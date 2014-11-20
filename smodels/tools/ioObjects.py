@@ -46,11 +46,13 @@ class ResultList(Printer):
         #check if outputarray is empty
         return len(self.outputarray)==0
 
-    def formatData(self):
+    def formatData(self,outputLevel):
         """
         to access printout format
+        :param outputLevel: general control for the output depth to be printed 
+                            (0 = no output, 1 = basic output, 2 = detailed output,...
         """
-        return self.formatResultsData()
+        return self.formatResultsData(outputLevel)
 
 class OutputStatus(Printer):
     """
@@ -88,11 +90,13 @@ class OutputStatus(Printer):
         self.warnings += warning
         return
 
-    def formatData(self):
+    def formatData(self,outputLevel):
         """
         to access printout format
+        :param outputLevel: general control for the output depth to be printed 
+                            (0 = no output, 1 = basic output, 2 = detailed output,...
         """
-        return self.formatStatusData()
+        return self.formatStatusData(outputLevel)
 
 
 class LheStatus(Printer):
@@ -107,8 +111,8 @@ class LheStatus(Printer):
         self.maxcond = maxcond
         self.status = self.evaluateStatus()
 
-    def formatData(self):
-        return self.formatLHEData()
+    def formatData(self,outputLevel):
+        return self.formatLHEData(outputLevel)
 
     def evaluateStatus(self):
         if not os.path.exists(self.filename):
