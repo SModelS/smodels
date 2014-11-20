@@ -288,28 +288,3 @@ class Printer(object):
         for topo in sorted(self.topos, key=lambda x: x.value, reverse=True)[:nprint]:
             output += "%5s %10.3E    # %45s\n" % (str(self.sqrts / TeV), topo.value, str(topo.topo))
         return output
-
-
-    '''def formatElementList(self):
-        output = ""
-        for (i,topo) in enumerate(self):
-            output += '\n'
-            output += "====================================================================="
-            output += "====================================================================="
-            output += "A new global topoloy starts here" 
-            output += "====================================================================="
-            output += "====================================================================="
-            for j, el in enumerate(topo.elementList):
-                output += "........................................................................."
-                output += "........................................................................."
-                output += '\n'
-                output += "Particles in topology:", el.getParticles()
-                output += '\n'
-                output += 'The element masses are'
-                for item in range(len(el.getMasses())):
-                    output += "Masses branch %i:" %item, el.getMasses()[item]
-                output += "\n"
-                output += "The element weights are:"
-                for k in el.weight.getDictionary():
-                    output += "Sqrts:", k, "\t Weights:", el.weight.getDictionary()[k]
-        return output'''
