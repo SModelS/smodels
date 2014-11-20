@@ -42,7 +42,7 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
     #slhastat == -3 missing input file
 
     if parser.getboolean("options","doSLHAdec"):
-        inputStatus = slhaChecks.SlhaStatus(inputFile, sigmacut = parser.getfloat("parameters","sigmacut"), maxDisplacement = .001, checkXsec = not parser.getboolean("options","addMissingXsecs"), massgap = parser.getfloat("parameters","minmassgap"), maxcond = parser.getfloat("parameters","maxcond"))
+        inputStatus = slhaChecks.SlhaStatus(inputFile, sigmacut = parser.getfloat("parameters","sigmacut"), checkXsec = not parser.getboolean("options","addMissingXsecs"), massgap = parser.getfloat("parameters","minmassgap"), maxcond = parser.getfloat("parameters","maxcond"))
     else:
         #for input lhe, check if file exists and has correct format
         inputStatus = ioObjects.LheStatus(inputFile, massgap=parser.getfloat("parameters","minmassgap"), maxcond=parser.getfloat("parameters","maxcond"))
