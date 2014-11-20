@@ -51,8 +51,9 @@ class SlhaStatus(Printer):
         self.status = self.evaluateStatus()
     
     
-    def formatData(self):
-        return self.formatSLHAData()
+    def formatData(self,outputLevel):
+        
+        return self.formatSLHAData(outputLevel)
 
 
     def read(self):

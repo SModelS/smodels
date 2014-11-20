@@ -143,24 +143,12 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
         outputStatus.printout("file", outputfile)
         inputStatus.printout("file", outputfile)
         sys.exit()
-
-    if parser.getboolean("stdout","printGtop"):
-        smstoplist.printout()
-
-    # This is my porposed format for element tabel
-    if parser.getboolean("stdout","printThEl"):
-        for (i,topo) in enumerate(smstoplist):
-            print '\n'
-            print "A new global topoloy starts here" 
-            print "====================================================================="
-            for j, el in enumerate(topo.elementList):
-                print "\t ........................................................................."
-                el.printout()
-        print "====================================================================="
-        print "====================================================================="
-        print "The list ends here" 
-        print "====================================================================="
-        print "====================================================================="
+    
+    outLevel= 0
+    if parser.getboolean("stdout","printDecomp"):
+        outLevel = 1
+        outLevel += parser.getboolean("stdout","addElmentInfo")
+    smstoplist.printout(outputLevel=outLevel)
 
     analyses = parser.get("data","analyses")
     #in case that a list of analyses is given, retrieve list
@@ -176,7 +164,6 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
     #variables set to define printing options
     results = ioObjects.ResultList(bestresultonly = not parser.getboolean("file","expandedSummary"), describeTopo = parser.getboolean("file","describeTopo"))
 
-    constrainedElements = []
 
     if parser.getboolean("stdout","printAnaEl"):
         for analysis in listofanalyses:
@@ -188,7 +175,6 @@ def main(filename, parameterfile=None, outputfile="summary.txt"):
             print "Analysis Topology:", analysis.label.split(":")[1]
             print "Analysis Sqrts:", analysis.sqrts
             print "========================================================"
-            ref_el = None
             for el in elements:
                 el.printout()
                 print "........................................................"
