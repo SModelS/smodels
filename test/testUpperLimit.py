@@ -13,7 +13,7 @@ from smodels.experiment.smsInterpolation import upperLimit
 from smodels.experiment import smsHelpers
 from smodels.installation import installDirectory
 
-smsHelpers.base = installDirectory() + 'validation/database/'
+smsHelpers.base = installDirectory() + 'test/database/'
 
 class UpperLimitTest(unittest.TestCase):
 
