@@ -29,9 +29,8 @@ class SlhaStatus(Printer):
     def __init__(self, filename, maxFlightlength=1., maxDisplacement=.01, sigmacut=.01,
                  findMissingDecays=True, findIllegalDecays=False, findDisplaced=True,
                  massgap=5., maxcond=.2, findEmptyDecays=True, checkXsec=True,
-                 checkLSP=True, checkFlightlength=True, model="MSSM"):
+                 checkLSP=True, checkFlightlength=True):
         self.filename = filename
-        self.model = model
         self.maxFlightlength = maxFlightlength
         self.maxDisplacement = maxDisplacement
         self.sigmacut = sigmacut
@@ -230,7 +229,7 @@ class SlhaStatus(Printer):
         """
         if not checkLSP:
             return 0, "Did not check for charged lsp"
-        qn = Qnumbers(self.lsp, self.model)
+        qn = Qnumbers(self.lsp)
         if qn.pid == 0:
             return -1, "lsp pid " + str(self.lsp) + " is not known\n"
         if qn.charge3 != 0 or qn.cdim != 1:
@@ -441,7 +440,7 @@ class SlhaStatus(Printer):
         """
         if pid in smMasses.visible: return True
         if pid in smMasses.invisible: return False
-        qn = Qnumbers(pid, self.model)
+        qn = Qnumbers(pid)
         if qn.pid == 0:
             return True
         if qn.charge3 != 0 or qn.cdim != 1:
@@ -457,14 +456,12 @@ class Qnumbers:
     """
     An instance of this class represents quantum numbers.
     
-    Get quantum numbers (spin*2, electrical charge*3, color dimension) from "model"_qNumbers.
+    Get quantum numbers (spin*2, electrical charge*3, color dimension) from qNumbers.
     
     """
-    def __init__(self, pid, model="MSSM"):
-        #exec("from tools.%s_qNumbers import qNumbers" %model)
-        from smodels.tools.mssmQNumbers import qNumbers
+    def __init__(self, pid):
+        from smodels.particles import qNumbers
         self.pid = pid
-        self.model = model
         if not pid in qNumbers.keys():
             self.pid = 0
         else:
@@ -497,9 +494,6 @@ if __name__ == "__main__":
     argparser.add_argument('-ctau', '--ctau',
                            help = 'check if nlsp has prompt decay',
                            action = 'store_false')
-    argparser.add_argument('-m', '--model',
-                           help = 'give input model, e.g. MSSM',
-                           default = 'MSSM')
     argparser.add_argument('-maxDisp', '--displacement',
                            help = 'give maximum displacement of secondary vertex in m',
                            default = .001)
@@ -516,5 +510,5 @@ if __name__ == "__main__":
     status = SlhaStatus(args.filename, args.flightlength, args.displacement,
                         args.sigmacut, args.decays, args.displaced,
                         args.massgap, args.empty, args.xsec, args.lsp,
-                        args.ctau, args.model) # pylint: disable-msg=C0103
+                        args.ctau) # pylint: disable-msg=C0103
     print(status.status)
