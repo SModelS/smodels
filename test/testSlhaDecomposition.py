@@ -20,7 +20,7 @@ class SlhaDecompositionTest(unittest.TestCase):
     def test(self):
         self.logger.info ( "test decomposition, no compression" )
         """ test the decomposition with no compression """
-        slhafile="../inputFiles/slha/andrePT4.slha"
+        slhafile="../oldFiles/andrePT4.slha"
         topos = slhaDecomposer.decompose ( slhafile, .1*fb, False, False, 5.*GeV )
         self.assertEqual ( len(topos), 2 )
         e1,e2=len(topos[0].elementList),len(topos[1].elementList)
