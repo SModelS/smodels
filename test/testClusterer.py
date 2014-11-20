@@ -19,7 +19,7 @@ class ClustererTest(unittest.TestCase):
         from smodels.tools.physicsUnits import GeV, pb
         import copy
 
-        filename = "%sinputFiles/lhe/T1_1.lhe" % (installDirectory() )
+        filename = "%sinputFiles/lhe/simplyGluino_1.lhe" % (installDirectory() )
         reader = lheReader.LheReader(filename)
         event = reader.next()
         event_xsec=event.metainfo["totalxsec"]
