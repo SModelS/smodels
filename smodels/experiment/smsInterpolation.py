@@ -154,6 +154,10 @@ def _doGridData(analysis, topology, masses, dPar, run=None):
         logger.warning("Could not find results for %s/%s", analysis, topology)
         return None
 
+    if len(masslist)==1:
+        logger.error("Only one histogram available for %s/%s, cannot interpolate for intermediate mass.", analysis, topology)
+        return None
+
     p = np.array(masslist)
     v = np.array(ullist)
 
