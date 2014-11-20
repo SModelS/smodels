@@ -118,6 +118,7 @@ def _doGridData(analysis, topology, masses, dPar, run=None):
                                                     _getHistName(topology,
                                                                  ds['mz'][0]),
                                                     run)
+        if not ulDict: continue
         for x in ulDict:
             for y in ulDict[x]:
 
