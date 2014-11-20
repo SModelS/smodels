@@ -8,7 +8,7 @@
 
 """
 
-from smodels.tools.physicsUnits import fb, TeV, pb
+from smodels.tools.physicsUnits import TeV, pb, fb
 from smodels.theory import lheReader
 import smodels.particles
 import logging
@@ -180,7 +180,7 @@ class XSection(object):
         Replace the cross-section value by zero.
         
         """
-        self.value = 0. * fb
+        self.value = 0. * pb
 
 
 class XSectionList(object):
@@ -201,7 +201,7 @@ class XSectionList(object):
         if infoList:
             for info in infoList:
                 newentry = XSection()
-                newentry.value = 0. * fb
+                newentry.value = 0. * pb
                 newentry.pid = (None, None)
                 newentry.info = info.copy()
                 self.add(newentry)
@@ -325,7 +325,7 @@ class XSectionList(object):
         
         """
         for xsec in self:
-            xsec.value = 0. * fb
+            xsec.value = 0. * pb
 
 
     def delete(self, xSec):
@@ -393,7 +393,7 @@ class XSectionList(object):
         Get the maximum cross-section value appearing in the list.
         
         """
-        maxxsec = 0. * fb
+        maxxsec = 0. * pb
         for xsec in self:
             if xsec.value > maxxsec:
                 maxxsec = xsec.value
@@ -509,13 +509,15 @@ class XSectionList(object):
             self.xSections = newList.xSections
 
 
-def getXsecFromSLHAFile(slhafile, useXSecs=None):
+def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
     """
-    Obtain cross-sections for pair production of R-odd particles from input SLHA file. 
+    Obtain cross-sections for pair production of R-odd particles from input SLHA file.
+    The default unit for cross-section is pb.
     
     :param slhafile: SLHA input file with cross-sections
     :param useXSecs: if defined enables the user to select cross-sections to
                      use. Must be a XSecInfoList object
+    :param xsecUnit: cross-section unit in the input file (must be a Unum unit)
     :returns: a XSectionList object    
      
     """
@@ -543,7 +545,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None):
                 logger.warning("Ignoring cross-section for "+str(pids)+" production") #Ignore production of R-Even particles                
                 break        
         csOrder = eval(l.split()[1])
-        cs = eval(l.split()[6]) * fb
+        cs = eval(l.split()[6]) * xsecUnit
         wlabel = str(int(sqrtS)) + ' TeV'
         if csOrder == 0:
             wlabel += ' (LO)'
@@ -628,7 +630,7 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
         elif xsec.info.order == 2:
             wlabel += ' (NLL)'
         xsec.info.label = wlabel
-        xsec.value = 0. * fb
+        xsec.value = 0. * pb
         xsec.pid = pid
         # If addEvents = False, set cross-section value to event weight
         if not addEvents:

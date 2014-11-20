@@ -15,6 +15,9 @@ from smodels.tools.physicsUnits import fb, GeV
 from smodels.experiment import smsAnalysisFactory
 from smodels.theory.theoryPrediction import theoryPredictionFor
 
+from smodels.experiment import smsHelpers
+smsHelpers.base="/home/lessa/smodels-database/"
+
 
 def main():
     """
@@ -27,7 +30,7 @@ def main():
 #     lhefile = 'inputFiles/lhe/jory_dqdqbar_mgo_inf_msq300_mlsp100.lhe'
 
     # Decompose model (SLHA or LHE input):
-    sigmacut = 0.001 * fb
+    sigmacut = 0.1 * fb
     mingap = 5. * GeV
 
     smstoplist = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=True,
@@ -37,9 +40,9 @@ def main():
 
     # Print decomposition summary
     smstoplist.printout()
-    for top in smstoplist:
-        for el in top.elementList:
-            print(el,el.weight)
+#     for top in smstoplist:
+#         for el in top.elementList:
+#             print(el,el.weight)
 
     # Load analyses
     listofanalyses = smsAnalysisFactory.load()
