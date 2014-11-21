@@ -23,7 +23,7 @@ class TimeoutTest(unittest.TestCase):
     def testNegative(self):
         t0=time.time()
         self.logger.info ( "test that we dont get timed out" )
-        ret=self.pythia.run ( "../inputFiles/slha/T1.slha" )
+        ret=self.pythia.run ( "../inputFiles/slha/simplyGluino.slha" )
         lines=ret.split("\n")
         dt=time.time()-t0
         subprocesses1=lines[-13]
