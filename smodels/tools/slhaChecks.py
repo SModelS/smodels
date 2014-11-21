@@ -40,7 +40,7 @@ if __name__ == "__main__":
                            help = 'give maximum displacement of secondary vertex in m',
                            default = .001)
     argparser.add_argument('-sigmacut','--sigmacut',
-                           help = 'give sigmacut in fb', #FIXME is that true? or pb?
+                           help = 'give sigmacut in fb',
                            default = .01)
     argparser.add_argument('-fD', '--displaced',
                            help = 'find displaced vertices',
