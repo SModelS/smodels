@@ -11,10 +11,14 @@
 import os, sys
 from smodels.theory import lheReader
 from smodels.theory.printer import Printer
-from smodels.tools.physicsUnits import m, GeV
+from smodels.tools.physicsUnits import m, GeV, fb
 from smodels.tools import smMasses
 from smodels.tools import modpyslha as pyslha
 from smodels.particles import qNumbers
+from smodels.theory import crossSection
+import logging
+
+logger = logging.getLogger(__name__)
 
 class ResultList(Printer):
     """
@@ -62,11 +66,14 @@ class OutputStatus(Printer):
     """
     Object that holds all status information and has a predefined printout 
     """
-    def __init__(self, inputStatus, databaseVersion,outputfile):
+    def __init__(self,inputStatus,parameters,databaseVersion,outputfile):
         """
         Initialize output. If one of the checks failed, exit.
         """
         
+        self.outputfile = outputfile
+        self.inputfile = inputStatus.filestatus.filename
+        self.parameters = parameters
         self.filestatus = inputStatus.status[0]
         self.warnings = inputStatus.status[1]
         self.databaseVersion = databaseVersion
@@ -80,13 +87,17 @@ class OutputStatus(Printer):
         self.status = 0
         if not self.databaseVersion or self.filestatus < 0:
             self.status = min(self.databaseVersion,self.filestatus)
-            self.printout("file",outputfile)
+        self.checkStatus()
+    
+    def checkStatus(self):
+        if self.status < 0:
+            self.printout("file",self.outputfile)
             sys.exit()
 
 
     def updateStatus(self, status):
         self.status = status
-        return
+        self.checkStatus()
 
     def updateSLHAStatus(self, status):
         self.slhastatus = status
@@ -108,17 +119,23 @@ class OutputStatus(Printer):
 class FileStatus(Printer):
     """
     Object to run several checks on the input file.
-    Equals to LheStatus (SlhaStatus) if inputType = lhe (slha)
+    It holds an LheStatus (SlhaStatus) object if inputType = lhe (slha)
     """
     
-    def __init__(self, inputType, inputFile, sigmacut, massgap):
-        if inputType == 'lhe':
-            self.status = LheStatus(inputFile).status 
-        elif inputType == 'slha':
-            self.status = SlhaStatus(inputFile,sigmacut=sigmacut,massgap=massgap).status
-        else: 
-            self.status = -5, 'Unknown input type: %s' % inputType
+    def __init__(self, inputType, inputFile, sigmacut=None, massgap=None):
 
+        self.inputType = inputType
+                
+        if self.inputType == 'lhe':
+            self.filestatus = LheStatus(inputFile)            
+            self.status = self.filestatus.status
+        elif self.inputType == 'slha':
+            self.filestatus = SlhaStatus(inputFile,sigmacut=sigmacut,massgap=massgap)            
+            self.status = self.filestatus.status
+        else:
+            self.filestatus = None
+            self.status = -5, 'Unknown input type: %s' % self.inputType
+            
 
 class LheStatus(Printer):
     """
@@ -128,9 +145,6 @@ class LheStatus(Printer):
     def __init__(self, filename):
         self.filename = filename
         self.status = self.evaluateStatus()
-
-    def formatData(self,outputLevel):
-        return self.formatLHEData(outputLevel)
 
     def evaluateStatus(self):
         if not os.path.exists(self.filename):
@@ -157,7 +171,7 @@ class SlhaStatus(Printer):
     = -2: case of formal problems, e.g. missing decay blocks, in the file
     The parameter maxFlightlength is specified in meters. 
     """
-    def __init__(self, filename, maxFlightlength=1., maxDisplacement=.01, sigmacut=.01,massgap=5.,
+    def __init__(self, filename, maxFlightlength=1., maxDisplacement=.01, sigmacut=.01*fb,massgap=5.*GeV,
                  checkLSP = True, checkFlightlength = True, findMissingDecays = True,
                  findIllegalDecays = True, findEmptyDecays = True, checkXsec = True, findDisplaced = True):
         self.filename = filename
@@ -181,11 +195,6 @@ class SlhaStatus(Printer):
         self.status = self.evaluateStatus()
     
     
-    def formatData(self,outputLevel):
-        
-        return self.formatSLHAData(outputLevel)
-
-
     def read(self):
         """
         Get pyslha output object.
@@ -228,15 +237,6 @@ class SlhaStatus(Printer):
             return -2, retMes
         return ret, "Input file ok" 
 
-
-    def reEvaluateDisplaced(self):
-        """
-        Re-read the input file and evaluate the status in case changes
-        were made in the input file
-        """
-
-        self.slha = self.read()
-        return self.findDisplacedVertices(True)
 
     def checkDecayBlock(self, findMissingDecays):
         """
@@ -350,7 +350,14 @@ class SlhaStatus(Printer):
         for line in f:
             if "XSECTION" in line:
                 return 1, "XSECTION table present"
-        return -1, "XSECTION table missing, will be computed by SModelS"
+        
+        msg = "XSECTION table is missing. Please include the cross-section information and try again.\n"
+        msg += "\n\t For MSSM models, it is possible to compute the MSSM cross-sections"
+        msg += " using Pythia through the command:\n\n"
+        msg += "\t  ./smodels.py xseccomputer "+ self.filename+" -p \n\n"        
+        msg += "\t For more options and information run: ./smodels.py xseccomputer -h\n"
+        logger.error(msg)
+        sys.exit()
 
 
     def testLSP(self, checkLSP):
@@ -495,59 +502,36 @@ class SlhaStatus(Printer):
         """
         if not findDisplaced:
             return 0, "Did not check for displaced vertices"
-
-        ok = 1
-        msg = "Found displaced vertices:\n"
-        for particle,block in self.slha.decays.items():
-            if particle <= 50: continue
-            if particle == self.findLSP(): continue
-            #FIXME disabled check for mass splitting, should this be tested?
-            #if self.slha.blocks["MASS"][particle] - self.slha.blocks["MASS"][self.findLSP()] < self.massgap: continue
-            lt = self.getLifetime(particle, ctau=True)
-            if lt<self.maxDisplacement: continue
-            pcs = 0.
-            brvalue = 0.            
+        
+        #Get list of cross-sections:        
+        xsecList = crossSection.getXsecFromSLHAFile(self.filename)
+        #Check if any of particles being produced have visible displaced vertices
+        #with a weight > sigmacut
+        msg = None
+        for pid in xsecList.getPIDs():
+            if pid <= 50: continue
+            if pid == self.findLSP(): continue
+            xsecmax = xsecList.getXsecsFor(pid).getMaxXsec()
+            if xsecmax < self.sigmacut: continue           
+            lt = self.getLifetime(pid, ctau=True)
+            if lt < self.maxDisplacement: continue
+            brvalue = 0.
             daughters = []
-            for decay in block.decays:
+            #Sum all BRs which contain at least one visible particle
+            for decay in self.slhadecays[pid].decays:
                 for pid in decay.ids:
                     if self.visible(abs(pid), decay=True):
-                        if not pcs: pcs = self.getXSEC(particle)
                         brvalue += decay.br
                         daughters.append(decay.ids)
                         break
-            if pcs*brvalue*brvalue > self.sigmacut:
+            if xsecmax*brvalue > self.sigmacut:
+                if not msg: msg = "Found displaced vertices:\n"
                 if lt < 1.: msg = msg + "#Displaced vertex: "
                 else: msg = msg + "#Longlived particle: "
-                ok = -1
-                msg = msg + "%s (c*tau = %s) is decaying to %s\n" %(particle,str(lt), str(daughters))
-        if ok == 1: msg = "no displaced vertices found"
-        return ok, msg
+                msg = msg + "%s (c*tau = %s) is decaying to %s\n" %(pid,str(lt), str(daughters))
+        if not msg: return 1,"no displaced vertices found"
+        else: return -1, msg
 
-
-    def getXSEC(self, pid, sqrts=8000.):
-        """
-        get crosssection for pair production, read last line
-        """
-        inblock = None
-        xsec = 0.
-        pid = abs(int(pid))
-        for line in open(self.filename):
-            line=line.split('#')[0]
-            if not line.strip(): continue
-            lineelements = line.split()
-            if lineelements[0]=="XSECTION":
-                if float(lineelements[1])==sqrts:
-                    if abs(int(lineelements[-1]))==abs(int(lineelements[-2]))==pid:
-                        inblock = True
-                        continue
-                    else: inblock = None
-                else: inblock = None
-            if not inblock: continue
-            if not line.strip():
-                inblock=None
-                continue
-            xsec += float(line.split()[-3])
-        return xsec
 
 
     def degenerateChi(self):

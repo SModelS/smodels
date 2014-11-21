@@ -12,7 +12,6 @@ from smodels.tools import ioObjects, xsecComputer, missingTopologies
 from smodels.experiment import smsHelpers, smsAnalysisFactory, smsResults
 from smodels.theory import slhaDecomposer, lheDecomposer
 from smodels.theory.theoryPrediction import theoryPredictionFor,  _getElementsFrom
-from smodels.theory import crossSection
 from smodels.installation import installDirectory
 log = logging.getLogger(__name__)
 
@@ -61,7 +60,7 @@ def main(inputFile, parameterFile, outputFile):
         databaseVersion  = None
 
     #initialize output status and exit if there were errors in the input
-    outputStatus = ioObjects.OutputStatus(inputStatus, databaseVersion, outputFile)
+    outputStatus = ioObjects.OutputStatus(inputStatus, dict(parser.items("parameters")), databaseVersion, outputFile)
 #---------------------------------------------------------------------------------------------------------
 
 
@@ -77,19 +76,14 @@ def main(inputFile, parameterFile, outputFile):
             smstoplist = lheDecomposer.decompose(inputFile, doCompress=parser.getboolean("options","doCompress"),
                          doInvisible=parser.getboolean("options","doInvisible"), minmassgap=minmassgap)   
     except:
+        #Update status to fail, print error message and exit:
         outputStatus.updateStatus(-1)
-        outputStatus.printout("file", outputFile)
-        inputStatus.printout("file", outputFile)
-        sys.exit()
         
 #Print Decomposition output:
     # If no topologies with sigma > sigmacut are found, update status, write output file, stop running
     if not smstoplist:
         outputStatus.updateStatus(-3)
-        outputStatus.printout("file", outputFile)
-        inputStatus.printout("file", outputFile)
-        sys.exit()
-    
+            
     outLevel= 0
     if parser.getboolean("stdout","printDecomp"):
         outLevel = 1
@@ -111,15 +105,16 @@ def main(inputFile, parameterFile, outputFile):
         outLevel = 1
         outLevel += parser.getboolean("stdout","addAnaInfo")
         print("=======================\n == List of Analyses   ====\n ================")
-        for analysis in listofanalyses:            
+        for analysis in listofanalyses:
             analysis.printout(outputLevel=outLevel)    
 #------------------------------
 
-#--------------------
-#Compute theory predictions and anlalyses constraints
-#--------------------
 
-    #define result list that collects all theoryprediction objects
+#----------------------------------------------------
+#Compute theory predictions and anlalyses constraints
+#----------------------------------------------------
+
+    #define result list that collects all theoryPrediction objects
     #variables set to define printing options
     results = ioObjects.ResultList(bestresultonly = not parser.getboolean("file","expandedSummary"), 
                                    describeTopo = parser.getboolean("file","describeTopo"))
@@ -146,19 +141,16 @@ def main(inputFile, parameterFile, outputFile):
 
     # write output file
     outputStatus.printout("file", outputFile)
-    inputStatus.printout("file", outputFile)
     # add experimental constraints if found
     if outputStatus.status == 1: results.printout("file", outputFile)
 
-    sqrtsValues = [xsec.info.sqrts for xsec in smstoplist.getTotalWeight()]
-    if not sqrts in sqrtsValues: sqrts = max(sqrtsValues)
-
+    sqrts = max([xsec.info.sqrts for xsec in smstoplist.getTotalWeight()])
     if parser.getboolean("options","findMissingTopos"):
         #look for missing topologies, add them to the output file
         missingtopos = missingTopologies.MissingTopoList(sqrts)
         missingtopos.findMissingTopos(smstoplist, listofanalyses, parser.getfloat("parameters","minmassgap")*GeV)
         missingtopos.printout("file", outputFile)
-
+# ---------------------------------------------------------
 
 
 if __name__ == "__main__":
