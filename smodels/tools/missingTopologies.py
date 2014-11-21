@@ -34,7 +34,7 @@ class MissingTopoList(Printer):
         name = self.orderbranches(self.generalName(el.__str__()))
         for topo in self.topos:
             if name == topo.topo:
-                topo.weights.__add__(el.weight)
+                topo.weights += el.weight
                 return
         self.topos.append(MissingTopo(name, el.weight))
         return
