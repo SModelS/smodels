@@ -173,7 +173,7 @@ class SlhaStatus(Printer):
     """
     def __init__(self, filename, maxFlightlength=1., maxDisplacement=.01, sigmacut=.01*fb,massgap=5.*GeV,
                  checkLSP = True, checkFlightlength = True, findMissingDecays = True,
-                 findIllegalDecays = True, findEmptyDecays = True, checkXsec = True, findDisplaced = True):
+                 findIllegalDecays = False, findEmptyDecays = True, checkXsec = True, findDisplaced = True):
         self.filename = filename
         self.maxFlightlength = maxFlightlength
         self.maxDisplacement = maxDisplacement
