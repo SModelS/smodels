@@ -27,8 +27,8 @@ class LheReaderTest(unittest.TestCase):
         b0=element.branches[0]
         sb0=str(b0)
         assert ( sb0 == "[[jet,jet]]" )
-        assert ( b0.masses[0]-475*GeV ) < .1*GeV
-        assert ( b0.masses[1]-325*GeV ) < .1*GeV
+        assert ( b0.masses[0]-675*GeV ) < .1*GeV
+        assert ( b0.masses[1]-600*GeV ) < .1*GeV
 
 if __name__ == "__main__":
     unittest.main()
