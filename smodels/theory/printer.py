@@ -138,12 +138,22 @@ class Printer(object):
 
         return output
     
+    def formatULanalysisData(self,outputLevel):
+        """
+        Format data for a ULanalysis object.
+        :param outputLevel: general control for the output depth to be printed 
+                            (0 = no output, 1 = basic output, 2 = detailed output,...)
+        """
+         
+        if not outputLevel: return None
+         
+         
+    
     def formatTheoryPredictionData(self,outputLevel):
         """
         Format data of a TheoryPrediction object.
         :param outputLevel: general control for the output depth to be printed 
-                            (0 = no output, 1 = basic output, 2 = detailed output,...)
-        
+                            (0 = no output, 1 = basic output, 2 = detailed output,...)  
         """
         
         if not outputLevel: return None
