@@ -503,7 +503,7 @@ class SlhaStatus(Printer):
         if not findDisplaced:
             return 0, "Did not check for displaced vertices"
         
-        #Get list of cross-sections:        
+        #Get list of cross-sections:
         xsecList = crossSection.getXsecFromSLHAFile(self.filename)
         #Check if any of particles being produced have visible displaced vertices
         #with a weight > sigmacut
@@ -518,9 +518,9 @@ class SlhaStatus(Printer):
             brvalue = 0.
             daughters = []
             #Sum all BRs which contain at least one visible particle
-            for decay in self.slhadecays[pid].decays:
-                for pid in decay.ids:
-                    if self.visible(abs(pid), decay=True):
+            for decay in self.slha.decays[pid].decays:
+                for pidb in decay.ids:
+                    if self.visible(abs(pidb), decay=True):
                         brvalue += decay.br
                         daughters.append(decay.ids)
                         break
