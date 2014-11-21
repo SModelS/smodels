@@ -386,7 +386,7 @@ class SlhaStatus(Printer):
         pid = 0
         minmass = None
         for particle, mass in self.slha.blocks["MASS"].items():
-            if particle <= 50 or 3000054<=particle<=3000056:
+            if particle <= 50:
                 continue
             mass = abs(mass)
             if minmass == None:
@@ -452,7 +452,7 @@ class SlhaStatus(Printer):
         minmass = None
         for particle, mass in self.slha.blocks["MASS"].items():
             mass = abs(mass)
-            if particle == lsp or particle <= 50 or 3000054<=particle<=3000056:
+            if particle == lsp or particle <= 50:
                 continue
             if minmass == None:
                 pid, minmass = particle, mass
