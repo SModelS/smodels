@@ -60,9 +60,8 @@ def main(inputFile, parameterFile, outputFile):
         log.error("Database not found in %s" % os.path.realpath(smsHelpers.base))
         databaseVersion  = None
 
-    #initialize output status
+    #initialize output status and exit if there were errors in the input
     outputStatus = ioObjects.OutputStatus(inputStatus, databaseVersion, outputFile)
-    if not outputStatus: sys.exit()
 #---------------------------------------------------------------------------------------------------------
 
 
@@ -109,12 +108,14 @@ def main(inputFile, parameterFile, outputFile):
 
 #Print list of analyses loaded:
     if parser.getboolean("stdout","printAnalyses"):
-        outputLevel = 1
-        outputLevel += parser.getboolean("stdout","addAnaInfo")
-        for analysis in listofanalyses:
-            analysis.printout(outputLevel)    
+        outLevel = 1
+        outLevel += parser.getboolean("stdout","addAnaInfo")
+        print("=======================\n == List of Analyses   ====\n ================")
+        for analysis in listofanalyses:            
+            analysis.printout(outputLevel=outLevel)    
 #------------------------------
 
+    sys.exit()
 
 #--------------------
 #Compute theory predictions and anlalyses constraints

@@ -42,7 +42,7 @@ class Printer(object):
         # Cluster
         if outputLevel:
             self.output = self.formatData(outputLevel)
-
+            
             if target == "stdout":
                 print(self.output)
             elif target == "file":
@@ -146,6 +146,24 @@ class Printer(object):
         """
          
         if not outputLevel: return None
+        
+        output = ""
+        output += "========================================================\n"
+        output += "Analysis Name: "+self.label.split(":")[0]+'\n'
+        output += "Constraint Label: "+self.label.split(":")[1]+'\n'
+        output += "Analysis Sqrts: "+str(self.sqrts)+'\n'
+        if outputLevel == 2:
+            output += "\t -----------------------------\n"
+            output += "\t Elements tested by analysis:\n"
+            listOfelements = []
+            for el,eff in self.elementsEff.items():                
+                if eff > 0. and not el.getParticles() in listOfelements:
+                    listOfelements.append(el.getParticles())
+            for el in listOfelements:
+                output += "\t    "+str(el)+"\n"
+        
+        return output
+
          
          
     

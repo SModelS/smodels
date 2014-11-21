@@ -62,13 +62,13 @@ class OutputStatus(Printer):
     """
     Object that holds all status information and has a predefined printout 
     """
-    def __init__(self, slhastatus, warnings, databaseVersion,outputfile):
+    def __init__(self, inputStatus, databaseVersion,outputfile):
         """
         Initialize output. If one of the checks failed, exit.
         """
         
-        self.slhastatus = slhastatus
-        self.warnings = warnings
+        self.filestatus = inputStatus.status[0]
+        self.warnings = inputStatus.status[1]
         self.databaseVersion = databaseVersion
         self.statusStrings = {-1: "#could not run the decomposition",
                               -3: "#no cross sections above sigmacut found",
@@ -78,11 +78,10 @@ class OutputStatus(Printer):
                                1: "#decomposition was successful"}
 
         self.status = 0
-        if not self.databaseVersion or self.slhastatus < 0:
-            self.status = min(self.databaseVersion,self.slhastatus)
+        if not self.databaseVersion or self.filestatus < 0:
+            self.status = min(self.databaseVersion,self.filestatus)
             self.printout("file",outputfile)
-            return False
-        else: return True
+            sys.exit()
 
 
     def updateStatus(self, status):
@@ -114,10 +113,11 @@ class FileStatus(Printer):
     
     def __init__(self, inputType, inputFile, sigmacut, massgap):
         if inputType == 'lhe':
-            return LheStatus(inputFile) 
+            self.status = LheStatus(inputFile).status 
         elif inputType == 'slha':
-            return SlhaStatus(inputFile,sigmacut=sigmacut,massgap=massgap)
-        else: return -5, 'Unknown input type: %s' % inputType
+            self.status = SlhaStatus(inputFile,sigmacut=sigmacut,massgap=massgap).status
+        else: 
+            self.status = -5, 'Unknown input type: %s' % inputType
 
 
 class LheStatus(Printer):
