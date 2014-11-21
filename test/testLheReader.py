@@ -17,7 +17,7 @@ class LheReaderTest(unittest.TestCase):
         from smodels.installation import installDirectory
         from smodels.tools.physicsUnits import GeV
 
-        filename = "%sinputFiles/lhe/T1_1.lhe" % (installDirectory() )
+        filename = "%sinputFiles/lhe/simplyGluino.lhe" % (installDirectory() )
         reader = lheReader.LheReader(filename)
         event = reader.next()
         element = lheDecomposer.elementFromEvent(event,
