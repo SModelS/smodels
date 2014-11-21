@@ -115,27 +115,22 @@ def main(inputFile, parameterFile, outputFile):
             analysis.printout(outputLevel=outLevel)    
 #------------------------------
 
-    sys.exit()
-
 #--------------------
 #Compute theory predictions and anlalyses constraints
 #--------------------
 
     #define result list that collects all theoryprediction objects
     #variables set to define printing options
-    results = ioObjects.ResultList(bestresultonly = not parser.getboolean("file","expandedSummary"), describeTopo = parser.getboolean("file","describeTopo"))
-
-
-
-
+    results = ioObjects.ResultList(bestresultonly = not parser.getboolean("file","expandedSummary"), 
+                                   describeTopo = parser.getboolean("file","describeTopo"))
+    
     #Get theory prediction for each analysis and print basic output
     for analysis in listofanalyses:
         theorypredictions = theoryPredictionFor(analysis, smstoplist)
-        if not theorypredictions:
-            continue
+        if not theorypredictions:  continue
         if parser.getboolean("stdout","printResults"):
             print "================================================================================"
-            theorypredictions.printout() # again, check print function
+            theorypredictions.printout()
         print "................................................................................"
 
         # Create a list of results, to determine the best result
@@ -143,13 +138,6 @@ def main(inputFile, parameterFile, outputFile):
             results.addResult(theoryprediction, maxcond = parser.getfloat("parameters","maxcond"))
 
     # If there is no best result, this means that there are no matching experimental results for the point.
-    # Decomposition status has following flags:
-    #-1: "#could not run the decomposition",
-    #-3: "#no cross sections above sigmacut found",
-    #-2: "#bad input slha, did not run decomposition",
-    #0: "#no matching experimental results",
-    #1: "#decomposition was successful". 
-
     if results.isEmpty():
         # no experimental constraints found
         outputStatus.updateStatus(0)

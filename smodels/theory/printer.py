@@ -150,7 +150,7 @@ class Printer(object):
         output = ""
         output += "========================================================\n"
         output += "Analysis Name: "+self.label.split(":")[0]+'\n'
-        output += "Constraint Label: "+self.label.split(":")[1]+'\n'
+        output += "Tx Label: "+self.label.split(":")[1]+'\n'
         output += "Analysis Sqrts: "+str(self.sqrts)+'\n'
         if outputLevel == 2:
             output += "\t -----------------------------\n"
