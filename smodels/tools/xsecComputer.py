@@ -245,6 +245,7 @@ def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True ):
 
 
 def main(args):
+    
     sqrtses = [item for sublist in args.sqrts for item in sublist]
     if len(sqrtses) == 0:
         sqrtses = [8]
@@ -290,39 +291,4 @@ def main(args):
                 print "%s %20s:  %5.2f pb" % ( xsec.info.label,xsec.pid,xsec.value/pb )
         print
         sys.exit(0)
-
-
-if __name__ == "__main__":
-    """
-    Compute the cross section of a given SLHA file.
-
-    """
-    desc = "compute the cross section of an SLHA file"
-    argparser = argparse.ArgumentParser(description=desc)
-    argparser.add_argument('file', type=types.StringType, nargs=1,
-                           help="SLHA file to compute cross section "
-                           "for")
-    argparser.add_argument('-s', '--sqrts', nargs='+', action='append',
-                           help="sqrt(s) TeV. Can supply more than one value.",
-                           type=int, default=[])
-    argparser.add_argument('-e', '--nevents', type=int, default=100,
-                           help="number of events to be simulated.")
-    argparser.add_argument('-f', '--tofile', action='store_true',
-                           help="write cross sections to file")
-    argparser.add_argument('-k', '--keep', action='store_true',
-                           help="do not unlink temporary directory")
-    argparser.add_argument('-n', '--NLO', action='store_true',
-                           help="compute at the NLO level (default is LO)")
-    argparser.add_argument('-N', '--NLL',
-                           help="compute at the NLL level (takes precedence "
-                           "over NLL, default is LO)",
-                           action='store_true')
-    argparser.add_argument('-O', '--LOfromSLHA',
-                           help="use LO cross-sections from file to compute" 
-                           " the NLO or NLL cross-sections (only for -N or -n)",
-                           action='store_true')
-    
-    args = argparser.parse_args()
-
-    main()
 
