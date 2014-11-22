@@ -9,9 +9,9 @@
 """
 
 from smodels.experiment import limitGetter
+from smodels.theory.printer import Printer
 
-
-class ULanalysis(object):
+class ULanalysis(Printer):
     """
     Class to store upper limit-type analyses.
     
@@ -62,9 +62,17 @@ class ULanalysis(object):
         
         """
         return limitGetter.getPlotLimit(mass, self)
+    
+    def formatData(self,outputLevel):
+        """
+        Select data preparation method through dynamic binding.
+        :param outputLevel: general control for the output depth to be printed 
+                            (0 = no output, 1 = basic output, 2 = detailed output,...
+        """
+        return Printer.formatULanalysisData(self,outputLevel)    
 
 
-class SRanalysis(object):
+class SRanalysis(Printer):
     """
     Class to store signal region-type of analyses with efficiency maps.
     
