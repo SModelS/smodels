@@ -357,7 +357,7 @@ class Element(Printer):
         return newElements
 
 
-    def massCompress(self, mingap):
+    def massCompress(self, minmassgap):
         """
         Perform mass compression.
         
@@ -378,7 +378,7 @@ class Element(Printer):
                 continue
             masses = branch.masses
             for ivertex in range(vertnumb[ib] - 1):
-                if abs(masses[ivertex] - masses[ivertex + 1]) < mingap:
+                if abs(masses[ivertex] - masses[ivertex + 1]) < minmassgap:
                     newelement.branches[ib].particles[ivertex] = None
                     newelement.branches[ib].masses[ivertex] = None
             while newelement.branches[ib].particles.count(None) > 0:
