@@ -42,7 +42,7 @@ class Printer(object):
         # Cluster
         if outputLevel:
             self.output = self.formatData(outputLevel)
-
+            
             if target == "stdout":
                 print(self.output)
             elif target == "file":
@@ -138,12 +138,40 @@ class Printer(object):
 
         return output
     
+    def formatULanalysisData(self,outputLevel):
+        """
+        Format data for a ULanalysis object.
+        :param outputLevel: general control for the output depth to be printed 
+                            (0 = no output, 1 = basic output, 2 = detailed output,...)
+        """
+         
+        if not outputLevel: return None
+        
+        output = ""
+        output += "========================================================\n"
+        output += "Analysis Name: "+self.label.split(":")[0]+'\n'
+        output += "Tx Label: "+self.label.split(":")[1]+'\n'
+        output += "Analysis Sqrts: "+str(self.sqrts)+'\n'
+        if outputLevel == 2:
+            output += "\t -----------------------------\n"
+            output += "\t Elements tested by analysis:\n"
+            listOfelements = []
+            for el,eff in self.elementsEff.items():                
+                if eff > 0. and not el.getParticles() in listOfelements:
+                    listOfelements.append(el.getParticles())
+            for el in listOfelements:
+                output += "\t    "+str(el)+"\n"
+        
+        return output
+
+         
+         
+    
     def formatTheoryPredictionData(self,outputLevel):
         """
         Format data of a TheoryPrediction object.
         :param outputLevel: general control for the output depth to be printed 
-                            (0 = no output, 1 = basic output, 2 = detailed output,...)
-        
+                            (0 = no output, 1 = basic output, 2 = detailed output,...)  
         """
         
         if not outputLevel: return None
@@ -183,11 +211,12 @@ class Printer(object):
         if not outputLevel: return None
         
         output = ""
-
-        output += "Input status: " + str(self.slhastatus) + "\n"
-        output += "Decomposition output status: "+str(self.status)+" "+self.statusStrings[self.status] + "\n"
-        if self.databaseVersion: output += "Database version: %s\n" % self.databaseVersion
-        if self.slhastatus < 0: output += str(self.warnings) + "\n"
+        output += "Input status: " + str(self.filestatus) + "\n"
+        output += "Decomposition output status: "+str(self.status)+" "+self.statusStrings[self.status] + "\n"        
+        if self.filestatus < 0: output += str(self.warnings) + "\n"
+        output += "#Input File: " + self.inputfile + "\n"
+        for label,par in self.parameters.items(): output += "#"+label + " = " + str(par) + '\n'
+        if self.databaseVersion: output += "#Database version: %s\n" % self.databaseVersion        
         output += "================================================================================\n"
 
         return output
@@ -222,47 +251,6 @@ class Printer(object):
         output += "\n \n"
         output += "================================================================================\n"
         output += "The highest R value is r_ratio = " + str(self.getR(bestresult)) + "\n"
-
-        return output
-
-    def formatSLHAData(self,outputLevel):
-        """
-        Format data of the slha checks output object.
-        :param outputLevel: general control for the output depth to be printed 
-                            (0 = no output, 1 = basic output, 2 = detailed output,...)
-        """
-        
-        if not outputLevel: return None
-        
-        output = ""
-
-        output += "Input file: " + self.filename + "\n"
-        output += "Sigmacut: " + str(self.sigmacut* fb) + "\n"
-        output += "Minmassgap: " + str(self.massgap*GeV) + "\n"
-        output += "Maxcond: " + str(self.maxcond) + "\n"
-        if not self.status[0] == -3:
-        #cannot add this information in case the input file is not slha format
-            output += "LSP PID, mass: " + str(self.findLSP(returnmass=True)) + "\n"
-            output += "NLSP PID, mass: " + str(self.findNLSP(returnmass=True)) + "\n"
-        output += "================================================================================\n"
-
-        return output
-
-    def formatLHEData(self,outputLevel):
-        """
-        Format data of lhe status, analog to slha status.
-        :param outputLevel: general control for the output depth to be printed 
-                            (0 = no output, 1 = basic output, 2 = detailed output,...)
-        """
-        
-        if not outputLevel: return None
-        
-        output = ""
-
-        output += "Input file: " + self.filename + "\n"
-        output += "Minmassgap: " + str(self.massgap*GeV) + "\n"
-        output += "Maxcond: " + str(self.maxcond) + "\n"
-        output += "================================================================================\n"
 
         return output
 
