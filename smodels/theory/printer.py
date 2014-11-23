@@ -152,7 +152,6 @@ class Printer(object):
         output += "Analysis Name: "+self.label.split(":")[0]+'\n'
         output += "Tx Label: "+self.label.split(":")[1]+'\n'
         output += "Analysis Sqrts: "+str(self.sqrts)+'\n'
-        output += "Analysis luminosity: "+str(self.lum)+'\n'
         if outputLevel == 2:
             output += "\t -----------------------------\n"
             output += "\t Elements tested by analysis:\n"
@@ -239,7 +238,7 @@ class Printer(object):
             output += "The result with highest R value is\n"
             self.outputarray = [bestresult]
 
-        output += "#Analysis  Topology  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r\n\n"
+        output += "#Analysis  Tx_Name  Sqrts  Cond. Violation  Theory_Value(fb)  Exp_limit(fb)  r\n\n"
         for op in self.outputarray:
             output += "%19s %16s " %(op.analysis.label.split(":")[0], op.analysis.label.split(":")[1]) # ana, topo
             output += "%4s " % (op.analysis.sqrts / TeV) # sqrts
@@ -272,7 +271,7 @@ class Printer(object):
 
         
         output += "Missing topologies with the highest cross-sections (up to "+str(nprint)+"):\n"
-        output += "Sqrts (TeV)   Weight (fb)        Topology description\n"
+        output += "Sqrts (TeV)   Weight (fb)        Element description\n"
 
         for topo in sorted(self.topos, key=lambda x: x.value, reverse=True)[:nprint]:
             output += "%5s %10.3E    # %45s\n" % (str(self.sqrts / TeV), topo.value, str(topo.topo))
