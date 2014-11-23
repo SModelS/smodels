@@ -17,29 +17,27 @@ logger = logging.getLogger(__name__)
 
 class ElementCluster(object):
     """
-    An instance of this class represents a cluster.
-    
+    An instance of this class represents a cluster.    
     This class is used to store the relevant information about a cluster of
     elements and to manipulate this information.
     
+    :ivar elements: list of elements in the cluster (Element objects)    
     """
     def __init__(self):
         self.elements = []
 
-
     def __iter__(self):
         return iter(self.elements)
 
-
     def __getitem__(self, iel):
         return self.elements[iel]
-
 
     def getTotalXSec(self):
         """
         Return the sum over the cross-sections of all elements belonging to
         the cluster.
         
+        :returns: sum of weights of all the elements in the cluster (XSectionList object)
         """
         totxsec = crossSection.XSectionList()
         for el in self.elements:
@@ -50,8 +48,7 @@ class ElementCluster(object):
         """
         Return the average mass of all elements belonging to the cluster.
         
-        :returns: average mass
-         
+        :returns: average mass array         
         """
         massList = [el.getMasses() for el in self.elements]
         weights = [el.weight.getMaxXsec() / fb for el in self.elements]
@@ -60,20 +57,25 @@ class ElementCluster(object):
 
 class IndexCluster(object):
     """
-    An instance of this class represents a cluster storing element indices.
-    
+    An instance of this class represents a cluster storing element indices.    
     This auxiliary class is used to store element indices and positions in
-    upper limit space. It is used by the clustering algorithm.
+    upper limit space. It is only used by the clustering algorithm.
     
+    :ivar indices: list of integers mapping the cluster elements to their position in the list
+                   (1st element -> index 0, 2nd element -> index 1,...)
+    :ivar avgPosition: position in upper limit space for the cluster average mass
+    :ivar massMap: dictionary with indices as keys and the corresponding element mass as values
+    :ivar positionMap: dictionary with indices as keys and the corresponding element position
+                        in upper limit space as values
+    :ivar weightMap: dictionary with indices as keys and the corresponding element weight
+                     as values
+    :ivar analysis: analysis to which the cluster applies (ULanalysis object)
     """
     def __init__(self, massMap=None, posMap=None, wMap=None, indices=set([]),
                  analysis=None):
         self.indices = indices
         self.avgPosition = None
-        # Store the element mass list (for all elements)
         self.massMap = massMap
-        # Store the element mass position in upper limit space list (for all
-        # elements)
         self.positionMap = posMap
         self.weightMap = wMap
         self.analysis = analysis
@@ -225,6 +227,7 @@ def clusterElements(elements, analysis, maxDist):
     
     :parameter elements: list of elements (Element objects)
     :parameter analysis: analysis to be considered (must be a ULanalysis object)
+    
     :returns: list of clusters (ElementCluster objects)    
     """
     # Get the list of elements with good masses (with the masses replaced by
@@ -241,9 +244,12 @@ def _doCluster(elements, analysis, maxDist):
     """
     Cluster algorithm to cluster elements.
     
-    :returns: a list of ElementCluster objects containing the elements
-    belonging to the cluster
+    :parameter elements: list of all elements to be clustered
+    :parameter analysis: analysis to which the cluster applies (ULanalysis object)
+    :parameter maxDist: maximum mass distance for clustering two elements
     
+    :returns: a list of ElementCluster objects containing the elements
+    belonging to the cluster    
     """
     # First build the element:mass, element:position in UL space
     # and element:maxWeight (in fb) dictionaries
@@ -336,14 +342,21 @@ def _doCluster(elements, analysis, maxDist):
 
 def _getGoodElements(elements, analysis, maxDist):
     """
-    Get the list of good masses appearing elements according to the analysis
-    distance.
+    Get the list of elements which have "good masses".
+    Good masses are defined as those where both branches in the element have identical
+    mass arrays or where the distance between the two mass arrays is smaller than maxDist.
+    e.g. if the element mass array is [[m1,m2] , [m3,m4]] (branch1 = [m1,m2], branch2 = [m3,m4]),
+    then the mass is "good" if m1=m3 and m3=m4 or if the mass distance between [[m1,m2],[m1,m2]]
+    and [[m3,m4],[m3,m4]] is smaller than maxDist.
+    If the element has a good mass, its mass is replaced by the mass average of [[m1,m2],[m1,m2]]
+    and [[m3,m4],[m3,m4]].
     
-    :returns: list of elements with good masses with their masses replaced by
-    the branch average. A mass is good if the mass distance between the
-    branches is less than maxDist and if the element mass (or mass avg) falls
-    inside the upper limit plane.
+    :parameter elements: list of all elements to be clustered
+    :parameter analysis: analysis to which the cluster applies (ULanalysis object)
+    :parameter maxDist: maximum mass distance for clustering two elements
     
+    :returns: list with a copy of the elements with good masses with their masses replaced by
+    the branch average.    
     """
     goodElements = []
     for element in elements:

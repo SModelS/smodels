@@ -4,6 +4,7 @@
 .. module:: theory.Topology
    :synopsis: Provides a Topology class and a TopologyList collection type.
 
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
 
 """
