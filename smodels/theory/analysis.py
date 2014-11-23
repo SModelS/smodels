@@ -13,18 +13,18 @@ from smodels.theory.printer import Printer
 
 class ULanalysis(Printer):
     """
-    Class to store upper limit-type analyses.
-    
+    Class to store one upper limit-type analysis.    
     Stores the conditions and the elements constrained by the analysis as well
     as basic analysis info.
-    
-    self.conditions -- List of condition strings
-    
-    self.constraint -- Constraint string
-    
-    self.elementsEff -- Dictionary with constrained elements as keys and
-    efficiencies as values
-    
+
+    :ivar conditions: List of conditions strings    
+    :ivar constraint: Constraint string
+    :ivar elementsEff: Dictionary with constrained elements as keys and
+    efficiencies as values    
+    :ivar label: Analysis label/name
+    :ivar sqrts: Analysis center-of-mass energy
+    :ivar lum: Analysis luminosity
+    :ivar run: Analysis run label    
     """
     def __init__(self):
         self.label = ""
@@ -40,13 +40,11 @@ class ULanalysis(Printer):
 
     def getEfficiencyFor(self, element):
         """
-        Get (simple) efficiency for element.
-        
+        Get (trivial) efficiency for element.        
         Returns zero if element is not constrained by the analysis or the
         element multiplicative factor if it is.
         
-        :returns: float -- zero, if element is not found
-        
+        :returns: 1 if element is in constraint, zero otherwise        
         """
         for el in self.elementsEff:
             if element.particlesMatch(el):
@@ -57,16 +55,16 @@ class ULanalysis(Printer):
         """
         Get the experimental upper limit for a specific mass array.
         
-        :param mass: mass vector for computing the upper limit
-        :returns: experimental upper limit for cross-section times BR
-        
+        :parameter mass: mass vector for computing the upper limit
+        :returns: experimental upper limit for cross-section times BR (float with unit or Unum object)      
         """
+        
         return limitGetter.getPlotLimit(mass, self)
     
     def formatData(self,outputLevel):
         """
         Select data preparation method through dynamic binding.
-        :param outputLevel: general control for the output depth to be printed 
+        :parameter outputLevel: general control for the output depth to be printed 
                             (0 = no output, 1 = basic output, 2 = detailed output,...
         """
         return Printer.formatULanalysisData(self,outputLevel)    
@@ -74,11 +72,14 @@ class ULanalysis(Printer):
 
 class SRanalysis(Printer):
     """
-    Class to store signal region-type of analyses with efficiency maps.
-    
+    Class to store one signal region-type of analysis.    
     Stores the basic analysis info and contains a method for obtaining the
-    efficiency from the database.
+    efficiency maps from the database.
     
+    :ivar label: Analysis label/name
+    :ivar sqrts: Analysis center-of-mass energy
+    :ivar lum: Analysis luminosity
+    :ivar run: Analysis run label
     """
     def __init__(self):
         self.label = ""
@@ -90,19 +91,27 @@ class SRanalysis(Printer):
         return self.label
 
     def getEfficiencyFor(self, element):
-        """ Get efficiency from a database (dummy for now).        
+        """
+        Get efficiency for element from the database.        
+        Returns zero if a efficiency is not found.
+        
+        .. warning:: not implemented yet
+                
+        :returns: efficiency value (float). zero, if element is not found        
         """
         if not element:
             return False
         return False
 
     def getLimitFor(self):
-        """ Get experimental limit for a cross-section in a specific signal region.
-        (dummy for now)
+        """
+        Get experimental limit for a cross-section in a specific signal region.
+        
+        
+        .. warning:: not implemented yet
         
         :returns: experimental upper limit for cross-section in the signal
-                  region
-        
+                  region (float with unit or Unum object)        
         """
         return False
 

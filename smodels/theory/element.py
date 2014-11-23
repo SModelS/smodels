@@ -12,30 +12,35 @@ from smodels.theory import crossSection
 from smodels.particles import rEven, ptcDic
 from smodels.theory.printer import Printer
 import logging
+import sys
 
 logger = logging.getLogger(__name__)
 
 
 class Element(Printer):
     """
-    An instance of this class represents an element.
-    
+    An instance of this class represents an element.    
     This class possesses a pair of branches and the element weight
     (cross-section * BR).
     
+    :ivar branches: list of branches (Branch objects)
+    :ivar weight: element weight (cross-section * BR)
+    :ivar motherElements: only for elements generated from a parent element
+                          by mass compression, invisible compression,etc.
+                          Holds a pair of (whence, mother element), where
+                          whence describes what process generated the element    
     """
     def __init__(self, info=None):
+        """
+        Initializes the element. If info is defined, tries to generate
+        the element using it.
+        
+        :parameter info: string describing the element in bracket notation
+                         (e.g. [[[e+],[jet]],[[e-],[jet]]])
+        """
         self.branches = [Branch(), Branch()]
         self.weight = crossSection.XSectionList()
         self.motherElements = []
-        """ Elements that arise from compression have mother elements.
-            Mother elements are pairs of ( whence, element ),
-            'whence' describing what the element is from 
-            (mass compression, invisible compression, etc),
-            while 'element' is the actual object.
-            If element is not due to compression, 
-            then list remains empty.
-        """
         
         if info:
             # Create element from particle string
@@ -65,7 +70,11 @@ class Element(Printer):
                     self.branches[ib] = branch.copy()
 
     def combineMotherElements ( self, el2 ):
-        """ combine mother elements from self and el2 into self """
+        """
+        Combine mother elements from self and el2 into self
+        
+        :parameter el2: element (Element Object)  
+        """
         if len(self.motherElements)==0: 
             # no mothers? then you yourself are mother!
             tmp=self.copy()
@@ -91,8 +100,9 @@ class Element(Printer):
 
     def __str__(self):
         """
-        Create the canonical name of the element, e.g. [[jet],[jet]].
+        Create the element bracket notation string, e.g. [[[jet]],[[jet]].
         
+        :returns: string representation of the element (in bracket notation)    
         """
         particleString = str(self.getParticles()).replace(" ", "").\
                 replace("'", "")
@@ -101,13 +111,12 @@ class Element(Printer):
 
     def isEqual(self, other, order=False, useDict=True):
         """
-        Compare two Elements for equality.
-        
-        If order == False, test both branch orderings (for an element doublet
-        only). If useDict == True, allow for nclusive particle labels.
-        
+        Compare two Elements for equality.        
+                
+        :parameter other: element to be compared (Element object)
+        :parameter order: if False, test both branch orderings.
+        :parameter useDict: if True, allow for inclusive particle labels.
         :returns: True, if all masses and particles are equal; False, else;        
-        
         """
         if type(self) != type(other):
             return False
@@ -131,11 +140,10 @@ class Element(Printer):
         """
         Compare two Elements for matching particles.
         
-        If order == False, test both branch orderings (for an element doublet
-        only). If useDict == True, allow for inclusive particle abels.
-        
-        :returns: True, if particles match; False, else;
-        
+        :parameter other: element to be compared (Element object)
+        :parameter order: if False, test both branch orderings.
+        :parameter useDict: if True, allow for inclusive particle labels.
+        :returns: True, if particles match; False, else;        
         """
         if type(self) != type(other):
             return False
@@ -153,19 +161,16 @@ class Element(Printer):
 
     def copy(self):
         """
-        Create a copy of self.
+        Create a copy of self.        
+        Faster than deepcopy.     
         
-        Faster than deepcopy.
-        
+        :returns: copy of element (Element object)   
         """
         newel = Element()
         newel.branches = []
         for branch in self.branches:
             newel.branches.append(branch.copy())
         newel.weight = self.weight.copy()
-        import copy
-        # if len(self.motherElements)>=0:
-        ## newel.motherElements = copy.deepcopy( self.motherElements ) 
         newel.motherElements = self.motherElements[:]
         return newel
 
@@ -174,11 +179,14 @@ class Element(Printer):
         """
         Set the element masses to the input mass array.
         
-        If sameOrder == True, set the masses to the same branch ordering. If
-        opposOrder == True, set the masses to the opposite branch ordering. If
-        both sameOrder == True and opposOrder == True, set the masses to the
-        smaller of the two orderings.
         
+        :parameter mass: list of masses ([[masses for branch1],[masses for branch2]])
+        :parameter sameOrder: if True, set the masses to the same branch ordering
+                              If True and opposOrder=True, set the masses to the
+                              smaller of the two orderings.
+        :parameter opposOrder: if True, set the masses to the opposite branch ordering.
+                               If True and sameOrder=True, set the masses to the
+                               smaller of the two orderings.             
         """
         if sameOrder and opposOrder:
             if mass[0] == _smallerMass(mass[0], mass[1]):
@@ -190,12 +198,10 @@ class Element(Printer):
         elif opposOrder:
             newmass = [mass[1], mass[0]]
         else:
-            logger.error("Called with no possible ordering")
-            import sys
+            logger.error("Called with no possible ordering")            
             sys.exit()
         if len(newmass) != len(self.branches):
             logger.error("Called with wrong number of mass branches")
-            import sys
             sys.exit()
 
         for i, mass in enumerate(newmass):
@@ -205,8 +211,10 @@ class Element(Printer):
     def switchBranches(self):
         """
         Switch branches, if the element contains a pair of them.
-                
+        
+        :returns: element with switched branches (Element object)                
         """
+        
         newEl = self.copy()
         if len(self.branches) == 2:
             newEl.branches = [newEl.branches[1], newEl.branches[0]]
@@ -215,9 +223,11 @@ class Element(Printer):
 
     def getParticles(self):
         """
-        Get the array of particles in the element.   
-             
+        Get the array of particles in the element.
+        
+        :returns: list of particle strings                
         """
+        
         ptcarray = []
         for branch in self.branches:
             ptcarray.append(branch.particles)
@@ -226,8 +236,9 @@ class Element(Printer):
 
     def getMasses(self):
         """
-        Get the array of masses in the element.   
-             
+        Get the array of masses in the element.    
+        
+        :returns: list of masses (mass array)            
         """
         massarray = []
         for branch in self.branches:
@@ -237,29 +248,33 @@ class Element(Printer):
 
     def getDaughters(self):
         """
-        Get a pair of daughter IDs.
+        Get a pair of daughter IDs (PDGs of the last intermediate state appearing the cascade decay).    
+        Can be None, if the element does not have a definite daughter.
         
-        Can be None, if the element does not have a definite daughter.      
-           
+        :returns: list of PDG ids
         """
+        
         return (self.branches[0].daughterID, self.branches[1].daughterID)
 
 
     def getMothers(self):
         """
-        Get a pair of mother IDs.
+        Get a pair of mother IDs (PDG ids of the primary mother intermediate state).      
+        Can be None, if the element does not have a definite mother.
         
-        Can be None, if the element does not have a mother daughter.
-        
+        :returns: list of PDG ids
         """
+        
         return (self.branches[0].momID, self.branches[1].momID)
 
 
     def getEinfo(self):
         """
-        Get global topology info from particle string.
+        Get topology info from particle string.
         
+        :returns: dictionary containing vertices and number of final states information  
         """
+        
         vertnumb = []
         vertparts = []
         for branch in self.branches:
@@ -274,19 +289,20 @@ class Element(Printer):
 
     def _getLength(self):
         """
-        Get the maximum of the two branch lengths.
+        Get the maximum of the two branch lengths.    
         
+        :returns: maximum length of the element branches (int)    
         """
         return max(self.branches[0].getLength(), self.branches[1].getLength())
 
 
     def isInList(self, listOfElements, igmass=False, useDict=True):
         """
-        Check if the element is present in the element list.
+        Check if the element is present in the element list.   
         
+        :parameter      
         If igmass == False also check if the analysis has the element mass
-        array.
-        
+        array.        
         """
         for el in listOfElements:
             if igmass:
@@ -304,29 +320,33 @@ class Element(Printer):
         Check if the particles defined in the element exist and are consistent
         with the element info.
         
+        :returns: True if the element is consistent. Print error message
+                  and exits otherwise.
         """
         info = self.getEinfo()
         for ib, branch in enumerate(self.branches):
             for iv, vertex in enumerate(branch.particles):
                 if len(vertex) != info['vertparts'][ib][iv]:
                     logger.error("Wrong syntax")
-                    import sys
                     sys.exit()
                 for ptc in vertex:
                     if not ptc in rEven.values() and not ptc in ptcDic:
                         logger.error("Unknown particle" + ptc)
-                        import sys
                         sys.exit()
         return True
 
 
     def compressElement(self, doCompress, doInvisible, minmassgap):
         """
-        Keep compressing they original element and the derived ones till they
+        Keep compressing the original element and the derived ones till they
         can be compressed no more.
         
-        :returns: list with the compressed elements
-        
+        :parameter doCompress: if True, perform mass compression
+        :parameter doInvisible: if True, perform invisible compression
+        :parameter minmassgap: value (in GeV) of the maximum 
+                               mass difference for compression
+                               (if mass difference < minmassgap, perform mass compression)
+        :returns: list with the compressed elements (Element objects)        
         """
         added = True
         newElements = [self.copy()]
@@ -361,9 +381,11 @@ class Element(Printer):
         """
         Perform mass compression.
         
+        :parameter minmassgap: value (in GeV) of the maximum 
+                               mass difference for compression
+                               (if mass difference < minmassgap -> perform mass compression)
         :returns: compressed copy of the element, if two masses in this
-                  topology are degenerate; None, if compression is not possible;
-        
+                  element are degenerate; None, if compression is not possible;        
         """
         newelement = self.copy()
         newelement.motherElements = [ ("mass", self.copy()) ]
@@ -398,6 +420,8 @@ class Element(Printer):
         Check if the element topology matches any of the topologies in the
         element list.
         
+        :parameter elementList: list of elements (Element objects)
+        :returns: True, if element topology has a match in the list, False otherwise.        
         """
         if type(elementList) != type([]) or len(elementList) == 0:
             return False
@@ -414,10 +438,10 @@ class Element(Printer):
 
     def invisibleCompress(self):
         """
-        Compress cascade decays ending with neutrinos and daughter.
+        Perform invisible compression.
         
-        If no compression is possible, return None.
-        
+        :returns: compressed copy of the element, if element ends with invisible
+                  particles; None, if compression is not possible
         """
         newelement = self.copy()
         newelement.motherElements = [ ("invisible", self.copy()) ]
@@ -446,7 +470,8 @@ class Element(Printer):
     def formatData(self,outputLevel):
         """
         Select data preparation method through dynamic binding.
-        :param outputLevel: general control for the output depth to be printed 
+        
+        :parameter outputLevel: general control for the output depth to be printed 
                             (0 = no output, 1 = basic output, 2 = detailed output,...
         """
         return Printer.formatElementData(self,outputLevel)
@@ -454,10 +479,12 @@ class Element(Printer):
 
 def _smallerMass(mass1, mass2):
     """
-    Select the smaller of two mass arrays.
-    
+    Select the smaller of two mass arrays.    
     Use an ordering criterion (machine-independent) for selection.
     
+    :parameter mass1: mass array (list of masses)
+    :parameter mass2: mass array (list of masses)
+    :returns: mass1, if mass1 > mass2; mass2, otherwise 
     """
     mass1List = []
     mass2List = []
@@ -478,5 +505,4 @@ def _smallerMass(mass1, mass2):
         pass
 
     logger.error("Invalid input")
-    import sys
     sys.exit()

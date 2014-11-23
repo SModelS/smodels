@@ -33,7 +33,7 @@ def decompose(lhefile, inputXsecs=None, nevts=None, doCompress=False,
     :param doInvisible: invisible compression option (True/False)
     :param minmassgap: minimum mass gap for mass compression (only used if
                        doCompress=True)
-    :returns: TopologyList object 
+    :returns: list of topologies (TopologyList object) 
     
     """
 

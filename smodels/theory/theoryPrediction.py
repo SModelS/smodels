@@ -10,7 +10,6 @@
 import copy
 from smodels.theory import clusterTools, crossSection, element
 from smodels.theory.particleNames import elementsInStr
-from smodels.theory.auxiliaryFunctions import cSim, cGtr  # pylint: disable=W0611
 from smodels.theory.analysis import SRanalysis
 from smodels.theory.analysis import ULanalysis
 from smodels.theory.printer import Printer
@@ -69,14 +68,17 @@ class TheoryPredictionList(Printer):
 
 def theoryPredictionFor(analysis, smsTopList, maxMassDist=0.2):
     """
-    Compute theory predictions.
-    
+    Compute theory predictions for the given analysis, using the list of elements
+    in smsTopList.    
     Collect elements and efficiencies, combine the masses (if needed) and
     compute the conditions (if existing).
     
-    :returns: list of TheoryPrediction objects
-    
+    :parameter analysis: analysis to be considered (ULanalysis or SRanalysis object)
+    :parameter smsTopList: list of topologies containing elements (TopologyList object)
+    :parameter maxMassDist: maximum mass distance for clustering elements (float)
+    :returns: list of TheoryPrediction objects    
     """
+    
     # Select elements constrained by analysis and apply efficiencies
     elements = _getElementsFrom(smsTopList, analysis)
     if len(elements) == 0:
@@ -100,13 +102,15 @@ def theoryPredictionFor(analysis, smsTopList, maxMassDist=0.2):
 
 def _getElementsFrom(smsTopList, analysis):
     """
-    Get elements, that are constrained by the analysis.
+    Get elements, that are constrained by the analysis.    
+    Loop over all elements in smsTopList and returns a copy of the elements which are
+    constrained by the analysis (have efficiency != 0). The copied elements
+    have their weights multiplied by their respective efficiencies and the cross-sections not
+    matching the analysis center-of-mass energy are removed.
     
-    Loop over all elements in smsTopList and returns the elements which are
-    constrained by the analysis (have efficiency != 0). The elements weights
-    are multiplied by their respective efficiency and the cross-sections not
-    matching the analysis sqrts are removed.
-    
+    :parameter analysis: analysis to be considered (ULanalysis or SRanalysis object)
+    :parameter smsTopList: list of topologies containing elements (TopologyList object)
+    :returns: list of elements (Element objects)
     """
     elements = []
     for el in smsTopList.getElements():
@@ -126,11 +130,13 @@ def _getElementsFrom(smsTopList, analysis):
 
 def _combineElements(elements, analysis, maxDist):
     """
-    Combine elements according to the analysis type.
-    
+    Combine elements according to the analysis type.    
     If analysis == upper limit type, group elements into mass clusters. If
     analysis == signal region type, group all elements into a single cluster.
     
+    :parameter elements: list of elements (Element objects)
+    :parameter analysis: analysis to be considered (ULanalysis or SRanalysis object)
+    :returns: list of element clusters (ElementCluster objects)
     """
     if type(analysis) == type(SRanalysis()):
         clusters = [clusterTools.groupAll(elements)]
@@ -141,13 +147,14 @@ def _combineElements(elements, analysis, maxDist):
 
 def _evalConstraint(cluster, analysis):
     """
-    Evaluate the analysis constraint inside an element cluster.
+    Evaluate the analysis constraint inside an element cluster.      
+    If analysis type == upper limit, sum all the elements' weights
+    according to the analysis constraint.
+    If analysis type == signal region, sum all the elements' weights.
     
-    If analysis type == upper limit, evaluates the analysis constraint inside
-    an element cluster.
-    
-    :retunrs: total cluster cross-section, if analysis type == signal region
-    
+    :parameter cluster: cluster of elements (ElementCluster object)
+    :parameter analysis: analysis to be considered (ULanalysis or SRanalysis object)
+    :returns: cluster cross-section
     """    
     
     if type(analysis) == type(SRanalysis()):
@@ -167,7 +174,7 @@ def _evalConditions(cluster, analysis):
     If analysis type == upper limit, evaluates the analysis conditions inside
     an element cluster.
     
-    :retunrs: None, if analysis type == signal region
+    :returns: None, if analysis type == signal region
     
     """    
     
@@ -192,7 +199,7 @@ def _evalExpression(stringExpr,cluster,analysis):
     """
     Auxiliary method to evaluate a string expression using the weights of the elements in the cluster.
     
-    :return: cross-section value for the expression or expression value if it is not numerical (None,string,...)
+    :returns: cross-section value for the expression or expression value if it is not numerical (None,string,...)
     """
 
 #Generate elements appearing in the string expression with zero cross-sections:
