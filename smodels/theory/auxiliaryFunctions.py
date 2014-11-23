@@ -53,8 +53,13 @@ def massPosition(mass, analysis):
 
 def distance(xmass1, xmass2):
     """
-    Define distance between two mass positions.
+    Define distance between two mass positions in upper limit space.
+    The distance is defined as d = 2*|xmass1-xmass2|/(xmass1+xmass2).
     
+    
+    :parameter xmass1: upper limit value (in fb) for the mass1
+    :parameter xmass2: upper limit value (in fb) for the mass2
+    :returns: relative mass distance in upper limit space     
     """
     if xmass1 is None or xmass2 is None:
         return None
@@ -74,8 +79,8 @@ def massAvg(massList, method='weighted', weights=None):
     switch method to harmonic.    
     If massList contains a zero mass, switch method to mean.
     
-    :param method: possible values: harmonic, mean, weighted
-    :param weights: weights of elements (only for weighted average)
+    :parameter method: possible values: harmonic, mean, weighted
+    :parameter weights: weights of elements (only for weighted average)
     
     """
     if not massList:

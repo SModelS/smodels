@@ -25,15 +25,16 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
               minmassgap=-1.*GeV, useXSecs=None):
     """
     Perform SLHA-based decomposition.
+    
     :param sigcut: minimum sigma*BR to be generated, by default sigcut = 0.1 fb
-    :param doCompress: turn mass compressed topologies on/off
-    :param doInvisible: turn invisibly compressed topologies on/off
+    :param doCompress: turn mass compression on/off
+    :param doInvisible: turn invisible compression on/off
     :param minmassgap: maximum value (in GeV) for considering two R-odd particles
                        degenerate (only revelant for doCompress=True )
     :param useXSecs: optionally a dictionary with cross-sections for pair
                  production, by default reading the cross sections
                  from the SLHA file.
-    :returns: TopologyList
+    :returns: list of topologies (TopologyList object)
 
     """
     t1 = time.time()

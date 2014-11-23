@@ -220,10 +220,12 @@ def groupAll(elements):
 
 
 def clusterElements(elements, analysis, maxDist):
-    """ Cluster the original elements according to their mass distance.
+    """
+    Cluster the original elements according to their mass distance.
     
-    :returns: list of clusters; 
-    
+    :parameter elements: list of elements (Element objects)
+    :parameter analysis: analysis to be considered (must be a ULanalysis object)
+    :returns: list of clusters (ElementCluster objects)    
     """
     # Get the list of elements with good masses (with the masses replaced by
     # their 'good' value):
