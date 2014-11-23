@@ -23,6 +23,15 @@ class TheoryPrediction(object):
     An instance of this class represents the results of the theory prediction
     for an analysis.
     
+    :ivar analysis: holds the analysis (ULanalysis or SRanalysis object)
+                    to which the prediction refers to
+    :ivar value: value of the theory prediction 
+                (relevant cross-section to be compared with the experimental limits).
+                It is a XSection object.
+    :ivar conditions: list of values for the analysis conditions
+                      (only for upper limit-type analysis, e.g. analysis=ULanalysis)
+    :ivar mass: mass of the cluster to which the theory prediction refers to
+                (only for upper limit-type analysis, e.g. analysis=ULanalysis)    
     """
     def __init__(self):
         self.analysis = None
@@ -30,7 +39,13 @@ class TheoryPrediction(object):
         self.conditions = None
         self.mass = None
         
-    def getmaxCondition(self):      
+    def getmaxCondition(self):
+        """
+        Returns the maximum value from the list conditions
+        
+        :returns: maximum condition value (float)
+        """
+            
         maxcond = 0.
         for value in self.conditions.values():
             if value == 'N/A': return value
@@ -41,15 +56,21 @@ class TheoryPrediction(object):
 
 class TheoryPredictionList(Printer):
     """
-    An instance of this class represents the a collection of theory prediction
+    An instance of this class represents a collection of theory prediction
     objects.
     
+    :ivar _theoryPredictions: list of TheoryPrediction objects    
     """
     def __init__(self, theoryPredictions):
+        """
+        Initializes the list.
+        
+        :parameter theoryPredictions: list of TheoryPrediction objects
+        """
         self._theoryPredictions = theoryPredictions
 
 
-    def __iter__(self):
+    def __iter__(self):      
         for theoryPrediction in self._theoryPredictions:
             yield theoryPrediction
 
@@ -168,14 +189,14 @@ def _evalConstraint(cluster, analysis):
     
 
 def _evalConditions(cluster, analysis):
-    """
-    Evaluate the analysis conditions inside an element cluster.
-    
-    If analysis type == upper limit, evaluates the analysis conditions inside
+    """        
+    If analysis type == upper limit (ULanalysis), evaluates the analysis conditions inside
     an element cluster.
+    If analysis type == signal region (SRanalysis), returns None
     
-    :returns: None, if analysis type == signal region
-    
+    :parameter cluster: cluster of elements (ElementCluster object)
+    :parameter analysis: analysis to obtain the conditions (ULanalysis or SRanalysis object)
+    :returns: list of condition values (floats) if analysis type == upper limit. None, otherwise.    
     """    
     
     if type(analysis) == type(SRanalysis()):
@@ -198,8 +219,16 @@ def _evalConditions(cluster, analysis):
 def _evalExpression(stringExpr,cluster,analysis):
     """
     Auxiliary method to evaluate a string expression using the weights of the elements in the cluster.
+    Replaces the elements in stringExpr (in bracket notation) by their weights and evaluate the 
+    expression.
+    e.g. computes the total weight of string expressions such as "[[[e^+]],[[e^-]]]+[[[mu^+]],[[mu^-]]]"
+    or ratios of weights of string expressions such as "[[[e^+]],[[e^-]]]/[[[mu^+]],[[mu^-]]]"
+    and so on...    
     
-    :returns: cross-section value for the expression or expression value if it is not numerical (None,string,...)
+    :parameter stringExpr: string containing the expression to be evaluated
+    :parameter cluster: cluster of elements (ElementCluster object)
+    :parameter analysis: analysis (ULanalysis object). Just used to print the error message
+    :returns: value for the expression. Can be a XSectionList object, a float or not numerical (None,string,...)
     """
 
 #Generate elements appearing in the string expression with zero cross-sections:

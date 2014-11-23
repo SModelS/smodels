@@ -8,10 +8,11 @@
 
 """
 
-from smodels.tools.physicsUnits import TeV, pb, fb
+from smodels.tools.physicsUnits import TeV, pb
 from smodels.theory import lheReader
 import smodels.particles
 import logging
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -94,7 +95,6 @@ class XSection(object):
             newXsec.value = newXsec.value * other
         else:
             logger.error("Xsections can only be multiplied by floats")
-            import sys
             sys.exit()
         return newXsec
 
@@ -117,7 +117,6 @@ class XSection(object):
                 res.value += other.value
                 return res
         logger.error("Trying to add " + type(other) + " to a XSection object")
-        import sys
         sys.exit()
 
 
@@ -239,7 +238,6 @@ class XSectionList(object):
     def __setitem__(self, index, xsec):
         if type(xsec) != type(XSection()):
             logger.error("Input object must be a XSection() object")
-            import sys
             sys.exit()
         else:
             self.xSections[index] = xsec
@@ -271,7 +269,6 @@ class XSectionList(object):
         """
         if type(newxsec) != type(XSection()):
             logger.error("Input object must be a XSection() object")
-            import sys
             sys.exit()
         else:
             self.xSections.append(newxsec.copy())
@@ -287,7 +284,6 @@ class XSectionList(object):
         """
         if type(newxsec) != type(XSection()):
             logger.error("Input object must be a XSection() object")
-            import sys
             sys.exit()
         else:
             exists = False
@@ -514,10 +510,10 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
     Obtain cross-sections for pair production of R-odd particles from input SLHA file.
     The default unit for cross-section is pb.
     
-    :param slhafile: SLHA input file with cross-sections
-    :param useXSecs: if defined enables the user to select cross-sections to
+    :parameter slhafile: SLHA input file with cross-sections
+    :parameter useXSecs: if defined enables the user to select cross-sections to
                      use. Must be a XSecInfoList object
-    :param xsecUnit: cross-section unit in the input file (must be a Unum unit)
+    :parameter xsecUnit: cross-section unit in the input file (must be a Unum unit)
     :returns: a XSectionList object    
      
     """
@@ -555,7 +551,6 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
             wlabel += ' (NLL)'
         else:
             logger.error("Unknown QCD order in XSECTION line " + l)
-            import sys
             sys.exit()
         xsec = XSection()
         xsec.info.sqrts = sqrtS * TeV
@@ -577,8 +572,8 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
     """
     Obtain cross-sections from input LHE file.
     
-    :param lhefile: LHE input file with unweighted MC events
-    :param addEvents: if True, add cross-sections with the same mothers,
+    :parameter lhefile: LHE input file with unweighted MC events
+    :parameter addEvents: if True, add cross-sections with the same mothers,
                       otherwise return the event weight for each pair of mothers
     :returns: a XSectionList object
     
@@ -587,18 +582,15 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
     xSecsInFile = XSectionList()
     reader = lheReader.LheReader(lhefile)
     if not type ( reader.metainfo["totalxsec"] ) == type ( pb) :
-        logger.error("Cross-section information not found in LHE file.")
-        import sys
+        logger.error("Cross-section information not found in LHE file.")        
         sys.exit()
     elif not reader.metainfo["nevents"]:
         logger.error("Total number of events information not found in LHE " +
                      "file.")
-        import sys
         sys.exit()
     elif not type ( reader.metainfo["sqrts"] ) == type ( TeV ):
         logger.error("Center-of-mass energy information not found in LHE " +
                      "file.")
-        import sys
         sys.exit()
 
     # Common cross-section info

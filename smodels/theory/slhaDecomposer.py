@@ -17,6 +17,7 @@ from smodels.tools import modpyslha as pyslha
 from smodels.tools.physicsUnits import fb, GeV
 import smodels.particles
 import logging
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -40,8 +41,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     t1 = time.time()
 
     if doCompress and minmassgap / GeV < 0.:
-        logger.error("Asked for compression without specifying minmassgap. Please set minmassgap.")
-        import sys
+        logger.error("Asked for compression without specifying minmassgap. Please set minmassgap.")        
         sys.exit()
 
     if type(sigcut) == type(1.):
@@ -52,7 +52,6 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
         f=modpyslha.readSLHAFile ( slhafile )
     except modpyslha.ParseError,e:
         logger.error ( "This file cannot be parsed as an SLHA file: %s" % e )
-        import sys
         sys.exit()
 
     # Get cross-section from file
