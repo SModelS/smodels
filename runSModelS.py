@@ -53,7 +53,7 @@ def main(inputFile, parameterFile, outputFile):
 
     #check database address    
     try:
-        smsHelpers.base = parser.get("path","database")
+        smsHelpers.base = parser.get("path","databasePath")
         databaseVersion = smsHelpers.databaseVersion()
     except:
         log.error("Database not found in %s" % os.path.realpath(smsHelpers.base))
@@ -93,12 +93,14 @@ def main(inputFile, parameterFile, outputFile):
 
 #-------------------------
 #Load analysis database
-#-------------------------
-    analyses = parser.get("data","analyses")
-    #in case that a list of analyses is given, retrieve list
-    if "," in analyses: analyses = analyses.split(",")
+#-------------------------    
+    #in case that a list of analyses or txnames are given, retrieve list
+    analyses = parser.get("database","analyses")
+    if "," in analyses: analyses = analyses.split(",")    
+    txnames = parser.get("database","txnames")
+    if "," in txnames: txnames = txnames.split(",")
     # Load analyses
-    listofanalyses = smsAnalysisFactory.load(analyses)
+    listofanalyses = smsAnalysisFactory.load(analyses, txnames)
 
 #Print list of analyses loaded:
     if parser.getboolean("stdout","printAnalyses"):
@@ -117,7 +119,7 @@ def main(inputFile, parameterFile, outputFile):
     #define result list that collects all theoryPrediction objects
     #variables set to define printing options
     results = ioObjects.ResultList(bestresultonly = not parser.getboolean("file","expandedSummary"), 
-                                   describeTopo = parser.getboolean("file","describeTopo"))
+                                   describeTopo = parser.getboolean("file","addAllResults"))
     
     #Get theory prediction for each analysis and print basic output
     for analysis in listofanalyses:
