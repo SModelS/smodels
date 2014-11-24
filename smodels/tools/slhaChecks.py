@@ -12,29 +12,21 @@
 
 from __future__ import print_function
 import argparse
-from smodels.tools.ioObjects import SlhaStatus 
+from smodels.tools.ioObjects import SlhaStatus
+from smodels.tools.physicsUnits import fb, GeV
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser() # pylint: disable-msg=C0103
     argparser.add_argument('-f', '--filename',
                            help = 'filename of input slha')
-    argparser.add_argument('-maxfl', '--flightlength',
-                           help = 'maximum c*tau in m',
-                           default = 3.)
-    argparser.add_argument('-mD', '--decays',
-                           help = 'find missing decay blocks',
-                           action = 'store_false')
-    argparser.add_argument('-fE', '--empty',
-                           help = 'find empty decay blocks',
-                           action = 'store_false')
     argparser.add_argument('-xS', '--xsec',
                            help = 'check if file contains xsection block',
                            action = 'store_false')
     argparser.add_argument('-lsp', '--lsp',
                            help = 'check if lsp is neutral and colorless',
                            action = 'store_false')
-    argparser.add_argument('-ctau', '--ctau',
-                           help = 'check if nlsp has prompt decay',
+    argparser.add_argument('-longlived', '--longlived',
+                           help = 'check for stable charged particles and visible displaced vertices',
                            action = 'store_false')
     argparser.add_argument('-maxDisp', '--displacement',
                            help = 'give maximum displacement of secondary vertex in m',
@@ -42,15 +34,16 @@ if __name__ == "__main__":
     argparser.add_argument('-sigmacut','--sigmacut',
                            help = 'give sigmacut in fb',
                            default = .01)
-    argparser.add_argument('-fD', '--displaced',
-                           help = 'find displaced vertices',
-                           action = 'store_false')
     argparser.add_argument('-mg', '--massgap',
                            help= 'give massgap for mass compression in GeV',
                            default = 5.)
+    argparser.add_argument('-illegal','--illegal',
+                           help= 'check if all decays are kinematically allowed', 
+                           action = 'store_true')
     args = argparser.parse_args() # pylint: disable-msg=C0103
-    status = SlhaStatus(args.filename, args.flightlength, args.displacement,
-                        args.sigmacut, args.decays, args.displaced,
-                        args.massgap, args.empty, args.xsec, args.lsp,
-                        args.ctau) # pylint: disable-msg=C0103
+    status = SlhaStatus(args.filename, maxDisplacement=args.displacement,
+                        sigmacut=args.sigmacut*fb,
+                        massgap=args.massgap*GeV, checkLSP=args.lsp,
+                        findIllegalDecays=args.illegal, checkXsec=args.xsec,
+                        findLonglived=args.longlived) # pylint: disable-msg=C0103
     print(status.status)
