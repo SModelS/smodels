@@ -14,7 +14,7 @@ from smodels.theory.printer import Printer
 from smodels.tools.physicsUnits import m, GeV, fb
 from smodels.tools import smMasses
 from smodels.tools import modpyslha as pyslha
-from smodels.particles import qNumbers
+from smodels.particles import qNumbers, rEven
 from smodels.theory import crossSection
 import logging
 
@@ -240,7 +240,7 @@ class SlhaStatus(Printer):
 
     def checkDecayBlock(self, findMissingDecays):
         """
-        Check if there is a decay table for each particle with pid > 50 given
+        Check if there is a decay table for each particle (not listed in rEven)
         in the mass block.
         
         """
@@ -250,7 +250,7 @@ class SlhaStatus(Printer):
         missing = "Missing decay block for PIDs"
         pids = self.slha.blocks["MASS"].keys()
         for pid in pids:
-            if pid <= 50:
+            if pid in rEven:
                 continue
             if not pid in self.slha.decays:
                 missing = missing + ", " + str(pid)
@@ -263,7 +263,7 @@ class SlhaStatus(Printer):
 
     def checkCtau(self, checkFlightlength):
         """
-        Check if c*tau of particles with pid > 50 is larger than maximum given in maxFlightlength.
+        Check if c*tau of particles (not in rEven) is larger than maximum given in maxFlightlength.
         Report error for stable or long lived charged particles.
 
         """
@@ -272,7 +272,7 @@ class SlhaStatus(Printer):
         st = 1
         msg = ""
         for particle in self.slha.decays:
-            if particle <= 50: continue
+            if particle in rEven: continue
             if particle == self.findLSP(): continue
             ct = self.getLifetime(particle, ctau = True)
             if ct < 0:
@@ -321,7 +321,7 @@ class SlhaStatus(Printer):
         st = 1
         badDecay = "Illegal decay for PIDs "
         for particle, block in self.slha.decays.items():
-            if particle < 50 : continue
+            if particle in rEven : continue
             if not particle in self.slha.blocks["MASS"].keys(): continue
             mMom = abs(self.slha.blocks["MASS"][particle])
             for dcy in block.decays:
@@ -378,7 +378,7 @@ class SlhaStatus(Printer):
 
     def findLSP(self, returnmass=None):
         """
-        Find lightest particle with pid > 50.
+        Find lightest particle (not in rEven).
         
         :returns: pid, mass of the lsp, if returnmass == True
         
@@ -386,7 +386,7 @@ class SlhaStatus(Printer):
         pid = 0
         minmass = None
         for particle, mass in self.slha.blocks["MASS"].items():
-            if particle <= 50:
+            if particle in rEven:
                 continue
             mass = abs(mass)
             if minmass == None:
@@ -442,7 +442,7 @@ class SlhaStatus(Printer):
 
     def findNLSP(self, returnmass = None):
         """
-        Find second lightest particle with pid >= 50.
+        Find second lightest particle (not in rEven).
         
         :returns: pid ,mass of the NLSP, if returnmass == True
         
@@ -452,7 +452,7 @@ class SlhaStatus(Printer):
         minmass = None
         for particle, mass in self.slha.blocks["MASS"].items():
             mass = abs(mass)
-            if particle == lsp or particle <= 50:
+            if particle == lsp or particle in rEven:
                 continue
             if minmass == None:
                 pid, minmass = particle, mass
@@ -509,7 +509,7 @@ class SlhaStatus(Printer):
         #with a weight > sigmacut
         msg = None
         for pid in xsecList.getPIDs():
-            if pid <= 50: continue
+            if pid in rEven: continue
             if pid == self.findLSP(): continue
             xsecmax = xsecList.getXsecsFor(pid).getMaxXsec()
             if xsecmax < self.sigmacut: continue           
