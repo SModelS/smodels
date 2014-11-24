@@ -40,8 +40,8 @@ def main(inputFile, parameterFile, outputFile):
 
     if os.path.exists(outputFile): #remove old output file
         log.warning("Removing old output file in "+outputFile)
-        outfile = open(outpuFile,'w')
-        outfile.close()
+    outfile = open(outputFile,'w')
+    outfile.close()
 
     inputType = parser.get("options","inputType").lower()
     if inputType != 'slha' and inputType != 'lhe':
