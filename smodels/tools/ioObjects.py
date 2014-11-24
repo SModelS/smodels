@@ -11,7 +11,7 @@
 import os, sys
 from smodels.theory import lheReader
 from smodels.theory.printer import Printer
-from smodels.tools.physicsUnits import m, GeV, fb
+from smodels.tools.physicsUnits import GeV, fb
 from smodels.tools import smMasses
 from smodels.tools import modpyslha as pyslha
 from smodels.particles import qNumbers
