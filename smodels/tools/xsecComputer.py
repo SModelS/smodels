@@ -264,7 +264,7 @@ def main(args):
                              "TeV! Available are: %s TeV." % 
                              (sqrts, allowedsqrtses ))
                 sys.exit(0)
-    inputFile = args.file[0]
+    inputFile = args.filename
     if not os.path.exists(inputFile):
         logger.error("File '%s' does not exist.", inputFile)
         sys.exit(1)
