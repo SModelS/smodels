@@ -8,7 +8,7 @@
 
 """
 
-from smodels.experiment import smsInterpolation
+from smodels.experiment import smsInterpolation, smsHelpers
 from smodels.tools.physicsUnits import TeV, GeV, fb
 import copy
 import sys
@@ -69,13 +69,14 @@ def getPlotLimit(inmass, analysis):
         logger.error("Length of mass-array < 2 (M: " + str(massArray) + ").")
         sys.exit()
 
-    # Make sure the two branches have equal masses
-    if massArray[0] != massArray[1]:
-        logger.error("Masses differ between branches.")
-        return False
-
-#    masslist = [mass / GeV for mass in massArray[0]]
-    masslist = massArray[0]
+    massCondition = smsHelpers.getMetaInfoField(analysis.label, "massCondition")
+    if not massCondition or massCondition == "equal branches":
+        # Make sure the two branches have equal masses
+        if massArray[0] != massArray[1]:
+            logger.error("Masses differ between branches.")
+            return False
+        masslist = massArray[0]
+    else: masslist = massArray
 
     # Run label
     run = analysis.run
