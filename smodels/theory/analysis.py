@@ -8,7 +8,7 @@
         
 """
 
-from smodels.experiment import limitGetter
+from smodels.experiment import limitGetter, smsHelpers
 from smodels.theory.printer import Printer
 
 class ULanalysis(Printer):
@@ -60,6 +60,17 @@ class ULanalysis(Printer):
         """
         
         return limitGetter.getPlotLimit(mass, self)
+    
+    def getMassCondition(self):
+        """
+        Most analyses include assumptions about the masses of the elements
+        appearing in their constraints.
+        This method returns a string describing the mass condition
+        
+        :returns: string describing mass condition (from the massCondition field)
+        """
+        
+        return smsHelpers.getMetaInfoField(self.label, "massCondition")
     
     def formatData(self,outputLevel):
         """

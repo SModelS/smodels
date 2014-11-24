@@ -342,31 +342,34 @@ def _doCluster(elements, analysis, maxDist):
 
 def _getGoodElements(elements, analysis, maxDist):
     """
-    Get the list of elements which have "good masses".
-    Good masses are defined as those where both branches in the element have identical
+    Get the list of elements which have masses satisfying the analysis conditions
+    and that lie inside the analysis upper limit grid.
+    
+    Most analyses require equal branch masses.
+    For such analyses good masses are defined as those where both branches in the element have identical
     mass arrays or where the distance between the two mass arrays is smaller than maxDist.
     e.g. if the element mass array is [[m1,m2] , [m3,m4]] (branch1 = [m1,m2], branch2 = [m3,m4]),
     then the mass is "good" if m1=m3 and m3=m4 or if the mass distance between [[m1,m2],[m1,m2]]
     and [[m3,m4],[m3,m4]] is smaller than maxDist.
     If the element has a good mass, its mass is replaced by the mass average of [[m1,m2],[m1,m2]]
     and [[m3,m4],[m3,m4]].
-    
+    For the anlyses where there is no such requirement, return the original list of elements
+    with masses lying inside the analysis grid.
+        
     :parameter elements: list of all elements to be clustered
     :parameter analysis: analysis to which the cluster applies (ULanalysis object)
     :parameter maxDist: maximum mass distance for clustering two elements
     
-    :returns: list with a copy of the elements with good masses with their masses replaced by
-    the branch average.    
+    :returns: list with a copy of the elements with good masses, with their masses replaced by
+    the branch average (if equal branch masses are required by the analysis)
     """
-    goodElements = []
+    goodElements = []    
+    massCondition = analysis.getMassCondition()   
+    
     for element in elements:
         mass = element.getMasses()
         goodmass = None
-        if mass[0] == mass[1]:
-            p=massPosition(mass, analysis)
-            if type(p)==type(fb):
-                goodmass = mass
-        else:
+        if mass[0] != mass[1] and (not massCondition or massCondition == "equal branches"):
             mass1 = [mass[0], mass[0]]
             mass2 = [mass[1], mass[1]]
             mP1 = massPosition(mass1, analysis)
@@ -375,6 +378,10 @@ def _getGoodElements(elements, analysis, maxDist):
                 continue
             if distance(mP1, mP2) < maxDist:
                 goodmass = massAvg([mass1, mass2], method='harmonic')
+        else:
+            p=massPosition(mass, analysis)
+            if type(p)==type(fb): goodmass = mass
+
         if goodmass and type(massPosition(goodmass, analysis))==type(fb):
             goodElements.append(element.copy())
             goodElements[-1].setMasses(goodmass)
