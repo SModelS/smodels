@@ -172,8 +172,8 @@ class SlhaStatus(Printer):
     The parameter maxFlightlength is specified in meters. 
     """
     def __init__(self, filename, maxFlightlength=1., maxDisplacement=.01, sigmacut=.01*fb,massgap=5.*GeV,
-                 checkLSP = True, checkFlightlength = True, findMissingDecays = True,
-                 findIllegalDecays = False, findEmptyDecays = True, checkXsec = True, findDisplaced = True):
+                 checkLSP = True,
+                 findIllegalDecays = False, checkXsec = True, findDisplaced = True):
         self.filename = filename
         self.maxFlightlength = maxFlightlength
         self.maxDisplacement = maxDisplacement
@@ -185,10 +185,7 @@ class SlhaStatus(Printer):
             return
         self.lsp = self.findLSP()
         self.lspStatus = self.testLSP(checkLSP)
-        self.ctauStatus = self.checkCtau(checkFlightlength)
-        self.missingDecays = self.checkDecayBlock(findMissingDecays)
         self.illegalDecays = self.findIllegalDecay(findIllegalDecays)
-        self.emptyDecays = self.findEmptyDecay(findEmptyDecays)
         self.xsec = self.hasXsec(checkXsec)
         self.vertexStatus = self.findDisplacedVertices(findDisplaced)
         
@@ -217,14 +214,14 @@ class SlhaStatus(Printer):
             return -3, "Could not read input slha file"
         ret = 0
         retMes = "#Warnings:\n"
-        for st, message in [self.missingDecays, self.emptyDecays,
+        for st, message in [
                             self.xsec]:
             if st < 0:
                 ret = -2
                 retMes = retMes + "#" + message + ".\n"
             elif st == 1 and not ret == -2:
                 ret = 1
-        for st, message in [self.lspStatus, self.ctauStatus,
+        for st, message in [self.lspStatus,
                             self.vertexStatus, self.illegalDecays]:
             if st < 0:
                 ret = -1
@@ -237,79 +234,14 @@ class SlhaStatus(Printer):
             return -2, retMes
         return ret, "Input file ok" 
 
-
-    def checkDecayBlock(self, findMissingDecays):
+    def emptyDecay(self, pid):
         """
-        Check if there is a decay table for each particle (not listed in rEven)
-        in the mass block.
-        
+        Check if any decay is listed for the particle with pid
+        returns True if the decay block is missing or if it is empty
         """
-        if not findMissingDecays :
-            return 0, "Did not check for missing decay blocks"
-        st = 1
-        missing = "Missing decay block for PIDs"
-        pids = self.slha.blocks["MASS"].keys()
-        for pid in pids:
-            if pid in rEven:
-                continue
-            if not pid in self.slha.decays:
-                missing = missing + ", " + str(pid)
-                st = -1
-        if st == 1:
-            missing = "No missing decay blocks"
-        missing += "\n"
-        return st, missing
-
-
-    def checkCtau(self, checkFlightlength):
-        """
-        Check if c*tau of particles (not in rEven) is larger than maximum given in maxFlightlength.
-        Report error for stable or long lived charged particles.
-
-        """
-        if not checkFlightlength:
-            return 0, "Did not check c*tau of new particles"
-        st = 1
-        msg = ""
-        for particle in self.slha.decays:
-            if particle in rEven: continue
-            if particle == self.findLSP(): continue
-            ct = self.getLifetime(particle, ctau = True)
-            if ct < 0:
-                if self.visible(particle):
-                    st = -1
-                    msg += "Charged stable particle " + str(particle) + "\n"
-                else: msg += "Additional neutral stable particle " + str(particle) + "\n"
-            elif ct > self.maxFlightlength:
-                if self.visible(particle):
-                    st = -1
-                    msg += "Charged long lived particle " + str(particle) + " (c*tau = %s)" % str(ct) + "\n"
-                else: msg += "Neutral long lived particle " + str(particle) + " (c*tau = %s)" % str(ct) + "\n"
-        if not msg: "No additional stable or long lived particles found\n" 
-        return st, msg
-
-
-    def findEmptyDecay(self, findEmpty):
-        """
-        Find all particles that are considered stable in SModelS.
-        
-        Stable particle means that no branching ratios are given in the
-        decay table of the particle in the slha file.
-        
-        """
-        if not findEmpty:
-            return 0, "Did not check for empty decay blocks"
-        st = 1
-        stableParticles = "Empty decay block for PIDs"
-        for particle, block in self.slha.decays.items():
-            if particle == self.lsp:
-                continue
-            if not block.decays:
-                stableParticles = stableParticles + ", " + str(particle)
-                st = -1
-        if st == 1:
-            stableParticles = "No empty decay blocks"
-        return st, stableParticles
+        if not abs(pid) in self.slha.decays: return True #consider missing decay block as empty
+        if not self.slha.decays[abs(pid)].decays: return True
+        return None
 
 
     def findIllegalDecay(self, findIllegal):
@@ -409,12 +341,14 @@ class SlhaStatus(Printer):
             else:
                 # Particle is stable
                 return -1
+            if self.emptyDecay(pid): return -1 # if decay block is empty particle is also considered stable 
             if ctau:
                 return lt*3E8
             else:
                 return lt
         except KeyError:
-            print("%s is no valid PID" % abs(pid))
+            log.warning("No decay block for %s, consider it as a stable particle")
+            return -1 
             
 
     def sumBR(self, pid):
@@ -507,13 +441,17 @@ class SlhaStatus(Printer):
         xsecList = crossSection.getXsecFromSLHAFile(self.filename)
         #Check if any of particles being produced have visible displaced vertices
         #with a weight > sigmacut
-        msg = None
+        msg = ""
         for pid in xsecList.getPIDs():
             if pid in rEven: continue
             if pid == self.findLSP(): continue
             xsecmax = xsecList.getXsecsFor(pid).getMaxXsec()
             if xsecmax < self.sigmacut: continue           
             lt = self.getLifetime(pid, ctau=True)
+            if lt < 0:
+                #error for stable charged particles
+                if self.visible(abs(pid)):
+                    msg += "#Stable charged particle: %s\n" %pid
             if lt < self.maxDisplacement: continue
             brvalue = 0.
             daughters = []
@@ -525,7 +463,6 @@ class SlhaStatus(Printer):
                         daughters.append(decay.ids)
                         break
             if xsecmax*brvalue > self.sigmacut:
-                if not msg: msg = "Found displaced vertices:\n"
                 if lt < 1.: msg = msg + "#Displaced vertex: "
                 else: msg = msg + "#Longlived particle: "
                 msg = msg + "%s (c*tau = %s) is decaying to %s\n" %(pid,str(lt), str(daughters))
