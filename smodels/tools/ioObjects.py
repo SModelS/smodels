@@ -169,13 +169,12 @@ class SlhaStatus(Printer):
     = 1: the check is ok
     = -1: case of a physical problem, e.g. charged LSP,
     = -2: case of formal problems, e.g. missing decay blocks, in the file
-    The parameter maxFlightlength is specified in meters. 
+    The parameter maxDisplacement is specified in meters. 
     """
-    def __init__(self, filename, maxFlightlength=1., maxDisplacement=.01, sigmacut=.01*fb,massgap=5.*GeV,
+    def __init__(self, filename, maxDisplacement=.01, sigmacut=.01*fb,massgap=5.*GeV,
                  checkLSP = True,
                  findIllegalDecays = False, checkXsec = True, findLonglived = True):
         self.filename = filename
-        self.maxFlightlength = maxFlightlength
         self.maxDisplacement = maxDisplacement
         self.sigmacut = sigmacut
         self.massgap = massgap
