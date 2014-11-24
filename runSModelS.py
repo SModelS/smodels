@@ -7,11 +7,11 @@
 import sys, os, logging
 import argparse
 from ConfigParser import SafeConfigParser
-from smodels.tools.physicsUnits import GeV, fb, TeV
-from smodels.tools import ioObjects, xsecComputer, missingTopologies
-from smodels.experiment import smsHelpers, smsAnalysisFactory, smsResults
+from smodels.tools.physicsUnits import GeV, fb
+from smodels.tools import ioObjects, missingTopologies
+from smodels.experiment import smsHelpers, smsAnalysisFactory
 from smodels.theory import slhaDecomposer, lheDecomposer
-from smodels.theory.theoryPrediction import theoryPredictionFor,  _getElementsFrom
+from smodels.theory.theoryPrediction import theoryPredictionFor
 from smodels.installation import installDirectory
 log = logging.getLogger(__name__)
 

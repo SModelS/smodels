@@ -12,7 +12,7 @@
 
 from __future__ import print_function
 import argparse
-from smodels.theory.ioObjects import SlhaStatus 
+from smodels.tools.ioObjects import SlhaStatus 
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser() # pylint: disable-msg=C0103
