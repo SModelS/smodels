@@ -122,7 +122,7 @@ class FileStatus(Printer):
     It holds an LheStatus (SlhaStatus) object if inputType = lhe (slha)
     """
     
-    def __init__(self, inputType, inputFile, sigmacut=None, massgap=None):
+    def __init__(self, inputType, inputFile, sigmacut=None):
 
         self.inputType = inputType
                 
@@ -130,7 +130,7 @@ class FileStatus(Printer):
             self.filestatus = LheStatus(inputFile)            
             self.status = self.filestatus.status
         elif self.inputType == 'slha':
-            self.filestatus = SlhaStatus(inputFile,sigmacut=sigmacut,massgap=massgap)            
+            self.filestatus = SlhaStatus(inputFile,sigmacut=sigmacut)            
             self.status = self.filestatus.status
         else:
             self.filestatus = None
@@ -171,13 +171,12 @@ class SlhaStatus(Printer):
     = -2: case of formal problems, e.g. missing decay blocks, in the file
     The parameter maxDisplacement is specified in meters. 
     """
-    def __init__(self, filename, maxDisplacement=.01, sigmacut=.01*fb,massgap=5.*GeV,
+    def __init__(self, filename, maxDisplacement=.01, sigmacut=.01*fb,
                  checkLSP = True,
                  findIllegalDecays = False, checkXsec = True, findLonglived = True):
         self.filename = filename
         self.maxDisplacement = maxDisplacement
         self.sigmacut = sigmacut
-        self.massgap = massgap
         self.slha = self.read()
         if not self.slha:
             self.status = -3, "Could not read input slha"

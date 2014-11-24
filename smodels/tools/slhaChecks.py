@@ -34,16 +34,12 @@ if __name__ == "__main__":
     argparser.add_argument('-sigmacut','--sigmacut',
                            help = 'give sigmacut in fb',
                            default = .01)
-    argparser.add_argument('-mg', '--massgap',
-                           help= 'give massgap for mass compression in GeV',
-                           default = 5.)
     argparser.add_argument('-illegal','--illegal',
                            help= 'check if all decays are kinematically allowed', 
                            action = 'store_true')
     args = argparser.parse_args() # pylint: disable-msg=C0103
     status = SlhaStatus(args.filename, maxDisplacement=args.displacement,
-                        sigmacut=args.sigmacut*fb,
-                        massgap=args.massgap*GeV, checkLSP=args.lsp,
+                        sigmacut=args.sigmacut*fb, checkLSP=args.lsp,
                         findIllegalDecays=args.illegal, checkXsec=args.xsec,
                         findLonglived=args.longlived) # pylint: disable-msg=C0103
     print(status.status)
