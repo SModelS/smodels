@@ -405,7 +405,7 @@ class SlhaStatus(Printer):
         """
         widths = self.getDecayWidths()
         try:
-            if widths[pid]: lt = (1.0 / widths[pid]) / 1.51926778e24
+            if widths[abs(pid)]: lt = (1.0 / widths[abs(pid)]) / 1.51926778e24
             else:
                 # Particle is stable
                 return -1
@@ -414,7 +414,7 @@ class SlhaStatus(Printer):
             else:
                 return lt
         except KeyError:
-            print("%s is no valid PID" % pid)
+            print("%s is no valid PID" % abs(pid))
             
 
     def sumBR(self, pid):
