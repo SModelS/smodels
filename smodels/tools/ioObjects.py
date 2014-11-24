@@ -225,6 +225,7 @@ class SlhaStatus(Printer):
             if st < 0:
                 ret = -1
                 retMes = retMes + "#" + message + "\n"
+            elif st == 1 and ret >= 0: ret = 1
         if ret == 0:
             return 0, "No checks performed"
         if ret == -1:
