@@ -445,7 +445,7 @@ class SlhaStatus(Printer):
         for pid in xsecList.getPIDs():
             if pid in rEven: continue
             if pid == self.findLSP(): continue
-            xsecmax = xsecList.getXsecsFor(pid).getMaxXsec()
+            xsecmax = xsecList.getXsecsFor(pid).getMaxXsec()            
             if xsecmax < self.sigmacut: continue           
             lt = self.getLifetime(pid, ctau=True)
             if lt < 0:
