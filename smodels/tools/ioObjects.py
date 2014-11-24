@@ -456,7 +456,7 @@ class SlhaStatus(Printer):
             brvalue = 0.
             daughters = []
             #Sum all BRs which contain at least one visible particle
-            for decay in self.slha.decays[pid].decays:
+            for decay in self.slha.decays[abs(pid)].decays:
                 for pidb in decay.ids:
                     if self.visible(abs(pidb), decay=True):
                         brvalue += decay.br
@@ -497,7 +497,7 @@ class SlhaStatus(Printer):
         if decay:
             for decay in self.slha.decays[pid].decays:
                 for pids in decay.ids:
-                    if self.visible(pids, decay=True): return True
+                    if self.visible(abs(pids), decay=True): return True
         return False
 
 
