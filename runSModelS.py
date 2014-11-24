@@ -49,7 +49,7 @@ def main(inputFile, parameterFile, outputFile):
         sys.exit()
     #Check input file for errors
     if parser.getboolean("options","checkInput"):        
-        inputStatus = ioObjects.FileStatus(inputType,inputFile,sigmacut,minmassgap)        
+        inputStatus = ioObjects.FileStatus(inputType,inputFile,sigmacut)        
     else: inputStatus.status = [0, None]
 
     #check database address    
