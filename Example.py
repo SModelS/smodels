@@ -10,12 +10,12 @@
 
 #Import basic functions (this file must be run under the installation folder
 from __future__ import print_function
+import sys
 from smodels.theory import slhaDecomposer
 from smodels.theory import lheDecomposer
 from smodels.tools.physicsUnits import fb, GeV
 from smodels.experiment import smsAnalysisFactory
 from smodels.theory.theoryPrediction import theoryPredictionFor
-
 from smodels.experiment import smsHelpers
 
 #Set the address of the database folder
@@ -37,8 +37,7 @@ def main():
     mingap = 5. * GeV
 
     #Decompose model (use slhaDecomposer for SLHA input or lheDecomposer for LHE input):
-    smstoplist = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=True,
-                                        doInvisible=True, minmassgap=mingap)
+    smstoplist = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=True,doInvisible=True, minmassgap=mingap)
 #     smstoplist = lheDecomposer.decompose(lhefile, doCompress=True,doInvisible=True, minmassgap=mingap)
 
     # Print decomposition summary. Set outputLevel=0 (no output), 1 (simple output), 2 (extended output)
@@ -46,7 +45,6 @@ def main():
 
     # Load all analyses from database
     listofanalyses = smsAnalysisFactory.load()
-
 
     # Compute the theory predictions for each analysis
     analysesPredictions = [theoryPredictionFor(analysis, smstoplist) for analysis in listofanalyses]
@@ -64,8 +62,10 @@ def main():
             
             #Get upper limit for the respective prediction:
             print("Analysis UL = ",theoryPrediction.analysis.getUpperLimitFor(theoryPrediction.mass)) 
-        
+    
+    
 
 
 if __name__ == '__main__':
     main()
+    sys.exit()
