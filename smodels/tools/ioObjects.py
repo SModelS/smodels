@@ -173,7 +173,7 @@ class SlhaStatus(Printer):
     """
     def __init__(self, filename, maxFlightlength=1., maxDisplacement=.01, sigmacut=.01*fb,massgap=5.*GeV,
                  checkLSP = True,
-                 findIllegalDecays = False, checkXsec = True, findDisplaced = True):
+                 findIllegalDecays = False, checkXsec = True, findLonglived = True):
         self.filename = filename
         self.maxFlightlength = maxFlightlength
         self.maxDisplacement = maxDisplacement
@@ -187,7 +187,7 @@ class SlhaStatus(Printer):
         self.lspStatus = self.testLSP(checkLSP)
         self.illegalDecays = self.findIllegalDecay(findIllegalDecays)
         self.xsec = self.hasXsec(checkXsec)
-        self.vertexStatus = self.findDisplacedVertices(findDisplaced)
+        self.longlived = self.findLonglivedParticles(findLonglived)
         
         self.status = self.evaluateStatus()
     
@@ -222,7 +222,7 @@ class SlhaStatus(Printer):
             elif st == 1 and not ret == -2:
                 ret = 1
         for st, message in [self.lspStatus,
-                            self.vertexStatus, self.illegalDecays]:
+                            self.longlived, self.illegalDecays]:
             if st < 0:
                 ret = -1
                 retMes = retMes + "#" + message + "\n"
@@ -430,18 +430,19 @@ class SlhaStatus(Printer):
         return self.deltaMass(lsp, nlsp)
 
 
-    def findDisplacedVertices(self, findDisplaced):
+    def findLonglivedParticles(self, findLonglived):
         """
         find meta-stable particles that decay to visible particles
+        and stable charged particles
         """
-        if not findDisplaced:
-            return 0, "Did not check for displaced vertices"
+        if not findLonglived:
+            return 0, "Did not check for long lived particles"
         
         #Get list of cross-sections:
         xsecList = crossSection.getXsecFromSLHAFile(self.filename)
         #Check if any of particles being produced have visible displaced vertices
         #with a weight > sigmacut
-        msg = ""
+        chargedList = []
         for pid in xsecList.getPIDs():
             if pid in rEven: continue
             if pid == self.findLSP(): continue
@@ -451,7 +452,7 @@ class SlhaStatus(Printer):
             if lt < 0:
                 #error for stable charged particles
                 if self.visible(abs(pid)):
-                    msg += "#Stable charged particle: %s\n" %pid
+                    if not abs(pid) in chargedList: chargedList.append(abs(pid))
             if lt < self.maxDisplacement: continue
             brvalue = 0.
             daughters = []
@@ -463,12 +464,9 @@ class SlhaStatus(Printer):
                         daughters.append(decay.ids)
                         break
             if xsecmax*brvalue > self.sigmacut:
-                if lt < 1.: msg = msg + "#Displaced vertex: "
-                else: msg = msg + "#Longlived particle: "
-                msg = msg + "%s (c*tau = %s) is decaying to %s\n" %(pid,str(lt), str(daughters))
-        if not msg: return 1,"no displaced vertices found"
-        else: return -1, msg
-
+                if not abs(pid) in chargedList: chargedList.append(abs(pid))
+        if not chargedList: return 1,"no long lived particles found"
+        else: return -1, "#Visible decays / stable charged particles: %s" %str(chargedList)
 
 
     def degenerateChi(self):
