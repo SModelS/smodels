@@ -14,7 +14,7 @@ from __future__ import print_function
 from smodels.tools.ioObjects import SlhaStatus
 from smodels.tools.physicsUnits import fb
 
-def main(args):
+def main(args):   
     status = SlhaStatus(args.filename, maxDisplacement=args.displacement,
                         sigmacut=args.sigmacut*fb, checkLSP=args.lsp,
                         findIllegalDecays=args.illegal, checkXsec=args.xsec,
