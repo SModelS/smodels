@@ -12,7 +12,6 @@ import os, sys
 from smodels.theory import lheReader
 from smodels.theory.printer import Printer
 from smodels.tools.physicsUnits import GeV, fb
-from smodels.tools import smMasses
 from smodels.tools import modpyslha as pyslha
 from smodels.particles import qNumbers, rEven
 from smodels.theory import crossSection
@@ -259,7 +258,7 @@ class SlhaStatus(Printer):
                 mDau = 0.
                 for ptc in dcy.ids:
                     ptc = abs(ptc)
-                    if ptc in smMasses.masses: mDau += smMasses.masses[ptc]
+                    if ptc in SMmasses: mDau += SMmasses[ptc]
                     elif ptc in self.slha.blocks["MASS"].keys(): mDau += abs(self.slha.blocks["MASS"][ptc])
                     else: return -2, "Unknown PID %s in decay of %s" %(str(ptc),str(particle)) # FIXME unknown pid, what to do??
                 if mDau > mMom:
@@ -487,8 +486,8 @@ class SlhaStatus(Printer):
         If pid is not known, consider it as visible
         If pid not SM particle and decay = True, check if particle or decay products are visible
         """
-        if pid in smMasses.visible: return True
-        if pid in smMasses.invisible: return False
+        if pid in SMvisible: return True
+        if pid in SMinvisible: return False
         qn = Qnumbers(pid)
         if qn.pid == 0:
             return True
@@ -517,3 +516,8 @@ class Qnumbers:
             self.spin2 = self.l[0]
             self.charge3 = self.l[1]
             self.cdim = self.l[2]
+
+SMmasses = {1: 4.8e-3 , 2: 2.3e-3 , 3: 95e-2 ,4: 1.275 ,5: 4.18 , 6: 173.21 ,11: 0.51099e-3 ,12: 0,13: 105.658e-3 ,14: 0 ,15: 1.177682 , 16: 0 , 21: 0 , 22: 0 ,23: 91.1876 ,24: 80.385 , 25: 125.5}
+
+SMvisible = [1,2,3,4,5,6,11,13,15,21,22,23,24,25]
+SMinvisible = [12,14,16]
