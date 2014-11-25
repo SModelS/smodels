@@ -94,14 +94,8 @@ class Printer(object):
                 output += "Number of vertices: " + str(topo.vertnumb) + ' \n'
                 old_vertices = str(topo.vertnumb)
             output += "Number of vertex parts: " + str(topo.vertparts) + '\n'
-            totxsec = crossSection.XSectionList()
-            for el in topo.elementList:
-                totxsec.combineWith(el.weight)
-            output += "Total Global topology weight:\n" 
-            for k in totxsec.getDictionary():
-                pos=k.find(" " )
-                sqrts=str( float(k[:pos]) * TeV) 
-                output += "Sqrts: " + sqrts + "\t Weight: " + str(totxsec.getDictionary()[k]) + "\n"
+            totxsec = topo.getTotalWeight()
+            output += "Total Global topology weight :\n"+totxsec.niceStr()+'\n'
             output += "Total Number of Elements: " + str(len(topo.elementList)) + '\n' 
             if outputLevel == 2:                
                 for el in topo.elementList:
