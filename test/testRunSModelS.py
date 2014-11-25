@@ -19,8 +19,8 @@ class RunSModelSTest(unittest.TestCase):
         filename = "%s/inputFiles/slha/lightSquarks.slha" % (installDirectory() )
         print "filename=",filename
         main(filename, 
-             parameterfile="%s/test/testParameters.ini" %installDirectory(), 
-             outputfile="%s/test/unitTestOutput.txt" %installDirectory())
+             parameterFile="%s/test/testParameters.ini" %installDirectory(), 
+             outputFile="%s/test/unitTestOutput.txt" %installDirectory())
         sample = summaryReader.Summary(
                 "%s/test/summary_default.txt" %installDirectory())
         outputfile = summaryReader.Summary(
