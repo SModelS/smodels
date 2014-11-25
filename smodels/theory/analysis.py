@@ -8,7 +8,7 @@
         
 """
 
-from smodels.experiment import limitGetter, smsHelpers
+from smodels.experiment import limitGetter, smsResults
 from smodels.theory.printer import Printer
 
 class ULanalysis(Printer):
@@ -68,9 +68,12 @@ class ULanalysis(Printer):
         This method returns a string describing the mass condition
         
         :returns: string describing mass condition (from the massCondition field)
+                  or None if no condition is found
         """
         
-        return smsHelpers.getMetaInfoField(self.label, "massCondition")
+        ananame, txname = self.label.split(':')
+        
+        return smsResults.getMassCondition(ananame,txname)
     
     def formatData(self,outputLevel):
         """

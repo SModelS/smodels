@@ -85,6 +85,19 @@ def getConstraints(analysis, topology="all", run=None):
     return ret[topology]
 
 
+def getMassCondition(anaName, txName, run=None):
+    """
+    Get the mass condition for an analysis.
+
+    :returns: string containing the mass condition (e.g. equal branches)
+    """
+        
+    run = smsHelpers.getRun(anaName, run)
+    ret = smsHelpers.getLines(anaName, run, "massCondition")
+    if not txName in ret: return None
+    else: return ret[txName]
+
+
 def getSqrts(analysis, run=None):
     """ get the center-of-mass energy of the analysis.
     """
