@@ -158,7 +158,14 @@ class XSection(object):
         """
         st = self.info.label + ':' + str(self.value)
         return st
-
+    
+    def niceStr(self):
+        """
+        Generates a more human readable string. The string format is:
+        Sqrts: self.info.sqrts,  Weight: self.value
+        """
+        st = 'Sqrts: '+str(self.info.sqrts) + ', Weight:' + str(self.value)
+        return st
 
     def copy(self):
         """
@@ -249,6 +256,12 @@ class XSectionList(object):
 
     def __str__(self):
         return str([str(xsec) for xsec in self])
+    
+    def niceStr(self):
+        st = ""
+        for xsec in self:
+            st += xsec.niceStr()+'\n'
+        return st    
 
 
     def copy(self):
@@ -427,12 +440,6 @@ class XSectionList(object):
                 xSecs = self.getXsecsFor(pid)
                 for xsec in xSecs:
                     xSecDictionary[pid][xsec.info.label] = xsec.value
-            #if len(allPids) == 1:
-            #    # If groupBy == pids and a
-            #    # single pid is present, return a simple dictionary with the
-            #    # cross-sections for the pid.
-            #    # Return standard weight dictionary
-            #    xSecDictionary = xSecDictionary[allPids[0]]
 
         elif groupBy == "labels":
             allLabels = self._getLabels()
