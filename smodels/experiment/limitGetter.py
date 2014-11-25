@@ -69,8 +69,8 @@ def getPlotLimit(inmass, analysis):
         logger.error("Length of mass-array < 2 (M: " + str(massArray) + ").")
         sys.exit()
 
-    massCondition = analysis.getMassCondition()
-    if not massCondition or massCondition == "equal branches":
+    branchcondition = analysis.getMassCondition()
+    if not branchcondition or branchcondition == "equal branches":
         # Make sure the two branches have equal masses
         if massArray[0] != massArray[1]:
             logger.error("Masses differ between branches.")

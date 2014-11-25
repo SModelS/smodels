@@ -59,19 +59,19 @@ class ULanalysis(Printer):
         
         return limitGetter.getPlotLimit(mass, self)
     
-    def getMassCondition(self):
+    def getBranchCondition(self):
         """
         Most analyses include assumptions about the masses of the elements
         appearing in their constraints.
-        This method returns a string describing the mass condition
+        This method returns a string describing this condition
         
-        :returns: string describing mass condition (from the massCondition field)
+        :returns: string describing branch condition (from the branchcondition field)
                   or None if no condition is found
         """
         
         ananame, txname = self.label.split(':')
         
-        return smsResults.getMassCondition(ananame,txname)
+        return smsResults.getBranchCondition(ananame,txname)
     
     def formatData(self,outputLevel):
         """

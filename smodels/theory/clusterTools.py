@@ -364,12 +364,12 @@ def _getGoodElements(elements, analysis, maxDist):
     the branch average (if equal branch masses are required by the analysis)
     """
     goodElements = []    
-    massCondition = analysis.getMassCondition()   
+    branchCondition = analysis.getBranchCondition()   
     
     for element in elements:
         mass = element.getMasses()
         goodmass = None
-        if mass[0] != mass[1] and (not massCondition or massCondition == "equal branches"):
+        if mass[0] != mass[1] and (not branchCondition or branchCondition == "equal branches"):
             mass1 = [mass[0], mass[0]]
             mass2 = [mass[1], mass[1]]
             mP1 = massPosition(mass1, analysis)
