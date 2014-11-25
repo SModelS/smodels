@@ -28,12 +28,12 @@ def main():
     xseccomputer.add_argument('-f', '--filename', help="SLHA file to compute cross sections for", required=True)
       
     slhachecker = subparsers.add_parser('slhachecker', description="Perform several checks on a SLHA file.")    
-    slhachecker.add_argument('-xS', '--xsec', help = 'check if file contains xsection block', action = 'store_false')
-    slhachecker.add_argument('-lsp', '--lsp', help = 'check if lsp is neutral and colorless', action = 'store_false')
-    slhachecker.add_argument('-longlived', '--longlived', help = 'check for stable charged particles and visible displaced vertices', action = 'store_false')
+    slhachecker.add_argument('-xS', '--xsec', help = 'turn off the check for xsection blocks', action = 'store_false')
+    slhachecker.add_argument('-lsp', '--lsp', help = 'turn off the check for charged lsp', action = 'store_false')
+    slhachecker.add_argument('-longlived', '--longlived', help = 'turn off the check for stable charged particles and visible displaced vertices', action = 'store_false')
     slhachecker.add_argument('-m', '--displacement', help = 'give maximum displacement of secondary vertex in m', default = .001, type = float)
     slhachecker.add_argument('-s','--sigmacut', help = 'give sigmacut in fb', default = .01, type = float)
-    slhachecker.add_argument('-illegal','--illegal', help= 'check if all decays are kinematically allowed', action = 'store_true')
+    slhachecker.add_argument('-illegal','--illegal', help= 'turn on check for kinematically forbidden decays', action = 'store_true')
     slhachecker.add_argument('-f', '--filename', help = 'name of input SLHA file', required=True)
     
     
