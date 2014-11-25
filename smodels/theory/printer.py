@@ -124,11 +124,7 @@ class Printer(object):
         output += "\t\t The element masses are \n"
         for i, el in enumerate(self.getMasses()):
             output += "\t\t Branch %i: " %i+ str(el) + "\n"
-        output += "\t\t The element weights are: \n"
-        for k in self.weight.getDictionary():
-            pos=k.find(" " )
-            sqrts=str( float(k[:pos]) * TeV) 
-            output += "\t\t Sqrts: " + sqrts + "\t Weight: " + str(self.weight.getDictionary()[k]) + "\n"
+        output += "\t\t The element weights are: \n \t\t "+self.weight.niceStr()
 
         return output
     
