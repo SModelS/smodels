@@ -78,11 +78,6 @@ def getPlotLimit(inmass, analysis):
         masslist = massArray[0]
     else: masslist = massArray
 
-    # Run label
-    run = analysis.run
-    # If run has not been defined, use latest run
-    if run == "":
-        run = None
     analysis, cmsLabel = analysis.label.split(':')
     upperLimit = smsInterpolation.upperLimit(analysis, cmsLabel, masslist)
     return upperLimit

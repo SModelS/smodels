@@ -19,7 +19,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def upperLimit(analysis, topology, masses, run=None):
+def upperLimit(analysis, topology, masses, path=None):
     """
     Return upper limit for analysis-topology for given masses. 
     
@@ -30,8 +30,8 @@ def upperLimit(analysis, topology, masses, run=None):
     
     """
     d = smsResults.getaxes(analysis, topology)
-    if not run:
-        run = smsHelpers.getRun(analysis)
+    if not path:
+        path = smsHelpers.getPath(analysis)
     if not d:
         logger.error("%s/%s not found.", analysis, topology)
         return None
@@ -71,7 +71,7 @@ def upperLimit(analysis, topology, masses, run=None):
                                             masses[_getAxis('y', d[0]['axes'])],
                                             interpolate=True)
         return None
-    return _doGridData(analysis, topology, masses, d, run)
+    return _doGridData(analysis, topology, masses, d, path)
 
 
 def _getHistName(topo, mz):
@@ -89,7 +89,7 @@ def _getHistName(topo, mz):
         return topo + mz
 
 
-def _doGridData(analysis, topology, masses, dPar, run=None):
+def _doGridData(analysis, topology, masses, dPar, path=None):
     """
     Create np.array and uses scipy.griddata function for analysis-topology.
     
@@ -118,7 +118,7 @@ def _doGridData(analysis, topology, masses, dPar, run=None):
         ulDict = smsHelpers.getUpperLimitDictionary(analysis,
                                                     _getHistName(topology,
                                                                  ds['mz'][0]),
-                                                    run)
+                                                    path)
         if not ulDict: continue
         cter += 1
         for x in ulDict:

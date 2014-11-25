@@ -17,48 +17,44 @@ import logging
 logger = logging.getLogger(__name__)
 
 base = "/database/path/not/set"
-runs = ["8TeV", "2012", "ATLAS8TeV", "2011", "RPV8", "RPV7"]
-runs_ = {}
 mlines = {}
 infoFields = {}
 pMI_ = {}
 upperLimitDict = {}
 expupperLimitDict = {}
 
+sqrts = ["8TeV"]
+experiments = ["ATLAS", "CMS"]
+paths_ = {}
 
-def getRun(analysis, run=None):
+def getPath(analysis, path=None):
     """
-    Search for an analysis.
-
-    If a specific run is given, check if results are present.
-
-    :returns: run; None, if not found;
-
+    Search for an analysis
     """
-    key = analysis + str(run)
-    if key in runs_:
-        return runs_[key]
-    if run:
-        if os.path.exists("%s/%s/%s" % (base, run, analysis)):
-            runs_[key] = run
-            return run
-    for trun in runs:
-        if os.path.exists("%s/%s/%s" % (base, trun, analysis)):
-            runs_[key] = trun
-            return trun
-    runs_[key] = None
+    if analysis in paths_:
+        return paths_[analysis]
+    if path:
+        if os.path.exists("%s/%s/%s" % (base, path, analysis)):
+            paths_[analysis] = str(path)
+            return paths_[analysis]
+    for s in sqrts:
+        for e in experiments:
+            if os.path.exists("%s/%s/%s/%s" % (base, s, e, analysis)):
+                paths_[analysis] = "%s/%s" % (s, e)
+                return paths_[analysis]
+    paths_[analysis] = None
     return None
 
 
-def getLines(analysis, run, label="condition"):
+def getLines(analysis, path, label="condition"):
     """
-    Get all <label> lines in info.txt for an analysis-run pair.
+    Get all <label> lines in info.txt for an analysis-path pair.
 
     """
-    key = analysis + run + label
+    key = analysis + path + label
     if key in mlines:
         return mlines[key]
-    info = "%s/%s/%s/info.txt" % (base, run, analysis)
+    info = "%s/%s/%s/info.txt" % (base, path, analysis)
     ret = {}
     if not os.path.exists(info):
         logger.warn("Cannot find %s.", info)
@@ -92,16 +88,16 @@ def getLines(analysis, run, label="condition"):
     return ret
 
 
-def getMetaInfoField(analysis, field, run=None):
+def getMetaInfoField(analysis, field, path):
     """
     Get one specific entry of the meta info.
 
     """
-    key = analysis + field + str(run)
+    key = analysis + field + str(path)
     if key in infoFields:
         return infoFields[key]
-    run = getRun(analysis, run)
-    metainfo = _parseMetaInfo(analysis, run)
+    path = getPath(analysis, path)
+    metainfo = _parseMetaInfo(analysis, path)
     if not field in metainfo:
         infoFields[key] = None
         return infoFields[key]
@@ -117,15 +113,15 @@ def getMetaInfoField(analysis, field, run=None):
     return f
 
 
-def _parseMetaInfo(analysis, run):
+def _parseMetaInfo(analysis, path):
     """
-    Get all the meta information for a given analysis-run pair.
+    Get all the meta information for a given analysis-path pair.
 
     """
-    key = analysis + str(run)
+    key = analysis + str(path)
     if key in pMI_:
         return pMI_[key]
-    info = "%s/%s/%s/info.txt" % (base, run, analysis)
+    info = "%s/%s/%s/info.txt" % (base, path, analysis)
     ret = {}
     if not os.path.exists(info):
         logger.warn("Cannot find %s.", info)
@@ -153,20 +149,20 @@ def _parseMetaInfo(analysis, run):
     return ret
 
 
-def getUpperLimitDictionary(analysis, topology, run, expected=False):
+def getUpperLimitDictionary(analysis, topology, path, expected=False):
     """
     Returns a dictionary containing the raw Upper Limit data for the analysis
     and topology. 
 
     """
-    key = analysis + topology + str(run)
+    key = analysis + topology + str(path)
     if expected:
         if key in expupperLimitDict:
             return expupperLimitDict[key]
     else:
         if key in upperLimitDict:
             return upperLimitDict[key]
-    dictfile = "%s/%s/%s/sms.py" % (base, run, analysis)
+    dictfile = "%s/%s/%s/sms.py" % (base, path, analysis)
     if not os.path.exists(dictfile):
         logger.warn("Dictionary file %s does not exist.", dictfile)
         upperLimitDict[key] = None
@@ -198,14 +194,14 @@ def getUpperLimitDictionary(analysis, topology, run, expected=False):
     return dictionary[topology]
 
 
-def hasDictionary(analysis, run=None, topology=None):
+def hasDictionary(analysis, path=None, topology=None):
     """
     Check if available upper limits are in dictionary format.
 
     """
-    if not run:
-        run = getRun(analysis)
-    dictfile = "%s/%s/%s/sms.py" % (base, run, analysis)
+    if not path:
+        path = getPath(analysis)
+    dictfile = "%s/%s/%s/sms.py" % (base, path, analysis)
     if os.path.exists(dictfile):
         if topology == None:
             return True
