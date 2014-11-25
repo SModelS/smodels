@@ -19,8 +19,8 @@ smsHelpers.base =  './database/'
 class UpperLimitTest(unittest.TestCase):
 
     def testDirectDecay(self):
-        ul = float(upperLimit("SUS12011","T2",[400*GeV,100*GeV])/pb)
-        self.assertAlmostEquals ( ul, 0.506043016910553 )
+        ul = float(upperLimit("SUS12028","T2",[400*GeV,100*GeV])/pb)
+        self.assertAlmostEquals ( ul, 0.43757864832878113)
 
     def testCascadeDecay(self):
         ul = float(upperLimit("ATLAS_CONF_2013_048","T6bbWW",[500*GeV,400*GeV,100*GeV])/pb)
