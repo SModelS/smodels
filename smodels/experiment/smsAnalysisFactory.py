@@ -71,6 +71,7 @@ def load(analyses=None, topologies=None, sqrts=[7, 8], usePrivate=False ):
             logger.debug(str(tx))
             newAnalysis = analysis.ULanalysis()
             newAnalysis.sqrts = smsResults.getSqrts(ana)
+            newAnalysis.lum = smsResults.getLumi(ana)
             stopo = _getRealTopo(tx)
             newAnalysis.label = ana + ":" + tx
             # "2012"
