@@ -143,8 +143,7 @@ def addXSecToFile(xsecs, slhafile, comment=None, complain=True):
         sys.exit()
     if len(xsecs) == 0:
         logger.warning("No cross-sections available.")
-        import sys
-        sys.exit()
+        return False
     # Check if file already contain cross-section blocks
     xSectionList = crossSection.getXsecFromSLHAFile(slhafile)
     if xSectionList and complain:
