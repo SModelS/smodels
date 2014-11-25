@@ -415,9 +415,7 @@ class XSectionList(object):
         
         First level keys are the particles IDs (if groupBy == pids) or labels
         (if groupBy == labels) and values are the cross-section labels or
-        particle IDs and the cross-section value. If groupBy == pids and a
-        single pid is present, return a simple dictionary with the
-        cross-sections for the pid.
+        particle IDs and the cross-section value. 
         
         """
         xSecDictionary = {}
@@ -429,9 +427,12 @@ class XSectionList(object):
                 xSecs = self.getXsecsFor(pid)
                 for xsec in xSecs:
                     xSecDictionary[pid][xsec.info.label] = xsec.value
-            if len(allPids) == 1:
-                # Return standard weight dictionary
-                xSecDictionary = xSecDictionary[allPids[0]]
+            #if len(allPids) == 1:
+            #    # If groupBy == pids and a
+            #    # single pid is present, return a simple dictionary with the
+            #    # cross-sections for the pid.
+            #    # Return standard weight dictionary
+            #    xSecDictionary = xSecDictionary[allPids[0]]
 
         elif groupBy == "labels":
             allLabels = self._getLabels()
