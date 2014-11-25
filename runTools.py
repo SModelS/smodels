@@ -10,7 +10,7 @@
 
 import argparse
 from smodels.tools import xsecComputer
-from smodels.tools import slhaChecks
+from smodels.tools import slhaChecks, lheChecks
 
 
 def main():

@@ -89,15 +89,15 @@ def getConstraints(analysis, topology="all", path=None):
     return ret[topology]
 
 
-def getMassCondition(anaName, txName, path=None):
+def getBranchCondition(anaName, txName, path=None):
     """
-    Get the mass condition for an analysis.
+    Get the branch condition for an analysis.
 
-    :returns: string containing the mass condition (e.g. equal branches)
+    :returns: string containing the branch condition (e.g. equal branch masses)
     """
         
     path = smsHelpers.getPath(anaName, path)
-    ret = smsHelpers.getLines(anaName, path, "massCondition")
+    ret = smsHelpers.getLines(anaName, path, "branchcondition")
     if not txName in ret: return None
     else: return ret[txName]
 
