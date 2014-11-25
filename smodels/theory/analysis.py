@@ -24,13 +24,11 @@ class ULanalysis(Printer):
     :ivar label: Analysis label/name
     :ivar sqrts: Analysis center-of-mass energy
     :ivar lum: Analysis luminosity
-    :ivar run: Analysis run label    
     """
     def __init__(self):
         self.label = ""
         self.sqrts = 0
         self.lum = 0
-        self.run = None
         self.conditions = None
         self.constraint = None
         self.elementsEff = {}
@@ -93,13 +91,11 @@ class SRanalysis(Printer):
     :ivar label: Analysis label/name
     :ivar sqrts: Analysis center-of-mass energy
     :ivar lum: Analysis luminosity
-    :ivar run: Analysis run label
     """
     def __init__(self):
         self.label = ""
         self.sqrts = 0
         self.lum = 0
-        self.run = None
 
     def __str__(self):
         return self.label

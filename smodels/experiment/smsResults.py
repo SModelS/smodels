@@ -13,7 +13,7 @@ from smodels.tools.physicsUnits import TeV, pb, fb, GeV
 from smodels.tools import rcFile
 from smodels.experiment import smsHelpers
 from smodels.experiment.experimentExceptions import MetaInfoError
-from smodels.experiment.smsHelpers import getRun
+from smodels.experiment.smsHelpers import getPath
 from smodels.tools.uniqueLogFilter import UniqueFilter
 import logging
 
@@ -25,43 +25,47 @@ constraints = {}
 conditions = {}
 
 
-def getAllResults(run=None):
+def getAllResults(sqrts=None, experiment=None):
     """
     Get all analyses and topologies that have results.
 
     """
     import os
-    key = str(run)
+    key = str(sqrts)+str(experiment)
     if key in allresults:
         return allresults[key]
-    runs = smsHelpers.runs
-    if run:
-        runs = [run]
+    sqrtsList = smsHelpers.sqrts
+    experimentList = smsHelpers.experiments
+    if sqrts:
+        sqrtsList = [sqrts]
+    if experiment:
+        experimentList = [experiment]
     ret = {}
-    for r in runs:
-        if not os.path.exists("%s/%s/" % (smsHelpers.base, r)):
-            logger.warning("Expected directory %s was not found in the database at %s" % (r, smsHelpers.base))
-            continue
-        dirs = os.listdir("%s/%s/" % (smsHelpers.base, r))
-        for ana in dirs:
-            if os.path.exists("%s/%s/%s/info.txt" % (smsHelpers.base, r, ana)):
-                topos = getTopologies(ana, run)
-                ret[ana] = topos
+    for s in sqrtsList:
+        for e in experimentList:
+            if not os.path.exists("%s/%s/%s/" % (smsHelpers.base, s, e)):
+                logger.warning("Expected directory %s/%s was not found in the database at %s" % (s, e, smsHelpers.base))
+                continue
+            dirs = os.listdir("%s/%s/%s" % (smsHelpers.base, s, e))
+            for ana in dirs:
+                if os.path.exists("%s/%s/%s/%s/info.txt" % (smsHelpers.base, s, e, ana)):
+                    topos = getTopologies(ana)
+                    ret[ana] = topos
     allresults[key] = ret
     return ret
 
 
-def getTopologies(analysis, run=None):
+def getTopologies(analysis):
     """
     Get all topologies of an analysis with constraints.
 
     """
-    run = smsHelpers.getRun(analysis, run)
-    x = getConstraints(analysis, run=run)
+    path = smsHelpers.getPath(analysis)
+    x = getConstraints(analysis, path=path)
     return x.keys()
 
 
-def getConstraints(analysis, topology="all", run=None):
+def getConstraints(analysis, topology="all", path=None):
     """
     Get constraints of an analysis.
 
@@ -70,11 +74,11 @@ def getConstraints(analysis, topology="all", run=None):
               None if non-existent;
 
     """
-    key = analysis + topology + str(run)
+    key = analysis + topology + str(path)
     if key in constraints:
         return constraints[key]
-    run = smsHelpers.getRun(analysis, run)
-    ret = smsHelpers.getLines(analysis, run, "constraint")
+    path = smsHelpers.getPath(analysis, path)
+    ret = smsHelpers.getLines(analysis, path, "constraint")
     if topology == "all":
         constraints[key] = ret
         return ret
@@ -85,23 +89,23 @@ def getConstraints(analysis, topology="all", run=None):
     return ret[topology]
 
 
-def getMassCondition(anaName, txName, run=None):
+def getMassCondition(anaName, txName, path=None):
     """
     Get the mass condition for an analysis.
 
     :returns: string containing the mass condition (e.g. equal branches)
     """
         
-    run = smsHelpers.getRun(anaName, run)
-    ret = smsHelpers.getLines(anaName, run, "massCondition")
+    path = smsHelpers.getPath(anaName, path)
+    ret = smsHelpers.getLines(anaName, path, "massCondition")
     if not txName in ret: return None
     else: return ret[txName]
 
 
-def getSqrts(analysis, run=None):
+def getSqrts(analysis, path=None):
     """ get the center-of-mass energy of the analysis.
     """
-    sqrts = smsHelpers.getMetaInfoField(analysis, "sqrts", run)
+    sqrts = smsHelpers.getMetaInfoField(analysis, "sqrts", path)
     try:
         return float(sqrts) * TeV
 
@@ -113,7 +117,7 @@ def getSqrts(analysis, run=None):
     return sqrts
 
 
-def getConditions(analysis, topology="all", fuzzy=True, run=None):
+def getConditions(analysis, topology="all", fuzzy=True, path=None):
     """
     Get conditions of an analysis.
 
@@ -122,14 +126,14 @@ def getConditions(analysis, topology="all", fuzzy=True, run=None):
               non-existent.
 
     """
-    key = analysis + topology + str(fuzzy) + str(run)
+    key = analysis + topology + str(fuzzy) + str(path)
     if key in conditions:
         return conditions[key]
-    run = smsHelpers.getRun(analysis, run)
+    path = smsHelpers.getPath(analysis, path)
     if fuzzy:
-        ret = smsHelpers.getLines(analysis, run, "fuzzycondition")
+        ret = smsHelpers.getLines(analysis, path, "fuzzycondition")
     else:
-        ret = smsHelpers.getLines(analysis, run, "condition")
+        ret = smsHelpers.getLines(analysis, path, "condition")
     if topology == "all":
         conditions[key] = ret
         return ret
@@ -140,7 +144,7 @@ def getConditions(analysis, topology="all", fuzzy=True, run=None):
     return ret[topology]
 
 
-def getaxes(analysis, topology=None, run=None):
+def getaxes(analysis, topology=None, path=None):
     """Get information about the histogram axes for an analysis.
 
     For each topology list of dictionary, each dictionary corresponds to one
@@ -152,7 +156,7 @@ def getaxes(analysis, topology=None, run=None):
     if not _exists(analysis, topology=None):
         return None
     try:
-        st = smsHelpers.getMetaInfoField(analysis, "axes", run)
+        st = smsHelpers.getMetaInfoField(analysis, "axes", path)
     except MetaInfoError:
         logger.error("Meta info field 'axes' does not exist in %s.", analysis)
         st = None
@@ -200,46 +204,46 @@ def getBase():
     """
     return smsHelpers.base
 
-def getURL(analysis, run=None):
+def getURL(analysis, path=None):
     """
     Get the URL of an analysis.
     
     """
     logger.warning ("getURL is deprecated")
-    return smsHelpers.getMetaInfoField(analysis, "url", run)
+    return smsHelpers.getMetaInfoField(analysis, "url", path)
 
 
-def hasURL(analysis, run=None):
+def hasURL(analysis, path=None):
     """
     Check if URL of an analysis exists."""
     logger.warning("hasURL is deprecated")
-    return smsHelpers.getMetaInfoField(analysis, "url", run)
+    return smsHelpers.getMetaInfoField(analysis, "url", path)
 
 
-def getPAS(analysis, run=None):
+def getPAS(analysis, path=None):
     """
     Get the PAS of an analysis.
     
     """
     logger.warning("getPAS is deprecated")
-    return smsHelpers.getMetaInfoField(analysis, "pas", run)
+    return smsHelpers.getMetaInfoField(analysis, "pas", path)
 
 
-def getJournal(analysis, run=None):
+def getJournal(analysis, path=None):
     """
     Get the journal of an analysis.
     
     """
     logger.warning ("getJournal is deprecated")
-    return smsHelpers.getMetaInfoField(analysis, "journal", run)
+    return smsHelpers.getMetaInfoField(analysis, "journal", path)
 
 
-def getLumi(analysis, run=None):
+def getLumi(analysis, path=None):
     """
     Get the integrated luminosity for an analysis.
     
     """
-    lumifb = smsHelpers.getMetaInfoField(analysis, "lumi", run)
+    lumifb = smsHelpers.getMetaInfoField(analysis, "lumi", path)
     try:
         return float(lumifb) / fb
     except ValueError:
@@ -250,58 +254,64 @@ def getLumi(analysis, run=None):
     return lumifb
 
 
-def isPrivate(analysis, run=None):
+def isPrivate(analysis, path=None):
     """
     Check if analysis is flagged as private.
     """
-    field=smsHelpers.getMetaInfoField(analysis, "private", run)
+    field=smsHelpers.getMetaInfoField(analysis, "private", path)
     if field==None: return False
     return bool(int(field))
 
 
-def getExperiment(analysis, run=None):
+def getExperiment(analysis, path=None):
     """
-    Check if run is ATLAS8TeV, else return CMS.
+    Check if path is to ATLAS directory, else return CMS.
     
     """
     logger.warning("getExperiment is deprecated")
-    run1 = getRun(analysis, run)
-    if run1.find("ATLAS") > -1:
+    path1 = getPath(analysis, path)
+    if path1.find("ATLAS") > -1:
         return "ATLAS"
     return "CMS"
 
 
-def getComment(analysis, run=None):
+def getComment(analysis, path=None):
     """
     Get the comment of an analysis.
     
     """
     logger.warning ("getComment is deprecated")
-    return smsHelpers.getMetaInfoField(analysis, "comment", run)
+    return smsHelpers.getMetaInfoField(analysis, "comment", path)
 
 
-def considerRuns(runs):
+def considerExperiment(experiment):
     """
-    Define the run labels to be considered.
+    Define the experiment to be considered.
     
     """
-    smsHelpers.runs = runs
+    smsHelpers.experiments = [experiment]
 
-
-def _exists(analysis, topology, run=None):
+def considerSqrts(sqrts):
     """
-    Check if the dictionary 'limit_topo' in <run>/<analysis>/sms.py exists.
+    Define the center of mass energies to be considered (as strings in list format)
+    """
+    smsHelpers.sqrts = sqrts
+
+
+def _exists(analysis, topology, path=None):
+    """
+    Check if the dictionary 'limit_topo' in <path>/sms.py exists.
 
     For topologies with intermediate masses, check if all dictionaries listed
     in the axes-information exist. If topology == None, check if
-    <run>/<analysis>/sms.py exists.
+    <path>/sms.py exists.
 
     """
-    run2 = smsHelpers.getRun(analysis, run)
+    path2 = smsHelpers.getPath(analysis, path)
     if not topology:
         import os
         base = smsHelpers.base
-        pydict = "%s/%s/%s/sms.py" % (base, run2, analysis)
+        pydict = "%s/%s/%s/sms.py" % (base, path2, analysis)
         if os.path.exists(pydict):
             return True
         else:
@@ -309,24 +319,24 @@ def _exists(analysis, topology, run=None):
     axes = getaxes(analysis, topology)
     if not axes:
         return False
-    hasDict = smsHelpers.hasDictionary(analysis, run2)
+    hasDict = smsHelpers.hasDictionary(analysis, path2)
     if not hasDict:
         return False
-    return smsHelpers.hasDictionary(analysis, run2, topology)
+    return smsHelpers.hasDictionary(analysis, path2, topology)
 
 
-def getUpperLimit(analysis, topology, mx=None, my=None, run=None,
+def getUpperLimit(analysis, topology, mx=None, my=None, path=None,
                   interpolate=False, expected=False):
     """
-    Get the upper limit for run/analysis/topology.
+    Get the upper limit for path/analysis/topology.
 
     :returns: None, if it does not exist; entire dictionary, if mx and my are
               None; upper limit at mx/my, if mx and my are floats;
 
     """
-    run = smsHelpers.getRun(analysis, run)
-    if smsHelpers.hasDictionary(analysis, run):
-        return getUpperLimitFromDictionary(analysis, topology, mx, my, run,
+    path = smsHelpers.getPath(analysis, path)
+    if smsHelpers.hasDictionary(analysis, path):
+        return getUpperLimitFromDictionary(analysis, topology, mx, my, path,
                                            interpolate=interpolate,
                                            expected=expected)
     logger.warning("No upper limits found for %s", analysis)
@@ -334,13 +344,13 @@ def getUpperLimit(analysis, topology, mx=None, my=None, run=None,
 
 
 def getUpperLimitFromDictionary(analysis, topology, mx=None, my=None,
-                                run=None, png=None, interpolate=False,
+                                path=None, png=None, interpolate=False,
                                 expected=False):
     """
     Get an upper limit from the python dictionary.
 
     """
-    dictionary = smsHelpers.getUpperLimitDictionary(analysis, topology, run,
+    dictionary = smsHelpers.getUpperLimitDictionary(analysis, topology, path,
                                                     expected=expected)
     if dictionary == None:
         return dictionary

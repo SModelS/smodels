@@ -75,7 +75,6 @@ def load(analyses=None, topologies=None, sqrts=[7, 8], usePrivate=False ):
             stopo = _getRealTopo(tx)
             newAnalysis.label = ana + ":" + tx
             # "2012"
-            newAnalysis.run = smsHelpers.getRun(ana)
             constraint = smsResults.getConstraints(ana, topology=stopo)
             cond = smsResults.getConditions(ana, topology=stopo)
             if not constraint or constraint == "Not yet assigned":
