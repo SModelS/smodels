@@ -441,6 +441,7 @@ class SlhaStatus(Printer):
         #Check if any of particles being produced have visible displaced vertices
         #with a weight > sigmacut
         chargedList = []
+        ltstr = ""
         for pid in xsecList.getPIDs():
             if pid in rEven: continue
             if pid == self.findLSP(): continue
@@ -450,7 +451,9 @@ class SlhaStatus(Printer):
             if lt < 0:
                 #error for stable charged particles
                 if self.visible(abs(pid)):
-                    if not abs(pid) in chargedList: chargedList.append(abs(pid))
+                    if not abs(pid) in chargedList:
+                        chargedList.append(abs(pid))
+                        if not str(abs(pid)) in ltstr: ltstr += "#%s : c*tau = inf\n" %str(abs(pid))
             if lt < self.maxDisplacement: continue
             brvalue = 0.
             daughters = []
@@ -462,9 +465,11 @@ class SlhaStatus(Printer):
                         daughters.append(decay.ids)
                         break
             if xsecmax*brvalue > self.sigmacut:
-                if not abs(pid) in chargedList: chargedList.append(abs(pid))
+                if not abs(pid) in chargedList:
+                    chargedList.append(abs(pid))
+                    if not str(abs(pid)) in ltstr: ltstr += "#%s : c*tau = %s\n" %(str(abs(pid)),str(lt))
         if not chargedList: return 1,"no long lived particles found"
-        else: return -1, "#Visible decays / stable charged particles: %s" %str(chargedList)
+        else: return -1, "#Visible decays of longlived particles / stable charged particles: %s\n%s" %(str(chargedList),ltstr)
 
 
     def degenerateChi(self):
