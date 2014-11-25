@@ -11,7 +11,7 @@
 
 from smodels.tools import xsecComputer
 from smodels.tools.xsecComputer import LO, NLL
-from smodels.tools.physicsUnits import TeV
+from smodels.tools.physicsUnits import TeV, fb
 import unittest
 import logging
 import logging.config
@@ -21,21 +21,30 @@ class XSecTest(unittest.TestCase):
     logging.config.fileConfig( "./logging.conf" )
     logger = logging.getLogger(__name__)
 
-    def testLO(self):
+    def testLOGlu(self):
         """ test the computation of LO cross section """
         self.logger.info ( "test LO xsecs @ 8 TeV" )
-        slhafile="../oldFiles/andrePT4.slha"
+        slhafile="../inputFiles/slha/simplyGluino.slha"
         w = xsecComputer.computeXSec(8*TeV,LO,1000, slhafile ).getDictionary()
-        w8lo= 1000 * w[(1000023, 1000024)]['8 TeV (LO)'].asNumber() 
-        self.assertAlmostEqual(w8lo, 35.014621117 )  ## 35.01 fb
+        w8lo= w[(1000021, 1000021)]['8 TeV (LO)'].asNumber( fb )
+        self.assertAlmostEqual(w8lo, 268.4799000000022  ) ## 268.48 fb
 
-    def testNLL (self):
+    def testNLLGlu(self):
+        """ test the computation of LO cross section """
+        self.logger.info ( "test LO xsecs @ 8 TeV" )
+        slhafile="../inputFiles/slha/simplyGluino.slha"
+        w = xsecComputer.computeXSec(8*TeV,NLL,1000, slhafile ).getDictionary()
+        w8lo= w[(1000021, 1000021)]['8 TeV (NLO+NLL)'].asNumber( fb )
+        self.assertAlmostEqual(w8lo, 583.1651907900048 ) ## 583.165 fb
+
+    def testNLLSq (self):
         """ test the computation of NLL cross section """
         self.logger.info ( "test NLL xsecs @ 8 TeV" )
-        filename="../oldFiles/squarks.slha"
+        filename="../inputFiles/slha/lightSquarks.slha"
         w = xsecComputer.computeXSec(8*TeV,NLL,1000, filename ).getDictionary()
-        w8nll = 1000 * w[(1000001, 1000002)]['8 TeV (NLO+NLL)'].asNumber() 
-        self.assertAlmostEqual( w8nll, 60.915027554653705 ) ## 61 fb
+        # print "w=",w
+        w8nll = w[(1000001, 1000002)]['8 TeV (NLO+NLL)'].asNumber( fb )
+        self.assertAlmostEqual( w8nll, 10.957084534646183 ) ## 10.95 pb
 
 
 if __name__ == "__main__":
