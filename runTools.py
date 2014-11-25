@@ -36,6 +36,8 @@ def main():
     slhachecker.add_argument('-illegal','--illegal', help= 'turn on check for kinematically forbidden decays', action = 'store_true')
     slhachecker.add_argument('-f', '--filename', help = 'name of input SLHA file', required=True)
     
+    lhechecker = subparser.add_parser('lhechecker', description"Check if the input file has LHE format.")
+    lhechecker.add_argument('-f', '--filename', help = 'name of input LHE file', required=True)
     
     args = parser.parse_args()
     
@@ -43,6 +45,8 @@ def main():
         xsecComputer.main(args)
     if args.subparser_name == 'slhachecker':    
         slhaChecks.main(args)
+    if args.subparser_name == 'lhechecker':
+        lheChecks.main(args)
 
 if __name__ == '__main__':
     main()
