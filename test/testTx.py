@@ -31,7 +31,7 @@ class TxTest(unittest.TestCase):
                 mLSP=masses[0][1]
                 self.assertEqual ( str(element), "[[[jet,jet]],[[jet,jet]]]" )
                 self.assertEqual ( int ( mgluino / GeV ), 675 )
-                self.assertEqual ( int ( mLSP / GeV ), 600 )
+                self.assertEqual ( int ( mLSP / GeV ), 200 )
 
 if __name__ == "__main__":
     unittest.main()
