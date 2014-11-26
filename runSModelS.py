@@ -151,7 +151,8 @@ def main(inputFile, parameterFile, outputFile):
     if parser.getboolean("options","findMissingTopos"):
         #look for missing topologies, add them to the output file
         missingtopos = missingTopologies.MissingTopoList(sqrts)
-        missingtopos.findMissingTopos(smstoplist, listofanalyses, parser.getfloat("parameters","minmassgap")*GeV)
+        missingtopos.findMissingTopos(smstoplist, listofanalyses, minmassgap, parser.getboolean("options","doCompress"),
+                         doInvisible=parser.getboolean("options","doInvisible"))
         missingtopos.printout("file", outputFile)
 # ---------------------------------------------------------
 

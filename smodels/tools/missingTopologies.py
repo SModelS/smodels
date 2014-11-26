@@ -53,18 +53,18 @@ class MissingTopoList(Printer):
         li.sort()
         return str(li).replace("'", "").replace(" ", "")
 
-    def findMissingTopos(self, smstoplist, listOfAnalyses, minmassgap):
+    def findMissingTopos(self, smstoplist, listOfAnalyses, minmassgap, doCompress, doInvisible):
         from smodels.tools.physicsUnits import fb
-        for el in smstoplist:
-            for sel in el.elementList:
-                if sel.compressElement(True, True, minmassgap):
+        for top in smstoplist:
+            for el in top.elementList:
+                if el.compressElement(doCompress, doInvisible, minmassgap):
                     continue
                 covered = None
                 for ana in listOfAnalyses:
-                    if not ana.getEfficiencyFor(sel) == 0:
+                    if not ana.getEfficiencyFor(el) == 0:
                         covered = True
                 if not covered:
-                    self.addToTopos(sel)
+                    self.addToTopos(el)
         for topo in self.topos:
             if not topo.weights.getXsecsFor(self.sqrts): continue
             topo.value = topo.weights.getXsecsFor(self.sqrts)[0].value / fb
