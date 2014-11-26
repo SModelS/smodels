@@ -54,6 +54,17 @@ class MissingTopoList(Printer):
         return str(li).replace("'", "").replace(" ", "")
 
     def findMissingTopos(self, smstoplist, listOfAnalyses, minmassgap, doCompress, doInvisible):
+        """
+        Loops over all the elements in smstoplist and checks if the elements
+        are tested by any of the analysis in listOfAnalysis.
+        
+        :parameter smstoplist: list of topologies (TopologyLis object)
+        :parameter listOfAnlysis: a list of ULanalysis objects
+        :parameter minmassgap: the parameter for mass compression (Unum object)
+        :parameter doCompress: if set to True will ignore elements which can be mass compressed (True/Fals)
+        :parameter doInvisible: if set to True will ignore elements which can be invisibly compressed (True/False)
+        """
+        
         from smodels.tools.physicsUnits import fb
         for top in smstoplist:
             for el in top.elementList:
