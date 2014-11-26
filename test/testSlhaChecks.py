@@ -22,7 +22,7 @@ class SlhaTest(unittest.TestCase):
     def testBadFile(self):
         filename = "%soldFiles/nobdecay.slha" % (installDirectory() )
         st=slhaChecks.SlhaStatus(filename)
-        self.assertEquals (st.status, (-1, '#ERROR: special signatures in this point.\n#Warnings:\n#Empty decay block for PIDs, 1000005.\n#XSECTION table missing, will be computed by SModelS.\n#Charged stable particle 1000005\n\n'))
+        self.assertEquals (st.status, (-1, '#ERROR: special signatures in this point.\n#Warnings:\n##Visible decays of longlived particles / stable charged particles: [1000005]\n#1000005 : c*tau = inf\n\n'))
 
 if __name__ == "__main__":
     unittest.main()
