@@ -10,8 +10,8 @@
 import copy
 from smodels.theory import clusterTools, crossSection, element
 from smodels.theory.particleNames import elementsInStr
-from smodels.theory.auxiliaryFunctions import cSim, cGtr  # pylint: disable=W0611
-from smodels.theory.analysis import SRanalysis
+from smodels.theory.auxiliaryFunctions import cSim, cGtr  #DO NOT REMOVE
+from smodels.theory.analysis import EManalysis
 from smodels.theory.analysis import ULanalysis
 from smodels.theory.printer import Printer
 import logging
@@ -24,7 +24,7 @@ class TheoryPrediction(object):
     An instance of this class represents the results of the theory prediction
     for an analysis.
     
-    :ivar analysis: holds the analysis (ULanalysis or SRanalysis object)
+    :ivar analysis: holds the analysis (ULanalysis or EManalysis object)
                     to which the prediction refers to
     :ivar value: value of the theory prediction 
                 (relevant cross-section to be compared with the experimental limits).
@@ -95,7 +95,7 @@ def theoryPredictionFor(analysis, smsTopList, maxMassDist=0.2):
     Collect elements and efficiencies, combine the masses (if needed) and
     compute the conditions (if existing).
     
-    :parameter analysis: analysis to be considered (ULanalysis or SRanalysis object)
+    :parameter analysis: analysis to be considered (ULanalysis or EManalysis object)
     :parameter smsTopList: list of topologies containing elements (TopologyList object)
     :parameter maxMassDist: maximum mass distance for clustering elements (float)
     :returns: list of TheoryPrediction objects    
@@ -130,7 +130,7 @@ def _getElementsFrom(smsTopList, analysis):
     have their weights multiplied by their respective efficiencies and the cross-sections not
     matching the analysis center-of-mass energy are removed.
     
-    :parameter analysis: analysis to be considered (ULanalysis or SRanalysis object)
+    :parameter analysis: analysis to be considered (ULanalysis or EManalysis object)
     :parameter smsTopList: list of topologies containing elements (TopologyList object)
     :returns: list of elements (Element objects)
     """
@@ -154,13 +154,13 @@ def _combineElements(elements, analysis, maxDist):
     """
     Combine elements according to the analysis type.    
     If analysis == upper limit type, group elements into mass clusters. If
-    analysis == signal region type, group all elements into a single cluster.
+    analysis == efficiency map type, group all elements into a single cluster.
     
     :parameter elements: list of elements (Element objects)
-    :parameter analysis: analysis to be considered (ULanalysis or SRanalysis object)
+    :parameter analysis: analysis to be considered (ULanalysis or EManalysis object)
     :returns: list of element clusters (ElementCluster objects)
     """
-    if type(analysis) == type(SRanalysis()):
+    if type(analysis) == type(EManalysis()):
         clusters = [clusterTools.groupAll(elements)]
     elif type(analysis) == type(ULanalysis()):
         clusters = clusterTools.clusterElements(elements, analysis, maxDist)
@@ -172,14 +172,14 @@ def _evalConstraint(cluster, analysis):
     Evaluate the analysis constraint inside an element cluster.      
     If analysis type == upper limit, sum all the elements' weights
     according to the analysis constraint.
-    If analysis type == signal region, sum all the elements' weights.
+    If analysis type == efficiency map, sum all the elements' weights.
     
     :parameter cluster: cluster of elements (ElementCluster object)
-    :parameter analysis: analysis to be considered (ULanalysis or SRanalysis object)
+    :parameter analysis: analysis to be considered (ULanalysis or EManalysis object)
     :returns: cluster cross-section
     """    
     
-    if type(analysis) == type(SRanalysis()):
+    if type(analysis) == type(EManalysis()):
         return cluster.getTotalXSec()
     elif type(analysis) == type(ULanalysis()):
         if not analysis.constraint:
@@ -193,14 +193,14 @@ def _evalConditions(cluster, analysis):
     """        
     If analysis type == upper limit (ULanalysis), evaluates the analysis conditions inside
     an element cluster.
-    If analysis type == signal region (SRanalysis), returns None
+    If analysis type == efficiency map (EManalysis), returns None
     
     :parameter cluster: cluster of elements (ElementCluster object)
-    :parameter analysis: analysis to obtain the conditions (ULanalysis or SRanalysis object)
+    :parameter analysis: analysis to obtain the conditions (ULanalysis or EManalysis object)
     :returns: list of condition values (floats) if analysis type == upper limit. None, otherwise.    
     """    
     
-    if type(analysis) == type(SRanalysis()):
+    if type(analysis) == type(EManalysis()):
         return None
     elif type(analysis) == type(ULanalysis()):
         if not analysis.conditions:
