@@ -13,6 +13,8 @@ from smodels.theory.printer import Printer
 class MissingTopo():
     """
     Object to describe one missing topology result
+    :ivar topo: topology description
+    :ivar weights: weights dictionary
     """
     def __init__(self, topo, weights):
         self.topo = topo
@@ -22,6 +24,7 @@ class MissingTopo():
 class MissingTopoList(Printer):
     """
     Object to find and collect MissingTopo objects, plus printout functionality
+    :ivar sqrts: center of mass energy for which missing topologies should be evaluated
     """
     def __init__(self, sqrts):
         self.sqrts = sqrts
@@ -31,6 +34,12 @@ class MissingTopoList(Printer):
         return self.formatMissingData(outputLevel)
 
     def addToTopos(self, el):
+        """
+        adds an element to the list of missing topologies
+        if the element contributes to a missing topology that is already
+        in the list, add weight to topology
+        :parameter el: element to be added
+        """
         name = self.orderbranches(self.generalName(el.__str__()))
         for topo in self.topos:
             if name == topo.topo:
@@ -40,6 +49,12 @@ class MissingTopoList(Printer):
         return
 
     def generalName(self, instr):
+        """
+        generalize by summing over charges
+        e, mu are combined to l
+        :parameter instr: element as string
+        :returns: string of generalized element
+        """
         from smodels.theory.particleNames import ptcDic
         exch = ["W", "l", "t", "ta"]
         for pn in exch:
@@ -48,6 +63,11 @@ class MissingTopoList(Printer):
         return instr
 
     def orderbranches(self, instr):
+        """
+        unique ordering of branches
+        :parameter instr: element as string
+        :returns: string of ordered element
+        """
         from smodels.theory.element import Element
         li = Element(instr).getParticles()
         li.sort()
