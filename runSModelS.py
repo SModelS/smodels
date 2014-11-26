@@ -116,14 +116,14 @@ def main(inputFile, parameterFile, outputFile):
 #----------------------------------------------------
 #Compute theory predictions and anlalyses constraints
 #----------------------------------------------------
-
+    
     #define result list that collects all theoryPrediction objects
     #variables set to define printing options
     results = ioObjects.ResultList(bestresultonly = not parser.getboolean("file","expandedSummary"), 
                                    describeTopo = parser.getboolean("file","addConstraintInfo"))
     
     #Get theory prediction for each analysis and print basic output
-    for analysis in listofanalyses:
+    for analysis in listofanalyses:        
         theorypredictions = theoryPredictionFor(analysis, smstoplist)
         if not theorypredictions:  continue
         if parser.getboolean("stdout","printResults"):

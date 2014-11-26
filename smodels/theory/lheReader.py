@@ -43,21 +43,25 @@ class LheReader(object):
         # cross-section, total number of events)
         self.file.seek(0)
         line = self.file.readline()
-        nevts = 0
+        nevts = None
+        totxsec = None
+        sqrts = None
         # Exit if reached end of events or file
         while not "</LesHouchesEvents>" in line and line != "":
             if "<init>" in line:
                 line = self.file.readline()
-                sqrts = (eval(line.split()[2]) + \
-                                 eval(line.split()[3])) / 1000. * TeV
-                self.metainfo["sqrts"] = sqrts
-                totxsec = 0. * pb 
+                if line.split()[0] == line.split()[1] == "2212":
+                    sqrts = (eval(line.split()[2]) + eval(line.split()[3])) / 1000. * TeV
+                    self.metainfo["sqrts"] = sqrts
+                else: break
                 line = self.file.readline()
                 while not "</init>" in line:
+                    if totxsec is None: totxsec = 0*pb
                     totxsec += eval(line.split()[0])* pb
                     line = self.file.readline()
                 self.metainfo["totalxsec"] = totxsec
-            elif "<event>" in line:                
+            elif "<event>" in line:
+                if nevts is None: nevts = 0
                 nevts += 1
             line = self.file.readline()
         self.metainfo["nevents"] = nevts

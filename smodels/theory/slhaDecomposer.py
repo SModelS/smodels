@@ -129,7 +129,7 @@ def _getDictionariesFromSLHA(slhafile):
     brDic = {}
     for pid in res.decays.keys():
         if pid in rEven:
-            logger.warning("Ignoring %s decays",smodels.particles.rEven[pid])
+            logger.info("Ignoring %s decays",smodels.particles.rEven[pid])
             continue
         brs = []
         for decay in res.decays[pid].decays:
@@ -140,7 +140,7 @@ def _getDictionariesFromSLHA(slhafile):
             if nOdd + nEven == len(decay.ids) and nOdd == 1:
                 brs.append(decay)
             else:
-                logger.warning("Ignoring decay: %i -> [%s]",pid,decay.ids)
+                logger.info("Ignoring decay: %i -> [%s]",pid,decay.ids)
 
         brsConj = copy.deepcopy(brs)
         for br in brsConj:
