@@ -61,15 +61,15 @@ def upperLimit(analysis, topology, masses, path=None):
         return None
     if len(masses) > 2 and len(d) == 1:
         if _compareMasses(masses, d[0]):
-            logger.error("Only one histogram available for %s/%s, cannot "
-                         "interpolate for intermediate mass.", analysis,
-                         topology)
             return smsResults.getUpperLimit(analysis,
                                             _getHistName(topology,
                                                          d[0]['mz'][0]),
                                             masses[_getAxis('x', d[0]['axes'])],
                                             masses[_getAxis('y', d[0]['axes'])],
                                             interpolate=True)
+        logger.error("Only one histogram available for %s/%s, cannot "
+                     "interpolate for intermediate mass.", analysis,
+                     topology)
         return None
     return _doGridData(analysis, topology, masses, d, path)
 
