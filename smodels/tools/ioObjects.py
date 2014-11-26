@@ -22,6 +22,9 @@ logger = logging.getLogger(__name__)
 class ResultList(Printer):
     """
     Class that collects experimental constraints and has a predefined printout
+    :ivar outputarray: list of theorypredictions
+    :ivar bestresultonly: if True, printout will print only the best result
+    :ivar describeTopo: if True, printout will print the constraints
     """
     def __init__(self, outputarray = [], bestresultonly = None, describeTopo = None):
         self.outputarray = outputarray
@@ -29,6 +32,11 @@ class ResultList(Printer):
         self.describeTopo = describeTopo
 
     def addResult(self, res, maxcond):
+        """
+        Add a result to the outputarry, unless it violates maxcond
+        :parameter res: theoryprediction to be added to ResultList
+        :parameter maxcond: maximum condition violation
+        """
         mCond = res.getmaxCondition()
         if mCond == 'N/A': return
         if mCond > maxcond: return
@@ -36,21 +44,31 @@ class ResultList(Printer):
         return
 
     def getR(self, res):
-        #calculate R value
+        """
+        calculate R value
+        :parameter res: theoryprediction
+        :returns: R value = weight / upper limit
+        """
         return res.value[0].value / res.analysis.getUpperLimitFor(res.mass)
 
     def sort(self):
-        #reverse sort outputarray by R value
+        """
+        reverse sort outputarray by R value
+        """
         self.outputarray = sorted(self.outputarray, key=self.getR, reverse=True)
         return
 
     def getBestResult(self):
-        #return best result
+        """ 
+        return best result
+        """
         self.sort()
         return self.outputarray[0]
 
     def isEmpty(self):
-        #check if outputarray is empty
+        """
+        check if outputarray is empty
+        """
         return len(self.outputarray)==0
 
     def formatData(self,outputLevel):
@@ -64,6 +82,10 @@ class ResultList(Printer):
 class OutputStatus(Printer):
     """
     Object that holds all status information and has a predefined printout 
+    :ivar inputStatus: FileStatus of input file
+    :ivar parameters: input parameters
+    :ivar databaseVersion: database version (string)
+    :ivar outputfile: path to outputfile
     """
     def __init__(self,inputStatus,parameters,databaseVersion,outputfile):
         """
@@ -89,20 +111,35 @@ class OutputStatus(Printer):
         self.checkStatus()
     
     def checkStatus(self):
+        """
+        check status, exit if negativ
+        """
         if self.status < 0:
             self.printout("file",self.outputfile)
             sys.exit()
 
 
     def updateStatus(self, status):
+        """
+        update status
+        :parameter status: new status flag
+        """
         self.status = status
         self.checkStatus()
 
     def updateSLHAStatus(self, status):
+        """
+        update slha status
+        :parameter status: new slha status flag
+        """
         self.slhastatus = status
         return
 
     def addWarning(self, warning):
+        """
+        append warning to warnings
+        :parameter warning: warning to be appended
+        """
         self.warnings += warning
         return
 
@@ -119,6 +156,9 @@ class FileStatus(Printer):
     """
     Object to run several checks on the input file.
     It holds an LheStatus (SlhaStatus) object if inputType = lhe (slha)
+    :ivar inputType: specify input type as SLHA or LHE
+    :ivar inputFile: path to input file
+    :ivar sigmacut: sigmacut in fb
     """
     
     def __init__(self, inputType, inputFile, sigmacut=None):
@@ -139,6 +179,7 @@ class FileStatus(Printer):
 class LheStatus(Printer):
     """
     Object to check if input lhe file contains errors
+    :ivar filename: path to input LHE file
     """
 
     def __init__(self, filename):
@@ -146,6 +187,9 @@ class LheStatus(Printer):
         self.status = self.evaluateStatus()
 
     def evaluateStatus(self):
+        """
+        run status check
+        """
         if not os.path.exists(self.filename):
             #set status flag to -3, as in slha checks for missing input file
             return -3, "Inputfile %s not found" %self.filename
@@ -171,7 +215,13 @@ class SlhaStatus(Printer):
     = 1: the check is ok
     = -1: case of a physical problem, e.g. charged LSP,
     = -2: case of formal problems, e.g. missing decay blocks, in the file
-    The parameter maxDisplacement is specified in meters. 
+    :ivar filename: path to input SLHA file
+    :ivar maxDisplacement: maximum c*tau for promt decays in meters
+    :ivar sigmacut: sigmacut in fb
+    :ivar checkLSP: if True check if LSP is neutral
+    :ivar findIllegalDecays: if True check if all decays are kinematically allowed
+    :ivar checkXsec: if True check if SLHA file contains cross sections
+    :ivar findLonglived: if True find stable charged particles and displaced vertices
     """
     def __init__(self, filename, maxDisplacement=.01, sigmacut=.01*fb,
                  checkLSP = True,
@@ -238,7 +288,8 @@ class SlhaStatus(Printer):
     def emptyDecay(self, pid):
         """
         Check if any decay is listed for the particle with pid
-        returns True if the decay block is missing or if it is empty
+        :parameter pid: PID number of particle to be checked
+        :returns: True if the decay block is missing or if it is empty, None otherwise
         """
         if not abs(pid) in self.slha.decays: return True #consider missing decay block as empty
         if not self.slha.decays[abs(pid)].decays: return True
@@ -248,6 +299,8 @@ class SlhaStatus(Printer):
     def findIllegalDecay(self, findIllegal):
         """
         Find decays for which the sum of daughter masses excels the mother mass
+        :parameter findIllegal: True if check should be run
+        :returns: status flag and message
         """
         if not findIllegal:
             return 0, "Did not check for illegal decays"
@@ -275,7 +328,8 @@ class SlhaStatus(Printer):
     def hasXsec(self, checkXsec):
         """
         Check if XSECTION table is present in the slha file.
-        
+        :parameter checkXsec: set True to run the check
+        :returns: status flag, message
         """
         if not checkXsec:
             return 0, "Did not check for missing XSECTION table"
@@ -296,7 +350,8 @@ class SlhaStatus(Printer):
     def testLSP(self, checkLSP):
         """
         Check if lsp is charged.
-        
+        :parameter checkLSP: set True to run the check
+        :returns: status flag, message
         """
         if not checkLSP:
             return 0, "Did not check for charged lsp"
@@ -334,7 +389,9 @@ class SlhaStatus(Printer):
     def getLifetime(self, pid, ctau=False):
         """
         Compute lifetime from decay-width for a particle with pid.
-        
+        :parameter pid: PID of particle
+        :parameter ctau: set True to multiply lifetime by c
+        :returns: lifetime
         """
         widths = self.getDecayWidths()
         try:
@@ -355,7 +412,8 @@ class SlhaStatus(Printer):
     def sumBR(self, pid):
         """
         Calculate the sum of all branching ratios for particle with pid.
-        
+        :parameter pid: PID of particle
+        :returns: sum of branching ratios as given in the decay table for pid
         """
         decaylist = self.slha.decays[pid].decays
         totalBR = 0.
@@ -367,7 +425,7 @@ class SlhaStatus(Printer):
     def deltaMass(self, pid1, pid2):
         """
         Calculate mass splitting between particles with pid1 and pid2.
-        
+        :returns: mass difference
         """
         m1 = self.slha.blocks["MASS"][pid1]
         m2 = self.slha.blocks["MASS"][pid2]
@@ -435,6 +493,7 @@ class SlhaStatus(Printer):
         """
         find meta-stable particles that decay to visible particles
         and stable charged particles
+        :returns: status flag, message
         """
         if not findLonglived:
             return 0, "Did not check for long lived particles"
