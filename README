@@ -1,4 +1,61 @@
-SModelS is based on a general procedure to decompose Beyond the Standard Model (BSM) collider signatures presenting a Z2 symmetry into Simplified Model Spectrum (SMS) topologies. Our method provides a way to cast BSM predictions for the LHC in a model independent framework, which can be directly confronted with the relevant experimental constraints. Our concrete implementation currently focusses on supersymmetry searches with missing energy, for which a large variety of SMS results from ATLAS and CMS are available. The main ingredients are:                                                        
- - the decomposition of the BSM spectrum into SMS topologies                          
- - a database of experimental SMS results                                             
- - the interface between decomposition and results database (to check limits)
+Installation and Deployment
+===========================
+
+For installation, SModelS makes use of Python's *setuptools*.
+Thus:
+
+  python setup.py install 
+
+should install the entire project.
+Nothing more should have to be known for installing SModelS.
+However, here is some information that might help in case something does *not*
+work out of the box:
+
+On the Python side, *setuptools* will ask for the following Python libraries
+to be installed on the computer:
+
+ * unum 
+ * numpy
+ * argparse
+ * docutils>=0.3
+ * scipy>=0.9.0
+
+In addition, SModelS ships with a few HEP tools:
+
+ * pythia 6.4.27
+ * nllfast versions 1.2, 2.1, 3.0, 4.01dcpl, 5.01dcpl
+
+Makefile scripts are available in SModelS for compilation of these packages: simply
+typing ``make`` in smodels/lib should compile everything needed for running
+SModelS, if the *setuptools* havent already done so.:
+
+   python smodels/tools/toolBox.py 
+
+should list and check all dependencies.
+
+Also, the toplevel Makefile ships with rules to make standard .deb and .rpm
+packages.  ``make buildrpm`` and ``make builddeb`` should build packages that
+can be installed just like any other rpm/deb package.
+
+
+Installation on SL6
+-------------------
+
+Installation on an SL6 (Scientific Linux 6 or Scientific Linux CERN 6) machine is a bit tricky, because SModelS requires a recent
+version of *scipy*. We succeeded to install SModelS on SL6 by doing:
+
+ * yum install gcc-c++ libstdc++-devel libevent-devel python-devel lapack lapack-devel blas blas-devel libgfortran python-distutils-extra
+
+In addition, the following steps were needed:
+
+ * pip install nose unum argparse
+ * pip install numpy
+ * pip install pymc
+ * export LC_ALL=C; export LANG=C; pip install scipy
+
+Note, that these steps can be done within a python ``virtualenv``:
+
+ * virtualenv <my-environment-directory>
+ * source <my-environment-directory>bin/activate
+
+

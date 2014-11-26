@@ -18,16 +18,22 @@ class CompressionTest(unittest.TestCase):
 
     def testInvisiblePositive(self):
         """ test the invisible compression, a positive example """
-        slhafile="../oldFiles/andrePT4.slha"
+        slhafile="../inputFiles/slha/lightSquarks.slha"
+        # slhafile="../inputFiles/slha/compression.slha"
         topos = slhaDecomposer.decompose ( slhafile, .1*fb, False, True, 5.*GeV )
+        print "slhafile",slhafile
         for topo in topos:
-            if str(topo)!="[0][1,1,0]":
-                continue
+          #  if str(topo)!="[0][1,1,0]":
+          #      continue
             for element in topo.elementList:
-                if str(element)!="[[],[[nu],[ta+]]]":
-                    continue
-                # print element,"mother:",element.motherElements,element.compressionAlgorithms,element.weight
-                self.assertEqual ( str(element.motherElements[0][1]),"[[[nu],[nu]],[[nu],[ta+]]]" )
+          #      if str(element)!="[[],[[nu],[ta+]]]":
+          #          continue
+                print
+                print topo,element,"mother:",len(element.motherElements),element.motherElements
+                #print "m00=",str(element.motherElements[0][0])
+                for x in element.motherElements: 
+                    print "m0",str(x[0])
+          #      self.assertEqual ( str(element.motherElements[0][1]),"[[[nu],[nu]],[[nu],[ta+]]]" )
                 ## 6 neutrino flavors get added!
                 self.assertEqual ( len(element.motherElements), 6 ) 
                 self.assertEqual ( str(element.motherElements[0][0]),"invisible" )
