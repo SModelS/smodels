@@ -1,0 +1,10 @@
+sqrts: 8.00
+lumi: 19.50
+pas: SUS-13-006
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13006
+publisheddata: True
+condition: TChiWZ -> None
+fuzzycondition: TChiWZ -> None
+constraint: TChiWZ -> [[['W']],[['Z']]]
+category: TChiWZ -> eweakino
+axes: TChiWZ: M1 M0
