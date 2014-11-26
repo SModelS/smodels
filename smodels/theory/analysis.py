@@ -82,9 +82,9 @@ class ULanalysis(Printer):
         return Printer.formatULanalysisData(self,outputLevel)    
 
 
-class SRanalysis(Printer):
+class EManalysis(Printer):
     """
-    Class to store one signal region-type of analysis.    
+    Class to store a efficiency map-type of analysis.    
     Stores the basic analysis info and contains a method for obtaining the
     efficiency maps from the database.
     
@@ -115,13 +115,13 @@ class SRanalysis(Printer):
 
     def getLimitFor(self):
         """
-        Get experimental limit for a cross-section in a specific signal region.
+        Get experimental limit for a cross-section.
         
         
         .. warning:: not implemented yet
         
-        :returns: experimental upper limit for cross-section in the signal
-                  region (float with unit or Unum object)        
+        :returns: experimental upper limit for cross-section
+                  (float with unit or Unum object)        
         """
         return False
 
