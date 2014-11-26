@@ -20,7 +20,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def load(analyses=None, topologies=None, sqrts=[7, 8], usePrivate=False ):
+def load(analyses=None, topologies=None, sqrts=[7, 8], usePrivate=False, useSuperseded=False ):
     """
     Create an analysis objects from the info given in the SMS results database.
 
@@ -56,6 +56,9 @@ def load(analyses=None, topologies=None, sqrts=[7, 8], usePrivate=False ):
     for ana in analyses:
         if smsResults.isPrivate(ana) and not usePrivate:
             logger.info("Skipping private analysis %s.",str(ana))
+            continue
+        if smsResults.isSuperseded(ana) and not useSuperseded:
+            logger.info("%s has been superseded by %s, skipping %s" %(ana, smsResults.isSuperseded(ana), ana))
             continue
         logger.debug("Building analysis %s.", str(ana))
         ss = smsResults.getSqrts(ana) / TeV

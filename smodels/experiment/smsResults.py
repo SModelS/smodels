@@ -262,6 +262,13 @@ def isPrivate(analysis, path=None):
     if field==None: return False
     return bool(int(field))
 
+def isSuperseded (analysis, path=None):
+    """
+    check if analysis is superseded, if yes,
+    return analysis name of newer analysis
+    """
+    return smsHelpers.getMetaInfoField (analysis, "superseded_by", path)
+
 
 def getExperiment(analysis, path=None):
     """
