@@ -302,7 +302,7 @@ def considerSqrts(sqrts):
     """
     Define the center of mass energies to be considered (as strings in list format)
     """
-    smsHelpers.sqrts = sqrts
+    smsHelpers.sqrts = [sqrts]
 
 
 def _exists(analysis, topology, path=None):

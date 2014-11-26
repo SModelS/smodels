@@ -1,6 +1,6 @@
 Input status: 1
 Decomposition output status: 1 #decomposition was successful
-#Input File: $HOME/smodels/inputFiles/slha/lightSquarks.slha
+#Input File: ../inputFiles/slha/lightSquarks.slha
 #maxcond = 0.2
 #minmassgap = 5.
 #sigmacut = 0.03
@@ -10,6 +10,9 @@ Decomposition output status: 1 #decomposition was successful
 
            SUS12028               T2 8.00E+00    0.0  1.773E+00  1.636E+01  1.084E-01
 #[[['jet']],[['jet']]]
+--------------------------------------------------------------------------------
+           SUS13006           TChiWZ 8.00E+00    0.0  1.847E+01  4.443E+02  4.157E-02
+#[[['W']],[['Z']]]
 --------------------------------------------------------------------------------
            SUS12028               T1 8.00E+00    0.0  3.917E-01  3.144E+01  1.246E-02
 #[[['jet','jet']],[['jet','jet']]]
@@ -23,7 +26,6 @@ Missing topologies with the highest cross-sections (up to 10):
 Sqrts (TeV)   Weight (fb)        Element description
 8.00E+00   9.588E+01    #                             [[[W]],[[higgs]]]
 8.00E+00   5.958E+01    #                                 [[[W]],[[W]]]
-8.00E+00   1.847E+01    #                                 [[[W]],[[Z]]]
 8.00E+00   1.567E+01    #                 [[[jet],[W]],[[jet,jet],[W]]]
 8.00E+00   1.395E+01    #       [[[jet],[jet,jet],[W]],[[jet,jet],[W]]]
 8.00E+00   9.069E+00    #             [[[jet,jet],[W]],[[jet,jet],[W]]]
@@ -31,3 +33,4 @@ Sqrts (TeV)   Weight (fb)        Element description
 8.00E+00   7.608E+00    #         [[[jet,jet],[W]],[[jet,jet],[higgs]]]
 8.00E+00   7.087E+00    #           [[[jet],[W]],[[jet],[jet,jet],[W]]]
 8.00E+00   6.617E+00    #                     [[[jet],[W]],[[jet],[W]]]
+8.00E+00   6.336E+00    #             [[[jet],[W]],[[jet,jet],[higgs]]]
