@@ -27,7 +27,7 @@ class ClustererTest(unittest.TestCase):
         xsecs = crossSection.getXsecFromLHEFile(filename)
         element = lheDecomposer.elementFromEvent(event, xsecs )
                   #crossSection.XSectionList( { "8 TeV (NLL)": xsec } ))
-        print "w0=",element.branches[0].masses
+        # print "w0=",element.branches[0].masses
         e0=copy.deepcopy(element)
 
         ## make a second element with a slightly different gluino mass
