@@ -1,50 +1,56 @@
 Installation and Deployment
 ===========================
 
-For installation, SModelS makes use of Python's *setuptools*.
-Thus:
+SModelS is a Python library that requires Python version 2.6 or later 
+(but not version 3).  Internally, SModelS uses the following tools:
 
-  python setup.py install 
+ * pythia 6.4.27
+ * nllfast version 2.1
 
-should install the entire project.
-Nothing more should have to be known for installing SModelS.
-However, here is some information that might help in case something does *not*
-work out of the box:
+These tools are built into SModelS, they need not be installed separately.
+In addition, SModelS depends on the following *external* python libraries:
 
-On the Python side, *setuptools* will ask for the following Python libraries
-to be installed on the computer:
-
- * unum 
+ * unum
  * numpy
  * argparse
  * docutils>=0.3
  * scipy>=0.9.0
 
-In addition, SModelS ships with a few HEP tools:
+For installation, SModelS makes use of Python's *setuptools*.
+Thus ::
+  python setup.py install 
 
- * pythia 6.4.27
- * nllfast versions 1.2, 2.1, 3.0, 4.01dcpl, 5.01dcpl
+should install the entire project, compile the internal pythia and nllfast versions
+using gfortran. It should also resolve the external dependencies, i.e. install
+the python libraries listed above using e.g. *pip*.
 
-Makefile scripts are available in SModelS for compilation of these packages: simply
-typing ``make`` in smodels/lib should compile everything needed for running
-SModelS, if the *setuptools* havent already done so.:
+In case the compilation of SModelS fails, it is advised to try to compile
+the tools manually, by issuing "make" in the *lib/* directory.
+In case the installation of the external libraries fails, our advise is to install
+them manually. For SL6 machines, a recipe is given below.
+
+There is also a diagnostic tool available: ::
 
    python smodels/tools/toolBox.py 
 
-should list and check all dependencies.
+should list and check all internal tools (pythia and nllfast) and external
+(numpy, scipy, unum, ... ) dependencies.
 
 Also, the toplevel Makefile ships with rules to make standard .deb and .rpm
 packages.  ``make buildrpm`` and ``make builddeb`` should build packages that
 can be installed just like any other rpm/deb package.
 
+In case everything fails, please contact smodels-users@oeaw.ac.at.
 
 Installation on SL6
 -------------------
 
-Installation on an SL6 (Scientific Linux 6 or Scientific Linux CERN 6) machine is a bit tricky, because SModelS requires a recent
-version of *scipy*. We succeeded to install SModelS on SL6 by doing:
+Installation on an SL6 (Scientific Linux 6 or Scientific Linux CERN 6) machine
+is tricky, because SModelS requires a more recent version of *scipy* than is provided by SL6. 
+We succeeded to install SModelS on SL6 by doing:
 
  * yum install gcc-c++ libstdc++-devel libevent-devel python-devel lapack lapack-devel blas blas-devel libgfortran python-distutils-extra
+
 
 In addition, the following steps were needed:
 
@@ -53,9 +59,6 @@ In addition, the following steps were needed:
  * pip install pymc
  * export LC_ALL=C; export LANG=C; pip install scipy
 
-Note, that these steps can be done within a python ``virtualenv``:
 
- * virtualenv <my-environment-directory>
- * source <my-environment-directory>bin/activate
-
+Note, that these steps can safely be done within a python ``virtualenv``.
 
