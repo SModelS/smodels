@@ -55,7 +55,7 @@ class IntegrationTest(unittest.TestCase):
         smsHelpers.base = installDirectory() + 'test/database/'
         smsHelpers.runs = [ "2012" ]
         ## slhafile = installDirectory()+'oldFiles/andrePT4.slha'
-        slhafile = '../inputFiles/slha/simplyGluino.slha'
+        slhafile = '../inputFiles/slha/lightSquarks.slha'
         self.configureLogger()
         smstoplist = slhaDecomposer.decompose(slhafile, .1*fb, doCompress=True,
                 doInvisible=True, minmassgap=5.*GeV)
