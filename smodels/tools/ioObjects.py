@@ -150,12 +150,15 @@ class LheStatus(Printer):
             #set status flag to -3, as in slha checks for missing input file
             return -3, "Inputfile %s not found" %self.filename
         lhe = lheReader.LheReader(self.filename)
-        if not lhe.metainfo["nevents"]:
-            return -1, "No events found in inputfile %s" %self.filename
-        elif not lhe.metainfo["totalxsec"]:
-            return -1, "Total cross-section not found in inputfile %s" %self.filename
-        elif not lhe.metainfo["sqrts"]:
+        nevents = lhe.metainfo["nevents"]
+        totxsec = lhe.metainfo["totalxsec"]
+        sqrts = lhe.metainfo["sqrts"]
+        if (not type(sqrts) == type(1*GeV)) or (not sqrts.asNumber()):
             return -1, "Center-of-mass energy not found in inputfile %s" %self.filename
+        elif not nevents:
+            return -1, "No events found in inputfile %s" %self.filename
+        elif (not type(totxsec) == type(1*fb)) or (not totxsec.asNumber()):
+            return -1, "Total cross-section not found in inputfile %s" %self.filename
         return 1, "Input file ok"
     
     
