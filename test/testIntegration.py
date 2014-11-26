@@ -20,26 +20,27 @@ class IntegrationTest(unittest.TestCase):
         logging.config.fileConfig( fname=fc, disable_existing_loggers=False )
 
     def predictions(self):
-        return { 'SUS13006:TSlepSlep371': 2.42154060952*fb,
-                 'SUS13006:TSlepSlep420': 0.246832973996*fb,
-                 'SUS13006:TChiChipmSlepL371': 8.43114195825*fb,
+        return { 'SUS13006:TChiWZ': 2.42154060952*fb,
+                 'SUS12028:T2': None,
+                 'SUS12028:T1': 8.43114195825*fb,
                  'SUS12022:TChiChipmSlepL371': 8.43114195825*fb }
 
     def checkAnalysis(self,analysis,smstoplist):
         from smodels.theory.theoryPrediction import theoryPredictionFor
         theorypredictions = theoryPredictionFor(analysis, smstoplist)
+        defpreds=self.predictions()
+        print "ana",analysis,theorypredictions
         if not theorypredictions:
             return
-        defpreds=self.predictions()
         ### print(">>>> Ana %s" % analysis.label)
         for pred in theorypredictions:
             # print ( "Pred ana",pred.analysis.label)
             m0=str ( int ( pred.mass[0][0]/GeV )  )
             # print ( "Pred mass0",m0 )
-            # print ( "Pred mass0",int(pred.mass[0]/GeV))
-            predval=pred.value.getDictionary()['8.0 [TeV]']
+            #print ( "Pred mass0",int(pred.mass[0]/GeV))
+            print ( "Pred value",pred.value.getDictionary() )
+            predval=pred.value.getDictionary()[(None,None)]['8 TeV (NLL)']
             defpredval=defpreds[pred.analysis.label+m0] 
-            # print ( "Pred value",predval )
             # print ( "Pred default value",defpredval )
             self.assertAlmostEqual ( predval / fb, defpredval / fb )
 
@@ -53,7 +54,8 @@ class IntegrationTest(unittest.TestCase):
         from smodels.experiment import smsAnalysisFactory, smsHelpers
         smsHelpers.base = installDirectory() + 'test/database/'
         smsHelpers.runs = [ "2012" ]
-        slhafile = installDirectory()+'oldFiles/andrePT4.slha'
+        ## slhafile = installDirectory()+'oldFiles/andrePT4.slha'
+        slhafile = '../inputFiles/slha/simplyGluino.slha'
         self.configureLogger()
         smstoplist = slhaDecomposer.decompose(slhafile, .1*fb, doCompress=True,
                 doInvisible=True, minmassgap=5.*GeV)

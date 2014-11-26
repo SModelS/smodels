@@ -17,7 +17,7 @@ class RunSModelSTest(unittest.TestCase):
     def testGoodFile(self):
 
         filename = "%s/inputFiles/slha/lightSquarks.slha" % (installDirectory() )
-        print "filename=",filename
+#        print "filename=",filename
         main(filename, 
              parameterFile="%s/test/testParameters.ini" %installDirectory(), 
              outputFile="%s/test/unitTestOutput.txt" %installDirectory())
