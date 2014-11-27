@@ -1,0 +1,28 @@
+SModelS v1
+==========
+
+
+Installation
+-------------
+* For installation instructions see INSTALL.
+
+
+Running SModelS
+---------------
+Before running SModelS makes sure you have a version of the
+experimental database (smodels-database) in your system.
+
+SModelS provides a command-line tool (runSModelS.py) for the basic functionalities,
+which can be executed as:
+
+./runSModelS.py -p <parameter file> -f <input file> -o <output file>
+
+For help instructions:
+
+./runSModelS.py -h
+
+A detailed documentaion on the parameter file and the output can be found
+in the section Running SModelS of the SModelS manual (docs/index.html)
+
+An example file on how to call the SModelS libraries from your own
+python code can be found in Example.py.
