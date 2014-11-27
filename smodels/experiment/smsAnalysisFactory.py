@@ -36,7 +36,7 @@ def load(analyses=None, topologies=None, sqrts=[7, 8], usePrivate=False, useSupe
     """
 
     #info message if superseded results are not used
-    logger.info("useSuperseded is not set, skipping superseded results")
+    if not useSuperseded: logger.info("useSuperseded is not set, skipping superseded results")
 
     #to have readable input, we can give all instead of None
     if topologies == "all": topologies = None
