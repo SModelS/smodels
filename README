@@ -9,9 +9,6 @@ Installation
 
 Running SModelS
 ---------------
-Before running SModelS makes sure you have a version of the
-experimental database (smodels-database) in your system.
-
 SModelS provides a command-line tool (runSModelS.py) for the basic functionalities,
 which can be executed as:
 
@@ -21,8 +18,19 @@ For help instructions:
 
 ./runSModelS.py -h
 
-A detailed documentaion on the parameter file and the output can be found
-in the section Running SModelS of the SModelS manual (docs/index.html)
-
 An example file on how to call the SModelS libraries from your own
-python code can be found in Example.py.
+Python code can be found in Example.py.
+
+Detailed explanations on how to use SModelS, including explanations of the
+output, can be found in the section ``Running SModelS'' of the SModelS manual
+(docs/index.html).
+
+
+Citation
+--------
+If you use this software please cite:
+
+- "SModelS: A tool for interpreting simplified-model results from the LHC", Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Wolfgang Magerl, Doris Proschofsky, Wolfgang Waltenberger, arXiv:1312.4175 EPJC May 2014, 74:2868
+- PySLHA arXiv:1305.4194
+- Pythia6 manual JHEP 05 (2006) 026 (LU TP 06-13, FERMILAB-PUB-06-052-CD-T, hep-ph/0603175) 
+- NLL-fast W. Beenakker, S. Brensing, M. Krämer, A. Kulesza, E. Laenen, L. Motyka, I. Niessen, Int. J. Mod. Phys. A26 (2011) 2637-2664 
