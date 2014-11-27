@@ -166,7 +166,7 @@ def simParticles(ptype1, ptype2, useDict=True):
     """
     Compares 2 particle names or 2 nested name arrays. Allows for dictionary
     labels (Ex: L = l, l+ = l, l = l-,...). For the last nested level ignore
-    particle ordering. FIXME nesting? 
+    particle ordering.
  
     :param ptype1: first (nested) list of particle names, e.g. ['l','jet']
     :param ptype2: second (nested) list of particle names 

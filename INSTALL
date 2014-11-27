@@ -4,11 +4,12 @@ Installation and Deployment
 SModelS is a Python library that requires Python version 2.6 or later 
 (but not version 3).  Internally, SModelS uses the following tools:
 
- * pythia 6.4.27
- * nllfast version 2.1
+ * Pythia 6.4.27
+ * NLL-fast 1.2 (7 TeV) and 2.1 (8 TeV)
+ * PySLHA (modified version)
 
 These tools are built into SModelS, they need not be installed separately.
-In addition, SModelS depends on the following *external* python libraries:
+In addition, SModelS depends on the following *external* Python libraries:
 
  * unum
  * numpy
@@ -20,25 +21,21 @@ For installation, SModelS makes use of Python's *setuptools*.
 Thus ::
   python setup.py install 
 
-should install the entire project, compile the internal pythia and nllfast versions
+should install the entire project, compile the internal Pythia and NLL-fast versions
 using gfortran. It should also resolve the external dependencies, i.e. install
-the python libraries listed above using e.g. *pip*.
+the Python libraries listed above using e.g. *pip*.
 
 In case the compilation of SModelS fails, it is advised to try to compile
 the tools manually, by issuing "make" in the *lib/* directory.
-In case the installation of the external libraries fails, our advise is to install
-them manually. For SL6 machines, a recipe is given below.
+In case the installation of the external libraries fails, you can also try to install
+them manually, then rerun setup.py.  For SL6 machines, a recipe is given below.
 
 There is also a diagnostic tool available: ::
 
    python smodels/tools/toolBox.py 
 
-should list and check all internal tools (pythia and nllfast) and external
+should list and check all internal tools (Pythia and NLL-fast) and external
 (numpy, scipy, unum, ... ) dependencies.
-
-Also, the toplevel Makefile ships with rules to make standard .deb and .rpm
-packages.  ``make buildrpm`` and ``make builddeb`` should build packages that
-can be installed just like any other rpm/deb package.
 
 In case everything fails, please contact smodels-users@oeaw.ac.at.
 
@@ -52,7 +49,7 @@ We succeeded to install SModelS on SL6 by doing:
  * yum install gcc-c++ libstdc++-devel libevent-devel python-devel lapack lapack-devel blas blas-devel libgfortran python-distutils-extra
 
 
-In addition, the following steps were needed:
+followed by:
 
  * pip install nose unum argparse
  * pip install numpy
@@ -60,5 +57,5 @@ In addition, the following steps were needed:
  * export LC_ALL=C; export LANG=C; pip install scipy
 
 
-Note, that these steps can safely be done within a python ``virtualenv``.
+Note, that these steps can safely be done within a Python ``virtualenv``.
 
