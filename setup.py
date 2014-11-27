@@ -13,9 +13,6 @@ def read(fname):
     """
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
-# nllfast={"1.2": "nllfast_7TeV", "2.1": "nllfast_8TeV", "3.0":"nllfast_13TeV",
-#          "4.01dcpl": "nllfast_14TeV", "5.01dcpl": "nllfast_33TeV" }
-
 def listDirectory ( dirname ):
     if dirname[-1]=="/":
         dirname=dirname[:-1]
@@ -36,15 +33,8 @@ def dataFiles ():
     for directory in [ "inputFiles/slha/", "inputFiles/lhe/", 
                        "lib/nllfast/nllfast-1.2/",
                        "lib/nllfast/nllfast-2.1/",
-                       "lib/nllfast/nllfast-3.0/",
-                       "lib/nllfast/nllfast-4.01dcpl/",
-                       "lib/nllfast/nllfast-5.01dcpl/",
                        "lib/pythia6/", "etc" ]:
         ret.append ( ( directory, listDirectory ( directory ) ) )
-
-    ## then the binaries
-    #ret.append ( ( "lib/nllfast/nllfast-1.2/", 
-    #             [ "lib/nllfast/nllfast-1.2/nllfast_7TeV" ] )  )
 
     return ret
 
