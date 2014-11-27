@@ -75,6 +75,9 @@ class TheoryPredictionList(Printer):
         for theoryPrediction in self._theoryPredictions:
             yield theoryPrediction
 
+    def __getitem__(self, index):
+        return self._theoryPredictions[index]
+
     def __len__(self):
         return len(self._theoryPredictions)
 
