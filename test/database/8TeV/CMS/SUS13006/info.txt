@@ -4,7 +4,11 @@ pas: SUS-13-006
 url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13006
 publisheddata: True
 condition: TChiWZ -> None
+condition: TChiWZoff -> [[['mu+','mu-']],[['l','nu']]] > [[['e+','e-']],[['l','nu']]]
 fuzzycondition: TChiWZ -> None
+fuzzycondition: TChiWZoff -> Cgtr([[['mu+','mu-']],[['l','nu']]],[[['e+','e-']],[['l','nu']]])
 constraint: TChiWZ -> [[['W']],[['Z']]]
+constraint: TChiWZoff -> 71.*([[['mu+','mu-']],[['l','nu']]] + [[['e+','e-']],[['l','nu']]])
 category: TChiWZ -> eweakino
-axes: TChiWZ: M1 M0
+category: TChiWZoff -> eweakino
+axes: TChiWZ: M1 M0, TChiWZoff: M1 M0
