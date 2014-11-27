@@ -48,9 +48,8 @@ def main(inputFile, parameterFile, outputFile):
         log.error("Unknown input type (must be SLHA or LHE): %s" % inputType)
         sys.exit()
     #Check input file for errors
-    if parser.getboolean("options","checkInput"):        
-        inputStatus = ioObjects.FileStatus(inputType,inputFile,sigmacut)        
-    else: inputStatus.status = [0, None]
+    inputStatus = ioObjects.FileStatus()
+    if parser.getboolean("options","checkInput"): inputStatus.checkFile(inputType,inputFile,sigmacut)        
 
     #check database address    
     try:
@@ -61,7 +60,7 @@ def main(inputFile, parameterFile, outputFile):
         databaseVersion  = None
 
     #initialize output status and exit if there were errors in the input
-    outputStatus = ioObjects.OutputStatus(inputStatus, dict(parser.items("parameters")), databaseVersion, outputFile)
+    outputStatus = ioObjects.OutputStatus(inputStatus.status,inputFile,dict(parser.items("parameters")), databaseVersion, outputFile)
 #---------------------------------------------------------------------------------------------------------
 
 
