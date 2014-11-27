@@ -219,6 +219,7 @@ class SlhaStatus(Printer):
     :ivar maxDisplacement: maximum c*tau for promt decays in meters
     :ivar sigmacut: sigmacut in fb
     :ivar checkLSP: if True check if LSP is neutral
+    :ivar findMissingDecayBlocks: if True add a warning for missing decay blocks
     :ivar findIllegalDecays: if True check if all decays are kinematically allowed
     :ivar checkXsec: if True check if SLHA file contains cross sections
     :ivar findLonglived: if True find stable charged particles and displaced vertices
@@ -263,9 +264,13 @@ class SlhaStatus(Printer):
         if not self.slha:
             return -3, "Could not read input slha file"
         ret = 0
+        warning = None
         retMes = "#Warnings:\n"
-        for st, message in [
-                            self.xsec]:
+        st , message = self.decayBlocksStatus # add only warning, no negative staus flag in case of missing decay blocks
+        if st < 0:
+            warning = True
+            retMes += message + "\n"
+        for st, message in [self.xsec]:
             if st < 0:
                 ret = -2
                 retMes = retMes + "#" + message + ".\n"
@@ -283,7 +288,8 @@ class SlhaStatus(Printer):
             return -1, "#ERROR: special signatures in this point.\n" + retMes
         if ret == -2:
             return -2, retMes
-        return ret, "Input file ok" 
+        if not warning: retMes = "Input file ok"
+        return ret, retMes
 
     def emptyDecay(self, pid):
         """
