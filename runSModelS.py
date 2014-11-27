@@ -58,6 +58,7 @@ def main(inputFile, parameterFile, outputFile):
     except:
         log.error("Database not found in %s" % os.path.realpath(smsHelpers.base))
         databaseVersion  = None
+        sys.exit()
 
     #initialize output status and exit if there were errors in the input
     outputStatus = ioObjects.OutputStatus(inputStatus.status,inputFile,dict(parser.items("parameters")), databaseVersion, outputFile)

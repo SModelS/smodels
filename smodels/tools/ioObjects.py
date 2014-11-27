@@ -102,13 +102,15 @@ class OutputStatus(Printer):
         self.statusStrings = {-1: "#could not run the decomposition",
                               -3: "#no cross sections above sigmacut found",
                               -4: "#database not found",
-                              -2: "#bad input slha, did not run decomposition",
+                              -2: "#bad input file, did not run decomposition",
                                0: "#no matching experimental results",
                                1: "#decomposition was successful"}
 
-        self.status = 0
-        if not self.databaseVersion or self.filestatus < 0:
-            self.status = min(self.databaseVersion,self.filestatus)
+        self.status = 0        
+        if not self.databaseVersion or self.databaseVersion < 0:
+            self.status = -4
+        if self.filestatus < 0:       
+            self.status = - 2
         self.checkStatus()
     
     def checkStatus(self):
@@ -116,6 +118,7 @@ class OutputStatus(Printer):
         check status, exit if negativ
         """
         if self.status < 0:
+            self.printout("stdout")
             self.printout("file",self.outputfile)
             sys.exit()
 
@@ -202,11 +205,11 @@ class LheStatus(Printer):
         totxsec = lhe.metainfo["totalxsec"]
         sqrts = lhe.metainfo["sqrts"]
         if (not type(sqrts) == type(1*GeV)) or (not sqrts.asNumber()):
-            return -1, "Center-of-mass energy not found in inputfile %s" %self.filename
+            return -1, "Center-of-mass energy not found in the input LHE file %s" %self.filename
         elif not nevents:
-            return -1, "No events found in inputfile %s" %self.filename
+            return -1, "No events found in the input LHE file %s" %self.filename
         elif (not type(totxsec) == type(1*fb)) or (not totxsec.asNumber()):
-            return -1, "Total cross-section not found in inputfile %s" %self.filename
+            return -1, "Total cross-section not found in the input LHE file %s" %self.filename
         return 1, "Input file ok"
     
     
@@ -234,9 +237,9 @@ class SlhaStatus(Printer):
         self.filename = filename
         self.maxDisplacement = maxDisplacement
         self.sigmacut = sigmacut
-        self.slha = self.read()
+        self.slha = self.read()        
         if not self.slha:
-            self.status = -3, "Could not read input slha"
+            self.status = -3, "Could not read input SLHA file"
             return
         self.lsp = self.findLSP()
         self.lspStatus = self.testLSP(checkLSP)
