@@ -82,21 +82,22 @@ class ResultList(Printer):
 class OutputStatus(Printer):
     """
     Object that holds all status information and has a predefined printout 
-    :ivar inputStatus: FileStatus of input file
+    :ivar status: status of input file
+    :ivar inputFile: input file name
     :ivar parameters: input parameters
     :ivar databaseVersion: database version (string)
     :ivar outputfile: path to outputfile
     """
-    def __init__(self,inputStatus,parameters,databaseVersion,outputfile):
+    def __init__(self,status,inputFile,parameters,databaseVersion,outputfile):
         """
         Initialize output. If one of the checks failed, exit.
         """
         
         self.outputfile = outputfile
-        self.inputfile = inputStatus.filestatus.filename
+        self.inputfile = inputFile
         self.parameters = parameters
-        self.filestatus = inputStatus.status[0]
-        self.warnings = inputStatus.status[1]
+        self.filestatus = status[0]
+        self.warnings = status[1]
         self.databaseVersion = databaseVersion
         self.statusStrings = {-1: "#could not run the decomposition",
                               -3: "#no cross sections above sigmacut found",
@@ -161,14 +162,17 @@ class FileStatus(Printer):
     :ivar sigmacut: sigmacut in fb
     """
     
-    def __init__(self, inputType, inputFile, sigmacut=None):
-
-        self.inputType = inputType
+    def __init__(self):
+        
+        self.filestatus = None
+        self.status = 0, "File not checked\n"
+        
+    def checkFile(self,inputType, inputFile, sigmacut=None):
                 
-        if self.inputType == 'lhe':
+        if inputType == 'lhe':
             self.filestatus = LheStatus(inputFile)            
             self.status = self.filestatus.status
-        elif self.inputType == 'slha':
+        elif inputType == 'slha':
             self.filestatus = SlhaStatus(inputFile,sigmacut=sigmacut)            
             self.status = self.filestatus.status
         else:
