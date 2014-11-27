@@ -35,6 +35,9 @@ def load(analyses=None, topologies=None, sqrts=[7, 8], usePrivate=False, useSupe
     
     """
 
+    #info message if superseded results are not used
+    logger.info("useSuperseded is not set, skipping superseded results")
+
     #to have readable input, we can give all instead of None
     if topologies == "all": topologies = None
     if analyses == "all": analyses = None
@@ -58,7 +61,6 @@ def load(analyses=None, topologies=None, sqrts=[7, 8], usePrivate=False, useSupe
             logger.info("Skipping private analysis %s.",str(ana))
             continue
         if smsResults.isSuperseded(ana) and not useSuperseded:
-            logger.info("%s has been superseded by %s, skipping %s" %(ana, smsResults.isSuperseded(ana), ana))
             continue
         logger.debug("Building analysis %s.", str(ana))
         ss = smsResults.getSqrts(ana) / TeV
