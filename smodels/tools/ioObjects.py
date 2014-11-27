@@ -224,7 +224,7 @@ class SlhaStatus(Printer):
     :ivar findLonglived: if True find stable charged particles and displaced vertices
     """
     def __init__(self, filename, maxDisplacement=.01, sigmacut=.01*fb,
-                 checkLSP = True,
+                 checkLSP = True, findMissingDecayBlocks=True,
                  findIllegalDecays = False, checkXsec = True, findLonglived = True):
         self.filename = filename
         self.maxDisplacement = maxDisplacement
@@ -237,6 +237,7 @@ class SlhaStatus(Printer):
         self.lspStatus = self.testLSP(checkLSP)
         self.illegalDecays = self.findIllegalDecay(findIllegalDecays)
         self.xsec = self.hasXsec(checkXsec)
+        self.decayBlocksStatus = self.findMissingDecayBlocks(findMissingDecayBlocks)
         self.longlived = self.findLonglivedParticles(findLonglived)
         
         self.status = self.evaluateStatus()
@@ -264,8 +265,9 @@ class SlhaStatus(Printer):
             return -3, "Could not read input slha file"
         ret = 0
         retMes = "#Warnings:\n"
-        for st, message in [
-                            self.xsec]:
+        st , message = self.decayBlocksStatus # add only warning, no negative staus flag in case of missing decay blocks
+        if st < 0: retMes += message + "\n"
+        for st, message in [self.xsec]:
             if st < 0:
                 ret = -2
                 retMes = retMes + "#" + message + ".\n"
@@ -294,6 +296,28 @@ class SlhaStatus(Printer):
         if not abs(pid) in self.slha.decays: return True #consider missing decay block as empty
         if not self.slha.decays[abs(pid)].decays: return True
         return None
+
+
+    def findMissingDecayBlocks(self, findMissingBlocks):
+        """
+        For all non-rEven particles listed in mass block, check if decay block is written
+        :returns: status flag and message
+        """
+        if not findMissingBlocks:
+            return 0, "Did not check for missing decay blocks"
+        st = 1
+        missing = []
+        pids = self.slha.blocks["MASS"].keys()
+        for pid in pids:
+            if pid in rEven:
+                continue
+            if not pid in self.slha.decays:
+                missing.append(pid)
+                st = -1
+        if st == 1:
+            msg = "No missing decay blocks"
+        else: msg = "# Missing decay blocks for %s" %str(missing)
+        return st, msg
 
 
     def findIllegalDecay(self, findIllegal):
@@ -344,7 +368,7 @@ class SlhaStatus(Printer):
         msg += "\t  ./smodels.py xseccomputer "+ self.filename+" -p \n\n"        
         msg += "\t For more options and information run: ./smodels.py xseccomputer -h\n"
         logger.error(msg)
-        sys.exit()
+        return -1, msg
 
 
     def testLSP(self, checkLSP):
