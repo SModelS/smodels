@@ -98,7 +98,7 @@ def elementsInStr(instring):
                 if not ptc:
                     continue
                 if not ptc in rEven.values() and not ptc in ptcDic:
-                    logger.error("Unknown particle " + ptc)
+                    logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
                     sys.exit()
 
     # Check if there are not unmatched ['s and/or ]'s in the string
@@ -150,7 +150,7 @@ def vertInStr(instring):
                 if not ptc:
                     continue
                 if not ptc in rEven.values() and not ptc in ptcDic:
-                    logger.error("Unknown particle " + ptc)
+                    logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
                     sys.exit()
             vertStr = ""
 
