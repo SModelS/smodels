@@ -67,9 +67,9 @@ def upperLimit(analysis, topology, masses, path=None):
                                             masses[_getAxis('x', d[0]['axes'])],
                                             masses[_getAxis('y', d[0]['axes'])],
                                             interpolate=True)
-        logger.error("Only one histogram available for %s/%s, cannot "
-                     "interpolate for intermediate mass.", analysis,
-                     topology)
+        logger.warning("Only one histogram available for %s/%s, cannot "
+                       "interpolate for intermediate mass.", analysis,
+                       topology)
         return None
     return _doGridData(analysis, topology, masses, d, path)
 
@@ -157,7 +157,7 @@ def _doGridData(analysis, topology, masses, dPar, path=None):
         return None
 
     if cter==1:
-        logger.error("Only one histogram available for %s/%s, cannot interpolate for intermediate mass.", analysis, topology)
+        logger.warning("Only one histogram available for %s/%s, cannot interpolate for intermediate mass.", analysis, topology)
         return None
 
     p = np.array(masslist)
