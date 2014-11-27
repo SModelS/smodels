@@ -8,6 +8,8 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com> 
     
 """
+import sys
+sys.path.append("../")
 
 import unittest
 
