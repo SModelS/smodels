@@ -331,7 +331,7 @@ class Element(Printer):
                     sys.exit()
                 for ptc in vertex:
                     if not ptc in rEven.values() and not ptc in ptcDic:
-                        logger.error("Unknown particle" + ptc)
+                        logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
                         sys.exit()
         return True
 

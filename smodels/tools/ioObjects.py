@@ -340,7 +340,8 @@ class SlhaStatus(Printer):
                     ptc = abs(ptc)
                     if ptc in SMmasses: mDau += SMmasses[ptc]
                     elif ptc in self.slha.blocks["MASS"].keys(): mDau += abs(self.slha.blocks["MASS"][ptc])
-                    else: return -2, "Unknown PID %s in decay of %s" %(str(ptc),str(particle)) # FIXME unknown pid, what to do??
+                    else:
+                        return -2, "Unknown PID %s in decay of %s" %(str(ptc),str(particle) + ". Add " + str(ptc) + " to smodels/particle.py")
                 if mDau > mMom:
                     st = -1
                     if not str(particle) in badDecay: badDecay += str(particle)+ " "
