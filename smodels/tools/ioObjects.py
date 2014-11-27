@@ -349,7 +349,7 @@ class SlhaStatus(Printer):
         msg += "\n\t For MSSM models, it is possible to compute the MSSM cross-sections"
         msg += " using Pythia through the command:\n\n"
         msg += "\t  ./runTools.py xseccomputer -p -f"+ self.filename+" \n\n"        
-        msg += "\t For more options and information run: ./smodels.py xseccomputer -h\n"
+        msg += "\t For more options and information run: ./runTools.py xseccomputer -h\n"
         logger.error(msg)
         sys.exit()
 
