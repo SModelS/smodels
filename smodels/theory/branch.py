@@ -53,7 +53,7 @@ class Branch(object):
                     for ptc in ptcs:
                         if not ptc in rEven.values() \
                                 and not ptc in ptcDic:
-                            logger.error("Unknown particle " + ptc)
+                            logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
                             sys.exit()
                     self.particles.append(ptcs)
 
