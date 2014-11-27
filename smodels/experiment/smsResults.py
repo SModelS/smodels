@@ -10,7 +10,7 @@
 """
 
 from smodels.tools.physicsUnits import TeV, pb, fb, GeV
-from smodels.tools import rcFile
+## from smodels.tools import rcFile
 from smodels.experiment import smsHelpers
 from smodels.experiment.experimentExceptions import MetaInfoError
 from smodels.experiment.smsHelpers import getPath

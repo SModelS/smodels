@@ -29,7 +29,7 @@ class ExternalTool(object):
 
     def installDirectory(self):
         """
-        TODO: write docstring
+        :returns: the installation directory of the tool
         
         """
         t = self.executablePath

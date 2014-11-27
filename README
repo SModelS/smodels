@@ -1,64 +1,36 @@
-Installation and Deployment
-===========================
-
-SModelS is a Python library that requires Python version 2.6 or later 
-(but not version 3).  Internally, SModelS uses the following tools:
-
- * pythia 6.4.27
- * nllfast version 2.1
-
-These tools are built into SModelS, they need not be installed separately.
-In addition, SModelS depends on the following *external* python libraries:
-
- * unum
- * numpy
- * argparse
- * docutils>=0.3
- * scipy>=0.9.0
-
-For installation, SModelS makes use of Python's *setuptools*.
-Thus ::
-  python setup.py install 
-
-should install the entire project, compile the internal pythia and nllfast versions
-using gfortran. It should also resolve the external dependencies, i.e. install
-the python libraries listed above using e.g. *pip*.
-
-In case the compilation of SModelS fails, it is advised to try to compile
-the tools manually, by issuing "make" in the *lib/* directory.
-In case the installation of the external libraries fails, our advise is to install
-them manually. For SL6 machines, a recipe is given below.
-
-There is also a diagnostic tool available: ::
-
-   python smodels/tools/toolBox.py 
-
-should list and check all internal tools (pythia and nllfast) and external
-(numpy, scipy, unum, ... ) dependencies.
-
-Also, the toplevel Makefile ships with rules to make standard .deb and .rpm
-packages.  ``make buildrpm`` and ``make builddeb`` should build packages that
-can be installed just like any other rpm/deb package.
-
-In case everything fails, please contact smodels-users@oeaw.ac.at.
-
-Installation on SL6
--------------------
-
-Installation on an SL6 (Scientific Linux 6 or Scientific Linux CERN 6) machine
-is tricky, because SModelS requires a more recent version of *scipy* than is provided by SL6. 
-We succeeded to install SModelS on SL6 by doing:
-
- * yum install gcc-c++ libstdc++-devel libevent-devel python-devel lapack lapack-devel blas blas-devel libgfortran python-distutils-extra
+SModelS v1
+==========
 
 
-In addition, the following steps were needed:
-
- * pip install nose unum argparse
- * pip install numpy
- * pip install pymc
- * export LC_ALL=C; export LANG=C; pip install scipy
+Installation
+-------------
+* For installation instructions see INSTALL.
 
 
-Note, that these steps can safely be done within a python ``virtualenv``.
+Running SModelS
+---------------
+SModelS provides a command-line tool (runSModelS.py) for the basic functionalities,
+which can be executed as:
 
+./runSModelS.py -p <parameter file> -f <input file> -o <output file>
+
+For help instructions:
+
+./runSModelS.py -h
+
+An example file on how to call the SModelS libraries from your own
+Python code can be found in Example.py.
+
+Detailed explanations on how to use SModelS, including explanations of the
+output, can be found in the section ``Running SModelS'' of the SModelS manual
+(docs/index.html).
+
+
+Citation
+--------
+If you use this software please cite:
+
+- "SModelS: A tool for interpreting simplified-model results from the LHC", Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Wolfgang Magerl, Doris Proschofsky, Wolfgang Waltenberger, arXiv:1312.4175 EPJC May 2014, 74:2868
+- PySLHA arXiv:1305.4194
+- Pythia6 manual JHEP 05 (2006) 026 (LU TP 06-13, FERMILAB-PUB-06-052-CD-T, hep-ph/0603175) 
+- NLL-fast W. Beenakker, S. Brensing, M. KrÃ¤mer, A. Kulesza, E. Laenen, L. Motyka, I. Niessen, Int. J. Mod. Phys. A26 (2011) 2637-2664 

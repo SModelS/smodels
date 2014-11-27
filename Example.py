@@ -1,14 +1,12 @@
 #!/usr/bin/env python
 
 """
-.. module:: simpleExample
+.. module:: Example
    :synopsis: Basic main file example for using SModelS.
-
-.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
 """
 
-#Import basic functions (this file must be run under the installation folder
+#Import basic functions (this file must be run under the installation folder)
 from __future__ import print_function
 import sys
 from smodels.theory import slhaDecomposer
@@ -19,7 +17,7 @@ from smodels.theory.theoryPrediction import theoryPredictionFor
 from smodels.experiment import smsHelpers
 
 #Set the address of the database folder
-smsHelpers.base="/home/lessa/smodels-database/"
+smsHelpers.base="./smodels-database/"
 
 
 def main():
@@ -29,8 +27,8 @@ def main():
     """
 
     #Path to input file name (either a SLHA or LHE file)
-    slhafile = 'inputFiles/slha/lightSquarks.slha'
-#     lhefile = 'inputFiles/lhe/lightSquarks.slha.lhe'
+    slhafile = 'inputFiles/slha/gluino_squarks.slha'
+#     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
 
     #Set main options for decomposition:
     sigmacut = 0.03 * fb
