@@ -23,7 +23,7 @@ def main():
     xseccomputer.add_argument('-p', '--tofile', action='store_true', help="write cross sections to file")
     xseccomputer.add_argument('-k', '--keep', action='store_true', help="do not unlink temporary directory")
     xseccomputer.add_argument('-n', '--NLO', action='store_true', help="compute at the NLO level (default is LO)")
-    xseccomputer.add_argument('-N', '--NLL', help="compute at the NLL level (takes precedence over NLL, default is LO)", action='store_true')
+    xseccomputer.add_argument('-N', '--NLL', help="compute at the NLO+NLL level (takes precedence over NLO, default is LO)", action='store_true')
     xseccomputer.add_argument('-O', '--LOfromSLHA',help="use LO cross-sections from file to compute the NLO or NLL cross-sections", action='store_true')
     xseccomputer.add_argument('-f', '--filename', help="SLHA file to compute cross sections for", required=True)
       
