@@ -1,7 +1,0 @@
-# copy this file to ~/.smodelsrc
-
-from smodels.experiment import smsHelpers
-import os
-
-## this defines where the database resides
-smsHelpers.base=os.environ["HOME"]+"/SMS_database/"
