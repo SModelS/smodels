@@ -33,4 +33,4 @@ If you use this software please cite:
 - "SModelS: A tool for interpreting simplified-model results from the LHC", Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Wolfgang Magerl, Doris Proschofsky, Wolfgang Waltenberger, arXiv:1312.4175 EPJC May 2014, 74:2868
 - PySLHA arXiv:1305.4194
 - Pythia6 manual JHEP 05 (2006) 026 (LU TP 06-13, FERMILAB-PUB-06-052-CD-T, hep-ph/0603175) 
-- NLL-fast W. Beenakker, S. Brensing, M. KrÃ¤mer, A. Kulesza, E. Laenen, L. Motyka, I. Niessen, Int. J. Mod. Phys. A26 (2011) 2637-2664 
+- NLL-fast W. Beenakker, S. Brensing, M. Krämer, A. Kulesza, E. Laenen, L. Motyka, I. Niessen, Int. J. Mod. Phys. A26 (2011) 2637-2664 
