@@ -287,7 +287,6 @@ class ExternalPythia6(ExternalTool):
             output = self.run(slhaPath, "<install>/etc/pythia_test.card",
                     do_compile=False, do_check=False ) 
             output = output.split("\n")
-            ## print ("output="+str(output) )
             if output[-1].find("The following floating-point") > -1:
                 output.pop()
 
