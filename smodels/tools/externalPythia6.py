@@ -301,6 +301,7 @@ class ExternalPythia6(ExternalTool):
                     return False
         except Exception, e:
             logger.error("Something is wrong with the setup: exception %s", e)
+            return False
         return True
 
 
