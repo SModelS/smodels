@@ -1,0 +1,2106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>theory Package &mdash; SModelS 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SModelS 1.0 documentation" href="index.html" />
+    <link rel="next" title="experiment Package" href="experiment.html" />
+    <link rel="prev" title="SModelS" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="experiment.html" title="experiment Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="SModelS"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">SModelS 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="theory-package">
+<h1>theory Package<a class="headerlink" href="#theory-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">theory</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-theory.__init__"></span></div>
+<div class="section" id="module-theory.analysis">
+<span id="analysis-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">analysis</span></tt> Module<a class="headerlink" href="#module-theory.analysis" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-theory.analysis"></span><dl class="class">
+<dt id="theory.analysis.EManalysis">
+<em class="property">class </em><tt class="descclassname">theory.analysis.</tt><tt class="descname">EManalysis</tt><a class="headerlink" href="#theory.analysis.EManalysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">smodels.theory.printer.Printer</span></tt></p>
+<p>Class to store a efficiency map-type of analysis.    
+Stores the basic analysis info and contains a method for obtaining the
+efficiency maps from the database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label</strong> &#8211; Analysis label/name</li>
+<li><strong>sqrts</strong> &#8211; Analysis center-of-mass energy</li>
+<li><strong>lum</strong> &#8211; Analysis luminosity</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="theory.analysis.EManalysis.getEfficiencyFor">
+<tt class="descname">getEfficiencyFor</tt><big>(</big><em>element</em><big>)</big><a class="headerlink" href="#theory.analysis.EManalysis.getEfficiencyFor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get efficiency for element from the database.        
+Returns zero if a efficiency is not found.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">not implemented yet</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">efficiency value (float). zero, if element is not found</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.analysis.EManalysis.getLimitFor">
+<tt class="descname">getLimitFor</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.analysis.EManalysis.getLimitFor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get experimental limit for a cross-section.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">not implemented yet</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">experimental upper limit for cross-section
+(float with unit or Unum object)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="theory.analysis.ULanalysis">
+<em class="property">class </em><tt class="descclassname">theory.analysis.</tt><tt class="descname">ULanalysis</tt><a class="headerlink" href="#theory.analysis.ULanalysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">smodels.theory.printer.Printer</span></tt></p>
+<p>Class to store one upper limit-type analysis.    
+Stores the conditions and the elements constrained by the analysis as well
+as basic analysis info.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>conditions</strong> &#8211; List of conditions strings</li>
+<li><strong>constraint</strong> &#8211; Constraint string</li>
+<li><strong>elementsEff</strong> &#8211; Dictionary with constrained elements as keys and</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>efficiencies as values    
+:ivar label: Analysis label/name
+:ivar sqrts: Analysis center-of-mass energy
+:ivar lum: Analysis luminosity</p>
+<dl class="method">
+<dt id="theory.analysis.ULanalysis.formatData">
+<tt class="descname">formatData</tt><big>(</big><em>outputLevel</em><big>)</big><a class="headerlink" href="#theory.analysis.ULanalysis.formatData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select data preparation method through dynamic binding.
+:parameter outputLevel: general control for the output depth to be printed</p>
+<blockquote>
+<div>(0 = no output, 1 = basic output, 2 = detailed output,...</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.analysis.ULanalysis.getBranchCondition">
+<tt class="descname">getBranchCondition</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.analysis.ULanalysis.getBranchCondition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Most analyses include assumptions about the masses of the elements
+appearing in their constraints.
+This method returns a string describing this condition</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">string describing branch condition (from the branchcondition field)
+or None if no condition is found</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.analysis.ULanalysis.getEfficiencyFor">
+<tt class="descname">getEfficiencyFor</tt><big>(</big><em>element</em><big>)</big><a class="headerlink" href="#theory.analysis.ULanalysis.getEfficiencyFor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get (trivial) efficiency for element.        
+Returns zero if element is not constrained by the analysis or the
+element multiplicative factor if it is.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">1 if element is in constraint, zero otherwise</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.analysis.ULanalysis.getUpperLimitFor">
+<tt class="descname">getUpperLimitFor</tt><big>(</big><em>mass</em><big>)</big><a class="headerlink" href="#theory.analysis.ULanalysis.getUpperLimitFor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the experimental upper limit for a specific mass array.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mass</strong> &#8211; mass vector for computing the upper limit</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">experimental upper limit for cross-section times BR (float with unit or Unum object)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-theory.auxiliaryFunctions">
+<span id="auxiliaryfunctions-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">auxiliaryFunctions</span></tt> Module<a class="headerlink" href="#module-theory.auxiliaryFunctions" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-theory.auxiliaryFunctions"></span><dl class="function">
+<dt id="theory.auxiliaryFunctions._flattenList">
+<tt class="descclassname">theory.auxiliaryFunctions.</tt><tt class="descname">_flattenList</tt><big>(</big><em>inlist</em>, <em>dims=None</em><big>)</big><a class="headerlink" href="#theory.auxiliaryFunctions._flattenList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flatten a multi-dimensional nested list.</p>
+<p>Output ordering: [first level objects, second level objects, ...].</p>
+<p>If dims == [], include dimensions of nested list to it. This is useful when
+comparing lists).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.auxiliaryFunctions._memoize">
+<tt class="descclassname">theory.auxiliaryFunctions.</tt><tt class="descname">_memoize</tt><big>(</big><em>func</em><big>)</big><a class="headerlink" href="#theory.auxiliaryFunctions._memoize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cache the results of massPosition.</p>
+<p>Serves as a wrapper to cache the results of massPosition, since this is a
+computationally expensive function.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.auxiliaryFunctions.cGtr">
+<tt class="descclassname">theory.auxiliaryFunctions.</tt><tt class="descname">cGtr</tt><big>(</big><em>weightA</em>, <em>weightB</em><big>)</big><a class="headerlink" href="#theory.auxiliaryFunctions.cGtr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the auxiliary greater function.</p>
+<p>Return a number between 0 and 1 depending on how much it is violated
+(0 = A &gt; B, 1 = A &lt;&lt; B).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">XSectioList object with the values for each label.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.auxiliaryFunctions.cSim">
+<tt class="descclassname">theory.auxiliaryFunctions.</tt><tt class="descname">cSim</tt><big>(</big><em>*weights</em><big>)</big><a class="headerlink" href="#theory.auxiliaryFunctions.cSim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the auxiliar similar function.</p>
+<p>Return the maximum relative difference between any element weights of the
+list, normalized to [0,1].</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">XSectionList object with the values for each label.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.auxiliaryFunctions.distance">
+<tt class="descclassname">theory.auxiliaryFunctions.</tt><tt class="descname">distance</tt><big>(</big><em>xmass1</em>, <em>xmass2</em><big>)</big><a class="headerlink" href="#theory.auxiliaryFunctions.distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define distance between two mass positions in upper limit space.
+The distance is defined as d = 2*|xmass1-xmass2|/(xmass1+xmass2).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>xmass1</strong> &#8211; upper limit value (in fb) for the mass1</li>
+<li><strong>xmass2</strong> &#8211; upper limit value (in fb) for the mass2</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">relative mass distance in upper limit space</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.auxiliaryFunctions.massAvg">
+<tt class="descclassname">theory.auxiliaryFunctions.</tt><tt class="descname">massAvg</tt><big>(</big><em>massList</em>, <em>method='weighted'</em>, <em>weights=None</em><big>)</big><a class="headerlink" href="#theory.auxiliaryFunctions.massAvg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the average mass of massList according to method.</p>
+<p>If method=weighted but weights were not properly defined,
+switch method to harmonic.    
+If massList contains a zero mass, switch method to mean.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>method</strong> &#8211; possible values: harmonic, mean, weighted</li>
+<li><strong>weights</strong> &#8211; weights of elements (only for weighted average)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.auxiliaryFunctions.massPosition">
+<tt class="descclassname">theory.auxiliaryFunctions.</tt><tt class="descname">massPosition</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#theory.auxiliaryFunctions.massPosition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Give mass position in upper limit space.    
+Use the analysis experimental limit data.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-theory.branch">
+<span id="branch-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">branch</span></tt> Module<a class="headerlink" href="#module-theory.branch" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-theory.branch"></span><dl class="class">
+<dt id="theory.branch.Branch">
+<em class="property">class </em><tt class="descclassname">theory.branch.</tt><tt class="descname">Branch</tt><big>(</big><em>info=None</em><big>)</big><a class="headerlink" href="#theory.branch.Branch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>An instance of this class represents a branch.    
+A branch-element can be constructed from a string (e.g., (&#8216;[b,b],[W]&#8217;).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>masses</strong> &#8211; list of masses for the intermediate states</li>
+<li><strong>particles</strong> &#8211; list of particles (strings) for the final states</li>
+<li><strong>momID</strong> &#8211; PDG id for the primary (intermediate state) mother</li>
+<li><strong>daughterID</strong> &#8211; PDG id for the last intermediate state</li>
+<li><strong>maxWeight</strong> &#8211; weight of the branch (XSection object)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="theory.branch.Branch._addDecay">
+<tt class="descname">_addDecay</tt><big>(</big><em>br</em>, <em>massDictionary</em><big>)</big><a class="headerlink" href="#theory.branch.Branch._addDecay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a new branch adding a 1-step cascade decay        
+This is described by the br object, with particle masses given by
+massDictionary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>br</strong> &#8211; branching ratio object (see pyslha). Contains information about the decay.</li>
+<li><strong>massDictionary</strong> &#8211; dictionary containing the masses for all intermediate states.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">extended branch (Branch object). False if there was an error.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.branch.Branch.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.branch.Branch.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an independent copy of self.        
+Faster than deepcopy.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Branch object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.branch.Branch.decayDaughter">
+<tt class="descname">decayDaughter</tt><big>(</big><em>brDictionary</em>, <em>massDictionary</em><big>)</big><a class="headerlink" href="#theory.branch.Branch.decayDaughter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a list of all new branches generated by the 1-step cascade
+decay of the current branch daughter.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>brDictionary</strong> &#8211; dictionary with the decay information
+for all intermediate states (values are br objects, see pyslha)</li>
+<li><strong>massDictionary</strong> &#8211; dictionary containing the masses for all intermediate states.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of extended branches (Branch objects). Empty list if daughter is stable or
+if daughterID was not defined.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.branch.Branch.getLength">
+<tt class="descname">getLength</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.branch.Branch.getLength" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the branch length (= number of R-odd masses).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">length of branch (number of cascade decay steps)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.branch.Branch.isEqual">
+<tt class="descname">isEqual</tt><big>(</big><em>other</em>, <em>useDict=True</em><big>)</big><a class="headerlink" href="#theory.branch.Branch.isEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compares two branches. If particles are similar
+and masses are equal, return True. Otherwise, return False.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>other</strong> &#8211; branch to be compared (Branch object)</li>
+<li><strong>useDict</strong> &#8211; if True, allow for inclusive particle labels</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">True if branches are equal (particles and masses match); False otherwise.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.branch.decayBranches">
+<tt class="descclassname">theory.branch.</tt><tt class="descname">decayBranches</tt><big>(</big><em>branchList, brDictionary, massDictionary, sigcut=0.00E+00 [fb]</em><big>)</big><a class="headerlink" href="#theory.branch.decayBranches" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decay all branches from branchList until all unstable intermediate states have decayed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>branchList</strong> &#8211; list of Branch() objects containing the initial mothers</li>
+<li><strong>brDictionary</strong> &#8211; dictionary with the decay information
+for all intermediate states (values are br objects, see pyslha)</li>
+<li><strong>massDictionary</strong> &#8211; dictionary containing the masses for all intermediate states.</li>
+<li><strong>sigcut</strong> &#8211; minimum sigma*BR to be generated, by default sigcut = 0.
+(all branches are kept)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of branches (Branch objects)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-theory.clusterTools">
+<span id="clustertools-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">clusterTools</span></tt> Module<a class="headerlink" href="#module-theory.clusterTools" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="theory.clusterTools.ElementCluster">
+<em class="property">class </em><tt class="descclassname">theory.clusterTools.</tt><tt class="descname">ElementCluster</tt><a class="headerlink" href="#theory.clusterTools.ElementCluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>An instance of this class represents a cluster.    
+This class is used to store the relevant information about a cluster of
+elements and to manipulate this information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><strong>elements</strong> &#8211; list of elements in the cluster (Element objects)</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="theory.clusterTools.ElementCluster.getAvgMass">
+<tt class="descname">getAvgMass</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.clusterTools.ElementCluster.getAvgMass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the average mass of all elements belonging to the cluster.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">average mass array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.clusterTools.ElementCluster.getTotalXSec">
+<tt class="descname">getTotalXSec</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.clusterTools.ElementCluster.getTotalXSec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the sum over the cross-sections of all elements belonging to
+the cluster.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">sum of weights of all the elements in the cluster (XSectionList object)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="theory.clusterTools.IndexCluster">
+<em class="property">class </em><tt class="descclassname">theory.clusterTools.</tt><tt class="descname">IndexCluster</tt><big>(</big><em>massMap=None</em>, <em>posMap=None</em>, <em>wMap=None</em>, <em>indices=set([])</em>, <em>analysis=None</em><big>)</big><a class="headerlink" href="#theory.clusterTools.IndexCluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>An instance of this class represents a cluster storing element indices.    
+This auxiliary class is used to store element indices and positions in
+upper limit space. It is only used by the clustering algorithm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>indices</strong> &#8211; list of integers mapping the cluster elements to their position in the list
+(1st element -&gt; index 0, 2nd element -&gt; index 1,...)</li>
+<li><strong>avgPosition</strong> &#8211; position in upper limit space for the cluster average mass</li>
+<li><strong>massMap</strong> &#8211; dictionary with indices as keys and the corresponding element mass as values</li>
+<li><strong>positionMap</strong> &#8211; dictionary with indices as keys and the corresponding element position
+in upper limit space as values</li>
+<li><strong>weightMap</strong> &#8211; dictionary with indices as keys and the corresponding element weight
+as values</li>
+<li><strong>analysis</strong> &#8211; analysis to which the cluster applies (ULanalysis object)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="theory.clusterTools.IndexCluster._getAvgPosition">
+<tt class="descname">_getAvgPosition</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.clusterTools.IndexCluster._getAvgPosition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the average position in upper limit space for all indices
+belonging to the cluster.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.clusterTools.IndexCluster._getDistanceTo">
+<tt class="descname">_getDistanceTo</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#theory.clusterTools.IndexCluster._getDistanceTo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the maximum distance between any elements belonging to the
+cluster and the object obj.</p>
+<p>obj can be a position in upper limit space or an element index.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.clusterTools.IndexCluster._getMaxInternalDist">
+<tt class="descname">_getMaxInternalDist</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.clusterTools.IndexCluster._getMaxInternalDist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the maximum distance between any pair of elements belonging
+to the cluster as well as the cluster center and any element.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.clusterTools.IndexCluster.add">
+<tt class="descname">add</tt><big>(</big><em>iels</em><big>)</big><a class="headerlink" href="#theory.clusterTools.IndexCluster.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an index or a list of indices to the list of indices and update
+the avgPosition value.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.clusterTools.IndexCluster.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.clusterTools.IndexCluster.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a copy of the index cluster (faster than deepcopy).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.clusterTools.IndexCluster.remove">
+<tt class="descname">remove</tt><big>(</big><em>iels</em><big>)</big><a class="headerlink" href="#theory.clusterTools.IndexCluster.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove an index or a list of indices to the list of indices and
+update the avgPosition value.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.clusterTools._doCluster">
+<tt class="descclassname">theory.clusterTools.</tt><tt class="descname">_doCluster</tt><big>(</big><em>elements</em>, <em>analysis</em>, <em>maxDist</em><big>)</big><a class="headerlink" href="#theory.clusterTools._doCluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cluster algorithm to cluster elements.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>elements</strong> &#8211; list of all elements to be clustered</li>
+<li><strong>analysis</strong> &#8211; analysis to which the cluster applies (ULanalysis object)</li>
+<li><strong>maxDist</strong> &#8211; maximum mass distance for clustering two elements</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a list of ElementCluster objects containing the elements</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>belonging to the cluster</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.clusterTools._getGoodElements">
+<tt class="descclassname">theory.clusterTools.</tt><tt class="descname">_getGoodElements</tt><big>(</big><em>elements</em>, <em>analysis</em>, <em>maxDist</em><big>)</big><a class="headerlink" href="#theory.clusterTools._getGoodElements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the list of elements which have masses satisfying the analysis conditions
+and that lie inside the analysis upper limit grid.</p>
+<p>Most analyses require equal branch masses.
+For such analyses good masses are defined as those where both branches in the element have identical
+mass arrays or where the distance between the two mass arrays is smaller than maxDist.
+e.g. if the element mass array is [[m1,m2] , [m3,m4]] (branch1 = [m1,m2], branch2 = [m3,m4]),
+then the mass is &#8220;good&#8221; if m1=m3 and m3=m4 or if the mass distance between [[m1,m2],[m1,m2]]
+and [[m3,m4],[m3,m4]] is smaller than maxDist.
+If the element has a good mass, its mass is replaced by the mass average of [[m1,m2],[m1,m2]]
+and [[m3,m4],[m3,m4]].
+For the anlyses where there is no such requirement, return the original list of elements
+with masses lying inside the analysis grid.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>elements</strong> &#8211; list of all elements to be clustered</li>
+<li><strong>analysis</strong> &#8211; analysis to which the cluster applies (ULanalysis object)</li>
+<li><strong>maxDist</strong> &#8211; maximum mass distance for clustering two elements</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list with a copy of the elements with good masses, with their masses replaced by</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>the branch average (if equal branch masses are required by the analysis)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.clusterTools.clusterElements">
+<tt class="descclassname">theory.clusterTools.</tt><tt class="descname">clusterElements</tt><big>(</big><em>elements</em>, <em>analysis</em>, <em>maxDist</em><big>)</big><a class="headerlink" href="#theory.clusterTools.clusterElements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cluster the original elements according to their mass distance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>elements</strong> &#8211; list of elements (Element objects)</li>
+<li><strong>analysis</strong> &#8211; analysis to be considered (must be a ULanalysis object)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of clusters (ElementCluster objects)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.clusterTools.groupAll">
+<tt class="descclassname">theory.clusterTools.</tt><tt class="descname">groupAll</tt><big>(</big><em>elements</em><big>)</big><a class="headerlink" href="#theory.clusterTools.groupAll" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a single cluster containing all the elements.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-theory.crossSection">
+<span id="crosssection-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">crossSection</span></tt> Module<a class="headerlink" href="#module-theory.crossSection" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-theory.crossSection"></span><dl class="class">
+<dt id="theory.crossSection.XSection">
+<em class="property">class </em><tt class="descclassname">theory.crossSection.</tt><tt class="descname">XSection</tt><a class="headerlink" href="#theory.crossSection.XSection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>An instance of this class represents a cross-section.</p>
+<p>This class is used to store the information of a single cross-section
+(value, paritcle ids, center of mass, order and label).</p>
+<p>order = 0 (LO), 1 (NLO) or 2 (NLL).</p>
+<dl class="method">
+<dt id="theory.crossSection.XSection._zeroXSec">
+<tt class="descname">_zeroXSec</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.crossSection.XSection._zeroXSec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace the cross-section value by zero.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.crossSection.XSection.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.crossSection.XSection.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates an independent copy of self.</p>
+<p>Faster than deepcopy.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.crossSection.XSection.niceStr">
+<tt class="descname">niceStr</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.crossSection.XSection.niceStr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a more human readable string. The string format is:
+Sqrts: self.info.sqrts,  Weight: self.value</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="theory.crossSection.XSectionInfo">
+<em class="property">class </em><tt class="descclassname">theory.crossSection.</tt><tt class="descname">XSectionInfo</tt><a class="headerlink" href="#theory.crossSection.XSectionInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>An instance of this class represents information regarding a cross-section.</p>
+<p>This class is used to store information of a cross-section (center of
+mass, order and label).</p>
+<dl class="method">
+<dt id="theory.crossSection.XSectionInfo.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.crossSection.XSectionInfo.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an independent copy of self.</p>
+<p>Faster than deepcopy.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="theory.crossSection.XSectionList">
+<em class="property">class </em><tt class="descclassname">theory.crossSection.</tt><tt class="descname">XSectionList</tt><big>(</big><em>infoList=None</em><big>)</big><a class="headerlink" href="#theory.crossSection.XSectionList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>An instance of this class represents a list of cross-sections.</p>
+<p>This class is used to store a list of cross-sections.</p>
+<dl class="method">
+<dt id="theory.crossSection.XSectionList._addValue">
+<tt class="descname">_addValue</tt><big>(</big><em>newxsec</em><big>)</big><a class="headerlink" href="#theory.crossSection.XSectionList._addValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a XSection object to the list.</p>
+<p>If the XSection object already exists, add to its values, otherwise
+append the object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.crossSection.XSectionList._getLabels">
+<tt class="descname">_getLabels</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.crossSection.XSectionList._getLabels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all labels appearing in the list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.crossSection.XSectionList._zeroXSecs">
+<tt class="descname">_zeroXSecs</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.crossSection.XSectionList._zeroXSecs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace the cross-section values in the list by zero.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.crossSection.XSectionList.add">
+<tt class="descname">add</tt><big>(</big><em>newxsec</em><big>)</big><a class="headerlink" href="#theory.crossSection.XSectionList.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append a XSection object to the list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.crossSection.XSectionList.combineWith">
+<tt class="descname">combineWith</tt><big>(</big><em>newXsecs</em><big>)</big><a class="headerlink" href="#theory.crossSection.XSectionList.combineWith" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new list of cross-sections.</p>
+<p>If the new cross-sections already appear (have same order and sqrts),
+add its value to the original value, otherwise append it to the list.
+The particle IDs are ignored when adding cross-sections. Hence, they
+are set to (None, None) if any cross-sections are combined.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.crossSection.XSectionList.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.crossSection.XSectionList.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates an independent copy of itself. Faster than deepcopy.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.crossSection.XSectionList.delete">
+<tt class="descname">delete</tt><big>(</big><em>xSec</em><big>)</big><a class="headerlink" href="#theory.crossSection.XSectionList.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the cross-section entry from the list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.crossSection.XSectionList.getDictionary">
+<tt class="descname">getDictionary</tt><big>(</big><em>groupBy='pids'</em><big>)</big><a class="headerlink" href="#theory.crossSection.XSectionList.getDictionary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the list of XSection objects to a nested dictionary.</p>
+<p>First level keys are the particles IDs (if groupBy == pids) or labels
+(if groupBy == labels) and values are the cross-section labels or
+particle IDs and the cross-section value.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.crossSection.XSectionList.getInfo">
+<tt class="descname">getInfo</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.crossSection.XSectionList.getInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get basic info about the cross-sections appearing in the list (order,
+value and label).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of XSectionInfo objects</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.crossSection.XSectionList.getMaxXsec">
+<tt class="descname">getMaxXsec</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.crossSection.XSectionList.getMaxXsec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the maximum cross-section value appearing in the list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.crossSection.XSectionList.getMinXsec">
+<tt class="descname">getMinXsec</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.crossSection.XSectionList.getMinXsec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get minimum cross-section value appearing in the list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.crossSection.XSectionList.getPIDpairs">
+<tt class="descname">getPIDpairs</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.crossSection.XSectionList.getPIDpairs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all particle ID pairs appearing in the list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.crossSection.XSectionList.getPIDs">
+<tt class="descname">getPIDs</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.crossSection.XSectionList.getPIDs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all particle IDs appearing in the list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.crossSection.XSectionList.getXsecsFor">
+<tt class="descname">getXsecsFor</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#theory.crossSection.XSectionList.getXsecsFor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of XSection objects for item (label, pid, sqrts).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.crossSection.XSectionList.niceStr">
+<tt class="descname">niceStr</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.crossSection.XSectionList.niceStr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="theory.crossSection.XSectionList.removeLowerOrder">
+<tt class="descname">removeLowerOrder</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.crossSection.XSectionList.removeLowerOrder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keep only the highest order cross-section for each process in the list.</p>
+<p>Remove order information and set default labels.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.crossSection.getXsecFromLHEFile">
+<tt class="descclassname">theory.crossSection.</tt><tt class="descname">getXsecFromLHEFile</tt><big>(</big><em>lhefile</em>, <em>addEvents=True</em><big>)</big><a class="headerlink" href="#theory.crossSection.getXsecFromLHEFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain cross-sections from input LHE file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lhefile</strong> &#8211; LHE input file with unweighted MC events</li>
+<li><strong>addEvents</strong> &#8211; if True, add cross-sections with the same mothers,
+otherwise return the event weight for each pair of mothers</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a XSectionList object</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.crossSection.getXsecFromSLHAFile">
+<tt class="descclassname">theory.crossSection.</tt><tt class="descname">getXsecFromSLHAFile</tt><big>(</big><em>slhafile, useXSecs=None, xsecUnit=1.00E+00 [pb]</em><big>)</big><a class="headerlink" href="#theory.crossSection.getXsecFromSLHAFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain cross-sections for pair production of R-odd particles from input SLHA file.
+The default unit for cross-section is pb.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>slhafile</strong> &#8211; SLHA input file with cross-sections</li>
+<li><strong>useXSecs</strong> &#8211; if defined enables the user to select cross-sections to
+use. Must be a XSecInfoList object</li>
+<li><strong>xsecUnit</strong> &#8211; cross-section unit in the input file (must be a Unum unit)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a XSectionList object</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-theory.element">
+<span id="element-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">element</span></tt> Module<a class="headerlink" href="#module-theory.element" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-theory.element"></span><dl class="class">
+<dt id="theory.element.Element">
+<em class="property">class </em><tt class="descclassname">theory.element.</tt><tt class="descname">Element</tt><big>(</big><em>info=None</em><big>)</big><a class="headerlink" href="#theory.element.Element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">smodels.theory.printer.Printer</span></tt></p>
+<p>An instance of this class represents an element.    
+This class possesses a pair of branches and the element weight
+(cross-section * BR).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>branches</strong> &#8211; list of branches (Branch objects)</li>
+<li><strong>weight</strong> &#8211; element weight (cross-section * BR)</li>
+<li><strong>motherElements</strong> &#8211; only for elements generated from a parent element
+by mass compression, invisible compression,etc.
+Holds a pair of (whence, mother element), where
+whence describes what process generated the element</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="theory.element.Element._getLength">
+<tt class="descname">_getLength</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.element.Element._getLength" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the maximum of the two branch lengths.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">maximum length of the element branches (int)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.element.Element.checkConsistency">
+<tt class="descname">checkConsistency</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.element.Element.checkConsistency" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the particles defined in the element exist and are consistent
+with the element info.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if the element is consistent. Print error message
+and exits otherwise.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.element.Element.combineMotherElements">
+<tt class="descname">combineMotherElements</tt><big>(</big><em>el2</em><big>)</big><a class="headerlink" href="#theory.element.Element.combineMotherElements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine mother elements from self and el2 into self</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>el2</strong> &#8211; element (Element Object)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.element.Element.compressElement">
+<tt class="descname">compressElement</tt><big>(</big><em>doCompress</em>, <em>doInvisible</em>, <em>minmassgap</em><big>)</big><a class="headerlink" href="#theory.element.Element.compressElement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keep compressing the original element and the derived ones till they
+can be compressed no more.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>doCompress</strong> &#8211; if True, perform mass compression</li>
+<li><strong>doInvisible</strong> &#8211; if True, perform invisible compression</li>
+<li><strong>minmassgap</strong> &#8211; value (in GeV) of the maximum 
+mass difference for compression
+(if mass difference &lt; minmassgap, perform mass compression)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list with the compressed elements (Element objects)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.element.Element.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.element.Element.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a copy of self.        
+Faster than deepcopy.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">copy of element (Element object)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.element.Element.formatData">
+<tt class="descname">formatData</tt><big>(</big><em>outputLevel</em><big>)</big><a class="headerlink" href="#theory.element.Element.formatData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select data preparation method through dynamic binding.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>outputLevel</strong> &#8211; general control for the output depth to be printed 
+(0 = no output, 1 = basic output, 2 = detailed output,...</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.element.Element.getDaughters">
+<tt class="descname">getDaughters</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.element.Element.getDaughters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a pair of daughter IDs (PDGs of the last intermediate state appearing the cascade decay).    
+Can be None, if the element does not have a definite daughter.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of PDG ids</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.element.Element.getEinfo">
+<tt class="descname">getEinfo</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.element.Element.getEinfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get topology info from particle string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dictionary containing vertices and number of final states information</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.element.Element.getMasses">
+<tt class="descname">getMasses</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.element.Element.getMasses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the array of masses in the element.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of masses (mass array)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.element.Element.getMothers">
+<tt class="descname">getMothers</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.element.Element.getMothers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a pair of mother IDs (PDG ids of the primary mother intermediate state).      
+Can be None, if the element does not have a definite mother.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of PDG ids</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.element.Element.getParticles">
+<tt class="descname">getParticles</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.element.Element.getParticles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the array of particles in the element.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of particle strings</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.element.Element.hasTopInList">
+<tt class="descname">hasTopInList</tt><big>(</big><em>elementList</em><big>)</big><a class="headerlink" href="#theory.element.Element.hasTopInList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the element topology matches any of the topologies in the
+element list.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>elementList</strong> &#8211; list of elements (Element objects)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True, if element topology has a match in the list, False otherwise.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.element.Element.invisibleCompress">
+<tt class="descname">invisibleCompress</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.element.Element.invisibleCompress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform invisible compression.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">compressed copy of the element, if element ends with invisible
+particles; None, if compression is not possible</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.element.Element.isEqual">
+<tt class="descname">isEqual</tt><big>(</big><em>other</em>, <em>order=False</em>, <em>useDict=True</em><big>)</big><a class="headerlink" href="#theory.element.Element.isEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare two Elements for equality.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>other</strong> &#8211; element to be compared (Element object)</li>
+<li><strong>order</strong> &#8211; if False, test both branch orderings.</li>
+<li><strong>useDict</strong> &#8211; if True, allow for inclusive particle labels.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">True, if all masses and particles are equal; False, else;</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.element.Element.isInList">
+<tt class="descname">isInList</tt><big>(</big><em>listOfElements</em>, <em>igmass=False</em>, <em>useDict=True</em><big>)</big><a class="headerlink" href="#theory.element.Element.isInList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the element is present in the element list.</p>
+<p>:parameter      
+If igmass == False also check if the analysis has the element mass
+array.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.element.Element.massCompress">
+<tt class="descname">massCompress</tt><big>(</big><em>minmassgap</em><big>)</big><a class="headerlink" href="#theory.element.Element.massCompress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform mass compression.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>minmassgap</strong> &#8211; value (in GeV) of the maximum 
+mass difference for compression
+(if mass difference &lt; minmassgap -&gt; perform mass compression)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">compressed copy of the element, if two masses in this
+element are degenerate; None, if compression is not possible;</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.element.Element.particlesMatch">
+<tt class="descname">particlesMatch</tt><big>(</big><em>other</em>, <em>order=False</em>, <em>useDict=True</em><big>)</big><a class="headerlink" href="#theory.element.Element.particlesMatch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare two Elements for matching particles.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>other</strong> &#8211; element to be compared (Element object)</li>
+<li><strong>order</strong> &#8211; if False, test both branch orderings.</li>
+<li><strong>useDict</strong> &#8211; if True, allow for inclusive particle labels.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">True, if particles match; False, else;</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.element.Element.setMasses">
+<tt class="descname">setMasses</tt><big>(</big><em>mass</em>, <em>sameOrder=True</em>, <em>opposOrder=False</em><big>)</big><a class="headerlink" href="#theory.element.Element.setMasses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the element masses to the input mass array.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mass</strong> &#8211; list of masses ([[masses for branch1],[masses for branch2]])</li>
+<li><strong>sameOrder</strong> &#8211; if True, set the masses to the same branch ordering
+If True and opposOrder=True, set the masses to the
+smaller of the two orderings.</li>
+<li><strong>opposOrder</strong> &#8211; if True, set the masses to the opposite branch ordering.
+If True and sameOrder=True, set the masses to the
+smaller of the two orderings.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.element.Element.switchBranches">
+<tt class="descname">switchBranches</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.element.Element.switchBranches" title="Permalink to this definition">¶</a></dt>
+<dd><p>Switch branches, if the element contains a pair of them.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">element with switched branches (Element object)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.element._smallerMass">
+<tt class="descclassname">theory.element.</tt><tt class="descname">_smallerMass</tt><big>(</big><em>mass1</em>, <em>mass2</em><big>)</big><a class="headerlink" href="#theory.element._smallerMass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select the smaller of two mass arrays.    
+Use an ordering criterion (machine-independent) for selection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mass1</strong> &#8211; mass array (list of masses)</li>
+<li><strong>mass2</strong> &#8211; mass array (list of masses)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">mass1, if mass1 &gt; mass2; mass2, otherwise</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-theory.lheDecomposer">
+<span id="lhedecomposer-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">lheDecomposer</span></tt> Module<a class="headerlink" href="#module-theory.lheDecomposer" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-theory.lheDecomposer"></span><dl class="function">
+<dt id="theory.lheDecomposer._getDictionariesFromEvent">
+<tt class="descclassname">theory.lheDecomposer.</tt><tt class="descname">_getDictionariesFromEvent</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#theory.lheDecomposer._getDictionariesFromEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create mass and BR dictionaries for each branch in an event.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; LHE event</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">BR and mass dictionaries for the branches in the event</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.lheDecomposer.decompose">
+<tt class="descclassname">theory.lheDecomposer.</tt><tt class="descname">decompose</tt><big>(</big><em>lhefile, inputXsecs=None, nevts=None, doCompress=False, doInvisible=False, minmassgap=-1.00E+00 [GeV]</em><big>)</big><a class="headerlink" href="#theory.lheDecomposer.decompose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform LHE-based decomposition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lhefile</strong> &#8211; LHE file with e.g. pythia events</li>
+<li><strong>inputXsecs</strong> &#8211; xSectionList object with cross-sections for the mothers
+appearing in the LHE file. If None, use information from file.</li>
+<li><strong>nevts</strong> &#8211; (maximum) number of events used in the decomposition. If
+None, all events from file are processed.</li>
+<li><strong>doCompress</strong> &#8211; mass compression option (True/False)</li>
+<li><strong>doInvisible</strong> &#8211; invisible compression option (True/False)</li>
+<li><strong>minmassgap</strong> &#8211; minimum mass gap for mass compression (only used if
+doCompress=True)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of topologies (TopologyList object)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.lheDecomposer.elementFromEvent">
+<tt class="descclassname">theory.lheDecomposer.</tt><tt class="descname">elementFromEvent</tt><big>(</big><em>event</em>, <em>weight=None</em><big>)</big><a class="headerlink" href="#theory.lheDecomposer.elementFromEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an element from a LHE event and the corresponding event weight.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>event</strong> &#8211; LHE event</li>
+<li><strong>weight</strong> &#8211; event weight. Must be a XSectionList object (usually with a
+single entry) or None if not specified.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">element</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-theory.lheReader">
+<span id="lhereader-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">lheReader</span></tt> Module<a class="headerlink" href="#module-theory.lheReader" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-LheReader"></span><dl class="class">
+<dt id="theory.lheReader.LheReader">
+<em class="property">class </em><tt class="descclassname">theory.lheReader.</tt><tt class="descname">LheReader</tt><big>(</big><em>filename</em>, <em>nmax=None</em><big>)</big><a class="headerlink" href="#theory.lheReader.LheReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>An instance of this class represents a reader for LHE files.</p>
+<dl class="method">
+<dt id="theory.lheReader.LheReader.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.lheReader.LheReader.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the lhe file, if open.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.lheReader.LheReader.event">
+<tt class="descname">event</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.lheReader.LheReader.event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get next event.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">SmsEvent; None if no event is left to be read.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.lheReader.LheReader.next">
+<tt class="descname">next</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.lheReader.LheReader.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get next element in iteration.</p>
+<p>Needed for the iterator.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="theory.lheReader.Particle">
+<em class="property">class </em><tt class="descclassname">theory.lheReader.</tt><tt class="descname">Particle</tt><a class="headerlink" href="#theory.lheReader.Particle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>An instance of this class represents a particle.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="theory.lheReader.SmsEvent">
+<em class="property">class </em><tt class="descclassname">theory.lheReader.</tt><tt class="descname">SmsEvent</tt><big>(</big><em>eventnr=None</em><big>)</big><a class="headerlink" href="#theory.lheReader.SmsEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Event class featuring a list of particles and some convenience functions.</p>
+<dl class="method">
+<dt id="theory.lheReader.SmsEvent.add">
+<tt class="descname">add</tt><big>(</big><em>particle</em><big>)</big><a class="headerlink" href="#theory.lheReader.SmsEvent.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add particle to the event.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.lheReader.SmsEvent.getMom">
+<tt class="descname">getMom</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.lheReader.SmsEvent.getMom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the pdgs of the mothers, None if a problem occurs.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.lheReader.SmsEvent.metaInfo">
+<tt class="descname">metaInfo</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#theory.lheReader.SmsEvent.metaInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the meta information of &#8216;key&#8217;, None if info does not exist.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-theory.particleNames">
+<span id="particlenames-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">particleNames</span></tt> Module<a class="headerlink" href="#module-theory.particleNames" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-ParticleNames"></span><dl class="function">
+<dt id="theory.particleNames.elementsInStr">
+<tt class="descclassname">theory.particleNames.</tt><tt class="descname">elementsInStr</tt><big>(</big><em>instring</em><big>)</big><a class="headerlink" href="#theory.particleNames.elementsInStr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse instring and return a list of elements appearing in instring.</p>
+<p>instring can also be a list of strings.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of elements appearing in instring in string format</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.particleNames.getName">
+<tt class="descclassname">theory.particleNames.</tt><tt class="descname">getName</tt><big>(</big><em>pdg</em><big>)</big><a class="headerlink" href="#theory.particleNames.getName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert pdg number to particle name according to the dictionaries rOdd and
+rEven.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">particle name (e.g. gluino, mu-, ...)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.particleNames.getPdg">
+<tt class="descclassname">theory.particleNames.</tt><tt class="descname">getPdg</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#theory.particleNames.getPdg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a name to the pdg number according to the dictionaries rOdd and
+rEven.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">particle pdg; None, if name could not be resolved</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.particleNames.simParticles">
+<tt class="descclassname">theory.particleNames.</tt><tt class="descname">simParticles</tt><big>(</big><em>ptype1</em>, <em>ptype2</em>, <em>useDict=True</em><big>)</big><a class="headerlink" href="#theory.particleNames.simParticles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compares 2 particle names or 2 nested name arrays. Allows for dictionary
+labels (Ex: L = l, l+ = l, l = l-,...). For the last nested level ignore
+particle ordering.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ptype1</strong> &#8211; first (nested) list of particle names, e.g. [&#8216;l&#8217;,&#8217;jet&#8217;]</li>
+<li><strong>ptype2</strong> &#8211; second (nested) list of particle names</li>
+<li><strong>useDict</strong> &#8211; use the translation dictionary, i.e. allow e to stand for
+e+ or e-, l+ to stand for e+ or mu+, etc</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">boolean</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.particleNames.vertInStr">
+<tt class="descclassname">theory.particleNames.</tt><tt class="descname">vertInStr</tt><big>(</big><em>instring</em><big>)</big><a class="headerlink" href="#theory.particleNames.vertInStr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses instring (or a list of strings) and returns the list of particle
+vertices appearing in instring.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-theory.printer">
+<span id="printer-module"></span><h2><a class="reference internal" href="#module-printer" title="printer: Facility used in classes to derive from and be able to print different data types in different forms."><tt class="xref py py-mod docutils literal"><span class="pre">printer</span></tt></a> Module<a class="headerlink" href="#module-theory.printer" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-printer"></span><dl class="class">
+<dt id="theory.printer.Printer">
+<em class="property">class </em><tt class="descclassname">theory.printer.</tt><tt class="descname">Printer</tt><a class="headerlink" href="#theory.printer.Printer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Printer class for defining specific print options and format for objects.</p>
+<dl class="method">
+<dt id="theory.printer.Printer.formatData">
+<tt class="descname">formatData</tt><big>(</big><em>outputLevel</em><big>)</big><a class="headerlink" href="#theory.printer.Printer.formatData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format data of the derived object.</p>
+<p>Has to be implemented in the derived object. The real implementation is
+selected through dynamic binding.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body">NotImplementedError</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.printer.Printer.formatElementData">
+<tt class="descname">formatElementData</tt><big>(</big><em>outputLevel</em><big>)</big><a class="headerlink" href="#theory.printer.Printer.formatElementData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format data of to print an element object.
+:param outputLevel: general control for the output depth to be printed</p>
+<blockquote>
+<div>(0 = no output, 1 = basic output, 2 = detailed output,...)</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.printer.Printer.formatMissingData">
+<tt class="descname">formatMissingData</tt><big>(</big><em>outputLevel</em><big>)</big><a class="headerlink" href="#theory.printer.Printer.formatMissingData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format data of missing topology list.
+:param outputLevel: general control for the output depth to be printed</p>
+<blockquote>
+<div>(0 = no output, 1 = basic output, 2 = detailed output,...)</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.printer.Printer.formatResultsData">
+<tt class="descname">formatResultsData</tt><big>(</big><em>outputLevel</em><big>)</big><a class="headerlink" href="#theory.printer.Printer.formatResultsData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format data of the final output object.
+:param outputLevel: general control for the output depth to be printed</p>
+<blockquote>
+<div>(0 = no output, 1 = basic output, 2 = detailed output,...)</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.printer.Printer.formatStatusData">
+<tt class="descname">formatStatusData</tt><big>(</big><em>outputLevel</em><big>)</big><a class="headerlink" href="#theory.printer.Printer.formatStatusData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format data of the output status object.
+:param outputLevel: general control for the output depth to be printed</p>
+<blockquote>
+<div>(0 = no output, 1 = basic output, 2 = detailed output,...)</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.printer.Printer.formatTheoryPredictionData">
+<tt class="descname">formatTheoryPredictionData</tt><big>(</big><em>outputLevel</em><big>)</big><a class="headerlink" href="#theory.printer.Printer.formatTheoryPredictionData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format data of a TheoryPrediction object.
+:param outputLevel: general control for the output depth to be printed</p>
+<blockquote>
+<div>(0 = no output, 1 = basic output, 2 = detailed output,...)</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.printer.Printer.formatTopologyListData">
+<tt class="descname">formatTopologyListData</tt><big>(</big><em>outputLevel</em><big>)</big><a class="headerlink" href="#theory.printer.Printer.formatTopologyListData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format data of to print Global topologies object.        
+:param outputLevel: general control for the output depth to be printed</p>
+<blockquote>
+<div>(0 = no output, 1 = basic output, 2 = detailed output,...)</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.printer.Printer.formatULanalysisData">
+<tt class="descname">formatULanalysisData</tt><big>(</big><em>outputLevel</em><big>)</big><a class="headerlink" href="#theory.printer.Printer.formatULanalysisData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format data for a ULanalysis object.
+:param outputLevel: general control for the output depth to be printed</p>
+<blockquote>
+<div>(0 = no output, 1 = basic output, 2 = detailed output,...)</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.printer.Printer.printout">
+<tt class="descname">printout</tt><big>(</big><em>target='stdout'</em>, <em>filename=''</em>, <em>outputLevel=1</em><big>)</big><a class="headerlink" href="#theory.printer.Printer.printout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the content of the data structure to the target.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>target</strong> &#8211; The target to print to. Possible values: stdout, file.
+Default: stdout.</li>
+<li><strong>filename</strong> &#8211; Filename to which the output is written</li>
+<li><strong>outputLevel</strong> &#8211; general control for the output depth to be printed 
+(0 = no output, 1 = basic output, 2 = detailed output,...)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-theory.slhaDecomposer">
+<span id="slhadecomposer-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">slhaDecomposer</span></tt> Module<a class="headerlink" href="#module-theory.slhaDecomposer" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-theory.slhaDecomposer"></span><dl class="function">
+<dt id="theory.slhaDecomposer._getDictionariesFromSLHA">
+<tt class="descclassname">theory.slhaDecomposer.</tt><tt class="descname">_getDictionariesFromSLHA</tt><big>(</big><em>slhafile</em><big>)</big><a class="headerlink" href="#theory.slhaDecomposer._getDictionariesFromSLHA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create mass and BR dictionaries from an SLHA file.
+Ignore decay blocks with R-parity violating or unknown decays</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.slhaDecomposer.decompose">
+<tt class="descclassname">theory.slhaDecomposer.</tt><tt class="descname">decompose</tt><big>(</big><em>slhafile, sigcut=1.00E-01 [fb], doCompress=False, doInvisible=False, minmassgap=-1.00E+00 [GeV], useXSecs=None</em><big>)</big><a class="headerlink" href="#theory.slhaDecomposer.decompose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform SLHA-based decomposition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sigcut</strong> &#8211; minimum sigma*BR to be generated, by default sigcut = 0.1 fb</li>
+<li><strong>doCompress</strong> &#8211; turn mass compression on/off</li>
+<li><strong>doInvisible</strong> &#8211; turn invisible compression on/off</li>
+<li><strong>minmassgap</strong> &#8211; maximum value (in GeV) for considering two R-odd particles
+degenerate (only revelant for doCompress=True )</li>
+<li><strong>useXSecs</strong> &#8211; optionally a dictionary with cross-sections for pair
+production, by default reading the cross sections
+from the SLHA file.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of topologies (TopologyList object)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-theory.theoryPrediction">
+<span id="theoryprediction-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">theoryPrediction</span></tt> Module<a class="headerlink" href="#module-theory.theoryPrediction" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-theory.theoryPrediction"></span><dl class="class">
+<dt id="theory.theoryPrediction.TheoryPrediction">
+<em class="property">class </em><tt class="descclassname">theory.theoryPrediction.</tt><tt class="descname">TheoryPrediction</tt><a class="headerlink" href="#theory.theoryPrediction.TheoryPrediction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>An instance of this class represents the results of the theory prediction
+for an analysis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>analysis</strong> &#8211; holds the analysis (ULanalysis or EManalysis object)
+to which the prediction refers to</li>
+<li><strong>value</strong> &#8211; value of the theory prediction 
+(relevant cross-section to be compared with the experimental limits).
+It is a XSection object.</li>
+<li><strong>conditions</strong> &#8211; list of values for the analysis conditions
+(only for upper limit-type analysis, e.g. analysis=ULanalysis)</li>
+<li><strong>mass</strong> &#8211; mass of the cluster to which the theory prediction refers to
+(only for upper limit-type analysis, e.g. analysis=ULanalysis)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="theory.theoryPrediction.TheoryPrediction.getmaxCondition">
+<tt class="descname">getmaxCondition</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.theoryPrediction.TheoryPrediction.getmaxCondition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the maximum value from the list conditions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">maximum condition value (float)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="theory.theoryPrediction.TheoryPredictionList">
+<em class="property">class </em><tt class="descclassname">theory.theoryPrediction.</tt><tt class="descname">TheoryPredictionList</tt><big>(</big><em>theoryPredictions</em><big>)</big><a class="headerlink" href="#theory.theoryPrediction.TheoryPredictionList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">smodels.theory.printer.Printer</span></tt></p>
+<p>An instance of this class represents a collection of theory prediction
+objects.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><strong>_theoryPredictions</strong> &#8211; list of TheoryPrediction objects</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="theory.theoryPrediction.TheoryPredictionList.formatData">
+<tt class="descname">formatData</tt><big>(</big><em>outputLevel</em><big>)</big><a class="headerlink" href="#theory.theoryPrediction.TheoryPredictionList.formatData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select data preparation method through dynamic binding.
+:param outputLevel: general control for the output depth to be printed</p>
+<blockquote>
+<div>(0 = no output, 1 = basic output, 2 = detailed output,...</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.theoryPrediction._combineElements">
+<tt class="descclassname">theory.theoryPrediction.</tt><tt class="descname">_combineElements</tt><big>(</big><em>elements</em>, <em>analysis</em>, <em>maxDist</em><big>)</big><a class="headerlink" href="#theory.theoryPrediction._combineElements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine elements according to the analysis type.    
+If analysis == upper limit type, group elements into mass clusters. If
+analysis == efficiency map type, group all elements into a single cluster.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>elements</strong> &#8211; list of elements (Element objects)</li>
+<li><strong>analysis</strong> &#8211; analysis to be considered (ULanalysis or EManalysis object)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of element clusters (ElementCluster objects)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.theoryPrediction._evalConditions">
+<tt class="descclassname">theory.theoryPrediction.</tt><tt class="descname">_evalConditions</tt><big>(</big><em>cluster</em>, <em>analysis</em><big>)</big><a class="headerlink" href="#theory.theoryPrediction._evalConditions" title="Permalink to this definition">¶</a></dt>
+<dd><p>If analysis type == upper limit (ULanalysis), evaluates the analysis conditions inside
+an element cluster.
+If analysis type == efficiency map (EManalysis), returns None</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cluster</strong> &#8211; cluster of elements (ElementCluster object)</li>
+<li><strong>analysis</strong> &#8211; analysis to obtain the conditions (ULanalysis or EManalysis object)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of condition values (floats) if analysis type == upper limit. None, otherwise.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.theoryPrediction._evalConstraint">
+<tt class="descclassname">theory.theoryPrediction.</tt><tt class="descname">_evalConstraint</tt><big>(</big><em>cluster</em>, <em>analysis</em><big>)</big><a class="headerlink" href="#theory.theoryPrediction._evalConstraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the analysis constraint inside an element cluster.      
+If analysis type == upper limit, sum all the elements&#8217; weights
+according to the analysis constraint.
+If analysis type == efficiency map, sum all the elements&#8217; weights.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cluster</strong> &#8211; cluster of elements (ElementCluster object)</li>
+<li><strong>analysis</strong> &#8211; analysis to be considered (ULanalysis or EManalysis object)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">cluster cross-section</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.theoryPrediction._evalExpression">
+<tt class="descclassname">theory.theoryPrediction.</tt><tt class="descname">_evalExpression</tt><big>(</big><em>stringExpr</em>, <em>cluster</em>, <em>analysis</em><big>)</big><a class="headerlink" href="#theory.theoryPrediction._evalExpression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auxiliary method to evaluate a string expression using the weights of the elements in the cluster.
+Replaces the elements in stringExpr (in bracket notation) by their weights and evaluate the 
+expression.
+e.g. computes the total weight of string expressions such as &#8220;[[[e^+]],[[e^-]]]+[[[mu^+]],[[mu^-]]]&#8221;
+or ratios of weights of string expressions such as &#8220;[[[e^+]],[[e^-]]]/[[[mu^+]],[[mu^-]]]&#8221;
+and so on...</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>stringExpr</strong> &#8211; string containing the expression to be evaluated</li>
+<li><strong>cluster</strong> &#8211; cluster of elements (ElementCluster object)</li>
+<li><strong>analysis</strong> &#8211; analysis (ULanalysis object). Just used to print the error message</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">value for the expression. Can be a XSectionList object, a float or not numerical (None,string,...)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.theoryPrediction._getElementsFrom">
+<tt class="descclassname">theory.theoryPrediction.</tt><tt class="descname">_getElementsFrom</tt><big>(</big><em>smsTopList</em>, <em>analysis</em><big>)</big><a class="headerlink" href="#theory.theoryPrediction._getElementsFrom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get elements, that are constrained by the analysis.    
+Loop over all elements in smsTopList and returns a copy of the elements which are
+constrained by the analysis (have efficiency != 0). The copied elements
+have their weights multiplied by their respective efficiencies and the cross-sections not
+matching the analysis center-of-mass energy are removed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>analysis</strong> &#8211; analysis to be considered (ULanalysis or EManalysis object)</li>
+<li><strong>smsTopList</strong> &#8211; list of topologies containing elements (TopologyList object)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of elements (Element objects)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="theory.theoryPrediction.theoryPredictionFor">
+<tt class="descclassname">theory.theoryPrediction.</tt><tt class="descname">theoryPredictionFor</tt><big>(</big><em>analysis</em>, <em>smsTopList</em>, <em>maxMassDist=0.2</em><big>)</big><a class="headerlink" href="#theory.theoryPrediction.theoryPredictionFor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute theory predictions for the given analysis, using the list of elements
+in smsTopList.    
+Collect elements and efficiencies, combine the masses (if needed) and
+compute the conditions (if existing).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>analysis</strong> &#8211; analysis to be considered (ULanalysis or EManalysis object)</li>
+<li><strong>smsTopList</strong> &#8211; list of topologies containing elements (TopologyList object)</li>
+<li><strong>maxMassDist</strong> &#8211; maximum mass distance for clustering elements (float)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of TheoryPrediction objects</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-theory.topology">
+<span id="topology-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">topology</span></tt> Module<a class="headerlink" href="#module-theory.topology" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-theory.Topology"></span><dl class="class">
+<dt id="theory.topology.Topology">
+<em class="property">class </em><tt class="descclassname">theory.topology.</tt><tt class="descname">Topology</tt><big>(</big><em>elements=None</em><big>)</big><a class="headerlink" href="#theory.topology.Topology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>An instance of this class represents a topology.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>vertnumb</strong> &#8211; list with number of vertices in each branch</li>
+<li><strong>verparts</strong> &#8211; list with number of final states in each branch</li>
+<li><strong>elementList</strong> &#8211; list of Element objects with this common topology</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="theory.topology.Topology._getTinfo">
+<tt class="descname">_getTinfo</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.topology.Topology._getTinfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dictionary with the topology number of vertices and vertparts.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dictionary with topology information</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.topology.Topology.addElement">
+<tt class="descname">addElement</tt><big>(</big><em>newelement</em><big>)</big><a class="headerlink" href="#theory.topology.Topology.addElement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an Element object to the elementList.</p>
+<p>For all the pre-existing elements, which match the new element, add
+weight. If no pre-existing elements match the new one, add it to the
+list. When comparing elements, try both branch orderings.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>newelement</strong> &#8211; element to be added (Element object)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True, if the element was added. False, otherwise</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.topology.Topology.checkConsistency">
+<tt class="descname">checkConsistency</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.topology.Topology.checkConsistency" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the all the elements in elementList are
+consistent with the topology (same number of vertices and final states)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if all the elements are consistent. Print error message
+and exits otherwise.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.topology.Topology.describe">
+<tt class="descname">describe</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.topology.Topology.describe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a detailed description of the topology.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of strings with a description of the topology</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.topology.Topology.getElements">
+<tt class="descname">getElements</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.topology.Topology.getElements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get list of elements of the topology.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">elementList (list of Element objects)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.topology.Topology.getTotalWeight">
+<tt class="descname">getTotalWeight</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.topology.Topology.getTotalWeight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the sum of all elements weights.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">sum of weights of all elements (XSection object)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.topology.Topology.isEqual">
+<tt class="descname">isEqual</tt><big>(</big><em>other</em>, <em>order=False</em><big>)</big><a class="headerlink" href="#theory.topology.Topology.isEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare two topologies. Two topologies are equal if 
+they have the same number of vertices and final states (in each vertex).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>other</strong> &#8211; topology to be compared (Topology object)</li>
+<li><strong>order</strong> &#8211; if False, compare the two possible branch orderings.
+If True, compare the two topologies assuming the same
+branch ordering.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">True, if both topologies equal; False, otherwise</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="theory.topology.TopologyList">
+<em class="property">class </em><tt class="descclassname">theory.topology.</tt><tt class="descname">TopologyList</tt><big>(</big><em>topologies=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#theory.topology.TopologyList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">smodels.theory.printer.Printer</span></tt></p>
+<p>An instance of this class represents an iterable collection of topologies.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><strong>topos</strong> &#8211; list of topologies (Topology objects)</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="theory.topology.TopologyList.add">
+<tt class="descname">add</tt><big>(</big><em>newTopology</em><big>)</big><a class="headerlink" href="#theory.topology.TopologyList.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if elements in newTopology matches an entry in self.topos.</p>
+<p>If it does, add weight. If the same topology exists, but not the same
+element, add element. If neither element nor topology exist, add the
+new topology and all its elements.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.topology.TopologyList.addList">
+<tt class="descname">addList</tt><big>(</big><em>topoList</em><big>)</big><a class="headerlink" href="#theory.topology.TopologyList.addList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds topologies in topoList using the add method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.topology.TopologyList.describe">
+<tt class="descname">describe</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.topology.TopologyList.describe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns string with basic information about the topology list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.topology.TopologyList.formatData">
+<tt class="descname">formatData</tt><big>(</big><em>outputLevel</em><big>)</big><a class="headerlink" href="#theory.topology.TopologyList.formatData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select data preparation method through dynamic binding.
+:param outputLevel: general control for the output depth to be printed</p>
+<blockquote>
+<div>(0 = no output, 1 = basic output, 2 = detailed output,...</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.topology.TopologyList.getElements">
+<tt class="descname">getElements</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.topology.TopologyList.getElements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list with all the elements in all the topologies.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theory.topology.TopologyList.getTotalWeight">
+<tt class="descname">getTotalWeight</tt><big>(</big><big>)</big><a class="headerlink" href="#theory.topology.TopologyList.getTotalWeight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the sum of all topologies total weights.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">theory Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">theory</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-theory.analysis"><tt class="docutils literal"><span class="pre">analysis</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-theory.auxiliaryFunctions"><tt class="docutils literal"><span class="pre">auxiliaryFunctions</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-theory.branch"><tt class="docutils literal"><span class="pre">branch</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-theory.clusterTools"><tt class="docutils literal"><span class="pre">clusterTools</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-theory.crossSection"><tt class="docutils literal"><span class="pre">crossSection</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-theory.element"><tt class="docutils literal"><span class="pre">element</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-theory.lheDecomposer"><tt class="docutils literal"><span class="pre">lheDecomposer</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-theory.lheReader"><tt class="docutils literal"><span class="pre">lheReader</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-theory.particleNames"><tt class="docutils literal"><span class="pre">particleNames</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-theory.printer"><tt class="docutils literal"><span class="pre">printer</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-theory.slhaDecomposer"><tt class="docutils literal"><span class="pre">slhaDecomposer</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-theory.theoryPrediction"><tt class="docutils literal"><span class="pre">theoryPrediction</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-theory.topology"><tt class="docutils literal"><span class="pre">topology</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">SModelS</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="experiment.html"
+                        title="next chapter">experiment Package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/theory.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="experiment.html" title="experiment Package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="SModelS"
+             >previous</a> |</li>
+        <li><a href="index.html">SModelS 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Wolfgang Magerl, Doris Proschofsky, Wolfgang Waltenberger.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

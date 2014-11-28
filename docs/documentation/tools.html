@@ -1,0 +1,1683 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tools Package &mdash; SModelS 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SModelS 1.0 documentation" href="index.html" />
+    <link rel="prev" title="experiment Package" href="experiment.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="experiment.html" title="experiment Package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">SModelS 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="tools-package">
+<h1>tools Package<a class="headerlink" href="#tools-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">tools</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-tools.__init__"></span></div>
+<div class="section" id="module-tools.asciiGraph">
+<span id="asciigraph-module"></span><h2><a class="reference internal" href="#module-asciiGraph" title="asciiGraph: Contains a simple routine to draw ASCII-art Feynman-like graphs."><tt class="xref py py-mod docutils literal"><span class="pre">asciiGraph</span></tt></a> Module<a class="headerlink" href="#module-tools.asciiGraph" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-asciiGraph"></span><dl class="function">
+<dt id="tools.asciiGraph._drawBranch">
+<tt class="descclassname">tools.asciiGraph.</tt><tt class="descname">_drawBranch</tt><big>(</big><em>branch</em>, <em>upwards</em>, <em>labels</em>, <em>htmlFormat</em>, <em>border</em>, <em>l</em><big>)</big><a class="headerlink" href="#tools.asciiGraph._drawBranch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw a single branch.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.asciiGraph._printParticle">
+<tt class="descclassname">tools.asciiGraph.</tt><tt class="descname">_printParticle</tt><big>(</big><em>label</em><big>)</big><a class="headerlink" href="#tools.asciiGraph._printParticle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rename particles for the asciidraw routine.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.asciiGraph.asciidraw">
+<tt class="descclassname">tools.asciiGraph.</tt><tt class="descname">asciidraw</tt><big>(</big><em>element</em>, <em>labels=True</em>, <em>html=False</em>, <em>border=False</em><big>)</big><a class="headerlink" href="#tools.asciiGraph.asciidraw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw a simple ASCII graph on the screen.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tools.externalNllFast">
+<span id="externalnllfast-module"></span><h2><a class="reference internal" href="#module-externalNllFast" title="externalNllFast: Wrapper for all nllfast versions."><tt class="xref py py-mod docutils literal"><span class="pre">externalNllFast</span></tt></a> Module<a class="headerlink" href="#module-tools.externalNllFast" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-externalNllFast"></span><dl class="class">
+<dt id="tools.externalNllFast.ExternalNllFast">
+<em class="property">class </em><tt class="descclassname">tools.externalNllFast.</tt><tt class="descname">ExternalNllFast</tt><big>(</big><em>sqrts</em>, <em>nllfastVersion</em>, <em>testParams</em>, <em>testCondition</em><big>)</big><a class="headerlink" href="#tools.externalNllFast.ExternalNllFast" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">smodels.tools.externalTool.ExternalTool</span></tt></p>
+<p>An instance of this class represents the installation of nllfast.</p>
+<dl class="method">
+<dt id="tools.externalNllFast.ExternalNllFast.checkInstallation">
+<tt class="descname">checkInstallation</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.externalNllFast.ExternalNllFast.checkInstallation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if installation of tool is valid by looking for executable and
+executing it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.externalNllFast.ExternalNllFast.compile">
+<tt class="descname">compile</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.externalNllFast.ExternalNllFast.compile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to compile nllfast.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.externalNllFast.ExternalNllFast.fetch">
+<tt class="descname">fetch</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.externalNllFast.ExternalNllFast.fetch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch and unpack tarball.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.externalNllFast.ExternalNllFast.run">
+<tt class="descname">run</tt><big>(</big><em>process</em>, <em>pdf</em>, <em>squarkmass</em>, <em>gluinomass</em><big>)</big><a class="headerlink" href="#tools.externalNllFast.ExternalNllFast.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute nllfast.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Params process:</th><td class="field-body">which process: st, sb, gg, gdcpl, sdcpl, ss, sg, tot</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Params pdf:</th><td class="field-body">cteq=cteq6, mstw2008</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Params squarkmass:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">squarkmass, None if squark decoupled</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Params gluinomass:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">gluinomass, None if gluino decoupled</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">stdout and stderr, or error message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.externalNllFast.ExternalNllFast.run_">
+<tt class="descname">run_</tt><big>(</big><em>params</em><big>)</big><a class="headerlink" href="#tools.externalNllFast.ExternalNllFast.run_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute nllfast7.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Params params:</th><td class="field-body">parameters used (e.g. gg cteq5 .... )</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">stdout and stderr, or error message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.externalNllFast.ExternalNllFast.unlink">
+<tt class="descname">unlink</tt><big>(</big><em>inputFile</em><big>)</big><a class="headerlink" href="#tools.externalNllFast.ExternalNllFast.unlink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove inputFile.out</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tools.externalNllFast.ExternalNllFast7">
+<em class="property">class </em><tt class="descclassname">tools.externalNllFast.</tt><tt class="descname">ExternalNllFast7</tt><a class="headerlink" href="#tools.externalNllFast.ExternalNllFast7" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tools.externalNllFast.ExternalNllFast" title="tools.externalNllFast.ExternalNllFast"><tt class="xref py py-class docutils literal"><span class="pre">tools.externalNllFast.ExternalNllFast</span></tt></a></p>
+<p>An instance of this class represents the installation of nllfast 7.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tools.externalNllFast.ExternalNllFast8">
+<em class="property">class </em><tt class="descclassname">tools.externalNllFast.</tt><tt class="descname">ExternalNllFast8</tt><a class="headerlink" href="#tools.externalNllFast.ExternalNllFast8" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tools.externalNllFast.ExternalNllFast" title="tools.externalNllFast.ExternalNllFast"><tt class="xref py py-class docutils literal"><span class="pre">tools.externalNllFast.ExternalNllFast</span></tt></a></p>
+<p>An instance of this class represents the installation of nllfast 8.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tools.externalPythia6">
+<span id="externalpythia6-module"></span><h2><a class="reference internal" href="#module-externalPythia6" title="externalPythia6: Wrapper for pythia6."><tt class="xref py py-mod docutils literal"><span class="pre">externalPythia6</span></tt></a> Module<a class="headerlink" href="#module-tools.externalPythia6" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-externalPythia6"></span><dl class="class">
+<dt id="tools.externalPythia6.ExternalPythia6">
+<em class="property">class </em><tt class="descclassname">tools.externalPythia6.</tt><tt class="descname">ExternalPythia6</tt><big>(</big><em>configFile='&lt;install&gt;/etc/pythia.card'</em>, <em>executablePath='&lt;install&gt;/lib/pythia6/pythia_lhe'</em>, <em>srcPath='&lt;install&gt;/lib/pythia6/'</em><big>)</big><a class="headerlink" href="#tools.externalPythia6.ExternalPythia6" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">smodels.tools.externalTool.ExternalTool</span></tt></p>
+<p>An instance of this class represents the installation of pythia6.</p>
+<dl class="method">
+<dt id="tools.externalPythia6.ExternalPythia6.checkFileExists">
+<tt class="descname">checkFileExists</tt><big>(</big><em>inputFile</em><big>)</big><a class="headerlink" href="#tools.externalPythia6.ExternalPythia6.checkFileExists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if file exists, raise an IOError if it does not.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">absolute file name if file exists.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.externalPythia6.ExternalPythia6.checkInstallation">
+<tt class="descname">checkInstallation</tt><big>(</big><em>fix=False</em><big>)</big><a class="headerlink" href="#tools.externalPythia6.ExternalPythia6.checkInstallation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if installation of tool is correct by looking for executable and
+running it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>compile</strong> &#8211; should it try to fix the situation, if something is wrong?</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True, if everything is ok</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.externalPythia6.ExternalPythia6.chmod">
+<tt class="descname">chmod</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.externalPythia6.ExternalPythia6.chmod" title="Permalink to this definition">¶</a></dt>
+<dd><p>chmod 755 on pythia executable, if it exists.
+Do nothing, if it doesnt exist.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.externalPythia6.ExternalPythia6.compile">
+<tt class="descname">compile</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.externalPythia6.ExternalPythia6.compile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compile pythia_lhe.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.externalPythia6.ExternalPythia6.complain">
+<tt class="descname">complain</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.externalPythia6.ExternalPythia6.complain" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tools.externalPythia6.ExternalPythia6.fetch">
+<tt class="descname">fetch</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.externalPythia6.ExternalPythia6.fetch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch and unpack tarball.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.externalPythia6.ExternalPythia6.replaceInCfgFile">
+<tt class="descname">replaceInCfgFile</tt><big>(</big><em>replacements={'SQRTS': 8000</em>, <em>'NEVENTS': 10000}</em><big>)</big><a class="headerlink" href="#tools.externalPythia6.ExternalPythia6.replaceInCfgFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace strings in the config file by other strings, similar to
+setParameter.</p>
+<p>This is introduced as a simple mechanism to make changes to the
+parameter file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>replacements</strong> &#8211; dictionary of strings and values; the strings will
+be replaced with the values; the dictionary keys 
+must be strings present in the config file</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.externalPythia6.ExternalPythia6.reset">
+<tt class="descname">reset</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.externalPythia6.ExternalPythia6.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy the original config file again.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.externalPythia6.ExternalPythia6.run">
+<tt class="descname">run</tt><big>(</big><em>slhaFile</em>, <em>cfgfile=None</em>, <em>do_unlink=True</em>, <em>do_compile=False</em>, <em>do_check=True</em><big>)</big><a class="headerlink" href="#tools.externalPythia6.ExternalPythia6.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run Pythia.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>slhaFile</strong> &#8211; SLHA file</li>
+<li><strong>cfgfile</strong> &#8211; optionally supply a new config file; if not supplied,
+use the one supplied at construction time; 
+this config file will not be touched or copied;  
+it will be taken as is</li>
+<li><strong>do_unlink</strong> &#8211; clean up temporary files after run?</li>
+<li><strong>do_compile</strong> &#8211; if true, we try to compile binary if it isnt installed.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">stdout and stderr, or error message</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.externalPythia6.ExternalPythia6.setParameter">
+<tt class="descname">setParameter</tt><big>(</big><em>param='MSTP(163)'</em>, <em>value=6</em><big>)</big><a class="headerlink" href="#tools.externalPythia6.ExternalPythia6.setParameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modifies the config file, similar to .replaceInCfgFile.</p>
+<p>It will set param to value, overwriting possible old values.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.externalPythia6.ExternalPythia6.tempDirectory">
+<tt class="descname">tempDirectory</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.externalPythia6.ExternalPythia6.tempDirectory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the temporary directory name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.externalPythia6.ExternalPythia6.unlink">
+<tt class="descname">unlink</tt><big>(</big><em>unlinkdir=True</em><big>)</big><a class="headerlink" href="#tools.externalPythia6.ExternalPythia6.unlink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove temporary files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>unlinkdir</strong> &#8211; remove temp directory completely</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tools.externalPythonTools">
+<span id="externalpythontools-module"></span><h2><a class="reference internal" href="#module-externalPythonTools" title="externalPythonTools: this module is to check the installation of python tools,  i.e. unum, scipy, numpy."><tt class="xref py py-mod docutils literal"><span class="pre">externalPythonTools</span></tt></a> Module<a class="headerlink" href="#module-tools.externalPythonTools" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-externalPythonTools"></span><dl class="class">
+<dt id="tools.externalPythonTools.ExternalPythonTool">
+<em class="property">class </em><tt class="descclassname">tools.externalPythonTools.</tt><tt class="descname">ExternalPythonTool</tt><big>(</big><em>importname</em><big>)</big><a class="headerlink" href="#tools.externalPythonTools.ExternalPythonTool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>An instance of this class represents the installation of unum.
+As it is python-only, we need this only for installation,
+not for running (contrary to nllfast or pythia).</p>
+<dl class="method">
+<dt id="tools.externalPythonTools.ExternalPythonTool.checkInstallation">
+<tt class="descname">checkInstallation</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.externalPythonTools.ExternalPythonTool.checkInstallation" title="Permalink to this definition">¶</a></dt>
+<dd><p>The check is basically done in the constructor</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.externalPythonTools.ExternalPythonTool.installDirectory">
+<tt class="descname">installDirectory</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.externalPythonTools.ExternalPythonTool.installDirectory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just returns the pythonPath variable</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.externalPythonTools.ExternalPythonTool.pathOfExecutable">
+<tt class="descname">pathOfExecutable</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.externalPythonTools.ExternalPythonTool.pathOfExecutable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just returns the pythonPath variable</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tools.externalTool">
+<span id="externaltool-module"></span><h2><a class="reference internal" href="#module-externalTool" title="externalTool: Wrapper code for external tools: base class"><tt class="xref py py-mod docutils literal"><span class="pre">externalTool</span></tt></a> Module<a class="headerlink" href="#module-tools.externalTool" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-externalTool"></span><dl class="class">
+<dt id="tools.externalTool.ExternalTool">
+<em class="property">class </em><tt class="descclassname">tools.externalTool.</tt><tt class="descname">ExternalTool</tt><a class="headerlink" href="#tools.externalTool.ExternalTool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>An instance of this class represents the installation of an external tool.</p>
+<p>An external tool encapsulates a tool that is executed via
+commands.getoutput. It defines how the tool is tested for proper
+installation and how the tool is executed.</p>
+<dl class="method">
+<dt id="tools.externalTool.ExternalTool.absPath">
+<tt class="descname">absPath</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#tools.externalTool.ExternalTool.absPath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the absolute path of &lt;path&gt;, replacing &lt;install&gt; with the
+installation directory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.externalTool.ExternalTool.basePath">
+<tt class="descname">basePath</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.externalTool.ExternalTool.basePath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the base installation path.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.externalTool.ExternalTool.installDirectory">
+<tt class="descname">installDirectory</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.externalTool.ExternalTool.installDirectory" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the installation directory of the tool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.externalTool.ExternalTool.pathOfExecutable">
+<tt class="descname">pathOfExecutable</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.externalTool.ExternalTool.pathOfExecutable" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">path of executable</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.externalTool.ok">
+<tt class="descclassname">tools.externalTool.</tt><tt class="descname">ok</tt><big>(</big><em>b</em><big>)</big><a class="headerlink" href="#tools.externalTool.ok" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">&#8216;ok&#8217; if b is True, else, return &#8216;error&#8217;.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tools.ioObjects">
+<span id="ioobjects-module"></span><h2><a class="reference internal" href="#module-ioObjects" title="ioObjects"><tt class="xref py py-mod docutils literal"><span class="pre">ioObjects</span></tt></a> Module<a class="headerlink" href="#module-tools.ioObjects" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-ioObjects"></span><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">Definitions of input/output parameters which are read from parameter.in</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="tools.ioObjects.FileStatus">
+<em class="property">class </em><tt class="descclassname">tools.ioObjects.</tt><tt class="descname">FileStatus</tt><a class="headerlink" href="#tools.ioObjects.FileStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">smodels.theory.printer.Printer</span></tt></p>
+<p>Object to run several checks on the input file.
+It holds an LheStatus (SlhaStatus) object if inputType = lhe (slha)
+:ivar inputType: specify input type as SLHA or LHE
+:ivar inputFile: path to input file
+:ivar sigmacut: sigmacut in fb</p>
+<dl class="method">
+<dt id="tools.ioObjects.FileStatus.checkFile">
+<tt class="descname">checkFile</tt><big>(</big><em>inputType</em>, <em>inputFile</em>, <em>sigmacut=None</em><big>)</big><a class="headerlink" href="#tools.ioObjects.FileStatus.checkFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tools.ioObjects.LheStatus">
+<em class="property">class </em><tt class="descclassname">tools.ioObjects.</tt><tt class="descname">LheStatus</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#tools.ioObjects.LheStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">smodels.theory.printer.Printer</span></tt></p>
+<p>Object to check if input lhe file contains errors
+:ivar filename: path to input LHE file</p>
+<dl class="method">
+<dt id="tools.ioObjects.LheStatus.evaluateStatus">
+<tt class="descname">evaluateStatus</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.ioObjects.LheStatus.evaluateStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>run status check</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tools.ioObjects.OutputStatus">
+<em class="property">class </em><tt class="descclassname">tools.ioObjects.</tt><tt class="descname">OutputStatus</tt><big>(</big><em>status</em>, <em>inputFile</em>, <em>parameters</em>, <em>databaseVersion</em>, <em>outputfile</em><big>)</big><a class="headerlink" href="#tools.ioObjects.OutputStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">smodels.theory.printer.Printer</span></tt></p>
+<p>Object that holds all status information and has a predefined printout 
+:ivar status: status of input file
+:ivar inputFile: input file name
+:ivar parameters: input parameters
+:ivar databaseVersion: database version (string)
+:ivar outputfile: path to outputfile</p>
+<dl class="method">
+<dt id="tools.ioObjects.OutputStatus.addWarning">
+<tt class="descname">addWarning</tt><big>(</big><em>warning</em><big>)</big><a class="headerlink" href="#tools.ioObjects.OutputStatus.addWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>append warning to warnings
+:parameter warning: warning to be appended</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.OutputStatus.checkStatus">
+<tt class="descname">checkStatus</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.ioObjects.OutputStatus.checkStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>check status, exit if negativ</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.OutputStatus.formatData">
+<tt class="descname">formatData</tt><big>(</big><em>outputLevel</em><big>)</big><a class="headerlink" href="#tools.ioObjects.OutputStatus.formatData" title="Permalink to this definition">¶</a></dt>
+<dd><p>to access printout format
+:param outputLevel: general control for the output depth to be printed</p>
+<blockquote>
+<div>(0 = no output, 1 = basic output, 2 = detailed output,...</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.OutputStatus.updateSLHAStatus">
+<tt class="descname">updateSLHAStatus</tt><big>(</big><em>status</em><big>)</big><a class="headerlink" href="#tools.ioObjects.OutputStatus.updateSLHAStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>update slha status
+:parameter status: new slha status flag</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.OutputStatus.updateStatus">
+<tt class="descname">updateStatus</tt><big>(</big><em>status</em><big>)</big><a class="headerlink" href="#tools.ioObjects.OutputStatus.updateStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>update status
+:parameter status: new status flag</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tools.ioObjects.Qnumbers">
+<em class="property">class </em><tt class="descclassname">tools.ioObjects.</tt><tt class="descname">Qnumbers</tt><big>(</big><em>pid</em><big>)</big><a class="headerlink" href="#tools.ioObjects.Qnumbers" title="Permalink to this definition">¶</a></dt>
+<dd><p>An instance of this class represents quantum numbers.</p>
+<p>Get quantum numbers (spin*2, electrical charge*3, color dimension) from qNumbers.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tools.ioObjects.ResultList">
+<em class="property">class </em><tt class="descclassname">tools.ioObjects.</tt><tt class="descname">ResultList</tt><big>(</big><em>outputarray=</em><span class="optional">[</span><span class="optional">]</span>, <em>bestresultonly=None</em>, <em>describeTopo=None</em><big>)</big><a class="headerlink" href="#tools.ioObjects.ResultList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">smodels.theory.printer.Printer</span></tt></p>
+<p>Class that collects experimental constraints and has a predefined printout
+:ivar outputarray: list of theorypredictions
+:ivar bestresultonly: if True, printout will print only the best result
+:ivar describeTopo: if True, printout will print the constraints</p>
+<dl class="method">
+<dt id="tools.ioObjects.ResultList.addResult">
+<tt class="descname">addResult</tt><big>(</big><em>res</em>, <em>maxcond</em><big>)</big><a class="headerlink" href="#tools.ioObjects.ResultList.addResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a result to the outputarry, unless it violates maxcond
+:parameter res: theoryprediction to be added to ResultList
+:parameter maxcond: maximum condition violation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.ResultList.formatData">
+<tt class="descname">formatData</tt><big>(</big><em>outputLevel</em><big>)</big><a class="headerlink" href="#tools.ioObjects.ResultList.formatData" title="Permalink to this definition">¶</a></dt>
+<dd><p>to access printout format
+:param outputLevel: general control for the output depth to be printed</p>
+<blockquote>
+<div>(0 = no output, 1 = basic output, 2 = detailed output,...</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.ResultList.getBestResult">
+<tt class="descname">getBestResult</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.ioObjects.ResultList.getBestResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>return best result</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.ResultList.getR">
+<tt class="descname">getR</tt><big>(</big><em>res</em><big>)</big><a class="headerlink" href="#tools.ioObjects.ResultList.getR" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate R value
+:parameter res: theoryprediction
+:returns: R value = weight / upper limit</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.ResultList.isEmpty">
+<tt class="descname">isEmpty</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.ioObjects.ResultList.isEmpty" title="Permalink to this definition">¶</a></dt>
+<dd><p>check if outputarray is empty</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.ResultList.sort">
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.ioObjects.ResultList.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>reverse sort outputarray by R value</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tools.ioObjects.SlhaStatus">
+<em class="property">class </em><tt class="descclassname">tools.ioObjects.</tt><tt class="descname">SlhaStatus</tt><big>(</big><em>filename, maxDisplacement=0.01, sigmacut=1.00E-02 [fb], checkLSP=True, findMissingDecayBlocks=True, findIllegalDecays=False, checkXsec=True, findLonglived=True</em><big>)</big><a class="headerlink" href="#tools.ioObjects.SlhaStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">smodels.theory.printer.Printer</span></tt></p>
+<p>An instance of this class represents the status of an SLHA file.
+The output status is:
+= 0 : the file is not checked,
+= 1: the check is ok
+= -1: case of a physical problem, e.g. charged LSP,
+= -2: case of formal problems, e.g. no cross sections
+:ivar filename: path to input SLHA file
+:ivar maxDisplacement: maximum c*tau for promt decays in meters
+:ivar sigmacut: sigmacut in fb
+:ivar checkLSP: if True check if LSP is neutral
+:ivar findMissingDecayBlocks: if True add a warning for missing decay blocks
+:ivar findIllegalDecays: if True check if all decays are kinematically allowed
+:ivar checkXsec: if True check if SLHA file contains cross sections
+:ivar findLonglived: if True find stable charged particles and displaced vertices</p>
+<dl class="method">
+<dt id="tools.ioObjects.SlhaStatus.degenerateChi">
+<tt class="descname">degenerateChi</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.ioObjects.SlhaStatus.degenerateChi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if chi01 is lsp and chipm1 is NLSP. If so, check mass splitting.
+This function is not used, the limit is arbitrary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.SlhaStatus.deltaMass">
+<tt class="descname">deltaMass</tt><big>(</big><em>pid1</em>, <em>pid2</em><big>)</big><a class="headerlink" href="#tools.ioObjects.SlhaStatus.deltaMass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate mass splitting between particles with pid1 and pid2.
+:returns: mass difference</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.SlhaStatus.emptyDecay">
+<tt class="descname">emptyDecay</tt><big>(</big><em>pid</em><big>)</big><a class="headerlink" href="#tools.ioObjects.SlhaStatus.emptyDecay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if any decay is listed for the particle with pid
+:parameter pid: PID number of particle to be checked
+:returns: True if the decay block is missing or if it is empty, None otherwise</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.SlhaStatus.evaluateStatus">
+<tt class="descname">evaluateStatus</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.ioObjects.SlhaStatus.evaluateStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get status summary from all performed checks.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a status flag and a message for explanation</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.SlhaStatus.findIllegalDecay">
+<tt class="descname">findIllegalDecay</tt><big>(</big><em>findIllegal</em><big>)</big><a class="headerlink" href="#tools.ioObjects.SlhaStatus.findIllegalDecay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find decays for which the sum of daughter masses excels the mother mass
+:parameter findIllegal: True if check should be run
+:returns: status flag and message</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.SlhaStatus.findLSP">
+<tt class="descname">findLSP</tt><big>(</big><em>returnmass=None</em><big>)</big><a class="headerlink" href="#tools.ioObjects.SlhaStatus.findLSP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find lightest particle (not in rEven).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">pid, mass of the lsp, if returnmass == True</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.SlhaStatus.findLonglivedParticles">
+<tt class="descname">findLonglivedParticles</tt><big>(</big><em>findLonglived</em><big>)</big><a class="headerlink" href="#tools.ioObjects.SlhaStatus.findLonglivedParticles" title="Permalink to this definition">¶</a></dt>
+<dd><p>find meta-stable particles that decay to visible particles
+and stable charged particles
+:returns: status flag, message</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.SlhaStatus.findMissingDecayBlocks">
+<tt class="descname">findMissingDecayBlocks</tt><big>(</big><em>findMissingBlocks</em><big>)</big><a class="headerlink" href="#tools.ioObjects.SlhaStatus.findMissingDecayBlocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>For all non-rEven particles listed in mass block, check if decay block is written
+:returns: status flag and message</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.SlhaStatus.findNLSP">
+<tt class="descname">findNLSP</tt><big>(</big><em>returnmass=None</em><big>)</big><a class="headerlink" href="#tools.ioObjects.SlhaStatus.findNLSP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find second lightest particle (not in rEven).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">pid ,mass of the NLSP, if returnmass == True</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.SlhaStatus.getDecayWidth">
+<tt class="descname">getDecayWidth</tt><big>(</big><em>pid</em><big>)</big><a class="headerlink" href="#tools.ioObjects.SlhaStatus.getDecayWidth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the decay-width for particle with pid, if it exists.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.SlhaStatus.getDecayWidths">
+<tt class="descname">getDecayWidths</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.ioObjects.SlhaStatus.getDecayWidths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all decay-widths as a dictionary {pid: width}.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.SlhaStatus.getLifetime">
+<tt class="descname">getLifetime</tt><big>(</big><em>pid</em>, <em>ctau=False</em><big>)</big><a class="headerlink" href="#tools.ioObjects.SlhaStatus.getLifetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute lifetime from decay-width for a particle with pid.
+:parameter pid: PID of particle
+:parameter ctau: set True to multiply lifetime by c
+:returns: lifetime</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.SlhaStatus.hasXsec">
+<tt class="descname">hasXsec</tt><big>(</big><em>checkXsec</em><big>)</big><a class="headerlink" href="#tools.ioObjects.SlhaStatus.hasXsec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if XSECTION table is present in the slha file.
+:parameter checkXsec: set True to run the check
+:returns: status flag, message</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.SlhaStatus.massDiffLSPandNLSP">
+<tt class="descname">massDiffLSPandNLSP</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.ioObjects.SlhaStatus.massDiffLSPandNLSP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the mass difference between the lsp and the nlsp.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.SlhaStatus.read">
+<tt class="descname">read</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.ioObjects.SlhaStatus.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get pyslha output object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.SlhaStatus.sumBR">
+<tt class="descname">sumBR</tt><big>(</big><em>pid</em><big>)</big><a class="headerlink" href="#tools.ioObjects.SlhaStatus.sumBR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the sum of all branching ratios for particle with pid.
+:parameter pid: PID of particle
+:returns: sum of branching ratios as given in the decay table for pid</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.SlhaStatus.testLSP">
+<tt class="descname">testLSP</tt><big>(</big><em>checkLSP</em><big>)</big><a class="headerlink" href="#tools.ioObjects.SlhaStatus.testLSP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if lsp is charged.
+:parameter checkLSP: set True to run the check
+:returns: status flag, message</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.ioObjects.SlhaStatus.visible">
+<tt class="descname">visible</tt><big>(</big><em>pid</em>, <em>decay=None</em><big>)</big><a class="headerlink" href="#tools.ioObjects.SlhaStatus.visible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if pid is detectable
+If pid is not known, consider it as visible
+If pid not SM particle and decay = True, check if particle or decay products are visible</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tools.lheChecks">
+<span id="lhechecks-module"></span><h2><a class="reference internal" href="#module-lheChecks" title="lheChecks: Check LHE file format."><tt class="xref py py-mod docutils literal"><span class="pre">lheChecks</span></tt></a> Module<a class="headerlink" href="#module-tools.lheChecks" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-lheChecks"></span><dl class="function">
+<dt id="tools.lheChecks.main">
+<tt class="descclassname">tools.lheChecks.</tt><tt class="descname">main</tt><big>(</big><em>args</em><big>)</big><a class="headerlink" href="#tools.lheChecks.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tools.missingTopologies">
+<span id="missingtopologies-module"></span><h2><a class="reference internal" href="#module-missingTopologies" title="missingTopologies"><tt class="xref py py-mod docutils literal"><span class="pre">missingTopologies</span></tt></a> Module<a class="headerlink" href="#module-tools.missingTopologies" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-missingTopologies"></span><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">Definitions of classes used to find, format missing topologies</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="tools.missingTopologies.MissingTopo">
+<em class="property">class </em><tt class="descclassname">tools.missingTopologies.</tt><tt class="descname">MissingTopo</tt><big>(</big><em>topo</em>, <em>weights</em><big>)</big><a class="headerlink" href="#tools.missingTopologies.MissingTopo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object to describe one missing topology result
+:ivar topo: topology description
+:ivar weights: weights dictionary</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tools.missingTopologies.MissingTopoList">
+<em class="property">class </em><tt class="descclassname">tools.missingTopologies.</tt><tt class="descname">MissingTopoList</tt><big>(</big><em>sqrts</em><big>)</big><a class="headerlink" href="#tools.missingTopologies.MissingTopoList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">smodels.theory.printer.Printer</span></tt></p>
+<p>Object to find and collect MissingTopo objects, plus printout functionality
+:ivar sqrts: center of mass energy for which missing topologies should be evaluated</p>
+<dl class="method">
+<dt id="tools.missingTopologies.MissingTopoList.addToTopos">
+<tt class="descname">addToTopos</tt><big>(</big><em>el</em>, <em>sumL=None</em><big>)</big><a class="headerlink" href="#tools.missingTopologies.MissingTopoList.addToTopos" title="Permalink to this definition">¶</a></dt>
+<dd><p>adds an element to the list of missing topologies
+if the element contributes to a missing topology that is already
+in the list, add weight to topology
+:parameter el: element to be added</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.missingTopologies.MissingTopoList.findMissingTopos">
+<tt class="descname">findMissingTopos</tt><big>(</big><em>smstoplist</em>, <em>listOfAnalyses</em>, <em>minmassgap</em>, <em>doCompress</em>, <em>doInvisible</em>, <em>sumL=None</em><big>)</big><a class="headerlink" href="#tools.missingTopologies.MissingTopoList.findMissingTopos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loops over all the elements in smstoplist and checks if the elements
+are tested by any of the analysis in listOfAnalysis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>smstoplist</strong> &#8211; list of topologies (TopologyLis object)</li>
+<li><strong>listOfAnlysis</strong> &#8211; a list of ULanalysis objects</li>
+<li><strong>minmassgap</strong> &#8211; the parameter for mass compression (Unum object)</li>
+<li><strong>doCompress</strong> &#8211; if set to True will ignore elements which can be mass compressed (True/Fals)</li>
+<li><strong>doInvisible</strong> &#8211; if set to True will ignore elements which can be invisibly compressed (True/False)</li>
+<li><strong>sumL</strong> &#8211; if True, missing topologies will not distinguish e and mu</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.missingTopologies.MissingTopoList.formatData">
+<tt class="descname">formatData</tt><big>(</big><em>outputLevel</em><big>)</big><a class="headerlink" href="#tools.missingTopologies.MissingTopoList.formatData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tools.missingTopologies.MissingTopoList.generalName">
+<tt class="descname">generalName</tt><big>(</big><em>instr</em>, <em>sumL=None</em><big>)</big><a class="headerlink" href="#tools.missingTopologies.MissingTopoList.generalName" title="Permalink to this definition">¶</a></dt>
+<dd><p>generalize by summing over charges
+e, mu are combined to l
+:parameter instr: element as string
+:returns: string of generalized element</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.missingTopologies.MissingTopoList.orderbranches">
+<tt class="descname">orderbranches</tt><big>(</big><em>instr</em><big>)</big><a class="headerlink" href="#tools.missingTopologies.MissingTopoList.orderbranches" title="Permalink to this definition">¶</a></dt>
+<dd><p>unique ordering of branches
+:parameter instr: element as string
+:returns: string of ordered element</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tools.modpyslha">
+<span id="modpyslha-module"></span><h2><a class="reference internal" href="#module-modpyslha" title="modpyslha: Modified pyslha reader."><tt class="xref py py-mod docutils literal"><span class="pre">modpyslha</span></tt></a> Module<a class="headerlink" href="#module-tools.modpyslha" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-modpyslha"></span><p>A simple but flexible handler of the SUSY Les Houches Accord (SLHA) data format.</p>
+<p>pyslha is a parser/writer module for particle physics SUSY Les Houches Accord
+(SLHA) supersymmetric spectrum/decay files, and a collection of scripts which
+use the interface, e.g. for conversion to and from the legacy ISAWIG format, or
+to plot the mass spectrum and decay chains.</p>
+<p>The current release supports SLHA version 1, and as far as I&#8217;m aware is also
+fully compatible with SLHA2: the block structures are read and accessed
+generically. If you have any problems, please provide an example input file and
+I&#8217;ll happily investigate. SLHA3 is not yet supported (or standardised) but in
+recent releases the new structures will not crash the parser. Support will be
+added once the format is standardised (and in response to demand!)</p>
+<p>The plotting script provides output in PDF, EPS and PNG via LaTeX and the TikZ
+graphics package, and as LaTeX/TikZ source for direct embedding into documents or
+user-tweaking of the generated output.</p>
+<p>Users of version 1.x should note that the interface has changed a little in
+version 2.0.0 and onward, in particular in the interface of the Block objects,
+which are now more dict-like: entries can be added and accessed via the usual
+square-brackets indexing operators, including for multiple indices as is common
+for mixing matrices e.g. NMIX[1,2] as opposed to the old NMIX.entries[1][2]
+way. This does break backward compatibility but is a big improvement both for
+internal code sanity and usability. The Block interface also now supplies
+dict-like has_key(), keys(), and items() methods, as well as more specialist
+value(), set_value() and is_single_valued() methods for improved access to ALPHA
+and any other unindexed blocks.</p>
+<p>If you use PySLHA, for either model data handling or spectrum visualisation,
+please cite the paper: <a class="reference external" href="http://arxiv.org/abs/1305.4194">http://arxiv.org/abs/1305.4194</a></p>
+<p>TODOs:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>For 3.0.x:</dt>
+<dd><ul class="first last simple">
+<li>Add handling of XSECTION if/when standardised.</li>
+<li>In set_value, if first item is non-int, treat as None-indexed.</li>
+<li>Refine value string heuristic for strings with ints in them?</li>
+<li>Use Doc to handle document-level header comments.</li>
+<li>Add block and decay summary comments to the OrderedDict (wrap OrderedDict as DataStore?)</li>
+</ul>
+</dd>
+<dt>For 3.1.x:</dt>
+<dd><ul class="first last simple">
+<li>Preserve inline comments from read -&gt; write (needs full-line/inline comment
+separation). Can use separate comment dicts in Block and Decay, and
+attach a multiline .comment attr to the returned/written dicts.</li>
+</ul>
+</dd>
+<dt>Later/maybe:</dt>
+<dd><ul class="first last simple">
+<li>Add Sphinx docs.</li>
+<li>Identify HERWIG decay matrix element to use in ISAWIG.</li>
+<li>Handle RPV SUSY in ISAWIG.</li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="exception">
+<dt id="tools.modpyslha.AccessError">
+<em class="property">exception </em><tt class="descclassname">tools.modpyslha.</tt><tt class="descname">AccessError</tt><big>(</big><em>errmsg</em><big>)</big><a class="headerlink" href="#tools.modpyslha.AccessError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+<p>Exception object to be raised when a SLHA block is accessed in an invalid way</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tools.modpyslha.Block">
+<em class="property">class </em><tt class="descclassname">tools.modpyslha.</tt><tt class="descname">Block</tt><big>(</big><em>name</em>, <em>q=None</em>, <em>entries=None</em><big>)</big><a class="headerlink" href="#tools.modpyslha.Block" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Object representation of any BLOCK elements read from an SLHA file.</p>
+<p>Blocks have a name, may have an associated Q value, and contain a collection
+of data entries, each indexed by one or more keys. Entries in the dictionary
+are stored as numeric types (int or float) when a cast from the string in
+the file has been possible.</p>
+<p>Block is closely related to a Python dict (and, in fact, is implemented via
+an OrderedDict when possible). The preferred methods of entry access use the
+dict-like [] operator for getting and setting, and the keys() and items()
+methods for iteration. Purely iterating over the object behaves like keys(),
+as for an ordinary dict.</p>
+<p>Multiple (integer) indices are possible, especially for entries in mixing
+matrix blocks. These are now implemented in the natural way, e.g. for access
+to the (1,2) element of a mixing matrix block, use bmix[1,2] = 0.123 and
+print bmix[1,2]. The value() and set_value() functions behave
+similarly. Multi-element values are also permitted.</p>
+<p>It is possible, although not usual, to store unindexed values in a
+block. This is only supported when that entry is the only one in the block,
+and it is stored in the normal fashion but with None as the lookup key. The
+value() method may be used without a key argument to retrieve this value, if
+the is_single_valued() method returns True, and similarly the set_value()
+method may be used to set it if only one argument is supplied and the object
+is compatible.</p>
+<dl class="method">
+<dt id="tools.modpyslha.Block.add_entry">
+<tt class="descname">add_entry</tt><big>(</big><em>args</em><big>)</big><a class="headerlink" href="#tools.modpyslha.Block.add_entry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an entry to the block from an iterable (i.e. list or tuple) of
+strings, or from a whitespace-separated string.</p>
+<p>This method is just for convenience: it splits the single string
+argument if necessary and converts the list of strings into numeric
+types when possible. For the treatment of the resulting iterable see the
+set_value method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.modpyslha.Block.get">
+<tt class="descname">get</tt><big>(</big><em>key=None</em>, <em>default=1</em><big>)</big><a class="headerlink" href="#tools.modpyslha.Block.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a value from the block with the supplied key.</p>
+<p>If no key is given, then the block must contain only one non-indexed
+value otherwise an AccessError exception will be raised.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.modpyslha.Block.has_key">
+<tt class="descname">has_key</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#tools.modpyslha.Block.has_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does the block have the given key?</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.modpyslha.Block.is_single_valued">
+<tt class="descname">is_single_valued</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.modpyslha.Block.is_single_valued" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return true if there is only one entry, and it has no index: the
+&#8216;value()&#8217; attribute may be used in that case without an argument.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.modpyslha.Block.items">
+<tt class="descname">items</tt><big>(</big><em>key=None</em><big>)</big><a class="headerlink" href="#tools.modpyslha.Block.items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Access the block items as (key,value) tuples.</p>
+<p>Note: The Python 3 dict attribute &#8216;items()&#8217; is used rather than the
+&#8216;old&#8217; Python 2 &#8216;iteritems()&#8217; name for forward-looking compatibility.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.modpyslha.Block.keys">
+<tt class="descname">keys</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.modpyslha.Block.keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Access the block item keys.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.modpyslha.Block.set">
+<tt class="descname">set</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#tools.modpyslha.Block.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a value in the block via supplied key/value arguments.</p>
+<p>Indexing is determined automatically: any leading integers will be
+treated as a multi-dimensional index, with the remaining entries being a
+(potentially multi-dimensional) value. If all N args are ints, then the
+first N-1 are treated as the index and the Nth as the value.</p>
+<p>If there is only one arg it will be treated as the value of a
+single-valued block. In this case the block must already contain at most
+one non-indexed value otherwise an AccessError exception will be
+raised.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.modpyslha.Block.set_value">
+<tt class="descname">set_value</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#tools.modpyslha.Block.set_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a value in the block via supplied key/value arguments.</p>
+<p>Indexing is determined automatically: any leading integers will be
+treated as a multi-dimensional index, with the remaining entries being a
+(potentially multi-dimensional) value. If all N args are ints, then the
+first N-1 are treated as the index and the Nth as the value.</p>
+<p>If there is only one arg it will be treated as the value of a
+single-valued block. In this case the block must already contain at most
+one non-indexed value otherwise an AccessError exception will be
+raised.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.modpyslha.Block.value">
+<tt class="descname">value</tt><big>(</big><em>key=None</em>, <em>default=1</em><big>)</big><a class="headerlink" href="#tools.modpyslha.Block.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a value from the block with the supplied key.</p>
+<p>If no key is given, then the block must contain only one non-indexed
+value otherwise an AccessError exception will be raised.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.modpyslha.Block.values">
+<tt class="descname">values</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.modpyslha.Block.values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Access the block item values.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tools.modpyslha.Decay">
+<em class="property">class </em><tt class="descclassname">tools.modpyslha.</tt><tt class="descname">Decay</tt><big>(</big><em>br</em>, <em>nda</em>, <em>ids</em>, <em>parentid=None</em><big>)</big><a class="headerlink" href="#tools.modpyslha.Decay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Object representing a decay entry on a particle decribed by the SLHA file.
+&#8216;Decay&#8217; objects are not a direct representation of a DECAY block in an SLHA
+file... that role, somewhat confusingly, is taken by the Particle class.</p>
+<p>Decay objects have three properties: a branching ratio, br, an nda number
+(number of daughters == len(ids)), and a tuple of PDG PIDs to which the
+decay occurs. The PDG ID of the particle whose decay this represents may
+also be stored, but this is normally known via the Particle in which the
+decay is stored.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tools.modpyslha.Doc">
+<em class="property">class </em><tt class="descclassname">tools.modpyslha.</tt><tt class="descname">Doc</tt><big>(</big><em>blocks</em>, <em>decays=None</em>, <em>xsections=None</em><big>)</big><a class="headerlink" href="#tools.modpyslha.Doc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Top level container for everything in an SLHA record</p>
+<dl class="method">
+<dt id="tools.modpyslha.Doc.write">
+<tt class="descname">write</tt><big>(</big><em>filename=None</em>, <em>ignorenobr=False</em>, <em>precision=8</em><big>)</big><a class="headerlink" href="#tools.modpyslha.Doc.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenient method for converting an SLHA Doc object to SLHA format,
+either returned as a string or written to a file depending on whether
+the filename variable is None.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tools.modpyslha.ParseError">
+<em class="property">exception </em><tt class="descclassname">tools.modpyslha.</tt><tt class="descname">ParseError</tt><big>(</big><em>errmsg</em><big>)</big><a class="headerlink" href="#tools.modpyslha.ParseError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+<p>Exception object to be raised when a spectrum file/string is malformed</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tools.modpyslha.Particle">
+<em class="property">class </em><tt class="descclassname">tools.modpyslha.</tt><tt class="descname">Particle</tt><big>(</big><em>pid</em>, <em>totalwidth=None</em>, <em>mass=None</em><big>)</big><a class="headerlink" href="#tools.modpyslha.Particle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Representation of a single, specific particle, decay block from an SLHA
+file.  These objects are not themselves called &#8216;Decay&#8217;, since that concept
+applies more naturally to the various decays found inside this
+object. Particle classes store the PDG ID (pid) of the particle being
+represented, and optionally the mass (mass) and total decay width
+(totalwidth) of that particle in the SLHA scenario. Masses may also be found
+via the MASS block, from which the Particle.mass property is filled, if at
+all. They also store a list of Decay objects (decays) which are probably the
+item of most interest.</p>
+<dl class="method">
+<dt id="tools.modpyslha.Particle.add_decay">
+<tt class="descname">add_decay</tt><big>(</big><em>br</em>, <em>nda</em>, <em>ids</em><big>)</big><a class="headerlink" href="#tools.modpyslha.Particle.add_decay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the decay entry to the Particle object.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.modpyslha._autostr">
+<tt class="descclassname">tools.modpyslha.</tt><tt class="descname">_autostr</tt><big>(</big><em>var</em>, <em>precision=8</em><big>)</big><a class="headerlink" href="#tools.modpyslha._autostr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Automatically format numerical types as the right sort of string.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.modpyslha._autotuple">
+<tt class="descclassname">tools.modpyslha.</tt><tt class="descname">_autotuple</tt><big>(</big><em>a</em><big>)</big><a class="headerlink" href="#tools.modpyslha._autotuple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Automatically convert the supplied iterable to a scalar or tuple as appropriate.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.modpyslha._autotype">
+<tt class="descclassname">tools.modpyslha.</tt><tt class="descname">_autotype</tt><big>(</big><em>var</em><big>)</big><a class="headerlink" href="#tools.modpyslha._autotype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Automatically convert strings to numerical types if possible.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tools.modpyslha._dict">
+<em class="property">class </em><tt class="descclassname">tools.modpyslha.</tt><tt class="descname">_dict</tt><big>(</big><em>name=None</em><big>)</big><a class="headerlink" href="#tools.modpyslha._dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">collections.OrderedDict</span></tt></p>
+<p>A cosmetic wrapper on an OrderedDict if possible, or a normal dict if not.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.modpyslha._mkdict">
+<tt class="descclassname">tools.modpyslha.</tt><tt class="descname">_mkdict</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.modpyslha._mkdict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an OrderedDict if possible, or a normal dict if not.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.modpyslha._read">
+<tt class="descclassname">tools.modpyslha.</tt><tt class="descname">_read</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#tools.modpyslha._read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a file&#8217;s contents, autodetecting whether the arg is a file or filename,
+and treating &#8216;-&#8216; as as indication to read from stdin.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.modpyslha._write">
+<tt class="descclassname">tools.modpyslha.</tt><tt class="descname">_write</tt><big>(</big><em>f</em>, <em>txt</em><big>)</big><a class="headerlink" href="#tools.modpyslha._write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write to a file, autodetecting whether the arg is a file or filename,
+and treating &#8216;-&#8216; as as indication to write to stdout.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.modpyslha.herwigid2pdgid">
+<tt class="descclassname">tools.modpyslha.</tt><tt class="descname">herwigid2pdgid</tt><big>(</big><em>hwid</em><big>)</big><a class="headerlink" href="#tools.modpyslha.herwigid2pdgid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a particle ID code in the HERWIG internal IDHW format (as used by
+ISAWIG) into its equivalent in the standard PDG ID code definition.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.modpyslha.pdgid2herwigid">
+<tt class="descclassname">tools.modpyslha.</tt><tt class="descname">pdgid2herwigid</tt><big>(</big><em>pdgid</em><big>)</big><a class="headerlink" href="#tools.modpyslha.pdgid2herwigid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a particle ID code in the standard PDG ID code definition into
+its equivalent in the HERWIG internal IDHW format (as used by ISAWIG).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.modpyslha.read">
+<tt class="descclassname">tools.modpyslha.</tt><tt class="descname">read</tt><big>(</big><em>spcfile</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#tools.modpyslha.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read an SLHA or ISAWIG file (or stdin).</p>
+<p>spcfile may either be a string filename or a file object.
+If a s string, the assumed file format is based from the
+filename; if a file it is assumed to be SLHA format.</p>
+<p>Other keyword parameters are passed to readSLHA/readISAWIG.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.modpyslha.readISAWIG">
+<tt class="descclassname">tools.modpyslha.</tt><tt class="descname">readISAWIG</tt><big>(</big><em>isastr</em>, <em>ignorenobr=False</em><big>)</big><a class="headerlink" href="#tools.modpyslha.readISAWIG" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a spectrum definition from a string in the ISAWIG format, returning
+dictionaries of blocks and decays. While this is not an SLHA format, it is
+informally supported as a useful mechanism for converting ISAWIG spectra to
+SLHA.</p>
+<p>ISAWIG parsing based on the HERWIG SUSY specification format, from
+<a class="reference external" href="http://www.hep.phy.cam.ac.uk/~richardn/HERWIG/ISAWIG/file.html">http://www.hep.phy.cam.ac.uk/~richardn/HERWIG/ISAWIG/file.html</a></p>
+<p>If the ignorenobr parameter is True, do not store decay entries with a
+branching ratio of zero.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.modpyslha.readISAWIGFile">
+<tt class="descclassname">tools.modpyslha.</tt><tt class="descname">readISAWIGFile</tt><big>(</big><em>isafile</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#tools.modpyslha.readISAWIGFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a spectrum definition from a file in the ISAWIG format, returning
+dictionaries of blocks and decays. While this is not an SLHA format, it is
+informally supported as a useful mechanism for converting ISAWIG spectra to
+SLHA.</p>
+<p>isafile may either be a string filename or a file object.</p>
+<p>Other keyword parameters are passed to readISAWIG.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.modpyslha.readSLHA">
+<tt class="descclassname">tools.modpyslha.</tt><tt class="descname">readSLHA</tt><big>(</big><em>spcstr</em>, <em>ignorenobr=False</em>, <em>ignorenomass=False</em>, <em>ignoreblocks=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#tools.modpyslha.readSLHA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read an SLHA definition from a string, returning dictionaries of blocks and
+decays.</p>
+<p>If the ignorenobr parameter is True, do not store decay entries with a
+branching ratio of zero.</p>
+<p>If the ignorenomass parameter is True, parse file even if mass block is
+absent in the file (default is to raise a ParseError).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.modpyslha.readSLHAFile">
+<tt class="descclassname">tools.modpyslha.</tt><tt class="descname">readSLHAFile</tt><big>(</big><em>spcfile</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#tools.modpyslha.readSLHAFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read an SLHA file, returning dictionaries of blocks and decays.</p>
+<p>Other keyword parameters are passed to readSLHA.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.modpyslha.write">
+<tt class="descclassname">tools.modpyslha.</tt><tt class="descname">write</tt><big>(</big><em>spcfile</em>, <em>doc</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#tools.modpyslha.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write to an SLHA or ISAWIG file (or stdout).</p>
+<p>spcfile may either be a string filename or a file object.
+If a s string, the assumed file format is based from the
+filename; if a file it is assumed to be SLHA format.</p>
+<p>Other keyword parameters are passed to writeSLHA/writeISAWIG.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.modpyslha.writeISAWIG">
+<tt class="descclassname">tools.modpyslha.</tt><tt class="descname">writeISAWIG</tt><big>(</big><em>doc</em>, <em>ignorenobr=False</em>, <em>precision=8</em><big>)</big><a class="headerlink" href="#tools.modpyslha.writeISAWIG" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a SUSY spectrum definition in the format produced by ISAWIG for inut to HERWIG
+as a string, from the supplied SLHA blocks and decays dicts.</p>
+<p>ISAWIG parsing based on the HERWIG SUSY specification format, from
+<a class="reference external" href="http://www.hep.phy.cam.ac.uk/~richardn/HERWIG/ISAWIG/file.html">http://www.hep.phy.cam.ac.uk/~richardn/HERWIG/ISAWIG/file.html</a></p>
+<p>If the ignorenobr parameter is True, do not write decay entries with a
+branching ratio of zero.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.modpyslha.writeISAWIGFile">
+<tt class="descclassname">tools.modpyslha.</tt><tt class="descname">writeISAWIGFile</tt><big>(</big><em>isafile</em>, <em>doc</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#tools.modpyslha.writeISAWIGFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write an ISAWIG file from the supplied blocks and decays dicts.</p>
+<p>isafile may either be a string filename or a file object.</p>
+<p>Other keyword parameters are passed to writeISAWIG.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.modpyslha.writeSLHA">
+<tt class="descclassname">tools.modpyslha.</tt><tt class="descname">writeSLHA</tt><big>(</big><em>doc</em>, <em>ignorenobr=False</em>, <em>precision=8</em><big>)</big><a class="headerlink" href="#tools.modpyslha.writeSLHA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an SLHA definition as a string, from the supplied blocks and decays dicts.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.modpyslha.writeSLHABlocks">
+<tt class="descclassname">tools.modpyslha.</tt><tt class="descname">writeSLHABlocks</tt><big>(</big><em>blocks</em>, <em>precision=8</em><big>)</big><a class="headerlink" href="#tools.modpyslha.writeSLHABlocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an SLHA definition as a string, from the supplied blocks dict.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.modpyslha.writeSLHADecays">
+<tt class="descclassname">tools.modpyslha.</tt><tt class="descname">writeSLHADecays</tt><big>(</big><em>decays</em>, <em>ignorenobr=False</em>, <em>precision=8</em><big>)</big><a class="headerlink" href="#tools.modpyslha.writeSLHADecays" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an SLHA decay definition as a string, from the supplied decays dict.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.modpyslha.writeSLHAFile">
+<tt class="descclassname">tools.modpyslha.</tt><tt class="descname">writeSLHAFile</tt><big>(</big><em>spcfile</em>, <em>doc</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#tools.modpyslha.writeSLHAFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write an SLHA file from the supplied blocks and decays dicts.</p>
+<p>Other keyword parameters are passed to writeSLHA.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tools.nllFast">
+<span id="nllfast-module"></span><h2><a class="reference internal" href="#module-nllFast" title="nllFast: This module provides methods to access the nllfast grid and compute k-factors (when available) to SUSY pair  production cross-sections."><tt class="xref py py-mod docutils literal"><span class="pre">nllFast</span></tt></a> Module<a class="headerlink" href="#module-tools.nllFast" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-nllFast"></span><dl class="function">
+<dt id="tools.nllFast.getDecoupledKfactors">
+<tt class="descclassname">tools.nllFast.</tt><tt class="descname">getDecoupledKfactors</tt><big>(</big><em>nllpath</em>, <em>process</em>, <em>energy</em>, <em>pdf</em>, <em>mass</em><big>)</big><a class="headerlink" href="#tools.nllFast.getDecoupledKfactors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute k-factors in the decoupled (squark or gluino) regime for the process.
+If a decoupled grid does not exist for the process, return None</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.nllFast.getKfactorsFor">
+<tt class="descclassname">tools.nllFast.</tt><tt class="descname">getKfactorsFor</tt><big>(</big><em>pIDs</em>, <em>sqrts</em>, <em>slhafile</em>, <em>pdf='cteq'</em><big>)</big><a class="headerlink" href="#tools.nllFast.getKfactorsFor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the NLLfast grid and returns a pair of k-factors (NLO and NLL) for the
+pair.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">k-factors = None, if NLLfast does not contain the process; uses
+the slhafile to obtain the SUSY spectrum.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.nllFast.getKfactorsFrom">
+<tt class="descclassname">tools.nllFast.</tt><tt class="descname">getKfactorsFrom</tt><big>(</big><em>output</em><big>)</big><a class="headerlink" href="#tools.nllFast.getKfactorsFrom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read NLLfast output and return the k-factors.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.nllFast.getProcessName">
+<tt class="descclassname">tools.nllFast.</tt><tt class="descname">getProcessName</tt><big>(</big><em>pIDs</em><big>)</big><a class="headerlink" href="#tools.nllFast.getProcessName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the process name (in NLLfast notation) for the pair production of
+pIDs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None, if the particle ID pair is not contained in NLLfast</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.nllFast.interpolateKfactors">
+<tt class="descclassname">tools.nllFast.</tt><tt class="descname">interpolateKfactors</tt><big>(</big><em>kFacsVector</em>, <em>xval</em><big>)</big><a class="headerlink" href="#tools.nllFast.interpolateKfactors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interpolate a list of k-factor  values from
+kFacsVector = [[x0,[k1,k2,..]], [x1,[k1,k2,..],...].</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of interpolated k-factor values at x-value xval</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.nllFast.runNLLfast">
+<tt class="descclassname">tools.nllFast.</tt><tt class="descname">runNLLfast</tt><big>(</big><em>nll_run</em>, <em>nllpath</em><big>)</big><a class="headerlink" href="#tools.nllFast.runNLLfast" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute NLLfast with command nll_run at nllpath.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">NLLfast output as a string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tools.physicsUnits">
+<span id="physicsunits-module"></span><h2><a class="reference internal" href="#module-physicsUnits" title="physicsUnits: This introduces physical units (GeV, fb) to the framework."><tt class="xref py py-mod docutils literal"><span class="pre">physicsUnits</span></tt></a> Module<a class="headerlink" href="#module-tools.physicsUnits" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-physicsUnits"></span><dl class="data">
+<dt id="tools.physicsUnits.TeV">
+<tt class="descclassname">tools.physicsUnits.</tt><tt class="descname">TeV</tt><em class="property"> = 1.00E+00 [TeV]</em><a class="headerlink" href="#tools.physicsUnits.TeV" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>def addunit(value, unitstring, deprecated=True ):</dt>
+<dd><p class="first">Add units to values.</p>
+<p>Allow to turn this functionality off, in case &#8220;units&#8221; is not installed.</p>
+<dl class="docutils">
+<dt>if deprecated:</dt>
+<dd>logger.warning(&#8220;physicsUnits.addunit has been deprecated. Please multiply directly with the unit.&#8221; )</dd>
+<dt>if value == None:</dt>
+<dd>return value</dd>
+<dt>if not useUnits:</dt>
+<dd>return value</dd>
+<dt>if useUnits:</dt>
+<dd><p class="first"># for convenience, we add units also to tuples, lists, and dictionaries
+if isinstance(value, list):</p>
+<blockquote>
+<div>return [addunit(x, unitstring, deprecated ) for x in value]</div></blockquote>
+<dl class="docutils">
+<dt>if isinstance(value, tuple):</dt>
+<dd>return tuple([addunit(x, unitstring, deprecated ) for x in value])</dd>
+<dt>if isinstance(value, dict):</dt>
+<dd><p class="first">ret = {}
+for (k, v) in value.items():</p>
+<blockquote>
+<div>ret[k] = addunit(v, unitstring, deprecated )</div></blockquote>
+<p class="last">return ret</p>
+</dd>
+<dt>if not isinstance(value, float) and not isinstance(value, int):</dt>
+<dd>return value</dd>
+<dt>if unitstring == &#8220;GeV&#8221;:</dt>
+<dd>return value * GeV</dd>
+<dt>if unitstring == &#8220;TeV&#8221;:</dt>
+<dd>return value * TeV</dd>
+<dt>if unitstring == &#8220;fb&#8221;:</dt>
+<dd>return value * fb</dd>
+<dt>if unitstring == &#8220;pb&#8221;:</dt>
+<dd>return value * pb</dd>
+<dt>if unitstring == &#8220;fb-1&#8221;:</dt>
+<dd>return value / fb</dd>
+</dl>
+<p class="last">logger.warning(&#8220;Unknown unit: &#8221; + unitstring)</p>
+</dd>
+</dl>
+<p class="last">return value</p>
+</dd>
+<dt>def rmvunit(value, unitstring):</dt>
+<dd><p class="first">Remove units from values.</p>
+<p>Allow to turn this functionality off, in case &#8220;units&#8221; is not installed.</p>
+<p>logger.warning(&#8220;physicsUnits.rmvunit has been deprecated. Please divide directly with the unit.&#8221; )
+if not useUnits:</p>
+<blockquote>
+<div>return value</div></blockquote>
+<dl class="last docutils">
+<dt>if useUnits:</dt>
+<dd><dl class="first docutils">
+<dt>if type(value) != type(1.*GeV):</dt>
+<dd>return value</dd>
+<dt>if unitstring == &#8220;GeV&#8221;:</dt>
+<dd>return value.asNumber(GeV)</dd>
+<dt>if unitstring == &#8220;TeV&#8221;:</dt>
+<dd>return value.asNumber(TeV)</dd>
+<dt>if unitstring == &#8220;fb&#8221;:</dt>
+<dd>return value.asNumber(fb)</dd>
+<dt>if unitstring == &#8220;pb&#8221;:</dt>
+<dd>return value.asNumber(pb)</dd>
+<dt>if unitstring == &#8220;fb-1&#8221;:</dt>
+<dd>return value.asNumber(1 / fb)</dd>
+</dl>
+<p class="last">logger.warning(&#8220;Unknown unit: &#8221; + unitstring)
+return value</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tools.slhaChecks">
+<span id="slhachecks-module"></span><h2><a class="reference internal" href="#module-slhaChecks" title="slhaChecks: Check SLHA file for integrity."><tt class="xref py py-mod docutils literal"><span class="pre">slhaChecks</span></tt></a> Module<a class="headerlink" href="#module-tools.slhaChecks" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-slhaChecks"></span><dl class="function">
+<dt id="tools.slhaChecks.main">
+<tt class="descclassname">tools.slhaChecks.</tt><tt class="descname">main</tt><big>(</big><em>args</em><big>)</big><a class="headerlink" href="#tools.slhaChecks.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tools.summaryReader">
+<span id="summaryreader-module"></span><h2><a class="reference internal" href="#module-summaryReader" title="summaryReader"><tt class="xref py py-mod docutils literal"><span class="pre">summaryReader</span></tt></a> Module<a class="headerlink" href="#module-tools.summaryReader" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-summaryReader"></span><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">Definitions of class to read the summary.txt files</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="tools.summaryReader.Output">
+<em class="property">class </em><tt class="descclassname">tools.summaryReader.</tt><tt class="descname">Output</tt><big>(</big><em>l</em><big>)</big><a class="headerlink" href="#tools.summaryReader.Output" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="tools.summaryReader.Summary">
+<em class="property">class </em><tt class="descclassname">tools.summaryReader.</tt><tt class="descname">Summary</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#tools.summaryReader.Summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to access the output given in the summary.txt</p>
+<dl class="method">
+<dt id="tools.summaryReader.Summary.read">
+<tt class="descname">read</tt><big>(</big><em>infile</em><big>)</big><a class="headerlink" href="#tools.summaryReader.Summary.read" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tools.toolBox">
+<span id="toolbox-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">toolBox</span></tt> Module<a class="headerlink" href="#module-tools.toolBox" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tools.toolBox.ToolBox">
+<em class="property">class </em><tt class="descclassname">tools.toolBox.</tt><tt class="descname">ToolBox</tt><a class="headerlink" href="#tools.toolBox.ToolBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A singleton-like class that keeps track of all external tools.
+Intended to make installation and deployment easier.</p>
+<dl class="attribute">
+<dt id="tools.toolBox.ToolBox._ToolBox__shared_state">
+<tt class="descname">_ToolBox__shared_state</tt><em class="property"> = {'tools': {}}</em><a class="headerlink" href="#tools.toolBox.ToolBox._ToolBox__shared_state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tools.toolBox.ToolBox.add">
+<tt class="descname">add</tt><big>(</big><em>instance</em><big>)</big><a class="headerlink" href="#tools.toolBox.ToolBox.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a tool by passing an instance to this method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.toolBox.ToolBox.checkInstallation">
+<tt class="descname">checkInstallation</tt><big>(</big><em>colors=True</em>, <em>make=False</em>, <em>printit=True</em><big>)</big><a class="headerlink" href="#tools.toolBox.ToolBox.checkInstallation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if all tools listed are installed properly, 
+returns True if everything is ok, False otherwise.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.toolBox.ToolBox.compile">
+<tt class="descname">compile</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.toolBox.ToolBox.compile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tries to compile and install tools that are not yet marked
+as &#8216;installed&#8217;.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.toolBox.ToolBox.get">
+<tt class="descname">get</tt><big>(</big><em>tool</em>, <em>verbose=True</em><big>)</big><a class="headerlink" href="#tools.toolBox.ToolBox.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets instance of tool from the toolbox.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.toolBox.ToolBox.initSingleton">
+<tt class="descname">initSingleton</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.toolBox.ToolBox.initSingleton" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes singleton instance (done only once for the entire class).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.toolBox.ToolBox.installationOk">
+<tt class="descname">installationOk</tt><big>(</big><em>ok</em>, <em>colors</em><big>)</big><a class="headerlink" href="#tools.toolBox.ToolBox.installationOk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns color coded string to signal installation issues.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.toolBox.ToolBox.listOfTools">
+<tt class="descname">listOfTools</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.toolBox.ToolBox.listOfTools" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a simple list with the tool names.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tools.uniqueLogFilter">
+<span id="uniquelogfilter-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">uniqueLogFilter</span></tt> Module<a class="headerlink" href="#module-tools.uniqueLogFilter" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tools.uniqueLogFilter.UniqueFilter">
+<em class="property">class </em><tt class="descclassname">tools.uniqueLogFilter.</tt><tt class="descname">UniqueFilter</tt><big>(</big><em>name=''</em><big>)</big><a class="headerlink" href="#tools.uniqueLogFilter.UniqueFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">logging.Filter</span></tt></p>
+<p>Messages are allowed through just once.
+The &#8216;message&#8217; includes substitutions, but is not formatted by the 
+handler. If it were, then practically all messages would be unique!
+stolen from: <a class="reference external" href="http://code.activestate.com/recipes/412552-using-the-logging-module/">http://code.activestate.com/recipes/412552-using-the-logging-module/</a></p>
+<dl class="method">
+<dt id="tools.uniqueLogFilter.UniqueFilter._UniqueFilter__is_first_time">
+<tt class="descname">_UniqueFilter__is_first_time</tt><big>(</big><em>rec</em><big>)</big><a class="headerlink" href="#tools.uniqueLogFilter.UniqueFilter._UniqueFilter__is_first_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Emit a message only once.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.uniqueLogFilter.UniqueFilter.filter">
+<tt class="descname">filter</tt><big>(</big><em>rec</em><big>)</big><a class="headerlink" href="#tools.uniqueLogFilter.UniqueFilter.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>logging.Filter.filter performs an extra filter on the name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tools.uniqueLogFilter.UniqueFilter.reset">
+<tt class="descname">reset</tt><big>(</big><big>)</big><a class="headerlink" href="#tools.uniqueLogFilter.UniqueFilter.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Act as if nothing has happened.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tools.xsecComputer">
+<span id="xseccomputer-module"></span><h2><a class="reference internal" href="#module-xsecComputer" title="xsecComputer: Computation of reference (&quot;theory&quot;) production cross sections."><tt class="xref py py-mod docutils literal"><span class="pre">xsecComputer</span></tt></a> Module<a class="headerlink" href="#module-tools.xsecComputer" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-xsecComputer"></span><dl class="function">
+<dt id="tools.xsecComputer.addXSecToFile">
+<tt class="descclassname">tools.xsecComputer.</tt><tt class="descname">addXSecToFile</tt><big>(</big><em>xsecs</em>, <em>slhafile</em>, <em>comment=None</em>, <em>complain=True</em><big>)</big><a class="headerlink" href="#tools.xsecComputer.addXSecToFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write cross-sections to an SLHA file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>xsecs</strong> &#8211; a XSectionList object containing the cross-sections</li>
+<li><strong>slhafile</strong> &#8211; target file for writing the cross-sections in SLHA format</li>
+<li><strong>comment</strong> &#8211; optional comment to be added to each cross-section block</li>
+<li><strong>complain</strong> &#8211; complain if there are already cross sections in file</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.xsecComputer.computeXSec">
+<tt class="descclassname">tools.xsecComputer.</tt><tt class="descname">computeXSec</tt><big>(</big><em>sqrts</em>, <em>maxOrder</em>, <em>nevts</em>, <em>slhafile</em>, <em>lhefile=None</em>, <em>unlink=True</em>, <em>loFromSlha=None</em><big>)</big><a class="headerlink" href="#tools.xsecComputer.computeXSec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run pythia and compute SUSY cross-sections for the input SLHA file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sqrts</strong> &#8211; sqrt{s} to run Pythia, given as a unum (e.g. 7.*TeV)</li>
+<li><strong>maxOrder</strong> &#8211; maximum order to compute the cross-section, given as an integer
+if maxOrder == 0, compute only LO pythia xsecs
+if maxOrder == 1, apply NLO K-factors from NLLfast (if available)
+if maxOrder == 2, apply NLO+NLL K-factors from NLLfast (if available)</li>
+<li><strong>nevts</strong> &#8211; number of events for pythia run</li>
+<li><strong>slhafile</strong> &#8211; SLHA file</li>
+<li><strong>lhefile</strong> &#8211; LHE file. If None, do not write pythia output to file. If
+file does not exist, write pythia output to this file name. If
+file exists, read LO xsecs from this file (does not run pythia).</li>
+<li><strong>unlink</strong> &#8211; Clean up temp directory after running pythia</li>
+<li><strong>loFromSlha</strong> &#8211; If True, uses the LO xsecs from the SLHA file to compute the
+higher order xsecs</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">XSectionList object</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.xsecComputer.main">
+<tt class="descclassname">tools.xsecComputer.</tt><tt class="descname">main</tt><big>(</big><em>args</em><big>)</big><a class="headerlink" href="#tools.xsecComputer.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tools.xsecComputer.runPythia">
+<tt class="descclassname">tools.xsecComputer.</tt><tt class="descname">runPythia</tt><big>(</big><em>slhafile</em>, <em>nevts</em>, <em>sqrts</em>, <em>lhefile=None</em>, <em>unlink=True</em><big>)</big><a class="headerlink" href="#tools.xsecComputer.runPythia" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute pythia_lhe with n events, at sqrt(s)=sqrts.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>slhafile</strong> &#8211; input SLHA file</li>
+<li><strong>nevts</strong> &#8211; number of events to be generated</li>
+<li><strong>sqrts</strong> &#8211; center of mass sqrt{s} (in TeV)</li>
+<li><strong>lhefile</strong> &#8211; option to write LHE output to file; ff None, do not write
+output to disk.</li>
+<li><strong>unlink</strong> &#8211; Clean up temp directory after running pythia</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">file object with the LHE events</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.xsecComputer.xsecToBlock">
+<tt class="descclassname">tools.xsecComputer.</tt><tt class="descname">xsecToBlock</tt><big>(</big><em>xsec, inPDGs=(2212, 2212), comment=None, xsecUnit=1.00E+00 [pb]</em><big>)</big><a class="headerlink" href="#tools.xsecComputer.xsecToBlock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a string for a XSECTION block in the SLHA format from a XSection
+object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>inPDGs</strong> &#8211; defines the PDGs of the incoming states
+(default = 2212,2212)</li>
+<li><strong>comment</strong> &#8211; is added at the end of the header as a comment</li>
+<li><strong>xsecUnit</strong> &#8211; unit of cross-sections to be written (default is pb). Must be a Unum unit.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">tools Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">tools</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-tools.asciiGraph"><tt class="docutils literal"><span class="pre">asciiGraph</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tools.externalNllFast"><tt class="docutils literal"><span class="pre">externalNllFast</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tools.externalPythia6"><tt class="docutils literal"><span class="pre">externalPythia6</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tools.externalPythonTools"><tt class="docutils literal"><span class="pre">externalPythonTools</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tools.externalTool"><tt class="docutils literal"><span class="pre">externalTool</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tools.ioObjects"><tt class="docutils literal"><span class="pre">ioObjects</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tools.lheChecks"><tt class="docutils literal"><span class="pre">lheChecks</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tools.missingTopologies"><tt class="docutils literal"><span class="pre">missingTopologies</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tools.modpyslha"><tt class="docutils literal"><span class="pre">modpyslha</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tools.nllFast"><tt class="docutils literal"><span class="pre">nllFast</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tools.physicsUnits"><tt class="docutils literal"><span class="pre">physicsUnits</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tools.slhaChecks"><tt class="docutils literal"><span class="pre">slhaChecks</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tools.summaryReader"><tt class="docutils literal"><span class="pre">summaryReader</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tools.toolBox"><tt class="docutils literal"><span class="pre">toolBox</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tools.uniqueLogFilter"><tt class="docutils literal"><span class="pre">uniqueLogFilter</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tools.xsecComputer"><tt class="docutils literal"><span class="pre">xsecComputer</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="experiment.html"
+                        title="previous chapter">experiment Package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/tools.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="experiment.html" title="experiment Package"
+             >previous</a> |</li>
+        <li><a href="index.html">SModelS 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Wolfgang Magerl, Doris Proschofsky, Wolfgang Waltenberger.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

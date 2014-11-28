@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Analyses Names &mdash; SModelS 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="_static/smodels.ico"/>
+    <link rel="top" title="SModelS 1.0 documentation" href="index.html" />
+    <link rel="up" title="Basic Concepts and Definitions" href="SModelSDefs.html" />
+    <link rel="next" title="SModelS Structure" href="Structure.html" />
+    <link rel="prev" title="Database Definitions" href="DatabaseDefinitions.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Structure.html" title="SModelS Structure"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="DatabaseDefinitions.html" title="Database Definitions"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">SModelS 1.0 documentation</a> &raquo;</li>
+          <li><a href="SModelSDefs.html" accesskey="U">Basic Concepts and Definitions</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="analyses-names">
+<span id="txname"></span><h1>Analyses Names<a class="headerlink" href="#analyses-names" title="Permalink to this headline">¶</a></h1>
+<p>Experimental analyses containing cross-section upper limits (see <a class="reference internal" href="DatabaseDefinitions.html#ulanalysis"><em>UL analysis</em></a>)
+are labelled according to their publication reference.
+For ATLAS analyses, we use arXiv or confnote number,
+for CMS analyses the PAS (public analysis summary) number.
+However, as discussed in <a class="reference internal" href="DatabaseDefinitions.html#ulanalysis"><em>UL analysis</em></a>,
+a single publication may contain several <a class="reference internal" href="DatabaseDefinitions.html#ulanalysis"><em>analyses</em></a>, corresponding to different
+<a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><em>constraints</em></a> (or sums of <a class="reference internal" href="TheoryDefinitions.html#element"><em>elements</em></a>).
+Therefore the analysis label must also specify to which <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><em>constraint</em></a> it refers too.
+Although the <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><em>constraint</em></a> can be specified using the <a class="reference internal" href="TheoryDefinitions.html#bracketnotation"><em>bracket notation</em></a>, this is usually too cumbersome for a simple label.
+We therefore adopt a notation based on the CMS SMS conventions, where each specific <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><em>constraint</em></a> is
+labeled as <em>T&lt;constraint name&gt;</em>.
+The complete analysis name is then given by:</p>
+<p>&lt;publication label&gt;:T&lt;constraint name&gt;</p>
+<p>As an example, consider the analysis with the upper limits for slepton pair production:</p>
+<a class="reference internal image-reference" href="_images/ATLASslepUL.png" id="constraintplot"><img alt="_images/ATLASslepUL.png" id="constraintplot" src="_images/ATLASslepUL.png" style="height: 460px;" /></a>
+<p>The conference note corresponding to the analysis is ATLAS-SUSY-2013-11 and its <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><em>constraint</em></a>
+(<span class="math">\([[[e^+]],[[e^-]]] + [[[\mu^+]],[[\mu^-]]]\)</span>) label is <em>TSlepSlep</em>. As a result, SModelS
+uses the analysis name:</p>
+<p><em>ATLAS-SUSY-2013-11:TSlepSlep</em></p>
+<p>A complete list of all constraint labels (or Tx names) can be found <a class="reference external" href="http://smodels.hephy.at/wiki/SmsDictionary">here</a>.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/banner180.png" alt="Logo"/>
+            </a></p>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="DatabaseDefinitions.html"
+                        title="previous chapter">Database Definitions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Structure.html"
+                        title="next chapter">SModelS Structure</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/AnalysesNames.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Structure.html" title="SModelS Structure"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="DatabaseDefinitions.html" title="Database Definitions"
+             >previous</a> |</li>
+        <li><a href="index.html">SModelS 1.0 documentation</a> &raquo;</li>
+          <li><a href="SModelSDefs.html" >Basic Concepts and Definitions</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, Michael Traub, Wolfgang Waltenberger.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

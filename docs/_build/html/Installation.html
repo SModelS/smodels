@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installation and Deployment &mdash; SModelS 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="_static/smodels.ico"/>
+    <link rel="top" title="SModelS 1.0 documentation" href="index.html" />
+    <link rel="next" title="Running SModelS" href="RunningSModelS.html" />
+    <link rel="prev" title="SModelS Tools" href="Tools.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="RunningSModelS.html" title="Running SModelS"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Tools.html" title="SModelS Tools"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">SModelS 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="installation-and-deployment">
+<h1>Installation and Deployment<a class="headerlink" href="#installation-and-deployment" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="standard-installation">
+<h2>Standard Installation<a class="headerlink" href="#standard-installation" title="Permalink to this headline">¶</a></h2>
+<p>SModelS is a Python library that requires Python version 2.6 or later
+(but not version 3).  Internally, SModelS uses the following tools:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference external" href="http://arxiv.org/abs/hep-ph/0603175">Pythia 6.4.27</a></li>
+<li><a class="reference external" href="http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast">NLL-fast</a> 1.2 (7 TeV) and 2.1 (8 TeV)</li>
+<li><a class="reference external" href="http://arxiv.org/abs/1305.4194">PySLHA</a> (modified version)</li>
+</ul>
+</div></blockquote>
+<p>These tools are built into SModelS, they need not be installed separately.
+In addition, SModelS depends on the following <em>external</em> Python libraries:</p>
+<blockquote>
+<div><ul class="simple">
+<li>unum</li>
+<li>numpy</li>
+<li>argparse</li>
+<li>docutils&gt;=0.3</li>
+<li>scipy&gt;=0.9.0</li>
+</ul>
+</div></blockquote>
+<p>For installation, SModelS makes use of Python&#8217;s <em>setuptools</em>.
+Thus</p>
+<div class="highlight-python"><div class="highlight"><pre>python setup.py install
+</pre></div>
+</div>
+<p>should install the entire project, compile the internal Pythia and NLL-fast versions
+using gfortran. It should also resolve the external dependencies, i.e. install
+the Python libraries listed above using e.g. <em>pip</em>.</p>
+<p>In case the compilation of SModelS fails, it is advised to try to compile
+the tools manually, by issuing &#8220;make&#8221; in the <em>lib/</em> directory.
+In case the installation of the external libraries fails, you can also try to install
+them manually, then rerun setup.py.  For SL6 machines, a recipe is given below.</p>
+<p>There is also a diagnostic tool available:</p>
+<div class="highlight-python"><div class="highlight"><pre>python smodels/tools/toolBox.py
+</pre></div>
+</div>
+<p>should list and check all internal tools (Pythia and NLL-fast) and external
+(numpy, scipy, unum, ... ) dependencies.</p>
+<p>In case everything fails, please contact <a class="reference external" href="mailto:smodels-support&#37;&#52;&#48;oeaw&#46;ac&#46;at">smodels-support<span>&#64;</span>oeaw<span>&#46;</span>ac<span>&#46;</span>at</a>.</p>
+</div>
+<div class="section" id="installation-on-sl6">
+<h2>Installation on SL6<a class="headerlink" href="#installation-on-sl6" title="Permalink to this headline">¶</a></h2>
+<p>Installation on an SL6 (Scientific Linux 6 or Scientific Linux CERN 6) machine
+is tricky, because SModelS requires a more recent version of <em>scipy</em> than is provided by SL6.
+We succeeded to install SModelS on SL6 by doing:</p>
+<blockquote>
+<div><ul class="simple">
+<li>yum install gcc-c++ libstdc++-devel libevent-devel python-devel lapack lapack-devel blas blas-devel libgfortran python-distutils-extra</li>
+</ul>
+</div></blockquote>
+<p>followed by:</p>
+<blockquote>
+<div><ul class="simple">
+<li>pip install nose unum argparse</li>
+<li>pip install numpy</li>
+<li>pip install pymc</li>
+<li>export LC_ALL=C; export LANG=C; pip install scipy</li>
+</ul>
+</div></blockquote>
+<p>Note, that these steps can safely be done within a Python <tt class="docutils literal"><span class="pre">virtualenv</span></tt>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/banner180.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installation and Deployment</a><ul>
+<li><a class="reference internal" href="#standard-installation">Standard Installation</a></li>
+<li><a class="reference internal" href="#installation-on-sl6">Installation on SL6</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Tools.html"
+                        title="previous chapter">SModelS Tools</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="RunningSModelS.html"
+                        title="next chapter">Running SModelS</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/Installation.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="RunningSModelS.html" title="Running SModelS"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Tools.html" title="SModelS Tools"
+             >previous</a> |</li>
+        <li><a href="index.html">SModelS 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, Michael Traub, Wolfgang Waltenberger.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

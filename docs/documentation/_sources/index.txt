@@ -1,0 +1,38 @@
+.. SModelS documentation master file.
+
+
+SModelS
+=======
+
+Last update: |today| 
+
+
+Contents
+========
+
+.. toctree::
+   :maxdepth: 2
+
+   theory
+   experiment
+   tools
+
+
+About this documentation
+========================
+
+Automated daily update:
+
+* 06:00 CET: Git pull
+* 06:05 CET: Sphinx checks for changes in the packages **Theory**, **Experiment** and **Tools**
+* 06:10 CET: Sphinx html build
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
+:doc:`math`
