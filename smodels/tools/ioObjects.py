@@ -221,7 +221,7 @@ class SlhaStatus(Printer):
     = 0 : the file is not checked,
     = 1: the check is ok
     = -1: case of a physical problem, e.g. charged LSP,
-    = -2: case of formal problems, e.g. missing decay blocks, in the file
+    = -2: case of formal problems, e.g. no cross sections
     :ivar filename: path to input SLHA file
     :ivar maxDisplacement: maximum c*tau for promt decays in meters
     :ivar sigmacut: sigmacut in fb
