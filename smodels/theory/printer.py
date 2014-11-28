@@ -240,7 +240,7 @@ class Printer(object):
 
         output += "\n \n"
         output += "================================================================================\n"
-        output += "The highest R value is r_ratio = " + str(self.getR(bestresult)) + "\n"
+        output += "The highest r value is = " + str(self.getR(bestresult)) + "\n"
 
         return output
 
