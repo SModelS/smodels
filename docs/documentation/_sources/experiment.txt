@@ -1,0 +1,59 @@
+experiment Package
+==================
+
+:mod:`experiment` Package
+-------------------------
+
+.. automodule:: experiment.__init__
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`experimentExceptions` Module
+----------------------------------
+
+.. automodule:: experiment.experimentExceptions
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`limitGetter` Module
+-------------------------
+
+.. automodule:: experiment.limitGetter
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`smsAnalysisFactory` Module
+--------------------------------
+
+.. automodule:: experiment.smsAnalysisFactory
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`smsHelpers` Module
+------------------------
+
+.. automodule:: experiment.smsHelpers
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`smsInterpolation` Module
+------------------------------
+
+.. automodule:: experiment.smsInterpolation
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`smsResults` Module
+------------------------
+
+.. automodule:: experiment.smsResults
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

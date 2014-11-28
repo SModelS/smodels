@@ -1,0 +1,99 @@
+HowTo
+=====
+
+Using the **rst** markup syntax can help others understand complex functions or methods. There's merely one important thing to remember:
+
+* **rst** uses 3 spaces (instead of Python's recommended 4) for indention
+
+Further reading:
+
+   http://sphinx-doc.org/rest.html
+
+
+Example 1
+---------
+
+Here's an example for function arguments, return values and other markups::
+
+   def some_function(user, password):
+       """This function does something.
+       
+       Args:
+          user (str): The username to use.
+          password (str): The password to use.
+
+       Returns:
+          int. The return code::
+
+             0 -- Error
+             1 -- Success
+
+       Raises:
+          AttributeError, KeyError
+
+       Usage:
+
+       >>> print some_function('putin', 'asdf1234')
+       1
+
+       'putin' is just an example. This function always returns 1.
+
+       """
+       return 1
+
+
+In the documentation you will see the following result:
+
+   Args:
+      user (str): The username to use.
+
+      password (str): The password to use.
+
+   Returns:
+      int. The return code::
+
+         0 -- Error
+         1 -- Success
+
+   Raises:
+      AttributeError, KeyError
+
+   Usage::
+      
+      >>> print some_function('putin', 'asdf1234')
+      1
+   
+   'putin' is just an example. This function always returns 0.
+
+
+Example 2
+---------
+
+Sphinx adds a few neat directives to **rst**. Using them results in a better looking output::
+
+   def some_function(user, password):
+       """This function does something.
+       
+       :param user: The username to use.
+       :type user: str
+       :param password: The password to use.
+       :type password: str
+       :returns: int -- the return code.
+       :raises: AttributeError, KeyError
+
+       """
+       return 1
+
+
+Here's what you will get:
+
+   =============== =======================================
+   **Parameters:** * user (str) - The username to use.
+                   * password (str) - The password to use.
+
+   **Returns:**    int - the return code.
+   
+   **Raises:**     AttributeError, KeyError
+   =============== =======================================
+
+

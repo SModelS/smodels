@@ -1,0 +1,139 @@
+tools Package
+=============
+
+:mod:`tools` Package
+--------------------
+
+.. automodule:: tools.__init__
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`asciiGraph` Module
+------------------------
+
+.. automodule:: tools.asciiGraph
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`externalNllFast` Module
+-----------------------------
+
+.. automodule:: tools.externalNllFast
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`externalPythia6` Module
+-----------------------------
+
+.. automodule:: tools.externalPythia6
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`externalPythonTools` Module
+---------------------------------
+
+.. automodule:: tools.externalPythonTools
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`externalTool` Module
+--------------------------
+
+.. automodule:: tools.externalTool
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`ioObjects` Module
+-----------------------
+
+.. automodule:: tools.ioObjects
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`lheChecks` Module
+-----------------------
+
+.. automodule:: tools.lheChecks
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`missingTopologies` Module
+-------------------------------
+
+.. automodule:: tools.missingTopologies
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`modpyslha` Module
+-----------------------
+
+.. automodule:: tools.modpyslha
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`nllFast` Module
+---------------------
+
+.. automodule:: tools.nllFast
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`physicsUnits` Module
+--------------------------
+
+.. automodule:: tools.physicsUnits
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`slhaChecks` Module
+------------------------
+
+.. automodule:: tools.slhaChecks
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`summaryReader` Module
+---------------------------
+
+.. automodule:: tools.summaryReader
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`toolBox` Module
+---------------------
+
+.. automodule:: tools.toolBox
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`uniqueLogFilter` Module
+-----------------------------
+
+.. automodule:: tools.uniqueLogFilter
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`xsecComputer` Module
+--------------------------
+
+.. automodule:: tools.xsecComputer
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

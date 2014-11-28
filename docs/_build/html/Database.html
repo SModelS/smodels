@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Database of Experimental Analyses &mdash; SModelS 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="_static/smodels.ico"/>
+    <link rel="top" title="SModelS 1.0 documentation" href="index.html" />
+    <link rel="up" title="SModelS Structure" href="Structure.html" />
+    <link rel="next" title="SModelS Tools" href="Tools.html" />
+    <link rel="prev" title="Theory Predictions" href="TheoryPredictions.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Tools.html" title="SModelS Tools"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="TheoryPredictions.html" title="Theory Predictions"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">SModelS 1.0 documentation</a> &raquo;</li>
+          <li><a href="Structure.html" accesskey="U">SModelS Structure</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="database-of-experimental-analyses">
+<h1>Database of Experimental Analyses<a class="headerlink" href="#database-of-experimental-analyses" title="Permalink to this headline">¶</a></h1>
+<p>SModelS stores all the information about the experimental results in an <a class="reference internal" href="DatabaseDefinitions.html#ulanalysis"><em>analyses</em></a>
+database <a class="footnote-reference" href="#id2" id="id1">[*]</a>. The database is organized as files in an ordinary (UNIX) directory hierarchy,
+with a thin python layer serving as the access to the database.</p>
+<p>The top level of the SModelS database categorizes the analyses by LHC center-of-mass energies, <span class="math">\(\sqrt{s}\)</span>:</p>
+<ul class="simple">
+<li>7TeV</li>
+<li>8TeV</li>
+</ul>
+<p>Also, the top level directory contains a file called <tt class="docutils literal"><span class="pre">version</span></tt> with the version string
+of the database.</p>
+<p>The second level splits the results up between the different experiments:</p>
+<ul class="simple">
+<li>8TeV/CMS/</li>
+<li>8TeV/ATLAS/</li>
+</ul>
+<p>The third level of the directory hierarchy encodes the publications:</p>
+<ul class="simple">
+<li>8TeV/CMS/CMS-SUS-12-028</li>
+<li>8TeV/ATLAS/ATLAS-SUSY-2013-12</li>
+<li>...</li>
+</ul>
+<p>For each publication, there are two files:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">sms.py</span></tt> contains the experimental results for the cross-section upper limits as a function of the mass parameters, as python code.
+The code will fill a nested <tt class="docutils literal"><span class="pre">Dict</span></tt> dictionary with the upper limits. The dictionary keys are the corresponding <em>Txnames</em> for the
+analysis <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><em>constraint</em></a> (see <a class="reference internal" href="AnalysesNames.html"><em>Analyses Names</em></a>).</li>
+<li><tt class="docutils literal"><span class="pre">info.txt</span></tt> contains all the meta information around the publication. Here is the content of CMS-SUS-13-006 as an example:</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre>sqrts: 8.0*TeV
+lumi: 19.5/fb
+id: CMS-SUS-13-006
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13006
+arxiv: http://arxiv.org/abs/1405.7570
+publication: http://link.springer.com/article/10.1140%2Fepjc%2Fs10052-014-3036-7
+supersedes: CMS-PAS-SUS-12-022
+digitaldata: True
+</pre></div>
+</div>
+<p>In particular, it defines the center-of-mass energy <span class="math">\(\sqrt{s}\)</span> (in TeV) and the integrated luminosity, <span class="math">\(\mathrm{fb}^{-1}\)</span>.
+Optionally, units (e.g. &#8220;* TeV&#8221; or &#8220;/ fb&#8221;) can be added to the number.</p>
+<p>The next block:</p>
+<div class="highlight-python"><div class="highlight"><pre>constraint: TChiWZ -&gt; [[[&#39;W&#39;]],[[&#39;Z&#39;]]]
+constraint: TSlepSlep -&gt; [[[&#39;e+&#39;]],[[&#39;e-&#39;]]]+[[[&#39;mu+&#39;]],[[&#39;mu-&#39;]]]
+fuzzycondition: TChiWZ -&gt; None
+fuzzycondition: TSlepSlep -&gt; Cgtr([[[&#39;mu+&#39;]],[[&#39;mu-&#39;]]],[[[&#39;e+&#39;]],[[&#39;e-&#39;]]])
+</pre></div>
+</div>
+<p>holds the constraint and conditions, as described in <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><em>constraint</em></a>, and <a class="reference internal" href="DatabaseDefinitions.html#ulconditions"><em>conditions</em></a>, respectively.</p>
+<p>Finally,</p>
+<div class="highlight-python"><div class="highlight"><pre>axes: TChiWZ: M1 M0, TSlepSlep: M1 M0, TChiChipmSlepL: M1 M0 050 -  M1 M0 005 - M1 M0 095, TChiChipmSlepStau:  M1 M0 050 - M1 M0 005 - M1 M0 095,TChiWZoff: M1 M0, TChiWH: M1 M0
+</pre></div>
+</div>
+<p>describes the mass planes and how for analyses with intermediate masses, the
+two-dimensional histograms map onto the three-dimensional SMS parameter space.</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[*]</a></td><td>Currently only cross section upper limits are included (see <a class="reference internal" href="DatabaseDefinitions.html#ulanalysis"><em>UL Analyses</em></a>).</td></tr>
+</tbody>
+</table>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/banner180.png" alt="Logo"/>
+            </a></p>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="TheoryPredictions.html"
+                        title="previous chapter">Theory Predictions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Tools.html"
+                        title="next chapter">SModelS Tools</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/Database.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Tools.html" title="SModelS Tools"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="TheoryPredictions.html" title="Theory Predictions"
+             >previous</a> |</li>
+        <li><a href="index.html">SModelS 1.0 documentation</a> &raquo;</li>
+          <li><a href="Structure.html" >SModelS Structure</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, Michael Traub, Wolfgang Waltenberger.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

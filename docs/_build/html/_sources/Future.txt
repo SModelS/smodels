@@ -1,0 +1,15 @@
+Future developments
+===================
+
+The following is a list of features that are foreseen for future versions of SModelS (>= 1.1):
+
+ * *approximate likelihoods:* knowing the observed *and* the expected upper limits on production cross sections, one can construct approximate truncated Gaussian likelihoods. We will check with individual examples that our approximations indeed hold, i.e: that they really are appropiate approximation to the full likelihoods computed internally by the experiments.
+ * *heavy charged stable particles:* heavy charged stable particles feature very distinct signatures at the LHC collider; we intend to include such signatures in our framework.
+ * *kinematic filters:* kinematic studies might indicate regions in simplified models parameter space where certain results cannot be applied to certain theories. For example, the SUS12011:T2 results for low squark masses might not be applicable to UED scenarios, because the kinematic differences might be too large. Kinematic filters would accomodate for such findings and guarantee that the results arent applied in problematic parts of SMS parameter space.  * support for efficiency maps: In of the versions to come we want to introduce also the construction of upper limits based on the efficiency maps, similar to the effort of the fastlim team [1]
+ * *pythia8:* since quite some time now pythia6 is considered legacy and migration to pythia8 has been strongly encouraged by the pythia authors.  We will follow their advice.
+ * and much more
+ * ...
+
+**References**:
+
+ [1] http://arxiv.org/abs/1402.0492

@@ -1,0 +1,115 @@
+theory Package
+==============
+
+:mod:`theory` Package
+---------------------
+
+.. automodule:: theory.__init__
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`analysis` Module
+----------------------
+
+.. automodule:: theory.analysis
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`auxiliaryFunctions` Module
+--------------------------------
+
+.. automodule:: theory.auxiliaryFunctions
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`branch` Module
+--------------------
+
+.. automodule:: theory.branch
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`clusterTools` Module
+--------------------------
+
+.. automodule:: theory.clusterTools
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`crossSection` Module
+--------------------------
+
+.. automodule:: theory.crossSection
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`element` Module
+---------------------
+
+.. automodule:: theory.element
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`lheDecomposer` Module
+---------------------------
+
+.. automodule:: theory.lheDecomposer
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`lheReader` Module
+-----------------------
+
+.. automodule:: theory.lheReader
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`particleNames` Module
+---------------------------
+
+.. automodule:: theory.particleNames
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`printer` Module
+---------------------
+
+.. automodule:: theory.printer
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`slhaDecomposer` Module
+----------------------------
+
+.. automodule:: theory.slhaDecomposer
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`theoryPrediction` Module
+------------------------------
+
+.. automodule:: theory.theoryPrediction
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`topology` Module
+----------------------
+
+.. automodule:: theory.topology
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

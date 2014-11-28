@@ -1,0 +1,374 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SModelS Tools &mdash; SModelS 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="_static/smodels.ico"/>
+    <link rel="top" title="SModelS 1.0 documentation" href="index.html" />
+    <link rel="up" title="SModelS Structure" href="Structure.html" />
+    <link rel="next" title="Installation and Deployment" href="Installation.html" />
+    <link rel="prev" title="Database of Experimental Analyses" href="Database.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Installation.html" title="Installation and Deployment"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Database.html" title="Database of Experimental Analyses"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">SModelS 1.0 documentation</a> &raquo;</li>
+          <li><a href="Structure.html" accesskey="U">SModelS Structure</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="smodels-tools">
+<h1>SModelS Tools<a class="headerlink" href="#smodels-tools" title="Permalink to this headline">¶</a></h1>
+<p>Inside SModelS there are a number of tools that may be convenient for the user:</p>
+<ul class="simple">
+<li>a <a class="reference internal" href="#xseccalc"><em>cross section calculator</em></a> based on <a class="reference external" href="http://home.thep.lu.se/~torbjorn/Pythia.html">Pythia6</a>  and
+<a class="reference external" href="http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast">NLLfast</a>,</li>
+<li><a class="reference internal" href="#filechecks"><em>SLHA and LHE file checkers</em></a> to check your input files for completeness and sanity,</li>
+<li>a module for identifying <a class="reference internal" href="#misstops"><em>missing topologies</em></a>.</li>
+</ul>
+<div class="section" id="cross-section-calculator">
+<span id="xseccalc"></span><h2>Cross-Section Calculator<a class="headerlink" href="#cross-section-calculator" title="Permalink to this headline">¶</a></h2>
+<p>This little tool computes LHC production cross-sections for <em>MSSM particles</em>
+and writes them out in <a class="reference internal" href="BasicInput.html#xsecblock"><em>SLHA convention</em></a>. This can in particular be convenient for adding cross-sections to SLHA input files, see <a class="reference internal" href="BasicInput.html"><em>Basic Input</em></a>. The calculation is done at LO with <a class="reference external" href="http://home.thep.lu.se/~torbjorn/Pythia.html">Pythia6.4</a> ; K-factors for colored particles are computed with <a class="reference external" href="http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast">NLLfast</a> .</p>
+<p><strong>The usage of the cross-section calculator is:</strong></p>
+<p>runTools.py xseccomputer [-h]  [-h] -f FILENAME [-s SQRTS [SQRTS ...]] [-e NEVENTS] [-p] [-k] [-n] [-N] [-O]</p>
+<dl class="docutils">
+<dt><em>arguments</em>:</dt>
+<dd><table class="first last docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-h</span>, <span class="option">--help</span></kbd></td>
+<td>show this help message and exit</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-s <var>SQRTS</var></span>, <span class="option">--sqrts <var>SQRTS</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>sqrt(s) TeV. Can supply more than one value.</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-e <var>NEVENTS</var></span>, <span class="option">--nevents <var>NEVENTS</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>number of events to be simulated.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-p</span>, <span class="option">--tofile</span></kbd></td>
+<td>write cross sections to file</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-k</span>, <span class="option">--keep</span></kbd></td>
+<td>do not unlink temporary directory</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-n</span>, <span class="option">--NLO</span></kbd></td>
+<td>compute at the NLO level (default is LO)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-N</span>, <span class="option">--NLL</span></kbd></td>
+<td>compute at the NLO+NLL level (takes precedence over NLO,
+default is LO)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-O</span>, <span class="option">--LOfromSLHA</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>use LO cross-sections from file to compute the NLO or
+NLO+NLL cross-sections</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-f <var>FILENAME</var></span>, <span class="option">--filename <var>FILENAME</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>SLHA file to compute cross sections for</td></tr>
+</tbody>
+</table>
+</dd>
+</dl>
+<p>Some more explanations:</p>
+<ul class="simple">
+<li><em>-s</em> (int): an integer with the value (in TeV) of the LHC center-of-mass energy for computing the cross-sections</li>
+<li><em>-e</em> (int): the number of Monte Carlo events when running Pythia</li>
+<li><em>-p</em>: if set, the cross-sections will be written back to the file. If in the input file already
+contains cross-sections, only the non-overlapping ones will be written. If not set, the cross-sections
+will be written to the screen.</li>
+<li><em>-k</em>: if set, keep the temporary directory containing the Pythia run output. This option is only
+relevant when checking for errors when running Pythia.</li>
+<li><em>-n</em>: if set, use Pythia and NLLfast to compute NLO cross-sections. Note that since NLLfast only contains
+results for production of squarks and gluinos, only these cross-sections will be generated</li>
+<li><em>-N</em>: if set, use Pythia and NLLfast to compute NLO+NLL cross-sections. Note that since NLLfast only contains
+results for production of squarks and gluinos, only these cross-sections will be generated</li>
+<li><em>-O</em>: if set, SModelS will read the LO cross-sections from the input file
+and use NLLfast to compute the NLO or NLO+NLL cross-sections for squarks and gluinos</li>
+<li><em>-f</em>: name of input SLHA file</li>
+</ul>
+<p>Further Pythia parameters are defined in <a class="reference download internal" href="_downloads/pythia.card"><tt class="xref download docutils literal"><span class="pre">etc/pythia.card</span></tt></a>.</p>
+<p>A typical
+usage example is:</p>
+<div class="highlight-python"><div class="highlight"><pre>runTools.py xseccomputer -s 8 -e 10000 -p -f compressedSpec.slha
+</pre></div>
+</div>
+<p>which will compute 8 TeV LO cross-sections (at the LHC) for all MSSM processes using 10k MC events.
+If, <em>after</em> the LO cross-sections have been computed, one wants to add the NLO+NLL cross-sections for gluinos and squarks:</p>
+<div class="highlight-python"><div class="highlight"><pre>runTools.py xseccomputer -s 8 -p -N -O -f compressedSpec.slha
+</pre></div>
+</div>
+<p>The resulting file will then contain LO cross-sections for all MSSM processes and NLO+NLL cross-sections for gluinos and squarks.
+When reading the input file, SModelS will then use only the highest order cross-sections available for each process.</p>
+</div>
+<div class="section" id="input-file-checks">
+<span id="filechecks"></span><h2>Input File Checks<a class="headerlink" href="#input-file-checks" title="Permalink to this headline">¶</a></h2>
+<p>As discussed in <a class="reference internal" href="BasicInput.html"><em>Basic Input</em></a>, SModelS accepts both SLHA and LHE input files. It can be convenient to perform certain sanity checks on these files as described below.</p>
+<ul class="simple">
+<li><strong>The input file checks are implemented by the</strong> <a class="reference external" href="../../documentation/tools.html#tools.ioObjects.FileStatus">FileStatus class</a></li>
+</ul>
+<div class="section" id="lhe-file-checker">
+<span id="lhechecks"></span><h3>LHE File Checker<a class="headerlink" href="#lhe-file-checker" title="Permalink to this headline">¶</a></h3>
+<p>For a LHE input file only very basic checks are performed, namely that</p>
+<ul class="simple">
+<li>the file exists,</li>
+<li>it contains at least one event,</li>
+<li>the information on the total cross section and the center of mass energy can be found.</li>
+</ul>
+<p><strong>The usage of the LHE checker is simply:</strong></p>
+<p>runTools.py lhechecker [-h] -f FILENAME</p>
+<dl class="docutils">
+<dt><em>arguments</em>:</dt>
+<dd><table class="first docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-h</span>, <span class="option">--help</span></kbd></td>
+<td>show this help message and exit</td></tr>
+</tbody>
+</table>
+<p class="last">-f FILENAME, &#8211;filename FILENAME</p>
+</dd>
+</dl>
+<p>A typical
+usage example is:</p>
+<div class="highlight-python"><div class="highlight"><pre>runTools.py lhechecker -f gluino_squarks.lhe
+</pre></div>
+</div>
+</div>
+<div class="section" id="slha-file-checker">
+<span id="slhachecks"></span><h3>SLHA File Checker<a class="headerlink" href="#slha-file-checker" title="Permalink to this headline">¶</a></h3>
+<p>The SLHA file checker allows to perform quite rigorous checks of SLHA input files. Concretely, it verifies that</p>
+<ul class="simple">
+<li>the file exists and is given in SLHA format,</li>
+<li>the file contains masses and decay branching ratios in standard SLHA format</li>
+<li>the file contains cross-sections according to the <a class="reference internal" href="BasicInput.html#xsecslha"><em>SLHA format for cross-sections</em></a>,</li>
+<li>the lightest <a class="reference internal" href="TheoryDefinitions.html#odd-states"><em>Z2-odd state</em></a> (the LSP in supersymmetric models) is neutral,</li>
+<li>there are no stable charged particles nor displaced vertices (no non-prompt visible decays), as currently all the analyses considered by SModelS require a prompt MET signature.</li>
+</ul>
+<p>In addition, one can ask that</p>
+<ul class="simple">
+<li>all decays listed in the DECAY block are kinematically allowed, <em>i.e.</em> the sum of masses of the decay products may not exceed the mother mass. <em>NB This check for &#8220;illegal decays&#8221; is turned off by default.</em></li>
+</ul>
+<p>If any of the above tests fail (return a negative result), an error message is shown.</p>
+<p>Some more comments are in order.
+In order to check that the lightest Z<sub>2</sub>-odd state has zero electric and color charges, the quantum numbers of the BSM particles must be given in the
+<tt class="docutils literal"><span class="pre">qNumbers</span></tt> dictionary in <a class="reference download internal" href="_downloads/particles.py"><tt class="xref download docutils literal"><span class="pre">particles.py</span></tt></a>. The format is</p>
+<p><tt class="docutils literal"><span class="pre">[2*spin,</span> <span class="pre">3*electric</span> <span class="pre">charge,</span> <span class="pre">dimension</span> <span class="pre">of</span> <span class="pre">SU(3)</span> <span class="pre">representation]</span></tt></p>
+<p>The list of quantum numbers is also required to check for displaced vertices or heavy charged particles.
+The check for long-lived (or stable) particles first verifies if these
+appear in one of the cross-section blocks and their cross-section
+exceeds the minimum cross-section value defined by <a class="reference internal" href="RunningSModelS.html#parameterfile"><em>sigmacut</em></a> (see  <a class="reference internal" href="Decomposition.html#minweight"><em>Minimum Decomposition Weight</em></a>).
+If the cross-section is larger than sigmacut and the particle is stable,
+the checker verifies if it is neutral (both electric and color charges
+are zero). On the other hand, if the particle is unstable, but its lifetime (times <em>c</em>)
+is larger than a minimum value (<em>default = 10 mm</em>), the particle is considered
+as a non-prompt decay.
+For non-prompt decays, all channels are then checked for visible decay products.
+If the branching ratio to visible decays times the maximum production cross-section
+for the particle exceeds <a class="reference internal" href="RunningSModelS.html#parameterfile"><em>sigmacut</em></a>, the particle&#8217;s decay
+is considered as a displaced vertex.</p>
+<p><strong>The usage of the SLHA checker is:</strong></p>
+<p>runTools.py slhachecker [-h] [-xS] [-lsp] [-longlived] [-m DISPLACEMENT] [-s SIGMACUT] [-illegal] -f FILENAME</p>
+<dl class="docutils">
+<dt><em>arguments</em>:</dt>
+<dd><table class="first last docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-h</span>, <span class="option">--help</span></kbd></td>
+<td>show this help message and exit</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-x<var>S</var></span>, <span class="option">--xsec</span></kbd></td>
+<td>turn off the check for xsection blocks</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-l<var>sp</var></span>, <span class="option">--lsp</span></kbd></td>
+<td>turn off the check for charged lsp</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-l<var>onglived</var></span>, <span class="option">--longlived</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>turn off the check for stable charged particles and
+visible displaced vertices</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-m <var>DISPLACEMENT</var></span>, <span class="option">--displacement <var>DISPLACEMENT</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>give maximum displacement of secondary vertex in m</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-s <var>SIGMACUT</var></span>, <span class="option">--sigmacut <var>SIGMACUT</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>give sigmacut in fb</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-i<var>llegal</var></span>, <span class="option">--illegal</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>turn on check for kinematically forbidden decays</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-d<var>B</var></span>, <span class="option">--decayBlocks</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>turn off the check for missing decay blocks</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-f <var>FILENAME</var></span>, <span class="option">--filename <var>FILENAME</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>name of input SLHA file</td></tr>
+</tbody>
+</table>
+</dd>
+</dl>
+<p>In some more detail:</p>
+<ul class="simple">
+<li><em>-f</em>: path to the input file</li>
+<li><em>-xS</em>: if this flag is set, the check for a cross section block will not be performed</li>
+<li><em>-lsp</em>: if this flag is set, the check for a neutral LSP will not be performed</li>
+<li><em>-longlived</em>: if this flag is set, check for non-prompt visible decays or stable charged particles will not be performed</li>
+<li><em>-m</em> (float): use this to set the value of c*tau (in meters) where a decay is no longer considered prompt</li>
+<li><em>-s</em> (float): use this to set the value of sigmacut, that is used as a cutoff for relevant non-promt decays or long lived charged particle production</li>
+<li><em>-illegal</em>: if this flag is set, the check for illegal (kinematically forbidden) decays will be performed</li>
+<li><em>-dB</em>: if this flag is set, the check for missing decay blocks will not be performed</li>
+</ul>
+<p>A typical
+usage example is:</p>
+<div class="highlight-python"><div class="highlight"><pre>runTools.py slhachecker -m 0.001 -s 0.01 -f lightSquarks.slha
+</pre></div>
+</div>
+<p>Running this will print the status flag and a message with potential warnings
+and error messages.</p>
+</div>
+</div>
+<div class="section" id="missing-topologies">
+<span id="misstops"></span><h2>Missing Topologies<a class="headerlink" href="#missing-topologies" title="Permalink to this headline">¶</a></h2>
+<p>Unlike the <a class="reference internal" href="#filechecks"><em>file checks</em></a> and the <a class="reference internal" href="#xseccalc"><em>cross-section calculator</em></a>, the missing topologies tool can be called only <em>after</em> the SMS <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> and <a class="reference internal" href="TheoryPredictions.html"><em>theory predictions</em></a> have been computed.
+Given the <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> output (list of <a class="reference internal" href="TheoryDefinitions.html#element"><em>elements</em></a>), as well as the <a class="reference internal" href="Database.html"><em>database</em></a>
+information, it finds the <a class="reference internal" href="TheoryDefinitions.html#element"><em>elements</em></a> which are
+not tested by any of the <a class="reference internal" href="DatabaseDefinitions.html#ulanalysis"><em>analyses</em></a> in the <a class="reference internal" href="Database.html"><em>database</em></a>.</p>
+<p>To this end, the tool loops over all the <a class="reference internal" href="TheoryDefinitions.html#element"><em>elements</em></a> found in the
+<a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> and checks if they are tested by one or more <a class="reference internal" href="DatabaseDefinitions.html#ulanalysis"><em>analyses</em></a> in the <a class="reference internal" href="Database.html"><em>database</em></a>.
+If <a class="reference internal" href="Decomposition.html#masscomp"><em>mass</em></a> or <a class="reference internal" href="Decomposition.html#invcomp"><em>invisible compression</em></a>
+are turned on, elements which can be <a class="reference internal" href="Decomposition.html#elementcomp"><em>compressed</em></a> are not considered, to avoid double counting.
+All the <a class="reference internal" href="TheoryDefinitions.html#element"><em>elements</em></a> not appearing in any of the <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><em>constraints</em></a> in the <a class="reference internal" href="Database.html"><em>database</em></a> are then marked
+as &#8220;missing&#8221;. A missing topology is then characterized
+by a sum over the missing <a class="reference internal" href="TheoryDefinitions.html#element"><em>elements</em></a> differing only by their
+masses (with the same <a class="reference internal" href="TheoryDefinitions.html#final-states"><em>final states</em></a>) or electric charges.</p>
+<p>The missing topologies tool is normally called from within SModelS (e.g. when running <a class="reference internal" href="RunningSModelS.html#runsmodels"><em>runSModelS.py</em></a>) by setting <strong>findMissingTopos=True</strong>
+in the <a class="reference internal" href="RunningSModelS.html#parameterfile"><em>parameters file</em></a> .
+In the output, the missing topologies are ordered by cross section. By default only the ones with the ten largest cross-sections are shown.</p>
+<ul class="simple">
+<li><strong>The missing topologies tool is implemented by</strong> <a class="reference external" href="../../documentation/tools.html#module-tools.missingTopologies">findMissingTopos</a> <strong>method</strong></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/banner180.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">SModelS Tools</a><ul>
+<li><a class="reference internal" href="#cross-section-calculator">Cross-Section Calculator</a></li>
+<li><a class="reference internal" href="#input-file-checks">Input File Checks</a><ul>
+<li><a class="reference internal" href="#lhe-file-checker">LHE File Checker</a></li>
+<li><a class="reference internal" href="#slha-file-checker">SLHA File Checker</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#missing-topologies">Missing Topologies</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Database.html"
+                        title="previous chapter">Database of Experimental Analyses</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Installation.html"
+                        title="next chapter">Installation and Deployment</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/Tools.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Installation.html" title="Installation and Deployment"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Database.html" title="Database of Experimental Analyses"
+             >previous</a> |</li>
+        <li><a href="index.html">SModelS 1.0 documentation</a> &raquo;</li>
+          <li><a href="Structure.html" >SModelS Structure</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, Michael Traub, Wolfgang Waltenberger.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Database Definitions &mdash; SModelS 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="_static/smodels.ico"/>
+    <link rel="top" title="SModelS 1.0 documentation" href="index.html" />
+    <link rel="up" title="Basic Concepts and Definitions" href="SModelSDefs.html" />
+    <link rel="next" title="Analyses Names" href="AnalysesNames.html" />
+    <link rel="prev" title="Theory Definitions" href="TheoryDefinitions.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="AnalysesNames.html" title="Analyses Names"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="TheoryDefinitions.html" title="Theory Definitions"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">SModelS 1.0 documentation</a> &raquo;</li>
+          <li><a href="SModelSDefs.html" accesskey="U">Basic Concepts and Definitions</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="database-definitions">
+<span id="databasedefs"></span><h1>Database Definitions<a class="headerlink" href="#database-definitions" title="Permalink to this headline">¶</a></h1>
+<p>The SModelS database collects experimental results from both ATLAS and CMS.
+The results from each publication or conference note can be included in the database either as an
+<a class="reference internal" href="#ulanalysis"><em>Upper Limit Analysis</em></a> or <a class="reference internal" href="#emanalysis"><em>Efficiency Map Analysis</em></a>.</p>
+<div class="section" id="upper-limit-analyses">
+<span id="ulanalysis"></span><h2>Upper Limit Analyses<a class="headerlink" href="#upper-limit-analyses" title="Permalink to this headline">¶</a></h2>
+<p>Upper Limit (UL) analyses refer to the experimental constraints on the cross-section times branching ratio
+( <span class="math">\(\sigma \times BR\)</span> ) from a specific experimental publication or conference note.
+Each UL analysis corresponds to the 95% upper limit constraints on <span class="math">\(\sigma \times BR\)</span> for a given
+<a class="reference internal" href="TheoryDefinitions.html#element"><em>element</em></a> or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><em>elements</em></a>.
+For illustration, consider this CMS example:</p>
+<a class="reference internal image-reference" href="_images/ULexample.png" id="ulplot"><img alt="_images/ULexample.png" id="ulplot" src="_images/ULexample.png" style="height: 480px;" /></a>
+<p>In this case the UL analysis constrains the element <span class="math">\([[[jet]],[[jet]]]\)</span>, where we are using the notation
+defined in <a class="reference internal" href="TheoryDefinitions.html#bracketnotation"><em>Bracket Notation</em></a>.</p>
+<p>Each individual UL analysis holds the upper limit values on <span class="math">\(\sigma \times BR\)</span> as a function of the respective
+parameter space (usually BSM masses or slices over mass planes). Furthermore, the corresponding <a class="reference internal" href="#ulconstraint"><em>constraints</em></a>
+and <a class="reference internal" href="#ulconditions"><em>conditions</em></a> must also be specified.
+UL analyses may also contain information about the analysis luminosity, center-of-mass, publication reference and others.
+<em>We also point out that the exclusion curve is never used by SModelS</em>.</p>
+<p>Note that a given experimental publication (or conference note) may contain several UL analyses, since a single
+publication may contain upper limits for several different <a class="reference internal" href="TheoryDefinitions.html#element"><em>elements</em></a> (or <a class="reference internal" href="#ulconstraint"><em>constraints</em></a>).</p>
+<ul class="simple">
+<li><strong>UL analyses are described by the</strong> <a class="reference external" href="../../documentation/theory.html#theory.analysis.ULanalysis">ULanalysis Class</a></li>
+</ul>
+<div class="section" id="analysis-constraints">
+<span id="ulconstraint"></span><h3>Analysis Constraints<a class="headerlink" href="#analysis-constraints" title="Permalink to this headline">¶</a></h3>
+<p>Constraints are defined as the <a class="reference internal" href="TheoryDefinitions.html#element"><em>element</em></a> or sum over <a class="reference internal" href="TheoryDefinitions.html#element"><em>elements</em></a>
+which is constrained by the experimental upper limits. The analysis constraints can also be simply expressed in the
+<a class="reference internal" href="TheoryDefinitions.html#bracketnotation"><em>bracket notation</em></a> as a sum of individual elements.</p>
+<p>As an example, consider the <a class="reference external" href="https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-049/">ATLAS analysis</a> shown below:</p>
+<a class="reference internal image-reference" href="_images/constraintExample.png" id="constraintplot"><img alt="_images/constraintExample.png" id="constraintplot" src="_images/constraintExample.png" style="height: 580px;" /></a>
+<p>As we can see, the upper limits apply to the sum of the cross-sections:</p>
+<div class="math">
+\[\sigma = \sigma([[[e^+]],[[e^-]]]) + \sigma([[[\mu^+]],[[\mu^-]]])\]</div>
+<p>In this case the analysis constraint is simply:</p>
+<div class="math">
+\[[[[e^+]],[[e^-]]] + [[[\mu^+]],[[\mu^-]]]\]</div>
+<p>where it is understood that the sum is over the weights of the respective elements
+and not over the elements themselves.</p>
+<p>Note that the sum can be over particle charges, flavors or more complex combinations of elements.
+However, <em>almost all analyses sum only over elements sharing a common</em> <a class="reference internal" href="TheoryDefinitions.html#topology"><em>topology</em></a>.</p>
+</div>
+<div class="section" id="analysis-conditions">
+<span id="ulconditions"></span><h3>Analysis Conditions<a class="headerlink" href="#analysis-conditions" title="Permalink to this headline">¶</a></h3>
+<p>When the analysis <a class="reference internal" href="#ulconstraint"><em>constraints</em></a> are non-trivial (refer to a sum of elements), it is often the case
+that there are implicit (or explicit) assumptions about the contribution of each element. For instance,
+in the <a class="reference internal" href="#constraintplot"><em>figure above</em></a>, it is implicitly assumed that each lepton flavor contributes equally
+to the summed cross-section:</p>
+<div class="math">
+\[\sigma([[[e^+]],[[e^-]]]) = \sigma([[[\mu^+]],[[\mu^-]]])           \;\;\; \mbox{(condition)}\]</div>
+<p>Therefore, when applying these constraints to general models, one must also verify if
+these conditions are satisfied. Once again we can express these conditions in
+<a class="reference internal" href="TheoryDefinitions.html#bracketnotation"><em>bracket notation</em></a>:</p>
+<div class="math">
+\[[[[e^+]],[[e^-]]] = [[[\mu^+]],[[\mu^-]]]           \;\;\; \mbox{(condition)}\]</div>
+<p>where it is understood that the condition refers to the weights of the respective elements
+and not to the elements themselves.</p>
+<p>In several cases it is desirable to relax the analysis conditions, so the analysis
+upper limits can be applied to a broader spectrum of models. Once again, for the example mentioned
+above, it might be reasonable to impose instead:</p>
+<div class="math">
+\[[[[e^+]],[[e^-]]] \simeq [[[\mu^+]],[[\mu^-]]]           \;\;\; \mbox{(fuzzy condition)}\]</div>
+<p>The <em>departure</em> from the exact condition can then be properly quantified and one can decide whether the analysis upper limits are applicable or not to the model being considered.
+Concretely, for each condition a number between 0 and 1 is returned,
+where 0 means the condition is exactly satisfied and 1 means it is maximally violated.
+Allowing for a <span class="math">\(20\%\)</span> violation of a condition corresponds approximately to
+a &#8216;&#8217;condition violation value&#8217;&#8217; (or simply condition value) of 0.2.
+The condition values  are given as an output of SModelS, so the user can decide what are the
+maximum acceptable values.</p>
+</div>
+</div>
+<div class="section" id="efficiency-map-analyses">
+<span id="emanalysis"></span><h2>Efficiency Map Analyses<a class="headerlink" href="#efficiency-map-analyses" title="Permalink to this headline">¶</a></h2>
+<p>Efficiency Map (EM) analyses are more fundamental than <a class="reference internal" href="#ulanalysis"><em>UL analyses</em></a>. Instead of holding cross-section upper limits, they correspond to one or more <a class="reference internal" href="#effmap"><em>efficiency maps</em></a> together with the
+information about the expected and observed data for the relevant signal region(s).:</p>
+<div class="highlight-python"><div class="highlight"><pre>Note: Efficiency Map analyses are not yet functional in the public release!!!
+</pre></div>
+</div>
+<div class="section" id="efficiency-maps">
+<span id="effmap"></span><h3>Efficiency Maps<a class="headerlink" href="#efficiency-maps" title="Permalink to this headline">¶</a></h3>
+<p>Efficiency maps correspond to a grid of simulated acceptance times efficiency
+( <span class="math">\(A \times \epsilon\)</span> ) values for specific signal region(s). In the following we will refer to <span class="math">\(A \times \epsilon\)</span> simply as <em>efficiency</em>.</p>
+<p>The signal is assumed to correspond to a single element, which characterizes the basic signal kinematics
+and hence its efficiency.
+The efficiency grid is usually a function of the BSM masses appearing in the element, as shown by the example below:</p>
+<a class="reference internal image-reference" href="_images/EMexample.png" id="emplot"><img alt="_images/EMexample.png" id="emplot" src="_images/EMexample.png" style="height: 480px;" /></a>
+<p>Although efficiency maps are most useful for <a class="reference internal" href="#emanalysis"><em>EM analyses</em></a>, they can also be constructed for
+<a class="reference internal" href="#ulanalysis"><em>UL analyses</em></a>. For the latter, the efficiencies for a given element are either 1, if the element
+belongs to the <a class="reference internal" href="#ulconstraint"><em>UL analysis constraint</em></a>, or 0, if the element
+does not belong to the <a class="reference internal" href="#ulconstraint"><em>UL analysis constraint</em></a>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/banner180.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Database Definitions</a><ul>
+<li><a class="reference internal" href="#upper-limit-analyses">Upper Limit Analyses</a><ul>
+<li><a class="reference internal" href="#analysis-constraints">Analysis Constraints</a></li>
+<li><a class="reference internal" href="#analysis-conditions">Analysis Conditions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#efficiency-map-analyses">Efficiency Map Analyses</a><ul>
+<li><a class="reference internal" href="#efficiency-maps">Efficiency Maps</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="TheoryDefinitions.html"
+                        title="previous chapter">Theory Definitions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="AnalysesNames.html"
+                        title="next chapter">Analyses Names</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/DatabaseDefinitions.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="AnalysesNames.html" title="Analyses Names"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="TheoryDefinitions.html" title="Theory Definitions"
+             >previous</a> |</li>
+        <li><a href="index.html">SModelS 1.0 documentation</a> &raquo;</li>
+          <li><a href="SModelSDefs.html" >Basic Concepts and Definitions</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, Michael Traub, Wolfgang Waltenberger.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

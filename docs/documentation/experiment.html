@@ -1,0 +1,585 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>experiment Package &mdash; SModelS 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SModelS 1.0 documentation" href="index.html" />
+    <link rel="next" title="tools Package" href="tools.html" />
+    <link rel="prev" title="theory Package" href="theory.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="tools Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="theory.html" title="theory Package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">SModelS 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="experiment-package">
+<h1>experiment Package<a class="headerlink" href="#experiment-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">experiment</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-experiment.__init__"></span><span class="target" id="module-experiment.__init__"></span></div>
+<div class="section" id="module-experiment.experimentExceptions">
+<span id="experimentexceptions-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">experimentExceptions</span></tt> Module<a class="headerlink" href="#module-experiment.experimentExceptions" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-experiment.experimentExceptions"></span><dl class="exception">
+<dt id="experiment.experimentExceptions.MetaInfoError">
+<em class="property">exception </em><tt class="descclassname">experiment.experimentExceptions.</tt><tt class="descname">MetaInfoError</tt><a class="headerlink" href="#experiment.experimentExceptions.MetaInfoError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+<p>Exception class that is raised when a meta info field cannot be found.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-experiment.limitGetter">
+<span id="limitgetter-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">limitGetter</span></tt> Module<a class="headerlink" href="#module-experiment.limitGetter" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-experiment.limitGetter"></span><dl class="function">
+<dt id="experiment.limitGetter.getPlotLimit">
+<tt class="descclassname">experiment.limitGetter.</tt><tt class="descname">getPlotLimit</tt><big>(</big><em>inmass</em>, <em>analysis</em><big>)</big><a class="headerlink" href="#experiment.limitGetter.getPlotLimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get upper limit on sigma*BR for a specific array of masses from plot.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>inmass</strong> &#8211; Array of masses in SModelS graph.</li>
+<li><strong>analysis</strong> &#8211; experiment.analysis.ULanalysis.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.limitGetter.limit">
+<tt class="descclassname">experiment.limitGetter.</tt><tt class="descname">limit</tt><big>(</big><em>analysis</em>, <em>addTheoryPredictions=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#experiment.limitGetter.limit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get limit from an analysis object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>addTheoryPredictions</strong> (<em>[String]</em>) &#8211; list of theory predictions to add, e.g.,
+[ &#8216;7 TeV (NLL)&#8217;, &#8216;7 TeV (LO)&#8217; ]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-experiment.smsAnalysisFactory">
+<span id="smsanalysisfactory-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">smsAnalysisFactory</span></tt> Module<a class="headerlink" href="#module-experiment.smsAnalysisFactory" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-experiment.smsAnalysisFactory"></span><dl class="function">
+<dt id="experiment.smsAnalysisFactory._getArray">
+<tt class="descclassname">experiment.smsAnalysisFactory.</tt><tt class="descname">_getArray</tt><big>(</big><em>constraint</em><big>)</big><a class="headerlink" href="#experiment.smsAnalysisFactory._getArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get number of vertices, branches and insertions from a constraint string.</p>
+<p>This maps, e.g.,
+2*([[[&#8216;L&#8217;],[&#8216;L&#8217;]],[[&#8216;L&#8217;],[&#8216;nu&#8217;]]] + [[[&#8216;L&#8217;],[&#8216;L&#8217;]],[[&#8216;nu&#8217;],[&#8216;L&#8217;]]])
+to
+[[[&#8216;L&#8217;],[&#8216;L&#8217;]],[[&#8216;L&#8217;],[&#8216;nu&#8217;]]]</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsAnalysisFactory._getElementsEffs">
+<tt class="descclassname">experiment.smsAnalysisFactory.</tt><tt class="descname">_getElementsEffs</tt><big>(</big><em>constraint</em>, <em>conditions</em><big>)</big><a class="headerlink" href="#experiment.smsAnalysisFactory._getElementsEffs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary of elements with their simple efficiencies as values.    
+Efficiencies are = 1. if the element appears in the constraint or conditions.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsAnalysisFactory._getRealTopo">
+<tt class="descclassname">experiment.smsAnalysisFactory.</tt><tt class="descname">_getRealTopo</tt><big>(</big><em>tx</em><big>)</big><a class="headerlink" href="#experiment.smsAnalysisFactory._getRealTopo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get real topology, e.g., T3w025 -&gt; T3w, etc.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsAnalysisFactory.load">
+<tt class="descclassname">experiment.smsAnalysisFactory.</tt><tt class="descname">load</tt><big>(</big><em>analyses=None, topologies=None, sqrts=[7, 8], usePrivate=False, useSuperseded=False</em><big>)</big><a class="headerlink" href="#experiment.smsAnalysisFactory.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an analysis objects from the info given in the SMS results database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>analyses</strong> &#8211; If a list of analyses is passed, create only objects for
+these analyses (the database naming convention is used).</li>
+<li><strong>topologies</strong> &#8211; If a list of topologies is passed, only these topologies
+are considered.</li>
+<li><strong>sqrts</strong> &#8211; Array of center-of-mass energies of the analyses that are to
+be considered.</li>
+<li><strong>usePrivate</strong> &#8211; Include analyses flagged as private.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of analyses</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-experiment.smsHelpers">
+<span id="smshelpers-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">smsHelpers</span></tt> Module<a class="headerlink" href="#module-experiment.smsHelpers" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-experiment.smsHelpers"></span><dl class="function">
+<dt id="experiment.smsHelpers._parseMetaInfo">
+<tt class="descclassname">experiment.smsHelpers.</tt><tt class="descname">_parseMetaInfo</tt><big>(</big><em>analysis</em>, <em>path</em><big>)</big><a class="headerlink" href="#experiment.smsHelpers._parseMetaInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all the meta information for a given analysis-path pair.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsHelpers.databaseVersion">
+<tt class="descclassname">experiment.smsHelpers.</tt><tt class="descname">databaseVersion</tt><big>(</big><em>astuple=False</em><big>)</big><a class="headerlink" href="#experiment.smsHelpers.databaseVersion" title="Permalink to this definition">¶</a></dt>
+<dd><p>prints out version number of the <em>database</em></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsHelpers.getLines">
+<tt class="descclassname">experiment.smsHelpers.</tt><tt class="descname">getLines</tt><big>(</big><em>analysis</em>, <em>path</em>, <em>label='condition'</em><big>)</big><a class="headerlink" href="#experiment.smsHelpers.getLines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all &lt;label&gt; lines in info.txt for an analysis-path pair.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsHelpers.getMetaInfoField">
+<tt class="descclassname">experiment.smsHelpers.</tt><tt class="descname">getMetaInfoField</tt><big>(</big><em>analysis</em>, <em>field</em>, <em>path</em><big>)</big><a class="headerlink" href="#experiment.smsHelpers.getMetaInfoField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get one specific entry of the meta info.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsHelpers.getPath">
+<tt class="descclassname">experiment.smsHelpers.</tt><tt class="descname">getPath</tt><big>(</big><em>analysis</em>, <em>path=None</em><big>)</big><a class="headerlink" href="#experiment.smsHelpers.getPath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search for an analysis</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsHelpers.getUpperLimitDictionary">
+<tt class="descclassname">experiment.smsHelpers.</tt><tt class="descname">getUpperLimitDictionary</tt><big>(</big><em>analysis</em>, <em>topology</em>, <em>path</em>, <em>expected=False</em><big>)</big><a class="headerlink" href="#experiment.smsHelpers.getUpperLimitDictionary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary containing the raw Upper Limit data for the analysis
+and topology.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsHelpers.hasDictionary">
+<tt class="descclassname">experiment.smsHelpers.</tt><tt class="descname">hasDictionary</tt><big>(</big><em>analysis</em>, <em>path=None</em>, <em>topology=None</em><big>)</big><a class="headerlink" href="#experiment.smsHelpers.hasDictionary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if available upper limits are in dictionary format.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-experiment.smsInterpolation">
+<span id="smsinterpolation-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">smsInterpolation</span></tt> Module<a class="headerlink" href="#module-experiment.smsInterpolation" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-experiment.smsInterpolation"></span><dl class="function">
+<dt id="experiment.smsInterpolation._compareMasses">
+<tt class="descclassname">experiment.smsInterpolation.</tt><tt class="descname">_compareMasses</tt><big>(</big><em>masses</em>, <em>d</em><big>)</big><a class="headerlink" href="#experiment.smsInterpolation._compareMasses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if input masses are comparable to masses in the histogram.</p>
+<p>Masses are comparable corresponding to the information given in
+axes-dictionary d.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsInterpolation._doGridData">
+<tt class="descclassname">experiment.smsInterpolation.</tt><tt class="descname">_doGridData</tt><big>(</big><em>analysis</em>, <em>topology</em>, <em>masses</em>, <em>dPar</em>, <em>path=None</em><big>)</big><a class="headerlink" href="#experiment.smsInterpolation._doGridData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create np.array and uses scipy.griddata function for analysis-topology.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsInterpolation._getAxis">
+<tt class="descclassname">experiment.smsInterpolation.</tt><tt class="descname">_getAxis</tt><big>(</big><em>w</em>, <em>a</em><big>)</big><a class="headerlink" href="#experiment.smsInterpolation._getAxis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find according index in the masses-list for w == x, y.</p>
+<p>Use the axes-information a == (mx - my).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsInterpolation._getHistName">
+<tt class="descclassname">experiment.smsInterpolation.</tt><tt class="descname">_getHistName</tt><big>(</big><em>topo</em>, <em>mz</em><big>)</big><a class="headerlink" href="#experiment.smsInterpolation._getHistName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build histogram name for given topology and mz information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mz</strong> &#8211; given in the axes-information</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsInterpolation._getIndex">
+<tt class="descclassname">experiment.smsInterpolation.</tt><tt class="descname">_getIndex</tt><big>(</big><em>ls</em>, <em>second=False</em><big>)</big><a class="headerlink" href="#experiment.smsInterpolation._getIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find index of list element with maximum value.</p>
+<p>If the last element is the maximum, return -1. If second == True, find
+second largest list element.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsInterpolation._getxval">
+<tt class="descclassname">experiment.smsInterpolation.</tt><tt class="descname">_getxval</tt><big>(</big><em>mx</em>, <em>my</em>, <em>mz</em>, <em>mass=False</em><big>)</big><a class="headerlink" href="#experiment.smsInterpolation._getxval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate x-value for one point.
+Note: all masses have to be without units!
+If mass == True is selected, return intermediate mass instead of x-value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mx</strong> &#8211; Mother-mass</li>
+<li><strong>my</strong> &#8211; LSP-mass</li>
+<li><strong>mz</strong> &#8211; information on the intermediate mass as given in the</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>axes-information.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsInterpolation.upperLimit">
+<tt class="descclassname">experiment.smsInterpolation.</tt><tt class="descname">upperLimit</tt><big>(</big><em>analysis</em>, <em>topology</em>, <em>masses</em>, <em>path=None</em><big>)</big><a class="headerlink" href="#experiment.smsInterpolation.upperLimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return upper limit for analysis-topology for given masses.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>masses</strong> &#8211; list of masses, with (mother, intermediate(s), LSP). For
+intermediate masses: if possible do interpolation over upper limits for
+different x-values. If interpolation is not possible: check if masses are
+comparable to the assumptions in the histogram.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-experiment.smsResults">
+<span id="smsresults-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">smsResults</span></tt> Module<a class="headerlink" href="#module-experiment.smsResults" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-experiment.smsResults"></span><dl class="function">
+<dt id="experiment.smsResults._exists">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">_exists</tt><big>(</big><em>analysis</em>, <em>topology</em>, <em>path=None</em><big>)</big><a class="headerlink" href="#experiment.smsResults._exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the dictionary &#8216;limit_topo&#8217; in &lt;path&gt;/sms.py exists.</p>
+<p>For topologies with intermediate masses, check if all dictionaries listed
+in the axes-information exist. If topology == None, check if
+&lt;path&gt;/sms.py exists.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.considerExperiment">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">considerExperiment</tt><big>(</big><em>experiment</em><big>)</big><a class="headerlink" href="#experiment.smsResults.considerExperiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the experiment to be considered.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.considerSqrts">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">considerSqrts</tt><big>(</big><em>sqrts</em><big>)</big><a class="headerlink" href="#experiment.smsResults.considerSqrts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the center of mass energies to be considered (as strings in list format)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.getAllResults">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">getAllResults</tt><big>(</big><em>sqrts=None</em>, <em>experiment=None</em><big>)</big><a class="headerlink" href="#experiment.smsResults.getAllResults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all analyses and topologies that have results.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.getBase">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">getBase</tt><big>(</big><big>)</big><a class="headerlink" href="#experiment.smsResults.getBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the base directory of the database.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.getBranchCondition">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">getBranchCondition</tt><big>(</big><em>anaName</em>, <em>txName</em>, <em>path=None</em><big>)</big><a class="headerlink" href="#experiment.smsResults.getBranchCondition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the branch condition for an analysis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">string containing the branch condition (e.g. equal branch masses)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.getClosestValue">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">getClosestValue</tt><big>(</big><em>dictionary</em>, <em>mx</em>, <em>my</em><big>)</big><a class="headerlink" href="#experiment.smsResults.getClosestValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the upper limit of the point in dictionary that is closest to mx and
+my, assuming that dictionary is a dictionary of mx, my, ul.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.getComment">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">getComment</tt><big>(</big><em>analysis</em>, <em>path=None</em><big>)</big><a class="headerlink" href="#experiment.smsResults.getComment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the comment of an analysis.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.getConditions">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">getConditions</tt><big>(</big><em>analysis</em>, <em>topology='all'</em>, <em>fuzzy=True</em>, <em>path=None</em><big>)</big><a class="headerlink" href="#experiment.smsResults.getConditions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get conditions of an analysis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dictionary of conditions, if topology == &#8220;all&#8221;; single condition
+for the passed topology, if only one topology is passed; None if
+non-existent.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.getConstraints">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">getConstraints</tt><big>(</big><em>analysis</em>, <em>topology='all'</em>, <em>path=None</em><big>)</big><a class="headerlink" href="#experiment.smsResults.getConstraints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get constraints of an analysis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dictionary of constraints, if topology == &#8220;all&#8221;; single
+constraint for the passed topology, if only one topology is passed; 
+None if non-existent;</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.getExperiment">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">getExperiment</tt><big>(</big><em>analysis</em>, <em>path=None</em><big>)</big><a class="headerlink" href="#experiment.smsResults.getExperiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if path is to ATLAS directory, else return CMS.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.getInterpolatedUpperLimitDelaunay">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">getInterpolatedUpperLimitDelaunay</tt><big>(</big><em>dictionary</em>, <em>inmx</em>, <em>inmy</em><big>)</big><a class="headerlink" href="#experiment.smsResults.getInterpolatedUpperLimitDelaunay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get interpolated upper limit from dictionary at point (inmx, inmy).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dictionary</strong> &#8211; dictionary (sms.py), contains upper limits of one
+analysis and one topology</li>
+<li><strong>inmx</strong> &#8211; mass point on x-axis</li>
+<li><strong>inmy</strong> &#8211; mass point on y-axis</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">interpolated upper limit at point (inmx, inmy)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.getJournal">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">getJournal</tt><big>(</big><em>analysis</em>, <em>path=None</em><big>)</big><a class="headerlink" href="#experiment.smsResults.getJournal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the journal of an analysis.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.getLumi">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">getLumi</tt><big>(</big><em>analysis</em>, <em>path=None</em><big>)</big><a class="headerlink" href="#experiment.smsResults.getLumi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the integrated luminosity for an analysis.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.getPAS">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">getPAS</tt><big>(</big><em>analysis</em>, <em>path=None</em><big>)</big><a class="headerlink" href="#experiment.smsResults.getPAS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the PAS of an analysis.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.getSqrts">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">getSqrts</tt><big>(</big><em>analysis</em>, <em>path=None</em><big>)</big><a class="headerlink" href="#experiment.smsResults.getSqrts" title="Permalink to this definition">¶</a></dt>
+<dd><p>get the center-of-mass energy of the analysis.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.getTopologies">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">getTopologies</tt><big>(</big><em>analysis</em><big>)</big><a class="headerlink" href="#experiment.smsResults.getTopologies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all topologies of an analysis with constraints.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.getURL">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">getURL</tt><big>(</big><em>analysis</em>, <em>path=None</em><big>)</big><a class="headerlink" href="#experiment.smsResults.getURL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the URL of an analysis.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.getUpperLimit">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">getUpperLimit</tt><big>(</big><em>analysis</em>, <em>topology</em>, <em>mx=None</em>, <em>my=None</em>, <em>path=None</em>, <em>interpolate=False</em>, <em>expected=False</em><big>)</big><a class="headerlink" href="#experiment.smsResults.getUpperLimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the upper limit for path/analysis/topology.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None, if it does not exist; entire dictionary, if mx and my are
+None; upper limit at mx/my, if mx and my are floats;</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.getUpperLimitFromDictionary">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">getUpperLimitFromDictionary</tt><big>(</big><em>analysis</em>, <em>topology</em>, <em>mx=None</em>, <em>my=None</em>, <em>path=None</em>, <em>png=None</em>, <em>interpolate=False</em>, <em>expected=False</em><big>)</big><a class="headerlink" href="#experiment.smsResults.getUpperLimitFromDictionary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an upper limit from the python dictionary.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.getaxes">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">getaxes</tt><big>(</big><em>analysis</em>, <em>topology=None</em>, <em>path=None</em><big>)</big><a class="headerlink" href="#experiment.smsResults.getaxes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get information about the histogram axes for an analysis.</p>
+<p>For each topology list of dictionary, each dictionary corresponds to one
+histogram. The key axes gives string (mx-my), the key mz gives information
+on other masses, if you supply a topology, returns list for this topology
+only.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.hasURL">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">hasURL</tt><big>(</big><em>analysis</em>, <em>path=None</em><big>)</big><a class="headerlink" href="#experiment.smsResults.hasURL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if URL of an analysis exists.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.inConvexHull">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">inConvexHull</tt><big>(</big><em>dictionary</em>, <em>mx</em>, <em>my</em><big>)</big><a class="headerlink" href="#experiment.smsResults.inConvexHull" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if (mx,my) point is in the data dictionary.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.isPrivate">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">isPrivate</tt><big>(</big><em>analysis</em>, <em>path=None</em><big>)</big><a class="headerlink" href="#experiment.smsResults.isPrivate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if analysis is flagged as private.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.isSuperseded">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">isSuperseded</tt><big>(</big><em>analysis</em>, <em>path=None</em><big>)</big><a class="headerlink" href="#experiment.smsResults.isSuperseded" title="Permalink to this definition">¶</a></dt>
+<dd><p>check if analysis is superseded, if yes,
+return analysis name of newer analysis</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.smsResults.setBase">
+<tt class="descclassname">experiment.smsResults.</tt><tt class="descname">setBase</tt><big>(</big><em>base</em><big>)</big><a class="headerlink" href="#experiment.smsResults.setBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the base directory of the database.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">experiment Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">experiment</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-experiment.experimentExceptions"><tt class="docutils literal"><span class="pre">experimentExceptions</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-experiment.limitGetter"><tt class="docutils literal"><span class="pre">limitGetter</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-experiment.smsAnalysisFactory"><tt class="docutils literal"><span class="pre">smsAnalysisFactory</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-experiment.smsHelpers"><tt class="docutils literal"><span class="pre">smsHelpers</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-experiment.smsInterpolation"><tt class="docutils literal"><span class="pre">smsInterpolation</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-experiment.smsResults"><tt class="docutils literal"><span class="pre">smsResults</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="theory.html"
+                        title="previous chapter">theory Package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tools.html"
+                        title="next chapter">tools Package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/experiment.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="tools Package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="theory.html" title="theory Package"
+             >previous</a> |</li>
+        <li><a href="index.html">SModelS 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Wolfgang Magerl, Doris Proschofsky, Wolfgang Waltenberger.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>
