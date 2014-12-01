@@ -59,3 +59,8 @@ followed by:
 
 Note, that these steps can safely be done within a Python ``virtualenv``.
 
+
+Some distributions like SL5, the python default version may be smaller than 2.6.
+In these cases, ``virtualenv`` has to be set up for a python version >= 2.6.
+E.g. for python 2.6, do ``virtualenv --python=python2.6``, and modify by hand 
+the hash-bang in the executable from ``#!/usr/bin/env python`` to ``#!/usr/bin/env python2.6``. Then perform the steps listed under ``Installation on SL6``.
