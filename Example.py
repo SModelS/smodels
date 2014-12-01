@@ -3,6 +3,8 @@
 """
 .. module:: Example
    :synopsis: Basic main file example for using SModelS.
+   
+   This file must be run under the installation folder.
 
 """
 
