@@ -164,7 +164,7 @@ class ExternalPythia6(ExternalTool):
     def complain ( self ):
         import sys
         logger.error("please fix manually, e.g. try 'make' in smodels/lib, " \
-               " or file a complaint at smodels-support@oeaw.ac.at" )
+               " or file a complaint at smodels-users@lists.oeaw.ac.at" )
         sys.exit(0)
 
     def run(self, slhaFile, cfgfile=None, do_unlink=True, do_compile=False,

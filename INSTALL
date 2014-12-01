@@ -37,7 +37,7 @@ There is also a diagnostic tool available: ::
 should list and check all internal tools (Pythia and NLL-fast) and external
 (numpy, scipy, unum, ... ) dependencies.
 
-In case everything fails, please contact smodels-support@oeaw.ac.at.
+In case everything fails, please contact smodels-users@lists.oeaw.ac.at
 
 Installation on SL6
 -------------------
