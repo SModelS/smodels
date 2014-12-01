@@ -1,0 +1,19 @@
+sqrts: 8.0*TeV
+lumi: 19.3/fb
+id: CMS-PAS-SUS-14-011
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS14011
+supersedes: SUS-13-004
+digitaldata: False
+constraint: T1tttt -> [[['t','t']],[['t','t']]]
+constraint: T2tt -> [[['t']],[['t']]]
+constraint: T1bbbb -> [[['b','b']],[['b','b']]]
+constraint: T1ttttoff -> [[['b','b','W','W']],[['b','b','W','W']]]
+fuzzycondition: T1tttt -> None
+fuzzycondition: T2tt -> None
+fuzzycondition: T1bbbb -> None
+fuzzycondition: T1ttttoff -> None
+axes: T1tttt: M1 M0, T1ttttoff: M1 M0, T2tt: M1 M0, T1bbbb: M1 M0
+branchcondition: T1bbbb -> equal branches
+branchcondition: T2tt -> equal branches
+branchcondition: T1tttt -> equal branches
+branchcondition: T1ttttoff -> equal branches

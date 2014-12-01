@@ -1,0 +1,17 @@
+sqrts: 8.0*TeV
+lumi: 19.3/fb
+id: CMS-SUS-13-007
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13007
+arxiv: http://arxiv.org/abs/arXiv:1311.4937
+publication: http://www.sciencedirect.com/science/article/pii/S037026931400255X
+digitaldata: True
+constraint: T1tttt -> [[['t','t']],[['t','t']]]
+constraint: T1ttttoff -> [[['b','b','W','W']],[['b','b','W','W']]]
+constraint: T5tttt -> [[['t'],['t']],[['t'],['t']]]
+fuzzycondition: T1tttt -> None
+fuzzycondition: T1ttttoff -> None
+fuzzycondition: T5tttt -> None
+axes: T1tttt: M1 M0, T1ttttoff: M1 M0, T5tttt: M2 M0 M11000 - M0 M2 LSP050
+branchcondition: T1tttt -> equal branches
+branchcondition: T1ttttoff -> equal branches
+branchcondition: T5tttt -> equal branches

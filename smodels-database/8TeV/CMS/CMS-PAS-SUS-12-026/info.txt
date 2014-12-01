@@ -1,0 +1,10 @@
+sqrts: 8.00*TeV
+lumi: 9.20/fb
+id: CMS-PAS-SUS-12-026
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS12026
+superseded_by: CMS-SUS-13-002 (more data)
+digitaldata: True
+constraint: T1tttt -> [[['t+','t-']],[['t+','t-']]]
+fuzzycondition: T1tttt -> None
+axes: T1tttt: M1 M0
+branchcondition: T1tttt -> equal branches

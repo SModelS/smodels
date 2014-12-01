@@ -1,0 +1,14 @@
+sqrts: 8.0*TeV
+lumi: 20.3/fb
+id: ATLAS-SUSY-2013-15
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-15/
+arxiv: http://arxiv.org/abs/1407.0583
+supersedes: ATLAS-CONF-2013-037 ATLAS-CONF-2012-166
+digitaldata: True
+constraint: T2tt -> [[['t']],[['t']]]
+constraint: T2bbWW -> [[['b','W']],[['b','W']]]
+fuzzycondition: T2tt -> None
+fuzzycondition: T2bbWW -> None
+axes: T2tt: M1 M0, T2bbWW: M1 M0
+branchcondition: T2tt -> equal branches
+branchcondition: T2bbWW -> equal branches

@@ -1,0 +1,10 @@
+sqrts: 8.0*TeV
+lumi: 20.3/fb
+id: ATLAS-SUSY-2013-14
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-14/
+supersedes: ATLAS-CONF-2013-028
+digitaldata: True
+constraint: TStauStau -> [[['ta+']],[['ta-']]]
+fuzzycondition: TStauStau -> None
+axes: TStauStau: M1 M0
+branchcondition: TStauStau -> equal branches

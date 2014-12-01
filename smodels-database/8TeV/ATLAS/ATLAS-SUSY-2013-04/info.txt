@@ -1,0 +1,12 @@
+sqrts: 8.0*TeV
+lumi: 20.3/fb
+id: ATLAS-SUSY-2013-04
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-04/
+arxiv: http://arxiv.org/abs/1308.1841
+publication: http://link.springer.com/article/10.1007/JHEP10%282013%29130
+supersedes: ATLAS-CONF-2012-103
+digitaldata: False
+constraint: T1tttt -> [[['t','t']],[['t','t']]]
+fuzzycondition: T1tttt -> None
+axes: T1tttt: M1 M0
+branchcondition: T1tttt -> equal branches

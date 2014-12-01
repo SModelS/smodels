@@ -1,0 +1,15 @@
+sqrts: 8.0*TeV
+lumi: 20.3/fb
+id: ATLAS-SUSY-2013-11
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-11/
+arxiv: http://arxiv.org/abs/1403.5294
+publication: http://link.springer.com/article/10.1007/JHEP05(2014)071
+supersedes: ATLAS-CONF-2013-049
+digitaldata: True
+constraint: TChiWZ -> [[['W']],[['Z']]]
+constraint: TSlepSlep -> [[['e+']],[['e-']]]+[[['mu+']],[['mu-']]]
+fuzzycondition: TChiWZ -> None
+fuzzycondition: TSlepSlep -> Cgtr([[['mu+']],[['mu-']]],[[['e+']],[['e-']]])
+axes: TSlepSlep: M1 M0, TChiWZ: M1 M0
+branchcondition: TChiWZ -> equal branches
+branchcondition: TSlepSlep -> equal branches

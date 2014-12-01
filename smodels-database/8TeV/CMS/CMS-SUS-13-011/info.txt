@@ -1,0 +1,15 @@
+sqrts: 8.0*TeV
+lumi: 19.5/fb
+id: CMS-SUS-13-011
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13011
+arxiv: http://arxiv.org/abs/1308.1586
+publication: http://link.springer.com/article/10.1140%2Fepjc%2Fs10052-013-2677-2
+supersedes: CMS-PAS-SUS-12-023
+digitaldata: True
+constraint: T2tt -> [[['t']],[['t']]]
+constraint: T6bbWW -> [[['b'],['W']],[['b'],['W']]]
+fuzzycondition: T2tt -> None
+fuzzycondition: T6bbWW -> None
+axes: T2tt: M1 M0, T6bbWW:  M1 M0 050 - M1 M0 025 - M1 M0 075
+branchcondition: T6bbWW -> equal branches
+branchcondition: T2tt -> equal branches
