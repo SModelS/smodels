@@ -115,6 +115,10 @@ We succeeded to install SModelS on SL6 by doing:</p>
 </ul>
 </div></blockquote>
 <p>Note, that these steps can safely be done within a Python <tt class="docutils literal"><span class="pre">virtualenv</span></tt>.</p>
+<p>Some distributions like SL5, the python default version may be smaller than 2.6.
+In these cases, <tt class="docutils literal"><span class="pre">virtualenv</span></tt> has to be set up for a python version &gt;= 2.6.
+E.g. for python 2.6, do <tt class="docutils literal"><span class="pre">virtualenv</span> <span class="pre">--python=python2.6</span></tt>, and modify by hand
+the hash-bang in the executable from <tt class="docutils literal"><span class="pre">#!/usr/bin/env</span> <span class="pre">python</span></tt> to <tt class="docutils literal"><span class="pre">#!/usr/bin/env</span> <span class="pre">python2.6</span></tt>. Then perform the steps listed under <tt class="docutils literal"><span class="pre">Installation</span> <span class="pre">on</span> <span class="pre">SL6</span></tt>.</p>
 </div>
 </div>
 
