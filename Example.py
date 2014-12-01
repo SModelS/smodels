@@ -3,10 +3,11 @@
 """
 .. module:: Example
    :synopsis: Basic main file example for using SModelS.
+   
+   This file must be run under the installation folder.
 
 """
 
-""" Import basic functions (this file must be run under the installation folder) """
 from __future__ import print_function
 import sys
 from smodels.theory import slhaDecomposer
