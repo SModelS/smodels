@@ -1,0 +1,20 @@
+sqrts: 8.0*TeV
+lumi: 19.5/fb
+id: CMS-SUS-13-012
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13012
+arxiv: http://arxiv.org/abs/1402.4770
+publication: http://link.springer.com/article/10.1007/JHEP06%282014%29055
+digitaldata: True
+constraint: T1tttt -> [[['t','t']],[['t','t']]]
+constraint: T2 -> [[['jet']],[['jet']]]
+constraint: T1ttttoff -> [[['b','b','W','W']],[['b','b','W','W']]]
+constraint: T1 -> [[['jet','jet']],[['jet','jet']]]
+fuzzycondition: T1tttt -> None
+fuzzycondition: T2 -> None
+fuzzycondition: T1ttttoff -> None
+fuzzycondition: T1 -> None
+axes: T1: M1 M0, T2: M1 M0, T1tttt: M1 M0, T1ttttoff: M1 M0
+branchcondition: T1tttt -> equal branches
+branchcondition: T2 -> equal branches
+branchcondition: T1ttttoff -> equal branches
+branchcondition: T1 -> equal branches

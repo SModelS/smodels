@@ -1,0 +1,9 @@
+sqrts: 8.00*TeV
+lumi: 5.80/fb
+id: ATLAS-CONF-2012-105
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2012-105/
+digitaldata: False
+constraint: T1tttt -> [[['t+','t-']],[['t+','t-']]]
+fuzzycondition: T1tttt -> None
+axes: T1tttt: M1 M0
+branchcondition: T1tttt -> equal branches

@@ -1,0 +1,10 @@
+sqrts: 8.00*TeV
+lumi: 20.10/fb
+id: ATLAS-CONF-2013-053
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-053/
+superseded_by: ATLAS-SUSY-2013-05
+digitaldata: False
+constraint: T2bb -> [[['b']],[['b']]]
+fuzzycondition: T2bb -> None
+axes: T2bb: M1 M0
+branchcondition: T2bb -> equal branches

@@ -1,0 +1,15 @@
+sqrts: 8.0*TeV
+lumi: 20.3/fb
+id: ATLAS-SUSY-2013-02
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-02/
+arxiv: http://arxiv.org/abs/1405.7875
+publication: http://link.springer.com/article/10.1007/JHEP09%282014%29176
+supersedes: ATLAS_CONF_2013_047
+digitaldata: True
+constraint: T2 -> [[['jet']],[['jet']]]
+constraint: T1 -> [[['jet','jet']],[['jet','jet']]]
+fuzzycondition: T2 -> None
+fuzzycondition: T1 -> None
+axes: T1: M1 M0, T2: M1 M0
+branchcondition: T2 -> equal branches
+branchcondition: T1 -> equal branches

@@ -1,0 +1,13 @@
+sqrts: 8.0*TeV
+lumi: 20.1/fb
+id: ATLAS-CONF-2013-061
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-061/ http://cds.cern.ch/record/1557778
+superseded_by: ATLAS-SUSY-2013-05
+digitaldata: True
+constraint: T1bbbb -> [[['b','b']],[['b','b']]]
+constraint: T1tttt -> [[['t','t']],[['t','t']]]
+fuzzycondition: T1bbbb -> None
+fuzzycondition: T1tttt -> None
+axes: T1bbbb: M1 M0, T1tttt: M1 M0
+branchcondition: T1bbbb -> equal branches
+branchcondition: T1tttt -> equal branches

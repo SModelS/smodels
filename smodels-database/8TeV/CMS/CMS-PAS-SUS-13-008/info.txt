@@ -1,0 +1,12 @@
+sqrts: 8.00*TeV
+lumi: 19.50/fb
+id: CMS-PAS-SUS-13-008
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13008
+digitaldata: True
+constraint: T6ttWW -> [[['t'],['W']],[['t'],['W']]]
+constraint: T1tttt -> [[['t','t']],[['t','t']]]
+fuzzycondition: T6ttWW -> None
+fuzzycondition: T1tttt -> None
+axes: T1tttt: M1 M0, T6ttWW: M1 M2 LSP050 - M1 M0 x200 - M1 M0 x125
+branchcondition: T6ttWW -> equal branches
+branchcondition: T1tttt -> equal branches
