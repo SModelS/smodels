@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
 """
-.. module:: Main code for running smodels
+.. module:: runSModelS
+   :synopsis: Main code for running SModelS.
+   
 """
 
 import sys, os, logging
