@@ -378,7 +378,7 @@ class SlhaStatus(Printer):
         msg = "XSECTION table is missing. Please include the cross-section information and try again.\n"
         msg += "\n\t For MSSM models, it is possible to compute the MSSM cross-sections"
         msg += " using Pythia through the command:\n\n"
-        msg += "\t  ./runTools.py xseccomputer -p -f"+ self.filename+" \n\n"        
+        msg += "\t  ./runTools.py xseccomputer -p -f "+ self.filename+" \n\n"        
         msg += "\t For more options and information run: ./runTools.py xseccomputer -h\n"
         logger.error(msg)
         return -1, msg
