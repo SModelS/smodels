@@ -6,7 +6,7 @@
 
 """
 
-""" Import basic functions (this file must be run under the installation folder) """
+""" Import basic functions (this file must be executed in the installation folder) """
 from __future__ import print_function
 import sys
 from smodels.theory import slhaDecomposer
@@ -73,4 +73,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    sys.exit()
