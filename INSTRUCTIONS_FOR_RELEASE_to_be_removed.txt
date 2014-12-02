@@ -1,0 +1,7 @@
+When getting the code from the public branch to the tarball a few steps should be performed:
+
+1) copy the git folder
+2) remove the .git* files
+3) RE-BUILD THE SOFT LINKS (docs/Manual.html and docs/CodeDocumentation.html)
+4) REMOVE THIS FILE!!
+5) Add the quick-guide to docs (?)
