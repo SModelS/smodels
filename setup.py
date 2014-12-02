@@ -34,7 +34,8 @@ def dataFiles ():
     List all config files and binaries
 
     """
-    ret = [("", ["BANNER", "README", "COPYING", "version"])]
+    ret = [("", [ "BANNER", "README", "COPYING" ])]
+    ret.append ( ( "smodels", [ "version" ] ) )
 
     for directory in ["inputFiles/slha/", "inputFiles/lhe/", "lib/nllfast/nllfast-1.2/", "lib/nllfast/nllfast-2.1/", "lib/pythia6/", "etc"]:
         ret.append ((directory, listDirectory (directory)))

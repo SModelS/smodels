@@ -43,7 +43,7 @@ def version(astuple=False):
     Print version number of the SModelS framework.
     
     """
-    f = open("%s/version" % installDirectory())
+    f = open("%s/smodels/version" % installDirectory())
     l = f.readline()
     f.close()
     l = l.replace("\n", "")
