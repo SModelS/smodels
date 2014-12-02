@@ -98,7 +98,7 @@ output, can be found in the section ``Running SModelS'' of the SModelS manual
 (docs/Manual.html).
 
 A few example input files are provided in the inputFiles folder and can be
-used to test runSModelS.py
+used to test runSModelS.py.
 
 
 Citation
