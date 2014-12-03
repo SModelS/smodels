@@ -16,6 +16,7 @@ SModelS is a Python library that requires Python version 2.6 or later
 These tools are built into SModelS, they need not be installed separately. 
 In addition, SModelS depends on the following *external* Python libraries:
 
+ * setuptools
  * unum
  * numpy
  * argparse
@@ -67,10 +68,11 @@ Note, that these steps can safely be done within a Python ``virtualenv``.
 Installation on SL5 and similar distributions                                         
 ---------------------------------------------                                         
                                                                                       
-In some distributions like SL5, the python default version may be smaller than        
-2.6.  In these cases, ``virtualenv`` has to be set up for a python version >= 2.6.  
-E.g. for python 2.6, do ``virtualenv --python=python2.6 <envname>``, and modify by hand
-the first line in the executable from ``#!/usr/bin/env python`` to ``#!/usr/bin/env python2.6``.  
+In some distributions like SL5, the python default version may be smaller than
+2.6.  In these cases, ``virtualenv`` has to be set up for a python version >=
+2.6.  E.g. for python 2.6, do ``virtualenv --python=python2.6 <envname>``, and
+modify by hand the first line in the executable from ``#!/usr/bin/env python``
+to ``#!/usr/bin/env python2.6``.  
 Then perform the steps listed under ``Installation on SL6``.  
 
 
