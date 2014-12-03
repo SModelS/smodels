@@ -7,16 +7,15 @@ Installation
 ============
 
 SModelS is a Python library that requires Python version 2.6 or later 
-(but not version 3). Internally, SModelS uses the following tools:
+(but not version 3) with setuptools installed. Internally, SModelS uses the following tools:
 
  * Pythia 6.4.27
  * NLL-fast 1.2 (7 TeV) and 2.1 (8 TeV)
  * PySLHA (modified version)
 
 These tools are built into SModelS, they need not be installed separately. 
-In addition, SModelS depends on the following *external* Python libraries:
+In addition to setuptools, SModelS depends on the following *external* Python libraries:
 
- * setuptools
  * unum
  * numpy
  * argparse
@@ -30,6 +29,9 @@ Thus ::
 should install the entire project, compile the internal Pythia and NLL-fast versions
 using gfortran. It should also resolve the external dependencies, i.e. install
 the Python libraries listed above using e.g. *pip*.
+If the python libraries are installed in a system folder (as is the default behavior),
+it will be necessary to run the install command with superuser privilege.
+
 
 In case the compilation of SModelS fails, it is advised to try to compile
 the tools manually, by issuing "make" in the *lib/* directory.
