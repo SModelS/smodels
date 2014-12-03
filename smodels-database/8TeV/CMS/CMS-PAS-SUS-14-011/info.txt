@@ -2,7 +2,7 @@ sqrts: 8.0*TeV
 lumi: 19.3/fb
 id: CMS-PAS-SUS-14-011
 url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS14011
-supersedes: SUS-13-004
+supersedes: CMS-PAS-SUS-13-004
 digitaldata: False
 constraint: T1tttt -> [[['t','t']],[['t','t']]]
 constraint: T2tt -> [[['t']],[['t']]]
