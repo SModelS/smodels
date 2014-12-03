@@ -56,16 +56,16 @@
 <div class="section" id="standard-installation">
 <h2>Standard Installation<a class="headerlink" href="#standard-installation" title="Permalink to this headline">¶</a></h2>
 <p>SModelS is a Python library that requires Python version 2.6 or later
-(but not version 3).  Internally, SModelS uses the following tools:</p>
+(but not version 3) with setuptools installed. Internally, SModelS uses the following tools:</p>
 <blockquote>
 <div><ul class="simple">
-<li><a class="reference external" href="http://arxiv.org/abs/hep-ph/0603175">Pythia 6.4.27</a></li>
-<li><a class="reference external" href="http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast">NLL-fast</a> 1.2 (7 TeV) and 2.1 (8 TeV)</li>
-<li><a class="reference external" href="http://arxiv.org/abs/1305.4194">PySLHA</a> (modified version)</li>
+<li>Pythia 6.4.27</li>
+<li>NLL-fast 1.2 (7 TeV) and 2.1 (8 TeV)</li>
+<li>PySLHA (modified version)</li>
 </ul>
 </div></blockquote>
 <p>These tools are built into SModelS, they need not be installed separately.
-In addition, SModelS depends on the following <em>external</em> Python libraries:</p>
+In addition to setuptools, SModelS depends on the following <em>external</em> Python libraries:</p>
 <blockquote>
 <div><ul class="simple">
 <li>unum</li>
@@ -82,7 +82,9 @@ Thus</p>
 </div>
 <p>should install the entire project, compile the internal Pythia and NLL-fast versions
 using gfortran. It should also resolve the external dependencies, i.e. install
-the Python libraries listed above using e.g. <em>pip</em>.</p>
+the Python libraries listed above using e.g. <em>pip</em>.
+If the python libraries are installed in a system folder (as is the default behavior),
+it will be necessary to run the install command with superuser privilege.</p>
 <p>In case the compilation of SModelS fails, it is advised to try to compile
 the tools manually, by issuing &#8220;make&#8221; in the <em>lib/</em> directory.
 In case the installation of the external libraries fails, you can also try to install
@@ -94,12 +96,11 @@ them manually, then rerun setup.py.  For SL6 machines, a recipe is given below.<
 <p>should list and check all internal tools (Pythia and NLL-fast) and external
 (numpy, scipy, unum, ... ) dependencies.</p>
 <p>In case everything fails, please contact <a class="reference external" href="mailto:smodels-users&#37;&#52;&#48;lists&#46;oeaw&#46;ac&#46;at">smodels-users<span>&#64;</span>lists<span>&#46;</span>oeaw<span>&#46;</span>ac<span>&#46;</span>at</a></p>
-</div>
 <div class="section" id="installation-on-sl6">
-<h2>Installation on SL6<a class="headerlink" href="#installation-on-sl6" title="Permalink to this headline">¶</a></h2>
+<h3>Installation on SL6<a class="headerlink" href="#installation-on-sl6" title="Permalink to this headline">¶</a></h3>
 <p>Installation on an SL6 (Scientific Linux 6 or Scientific Linux CERN 6) machine
 is tricky, because SModelS requires a more recent version of <em>scipy</em> than is provided by SL6.
-We succeeded to install SModelS on SL6 by doing:</p>
+SModelS can be installed on SL6 by doing:</p>
 <blockquote>
 <div><ul class="simple">
 <li>yum install gcc-c++ libstdc++-devel libevent-devel python-devel lapack lapack-devel blas blas-devel libgfortran python-distutils-extra</li>
@@ -115,10 +116,16 @@ We succeeded to install SModelS on SL6 by doing:</p>
 </ul>
 </div></blockquote>
 <p>Note, that these steps can safely be done within a Python <tt class="docutils literal"><span class="pre">virtualenv</span></tt>.</p>
-<p>Some distributions like SL5, the python default version may be smaller than 2.6.
-In these cases, <tt class="docutils literal"><span class="pre">virtualenv</span></tt> has to be set up for a python version &gt;= 2.6.
-E.g. for python 2.6, do <tt class="docutils literal"><span class="pre">virtualenv</span> <span class="pre">--python=python2.6</span></tt>, and modify by hand
-the hash-bang in the executable from <tt class="docutils literal"><span class="pre">#!/usr/bin/env</span> <span class="pre">python</span></tt> to <tt class="docutils literal"><span class="pre">#!/usr/bin/env</span> <span class="pre">python2.6</span></tt>. Then perform the steps listed under <tt class="docutils literal"><span class="pre">Installation</span> <span class="pre">on</span> <span class="pre">SL6</span></tt>.</p>
+</div>
+<div class="section" id="installation-on-sl5-and-similar-distributions">
+<h3>Installation on SL5 and similar distributions<a class="headerlink" href="#installation-on-sl5-and-similar-distributions" title="Permalink to this headline">¶</a></h3>
+<p>In some distributions like SL5, the python default version may be smaller than
+2.6.  In these cases, <tt class="docutils literal"><span class="pre">virtualenv</span></tt> has to be set up for a python version &gt;=
+2.6.  E.g. for python 2.6, do <tt class="docutils literal"><span class="pre">virtualenv</span> <span class="pre">--python=python2.6</span> <span class="pre">&lt;envname&gt;</span></tt>, and
+modify by hand the first line in the executable from <tt class="docutils literal"><span class="pre">#!/usr/bin/env</span> <span class="pre">python</span></tt>
+to <tt class="docutils literal"><span class="pre">#!/usr/bin/env</span> <span class="pre">python2.6</span></tt>.
+Then perform the steps listed under <tt class="docutils literal"><span class="pre">Installation</span> <span class="pre">on</span> <span class="pre">SL6</span></tt>.</p>
+</div>
 </div>
 </div>
 
@@ -134,8 +141,11 @@ the hash-bang in the executable from <tt class="docutils literal"><span class="p
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Installation and Deployment</a><ul>
-<li><a class="reference internal" href="#standard-installation">Standard Installation</a></li>
+<li><a class="reference internal" href="#standard-installation">Standard Installation</a><ul>
 <li><a class="reference internal" href="#installation-on-sl6">Installation on SL6</a></li>
+<li><a class="reference internal" href="#installation-on-sl5-and-similar-distributions">Installation on SL5 and similar distributions</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
