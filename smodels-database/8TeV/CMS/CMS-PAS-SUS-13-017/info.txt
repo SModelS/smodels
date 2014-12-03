@@ -1,9 +1,0 @@
-sqrts: 8.0*TeV
-lumi: 19.5/fb
-id: CMS-PAS-SUS-13-017
-url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13017
-digitaldata: True
-constraint: TChiWH -> [[['higgs']],[['W']]]
-fuzzycondition: TChiWH -> None
-axes: TChiWH: M1 M0
-branchcondition: TChiWH -> equal branches
