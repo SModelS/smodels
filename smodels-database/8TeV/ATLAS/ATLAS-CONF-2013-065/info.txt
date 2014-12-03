@@ -1,7 +1,7 @@
 sqrts: 8.0*TeV
 lumi: 20.3/fb
 id: ATLAS-CONF-2013-065
-url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-065/ http://cds.cern.ch/record/1562840
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-065/
 digitaldata: True
 constraint: T2tt -> [[['t+']],[['t-']]]
 fuzzycondition: T2tt -> None

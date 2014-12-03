@@ -6,10 +6,13 @@ arxiv: http://arxiv.org/abs/1403.4853
 publication: http://link.springer.com/article/10.1007/JHEP06(2014)124
 supersedes: ATLAS-CONF-2013-048
 digitaldata: True
+constraint: T2tt -> [[['t+']],[['t-']]]
 constraint: T2bbWW -> [[['b','W+']],[['b','W-']]]
 constraint: T6bbWW -> [[['b'],['W+']],[['b'],['W-']]]
+fuzzycondition: T2tt -> None
 fuzzycondition: T2bbWW -> None
 fuzzycondition: T6bbWW -> None
-axes: T2bbWW: M1 M0, T6bbWW: M1 M0 C106 - M1 M0 x200 -  M1 M0 D(M2/M1)=010 - M1 M2 LSP001 - M2 M0 M1300
+axes: T2tt: M1 M0, T2bbWW: M1 M0, T6bbWW: M1 M0 C106 - M1 M0 x200 -  M1 M0 D(M2/M1)=010 - M1 M2 LSP001 - M2 M0 M1300
 branchcondition: T6bbWW -> equal branches
+branchcondition: T2tt -> equal branches
 branchcondition: T2bbWW -> equal branches

@@ -1,10 +1,10 @@
 sqrts: 8.0*TeV
 lumi: 20.3/fb
 id: ATLAS-CONF-2013-049
-url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-049/ https://cds.cern.ch/record/1547565
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-049/
 superseded_by: ATLAS-SUSY-2013-11
 digitaldata: True
 constraint: TSlepSlep -> [[['e+']],[['e-']]]+[[['mu+']],[['mu-']]]
-fuzzycondition: TSlepSlep -> Cgtr([[['mu+']],[['mu-']]],[[['e+']],[['e-']]])
+fuzzycondition: TSlepSlep -> cGtr([[['mu+']],[['mu-']]],[[['e+']],[['e-']]])
 axes: TSlepSlep: M1 M0
 branchcondition: TSlepSlep -> equal branches

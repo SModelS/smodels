@@ -1,7 +1,7 @@
 sqrts: 8.0*TeV
 lumi: 20.3/fb
 id: ATLAS-CONF-2013-048
-url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-048/ http://cds.cern.ch/record/1547564
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-048/
 superseded_by: ATLAS-SUSY-2013-19
 digitaldata: True
 constraint: T2bbWW -> [[['b','W+']],[['b','W-']]]

@@ -9,7 +9,7 @@ digitaldata: True
 constraint: TChiWZ -> [[['W']],[['Z']]]
 constraint: TSlepSlep -> [[['e+']],[['e-']]]+[[['mu+']],[['mu-']]]
 fuzzycondition: TChiWZ -> None
-fuzzycondition: TSlepSlep -> Cgtr([[['mu+']],[['mu-']]],[[['e+']],[['e-']]])
+fuzzycondition: TSlepSlep -> cGtr([[['mu+']],[['mu-']]],[[['e+']],[['e-']]])
 axes: TSlepSlep: M1 M0, TChiWZ: M1 M0
 branchcondition: TChiWZ -> equal branches
 branchcondition: TSlepSlep -> equal branches

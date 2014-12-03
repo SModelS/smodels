@@ -1,19 +1,13 @@
 sqrts: 8.0*TeV
 lumi: 20.3/fb
 id: ATLAS-CONF-2013-047
-url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-047/ http://cds.cern.ch/record/1547563
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-047/
 superseded_by: ATLAS-SUSY-2013-02
 digitaldata: True
-constraint: T6WW -> [[['jet'],['W']],[['jet'],['W']]]
 constraint: T2 -> [[['jet']],[['jet']]]
 constraint: T1 -> [[['jet','jet']],[['jet','jet']]]
-constraint: T5WW -> [[['jet','jet'],['W']],[['jet','jet'],['W']]]
-fuzzycondition: T6WW -> None
 fuzzycondition: T2 -> None
 fuzzycondition: T1 -> None
-fuzzycondition: T5WW -> None
-axes: T1: M1 M0, T2: M1 M0, T5WW: M1 M2 LSP060 - M1 M0 050, T6WW: M1 M2 LSP060 - M1 M0 050
-branchcondition: T6WW -> equal branches
+axes: T1: M1 M0, T2: M1 M0
 branchcondition: T2 -> equal branches
 branchcondition: T1 -> equal branches
-branchcondition: T5WW -> equal branches

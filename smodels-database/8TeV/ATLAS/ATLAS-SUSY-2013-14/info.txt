@@ -2,6 +2,8 @@ sqrts: 8.0*TeV
 lumi: 20.3/fb
 id: ATLAS-SUSY-2013-14
 url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-14/
+arxiv: http://arxiv.org/abs/1407.0350
+publication: link.springer.com/article/10.1007/JHEP10(2014)096
 supersedes: ATLAS-CONF-2013-028
 digitaldata: True
 constraint: TStauStau -> [[['ta+']],[['ta-']]]

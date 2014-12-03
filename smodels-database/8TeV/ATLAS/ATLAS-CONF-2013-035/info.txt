@@ -7,7 +7,7 @@ digitaldata: True
 constraint: TChiWZ -> [[['W']],[['Z']]]
 constraint: TChiWZoff -> 71.*([[['mu+','mu-']],[['l','nu']]] + [[['e+','e-']],[['l','nu']]])
 fuzzycondition: TChiWZ -> None
-fuzzycondition: TChiWZoff -> Cgtr([[['mu+','mu-']],[['l','nu']]],[[['e+','e-']],[['l','nu']]])
+fuzzycondition: TChiWZoff -> cGtr([[['mu+','mu-']],[['l','nu']]],[[['e+','e-']],[['l','nu']]])
 axes: TChiWZ: M1 M0, TChiWZoff: M1 M0
 branchcondition: TChiWZ -> equal branches
 branchcondition: TChiWZoff -> equal branches

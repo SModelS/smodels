@@ -2,7 +2,6 @@ sqrts: 8.0*TeV
 lumi: 20.7/fb
 id: ATLAS-CONF-2013-007
 url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-007/
-superseded_by: ATLAS-SUSY-2013-09
 digitaldata: False
 constraint: T1tttt -> [[['t+','t-']],[['t+','t-']]]
 fuzzycondition: T1tttt -> None
