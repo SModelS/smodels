@@ -33,6 +33,9 @@ class MassParametrizationException(Exception):
 class InvalidInfotxtFileException(Exception):
     pass
 
+class InvalidSmspytFileException(Exception):
+    pass
+
 class InvalidInfoFieldException(Exception):
     pass
 
