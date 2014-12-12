@@ -33,7 +33,7 @@ class ExperimentIDObject(object):
         self._smsroot = smsroot
         self._smspy = smspy
         self._verbosity = 'error'
-        self._dummies = ['not yet assigned', 'not jet assigned', '', 'not yet assignet']
+        self._dummies = ['not yet assigned', 'not yet assigned', '', 'not yet assignet']
 
     def __str__(self ):
         ret = "%s [%s, %s] <<%s>>" % \
