@@ -193,13 +193,13 @@ class DataBase(object):
                 newAna = analysisObjects.EManalysis(info,smspy.dataList[0])
                 logger.info('Only upper limits analyses are accepted. Skipping %s' % ID)
                 continue
+                analysisList.append(newAna)
             elif analysisType == 'UpperLimit':                
                 for txnameInfo in info.txNameInfoList:
                     if txnames and not txnameInfo.name in txnames: continue
                     data = smspy.getDataFor(txnameInfo.name)
-                    newAna = analysisObjects.ULanalysis(info.globalInfo,data,txnameInfo)
-            
-            analysisList.append(newAna)
+                    newAna = analysisObjects.ULanalysis(info.globalInfo,data,txnameInfo)            
+                    analysisList.append(newAna)
         
         return analysisList
         

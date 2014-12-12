@@ -10,10 +10,10 @@
 """
 
 import logging,os,sys
-from databaseBrowserException import InvalidSmspytFileException
 from smodels.tools.physicsUnits import GeV, fb, TeV, pb
 from smodels.theory import element
 import numpy as np
+from scipy.interpolate import griddata
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
 logging.basicConfig(format=FORMAT)
@@ -46,6 +46,22 @@ class ULdata(object):
         if np.array(self.data[0][0]).shape() != np.array(massarray).shape():
             logger.error("Wrong mass input format")
             sys.exit()
+
+        mass = np.array(massarray).flatten()
+        xpts, ypts = np.array(), np.array()
+        for pt in self.data:            
+            xpts.append(np.array(pt[0]).flatten())
+            ypts.append(pt[1])
+
+        ul = griddata(xpts, ypts, [mass], method="linear")
+        #Deal with nested result from griddata:
+        while isinstance(ul[0],np.ndarray): ul = ul.flatten()
+        ul = ul[0]
+    
+        if type(ul) != type(pb):
+            logger.error("Masses out of efficiency map range (no extrapolation)")
+            return 0.
+        else: return ul            
             
 
 class EMdata(object):
@@ -75,9 +91,8 @@ class EMdata(object):
         
         for el, effmap in enumerate(self.dataDic):
             if el == element:
-                return "FIX: needs to implement interpolation of effmap"    
+                return "FIX: needs to implement interpolation of effmap"
 
-    
     
 class Smspy(object):
     """Holds all the information stored in the sms.py file. 
@@ -109,7 +124,7 @@ class Smspy(object):
         #Open the info file and get the information:
         if not os.path.isfile(path):
             logger.error("Data file %s not found" % path)
-            raise InvalidSmspytFileException("sms.py file not found")
+            sys.exit()
         smspy = {}
         execfile(path,smspy)
         if not 'Dict' in smspy:
