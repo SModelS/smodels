@@ -12,7 +12,6 @@
 from __future__ import print_function
 import logging
 from smodels.theory import crossSection
-from smodels.experiment import smsResults
 from smodels.tools.physicsUnits import GeV, fb, TeV
 
 logger = logging.getLogger(__name__)
@@ -236,7 +235,7 @@ class Printer(object):
             output += "%5s " % op.getmaxCondition() # condition violation
             output += "%10.3E %10.3E " % (op.value[0].value / fb,op.analysis.getUpperLimitFor(op.mass) / fb) # theory cross section , expt upper limit
             output += "%10.3E\n" % self.getR(op)
-            if self.describeTopo: output += "#" + str(smsResults.getConstraints(op.analysis.label.split(":")[0],op.analysis.label.split(":")[1])) + "\n"
+            if self.describeTopo: output += "#" + str(op.analysis.constraint) + "\n"
             if not op == self.outputarray[-1]: output += "--------------------------------------------------------------------------------\n"
 
         output += "\n \n"

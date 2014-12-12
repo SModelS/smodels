@@ -9,8 +9,7 @@
 
 """
 
-import logging,os
-from databaseBrowserException import InvalidInfoFieldException,InvalidFieldValueException,InvalidInfotxtFileException
+import logging,os,sys
 from smodels.tools.physicsUnits import GeV, fb, TeV, pb
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
@@ -82,7 +81,7 @@ class GlobalInfo(object):
             try: setattr(self,tag,eval(value))
             except NameError:
                 logger.error("The value for % should be numerical" % tag)
-                raise InvalidFieldValueException("Non numerical value for numerical field.")
+                sys.exit()
         else: setattr(self,tag,value)
         
     def getInfo(self, infoLabel):
@@ -127,7 +126,7 @@ class Infotxt(object):
         #Open the info file and get the information:
         if not os.path.isfile(path):
             logger.error("Info file %s not found" % path)
-            raise InvalidInfotxtFileException("info.txt file not found")            
+            sys.exit()            
         infoFile = open(self._path)
         content = infoFile.readlines()
         infoFile.close()
@@ -173,7 +172,7 @@ class Infotxt(object):
         if not txInfo is False: return txInfo
         
         logger.error("Info field %s not found" %infoLabel)
-        raise InvalidInfoFieldException("Invalid info field")
+        sys.exit()
   
     
     def getTxNames(self):
