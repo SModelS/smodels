@@ -32,3 +32,9 @@ class MassParametrizationException(Exception):
 
 class InvalidInfotxtFileException(Exception):
     pass
+
+class InvalidInfoFieldException(Exception):
+    pass
+
+class InvalidFieldValueException(Exception):
+    pass

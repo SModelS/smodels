@@ -38,8 +38,8 @@ class Browser(object):
     """
     def __init__(self, base='/afs/hephy.at/user/w/walten/public/sms/'):
         self._allruns = ["8TeV", "7TeV"] # expand to 13TeV and 14TeV later
-        self._allexperiments = ["CMS", "ATLAS"]
-        self._artifacts = ['old', 'bad', 'missing', 'TODO', 'readme', 'SUCHI_RL_TEST']
+#        self._allexperiments = ["CMS", "ATLAS"]
+#        self._artifacts = ['old', 'bad', 'missing', 'TODO', 'readme', 'SUCHI_RL_TEST']
         self._base = self._validateBase(base)
         self._experimentRestriction = None
         self._verbosity = 'error'
@@ -53,9 +53,8 @@ class Browser(object):
 
     @property
     def databaseVersion(self):
-        """The version of the database, read from the 'version'
-           file.
-
+        """
+        The version of the database, read from the 'version' file.
         """
         return self._databaseVersion
         
@@ -216,7 +215,7 @@ class Browser(object):
             logger.debug('Found info.txt in %s' %pathToInfo)
             try:
                 info = Infotxt(pathToInfo)
-            except   InvalidInfotxtFileException: continue  
+            except InvalidInfotxtFileException: continue  
             run = info._run
             run = '%s*TeV' %float(run.split('*')[0])
             if not run in data:
