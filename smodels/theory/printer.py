@@ -141,7 +141,8 @@ class Printer(object):
         output += "========================================================\n"
         output += "Analysis Name: "+self.label.split(":")[0]+'\n'
         output += "Tx Label: "+self.label.split(":")[1]+'\n'
-        output += "Analysis Sqrts: "+str(self.sqrts)+'\n'
+        output += "Sqrts: "+str(self.sqrts)+'\n'
+        output += "Luminosity: "+str(self.lum)+'\n'
         if outputLevel == 2:
             output += "\t -----------------------------\n"
             output += "\t Elements tested by analysis:\n"
