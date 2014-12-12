@@ -141,7 +141,8 @@ ptcDic = {"e"  : ["e+",  "e-"],
           "t"  : ["t+",  "t-"],
           "L+" : ["e+",  "mu+", "ta+"],
           "L-" : ["e-",  "mu-", "ta-"],
-          "L"  : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-"]}
+          "L"  : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-"],
+          "all" : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-", "jet", "W+", "W-","Z","photon","higgs","t+","t-","b"]}
 
 #Quantum numbers for the new particles. Just used by tools.slhaChecks
 #PDG: (spin*2, electrical charge*3, color dimension)
