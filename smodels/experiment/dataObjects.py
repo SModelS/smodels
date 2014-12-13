@@ -94,7 +94,7 @@ class EMdata(object):
                 return "FIX: needs to implement interpolation of effmap"
 
     
-class Smspy(object):
+class DataFile(object):
     """Holds all the information stored in the sms.py file. 
     Provides the required information about txNames and data.
        
@@ -162,7 +162,7 @@ class Smspy(object):
         txnames = smspy['Dict'].keys()
         return txnames
 
-    def getDataFor(self,txname=None):
+    def getData(self,txname=None):
         """For UL analyses returns the list of the ULdata object for the corresponding txname.
         For EM-type analyses, returns the EMdata object (txname is not used).
         

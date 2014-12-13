@@ -29,8 +29,8 @@ class ExpResult(object):
     """
     def __init__(self, path):
         self.path = path
-        self.info = infoObjects.Infotxt(os.path.join(path,"info.txt"))
-        self.smspy = dataObjects.Smspy(os.path.join(path,"sms.py"),self.info)
+        self.info = infoObjects.InfoFile(os.path.join(path,"info.txt"))
+        self.smspy = dataObjects.DataFile(os.path.join(path,"sms.py"),self.info)
     
 
 class DataBase(object):    
@@ -131,7 +131,7 @@ class DataBase(object):
 
     def _loadExpResults(self):
         """
-        Goes over the database folder and generates a list of ExpResult objects for
+        Checks the database folder and generates a list of ExpResult objects for
         each (info.txt,sms.py) pair.
         
         :return: list of ExpResult objects    
@@ -190,14 +190,15 @@ class DataBase(object):
             analysisType = info.getInfo('analysisType')            
             if analysisIDs and not ID in analysisIDs: continue
             if analysisType == 'EfficiencyMap':
-                newAna = analysisObjects.EManalysis(info,smspy.dataList[0])
+                data = smspy.getData()
+                newAna = analysisObjects.EManalysis(info,data)
                 logger.info('Only upper limits analyses are accepted. Skipping %s' % ID)
                 continue
                 analysisList.append(newAna)
             elif analysisType == 'UpperLimit':                
                 for txnameInfo in info.txNameInfoList:
                     if txnames and not txnameInfo.name in txnames: continue
-                    data = smspy.getDataFor(txnameInfo.name)
+                    data = smspy.getData(txnameInfo.name)
                     newAna = analysisObjects.ULanalysis(info.globalInfo,data,txnameInfo)            
                     analysisList.append(newAna)
         

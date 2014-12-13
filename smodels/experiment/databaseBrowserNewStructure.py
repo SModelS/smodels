@@ -20,7 +20,7 @@ from databaseBrowserException import InvalidExperimentIDException
 from databaseBrowserException import InvalidTxNameException
 from databaseBrowserException import InvalidInfotxtFileException
 from smodels.tools.physicsUnits import GeV
-from infotxt import Infotxt
+from infotxt import InfoFile
 
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
@@ -214,7 +214,7 @@ class Browser(object):
             pathToInfo = os.path.join(root, 'info.txt')
             logger.debug('Found info.txt in %s' %pathToInfo)
             try:
-                info = Infotxt(pathToInfo)
+                info = InfoFile(pathToInfo)
             except InvalidInfotxtFileException: continue  
             run = info._run
             run = '%s*TeV' %float(run.split('*')[0])
@@ -426,7 +426,7 @@ class Browser(object):
     def _txDict(self, txName):
         """Creates a nested dictionary that holds all the info.txt objects
         for each txName.
-        :return: {'txName': {'experimentID': Infotxt(experimentID)}}
+        :return: {'txName': {'experimentID': InfoFile(experimentID)}}
         
         """
         txDict = {}
