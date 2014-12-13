@@ -1,7 +1,7 @@
 """
-.. module:: databaseFactory
-   :synopsis: Holds the classes and methods to load the database and create the Infotxt and Smspy
-              objects.
+.. module:: databaseObjects
+   :synopsis: Holds the classes and methods to load the database and create the InfoFile and DataFile
+              objects as well as the list of analyses.
 
 .. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
