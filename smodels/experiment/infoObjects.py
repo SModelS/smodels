@@ -53,7 +53,7 @@ class TxNameInfo(object):
 
 class GlobalInfo(object):
     """
-    Holds the global information containing in a info.txt file
+    Holds the global information contained in a info.txt file
     (luminosity, sqrts, experimentID,...).
     Its attributes are generated according to the lines in the
     info.txt file which contain "info_tag: value".
@@ -67,7 +67,7 @@ class GlobalInfo(object):
     def __init__(self, path):        
         self.infofile = path
         self.analysisType = 'UpperLimit'
-        self._numericalAttr = ['lum','sqrts','lumi']
+        self._numericalAttr = ['sqrts','lumi']
         
     def addInfo(self,tag,value):
         """
@@ -93,7 +93,7 @@ class GlobalInfo(object):
         if hasattr(self,infoLabel): return getattr(self,infoLabel)
         else: return False
     
-class Infotxt(object):
+class InfoFile(object):
     """Holds all the information stored in the info.txt file. 
     Provides the required information about txNames, results and all the 
     meta-information needed for a single analysis object.
@@ -171,7 +171,7 @@ class Infotxt(object):
                 break
         if not txInfo is False: return txInfo
         
-        logger.error("Info field %s not found" %infoLabel)
+        logger.error("Info field %s not found" % infoLabel)
         sys.exit()
   
     
