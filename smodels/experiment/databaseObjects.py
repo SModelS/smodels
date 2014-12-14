@@ -31,7 +31,7 @@ class ExpResult(object):
         self.path = path
         self.info = infoObjects.InfoFile(os.path.join(path,"info.txt"))
         self.smspy = dataObjects.DataFile(os.path.join(path,"sms.py"),self.info)
-    
+            
 
 class DataBase(object):    
     """
@@ -197,8 +197,8 @@ class DataBase(object):
                 analysisList.append(newAna)
             elif analysisType == 'UpperLimit':                
                 for txnameInfo in info.txNameInfoList:
-                    if txnames and not txnameInfo.name in txnames: continue
-                    data = smspy.getData(txnameInfo.name)
+                    if txnames and not txnameInfo.txname in txnames: continue
+                    data = smspy.getData(txnameInfo.txname)
                     newAna = analysisObjects.ULanalysis(info.globalInfo,data,txnameInfo)            
                     analysisList.append(newAna)
         

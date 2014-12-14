@@ -98,7 +98,7 @@ class DataFile(object):
     """Holds all the information stored in the sms.py file. 
     Provides the required information about txNames and data.
        
-    :ivar _path: path to the sms.py file
+    :ivar path: path to the sms.py file
     :ivar dataList: list of data objects (either
     :ivar txNameInfoList: a list of TxNameInfo objects constaining the information
                          which is txname-specific (constraint, condition,...)
@@ -112,13 +112,13 @@ class DataFile(object):
         For EM analyses, generates a single EMdata object, which holds all the
         efficiency maps (for all the elements) for a single analysis/signal region.
         
-        :param path: path to the sms.py file (string)
+        :param datapath: path to the sms.py file (string)
         :param infoObject: Infotxt object containing the respective info.txt information    
         """
         
-        self._path = path
+        self.datapath = path
         self.infoObject = infoObject
-        logger.debug('Creating object based on sms.py: %s' %self._path)        
+        logger.debug('Creating object based on sms.py: %s' %self.datapath)        
         self.dataList = []
  
         #Open the info file and get the information:
@@ -158,7 +158,7 @@ class DataFile(object):
         """
         
         smspy = {}
-        execfile(self._path,smspy)
+        execfile(self.datapath,smspy)
         txnames = smspy['Dict'].keys()
         return txnames
 
