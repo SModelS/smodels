@@ -26,16 +26,50 @@ class Browser(object):
     Verbosity can be set to specified level.
     
     :ivar database: DataBase object holding all the database information
+    :ivar browserList: list of experimental results loaded in the browser.
+                       Can be used to hold a subset of results in the database.
+                       By default all results are loaded. 
     
     """
     def __init__(self, database):
+        
+        self.browserList = []
         if isinstance(database,str):
-            self.database = DataBase(database)
+            self.database = DataBase(database)            
         elif isinstance(database,DataBase):
             self.database = database
         else:
             logger.error("The input must be the database location or a DataBase object.")
+            sys.exit()            
+        self.loadAllResults()
+        
+    def __iter__(self):
+        return iter(self.browserList)
+
+    def __getitem__(self, index):
+        return self.browserList[index]
+
+    def __setitem__(self, index, expRes):
+        if not isinstance(expRes,ExpResult):
+            logger.error("Input object must be a ExpResult() object")
             sys.exit()
+        else:
+            self.browserList[index] = expRes
+
+    def __len__(self):
+        return len(self.browserList)
+
+    def __str__(self):
+        return str([expRes.info.getInfo('id') for expRes in self.browserList])
+    
+        
+    def loadAllResults(self):
+        """
+        Saves all the results from database to the browserList.
+        Can be used to restore all results to browserList.
+        """
+        
+        self.browserList = self.database.expResultList[:]
             
     def getValuesFor(self,attribute=None,expResult=None):
         """
@@ -97,9 +131,16 @@ class Browser(object):
         return fields
      
   
-    def getExpResultsWith(self,restrDict = {}):
-        """Returns a list of all experimental results (pair of InfoFile and DataFile)
-        with the fields and field values given as a restriction dictionary.
+    def loadExpResultsWith(self,restrDict = {}):
+        """
+        Loads the list of the experimental results (pair of InfoFile and DataFile)
+        satisfying the restrictions to the browserList.
+        The restrictions specified as a dictionary.
+        
+        :param restrDict: dictionary containing the fields and their allowed values.
+                          E.g. {'lumi' : [19.4/fb, 20.3/fb], 'txname' : 'T1',....}
+                          The dictionary values can be single entries or a list of values.
+                          For the fields not listed, all values are assumed to be allowed.
         """
           
         #First check all the selected fields exist and build the corresponding
@@ -134,4 +175,4 @@ class Browser(object):
                     break                        
 
               
-        return results
+        self.browserList = results[:]
