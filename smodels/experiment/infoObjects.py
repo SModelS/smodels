@@ -30,7 +30,7 @@ class TxNameInfo(object):
     
     def __init__(self, txname=None):
         
-        self.name = txname    
+        self.txname = txname    
         
     def addInfo(self,tag,value):
         """
@@ -80,7 +80,7 @@ class GlobalInfo(object):
         if tag in self._numericalAttr:
             try: setattr(self,tag,eval(value))
             except NameError:
-                logger.error("The value for % should be numerical" % tag)
+                logger.error("The value for %s should be numerical" % tag)
                 sys.exit()
         else: setattr(self,tag,value)
         
@@ -98,7 +98,7 @@ class InfoFile(object):
     Provides the required information about txNames, results and all the 
     meta-information needed for a single analysis object.
        
-    :ivar _path: path to the info.txt file
+    :ivar infopath: path to the info.txt file
     :ivar globalInfo: GlobalInfo object. Containts all the global information in the file
                       (lum, sqrts, ID,...)
     :ivar txNameInfoList: a list of TxNameInfo objects constaining the information
@@ -114,8 +114,8 @@ class InfoFile(object):
         :param path: path to the info.txt file    
         """
         
-        self._path = path
-        logger.debug('Creating object based on info.txt: %s' %self._path)        
+        self.infopath = path
+        logger.debug('Creating object based on info.txt: %s' %self.infopath)        
         self.globalInfo = None
         self.txNameInfoList = []        
         self._txnameFields = ['constraint', 'condition', 'fuzzycondition', \
@@ -127,10 +127,10 @@ class InfoFile(object):
         if not os.path.isfile(path):
             logger.error("Info file %s not found" % path)
             sys.exit()            
-        infoFile = open(self._path)
+        infoFile = open(self.infopath)
         content = infoFile.readlines()
         infoFile.close()
-        globalInfo = GlobalInfo(self._path)
+        globalInfo = GlobalInfo(self.infopath)
         txObjects = {}
         
         #Get tags in info file:
@@ -142,7 +142,7 @@ class InfoFile(object):
             if tags.count(tag) == 1 and not tag in self._txnameFields:
                 globalInfo.addInfo(tag,value)
             elif not tag in self._txnameFields:
-                logger.info("Ignoring unknown field %s found in file %s" % (tag, self._path))
+                logger.info("Ignoring unknown field %s found in file %s" % (tag, self.infopath))
                 continue
             elif "->" in value:
                 txname = value.split('->')[0].strip()
@@ -164,9 +164,9 @@ class InfoFile(object):
         
         globInfo = self.globalInfo.getInfo(infoLabel)
         if not globInfo is False: return globInfo
-        txInfo = False        
+        txInfo = False
         for txNameInfo in self.txNameInfoList:
-            if txNameInfo.name == txname:
+            if txNameInfo.txname == txname:
                 txInfo = txNameInfo.getInfo(infoLabel)
                 break
         if not txInfo is False: return txInfo
@@ -181,7 +181,7 @@ class InfoFile(object):
         :return: list of txnames (strings)        
         """
         
-        txnames = [txNameInfo.name for txNameInfo in self.txNameInfoList]
+        txnames = [txNameInfo.txname for txNameInfo in self.txNameInfoList]
         return txnames
 
     def getTxInfoFor(self,txname):
@@ -190,6 +190,6 @@ class InfoFile(object):
         """
         
         for txInfo in self.txNameInfoList:
-            if txInfo.name == txname: return txInfo
+            if txInfo.txname == txname: return txInfo
         logger.info("No object found for Txname = %s" % txname)
         return None

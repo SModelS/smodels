@@ -47,7 +47,7 @@ class ULanalysis(Analysis,Printer):
         Analysis.__init__(self,globalInfo,ULdata)
         Printer.__init__(self)
         self.txInfo = txnameInfo
-        self.label += ':' + txnameInfo.name
+        self.label += ':' + txnameInfo.txname
         
         self.conditions = txnameInfo.getInfo('fuzzycondition')
         self.constraint = txnameInfo.getInfo('constraint')
