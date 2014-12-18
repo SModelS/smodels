@@ -20,22 +20,22 @@ logger.setLevel(level=logging.INFO)
 
 class ExpResult(object):
     """
-    Simple object to hols a pair of (Infotxt,Smspy) objects corresponding to an
+    Simple object to hols a pair of (InfoFile,DataFile) objects corresponding to an
     experimental result.
     
     :ivar path: path to the result folder
-    :ivar info: Infotxt object
-    :ivar smspy: Smspy object
+    :ivar info: InfoFile object
+    :ivar data: DataFile object
     """
     def __init__(self, path):
         self.path = path
         self.info = infoObjects.InfoFile(os.path.join(path,"info.txt"))
-        self.smspy = dataObjects.DataFile(os.path.join(path,"sms.py"),self.info)
+        self.data = dataObjects.DataFile(os.path.join(path,"sms.py"),self.info)
             
 
 class DataBase(object):    
     """
-    Database object. Holds a collection of Infotxt and Smspy objects containing
+    Database object. Holds a collection of InfoFile and DataFile objects containing
     all the metainfo from the info.txt files and the corresponding data from the sms.py
     files.
     
@@ -185,7 +185,7 @@ class DataBase(object):
         analysisList = []
         for expResult in self.expResultList:
             info = expResult.info
-            smspy = expResult.smspy
+            smspy = expResult.data
             ID = info.getInfo('id')
             analysisType = info.getInfo('analysisType')            
             if analysisIDs and not ID in analysisIDs: continue

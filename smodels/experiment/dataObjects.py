@@ -113,7 +113,7 @@ class DataFile(object):
         efficiency maps (for all the elements) for a single analysis/signal region.
         
         :param datapath: path to the sms.py file (string)
-        :param infoObject: Infotxt object containing the respective info.txt information    
+        :param infoObject: InfoData object containing the respective info.txt information    
         """
         
         self.datapath = path
