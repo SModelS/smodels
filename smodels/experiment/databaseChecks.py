@@ -8,6 +8,7 @@
 """
 
 import logging, os, sys, re
+from smodels.tools.physicsUnits import GeV, fb, TeV, pb
 from smodels.experiment import infoObjects, dataObjects, analysisObjects
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
@@ -191,51 +192,98 @@ def globalInfoChecker(object):
     
     def id(self,value):
         
-        pass
-    
+        experiments = ['ATLAS','CMS']
+        paperNames = ['CONF','SUSY','PAS']
+        try:
+            values = value.split('-')
+            if not value[0] in experiments:
+                return False
+            if not value[1] in paperNames:
+                return False
+            if not isinstance(eval(values[-1]),int) \
+            or not isinstance(eval(values[-2]),int):
+                return False
+        except:
+            return False
+        return True
+                
     def url(self,value):
         
-        pass
+        if not value[:8] == 'https://' and not value[:7] == 'http://':
+            return False
+        return True
     
     def digitaldata(self,value):
         
-        pass
+        if not value == 'False' and not value == 'True':
+            return False
+        return True
   
     def publication(self,value):
         
-        pass
+        if not value[:8] == 'https://' and not value[:7] == 'http://':
+            return False
+        return True
     
     def arxiv(self,value):
         
-        pass
+        if not value[:8] == 'https://' and not value[:7] == 'http://':
+            return False
+        return True
     
     def superseded_by(self,value):
         
-        pass
-    
+        try:
+            values = value.split(',')
+            values = [value.strip() for value in values]
+            for value in values:
+                return self.id(value)
+        except:
+            return False
+        
     def supersedes(self, value):
         
-        pass
+        try:
+            values = value.split(',')
+            values = [value.strip() for value in values]
+            for value in values:
+                return self.id(value)
+        except:
+            return False
     
     def checked(self, value):
         
-        pass
+        checkers = ['AL', 'SuK', 'WW', 'UL', 'VM', 'MT', 'SK']
+        try:
+            values = values.split(',')
+            values = [value.strip() for value in values]
+            for value in values:
+                topo, checker = value.split(':')
+                checker = checker.strip()
+                if not checker in checkers: return False
+        except:
+            return False
+        return True
     
     def private(self, value):
         
-        pass
+        if not value == 'False' and not value == 'True':
+            return False
+        return True
     
     def prettyname(self, value):
     
-        pass
+        return True
     
     def contact(self, value):
         
-        pass
+        return True
     
     def validated(self, value):
         
-        pass
+        if not value == 'False' and not value == 'True':
+            return False
+        return True
 
 
 def checkInfoFile(infoFileObj):
