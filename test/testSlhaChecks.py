@@ -15,7 +15,7 @@ from smodels.tools import slhaChecks
 class SlhaTest(unittest.TestCase):
     def testGoodFile(self):
 
-        filename = "%sinputFiles/slha/lightSquarks.slha" % (installDirectory() )
+        filename = "%sinputFiles/slha/gluino_squarks.slha" % (installDirectory() )
         st=slhaChecks.SlhaStatus(filename)
         self.assertEquals ( st.status, (1, 'Input file ok') )
         
