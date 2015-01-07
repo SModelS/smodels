@@ -1,6 +1,6 @@
 Input status: 1
 Decomposition output status: 1 #decomposition was successful
-#Input File: ../inputFiles/slha/lightSquarks.slha
+#Input File: ../inputFiles/slha/gluino_squarks.slha
 #maxcond = 0.2
 #minmassgap = 5.
 #sigmacut = 0.03
@@ -19,7 +19,7 @@ Decomposition output status: 1 #decomposition was successful
 
  
 ================================================================================
-The highest R value is r_ratio = 1.08E-01 
+The highest r value is = 1.08E-01 
 
 ================================================================================
 Missing topologies with the highest cross-sections (up to 10):
