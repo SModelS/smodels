@@ -152,8 +152,9 @@ def _getArray(constraint):
 
 
 if __name__ == "__main__":
+    smsHelpers.base="../../../smodels-database/"
     load()
     print("List of analyses/results: ")
     _listOfAnalyses = load()
     for (ct, _ana) in enumerate(_listOfAnalyses):
-        print(ct, _ana.label, _ana.Top.vertnumb, _ana.Top.vertparts)
+        print(ct, _ana, _ana.constraint, _ana.conditions, _ana.sqrts )
