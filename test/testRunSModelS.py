@@ -27,5 +27,18 @@ class RunSModelSTest(unittest.TestCase):
                 "%s/test/unitTestOutput.txt" %installDirectory())
         self.assertEquals(sample, outputfile)
 
+    def testBadFile(self):
+
+        filename = "%s/inputFiles/slha/I_dont_exist.slha" % (installDirectory() )
+#        print "filename=",filename
+        main(filename, 
+             parameterFile="%s/test/testParameters.ini" %installDirectory(), 
+             outputFile="%s/test/unitTestOutput.txt" %installDirectory())
+        sample = summaryReader.Summary(
+                "%s/test/summary_bad_default.txt" %installDirectory())
+        outputfile = summaryReader.Summary(
+                "%s/test/unitTestOutput.txt" %installDirectory())
+        self.assertEquals(sample, outputfile)
+
 if __name__ == "__main__":
     unittest.main()
