@@ -19,7 +19,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 def load(analyses=None, topologies=None, sqrts=[7, 8], usePrivate=False, useSuperseded=False ):
     """
     Create an analysis objects from the info given in the SMS results database.
