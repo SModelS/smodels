@@ -115,12 +115,12 @@ class OutputStatus(Printer):
     
     def checkStatus(self):
         """
-        check status, exit if negativ
+        printout negative status, FIXME more comments
         """
         if self.status < 0:
             self.printout("stdout")
             self.printout("file",self.outputfile)
-            sys.exit()
+        return self.status
 
 
     def updateStatus(self, status):
@@ -129,7 +129,7 @@ class OutputStatus(Printer):
         :parameter status: new status flag
         """
         self.status = status
-        self.checkStatus()
+        return self.checkStatus()
 
     def updateSLHAStatus(self, status):
         """

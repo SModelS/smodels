@@ -79,11 +79,13 @@ def main(inputFile, parameterFile, outputFile):
     except:
         #Update status to fail, print error message and exit:
         outputStatus.updateStatus(-1)
+        return
         
 #Print Decomposition output:
     # If no topologies with sigma > sigmacut are found, update status, write output file, stop running
     if not smstoplist:
         outputStatus.updateStatus(-3)
+        return
             
     outLevel= 0
     if parser.getboolean("stdout","printDecomp"):
