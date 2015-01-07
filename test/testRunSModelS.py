@@ -16,7 +16,7 @@ from runSModelS import main
 class RunSModelSTest(unittest.TestCase):
     def testGoodFile(self):
 
-        filename = "%s/inputFiles/slha/lightSquarks.slha" % (installDirectory() )
+        filename = "%s/inputFiles/slha/gluino_squarks.slha" % (installDirectory() )
 #        print "filename=",filename
         main(filename, 
              parameterFile="%s/test/testParameters.ini" %installDirectory(), 
