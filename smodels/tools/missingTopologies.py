@@ -9,6 +9,7 @@
 """
 
 from smodels.theory.printer import Printer
+from smodels.tools.physicsUnits import GeV
 
 class MissingTopo():
     """
@@ -16,9 +17,10 @@ class MissingTopo():
     :ivar topo: topology description
     :ivar weights: weights dictionary
     """
-    def __init__(self, topo, weights):
+    def __init__(self, topo, weights, masses ):
         self.topo = topo
         self.weights = weights
+        self.masses  = masses
         self.value = None
 
 class MissingTopoList(Printer):
@@ -33,6 +35,14 @@ class MissingTopoList(Printer):
     def formatData(self,outputLevel):
         return self.formatMissingData(outputLevel)
 
+    def equals ( self, m1, m2 ):
+        if len(m1)!=len(m2):
+            return False
+        for (i1,i2) in zip(m1[0]+m1[1],m2[0]+m2[1]):
+            if abs(  i2.asNumber(GeV)-i1.asNumber(GeV) )>.0001:
+                return False
+        return True
+
     def addToTopos(self, el, sumL=None):
         """
         adds an element to the list of missing topologies
@@ -42,10 +52,10 @@ class MissingTopoList(Printer):
         """
         name = self.orderbranches(self.generalName(el.__str__(), sumL))
         for topo in self.topos:
-            if name == topo.topo:
+            if name == topo.topo and self.equals ( el.getMasses(), topo.masses ):
                 topo.weights += el.weight
                 return
-        self.topos.append(MissingTopo(name, el.weight))
+        self.topos.append(MissingTopo(name, el.weight, el.getMasses()  ))
         return
 
     def generalName(self, instr, sumL=None):
