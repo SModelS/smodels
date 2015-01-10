@@ -129,9 +129,9 @@ def main(inputFile, parameterFile, outputFile):
         theorypredictions = theoryPredictionFor(analysis, smstoplist)
         if not theorypredictions:  continue
         if parser.getboolean("stdout","printResults"):
-            print "="*80
+            print "================================================================================"
             theorypredictions.printout()
-        print "."*80
+        print "................................................................................"
 
         # Create a list of results, to determine the best result
         for theoryprediction in theorypredictions:
