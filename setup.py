@@ -76,10 +76,13 @@ def compile():
     import subprocess
     subprocess.call( ["make","-C","lib" ] )
 
+def version():
+    with open("version") as f: return f.readline()
+
 compile()
 setup(
     name = "smodels",
-    version = "1.0",
+    version = version(),
     author = ("Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, "
               "Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, "
               "Michael Traub, Wolfgang Waltenberger"),
