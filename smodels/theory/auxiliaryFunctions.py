@@ -48,7 +48,7 @@ def massPosition(mass, analysis):
     if type(xmass) != type(1.*pb):
         return None
     xmass = xmass / fb
-    return xmass.asNumber()
+    return xmass
 
 
 def distance(xmass1, xmass2):

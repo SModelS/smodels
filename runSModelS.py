@@ -125,7 +125,7 @@ def main(inputFile, parameterFile, outputFile):
                                    describeTopo = parser.getboolean("file","addConstraintInfo"))
     
     #Get theory prediction for each analysis and print basic output
-    for analysis in listofanalyses:        
+    for analysis in listofanalyses:
         theorypredictions = theoryPredictionFor(analysis, smstoplist)
         if not theorypredictions:  continue
         if parser.getboolean("stdout","printResults"):
