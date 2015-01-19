@@ -64,7 +64,7 @@ def compile():
 compile()
 setup(
     name="smodels",
-    version="1.0",
+    version="1.0.1",
     author=("Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, "
               "Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, "
               "Michael Traub, Wolfgang Waltenberger"),
