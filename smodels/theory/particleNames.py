@@ -62,6 +62,7 @@ def elementsInStr(instring):
     :returns: list of elements appearing in instring in string format
     
     """
+    
     if type(instring) == type('st'):
         outstr = instring
     elif type(instring) == type([]):

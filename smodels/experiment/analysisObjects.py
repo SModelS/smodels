@@ -51,8 +51,8 @@ class ULanalysis(Analysis,Printer):
         
         self.conditions = txnameInfo.getInfo('fuzzycondition')
         self.constraint = txnameInfo.getInfo('constraint')
-        self.elementsEff = self._generateEffs
-
+        self.elementsEff = self._generateEffs()
+        
     def __str__(self):
         return self.label
     
@@ -66,8 +66,7 @@ class ULanalysis(Analysis,Printer):
         
         #First generate all the elements which appear in the constraint or conditions
         elStrings = elementsInStr(self.constraint)
-        if self.conditions:
-            for cond in self.conditions: elStrings += elementsInStr(cond)
+        if self.conditions: elStrings += elementsInStr(self.conditions)
         elementsEff = {}
         elStrings = set(elStrings)
         for elstr in elStrings:
@@ -84,6 +83,7 @@ class ULanalysis(Analysis,Printer):
         
         :returns: 1 if element is in constraint, zero otherwise        
         """
+        
         for el in self.elementsEff:
             if element.particlesMatch(el):
                 return self.elementsEff[el]
