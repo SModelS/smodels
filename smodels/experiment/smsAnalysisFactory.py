@@ -19,6 +19,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def load(analyses=None, topologies=None, sqrts=[7, 8], usePrivate=False, useSuperseded=False ):
     """
     Create an analysis objects from the info given in the SMS results database.
@@ -56,6 +57,9 @@ def load(analyses=None, topologies=None, sqrts=[7, 8], usePrivate=False, useSupe
     if analyses == None:
         analyses = smsResults.getAllResults().keys()
     for ana in analyses:
+        if not smsHelpers.getPath(ana):
+            logger.warning("Analyses %s not found" % ana)
+            continue        
         if smsResults.isPrivate(ana) and not usePrivate:
             logger.info("Skipping private analysis %s.",str(ana))
             continue
@@ -96,6 +100,9 @@ def load(analyses=None, topologies=None, sqrts=[7, 8], usePrivate=False, useSupe
             newAnalysis.elementsEff = _getElementsEffs(constraint,cond)
             # Add analysis to list of analyses:
             listOfAnalyses.append(newAnalysis)
+    
+    if not listOfAnalyses:
+        logger.warning("Zero analysis loaded.")
 
     return listOfAnalyses
 
@@ -152,9 +159,8 @@ def _getArray(constraint):
 
 
 if __name__ == "__main__":
-    smsHelpers.base="../../../smodels-database/"
     load()
     print("List of analyses/results: ")
     _listOfAnalyses = load()
     for (ct, _ana) in enumerate(_listOfAnalyses):
-        print(ct, _ana, _ana.constraint, _ana.conditions, _ana.sqrts )
+        print(ct, _ana.label, _ana.Top.vertnumb, _ana.Top.vertparts)
