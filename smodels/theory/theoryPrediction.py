@@ -11,8 +11,7 @@ import copy
 from smodels.theory import clusterTools, crossSection, element
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.auxiliaryFunctions import cSim, cGtr  #DO NOT REMOVE
-from smodels.theory.analysis import EManalysis
-from smodels.theory.analysis import ULanalysis
+from smodels.experiment.analysisObjects import EManalysis, ULanalysis
 from smodels.theory.printer import Printer
 import logging
 
@@ -163,9 +162,9 @@ def _combineElements(elements, analysis, maxDist):
     :parameter analysis: analysis to be considered (ULanalysis or EManalysis object)
     :returns: list of element clusters (ElementCluster objects)
     """
-    if type(analysis) == type(EManalysis()):
+    if isinstance(analysis,EManalysis):
         clusters = [clusterTools.groupAll(elements)]
-    elif type(analysis) == type(ULanalysis()):
+    elif isinstance(analysis,ULanalysis):        
         clusters = clusterTools.clusterElements(elements, analysis, maxDist)
     return clusters
 
@@ -182,9 +181,9 @@ def _evalConstraint(cluster, analysis):
     :returns: cluster cross-section
     """    
     
-    if type(analysis) == type(EManalysis()):
+    if isinstance(analysis,EManalysis):
         return cluster.getTotalXSec()
-    elif type(analysis) == type(ULanalysis()):
+    elif isinstance(analysis,ULanalysis):
         if not analysis.constraint:
             return analysis.constraint
         
@@ -203,9 +202,9 @@ def _evalConditions(cluster, analysis):
     :returns: list of condition values (floats) if analysis type == upper limit. None, otherwise.    
     """    
     
-    if type(analysis) == type(EManalysis()):
+    if isinstance(analysis,EManalysis):
         return None
-    elif type(analysis) == type(ULanalysis()):
+    elif isinstance(analysis,ULanalysis):
         if not analysis.conditions:
             return analysis.conditions
         conditions = {}

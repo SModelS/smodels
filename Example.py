@@ -14,10 +14,10 @@ from smodels.theory import lheDecomposer
 from smodels.tools.physicsUnits import fb, GeV
 from smodels.experiment import smsAnalysisFactory
 from smodels.theory.theoryPrediction import theoryPredictionFor
-from smodels.experiment import smsHelpers
+from smodels.experiment.databaseObjects import DataBase
 
 #Set the address of the database folder
-smsHelpers.base="./smodels-database/"
+database = DataBase("/home/lessa/smodels-database/")
 
 
 def main():
@@ -31,7 +31,7 @@ def main():
 #     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
 
     #Set main options for decomposition:
-    sigmacut = 0.03 * fb
+    sigmacut = 0.3 * fb
     mingap = 5. * GeV
 
     #Decompose model (use slhaDecomposer for SLHA input or lheDecomposer for LHE input):
@@ -42,7 +42,7 @@ def main():
     smstoplist.printout(outputLevel=1)
 
     # Load all analyses from database
-    listofanalyses = smsAnalysisFactory.load()
+    listofanalyses = database.getAnalyses()
 
     # Compute the theory predictions for each analysis
     analysesPredictions = [theoryPredictionFor(analysis, smstoplist) for analysis in listofanalyses]

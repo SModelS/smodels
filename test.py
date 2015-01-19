@@ -15,7 +15,7 @@ from smodels.tools.physicsUnits import GeV, fb, TeV, pb
 from smodels.experiment.databaseBrowser import Browser
 import numpy as np
 
-database = DataBase("/home/lessa/smodels-HSCP/smodels-database/")
+database = DataBase("/home/lessa/smodels-database/")
 browser = Browser(database)
 #print browser.getAttributes()
 #print browser.getAttributes()
@@ -24,13 +24,14 @@ print browser
 browser.loadExpResultsWith({'txname': ['T2','T1'], 'id' : ['ATLAS-CONF-2013-047','CMS-SUS-12-028','CMS-SUS-12-018']})
 print browser
 
-sys.exit()
-database = DataBase("/home/lessa/smodels-HSCP/smodels-database/")
-print database._getDatabaseVersion
-res = database._getExpResults(txnames=["TChiWZ"])
-for r in res: print r.info.getInfo('id'),r.info.getTxNames()
+#sys.exit()
+database = DataBase("/home/lessa/smodels-database/")
+#print database._getDatabaseVersion
+#res = database._getExpResults(txnames=["TChiWZ"])
+#for r in res: print r.info.getInfo('id'),r.info.getTxNames()
+#sys.exit()
 
-listOfana = database.getAnalyses()
+listOfana = database.getAnalyses(txnames=['TChiWZ'])
 
 
 for ana in listOfana:
