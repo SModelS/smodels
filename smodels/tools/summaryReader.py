@@ -1,11 +1,11 @@
-#!/usr/bin/env python
+"""
+.. module:: summaryReader
+   :synopsis: Classes to read the summary.txt files.
+    
+.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>    
 
 """
-    .. module:: summaryReader
-    :synopsis: Definitions of class to read the summary.txt files
-    
-    .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>    
-"""
+
 class Output():
     def __init__(self, l):
         self.ana = l[0]
@@ -22,11 +22,12 @@ class Output():
         else:
             return False
 
+
 class Summary():
     """
     Class to access the output given in the summary.txt
+    
     """
-
     def __init__(self, filename):
         self.results = []
         self.read(filename)
@@ -35,17 +36,23 @@ class Summary():
         f = open(infile)
         resultLines = None
         for l in f:
-            if not l.strip(): continue
+            if not l.strip():
+                continue
             if "#Analysis" in l:
                 resultLines = True
                 continue
-            if l.startswith("#"): continue
-            if "----" in l: continue
-            if "====" in l: resultLines = None
+            if l.startswith("#"):
+                continue
+            if "----" in l:
+                continue
+            if "====" in l:
+                resultLines = None
             if resultLines: self.results.append(Output(l.split()))
 
     def __eq__(self, other):
-        if not len(self.results) == len(other.results): return False
+        if not len(self.results) == len(other.results):
+            return False
         for res in self.results:
-            if not res in other.results: return False
+            if not res in other.results:
+                return False
         return True
