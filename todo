@@ -1,0 +1,7 @@
+- remove lightEwkinos in inputFiles/slha/ in the tarball
+- remove oldFiles from the tarball
+- mv recipes to docs/Manual/
+- remove .ipynb from the tarball
+- write script in distribution
+- remove test/ by the distribution script
+- add database to tarball
