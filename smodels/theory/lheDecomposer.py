@@ -186,5 +186,3 @@ def _getDictionariesFromEvent(event):
         brDic[ibranch][momPdg][0].ids.append(particle.pdg)
 
     return brDic, massDic
-
-
