@@ -8,7 +8,6 @@
    
 """
 
-
 import sys
 import commands
 import os
@@ -57,18 +56,22 @@ def makeClean ():
     o=commands.getoutput("cd ../lib/ ; make clean" )
     print o
 
-def fetchDatabase(dirname):
+def fetchDatabase(version,dirname):
     """ git-pull the database """
     print "git pull the database """
-    o=commands.getoutput( "cd %s; git clone git@smodels.hephy.at:smodels-database " % dirname )
+    cmd="cd %s; git clone -b v%s git@smodels.hephy.at:smodels-database " % \
+            (dirname, version)
+    o=commands.getoutput( cmd )
     print o
 
 def createTarball(version,dirname):
     """ finally create the tarball """
     print "Create tarball smodels-v%s.tar.gz" % version
-    o=commands.getoutput("tar czvf smodels-v%s.tar.gz %s" % (version,dirname) )
+    o=commands.getoutput("tar czvf smodels-v%s.tar.gz %s" % (version, dirname) )
     print o
 
+def rmExtraFiles(dirname):
+    """ remove a few more files """
 
 def create():
     """ create a tarball for distribution """
@@ -80,7 +83,8 @@ def create():
     mkdir(dirname)
     cp(dirname)
     rmpyc(dirname)
-    ## fetchDatabase(dirname)
+    rmExtraFiles(dirname)
+    ## fetchDatabase(version,dirname)
     createTarball(version,dirname)
     rmdir(dirname)
 
