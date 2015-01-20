@@ -62,7 +62,7 @@ def compile():
 
 
 def version():
-    with open("version") as f: return f.readline()
+    with open("smodels/version") as f: return f.readline()
 
 compile()
 setup(
