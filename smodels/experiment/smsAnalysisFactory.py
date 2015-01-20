@@ -58,7 +58,7 @@ def load(analyses=None, topologies=None, sqrts=[7, 8], usePrivate=False, useSupe
         analyses = smsResults.getAllResults().keys()
     for ana in analyses:
         if not smsHelpers.getPath(ana):
-            logger.warning("Analyses %s not found" % ana)
+            logger.warning("Analysis %s not found" % ana)
             continue        
         if smsResults.isPrivate(ana) and not usePrivate:
             logger.info("Skipping private analysis %s.",str(ana))
@@ -102,7 +102,7 @@ def load(analyses=None, topologies=None, sqrts=[7, 8], usePrivate=False, useSupe
             listOfAnalyses.append(newAnalysis)
     
     if not listOfAnalyses:
-        logger.warning("Zero analysis loaded.")
+        logger.warning("Zero analyses loaded.")
 
     return listOfAnalyses
 
