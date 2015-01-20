@@ -60,8 +60,9 @@ def makeClean ():
 
 def fetchDatabase():
     """ git-pull the database """
-    print RED,"git clone the database ",RESET
-    cmd="cd %s; git clone -b v%s git@smodels.hephy.at:smodels-database " % \
+    print RED,"git clone the database ... ",RESET
+    cmd="cd %s; git clone -b v%s git@smodels.hephy.at:smodels-database ;" \
+        " rm -rf smodels-database/.git smodels-database/.gitignore " % \
             (dirname, version)
     o=commands.getoutput( cmd )
     print o
@@ -104,7 +105,9 @@ def runExample ( ):
 
 def test ( ):
     """ test the tarball, explode it, run make, and runSModelS.py """
-    print RED,"Now test the setup ...",RESET
+    print RED,"--------------------------",RESET
+    print RED,"    Test the setup ...    ",RESET
+    print RED,"--------------------------",RESET
     rmdir ( )
     explode ( )
     make ( )
