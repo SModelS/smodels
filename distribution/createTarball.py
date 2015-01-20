@@ -84,26 +84,31 @@ def convertRecipes():
 
 def explode ( ):
     """ explode the tarball """
+    print RED,"Explode the tarball ...", RESET
     cmd="tar xzvf smodels-v%s.tar.gz" % version
     o=commands.getoutput ( cmd )
 
 def make ( ):
     """ run make in dirname/lib """
-    print RED,"Now run make in dirname/lib", RESET
+    print RED,"Now run make in dirname/lib ...", RESET
     cmd="cd %s/lib; make" % dirname
     o=commands.getoutput ( cmd )
     print o
 
 def runExample ( ):
     """ run Example.py """
-
+    print RED,"Now run Example.py ...",RESET
+    cmd="cd %s/; ./Example.py" % dirname
+    o=commands.getoutput ( cmd )
+    print o
 
 def test ( ):
     """ test the tarball, explode it, run make, and runSModelS.py """
-    print RED,"Now test the setup",RESET
+    print RED,"Now test the setup ...",RESET
     rmdir ( )
     explode ( )
     make ( )
+    runExample()
 
 
 def create():
