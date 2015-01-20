@@ -73,6 +73,13 @@ def createTarball(version,dirname):
 def rmExtraFiles(dirname):
     """ remove a few more files """
 
+def convertRecipes(dirname):
+    """ convert the recipes from .ipynb to .py and .html """
+    print "Converting the recipes"
+    cmd="cd %s/docs/Manual/recipes/; make convert remove_ipynbs" % dirname
+    o=commands.getoutput ( cmd )
+    print o
+
 def create():
     """ create a tarball for distribution """
     version=getVersion()
@@ -85,8 +92,9 @@ def create():
     rmpyc(dirname)
     rmExtraFiles(dirname)
     ## fetchDatabase(version,dirname)
+    convertRecipes(dirname)
     createTarball(version,dirname)
-    rmdir(dirname)
+##     rmdir(dirname)
 
 
 if __name__ == "__main__":
