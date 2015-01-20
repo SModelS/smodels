@@ -32,7 +32,7 @@ def rmdir( dirname ):
     """ remove the temporary directory """
     if os.path.exists(dirname):
         print "Removing temporary directory",dirname
-        o=commands.getoutput ( "rm -r %s" % dirname )
+        o=commands.getoutput ( "rm -rf %s" % dirname )
         print o
 
 def cp( dirname ):
@@ -58,7 +58,7 @@ def makeClean ():
 
 def fetchDatabase(version,dirname):
     """ git-pull the database """
-    print "git pull the database """
+    print "git clone the database """
     cmd="cd %s; git clone -b v%s git@smodels.hephy.at:smodels-database " % \
             (dirname, version)
     o=commands.getoutput( cmd )
@@ -91,7 +91,7 @@ def create():
     cp(dirname)
     rmpyc(dirname)
     rmExtraFiles(dirname)
-    ## fetchDatabase(version,dirname)
+    fetchDatabase(version,dirname)
     convertRecipes(dirname)
     createTarball(version,dirname)
 ##     rmdir(dirname)
