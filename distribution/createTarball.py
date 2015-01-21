@@ -13,8 +13,8 @@ import commands
 import os
 
 
-RED = "\[31;11m"
-RESET = "\[37;0m"
+RED = "\033[31;11m"
+RESET = "\033[7;0m"
 
 
 def getVersion():
