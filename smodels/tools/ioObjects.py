@@ -540,6 +540,7 @@ class SlhaStatus(Printer):
         #Check if any of particles being produced have visible displaced vertices
         #with a weight > sigmacut
         chargedList = []
+        missingList = []
         ltstr = ""
         for pid in xsecList.getPIDs():
             if pid in rEven: continue
@@ -563,13 +564,21 @@ class SlhaStatus(Printer):
                         brvalue += decay.br
                         daughters.append(decay.ids)
                         break
+                    elif self.visible(abs(pidb), decay=True) == None:
+                        if not abs(pidb) in missingList:
+                            missingList.append(abs(pidb))
             if xsecmax*brvalue > self.sigmacut:
                 if not abs(pid) in chargedList:
                     chargedList.append(abs(pid))
                     if not str(abs(pid)) in ltstr: ltstr += "#%s : c*tau = %s\n" %(str(abs(pid)),str(lt))
-        if not chargedList: return 1,"no long lived particles found"
-        else: return -1, "#Visible decays of longlived particles / stable charged particles: %s\n%s" %(str(chargedList),ltstr)
-
+        if not chargedList and not missingList: return 1,"no long lived particles found"
+        else:
+            msg = ""
+            if chargedList:
+                msg += "#Visible decays of longlived particles / stable charged particles: %s\n%s" %(str(chargedList),ltstr)
+            if missingList:
+                msg += "#Missing decay blocks of new r-Even particles appearing in displaced vertices: %s\n" %(str(missingList))
+        return -1, msg
 
     def degenerateChi(self):
         """
@@ -598,6 +607,9 @@ class SlhaStatus(Printer):
         if qn.charge3 != 0 or qn.cdim != 1:
             return True
         if decay:
+            if not pid in self.slha.decays:
+                logger.warning("Missing decay block for pid %s" %(str(pid)))
+                return None # Note: purposely distinguished from False so I can propagate the information to the output file
             for decay in self.slha.decays[pid].decays:
                 for pids in decay.ids:
                     if self.visible(abs(pids), decay=True): return True
