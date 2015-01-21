@@ -12,8 +12,8 @@ import sys
 import commands
 import os
 
-RED="[31;11m"
-RESET="[37;0m" 
+RED="\[31;11m"
+RESET="\[37;0m" 
 
 def getVersion():
     """ obtain the smodels version """
