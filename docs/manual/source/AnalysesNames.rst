@@ -1,6 +1,6 @@
+.. index:: Analyses Names
 .. _Txname:
 
-==============
 Analyses Names
 ==============
 
