@@ -1,0 +1,99 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+    xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw"
+    version="1.1" baseProfile="full">
+    <g>
+        <g latexdraw:type="picture" id="id7180697">
+            <image
+                xlink:href="/home/lessa/smodels-manual/images/diagram-MassTopA.png"
+                x="-1136.6666666666674" y="41.333333333333485"
+                height="633" width="1259"/>
+        </g>
+        <g latexdraw:type="picture" id="id539769534">
+            <image
+                xlink:href="/home/lessa/smodels-manual/images/diagram-MassTopB.png"
+                x="500.00000000000034" y="41.333333333333144"
+                height="633" width="1259"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id130081731">
+            <polyline
+                points="161.33333333333337,340.0000000000001 477.3333333333335,338.66666666666674 "
+                stroke-width="8.0" stroke="#c12b2b"
+                latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-130081731)"/>
+        </g>
+        <g latexdraw:type="ellipse" id="id974745383">
+            <ellipse cx="-341.33333333333337" cy="488.66666666666686"
+                rx="216.1666666666667" ry="96.8333333333334"
+                latexdraw:borderPos="outer" stroke-width="5.0"
+                stroke="#c12b2b" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1314522795">
+            <polyline
+                points="-364.0000000000001,686.6666666666669 -321.3333333333334,760.0000000000002 -321.3333333333334,685.3333333333335 "
+                stroke-width="4.0" stroke="#c12b2b" fill="none"
+                latexdraw:rotationAngle="0.0"
+                marker-start="url(#arrow0-1314522795)" marker-end="url(#arrow1-1314522795)"/>
+        </g>
+        <g latexdraw:type="text" id="id1911358965" fill="#c12b2b" latexdraw:position="bl">
+            <text x="-410.66666666666663" y="821.3333333333329"><![CDATA[\Huge Soft Final State]]></text>
+        </g>
+        <g latexdraw:type="ellipse" id="id267737857">
+            <ellipse cx="1162.6666666666663" cy="472.6666666666671"
+                rx="110.16666666666674" ry="76.16666666666663"
+                latexdraw:borderPos="outer" stroke-width="5.0"
+                stroke="#c12b2b" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667"/>
+        </g>
+        <g latexdraw:type="arc" id="id67641177" transform="rotate(495.8673777282231) translate(-749.7529812318362 -266.9040687621359)">
+            <path
+                d="M 1279.6923076923024 -18.512820512820554 A 850.7179487179461 850.7179487179461 0.0 0 0 353.98889157351726 -865.9195752354553 "
+                latexdraw:borderPos="outer" stroke-width="6.0"
+                stroke="#c12b2b" fill="none" stroke-linecap="round"
+                stroke-dasharray="1, 11.291666666666668"
+                latexdraw:rotationAngle="8.654518394587893" marker-end="url(#arrow1-67641177)"/>
+        </g>
+    </g>
+    <defs>
+        <marker overflow="visible" orient="auto" id="arrow1-130081731">
+            <path
+                d="M 0.0 0.0 L -3.263020833333333 1.1653645833333333 L -3.263020833333333 0.0 L -3.263020833333333 -1.1653645833333333 z "
+                latexdraw:arrSizeNum="2.0" fill="#c12b2b"/>
+        </marker>
+        <marker overflow="visible" orient="auto" id="arrow0-1314522795">
+            <path
+                d="M 0.0 0.0 L 3.7260416666666667 1.3307291666666667 L 3.7260416666666667 0.0 L 3.7260416666666667 -1.3307291666666667 z "
+                latexdraw:arrSizeNum="2.0" fill="#c12b2b"/>
+        </marker>
+        <marker overflow="visible" orient="auto" id="arrow1-1314522795">
+            <path
+                d="M 0.0 0.0 L -3.7260416666666667 1.3307291666666667 L -3.7260416666666667 0.0 L -3.7260416666666667 -1.3307291666666667 z "
+                latexdraw:arrSizeNum="2.0" fill="#c12b2b"/>
+        </marker>
+        <marker overflow="visible" orient="auto" id="arrow1-67641177">
+            <path
+                d="M 0.0 0.0 L -3.417361111111111 1.2204861111111112 L -3.417361111111111 0.0 L -3.417361111111111 -1.2204861111111112 z "
+                latexdraw:arrSizeNum="2.0" fill="#c12b2b"/>
+        </marker>
+    </defs>
+    <metadata>
+        <latexdraw:metadata>
+            <latexdraw:latexIncludes><![CDATA[
+]]></latexdraw:latexIncludes>
+            <latexdraw:displayXScale>true</latexdraw:displayXScale>
+            <latexdraw:displayYScale>true</latexdraw:displayYScale>
+            <latexdraw:unit>CM</latexdraw:unit>
+            <latexdraw:zoom>0.6499999999999997</latexdraw:zoom>
+            <latexdraw:magneticGridStyle>CUSTOMISED</latexdraw:magneticGridStyle>
+            <latexdraw:gridGap>10</latexdraw:gridGap>
+            <latexdraw:magneticGrid>false</latexdraw:magneticGrid>
+            <latexdraw:version>3.3.0</latexdraw:version>
+            <latexdraw:size>
+                <latexdraw:width>1922</latexdraw:width>
+                <latexdraw:height>1047</latexdraw:height>
+            </latexdraw:size>
+            <latexdraw:position>
+                <latexdraw:x>0.0</latexdraw:x>
+                <latexdraw:y>34.0</latexdraw:y>
+            </latexdraw:position>
+        </latexdraw:metadata>
+    </metadata>
+</svg>
