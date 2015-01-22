@@ -20,10 +20,11 @@ class ULanalysis(Printer):
     :ivar conditions: List of conditions strings    
     :ivar constraint: Constraint string
     :ivar elementsEff: Dictionary with constrained elements as keys and
-    efficiencies as values    
+       efficiencies as values    
     :ivar label: Analysis label/name
     :ivar sqrts: Analysis center-of-mass energy
     :ivar lum: Analysis luminosity
+    
     """
     def __init__(self):
         self.label = ""
@@ -42,7 +43,8 @@ class ULanalysis(Printer):
         Returns zero if element is not constrained by the analysis or the
         element multiplicative factor if it is.
         
-        :returns: 1 if element is in constraint, zero otherwise        
+        :returns: 1 if element is in constraint, zero otherwise  
+              
         """
         for el in self.elementsEff:
             if element.particlesMatch(el):
@@ -54,7 +56,8 @@ class ULanalysis(Printer):
         Get the experimental upper limit for a specific mass array.
         
         :parameter mass: mass vector for computing the upper limit
-        :returns: experimental upper limit for cross-section times BR (float with unit or Unum object)      
+        :returns: experimental upper limit for cross-section times BR (float with unit or Unum object)  
+            
         """
         
         return limitGetter.getPlotLimit(mass, self)
@@ -67,6 +70,7 @@ class ULanalysis(Printer):
         
         :returns: string describing branch condition (from the branchcondition field)
                   or None if no condition is found
+                  
         """
         
         ananame, txname = self.label.split(':')
@@ -76,8 +80,10 @@ class ULanalysis(Printer):
     def formatData(self,outputLevel):
         """
         Select data preparation method through dynamic binding.
+        
         :parameter outputLevel: general control for the output depth to be printed 
                             (0 = no output, 1 = basic output, 2 = detailed output,...
+                            
         """
         return Printer.formatULanalysisData(self,outputLevel)    
 
@@ -91,6 +97,7 @@ class EManalysis(Printer):
     :ivar label: Analysis label/name
     :ivar sqrts: Analysis center-of-mass energy
     :ivar lum: Analysis luminosity
+    
     """
     def __init__(self):
         self.label = ""
@@ -107,7 +114,8 @@ class EManalysis(Printer):
         
         .. warning:: not implemented yet
                 
-        :returns: efficiency value (float). zero, if element is not found        
+        :returns: efficiency value (float). zero, if element is not found  
+              
         """
         if not element:
             return False
@@ -117,11 +125,11 @@ class EManalysis(Printer):
         """
         Get experimental limit for a cross-section.
         
-        
         .. warning:: not implemented yet
         
         :returns: experimental upper limit for cross-section
-                  (float with unit or Unum object)        
+           (float with unit or Unum object)     
+                     
         """
         return False
 
