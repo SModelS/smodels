@@ -1,7 +1,7 @@
 """
 .. module:: theory.clusterTools
    :synopsis: Module holding the ElementCluster class and cluster methods used to combine similar elements according
-   to the analysis.
+      to the analysis.
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
         

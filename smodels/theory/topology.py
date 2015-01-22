@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: theory.Topology
+.. module:: theory.topology
    :synopsis: Provides a Topology class and a TopologyList collection type.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -52,9 +52,9 @@ class Topology(object):
         
         :returns: string with number of final states in each branch
         """
-        ret=""
+        ret = ""
         for p in self.vertparts:
-            ret+="%s" % str(p).replace(" ","")
+            ret += "%s" % str(p).replace(" ", "")
         return ret
 
     def __eq__(self, other):
@@ -90,7 +90,7 @@ class Topology(object):
                           branch ordering.
         :returns: True, if both topologies equal; False, otherwise
         """
-        
+
         if type(self) != type(other):
             return False
         if order or len(self.vertnumb) != 2 or len(other.vertnumb) != 2:
@@ -164,7 +164,7 @@ class Topology(object):
         :parameter newelement: element to be added (Element object)
         :returns: True, if the element was added. False, otherwise
         """
-        
+
         # If the topology info has not been set yet, set it using the element
         # info
         if not self.vertparts:
@@ -247,12 +247,13 @@ class TopologyList(Printer):
     An instance of this class represents an iterable collection of topologies.
     
     :ivar topos: list of topologies (Topology objects)
+    
     """
     def __init__(self, topologies=[]):
         """
         Add topologies sequentially, if provided.
         """
-        
+
         super(TopologyList, self).__init__()
         self.topos = []
         for topo in topologies:
@@ -307,6 +308,7 @@ class TopologyList(Printer):
         new topology and all its elements.
 
         :type topo: Topology
+        
         """
         topmatch = False
         for itopo, topo in enumerate(self.topos):
@@ -344,12 +346,13 @@ class TopologyList(Printer):
         return elements
 
 
-    def formatData(self,outputLevel):
+    def formatData(self, outputLevel):
         """
         Select data preparation method through dynamic binding.
+        
         :param outputLevel: general control for the output depth to be printed 
-                            (0 = no output, 1 = basic output, 2 = detailed output,...
+           (0 = no output, 1 = basic output, 2 = detailed output,...
 
         """
-        return Printer.formatTopologyListData(self,outputLevel)
+        return Printer.formatTopologyListData(self, outputLevel)
 
