@@ -11,11 +11,13 @@
 import sys
 import commands
 import os
-
+import time
 
 RED = "\033[31;11m"
 RESET = "\033[7;0m"
 
+def comment( text ):
+    print "%s[%s] %s %s" % ( RED, time.asctime(),text,RESET )
 
 def getVersion():
     """
@@ -32,7 +34,7 @@ def mkdir():
     """
     Create a temporary directory for creating the tarball.
     """
-    print RED, "Creating temporary directory", dirname, RESET
+    comment ("Creating temporary directory %s" %  dirname )
     o = commands.getoutput("mkdir -p %s" % dirname)
     print o
 
@@ -42,7 +44,7 @@ def rmdir():
     Remove the temporary directory.
     """
     if os.path.exists(dirname):
-        print RED, "Removing temporary directory", dirname, RESET
+        comment ( "Removing temporary directory %s" % dirname )
         o = commands.getoutput("rm -rf %s" % dirname)
         print o
 
@@ -51,19 +53,29 @@ def cp():
     """
     Copy files to temporary directory.
     """
-    print RED, "Copying the files to", dirname, RESET
+    comment ( "Copying the files to %s" % dirname )
     for i in os.listdir("../"):
         if i not in [".git", ".gitignore", "distribution", "test"]:
             # print i
             o = commands.getoutput("cp -r ../%s %s/" % (i, dirname))
     # print o
 
+def clone():
+    """
+    Git clone smodels itself into dirname, then remove .git, .gitignore, distribution, and test.
+    """
+    print RED, "Git-cloning smodels in", dirname, RESET
+    o = commands.getoutput("cd %s; git clone git@smodels.hephy.at:smodels" % (dirname) )
+    print o
+    for i in os.listdir( dirname ):
+        if i in [".git", ".gitignore", "distribution", "test"]:
+            o = commands.getoutput ( "rm -rf %s/%s" % (dirname,i) )
 
 def rmpyc ():
     """
     Remove .pyc files.
     """
-    print RED, "Removing all pyc files ... ", RESET
+    comment ( "Removing all pyc files ... " )
     o = commands.getoutput("cd %s; rm -f *.pyc */*.pyc */*/*.pyc" % dirname)
     print o
 
@@ -72,7 +84,7 @@ def makeClean ():
     """
     Execute 'make clean' in host directory.
     """
-    print RED, "Make clean ....", RESET
+    comment ( "Make clean ...." )
     o = commands.getoutput("cd ../lib/ ; make clean")
     print o
 
@@ -81,7 +93,7 @@ def fetchDatabase():
     """
     Execute 'git clone' to retrieve the database.
     """
-    print RED, "git clone the database ... ", RESET
+    comment ( "git clone the database ... " )
     cmd = "cd %s; git clone -b v%s git@smodels.hephy.at:smodels-database ;" \
         " rm -rf smodels-database/.git smodels-database/.gitignore " % \
             (dirname, version)
@@ -93,7 +105,7 @@ def createTarball():
     """
     Create the tarball.
     """
-    print RED, "Create tarball smodels-v%s.tar.gz" % version, RESET
+    comment ( "Create tarball smodels-v%s.tar.gz" % version )
     o = commands.getoutput("tar czvf smodels-v%s.tar.gz %s" % (version, dirname))
     print o
 
@@ -109,17 +121,27 @@ def convertRecipes():
     """
     Compile recipes from .ipynb to .py and .html.
     """
-    print RED, "Converting the recipes", RESET
-    cmd = "cd %s/docs/Manual/recipes/; make convert remove_ipynbs" % dirname
+    comment ( "Converting the recipes" )
+    cmd = "cd %s/docs/manual/source/recipes/; make convert remove_ipynbs" % dirname
     o = commands.getoutput (cmd)
     print o
 
+def makeDocumentation():
+    """
+    create the documentation via sphinx """
+    comment ( "Creating the documentation" )
+    cmd = "cd %s/docs/manual/; make html; rm -r source/" % dirname
+    o = commands.getoutput (cmd)
+    print o
+    cmd = "cd %s/docs/documentation/; make html; rm -r source/" % dirname
+    o = commands.getoutput (cmd)
+    print o
 
 def explode ():
     """
     Explode the tarball.
     """
-    print RED, "Explode the tarball ...", RESET
+    comment ( "Explode the tarball ..." )
     cmd = "tar xzvf smodels-v%s.tar.gz" % version
     o = commands.getoutput (cmd)
 
@@ -128,7 +150,7 @@ def make ():
     """
     Execute 'make' in dirname/lib.
     """
-    print RED, "Now run make in dirname/lib ...", RESET
+    comment ( "Now run make in dirname/lib ..." )
     cmd = "cd %s/lib; make" % dirname
     o = commands.getoutput (cmd)
     print o
@@ -138,7 +160,7 @@ def runExample ():
     """
     Execute Example.py.
     """
-    print RED, "Now run Example.py ...", RESET
+    comment ( "Now run Example.py ..." )
     cmd = "cd %s/; ./Example.py" % dirname
     o = commands.getoutput (cmd)
     print o
@@ -148,31 +170,41 @@ def test ():
     """
     Test the tarball, explode it, execute 'make', and 'runSModelS.py'.
     """
-    print RED, "--------------------------", RESET
-    print RED, "    Test the setup ...    ", RESET
-    print RED, "--------------------------", RESET
+    comment ( "--------------------------" )
+    comment ( "    Test the setup ...    " )
+    comment ( "--------------------------" )
     rmdir ()
     explode ()
     make ()
     runExample()
+
+def testDocumentation():
+    """ Test the documentation """
+    comment ( "Test the documentation" )
+    cmd="ls %s/docs/manual.html" % dirname 
+    o = commands.getoutput (cmd)
+    print o
 
 
 def create():
     """
     Create a tarball for distribution.
     """
-    print RED, "Creating tarball for distribution, version", version, RESET
+    comment ( "Creating tarball for distribution, version %s" % version )
     makeClean()
     rmdir()
     mkdir()
     cp()
+    # clone()
     rmpyc()
     rmExtraFiles()
     fetchDatabase()
+    makeDocumentation()
     convertRecipes()
     createTarball()
     test ()
     # rmdir(dirname)
+    testDocumentation()
 
 
 if __name__ == "__main__":
