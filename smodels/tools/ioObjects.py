@@ -2,7 +2,7 @@
 
 """
 .. module:: tools.ioObjects
-   :synopsis: Definitions of input/output parameters which are read from parameter.in
+   :synopsis: Definitions of input/output parameters which are read from parameter.in.
     
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>    
 .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
@@ -22,21 +22,25 @@ logger = logging.getLogger(__name__)
 
 class ResultList(Printer):
     """
-    Class that collects experimental constraints and has a predefined printout
+    Class that collects experimental constraints and has a predefined printout.
+    
     :ivar outputarray: list of theorypredictions
     :ivar bestresultonly: if True, printout will print only the best result
     :ivar describeTopo: if True, printout will print the constraints
+    
     """
-    def __init__(self, outputarray = [], bestresultonly = None, describeTopo = None):
+    def __init__(self, outputarray=[], bestresultonly=None, describeTopo=None):
         self.outputarray = outputarray
         self.bestresultonly = bestresultonly
         self.describeTopo = describeTopo
 
     def addResult(self, res, maxcond):
         """
-        Add a result to the outputarry, unless it violates maxcond
+        Add a result to the outputarry, unless it violates maxcond.
+        
         :parameter res: theoryprediction to be added to ResultList
         :parameter maxcond: maximum condition violation
+        
         """
         mCond = res.getmaxCondition()
         if mCond == 'N/A': return
@@ -46,54 +50,65 @@ class ResultList(Printer):
 
     def getR(self, res):
         """
-        calculate R value
+        Calculate R value.
+        
         :parameter res: theoryprediction
         :returns: R value = weight / upper limit
+        
         """
         return res.value[0].value / res.analysis.getUpperLimitFor(res.mass)
 
     def sort(self):
         """
-        reverse sort outputarray by R value
+        Reverse sort outputarray by R value.
+        
         """
         self.outputarray = sorted(self.outputarray, key=self.getR, reverse=True)
         return
 
     def getBestResult(self):
         """ 
-        return best result
+        Return best result.
+        
         """
         self.sort()
         return self.outputarray[0]
 
     def isEmpty(self):
         """
-        check if outputarray is empty
+        Check if outputarray is empty.
+        
         """
-        return len(self.outputarray)==0
+        return len(self.outputarray) == 0
 
-    def formatData(self,outputLevel):
+    def formatData(self, outputLevel):
         """
-        to access printout format
+        Access printout format.
+        
         :param outputLevel: general control for the output depth to be printed 
-                            (0 = no output, 1 = basic output, 2 = detailed output,...
+           (0 = no output, 1 = basic output, 2 = detailed output,...
+           
         """
         return self.formatResultsData(outputLevel)
 
+
 class OutputStatus(Printer):
     """
-    Object that holds all status information and has a predefined printout 
+    Object that holds all status information and has a predefined printout.
+    
     :ivar status: status of input file
     :ivar inputFile: input file name
     :ivar parameters: input parameters
     :ivar databaseVersion: database version (string)
     :ivar outputfile: path to outputfile
+    
     """
-    def __init__(self,status,inputFile,parameters,databaseVersion,outputfile):
+    def __init__(self, status, inputFile, parameters, databaseVersion, outputfile):
         """
         Initialize output. If one of the checks failed, exit.
-        """
         
+        """
+
         self.outputfile = outputfile
         self.inputfile = inputFile
         self.parameters = parameters
@@ -101,58 +116,66 @@ class OutputStatus(Printer):
         self.warnings = status[1]
         self.databaseVersion = databaseVersion
         self.statusStrings = {-1: "#could not run the decomposition",
-                              -3: "#no cross sections above sigmacut found",
-                              -4: "#database not found",
-                              -2: "#bad input file, did not run decomposition",
+                              - 3: "#no cross sections above sigmacut found",
+                              - 4: "#database not found",
+                              - 2: "#bad input file, did not run decomposition",
                                0: "#no matching experimental results",
                                1: "#decomposition was successful"}
 
-        self.status = 0        
+        self.status = 0
         if not self.databaseVersion or self.databaseVersion < 0:
             self.status = -4
-        if self.filestatus < 0:       
-            self.status = - 2
+        if self.filestatus < 0:
+            self.status = -2
         self.checkStatus()
-    
+
     def checkStatus(self):
         """
-        printout negative status, FIXME more comments
+        Printout negative status, FIXME more comments.
+        
         """
         if self.status < 0:
             self.printout("stdout")
-            self.printout("file",self.outputfile)
+            self.printout("file", self.outputfile)
         return self.status
 
 
     def updateStatus(self, status):
         """
-        update status
+        Update status.
+        
         :parameter status: new status flag
+        
         """
         self.status = status
         return self.checkStatus()
 
     def updateSLHAStatus(self, status):
         """
-        update slha status
-        :parameter status: new slha status flag
+        Update SLHA status.
+        
+        :parameter status: new SLHA status flag
+        
         """
         self.slhastatus = status
         return
 
     def addWarning(self, warning):
         """
-        append warning to warnings
+        Append warning to warnings.
+        
         :parameter warning: warning to be appended
+        
         """
         self.warnings += warning
         return
 
-    def formatData(self,outputLevel):
+    def formatData(self, outputLevel):
         """
-        to access printout format
+        Access printout format.
+        
         :param outputLevel: general control for the output depth to be printed 
-                            (0 = no output, 1 = basic output, 2 = detailed output,...
+           (0 = no output, 1 = basic output, 2 = detailed output,...
         """
         return self.formatStatusData(outputLevel)
 
@@ -161,33 +184,38 @@ class FileStatus(Printer):
     """
     Object to run several checks on the input file.
     It holds an LheStatus (SlhaStatus) object if inputType = lhe (slha)
+    
     :ivar inputType: specify input type as SLHA or LHE
     :ivar inputFile: path to input file
     :ivar sigmacut: sigmacut in fb
-    """
     
+    """
+
     def __init__(self):
-        
+
         self.filestatus = None
         self.status = 0, "File not checked\n"
-        
-    def checkFile(self,inputType, inputFile, sigmacut=None):
-                
+
+
+    def checkFile(self, inputType, inputFile, sigmacut=None):
+
         if inputType == 'lhe':
-            self.filestatus = LheStatus(inputFile)            
+            self.filestatus = LheStatus(inputFile)
             self.status = self.filestatus.status
         elif inputType == 'slha':
-            self.filestatus = SlhaStatus(inputFile,sigmacut=sigmacut)            
+            self.filestatus = SlhaStatus(inputFile, sigmacut=sigmacut)
             self.status = self.filestatus.status
         else:
             self.filestatus = None
             self.status = -5, 'Unknown input type: %s' % self.inputType
-            
+
 
 class LheStatus(Printer):
     """
-    Object to check if input lhe file contains errors
+    Object to check if input lhe file contains errors.
+    
     :ivar filename: path to input LHE file
+    
     """
 
     def __init__(self, filename):
@@ -199,22 +227,22 @@ class LheStatus(Printer):
         run status check
         """
         if not os.path.exists(self.filename):
-            #set status flag to -3, as in slha checks for missing input file
-            return -3, "Inputfile %s not found" %self.filename
+            # set status flag to -3, as in slha checks for missing input file
+            return -3, "Inputfile %s not found" % self.filename
         lhe = lheReader.LheReader(self.filename)
         nevents = lhe.metainfo["nevents"]
         totxsec = lhe.metainfo["totalxsec"]
         sqrts = lhe.metainfo["sqrts"]
-        if (not type(sqrts) == type(1*GeV)) or (not sqrts.asNumber()):
-            return -1, "Center-of-mass energy not found in the input LHE file %s" %self.filename
+        if (not type(sqrts) == type(1 * GeV)) or (not sqrts.asNumber()):
+            return -1, "Center-of-mass energy not found in the input LHE file %s" % self.filename
         elif not nevents:
-            return -1, "No events found in the input LHE file %s" %self.filename
-        elif (not type(totxsec) == type(1*fb)) or (not totxsec.asNumber()):
-            return -1, "Total cross-section not found in the input LHE file %s" %self.filename
+            return -1, "No events found in the input LHE file %s" % self.filename
+        elif (not type(totxsec) == type(1 * fb)) or (not totxsec.asNumber()):
+            return -1, "Total cross-section not found in the input LHE file %s" % self.filename
         return 1, "Input file ok"
-    
-    
-    
+
+
+
 class SlhaStatus(Printer):
     """
     An instance of this class represents the status of an SLHA file.
@@ -223,6 +251,7 @@ class SlhaStatus(Printer):
     = 1: the check is ok
     = -1: case of a physical problem, e.g. charged LSP,
     = -2: case of formal problems, e.g. no cross sections
+    
     :ivar filename: path to input SLHA file
     :ivar maxDisplacement: maximum c*tau for promt decays in meters
     :ivar sigmacut: sigmacut in fb
@@ -231,14 +260,15 @@ class SlhaStatus(Printer):
     :ivar findIllegalDecays: if True check if all decays are kinematically allowed
     :ivar checkXsec: if True check if SLHA file contains cross sections
     :ivar findLonglived: if True find stable charged particles and displaced vertices
+    
     """
-    def __init__(self, filename, maxDisplacement=.01, sigmacut=.01*fb,
-                 checkLSP = True, findMissingDecayBlocks=True,
-                 findIllegalDecays = False, checkXsec = True, findLonglived = True):
+    def __init__(self, filename, maxDisplacement=.01, sigmacut=.01 * fb,
+                 checkLSP=True, findMissingDecayBlocks=True,
+                 findIllegalDecays=False, checkXsec=True, findLonglived=True):
         self.filename = filename
         self.maxDisplacement = maxDisplacement
         self.sigmacut = sigmacut
-        self.slha = self.read()        
+        self.slha = self.read()
         if not self.slha:
             self.status = -3, "Could not read input SLHA file"
             return
@@ -248,10 +278,10 @@ class SlhaStatus(Printer):
         self.xsec = self.hasXsec(checkXsec)
         self.decayBlocksStatus = self.findMissingDecayBlocks(findMissingDecayBlocks)
         self.longlived = self.findLonglivedParticles(findLonglived)
-        
+
         self.status = self.evaluateStatus()
-    
-    
+
+
     def read(self):
         """
         Get pyslha output object.
@@ -275,7 +305,7 @@ class SlhaStatus(Printer):
         ret = 0
         warning = None
         retMes = "#Warnings:\n"
-        st , message = self.decayBlocksStatus # add only warning, no negative staus flag in case of missing decay blocks
+        st , message = self.decayBlocksStatus  # add only warning, no negative staus flag in case of missing decay blocks
         if st < 0:
             warning = True
             retMes += message + "\n"
@@ -303,10 +333,12 @@ class SlhaStatus(Printer):
     def emptyDecay(self, pid):
         """
         Check if any decay is listed for the particle with pid
+        
         :parameter pid: PID number of particle to be checked
         :returns: True if the decay block is missing or if it is empty, None otherwise
+        
         """
-        if not abs(pid) in self.slha.decays: return True #consider missing decay block as empty
+        if not abs(pid) in self.slha.decays: return True  # consider missing decay block as empty
         if not self.slha.decays[abs(pid)].decays: return True
         return None
 
@@ -314,7 +346,9 @@ class SlhaStatus(Printer):
     def findMissingDecayBlocks(self, findMissingBlocks):
         """
         For all non-rEven particles listed in mass block, check if decay block is written
+        
         :returns: status flag and message
+        
         """
         if not findMissingBlocks:
             return 0, "Did not check for missing decay blocks"
@@ -329,15 +363,17 @@ class SlhaStatus(Printer):
                 st = -1
         if st == 1:
             msg = "No missing decay blocks"
-        else: msg = "# Missing decay blocks for %s" %str(missing)
+        else: msg = "# Missing decay blocks for %s" % str(missing)
         return st, msg
 
 
     def findIllegalDecay(self, findIllegal):
         """
         Find decays for which the sum of daughter masses excels the mother mass
+        
         :parameter findIllegal: True if check should be run
         :returns: status flag and message
+        
         """
         if not findIllegal:
             return 0, "Did not check for illegal decays"
@@ -354,10 +390,10 @@ class SlhaStatus(Printer):
                     if ptc in SMmasses: mDau += SMmasses[ptc]
                     elif ptc in self.slha.blocks["MASS"].keys(): mDau += abs(self.slha.blocks["MASS"][ptc])
                     else:
-                        return -2, "Unknown PID %s in decay of %s" %(str(ptc),str(particle) + ". Add " + str(ptc) + " to smodels/particle.py")
+                        return -2, "Unknown PID %s in decay of %s" % (str(ptc), str(particle) + ". Add " + str(ptc) + " to smodels/particle.py")
                 if mDau > mMom:
                     st = -1
-                    if not str(particle) in badDecay: badDecay += str(particle)+ " "
+                    if not str(particle) in badDecay: badDecay += str(particle) + " "
         if st == 1:
             badDecay = "No illegal decay blocks"
         return st, badDecay
@@ -366,8 +402,10 @@ class SlhaStatus(Printer):
     def hasXsec(self, checkXsec):
         """
         Check if XSECTION table is present in the slha file.
+        
         :parameter checkXsec: set True to run the check
         :returns: status flag, message
+        
         """
         if not checkXsec:
             return 0, "Did not check for missing XSECTION table"
@@ -375,11 +413,11 @@ class SlhaStatus(Printer):
         for line in f:
             if "XSECTION" in line:
                 return 1, "XSECTION table present"
-        
+
         msg = "XSECTION table is missing. Please include the cross-section information and try again.\n"
         msg += "\n\t For MSSM models, it is possible to compute the MSSM cross-sections"
         msg += " using Pythia through the command:\n\n"
-        msg += "\t  ./runTools.py xseccomputer -p -f "+ self.filename+" \n\n"        
+        msg += "\t  ./runTools.py xseccomputer -p -f " + self.filename + " \n\n"
         msg += "\t For more options and information run: ./runTools.py xseccomputer -h\n"
         logger.error(msg)
         return -1, msg
@@ -387,9 +425,11 @@ class SlhaStatus(Printer):
 
     def testLSP(self, checkLSP):
         """
-        Check if lsp is charged.
+        Check if LSP is charged.
+        
         :parameter checkLSP: set True to run the check
         :returns: status flag, message
+        
         """
         if not checkLSP:
             return 0, "Did not check for charged lsp"
@@ -420,16 +460,18 @@ class SlhaStatus(Printer):
             if mass < minmass:
                 pid, minmass = particle, mass
         if returnmass:
-            return pid, minmass*GeV 
+            return pid, minmass * GeV
         return pid
 
 
     def getLifetime(self, pid, ctau=False):
         """
         Compute lifetime from decay-width for a particle with pid.
+        
         :parameter pid: PID of particle
         :parameter ctau: set True to multiply lifetime by c
         :returns: lifetime
+        
         """
         widths = self.getDecayWidths()
         try:
@@ -437,41 +479,45 @@ class SlhaStatus(Printer):
             else:
                 # Particle is stable
                 return -1
-            if self.emptyDecay(pid): return -1 # if decay block is empty particle is also considered stable 
+            if self.emptyDecay(pid): return -1  # if decay block is empty particle is also considered stable
             if ctau:
-                return lt*3E8
+                return lt * 3E8
             else:
                 return lt
         except KeyError:
             logger.warning("No decay block for %s, consider it as a stable particle")
-            return -1 
-            
+            return -1
+
 
     def sumBR(self, pid):
         """
         Calculate the sum of all branching ratios for particle with pid.
+        
         :parameter pid: PID of particle
         :returns: sum of branching ratios as given in the decay table for pid
+        
         """
         decaylist = self.slha.decays[pid].decays
         totalBR = 0.
         for entry in decaylist:
             totalBR += entry.br
         return totalBR
-    
+
 
     def deltaMass(self, pid1, pid2):
         """
         Calculate mass splitting between particles with pid1 and pid2.
+        
         :returns: mass difference
+        
         """
         m1 = self.slha.blocks["MASS"][pid1]
         m2 = self.slha.blocks["MASS"][pid2]
         dm = abs(abs(m1) - abs(m2))
         return dm
-    
 
-    def findNLSP(self, returnmass = None):
+
+    def findNLSP(self, returnmass=None):
         """
         Find second lightest particle (not in rEven).
         
@@ -490,9 +536,9 @@ class SlhaStatus(Printer):
             if mass < minmass:
                 pid, minmass = particle, mass
         if returnmass:
-            return pid, minmass*GeV
+            return pid, minmass * GeV
         return pid
-    
+
 
     def getDecayWidths(self):
         """
@@ -500,10 +546,10 @@ class SlhaStatus(Printer):
         
         """
         widths = {}
-        for particle,block in self.slha.decays.items():
+        for particle, block in self.slha.decays.items():
             widths[particle] = block.totalwidth
         return widths
-    
+
 
     def getDecayWidth(self, pid):
         """
@@ -515,8 +561,8 @@ class SlhaStatus(Printer):
             return widths[pid]
         except KeyError:
             print("%s is no valid PID" % pid)
-           
-             
+
+
     def massDiffLSPandNLSP(self):
         """
         Get the mass difference between the lsp and the nlsp.
@@ -529,36 +575,38 @@ class SlhaStatus(Printer):
 
     def findLonglivedParticles(self, findLonglived):
         """
-        find meta-stable particles that decay to visible particles
-        and stable charged particles
+        Find meta-stable particles that decay to visible particles
+        and stable charged particles.
+        
         :returns: status flag, message
+        
         """
         if not findLonglived:
             return 0, "Did not check for long lived particles"
-        
-        #Get list of cross-sections:
+
+        # Get list of cross-sections:
         xsecList = crossSection.getXsecFromSLHAFile(self.filename)
-        #Check if any of particles being produced have visible displaced vertices
-        #with a weight > sigmacut
+        # Check if any of particles being produced have visible displaced vertices
+        # with a weight > sigmacut
         chargedList = []
         missingList = []
         ltstr = ""
         for pid in xsecList.getPIDs():
             if pid in rEven: continue
             if pid == self.findLSP(): continue
-            xsecmax = xsecList.getXsecsFor(pid).getMaxXsec()            
-            if xsecmax < self.sigmacut: continue           
+            xsecmax = xsecList.getXsecsFor(pid).getMaxXsec()
+            if xsecmax < self.sigmacut: continue
             lt = self.getLifetime(pid, ctau=True)
             if lt < 0:
-                #error for stable charged particles
+                # error for stable charged particles
                 if self.visible(abs(pid)):
                     if not abs(pid) in chargedList:
                         chargedList.append(abs(pid))
-                        if not str(abs(pid)) in ltstr: ltstr += "#%s : c*tau = inf\n" %str(abs(pid))
+                        if not str(abs(pid)) in ltstr: ltstr += "#%s : c*tau = inf\n" % str(abs(pid))
             if lt < self.maxDisplacement: continue
             brvalue = 0.
             daughters = []
-            #Sum all BRs which contain at least one visible particle
+            # Sum all BRs which contain at least one visible particle
             for decay in self.slha.decays[abs(pid)].decays:
                 for pidb in decay.ids:
                     if self.visible(abs(pidb), decay=True):
@@ -568,17 +616,17 @@ class SlhaStatus(Printer):
                     elif self.visible(abs(pidb), decay=True) == None:
                         if not abs(pidb) in missingList:
                             missingList.append(abs(pidb))
-            if xsecmax*brvalue > self.sigmacut:
+            if xsecmax * brvalue > self.sigmacut:
                 if not abs(pid) in chargedList:
                     chargedList.append(abs(pid))
-                    if not str(abs(pid)) in ltstr: ltstr += "#%s : c*tau = %s\n" %(str(abs(pid)),str(lt))
-        if not chargedList and not missingList: return 1,"no long lived particles found"
+                    if not str(abs(pid)) in ltstr: ltstr += "#%s : c*tau = %s\n" % (str(abs(pid)), str(lt))
+        if not chargedList and not missingList: return 1, "no long lived particles found"
         else:
             msg = ""
             if chargedList:
-                msg += "#Visible decays of longlived particles / stable charged particles: %s\n%s" %(str(chargedList),ltstr)
+                msg += "#Visible decays of longlived particles / stable charged particles: %s\n%s" % (str(chargedList), ltstr)
             if missingList:
-                msg += "#Missing decay blocks of new r-Even particles appearing in displaced vertices: %s\n" %(str(missingList))
+                msg += "#Missing decay blocks of new r-Even particles appearing in displaced vertices: %s\n" % (str(missingList))
         return -1, msg
 
     def degenerateChi(self):
@@ -596,9 +644,10 @@ class SlhaStatus(Printer):
 
     def visible(self, pid, decay=None):
         """
-        Check if pid is detectable
-        If pid is not known, consider it as visible
-        If pid not SM particle and decay = True, check if particle or decay products are visible
+        Check if pid is detectable.
+        If pid is not known, consider it as visible.
+        If pid not SM particle and decay = True, check if particle or decay products are visible.
+        
         """
         if pid in SMvisible: return True
         if pid in SMinvisible: return False
@@ -609,8 +658,8 @@ class SlhaStatus(Printer):
             return True
         if decay:
             if not pid in self.slha.decays:
-                logger.warning("Missing decay block for pid %s" %(str(pid)))
-                return None # Note: purposely distinguished from False so I can propagate the information to the output file
+                logger.warning("Missing decay block for pid %s" % (str(pid)))
+                return None  # Note: purposely distinguished from False so I can propagate the information to the output file
             for decay in self.slha.decays[pid].decays:
                 for pids in decay.ids:
                     if self.visible(abs(pids), decay=True): return True
@@ -624,7 +673,7 @@ class Qnumbers:
     Get quantum numbers (spin*2, electrical charge*3, color dimension) from qNumbers.
     
     """
-    def __init__(self, pid):        
+    def __init__(self, pid):
         self.pid = pid
         if not pid in qNumbers.keys():
             self.pid = 0
@@ -634,7 +683,7 @@ class Qnumbers:
             self.charge3 = self.l[1]
             self.cdim = self.l[2]
 
-SMmasses = {1: 4.8e-3 , 2: 2.3e-3 , 3: 95e-2 ,4: 1.275 ,5: 4.18 , 6: 173.21 ,11: 0.51099e-3 ,12: 0,13: 105.658e-3 ,14: 0 ,15: 1.177682 , 16: 0 , 21: 0 , 22: 0 ,23: 91.1876 ,24: 80.385 , 25: 125.5}
+SMmasses = {1: 4.8e-3 , 2: 2.3e-3 , 3: 95e-2 , 4: 1.275 , 5: 4.18 , 6: 173.21 , 11: 0.51099e-3 , 12: 0, 13: 105.658e-3 , 14: 0 , 15: 1.177682 , 16: 0 , 21: 0 , 22: 0 , 23: 91.1876 , 24: 80.385 , 25: 125.5}
 
-SMvisible = [1,2,3,4,5,6,11,13,15,21,22,23,24,25]
-SMinvisible = [12,14,16]
+SMvisible = [1, 2, 3, 4, 5, 6, 11, 13, 15, 21, 22, 23, 24, 25]
+SMinvisible = [12, 14, 16]

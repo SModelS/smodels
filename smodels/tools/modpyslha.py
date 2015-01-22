@@ -3,6 +3,7 @@
 """
 .. module:: tools.modpyslha
    :synopsis: Modified pyslha reader.
+   
 A simple but flexible handler of the SUSY Les Houches Accord (SLHA) data format.
 
 pyslha is a parser/writer module for particle physics SUSY Les Houches Accord

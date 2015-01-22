@@ -32,7 +32,8 @@ class TheoryPrediction(object):
     :ivar conditions: list of values for the analysis conditions
                       (only for upper limit-type analysis, e.g. analysis=ULanalysis)
     :ivar mass: mass of the cluster to which the theory prediction refers to
-                (only for upper limit-type analysis, e.g. analysis=ULanalysis)    
+                (only for upper limit-type analysis, e.g. analysis=ULanalysis)   
+                 
     """
     def __init__(self):
         self.analysis = None
@@ -45,6 +46,7 @@ class TheoryPrediction(object):
         Returns the maximum value from the list conditions
         
         :returns: maximum condition value (float)
+        
         """
             
         maxcond = 0.
@@ -60,13 +62,15 @@ class TheoryPredictionList(Printer):
     An instance of this class represents a collection of theory prediction
     objects.
     
-    :ivar _theoryPredictions: list of TheoryPrediction objects    
+    :ivar _theoryPredictions: list of TheoryPrediction objects   
+     
     """
     def __init__(self, theoryPredictions):
         """
         Initializes the list.
         
         :parameter theoryPredictions: list of TheoryPrediction objects
+        
         """
         self._theoryPredictions = theoryPredictions
 
@@ -84,8 +88,9 @@ class TheoryPredictionList(Printer):
     def formatData(self,outputLevel):
         """
         Select data preparation method through dynamic binding.
+        
         :param outputLevel: general control for the output depth to be printed 
-                            (0 = no output, 1 = basic output, 2 = detailed output,...
+           (0 = no output, 1 = basic output, 2 = detailed output,...
         
         """
         return Printer.formatTheoryPredictionData(self,outputLevel)
@@ -102,8 +107,8 @@ def theoryPredictionFor(analysis, smsTopList, maxMassDist=0.2):
     :parameter smsTopList: list of topologies containing elements (TopologyList object)
     :parameter maxMassDist: maximum mass distance for clustering elements (float)
     :returns: list of TheoryPrediction objects    
-    """
     
+    """
     # Select elements constrained by analysis and apply efficiencies
     elements = _getElementsFrom(smsTopList, analysis)
     if len(elements) == 0:
@@ -136,6 +141,7 @@ def _getElementsFrom(smsTopList, analysis):
     :parameter analysis: analysis to be considered (ULanalysis or EManalysis object)
     :parameter smsTopList: list of topologies containing elements (TopologyList object)
     :returns: list of elements (Element objects)
+    
     """
     elements = []
     for el in smsTopList.getElements():
@@ -162,6 +168,7 @@ def _combineElements(elements, analysis, maxDist):
     :parameter elements: list of elements (Element objects)
     :parameter analysis: analysis to be considered (ULanalysis or EManalysis object)
     :returns: list of element clusters (ElementCluster objects)
+    
     """
     if type(analysis) == type(EManalysis()):
         clusters = [clusterTools.groupAll(elements)]
@@ -180,8 +187,8 @@ def _evalConstraint(cluster, analysis):
     :parameter cluster: cluster of elements (ElementCluster object)
     :parameter analysis: analysis to be considered (ULanalysis or EManalysis object)
     :returns: cluster cross-section
-    """    
     
+    """    
     if type(analysis) == type(EManalysis()):
         return cluster.getTotalXSec()
     elif type(analysis) == type(ULanalysis()):
@@ -201,8 +208,8 @@ def _evalConditions(cluster, analysis):
     :parameter cluster: cluster of elements (ElementCluster object)
     :parameter analysis: analysis to obtain the conditions (ULanalysis or EManalysis object)
     :returns: list of condition values (floats) if analysis type == upper limit. None, otherwise.    
-    """    
     
+    """    
     if type(analysis) == type(EManalysis()):
         return None
     elif type(analysis) == type(ULanalysis()):
@@ -233,6 +240,7 @@ def _evalExpression(stringExpr,cluster,analysis):
     :parameter cluster: cluster of elements (ElementCluster object)
     :parameter analysis: analysis (ULanalysis object). Just used to print the error message
     :returns: value for the expression. Can be a XSectionList object, a float or not numerical (None,string,...)
+    
     """
 
 #Generate elements appearing in the string expression with zero cross-sections:
