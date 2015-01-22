@@ -14,10 +14,16 @@ import os
 import time
 
 RED = "\033[31;11m"
+GREEN = "\033[32;11m"
 RESET = "\033[7;0m"
 
 def comment( text ):
     print "%s[%s] %s %s" % ( RED, time.asctime(),text,RESET )
+
+def run ( cmd ):
+    print "%scmd: %s%s" % (GREEN,cmd,RESET)
+    o=commands.getoutput ( cmd )
+    print o
 
 def getVersion():
     """
@@ -35,9 +41,7 @@ def mkdir():
     Create a temporary directory for creating the tarball.
     """
     comment ("Creating temporary directory %s" %  dirname )
-    o = commands.getoutput("mkdir -p %s" % dirname)
-    print o
-
+    run ("mkdir -p %s" % dirname)
 
 def rmdir():
     """
@@ -45,8 +49,7 @@ def rmdir():
     """
     if os.path.exists(dirname):
         comment ( "Removing temporary directory %s" % dirname )
-        o = commands.getoutput("rm -rf %s" % dirname)
-        print o
+        run ("rm -rf %s" % dirname)
 
 
 def cp():
@@ -56,28 +59,24 @@ def cp():
     comment ( "Copying the files to %s" % dirname )
     for i in os.listdir("../"):
         if i not in [".git", ".gitignore", "distribution", "test"]:
-            # print i
-            o = commands.getoutput("cp -r ../%s %s/" % (i, dirname))
-    # print o
+            run ("cp -r ../%s %s/" % (i, dirname))
 
 def clone():
     """
     Git clone smodels itself into dirname, then remove .git, .gitignore, distribution, and test.
     """
     comment ( "Git-cloning smodels into %s (this might take a while)" % dirname )
-    o = commands.getoutput("git clone git@smodels.hephy.at:smodels %s" % (dirname) )
-    print o
+    run ("git clone git@smodels.hephy.at:smodels %s" % (dirname) )
     for i in os.listdir( dirname ):
         if i in [".git", ".gitignore", "distribution", "test"]:
-            o = commands.getoutput ( "rm -rf %s/%s" % (dirname,i) )
+            run ( "rm -rf %s/%s" % (dirname,i) )
 
 def rmpyc ():
     """
     Remove .pyc files.
     """
     comment ( "Removing all pyc files ... " )
-    o = commands.getoutput("cd %s; rm -f *.pyc */*.pyc */*/*.pyc" % dirname)
-    print o
+    run ("cd %s; rm -f *.pyc */*.pyc */*/*.pyc" % dirname)
 
 
 def makeClean ():
@@ -85,9 +84,7 @@ def makeClean ():
     Execute 'make clean' in host directory.
     """
     comment ( "Make clean ...." )
-    o = commands.getoutput("cd ../lib/ ; make clean")
-    print o
-
+    run ("cd ../lib/ ; make clean")
 
 def fetchDatabase():
     """
@@ -97,18 +94,14 @@ def fetchDatabase():
     cmd = "cd %s; git clone -b v%s git@smodels.hephy.at:smodels-database ;" \
         " rm -rf smodels-database/.git smodels-database/.gitignore " % \
             (dirname, version)
-    o = commands.getoutput(cmd)
-    print o
-
+    run ( cmd )
 
 def createTarball():
     """
     Create the tarball.
     """
     comment ( "Create tarball smodels-v%s.tar.gz" % version )
-    o = commands.getoutput("tar czvf smodels-v%s.tar.gz %s" % (version, dirname))
-    print o
-
+    run ("tar czvf smodels-v%s.tar.gz %s" % (version, dirname))
 
 def rmExtraFiles():
     """
@@ -118,10 +111,7 @@ def rmExtraFiles():
     extras = [ "inputFiles/slha/nobdecay.slha" ]
     for i in extras:
         cmd = "rm -rf %s/%s" % ( dirname, i )
-        o = commands.getoutput( cmd )
-        print o
-        
-
+        run ( cmd )
 
 def convertRecipes():
     """
@@ -129,19 +119,16 @@ def convertRecipes():
     """
     comment ( "Converting the recipes" )
     cmd = "cd %s/docs/manual/source/recipes/; make convert remove_ipynbs" % dirname
-    o = commands.getoutput (cmd)
-    print o
+    run (cmd)
 
 def makeDocumentation():
     """
     create the documentation via sphinx """
     comment ( "Creating the documentation" )
     cmd = "cd %s/docs/manual/; make html; rm -r make.bat Makefile source update" % dirname
-    o = commands.getoutput (cmd)
-    print o
+    run (cmd)
     cmd = "cd %s/docs/documentation/; make html; rm -r make.bat  Makefile source update" % dirname
-    o = commands.getoutput (cmd)
-    print o
+    run (cmd)
 
 def explode ():
     """
@@ -149,8 +136,7 @@ def explode ():
     """
     comment ( "Explode the tarball ..." )
     cmd = "tar xzvf smodels-v%s.tar.gz" % version
-    o = commands.getoutput (cmd)
-
+    run (cmd)
 
 def make ():
     """
@@ -158,9 +144,7 @@ def make ():
     """
     comment ( "Now run make in dirname/lib ..." )
     cmd = "cd %s/lib; make" % dirname
-    o = commands.getoutput (cmd)
-    print o
-
+    run (cmd)
 
 def runExample ():
     """
@@ -168,9 +152,7 @@ def runExample ():
     """
     comment ( "Now run Example.py ..." )
     cmd = "cd %s/; ./Example.py" % dirname
-    o = commands.getoutput (cmd)
-    print o
-
+    run (cmd)
 
 def test ():
     """
@@ -188,9 +170,7 @@ def testDocumentation():
     """ Test the documentation """
     comment ( "Test the documentation" )
     cmd="ls %s/docs/manual.html" % dirname 
-    o = commands.getoutput (cmd)
-    print o
-
+    run (cmd)
 
 def create():
     """
