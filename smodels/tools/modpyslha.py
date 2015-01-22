@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 """
-.. module:: modpyslha
+.. module:: tools.modpyslha
    :synopsis: Modified pyslha reader.
 A simple but flexible handler of the SUSY Les Houches Accord (SLHA) data format.
 

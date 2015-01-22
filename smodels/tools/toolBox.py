@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 """
-.. module:: toolBox
+.. module:: tools.toolBox
    :synopsis: Contains a singleton-like class that keeps track of all external
-   "HEP" tools, such as pythia, nllfast, etc. 
-   Used primarily for installation and deployment.
+      "HEP" tools, such as pythia, nllfast, etc. 
+      Used primarily for installation and deployment.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 

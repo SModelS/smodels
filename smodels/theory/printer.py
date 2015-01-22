@@ -1,7 +1,7 @@
 """
-.. module:: printer
+.. module:: theory.printer
    :synopsis: Facility used in classes to derive from and be able to print
-              different data types in different forms.
+      different data types in different forms.
 
 .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>    
@@ -31,10 +31,10 @@ class Printer(object):
         Print the content of the data structure to the target.
 
         :param target: The target to print to. Possible values: stdout, file.
-                       Default: stdout.
+           Default: stdout.
         :param filename: Filename to which the output is written
         :param outputLevel: general control for the output depth to be printed 
-                            (0 = no output, 1 = basic output, 2 = detailed output,...)
+           (0 = no output, 1 = basic output, 2 = detailed output,...)
         :returns: None
         
         """
@@ -70,9 +70,10 @@ class Printer(object):
 
     def formatTopologyListData(self,outputLevel):
         """
-        Format data of to print Global topologies object.        
+        Format data of to print Global topologies object.   
+             
         :param outputLevel: general control for the output depth to be printed 
-                            (0 = no output, 1 = basic output, 2 = detailed output,...)
+           (0 = no output, 1 = basic output, 2 = detailed output,...)
         
         """
                 
@@ -111,9 +112,10 @@ class Printer(object):
     
     def formatElementData(self,outputLevel):
         """
-            Format data of to print an element object.
-            :param outputLevel: general control for the output depth to be printed 
-                            (0 = no output, 1 = basic output, 2 = detailed output,...)
+        Format data of to print an element object.
+        
+        :param outputLevel: general control for the output depth to be printed 
+           (0 = no output, 1 = basic output, 2 = detailed output,...)
         """
         
         if not outputLevel: return None
@@ -131,8 +133,9 @@ class Printer(object):
     def formatULanalysisData(self,outputLevel):
         """
         Format data for a ULanalysis object.
+        
         :param outputLevel: general control for the output depth to be printed 
-                            (0 = no output, 1 = basic output, 2 = detailed output,...)
+           (0 = no output, 1 = basic output, 2 = detailed output,...)
         """
          
         if not outputLevel: return None
@@ -160,8 +163,9 @@ class Printer(object):
     def formatTheoryPredictionData(self,outputLevel):
         """
         Format data of a TheoryPrediction object.
+        
         :param outputLevel: general control for the output depth to be printed 
-                            (0 = no output, 1 = basic output, 2 = detailed output,...)  
+           (0 = no output, 1 = basic output, 2 = detailed output,...)  
         """
         
         if not outputLevel: return None
@@ -194,8 +198,9 @@ class Printer(object):
     def formatStatusData(self,outputLevel):
         """
         Format data of the output status object.
+        
         :param outputLevel: general control for the output depth to be printed 
-                            (0 = no output, 1 = basic output, 2 = detailed output,...)
+           (0 = no output, 1 = basic output, 2 = detailed output,...)
         """
         
         if not outputLevel: return None
@@ -214,8 +219,9 @@ class Printer(object):
     def formatResultsData(self,outputLevel):
         """
         Format data of the final output object.
+        
         :param outputLevel: general control for the output depth to be printed 
-                            (0 = no output, 1 = basic output, 2 = detailed output,...)
+           (0 = no output, 1 = basic output, 2 = detailed output,...)
         """
         
         if not outputLevel: return None
@@ -247,8 +253,9 @@ class Printer(object):
     def formatMissingData(self,outputLevel):
         """
         Format data of missing topology list.
+        
         :param outputLevel: general control for the output depth to be printed 
-                            (0 = no output, 1 = basic output, 2 = detailed output,...)
+           (0 = no output, 1 = basic output, 2 = detailed output,...)
         """
         
         if not outputLevel: return None
