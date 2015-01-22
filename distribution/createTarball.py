@@ -64,7 +64,7 @@ def clone():
     """
     Git clone smodels itself into dirname, then remove .git, .gitignore, distribution, and test.
     """
-    print RED, "Git-cloning smodels in", dirname, RESET
+    comment ( "Git-cloning smodels in %s" % dirname )
     o = commands.getoutput("cd %s; git clone git@smodels.hephy.at:smodels" % (dirname) )
     print o
     for i in os.listdir( dirname ):
@@ -130,10 +130,10 @@ def makeDocumentation():
     """
     create the documentation via sphinx """
     comment ( "Creating the documentation" )
-    cmd = "cd %s/docs/manual/; make html; rm -r source/" % dirname
+    cmd = "cd %s/docs/manual/; make html; rm -r make.bat Makefile source update" % dirname
     o = commands.getoutput (cmd)
     print o
-    cmd = "cd %s/docs/documentation/; make html; rm -r source/" % dirname
+    cmd = "cd %s/docs/documentation/; make html; rm -r make.bat  Makefile source update" % dirname
     o = commands.getoutput (cmd)
     print o
 
@@ -195,7 +195,7 @@ def create():
     rmdir()
     mkdir()
     cp()
-    # clone()
+    ## clone()
     rmpyc()
     rmExtraFiles()
     fetchDatabase()
