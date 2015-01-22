@@ -1,10 +1,10 @@
-***************************
-Installation and Deployment
-***************************
+.. index:: Installation and Deployment
 
-====================
+Installation and Deployment
+===========================
+
 Standard Installation
-====================
+---------------------
 
 SModelS is a Python library that requires Python version 2.6 or later 
 (but not version 3).  Internally, SModelS uses the following tools:
@@ -24,6 +24,7 @@ In addition, SModelS depends on the following *external* Python libraries:
 
 For installation, SModelS makes use of Python's *setuptools*.
 Thus ::
+
   python setup.py install 
 
 should install the entire project, compile the internal Pythia and NLL-fast versions
@@ -44,9 +45,8 @@ should list and check all internal tools (Pythia and NLL-fast) and external
 
 In case everything fails, please contact smodels-users@lists.oeaw.ac.at
 
-===================
 Installation on SL6
-===================
+-------------------
 
 Installation on an SL6 (Scientific Linux 6 or Scientific Linux CERN 6) machine
 is tricky, because SModelS requires a more recent version of *scipy* than is provided by SL6. 
@@ -67,7 +67,7 @@ Note, that these steps can safely be done within a Python ``virtualenv``.
 
                                                                                       
 Installation on SL5 and similar distributions                                         
----------------------------------------------                                         
+---------------------------------------------                              
                                                                                       
 In some distributions like SL5, the python default version may be smaller than        
 2.6.  In these cases, ``virtualenv`` has to be set up for a python version >=         2.6.  E.g. for python 2.6, do ``virtualenv --python=python2.6 <envname>``,            and modify by hand the first line in the executable from ``#!/usr/bin/env python``    
