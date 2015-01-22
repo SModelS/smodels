@@ -69,4 +69,4 @@ and the QCD order. *NB if the input file contains two cross-sections for the sam
 the highest order will be used.*
 
 * **Reading of cross-sections from an input file is
-  implemented by the** `getXsecFromSLHAFile <../../documentation/theory.html#theory.crossSection.getXsecFromSLHAFile>`_ **method** 
+  implemented by the** `getXsecFromSLHAFile <../../../documentation/build/html/theory.html#theory.crossSection.getXsecFromSLHAFile>`_ **method** 

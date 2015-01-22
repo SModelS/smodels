@@ -87,7 +87,7 @@ as in the figure below, the branch belongs to an |element|.
 .. image:: images/branchEl.png
    :height: 100px
    
-* **Branches are described by the** `Branch Class <../../documentation/theory.html#theory.branch.Branch>`_   
+* **Branches are described by the** `Branch Class <../../../documentation/build/html/theory.html#theory.branch.Branch>`_   
 
 .. _topology:
 
@@ -115,7 +115,7 @@ there are no final states coming out of the last vertex in the branch.*
 Topologies are also a useful way to group |elements|. In this way,  topologies represent a list of elements sharing a common basic structure (same number of branches, vertices and
 final states in each vertex).
 
-* **Topologies are described by the** `Topology Class <../../documentation/theory.html#theory.topology.Topology>`_   
+* **Topologies are described by the** `Topology Class <../../../documentation/build/html/theory.html#theory.topology.Topology>`_   
 
 .. _element:
 
@@ -136,7 +136,7 @@ Below we show an example of an element and the information it contains.
 .. image:: images/element.png
    :height: 280px
 
-* **Elements are described by the** `Element Class <../../documentation/theory.html#theory.element.Element>`_    
+* **Elements are described by the** `Element Class <../../../documentation/build/html/theory.html#theory.element.Element>`_    
 
 .. _notation:
 

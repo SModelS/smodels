@@ -92,7 +92,7 @@ Input File Checks
 
 As discussed in :doc:`Basic Input <BasicInput>`, SModelS accepts both SLHA and LHE input files. It can be convenient to perform certain sanity checks on these files as described below.
 
-* **The input file checks are implemented by the** `FileStatus class <../../documentation/tools.html#tools.ioObjects.FileStatus>`_
+* **The input file checks are implemented by the** `FileStatus class <../../../documentation/build/html/tools.html#tools.ioObjects.FileStatus>`_
 
 .. _lheChecks:
 
@@ -228,4 +228,4 @@ The missing topologies tool is normally called from within SModelS (e.g. when ru
 in the :ref:`parameters file <parameterFile>` .
 In the output, the missing topologies are ordered by cross section. By default only the ones with the ten largest cross-sections are shown.
 
-* **The missing topologies tool is implemented by** `findMissingTopos <../../documentation/tools.html#module-tools.missingTopologies>`_ **method**
+* **The missing topologies tool is implemented by** `findMissingTopos <../../../documentation/build/html/tools.html#module-tools.missingTopologies>`_ **method**

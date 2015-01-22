@@ -38,7 +38,7 @@ UL analyses may also contain information about the analysis luminosity, center-o
 Note that a given experimental publication (or conference note) may contain several UL analyses, since a single
 publication may contain upper limits for several different :ref:`elements <element>` (or :ref:`constraints <ULconstraint>`).
 
-* **UL analyses are described by the** `ULanalysis Class <../../documentation/theory.html#theory.analysis.ULanalysis>`_
+* **UL analyses are described by the** `ULanalysis Class <../../../documentation/build/html/theory.html#theory.analysis.ULanalysis>`_
 
 .. _ULconstraint:
 
