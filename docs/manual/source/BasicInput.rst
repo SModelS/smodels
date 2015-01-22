@@ -1,10 +1,12 @@
-===========
+.. index:: Basic Input
+
+.. _basicInput:
+
 Basic Input
 ===========
 
-
 Basic Model Input
-=================
+-----------------
 The main input for SModelS is the full model definition, which can be
 given in the two following forms:
 
@@ -34,9 +36,8 @@ When generating the events it is also important to ensure that the no mass smear
 values for a given particle are the same throughout the LHE file.
 
 
-
 New Particles
-=============
+-------------
 
 Besides information about the masses and branching ratios, the user must also define
 which particles are Z\ :sub:`2`-odd states (:ref:`Intermediate states <odd states>`) 
@@ -52,7 +53,7 @@ it is also necessary to define some of the particle's quantum numbers, as illust
 
 
 SLHA Format for Cross-Sections
-==============================
+------------------------------
 
 A list of cross-section blocks (one for each production process) must be included in the SLHA file for the SLHA-based Decomposition. 
 The following SLHA format for each cross-section block is assumed (see the `Les Houches note <http://phystev.cnrs.fr/wiki/2013:groups:tools:slha>`_):

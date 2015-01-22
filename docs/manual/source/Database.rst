@@ -1,10 +1,13 @@
+.. index:: Database of Experimental Analyses
+
+.. _database:
+
 .. |constraint| replace:: :ref:`constraint <ULconstraint>`
 .. |conditions| replace:: :ref:`conditions <ULconditions>` 
 .. |fb-1| replace:: :math:`\mathrm{fb}^{-1}`
 .. |sqrts| replace:: :math:`\sqrt{s}`
 .. |analyses| replace:: :ref:`analyses <ULanalysis>`
 
-=================================
 Database of Experimental Analyses
 =================================
 

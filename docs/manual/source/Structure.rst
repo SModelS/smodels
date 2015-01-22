@@ -1,6 +1,7 @@
-*****************
+.. index:: SModelS Structure
+
 SModelS Structure
-*****************
+=================
 
 The SModelS framework consists of following main parts:
 

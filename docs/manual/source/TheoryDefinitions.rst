@@ -1,3 +1,5 @@
+.. index:: Theory Definitions
+
 .. |element| replace:: :ref:`element <element>`
 .. |elements| replace:: :ref:`elements <element>`
 .. |topology| replace:: :ref:`topology <topology>`
@@ -10,7 +12,6 @@
 
 .. _theoryDefs:
 
-==================
 Theory Definitions
 ==================
 
@@ -157,6 +158,7 @@ The outermost brackets correspond to the :ref:`branches <branch>` of the |elemen
 The ordering for the branches is arbitrary and each branch contains
 an *ordered* list of :ref:`vertices <vertex>` and each vertex contains an *unordered* list of the |final states|
 coming out of the vertex. Schematically, for the example in the :ref:`figure above <bracketnotation>`, we have::
+
    element = [branch1, branch2]
       branch1 = [vertex1,vertex2]
          vertex1 = [l+]
