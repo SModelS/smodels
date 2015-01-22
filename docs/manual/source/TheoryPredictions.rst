@@ -46,7 +46,7 @@ be individually confronted with the analysis experimental upper limit.
 Below we describe the method for computing the theory predictions for each type
 of analysis separately.
 
-* **Theory predictions are computed using the** `theoryPredictionFor <../../documentation/theory.html#theory.theoryPrediction.theoryPredictionFor>`_ **method** 
+* **Theory predictions are computed using the** `theoryPredictionFor <../../../documentation/build/html/theory.html#theory.theoryPrediction.theoryPredictionFor>`_ **method** 
 
 
 Theory Predictions for UL Analyses
@@ -79,7 +79,7 @@ is :math:`[[[e^+]],[[e^-]]]\,+\,[[[\mu^+]],[[\mu^-]]]`.
 
 
 
-* **The element selection is implemented by the** `getElementsFrom <../../documentation/theory.html#theory.theoryPrediction._getElementsFrom>`_ **method**
+* **The element selection is implemented by the** `getElementsFrom <../../../documentation/build/html/theory.html#theory.theoryPrediction._getElementsFrom>`_ **method**
 
 .. _ULcluster:
 
@@ -105,7 +105,7 @@ measure of the distance between two :ref:`element <element>` masses, as describe
 
 
 If two of the selected :ref:`elements <element>` have a :ref:`mass distance <massdist>` smaller
-than a maximum value (defined by `maxDist <../../documentation/theory.html#theory.clusterTools.clusterElements>`_),
+than a maximum value (defined by `maxDist <../../../documentation/build/html/theory.html#theory.clusterTools.clusterElements>`_),
 they are gouped in the same mass cluster, as illustrated by the example below:
 
 
@@ -119,7 +119,7 @@ and compared against the experimental upper limit.
 
 
 
-* **The clustering of elements is implemented by the** `clusterElements <../../documentation/theory.html#theory.clusterTools.clusterElements>`_  **method**.
+* **The clustering of elements is implemented by the** `clusterElements <../../../documentation/build/html/theory.html#theory.clusterTools.clusterElements>`_  **method**.
 
 .. _massdist:  
 
@@ -142,7 +142,7 @@ upper limits. More explicitly:
                                        & \Rightarrow \mbox{mass distance}(A,B) = \frac{|x-y|}{(x+y)/2}
    
 where :math:`M_A,M_B` (:math:`x,y`) are the mass arrays (upper limits) for the :ref:`elements <element>` A and B, respectively.
-If the mass distance of two :ref:`elements <element>` is smaller than `maxDist <../../documentation/theory.html#theory.clusterTools.clusterElements>`_,
+If the mass distance of two :ref:`elements <element>` is smaller than `maxDist <../../../documentation/build/html/theory.html#theory.clusterTools.clusterElements>`_,
 the two masses are considered similar.
 
 Notice that the above definition of mass distance quantifies the experimental analysis
@@ -150,7 +150,7 @@ sensitivity to mass differences, which is the relevant parameter when :ref:`clus
 Also, a check is performed to ensure that masses with very distinct values but similar upper limits are not
 clustered together.
 
-* **The mass distance function is implemented by the** `distance <../../documentation/theory.html#theory.auxiliaryFunctions.distance>`_ **method**
+* **The mass distance function is implemented by the** `distance <../../../documentation/build/html/theory.html#theory.auxiliaryFunctions.distance>`_ **method**
 
 
 
@@ -195,7 +195,7 @@ we will have :math:`eff_2,eff_4 \simeq 0` for the example in the :ref:`figure ab
 Nonetheless, the element selection for a :ref:`EM analysis <EManalysis>` is usually more inclusive than
 the one applied for the :ref:`UL analysis <ULanalysis>`, resulting in larger values for the theory prediction.
 
-* **The element selection is implemented by the** `getElementsFrom <../../documentation/theory.html#theory.theoryPrediction._getElementsFrom>`_ **method**
+* **The element selection is implemented by the** `getElementsFrom <../../../documentation/build/html/theory.html#theory.theoryPrediction._getElementsFrom>`_ **method**
 
 .. _EMcluster:
 
@@ -209,7 +209,7 @@ according to their masses, since the mass differences have already been accounte
 As a result, after the :ref:`element selection <EMselection>` all elements belong to a single cluster.
 
 
-* **The (trivial) clustering of elements is implemented by the** `clusterElements <../../documentation/theory.html#theory.clusterTools.clusterElements>`_  **method**.
+* **The (trivial) clustering of elements is implemented by the** `clusterElements <../../../documentation/build/html/theory.html#theory.clusterTools.clusterElements>`_  **method**.
 
 
 ================================================
@@ -230,7 +230,7 @@ The procedure described above can be applied to all the analyses in the database
 in a list of theory predictions and upper limits for each analysis. A model can then be considered
 excluded by the experimental results if, for one or more analysis, we have *theory prediction* :math:`>` *upper limit* [*]_.
 
-* **The upper limits for a given**  :ref:`UL analysis <ULanalysis>` **can be obtained by the** `getUpperLimitFor <../../documentation/theory.html#theory.analysis.ULanalysis.getUpperLimitFor>`_  **method**.
+* **The upper limits for a given**  :ref:`UL analysis <ULanalysis>` **can be obtained by the** `getUpperLimitFor <../../../documentation/build/html/theory.html#theory.analysis.ULanalysis.getUpperLimitFor>`_  **method**.
 
 
 

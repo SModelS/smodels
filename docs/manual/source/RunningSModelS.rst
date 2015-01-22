@@ -312,8 +312,8 @@ Below we go step-by-step through this example code:
    :lines: 36-37
    
 * *Perform the* |decomposition|. Depending on the type
-  of input format, choose either the `slhaDecomposer.decompose <../../documentation/theory.html#theory.slhaDecomposer.decompose>`_ or
-  `lheDecomposer.decompose <../../documentation/theory.html#theory.slhaDecomposer.decompose>`_ method. The **doCompress** and **doInvisible** options turn on/off the |mass compression| and |invisible compression|, respectively
+  of input format, choose either the `slhaDecomposer.decompose <../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose>`_ or
+  `lheDecomposer.decompose <../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose>`_ method. The **doCompress** and **doInvisible** options turn on/off the |mass compression| and |invisible compression|, respectively
   
 .. literalinclude:: /examples/Example.py
    :lines: 40
@@ -329,7 +329,7 @@ Below we go step-by-step through this example code:
    :lines: 47
    
 * *Compute the* |theory predictions|. For each analysis in list of analyses compute the |theory predictions|. The output
-  is a list of `theory prediction objects <../../documentation/theory.html#theory.theoryPrediction.TheoryPrediction>`_
+  is a list of `theory prediction objects <../../../documentation/build/html/theory.html#theory.theoryPrediction.TheoryPrediction>`_
   (for each analysis) with results for each :ref:`cluster <ULcluster>`
   
 .. literalinclude:: /examples/Example.py

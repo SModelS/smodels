@@ -71,7 +71,7 @@ In order to avoid a too large number of elements, only those satisfying a :ref:`
 Furthermore, the elements are grouped according to their :ref:`topologies <topology>`. The final output of the
 SLHA decomposition is a list of such topologies, where each topology contains a list of the elements generated during the decomposition.    
 
-* **The SLHA decomposition is implemented by the** `SLHA decompose method <../../documentation/theory.html#theory.slhaDecomposer.decompose>`_
+* **The SLHA decomposition is implemented by the** `SLHA decompose method <../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose>`_
 
 
 .. _minweight:
@@ -85,11 +85,11 @@ may become too large, and the computing time too long.
 For most practical purposes, however, elements with extremely small weights (cross-section times BRs)
 can be discarded, since they will fall well below the experimental limits. Therefore, during the SLHA decomposition,
 whenever an element is generated with a weight below some minimum value, this element (and all elements derived from it) is ignored.
-The minimum weight to be considered is given by the `sigcut <../../documentation/theory.html#theory.slhaDecomposer.decompose>`_ parameter 
-and is easily adjustable (see `slhaDecomposer.decompose <../../documentation/theory.html#theory.slhaDecomposer.decompose>`_)
+The minimum weight to be considered is given by the `sigcut <../../../documentation/build/html/theory.html#build/html/theory.slhaDecomposer.decompose>`_ parameter 
+and is easily adjustable (see `slhaDecomposer.decompose <../../../documentation/build/html/theory.html#build/html/theory.slhaDecomposer.decompose>`_)
 
 Note that, when computing the |theory predictions|, the weight of several |elements| can be combined together. Hence
-it is recommended to set the value of `sigcut <../../documentation/theory.html#theory.slhaDecomposer.decompose>`_
+it is recommended to set the value of `sigcut <../../../documentation/build/html/theory.html#build/html/theory.slhaDecomposer.decompose>`_
 approximately one order of magnitude below the minimum signal cross-sections the experimental data can constrain.
  
 .. _lheDecomp:
@@ -114,7 +114,7 @@ are fully dependent on the Monte Carlo statistics used to generate the LHE file.
 Also, when generating the events it is important to ensure that the no mass smearing is applied, so the events
 always contain the mass value for a given particle.
 
-* **The LHE decomposition is implemented by the** `LHE decompose method <../../documentation/theory.html#theory.lheDecomposer.decompose>`_
+* **The LHE decomposition is implemented by the** `LHE decompose method <../../../documentation/build/html/theory.html#build/html/theory.lheDecomposer.decompose>`_
 
 .. _elementComp:
 
@@ -146,7 +146,7 @@ decay, as shown below:
    :height: 300px
 
 After the compression, only the lightest of the two near-degenerate masses are kept in the element, as shown :ref:`above <massCompfig>`.
-The main parameter which controls the compression is `minmassgap <../../documentation/theory.html#theory.element.Element.massCompress>`_,
+The main parameter which controls the compression is `minmassgap <../../../documentation/build/html/theory.html#build/html/theory.element.Element.massCompress>`_,
 which corresponds to the maximum value of :math:`\epsilon`
 in the :ref:`figure above <massCompfig>` to which the compression is performed:
 
@@ -154,10 +154,10 @@ in the :ref:`figure above <massCompfig>` to which the compression is performed:
    & \mbox{if } |M_j - M_{j+1}| < minmassgap \rightarrow \mbox{the decay is compressed}\\ 
    & \mbox{if } |M_j - M_{j+1}| > minmassgap \rightarrow \mbox{the decay is NOT compressed}\\
 
-Note that the compression is an approximation since the finalstates, depending on the boost of the parent state, may not always be soft. It is recommended to choose values of `minmassgap <../../documentation/theory.html#theory.element.Element.massCompress>`_
+Note that the compression is an approximation since the finalstates, depending on the boost of the parent state, may not always be soft. It is recommended to choose values of `minmassgap <../../../documentation/build/html/theory.html#build/html/theory.element.Element.massCompress>`_
 between 1-10 GeV; the default value is 5 GeV.
 
-* **Mass compression is implemented by the** `massCompress <../../documentation/theory.html#theory.element.Element.massCompress>`_ **method**
+* **Mass compression is implemented by the** `massCompress <../../../documentation/build/html/theory.html#build/html/theory.element.Element.massCompress>`_ **method**
 and can be easily turned on/off by the flag *doCompress* in the :ref:`SLHA <slhaDecomp>` or :ref:`LHE <lheDecomp>` decompositions
 
 .. _invComp:
@@ -186,7 +186,7 @@ contain only invisible final states:
    :height: 300px
 
 
-* **Invisible compression is implemented by the** `invisibleCompress <../../documentation/theory.html#theory.element.Element.invisibleCompress>`_ **method**
+* **Invisible compression is implemented by the** `invisibleCompress <../../../documentation/build/html/theory.html#build/html/theory.element.Element.invisibleCompress>`_ **method**
 and can be easily turned on/off by the flag *doInvisible* in the :ref:`SLHA <slhaDecomp>` or :ref:`LHE <lheDecomp>` decompositions
 
  

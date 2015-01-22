@@ -196,8 +196,8 @@ def create():
     clone() ## ... clone smodels into it ...
     rmExtraFiles() ## ... remove unneeded files ...
     fetchDatabase() 
-    makeDocumentation()
     convertRecipes()
+    makeDocumentation()
     rmpyc() ## ...  remove the pyc files created by makeDocumentation ...
     createTarball() ## here we go! create!
     test ()
