@@ -2,7 +2,7 @@
 
 """
 .. module:: theory.lheDecomposer
-   :synopsis: Decomposition of LHE events and creation of TopologyLists 
+   :synopsis: Decomposition of LHE events and creation of TopologyLists.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 

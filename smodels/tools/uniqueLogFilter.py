@@ -1,12 +1,13 @@
-import logging
 """
-.. module:: uniqueLogFilter
+.. module:: tools.uniqueLogFilter
    :synopsis: Contains a stolen code snippet for a logging filter to
        have identical log messages appear only once.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
+
+import logging
 
 class UniqueFilter(logging.Filter):
     """Messages are allowed through just once.

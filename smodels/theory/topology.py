@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: theory.Topology
+.. module:: theory.topology
    :synopsis: Provides a Topology class and a TopologyList collection type.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
