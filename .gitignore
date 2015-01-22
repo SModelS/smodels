@@ -10,6 +10,7 @@ old/
 .project
 .pydevproject
 .pybuild
+.settings
 smodels.log
 summary.txt
 pythia_lhe
