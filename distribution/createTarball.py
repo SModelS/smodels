@@ -119,7 +119,7 @@ def rmExtraFiles():
     Remove additional files.
     """
     comment ( "Remove a few unneeded files" )
-    extras = [ "inputFiles/slha/nobdecay.slha" ]
+    extras = [ "inputFiles/slha/nobdecay.slha", "inputFiles/slha/lightEWinos.slha" ]
     for i in extras:
         cmd = "rm -rf %s/%s" % ( dirname, i )
         run ( cmd )
@@ -180,7 +180,7 @@ def test ():
 def testDocumentation():
     """ Test the documentation """
     comment ( "Test the documentation" )
-    cmd="ls %s/docs/manual.html" % dirname 
+    cmd="ls %s/docs/manual/build/html/index.html" % dirname 
     run (cmd)
 
 def create():
