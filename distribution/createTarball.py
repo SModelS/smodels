@@ -19,11 +19,18 @@ RESET = "\033[7;0m"
 
 def comment( text ):
     print "%s[%s] %s %s" % ( RED, time.asctime(),text,RESET )
+    f=open("create.log","a")
+    f.write (  "[%s] %s\n" % ( time.asctime(),text ) )
+    f.close()
 
 def run ( cmd ):
     print "%scmd: %s%s" % (GREEN,cmd,RESET)
+    f=open("create.log","a")
+    f.write ( "cmd: %s\n" % (cmd) )
     o=commands.getoutput ( cmd )
     print o
+    f.write ( o + "\n" )
+    f.close()
 
 def getVersion():
     """
@@ -35,6 +42,10 @@ def getVersion():
 version = getVersion()
 dirname = "smodels-v%s" % version
 
+def rmlog():
+    """ clear the log file """
+    cmd="rm -f create.log"
+    commands.getoutput ( cmd )
 
 def mkdir():
     """
@@ -125,7 +136,7 @@ def makeDocumentation():
     """
     create the documentation via sphinx """
     comment ( "Creating the documentation" )
-    cmd = "cd %s/docs/manual/; make html; rm -r make.bat Makefile source update" % dirname
+    cmd = "cd %s/docs/manual/; make html; rm -r make.bat Makefile source " % dirname
     run (cmd)
     cmd = "cd %s/docs/documentation/; make html; rm -r make.bat  Makefile source update" % dirname
     run (cmd)
@@ -176,18 +187,19 @@ def create():
     """
     Create a tarball for distribution.
     """
+    rmlog() ## first remove the log file
     comment ( "Creating tarball for distribution, version %s" % version )
     # makeClean()
     rmdir()
-    mkdir()
+    mkdir() ## .. then create the temp dir
     ## cp()
-    clone()
-    rmpyc()
-    rmExtraFiles()
-    fetchDatabase()
+    clone() ## ... clone smodels into it ...
+    rmExtraFiles() ## ... remove unneeded files ...
+    fetchDatabase() 
     makeDocumentation()
     convertRecipes()
-    createTarball()
+    rmpyc() ## ...  remove the pyc files created by makeDocumentation ...
+    createTarball() ## here we go! create!
     test ()
     # rmdir(dirname)
     testDocumentation()
