@@ -1,6 +1,7 @@
-******************************
+.. index:: Basic Concepts and Definitions
+
 Basic Concepts and Definitions
-******************************
+==============================
 
 Throughout this manual, several concepts are used extensively. Here we define the most important ones, their respective nomenclature and some useful notation.
 The concepts related to the basic building blocks of the :doc:`decomposition <Decomposition>`

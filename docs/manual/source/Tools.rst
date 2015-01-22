@@ -1,3 +1,5 @@
+.. index:: SModelS Tools
+
 .. |element| replace:: :ref:`element <element>`
 .. |elements| replace:: :ref:`elements <element>`
 .. |topology| replace:: :ref:`topology <topology>`
@@ -14,7 +16,6 @@
 .. |database| replace:: :doc:`database <Database>`
 .. |bracket notation| replace:: :ref:`bracket notation <bracketNotation>`
 
-=============
 SModelS Tools
 =============
 
@@ -28,7 +29,7 @@ Inside SModelS there are a number of tools that may be convenient for the user:
 .. _xsecCalc:
 
 Cross-Section Calculator
-========================
+------------------------
 
 This little tool computes LHC production cross-sections for *MSSM particles*
 and writes them out in :ref:`SLHA convention <xsecblock>`. This can in particular be convenient for adding cross-sections to SLHA input files, see :doc:`Basic Input <BasicInput>`. The calculation is done at LO with `Pythia6.4 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_ ; K-factors for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_ .
@@ -75,10 +76,12 @@ Further Pythia parameters are defined in :download:`etc/pythia.card </images/pyt
 
 A typical
 usage example is: ::
+
    runTools.py xseccomputer -s 8 -e 10000 -p -f compressedSpec.slha
 
 which will compute 8 TeV LO cross-sections (at the LHC) for all MSSM processes using 10k MC events.
 If, *after* the LO cross-sections have been computed, one wants to add the NLO+NLL cross-sections for gluinos and squarks: ::
+
    runTools.py xseccomputer -s 8 -p -N -O -f compressedSpec.slha
 
 The resulting file will then contain LO cross-sections for all MSSM processes and NLO+NLL cross-sections for gluinos and squarks.
@@ -88,7 +91,7 @@ When reading the input file, SModelS will then use only the highest order cross-
 .. _fileChecks:
 
 Input File Checks
-=================
+-----------------
 
 As discussed in :doc:`Basic Input <BasicInput>`, SModelS accepts both SLHA and LHE input files. It can be convenient to perform certain sanity checks on these files as described below.
 
@@ -97,7 +100,7 @@ As discussed in :doc:`Basic Input <BasicInput>`, SModelS accepts both SLHA and L
 .. _lheChecks:
 
 LHE File Checker
-----------------
+^^^^^^^^^^^^^^^^
 
 For a LHE input file only very basic checks are performed, namely that
 
@@ -113,17 +116,21 @@ For a LHE input file only very basic checks are performed, namely that
 runTools.py lhechecker [-h] -f FILENAME
 
 *arguments*:
+
   -h, --help            show this help message and exit
+  
   -f FILENAME, --filename FILENAME
+  
 
 A typical
 usage example is: ::
+
    runTools.py lhechecker -f gluino_squarks.lhe
 
 .. _slhaChecks:
 
 SLHA File Checker
------------------
+^^^^^^^^^^^^^^^^^
 
 The SLHA file checker allows to perform quite rigorous checks of SLHA input files. Concretely, it verifies that
 
@@ -199,6 +206,7 @@ In some more detail:
 
 A typical
 usage example is: ::
+
    runTools.py slhachecker -m 0.001 -s 0.01 -f lightSquarks.slha
 
 Running this will print the status flag and a message with potential warnings
@@ -208,7 +216,7 @@ and error messages.
 .. _missTops:
 
 Missing Topologies
-==================
+------------------
 
 Unlike the :ref:`file checks <fileChecks>` and the :ref:`cross-section calculator <xsecCalc>`, the missing topologies tool can be called only *after* the SMS |decomposition| and |theory predictions| have been computed.
 Given the |decomposition| output (list of |elements|), as well as the |database|

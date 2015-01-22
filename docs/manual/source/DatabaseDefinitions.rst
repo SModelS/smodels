@@ -1,6 +1,7 @@
+.. index:: Database Definitions
+
 .. _databaseDefs:
 
-====================
 Database Definitions
 ====================
 

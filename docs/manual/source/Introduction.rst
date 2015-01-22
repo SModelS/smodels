@@ -1,6 +1,7 @@
-************
+.. index:: Introduction
+
 Introduction
-************
+============
 
 (From the original SModelS paper, `arXiv:1312.4175 <http://arxiv.org/abs/arXiv:1312.4175>`_ )
 

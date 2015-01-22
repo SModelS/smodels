@@ -1,3 +1,5 @@
+.. index:: Running SModelS
+
 .. |invisible compression| replace:: :ref:`invisible compression <invComp>`
 .. |mass compression| replace:: :ref:`mass compression <massComp>`
 .. |element| replace:: :ref:`element <element>`
@@ -15,9 +17,8 @@
 
 .. _runningSModelS:
 
-***************
 Running SModelS
-***************
+===============
 
 For the first-time user, SModelS ships with a command-line tool :ref:`runSModelS.py <runSModelS>`, which
 takes an SLHA or LHE file as input (see :doc:`Basic Input <BasicInput>`), and reports on the SMS
@@ -33,9 +34,8 @@ code (:ref:`Example.py <exampleCode>`) are described below.
 
 .. _runSModelS:
 
-=============
 runSModelS.py
-=============
+-------------
 
 
 *runSModelS.py* covers several different applications of the SModelS functionality,
@@ -69,7 +69,7 @@ These settings may be changed from their default values using the :ref:`paramete
 
 
 The Parameters File
--------------------
+^^^^^^^^^^^^^^^^^^^
 
 The basic options and parameters used by *runSModelS.py* are defined in the parameter file.
 An example parameter file, including all available parameters together
@@ -175,7 +175,7 @@ Below we give more detailed information about each entry in the parameters file.
 .. _output:
 
 The Output
-----------
+^^^^^^^^^^
 
 The results of |runSModelS| are printed both to the screen and to the output (summary) file. If no
 output file is specified when calling |runSModelS|, the file output will be printed to ./summary.txt.
@@ -185,7 +185,7 @@ the :ref:`output file <fileOut>`.
 .. _screenOut:
 
 Screen Output
-^^^^^^^^^^^^^
+*************
 
 If all the options in *stdout* (**printDecomp**,  **addElmentInfo**, **printAnalyses**, **addAnaInfo** and
 **printResults**)  are set to True (see :ref:`parameter file <parameterFile>`), the screen output contains the following information:
@@ -225,7 +225,8 @@ If all the options in *stdout* (**printDecomp**,  **addElmentInfo**, **printAnal
 .. _fileOut:
 
 Summary File Output
-^^^^^^^^^^^^^^^^^^^
+*******************
+
 If both **expandedSummary** and **addConstraintInfo** are set to True
 (see :ref:`parameter file <parameterFile>`), the file output contains the following information:
 
@@ -281,9 +282,8 @@ If both **expandedSummary** and **addConstraintInfo** are set to True
 
 .. _exampleCode:
 
-==========
 Example.py
-==========
+----------
 
 Although :ref:`runSModelS.py <runSModelS>` provides the main SModelS features with a command line interface, 
 users more familiar with Python and the SModelS language may prefer to write their own main program. 
