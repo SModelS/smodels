@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: externalNllFast
+.. module:: tools.externalNllFast
    :synopsis: Wrapper for all nllfast versions.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>

@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
 """
-    .. module:: missingTopologies
-    :synopsis: Definitions of classes used to find, format missing topologies
+.. module:: tools.missingTopologies
+   :synopsis: Definitions of classes used to find, format missing topologies
     
-    .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>    
-    .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
+.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>    
+.. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
+
 """
 
 from smodels.theory.printer import Printer

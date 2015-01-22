@@ -1,0 +1,137 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+    xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw"
+    version="1.1" baseProfile="full">
+    <g>
+        <g latexdraw:type="picture" id="id368425353">
+            <image
+                xlink:href="/home/lessa/smodels-manual/images/diagram-InvisibleTopB.png"
+                x="501.5384615384605" y="20.000000000000057"
+                height="633" width="1022"/>
+        </g>
+        <g latexdraw:type="picture" id="id375984291">
+            <image
+                xlink:href="/home/lessa/smodels-manual/images/diagram-InvisibleTopA.png"
+                x="-1290.7692307692312" y="27.692307692308276"
+                height="633" width="1259"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id693714420">
+            <polyline
+                points="69.025641025641,333.84615384615347 385.0256410256411,332.5128205128201 "
+                stroke-width="8.0" stroke="#c12b2b"
+                latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-693714420)"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id537298490">
+            <polyline
+                points="-471.6923076923078,691.254578754579 -332.10256410256443,767.6923076923081 -259.7948717948721,691.4871794871799 "
+                stroke-width="4.0" stroke="#c12b2b" fill="none"
+                latexdraw:rotationAngle="0.0"
+                marker-start="url(#arrow0-537298490)" marker-end="url(#arrow1-537298490)"/>
+        </g>
+        <g latexdraw:type="text" id="id1398773864" fill="#c12b2b" latexdraw:position="bl">
+            <text x="-493.74358974358995" y="818.25641025641"><![CDATA[\Huge Invisible Final States]]></text>
+        </g>
+        <g latexdraw:type="ellipse" id="id688848539">
+            <ellipse cx="1162.6666666666663" cy="472.6666666666671"
+                rx="110.16666666666674" ry="76.16666666666663"
+                latexdraw:borderPos="outer" stroke-width="5.0"
+                stroke="#c12b2b" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667"/>
+        </g>
+        <g latexdraw:type="arc" id="id398812600" transform="rotate(495.8673777282231) translate(-749.7529812318362 -266.9040687621361)">
+            <path
+                d="M 1279.6923076923024 -18.51282051282044 A 850.7179487179461 850.7179487179461 0.0 0 0 353.9888915735175 -865.9195752354552 "
+                latexdraw:borderPos="outer" stroke-width="6.0"
+                stroke="#c12b2b" fill="none" stroke-linecap="round"
+                stroke-dasharray="1, 11.291666666666668"
+                latexdraw:rotationAngle="8.654518394587893" marker-end="url(#arrow1-398812600)"/>
+        </g>
+        <g latexdraw:type="ellipse" id="id1408936030">
+            <ellipse cx="-394.2564102564115" cy="461.8974358974367"
+                rx="321.7051282051284" ry="110.78205128205241"
+                latexdraw:borderPos="outer" stroke-width="5.0"
+                stroke="#c12b2b" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667"/>
+        </g>
+        <g latexdraw:type="ellipse" id="id423454639">
+            <ellipse cx="1397.282051282051" cy="202.66666666666617"
+                rx="110.16666666666674" ry="76.16666666666663"
+                latexdraw:borderPos="outer" stroke-width="5.0"
+                stroke="#c12b2b" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667"/>
+        </g>
+        <g latexdraw:type="ellipse" id="id1774868877">
+            <ellipse cx="-272.7179487179508" cy="199.58974358974524"
+                rx="193.2435897435896" ry="110.78205128205241"
+                latexdraw:borderPos="outer" stroke-width="5.0"
+                stroke="#c12b2b" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667"/>
+        </g>
+        <g latexdraw:type="arc" id="id304211823" transform="rotate(698.6647812948917) translate(-608.1048748317637 109.94765171230165)">
+            <path
+                d="M 1756.7689051131126 498.81744921632276 A 1572.256410256408 1572.256410256408 0.0 0 0 457.31286509495453 -6.95733198027483 "
+                latexdraw:borderPos="outer" stroke-width="6.0"
+                stroke="#c12b2b" fill="none" stroke-linecap="round"
+                stroke-dasharray="1, 11.291666666666668"
+                latexdraw:rotationAngle="12.194000801321952" marker-start="url(#arrow0-304211823)"/>
+        </g>
+        <g latexdraw:type="text" id="id742841396" fill="#c12b2b" latexdraw:position="bl">
+            <text x="-274.5128205128209" y="-97.8974358974366"><![CDATA[\Huge Invisible Final State]]></text>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1386626562">
+            <polyline
+                points="-109.23076923076928,-81.53846153846158 -230.7692307692309,9.230769230769235 "
+                stroke-width="4.0" stroke="#c12b2b"
+                latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-1386626562)"/>
+        </g>
+    </g>
+    <defs>
+        <marker overflow="visible" orient="auto" id="arrow1-693714420">
+            <path
+                d="M 0.0 0.0 L -3.263020833333333 1.1653645833333333 L -3.263020833333333 0.0 L -3.263020833333333 -1.1653645833333333 z "
+                latexdraw:arrSizeNum="2.0" fill="#c12b2b"/>
+        </marker>
+        <marker overflow="visible" orient="auto" id="arrow0-537298490">
+            <path
+                d="M 0.0 0.0 L 3.7260416666666667 1.3307291666666667 L 3.7260416666666667 0.0 L 3.7260416666666667 -1.3307291666666667 z "
+                latexdraw:arrSizeNum="2.0" fill="#c12b2b"/>
+        </marker>
+        <marker overflow="visible" orient="auto" id="arrow1-537298490">
+            <path
+                d="M 0.0 0.0 L -3.7260416666666667 1.3307291666666667 L -3.7260416666666667 0.0 L -3.7260416666666667 -1.3307291666666667 z "
+                latexdraw:arrSizeNum="2.0" fill="#c12b2b"/>
+        </marker>
+        <marker overflow="visible" orient="auto" id="arrow1-398812600">
+            <path
+                d="M 0.0 0.0 L -3.417361111111111 1.2204861111111112 L -3.417361111111111 0.0 L -3.417361111111111 -1.2204861111111112 z "
+                latexdraw:arrSizeNum="2.0" fill="#c12b2b"/>
+        </marker>
+        <marker overflow="visible" orient="auto" id="arrow0-304211823">
+            <path
+                d="M 0.0 0.0 L 3.417361111111111 1.2204861111111112 L 3.417361111111111 0.0 L 3.417361111111111 -1.2204861111111112 z "
+                latexdraw:arrSizeNum="2.0" fill="#c12b2b"/>
+        </marker>
+        <marker overflow="visible" orient="auto" id="arrow1-1386626562">
+            <path
+                d="M 0.0 0.0 L -3.7260416666666667 1.3307291666666667 L -3.7260416666666667 0.0 L -3.7260416666666667 -1.3307291666666667 z "
+                latexdraw:arrSizeNum="2.0" fill="#c12b2b"/>
+        </marker>
+    </defs>
+    <metadata>
+        <latexdraw:metadata>
+            <latexdraw:latexIncludes><![CDATA[]]></latexdraw:latexIncludes>
+            <latexdraw:displayXScale>true</latexdraw:displayXScale>
+            <latexdraw:displayYScale>true</latexdraw:displayYScale>
+            <latexdraw:unit>CM</latexdraw:unit>
+            <latexdraw:zoom>0.6499999999999997</latexdraw:zoom>
+            <latexdraw:magneticGridStyle>CUSTOMISED</latexdraw:magneticGridStyle>
+            <latexdraw:gridGap>10</latexdraw:gridGap>
+            <latexdraw:magneticGrid>false</latexdraw:magneticGrid>
+            <latexdraw:version>3.3.0</latexdraw:version>
+            <latexdraw:size>
+                <latexdraw:width>1922</latexdraw:width>
+                <latexdraw:height>1047</latexdraw:height>
+            </latexdraw:size>
+            <latexdraw:position>
+                <latexdraw:x>0.0</latexdraw:x>
+                <latexdraw:y>34.0</latexdraw:y>
+            </latexdraw:position>
+        </latexdraw:metadata>
+    </metadata>
+</svg>
