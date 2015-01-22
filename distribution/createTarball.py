@@ -64,8 +64,8 @@ def clone():
     """
     Git clone smodels itself into dirname, then remove .git, .gitignore, distribution, and test.
     """
-    comment ( "Git-cloning smodels in %s" % dirname )
-    o = commands.getoutput("cd %s; git clone git@smodels.hephy.at:smodels" % (dirname) )
+    comment ( "Git-cloning smodels into %s (this might take a while)" % dirname )
+    o = commands.getoutput("git clone git@smodels.hephy.at:smodels %s" % (dirname) )
     print o
     for i in os.listdir( dirname ):
         if i in [".git", ".gitignore", "distribution", "test"]:
@@ -93,7 +93,7 @@ def fetchDatabase():
     """
     Execute 'git clone' to retrieve the database.
     """
-    comment ( "git clone the database ... " )
+    comment ( "git clone the database (this might take a while)" )
     cmd = "cd %s; git clone -b v%s git@smodels.hephy.at:smodels-database ;" \
         " rm -rf smodels-database/.git smodels-database/.gitignore " % \
             (dirname, version)
@@ -114,7 +114,13 @@ def rmExtraFiles():
     """
     Remove additional files.
     """
-    pass
+    comment ( "Remove a few unneeded files" )
+    extras = [ "inputFiles/slha/nobdecay.slha" ]
+    for i in extras:
+        cmd = "rm -rf %s/%s" % ( dirname, i )
+        o = commands.getoutput( cmd )
+        print o
+        
 
 
 def convertRecipes():
@@ -191,11 +197,11 @@ def create():
     Create a tarball for distribution.
     """
     comment ( "Creating tarball for distribution, version %s" % version )
-    makeClean()
+    # makeClean()
     rmdir()
     mkdir()
-    cp()
-    ## clone()
+    ## cp()
+    clone()
     rmpyc()
     rmExtraFiles()
     fetchDatabase()
