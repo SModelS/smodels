@@ -129,7 +129,7 @@ def convertRecipes():
     Compile recipes from .ipynb to .py and .html.
     """
     comment ( "Converting the recipes" )
-    cmd = "cd %s/docs/manual/source/recipes/; make convert remove_ipynbs" % dirname
+    cmd = "cd %s/docs/manual/source/recipes/; make convert remove_ipynb" % dirname
     run (cmd)
 
 def makeDocumentation():
