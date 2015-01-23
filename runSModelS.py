@@ -50,7 +50,7 @@ def main(inputFile, parameterFile, outputFile):
     inputType = parser.get("options", "inputType").lower()
     if inputType != 'slha' and inputType != 'lhe':
         log.error("Unknown input type (must be SLHA or LHE): %s" % inputType)
-        sys.exit()
+        return
 
     """ Check input file for errors """
     inputStatus = ioObjects.FileStatus()
@@ -64,11 +64,11 @@ def main(inputFile, parameterFile, outputFile):
     except:
         log.error("Database not found in %s" % os.path.realpath(smsHelpers.base))
         databaseVersion = None
-        sys.exit()
+        return
 
     """ Initialize output status and exit if there were errors in the input """
     outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile, dict(parser.items("parameters")), databaseVersion, outputFile)
-
+    if outputStatus.status < 0: return
 
     """
     Decompose input file
@@ -85,11 +85,13 @@ def main(inputFile, parameterFile, outputFile):
     except:
         """ Update status to fail, print error message and exit """
         outputStatus.updateStatus(-1)
+        return
 
     """ Print Decomposition output.
         If no topologies with sigma > sigmacut are found, update status, write output file, stop running """
     if not smstoplist:
         outputStatus.updateStatus(-3)
+        return
 
     outLevel = 0
     if parser.getboolean("stdout", "printDecomp"):
