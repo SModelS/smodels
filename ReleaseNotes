@@ -1,7 +1,7 @@
 Release v1.0.1, Thu 22 Jan 2015 12:42:29 PM BRST:
 =======================================================
 
-	* cluster bug fix by Andre
-	* slha checks updates by Uschi
-	* Fixed SUS-13-012 bug in database (Michi)
-	* updated references.bib to include also SLAC meta info
+	* cluster bug fix (Andre Lessa)
+	* slha checks updates (Ursula Laa)
+	* Fixed SUS-13-012 bug in database (Michael Traub)
+	* updated references.bib to include SLAC meta info (Wolfgang Waltenberger)
