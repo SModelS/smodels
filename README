@@ -109,6 +109,6 @@ If you use this software please cite SModelS v1.0 as well as the programs
 it makes use of (Pythia6.4, NLL-fast and PySLHA). For convenience, the relevant 
 citations are provided in bibtex format in references.bib. 
 
-For citing the experimental analyses in the database, you can use smodels-database/8TeV/database.bib 
+For citing the experimental analyses in the database, you can use smodels-database/database.bib 
 
 
