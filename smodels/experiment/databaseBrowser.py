@@ -176,9 +176,10 @@ class Browser(object):
                 if len(intersec) == 0:
                     results.remove(expRes)
                     break                        
-
               
         self.browserList = results[:]
+        
+        if not self.browserList: logger.warning("Zero results loaded.")
     
     def loadAnalysesWith(self,restrDict = {}):
         """
