@@ -7,7 +7,4 @@ buildrpm:
 	$(PYTHON) setup.py bdist_rpm --force-arch x86_64  ## --post-install=rpm/postinstall --pre-uninstall=rpm/preuninstall
 ##	$(PYTHON) setup.py bdist --formats rpm ## --post-install=rpm/postinstall --pre-uninstall=rpm/preuninstall
 
-test: .PHONY
-	cd test && ./runCompleteTestSuite.py 
-
 .PHONY:

@@ -119,7 +119,7 @@ def rmExtraFiles():
     Remove additional files.
     """
     comment ( "Remove a few unneeded files" )
-    extras = [ "inputFiles/slha/nobdecay.slha", "inputFiles/slha/lightEWinos.slha" ]
+    extras = [ "inputFiles/slha/nobdecay.slha", "inputFiles/slha/lightEWinos.slha", "docs/documentation/smodels.log" ]
     for i in extras:
         cmd = "rm -rf %s/%s" % ( dirname, i )
         run ( cmd )
@@ -194,10 +194,10 @@ def create():
     mkdir() ## .. then create the temp dir
     ## cp()
     clone() ## ... clone smodels into it ...
-    rmExtraFiles() ## ... remove unneeded files ...
     fetchDatabase() 
     convertRecipes()
     makeDocumentation()
+    rmExtraFiles() ## ... remove unneeded files ...
     rmpyc() ## ...  remove the pyc files created by makeDocumentation ...
     createTarball() ## here we go! create!
     test ()
