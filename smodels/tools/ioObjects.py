@@ -131,7 +131,7 @@ class OutputStatus(Printer):
 
     def checkStatus(self):
         """
-        Printout negative status, FIXME more comments.
+        Printout negative status.
         
         """
         if self.status < 0:
