@@ -180,16 +180,4 @@ class Browser(object):
         self.browserList = results[:]
         
         if not self.browserList: logger.warning("Zero results loaded.")
-    
-    def loadAnalysesWith(self,restrDict = {}):
-        """
-        Loads the list of the experimental results (pair of InfoFile and DataFile)
-        satisfying the restrictions to the browserList.
-        The restrictions specified as a dictionary.
-        
-        :param restrDict: dictionary containing the fields and their allowed values.
-                          E.g. {'lumi' : [19.4/fb, 20.3/fb], 'txname' : 'T1',....}
-                          The dictionary values can be single entries or a list of values.
-                          For the fields not listed, all values are assumed to be allowed.
-        """
-        
+   
