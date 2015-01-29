@@ -144,6 +144,8 @@ class DataBase(object):
                 continue
             else:
                 resultsList.append(ExpResult(root))
+
+        if not resultsList: logger.warning("Zero results loaded.")
                 
         return resultsList
     
@@ -201,6 +203,8 @@ class DataBase(object):
                     data = smspy.getData(txnameInfo.txname)
                     newAna = analysisObjects.ULanalysis(info.globalInfo,data,txnameInfo)            
                     analysisList.append(newAna)
+        
+        if not analysisList: logger.warning("Zero analyses loaded.")
         
         return analysisList
         
