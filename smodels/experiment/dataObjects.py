@@ -52,7 +52,7 @@ class ULdata(object):
         for pt in self.data:            
             xpts.append(np.array(pt[0]).flatten())
             ypts.append(pt[1])
-
+        
         ul = griddata(xpts, ypts, [mass], method="linear")
         #Deal with nested result from griddata:
         while isinstance(ul[0],np.ndarray): ul = ul.flatten()

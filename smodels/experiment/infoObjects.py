@@ -118,10 +118,6 @@ class InfoFile(object):
         logger.debug('Creating object based on info.txt: %s' %self.infopath)        
         self.globalInfo = None
         self.txNameInfoList = []        
-        self._txnameFields = ['constraint', 'condition', 'fuzzycondition', \
-        'unconstraint', 'exclusions', 'expectedexclusions', 'exclusionsp1', \
-        'expectedexclusionsp1','exclusionsm1', 'expectedexclusionsm1', \
-        'category', 'branchcondition']        
  
         #Open the info file and get the information:
         if not os.path.isfile(path):
@@ -139,16 +135,17 @@ class InfoFile(object):
             if not tag: continue
             line = content[i]
             value = line.split(':',1)[1].strip()            
-            if tags.count(tag) == 1 and not tag in self._txnameFields:
+            if tags.count(tag) == 1 and not "->" in value:
                 globalInfo.addInfo(tag,value)
-            elif not tag in self._txnameFields:
-                logger.info("Ignoring unknown field %s found in file %s" % (tag, self.infopath))
-                continue
             elif "->" in value:
                 txname = value.split('->')[0].strip()
                 newvalue = value.split('->')[1]
                 if not txname in txObjects: txObjects[txname] = TxNameInfo(txname)
                 txObjects[txname].addInfo(tag,newvalue)
+            else:
+                logger.info("Ignoring unknown field %s found in file %s" % (tag, self.infopath))
+                continue
+                
 
         self.globalInfo = globalInfo
         self.txNameInfoList = txObjects.values()
@@ -156,6 +153,9 @@ class InfoFile(object):
 
     def getInfo(self, infoLabel, txname=None):
         """Returns the value of info field.
+        If the info field belongs to a Txname (TxNameInfo object) and txname
+        is specified, returns the value for the respective TxName. Otherwise returns
+        a dictionary with the values for all TxNames containing the info field.
         :param infoLabel: label of the info field (string). It must be an attribute of
                           the GlobalInfo object or one of the TxNameInfo objects
         :param txname: If infoLabel belongs to a TxnameInfo object, the desired TxName must
@@ -165,11 +165,18 @@ class InfoFile(object):
         globInfo = self.globalInfo.getInfo(infoLabel)
         if not globInfo is False: return globInfo
         txInfo = False
-        for txNameInfo in self.txNameInfoList:
-            if txNameInfo.txname == txname:
+        if txname:
+            for txNameInfo in self.txNameInfoList:           
+                if txNameInfo.txname == txname:
+                    txInfo = txNameInfo.getInfo(infoLabel)
+                    break
+            if not txInfo is False: return txInfo
+        else:
+            infoList = {}
+            for txNameInfo in self.txNameInfoList:
                 txInfo = txNameInfo.getInfo(infoLabel)
-                break
-        if not txInfo is False: return txInfo
+                if txInfo: infoList[txNameInfo.txname] = txInfo
+            if infoList: return infoList        
         
         logger.error("Info field %s not found" % infoLabel)
         sys.exit()
