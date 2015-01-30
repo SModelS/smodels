@@ -132,6 +132,24 @@ class Browser(object):
                 if "_" == field[0]: fields.remove(field)
                
         return fields
+
+    def getULFor(self,expid,txname,massarray):
+        """
+        Get an upper limit for the given experimental id, the txname, and the massarray. 
+        Interpolation is done, if necessary.
+        :param expid: experimental id (string)
+        :param txname: txname (string)
+        :param massarray: list of masses with units, e.g.
+                          [[ 400.*GeV, 100.*GeV],[400.*GeV, 100.*GeV]]
+
+        :return: upper limit [fb]
+        """
+        for expres in self:
+            if expres.info.globalInfo.id != expid:
+                continue
+            return expres.data.getData ( txname ).getULFor ( massarray )
+        logger.warning ( "browser could not find %s" % ( expid ) )
+        return None
      
   
     def loadExpResultsWith(self,restrDict = {}):

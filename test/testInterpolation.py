@@ -11,17 +11,37 @@
 import unittest
 import os
 import numpy as np
+from smodels.tools.physicsUnits import GeV, TeV
 
 class InterpolationTest(unittest.TestCase):
-    def testInterpolation(self):
+    def mestInterpolation(self):
         from smodels.experiment import infoObjects, dataObjects
-        from smodels.tools.physicsUnits import GeV, TeV
-        path="/home/walten/Downloads/extended-database/"
-        expid="8TeV/CMS/CMS-SUS-12-028/"
+        path="/home/walten/git/smodels-database/" ## new style!
+        expid="8TeV/ATLAS/ATLAS-SUSY-2013-05/"
         info = infoObjects.InfoFile(os.path.join(path,expid,"info.txt"))
         data = dataObjects.DataFile(os.path.join(path,expid,"sms.py"),info)
-        for i in data.dataList:
-            if i.txname != "T1":
-                continue
-            print i.analysisID, i.txname
-            ## print i.data
+        d=data.getData ( "T2bb" )
+        print d.analysisID, d.txname
+        ## print i.data
+        massarray=[[ 400.*GeV, 100.*GeV ], [ 400.*GeV, 100.*GeV ] ]
+        ## print np.array(massarray).shape
+        # d.getULFor ( massarray )
+    
+    def testWithBrowser(self):
+        from smodels.experiment import databaseBrowser
+        path="/home/walten/git/smodels-database/" ## new style!
+        browser = databaseBrowser.Browser ( path )
+        txname,id="T2bb","ATLAS-SUSY-2013-05"
+        massarray=[[ 400.*GeV, 100.*GeV ], [ 400.*GeV, 100.*GeV ] ]
+        browser.getULFor ( id, txname, massarray )
+        ## print browser.getAttributes()
+        #browser.loadExpResultsWith ( { "txname":txname, "id": id } )
+        #for expres in browser:
+        #    if expres.info.globalInfo.id != id:
+        #        continue
+        #    print "ExpRes",expres,expres.info.globalInfo.id
+        #    print expres.data.getData ( txname )
+        #    print expres.data.getData ( txname ).getULFor ( massarray )
+
+if __name__ == "__main__":
+    unittest.main()
