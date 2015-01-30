@@ -78,10 +78,10 @@ class SVDTrafo:
         mrot=np.dot(m,self.V)
         if self.countNonZeros ( mrot ) != self.dimensionality:
             logger.warning ( "trying to interpolate outside of convex hull" )
-            print "mrot=",mrot
+            ## print "mrot=",mrot
             return float('nan')*fb
         r = griddata( self.Mp, self.xsec, mrot[:self.dimensionality], method="linear") 
-        return r*fb
+        return r[0]*fb
 
     def __init__ ( self, data ):
         """ Initialise SVDTrafo, giving data in the form:
