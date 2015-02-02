@@ -15,7 +15,9 @@ from smodels.tools.physicsUnits import GeV, fb
 
 class SVDTest(unittest.TestCase):
     def testSVD(self):
-        data = [ [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], 10.*fb ], 
+        data = [ [ [[ 150.*GeV, 50.*GeV], [ 150.*GeV, 50.*GeV] ],  3.*fb ], 
+                 [ [[ 200.*GeV,100.*GeV], [ 200.*GeV,100.*GeV] ],  5.*fb ], 
+                 [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], 10.*fb ], 
                  [ [[ 300.*GeV,150.*GeV], [ 300.*GeV,150.*GeV] ], 13.*fb ], 
                  [ [[ 300.*GeV,200.*GeV], [ 300.*GeV,200.*GeV] ], 15.*fb ], 
                  [ [[ 300.*GeV,250.*GeV], [ 300.*GeV,250.*GeV] ], 20.*fb ], 
@@ -27,10 +29,10 @@ class SVDTest(unittest.TestCase):
                  [ [[ 400.*GeV,350.*GeV], [ 400.*GeV,350.*GeV] ], 19.*fb ], 
                  ]
         trafo=SVDTrafo ( data )
-        self.assertAlmostEquals ( trafo.getInterpolatedValue ( [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ] ), 10.*fb )
-        self.assertAlmostEquals ( trafo.getInterpolatedValue ( [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ] ), 17.*fb )
-        self.assertAlmostEquals ( trafo.getInterpolatedValue ( [[ 300.*GeV,125.*GeV], [ 300.*GeV,125.*GeV] ] ), 11.5*fb )
-        self.assertAlmostEquals ( trafo.getInterpolatedValue ( [[ 300.*GeV,120.*GeV], [ 300.*GeV,120.*GeV] ] ), 11.2*fb )
+        self.assertAlmostEquals ( trafo.getInterpolatedValue ( [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ] ).asNumber(fb), 10. )
+        self.assertAlmostEquals ( trafo.getInterpolatedValue ( [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ] ).asNumber(fb), 17. )
+        self.assertAlmostEquals ( trafo.getInterpolatedValue ( [[ 300.*GeV,125.*GeV], [ 300.*GeV,125.*GeV] ] ).asNumber(fb), 11.5 )
+        self.assertAlmostEquals ( trafo.getInterpolatedValue ( [[ 300.*GeV,120.*GeV], [ 300.*GeV,120.*GeV] ] ).asNumber(fb), 11.2 )
         self.assertTrue ( math.isnan ( trafo.getInterpolatedValue ( [[ 300.*GeV,120.*GeV], [ 300.*GeV,125.*GeV] ] ).asNumber(fb) ) )
         self.assertTrue ( math.isnan ( trafo.getInterpolatedValue ( [[ 500.*GeV,200.*GeV], [ 500.*GeV,200.*GeV] ] ).asNumber(fb) ) )
     #    print "upper limit for 300,120=", trafo.getInterpolatedValue ( [[ 300.*GeV,120.*GeV], [ 300.*GeV,120.*GeV] ] )

@@ -29,7 +29,7 @@ class SVDTrafo:
         """ count the nonzeros in a vector """
         nz=0
         for i in mp:
-            if abs(i)<10**-5:
+            if abs(i)>10**-5:
                 nz+=1
         return nz
 
@@ -70,6 +70,24 @@ class SVDTrafo:
         self.Mp=MpCut ## also keep the rotated points, with truncated zeros
         #print "Mp,xseec=",zip(self.Mp,self.xsec)
 
+    def interpolateOutsideConvexHull ( self, massarray ):
+        """ experimental routine, meant to check if we can interpolate outside convex hull """
+        m=self.flattenMassArray ( massarray )
+        mrot=np.dot(m,self.V)
+        dp=self.countNonZeros ( mrot ) ## dimensionality of input
+        max_displacement = max ( abs(mrot[self.dimensionality:]) ) ## axis with maximum displacement from zero
+
+        projected_value=griddata( self.Mp, self.xsec, mrot[:self.dimensionality], method="linear")
+        mrotp=mrot
+        mrotp[0]+=max_displacement
+        p1 = abs ( griddata( self.Mp, self.xsec, mrotp[:self.dimensionality], method="linear") - projected_value ) / projected_value
+        mrotm=mrot
+        mrotm[0]-=max_displacement
+        m1 = abs ( griddata( self.Mp, self.xsec, mrotm[:self.dimensionality], method="linear") - projected_value ) / projected_value
+        print "p1,m1=",p1,m1
+        
+
+
     def getInterpolatedValue ( self, massarray ):
         """
            :param massarray: e.g. [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ]
@@ -77,24 +95,37 @@ class SVDTrafo:
         """
         m=self.flattenMassArray ( massarray )
         mrot=np.dot(m,self.V)
-        if self.countNonZeros ( mrot ) != self.dimensionality:
-            logger.warning ( "trying to interpolate outside of convex hull" )
-            ## print "mrot=",mrot
+        dp=self.countNonZeros ( mrot )
+        if dp != self.dimensionality:
+            logger.warning ( "trying to interpolate outside of convex hull (d=%d,dp=%d)" % 
+                     ( self.dimensionality, dp ) )
+            self.interpolateOutsideConvexHull ( massarray )
+            #print "mrot=",mrot
+            #print "projected upper limit=",griddata( self.Mp, self.xsec, mrot[:self.dimensionality], method="linear") * self.unit
+            #max_displacement = max ( abs(mrot[self.dimensionality:]) )
+            #print "maximum displacement=",max_displacement
+            #mrotp=mrot
+            #mrotp[0]+=max_displacement
+            #print "projected+md=",griddata( self.Mp, self.xsec, mrotp[:self.dimensionality], method="linear") * self.unit
             return float('nan')*self.unit
         r = griddata( self.Mp, self.xsec, mrot[:self.dimensionality], method="linear") 
         return r[0]*self.unit
 
-    def __init__ ( self, data ):
+    def __init__ ( self, data, accept_errors_upto=None ):
         """ Initialise SVDTrafo, giving data in the form:
             [ [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], 10.*fb ], ... ]
             for upper limits or 
             [ [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], .1 ], ... ]
             for efficiency maps
+
+            :param accept_errors_upto: If None, do not allow extrapolations outside of convex hull.
+                 If float value given, allow that much relative uncertainty when extrapolating outside convex hull.
+                 This method is used, when we violate the equal branches constraint.
         """
         self.data = data
         self.unit=1.0 ## store the unit so that we can take arbitrary units for the "z" values.
                    # default is unitless, which wwe use for efficiency maps
-        if len(data)<1 or len(data[0])<2 or type(data[0][0][0]) != unum.Unum:
+        if len(data)<1 or len(data[0])<2:
                 logger.error ( "input data not in correct format. expecting sth like " \
          " [ [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], 10.*fb ], ... ] for upper " \
          " limits or [ [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], .1 ], ... ] for efficiency maps" )
