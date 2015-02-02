@@ -15,6 +15,7 @@ import numpy as np
 from scipy.linalg import svd
 from scipy.interpolate import griddata
 from smodels.tools.physicsUnits import GeV, fb
+import unum
 import logging
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
@@ -45,7 +46,7 @@ class SVDTrafo:
         M,Mp=[],[]
         self.xsec=[]
         for x,y in data:
-            self.xsec.append ( y / fb )
+            self.xsec.append ( y / self.unit )
             xp = self.flattenMassArray ( x )
             M.append ( xp )
         # print "M=",M
@@ -69,23 +70,35 @@ class SVDTrafo:
         self.Mp=MpCut ## also keep the rotated points, with truncated zeros
         #print "Mp,xseec=",zip(self.Mp,self.xsec)
 
-    def getUpperLimit ( self, massarray ):
+    def getInterpolatedValue ( self, massarray ):
         """
            :param massarray: e.g. [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ]
-           :return: upper limit, in fb 
+           :return: interpolated value, in same units as input
         """
         m=self.flattenMassArray ( massarray )
         mrot=np.dot(m,self.V)
         if self.countNonZeros ( mrot ) != self.dimensionality:
             logger.warning ( "trying to interpolate outside of convex hull" )
             ## print "mrot=",mrot
-            return float('nan')*fb
+            return float('nan')*self.unit
         r = griddata( self.Mp, self.xsec, mrot[:self.dimensionality], method="linear") 
-        return r[0]*fb
+        return r[0]*self.unit
 
     def __init__ ( self, data ):
         """ Initialise SVDTrafo, giving data in the form:
             [ [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], 10.*fb ], ... ]
+            for upper limits or 
+            [ [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], .1 ], ... ]
+            for efficiency maps
         """
         self.data = data
+        self.unit=1.0 ## store the unit so that we can take arbitrary units for the "z" values.
+                   # default is unitless, which wwe use for efficiency maps
+        if len(data)<1 or len(data[0])<2 or type(data[0][0][0]) != unum.Unum:
+                logger.error ( "input data not in correct format. expecting sth like " \
+         " [ [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], 10.*fb ], ... ] for upper " \
+         " limits or [ [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], .1 ], ... ] for efficiency maps" )
+        if type(data[0][1])==unum.Unum:
+            ## if its a unum, we store 1.0 * unit
+            self.unit=data[0][1] / ( data[0][1].asNumber() )
         self.computeV ( data )
