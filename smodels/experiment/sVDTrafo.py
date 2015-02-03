@@ -17,6 +17,8 @@ from scipy.interpolate import griddata
 from smodels.tools.physicsUnits import GeV, fb
 import unum
 import logging
+import copy
+import math
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
 logging.basicConfig(format=FORMAT)
@@ -70,24 +72,87 @@ class SVDTrafo:
         self.Mp=MpCut ## also keep the rotated points, with truncated zeros
         #print "Mp,xseec=",zip(self.Mp,self.xsec)
 
-    def interpolateOutsideConvexHull ( self, massarray ):
+    def _interpolateOutsideConvexHullOld ( self, massarray ):
         """ experimental routine, meant to check if we can interpolate outside convex hull """
         m=self.flattenMassArray ( massarray )
         mrot=np.dot(m,self.V)
         dp=self.countNonZeros ( mrot ) ## dimensionality of input
         max_displacement = max ( abs(mrot[self.dimensionality:]) ) ## axis with maximum displacement from zero
+        length = np.sqrt ( np.dot ( mrot[self.dimensionality:], mrot[self.dimensionality:] ) )
+        print "max_displacement=",max_displacement
+        print "length=",length
 
         projected_value=griddata( self.Mp, self.xsec, mrot[:self.dimensionality], method="linear")
-        mrotp=mrot
-        mrotp[0]+=max_displacement
-        p1 = abs ( griddata( self.Mp, self.xsec, mrotp[:self.dimensionality], method="linear") - projected_value ) / projected_value
-        mrotm=mrot
-        mrotm[0]-=max_displacement
-        m1 = abs ( griddata( self.Mp, self.xsec, mrotm[:self.dimensionality], method="linear") - projected_value ) / projected_value
-        print "p1,m1=",p1,m1
+        if math.isnan ( projected_value ):
+            return projected_value * self.unit
+        displacements=[]
+        for i in range(self.dimensionality):
+            mrotp=copy.deepcopy(mrot)
+            mrotp[i]+=length
+            p1 = abs ( griddata( self.Mp, self.xsec, mrotp[:self.dimensionality], method="linear") - projected_value ) / projected_value
+            displacements.append ( p1 )
+            mrotm=copy.deepcopy(mrot)
+            mrotm[i]-=length
+            m1 = abs ( griddata( self.Mp, self.xsec, mrotm[:self.dimensionality], method="linear") - projected_value ) / projected_value
+            displacements.append ( m1 )
+#            print "i,p1,m1=",i,p1,m1
+        for i in displacements:
+                ## if any of the displacements falls outside the convext hull,
+                ## we dont extrapolate
+                if math.isnan ( i ):
+                    return float("nan")*self.unit
+        maxd=max(displacements)
+        print "maximum=",maxd
+        ## now go length in direction of gradient
+
+        if maxd > self.accept_errors_upto:
+   #         print "returning nan"
+            return float("nan")*self.unit
+   #     print "returning",projected_value[0]*self.unit
+        return projected_value[0]*self.unit
         
 
 
+    def _interpolateOutsideConvexHull ( self, massarray ):
+        """ experimental routine, meant to check if we can interpolate outside convex hull """
+        m=self.flattenMassArray ( massarray )
+        mrot=np.dot(m,self.V)
+        dp=self.countNonZeros ( mrot ) ## dimensionality of input
+        ## how far are we away from the "plane"
+        length = np.sqrt ( np.dot ( mrot[self.dimensionality:], mrot[self.dimensionality:] ) )
+        ## the value of the grid at the point projected to the "plane"
+        projected_value=griddata( self.Mp, self.xsec, mrot[:self.dimensionality], method="linear")[0]
+        
+        ## compute gradient
+        gradient=[]
+        for i in range ( self.dimensionality ):
+            mrot2=copy.deepcopy(mrot)
+            mrot2[i]+=length
+            gradient.append ( ( griddata( self.Mp, self.xsec, mrot2[:self.dimensionality], method="linear")[0] - projected_value ) / length )
+        ## normalize gradient
+        # print "gradient=",gradient
+        C= np.sqrt ( np.dot ( gradient, gradient ) )
+        for i,j in enumerate(gradient):
+            gradient[i]=gradient[i]/C*length
+        ## walk one length along gradient
+        mrot3=copy.deepcopy(mrot)
+        mrot4=copy.deepcopy(mrot)
+        for i,j in enumerate(gradient):
+            mrot3[i]+=gradient[i]
+            mrot4[i]-=gradient[i]
+        # print "projected value", projected_value
+        ag=griddata( self.Mp, self.xsec, mrot3[:self.dimensionality], method="linear")[0]
+        #print "along gradient", ag
+        agm=griddata( self.Mp, self.xsec, mrot4[:self.dimensionality], method="linear")[0]
+        #print "along negative gradient",agm
+        dep=abs ( ag - projected_value ) / projected_value
+        dem=abs ( agm - projected_value ) / projected_value
+        #print "relative error positive", dep
+        #print "relative error negative", dem
+        if dep < self.accept_errors_upto and dem < self.accept_errors_upto:
+            return projected_value * self.unit
+        return float("nan") * self.unit
+            
     def getInterpolatedValue ( self, massarray ):
         """
            :param massarray: e.g. [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ]
@@ -97,9 +162,11 @@ class SVDTrafo:
         mrot=np.dot(m,self.V)
         dp=self.countNonZeros ( mrot )
         if dp != self.dimensionality:
-            logger.warning ( "trying to interpolate outside of convex hull (d=%d,dp=%d)" % 
+            if self.accept_errors_upto == None:
+                return float('nan')*self.unit
+            logger.info ( "attempting to interpolate outside of convex hull (d=%d,dp=%d)" % 
                      ( self.dimensionality, dp ) )
-            self.interpolateOutsideConvexHull ( massarray )
+            return self._interpolateOutsideConvexHull ( massarray )
             #print "mrot=",mrot
             #print "projected upper limit=",griddata( self.Mp, self.xsec, mrot[:self.dimensionality], method="linear") * self.unit
             #max_displacement = max ( abs(mrot[self.dimensionality:]) )
@@ -107,7 +174,6 @@ class SVDTrafo:
             #mrotp=mrot
             #mrotp[0]+=max_displacement
             #print "projected+md=",griddata( self.Mp, self.xsec, mrotp[:self.dimensionality], method="linear") * self.unit
-            return float('nan')*self.unit
         r = griddata( self.Mp, self.xsec, mrot[:self.dimensionality], method="linear") 
         return r[0]*self.unit
 
@@ -119,10 +185,12 @@ class SVDTrafo:
             for efficiency maps
 
             :param accept_errors_upto: If None, do not allow extrapolations outside of convex hull.
-                 If float value given, allow that much relative uncertainty when extrapolating outside convex hull.
-                 This method is used, when we violate the equal branches constraint.
+                 If float value given, allow that much relative uncertainty on the upper limit / efficiency 
+                 when extrapolating outside convex hull.
+                 This method can be used to loosen the equal branches assumption.
         """
         self.data = data
+        self.accept_errors_upto=accept_errors_upto
         self.unit=1.0 ## store the unit so that we can take arbitrary units for the "z" values.
                    # default is unitless, which wwe use for efficiency maps
         if len(data)<1 or len(data[0])<2:
