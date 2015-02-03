@@ -35,9 +35,9 @@ class SVDTest(unittest.TestCase):
         self.assertAlmostEquals ( trafo.getInterpolatedValue ( [[ 300.*GeV,120.*GeV], [ 300.*GeV,120.*GeV] ] ).asNumber(fb), 11.2 )
         self.assertTrue ( math.isnan ( trafo.getInterpolatedValue ( [[ 300.*GeV,120.*GeV], [ 300.*GeV,125.*GeV] ] ).asNumber(fb) ) )
         self.assertTrue ( math.isnan ( trafo.getInterpolatedValue ( [[ 500.*GeV,200.*GeV], [ 500.*GeV,200.*GeV] ] ).asNumber(fb) ) )
-    #    print "upper limit for 300,120=", trafo.getInterpolatedValue ( [[ 300.*GeV,120.*GeV], [ 300.*GeV,120.*GeV] ] )
-        #print "upper limit for 300,120,300,125=", trafo.getInterpolatedValue ( [[ 300.*GeV,120.*GeV], [ 300.*GeV,125.*GeV] ] )
-        #print "upper limit for 500,200,500,200=", trafo.getInterpolatedValue ( [[ 500.*GeV,200.*GeV], [ 500.*GeV,200.*GeV] ] )
+        loose=SVDTrafo ( data, accept_errors_upto = 0.05 )
+        self.assertAlmostEquals ( loose.getInterpolatedValue ( [[ 300.*GeV,120.*GeV], [ 300.*GeV,125.*GeV] ] ).asNumber(fb), 11.35 )
+        self.assertTrue ( math.isnan ( loose.getInterpolatedValue ( [[ 300.*GeV,120.*GeV], [ 300.*GeV,140.*GeV] ] ).asNumber(fb) ) )
 
     def testWithEfficiencies(self):
         data = [ [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], .1 ], 
