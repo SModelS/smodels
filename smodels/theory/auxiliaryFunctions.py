@@ -40,11 +40,12 @@ def _memoize(func):
 
 
 @_memoize
-def massPosition(mass, analysis):
+def massPosition(mass, txdata):
     """ Give mass position in upper limit space.    
-    Use the analysis experimental limit data.    
+    Use the analysis experimental limit data. 
+    :param txdata: TxNameData object holding the data and interpolation   
     """
-    xmass = analysis.getUpperLimitFor(mass)
+    xmass = txdata.getValueFor(mass)
     if type(xmass) != type(1.*pb):
         return None
     xmass = xmass / fb
