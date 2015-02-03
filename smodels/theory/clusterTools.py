@@ -71,14 +71,12 @@ class IndexCluster(object):
                      as values
     :ivar analysis: analysis to which the cluster applies (ULanalysis object)
     """
-    def __init__(self, massMap=None, posMap=None, wMap=None, indices=set([]),
-                 analysis=None):
+    def __init__(self, massMap=None, posMap=None, wMap=None, indices=set([])):
         self.indices = indices
         self.avgPosition = None
         self.massMap = massMap
         self.positionMap = posMap
         self.weightMap = wMap
-        self.analysis = analysis
 
 
         if massMap and posMap and wMap and len(self.indices) > 0:
@@ -221,31 +219,27 @@ def groupAll(elements):
     return cluster
 
 
-def clusterElements(elements, analysis, maxDist):
+def clusterElements(elements, txdata, maxDist):
     """
     Cluster the original elements according to their mass distance.
     
     :parameter elements: list of elements (Element objects)
-    :parameter analysis: analysis to be considered (must be a ULanalysis object)
+    :parameter txdata: TxNameData object to be used for computing distances in UL space
     
     :returns: list of clusters (ElementCluster objects)    
     """
-    # Get the list of elements with good masses (with the masses replaced by
-    # their 'good' value):
-    goodElements = _getGoodElements(elements, analysis, maxDist)
-    if len(goodElements) == 0:
-        return []
+    if len(elements) == 0:  return []
     # ElementCluster elements by their mass:
-    clusters = _doCluster(goodElements, analysis, maxDist)
+    clusters = _doCluster(elements, txdata, maxDist)
     return clusters
 
 
-def _doCluster(elements, analysis, maxDist):
+def _doCluster(elements, txdata, maxDist):
     """
     Cluster algorithm to cluster elements.
     
     :parameter elements: list of all elements to be clustered
-    :parameter analysis: analysis to which the cluster applies (ULanalysis object)
+    :parameter txdata: TxNameData object to be used for computing distances in UL space
     :parameter maxDist: maximum mass distance for clustering two elements
     
     :returns: a list of ElementCluster objects containing the elements
@@ -260,7 +254,7 @@ def _doCluster(elements, analysis, maxDist):
     for iel, el in enumerate(elements):
         if not el.getMasses() in massMap.values():
             massMap[iel] = el.getMasses()
-            posMap[iel] = massPosition(massMap[iel], analysis)
+            posMap[iel] = massPosition(massMap[iel], txdata)
             weightMap[iel] = el.weight.getMaxXsec() / fb
         else:
             j = massMap.keys()[massMap.values().index(el.getMasses())] 
@@ -273,7 +267,7 @@ def _doCluster(elements, analysis, maxDist):
         for jel in posMap:            
             if distance(posMap[iel], posMap[jel]) <= maxDist:
                 indices.append(jel)        
-        indexCluster = IndexCluster(massMap, posMap, weightMap, set(indices), analysis)
+        indexCluster = IndexCluster(massMap, posMap, weightMap, set(indices))
         clusterList.append(indexCluster)
 
     #Split the maximal clusters until all elements inside each cluster are
@@ -313,7 +307,7 @@ def _doCluster(elements, analysis, maxDist):
     # Add clusters of individual masses (just to be safe)
     for iel in massMap:
         finalClusters.append(IndexCluster(massMap, posMap, weightMap,
-                                           set([iel]),analysis))
+                                           set([iel])))
 
     # Clean up clusters (remove redundant clusters)
     for ic, clusterA in enumerate(finalClusters):
@@ -338,52 +332,3 @@ def _doCluster(elements, analysis, maxDist):
         clusterList.append(cluster)
 
     return clusterList
-
-
-def _getGoodElements(elements, analysis, maxDist):
-    """
-    Get the list of elements which have masses satisfying the analysis conditions
-    and that lie inside the analysis upper limit grid.
-    
-    Most analyses require equal branch masses.
-    For such analyses good masses are defined as those where both branches in the element have identical
-    mass arrays or where the distance between the two mass arrays is smaller than maxDist.
-    e.g. if the element mass array is [[m1,m2] , [m3,m4]] (branch1 = [m1,m2], branch2 = [m3,m4]),
-    then the mass is "good" if m1=m3 and m3=m4 or if the mass distance between [[m1,m2],[m1,m2]]
-    and [[m3,m4],[m3,m4]] is smaller than maxDist.
-    If the element has a good mass, its mass is replaced by the mass average of [[m1,m2],[m1,m2]]
-    and [[m3,m4],[m3,m4]].
-    For the anlyses where there is no such requirement, return the original list of elements
-    with masses lying inside the analysis grid.
-        
-    :parameter elements: list of all elements to be clustered
-    :parameter analysis: analysis to which the cluster applies (ULanalysis object)
-    :parameter maxDist: maximum mass distance for clustering two elements
-    
-    :returns: list with a copy of the elements with good masses, with their masses replaced by
-    the branch average (if equal branch masses are required by the analysis)
-    """
-    goodElements = []    
-    branchCondition = analysis.getBranchCondition()   
-    
-    for element in elements:
-        mass = element.getMasses()
-        goodmass = None
-        if mass[0] != mass[1] and (not branchCondition or branchCondition == "equal branches"):
-            mass1 = [mass[0], mass[0]]
-            mass2 = [mass[1], mass[1]]
-            mP1 = massPosition(mass1, analysis)
-            mP2 = massPosition(mass2, analysis)
-            if type(mP1)==type(None) or type(mP2)==type(None):
-                continue
-            if distance(mP1, mP2) < maxDist:
-                goodmass = massAvg([mass1, mass2], method='harmonic')
-        else:
-            p=massPosition(mass, analysis)
-            if type(p)==type(fb): goodmass = mass
-
-        if goodmass and type(massPosition(goodmass, analysis))==type(fb):
-            goodElements.append(element.copy())
-            goodElements[-1].setMasses(goodmass)
-
-    return goodElements
