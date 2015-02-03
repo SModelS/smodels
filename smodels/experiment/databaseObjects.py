@@ -8,8 +8,9 @@
 
 """
 
-import logging, os, sys
-from smodels.experiment import infoObjects, dataObjects, analysisObjects
+import logging, os, sys, glob
+from smodels.experiment import infoObject
+from smodels.experiment import txnameObject
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
 logging.basicConfig(format=FORMAT)
@@ -27,10 +28,24 @@ class ExpResult(object):
     :ivar info: InfoFile object
     :ivar data: DataFile object
     """
-    def __init__(self, path):
-        self.path = path
-        self.info = infoObjects.InfoFile(os.path.join(path,"info.txt"))
-        self.data = dataObjects.DataFile(os.path.join(path,"sms.py"),self.info)
+    def __init__(self, path=None):
+        if path and os.path.isdir(path):
+            self.path = path
+            self.info = infoObject.Info(os.path.join(path,"info.txt"))
+            self.txnames = []
+            for txtfile in glob.iglob(os.path.join(path,"*.txt")):            
+                txtFile = open(txtfile,'r')
+                data = txtFile.read()
+                if not "txname" in data or (not 'upperLimits' in data and not 'efficiencyMap' in data):
+                    continue         
+                       
+                self.txnames.append(txnameObject.TxName(txtfile))
+            
+    def __str__(self):
+        label = self.info.getInfo('id') + ": "
+        for txname in self.txnames:
+            label += txname.txname+','
+        return label[:-1]
             
 
 class DataBase(object):    
@@ -75,6 +90,14 @@ class DataBase(object):
             logger.error('%s is no valid path!' %path)
             sys.exit()        
         return path
+    
+    def __str__(self):
+        idList = "Database: "+self.databaseVersion+"\n---------- \n"
+        for expRes in self.expResultList:
+            idList += expRes.info.getInfo('id')+'\n'
+        return idList
+        
+             
     
     @property
     def _getDatabaseVersion(self):
@@ -139,7 +162,7 @@ class DataBase(object):
         
         resultsList = []
         for root, dirs, files in os.walk(self._base):
-            if not 'info.txt' in files or not 'sms.py' in files:
+            if not 'info.txt' in files:
                 logger.debug("Missing files in %s" % root)
                 continue
             else:
@@ -148,63 +171,35 @@ class DataBase(object):
         if not resultsList: logger.warning("Zero results loaded.")
                 
         return resultsList
-    
-    def _getExpResults(self,analysisIDs=[],txnames=[]):
+
+    def getExpResults(self,analysisIDs=[],txnames=[]):
         """
-        Returns a list of ExpResult objects containing the experimental results information.
+        Returns a list of ExpResult objects.
+        Each object refers to an analysisID (for UL analyses)
+        or analysisID+SignalRegion (for EM analyses).
         If analysisIDs is defined, returns only the results matching one of the IDs in the list.
-        If txname is defined, returns only the results which contains
-        at least one of the Tx names in the list.
+        If txname is defined, returns only the results matching one of the Tx names in the list.
         :param analysisID: list of analysis ids ([CMS-SUS-13-006,...])
         :param txname: list of txnames ([TChiWZ,...])
         :returns: list of ExpResult objects    
         """
         
         
-        resultsList = []
+        expResultList = []
         for expResult in self.expResultList:
-            ID = expResult.info.getInfo('id')            
+            ID = expResult.info.getInfo('id')
+            #Skip analysis not containing any of the required ids:
             if analysisIDs and not ID in analysisIDs: continue
-            commonNames = [txname for txname in txnames if txname in expResult.info.getTxNames()]
-            if not commonNames: continue
-            resultsList.append(expResult)
-        
-        return resultsList
-        
-    def getAnalyses(self,analysisIDs=[],txnames=[]):
-        """
-        Returns a list of ULanalysis or EManalysis objects.
-        Each object refers to a single analysisID+Txname (for UL analyses)
-        or analysisID+SignalRegion (for a EM analyses).
-        If analysisIDs is defined, returns only the results matching one of the IDs in the list.
-        If txname is defined, returns only the results matching one of the Tx names in the list.
-        :param analysisID: list of analysis ids ([CMS-SUS-13-006,...])
-        :param txname: list of txnames ([TChiWZ,...])
-        :returns: list of ULanalysis or EManalysis objects    
-        """
-        
-        
-        analysisList = []
-        for expResult in self.expResultList:
-            info = expResult.info
-            smspy = expResult.data
-            ID = info.getInfo('id')
-            analysisType = info.getInfo('analysisType')            
-            if analysisIDs and not ID in analysisIDs: continue
-            if analysisType == 'EfficiencyMap':
-                data = smspy.getData()
-                newAna = analysisObjects.EManalysis(info,data)
-                logger.info('Only upper limits analyses are accepted. Skipping %s' % ID)
-                continue
-                analysisList.append(newAna)
-            elif analysisType == 'UpperLimit':                
-                for txnameInfo in info.txNameInfoList:
-                    if txnames and not txnameInfo.txname in txnames: continue
-                    data = smspy.getData(txnameInfo.txname)
-                    newAna = analysisObjects.ULanalysis(info.globalInfo,data,txnameInfo)            
-                    analysisList.append(newAna)
-        
-        if not analysisList: logger.warning("Zero analyses loaded.")
-        
-        return analysisList
+            newExpResult = ExpResult()
+            newExpResult.path = expResult.path
+            newExpResult.info = expResult.info            
+            newExpResult.txnames = []
+            for txname in expResult.txnames:
+                if txnames and not txname.txname in txnames:
+                    continue
+                newExpResult.txnames.append(txname)
+            #Skip analysis not containing any of the required txnames:
+            if not newExpResult.txnames: continue
+            expResultList.append(newExpResult)                        
+        return expResultList
         

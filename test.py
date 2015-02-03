@@ -8,31 +8,26 @@
 
 #Import basic functions (this file must be run under the installation folder)
 import sys
-from smodels.experiment.infoObjects import InfoFile
-from smodels.experiment.dataObjects import DataFile
+from smodels.experiment.infoObject import Info
 from smodels.experiment.databaseObjects import DataBase
 from smodels.tools.physicsUnits import GeV, fb, TeV, pb
 from smodels.experiment.databaseBrowser import Browser
 import numpy as np
 
-database = DataBase("/home/lessa/smodels-DBtest/")
+# database = DataBase("/home/lessa/smodels-database/")
 # browser = Browser(database)
-#print browser.getAttributes()
+# print browser.getAttributes()
 #print browser.getAttributes()
 # nl = 0
 # print browser
 # browser.loadExpResultsWith({'txname': ['T2','T1','T2bb'], 'id' : ['ATLAS-SUSY-2013-05']})
 # print browser
-# print browser.getValuesFor("implimented_by")
-# print browser.getValuesFor("constraint")
-
-#sys.exit()
-database = DataBase("/home/lessa/smodels-DBtest/")
-print database._getDatabaseVersion
-
-listOfana = database.getAnalyses(txnames=['T2bb'])
-
-
-for ana in listOfana:
-  print ana.printout()
-  print ana.getUpperLimitFor([[200.*GeV,50.*GeV],[200.*GeV,50.*GeV]])
+# print browser.getValuesFor("lumi")
+# print browser.getValuesFor("axes")
+# print database
+database = DataBase("/home/lessa/smodels-database/")
+print database
+listOfExpRes = database.getExpResults()
+for expRes in listOfExpRes:
+    for txname in expRes.txnames:
+        print txname.axes
