@@ -98,7 +98,7 @@ class MissingTopoList(Printer):
                     if not ana.getEfficiencyFor(el) == 0:
                         covered = True
                 if not covered:
-                    self.addToTopos(el)
+                    self.addToTopos(el, sumL)
         for topo in self.topos:
             if not topo.weights.getXsecsFor(self.sqrts): continue
             topo.value = topo.weights.getXsecsFor(self.sqrts)[0].value / fb
