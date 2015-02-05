@@ -49,7 +49,7 @@ class TxName(object):
             if tags.count(tag) == 1:
                 if ';' in value: value = value.split(';')
                 if tag == 'upperLimits' or tag == 'efficiencyMap':
-                    self.data = TxNameData(tag,value)
+                    self.txnameData = TxNameData(tag,value)
                 else: self.addInfo(tag,value)
             else:
                 logger.info("Ignoring unknown field %s found in file %s" % (tag, self.infopath))
@@ -118,4 +118,8 @@ class TxNameData(object):
         Interpolates the data and returns the UL or efficiency for the respective massarray
         :param massarray: mass array values (with units), i.e. [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         """
+        
+        
+        
+        return "dummy"
     
