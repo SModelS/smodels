@@ -37,7 +37,7 @@ class ExpResult(object):
                 txtFile = open(txtfile,'r')
                 data = txtFile.read()
                 if not "txname" in data or (not 'upperLimits' in data and not 'efficiencyMap' in data):
-                    continue         
+                    continue
                        
                 self.txnames.append(txnameObject.TxName(txtfile))
             
