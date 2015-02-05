@@ -28,6 +28,7 @@ import numpy as np
 database = DataBase("/home/lessa/smodels-database/")
 print database
 listOfExpRes = database.getExpResults()
+
 for expRes in listOfExpRes:
     for txname in expRes.txnames:
-        print txname.axes
+        print txname.txnameData.getValueFor([[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ])
