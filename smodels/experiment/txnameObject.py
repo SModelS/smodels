@@ -28,7 +28,7 @@ class TxName(object):
     def __init__(self, path):
         self.txnameFile = path
         self.txnameData = None
-        self.elements = []
+        self._elements = []
         
         logger.debug('Creating object based on txname file: %s' %self.txnameFile)        
  
@@ -55,9 +55,9 @@ class TxName(object):
                 logger.info("Ignoring unknown field %s found in file %s" % (tag, self.infopath))
                 continue
         
-        #Builds up a list of elements appearing in constraints:        
+        #Builds up a list of _elements appearing in constraints:        
         if hasattr(self,'constraint'):
-            self.elements = elementsInStr(self.constraint)
+            self._elements = elementsInStr(self.constraint)
         
     def addInfo(self,tag,value):
         """
@@ -91,13 +91,13 @@ class TxName(object):
         """
         
         if hasattr(self,'upperLimits'):
-            for el in self.elements:
+            for el in self._elements:
                 if element.particlesMatch(el):
                     ul = self.txnameData.getValueFor(el.getMasses())
                     if ul: return 1.
             return 0.
         elif hasattr(self,'efficiencyMap'):
-            for el in self.elements:
+            for el in self._elements:
                 if element.particlesMatch(el):
                     eff = self.txnameData.getValueFor(element.getMasses())
                     if eff: return eff                    
