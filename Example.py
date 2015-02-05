@@ -12,8 +12,7 @@ import sys
 from smodels.theory import slhaDecomposer
 from smodels.theory import lheDecomposer
 from smodels.tools.physicsUnits import fb, GeV
-from smodels.experiment import smsAnalysisFactory
-from smodels.theory.theoryPrediction import theoryPredictionFor
+from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.experiment.databaseObjects import DataBase
 
 #Set the address of the database folder
@@ -42,25 +41,22 @@ def main():
     smstoplist.printout(outputLevel=1)
 
     # Load all analyses from database
-    listofanalyses = database.getAnalyses()
+    listOfExpRes = database.getExpResults()
 
     # Compute the theory predictions for each analysis
-    analysesPredictions = [theoryPredictionFor(analysis, smstoplist) for analysis in listofanalyses]
-
-    #Access information for each theory prediction/analysis
-    for analysisPred in analysesPredictions:
-        if not analysisPred: continue  #Skip non-applicable analyses
-        #If the analysis prediction contains more than one theory prediction (cluster), loop over predictions:        
-        for theoryPrediction in analysisPred:
+    for expResult in listOfExpRes:
+        print(expResult)
+        predictions = theoryPredictionsFor(expResult, smstoplist)
+        for theoryPrediction in predictions:
             print("------------------------")
-            print("Analysis name = ",theoryPrediction.analysis.label)   #Analysis name
+            print("TxName = ",theoryPrediction.txname)   #Analysis name
             print("Prediction Mass = ",theoryPrediction.mass)    #Value for average cluster mass (average mass of the elements in cluster)
             print("Signal Cross-Section = ",theoryPrediction.value)   #Value for the cluster signal cross-section
             print("Condition Violation = ",theoryPrediction.conditions)  #Condition violation values
-            
+              
             #Get upper limit for the respective prediction:
-            print("Analysis UL = ",theoryPrediction.analysis.getUpperLimitFor(theoryPrediction.mass)) 
-    
+            print("Analysis UL = ",theoryPrediction.txname.txnameData.getValueFor(theoryPrediction.mass)) 
+      
     
 
 

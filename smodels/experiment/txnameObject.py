@@ -12,6 +12,7 @@
 import logging,os,sys
 from smodels.tools.physicsUnits import GeV, fb, TeV, pb
 from smodels.theory.particleNames import elementsInStr
+from smodels.theory.element import Element
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
 logging.basicConfig(format=FORMAT)
@@ -57,7 +58,10 @@ class TxName(object):
         
         #Builds up a list of _elements appearing in constraints:        
         if hasattr(self,'constraint'):
-            self._elements = elementsInStr(self.constraint)
+            self._elements = [Element(el) for el in elementsInStr(self.constraint)]
+
+    def __str__(self):
+        return self.txname
         
     def addInfo(self,tag,value):
         """
@@ -90,18 +94,21 @@ class TxName(object):
         :return: efficiency (float)
         """
         
-        if hasattr(self,'upperLimits'):
-            for el in self._elements:
+        if self.txnameData.type == 'upperLimits':
+            for el in self._elements:                
                 if element.particlesMatch(el):
                     ul = self.txnameData.getValueFor(el.getMasses())
-                    if ul: return 1.
+                    if type(ul) == type(fb): return 1.
             return 0.
-        elif hasattr(self,'efficiencyMap'):
+        elif self.txnameData.type == 'efficiencyMap':
             for el in self._elements:
                 if element.particlesMatch(el):
                     eff = self.txnameData.getValueFor(element.getMasses())
                     if eff: return eff                    
             return 0.
+        else:
+            logger.error("Unknown data type: %s" % self.txnameData.type)
+            sys.exit()
             
         
 
@@ -119,7 +126,5 @@ class TxNameData(object):
         :param massarray: mass array values (with units), i.e. [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         """
         
-        
-        
-        return "dummy"
+        return 1.*fb
     
