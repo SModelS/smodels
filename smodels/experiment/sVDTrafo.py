@@ -70,86 +70,60 @@ class SVDTrafo:
         for i in Mp:
             MpCut.append ( i[:self.dimensionality].tolist() )
         self.Mp=MpCut ## also keep the rotated points, with truncated zeros
-        #print "Mp,xseec=",zip(self.Mp,self.xsec)
 
-    def _interpolateOutsideConvexHullOld ( self, massarray ):
-        """ experimental routine, meant to check if we can interpolate outside convex hull """
-        m=self.flattenMassArray ( massarray )
-        mrot=np.dot(m,self.V)
-        dp=self.countNonZeros ( mrot ) ## dimensionality of input
-        max_displacement = max ( abs(mrot[self.dimensionality:]) ) ## axis with maximum displacement from zero
-        length = np.sqrt ( np.dot ( mrot[self.dimensionality:], mrot[self.dimensionality:] ) )
-        print "max_displacement=",max_displacement
-        print "length=",length
-
-        projected_value=griddata( self.Mp, self.xsec, mrot[:self.dimensionality], method="linear")
-        if math.isnan ( projected_value ):
-            return projected_value * self.unit
-        displacements=[]
-        for i in range(self.dimensionality):
-            mrotp=copy.deepcopy(mrot)
-            mrotp[i]+=length
-            p1 = abs ( griddata( self.Mp, self.xsec, mrotp[:self.dimensionality], method="linear") - projected_value ) / projected_value
-            displacements.append ( p1 )
-            mrotm=copy.deepcopy(mrot)
-            mrotm[i]-=length
-            m1 = abs ( griddata( self.Mp, self.xsec, mrotm[:self.dimensionality], method="linear") - projected_value ) / projected_value
-            displacements.append ( m1 )
-#            print "i,p1,m1=",i,p1,m1
-        for i in displacements:
-                ## if any of the displacements falls outside the convext hull,
-                ## we dont extrapolate
-                if math.isnan ( i ):
-                    return float("nan")*self.unit
-        maxd=max(displacements)
-        print "maximum=",maxd
-        ## now go length in direction of gradient
-
-        if maxd > self.accept_errors_upto:
-   #         print "returning nan"
-            return float("nan")*self.unit
-   #     print "returning",projected_value[0]*self.unit
-        return projected_value[0]*self.unit
-        
-
-
-    def _interpolateOutsideConvexHull ( self, massarray ):
-        """ experimental routine, meant to check if we can interpolate outside convex hull """
-        m=self.flattenMassArray ( massarray )
-        mrot=np.dot(m,self.V)
-        dp=self.countNonZeros ( mrot ) ## dimensionality of input
-        ## how far are we away from the "plane"
-        length = np.sqrt ( np.dot ( mrot[self.dimensionality:], mrot[self.dimensionality:] ) )
+    def _estimateExtrapolationError ( self, massarray ):
+        """ when projecting a point p from n to the point P in m dimensions,
+            we estimate the expected extrapolation error with the following strategy: 
+            we compute the gradient at point P, and let alpha be the distance between
+            p and P. We then walk one step of length alpha in the direction of the greatest ascent,
+            and the opposite direction. Whichever relative change is greater is 
+            reported as the expected extrapolation error.
+        """
+        p=self.flattenMassArray ( massarray ) ## point p in n dimensions
+        P=np.dot(p,self.V)                    ## projected point p in n dimensions
+        ## P[self.dimensionality:] is project point p in m dimensions
+        # m=self.countNonZeros ( P ) ## dimensionality of input
+        ## how far are we away from the "plane": distance alpha
+        alpha = np.sqrt ( np.dot ( P[self.dimensionality:], P[self.dimensionality:] ) )
         ## the value of the grid at the point projected to the "plane"
-        projected_value=griddata( self.Mp, self.xsec, mrot[:self.dimensionality], method="linear")[0]
+        projected_value=griddata( self.Mp, self.xsec, P[:self.dimensionality], method="linear")[0]
         
         ## compute gradient
         gradient=[]
         for i in range ( self.dimensionality ):
-            mrot2=copy.deepcopy(mrot)
-            mrot2[i]+=length
-            gradient.append ( ( griddata( self.Mp, self.xsec, mrot2[:self.dimensionality], method="linear")[0] - projected_value ) / length )
+            P2=copy.deepcopy(P)
+            P2[i]+=alpha
+            gradient.append ( ( 
+                griddata( self.Mp, self.xsec, P2[:self.dimensionality], method="linear")[0] - projected_value ) / alpha )
         ## normalize gradient
         # print "gradient=",gradient
         C= np.sqrt ( np.dot ( gradient, gradient ) )
         for i,j in enumerate(gradient):
-            gradient[i]=gradient[i]/C*length
-        ## walk one length along gradient
-        mrot3=copy.deepcopy(mrot)
-        mrot4=copy.deepcopy(mrot)
+            gradient[i]=gradient[i]/C*alpha
+        ## walk one alpha along gradient
+        P3=copy.deepcopy(P)
+        P4=copy.deepcopy(P)
         for i,j in enumerate(gradient):
-            mrot3[i]+=gradient[i]
-            mrot4[i]-=gradient[i]
+            P3[i]+=gradient[i]
+            P4[i]-=gradient[i]
         # print "projected value", projected_value
-        ag=griddata( self.Mp, self.xsec, mrot3[:self.dimensionality], method="linear")[0]
+        ag=griddata( self.Mp, self.xsec, P3[:self.dimensionality], method="linear")[0]
         #print "along gradient", ag
-        agm=griddata( self.Mp, self.xsec, mrot4[:self.dimensionality], method="linear")[0]
+        agm=griddata( self.Mp, self.xsec, P4[:self.dimensionality], method="linear")[0]
         #print "along negative gradient",agm
         dep=abs ( ag - projected_value ) / projected_value
         dem=abs ( agm - projected_value ) / projected_value
-        #print "relative error positive", dep
-        #print "relative error negative", dem
-        if dep < self.accept_errors_upto and dem < self.accept_errors_upto:
+        de=dep
+        if dem > de: de=dem
+        return de
+
+    def _interpolateOutsideConvexHull ( self, massarray ):
+        """ experimental routine, meant to check if we can interpolate outside convex hull """
+        p=self.flattenMassArray ( massarray )
+        P=np.dot(p,self.V)
+        projected_value=griddata( self.Mp, self.xsec, P[:self.dimensionality], method="linear")[0]
+        de = self._estimateExtrapolationError ( massarray ) 
+        if de < self.accept_errors_upto:
             return projected_value * self.unit
         return float("nan") * self.unit
             
