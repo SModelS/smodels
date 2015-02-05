@@ -71,12 +71,13 @@ class IndexCluster(object):
                      as values
     :ivar analysis: analysis to which the cluster applies (ULanalysis object)
     """
-    def __init__(self, massMap=None, posMap=None, wMap=None, indices=set([])):
+    def __init__(self, massMap=None, posMap=None, wMap=None, indices=set([]), txdata = None):
         self.indices = indices
         self.avgPosition = None
         self.massMap = massMap
         self.positionMap = posMap
         self.weightMap = wMap
+        self.txdata = txdata
 
 
         if massMap and posMap and wMap and len(self.indices) > 0:
@@ -166,7 +167,7 @@ class IndexCluster(object):
         masses = [self.massMap[iel] for iel in self]
         weights = [self.weightMap[iel] for iel in self]
         clusterMass = massAvg(masses,weights=weights)
-        avgPos = massPosition(clusterMass, self.analysis)
+        avgPos = self.txdata.getValueFor(clusterMass)/fb
         return avgPos
 
 
@@ -267,7 +268,7 @@ def _doCluster(elements, txdata, maxDist):
         for jel in posMap:            
             if distance(posMap[iel], posMap[jel]) <= maxDist:
                 indices.append(jel)        
-        indexCluster = IndexCluster(massMap, posMap, weightMap, set(indices))
+        indexCluster = IndexCluster(massMap, posMap, weightMap, set(indices),txdata)
         clusterList.append(indexCluster)
 
     #Split the maximal clusters until all elements inside each cluster are

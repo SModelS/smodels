@@ -95,7 +95,8 @@ class XSection(object):
             newXsec.value = newXsec.value * other
         else:
             logger.error("Xsections can only be multiplied by floats")
-            sys.exit()
+#             sys.exit()
+            raise Exception("bla")
         return newXsec
 
 
