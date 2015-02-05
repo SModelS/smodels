@@ -89,23 +89,23 @@ class TheoryPredictionList(Printer):
         """
         return Printer.formatTheoryPredictionData(self,outputLevel)
 
-def theoryPredictionFor(expResult, smsTopList, maxMassDist=0.2):
+def theoryPredictionsForr(expResult, smsTopList, maxMassDist=0.2):
     """
-    Compute theory predictions for the given experimental result, using the list of elements
+    Compute theory predictions for the given experimental result, using the list of _elements
     in smsTopList.
-    For each Txname appearing in expResult, it collects the elements and efficiencies, 
+    For each Txname appearing in expResult, it collects the _elements and efficiencies, 
     combine the masses (if needed) and compute the conditions (if existing).
     
     :parameter expResult: expResult to be considered (ExpResult object)
-    :parameter smsTopList: list of topologies containing elements (TopologyList object)
-    :parameter maxMassDist: maximum mass distance for clustering elements (float)
+    :parameter smsTopList: list of topologies containing _elements (TopologyList object)
+    :parameter maxMassDist: maximum mass distance for clustering _elements (float)
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction objects    
     """
     
     predictionList = TheoryPredictionList()
     #Loop over the txnames in expResult:
     for txname in expResult.txnames:
-        # Select elements belonging to TxName and apply efficiencies
+        # Select _elements belonging to TxName and apply efficiencies
         elements = _getElementsFrom(smsTopList, txname)
         if len(elements) == 0: continue        
         #Remove the cross-sections which do not match the experimental analysis:
@@ -131,14 +131,14 @@ def theoryPredictionFor(expResult, smsTopList, maxMassDist=0.2):
 
 def _getElementsFrom(smsTopList, txname):
     """
-    Get elements, that belong to the TxName (appear in constraint).    
-    Loop over all elements in smsTopList and returns a copy of the elements belonging
-    to TxName (have efficiency != 0). The copied elements
+    Get _elements, that belong to the TxName (appear in constraint).    
+    Loop over all _elements in smsTopList and returns a copy of the _elements belonging
+    to TxName (have efficiency != 0). The copied _elements
     have their weights multiplied by their respective efficiencies.
     
     :parameter txname: TxName to be considered (TxName object)
-    :parameter smsTopList: list of topologies containing elements (TopologyList object)
-    :returns: list of elements (Element objects)
+    :parameter smsTopList: list of topologies containing _elements (TopologyList object)
+    :returns: list of _elements (Element objects)
     """
     elements = []
     for el in smsTopList.getElements():
@@ -151,11 +151,11 @@ def _getElementsFrom(smsTopList, txname):
 
 def _combineElements(elements, txname, maxDist):
     """
-    Combine elements according to the txname type.    
-    If txname == upper limit type, group elements into mass clusters. If
-    txname == efficiency map type, group all elements into a single cluster.
+    Combine _elements according to the txname type.    
+    If txname == upper limit type, group _elements into mass clusters. If
+    txname == efficiency map type, group all _elements into a single cluster.
     
-    :parameter elements: list of elements (Element objects)
+    :parameter _elements: list of _elements (Element objects)
     :parameter analysis: analysis to be considered (ULanalysis or EManalysis object)
     :returns: list of element clusters (ElementCluster objects)
     """
@@ -169,11 +169,11 @@ def _combineElements(elements, txname, maxDist):
 def _evalConstraint(cluster, txname):
     """
     Evaluate the txname constraint inside an element cluster.      
-    If txname type == upper limit, sum all the elements' weights
+    If txname type == upper limit, sum all the _elements' weights
     according to the analysis constraint.
-    If txname type == efficiency map, sum all the elements' weights.
+    If txname type == efficiency map, sum all the _elements' weights.
     
-    :parameter cluster: cluster of elements (ElementCluster object)
+    :parameter cluster: cluster of _elements (ElementCluster object)
     :parameter txname: TxName object holding the constraint
     :returns: cluster cross-section
     """    
@@ -194,7 +194,7 @@ def _evalConditions(cluster, txname):
     an element cluster.
     If txname type == efficiency map (EManalysis), returns None
     
-    :parameter cluster: cluster of elements (ElementCluster object)
+    :parameter cluster: cluster of _elements (ElementCluster object)
     :parameter txname: TxName object holding the conditions
     :returns: list of condition values (floats) if analysis type == upper limit. None, otherwise.    
     """    
@@ -218,29 +218,29 @@ def _evalConditions(cluster, txname):
         
 def _evalExpression(stringExpr,cluster):
     """
-    Auxiliary method to evaluate a string expression using the weights of the elements in the cluster.
-    Replaces the elements in stringExpr (in bracket notation) by their weights and evaluate the 
+    Auxiliary method to evaluate a string expression using the weights of the _elements in the cluster.
+    Replaces the _elements in stringExpr (in bracket notation) by their weights and evaluate the 
     expression.
     e.g. computes the total weight of string expressions such as "[[[e^+]],[[e^-]]]+[[[mu^+]],[[mu^-]]]"
     or ratios of weights of string expressions such as "[[[e^+]],[[e^-]]]/[[[mu^+]],[[mu^-]]]"
     and so on...    
     
     :parameter stringExpr: string containing the expression to be evaluated
-    :parameter cluster: cluster of elements (ElementCluster object)
+    :parameter cluster: cluster of _elements (ElementCluster object)
     :returns: value for the expression. Can be a XSectionList object, a float or not numerical (None,string,...)
     """
 
-#Generate elements appearing in the string expression with zero cross-sections:
+#Generate _elements appearing in the string expression with zero cross-sections:
     elements = []
     for elStr in elementsInStr(stringExpr):
         el = element.Element(elStr)      
         elements.append(el)
 
-#Replace elements in strings by their weights and add weights from cluster to the elements list:
+#Replace _elements in strings by their weights and add weights from cluster to the _elements list:
     expr = stringExpr[:].replace("'","").replace(" ","") 
     for iel, el in enumerate(elements):        
-        expr = expr.replace(str(el), "elements["+ str(iel) +"].weight")        
-        for el1 in cluster.elements:                    
+        expr = expr.replace(str(el), "_elements["+ str(iel) +"].weight")        
+        for el1 in cluster._elements:                    
             if el1.particlesMatch(el):
                 el.weight.combineWith(el1.weight)
                 el.combineMotherElements(el1) ## keep track of all mothers
