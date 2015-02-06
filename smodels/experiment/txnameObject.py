@@ -225,7 +225,7 @@ class TxNameData(object):
         de = self._estimateExtrapolationError ( massarray ) 
         if de < self.accept_errors_upto:
             return projected_value * self.unit
-        logger.info ( "error %f too large to propagate outside convext hull" % de )
+        logger.info ( "Expected error of %f too large to propagate outside convext hull" % de )
         return float("nan") * self.unit
 
 
