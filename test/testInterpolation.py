@@ -33,6 +33,10 @@ class InterpolationTest(unittest.TestCase):
         txname=expRes.txnames[0] # T6bbWW
         result=txname.txnameData.getValueFor([[ 300.*GeV,105.*GeV,100.*GeV], [ 300.*GeV,105.*GeV,100.*GeV] ])
         self.assertAlmostEquals( result.asNumber(pb),0.176266 )
+        result=txname.txnameData.getValueFor([[ 300.*GeV,270.*GeV,200.*GeV], [ 300.*GeV,270.*GeV,200.*GeV] ])
+        self.assertAlmostEquals( result.asNumber(pb),87.0403 )
+        result=txname.txnameData.getValueFor([[ 300.*GeV,270.*GeV,200.*GeV], [ 300.*GeV,271.*GeV,200.*GeV] ])
+        self.assertAlmostEquals( result.asNumber(pb),88.6505675 )
     def testOutsidePlane(self):
         self.database = DataBase ( "./database/" )
         listOfExpRes = self.database.getExpResults(analysisIDs=["ATLAS-SUSY-2013-05"], txnames=["T2bb","T6bbWW" ] )
@@ -60,6 +64,22 @@ class InterpolationTest(unittest.TestCase):
         txnameData=TxNameData ( "upperlimit", data )
         result=txnameData.getValueFor([[ 300.*GeV,125.*GeV], [ 300.*GeV,125.*GeV] ])
         self.assertAlmostEquals( result.asNumber(pb),0.0115 ) 
+    def testEfficiencyMaps(self):
+        data = [ [ [[ 150.*GeV, 50.*GeV], [ 150.*GeV, 50.*GeV] ],  .03 ], 
+             [ [[ 200.*GeV,100.*GeV], [ 200.*GeV,100.*GeV] ], .05 ], 
+             [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], .10 ], 
+             [ [[ 300.*GeV,150.*GeV], [ 300.*GeV,150.*GeV] ], .13 ], 
+             [ [[ 300.*GeV,200.*GeV], [ 300.*GeV,200.*GeV] ], .15 ], 
+             [ [[ 300.*GeV,250.*GeV], [ 300.*GeV,250.*GeV] ], .20 ], 
+             [ [[ 400.*GeV,100.*GeV], [ 400.*GeV,100.*GeV] ], .08 ], 
+             [ [[ 400.*GeV,150.*GeV], [ 400.*GeV,150.*GeV] ], .10 ], 
+             [ [[ 400.*GeV,200.*GeV], [ 400.*GeV,200.*GeV] ], .12 ], 
+             [ [[ 400.*GeV,250.*GeV], [ 400.*GeV,250.*GeV] ], .15 ], 
+             [ [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ], .17 ], 
+             [ [[ 400.*GeV,350.*GeV], [ 400.*GeV,350.*GeV] ], .19 ], ]
+        txnameData=TxNameData ( "upperlimit", data )
+        result=txnameData.getValueFor([[ 300.*GeV,125.*GeV], [ 300.*GeV,125.*GeV] ])
+        self.assertAlmostEquals( result,0.115 ) 
         
 
        
