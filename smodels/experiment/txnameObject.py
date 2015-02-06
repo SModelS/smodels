@@ -129,7 +129,10 @@ class TxNameData(object):
             This method can be used to loosen the equal branches assumption.
         """
         self.type = tag
-        self.data = eval(value, {'fb' : fb, 'pb' : pb, 'GeV' : GeV, 'TeV' : TeV})
+        if type(value)==str:
+            self.data = eval(value, {'fb' : fb, 'pb' : pb, 'GeV' : GeV, 'TeV' : TeV})
+        else: ## the data can also be given as lists, for debugging
+            self.data = value
         self.unit = 1.0 ## store the unit so that we can take arbitrary units for the "z" values.
                         ## default is unitless, which we use for efficiency maps
         if len(self.data)<1 or len(self.data[0])<2:
