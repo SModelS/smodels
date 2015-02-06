@@ -135,14 +135,14 @@ class TxNameData(object):
             self.data = value
         self.unit = 1.0 ## store the unit so that we can take arbitrary units for the "z" values.
                         ## default is unitless, which we use for efficiency maps
-        if len(self.data)<1 or len(self.data[0])<2:
+        if len(self.data) < 1 or len(self.data[0]) < 2:
                 logger.error ( "input data not in correct format. expecting sth like " \
          " [ [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], 10.*fb ], ... ] for upper " \
          " limits or [ [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], .1 ], ... ] for efficiency maps" )
         if type(self.data[0][1])==unum.Unum:
             ## if its a unum, we store 1.0 * unit
             self.unit=self.data[0][1] / ( self.data[0][1].asNumber() )
-        self.unit= self.data[0][1] / ( self.data[0][1].asNumber() )
+
         self.accept_errors_upto=accept_errors_upto
         self.computeV()
 
