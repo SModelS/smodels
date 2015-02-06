@@ -152,18 +152,17 @@ class TxNameData(object):
         Interpolates the data and returns the UL or efficiency for the respective massarray
         :param massarray: mass array values (with units), i.e. [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         """
-        
-        m=self.flattenMassArray ( massarray ) ## flatten
-        mrot=np.dot(m,self.V)  ## rotate
-        dp=self.countNonZeros ( mrot )
+        p=self.flattenMassArray ( massarray ) ## flatten
+        P=np.dot(p,self.V)  ## rotate
+        dp=self.countNonZeros ( P )
+        self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")
         if dp != self.dimensionality: ## we have data in different dimensions
             if self.accept_errors_upto == None:
-                return float('nan')*self.unit
+                return float('nan')
             logger.info ( "attempting to interpolate outside of convex hull (d=%d,dp=%d)" %
                      ( self.dimensionality, dp ) )
             return self._interpolateOutsideConvexHull ( massarray )
-        r = griddata( self.Mp, self.xsec, [ mrot[:self.dimensionality] ], method="linear")
-        return r[0]*self.unit
+        return self.projected_value[0]*self.unit
         
     def flattenMassArray ( self, data ):
         """ flatten mass array and remove units """
@@ -187,7 +186,7 @@ class TxNameData(object):
         ## how far are we away from the "plane": distance alpha
         alpha = np.sqrt ( np.dot ( P[self.dimensionality:], P[self.dimensionality:] ) )
         ## the value of the grid at the point projected to the "plane"
-        projected_value=griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
+        ##projected_value=griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
         
         ## compute gradient
         gradient=[]
@@ -195,7 +194,7 @@ class TxNameData(object):
             P2=copy.deepcopy(P)
             P2[i]+=alpha
             gradient.append ( ( 
-                griddata( self.Mp, self.xsec, [ P2[:self.dimensionality]], method="linear")[0] - projected_value ) / alpha )
+                griddata( self.Mp, self.xsec, [ P2[:self.dimensionality]], method="linear")[0] - self.projected_value[0] ) / alpha )
         ## normalize gradient
         # print "gradient=",gradient
         C= np.sqrt ( np.dot ( gradient, gradient ) )
@@ -212,8 +211,8 @@ class TxNameData(object):
         #print "along gradient", ag
         agm=griddata( self.Mp, self.xsec, [ P4[:self.dimensionality] ], method="linear")[0]
         #print "along negative gradient",agm
-        dep=abs ( ag - projected_value ) / projected_value
-        dem=abs ( agm - projected_value ) / projected_value
+        dep=abs ( ag - self.projected_value[0] ) / self.projected_value[0]
+        dem=abs ( agm - self.projected_value[0] ) / self.projected_value[0]
         de=dep
         if dem > de: de=dem
         return de
@@ -222,12 +221,12 @@ class TxNameData(object):
         """ experimental routine, meant to check if we can interpolate outside convex hull """
         p=self.flattenMassArray ( massarray )
         P=np.dot(p,self.V)
-        projected_value=griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
+        # projected_value=griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
         de = self._estimateExtrapolationError ( massarray ) 
         if de < self.accept_errors_upto:
-            return projected_value * self.unit
+            return self.projected_value[0] * self.unit
         logger.info ( "Expected error of %f too large to propagate outside convext hull" % de )
-        return float("nan") * self.unit
+        return float("nan")
 
 
     def countNonZeros ( self, mp ):
