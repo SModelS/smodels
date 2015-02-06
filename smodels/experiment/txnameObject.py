@@ -18,6 +18,7 @@ from scipy.linalg import svd
 import numpy as np
 import unum
 import copy
+import math
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
 logging.basicConfig(format=FORMAT)
@@ -155,14 +156,14 @@ class TxNameData(object):
         p=self.flattenMassArray ( massarray ) ## flatten
         P=np.dot(p,self.V)  ## rotate
         dp=self.countNonZeros ( P )
-        self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")
+        self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
         if dp != self.dimensionality: ## we have data in different dimensions
             if self.accept_errors_upto == None:
                 return float('nan')
             logger.info ( "attempting to interpolate outside of convex hull (d=%d,dp=%d)" %
                      ( self.dimensionality, dp ) )
             return self._interpolateOutsideConvexHull ( massarray )
-        return self.projected_value[0]*self.unit
+        return self._returnProjectedValue()
         
     def flattenMassArray ( self, data ):
         """ flatten mass array and remove units """
@@ -194,7 +195,7 @@ class TxNameData(object):
             P2=copy.deepcopy(P)
             P2[i]+=alpha
             gradient.append ( ( 
-                griddata( self.Mp, self.xsec, [ P2[:self.dimensionality]], method="linear")[0] - self.projected_value[0] ) / alpha )
+                griddata( self.Mp, self.xsec, [ P2[:self.dimensionality]], method="linear")[0] - self.projected_value ) / alpha )
         ## normalize gradient
         # print "gradient=",gradient
         C= np.sqrt ( np.dot ( gradient, gradient ) )
@@ -211,8 +212,8 @@ class TxNameData(object):
         #print "along gradient", ag
         agm=griddata( self.Mp, self.xsec, [ P4[:self.dimensionality] ], method="linear")[0]
         #print "along negative gradient",agm
-        dep=abs ( ag - self.projected_value[0] ) / self.projected_value[0]
-        dem=abs ( agm - self.projected_value[0] ) / self.projected_value[0]
+        dep=abs ( ag - self.projected_value) / self.projected_value
+        dem=abs ( agm - self.projected_value ) / self.projected_value
         de=dep
         if dem > de: de=dem
         return de
@@ -224,10 +225,15 @@ class TxNameData(object):
         # projected_value=griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
         de = self._estimateExtrapolationError ( massarray ) 
         if de < self.accept_errors_upto:
-            return self.projected_value[0] * self.unit
+            return self._returnProjectedValue()
         logger.info ( "Expected error of %f too large to propagate outside convext hull" % de )
         return float("nan")
 
+    def _returnProjectedValue ( self ):
+        ## nans are returned without units
+        if math.isnan ( self.projected_value ):
+            return self.projected_value
+        return self.projected_value * self.unit 
 
     def countNonZeros ( self, mp ):
         """ count the nonzeros in a vector """
