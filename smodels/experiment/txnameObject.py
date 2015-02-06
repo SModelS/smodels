@@ -158,7 +158,7 @@ class TxNameData(object):
         self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")
         if dp != self.dimensionality: ## we have data in different dimensions
             if self.accept_errors_upto == None:
-                return float('nan')*self.unit
+                return float('nan')
             logger.info ( "attempting to interpolate outside of convex hull (d=%d,dp=%d)" %
                      ( self.dimensionality, dp ) )
             return self._interpolateOutsideConvexHull ( massarray )
@@ -226,7 +226,7 @@ class TxNameData(object):
         if de < self.accept_errors_upto:
             return self.projected_value[0] * self.unit
         logger.info ( "Expected error of %f too large to propagate outside convext hull" % de )
-        return float("nan") * self.unit
+        return float("nan")
 
 
     def countNonZeros ( self, mp ):
