@@ -101,8 +101,8 @@ class TxName(object):
         
         if self.txnameData.type == 'upperLimits':
             for el in self._elements:                
-                if element.particlesMatch(el):
-                    ul = self.txnameData.getValueFor(el.getMasses())
+                if element.particlesMatch(el):                    
+                    ul = self.txnameData.getValueFor(element.getMasses())
                     if type(ul) == type(fb): return 1.
             return 0.
         elif self.txnameData.type == 'efficiencyMap':
@@ -152,6 +152,7 @@ class TxNameData(object):
         Interpolates the data and returns the UL or efficiency for the respective massarray
         :param massarray: mass array values (with units), i.e. [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         """
+        
         m=self.flattenMassArray ( massarray ) ## flatten
         mrot=np.dot(m,self.V)  ## rotate
         dp=self.countNonZeros ( mrot )
