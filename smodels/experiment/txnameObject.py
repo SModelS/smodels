@@ -142,7 +142,7 @@ class TxNameData(object):
         if type(self.data[0][1])==unum.Unum:
             ## if its a unum, we store 1.0 * unit
             self.unit=self.data[0][1] / ( self.data[0][1].asNumber() )
-        self.unit= self.data[0][1] / ( self.data[0][1].asNumber() )
+
         self.accept_errors_upto=accept_errors_upto
         self.computeV()
 
