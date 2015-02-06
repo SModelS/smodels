@@ -168,7 +168,7 @@ class IndexCluster(object):
         weights = [self.weightMap[iel] for iel in self]
         clusterMass = massAvg(masses,weights=weights)
         avgPos = self.txdata.getValueFor(clusterMass)/fb
-        return avgPos
+        return avgPos.asNumber()
 
 
     def _getDistanceTo(self, obj):
