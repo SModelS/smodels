@@ -17,6 +17,7 @@ from scipy.interpolate import griddata
 from scipy.linalg import svd
 import numpy as np
 import unum
+import copy
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
 logging.basicConfig(format=FORMAT)
@@ -123,6 +124,64 @@ class TxNameData(object):
             for j in i:
                 ret.append ( j.asNumber(GeV) )
         return ret
+    def _estimateExtrapolationError ( self, massarray ):
+        """ when projecting a point p from n to the point P in m dimensions,
+            we estimate the expected extrapolation error with the following strategy: 
+            we compute the gradient at point P, and let alpha be the distance between
+            p and P. We then walk one step of length alpha in the direction of the greatest ascent,
+            and the opposite direction. Whichever relative change is greater is 
+            reported as the expected extrapolation error.
+        """
+        p=self.flattenMassArray ( massarray ) ## point p in n dimensions
+        P=np.dot(p,self.V)                    ## projected point p in n dimensions
+        ## P[self.dimensionality:] is project point p in m dimensions
+        # m=self.countNonZeros ( P ) ## dimensionality of input
+        ## how far are we away from the "plane": distance alpha
+        alpha = np.sqrt ( np.dot ( P[self.dimensionality:], P[self.dimensionality:] ) )
+        ## the value of the grid at the point projected to the "plane"
+        projected_value=griddata( self.Mp, self.xsec, P[:self.dimensionality], method="linear")[0]
+        
+        ## compute gradient
+        gradient=[]
+        for i in range ( self.dimensionality ):
+            P2=copy.deepcopy(P)
+            P2[i]+=alpha
+            gradient.append ( ( 
+                griddata( self.Mp, self.xsec, P2[:self.dimensionality], method="linear")[0] - projected_value ) / alpha )
+        ## normalize gradient
+        # print "gradient=",gradient
+        C= np.sqrt ( np.dot ( gradient, gradient ) )
+        for i,j in enumerate(gradient):
+            gradient[i]=gradient[i]/C*alpha
+        ## walk one alpha along gradient
+        P3=copy.deepcopy(P)
+        P4=copy.deepcopy(P)
+        for i,j in enumerate(gradient):
+            P3[i]+=gradient[i]
+            P4[i]-=gradient[i]
+        # print "projected value", projected_value
+        ag=griddata( self.Mp, self.xsec, P3[:self.dimensionality], method="linear")[0]
+        #print "along gradient", ag
+        agm=griddata( self.Mp, self.xsec, P4[:self.dimensionality], method="linear")[0]
+        #print "along negative gradient",agm
+        dep=abs ( ag - projected_value ) / projected_value
+        dem=abs ( agm - projected_value ) / projected_value
+        de=dep
+        if dem > de: de=dem
+        return de
+
+    def _interpolateOutsideConvexHull ( self, massarray ):
+        """ experimental routine, meant to check if we can interpolate outside convex hull """
+        p=self.flattenMassArray ( massarray )
+        P=np.dot(p,self.V)
+        projected_value=griddata( self.Mp, self.xsec, P[:self.dimensionality], method="linear")[0]
+        de = self._estimateExtrapolationError ( massarray ) 
+        if de < self.accept_errors_upto:
+            return projected_value * self.unit
+        logger.info ( "error %f too large to propagate outside convext hull" % de )
+        return float("nan") * self.unit
+
+
     def countNonZeros ( self, mp ):
         """ count the nonzeros in a vector """
         nz=0
@@ -159,7 +218,7 @@ class TxNameData(object):
         self.Mp=MpCut ## also keep the rotated points, with truncated zeros
 
     
-    def __init__(self,tag,value, accept_errors_upto=None):
+    def __init__(self,tag,value, accept_errors_upto=.05):
         """
             :param accept_errors_upto: If None, do not allow extrapolations outside of convex hull.
              If float value given, allow that much relative uncertainty on the upper limit / efficiency
@@ -195,7 +254,7 @@ class TxNameData(object):
                 return float('nan')*self.unit
             logger.info ( "attempting to interpolate outside of convex hull (d=%d,dp=%d)" %
                      ( self.dimensionality, dp ) )
-##            return self._interpolateOutsideConvexHull ( massarray )
+            return self._interpolateOutsideConvexHull ( massarray )
         r = griddata( self.Mp, self.xsec, mrot[:self.dimensionality], method="linear")
         return r[0]*self.unit
         
