@@ -16,7 +16,7 @@ from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.experiment.databaseObjects import DataBase
 
 #Set the address of the database folder
-database = DataBase("/home/lessa/smodels-database/")
+database = DataBase("./test/database/")
 
 
 def main():
@@ -26,7 +26,8 @@ def main():
     """
 
     #Path to input file name (either a SLHA or LHE file)
-    slhafile = 'inputFiles/slha/gluino_squarks.slha'
+#     slhafile = 'inputFiles/slha/gluino_squarks.slha'
+    slhafile = 'inputFiles/slha/compressedSpec.slha'
 #     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
 
     #Set main options for decomposition:

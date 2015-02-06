@@ -25,13 +25,13 @@ import numpy as np
 # print browser.getValuesFor("lumi")
 # print browser.getValuesFor("axes")
 # print database
-database = DataBase("/home/lessa/smodels-database/")
+database = DataBase("./test/database/")
 print database
 listOfExpRes = database.getExpResults()
 
 
 for expRes in listOfExpRes:
     for txname in expRes.txnames:
-        if txname.txname != 'T2bb': continue
+        if txname.txname != 'T6bbWWoff': continue
         print txname.txname        
-        print txname.txnameData.getValueFor([[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV]])
+        print txname.txnameData.getValueFor([[ 648.*GeV,304.*GeV,301.*GeV], [ 648.*GeV,304.*GeV,301.*GeV]])
