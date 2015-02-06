@@ -49,7 +49,7 @@ class InterpolationTest(unittest.TestCase):
         result=txname.txnameData.getValueFor([[ 600.*GeV,120.*GeV], [ 600.*GeV,130.*GeV] ])
         self.assertAlmostEquals( result.asNumber(pb),0.0197154 )
         result=txname.txnameData.getValueFor([[ 300.*GeV,120.*GeV], [ 300.*GeV,130.*GeV] ])
-        self.assertTrue ( math.isnan ( result.asNumber(pb) ) )
+        self.assertTrue ( math.isnan ( result ) )
     def testWithDirectData(self):
         data = [ [ [[ 150.*GeV, 50.*GeV], [ 150.*GeV, 50.*GeV] ],  3.*fb ], 
              [ [[ 200.*GeV,100.*GeV], [ 200.*GeV,100.*GeV] ],  5.*fb ], 
