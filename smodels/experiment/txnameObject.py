@@ -232,6 +232,7 @@ class TxNameData(object):
     def _returnProjectedValue ( self ):
         ## nans are returned without units
         if math.isnan ( self.projected_value ):
+            logger.info ( "projected value is 'nan'. Projected point not in convex hull?")
             return self.projected_value
         return self.projected_value * self.unit 
 
