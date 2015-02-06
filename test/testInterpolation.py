@@ -10,7 +10,8 @@
 """
 import unittest
 from smodels.experiment.databaseObjects import DataBase
-from smodels.tools.physicsUnits import GeV, TeV, pb
+from smodels.experiment.txnameObject import TxNameData
+from smodels.tools.physicsUnits import GeV, TeV, pb, fb
 import math
 
 class InterpolationTest(unittest.TestCase):
@@ -35,6 +36,25 @@ class InterpolationTest(unittest.TestCase):
         self.assertAlmostEquals( result.asNumber(pb),0.0197154 )
         result=txname.txnameData.getValueFor([[ 300.*GeV,120.*GeV], [ 300.*GeV,130.*GeV] ])
         self.assertTrue ( math.isnan ( result.asNumber(pb) ) )
+    def testWithDirectData(self):
+        data = [ [ [[ 150.*GeV, 50.*GeV], [ 150.*GeV, 50.*GeV] ],  3.*fb ], 
+             [ [[ 200.*GeV,100.*GeV], [ 200.*GeV,100.*GeV] ],  5.*fb ], 
+             [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], 10.*fb ], 
+             [ [[ 300.*GeV,150.*GeV], [ 300.*GeV,150.*GeV] ], 13.*fb ], 
+             [ [[ 300.*GeV,200.*GeV], [ 300.*GeV,200.*GeV] ], 15.*fb ], 
+             [ [[ 300.*GeV,250.*GeV], [ 300.*GeV,250.*GeV] ], 20.*fb ], 
+             [ [[ 400.*GeV,100.*GeV], [ 400.*GeV,100.*GeV] ],  8.*fb ], 
+             [ [[ 400.*GeV,150.*GeV], [ 400.*GeV,150.*GeV] ], 10.*fb ], 
+             [ [[ 400.*GeV,200.*GeV], [ 400.*GeV,200.*GeV] ], 12.*fb ], 
+             [ [[ 400.*GeV,250.*GeV], [ 400.*GeV,250.*GeV] ], 15.*fb ], 
+             [ [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ], 17.*fb ], 
+             [ [[ 400.*GeV,350.*GeV], [ 400.*GeV,350.*GeV] ], 19.*fb ], ]
+        txnameData=TxNameData ( "upperlimit", data )
+        result=txnameData.getValueFor([[ 300.*GeV,125.*GeV], [ 300.*GeV,125.*GeV] ])
+        self.assertAlmostEquals( result.asNumber(pb),0.0115 ) 
+        
+
+       
 
 if __name__ == "__main__":
     unittest.main()
