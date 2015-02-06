@@ -117,6 +117,50 @@ class TxName(object):
             
 class TxNameData(object):
     """Holds the data for the Txname object.  It holds Upper limit values or efficiencies."""
+    
+   
+    def __init__(self,tag,value, accept_errors_upto=.05):
+        """
+        :param tag: data tag in string format (upperLimits or efficiencyMap)
+        :param value: data in string format
+        :param accept_errors_upto: If None, do not allow extrapolations outside of convex hull.
+            If float value given, allow that much relative uncertainty on the upper limit / efficiency
+            when extrapolating outside convex hull.
+            This method can be used to loosen the equal branches assumption.
+        """
+        self.type = tag
+        self.data = eval(value, {'fb' : fb, 'pb' : pb, 'GeV' : GeV, 'TeV' : TeV})
+        self.unit = 1.0 ## store the unit so that we can take arbitrary units for the "z" values.
+                        ## default is unitless, which we use for efficiency maps
+        if len(self.data)<1 or len(self.data[0])<2:
+                logger.error ( "input data not in correct format. expecting sth like " \
+         " [ [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], 10.*fb ], ... ] for upper " \
+         " limits or [ [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], .1 ], ... ] for efficiency maps" )
+        if type(self.data[0][1])==unum.Unum:
+            ## if its a unum, we store 1.0 * unit
+            self.unit=self.data[0][1] / ( self.data[0][1].asNumber() )
+        self.unit= self.data[0][1] / ( self.data[0][1].asNumber() )
+        self.accept_errors_upto=accept_errors_upto
+        self.computeV()
+
+       
+    def getValueFor(self,massarray):
+        """
+        Interpolates the data and returns the UL or efficiency for the respective massarray
+        :param massarray: mass array values (with units), i.e. [[100*GeV,10*GeV],[100*GeV,10*GeV]]
+        """
+        m=self.flattenMassArray ( massarray ) ## flatten
+        mrot=np.dot(m,self.V)  ## rotate
+        dp=self.countNonZeros ( mrot )
+        if dp != self.dimensionality: ## we have data in different dimensions
+            if self.accept_errors_upto == None:
+                return float('nan')*self.unit
+            logger.info ( "attempting to interpolate outside of convex hull (d=%d,dp=%d)" %
+                     ( self.dimensionality, dp ) )
+            return self._interpolateOutsideConvexHull ( massarray )
+        r = griddata( self.Mp, self.xsec, mrot[:self.dimensionality], method="linear")
+        return r[0]*self.unit
+        
     def flattenMassArray ( self, data ):
         """ flatten mass array and remove units """
         ret=[]
@@ -216,45 +260,5 @@ class TxNameData(object):
         for i in Mp:
             MpCut.append ( i[:self.dimensionality].tolist() )
         self.Mp=MpCut ## also keep the rotated points, with truncated zeros
-
-    
-    def __init__(self,tag,value, accept_errors_upto=.05):
-        """
-            :param accept_errors_upto: If None, do not allow extrapolations outside of convex hull.
-             If float value given, allow that much relative uncertainty on the upper limit / efficiency
-             when extrapolating outside convex hull.
-             This method can be used to loosen the equal branches assumption.
-        """
-        self.type = tag
-        self.data = eval(value, {'fb' : fb, 'pb' : pb, 'GeV' : GeV, 'TeV' : TeV})
-        self.unit = 1.0 ## store the unit so that we can take arbitrary units for the "z" values.
-                         # default is unitless, which we use for efficiency maps
-        if len(self.data)<1 or len(self.data[0])<2:
-                logger.error ( "input data not in correct format. expecting sth like " \
-         " [ [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], 10.*fb ], ... ] for upper " \
-         " limits or [ [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], .1 ], ... ] for efficiency maps" )
-        if type(self.data[0][1])==unum.Unum:
-            ## if its a unum, we store 1.0 * unit
-            self.unit=self.data[0][1] / ( self.data[0][1].asNumber() )
-        self.unit= self.data[0][1] / ( self.data[0][1].asNumber() )
-        self.accept_errors_upto=accept_errors_upto
-        self.computeV()
-
-       
-    def getValueFor(self,massarray):
-        """
-        Interpolates the data and returns the UL or efficiency for the respective massarray
-        :param massarray: mass array values (with units), i.e. [[100*GeV,10*GeV],[100*GeV,10*GeV]]
-        """
-        m=self.flattenMassArray ( massarray ) ## flatten
-        mrot=np.dot(m,self.V)  ## rotate
-        dp=self.countNonZeros ( mrot )
-        if dp != self.dimensionality: ## we have data in different dimensions
-            if self.accept_errors_upto == None:
-                return float('nan')*self.unit
-            logger.info ( "attempting to interpolate outside of convex hull (d=%d,dp=%d)" %
-                     ( self.dimensionality, dp ) )
-            return self._interpolateOutsideConvexHull ( massarray )
-        r = griddata( self.Mp, self.xsec, mrot[:self.dimensionality], method="linear")
-        return r[0]*self.unit
+        
         
