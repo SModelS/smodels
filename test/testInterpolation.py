@@ -9,39 +9,20 @@
 
 """
 import unittest
-import os
-import numpy as np
-from smodels.tools.physicsUnits import GeV, TeV
+from smodels.experiment.databaseObjects import DataBase
+from smodels.tools.physicsUnits import GeV, TeV, pb
 
 class InterpolationTest(unittest.TestCase):
-    def mestInterpolation(self):
-        from smodels.experiment import infoObjects, dataObjects
-        path="/home/walten/git/smodels-database/" ## new style!
-        expid="8TeV/ATLAS/ATLAS-SUSY-2013-05/"
-        info = infoObjects.InfoFile(os.path.join(path,expid,"info.txt"))
-        data = dataObjects.DataFile(os.path.join(path,expid,"sms.py"),info)
-        d=data.getData ( "T2bb" )
-        print d.analysisID, d.txname
-        ## print i.data
-        massarray=[[ 400.*GeV, 100.*GeV ], [ 400.*GeV, 100.*GeV ] ]
-        ## print np.array(massarray).shape
-        # d.getULFor ( massarray )
-    
-    def testWithBrowser(self):
-        from smodels.experiment import databaseBrowser
-        path="/home/walten/git/smodels-database/" ## new style!
-        browser = databaseBrowser.Browser ( path )
-        txname,id="T2bb","ATLAS-SUSY-2013-05"
-        massarray=[[ 400.*GeV, 100.*GeV ], [ 400.*GeV, 100.*GeV ] ]
-        browser.getULFor ( id, txname, massarray )
-        ## print browser.getAttributes()
-        #browser.loadExpResultsWith ( { "txname":txname, "id": id } )
-        #for expres in browser:
-        #    if expres.info.globalInfo.id != id:
-        #        continue
-        #    print "ExpRes",expres,expres.info.globalInfo.id
-        #    print expres.data.getData ( txname )
-        #    print expres.data.getData ( txname ).getULFor ( massarray )
+    def testInterpolation(self):
+        database = DataBase("./database/") 
+        # print database
+        listOfExpRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2013-05"], txnames=["T2bb","T6bbWW" ] )
+        expRes=listOfExpRes[0]   # ATLAS-SUSY-2013-05
+        txname=expRes.txnames[1] # T2bb
+        result=txname.txnameData.getValueFor([[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ])
+        self.assertAlmostEquals( result.asNumber(pb),0.162457 )
+        result=txname.txnameData.getValueFor([[ 300.*GeV,125.*GeV], [ 300.*GeV,125.*GeV] ])
+        self.assertAlmostEquals( result.asNumber(pb),0.237745 )
 
 if __name__ == "__main__":
     unittest.main()
