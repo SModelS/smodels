@@ -101,8 +101,8 @@ class TxName(object):
         
         if self.txnameData.type == 'upperLimits':
             for el in self._elements:                
-                if element.particlesMatch(el):
-                    ul = self.txnameData.getValueFor(el.getMasses())
+                if element.particlesMatch(el):                    
+                    ul = self.txnameData.getValueFor(element.getMasses())
                     if type(ul) == type(fb): return 1.
             return 0.
         elif self.txnameData.type == 'efficiencyMap':
