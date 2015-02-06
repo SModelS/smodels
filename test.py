@@ -29,7 +29,9 @@ database = DataBase("/home/lessa/smodels-database/")
 print database
 listOfExpRes = database.getExpResults()
 
+
 for expRes in listOfExpRes:
     for txname in expRes.txnames:
-        print txname.txname,txname._elements
-        print txname.txnameData.getValueFor([[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ])
+        if txname.txname != 'T2bb': continue
+        print txname.txname        
+        print txname.txnameData.getValueFor([[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV]])
