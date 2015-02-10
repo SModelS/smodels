@@ -9,7 +9,7 @@
 
 import logging, os, sys, re
 from smodels.tools.physicsUnits import GeV, fb, TeV, pb
-from smodels.experiment import infoObjects, dataObjects, analysisObjects
+from smodels.experiment import infoObjects, dataObjects
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
 logging.basicConfig(format=FORMAT)
