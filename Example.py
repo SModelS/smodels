@@ -16,7 +16,7 @@ from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.experiment.databaseObjects import DataBase
 
 #Set the address of the database folder
-database = DataBase("./test/database/")
+database = DataBase("../smodels-database/")
 
 
 def main():
@@ -27,7 +27,8 @@ def main():
 
     #Path to input file name (either a SLHA or LHE file)
 #     slhafile = 'inputFiles/slha/gluino_squarks.slha'
-    slhafile = 'inputFiles/slha/compressedSpec.slha'
+    slhafile = 'inputFiles/slha/lightEWinos.slha'
+#     slhafile = 'inputFiles/slha/compression.slha'
 #     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
 
     #Set main options for decomposition:
@@ -39,16 +40,16 @@ def main():
 #     smstoplist = lheDecomposer.decompose(lhefile, doCompress=True,doInvisible=True, minmassgap=mingap)
 
     # Print decomposition summary. Set outputLevel=0 (no output), 1 (simple output), 2 (extended output)
-    smstoplist.printout(outputLevel=1)
+    smstoplist.printout(outputLevel=0)
 
     # Load all analyses from database
     listOfExpRes = database.getExpResults()
-    print(len(listOfExpRes))
 
     # Compute the theory predictions for each analysis
     for expResult in listOfExpRes:
         print(expResult)
         predictions = theoryPredictionsFor(expResult, smstoplist)
+        if not predictions: continue
         for theoryPrediction in predictions:
             print("------------------------")
             print("TxName = ",theoryPrediction.txname)   #Analysis name

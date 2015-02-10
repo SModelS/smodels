@@ -94,6 +94,7 @@ class XSection(object):
         if type(other) == type(1.):
             newXsec.value = newXsec.value * other
         else:
+            print other,type(other)
             logger.error("Xsections can only be multiplied by floats")
 #             sys.exit()
             raise Exception("bla")
