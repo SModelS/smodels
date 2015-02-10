@@ -154,6 +154,10 @@ class TxNameData(object):
         :param massarray: mass array values (with units), i.e. [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         """
         p=self.flattenMassArray ( massarray ) ## flatten
+        if len(p)!=self.full_dimensionality:
+            logger.error ( "dimensional error. I have been asked to compare a %d-dimensional mass vector with " \
+                    "%d-dimensional data!" % ( len(p), self.full_dimensionality ) )
+            return float("nan")
         P=np.dot(p,self.V)  ## rotate
         dp=self.countNonZeros ( P )
         self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
@@ -258,6 +262,8 @@ class TxNameData(object):
         self.V=V
         Mp=[]
 
+        ## the dimensionality of the whole mass space, disrespecting equal branches assumption
+        self.full_dimensionality = len(xp)
         self.dimensionality=0
         for m in M:
             mp=np.dot(m,V)
