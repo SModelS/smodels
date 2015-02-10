@@ -112,7 +112,7 @@ class TxName(object):
             for el in self._elements:
                 if element.particlesMatch(el):
                     eff = self.txnameData.getValueFor(element.getMasses())
-                    if eff and not eff is float('nan'): return eff                    
+                    if eff and not math.isnan ( eff ): return eff                    
             return 0.
         else:
             logger.error("Unknown data type: %s" % self.txnameData.type)
