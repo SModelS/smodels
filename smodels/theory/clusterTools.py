@@ -47,9 +47,14 @@ class ElementCluster(object):
     def getAvgMass(self):
         """
         Return the average mass of all elements belonging to the cluster.
+        If the cluster does not refer to a TxName (i.e. in efficiency map results),
+        returns None.
         
         :returns: average mass array         
         """
+        
+        if self.txname is None: return None
+        
         massList = [el.getMasses() for el in self.elements]
         weights = [el.weight.getMaxXsec() / fb for el in self.elements]
         return massAvg(massList,weights=weights)

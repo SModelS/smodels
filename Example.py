@@ -54,11 +54,15 @@ def main():
             print("------------------------")
             print("TxName = ",theoryPrediction.txname)   #Analysis name
             print("Prediction Mass = ",theoryPrediction.mass)    #Value for average cluster mass (average mass of the elements in cluster)
-            print("Signal Cross-Section = ",theoryPrediction.value)   #Value for the cluster signal cross-section
+            print("Theory Prediction = ",theoryPrediction.value)   #Value for the cluster signal cross-section
             print("Condition Violation = ",theoryPrediction.conditions)  #Condition violation values
               
             #Get upper limit for the respective prediction:
-            print("Analysis UL = ",theoryPrediction.txname.txnameData.getUpperLimitFor(theoryPrediction.mass)) 
+            if theoryPrediction.txname:
+                mass, txname = theoryPrediction.mass, theoryPrediction.txname
+                print("Theory Prediction UL = ",theoryPrediction.expResult.getUpperLimitFor(txname,mass))
+            else: 
+                print("Theory Prediction UL = ",theoryPrediction.expResult.getUpperLimit())
       
     
 

@@ -11,7 +11,7 @@ from smodels.theory import clusterTools, crossSection, element
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.auxiliaryFunctions import cSim, cGtr  #DO NOT REMOVE
 from smodels.theory.printer import Printer
-import logging
+import logging,sys
 
 logger = logging.getLogger(__name__)
 
@@ -103,117 +103,132 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2):
     """
     
     predictionList = []
-    #Loop over the txnames in expResult:
-    for txname in expResult.txnames:
-        # Select elements belonging to TxName and apply efficiencies
-        elements = _getElementsFrom(smsTopList, txname)
-        if len(elements) == 0: continue        
-        #Remove the cross-sections which do not match the experimental analysis:
-        for el in elements:
-            for xsec in el.weight:
-                if xsec.info.sqrts != expResult.info.sqrts:
-                    el.weight.delete(xsec)
- 
-        # Combine masses
-        clusters = _combineElements(elements, txname, maxDist=maxMassDist)
-        # Collect results and evaluate conditions
-        for cluster in clusters:
-            theoryPrediction = TheoryPrediction()
-            theoryPrediction.txname = txname
-            theoryPrediction.value = _evalConstraint(cluster,txname)            
-            theoryPrediction.conditions = _evalConditions(cluster, txname)
-            theoryPrediction.mass = cluster.getAvgMass()
-            predictionList.append(theoryPrediction)
+    # Select elements belonging to expResult and apply efficiencies
+    elements = _getElementsFrom(smsTopList, expResult)
+    if len(elements) == 0: return None        
+
+    # Combine elements according to their respective constraints and masses
+    # (For efficiencyMap analysis group all elements)
+    clusters = _combineElements(elements, expResult, maxDist=maxMassDist)
+    # Collect results and evaluate conditions
+    for cluster in clusters:
+        theoryPrediction = TheoryPrediction()
+        theoryPrediction.expResult = expResult
+        theoryPrediction.txname = cluster.txname  # = None for efficiency map results
+        theoryPrediction.value = _evalConstraint(cluster)            
+        theoryPrediction.conditions = _evalConditions(cluster)
+        theoryPrediction.mass = cluster.getAvgMass()
+        predictionList.append(theoryPrediction)
 
     if len(predictionList) == 0: return None
     else: return TheoryPredictionList(predictionList)
 
 
-def _getElementsFrom(smsTopList, txname):
+def _getElementsFrom(smsTopList, expResult):
     """
-    Get elements, that belong to the TxName (appear in constraint).    
+    Get elements that belong to any of the TxNames in expResult 
+    (appear in any of constraints in the result).    
     Loop over all elements in smsTopList and returns a copy of the elements belonging
-    to TxName (have efficiency != 0). The copied elements
+    to any of the constraints (TxNames, i.e. have efficiency != 0). The copied elements
     have their weights multiplied by their respective efficiencies.
     
-    :parameter txname: TxName to be considered (TxName object)
+    :parameter expResult: Experimental result to be considered (ExpResult object)
     :parameter smsTopList: list of topologies containing elements (TopologyList object)
     :returns: list of elements (Element objects)
     """
+    
     elements = []
-    for el in smsTopList.getElements():      
-        eff = txname.getEfficiencyFor(el)        
-        if eff == 0.: continue
-        element = el.copy()
-        element.weight *= eff
-        elements.append(element)  
+    for el in smsTopList.getElements():
+        for txname in expResult.txnames:   
+            eff = txname.getEfficiencyFor(el)        
+            if eff == 0.: continue
+            element = el.copy()
+            element.weight *= eff
+            elements.append(element)  
     return elements
 
 
-def _combineElements(elements, txname, maxDist):
+def _combineElements(elements, expResult, maxDist):
     """
-    Combine elements according to the txname type.    
-    If txname == upper limit type, group elements into mass clusters. If
-    txname == efficiency map type, group all elements into a single cluster.
+    Combine elements according to the experimental result type.    
+    If expResult == upper limit type, first group elements with different TxNames
+    and then into mass clusters.
+    If expResult == efficiency map type, group all elements into a single cluster.
     
     :parameter elements: list of elements (Element objects)
-    :parameter analysis: analysis to be considered (ULanalysis or EManalysis object)
+    :parameter expResult: experimental result to be considered (ExpResult object)
     :returns: list of element clusters (ElementCluster objects)
     """
-    if txname.txnameData.type == 'efficiencyMap':
-        clusters = [clusterTools.groupAll(elements)]
-    elif txname.txnameData.type == 'upperLimits':        
-        clusters = clusterTools.clusterElements(elements, txname.txnameData, maxDist)
+    
+    clusters = []
+    if expResult.txnames[0].txnameData.type == 'efficiencyMap':
+        cluster = clusterTools.groupAll(elements)
+        cluster.txname = None
+        clusters.append(cluster)
+    elif expResult.txnames[0].txnameData.type == 'upperLimits':        
+        for txname in expResult.txnames:
+            txnameEls = []
+            for element in elements:
+                for el in txname._elements:                
+                    if element.particlesMatch(el): txnameEls.append(element)
+            txnameClusters = clusterTools.clusterElements(elements, txname.txnameData, maxDist)
+            for cluster in txnameClusters: cluster.txname = txname
+            clusters += txnameClusters
     return clusters
 
 
-def _evalConstraint(cluster, txname):
+def _evalConstraint(cluster):
     """
-    Evaluate the txname constraint inside an element cluster.      
-    If txname type == upper limit, sum all the elements' weights
+    Evaluate the constraint inside an element cluster.      
+    If the cluster refers to a specific TxName, sum all the elements' weights
     according to the analysis constraint.
-    If txname type == efficiency map, sum all the elements' weights.
+    If cluster.txname = None (efficiency map), sum all the elements' weights.
     
     :parameter cluster: cluster of elements (ElementCluster object)
-    :parameter txname: TxName object holding the constraint
     :returns: cluster cross-section
     """    
     
-    if txname.txnameData.type == 'efficiencyMap':
+    if cluster.txname is None:
         return cluster.getTotalXSec()
-    elif txname.txnameData.type == 'upperLimits':
-        if not txname.constraint:
-            return txname.constraint
-        exprvalue = _evalExpression(txname.constraint,cluster)
+    elif cluster.txname.txnameData.type == 'upperLimits':
+        if not cluster.txname.constraint or cluster.txname.constraint == "not yet assigned":
+            return cluster.txname.constraint
+        exprvalue = _evalExpression(cluster.txname.constraint,cluster)
         return exprvalue
+    else:
+        logger.error("Unknown cluster type")
+        sys.exit()
     
 
-def _evalConditions(cluster, txname):
-    """        
-    If txname type == upper limit (ULanalysis), evaluates the analysis conditions inside
+def _evalConditions(cluster):
+    """
+    Evaluate the conditions (if any) inside an element cluster.   
+    If the cluster refers to a specific TxName, evaluates the analysis conditions inside
     an element cluster.
-    If txname type == efficiency map (EManalysis), returns None
+    If cluster.txname = None (efficiency map), returns None
     
-    :parameter cluster: cluster of elements (ElementCluster object)
-    :parameter txname: TxName object holding the conditions
+    :parameter cluster: cluster of elements (ElementCluster object)    
     :returns: list of condition values (floats) if analysis type == upper limit. None, otherwise.    
     """    
     
-    if txname.txnameData.type == 'efficiencyMap':
+    if cluster.txname is None:
         return None
-    elif txname.txnameData.type == 'upperLimits':  
-        if not txname.fuzzycondition or txname.fuzzycondition == 'None':
-            return txname.fuzzycondition
+    elif cluster.txname.txnameData.type == 'upperLimits':  
+        if not cluster.txname.fuzzycondition or cluster.txname.fuzzycondition == 'None'\
+         or cluster.txname.fuzzycondition == "not yet assigned":
+            return cluster.txname.fuzzycondition
         conditions = {}
         # Loop over conditions
-        for cond in txname.fuzzycondition:
+        for cond in cluster.txname.fuzzycondition:
             exprvalue = _evalExpression(cond,cluster)
             if type(exprvalue) == type(crossSection.XSectionList()):
                 conditions[cond] = exprvalue[0].value
             else:
-                conditions[cond] = exprvalue
-                
+                conditions[cond] = exprvalue                
         return conditions    
+    else:
+        logger.error("Unknown cluster type")
+        sys.exit()
         
         
 def _evalExpression(stringExpr,cluster):
