@@ -29,8 +29,8 @@ def main():
     # print browser.getValuesFor("lumi")
     # print browser.getValuesFor("axes")
     # print database
-    database = DataBase("./test/database/")
-#    database = DataBase("../smodels-database/")
+#     database = DataBase("./test/database/")
+    database = DataBase("../smodels-database/")
     print database
     listOfExpRes = database.getExpResults()
 
@@ -38,8 +38,9 @@ def main():
     for expRes in listOfExpRes:
         for txname in expRes.txnames:
             if txname.txname != 'T1tttt': continue
-            print txname.txname        
-            print txname.txnameData.getValueFor([[ 648.*GeV,304.*GeV,301.*GeV], [ 648.*GeV,304.*GeV,301.*GeV]])
+            print expRes
+            print txname.txname
+            print txname.txnameData.getValueFor([[ 648.*GeV,30.*GeV], [ 648.*GeV,30.*GeV]])
 
 
 if __name__ == "__main__":

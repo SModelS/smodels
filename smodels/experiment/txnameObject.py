@@ -161,6 +161,7 @@ class TxNameData(object):
         P=np.dot(p,self.V)  ## rotate
         dp=self.countNonZeros ( P )
         self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
+        self.projected_value = float(self.projected_value)
         if dp != self.dimensionality: ## we have data in different dimensions
             if self.accept_errors_upto == None:
                 return float('nan')
