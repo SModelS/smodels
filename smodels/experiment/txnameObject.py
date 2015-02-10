@@ -165,12 +165,13 @@ class TxNameData(object):
 
         setattr(self,tag,value)
     
-    def getUpperLimitFor(self,massarray):
+    def getUpperLimitFor(self,massarray=None):
         """
         Computer the 95\% upper limit for the given mass array.
-        For upperLimit type analyses returns the value from the upper limit map.
+        For upperLimit type analyses returns the value from the upper limit map for the respective mass array.
         For efficiencyMap type analyses computes the upper limit using the number of observed
         events, expected BG and its error.
+        The mass array is only necessary for upperLimit type analyses.
         FIXME: Does not include systematical uncertainties (for now) 
         """
         
