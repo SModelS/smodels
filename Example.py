@@ -47,7 +47,7 @@ def main():
 
     # Compute the theory predictions for each analysis
     for expResult in listOfExpRes:
-        print(expResult)
+        print('\n',expResult)
         predictions = theoryPredictionsFor(expResult, smstoplist)
         if not predictions: continue
         for theoryPrediction in predictions:
