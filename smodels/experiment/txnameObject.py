@@ -11,12 +11,10 @@
 
 import logging,os,sys
 from smodels.tools.physicsUnits import GeV, fb, TeV, pb
-from smodels.tools import statistics
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.element import Element
 from scipy.interpolate import griddata
 from scipy.linalg import svd
-from scipy import stats
 import numpy as np
 import unum
 import copy
@@ -61,11 +59,6 @@ class TxName(object):
                 if ';' in value: value = value.split(';')
                 if tag == 'upperLimits' or tag == 'efficiencyMap':
                     self.txnameData = TxNameData(tag,value)
-                    if tag == 'efficiencyMap':
-                        self.txnameData.addInfo('expectedBG',self.infoObj.expectedBG)
-                        self.txnameData.addInfo('observedN',self.infoObj.observedN)
-                        self.txnameData.addInfo('bgError',self.infoObj.bgError)
-                        self.txnameData.addInfo('lumi',self.infoObj.lumi)
                 else: self.addInfo(tag,value)
             else:
                 logger.info("Ignoring unknown field %s found in file %s" % (tag, self.infopath))
@@ -119,7 +112,7 @@ class TxName(object):
             for el in self._elements:
                 if element.particlesMatch(el):
                     eff = self.txnameData.getValueFor(element.getMasses())
-                    if eff: return eff                    
+                    if eff and not eff is float('nan'): return eff                    
             return 0.
         else:
             logger.error("Unknown data type: %s" % self.txnameData.type)
@@ -155,38 +148,6 @@ class TxNameData(object):
 
         self.accept_errors_upto=accept_errors_upto
         self.computeV()
-
-    def addInfo(self,tag,value):
-        """
-        Adds the info field labeled by tag with value value to the object.
-        :param tag: information label (string)
-        :param value: value for the field in string format 
-        """
-
-        setattr(self,tag,value)
-    
-    def getUpperLimitFor(self,massarray=None):
-        """
-        Computer the 95\% upper limit for the given mass array.
-        For upperLimit type analyses returns the value from the upper limit map for the respective mass array.
-        For efficiencyMap type analyses computes the upper limit using the number of observed
-        events, expected BG and its error.
-        The mass array is only necessary for upperLimit type analyses.
-        FIXME: Does not include systematical uncertainties (for now) 
-        """
-        
-        if self.type == 'upperLimits':
-            return self.getValueFor(massarray)
-        elif self.type == 'efficiencyMap':
-            Nobs = self.observedN  #Number of observed events
-            Nexp = self.expectedBG  #Number of expected BG events
-            alpha = 0.05 #95% C.L.
-            lumi = self.lumi
-            maxSignalXsec = statistics.computeCLInterval(Nobs,Nexp,lumi,alpha)  #DOES NOT INCLUDE SYSTEMATIC UNCERTAINTIES
-            return maxSignalXsec
-        else:
-            logger.error("Unknown analysis type")
-            sys.exit()
        
     def getValueFor(self,massarray):
         """

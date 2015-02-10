@@ -11,6 +11,8 @@
 import logging, os, sys, glob
 from smodels.experiment import infoObject
 from smodels.experiment import txnameObject
+from smodels.tools import statistics
+from smodels.theory.auxiliaryFunctions import _memoize
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
 logging.basicConfig(format=FORMAT)
@@ -47,6 +49,43 @@ class ExpResult(object):
             label += txname.txname+','
         return label[:-1]
             
+            
+    def getUpperLimitFor(self,txname,massarray):
+        """
+        Get the 95\% upper limit for the given mass array from the UL map in the respective
+        txname object.
+        Only to be used for upper limit type results. 
+        """
+        
+               
+        if not txname in self.txnames:
+            logger.error("The requested TxName object does not belong to the result.")
+            sys.exit()
+        if not txname.txnameData.type == 'upperLimits':
+            logger.error("getUpperLimitFor is intended for upper limit results only!")
+            sys.exit()
+        return txname.txnameData.getValueFor(massarray)
+
+
+    @_memoize    
+    def getUpperLimit(self,alpha = 0.05):
+        """
+        Computes the 95% upper limit on the signal*efficiency for an efficiency
+        type result.
+        Only to be used for efficiency map type results.
+        :param alpha: Can be used to change the C.L. value. The default value is 0.05 (= 95% C.L.)
+        """
+                
+        if self.txnames[0].txnameData.type != 'efficiencyMap':
+            logger.error("getUpperLimit is intended for efficiency map results only!")
+            sys.exit()
+            
+        Nobs = self.info.observedN  #Number of observed events
+        Nexp = self.info.expectedBG  #Number of expected BG events
+        lumi = self.info.lumi
+        maxSignalXsec = statistics.computeCLInterval(Nobs,Nexp,lumi,alpha)  #DOES NOT INCLUDE SYSTEMATIC UNCERTAINTIES
+        return maxSignalXsec
+ 
 
 class DataBase(object):    
     """
