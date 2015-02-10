@@ -105,7 +105,11 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2):
     predictionList = []
     # Select elements belonging to expResult and apply efficiencies
     elements = _getElementsFrom(smsTopList, expResult)
-    if len(elements) == 0: return None        
+    if len(elements) == 0: return None
+    for el in elements:
+        for xsec in el.weight:
+            if xsec.info.sqrts != expResult.info.sqrts:
+                el.weight.delete(xsec)    
 
     # Combine elements according to their respective constraints and masses
     # (For efficiencyMap analysis group all elements)
@@ -140,7 +144,7 @@ def _getElementsFrom(smsTopList, expResult):
     elements = []
     for el in smsTopList.getElements():
         for txname in expResult.txnames:   
-            eff = txname.getEfficiencyFor(el)        
+            eff = txname.getEfficiencyFor(el)       
             if eff == 0.: continue
             element = el.copy()
             element.weight *= eff
@@ -171,7 +175,7 @@ def _combineElements(elements, expResult, maxDist):
             for element in elements:
                 for el in txname._elements:                
                     if element.particlesMatch(el): txnameEls.append(element)
-            txnameClusters = clusterTools.clusterElements(elements, txname.txnameData, maxDist)
+            txnameClusters = clusterTools.clusterElements(txnameEls, txname.txnameData, maxDist)
             for cluster in txnameClusters: cluster.txname = txname
             clusters += txnameClusters
     return clusters
