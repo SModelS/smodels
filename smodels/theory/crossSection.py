@@ -96,8 +96,7 @@ class XSection(object):
         else:
             print other,type(other)
             logger.error("Xsections can only be multiplied by floats")
-#             sys.exit()
-            raise Exception("bla")
+            sys.exit()
         return newXsec
 
 

@@ -39,7 +39,7 @@ class ExpResult(object):
                 if not "txname" in data or (not 'upperLimits' in data and not 'efficiencyMap' in data):
                     continue
                        
-                self.txnames.append(txnameObject.TxName(txtfile))
+                self.txnames.append(txnameObject.TxName(txtfile,self.info))
             
     def __str__(self):
         label = self.info.getInfo('id') + ": "
