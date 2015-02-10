@@ -30,7 +30,7 @@ def main():
     # print browser.getValuesFor("axes")
     # print database
     database = DataBase("./test/database/")
-    database = DataBase("../smodels-database/")
+#    database = DataBase("../smodels-database/")
     print database
     listOfExpRes = database.getExpResults()
 
