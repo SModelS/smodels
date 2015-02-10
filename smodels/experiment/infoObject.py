@@ -68,7 +68,9 @@ class Info(object):
                   
         try:
             setattr(self,tag,eval(value, {'fb' : fb, 'pb' : pb, 'GeV' : GeV, 'TeV' : TeV}))
-        except NameError:            
+        except SyntaxError:          
+            setattr(self,tag,value)
+        except NameError:
             setattr(self,tag,value)
         
     def getInfo(self, infoLabel):
