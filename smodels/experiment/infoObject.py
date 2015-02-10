@@ -33,8 +33,7 @@ class Info(object):
     
     def __init__(self, path):        
         self.infofile = path
-        self.analysisType = 'UpperLimit'
-        self._numericalAttr = ['sqrts','lumi']
+        self.analysisType = 'upperLimit'
 
         logger.debug('Creating object based on info.txt: %s' %self.infofile)        
  
@@ -67,12 +66,10 @@ class Info(object):
         :param value: value for the field in string format 
         """
                   
-        if tag in self._numericalAttr:
-            try: setattr(self,tag,eval(value, {'fb' : fb, 'pb' : pb, 'GeV' : GeV, 'TeV' : TeV}))
-            except NameError:
-                logger.error("The value for %s should be numerical" % tag)
-                sys.exit()
-        else: setattr(self,tag,value)
+        try:
+            setattr(self,tag,eval(value, {'fb' : fb, 'pb' : pb, 'GeV' : GeV, 'TeV' : TeV}))
+        except NameError:            
+            setattr(self,tag,value)
         
     def getInfo(self, infoLabel):
         """Returns the value of info field.

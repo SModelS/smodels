@@ -15,6 +15,7 @@ from smodels.theory.particleNames import elementsInStr
 from smodels.theory.element import Element
 from scipy.interpolate import griddata
 from scipy.linalg import svd
+from scipy import stats
 import numpy as np
 import unum
 import copy
@@ -32,10 +33,12 @@ class TxName(object):
     file (constraint, condition,...) as well as the data.
     """
     
-    def __init__(self, path):
+    def __init__(self, path, infoObj):
         self.txnameFile = path
+        self.infoObj = infoObj
         self.txnameData = None
         self._elements = []
+        
         
         logger.debug('Creating object based on txname file: %s' %self.txnameFile)        
  
@@ -57,6 +60,11 @@ class TxName(object):
                 if ';' in value: value = value.split(';')
                 if tag == 'upperLimits' or tag == 'efficiencyMap':
                     self.txnameData = TxNameData(tag,value)
+                    if tag == 'efficiencyMap':
+                        self.txnameData.addInfo('expectedBG',self.infoObj.expectedBG)
+                        self.txnameData.addInfo('observedN',self.infoObj.observedN)
+                        self.txnameData.addInfo('bgError',self.infoObj.bgError)
+                        self.txnameData.addInfo('lumi',self.infoObj.lumi)
                 else: self.addInfo(tag,value)
             else:
                 logger.info("Ignoring unknown field %s found in file %s" % (tag, self.infopath))
@@ -120,7 +128,7 @@ class TxNameData(object):
     """Holds the data for the Txname object.  It holds Upper limit values or efficiencies."""
     
    
-    def __init__(self,tag,value, accept_errors_upto=.05):
+    def __init__(self,tag,value,accept_errors_upto=.05):
         """
         :param tag: data tag in string format (upperLimits or efficiencyMap)
         :param value: data in string format
@@ -147,6 +155,38 @@ class TxNameData(object):
         self.accept_errors_upto=accept_errors_upto
         self.computeV()
 
+    def addInfo(self,tag,value):
+        """
+        Adds the info field labeled by tag with value value to the object.
+        :param tag: information label (string)
+        :param value: value for the field in string format 
+        """
+
+        setattr(self,tag,value)
+    
+    def getUpperLimitFor(self,massarray):
+        """
+        Computer the 95\% upper limit for the given mass array.
+        For upperLimit type analyses returns the value from the upper limit map.
+        For efficiencyMap type analyses computes the upper limit using the number of observed
+        events, expected BG and its error. 
+        """
+        
+        if self.type == 'upperLimits':
+            return self.getValueFor(massarray)
+        elif self.type == 'efficiencyMap':
+            if self.data.obsEvents is None or self.data.expBGerror is None or self.data.xpectedBG is None:
+                return False
+        
+            Nobs = self.data.obsEvents  #Number of observed events
+            Nexp = self.data.expectedBG  #Number of expected BG events
+            alpha = 0.05 #95% C.L.
+            Nmax = 0.5*stats.chi2.isf(alpha,2*(Nobs+1)) - Nexp  #Upper limit on number of signal events
+            maxSignalEvents = Nmax  #DOES NOT INCLUDE SYSTEMATIC UNCERTAINTIES
+            return maxSignalEvents/self.lum
+        else:
+            logger.error("Unknown analysis type")
+            sys.exit()
        
     def getValueFor(self,massarray):
         """
