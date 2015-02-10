@@ -11,6 +11,7 @@
 
 import logging,os,sys
 from smodels.tools.physicsUnits import GeV, fb, TeV, pb
+from smodels.tools import statistics
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.element import Element
 from scipy.interpolate import griddata
@@ -169,21 +170,19 @@ class TxNameData(object):
         Computer the 95\% upper limit for the given mass array.
         For upperLimit type analyses returns the value from the upper limit map.
         For efficiencyMap type analyses computes the upper limit using the number of observed
-        events, expected BG and its error. 
+        events, expected BG and its error.
+        FIXME: Does not include systematical uncertainties (for now) 
         """
         
         if self.type == 'upperLimits':
             return self.getValueFor(massarray)
         elif self.type == 'efficiencyMap':
-            if self.data.obsEvents is None or self.data.expBGerror is None or self.data.xpectedBG is None:
-                return False
-        
-            Nobs = self.data.obsEvents  #Number of observed events
-            Nexp = self.data.expectedBG  #Number of expected BG events
+            Nobs = self.observedN  #Number of observed events
+            Nexp = self.expectedBG  #Number of expected BG events
             alpha = 0.05 #95% C.L.
-            Nmax = 0.5*stats.chi2.isf(alpha,2*(Nobs+1)) - Nexp  #Upper limit on number of signal events
-            maxSignalEvents = Nmax  #DOES NOT INCLUDE SYSTEMATIC UNCERTAINTIES
-            return maxSignalEvents/self.lum
+            lumi = self.lumi
+            maxSignalXsec = statistics.computeCLInterval(Nobs,Nexp,lumi,alpha)  #DOES NOT INCLUDE SYSTEMATIC UNCERTAINTIES
+            return maxSignalXsec
         else:
             logger.error("Unknown analysis type")
             sys.exit()

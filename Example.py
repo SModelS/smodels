@@ -58,7 +58,7 @@ def main():
             print("Condition Violation = ",theoryPrediction.conditions)  #Condition violation values
               
             #Get upper limit for the respective prediction:
-            print("Analysis UL = ",theoryPrediction.txname.txnameData.getValueFor(theoryPrediction.mass)) 
+            print("Analysis UL = ",theoryPrediction.txname.txnameData.getUpperLimitFor(theoryPrediction.mass)) 
       
     
 
