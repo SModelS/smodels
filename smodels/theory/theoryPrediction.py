@@ -174,7 +174,9 @@ def _combineElements(elements, expResult, maxDist):
             txnameEls = []
             for element in elements:
                 for el in txname._elements:                
-                    if element.particlesMatch(el): txnameEls.append(element)
+                    if element.particlesMatch(el):
+                        txnameEls.append(element)
+                        break
             txnameClusters = clusterTools.clusterElements(txnameEls, txname.txnameData, maxDist)
             for cluster in txnameClusters: cluster.txname = txname
             clusters += txnameClusters
