@@ -224,6 +224,9 @@ def _evalConditions(cluster):
          or cluster.txname.fuzzycondition == "not yet assigned":
             return cluster.txname.fuzzycondition
         conditions = {}
+        #Make sure conditions is always a list
+        if isinstance(cluster.txname.fuzzycondition,str): 
+            cluster.txname.fuzzycondition = [cluster.txname.fuzzycondition]
         # Loop over conditions
         for cond in cluster.txname.fuzzycondition:
             exprvalue = _evalExpression(cond,cluster)
