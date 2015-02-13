@@ -7,7 +7,7 @@
 """
 
 from numpy import sqrt,inf
-from scipy import stats,special,integrate
+from scipy import stats,special,integrate,optimize
 
 def computeCLInterval( Nobs, Nexp, lumi, alpha=.05 ):
     """ Get experimental limit for the signal cross-section*efficiency in the analysis signal region.
@@ -21,13 +21,16 @@ def computeCLInterval( Nobs, Nexp, lumi, alpha=.05 ):
             
     return maxSignalEvents/lumi
 
-def getPValue(Nobs,Nbg,NbgErr,Nsig):
+def getPValue(Nsig,Nobs,Nbg,NbgErr):
     """
     Computes the p-value using the signal cross-section (Nsig) and the systematic
     error in the BG (bgsysError = systematic error/expected BG).
     Assumes a Gaussian distribution for the BG systematical error.
     
-    :param signalxsec: signal cross-section*efficiency for the signal region with units (Unum object)
+    :param Nsig: number of signal events (float)
+    :param Nobs: number of observed events (integer)
+    :param Nbg: number of expected BG events (float)
+    :param NbgErr:  systematical error on the background (float)
     :returns: the p-value (float)
     """
     #Signal + BG prediction:
@@ -42,3 +45,22 @@ def getPValue(Nobs,Nbg,NbgErr,Nsig):
     #P-value integral
     p = n*integrate.quad(pint,0,inf)[0]        
     return p
+
+def getUL(Nobs,Nbg,NbgErr):
+    """
+    Computes the 95% upper limit on the signal*efficiency cross-section,
+    given number of observed events (Nobs), number of expected BG events (Nbg)
+    and the systematical error on the background (NbgErr)
+    
+    :param Nobs: number of observed events (integer)
+    :param Nbg: number of expected BG events (float)
+    :param NbgErr:  systematical error on the background (float)
+    :returns: the 95% confidence level on signal*efficiency*luminosity (float)
+    """
+    
+    def pValm(x):
+        return 0.0227 - getPValue(x,Nobs,Nbg,NbgErr) 
+    
+    nmax = optimize.brentq(pValm,0.,float(Nobs))
+    return nmax
+    
