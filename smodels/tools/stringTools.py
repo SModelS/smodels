@@ -13,7 +13,7 @@ def concatenateLines ( oldcontent ):
     tmp=""
     for line in oldcontent:
         tmp+=line.strip()
-        if tmp[-1] not in [ ",", '\\' ]:
+        if tmp != "" and tmp[-1] not in [ ",", '\\' ]:
             content.append ( tmp )
             tmp=""
         if tmp != "" and tmp[-1] == '\\':
