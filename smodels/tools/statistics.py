@@ -56,7 +56,7 @@ def getPValue(Nsig,Nobs,Nbg,NbgErr):
             return pInt
         
         #P-value integral
-        p = n*integrate.quad(pint,Ntot-10.*NbgErr,Ntot+10.*NbgErr)[0]
+        p = n*integrate.quad(pint,max(0.,Ntot-10.*NbgErr),Ntot+10.*NbgErr)[0]
                 
         return p
 
