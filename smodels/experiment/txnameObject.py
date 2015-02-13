@@ -45,8 +45,9 @@ class TxName(object):
         if not os.path.isfile(path):
             logger.error("Txname file %s not found" % path)
             sys.exit()      
+        from smodels.tools.stringTools import concatenateLines
         txfile = open(self.txnameFile)
-        content = txfile.readlines()
+        content = concatenateLines (  txfile.readlines() )
         txfile.close()
         
         #Get tags in info file:
