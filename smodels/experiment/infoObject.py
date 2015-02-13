@@ -41,8 +41,9 @@ class Info(object):
         if not os.path.isfile(path):
             logger.error("Info file %s not found" % path)
             sys.exit()      
+        from smodels.tools.stringTools import concatenateLines
         infoFile = open(self.infofile)
-        content = infoFile.readlines()
+        content = concatenateLines ( infoFile.readlines() )
         infoFile.close()
         
         #Get tags in info file:
