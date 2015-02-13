@@ -167,8 +167,8 @@ class TxNameData(object):
         if dp != self.dimensionality: ## we have data in different dimensions
             if self.accept_errors_upto == None:
                 return float('nan')
-            logger.info ( "attempting to interpolate outside of convex hull (d=%d,dp=%d)" %
-                     ( self.dimensionality, dp ) )
+            logger.info ( "attempting to interpolate outside of convex hull (d=%d,dp=%d,masses=%s)" %
+                     ( self.dimensionality, dp, str(massarray) ) )
             return self._interpolateOutsideConvexHull ( massarray )
         return self._returnProjectedValue()
         
