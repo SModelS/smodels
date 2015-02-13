@@ -8,8 +8,7 @@
 
 from numpy import sqrt,inf
 from scipy import stats,special,integrate,optimize
-import numpy as np
-from scipy import stats,special,integrate
+from smodels.tools import BayesianUpperLimit
 
 def computeCLInterval( Nobs, Nexp, lumi, alpha=.05 ):
     """ Get experimental limit for the signal cross-section*efficiency in the analysis signal region.
@@ -32,7 +31,7 @@ def bayesianUpperLimit ( nev, sac, xbg, sbg, cl=.95, prec=-1., smax=0. ):
     :param  cl: desired CL
     :param smax: upper limit of integration
     :param prec: integration step size """
-    from smodels.tools import BayesianUpperLimit
+    
     return BayesianUpperLimit.upperLimit ( nev, sac, xbg, sbg, cl, prec, smax )
 
 def getPValue(Nobs,Nbg,NbgErr,Nsig):
