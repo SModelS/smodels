@@ -20,7 +20,7 @@ class StatisticsTest(unittest.TestCase):
         self.assertAlmostEqual ( re, 21.4256127382 )
 
     def testUL(self):
-        re = statistics.getUL ( 100, 100., 10. )
+        re = statistics.getUL ( 100, 100., 0. )
         print re
 
 if __name__ == "__main__":

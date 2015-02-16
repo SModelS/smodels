@@ -17,6 +17,8 @@ def upperLimit ( nev, sac, xbg, sbg, cl=.95, prec=-1., smax=0. ):
     smax = 10. * nev
   if prec < 0.:
     prec=xbg*.001
+    if prec > 200:
+        prec=100.
   if xbg < 0.:
     print "[BayesianUpperLimit] error: cannot deal with negative expected background"
     return 0.
