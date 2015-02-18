@@ -1,21 +1,24 @@
 #!/usr/bin/env python
 
-"""
-.. module:: simpleExample
-   :synopsis: Basic use case for the SModelS framework.
 
-.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
+#from smodels.tools.statistics import getUL,getPValue,computeCLInterval
+import sys
+from numpy import sqrt,inf
+from scipy import stats,special,integrate,optimize
+from smodels.tools.statistics import getUL
 
-"""
-import elementtree.ElementTree as ET
 
-smstoplist = [1,2,3,4,55,6]
-toplist = ET.Element("toplist")
-for itop,topi in enumerate(smstoplist):
-  top = ET.SubElement(toplist,"top")
-  top.attrib["id"] = "top"+str(itop)
-  nels = ET.SubElement(top,"graph")
-  nels.text = str(topi)
-  
-tree = ET.ElementTree(toplist)
-tree.write("text.xml")
+Nobs = 2
+Nbg = 6.
+NbgErr = 4.1
+
+#print computeCLInterval(Nobs, Nbg, 1.)
+
+#sys.exit()
+
+x = getUL(Nobs,Nbg,NbgErr)
+print x
+#print getPValue(10.,Nobs,Nbg,NbgErr)
+
+
+
