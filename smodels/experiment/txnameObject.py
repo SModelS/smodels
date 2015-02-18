@@ -156,6 +156,7 @@ class TxNameData(object):
         :param massarray: mass array values (with units), i.e. [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         """
         p=self.flattenMassArray ( massarray ) ## flatten
+        self.massarray = massarray
         if len(p)!=self.full_dimensionality:
             logger.error ( "dimensional error. I have been asked to compare a %d-dimensional mass vector with " \
                     "%d-dimensional data!" % ( len(p), self.full_dimensionality ) )
@@ -239,7 +240,7 @@ class TxNameData(object):
     def _returnProjectedValue ( self ):
         ## nans are returned without units
         if math.isnan ( self.projected_value ):
-            logger.info ( "projected value is 'nan'. Projected point not in convex hull?")
+            logger.info ( "projected value is 'nan'. Projected point not in convex hull? original point=%s" % self.massarray )
             return self.projected_value
         return self.projected_value * self.unit 
 
