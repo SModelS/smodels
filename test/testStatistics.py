@@ -27,20 +27,29 @@ class StatisticsTest(unittest.TestCase):
     def testCoverage(self):
         lambdaBG=20
         lambdaSig=5
-        nBG=scipy.stats.poisson.rvs(lambdaBG)
-        nSig=scipy.stats.poisson.rvs(lambdaSig)
-        nObs=nBG+nSig
-        relErrorBG=-1.
-        while relErrorBG<0.:
-            relErrorBG=scipy.stats.norm.rvs ( 0.3, 0.1 )
-        estBG=scipy.stats.norm.rvs(nBG,math.sqrt ( nBG + ( relErrorBG*nBG )**2  ) )
-      #  re=statistics.bayesianUpperLimit ( nObs, .0001, estBG, relErrorBG*estBG )
-        print "nObs=",nObs
-        print "nSig=",nSig
-        print "nBG=",nBG
-        print "estBG=",estBG,"+-",relErrorBG*estBG
-        re=statistics.getUL ( nObs, estBG, relErrorBG*estBG )
-        print "95% UL =",re
+        coverage=[]
+        for i in range(100):
+            nBG=scipy.stats.poisson.rvs(lambdaBG)
+            nSig=scipy.stats.poisson.rvs(lambdaSig)
+            nObs=nBG+nSig
+            relErrorBG=-1.
+            while relErrorBG<0.:
+                relErrorBG=scipy.stats.norm.rvs ( 0.3, 0.1 )
+            estBG=scipy.stats.norm.rvs( lambdaBG,math.sqrt ( lambdaBG + ( relErrorBG*lambdaBG )**2  ) )
+            re=statistics.bayesianUpperLimit ( nObs, .0001, estBG, relErrorBG*estBG )
+           # re=statistics.getUL ( nObs, estBG, relErrorBG*estBG )
+            if re==0.0:
+                continue
+            print "nObs=",nObs
+            print "nSig=",nSig
+            print "nBG=",nBG
+            print "estBG=",estBG,"+-",relErrorBG*estBG
+            re=statistics.getUL ( nObs, estBG, relErrorBG*estBG )
+            print "95% UL =",re
+            print "---------------"
+            coverage.append ( re<nSig )
+        print "coverage=",sum(coverage),len(coverage)
+
 
 
 if __name__ == "__main__":
