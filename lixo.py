@@ -5,19 +5,19 @@
 import sys
 from numpy import sqrt,inf
 from scipy import stats,special,integrate,optimize
-from smodels.tools.statistics import getUL
+from smodels.tools.statistics import getUL,getPValue
 
 
-Nobs = 2
-Nbg = 6.
-NbgErr = 4.1
+Nobs = 3
+Nbg = 3.
+NbgErr = 1.
 
 #print computeCLInterval(Nobs, Nbg, 1.)
 
 #sys.exit()
 
 x = getUL(Nobs,Nbg,NbgErr)
-print x
+print x,getPValue(x,Nobs,Nbg,NbgErr)
 #print getPValue(10.,Nobs,Nbg,NbgErr)
 
 

@@ -76,7 +76,7 @@ def getUL(Nobs,Nbg,NbgErr):
     n1 = (Nobs - Nbg) + 4*sqrt(NbgErr**2 + Nbg)
 
     def pValm(x):
-        return 0.0227 - getPValue(x,Nobs,Nbg,NbgErr)
+        return 0.05 - getPValue(x,Nobs,Nbg,NbgErr)
 
     nmax = optimize.brentq(pValm,n0,n1)
     return nmax
