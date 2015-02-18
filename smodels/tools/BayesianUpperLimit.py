@@ -10,44 +10,45 @@ def upperLimit ( nev, sac, xbg, sbg, cl=.95, prec=-1., smax=0. ):
     :param xbg: expected background
     :param sbg: uncertainty in background
     :param  cl: desired CL
-    :param smax: upper limit of integration
     :param prec: integration step size
+    :param smax: upper limit of integration
   """
   if smax < 1e-5 : 
-    smax = 10. * nev
+    smax = 10. * ( nev + 1 )
   if prec < 0.:
     prec=xbg*.001
     if prec > 200:
         prec=xbg*0.00001
   if xbg < 0.:
     print "[BayesianUpperLimit] error: cannot deal with negative expected background"
-    return 0.
+    return float('nan')
 
   if sac < 0. or sac > 1.:
     print "[BayesianUpperLimit] error: signal acceptance must be between 0 and 1"
-    return 0.
+    return float('nan')
 
   if nev < 0:
     print "[BayesianUpperLimit] error: negative number of observed events."
-    return 0.
+    return float('nan')
 
   if sbg < 0.:
     print "[BayesianUpperLimit] error: negative sigma on bkg expectation!"
-    return 0.
+    return float('nan')
 
   if ( cl < 0. or cl > 1. ):
     print "[BayesianUpperLimit] error, confidence limit must be between 0 and 1"
+    return float('nan')
 
   if ( smax < 2. * nev or smax > 100. * nev ):
     print "[BayesianUpperLimit] warning: strange choice for smax, smax=",\
           smax, ", nev=", nev
   if ( prec < 0. ):
     print "[BayesianUpperLimit] error: negative precision."
-    return 0.
+    return float('nan')
 
-  if ( prec > .3 * nev ):
+  if ( prec > .3 * nev and nev>0 ):
     print "[BayesianUpperLimit] error: precision too low, prec=",prec," nev=", nev
-    return 0.
+    return float('nan')
 
   bsum=0.
   xev=prec/2.
@@ -60,11 +61,11 @@ def upperLimit ( nev, sac, xbg, sbg, cl=.95, prec=-1., smax=0. ):
     xlike = _blike ( nev,sac,xbg,sbg,xev)
     if ( math.isinf(xlike)) or math.isnan(xlike):
       if ( nlist==0 ):
-        print "[BayesianUpperLimit] first likelihood is nan/inf! return -1!"
-        return -1.
+        print "[BayesianUpperLimit] first likelihood is nan/inf! return nan!"
+        return float('nan')
+
       print
       print "(D=" << nev << ", s=" << xev << ", l=" << xlike
-      sys.exit(0)
     xlist[nlist]=xev
     blist[nlist]=xlike
     bsum+=xlike
@@ -86,21 +87,23 @@ def upperLimit ( nev, sac, xbg, sbg, cl=.95, prec=-1., smax=0. ):
       bcl=bint
     bint+=blist[i]
 
-
   # interpolate linearly
   plim=xlist[icl]+( xlist[icl+1]-xlist[icl] ) * (cl*bsum-bcl)/blist[icl+1]
   return plim
 
 def _blike ( nev, sac, xbg, sbg, xev ):
     """ return likelihood to observe nev events given expected background xbg, 
-        error on background sbg, number of signal events (FIXME is this true?) """
+        error on background sbg, expected number of signal events xev, 
+        error on signal acceptance sac """
     xint=0.
+
+    ## perform double Gaussian integral by Monte Carlo
 
     nmax=2000
     for i in range(nmax):
         # pick expected background and signal from Gaussian
         bg, sig = -1., -1.
-        while ( (bg < 0.) or ( sig < 0.) ):
+        while bg < 0. or sig < 0.:
             a,b =np.random.normal(), np.random.normal()
             bg = xbg + a * sbg
             sig = xev * ( 1. + b * sac )
@@ -108,7 +111,7 @@ def _blike ( nev, sac, xbg, sbg, xev ):
         # total expected
         ex= bg + sig
 
-        # value of integrand
+        # value of integrand, poisson likelihood value
         # xxx = e (-ex) * ex^nev / nev! 
         xxx = exp (  nev * log ( ex ) - ex - math.lgamma(nev+1 ) )
         if math.isinf (xxx) or math.isnan ( xxx ):
