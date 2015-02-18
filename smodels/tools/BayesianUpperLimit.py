@@ -18,7 +18,7 @@ def upperLimit ( nev, sac, xbg, sbg, cl=.95, prec=-1., smax=0. ):
   if prec < 0.:
     prec=xbg*.001
     if prec > 200:
-        prec=100.
+        prec=xbg*0.00001
   if xbg < 0.:
     print "[BayesianUpperLimit] error: cannot deal with negative expected background"
     return 0.
@@ -49,15 +49,13 @@ def upperLimit ( nev, sac, xbg, sbg, cl=.95, prec=-1., smax=0. ):
     print "[BayesianUpperLimit] error: precision too low, prec=",prec," nev=", nev
     return 0.
 
-  xevmax = smax
-  dxev = prec
   bsum=0.
-  xev=dxev/2.
+  xev=prec/2.
   blist=[0]*10000
   xlist=[0]*10000
 
   nlist =0
-  ## FIXME you are here
+
   while True:
     xlike = _blike ( nev,sac,xbg,sbg,xev)
     if ( math.isinf(xlike)) or math.isnan(xlike):
@@ -72,13 +70,14 @@ def upperLimit ( nev, sac, xbg, sbg, cl=.95, prec=-1., smax=0. ):
     bsum+=xlike
     if False: 
       print "(D=" << nev << ", s=" << xev << ", l=" << xlike << ")\033[1A"
-    xev+=dxev
+    xev+=prec
     if ( blist[nlist]/blist[0] < 1e-6 ): break
-    if ( xev > xevmax ): break
+    if ( xev > smax ): break
     nlist+=1
   if False: print
 
   icl=0
+  #  find place just below threshold
   bint=0.
   bcl=0.
   for i in range(nlist):
@@ -86,37 +85,34 @@ def upperLimit ( nev, sac, xbg, sbg, cl=.95, prec=-1., smax=0. ):
       icl=i
       bcl=bint
     bint+=blist[i]
+
+
+  # interpolate linearly
   plim=xlist[icl]+( xlist[icl+1]-xlist[icl] ) * (cl*bsum-bcl)/blist[icl+1]
   return plim
 
-def _factorial ( n ):
-    if n<0:
-        return 1.
-    if n<9:
-        return [1.,1.,2.,6.,24.,120.,720.,5040.,40320.,362880. ][n]
-    return 2.506628*sqrt(n)*n**n*exp(-n)*(1.+1./12./n )
-
-
 def _blike ( nev, sac, xbg, sbg, xev ):
-    xxbg=xbg
-    ssbg=sbg
-    ssac = sac
-    xxev=xev
+    """ return likelihood to observe nev events given expected background xbg, 
+        error on background sbg, number of signal events (FIXME is this true?) """
     xint=0.
 
     nmax=2000
     for i in range(nmax):
-        yybg=-1.
-        yyev=-1.
-        while ( (yybg < 0.) or (yyev < 0.) ):
+        # pick expected background and signal from Gaussian
+        bg, sig = -1., -1.
+        while ( (bg < 0.) or ( sig < 0.) ):
             a,b =np.random.normal(), np.random.normal()
-            yybg = xxbg + a * ssbg
-            yyev = xxev * ( 1. + b * ssac )
+            bg = xbg + a * sbg
+            sig = xev * ( 1. + b * sac )
 
-        yyex=yybg + yyev
+        # total expected
+        ex= bg + sig
 
-        xxx = exp (  nev * log ( yyex ) - yyex - math.lgamma(nev+1 ) )
+        # value of integrand
+        # xxx = e (-ex) * ex^nev / nev! 
+        xxx = exp (  nev * log ( ex ) - ex - math.lgamma(nev+1 ) )
         if math.isinf (xxx) or math.isnan ( xxx ):
-            print "[blike] xxx=", xxx, " yyex=", yyex, " nev=", nev, ", nev!=", _factorial(nev)
+            print "[blike] xxx=", xxx, " yyex=", yyex, " nev=", nev, ", nev!=", math.gamma(nev+1)
         xint +=xxx
+    # print "[_blike] returns",xint/float(nmax)
     return xint/float(nmax)
