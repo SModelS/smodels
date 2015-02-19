@@ -68,7 +68,7 @@ def upperLimit ( nev, sac, xbg, sbg, cl=.95, prec=None, smax=None ):
       print "(D=" << nev << ", s=" << xev << ", l=" << xlike
     if nlist>=len(blist):
         print "[BayesianUpperLimit] need to extend array"
-        for i in range(1000):
+        for i in range(10000):
             blist.append(0)
             xlist.append(0)
     xlist[nlist]=xev
