@@ -22,7 +22,7 @@ def computeCLInterval( Nobs, Nexp, lumi, alpha=.05 ):
             
     return maxSignalEvents/lumi
 
-def bayesianUpperLimit ( nev, sac, xbg, sbg, cl=.95, prec=-1., smax=0. ):
+def bayesianUpperLimit ( nev, sac, xbg, sbg, cl=.95, prec=None, smax=None ):
     """ conway's bayesian method 
     :param nev: number of observed events
     :param sac: relative uncertainty in acceptance

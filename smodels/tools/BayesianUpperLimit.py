@@ -2,7 +2,7 @@ from math import sqrt, exp, log
 import math
 import numpy as np
 
-def upperLimit ( nev, sac, xbg, sbg, cl=.95, prec=-1., smax=0. ):
+def upperLimit ( nev, sac, xbg, sbg, cl=.95, prec=None, smax=None ):
   """ Computes the upper limit.
 
     :param nev: number of observed events
@@ -13,10 +13,10 @@ def upperLimit ( nev, sac, xbg, sbg, cl=.95, prec=-1., smax=0. ):
     :param prec: integration step size
     :param smax: upper limit of integration
   """
-  if smax < 1e-5 : 
+  if smax == None: 
     smax = 10. * ( nev + 1 )
-  if prec < 0.:
-    prec=xbg*.001
+  if prec == None:
+    prec=xbg*.003
     if prec > 200:
         prec=xbg*0.00001
   if xbg < 0.:
@@ -66,6 +66,11 @@ def upperLimit ( nev, sac, xbg, sbg, cl=.95, prec=-1., smax=0. ):
 
       print
       print "(D=" << nev << ", s=" << xev << ", l=" << xlike
+    if nlist>=len(blist):
+        print "[BayesianUpperLimit] need to extend array"
+        for i in range(1000):
+            blist.append(0)
+            xlist.append(0)
     xlist[nlist]=xev
     blist[nlist]=xlike
     bsum+=xlike
