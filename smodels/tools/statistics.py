@@ -72,8 +72,10 @@ def getUL(Nobs,Nbg,NbgErr):
     :returns: the 95% confidence level on signal*efficiency*luminosity (float)
     """
     
-    n0 = max((Nobs - Nbg) - 4*sqrt(NbgErr**2 + Nbg),0.)
-    n1 = (Nobs - Nbg) + 4*sqrt(NbgErr**2 + Nbg)
+    n0 = 0.
+    n1 = abs(Nobs - Nbg) + 4*sqrt(NbgErr**2 + Nbg)
+    while getPValue(n1,Nobs,Nbg,NbgErr) > 0.05:
+        n1 += 4.*sqrt(NbgErr**2 + Nbg)
 
     def pValm(x):
         return 0.05 - getPValue(x,Nobs,Nbg,NbgErr)
