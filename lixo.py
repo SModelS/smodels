@@ -8,9 +8,9 @@ from scipy import stats,special,integrate,optimize
 from smodels.tools.statistics import getUL,getPValue
 
 
-Nobs = 24
-Nbg = 3.3
-NbgErr = 1.5
+Nobs = 102
+Nbg = 97.935
+NbgErr = 0.005
 
 #print computeCLInterval(Nobs, Nbg, 1.)
 
