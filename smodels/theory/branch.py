@@ -234,4 +234,7 @@ def decayBranches(branchList, brDictionary, massDictionary,
                 finalBranchList.append(inbranch)
         # Use new branches (if any) for next iteration step
         branchList = newBranchList
+        
+    #Sort list by initial branch PID:
+    finalBranchList = sorted(finalBranchList, key=lambda branch: branch.momID)
     return finalBranchList
