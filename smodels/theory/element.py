@@ -335,7 +335,7 @@ class Element(Printer):
                         sys.exit()
         return True
 
-
+    
     def compressElement(self, doCompress, doInvisible, minmassgap):
         """
         Keep compressing the original element and the derived ones till they
@@ -376,7 +376,6 @@ class Element(Printer):
         newElements.pop(0)  # Remove original element
         return newElements
 
-
     def massCompress(self, minmassgap):
         """
         Perform mass compression.
@@ -387,33 +386,37 @@ class Element(Printer):
         :returns: compressed copy of the element, if two masses in this
                   element are degenerate; None, if compression is not possible;        
         """
-        newelement = self.copy()
-        newelement.motherElements = [ ("mass", self.copy()) ]
-
-        vertnumb = self.getEinfo()["vertnumb"]
-        # Nothing to be compressed
-        if max(vertnumb) < 2:
-            return None
-        # Loop over branches
-        for ib, branch in enumerate(self.branches):
-            if vertnumb[ib] < 2:
-                continue
-            masses = branch.masses
-            for ivertex in range(vertnumb[ib] - 1):
-                if abs(masses[ivertex] - masses[ivertex + 1]) < minmassgap:
-                    newelement.branches[ib].particles[ivertex] = None
-                    newelement.branches[ib].masses[ivertex] = None
-            while newelement.branches[ib].particles.count(None) > 0:
-                iNone = newelement.branches[ib].particles.index(None)
-                newelement.branches[ib].particles.pop(iNone)
-                newelement.branches[ib].masses.pop(iNone)
-
-
-        if newelement.isEqual(self):
-            return None
+        
+        masses = self.getMasses()
+        b1_masses,b2_masses = masses
+        d1 = [b1_masses[i]-b1_masses[i+1] for i in range(len(b1_masses)-1)]
+        d2 = [b2_masses[i]-b2_masses[i+1] for i in range(len(b2_masses)-1)]
+        comp_vertex1 = []  #List of vertices to be compressed in branch 1
+        comp_vertex2 = [] #List of vertices to be compressed in branch 2
+        for i,d in enumerate(d1):
+            if d < minmassgap: comp_vertex1.append(i)
+        for i,d in enumerate(d2):
+            if d < minmassgap: comp_vertex2.append(i)
+        if not comp_vertex1 and not comp_vertex2: return None #Nothing to be compressed
         else:
-            return newelement
-
+            newelement = self.copy()
+            newelement.motherElements = [ ("mass", self.copy()) ]
+            if comp_vertex1:            
+                new_branch = newelement.branches[0]
+                ncomp = 0
+                for iv in comp_vertex1:
+                    new_branch.masses.pop(iv-ncomp)
+                    new_branch.particles.pop(iv-ncomp)
+                    ncomp +=1
+            if comp_vertex2:            
+                new_branch = newelement.branches[1]
+                ncomp = 0
+                for iv in comp_vertex2:
+                    new_branch.masses.pop(iv-ncomp)
+                    new_branch.particles.pop(iv-ncomp)
+                    ncomp +=1
+        return newelement
+    
 
     def hasTopInList(self, elementList):
         """
