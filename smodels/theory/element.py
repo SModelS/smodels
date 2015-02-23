@@ -388,33 +388,29 @@ class Element(Printer):
         """
         
         masses = self.getMasses()
-        b1_masses,b2_masses = masses
-        d1 = [b1_masses[i]-b1_masses[i+1] for i in range(len(b1_masses)-1)]
-        d2 = [b2_masses[i]-b2_masses[i+1] for i in range(len(b2_masses)-1)]
-        comp_vertex1 = []  #List of vertices to be compressed in branch 1
-        comp_vertex2 = [] #List of vertices to be compressed in branch 2
-        for i,d in enumerate(d1):
-            if d < minmassgap: comp_vertex1.append(i)
-        for i,d in enumerate(d2):
-            if d < minmassgap: comp_vertex2.append(i)
-        if not comp_vertex1 and not comp_vertex2: return None #Nothing to be compressed
+        massDiffs = []
+        #Compute mass differences in each branch
+        for massbr in masses:
+            massDiffs.append([massbr[i]-massbr[i+1] for i in range(len(massbr)-1)])
+        #Compute list of vertices to be compressed in each branch            
+        compVertices = []
+        for ibr,massbr in enumerate(massDiffs):
+            compVertices.append([])
+            for iv,massD in enumerate(massbr):            
+                if massD < minmassgap: compVertices[ibr].append(iv)
+        if not sum(compVertices,[]): return None #Nothing to be compressed
         else:
             newelement = self.copy()
             newelement.motherElements = [ ("mass", self.copy()) ]
-            if comp_vertex1:            
-                new_branch = newelement.branches[0]
-                ncomp = 0
-                for iv in comp_vertex1:
-                    new_branch.masses.pop(iv-ncomp)
-                    new_branch.particles.pop(iv-ncomp)
-                    ncomp +=1
-            if comp_vertex2:            
-                new_branch = newelement.branches[1]
-                ncomp = 0
-                for iv in comp_vertex2:
-                    new_branch.masses.pop(iv-ncomp)
-                    new_branch.particles.pop(iv-ncomp)
-                    ncomp +=1
+            for ibr,compbr in enumerate(compVertices):
+                if compbr:            
+                    new_branch = newelement.branches[ibr]
+                    ncomp = 0
+                    for iv in compbr:
+                        new_branch.masses.pop(iv-ncomp)
+                        new_branch.particles.pop(iv-ncomp)
+                        ncomp +=1
+
         return newelement
     
 
