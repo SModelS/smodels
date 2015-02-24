@@ -35,7 +35,7 @@ def run ( cmd ):
 def getVersion():
     """
     Obtain the smodels version """
-    sys.path.append("../")
+    sys.path.insert(0,"../")
     from smodels import installation
     return installation.version()
 
