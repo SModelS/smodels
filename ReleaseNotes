@@ -1,12 +1,12 @@
 Release v1.0.2
 =======================================================
   * lepton summation fix in runSModelS (Ursula Laa)
-
+  * Major speedup in slha file decomposition (Andre Lessa)
 
 Release v1.0.1, Thu 22 Jan 2015 12:42:29 PM BRST:
 =======================================================
 
-	* cluster bug fix (Andre Lessa)
-	* slha checks updates (Ursula Laa)
-	* Fixed SUS-13-012 bug in database (Michael Traub)
-	* updated references.bib to include SLAC meta info (Wolfgang Waltenberger)
+  * cluster bug fix (Andre Lessa)
+  * slha checks updates (Ursula Laa)
+  * Fixed SUS-13-012 bug in database (Michael Traub)
+  * updated references.bib to include SLAC meta info (Wolfgang Waltenberger)
