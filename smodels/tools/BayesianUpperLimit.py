@@ -16,7 +16,7 @@ def upperLimit ( nev, sac, xbg, sbg, cl=.95, prec=None, smax=None ):
   if smax == None: 
     smax = 10. * ( nev + 1 )
   if prec == None:
-    prec=xbg*.003
+    prec=xbg*.001
     if prec > 200:
         prec=xbg*0.00001
   if xbg < 0.:
@@ -86,8 +86,10 @@ def upperLimit ( nev, sac, xbg, sbg, cl=.95, prec=None, smax=None ):
   #  find place just below threshold
   bint=0.
   bcl=0.
+#  print "blist=",blist
   for i in range(nlist):
     if ( ( bint < cl * bsum ) and ( (bint+blist[i])>cl*bsum) ):
+#    if blist[i]>(1-cl) and blist[i+1]<(1-cl): ## fixme
       icl=i
       bcl=bint
     bint+=blist[i]
