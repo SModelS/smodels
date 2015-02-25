@@ -68,12 +68,13 @@ class ExpResult(object):
 
 
     @_memoize    
-    def getUpperLimit(self,alpha = 0.05):
+    def getUpperLimit(self,alpha = 0.05, expected = False ):
         """
         Computes the 95% upper limit on the signal*efficiency for an efficiency
         type result.
         Only to be used for efficiency map type results.
         :param alpha: Can be used to change the C.L. value. The default value is 0.05 (= 95% C.L.)
+        :param expected: Compute expected limit ( i.e. Nobserved = NexpectedBG )
         """
                 
         if self.txnames[0].txnameData.type != 'efficiencyMap':
@@ -81,11 +82,16 @@ class ExpResult(object):
             sys.exit()
             
         Nobs = self.info.observedN  #Number of observed events
+        if expected: 
+            Nobs=self.info.expectedBG 
         Nexp = self.info.expectedBG  #Number of expected BG events
         bgError = self.info.bgError # error on BG
         lumi = self.info.lumi
-        # maxSignalXsec = statistics.computeCLInterval(Nobs,Nexp,lumi,alpha)  #DOES NOT INCLUDE SYSTEMATIC UNCERTAINTIES
-        maxSignalXsec = statistics.bayesianUpperLimit (Nobs,0.,Nexp,bgError,1-alpha) / lumi ## takes much time
+        maxSignalXsec = statistics.computeCLInterval(Nobs,Nexp,lumi,alpha)  #DOES NOT INCLUDE SYSTEMATIC UNCERTAINTIES
+        ## maxSignalXsec = statistics.bayesianUpperLimit (Nobs,0.,Nexp,bgError,1-alpha) / lumi ## takes much time
+        ## r=statistics.upperLimit (Nobs,Nexp,bgError,alpha)
+        ## maxSignalXsec = r / lumi ## takes much time
+        print "maxSignalXSec=",maxSignalXsec
         return maxSignalXsec
  
 
