@@ -87,6 +87,90 @@ class ExpResult(object):
         # maxSignalXsec = statistics.computeCLInterval(Nobs,Nexp,lumi,alpha)  #DOES NOT INCLUDE SYSTEMATIC UNCERTAINTIES
         maxSignalXsec = statistics.bayesianUpperLimit (Nobs,0.,Nexp,bgError,1-alpha) / lumi ## takes much time
         return maxSignalXsec
+    
+    def getValuesFor(self,attribute=None):
+        """
+        Returns a list for the possible values appearing in the ExpResult
+        for the required attribute (sqrts,id,constraint,...).
+        If there is a single value, returns the value itself.
+        
+        :param attribute: name of a field in the database (string). If not defined
+                          it will return a dictionary with all fields and their respective
+                          values
+        :return: list of values or value
+        """
+        
+        
+        fieldDict = self.__dict__.items()[:]
+        valuesDict = {}
+        while fieldDict:
+            for field,value in fieldDict[:]:
+                if not '<smodels.experiment' in str(value):
+                    if not field in valuesDict: valuesDict[field] = [value]
+                    else: valuesDict[field].append(value)              
+                else:
+                    if isinstance(value,list):
+                        for entry in value: fieldDict += entry.__dict__.items()[:]
+                    else: fieldDict += value.__dict__.items()[:]
+                fieldDict.remove((field,value))                
+
+        #Try to keep only the set of unique values
+        for key,val in valuesDict.items():
+            try: valuesDict[key] = list(set(val))
+            except: pass
+        if not attribute: return valuesDict
+        elif not attribute in valuesDict:
+            logger.warning("Could not find field %s in database" % attribute)
+            return False
+        else:
+            if len(valuesDict[attribute]) == 1: return valuesDict[attribute][0]
+            else:
+                return valuesDict[attribute]
+            
+            
+    def getAttributes(self,showPrivate=False):
+        """
+        Checks for all the fields/attributes it contains as well as the
+        attributes of its objects if they belong to smodels.experiment.
+        
+        :param showPrivate: if True, also returns the protected fields (_field)
+        :return: list of field names (strings)
+        """
+        
+        fields = self.getValuesFor().keys()
+        fields = list(set(fields))
+        
+        if not showPrivate:
+            for field in fields[:]:
+                if "_" == field[0]: fields.remove(field)
+               
+        return fields
+    
+    def getTxnameWith(self,restrDict = {}):
+        """
+        Returns a list of TxName objects satisfying the restrictions.
+        The restrictions specified as a dictionary.
+        
+        :param restrDict: dictionary containing the fields and their allowed values.
+                          E.g. {'txname' : 'T1', 'axes' : ....}
+                          The dictionary values can be single entries or a list of values.
+                          For the fields not listed, all values are assumed to be allowed.
+        :return: list of TxName objects if more than one txname matches the selection
+        criteria or a single TxName object, if only one matches the selection.
+        """
+        
+        txnameList = []
+        for tag,value in restrDict.items():
+            for txname in self.txnames:
+                txval = txname.getInfo(tag)
+                if txval is False: continue
+                elif txval == value: txnameList.append(txname)
+        
+        if len(txnameList) == 1: txnameList = txnameList[0]
+        
+        return txnameList
+
+
  
 
 class DataBase(object):    
