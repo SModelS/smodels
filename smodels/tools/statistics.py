@@ -10,8 +10,11 @@ from numpy import sqrt,inf
 from scipy import stats,special,integrate,optimize
 from smodels.tools import BayesianUpperLimit
 
-def upperLimit ( Nobs, Nexp, sigmaexp, alpha=.05 ):
-    ret = upperLimitMadAnalysis ( Nobs, Nexp, sigmaexp, 1.-alpha )
+def upperLimit ( Nobs, Nexp, sigmaexp, lumi, alpha=.05 ):
+    """ a convenience function to have a central place where to centrally change the 
+      way the upper limit gets computed """
+    ret = computeCLInterval ( Nobs, exp, lumi, alpha )
+    # ret = upperLimitMadAnalysis ( Nobs, Nexp, sigmaexp, 1.-alpha ) / lumi
     return ret
 
 def computeCLInterval( Nobs, Nexp, lumi, alpha=.05 ):
