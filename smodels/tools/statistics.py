@@ -10,6 +10,10 @@ from numpy import sqrt,inf
 from scipy import stats,special,integrate,optimize
 from smodels.tools import BayesianUpperLimit
 
+def upperLimit ( Nobs, Nexp, sigmaexp, alpha=.05 ):
+    ret = upperLimitMadAnalysis ( Nobs, Nexp, sigmaexp, 1.-alpha )
+    return ret
+
 def computeCLInterval( Nobs, Nexp, lumi, alpha=.05 ):
     """ Get experimental limit for the signal cross-section*efficiency in the analysis signal region.
                     
