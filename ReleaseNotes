@@ -1,7 +1,9 @@
-Release v1.0.2
+Release v1.0.2, Wed 25 Feb 2015 02:48:11 PM BRT 
 =======================================================
+
   * lepton summation fix in runSModelS (Ursula Laa)
   * Major speedup in slha file decomposition (Andre Lessa)
+
 
 Release v1.0.1, Thu 22 Jan 2015 12:42:29 PM BRST:
 =======================================================
