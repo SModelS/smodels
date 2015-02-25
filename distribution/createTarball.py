@@ -111,8 +111,8 @@ def createTarball():
     """
     Create the tarball.
     """
-    comment ( "Create tarball smodels-v%s.tar.gz" % version )
-    run ("tar czvf smodels-v%s.tar.gz %s" % (version, dirname))
+    comment ( "Create tarball smodels-v%s.tgz" % version )
+    run ("tar czvf smodels-v%s.tgz %s" % (version, dirname))
 
 def rmExtraFiles():
     """
@@ -146,7 +146,7 @@ def explode ():
     Explode the tarball.
     """
     comment ( "Explode the tarball ..." )
-    cmd = "tar xzvf smodels-v%s.tar.gz" % version
+    cmd = "tar xzvf smodels-v%s.tgz" % version
     run (cmd)
 
 def make ():
