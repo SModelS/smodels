@@ -87,11 +87,7 @@ class ExpResult(object):
         Nexp = self.info.expectedBG  #Number of expected BG events
         bgError = self.info.bgError # error on BG
         lumi = self.info.lumi
-        maxSignalXsec = statistics.computeCLInterval(Nobs,Nexp,lumi,alpha)  #DOES NOT INCLUDE SYSTEMATIC UNCERTAINTIES
-        ## maxSignalXsec = statistics.bayesianUpperLimit (Nobs,0.,Nexp,bgError,1-alpha) / lumi ## takes much time
-        ## r=statistics.upperLimit (Nobs,Nexp,bgError,alpha)
-        ## maxSignalXsec = r / lumi ## takes much time
-        print "maxSignalXSec=",maxSignalXsec
+        maxSignalXsec = statistics.upperLimit (Nobs,Nexp,bgError,lumi,alpha)
         return maxSignalXsec
     
     def getValuesFor(self,attribute=None):
