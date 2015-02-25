@@ -26,14 +26,12 @@ class Info(object):
     info.txt file which contain "info_tag: value".
     
     :ivar infofile: path to the info.txt file
-    :ivar analysisType: default type for analysis
     :ivar numericalAttr: list of properties which should be evaluated
                          when added to the object
     """
     
     def __init__(self, path):        
         self.infofile = path
-        self.analysisType = 'upperLimit'
 
         logger.debug('Creating object based on info.txt: %s' %self.infofile)        
  
