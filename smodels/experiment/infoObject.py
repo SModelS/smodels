@@ -26,8 +26,6 @@ class Info(object):
     info.txt file which contain "info_tag: value".
     
     :ivar infofile: path to the info.txt file
-    :ivar numericalAttr: list of properties which should be evaluated
-                         when added to the object
     """
     
     def __init__(self, path):        
@@ -71,6 +69,8 @@ class Info(object):
             setattr(self,tag,value)
         except NameError:
             setattr(self,tag,value)
+        except TypeError:
+            setattr(self,tag,value)             
         
     def getInfo(self, infoLabel):
         """Returns the value of info field.

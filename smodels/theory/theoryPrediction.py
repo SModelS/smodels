@@ -219,8 +219,8 @@ def _evalConditions(cluster):
     
     if cluster.txname is None:
         return None
-    elif cluster.txname.txnameData.type == 'upperLimits':  
-        if not cluster.txname.fuzzycondition or cluster.txname.fuzzycondition == 'None'\
+    elif cluster.txname.txnameData.type == 'upperLimits':
+        if not cluster.txname.fuzzycondition \
          or cluster.txname.fuzzycondition == "not yet assigned":
             return cluster.txname.fuzzycondition
         conditions = {}
