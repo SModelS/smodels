@@ -78,8 +78,20 @@ class TxName(object):
         :param tag: information label (string)
         :param value: value for the field in string format 
         """
-
-        setattr(self,tag,value)
+        
+        if tag == 'constraint' or tag == 'condition' or tag == 'fuzzycondition':
+            if isinstance(value,list):
+                value = [val.replace("'","") for val in value]
+            else: value = value.replace("'","")            
+        
+        try:
+            setattr(self,tag,eval(value, {'fb' : fb, 'pb' : pb, 'GeV' : GeV, 'TeV' : TeV}))
+        except SyntaxError:          
+            setattr(self,tag,value)
+        except NameError:
+            setattr(self,tag,value)
+        except TypeError:
+            setattr(self,tag,value)            
     
     def getInfo(self, infoLabel):
         """Returns the value of info field.
