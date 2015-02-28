@@ -57,13 +57,16 @@ class TheoryPredictionList(Printer):
     
     :ivar _theoryPredictions: list of TheoryPrediction objects    
     """
-    def __init__(self, theoryPredictions):
+    def __init__(self, theoryPredictions=None):
         """
         Initializes the list.
         
         :parameter theoryPredictions: list of TheoryPrediction objects
-        """
-        self._theoryPredictions = theoryPredictions
+        """        
+        self._theoryPredictions = []
+        if theoryPredictions and isinstance(theoryPredictions,list):
+            self._theoryPredictions =theoryPredictions
+        
 
 
     def __iter__(self):      
@@ -102,48 +105,113 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2):
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction objects    
     """
     
-    predictionList = []
+    dataSetResults = []
+    #Compute predictions for each data set (for UL analyses there is one single set)
+    for dataset in expResult.datasets:
+        predList = _getDataSetPredictions(dataset,smsTopList,maxMassDist)
+        if predList: dataSetResults.append(predList)
+    if not dataSetResults: return None
+    
+    #For results with more than one dataset, select the best data set 
+    #according to the expect upper limit
+    bestResults = _getBestResults(dataSetResults)
+    bestResults.expResult = expResult
+    return bestResults
+
+
+def _getBestResults(dataSetResults):
+    """
+    Returns the best result according to the expect upper limit
+    :param dataSetResults: list of TheoryPredictionList objects
+    :return: best result (TheoryPredictionList object)
+    """
+        
+    #In the case of UL analyses or efficiency-maps with a single signal region
+    #return the single result:        
+    if len(dataSetResults) == 1: return dataSetResults[0]
+    
+    #For efficiency-map analyses with multipler signal regions,
+    #select the best one according to the expected upper limit:
+    bestExpectedR = 0.
+    for predList in dataSetResults:
+        dataset = predList.dataset
+        if dataset.dataInfo.datatype != 'efficiency-map':
+            logger.error("Multiple data sets should only exist for efficiency map results!")
+            sys.exit()
+        if len(predList) != 1:
+            logger.error("Multiple clusters should only exist for upper limit results!")
+            sys.exit()
+            
+        pred = predList[0]
+        expectedR = pred.value/dataset.getUpperLimit(expected=True)
+        if expectedR > bestExpectedR:
+            bestExpectedR = expectedR
+            bestPredList = predList
+    
+    return bestPredList
+    
+
+def _getDataSetPredictions(dataset,smsTopList,maxMassDist):   
+    """
+    Compute theory predictions for a given data set.
+    For upper-limit results returns the list of theory predictions for the experimental result.
+    For efficiency-map results returns the list of theory predictions for the signal region.
+    Uses the list of elements in smsTopList.
+    For each Txname appearing in dataset, it collects the elements and efficiencies, 
+    combine the masses (if needed) and compute the conditions (if existing).
+    
+    :parameter dataset: Data Set to be considered (DataSet object)
+    :parameter smsTopList: list of topologies containing elements (TopologyList object)
+    :parameter maxMassDist: maximum mass distance for clustering elements (float)
+    :returns:  a TheoryPredictionList object containing a list of TheoryPrediction objects    
+    """     
+    
+    predictionList = TheoryPredictionList()
+    predictionList.dataset = dataset
     # Select elements belonging to expResult and apply efficiencies
-    elements = _getElementsFrom(smsTopList, expResult)
+    elements = _getElementsFrom(smsTopList, dataset)
     if len(elements) == 0: return None
     for el in elements:
         for xsec in el.weight:
-            if xsec.info.sqrts != expResult.info.sqrts:
+            if xsec.info.sqrts != dataset.info.sqrts:
                 el.weight.delete(xsec)    
 
     # Combine elements according to their respective constraints and masses
     # (For efficiencyMap analysis group all elements)
-    clusters = _combineElements(elements, expResult, maxDist=maxMassDist)
-    # Collect results and evaluate conditions
+    clusters = _combineElements(elements, dataset, maxDist=maxMassDist)
+    
+    # Collect results and evaluate conditions    
     for cluster in clusters:
         theoryPrediction = TheoryPrediction()
-        theoryPrediction.expResult = expResult
         theoryPrediction.txname = cluster.txname  # = None for efficiency map results
         theoryPrediction.value = _evalConstraint(cluster)            
         theoryPrediction.conditions = _evalConditions(cluster)
         theoryPrediction.mass = cluster.getAvgMass()
-        predictionList.append(theoryPrediction)
+        predictionList + theoryPrediction
+        
+
+    
 
     if len(predictionList) == 0: return None
-    else: return TheoryPredictionList(predictionList)
+    else: return predictionList
 
 
-def _getElementsFrom(smsTopList, expResult):
+def _getElementsFrom(smsTopList, dataset):
     """
-    Get elements that belong to any of the TxNames in expResult 
+    Get elements that belong to any of the TxNames in dataset 
     (appear in any of constraints in the result).    
     Loop over all elements in smsTopList and returns a copy of the elements belonging
     to any of the constraints (TxNames, i.e. have efficiency != 0). The copied elements
     have their weights multiplied by their respective efficiencies.
     
-    :parameter expResult: Experimental result to be considered (ExpResult object)
+    :parameter dataset:  Data Set to be considered (DataSet object)
     :parameter smsTopList: list of topologies containing elements (TopologyList object)
     :returns: list of elements (Element objects)
     """
     
     elements = []
     for el in smsTopList.getElements():
-        for txname in expResult.txnames:   
+        for txname in dataset.txnameList:   
             eff = txname.getEfficiencyFor(el)       
             if eff == 0.: continue
             element = el.copy()
@@ -152,25 +220,25 @@ def _getElementsFrom(smsTopList, expResult):
     return elements
 
 
-def _combineElements(elements, expResult, maxDist):
+def _combineElements(elements, dataset, maxDist):
     """
-    Combine elements according to the experimental result type.    
+    Combine elements according to the data set type.    
     If expResult == upper limit type, first group elements with different TxNames
     and then into mass clusters.
     If expResult == efficiency map type, group all elements into a single cluster.
     
     :parameter elements: list of elements (Element objects)
-    :parameter expResult: experimental result to be considered (ExpResult object)
+    :parameter expResult: Data Set to be considered (DataSet object)
     :returns: list of element clusters (ElementCluster objects)
     """
     
     clusters = []
-    if expResult.txnames[0].txnameData.type == 'efficiencyMap':
+    if dataset.dataInfo.datatype == 'efficiency-map':
         cluster = clusterTools.groupAll(elements)
         cluster.txname = None
         clusters.append(cluster)
-    elif expResult.txnames[0].txnameData.type == 'upperLimits':        
-        for txname in expResult.txnames:
+    elif dataset.dataInfo.datatype == 'upper-limit':        
+        for txname in dataset.txnameList:
             txnameEls = []
             for element in elements:
                 for el in txname._elements:                
@@ -180,6 +248,7 @@ def _combineElements(elements, expResult, maxDist):
             txnameClusters = clusterTools.clusterElements(txnameEls, txname.txnameData, maxDist)
             for cluster in txnameClusters: cluster.txname = txname
             clusters += txnameClusters
+                
     return clusters
 
 
