@@ -145,10 +145,13 @@ class Browser(object):
         :return: upper limit [fb]
         """
         for expres in self:
-            if expres.info.globalInfo.id != expid:
+            if expres.getValuesFor('id') != expid:
                 continue
-            return expres.data.getData ( txname ).getULFor ( massarray )
-        logger.warning ( "browser could not find %s" % ( expid ) )
+            txnames = expres.getTxNames()
+            for tx in txnames:
+                if not tx.txname == txname: continue                
+                return tx.txnameData.getValueFor(massarray)
+        logger.warning ( "browser could not find %s or %s" % ( expid, txname ) )
         return None
      
   
