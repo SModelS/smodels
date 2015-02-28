@@ -1,7 +1,7 @@
 """
 .. module:: dataObjects
    :synopsis: Holds the classes and methods used to read and store the information in the
-              sms.py files. Also contains the interpolation methods
+              txname.txt files. Also contains the interpolation methods
 
 .. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -12,6 +12,7 @@
 import logging,os,sys
 from smodels.tools.physicsUnits import GeV, fb, TeV, pb
 from smodels.theory.particleNames import elementsInStr
+from smodels.tools.stringTools import concatenateLines
 from smodels.theory.element import Element
 from scipy.interpolate import griddata
 from scipy.linalg import svd
@@ -38,14 +39,16 @@ class TxName(object):
         self.txnameData = None
         self._elements = []
         
-        
         logger.debug('Creating object based on txname file: %s' %self.txnameFile)        
- 
         #Open the info file and get the information:
         if not os.path.isfile(path):
             logger.error("Txname file %s not found" % path)
-            sys.exit()      
-        from smodels.tools.stringTools import concatenateLines
+            sys.exit()
+        txtFile = open(path,'r')
+        txdata = txtFile.read()
+        if not "txname" in txdata: raise TypeError
+        if not 'upperLimits' in txdata and not 'efficiencyMap' in txdata:
+            raise TypeError
         txfile = open(self.txnameFile)
         content = concatenateLines (  txfile.readlines() )
         txfile.close()
@@ -57,7 +60,7 @@ class TxName(object):
             line = content[i]
             value = line.split(':',1)[1].strip()            
             if tags.count(tag) == 1:
-                if ';' in value: value = value.split(';')
+                if ';' in value: value = value.split(';')                
                 if tag == 'upperLimits' or tag == 'efficiencyMap':
                     self.txnameData = TxNameData(tag,value)
                 else: self.addInfo(tag,value)
