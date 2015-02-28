@@ -22,18 +22,21 @@ def main():
 #     print expRes
 #     sys.exit()
 
-    # database = DataBase("/home/lessa/smodels-database/")
-    # browser = Browser(database)
+    database = DataBase("/home/lessa/smodels-database/")
+    browser = Browser(database)
     # print browser.getAttributes()
     #print browser.getAttributes()
     # nl = 0
     # print browser
-    # browser.loadExpResultsWith({'txname': ['T2','T1','T2bb'], 'id' : ['ATLAS-SUSY-2013-05']})
+#     browser.loadExpResultsWith({'txname': ['T1tttt'], 'dataid' : ['ANA7-CUT0']})
     # print browser
     # print browser.getValuesFor("lumi")
     # print browser.getValuesFor("axes")
     # print database
 #     database = DataBase("./test/database/")
+
+    print browser
+    sys.exit()
     database = DataBase("../smodels-database/")
     print database
     listOfExpRes = database.getExpResults()
