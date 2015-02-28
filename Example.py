@@ -50,19 +50,23 @@ def main():
         print('\n',expResult)
         predictions = theoryPredictionsFor(expResult, smstoplist)
         if not predictions: continue
+        dataset = predictions.dataset
+        datasetID = dataset.getValuesFor('dataid')
         for theoryPrediction in predictions:
+            mass = theoryPrediction.mass
+            txname = theoryPrediction.txname            
             print("------------------------")
-            print("TxName = ",theoryPrediction.txname)   #Analysis name
-            print("Prediction Mass = ",theoryPrediction.mass)    #Value for average cluster mass (average mass of the elements in cluster)
+            print("TxName = ",txname)   #Analysis name
+            print("Prediction Mass = ",mass)    #Value for average cluster mass (average mass of the elements in cluster)
             print("Theory Prediction = ",theoryPrediction.value)   #Value for the cluster signal cross-section
             print("Condition Violation = ",theoryPrediction.conditions)  #Condition violation values
               
             #Get upper limit for the respective prediction:
-            if theoryPrediction.txname:
-                mass, txname = theoryPrediction.mass, theoryPrediction.txname
-                print("Theory Prediction UL = ",theoryPrediction.expResult.getUpperLimitFor(txname,mass))
-            else: 
-                print("Theory Prediction UL = ",theoryPrediction.expResult.getUpperLimit())
+            if expResult.getValuesFor('datatype') == 'upper-limit':
+                print("Theory Prediction UL = ",expResult.getUpperLimitFor(txname=txname,mass=mass))
+            elif expResult.getValuesFor('datatype') == 'efficiency-map':
+                print("Theory Prediction UL = ",expResult.getUpperLimitFor(dataID=datasetID))
+            else: print('weird:',expResult.getValuesFor('type'))
       
     
 

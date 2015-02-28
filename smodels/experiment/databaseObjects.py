@@ -9,10 +9,11 @@
 """
 
 import logging, os, sys
-from smodels.experiment import infoObject
+from smodels.experiment import infoObject,txnameObject
 from smodels.experiment import datasetObject
 from smodels.tools import statistics
 from smodels.theory.auxiliaryFunctions import _memoize
+import unum
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
 logging.basicConfig(format=FORMAT)
@@ -69,26 +70,54 @@ class ExpResult(object):
             txnames += dataset.txnameList
         return txnames
 
-    @_memoize    
-    def getUpperLimitFor(self,dataID,alpha = 0.05, expected = False ):
+     
+    def getUpperLimitFor(self,dataID=None,alpha = 0.05, expected = False, txname=None, mass=None):
         """
-        Computes the 95% upper limit on the signal*efficiency for an efficiency
+        Computes a 95% upper limit on the signal cross-section according to the type of result.
+        If dataID is define, returns the UL for the signal*efficiency for an efficiency
         type result for the given dataSet ID (signal region).
-        Only to be used for efficiency map type results.
-        :param dataID: dataset ID (string)
+        If txname and mass are defined, returns the UL for the signal*BR for a upper-limit
+        type result for the given mass array and Txname.
+        
+        :param dataID: dataset ID (string) (only for efficiency-map type results)
         :param alpha: Can be used to change the C.L. value. The default value is 0.05 (= 95% C.L.)
-        :param expected: Compute expected limit ( i.e. Nobserved = NexpectedBG )
+                      (only for  efficiency-map results)
+        :param expected: Compute expected limit, i.e. Nobserved = NexpectedBG
+                         (only for efficiency-map results)
+        :param txname: TxName object (only for UL-type results)
+        :param mass: Mass array with units (only for UL-type results)
         
         :return: upper limit (Unum object)
         """
+        
+        if self.getValuesFor('datatype') == 'efficiency-map':
+            if not dataID or not isinstance(dataID,str):
+                logger.error("The data set ID must be defined when computing ULs for\
+                            efficiency-map results.")
+                return False
 
-        upperLimits = self.getUpperLimits(alpha, expected)
-        if not upperLimits: return False           
-        if not dataID in upperLimits:
-            logger.error("Data id %s not found." %dataID)
-            return False
-        else: 
-            return upperLimits[dataID]
+            upperLimits = self.getUpperLimits(alpha, expected)
+            if not upperLimits: return False           
+            if not dataID in upperLimits:
+                logger.error("Data id %s not found." %dataID)
+                return False
+            else:
+                return upperLimits[dataID]
+        elif self.getValuesFor('datatype') == 'upper-limit':
+            if not txname or not mass:
+                logger.error("A TxName and mass array must be defined when computing ULs for\
+                            upper-limit results.")
+                return False
+            if not isinstance(txname,txnameObject.TxName) and not isinstance(txname,str):
+                logger.error("txname must be a TxName object or a string")
+                return False
+            if not isinstance(mass,list):
+                logger.error("mass must be a mass array")
+                return False
+            for tx in self.getTxNames():
+                if tx == txname or tx.txname == txname:
+                    return tx.txnameData.getValueFor(mass)
+            
 
     @_memoize    
     def getUpperLimits(self,alpha = 0.05, expected = False ):
@@ -104,19 +133,11 @@ class ExpResult(object):
         
         upperLimits = {}
         for dataset in self.datasets:
-            if dataset.dataInfo.type != 'efficiency-map':
+            if dataset.dataInfo.datatype != 'efficiency-map':
                 logger.error("getUpperLimit is intended for efficiency map results only!")
                 return False
-                
-            Nobs = dataset.dataInfo.observedN  #Number of observed events
-            if expected: 
-                Nobs=dataset.dataInfo.expectedBG 
-            Nexp = dataset.dataInfo.expectedBG  #Number of expected BG events
-            bgError = dataset.dataInfo.bgError # error on BG
-            lumi = self.info.lumi
-            maxSignalXsec = statistics.upperLimit (Nobs,Nexp,bgError,lumi,alpha)
-            
-            upperLimits[dataset.dataInfo.dataid] = maxSignalXsec
+                            
+            upperLimits[dataset.dataInfo.dataid] = dataset.getUpperLimit(alpha,expected)
                 
         return upperLimits
     
