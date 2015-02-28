@@ -10,13 +10,17 @@ def main():
     #Import basic functions (this file must be run under the installation folder)
     import sys
     from smodels.experiment.infoObject import Info
-    from smodels.experiment.databaseObjects import DataBase
+    from smodels.experiment.databaseObjects import DataBase,ExpResult
     from smodels.tools.physicsUnits import GeV, fb, TeV, pb
     from smodels.experiment.databaseBrowser import Browser
     import numpy as np
     import logging
     from smodels.experiment.txnameObject import logger as ml
     ml.setLevel(level=logging.ERROR ) 
+
+#     expRes = ExpResult('/home/lessa/smodels-database/8TeV/CMS/CMS-SUS-13-007')
+#     print expRes
+#     sys.exit()
 
     # database = DataBase("/home/lessa/smodels-database/")
     # browser = Browser(database)
@@ -36,7 +40,7 @@ def main():
 
 
     for expRes in listOfExpRes:
-        for txname in expRes.txnames:
+        for txname in expRes.getTxNames():         
             if txname.txname != 'T1tttt': continue
             print expRes
             print txname.txname

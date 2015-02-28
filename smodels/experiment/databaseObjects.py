@@ -8,9 +8,9 @@
 
 """
 
-import logging, os, sys, glob
+import logging, os, sys
 from smodels.experiment import infoObject
-from smodels.experiment import txnameObject
+from smodels.experiment import datasetObject
 from smodels.tools import statistics
 from smodels.theory.auxiliaryFunctions import _memoize
 
@@ -33,62 +33,92 @@ class ExpResult(object):
     def __init__(self, path=None):
         if path and os.path.isdir(path):
             self.path = path
+            if not os.path.isfile(os.path.join(path,"info.txt")):
+                logger.error("info.txt file not found in " + path)
+                raise TypeError
             self.info = infoObject.Info(os.path.join(path,"info.txt"))
-            self.txnames = []
-            for txtfile in glob.iglob(os.path.join(path,"*.txt")):            
-                txtFile = open(txtfile,'r')
-                data = txtFile.read()
-                if not "txname" in data or (not 'upperLimits' in data and not 'efficiencyMap' in data):
-                    continue
-                       
-                self.txnames.append(txnameObject.TxName(txtfile,self.info))
+            self.datasets = []
+            for root, dirs, files in os.walk(path):
+                if 'dataInfo.txt' in files:   #data folder found
+                    #Build data set
+                    try:
+                        dataset = datasetObject.DataSet(root,self.info)
+                        self.datasets.append(dataset)
+                    except TypeError: continue
             
     def __str__(self):
         label = self.info.getInfo('id') + ": "
-        for txname in self.txnames:
-            label += txname.txname+','
+        dataIDs = self.getValuesFor('dataid')
+        if dataIDs:
+            for dataid in dataIDs:
+                if dataid: label += dataid
+        label += ':'
+        txnames = self.getValuesFor('txname')
+        if isinstance(txnames,list):
+            for txname in txnames: label += txname+','
+        else: label += txnames+','
         return label[:-1]
-            
-            
-    def getUpperLimitFor(self,txname,massarray):
+    
+    def getTxNames(self):
         """
-        Get the 95\% upper limit for the given mass array from the UL map in the respective
-        txname object.
-        Only to be used for upper limit type results. 
+        Returns a list of all TxName objects appearing in all dataSets.
         """
         
-               
-        if not txname in self.txnames:
-            logger.error("The requested TxName object does not belong to the result.")
-            sys.exit()
-        if not txname.txnameData.type == 'upperLimits':
-            logger.error("getUpperLimitFor is intended for upper limit results only!")
-            sys.exit()
-        return txname.txnameData.getValueFor(massarray)
-
+        txnames = []
+        for dataset in self.datasets:
+            txnames += dataset.txnameList
+        return txnames
 
     @_memoize    
-    def getUpperLimit(self,alpha = 0.05, expected = False ):
+    def getUpperLimitFor(self,dataID,alpha = 0.05, expected = False ):
         """
         Computes the 95% upper limit on the signal*efficiency for an efficiency
-        type result.
+        type result for the given dataSet ID (signal region).
+        Only to be used for efficiency map type results.
+        :param dataID: dataset ID (string)
+        :param alpha: Can be used to change the C.L. value. The default value is 0.05 (= 95% C.L.)
+        :param expected: Compute expected limit ( i.e. Nobserved = NexpectedBG )
+        
+        :return: upper limit (Unum object)
+        """
+
+        upperLimits = self.getUpperLimits(alpha, expected)
+        if not upperLimits: return False           
+        if not dataID in upperLimits:
+            logger.error("Data id %s not found." %dataID)
+            return False
+        else: 
+            return upperLimits[dataID]
+
+    @_memoize    
+    def getUpperLimits(self,alpha = 0.05, expected = False ):
+        """
+        Computes the 95% upper limit on the signal*efficiency for an efficiency
+        type result for all the datasets (signal regions).
         Only to be used for efficiency map type results.
         :param alpha: Can be used to change the C.L. value. The default value is 0.05 (= 95% C.L.)
         :param expected: Compute expected limit ( i.e. Nobserved = NexpectedBG )
+        
+        :return: dictionary with dataset IDs as keys and the upper limit as values 
         """
+        
+        upperLimits = {}
+        for dataset in self.datasets:
+            if dataset.dataInfo.type != 'efficiency-map':
+                logger.error("getUpperLimit is intended for efficiency map results only!")
+                return False
                 
-        if self.txnames[0].txnameData.type != 'efficiencyMap':
-            logger.error("getUpperLimit is intended for efficiency map results only!")
-            sys.exit()
+            Nobs = dataset.dataInfo.observedN  #Number of observed events
+            if expected: 
+                Nobs=dataset.dataInfo.expectedBG 
+            Nexp = dataset.dataInfo.expectedBG  #Number of expected BG events
+            bgError = dataset.dataInfo.bgError # error on BG
+            lumi = self.info.lumi
+            maxSignalXsec = statistics.upperLimit (Nobs,Nexp,bgError,lumi,alpha)
             
-        Nobs = self.info.observedN  #Number of observed events
-        if expected: 
-            Nobs=self.info.expectedBG 
-        Nexp = self.info.expectedBG  #Number of expected BG events
-        bgError = self.info.bgError # error on BG
-        lumi = self.info.lumi
-        maxSignalXsec = statistics.upperLimit (Nobs,Nexp,bgError,lumi,alpha)
-        return maxSignalXsec
+            upperLimits[dataset.dataInfo.dataid] = maxSignalXsec
+                
+        return upperLimits
     
     def getValuesFor(self,attribute=None):
         """
@@ -163,7 +193,7 @@ class ExpResult(object):
         
         txnameList = []
         for tag,value in restrDict.items():
-            for txname in self.txnames:
+            for txname in self.getTxNames():
                 txval = txname.getInfo(tag)
                 if txval is False: continue
                 elif txval == value: txnameList.append(txname)
@@ -293,21 +323,24 @@ class DataBase(object):
                 logger.debug("Missing files in %s" % root)
                 continue
             else:
-                resultsList.append(ExpResult(root))
+                expres = ExpResult(root)
+                if expres: resultsList.append(expres)
 
         if not resultsList: logger.warning("Zero results loaded.")
                 
         return resultsList
 
-    def getExpResults(self,analysisIDs=[],txnames=[]):
+    def getExpResults(self,analysisIDs=[],datasetIDs=[],txnames=[]):
         """
         Returns a list of ExpResult objects.
-        Each object refers to an analysisID (for UL analyses)
-        or analysisID+SignalRegion (for EM analyses).
+        Each object refers to an analysisID containing one (for UL) or more (for Efficiency maps)
+        dataset (signal region) and each dataset containing one or more TxNames.
         If analysisIDs is defined, returns only the results matching one of the IDs in the list.
+        If datasetIDs is defined, returns only the results matching one of the IDs in the list.
         If txname is defined, returns only the results matching one of the Tx names in the list.
         :param analysisID: list of analysis ids ([CMS-SUS-13-006,...])
-        :param txname: list of txnames ([TChiWZ,...])
+        :param datasetIDs: list of dataset ids ([ANA-CUT0,...])
+        :param txnames: list of txnames ([TChiWZ,...])
         :returns: list of ExpResult objects    
         """
         
@@ -319,14 +352,21 @@ class DataBase(object):
             if analysisIDs and not ID in analysisIDs: continue
             newExpResult = ExpResult()
             newExpResult.path = expResult.path
-            newExpResult.info = expResult.info            
-            newExpResult.txnames = []
-            for txname in expResult.txnames:
-                if txnames and not txname.txname in txnames:
+            newExpResult.info = expResult.info        
+            newExpResult.datasets = []
+            for dataset in expResult.datasets:
+                if datasetIDs and not dataset.dataInfo.dataid in datasetIDs:
                     continue
-                newExpResult.txnames.append(txname)
+                newDataSet = datasetObject.DataSet(dataset.dataDir,dataset.info)
+                newDataSet.dataInfo = dataset.dataInfo
+                newDataSet.txnameList = []
+                for txname in dataset.txnameList:
+                    if txnames and not txname.txname in txnames:
+                        continue
+                    newDataSet.txnameList.append(txname)
+                newExpResult.datasets.append(dataset)
             #Skip analysis not containing any of the required txnames:
-            if not newExpResult.txnames: continue
+            if not newExpResult.getTxNames(): continue
             expResultList.append(newExpResult)                        
         return expResultList
         
