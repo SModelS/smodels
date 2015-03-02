@@ -118,6 +118,9 @@ class ExpResult(object):
             for tx in self.getTxNames():
                 if tx == txname or tx.txname == txname:
                     return tx.txnameData.getValueFor(mass)
+        else:
+            logger.warning("Unkown data type: %s. Data will be ignored." 
+                           % self.getValuesFor('datatype'))
             
 
     @_memoize    
