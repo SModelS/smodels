@@ -52,7 +52,8 @@ class ExpResult(object):
         dataIDs = self.getValuesFor('dataid')
         if dataIDs:
             for dataid in dataIDs:
-                if dataid: label += dataid
+                if dataid: label += dataid + ","
+        label = label[:-1]
         label += ':'
         txnames = self.getValuesFor('txname')
         if isinstance(txnames,list):
@@ -132,7 +133,7 @@ class ExpResult(object):
         """
         
         upperLimits = {}
-        for dataset in self.datasets:
+        for dataset in self.datasets:            
             if dataset.dataInfo.datatype != 'efficiency-map':
                 logger.error("getUpperLimit is intended for efficiency map results only!")
                 return False
@@ -173,7 +174,7 @@ class ExpResult(object):
             except: pass
         if not attribute: return valuesDict
         elif not attribute in valuesDict:
-            logger.warning("Could not find field %s in database" % attribute)
+            logger.warning("Could not find field %s in %s" % (attribute,self.path))
             return False
         else:
             if len(valuesDict[attribute]) == 1: return valuesDict[attribute][0]

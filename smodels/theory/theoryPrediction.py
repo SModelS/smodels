@@ -141,9 +141,12 @@ def _getBestResults(dataSetResults):
         if len(predList) != 1:
             logger.error("Multiple clusters should only exist for upper limit results!")
             sys.exit()
-            
         pred = predList[0]
-        expectedR = pred.value/dataset.getUpperLimit(0.05,True)
+        if len(pred.value) != 1:
+            logger.error("Signal region prediction should correspond to a single cross-section!")
+            sys.exit()
+        xsec = pred.value[0]        
+        expectedR = xsec.value/dataset.getUpperLimit(0.05,True)
         if expectedR > bestExpectedR:
             bestExpectedR = expectedR
             bestPredList = predList
