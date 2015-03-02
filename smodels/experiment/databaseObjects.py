@@ -387,9 +387,11 @@ class DataBase(object):
                 newDataSet.txnameList = []
                 for txname in dataset.txnameList:
                     if txnames and not txname.txname in txnames:
-                        continue
+                        continue                   
                     newDataSet.txnameList.append(txname)
-                newExpResult.datasets.append(dataset)
+                #Skip data set not containing any of the required txnames:
+                if not newDataSet.txnameList: continue                    
+                newExpResult.datasets.append(newDataSet)
             #Skip analysis not containing any of the required txnames:
             if not newExpResult.getTxNames(): continue
             expResultList.append(newExpResult)                        
