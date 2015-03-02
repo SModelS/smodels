@@ -13,8 +13,8 @@ from smodels.tools import BayesianUpperLimit
 def upperLimit ( Nobs, Nexp, sigmaexp, lumi, alpha=.05 ):
     """ a convenience function to have a central place where to centrally change the 
       way the upper limit gets computed """
-    ret = computeCLInterval ( Nobs, Nexp, lumi, alpha )
-    ## ret = upperLimitMadAnalysis ( Nobs, Nexp, sigmaexp, 1.-alpha ) / lumi
+    ## ret = computeCLInterval ( Nobs, Nexp, lumi, alpha )
+    ret = upperLimitMadAnalysis ( Nobs, Nexp, sigmaexp, 1.-alpha ) / lumi
     return ret
 
 def computeCLInterval( Nobs, Nexp, lumi, alpha=.05 ):
@@ -41,22 +41,24 @@ def bayesianUpperLimit ( nev, sac, xbg, sbg, cl=.95, prec=None, smax=None ):
     
     return BayesianUpperLimit.upperLimit ( nev, sac, xbg, sbg, cl, prec, smax )
 
-def upperLimitMadAnalysis ( nev, xbg, sbg, cl=.95, numberoftoys=10000, return_nan=False ):
+def upperLimitMadAnalysis ( nev, xbg, sbg, cl=.95, numberoftoys=10000, upto = 1.0, return_nan=False ):
     """ upper limit obtained via mad analysis 5 code 
     :param nev: number of observed events
     :param sac: relative uncertainty in acceptance
     :param sbg: uncertainty in background
     :param  cl: desired CL
+    :param numberoftoys: how many toy experiments do we make?
+    :param upto: search for 95% upto this number times nev
     """
     import exclusion_CLs
     import scipy.optimize
     def f( sig ):
         return exclusion_CLs.CLs ( nev, xbg, sbg, sig, numberoftoys ) - cl
     try:
-        return scipy.optimize.brentq ( f, 0, nev )
+        return scipy.optimize.brentq ( f, 0, upto * nev )
     except Exception,e:
         if not return_nan:
-            return upperLimitMadAnalysis ( nev, xbg, sbg, cl, 5*numberoftoys, True )
+            return upperLimitMadAnalysis ( nev, xbg, sbg, cl, 5*numberoftoys, 5.0*upto, True )
         else:
             return float("nan")
 
