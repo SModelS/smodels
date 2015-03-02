@@ -251,6 +251,9 @@ def _combineElements(elements, dataset, maxDist):
             txnameClusters = clusterTools.clusterElements(txnameEls, txname.txnameData, maxDist)
             for cluster in txnameClusters: cluster.txname = txname
             clusters += txnameClusters
+    else:
+        logger.warning("Unkown data type: %s. Data will be ignored." 
+                       % dataset.dataInfo.datatype)
                 
     return clusters
 
