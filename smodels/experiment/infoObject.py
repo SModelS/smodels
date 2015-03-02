@@ -1,7 +1,7 @@
 """
 .. module:: infoObjects
    :synopsis: Holds the classes and methods used to read and store the information in the
-              info.txt files.
+              info.txt or dataInfo.txt files.
 
 .. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
