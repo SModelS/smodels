@@ -143,7 +143,7 @@ def _getBestResults(dataSetResults):
             sys.exit()
             
         pred = predList[0]
-        expectedR = pred.value/dataset.getUpperLimit(expected=True)
+        expectedR = pred.value/dataset.getUpperLimit(0.05,True)
         if expectedR > bestExpectedR:
             bestExpectedR = expectedR
             bestPredList = predList
