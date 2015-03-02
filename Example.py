@@ -28,6 +28,7 @@ def main():
     #Path to input file name (either a SLHA or LHE file)
 #     slhafile = 'inputFiles/slha/gluino_squarks.slha'
     slhafile = 'inputFiles/slha/lightEWinos.slha'
+    slhafile = '/home/lessa/smodels-utils/slha/T2tt/T2tt_300_75_NLL.slha'
 #     slhafile = 'inputFiles/slha/compression.slha'
 #     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
 
