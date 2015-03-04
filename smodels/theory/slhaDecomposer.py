@@ -51,7 +51,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     try:
         f=modpyslha.readSLHAFile ( slhafile )
     except modpyslha.ParseError,e:
-        logger.error ( "This file cannot be parsed as an SLHA file: %s" % e )
+        logger.error ( "The file %s cannot be parsed as an SLHA file: %s" % (slhafile, e) )
         sys.exit()
 
     # Get cross-section from file
