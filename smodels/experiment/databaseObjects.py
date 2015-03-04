@@ -11,9 +11,7 @@
 import logging, os, sys
 from smodels.experiment import infoObject,txnameObject
 from smodels.experiment import datasetObject
-from smodels.tools import statistics
 from smodels.theory.auxiliaryFunctions import _memoize
-import unum
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
 logging.basicConfig(format=FORMAT)
@@ -227,7 +225,6 @@ class ExpResult(object):
         
         return txnameList
 
-
  
 
 class DataBase(object):    
@@ -366,7 +363,8 @@ class DataBase(object):
         :param analysisID: list of analysis ids ([CMS-SUS-13-006,...])
         :param datasetIDs: list of dataset ids ([ANA-CUT0,...])
         :param txnames: list of txnames ([TChiWZ,...])
-        :returns: list of ExpResult objects    
+        :returns: list of ExpResult objects or the ExpResult object if the list contains
+                   only one result
         """
         
         
@@ -378,7 +376,7 @@ class DataBase(object):
             newExpResult = ExpResult()
             newExpResult.path = expResult.path
             newExpResult.info = expResult.info        
-            newExpResult.datasets = []
+            newExpResult.datasets = []            
             for dataset in expResult.datasets:
                 if datasetIDs and not dataset.dataInfo.dataid in datasetIDs:
                     continue
@@ -394,6 +392,7 @@ class DataBase(object):
                 newExpResult.datasets.append(newDataSet)
             #Skip analysis not containing any of the required txnames:
             if not newExpResult.getTxNames(): continue
-            expResultList.append(newExpResult)                        
-        return expResultList
+            expResultList.append(newExpResult)
+        if len(expResultList) == 1: return expResultList[0]
+        else: return expResultList
         

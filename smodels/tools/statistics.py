@@ -6,15 +6,18 @@
         
 """
 
-from numpy import sqrt,inf
+from numpy import sqrt
 from scipy import stats,special,integrate,optimize
 from smodels.tools import BayesianUpperLimit
 
 def upperLimit ( Nobs, Nexp, sigmaexp, lumi, alpha=.05 ):
     """ a convenience function to have a central place where to centrally change the 
       way the upper limit gets computed """
-    ## ret = computeCLInterval ( Nobs, Nexp, lumi, alpha )
-    ret = upperLimitMadAnalysis ( Nobs, Nexp, sigmaexp, 1.-alpha ) / lumi
+
+#     ret = getUL(Nobs, Nexp, sigmaexp,alpha)/lumi
+    ret = bayesianUpperLimit(Nobs,0.00001,Nexp,sigmaexp,1.-alpha)/lumi
+#     ret = upperLimitMadAnalysis ( Nobs, Nexp, sigmaexp, 1.-alpha ) / lumi
+
     return ret
 
 def computeCLInterval( Nobs, Nexp, lumi, alpha=.05 ):
@@ -90,7 +93,7 @@ def getPValue(Nsig,Nobs,Nbg,NbgErr):
                 
         return p
 
-def getUL(Nobs,Nbg,NbgErr):
+def getUL(Nobs,Nbg,NbgErr,alpha):
     """
     Computes the 95% upper limit on the signal*efficiency cross-section,
     given number of observed events (Nobs), number of expected BG events (Nbg)
@@ -99,16 +102,17 @@ def getUL(Nobs,Nbg,NbgErr):
     :param Nobs: number of observed events (integer)
     :param Nbg: number of expected BG events (float)
     :param NbgErr:  systematical error on the background (float)
+    :param alpha: 1-C.L. i.e. for 95% C.L. alpha = 0.05
     :returns: the 95% confidence level on signal*efficiency*luminosity (float)
     """
     
     n0 = 0.
     n1 = abs(Nobs - Nbg) + 4*sqrt(NbgErr**2 + Nbg)
-    while getPValue(n1,Nobs,Nbg,NbgErr) > 0.05:
+    while getPValue(n1,Nobs,Nbg,NbgErr) > alpha:
         n1 += 4.*sqrt(NbgErr**2 + Nbg)
 
     def pValm(x):
-        return 0.05 - getPValue(x,Nobs,Nbg,NbgErr)
+        return alpha - getPValue(x,Nobs,Nbg,NbgErr)
 
     nmax = optimize.brentq(pValm,n0,n1)
     return nmax
