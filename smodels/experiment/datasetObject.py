@@ -121,7 +121,7 @@ class DataSet(object):
         Nexp = self.dataInfo.expectedBG  #Number of expected BG events
         bgError = self.dataInfo.bgError # error on BG
         lumi = self.info.lumi
-        maxSignalXsec = statistics.upperLimit (Nobs,Nexp,bgError,lumi,alpha)
+        maxSignalXsec = statistics.upperLimit(Nobs,Nexp,bgError,lumi,alpha)
                 
         return maxSignalXsec
             
