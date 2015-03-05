@@ -185,11 +185,14 @@ class Branch(object):
         :returns: list of extended branches (Branch objects). Empty list if daughter is stable or
                   if daughterID was not defined.
         """
+                
         if not self.daughterID:
             # Do nothing if there is no R-odd daughter (relevant for RPV decays
             # of the LSP)
             return []
-        # List of possible decays (brs) for R-odd daughter in branch
+        #If decay table is not defined, assume daughter is stable:
+        if not self.daughterID in brDictionary: return []
+        # List of possible decays (brs) for R-odd daughter in branch        
         brs = brDictionary[self.daughterID]
         if len(brs) == 0:
             # Daughter is stable, there are no new branches
