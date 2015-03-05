@@ -74,6 +74,9 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
         branchList.append(Branch())
         branchList[-1].momID = pid
         branchList[-1].daughterID = pid
+        if not pid in massDic:
+            logger.error ( "pid %d does not appear in masses dictionary %s in slhafile %s" % 
+                    ( pid, massDic, slhafile ) )
         branchList[-1].masses = [massDic[pid]]
         branchList[-1].maxWeight = maxWeight[pid]
 
