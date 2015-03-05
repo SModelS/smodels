@@ -80,7 +80,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
         branchList[-1].masses = [massDic[pid]]
         branchList[-1].maxWeight = maxWeight[pid]
 
-    # Generate final branches (after all R-odd particles have decayed)
+    # Generate final branches (after all R-odd particles have decayed)    
     finalBranchList = decayBranches(branchList, brDic, massDic, sigcut)
 
     smsTopList = topology.TopologyList()
@@ -151,11 +151,10 @@ def _getDictionariesFromSLHA(slhafile):
         brDic[pid] = brs
         brDic[-pid] = brsConj
     # Get mass list for all particles
-    massDic = {}
-    for pid in res.decays.keys():
-        if pid and res.decays[pid].mass != None:
-            massDic[pid] = abs(res.decays[pid].mass)* GeV
-            massDic[-pid] = abs(res.decays[pid].mass) * GeV
-
+    massDic = dict(res.blocks['MASS'].items())
+    for pid in massDic.keys()[:]:
+        massDic[pid] *= GeV
+        if not -pid in massDic: massDic[-pid] = massDic[pid]    
+ 
     return brDic, massDic
 
