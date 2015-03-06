@@ -43,7 +43,7 @@ def main():
     smstoplist.printout(outputLevel=0)
 
     # Load all analyses from database
-    listOfExpRes = database.getExpResults()
+    listOfExpRes = database.getExpResults(datasetIDs=[None])
 
     # Compute the theory predictions for each analysis
     for expResult in listOfExpRes:
