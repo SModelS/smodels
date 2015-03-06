@@ -21,7 +21,7 @@ class TxTest(unittest.TestCase):
     def testT1(self):
         self.logger.info ( "T1" )
         """ test with the T1 slha input file """
-        slhafile="../inputFiles/slha/T1xsecs.slha"
+        slhafile="../inputFiles/slha/simplyGluino.slha"
         topos = slhaDecomposer.decompose ( slhafile, .1*fb, False, False, 5.*GeV )
         for topo in topos:
             for element in topo.elementList:
@@ -31,7 +31,7 @@ class TxTest(unittest.TestCase):
                 mLSP=masses[0][1]
                 self.assertEqual ( str(element), "[[[jet,jet]],[[jet,jet]]]" )
                 self.assertEqual ( int ( mgluino / GeV ), 675 )
-                self.assertEqual ( int ( mLSP / GeV ), 600 )
+                self.assertEqual ( int ( mLSP / GeV ), 200 )
 
 if __name__ == "__main__":
     unittest.main()

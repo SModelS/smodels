@@ -33,7 +33,7 @@ def decompose(lhefile, inputXsecs=None, nevts=None, doCompress=False,
     :param doInvisible: invisible compression option (True/False)
     :param minmassgap: minimum mass gap for mass compression (only used if
                        doCompress=True)
-    :returns: TopologyList object 
+    :returns: list of topologies (TopologyList object) 
     
     """
 
@@ -187,49 +187,4 @@ def _getDictionariesFromEvent(event):
 
     return brDic, massDic
 
-if __name__ == "__main__":
-    """
-    Decomposes a given LHE file.
 
-    """
-    import argparse
-    import types
-    argparser = argparse.ArgumentParser(description="Decomposes a given LHE file.")
-    argparser.add_argument('file', type=types.StringType, nargs=1,
-                           help="LHE file to decompose." )
-    argparser.add_argument('-c', '--compress', action='store_true',
-                           help="turn mass compressed topologies on." )
-    argparser.add_argument('-i', '--invisible', action='store_true',
-                           help="turn invisibly compressed topologies on." )
-    argparser.add_argument('-x', '--crosssections', action='store_true',
-                           help="print the production cross sections." )
-    argparser.add_argument('-M', '--masses', action='store_true',
-                           help="print the masses." )
-    argparser.add_argument('-n', '--nevents', type=int, default=-1,
-                           help="number of events to be checked for, -1 means all events in file." )       
-    argparser.add_argument('-m', '--minmassgap', type=float, default=-1.,
-                           help="minimum sigma*BR to be generated, in fb" )       
-
-    args = argparser.parse_args()
-    File=args.file[0]
-    def boolean(b):
-        if b: return "true"
-        return "false"
-    print "Now trying to decompose:",File
-    print "                       - compression=%s" % boolean(args.compress)
-    print "                       - invisible=%s" % boolean(args.invisible)
-    print "                       - minmassgap=%.2f" % args.minmassgap
-    topolist=decompose ( File, None, args.nevents, args.compress, args.invisible,
-            args.minmassgap * GeV )
-    if len(topolist)>0:
-        print "Found the following topologies: "
-        for t in topolist:
-            print
-            print t
-            for el in t.getElements():
-                print el, ## ,el.getMasses()
-                if args.masses:
-                    print el.getMasses(),
-                if args.crosssections:
-                    print el.weight,
-                print

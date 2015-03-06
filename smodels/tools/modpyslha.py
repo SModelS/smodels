@@ -511,9 +511,9 @@ def readSLHA(spcstr, ignorenobr=False, ignorenomass=False, ignoreblocks=[]):
             ## Handle unknown section type start lines (and continue ignoring until a non-header line is found)
             elif type(_autotype(line.split()[0])) is str:
                 import sys
-                if line.split()[0]!="XSECTION":
+#                 if line.split()[0]!="XSECTION":
                     ## xsection isnt unknown.
-                    sys.stderr.write("Ignoring unknown section type: %s\n" % line.split()[0])
+#                     sys.stderr.write("Ignoring unknown section type: %s\n" % line.split()[0])
                 currentblock = None
                 currentdecay = None
 

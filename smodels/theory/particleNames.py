@@ -62,6 +62,7 @@ def elementsInStr(instring):
     :returns: list of elements appearing in instring in string format
     
     """
+    
     if type(instring) == type('st'):
         outstr = instring
     elif type(instring) == type([]):
@@ -98,7 +99,7 @@ def elementsInStr(instring):
                 if not ptc:
                     continue
                 if not ptc in rEven.values() and not ptc in ptcDic:
-                    logger.error("Unknown particle " + ptc)
+                    logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
                     sys.exit()
 
     # Check if there are not unmatched ['s and/or ]'s in the string
@@ -150,7 +151,7 @@ def vertInStr(instring):
                 if not ptc:
                     continue
                 if not ptc in rEven.values() and not ptc in ptcDic:
-                    logger.error("Unknown particle " + ptc)
+                    logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
                     sys.exit()
             vertStr = ""
 
@@ -166,7 +167,7 @@ def simParticles(ptype1, ptype2, useDict=True):
     """
     Compares 2 particle names or 2 nested name arrays. Allows for dictionary
     labels (Ex: L = l, l+ = l, l = l-,...). For the last nested level ignore
-    particle ordering. FIXME nesting? 
+    particle ordering.
  
     :param ptype1: first (nested) list of particle names, e.g. ['l','jet']
     :param ptype2: second (nested) list of particle names 

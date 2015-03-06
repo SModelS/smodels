@@ -281,7 +281,7 @@ class ExternalPythia6(ExternalTool):
             logger.error("%s is not executable", self.executable)
             self.chmod()
             return False
-        slhaFile = "/inputFiles/slha/andrePT4.slha"
+        slhaFile = "/inputFiles/slha/gluino_squarks.slha"
         slhaPath = installation.installDirectory() + slhaFile
         try:
             output = self.run(slhaPath, "<install>/etc/pythia_test.card",
@@ -299,8 +299,9 @@ class ExternalPythia6(ExternalTool):
                     logger.error("Expected >>>%s<<< found >>>%s<<<", line,
                                  output[nr])
                     return False
-        except Exception, e:  # TODO: which exception?
+        except Exception, e:
             logger.error("Something is wrong with the setup: exception %s", e)
+            return False
         return True
 
 

@@ -1,10 +1,13 @@
-all: compile
+FCC=gfortran
+PROGRAM=nllfast_7TeV
 
-tarball:
-	tar czvf nllfast7.tar.gz nllfast-1.2.f *.grid Makefile
+all: $(PROGRAM) gg.out sb.out sg.out ss.out st.out gdcpl.out sdcpl.out
 
-compile:
-	gfortran -o nllfast_7TeV nllfast-1.2.f
+$(PROGRAM):
+	$(FCC) -o $(PROGRAM) nllfast-*.f
+%.out:
+	touch $@
+	chmod 666 $@
 
 clean:
-	rm -f nllfast_7TeV
+	rm -f $(PROGRAM) *.out

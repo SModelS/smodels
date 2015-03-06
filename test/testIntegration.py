@@ -3,13 +3,13 @@
 """
 .. module:: testIntegration
    :synopsis: Integration test, tests a simple but complete use case.
-              Uses the database in smodels/validation/database.
+              Uses the database in smodels/test/database.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
 import unittest
-from smodels.tools.physicsUnits import fb, GeV
+from smodels.tools.physicsUnits import fb, GeV, pb
 import inspect
 import os
 
@@ -20,26 +20,31 @@ class IntegrationTest(unittest.TestCase):
         logging.config.fileConfig( fname=fc, disable_existing_loggers=False )
 
     def predictions(self):
-        return { 'SUS13006:TSlepSlep371': 2.42154060952*fb,
-                 'SUS13006:TSlepSlep420': 0.246832973996*fb,
-                 'SUS13006:TChiChipmSlepL371': 8.43114195825*fb,
+        return { 'SUS13006:TChiWZ': 18.4709328281*fb,
+                 'SUS12028:T2': 1.69834196094*fb,
+                 'SUS12028:T1': 8.43114195825*fb,
                  'SUS12022:TChiChipmSlepL371': 8.43114195825*fb }
 
     def checkAnalysis(self,analysis,smstoplist):
         from smodels.theory.theoryPrediction import theoryPredictionFor
         theorypredictions = theoryPredictionFor(analysis, smstoplist)
+        defpreds=self.predictions()
+        # print "ana",analysis,theorypredictions
         if not theorypredictions:
             return
-        defpreds=self.predictions()
         ### print(">>>> Ana %s" % analysis.label)
         for pred in theorypredictions:
             # print ( "Pred ana",pred.analysis.label)
             m0=str ( int ( pred.mass[0][0]/GeV )  )
             # print ( "Pred mass0",m0 )
-            # print ( "Pred mass0",int(pred.mass[0]/GeV))
-            predval=pred.value.getDictionary()['8.0 [TeV]']
-            defpredval=defpreds[pred.analysis.label+m0] 
-            # print ( "Pred value",predval )
+            #print ( "Pred mass0",int(pred.mass[0]/GeV))
+            #print ( "Pred value",pred.value )
+            #print ( "Pred value type",type(pred.value) )
+            #print ( "Pred value dict",pred.value.__dict__ )
+            w=pred.value.getDictionary()[(None,None)]
+            predval=w['8.00E+00 [TeV]']
+            #print "predval=",predval.asNumber(fb)
+            defpredval=defpreds[pred.analysis.label] 
             # print ( "Pred default value",defpredval )
             self.assertAlmostEqual ( predval / fb, defpredval / fb )
 
@@ -51,9 +56,11 @@ class IntegrationTest(unittest.TestCase):
         from smodels.tools.physicsUnits import fb, GeV
         from smodels.theory import slhaDecomposer
         from smodels.experiment import smsAnalysisFactory, smsHelpers
-        smsHelpers.base = installDirectory() + 'validation/database/'
-        smsHelpers.runs = [ "2012" ]
-        slhafile = installDirectory()+'inputFiles/slha/andrePT4.slha'
+        smsHelpers.base = installDirectory() + 'test/database/'
+        # smsHelpers.runs = [ "2012" ]
+        ## slhafile = installDirectory()+'oldFiles/andrePT4.slha'
+        slhafile = '../inputFiles/slha/lightSquarks.slha'
+        ## slhafile = '../inputFiles/slha/compression.slha'
         self.configureLogger()
         smstoplist = slhaDecomposer.decompose(slhafile, .1*fb, doCompress=True,
                 doInvisible=True, minmassgap=5.*GeV)
