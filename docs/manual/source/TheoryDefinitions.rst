@@ -1,0 +1,178 @@
+.. index:: Theory Definitions
+
+.. |element| replace:: :ref:`element <element>`
+.. |elements| replace:: :ref:`elements <element>`
+.. |topology| replace:: :ref:`topology <topology>`
+.. |topologies| replace:: :ref:`topologies <topology>`
+.. |analysis| replace:: :ref:`analysis <ULanalysis>`
+.. |analyses| replace:: :ref:`analyses <ULanalysis>`
+.. |bracket notation| replace:: :ref:`bracket notation <bracketNotation>`
+.. |final states| replace:: :ref:`final states <final states>`
+
+
+.. _theoryDefs:
+
+Theory Definitions
+==================
+
+The so-called theory module contains the basic tools necessary for decomposing the input model
+(either in LHE or SLHA format) into SMS |topologies| and using the output of the decomposition
+to compute the :doc:`theoretical prediction <TheoryPredictions>` for a given :ref:`experimental analysis <ULanalysis>`.
+
+We start by explaining the basic components: vertices, Z\ :sub:`2`-even and Z\ :sub:`2`-odd states shown in the scheme below.
+The construction of a global |topology| and the |bracket notation| used in SModleS are explained further below on this page. 
+
+.. _topscheme:
+
+.. image:: images/topScheme.png
+   :height: 280px
+
+
+.. _vertex:
+
+Vertices
+--------
+Each Z\ :sub:`2`-odd state appearing in a |topology| ends with a vertex (see :ref:`scheme above <topscheme>`)
+In most cases vertices correspond to the decay of the Z\ :sub:`2`-odd state.
+The only exceptions are topologies ending with a stable Z\ :sub:`2`-odd state.
+In this case the last vertex contains no outgoing |final states| and indicates
+the stability of the last Z\ :sub:`2`-odd particle appearing in the :ref:`branch <branch>`.
+
+.. _final states:
+
+Final States (Z\ :sub:`2`-even)
+-------------------------------
+
+Final states indicate all Z\ :sub:`2`-even states coming out of a vertex (see :ref:`scheme above <topscheme>`).
+In most cases, these correspond to Standard Model particles (electrons, gauge bosons, Higgs,...).
+Note that, if the input model contains BSM states which are Z\ :sub:`2`-even (such as additional Higgs bosons),
+these also appear as final states.
+In contrast, stable or long-lived Z\ :sub:`2`-odd particles which might appear in the detector (either as MET or charged tracks)
+are *not* classified as final states.
+
+
+* Z\ :sub:`2`-even **states are defined (and can be easily modified) in** :download:`particles.py <images/particles.py>` 
+
+.. _odd states:
+
+Intermediate States (Z\ :sub:`2`-odd)
+-------------------------------------
+
+The Z\ :sub:`2`-odd states are always assumed to consist of BSM particles with Z\ :sub:`2`
+conserving decays of the form: (Z\ :sub:`2`-odd state) :math:`\rightarrow`  (Z\ :sub:`2`-odd state') + Final States.
+The only information kept from the intermediate states are their masses (see :ref:`scheme above <topscheme>`).
+If an intermediate state is stable and neutral, it is considered as a MET signal.
+
+* Z\ :sub:`2`-odd **states are defined (and can be easily modified) in** :download:`particles.py <images/particles.py>`
+
+.. _branch:
+
+Branches
+--------
+
+A branch is the basic substructure of a |topology|.
+It represents a series of cascade decays of a single initial Z\ :sub:`2`-odd
+state.
+The figure below shows an example of a branch.
+
+.. image:: images/branchTop.png
+   :height: 100px
+
+Each branch is fully defined by its number of vertices and the number of 
+:ref:`final states` coming out of each vertex. The particle labels for the |final states|
+may or may not be specified.
+If the particle labels of the final states are not specified (such as in the figure
+above), the branch belongs to a :ref:`global topology <topology>`. However, if it is dressed with its final states
+as in the figure below, the branch belongs to an |element|.
+
+.. image:: images/branchEl.png
+   :height: 100px
+   
+* **Branches are described by the** `Branch Class <../../../documentation/build/html/theory.html#theory.branch.Branch>`_   
+
+.. _topology:
+
+Topologies
+----------
+
+Topologies describe the basic structure of an |element|.
+Each global topology corresponds to a cascade decay chain *without*
+the final Z\ :sub:`2`-even states or  Z\ :sub:`2`-odd masses specified.
+Therefore the global topology is fully determined by its number of
+branches, number of vertices in each :ref:`branch <branch>` and number of
+|final states| coming out of each :ref:`vertex <vertex>`.
+As as example consider the following topology:
+
+.. image:: images/globTop.png
+   :height: 200px
+
+It contains 2 branches. The first (topmost) :ref:`branch <branch>` contains 3 vertices
+with 1 final state each in the first two vertices and zero in the third.
+On the other hand, the second :ref:`branch <branch>` contains 2 vertices with two 
+|final states| coming out of the first vertex and zero coming out of the second.
+*Notice that, for topologies ending with stable* Z\ :sub:`2` *-odd states,
+there are no final states coming out of the last vertex in the branch.*
+
+Topologies are also a useful way to group |elements|. In this way,  topologies represent a list of elements sharing a common basic structure (same number of branches, vertices and
+final states in each vertex).
+
+* **Topologies are described by the** `Topology Class <../../../documentation/build/html/theory.html#theory.topology.Topology>`_   
+
+.. _element:
+
+Elements
+--------
+
+Elements are *dressed* global topologies, where both the final state (Z\ :sub:`2`-even) particles and the
+BSM (Z\ :sub:`2`-odd) masses appearing in the topology have been defined.
+An element may also hold information about its corresponding weight (cross-section times branching ratio).
+An element is defined by its :ref:`global topology<topology>` properties (number of branches, vertices and particles in each vertex)
+plus its |final states|, and a mass array containing the ordered Z\ :sub:`2`-odd masses
+appearing in the element.
+Below we show an example of an element and the information it contains.
+
+
+.. _elementscheme:
+
+.. image:: images/element.png
+   :height: 280px
+
+* **Elements are described by the** `Element Class <../../../documentation/build/html/theory.html#theory.element.Element>`_    
+
+.. _notation:
+
+Bracket Notation
+----------------
+
+The structure and final states of |elements| are represented in textual form using a nested brackets
+notation. The scheme below shows how to convert between the graphical and bracket representations of an element:
+
+
+.. _bracketnotation:
+
+.. image:: images/bracketNotation.png
+   :height: 280px
+
+The brackets are ordered and nested in the following way.
+The outermost brackets correspond to the :ref:`branches <branch>` of the |element|.
+The ordering for the branches is arbitrary and each branch contains
+an *ordered* list of :ref:`vertices <vertex>` and each vertex contains an *unordered* list of the |final states|
+coming out of the vertex. Schematically, for the example in the :ref:`figure above <bracketnotation>`, we have::
+
+   element = [branch1, branch2]
+      branch1 = [vertex1,vertex2]
+         vertex1 = [l+]
+         vertex2 = [nu]
+      branch2 = [vertex1]
+         vertex1 = [l+,l-]
+
+Using the above scheme it is possible to unambiguously describe each |element| with a simple list of nested brackets.
+However, in order to fully specify all the information relative to a single |element|, we must
+also include the list of :ref:`intermediate state <odd states>` masses and the element weight.
+The :ref:`intermediate state <odd states>` masses can also be represented by a mass array
+for each branch, as shown below:
+
+.. _massnotation:
+
+.. image:: images/massNotation.png
+   :height: 280px

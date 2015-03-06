@@ -15,12 +15,12 @@ from smodels.tools import slhaChecks
 class SlhaTest(unittest.TestCase):
     def testGoodFile(self):
 
-        filename = "%sinputFiles/slha/lightSquarks.slha" % (installDirectory() )
+        filename = "%sinputFiles/slha/gluino_squarks.slha" % (installDirectory() )
         st=slhaChecks.SlhaStatus(filename)
         self.assertEquals ( st.status, (1, 'Input file ok') )
         
     def testBadFile(self):
-        filename = "%soldFiles/nobdecay.slha" % (installDirectory() )
+        filename = "%sinputFiles/slha/nobdecay.slha" % (installDirectory() )
         st=slhaChecks.SlhaStatus(filename)
         self.assertEquals (st.status, (-1, '#ERROR: special signatures in this point.\n#Warnings:\n##Visible decays of longlived particles / stable charged particles: [1000005]\n#1000005 : c*tau = inf\n\n'))
 

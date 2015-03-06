@@ -395,7 +395,7 @@ class XSectionList(object):
         allPids = []
         for xsec in self:
             allPids.extend(xsec.pid)
-        return list(set(allPids))
+        return sorted(list(set(allPids)))
 
 
     def getMaxXsec(self):
@@ -512,6 +512,13 @@ class XSectionList(object):
             logger.info("Ignoring %i lower order cross-sections",
                            (len(self) - len(newList)))
             self.xSections = newList.xSections
+            
+    def order(self):
+        """
+        Order the cross-section in the list by their PDG pairs
+        """
+        
+        self.xSections = sorted(self.xSections, key=lambda xsec: xsec.pid)
 
 
 def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):

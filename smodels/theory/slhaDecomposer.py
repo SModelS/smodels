@@ -21,7 +21,6 @@ import sys
 
 logger = logging.getLogger(__name__)
 
-
 def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
               minmassgap=-1.*GeV, useXSecs=None):
     """
@@ -60,13 +59,20 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     brDic, massDic = _getDictionariesFromSLHA(slhafile)
     # Only use the highest order cross-sections for each process
     xSectionList.removeLowerOrder()
-
+    # Order xsections by PDGs to improve performance
+    xSectionList.order()
 
     # Get maximum cross-sections (weights) for single particles (irrespective
     # of sqrtS)
     maxWeight = {}
     for pid in xSectionList.getPIDs():
-        maxWeight[pid] = xSectionList.getXsecsFor(pid).getMaxXsec()
+        maxWeight[pid] = xSectionList.getXsecsFor(pid).getMaxXsec()    
+
+    # Generate dictionary, where keys are the PIDs and values 
+    # are the list of cross-sections for the PID pair (for performance)
+    xSectionListDict = {}    
+    for pids in xSectionList.getPIDpairs():
+        xSectionListDict[pids] = xSectionList.getXsecsFor(pids)
 
     # Create 1-particle branches with all possible mothers
     branchList = []
@@ -82,37 +88,44 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
 
     # Generate final branches (after all R-odd particles have decayed)    
     finalBranchList = decayBranches(branchList, brDic, massDic, sigcut)
+    # Generate dictionary, where keys are the PIDs and values are the list of branches for the PID (for performance)
+    branchListDict = {}
+    for branch in finalBranchList:
+        if branch.momID in branchListDict:
+            branchListDict[branch.momID].append(branch)
+        else:
+            branchListDict[branch.momID] = [branch]
+    for pid in xSectionList.getPIDs():
+        if not pid in branchListDict: branchListDict[pid] = []
 
     smsTopList = topology.TopologyList()
     # Combine pairs of branches into elements according to production
     # cross-section list
     for pids in xSectionList.getPIDpairs():
-        for branch1 in finalBranchList:
-            for branch2 in finalBranchList:
-                if branch1.momID == pids[0] and branch2.momID == pids[1]:
-                    finalBR = branch1.maxWeight * branch2.maxWeight / \
+        weightList = xSectionListDict[pids]
+        minBR = (sigcut/weightList.getMaxXsec()).asNumber()
+        if minBR > 1.: continue
+        for branch1 in branchListDict[pids[0]]:
+            for branch2 in branchListDict[pids[1]]:
+                finalBR = branch1.maxWeight * branch2.maxWeight / \
                             (maxWeight[pids[0]] * maxWeight[pids[1]])
-                    if type(finalBR) == type( 1. * fb):
-                        finalBR = finalBR.asNumber()
-                    weightList = xSectionList.getXsecsFor(pids) * finalBR
+                if type(finalBR) == type( 1. * fb):
+                    finalBR = finalBR.asNumber()
+                if finalBR < minBR: continue # Skip elements with xsec below sigcut
 
-                    newElement = element.Element([branch1, branch2])
-                    newElement.weight = weightList
-                    allElements = [newElement]
-                    # Perform compression
-                    if doCompress or doInvisible:
-                        allElements += newElement.compressElement(doCompress,
+                newElement = element.Element([branch1, branch2])
+                newElement.weight = weightList*finalBR
+                allElements = [newElement]
+                # Perform compression
+                if doCompress or doInvisible:
+                    allElements += newElement.compressElement(doCompress,
                                                                   doInvisible,
                                                                   minmassgap)
 
-                    for el in allElements:
-                        if el.weight.getMaxXsec() < sigcut:
-                            # Skip elements with xsec below sigcut
-                            continue
-                        top = topology.Topology(el)
-                        smsTopList.addList([top])
+                for el in allElements:
+                    top = topology.Topology(el)
+                    smsTopList.addList([top])
     logger.debug("slhaDecomposer done in " + str(time.time() - t1) + " s.")
-
     return smsTopList
 
 

@@ -2,7 +2,7 @@
 
 """
 .. module:: theory.lheDecomposer
-   :synopsis: Decomposition of LHE events and creation of TopologyLists 
+   :synopsis: Decomposition of LHE events and creation of TopologyLists.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
@@ -186,5 +186,3 @@ def _getDictionariesFromEvent(event):
         brDic[ibranch][momPdg][0].ids.append(particle.pdg)
 
     return brDic, massDic
-
-

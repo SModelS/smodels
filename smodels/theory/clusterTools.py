@@ -1,7 +1,7 @@
 """
 .. module:: theory.clusterTools
    :synopsis: Module holding the ElementCluster class and cluster methods used to combine similar elements according
-   to the analysis.
+      to the analysis.
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
         
@@ -187,7 +187,7 @@ class IndexCluster(object):
         dmax = 0.
         if type(obj) == type(int()) and obj >= 0:
             pos = self.positionMap[obj]
-        elif type(obj) == type(float()):
+        elif type(obj) == type(fb):
             pos = obj
         else:
             logger.error("Unknown object type (must be an element index or "
@@ -291,7 +291,6 @@ def _doCluster(elements, txdata, maxDist):
                 continue
             # Distance to cluster center (average)
             distAvg = indexCluster._getDistanceTo(indexCluster.avgPosition)
-
             #Loop over cluster elements and if element distance or cluster
             #average distance falls outside the cluster, remove element
             for iel in indexCluster:
