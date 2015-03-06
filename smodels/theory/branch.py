@@ -10,21 +10,29 @@ from smodels.theory.particleNames import simParticles, elementsInStr
 from smodels.tools.physicsUnits import fb
 import logging
 from smodels.particles import rEven, ptcDic
+import sys
 
 logger = logging.getLogger(__name__)
 
 
 class Branch(object):
     """
-    An instance of this class represents a branch.
-    
+    An instance of this class represents a branch.    
     A branch-element can be constructed from a string (e.g., ('[b,b],[W]').
     
+    :ivar masses: list of masses for the intermediate states
+    :ivar particles: list of particles (strings) for the final states
+    :ivar momID: PDG id for the primary (intermediate state) mother
+    :ivar daughterID: PDG id for the last intermediate state
+    :ivar maxWeight: weight of the branch (XSection object)
     """
     def __init__(self, info=None):
         """
         Initializes the branch. If info is defined, tries to generate
-        the branch using it. info must be a string description of the branch.
+        the branch using it.
+        
+        :parameter info: string describing the branch in bracket notation
+                         (e.g. [[e+],[jet]])
         """
         self.masses = []
         self.particles = []
@@ -35,7 +43,6 @@ class Branch(object):
             branch = elementsInStr(info)
             if not branch or len(branch) > 1:
                 logger.error("Wrong input string " + info)
-                import sys
                 sys.exit()
             else:
                 branch = branch[0]
@@ -46,15 +53,16 @@ class Branch(object):
                     for ptc in ptcs:
                         if not ptc in rEven.values() \
                                 and not ptc in ptcDic:
-                            logger.error("Unknown particle " + ptc)
-                            import sys
+                            logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
                             sys.exit()
                     self.particles.append(ptcs)
 
 
     def __str__(self):
         """
-        Create the canonical SModels description of the Branch.        
+        Create the branch bracket notation string, e.g. [[e+],[jet]].
+        
+        :returns: string representation of the branch (in bracket notation)    
         """
         st = str(self.particles).replace("'", "")
         st = st.replace(" ", "")
@@ -63,21 +71,34 @@ class Branch(object):
 
     def __eq__(self, other):
         """
-        Use the branch isEqual function to compare two branches.
+        Check if branches are equal, allowing for inclusive particle labels.
+        
+        :parameter other: branch to be compared (Branch object)
+        :returns: True if branches are equal (particles and masses match); False otherwise.
         """
+        
         return self.isEqual(other)
 
 
     def __ne__(self, other):
         """
-        Use the branch isEqual function to compare two branches.
+        Check if branches are different, allowing for inclusive particle labels.
+        
+        :parameter other: branch to be compared (Branch object)
+        :returns: False if branches are equal (particles and masses match); True otherwise.
         """
+        
         return not self.isEqual(other)
 
 
     def isEqual(self, other, useDict=True):
-        """ Compare the branch with other. If particles are similar
-        and masses are equal, return True. Otherwise, return False.        
+        """
+        Compares two branches. If particles are similar
+        and masses are equal, return True. Otherwise, return False.  
+        
+        :parameter other: branch to be compared (Branch object)
+        :parameter useDict: if True, allow for inclusive particle labels
+        :returns: True if branches are equal (particles and masses match); False otherwise.              
         """
         if type (other) != type(self):
             return False
@@ -90,10 +111,10 @@ class Branch(object):
 
     def copy(self):
         """
-        Generate an independent copy of self.
-        
+        Generate an independent copy of self.        
         Faster than deepcopy.
         
+        :returns: Branch object
         """
         newbranch = Branch()
         newbranch.masses = self.masses[:]
@@ -109,17 +130,20 @@ class Branch(object):
         """
         Returns the branch length (= number of R-odd masses).
         
+        :returns: length of branch (number of cascade decay steps)
         """
         return len(self.masses)
 
 
     def _addDecay(self, br, massDictionary):
         """
-        Generate a new branch adding a 1-step cascade decay.
-        
+        Generate a new branch adding a 1-step cascade decay        
         This is described by the br object, with particle masses given by
         massDictionary.
         
+        :parameter br: branching ratio object (see pyslha). Contains information about the decay.
+        :parameter massDictionary: dictionary containing the masses for all intermediate states.
+        :returns: extended branch (Branch object). False if there was an error.
         """
         newBranch = self.copy()
         newparticles = []
@@ -155,12 +179,20 @@ class Branch(object):
         Generate a list of all new branches generated by the 1-step cascade
         decay of the current branch daughter.
         
+        :parameter brDictionary: dictionary with the decay information
+                                 for all intermediate states (values are br objects, see pyslha)
+        :parameter massDictionary: dictionary containing the masses for all intermediate states.
+        :returns: list of extended branches (Branch objects). Empty list if daughter is stable or
+                  if daughterID was not defined.
         """
+                
         if not self.daughterID:
             # Do nothing if there is no R-odd daughter (relevant for RPV decays
             # of the LSP)
             return []
-        # List of possible decays (brs) for R-odd daughter in branch
+        #If decay table is not defined, assume daughter is stable:
+        if not self.daughterID in brDictionary: return []
+        # List of possible decays (brs) for R-odd daughter in branch        
         brs = brDictionary[self.daughterID]
         if len(brs) == 0:
             # Daughter is stable, there are no new branches
@@ -175,16 +207,15 @@ class Branch(object):
 def decayBranches(branchList, brDictionary, massDictionary,
                   sigcut=0. *fb):
     """
-    Decay all branches from branchList until all R-odd particles have decayed.
+    Decay all branches from branchList until all unstable intermediate states have decayed.
     
-    :param branchList: list of Branch() objects containing the initial mothers
-    :param brDictionary: branching ratio dictionary for all particles appearing
-                         in the decays
-    :param massDictionary: mass dictionary for all particles appearing in the
-                           decays
-    :param sigcut: minimum sigma*BR to be generated, by default sigcut = 0.
+    :parameter branchList: list of Branch() objects containing the initial mothers
+    :parameter brDictionary: dictionary with the decay information
+                                 for all intermediate states (values are br objects, see pyslha)
+    :parameter massDictionary: dictionary containing the masses for all intermediate states.
+    :parameter sigcut: minimum sigma*BR to be generated, by default sigcut = 0.
                    (all branches are kept)
-    
+    :returns: list of branches (Branch objects)    
     """
 
     finalBranchList = []

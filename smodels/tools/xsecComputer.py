@@ -11,14 +11,12 @@
 """
 from smodels import installation
 from smodels.tools import toolBox
-from smodels.tools.physicsUnits import fb, TeV, GeV
+from smodels.tools.physicsUnits import pb, TeV, GeV
 from smodels.theory import crossSection
 from smodels.tools import nllFast
 import os
 import cStringIO
 import logging
-import argparse
-import types
 import sys
 
 logger = logging.getLogger(__name__)
@@ -119,9 +117,9 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
                     xsecs[i] = xsec * k
 
     # Remove zero cross-sections
-    while len(xsecs) > 0 and xsecs.getMinXsec() == 0. * fb:
+    while len(xsecs) > 0 and xsecs.getMinXsec() == 0. * pb:
         for xsec in xsecs:
-            if xsec.value == 0. * fb:
+            if xsec.value == 0. * pb:
                 xsecs.delete(xsec)
                 break
     if maxOrder > 0 and len(xsecs) == 0:
@@ -137,7 +135,7 @@ def addXSecToFile(xsecs, slhafile, comment=None, complain=True):
     :param slhafile: target file for writing the cross-sections in SLHA format
     :param comment: optional comment to be added to each cross-section block
     :param complain: complain if there are already cross sections in file
-
+    
     """
     if not os.path.isfile(slhafile):
         logger.error("SLHA file not found.")
@@ -145,8 +143,7 @@ def addXSecToFile(xsecs, slhafile, comment=None, complain=True):
         sys.exit()
     if len(xsecs) == 0:
         logger.warning("No cross-sections available.")
-        import sys
-        sys.exit()
+        return False
     # Check if file already contain cross-section blocks
     xSectionList = crossSection.getXsecFromSLHAFile(slhafile)
     if xSectionList and complain:
@@ -169,7 +166,7 @@ def addXSecToFile(xsecs, slhafile, comment=None, complain=True):
     return True
 
 
-def xsecToBlock(xsec, inPDGs=(2212, 2212), comment=None):
+def xsecToBlock(xsec, inPDGs=(2212, 2212), comment=None, xsecUnit = pb):
     """
     Generate a string for a XSECTION block in the SLHA format from a XSection
     object.
@@ -178,6 +175,7 @@ def xsecToBlock(xsec, inPDGs=(2212, 2212), comment=None):
                    (default = 2212,2212)
 
     :param comment: is added at the end of the header as a comment
+    :param xsecUnit: unit of cross-sections to be written (default is pb). Must be a Unum unit.
 
     """
     if type(xsec) != type(crossSection.XSection()):
@@ -197,7 +195,7 @@ def xsecToBlock(xsec, inPDGs=(2212, 2212), comment=None):
     if comment:
         header += "   # " + str(comment)  # Comment
     entry = "0  " + str(xsec.info.order) + "  0  0  0  0  " + \
-            str("%16.8E" % (xsec.value / fb) ) + " SModelS " + installation.version()
+            str("%16.8E" % (xsec.value / xsecUnit) ) + " SModelS " + installation.version()
 
     return "\n" + header + "\n" + entry
 
@@ -243,39 +241,8 @@ def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True ):
     return lheFile
 
 
-if __name__ == "__main__":
-    """
-    Compute the cross section of a given SLHA file.
-
-    """
-    desc = "compute the cross section of an SLHA file"
-    argparser = argparse.ArgumentParser(description=desc)
-    argparser.add_argument('file', type=types.StringType, nargs=1,
-                           help="SLHA file to compute cross section "
-                           "for")
-    argparser.add_argument('-s', '--sqrts', nargs='+', action='append',
-                           help="sqrt(s) TeV. Can supply more than one value.",
-                           type=int, default=[])
-    argparser.add_argument('-e', '--nevents', type=int, default=100,
-                           help="number of events to be simulated.")
-    argparser.add_argument('-f', '--tofile', action='store_true',
-                           help="write cross sections to file")
-    #argparser.add_argument('-S', '--slha', action='store_true',
-    #                       help="input file is an SLHA file")
-    #argparser.add_argument('-L', '--lhe', action='store_true',
-    #                       help="input file is an LHE file")
-    argparser.add_argument('-k', '--keep', action='store_true',
-                           help="do not unlink temporary directory")
-    argparser.add_argument('-n', '--NLO', action='store_true',
-                           help="compute at the NLO level (default is LO)")
-    argparser.add_argument('-N', '--NLL',
-                           help="compute at the NLL level (takes precedence "
-                           "over NLL, default is LO)",
-                           action='store_true')
-    args = argparser.parse_args()
-
-
-
+def main(args):
+    
     sqrtses = [item for sublist in args.sqrts for item in sublist]
     if len(sqrtses) == 0:
         sqrtses = [8]
@@ -294,20 +261,18 @@ if __name__ == "__main__":
                              "TeV! Available are: %s TeV." % 
                              (sqrts, allowedsqrtses ))
                 sys.exit(0)
-                # sqrtses.remove(sqrts)
-    inputFile = args.file[0]
+    inputFile = args.filename
     if not os.path.exists(inputFile):
         logger.error("File '%s' does not exist.", inputFile)
         sys.exit(1)
-    #if inputFile[-5:].lower() == ".slha" or args.slha:
     if args.tofile:
         logger.info("Computing SLHA cross section from %s, adding to "
                     "SLHA file." % inputFile )
         for s in sqrtses:
             ss = s*TeV 
             xsecs = computeXSec( ss, order, args.nevents, inputFile, 
-                                 unlink=(not args.keep) )
-            comment = "Nevts: " + str(args.nevents) + " xsec unit: fb"
+                                 unlink=(not args.keep), loFromSlha=args.LOfromSLHA)
+            comment = "Nevts: " + str(args.nevents) + " xsec unit: pb"
             addXSecToFile(xsecs, inputFile, comment)
         sys.exit(0)
     else:
@@ -320,16 +285,7 @@ if __name__ == "__main__":
             xsecs = computeXSec(ss, order, args.nevents, inputFile, \
                         unlink=(not args.keep) )
             for xsec in xsecs: 
-                print "%s %20s:  %5.2f fb" % ( xsec.info.label,xsec.pid,xsec.value/fb )
+                print "%s %20s:  %5.2f pb" % ( xsec.info.label,xsec.pid,xsec.value/pb )
         print
         sys.exit(0)
-    #if inputFile[-4:].lower() == ".lhe" or args.lhe:
-    #    if args.tofile:
-    #        logger.error("Compute LHE section, and add to file. TODO: I guess "
-    #                     "we do not need this case?")
-    #        sys.exit(0)
-    #    else:
-    #        logger.error("Compute LHE section, print out, but do not add to "
-    #                     "file. TODO: not yet implemented.")
-    #        sys.exit(0)
 

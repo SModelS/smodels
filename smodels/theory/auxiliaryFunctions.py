@@ -40,21 +40,27 @@ def _memoize(func):
 
 
 @_memoize
-def massPosition(mass, analysis):
+def massPosition(mass, txdata):
     """ Give mass position in upper limit space.    
-    Use the analysis experimental limit data.    
+    Use the analysis experimental limit data. 
+    :param txdata: TxNameData object holding the data and interpolation   
     """
-    xmass = analysis.getUpperLimitFor(mass)
+    xmass = txdata.getValueFor(mass)
     if type(xmass) != type(1.*pb):
         return None
     xmass = xmass / fb
-    return xmass
+    return xmass.asNumber()
 
 
 def distance(xmass1, xmass2):
     """
-    Define distance between two mass positions.
+    Define distance between two mass positions in upper limit space.
+    The distance is defined as d = 2*|xmass1-xmass2|/(xmass1+xmass2).
     
+    
+    :parameter xmass1: upper limit value (in fb) for the mass1
+    :parameter xmass2: upper limit value (in fb) for the mass2
+    :returns: relative mass distance in upper limit space     
     """
     if xmass1 is None or xmass2 is None:
         return None
@@ -74,8 +80,8 @@ def massAvg(massList, method='weighted', weights=None):
     switch method to harmonic.    
     If massList contains a zero mass, switch method to mean.
     
-    :param method: possible values: harmonic, mean, weighted
-    :param weights: weights of elements (only for weighted average)
+    :parameter method: possible values: harmonic, mean, weighted
+    :parameter weights: weights of elements (only for weighted average)
     
     """
     if not massList:

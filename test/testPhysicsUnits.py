@@ -14,7 +14,7 @@ class PhysicsUnitsTest(unittest.TestCase):
     def testXSecs(self):
         x1= 3000.0 * fb
         x2= 3.0 * pb
-        self.assertAlmostEqual(x1,x2)
+        self.assertAlmostEqual( x1.asNumber(fb),x2.asNumber(fb) )
     def testEnergies(self):
         d1= 7000.0 * GeV
         d2= 7.0 * TeV

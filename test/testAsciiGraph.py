@@ -28,7 +28,7 @@ class AsciiTest(unittest.TestCase):
         from smodels.theory import lheReader, lheDecomposer, crossSection
         from smodels.installation import installDirectory
 
-        filename = "%sinputFiles/lhe/T1_1.lhe" % (installDirectory() )
+        filename = "%sinputFiles/lhe/simplyGluino.lhe" % (installDirectory() )
         reader = lheReader.LheReader(filename)
         event = reader.next()
         element = lheDecomposer.elementFromEvent(event,

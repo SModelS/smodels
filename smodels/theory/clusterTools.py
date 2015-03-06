@@ -17,29 +17,27 @@ logger = logging.getLogger(__name__)
 
 class ElementCluster(object):
     """
-    An instance of this class represents a cluster.
-    
+    An instance of this class represents a cluster.    
     This class is used to store the relevant information about a cluster of
     elements and to manipulate this information.
     
+    :ivar elements: list of elements in the cluster (Element objects)    
     """
     def __init__(self):
         self.elements = []
 
-
     def __iter__(self):
         return iter(self.elements)
 
-
     def __getitem__(self, iel):
         return self.elements[iel]
-
 
     def getTotalXSec(self):
         """
         Return the sum over the cross-sections of all elements belonging to
         the cluster.
         
+        :returns: sum of weights of all the elements in the cluster (XSectionList object)
         """
         totxsec = crossSection.XSectionList()
         for el in self.elements:
@@ -49,10 +47,14 @@ class ElementCluster(object):
     def getAvgMass(self):
         """
         Return the average mass of all elements belonging to the cluster.
+        If the cluster does not refer to a TxName (i.e. in efficiency map results),
+        returns None.
         
-        :returns: average mass
-         
+        :returns: average mass array         
         """
+        
+        if self.txname is None: return None
+        
         massList = [el.getMasses() for el in self.elements]
         weights = [el.weight.getMaxXsec() / fb for el in self.elements]
         return massAvg(massList,weights=weights)
@@ -60,23 +62,27 @@ class ElementCluster(object):
 
 class IndexCluster(object):
     """
-    An instance of this class represents a cluster storing element indices.
-    
+    An instance of this class represents a cluster storing element indices.    
     This auxiliary class is used to store element indices and positions in
-    upper limit space. It is used by the clustering algorithm.
+    upper limit space. It is only used by the clustering algorithm.
     
+    :ivar indices: list of integers mapping the cluster elements to their position in the list
+                   (1st element -> index 0, 2nd element -> index 1,...)
+    :ivar avgPosition: position in upper limit space for the cluster average mass
+    :ivar massMap: dictionary with indices as keys and the corresponding element mass as values
+    :ivar positionMap: dictionary with indices as keys and the corresponding element position
+                        in upper limit space as values
+    :ivar weightMap: dictionary with indices as keys and the corresponding element weight
+                     as values
+    :ivar analysis: analysis to which the cluster applies (ULanalysis object)
     """
-    def __init__(self, massMap=None, posMap=None, wMap=None, indices=set([]),
-                 analysis=None):
+    def __init__(self, massMap=None, posMap=None, wMap=None, indices=set([]), txdata = None):
         self.indices = indices
         self.avgPosition = None
-        # Store the element mass list (for all elements)
         self.massMap = massMap
-        # Store the element mass position in upper limit space list (for all
-        # elements)
         self.positionMap = posMap
         self.weightMap = wMap
-        self.analysis = analysis
+        self.txdata = txdata
 
 
         if massMap and posMap and wMap and len(self.indices) > 0:
@@ -166,8 +172,8 @@ class IndexCluster(object):
         masses = [self.massMap[iel] for iel in self]
         weights = [self.weightMap[iel] for iel in self]
         clusterMass = massAvg(masses,weights=weights)
-        avgPos = massPosition(clusterMass, self.analysis)
-        return avgPos
+        avgPos = self.txdata.getValueFor(clusterMass)/fb
+        return avgPos.asNumber()
 
 
     def _getDistanceTo(self, obj):
@@ -219,30 +225,31 @@ def groupAll(elements):
     return cluster
 
 
-def clusterElements(elements, analysis, maxDist):
-    """ Cluster the original elements according to their mass distance.
-    
-    :returns: list of clusters; If keepMassInfo == True, saves the original
-              masses and their cluster value in massDict.
-    
+def clusterElements(elements, txdata, maxDist):
     """
-    # Get the list of elements with good masses (with the masses replaced by
-    # their 'good' value):
-    goodElements = _getGoodElements(elements, analysis, maxDist)
-    if len(goodElements) == 0:
-        return []
+    Cluster the original elements according to their mass distance.
+    
+    :parameter elements: list of elements (Element objects)
+    :parameter txdata: TxNameData object to be used for computing distances in UL space
+    
+    :returns: list of clusters (ElementCluster objects)    
+    """
+    if len(elements) == 0:  return []
     # ElementCluster elements by their mass:
-    clusters = _doCluster(goodElements, analysis, maxDist)
+    clusters = _doCluster(elements, txdata, maxDist)
     return clusters
 
 
-def _doCluster(elements, analysis, maxDist):
+def _doCluster(elements, txdata, maxDist):
     """
     Cluster algorithm to cluster elements.
     
-    :returns: a list of ElementCluster objects containing the elements
-    belonging to the cluster
+    :parameter elements: list of all elements to be clustered
+    :parameter txdata: TxNameData object to be used for computing distances in UL space
+    :parameter maxDist: maximum mass distance for clustering two elements
     
+    :returns: a list of ElementCluster objects containing the elements
+    belonging to the cluster    
     """
     # First build the element:mass, element:position in UL space
     # and element:maxWeight (in fb) dictionaries
@@ -253,7 +260,7 @@ def _doCluster(elements, analysis, maxDist):
     for iel, el in enumerate(elements):
         if not el.getMasses() in massMap.values():
             massMap[iel] = el.getMasses()
-            posMap[iel] = massPosition(massMap[iel], analysis)
+            posMap[iel] = massPosition(massMap[iel], txdata)
             weightMap[iel] = el.weight.getMaxXsec() / fb
         else:
             j = massMap.keys()[massMap.values().index(el.getMasses())] 
@@ -266,7 +273,7 @@ def _doCluster(elements, analysis, maxDist):
         for jel in posMap:            
             if distance(posMap[iel], posMap[jel]) <= maxDist:
                 indices.append(jel)        
-        indexCluster = IndexCluster(massMap, posMap, weightMap, set(indices), analysis)
+        indexCluster = IndexCluster(massMap, posMap, weightMap, set(indices),txdata)
         clusterList.append(indexCluster)
 
     #Split the maximal clusters until all elements inside each cluster are
@@ -306,7 +313,7 @@ def _doCluster(elements, analysis, maxDist):
     # Add clusters of individual masses (just to be safe)
     for iel in massMap:
         finalClusters.append(IndexCluster(massMap, posMap, weightMap,
-                                           set([iel]),analysis))
+                                           set([iel])))
 
     # Clean up clusters (remove redundant clusters)
     for ic, clusterA in enumerate(finalClusters):
@@ -331,38 +338,3 @@ def _doCluster(elements, analysis, maxDist):
         clusterList.append(cluster)
 
     return clusterList
-
-
-def _getGoodElements(elements, analysis, maxDist):
-    """
-    Get the list of good masses appearing elements according to the analysis
-    distance.
-    
-    :returns: list of elements with good masses with their masses replaced by
-    the branch average. A mass is good if the mass distance between the
-    branches is less than maxDist and if the element mass (or mass avg) falls
-    inside the upper limit plane.
-    
-    """
-    goodElements = []
-    for element in elements:
-        mass = element.getMasses()
-        goodmass = None
-        if mass[0] == mass[1]:
-            p=massPosition(mass, analysis)
-            if type(p)==type(fb):
-                goodmass = mass
-        else:
-            mass1 = [mass[0], mass[0]]
-            mass2 = [mass[1], mass[1]]
-            mP1 = massPosition(mass1, analysis)
-            mP2 = massPosition(mass2, analysis)
-            if type(mP1)==type(None) or type(mP2)==type(None):
-                continue
-            if distance(mP1, mP2) < maxDist:
-                goodmass = massAvg([mass1, mass2], method='harmonic')
-        if goodmass and type(massPosition(goodmass, analysis))==type(fb):
-            goodElements.append(element.copy())
-            goodElements[-1].setMasses(goodmass)
-
-    return goodElements

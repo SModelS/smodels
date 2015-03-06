@@ -16,11 +16,11 @@ from runSModelS import main
 class RunSModelSTest(unittest.TestCase):
     def testGoodFile(self):
 
-        filename = "%s/inputFiles/slha/T1_7TeV.slha" % (installDirectory() )
-        print "filename=",filename
+        filename = "%s/inputFiles/slha/lightSquarks.slha" % (installDirectory() )
+#        print "filename=",filename
         main(filename, 
-             parameterfile="%s/test/testParameters.ini" %installDirectory(), 
-             outputfile="%s/test/unitTestOutput.txt" %installDirectory())
+             parameterFile="%s/test/testParameters.ini" %installDirectory(), 
+             outputFile="%s/test/unitTestOutput.txt" %installDirectory())
         sample = summaryReader.Summary(
                 "%s/test/summary_default.txt" %installDirectory())
         outputfile = summaryReader.Summary(

@@ -4,6 +4,7 @@
 .. module:: theory.Topology
    :synopsis: Provides a Topology class and a TopologyList collection type.
 
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
 
 """
@@ -12,6 +13,7 @@ from smodels.theory import crossSection
 from smodels.theory.element import Element
 from smodels.theory.printer import Printer
 import logging
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -19,15 +21,18 @@ logger = logging.getLogger(__name__)
 class Topology(object):
     """
     An instance of this class represents a topology.
-
+    
+    :ivar vertnumb: list with number of vertices in each branch
+    :ivar verparts: list with number of final states in each branch
+    :ivar elementList: list of Element objects with this common topology
     """
     def __init__(self, elements=None):
         """
         Constructor.
-
         If elements is defined, create the topology from it. If elements it is
         a list, all elements must share a common global topology.
-
+        
+        :parameter elements: Element object or list of Element objects
         """
         self.vertnumb = []
         self.vertparts = []
@@ -44,7 +49,8 @@ class Topology(object):
         """
         Return string with numbers of particles per vertex, e.g.
         [1,0],[2,1,0]
-
+        
+        :returns: string with number of final states in each branch
         """
         ret=""
         for p in self.vertparts:
@@ -52,24 +58,39 @@ class Topology(object):
         return ret
 
     def __eq__(self, other):
+        """
+        Check if topologies are equal (same number of vertices and final states)
+        
+        :parameter other: topology to be compared (Topology object)
+        :returns: True if topologies are equal; False otherwise.
+        """
+
         return self.isEqual(other)
 
 
     def __ne__(self, other):
+        """
+        Check if topologies are different (different number of vertices or final states)
+        
+        :parameter other: topology to be compared (Topology object)
+        :returns: False if topologies are equal; True otherwise.
+        """
+
         return not self.isEqual(other)
 
 
     def isEqual(self, other, order=False):
         """
-        Check for equality of two topologies.
+        Compare two topologies. Two topologies are equal if 
+        they have the same number of vertices and final states (in each vertex).
 
-        If order == False and each topology has two branches, ignore branch
-        ordering.
-
-        :returns: True, if both topologies have the same number of vertices and
-                  particles.
-
+        :parameter other: topology to be compared (Topology object)
+        :parameter order: if False, compare the two possible branch orderings.
+                          If True, compare the two topologies assuming the same
+                          branch ordering.
+        :returns: True, if both topologies equal; False, otherwise
         """
+        
         if type(self) != type(other):
             return False
         if order or len(self.vertnumb) != 2 or len(other.vertnumb) != 2:
@@ -92,22 +113,20 @@ class Topology(object):
 
     def checkConsistency(self):
         """
-        Perform a consistency check.
-
-        The number of vertices and insertions per vertex is redundant
-        information in a topology, so we can perform an internal consistency
-        check.
-
+        Check if the all the elements in elementList are
+        consistent with the topology (same number of vertices and final states)
+        
+        :returns: True if all the elements are consistent. Print error message
+                  and exits otherwise.
         """
+
         for element in self.elementList:
             info = element.getEinfo()
             if self.vertnumb != info["vertnumb"]:
                 logger.error("Inconsistent topology.")
-                import sys
                 sys.exit()
             if self.vertparts != info["vertparts"]:
                 logger.error("Inconsistent topology.")
-                import sys
                 sys.exit()
         logger.info("Consistent topology.")
         return True
@@ -117,6 +136,7 @@ class Topology(object):
         """
         Create a detailed description of the topology.
 
+        :returns: list of strings with a description of the topology
         """
         ret = ("number of vertices: %s, number of vertex particles: %s, "
                "number of elements: %d" % \
@@ -128,6 +148,7 @@ class Topology(object):
         """
         Get list of elements of the topology.
 
+        :return: elementList (list of Element objects)
         """
         return self.elementList
 
@@ -138,9 +159,12 @@ class Topology(object):
 
         For all the pre-existing elements, which match the new element, add
         weight. If no pre-existing elements match the new one, add it to the
-        list. If order == False, try both branch orderings.
-
+        list. When comparing elements, try both branch orderings.
+        
+        :parameter newelement: element to be added (Element object)
+        :returns: True, if the element was added. False, otherwise
         """
+        
         # If the topology info has not been set yet, set it using the element
         # info
         if not self.vertparts:
@@ -197,6 +221,7 @@ class Topology(object):
         """
         Return a dictionary with the topology number of vertices and vertparts.
 
+        :returns: dictionary with topology information
         """
         return {'vertnumb' : self.vertnumb, 'vertparts' : self.vertparts}
 
@@ -204,7 +229,8 @@ class Topology(object):
     def getTotalWeight(self):
         """
         Return the sum of all elements weights.
-
+        
+        :returns: sum of weights of all elements (XSection object)
         """
         if len(self.elementList) == 0:
             return None
@@ -219,13 +245,14 @@ class Topology(object):
 class TopologyList(Printer):
     """
     An instance of this class represents an iterable collection of topologies.
-
+    
+    :ivar topos: list of topologies (Topology objects)
     """
     def __init__(self, topologies=[]):
         """
         Add topologies sequentially, if provided.
-
         """
+        
         super(TopologyList, self).__init__()
         self.topos = []
         for topo in topologies:
@@ -280,7 +307,6 @@ class TopologyList(Printer):
         new topology and all its elements.
 
         :type topo: Topology
-
         """
         topmatch = False
         for itopo, topo in enumerate(self.topos):
@@ -318,10 +344,12 @@ class TopologyList(Printer):
         return elements
 
 
-    def formatData(self):
+    def formatData(self,outputLevel):
         """
         Select data preparation method through dynamic binding.
+        :param outputLevel: general control for the output depth to be printed 
+                            (0 = no output, 1 = basic output, 2 = detailed output,...
 
         """
-        return Printer.formatTopologyListData(self)
+        return Printer.formatTopologyListData(self,outputLevel)
 

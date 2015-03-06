@@ -13,9 +13,10 @@ old/
 smodels.log
 summary.txt
 pythia_lhe
-recipes/recipe*.py
-recipes/recipe*.html
+recipes/*.py
+recipes/*.html
 recipes/.ipynb_checkpoints
+recipes/tmp.slha
 lib/nllfast/nllfast-1.2/nllfast_7TeV
 lib/nllfast/nllfast-2.1/nllfast_8TeV
 lib/nllfast/nllfast-3.0/nllfast_13TeV

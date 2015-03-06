@@ -1,0 +1,17 @@
+Some Basic Info about the development stage of the new Browser and database
+-----------------------------------------------------------------------------
+
+
+The new smodels.experiment folder assumes the following data structure in sms.py:
+
+
+sms.py:
+Dict['TChiWZ']= [  [[massList1,massList2],UL],  [[massList1,massList2],UL], [[massList1,massList2],UL]...]
+...
+
+where [massList1,massList2] = massArray for the whole element (massList1 = masses for Branch1, massList2 = masses for Branch2)
+
+*Right now Example.py and the smodels.theory folder is being adapted to the new format. But since we do not have the new database in place,
+it can not be tested.
+
+*The code for dealing with summary plots and validation is not developed at all.

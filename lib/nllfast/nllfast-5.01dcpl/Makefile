@@ -1,10 +1,13 @@
-all: compile
+FCC=gfortran
+PROGRAM=nllfast_33TeV
 
-tarball:
-	tar czvf nllfast33.tar.gz nllfast-5.01dcpl.f *.grid Makefile
+all: $(PROGRAM) gg.out sb.out sg.out ss.out st.out gdcpl.out sdcpl.out
 
-compile:
-	gfortran -o nllfast_33TeV nllfast-5.01dcpl-33TeV.f
+$(PROGRAM):
+	$(FCC) -o $(PROGRAM) nllfast-*.f
+%.out:
+	touch $@
+	chmod 666 $@
 
 clean:
-	rm -f nllfast_33TeV
+	rm -f $(PROGRAM) *.out

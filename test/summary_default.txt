@@ -1,27 +1,36 @@
-SLHA status: -2
+Input status: 1
 Decomposition output status: 1 #decomposition was successful
-Database version: validation
-#Warnings:
-#Missing decay block for PIDs, 1000001, 2000001, 1000002, 2000002, 1000003, 2000003, 1000004, 2000004, 1000023, 1000025, 1000035, 1000024, 1000037.
-#Empty decay block for PIDs, 1000006, 2000006, 1000005, 2000005, 1000011, 2000011, 1000013, 2000013, 1000015, 2000015, 1000012, 1000014, 1000016.
-
+#Input File: ../inputFiles/slha/lightSquarks.slha
+#maxcond = 0.2
+#minmassgap = 5.
+#sigmacut = 0.03
+#Database version: unittest
 ================================================================================
-Input file: $HOME/smodels/inputFiles/slha/T1_7TeV.slha
-Sigmacut: 3.00E-02 [fb]
-Minmassgap: 5.00E+00 [GeV]
-Maxcond: 0.2
-LSP PID, mass: (1000022, 2.50E+02 [GeV])
-NLSP PID, mass: (1000021, 6.75E+02 [GeV])
-================================================================================
-#Analysis  Topology  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r
+#Analysis  Tx_Name  Sqrts  Cond. Violation  Theory_Value(fb)  Exp_limit(fb)  r
 
-           SUS12011               T1 7.00E+00    0.0  2.957E+02  1.151E+02  2.568E+00
+           SUS12028               T2 8.00E+00    0.0  1.773E+00  1.636E+01  1.084E-01
+#[[['jet']],[['jet']]]
+--------------------------------------------------------------------------------
+           SUS13006           TChiWZ 8.00E+00    0.0  1.847E+01  4.443E+02  4.157E-02
+#[[['W']],[['Z']]]
+--------------------------------------------------------------------------------
+           SUS12028               T1 8.00E+00    0.0  3.917E-01  3.144E+01  1.246E-02
 #[[['jet','jet']],[['jet','jet']]]
 
  
 ================================================================================
-The highest R value is r_ratio = 2.57E+00 
+The highest R value is r_ratio = 1.08E-01 
 
 ================================================================================
-Missing topologies with high cross sections:
-Sqrts (TeV)   Weight (fb)        Topology description
+Missing topologies with the highest cross-sections (up to 10):
+Sqrts (TeV)   Weight (fb)        Element description
+8.00E+00   9.588E+01    #                             [[[W]],[[higgs]]]
+8.00E+00   5.958E+01    #                                 [[[W]],[[W]]]
+8.00E+00   1.567E+01    #                 [[[jet],[W]],[[jet,jet],[W]]]
+8.00E+00   1.395E+01    #       [[[jet],[jet,jet],[W]],[[jet,jet],[W]]]
+8.00E+00   9.069E+00    #             [[[jet,jet],[W]],[[jet,jet],[W]]]
+8.00E+00   8.925E+00    #                     [[[jet]],[[jet,jet],[W]]]
+8.00E+00   7.608E+00    #         [[[jet,jet],[W]],[[jet,jet],[higgs]]]
+8.00E+00   7.087E+00    #           [[[jet],[W]],[[jet],[jet,jet],[W]]]
+8.00E+00   6.617E+00    #                     [[[jet],[W]],[[jet],[W]]]
+8.00E+00   6.336E+00    #             [[[jet],[W]],[[jet,jet],[higgs]]]
