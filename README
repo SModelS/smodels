@@ -1,14 +1,87 @@
-SModelS v1
-==========
+============
+SModelS v1.0
+============
 
 
 Installation
--------------
-* For installation instructions see INSTALL.
+============
+
+SModelS is a Python library that requires Python version 2.6 or later 
+(but not version 3) with setuptools installed. Internally, SModelS uses the following tools:
+
+ * Pythia 6.4.27
+ * NLL-fast 1.2 (7 TeV) and 2.1 (8 TeV)
+ * PySLHA (modified version)
+
+These tools are built into SModelS, they need not be installed separately. 
+In addition to setuptools, SModelS depends on the following *external* Python libraries:
+
+ * unum
+ * numpy
+ * argparse
+ * docutils>=0.3
+ * scipy>=0.9.0
+
+For installation, SModelS makes use of Python's *setuptools*.
+Thus ::
+  python setup.py install 
+
+should install the entire project, compile the internal Pythia and NLL-fast versions
+using gfortran. It should also resolve the external dependencies, i.e. install
+the Python libraries listed above using e.g. *pip*.
+If the python libraries are installed in a system folder (as is the default behavior),
+it will be necessary to run the install command with superuser privilege.
+
+
+In case the compilation of SModelS fails, it is advised to try to compile
+the tools manually, by issuing "make" in the *lib/* directory.
+In case the installation of the external libraries fails, you can also try to install
+them manually, then rerun setup.py.  For SL6 machines, a recipe is given below.
+
+There is also a diagnostic tool available: ::
+
+   python smodels/tools/toolBox.py 
+
+should list and check all internal tools (Pythia and NLL-fast) and external
+(numpy, scipy, unum, ... ) dependencies.
+
+In case everything fails, please contact smodels-users@lists.oeaw.ac.at
+
+
+Installation on SL6
+-------------------
+
+Installation on an SL6 (Scientific Linux 6 or Scientific Linux CERN 6) machine
+is tricky, because SModelS requires a more recent version of *scipy* than is provided by SL6. 
+SModelS can be installed on SL6 by doing:
+
+ * yum install gcc-c++ libstdc++-devel libevent-devel python-devel lapack lapack-devel blas blas-devel libgfortran python-distutils-extra
+
+followed by:
+
+ * pip install nose unum argparse
+ * pip install numpy
+ * pip install pymc
+ * export LC_ALL=C; export LANG=C; pip install scipy
+
+Note, that these steps can safely be done within a Python ``virtualenv``.
+
+                                                                                      
+Installation on SL5 and similar distributions                                         
+---------------------------------------------                                         
+                                                                                      
+In some distributions like SL5, the python default version may be smaller than
+2.6.  In these cases, ``virtualenv`` has to be set up for a python version >=
+2.6.  E.g. for python 2.6, do ``virtualenv --python=python2.6 <envname>``, and
+modify by hand the first line in the executable from ``#!/usr/bin/env python``
+to ``#!/usr/bin/env python2.6``.  
+Then perform the steps listed under ``Installation on SL6``.  
+
 
 
 Running SModelS
----------------
+===============
+
 SModelS provides a command-line tool (runSModelS.py) for the basic functionalities,
 which can be executed as:
 
@@ -23,14 +96,19 @@ Python code can be found in Example.py.
 
 Detailed explanations on how to use SModelS, including explanations of the
 output, can be found in the section ``Running SModelS'' of the SModelS manual
-(docs/index.html).
+(docs/Manual.html).
+
+A few example input files are provided in the inputFiles folder and can be
+used to test runSModelS.py.
 
 
 Citation
---------
-If you use this software please cite:
+========
 
-- "SModelS: A tool for interpreting simplified-model results from the LHC", Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Wolfgang Magerl, Doris Proschofsky, Wolfgang Waltenberger, arXiv:1312.4175 EPJC May 2014, 74:2868
-- PySLHA arXiv:1305.4194
-- Pythia6 manual JHEP 05 (2006) 026 (LU TP 06-13, FERMILAB-PUB-06-052-CD-T, hep-ph/0603175) 
-- NLL-fast W. Beenakker, S. Brensing, M. Krämer, A. Kulesza, E. Laenen, L. Motyka, I. Niessen, Int. J. Mod. Phys. A26 (2011) 2637-2664 
+If you use this software please cite SModelS v1.0 as well as the programs 
+it makes use of (Pythia6.4, NLL-fast and PySLHA). For convenience, the relevant 
+citations are provided in bibtex format in references.bib. 
+
+For citing the experimental analyses in the database, you can use smodels-database/database.bib 
+
+

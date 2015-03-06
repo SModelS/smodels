@@ -1,0 +1,27 @@
+sqrts: 8.0*TeV
+lumi: 19.5/fb
+id: CMS-SUS-13-006
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13006
+arxiv: http://arxiv.org/abs/1405.7570
+publication: http://link.springer.com/article/10.1140%2Fepjc%2Fs10052-014-3036-7
+supersedes: CMS-PAS-SUS-12-022
+digitaldata: True
+constraint: TChiWZ -> [[['W']],[['Z']]]
+constraint: TSlepSlep -> [[['e+']],[['e-']]]+[[['mu+']],[['mu-']]]
+constraint: TChiWZoff -> 71.*([[['mu+','mu-']],[['l','nu']]] + [[['e+','e-']],[['l','nu']]])
+constraint: TChiWH -> [[['W']],[['higgs']]]
+constraint: TChiChipmSlepL -> 2.*([[['L'],['L']],[['L'],['nu']]] + [[['L'],['L']],[['nu'],['L']]])
+constraint: TChiChipmSlepStau -> [[['L'],['L']],[['nu'],['ta']]]
+fuzzycondition: TChiWZ -> None
+fuzzycondition: TSlepSlep -> Cgtr([[['mu+']],[['mu-']]],[[['e+']],[['e-']]])
+fuzzycondition: TChiWZoff -> Cgtr([[['mu+','mu-']],[['l','nu']]],[[['e+','e-']],[['l','nu']]])
+fuzzycondition: TChiWH -> None
+fuzzycondition: TChiChipmSlepL -> Csim([[['L'],['L']],[['L'],['nu']]],[[['L'],['L']],[['nu'],['L']]]); Cgtr([[['L'],['L']],[['nu'],['L']]],3.*[[['ta'],['ta']],[['nu'],['L']]]); Cgtr([[['L'],['L']],[['L'],['nu']]],3.*[[['ta'],['ta']],[['L'],['nu']]]); Cgtr([[['L'],['L']],[['nu'],['L']]],3.*[[['L'],['L']],[['nu'],['ta']]]); Cgtr([[['L'],['L']],[['L'],['nu']]],3.*[[['L'],['L']],[['ta'],['nu']]]);Cgtr([[['L'],['L']],[['nu'],['L']]],3.*[[['e'],['e']],[['nu'],['L']]]); Cgtr([[['L'],['L']],[['L'],['nu']]],3.*[[['e'],['e']],[['L'],['nu']]]); Cgtr([[['L'],['L']],[['nu'],['L']]],3.*[[['L'],['L']],[['nu'],['e']]]); Cgtr([[['L'],['L']],[['L'],['nu']]],3.*[[['L'],['L']],[['e'],['nu']]])
+fuzzycondition: TChiChipmSlepStau -> Cgtr([[['L'],['L']],[['nu'],['ta']]],3.*[[['ta'],['ta']],[['nu'],['ta']]]);Cgtr([[['L'],['L']],[['nu'],['ta']]],3.*[[['e'],['e']],[['nu'],['ta']]])
+axes: TChiWZ: M1 M0, TSlepSlep: M1 M0, TChiChipmSlepL: M1 M0 050 -  M1 M0 005 - M1 M0 095, TChiChipmSlepStau:  M1 M0 050 - M1 M0 005 - M1 M0 095,TChiWZoff: M1 M0, TChiWH: M1 M0
+masscondition: TChiWZ -> equal branches
+masscondition: TSlepSlep -> equal branches
+masscondition: TChiChipmSlepStau -> equal branches
+masscondition: TChiWH -> equal branches
+masscondition: TChiChipmSlepL -> equal branches
+masscondition: TChiWZoff -> equal branches

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: externalTool
+.. module:: tools.externalTool
    :synopsis: Wrapper code for external tools: base class
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>

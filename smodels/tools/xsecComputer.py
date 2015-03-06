@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: xsecComputer
+.. module:: tools.xsecComputer
    :synopsis: Computation of reference ("theory") production cross sections.
 
 .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>

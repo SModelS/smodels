@@ -335,7 +335,7 @@ class Element(Printer):
                         sys.exit()
         return True
 
-
+    
     def compressElement(self, doCompress, doInvisible, minmassgap):
         """
         Keep compressing the original element and the derived ones till they
@@ -376,7 +376,6 @@ class Element(Printer):
         newElements.pop(0)  # Remove original element
         return newElements
 
-
     def massCompress(self, minmassgap):
         """
         Perform mass compression.
@@ -387,33 +386,33 @@ class Element(Printer):
         :returns: compressed copy of the element, if two masses in this
                   element are degenerate; None, if compression is not possible;        
         """
-        newelement = self.copy()
-        newelement.motherElements = [ ("mass", self.copy()) ]
-
-        vertnumb = self.getEinfo()["vertnumb"]
-        # Nothing to be compressed
-        if max(vertnumb) < 2:
-            return None
-        # Loop over branches
-        for ib, branch in enumerate(self.branches):
-            if vertnumb[ib] < 2:
-                continue
-            masses = branch.masses
-            for ivertex in range(vertnumb[ib] - 1):
-                if abs(masses[ivertex] - masses[ivertex + 1]) < minmassgap:
-                    newelement.branches[ib].particles[ivertex] = None
-                    newelement.branches[ib].masses[ivertex] = None
-            while newelement.branches[ib].particles.count(None) > 0:
-                iNone = newelement.branches[ib].particles.index(None)
-                newelement.branches[ib].particles.pop(iNone)
-                newelement.branches[ib].masses.pop(iNone)
-
-
-        if newelement.isEqual(self):
-            return None
+        
+        masses = self.getMasses()
+        massDiffs = []
+        #Compute mass differences in each branch
+        for massbr in masses:
+            massDiffs.append([massbr[i]-massbr[i+1] for i in range(len(massbr)-1)])
+        #Compute list of vertices to be compressed in each branch            
+        compVertices = []
+        for ibr,massbr in enumerate(massDiffs):
+            compVertices.append([])
+            for iv,massD in enumerate(massbr):            
+                if massD < minmassgap: compVertices[ibr].append(iv)
+        if not sum(compVertices,[]): return None #Nothing to be compressed
         else:
-            return newelement
+            newelement = self.copy()
+            newelement.motherElements = [ ("mass", self.copy()) ]
+            for ibr,compbr in enumerate(compVertices):
+                if compbr:            
+                    new_branch = newelement.branches[ibr]
+                    ncomp = 0
+                    for iv in compbr:
+                        new_branch.masses.pop(iv-ncomp)
+                        new_branch.particles.pop(iv-ncomp)
+                        ncomp +=1
 
+        return newelement
+    
 
     def hasTopInList(self, elementList):
         """

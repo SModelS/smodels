@@ -28,7 +28,8 @@ class TheoryPrediction(object):
     :ivar conditions: list of values for the analysis conditions
                       (only for upper limit-type analysis, e.g. analysis=ULanalysis)
     :ivar mass: mass of the cluster to which the theory prediction refers to
-                (only for upper limit-type analysis, e.g. analysis=ULanalysis)    
+                (only for upper limit-type analysis, e.g. analysis=ULanalysis)   
+                 
     """
     def __init__(self):
         self.analysis = None
@@ -41,6 +42,7 @@ class TheoryPrediction(object):
         Returns the maximum value from the list conditions
         
         :returns: maximum condition value (float)
+        
         """
             
         maxcond = 0.
@@ -55,7 +57,8 @@ class TheoryPredictionList(Printer):
     An instance of this class represents a collection of theory prediction
     objects.
     
-    :ivar _theoryPredictions: list of TheoryPrediction objects    
+    :ivar _theoryPredictions: list of TheoryPrediction objects   
+     
     """
     def __init__(self, theoryPredictions=None):
         """
@@ -65,8 +68,7 @@ class TheoryPredictionList(Printer):
         """        
         self._theoryPredictions = []
         if theoryPredictions and isinstance(theoryPredictions,list):
-            self._theoryPredictions =theoryPredictions
-        
+            self._theoryPredictions = theoryPredictions
 
 
     def __iter__(self):      
@@ -86,8 +88,9 @@ class TheoryPredictionList(Printer):
     def formatData(self,outputLevel):
         """
         Select data preparation method through dynamic binding.
+        
         :param outputLevel: general control for the output depth to be printed 
-                            (0 = no output, 1 = basic output, 2 = detailed output,...
+           (0 = no output, 1 = basic output, 2 = detailed output,...
         
         """
         return Printer.formatTheoryPredictionData(self,outputLevel)
@@ -210,6 +213,7 @@ def _getElementsFrom(smsTopList, dataset):
     :parameter dataset:  Data Set to be considered (DataSet object)
     :parameter smsTopList: list of topologies containing elements (TopologyList object)
     :returns: list of elements (Element objects)
+    
     """
     
     elements = []
@@ -233,6 +237,7 @@ def _combineElements(elements, dataset, maxDist):
     :parameter elements: list of elements (Element objects)
     :parameter expResult: Data Set to be considered (DataSet object)
     :returns: list of element clusters (ElementCluster objects)
+    
     """
     
     clusters = []
@@ -267,8 +272,8 @@ def _evalConstraint(cluster):
     
     :parameter cluster: cluster of elements (ElementCluster object)
     :returns: cluster cross-section
-    """    
-    
+    """
+
     if cluster.txname is None:
         return cluster.getTotalXSec()
     elif cluster.txname.txnameData.type == 'upperLimits':
@@ -290,8 +295,8 @@ def _evalConditions(cluster):
     
     :parameter cluster: cluster of elements (ElementCluster object)    
     :returns: list of condition values (floats) if analysis type == upper limit. None, otherwise.    
-    """    
-    
+    """
+
     if cluster.txname is None:
         return None
     elif cluster.txname.txnameData.type == 'upperLimits':
@@ -327,6 +332,7 @@ def _evalExpression(stringExpr,cluster):
     :parameter stringExpr: string containing the expression to be evaluated
     :parameter cluster: cluster of elements (ElementCluster object)
     :returns: value for the expression. Can be a XSectionList object, a float or not numerical (None,string,...)
+    
     """
 
 #Generate elements appearing in the string expression with zero cross-sections:

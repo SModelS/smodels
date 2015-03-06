@@ -1,13 +1,17 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+
 """
 .. module:: Example
    :synopsis: Basic main file example for using SModelS.
+   
+   This file must be run under the installation folder.
 
 """
 
-#Import basic functions (this file must be run under the installation folder)
-from __future__ import print_function
+""" Import basic functions (this file must be executed in the installation folder) """
+
 import sys
 from smodels.theory import slhaDecomposer
 from smodels.theory import lheDecomposer
@@ -35,9 +39,9 @@ def main():
     sigmacut = 0.3 * fb
     mingap = 5. * GeV
 
-    #Decompose model (use slhaDecomposer for SLHA input or lheDecomposer for LHE input):
-    smstoplist = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=True,doInvisible=True, minmassgap=mingap)
-#     smstoplist = lheDecomposer.decompose(lhefile, doCompress=True,doInvisible=True, minmassgap=mingap)
+    """ Decompose model (use slhaDecomposer for SLHA input or lheDecomposer for LHE input) """
+    smstoplist = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
+    # smstoplist = lheDecomposer.decompose(lhefile, doCompress=True,doInvisible=True, minmassgap=mingap)
 
     # Print decomposition summary. Set outputLevel=0 (no output), 1 (simple output), 2 (extended output)
     smstoplist.printout(outputLevel=0)
@@ -73,4 +77,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    sys.exit()
