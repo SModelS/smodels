@@ -25,7 +25,7 @@ LO= 0  ## simple variables used to increase readability the perturbation order
 NLO=1
 NLL=2
 
-def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loFromSlha=None ):
+def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loFromSlha=None, pythiacard=None ):
     """
     Run pythia and compute SUSY cross-sections for the input SLHA file.
 
@@ -43,6 +43,7 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
 
     :param loFromSlha: If True, uses the LO xsecs from the SLHA file to compute the
                        higher order xsecs
+    :param pythiaCard: Optional path to pythia.card. If None, uses /etc/pythia.card
 
     :returns: XSectionList object
 
@@ -80,7 +81,7 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
             if xsec.info.order == 0: loXsecs.add(xsec)
     else:
         if not lhefile or not os.path.isfile(lhefile):
-            lheFile = runPythia(slhafile, nevts, sqrts / TeV, lhefile, unlink=unlink)
+            lheFile = runPythia(slhafile, nevts, sqrts / TeV, lhefile, unlink=unlink,pythiacard=pythiacard)
         else:
             lheFile = open(lhefile, 'r')
         loXsecs = crossSection.getXsecFromLHEFile(lheFile)
@@ -202,7 +203,7 @@ def xsecToBlock(xsec, inPDGs=(2212, 2212), comment=None, xsecUnit = pb):
     return "\n" + header + "\n" + entry
 
 
-def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True ):
+def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True, pythiacard=None ):
     """
     Execute pythia_lhe with n events, at sqrt(s)=sqrts.
 
@@ -212,11 +213,15 @@ def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True ):
     :param lhefile: option to write LHE output to file; ff None, do not write
                     output to disk.
     :param unlink: Clean up temp directory after running pythia
+    :param pythiaCard: Optional path to pythia.card. If None, uses /etc/pythia.card
+    
     :returns: file object with the LHE events
 
     """
     box = toolBox.ToolBox()
     tool = box.get("pythia6")
+    #Change pythia card, if defined:
+    if pythiacard: tool.cfgfile = pythiacard
     # Check if template config file exists
     tool.reset()
     tool.replaceInCfgFile({"NEVENTS": nevts, "SQRTS":1000 * sqrts})
