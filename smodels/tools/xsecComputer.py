@@ -124,6 +124,7 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
                 break
     if maxOrder > 0 and len(xsecs) == 0:
         logger.warning("No NLO or NLL cross-sections available.")
+        
     return xsecs
 
 
@@ -137,6 +138,7 @@ def addXSecToFile(xsecs, slhafile, comment=None, complain=True):
     :param complain: complain if there are already cross sections in file
     
     """
+    
     if not os.path.isfile(slhafile):
         logger.error("SLHA file not found.")
         import sys
@@ -285,7 +287,7 @@ def main(args):
             xsecs = computeXSec(ss, order, args.nevents, inputFile, \
                         unlink=(not args.keep) )
             for xsec in xsecs: 
-                print "%s %20s:  %5.2f pb" % ( xsec.info.label,xsec.pid,xsec.value/pb )
+                print "%s %20s:  %.3e pb" % ( xsec.info.label,xsec.pid,xsec.value/pb )
         print
         sys.exit(0)
 
