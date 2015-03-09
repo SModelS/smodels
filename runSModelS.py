@@ -11,9 +11,9 @@ import argparse
 from ConfigParser import SafeConfigParser
 from smodels.tools.physicsUnits import GeV, fb
 from smodels.tools import ioObjects, missingTopologies
-from smodels.experiment import smsHelpers, smsAnalysisFactory
+from smodels.experiment.databaseObjects import DataBase
 from smodels.theory import slhaDecomposer, lheDecomposer
-from smodels.theory.theoryPrediction import theoryPredictionFor
+from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.installation import installDirectory
 log = logging.getLogger(__name__)
 
@@ -59,10 +59,11 @@ def main(inputFile, parameterFile, outputFile):
 
     """ Check database location """
     try:
-        smsHelpers.base = parser.get("path", "databasePath")
-        databaseVersion = smsHelpers.databaseVersion()
+        databasePath = parser.get("path", "databasePath")
+        database = DataBase(databasePath)
+        databaseVersion = database.databaseVersion
     except:
-        log.error("Database not found in %s" % os.path.realpath(smsHelpers.base))
+        log.error("Database not found in %s" % os.path.realpath(databasePath))
         databaseVersion = None
         return
 
@@ -106,23 +107,16 @@ def main(inputFile, parameterFile, outputFile):
     """
     
     """ In case that a list of analyses or txnames are given, retrieve list """
-    analyses = parser.get("database", "analyses")
-    if "," in analyses:
-        analyses = analyses.split(",")
-    txnames = parser.get("database", "txnames")
-    if "," in txnames:
-        txnames = txnames.split(",")
+    analyses = parser.get("database", "analyses").split(",")
+    txnames = parser.get("database", "txnames").split(",")
     
-    """ Load analyses """
-    listofanalyses = smsAnalysisFactory.load(analyses, txnames)
+    """ Load analyses """    
+    listOfExpRes = database.getExpResults(analysisIDs=analyses,txnames=txnames) 
 
     """ Print list of analyses loaded """
     if parser.getboolean("stdout", "printAnalyses"):
-        outLevel = 1
-        outLevel += parser.getboolean("stdout", "addAnaInfo")
         print("=======================\n == List of Analyses   ====\n ================")
-        for analysis in listofanalyses:
-            analysis.printout(outputLevel=outLevel)
+        for expResult in listOfExpRes: print(expResult)
 
 
     """
@@ -136,10 +130,10 @@ def main(inputFile, parameterFile, outputFile):
                                    describeTopo=parser.getboolean("file", "addConstraintInfo"))
 
     """ Get theory prediction for each analysis and print basic output """
-    for analysis in listofanalyses:
-        theorypredictions = theoryPredictionFor(analysis, smstoplist)
-        if not theorypredictions:
-            continue
+    for expResult in listOfExpRes:
+        theorypredictions = theoryPredictionsFor(expResult, smstoplist)
+        if not theorypredictions: continue
+        print(expResult)
         if parser.getboolean("stdout", "printResults"):
             print "================================================================================"
             theorypredictions.printout()
@@ -166,7 +160,7 @@ def main(inputFile, parameterFile, outputFile):
     if parser.getboolean("options", "findMissingTopos"):
         """ Look for missing topologies, add them to the output file """
         missingtopos = missingTopologies.MissingTopoList(sqrts)
-        missingtopos.findMissingTopos(smstoplist, listofanalyses, minmassgap, parser.getboolean("options", "doCompress"),
+        missingtopos.findMissingTopos(smstoplist, listOfExpRes, minmassgap, parser.getboolean("options", "doCompress"),
                          doInvisible=parser.getboolean("options", "doInvisible"))
         missingtopos.printout("file", outputFile)
 
