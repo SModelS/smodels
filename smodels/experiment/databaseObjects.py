@@ -242,7 +242,6 @@ class DataBase(object):
         self._verbosity = 'error'
         self._databaseVersion = self._getDatabaseVersion
         self.expResultList = self._loadExpResults()
-        
 
     @property
     def databaseVersion(self):

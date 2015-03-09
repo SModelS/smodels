@@ -31,7 +31,7 @@ def main():
 
     #Path to input file name (either a SLHA or LHE file)
 #     slhafile = 'inputFiles/slha/gluino_squarks.slha'
-    slhafile = 'inputFiles/slha/lightEWinos.slha'    
+    slhafile = 'inputFiles/slha/lightEWinos.slha'
 #     slhafile = 'inputFiles/slha/compression.slha'
 #     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
 
