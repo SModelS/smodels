@@ -221,7 +221,9 @@ def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True, pythiacard=None
     box = toolBox.ToolBox()
     tool = box.get("pythia6")
     #Change pythia card, if defined:
-    if pythiacard: tool.cfgfile = pythiacard
+    if pythiacard:
+        pythiacard_default = tool.cfgfile
+        tool.cfgfile = pythiacard
     # Check if template config file exists
     tool.reset()
     tool.replaceInCfgFile({"NEVENTS": nevts, "SQRTS":1000 * sqrts})
@@ -232,8 +234,11 @@ def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True, pythiacard=None
     lhedata = tool.run(slhafile, do_unlink=unlink )
     if not "<LesHouchesEvents" in lhedata:
         logger.error("LHE events not found in pythia output")
-        import sys
         sys.exit()
+
+    #Reset pythia card to its default value
+    if pythiacard:
+        tool.cfgfile = pythiacard_default
 
     # Generate file object with lhe events
     if lhefile:
