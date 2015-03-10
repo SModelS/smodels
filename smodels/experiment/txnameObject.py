@@ -69,9 +69,15 @@ class TxName(object):
                 continue
         
         #Builds up a list of _elements appearing in constraints:        
-        if hasattr(self,'constraint'):
+        if hasattr(self,'constraint'):             
             self._elements = [Element(el) for el in elementsInStr(self.constraint)]
-
+        if hasattr(self,'fuzzycondition') and self.fuzzycondition:
+            conds = self.fuzzycondition
+            if not isinstance(conds,list): conds = [conds]
+            for cond in conds:                
+                for el in elementsInStr(cond):
+                    if not el in self._elements: self._elements.append(Element(el))
+        
     def __str__(self):
         return self.txname
         
@@ -120,7 +126,7 @@ class TxName(object):
         
         if self.txnameData.type == 'upperLimits':
             for el in self._elements:                
-                if element.particlesMatch(el):                    
+                if element.particlesMatch(el):                                        
                     ul = self.txnameData.getValueFor(element.getMasses())
                     if type(ul) == type(fb): return 1.
             return 0.
@@ -295,5 +301,3 @@ class TxNameData(object):
         for i in Mp:
             MpCut.append ( i[:self.dimensionality].tolist() )
         self.Mp=MpCut ## also keep the rotated points, with truncated zeros
-        
-        

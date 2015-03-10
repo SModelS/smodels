@@ -145,6 +145,8 @@ class Element(Printer):
         :parameter useDict: if True, allow for inclusive particle labels.
         :returns: True, if particles match; False, else;        
         """
+        
+        
         if type(self) != type(other):
             return False
         ptcs = self.getParticles()
