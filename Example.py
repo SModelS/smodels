@@ -44,7 +44,7 @@ def main():
     # smstoplist = lheDecomposer.decompose(lhefile, doCompress=True,doInvisible=True, minmassgap=mingap)
 
     # Print decomposition summary. Set outputLevel=0 (no output), 1 (simple output), 2 (extended output)
-    smstoplist.printout(outputLevel=0)
+    smstoplist.printout(outputLevel=2)
 
     # Load all analyses from database
     listOfExpRes = database.getExpResults(datasetIDs=[None])
