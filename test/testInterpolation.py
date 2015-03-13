@@ -45,12 +45,13 @@ class InterpolationTest(unittest.TestCase):
         expRes = self.database.getExpResults(analysisIDs=["ATLAS-SUSY-2013-05"], txnames=["T2bb" ] )
         # expRes=listOfExpRes[0]   # ATLAS-SUSY-2013-05
         txname=expRes.datasets[0].txnameList[0] # T6bbWW
-        result=txname.txnameData.getValueFor([[ 300.*GeV,126.*GeV], [ 300.*GeV,128.*GeV] ])
-        self.assertAlmostEquals( result.asNumber(pb),0.24376804 )
+        result=txname.txnameData.getValueFor([[ 300.*GeV,127.*GeV], [ 300.*GeV,127.5*GeV] ])
+        self.assertAlmostEquals( result.asNumber(pb),0.24452092000000109 )
         result=txname.txnameData.getValueFor([[ 600.*GeV,120.*GeV], [ 600.*GeV,130.*GeV] ])
         self.assertAlmostEquals( result.asNumber(pb),0.0197154 )
         result=txname.txnameData.getValueFor([[ 300.*GeV,120.*GeV], [ 300.*GeV,130.*GeV] ])
         self.assertTrue ( result == None )
+
     def testWithDirectData(self):
         data = [ [ [[ 150.*GeV, 50.*GeV], [ 150.*GeV, 50.*GeV] ],  3.*fb ], 
              [ [[ 200.*GeV,100.*GeV], [ 200.*GeV,100.*GeV] ],  5.*fb ], 

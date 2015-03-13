@@ -177,13 +177,18 @@ class TxNameData(object):
         :param massarray: mass array values (with units), i.e. [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         """
                 
-        p=self.flattenMassArray ( massarray ) ## flatten
+        porig=self.flattenMassArray ( massarray ) ## flatten
         self.massarray = massarray
-        if len(p)!=self.full_dimensionality:
+        if len(porig)!=self.full_dimensionality:
             logger.error ( "dimensional error. I have been asked to compare a %d-dimensional mass vector with " \
-                    "%d-dimensional data!" % ( len(p), self.full_dimensionality ) )
+                    "%d-dimensional data!" % ( len(porig), self.full_dimensionality ) )
             return None
+        p = [] 
+        #print "porig=",porig
+        p= ( (np.matrix(porig)[0] - self.delta_x ) ).tolist()[0]
+        #print "pafter=",p
         P=np.dot(p,self.V)  ## rotate
+        #print "P=",P
         dp=self.countNonZeros ( P )
         self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
         self.projected_value = float(self.projected_value)
@@ -211,7 +216,9 @@ class TxNameData(object):
             and the opposite direction. Whichever relative change is greater is 
             reported as the expected extrapolation error.
         """
-        p=self.flattenMassArray ( massarray ) ## point p in n dimensions
+        #p=self.flattenMassArray ( massarray ) ## point p in n dimensions
+        porig=self.flattenMassArray ( massarray ) ## flatten
+        p= ( (np.matrix(porig)[0] - self.delta_x ) ).tolist()[0]
         P=np.dot(p,self.V)                    ## projected point p in n dimensions
         ## P[self.dimensionality:] is project point p in m dimensions
         # m=self.countNonZeros ( P ) ## dimensionality of input
@@ -251,7 +258,8 @@ class TxNameData(object):
 
     def _interpolateOutsideConvexHull ( self, massarray ):
         """ experimental routine, meant to check if we can interpolate outside convex hull """
-        p=self.flattenMassArray ( massarray )
+        porig=self.flattenMassArray ( massarray ) ## flatten
+        p= ( (np.matrix(porig)[0] - self.delta_x ) ).tolist()[0]
         P=np.dot(p,self.V)
         # projected_value=griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
         de = self._estimateExtrapolationError ( massarray ) 
@@ -278,12 +286,24 @@ class TxNameData(object):
     def computeV ( self ):
         """ compute rotation matrix V, rotate and truncate also
             'data' points and store in self.Mp """
-        M=[]
+        Morig=[]
         self.xsec=[]
+             
         for x,y in self.data:
             self.xsec.append ( y / self.unit )
             xp = self.flattenMassArray ( x )
-            M.append ( xp )
+            Morig.append ( xp )
+        aM=np.matrix ( Morig )
+        MT=aM.T.tolist()
+        self.delta_x = np.matrix ( [ sum (x)/len(Morig) for x in MT ] )[0]
+        # self.delta_x = [1]*len(MT)
+        #print "delta_x=",self.delta_x
+        M = []
+        #print "Morig=",Morig
+        for Mx in Morig:
+            M.append ( ( np.matrix ( Mx ) - self.delta_x ).tolist()[0] )
+        #print "M=",M
+
         U,s,Vt=svd(M)
         V=Vt.T
         self.V=V
