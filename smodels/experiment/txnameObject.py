@@ -134,7 +134,7 @@ class TxName(object):
             for el in self._elements:
                 if element.particlesMatch(el):
                     eff = self.txnameData.getValueFor(element.getMasses())
-                    if eff and not math.isnan ( eff ): return eff                    
+                    if type(eff) == type(1.): return eff                    
             return 0.
         else:
             logger.error("Unknown data type: %s" % self.txnameData.type)
@@ -176,22 +176,24 @@ class TxNameData(object):
         Interpolates the data and returns the UL or efficiency for the respective massarray
         :param massarray: mass array values (with units), i.e. [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         """
+                
         p=self.flattenMassArray ( massarray ) ## flatten
         self.massarray = massarray
         if len(p)!=self.full_dimensionality:
             logger.error ( "dimensional error. I have been asked to compare a %d-dimensional mass vector with " \
                     "%d-dimensional data!" % ( len(p), self.full_dimensionality ) )
-            return float("nan")
+            return None
         P=np.dot(p,self.V)  ## rotate
         dp=self.countNonZeros ( P )
         self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
         self.projected_value = float(self.projected_value)
         if dp != self.dimensionality: ## we have data in different dimensions
             if self.accept_errors_upto == None:
-                return float('nan')
+                return None
             logger.info ( "attempting to interpolate outside of convex hull (d=%d,dp=%d,masses=%s)" %
                      ( self.dimensionality, dp, str(massarray) ) )
             return self._interpolateOutsideConvexHull ( massarray )
+
         return self._returnProjectedValue()
         
     def flattenMassArray ( self, data ):
@@ -256,13 +258,13 @@ class TxNameData(object):
         if de < self.accept_errors_upto:
             return self._returnProjectedValue()
         logger.info ( "Expected error of %f too large to propagate outside convext hull" % de )
-        return float("nan")
+        return None
 
     def _returnProjectedValue ( self ):
-        ## nans are returned without units
-        if math.isnan ( self.projected_value ):
-            logger.info ( "projected value is 'nan'. Projected point not in convex hull? original point=%s" % self.massarray )
-            return self.projected_value
+        ## None is returned without units
+        if self.projected_value is None or math.isnan(self.projected_value):
+            logger.info ( "projected value is None. Projected point not in convex hull? original point=%s" % self.massarray )
+            return None
         return self.projected_value * self.unit 
 
     def countNonZeros ( self, mp ):
