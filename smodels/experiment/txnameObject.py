@@ -128,13 +128,13 @@ class TxName(object):
             for el in self._elements:                
                 if element.particlesMatch(el):                                        
                     ul = self.txnameData.getValueFor(element.getMasses())
-                    if ul and type(ul) == type(fb): return 1.
+                    if type(ul) == type(fb): return 1.
             return 0.
         elif self.txnameData.type == 'efficiencyMap':
             for el in self._elements:
                 if element.particlesMatch(el):
                     eff = self.txnameData.getValueFor(element.getMasses())
-                    if eff and type(eff) == type(1.): return eff                    
+                    if type(eff) == type(1.): return eff                    
             return 0.
         else:
             logger.error("Unknown data type: %s" % self.txnameData.type)
