@@ -219,7 +219,7 @@ def _getElementsFrom(smsTopList, dataset):
     elements = []
     for el in smsTopList.getElements():
         for txname in dataset.txnameList:   
-            eff = txname.getEfficiencyFor(el)    
+            eff = txname.getEfficiencyFor(el)
             if eff == 0.: continue
             element = el.copy()
             element.weight *= eff

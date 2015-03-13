@@ -176,6 +176,7 @@ class TxNameData(object):
         Interpolates the data and returns the UL or efficiency for the respective massarray
         :param massarray: mass array values (with units), i.e. [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         """
+                
         p=self.flattenMassArray ( massarray ) ## flatten
         self.massarray = massarray
         if len(p)!=self.full_dimensionality:
@@ -192,6 +193,7 @@ class TxNameData(object):
             logger.info ( "attempting to interpolate outside of convex hull (d=%d,dp=%d,masses=%s)" %
                      ( self.dimensionality, dp, str(massarray) ) )
             return self._interpolateOutsideConvexHull ( massarray )
+
         return self._returnProjectedValue()
         
     def flattenMassArray ( self, data ):
@@ -260,9 +262,9 @@ class TxNameData(object):
 
     def _returnProjectedValue ( self ):
         ## None is returned without units
-        if self.projected_value is None:
+        if self.projected_value is None or math.isnan(self.projected_value):
             logger.info ( "projected value is None. Projected point not in convex hull? original point=%s" % self.massarray )
-            return self.projected_value
+            return None
         return self.projected_value * self.unit 
 
     def countNonZeros ( self, mp ):
