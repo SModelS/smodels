@@ -72,6 +72,9 @@ class MissingTopoList(Printer):
         """
         from smodels.theory.element import Element
         li = Element(instr).getParticles()
+        for be in li:
+            for ve in be:
+                ve.sort()
         li.sort()
         return str(li).replace("'", "").replace(" ", "")
 
