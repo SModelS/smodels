@@ -183,13 +183,23 @@ class TxNameData(object):
             logger.error ( "dimensional error. I have been asked to compare a %d-dimensional mass vector with " \
                     "%d-dimensional data!" % ( len(porig), self.full_dimensionality ) )
             return None
-        p = [] 
         #print "porig=",porig
         p= ( (np.matrix(porig)[0] - self.delta_x ) ).tolist()[0]
         #print "pafter=",p
         P=np.dot(p,self.V)  ## rotate
         #print "P=",P
         dp=self.countNonZeros ( P )
+        
+#         #Check which points are being used in interpolation
+#         from scipy import spatial
+#         delaun = spatial.Delaunay(self.Mp)
+#         isimplex = delaun.find_simplex([P[:self.dimensionality] ])[0]
+#         for ipt in delaun.simplices[isimplex]:
+#             pt = self.Mp[ipt] + [0.]*(len(porig)-len(self.Mp[ipt]))
+#             pt = np.dot(pt,np.transpose(self.V))
+#             pt = pt + self.delta_x[0]
+#             print pt,self.xsec[ipt]
+        
         self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
         self.projected_value = float(self.projected_value)
         if dp != self.dimensionality: ## we have data in different dimensions
