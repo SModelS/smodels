@@ -219,7 +219,7 @@ def _getElementsFrom(smsTopList, dataset):
     elements = []
     for el in smsTopList.getElements():
         for txname in dataset.txnameList:   
-            eff = txname.getEfficiencyFor(el)
+            eff = txname.getEfficiencyFor(el)            
             if eff == 0.: continue
             element = el.copy()
             element.weight *= eff
@@ -249,10 +249,10 @@ def _combineElements(elements, dataset, maxDist):
         for txname in dataset.txnameList:
             txnameEls = []
             for element in elements:
-                for el in txname._elements:                
-                    if element.particlesMatch(el):
-                        txnameEls.append(element)
-                        break
+                #Check if element really belongs to txname:
+                if not txname.getEfficiencyFor(element): continue
+                else: txnameEls.append(element)
+
             txnameClusters = clusterTools.clusterElements(txnameEls, txname.txnameData, maxDist)
             for cluster in txnameClusters: cluster.txname = txname
             clusters += txnameClusters
