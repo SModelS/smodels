@@ -10,6 +10,7 @@
 
 from smodels.experiment import limitGetter, smsResults
 from smodels.theory.printer import Printer
+from smodels.theory.auxiliaryFunctions import _memoize
 
 class ULanalysis(Printer):
     """
@@ -51,6 +52,7 @@ class ULanalysis(Printer):
                 return self.elementsEff[el]
         return 0.
 
+    @_memoize
     def getUpperLimitFor(self, mass):
         """
         Get the experimental upper limit for a specific mass array.

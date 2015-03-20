@@ -39,11 +39,11 @@ def _memoize(func):
     return _wrap
 
 
-@_memoize
 def massPosition(mass, analysis):
     """ Give mass position in upper limit space.    
     Use the analysis experimental limit data.    
     """
+    
     xmass = analysis.getUpperLimitFor(mass)
     if type(xmass) != type(1.*pb):
         return None
