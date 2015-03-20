@@ -44,10 +44,11 @@ def main():
     # smstoplist = lheDecomposer.decompose(lhefile, doCompress=True,doInvisible=True, minmassgap=mingap)
 
     # Print decomposition summary. Set outputLevel=0 (no output), 1 (simple output), 2 (extended output)
-    smstoplist.printout(outputLevel=2)
+    smstoplist.printout(outputLevel=0)
 
     # Load all analyses from database
-    listOfExpRes = database.getExpResults(datasetIDs=[None])
+    listOfExpRes = [database.getExpResults(datasetIDs=[None],analysisIDs=['ATLAS-SUSY-2013-05']
+                                           ,txnames=['T6bbWWoff'])]
 
     # Compute the theory predictions for each analysis
     for expResult in listOfExpRes:

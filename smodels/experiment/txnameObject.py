@@ -14,6 +14,7 @@ from smodels.tools.physicsUnits import GeV, fb, TeV, pb
 from smodels.theory.particleNames import elementsInStr
 from smodels.tools.stringTools import concatenateLines
 from smodels.theory.element import Element
+from smodels.theory.auxiliaryFunctions import _memoize
 from scipy.interpolate import griddata
 from scipy.linalg import svd
 import numpy as np
@@ -170,25 +171,27 @@ class TxNameData(object):
 
         self.accept_errors_upto=accept_errors_upto
         self.computeV()
-       
+
+    @_memoize       
     def getValueFor(self,massarray):
         """
         Interpolates the data and returns the UL or efficiency for the respective massarray
         :param massarray: mass array values (with units), i.e. [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         """
-                
+        
         porig=self.flattenMassArray ( massarray ) ## flatten
         self.massarray = massarray
         if len(porig)!=self.full_dimensionality:
             logger.error ( "dimensional error. I have been asked to compare a %d-dimensional mass vector with " \
                     "%d-dimensional data!" % ( len(porig), self.full_dimensionality ) )
             return None
-        #print "porig=",porig
+#         print "porig=",porig
         p= ( (np.matrix(porig)[0] - self.delta_x ) ).tolist()[0]
-        #print "pafter=",p
+#         print "pafter=",p
         P=np.dot(p,self.V)  ## rotate
-        #print "P=",P
+#         print "P=",P
         dp=self.countNonZeros ( P )
+#         print 'Pp=',P[:self.dimensionality]
         
 #         #Check which points are being used in interpolation
 #         from scipy import spatial
@@ -201,7 +204,7 @@ class TxNameData(object):
 #             print pt,self.xsec[ipt]
         
         self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
-        self.projected_value = float(self.projected_value)
+        self.projected_value = float(self.projected_value)        
         if dp != self.dimensionality: ## we have data in different dimensions
             if self.accept_errors_upto == None:
                 return None
@@ -279,7 +282,7 @@ class TxNameData(object):
         return None
 
     def _returnProjectedValue ( self ):
-        ## None is returned without units
+        ## None is returned without units'
         if self.projected_value is None or math.isnan(self.projected_value):
             logger.info ( "projected value is None. Projected point not in convex hull? original point=%s" % self.massarray )
             return None

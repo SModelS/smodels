@@ -58,7 +58,7 @@ class ElementCluster(object):
             else: return self.elements[0].getMasses()
         
         massList = [el.getMasses() for el in self.elements]
-        weights = [el.weight.getMaxXsec() / fb for el in self.elements]
+        weights = [el.weight.getMaxXsec() / fb for el in self.elements]        
         return massAvg(massList,weights=weights)
 
 
