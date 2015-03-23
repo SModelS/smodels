@@ -76,7 +76,7 @@ class IndexCluster(object):
                         in upper limit space as values
     :ivar weightMap: dictionary with indices as keys and the corresponding element weight
                      as values
-    :ivar analysis: analysis to which the cluster applies (ULanalysis object)
+    :ivar txdata: TxNameData object to be used for computing distances in UL space
     """
     def __init__(self, massMap=None, posMap=None, wMap=None, indices=set([]), txdata = None):
         self.indices = indices
@@ -124,7 +124,7 @@ class IndexCluster(object):
         if type(self.weightMap) == type(dict()):
             newcluster.weightMap = dict(self.weightMap.items())
         else: newcluster.weightMap = None
-        newcluster.analysis = self.analysis
+        newcluster.txdata = self.txdata
       
         return newcluster
 
@@ -186,10 +186,11 @@ class IndexCluster(object):
         obj can be a position in upper limit space or an element index.
         
         """
+
         dmax = 0.
         if type(obj) == type(int()) and obj >= 0:
             pos = self.positionMap[obj]
-        elif type(obj) == type(fb):
+        elif type(obj) == type(1.):
             pos = obj
         else:
             logger.error("Unknown object type (must be an element index or "
@@ -209,7 +210,7 @@ class IndexCluster(object):
         
         """
         dmax = 0.
-        if self.avgPosition == None:
+        if self.avgPosition is None:
             self.avgPosition = self._getAvgPosition()
         for iel in self:
             dmax = max(dmax, distance(self.positionMap[iel], self.avgPosition))

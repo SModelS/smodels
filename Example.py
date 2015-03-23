@@ -47,8 +47,8 @@ def main():
     smstoplist.printout(outputLevel=0)
 
     # Load all analyses from database
-    listOfExpRes = [database.getExpResults(datasetIDs=[None],analysisIDs=['ATLAS-SUSY-2013-05']
-                                           ,txnames=['T6bbWWoff'])]
+    listOfExpRes = [database.getExpResults(datasetIDs=[None],analysisIDs=['ATLAS-SUSY-2013-11'])]
+#     listOfExpRes = database.getExpResults(datasetIDs=[None])
 
     # Compute the theory predictions for each analysis
     for expResult in listOfExpRes:
