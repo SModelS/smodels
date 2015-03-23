@@ -278,7 +278,8 @@ class TxNameData(object):
         de = self._estimateExtrapolationError ( massarray ) 
         if de < self.accept_errors_upto:
             return self._returnProjectedValue()
-        logger.info ( "Expected error of %f too large to propagate outside convext hull" % de )
+        if not math.isnan(de):
+            logger.info ( "Expected error of %f too large to propagate outside convex hull" % de )
         return None
 
     def _returnProjectedValue ( self ):
