@@ -485,7 +485,7 @@ class SlhaStatus(Printer):
             else:
                 return lt
         except KeyError:
-            logger.warning("No decay block for %s, consider it as a stable particle")
+            logger.warning("No decay block for %s, consider it as a stable particle" % str(pid) )
             return -1
 
 
