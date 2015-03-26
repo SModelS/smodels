@@ -17,10 +17,10 @@ from smodels.theory import slhaDecomposer
 from smodels.theory import lheDecomposer
 from smodels.tools.physicsUnits import fb, GeV
 from smodels.theory.theoryPrediction import theoryPredictionsFor
-from smodels.experiment.databaseObjects import DataBase
+from smodels.experiment.databaseObjects import Database
 
 #Set the address of the database folder
-database = DataBase("../smodels-database/")
+database = Database("../smodels-database/")
 
 
 def main():

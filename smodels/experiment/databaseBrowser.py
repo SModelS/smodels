@@ -9,7 +9,7 @@
 import logging
 #import setPath
 import sys
-from smodels.experiment.databaseObjects import DataBase,ExpResult
+from smodels.experiment.databaseObjects import Database,ExpResult
 import numpy, unum
 
 
@@ -25,7 +25,7 @@ class Browser(object):
     smodels-database. Browser can be restricted to specified run or experiment. 
     Verbosity can be set to specified level.
     
-    :ivar database: DataBase object holding all the database information
+    :ivar database: Database object holding all the database information
     :ivar browserList: list of experimental results loaded in the browser.
                        Can be used to hold a subset of results in the database.
                        By default all results are loaded. 
@@ -35,11 +35,11 @@ class Browser(object):
         
         self.browserList = []
         if isinstance(database,str):
-            self.database = DataBase(database)            
-        elif isinstance(database,DataBase):
+            self.database = Database(database)            
+        elif isinstance(database,Database):
             self.database = database
         else:
-            logger.error("The input must be the database location or a DataBase object.")
+            logger.error("The input must be the database location or a Database object.")
             sys.exit()            
         self.loadAllResults()
         

@@ -11,7 +11,7 @@ import argparse
 from ConfigParser import SafeConfigParser
 from smodels.tools.physicsUnits import GeV, fb
 from smodels.tools import ioObjects, missingTopologies
-from smodels.experiment.databaseObjects import DataBase
+from smodels.experiment.databaseObjects import Database
 from smodels.theory import slhaDecomposer, lheDecomposer
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.installation import installDirectory
@@ -60,7 +60,7 @@ def main(inputFile, parameterFile, outputFile):
     """ Check database location """
     try:
         databasePath = parser.get("path", "databasePath")
-        database = DataBase(databasePath)
+        database = Database(databasePath)
         databaseVersion = database.databaseVersion
     except:
         log.error("Database not found in %s" % os.path.realpath(databasePath))
