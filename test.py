@@ -10,7 +10,7 @@ def main():
     #Import basic functions (this file must be run under the installation folder)
     import sys
     from smodels.experiment.infoObject import Info
-    from smodels.experiment.databaseObjects import DataBase,ExpResult
+    from smodels.experiment.databaseObjects import Database,ExpResult
     from smodels.tools.physicsUnits import GeV, fb, TeV, pb
     from smodels.experiment.databaseBrowser import Browser
     import numpy as np
@@ -22,7 +22,7 @@ def main():
 #     print expRes
 #     sys.exit()
 
-    database = DataBase("/home/lessa/smodels-database/")
+    database = Database("/home/lessa/smodels-database/")
     browser = Browser(database)
     # print browser.getAttributes()
     #print browser.getAttributes()
@@ -33,11 +33,11 @@ def main():
     # print browser.getValuesFor("lumi")
     # print browser.getValuesFor("axes")
     # print database
-#     database = DataBase("./test/database/")
+#     database = Database("./test/database/")
 
     print browser
     sys.exit()
-    database = DataBase("../smodels-database/")
+    database = Database("../smodels-database/")
     print database
     listOfExpRes = database.getExpResults()
 
