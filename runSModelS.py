@@ -6,8 +6,12 @@
    
 """
 
-import sys, os, logging
+import os
+import logging
 import argparse
+import datetime
+import platform
+import traceback
 from ConfigParser import SafeConfigParser
 from smodels.tools.physicsUnits import GeV, fb
 from smodels.tools import ioObjects, missingTopologies
@@ -15,6 +19,7 @@ from smodels.experiment.databaseObjects import Database
 from smodels.theory import slhaDecomposer, lheDecomposer
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.installation import installDirectory
+
 log = logging.getLogger(__name__)
 
 
@@ -170,14 +175,59 @@ if __name__ == "__main__":
     parameterFile = "%s/etc/parameters_default.ini" % installDirectory()
     outputFile = "summary.txt"
 
-    """ Get the name of input slha file and parameter file """
+    """ Get the name of input SLHA file and parameter file """
     argparser = argparse.ArgumentParser()
     argparser.add_argument('-f', '--filename', help='name of SLHA or LHE input file, necessary input', required=True)
-    argparser.add_argument('-p', '--parameterFile',
-                            help='name of parameter file, optional argument, if not set, use all parameters from etc/parameters_default.ini',
-                            default=parameterFile)
-    argparser.add_argument('-o', '--outputFile', help='name of output file, optional argument, default is: ' + outputFile,
-                           default=outputFile)
+    argparser.add_argument('-p', '--parameterFile', help='name of parameter file, optional argument, if not set, use '
+                           'all parameters from etc/parameters_default.ini', default=parameterFile)
+    argparser.add_argument('-o', '--outputFile', help='name of output file, optional argument, default is: ' +
+                           outputFile, default=outputFile)
+    argparser.add_argument('--development', help='enable development output', action='store_true')
     args = argparser.parse_args()
 
-    main(args.filename, args.parameterFile, args.outputFile)
+    try:
+        main(args.filename, args.parameterFile, args.outputFile)
+        
+    except Exception as exception:
+        if args.development:
+            print(exception.value)
+        else:
+            timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S%f')
+            timestampHuman = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+            debugFileName = 'smodels-' + timestamp + '.debug'
+            with open('smodels/version', 'r') as versionFile:
+                version = versionFile.readline()
+            with open(args.filename, 'r') as inputFile:
+                inputFileContent = inputFile.read()
+            with open(args.parameterFile, 'r') as parameterFile:
+                parameterFileContent = parameterFile.read()
+            
+            debugFile = open(debugFileName, 'w')
+            debugFile.write("================================================================================\n")
+            debugFile.write("SModelS Debug File\n")
+            debugFile.write("Timestamp: " + timestampHuman + "\n")
+            debugFile.write("SModelS Version: " + version + "\n")
+            debugFile.write("Platform: " + platform.platform() + "\n")
+            debugFile.write("Python Version: " + platform.python_version() + "\n\n")
+            debugFile.write("================================================================================\n\n")
+            debugFile.write("Output\n")            
+            debugFile.write("--------------------------------------------------------------------------------\n\n")
+            debugFile.write(traceback.format_exc() + "\n\n")
+            debugFile.write("Input File\n")            
+            debugFile.write("--------------------------------------------------------------------------------\n\n")
+            debugFile.write(inputFileContent + "\n\n")
+            debugFile.write("Parameter File\n")            
+            debugFile.write("--------------------------------------------------------------------------------\n\n")
+            debugFile.write(parameterFileContent + "\n\n")
+            debugFile.close()
+            
+            
+            print("\n\n\n\n")
+            print("================================================================================\n")
+            print("SModelS quit unexpectedly due to an unknown error.\n")
+            print("The error has been written to " + debugFileName + ".\n")
+            print("Please send this file to smodels-users@lists.oeaw.ac.at to help making SModelS")
+            print("better!\n")
+            print("Alternatively, use the '--development' option when running runSModelS.py to")
+            print("display all error messages.\n")
+            print("================================================================================")
