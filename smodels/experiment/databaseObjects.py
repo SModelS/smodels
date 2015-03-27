@@ -1,5 +1,5 @@
 """
-.. module:: databaseObjects
+.. module:: experiment.databaseObjects
    :synopsis: Contains classes and methods to load the database and create the InfoFile and DataFile
               objects as well as the list of analyses.
 
@@ -8,16 +8,15 @@
 
 """
 
-import logging, os, sys
-from smodels.experiment import infoObject, txnameObject
+import logging
+import os
+from smodels.experiment import infoObject
+from smodels.experiment import txnameObject
 from smodels.experiment import datasetObject
 from smodels.theory.auxiliaryFunctions import _memoize
+from smodels.experiment.exceptions import DatabaseNotFoundException
 
-FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
-logging.basicConfig(format=FORMAT)
 logger = logging.getLogger(__name__)
-
-logger.setLevel(level=logging.INFO)
 
 
 class ExpResult(object):
@@ -38,33 +37,38 @@ class ExpResult(object):
                 raise TypeError
             self.info = infoObject.Info(os.path.join(path, "info.txt"))
             self.datasets = []
-            for root, dirs, files in os.walk(path):
+            for root, _, files in os.walk(path):
                 if 'dataInfo.txt' in files:  # data folder found
                     # Build data set
                     try:
                         dataset = datasetObject.DataSet(root, self.info)
                         self.datasets.append(dataset)
-                    except TypeError: continue
+                    except TypeError:
+                        continue
 
     def __str__(self):
         label = self.info.getInfo('id') + ": "
         dataIDs = self.getValuesFor('dataid')
         if dataIDs:
             for dataid in dataIDs:
-                if dataid: label += dataid + ","
+                if dataid:
+                    label += dataid + ","
         label = label[:-1]
         label += ':'
         txnames = self.getValuesFor('txname')
         if isinstance(txnames, list):
-            for txname in txnames: label += txname + ','
-        else: label += txnames + ','
+            for txname in txnames:
+                label += txname + ','
+        else:
+            label += txnames + ','
         return label[:-1]
+
 
     def getTxNames(self):
         """
         Returns a list of all TxName objects appearing in all dataSets.
+        
         """
-
         txnames = []
         for dataset in self.datasets:
             txnames += dataset.txnameList
@@ -88,8 +92,8 @@ class ExpResult(object):
         :param mass: Mass array with units (only for UL-type results)
         
         :return: upper limit (Unum object)
+        
         """
-
         if self.getValuesFor('datatype') == 'efficiency-map':
             if not dataID or not isinstance(dataID, str):
                 logger.error("The data set ID must be defined when computing ULs for\
@@ -97,9 +101,10 @@ class ExpResult(object):
                 return False
 
             upperLimits = self.getUpperLimits(alpha, expected)
-            if not upperLimits: return False
+            if not upperLimits:
+                return False
             if not dataID in upperLimits:
-                logger.error("Data id %s not found." % dataID)
+                logger.error("Data id %s not found.", dataID)
                 return False
             else:
                 return upperLimits[dataID]
@@ -118,8 +123,7 @@ class ExpResult(object):
                 if tx == txname or tx.txname == txname:
                     return tx.txnameData.getValueFor(mass)
         else:
-            logger.warning("Unkown data type: %s. Data will be ignored."
-                           % self.getValuesFor('datatype'))
+            logger.warning("Unkown data type: %s. Data will be ignored.", self.getValuesFor('datatype'))
 
 
     @_memoize
@@ -128,12 +132,13 @@ class ExpResult(object):
         Computes the 95% upper limit on the signal*efficiency for an efficiency
         type result for all the datasets (signal regions).
         Only to be used for efficiency map type results.
+        
         :param alpha: Can be used to change the C.L. value. The default value is 0.05 (= 95% C.L.)
         :param expected: Compute expected limit ( i.e. Nobserved = NexpectedBG )
         
         :return: dictionary with dataset IDs as keys and the upper limit as values 
+        
         """
-
         upperLimits = {}
         for dataset in self.datasets:
             if dataset.dataInfo.datatype != 'efficiency-map':
@@ -143,6 +148,7 @@ class ExpResult(object):
             upperLimits[dataset.dataInfo.dataid] = dataset.getUpperLimit(alpha, expected)
 
         return upperLimits
+
 
     def getValuesFor(self, attribute=None):
         """
@@ -154,32 +160,37 @@ class ExpResult(object):
                           it will return a dictionary with all fields and their respective
                           values
         :return: list of values or value
+        
         """
-
-
         fieldDict = self.__dict__.items()[:]
         valuesDict = {}
         while fieldDict:
             for field, value in fieldDict[:]:
                 if not '<smodels.experiment' in str(value):
-                    if not field in valuesDict: valuesDict[field] = [value]
+                    if not field in valuesDict:
+                        valuesDict[field] = [value]
                     else: valuesDict[field].append(value)
                 else:
                     if isinstance(value, list):
-                        for entry in value: fieldDict += entry.__dict__.items()[:]
+                        for entry in value:
+                            fieldDict += entry.__dict__.items()[:]
                     else: fieldDict += value.__dict__.items()[:]
                 fieldDict.remove((field, value))
 
         # Try to keep only the set of unique values
         for key, val in valuesDict.items():
-            try: valuesDict[key] = list(set(val))
-            except: pass
-        if not attribute: return valuesDict
+            try:
+                valuesDict[key] = list(set(val))
+            except:
+                pass
+        if not attribute:
+            return valuesDict
         elif not attribute in valuesDict:
-            logger.warning("Could not find field %s in %s" % (attribute, self.path))
+            logger.warning("Could not find field %s in %s", attribute, self.path)
             return False
         else:
-            if len(valuesDict[attribute]) == 1: return valuesDict[attribute][0]
+            if len(valuesDict[attribute]) == 1:
+                return valuesDict[attribute][0]
             else:
                 return valuesDict[attribute]
 
@@ -191,16 +202,17 @@ class ExpResult(object):
         
         :param showPrivate: if True, also returns the protected fields (_field)
         :return: list of field names (strings)
+        
         """
-
         fields = self.getValuesFor().keys()
         fields = list(set(fields))
 
         if not showPrivate:
             for field in fields[:]:
-                if "_" == field[0]: fields.remove(field)
-
+                if "_" == field[0]:
+                    fields.remove(field)
         return fields
+    
 
     def getTxnameWith(self, restrDict={}):
         """
@@ -213,19 +225,21 @@ class ExpResult(object):
                           For the fields not listed, all values are assumed to be allowed.
         :return: list of TxName objects if more than one txname matches the selection
         criteria or a single TxName object, if only one matches the selection.
+        
         """
-
         txnameList = []
         for tag, value in restrDict.items():
             for txname in self.getTxNames():
                 txval = txname.getInfo(tag)
-                if txval is False: continue
-                elif txval == value: txnameList.append(txname)
+                if txval is False:
+                    continue
+                elif txval == value:
+                    txnameList.append(txname)
 
-        if len(txnameList) == 1: txnameList = txnameList[0]
+        if len(txnameList) == 1:
+            txnameList = txnameList[0]
 
         return txnameList
-
 
 
 class Database(object):
@@ -244,6 +258,7 @@ class Database(object):
         self._databaseVersion = self._getDatabaseVersion
         self.expResultList = self._loadExpResults()
 
+
     @property
     def databaseVersion(self):
         """
@@ -251,6 +266,7 @@ class Database(object):
         
         """
         return self._databaseVersion
+
 
     @property
     def base(self):
@@ -260,25 +276,26 @@ class Database(object):
         """
         return self._base
 
+
     def _validateBase(self, path):
         """
         Validates the base directory to locate the database. 
         Exits the script if something is wrong with the path.
     
         """
-        logger.debug('Try to set the path for the database to: %s' % path)
+        logger.debug('Try to set the path for the database to: %s', path)
         path = os.path.realpath(path) + '/'
         if not os.path.exists(path):
-            logger.error('%s is no valid path!' % path)
-            sys.exit()
+            logger.error('%s is no valid path!', path)
+            raise DatabaseNotFoundException("Database not found")
         return path
+
 
     def __str__(self):
         idList = "Database: " + self.databaseVersion + "\n---------- \n"
         for expRes in self.expResultList:
             idList += expRes.info.getInfo('id') + '\n'
         return idList
-
 
 
     @property
@@ -291,14 +308,13 @@ class Database(object):
             versionFile = open(self._base + '/version')
             content = versionFile.readlines()
             versionFile.close()
-            logger.debug('Found version file %s with content %s' \
-            % (self._base + '/version', content))
+            logger.debug('Found version file %s with content %s', self._base + '/version', content)
             return content[0].strip()
 
         except IOError:
-            logger.error('There is no version file %s' \
-            % self._base + '/version')
+            logger.error('There is no version file %s', self._base + '/version')
             return 'unknown version'
+
 
     @property
     def verbosity(self):
@@ -307,6 +323,7 @@ class Database(object):
         
         """
         return self._verbosity
+
 
     @verbosity.setter
     def verbosity(self, level):
@@ -317,6 +334,7 @@ class Database(object):
         level = self._validateLevel(level)
         self._verbosity = level
         self._setLogLevel(level)
+
 
     def _validateLevel(self, level):
         """
@@ -329,6 +347,7 @@ class Database(object):
             return 'error'
         return level.lower()
 
+
     def _setLogLevel(self, level='error'):
         if level == 'debug':
             logger.setLevel(level=logging.DEBUG)
@@ -339,6 +358,7 @@ class Database(object):
         if level == 'error':
             pass
 
+
     def _loadExpResults(self):
         """
         Checks the database folder and generates a list of ExpResult objects for
@@ -347,11 +367,10 @@ class Database(object):
         :return: list of ExpResult objects 
   
         """
-
         resultsList = []
-        for root, dirs, files in os.walk(self._base):
+        for root, _, files in os.walk(self._base):
             if not 'info.txt' in files:
-                logger.debug("Missing files in %s" % root)
+                logger.debug("Missing files in %s", root)
                 continue
             else:
                 expres = ExpResult(root)
@@ -362,6 +381,7 @@ class Database(object):
             logger.warning("Zero results loaded.")
 
         return resultsList
+
 
     def getExpResults(self, analysisIDs=[], datasetIDs=[], txnames=[]):
         """
@@ -380,8 +400,6 @@ class Database(object):
                    only one result
                    
         """
-
-
         expResultList = []
         for expResult in self.expResultList:
             ID = expResult.info.getInfo('id')
