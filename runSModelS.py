@@ -6,19 +6,22 @@
    
 """
 
+from __future__ import print_function
 import os
 import logging
 import argparse
-import datetime
-import platform
-import traceback
 from ConfigParser import SafeConfigParser
-from smodels.tools.physicsUnits import GeV, fb
-from smodels.tools import ioObjects, missingTopologies
 from smodels.experiment.databaseObjects import Database
-from smodels.theory import slhaDecomposer, lheDecomposer
-from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.installation import installDirectory
+from smodels.theory import slhaDecomposer
+from smodels.theory import lheDecomposer
+from smodels.theory.theoryPrediction import theoryPredictionsFor
+from smodels.tools.physicsUnits import GeV
+from smodels.tools.physicsUnits import fb
+from smodels.tools import ioObjects
+from smodels.tools import missingTopologies
+from smodels.tools import debug
+from smodels.experiment.exceptions import DatabaseNotFoundException
 
 log = logging.getLogger(__name__)
 
@@ -48,7 +51,7 @@ def main(inputFile, parameterFile, outputFile):
     minmassgap = parser.getfloat("parameters", "minmassgap") * GeV
 
     if os.path.exists(outputFile):
-        log.warning("Removing old output file in " + outputFile)
+        log.warning("Removing old output file " + outputFile)
     outfile = open(outputFile, 'w')
     outfile.close()
 
@@ -67,7 +70,7 @@ def main(inputFile, parameterFile, outputFile):
         databasePath = parser.get("path", "databasePath")
         database = Database(databasePath)
         databaseVersion = database.databaseVersion
-    except:
+    except DatabaseNotFoundException:
         log.error("Database not found in %s" % os.path.realpath(databasePath))
         databaseVersion = None
         return
@@ -110,13 +113,13 @@ def main(inputFile, parameterFile, outputFile):
     Load analysis database
     ======================
     """
-    
+
     """ In case that a list of analyses or txnames are given, retrieve list """
     analyses = parser.get("database", "analyses").split(",")
     txnames = parser.get("database", "txnames").split(",")
-    
-    """ Load analyses """    
-    listOfExpRes = database.getExpResults(analysisIDs=analyses,txnames=txnames) 
+
+    """ Load analyses """
+    listOfExpRes = database.getExpResults(analysisIDs=analyses, txnames=txnames)
 
     """ Print list of analyses loaded """
     if parser.getboolean("stdout", "printAnalyses"):
@@ -140,9 +143,9 @@ def main(inputFile, parameterFile, outputFile):
         if not theorypredictions: continue
         print(expResult)
         if parser.getboolean("stdout", "printResults"):
-            print "================================================================================"
+            print("================================================================================")
             theorypredictions.printout()
-        print "................................................................................"
+        print("................................................................................")
 
         """ Create a list of results, to determine the best result """
         for theoryprediction in theorypredictions:
@@ -183,51 +186,24 @@ if __name__ == "__main__":
     argparser.add_argument('-o', '--outputFile', help='name of output file, optional argument, default is: ' +
                            outputFile, default=outputFile)
     argparser.add_argument('--development', help='enable development output', action='store_true')
+    argparser.add_argument('--run-debug', help='parse debug file and use its contents for a SModelS run',
+                           action='store_true')
     args = argparser.parse_args()
-
-    try:
+    
+    if args.run_debug:
+        args.filename, args.parameterFile = debug.readDebugFile(args.filename)
         main(args.filename, args.parameterFile, args.outputFile)
         
-    except Exception as exception:
-        if args.development:
-            print(exception.value)
-        else:
-            timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S%f')
-            timestampHuman = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-            debugFileName = 'smodels-' + timestamp + '.debug'
-            with open('smodels/version', 'r') as versionFile:
-                version = versionFile.readline()
-            with open(args.filename, 'r') as inputFile:
-                inputFileContent = inputFile.read()
-            with open(args.parameterFile, 'r') as parameterFile:
-                parameterFileContent = parameterFile.read()
+    else:
+        try:
+            main(args.filename, args.parameterFile, args.outputFile)
+            raise Exception()
+    
+        except Exception:
+            debugFacility = debug.Debug()
             
-            debugFile = open(debugFileName, 'w')
-            debugFile.write("================================================================================\n")
-            debugFile.write("SModelS Debug File\n")
-            debugFile.write("Timestamp: " + timestampHuman + "\n")
-            debugFile.write("SModelS Version: " + version + "\n")
-            debugFile.write("Platform: " + platform.platform() + "\n")
-            debugFile.write("Python Version: " + platform.python_version() + "\n\n")
-            debugFile.write("================================================================================\n\n")
-            debugFile.write("Output\n")            
-            debugFile.write("--------------------------------------------------------------------------------\n\n")
-            debugFile.write(traceback.format_exc() + "\n\n")
-            debugFile.write("Input File\n")            
-            debugFile.write("--------------------------------------------------------------------------------\n\n")
-            debugFile.write(inputFileContent + "\n\n")
-            debugFile.write("Parameter File\n")            
-            debugFile.write("--------------------------------------------------------------------------------\n\n")
-            debugFile.write(parameterFileContent + "\n\n")
-            debugFile.close()
-            
-            
-            print("\n\n\n\n")
-            print("================================================================================\n")
-            print("SModelS quit unexpectedly due to an unknown error.\n")
-            print("The error has been written to " + debugFileName + ".\n")
-            print("Please send this file to smodels-users@lists.oeaw.ac.at to help making SModelS")
-            print("better!\n")
-            print("Alternatively, use the '--development' option when running runSModelS.py to")
-            print("display all error messages.\n")
-            print("================================================================================")
+            if args.development:
+                print(debug.createStackTrace())
+            else:
+                debugFacility.createDebugFile(args.filename, args.parameterFile)
+                print(debugFacility.createUnknownErrorMessage())
