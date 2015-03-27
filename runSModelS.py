@@ -205,5 +205,6 @@ if __name__ == "__main__":
             if args.development:
                 print(debug.createStackTrace())
             else:
+                print(debug.createStackTrace())
                 debugFacility.createDebugFile(args.filename, args.parameterFile)
                 print(debugFacility.createUnknownErrorMessage())
