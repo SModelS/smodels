@@ -217,13 +217,14 @@ def _getElementsFrom(smsTopList, dataset):
     """
     
     elements = []
-    for el in smsTopList.getElements():        
-        for txname in dataset.txnameList:   
-            eff = txname.getEfficiencyFor(el)            
+    for el in smsTopList.getElements():             
+        for txname in dataset.txnameList:
+            hasEl = txname.hasElementAs(el)
+            if not hasEl: continue   
+            eff = txname.getEfficiencyFor(hasEl)            
             if eff == 0.: continue
-            element = el.copy()
-            element.weight *= eff
-            elements.append(element)
+            hasEl.weight *= eff
+            elements.append(hasEl)
             break  
     return elements
 

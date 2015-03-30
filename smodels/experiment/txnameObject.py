@@ -112,6 +112,24 @@ class TxName(object):
         if hasattr(self,infoLabel): return getattr(self,infoLabel)
         else: return False
 
+    def hasElementAs(self,element):
+        """
+        Check if the conditions or constraint in Txname contains the element.
+        :param element: Element object
+        :param order: If False will test both branch orderings.
+        :return: A copy of the element on the correct branch ordering appearing
+                in the Txname constraint or condition.
+        """
+        
+        elementB = element.switchBranches()
+        for el in self._elements:
+            if element.particlesMatch(el,order=True):
+                return element.copy()
+            elif elementB.particlesMatch(el,order=True):
+                return elementB
+        return False
+        
+
     def getEfficiencyFor(self,element):
         """
         For upper limit results, checks if the input element appears in the constraints
@@ -125,18 +143,22 @@ class TxName(object):
         :return: efficiency (float)
         """
         
-        if self.txnameData.type == 'upperLimits':
-            for el in self._elements:                
-                if element.particlesMatch(el):                                        
-                    ul = self.txnameData.getValueFor(element.getMasses())
-                    if type(ul) == type(fb): return 1.
-            return 0.
+        #Check if the element appears in Txname:
+        hasEl = self.hasElementAs(element)        
+        if not hasEl: return 0.
+        mass = hasEl.getMasses()
+        if self.txnameData.type == 'upperLimits':            
+            ul = self.txnameData.getValueFor(mass)
+            if type(ul) == type(fb):
+                return 1.
+            else:
+                return 0.
         elif self.txnameData.type == 'efficiencyMap':
-            for el in self._elements:
-                if element.particlesMatch(el):
-                    eff = self.txnameData.getValueFor(element.getMasses())
-                    if type(eff) == type(1.): return eff                    
-            return 0.
+            eff = self.txnameData.getValueFor(mass)
+            if type(eff) == type(1.):
+                return eff
+            else:
+                return 0.
         else:
             logger.error("Unknown data type: %s" % self.txnameData.type)
             sys.exit()
