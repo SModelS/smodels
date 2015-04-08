@@ -130,7 +130,8 @@ def _getBestResults(dataSetResults):
         
     #In the case of UL analyses or efficiency-maps with a single signal region
     #return the single result:        
-    if len(dataSetResults) == 1: return dataSetResults[0]
+    if len(dataSetResults) == 1:
+        return dataSetResults[0]
     
     #For efficiency-map analyses with multipler signal regions,
     #select the best one according to the expected upper limit:
