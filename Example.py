@@ -28,7 +28,7 @@ def main():
     Main program. Displays basic use case.
 
     """
-
+    
     #Path to input file name (either a SLHA or LHE file)
 #     slhafile = 'inputFiles/slha/gluino_squarks.slha'
     slhafile = 'inputFiles/slha/lightEWinos.slha'
@@ -44,19 +44,19 @@ def main():
     # smstoplist = lheDecomposer.decompose(lhefile, doCompress=True,doInvisible=True, minmassgap=mingap)
 
     # Print decomposition summary. Set outputLevel=0 (no output), 1 (simple output), 2 (extended output)
-    smstoplist.printout(outputLevel=0)
+    smstoplist.printout(outputLevel=2)
 
     # Load all analyses from database
+#     listOfExpRes = database.getExpResults()
     listOfExpRes = database.getExpResults(datasetIDs=[None])
-#     listOfExpRes = database.getExpResults(datasetIDs=[None])
 
     # Compute the theory predictions for each analysis
     for expResult in listOfExpRes:
-        print('\n',expResult)
         predictions = theoryPredictionsFor(expResult, smstoplist)
         if not predictions: continue
         dataset = predictions.dataset
         datasetID = dataset.getValuesFor('dataid')
+        print('\n',expResult)
         for theoryPrediction in predictions:
             mass = theoryPrediction.mass
             txname = theoryPrediction.txname            
