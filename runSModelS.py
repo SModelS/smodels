@@ -21,10 +21,10 @@ from smodels.tools.physicsUnits import fb
 from smodels.tools import ioObjects
 from smodels.tools import missingTopologies
 from smodels.tools import debug
+from smodels.tools.printer import printout, MPrinter
 from smodels.experiment.exceptions import DatabaseNotFoundException
 
 log = logging.getLogger(__name__)
-
 
 def main(inputFile, parameterFile, outputFile):
     """
@@ -106,7 +106,7 @@ def main(inputFile, parameterFile, outputFile):
     if parser.getboolean("stdout", "printDecomp"):
         outLevel = 1
         outLevel += parser.getboolean("stdout", "addElmentInfo")
-    smstoplist.printout(outputLevel=outLevel)
+    printout(smstoplist,outputLevel=outLevel)
 
 
     """
@@ -128,7 +128,7 @@ def main(inputFile, parameterFile, outputFile):
 
 
     """
-    Compute theory predictions and anlalyses constraints
+    Compute theory predictions and analyses constraints
     ====================================================
     """
 
@@ -141,10 +141,9 @@ def main(inputFile, parameterFile, outputFile):
     for expResult in listOfExpRes:
         theorypredictions = theoryPredictionsFor(expResult, smstoplist)
         if not theorypredictions: continue
-        print(expResult)
         if parser.getboolean("stdout", "printResults"):
             print("================================================================================")
-            theorypredictions.printout()
+            printout(theorypredictions)
         print("................................................................................")
 
         """ Create a list of results, to determine the best result """
@@ -158,19 +157,21 @@ def main(inputFile, parameterFile, outputFile):
     else:
         outputStatus.updateStatus(1)
 
-    """ Write output file """
-    outputStatus.printout("file", outputFile)
-    """ Add experimental constraints if found """
+    printer = MPrinter(outputs={'summary' : outputFile})
+    printer.addObj(outputStatus)
     if outputStatus.status == 1:
-        results.printout("file", outputFile)
-
+        printer.addObj(results)
+    
     sqrts = max([xsec.info.sqrts for xsec in smstoplist.getTotalWeight()])
     if parser.getboolean("options", "findMissingTopos"):
         """ Look for missing topologies, add them to the output file """
         missingtopos = missingTopologies.MissingTopoList(sqrts)
         missingtopos.findMissingTopos(smstoplist, listOfExpRes, minmassgap, parser.getboolean("options", "doCompress"),
                          doInvisible=parser.getboolean("options", "doInvisible"))
-        missingtopos.printout("file", outputFile)
+        
+        printer.addObj(missingtopos)
+        
+    printer.close()
 
 
 if __name__ == "__main__":
@@ -197,8 +198,7 @@ if __name__ == "__main__":
     else:
         try:
             main(args.filename, args.parameterFile, args.outputFile)
-            raise Exception()
-    
+            raise Exception()   
         except Exception:
             debugFacility = debug.Debug()
             
