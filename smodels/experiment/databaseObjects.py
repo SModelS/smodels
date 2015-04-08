@@ -29,6 +29,7 @@ class ExpResult(object):
     :ivar data: DataFile object
     
     """
+        
     def __init__(self, path=None):
         if path and os.path.isdir(path):
             self.path = path
@@ -252,6 +253,8 @@ class Database(object):
     :ivar expResultList: list of ExpResult objects 
         
     """
+    
+    
     def __init__(self, base=None):
         self._base = self._validateBase(base)
         self._verbosity = 'error'
@@ -358,7 +361,7 @@ class Database(object):
         if level == 'error':
             pass
 
-
+    
     def _loadExpResults(self):
         """
         Checks the database folder and generates a list of ExpResult objects for

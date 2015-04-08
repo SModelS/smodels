@@ -23,7 +23,7 @@ logger.setLevel(level=logging.DEBUG)
 class DataSet(object):
     """Holds the information to a data folder (TxName objects, dataInfo,...)
     """
-    
+        
     def __init__(self, path,infoObj):
         self.dataDir = path
         self.info = infoObj

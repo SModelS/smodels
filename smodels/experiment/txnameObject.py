@@ -34,6 +34,7 @@ class TxName(object):
     file (constraint, condition,...) as well as the data.
     """
     
+    
     def __init__(self, path, infoObj):
         self.txnameFile = path
         self.infoObj = infoObj
@@ -166,7 +167,6 @@ class TxName(object):
 class TxNameData(object):
     """Holds the data for the Txname object.  It holds Upper limit values or efficiencies."""
     
-   
     def __init__(self,tag,value,accept_errors_upto=.05):
         """
         :param tag: data tag in string format (upperLimits or efficiencyMap)
@@ -177,10 +177,19 @@ class TxNameData(object):
             This method can be used to loosen the equal branches assumption.
         """
         self.type = tag
-        if type(value)==str:
-            self.data = eval(value, {'fb' : fb, 'pb' : pb, 'GeV' : GeV, 'TeV' : TeV})
+        self.accept_errors_upto=accept_errors_upto
+        self.store_value = value
+        self.data = None
+        
+    def loadData(self):
+        """
+        Uses the information in store_value to generate the data grid used for interpolation.
+        """
+        
+        if type(self.store_value)==str:
+            self.data = eval(self.store_value, {'fb' : fb, 'pb' : pb, 'GeV' : GeV, 'TeV' : TeV})
         else: ## the data can also be given as lists, for debugging
-            self.data = value
+            self.data = self.store_value
         self.unit = 1.0 ## store the unit so that we can take arbitrary units for the "z" values.
                         ## default is unitless, which we use for efficiency maps
         if len(self.data) < 1 or len(self.data[0]) < 2:
@@ -190,9 +199,10 @@ class TxNameData(object):
         if type(self.data[0][1])==unum.Unum:
             ## if its a unum, we store 1.0 * unit
             self.unit=self.data[0][1] / ( self.data[0][1].asNumber() )
-
-        self.accept_errors_upto=accept_errors_upto
+       
         self.computeV()
+
+
 
     @_memoize       
     def getValueFor(self,massarray):
@@ -200,6 +210,8 @@ class TxNameData(object):
         Interpolates the data and returns the UL or efficiency for the respective massarray
         :param massarray: mass array values (with units), i.e. [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         """
+        
+        if not self.data: self.loadData()
         
         porig=self.flattenMassArray ( massarray ) ## flatten
         self.massarray = massarray
