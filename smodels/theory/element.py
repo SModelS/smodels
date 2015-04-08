@@ -10,14 +10,13 @@ from smodels.theory.particleNames import simParticles, elementsInStr
 from smodels.theory.branch import Branch
 from smodels.theory import crossSection
 from smodels.particles import rEven, ptcDic
-from smodels.theory.printer import Printer
 import logging
 import sys
 
 logger = logging.getLogger(__name__)
 
 
-class Element(Printer):
+class Element(object):
     """
     An instance of this class represents an element.    
     This class possesses a pair of branches and the element weight

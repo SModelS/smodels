@@ -9,7 +9,6 @@
 
 """
 
-from smodels.theory.printer import Printer
 
 class MissingTopo():
     """
@@ -22,7 +21,7 @@ class MissingTopo():
         self.weights = weights
         self.value = None
 
-class MissingTopoList(Printer):
+class MissingTopoList(object):
     """
     Object to find and collect MissingTopo objects, plus printout functionality
     :ivar sqrts: center of mass energy for which missing topologies should be evaluated

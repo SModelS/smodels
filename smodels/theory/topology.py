@@ -11,7 +11,6 @@
 
 from smodels.theory import crossSection
 from smodels.theory.element import Element
-from smodels.theory.printer import Printer
 import logging
 import sys
 
@@ -242,7 +241,7 @@ class Topology(object):
         return sumw
 
 
-class TopologyList(Printer):
+class TopologyList(object):
     """
     An instance of this class represents an iterable collection of topologies.
     

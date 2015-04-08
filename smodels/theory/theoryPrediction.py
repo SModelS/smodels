@@ -10,7 +10,6 @@
 from smodels.theory import clusterTools, crossSection, element
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.auxiliaryFunctions import cSim, cGtr  #DO NOT REMOVE
-from smodels.theory.printer import Printer
 import logging,sys
 
 logger = logging.getLogger(__name__)
@@ -52,7 +51,7 @@ class TheoryPrediction(object):
             maxcond = max(maxcond,value)
         return maxcond        
 
-class TheoryPredictionList(Printer):
+class TheoryPredictionList(object):
     """
     An instance of this class represents a collection of theory prediction
     objects.
