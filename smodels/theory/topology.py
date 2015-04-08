@@ -343,15 +343,3 @@ class TopologyList(object):
         for top in self.topos:
             elements.extend(top.elementList)
         return elements
-
-
-    def formatData(self, outputLevel):
-        """
-        Select data preparation method through dynamic binding.
-        
-        :param outputLevel: general control for the output depth to be printed 
-           (0 = no output, 1 = basic output, 2 = detailed output,...
-
-        """
-        return Printer.formatTopologyListData(self, outputLevel)
-

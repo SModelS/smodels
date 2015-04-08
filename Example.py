@@ -16,6 +16,7 @@ import sys
 from smodels.theory import slhaDecomposer
 from smodels.theory import lheDecomposer
 from smodels.tools.physicsUnits import fb, GeV
+from smodels.tools.printer import printout
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.experiment.databaseObjects import Database
 
@@ -43,9 +44,9 @@ def main():
     smstoplist = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
     # smstoplist = lheDecomposer.decompose(lhefile, doCompress=True,doInvisible=True, minmassgap=mingap)
 
-    # Print decomposition summary. Set outputLevel=0 (no output), 1 (simple output), 2 (extended output)
-    smstoplist.printout(outputLevel=2)
-
+    # Print decomposition summary. Set outputLevel=0 (no output), 1 (simple output), 2 (extended output)    
+    printout(smstoplist,outputLevel=1)
+    
     # Load all analyses from database
 #     listOfExpRes = database.getExpResults()
     listOfExpRes = database.getExpResults(datasetIDs=[None])
@@ -54,6 +55,7 @@ def main():
     for expResult in listOfExpRes:
         predictions = theoryPredictionsFor(expResult, smstoplist)
         if not predictions: continue
+#         printout(predictions)
         dataset = predictions.dataset
         datasetID = dataset.getValuesFor('dataid')
         print('\n',expResult)
