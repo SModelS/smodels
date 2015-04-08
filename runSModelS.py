@@ -118,8 +118,8 @@ def main(inputFile, parameterFile, outputFile):
     analyses = parser.get("database", "analyses").split(",")
     txnames = parser.get("database", "txnames").split(",")
 
-    """ Load analyses """
-    listOfExpRes = database.getExpResults(analysisIDs=analyses, txnames=txnames)
+    """ Load analyses """        
+    listOfExpRes = database.getExpResults(analysisIDs=analyses, txnames=txnames, datasetIDs=[None])
 
     """ Print list of analyses loaded """
     if parser.getboolean("stdout", "printAnalyses"):
@@ -136,9 +136,8 @@ def main(inputFile, parameterFile, outputFile):
         Variables set to define printing options. """
     results = ioObjects.ResultList(bestresultonly=not parser.getboolean("file", "expandedSummary"),
                                    describeTopo=parser.getboolean("file", "addConstraintInfo"))
-
-    """ Get theory prediction for each analysis and print basic output """
-    for expResult in listOfExpRes:
+    """ Get theory prediction for each analysis and print basic output """    
+    for expResult in listOfExpRes:        
         theorypredictions = theoryPredictionsFor(expResult, smstoplist)
         if not theorypredictions: continue
         if parser.getboolean("stdout", "printResults"):
@@ -201,7 +200,7 @@ if __name__ == "__main__":
             raise Exception()   
         except Exception:
             debugFacility = debug.Debug()
-            
+             
             if args.development:
                 print(debug.createStackTrace())
             else:
