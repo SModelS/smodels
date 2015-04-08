@@ -11,7 +11,6 @@
 
 import os, sys
 from smodels.theory import lheReader
-from smodels.theory.printer import Printer
 from smodels.tools.physicsUnits import GeV, fb
 from smodels.tools import modpyslha as pyslha
 from smodels.particles import qNumbers, rEven
@@ -20,7 +19,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class ResultList(Printer):
+class ResultList(object):
     """
     Class that collects experimental constraints and has a predefined printout.
     
@@ -92,7 +91,7 @@ class ResultList(Printer):
         return self.formatResultsData(outputLevel)
 
 
-class OutputStatus(Printer):
+class OutputStatus(object):
     """
     Object that holds all status information and has a predefined printout.
     
@@ -180,7 +179,7 @@ class OutputStatus(Printer):
         return self.formatStatusData(outputLevel)
 
 
-class FileStatus(Printer):
+class FileStatus(object):
     """
     Object to run several checks on the input file.
     It holds an LheStatus (SlhaStatus) object if inputType = lhe (slha)
@@ -210,7 +209,7 @@ class FileStatus(Printer):
             self.status = -5, 'Unknown input type: %s' % self.inputType
 
 
-class LheStatus(Printer):
+class LheStatus(object):
     """
     Object to check if input lhe file contains errors.
     
@@ -243,7 +242,7 @@ class LheStatus(Printer):
 
 
 
-class SlhaStatus(Printer):
+class SlhaStatus(object):
     """
     An instance of this class represents the status of an SLHA file.
     The output status is:
