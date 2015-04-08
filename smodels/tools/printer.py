@@ -40,6 +40,23 @@ class MPrinter(object):
             printer.outputType = output
             printer.filename = fname
             self.Printers.append(printer)
+            
+    def addObj(self,obj):
+        """
+        Adds the object to all its Printers:
+        :param obj: An object which can be handled by the Printers.
+        """
+        
+        for printer in self.Printers:
+            printer.addObj(obj)
+            
+    def close(self):
+        """
+        Close all the Printers
+        """
+        
+        for printer in self.Printers:
+            printer.close()
         
 
 class Printer(object):
