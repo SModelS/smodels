@@ -403,25 +403,29 @@ class Database(object):
                    only one result
                    
         """
+        
         expResultList = []
         for expResult in self.expResultList:
             ID = expResult.info.getInfo('id')
             # Skip analysis not containing any of the required ids:
-            if analysisIDs and not ID in analysisIDs:
-                continue
+            if analysisIDs != ['all']:
+                if analysisIDs and not ID in analysisIDs:
+                    continue
             newExpResult = ExpResult()
             newExpResult.path = expResult.path
             newExpResult.info = expResult.info
             newExpResult.datasets = []
             for dataset in expResult.datasets:
-                if datasetIDs and not dataset.dataInfo.dataid in datasetIDs:
-                    continue
+                if datasetIDs != ['all']:
+                    if datasetIDs and not dataset.dataInfo.dataid in datasetIDs:
+                        continue
                 newDataSet = datasetObject.DataSet(dataset.dataDir, dataset.info)
                 newDataSet.dataInfo = dataset.dataInfo
                 newDataSet.txnameList = []
                 for txname in dataset.txnameList:
-                    if txnames and not txname.txname in txnames:
-                        continue
+                    if txnames != ['all']:
+                        if txnames and not txname.txname in txnames:
+                            continue
                     newDataSet.txnameList.append(txname)
                 # Skip data set not containing any of the required txnames:
                 if not newDataSet.txnameList:

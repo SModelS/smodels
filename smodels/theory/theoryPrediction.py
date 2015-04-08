@@ -43,7 +43,8 @@ class TheoryPrediction(object):
         :returns: maximum condition value (float)
         
         """
-            
+
+        if not self.conditions: return 0.        
         maxcond = 0.
         for value in self.conditions.values():
             if value == 'N/A': return value
