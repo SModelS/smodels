@@ -20,7 +20,7 @@ from smodels.tools.physicsUnits import GeV
 from smodels.tools.physicsUnits import fb
 from smodels.tools import ioObjects
 from smodels.tools import missingTopologies
-from smodels.tools import debug
+from smodels.tools import crashReport
 from smodels.tools.printer import printout, MPrinter
 from smodels.experiment.exceptions import DatabaseNotFoundException
 
@@ -186,24 +186,23 @@ if __name__ == "__main__":
     argparser.add_argument('-o', '--outputFile', help='name of output file, optional argument, default is: ' +
                            outputFile, default=outputFile)
     argparser.add_argument('--development', help='enable development output', action='store_true')
-    argparser.add_argument('--run-debug', help='parse debug file and use its contents for a SModelS run',
+    argparser.add_argument('--run-crashreport', help='parse crash report file and use its contents for a SModelS run',
                            action='store_true')
     args = argparser.parse_args()
     
-    if args.run_debug:
-        args.filename, args.parameterFile = debug.readDebugFile(args.filename)
+    if args.run_crashreport:
+        args.filename, args.parameterFile = crashReport.readCrashReportFile(args.filename)
         main(args.filename, args.parameterFile, args.outputFile)
         
     else:
         try:
             main(args.filename, args.parameterFile, args.outputFile)
-            raise Exception()   
         except Exception:
-            debugFacility = debug.Debug()
+            crashReportFacility = crashReport.CrashReport()
              
             if args.development:
-                print(debug.createStackTrace())
+                print(crashReport.createStackTrace())
             else:
-                print(debug.createStackTrace())
-                debugFacility.createDebugFile(args.filename, args.parameterFile)
-                print(debugFacility.createUnknownErrorMessage())
+                print(crashReport.createStackTrace())
+                crashReportFacility.createCrashReportFile(args.filename, args.parameterFile)
+                print(crashReportFacility.createUnknownErrorMessage())
