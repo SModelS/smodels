@@ -1,0 +1,158 @@
+"""
+.. module:: tools.crashReport
+   :synopsis: Facility used in runSModelS.py to create and read SModelS crash report files.
+
+.. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
+
+"""
+
+import os
+import datetime
+import platform
+import traceback
+import logging
+
+log = logging.getLogger(__name__)
+
+
+class CrashReport(object):
+    """
+    Class that handles all crash report information.
+    
+    """    
+    def __init__(self):        
+        timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S%f')
+        self.timestampHuman = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+        self.crashReportFileName = 'smodels-' + timestamp + '.crash'
+
+
+    def createCrashReportFile(self, inputFileName, parameterFileName):
+        """
+        Create a new SModelS crash report file.
+        
+        A SModelS crash report file contains:
+        
+        - a timestamp
+        - SModelS version
+        - platform information (CPU architecture, operating system, ...)
+        - Python version
+        - stack trace
+        - input file name
+        - input file content
+        - parameter file name
+        - parameter file content
+        
+        :param inputFileName: relative location of the input file
+        :param parameterFileName: relative location of the parameter file
+        
+        """
+    
+        with open('smodels/version', 'r') as versionFile:
+            version = versionFile.readline()
+    
+        with open(inputFileName, 'r') as inputFile:
+            inputFileContent = inputFile.read()
+    
+        with open(parameterFileName, 'r') as parameterFile:
+            parameterFileContent = parameterFile.read()
+    
+        crashReportFile = open(self.crashReportFileName, 'w')
+        crashReportFile.write("================================================================================\n")
+        crashReportFile.write("SModelS Crash Report File\n")
+        crashReportFile.write("================================================================================\n")
+        crashReportFile.write("Timestamp: " + self.timestampHuman + "\n\n")
+        crashReportFile.write("SModelS Version: " + version + "\n")
+        crashReportFile.write("Platform: " + platform.platform() + "\n")
+        crashReportFile.write("Python Version: " + platform.python_version() + "\n\n")
+        crashReportFile.write("================================================================================\n\n")
+        crashReportFile.write("--------------------------------------------------------------------------------\n")
+        crashReportFile.write("* Output\n")
+        crashReportFile.write("--------------------------------------------------------------------------------\n\n")
+        crashReportFile.write(traceback.format_exc() + "\n\n")
+        crashReportFile.write("--------------------------------------------------------------------------------\n")
+        crashReportFile.write("* Input File\n")
+        crashReportFile.write("  " + os.path.basename(inputFileName) + "\n")
+        crashReportFile.write("--------------------------------------------------------------------------------\n\n")
+        crashReportFile.write(inputFileContent + "\n")
+        crashReportFile.write("--------------------------------------------------------------------------------\n")
+        crashReportFile.write("* Parameter File\n")
+        crashReportFile.write("  " + os.path.basename(parameterFileName) + "\n")
+        crashReportFile.write("--------------------------------------------------------------------------------\n\n")
+        crashReportFile.write(parameterFileContent)
+        crashReportFile.close()
+        
+    
+    def createUnknownErrorMessage(self):
+        """
+        Create a message for an unknown error.
+        
+        """
+        message = ("\n\n\n"
+                   "================================================================================\n\n"
+                   "SModelS quit unexpectedly due to an unknown error. The error has been written to\n"
+                   + self.crashReportFileName + ".\n\n"
+                   "Please send this file to smodels-users@lists.oeaw.ac.at and shortly describe\n"
+                   "what you did to help making SModelS better!\n\n"
+                   "Alternatively, use the '--development' option when running runSModelS.py to\n"
+                   "prevent this message from showing up again.\n\n"
+                   "================================================================================")
+        return message
+    
+    
+def readCrashReportFile(crashReportFileName):
+    """
+    Read a crash report file to use its input and parameter file sections for a SModelS run.
+    
+    :param crashReportFileName: relative location of the crash report file
+    
+    """
+    with open(crashReportFileName, 'r') as crashReportFile:
+        crashReportFileContent = crashReportFile.readlines()
+        
+    lineNumber = 0
+    inputStartLine = 0
+    inputEndLine = 0
+    parameterStartLine = 0
+    
+    for line in crashReportFileContent:
+        if lineNumber == 1:
+            if not line.rstrip() == "SModelS Crash Report File":
+                log.error("ERROR: Not a SModelS crash report file!")
+                break
+            
+        if line.rstrip() == "* Input File":
+            inputStartLine = lineNumber + 4
+            
+        if line.rstrip() == "* Parameter File":
+            inputEndLine = lineNumber - 2
+            parameterStartLine = lineNumber + 4
+        
+        lineNumber += 1
+        
+    parameterEndLine = lineNumber
+    
+    crashReportInputFileName = 'crash_report_input'
+    crashReportParameterFileName = 'crash_report_parameter'
+    
+    crashReportInputFile = open(crashReportInputFileName, 'w')
+    crashReportParameterFile = open(crashReportParameterFileName, 'w')
+    
+    for i in range(inputStartLine, inputEndLine):
+        crashReportInputFile.write(crashReportFileContent[i])
+    
+    for i in range(parameterStartLine, parameterEndLine):
+        crashReportParameterFile.write(crashReportFileContent[i])
+        
+    crashReportInputFile.close()
+    crashReportParameterFile.close()
+    
+    return crashReportInputFileName, crashReportParameterFileName
+    
+    
+def createStackTrace():
+    """
+    Return the stack trace.
+    
+    """
+    return traceback.format_exc()
+
