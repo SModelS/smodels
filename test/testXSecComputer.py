@@ -30,8 +30,8 @@ class XSecTest(unittest.TestCase):
         self.assertAlmostEqual(w8lo, 268.4799000000022  ) ## 268.48 fb
 
     def testNLLGlu(self):
-        """ test the computation of LO cross section """
-        self.logger.info ( "test LO xsecs @ 8 TeV" )
+        """ test the computation of NLL cross section """
+        self.logger.info ( "test NLL xsecs @ 8 TeV" )
         slhafile="../inputFiles/slha/simplyGluino.slha"
         w = xsecComputer.computeXSec(8*TeV,NLL,1000, slhafile ).getDictionary()
         w8lo= w[(1000021, 1000021)]['8 TeV (NLO+NLL)'].asNumber( fb )
