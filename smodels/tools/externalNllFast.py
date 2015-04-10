@@ -92,7 +92,7 @@ class ExternalNllFast(ExternalTool):
 
     def run_(self, params):
         """
-        Execute nllfast7.
+        Execute nllfast.
         
         :params params: parameters used (e.g. gg cteq5 .... )
         :returns: stdout and stderr, or error message
