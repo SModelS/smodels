@@ -100,7 +100,7 @@ class ExternalNllFast(ExternalTool):
         """
         cmd = "cd %s; %s %s" % (self.cdPath, self.executablePath, params)
         out = commands.getoutput(cmd)
-        out = out.split("\n")
+        ## out = out.split("\n")
         return out
 
 
@@ -121,11 +121,11 @@ class ExternalNllFast(ExternalTool):
         if not pdf in ["cteq", "cteq6", "mstw", "mstw2008"]:
             return None
         if not squarkmass:
-            return self.run_("%s %s %s") % (process, pdf, gluinomass)
+            return self.run_("%s %s %s" % (process, pdf, gluinomass) )
         if not gluinomass:
-            return self.run_("%s %s %s") % (process, pdf, squarkmass)
-        return self.run_("%s %s %s %s") % \
-                (process, pdf, squarkmass, gluinomass)
+            return self.run_("%s %s %s" % (process, pdf, squarkmass) )
+        return self.run_("%s %s %s %s" % \
+                (process, pdf, squarkmass, gluinomass) )
 
 
     def checkInstallation(self):
@@ -141,7 +141,7 @@ class ExternalNllFast(ExternalTool):
             logger.error("%s is not executable", self.executable)
             return False
         out = self.run_(self.testParams)
-        if out[-1].find(self.testCondition) == -1:
+        if out.find(self.testCondition) == -1:
             logger.error("Setup invalid: " + str(out))
             return False
         self.unlink("gg")

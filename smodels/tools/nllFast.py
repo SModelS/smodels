@@ -91,15 +91,16 @@ def getKfactorsFor(pIDs, sqrts, slhafile, pdf='cteq'):
     nllpath = tool.installDirectory()
     tool.pathOfExecutable()
     tool.checkInstallation()
-    if process == "st":
-        nll_run = "./nllfast_" + energy + " %s %s %s" % \
-                  (process, pdf, squarkmass)
-    else:
-        nll_run = "./nllfast_" + energy + " %s %s %s %s" % \
-                  (process, pdf, squarkmass, gluinomass)
+    #if process == "st":
+    #    nll_run = "./nllfast_" + energy + " %s %s %s" % \
+    #              (process, pdf, squarkmass)
+    #else:
+    #    nll_run = "./nllfast_" + energy + " %s %s %s %s" % \
+    #              (process, pdf, squarkmass, gluinomass)
 
+    nll_output = tool.run ( process, pdf, squarkmass, gluinomass )
     # Run NLLfast
-    nll_output = runNLLfast(nll_run, nllpath)
+    # nll_output = runNLLfast(nll_run, nllpath)
 
     # If run was successful, return k-factors:
     if "K_NLO" in nll_output:
