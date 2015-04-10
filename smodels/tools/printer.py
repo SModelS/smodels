@@ -1,7 +1,7 @@
 """
-.. module:: theory.printer
-   :synopsis: Facility used in classes to derive from and be able to print
-      different data types in different forms.
+.. module:: printer
+   :synopsis: Facility used to print elements, theorypredictions, missing topologies et al
+      in various forms
 
 .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>    
