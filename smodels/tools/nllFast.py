@@ -10,7 +10,6 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
 """
-
 import commands
 import os
 from smodels.tools import toolBox
@@ -292,6 +291,6 @@ if __name__ == "__main__":
     Calculate k factors for a pid pair.
     
     """
-    slhaF = installation.installDirectory() + "inputFiles/slha/T1.slha"
-    kNLO, kNLL = getKfactorsFor((1000021, 1000021), 13.*TeV, slhaF)
+    slhaF = installation.installDirectory() + "inputFiles/slha/gluino_squarks.slha"
+    kNLO, kNLL = getKfactorsFor((1000021, 1000021), 8*TeV, slhaF)
     print("nlo, nll = " + str(kNLO) + ", " + str(kNLL))
