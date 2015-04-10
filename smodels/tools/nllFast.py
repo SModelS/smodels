@@ -146,10 +146,13 @@ def getKfactorsFor(pIDs, sqrts, slhafile, pdf='cteq'):
         kfacs = None        
         while not kfacs and dcpl_mass > 500.:
             dcpl_mass -= 100.  # Reduce decoupled mass, until NLLfast produces results
-            if process == 'sb': nllinput = (process, pdf, squarkmass, dcpl_mass)
-            else:  nllinput = (process, pdf, dcpl_mass, gluinomass)
-            nll_run = "./nllfast_" + energy + " %s %s %s %s" % nllinput
-            nll_output = runNLLfast(nll_run, nllpath)
+            #if process == 'sb': nllinput = (process, pdf, squarkmass, dcpl_mass)
+            #else:  nllinput = (process, pdf, dcpl_mass, gluinomass)
+            #nll_run = "./nllfast_" + energy + " %s %s %s %s" % nllinput
+            #nll_output = runNLLfast(nll_run, nllpath)
+            #print "old nll_output >>%s<<" % ( nll_output )
+            nll_output = tool.run ( process, pdf, dcpl_mass, gluinomass )
+            #print "new nll_output >>%s<<" % ( nll_output )
             kfacs = getKfactorsFrom(nll_output)        
         kFacsVector.append([dcpl_mass, kfacs]) #Second point for interpolation (non-decoupled grid)
 
