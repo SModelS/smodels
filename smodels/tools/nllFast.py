@@ -133,7 +133,8 @@ def getKfactorsFor(pIDs, sqrts, slhafile, pdf='cteq'):
         return (None, None)
 
     # Obtain k-factors from the NLLfast decoupled grid
-    kfacs = getDecoupledKfactors(nllpath,process,energy,pdf,min(gluinomass,squarkmass))
+    # kfacs = getDecoupledKfactorsOld(nllpath,process,energy,pdf,min(gluinomass,squarkmass))
+    kfacs = getDecoupledKfactors(tool,process,pdf,min(gluinomass,squarkmass))
     # Decoupling limit is satisfied, do not interpolate
     if not kfacs:
         logger.warning("Error obtaining k-factors from the NLLfast decoupled grid for " + process)
@@ -272,7 +273,7 @@ def interpolateKfactors(kFacsVector, xval):
 
     return kFacs
 
-def getDecoupledKfactors(nllpath,process,energy,pdf,mass):
+def getDecoupledKfactorsOld(nllpath,process,energy,pdf,mass):
     """
     Compute k-factors in the decoupled (squark or gluino) regime for the process.
     If a decoupled grid does not exist for the process, return None
@@ -284,6 +285,23 @@ def getDecoupledKfactors(nllpath,process,energy,pdf,mass):
     nll_run = "./nllfast_" + energy + " %s %s %s" % \
                       (process_dcpl, pdf, mass)
     nll_output = runNLLfast(nll_run, nllpath)
+    if "K_NLO" in nll_output:
+        return getKfactorsFrom(nll_output)
+    else: return None
+
+def getDecoupledKfactors(tool,process,pdf,mass):
+    """
+    Compute k-factors in the decoupled (squark or gluino) regime for the process.
+    If a decoupled grid does not exist for the process, return None
+    """
+        
+    if process != 'sb' and process != 'gg': return None
+    elif process == 'sb': process_dcpl = 'sdcpl'
+    elif process == 'gg': process_dcpl = 'gdcpl'    
+    #nll_run = "./nllfast_" + energy + " %s %s %s" % \
+    #                  (process_dcpl, pdf, mass)
+    #nll_output = runNLLfast(nll_run, nllpath)
+    nll_output = tool.run ( process_dcpl, pdf, mass )
     if "K_NLO" in nll_output:
         return getKfactorsFrom(nll_output)
     else: return None
