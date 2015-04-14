@@ -1,0 +1,105 @@
+
+TGQ
+
+    Fig.Number              link
+    limit                   limit_TGQ.txt    link    comment
+
+    Fig.Number              link
+    exclusion               exclusion_TGQ.txt    link    comment
+    exclusionp1             file    link    comment
+    exclusionm1             file    link    comment
+    expectedexclusion       file    link    comment
+    expectedexclusionp1     file    link    comment
+    expectedexclusionm1     file    link    comment
+
+T6WWLSP060
+
+    Fig.Number              link
+    limit                   limit_T6WWLSP060.txt    link    comment
+
+    Fig.Number              link
+    exclusion               exclusion_T6WWLSP060.txt    link    comment
+    exclusionp1             file    link    comment
+    exclusionm1             file    link    comment
+    expectedexclusion       file    link    comment
+    expectedexclusionp1     file    link    comment
+    expectedexclusionm1     file    link    comment
+
+T6WW050
+
+    Fig.Number              link
+    limit                   limit_T6WW050.txt    link    comment
+
+    Fig.Number              link
+    exclusion               exclusion_T6WW050.txt    link    comment
+    exclusionp1             file    link    comment
+    exclusionm1             file    link    comment
+    expectedexclusion       file    link    comment
+    expectedexclusionp1     file    link    comment
+    expectedexclusionm1     file    link    comment
+
+T5WW050
+
+    Fig.Number              link
+    limit                   limit_T5WW050.txt    link    comment
+
+    Fig.Number              link
+    exclusion               exclusion_T5WW050.txt    link    comment
+    exclusionp1             file    link    comment
+    exclusionm1             file    link    comment
+    expectedexclusion       file    link    comment
+    expectedexclusionp1     file    link    comment
+    expectedexclusionm1     file    link    comment
+
+T5WWLSP060
+
+    Fig.Number              link
+    limit                   limit_T5WWLSP060.txt    link    comment
+
+    Fig.Number              link
+    exclusion               exclusion_T5WWLSP060.txt    link    comment
+    exclusionp1             file    link    comment
+    exclusionm1             file    link    comment
+    expectedexclusion       file    link    comment
+    expectedexclusionp1     file    link    comment
+    expectedexclusionm1     file    link    comment
+
+T5ttccD020
+
+    Fig.Number              link
+    limit                   limit_T5ttccD020.txt    link    comment
+
+    Fig.Number              link
+    exclusion               exclusion_T5ttccD020.txt    link    comment
+    exclusionp1             file    link    comment
+    exclusionm1             file    link    comment
+    expectedexclusion       file    link    comment
+    expectedexclusionp1     file    link    comment
+    expectedexclusionm1     file    link    comment
+    
+T2
+
+    Fig.Number              link
+    limit                   limit_T2.txt    link    comment
+
+    Fig.Number              link
+    exclusion               exclusion_T2.txt    link    comment
+    exclusionp1             file    link    comment
+    exclusionm1             file    link    comment
+    expectedexclusion       file    link    comment
+    expectedexclusionp1     file    link    comment
+    expectedexclusionm1     file    link    comment
+    
+T1
+
+    Fig.Number              link
+    limit                   limit_T1.txt    link    comment
+
+    Fig.Number              link
+    exclusion               exclusion_T1.txt    link    comment
+    exclusionp1             file    link    comment
+    exclusionm1             file    link    comment
+    expectedexclusion       file    link    comment
+    expectedexclusionp1     file    link    comment
+    expectedexclusionm1     file    link    comment
+    
