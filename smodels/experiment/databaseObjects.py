@@ -76,7 +76,8 @@ class ExpResult(object):
         return txnames
 
 
-    def getUpperLimitFor(self, dataID=None, alpha=0.05, expected=False, txname=None, mass=None):
+    def getUpperLimitFor(self, dataID=None, alpha=0.05, expected=False,
+                          txname=None, mass=None, compute=False):
         """
         Computes a 95% upper limit on the signal cross-section according to the type of result.
         If dataID is define, returns the UL for the signal*efficiency for an efficiency
@@ -100,7 +101,7 @@ class ExpResult(object):
                 logger.error("The data set ID must be defined when computing ULs for\
                             efficiency-map results.")
                 return False
-
+            
             upperLimits = self.getUpperLimits(alpha, expected)
             if not upperLimits:
                 return False
@@ -109,6 +110,7 @@ class ExpResult(object):
                 return False
             else:
                 return upperLimits[dataID]
+            
         elif self.getValuesFor('datatype') == 'upper-limit':
             if not txname or not mass:
                 logger.error("A TxName and mass array must be defined when computing ULs for\
@@ -128,7 +130,7 @@ class ExpResult(object):
 
 
     @_memoize
-    def getUpperLimits(self, alpha=0.05, expected=False):
+    def getUpperLimits(self, alpha=0.05, expected=False, compute=False):
         """
         Computes the 95% upper limit on the signal*efficiency for an efficiency
         type result for all the datasets (signal regions).
@@ -136,6 +138,10 @@ class ExpResult(object):
         
         :param alpha: Can be used to change the C.L. value. The default value is 0.05 (= 95% C.L.)
         :param expected: Compute expected limit ( i.e. Nobserved = NexpectedBG )
+        :param compute: If True, the upper limit will be computed
+                        from expected and observed number of events. If False, the value listed
+                        in the database will be used instead.
+        
         
         :return: dictionary with dataset IDs as keys and the upper limit as values 
         
@@ -146,7 +152,10 @@ class ExpResult(object):
                 logger.error("getUpperLimit is intended for efficiency map results only!")
                 return False
 
-            upperLimits[dataset.dataInfo.dataid] = dataset.getUpperLimit(alpha, expected)
+            if compute:
+                upperLimits[dataset.dataInfo.dataid] = dataset.getUpperLimit(alpha, expected)
+            else:
+                upperLimits[dataset.dataInfo.dataid] = dataset.getValuesFor('upperLimit')                
 
         return upperLimits
 
