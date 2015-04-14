@@ -16,38 +16,38 @@ import os
 class IntegrationTest(unittest.TestCase):
     def configureLogger(self):
         import logging.config
-        fc= inspect.getabsfile(self.configureLogger).replace ( "testIntegration.py", "integration.conf" )
+        fc= inspect.getabsfile(self.configureLogger).replace ( "testTheoryPrediction.py", "integration.conf" )
         logging.config.fileConfig( fname=fc, disable_existing_loggers=False )
 
     def predictions(self):
-        return { 'SUS13006:TChiWZ': 18.4709328281*fb,
-                 'SUS12028:T2': 1.69834196094*fb,
-                 'SUS12028:T1': 572.168935 * fb, ## 8.43114195825*fb,
-                 'SUS12022:TChiChipmSlepL371': 8.43114195825*fb }
+        return { 'ATLAS-SUSY-2013-02:T1': 572.168935 * fb }
 
     def checkAnalysis(self,analysis,smstoplist):
-        print "checking analysis",analysis
+        # print "checking analysis",analysis
         from smodels.theory.theoryPrediction import theoryPredictionsFor
         theorypredictions = theoryPredictionsFor(analysis, smstoplist)
         defpreds=self.predictions()
-        # print "ana",analysis,theorypredictions
+        #print "ana",analysis,theorypredictions
         if not theorypredictions:
-            return
-        ### print(">>>> Ana %s" % analysis.label)
+            print "no theory predictions for",analysis,"??"
+            import sys
+            sys.exit(-1)
+        #print(">>>> Ana %s" % analysis)
         for pred in theorypredictions:
-            # print ( "Pred ana",pred.analysis.label)
+            #print ( "Pred ana",str(analysis.info.getInfo('id')))
+            #print ( "Pred txname",pred.txname.getInfo("txname"))
             m0=str ( int ( pred.mass[0][0]/GeV )  )
-            # print ( "Pred mass0",m0 )
+            #print ( "Pred mass0",m0 )
             #print ( "Pred mass0",int(pred.mass[0]/GeV))
             #print ( "Pred value",pred.value )
             #print ( "Pred value type",type(pred.value) )
             #print ( "Pred value dict",pred.value.__dict__ )
             w=pred.value.getDictionary()[(None,None)]
             predval=w['8 TeV (NLL)']
-            ## print w,"%10f" % (predval/fb)
+            #print w,"%10f" % (predval/fb)
             #print "predval=",predval.asNumber(fb)
-            defpredval=defpreds[pred.analysis.label] 
-            # print ( "Pred default value",defpredval )
+            defpredval=defpreds[analysis.info.getInfo('id')+":"+pred.txname.getInfo("txname") ]
+            #print ( "Pred default value",defpredval )
             self.assertAlmostEqual ( predval / fb, defpredval / fb )
 
             # print ( "Pred condition",pred.conditions)
@@ -69,8 +69,8 @@ class IntegrationTest(unittest.TestCase):
         smstoplist = slhaDecomposer.decompose(slhafile, .1*fb, doCompress=True,
                 doInvisible=True, minmassgap=5.*GeV)
         database = Database ( "./database/" )
-        listofanalyses = database.getExpResults()
-        print "analyses=",listofanalyses
+        listofanalyses = database.getExpResults( analysisIDs= [ "ATLAS-SUSY-2013-02" ], txnames = [ "T1" ] )
+        ## print "analyses=",listofanalyses
         if type(listofanalyses) != list:
             listofanalyses= [ listofanalyses] 
         for analysis in listofanalyses:
