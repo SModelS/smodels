@@ -9,26 +9,31 @@
 """
 import unittest
 from smodels.tools.physicsUnits import GeV, pb
-from smodels.experiment.smsInterpolation import upperLimit
-from smodels.experiment import smsHelpers
 from smodels.installation import installDirectory
+from smodels.experiment.databaseObjects import Database
+#from smodels.experiment.smsInterpolation import upperLimit
+#from smodels.experiment import smsHelpers
 
 ## smsHelpers.base = installDirectory() + 'test/database/'
-smsHelpers.base =  './database/'
+# smsHelpers.base =  './database/'
+database=Database ( "./database" )
 
 class UpperLimitTest(unittest.TestCase):
 
     def testDirectDecay(self):
-        ul = float(upperLimit("SUS12028","T2",[400*GeV,100*GeV])/pb)
-        self.assertAlmostEquals ( ul, 0.43757864832878113)
+        expRes=database.getExpResults ( analysisIDs = [ "ATLAS-SUSY-2013-05" ], datasetIDs= [ None ] , txnames= [ "T2bb" ] )
+        ul = expRes.getUpperLimitFor (txname= "T2bb",  mass=[[400*GeV,100*GeV],[400*GeV,100*GeV]] ).asNumber ( pb )
+        self.assertAlmostEquals ( ul, 0.0608693 )
+
+    def testOutofBounds(self):
+        expRes=database.getExpResults ( analysisIDs = [ "ATLAS-SUSY-2013-05" ], datasetIDs= [ None ] , txnames= [ "T6bbWW" ] )
+        ul = expRes.getUpperLimitFor (txname= "T6bbWW",  mass=[[400*GeV,250*GeV,100*GeV],[400*GeV,250*GeV,100*GeV]] )
+        self.assertTrue ( ul == None )
 
     def testCascadeDecay(self):
-        ul = float(upperLimit("ATLAS_CONF_2013_048","T6bbWW",[500*GeV,400*GeV,100*GeV])/pb)
-        self.assertAlmostEquals( ul , 0.10152592613065325 )
-
-    def testMissingUnits(self):
-        ul = upperLimit("ATLAS_CONF_2013_048", "T6bbWW", [500, 400, 100])
-        self.assertTrue(ul==None)
+        expRes=database.getExpResults ( analysisIDs = [ "ATLAS-SUSY-2013-05" ], datasetIDs= [ None ] , txnames= [ "T6bbWW" ] )
+        ul = expRes.getUpperLimitFor (txname= "T6bbWW",  mass=[[150*GeV,140*GeV,135*GeV],[150*GeV,140*GeV,135*GeV]] ).asNumber ( pb )
+        self.assertAlmostEquals ( ul, 324.682 )
 
 if __name__ == "__main__":
     unittest.main()
