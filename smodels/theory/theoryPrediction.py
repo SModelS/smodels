@@ -245,8 +245,7 @@ def _combineElements(elements, dataset, maxDist):
     
     clusters = []
     if dataset.dataInfo.datatype == 'efficiency-map':
-        cluster = clusterTools.groupAll(elements)
-        cluster.txname = None
+        cluster = clusterTools.groupAll(elements)        
         clusters.append(cluster)
     elif dataset.dataInfo.datatype == 'upper-limit':        
         for txname in dataset.txnameList:
@@ -255,9 +254,7 @@ def _combineElements(elements, dataset, maxDist):
                 #Check if element really belongs to txname:
                 if not txname.getEfficiencyFor(element): continue
                 else: txnameEls.append(element)
-
-            txnameClusters = clusterTools.clusterElements(txnameEls, txname.txnameData, maxDist)
-            for cluster in txnameClusters: cluster.txname = txname
+            txnameClusters = clusterTools.clusterElements(txnameEls, txname, maxDist)            
             clusters += txnameClusters
     else:
         logger.warning("Unkown data type: %s. Data will be ignored." 

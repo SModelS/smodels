@@ -225,21 +225,24 @@ def groupAll(elements):
     """
     cluster = ElementCluster()
     cluster.elements = elements
+    cluster.txname = None
     return cluster
 
 
-def clusterElements(elements, txdata, maxDist):
+def clusterElements(elements, txname, maxDist):
     """
     Cluster the original elements according to their mass distance.
     
     :parameter elements: list of elements (Element objects)
-    :parameter txdata: TxNameData object to be used for computing distances in UL space
+    :parameter txname: TxName object to be used for computing distances in UL space
     
     :returns: list of clusters (ElementCluster objects)    
     """
     if len(elements) == 0:  return []
+    txdata = txname.txnameData
     # ElementCluster elements by their mass:
     clusters = _doCluster(elements, txdata, maxDist)
+    for cluster in clusters: cluster.txname = txname
     return clusters
 
 
