@@ -21,7 +21,6 @@ class InterpolationTest(unittest.TestCase):
         self.database = Database ( "./database/" )
         # print database
         expRes = self.database.getExpResults(analysisIDs=["ATLAS-SUSY-2013-05"], datasetIDs=[None], txnames=["T2bb" ] )
-        print "expRes=",expRes
         #expRes=listOfExpRes[0]   # ATLAS-SUSY-2013-05
         txname=expRes.datasets[0].txnameList[0] # T2bb
         result=txname.txnameData.getValueFor([[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ])
