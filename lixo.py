@@ -1,12 +1,18 @@
 #!/usr/bin/env python
 
-
-#from smodels.tools.statistics import getUL,getPValue,computeCLInterval
 import sys
-from smodels.tools.printer import TextBasedPrinter, TxTPrinter
-p1 = TextBasedPrinter()
-print dir(p1)
+from smodels.theory import slhaDecomposer
+from smodels.theory import lheDecomposer
+from smodels.tools.physicsUnits import fb, GeV
+from smodels.tools.printer import printout
+from smodels.theory.theoryPrediction import theoryPredictionsFor
+from smodels.experiment.databaseObjects import Database
 
-p2 = TxTPrinter()
-print dir(p2)
+#Set the address of the database folder
+database = Database("../smodels-database/")
 
+ listOfExpRes = database.getExpResults(datasetIDs=[None])
+
+for expRes in listOfExpRes:
+      print (expRes.getValuesFor('sqrts')/TeV).asNumber()
+      sys.exit()

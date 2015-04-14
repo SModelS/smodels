@@ -57,7 +57,7 @@ class MPrinter(object):
 
 class TextBasedPrinter(object):
     """
-    Super class to handle the printing of one text-based outputs
+    Super class to handle the printing of the text-based output
     """
     
     def __init__(self):
@@ -369,7 +369,32 @@ class PyPrinter(TextBasedPrinter):
         TextBasedPrinter.__init__(self)                
         self.printingOrder = [OutputStatus,TopologyList,Element,
                              TheoryPredictionList,ResultList,MissingTopoList]
+
+
+    def _formatTheoryPredictionList(self, obj):
         
+        ExptRes = []
+        expResult = obj.expResult
+        datasetID = obj.dataset.getValuesFor('dataid')
+        for prediction in obj:
+            mass = prediction.mass
+            txname = prediction.txname            
+            maxconds = prediction.getmaxCondition()
+            if maxconds == 'N/A': maxconds = -1.
+            theores = (prediction.value/fb).asNumber()
+            if expResult.getValuesFor('datatype') == 'upper-limit':
+                explimit = expResult.getUpperLimitFor(txname=txname,mass=mass)
+            elif expResult.getValuesFor('datatype') == 'efficiency-map':
+                explimit = expResult.getUpperLimitFor(dataID=datasetID)
+            explimit = (explimit/fb).asNumber()
+            expID =  expResult.getValuesFor('id')   
+            ExptRes.append({'maxcond': maxconds, 'tval (fb)': theores,
+                            'TxName': txname, 'DaughterMass (GeV)': (mass[0][-1]/GeV).asNumber(),
+                            'exptlimit (fb)': explimit, 'ExpID': expID,
+                            'Sqrts (TeV)': (expResult.getValuesFor('sqrts')/TeV).asNumber(),
+                            'MotherMass': (mass[0][0]/GeV).asNumber()})
+            
+        return ExptRes
 
 
 def printout(obj, outputLevel=1):
