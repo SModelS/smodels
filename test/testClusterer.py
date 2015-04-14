@@ -9,6 +9,8 @@
 
 """
 import unittest
+import sys
+sys.path.append('../')
 
 class ClustererTest(unittest.TestCase):
     def testClusterer(self):
