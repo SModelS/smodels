@@ -7,12 +7,11 @@ from smodels.tools.physicsUnits import fb, GeV
 from smodels.tools.printer import printout
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.experiment.databaseObjects import Database
+from smodels.tools.physicsUnits import GeV, fb, TeV
 
-#Set the address of the database folder
-database = Database("../smodels-database/")
 
- listOfExpRes = database.getExpResults(datasetIDs=[None])
+from smodels.tools import modpyslha as pyslha
 
-for expRes in listOfExpRes:
-      print (expRes.getValuesFor('sqrts')/TeV).asNumber()
-      sys.exit()
+slhafile = 'inputFiles/slha/lightEWinos.slha'
+res = pyslha.readSLHAFile(slhafile)
+print res
