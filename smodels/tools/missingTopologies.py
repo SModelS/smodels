@@ -97,8 +97,9 @@ class MissingTopoList(object):
                     continue
                 covered = None
                 for ana in listOfAnalyses:
-                    if not ana.getEfficiencyFor(el) == 0:
-                        covered = True
+                    for txname in ana.getTxNames():
+                        if not txname.getEfficiencyFor(el) == 0:
+                            covered = True
                 if not covered:
                     self.addToTopos(el, sumL)
         for topo in self.topos:
