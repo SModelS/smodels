@@ -26,8 +26,9 @@ class IntegrationTest(unittest.TestCase):
                  'SUS12022:TChiChipmSlepL371': 8.43114195825*fb }
 
     def checkAnalysis(self,analysis,smstoplist):
-        from smodels.theory.theoryPrediction import theoryPredictionFor
-        theorypredictions = theoryPredictionFor(analysis, smstoplist)
+        print "checking analysis",analysis
+        from smodels.theory.theoryPrediction import theoryPredictionsFor
+        theorypredictions = theoryPredictionsFor(analysis, smstoplist)
         defpreds=self.predictions()
         # print "ana",analysis,theorypredictions
         if not theorypredictions:
@@ -56,8 +57,9 @@ class IntegrationTest(unittest.TestCase):
         from smodels.installation import installDirectory
         from smodels.tools.physicsUnits import fb, GeV
         from smodels.theory import slhaDecomposer
-        from smodels.experiment import smsAnalysisFactory, smsHelpers
-        smsHelpers.base = installDirectory() + 'test/database/'
+        from smodels.experiment.databaseObjects import Database
+        #from smodels.experiment import smsAnalysisFactory, smsHelpers
+        #smsHelpers.base = installDirectory() + 'test/database/'
         # smsHelpers.runs = [ "2012" ]
         ## slhafile = installDirectory()+'oldFiles/andrePT4.slha'
         #slhafile = '../inputFiles/slha/lightSquarks.slha'
@@ -66,7 +68,11 @@ class IntegrationTest(unittest.TestCase):
         self.configureLogger()
         smstoplist = slhaDecomposer.decompose(slhafile, .1*fb, doCompress=True,
                 doInvisible=True, minmassgap=5.*GeV)
-        listofanalyses = smsAnalysisFactory.load()
+        database = Database ( "./database/" )
+        listofanalyses = database.getExpResults()
+        print "analyses=",listofanalyses
+        if type(listofanalyses) != list:
+            listofanalyses= [ listofanalyses] 
         for analysis in listofanalyses:
             self.checkAnalysis(analysis,smstoplist)
 
