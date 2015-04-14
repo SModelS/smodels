@@ -301,7 +301,7 @@ def getDecoupledKfactors(tool,process,pdf,mass):
     #nll_run = "./nllfast_" + energy + " %s %s %s" % \
     #                  (process_dcpl, pdf, mass)
     #nll_output = runNLLfast(nll_run, nllpath)
-    nll_output = tool.run ( process_dcpl, pdf, mass )
+    nll_output = tool.run ( process_dcpl, pdf, mass, None )
     if "K_NLO" in nll_output:
         return getKfactorsFrom(nll_output)
     else: return None
