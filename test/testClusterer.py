@@ -27,6 +27,7 @@ class ClustererTest(unittest.TestCase):
         xsecs = crossSection.getXsecFromLHEFile(filename)
         element = lheDecomposer.elementFromEvent(event, xsecs )
                   #crossSection.XSectionList( { "8 TeV (NLL)": xsec } ))
+        element.txname=None
         # print "w0=",element.branches[0].masses
         e0=copy.deepcopy(element)
 
@@ -38,7 +39,9 @@ class ClustererTest(unittest.TestCase):
         # lets now cluster the two different gluino masses.
         # yes, this is a very strange example :)
         newel=clusterTools.groupAll ( [e0,e1] )
+        newel.txname=True
         newmasses=newel.getAvgMass()
+        print "newmasses=",newmasses
         self.assertAlmostEquals ( newmasses[0][0]/GeV, 700. ) 
         self.assertAlmostEquals ( newmasses[0][1]/GeV, 200. )
 
