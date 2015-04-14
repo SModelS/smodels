@@ -47,6 +47,7 @@ def main():
     # Print decomposition summary. Set outputLevel=0 (no output), 1 (simple output), 2 (extended output)    
     printout(smstoplist,outputLevel=1)
     
+    
     # Load all analyses from database
 #     listOfExpRes = database.getExpResults()
     listOfExpRes = database.getExpResults(datasetIDs=[None])
