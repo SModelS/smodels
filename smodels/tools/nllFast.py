@@ -254,7 +254,6 @@ def interpolateKfactors(kFacsVector, xval):
     :returns: list of interpolated k-factor values at x-value xval
     
     """
-    print "[interpolateKfactors]",kFacsVector,"xval=",xval
     kFacs = []
 
     xpts = [x[0] for x in kFacsVector]
