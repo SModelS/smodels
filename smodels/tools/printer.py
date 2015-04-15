@@ -28,9 +28,9 @@ class MPrinter(object):
     """
     Master Printer class to handle the Printers (one printer/output type)   
     """
-    def __init__(self):
+    def __init__(self,*printerList):
         
-        self.Printers = []
+        self.Printers = printerList
             
     def addObj(self,obj):
         """
@@ -62,13 +62,13 @@ class TextBasedPrinter(object):
     Super class to handle the printing of the text-based output
     """
     
-    def __init__(self):
+    def __init__(self, output, filename, outputLevel):
             
         self.objList = []
         self.outputList = []
-        self.outputLevel = 1
-        self.filename = None
-        self.output = 'stdout'
+        self.outputLevel = outputLevel
+        self.filename = filename
+        self.output = output
         self.printingOrder = []
         
     def close(self):
@@ -352,9 +352,9 @@ class TxTPrinter(TextBasedPrinter):
     """
     Printer class to handle the printing of one single text output
     """
-    def __init__(self):
+    def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
 
-        TextBasedPrinter.__init__(self)                
+        TextBasedPrinter.__init__(self, output, filename, outputLevel)                
         self.printingOrder = [OutputStatus,TopologyList,Element,
                              TheoryPredictionList,ResultList,MissingTopoList]
 
@@ -363,9 +363,9 @@ class SummaryPrinter(TextBasedPrinter):
     Printer class to handle the printing of one single summary output
     """
     
-    def __init__(self):
+    def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
 
-        TextBasedPrinter.__init__(self)
+        TextBasedPrinter.__init__(self, output, filename, outputLevel)
         self.printingOrder = [OutputStatus,ResultList,MissingTopoList]
         
 
@@ -373,9 +373,9 @@ class PyPrinter(TextBasedPrinter):
     """
     Printer class to handle the printing of one single pythonic output
     """
-    def __init__(self):
+    def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
 
-        TextBasedPrinter.__init__(self)                
+        TextBasedPrinter.__init__(self, output, filename, outputLevel)                
         self.printingOrder = [Doc,OutputStatus,TheoryPredictionList,MissingTopoList]
 
     def flush(self):
