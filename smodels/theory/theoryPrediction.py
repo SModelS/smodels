@@ -194,6 +194,7 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
         theoryPrediction.value = _evalConstraint(cluster)            
         theoryPrediction.conditions = _evalConditions(cluster)
         theoryPrediction.mass = cluster.getAvgMass()
+        theoryPrediction.PIDs = cluster.getPIDs()
         predictionList + theoryPrediction
         
 

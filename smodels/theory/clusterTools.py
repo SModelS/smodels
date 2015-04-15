@@ -62,6 +62,22 @@ class ElementCluster(object):
         return massAvg(massList,weights=weights)
 
 
+    def getPIDs(self):
+        """
+        Return the list of all PIDs appearing in all elements in the cluster,
+        i.e. [ [[pdg1, pdg2,...],[pdg3,pdg4,...]], [[pdg1', pdg2',...],[pdg3',pdg4',...]] 
+        
+        :returns: list of PIDs
+        """
+        
+        PIDs = []
+        for el in self:
+            for pidList in el.getPIDs():
+                if not pidList in PIDs: PIDs.append(pidList)
+            
+        return PIDs
+
+
 class IndexCluster(object):
     """
     An instance of this class represents a cluster storing element indices.    

@@ -275,6 +275,9 @@ class TextBasedPrinter(object):
             if theoryPrediction.mass:
                 for ibr, br in enumerate(theoryPrediction.mass):
                     output += "Masses in branch %i: " % ibr + str(br) + "\n"
+            if outputLevel == 2:
+                for pidList in theoryPrediction.PIDs:
+                    output += "PIDs:" + str(pidList) + "\n"
             output += "Theory prediction: " + str(theoryPrediction.value) + "\n"
             output += "Theory conditions:"
             if not theoryPrediction.conditions:

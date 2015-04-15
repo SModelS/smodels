@@ -61,10 +61,12 @@ def main():
         print('\n',expResult)
         for theoryPrediction in predictions:
             mass = theoryPrediction.mass
-            txname = theoryPrediction.txname            
+            txname = theoryPrediction.txname
+            PIDs =  theoryPrediction.PIDs         
             print("------------------------")
             print("TxName = ",txname)   #Analysis name
             print("Prediction Mass = ",mass)    #Value for average cluster mass (average mass of the elements in cluster)
+            print("Prediction PIDs = ",PIDs)    #Value for average cluster mass (average mass of the elements in cluster)
             print("Theory Prediction = ",theoryPrediction.value)   #Value for the cluster signal cross-section
             print("Condition Violation = ",theoryPrediction.conditions)  #Condition violation values
               
