@@ -21,7 +21,7 @@ from smodels.tools.physicsUnits import fb
 from smodels.tools import ioObjects
 from smodels.tools import missingTopologies
 from smodels.tools import crashReport
-from smodels.tools.printer import printout, MPrinter
+import smodels.tools.printer as prt
 from smodels.experiment.exceptions import DatabaseNotFoundException
 
 log = logging.getLogger(__name__)
@@ -54,6 +54,12 @@ def main(inputFile, parameterFile, outputFile):
         log.warning("Removing old output file " + outputFile)
     outfile = open(outputFile, 'w')
     outfile.close()
+
+    stdoutPrinter = prt.TxTPrinter(output = 'stdout')
+    summaryPrinter = prt.SummaryPrinter(output = 'file', filename = 'summary_print.txt')
+    pythonPrinter = prt.PyPrinter(output = 'file', filename = 'sms_output.py')
+    printer = prt.MPrinter(stdoutPrinter,summaryPrinter,pythonPrinter)
+
 
     inputType = parser.get("options", "inputType").lower()
     if inputType != 'slha' and inputType != 'lhe':
@@ -106,7 +112,7 @@ def main(inputFile, parameterFile, outputFile):
     if parser.getboolean("stdout", "printDecomp"):
         outLevel = 1
         outLevel += parser.getboolean("stdout", "addElmentInfo")
-    printout(smstoplist,outputLevel=outLevel)
+    printer.addObj(smstoplist)
 
 
     """
@@ -142,7 +148,7 @@ def main(inputFile, parameterFile, outputFile):
         if not theorypredictions: continue
         if parser.getboolean("stdout", "printResults"):
             print("================================================================================")
-            printout(theorypredictions)
+            printer.addObj(theorypredictions)
         print("................................................................................")
 
         """ Create a list of results, to determine the best result """
@@ -156,7 +162,6 @@ def main(inputFile, parameterFile, outputFile):
     else:
         outputStatus.updateStatus(1)
 
-    printer = MPrinter(outputs={'summary' : outputFile})
     printer.addObj(outputStatus)
     if outputStatus.status == 1:
         printer.addObj(results)
