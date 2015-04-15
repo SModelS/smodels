@@ -24,16 +24,11 @@ from smodels.tools import modpyslha as pyslha
 #Set the address of the database folder
 database = Database("../smodels-database/")
 
-printerList = printer.MPrinter()
-stdoutPrinter = printer.TxTPrinter()
-stdoutPrinter.output = 'stdout'
-summaryPrinter = printer.SummaryPrinter()
-summaryPrinter.output = 'file'
-summaryPrinter.filename = 'summary_print.txt'
-pythonPrinter = printer.PyPrinter()
-pythonPrinter.output = 'file'
-pythonPrinter.filename = 'sms_output.py'
-printerList.Printers = [stdoutPrinter,summaryPrinter,pythonPrinter]
+
+stdoutPrinter = printer.TxTPrinter(output = 'stdout')
+summaryPrinter = printer.SummaryPrinter(output = 'file', filename = 'summary_print.txt')
+pythonPrinter = printer.PyPrinter(output = 'file', filename = 'sms_output.py')
+printerList = printer.MPrinter(stdoutPrinter,summaryPrinter,pythonPrinter)
 
 def main():
     """
