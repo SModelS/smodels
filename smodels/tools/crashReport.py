@@ -11,6 +11,7 @@ import datetime
 import platform
 import traceback
 import logging
+from smodels import installation
 
 log = logging.getLogger(__name__)
 
@@ -47,7 +48,7 @@ class CrashReport(object):
         
         """
     
-        with open('smodels/version', 'r') as versionFile:
+        with open(installation.installDirectory()+'/smodels/version', 'r') as versionFile:
             version = versionFile.readline()
     
         with open(inputFileName, 'r') as inputFile:
