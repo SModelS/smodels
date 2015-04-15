@@ -143,7 +143,7 @@ class OutputStatus(object):
             # self.printout("file", self.outputfile)
             sprinter = printer.SummaryPrinter()
             sprinter.output = 'file'
-            sprinter.filename = self.outputfile
+            sprinter.filename = "summary.txt"
             sprinter.addObj ( self )
             sprinter.close()
         return self.status
