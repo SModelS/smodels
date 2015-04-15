@@ -134,8 +134,18 @@ class OutputStatus(object):
         
         """
         if self.status < 0:
-            self.printout("stdout")
-            self.printout("file", self.outputfile)
+            # self.printout("stdout")
+            from smodels.tools import printer
+            tprinter = printer.TxTPrinter()
+            tprinter.output = 'stdout' 
+            tprinter.addObj ( self )
+            tprinter.close()
+            # self.printout("file", self.outputfile)
+            sprinter = printer.SummaryPrinter()
+            sprinter.output = 'file'
+            sprinter.filename = self.outputfile
+            sprinter.addObj ( self )
+            sprinter.close()
         return self.status
 
 
