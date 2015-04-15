@@ -33,7 +33,6 @@ def main():
     #Path to input file name (either a SLHA or LHE file)
 #     slhafile = 'inputFiles/slha/gluino_squarks.slha'
     slhafile = 'inputFiles/slha/lightEWinos.slha'
-#     slhafile = 'inputFiles/slha/compression.slha'
 #     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
 
     #Set main options for decomposition:
@@ -43,9 +42,9 @@ def main():
     """ Decompose model (use slhaDecomposer for SLHA input or lheDecomposer for LHE input) """
     smstoplist = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
     # smstoplist = lheDecomposer.decompose(lhefile, doCompress=True,doInvisible=True, minmassgap=mingap)
-
+    
     # Print decomposition summary. Set outputLevel=0 (no output), 1 (simple output), 2 (extended output)    
-    printout(smstoplist,outputLevel=1)
+    printout(smstoplist,outputLevel=2)
     
     
     # Load all analyses from database

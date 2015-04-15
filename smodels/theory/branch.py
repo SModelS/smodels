@@ -22,8 +22,9 @@ class Branch(object):
     
     :ivar masses: list of masses for the intermediate states
     :ivar particles: list of particles (strings) for the final states
-    :ivar momID: PDG id for the primary (intermediate state) mother
-    :ivar daughterID: PDG id for the last intermediate state
+    :ivar PIDs: a list of the pdg numbers of the intermediate states appearing in the branch.
+                If the branch represents more than one possible pdg list, PIDs will correspond
+                to a nested list (PIDs = [[pid1,pid2,...],[pidA,pidB,...])
     :ivar maxWeight: weight of the branch (XSection object)
     """
     def __init__(self, info=None):
@@ -36,8 +37,7 @@ class Branch(object):
         """
         self.masses = []
         self.particles = []
-        self.momID = None
-        self.daughterID = None
+        self.PIDs = []
         self.maxWeight = None
         if type(info) == type(str()):
             branch = elementsInStr(info)
@@ -119,8 +119,9 @@ class Branch(object):
         newbranch = Branch()
         newbranch.masses = self.masses[:]
         newbranch.particles = self.particles[:]
-        newbranch.momID = self.momID
-        newbranch.daughterID = self.daughterID
+        newbranch.PIDs = []
+        for pidList in self.PIDs:
+            newbranch.PIDs.append(pidList[:])
         if not self.maxWeight is None:
             newbranch.maxWeight = self.maxWeight.copy()
         return newbranch
@@ -148,7 +149,11 @@ class Branch(object):
         newBranch = self.copy()
         newparticles = []
         newmass = []
-        newBranch.daughterID = None
+        
+        if len(self.PIDs) != 1:
+            logger.error("During decay the branch should \
+                            not have multiple PID lists!")
+            return False   
 
         for partID in br.ids:
             # Add R-even particles to final state
@@ -157,7 +162,7 @@ class Branch(object):
             else:
                 # Add masses of non R-even particles to mass vector
                 newmass.append(massDictionary[partID])
-                newBranch.daughterID = partID
+                newBranch.PIDs[0].append(partID)
 
         if len(newmass) > 1:
             logger.warning("Multiple R-odd particles in the final state: " +
@@ -185,15 +190,18 @@ class Branch(object):
         :returns: list of extended branches (Branch objects). Empty list if daughter is stable or
                   if daughterID was not defined.
         """
-                
-        if not self.daughterID:
+
+        if len(self.PIDs) != 1:
+            logger.error("Can not decay branch with multiple PID lists")
+            return False                
+        if not self.PIDs[0][-1]:
             # Do nothing if there is no R-odd daughter (relevant for RPV decays
             # of the LSP)
             return []
         #If decay table is not defined, assume daughter is stable:
-        if not self.daughterID in brDictionary: return []
+        if not self.PIDs[0][-1] in brDictionary: return []
         # List of possible decays (brs) for R-odd daughter in branch        
-        brs = brDictionary[self.daughterID]
+        brs = brDictionary[self.PIDs[0][-1]]
         if len(brs) == 0:
             # Daughter is stable, there are no new branches
             return []
@@ -239,5 +247,5 @@ def decayBranches(branchList, brDictionary, massDictionary,
         branchList = newBranchList
         
     #Sort list by initial branch PID:
-    finalBranchList = sorted(finalBranchList, key=lambda branch: branch.momID)
+    finalBranchList = sorted(finalBranchList, key=lambda branch: branch.PIDs)
     return finalBranchList

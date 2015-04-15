@@ -68,22 +68,6 @@ class Element(object):
                 for ib, branch in enumerate(info):
                     self.branches[ib] = branch.copy()
 
-    def combineMotherElements ( self, el2 ):
-        """
-        Combine mother elements from self and el2 into self
-        
-        :parameter el2: element (Element Object)  
-        """
-        if len(self.motherElements)==0: 
-            # no mothers? then you yourself are mother!
-            tmp=self.copy()
-            self.motherElements.append ( ("combine", tmp) )
-        for m in el2.motherElements:
-            self.motherElements.append ( (m[0], m[1].copy()) )
-        if len(el2.motherElements)==0: 
-            # no mothers? then yo yourself are mother now
-            tmp=el2.copy()
-            self.motherElements.append ( ("combine", tmp) )
 
     def __eq__(self, other):
         return self.isEqual(other)
@@ -246,27 +230,56 @@ class Element(object):
             massarray.append(branch.masses)
         return massarray
 
+    def getPIDs(self):
+        """
+        Get the list of IDs (PDGs of the intermediate states appearing the cascade decay), i.e.
+        [  [[pdg1,pdg2,...],[pdg3,pdg4,...]] ].
+        The list might have more than one entry if the element combines different pdg lists:
+        [  [[pdg1,pdg2,...],[pdg3,pdg4,...]],  [[pdg1',pdg2',...],[pdg3',pdg4',...]], ...]
+        
+        :returns: list of PDG ids
+        """
+        
+        pids = []
+        for ipid,PIDlist in enumerate(self.branches[0].PIDs):
+            pids.append([self.branches[0].PIDs[ipid],self.branches[1].PIDs[ipid]])
+        
+        return pids
 
     def getDaughters(self):
         """
-        Get a pair of daughter IDs (PDGs of the last intermediate state appearing the cascade decay).    
-        Can be None, if the element does not have a definite daughter.
+        Get a pair of daughter IDs (PDGs of the last intermediate 
+        state appearing the cascade decay), i.e. [ [pdgLSP1,pdgLSP2] ]    
+        Can be a list, if the element combines several daughters:
+        [ [pdgLSP1,pdgLSP2],  [pdgLSP1',pdgLSP2']] 
         
         :returns: list of PDG ids
         """
         
-        return (self.branches[0].daughterID, self.branches[1].daughterID)
-
-
+        pids = self.getPIDs()
+        daughterPIDs = []
+        for pidlist in pids:
+            daughterPIDs.append([pidlist[0][-1],pidlist[1][-1]])
+            
+        return daughterPIDs
+    
     def getMothers(self):
         """
-        Get a pair of mother IDs (PDG ids of the primary mother intermediate state).      
-        Can be None, if the element does not have a definite mother.
+        Get a pair of mother IDs (PDGs of the first intermediate 
+        state appearing the cascade decay), i.e. [ [pdgMOM1,pdgMOM2] ]    
+        Can be a list, if the element combines several mothers:
+        [ [pdgMOM1,pdgMOM2],  [pdgMOM1',pdgMOM2']] 
         
         :returns: list of PDG ids
         """
         
-        return (self.branches[0].momID, self.branches[1].momID)
+        pids = self.getPIDs()
+        momPIDs = []
+        for pidlist in pids:
+            momPIDs.append([pidlist[0][0],pidlist[1][0]])
+            
+        return momPIDs    
+
 
 
     def getEinfo(self):
@@ -467,14 +480,40 @@ class Element(object):
         else:
             return newelement
 
-    def formatData(self,outputLevel):
+
+    def combineMotherElements ( self, el2 ):
         """
-        Select data preparation method through dynamic binding.
+        Combine mother elements from self and el2 into self
         
-        :parameter outputLevel: general control for the output depth to be printed 
-                            (0 = no output, 1 = basic output, 2 = detailed output,...
+        :parameter el2: element (Element Object)  
         """
-        return Printer.formatElementData(self,outputLevel)
+        if len(self.motherElements)==0: 
+            # no mothers? then you yourself are mother!
+            tmp=self.copy()
+            self.motherElements.append ( ("combine", tmp) )
+        for m in el2.motherElements:
+            self.motherElements.append ( (m[0], m[1].copy()) )
+        if len(el2.motherElements)==0: 
+            # no mothers? then yo yourself are mother now
+            tmp=el2.copy()
+            self.motherElements.append ( ("combine", tmp) )
+
+
+    def combinePIDs(self,el2):
+        """
+        Combine the PIDs of both elements. If the PIDs already appear in self,
+        do not add them to the list.
+        
+        :parameter el2: element (Element Object) 
+        """
+           
+        elPIDs = self.getPIDs()
+        newelPIDs = el2.getPIDs()
+        for pidlist in newelPIDs:                    
+            if not pidlist in elPIDs:
+                self.branches[0].PIDs.append(pidlist[0])
+                self.branches[1].PIDs.append(pidlist[1])
+
 
 
 def _smallerMass(mass1, mass2):

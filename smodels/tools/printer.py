@@ -218,8 +218,12 @@ class TextBasedPrinter(object):
         output += "\t\t Particles in element: " + str(obj.getParticles())
         output += "\n"
         output += "\t\t The element masses are \n"
-        for i, el in enumerate(obj.getMasses()):
-            output += "\t\t Branch %i: " % i + str(el) + "\n"
+        for i, mass in enumerate(obj.getMasses()):
+            output += "\t\t Branch %i: " % i + str(mass) + "\n"
+        output += "\n"
+        output += "\t\t The element PIDs are \n"
+        for pidlist in obj.getPIDs():
+            output += "\t\t PIDs: "+ str(pidlist) + "\n"           
         output += "\t\t The element weights are: \n \t\t " + obj.weight.niceStr()
 
         return output

@@ -93,14 +93,13 @@ def elementFromEvent(event, weight=None):
         # Particle came from initial state (primary mother)
         if 1 in particle.moms:
             mombranch = branch.Branch()
-            mombranch.momID = particle.pdg
-            mombranch.daughterID = particle.pdg            
+            mombranch.PIDs = [[particle.pdg]]            
             if weight:
                 mombranch.maxWeight = weight.getMaxXsec()
             # Get simple BR and Mass dictionaries for the corresponding branch
             branchBR = brDic[ip]
             branchMass = massDic[ip]
-            mombranch.masses = [branchMass[mombranch.momID]]
+            mombranch.masses = [branchMass[mombranch.PIDs[0][0]]]
             # Generate final branches (after all R-odd particles have decayed)
             finalBranchList += branch.decayBranches([mombranch], branchBR,
                                                     branchMass, sigcut=0. * fb )
