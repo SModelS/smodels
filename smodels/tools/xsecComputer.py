@@ -260,7 +260,7 @@ def main(args):
             print "1"
         else:
             print "0"
-    return
+        return
        
     
     sqrtses = [item for sublist in args.sqrts for item in sublist]
