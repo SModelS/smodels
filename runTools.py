@@ -21,6 +21,7 @@ def main():
     xseccomputer.add_argument('-s', '--sqrts', nargs='+', action='append', help="sqrt(s) TeV. Can supply more than one value.", type=int, default=[])
     xseccomputer.add_argument('-e', '--nevents', type=int, default=10000, help="number of events to be simulated.")
     xseccomputer.add_argument('-p', '--tofile', action='store_true', help="write cross sections to file")
+    xseccomputer.add_argument('-q', '--query', action='store_true', help="only query if there are cross sections in the file")
     xseccomputer.add_argument('-k', '--keep', action='store_true', help="do not unlink temporary directory")
     xseccomputer.add_argument('-n', '--NLO', action='store_true', help="compute at the NLO level (default is LO)")
     xseccomputer.add_argument('-N', '--NLL', help="compute at the NLO+NLL level (takes precedence over NLO, default is LO)", action='store_true')
