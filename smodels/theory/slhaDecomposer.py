@@ -167,6 +167,7 @@ def _getDictionariesFromSLHA(slhafile):
     massDic = dict(res.blocks['MASS'].items())
     for pid in massDic.keys()[:]:
         massDic[pid] *= GeV
+        massDic[pid] = abs(massDic[pid])
         if not -pid in massDic: massDic[-pid] = massDic[pid]    
  
     return brDic, massDic
