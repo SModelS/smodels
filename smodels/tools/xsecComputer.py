@@ -254,6 +254,14 @@ def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True, pythiacard=None
 
 
 def main(args):
+    if args.query:
+        xsecsInfile = crossSection.getXsecFromSLHAFile(args.filename)
+        if xsecsInfile:
+            print "1"
+        else:
+            print "0"
+    return
+       
     
     sqrtses = [item for sublist in args.sqrts for item in sublist]
     if len(sqrtses) == 0:
