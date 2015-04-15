@@ -186,17 +186,12 @@ class Topology(object):
                 added = True
                 element.weight.combineWith(newelement.weight)
                 element.combineMotherElements(newelement)
-                # When combining elements with different mothers, erase mother
-                # info
-                if element.getMothers() != newelement.getMothers():
-                    element.branches[0].momID = None
-                    element.branches[1].momID = None
-                # When combining elements with different daughters, erase
-                # daughter info
-                if element.getDaughters() != newelement.getDaughters():
-                    element.branches[0].daughterID = None
-                    element.branches[1].daughterID = None
-
+                #Check the correct branch ordering when combining PIDs
+                if element.isEqual(newelement, order=True):
+                    element.combinePIDs(newelement)
+                else:
+                    element.combinePIDs(newelement.switchBranches())
+                
 
         if added:
             return True

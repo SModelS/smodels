@@ -78,8 +78,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     branchList = []
     for pid in maxWeight:
         branchList.append(Branch())
-        branchList[-1].momID = pid
-        branchList[-1].daughterID = pid
+        branchList[-1].PIDs = [[pid]]
         if not pid in massDic:
             logger.error ( "pid %d does not appear in masses dictionary %s in slhafile %s" % 
                     ( pid, massDic, slhafile ) )
@@ -91,10 +90,14 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     # Generate dictionary, where keys are the PIDs and values are the list of branches for the PID (for performance)
     branchListDict = {}
     for branch in finalBranchList:
-        if branch.momID in branchListDict:
-            branchListDict[branch.momID].append(branch)
+        if len(branch.PIDs) != 1:
+            logger.error("During decomposition the branches should \
+                            not have multiple PID lists!")
+            return False   
+        if branch.PIDs[0][0] in branchListDict:
+            branchListDict[branch.PIDs[0][0]].append(branch)
         else:
-            branchListDict[branch.momID] = [branch]
+            branchListDict[branch.PIDs[0][0]] = [branch]
     for pid in xSectionList.getPIDs():
         if not pid in branchListDict: branchListDict[pid] = []
 
@@ -112,6 +115,11 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
                 if type(finalBR) == type( 1. * fb):
                     finalBR = finalBR.asNumber()
                 if finalBR < minBR: continue # Skip elements with xsec below sigcut
+
+                if len(branch1.PIDs) != 1 or len(branch2.PIDs) != 1:
+                    logger.error("During decomposition the branches should \
+                            not have multiple PID lists!")
+                    return False    
 
                 newElement = element.Element([branch1, branch2])
                 newElement.weight = weightList*finalBR
