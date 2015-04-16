@@ -55,7 +55,7 @@ class ResultList(object):
         :returns: R value = weight / upper limit
         
         """
-        return res.value[0].value / res.expResult.getUpperLimitFor(res.mass)
+        return res.value[0].value / res.txname.txnameData.getValueFor(res.mass)
 
     def sort(self):
         """

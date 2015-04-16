@@ -315,12 +315,14 @@ class TextBasedPrinter(object):
             obj.outputarray = [bestresult]
         output += "#Analysis  Tx_Name  Sqrts  Cond. Violation  Theory_Value(fb)  Exp_limit(fb)  r\n\n"
         for op in obj.outputarray:
-            output += "%19s %16s " % (op.analysis.label.split(":")[0], op.analysis.label.split(":")[1])  # ana, topo
-            output += "%4s " % (op.analysis.sqrts / TeV)  # sqrts
+            output += "%19s %16s " % (op.expResult.info.getInfo('id'), op.txname.getInfo('txname') )  # ana, topo
+            # output += "%19s %16s " % (op.analysis.label.split(":")[0], op.analysis.label.split(":")[1])  # ana, topo
+            output += "%4s " % (op.expResult.info.getInfo("sqrts") / TeV)  # sqrts
             output += "%5s " % op.getmaxCondition()  # condition violation
-            output += "%10.3E %10.3E " % (op.value[0].value / fb, op.analysis.getUpperLimitFor(op.mass) / fb)  # theory cross section , expt upper limit
+            output += "%10.3E %10.3E " % (op.value[0].value / fb, op.txname.txnameData.getValueFor(op.mass) / fb)  # theory cross section , expt upper limit
             output += "%10.3E\n" % obj.getR(op)
-            if obj.describeTopo: output += "#" + str(op.analysis.constraint) + "\n"
+            if obj.describeTopo: output += "#" + str(op.txname.getInfo("constraint")) + "\n"
+            # if obj.describeTopo: output += "#" + str(op.analysis.constraint) + "\n"
             if not op == obj.outputarray[-1]: output += "--------------------------------------------------------------------------------\n"
 
         output += "\n \n"
