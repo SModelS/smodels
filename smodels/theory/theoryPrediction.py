@@ -119,6 +119,8 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2):
     #according to the expect upper limit
     bestResults = _getBestResults(dataSetResults)
     bestResults.expResult = expResult
+    for op in bestResults:
+        op.expResult = expResult
     return bestResults
 
 
