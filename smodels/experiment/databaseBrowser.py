@@ -133,25 +133,54 @@ class Browser(object):
                
         return fields
 
-    def getULFor(self,expid,txname,massarray):
+    def getULFor(self,expid,txname=None,massarray=None,datasetID=None):
         """
         Get an upper limit for the given experimental id, the txname, and the massarray. 
         Interpolation is done, if necessary.
         :param expid: experimental id (string)
-        :param txname: txname (string)
+        :param txname: txname (string). ONLY required for upper limit results
         :param massarray: list of masses with units, e.g.
                           [[ 400.*GeV, 100.*GeV],[400.*GeV, 100.*GeV]]
-
+                          ONLY required for upper limit results
+        :param datasetID: string defining the dataset id, e.g. ANA5-CUT3. 
+                          ONLY required for efficiency map results
         :return: upper limit [fb]
         """
-        for expres in self:
-            if expres.getValuesFor('id') != expid:
+        
+        #First select the experimental results matching the id and the result type:
+        expres = None
+        for expResult in self:
+            if expResult.getValuesFor('id') != expid:
                 continue
+            else:
+                if 'upper-limit' in expResult.getValuesFor('datatype'):
+                    if not txname or not massarray: continue
+                    expres = expResult
+                    break
+                elif 'efficiency-map' in expResult.getValuesFor('datatype'):
+                    if not datasetID: continue
+                    expres = expResult
+                    break
+
+        if not expres:
+            logger.warning ( "browser could not find %s . For upper limit results \
+            txname and massarray must be defined, while for efficiency map results only \
+            dataset must be defined" % (expid))
+            return None
+        
+        if 'upper-limit' in expres.getValuesFor('datatype'):
             txnames = expres.getTxNames()
             for tx in txnames:
                 if not tx.txname == txname: continue                
                 return tx.txnameData.getValueFor(massarray)
-        logger.warning ( "browser could not find %s or %s" % ( expid, txname ) )
+            
+        elif 'efficiency-map' in expres.getValuesFor('datatype'):
+            for dataset in expres.datasets:
+                if dataset.dataInfo.dataid != datasetID:
+                    continue
+                return dataset.getUpperLimit()
+
+        logger.warning ( "browser could not find upper limit.")
         return None
      
   
