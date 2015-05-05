@@ -207,6 +207,7 @@ class Branch(object):
             return []
         newBranches = []
         for br in brs:
+            if not br.br: continue  #Skip zero BRs
             # Generate a new branch for each possible decay
             newBranches.append(self._addDecay(br, massDictionary))
         return newBranches
