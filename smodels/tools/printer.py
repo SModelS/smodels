@@ -15,6 +15,7 @@ from smodels.theory.topology import TopologyList
 from smodels.theory.element import Element
 from smodels.theory.theoryPrediction import TheoryPredictionList
 from smodels.experiment.txnameObject import TxName
+from smodels.experiment.databaseObjects import ExpResult
 from smodels.tools.ioObjects import OutputStatus, ResultList
 from smodels.tools.missingTopologies import MissingTopoList
 from smodels.tools.physicsUnits import GeV, fb, TeV
@@ -32,14 +33,14 @@ class MPrinter(object):
         
         self.Printers = printerList
             
-    def addObj(self,obj):
+    def addObj(self,obj,objOutputLevel=None):
         """
         Adds the object to all its Printers:
         :param obj: An object which can be handled by the Printers.
         """
         
         for printer in self.Printers:
-            printer.addObj(obj)
+            printer.addObj(obj,objOutputLevel)
             
     def close(self):
         """
@@ -98,16 +99,19 @@ class TextBasedPrinter(object):
         self.objList = []
         self.outputList = []
         
-    def addObj(self,obj):
+    def addObj(self,obj,objOutputLevel=None):
         """
         Adds object to the Printer. The object will be formatted according to the outputType
         and the outputLevel. The resulting output will be stored in outputList.
         :param obj: A object to be printed. Must match one of the types defined in formatObj
+        :param outputLevel: Defines object specific output level. If set to None it will use
+                            the printer outputLevel value.
         :return: True if the object has been added to the output. If the object does not belong
                 to printingOrder or has no output format defined, returns False.        
         """
         
-        output = self._formatObj(obj)
+        if objOutputLevel is None: objOutputLevel = self.outputLevel
+        output = self._formatObj(obj,objOutputLevel)
         if output is False:
             return False    
         self.objList.append(obj)  
@@ -115,44 +119,48 @@ class TextBasedPrinter(object):
         return True
     
 
-    def _formatObj(self,obj):
+    def _formatObj(self,obj,objOutputLevel):
         """
         Method for formatting the output depending on the type of object
         and output.
         :param obj: A object to be printed. Must match one of the types defined in formatObj
+        :param outputLevel: Defines object specific output level.
         """
         
         if isinstance(obj,TopologyList):
-            return self._formatTopologyList(obj)
+            return self._formatTopologyList(obj,objOutputLevel)
         elif isinstance(obj,Element):
-            return self._formatElementList(obj)
+            return self._formatElementList(obj,objOutputLevel)
         elif isinstance(obj,TxName):
-            return self._formatTxName(obj)     
+            return self._formatTxName(obj,objOutputLevel)
+        elif isinstance(obj,ExpResult):
+            return self._formatExpResult(obj,objOutputLevel)
         elif isinstance(obj,TheoryPredictionList):
-            return self._formatTheoryPredictionList(obj)
+            return self._formatTheoryPredictionList(obj,objOutputLevel)
         elif isinstance(obj,OutputStatus):
-            return self._formatOutputStatus(obj)   
+            return self._formatOutputStatus(obj,objOutputLevel)   
         elif isinstance(obj,ResultList):
-            return self._formatResultList(obj)
+            return self._formatResultList(obj,objOutputLevel)
         elif isinstance(obj,MissingTopoList):
-            return self._formatMissingTopoList(obj)
+            return self._formatMissingTopoList(obj,objOutputLevel)
         elif isinstance(obj,Doc):
-            return self._formatPySLHA(obj)        
+            return self._formatPySLHA(obj,objOutputLevel)        
         else:
             return False     
 
-    def _formatPySLHA(self,obj):
+    def _formatPySLHA(self,obj,objOutputLevel):
         
         return False
         
-    def _formatOutputStatus(self, obj):
+    def _formatOutputStatus(self, obj, objOutputLevel):
         """
         Format data for a OutputStatus object. 
            
-        :param obj: A OutputStatus object to be printed.     
+        :param obj: A OutputStatus object to be printed.
+        :param outputLevel: Defines object specific output level.   
         """
 
-        outputLevel = self.outputLevel
+        outputLevel = objOutputLevel
         if not outputLevel: return None
 
         output = ""
@@ -166,15 +174,15 @@ class TextBasedPrinter(object):
 
         return output
 
-    def _formatTopologyList(self, obj):
+    def _formatTopologyList(self, obj, objOutputLevel):
         """
         Format data for a TopologyList object. 
            
         :param obj: A TopologyList object to be printed.
+        :param outputLevel: Defines object specific output level.
         """
 
-        outputLevel = self.outputLevel
-        if not outputLevel: return None
+        if not objOutputLevel: return None
 
         old_vertices = ""
         output = ""
@@ -195,7 +203,7 @@ class TextBasedPrinter(object):
             totxsec = topo.getTotalWeight()
             output += "Total Global topology weight :\n" + totxsec.niceStr() + '\n'
             output += "Total Number of Elements: " + str(len(topo.elementList)) + '\n'
-            if outputLevel == 2:
+            if objOutputLevel == 2:
                 for el in topo.elementList:
                     output += "\t\t .........................................................................\n"
                     output += "\t\t Element: \n"
@@ -204,15 +212,15 @@ class TextBasedPrinter(object):
         return output
 
 
-    def _formatElement(self, obj):
+    def _formatElement(self, obj, objOutputLevel):
         """
         Format data for a Element object. 
            
-        :param obj: A Element object to be printed.     
+        :param obj: A Element object to be printed.
+        :param outputLevel: Defines object specific output level.
         """
 
-        outputLevel = self.outputLevel
-        if not outputLevel: return None
+        if not objOutputLevel: return None
 
         output = ""
         output += "\t\t Particles in element: " + str(obj.getParticles())
@@ -228,20 +236,20 @@ class TextBasedPrinter(object):
 
         return output
 
-    def _formatTxName(self, obj):
+    def _formatTxName(self, obj, objOutputLevel):
         """
         Format data for a TxName object. 
            
-        :param obj: A TxName object to be printed.     
+        :param obj: A TxName object to be printed.
+        :param outputLevel: Defines object specific output level.   
         """
 
-        outputLevel = self.outputLevel
-        if not outputLevel: return None
+        if not objOutputLevel: return None
 
         output = ""
         output += "========================================================\n"
         output += "Tx Label: "+obj.txname+'\n'
-        if outputLevel == 2:
+        if objOutputLevel == 2:
             output += "\t -----------------------------\n"
             output += "\t Elements tested by analysis:\n"            
             for el in obj._elements():
@@ -249,16 +257,41 @@ class TextBasedPrinter(object):
                 
         return output
 
+    def _formatExpResult(self, obj, objOutputLevel):
+        """
+        Format data for a ExpResult object. 
+           
+        :param obj: A ExpResult object to be printed.
+        :param outputLevel: Defines object specific output level.  
+        """
+        
+        if not objOutputLevel: return None
 
-    def _formatTheoryPredictionList(self, obj):
+        output = ""
+        output += "========================================================\n"
+        output += "Experimental Result ID: " + obj.getValuesFor('id') + '\n'
+        output += "Tx Labels: " + str(obj.getValuesFor('txname')) + '\n'
+        output += "Sqrts: " + str(obj.getValuesFor('sqrts')) + '\n'
+        if objOutputLevel == 2:
+            output += "\t -----------------------------\n"
+            output += "\t Elements tested by analysis:\n"
+            listOfelements = obj.getValuesFor('_elements')
+            for el in listOfelements:
+                output += "\t    " + str(el) + "\n"
+
+        return output
+
+
+
+    def _formatTheoryPredictionList(self, obj, objOutputLevel):
         """
         Format data for a TheoryPredictionList object. 
            
-        :param obj: A TheoryPredictionList object to be printed.     
+        :param obj: A TheoryPredictionList object to be printed.
+        :param outputLevel: Defines object specific output level.  
         """
 
-        outputLevel = self.outputLevel
-        if not outputLevel: return None
+        if not objOutputLevel: return None
 
         output = ""
 
@@ -275,7 +308,7 @@ class TextBasedPrinter(object):
             if theoryPrediction.mass:
                 for ibr, br in enumerate(theoryPrediction.mass):
                     output += "Masses in branch %i: " % ibr + str(br) + "\n"
-            if outputLevel == 2:
+            if objOutputLevel == 2:
                 for pidList in theoryPrediction.PIDs:
                     output += "PIDs:" + str(pidList) + "\n"
             output += "Theory prediction: " + str(theoryPrediction.value) + "\n"
@@ -297,15 +330,15 @@ class TextBasedPrinter(object):
 
         return output
 
-    def _formatResultList(self, obj):
+    def _formatResultList(self, obj, objOutputLevel):
         """
         Format data of the ResultList object.
            
-        :param obj: A ResultList object to be printed.     
+        :param obj: A ResultList object to be printed.
+        :param outputLevel: Defines object specific output level.
         """
 
-        outputLevel = self.outputLevel
-        if not outputLevel: return None
+        if not objOutputLevel: return None
 
         output = ""
 
@@ -331,15 +364,15 @@ class TextBasedPrinter(object):
 
         return output
 
-    def _formatMissingTopoList(self, obj):
+    def _formatMissingTopoList(self, obj, objOutputLevel):
         """
         Format data of the MissingTopoList object.
            
-        :param obj: A MissingTopoList object to be printed.     
+        :param obj: A MissingTopoList object to be printed.
+        :param outputLevel: Defines object specific output level.   
         """
 
-        outputLevel = self.outputLevel
-        if not outputLevel: return None
+        if not objOutputLevel: return None
 
         nprint = 10  # Number of missing topologies to be printed (ordered by cross-sections)
 
@@ -419,26 +452,28 @@ class PyPrinter(TextBasedPrinter):
         self.objList = []
         self.outputList = []
 
-    def _formatOutputStatus(self, obj):
+    def _formatOutputStatus(self, obj, objOutputLevel):
         """
         Format data for a OutputStatus object. 
            
-        :param obj: A OutputStatus object to be printed.     
+        :param obj: A OutputStatus object to be printed.
+        :param outputLevel: Defines object specific output level.   
         """
+        
+        if not objOutputLevel: return None
         
         parameters = obj.parameters
         return parameters
 
-    def _formatTheoryPredictionList(self, obj):
+    def _formatTheoryPredictionList(self, obj, objOutputLevel):
         """
         Format a TheoryPredictionList object to a python dictionary
         :param obj: TheoryPredictionList object
-        
+        :param outputLevel: Defines object specific output level.
         :return: python dictionary
         """
                 
-        outputLevel = self.outputLevel
-        if not outputLevel: return None
+        if not objOutputLevel: return None
         
         ExptRes = []
         expResult = obj.expResult
@@ -475,10 +510,15 @@ class PyPrinter(TextBasedPrinter):
          
         return {'ExptRes' : ExptRes}
     
-    def _formatPySLHA(self, obj):
+    def _formatPySLHA(self, obj, objOutputLevel):
         """
         Format a pyslha object to be printed as a dictionary
+        
+        :param obj: pyslha object
+        :param outputLevel: Defines object specific output level.
         """
+        
+        if not objOutputLevel: return None
         
         MINPAR = dict(obj.blocks['MINPAR'].entries)
         EXTPAR = dict(obj.blocks['EXTPAR'].entries)
@@ -513,15 +553,15 @@ class PyPrinter(TextBasedPrinter):
                 'chamix' : chamix, 'MM' : {}, 'sbotmix' : sbotmix,
                 'EXTPAR' : EXTPAR, 'mass' : mass}
 
-    def _formatMissingTopoList(self, obj):
+    def _formatMissingTopoList(self, obj, objOutputLevel):
         """
         Format data of the MissingTopoList object.
            
-        :param obj: A MissingTopoList object to be printed.     
+        :param obj: A MissingTopoList object to be printed.
+        :param outputLevel: Defines object specific output level.    
         """
 
-        outputLevel = self.outputLevel
-        if not outputLevel: return None
+        if not objOutputLevel: return None
 
         nprint = 10  # Number of missing topologies to be printed (ordered by cross-sections)
 

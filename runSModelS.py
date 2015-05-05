@@ -36,6 +36,8 @@ def main(inputFile, parameterFile, outputFile):
     
     """
 
+
+
     """
     Read and check input file
     =========================
@@ -54,11 +56,6 @@ def main(inputFile, parameterFile, outputFile):
         log.warning("Removing old output file " + outputFile)
     outfile = open(outputFile, 'w')
     outfile.close()
-
-    stdoutPrinter = prt.TxTPrinter(output = 'stdout')
-    summaryPrinter = prt.SummaryPrinter(output = 'file', filename = 'summary_print.txt')
-    pythonPrinter = prt.PyPrinter(output = 'file', filename = 'sms_output.py')
-    printer = prt.MPrinter(stdoutPrinter,summaryPrinter,pythonPrinter)
 
 
     inputType = parser.get("options", "inputType").lower()
@@ -84,6 +81,13 @@ def main(inputFile, parameterFile, outputFile):
     """ Initialize output status and exit if there were errors in the input """
     outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile, dict(parser.items("parameters")), databaseVersion, outputFile)
     if outputStatus.status < 0: return
+
+
+    """ Setup output printers """
+    stdoutPrinter = prt.TxTPrinter(output = 'stdout')
+    summaryPrinter = prt.SummaryPrinter(output = 'file', filename = outputFile)
+    printer = prt.MPrinter(stdoutPrinter,summaryPrinter)
+
 
     """
     Decompose input file
@@ -112,7 +116,7 @@ def main(inputFile, parameterFile, outputFile):
     if parser.getboolean("stdout", "printDecomp"):
         outLevel = 1
         outLevel += parser.getboolean("stdout", "addElmentInfo")
-    printer.addObj(smstoplist)
+    stdoutPrinter.addObj(smstoplist,outLevel)
 
 
     """
@@ -128,9 +132,12 @@ def main(inputFile, parameterFile, outputFile):
     listOfExpRes = database.getExpResults(analysisIDs=analyses, txnames=txnames, datasetIDs=[None])
 
     """ Print list of analyses loaded """
+    outLevel = 0
     if parser.getboolean("stdout", "printAnalyses"):
-        print("=======================\n == List of Analyses   ====\n ================")
-        for expResult in listOfExpRes: print(expResult)
+        outLevel = 1
+        outLevel += parser.getboolean("stdout", "addAnaInfo")
+        print("=======================\n == List of Analyses   ====\n ================")          
+    for expResult in listOfExpRes: stdoutPrinter.addObj(expResult,outLevel)
 
 
     """
@@ -148,7 +155,7 @@ def main(inputFile, parameterFile, outputFile):
         if not theorypredictions: continue
         if parser.getboolean("stdout", "printResults"):
             print("================================================================================")
-            printer.addObj(theorypredictions)
+            stdoutPrinter.addObj(theorypredictions)
         print("................................................................................")
 
         """ Create a list of results, to determine the best result """
