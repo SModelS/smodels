@@ -9,6 +9,8 @@
 
 """
 import unittest
+import sys
+sys.path.append('../')
 
 class AsciiTest(unittest.TestCase):
     def orig(self):

@@ -86,14 +86,14 @@ def elementFromEvent(event, weight=None):
         return None
 
     brDic, massDic = _getDictionariesFromEvent(event)
-    
+
     # Create branch list
     finalBranchList = []
     for ip, particle in enumerate(event.particles):
         # Particle came from initial state (primary mother)
         if 1 in particle.moms:
             mombranch = branch.Branch()
-            mombranch.PIDs = [[particle.pdg]]            
+            mombranch.PIDs = [[particle.pdg]]           
             if weight:
                 mombranch.maxWeight = weight.getMaxXsec()
             # Get simple BR and Mass dictionaries for the corresponding branch
