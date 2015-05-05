@@ -126,7 +126,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2):
 
 def _getBestResults(dataSetResults):
     """
-    Returns the best result according to the expect upper limit
+    Returns the best result according to the expected upper limit
     :param dataSetResults: list of TheoryPredictionList objects
     :return: best result (TheoryPredictionList object)
     """
