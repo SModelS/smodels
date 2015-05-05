@@ -49,7 +49,7 @@ def main():
     
     # Load all analyses from database
 #     listOfExpRes = database.getExpResults()
-    listOfExpRes = database.getExpResults(datasetIDs=[None])
+    listOfExpRes = database.getExpResults()
 
     # Compute the theory predictions for each analysis
     for expResult in listOfExpRes:
