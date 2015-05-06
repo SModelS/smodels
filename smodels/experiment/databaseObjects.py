@@ -128,7 +128,7 @@ class ExpResult(object):
                 logger.error("mass must be a mass array")
                 return False
             for tx in self.getTxNames():
-                if tx == txname or tx.txname == txname:
+                if tx == txname or tx.txName == txname:
                     return tx.txnameData.getValueFor(mass)
         else:
             logger.warning("Unkown data type: %s. Data will be ignored.", self.getValuesFor('datatype'))
@@ -161,7 +161,6 @@ class ExpResult(object):
                 upperLimits[dataset.dataInfo.dataid] = dataset.getUpperLimit(alpha, expected)
             else:
                 upperLimit = dataset.dataInfo.upperLimit
-                print upperLimit,dataset.dataDir
                 if (upperLimit/fb).normalize()._unit:
                     logger.error("Upper limit defined with wrong units for %s and %s"
                                   %(dataset.globalInfo.id,dataset.dataInfo.dataID))
@@ -445,7 +444,7 @@ class Database(object):
                 newDataSet.txnameList = []
                 for txname in dataset.txnameList:
                     if txnames != ['all']:
-                        if not txname.txname in txnames:
+                        if not txname.txName in txnames:
                             continue
                     newDataSet.txnameList.append(txname)
                 # Skip data set not containing any of the required txnames:
