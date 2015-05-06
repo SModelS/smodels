@@ -142,11 +142,7 @@ def _getBestResults(dataSetResults):
     bestExpectedR = 0.
     for predList in dataSetResults:
         dataset = predList.dataset
-<<<<<<< HEAD
-        if dataset.dataInfo.datatype != 'efficiencyMap':
-=======
         if dataset.dataInfo.dataType != 'efficiencyMap':
->>>>>>> d2b482ffe3b595807df2bb81a5a80b76b53767e2
             logger.error("Multiple data sets should only exist for efficiency map results!")
             sys.exit()
         if len(predList) != 1:
