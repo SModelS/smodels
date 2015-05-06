@@ -50,14 +50,14 @@ class ExpResult(object):
 
     def __str__(self):
         label = self.globalInfo.getInfo('id') + ": "
-        dataIDs = self.getValuesFor('dataid')
+        dataIDs = self.getValuesFor('dataId')
         if dataIDs:
             for dataid in dataIDs:
                 if dataid:
                     label += dataid + ","
         label = label[:-1]
         label += ':'
-        txnames = self.getValuesFor('txname')
+        txnames = self.getValuesFor('txName')
         if isinstance(txnames, list):
             for txname in txnames:
                 label += txname + ','
@@ -101,7 +101,7 @@ class ExpResult(object):
         :return: upper limit (Unum object)
         
         """
-        if self.getValuesFor('datatype') == 'efficiency-map':
+        if self.getValuesFor('dataType') == 'efficiencyMap':
             if not dataID or not isinstance(dataID, str):
                 logger.error("The data set ID must be defined when computing ULs for\
                             efficiency-map results.")
@@ -116,7 +116,7 @@ class ExpResult(object):
             else:
                 return upperLimits[dataID]
             
-        elif self.getValuesFor('datatype') == 'upper-limit':
+        elif self.getValuesFor('dataType') == 'upperLimit':
             if not txname or not mass:
                 logger.error("A TxName and mass array must be defined when computing ULs for\
                             upper-limit results.")
@@ -153,7 +153,7 @@ class ExpResult(object):
         """
         upperLimits = {}
         for dataset in self.datasets:
-            if dataset.dataInfo.datatype != 'efficiency-map':
+            if dataset.dataInfo.dataType != 'efficiencyMap':
                 logger.error("getUpperLimit is intended for efficiency map results only!")
                 return False
 
@@ -437,7 +437,7 @@ class Database(object):
             newExpResult.datasets = []
             for dataset in expResult.datasets:
                 if datasetIDs != ['all']:
-                    if not dataset.dataInfo.dataid in datasetIDs:
+                    if not dataset.dataInfo.dataId in datasetIDs:
                         continue
                 newDataSet = datasetObject.DataSet(dataset.dataDir, dataset.globalInfo)
                 newDataSet.dataInfo = dataset.dataInfo
