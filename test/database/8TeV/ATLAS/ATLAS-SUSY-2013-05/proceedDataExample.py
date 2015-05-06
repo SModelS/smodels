@@ -2,7 +2,7 @@
 
 """
 .. module:: convert
-   :synopsis: uesed to create info.txt,sms.py,sms.root and newSms.py.
+   :synopsis: uesed to create globalInfo.txt,sms.py,sms.root and newSms.py.
 
 .. moduleauthor:: Michael Traub <michael.traub@gmx.at>
 
@@ -72,7 +72,7 @@ def main():
     # chose TxName:
     txName = 'T6bbWWoff'
     # get all available equationSets/massPlanes/plots
-    # from info.txt:
+    # from globalInfo.txt:
     equationSets = getEquationSets(txName)
     # chose equationSet:
     equationSet = equationSets[0]

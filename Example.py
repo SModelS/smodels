@@ -23,7 +23,6 @@ from smodels.experiment.databaseObjects import Database
 #Set the address of the database folder
 database = Database("../smodels-database/")
 
-
 def main():
     """
     Main program. Displays basic use case.
@@ -48,7 +47,6 @@ def main():
     
     
     # Load all analyses from database
-#     listOfExpRes = database.getExpResults()
     listOfExpRes = database.getExpResults()
 
     # Compute the theory predictions for each analysis

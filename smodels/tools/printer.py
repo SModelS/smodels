@@ -207,7 +207,7 @@ class TextBasedPrinter(object):
                 for el in topo.elementList:
                     output += "\t\t .........................................................................\n"
                     output += "\t\t Element: \n"
-                    output += self._formatElement(el) + "\n"
+                    output += self._formatElement(el,1) + "\n"
 
         return output
 
@@ -296,7 +296,7 @@ class TextBasedPrinter(object):
         output = ""
 
         expRes = obj.expResult
-        info = expRes.info
+        info = expRes.globalInfo
         datasetInfo = obj.dataset.dataInfo        
         for theoryPrediction in obj:
             output += "\n"
@@ -348,9 +348,9 @@ class TextBasedPrinter(object):
             obj.outputarray = [bestresult]
         output += "#Analysis  Tx_Name  Sqrts  Cond. Violation  Theory_Value(fb)  Exp_limit(fb)  r\n\n"
         for op in obj.outputarray:
-            output += "%19s %16s " % (op.expResult.info.getInfo('id'), op.txname.getInfo('txname') )  # ana, topo
+            output += "%19s %16s " % (op.expResult.globalInfo.getInfo('id'), op.txname.getInfo('txname') )  # ana, topo
             # output += "%19s %16s " % (op.analysis.label.split(":")[0], op.analysis.label.split(":")[1])  # ana, topo
-            output += "%4s " % (op.expResult.info.getInfo("sqrts") / TeV)  # sqrts
+            output += "%4s " % (op.expResult.globalInfo.getInfo("sqrts") / TeV)  # sqrts
             output += "%5s " % op.getmaxCondition()  # condition violation
             output += "%10.3E %10.3E " % (op.value[0].value / fb, op.txname.txnameData.getValueFor(op.mass) / fb)  # theory cross section , expt upper limit
             output += "%10.3E\n" % obj.getR(op)

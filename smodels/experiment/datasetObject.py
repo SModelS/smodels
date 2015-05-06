@@ -12,6 +12,7 @@ import logging,os,glob
 from smodels.experiment import txnameObject,infoObject
 from smodels.tools import statistics
 from smodels.theory.auxiliaryFunctions import _memoize
+from smodels.tools.physicsUnits import fb
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
 logging.basicConfig(format=FORMAT)
@@ -26,7 +27,7 @@ class DataSet(object):
         
     def __init__(self, path,infoObj):
         self.dataDir = path
-        self.info = infoObj
+        self.globalInfo = infoObj
         self.txnameList = []
         
         logger.debug('Creating object based on data folder : %s' %self.dataDir)
@@ -40,7 +41,7 @@ class DataSet(object):
         #Get list of TxName objects:
         for txtfile in glob.iglob(os.path.join(path,"*.txt")):
             try:
-                txname = txnameObject.TxName(txtfile,self.info)
+                txname = txnameObject.TxName(txtfile,self.globalInfo)
                 self.txnameList.append(txname)
             except TypeError: continue
             
@@ -120,8 +121,14 @@ class DataSet(object):
             Nobs = self.dataInfo.expectedBG 
         Nexp = self.dataInfo.expectedBG  #Number of expected BG events
         bgError = self.dataInfo.bgError # error on BG
-        lumi = self.info.lumi
+        lumi = self.globalInfo.lumi
+        if (lumi*fb).normalize()._unit:
+            ID = self.globalInfo.id
+            logger.error("Luminosity defined with wrong units for %s" %(ID) )
+            return False
+            
         maxSignalXsec = statistics.upperLimit(Nobs,Nexp,bgError,lumi,alpha)
+        
                 
         return maxSignalXsec
             

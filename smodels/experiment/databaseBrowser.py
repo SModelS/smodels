@@ -60,7 +60,7 @@ class Browser(object):
         return len(self.browserList)
 
     def __str__(self):
-        return str([expRes.info.getInfo('id') for expRes in self.browserList])
+        return str([expRes.globalInfo.getInfo('id') for expRes in self.browserList])
     
         
     def loadAllResults(self):

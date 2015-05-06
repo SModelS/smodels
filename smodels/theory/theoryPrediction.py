@@ -11,6 +11,7 @@ from smodels.theory import clusterTools, crossSection, element
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.auxiliaryFunctions import cSim, cGtr  #DO NOT REMOVE
 import logging,sys
+from smodels.tools.physicsUnits import TeV
 
 logger = logging.getLogger(__name__)
 
@@ -180,9 +181,14 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
     # Select elements belonging to expResult and apply efficiencies
     elements = _getElementsFrom(smsTopList, dataset)
     if len(elements) == 0: return None
+    if (dataset.globalInfo.sqrts/TeV).normalize()._unit:
+            ID = dataset.globalInfo.id
+            logger.error("Sqrts defined with wrong units for %s" %(ID) )
+            return False
+
     for el in elements:
-        for xsec in el.weight:
-            if xsec.info.sqrts != dataset.info.sqrts:
+        for xsec in el.weight:          
+            if xsec.info.sqrts != dataset.globalInfo.sqrts:
                 el.weight.delete(xsec)    
 
     # Combine elements according to their respective constraints and masses
