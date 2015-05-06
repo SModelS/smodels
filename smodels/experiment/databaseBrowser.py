@@ -153,11 +153,11 @@ class Browser(object):
             if expResult.getValuesFor('id') != expid:
                 continue
             else:
-                if 'upper-limit' in expResult.getValuesFor('datatype'):
+                if 'upperLimit' in expResult.getValuesFor('datatype'):
                     if not txname or not massarray: continue
                     expres = expResult
                     break
-                elif 'efficiency-map' in expResult.getValuesFor('datatype'):
+                elif 'efficiencyMap' in expResult.getValuesFor('datatype'):
                     if not datasetID: continue
                     expres = expResult
                     break
@@ -168,13 +168,13 @@ class Browser(object):
             dataset must be defined" % (expid))
             return None
         
-        if 'upper-limit' in expres.getValuesFor('datatype'):
+        if 'upperLimit' in expres.getValuesFor('datatype'):
             txnames = expres.getTxNames()
             for tx in txnames:
                 if not tx.txName == txname: continue                
                 return tx.txnameData.getValueFor(massarray)
             
-        elif 'efficiency-map' in expres.getValuesFor('datatype'):
+        elif 'efficiencyMap' in expres.getValuesFor('datatype'):
             for dataset in expres.datasets:
                 if dataset.dataInfo.dataid != datasetID:
                     continue

@@ -26,11 +26,11 @@ class DataSet(object):
     """
         
     def __init__(self, path,infoObj):
-        self.dataDir = path
+        self.path = path
         self.globalInfo = infoObj
         self.txnameList = []
         
-        logger.debug('Creating object based on data folder : %s' %self.dataDir)
+        logger.debug('Creating object based on data folder : %s' %self.path)
         
         #Get data folder info:
         if not os.path.isfile(os.path.join(path,"dataInfo.txt")):

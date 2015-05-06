@@ -69,9 +69,9 @@ def main():
             print("Condition Violation = ",theoryPrediction.conditions)  #Condition violation values
               
             #Get upper limit for the respective prediction:
-            if expResult.getValuesFor('datatype') == 'upper-limit':
+            if expResult.getValuesFor('datatype') == 'upperLimit':
                 print("Theory Prediction UL = ",expResult.getUpperLimitFor(txname=txname,mass=mass))
-            elif expResult.getValuesFor('datatype') == 'efficiency-map':
+            elif expResult.getValuesFor('datatype') == 'efficiencyMap':
                 print("Theory Prediction UL = ",expResult.getUpperLimitFor(dataID=datasetID))
             else: print('weird:',expResult.getValuesFor('type'))
       

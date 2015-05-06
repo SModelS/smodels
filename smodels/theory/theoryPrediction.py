@@ -142,7 +142,7 @@ def _getBestResults(dataSetResults):
     bestExpectedR = 0.
     for predList in dataSetResults:
         dataset = predList.dataset
-        if dataset.dataInfo.datatype != 'efficiency-map':
+        if dataset.dataInfo.datatype != 'efficiencyMap':
             logger.error("Multiple data sets should only exist for efficiency map results!")
             sys.exit()
         if len(predList) != 1:
@@ -253,10 +253,10 @@ def _combineElements(elements, dataset, maxDist):
     """
     
     clusters = []
-    if dataset.dataInfo.datatype == 'efficiency-map':
+    if dataset.dataInfo.datatype == 'efficiencyMap':
         cluster = clusterTools.groupAll(elements)        
         clusters.append(cluster)
-    elif dataset.dataInfo.datatype == 'upper-limit':        
+    elif dataset.dataInfo.datatype == 'upperLimit':        
         for txname in dataset.txnameList:
             txnameEls = []
             for element in elements:
