@@ -36,7 +36,7 @@ class TxName(object):
     
     
     def __init__(self, path, infoObj):
-        self.txnameFile = path
+        self.path = path
         self.globalInfo = infoObj
         self.txnameData = None
         self._elements = []
@@ -51,7 +51,7 @@ class TxName(object):
         if not "txname" in txdata: raise TypeError
         if not 'upperLimits' in txdata and not 'efficiencyMap' in txdata:
             raise TypeError
-        txfile = open(self.txnameFile)
+        txfile = open(self.path)
         content = concatenateLines (  txfile.readlines() )
         txfile.close()
         

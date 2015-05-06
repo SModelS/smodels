@@ -320,10 +320,10 @@ class TextBasedPrinter(object):
                 for cond in theoryPrediction.conditions:
                     condlist.append(theoryPrediction.conditions[cond])
                 output += str(condlist) + "\n"
-            if datasetInfo.datatype == 'upper-limit':
+            if datasetInfo.datatype == 'upperLimit':
                 experimentalLimit = expRes.getUpperLimitFor(txname=theoryPrediction.txname,
                                                             mass=theoryPrediction.mass)
-            elif datasetInfo.datatype == 'efficiency-map':
+            elif datasetInfo.datatype == 'efficiencyMap':
                 experimentalLimit = expRes.getUpperLimitFor(dataID=datasetInfo.dataid)
 
             output += "Experimental limit: " + str(experimentalLimit) + "\n"
@@ -496,9 +496,9 @@ class PyPrinter(TextBasedPrinter):
             else:
                 TxName = None
             theores = (prediction.value.getMaxXsec()/fb).asNumber()
-            if expResult.getValuesFor('datatype') == 'upper-limit':
+            if expResult.getValuesFor('datatype') == 'upperLimit':
                 explimit = expResult.getUpperLimitFor(txname=txname,mass=mass)
-            elif expResult.getValuesFor('datatype') == 'efficiency-map':
+            elif expResult.getValuesFor('datatype') == 'efficiencyMap':
                 explimit = expResult.getUpperLimitFor(dataID=datasetID)
             explimit = (explimit/fb).asNumber()
             ExptRes.append({'maxcond': maxconds, 'tval (fb)': theores,

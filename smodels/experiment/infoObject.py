@@ -25,20 +25,20 @@ class Info(object):
     Its attributes are generated according to the lines in the
     globalInfo.txt file which contain "info_tag: value".
     
-    :ivar infofile: path to the globalInfo.txt file
+    :ivar path: path to the globalInfo.txt file
     """
     
     def __init__(self, path):        
-        self.infofile = path
+        self.path = path
 
-        logger.debug('Creating object based on globalInfo.txt: %s' %self.infofile)        
+        logger.debug('Creating object based on globalInfo.txt: %s' %self.path)        
  
         #Open the info file and get the information:
         if not os.path.isfile(path):
             logger.error("Info file %s not found" % path)
             sys.exit()      
         from smodels.tools.stringTools import concatenateLines
-        infoFile = open(self.infofile)
+        infoFile = open(self.path)
         content = concatenateLines ( infoFile.readlines() )
         infoFile.close()
         
@@ -51,7 +51,7 @@ class Info(object):
             if tags.count(tag) == 1:
                 self.addInfo(tag,value)
             else:
-                logger.info("Ignoring unknown field %s found in file %s" % (tag, self.infofile))
+                logger.info("Ignoring unknown field %s found in file %s" % (tag, self.path))
                 continue
 
         

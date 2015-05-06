@@ -101,7 +101,7 @@ class ExpResult(object):
         :return: upper limit (Unum object)
         
         """
-        if self.getValuesFor('datatype') == 'efficiency-map':
+        if self.getValuesFor('datatype') == 'efficiencyMap':
             if not dataID or not isinstance(dataID, str):
                 logger.error("The data set ID must be defined when computing ULs for\
                             efficiency-map results.")
@@ -116,7 +116,7 @@ class ExpResult(object):
             else:
                 return upperLimits[dataID]
             
-        elif self.getValuesFor('datatype') == 'upper-limit':
+        elif self.getValuesFor('datatype') == 'upperLimit':
             if not txname or not mass:
                 logger.error("A TxName and mass array must be defined when computing ULs for\
                             upper-limit results.")
@@ -153,7 +153,7 @@ class ExpResult(object):
         """
         upperLimits = {}
         for dataset in self.datasets:
-            if dataset.dataInfo.datatype != 'efficiency-map':
+            if dataset.dataInfo.datatype != 'efficiencyMap':
                 logger.error("getUpperLimit is intended for efficiency map results only!")
                 return False
 
@@ -439,7 +439,7 @@ class Database(object):
                 if datasetIDs != ['all']:
                     if not dataset.dataInfo.dataid in datasetIDs:
                         continue
-                newDataSet = datasetObject.DataSet(dataset.dataDir, dataset.globalInfo)
+                newDataSet = datasetObject.DataSet(dataset.path, dataset.globalInfo)
                 newDataSet.dataInfo = dataset.dataInfo
                 newDataSet.txnameList = []
                 for txname in dataset.txnameList:
