@@ -41,14 +41,14 @@ class TxName(object):
         self.txnameData = None
         self._elements = []
         
-        logger.debug('Creating object based on txname file: %s' %self.txnameFile)        
+        logger.debug('Creating object based on txname file: %s' %self.path)        
         #Open the info file and get the information:
         if not os.path.isfile(path):
             logger.error("Txname file %s not found" % path)
             sys.exit()
         txtFile = open(path,'r')
         txdata = txtFile.read()
-        if not "txname" in txdata: raise TypeError
+        if not "txName" in txdata: raise TypeError
         if not 'upperLimits' in txdata and not 'efficiencyMap' in txdata:
             raise TypeError
         txfile = open(self.path)
