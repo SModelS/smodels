@@ -101,11 +101,7 @@ class ExpResult(object):
         :return: upper limit (Unum object)
         
         """
-<<<<<<< HEAD
-        if self.getValuesFor('datatype') == 'efficiencyMap':
-=======
         if self.getValuesFor('dataType') == 'efficiencyMap':
->>>>>>> d2b482ffe3b595807df2bb81a5a80b76b53767e2
             if not dataID or not isinstance(dataID, str):
                 logger.error("The data set ID must be defined when computing ULs for\
                             efficiency-map results.")
@@ -157,11 +153,7 @@ class ExpResult(object):
         """
         upperLimits = {}
         for dataset in self.datasets:
-<<<<<<< HEAD
-            if dataset.dataInfo.datatype != 'efficiencyMap':
-=======
             if dataset.dataInfo.dataType != 'efficiencyMap':
->>>>>>> d2b482ffe3b595807df2bb81a5a80b76b53767e2
                 logger.error("getUpperLimit is intended for efficiency map results only!")
                 return False
 
