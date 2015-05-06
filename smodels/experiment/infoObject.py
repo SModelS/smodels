@@ -1,7 +1,7 @@
 """
 .. module:: infoObjects
    :synopsis: Holds the classes and methods used to read and store the information in the
-              info.txt or dataInfo.txt files.
+              globalInfo.txt or dataglobalInfo.txt files.
 
 .. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -20,18 +20,18 @@ logger.setLevel(level=logging.DEBUG)
 
 class Info(object):
     """
-    Holds the global information contained in a info.txt file
+    Holds the global information contained in a globalInfo.txt file
     (luminosity, sqrts, experimentID,...).
     Its attributes are generated according to the lines in the
-    info.txt file which contain "info_tag: value".
+    globalInfo.txt file which contain "info_tag: value".
     
-    :ivar infofile: path to the info.txt file
+    :ivar infofile: path to the globalInfo.txt file
     """
     
     def __init__(self, path):        
         self.infofile = path
 
-        logger.debug('Creating object based on info.txt: %s' %self.infofile)        
+        logger.debug('Creating object based on globalInfo.txt: %s' %self.infofile)        
  
         #Open the info file and get the information:
         if not os.path.isfile(path):

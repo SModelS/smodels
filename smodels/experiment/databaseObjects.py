@@ -15,6 +15,7 @@ from smodels.experiment import txnameObject
 from smodels.experiment import datasetObject
 from smodels.theory.auxiliaryFunctions import _memoize
 from smodels.experiment.exceptions import DatabaseNotFoundException
+from smodels.tools.physicsUnits import fb
 
 logger = logging.getLogger(__name__)
 
@@ -33,22 +34,22 @@ class ExpResult(object):
     def __init__(self, path=None):
         if path and os.path.isdir(path):
             self.path = path
-            if not os.path.isfile(os.path.join(path, "info.txt")):
-                logger.error("info.txt file not found in " + path)
+            if not os.path.isfile(os.path.join(path, "globalInfo.txt")):
+                logger.error("globalInfo.txt file not found in " + path)
                 raise TypeError
-            self.info = infoObject.Info(os.path.join(path, "info.txt"))
+            self.globalInfo = infoObject.Info(os.path.join(path, "globalInfo.txt"))
             self.datasets = []
             for root, _, files in os.walk(path):
                 if 'dataInfo.txt' in files:  # data folder found
                     # Build data set
                     try:
-                        dataset = datasetObject.DataSet(root, self.info)
+                        dataset = datasetObject.DataSet(root, self.globalInfo)
                         self.datasets.append(dataset)
                     except TypeError:
                         continue
 
     def __str__(self):
-        label = self.info.getInfo('id') + ": "
+        label = self.globalInfo.getInfo('id') + ": "
         dataIDs = self.getValuesFor('dataid')
         if dataIDs:
             for dataid in dataIDs:
@@ -92,6 +93,10 @@ class ExpResult(object):
                          (only for efficiency-map results)
         :param txname: TxName object (only for UL-type results)
         :param mass: Mass array with units (only for UL-type results)
+        :param compute: If True, the upper limit will be computed
+                        from expected and observed number of events. If False, the value listed
+                        in the database will be used instead.
+        
         
         :return: upper limit (Unum object)
         
@@ -155,7 +160,14 @@ class ExpResult(object):
             if compute:
                 upperLimits[dataset.dataInfo.dataid] = dataset.getUpperLimit(alpha, expected)
             else:
-                upperLimits[dataset.dataInfo.dataid] = dataset.getValuesFor('upperLimit')                
+                upperLimit = dataset.dataInfo.upperLimit
+                print upperLimit,dataset.dataDir
+                if (upperLimit/fb).normalize()._unit:
+                    logger.error("Upper limit defined with wrong units for %s and %s"
+                                  %(dataset.globalInfo.id,dataset.dataInfo.dataID))
+                    return False
+                upperLimits[dataset.dataInfo.dataid] = upperLimit
+                              
 
         return upperLimits
 
@@ -255,7 +267,7 @@ class ExpResult(object):
 class Database(object):
     """
     Database object. Holds a collection of InfoFile and DataFile objects containing
-    all the metainfo from the info.txt files and the corresponding data from the sms.py
+    all the metainfo from the globalInfo.txt files and the corresponding data from the sms.py
     files.
     
     :ivar base: path to the database (string)
@@ -306,7 +318,7 @@ class Database(object):
     def __str__(self):
         idList = "Database: " + self.databaseVersion + "\n---------- \n"
         for expRes in self.expResultList:
-            idList += expRes.info.getInfo('id') + '\n'
+            idList += expRes.globalInfo.getInfo('id') + '\n'
         return idList
 
 
@@ -374,14 +386,14 @@ class Database(object):
     def _loadExpResults(self):
         """
         Checks the database folder and generates a list of ExpResult objects for
-        each (info.txt,sms.py) pair.
+        each (globalInfo.txt,sms.py) pair.
         
         :return: list of ExpResult objects 
   
         """
         resultsList = []
         for root, _, files in os.walk(self._base):
-            if not 'info.txt' in files:
+            if not 'globalInfo.txt' in files:
                 logger.debug("Missing files in %s", root)
                 continue
             else:
@@ -395,7 +407,7 @@ class Database(object):
         return resultsList
 
 
-    def getExpResults(self, analysisIDs=[], datasetIDs=[], txnames=[]):
+    def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all']):
         """
         Returns a list of ExpResult objects.
         
@@ -415,25 +427,25 @@ class Database(object):
         
         expResultList = []
         for expResult in self.expResultList:
-            ID = expResult.info.getInfo('id')
+            ID = expResult.globalInfo.getInfo('id')
             # Skip analysis not containing any of the required ids:
             if analysisIDs != ['all']:
-                if analysisIDs and not ID in analysisIDs:
-                    continue
+                if not ID in analysisIDs:
+                    continue              
             newExpResult = ExpResult()
             newExpResult.path = expResult.path
-            newExpResult.info = expResult.info
+            newExpResult.globalInfo = expResult.globalInfo
             newExpResult.datasets = []
             for dataset in expResult.datasets:
                 if datasetIDs != ['all']:
-                    if datasetIDs and not dataset.dataInfo.dataid in datasetIDs:
+                    if not dataset.dataInfo.dataid in datasetIDs:
                         continue
-                newDataSet = datasetObject.DataSet(dataset.dataDir, dataset.info)
+                newDataSet = datasetObject.DataSet(dataset.dataDir, dataset.globalInfo)
                 newDataSet.dataInfo = dataset.dataInfo
                 newDataSet.txnameList = []
                 for txname in dataset.txnameList:
                     if txnames != ['all']:
-                        if txnames and not txname.txname in txnames:
+                        if not txname.txname in txnames:
                             continue
                     newDataSet.txnameList.append(txname)
                 # Skip data set not containing any of the required txnames:
@@ -444,8 +456,5 @@ class Database(object):
             if not newExpResult.getTxNames():
                 continue
             expResultList.append(newExpResult)
-        if len(expResultList) == 1:
-            return expResultList[0]
-        else:
-            return expResultList
+        return expResultList
 

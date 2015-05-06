@@ -37,7 +37,7 @@ class TxName(object):
     
     def __init__(self, path, infoObj):
         self.txnameFile = path
-        self.infoObj = infoObj
+        self.globalInfo = infoObj
         self.txnameData = None
         self._elements = []
         

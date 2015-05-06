@@ -14,8 +14,8 @@ def upperLimit ( Nobs, Nexp, sigmaexp, lumi, alpha=.05 ):
     """ a convenience function to have a central place where to centrally change the 
       way the upper limit gets computed """
 
-#    ret = getUL(Nobs, Nexp, sigmaexp,alpha)/lumi
-#    ret = bayesianUpperLimit(Nobs,0.00001,Nexp,sigmaexp,1.-alpha)/lumi
+#     ret = getUL(Nobs, Nexp, sigmaexp,alpha)/lumi
+#     ret = bayesianUpperLimit(Nobs,0.00001,Nexp,sigmaexp,1.-alpha)/lumi
     ret = upperLimitMadAnalysis ( Nobs, Nexp, sigmaexp, 1.-alpha ) / lumi
 
     return ret
