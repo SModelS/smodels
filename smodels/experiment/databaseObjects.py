@@ -158,14 +158,14 @@ class ExpResult(object):
                 return False
 
             if compute:
-                upperLimits[dataset.dataInfo.dataid] = dataset.getUpperLimit(alpha, expected)
+                upperLimits[dataset.dataInfo.dataId] = dataset.getUpperLimit(alpha, expected)
             else:
                 upperLimit = dataset.dataInfo.upperLimit
                 if (upperLimit/fb).normalize()._unit:
                     logger.error("Upper limit defined with wrong units for %s and %s"
-                                  %(dataset.globalInfo.id,dataset.dataInfo.dataID))
+                                  %(dataset.globalInfo.id,dataset.dataInfo.dataId))
                     return False
-                upperLimits[dataset.dataInfo.dataid] = upperLimit
+                upperLimits[dataset.dataInfo.dataId] = upperLimit
                               
 
         return upperLimits
