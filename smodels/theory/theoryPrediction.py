@@ -309,15 +309,15 @@ def _evalConditions(cluster):
     if cluster.txname is None:
         return None
     elif cluster.txname.txnameData.type == 'upperLimits':
-        if not cluster.txname.fuzzycondition \
-         or cluster.txname.fuzzycondition == "not yet assigned":
-            return cluster.txname.fuzzycondition
+        if not cluster.txname.condition \
+         or cluster.txname.condition == "not yet assigned":
+            return cluster.txname.condition
         conditions = {}
         #Make sure conditions is always a list
-        if isinstance(cluster.txname.fuzzycondition,str): 
-            cluster.txname.fuzzycondition = [cluster.txname.fuzzycondition]
+        if isinstance(cluster.txname.condition,str): 
+            cluster.txname.condition = [cluster.txname.condition]
         # Loop over conditions
-        for cond in cluster.txname.fuzzycondition:
+        for cond in cluster.txname.condition:
             exprvalue = _evalExpression(cond,cluster)
             if type(exprvalue) == type(crossSection.XSectionList()):
                 conditions[cond] = exprvalue[0].value

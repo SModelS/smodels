@@ -73,15 +73,15 @@ class TxName(object):
         #Builds up a list of _elements appearing in constraints:        
         if hasattr(self,'constraint'):             
             self._elements = [Element(el) for el in elementsInStr(self.constraint)]
-        if hasattr(self,'fuzzycondition') and self.fuzzycondition:
-            conds = self.fuzzycondition
+        if hasattr(self,'condition') and self.condition:
+            conds = self.condition
             if not isinstance(conds,list): conds = [conds]
             for cond in conds:                
                 for el in elementsInStr(cond):
                     if not el in self._elements: self._elements.append(Element(el))
         
     def __str__(self):
-        return self.txname
+        return self.txName
         
     def addInfo(self,tag,value):
         """
@@ -90,7 +90,7 @@ class TxName(object):
         :param value: value for the field in string format 
         """
         
-        if tag == 'constraint' or tag == 'condition' or tag == 'fuzzycondition':
+        if tag == 'constraint' or tag == 'condition':
             if isinstance(value,list):
                 value = [val.replace("'","") for val in value]
             else: value = value.replace("'","")            

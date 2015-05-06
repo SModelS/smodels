@@ -27,7 +27,7 @@ class TxNameInfoChecker(object):
         
         self.testObj = txnameInfoObj
         self.path = path
-        self.mandatoryFields = ['constraint','fuzzycondition','branchcondition']
+        self.mandatoryFields = ['constraint','condition']
         
         for field in self.mandatoryFields:
             if not hasattr(self.testObj ,field):
@@ -107,7 +107,7 @@ class TxNameInfoChecker(object):
   
         return True
     
-    def fuzzycondition(self,value):
+    def condition(self,value):
         
         if value == 'None': return True
         constraints = self._constrints(value)
@@ -325,7 +325,7 @@ class Test(object):
     
     def __init__(self):
         self.constraint = "71.*([[['mu+','mu-']],[['l','nu']]] + [[['e+','e-']],[['l','nu']]])"
-        self.fuzzycondition = "Cgtr([[['b'],['L','nu']],[['b'],['jet','jet']]],3.*[[['b'],['ta','nu']],[['b'],['jet','jet']]]);Cgtr([[['b'],['L','nu']],[['b'],['jet','jet']]],3.*[[['b'],['e','nu']],[['b'],['jet','jet']]])"
+        self.condition = "Cgtr([[['b'],['L','nu']],[['b'],['jet','jet']]],3.*[[['b'],['ta','nu']],[['b'],['jet','jet']]]);Cgtr([[['b'],['L','nu']],[['b'],['jet','jet']]],3.*[[['b'],['e','nu']],[['b'],['jet','jet']]])"
         self.axes = 'Eq(y,lsp)_Eq(x,mother)'
         self.branchcondition = 'equal branches'
         self.condition = "[[['mu+']],[['mu-']]] > [[['e+']],[['e-']]]"

@@ -248,7 +248,7 @@ class TextBasedPrinter(object):
 
         output = ""
         output += "========================================================\n"
-        output += "Tx Label: "+obj.txname+'\n'
+        output += "Tx Label: "+obj.txName+'\n'
         if objOutputLevel == 2:
             output += "\t -----------------------------\n"
             output += "\t Elements tested by analysis:\n"            

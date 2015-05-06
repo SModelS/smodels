@@ -171,7 +171,7 @@ class Browser(object):
         if 'upper-limit' in expres.getValuesFor('datatype'):
             txnames = expres.getTxNames()
             for tx in txnames:
-                if not tx.txname == txname: continue                
+                if not tx.txName == txname: continue                
                 return tx.txnameData.getValueFor(massarray)
             
         elif 'efficiency-map' in expres.getValuesFor('datatype'):
