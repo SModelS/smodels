@@ -53,9 +53,8 @@ def main():
     for expResult in listOfExpRes:
         predictions = theoryPredictionsFor(expResult, smstoplist)
         if not predictions: continue
-#         printout(predictions)
         dataset = predictions.dataset
-        datasetID = dataset.getValuesFor('dataid')
+        datasetID = dataset.getValuesFor('dataId')
         print('\n',expResult)
         for theoryPrediction in predictions:
             mass = theoryPrediction.mass
@@ -69,9 +68,9 @@ def main():
             print("Condition Violation = ",theoryPrediction.conditions)  #Condition violation values
               
             #Get upper limit for the respective prediction:
-            if expResult.getValuesFor('datatype') == 'upper-limit':
+            if expResult.getValuesFor('dataType') == 'upperLimit':
                 print("Theory Prediction UL = ",expResult.getUpperLimitFor(txname=txname,mass=mass))
-            elif expResult.getValuesFor('datatype') == 'efficiency-map':
+            elif expResult.getValuesFor('dataType') == 'efficiencyMap':
                 print("Theory Prediction UL = ",expResult.getUpperLimitFor(dataID=datasetID))
             else: print('weird:',expResult.getValuesFor('type'))
       
