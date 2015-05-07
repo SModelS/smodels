@@ -153,11 +153,11 @@ class Browser(object):
             if expResult.getValuesFor('id') != expid:
                 continue
             else:
-                if 'upperLimit' in expResult.getValuesFor('datatype'):
+                if 'upperLimit' in expResult.getValuesFor('dataType'):
                     if not txname or not massarray: continue
                     expres = expResult
                     break
-                elif 'efficiencyMap' in expResult.getValuesFor('datatype'):
+                elif 'efficiencyMap' in expResult.getValuesFor('dataType'):
                     if not datasetID: continue
                     expres = expResult
                     break
