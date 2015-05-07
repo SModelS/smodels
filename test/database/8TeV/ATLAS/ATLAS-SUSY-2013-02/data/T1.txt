@@ -1,9 +1,9 @@
-txname: T1
+txName: T1
+conditionDescription: None
 condition: None
-fuzzycondition: None
 constraint: [[['jet','jet']],[['jet','jet']]]
 figureUrl: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-02/figaux_09a.png
-validated: True
+validated: None
 axes: 2*Eq(mother,x)_Eq(lsp,y)
 publishedData: False
 upperLimits: [[[[112.0*GeV, 37.0*GeV], [112.0*GeV, 37.0*GeV]], 36142.88*pb],

@@ -1,9 +1,9 @@
-txname: T5tctc
+txName: T5tctc
+conditionDescription: None
 condition: None
-fuzzycondition: None
 constraint: [[['t'],['jet']],[['t'],['jet']]]
 figureUrl: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-02/figaux_13.png
-validated: True
+validated: None
 axes: 2*Eq(mother,x)_Eq(inter0,y)_Eq(lsp,y-20.0)
 publishedData: False
 upperLimits: [[[[300.0*GeV, 120.0*GeV, 100.0*GeV], [300.0*GeV, 120.0*GeV, 100.0*GeV]], 148.3141*pb],
