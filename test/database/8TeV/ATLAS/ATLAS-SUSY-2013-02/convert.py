@@ -38,10 +38,10 @@ info.private = False
 info.lumi = '20.3'
 info.publication = 'http://link.springer.com/article/10.1007/JHEP09%282014%29176'
 info.url = 'https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-02/'
-#info.superseded_by =
+#info.supersededBy =
 info.arxiv = 'http://arxiv.org/abs/1405.7875'
 #info.contact =
-info.prettyname =  "jets and met"
+info.prettyName =  "jets and met"
 info.supersedes = 'ATLAS-CONF-2013-047'
 
 #+++++++ next txName block ++++++++++++++
@@ -51,10 +51,10 @@ TGQ = TxNameInput('TGQ')
 TGQ.on.constraint ="[[['jet']],[['jet','jet']]]"
 # TGQ.off.constraint ="[[['jet','jet']],[['jet']]]"
 #TGQ.off.constraint =
+TGQ.on.conditionDescription ="None"
+#TGQ.off.conditionDescription =
 TGQ.on.condition ="None"
 #TGQ.off.condition =
-TGQ.on.fuzzycondition ="None"
-#TGQ.off.fuzzycondition =
 
 #+++++++ next mass plane block ++++++++++++++
 TGQ0 = TGQ.addMassPlane(motherMass = 0.96 * x, lspMass = y )
@@ -95,10 +95,10 @@ T6WW = TxNameInput('T6WW')
 #T6WW.off.checked =
 T6WW.on.constraint ="[[['jet'],['W']],[['jet'],['W']]]"
 T6WW.off.constraint = "2.23 * [[['jet'],['jet','jet']],[['jet'],['jet','jet']]]"
-T6WW.on.condition ="None"
-T6WW.off.condition = "2.23 * [[['jet'],['jet','jet']],[['jet'],['jet','jet']]] ~ 9.18 * [[['jet'],['L','nu']],[['jet'],['L','nu']]]; 2.23 * [[['jet'],['jet','jet']],[['jet'],['jet','jet']]] ~ 2.26 * [[['jet'],['L','nu']],[['jet'],['jet','jet']]]"
-T6WW.on.fuzzycondition = "None"
-T6WW.off.fuzzycondition ="Csim ( 2.23 * [[['jet'],['jet','jet']],[['jet'],['jet','jet']]], 9.18 * [[['jet'],['L','nu']],[['jet'],['L','nu']]] ) ; Csim ( 2.23 * [[['jet'],['jet','jet']],[['jet'],['jet','jet']]], 2.26 * [[['jet'],['L','nu']],[['jet'],['jet','jet']]])"
+T6WW.on.conditionDescription ="None"
+T6WW.off.conditionDescription = "2.23 * [[['jet'],['jet','jet']],[['jet'],['jet','jet']]] ~ 9.18 * [[['jet'],['L','nu']],[['jet'],['L','nu']]]; 2.23 * [[['jet'],['jet','jet']],[['jet'],['jet','jet']]] ~ 2.26 * [[['jet'],['L','nu']],[['jet'],['jet','jet']]]"
+T6WW.on.condition = "None"
+T6WW.off.condition ="Csim ( 2.23 * [[['jet'],['jet','jet']],[['jet'],['jet','jet']]], 9.18 * [[['jet'],['L','nu']],[['jet'],['L','nu']]] ) ; Csim ( 2.23 * [[['jet'],['jet','jet']],[['jet'],['jet','jet']]], 2.26 * [[['jet'],['L','nu']],[['jet'],['jet','jet']]])"
 
 #+++++++ next mass plane block ++++++++++++++
 T6WWLSP060 = T6WW.addMassPlane(motherMass = x, interMass0 = y, lspMass = 60.0)
@@ -175,10 +175,10 @@ T2 = TxNameInput('T2')
 #T2.off.checked =
 T2.on.constraint ="[[['jet']],[['jet']]]"
 #T2.off.constraint =
+T2.on.conditionDescription ="None"
+#T2.off.conditionDescription =
 T2.on.condition ="None"
 #T2.off.condition =
-T2.on.fuzzycondition ="None"
-#T2.off.fuzzycondition =
 
 #+++++++ next mass plane block ++++++++++++++
 T2 = T2.addMassPlane(motherMass = x, lspMass = y)
@@ -219,10 +219,10 @@ T1 = TxNameInput('T1')
 #T1.off.checked =
 T1.on.constraint ="[[['jet','jet']],[['jet','jet']]]"
 #T1.off.constraint =
+T1.on.conditionDescription ="None"
+#T1.off.conditionDescription =
 T1.on.condition ="None"
 #T1.off.condition =
-T1.on.fuzzycondition ="None"
-#T1.off.fuzzycondition =
 
 #+++++++ next mass plane block ++++++++++++++
 T1 = T1.addMassPlane(motherMass = x, lspMass = y)
@@ -261,10 +261,10 @@ T5WW = TxNameInput('T5WW')
 #T5WW.off.checked =
 T5WW.on.constraint ="[[['jet','jet'],['W']],[['jet','jet'],['W']]]"
 T5WW.off.constraint = "2.23 * [[['jet','jet'],['jet','jet']],[['jet','jet'],['jet','jet']]]"
+T5WW.on.conditionDescription ="None"
+T5WW.off.conditionDescription = "2.23 * [[['jet','jet'],['jet','jet']],[['jet','jet'],['jet','jet']]] ~ 9.18 * [[['jet','jet'],['L','nu']],[['jet','jet'],['L','nu']]] ; 2.23 * [[['jet','jet'],['jet','jet']],[['jet','jet'],['jet','jet']]] ~ 2.26 * [[['jet','jet'],['L','nu']],[['jet','jet'],['jet','jet']]]"
 T5WW.on.condition ="None"
-T5WW.off.condition = "2.23 * [[['jet','jet'],['jet','jet']],[['jet','jet'],['jet','jet']]] ~ 9.18 * [[['jet','jet'],['L','nu']],[['jet','jet'],['L','nu']]] ; 2.23 * [[['jet','jet'],['jet','jet']],[['jet','jet'],['jet','jet']]] ~ 2.26 * [[['jet','jet'],['L','nu']],[['jet','jet'],['jet','jet']]]"
-T5WW.on.fuzzycondition ="None"
-T5WW.off.fuzzycondition = "Csim ( 2.23 * [[['jet','jet'],['jet','jet']],[['jet','jet'],['jet','jet']]], 9.18 * [[['jet','jet'],['L','nu']],[['jet','jet'],['L','nu']]] ); Csim ( 2.23 * [[['jet','jet'],['jet','jet']],[['jet','jet'],['jet','jet']]], 2.26 * [[['jet','jet'],['L','nu']],[['jet','jet'],['jet','jet']]] )"
+T5WW.off.condition = "Csim ( 2.23 * [[['jet','jet'],['jet','jet']],[['jet','jet'],['jet','jet']]], 9.18 * [[['jet','jet'],['L','nu']],[['jet','jet'],['L','nu']]] ); Csim ( 2.23 * [[['jet','jet'],['jet','jet']],[['jet','jet'],['jet','jet']]], 2.26 * [[['jet','jet'],['L','nu']],[['jet','jet'],['jet','jet']]] )"
 
 #+++++++ next mass plane block ++++++++++++++
 T5WWLSP060 = T5WW.addMassPlane(motherMass = x, interMass0 = y, lspMass = 60.0)
@@ -338,10 +338,10 @@ T5tctc = TxNameInput('T5tctc')
 #T5tctc.off.checked =
 T5tctc.on.constraint ="[[['t'],['jet']],[['t'],['jet']]]"
 T5tctc.off.constraint ="[[['W','b'],['jet']],[['W','b'],['jet']]]"
+T5tctc.on.conditionDescription ="None"
+#T5tctc.off.conditionDescription =
 T5tctc.on.condition ="None"
 #T5tctc.off.condition =
-T5tctc.on.fuzzycondition ="None"
-#T5tctc.off.fuzzycondition =
 
 #+++++++ next mass plane block ++++++++++++++
 T5tctcD020 = T5tctc.addMassPlane(motherMass = x, interMass0 = y, lspMass = y - 20.0)

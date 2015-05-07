@@ -2,7 +2,7 @@
 
 """
 .. module:: convert
-   :synopsis: uesed to create globalInfo.txt,sms.py,sms.root and newSms.py.
+   :synopsis: uesed to create info.txt,sms.py,sms.root and newSms.py.
 
 .. moduleauthor:: Michael Traub <michael.traub@gmx.at>
 
@@ -40,14 +40,22 @@ def getUpperLimits(txName):
     f = open(txName + '.txt')
     lines = f.readlines()
     f.close()
+    upperLimitsBlock = False
     for line in lines:
         #print line
+        if upperLimitsBlock == True and ':' in line:
+            upperLimitsBlock = False
         if 'upperLimits' in line:
             line = line.replace('\n','')
             upperLimits = line.split(': ')[1]
-            upperLimits = upperLimits.replace('*GeV','')
-            upperLimits = upperLimits.replace('*pb','')
-            return eval(upperLimits)
+            upperLimitsBlock = True
+            continue
+        if upperLimitsBlock == True:
+            line = line.replace('\n','')
+            upperLimits = upperLimits + line
+    upperLimits = upperLimits.replace('*GeV','')
+    upperLimits = upperLimits.replace('*pb','')
+    return eval(upperLimits)
         
         
 def getHisto(points, txName, eqSet):
@@ -72,10 +80,10 @@ def main():
     # chose TxName:
     txName = 'T6bbWWoff'
     # get all available equationSets/massPlanes/plots
-    # from globalInfo.txt:
+    # from info.txt:
     equationSets = getEquationSets(txName)
     # chose equationSet:
-    equationSet = equationSets[0]
+    equationSet = equationSets[1]
     # init OrigPlot object with chosen equationSet:
     origPlot = OrigPlot.fromString(equationSet)
 
@@ -85,7 +93,7 @@ def main():
     upperLimits = getUpperLimits(txName)
     print upperLimits
     for entry in upperLimits:
-        massArray, limit = entry[0][0], entry[1]
+        massArray, limit = entry[0], entry[1]
         xy = origPlot.getXYValues(massArray)
         print '%s --> %s: %s' %(massArray, xy, limit )
         if not xy: continue
