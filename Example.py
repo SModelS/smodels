@@ -53,26 +53,28 @@ def main():
     for expResult in listOfExpRes:
         predictions = theoryPredictionsFor(expResult, smstoplist)
         if not predictions: continue
-        dataset = predictions.dataset
-        datasetID = dataset.getValuesFor('dataId')
-        print('\n',expResult)
+        print('\n',expResult.getValuesFor('id')[0])
         for theoryPrediction in predictions:
+            dataset = theoryPrediction.dataset
+            datasetID = dataset.getValuesFor('dataId')[0]            
             mass = theoryPrediction.mass
-            txname = theoryPrediction.txname
+            txnames = [str(txname) for txname in theoryPrediction.txnames]
             PIDs =  theoryPrediction.PIDs         
             print("------------------------")
-            print("TxName = ",txname)   #Analysis name
+            print("Dataset = ",datasetID)   #Analysis name
+            print("TxNames = ",txnames)   
             print("Prediction Mass = ",mass)    #Value for average cluster mass (average mass of the elements in cluster)
             print("Prediction PIDs = ",PIDs)    #Value for average cluster mass (average mass of the elements in cluster)
             print("Theory Prediction = ",theoryPrediction.value)   #Value for the cluster signal cross-section
             print("Condition Violation = ",theoryPrediction.conditions)  #Condition violation values
               
             #Get upper limit for the respective prediction:
-            if expResult.getValuesFor('dataType') == 'upperLimit':
-                print("Theory Prediction UL = ",expResult.getUpperLimitFor(txname=txname,mass=mass))
-            elif expResult.getValuesFor('dataType') == 'efficiencyMap':
+            if expResult.getValuesFor('dataType')[0] == 'upperLimit':
+                print("Theory Prediction UL = ",
+                      expResult.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=mass))
+            elif expResult.getValuesFor('dataType')[0] == 'efficiencyMap':
                 print("Theory Prediction UL = ",expResult.getUpperLimitFor(dataID=datasetID))
-            else: print('weird:',expResult.getValuesFor('type'))
+            else: print('weird:',expResult.getValuesFor('dataType'))
       
     
 

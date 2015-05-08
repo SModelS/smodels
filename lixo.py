@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-from __future__ import print_function
-
 """
 .. module:: Example
    :synopsis: Basic main file example for using SModelS.
@@ -17,16 +15,23 @@ from smodels.theory import slhaDecomposer
 from smodels.theory import lheDecomposer
 from smodels.tools.physicsUnits import fb, GeV
 from smodels.tools.printer import printout
-from smodels.theory.theoryPrediction import theoryPredictionsFor
+from smodels.theory.theoryPrediction import TheoryPredictionList,TheoryPrediction
 from smodels.experiment.databaseObjects import Database
 from unum import ShouldBeUnitlessError
 
-from smodels.tools.statistics import upperLimit
+a1 = TheoryPrediction()
+a2 = TheoryPrediction()
+a3 = TheoryPrediction()
+a = TheoryPredictionList()
+a._theoryPredictions = [a1,a2,a3]
 
+b1 = TheoryPrediction()
+b2 = TheoryPrediction()
+b = TheoryPredictionList()
+b._theoryPredictions = [b1,b2]
 
-Nobs = 0
-Nexp = 3.0
-sigmaexp = 2.8
-lumi = 20.1/fb
+print len(a),len(b)
 
-print(upperLimit(Nobs, Nexp, sigmaexp, lumi))
+c = a + b
+
+print len(sum([a,b]))

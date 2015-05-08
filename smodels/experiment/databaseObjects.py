@@ -101,7 +101,7 @@ class ExpResult(object):
         :return: upper limit (Unum object)
         
         """
-        if self.getValuesFor('dataType') == 'efficiencyMap':
+        if self.getValuesFor('dataType')[0] == 'efficiencyMap':
             if not dataID or not isinstance(dataID, str):
                 logger.error("The data set ID must be defined when computing ULs for\
                             efficiency-map results.")
@@ -116,7 +116,7 @@ class ExpResult(object):
             else:
                 return upperLimits[dataID]
             
-        elif self.getValuesFor('dataType') == 'upperLimit':
+        elif self.getValuesFor('dataType')[0] == 'upperLimit':
             if not txname or not mass:
                 logger.error("A TxName and mass array must be defined when computing ULs for\
                             upper-limit results.")
@@ -131,7 +131,8 @@ class ExpResult(object):
                 if tx == txname or tx.txName == txname:
                     return tx.txnameData.getValueFor(mass)
         else:
-            logger.warning("Unkown data type: %s. Data will be ignored.", self.getValuesFor('datatype'))
+            logger.warning("Unkown data type: %s. Data will be ignored.", 
+                           self.getValuesFor('dataType')[0])
 
 
     @_memoize

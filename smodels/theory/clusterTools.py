@@ -10,7 +10,7 @@
 from smodels.theory import crossSection
 from smodels.theory.auxiliaryFunctions import massAvg, massPosition, distance
 from smodels.tools.physicsUnits import fb
-import logging
+import logging,sys
 
 logger = logging.getLogger(__name__)
 
@@ -53,13 +53,13 @@ class ElementCluster(object):
         :returns: average mass array         
         """
         
-        if self.txname is None:
+        if self.getDataType() == 'efficiencyMap':
             if len(self.elements) > 1: return None
             else: return self.elements[0].getMasses()
-        
-        massList = [el.getMasses() for el in self.elements]
-        weights = [el.weight.getMaxXsec() / fb for el in self.elements]        
-        return massAvg(massList,weights=weights)
+        elif self.getDataType() == 'upperLimits':
+            massList = [el.getMasses() for el in self.elements]
+            weights = [el.weight.getMaxXsec() / fb for el in self.elements]        
+            return massAvg(massList,weights=weights)
 
 
     def getPIDs(self):
@@ -76,6 +76,25 @@ class ElementCluster(object):
                 if not pidList in PIDs: PIDs.append(pidList)
             
         return PIDs
+    
+    def getDataType(self):
+        """
+        Checks to which type of data (efficiency map or upper limit)
+        the cluster refers to. It uses the cluster.txnames attribute.
+        If not defined, returns None 
+        :return: upperLimits or efficiencyMap (string)
+        """
+        
+        if not hasattr(self, 'txnames') or not self.txnames:
+            return None
+        else:
+            #Check the data types
+            dataType = list(set([txname.txnameData.type for txname in self.txnames]))
+            if len(dataType) != 1:
+                logger.error("A single cluster contain mixed data types!")
+                sys.exit()
+            else:
+                return dataType[0]
 
 
 class IndexCluster(object):
@@ -241,7 +260,7 @@ def groupAll(elements):
     """
     cluster = ElementCluster()
     cluster.elements = elements
-    cluster.txname = None
+    cluster.txnames = None
     return cluster
 
 
@@ -258,7 +277,7 @@ def clusterElements(elements, txname, maxDist):
     txdata = txname.txnameData
     # ElementCluster elements by their mass:
     clusters = _doCluster(elements, txdata, maxDist)
-    for cluster in clusters: cluster.txname = txname
+    for cluster in clusters: cluster.txnames = [txname]
     return clusters
 
 
