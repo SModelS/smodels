@@ -26,7 +26,7 @@ FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
 logging.basicConfig(format=FORMAT)
 logger = logging.getLogger(__name__)
 
-logger.setLevel(level=logging.DEBUG)
+logger.setLevel(level=logging.ERROR)
 
 
 class TxName(object):

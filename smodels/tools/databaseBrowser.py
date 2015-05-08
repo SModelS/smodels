@@ -26,14 +26,14 @@ class Browser(object):
     Verbosity can be set to specified level.
     
     :ivar database: Database object holding all the database information
-    :ivar browserList: list of experimental results loaded in the browser.
+    :ivar _selectedExpResults: list of experimental results loaded in the browser.
                        Can be used to hold a subset of results in the database.
                        By default all results are loaded. 
     
     """
     def __init__(self, database):
         
-        self.browserList = []
+        self._selectedExpResults = []
         if isinstance(database,str):
             self.database = Database(database)            
         elif isinstance(database,Database):
@@ -44,32 +44,32 @@ class Browser(object):
         self.loadAllResults()
         
     def __iter__(self):
-        return iter(self.browserList)
+        return iter(self._selectedExpResults)
 
     def __getitem__(self, index):
-        return self.browserList[index]
+        return self._selectedExpResults[index]
 
     def __setitem__(self, index, expRes):
         if not isinstance(expRes,ExpResult):
             logger.error("Input object must be a ExpResult() object")
             sys.exit()
         else:
-            self.browserList[index] = expRes
+            self._selectedExpResults[index] = expRes
 
     def __len__(self):
-        return len(self.browserList)
+        return len(self._selectedExpResults)
 
     def __str__(self):
-        return str([expRes.globalInfo.getInfo('id') for expRes in self.browserList])
+        return str([expRes.globalInfo.getInfo('id') for expRes in self._selectedExpResults])
     
         
     def loadAllResults(self):
         """
-        Saves all the results from database to the browserList.
-        Can be used to restore all results to browserList.
+        Saves all the results from database to the _selectedExpResults.
+        Can be used to restore all results to _selectedExpResults.
         """
         
-        self.browserList = self.database.expResultList[:]
+        self._selectedExpResults = self.database.expResultList[:]
             
     def getValuesFor(self,attribute=None,expResult=None):
         """
@@ -132,67 +132,86 @@ class Browser(object):
                 if "_" == field[0]: fields.remove(field)
                
         return fields
-
-    def getULFor(self,expid,txname=None,massarray=None,datasetID=None):
+    
+    def getULFor(self,expid,txname,massarray):
         """
-        Get an upper limit for the given experimental id, the txname, and the massarray. 
+        Get an upper limit for the given experimental id, the txname, and the massarray.
+        Can only be used for UL experimental results. 
         Interpolation is done, if necessary.
         :param expid: experimental id (string)
         :param txname: txname (string). ONLY required for upper limit results
         :param massarray: list of masses with units, e.g.
                           [[ 400.*GeV, 100.*GeV],[400.*GeV, 100.*GeV]]
-                          ONLY required for upper limit results
-        :param datasetID: string defining the dataset id, e.g. ANA5-CUT3. 
-                          ONLY required for efficiency map results
         :return: upper limit [fb]
         """
         
         #First select the experimental results matching the id and the result type:
         expres = None
         for expResult in self:
-            if expResult.getValuesFor('id') != expid:
+            if expResult.getValuesFor('id')[0] != expid:
                 continue
             else:
                 if 'upperLimit' in expResult.getValuesFor('dataType'):
-                    if not txname or not massarray: continue
-                    expres = expResult
-                    break
-                elif 'efficiencyMap' in expResult.getValuesFor('dataType'):
-                    if not datasetID: continue
                     expres = expResult
                     break
 
         if not expres:
-            logger.warning ( "browser could not find %s . For upper limit results \
-            txname and massarray must be defined, while for efficiency map results only \
-            dataset must be defined" % (expid))
+            logger.warning( "Could not find UL result %s . getULFor can only be\
+            used for upper-limit results." % (expid))
+            return None
+
+        txnames = expres.getTxNames()
+        for tx in txnames:
+            if not tx.txName == txname:
+                continue                
+            return tx.txnameData.getValueFor(massarray)
+
+        logger.warning( "Could not find TxName %s ." % (txname))
+        return None
+    
+
+    def getULForSR(self,expid,datasetID):
+        """
+        Get an upper limit for the given experimental id and dataset (signal region).
+        Can only be used for efficiency-map results.
+        :param expid: experimental id (string)
+        :param datasetID: string defining the dataset id, e.g. ANA5-CUT3.
+        :return: upper limit [fb]
+        """
+        
+        #First select the experimental results matching the id and the result type:
+        expres = None
+        for expResult in self:
+            if expResult.getValuesFor('id')[0] != expid:
+                continue
+            else:
+                if 'efficiencyMap' in expResult.getValuesFor('dataType'):
+                    expres = expResult
+                    break
+
+        if not expres:
+            logger.warning ("Could not find efficiency-map result %s . getULForSR can only be\
+            used for efficiency-map results." % (expid))
             return None
         
-        if 'upperLimit' in expres.getValuesFor('datatype'):
-            txnames = expres.getTxNames()
-            for tx in txnames:
-                if not tx.txName == txname: continue                
-                return tx.txnameData.getValueFor(massarray)
-            
-        elif 'efficiencyMap' in expres.getValuesFor('datatype'):
-            for dataset in expres.datasets:
-                if dataset.dataInfo.dataid != datasetID:
-                    continue
-                return dataset.getUpperLimit()
+        for dataset in expres.datasets:
+            if dataset.dataInfo.dataId != datasetID:
+                continue
+            return dataset.getUpperLimit()
 
-        logger.warning ( "browser could not find upper limit.")
+        logger.warning ( "Could not find dataset %s ." % (datasetID))
         return None
      
   
-    def loadExpResultsWith(self,restrDict = {}):
+    def selectExpResultsWith(self,**restrDict):
         """
         Loads the list of the experimental results (pair of InfoFile and DataFile)
-        satisfying the restrictions to the browserList.
+        satisfying the restrictions to the _selectedExpResults.
         The restrictions specified as a dictionary.
         
-        :param restrDict: dictionary containing the fields and their allowed values.
-                          E.g. {'lumi' : [19.4/fb, 20.3/fb], 'txname' : 'T1',....}
-                          The dictionary values can be single entries or a list of values.
+        :param restrDict: selection fields and their allowed values.
+                          E.g. lumi = [19.4/fb, 20.3/fb], txName = 'T1',....}
+                          The values can be single entries or a list of values.
                           For the fields not listed, all values are assumed to be allowed.
         """
           
@@ -227,7 +246,7 @@ class Browser(object):
                     results.remove(expRes)
                     break                        
               
-        self.browserList = results[:]
+        self._selectedExpResults = results[:]
         
-        if not self.browserList: logger.warning("Zero results loaded.")
+        if not self._selectedExpResults: logger.warning("Zero results loaded.")
    

@@ -82,21 +82,22 @@ class TheoryPredictionList(object):
     def __len__(self):
         return len(self._theoryPredictions)
     
-    def __add__(self,theoPred):
-        if isinstance(theoPred,TheoryPrediction):
-            self._theoryPredictions.append(theoPred)
-
-    def formatData(self,outputLevel):
-        """
-        Select data preparation method through dynamic binding.
+    def __add__(self,theoPredList):
+        if isinstance(theoPredList,TheoryPredictionList):
+            res = TheoryPredictionList()
+            res._theoryPredictions = self._theoryPredictions + theoPredList._theoryPredictions
+            return res
+        else:
+            return None
         
-        :param outputLevel: general control for the output depth to be printed 
-           (0 = no output, 1 = basic output, 2 = detailed output,...
-        
-        """
-        return Printer.formatTheoryPredictionData(self,outputLevel)
+    def __radd__(self, theoPredList):
+        if theoPredList == 0:
+            return self
+        else:
+            return self.__add__(theoPredList)        
 
-def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2):
+
+def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2, useBestDataset=True):
     """
     Compute theory predictions for the given experimental result, using the list of elements
     in smsTopList.
@@ -106,6 +107,8 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2):
     :parameter expResult: expResult to be considered (ExpResult object)
     :parameter smsTopList: list of topologies containing elements (TopologyList object)
     :parameter maxMassDist: maximum mass distance for clustering elements (float)
+    :parameter useBestDataset: If True, uses only the best dataset (signal region).
+               If False, returns predictions for all datasets.
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction objects    
     """
     
@@ -118,11 +121,16 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2):
     
     #For results with more than one dataset, select the best data set 
     #according to the expect upper limit
-    bestResults = _getBestResults(dataSetResults)
-    bestResults.expResult = expResult
-    for op in bestResults:
-        op.expResult = expResult
-    return bestResults
+    if useBestDataset:
+        bestResults = _getBestResults(dataSetResults)
+        bestResults.expResult = expResult
+        for theoPred in bestResults:
+            theoPred.expResult = expResult    
+        return bestResults
+    else:        
+        allResults = sum(dataSetResults)
+        for theoPred in allResults: theoPred.expResult = expResult
+        return allResults
 
 
 def _getBestResults(dataSetResults):
@@ -141,13 +149,13 @@ def _getBestResults(dataSetResults):
     #select the best one according to the expected upper limit:
     bestExpectedR = 0.
     for predList in dataSetResults:
-        dataset = predList.dataset
-        if dataset.dataInfo.dataType != 'efficiencyMap':
-            logger.error("Multiple data sets should only exist for efficiency map results!")
-            sys.exit()
         if len(predList) != 1:
             logger.error("Multiple clusters should only exist for upper limit results!")
             sys.exit()
+        dataset = predList[0].dataset
+        if dataset.dataInfo.dataType != 'efficiencyMap':
+            logger.error("Multiple data sets should only exist for efficiency map results!")
+            sys.exit()                    
         pred = predList[0]
         if len(pred.value) != 1:
             logger.error("Signal region prediction should correspond to a single cross-section!")
@@ -177,7 +185,6 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
     """     
     
     predictionList = TheoryPredictionList()
-    predictionList.dataset = dataset
     # Select elements belonging to expResult and apply efficiencies
     elements = _getElementsFrom(smsTopList, dataset)
     if len(elements) == 0: return None
@@ -198,15 +205,14 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
     # Collect results and evaluate conditions    
     for cluster in clusters:
         theoryPrediction = TheoryPrediction()
-        theoryPrediction.txname = cluster.txname  # = None for efficiency map results
+        theoryPrediction.dataset = dataset
+        theoryPrediction.txnames = cluster.txnames  
         theoryPrediction.value = _evalConstraint(cluster)            
         theoryPrediction.conditions = _evalConditions(cluster)
         theoryPrediction.mass = cluster.getAvgMass()
         theoryPrediction.PIDs = cluster.getPIDs()
-        predictionList + theoryPrediction
+        predictionList._theoryPredictions.append(theoryPrediction)
         
-
-    
 
     if len(predictionList) == 0: return None
     else: return predictionList
@@ -252,9 +258,11 @@ def _combineElements(elements, dataset, maxDist):
     
     """
     
-    clusters = []
+    clusters = []   
+    
     if dataset.dataInfo.dataType == 'efficiencyMap':
-        cluster = clusterTools.groupAll(elements)        
+        cluster = clusterTools.groupAll(elements)
+        cluster.txnames = dataset.txnameList  
         clusters.append(cluster)
     elif dataset.dataInfo.dataType == 'upperLimit':        
         for txname in dataset.txnameList:
@@ -263,7 +271,7 @@ def _combineElements(elements, dataset, maxDist):
                 #Check if element really belongs to txname:
                 if not txname.getEfficiencyFor(element): continue
                 else: txnameEls.append(element)
-            txnameClusters = clusterTools.clusterElements(txnameEls, txname, maxDist)            
+            txnameClusters = clusterTools.clusterElements(txnameEls, txname, maxDist)         
             clusters += txnameClusters
     else:
         logger.warning("Unkown data type: %s. Data will be ignored." 
@@ -277,56 +285,62 @@ def _evalConstraint(cluster):
     Evaluate the constraint inside an element cluster.      
     If the cluster refers to a specific TxName, sum all the elements' weights
     according to the analysis constraint.
-    If cluster.txname = None (efficiency map), sum all the elements' weights.
+    For efficiency map results, sum all the elements' weights.
     
     :parameter cluster: cluster of elements (ElementCluster object)
     :returns: cluster cross-section
     """
 
-    if cluster.txname is None:
+    if cluster.getDataType() == 'efficiencyMap':
         return cluster.getTotalXSec()
-    elif cluster.txname.txnameData.type == 'upperLimits':
-        if not cluster.txname.constraint or cluster.txname.constraint == "not yet assigned":
-            return cluster.txname.constraint
-        exprvalue = _evalExpression(cluster.txname.constraint,cluster)
+    elif cluster.getDataType() == 'upperLimits':
+        if len(cluster.txnames) != 1:
+            logger.error("An upper limit cluster should never contain more than one TxName")
+            sys.exit()
+        txname = cluster.txnames[0]
+        if not txname.constraint or txname.constraint == "not yet assigned":
+            return txname.constraint
+        exprvalue = _evalExpression(txname.constraint,cluster)
         return exprvalue
     else:
-        logger.error("Unknown cluster type")
+        print str(cluster.getDataType())
+        logger.error("Unknown data type %s" %(str(cluster.getDataType)))
         sys.exit()
     
 
 def _evalConditions(cluster):
     """
-    Evaluate the conditions (if any) inside an element cluster.   
-    If the cluster refers to a specific TxName, evaluates the analysis conditions inside
-    an element cluster.
-    If cluster.txname = None (efficiency map), returns None
+    Evaluate the conditions (if any) inside an element cluster.
     
     :parameter cluster: cluster of elements (ElementCluster object)    
     :returns: list of condition values (floats) if analysis type == upper limit. None, otherwise.    
     """
 
-    if cluster.txname is None:
-        return None
-    elif cluster.txname.txnameData.type == 'upperLimits':
-        if not cluster.txname.condition \
-         or cluster.txname.condition == "not yet assigned":
-            return cluster.txname.condition
-        conditions = {}
+    conditionVals = {}
+    for txname in cluster.txnames:
+        if not txname.condition or txname.condition == "not yet assigned":
+            continue        
         #Make sure conditions is always a list
-        if isinstance(cluster.txname.condition,str): 
-            cluster.txname.condition = [cluster.txname.condition]
+        if isinstance(txname.condition,str):
+            conditions =  [txname.condition]
+        elif isinstance(txname.condition,list):
+            conditions = txname.condition
+        else:
+            logger.error("Conditions should be a list or a string")
+            sys.exit()
+            
         # Loop over conditions
-        for cond in cluster.txname.condition:
+        for cond in conditions:
             exprvalue = _evalExpression(cond,cluster)
             if type(exprvalue) == type(crossSection.XSectionList()):
-                conditions[cond] = exprvalue[0].value
+                conditionVals[cond] = exprvalue[0].value
             else:
-                conditions[cond] = exprvalue                
-        return conditions    
-    else:
-        logger.error("Unknown cluster type")
-        sys.exit()
+                conditions[cond] = exprvalue
+    
+    if not conditionVals:
+        return None
+    else:            
+        return conditionVals    
         
         
 def _evalExpression(stringExpr,cluster):

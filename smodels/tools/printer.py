@@ -269,9 +269,9 @@ class TextBasedPrinter(object):
 
         output = ""
         output += "========================================================\n"
-        output += "Experimental Result ID: " + obj.getValuesFor('id') + '\n'
-        output += "Tx Labels: " + str(obj.getValuesFor('txname')) + '\n'
-        output += "Sqrts: " + str(obj.getValuesFor('sqrts')) + '\n'
+        output += "Experimental Result ID: " + obj.getValuesFor('id')[0] + '\n'
+        output += "Tx Labels: " + str(obj.getValuesFor('txName')) + '\n'
+        output += "Sqrts: " + str(obj.getValuesFor('sqrts')[0]) + '\n'
         if objOutputLevel == 2:
             output += "\t -----------------------------\n"
             output += "\t Elements tested by analysis:\n"
@@ -301,7 +301,7 @@ class TextBasedPrinter(object):
         for theoryPrediction in obj:
             output += "\n"
             output += "---------------Analysis Label = " + info.id + "\n"
-            output += "-------------------Dataset Label = " + str(datasetInfo.dataid) + "\n"
+            output += "-------------------Dataset Label = " + str(datasetInfo.dataId) + "\n"
             output += "-------------------Txname Label = " + str(theoryPrediction.txname) + "\n"
             output += "Analysis sqrts: " + str(info.sqrts) + \
                     "\n"
@@ -320,10 +320,10 @@ class TextBasedPrinter(object):
                 for cond in theoryPrediction.conditions:
                     condlist.append(theoryPrediction.conditions[cond])
                 output += str(condlist) + "\n"
-            if datasetInfo.datatype == 'upperLimit':
+            if datasetInfo.dataType == 'upperLimit':
                 experimentalLimit = expRes.getUpperLimitFor(txname=theoryPrediction.txname,
                                                             mass=theoryPrediction.mass)
-            elif datasetInfo.datatype == 'efficiencyMap':
+            elif datasetInfo.dataType == 'efficiencyMap':
                 experimentalLimit = expRes.getUpperLimitFor(dataID=datasetInfo.dataId)
 
             output += "Experimental limit: " + str(experimentalLimit) + "\n"
@@ -477,9 +477,9 @@ class PyPrinter(TextBasedPrinter):
         
         ExptRes = []
         expResult = obj.expResult
-        datasetID = obj.dataset.getValuesFor('dataid')
-        expID =  expResult.getValuesFor('id')
-        sqrts = (expResult.getValuesFor('sqrts')/TeV).asNumber()        
+        datasetID = obj.dataset.getValuesFor('dataId')[0]
+        expID =  expResult.getValuesFor('id')[0]
+        sqrts = (expResult.getValuesFor('sqrts')[0]/TeV).asNumber()        
         for prediction in obj:
             mass = prediction.mass
             txname = prediction.txname            
@@ -496,9 +496,9 @@ class PyPrinter(TextBasedPrinter):
             else:
                 TxName = None
             theores = (prediction.value.getMaxXsec()/fb).asNumber()
-            if expResult.getValuesFor('datatype') == 'upperLimit':
+            if expResult.getValuesFor('dataType')[0] == 'upperLimit':
                 explimit = expResult.getUpperLimitFor(txname=txname,mass=mass)
-            elif expResult.getValuesFor('datatype') == 'efficiencyMap':
+            elif expResult.getValuesFor('dataType')[0] == 'efficiencyMap':
                 explimit = expResult.getUpperLimitFor(dataID=datasetID)
             explimit = (explimit/fb).asNumber()
             ExptRes.append({'maxcond': maxconds, 'tval (fb)': theores,

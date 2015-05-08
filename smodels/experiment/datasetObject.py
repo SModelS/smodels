@@ -81,9 +81,7 @@ class DataSet(object):
             logger.warning("Could not find field %s in database" % attribute)
             return False
         else:
-            if len(valuesDict[attribute]) == 1: return valuesDict[attribute][0]
-            else:
-                return valuesDict[attribute]
+            return valuesDict[attribute]
             
 
     def getAttributes(self,showPrivate=False):
