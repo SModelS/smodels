@@ -14,13 +14,13 @@ def upperLimit ( Nobs, Nexp, sigmaexp, lumi, alpha=.05 ):
     """ a convenience function to have a central place where to centrally change the 
       way the upper limit gets computed """
 
-#     ret = getUL(Nobs, Nexp, sigmaexp,alpha)/lumi
-#     ret = bayesianUpperLimit(Nobs,0.00001,Nexp,sigmaexp,1.-alpha)/lumi
-    ret = upperLimitMadAnalysis ( Nobs, Nexp, sigmaexp, 1.-alpha ) / lumi
+#     ret = _getUL(Nobs, Nexp, sigmaexp,alpha)/lumi
+#     ret = _bayesianUpperLimit(Nobs,0.00001,Nexp,sigmaexp,1.-alpha)/lumi
+    ret = _upperLimitMadAnalysis ( Nobs, Nexp, sigmaexp, 1.-alpha ) / lumi
 
     return ret
 
-def computeCLInterval( Nobs, Nexp, lumi, alpha=.05 ):
+def _computeCLInterval( Nobs, Nexp, lumi, alpha=.05 ):
     """ Get experimental limit for the signal cross-section*efficiency in the analysis signal region.
                     
     :returns: (1-alpha) C.L. experimental upper limit for the signal cross-section in the signal
@@ -32,7 +32,7 @@ def computeCLInterval( Nobs, Nexp, lumi, alpha=.05 ):
             
     return maxSignalEvents/lumi
 
-def bayesianUpperLimit ( nev, sac, xbg, sbg, cl=.95, prec=None, smax=None ):
+def _bayesianUpperLimit ( nev, sac, xbg, sbg, cl=.95, prec=None, smax=None ):
     """ conway's bayesian method 
     :param nev: number of observed events
     :param sac: relative uncertainty in acceptance
@@ -44,7 +44,7 @@ def bayesianUpperLimit ( nev, sac, xbg, sbg, cl=.95, prec=None, smax=None ):
     
     return BayesianUpperLimit.upperLimit ( nev, sac, xbg, sbg, cl, prec, smax )
 
-def upperLimitMadAnalysis ( nev, xbg, sbg, cl=.95, numberoftoys=10000, upto = 1.0, return_nan=False ):
+def _upperLimitMadAnalysis ( nev, xbg, sbg, cl=.95, numberoftoys=10000, upto = 1.0, return_nan=False ):
     """ upper limit obtained via mad analysis 5 code 
     :param nev: number of observed events
     :param sac: relative uncertainty in acceptance
@@ -58,16 +58,16 @@ def upperLimitMadAnalysis ( nev, xbg, sbg, cl=.95, numberoftoys=10000, upto = 1.
     def f( sig ):
         return exclusion_CLs.CLs ( nev, xbg, sbg, sig, numberoftoys ) - cl
     try:
-        return scipy.optimize.brentq ( f, 0, upto * nev )
+        return scipy.optimize.brentq ( f, 0, upto * max(nev,xbg,sbg) )
     except Exception,e:
         if not return_nan:
-            return upperLimitMadAnalysis ( nev, xbg, sbg, cl, 5*numberoftoys, 5.0*upto, True )
+            return _upperLimitMadAnalysis ( nev, xbg, sbg, cl, 5*numberoftoys, 5.0*upto, upto>10. )
         else:
             return float("nan")
 
 
 
-def getPValue(Nsig,Nobs,Nbg,NbgErr):
+def _getPValue(Nsig,Nobs,Nbg,NbgErr):
         """
         Computes the p-value using the signal cross-section (signalxsec) and the systematic
         error in the BG (bgsysError = systematic error/expected BG).
@@ -93,7 +93,7 @@ def getPValue(Nsig,Nobs,Nbg,NbgErr):
                 
         return p
 
-def getUL(Nobs,Nbg,NbgErr,alpha):
+def _getUL(Nobs,Nbg,NbgErr,alpha):
     """
     Computes the 95% upper limit on the signal*efficiency cross-section,
     given number of observed events (Nobs), number of expected BG events (Nbg)
@@ -108,11 +108,11 @@ def getUL(Nobs,Nbg,NbgErr,alpha):
     
     n0 = 0.
     n1 = abs(Nobs - Nbg) + 4*sqrt(NbgErr**2 + Nbg)
-    while getPValue(n1,Nobs,Nbg,NbgErr) > alpha:
+    while _getPValue(n1,Nobs,Nbg,NbgErr) > alpha:
         n1 += 4.*sqrt(NbgErr**2 + Nbg)
 
     def pValm(x):
-        return alpha - getPValue(x,Nobs,Nbg,NbgErr)
+        return alpha - _getPValue(x,Nobs,Nbg,NbgErr)
 
     nmax = optimize.brentq(pValm,n0,n1)
     return nmax
