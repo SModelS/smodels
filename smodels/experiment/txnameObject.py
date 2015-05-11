@@ -242,7 +242,7 @@ class TxNameData(object):
         if dp != self.dimensionality: ## we have data in different dimensions
             if self.accept_errors_upto == None:
                 return None
-            logger.info ( "attempting to interpolate outside of convex hull (d=%d,dp=%d,masses=%s)" %
+            logger.debug ( "attempting to interpolate outside of convex hull (d=%d,dp=%d,masses=%s)" %
                      ( self.dimensionality, dp, str(massarray) ) )
             return self._interpolateOutsideConvexHull ( massarray )
 
@@ -313,13 +313,13 @@ class TxNameData(object):
         if de < self.accept_errors_upto:
             return self._returnProjectedValue()
         if not math.isnan(de):
-            logger.info ( "Expected error of %f too large to propagate outside convex hull" % de )
+            logger.debug ( "Expected propagation error of %f too large to propagate." % de )
         return None
 
     def _returnProjectedValue ( self ):
         ## None is returned without units'
         if self.projected_value is None or math.isnan(self.projected_value):
-            logger.info ( "projected value is None. Projected point not in convex hull? original point=%s" % self.massarray )
+            logger.debug ( "projected value is None. Projected point not in convex hull? original point=%s" % self.massarray )
             return None
         return self.projected_value * self.unit 
 
