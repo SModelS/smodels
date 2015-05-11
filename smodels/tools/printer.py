@@ -297,12 +297,12 @@ class TextBasedPrinter(object):
 
         expRes = obj.expResult
         info = expRes.globalInfo
-        datasetInfo = obj.dataset.dataInfo        
         for theoryPrediction in obj:
+            datasetInfo = theoryPrediction.dataset.dataInfo        
             output += "\n"
             output += "---------------Analysis Label = " + info.id + "\n"
             output += "-------------------Dataset Label = " + str(datasetInfo.dataId) + "\n"
-            output += "-------------------Txname Label = " + str(theoryPrediction.txname) + "\n"
+            output += "-------------------Txname Label = " + str(theoryPrediction.txName) + "\n"
             output += "Analysis sqrts: " + str(info.sqrts) + \
                     "\n"
             if theoryPrediction.mass:
