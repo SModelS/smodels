@@ -9,9 +9,17 @@ args = argparser.parse_args()
 import IPython
 from smodels.tools import databaseBrowser
 from smodels.tools.physicsUnits import fb, pb, GeV, TeV
+from smodels.installation import installDirectory
 
-header = "Welcome to SModelS\n"
-header += "browser = Browser ( %s )" % ( args.path_to_database ) 
+header = ""
+with open( installDirectory()+"/BANNER") as f:
+    lines=f.readlines()
+    for line in lines: header+=line
+
+header += "\n"
+header += "fb, pb, GeV, TeV defined.\n"
+header += "browser = Browser ( '%s' )\n" % ( args.path_to_database ) 
+
 
 browser = databaseBrowser.Browser ( args.path_to_database )
 
