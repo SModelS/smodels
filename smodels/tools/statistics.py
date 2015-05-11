@@ -3,16 +3,14 @@
    :synopsis: Code that computes CLs, p values, etc.
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
         
 """
 
-from numpy import sqrt
-from scipy import stats,special,integrate,optimize
-from smodels.tools import BayesianUpperLimit
+from smodels.tools.physicsUnits import fb
 
 def upperLimit ( Nobs, Nexp, sigmaexp, lumi, alpha=.05 ):
-    """ a convenience function to have a central place where to centrally change the 
-      way the upper limit gets computed """
+    """ computes the 95% CL upper limit on the production cross section """
 
 #     ret = _getUL(Nobs, Nexp, sigmaexp,alpha)/lumi
 #     ret = _bayesianUpperLimit(Nobs,0.00001,Nexp,sigmaexp,1.-alpha)/lumi
@@ -26,6 +24,7 @@ def _computeCLInterval( Nobs, Nexp, lumi, alpha=.05 ):
     :returns: (1-alpha) C.L. experimental upper limit for the signal cross-section in the signal
               region        
     """
+    from scipy import stats
                    
     Nmax = 0.5*stats.chi2.isf(alpha,2*(Nobs+1)) - Nexp  #Upper limit on number of signal events
     maxSignalEvents = Nmax  #DOES NOT INCLUDE SYSTEMATIC UNCERTAINTIES
@@ -41,7 +40,7 @@ def _bayesianUpperLimit ( nev, sac, xbg, sbg, cl=.95, prec=None, smax=None ):
     :param  cl: desired CL
     :param smax: upper limit of integration
     :param prec: integration step size """
-    
+    from smodels.tools import BayesianUpperLimit
     return BayesianUpperLimit.upperLimit ( nev, sac, xbg, sbg, cl, prec, smax )
 
 def _upperLimitMadAnalysis ( nev, xbg, sbg, cl=.95, numberoftoys=10000, upto = 1.0, return_nan=False ):
@@ -68,30 +67,32 @@ def _upperLimitMadAnalysis ( nev, xbg, sbg, cl=.95, numberoftoys=10000, upto = 1
 
 
 def _getPValue(Nsig,Nobs,Nbg,NbgErr):
-        """
-        Computes the p-value using the signal cross-section (signalxsec) and the systematic
-        error in the BG (bgsysError = systematic error/expected BG).
-        Assumes a Gaussian distribution for the BG systematical error.
-        """
-       
-        #Signal + BG prediction:
-        Ntot = Nbg+Nsig
-        #Total systematical error in BG+signal:
-        NErr = NbgErr
-                
-        #Normalization        
-        n = (1./2.)*(1. + special.erf(Ntot/(sqrt(2.)*NErr)))
-                
-        #P-value integrand
-        def pint(x):            
-            pInt = stats.poisson.cdf(Nobs,x)   #poisson.cdf with mean x (=total number of predicted events distributed according to gaussian)
-            pInt *= stats.norm.pdf(x,loc=Ntot,scale=NErr)  #systematical error weight
-            return pInt
-        
-        #P-value integral
-        p = n*integrate.quad(pint,max(0.,Ntot-10.*NbgErr),Ntot+10.*NbgErr)[0]
-                
-        return p
+    """
+    Computes the p-value using the signal cross-section (signalxsec) and the systematic
+    error in the BG (bgsysError = systematic error/expected BG).
+    Assumes a Gaussian distribution for the BG systematical error.
+    """
+    from numpy import sqrt
+    from scipy import integrate,special, stats
+   
+    #Signal + BG prediction:
+    Ntot = Nbg+Nsig
+    #Total systematical error in BG+signal:
+    NErr = NbgErr
+            
+    #Normalization        
+    n = (1./2.)*(1. + special.erf(Ntot/(sqrt(2.)*NErr)))
+            
+    #P-value integrand
+    def pint(x):            
+        pInt = stats.poisson.cdf(Nobs,x)   #poisson.cdf with mean x (=total number of predicted events distributed according to gaussian)
+        pInt *= stats.norm.pdf(x,loc=Ntot,scale=NErr)  #systematical error weight
+        return pInt
+    
+    #P-value integral
+    p = n*integrate.quad(pint,max(0.,Ntot-10.*NbgErr),Ntot+10.*NbgErr)[0]
+            
+    return p
 
 def _getUL(Nobs,Nbg,NbgErr,alpha):
     """
@@ -105,6 +106,8 @@ def _getUL(Nobs,Nbg,NbgErr,alpha):
     :param alpha: 1-C.L. i.e. for 95% C.L. alpha = 0.05
     :returns: the 95% confidence level on signal*efficiency*luminosity (float)
     """
+    from numpy import sqrt
+    from scipy import optimize
     
     n0 = 0.
     n1 = abs(Nobs - Nbg) + 4*sqrt(NbgErr**2 + Nbg)
