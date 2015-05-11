@@ -270,6 +270,7 @@ def clusterElements(elements, txname, maxDist):
     
     :parameter elements: list of elements (Element objects)
     :parameter txname: TxName object to be used for computing distances in UL space
+    :parameter maxDist: maximum mass distance for clustering two elements
     
     :returns: list of clusters (ElementCluster objects)    
     """
