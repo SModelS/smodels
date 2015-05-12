@@ -326,7 +326,7 @@ class TextBasedPrinter(object):
             if expRes.getValuesFor('dataType')[0] == 'upperLimit':
                 experimentalLimit = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass)
             elif expRes.getValuesFor('dataType')[0] == 'efficiencyMap':
-                experimentalLimit = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.datasetID)
+                experimentalLimit = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.getValuesFor('dataId')[0])
 
             output += "Experimental limit: " + str(experimentalLimit) + "\n"
 
