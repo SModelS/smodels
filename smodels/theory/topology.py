@@ -11,6 +11,7 @@
 
 from smodels.theory import crossSection
 from smodels.theory.element import Element
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import logging
 import sys
 
@@ -123,10 +124,10 @@ class Topology(object):
             info = element.getEinfo()
             if self.vertnumb != info["vertnumb"]:
                 logger.error("Inconsistent topology.")
-                sys.exit()
+                raise SModelSError()
             if self.vertparts != info["vertparts"]:
                 logger.error("Inconsistent topology.")
-                sys.exit()
+                raise SModelSError()
         logger.info("Consistent topology.")
         return True
 

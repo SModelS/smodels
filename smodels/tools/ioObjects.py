@@ -17,6 +17,7 @@ from smodels.tools import modpyslha as pyslha
 from smodels.particles import qNumbers, rEven
 from smodels.theory import crossSection
 from smodels.theory.theoryPrediction import TheoryPrediction
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import logging
 
 logger = logging.getLogger(__name__)
@@ -48,7 +49,7 @@ class ResultList(object):
         
         if not isinstance(theoPred,TheoryPrediction):
             logger.error("Only TheoryPrediction objects can be added to ResultList")
-            sys.exit()
+            raise SModelSError()
                     
         mCond = theoPred.getmaxCondition()
         if mCond == 'N/A' or mCond > maxcond:

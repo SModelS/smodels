@@ -10,6 +10,7 @@
 
 from smodels.tools.physicsUnits import TeV, pb
 import logging
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 logger = logging.getLogger(__name__)
 
@@ -193,8 +194,7 @@ class SmsEvent(object):
                 imom += 1
         if imom != 2:
             logger.error("Number of mother particles %d != 2", imom)
-            import sys
-            sys.exit()
+            raise SModelSError()
         if momspdg[0] > momspdg[1]:
             momspdg[0], momspdg[1] = momspdg[1], momspdg[0]
         return momspdg

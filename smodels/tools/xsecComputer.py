@@ -14,6 +14,7 @@ from smodels.tools import toolBox
 from smodels.tools.physicsUnits import pb, TeV, GeV
 from smodels.theory import crossSection
 from smodels.tools import nllFast
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import os
 import cStringIO
 import logging
@@ -51,13 +52,13 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
 
     if not os.path.isfile(slhafile):
         logger.error("SLHA file %s not found.", slhafile)
-        sys.exit()
+        raise SModelSError()
     from smodels.tools import modpyslha
     try:
         f=modpyslha.readSLHAFile(slhafile)
     except modpyslha.ParseError,e:
         logger.error("File cannot be parsed as SLHA file: %s" % e )
-        sys.exit()
+        raise SModelSError()
 
     if type(sqrts)==type(float) or type(sqrts)==type(int):
         logger.warning("sqrt(s) given as scalar, will add TeV as unit." )
@@ -142,8 +143,7 @@ def addXSecToFile(xsecs, slhafile, comment=None, complain=True):
     
     if not os.path.isfile(slhafile):
         logger.error("SLHA file not found.")
-        import sys
-        sys.exit()
+        raise SModelSError()
     if len(xsecs) == 0:
         logger.warning("No cross-sections available.")
         return False
@@ -183,8 +183,7 @@ def xsecToBlock(xsec, inPDGs=(2212, 2212), comment=None, xsecUnit = pb):
     """
     if type(xsec) != type(crossSection.XSection()):
         logger.error("Wrong input")
-        import sys
-        sys.exit()
+        raise SModelSError()
     # Sqrt(s) in GeV
     header = "XSECTION  " + str(xsec.info.sqrts / GeV)
     for pdg in inPDGs:
@@ -234,7 +233,7 @@ def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True, pythiacard=None
     lhedata = tool.run(slhafile, do_unlink=unlink )
     if not "<LesHouchesEvents" in lhedata:
         logger.error("LHE events not found in pythia output")
-        sys.exit()
+        raise SModelSError()
 
     #Reset pythia card to its default value
     if pythiacard:

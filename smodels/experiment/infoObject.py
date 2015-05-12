@@ -11,6 +11,7 @@
 
 import logging,os,sys
 from smodels.tools.physicsUnits import GeV, fb, TeV, pb
+from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
 logging.basicConfig(format=FORMAT)
@@ -36,7 +37,7 @@ class Info(object):
         #Open the info file and get the information:
         if not os.path.isfile(path):
             logger.error("Info file %s not found" % path)
-            sys.exit()      
+            raise SModelSError()      
         from smodels.tools.stringTools import concatenateLines
         infoFile = open(self.path)
         content = concatenateLines ( infoFile.readlines() )

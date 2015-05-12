@@ -12,6 +12,7 @@ from smodels.theory import crossSection
 from smodels.particles import rEven, ptcDic
 import logging
 import sys
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 logger = logging.getLogger(__name__)
 
@@ -184,10 +185,10 @@ class Element(object):
             newmass = [mass[1], mass[0]]
         else:
             logger.error("Called with no possible ordering")            
-            sys.exit()
+            raise SModelSError()
         if len(newmass) != len(self.branches):
             logger.error("Called with wrong number of mass branches")
-            sys.exit()
+            raise SModelSError()
 
         for i, mass in enumerate(newmass):
             self.branches[i].masses = mass[:]
@@ -342,11 +343,11 @@ class Element(object):
             for iv, vertex in enumerate(branch.particles):
                 if len(vertex) != info['vertparts'][ib][iv]:
                     logger.error("Wrong syntax")
-                    sys.exit()
+                    raise SModelSError()
                 for ptc in vertex:
                     if not ptc in rEven.values() and not ptc in ptcDic:
                         logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
-                        sys.exit()
+                        raise SModelSError()
         return True
 
     
@@ -544,4 +545,4 @@ def _smallerMass(mass1, mass2):
         pass
 
     logger.error("Invalid input")
-    sys.exit()
+    raise SModelSError()

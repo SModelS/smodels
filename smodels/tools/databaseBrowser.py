@@ -11,6 +11,7 @@ import logging
 import sys
 from smodels.experiment.databaseObjects import Database,ExpResult
 import numpy, unum
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
@@ -40,7 +41,7 @@ class Browser(object):
             self.database = database
         else:
             logger.error("The input must be the database location or a Database object.")
-            sys.exit()            
+            raise SModelSError()            
         self.loadAllResults()
         
     def __iter__(self):
@@ -52,7 +53,7 @@ class Browser(object):
     def __setitem__(self, index, expRes):
         if not isinstance(expRes,ExpResult):
             logger.error("Input object must be a ExpResult() object")
-            sys.exit()
+            raise SModelSError()
         else:
             self._selectedExpResults[index] = expRes
 

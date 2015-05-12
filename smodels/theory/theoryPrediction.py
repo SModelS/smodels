@@ -12,6 +12,7 @@ from smodels.theory.particleNames import elementsInStr
 from smodels.theory.auxiliaryFunctions import cSim, cGtr  #DO NOT REMOVE
 import logging,sys
 from smodels.tools.physicsUnits import TeV
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 logger = logging.getLogger(__name__)
 
@@ -132,7 +133,6 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2, useBestDataset=
         for theoPred in allResults: theoPred.expResult = expResult
         return allResults
 
-
 def _getBestResults(dataSetResults):
     """
     Returns the best result according to the expected upper limit
@@ -151,15 +151,15 @@ def _getBestResults(dataSetResults):
     for predList in dataSetResults:
         if len(predList) != 1:
             logger.error("Multiple clusters should only exist for upper limit results!")
-            sys.exit()
+            raise SModelSError()
         dataset = predList[0].dataset
         if dataset.dataInfo.dataType != 'efficiencyMap':
             logger.error("Multiple data sets should only exist for efficiency map results!")
-            sys.exit()                    
+            raise SModelSError()                    
         pred = predList[0]
         if len(pred.value) != 1:
             logger.error("Signal region prediction should correspond to a single cross-section!")
-            sys.exit()
+            raise SModelSError()
         xsec = pred.value[0]        
         expectedR = xsec.value/dataset.getUpperLimit(0.05,True)
         if expectedR > bestExpectedR:
@@ -296,7 +296,7 @@ def _evalConstraint(cluster):
     elif cluster.getDataType() == 'upperLimit':
         if len(cluster.txnames) != 1:
             logger.error("An upper limit cluster should never contain more than one TxName")
-            sys.exit()
+            raise SModelSError()
         txname = cluster.txnames[0]
         if not txname.constraint or txname.constraint == "not yet assigned":
             return txname.constraint
@@ -304,7 +304,7 @@ def _evalConstraint(cluster):
         return exprvalue
     else:
         logger.error("Unknown data type %s" %(str(cluster.getDataType())))
-        sys.exit()
+        raise SModelSError()
     
 
 def _evalConditions(cluster):
@@ -326,7 +326,7 @@ def _evalConditions(cluster):
             conditions = txname.condition
         else:
             logger.error("Conditions should be a list or a string")
-            sys.exit()
+            raise SModelSError()
             
         # Loop over conditions
         for cond in conditions:

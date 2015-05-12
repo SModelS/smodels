@@ -14,6 +14,7 @@ from smodels.tools.physicsUnits import GeV, fb, TeV, pb
 from smodels.theory.particleNames import elementsInStr
 from smodels.tools.stringTools import concatenateLines
 from smodels.theory.element import Element
+from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.theory.auxiliaryFunctions import _memoize
 from scipy.interpolate import griddata
 from scipy.linalg import svd
@@ -45,7 +46,7 @@ class TxName(object):
         #Open the info file and get the information:
         if not os.path.isfile(path):
             logger.error("Txname file %s not found" % path)
-            sys.exit()
+            raise SModelSError()
         txtFile = open(path,'r')
         txdata = txtFile.read()
         if not "txName" in txdata: raise TypeError
@@ -157,7 +158,7 @@ class TxName(object):
             return val  #The element has an eff
         else:
             logger.error("Unknown txnameData value: %s" % (str(type(val))))
-            sys.exit()
+            raise SModelSError()
             
 class TxNameData(object):
     """Holds the data for the Txname object.  It holds Upper limit values or efficiencies."""

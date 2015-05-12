@@ -11,6 +11,7 @@ from smodels.tools.physicsUnits import fb
 import logging
 from smodels.particles import rEven, ptcDic
 import sys
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +44,7 @@ class Branch(object):
             branch = elementsInStr(info)
             if not branch or len(branch) > 1:
                 logger.error("Wrong input string " + info)
-                sys.exit()
+                raise SModelSError()
             else:
                 branch = branch[0]
                 vertices = elementsInStr(branch[1:-1])
@@ -54,7 +55,7 @@ class Branch(object):
                         if not ptc in rEven.values() \
                                 and not ptc in ptcDic:
                             logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
-                            sys.exit()
+                            raise SModelSError()
                     self.particles.append(ptcs)
 
 

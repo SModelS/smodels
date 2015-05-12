@@ -13,6 +13,7 @@ import sys
 import copy
 import logging
 from smodels.particles import rEven, rOdd, ptcDic
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +71,7 @@ def elementsInStr(instring):
         for st in instring:
             if type(st) != type('st'):
                 logger.error("Input must be a string or a list of strings")
-                sys.exit()
+                raise SModelSError()
             # Combine list of strings in a single string
             outstr += st
 
@@ -100,12 +101,12 @@ def elementsInStr(instring):
                     continue
                 if not ptc in rEven.values() and not ptc in ptcDic:
                     logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
-                    raise("bla")
+                    raise SModelSError()
 
     # Check if there are not unmatched ['s and/or ]'s in the string
     if nc != 0:
         logger.error("Wrong input (incomplete elements?) " + instring)
-        sys.exit()
+        raise SModelSError()
 
     return elements
 
@@ -123,7 +124,7 @@ def vertInStr(instring):
         for st in instring:
             if type(st) != type('st'):
                 logger.error("Input must be a string or a list of strings")
-                sys.exit()
+                raise SModelSError()
             # Combine list of strings in a single string
             outstr += st
 
@@ -152,13 +153,13 @@ def vertInStr(instring):
                     continue
                 if not ptc in rEven.values() and not ptc in ptcDic:
                     logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
-                    sys.exit()
+                    raise SModelSError()
             vertStr = ""
 
     # Check if there are not unmatched ['s and/or ]'s in the string
     if nc != 0:
         logger.error("Wrong input (incomplete elements?) " + instring)
-        sys.exit()
+        raise SModelSError()
 
     return vertices
 
@@ -201,7 +202,7 @@ def simParticles(ptype1, ptype2, useDict=True):
                         wrongFormat = True
     if wrongFormat:
         logger.error("Wrong input format!" + str(ptype1) + " " + str(ptype2))
-        sys.exit()
+        raise SModelSError()
 
     # Put input in standard notation
     if type(ptype1) == type("str"):

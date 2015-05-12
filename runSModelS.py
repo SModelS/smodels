@@ -26,6 +26,7 @@ from smodels.experiment.exceptions import DatabaseNotFoundException
 
 log = logging.getLogger(__name__)
 
+
 def main(inputFile, parameterFile, outputFile):
     """
     Provides a command line interface to basic SModelS functionalities.
