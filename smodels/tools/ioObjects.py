@@ -6,6 +6,7 @@
     
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>    
 .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
 """
 
@@ -15,80 +16,91 @@ from smodels.tools.physicsUnits import GeV, fb
 from smodels.tools import modpyslha as pyslha
 from smodels.particles import qNumbers, rEven
 from smodels.theory import crossSection
+from smodels.theory.theoryPrediction import TheoryPrediction
 import logging
 
 logger = logging.getLogger(__name__)
 
 class ResultList(object):
     """
-    Class that collects experimental constraints and has a predefined printout.
+    Class that collects a list of theory predictions plus the corresponding upper limits.
     
-    :ivar outputarray: list of theorypredictions
-    :ivar bestresultonly: if True, printout will print only the best result
-    :ivar describeTopo: if True, printout will print the constraints
-    
+    :ivar theoryPredictions: list of TheoryPrediction objects    
     """
-    def __init__(self, outputarray=[], bestresultonly=None, describeTopo=None):
-        self.outputarray = outputarray
-        self.bestresultonly = bestresultonly
-        self.describeTopo = describeTopo
-
-    def addResult(self, res, maxcond):
-        """
-        Add a result to the outputarry, unless it violates maxcond.
+    
+    
+    def __init__(self, theoPredictionsList=[],maxcond = 1.):
         
-        :parameter res: theoryprediction to be added to ResultList
+        self.theoryPredictions = []
+        if theoPredictionsList:
+            for theoPred in theoPredictionsList:
+                self.addTheoPrediction(theoPred,maxcond)
+            self.sort()
+
+    def addTheoPrediction(self, theoPred, maxcond):
+        """
+        Add a result to the theoryPredictions, unless it violates maxcond.
+        
+        :parameter theoPred: a Theory Prediction object to be added to ResultList
         :parameter maxcond: maximum condition violation
         
         """
-        mCond = res.getmaxCondition()
-        if mCond == 'N/A': return
-        if mCond > maxcond: return
-        self.outputarray.append(res)
-        return
+        
+        if not isinstance(theoPred,TheoryPrediction):
+            logger.error("Only TheoryPrediction objects can be added to ResultList")
+            sys.exit()
+                    
+        mCond = theoPred.getmaxCondition()
+        if mCond == 'N/A' or mCond > maxcond:
+            return False
+        
+        self.theoryPredictions.append(theoPred)
+        return True
 
-    def getR(self, res):
+    def getR(self, theoPred):
         """
         Calculate R value.
         
-        :parameter res: theoryprediction
-        :returns: R value = weight / upper limit
-        
+        :paramtheoPredr theoPred: Theory Prediction object
+        :returns: R value = weight / upper limit        
         """
-        return res.value[0].value / res.txname.txnameData.getValueFor(res.mass)
+        
+        expResult = theoPred.expResult
+        datasetID = theoPred.dataset.getValuesFor('dataId')[0]
+        dataType = expResult.getValuesFor('dataType')[0] 
+        
+        if dataType == 'upperLimit':
+            ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass)
+        elif dataType == 'efficiencyMap':
+            ul = expResult.getUpperLimitFor(dataID=datasetID)
+        else:
+            logger.error("Unknown dataType %s" %(str(dataType)))
+        
+        return theoPred.value[0].value/ul
 
     def sort(self):
         """
-        Reverse sort outputarray by R value.
+        Reverse sort theoryPredictions by R value.
         
         """
-        self.outputarray = sorted(self.outputarray, key=self.getR, reverse=True)
-        return
+        self.theoryPredictions = sorted(self.theoryPredictions, key=self.getR, reverse=True)
 
-    def getBestResult(self):
+    def useBestResult(self):
         """ 
-        Return best result.
-        
+        Restricts the list of predictions to the best result only.        
         """
         self.sort()
-        return self.outputarray[0]
+        if self.theoryPredictions:
+            self.theoryPredictions = [self.theoryPredictions[0]]
+
 
     def isEmpty(self):
         """
         Check if outputarray is empty.
         
         """
-        return len(self.outputarray) == 0
+        return len(self.theoryPredictions) == 0
 
-    def formatData(self, outputLevel):
-        """
-        Access printout format.
-        
-        :param outputLevel: general control for the output depth to be printed 
-           (0 = no output, 1 = basic output, 2 = detailed output,...
-           
-        """
-        return self.formatResultsData(outputLevel)
 
 
 class OutputStatus(object):
