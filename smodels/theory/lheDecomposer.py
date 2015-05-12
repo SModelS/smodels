@@ -12,6 +12,7 @@ from smodels.theory import lheReader, topology, crossSection, element
 from smodels.theory import branch
 from smodels.tools import modpyslha as pyslha
 from smodels.tools.physicsUnits import fb, GeV
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import smodels.particles
 import copy
 import logging
@@ -39,8 +40,7 @@ def decompose(lhefile, inputXsecs=None, nevts=None, doCompress=False,
 
     if doCompress and minmassgap < 0. * GeV:
         logger.error("Asked for compression without specifying minmassgap. Please set minmassgap.")
-        import sys
-        sys.exit()
+        raise SModelSError()
 
     reader = lheReader.LheReader(lhefile, nevts)
     smsTopList = topology.TopologyList()
@@ -107,8 +107,7 @@ def elementFromEvent(event, weight=None):
     if len(finalBranchList) != 2:
         logger.error(str(len(finalBranchList)) + " branches found in event; "
                      "Possible R-parity violation")
-        import sys
-        sys.exit()
+        raise SModelSError()
     # Create element from event
     newElement = element.Element(finalBranchList)
     if weight:
@@ -143,8 +142,7 @@ def _getDictionariesFromEvent(event):
             if particle.moms[0] != particle.moms[1] and \
                     min(particle.moms) != 0:
                 logger.error("More than one parent particle found")
-                import sys
-                sys.exit()
+                raise SModelSError()
             initMom = max(particle.moms) - 1
             while particles[particles[initMom].moms[0]].status != -1:
                 # Find primary mother (labels the branch)

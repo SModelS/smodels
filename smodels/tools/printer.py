@@ -21,6 +21,7 @@ from smodels.tools.ioObjects import OutputStatus, ResultList
 from smodels.tools.missingTopologies import MissingTopoList
 from smodels.tools.physicsUnits import GeV, fb, TeV
 from smodels.tools.modpyslha import Doc
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from collections import OrderedDict
 
 logger = logging.getLogger(__name__)
@@ -357,7 +358,7 @@ class TextBasedPrinter(object):
                 txname = None
             else:
                 logger.error("Unknown dataType %s" %(str(dataType)))
-                sys.exit()
+                raise SModelSError()
             
             output += "%19s %16s " % (expResult.getValuesFor('id')[0], str(txname) )  # ana, topo
             output += "%4s " % (expResult.getValuesFor("sqrts")[0]/ TeV)  # sqrts

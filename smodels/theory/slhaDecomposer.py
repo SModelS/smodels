@@ -16,6 +16,7 @@ from smodels.theory.branch import Branch, decayBranches
 from smodels.tools import modpyslha as pyslha
 from smodels.tools.physicsUnits import fb, GeV
 import smodels.particles
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import logging
 import sys
 
@@ -41,7 +42,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
 
     if doCompress and minmassgap / GeV < 0.:
         logger.error("Asked for compression without specifying minmassgap. Please set minmassgap.")        
-        sys.exit()
+        raise SModelSError()
 
     if type(sigcut) == type(1.):
         sigcut = sigcut * fb
@@ -51,7 +52,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
         f=modpyslha.readSLHAFile ( slhafile )
     except modpyslha.ParseError,e:
         logger.error ( "The file %s cannot be parsed as an SLHA file: %s" % (slhafile, e) )
-        sys.exit()
+        raise SModelSError()
 
     # Get cross-section from file
     xSectionList = crossSection.getXsecFromSLHAFile(slhafile, useXSecs)

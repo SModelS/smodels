@@ -10,6 +10,7 @@
 from smodels.theory import crossSection
 from smodels.theory.auxiliaryFunctions import massAvg, massPosition, distance
 from smodels.tools.physicsUnits import fb
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import logging,sys
 
 logger = logging.getLogger(__name__)
@@ -96,14 +97,14 @@ class ElementCluster(object):
             dataType = list(set([type(txname.txnameData.data[0][1]) for txname in self.txnames]))
             if len(dataType) != 1:
                 logger.error("A single cluster contain mixed data types!")
-                sys.exit()
+                raise SModelSError()
             elif dataType[0] == type(fb):
                 return 'upperLimit'
             elif dataType[0] == type(1.):
                 return 'efficiencyMap'
             else:
                 logger.error("Unknown data type %s" % (str(dataType[0])))
-                sys.exit()
+                raise SModelSError()
 
 
 class IndexCluster(object):
@@ -239,7 +240,7 @@ class IndexCluster(object):
         else:
             logger.error("Unknown object type (must be an element index or "
                          "position)")
-            sys.exit()
+            raise SModelSError()
 
         for jel in self:
             dmax = max(dmax, distance(pos, self.positionMap[jel]))

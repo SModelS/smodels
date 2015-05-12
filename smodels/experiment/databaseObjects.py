@@ -81,7 +81,7 @@ class ExpResult(object):
                           txname=None, mass=None, compute=False):
         """
         Computes a 95% upper limit on the signal cross-section according to the type of result.
-        If dataID is define, returns the UL for the signal*efficiency for an efficiency
+        If dataID is defined, returns the UL for the signal*efficiency for an efficiency
         type result for the given dataSet ID (signal region).
         If txname and mass are defined, returns the UL for the signal*BR for a upper-limit
         type result for the given mass array and Txname.
@@ -107,7 +107,7 @@ class ExpResult(object):
                             efficiency-map results.")
                 return False
             
-            upperLimits = self.getUpperLimits(alpha, expected)
+            upperLimits = self.getUpperLimits(alpha, expected, compute)
             if not upperLimits:
                 return False
             if not dataID in upperLimits:

@@ -13,6 +13,7 @@ from smodels.theory import lheReader
 import smodels.particles
 import logging
 import sys
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 logger = logging.getLogger(__name__)
 
@@ -96,7 +97,7 @@ class XSection(object):
         else:
             print other,type(other)
             logger.error("Xsections can only be multiplied by floats")
-            sys.exit()
+            raise SModelSError()
         return newXsec
 
 
@@ -118,7 +119,7 @@ class XSection(object):
                 res.value += other.value
                 return res
         logger.error("Trying to add " + type(other) + " to a XSection object")
-        sys.exit()
+        raise SModelSError()
 
 
     def __eq__(self, other):
@@ -246,7 +247,7 @@ class XSectionList(object):
     def __setitem__(self, index, xsec):
         if type(xsec) != type(XSection()):
             logger.error("Input object must be a XSection() object")
-            sys.exit()
+            raise SModelSError()
         else:
             self.xSections[index] = xsec
 
@@ -283,7 +284,7 @@ class XSectionList(object):
         """
         if type(newxsec) != type(XSection()):
             logger.error("Input object must be a XSection() object")
-            sys.exit()
+            raise SModelSError()
         else:
             self.xSections.append(newxsec.copy())
 
@@ -298,7 +299,7 @@ class XSectionList(object):
         """
         if type(newxsec) != type(XSection()):
             logger.error("Input object must be a XSection() object")
-            sys.exit()
+            raise SModelSError()
         else:
             exists = False
             for iXSec, xSec in enumerate(self.xSections):
@@ -567,7 +568,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
             wlabel += ' (NLL)'
         else:
             logger.error("Unknown QCD order in XSECTION line " + l)
-            sys.exit()
+            raise SModelSError()
         xsec = XSection()
         xsec.info.sqrts = sqrtS * TeV
         xsec.info.order = csOrder
@@ -599,15 +600,15 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
     reader = lheReader.LheReader(lhefile)
     if not type ( reader.metainfo["totalxsec"] ) == type ( pb) :
         logger.error("Cross-section information not found in LHE file.")        
-        sys.exit()
+        raise SModelSError()
     elif not reader.metainfo["nevents"]:
         logger.error("Total number of events information not found in LHE " +
                      "file.")
-        sys.exit()
+        raise SModelSError()
     elif not type ( reader.metainfo["sqrts"] ) == type ( TeV ):
         logger.error("Center-of-mass energy information not found in LHE " +
                      "file.")
-        sys.exit()
+        raise SModelSError()
 
     # Common cross-section info
     totxsec = reader.metainfo["totalxsec"]

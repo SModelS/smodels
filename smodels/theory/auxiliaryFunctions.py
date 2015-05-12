@@ -14,6 +14,7 @@ from scipy import stats
 from collections import Iterable
 import logging
 import copy
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 logger = logging.getLogger(__name__)
 
@@ -100,8 +101,7 @@ def massAvg(massList, method='weighted', weights=None):
                 or len(mass[1]) != len(massList[0][1]):
             logger.error('Mass shape mismatch in mass list:\n' + str(mass) +
                          ' and ' + str(massList[0]))
-            import sys
-            sys.exit()
+            raise SModelSError()
 
     avgmass = copy.deepcopy(massList[0])
     for ib, branch in enumerate(massList[0]):
@@ -132,8 +132,7 @@ def cSim(*weights):
     for weight in weights:
         if type(weight) != type(crossSection.XSectionList()):
             logger.error("Trying to evaluate non-xsection objects")
-            import sys
-            sys.exit()
+            raise SModelSError()
 
     # Make sure both xsec lists have the same entries (add zero xsecs for the
     # missing entries)
@@ -178,8 +177,7 @@ def cGtr(weightA, weightB):
     if type(weightA) != type(crossSection.XSectionList()) or \
             type(weightB) != type(crossSection.XSectionList()):
         logger.error("Trying to evaluate non-xsection objects")
-        import sys
-        sys.exit()
+        raise SModelSError()
 
     # Make sure both xsec lists have the same entries (add zero xsecs for the
     # missing entries)
@@ -230,3 +228,4 @@ def _flattenList(inlist, dims=None):
         else:
             flat.append(item)
     return flat
+    
