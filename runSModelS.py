@@ -125,16 +125,16 @@ def main(inputFile, parameterFile, outputFile):
     """ In case that a list of analyses or txnames are given, retrieve list """
     analyses = parser.get("database", "analyses").split(",")
     txnames = parser.get("database", "txnames").split(",")
+    datasetIDs = parser.get("database", "datasets").split(",")
 
     """ Load analyses """        
-    listOfExpRes = database.getExpResults(analysisIDs=analyses, txnames=txnames, datasetIDs=[None])
+    listOfExpRes = database.getExpResults(analysisIDs=analyses, txnames=txnames, datasetIDs=datasetIDs)
 
     """ Print list of analyses loaded """
     outLevel = 0
     if parser.getboolean("stdout", "printAnalyses"):
         outLevel = 1
-        outLevel += parser.getboolean("stdout", "addAnaInfo")
-        print("=======================\n == List of Analyses   ====\n ================")          
+        outLevel += parser.getboolean("stdout", "addAnaInfo")          
     for expResult in listOfExpRes: stdoutPrinter.addObj(expResult,outLevel)
 
 
@@ -146,12 +146,10 @@ def main(inputFile, parameterFile, outputFile):
     """ Get theory prediction for each analysis and print basic output """
     allPredictions = []    
     for expResult in listOfExpRes:     
-        theorypredictions = theoryPredictionsFor(expResult, smstoplist)        
+        theorypredictions = theoryPredictionsFor(expResult, smstoplist)
         if not theorypredictions: continue
         if parser.getboolean("stdout", "printResults"):
-            print("================================================================================")
             stdoutPrinter.addObj(theorypredictions)
-        print("................................................................................")
 
         allPredictions += theorypredictions._theoryPredictions
 
