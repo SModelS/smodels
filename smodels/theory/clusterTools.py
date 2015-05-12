@@ -56,7 +56,7 @@ class ElementCluster(object):
         if self.getDataType() == 'efficiencyMap':
             if len(self.elements) > 1: return None
             else: return self.elements[0].getMasses()
-        elif self.getDataType() == 'upperLimits':
+        elif self.getDataType() == 'upperLimit':
             massList = [el.getMasses() for el in self.elements]
             weights = [el.weight.getMaxXsec() / fb for el in self.elements]        
             return massAvg(massList,weights=weights)
@@ -89,12 +89,17 @@ class ElementCluster(object):
             return None
         else:
             #Check the data types
-            dataType = list(set([txname.txnameData.type for txname in self.txnames]))
+            dataType = list(set([type(txname.txnameData.data[0][1]) for txname in self.txnames]))
             if len(dataType) != 1:
                 logger.error("A single cluster contain mixed data types!")
                 sys.exit()
+            elif dataType[0] == type(fb):
+                return 'upperLimit'
+            elif dataType[0] == type(1.):
+                return 'efficiencyMap'
             else:
-                return dataType[0]
+                logger.error("Unknown data type %s" % (str(dataType[0])))
+                sys.exit()
 
 
 class IndexCluster(object):
@@ -230,7 +235,6 @@ class IndexCluster(object):
         else:
             logger.error("Unknown object type (must be an element index or "
                          "position)")
-            import sys
             sys.exit()
 
         for jel in self:

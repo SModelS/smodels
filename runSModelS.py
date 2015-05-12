@@ -86,8 +86,6 @@ def main(inputFile, parameterFile, outputFile):
     """ Setup output printers """
     stdoutPrinter = prt.TxTPrinter(output = 'stdout')
     summaryPrinter = prt.SummaryPrinter(output = 'file', filename = outputFile)
-    printer = prt.MPrinter(stdoutPrinter,summaryPrinter)
-
 
     """
     Decompose input file
@@ -141,48 +139,58 @@ def main(inputFile, parameterFile, outputFile):
 
 
     """
-    Compute theory predictions and analyses constraints
+    Compute theory predictions
     ====================================================
     """
-
-    """ Define result list that collects all theoryPrediction objects.
-        Variables set to define printing options. """
-    results = ioObjects.ResultList(bestresultonly=not parser.getboolean("file", "expandedSummary"),
-                                   describeTopo=parser.getboolean("file", "addConstraintInfo"))
-    """ Get theory prediction for each analysis and print basic output """    
-    for expResult in listOfExpRes:        
-        theorypredictions = theoryPredictionsFor(expResult, smstoplist)
+   
+    """ Get theory prediction for each analysis and print basic output """
+    allPredictions = []    
+    for expResult in listOfExpRes:     
+        theorypredictions = theoryPredictionsFor(expResult, smstoplist)        
         if not theorypredictions: continue
         if parser.getboolean("stdout", "printResults"):
             print("================================================================================")
             stdoutPrinter.addObj(theorypredictions)
         print("................................................................................")
 
-        """ Create a list of results, to determine the best result """
-        for theoryprediction in theorypredictions:
-            results.addResult(theoryprediction, maxcond=parser.getfloat("parameters", "maxcond"))
+        allPredictions += theorypredictions._theoryPredictions
 
     """ If there is no best result, this means that there are no matching experimental results for the point """
-    if results.isEmpty():
+    if not allPredictions:
         """ no experimental constraints found """
         outputStatus.updateStatus(0)
     else:
         outputStatus.updateStatus(1)
 
-    printer.addObj(outputStatus)
-    if outputStatus.status == 1:
-        printer.addObj(results)
+    stdoutPrinter.addObj(outputStatus)
+    summaryPrinter.addObj(outputStatus)
+
+    """ Define result list that collects all theoryPrediction objects."""
+    maxcond = parser.getfloat("parameters", "maxcond")
+    results = ioObjects.ResultList(allPredictions,maxcond)
+    if not parser.getboolean("file", "expandedSummary"):
+        results.useBestResult()
+
+    outLevel = 0
+    if not results.isEmpty():
+        outLevel = 1
+        outLevel += parser.getboolean("file", "addConstraintInfo")
+    summaryPrinter.addObj(results,outLevel)
+    if parser.getboolean("stdout", "printResults"):
+        stdoutPrinter.addObj(results,outLevel)
     
-    sqrts = max([xsec.info.sqrts for xsec in smstoplist.getTotalWeight()])
-    if parser.getboolean("options", "findMissingTopos"):
-        """ Look for missing topologies, add them to the output file """
-        missingtopos = missingTopologies.MissingTopoList(sqrts)
-        missingtopos.findMissingTopos(smstoplist, listOfExpRes, minmassgap, parser.getboolean("options", "doCompress"),
-                         doInvisible=parser.getboolean("options", "doInvisible"))
+    
+#     sqrts = max([xsec.info.sqrts for xsec in smstoplist.getTotalWeight()])
+#     if parser.getboolean("options", "findMissingTopos"):
+#         """ Look for missing topologies, add them to the output file """
+#         missingtopos = missingTopologies.MissingTopoList(sqrts)
+#         missingtopos.findMissingTopos(smstoplist, listOfExpRes, minmassgap, parser.getboolean("options", "doCompress"),
+#                          doInvisible=parser.getboolean("options", "doInvisible"))        
+#         summaryPrinter.addObj(missingtopos)
+#         
         
-        printer.addObj(missingtopos)
-        
-    printer.close()
+    stdoutPrinter.close()
+    summaryPrinter.close()
 
 
 if __name__ == "__main__":

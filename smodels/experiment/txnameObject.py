@@ -64,7 +64,7 @@ class TxName(object):
             if tags.count(tag) == 1:
                 if ';' in value: value = value.split(';')                
                 if tag == 'upperLimits' or tag == 'efficiencyMap':
-                    self.txnameData = TxNameData(tag,value)
+                    self.txnameData = TxNameData(value)
                 else: self.addInfo(tag,value)
             else:
                 logger.info("Ignoring unknown field %s found in file %s" % (tag, self.infopath))
@@ -148,35 +148,30 @@ class TxName(object):
         hasEl = self.hasElementAs(element)        
         if not hasEl: return 0.
         mass = hasEl.getMasses()
-        if self.txnameData.type == 'upperLimits':            
-            ul = self.txnameData.getValueFor(mass)
-            if type(ul) == type(fb):
-                return 1.
-            else:
-                return 0.
-        elif self.txnameData.type == 'efficiencyMap':
-            eff = self.txnameData.getValueFor(mass)
-            if type(eff) == type(1.):
-                return eff
-            else:
-                return 0.
+        val = self.txnameData.getValueFor(mass)
+        if type(val) == type(fb):  
+            return 1.  #The element has an UL, return 1        
+        elif val is None or math.isnan(val):
+            return 0.  #The element mass is outside the data grid
+        elif type(val) == type(1.):
+            return val  #The element has an eff
         else:
-            logger.error("Unknown data type: %s" % self.txnameData.type)
+            logger.error("Unknown txnameData value: %s" % (str(type(val))))
             sys.exit()
             
 class TxNameData(object):
     """Holds the data for the Txname object.  It holds Upper limit values or efficiencies."""
     
-    def __init__(self,tag,value,accept_errors_upto=.05):
+    def __init__(self,value,accept_errors_upto=.05):
         """
-        :param tag: data tag in string format (upperLimits or efficiencyMap)
+        
         :param value: data in string format
         :param accept_errors_upto: If None, do not allow extrapolations outside of convex hull.
             If float value given, allow that much relative uncertainty on the upper limit / efficiency
             when extrapolating outside convex hull.
             This method can be used to loosen the equal branches assumption.
         """
-        self.type = tag
+
         self.accept_errors_upto=accept_errors_upto
         self.store_value = value
         self.data = None

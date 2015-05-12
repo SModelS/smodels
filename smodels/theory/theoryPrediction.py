@@ -293,7 +293,7 @@ def _evalConstraint(cluster):
 
     if cluster.getDataType() == 'efficiencyMap':
         return cluster.getTotalXSec()
-    elif cluster.getDataType() == 'upperLimits':
+    elif cluster.getDataType() == 'upperLimit':
         if len(cluster.txnames) != 1:
             logger.error("An upper limit cluster should never contain more than one TxName")
             sys.exit()
@@ -303,8 +303,7 @@ def _evalConstraint(cluster):
         exprvalue = _evalExpression(txname.constraint,cluster)
         return exprvalue
     else:
-        print str(cluster.getDataType())
-        logger.error("Unknown data type %s" %(str(cluster.getDataType)))
+        logger.error("Unknown data type %s" %(str(cluster.getDataType())))
         sys.exit()
     
 
