@@ -89,6 +89,10 @@ class ElementCluster(object):
             return None
         else:
             #Check the data types
+            for txname in self.txnames:                
+                if not txname.txnameData.data:
+                    txname.txnameData.loadData()  #Make sure the data is loaded
+                    
             dataType = list(set([type(txname.txnameData.data[0][1]) for txname in self.txnames]))
             if len(dataType) != 1:
                 logger.error("A single cluster contain mixed data types!")
