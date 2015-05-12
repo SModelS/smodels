@@ -6,6 +6,7 @@
 .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>    
 .. moduleauthor:: Suchita Kulkanri <suchita.kulkarni@gmail.com>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
 """
 
@@ -294,17 +295,17 @@ class TextBasedPrinter(object):
         if not objOutputLevel: return None
 
         output = ""
-
-        expRes = obj.expResult
-        info = expRes.globalInfo
         for theoryPrediction in obj:
+            expRes = obj.expResult
+            info = expRes.globalInfo            
             datasetInfo = theoryPrediction.dataset.dataInfo        
             output += "\n"
             output += "---------------Analysis Label = " + info.id + "\n"
             output += "-------------------Dataset Label = " + str(datasetInfo.dataId) + "\n"
-            output += "-------------------Txname Label = " + str(theoryPrediction.txName) + "\n"
+            output += "-------------------Txname Labels = " + str([str(txname) for txname in theoryPrediction.txnames]) + "\n"
             output += "Analysis sqrts: " + str(info.sqrts) + \
                     "\n"
+                    
             if theoryPrediction.mass:
                 for ibr, br in enumerate(theoryPrediction.mass):
                     output += "Masses in branch %i: " % ibr + str(br) + "\n"
@@ -320,11 +321,12 @@ class TextBasedPrinter(object):
                 for cond in theoryPrediction.conditions:
                     condlist.append(theoryPrediction.conditions[cond])
                 output += str(condlist) + "\n"
-            if datasetInfo.dataType == 'upperLimit':
-                experimentalLimit = expRes.getUpperLimitFor(txname=theoryPrediction.txname,
-                                                            mass=theoryPrediction.mass)
-            elif datasetInfo.dataType == 'efficiencyMap':
-                experimentalLimit = expRes.getUpperLimitFor(dataID=datasetInfo.dataId)
+                
+            #Get upper limit for the respective prediction:
+            if expRes.getValuesFor('dataType')[0] == 'upperLimit':
+                experimentalLimit = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass)
+            elif expRes.getValuesFor('dataType')[0] == 'efficiencyMap':
+                experimentalLimit = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.datasetID)
 
             output += "Experimental limit: " + str(experimentalLimit) + "\n"
 
@@ -342,25 +344,33 @@ class TextBasedPrinter(object):
 
         output = ""
 
-        bestresult = obj.getBestResult()
-        if obj.bestresultonly:
-            output += "The result with highest R value is\n"
-            obj.outputarray = [bestresult]
         output += "#Analysis  Tx_Name  Sqrts  Cond. Violation  Theory_Value(fb)  Exp_limit(fb)  r\n\n"
-        for op in obj.outputarray:
-            output += "%19s %16s " % (op.expResult.globalInfo.getInfo('id'), op.txname.getInfo('txname') )  # ana, topo
-            # output += "%19s %16s " % (op.analysis.label.split(":")[0], op.analysis.label.split(":")[1])  # ana, topo
-            output += "%4s " % (op.expResult.globalInfo.getInfo("sqrts") / TeV)  # sqrts
-            output += "%5s " % op.getmaxCondition()  # condition violation
-            output += "%10.3E %10.3E " % (op.value[0].value / fb, op.txname.txnameData.getValueFor(op.mass) / fb)  # theory cross section , expt upper limit
-            output += "%10.3E\n" % obj.getR(op)
-            if obj.describeTopo: output += "#" + str(op.txname.getInfo("constraint")) + "\n"
-            # if obj.describeTopo: output += "#" + str(op.analysis.constraint) + "\n"
-            if not op == obj.outputarray[-1]: output += "--------------------------------------------------------------------------------\n"
+        for theoPred in obj.theoryPredictions:
+            expResult = theoPred.expResult
+            datasetID = theoPred.dataset.getValuesFor('dataId')[0]
+            dataType = expResult.getValuesFor('dataType')[0]        
+            if dataType == 'upperLimit':
+                ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass)
+                txname = theoPred.txnames[0]
+            elif dataType == 'efficiencyMap':
+                ul = expResult.getUpperLimitFor(dataID=datasetID)
+                txname = None
+            else:
+                logger.error("Unknown dataType %s" %(str(dataType)))
+                sys.exit()
+            
+            output += "%19s %16s " % (expResult.getValuesFor('id')[0], str(txname) )  # ana, topo
+            output += "%4s " % (expResult.getValuesFor("sqrts")[0]/ TeV)  # sqrts
+            output += "%5s " % theoPred.getmaxCondition()  # condition violation            
+            output += "%10.3E %10.3E " % (theoPred.value[0].value / fb, ul / fb)  # theory cross section , expt upper limit
+            output += "%10.3E\n" % obj.getR(theoPred)
+            if objOutputLevel == 2:
+                output += "#" + str(txname) + "\n"            
+            if not theoPred == obj.theoryPredictions[-1]: output += "--------------------------------------------------------------------------------\n"
 
         output += "\n \n"
         output += "================================================================================\n"
-        output += "The highest r value is = " + str(obj.getR(bestresult)) + "\n"
+        output += "The highest r value is = " + str(obj.getR(obj.theoryPredictions[0])) + "\n"
 
         return output
 
