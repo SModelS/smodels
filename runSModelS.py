@@ -7,7 +7,7 @@
 """
 
 from __future__ import print_function
-import os
+import os, sys
 import logging
 import argparse
 from ConfigParser import SafeConfigParser
@@ -125,10 +125,21 @@ def main(inputFile, parameterFile, outputFile):
     """ In case that a list of analyses or txnames are given, retrieve list """
     analyses = parser.get("database", "analyses").split(",")
     txnames = parser.get("database", "txnames").split(",")
-    datasetIDs = parser.get("database", "datasets").split(",")
+    if parser.get("database", "dataselector") == "efficiencyMap":
+        dataTypes = ['efficiencyMap']
+        datasetIDs = ['all']
+    elif parser.get("database", "dataselector") == "upperLimit":
+        dataTypes = ['upperLimit']
+        datasetIDs = ['all']
+    else:
+        dataTypes = ['all']
+        datasetIDs = parser.get("database", "dataselector").split(",")
+    '''if parser.get("database", "datasets") == "None": datasetIDs = [None]
+    else: datasetIDs = parser.get("database", "datasets").split(",")'''
 
     """ Load analyses """        
-    listOfExpRes = database.getExpResults(analysisIDs=analyses, txnames=txnames, datasetIDs=datasetIDs)
+
+    listOfExpRes = database.getExpResults(analysisIDs=analyses, txnames=txnames, datasetIDs=datasetIDs, dataTypes=dataTypes)
 
     """ Print list of analyses loaded """
     outLevel = 0
