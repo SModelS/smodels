@@ -302,7 +302,7 @@ class TopologyList(object):
         element, add element. If neither element nor topology exist, add the
         new topology and all its elements.
 
-        :type topo: Topology
+        :param newTopology: Topology object
         
         """
         topmatch = False
@@ -315,6 +315,7 @@ class TopologyList(object):
         else:
             for newelement in newTopology.elementList:
                 self.topos[topmatch].addElement(newelement)
+
 
 
     def getTotalWeight(self):
