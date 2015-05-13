@@ -379,7 +379,7 @@ class Database(object):
         return resultsList
 
 
-    def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'], dataType = ['all']):
+    def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'], dataTypes = ['all']):
         """
         Returns a list of ExpResult objects.
         
@@ -408,11 +408,11 @@ class Database(object):
             newExpResult = ExpResult()
             newExpResult.path = expResult.path
             newExpResult.globalInfo = expResult.globalInfo
-            newExpResult.datasets = []
-            if dataType == ['efficiencyMap'] or dataType == ['upperLimit']:
-                if expResult.getValuesFor('dataType') != dataType:
-                    continue
+            newExpResult.datasets = []            
             for dataset in expResult.datasets:
+                if dataTypes != ['all']:
+                    if not dataset.dataInfo.dataType in dataTypes:
+                        continue
                 if datasetIDs != ['all']:
                     if not dataset.dataInfo.dataId in datasetIDs:
                         continue
