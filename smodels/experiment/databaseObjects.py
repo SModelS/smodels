@@ -379,7 +379,7 @@ class Database(object):
         return resultsList
 
 
-    def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all']):
+    def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'], dataType = ['all']):
         """
         Returns a list of ExpResult objects.
         
@@ -387,6 +387,7 @@ class Database(object):
         dataset (signal region) and each dataset containing one or more TxNames.
         If analysisIDs is defined, returns only the results matching one of the IDs in the list.
         If datasetIDs is defined, returns only the results matching one of the IDs in the list.
+        if datasetIDs is None, only upper limit maps are returned.
         If txname is defined, returns only the results matching one of the Tx names in the list.
         
         :param analysisID: list of analysis ids ([CMS-SUS-13-006,...])
@@ -408,6 +409,9 @@ class Database(object):
             newExpResult.path = expResult.path
             newExpResult.globalInfo = expResult.globalInfo
             newExpResult.datasets = []
+            if dataType == ['efficiencyMap'] or dataType == ['upperLimit']:
+                if expResult.getValuesFor('dataType') != dataType:
+                    continue
             for dataset in expResult.datasets:
                 if datasetIDs != ['all']:
                     if not dataset.dataInfo.dataId in datasetIDs:
@@ -428,5 +432,5 @@ class Database(object):
             if not newExpResult.getTxNames():
                 continue
             expResultList.append(newExpResult)
+        print "len(expResultList)", len(expResultList)
         return expResultList
-
