@@ -14,6 +14,7 @@ from smodels.tools.physicsUnits import GeV, fb, TeV, pb
 from smodels.theory.particleNames import elementsInStr
 from smodels.tools.stringTools import concatenateLines
 from smodels.theory.element import Element
+from smodels.theory.topology import Topology
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.theory.auxiliaryFunctions import _memoize
 from scipy.interpolate import griddata
@@ -41,6 +42,7 @@ class TxName(object):
         self.globalInfo = infoObj
         self.txnameData = None
         self._elements = []
+        self._topologies = []
         
         logger.debug('Creating object based on txname file: %s' %self.path)        
         #Open the info file and get the information:
@@ -80,6 +82,12 @@ class TxName(object):
             for cond in conds:                
                 for el in elementsInStr(cond):
                     if not el in self._elements: self._elements.append(Element(el))
+        
+        #Builds up a list of _topologies appearing in constraints:
+        for el in self._elements:
+            top = Topology(el)
+            if not top in self._topologies: self._topologies.append(top)
+
         
     def __str__(self):
         return self.txName
@@ -353,7 +361,7 @@ class TxNameData(object):
             'data' points and store in self.Mp """
         Morig=[]
         self.xsec=[]
-             
+     
         for x,y in self.data:
             self.xsec.append ( y / self.unit )
             xp = self.flattenMassArray ( x )
