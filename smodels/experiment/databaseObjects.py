@@ -379,17 +379,19 @@ class Database(object):
         return resultsList
 
 
-    def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all']):
+    def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'], dataTypes = ['all']):
         """
         Returns a list of ExpResult objects.
         
         Each object refers to an analysisID containing one (for UL) or more (for Efficiency maps)
         dataset (signal region) and each dataset containing one or more TxNames.
         If analysisIDs is defined, returns only the results matching one of the IDs in the list.
+        If dataTypes is defined, returns only the results matching a dataType in the list.
         If datasetIDs is defined, returns only the results matching one of the IDs in the list.
         If txname is defined, returns only the results matching one of the Tx names in the list.
         
         :param analysisID: list of analysis ids ([CMS-SUS-13-006,...])
+        :param dataType: dataType of the analysis (all, efficiencyMap or upperLimit)
         :param datasetIDs: list of dataset ids ([ANA-CUT0,...])
         :param txnames: list of txnames ([TChiWZ,...])
         :returns: list of ExpResult objects or the ExpResult object if the list contains
@@ -407,8 +409,11 @@ class Database(object):
             newExpResult = ExpResult()
             newExpResult.path = expResult.path
             newExpResult.globalInfo = expResult.globalInfo
-            newExpResult.datasets = []
+            newExpResult.datasets = []            
             for dataset in expResult.datasets:
+                if dataTypes != ['all']:
+                    if not dataset.dataInfo.dataType in dataTypes:
+                        continue
                 if datasetIDs != ['all']:
                     if not dataset.dataInfo.dataId in datasetIDs:
                         continue
@@ -429,4 +434,3 @@ class Database(object):
                 continue
             expResultList.append(newExpResult)
         return expResultList
-
