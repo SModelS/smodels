@@ -433,5 +433,4 @@ class Database(object):
             if not newExpResult.getTxNames():
                 continue
             expResultList.append(newExpResult)
-        print "len(expResultList)", len(expResultList)
         return expResultList
