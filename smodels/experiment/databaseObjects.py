@@ -386,11 +386,12 @@ class Database(object):
         Each object refers to an analysisID containing one (for UL) or more (for Efficiency maps)
         dataset (signal region) and each dataset containing one or more TxNames.
         If analysisIDs is defined, returns only the results matching one of the IDs in the list.
+        If dataTypes is defined, returns only the results matching a dataType in the list.
         If datasetIDs is defined, returns only the results matching one of the IDs in the list.
-        if datasetIDs is None, only upper limit maps are returned.
         If txname is defined, returns only the results matching one of the Tx names in the list.
         
         :param analysisID: list of analysis ids ([CMS-SUS-13-006,...])
+        :param dataType: dataType of the analysis (all, efficiencyMap or upperLimit)
         :param datasetIDs: list of dataset ids ([ANA-CUT0,...])
         :param txnames: list of txnames ([TChiWZ,...])
         :returns: list of ExpResult objects or the ExpResult object if the list contains
