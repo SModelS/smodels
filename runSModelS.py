@@ -133,7 +133,6 @@ def main(inputFile, parameterFile, outputFile):
 
     """ Load analyses """        
     listOfExpRes = database.getExpResults(analysisIDs=analyses, txnames=txnames, datasetIDs=datasetIDs, dataType=dataType)
-    sys.exit(10)
 
     """ Print list of analyses loaded """
     outLevel = 0
