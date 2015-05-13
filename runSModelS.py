@@ -138,6 +138,7 @@ def main(inputFile, parameterFile, outputFile):
     else: datasetIDs = parser.get("database", "datasets").split(",")'''
 
     """ Load analyses """        
+
     listOfExpRes = database.getExpResults(analysisIDs=analyses, txnames=txnames, datasetIDs=datasetIDs, dataTypes=dataTypes)
 
     """ Print list of analyses loaded """
