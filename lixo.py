@@ -18,20 +18,14 @@ from smodels.tools.printer import printout
 from smodels.theory.theoryPrediction import TheoryPredictionList,TheoryPrediction
 from smodels.experiment.databaseObjects import Database
 from unum import ShouldBeUnitlessError
+import random
 
-a1 = TheoryPrediction()
-a2 = TheoryPrediction()
-a3 = TheoryPrediction()
-a = TheoryPredictionList()
-a._theoryPredictions = [a1,a2,a3]
+r = 10.
+for i in range(10000):  
+      x = random.random()*fb
+      ul = random.random()*fb
+      r1 = x/ul
+      if r is None or r1 < r:
+            r = r1
 
-b1 = TheoryPrediction()
-b2 = TheoryPrediction()
-b = TheoryPredictionList()
-b._theoryPredictions = [b1,b2]
-
-print len(a),len(b)
-
-c = a + b
-
-print len(sum([a,b]))
+print r

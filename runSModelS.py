@@ -26,7 +26,6 @@ from smodels.experiment.exceptions import DatabaseNotFoundException
 
 log = logging.getLogger(__name__)
 
-
 def main(inputFile, parameterFile, outputFile):
     """
     Provides a command line interface to basic SModelS functionalities.
@@ -36,8 +35,6 @@ def main(inputFile, parameterFile, outputFile):
     :param outputFile: Output file to write a summary of results
     
     """
-
-
 
     """
     Read and check input file
@@ -88,6 +85,8 @@ def main(inputFile, parameterFile, outputFile):
     stdoutPrinter = prt.TxTPrinter(output = 'stdout')
     summaryPrinter = prt.SummaryPrinter(output = 'file', filename = outputFile)
 
+
+
     """
     Decompose input file
     ====================
@@ -137,8 +136,7 @@ def main(inputFile, parameterFile, outputFile):
         outLevel = 1
         outLevel += parser.getboolean("stdout", "addAnaInfo")          
     for expResult in listOfExpRes: stdoutPrinter.addObj(expResult,outLevel)
-
-
+    
     """
     Compute theory predictions
     ====================================================
@@ -163,7 +161,8 @@ def main(inputFile, parameterFile, outputFile):
 
     stdoutPrinter.addObj(outputStatus)
     summaryPrinter.addObj(outputStatus)
-
+    
+    
     """ Define result list that collects all theoryPrediction objects."""
     maxcond = parser.getfloat("parameters", "maxcond")
     results = ioObjects.ResultList(allPredictions,maxcond)
@@ -177,7 +176,6 @@ def main(inputFile, parameterFile, outputFile):
     summaryPrinter.addObj(results,outLevel)
     if parser.getboolean("stdout", "printResults"):
         stdoutPrinter.addObj(results,outLevel)
-    
     
 #     sqrts = max([xsec.info.sqrts for xsec in smstoplist.getTotalWeight()])
 #     if parser.getboolean("options", "findMissingTopos"):

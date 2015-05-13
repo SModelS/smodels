@@ -113,7 +113,7 @@ class TxName(object):
         
         if hasattr(self,infoLabel): return getattr(self,infoLabel)
         else: return False
-
+    
     def hasElementAs(self,element):
         """
         Check if the conditions or constraint in Txname contains the element.

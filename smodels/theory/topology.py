@@ -152,7 +152,7 @@ class Topology(object):
         """
         return self.elementList
 
-
+    
     def addElement(self, newelement):
         """
         Add an Element object to the elementList.
@@ -293,7 +293,7 @@ class TopologyList(object):
             s += str(topo) + "\n"
         return s
 
-
+    
     def add(self, newTopology):
         """
         Check if elements in newTopology matches an entry in self.topos.
