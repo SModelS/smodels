@@ -97,7 +97,6 @@ class TheoryPredictionList(object):
         else:
             return self.__add__(theoPredList)        
 
-
 def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2, useBestDataset=True):
     """
     Compute theory predictions for the given experimental result, using the list of elements
@@ -160,15 +159,14 @@ def _getBestResults(dataSetResults):
         if len(pred.value) != 1:
             logger.error("Signal region prediction should correspond to a single cross-section!")
             raise SModelSError()
-        xsec = pred.value[0]        
-        expectedR = xsec.value/dataset.getUpperLimit(0.05,True)
+        xsec = pred.value[0]
+        expectedR = xsec.value/dataset.getSRUpperLimit(0.05,True)
         if expectedR > bestExpectedR:
             bestExpectedR = expectedR
             bestPredList = predList
     
     return bestPredList
     
-
 def _getDataSetPredictions(dataset,smsTopList,maxMassDist):   
     """
     Compute theory predictions for a given data set.
@@ -216,7 +214,6 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
 
     if len(predictionList) == 0: return None
     else: return predictionList
-
 
 def _getElementsFrom(smsTopList, dataset):
     """

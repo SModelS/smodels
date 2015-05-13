@@ -13,6 +13,7 @@ from smodels.experiment import txnameObject,infoObject
 from smodels.tools import statistics
 from smodels.theory.auxiliaryFunctions import _memoize
 from smodels.tools.physicsUnits import fb
+from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
 logging.basicConfig(format=FORMAT)
@@ -40,7 +41,7 @@ class DataSet(object):
 
         #Get list of TxName objects:
         for txtfile in glob.iglob(os.path.join(path,"*.txt")):
-            try:
+            try:                
                 txname = txnameObject.TxName(txtfile,self.globalInfo)
                 self.txnameList.append(txname)
             except TypeError: continue
@@ -103,16 +104,26 @@ class DataSet(object):
         return fields
     
     @_memoize
-    def getUpperLimit(self,alpha = 0.05, expected = False ):
+    def getSRUpperLimit(self,alpha = 0.05, expected = False, compute = False ):
         """
-        Computes the 95% upper limit on the signal*efficiency for an efficiency-map
-        type data set
+        Computes the 95% upper limit on the signal*efficiency for a given
+        dataset (signal region)
         Only to be used for efficiency map type results.
         :param alpha: Can be used to change the C.L. value. The default value is 0.05 (= 95% C.L.)
         :param expected: Compute expected limit ( i.e. Nobserved = NexpectedBG )
+        :param compute: If True, the upper limit will be computed
+                        from expected and observed number of events. If False, the value listed
+                        in the database will be used instead.
         
         :return: upper limit value 
         """
+        
+        if not self.getValuesFor('dataType')[0] == 'efficiencyMap':
+            logger.error("getSRUpperLimit can only be used for efficiency map results!")
+            raise SModelSError()
+        
+        if not compute:
+            return self.getValuesFor('upperLimit')[0]
         
         Nobs = self.dataInfo.observedN  #Number of observed events
         if expected: 
