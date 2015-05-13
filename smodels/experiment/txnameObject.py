@@ -266,22 +266,43 @@ class TxNameData(object):
         ## P[self.dimensionality:] is project point p in m dimensions
         # m=self.countNonZeros ( P ) ## dimensionality of input
         ## how far are we away from the "plane": distance alpha
-        alpha = np.sqrt ( np.dot ( P[self.dimensionality:], P[self.dimensionality:] ) )
+        alpha = float ( np.sqrt ( np.dot ( P[self.dimensionality:], P[self.dimensionality:] ) ) )
         ## the value of the grid at the point projected to the "plane"
         ##projected_value=griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
         
         ## compute gradient
         gradient=[]
+        # print ",,,,,,,,,,,"
         for i in range ( self.dimensionality ):
+            #print "i=",i
             P2=copy.deepcopy(P)
+            #print "now adding alpha"
             P2[i]+=alpha
-            gradient.append ( ( 
-                griddata( self.Mp, self.xsec, [ P2[:self.dimensionality]], method="linear")[0] - self.projected_value ) / alpha )
+            #print "before griddata"
+            g=float ( ( griddata( self.Mp, self.xsec, [ P2[:self.dimensionality]], method="linear")[0] - self.projected_value ) / alpha )
+            #print "g=",g
+            if math.isnan ( g ):
+                ## if we cannot compute a gradient, we return nan
+                return float("nan")
+            gradient.append ( g )
         ## normalize gradient
         # print "gradient=",gradient
-        C= np.sqrt ( np.dot ( gradient, gradient ) )
+        C= float ( np.sqrt ( np.dot ( gradient, gradient ) ) )
+        if C == 0.:
+            ## zero gradient? we return 0.
+            return 0.
         for i,j in enumerate(gradient):
+            #print "i=",i
+            #print "j=",j
+            #print "C=",C
+            #print "alpha=",alpha
+            #print "gradient[i]=",gradient[i]
+            #print "type(gradient[i])=",type(gradient[i])
+            #print "type(C)=",type(C)
+            #print "type(alpha)=",type(alpha)
             gradient[i]=gradient[i]/C*alpha
+            #print "gradient after=",gradient[i]
+        #print "^^^^^^"
         ## walk one alpha along gradient
         P3=copy.deepcopy(P)
         P4=copy.deepcopy(P)
