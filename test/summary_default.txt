@@ -1,6 +1,6 @@
 Input status: 1
 Decomposition output status: 1 #decomposition was successful
-#Input File: ../inputFiles/slha/gluino_squarks.slha
+#Input File: /home/lessa/smodels//inputFiles/slha/gluino_squarks.slha
 #maxcond = 0.2
 #minmassgap = 5.
 #sigmacut = 0.03
@@ -8,29 +8,21 @@ Decomposition output status: 1 #decomposition was successful
 ================================================================================
 #Analysis  Tx_Name  Sqrts  Cond. Violation  Theory_Value(fb)  Exp_limit(fb)  r
 
-           SUS12028               T2 8.00E+00    0.0  1.773E+00  1.636E+01  1.084E-01
-#[[['jet']],[['jet']]]
+ ATLAS-SUSY-2013-02             T6WW 8.00E+00    0.0  6.617E+00  1.718E+01  3.851E-01
+#T6WW
 --------------------------------------------------------------------------------
-           SUS13006           TChiWZ 8.00E+00    0.0  1.847E+01  4.443E+02  4.157E-02
-#[[['W']],[['Z']]]
+ ATLAS-SUSY-2013-02               T2 8.00E+00    0.0  1.773E+00  6.099E+00  2.908E-01
+#T2
 --------------------------------------------------------------------------------
-           SUS12028               T1 8.00E+00    0.0  3.917E-01  3.144E+01  1.246E-02
-#[[['jet','jet']],[['jet','jet']]]
+ ATLAS-SUSY-2013-02             T5WW 8.00E+00    0.0  9.069E+00  3.234E+01  2.805E-01
+#T5WW
+--------------------------------------------------------------------------------
+ ATLAS-SUSY-2013-12           TChiWZ 8.00E+00    0.0  1.847E+01  3.301E+02  5.595E-02
+#TChiWZ
+--------------------------------------------------------------------------------
+ ATLAS-SUSY-2013-02               T1 8.00E+00    0.0  3.917E-01  1.082E+01  3.621E-02
+#T1
 
  
 ================================================================================
-The highest r value is = 1.08E-01 
-
-================================================================================
-Missing topologies with the highest cross-sections (up to 10):
-Sqrts (TeV)   Weight (fb)        Element description
-8.00E+00   9.588E+01    #                             [[[W]],[[higgs]]]
-8.00E+00   5.958E+01    #                                 [[[W]],[[W]]]
-8.00E+00   1.567E+01    #                 [[[jet],[W]],[[jet,jet],[W]]]
-8.00E+00   1.395E+01    #       [[[jet],[jet,jet],[W]],[[jet,jet],[W]]]
-8.00E+00   9.069E+00    #             [[[jet,jet],[W]],[[jet,jet],[W]]]
-8.00E+00   8.925E+00    #                     [[[jet]],[[jet,jet],[W]]]
-8.00E+00   7.608E+00    #         [[[jet,jet],[W]],[[jet,jet],[higgs]]]
-8.00E+00   7.087E+00    #           [[[jet],[W]],[[jet],[jet,jet],[W]]]
-8.00E+00   6.617E+00    #                     [[[jet],[W]],[[jet],[W]]]
-8.00E+00   6.336E+00    #             [[[jet],[W]],[[jet,jet],[higgs]]]
+The highest r value is = 3.85E-01 

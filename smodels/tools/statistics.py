@@ -94,7 +94,7 @@ def _getPValue(Nsig,Nobs,Nbg,NbgErr):
             
     return p
 
-def _getUL(Nobs,Nbg,NbgErr,alpha):
+def _getUL(Nobs,Nbg,NbgErr,alpha=0.05):
     """
     Computes the 95% upper limit on the signal*efficiency cross-section,
     given number of observed events (Nobs), number of expected BG events (Nbg)

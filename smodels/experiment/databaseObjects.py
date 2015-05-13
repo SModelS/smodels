@@ -76,7 +76,7 @@ class ExpResult(object):
             txnames += dataset.txnameList
         return txnames
 
-
+    
     def getUpperLimitFor(self, dataID=None, alpha=0.05, expected=False,
                           txname=None, mass=None, compute=False):
         """
@@ -107,14 +107,23 @@ class ExpResult(object):
                             efficiency-map results.")
                 return False
             
-            upperLimits = self.getUpperLimits(alpha, expected, compute)
-            if not upperLimits:
+            useDataset = False
+            for dataset in self.datasets:
+                if dataset.getValuesFor('dataId')[0] == dataID:
+                    useDataset = dataset
+                    break
+            if useDataset is False:
+                logger.error("The data set ID not found.")
                 return False
-            if not dataID in upperLimits:
-                logger.error("Data id %s not found.", dataID)
-                return False
+                
+            if compute:
+                upperLimit = useDataset.getSRUpperLimit(alpha, expected)
             else:
-                return upperLimits[dataID]
+                upperLimit = useDataset.dataInfo.upperLimit
+                if (upperLimit/fb).normalize()._unit:
+                    logger.error("Upper limit defined with wrong units for %s and %s"
+                                  %(dataset.globalInfo.id,dataset.dataInfo.dataId))
+                    return False           
             
         elif self.getValuesFor('dataType')[0] == 'upperLimit':
             if not txname or not mass:
@@ -129,48 +138,14 @@ class ExpResult(object):
                 return False
             for tx in self.getTxNames():
                 if tx == txname or tx.txName == txname:
-                    return tx.txnameData.getValueFor(mass)
+                    upperLimit = tx.txnameData.getValueFor(mass)
         else:
             logger.warning("Unkown data type: %s. Data will be ignored.", 
                            self.getValuesFor('dataType')[0])
 
-
-    @_memoize
-    def getUpperLimits(self, alpha=0.05, expected=False, compute=False):
-        """
-        Computes the 95% upper limit on the signal*efficiency for an efficiency
-        type result for all the datasets (signal regions).
-        Only to be used for efficiency map type results.
         
-        :param alpha: Can be used to change the C.L. value. The default value is 0.05 (= 95% C.L.)
-        :param expected: Compute expected limit ( i.e. Nobserved = NexpectedBG )
-        :param compute: If True, the upper limit will be computed
-                        from expected and observed number of events. If False, the value listed
-                        in the database will be used instead.
-        
-        
-        :return: dictionary with dataset IDs as keys and the upper limit as values 
-        
-        """
-        upperLimits = {}
-        for dataset in self.datasets:
-            if dataset.dataInfo.dataType != 'efficiencyMap':
-                logger.error("getUpperLimit is intended for efficiency map results only!")
-                return False
-
-            if compute:
-                upperLimits[dataset.dataInfo.dataId] = dataset.getUpperLimit(alpha, expected)
-            else:
-                upperLimit = dataset.dataInfo.upperLimit
-                if (upperLimit/fb).normalize()._unit:
-                    logger.error("Upper limit defined with wrong units for %s and %s"
-                                  %(dataset.globalInfo.id,dataset.dataInfo.dataId))
-                    return False
-                upperLimits[dataset.dataInfo.dataId] = upperLimit
-                              
-
-        return upperLimits
-
+        return upperLimit
+    
 
     def getValuesFor(self, attribute=None):
         """

@@ -88,6 +88,7 @@ class TextBasedPrinter(object):
                 
         for objType in self.printingOrder:
             for iobj,objB in enumerate(self.objList):
+                if not self.outputList[iobj]: continue  #Skip empty output
                 if objType == type(objB):
                     if self.output == 'stdout':
                         sys.stdout.write(self.outputList[iobj])
