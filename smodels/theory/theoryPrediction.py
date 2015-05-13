@@ -229,16 +229,24 @@ def _getElementsFrom(smsTopList, dataset):
     
     """
     
+    tops = []
+    for txname in dataset.txnameList:
+        tops += txname._topologies   #For performance only
+           
     elements = []
-    for el in smsTopList.getElements():             
-        for txname in dataset.txnameList:
-            hasEl = txname.hasElementAs(el)
-            if not hasEl: continue   
-            eff = txname.getEfficiencyFor(hasEl)            
-            if eff == 0.: continue
-            hasEl.weight *= eff
-            elements.append(hasEl)
-            break  
+    for top in smsTopList:
+        if not top in tops: continue  #For performance only
+        for el in top.getElements():             
+            for txname in dataset.txnameList:
+                if not txname._elements: continue
+                if not top in txname._topologies: continue
+                hasEl = txname.hasElementAs(el)
+                if not hasEl: continue   
+                eff = txname.getEfficiencyFor(hasEl)            
+                if eff == 0.: continue
+                hasEl.weight *= eff
+                elements.append(hasEl)
+                break
     return elements
 
 
