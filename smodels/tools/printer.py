@@ -278,8 +278,11 @@ class TextBasedPrinter(object):
         if objOutputLevel == 2:
             output += "\t -----------------------------\n"
             output += "\t Elements tested by analysis:\n"
-            listOfelements = obj.getValuesFor('_elements')[0]
-            for el in listOfelements:
+            listOfelements = []
+            for elList in obj.getValuesFor('_elements'):
+                for el in elList:
+                    if not el in listOfelements: listOfelements.append(el)
+            for el in listOfelements:                
                 output += "\t    " + str(el) + "\n"
 
         return output
