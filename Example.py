@@ -47,7 +47,7 @@ def main():
     
     
     # Load all analyses from database
-    listOfExpRes = database.getExpResults()
+    listOfExpRes = database.getExpResults(dataTypes=['efficiencyMap'])
 
     # Compute the theory predictions for each analysis
     for expResult in listOfExpRes:
@@ -70,11 +70,12 @@ def main():
               
             #Get upper limit for the respective prediction:
             if expResult.getValuesFor('dataType')[0] == 'upperLimit':
-                print("Theory Prediction UL = ",
-                      expResult.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=mass))
+                ul = expResult.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=mass)                     
             elif expResult.getValuesFor('dataType')[0] == 'efficiencyMap':
-                print("Theory Prediction UL = ",expResult.getUpperLimitFor(dataID=datasetID))
+                ul = expResult.getUpperLimitFor(dataID=datasetID)
             else: print('weird:',expResult.getValuesFor('dataType'))
+            print("Theory Prediction UL = ",ul)
+            print("R = ",theoryPrediction.value[0].value/ul)
       
     
 
