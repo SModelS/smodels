@@ -230,7 +230,7 @@ class TxNameData(object):
 #         print "P=",P
         dp=self.countNonZeros ( P )
 #         print 'Pp=',P[:self.dimensionality]
-        
+
 #         #Check which points are being used in interpolation
 #         from scipy import spatial
 #         delaun = spatial.Delaunay(self.Mp)
