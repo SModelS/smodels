@@ -267,9 +267,9 @@ class TextBasedPrinter(object):
         :param obj: A ExpResult object to be printed.
         :param outputLevel: Defines object specific output level.  
         """
-        
-        if not objOutputLevel: return None
 
+        if not objOutputLevel: return None
+        
         output = ""
         output += "========================================================\n"
         output += "Experimental Result ID: " + obj.getValuesFor('id')[0] + '\n'
@@ -278,7 +278,7 @@ class TextBasedPrinter(object):
         if objOutputLevel == 2:
             output += "\t -----------------------------\n"
             output += "\t Elements tested by analysis:\n"
-            listOfelements = obj.getValuesFor('_elements')
+            listOfelements = obj.getValuesFor('_elements')[0]
             for el in listOfelements:
                 output += "\t    " + str(el) + "\n"
 
@@ -409,7 +409,7 @@ class TxTPrinter(TextBasedPrinter):
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
 
         TextBasedPrinter.__init__(self, output, filename, outputLevel)                
-        self.printingOrder = [OutputStatus,TopologyList,Element,
+        self.printingOrder = [OutputStatus,TopologyList,Element,ExpResult,
                              TheoryPredictionList,ResultList,MissingTopoList]
 
 class SummaryPrinter(TextBasedPrinter):
