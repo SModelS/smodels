@@ -26,25 +26,27 @@ class DataSet(object):
     """Holds the information to a data folder (TxName objects, dataInfo,...)
     """
         
-    def __init__(self, path,infoObj):
+    def __init__(self, path=None, infoObj=None):
+        
         self.path = path
         self.globalInfo = infoObj
         self.txnameList = []
         
-        logger.debug('Creating object based on data folder : %s' %self.path)
-        
-        #Get data folder info:
-        if not os.path.isfile(os.path.join(path,"dataInfo.txt")):
-            logger.error("dataInfo.txt file not found in " + path)
-            raise TypeError
-        self.dataInfo = infoObject.Info(os.path.join(path,"dataInfo.txt"))
-
-        #Get list of TxName objects:
-        for txtfile in glob.iglob(os.path.join(path,"*.txt")):
-            try:                
-                txname = txnameObject.TxName(txtfile,self.globalInfo)
-                self.txnameList.append(txname)
-            except TypeError: continue
+        if path:
+            logger.debug('Creating object based on data folder : %s' %self.path)
+            
+            #Get data folder info:
+            if not os.path.isfile(os.path.join(path,"dataInfo.txt")):
+                logger.error("dataInfo.txt file not found in " + path)
+                raise TypeError
+            self.dataInfo = infoObject.Info(os.path.join(path,"dataInfo.txt"))
+    
+            #Get list of TxName objects:
+            for txtfile in glob.iglob(os.path.join(path,"*.txt")):
+                try:                
+                    txname = txnameObject.TxName(txtfile,self.globalInfo)
+                    self.txnameList.append(txname)
+                except TypeError: continue
             
 
     def getValuesFor(self,attribute=None):
