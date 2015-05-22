@@ -29,31 +29,33 @@ class Info(object):
     :ivar path: path to the globalInfo.txt file
     """
     
-    def __init__(self, path):        
+    def __init__(self, path=None):
+                
         self.path = path
-
-        logger.debug('Creating object based on globalInfo.txt: %s' %self.path)        
- 
-        #Open the info file and get the information:
-        if not os.path.isfile(path):
-            logger.error("Info file %s not found" % path)
-            raise SModelSError()      
-        from smodels.tools.stringTools import concatenateLines
-        infoFile = open(self.path)
-        content = concatenateLines ( infoFile.readlines() )
-        infoFile.close()
-        
-        #Get tags in info file:
-        tags = [line.split(':', 1)[0].strip() for line in content]
-        for i,tag in enumerate(tags):
-            if not tag: continue
-            line = content[i]
-            value = line.split(':',1)[1].strip()            
-            if tags.count(tag) == 1:
-                self.addInfo(tag,value)
-            else:
-                logger.info("Ignoring unknown field %s found in file %s" % (tag, self.path))
-                continue
+        if path:
+            logger.debug('Creating object based on globalInfo.txt: %s' %self.path)        
+     
+            #Open the info file and get the information:
+            if not os.path.isfile(path):
+                logger.error("Info file %s not found" % path)
+                raise SModelSError()      
+            from smodels.tools.stringTools import concatenateLines
+            infoFile = open(self.path)
+            content = concatenateLines ( infoFile.readlines() )
+            infoFile.close()
+            
+            #Get tags in info file:
+            tags = [line.split(':', 1)[0].strip() for line in content]
+            for i,tag in enumerate(tags):
+                if not tag: continue
+                line = content[i]
+                value = line.split(':',1)[1].strip()            
+                if tags.count(tag) == 1:
+                    self.addInfo(tag,value)
+                else:
+                    logger.info("Ignoring unknown field %s found in file %s" 
+                                % (tag, self.path))
+                    continue
 
         
     def addInfo(self,tag,value):
