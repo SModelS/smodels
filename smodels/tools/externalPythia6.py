@@ -20,6 +20,8 @@ import urllib
 import tarfile
 import logging
 
+FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'                                                              
+logging.basicConfig(format=FORMAT)
 logger = logging.getLogger(__name__)
 
 
