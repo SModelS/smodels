@@ -43,7 +43,7 @@ def _bayesianUpperLimit ( nev, sac, xbg, sbg, cl=.95, prec=None, smax=None ):
     from smodels.tools import BayesianUpperLimit
     return BayesianUpperLimit.upperLimit ( nev, sac, xbg, sbg, cl, prec, smax )
 
-def _upperLimitMadAnalysis ( nev, xbg, sbg, cl=.95, numberoftoys=10000, upto = 1.0, return_nan=False ):
+def _upperLimitMadAnalysis ( nev, xbg, sbg, cl=.95, numberoftoys=10000, upto = 5.0, return_nan=False ):
     """ upper limit obtained via mad analysis 5 code 
     :param nev: number of observed events
     :param sac: relative uncertainty in acceptance
@@ -55,12 +55,15 @@ def _upperLimitMadAnalysis ( nev, xbg, sbg, cl=.95, numberoftoys=10000, upto = 1
     import exclusion_CLs
     import scipy.optimize
     def f( sig ):
+        ##print "[statistics._upperLimitMadAnalysis] sig=",sig
+        ##print "[statistics._upperLimitMadAnalysis] f=",exclusion_CLs.CLs ( nev, xbg, sbg, sig, numberoftoys )
         return exclusion_CLs.CLs ( nev, xbg, sbg, sig, numberoftoys ) - cl
     try:
+        ##print "upto=",upto,"max(nv,xbg,sbg)=",max(nev,xbg,sbg)
         return scipy.optimize.brentq ( f, 0, upto * max(nev,xbg,sbg) )
     except Exception,e:
         if not return_nan:
-            return _upperLimitMadAnalysis ( nev, xbg, sbg, cl, 5*numberoftoys, 5.0*upto, upto>10. )
+            return _upperLimitMadAnalysis ( nev, xbg, sbg, cl, 5*numberoftoys, 5.0*upto, upto>30. )
         else:
             return float("nan")
 
