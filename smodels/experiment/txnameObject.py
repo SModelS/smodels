@@ -27,9 +27,7 @@ import math
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
 logging.basicConfig(format=FORMAT)
 logger = logging.getLogger(__name__)
-
 logger.setLevel(level=logging.ERROR)
-
 
 class TxName(object):
     """Holds the information related to one txname in the Txname.txt
@@ -318,12 +316,19 @@ class TxNameData(object):
             P3[i]+=gradient[i]
             P4[i]-=gradient[i]
         # print "projected value", projected_value
-        ag=griddata( self.Mp, self.xsec, [ P3[:self.dimensionality] ], method="linear")[0]
+        agp=griddata( self.Mp, self.xsec, [ P3[:self.dimensionality] ], method="linear")[0]
         #print "along gradient", ag
         agm=griddata( self.Mp, self.xsec, [ P4[:self.dimensionality] ], method="linear")[0]
         #print "along negative gradient",agm
-        dep=abs ( ag - self.projected_value) / self.projected_value
-        dem=abs ( agm - self.projected_value ) / self.projected_value
+        dep,dem=0.,0.
+        if self.projected_value == 0.:
+            if agp!=0.:
+                dep =1.0
+            if agm!=0.:
+                dem =1.0
+        else:
+            dep=abs ( agp - self.projected_value) / self.projected_value
+            dem=abs ( agm - self.projected_value ) / self.projected_value
         de=dep
         if dem > de: de=dem
         return de
