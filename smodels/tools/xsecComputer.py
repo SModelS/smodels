@@ -196,7 +196,7 @@ def xsecToBlock(xsec, inPDGs=(2212, 2212), comment=None, xsecUnit = pb):
         header += " " + str(pid)
     if comment:
         header += "   # " + str(comment)  # Comment
-    entry = "0  " + str(xsec.info.order) + "  0  0  0  0  " + \
+    entry = "  0  " + str(xsec.info.order) + "  0  0  0  0  " + \
             str("%16.8E" % (xsec.value / xsecUnit) ) + " SModelS " + installation.version()
 
     return "\n" + header + "\n" + entry
