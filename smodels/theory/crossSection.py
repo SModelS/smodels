@@ -16,6 +16,8 @@ import pyslha
 import sys
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
+FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
+logging.basicConfig(format=FORMAT)
 logger = logging.getLogger(__name__)
 
 
@@ -537,58 +539,38 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
     """
     # Store information about all cross-sections in the SLHA file
     xSecsInFile = XSectionList()
-    """
     f=pyslha.readSLHAFile ( slhafile )
-    for xsec in f.xsections:
-        print xsec,type(xsec)
-    """
-
-    slha = open(slhafile, 'r')
-    lines = slha.readlines()
-    xsecblock = False
-    for l in lines:
-        skipXsec = False
-        if l.startswith("#") or len(l) < 2 or not l.strip():
-            continue
-        if 'XSECTION' in l:
-            xsecblock = True
-            # Values in the SLHA file are in GeV
-            sqrtS = eval(l.split()[1]) / 1000.
-            pids = (eval(l.split()[5]), eval(l.split()[6]))
-            continue
-        if not xsecblock:
-            # Ignore other entries
-            continue
-        for pid in pids:
+    for production in f.xsections:
+        useXSecs = False
+        for pid in production[2:]:
             if not pid in smodels.particles.rOdd.keys():
-                skipXsec = True
-                logger.warning("Ignoring cross-section for "+str(pids)+" production") #Ignore production of R-Even particles                
-                break        
-        csOrder = eval(l.split()[1])
-        cs = eval(l.split()[6]) * xsecUnit
-        wlabel = str(int(sqrtS)) + ' TeV'
-        if csOrder == 0:
-            wlabel += ' (LO)'
-        elif csOrder == 1:
-            wlabel += ' (NLO)'
-        elif csOrder == 2:
-            wlabel += ' (NLL)'
-        else:
-            logger.error("Unknown QCD order in XSECTION line " + l)
-            raise SModelSError()
-        xsec = XSection()
-        xsec.info.sqrts = sqrtS * TeV
-        xsec.info.order = csOrder
-        xsec.info.label = wlabel
-        xsec.value = cs
-        xsec.pid = pids
-        # Do not add xsecs which do not match the user required ones:
-        if (useXSecs and not xsec.info in useXSecs) or skipXsec:
-            continue
-        else: xSecsInFile.add(xsec)
-
-    slha.close()
-
+                # ignore production of R-Even Particles
+                logger.warning("Ignoring cross-section for "+str(production)+" production") 
+                break
+        process = f.xsections.get ( production )
+        for pxsec in process.xsecs:
+            csOrder = pxsec.qcd_order
+            wlabel = str( int ( pxsec.sqrts / 1000) ) + ' TeV'
+            if csOrder == 0:
+                wlabel += ' (LO)'
+            elif csOrder == 1:
+                wlabel += ' (NLO)'
+            elif csOrder == 2:
+                wlabel += ' (NLL)'
+            else:
+                logger.error ( "Unknown QCD order %d" % csOrder )
+                raise SModelSError()
+            xsec = XSection()
+            xsec.info.sqrts = pxsec.sqrts * TeV
+            xsec.info.order = csOrder
+            xsec.info.label = wlabel
+            xsec.value = pxsec.value * pb
+            xsec.pid = production[2:]
+            # Do not add xsecs which do not match the user required ones:
+            if (useXSecs and not xsec.info in useXSecs):
+                continue
+            else: xSecsInFile.add(xsec)
+            
     return xSecsInFile
 
 
