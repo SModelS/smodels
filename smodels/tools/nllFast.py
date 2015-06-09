@@ -14,7 +14,7 @@
 import commands
 import os
 from smodels.tools import toolBox
-from smodels.tools import modpyslha as pyslha
+import pyslha
 from smodels.tools.physicsUnits import TeV
 import numpy
 import operator
