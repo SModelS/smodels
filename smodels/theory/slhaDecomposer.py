@@ -13,7 +13,7 @@ import copy
 import time
 from smodels.theory import element, topology, crossSection
 from smodels.theory.branch import Branch, decayBranches
-from smodels.tools import modpyslha as pyslha
+import pyslha
 from smodels.tools.physicsUnits import fb, GeV
 import smodels.particles
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
@@ -47,10 +47,9 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     if type(sigcut) == type(1.):
         sigcut = sigcut * fb
 
-    from smodels.tools import modpyslha
     try:
-        f=modpyslha.readSLHAFile ( slhafile )
-    except modpyslha.ParseError,e:
+        f=pyslha.readSLHAFile ( slhafile )
+    except pyslha.ParseError,e:
         logger.error ( "The file %s cannot be parsed as an SLHA file: %s" % (slhafile, e) )
         raise SModelSError()
 
