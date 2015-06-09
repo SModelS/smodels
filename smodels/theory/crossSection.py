@@ -12,6 +12,7 @@ from smodels.tools.physicsUnits import TeV, pb
 from smodels.theory import lheReader
 import smodels.particles
 import logging
+import pyslha
 import sys
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
@@ -536,6 +537,12 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
     """
     # Store information about all cross-sections in the SLHA file
     xSecsInFile = XSectionList()
+    """
+    f=pyslha.readSLHAFile ( slhafile )
+    for xsec in f.xsections:
+        print xsec,type(xsec)
+    """
+
     slha = open(slhafile, 'r')
     lines = slha.readlines()
     xsecblock = False

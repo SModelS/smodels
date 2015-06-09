@@ -16,6 +16,7 @@ from smodels.theory import crossSection
 from smodels.tools import nllFast
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import os
+import pyslha
 import cStringIO
 import logging
 import sys
@@ -53,10 +54,9 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
     if not os.path.isfile(slhafile):
         logger.error("SLHA file %s not found.", slhafile)
         raise SModelSError()
-    from smodels.tools import modpyslha
     try:
-        f=modpyslha.readSLHAFile(slhafile)
-    except modpyslha.ParseError,e:
+        f=pyslha.readSLHAFile(slhafile)
+    except pyslha.ParseError,e:
         logger.error("File cannot be parsed as SLHA file: %s" % e )
         raise SModelSError()
 
