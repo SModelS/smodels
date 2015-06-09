@@ -13,7 +13,7 @@
 import os, sys
 from smodels.theory import lheReader
 from smodels.tools.physicsUnits import GeV, fb
-from smodels.tools import modpyslha as pyslha
+import pyslha
 from smodels.particles import qNumbers, rEven
 from smodels.theory import crossSection
 from smodels.theory.theoryPrediction import TheoryPrediction
