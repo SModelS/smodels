@@ -20,7 +20,7 @@ from smodels.experiment.databaseObjects import ExpResult
 from smodels.tools.ioObjects import OutputStatus, ResultList
 from smodels.tools.missingTopologies import MissingTopoList
 from smodels.tools.physicsUnits import GeV, fb, TeV
-from smodels.tools.modpyslha import Doc
+from pyslha import Doc
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from collections import OrderedDict
 
