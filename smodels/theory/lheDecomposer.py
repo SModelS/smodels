@@ -10,9 +10,9 @@
 
 from smodels.theory import lheReader, topology, crossSection, element
 from smodels.theory import branch
-from smodels.tools import modpyslha as pyslha
 from smodels.tools.physicsUnits import fb, GeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
+import pyslha
 import smodels.particles
 import copy
 import logging
