@@ -561,7 +561,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
                 logger.error ( "Unknown QCD order %d" % csOrder )
                 raise SModelSError()
             xsec = XSection()
-            xsec.info.sqrts = pxsec.sqrts * TeV
+            xsec.info.sqrts = pxsec.sqrts/1000. * TeV
             xsec.info.order = csOrder
             xsec.info.label = wlabel
             xsec.value = pxsec.value * pb
