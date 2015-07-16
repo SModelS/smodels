@@ -7,9 +7,11 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
     
 """
-
+import sys
+sys.path.insert(0,"../")
 from smodels.theory import slhaDecomposer
 from smodels.tools.physicsUnits import GeV, fb
+from smodels import installation
 import unittest
 import logging
 #import logging.config
@@ -18,6 +20,7 @@ class SlhaDecompositionTest(unittest.TestCase):
     logger = logging.getLogger(__name__)
 
     def test(self):
+        print installation.installDirectory()
         self.logger.info ( "test decomposition, no compression" )
         """ test the decomposition with no compression """
         slhafile="../inputFiles/slha/simplyGluino.slha"
