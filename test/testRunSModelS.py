@@ -7,6 +7,8 @@
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
 
 """
+import sys
+sys.path.insert(0,"../")
 import unittest
 import os
 from smodels.installation import installDirectory
