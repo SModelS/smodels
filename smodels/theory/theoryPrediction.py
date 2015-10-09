@@ -11,7 +11,7 @@ from smodels.theory import clusterTools, crossSection, element
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.auxiliaryFunctions import cSim, cGtr  #DO NOT REMOVE
 import logging,sys
-from smodels.tools.physicsUnits import TeV
+from smodels.tools.physicsUnits import TeV,fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 logger = logging.getLogger(__name__)
@@ -147,6 +147,7 @@ def _getBestResults(dataSetResults):
     #For efficiency-map analyses with multipler signal regions,
     #select the best one according to the expected upper limit:
     bestExpectedR = 0.
+    bestXsec = 0.*fb
     for predList in dataSetResults:
         if len(predList) != 1:
             logger.error("Multiple clusters should only exist for upper limit results!")
@@ -160,10 +161,11 @@ def _getBestResults(dataSetResults):
             logger.error("Signal region prediction should correspond to a single cross-section!")
             raise SModelSError()
         xsec = pred.value[0]
-        expectedR = xsec.value/dataset.getSRUpperLimit(0.05,True)
-        if expectedR > bestExpectedR:
+        expectedR = xsec.value/dataset.getSRUpperLimit(0.05,True,True)        
+        if expectedR > bestExpectedR or (expectedR == bestExpectedR and xsec > bestXsec):
             bestExpectedR = expectedR
             bestPredList = predList
+            bestXsec = xsec.value
     
     return bestPredList
     
