@@ -161,7 +161,7 @@ def _getBestResults(dataSetResults):
             logger.error("Signal region prediction should correspond to a single cross-section!")
             raise SModelSError()
         xsec = pred.value[0]
-        expectedR = xsec.value/dataset.getSRUpperLimit(0.05,True,True)        
+        expectedR = xsec.value/dataset.getSRUpperLimit(0.05,True,False)
         if expectedR > bestExpectedR or (expectedR == bestExpectedR and xsec > bestXsec):
             bestExpectedR = expectedR
             bestPredList = predList
