@@ -8,7 +8,9 @@
 """
 
 from smodels.tools.physicsUnits import fb
+from smodels.theory.auxiliaryFunctions import _memoize
 
+@_memoize
 def upperLimit ( Nobs, Nexp, sigmaexp, lumi, alpha=.05 ):
     """ computes the 95% CL upper limit on the production cross section """
 
