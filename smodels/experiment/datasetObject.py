@@ -11,7 +11,6 @@
 import logging,os,glob
 from smodels.experiment import txnameObject,infoObject
 from smodels.tools import statistics
-from smodels.theory.auxiliaryFunctions import _memoize
 from smodels.tools.physicsUnits import fb
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
@@ -105,7 +104,7 @@ class DataSet(object):
                
         return fields
     
-    @_memoize
+    
     def getSRUpperLimit(self,alpha = 0.05, expected = False, compute = False ):
         """
         Computes the 95% upper limit on the signal*efficiency for a given
