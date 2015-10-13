@@ -21,9 +21,7 @@ logger = logging.getLogger(__name__)
 
 def _memoize(func):
     """
-    Cache the results of massPosition.
-    
-    Serves as a wrapper to cache the results of massPosition, since this is a
+    Serves as a wrapper to cache the results of func, since this is a
     computationally expensive function.
     
     """
