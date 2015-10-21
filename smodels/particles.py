@@ -115,20 +115,20 @@ rEven = {25 : "higgs",
         -12 : "nu",
          11 : "e-",
         -11 : "e+",
+         4  : "c",
+        -4  : "c",
          5  : "b",
         -5  : "b",
          6  : "t+",
         -6  : "t-",
-         1  : "jet",
-         2  : "jet",
-         3  : "jet",
-         4  : "jet",
-         21 : "jet",
-        -1  : "jet",
-        -2  : "jet",
-        -3  : "jet",
-        -4  : "jet",
-        -21 : "jet"}
+         1  : "q",
+         2  : "q",
+         3  : "q",
+         -1  : "q",
+         -2  : "q",
+         -3  : "q",
+         21  : "g",
+         -21  : "g" }
 
 #Particle dictionary. Convenient for defining multiple particles with one label.
 ptcDic = {"e"  : ["e+",  "e-"],
@@ -142,7 +142,8 @@ ptcDic = {"e"  : ["e+",  "e-"],
           "L+" : ["e+",  "mu+", "ta+"],
           "L-" : ["e-",  "mu-", "ta-"],
           "L"  : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-"],
-          "all" : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-", "jet", "W+", "W-","Z","photon","higgs","t+","t-","b"]}
+          "jet" : [ "q", "g", "c" ],
+          "all" : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-", "W+", "W-","Z","photon","higgs","t+","t-","b","c","q","g","c"]}
 
 #Quantum numbers for the new particles. Just used by tools.slhaChecks
 #PDG: (spin*2, electrical charge*3, color dimension)
