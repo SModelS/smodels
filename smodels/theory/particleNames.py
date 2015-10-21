@@ -100,7 +100,7 @@ def elementsInStr(instring):
                 if not ptc:
                     continue
                 if not ptc in rEven.values() and not ptc in ptcDic:
-                    logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
+                    logger.error("Unknown particle. Add " + ptc + " to smodels/particles.py")
                     raise SModelSError()
 
     # Check if there are not unmatched ['s and/or ]'s in the string
