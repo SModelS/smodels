@@ -154,7 +154,7 @@ def main(inputFile, parameterFile, outputFile):
     """
    
     """ Get theory prediction for each analysis and print basic output """
-    allPredictions = []    
+    allPredictions = []
     for expResult in listOfExpRes:     
         theorypredictions = theoryPredictionsFor(expResult, smstoplist)
         if not theorypredictions: continue
