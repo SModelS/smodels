@@ -50,8 +50,13 @@ def version(astuple=False):
     l.strip()
     if not astuple:
         return l
-    a, b = l.split(".")
-    return (int(a), int(b))
+    a = l.split(".")
+    for ctr,el in enumerate(a):
+        try:
+            a[ctr]=int(el)
+        except ValueError:
+            a[ctr]=el
+    return tuple(a)
 
 
 def license():
