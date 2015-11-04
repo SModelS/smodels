@@ -111,7 +111,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2, useBestDataset=
                If False, returns predictions for all datasets.
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction objects    
     """
-    
+
     dataSetResults = []
     #Compute predictions for each data set (for UL analyses there is one single set)
     for dataset in expResult.datasets:
@@ -183,7 +183,6 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
     :parameter maxMassDist: maximum mass distance for clustering elements (float)
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction objects    
     """     
-    
     predictionList = TheoryPredictionList()
     # Select elements belonging to expResult and apply efficiencies
     elements = _getElementsFrom(smsTopList, dataset)
@@ -211,6 +210,7 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
         theoryPrediction.conditions = _evalConditions(cluster)
         theoryPrediction.mass = cluster.getAvgMass()
         theoryPrediction.PIDs = cluster.getPIDs()
+        theoryPrediction.IDs = cluster.getIDs()
         predictionList._theoryPredictions.append(theoryPrediction)
         
 
