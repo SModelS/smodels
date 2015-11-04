@@ -62,7 +62,7 @@ def compile():
 
 
 def version():
-    with open("smodels/version") as f: return f.readline()
+    with open("smodels/version") as f: return f.readline().replace("\n","")
 
 compile()
 setup(
@@ -74,7 +74,7 @@ setup(
     author_email="smodels-developers@lists.oeaw.ac.at ",
     scripts=[ "bin/smodels-config", "runSModelS.py" ],
     install_requires=[ 'docutils>=0.3', 'numpy', 'scipy>=0.9.0', \
-                         'unum', 'argparse'],
+                         'unum', 'argparse', 'pyslha>=3.1.0' ],
     data_files=dataFiles() ,
     description=("A tool for interpreting simplified-model results from the "
                    "LHC"),
