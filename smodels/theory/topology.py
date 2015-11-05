@@ -340,3 +340,12 @@ class TopologyList(object):
         for top in self.topos:
             elements.extend(top.elementList)
         return elements
+
+    def _setElementIds(self):
+        """
+        Assign unique ID to each element in the Topolgy list
+        """
+        elID = 1
+        for element in self.getElements():
+            element.elID = elID
+            elID += 1
