@@ -246,6 +246,7 @@ def _getElementsFrom(smsTopList, dataset):
                 if not hasEl: continue   
                 eff = txname.getEfficiencyFor(hasEl)            
                 if eff == 0.: continue
+                el.covered += 1
                 hasEl.weight *= eff
                 elements.append(hasEl)
                 break
