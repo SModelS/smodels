@@ -14,16 +14,13 @@ from smodels.theory import slhaDecomposer
 from smodels.tools.physicsUnits import GeV
 from smodels.experiment.databaseObjects import Database
 from smodels.theory.theoryPrediction import theoryPredictionsFor
-import smodels.tools.printer as prt
 
 class ElementIdTest(unittest.TestCase):
     def testGoodFile(self):
 
         listOfIDs = [[945],[943, 944, 946, 947, 948, 949, 950, 951]]
-        stdoutPrinter = prt.TxTPrinter(output = 'stdout')
         filename = "%sinputFiles/slha/compressedSpec.slha" % (installDirectory() )
         topoList = slhaDecomposer.decompose(filename,doCompress = True, doInvisible=True, minmassgap = 5*GeV)
-        stdoutPrinter.addObj(topoList,2)
         database = Database("database/")
         resultlist = database.getExpResults()
         for res in resultlist:

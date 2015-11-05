@@ -41,7 +41,7 @@ class Element(object):
         self.branches = [Branch(), Branch()]
         self.weight = crossSection.XSectionList()
         self.motherElements = []
-        self.idx = 0
+        self.elID = 0
         
         if info:
             # Create element from particle string
@@ -159,7 +159,7 @@ class Element(object):
             newel.branches.append(branch.copy())
         newel.weight = self.weight.copy()
         newel.motherElements = self.motherElements[:]
-        newel.idx = self.idx
+        newel.elID = self.elID
         return newel
 
 

@@ -85,7 +85,7 @@ class ElementCluster(object):
         """
         IDs = []
         for el in self:
-            if not el.idx in IDs: IDs.append(el.idx)
+            if not el.elID in IDs: IDs.append(el.elID)
         return IDs
 
     def getDataType(self):
