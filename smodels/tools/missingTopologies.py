@@ -16,10 +16,11 @@ class MissingTopo():
     :ivar topo: topology description
     :ivar weights: weights dictionary
     """
-    def __init__(self, topo, weights):
+    def __init__(self, topo, weights, contributingElements=[]):
         self.topo = topo
         self.weights = weights
         self.value = None
+        self.contributingElements = contributingElements
 
 class MissingTopoList(object):
     """
@@ -44,8 +45,9 @@ class MissingTopoList(object):
         for topo in self.topos:
             if name == topo.topo:
                 topo.weights += el.weight
+                topo.contributingElements.append(el.elID)
                 return
-        self.topos.append(MissingTopo(name, el.weight))
+        self.topos.append(MissingTopo(name, el.weight, [el.elID]))
         return
 
     def generalName(self, instr, sumL=None):
@@ -91,17 +93,15 @@ class MissingTopoList(object):
         """
         
         from smodels.tools.physicsUnits import fb
-        for top in smstoplist:
-            for el in top.elementList:
-                if el.compressElement(doCompress, doInvisible, minmassgap):
-                    continue
-                covered = None
-                for ana in listOfAnalyses:
-                    for txname in ana.getTxNames():
-                        if not txname.getEfficiencyFor(el) == 0:
-                            covered = True
-                if not covered:
-                    self.addToTopos(el, sumL)
+        allMothers = []
+        for el in smstoplist.getElements():
+            for mEl in el.motherElements:
+                cID = mEl[-1].elID
+                if not cID in allMothers: allMothers.append(cID)
+        for el in smstoplist.getElements():
+            if el.elID in allMothers: continue
+            if el.covered > 0: continue
+            self.addToTopos(el, sumL)
         for topo in self.topos:
             if not topo.weights.getXsecsFor(self.sqrts): continue
             topo.value = topo.weights.getXsecsFor(self.sqrts)[0].value / fb

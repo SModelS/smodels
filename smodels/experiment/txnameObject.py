@@ -156,7 +156,7 @@ class TxName(object):
         if not hasEl: return 0.
         mass = hasEl.getMasses()
         val = self.txnameData.getValueFor(mass)
-        if type(val) == type(fb):  
+        if type(val) == type(fb):
             return 1.  #The element has an UL, return 1        
         elif val is None or math.isnan(val):
             return 0.  #The element mass is outside the data grid

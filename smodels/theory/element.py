@@ -42,6 +42,7 @@ class Element(object):
         self.weight = crossSection.XSectionList()
         self.motherElements = []
         self.elID = 0
+        self.covered = 0
         
         if info:
             # Create element from particle string

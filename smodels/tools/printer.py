@@ -404,6 +404,7 @@ class TextBasedPrinter(object):
 
         for topo in sorted(obj.topos, key=lambda x: x.value, reverse=True)[:nprint]:
             output += "%5s %10.3E    # %45s\n" % (str(obj.sqrts / TeV), topo.value, str(topo.topo))
+            output += "Contributing elements %s\n" % str(topo.contributingElements)
                 
         return output 
   
