@@ -194,7 +194,6 @@ class TextBasedPrinter(object):
         output += " || \t \t Global topologies table \t \t ||\n"
         output += " || \t \t\t\t\t\t\t || \n"
         output += "   ======================================================= \n"
-        idx = 1
         for topo in obj:
             if old_vertices == str(topo.vertnumb):
                 output += "\t .................................................. \n"
@@ -209,8 +208,6 @@ class TextBasedPrinter(object):
             output += "Total Number of Elements: " + str(len(topo.elementList)) + '\n'
             if objOutputLevel == 2:
                 for el in topo.elementList:
-                    el.idx = idx
-                    idx += 1
                     output += "\t\t .........................................................................\n"
                     output += "\t\t Element: \n"
                     output += self._formatElement(el,1) + "\n"
@@ -229,7 +226,7 @@ class TextBasedPrinter(object):
         if not objOutputLevel: return None
 
         output = ""
-        output +="\t\t Element ID: " + str(obj.idx)
+        output +="\t\t Element ID: " + str(obj.elID)
         output += "\n"
         output += "\t\t Particles in element: " + str(obj.getParticles())
         output += "\n"

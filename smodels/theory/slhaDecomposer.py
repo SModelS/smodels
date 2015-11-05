@@ -133,6 +133,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
                 for el in allElements:
                     top = topology.Topology(el)
                     smsTopList.add(top)
+    smsTopList._setElementIds()
     logger.debug("slhaDecomposer done in " + str(time.time() - t1) + " s.")
     return smsTopList
 
