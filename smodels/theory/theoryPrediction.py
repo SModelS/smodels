@@ -243,10 +243,10 @@ def _getElementsFrom(smsTopList, dataset):
                 if not txname._elements: continue
                 if not top in txname._topologies: continue
                 hasEl = txname.hasElementAs(el)
-                if not hasEl: continue   
+                if not hasEl: continue
+                el.covered += 1
                 eff = txname.getEfficiencyFor(hasEl)            
                 if eff == 0.: continue
-                el.covered += 1
                 hasEl.weight *= eff
                 elements.append(hasEl)
                 break
