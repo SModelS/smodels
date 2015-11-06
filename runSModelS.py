@@ -195,6 +195,7 @@ def main(inputFile, parameterFile, outputFile):
         missingtopos.findMissingTopos(smstoplist, listOfExpRes, minmassgap, parser.getboolean("options", "doCompress"),
                       doInvisible=parser.getboolean("options", "doInvisible"))        
         summaryPrinter.addObj(missingtopos)
+        stdoutPrinter.addObj(missingtopos,2)
          
         
     stdoutPrinter.close()
