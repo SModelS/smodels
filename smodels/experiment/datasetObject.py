@@ -126,9 +126,9 @@ class DataSet(object):
         if not compute:
             if expected:
                 try:
-                    return self.getValuesFor('expectedUL')[0]
+                    return self.getValuesFor('expectedUpperLimit')[0]
                 except TypeError:
-                    logger.info("expectedUL field not found. Using observed UL instead.")
+                    logger.info("expectedUpperLimit field not found. Using observed UL instead.")
                     return self.getValuesFor('upperLimit')[0]
             else:
                 return self.getValuesFor('upperLimit')[0]
