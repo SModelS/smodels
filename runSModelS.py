@@ -154,7 +154,7 @@ def main(inputFile, parameterFile, outputFile):
     """
    
     """ Get theory prediction for each analysis and print basic output """
-    allPredictions = []    
+    allPredictions = []
     for expResult in listOfExpRes:     
         theorypredictions = theoryPredictionsFor(expResult, smstoplist)
         if not theorypredictions: continue
@@ -188,14 +188,15 @@ def main(inputFile, parameterFile, outputFile):
     if parser.getboolean("stdout", "printResults"):
         stdoutPrinter.addObj(results,outLevel)
     
-#     sqrts = max([xsec.info.sqrts for xsec in smstoplist.getTotalWeight()])
-#     if parser.getboolean("options", "findMissingTopos"):
-#         """ Look for missing topologies, add them to the output file """
-#         missingtopos = missingTopologies.MissingTopoList(sqrts)
-#         missingtopos.findMissingTopos(smstoplist, listOfExpRes, minmassgap, parser.getboolean("options", "doCompress"),
-#                          doInvisible=parser.getboolean("options", "doInvisible"))        
-#         summaryPrinter.addObj(missingtopos)
-#         
+    sqrts = max([xsec.info.sqrts for xsec in smstoplist.getTotalWeight()])
+    if parser.getboolean("options", "findMissingTopos"):
+        """ Look for missing topologies, add them to the output file """
+        missingtopos = missingTopologies.MissingTopoList(sqrts)
+        missingtopos.findMissingTopos(smstoplist, listOfExpRes, minmassgap, parser.getboolean("options", "doCompress"),
+                      doInvisible=parser.getboolean("options", "doInvisible"))        
+        summaryPrinter.addObj(missingtopos)
+        stdoutPrinter.addObj(missingtopos,2)
+         
         
     stdoutPrinter.close()
     summaryPrinter.close()

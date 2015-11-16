@@ -16,10 +16,11 @@ class MissingTopo():
     :ivar topo: topology description
     :ivar weights: weights dictionary
     """
-    def __init__(self, topo, weights):
+    def __init__(self, topo, weights, contributingElements=[]):
         self.topo = topo
         self.weights = weights
         self.value = None
+        self.contributingElements = contributingElements
 
 class MissingTopoList(object):
     """
@@ -33,22 +34,23 @@ class MissingTopoList(object):
     def formatData(self,outputLevel):
         return self.formatMissingData(outputLevel)
 
-    def addToTopos(self, el, sumL=None):
+    def addToTopos(self, el, sumL=None, sumJet=None):
         """
         adds an element to the list of missing topologies
         if the element contributes to a missing topology that is already
         in the list, add weight to topology
         :parameter el: element to be added
         """
-        name = self.orderbranches(self.generalName(el.__str__(), sumL))
+        name = self.orderbranches(self.generalName(el.__str__(), sumL, sumJet))
         for topo in self.topos:
             if name == topo.topo:
                 topo.weights += el.weight
+                topo.contributingElements.append(el.elID)
                 return
-        self.topos.append(MissingTopo(name, el.weight))
+        self.topos.append(MissingTopo(name, el.weight, [el.elID]))
         return
 
-    def generalName(self, instr, sumL=None):
+    def generalName(self, instr, sumL=None, sumJet=None):
         """
         generalize by summing over charges
         e, mu are combined to l
@@ -58,9 +60,10 @@ class MissingTopoList(object):
         from smodels.theory.particleNames import ptcDic
         if sumL: exch = ["W", "l", "t", "ta"]
         else: exch = ["W", "e", "mu", "t", "ta"]
+        if sumJet: exch.append("jet")
         for pn in exch:
             for on in ptcDic[pn]:
-                instr = instr.replace(on, pn)
+                instr = instr.replace(on, pn).replace("hijetjets","higgs")
         return instr
 
     def orderbranches(self, instr):
@@ -77,7 +80,7 @@ class MissingTopoList(object):
         li.sort()
         return str(li).replace("'", "").replace(" ", "")
 
-    def findMissingTopos(self, smstoplist, listOfAnalyses, minmassgap, doCompress, doInvisible, sumL=None):
+    def findMissingTopos(self, smstoplist, listOfAnalyses, minmassgap, doCompress, doInvisible, sumL=None, sumJet=None):
         """
         Loops over all the elements in smstoplist and checks if the elements
         are tested by any of the analysis in listOfAnalysis.
@@ -91,17 +94,15 @@ class MissingTopoList(object):
         """
         
         from smodels.tools.physicsUnits import fb
-        for top in smstoplist:
-            for el in top.elementList:
-                if el.compressElement(doCompress, doInvisible, minmassgap):
-                    continue
-                covered = None
-                for ana in listOfAnalyses:
-                    for txname in ana.getTxNames():
-                        if not txname.getEfficiencyFor(el) == 0:
-                            covered = True
-                if not covered:
-                    self.addToTopos(el, sumL)
+        allMothers = []
+        for el in smstoplist.getElements():
+            for mEl in el.motherElements:
+                cID = mEl[-1].elID
+                if not cID in allMothers: allMothers.append(cID)
+        for el in smstoplist.getElements():
+            if el.elID in allMothers: continue
+            if el.covered > 0: continue
+            self.addToTopos(el, sumL, sumJet)
         for topo in self.topos:
             if not topo.weights.getXsecsFor(self.sqrts): continue
             topo.value = topo.weights.getXsecsFor(self.sqrts)[0].value / fb

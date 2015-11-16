@@ -226,6 +226,8 @@ class TextBasedPrinter(object):
         if not objOutputLevel: return None
 
         output = ""
+        output +="\t\t Element ID: " + str(obj.elID)
+        output += "\n"
         output += "\t\t Particles in element: " + str(obj.getParticles())
         output += "\n"
         output += "\t\t The element masses are \n"
@@ -314,6 +316,7 @@ class TextBasedPrinter(object):
             if theoryPrediction.mass:
                 for ibr, br in enumerate(theoryPrediction.mass):
                     output += "Masses in branch %i: " % ibr + str(br) + "\n"
+            if not theoryPrediction.IDs[0]==0: output += "Contributing elements: " + str(theoryPrediction.IDs) + "\n"
             if objOutputLevel == 2:
                 for pidList in theoryPrediction.PIDs:
                     output += "PIDs:" + str(pidList) + "\n"
@@ -401,6 +404,7 @@ class TextBasedPrinter(object):
 
         for topo in sorted(obj.topos, key=lambda x: x.value, reverse=True)[:nprint]:
             output += "%5s %10.3E    # %45s\n" % (str(obj.sqrts / TeV), topo.value, str(topo.topo))
+            if objOutputLevel==2: output += "Contributing elements %s\n" % str(topo.contributingElements)
                 
         return output 
   
