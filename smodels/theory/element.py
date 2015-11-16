@@ -41,6 +41,8 @@ class Element(object):
         self.branches = [Branch(), Branch()]
         self.weight = crossSection.XSectionList()
         self.motherElements = []
+        self.elID = 0
+        self.covered = 0 # how many analyses cover this element?
         
         if info:
             # Create element from particle string
@@ -158,6 +160,7 @@ class Element(object):
             newel.branches.append(branch.copy())
         newel.weight = self.weight.copy()
         newel.motherElements = self.motherElements[:]
+        newel.elID = self.elID
         return newel
 
 
