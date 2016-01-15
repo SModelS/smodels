@@ -4,50 +4,42 @@ experiment package
 Submodules
 ----------
 
-experiment.experimentExceptions module
---------------------------------------
+experiment.databaseObjects module
+---------------------------------
 
-.. automodule:: experiment.experimentExceptions
+.. automodule:: experiment.databaseObjects
     :members:
     :undoc-members:
     :show-inheritance:
 
-experiment.limitGetter module
------------------------------
+experiment.datasetObject module
+-------------------------------
 
-.. automodule:: experiment.limitGetter
+.. automodule:: experiment.datasetObject
     :members:
     :undoc-members:
     :show-inheritance:
 
-experiment.smsAnalysisFactory module
-------------------------------------
-
-.. automodule:: experiment.smsAnalysisFactory
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-experiment.smsHelpers module
+experiment.exceptions module
 ----------------------------
 
-.. automodule:: experiment.smsHelpers
+.. automodule:: experiment.exceptions
     :members:
     :undoc-members:
     :show-inheritance:
 
-experiment.smsInterpolation module
-----------------------------------
-
-.. automodule:: experiment.smsInterpolation
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-experiment.smsResults module
+experiment.infoObject module
 ----------------------------
 
-.. automodule:: experiment.smsResults
+.. automodule:: experiment.infoObject
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+experiment.txnameObject module
+------------------------------
+
+.. automodule:: experiment.txnameObject
     :members:
     :undoc-members:
     :show-inheritance:

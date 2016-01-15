@@ -4,10 +4,42 @@ tools package
 Submodules
 ----------
 
+tools.BayesianUpperLimit module
+-------------------------------
+
+.. automodule:: tools.BayesianUpperLimit
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 tools.asciiGraph module
 -----------------------
 
 .. automodule:: tools.asciiGraph
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tools.crashReport module
+------------------------
+
+.. automodule:: tools.crashReport
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tools.databaseBrowser module
+----------------------------
+
+.. automodule:: tools.databaseBrowser
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tools.exclusion_CLs module
+--------------------------
+
+.. automodule:: tools.exclusion_CLs
     :members:
     :undoc-members:
     :show-inheritance:
@@ -68,14 +100,6 @@ tools.missingTopologies module
     :undoc-members:
     :show-inheritance:
 
-tools.modpyslha module
-----------------------
-
-.. automodule:: tools.modpyslha
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 tools.nllFast module
 --------------------
 
@@ -92,10 +116,34 @@ tools.physicsUnits module
     :undoc-members:
     :show-inheritance:
 
+tools.printer module
+--------------------
+
+.. automodule:: tools.printer
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 tools.slhaChecks module
 -----------------------
 
 .. automodule:: tools.slhaChecks
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tools.statistics module
+-----------------------
+
+.. automodule:: tools.statistics
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tools.stringTools module
+------------------------
+
+.. automodule:: tools.stringTools
     :members:
     :undoc-members:
     :show-inheritance:

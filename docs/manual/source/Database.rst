@@ -1,4 +1,4 @@
-.. index:: Database of Experimental Analyses
+.. index:: Database of Experimental Results
 
 .. _database:
 
