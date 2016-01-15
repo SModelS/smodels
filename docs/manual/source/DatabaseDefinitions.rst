@@ -5,20 +5,58 @@
 Database Definitions
 ====================
 
-The SModelS database collects experimental results from both ATLAS and CMS.
-The results from each publication or conference note can be included in the database either as an 
-:ref:`Upper Limit Analysis <ULanalysis>` or :ref:`Efficiency Map Analysis <EManalysis>`.
+The SModelS database collects experimental results from both ATLAS and CMS, which are
+used to compute the experimental constraints on specific models.
+Starting with version 1.2, the SModelS database includes two types of experimental constraints:
+
+*  Upper Limit (UL) constraints: upper limit constraints on :math:`\sigma \times BR` of simplified models, 
+provided by the experimental collaborations (see :ref:`UL Constraints<ULconstraint>`);
+* Efficiency Map (EM) constraints: constraints on :math:`\sigma \times BR \times \epsilon` of simplified models,
+either provided by the experimental collaborations or computed by theory 
+collaborations (see :ref:`EM Constraints<EMconstraint>`); 
+
+Although the two types of constraints above are very distinct,
+both the folder structure and the object structure of SModelS are sufficiently flexible to
+simutaneously handle both UL and EM types.
+Each publication or conference note can be included in the database 
+as a :ref:`Experimental Result<ExpResult>` and are organized according to the folder structure described in
+:ref:`Database of Experimental Results<database>`. Hence, the database is simply a collection of experimental results,
+as described below. 
 
 
-.. _ULanalysis:
+.. _Database
 
-Upper Limit Analyses
---------------------
+Database
+--------
 
-Upper Limit (UL) analyses refer to the experimental constraints on the cross-section times branching ratio
+The database 
+
+
+* **The Database is described by the** `ExpResult Class <../../../documentation/build/html/experiment.html#experiment.databaseObjects.Database>`_
+
+.. _ExpResult:
+
+Experimental Result
+-------------------
+An experimental result contains all the relevant information corresponding to an experimental
+publication or conference note. In particular it holds  general information about the experimental analysis,
+such as the corresponding luminosity, center of mass energy, publication reference, etc.
+The current version allows for two possible types of experimental results: one containing upper limit maps
+and one containing efficiency maps.
+
+
+.. _ULtype:
+
+Upper Limit Type
+^^^^^^^^^^^^^^^^
+
+Upper Limit (UL) experimental results contains experimental constraints on the cross-section times branching ratio
 ( :math:`\sigma \times BR` ) from a specific experimental publication or conference note.
-Each UL analysis corresponds to the 95% upper limit constraints on :math:`\sigma \times BR` for a given 
+Each UL  result corresponds to the 95% upper limit constraints on :math:`\sigma \times BR` for a given 
 :ref:`element <element>` or sum of :ref:`elements <element>`.
+ In some cases it is useful to define a shorthand notation for the  :ref:`element <element>` 
+ or sum of :ref:`elements <element>` constrained by the  result. SModelS uses TxNames
+
 For illustration, consider this CMS example:
 
 .. _ULplot:
@@ -26,20 +64,53 @@ For illustration, consider this CMS example:
 .. image:: images/ULexample.png
    :height: 480px
 
-In this case the UL analysis constrains the element :math:`[[[jet]],[[jet]]]`, where we are using the notation
+In this case the UL result constrains the element :math:`[[[jet]],[[jet]]]`, where we are using the notation
 defined in :ref:`Bracket Notation <bracketnotation>`.
 
 
-Each individual UL analysis holds the upper limit values on :math:`\sigma \times BR` as a function of the respective 
-parameter space (usually BSM masses or slices over mass planes). Furthermore, the corresponding :ref:`constraints <ULconstraint>`
+Each individual UL result holds the upper limit values (*upper limit map*)
+on :math:`\sigma \times BR` as a function of the respective parameter space (usually BSM masses or slices over mass planes). 
+Furthermore, the corresponding :ref:`constraints <ULconstraint>`
 and :ref:`conditions <ULconditions>` must also be specified.
-UL analyses may also contain information about the analysis luminosity, center-of-mass, publication reference and others.
+Usually one :ref:`Experimental Result<ExpResult>` contains upper limit maps for more than one :ref:`element <element>`.
+
+
+As mentioned abovem, UL results also contain information about the analysis luminosity, center-of-mass, 
+publication reference and others.
 *We also point out that the exclusion curve is never used by SModelS*.
 
 Note that a given experimental publication (or conference note) may contain several UL analyses, since a single
 publication may contain upper limits for several different :ref:`elements <element>` (or :ref:`constraints <ULconstraint>`).
 
-* **UL analyses are described by the** `ULanalysis Class <../../../documentation/build/html/theory.html#theory.analysis.ULanalysis>`_
+.. _EMtype:
+
+Efficiency Map Type
+^^^^^^^^^^^^^^^^^^^
+
+
+For illustration, consider this CMS example:
+
+.. _EMplot:
+
+.. image:: images/ULexample.png
+   :height: 480px
+
+
+* **Experimental Results are described by the** `ExpResult Class <../../../documentation/build/html/experiment.html#experiment.databaseObjects.ExpResult>`_
+
+.. _DataSet:
+
+Data Set
+--------
+
+
+
+* **Data Sets are described by the** `DataSet Class <../../../documentation/build/html/experiment.html#experiment.datasetObject.DataSet>`_
+
+
+
+
+
 
 .. _ULconstraint:
 
