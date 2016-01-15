@@ -22,13 +22,12 @@ logger = logging.getLogger(__name__)
 
 class ExpResult(object):
     """
-    Simple object that contains a pair of (InfoFile,DataFile) objects corresponding to an
-    experimental result.
+    Object  containing the information and data corresponding to an
+    experimental result (experimental conference note or publication).
     
-    :ivar path: path to the result folder
-    :ivar info: InfoFile object
-    :ivar data: DataFile object
-    
+    :ivar path: path to the experimental result folder (i.e. ATLAS-CONF-2013-047)
+    :ivar globalInfo: Info object holding the data in <path>/globalInfo.txt
+    :ivar datasets: List of DataSet objects corresponding to the dataset folders in <path>    
     """
         
     def __init__(self, path=None):
@@ -68,8 +67,7 @@ class ExpResult(object):
 
     def getTxNames(self):
         """
-        Returns a list of all TxName objects appearing in all dataSets.
-        
+        Returns a list of all TxName objects appearing in all datasets.        
         """
         txnames = []
         for dataset in self.datasets:
@@ -238,9 +236,7 @@ class ExpResult(object):
 
 class Database(object):
     """
-    Database object. Holds a collection of InfoFile and DataFile objects containing
-    all the metainfo from the globalInfo.txt files and the corresponding data from the sms.py
-    files.
+    Database object. Holds a list of ExpResult objects.
     
     :ivar base: path to the database (string)
     :ivar expResultList: list of ExpResult objects 

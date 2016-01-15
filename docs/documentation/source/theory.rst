@@ -4,14 +4,6 @@ theory package
 Submodules
 ----------
 
-theory.analysis module
-----------------------
-
-.. automodule:: theory.analysis
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 theory.auxiliaryFunctions module
 --------------------------------
 
@@ -52,6 +44,14 @@ theory.element module
     :undoc-members:
     :show-inheritance:
 
+theory.exceptions module
+------------------------
+
+.. automodule:: theory.exceptions
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 theory.lheDecomposer module
 ---------------------------
 
@@ -72,14 +72,6 @@ theory.particleNames module
 ---------------------------
 
 .. automodule:: theory.particleNames
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-theory.printer module
----------------------
-
-.. automodule:: theory.printer
     :members:
     :undoc-members:
     :show-inheritance:
