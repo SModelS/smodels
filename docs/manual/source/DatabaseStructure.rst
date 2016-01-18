@@ -1,6 +1,6 @@
-.. index:: Database of Experimental Results
+.. index:: Database Structure
 
-.. _database:
+.. _databaseStruct:
 
 .. |constraint| replace:: :ref:`constraint <ULconstraint>`
 .. |conditions| replace:: :ref:`conditions <ULconditions>` 
@@ -8,8 +8,8 @@
 .. |sqrts| replace:: :math:`\sqrt{s}`
 .. |analyses| replace:: :ref:`analyses <ULanalysis>`
 
-Database of Experimental Analyses
-=================================
+Database of Experimental Results
+================================
 
 SModelS stores all the information about the experimental results in an |analyses|
 database [*]_. The database is organized as files in an ordinary (UNIX) directory hierarchy,

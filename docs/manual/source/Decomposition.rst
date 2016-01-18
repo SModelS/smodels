@@ -14,6 +14,7 @@
 .. |constraint| replace:: :ref:`constraint <ULconstraint>`
 .. |constraints| replace:: :ref:`constraints <ULconstraint>`
 
+.. _decomposition:
 
 Decomposition into Simplified Models
 ====================================
@@ -126,7 +127,7 @@ the :ref:`elements <element>` generated. In both the :ref:`LHE <lheDecomp>` and 
 simplifications are possible: :ref:`Mass Compression <massComp>` and :ref:`Invisible Compression <invComp>`.
 The main advantage of performing these compressions is that the simplified :ref:`element <element>` is
 always shorter (has fewer cascade decay steps), which makes it more likely to be constrained by experimental
-analyses. The details behind the compression methods are as follows:
+results. The details behind the compression methods are as follows:
 
 .. _massComp:
 

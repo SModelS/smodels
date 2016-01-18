@@ -32,7 +32,7 @@ the center-of-mass energy should be listed in the <init></init> block, according
 (see :download:`example file <examples/example.slha>`).
 Moreover, all the Z\ :sub:`2`-even particles (see definition in :ref:`final states <final states>`) should be set as stable, since
 in SModelS they are effectively considered as final states.
-When generating the events it is also important to ensure that the no mass smearing is applied, so the mass
+When generating the events it is also important to ensure that no mass smearing is applied, so the mass
 values for a given particle are the same throughout the LHE file.
 
 
