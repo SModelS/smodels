@@ -10,5 +10,4 @@ while the concepts relevant for the database of experimental results are given i
 
 .. toctree::
    TheoryDefinitions
-   DatabaseDefinitions   
-   AnalysesNames
+   DatabaseDefinitions

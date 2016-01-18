@@ -4,7 +4,7 @@
               reference cross sections and related functions.
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
-        
+.. autofunction:: _getElementsFrom        
 """
 
 from smodels.theory import clusterTools, crossSection, element
@@ -181,7 +181,7 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
     :parameter dataset: Data Set to be considered (DataSet object)
     :parameter smsTopList: list of topologies containing elements (TopologyList object)
     :parameter maxMassDist: maximum mass distance for clustering elements (float)
-    :returns:  a TheoryPredictionList object containing a list of TheoryPrediction objects    
+    :returns:  a TheoryPredictionList object containing a list of TheoryPrediction objects
     """     
     predictionList = TheoryPredictionList()
     # Select elements belonging to expResult and apply efficiencies
@@ -227,8 +227,7 @@ def _getElementsFrom(smsTopList, dataset):
     
     :parameter dataset:  Data Set to be considered (DataSet object)
     :parameter smsTopList: list of topologies containing elements (TopologyList object)
-    :returns: list of elements (Element objects)
-    
+    :returns: list of elements (Element objects)    
     """
     
     tops = []

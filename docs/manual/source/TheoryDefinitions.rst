@@ -4,8 +4,6 @@
 .. |elements| replace:: :ref:`elements <element>`
 .. |topology| replace:: :ref:`topology <topology>`
 .. |topologies| replace:: :ref:`topologies <topology>`
-.. |analysis| replace:: :ref:`analysis <ULanalysis>`
-.. |analyses| replace:: :ref:`analyses <ULanalysis>`
 .. |bracket notation| replace:: :ref:`bracket notation <bracketNotation>`
 .. |final states| replace:: :ref:`final states <final states>`
 
@@ -17,7 +15,7 @@ Theory Definitions
 
 The so-called theory module contains the basic tools necessary for decomposing the input model
 (either in LHE or SLHA format) into SMS |topologies| and using the output of the decomposition
-to compute the :doc:`theoretical prediction <TheoryPredictions>` for a given :ref:`experimental analysis <ULanalysis>`.
+to compute the :doc:`theoretical prediction <TheoryPredictions>` for a given :ref:`experimental result <ExpResult>`.
 
 We start by explaining the basic components: vertices, Z\ :sub:`2`-even and Z\ :sub:`2`-odd states shown in the scheme below.
 The construction of a global |topology| and the |bracket notation| used in SModleS are explained further below on this page. 
@@ -25,7 +23,7 @@ The construction of a global |topology| and the |bracket notation| used in SModl
 .. _topscheme:
 
 .. image:: images/topScheme.png
-   :height: 280px
+   :width: 60%
 
 
 .. _vertex:
@@ -76,7 +74,7 @@ state.
 The figure below shows an example of a branch.
 
 .. image:: images/branchTop.png
-   :height: 100px
+   :width: 40%
 
 Each branch is fully defined by its number of vertices and the number of 
 :ref:`final states` coming out of each vertex. The particle labels for the |final states|
@@ -86,7 +84,7 @@ above), the branch belongs to a :ref:`global topology <topology>`. However, if i
 as in the figure below, the branch belongs to an |element|.
 
 .. image:: images/branchEl.png
-   :height: 100px
+   :width: 40%
    
 * **Branches are described by the** `Branch Class <../../../documentation/build/html/theory.html#theory.branch.Branch>`_   
 
@@ -104,7 +102,7 @@ branches, number of vertices in each :ref:`branch <branch>` and number of
 As as example consider the following topology:
 
 .. image:: images/globTop.png
-   :height: 200px
+   :width: 40%
 
 It contains 2 branches. The first (topmost) :ref:`branch <branch>` contains 3 vertices
 with 1 final state each in the first two vertices and zero in the third.
@@ -135,7 +133,7 @@ Below we show an example of an element and the information it contains.
 .. _elementscheme:
 
 .. image:: images/element.png
-   :height: 280px
+   :width: 60%
 
 * **Elements are described by the** `Element Class <../../../documentation/build/html/theory.html#theory.element.Element>`_    
 
