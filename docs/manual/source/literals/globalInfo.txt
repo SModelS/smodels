@@ -1,0 +1,12 @@
+sqrts: 8.0*TeV
+lumi: 19.4/fb
+id: CMS-SUS-12-024
+prettyName: \slash{E}_{T}+b
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS12024
+arxiv: http://arxiv.org/abs/1305.2390
+publication: http://www.sciencedirect.com/science/article/pii/S0370269313005339
+contact: Keith Ulmer <keith.ulmer@cern.ch>, Josh Thompson <joshua.thompson@cern.ch>, Alessandro Gaz <alessandro.gaz@cern.ch>
+private: False
+implementedBy: Wolfgang Waltenberger
+lastUpdate: 2015/5/11
+
