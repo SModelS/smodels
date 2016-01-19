@@ -36,6 +36,7 @@ Contents
    Introduction   
    SModelSDefs   
    Structure
+   Tools
    Installation
    RunningSModelS
    Examples
