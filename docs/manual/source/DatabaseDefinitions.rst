@@ -26,10 +26,10 @@ The SModelS database collects experimental results from both ATLAS and CMS, whic
 used to compute the experimental constraints on specific models.
 Starting with version 1.1, the SModelS database includes two types of experimental constraints:
 
-*  Upper Limit (UL) constraints: constraints on :math:`\sigma \times BR` of simplified models, provided 
+*  Upper Limit (UL) constraints: constrains on :math:`\sigma \times BR` of simplified models, provided 
    by the experimental collaborations (see |ULrs|);
-*  Efficiency Map (EM) constraints: constraints on :math:`\sigma \times BR \times \epsilon` of simplified models.
-   The efficiencies in this case are either provided by the experimental collaborations or
+*  Efficiency Map (EM) constraints: constrains the total signal (:math:`\sum \sigma \times BR \times \epsilon`) in
+   a specific signal region.  The efficiencies in this case are either provided by the experimental collaborations or
    computed by theory groups (see |EMrs|); 
 
 Although the two types of constraints above are very distinct,

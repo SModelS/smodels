@@ -21,19 +21,19 @@ logger.setLevel(level=logging.WARNING)
 
 class Info(object):
     """
-    Holds the global information contained in a globalInfo.txt file
+    Holds the meta data information contained in a .txt file
     (luminosity, sqrts, experimentID,...).
     Its attributes are generated according to the lines in the
-    globalInfo.txt file which contain "info_tag: value".
+    .txt file which contain "info_tag: value".
     
-    :ivar path: path to the globalInfo.txt file
+    :ivar path: path to the .txt file
     """
     
     def __init__(self, path=None):
                 
         self.path = path
         if path:
-            logger.debug('Creating object based on globalInfo.txt: %s' %self.path)        
+            logger.debug('Creating object based on  %s' %self.path)        
      
             #Open the info file and get the information:
             if not os.path.isfile(path):
