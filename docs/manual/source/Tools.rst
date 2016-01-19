@@ -237,3 +237,6 @@ in the :ref:`parameters file <parameterFile>` .
 In the output, the missing topologies are ordered by cross section. By default only the ones with the ten largest cross-sections are shown.
 
 * **The missing topologies tool is implemented by** `findMissingTopos <../../../documentation/build/html/tools.html#module-tools.missingTopologies>`_ **method**
+
+Database Browser
+----------------

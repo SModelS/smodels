@@ -6,20 +6,43 @@
 .. |conditions| replace:: :ref:`conditions <ULconditions>` 
 .. |fb-1| replace:: :math:`\mathrm{fb}^{-1}`
 .. |sqrts| replace:: :math:`\sqrt{s}`
-.. |analyses| replace:: :ref:`analyses <ULanalysis>`
+.. |EM| replace:: :ref:`EM-type <EMtype>`
+.. |UL| replace:: :ref:`UL-type <ULtype>`
+.. |EMr| replace:: :ref:`EM-type result <EMtype>`
+.. |ULr| replace:: :ref:`UL-type result <ULtype>`
+.. |EMrs| replace:: :ref:`EM-type results <EMtype>`
+.. |ULrs| replace:: :ref:`UL-type results <ULtype>`
+.. |ExpRes| replace:: :ref:`Experimental Result<ExpResult>`
+.. |ExpRess| replace:: :ref:`Experimental Results<ExpResult>`
+.. |Dataset| replace:: :ref:`Data Set<DataSet>`
+.. |Datasets| replace:: :ref:`Data Sets<DataSet>`
+.. |Database| replace:: :ref:`Database <Database>`
+.. |element| replace:: :ref:`element <element>`
+.. |elements| replace:: :ref:`elements <element>`
 
 Database of Experimental Results
 ================================
 
-SModelS stores all the information about the experimental results in an |analyses|
-database [*]_. The database is organized as files in an ordinary (UNIX) directory hierarchy,
+SModelS stores all the information about the experimental results in the 
+|Database|. 
+Below we describe both the :ref:`directory <folderStruct>` and :ref:`object <objStruct>` structure of the  |Database|.
+
+.. _folderStruct:
+
+Database: Directory Structure
+-----------------------------
+
+The :ref:`Database <Database>` is organized as files in an ordinary (UNIX) directory hierarchy,
 with a thin python layer serving as the access to the database.
+The overall structure of the directory hierarchy and its contents is depicted in the scheme below (click to enlarge):
 
+.. image:: images/DatabaseFolders.png
+   :height: 400px
 
-The top level of the SModelS database categorizes the analyses by LHC center-of-mass energies, |sqrts|:
+As seen above, the top level of the SModelS database categorizes the analyses by LHC center-of-mass energies, |sqrts|:
 
-* 7TeV
-* 8TeV
+* 8 TeV
+* 13 TeV
 
 Also, the top level directory contains a file called ``version`` with the version string
 of the database.
@@ -29,41 +52,122 @@ The second level splits the results up between the different experiments:
 * 8TeV/CMS/
 * 8TeV/ATLAS/
 
-The third level of the directory hierarchy encodes the publications:
+The third level of the directory hierarchy encodes the |ExpRess|:
 
-* 8TeV/CMS/CMS-PAS-SUS-12-026
-* 8TeV/ATLAS/ATLAS-SUSY-2013-12
+* 8TeV/CMS/CMS-SUS-12-024
+* 8TeV/ATLAS/ATLAS-CONF-2013-047
 * ...
 
-For each publication, there are two files:
+* **The Database folder is described by the** `Database Class <../../../documentation/build/html/experiment.html#experiment.databaseObjects.Database>`_
 
-* ``sms.py`` contains the experimental results for the cross-section upper limits as a function of the mass parameters, as python code. 
-  The code will fill a nested ``Dict`` dictionary with the upper limits. The dictionary keys are the corresponding *Txnames* for the
-  analysis |constraint| (see :doc:`Analyses Names <AnalysesNames>`).
-    
-* ``info.txt`` contains all the meta information around the publication. Here is the content of CMS-SUS-13-006 as an example:
+Experimental Result Folder
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. literalinclude:: /literals/info.txt
+Each |ExpRes| folder contains: 
+
+* a folder for each |Dataset| (``data-xx``)
+* a ``globalInfo.txt`` file
+
+The ``globalInfo.txt`` file contains the meta information about the |ExpRes|.
+It defines the center-of-mass energy |sqrts|, the integrated luminosity, the id used to identify the result
+and additional information about the source of the data.
+Here is the content of CMS-SUS-12-024/globalInfo.txt as an example:
+      
+.. literalinclude:: /literals/globalInfo.txt
+   :lines: 1-11
+
+* **Experimental Result folder is described by the** `ExpResult Class <../../../documentation/build/html/experiment.html#experiment.databaseObjects.ExpResult>`_
+* **globalInfo files  are descrived by the** `Info Class <../../../documentation/build/html/experiment.html#experiment.infoObject.Info>`_
+
+Data Set Folder
+^^^^^^^^^^^^^^^
+
+Each |Dataset| folder (``data-xx``) contains:
+
+* the Upper Limit maps for |ULrs| or Efficiency maps for |EMrs| (``TxName.txt`` files)
+* a ``dataInfo.txt`` file containing meta information about the |Dataset|
+
+* **Data Set folders are  described by the** `DataSet Class <../../../documentation/build/html/experiment.html#experiment.datasetObject.DataSet>`_
+* **TxName files are descrived by the** `TxName Class <../../../documentation/build/html/experiment.html#experiment.txnameObject.TxName>`_
+* **dataInfo files  are descrived by the** `Info Class <../../../documentation/build/html/experiment.html#experiment.infoObject.Info>`_
+
+Data Set Folder: Upper Limit Type
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Since |ULrs| have a single dataset (see |Datasets|), the info file only holds some trivial
+information, such as the type of |ExpRes| (UL) and the dataset id (None).
+Here is the content of CMS-SUS-12-024/data/dataInfo.txt  as an example:
+
+.. literalinclude:: /literals/dataInfo.txt
+   :lines: 1-2
+
+For |ULrs|, each ``TxName.txt`` file contains the UL map for a given |element| or sum of |elements|
+(see |ExpRess|) as well as some meta information, including the corresponding |constraint| and the |conditions|.
+Here is the first few lines of CMS-SUS-12-024/data/T1tttt.txt:
+
+.. literalinclude:: /literals/T1tttt.txt
+   :lines: 1-9
+   
+As seen above, the first block of data in the ``T1tttt.txt`` file contains information about
+the |element| (:math:`[[[t,t]],[[t,t]]]`) for which the data refers to as well as reference to the original data source and
+some additional information.
+The second block of data contains the upper limit map as a function of the BSM masses:
+
+.. literalinclude:: /literals/T1tttt.txt
+   :lines: 10-20
+
+As we can see, the UL map is given as a python array with the structure: 
+:math:`[[\mbox{masses},\mbox{upper limit}], [\mbox{masses},\mbox{upper limit}],...]`.
+
+Data Set Folder: Efficiency Map Type
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For |EMrs| the ``dataInfo.txt`` contains relevant information,
+such as an id to identify the |dataset| (signal region), the number of observed and expected background
+events for the corresponding signal region and the respective signal upper limits. 
+Here is the content of CMS-SUS-13-012-eff/3NJet6_1000HT1250_200MHT300/dataInfo.txt  as an example:
+
+.. literalinclude:: /literals/dataInfo-eff.txt
+   :lines: 1-7
+
+For |EMrs|, each ``TxName.txt`` file contains the efficiency map for a given |element| or sum of |elements|
+(see |ExpRess|) as well as some meta information.
+Here is the first few lines of CMS-SUS-13-012-eff/3NJet6_1000HT1250_200MHT300/T2.txt:
+
+.. literalinclude:: /literals/T2.txt
    :lines: 1-8
+   
+As seen above, the first block of data in the ``T2.txt`` file contains information about
+the |element| (:math:`[[[jet]],[[jet]]]`) for which the efficiencies refers to as well as 
+reference to the original data source and some additional information.
+The second block of data contains the efficiency map as a function of the BSM masses:
 
-In particular, it defines the center-of-mass energy |sqrts| (in TeV) and the integrated luminosity, |fb-1|.
-Optionally, units (e.g. "* TeV" or "/ fb") can be added to the number.
+.. literalinclude:: /literals/T2.txt
+   :lines: 9-15
 
-The next block:
+As we can see the efficiency map is given as a python array with the structure: 
+:math:`[[\mbox{masses},\mbox{efficiency}], [\mbox{masses},\mbox{efficiency}],...]`.
 
-.. literalinclude:: /literals/info.txt
-   :lines: 9-10,15-16
+.. _objStruct:
 
-holds the constraint and conditions, as described in |constraint|, and |conditions|, respectively.
+Database: Object Structure
+--------------------------
 
-Finally,
+The :ref:`Database  folder structure <folderStruct>` is mapped to python objects in SModelS.
+The mapping is almost one-to-one, except for a few exceptions.
+Below we show the overall object structure  as well as the folders/files the objects
+represent (click to enlarge):
 
-.. literalinclude:: /literals/info.txt
-   :lines: 21
+.. image:: images/DatabaseObjects.png
+   :height: 400px
+   
+The type of python object (python class, phyton list,...) is shown in brackets.
+For convenience, below we explicitly list the main database folders/files and the python objects they
+are mapped to:
 
-describes the mass planes and how for analyses with intermediate masses, the
-two-dimensional histograms map onto the three-dimensional SMS parameter space.
-
-
-
-.. [*] Currently only cross section upper limits are included (see :ref:`UL Analyses <ULanalysis>`). 
+* |Database| folder :math:`\rightarrow` `Database Class <../../../documentation/build/html/experiment.html#experiment.databaseObjects.Database>`_
+* |ExpRes| folder :math:`\rightarrow` `ExpResult Class <../../../documentation/build/html/experiment.html#experiment.databaseObjects.ExpResult>`_
+* |Dataset| folder :math:`\rightarrow` `DataSet Class <../../../documentation/build/html/experiment.html#experiment.datasetObject.DataSet>`_
+* ``globalInfo.txt`` file  :math:`\rightarrow` `Info Class <../../../documentation/build/html/experiment.html#experiment.infoObject.Info>`_
+* ``dataInfo.txt`` file  :math:`\rightarrow` `Info Class <../../../documentation/build/html/experiment.html#experiment.infoObject.Info>`_
+* ``Txname.txt`` file  :math:`\rightarrow` `TxName Class <../../../documentation/build/html/experiment.html#experiment.txnameObject.TxName>`_

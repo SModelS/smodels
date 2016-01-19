@@ -143,7 +143,7 @@ class TxName(object):
         For upper limit results, checks if the input element appears in the constraints
         and falls inside the upper limit grid.
         If it does, returns efficiency = 1, else returns efficiency = 0.
-        For efficiency map results, checks if the input element appears in the constraints.
+        For efficiency map results, checks if the input element appears in the constraints
         and falls inside the efficiency map grid.
         If it does, returns the corresponding efficiency value, else returns efficiency = 0.
         

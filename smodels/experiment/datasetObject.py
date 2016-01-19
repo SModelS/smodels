@@ -22,7 +22,7 @@ logger.setLevel(level=logging.ERROR)
 
 
 class DataSet(object):
-    """Holds the information to a data folder (TxName objects, dataInfo,...)
+    """Holds the information to a data set folder (TxName objects, dataInfo,...)
     """
         
     def __init__(self, path=None, infoObj=None):

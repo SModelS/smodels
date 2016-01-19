@@ -78,11 +78,9 @@ class ExpResult(object):
     def getUpperLimitFor(self, dataID=None, alpha=0.05, expected=False,
                           txname=None, mass=None, compute=False):
         """
-        Computes a 95% upper limit on the signal cross-section according to the type of result.
-        If dataID is defined, returns the UL for the signal*efficiency for an efficiency
-        type result for the given dataSet ID (signal region).
-        If txname and mass are defined, returns the UL for the signal*BR for a upper-limit
-        type result for the given mass array and Txname.
+        Computes the 95% upper limit (UL) on the signal cross-section according to the type of result.
+        For an Efficiency Map type, returns  the UL for the signal*efficiency for the given dataSet ID (signal region).
+        For  an Upper Limit type,  returns the UL for the signal*BR for for the given mass array and Txname.
         
         :param dataID: dataset ID (string) (only for efficiency-map type results)
         :param alpha: Can be used to change the C.L. value. The default value is 0.05 (= 95% C.L.)
