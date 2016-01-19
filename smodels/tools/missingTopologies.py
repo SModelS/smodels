@@ -25,7 +25,9 @@ class MissingTopo():
 class MissingTopoList(object):
     """
     Object to find and collect MissingTopo objects, plus printout functionality
+    
     :ivar sqrts: center of mass energy for which missing topologies should be evaluated
+    
     """
     def __init__(self, sqrts):
         self.sqrts = sqrts

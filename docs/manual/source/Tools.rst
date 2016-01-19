@@ -15,6 +15,11 @@
 .. |final states| replace:: :ref:`final states <final states>`
 .. |database| replace:: :doc:`database <Database>`
 .. |bracket notation| replace:: :ref:`bracket notation <bracketNotation>`
+.. |ExpRes| replace:: :ref:`Experimental Result<ExpResult>`
+.. |ExpRess| replace:: :ref:`Experimental Results<ExpResult>`
+.. |Database| replace:: :ref:`Database <Database>`
+.. |Dataset| replace:: :ref:`Data Set<DataSet>`
+.. |Datasets| replace:: :ref:`Data Sets<DataSet>`
 
 SModelS Tools
 =============
@@ -236,7 +241,19 @@ The missing topologies tool is normally called from within SModelS (e.g. when ru
 in the :ref:`parameters file <parameterFile>` .
 In the output, the missing topologies are ordered by cross section. By default only the ones with the ten largest cross-sections are shown.
 
-* **The missing topologies tool is implemented by** `findMissingTopos <../../../documentation/build/html/tools.html#module-tools.missingTopologies>`_ **method**
+* **The missing topologies tool is implemented by the** `MissingTopoList class <../../../documentation/build/html/tools.html#tools.missingTopologies.MissingTopoList>`_ 
 
 Database Browser
 ----------------
+
+In several cases the user might be interested in an easy way to directly access the |Database| of |ExpRess|.
+This can be conveniently done using the database browser. The browser owns several methods to select  |ExpRess|
+or |Datasets| satisfying some user-defined conditions as well as to access the meta data and data inside each
+|ExpRes|. 
+
+Unlike most of the other SModelS tools, the browser can not be directly accessed from the command line.
+However, several python example codes using the functionalities of the browser
+can be found in :ref:`More Examples <Examples>`.
+Below we will quickly describe how to instantiate the browser and use its main functionalities.
+
+* **The Database browser tool is implemented by the**  `Browser class <../../../documentation/build/html/tools.html#tools.databaseBrowser.Browser>`_
