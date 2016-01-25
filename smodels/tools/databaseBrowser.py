@@ -1,8 +1,9 @@
 """
-.. module:: databaseBrowserNewStructure
+.. module:: databaseBrowser
    :synopsis: Centralized facility to access smodels-database.
 
 .. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
 """
 
