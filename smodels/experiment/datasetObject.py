@@ -52,12 +52,12 @@ class DataSet(object):
         """
         Returns a list for the possible values appearing in the DataSet
         for the required attribute.
-        If there is a single value, returns the value itself.
+
         
         :param attribute: name of a field in the database (string). If not defined
                           it will return a dictionary with all fields and their respective
                           values
-        :return: list of values or single value
+        :return: list of values
         """
         
         
