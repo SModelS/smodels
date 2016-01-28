@@ -33,10 +33,11 @@ class PropItem(SelectableDataItem):
                                     ,0.9*button.parent.parent.parent.parent.parent.height)
             
 
-        self.popup.bind(on_dismiss=self.checkSelection)                
+            self.popup.bind(on_dismiss=self.checkSelection)                
         self.popup.open()
     
     def checkSelection(self,button):
+        
         self.is_selected = False
         for val in self.valScreen.valItems:
             if val.is_selected:
@@ -156,9 +157,9 @@ class ValItem(SelectableDataItem):
         self.button = None
         
     def changeSel(self,button):
-        self.button = button           
-        self.is_selected = not self.is_selected        
-            
+        self.button = button
+        self.is_selected = not self.is_selected
+             
 class ULgetter(BoxLayout):
     """
     Defines the box for the upper limit calculator
