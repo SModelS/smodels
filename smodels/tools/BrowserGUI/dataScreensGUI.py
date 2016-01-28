@@ -9,6 +9,9 @@
 """
 
 import sys,os
+from kivy.logger import Logger
+import webbrowser  #To open URL links
+from kivy.uix.image import Image
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
@@ -22,7 +25,6 @@ from kivy.graphics import Color,Rectangle
 from kivy.metrics import sp
 Window.clearcolor = [0.08627450980392157, 0.10196078431372549, 0.10588235294117647, 1.0]
 from dataObjectsGUI import ValItem, ExpResItem, PropItem, datasetItem, txnameItem
-
 sys.path.append(os.path.join(os.getenv("HOME"),'smodels'))
 from smodels.tools.physicsUnits import GeV
 
@@ -219,7 +221,8 @@ class InfoScreen(BoxLayout):
         info_items = []
         for name,val in expRes.globalInfo.__dict__.items():            
             if 'http' in str(val):
-                iline = '[b] [size=17]'+str(name) + '[/size] [/b] :  [ref]' + str(val) + '[/ref]'
+                iline = '[b] [size=17]'+str(name) + '[/size] [/b] : [ref='+str(val)+'] [color=ff9999] '
+                iline  += str(val) + '[/color] [/ref]'
             else:
                 iline = '[b] [size=17]'+str(name) + '[/size] [/b] : ' + str(val)
             info_items.append(iline)
@@ -406,6 +409,7 @@ class TxnameScreen(BoxLayout):
 
         self.orientation = 'vertical'
         self.txname = txname
+        self.padding = 10
         self.infoItems = []
         with self.canvas.before:
             Color(0.10390763765541741, 0.1238898756660746, 0.12788632326820604, 1.0)
@@ -424,18 +428,36 @@ class TxnameScreen(BoxLayout):
                 if name.lower() == 'efficiencymap' or name.lower() == 'upperlimits': continue
                 if name.lower() == 'txnamedata': continue
                 if name.lower() == 'globalinfo': continue
-                if name[0] == '_': continue 
-                self.infoItems.append('[b] [size=17]'+str(name) + '[/size] [/b] : ' + str(val))
+                if name[0] == '_': continue
+                if 'http' in str(val):
+                    iline = '[b] [size=17]'+str(name) + '[/size] [/b] : [ref='+str(val)+'] [color=ff9999] '
+                    iline  += str(val) + '[/color] [/ref]'
+                else:
+                    iline = '[b] [size=17]'+str(name) + '[/size] [/b] : ' + str(val)                
+                self.infoItems.append(iline)
             list_adapter = SimpleListAdapter(data=sorted(self.infoItems),
                                          cls=myLabel, selection_mode='single')        
             txnameInfoList = ListView(adapter=list_adapter)
             txnameInfoList.children[0].bar_width = sp(5)
-            txnameInfoList.size_hint_y = 0.9
+            txnameInfoList.size_hint_y = 0.6
             txnameLabel = Label(text='%s Info:' %self.txname.getInfo('txName'), font_size = sp(20))
             txnameLabel.size_hint_y = 0.1
             
+            if os.path.isfile('./feyn/'+self.txname.getInfo('txName')+'_feyn.png'):
+                txImage = Image(source='./feyn/'+self.txname.getInfo('txName')+'_feyn.png')
+                txImage.size_hint = (0.2,0.5)
+                with txImage.canvas.before:
+                    Color(1.,1.,1.,1.)            
+                    txImage.rect = Rectangle(size=txImage.size,pos=txImage.pos)
+                    txImage.bind(pos=update_rect, size=update_rect)
+            else:
+                txImage = myLabel(text="[i] [size=20] (TxName image not found) [/size] [/i]")
+                txImage.markup = True
+                txImage.size_hint_y = 0.5
+            
             self.add_widget(txnameLabel)
             self.add_widget(txnameInfoList)
+            self.add_widget(txImage)
             
 
 class ULgetter(FloatLayout):
@@ -593,13 +615,16 @@ class myLabel(Label):
         self.shorten = True
         self.bind(on_ref_press=self.openlink)
         
-    def openlink(self,link):
+    def openlink(self,mlabel,link):
         """
-        Open link in the webbrowser (not implemented)
+        Open link in the webbrowser
+        :param mlabel: myLabel object
         :param link: url address
         """
-        import webbrowser
-        webbrowser.open(link)
+        try:            
+            webbrowser.open(link)
+        except:
+            Logger.error("Failed to open link: %s" %link)
 
 def selectResults(button):
     """
