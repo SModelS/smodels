@@ -371,8 +371,13 @@ class ValuesScreen(BoxLayout):
         creates a selectable list with the set of all values
         """
         if not self.children:   
-            #values:
-            values = dict([[str(v),v] for v in self.browser.getValuesFor(attribute=self.name)])                       
+            #Get all possible values for the attributes using the full database.
+            #To make sure that the values are taken from all exp results, temporarily restore the
+            #browser to the pre-selection state
+            tmpRes = self.browser._selectedExpResults[:]
+            self.browser.loadAllResults()            
+            values = dict([[str(v),v] for v in self.browser.getValuesFor(attribute=self.name)])
+            self.browser._selectedExpResults = tmpRes                       
             for val_str in sorted(values.keys()):
                 self.valItems.append(ValItem(self.name,values[val_str]))        
             
