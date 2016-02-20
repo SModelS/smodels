@@ -353,15 +353,21 @@ class TextBasedPrinter(object):
         output = ""
 
         output += "#Analysis  Tx_Name  Sqrts  Cond. Violation  Theory_Value(fb)  Exp_limit(fb)  r\n\n"
+        # Suggestion to obtain expected limits:
+        # output += "#Analysis  Tx_Name  Sqrts  Cond. Violation  PredTheory(fb)  ULobserved (fb) ULexpected (fb)  r\n\n"
         for theoPred in obj.theoryPredictions:
             expResult = theoPred.expResult
             datasetID = theoPred.dataset.getValuesFor('dataId')[0]
             dataType = expResult.getValuesFor('dataType')[0]        
             if dataType == 'upperLimit':
                 ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass)
+                # Suggestion to obtain expected limits:
+                # expected = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass, expected=True)
                 txname = theoPred.txnames[0]
             elif dataType == 'efficiencyMap':
                 ul = expResult.getUpperLimitFor(dataID=datasetID)
+                # Suggestion to obtain expected limits:
+                # expected = expResult.getUpperLimitFor(dataID=datasetID, expected=True, compute=True)
                 txname = None
             else:
                 logger.error("Unknown dataType %s" %(str(dataType)))
@@ -371,6 +377,8 @@ class TextBasedPrinter(object):
             output += "%4s " % (expResult.getValuesFor("sqrts")[0]/ TeV)  # sqrts
             output += "%5s " % theoPred.getmaxCondition()  # condition violation            
             output += "%10.3E %10.3E " % (theoPred.value[0].value / fb, ul / fb)  # theory cross section , expt upper limit
+            # Suggestion to obtain expected limits:
+            # output += "%10.3E " % (expected / fb)  # expected upper limit
             output += "%10.3E\n" % obj.getR(theoPred)
             if objOutputLevel == 2:
                 output += "#" + str(txname) + "\n"            
