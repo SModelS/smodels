@@ -113,7 +113,7 @@ class ExpResult(object):
                 return False
                 
             if compute:
-                upperLimit = useDataset.getSRUpperLimit(alpha, expected)
+                upperLimit = useDataset.getSRUpperLimit(alpha, expected, compute)
             else:
                 upperLimit = useDataset.dataInfo.upperLimit
                 if (upperLimit/fb).normalize()._unit:
