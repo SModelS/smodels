@@ -40,6 +40,8 @@ class Branch(object):
         self.particles = []
         self.PIDs = []
         self.maxWeight = None
+        self.vertnumb = None
+        self.vertparts = None
         if type(info) == type(str()):
             branch = elementsInStr(info)
             if not branch or len(branch) > 1:
@@ -57,6 +59,8 @@ class Branch(object):
                             logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
                             raise SModelSError()
                     self.particles.append(ptcs)
+            self.vertnumb = len(self.particles)
+            self.vertparts = [len(v) for v in self.particles]
 
 
     def __str__(self):
@@ -92,6 +96,44 @@ class Branch(object):
         return not self.isEqual(other)
 
 
+    def setInfo(self):
+        """
+        Defines the number of vertices (vertnumb) and number of
+        particles in each vertex (vertpats) properties, if they have not
+        been defined yet.
+        """
+
+        self.vertnumb = len(self.particles)
+        self.vertparts = [len(v) for v in self.particles]
+
+    
+    def particlesMatch(self, other, useDict=True):
+        """
+        Compare two Branches for matching particles (same as isEqual, but ignores
+        mass differences)
+        
+        :parameter other: branch to be compared (Branch object)
+        :parameter useDict: if True, allow for inclusive particle labels
+        :returns: True if branches are equal (particles and masses match); False otherwise.              
+        """
+        
+        if type (other) != type(self):
+            return False
+        
+        #Make sure number of vertices and particles have been defined
+        self.setInfo()
+        other.setInfo()
+        if self.vertnumb != other.vertnumb:
+            return False
+        if self.vertparts != other.vertparts:
+            return False
+
+        for iv,vertex in enumerate(self.particles):
+            if not simParticles(vertex,other.particles[iv]):
+                return False                        
+        return True
+    
+
     def isEqual(self, other, useDict=True):
         """
         Compares two branches. If particles are similar
@@ -101,14 +143,13 @@ class Branch(object):
         :parameter useDict: if True, allow for inclusive particle labels
         :returns: True if branches are equal (particles and masses match); False otherwise.              
         """
-        if type (other) != type(self):
+        
+        if not self.particlesMatch(other, useDict):
             return False
-        if not simParticles(self.particles, other.particles, useDict):
+        elif self.masses != other.masses:
             return False
-        if self.masses != other.masses:
-            return False
-        return True
-
+        
+        return True    
 
     def copy(self):
         """
@@ -121,6 +162,9 @@ class Branch(object):
         newbranch.masses = self.masses[:]
         newbranch.particles = self.particles[:]
         newbranch.PIDs = []
+        self.setInfo()
+        newbranch.vertnumb = self.vertnumb
+        newbranch.vertparts = self.vertparts[:]
         for pidList in self.PIDs:
             newbranch.PIDs.append(pidList[:])
         if not self.maxWeight is None:
@@ -130,10 +174,11 @@ class Branch(object):
 
     def getLength(self):
         """
-        Returns the branch length (= number of R-odd masses).
+        Returns the branch length (number of R-odd particles).
         
-        :returns: length of branch (number of cascade decay steps)
+        :returns: length of branch (number of R-odd particles)
         """
+        
         return len(self.masses)
 
 

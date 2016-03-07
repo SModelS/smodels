@@ -104,22 +104,29 @@ class Element(object):
         :parameter useDict: if True, allow for inclusive particle labels.
         :returns: True, if all masses and particles are equal; False, else;        
         """
+
         if type(self) != type(other):
             return False
-        mass = self.getMasses()
-        massA = other.getMasses()
+        
+        if len(self.branches) != len(other.branches):
+            return False
 
-        if self.particlesMatch(other, order=True, useDict=useDict) \
-                and mass == massA:
-            return True
-        if not order:
-            otherB = other.switchBranches()
-            massB = otherB.getMasses()
-            if self.particlesMatch(otherB, order=True, useDict=useDict) \
-                    and mass == massB:
+        #Check if particles inside each branch match in the correct order
+        branchMatches = []
+        for ib,br in enumerate(self.branches):
+            branchMatches.append(br.isEqual(other.branches[ib], useDict))
+        if sum(branchMatches) == 2:
                 return True
+        elif order:
+                return False
+        else:        
+        #Now check for opposite order
+            for ib,br in enumerate(self.switchBranches().branches):
+                if not br.isEqual(other.branches[ib], useDict):
+                    return False
 
-        return False
+            return True
+
 
 
     def particlesMatch(self, other, order=False, useDict=True):
@@ -135,16 +142,25 @@ class Element(object):
         
         if type(self) != type(other):
             return False
-        ptcs = self.getParticles()
-        ptcsA = other.getParticles()
-        if simParticles(ptcs, ptcsA, useDict):
-            return True
-        if not order:
-            ptcsB = other.switchBranches().getParticles()
-            if simParticles(ptcs, ptcsB, useDict):
-                return True
+        
+        if len(self.branches) != len(other.branches):
+            return False
 
-        return False
+        #Check if particles inside each branch match in the correct order
+        branchMatches = []
+        for ib,br in enumerate(self.branches):
+            branchMatches.append(br.particlesMatch(other.branches[ib], useDict))
+        if sum(branchMatches) == 2:
+                return True
+        elif order:
+                return False
+        else:        
+        #Now check for opposite order
+            for ib,br in enumerate(self.switchBranches().branches):
+                if not br.particlesMatch(other.branches[ib], useDict):
+                    return False
+
+            return True
 
 
     def copy(self):
@@ -434,6 +450,7 @@ class Element(object):
                         new_branch.masses.pop(iv-ncomp)
                         new_branch.particles.pop(iv-ncomp)
                         ncomp +=1
+                    new_branch.setInfo() 
 
         return newelement
     
@@ -484,6 +501,7 @@ class Element(object):
                     newelement.branches[ib].particles.pop(ivertex)
                 else:
                     break
+            newelement.branches[ib].setInfo()
 
         if newelement.isEqual(self):
             return None
