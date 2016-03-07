@@ -195,7 +195,7 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
     for el in elements:
         for xsec in el.weight:          
             if xsec.info.sqrts != dataset.globalInfo.sqrts:
-                el.weight.delete(xsec)    
+                el.weight.delete(xsec)
 
     # Combine elements according to their respective constraints and masses
     # (For efficiencyMap analysis group all elements)
@@ -377,7 +377,7 @@ def _evalExpression(stringExpr,cluster):
     expr = stringExpr[:].replace("'","").replace(" ","")
     for iel, el in enumerate(elements):        
         expr = expr.replace(str(el), "elements["+ str(iel) +"].weight")        
-        for el1 in cluster.elements:                    
+        for el1 in cluster.elements:
             if el1.particlesMatch(el):
                 el.weight.combineWith(el1.weight)
                 el.combineMotherElements(el1) ## keep track of all mothers
