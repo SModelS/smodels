@@ -46,7 +46,7 @@ class ClustererTest(unittest.TestCase):
         data = [ [ [[ 675.*GeV, 200.*GeV], [ 675.*GeV, 200.*GeV] ],  .03*fb ], 
                [ [[ 725.*GeV,200.*GeV], [ 725.*GeV,200.*GeV] ], .06*fb ] ,
                [ [[ 750.*GeV,250.*GeV], [ 750.*GeV,250.*GeV] ], .03*fb ] ]
-        txnameData=TxNameData ( "upperlimit", data )
+        txnameData=TxNameData(data)
         txname=TxName("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/T2bb.txt","info")
         txname.txnameData = txnameData
         newel=clusterTools.clusterElements ( [e0,e1],txname, 5. )
