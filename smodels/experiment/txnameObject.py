@@ -188,7 +188,7 @@ class TxNameData(object):
         Uses the information in store_value to generate the data grid used for interpolation.
         """
         
-        if type(self.store_value)==str:
+        if type(self.store_value)==str:            
             self.data = eval(self.store_value, {'fb' : fb, 'pb' : pb, 'GeV' : GeV, 'TeV' : TeV})
         else: ## the data can also be given as lists, for debugging
             self.data = self.store_value

@@ -23,10 +23,10 @@ class LheReaderTest(unittest.TestCase):
         element = lheDecomposer.elementFromEvent(event,
                                              crossSection.XSectionList())
         s=str(element)
-        assert ( s == "[[[jet,jet]],[[jet,jet]]]" )
+        assert ( s == "[[[q,q]],[[q,q]]]" )
         b0=element.branches[0]
         sb0=str(b0)
-        assert ( sb0 == "[[jet,jet]]" )
+        assert ( sb0 == "[[q,q]]" )
         assert ( b0.masses[0]-675*GeV ) < .1*GeV
         assert ( b0.masses[1]-600*GeV ) < .1*GeV
 
