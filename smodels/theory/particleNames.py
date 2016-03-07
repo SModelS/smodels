@@ -14,6 +14,7 @@ import copy
 import logging
 from smodels.particles import rEven, rOdd, ptcDic
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -164,102 +165,91 @@ def vertInStr(instring):
     return vertices
 
 
-def simParticles(ptype1, ptype2, useDict=True):
+def simParticles(plist1, plist2, useDict=True):
     """
-    Compares 2 particle names or 2 nested name arrays. Allows for dictionary
-    labels (Ex: L = l, l+ = l, l = l-,...). For the last nested level ignore
-    particle ordering.
+    Compares two lists of particle names. Allows for dictionary
+    labels (Ex: L = l, l+ = l, l = l-,...). Ignores particle ordering inside
+    the list
  
-    :param ptype1: first (nested) list of particle names, e.g. ['l','jet']
-    :param ptype2: second (nested) list of particle names 
+    :param plist1: first list of particle names, e.g. ['l','jet']
+    :param plist2: second list of particle names 
     :param useDict: use the translation dictionary, i.e. allow e to stand for
                     e+ or e-, l+ to stand for e+ or mu+, etc 
-    :returns: boolean
-    
+    :returns: True/False if the particles list match (ignoring order)    
     """
 
-    wrongFormat = False
-    if type(ptype1) != type(ptype2):
-        return False
-    # Check for nested arrays (should be in the standard notation [[[]],[[]]])
-    if type(ptype1) == type([]):
-        if len(ptype1) != len(ptype2):
-            return False
-        for ib, br in enumerate(ptype1):
-            if type(br) != type(ptype2[ib]) or type(br) != type([]):
-                wrongFormat = True
-            # Check number of vertices in branch
-            if len(ptype1[ib]) != len(ptype2[ib]):
-                return False
-            for iv, vt in enumerate(br):
-                if type(vt) != type(ptype2[ib][iv]) or type(vt) != type([]):
-                    wrongFormat = True
-                # Check number of particles in vertex
-                if len(ptype1[ib][iv]) != len(ptype2[ib][iv]):
-                    return False
-                for ptc in ptype1[ib][iv] + ptype2[ib][iv]:
-                    if not ptc in ptcDic.keys() + rEven.values():
-                        wrongFormat = True
-    if wrongFormat:
-        logger.error("Wrong input format!" + str(ptype1) + " " + str(ptype2))
+    if not isinstance(plist1,list) or type(plist1) != type(plist2):
+        logger.error("Input must be a list")
         raise SModelSError()
+    if len(plist1) != len(plist2):
+        return False
+    for i,p in enumerate(plist1):
+        if not isinstance(p,str) or not isinstance(plist2[i],str):
+            logger.error("Input must be a list of particle strings")
+            raise SModelSError()
+        elif not p in ptcDic.keys() + rEven.values():
+            logger.error("Unknow particle: %s" %p)
+            raise SModelSError()
+        elif not plist2[i] in ptcDic.keys() + rEven.values():
+            logger.error("Unknow particle: %s" %plist2[i])
+            raise SModelSError()
+                        
+        
+    l1 = sorted(plist1)
+    l2 = sorted(plist2)
+    if not useDict:
+        return l1 == l2
+    
+    #If dictionary is to be used, replace particles by their dictionay entries
+    #e.g. [jet,mu+] -> [[q,g,c],[mu+]], [jet,mu] -> [[q,g,c],[mu+,mu-]] 
+    extendedL1 = []    
+    for i,p in enumerate(plist1):
+        if not p in ptcDic:
+            extendedL1.append([p])
+        else:
+            extendedL1.append(ptcDic[p])
+    extendedL2 = []    
+    for i,p in enumerate(plist2):
+        if not p in ptcDic:
+            extendedL2.append([p])
+        else:
+            extendedL2.append(ptcDic[p])
+    
+    #Generate all combinations of particle lists
+    #e.g. [[q,g,c],[mu+]] -> [[q,mu+],[g,mu+],[c,mu+]]
+    extendedL1 = cartesian(extendedL1).tolist()
+    extendedL2 = cartesian(extendedL2).tolist()
+    #Sort the particles in each element, since the order does not matter
+    for ip,p in enumerate(extendedL1):
+        extendedL1[ip] = sorted(p)
+    for ip,p in enumerate(extendedL2):
+        extendedL2[ip] = sorted(p)
 
-    # Put input in standard notation
-    if type(ptype1) == type("str"):
-        ptype1v = [[[ptype1]], [[ptype1]]]
-        ptype2v = [[[ptype2]], [[ptype2]]]
-    else:
-        ptype1v = ptype1[:]
-        ptype2v = ptype2[:]
+    #Now compare the two lists and see if there is a match:
+    for plist in extendedL1:
+        if plist in extendedL2: return True
+        
+    return False
 
-    # Loop over branches
-    for ibr, br in enumerate(ptype1v):
-        # Loop over vertices
-        for iv, vt in enumerate(br):
-            # Check if lists match, ignoring possible dictionary entries
-            pmatch = True
-            for ptc in ptype1v[ibr][iv]:
-                if ptype1v[ibr][iv].count(ptc) != ptype2v[ibr][iv].count(ptc):
-                    pmatch = False
-            if pmatch:
-                continue
-            elif not useDict:
-                return False
-            # If they do not match and useDict=True, generate all possible
-            # lists from dictionary entries:
-            allptcs = [[ptype1v[ibr][iv]], [ptype2v[ibr][iv]]]
-            for allpt in allptcs:
-                ptc0 = copy.deepcopy(allpt[0])
-                for ipt in range(len(ptc0)):
-                    if ptc0[ipt] in ptcDic:
-                        for jpt in range(len(allpt)):
-                            if allpt[jpt] == []:
-                                continue
-                            newptc = copy.deepcopy(allpt[jpt])
-                            for ptc in ptcDic[ptc0[ipt]]:
-                                newptc[ipt] = ptc
-                                allpt.append(copy.deepcopy(newptc))
-                            allpt[jpt] = []
-                while allpt.count([]) > 0:
-                    allpt.remove([])
-
-            # Compare all possibilities
-            match = False
-            iA = 0
-            while not match and iA < len(allptcs[0]):
-                ptcA = allptcs[0][iA]
-                for ptcB in allptcs[1]:
-                    if len(ptcA) != len(ptcB):
-                        return False
-                    pmatch = True
-                    for ptc in ptcA:
-                        if ptcA.count(ptc) != ptcB.count(ptc):
-                            pmatch = False
-                    if pmatch:
-                        match = True
-                        break
-                iA += 1
-            if not match:
-                return False
-    # Entries are similar
-    return True
+def cartesian(arrays, out=None):
+    """
+    Defines the cartesian products of a list of arrays
+    :param arrays: A list of arrays (e.g. [[a,b,c],[c],[d,e]])
+    :param out: Auxiliary array for calculations
+    
+    :return: 2-D array (e.g. [ [a,c,d],[a,c,e],[b,c,d],[b,c,e],[c,c,d],[c,c,e] ])
+    """
+    arrays = [np.asarray(x) for x in arrays]
+    dtype = max([ar.dtype for ar in arrays])
+    #dtype = arrays[0].dtype
+    n = np.prod([x.size for x in arrays])
+    if out is None:
+        out = np.zeros([n, len(arrays)], dtype=dtype)
+    m = n / arrays[0].size
+    out[:,0] = np.repeat(arrays[0], m)
+    if arrays[1:]:
+        cartesian(arrays[1:], out=out[0:m,1:])
+        for j in xrange(1, arrays[0].size):
+            out[j*m:(j+1)*m,1:] = out[0:m,1:]
+    
+    return out
