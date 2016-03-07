@@ -8,6 +8,8 @@
     
 """
 
+import sys
+sys.path.append("../")
 from smodels.theory import slhaDecomposer
 from smodels.tools.physicsUnits import GeV, fb
 import unittest
@@ -30,7 +32,7 @@ class SlhaDecompositionTest(unittest.TestCase):
         self.assertEqual ( len(ellist), 1 )
         element=ellist[0]
         #print element
-        self.assertEqual ( str (element), "[[[jet,jet]],[[jet,jet]]]" )
+        self.assertEqual ( str (element), "[[[q,q]],[[q,q]]]" )
         #print element.weight
 
 if __name__ == "__main__":

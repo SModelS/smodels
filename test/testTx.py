@@ -7,7 +7,8 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
     
 """
-
+import sys
+sys.path.append("../")
 from smodels.theory import slhaDecomposer
 from smodels.tools import xsecComputer
 from smodels.tools.xsecComputer import NLL
@@ -29,7 +30,7 @@ class TxTest(unittest.TestCase):
                 # print "e=",element,"masses=",masses
                 mgluino=masses[0][0]
                 mLSP=masses[0][1]
-                self.assertEqual ( str(element), "[[[jet,jet]],[[jet,jet]]]" )
+                self.assertEqual ( str(element), "[[[q,q]],[[q,q]]]" )
                 self.assertEqual ( int ( mgluino / GeV ), 675 )
                 self.assertEqual ( int ( mLSP / GeV ), 200 )
 

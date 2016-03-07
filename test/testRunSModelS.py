@@ -9,6 +9,8 @@
 """
 import unittest
 import os
+import sys
+sys.path.append("../")
 from smodels.installation import installDirectory
 from smodels.tools import summaryReader
 from runSModelS import main

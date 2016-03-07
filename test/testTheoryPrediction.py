@@ -9,6 +9,8 @@
 
 """
 import unittest
+import sys
+sys.path.append("../")
 from smodels.tools.physicsUnits import fb, GeV, pb
 import inspect
 import os
@@ -22,19 +24,19 @@ class IntegrationTest(unittest.TestCase):
     def predictions(self):
         return { 'ATLAS-SUSY-2013-02:T1': 572.168935 * fb }
 
-    def checkAnalysis(self,analysis,smstoplist):
-        # print "checking analysis",analysis
+    def checkAnalysis(self,expresult,smstoplist):
+        # print "checking expresult",expresult
         from smodels.theory.theoryPrediction import theoryPredictionsFor
-        theorypredictions = theoryPredictionsFor(analysis, smstoplist)
+        theorypredictions = theoryPredictionsFor(expresult, smstoplist)
         defpreds=self.predictions()
-        #print "ana",analysis,theorypredictions
+        #print "ana",expresult,theorypredictions
         if not theorypredictions:
-            print "no theory predictions for",analysis,"??"
+            print "no theory predictions for",expresult,"??"
             import sys
             sys.exit(-1)
-        #print(">>>> Ana %s" % analysis)
+        #print(">>>> Ana %s" % expresult)
         for pred in theorypredictions:
-            #print ( "Pred ana",str(analysis.info.getInfo('id')))
+            #print ( "Pred ana",str(expresult.info.getInfo('id')))
             #print ( "Pred txname",pred.txname.getInfo("txname"))
             m0=str ( int ( pred.mass[0][0]/GeV )  )
             #print ( "Pred mass0",m0 )
@@ -46,7 +48,7 @@ class IntegrationTest(unittest.TestCase):
             predval=w['8 TeV (NLL)']
             #print w,"%10f" % (predval/fb)
             #print "predval=",predval.asNumber(fb)
-            defpredval=defpreds[analysis.info.getInfo('id')+":"+pred.txname.getInfo("txname") ]
+            defpredval=defpreds[expresult.getValuesFor('id')[0]+":"+pred.txnames[0].getInfo("txName") ]
             #print ( "Pred default value",defpredval )
             self.assertAlmostEqual ( predval / fb, defpredval / fb )
 
