@@ -73,28 +73,41 @@ class Branch(object):
         st = st.replace(" ", "")
         return st
 
-
-    def __eq__(self, other):
+    def __cmp__(self,other):
         """
-        Check if branches are equal, allowing for inclusive particle labels.
-        
-        :parameter other: branch to be compared (Branch object)
-        :returns: True if branches are equal (particles and masses match); False otherwise.
-        """
-        
-        return self.isEqual(other)
-
-
-    def __ne__(self, other):
-        """
-        Check if branches are different, allowing for inclusive particle labels.
-        
-        :parameter other: branch to be compared (Branch object)
-        :returns: False if branches are equal (particles and masses match); True otherwise.
+        Compares the branch with other.        
+        The comparison is made based on .
+        OBS: The particles inside each vertex MUST BE sorted (see branch.sortParticles())         
+        :param other:  branch to be compared (Branch object)
+        :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
         
-        return not self.isEqual(other)
+        if self.vertnumb != other.vertnumb:
+            comp = self.vertnumb > other.vertnumb
+            if comp: return 1
+            else: return -1
+        elif self.vertparts != other.vertparts:
+            comp = self.vertparts > other.vertparts
+            if comp: return 1
+            else: return -1
+        elif self.particles != other.particles:
+            comp = self.particles > other.particles
+            if comp: return 1
+            else: return -1
+        elif self.masses != other.masses:
+            comp = self.masses > other.masses
+            if comp: return 1
+            else: return -1
+        else:
+            return 0  #Branches are equal
 
+    def sortParticles(self):
+        """
+        Sort the particles inside each vertex
+        """
+        
+        for iv,vertex in enumerate(self.particles):
+            self.particles[iv] = sorted(vertex)
 
     def setInfo(self):
         """
@@ -106,14 +119,13 @@ class Branch(object):
         self.vertnumb = len(self.particles)
         self.vertparts = [len(v) for v in self.particles]
 
-
-    def particlesMatch(self, other, useDict=True):
+    
+    def particlesMatch(self, other):
         """
-        Compare two Branches for matching particles (same as isEqual, but ignores
-        mass differences)
+        Compare two Branches for matching particles, 
+        allow for inclusive particle labels (such as the ones defined in particles.py)
         
         :parameter other: branch to be compared (Branch object)
-        :parameter useDict: if True, allow for inclusive particle labels
         :returns: True if branches are equal (particles and masses match); False otherwise.              
         """
         
@@ -132,24 +144,7 @@ class Branch(object):
             if not simParticles(vertex,other.particles[iv]):
                 return False                        
         return True
-
-
-    def isEqual(self, other, useDict=True):
-        """
-        Compares two branches. If particles are similar
-        and masses are equal, return True. Otherwise, return False.  
-        
-        :parameter other: branch to be compared (Branch object)
-        :parameter useDict: if True, allow for inclusive particle labels
-        :returns: True if branches are equal (particles and masses match); False otherwise.              
-        """
-        
-        if not self.particlesMatch(other, useDict):
-            return False
-        elif self.masses != other.masses:
-            return False
-        
-        return True    
+   
 
     def copy(self):
         """
@@ -216,7 +211,7 @@ class Branch(object):
             return False
 
         if newparticles:
-            newBranch.particles.append(newparticles)
+            newBranch.particles.append(sorted(newparticles))
         if newmass:
             newBranch.masses.append(newmass[0])
         if not self.maxWeight is None:

@@ -222,7 +222,7 @@ def _getElementsFrom(smsTopList, dataset):
     Get elements that belong to any of the TxNames in dataset 
     (appear in any of constraints in the result).    
     Loop over all elements in smsTopList and returns a copy of the elements belonging
-    to any of the constraints (TxNames, i.e. have efficiency != 0). The copied elements
+    to any of the constraints (i.e. have efficiency != 0). The copied elements
     have their weights multiplied by their respective efficiencies.
     
     :parameter dataset:  Data Set to be considered (DataSet object)
@@ -230,25 +230,21 @@ def _getElementsFrom(smsTopList, dataset):
     :returns: list of elements (Element objects)    
     """
     
-    tops = []
-    for txname in dataset.txnameList:
-        tops += txname._topologies   #For performance only
-           
     elements = []
-    for top in smsTopList:
-        if not top in tops: continue  #For performance only
-        for el in top.getElements():             
-            for txname in dataset.txnameList:
-                if not txname._elements: continue
-                if not top in txname._topologies: continue
-                hasEl = txname.hasElementAs(el)
-                if not hasEl: continue
+    for txname in dataset.txnameList:
+        for top in smsTopList:
+            itop = txname._topologies.index(top)  #Check if the topology appear in txname
+            if itop is None: continue   
+            for el in top.getElements():
+                newEl = txname.hasElementAs(el)  #Check if element appears in txname
+                if not newEl: continue
                 el.covered += 1
-                eff = txname.getEfficiencyFor(hasEl)            
-                if eff == 0.: continue
-                hasEl.weight *= eff
-                elements.append(hasEl)
-                break
+                eff = txname.getEfficiencyFor(newEl.getMasses())
+                if not eff: continue
+                newEl.eff = eff
+                newEl.weight *= eff
+                elements.append(newEl) #Save element with correct branch ordering
+
     return elements
 
 
@@ -276,7 +272,7 @@ def _combineElements(elements, dataset, maxDist):
             txnameEls = []
             for element in elements:
                 #Check if element really belongs to txname:
-                if not txname.getEfficiencyFor(element): continue
+                if not txname.hasElementAs(element): continue                
                 else: txnameEls.append(element)
             txnameClusters = clusterTools.clusterElements(txnameEls, txname, maxDist)         
             clusters += txnameClusters

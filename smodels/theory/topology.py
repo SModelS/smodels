@@ -13,7 +13,7 @@ from smodels.theory import crossSection
 from smodels.theory.element import Element
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import logging
-import sys
+import bisect
 
 logger = logging.getLogger(__name__)
 
@@ -39,9 +39,9 @@ class Topology(object):
         self.elementList = []
 
         if elements:
-            if type(elements) == type(Element()):
+            if isinstance(elements,Element):
                 self.addElement(elements)
-            elif type(elements) == type([]):
+            elif isinstance(elements,list):
                 for element in elements:
                     self.addElement(element)
 
@@ -56,59 +56,26 @@ class Topology(object):
         for p in self.vertparts:
             ret += "%s" % str(p).replace(" ", "")
         return ret
-
-    def __eq__(self, other):
+    
+    def __cmp__(self,other):
         """
-        Check if topologies are equal (same number of vertices and final states)
-        
-        :parameter other: topology to be compared (Topology object)
-        :returns: True if topologies are equal; False otherwise.
+        Compares the topology with other.
+        The comparison is made on number of vertices and then on the 
+        total number of particles coming out of the vertices.
+        :param other:  topology to be compared (Topology object)
+        :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
-
-        return self.isEqual(other)
-
-
-    def __ne__(self, other):
-        """
-        Check if topologies are different (different number of vertices or final states)
-        
-        :parameter other: topology to be compared (Topology object)
-        :returns: False if topologies are equal; True otherwise.
-        """
-
-        return not self.isEqual(other)
-
-
-    def isEqual(self, other, order=False):
-        """
-        Compare two topologies. Two topologies are equal if 
-        they have the same number of vertices and final states (in each vertex).
-
-        :parameter other: topology to be compared (Topology object)
-        :parameter order: if False, compare the two possible branch orderings.
-                          If True, compare the two topologies assuming the same
-                          branch ordering.
-        :returns: True, if both topologies equal; False, otherwise
-        """
-
-        if type(self) != type(other):
-            return False
-        if order or len(self.vertnumb) != 2 or len(other.vertnumb) != 2:
-            if self.vertnumb != other.vertnumb:
-                return False
-            if self.vertparts != other.vertparts:
-                return False
-            return True
+                
+        if sorted(self.vertnumb,reverse=True) != sorted(other.vertnumb,reverse=True):
+            comp = sorted(self.vertnumb,reverse=True) > sorted(other.vertnumb,reverse=True)
+            if comp: return 1
+            else: return -1  
+        elif sorted(self.vertparts) != sorted(other.vertparts):
+            comp = sorted(self.vertparts) > sorted(other.vertparts)
+            if comp: return 1
+            else: return -1 
         else:
-            x1 = [self.vertnumb[0], self.vertparts[0]]
-            x2 = [self.vertnumb[1], self.vertparts[1]]
-            xA = [other.vertnumb[0], other.vertparts[0]]
-            xB = [other.vertnumb[1], other.vertparts[1]]
-            if x1 == xA and x2 == xB:
-                return True
-            if x1 == xB and x2 == xA:
-                return True
-            return False
+            return 0        
 
 
     def checkConsistency(self):
@@ -159,7 +126,7 @@ class Topology(object):
 
         For all the pre-existing elements, which match the new element, add
         weight. If no pre-existing elements match the new one, add it to the
-        list. When comparing elements, try both branch orderings.
+        list. OBS: newelement MUST ALREADY BE SORTED (see element.sort())
         
         :parameter newelement: element to be added (Element object)
         :returns: True, if the element was added. False, otherwise
@@ -172,44 +139,22 @@ class Topology(object):
         if not self.vertnumb:
             self.vertnumb = newelement.getEinfo()["vertnumb"]
 
-        # Check if newelement matches the topology structure
-        info = newelement.getEinfo()
-        infoB = newelement.switchBranches().getEinfo()
-        if info != self._getTinfo() and infoB != self._getTinfo():
+        #First check if element matches topology structure
+        info = newelement.getEinfo()        
+        if info != self._getTinfo():
             logger.warning('Element to be added does not match topology')
             return False
+        
+        index = bisect.bisect_left(self.elementList,newelement)        
+        if index != len(self.elementList) and self.elementList[index] == newelement:
+            self.elementList[index].weight.combineWith(newelement.weight)
+            self.elementList[index].combinePIDs(newelement)
+            self.elementList[index].combineMotherElements(newelement)
+        else:
+            self.elementList.insert(index,newelement)
 
+        return True
 
-        added = False
-        # Include element to elementList
-        for element in self.elementList:
-            if element == newelement:
-                added = True
-                element.weight.combineWith(newelement.weight)
-                element.combineMotherElements(newelement)
-                #Check the correct branch ordering when combining PIDs
-                if element.isEqual(newelement, order=True):
-                    element.combinePIDs(newelement)
-                else:
-                    element.combinePIDs(newelement.switchBranches())
-                
-
-        if added:
-            return True
-        # If element has not been found add to list (OBS: if both branch
-        # orderings are good, add the original one)
-        # Check both branch orderings
-        tryelements = [newelement, newelement.switchBranches()]
-        for newel in tryelements:
-            info = newel.getEinfo()
-            if info["vertnumb"] != self.vertnumb or info["vertparts"] != \
-                    self.vertparts:
-                continue
-            self.elementList.append(newel)
-            return True
-
-        # If element does not match topology info, return False
-        return False
 
 
     def _getTinfo(self):
@@ -273,6 +218,9 @@ class TopologyList(object):
             s += str(topo) + "\n"
         return s
 
+    def insert(self,index,topo):        
+        self.topos.insert(index,topo)
+        
 
     def addList(self, topoList):
         """
@@ -293,6 +241,21 @@ class TopologyList(object):
             s += str(topo) + "\n"
         return s
 
+    def index(self,topo):
+        """
+        Uses bisect to find the index where of topo in the list.
+        If topo does not appear in the list, returns None
+        :param topo: Topology object
+        :return: position of topo in the list. If topo does not    
+                appear in the list, return None.
+        """
+
+        i = bisect.bisect_left(self, topo)
+        if i != len(self) and self[i] == topo:
+            return i
+        
+        return None
+
     
     def add(self, newTopology):
         """
@@ -305,17 +268,39 @@ class TopologyList(object):
         :param newTopology: Topology object
         
         """
-        topmatch = False
-        for itopo, topo in enumerate(self.topos):
-            if topo == newTopology:
-                topmatch = itopo
-        # If no pre-existing topologies match, append it to list of topologies
-        if topmatch is False:
-            self.topos.append(newTopology)
-        else:
+        
+        index = bisect.bisect_left(self, newTopology)
+        if index != len(self) and self[index] == newTopology:
             for newelement in newTopology.elementList:
-                self.topos[topmatch].addElement(newelement)
+                self.topos[index].addElement(newelement)
+        else:
+            self.insert(index,newTopology)
 
+
+    def addElement(self, newelement):
+        """
+        Add an Element object to the corresponding topology in the list.
+        If the element topology does not match any of the topologies in
+        the list, create a new topology and insert it in the list.
+        If the element topology already exists, add it to the respective
+        topology.        
+        :parameter newelement: element to be added (Element object)
+        :returns: True, if the element was added. False, otherwise
+        """
+        
+        #First create a dummy topology from the element to check
+        #if this topology already exists in the list:
+        elInfo = newelement.getEinfo()
+        topoDummy = Topology()
+        topoDummy.elementList.append(newelement)
+        topoDummy.vertnumb = elInfo["vertnumb"]
+        topoDummy.vertparts = elInfo["vertparts"]
+        
+        index = bisect.bisect_left(self,topoDummy)
+        if index != len(self) and self.topos[index] == topoDummy:
+            self.topos[index].addElement(newelement)
+        else:
+            self.topos.insert(index,topoDummy)
 
 
     def getTotalWeight(self):
@@ -343,7 +328,7 @@ class TopologyList(object):
 
     def _setElementIds(self):
         """
-        Assign unique ID to each element in the Topolgy list
+        Assign unique ID to each element in the Topology list
         """
         elID = 1
         for element in self.getElements():
