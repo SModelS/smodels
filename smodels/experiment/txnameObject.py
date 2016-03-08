@@ -14,7 +14,7 @@ from smodels.tools.physicsUnits import GeV, fb, TeV, pb
 from smodels.theory.particleNames import elementsInStr
 from smodels.tools.stringTools import concatenateLines
 from smodels.theory.element import Element
-from smodels.theory.topology import Topology
+from smodels.theory.topology import TopologyList
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.theory.auxiliaryFunctions import _memoize
 from scipy.interpolate import griddata
@@ -40,7 +40,7 @@ class TxName(object):
         self.globalInfo = infoObj
         self.txnameData = None
         self._elements = []
-        self._topologies = []
+        self._topologies = TopologyList()
         
         logger.debug('Creating object based on txname file: %s' %self.path)        
         #Open the info file and get the information:
@@ -72,19 +72,21 @@ class TxName(object):
                 continue
         
         #Builds up a list of _elements appearing in constraints:        
-        if hasattr(self,'constraint'):             
+        if hasattr(self,'constraint'):           
             self._elements = [Element(el) for el in elementsInStr(self.constraint)]
         if hasattr(self,'condition') and self.condition:
             conds = self.condition
             if not isinstance(conds,list): conds = [conds]
             for cond in conds:                
                 for el in elementsInStr(cond):
-                    if not el in self._elements: self._elements.append(Element(el))
+                    newEl = Element(el)
+                    if not newEl in self._elements: self._elements.append(newEl)
         
-        #Builds up a list of _topologies appearing in constraints:
+        #Builds up a list of _topologies appearing in constraints:        
         for el in self._elements:
-            top = Topology(el)
-            if not top in self._topologies: self._topologies.append(top)
+            el.sortBranches()
+            self._topologies.addElement(el)
+        self._elements = sorted(self._elements)
 
         
     def __str__(self):
@@ -122,29 +124,28 @@ class TxName(object):
     
     def hasElementAs(self,element):
         """
-        Check if the conditions or constraint in Txname contains the element.
-        :param element: Element object
-        :param order: If False will test both branch orderings.
+        Verify if the conditions or constraint in Txname contains the element.
+        Check both branch orderings.
+        :param element: Element object        
         :return: A copy of the element on the correct branch ordering appearing
                 in the Txname constraint or condition.
         """
-        
-        elementB = element.switchBranches()
-        for el in self._elements:
-            if element.particlesMatch(el,order=True):
+                
+        for el in self._topologies.getElements():
+            if element.particlesMatch(el,branchOrder=True):
                 return element.copy()
-            elif elementB.particlesMatch(el,order=True):
-                return elementB
+            else:
+                elementB = element.switchBranches()
+                if elementB.particlesMatch(el,branchOrder=True):
+                    return elementB
         return False
         
 
-    def getEfficiencyFor(self,element):
+    def getEfficiencyFor(self,mass):
         """
-        For upper limit results, checks if the input element appears in the constraints
-        and falls inside the upper limit grid.
+        For upper limit results, checks if the input mass falls inside the upper limit grid.
         If it does, returns efficiency = 1, else returns efficiency = 0.
-        For efficiency map results, checks if the input element appears in the constraints
-        and falls inside the efficiency map grid.
+        For efficiency map results, checks if the mass falls inside the efficiency map grid.
         If it does, returns the corresponding efficiency value, else returns efficiency = 0.
         
         :param element: Element object
@@ -152,9 +153,6 @@ class TxName(object):
         """
         
         #Check if the element appears in Txname:
-        hasEl = self.hasElementAs(element)        
-        if not hasEl: return 0.
-        mass = hasEl.getMasses()
         val = self.txnameData.getValueFor(mass)
         if type(val) == type(fb):
             return 1.  #The element has an UL, return 1        
