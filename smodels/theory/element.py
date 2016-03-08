@@ -6,12 +6,11 @@
     
 """
 
-from smodels.theory.particleNames import simParticles, elementsInStr
+from smodels.theory.particleNames import elementsInStr
 from smodels.theory.branch import Branch
 from smodels.theory import crossSection
 from smodels.particles import rEven, ptcDic
 import logging
-import sys
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 logger = logging.getLogger(__name__)
@@ -53,35 +52,45 @@ class Element(object):
                     if elements:
                         nel = len(elements)
                     logging.error("Malformed input string. Number of elements "
-                                  "is %d, expected 1: in ``%s''", nel, info)
+                                  "is %d (expected 1) in: ``%s''", nel, info)
                     return False
                 else:
                     el = elements[0]
                     branches = elementsInStr(el[1:-1])
                     if not branches or len(branches) != 2:
                         logging.error("Malformed input string. Number of "
-                                      "branches is %d, expected 2: in ``%s''",
+                                      "branches is %d (expected 2) in: ``%s''",
                                       len(branches), info)
                         return False
-                    self.branches = []
+                    self.branches = []                    
                     for branch in branches:
                         self.branches.append(Branch(branch))
             # Create element from branch pair
             elif type(info) == type([]) and type(info[0]) == type(Branch()):
                 for ib, branch in enumerate(info):
                     self.branches[ib] = branch.copy()
-
-
-    def __eq__(self, other):
-        return self.isEqual(other)
+        
+    
+    def __cmp__(self,other):
+        """
+        Compares the element with other.        
+        The comparison is made based on branches.
+        OBS: The elements and the branches must be sorted! 
+        :param other:  element to be compared (Element object)
+        :return: -1 if self < other, 0 if self == other, +1, if self > other.
+        """
+        
+        #Compare branches:
+        if self.branches != other.branches:            
+            comp = self.branches > other.branches
+            if comp: return 1
+            else: return -1
+        else:
+            return 0     
 
 
     def __hash__(self):
         return object.__hash__(self)
-
-
-    def __ne__(self, other):
-        return not self.isEqual(other)
 
 
     def __str__(self):
@@ -93,49 +102,30 @@ class Element(object):
         particleString = str(self.getParticles()).replace(" ", "").\
                 replace("'", "")
         return particleString
-
-
-    def isEqual(self, other, order=False, useDict=True):
+    
+    def sortBranches(self):
         """
-        Compare two Elements for equality.        
-                
-        :parameter other: element to be compared (Element object)
-        :parameter order: if False, test both branch orderings.
-        :parameter useDict: if True, allow for inclusive particle labels.
-        :returns: True, if all masses and particles are equal; False, else;        
+        Sort branches. The smallest branch is the first one.
+        See the Branch object for definition of branch size and comparison
         """
-
-        if type(self) != type(other):
-            return False
         
-        if len(self.branches) != len(other.branches):
-            return False
-
-        #Check if particles inside each branch match in the correct order
-        branchMatches = []
-        for ib,br in enumerate(self.branches):
-            branchMatches.append(br.isEqual(other.branches[ib], useDict))
-        if sum(branchMatches) == 2:
-                return True
-        elif order:
-                return False
-        else:        
-        #Now check for opposite order
-            for ib,br in enumerate(self.switchBranches().branches):
-                if not br.isEqual(other.branches[ib], useDict):
-                    return False
-
-            return True
+        #First make sure each branch is individually sorted 
+        #(particles in each vertex are sorted)
+        for br in self.branches:
+            br.sortParticles()
+        #Now sort branches
+        self.branches = sorted(self.branches)
 
 
-
-    def particlesMatch(self, other, order=False, useDict=True):
+    def particlesMatch(self, other, branchOrder=False):
         """
-        Compare two Elements for matching particles.
+        Compare two Elements for matching particles only.
+        Allow for inclusive particle labels (such as the ones defined in particles.py).
+        If branchOrder = False, check both branch orderings.
         
         :parameter other: element to be compared (Element object)
-        :parameter order: if False, test both branch orderings.
-        :parameter useDict: if True, allow for inclusive particle labels.
+        :parameter branchOrder: If False, check both orderings, otherwise
+                                check the same branch ordering
         :returns: True, if particles match; False, else;        
         """
         
@@ -149,15 +139,15 @@ class Element(object):
         #Check if particles inside each branch match in the correct order
         branchMatches = []
         for ib,br in enumerate(self.branches):
-            branchMatches.append(br.particlesMatch(other.branches[ib], useDict))
+            branchMatches.append(br.particlesMatch(other.branches[ib]))
         if sum(branchMatches) == 2:
                 return True
-        elif order:
-                return False
-        else:        
+        elif branchOrder:
+            return False
+        else:       
         #Now check for opposite order
             for ib,br in enumerate(self.switchBranches().branches):
-                if not br.particlesMatch(other.branches[ib], useDict):
+                if not br.particlesMatch(other.branches[ib]):
                     return False
 
             return True
@@ -194,10 +184,7 @@ class Element(object):
                                smaller of the two orderings.             
         """
         if sameOrder and opposOrder:
-            if mass[0] == _smallerMass(mass[0], mass[1]):
-                newmass = mass
-            else:
-                newmass = [mass[1], mass[0]]
+            newmass = sorted(mass)
         elif sameOrder:
             newmass = mass
         elif opposOrder:
@@ -301,7 +288,6 @@ class Element(object):
         return momPIDs    
 
 
-
     def getEinfo(self):
         """
         Get topology info from particle string.
@@ -334,25 +320,6 @@ class Element(object):
         :returns: maximum length of the element branches (int)    
         """
         return max(self.branches[0].getLength(), self.branches[1].getLength())
-
-
-    def isInList(self, listOfElements, igmass=False, useDict=True):
-        """
-        Check if the element is present in the element list.   
-        
-        :parameter      
-        If igmass == False also check if the analysis has the element mass
-        array.        
-        """
-        for el in listOfElements:
-            if igmass:
-                if self.particlesMatch(el, useDict):
-                    return True
-            else:
-                if self.isEqual(el, useDict):
-                    return True
-
-        return False
 
 
     def checkConsistency(self):
@@ -452,6 +419,7 @@ class Element(object):
                         ncomp +=1
                     new_branch.setInfo() 
 
+        newelement.sortBranches()
         return newelement
     
 
@@ -503,9 +471,10 @@ class Element(object):
                     break
             newelement.branches[ib].setInfo()
 
-        if newelement.isEqual(self):
+        newelement.sortBranches()
+        if newelement == self:
             return None
-        else:
+        else:            
             return newelement
 
 
@@ -541,35 +510,3 @@ class Element(object):
             if not pidlist in elPIDs:
                 self.branches[0].PIDs.append(pidlist[0])
                 self.branches[1].PIDs.append(pidlist[1])
-
-
-
-def _smallerMass(mass1, mass2):
-    """
-    Select the smaller of two mass arrays.    
-    Use an ordering criterion (machine-independent) for selection.
-    
-    :parameter mass1: mass array (list of masses)
-    :parameter mass2: mass array (list of masses)
-    :returns: mass1, if mass1 > mass2; mass2, otherwise 
-    """
-    mass1List = []
-    mass2List = []
-    if mass1 == mass2:
-        return mass1
-    try:
-        for branch in mass1:
-            mass1List.extend(branch)
-        for branch in mass2:
-            mass2List.extend(branch)
-        if len(mass1List) == len(mass2List):
-            for im, m1 in enumerate(mass1List):
-                if m1 < mass2List[im]:
-                    return mass1
-                if m1 > mass2List[im]:
-                    return mass2
-    except:
-        pass
-
-    logger.error("Invalid input")
-    raise SModelSError()

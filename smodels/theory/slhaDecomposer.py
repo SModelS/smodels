@@ -101,6 +101,11 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     for pid in xSectionList.getPIDs():
         if not pid in branchListDict: branchListDict[pid] = []
 
+    #Sort the branch lists by max weight to improve performance:
+    for pid in branchListDict:
+        branchListDict[pid] = sorted(branchListDict[pid], 
+                                     key=lambda br: br.maxWeight, reverse=True)
+    
     smsTopList = topology.TopologyList()
     # Combine pairs of branches into elements according to production
     # cross-section list
@@ -109,10 +114,14 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
         minBR = (sigcut/weightList.getMaxXsec()).asNumber()
         if minBR > 1.: continue
         for branch1 in branchListDict[pids[0]]:
+            BR1 = branch1.maxWeight/maxWeight[pids[0]]  #Branching ratio for first branch            
+            if BR1 < minBR: break  #Stop loop if BR1 is already too low            
             for branch2 in branchListDict[pids[1]]:
-                finalBR = branch1.maxWeight * branch2.maxWeight / \
-                            (maxWeight[pids[0]] * maxWeight[pids[1]])
-                if type(finalBR) == type( 1. * fb):
+                BR2 = branch2.maxWeight/maxWeight[pids[1]]  #Branching ratio for second branch
+                if BR2 < minBR: break  #Stop loop if BR2 is already too low
+                
+                finalBR = BR1*BR2                
+                if type(finalBR) == type(1.*fb):
                     finalBR = finalBR.asNumber()
                 if finalBR < minBR: continue # Skip elements with xsec below sigcut
 
@@ -131,9 +140,10 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
                                                                   minmassgap)
 
                 for el in allElements:
-                    top = topology.Topology(el)
-                    smsTopList.add(top)
+                    el.sortBranches()  #Make sure elements are sorted BEFORE adding them                    
+                    smsTopList.addElement(el)                    
     smsTopList._setElementIds()
+
     logger.debug("slhaDecomposer done in " + str(time.time() - t1) + " s.")
     return smsTopList
 
