@@ -14,7 +14,7 @@ import copy
 import logging
 from smodels.particles import rEven, rOdd, ptcDic
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-import numpy as np
+import itertools
 
 logger = logging.getLogger(__name__)
 
@@ -164,7 +164,6 @@ def vertInStr(instring):
 
     return vertices
 
-
 def simParticles(plist1, plist2, useDict=True):
     """
     Compares two lists of particle names. Allows for dictionary
@@ -215,15 +214,10 @@ def simParticles(plist1, plist2, useDict=True):
         else:
             extendedL2.append(ptcDic[p])
     
-    #Generate all combinations of particle lists
+    #Generate all combinations of particle lists (already sorted to avoid ordering issues)
     #e.g. [[q,g,c],[mu+]] -> [[q,mu+],[g,mu+],[c,mu+]]
-    extendedL1 = cartesian(extendedL1).tolist()
-    extendedL2 = cartesian(extendedL2).tolist()
-    #Sort the particles in each element, since the order does not matter
-    for ip,p in enumerate(extendedL1):
-        extendedL1[ip] = sorted(p)
-    for ip,p in enumerate(extendedL2):
-        extendedL2[ip] = sorted(p)
+    extendedL1 = [sorted(list(i)) for i in itertools.product(*extendedL1)]
+    extendedL2 = [sorted(list(i)) for i in itertools.product(*extendedL2)]
 
     #Now compare the two lists and see if there is a match:
     for plist in extendedL1:
@@ -231,25 +225,3 @@ def simParticles(plist1, plist2, useDict=True):
         
     return False
 
-def cartesian(arrays, out=None):
-    """
-    Defines the cartesian products of a list of arrays
-    :param arrays: A list of arrays (e.g. [[a,b,c],[c],[d,e]])
-    :param out: Auxiliary array for calculations
-    
-    :return: 2-D array (e.g. [ [a,c,d],[a,c,e],[b,c,d],[b,c,e],[c,c,d],[c,c,e] ])
-    """
-    arrays = [np.asarray(x) for x in arrays]
-    dtype = max([ar.dtype for ar in arrays])
-    #dtype = arrays[0].dtype
-    n = np.prod([x.size for x in arrays])
-    if out is None:
-        out = np.zeros([n, len(arrays)], dtype=dtype)
-    m = n / arrays[0].size
-    out[:,0] = np.repeat(arrays[0], m)
-    if arrays[1:]:
-        cartesian(arrays[1:], out=out[0:m,1:])
-        for j in xrange(1, arrays[0].size):
-            out[j*m:(j+1)*m,1:] = out[0:m,1:]
-    
-    return out

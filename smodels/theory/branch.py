@@ -106,7 +106,7 @@ class Branch(object):
         self.vertnumb = len(self.particles)
         self.vertparts = [len(v) for v in self.particles]
 
-    
+
     def particlesMatch(self, other, useDict=True):
         """
         Compare two Branches for matching particles (same as isEqual, but ignores
@@ -132,7 +132,7 @@ class Branch(object):
             if not simParticles(vertex,other.particles[iv]):
                 return False                        
         return True
-    
+
 
     def isEqual(self, other, useDict=True):
         """
