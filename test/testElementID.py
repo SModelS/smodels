@@ -18,7 +18,7 @@ from smodels.theory.theoryPrediction import theoryPredictionsFor
 class ElementIdTest(unittest.TestCase):
     def testGoodFile(self):
 
-        listOfIDs = [[945],[943, 944, 946, 947, 948, 949, 950, 951]]
+        listOfIDs = [[28, 29, 30, 31, 24, 25, 26, 27],[23]]
         filename = "%sinputFiles/slha/compressedSpec.slha" % (installDirectory() )
         topoList = slhaDecomposer.decompose(filename,doCompress = True, doInvisible=True, minmassgap = 5*GeV)
         database = Database("database/")
