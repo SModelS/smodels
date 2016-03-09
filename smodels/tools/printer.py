@@ -101,7 +101,7 @@ class TextBasedPrinter(object):
                             outfile.close()
         self.objList = []
         self.outputList = []
-        
+    
     def addObj(self,obj,objOutputLevel=None):
         """
         Adds object to the Printer. The object will be formatted according to the outputType
@@ -272,18 +272,26 @@ class TextBasedPrinter(object):
 
         if not objOutputLevel: return None
         
+        txnames = []
+        for dataset in obj.datasets:
+            for txname in dataset.txnameList:
+                tx = txname.txName
+                if not tx in txnames: txnames.append(tx) 
+        
+        
         output = ""
         output += "========================================================\n"
-        output += "Experimental Result ID: " + obj.getValuesFor('id')[0] + '\n'
-        output += "Tx Labels: " + str(obj.getValuesFor('txName')) + '\n'
-        output += "Sqrts: " + str(obj.getValuesFor('sqrts')[0]) + '\n'
+        output += "Experimental Result ID: " + obj.globalInfo.id + '\n'
+        output += "Tx Labels: " + str(txnames) + '\n'
+        output += "Sqrts: " + str(obj.globalInfo.sqrts) + '\n'
         if objOutputLevel == 2:
             output += "\t -----------------------------\n"
             output += "\t Elements tested by analysis:\n"
             listOfelements = []
-            for elList in obj.getValuesFor('_elements'):
-                for el in elList:
-                    if not el in listOfelements: listOfelements.append(el)
+            for dataset in obj.datasets:
+                for txname in dataset.txnameList:
+                    for el in txname._topologyList.getElements():
+                        if not str(el) in listOfelements: listOfelements.append(str(el))
             for el in listOfelements:                
                 output += "\t    " + str(el) + "\n"
 
@@ -331,10 +339,10 @@ class TextBasedPrinter(object):
                 output += str(condlist) + "\n"
                 
             #Get upper limit for the respective prediction:
-            if expRes.getValuesFor('dataType')[0] == 'upperLimit':
+            if expRes.datasets[0].dataInfo.dataType == 'upperLimit':
                 experimentalLimit = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass)
-            elif expRes.getValuesFor('dataType')[0] == 'efficiencyMap':
-                experimentalLimit = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.getValuesFor('dataId')[0])
+            elif expRes.datasets[0].dataInfo.dataType == 'efficiencyMap':
+                experimentalLimit = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.dataInfo.dataId)
 
             output += "Experimental limit: " + str(experimentalLimit) + "\n"
 
@@ -357,8 +365,8 @@ class TextBasedPrinter(object):
         # output += "#Analysis  Tx_Name  Sqrts  Cond. Violation  PredTheory(fb)  ULobserved (fb) ULexpected (fb)  r\n\n"
         for theoPred in obj.theoryPredictions:
             expResult = theoPred.expResult
-            datasetID = theoPred.dataset.getValuesFor('dataId')[0]
-            dataType = expResult.getValuesFor('dataType')[0]        
+            datasetID = theoPred.dataset.dataInfo.dataId
+            dataType = expResult.datasets[0].dataInfo.dataType       
             if dataType == 'upperLimit':
                 ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass)
                 # Suggestion to obtain expected limits:
@@ -373,8 +381,8 @@ class TextBasedPrinter(object):
                 logger.error("Unknown dataType %s" %(str(dataType)))
                 raise SModelSError()
             
-            output += "%19s %16s " % (expResult.getValuesFor('id')[0], str(txname) )  # ana, topo
-            output += "%4s " % (expResult.getValuesFor("sqrts")[0]/ TeV)  # sqrts
+            output += "%19s %16s " % (expResult.globalInfo.id, str(txname) )  # ana, topo
+            output += "%4s " % (expResult.globalInfo.sqrts/ TeV)  # sqrts
             output += "%5s " % theoPred.getmaxCondition()  # condition violation            
             output += "%10.3E %10.3E " % (theoPred.value[0].value / fb, ul / fb)  # theory cross section , expt upper limit
             # Suggestion to obtain expected limits:
@@ -504,9 +512,9 @@ class PyPrinter(TextBasedPrinter):
         
         ExptRes = []
         expResult = obj.expResult
-        datasetID = obj.dataset.getValuesFor('dataId')[0]
-        expID =  expResult.getValuesFor('id')[0]
-        sqrts = (expResult.getValuesFor('sqrts')[0]/TeV).asNumber()        
+        datasetID = obj.dataset.dataInfo.dataId
+        expID =  expResult.globalInfo.id
+        sqrts = (expResult.globalInfo.sqrts/TeV).asNumber()        
         for prediction in obj:
             mass = prediction.mass
             txname = prediction.txname            
@@ -523,9 +531,9 @@ class PyPrinter(TextBasedPrinter):
             else:
                 TxName = None
             theores = (prediction.value.getMaxXsec()/fb).asNumber()
-            if expResult.getValuesFor('dataType')[0] == 'upperLimit':
+            if expResult.datasets[0].dataInfo.dataType == 'upperLimit':
                 explimit = expResult.getUpperLimitFor(txname=txname,mass=mass)
-            elif expResult.getValuesFor('dataType')[0] == 'efficiencyMap':
+            elif expResult.datasets[0].dataInfo.dataType == 'efficiencyMap':
                 explimit = expResult.getUpperLimitFor(dataID=datasetID)
             explimit = (explimit/fb).asNumber()
             ExptRes.append({'maxcond': maxconds, 'tval (fb)': theores,

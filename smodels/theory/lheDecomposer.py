@@ -65,8 +65,8 @@ def decompose(lhefile, inputXsecs=None, nevts=None, doCompress=False,
                                                       minmassgap)
 
         for el in allElements:
-            top = topology.Topology(el)
-            smsTopList.addList([top])
+            el.sortBranches()            
+            smsTopList.addElement(el)
 
     smsTopList._setElementIds()
     return smsTopList

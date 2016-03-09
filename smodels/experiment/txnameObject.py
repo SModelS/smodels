@@ -39,8 +39,7 @@ class TxName(object):
         self.path = path
         self.globalInfo = infoObj
         self.txnameData = None
-        self._elements = []
-        self._topologies = TopologyList()
+        self._topologyList = TopologyList()
         
         logger.debug('Creating object based on txname file: %s' %self.path)        
         #Open the info file and get the information:
@@ -71,22 +70,22 @@ class TxName(object):
                 logger.info("Ignoring unknown field %s found in file %s" % (tag, self.infopath))
                 continue
         
-        #Builds up a list of _elements appearing in constraints:        
+        #Builds up a list of elements appearing in constraints:
+        elements = []     
         if hasattr(self,'constraint'):           
-            self._elements = [Element(el) for el in elementsInStr(self.constraint)]
+            elements += [Element(el) for el in elementsInStr(self.constraint)]
         if hasattr(self,'condition') and self.condition:
             conds = self.condition
             if not isinstance(conds,list): conds = [conds]
             for cond in conds:                
                 for el in elementsInStr(cond):
                     newEl = Element(el)
-                    if not newEl in self._elements: self._elements.append(newEl)
+                    if not newEl in elements: elements.append(newEl)
         
-        #Builds up a list of _topologies appearing in constraints:        
-        for el in self._elements:
+        #Builds up TopologyList with all the elements appearing in constraints and conditions:        
+        for el in elements:
             el.sortBranches()
-            self._topologies.addElement(el)
-        self._elements = sorted(self._elements)
+            self._topologyList.addElement(el)
 
         
     def __str__(self):
@@ -131,7 +130,7 @@ class TxName(object):
                 in the Txname constraint or condition.
         """
                 
-        for el in self._topologies.getElements():
+        for el in self._topologyList.getElements():
             if element.particlesMatch(el,branchOrder=True):
                 return element.copy()
             else:

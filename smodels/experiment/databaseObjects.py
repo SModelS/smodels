@@ -49,14 +49,19 @@ class ExpResult(object):
 
     def __str__(self):
         label = self.globalInfo.getInfo('id') + ": "
-        dataIDs = self.getValuesFor('dataId')
+        dataIDs = [dataset.dataInfo.dataId for dataset in self.datasets]
         if dataIDs:
             for dataid in dataIDs:
                 if dataid:
                     label += dataid + ","
         label = label[:-1]
         label += ':'
-        txnames = self.getValuesFor('txName')
+        txnames = []
+        for dataset in self.datasets:
+            for txname in dataset.txnameList:
+                tx = txname.txName
+                if not tx in txnames:
+                    txnames.append(tx)
         if isinstance(txnames, list):
             for txname in txnames:
                 label += txname + ','
@@ -97,7 +102,7 @@ class ExpResult(object):
         :return: upper limit (Unum object)
         
         """
-        if self.getValuesFor('dataType')[0] == 'efficiencyMap':
+        if self.datasets[0].dataInfo.dataType == 'efficiencyMap':
             if not dataID or not isinstance(dataID, str):
                 logger.error("The data set ID must be defined when computing ULs for\
                             efficiency-map results.")
@@ -105,7 +110,7 @@ class ExpResult(object):
             
             useDataset = False
             for dataset in self.datasets:
-                if dataset.getValuesFor('dataId')[0] == dataID:
+                if dataset.dataInfo.dataId == dataID:
                     useDataset = dataset
                     break
             if useDataset is False:
@@ -121,7 +126,7 @@ class ExpResult(object):
                                   %(dataset.globalInfo.id,dataset.dataInfo.dataId))
                     return False           
             
-        elif self.getValuesFor('dataType')[0] == 'upperLimit':
+        elif self.datasets[0].dataInfo.dataType == 'upperLimit':
             if not txname or not mass:
                 logger.error("A TxName and mass array must be defined when computing ULs for\
                             upper-limit results.")
@@ -137,7 +142,7 @@ class ExpResult(object):
                     upperLimit = tx.txnameData.getValueFor(mass)
         else:
             logger.warning("Unkown data type: %s. Data will be ignored.", 
-                           self.getValuesFor('dataType')[0])
+                           self.datasets[0].dataInfo.dataType)
 
         
         return upperLimit
