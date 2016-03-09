@@ -20,7 +20,7 @@ from smodels.tools.physicsUnits import GeV
 from smodels.tools.physicsUnits import fb
 from smodels.tools import ioObjects
 from smodels.tools import missingTopologies
-from smodels.tools import crashReport
+from smodels.tools import crashReport, timeOut
 import smodels.tools.printer as prt
 from smodels.experiment.exceptions import DatabaseNotFoundException
 
@@ -217,15 +217,21 @@ if __name__ == "__main__":
     argparser.add_argument('--development', help='enable development output', action='store_true')
     argparser.add_argument('--run-crashreport', help='parse crash report file and use its contents for a SModelS run',
                            action='store_true')
+    argparser.add_argument('--timeout', help='define a limit on the running time (in secs).'
+                           ' If not set, run without a time limit', default = 0, type = int)
+    
+    
     args = argparser.parse_args()
     
     if args.run_crashreport:
         args.filename, args.parameterFile = crashReport.readCrashReportFile(args.filename)
-        main(args.filename, args.parameterFile, args.outputFile)
+        with timeOut.Timeout(args.timeout):
+            main(args.filename, args.parameterFile, args.outputFile)
         
     else:
         try:
-            main(args.filename, args.parameterFile, args.outputFile)
+            with timeOut.Timeout(args.timeout):
+                main(args.filename, args.parameterFile, args.outputFile)
         except Exception:
             crashReportFacility = crashReport.CrashReport()
              
