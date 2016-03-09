@@ -227,3 +227,19 @@ def _flattenList(inlist, dims=None):
             flat.append(item)
     return flat
     
+def index_bisect(inlist, el):
+    """
+    Return the index where to insert item el in inlist.
+    inlist is assumed to be sorted and a comparison function (lt or cmp)
+    must exist for el and the other elements of the list.
+    If el already appears in the list, inlist.insert(el) will
+    insert just before the leftmost el already there.  
+    """
+
+    lo = 0    
+    hi = len(inlist)
+    while lo < hi:
+        mid = (lo+hi)//2
+        if inlist[mid] < el: lo = mid+1
+        else: hi = mid
+    return lo
