@@ -12,8 +12,8 @@
 from smodels.theory import crossSection
 from smodels.theory.element import Element
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
+from smodels.theory.auxiliaryFunctions import index_bisect
 import logging
-import bisect
 
 logger = logging.getLogger(__name__)
 
@@ -145,7 +145,7 @@ class Topology(object):
             logger.warning('Element to be added does not match topology')
             return False
         
-        index = bisect.bisect_left(self.elementList,newelement)        
+        index = index_bisect(self.elementList,newelement)        
         if index != len(self.elementList) and self.elementList[index] == newelement:
             self.elementList[index].weight.combineWith(newelement.weight)
             self.elementList[index].combinePIDs(newelement)
@@ -250,7 +250,7 @@ class TopologyList(object):
                 appear in the list, return None.
         """
 
-        i = bisect.bisect_left(self, topo)
+        i = index_bisect(self, topo)
         if i != len(self) and self[i] == topo:
             return i
         
@@ -269,7 +269,7 @@ class TopologyList(object):
         
         """
         
-        index = bisect.bisect_left(self, newTopology)
+        index = index_bisect(self, newTopology)
         if index != len(self) and self[index] == newTopology:
             for newelement in newTopology.elementList:
                 self.topos[index].addElement(newelement)
@@ -296,7 +296,7 @@ class TopologyList(object):
         topoDummy.vertnumb = elInfo["vertnumb"]
         topoDummy.vertparts = elInfo["vertparts"]
         
-        index = bisect.bisect_left(self,topoDummy)
+        index = index_bisect(self,topoDummy)
         if index != len(self) and self.topos[index] == topoDummy:
             self.topos[index].addElement(newelement)
         else:
