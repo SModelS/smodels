@@ -119,19 +119,19 @@ class DataSet(object):
         :return: upper limit value 
         """
         
-        if not self.getValuesFor('dataType')[0] == 'efficiencyMap':
+        if not self.dataInfo.dataType == 'efficiencyMap':
             logger.error("getSRUpperLimit can only be used for efficiency map results!")
             raise SModelSError()
         
         if not compute:
             if expected:
                 try:
-                    return self.getValuesFor('expectedUpperLimit')[0]
-                except TypeError:
+                    return self.dataInfo.expectedUpperLimit
+                except AttributeError:                    
                     logger.info("expectedUpperLimit field not found. Using observed UL instead.")
-                    return self.getValuesFor('upperLimit')[0]
+                    return self.dataInfo.upperLimit
             else:
-                return self.getValuesFor('upperLimit')[0]
+                return self.dataInfo.upperLimit
         
         Nobs = self.dataInfo.observedN  #Number of observed events
         if expected: 
