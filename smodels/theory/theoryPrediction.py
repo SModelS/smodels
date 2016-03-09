@@ -168,7 +168,7 @@ def _getBestResults(dataSetResults):
             bestXsec = xsec.value
     
     return bestPredList
-    
+
 def _getDataSetPredictions(dataset,smsTopList,maxMassDist):   
     """
     Compute theory predictions for a given data set.
@@ -233,7 +233,7 @@ def _getElementsFrom(smsTopList, dataset):
     elements = []
     for txname in dataset.txnameList:
         for top in smsTopList:
-            itop = txname._topologies.index(top)  #Check if the topology appear in txname
+            itop = txname._topologyList.index(top)  #Check if the topology appear in txname
             if itop is None: continue   
             for el in top.getElements():
                 newEl = txname.hasElementAs(el)  #Check if element appears in txname
