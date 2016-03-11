@@ -48,8 +48,8 @@ should list and check all internal tools (Pythia and NLL-fast) and external
 In case everything fails, please contact smodels-users@lists.oeaw.ac.at
 
 
-Installation on SL6
--------------------
+Installation on SL6 with root user priviledges
+----------------------------------------------
 
 Installation on an SL6 (Scientific Linux 6 or Scientific Linux CERN 6) machine
 is tricky, because SModelS requires a more recent version of *scipy* than is provided by SL6. 
