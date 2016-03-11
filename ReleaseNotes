@@ -1,8 +1,10 @@
 Release v1.0.4, Fri 11 Mar 2016 11:18:46 AM CET 
 =======================================================
+
   * @memoize bug fixed (Andre Lessa)
-	* database.bib file included (Wolfgang Waltenberger)
-	* README file updated (Jory Sonneveld)
+  * database.bib file included (Wolfgang Waltenberger)
+  * README file updated (Jory Sonneveld and Wolfgang Waltenberger)
+
 
 Release v1.0.3, Tue 17 Mar 2015 09:22:03 AM BRT
 =======================================================
