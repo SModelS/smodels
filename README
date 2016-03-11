@@ -1,82 +1,159 @@
-============
-SModelS v1.0
-============
+==============
+SModelS v1.0.x
+==============
 
 
 Installation
 ============
 
-SModelS is a Python library that requires Python version 2.6 or later 
-(but not version 3) with setuptools installed. Internally, SModelS uses the following tools:
+SModelS is a Python library that requires Python version 2.6 or later
+(but not version 3), ideally with setuptools installed.
 
- * Pythia 6.4.27
- * NLL-fast 1.2 (7 TeV) and 2.1 (8 TeV)
- * PySLHA (modified version)
+Internally, SModelS uses the following tools:
 
-These tools are built into SModelS, they need not be installed separately. 
-In addition to setuptools, SModelS depends on the following *external* Python libraries:
+  * Pythia 6.4.27
+  * NLL-fast 1.2 (7 TeV) and 2.1 (8 TeV)
+  * PySLHA (modified version)
 
- * unum
- * numpy
- * argparse
- * docutils>=0.3
- * scipy>=0.9.0
+These tools are built into SModelS, they need not be installed separately.
+In addition to setuptools, SModelS depends on the following *external* Python
+libraries:
 
-For installation, SModelS makes use of Python's *setuptools*.
-Thus ::
-  python setup.py install 
+  * unum
+  * numpy
+  * argparse
+  * docutils>=0.3
+  * scipy>=0.9.0
 
-should install the entire project, compile the internal Pythia and NLL-fast versions
-using gfortran. It should also resolve the external dependencies, i.e. install
-the Python libraries listed above using e.g. *pip*.
-If the python libraries are installed in a system folder (as is the default behavior),
-it will be necessary to run the install command with superuser privilege.
+Installation using setup.py with python setuptools
+==================================================
 
+An easy way to install is through using the given setup.py
+*if you have python with setuptools installed*:
+You can do:
+  *  python setup.py install
+Or as a user without root privileges:
+  *  python setup.py install --user
+
+This should install the entire project, compile the internal Pythia and
+NLL-fast versions using gfortran. It should also resolve the external
+dependencies, i.e. install the Python libraries listed above using e.g. *pip*.
+If the python libraries are installed in a system folder (as is the default
+behavior), it will be necessary to run the install command with superuser
+privilege.
 
 In case the compilation of SModelS fails, it is advised to try to compile
-the tools manually, by issuing "make" in the *lib/* directory.
-In case the installation of the external libraries fails, you can also try to install
-them manually, then rerun setup.py.  For SL6 machines, a recipe is given below.
+the tools manually, by issuing "make" in the lib/ directory.
+In case the installation of the external libraries fails, you can also try to
+install them manually, then rerun setup.py.
+For a complete manual installation without setup.py and for installing
+on SL6 machines, recipes are given below.
 
 There is also a diagnostic tool available: ::
 
-   python smodels/tools/toolBox.py 
+  * python smodels/tools/toolBox.py
 
 should list and check all internal tools (Pythia and NLL-fast) and external
 (numpy, scipy, unum, ... ) dependencies.
 
-In case everything fails, please contact smodels-users@lists.oeaw.ac.at
 
 
-Installation on SL6 with root user priviledges
-----------------------------------------------
+Installation on SL6
+===================
 
 Installation on an SL6 (Scientific Linux 6 or Scientific Linux CERN 6) machine
-is tricky, because SModelS requires a more recent version of *scipy* than is provided by SL6. 
+is tricky, because SModelS requires a more recent version of *scipy* than is
+provided by SL6.
 SModelS can be installed on SL6 by doing:
 
- * yum install gcc-c++ libstdc++-devel libevent-devel python-devel lapack lapack-devel blas blas-devel libgfortran python-distutils-extra
+  * yum install gcc-c++ libstdc++-devel libevent-devel python-devel lapack \
+    lapack-devel blas blas-devel libgfortran python-distutils-extra
 
-followed by:
+If you do not have super user privileges, you can try and install anaconda 
+(see https://www.continuum.io/why-anaconda), execute the downloaded shell script.
 
- * pip install nose unum argparse
- * pip install numpy
- * pip install pymc
- * export LC_ALL=C; export LANG=C; pip install scipy
+In both cases, you can now install the following python packages using pip:
+  * pip install nose unum argparse
+  * pip install numpy
+  * pip install pymc
+  * export LC_ALL=C; export LANG=C; pip install scipy
 
-Note, that these steps can safely be done within a Python ``virtualenv``.
+Note that the --user flag can be used to install these packages without super
+user privileges:
+  * pip install nose unum argparse --user
+etc.
 
-                                                                                      
-Installation on SL5 and similar distributions                                         
----------------------------------------------                                         
-                                                                                      
+Note also that these steps can safely be done within a Python ``virtualenv``.
+
+
+Installation on SL5 and similar distributions
+=============================================
+
 In some distributions like SL5, the python default version may be smaller than
 2.6.  In these cases, ``virtualenv`` has to be set up for a python version >=
 2.6.  E.g. for python 2.6, do ``virtualenv --python=python2.6 <envname>``, and
 modify by hand the first line in the executable from ``#!/usr/bin/env python``
-to ``#!/usr/bin/env python2.6``.  
-Then perform the steps listed under ``Installation on SL6``.  
+to ``#!/usr/bin/env python2.6``.
+Then perform the steps listed under ``Installation on SL6``.
 
+
+
+Manual installation
+===================
+
+If for any reason you cannot run python setup.py and want or need
+to manually install SModelS, you can use the instructions below
+as a guide.
+Unlike the external tools used by SModelS, the SModelS code itself
+does not need precompilation as it is written in the python programming
+language.
+
+The modules scipy, numpy, and argparse come with most distributions and
+likely need no installation.
+Install any missing modules like unum with e.g. pip:
+  * pip install unum
+If you do not have root privileges, use the --user flag:
+  * pip install unum --user
+Alternatively, you can download the package into your
+SModelS installation directory:
+  * wget 'https://pypi.python.org/packages/source/U/Unum/Unum-4.1.0.tar.gz#md5=6089ff2ffab9fc5ddf7e0953ca58b312'
+  * tar xf Unum-4.1.0.tar.gz
+  * ln -s Unum-4.1.0/unum
+
+Compile the external tools pythia and nllfast in the lib directory:
+
+  * cd lib
+  * make
+
+Last, you have to make sure python can find smodels by setting the python path:
+
+  * export PYTHONPATH=$PYTHONPATH:/your/path/to/smodels-v1.0.x
+
+This path can also be set at the top of a python script with
+
+  * import sys
+  * sys.path.append('/your/path/to/smodels-v1.0.x')
+
+Check that the tools are found and the path is set correctly by running
+
+  * python smodels/tools/toolBox.py
+
+Note that you can check if the python modules are present by trying to import them
+in a python shell; in your shell, type:
+ % python
+ Python 2.6.6 (r266:84292, Jul 22 2015, 16:47:47)
+ [GCC 4.4.7 20120313 (Red Hat 4.4.7-16)] on linux2
+ Type "help", "copyright", "credits" or "license" for more information.
+ >>> import numpy
+ >>> import scipy
+ >>> import unum
+ >>> import argparse
+This should now not give any errors.
+
+To obtain the right scipy version:
+  * pip install scipy --user --upgrade
+
+In case everything fails, please contact smodels-users@lists.oeaw.ac.at
 
 
 Running SModelS
@@ -85,11 +162,14 @@ Running SModelS
 SModelS provides a command-line tool (runSModelS.py) for the basic functionalities,
 which can be executed as:
 
-./runSModelS.py -p <parameter file> -f <input file> -o <output file>
+  * ./runSModelS.py -p <parameter file> -f <input file> -o <output file>
+
+For example:
+  * ./runSModelS.py -f inputFiles/slha/simplyGluino.slha
 
 For help instructions:
 
-./runSModelS.py -h
+  * ./runSModelS.py -h
 
 An example file on how to call the SModelS libraries from your own
 Python code can be found in Example.py.
@@ -105,10 +185,9 @@ used to test runSModelS.py.
 Citation
 ========
 
-If you use this software please cite SModelS v1.0 as well as the programs 
-it makes use of (Pythia6.4, NLL-fast and PySLHA). For convenience, the relevant 
-citations are provided in bibtex format in references.bib. 
+If you use this software please cite SModelS v1.0 as well as the programs
+it makes use of (Pythia6.4, NLL-fast and PySLHA). For convenience, the relevant
+citations are provided in bibtex format in references.bib.
 
-For citing the experimental analyses in the database, you can use smodels-database/database.bib 
-
-
+For citing the experimental analyses in the database, you can use
+smodels-database/database.bib
