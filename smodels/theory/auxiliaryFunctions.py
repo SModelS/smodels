@@ -32,10 +32,13 @@ def _memoize(func):
         """
         Wrapper for the function to be memoized
         """ 
-
-        if str(args) not in cache:
-            cache[str(args)] = func(*args)
-        return cache[str(args)]
+        argstring = str(args[0])+" "
+        for line in args[1]:
+            for element in line:
+                argstring += "%.2f " % (element/GeV) 
+        if argstring not in cache:
+            cache[argstring] = func(*args)
+        return cache[argstring]
     return _wrap
 
 
