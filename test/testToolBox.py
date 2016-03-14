@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 """
-.. module:: testTx
-   :synopsis: Tests with Tx slha input files.
+.. module:: testToolBox
+   :synopsis: Tests the ToolBox thingie
     
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
     
