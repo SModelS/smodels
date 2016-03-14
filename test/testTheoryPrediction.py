@@ -8,9 +8,9 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
-import unittest
 import sys
-sys.path.append("../")
+sys.path.insert(0,"../")
+import unittest
 from smodels.tools.physicsUnits import fb, GeV, pb
 import inspect
 import os

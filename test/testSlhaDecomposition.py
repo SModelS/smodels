@@ -9,7 +9,7 @@
 """
 
 import sys
-sys.path.append("../")
+sys.path.insert(0,"../")
 from smodels.theory import slhaDecomposer
 from smodels.tools.physicsUnits import GeV, fb
 import unittest

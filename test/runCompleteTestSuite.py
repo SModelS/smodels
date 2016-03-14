@@ -8,9 +8,9 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com> 
     
 """
-import sys
-sys.path.append("../")
 
+import sys
+sys.path.insert(0,"../")
 import unittest
 
 def main():

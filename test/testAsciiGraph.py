@@ -10,7 +10,7 @@
 """
 import unittest
 import sys
-sys.path.append('../')
+sys.path.insert(0,"../")
 
 class AsciiTest(unittest.TestCase):
     def orig(self):
