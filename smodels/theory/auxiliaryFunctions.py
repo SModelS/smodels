@@ -19,6 +19,33 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 logger = logging.getLogger(__name__)
 
 
+def toString ( arg ):
+    try:
+        return "%.2f " % arg.asUnit(fb)
+    except Exception,e:
+        pass
+    try:
+        return "%.3f " % arg.asNumber(GeV)
+    except Exception,e:
+        pass
+    try:
+        return "%.2f " % arg.asUnit(1/fb)
+    except Exception,e:
+        pass
+    if type(arg) == float:
+        return "%.2f " % arg
+    if type(arg) == int:
+        return "%d " % arg
+    if type(arg) == str:
+        return "%s " % arg
+    if type(arg) in [ list, tuple ]:
+        argstring=""
+        for newarg in arg:
+            argstring += toString ( newarg )
+    #    print "argstring=",argstring
+        return argstring
+    return "%s " % ( str(arg) )
+            
 def _memoize(func):
     """
     Serves as a wrapper to cache the results of func, since this is a
@@ -31,10 +58,10 @@ def _memoize(func):
         """
         Wrapper for the function to be memoized
         """ 
-
-        if str(args) not in cache:
-            cache[str(args)] = func(*args)
-        return cache[str(args)]
+        argstring = toString ( args )
+        if argstring not in cache:
+            cache[argstring] = func(*args)
+        return cache[argstring]
     return _wrap
 
 
