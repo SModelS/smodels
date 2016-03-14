@@ -154,9 +154,9 @@ class ExpResult(object):
         for the required attribute (sqrts,id,constraint,...).
         If there is a single value, returns the value itself.
         
-        :param attribute: name of a field in the database (string). If not defined
-                          it will return a dictionary with all fields and their respective
-                          values
+        :param attribute: name of a field in the database (string). If not
+                          defined it will return a dictionary with all fields and 
+                          their respective values
         :return: list of values or value
         
         """
