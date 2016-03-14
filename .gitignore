@@ -4,6 +4,7 @@
 *.tar.gz
 build/
 test/unitTestOutput.txt
+test/stdout.log
 smodels.egg-info/
 dist/
 old/
@@ -34,4 +35,3 @@ debian/smodels.postinst.debhelper
 debian/smodels.prerm.debhelper
 debian/smodels.substvars
 debian/smodels/
-

@@ -17,30 +17,34 @@ from smodels.tools import summaryReader
 from runSModelS import main
 
 class RunSModelSTest(unittest.TestCase):
+    def main(self, filename ):
+        a=sys.stdout
+        sys.stdout = open ( "stdout.log", "w" )
+        out = "%s/test/unitTestOutput.txt" % installDirectory()
+        if os.path.exists ( out ): 
+            os.unlink ( out )
+        main(filename, 
+             parameterFile="%s/test/testParameters.ini" %installDirectory(), 
+             outputFile= out )
+        outputfile = summaryReader.Summary(
+                "%s/test/unitTestOutput.txt" % installDirectory())
+        sys.stdout = a
+        return outputfile
+
     def testGoodFile(self):
 
         filename = "%s/inputFiles/slha/gluino_squarks.slha" % (installDirectory() )
-#        print "filename=",filename
-        main(filename, 
-             parameterFile="%s/test/testParameters.ini" %installDirectory(), 
-             outputFile="%s/test/unitTestOutput.txt" %installDirectory())
+        outputfile = self.main(filename )
         sample = summaryReader.Summary(
                 "%s/test/summary_default.txt" %installDirectory())
-        outputfile = summaryReader.Summary(
-                "%s/test/unitTestOutput.txt" %installDirectory())
         self.assertEquals(sample, outputfile)
 
     def testBadFile(self):
 
         filename = "%s/inputFiles/slha/I_dont_exist.slha" % (installDirectory() )
-#        print "filename=",filename
-        main(filename, 
-             parameterFile="%s/test/testParameters.ini" %installDirectory(), 
-             outputFile="%s/test/unitTestOutput.txt" %installDirectory())
+        outputfile = self.main (filename ) 
         sample = summaryReader.Summary(
                 "%s/test/summary_bad_default.txt" %installDirectory())
-        outputfile = summaryReader.Summary(
-                "%s/test/unitTestOutput.txt" %installDirectory())
         self.assertEquals(sample, outputfile)
 
 if __name__ == "__main__":
