@@ -7,15 +7,12 @@
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
 
 """
+import sys
+sys.path.insert(0,"../")
 import unittest
 from smodels.tools.physicsUnits import GeV, pb
 from smodels.installation import installDirectory
 from smodels.experiment.databaseObjects import Database
-#from smodels.experiment.smsInterpolation import upperLimit
-#from smodels.experiment import smsHelpers
-
-## smsHelpers.base = installDirectory() + 'test/database/'
-# smsHelpers.base =  './database/'
 database=Database ( "./database" )
 
 class UpperLimitTest(unittest.TestCase):

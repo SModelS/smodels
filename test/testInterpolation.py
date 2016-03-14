@@ -9,7 +9,7 @@
 
 """
 import sys
-sys.path.insert(0,'../')
+sys.path.insert(0,"../")
 import unittest
 from smodels.experiment.databaseObjects import Database
 from smodels.experiment.txnameObject import TxNameData

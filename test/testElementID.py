@@ -7,8 +7,9 @@
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
 
 """
-import unittest, sys
-sys.path.insert(1, "../")
+import sys
+sys.path.insert(0,"../")
+import unittest
 from smodels.installation import installDirectory
 from smodels.theory import slhaDecomposer
 from smodels.tools.physicsUnits import GeV
