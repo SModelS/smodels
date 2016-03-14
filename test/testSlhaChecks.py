@@ -8,6 +8,8 @@
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
 
 """
+import sys
+sys.path.insert(0,"../")
 import unittest
 from smodels.installation import installDirectory
 from smodels.tools import slhaChecks

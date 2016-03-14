@@ -9,6 +9,8 @@
     
 """
 
+import sys
+sys.path.insert(0,"../")
 from smodels.tools import xsecComputer
 from smodels.tools.xsecComputer import LO, NLL
 from smodels.tools.physicsUnits import TeV, fb

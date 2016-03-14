@@ -7,10 +7,11 @@
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
 
 """
+
+import sys
+sys.path.insert(0,"../")
 import unittest
 import os
-import sys
-sys.path.append("../")
 from smodels.installation import installDirectory
 from smodels.tools import summaryReader
 from runSModelS import main
