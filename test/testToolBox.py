@@ -8,6 +8,8 @@
     
 """
 
+import sys
+sys.path.insert(0,"../")
 from smodels.tools import toolBox
 import unittest
 import logging
