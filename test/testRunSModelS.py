@@ -37,7 +37,7 @@ class RunSModelSTest(unittest.TestCase):
         outputfile = self.main(filename )
         sample = summaryReader.Summary(
                 "%s/test/summary_default.txt" %installDirectory())
-        if sample!=outputfile:
+        if not ( sample==outputfile ):
             print
             print "%s != %s" % ( os.path.basename(outputfile.filename), 
                                  os.path.basename(sample.filename) )
