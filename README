@@ -83,18 +83,20 @@ user privileges:
   * pip install nose unum argparse --user
 etc.
 
-Note also that these steps can safely be done within a Python ``virtualenv``.
+Note also that these steps can safely be done within a Python ``virtualenv''.
 
 
 Installation on SL5 and similar distributions
 =============================================
 
 In some distributions like SL5, the python default version may be smaller than
-2.6.  In these cases, ``virtualenv`` has to be set up for a python version >=
-2.6.  E.g. for python 2.6, do ``virtualenv --python=python2.6 <envname>``, and
-modify by hand the first line in the executable from ``#!/usr/bin/env python``
-to ``#!/usr/bin/env python2.6``.
-Then perform the steps listed under ``Installation on SL6``.
+2.6.  In these cases, ``virtualenv'' has to be set up for a python version >=
+2.6.  E.g. for python 2.6, do ``virtualenv --python=python2.6 <envname>'', and
+modify by hand the first line in the executable from ``#!/usr/bin/env python''
+to ``#!/usr/bin/env python2.6''.
+Then perform the steps listed under ``Installation on SL6''.
+Of course, anaconda is also an option for an SL5 setup, see ``Installation on
+SL6''.
 
 
 
