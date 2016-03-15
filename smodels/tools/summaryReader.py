@@ -30,6 +30,7 @@ class Summary():
     """
     def __init__(self, filename):
         self.results = []
+        self.filename = filename
         self.read(filename)
 
     def read(self, infile):
