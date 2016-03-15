@@ -254,13 +254,15 @@ class TxNameData(object):
             for j in i:
                 ret.append ( j.asNumber(GeV) )
         return ret
+
     def _estimateExtrapolationError ( self, massarray ):
-        """ when projecting a point p from n to the point P in m dimensions,
-            we estimate the expected extrapolation error with the following strategy: 
-            we compute the gradient at point P, and let alpha be the distance between
-            p and P. We then walk one step of length alpha in the direction of the greatest ascent,
-            and the opposite direction. Whichever relative change is greater is 
-            reported as the expected extrapolation error.
+        """ when projecting a point p from n to the point P in m dimensions, we
+            estimate the expected extrapolation error with the following
+            strategy: we compute the gradient at point P, and let alpha be the
+            distance between p and P. We then walk one step of length alpha in
+            the direction of the greatest ascent, and the opposite direction.
+            Whichever relative change is greater is reported as the expected
+            extrapolation error.
         """
         #p=self.flattenMassArray ( massarray ) ## point p in n dimensions
         porig=self.flattenMassArray ( massarray ) ## flatten
