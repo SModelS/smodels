@@ -15,7 +15,8 @@
 import time
 import sys
 import os
-import pickle
+# import pickle
+import cPickle as pickle
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.experiment.databaseObjects import Database
 import logging
@@ -51,6 +52,7 @@ class DbPickler(object):
         except DatabaseNotFoundException:
             logger.error("Database not found in %s" % os.path.realpath(self.db_dir))
             sys.exit()
+        return self.txt_db
 
     def lastModifiedDir ( self, dirname, lastm ):
         """ return the last modified timestamp of dirname,
@@ -106,7 +108,8 @@ class DbPickler(object):
             pickle.dump ( self.txt_mtime, f )
             logger.debug (  " * load text database" )
             self.loadTextDatabase() 
-            pickle.dump ( self.txt_db, f )
+            logger.debug (  " * write %s" % self.pclfile )
+            pickle.dump ( self.txt_db, f, protocol=2 )
             logger.debug (  " * done writing %s" % self.pclfile )
 
 
@@ -168,6 +171,10 @@ if __name__ == "__main__":
             and/or write database.pcl files')
     argparser.add_argument('-c', '--check', help='check pickle file',
                            action='store_true')
+    argparser.add_argument('-t', '--time', help='time reading db',
+                           action='store_true')
+    argparser.add_argument('-r', '--read', help='read pickle file',
+                           action='store_true')
     argparser.add_argument('-w', '--write', help='force writing pickle file',
                            action='store_true')
     argparser.add_argument('-u', '--update', help='update pickle file, if necessary',
@@ -184,4 +191,20 @@ if __name__ == "__main__":
         pickler.updatePickleFile()
     if args.check:
         pickler.checkPickleFile()
-    
+    if args.time:
+        t0=time.time()
+        db = pickler.loadPickleFile ( lastm_only = False )
+        t1=time.time()
+        print "Time it took reading pickle file: %.1f s." % (t1-t0)
+        txtdb = pickler.loadTextDatabase()
+        t2=time.time()
+        print "Time it took reading text   file: %.1f s." % (t2-t1)
+    if args.read:
+        db = pickler.loadPickleFile ( lastm_only = False )
+        listOfExpRes = db.getExpResults() 
+        for expResult in listOfExpRes:
+            print expResult
+        #txtdb=pickler.loadTextDatabase()
+        #listOfExpRes = txtdb.getExpResults() 
+        #for expResult in listOfExpRes:
+        #    print expResult
