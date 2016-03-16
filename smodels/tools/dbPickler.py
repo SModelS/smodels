@@ -33,6 +33,9 @@ class DbPickler(object):
         self.db_dir = db_dir
         self.txt_db = None
         self.pclfile = os.path.join ( self.db_dir, "database.pcl" )
+        self.pcl_mtime = None, None
+        self.pcl_db = None
+        self.txt_mtime = None, None
 
     def __str__ ( self ):
         ret = "Database at: %s\n" % ( self.db_dir )
@@ -71,8 +74,9 @@ class DbPickler(object):
         return (ret,ctr)
 
     def lastModifiedAndFileCount( self ):
-        # logger.info ( "Last modified time stamp" )
-        # logger.info ( "db at %s " % self.db_dir )
+        if self.txt_mtime[0]:
+            ## already evaluated
+            return
         versionfile = os.path.join ( self.db_dir, "version" ) 
         if not os.path.exists ( versionfile ):
             logger.error("%s does not exist." % versionfile )
@@ -87,36 +91,75 @@ class DbPickler(object):
             print subdir
             (lastm,tcount) = self.lastModifiedDir ( subdir, lastm )
             count+=tcount+1
-        return lastm,count
+        self.txt_mtime = lastm, count
 
     def createPickleFile ( self ):
         """ create a pcl file from the text database,
             potentially overwriting an old pcl file. """
-        logger.info ( "Creating pickle file:" )
-        logger.info ( " * compute last modified timestamp." )
-        lastm,count=self.lastModifiedAndFileCount()
-        logger.info (  " * compute timestamp: %s filecount: %d" % \
-                ( time.ctime ( lastm ), count ) )
-        logger.info (  " * create %s" % self.pclfile )
+        logger.debug ( "Creating pickle file:" )
+        logger.debug ( " * compute last modified timestamp." )
+        self.lastModifiedAndFileCount()
+        logger.debug (  " * compute timestamp: %s filecount: %d" % \
+                ( time.ctime ( self.txt_mtime[0] ), self.txt_mtime[1] ) )
+        logger.debug (  " * create %s" % self.pclfile )
         with open ( self.pclfile, "w" ) as f:
-            pickle.dump ( lastm, f )
-            pickle.dump ( count, f )
-            logger.info (  " * load text database" )
+            pickle.dump ( self.txt_mtime, f )
+            logger.debug (  " * load text database" )
             self.loadTextDatabase() 
             pickle.dump ( self.txt_db, f )
+            logger.debug (  " * done writing %s" % self.pclfile )
+
+
+    def needsUpdate ( self ):
+        """ does the pickle file need an update? """
+        self.lastModifiedAndFileCount()
+        self.loadPickleFile ( lastm_only = True )
+        return ( self.txt_mtime[0] > self.pcl_mtime[0] or \
+                 self.txt_mtime[1] != self.pcl_mtime[1] )
+
+    def updatePickleFile ( self ):
+        """ write a pickle file, but only if 
+            necessary. """
+        if self.needsUpdate():
+            logger.debug ( "pickle file needs an update." )
+            self.createPickleFile()
+        else:
+            logger.debug ( "pickle file does not need an update." )
 
     def loadPickleFile ( self, lastm_only = False ):
         """ load a pickle file, returning
             last modified, file count, database.
         :param lastm_only: if true, the database itself is not read.
+        :returns: database object, or None, lastm_only == True.
         """
+        if lastm_only and self.pcl_mtime[0]:
+            ## doesnt need to load database, and mtime is already
+            ## loaded
+            return None
+
+        if self.pcl_db:
+            return self.pcl_db
+
         with open ( self.pclfile, "r" ) as f:
-            lastm = pickle.load ( f )
-            count = pickle.load ( f )
-            db=None
+            self.pcl_mtime = pickle.load ( f )
             if not lastm_only:
-                db = pickle.load ( f )
-        return lastm,count,db
+                self.pcl_db = pickle.load ( f )
+        return self.pcl_db
+
+    def checkPickleFile ( self ):
+        nu=self.needsUpdate()
+        logger.debug ( "Checking pickle file." )
+        logger.debug ( "Pickle file dates to %s(%d)" % \
+                      ( time.ctime(self.pcl_mtime[0]),self.pcl_mtime[1] ) )
+        logger.debug ( "Database dates to %s(%d)" % \
+                      ( time.ctime(self.txt_mtime[0]),self.txt_mtime[1] ) )
+        if nu:
+            logger.debug ( "pickle file needs an update." )
+        else:
+            logger.debug ( "pickle file does not need an update." )
+        return nu
+
+            
         
 if __name__ == "__main__":
     import argparse
@@ -129,11 +172,16 @@ if __name__ == "__main__":
                            action='store_true')
     argparser.add_argument('-u', '--update', help='update pickle file, if necessary',
                            action='store_true')
-    argparser.add_argument('-d', '--database', help='directory name of database', default="../../../smodels-database/" )
+    argparser.add_argument('-d', '--database', help='directory name of database', 
+                            default="../../../smodels-database/" )
     args = argparser.parse_args()
     logger.setLevel(level=logging.DEBUG )
     pickler = DbPickler ( args.database )
-    print pickler
+    logger.debug ( "%s" % pickler )
     if args.write:
         pickler.createPickleFile()
+    if args.update:
+        pickler.updatePickleFile()
+    if args.check:
+        pickler.checkPickleFile()
     
