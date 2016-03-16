@@ -1,3 +1,5 @@
+VERSION=`cat ../smodels/version`
+
 all: run
 
 run:
@@ -6,5 +8,9 @@ run:
 clean:
 	rm -rf smodels-v* 
 
+version:
+	echo $(VERSION)
+
 upload:
 	scp ../ReleaseNotes smodels-v*.tgz smodels.hephy.at:/var/www/downloads/
+	scp -r smodels-v$(VERSION)/docs smodels.hephy.at:/var/www/docs/v$(VERSION)
