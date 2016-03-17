@@ -20,8 +20,9 @@ from smodels.theory.element import Element
 from smodels.theory.topology import TopologyList
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.theory.auxiliaryFunctions import _memoize
-from scipy.interpolate import griddata
+# from scipy.interpolate import griddata
 from scipy.linalg import svd
+import scipy.spatial.qhull as qhull
 import numpy as np
 import unum
 import copy
@@ -245,9 +246,10 @@ class TxNameData(object):
         p= ( (np.matrix(porig)[0] - self.delta_x ) ).tolist()[0]
         P=np.dot(p,self.V)  ## rotate
         dp=self.countNonZeros ( P )
+        self.projected_value = self.interpolate( [ P[:self.dimensionality] ] )
         
-        self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
-        self.projected_value = float(self.projected_value)        
+        # self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
+        # self.projected_value = float(self.projected_value)        
         if dp != self.dimensionality: ## we have data in different dimensions
             if self.accept_errors_upto == None:
                 return None
@@ -265,6 +267,30 @@ class TxNameData(object):
             for j in i:
                 ret.append ( j.asNumber(GeV) )
         return ret
+
+    def interpolate(self, uvw, fill_value=np.nan):
+        simplex = self.tri.find_simplex(uvw)
+        vertices = np.take(self.tri.simplices, simplex, axis=0)
+        temp = np.take(self.tri.transform, simplex, axis=0)
+        d=temp.shape[2]
+        delta = uvw - temp[:, d]
+        bary = np.einsum('njk,nk->nj', temp[:, :d, :], delta)
+        self.vtx = vertices
+        self.wts = np.hstack((bary, 1 - bary.sum(axis=1, keepdims=True)))
+        v=self.xsec 
+        if type (self.xsec[0]) == float:
+            values = np.array ( [ float(x) for x in self.xsec ] )
+        else:
+            values = np.array ( [ x.asNumber() for x in self.xsec ] )
+        # print ("values=",(values[:]))
+        # print ("v=",(v[:]))
+        #print ("wts=",wts.shape)
+        ret = np.einsum('nj,nj->n', np.take(values, self.vtx), self.wts)
+        #print ("retb=",ret[0])
+        with np.errstate(invalid='ignore'):
+            ret[np.any(self.wts < -1e-10, axis=1)] = fill_value
+        return float(ret[0])
+
 
     def _estimateExtrapolationError ( self, massarray ):
         """ when projecting a point p from n to the point P in m dimensions, we
@@ -288,16 +314,13 @@ class TxNameData(object):
         
         ## compute gradient
         gradient=[]
-        # print ",,,,,,,,,,,"
         for i in range ( self.dimensionality ):
-            #print "i=",i
             P2=copy.deepcopy(P)
-            #print "now adding alpha"
             P2[i]+=alpha
-            #print "before griddata"
-            g=float ( ( griddata( self.Mp, self.xsec, [ P2[:self.dimensionality]], 
-                        method="linear")[0] - self.projected_value ) / alpha )
-            #print "g=",g
+            pv = self.interpolate ( [ P2[:self.dimensionality] ] )
+            g=float ( ( pv - self.projected_value ) / alpha )
+            #g=float ( ( griddata( self.Mp, self.xsec, [ P2[:self.dimensionality]], 
+            #            method="linear")[0] - self.projected_value ) / alpha )
             if math.isnan ( g ):
                 ## if we cannot compute a gradient, we return nan
                 return float("nan")
@@ -319,11 +342,13 @@ class TxNameData(object):
             P3[i]+=gradient[i]
             P4[i]-=gradient[i]
         # print "projected value", projected_value
-        agp=griddata( self.Mp, self.xsec, [ P3[:self.dimensionality] ], 
-                      method="linear")[0]
+        agp=self.interpolate ( [ P3[:self.dimensionality] ] )
+        #agp=griddata( self.Mp, self.xsec, [ P3[:self.dimensionality] ], 
+        #              method="linear")[0]
         #print "along gradient", ag
-        agm=griddata( self.Mp, self.xsec, [ P4[:self.dimensionality] ], 
-                      method="linear")[0]
+        agm=self.interpolate ( [ P4[:self.dimensionality] ] )
+        #agm=griddata( self.Mp, self.xsec, [ P4[:self.dimensionality] ], 
+        #              method="linear")[0]
         #print "along negative gradient",agm
         dep,dem=0.,0.
         if self.projected_value == 0.:
@@ -407,6 +432,7 @@ class TxNameData(object):
         for i in Mp:
             MpCut.append ( i[:self.dimensionality].tolist() )
         self.Mp=MpCut ## also keep the rotated points, with truncated zeros
+        self.tri = qhull.Delaunay( self.Mp )
 
 if __name__ == "__main__":
     import time
@@ -424,7 +450,10 @@ if __name__ == "__main__":
          [ [[ 400.*GeV,350.*GeV], [ 400.*GeV,350.*GeV] ], 19.*fb ], ]
     txnameData=TxNameData ( data ) ## "upperlimit", data )
     t0=time.time()
-    print "now get Value!"
-    result=txnameData.getValueFor([[ 300.*GeV,125.*GeV], [ 300.*GeV,125.*GeV] ])
-    print result
-    print (time.time()-t0)*1000.,"ms"
+    for masses in [ [[ 302.*GeV,123.*GeV], [ 302.*GeV,123.*GeV]],
+                    [[ 254.*GeV,171.*GeV], [ 254.*GeV,170.*GeV]],
+    ]:
+        result=txnameData.getValueFor( masses )
+        sm = "%.1f %.1f" % ( masses[0][0].asNumber(GeV), masses[0][1].asNumber(GeV) )
+        print "%s %.3f fb" % ( sm, result.asNumber(fb) )
+    print "%.2f ms" % ( (time.time()-t0)*1000. )

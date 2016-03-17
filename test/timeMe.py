@@ -25,3 +25,4 @@ if suppressStdout:
 print "%.1f secs." % ( t1-t0 )
 
 print "on wnouc, old version: 71 secs."                                               
+print "on wnouc, without persistent triangulation: 45 secs."                                               
