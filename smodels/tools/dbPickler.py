@@ -15,7 +15,6 @@
 import time
 import sys
 import os
-# import pickle
 import cPickle as pickle
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.experiment.databaseObjects import Database
