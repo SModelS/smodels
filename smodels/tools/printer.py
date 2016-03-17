@@ -168,13 +168,15 @@ class TextBasedPrinter(object):
 
         output = ""
         output += "Input status: " + str(obj.filestatus) + "\n"
-        output += "Decomposition output status: " + str(obj.status) + " " + obj.statusStrings[obj.status] + "\n"
+        output += "Decomposition output status: " + str(obj.status) + " " 
+        output += obj.statusStrings[obj.status] + "\n"
         if obj.filestatus < 0: output += str(obj.warnings) + "\n"
         output += "#Input File: " + obj.inputfile + "\n"
-        for label, par in obj.parameters.items(): output += "#" + label + " = " + str(par) + '\n'
-        if obj.databaseVersion: output += "#Database version: %s\n" % obj.databaseVersion
-        output += "================================================================================\n"
-
+        for label, par in obj.parameters.items(): 
+            output += "#" + label + " = " + str(par) + '\n'
+        if obj.databaseVersion: 
+            output += "#Database version: %s\n" % obj.databaseVersion
+        output += "=" * 80 + "=\n"
         return output
 
     def _formatTopologyList(self, obj, objOutputLevel):
