@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 .. module:: txnameObject
    :synopsis: Holds the classes and methods used to read and store the
@@ -180,13 +182,15 @@ class TxNameData(object):
                 when extrapolating outside convex hull.
                 This method can be used to loosen the equal branches assumption.
         """
-
         self.accept_errors_upto=accept_errors_upto
         self.store_value = value
+        self.V = None
         self.data = None
+        self.loadData()
 
     def __ne__ ( self, other ):
         return not self.__eq__ ( other )
+
     def __eq__ ( self, other ):
         return self.data == other.data 
         
@@ -195,6 +199,9 @@ class TxNameData(object):
         Uses the information in store_value to generate the data grid used for
         interpolation.
         """
+
+        if self.data:
+            return
         
         if type(self.store_value)==str:            
             self.data = eval(self.store_value, 
@@ -217,8 +224,6 @@ class TxNameData(object):
        
         self.computeV()
 
-
-
     @_memoize       
     def getValueFor(self,massarray):
         """
@@ -228,7 +233,7 @@ class TxNameData(object):
                           [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         """
         
-        if not self.data: self.loadData()
+        self.loadData()
         
         porig=self.flattenMassArray ( massarray ) ## flatten
         self.massarray = massarray
@@ -366,6 +371,8 @@ class TxNameData(object):
     def computeV ( self ):
         """ compute rotation matrix V, rotate and truncate also
             'data' points and store in self.Mp """
+        if self.V!=None:
+             return
         Morig=[]
         self.xsec=[]
      
@@ -376,13 +383,9 @@ class TxNameData(object):
         aM=np.matrix ( Morig )
         MT=aM.T.tolist()
         self.delta_x = np.matrix ( [ sum (x)/len(Morig) for x in MT ] )[0]
-        # self.delta_x = [1]*len(MT)
-        #print "delta_x=",self.delta_x
         M = []
-        #print "Morig=",Morig
         for Mx in Morig:
             M.append ( ( np.matrix ( Mx ) - self.delta_x ).tolist()[0] )
-        #print "M=",M
 
         U,s,Vt=svd(M)
         V=Vt.T
@@ -404,3 +407,24 @@ class TxNameData(object):
         for i in Mp:
             MpCut.append ( i[:self.dimensionality].tolist() )
         self.Mp=MpCut ## also keep the rotated points, with truncated zeros
+
+if __name__ == "__main__":
+    import time
+    data = [ [ [[ 150.*GeV, 50.*GeV], [ 150.*GeV, 50.*GeV] ],  3.*fb ], 
+         [ [[ 200.*GeV,100.*GeV], [ 200.*GeV,100.*GeV] ],  5.*fb ], 
+         [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], 10.*fb ], 
+         [ [[ 300.*GeV,150.*GeV], [ 300.*GeV,150.*GeV] ], 13.*fb ], 
+         [ [[ 300.*GeV,200.*GeV], [ 300.*GeV,200.*GeV] ], 15.*fb ], 
+         [ [[ 300.*GeV,250.*GeV], [ 300.*GeV,250.*GeV] ], 20.*fb ], 
+         [ [[ 400.*GeV,100.*GeV], [ 400.*GeV,100.*GeV] ],  8.*fb ], 
+         [ [[ 400.*GeV,150.*GeV], [ 400.*GeV,150.*GeV] ], 10.*fb ], 
+         [ [[ 400.*GeV,200.*GeV], [ 400.*GeV,200.*GeV] ], 12.*fb ], 
+         [ [[ 400.*GeV,250.*GeV], [ 400.*GeV,250.*GeV] ], 15.*fb ], 
+         [ [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ], 17.*fb ], 
+         [ [[ 400.*GeV,350.*GeV], [ 400.*GeV,350.*GeV] ], 19.*fb ], ]
+    txnameData=TxNameData ( data ) ## "upperlimit", data )
+    t0=time.time()
+    print "now get Value!"
+    result=txnameData.getValueFor([[ 300.*GeV,125.*GeV], [ 300.*GeV,125.*GeV] ])
+    print result
+    print (time.time()-t0)*1000.,"ms"
