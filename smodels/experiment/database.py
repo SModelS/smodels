@@ -48,7 +48,6 @@ class Database(object):
         self.pcl_mtime = None, None
         self.pcl_db = None
         self.pclfile = os.path.join ( self._base, "database.pcl" )
-        logger.info ( "loading pickle file %s" % self.pclfile )
         self._setLogLevel ( self._verbosity )
         if force_load=="txt":
             self.loadTextDatabase()
@@ -145,12 +144,16 @@ class Database(object):
             return self.pcl_db
 
         with open ( self.pclfile, "r" ) as f:
+            t0=time.time()
             self.pcl_mtime = pickle.load ( f )
             self._databaseVersion = pickle.load ( f )
             self.pclfile = pickle.load ( f )
             if not lastm_only:
+                logger.info ( "loading pickle file %s" % self.pclfile )
                 self.expResultList = pickle.load ( f )
-                logger.info ( "Loaded database from %s" % self.pclfile )
+                t1=time.time()-t0
+                logger.info ( "Loaded database from %s in %.1f secs." % \
+                        ( self.pclfile, t1 ) )
         return self
 
     def checkPickleFile ( self ):
@@ -178,7 +181,7 @@ class Database(object):
         """ create a pcl file from the text database,
             potentially overwriting an old pcl file. """
         t0=time.time()
-        logger.debug ( "Creating pickle file:" )
+        logger.info ( "Creating pickle file (this may take a few minutes)" )
         logger.debug ( " * compute last modified timestamp." )
         self.lastModifiedAndFileCount()
         logger.debug (  " * compute timestamp: %s filecount: %d" % \
