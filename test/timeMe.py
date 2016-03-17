@@ -24,4 +24,4 @@ if suppressStdout:
     sys.stdout = a
 print "%.1f secs." % ( t1-t0 )
 
-print "old version: 3.5 secs."
+print "on wnouc, old version: 71 secs."                                               

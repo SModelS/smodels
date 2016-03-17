@@ -27,7 +27,8 @@ class RunSModelSTest(unittest.TestCase):
             os.unlink ( out )
         main(filename, 
              parameterFile="%s/test/testParameters.ini" %installDirectory(), 
-             outputFile= out )
+             outputFile= out,
+             verbosity = 'error' )
         outputfile = summaryReader.Summary(
                 "%s/test/unitTestOutput.txt" % installDirectory())
         if suppressStdout:
