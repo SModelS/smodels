@@ -57,6 +57,13 @@ class Info(object):
                                 % (tag, self.path))
                     continue
 
+    def __eq__ ( self, other ):
+        if self.__dict__ != other.__dict__:
+            return False
+        return True
+
+    def __ne__ ( self, other ):
+        return not self.__eq__ ( other )
         
     def addInfo(self,tag,value):
         """
@@ -67,7 +74,7 @@ class Info(object):
         """
                   
         try:
-            setattr(self,tag,eval(value, {'fb' : fb, 'pb' : pb, 'GeV' : GeV, 'TeV' : TeV}))
+            setattr(self,tag,eval(value, {'fb':fb, 'pb':pb, 'GeV':GeV, 'TeV':TeV}))
         except SyntaxError:          
             setattr(self,tag,value)
         except NameError:
@@ -77,8 +84,8 @@ class Info(object):
         
     def getInfo(self, infoLabel):
         """Returns the value of info field.
-        :param infoLabel: label of the info field (string). It must be an attribute of
-                          the GlobalInfo object
+        :param infoLabel: label of the info field (string). It must be an attribute
+                          of the GlobalInfo object
         """
         
         if hasattr(self,infoLabel): return getattr(self,infoLabel)

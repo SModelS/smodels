@@ -56,7 +56,14 @@ class Topology(object):
         for p in self.vertparts:
             ret += "%s" % str(p).replace(" ", "")
         return ret
-    
+
+    def __ne__(self,other):
+        return not ( self.__eq__(other) )
+
+    def __eq__(self,other):
+        ret = (self.__cmp__(other)==0 )
+        return ret
+
     def __cmp__(self,other):
         """
         Compares the topology with other.
@@ -199,6 +206,11 @@ class TopologyList(object):
         for topo in topologies:
             self.add(topo)
 
+    def __ne__(self,other):
+        return not self.__eq__(other)
+
+    def __eq__(self,other):
+        return self.topos == other.topos
 
     def __len__(self):
         return len(self.topos)

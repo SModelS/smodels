@@ -47,6 +47,19 @@ class ExpResult(object):
                     except TypeError:
                         continue
 
+    def __eq__(self, other ):
+        if self.globalInfo != other.globalInfo:
+            return False
+        if len(self.datasets) != len ( other.datasets ):
+            return False
+        for (myds,otherds) in zip ( self.datasets, other.datasets ):
+            if myds != otherds:
+                return False
+        return True
+
+    def __ne__(self, other ):
+        return not self.__eq__ ( other )
+
     def __str__(self):
         label = self.globalInfo.getInfo('id') + ": "
         dataIDs = [dataset.dataInfo.dataId for dataset in self.datasets]
