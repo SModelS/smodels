@@ -1,0 +1,337 @@
+#!/usr/bin/env python
+
+"""
+.. module:: experiment.database
+   :synopsis: Contains Database class that represents the database of
+              experimental results.
+
+.. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+
+"""
+
+import cPickle as pickle
+import logging
+import os
+from smodels.experiment import infoObject
+from smodels.experiment import txnameObject
+from smodels.experiment import datasetObject
+from smodels.experiment.expResult import ExpResult
+from smodels.theory.auxiliaryFunctions import _memoize
+from smodels.experiment.exceptions import DatabaseNotFoundException
+from smodels.tools.physicsUnits import fb
+
+logger = logging.getLogger(__name__)
+
+class Database(object):
+    """
+    Database object. Holds a list of ExpResult objects.
+    
+    :ivar base: path to the database (string)
+    :ivar expResultList: list of ExpResult objects 
+        
+    """
+    
+    
+    def __init__(self, base=None):
+        self._base = self._validateBase(base)
+        self._verbosity = 'error'
+        self._databaseVersion = self._getDatabaseVersion
+        self.expResultList = None
+        self.loadTextDatabase()
+
+    def loadTextDatabase ( self ):
+        self.expResultList = self._loadExpResults()
+
+    def lastModifiedDir ( self, dirname, lastm ):
+        """ return the last modified timestamp of dirname,
+            working recursively 
+        :param dirname: directory name that is checked
+        :param lastm: the most recent timestamp so far
+        :returns: the most recent timestamp, and the number of files
+        """
+        ret = lastm
+        ctr=0
+        for f in os.listdir ( dirname ):
+            lf = os.path.join ( dirname, f )
+            if os.path.isdir ( lf ):
+                (ret,tctr) = self.lastModifiedDir ( lf, ret )
+                ctr+=tctr+1
+            else:
+                ctr+=1
+                tmp = os.stat ( lf ).st_mtime
+                if tmp > ret:
+                    ret = tmp
+        return (ret,ctr)
+
+    def lastModifiedAndFileCount( self ):
+        if self.txt_mtime[0]:
+            ## already evaluated
+            return
+        versionfile = os.path.join ( self.db_dir, "version" ) 
+        if not os.path.exists ( versionfile ):
+            logger.error("%s does not exist." % versionfile )
+            sys.exit()
+        lastm = os.stat(versionfile).st_mtime
+        count=1
+        topdir = os.listdir ( self.db_dir )
+        for File in topdir:
+            subdir = os.path.join ( self.db_dir, File )
+            if not os.path.isdir ( subdir ) or File in [ ".git" ]:
+                continue
+            print subdir
+            (lastm,tcount) = self.lastModifiedDir ( subdir, lastm )
+            count+=tcount+1
+        self.txt_mtime = lastm, count
+
+    def createPickleFile ( self ):
+        """ create a pcl file from the text database,
+            potentially overwriting an old pcl file. """
+        logger.debug ( "Creating pickle file:" )
+        logger.debug ( " * compute last modified timestamp." )
+        self.lastModifiedAndFileCount()
+        logger.debug (  " * compute timestamp: %s filecount: %d" % \
+                ( time.ctime ( self.txt_mtime[0] ), self.txt_mtime[1] ) )
+        logger.debug (  " * create %s" % self.pclfile )
+        with open ( self.pclfile, "w" ) as f:
+            pickle.dump ( self.txt_mtime, f )
+            logger.debug (  " * load text database" )
+            self.loadTextDatabase() 
+            logger.debug (  " * write %s" % self.pclfile )
+            pickle.dump ( self.txt_db, f, protocol=2 )
+            logger.debug (  " * done writing %s" % self.pclfile )
+
+
+
+    @property
+    def databaseVersion(self):
+        """
+        The version of the database, read from the 'version' file.
+        
+        """
+        return self._databaseVersion
+
+
+    @property
+    def base(self):
+        """
+        This is the path to the base directory where to find the database.
+        
+        """
+        return self._base
+
+
+    def _validateBase(self, path):
+        """
+        Validates the base directory to locate the database. 
+        Exits the script if something is wrong with the path.
+    
+        """
+        logger.debug('Try to set the path for the database to: %s', path)
+        path = os.path.realpath(path) + '/'
+        if not os.path.exists(path):
+            logger.error('%s is no valid path!', path)
+            raise DatabaseNotFoundException("Database not found")
+        return path
+
+
+    def __str__(self):
+        idList = "Database: " + self.databaseVersion + "\n---------- \n"
+        if self.expResultList == None:
+            idList += "no text files loaded"
+        else:
+            for expRes in self.expResultList:
+                idList += expRes.globalInfo.getInfo('id') + '\n'
+        return idList
+
+
+    @property
+    def _getDatabaseVersion(self):
+        """
+        Retrieves the version of the database using the version file.
+        
+        """
+        try:
+            vfile = os.path.join ( self._base, "version" )
+            versionFile = open( vfile )
+            content = versionFile.readlines()
+            versionFile.close()
+            line = content[0].strip()
+            logger.debug("Found version file %s with content ``%s''" \
+                   % ( vfile, line) )
+            return line
+
+        except IOError:
+            logger.error('There is no version file %s', vfile )
+            return 'unknown version'
+
+
+    @property
+    def verbosity(self):
+        """
+        Tells the level the logger is set to.
+        
+        """
+        return self._verbosity
+
+
+    @verbosity.setter
+    def verbosity(self, level):
+        """
+        Set the logger to specified level.
+        
+        """
+        level = self._validateLevel(level)
+        self._verbosity = level
+        self._setLogLevel(level)
+
+
+    def _validateLevel(self, level):
+        """
+        Validates given level for Python's logger module.
+        
+        """
+        if not level.lower() in ['debug', 'info', 'warning', 'error']:
+            logger.error('No valid level for verbosity: %s! Browser will ' +
+                         'use default setting!' % level)
+            return 'error'
+        return level.lower()
+
+
+    def _setLogLevel(self, level='error'):
+        if level == 'debug':
+            logger.setLevel(level=logging.DEBUG)
+        if level == 'info':
+            logger.setLevel(level=logging.INFO)
+        if level == 'warning':
+            logger.setLevel(level=logging.WARNING)
+        if level == 'error':
+            pass
+
+    
+    def _loadExpResults(self):
+        """
+        Checks the database folder and generates a list of ExpResult objects for
+        each (globalInfo.txt,sms.py) pair.
+        
+        :returns: list of ExpResult objects 
+  
+        """
+        resultsList = []
+        for root, _, files in os.walk(self._base):
+            if not 'globalInfo.txt' in files:
+                logger.debug("Missing files in %s", root)
+                continue
+            else:
+                expres = ExpResult(root)
+                if expres:
+                    resultsList.append(expres)
+
+        if not resultsList:
+            logger.warning("Zero results loaded.")
+
+        return resultsList
+
+
+    def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'], dataTypes = ['all']):
+        """
+        Returns a list of ExpResult objects.
+        
+        Each object refers to an analysisID containing one (for UL) or more (for Efficiency maps)
+        dataset (signal region) and each dataset containing one or more TxNames.
+        If analysisIDs is defined, returns only the results matching one of the IDs in the list.
+        If dataTypes is defined, returns only the results matching a dataType in the list.
+        If datasetIDs is defined, returns only the results matching one of the IDs in the list.
+        If txname is defined, returns only the results matching one of the Tx names in the list.
+        
+        :param analysisID: list of analysis ids ([CMS-SUS-13-006,...])
+        :param dataType: dataType of the analysis (all, efficiencyMap or upperLimit)
+        :param datasetIDs: list of dataset ids ([ANA-CUT0,...])
+        :param txnames: list of txnames ([TChiWZ,...])
+        :returns: list of ExpResult objects or the ExpResult object if the list contains
+                   only one result
+                   
+        """
+        
+        expResultList = []
+        for expResult in self.expResultList:
+            ID = expResult.globalInfo.getInfo('id')
+            # Skip analysis not containing any of the required ids:
+            if analysisIDs != ['all']:
+                if not ID in analysisIDs:
+                    continue              
+            newExpResult = ExpResult()
+            newExpResult.path = expResult.path
+            newExpResult.globalInfo = expResult.globalInfo
+            newExpResult.datasets = []            
+            for dataset in expResult.datasets:
+                if dataTypes != ['all']:
+                    if not dataset.dataInfo.dataType in dataTypes:
+                        continue
+                if datasetIDs != ['all']:
+                    if not dataset.dataInfo.dataId in datasetIDs:
+                        continue
+                newDataSet = datasetObject.DataSet(dataset.path, dataset.globalInfo)
+                newDataSet.dataInfo = dataset.dataInfo
+                newDataSet.txnameList = []
+                for txname in dataset.txnameList:
+                    if txnames != ['all']:
+                        if not txname.txName in txnames:
+                            continue
+                    newDataSet.txnameList.append(txname)
+                # Skip data set not containing any of the required txnames:
+                if not newDataSet.txnameList:
+                    continue
+                newExpResult.datasets.append(newDataSet)
+            # Skip analysis not containing any of the required txnames:
+            if not newExpResult.getTxNames():
+                continue
+            expResultList.append(newExpResult)
+        return expResultList
+
+if __name__ == "__main__":
+    import argparse
+    """ Run as a script, this checks and/or writes database.pcl files """
+    argparser = argparse.ArgumentParser(description='simple script to check \
+            and/or write database.pcl files')
+    argparser.add_argument('-c', '--check', help='check pickle file',
+                           action='store_true')
+    argparser.add_argument('-t', '--time', help='time reading db',
+                           action='store_true')
+    argparser.add_argument('-r', '--read', help='read pickle file',
+                           action='store_true')
+    argparser.add_argument('-w', '--write', help='force writing pickle file',
+                           action='store_true')
+    argparser.add_argument('-u', '--update', help='update pickle file, if necessary',
+                           action='store_true')
+    argparser.add_argument('-d', '--database', help='directory name of database', 
+                            default="../../../smodels-database/" )
+    args = argparser.parse_args()
+    logger.setLevel(level=logging.DEBUG )
+    db = Database ( args.database )
+    logger.debug ( "%s" % db )
+    if args.write:
+        db.createPickleFile()
+    if args.update:
+        db.updatePickleFile()
+    if args.check:
+        db.checkPickleFile()
+    if args.time:
+        t0=time.time()
+        db = db.loadPickleFile ( lastm_only = False )
+        t1=time.time()
+        print "Time it took reading pickle file: %.1f s." % (t1-t0)
+        txtdb = db.loadTextDatabase()
+        t2=time.time()
+        print "Time it took reading text   file: %.1f s." % (t2-t1)
+    if args.read:
+        db = pickler.loadPickleFile ( lastm_only = False )
+        listOfExpRes = db.getExpResults() 
+        for expResult in listOfExpRes:
+            print expResult
+        #txtdb=pickler.loadTextDatabase()
+        #listOfExpRes = txtdb.getExpResults() 
+        #for expResult in listOfExpRes:
+        #    print expResult
+

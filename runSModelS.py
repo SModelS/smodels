@@ -11,7 +11,7 @@ import os, sys
 import logging
 import argparse
 from ConfigParser import SafeConfigParser
-from smodels.experiment.databaseObjects import Database
+from smodels.experiment.database import Database
 from smodels.installation import installDirectory
 from smodels.theory import slhaDecomposer
 from smodels.theory import lheDecomposer

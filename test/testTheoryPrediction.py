@@ -18,7 +18,8 @@ import os
 class IntegrationTest(unittest.TestCase):
     def configureLogger(self):
         import logging.config
-        fc= inspect.getabsfile(self.configureLogger).replace ( "testTheoryPrediction.py", "integration.conf" )
+        fc= inspect.getabsfile(self.configureLogger).replace ( 
+                "testTheoryPrediction.py", "integration.conf" )
         logging.config.fileConfig( fname=fc, disable_existing_loggers=False )
 
     def predictions(self):
@@ -59,7 +60,7 @@ class IntegrationTest(unittest.TestCase):
         from smodels.installation import installDirectory
         from smodels.tools.physicsUnits import fb, GeV
         from smodels.theory import slhaDecomposer
-        from smodels.experiment.databaseObjects import Database
+        from smodels.experiment.database import Database
         #from smodels.experiment import smsAnalysisFactory, smsHelpers
         #smsHelpers.base = installDirectory() + 'test/database/'
         # smsHelpers.runs = [ "2012" ]
