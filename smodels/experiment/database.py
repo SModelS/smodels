@@ -41,7 +41,7 @@ class Database(object):
             or pickle database ("pcl"), dont force anything if None
         """
         self._base = self._validateBase(base)
-        self._verbosity = 'debug'
+        self._verbosity = 'info'
         self._databaseVersion = None
         self.expResultList = None
         self.txt_mtime = None, None
@@ -146,7 +146,6 @@ class Database(object):
 
         with open ( self.pclfile, "r" ) as f:
             self.pcl_mtime = pickle.load ( f )
-            self._verbosity = pickle.load ( f )
             self._databaseVersion = pickle.load ( f )
             self.pclfile = pickle.load ( f )
             if not lastm_only:
@@ -161,9 +160,9 @@ class Database(object):
         logger.debug ( "Database dates to %s(%d)" % \
                       ( time.ctime(self.txt_mtime[0]),self.txt_mtime[1] ) )
         if nu:
-            logger.debug ( "pickle file needs an update." )
+            logger.info ( "pickle file needs an update." )
         else:
-            logger.debug ( "pickle file does not need an update." )
+            logger.info ( "pickle file does not need an update." )
         return nu
 
     def needsUpdate ( self ):
@@ -188,7 +187,6 @@ class Database(object):
         logger.debug (  " * create %s" % self.pclfile )
         with open ( pclfile, "w" ) as f:
             pickle.dump ( self.txt_mtime, f )
-            pickle.dump ( self._verbosity, f )
             pickle.dump ( self._databaseVersion, f )
             pickle.dump ( self.pclfile, f )
             logger.debug (  " * load text database" )
@@ -416,15 +414,25 @@ if __name__ == "__main__":
                            action='store_true')
     argparser.add_argument('-u', '--update', help='update pickle file, if necessary',
                            action='store_true')
-    argparser.add_argument('-d', '--database', help='directory name of database', 
+    argparser.add_argument('-d', '--debug', help='debug mode',
+                           action='store_true')
+    argparser.add_argument('-D', '--database', help='directory name of database', 
                             default="../../../smodels-database/" )
     args = argparser.parse_args()
     logger.setLevel(level=logging.INFO )
-    db = Database ( args.database )
-    db.verbosity = "info"
-    logger.debug ( "%s" % db )
+    if args.debug:
+        logger.setLevel(level=logging.DEBUG )
     if args.write:
+        db = Database ( args.database, force_load="txt" )
+        if args.debug:
+            db.verbosity = "debug"
+        logger.debug ( "%s" % db )
         db.createPickleFile()
+        sys.exit()
+    db = Database ( args.database )
+    if args.debug:
+        db.verbosity = "debug"
+    logger.debug ( "%s" % db )
     if args.update:
         db.updatePickleFile()
     if args.check:
