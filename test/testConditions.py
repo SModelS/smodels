@@ -13,7 +13,7 @@ import unittest
 from smodels.installation import installDirectory
 from smodels.theory import slhaDecomposer
 from smodels.tools.physicsUnits import GeV
-from smodels.experiment.databaseObjects import Database
+from smodels.experiment.database import Database
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 
 

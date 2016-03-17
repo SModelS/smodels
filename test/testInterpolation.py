@@ -11,7 +11,7 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.experiment.databaseObjects import Database
+from smodels.experiment.database import Database
 from smodels.experiment.txnameObject import TxNameData
 from smodels.tools.physicsUnits import GeV, TeV, pb, fb
 import math
