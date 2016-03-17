@@ -147,7 +147,7 @@ class Database(object):
             t0=time.time()
             self.pcl_mtime = pickle.load ( f )
             self._databaseVersion = pickle.load ( f )
-            self.pclfile = pickle.load ( f )
+            # self.pclfile = pickle.load ( f )
             if not lastm_only:
                 logger.info ( "loading pickle file %s" % self.pclfile )
                 self.expResultList = pickle.load ( f )
@@ -193,7 +193,7 @@ class Database(object):
         with open ( pclfile, "w" ) as f:
             pickle.dump ( self.txt_mtime, f )
             pickle.dump ( self._databaseVersion, f )
-            pickle.dump ( self.pclfile, f )
+            # pickle.dump ( self.pclfile, f )
             logger.debug (  " * load text database" )
             self.loadTextDatabase() 
             logger.debug (  " * write %s" % self.pclfile )
