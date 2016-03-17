@@ -60,12 +60,14 @@ class Database(object):
     def __eq__ ( self, other ):
         """ compare two database 
         """
-        print self.databaseVersion, other.databaseVersion
         if self.databaseVersion != other.databaseVersion:
             return False
-        print self.expResultList
-        print other.expResultList
-        return False
+        if len(self.expResultList ) != len (other.expResultList):
+            return False
+        for ( myres, otherres ) in zip ( self.expResultList, other.expResultList ):
+            if myres != otherres:
+                return False
+        return True
 
     def loadDatabase ( self ):
         """ if no pickle file is available, then 
