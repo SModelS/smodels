@@ -193,7 +193,7 @@ class Database(object):
             self.loadTextDatabase() 
             logger.debug (  " * write %s" % self.pclfile )
             pickle.dump ( self.expResultList, f, protocol=2 )
-            logger.debug (  " * done writing %s" % self.pclfile )
+            logger.info (  " * done writing %s" % self.pclfile )
 
     @property
     def databaseVersion(self):
