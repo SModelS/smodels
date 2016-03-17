@@ -47,6 +47,18 @@ class DataSet(object):
                     self.txnameList.append(txname)
                 except TypeError: continue
             
+    def __ne__ ( self, other ):
+        return not self.__eq__ ( other )
+
+    def __eq__ ( self, other ):
+        if self.dataInfo != other.dataInfo:
+            return False
+        if len(self.txnameList ) != len ( other.txnameList ):
+            return False
+        #for (mytx, othertx) in zip ( self.txnameList, other.txnameList ):
+        #    if mytx != othertx:
+        #        return False
+        return True
 
     def getValuesFor(self,attribute=None):
         """
