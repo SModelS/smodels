@@ -35,13 +35,13 @@ class Database(object):
         
     """
     
-    def __init__(self, base=None, force_load = None ):
+    def __init__(self, base=None, force_load = None, verbosity='info' ):
         """
         :param force_load: force loading the text database ("txt"),
             or pickle database ("pcl"), dont force anything if None
         """
         self._base = self._validateBase(base)
-        self._verbosity = 'info'
+        self._verbosity = verbosity
         self._databaseVersion = None
         self.expResultList = None
         self.txt_mtime = None, None
@@ -150,6 +150,7 @@ class Database(object):
             self.pclfile = pickle.load ( f )
             if not lastm_only:
                 self.expResultList = pickle.load ( f )
+                logger.info ( "Loaded database from %s" % self.pclfile )
         return self
 
     def checkPickleFile ( self ):
@@ -176,6 +177,7 @@ class Database(object):
     def createPickleFile ( self, filename=None ):
         """ create a pcl file from the text database,
             potentially overwriting an old pcl file. """
+        t0=time.time()
         logger.debug ( "Creating pickle file:" )
         logger.debug ( " * compute last modified timestamp." )
         self.lastModifiedAndFileCount()
@@ -193,7 +195,8 @@ class Database(object):
             self.loadTextDatabase() 
             logger.debug (  " * write %s" % self.pclfile )
             pickle.dump ( self.expResultList, f, protocol=2 )
-            logger.info (  " * done writing %s" % self.pclfile )
+            logger.info (  " * done writing %s in %.1f secs." % \
+                    ( self.pclfile, time.time()-t0 ) )
 
     @property
     def databaseVersion(self):
@@ -350,13 +353,14 @@ class Database(object):
         :param dataType: dataType of the analysis (all, efficiencyMap or upperLimit)
         :param datasetIDs: list of dataset ids ([ANA-CUT0,...])
         :param txnames: list of txnames ([TChiWZ,...])
-        :returns: list of ExpResult objects or the ExpResult object if the list contains
-                   only one result
+        :returns: list of ExpResult objects or the ExpResult object if the list
+                  contains only one result
                    
         """
-        
+        # print ".getExpResultList()"
         expResultList = []
         for expResult in self.expResultList:
+          #  print "expResult=",expResult.__str__()[:20]
             ID = expResult.globalInfo.getInfo('id')
             # Skip analysis not containing any of the required ids:
             if analysisIDs != ['all']:
@@ -373,7 +377,10 @@ class Database(object):
                 if datasetIDs != ['all']:
                     if not dataset.dataInfo.dataId in datasetIDs:
                         continue
-                newDataSet = datasetObject.DataSet(dataset.path, dataset.globalInfo)
+                # print "creating newDataSet %s %s " % ( dataset.path, dataset.globalInfo )
+                # print "dataset=",type(dataset)
+                newDataSet = datasetObject.DataSet(dataset.path, dataset.globalInfo,False)
+                # print "Done creating new Dataset"
                 newDataSet.dataInfo = dataset.dataInfo
                 newDataSet.txnameList = []
                 for txname in dataset.txnameList:
@@ -389,6 +396,7 @@ class Database(object):
             if not newExpResult.getTxNames():
                 continue
             expResultList.append(newExpResult)
+        # print "done .getExpResultList()"
         return expResultList
 
     def updatePickleFile ( self ):

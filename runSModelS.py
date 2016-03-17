@@ -26,7 +26,7 @@ from smodels.experiment.exceptions import DatabaseNotFoundException
 
 log = logging.getLogger(__name__)
 
-def main(inputFile, parameterFile, outputFile):
+def main(inputFile, parameterFile, outputFile, verbosity = 'info' ):
     """
     Provides a command line interface to basic SModelS functionalities.
     
@@ -72,7 +72,7 @@ def main(inputFile, parameterFile, outputFile):
     """ Check database location """
     try:
         databasePath = parser.get("path", "databasePath")
-        database = Database(databasePath)
+        database = Database(databasePath, verbosity=verbosity )
         databaseVersion = database.databaseVersion
     except DatabaseNotFoundException:
         log.error("Database not found in %s" % os.path.realpath(databasePath))
