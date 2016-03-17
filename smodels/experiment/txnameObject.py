@@ -1,7 +1,8 @@
 """
-.. module:: dataObjects
-   :synopsis: Holds the classes and methods used to read and store the information in the
-              txname.txt files. Also contains the interpolation methods
+.. module:: txnameObject
+   :synopsis: Holds the classes and methods used to read and store the
+              information in the txname.txt files. 
+              Also contains the interpolation methods.
 
 .. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -89,16 +90,6 @@ class TxName(object):
             el.sortBranches()
             self._topologyList.addElement(el)
 
-    #def __ne__(self, other ):
-    #    return not self.__eq__ ( other )
-
-    #def __eq__(self, other ):
-    #    if self._topologyList != other._topologyList:
-    #        return False
-    #    if self.txnameData != other.txnameData:
-    #        return False
-    #    return True
-        
     def __str__(self):
         return self.txName
         
@@ -153,10 +144,11 @@ class TxName(object):
 
     def getEfficiencyFor(self,mass):
         """
-        For upper limit results, checks if the input mass falls inside the upper limit grid.
-        If it does, returns efficiency = 1, else returns efficiency = 0.
-        For efficiency map results, checks if the mass falls inside the efficiency map grid.
-        If it does, returns the corresponding efficiency value, else returns efficiency = 0.
+        For upper limit results, checks if the input mass falls inside the
+        upper limit grid.  If it does, returns efficiency = 1, else returns
+        efficiency = 0.  For efficiency map results, checks if the mass falls
+        inside the efficiency map grid.  If it does, returns the corresponding
+        efficiency value, else returns efficiency = 0.
         
         :param element: Element object
         :return: efficiency (float)
@@ -175,7 +167,8 @@ class TxName(object):
             raise SModelSError()
             
 class TxNameData(object):
-    """Holds the data for the Txname object.  It holds Upper limit values or efficiencies."""
+    """ Holds the data for the Txname object.  It holds Upper limit values or
+        efficiencies."""
     
     def __init__(self,value,accept_errors_upto=.05):
         """
@@ -253,7 +246,8 @@ class TxNameData(object):
         if dp != self.dimensionality: ## we have data in different dimensions
             if self.accept_errors_upto == None:
                 return None
-            logger.debug ( "attempting to interpolate outside of convex hull (d=%d,dp=%d,masses=%s)" %
+            logger.debug ( "attempting to interpolate outside of convex hull "\
+                    "(d=%d,dp=%d,masses=%s)" %
                      ( self.dimensionality, dp, str(massarray) ) )
             return self._interpolateOutsideConvexHull ( massarray )
 
@@ -283,9 +277,9 @@ class TxNameData(object):
         ## P[self.dimensionality:] is project point p in m dimensions
         # m=self.countNonZeros ( P ) ## dimensionality of input
         ## how far are we away from the "plane": distance alpha
-        alpha = float ( np.sqrt ( np.dot ( P[self.dimensionality:], P[self.dimensionality:] ) ) )
+        alpha = float ( np.sqrt ( np.dot ( P[self.dimensionality:], 
+                        P[self.dimensionality:] ) ) )
         ## the value of the grid at the point projected to the "plane"
-        ##projected_value=griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
         
         ## compute gradient
         gradient=[]
@@ -296,7 +290,8 @@ class TxNameData(object):
             #print "now adding alpha"
             P2[i]+=alpha
             #print "before griddata"
-            g=float ( ( griddata( self.Mp, self.xsec, [ P2[:self.dimensionality]], method="linear")[0] - self.projected_value ) / alpha )
+            g=float ( ( griddata( self.Mp, self.xsec, [ P2[:self.dimensionality]], 
+                        method="linear")[0] - self.projected_value ) / alpha )
             #print "g=",g
             if math.isnan ( g ):
                 ## if we cannot compute a gradient, we return nan
@@ -309,14 +304,6 @@ class TxNameData(object):
             ## zero gradient? we return 0.
             return 0.
         for i,j in enumerate(gradient):
-            #print "i=",i
-            #print "j=",j
-            #print "C=",C
-            #print "alpha=",alpha
-            #print "gradient[i]=",gradient[i]
-            #print "type(gradient[i])=",type(gradient[i])
-            #print "type(C)=",type(C)
-            #print "type(alpha)=",type(alpha)
             gradient[i]=gradient[i]/C*alpha
             #print "gradient after=",gradient[i]
         #print "^^^^^^"
@@ -327,9 +314,11 @@ class TxNameData(object):
             P3[i]+=gradient[i]
             P4[i]-=gradient[i]
         # print "projected value", projected_value
-        agp=griddata( self.Mp, self.xsec, [ P3[:self.dimensionality] ], method="linear")[0]
+        agp=griddata( self.Mp, self.xsec, [ P3[:self.dimensionality] ], 
+                      method="linear")[0]
         #print "along gradient", ag
-        agm=griddata( self.Mp, self.xsec, [ P4[:self.dimensionality] ], method="linear")[0]
+        agm=griddata( self.Mp, self.xsec, [ P4[:self.dimensionality] ], 
+                      method="linear")[0]
         #print "along negative gradient",agm
         dep,dem=0.,0.
         if self.projected_value == 0.:
@@ -345,22 +334,24 @@ class TxNameData(object):
         return de
 
     def _interpolateOutsideConvexHull ( self, massarray ):
-        """ experimental routine, meant to check if we can interpolate outside convex hull """
+        """ experimental routine, meant to check if we can interpolate outside
+            convex hull """
         porig=self.flattenMassArray ( massarray ) ## flatten
         p= ( (np.matrix(porig)[0] - self.delta_x ) ).tolist()[0]
         P=np.dot(p,self.V)
-        # projected_value=griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
         de = self._estimateExtrapolationError ( massarray ) 
         if de < self.accept_errors_upto:
             return self._returnProjectedValue()
         if not math.isnan(de):
-            logger.debug ( "Expected propagation error of %f too large to propagate." % de )
+            logger.debug ( "Expected propagation error of %f too large to " \
+                           "propagate." % de )
         return None
 
     def _returnProjectedValue ( self ):
         ## None is returned without units'
         if self.projected_value is None or math.isnan(self.projected_value):
-            logger.debug ( "projected value is None. Projected point not in convex hull? original point=%s" % self.massarray )
+            logger.debug ( "projected value is None. Projected point not in " \
+                    "convex hull? original point=%s" % self.massarray )
             return None
         return self.projected_value * self.unit 
 
@@ -398,7 +389,8 @@ class TxNameData(object):
         self.V=V
         Mp=[]
 
-        ## the dimensionality of the whole mass space, disrespecting equal branches assumption
+        ## the dimensionality of the whole mass space, disrespecting equal branches 
+        ## assumption
         self.full_dimensionality = len(xp)
         self.dimensionality=0
         for m in M:
