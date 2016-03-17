@@ -17,9 +17,11 @@ from smodels.tools import summaryReader
 from runSModelS import main
 
 class RunSModelSTest(unittest.TestCase):
-    def main(self, filename ):
-        a=sys.stdout
-        sys.stdout = open ( "stdout.log", "w" )
+    def runMain(self, filename ):
+        suppressStdout = True
+        if suppressStdout:
+            a=sys.stdout
+            sys.stdout = open ( "stdout.log", "w" )
         out = "%s/test/unitTestOutput.txt" % installDirectory()
         if os.path.exists ( out ): 
             os.unlink ( out )
@@ -28,13 +30,15 @@ class RunSModelSTest(unittest.TestCase):
              outputFile= out )
         outputfile = summaryReader.Summary(
                 "%s/test/unitTestOutput.txt" % installDirectory())
-        sys.stdout = a
+        if suppressStdout:
+            sys.stdout = a
         return outputfile
 
     def testGoodFile(self):
 
-        filename = "%s/inputFiles/slha/gluino_squarks.slha" % (installDirectory() )
-        outputfile = self.main(filename )
+        filename = "%s/inputFiles/slha/gluino_squarks.slha" % \
+                    (installDirectory() )
+        outputfile = self.runMain(filename )
         sample = summaryReader.Summary(
                 "%s/test/summary_default.txt" %installDirectory())
         if not ( sample==outputfile ):
@@ -45,8 +49,9 @@ class RunSModelSTest(unittest.TestCase):
 
     def testBadFile(self):
 
-        filename = "%s/inputFiles/slha/I_dont_exist.slha" % (installDirectory() )
-        outputfile = self.main (filename ) 
+        filename = "%s/inputFiles/slha/I_dont_exist.slha" % \
+                    (installDirectory() )
+        outputfile = self.runMain (filename ) 
         sample = summaryReader.Summary(
                 "%s/test/summary_bad_default.txt" %installDirectory())
         self.assertEquals(sample, outputfile)
