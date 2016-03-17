@@ -42,7 +42,10 @@ def main(inputFile, parameterFile, outputFile, verbosity = 'info' ):
     =========================
     """
     parser = SafeConfigParser()
-    parser.read(parameterFile)
+    ret=parser.read(parameterFile)
+    if ret == []:
+        log.error ( "No such file or directory: '%s'" % parameterFile )
+        sys.exit()
 
     """ Minimum value of cross-section for an element to be considered eligible
         for decomposition.  Too small sigmacut leads to too large decomposition
