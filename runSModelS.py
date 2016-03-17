@@ -31,7 +31,8 @@ def main(inputFile, parameterFile, outputFile):
     Provides a command line interface to basic SModelS functionalities.
     
     :param inputFile: input file name (either a SLHA or LHE file)
-    :param parameterFile: File containing the input parameters (default = /etc/parameters_default.ini)
+    :param parameterFile: File containing the input parameters (default =
+                          /etc/parameters_default.ini)
     :param outputFile: Output file to write a summary of results
     
     """
@@ -43,11 +44,13 @@ def main(inputFile, parameterFile, outputFile):
     parser = SafeConfigParser()
     parser.read(parameterFile)
 
-    """ Minimum value of cross-section for an element to be considered eligible for decomposition.
-        Too small sigmacut leads to too large decomposition time. """
+    """ Minimum value of cross-section for an element to be considered eligible
+        for decomposition.  Too small sigmacut leads to too large decomposition
+        time.  """
     sigmacut = parser.getfloat("parameters", "sigmacut") * fb
 
-    """ Minimum value for considering two states non-degenerate (only used for mass compression) """
+    """ Minimum value for considering two states non-degenerate (only used for
+        mass compression) """
     minmassgap = parser.getfloat("parameters", "minmassgap") * GeV
 
     if os.path.exists(outputFile):
@@ -139,7 +142,8 @@ def main(inputFile, parameterFile, outputFile):
 
     """ Load analyses """        
 
-    listOfExpRes = database.getExpResults(analysisIDs=analyses, txnames=txnames, datasetIDs=datasetIDs, dataTypes=dataTypes)
+    listOfExpRes = database.getExpResults(analysisIDs=analyses, txnames=txnames, 
+                        datasetIDs=datasetIDs, dataTypes=dataTypes)
 
     """ Print list of analyses loaded """
     outLevel = 0
