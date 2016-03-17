@@ -67,7 +67,8 @@ class TxName(object):
                     self.txnameData = TxNameData(value)
                 else: self.addInfo(tag,value)
             else:
-                logger.info("Ignoring unknown field %s found in file %s" % (tag, self.infopath))
+                logger.info("Ignoring unknown field %s found in file %s" \
+                             % (tag, self.infopath))
                 continue
         
         #Builds up a list of elements appearing in constraints:
@@ -82,11 +83,21 @@ class TxName(object):
                     newEl = Element(el)
                     if not newEl in elements: elements.append(newEl)
         
-        #Builds up TopologyList with all the elements appearing in constraints and conditions:        
+        # Builds up TopologyList with all the elements appearing in constraints
+        # and conditions:        
         for el in elements:
             el.sortBranches()
             self._topologyList.addElement(el)
 
+    #def __ne__(self, other ):
+    #    return not self.__eq__ ( other )
+
+    #def __eq__(self, other ):
+    #    if self._topologyList != other._topologyList:
+    #        return False
+    #    if self.txnameData != other.txnameData:
+    #        return False
+    #    return True
         
     def __str__(self):
         return self.txName
@@ -170,31 +181,43 @@ class TxNameData(object):
         """
         
         :param value: data in string format
-        :param accept_errors_upto: If None, do not allow extrapolations outside of convex hull.
-            If float value given, allow that much relative uncertainty on the upper limit / efficiency
-            when extrapolating outside convex hull.
-            This method can be used to loosen the equal branches assumption.
+        :param accept_errors_upto: If None, do not allow extrapolations outside of 
+                convex hull.  If float value given, allow that much relative 
+                uncertainty on the upper limit / efficiency
+                when extrapolating outside convex hull.
+                This method can be used to loosen the equal branches assumption.
         """
 
         self.accept_errors_upto=accept_errors_upto
         self.store_value = value
         self.data = None
+
+    def __ne__ ( self, other ):
+        return not self.__eq__ ( other )
+    def __eq__ ( self, other ):
+        return self.data == other.data 
         
     def loadData(self):
         """
-        Uses the information in store_value to generate the data grid used for interpolation.
+        Uses the information in store_value to generate the data grid used for
+        interpolation.
         """
         
         if type(self.store_value)==str:            
-            self.data = eval(self.store_value, {'fb' : fb, 'pb' : pb, 'GeV' : GeV, 'TeV' : TeV})
+            self.data = eval(self.store_value, 
+                             {'fb':fb, 'pb':pb, 'GeV':GeV, 'TeV':TeV})
         else: ## the data can also be given as lists, for debugging
             self.data = self.store_value
-        self.unit = 1.0 ## store the unit so that we can take arbitrary units for the "z" values.
-                        ## default is unitless, which we use for efficiency maps
+        self.unit = 1.0 ## store the unit so that we can take arbitrary units for 
+                        ## the "z" values.  default is unitless, 
+                        ## which we use for efficiency maps
         if len(self.data) < 1 or len(self.data[0]) < 2:
-                logger.error ( "input data not in correct format. expecting sth like " \
-         " [ [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], 10.*fb ], ... ] for upper " \
-         " limits or [ [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], .1 ], ... ] for efficiency maps" )
+                logger.error ( "input data not in correct format. expecting sth " \
+                               "like [ [ [[ 300.*GeV,100.*GeV], "\
+                               "[ 300.*GeV,100.*GeV] ], 10.*fb ], ... ] "\
+                               "for upper limits or [ [ [[ 300.*GeV,100.*GeV],"\
+                               " [ 300.*GeV,100.*GeV] ], .1 ], ... ] for "\
+                               "efficiency maps" )
         if type(self.data[0][1])==unum.Unum:
             ## if its a unum, we store 1.0 * unit
             self.unit=self.data[0][1] / ( self.data[0][1].asNumber() )
@@ -206,8 +229,10 @@ class TxNameData(object):
     @_memoize       
     def getValueFor(self,massarray):
         """
-        Interpolates the data and returns the UL or efficiency for the respective massarray
-        :param massarray: mass array values (with units), i.e. [[100*GeV,10*GeV],[100*GeV,10*GeV]]
+        Interpolates the data and returns the UL or efficiency for the
+        respective massarray
+        :param massarray: mass array values (with units), i.e.
+                          [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         """
         
         if not self.data: self.loadData()
@@ -215,26 +240,13 @@ class TxNameData(object):
         porig=self.flattenMassArray ( massarray ) ## flatten
         self.massarray = massarray
         if len(porig)!=self.full_dimensionality:
-            logger.error ( "dimensional error. I have been asked to compare a %d-dimensional mass vector with " \
-                    "%d-dimensional data!" % ( len(porig), self.full_dimensionality ) )
+            logger.error ( "dimensional error. I have been asked to compare a "\
+                    "%d-dimensional mass vector with %d-dimensional data!" % \
+                    ( len(porig), self.full_dimensionality ) )
             return None
-#         print "porig=",porig
         p= ( (np.matrix(porig)[0] - self.delta_x ) ).tolist()[0]
-#         print "pafter=",p
         P=np.dot(p,self.V)  ## rotate
-#         print "P=",P
         dp=self.countNonZeros ( P )
-#         print 'Pp=',P[:self.dimensionality]
-
-#         #Check which points are being used in interpolation
-#         from scipy import spatial
-#         delaun = spatial.Delaunay(self.Mp)
-#         isimplex = delaun.find_simplex([P[:self.dimensionality] ])[0]
-#         for ipt in delaun.simplices[isimplex]:
-#             pt = self.Mp[ipt] + [0.]*(len(porig)-len(self.Mp[ipt]))
-#             pt = np.dot(pt,np.transpose(self.V))
-#             pt = pt + self.delta_x[0]
-#             print pt,self.xsec[ipt]
         
         self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
         self.projected_value = float(self.projected_value)        
