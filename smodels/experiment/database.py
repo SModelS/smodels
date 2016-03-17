@@ -11,9 +11,11 @@
 
 """
 
+import sys
 import cPickle as pickle
 import logging
 import os
+import time
 from smodels.experiment import infoObject
 from smodels.experiment import txnameObject
 from smodels.experiment import datasetObject
@@ -33,15 +35,57 @@ class Database(object):
         
     """
     
-    
-    def __init__(self, base=None):
+    def __init__(self, base=None, force_load = None ):
+        """
+        :param force_load: force loading the text database ("txt"),
+            or pickle database ("pcl"), dont force anything if None
+        """
         self._base = self._validateBase(base)
-        self._verbosity = 'error'
-        self._databaseVersion = self._getDatabaseVersion
+        self._verbosity = 'debug'
+        self._databaseVersion = None
         self.expResultList = None
-        self.loadTextDatabase()
+        self.txt_mtime = None, None
+        self.pcl_mtime = None, None
+        self.pcl_db = None
+        self.pclfile = os.path.join ( self._base, "database.pcl" )
+        logger.info ( "loading pickle file %s" % self.pclfile )
+        self._setLogLevel ( self._verbosity )
+        if force_load=="txt":
+            self.loadTextDatabase()
+        if force_load=="pcl":
+            self.loadPickleFile()
+        if force_load==None:
+            self.loadDatabase()
+
+    def __eq__ ( self, other ):
+        """ compare two database 
+        """
+        print self.databaseVersion, other.databaseVersion
+        if self.databaseVersion != other.databaseVersion:
+            return False
+        print self.expResultList
+        print other.expResultList
+        return False
+
+    def loadDatabase ( self ):
+        """ if no pickle file is available, then 
+            load the database and create the pickle file.
+            if pickle file is available, then check if
+            it needs update, create new pickle file, in
+            case it does need an update.
+        """
+        if not os.path.exists ( self.pclfile ):
+            self.loadTextDatabase()
+            self.createPickleFile()
+        else:
+            if self.needsUpdate():
+                self.createPickleFile()
+            else:
+                self.loadPickleFile( lastm_only = False )
 
     def loadTextDatabase ( self ):
+        """ simply loads the textdabase """
+        self._databaseVersion = self._getDatabaseVersion
         self.expResultList = self._loadExpResults()
 
     def lastModifiedDir ( self, dirname, lastm ):
@@ -69,23 +113,66 @@ class Database(object):
         if self.txt_mtime[0]:
             ## already evaluated
             return
-        versionfile = os.path.join ( self.db_dir, "version" ) 
+        versionfile = os.path.join ( self._base, "version" ) 
         if not os.path.exists ( versionfile ):
             logger.error("%s does not exist." % versionfile )
             sys.exit()
         lastm = os.stat(versionfile).st_mtime
         count=1
-        topdir = os.listdir ( self.db_dir )
+        topdir = os.listdir ( self._base )
         for File in topdir:
-            subdir = os.path.join ( self.db_dir, File )
+            subdir = os.path.join ( self._base, File )
             if not os.path.isdir ( subdir ) or File in [ ".git" ]:
                 continue
-            print subdir
             (lastm,tcount) = self.lastModifiedDir ( subdir, lastm )
             count+=tcount+1
         self.txt_mtime = lastm, count
 
-    def createPickleFile ( self ):
+    def loadPickleFile ( self, lastm_only = False ):
+        """ load a pickle file, returning
+            last modified, file count, database.
+        :param lastm_only: if true, the database itself is not read.
+        :returns: database object, or None, lastm_only == True.
+        """
+        if lastm_only and self.pcl_mtime[0]:
+            ## doesnt need to load database, and mtime is already
+            ## loaded
+            return None
+
+        if self.pcl_db:
+            return self.pcl_db
+
+        with open ( self.pclfile, "r" ) as f:
+            self.pcl_mtime = pickle.load ( f )
+            self._verbosity = pickle.load ( f )
+            self._databaseVersion = pickle.load ( f )
+            self.pclfile = pickle.load ( f )
+            if not lastm_only:
+                self.expResultList = pickle.load ( f )
+        return self
+
+    def checkPickleFile ( self ):
+        nu=self.needsUpdate()
+        logger.debug ( "Checking pickle file." )
+        logger.debug ( "Pickle file dates to %s(%d)" % \
+                      ( time.ctime(self.pcl_mtime[0]),self.pcl_mtime[1] ) )
+        logger.debug ( "Database dates to %s(%d)" % \
+                      ( time.ctime(self.txt_mtime[0]),self.txt_mtime[1] ) )
+        if nu:
+            logger.debug ( "pickle file needs an update." )
+        else:
+            logger.debug ( "pickle file does not need an update." )
+        return nu
+
+    def needsUpdate ( self ):
+        """ does the pickle file need an update? """
+        self.lastModifiedAndFileCount()
+        self.loadPickleFile ( lastm_only = True )
+        return ( self.txt_mtime[0] > self.pcl_mtime[0] or \
+                 self.txt_mtime[1] != self.pcl_mtime[1] )
+
+
+    def createPickleFile ( self, filename=None ):
         """ create a pcl file from the text database,
             potentially overwriting an old pcl file. """
         logger.debug ( "Creating pickle file:" )
@@ -93,16 +180,20 @@ class Database(object):
         self.lastModifiedAndFileCount()
         logger.debug (  " * compute timestamp: %s filecount: %d" % \
                 ( time.ctime ( self.txt_mtime[0] ), self.txt_mtime[1] ) )
+        pclfile = filename
+        if pclfile == None:
+            pclfile = self.pclfile
         logger.debug (  " * create %s" % self.pclfile )
-        with open ( self.pclfile, "w" ) as f:
+        with open ( pclfile, "w" ) as f:
             pickle.dump ( self.txt_mtime, f )
+            pickle.dump ( self._verbosity, f )
+            pickle.dump ( self._databaseVersion, f )
+            pickle.dump ( self.pclfile, f )
             logger.debug (  " * load text database" )
             self.loadTextDatabase() 
             logger.debug (  " * write %s" % self.pclfile )
-            pickle.dump ( self.txt_db, f, protocol=2 )
+            pickle.dump ( self.expResultList, f, protocol=2 )
             logger.debug (  " * done writing %s" % self.pclfile )
-
-
 
     @property
     def databaseVersion(self):
@@ -137,9 +228,9 @@ class Database(object):
 
 
     def __str__(self):
-        idList = "Database: " + self.databaseVersion + "\n---------- \n"
+        idList = "Database version: " + self.databaseVersion + "\n---------- \n"
         if self.expResultList == None:
-            idList += "no text files loaded"
+            idList += "no experimental results available!"
         else:
             for expRes in self.expResultList:
                 idList += expRes.globalInfo.getInfo('id') + '\n'
@@ -200,6 +291,7 @@ class Database(object):
 
 
     def _setLogLevel(self, level='error'):
+        level = level.lower()
         if level == 'debug':
             logger.setLevel(level=logging.DEBUG)
         if level == 'info':
@@ -220,8 +312,14 @@ class Database(object):
         """
         resultsList = []
         for root, _, files in os.walk(self._base):
+            if "/.git/" in root:
+                continue
+            if root[-11:] == "/validation":
+                continue
+            if root[-5:] == "/orig":
+                continue
             if not 'globalInfo.txt' in files:
-                logger.debug("Missing files in %s", root)
+                logger.debug("Missing globalInfo.txt in %s", root)
                 continue
             else:
                 expres = ExpResult(root)
@@ -234,16 +332,19 @@ class Database(object):
         return resultsList
 
 
-    def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'], dataTypes = ['all']):
+    def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
+                      dataTypes = ['all']):
         """
         Returns a list of ExpResult objects.
         
-        Each object refers to an analysisID containing one (for UL) or more (for Efficiency maps)
-        dataset (signal region) and each dataset containing one or more TxNames.
-        If analysisIDs is defined, returns only the results matching one of the IDs in the list.
-        If dataTypes is defined, returns only the results matching a dataType in the list.
-        If datasetIDs is defined, returns only the results matching one of the IDs in the list.
-        If txname is defined, returns only the results matching one of the Tx names in the list.
+        Each object refers to an analysisID containing one (for UL) or more
+        (for Efficiency maps) dataset (signal region) and each dataset
+        containing one or more TxNames.  If analysisIDs is defined, returns
+        only the results matching one of the IDs in the list.  If dataTypes is
+        defined, returns only the results matching a dataType in the list.  If
+        datasetIDs is defined, returns only the results matching one of the IDs
+        in the list.  If txname is defined, returns only the results matching
+        one of the Tx names in the list.
         
         :param analysisID: list of analysis ids ([CMS-SUS-13-006,...])
         :param dataType: dataType of the analysis (all, efficiencyMap or upperLimit)
@@ -290,6 +391,14 @@ class Database(object):
             expResultList.append(newExpResult)
         return expResultList
 
+    def updatePickleFile ( self ):
+        """ write a pickle file, but only if 
+            necessary. """
+        if self.needsUpdate():
+            logger.debug ( "pickle file needs an update." )
+            self.createPickleFile()
+        else:
+            logger.debug ( "pickle file does not need an update." )
 if __name__ == "__main__":
     import argparse
     """ Run as a script, this checks and/or writes database.pcl files """
@@ -308,8 +417,9 @@ if __name__ == "__main__":
     argparser.add_argument('-d', '--database', help='directory name of database', 
                             default="../../../smodels-database/" )
     args = argparser.parse_args()
-    logger.setLevel(level=logging.DEBUG )
+    logger.setLevel(level=logging.INFO )
     db = Database ( args.database )
+    db.verbosity = "info"
     logger.debug ( "%s" % db )
     if args.write:
         db.createPickleFile()
@@ -319,14 +429,14 @@ if __name__ == "__main__":
         db.checkPickleFile()
     if args.time:
         t0=time.time()
-        db = db.loadPickleFile ( lastm_only = False )
+        expResult = db.loadPickleFile ( lastm_only = False )
         t1=time.time()
         print "Time it took reading pickle file: %.1f s." % (t1-t0)
         txtdb = db.loadTextDatabase()
         t2=time.time()
         print "Time it took reading text   file: %.1f s." % (t2-t1)
     if args.read:
-        db = pickler.loadPickleFile ( lastm_only = False )
+        db = db.loadPickleFile ( lastm_only = False )
         listOfExpRes = db.getExpResults() 
         for expResult in listOfExpRes:
             print expResult
