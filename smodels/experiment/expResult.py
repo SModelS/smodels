@@ -10,10 +10,9 @@
 import cPickle as pickle
 import logging
 import os
-from smodels.experiment import infoObject
-from smodels.experiment import txnameObject
-from smodels.experiment import datasetObject
-from smodels.theory.auxiliaryFunctions import _memoize
+from smodels.experiment import infoObj
+from smodels.experiment import txnameObj
+from smodels.experiment import datasetObj
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.tools.physicsUnits import fb
 
@@ -36,13 +35,13 @@ class ExpResult(object):
             if not os.path.isfile(os.path.join(path, "globalInfo.txt")):
                 logger.error("globalInfo.txt file not found in " + path)
                 raise TypeError
-            self.globalInfo = infoObject.Info(os.path.join(path, "globalInfo.txt"))
+            self.globalInfo = infoObj.Info(os.path.join(path, "globalInfo.txt"))
             self.datasets = []
             for root, _, files in os.walk(path):
                 if 'dataInfo.txt' in files:  # data folder found
                     # Build data set
                     try:
-                        dataset = datasetObject.DataSet(root, self.globalInfo)
+                        dataset = datasetObj.DataSet(root, self.globalInfo)
                         self.datasets.append(dataset)
                     except TypeError:
                         continue
@@ -148,7 +147,7 @@ class ExpResult(object):
                 logger.error("A TxName and mass array must be defined when \
                              computing ULs for upper-limit results.")
                 return False
-            if not isinstance(txname, txnameObject.TxName) and \
+            if not isinstance(txname, txnameObj.TxName) and \
                not isinstance(txname, str):
                  logger.error("txname must be a TxName object or a string")
                  return False

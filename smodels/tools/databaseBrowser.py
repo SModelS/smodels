@@ -8,9 +8,7 @@
 """
 
 import logging
-#import setPath
-import sys
-from smodels.experiment.databaseObjects import Database,ExpResult
+from smodels.experiment.database import Database,ExpResult
 import numpy, unum
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
@@ -34,6 +32,9 @@ class Browser(object):
     
     """
     def __init__(self, database):
+        """
+        :param database: Path to the database or Database object
+        """        
         
         self._selectedExpResults = []
         if isinstance(database,str):

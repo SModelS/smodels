@@ -17,7 +17,7 @@ class ClustererTest(unittest.TestCase):
         """ test the mass clusterer """
         from smodels.theory import lheReader, lheDecomposer, crossSection
         from smodels.theory import clusterTools
-        from smodels.experiment.txnameObject import TxName, TxNameData
+        from smodels.experiment.txnameObj import TxName, TxNameData
         from smodels.installation import installDirectory
         from smodels.tools.physicsUnits import GeV, pb, fb
         import copy
