@@ -455,5 +455,5 @@ if __name__ == "__main__":
     ]:
         result=txnameData.getValueFor( masses )
         sm = "%.1f %.1f" % ( masses[0][0].asNumber(GeV), masses[0][1].asNumber(GeV) )
-        print "%s %.3f fb" % ( sm, result.asNumber(fb) )
-    print "%.2f ms" % ( (time.time()-t0)*1000. )
+        print ( "%s %.3f fb" % ( sm, result.asNumber(fb) ) )
+    print ( "%.2f ms" % ( (time.time()-t0)*1000. ) )

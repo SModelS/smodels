@@ -480,13 +480,13 @@ if __name__ == "__main__":
         t0=time.time()
         expResult = db.loadBinaryFile ( lastm_only = False )
         t1=time.time()
-        print "Time it took reading serializer file: %.1f s." % (t1-t0)
+        print ( "Time it took reading serializer file: %.1f s." % (t1-t0) )
         txtdb = db.loadTextDatabase()
         t2=time.time()
-        print "Time it took reading text   file: %.1f s." % (t2-t1)
+        print ( "Time it took reading text   file: %.1f s." % (t2-t1) )
     if args.read:
         db = db.loadBinaryFile ( lastm_only = False )
         listOfExpRes = db.getExpResults() 
         for expResult in listOfExpRes:
-            print expResult
+            print (expResult)
 
