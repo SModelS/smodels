@@ -13,6 +13,7 @@
 
 import sys
 import cPickle as pickle
+# import msgpack as pickle
 import logging
 import os
 import time
@@ -47,6 +48,8 @@ class Database(object):
         self.txt_mtime = None, None
         self.pcl_mtime = None, None
         self.pcl_db = None
+        self.sw_format_version = "100" ## what format does the software support?
+        self.pcl_format_version = None ## what format is in the pickle file?
         self.pclfile = os.path.join ( self._base, "database.pcl" )
         self._setLogLevel ( self._verbosity )
         if force_load=="txt":
@@ -145,11 +148,13 @@ class Database(object):
 
         with open ( self.pclfile, "r" ) as f:
             t0=time.time()
+            self.pcl_format_version = pickle.load ( f )
             self.pcl_mtime = pickle.load ( f )
             self._databaseVersion = pickle.load ( f )
             # self.pclfile = pickle.load ( f )
             if not lastm_only:
-                logger.info ( "loading pickle file %s" % self.pclfile )
+                logger.info ( "loading pickle file %s format version %s" % 
+                        ( self.pclfile, self.pcl_format_version ) )
                 self.expResultList = pickle.load ( f )
                 t1=time.time()-t0
                 logger.info ( "Loaded database from %s in %.1f secs." % \
@@ -174,7 +179,9 @@ class Database(object):
         self.lastModifiedAndFileCount()
         self.loadPickleFile ( lastm_only = True )
         return ( self.txt_mtime[0] > self.pcl_mtime[0] or \
-                 self.txt_mtime[1] != self.pcl_mtime[1] )
+                 self.txt_mtime[1] != self.pcl_mtime[1]  or \
+                 self.sw_format_version != self.pcl_format_version
+            )
 
 
     def createPickleFile ( self, filename=None ):
@@ -191,12 +198,14 @@ class Database(object):
             pclfile = self.pclfile
         logger.debug (  " * create %s" % self.pclfile )
         with open ( pclfile, "w" ) as f:
+            pickle.dump ( self.sw_format_version, f )
             pickle.dump ( self.txt_mtime, f )
             pickle.dump ( self._databaseVersion, f )
             # pickle.dump ( self.pclfile, f )
             logger.debug (  " * load text database" )
             self.loadTextDatabase() 
-            logger.debug (  " * write %s" % self.pclfile )
+            logger.debug (  " * write %s version %s" % ( self.pclfile,
+                       self.sw_format_version ) )
             pickle.dump ( self.expResultList, f, protocol=2 )
             logger.info (  " * done writing %s in %.1f secs." % \
                     ( self.pclfile, time.time()-t0 ) )

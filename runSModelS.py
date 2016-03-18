@@ -9,7 +9,6 @@
 from __future__ import print_function
 import os, sys
 import logging
-import argparse
 from ConfigParser import SafeConfigParser
 from smodels.experiment.database import Database
 from smodels.installation import installDirectory
@@ -210,28 +209,37 @@ def main(inputFile, parameterFile, outputFile, verbosity = 'info' ):
 
 
 if __name__ == "__main__":
+    import argparse
     """ Set default input and output files """
     parameterFile = "%s/etc/parameters_default.ini" % installDirectory()
     outputFile = "summary.txt"
 
     """ Get the name of input SLHA file and parameter file """
-    argparser = argparse.ArgumentParser()
-    argparser.add_argument('-f', '--filename', help='name of SLHA or LHE input file, necessary input', required=True)
-    argparser.add_argument('-p', '--parameterFile', help='name of parameter file, optional argument, if not set, use '
-                           'all parameters from etc/parameters_default.ini', default=parameterFile)
-    argparser.add_argument('-o', '--outputFile', help='name of output file, optional argument, default is: ' +
+    ap = argparse.ArgumentParser()
+    ap.add_argument('-f', '--filename', 
+            help='name of SLHA or LHE input file, necessary input', required=True)
+    ap.add_argument('-p', '--parameterFile', 
+            help='name of parameter file, optional argument, if not set, use '
+                           'all parameters from etc/parameters_default.ini', 
+                           default=parameterFile)
+    ap.add_argument('-o', '--outputFile', 
+            help='name of output file, optional argument, default is: ' +
                            outputFile, default=outputFile)
-    argparser.add_argument('--development', help='enable development output', action='store_true')
-    argparser.add_argument('--run-crashreport', help='parse crash report file and use its contents for a SModelS run',
+    ap.add_argument('--development', help='enable development output', 
+            action='store_true')
+    ap.add_argument('--run-crashreport', 
+            help='parse crash report file and use its contents for a SModelS run',
                            action='store_true')
-    argparser.add_argument('--timeout', help='define a limit on the running time (in secs).'
-                           ' If not set, run without a time limit', default = 0, type = int)
+    ap.add_argument('--timeout', help='define a limit on the running time (in secs).'
+                           ' If not set, run without a time limit', 
+                           default = 0, type = int)
     
     
-    args = argparser.parse_args()
+    args = ap.parse_args()
     
     if args.run_crashreport:
-        args.filename, args.parameterFile = crashReport.readCrashReportFile(args.filename)
+        args.filename, args.parameterFile = crashReport.readCrashReportFile(
+                args.filename)
         with timeOut.Timeout(args.timeout):
             main(args.filename, args.parameterFile, args.outputFile)
         
@@ -246,5 +254,6 @@ if __name__ == "__main__":
                 print(crashReport.createStackTrace())
             else:
                 print(crashReport.createStackTrace())
-                crashReportFacility.createCrashReportFile(args.filename, args.parameterFile)
+                crashReportFacility.createCrashReportFile(args.filename, 
+                                args.parameterFile)
                 print(crashReportFacility.createUnknownErrorMessage())
