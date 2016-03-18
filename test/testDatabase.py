@@ -25,7 +25,7 @@ class DatabaseTest(unittest.TestCase):
         """ tests writing pickle file """
         self.logger.info ( "test writing pickle file """ )
         writer = Database ( "./database/", force_load = "txt" )
-        writer.createPickleFile ( "./database.pcl" )
+        writer.createBinaryFile ( "./database.pcl" )
         reader1 = Database ( "./database/" )
         reader2 = Database ( "./", force_load = "pcl" )
         os.unlink ( "./database.pcl" )
