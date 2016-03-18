@@ -1,5 +1,5 @@
 """
-.. module:: infoObjects
+.. module:: infoObj
    :synopsis: Holds the classes and methods used to read and store the information in the
               globalInfo.txt or dataglobalInfo.txt files.
 

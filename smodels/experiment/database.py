@@ -15,11 +15,8 @@ import sys
 import logging
 import os
 import time
-from smodels.experiment import infoObject
-from smodels.experiment import txnameObject
-from smodels.experiment import datasetObject
+from smodels.experiment import datasetObj
 from smodels.experiment.expResult import ExpResult
-from smodels.theory.auxiliaryFunctions import _memoize
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.tools.physicsUnits import fb
 import cPickle as serializer
@@ -80,7 +77,7 @@ class Database(object):
             case it does need an update.
         """
         if not os.path.exists ( self.binfile ):
-            self.loadTextDatabase()
+#             self.loadTextDatabase()
             self.createBinaryFile()
         else:
             if self.needsUpdate():
@@ -388,10 +385,8 @@ class Database(object):
                   contains only one result
                    
         """
-        # print ".getExpResultList()"
         expResultList = []
         for expResult in self.expResultList:
-          #  print "expResult=",expResult.__str__()[:20]
             ID = expResult.globalInfo.getInfo('id')
             # Skip analysis not containing any of the required ids:
             if analysisIDs != ['all']:
@@ -410,7 +405,7 @@ class Database(object):
                         continue
                 # print "creating newDataSet %s %s " % ( dataset.path, dataset.globalInfo )
                 # print "dataset=",type(dataset)
-                newDataSet = datasetObject.DataSet(dataset.path, dataset.globalInfo,False)
+                newDataSet = datasetObj.DataSet(dataset.path, dataset.globalInfo,False)
                 # print "Done creating new Dataset"
                 newDataSet.dataInfo = dataset.dataInfo
                 newDataSet.txnameList = []

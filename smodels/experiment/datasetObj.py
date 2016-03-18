@@ -1,5 +1,5 @@
 """
-.. module:: datasetObjects
+.. module:: datasetObj
    :synopsis: Holds the classes and methods used to read and store the information in the
               data folders.
 
@@ -9,7 +9,7 @@
 
 
 import logging,os,glob
-from smodels.experiment import txnameObject,infoObject
+from smodels.experiment import txnameObj,infoObj
 from smodels.tools import statistics
 from smodels.tools.physicsUnits import fb
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
@@ -25,10 +25,10 @@ class DataSet(object):
     """Holds the information to a data set folder (TxName objects, dataInfo,...)
     """
         
-    def __init__(self, path=None, infoObj=None, createInfo=True ):
+    def __init__(self, path=None, info=None, createInfo=True ):
         
         self.path = path
-        self.globalInfo = infoObj
+        self.globalInfo = info
         self.txnameList = []
         
         if path and createInfo:
@@ -38,12 +38,12 @@ class DataSet(object):
             if not os.path.isfile(os.path.join(path,"dataInfo.txt")):
                 logger.error("dataInfo.txt file not found in " + path)
                 raise TypeError
-            self.dataInfo = infoObject.Info(os.path.join(path,"dataInfo.txt"))
+            self.dataInfo = infoObj.Info(os.path.join(path,"dataInfo.txt"))
 
             #Get list of TxName objects:
             for txtfile in glob.iglob(os.path.join(path,"*.txt")):
                 try:                
-                    txname = txnameObject.TxName(txtfile,self.globalInfo)
+                    txname = txnameObj.TxName(txtfile,self.globalInfo)
                     self.txnameList.append(txname)
                 except TypeError: continue
             
