@@ -36,13 +36,13 @@ class databaseBrowserGUIApp(App):
 if __name__ == "__main__":
     
     #First check if the database folder exists:
-    databasePath = os.path.join(os.getenv("HOME"),'smodels-database')
+    databasePath = os.path.join(os.getenv("HOME"),'smodels-database/database_light.pcl')
     if  len(sys.argv) > 1:
         databasePath = sys.argv[1]
-    if not os.path.isdir(databasePath):
-        Logger.error("Database folder %s does not exist!" %databasePath)
+    if not os.path.isdir(databasePath) and not os.path.isfile(databasePath):
+        Logger.error("Database %s not found!" %databasePath)
         sys.exit()
-     
+    
     #Load the Browser and check if it is a valid database   
     browser = Browser(databasePath)
     if not browser:

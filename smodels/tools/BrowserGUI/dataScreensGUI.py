@@ -94,7 +94,7 @@ class PropertiesScreen(BoxLayout):
         #Build list of attributes (property items)
         self.propItems = []        
         for attr in sorted(browser.getAttributes()):
-            if  attr == 'store_value': continue
+            if  attr[0] == '_': continue #Skip private attributes
             propItem = PropItem(attr,browser)  #Create the item based on the attribute
             propItem.valScreen = ValuesScreen(attr,browser) #Each item contains the values screen
             self.propItems.append(propItem) 
