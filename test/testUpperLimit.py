@@ -12,7 +12,7 @@ sys.path.insert(0,"../")
 import unittest
 from smodels.tools.physicsUnits import GeV, pb
 from smodels.installation import installDirectory
-from smodels.experiment.database import Database
+from smodels.experiment.databaseObj import Database
 database=Database ( "./database", verbosity='error' )
 
 class UpperLimitTest(unittest.TestCase):
