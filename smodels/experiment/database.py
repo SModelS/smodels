@@ -12,8 +12,6 @@
 """
 
 import sys
-import cPickle as pickle
-# import msgpack as pickle
 import logging
 import os
 import time
@@ -24,6 +22,7 @@ from smodels.experiment.expResult import ExpResult
 from smodels.theory.auxiliaryFunctions import _memoize
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.tools.physicsUnits import fb
+import cPickle as serializer
 
 logger = logging.getLogger(__name__)
 
@@ -39,9 +38,11 @@ class Database(object):
     def __init__(self, base=None, force_load = None, verbosity='info' ):
         """
         :param force_load: force loading the text database ("txt"),
-            or pickle database ("pcl"), dont force anything if None
+            or serializer database ("pcl"), dont force anything if None
         """
-        self._base = self._validateBase(base)
+        self.force_load = force_load
+        self.pclfilename = "database.pcl"
+        self._validateBase(base)
         self._verbosity = verbosity
         self._databaseVersion = None
         self.expResultList = None
@@ -49,14 +50,14 @@ class Database(object):
         self.pcl_mtime = None, None
         self.pcl_db = None
         self.sw_format_version = "100" ## what format does the software support?
-        self.pcl_format_version = None ## what format is in the pickle file?
-        self.pclfile = os.path.join ( self._base, "database.pcl" )
+        self.pcl_format_version = None ## what format is in the serializer file?
+        self.binfile = os.path.join ( self._base, self.pclfilename )
         self._setLogLevel ( self._verbosity )
-        if force_load=="txt":
+        if self.force_load=="txt":
             self.loadTextDatabase()
-        if force_load=="pcl":
-            self.loadPickleFile()
-        if force_load==None:
+        if self.force_load=="pcl":
+            self.loadBinaryFile()
+        if self.force_load==None:
             self.loadDatabase()
 
     def __eq__ ( self, other ):
@@ -72,23 +73,24 @@ class Database(object):
         return True
 
     def loadDatabase ( self ):
-        """ if no pickle file is available, then 
-            load the database and create the pickle file.
-            if pickle file is available, then check if
-            it needs update, create new pickle file, in
+        """ if no serializer file is available, then 
+            load the database and create the serializer file.
+            if serializer file is available, then check if
+            it needs update, create new serializer file, in
             case it does need an update.
         """
-        if not os.path.exists ( self.pclfile ):
+        if not os.path.exists ( self.binfile ):
             self.loadTextDatabase()
-            self.createPickleFile()
+            self.createBinaryFile()
         else:
             if self.needsUpdate():
-                self.createPickleFile()
+                self.createBinaryFile()
             else:
-                self.loadPickleFile( lastm_only = False )
+                self.loadBinaryFile( lastm_only = False )
 
     def loadTextDatabase ( self ):
         """ simply loads the textdabase """
+        logger.info ( "Parsing text database at %s" % self._base )
         self._databaseVersion = self._getDatabaseVersion
         self.expResultList = self._loadExpResults()
 
@@ -132,8 +134,8 @@ class Database(object):
             count+=tcount+1
         self.txt_mtime = lastm, count
 
-    def loadPickleFile ( self, lastm_only = False ):
-        """ load a pickle file, returning
+    def loadBinaryFile ( self, lastm_only = False ):
+        """ load a serializer file, returning
             last modified, file count, database.
         :param lastm_only: if true, the database itself is not read.
         :returns: database object, or None, lastm_only == True.
@@ -146,69 +148,72 @@ class Database(object):
         if self.pcl_db:
             return self.pcl_db
 
-        with open ( self.pclfile, "r" ) as f:
+        if not os.path.exists ( self.binfile ):
+            return None
+
+        with open ( self.binfile, "r" ) as f:
             t0=time.time()
-            self.pcl_format_version = pickle.load ( f )
-            self.pcl_mtime = pickle.load ( f )
-            self._databaseVersion = pickle.load ( f )
-            # self.pclfile = pickle.load ( f )
+            self.pcl_format_version = serializer.load ( f )
+            self.pcl_mtime = serializer.load ( f )
+            self._databaseVersion = serializer.load ( f )
+            # self.binfile = serializer.load ( f )
             if not lastm_only:
-                logger.info ( "loading pickle file %s format version %s" % 
-                        ( self.pclfile, self.pcl_format_version ) )
-                self.expResultList = pickle.load ( f )
+                logger.info ( "loading serializer file %s format version %s" % 
+                        ( self.binfile, self.pcl_format_version ) )
+                self.expResultList = serializer.load ( f )
                 t1=time.time()-t0
                 logger.info ( "Loaded database from %s in %.1f secs." % \
-                        ( self.pclfile, t1 ) )
+                        ( self.binfile, t1 ) )
         return self
 
-    def checkPickleFile ( self ):
+    def checkBinaryFile ( self ):
         nu=self.needsUpdate()
-        logger.debug ( "Checking pickle file." )
-        logger.debug ( "Pickle file dates to %s(%d)" % \
+        logger.debug ( "Checking serializer file." )
+        logger.debug ( "Binary file dates to %s(%d)" % \
                       ( time.ctime(self.pcl_mtime[0]),self.pcl_mtime[1] ) )
         logger.debug ( "Database dates to %s(%d)" % \
                       ( time.ctime(self.txt_mtime[0]),self.txt_mtime[1] ) )
         if nu:
-            logger.info ( "pickle file needs an update." )
+            logger.info ( "serializer file needs an update." )
         else:
-            logger.info ( "pickle file does not need an update." )
+            logger.info ( "serializer file does not need an update." )
         return nu
 
     def needsUpdate ( self ):
-        """ does the pickle file need an update? """
+        """ does the serializer file need an update? """
         self.lastModifiedAndFileCount()
-        self.loadPickleFile ( lastm_only = True )
+        self.loadBinaryFile ( lastm_only = True )
         return ( self.txt_mtime[0] > self.pcl_mtime[0] or \
                  self.txt_mtime[1] != self.pcl_mtime[1]  or \
                  self.sw_format_version != self.pcl_format_version
             )
 
 
-    def createPickleFile ( self, filename=None ):
+    def createBinaryFile ( self, filename=None ):
         """ create a pcl file from the text database,
             potentially overwriting an old pcl file. """
         t0=time.time()
-        logger.info ( "Creating pickle file (this may take a few minutes)" )
+        logger.info ( "Creating serializer file (this may take a few minutes)" )
         logger.debug ( " * compute last modified timestamp." )
         self.lastModifiedAndFileCount()
         logger.debug (  " * compute timestamp: %s filecount: %d" % \
                 ( time.ctime ( self.txt_mtime[0] ), self.txt_mtime[1] ) )
-        pclfile = filename
-        if pclfile == None:
-            pclfile = self.pclfile
-        logger.debug (  " * create %s" % self.pclfile )
-        with open ( pclfile, "w" ) as f:
-            pickle.dump ( self.sw_format_version, f )
-            pickle.dump ( self.txt_mtime, f )
-            pickle.dump ( self._databaseVersion, f )
-            # pickle.dump ( self.pclfile, f )
+        binfile = filename
+        if binfile == None:
+            binfile = self.binfile
+        logger.debug (  " * create %s" % self.binfile )
+        with open ( binfile, "w" ) as f:
+            # serializer.dump ( self.binfile, f )
             logger.debug (  " * load text database" )
             self.loadTextDatabase() 
-            logger.debug (  " * write %s version %s" % ( self.pclfile,
+            logger.debug (  " * write %s version %s" % ( self.binfile,
                        self.sw_format_version ) )
-            pickle.dump ( self.expResultList, f, protocol=2 )
+            serializer.dump ( self.sw_format_version, f, protocol=2 )
+            serializer.dump ( self.txt_mtime, f, protocol=2 )
+            serializer.dump ( self._databaseVersion, f, protocol=2 )
+            serializer.dump ( self.expResultList, f, protocol=2 )
             logger.info (  " * done writing %s in %.1f secs." % \
-                    ( self.pclfile, time.time()-t0 ) )
+                    ( self.binfile, time.time()-t0 ) )
 
     @property
     def databaseVersion(self):
@@ -231,16 +236,22 @@ class Database(object):
     def _validateBase(self, path):
         """
         Validates the base directory to locate the database. 
-        Exits the script if something is wrong with the path.
+        Raises an exception if something is wrong with the path.
     
         """
         logger.debug('Try to set the path for the database to: %s', path)
-        path = os.path.realpath(path) + '/'
+        tmp = os.path.realpath(path)
+        if os.path.isfile ( tmp ):
+            self._base = os.path.dirname ( tmp )
+            self.force_load = "pcl" 
+            self.pclfilename = os.path.basename ( tmp )
+            return
+
+        path = tmp + '/'
         if not os.path.exists(path):
             logger.error('%s is no valid path!', path)
             raise DatabaseNotFoundException("Database not found")
-        return path
-
+        self._base = path
 
     def __str__(self):
         idList = "Database version: " + self.databaseVersion + "\n---------- \n"
@@ -411,28 +422,28 @@ class Database(object):
         # print "done .getExpResultList()"
         return expResultList
 
-    def updatePickleFile ( self ):
-        """ write a pickle file, but only if 
+    def updateBinaryFile ( self ):
+        """ write a serializer file, but only if 
             necessary. """
         if self.needsUpdate():
-            logger.debug ( "pickle file needs an update." )
-            self.createPickleFile()
+            logger.debug ( "serializer file needs an update." )
+            self.createBinaryFile()
         else:
-            logger.debug ( "pickle file does not need an update." )
+            logger.debug ( "serializer file does not need an update." )
 if __name__ == "__main__":
     import argparse
     """ Run as a script, this checks and/or writes database.pcl files """
     argparser = argparse.ArgumentParser(description='simple script to check \
             and/or write database.pcl files')
-    argparser.add_argument('-c', '--check', help='check pickle file',
+    argparser.add_argument('-c', '--check', help='check serializer file',
                            action='store_true')
     argparser.add_argument('-t', '--time', help='time reading db',
                            action='store_true')
-    argparser.add_argument('-r', '--read', help='read pickle file',
+    argparser.add_argument('-r', '--read', help='read serializer file',
                            action='store_true')
-    argparser.add_argument('-w', '--write', help='force writing pickle file',
+    argparser.add_argument('-w', '--write', help='force writing serializer file',
                            action='store_true')
-    argparser.add_argument('-u', '--update', help='update pickle file, if necessary',
+    argparser.add_argument('-u', '--update', help='update serializer file, if necessary',
                            action='store_true')
     argparser.add_argument('-d', '--debug', help='debug mode',
                            action='store_true')
@@ -447,31 +458,27 @@ if __name__ == "__main__":
         if args.debug:
             db.verbosity = "debug"
         logger.debug ( "%s" % db )
-        db.createPickleFile()
+        db.createBinaryFile()
         sys.exit()
     db = Database ( args.database )
     if args.debug:
         db.verbosity = "debug"
     logger.debug ( "%s" % db )
     if args.update:
-        db.updatePickleFile()
+        db.updateBinaryFile()
     if args.check:
-        db.checkPickleFile()
+        db.checkBinaryFile()
     if args.time:
         t0=time.time()
-        expResult = db.loadPickleFile ( lastm_only = False )
+        expResult = db.loadBinaryFile ( lastm_only = False )
         t1=time.time()
-        print "Time it took reading pickle file: %.1f s." % (t1-t0)
+        print "Time it took reading serializer file: %.1f s." % (t1-t0)
         txtdb = db.loadTextDatabase()
         t2=time.time()
         print "Time it took reading text   file: %.1f s." % (t2-t1)
     if args.read:
-        db = db.loadPickleFile ( lastm_only = False )
+        db = db.loadBinaryFile ( lastm_only = False )
         listOfExpRes = db.getExpResults() 
         for expResult in listOfExpRes:
             print expResult
-        #txtdb=pickler.loadTextDatabase()
-        #listOfExpRes = txtdb.getExpResults() 
-        #for expResult in listOfExpRes:
-        #    print expResult
 
