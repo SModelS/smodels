@@ -249,7 +249,7 @@ class Element(object):
         
         pids = []
         for ipid,PIDlist in enumerate(self.branches[0].PIDs):            
-	    for ipid2,PIDlist2 in enumerate(self.branches[1].PIDs):
+            for ipid2,PIDlist2 in enumerate(self.branches[1].PIDs):
                 pids.append([self.branches[0].PIDs[ipid],self.branches[1].PIDs[ipid2]])
         
         return pids
