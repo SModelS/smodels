@@ -10,7 +10,7 @@ from __future__ import print_function
 import os, sys
 import logging
 from ConfigParser import SafeConfigParser
-from smodels.experiment.database import Database
+from smodels.experiment.databaseObj import Database
 from smodels.installation import installDirectory
 from smodels.theory import slhaDecomposer
 from smodels.theory import lheDecomposer
@@ -33,7 +33,7 @@ def main(inputFile, parameterFile, outputFile, verbosity = 'info', db=None ):
     :param parameterFile: File containing the input parameters (default =
                           /etc/parameters_default.ini)
     :param outputFile: Output file to write a summary of results
-    :param db: supply a smodels.experiment.database.Database object, so
+    :param db: supply a smodels.experiment.databaseObj.Database object, so
             the database doesnt have to be loaded anymore. Will 
             render a few parameters in the parameter file irrelevant.
     

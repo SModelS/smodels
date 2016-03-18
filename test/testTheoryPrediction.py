@@ -60,7 +60,7 @@ class IntegrationTest(unittest.TestCase):
         from smodels.installation import installDirectory
         from smodels.tools.physicsUnits import fb, GeV
         from smodels.theory import slhaDecomposer
-        from smodels.experiment.database import Database
+        from smodels.experiment.databaseObj import Database
         #from smodels.experiment import smsAnalysisFactory, smsHelpers
         #smsHelpers.base = installDirectory() + 'test/database/'
         # smsHelpers.runs = [ "2012" ]

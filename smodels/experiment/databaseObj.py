@@ -16,7 +16,7 @@ import logging
 import os
 import time
 from smodels.experiment import datasetObj
-from smodels.experiment.expResult import ExpResult
+from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.tools.physicsUnits import fb
 import cPickle as serializer
