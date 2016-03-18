@@ -82,7 +82,8 @@ def main(inputFile, parameterFile, outputFile, verbosity = 'info' ):
         return
 
     """ Initialize output status and exit if there were errors in the input """
-    outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile, dict(parser.items("parameters")), databaseVersion, outputFile)
+    outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile, 
+            dict(parser.items("parameters")), databaseVersion, outputFile)
     if outputStatus.status < 0: return
 
 
@@ -99,18 +100,23 @@ def main(inputFile, parameterFile, outputFile, verbosity = 'info' ):
     try:
         """ Decompose input SLHA file, store the output elements in smstoplist """
         if inputType == 'slha':
-            smstoplist = slhaDecomposer.decompose(inputFile, sigmacut, doCompress=parser.getboolean("options", "doCompress"),
-                         doInvisible=parser.getboolean("options", "doInvisible"), minmassgap=minmassgap)
+            smstoplist = slhaDecomposer.decompose(inputFile, sigmacut, 
+                    doCompress=parser.getboolean("options", "doCompress"),
+                    doInvisible=parser.getboolean("options", "doInvisible"), 
+                    minmassgap=minmassgap)
         else:
-            smstoplist = lheDecomposer.decompose(inputFile, doCompress=parser.getboolean("options", "doCompress"),
-                         doInvisible=parser.getboolean("options", "doInvisible"), minmassgap=minmassgap)
+            smstoplist = lheDecomposer.decompose(inputFile, 
+                    doCompress=parser.getboolean("options", "doCompress"),
+                    doInvisible=parser.getboolean("options", "doInvisible"), 
+                    minmassgap=minmassgap)
     except:
         """ Update status to fail, print error message and exit """
         outputStatus.updateStatus(-1)
         return
 
     """ Print Decomposition output.
-        If no topologies with sigma > sigmacut are found, update status, write output file, stop running """
+        If no topologies with sigma > sigmacut are found, update status, write
+        output file, stop running """
     if not smstoplist:
         outputStatus.updateStatus(-3)
         return
