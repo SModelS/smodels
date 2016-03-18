@@ -208,10 +208,11 @@ class Database(object):
             self.loadTextDatabase() 
             logger.debug (  " * write %s version %s" % ( self.binfile,
                        self.sw_format_version ) )
-            serializer.dump ( self.sw_format_version, f, protocol=2 )
-            serializer.dump ( self.txt_mtime, f, protocol=2 )
-            serializer.dump ( self._databaseVersion, f, protocol=2 )
-            serializer.dump ( self.expResultList, f, protocol=2 )
+            ptcl = serializer.HIGHEST_PROTOCOL
+            serializer.dump ( self.sw_format_version, f, protocol=ptcl )
+            serializer.dump ( self.txt_mtime, f, protocol=ptcl )
+            serializer.dump ( self._databaseVersion, f, protocol=ptcl )
+            serializer.dump ( self.expResultList, f, protocol=ptcl )
             logger.info (  " * done writing %s in %.1f secs." % \
                     ( self.binfile, time.time()-t0 ) )
 
@@ -246,6 +247,13 @@ class Database(object):
             self.force_load = "pcl" 
             self.pclfilename = os.path.basename ( tmp )
             return
+
+        if tmp[-4:]==".pcl":
+            if not os.path.exists ( tmp ):
+                logger.error ( "File not found: %s" % tmp )
+                sys.exit()
+            logger.error ( "Supplied a pcl filename, but %s is not a file." % tmp )
+            sys.exit()
 
         path = tmp + '/'
         if not os.path.exists(path):
