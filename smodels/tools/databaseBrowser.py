@@ -8,7 +8,7 @@
 """
 
 import logging
-from smodels.experiment.database import Database,ExpResult
+from smodels.experiment.databaseObj import Database,ExpResult
 import numpy, unum
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
