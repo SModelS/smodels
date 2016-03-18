@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: txnameObject
+.. module:: txnameObj
    :synopsis: Holds the classes and methods used to read and store the
               information in the txname.txt files. 
               Also contains the interpolation methods.
@@ -35,7 +35,7 @@ logger.setLevel(level=logging.ERROR)
 
 class TxName(object):
     """Holds the information related to one txname in the Txname.txt
-    file (constraint, condition,...) as well as the data.
+    file (constraint, condition,...) as well as the _data.
     """
     
     
@@ -162,7 +162,7 @@ class TxName(object):
         if type(val) == type(fb):
             return 1.  #The element has an UL, return 1        
         elif val is None or math.isnan(val):
-            return 0.  #The element mass is outside the data grid
+            return 0.  #The element mass is outside the _data grid
         elif type(val) == type(1.):
             return val  #The element has an eff
         else:
@@ -170,65 +170,65 @@ class TxName(object):
             raise SModelSError()
             
 class TxNameData(object):
-    """ Holds the data for the Txname object.  It holds Upper limit values or
+    """ Holds the _data for the Txname object.  It holds Upper limit values or
         efficiencies."""
     
     def __init__(self,value,accept_errors_upto=.05):
         """
         
-        :param value: data in string format
-        :param accept_errors_upto: If None, do not allow extrapolations outside of 
+        :param value: _data in string format
+        :param _accept_errors_upto: If None, do not allow extrapolations outside of 
                 convex hull.  If float value given, allow that much relative 
                 uncertainty on the upper limit / efficiency
                 when extrapolating outside convex hull.
                 This method can be used to loosen the equal branches assumption.
         """
-        self.accept_errors_upto=accept_errors_upto
-        self.store_value = value
-        self.V = None
-        self.data = None
+        self._accept_errors_upto=accept_errors_upto
+        self._store_value = value
+        self._V = None
+        self._data = None
         self.loadData()
 
     def __ne__ ( self, other ):
         return not self.__eq__ ( other )
 
     def __eq__ ( self, other ):
-        return self.data == other.data 
+        return self._data == other._data 
         
     def loadData(self):
         """
-        Uses the information in store_value to generate the data grid used for
+        Uses the information in _store_value to generate the _data grid used for
         interpolation.
         """
 
-        if self.data:
+        if self._data:
             return
         
-        if type(self.store_value)==str:            
-            self.data = eval(self.store_value, 
+        if type(self._store_value)==str:            
+            self._data = eval(self._store_value, 
                              {'fb':fb, 'pb':pb, 'GeV':GeV, 'TeV':TeV})
-        else: ## the data can also be given as lists, for debugging
-            self.data = self.store_value
+        else: ## the _data can also be given as lists, for debugging
+            self._data = self._store_value
         self.unit = 1.0 ## store the unit so that we can take arbitrary units for 
                         ## the "z" values.  default is unitless, 
                         ## which we use for efficiency maps
-        if len(self.data) < 1 or len(self.data[0]) < 2:
-                logger.error ( "input data not in correct format. expecting sth " \
+        if len(self._data) < 1 or len(self._data[0]) < 2:
+                logger.error ( "input _data not in correct format. expecting sth " \
                                "like [ [ [[ 300.*GeV,100.*GeV], "\
                                "[ 300.*GeV,100.*GeV] ], 10.*fb ], ... ] "\
                                "for upper limits or [ [ [[ 300.*GeV,100.*GeV],"\
                                " [ 300.*GeV,100.*GeV] ], .1 ], ... ] for "\
                                "efficiency maps" )
-        if type(self.data[0][1])==unum.Unum:
+        if type(self._data[0][1])==unum.Unum:
             ## if its a unum, we store 1.0 * unit
-            self.unit=self.data[0][1] / ( self.data[0][1].asNumber() )
+            self.unit=self._data[0][1] / ( self._data[0][1].asNumber() )
        
         self.computeV()
 
     @_memoize       
     def getValueFor(self,massarray):
         """
-        Interpolates the data and returns the UL or efficiency for the
+        Interpolates the _data and returns the UL or efficiency for the
         respective massarray
         :param massarray: mass array values (with units), i.e.
                           [[100*GeV,10*GeV],[100*GeV,10*GeV]]
@@ -240,18 +240,18 @@ class TxNameData(object):
         self.massarray = massarray
         if len(porig)!=self.full_dimensionality:
             logger.error ( "dimensional error. I have been asked to compare a "\
-                    "%d-dimensional mass vector with %d-dimensional data!" % \
+                    "%d-dimensional mass vector with %d-dimensional _data!" % \
                     ( len(porig), self.full_dimensionality ) )
             return None
         p= ( (np.matrix(porig)[0] - self.delta_x ) ).tolist()[0]
-        P=np.dot(p,self.V)  ## rotate
+        P=np.dot(p,self._V)  ## rotate
         dp=self.countNonZeros ( P )
         self.projected_value = self.interpolate( [ P[:self.dimensionality] ] )
         
         # self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
         # self.projected_value = float(self.projected_value)        
-        if dp != self.dimensionality: ## we have data in different dimensions
-            if self.accept_errors_upto == None:
+        if dp != self.dimensionality: ## we have _data in different dimensions
+            if self._accept_errors_upto == None:
                 return None
             logger.debug ( "attempting to interpolate outside of convex hull "\
                     "(d=%d,dp=%d,masses=%s)" %
@@ -304,7 +304,7 @@ class TxNameData(object):
         #p=self.flattenMassArray ( massarray ) ## point p in n dimensions
         porig=self.flattenMassArray ( massarray ) ## flatten
         p= ( (np.matrix(porig)[0] - self.delta_x ) ).tolist()[0]
-        P=np.dot(p,self.V)                    ## projected point p in n dimensions
+        P=np.dot(p,self._V)                    ## projected point p in n dimensions
         ## P[self.dimensionality:] is project point p in m dimensions
         # m=self.countNonZeros ( P ) ## dimensionality of input
         ## how far are we away from the "plane": distance alpha
@@ -368,9 +368,9 @@ class TxNameData(object):
             convex hull """
         porig=self.flattenMassArray ( massarray ) ## flatten
         p= ( (np.matrix(porig)[0] - self.delta_x ) ).tolist()[0]
-        P=np.dot(p,self.V)
+        P=np.dot(p,self._V)
         de = self._estimateExtrapolationError ( massarray ) 
-        if de < self.accept_errors_upto:
+        if de < self._accept_errors_upto:
             return self._returnProjectedValue()
         if not math.isnan(de):
             logger.debug ( "Expected propagation error of %f too large to " \
@@ -394,14 +394,14 @@ class TxNameData(object):
         return nz
 
     def computeV ( self ):
-        """ compute rotation matrix V, rotate and truncate also
-            'data' points and store in self.Mp """
-        if self.V!=None:
+        """ compute rotation matrix _V, rotate and truncate also
+            '_data' points and store in self.Mp """
+        if self._V!=None:
              return
         Morig=[]
         self.xsec=[]
      
-        for x,y in self.data:
+        for x,y in self._data:
             self.xsec.append ( y / self.unit )
             xp = self.flattenMassArray ( x )
             Morig.append ( xp )
@@ -414,7 +414,7 @@ class TxNameData(object):
 
         U,s,Vt=svd(M)
         V=Vt.T
-        self.V=V
+        self._V=V
         Mp=[]
 
         ## the dimensionality of the whole mass space, disrespecting equal branches 
@@ -448,7 +448,7 @@ if __name__ == "__main__":
          [ [[ 400.*GeV,250.*GeV], [ 400.*GeV,250.*GeV] ], 15.*fb ], 
          [ [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ], 17.*fb ], 
          [ [[ 400.*GeV,350.*GeV], [ 400.*GeV,350.*GeV] ], 19.*fb ], ]
-    txnameData=TxNameData ( data ) ## "upperlimit", data )
+    txnameData=TxNameData ( data ) ## "upperlimit", _data )
     t0=time.time()
     for masses in [ [[ 302.*GeV,123.*GeV], [ 302.*GeV,123.*GeV]],
                     [[ 254.*GeV,171.*GeV], [ 254.*GeV,170.*GeV]],
