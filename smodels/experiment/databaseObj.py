@@ -40,7 +40,7 @@ class Database(object):
         self.force_load = force_load
         self.pclfilename = "database.pcl"
         self._validateBase(base)
-        self._verbosity = verbosity
+        self._verbosity = "debug" ## verbosity
         self._databaseVersion = None
         self.expResultList = None
         self.txt_mtime = None, None
@@ -148,19 +148,28 @@ class Database(object):
         if not os.path.exists ( self.binfile ):
             return None
 
-        with open ( self.binfile, "r" ) as f:
-            t0=time.time()
-            self.pcl_format_version = serializer.load ( f )
-            self.pcl_mtime = serializer.load ( f )
-            self._databaseVersion = serializer.load ( f )
-            # self.binfile = serializer.load ( f )
-            if not lastm_only:
-                logger.info ( "loading serializer file %s format version %s" % 
-                        ( self.binfile, self.pcl_format_version ) )
-                self.expResultList = serializer.load ( f )
-                t1=time.time()-t0
-                logger.info ( "Loaded database from %s in %.1f secs." % \
-                        ( self.binfile, t1 ) )
+        try:
+            with open ( self.binfile, "r" ) as f:
+                t0=time.time()
+                self.pcl_format_version = serializer.load ( f )
+                self.pcl_mtime = serializer.load ( f )
+                self._databaseVersion = serializer.load ( f )
+                # self.binfile = serializer.load ( f )
+                if not lastm_only:
+                    logger.info ( "loading serializer file %s format version %s" % 
+                            ( self.binfile, self.pcl_format_version ) )
+                    self.expResultList = serializer.load ( f )
+                    t1=time.time()-t0
+                    logger.info ( "Loaded database from %s in %.1f secs." % \
+                            ( self.binfile, t1 ) )
+        except EOFError,e:
+            os.unlink ( self.binfile )
+            if lastm_only:
+                self.pcl_format_version = -1
+                self.pcl_mtime = 0
+                return self
+            logger.error ( "%s is not a binary database file! recreate it!" % self.binfile )
+            self.createBinaryFile()
         return self
 
     def checkBinaryFile ( self ):
@@ -178,6 +187,7 @@ class Database(object):
 
     def needsUpdate ( self ):
         """ does the serializer file need an update? """
+        # logger.debug ( "needsUpdate?" )
         self.lastModifiedAndFileCount()
         self.loadBinaryFile ( lastm_only = True )
         return ( self.txt_mtime[0] > self.pcl_mtime[0] or \
@@ -350,7 +360,7 @@ class Database(object):
             if root[-5:] == "/orig":
                 continue
             if not 'globalInfo.txt' in files:
-                logger.debug("Missing globalInfo.txt in %s", root)
+          #      logger.debug("Missing globalInfo.txt in %s", root)
                 continue
             else:
                 expres = ExpResult(root)
