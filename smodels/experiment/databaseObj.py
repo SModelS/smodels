@@ -46,7 +46,7 @@ class Database(object):
         self.txt_mtime = None, None
         self.pcl_mtime = None, None
         self.pcl_db = None
-        self.sw_format_version = "100" ## what format does the software support?
+        self.sw_format_version = "101" ## what format does the software support?
         self.pcl_format_version = None ## what format is in the serializer file?
         self.binfile = os.path.join ( self._base, self.pclfilename )
         self._setLogLevel ( self._verbosity )
@@ -135,7 +135,7 @@ class Database(object):
         """ load a serializer file, returning
             last modified, file count, database.
         :param lastm_only: if true, the database itself is not read.
-        :returns: database object, or None, lastm_only == True.
+        :returns: database object, or None, if lastm_only == True.
         """
         if lastm_only and self.pcl_mtime[0]:
             ## doesnt need to load database, and mtime is already
@@ -156,6 +156,13 @@ class Database(object):
                 self._databaseVersion = serializer.load ( f )
                 # self.binfile = serializer.load ( f )
                 if not lastm_only:
+                    if self.pcl_format_version != self.sw_format_version:
+                        logger.warning ( "binary file format (%s) and format supported by software (%s) disagree." % ( self.pcl_format_version, self.sw_format_version ) )
+                        logger.warning ( "will recreate binary." )
+                        self.createBinaryFile()
+                        return self
+
+                    print self.pcl_format_version
                     logger.info ( "loading serializer file %s format version %s" % 
                             ( self.binfile, self.pcl_format_version ) )
                     self.expResultList = serializer.load ( f )
