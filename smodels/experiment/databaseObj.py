@@ -162,7 +162,7 @@ class Database(object):
                         self.createBinaryFile()
                         return self
 
-                    print self.pcl_format_version
+                    ## print self.pcl_format_version
                     logger.info ( "loading serializer file %s format version %s" % 
                             ( self.binfile, self.pcl_format_version ) )
                     self.expResultList = serializer.load ( f )
