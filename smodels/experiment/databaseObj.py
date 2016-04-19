@@ -46,7 +46,7 @@ class Database(object):
         self.txt_mtime = None, None
         self.pcl_mtime = None, None
         self.pcl_db = None
-        self.sw_format_version = "101" ## what format does the software support?
+        self.sw_format_version = "102" ## what format does the software support?
         self.pcl_format_version = None ## what format is in the serializer file?
         self.binfile = os.path.join ( self._base, self.pclfilename )
         self._setLogLevel ( self._verbosity )
@@ -76,10 +76,12 @@ class Database(object):
             it needs update, create new serializer file, in
             case it does need an update.
         """
+        print "loadDatabase starts",os.path.exists ( self.binfile )
         if not os.path.exists ( self.binfile ):
 #             self.loadTextDatabase()
             self.createBinaryFile()
         else:
+            print "needs update >>%s>>" % self.needsUpdate()
             if self.needsUpdate():
                 self.createBinaryFile()
             else:
@@ -101,6 +103,13 @@ class Database(object):
         ret = lastm
         ctr=0
         for f in os.listdir ( dirname ):
+            if f in [ "orig", "sms.root", "validation" ]:
+                continue
+            if f[-1:]=="~":
+                continue
+            if f[-3:]==".py":
+                continue
+            print "lastModifiedDir",f
             lf = os.path.join ( dirname, f )
             if os.path.isdir ( lf ):
                 (ret,tctr) = self.lastModifiedDir ( lf, ret )
@@ -137,6 +146,7 @@ class Database(object):
         :param lastm_only: if true, the database itself is not read.
         :returns: database object, or None, if lastm_only == True.
         """
+        print "loadBinaryFile",lastm_only,self.pcl_mtime[0]
         if lastm_only and self.pcl_mtime[0]:
             ## doesnt need to load database, and mtime is already
             ## loaded
@@ -145,6 +155,7 @@ class Database(object):
         if self.pcl_db:
             return self.pcl_db
 
+        print "self.binfile=",self.binfile
         if not os.path.exists ( self.binfile ):
             return None
 
@@ -155,6 +166,8 @@ class Database(object):
                 self.pcl_mtime = serializer.load ( f )
                 self._databaseVersion = serializer.load ( f )
                 # self.binfile = serializer.load ( f )
+                print "sw_format_version=",self.sw_format_version
+                print "pcl_format_version",self.pcl_format_version
                 if not lastm_only:
                     if self.pcl_format_version != self.sw_format_version:
                         logger.warning ( "binary file format (%s) and format supported by software (%s) disagree." % ( self.pcl_format_version, self.sw_format_version ) )
@@ -170,6 +183,7 @@ class Database(object):
                     logger.info ( "Loaded database from %s in %.1f secs." % \
                             ( self.binfile, t1 ) )
         except EOFError,e:
+            print "eoferror",e
             os.unlink ( self.binfile )
             if lastm_only:
                 self.pcl_format_version = -1
@@ -177,6 +191,7 @@ class Database(object):
                 return self
             logger.error ( "%s is not a binary database file! recreate it!" % self.binfile )
             self.createBinaryFile()
+        print "loadBinaryFile returning",self
         return self
 
     def checkBinaryFile ( self ):
@@ -197,6 +212,8 @@ class Database(object):
         # logger.debug ( "needsUpdate?" )
         self.lastModifiedAndFileCount()
         self.loadBinaryFile ( lastm_only = True )
+        print "needs Update: text database",self.txt_mtime
+        print "needs Update: pcl database",self.pcl_mtime
         return ( self.txt_mtime[0] > self.pcl_mtime[0] or \
                  self.txt_mtime[1] != self.pcl_mtime[1]  or \
                  self.sw_format_version != self.pcl_format_version
