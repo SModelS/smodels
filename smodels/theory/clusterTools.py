@@ -9,7 +9,7 @@
 
 from smodels.theory import crossSection
 from smodels.theory.auxiliaryFunctions import massAvg, massPosition, distance
-from smodels.tools.physicsUnits import fb
+from smodels.tools.physicsUnits import fb, MeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import logging,sys
 
@@ -49,13 +49,31 @@ class ElementCluster(object):
         """
         Return the average mass of all elements belonging to the cluster.
         If the cluster does not refer to a TxName (i.e. in efficiency map results)
-        AND the cluster contains more than one element, returns None.
+        AND the cluster contains more than one element (assuming they differ in
+        the masses), returns None.
         
         :returns: average mass array         
         """
+
+        def similar ( a1, a2 ):
+            if len(a1) != len(a2):
+                return False
+            for l1,l2 in zip ( a1,a2 ):
+                if len(l1) != len(l2):
+                    return False
+                for e1, e2 in zip (l1,l2 ):
+                    d=abs ( (e1-e2).asNumber(MeV) )
+                    if d>.1:
+                        return False
+            return True
         
         if self.getDataType() == 'efficiencyMap':
-            if len(self.elements) > 1: return None
+            if len(self.elements) > 1: 
+                ret = self.elements[0].getMasses()
+                for i in self.elements[1:]:
+                    if not similar ( i.getMasses(), ret ):
+                        return None
+                return ret
             else: return self.elements[0].getMasses()
         elif self.getDataType() == 'upperLimit':
             massList = [el.getMasses() for el in self.elements]
