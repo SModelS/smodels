@@ -49,7 +49,7 @@ class ExternalPythia6(ExternalTool):
         self.executablePath = self.absPath(executablePath)
         self.executable = None
         self.srcPath = self.absPath(srcPath)
-        self.tempdir = tempfile.mkdtemp()
+        self.tempdir = None
         self.cfgfile = self.checkFileExists(configFile)
         self.keepTempDir = False
         self.nevents = None
@@ -62,7 +62,7 @@ class ExternalPythia6(ExternalTool):
         Copy the original config file again.
         
         """
-        shutil.copy(self.cfgfile, self.tempdir + "/temp.cfg")
+        shutil.copy(self.cfgfile, self.tempDirectory() + "/temp.cfg")
 
 
     def checkFileExists(self, inputFile):
@@ -83,7 +83,10 @@ class ExternalPythia6(ExternalTool):
         Return the temporary directory name.
         
         """
+        if self.tempdir == None:
+            self.tempdir = tempfile.mkdtemp()
         return self.tempdir
+
 
 
     def __str__(self):
@@ -117,7 +120,7 @@ class ExternalPythia6(ExternalTool):
                 os.unlink(self.tempdir + "/" + inputFile)
             if os.path.exists(self.tempdir):
                 os.rmdir(self.tempdir)
-                self.tempdir = tempfile.mkdtemp()
+                self.tempdir = None
 
 
     def replaceInCfgFile(self, replacements={"NEVENTS": 10000, "SQRTS":8000}):
@@ -199,19 +202,17 @@ class ExternalPythia6(ExternalTool):
             #        logger.error("still cannot find pythia6 binary, even after compiling.")
         #        self.complain()
         slha = self.checkFileExists(slhaFile)
-        # cfg = self.tempdir + "/temp.cfg"
-        # if cfgfile != None:
         cfg = self.absPath(cfgfile)
         logger.debug("running with " + str(cfg))
-        shutil.copy(slha, self.tempdir + "/fort.61")
+        shutil.copy(slha, self.tempDirectory() + "/fort.61")
         cmd = "cd %s ; %s < %s" % \
-             (self.tempdir, self.executablePath, cfg)
+             (self.tempDirectory(), self.executablePath, cfg)
         logger.debug("Now running " + str(cmd))
         Out = commands.getoutput(cmd)
         if do_unlink:
             self.unlink( unlinkdir=True )
         else:
-            f = open(self.tempdir + "/log", "w")
+            f = open(self.tempDirectory() + "/log", "w")
             f.write (cmd + "\n\n\n")
             f.write (Out + "\n")
             f.close()
@@ -275,6 +276,7 @@ class ExternalPythia6(ExternalTool):
         :returns: True, if everything is ok
         
         """
+        print ( "[externalPythia6] checkInstallation!" )
         if not os.path.exists(self.executablePath):
             logger.error("executable '%s' not found", self.executablePath)
             if fix:
