@@ -196,11 +196,6 @@ class ExternalPythia6(ExternalTool):
                     self.complain()
                 logger.warning("couldnt find pythia6 binary. I have been asked to try to compile it, though. Lets see.")
                 self.complain()
-            #    self.compile()
-            #    ci=self.checkInstallation( fix=False )
-            #    if not ci:
-            #        logger.error("still cannot find pythia6 binary, even after compiling.")
-        #        self.complain()
         slha = self.checkFileExists(slhaFile)
         cfg = self.absPath(cfgfile)
         logger.debug("running with " + str(cfg))
@@ -276,7 +271,6 @@ class ExternalPythia6(ExternalTool):
         :returns: True, if everything is ok
         
         """
-        print ( "[externalPythia6] checkInstallation!" )
         if not os.path.exists(self.executablePath):
             logger.error("executable '%s' not found", self.executablePath)
             if fix:
