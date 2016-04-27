@@ -117,6 +117,7 @@ class ExternalPythia6(ExternalTool):
                 os.unlink(self.tempdir + "/" + inputFile)
             if os.path.exists(self.tempdir):
                 os.rmdir(self.tempdir)
+                self.tempdir = tempfile.mkdtemp()
 
 
     def replaceInCfgFile(self, replacements={"NEVENTS": 10000, "SQRTS":8000}):
@@ -208,7 +209,7 @@ class ExternalPythia6(ExternalTool):
         logger.debug("Now running " + str(cmd))
         Out = commands.getoutput(cmd)
         if do_unlink:
-            self.unlink(unlinkdir=False)
+            self.unlink( unlinkdir=True )
         else:
             f = open(self.tempdir + "/log", "w")
             f.write (cmd + "\n\n\n")
