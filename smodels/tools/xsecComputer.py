@@ -230,7 +230,7 @@ def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True, pythiacard=None
 
     if unlink==False:
         logger.info ( "keeping temporary directory at %s" % tool.tempDirectory() )
-    lhedata = tool.run(slhafile, do_unlink=unlink )
+    lhedata = tool.run(slhafile, do_check=False, do_unlink=unlink )
     if not "<LesHouchesEvents" in lhedata:
         logger.error("LHE events not found in pythia output")
         raise SModelSError()
