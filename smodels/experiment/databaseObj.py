@@ -40,7 +40,7 @@ class Database(object):
         self.force_load = force_load
         self.pclfilename = "database.pcl"
         self._validateBase(base)
-        self._verbosity = "debug" ## verbosity
+        self._verbosity = verbosity 
         self._databaseVersion = None
         self.expResultList = None
         self.txt_mtime = None, None
