@@ -54,16 +54,8 @@ class ExternalPythia6(ExternalTool):
         self.keepTempDir = False
         self.nevents = None
         self.secondsPerEvent = 10
-        self.reset()
 
-
-    def reset(self):
-        """
-        Copy the original config file again.
-        
-        """
-        shutil.copy(self.cfgfile, self.tempDirectory() + "/temp.cfg")
-
+        self.unlink()
 
     def checkFileExists(self, inputFile):
         """
@@ -85,6 +77,7 @@ class ExternalPythia6(ExternalTool):
         """
         if self.tempdir == None:
             self.tempdir = tempfile.mkdtemp()
+            shutil.copy(self.cfgfile, self.tempdir + "/temp.cfg")
         return self.tempdir
 
 
@@ -108,6 +101,8 @@ class ExternalPythia6(ExternalTool):
         :param unlinkdir: remove temp directory completely
         
         """
+        if self.tempdir == None:
+            return
         if self.keepTempDir:
             logger.warn("Keeping everything in " + self.tempdir)
             return
@@ -136,10 +131,10 @@ class ExternalPythia6(ExternalTool):
                              must be strings present in the config file
         
         """
-        f = open(self.tempdir + "/temp.cfg")
+        f = open(self.tempDirectory() + "/temp.cfg")
         lines = f.readlines()
         f.close()
-        f = open(self.tempdir + "/temp.cfg", "w")
+        f = open(self.tempDirectory() + "/temp.cfg", "w")
         for line in lines:
             for (key, value) in replacements.items():
                 if key == "NEVENTS":
