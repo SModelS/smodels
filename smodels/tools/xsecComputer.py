@@ -50,7 +50,6 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
     :returns: XSectionList object
 
     """
-
     if not os.path.isfile(slhafile):
         logger.error("SLHA file %s not found.", slhafile)
         raise SModelSError()
@@ -86,7 +85,6 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
         else:
             lheFile = open(lhefile, 'r')
         loXsecs = crossSection.getXsecFromLHEFile(lheFile)
-
     xsecs = loXsecs
     wlabel = str(int(sqrts / TeV)) + ' TeV'
     if maxOrder == 0:
@@ -302,7 +300,7 @@ def main(args):
         for s in sqrtses:
             ss = s*TeV 
             xsecs = computeXSec(ss, order, args.nevents, inputFile, \
-                        unlink=(not args.keep) )
+                        unlink=(not args.keep), loFromSlha=args.LOfromSLHA )
             for xsec in xsecs: 
                 print "%s %20s:  %.3e pb" % ( xsec.info.label,xsec.pid,xsec.value/pb )
         print
