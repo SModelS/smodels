@@ -222,7 +222,7 @@ def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True, pythiacard=None
         pythiacard_default = tool.cfgfile
         tool.cfgfile = pythiacard
     # Check if template config file exists
-    tool.reset()
+    tool.unlink()
     tool.replaceInCfgFile({"NEVENTS": nevts, "SQRTS":1000 * sqrts})
     tool.setParameter("MSTP(163)", "6")
 

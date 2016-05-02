@@ -11,7 +11,15 @@
 
 import sys
 sys.path.insert(0,"../")
-import unittest
+v=sys.version_info
+if v[0] > 2 or ( v[0]==2 and v[1] > 6 ):
+    import unittest
+if v[0]==2 and v[1] < 7 and v[1] > 3:
+    try:
+        import unittest2 as unittest
+    except ImportError,e:
+        print "Error: python v",sys.version,"needs unittest2. Please install."
+        sys.exit()
 
 def run():
     unittest.TextTestRunner().run( unittest.TestLoader().discover("./") )
