@@ -25,14 +25,15 @@ from smodels.experiment.exceptions import DatabaseNotFoundException
 
 log = logging.getLogger(__name__)
 
-def main(inputFile, parameterFile, outputFile, verbosity = 'info', db=None ):
+def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
     """
     Provides a command line interface to basic SModelS functionalities.
     
     :param inputFile: input file name (either a SLHA or LHE file)
+                      or directory name (path to directory containing input files)
     :param parameterFile: File containing the input parameters (default =
                           /etc/parameters_default.ini)
-    :param outputFile: Output file to write a summary of results
+    :param outputDir: Output directory to write a summary of results to
     :param db: supply a smodels.experiment.databaseObj.Database object, so
             the database doesnt have to be loaded anymore. Will 
             render a few parameters in the parameter file irrelevant.
@@ -40,7 +41,7 @@ def main(inputFile, parameterFile, outputFile, verbosity = 'info', db=None ):
     """
 
     """
-    Read and check input file
+    Read and check parameter file
     =========================
     """
     parser = SafeConfigParser()
@@ -58,23 +59,12 @@ def main(inputFile, parameterFile, outputFile, verbosity = 'info', db=None ):
         mass compression) """
     minmassgap = parser.getfloat("parameters", "minmassgap") * GeV
 
-    if os.path.exists(outputFile):
-        log.warning("Removing old output file " + outputFile)
-    outfile = open(outputFile, 'w')
-    outfile.close()
-
-
     inputType = parser.get("options", "inputType").lower()
     if inputType != 'slha' and inputType != 'lhe':
         log.error("Unknown input type (must be SLHA or LHE): %s" % inputType)
         return
 
-    """ Check input file for errors """
-    inputStatus = ioObjects.FileStatus()
-    if parser.getboolean("options", "checkInput"):
-        inputStatus.checkFile(inputType, inputFile, sigmacut)
-
-    """ Check database location """
+    """ Check database location and load database"""
     try:
         databasePath = parser.get("path", "databasePath")
         database = db
@@ -86,156 +76,179 @@ def main(inputFile, parameterFile, outputFile, verbosity = 'info', db=None ):
         databaseVersion = None
         return
 
-    """ Initialize output status and exit if there were errors in the input """
-    outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile, 
-            dict(parser.items("parameters")), databaseVersion, outputFile)
-    if outputStatus.status < 0: return
+    """ Get list of input files to be tested """
+    if os.path.isdir(inFile):
+        fileList = os.listdir(inFile)
+    else: fileList = [inFile]
+
+    """ Create output directory if missing """
+    if not os.path.isdir(outputDir): os.mkdir(outputDir)
+
+    """ loop over input files and run SModelS """
+    for inputFile in fileList:
+        if len(fileList) > 1: inputFile = os.path.join(inFile, inputFile)
+        print("Now testing %s" %inputFile)
+        outputFile = os.path.join(outputDir, os.path.basename(inputFile))+'.smodels'
+
+        if os.path.exists(outputFile):
+            log.warning("Removing old output file " + outputFile)
+        outfile = open(outputFile, 'w')
+        outfile.close()
+
+        """ Check input file for errors """
+        inputStatus = ioObjects.FileStatus()
+        if parser.getboolean("options", "checkInput"):
+            inputStatus.checkFile(inputType, inputFile, sigmacut)
+
+        """ Initialize output status and exit if there were errors in the input """
+        outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile, 
+                dict(parser.items("parameters")), databaseVersion, outputFile)
+        if outputStatus.status < 0: continue
+
+        """ Setup output printers """
+        stdoutPrinter = prt.TxTPrinter(output = 'stdout')
+        summaryPrinter = prt.SummaryPrinter(output = 'file', filename = outputFile)
 
 
-    """ Setup output printers """
-    stdoutPrinter = prt.TxTPrinter(output = 'stdout')
-    summaryPrinter = prt.SummaryPrinter(output = 'file', filename = outputFile)
+
+        """
+        Decompose input file
+        ====================
+        """
+        try:
+            """ Decompose input SLHA file, store the output elements in smstoplist """
+            if inputType == 'slha':
+                smstoplist = slhaDecomposer.decompose(inputFile, sigmacut, 
+                        doCompress=parser.getboolean("options", "doCompress"),
+                        doInvisible=parser.getboolean("options", "doInvisible"), 
+                        minmassgap=minmassgap)
+            else:
+                smstoplist = lheDecomposer.decompose(inputFile, 
+                        doCompress=parser.getboolean("options", "doCompress"),
+                        doInvisible=parser.getboolean("options", "doInvisible"), 
+                        minmassgap=minmassgap)
+        except:
+            """ Update status to fail, print error message and exit """
+            outputStatus.updateStatus(-1)
+            continue
+
+        """ Print Decomposition output.
+            If no topologies with sigma > sigmacut are found, update status, write
+            output file, stop running """
+        if not smstoplist:
+            outputStatus.updateStatus(-3)
+            continue
+
+        outLevel = 0
+        if parser.getboolean("stdout", "printDecomp"):
+            outLevel = 1
+            outLevel += parser.getboolean("stdout", "addElmentInfo")
+        stdoutPrinter.addObj(smstoplist,outLevel)
 
 
+        """
+        Load analysis database
+        ======================
+        """
 
-    """
-    Decompose input file
-    ====================
-    """
-    try:
-        """ Decompose input SLHA file, store the output elements in smstoplist """
-        if inputType == 'slha':
-            smstoplist = slhaDecomposer.decompose(inputFile, sigmacut, 
-                    doCompress=parser.getboolean("options", "doCompress"),
-                    doInvisible=parser.getboolean("options", "doInvisible"), 
-                    minmassgap=minmassgap)
+        """ In case that a list of analyses or txnames are given, retrieve list """
+        analyses = parser.get("database", "analyses").split(",")
+        txnames = parser.get("database", "txnames").split(",")
+        if parser.get("database", "dataselector") == "efficiencyMap":
+            dataTypes = ['efficiencyMap']
+            datasetIDs = ['all']
+        elif parser.get("database", "dataselector") == "upperLimit":
+            dataTypes = ['upperLimit']
+            datasetIDs = ['all']
         else:
-            smstoplist = lheDecomposer.decompose(inputFile, 
-                    doCompress=parser.getboolean("options", "doCompress"),
-                    doInvisible=parser.getboolean("options", "doInvisible"), 
-                    minmassgap=minmassgap)
-    except:
-        """ Update status to fail, print error message and exit """
-        outputStatus.updateStatus(-1)
-        return
+            dataTypes = ['all']
+            datasetIDs = parser.get("database", "dataselector").split(",")
+        '''if parser.get("database", "datasets") == "None": datasetIDs = [None]
+        else: datasetIDs = parser.get("database", "datasets").split(",")'''
 
-    """ Print Decomposition output.
-        If no topologies with sigma > sigmacut are found, update status, write
-        output file, stop running """
-    if not smstoplist:
-        outputStatus.updateStatus(-3)
-        return
+        """ Load analyses """        
 
-    outLevel = 0
-    if parser.getboolean("stdout", "printDecomp"):
-        outLevel = 1
-        outLevel += parser.getboolean("stdout", "addElmentInfo")
-    stdoutPrinter.addObj(smstoplist,outLevel)
+        listOfExpRes = database.getExpResults(analysisIDs=analyses, txnames=txnames, 
+                            datasetIDs=datasetIDs, dataTypes=dataTypes)
 
-
-    """
-    Load analysis database
-    ======================
-    """
-
-    """ In case that a list of analyses or txnames are given, retrieve list """
-    analyses = parser.get("database", "analyses").split(",")
-    txnames = parser.get("database", "txnames").split(",")
-    if parser.get("database", "dataselector") == "efficiencyMap":
-        dataTypes = ['efficiencyMap']
-        datasetIDs = ['all']
-    elif parser.get("database", "dataselector") == "upperLimit":
-        dataTypes = ['upperLimit']
-        datasetIDs = ['all']
-    else:
-        dataTypes = ['all']
-        datasetIDs = parser.get("database", "dataselector").split(",")
-    '''if parser.get("database", "datasets") == "None": datasetIDs = [None]
-    else: datasetIDs = parser.get("database", "datasets").split(",")'''
-
-    """ Load analyses """        
-
-    listOfExpRes = database.getExpResults(analysisIDs=analyses, txnames=txnames, 
-                        datasetIDs=datasetIDs, dataTypes=dataTypes)
-
-    """ Print list of analyses loaded """
-    outLevel = 0
-    if parser.getboolean("stdout", "printAnalyses"):
-        outLevel = 1
-        outLevel += parser.getboolean("stdout", "addAnaInfo")          
-    for expResult in listOfExpRes: stdoutPrinter.addObj(expResult,outLevel)
+        """ Print list of analyses loaded """
+        outLevel = 0
+        if parser.getboolean("stdout", "printAnalyses"):
+            outLevel = 1
+            outLevel += parser.getboolean("stdout", "addAnaInfo")          
+        for expResult in listOfExpRes: stdoutPrinter.addObj(expResult,outLevel)
     
-    """
-    Compute theory predictions
-    ====================================================
-    """
+        """
+        Compute theory predictions
+        ====================================================
+        """
    
-    """ Get theory prediction for each analysis and print basic output """
-    allPredictions = []
-    for expResult in listOfExpRes:     
-        theorypredictions = theoryPredictionsFor(expResult, smstoplist)
-        if not theorypredictions: continue
+        """ Get theory prediction for each analysis and print basic output """
+        allPredictions = []
+        for expResult in listOfExpRes:     
+            theorypredictions = theoryPredictionsFor(expResult, smstoplist)
+            if not theorypredictions: continue
+            if parser.getboolean("stdout", "printResults"):
+                stdoutPrinter.addObj(theorypredictions)
+
+            allPredictions += theorypredictions._theoryPredictions
+
+        """ If there is no best result, this means that there are no matching experimental results for the point """
+        if not allPredictions:
+            """ no experimental constraints found """
+            outputStatus.updateStatus(0)
+        else:
+            outputStatus.updateStatus(1)
+
+        stdoutPrinter.addObj(outputStatus)
+        summaryPrinter.addObj(outputStatus)
+    
+    
+        """ Define result list that collects all theoryPrediction objects."""
+        maxcond = parser.getfloat("parameters", "maxcond")
+        results = ioObjects.ResultList(allPredictions,maxcond)
+        if not parser.getboolean("file", "expandedSummary"):
+            results.useBestResult()
+
+        outLevel = 0
+        if not results.isEmpty():
+            outLevel = 1
+            outLevel += parser.getboolean("file", "addConstraintInfo")
+        summaryPrinter.addObj(results,outLevel)
         if parser.getboolean("stdout", "printResults"):
-            stdoutPrinter.addObj(theorypredictions)
-
-        allPredictions += theorypredictions._theoryPredictions
-
-    """ If there is no best result, this means that there are no matching experimental results for the point """
-    if not allPredictions:
-        """ no experimental constraints found """
-        outputStatus.updateStatus(0)
-    else:
-        outputStatus.updateStatus(1)
-
-    stdoutPrinter.addObj(outputStatus)
-    summaryPrinter.addObj(outputStatus)
+            stdoutPrinter.addObj(results,outLevel)
     
-    
-    """ Define result list that collects all theoryPrediction objects."""
-    maxcond = parser.getfloat("parameters", "maxcond")
-    results = ioObjects.ResultList(allPredictions,maxcond)
-    if not parser.getboolean("file", "expandedSummary"):
-        results.useBestResult()
-
-    outLevel = 0
-    if not results.isEmpty():
-        outLevel = 1
-        outLevel += parser.getboolean("file", "addConstraintInfo")
-    summaryPrinter.addObj(results,outLevel)
-    if parser.getboolean("stdout", "printResults"):
-        stdoutPrinter.addObj(results,outLevel)
-    
-    sqrts = max([xsec.info.sqrts for xsec in smstoplist.getTotalWeight()])
-    if parser.getboolean("options", "findMissingTopos"):
-        """ Look for missing topologies, add them to the output file """
-        missingtopos = missingTopologies.MissingTopoList(sqrts)
-        missingtopos.findMissingTopos(smstoplist, listOfExpRes, minmassgap, parser.getboolean("options", "doCompress"),
-                      doInvisible=parser.getboolean("options", "doInvisible"))        
-        summaryPrinter.addObj(missingtopos)
-        stdoutPrinter.addObj(missingtopos,2)
+        sqrts = max([xsec.info.sqrts for xsec in smstoplist.getTotalWeight()])
+        if parser.getboolean("options", "findMissingTopos"):
+            """ Look for missing topologies, add them to the output file """
+            missingtopos = missingTopologies.MissingTopoList(sqrts)
+            missingtopos.findMissingTopos(smstoplist, listOfExpRes, minmassgap, parser.getboolean("options", "doCompress"),
+                        doInvisible=parser.getboolean("options", "doInvisible"))        
+            summaryPrinter.addObj(missingtopos)
+            stdoutPrinter.addObj(missingtopos,2)
          
         
-    stdoutPrinter.close()
-    summaryPrinter.close()
+        stdoutPrinter.close()
+        summaryPrinter.close()
 
 
 if __name__ == "__main__":
     import argparse
     """ Set default input and output files """
     parameterFile = "%s/etc/parameters_default.ini" % installDirectory()
-    outputFile = "summary.txt"
+    outputDir = "results"
 
     """ Get the name of input SLHA file and parameter file """
     ap = argparse.ArgumentParser()
     ap.add_argument('-f', '--filename', 
-            help='name of SLHA or LHE input file, necessary input', required=True)
+            help='name of SLHA or LHE input file, necessary input, if directory is given, loop all files in the directory', required=True)
     ap.add_argument('-p', '--parameterFile', 
             help='name of parameter file, optional argument, if not set, use '
                            'all parameters from etc/parameters_default.ini', 
                            default=parameterFile)
-    ap.add_argument('-o', '--outputFile', 
-            help='name of output file, optional argument, default is: ' +
-                           outputFile, default=outputFile)
+    ap.add_argument('-o', '--outputDir', 
+            help='name of output directory, optional argument, default is: ' +
+                           outputDir, default=outputDir)
     ap.add_argument('--development', help='enable development output', 
             action='store_true')
     ap.add_argument('--run-crashreport', 
@@ -252,12 +265,12 @@ if __name__ == "__main__":
         args.filename, args.parameterFile = crashReport.readCrashReportFile(
                 args.filename)
         with timeOut.Timeout(args.timeout):
-            main(args.filename, args.parameterFile, args.outputFile)
+            main(args.filename, args.parameterFile, args.outputDir)
         
     else:
         try:
             with timeOut.Timeout(args.timeout):
-                main(args.filename, args.parameterFile, args.outputFile)
+                main(args.filename, args.parameterFile, args.outputDir)
         except Exception:
             crashReportFacility = crashReport.CrashReport()
              
