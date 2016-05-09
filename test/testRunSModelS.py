@@ -22,15 +22,15 @@ class RunSModelSTest(unittest.TestCase):
         if suppressStdout:
             a=sys.stdout
             sys.stdout = open ( "stdout.log", "w" )
-        out = "%s/test/unitTestOutput.txt" % installDirectory()
-        if os.path.exists ( out ): 
-            os.unlink ( out )
+        out = "%s/test/unitTestOutput" % installDirectory()
+        #if os.path.exists ( out ): 
+        #    os.unlink ( out )
         main(filename, 
              parameterFile="%s/test/testParameters.ini" %installDirectory(), 
-             outputFile= out,
+             outputDir= out,
              verbosity = 'error' )
         outputfile = summaryReader.Summary(
-                "%s/test/unitTestOutput.txt" % installDirectory())
+                "%s/test/unitTestOutput/%s.smodels" % (installDirectory(),os.path.basename(filename)))
         if suppressStdout:
             sys.stdout = a
         return outputfile
