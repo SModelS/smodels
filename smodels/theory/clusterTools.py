@@ -122,16 +122,16 @@ class ElementCluster(object):
                 if not txname.txnameData._data:
                     txname.txnameData.loadData()  #Make sure the _data is loaded
                     
-            dataType = list(set([type(txname.txnameData._data[0][1]) for txname in self.txnames]))
-            if len(dataType) != 1:
+            dataTag = list(set([txname.txnameData.dataTag for txname in self.txnames]))            
+            if len(dataTag) != 1:
                 logger.error("A single cluster contain mixed data types!")
                 raise SModelSError()
-            elif dataType[0] == type(fb):
+            elif 'upperLimit' in dataTag[0]:
                 return 'upperLimit'
-            elif dataType[0] == type(1.):
+            elif 'efficiencyMap' in dataTag[0]:
                 return 'efficiencyMap'
             else:
-                logger.error("Unknown data type %s" % (str(dataType[0])))
+                logger.error("Unknown data type %s" % (dataTag[0]))
                 raise SModelSError()
 
 
@@ -297,11 +297,11 @@ def groupAll(elements):
     """
     cluster = ElementCluster()
     cluster.elements = elements
-    cluster.txnames = None
+    cluster.txnames = list(set([el.txname for el in elements]))
     return cluster
 
 
-def clusterElements(elements, txname, maxDist):
+def clusterElements(elements, maxDist):
     """
     Cluster the original elements according to their mass distance.
     
@@ -312,10 +312,15 @@ def clusterElements(elements, txname, maxDist):
     :returns: list of clusters (ElementCluster objects)    
     """
     if len(elements) == 0:  return []
-    txdata = txname.txnameData
+    txnames = list(set([el.txname for el in elements]))
+    if len(txnames) != 1:
+        logger.error("Clustering elements with different Txnames!")
+        raise SModelSError()
+    txdata = txnames[0].txnameData
     # ElementCluster elements by their mass:
     clusters = _doCluster(elements, txdata, maxDist)
-    for cluster in clusters: cluster.txnames = [txname]
+    for cluster in clusters:
+        cluster.txnames = txnames
     return clusters
 
 
