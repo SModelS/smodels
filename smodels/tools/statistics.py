@@ -89,7 +89,7 @@ def _getPValue(Nsig,Nobs,Nbg,NbgErr):
     n = (1./2.)*(1. + special.erf(Ntot/(sqrt(2.)*NErr)))
             
     #P-value integrand
-    def pint(x):            
+    def pint(x): 
         pInt = stats.poisson.cdf(Nobs,x)   #poisson.cdf with mean x (=total number of predicted events distributed according to gaussian)
         pInt *= stats.norm.pdf(x,loc=Ntot,scale=NErr)  #systematical error weight
         return pInt
