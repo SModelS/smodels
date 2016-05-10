@@ -10,6 +10,7 @@
 
 import unum
 import logging
+from unum import IncompatibleUnitsError
 
 logger = logging.getLogger(__name__)
 
