@@ -90,13 +90,13 @@ class XSection(object):
 
     def __mul__(self, other):
         """
-        Multiplies the value of the cross-section by the factor other (should be a float).        
+        Multiplies the value of the cross-section by the factor other (should be a float or int).        
         """
 
         
         newXsec = self.copy()
-        if type(other) == type(1.):
-            newXsec.value = newXsec.value * other
+        if isinstance(other,float) or isinstance(other,int):
+            newXsec.value = newXsec.value * float(other)
         else:
             print (other,type(other))
             logger.error("Xsections can only be multiplied by floats")
