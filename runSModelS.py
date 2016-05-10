@@ -24,6 +24,7 @@ import smodels.tools.printer as prt
 from smodels.experiment.exceptions import DatabaseNotFoundException
 
 log = logging.getLogger(__name__)
+currentFile = ""
 
 def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
     """
@@ -44,6 +45,7 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
     Read and check parameter file
     =========================
     """
+    global currentFile
     parser = SafeConfigParser()
     ret=parser.read(parameterFile)
     if ret == []:
@@ -88,6 +90,7 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
     for inputFile in fileList:
         if len(fileList) > 1: inputFile = os.path.join(inFile, inputFile)
         print("Now testing %s" %inputFile)
+        currentFile = inputFile
         outputFile = os.path.join(outputDir, os.path.basename(inputFile))+'.smodels'
 
         if os.path.exists(outputFile):
@@ -278,6 +281,6 @@ if __name__ == "__main__":
                 print(crashReport.createStackTrace())
             else:
                 print(crashReport.createStackTrace())
-                crashReportFacility.createCrashReportFile(args.filename, 
+                crashReportFacility.createCrashReportFile(currentFile, 
                                 args.parameterFile)
                 print(crashReportFacility.createUnknownErrorMessage())
