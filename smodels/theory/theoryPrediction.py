@@ -52,7 +52,8 @@ class TheoryPrediction(object):
             if value == 'N/A': return value
             if value == None: continue
             maxcond = max(maxcond,value)
-        return maxcond        
+        return maxcond
+    
 
 class TheoryPredictionList(object):
     """
@@ -243,6 +244,7 @@ def _getElementsFrom(smsTopList, dataset):
                 if not eff: continue
                 newEl.eff = eff
                 newEl.weight *= eff
+                newEl.txname = txname
                 elements.append(newEl) #Save element with correct branch ordering
 
     return elements
@@ -264,17 +266,17 @@ def _combineElements(elements, dataset, maxDist):
     clusters = []   
     
     if dataset.dataInfo.dataType == 'efficiencyMap':
-        cluster = clusterTools.groupAll(elements)
-        cluster.txnames = dataset.txnameList  
+        cluster = clusterTools.groupAll(elements)  
         clusters.append(cluster)
-    elif dataset.dataInfo.dataType == 'upperLimit':        
-        for txname in dataset.txnameList:
+    elif dataset.dataInfo.dataType == 'upperLimit':
+        txnames = list(set([el.txname for el in elements]))        
+        for txname in txnames:
             txnameEls = []
             for element in elements:
-                #Check if element really belongs to txname:
-                if not txname.hasElementAs(element): continue                
+                if not element.txname == txname:
+                    continue
                 else: txnameEls.append(element)
-            txnameClusters = clusterTools.clusterElements(txnameEls, txname, maxDist)         
+            txnameClusters = clusterTools.clusterElements(txnameEls, maxDist)         
             clusters += txnameClusters
     else:
         logger.warning("Unkown data type: %s. Data will be ignored." 
