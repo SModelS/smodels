@@ -69,6 +69,7 @@ class TxName(object):
                 if ';' in value: value = value.split(';')                
                 if tag == 'upperLimits' or tag == 'efficiencyMap':
                     self.txnameData = TxNameData(value)
+                    self.txnameData.dataTag = tag
                 else: self.addInfo(tag,value)
             else:
                 logger.info("Ignoring unknown field %s found in file %s" \

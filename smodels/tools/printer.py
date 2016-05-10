@@ -362,36 +362,40 @@ class TextBasedPrinter(object):
 
         output = ""
 
-        output += "#Analysis  Tx_Name  Sqrts  Cond. Violation  Theory_Value(fb)  Exp_limit(fb)  r\n\n"
+        output += "#Analysis  Sqrts  Cond. Violation  Theory_Value(fb)  Exp_limit(fb)  r\n\n"
         # Suggestion to obtain expected limits:
         # output += "#Analysis  Tx_Name  Sqrts  Cond. Violation  PredTheory(fb)  ULobserved (fb) ULexpected (fb)  r\n\n"
         for theoPred in obj.theoryPredictions:
             expResult = theoPred.expResult
             datasetID = theoPred.dataset.dataInfo.dataId
-            dataType = expResult.datasets[0].dataInfo.dataType       
+            dataType = expResult.datasets[0].dataInfo.dataType
+            txnames = theoPred.txnames       
             if dataType == 'upperLimit':
                 ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass)
                 # Suggestion to obtain expected limits:
                 # expected = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass, expected=True)
-                txname = theoPred.txnames[0]
+                signalRegion  = '(UL)'                
             elif dataType == 'efficiencyMap':
                 ul = expResult.getUpperLimitFor(dataID=datasetID)
                 # Suggestion to obtain expected limits:
                 # expected = expResult.getUpperLimitFor(dataID=datasetID, expected=True, compute=True)
-                txname = None
+                signalRegion  = theoPred.dataset.dataInfo.dataId                
             else:
                 logger.error("Unknown dataType %s" %(str(dataType)))
                 raise SModelSError()
             
-            output += "%19s %16s " % (expResult.globalInfo.id, str(txname) )  # ana, topo
+            output += "%19s  " % (expResult.globalInfo.id)  # ana
             output += "%4s " % (expResult.globalInfo.sqrts/ TeV)  # sqrts
             output += "%5s " % theoPred.getmaxCondition()  # condition violation            
             output += "%10.3E %10.3E " % (theoPred.value[0].value / fb, ul / fb)  # theory cross section , expt upper limit
             # Suggestion to obtain expected limits:
             # output += "%10.3E " % (expected / fb)  # expected upper limit
             output += "%10.3E\n" % obj.getR(theoPred)
+            output += " Signal Region:  "+signalRegion+"\n"
             if objOutputLevel == 2:
-                output += "#" + str(txname) + "\n"            
+                txnameStr = str([str(tx) for tx in txnames])
+                txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")              
+                output += " Txnames:  " + txnameStr + "\n"            
             if not theoPred == obj.theoryPredictions[-1]: output += "--------------------------------------------------------------------------------\n"
 
         output += "\n \n"
