@@ -47,6 +47,7 @@ class RunSModelSTest(unittest.TestCase):
             print "%s != %s" % ( os.path.basename(outputfile.filename), 
                                  os.path.basename(sample.filename) )
         self.assertEquals(sample, outputfile)
+        
 
     def testBadFile(self):
 
