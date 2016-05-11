@@ -47,9 +47,9 @@ class MissingTopoList(object):
         for topo in self.topos:
             if name == topo.topo:
                 topo.weights += el.weight
-                topo.contributingElements.append(el.elID)
+                topo.contributingElements.append(el)
                 return
-        self.topos.append(MissingTopo(name, el.weight, [el.elID]))
+        self.topos.append(MissingTopo(name, el.weight, [el]))
         return
 
     def generalName(self, instr, sumL=None, sumJet=None):
