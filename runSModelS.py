@@ -196,16 +196,6 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
 
             allPredictions += theorypredictions._theoryPredictions
 
-        """ If there is no best result, this means that there are no matching experimental results for the point """
-        if not allPredictions:
-            """ no experimental constraints found """
-            outputStatus.updateStatus(0)
-        else:
-            outputStatus.updateStatus(1)
-
-        stdoutPrinter.addObj(outputStatus)
-        summaryPrinter.addObj(outputStatus)
-    
     
         """ Define result list that collects all theoryPrediction objects."""
         maxcond = parser.getfloat("parameters", "maxcond")
@@ -215,8 +205,13 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
 
         outLevel = 0
         if not results.isEmpty():
+            outputStatus.updateStatus(1)
             outLevel = 1
             outLevel += parser.getboolean("file", "addConstraintInfo")
+        else:
+            outputStatus.updateStatus(0) # no results after enforcing maxcond
+        stdoutPrinter.addObj(outputStatus)
+        summaryPrinter.addObj(outputStatus)
         summaryPrinter.addObj(results,outLevel)
         if parser.getboolean("stdout", "printResults"):
             stdoutPrinter.addObj(results,outLevel)
