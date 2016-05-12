@@ -52,10 +52,16 @@ class Database(object):
         self._setLogLevel ( self._verbosity )
         if self.force_load=="txt":
             self.loadTextDatabase()
+            return
         if self.force_load=="pcl":
             self.loadBinaryFile()
-        if self.force_load==None:
+            return
+        if self.force_load in [ None, "none", "None" ]:
             self.loadDatabase()
+            return
+        logger.error ( "when initialising database: force_load=%s is not " \
+                       "recognized. Valid values are: pcl, txt, None." % force_load )
+        sys.exit()
 
     def __eq__ ( self, other ):
         """ compare two database 
@@ -224,7 +230,8 @@ class Database(object):
         """ create a pcl file from the text database,
             potentially overwriting an old pcl file. """
         t0=time.time()
-        logger.info ( "Creating serializer file (this may take a few minutes)" )
+        logger.info ( "Creating binary database " )
+        logger.info ( "(this may take a few minutes, but it's done only once!)" )
         logger.debug ( " * compute last modified timestamp." )
         self.lastModifiedAndFileCount()
         logger.debug (  " * compute timestamp: %s filecount: %d" % \
