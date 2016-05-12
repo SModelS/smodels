@@ -73,7 +73,7 @@ class TxName(object):
                 else: self.addInfo(tag,value)
             else:
                 logger.info("Ignoring unknown field %s found in file %s" \
-                             % (tag, self.infopath))
+                             % (tag, self.path))
                 continue
         
         #Builds up a list of elements appearing in constraints:
