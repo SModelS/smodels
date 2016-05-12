@@ -39,5 +39,21 @@ class XSecTest(unittest.TestCase):
         w8lo= w[(1000021, 1000021)]['8 TeV (NLO+NLL)'].asNumber( fb )
         self.assertAlmostEqual(w8lo, 583.1651907900048 ) ## 583.165 fb
 
+    def testLOGlu13(self):
+        """ test the computation of LO cross section """
+        self.logger.info ( "test LO xsecs @ 13 TeV" )
+        slhafile="../inputFiles/slha/simplyGluino.slha"
+        w = xsecComputer.computeXSec( 13*TeV,LO,1000, slhafile ).getDictionary()
+        w8lo= w[(1000021, 1000021)]['13 TeV (LO)'].asNumber( fb )
+        self.assertAlmostEqual(w8lo, 268.4799000000022  ) ## 268.48 fb
+
+    def testNLLGlu13(self):
+        """ test the computation of NLL cross section """
+        self.logger.info ( "test NLL xsecs @ 13 TeV" )
+        slhafile="../inputFiles/slha/simplyGluino.slha"
+        w = xsecComputer.computeXSec( 13*TeV,NLL,1000, slhafile ).getDictionary()
+        w8lo= w[(1000021, 1000021)]['13 TeV (NLO+NLL)'].asNumber( fb )
+        self.assertAlmostEqual(w8lo, 583.1651907900048 ) ## 583.165 fb
+
 if __name__ == "__main__":
     unittest.main()
