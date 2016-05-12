@@ -247,9 +247,11 @@ class IndexCluster(object):
         masses = [self.massMap[iel] for iel in self]
         weights = [self.weightMap[iel] for iel in self]
         clusterMass = massAvg(masses,weights=weights)
-        avgPos = self.txdata.getValueFor(clusterMass)/fb
-        return avgPos.asNumber()
-
+        avgPos = self.txdata.getValueFor(clusterMass)
+        if avgPos is None:
+            return False
+        else:
+            return (avgPos/fb).asNumber()
 
     def _getDistanceTo(self, obj):
         """
@@ -358,7 +360,9 @@ def _doCluster(elements, txdata, maxDist):
             if distance(posMap[iel], posMap[jel]) <= maxDist:
                 indices.append(jel)        
         indexCluster = IndexCluster(massMap, posMap, weightMap, set(indices),txdata)
-        clusterList.append(indexCluster)
+        #Ignore cluster which average mass falls oustide the grid:
+        if indexCluster.avgPosition:
+            clusterList.append(indexCluster)
 
     #Split the maximal clusters until all elements inside each cluster are
     #less than maxDist apart from each other and the cluster average position
@@ -383,7 +387,9 @@ def _doCluster(elements, txdata, maxDist):
                     newcluster = indexCluster.copy()
                     newcluster.remove(iel)
                     if not newcluster in newClusters:
-                        newClusters.append(newcluster)
+                        #Ignore cluster which average mass falls oustide the grid:
+                        if newcluster.avgPosition:
+                            newClusters.append(newcluster)
 
         clusterList = newClusters
         # Check for oversized list of indexCluster (too time consuming)
