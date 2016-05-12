@@ -171,8 +171,20 @@ class ExternalNllFast8(ExternalNllFast):
                                  testCondition="500.     600.    0.406E+00  "
                                  "0.873E+00  0.953E+00")
 
+class ExternalNllFast13(ExternalNllFast):
+    """
+    An instance of this class represents the installation of nllfast 8.
+    
+    """
+    def __init__(self):
+        ExternalNllFast.__init__(self, 13, "3.1",
+                                 testParams="gg cteq 500 600",
+                                 testCondition="600.    0.394E+01  0.690E+01  "
+                                 "0.731E+01    0.394E+00" )
+
 nllFastTools = { 7 : ExternalNllFast7(),
-                 8 : ExternalNllFast8() }
+                 8 : ExternalNllFast8(),
+                13 : ExternalNllFast13() }
 
 
 if __name__ == "__main__":
