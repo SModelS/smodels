@@ -4,7 +4,7 @@ id: CMS-SUS-13-012
 url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13012
 arxiv: http://arxiv.org/abs/1402.4770
 publication: JHEP06(2014)055
-contact: cms-pag-conveners-sus@NOSPAMcernSPAMNOT.ch
+contact: cms-pag-conveners-sus@cern.ch
 private: False
 implementedBy: Federico A
 lastUpdate: 2015/5/14
