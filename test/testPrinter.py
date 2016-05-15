@@ -20,11 +20,13 @@ from smodels.experiment.databaseObj import Database
 from smodels.tools import printer, ioObjects
 from smodels.tools import missingTopologies
 from smodels.tools import summaryReader
+from xml.etree import ElementTree
 
 stdoutPrinter = printer.TxTPrinter(output = 'file', filename = './unitTestOutput/sms_output.txt')
 summaryPrinter = printer.SummaryPrinter(output = 'file', filename = './unitTestOutput/summary_print.txt')
 pythonPrinter = printer.PyPrinter(output = 'file', filename = './unitTestOutput/sms_output.py')
-printerList = printer.MPrinter(stdoutPrinter,summaryPrinter,pythonPrinter)
+xmlPrinter = printer.XmlPrinter(output = 'file', filename = './unitTestOutput/sms_output.xml')
+printerList = printer.MPrinter(stdoutPrinter,summaryPrinter,pythonPrinter,xmlPrinter)
 #Set the address of the database folder
 database = Database("./database/")
 slhafile = "%s/inputFiles/slha/gluino_squarks.slha" % \
@@ -98,6 +100,22 @@ class RunPrinterTest(unittest.TestCase):
         defaultFile = defaultFile[defaultFile.rfind('/'):]
         defaultOut['input file'] = defaultFile
         self.assertEquals(smodelsOutput,defaultOut)
+        
+        #Test xml output
+        xmlDefault = ElementTree.parse("%s/test/default_output.xml" %installDirectory()).getroot()
+        xmlNew = ElementTree.parse("%s/test/unitTestOutput/sms_output.xml" %installDirectory()).getroot()
+        def compareXML(xmldefault,xmlnew):
+            self.assertEqual(len(xmldefault),len(xmlnew))
+            for i,el in enumerate(xmldefault):
+                newel = xmlnew[i]
+                self.assertEqual(len(el),len(newel))                
+                if len(el) == 0:
+                    if el.tag == 'input_file': continue
+                    self.assertEqual(el.text,newel.text)
+                    self.assertEqual(el.tag,newel.tag)
+                else:                    
+                    compareXML(el,newel)
+        compareXML(xmlDefault,xmlNew)
         
 
 if __name__ == "__main__":
