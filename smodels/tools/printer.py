@@ -11,7 +11,7 @@
 """
 
 from __future__ import print_function
-import logging,sys
+import logging,sys,os
 from smodels.theory.topology import TopologyList
 from smodels.theory.element import Element
 from smodels.theory.theoryPrediction import TheoryPredictionList
@@ -21,6 +21,7 @@ from smodels.tools.ioObjects import OutputStatus, ResultList
 from smodels.tools.missingTopologies import MissingTopoList
 from smodels.tools.physicsUnits import GeV, fb, TeV
 from pyslha import Doc
+from smodels import installation
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from collections import OrderedDict
 
@@ -74,6 +75,11 @@ class TextBasedPrinter(object):
         self.output = output
         self.printingOrder = []
         
+        
+        if filename and os.path.isfile(filename):
+            logger.warning("Removing file %s" %filename)
+            os.remove(filename)
+        
     def close(self):
         """
         Closes the printer and print the objects added to the output defined
@@ -116,7 +122,7 @@ class TextBasedPrinter(object):
         if objOutputLevel is None: objOutputLevel = self.outputLevel
         output = self._formatObj(obj,objOutputLevel)
         if output is False:
-            return False    
+            return False
         self.objList.append(obj)  
         self.outputList.append(output)
         return True
@@ -130,28 +136,15 @@ class TextBasedPrinter(object):
         :param outputLevel: Defines object specific output level.
         """
         
-        if isinstance(obj,TopologyList):
-            return self._formatTopologyList(obj,objOutputLevel)
-        elif isinstance(obj,Element):
-            return self._formatElementList(obj,objOutputLevel)
-        elif isinstance(obj,TxName):
-            return self._formatTxName(obj,objOutputLevel)
-        elif isinstance(obj,ExpResult):
-            return self._formatExpResult(obj,objOutputLevel)
-        elif isinstance(obj,TheoryPredictionList):
-            return self._formatTheoryPredictionList(obj,objOutputLevel)
-        elif isinstance(obj,OutputStatus):
-            return self._formatOutputStatus(obj,objOutputLevel)   
-        elif isinstance(obj,ResultList):
-            return self._formatResultList(obj,objOutputLevel)
-        elif isinstance(obj,MissingTopoList):
-            return self._formatMissingTopoList(obj,objOutputLevel)
-        elif isinstance(obj,Doc):
-            return self._formatPySLHA(obj,objOutputLevel)        
-        else:
-            return False     
+        typeStr = type(obj).__name__
+        try:
+            formatFunction = getattr(self,'_format'+typeStr)
+            return formatFunction(obj,objOutputLevel)
+        except:
+            return False
 
-    def _formatPySLHA(self,obj,objOutputLevel):
+
+    def _formatDoc(self,obj,objOutputLevel):
         
         return False
         
@@ -463,7 +456,7 @@ class PyPrinter(TextBasedPrinter):
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
 
         TextBasedPrinter.__init__(self, output, filename, outputLevel)                
-        self.printingOrder = [Doc,OutputStatus,TheoryPredictionList,MissingTopoList]
+        self.printingOrder = [OutputStatus,ResultList,MissingTopoList]
 
     def flush(self):
         """
@@ -471,19 +464,15 @@ class PyPrinter(TextBasedPrinter):
         to the defined output
         """
 
-        outputDict = OrderedDict()
+        outputDict = {}
         for objType in self.printingOrder:
             for iobj,obj in enumerate(self.objList):
                 if objType == type(obj):
                     objoutput = self.outputList[iobj]
-                    if objoutput.keys() == ['ExptRes'] and  'ExptRes' in outputDict:
-                        outputDict['ExptRes'] += objoutput['ExptRes']
-                    else:  
-                        outputDict.update(objoutput)
-        
+                    outputDict.update(objoutput)
                 
         if outputDict:
-            output = str(outputDict)
+            output = 'smodelsOutput = '+str(outputDict)
             if self.output == 'stdout':
                 sys.stdout.write(output)
             elif self.output == 'file':
@@ -507,8 +496,60 @@ class PyPrinter(TextBasedPrinter):
         
         if not objOutputLevel: return None
         
-        parameters = obj.parameters
-        return parameters
+        infoDict = dict(obj.parameters.items())
+        infoDict['input file'] = obj.inputfile
+        infoDict['database version'] = obj.databaseVersion        
+        infoDict['smodels version'] = obj.smodelsVersion
+        return infoDict
+    
+    def _formatResultList(self, obj, objOutputLevel):
+        """
+        Format data of the ResultList object.
+           
+        :param obj: A ResultList object to be printed.
+        :param outputLevel: Defines object specific output level.
+        """
+
+        if not objOutputLevel: return None
+
+        ExptRes = []
+        for theoryPrediction in obj.theoryPredictions:
+            expResult = theoryPrediction.expResult
+            dataset = theoryPrediction.dataset
+            expID = expResult.globalInfo.id
+            datasetID = dataset.dataInfo.dataId
+            dataType = dataset.dataInfo.dataType
+            if dataType == 'upperLimit':
+                ul = expResult.getUpperLimitFor(txname=theoryPrediction.txnames[0],
+                                                mass=theoryPrediction.mass)
+            elif dataType == 'efficiencyMap':
+                ul = expResult.getUpperLimitFor(dataID=datasetID)
+            else:
+                logger.error("Unknown dataType %s" %(str(dataType)))
+            value = theoryPrediction.value[0].value                     
+            txnames = [txname.txName for txname in theoryPrediction.txnames]
+            maxconds = theoryPrediction.getmaxCondition()
+            mass = theoryPrediction.mass
+            if mass:
+                daughterMass = mass[0][-1].asNumber(GeV)
+                motherMass = mass[0][0].asNumber(GeV)
+            else:
+                daughterMass = None
+                motherMass = None
+            sqrts = dataset.globalInfo.sqrts
+            ExptRes.append({'maxcond': maxconds, 'theory prediction (fb)': value.asNumber(fb),
+                        'upper limit (fb)': ul.asNumber(fb), 
+                        'TxNames': txnames,
+                        'DaughterMass (GeV)': daughterMass, 
+                        'MotherMass (GeV)': motherMass,
+                        'AnalysisID': expID,
+                        'DataSetID' : datasetID, 
+                        'AnalysisSqrts (TeV)': sqrts.asNumber(TeV),
+                        'lumi (1/fb)' : (dataset.globalInfo.lumi*fb).asNumber(),
+                        'dataType' : dataType})
+            
+        return {'ExptRes' : ExptRes}
+        
 
     def _formatTheoryPredictionList(self, obj, objOutputLevel):
         """
@@ -518,44 +559,10 @@ class PyPrinter(TextBasedPrinter):
         :return: python dictionary
         """
                 
-        if not objOutputLevel: return None
+        return self._formatResultList(obj,objOutputLevel)             
         
-        ExptRes = []
-        expResult = obj.expResult
-        datasetID = obj.dataset.dataInfo.dataId
-        expID =  expResult.globalInfo.id
-        sqrts = (expResult.globalInfo.sqrts/TeV).asNumber()        
-        for prediction in obj:
-            mass = prediction.mass
-            txname = prediction.txname            
-            maxconds = prediction.getmaxCondition()
-            if maxconds == 'N/A': maxconds = -1.
-            if mass:
-                motherMass = (mass[0][0]/GeV).asNumber()
-                daughterMass = (mass[0][-1]/GeV).asNumber()
-            else:
-                motherMass = None
-                daughterMass = None
-            if txname:
-                TxName = str(txname)
-            else:
-                TxName = None
-            theores = (prediction.value.getMaxXsec()/fb).asNumber()
-            if expResult.datasets[0].dataInfo.dataType == 'upperLimit':
-                explimit = expResult.getUpperLimitFor(txname=txname,mass=mass)
-            elif expResult.datasets[0].dataInfo.dataType == 'efficiencyMap':
-                explimit = expResult.getUpperLimitFor(dataID=datasetID)
-            explimit = (explimit/fb).asNumber()
-            ExptRes.append({'maxcond': maxconds, 'tval (fb)': theores,
-                            'TxName': TxName, 
-                            'DaughterMass (GeV)': daughterMass,
-                            'exptlimit (fb)': explimit, 'ExpID': expID,
-                            'Sqrts (TeV)': sqrts,
-                            'MotherMass (GeV)': motherMass})
-         
-        return {'ExptRes' : ExptRes}
     
-    def _formatPySLHA(self, obj, objOutputLevel):
+    def _formatDoc(self, obj, objOutputLevel):
         """
         Format a pyslha object to be printed as a dictionary
         
@@ -607,14 +614,21 @@ class PyPrinter(TextBasedPrinter):
         """
 
         if not objOutputLevel: return None
-
+        
         nprint = 10  # Number of missing topologies to be printed (ordered by cross-sections)
-
-        missList = []
-        for topo in obj.topos:
-            missList.append({'Topology' : str(topo.topo), 'weight (fb)' : topo.value})
-                        
-        return {'Missing' : missList} 
+        
+        missedTopos = []
+        for topo in sorted(obj.topos, key=lambda x: x.value, reverse=True)[:nprint]:
+            missed = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : topo.value,
+                                'element' : str(topo.topo)}
+            
+            if objOutputLevel==2:
+                contributing = []
+                for el in topo.contributingElements:
+                    contributing.append(el.elID)
+                missed["element IDs"] = contributing
+            missedTopos.append(missed)
+        return {'Missed Topologies': missedTopos}
 
 
 def printout(obj, outputLevel=1):
