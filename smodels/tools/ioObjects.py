@@ -13,6 +13,7 @@
 import os, sys
 from smodels.theory import lheReader
 from smodels.tools.physicsUnits import GeV, fb
+from smodels import installation
 import pyslha
 from smodels.particles import qNumbers, rEven
 from smodels.theory import crossSection
@@ -115,11 +116,19 @@ class OutputStatus(object):
     :ivar outputfile: path to outputfile
     
     """
-    def __init__(self, status, inputFile, parameters, databaseVersion, outputfile):
+    def __init__(self, status, inputFile, parameters, databaseVersion, outputfile=None):
         """
         Initialize output. If one of the checks failed, exit.
         
         """
+
+        try:
+            with open(installation.installDirectory()+'/smodels/version', 'r') as versionFile:
+                version = versionFile.readline()
+            self.smodelsVersion = version.replace('\n','')
+        except:
+            self.smodelsVersion = None
+
 
         self.outputfile = outputfile
         self.inputfile = inputFile
