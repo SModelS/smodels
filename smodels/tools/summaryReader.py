@@ -1,8 +1,8 @@
 """
 .. module:: tools.summaryReader
    :synopsis: Classes to read the summary.txt files.
-    
-.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>    
+
+.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
 
 """
 
@@ -22,8 +22,8 @@ class Output():
             return self.__dict__ == other.__dict__
         else:
             return False
-        
-class MissOutput():        
+
+class MissOutput():
     def __init__(self, l):
         self.sqrts = eval(l[0])
         self.weight = eval(l[1])
@@ -39,7 +39,7 @@ class MissOutput():
 class Summary():
     """
     Class to access the output given in the summary.txt
-    
+
     """
     def __init__(self, filename):
         self.results = []
@@ -48,6 +48,14 @@ class Summary():
         self.filename = filename
         self.missedTopos = []
         self.read(filename)
+
+    def __str__ ( self ):
+        import os
+        fn = self.filename.replace("//","/")
+        final = fn.replace ( os.getcwd(), "." )
+        if len(final)>50:
+            final="..."+final[-47:]
+        return "Summary(%s)" % final
 
     def read(self, infile):
         f = open(infile)
@@ -65,7 +73,7 @@ class Summary():
                 continue
             if "Missing topologies" in l:
                 missingLines = True
-                continue            
+                continue
             if l.startswith("#"):
                 continue
             if "----" in l:
@@ -78,9 +86,9 @@ class Summary():
             if 'Signal Region' in l or 'Txnames' in l:
                 continue
             if 'Missing Topologies' in l or 'Sqrts (TeV)' in l:
-                continue            
+                continue
             if resultLines:
-                if 'Signal Region' in lines[il+1]:                    
+                if 'Signal Region' in lines[il+1]:
                     signalRegion = lines[il+1].split(':')[1].strip()
                 if 'Txnames' in lines[il+2]:
                     txnames = sorted(lines[il+2].split(':')[1].strip().split(','))
@@ -92,11 +100,11 @@ class Summary():
         if not len(self.results) == len(other.results):
             return False
         if not len(self.missedTopos) == len(other.missedTopos):
-            return False        
+            return False
         for res in self.results:
             if not res in other.results:
                 return False
         for miss in self.missedTopos:
             if not miss in other.missedTopos:
-                return False            
+                return False
         return True
