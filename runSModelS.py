@@ -26,6 +26,10 @@ from smodels.experiment.exceptions import DatabaseNotFoundException
 log = logging.getLogger(__name__)
 currentFile = ""
 
+
+def runSingleFile ( inFile, inputFile, outputDir ):
+    return
+
 def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
     """
     Provides a command line interface to basic SModelS functionalities.
@@ -38,6 +42,8 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
     :param db: supply a smodels.experiment.databaseObj.Database object, so
             the database doesnt have to be loaded anymore. Will 
             render a few parameters in the parameter file irrelevant.
+            If None, load the database as described in parameterFile,
+            If True, force loading the text database.
     
     """
 
@@ -70,8 +76,10 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
     try:
         databasePath = parser.get("path", "databasePath")
         database = db
-        if database == None:
-            database = Database(databasePath, verbosity=verbosity )
+        if database in [ None, True ]:
+            force_load=None
+            if database == True: force_load="txt"
+            database = Database(databasePath, force_load=force_load, verbosity=verbosity )
         databaseVersion = database.databaseVersion
     except DatabaseNotFoundException:
         log.error("Database not found in %s" % os.path.realpath(databasePath))
@@ -88,6 +96,7 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
 
     """ loop over input files and run SModelS """
     for inputFile in fileList:
+        runSingleFile ( inFile, inputFile, outputDir )
         if len(fileList) > 1: inputFile = os.path.join(inFile, inputFile)
         print("Now testing %s" %inputFile)
         currentFile = inputFile
@@ -239,7 +248,8 @@ if __name__ == "__main__":
     """ Get the name of input SLHA file and parameter file """
     ap = argparse.ArgumentParser()
     ap.add_argument('-f', '--filename', 
-            help='name of SLHA or LHE input file, necessary input, if directory is given, loop all files in the directory', required=True)
+            help='name of SLHA or LHE input file, necessary input, if directory '
+                 'is given, loop all files in the directory', required=True)
     ap.add_argument('-p', '--parameterFile', 
             help='name of parameter file, optional argument, if not set, use '
                            'all parameters from etc/parameters_default.ini', 
@@ -249,26 +259,34 @@ if __name__ == "__main__":
                            outputDir, default=outputDir)
     ap.add_argument('--development', help='enable development output', 
             action='store_true')
+    ap.add_argument('-t', '--force_txt', help='force loading the text database',
+            action='store_true')
     ap.add_argument('--run-crashreport', 
             help='parse crash report file and use its contents for a SModelS run',
                            action='store_true')
+    ap.add_argument('-v','--verbose', help='verbosity level. '
+            'accepted values are: debug, info, warning, error.',
+                           default = "info", type = str )
     ap.add_argument('--timeout', help='define a limit on the running time (in secs).'
                            ' If not set, run without a time limit', 
                            default = 0, type = int)
     
     
     args = ap.parse_args()
+
+    db=None
+    if args.force_txt: db=True
     
     if args.run_crashreport:
         args.filename, args.parameterFile = crashReport.readCrashReportFile(
                 args.filename)
         with timeOut.Timeout(args.timeout):
-            main(args.filename, args.parameterFile, args.outputDir)
+            main(args.filename, args.parameterFile, args.outputDir, args.verbose, db )
         
     else:
         try:
             with timeOut.Timeout(args.timeout):
-                main(args.filename, args.parameterFile, args.outputDir)
+                main(args.filename, args.parameterFile, args.outputDir, args.verbose, db )
         except Exception:
             crashReportFacility = crashReport.CrashReport()
              
