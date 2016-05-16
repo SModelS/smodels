@@ -41,7 +41,8 @@ class Element(object):
         self.weight = crossSection.XSectionList()
         self.motherElements = []
         self.elID = 0
-        self.covered = 0 # how many analyses cover this element?
+        self.covered = False
+        self.tested = False 
         
         if info:
             # Create element from particle string
