@@ -46,6 +46,8 @@ class DataSet(object):
                     txname = txnameObj.TxName(txtfile,self.globalInfo)
                     self.txnameList.append(txname)
                 except TypeError: continue
+
+        self.txnameList.sort()
             
     def __ne__ ( self, other ):
         return not self.__eq__ ( other )
@@ -55,9 +57,6 @@ class DataSet(object):
             return False
         if len(self.txnameList ) != len ( other.txnameList ):
             return False
-        #for (mytx, othertx) in zip ( self.txnameList, other.txnameList ):
-        #    if mytx != othertx:
-        #        return False
         return True
 
     def getValuesFor(self,attribute=None):

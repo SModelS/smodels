@@ -87,7 +87,10 @@ class RunPrinterTest(unittest.TestCase):
                 "%s/test/unitTestOutput/summary_print.txt" %installDirectory())
         sample = summaryReader.Summary(
                 "%s/test/summary_default.txt" %installDirectory())
-        self.assertEquals(sample, output)
+        try:
+            self.assertEquals(sample, output)
+        except AssertionError,e:
+            raise AssertionError ( "%s != %s" % ( sample, output ) )
         
         #Test python output
         from default_output import smodelsOutput as defaultOut
@@ -98,7 +101,11 @@ class RunPrinterTest(unittest.TestCase):
         defaultFile = defaultOut['input file']
         defaultFile = defaultFile[defaultFile.rfind('/'):]
         defaultOut['input file'] = defaultFile
-        self.assertEquals(smodelsOutput,defaultOut)
+        try:
+            self.assertEquals(smodelsOutput,defaultOut)
+        except AssertionError,e:
+            msg = "%s != %s" % ( smodelsOutput, defaultOut )
+            raise AssertionError ( msg )
         
         #Test xml output
         xmlDefault = ElementTree.parse("%s/test/default_output.xml" %installDirectory()).getroot()
