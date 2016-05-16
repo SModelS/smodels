@@ -31,7 +31,7 @@ class TestLikelihood(unittest.TestCase):
         This is check is built into the likelihood
         module.
         """
-        print("\ntest_mean_std")
+        ## print("\ntest_mean_std")
         exp_cl = 0.95
 
         expected = (None, None)
@@ -58,8 +58,7 @@ class TestLikelihood(unittest.TestCase):
         Test if _cl_from_erfs gives results as expected from
         error functions.
         """
-        print("\ntest_cl_from_erf")
-
+        ## print("\ntest_cl_from_erf")
         expected = math.erf(1)
         actual = like._cl_from_erfs(0, 1/math.sqrt(2), 1)
         self.assertEqual(expected, actual)
@@ -97,7 +96,7 @@ class TestLikelihood(unittest.TestCase):
 
         Note that the error tolerance is high, mu +- 0.1*mu.
         """
-        print("\ntest_real_mean_vs_estimated_mean")
+        ## print("\ntest_real_mean_vs_estimated_mean")
         b = 200 # background
         n = 220 # observed
         lumi = 20.0 # fb-1
@@ -129,7 +128,7 @@ class TestLikelihood(unittest.TestCase):
         Important is that everything is in the same unit (pb and pb-1,
         or fb and fb-1, etc.).
         """
-        print("test_unit_handling\n")
+        ## print("test_unit_handling\n")
 
         from smodels.tools.physicsUnits import fb, pb, GeV, TeV
         theo =  5.72E-01 * pb # theory prediction
@@ -161,7 +160,7 @@ class TestLikelihood(unittest.TestCase):
         Important is that everything is in the same unit (pb and pb-1,
         or fb and fb-1, etc.).
         """
-        print("test_different_unit_handling\n")
+        # print("test_different_unit_handling\n")
 
         from smodels.tools.physicsUnits import fb, pb, GeV, TeV
         theo =  5.72E-01 * pb # theory prediction
@@ -193,7 +192,7 @@ class TestLikelihood(unittest.TestCase):
         SUSY T2 simplified model.
 
         """
-        print("test_computes_as_expected\n")
+        ## print("test_computes_as_expected\n")
 
         # Some computed chi2 for the cMSSM per m0, m12 mass:
         cmssm = {(360, 320): {'theo': 0.159063876816674, 'ul':
