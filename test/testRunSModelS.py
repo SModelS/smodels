@@ -42,10 +42,10 @@ class RunSModelSTest(unittest.TestCase):
         outputfile = self.runMain(filename )
         sample = summaryReader.Summary(
                 "%s/test/summary_default.txt" %installDirectory())
-        if not ( sample==outputfile ):
-            print
-            print "%s != %s" % ( os.path.basename(outputfile.filename), 
-                                 os.path.basename(sample.filename) )
+        #if not ( sample==outputfile ):
+        #    print
+        #    print "%s != %s" % ( os.path.basename(outputfile.filename), 
+        #                         os.path.basename(sample.filename) )
         try:
             self.assertEquals(sample, outputfile )
         except AssertionError,e:
