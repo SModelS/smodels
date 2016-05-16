@@ -65,9 +65,8 @@ class RunPrinterTest(unittest.TestCase):
         printerList.addObj(results,objOutputLevel=2)
         
         #Add missing topologies:
-        sqrts = max([xsec.info.sqrts for xsec in smstoplist.getTotalWeight()])
-        missingtopos = missingTopologies.MissingTopoList(sqrts)
-        missingtopos.findMissingTopos(smstoplist, listOfExpRes, mingap, True, doInvisible=True)        
+        missingtopos = missingTopologies.MissingTopoList()
+        missingtopos.findMissingTopos(smstoplist)        
         printerList.addObj(missingtopos)
         
         #Add additional information:

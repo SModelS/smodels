@@ -216,12 +216,11 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
         if parser.getboolean("stdout", "printResults"):
             stdoutPrinter.addObj(results,outLevel)
     
-        sqrts = max([xsec.info.sqrts for xsec in smstoplist.getTotalWeight()])
+        
         if parser.getboolean("options", "findMissingTopos"):
             """ Look for missing topologies, add them to the output file """
-            missingtopos = missingTopologies.MissingTopoList(sqrts)
-            missingtopos.findMissingTopos(smstoplist, listOfExpRes, minmassgap, parser.getboolean("options", "doCompress"),
-                        doInvisible=parser.getboolean("options", "doInvisible"))        
+            missingtopos = missingTopologies.MissingTopoList()
+            missingtopos.findMissingTopos(smstoplist)        
             summaryPrinter.addObj(missingtopos)
             stdoutPrinter.addObj(missingtopos,2)
          
