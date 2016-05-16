@@ -240,9 +240,10 @@ def _getElementsFrom(smsTopList, dataset):
             for el in top.getElements():
                 newEl = txname.hasElementAs(el)  #Check if element appears in txname
                 if not newEl: continue
-                el.covered += 1
+                el.covered = True
                 eff = txname.getEfficiencyFor(newEl.getMasses())
                 if not eff: continue
+                el.tested = True
                 newEl.eff = eff
                 newEl.weight *= eff
                 newEl.txname = txname
