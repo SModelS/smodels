@@ -300,6 +300,7 @@ def groupAll(elements):
     cluster = ElementCluster()
     cluster.elements = elements
     cluster.txnames = list(set([el.txname for el in elements]))
+    cluster.txnames.sort()
     return cluster
 
 
