@@ -104,7 +104,7 @@ class MissingTopoList(object):
                 if not cID in allMothers: allMothers.append(cID)
         for el in smstoplist.getElements():
             if el.elID in allMothers: continue
-            if el.covered > 0: continue
+            if el.covered: continue
             self.addToTopos(el, sumL, sumJet)
         for topo in self.topos:
             if not topo.weights.getXsecsFor(self.sqrts): continue
