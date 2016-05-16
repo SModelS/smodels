@@ -166,11 +166,15 @@ class TextBasedPrinter(object):
         output += "Decomposition output status: " + str(obj.status) + " " 
         output += obj.statusStrings[obj.status] + "\n"
         if obj.filestatus < 0: output += str(obj.warnings) + "\n"
-        output += "#Input File: " + obj.inputfile + "\n"
-        for label, par in obj.parameters.items(): 
-            output += "#" + label + " = " + str(par) + '\n'
+        output += "# Input File: " + obj.inputfile + "\n"
+        labels = obj.parameters.keys()
+        labels.sort()
+        # for label, par in obj.parameters.items(): 
+        for label in labels:
+            par=obj.parameters[label]
+            output += "# " + label + " = " + str(par) + '\n'
         if obj.databaseVersion: 
-            output += "#Database version: %s\n" % obj.databaseVersion
+            output += "# Database version: %s\n" % obj.databaseVersion
         output += "=" * 80 + "=\n"
         return output
 
