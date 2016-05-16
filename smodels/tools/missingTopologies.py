@@ -9,6 +9,8 @@
 
 """
 from smodels.tools.physicsUnits import fb
+import logging
+log = logging.getLogger(__name__)
 
 
 class MissingTopo():
@@ -27,12 +29,10 @@ class MissingTopoList(object):
     """
     Object to find and collect MissingTopo objects, plus printout functionality
     
-    :ivar sqrts: center of mass energy for which missing topologies should be evaluated
-    
     """
-    def __init__(self, sqrts):
-        self.sqrts = sqrts
+    def __init__(self):
         self.topos = []
+        self.sqrts  = None
 
     def formatData(self,outputLevel):
         return self.formatMissingData(outputLevel)
@@ -84,20 +84,19 @@ class MissingTopoList(object):
         return str(li).replace("'", "").replace(" ", "")
     
     
-    def findMissingTopos(self, smstoplist, listOfAnalyses, minmassgap, doCompress, doInvisible, sumL=None, sumJet=None):
+    def findMissingTopos(self, smstoplist, sumL=None, sumJet=None):
         """
         Loops over all the elements in smstoplist and checks if the elements
         are tested by any of the analysis in listOfAnalysis.
         
         :parameter smstoplist: list of topologies (TopologyLis object)
-        :parameter listOfAnlysis: a list of ULanalysis objects
-        :parameter minmassgap: the parameter for mass compression (Unum object)
-        :parameter doCompress: if set to True will ignore elements which can be mass compressed (True/Fals)
-        :parameter doInvisible: if set to True will ignore elements which can be invisibly compressed (True/False)
         :parameter sumL: if True, missing topologies will not distinguish e and mu
+        :parameter sumJet: if True, missing topologies will not distinguish light quarks and gluons        
         """
         
-        from smodels.tools.physicsUnits import fb
+        
+        sqrts = max([xsec.info.sqrts for xsec in smstoplist.getTotalWeight()])
+        self.sqrts = sqrts
         allMothers = []
         for el in smstoplist.getElements():
             for mEl in el.motherElements:
@@ -109,54 +108,5 @@ class MissingTopoList(object):
             self.addToTopos(el, sumL, sumJet)
         for topo in self.topos:
             if not topo.weights.getXsecsFor(self.sqrts): continue
-            topo.value = topo.weights.getXsecsFor(self.sqrts)[0].value / fb
-        return    
-
-#     def findMissingTopos(self, smstoplist, resultList, sumL=None, sumJet=None):
-#         """
-#         Loops over all the elements in smstoplist and checks if the elements
-#         are tested by any of the analysis in listOfAnalysis.
-#         
-#         :parameter smstoplist: list of topologies (TopologyLis object)
-#         :parameter resultList: a ResultList object
-#         :parameter minmassgap: the parameter for mass compression (Unum object)
-#         :parameter doCompress: if set to True will ignore elements which can be mass compressed (True/False)
-#         :parameter doInvisible: if set to True will ignore elements which can be invisibly compressed (True/False)
-#         :parameter sumL: if True, missing topologies will not distinguish e and mu
-#         """
-# 
-#         #First collect all element IDs from decomposition
-#         allIDs = []
-#         idDict = {}
-#         motherIDs = []
-#         for el in smstoplist.getElements():
-#             idDict[el.elID] = el
-#             allIDs.append(el.elID)
-#             for mEl in el.motherElements:
-#                 cID = mEl[-1].elID
-#                 motherIDs.append(cID)
-#         motherIDs = set(motherIDs)
-#         allIDs = set(allIDs)
-#         allIDs = allIDs.difference(motherIDs)  #Remove mother elements to avoid double counting (???)
-#         
-#         #Now group the results by sqrts
-#         sqrtsDict = {}
-#         for tp in resultList.theoryPredictions:
-#             sqrts = tp.expResult.globalInfo.sqrts
-#             if sqrts in sqrtsDict:
-#                 sqrtsDict[sqrts].append(tp)
-#             else:
-#                 sqrtsDict[sqrts] = [tp]
-#         
-#         for sqrts,tps in sqrtsDict.items():
-#             usedIDs = []
-#             for tp in tps:
-#                 usedIDs += tp.IDs
-#             usedIDs = set(usedIDs)
-#             missedIDs = allIDs.difference(usedIDs)
-#             missedEls = [idDict[elID] for elID in missedIDs]
-#             for el in missedEls:
-#                 self.addToTopos(el, sumL, sumJet)
-#             for topo in self.topos:
-#                 if not topo.weights.getXsecsFor(self.sqrts): continue
-#                 topo.value = topo.weights.getXsecsFor(self.sqrts)[0].value/fb
+            topo.value = topo.weights.getXsecsFor(self.sqrts)[0].value/fb
+        return
