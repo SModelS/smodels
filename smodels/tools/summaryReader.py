@@ -63,7 +63,7 @@ class Summary():
                 if 'Signal Region' in lines[il+1]:                    
                     signalRegion = lines[il+1].split(':')[1].strip()
                 if 'Txnames' in lines[il+2]:
-                    txnames = sorted(lines[il+2].split(':')[1].strip().split(','))                
+                    txnames = sorted(lines[il+2].split(':')[1].strip().split(','))
                 self.results.append(Output(l.split(),signalRegion,txnames))
 
     def __eq__(self, other):
