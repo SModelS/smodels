@@ -72,9 +72,11 @@ class RunPrinterTest(unittest.TestCase):
         #Add additional information:
         databaseVersion = database.databaseVersion
         outputStatus = ioObjects.OutputStatus([1,None], slhafile,
-                                               {'sigmacut (fb)' : sigmacut.asNumber(fb), 
-                                                'mingap (GeV)' : mingap.asNumber(GeV)},
+                                               {'sigmacut' : sigmacut.asNumber(fb), 
+                                                'minmassgap' : mingap.asNumber(GeV),
+                                                'maxcond': maxcond },
                                               databaseVersion)
+        outputStatus.status = 1
         printerList.addObj(outputStatus)
         printerList.close()
         self.assertEqual(True, True)
