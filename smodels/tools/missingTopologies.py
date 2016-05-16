@@ -8,6 +8,7 @@
 .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
 
 """
+from smodels.tools.physicsUnits import fb
 
 
 class MissingTopo():
@@ -81,7 +82,8 @@ class MissingTopoList(object):
                 ve.sort()
         li.sort()
         return str(li).replace("'", "").replace(" ", "")
-
+    
+    
     def findMissingTopos(self, smstoplist, listOfAnalyses, minmassgap, doCompress, doInvisible, sumL=None, sumJet=None):
         """
         Loops over all the elements in smstoplist and checks if the elements
@@ -108,6 +110,53 @@ class MissingTopoList(object):
         for topo in self.topos:
             if not topo.weights.getXsecsFor(self.sqrts): continue
             topo.value = topo.weights.getXsecsFor(self.sqrts)[0].value / fb
-        return
+        return    
 
-
+#     def findMissingTopos(self, smstoplist, resultList, sumL=None, sumJet=None):
+#         """
+#         Loops over all the elements in smstoplist and checks if the elements
+#         are tested by any of the analysis in listOfAnalysis.
+#         
+#         :parameter smstoplist: list of topologies (TopologyLis object)
+#         :parameter resultList: a ResultList object
+#         :parameter minmassgap: the parameter for mass compression (Unum object)
+#         :parameter doCompress: if set to True will ignore elements which can be mass compressed (True/False)
+#         :parameter doInvisible: if set to True will ignore elements which can be invisibly compressed (True/False)
+#         :parameter sumL: if True, missing topologies will not distinguish e and mu
+#         """
+# 
+#         #First collect all element IDs from decomposition
+#         allIDs = []
+#         idDict = {}
+#         motherIDs = []
+#         for el in smstoplist.getElements():
+#             idDict[el.elID] = el
+#             allIDs.append(el.elID)
+#             for mEl in el.motherElements:
+#                 cID = mEl[-1].elID
+#                 motherIDs.append(cID)
+#         motherIDs = set(motherIDs)
+#         allIDs = set(allIDs)
+#         allIDs = allIDs.difference(motherIDs)  #Remove mother elements to avoid double counting (???)
+#         
+#         #Now group the results by sqrts
+#         sqrtsDict = {}
+#         for tp in resultList.theoryPredictions:
+#             sqrts = tp.expResult.globalInfo.sqrts
+#             if sqrts in sqrtsDict:
+#                 sqrtsDict[sqrts].append(tp)
+#             else:
+#                 sqrtsDict[sqrts] = [tp]
+#         
+#         for sqrts,tps in sqrtsDict.items():
+#             usedIDs = []
+#             for tp in tps:
+#                 usedIDs += tp.IDs
+#             usedIDs = set(usedIDs)
+#             missedIDs = allIDs.difference(usedIDs)
+#             missedEls = [idDict[elID] for elID in missedIDs]
+#             for el in missedEls:
+#                 self.addToTopos(el, sumL, sumJet)
+#             for topo in self.topos:
+#                 if not topo.weights.getXsecsFor(self.sqrts): continue
+#                 topo.value = topo.weights.getXsecsFor(self.sqrts)[0].value/fb
