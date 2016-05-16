@@ -40,7 +40,7 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
                           /etc/parameters_default.ini)
     :param outputDir: Output directory to write a summary of results to
     :param db: supply a smodels.experiment.databaseObj.Database object, so
-            the database doesnt have to be loaded anymore. Will 
+            the database doesn't have to be loaded anymore. Will
             render a few parameters in the parameter file irrelevant.
             If None, load the database as described in parameterFile,
             If True, force loading the text database.
