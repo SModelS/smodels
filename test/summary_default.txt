@@ -1,10 +1,10 @@
 Input status: 1
 Decomposition output status: 1 #decomposition was successful
-#Input File: /home/lessa/smodels//inputFiles/slha/gluino_squarks.slha
-#maxcond = 0.2
-#minmassgap = 5.
-#sigmacut = 0.03
-#Database version: unittest
+# Input File: /home/lessa/smodels//inputFiles/slha/gluino_squarks.slha
+# maxcond = 0.2
+# minmassgap = 5.
+# sigmacut = 0.03
+# Database version: unittest
 =================================================================================
 #Analysis  Sqrts  Cond. Violation  Theory_Value(fb)  Exp_limit(fb)  r
 
