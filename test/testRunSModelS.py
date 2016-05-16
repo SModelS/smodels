@@ -46,7 +46,11 @@ class RunSModelSTest(unittest.TestCase):
             print
             print "%s != %s" % ( os.path.basename(outputfile.filename), 
                                  os.path.basename(sample.filename) )
-        self.assertEquals(sample, outputfile)
+        try:
+            self.assertEquals(sample, outputfile )
+        except AssertionError,e:
+            msg = "%s != %s" % ( sample, outputfile )
+            raise AssertionError ( msg )
         
 
     def testBadFile(self):
@@ -56,7 +60,11 @@ class RunSModelSTest(unittest.TestCase):
         outputfile = self.runMain (filename ) 
         sample = summaryReader.Summary(
                 "%s/test/summary_bad_default.txt" %installDirectory())
-        self.assertEquals(sample, outputfile)
+        try:
+            self.assertEquals(sample, outputfile )
+        except AssertionError,e:
+            msg = "%s != %s" % ( sample, outputfile )
+            raise AssertionError ( msg )
 
 if __name__ == "__main__":
     unittest.main()

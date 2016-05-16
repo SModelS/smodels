@@ -22,7 +22,7 @@ Decomposition output status: 1 #decomposition was successful
 --------------------------------------------------------------------------------
      CMS-SUS-13-012  8.00E+00    0.0  1.357E-01  1.214E+00  1.118E-01
  Signal Region:  3NJet6_1000HT1250_600MHTinf
- Txnames:  T2, T1
+ Txnames:  T1, T2
 --------------------------------------------------------------------------------
  ATLAS-SUSY-2013-12  8.00E+00    0.0  1.847E+01  3.301E+02  5.595E-02
  Signal Region:  (UL)
