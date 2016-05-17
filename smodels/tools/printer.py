@@ -657,7 +657,7 @@ class XmlPrinter(PyPrinter):
     
         tag = tag.replace(" ","_").replace("(","").replace(")","")
         if not isinstance(pyObj,list) and not isinstance(pyObj,dict):
-            parent.text = str(pyObj)
+            parent.text = str(pyObj).lstrip().rstrip()
         elif isinstance(pyObj,dict):
             for key,val in pyObj.items():
                 key = key.replace(" ","_").replace("(","").replace(")","")
