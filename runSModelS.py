@@ -18,7 +18,7 @@ from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.tools.physicsUnits import GeV
 from smodels.tools.physicsUnits import fb
 from smodels.tools import ioObjects
-from smodels.tools import missingTopologies
+from smodels.tools import coverage
 from smodels.tools import crashReport, timeOut
 import smodels.tools.printer as prt
 from smodels.experiment.exceptions import DatabaseNotFoundException
@@ -226,14 +226,14 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
             stdoutPrinter.addObj(results,outLevel)
     
         
-        if parser.getboolean("options", "findMissingTopos"):
+        if parser.getboolean("options", "testCoverage"):
             """ Look for missing topologies, add them to the output file """
-            missingtopos = missingTopologies.MissingTopoList()
-            missingtopos.findMissingTopos(smstoplist)        
-            summaryPrinter.addObj(missingtopos)
-            stdoutPrinter.addObj(missingtopos,2)
-         
-        
+            sqrts =  max([xsec.info.sqrts for xsec in smstoplist.getTotalWeight()])
+            uncovered = coverage.Uncovered(smstoplist, sumL=True, sumJet=True, sqrts=sqrts)
+            summaryPrinter.addObj(uncovered.missingTopos)
+            stdoutPrinter.addObj(uncovered.missingTopos,2) 
+            summaryPrinter.addObj(uncovered,2)
+            stdoutPrinter.addObj(uncovered,2) 
         stdoutPrinter.close()
         summaryPrinter.close()
 

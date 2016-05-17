@@ -18,7 +18,7 @@ from smodels.theory.theoryPrediction import TheoryPredictionList
 from smodels.experiment.txnameObj import TxName
 from smodels.experiment.expResultObj import ExpResult
 from smodels.tools.ioObjects import OutputStatus, ResultList
-from smodels.tools.missingTopologies import MissingTopoList
+from smodels.tools.coverage import UncoveredList, Uncovered
 from smodels.tools.physicsUnits import GeV, fb, TeV
 from pyslha import Doc
 from smodels import installation
@@ -209,7 +209,7 @@ class TextBasedPrinter(object):
             output += "Total Number of Elements: " + str(len(topo.elementList)) + '\n'
             if objOutputLevel == 2:
                 for el in topo.elementList:
-                    output += "\t\t .........................................................................\n"
+                    output += "\t\t "+ 73 * "." "\n"
                     output += "\t\t Element: \n"
                     output += self._formatElement(el,1) + "\n"
 
@@ -395,19 +395,19 @@ class TextBasedPrinter(object):
                 txnameStr = str([str(tx) for tx in txnames])
                 txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")              
                 output += " Txnames:  " + txnameStr + "\n"            
-            if not theoPred == obj.theoryPredictions[-1]: output += "--------------------------------------------------------------------------------\n"
+            if not theoPred == obj.theoryPredictions[-1]: output += 80 * "-"+ "\n"
 
         output += "\n \n"
-        output += "================================================================================\n"
+        output += 80 * "=" + "\n"
         output += "The highest r value is = " + str(obj.getR(obj.theoryPredictions[0])) + "\n"
 
         return output
 
-    def _formatMissingTopoList(self, obj, objOutputLevel):
+    def _formatUncoveredList(self, obj, objOutputLevel):
         """
-        Format data of the MissingTopoList object.
+        Format data of the UncoveredList object of missing topology type.
            
-        :param obj: A MissingTopoList object to be printed.
+        :param obj: A UncoveredList object to be printed.
         :param outputLevel: Defines object specific output level.   
         """
 
@@ -416,23 +416,64 @@ class TextBasedPrinter(object):
         nprint = 10  # Number of missing topologies to be printed (ordered by cross-sections)
 
         output = ""
-        output += "\n================================================================================\n"
+        output += "\n" + 80 * "=" + "\n"
         if len(obj.topos) == 0: return output + "No missing topologies found\n"
 
+        for topo in obj.topos:
+            if topo.value > 0.: continue
+            for el in topo.contributingElements:
+                if not el.weight.getXsecsFor(obj.sqrts): continue
+                topo.value += el.weight.getXsecsFor(obj.sqrts)[0].value.asNumber(fb)
 
         output += "Missing topologies with the highest cross-sections (up to " + str(nprint) + "):\n"
         output += "Sqrts (TeV)   Weight (fb)        Element description\n"
 
         for topo in sorted(obj.topos, key=lambda x: x.value, reverse=True)[:nprint]:
-            output += "%5s %10.3E    # %45s\n" % (str(obj.sqrts / TeV), topo.value, str(topo.topo))
+            output += "%5s %10.3E    # %45s\n" % (str(obj.sqrts.asNumber(TeV)), topo.value, str(topo.topo))
             if objOutputLevel==2:
                 contributing = []
                 for el in topo.contributingElements:
                     contributing.append(el.elID)
                 output += "Contributing elements %s\n" % str(contributing)
                 
-        return output 
-  
+        return output
+
+    def _formatUncovered(self, obj, objOutputLevel):
+        """
+        Format all uncovered data
+        """
+
+        if not objOutputLevel: return None
+
+        output = ""
+        if objOutputLevel == 1:
+            output += "\nTotal missing topology cross section: %10.3E\n" %(obj.getMissingXsec())
+            output += "Total cross section where we are outside the mass grid: %10.3E\n" %(obj.getOutOfGridXsec())
+            output += "Total cross section in long cascade decays: %10.3E\n" %(obj.getLongCascadeXsec())
+            output += "Total cross section in decays with asymmetric branches: %10.3E\n" %(obj.getAsymmetricXsec())
+            return output
+        if objOutputLevel ==2:
+            output += "\nFull information on unconstrained cross sections\n"
+            output += "================================================================================\n"
+            output += "Contributions outside the mass grid\n"
+            for topo in obj.outsideGrid.topos:
+                for el in topo.contributingElements:
+                    if not el.weight.getXsecsFor(obj.sqrts): continue
+                    topo.value += el.weight.getXsecsFor(obj.sqrts)[0].value.asNumber(fb)
+            for topo in sorted(obj.outsideGrid.topos, key=lambda x: x.value, reverse=True):
+                output += "%5s %10.3E    # %45s\n" % (str(obj.sqrts.asNumber(TeV)), topo.value, str(topo.topo))
+            output += "================================================================================\n"
+            output += "Long cascade decay by produced mothers\n"
+            output += "Mother1 Mother2 Weight (fb)\n"
+            for cascadeEntry in obj.longCascade.classes:
+                output += "%s %s %10.3E # %s\n" %(cascadeEntry.motherPIDs[0], cascadeEntry.motherPIDs[1], cascadeEntry.getWeight(obj.sqrts), str(cascadeEntry.motherPIDs))
+            output += "================================================================================\n"
+            output += "Asymmetric branch decay by produced mothers\n"
+            output += "Mother1 Mother2 Weight (fb)\n"
+            for asymmetricEntry in obj.asymmetricBranches.classes:
+                output += "%s %s %10.3E # %s\n" %(asymmetricEntry.motherPIDs[0], asymmetricEntry.motherPIDs[1], asymmetricEntry.getWeight(obj.sqrts),asymmetricEntry.motherPIDs)
+            return output
+
 
 class TxTPrinter(TextBasedPrinter):
     """
@@ -442,7 +483,7 @@ class TxTPrinter(TextBasedPrinter):
 
         TextBasedPrinter.__init__(self, output, filename, outputLevel)                
         self.printingOrder = [OutputStatus,TopologyList,Element,ExpResult,
-                             TheoryPredictionList,ResultList,MissingTopoList]
+                             TheoryPredictionList,ResultList,UncoveredList, Uncovered]
 
 class SummaryPrinter(TextBasedPrinter):
     """
@@ -452,7 +493,7 @@ class SummaryPrinter(TextBasedPrinter):
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
 
         TextBasedPrinter.__init__(self, output, filename, outputLevel)
-        self.printingOrder = [OutputStatus,ResultList,MissingTopoList]
+        self.printingOrder = [OutputStatus,ResultList,UncoveredList, Uncovered]
         
 
 class PyPrinter(TextBasedPrinter):
@@ -462,7 +503,7 @@ class PyPrinter(TextBasedPrinter):
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
 
         TextBasedPrinter.__init__(self, output, filename, outputLevel)                
-        self.printingOrder = [OutputStatus,ResultList,MissingTopoList]
+        self.printingOrder = [OutputStatus,ResultList,UncoveredList]
 
     def flush(self):
         """
@@ -611,11 +652,11 @@ class PyPrinter(TextBasedPrinter):
                 'chamix' : chamix, 'MM' : {}, 'sbotmix' : sbotmix,
                 'EXTPAR' : EXTPAR, 'mass' : mass}
 
-    def _formatMissingTopoList(self, obj, objOutputLevel):
+    def _formatUncoveredList(self, obj, objOutputLevel):
         """
-        Format data of the MissingTopoList object.
+        Format data of the UncoveredList object of missing topology type.
            
-        :param obj: A MissingTopoList object to be printed.
+        :param obj: A UncoveredList object to be printed.
         :param outputLevel: Defines object specific output level.    
         """
 
@@ -644,7 +685,7 @@ class XmlPrinter(PyPrinter):
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
 
         TextBasedPrinter.__init__(self, output, filename, outputLevel)                
-        self.printingOrder = [OutputStatus,ResultList,MissingTopoList]
+        self.printingOrder = [OutputStatus,ResultList,UncoveredList]
         
     def convertToElement(self,pyObj,parent,tag=""):
         """
