@@ -37,9 +37,9 @@ class InterpolationTest(unittest.TestCase):
         result=txname.txnameData.getValueFor([[ 300.*GeV,105.*GeV,100.*GeV], [ 300.*GeV,105.*GeV,100.*GeV] ])
         self.assertAlmostEquals( result.asNumber(pb),0.176266 )
         result=txname.txnameData.getValueFor([[ 300.*GeV,270.*GeV,200.*GeV], [ 300.*GeV,270.*GeV,200.*GeV] ])
-        self.assertAlmostEquals( result.asNumber(pb),87.0403 )
+        self.assertAlmostEquals( result.asNumber(pb), 87.0403 )
         result=txname.txnameData.getValueFor([[ 300.*GeV,270.*GeV,200.*GeV], [ 300.*GeV,271.*GeV,200.*GeV] ])
-        self.assertAlmostEquals( result.asNumber(pb),88.6505675 )
+        self.assertAlmostEquals( result.asNumber(pb), 88.6505675 )
     def testOutsidePlane(self):
         self.database = Database ( "./database/database.pcl" )
         expRes = self.database.getExpResults(analysisIDs=["ATLAS-SUSY-2013-05"], txnames=["T2bb" ] )
