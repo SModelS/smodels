@@ -13,7 +13,7 @@ import unittest
 from smodels.tools.physicsUnits import GeV, pb
 from smodels.installation import installDirectory
 from smodels.experiment.databaseObj import Database
-database=Database ( "./database", verbosity='error' )
+database=Database ( "./database", verbosity='warning' )
 
 class UpperLimitTest(unittest.TestCase):
 
@@ -35,7 +35,7 @@ class UpperLimitTest(unittest.TestCase):
         expRes=database.getExpResults ( analysisIDs = [ "ATLAS-SUSY-2013-05" ], 
                     datasetIDs= [ None ] , txnames= [ "T6bbWW" ] )
         ul = expRes[0].getUpperLimitFor (txname= "T6bbWW",  
-         mass=[[150*GeV,140*GeV,135*GeV],[150*GeV,140*GeV,135*GeV]] ).asNumber ( pb )
+         mass=[[150.*GeV,140.*GeV,135.*GeV],[150.*GeV,140.*GeV,135.*GeV]] ).asNumber ( pb )
         self.assertAlmostEquals ( ul, 324.682 )
 
 if __name__ == "__main__":
