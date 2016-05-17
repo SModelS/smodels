@@ -209,7 +209,7 @@ class TextBasedPrinter(object):
             output += "Total Number of Elements: " + str(len(topo.elementList)) + '\n'
             if objOutputLevel == 2:
                 for el in topo.elementList:
-                    output += "\t\t .........................................................................\n"
+                    output += "\t\t "+ 73 * "." "\n"
                     output += "\t\t Element: \n"
                     output += self._formatElement(el,1) + "\n"
 
@@ -395,10 +395,10 @@ class TextBasedPrinter(object):
                 txnameStr = str([str(tx) for tx in txnames])
                 txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")              
                 output += " Txnames:  " + txnameStr + "\n"            
-            if not theoPred == obj.theoryPredictions[-1]: output += "--------------------------------------------------------------------------------\n"
+            if not theoPred == obj.theoryPredictions[-1]: output += 80 * "-"+ "\n"
 
         output += "\n \n"
-        output += "================================================================================\n"
+        output += 80 * "=" + "\n"
         output += "The highest r value is = " + str(obj.getR(obj.theoryPredictions[0])) + "\n"
 
         return output
@@ -416,7 +416,7 @@ class TextBasedPrinter(object):
         nprint = 10  # Number of missing topologies to be printed (ordered by cross-sections)
 
         output = ""
-        output += "\n================================================================================\n"
+        output += "\n" + 80 * "=" + "\n"
         if len(obj.topos) == 0: return output + "No missing topologies found\n"
 
         for topo in obj.topos:
