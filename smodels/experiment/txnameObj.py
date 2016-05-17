@@ -99,7 +99,7 @@ class TxName(object):
 
     def __lt__ ( self, other ):
         """ sort by txName """
-        return self.txName < other.txName:
+        return self.txName < other.txName
         
     def addInfo(self,tag,value):
         """
