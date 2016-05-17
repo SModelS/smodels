@@ -101,52 +101,52 @@
     <smodels_version>1.0.90</smodels_version>
     <Missed_Topologies_List>
         <Missed_Topologies>
-            <weight_fb>5.96E+01 </weight_fb>
+            <weight_fb>59.5816892</weight_fb>
             <sqrts_TeV>8.0</sqrts_TeV>
             <element>[[[W]],[[W]]]</element>
         </Missed_Topologies>
         <Missed_Topologies>
-            <weight_fb>7.82E+00 </weight_fb>
+            <weight_fb>7.81829732986</weight_fb>
             <sqrts_TeV>8.0</sqrts_TeV>
             <element>[[[b,t],[W]],[[q],[W]]]</element>
         </Missed_Topologies>
         <Missed_Topologies>
-            <weight_fb>7.70E+00 </weight_fb>
+            <weight_fb>7.70220773132</weight_fb>
             <sqrts_TeV>8.0</sqrts_TeV>
             <element>[[[c,q],[W]],[[q],[W]]]</element>
         </Missed_Topologies>
         <Missed_Topologies>
-            <weight_fb>7.70E+00 </weight_fb>
+            <weight_fb>7.70220773132</weight_fb>
             <sqrts_TeV>8.0</sqrts_TeV>
             <element>[[[q],[W]],[[q,q],[W]]]</element>
         </Missed_Topologies>
         <Missed_Topologies>
-            <weight_fb>5.23E+00 </weight_fb>
+            <weight_fb>5.22944065631</weight_fb>
             <sqrts_TeV>8.0</sqrts_TeV>
             <element>[[[q],[W]],[[q],[higgs]]]</element>
         </Missed_Topologies>
         <Missed_Topologies>
-            <weight_fb>4.72E+00 </weight_fb>
+            <weight_fb>4.72499314641</weight_fb>
             <sqrts_TeV>8.0</sqrts_TeV>
             <element>[[[q],[W]],[[q,q],[higgs]]]</element>
         </Missed_Topologies>
         <Missed_Topologies>
-            <weight_fb>4.60E+00 </weight_fb>
+            <weight_fb>4.60277920494</weight_fb>
             <sqrts_TeV>8.0</sqrts_TeV>
             <element>[[[b,t],[W]],[[c,q],[W]]]</element>
         </Missed_Topologies>
         <Missed_Topologies>
-            <weight_fb>4.60E+00 </weight_fb>
+            <weight_fb>4.60277920494</weight_fb>
             <sqrts_TeV>8.0</sqrts_TeV>
             <element>[[[b,t],[W]],[[q,q],[W]]]</element>
         </Missed_Topologies>
         <Missed_Topologies>
-            <weight_fb>4.53E+00 </weight_fb>
+            <weight_fb>4.52980532133</weight_fb>
             <sqrts_TeV>8.0</sqrts_TeV>
             <element>[[[b,t],[W]],[[q]]]</element>
         </Missed_Topologies>
         <Missed_Topologies>
-            <weight_fb>4.46E+00 </weight_fb>
+            <weight_fb>4.46254473261</weight_fb>
             <sqrts_TeV>8.0</sqrts_TeV>
             <element>[[[c,q],[W]],[[q]]]</element>
         </Missed_Topologies>
