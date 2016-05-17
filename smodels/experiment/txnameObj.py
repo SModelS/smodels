@@ -3,7 +3,7 @@
 """
 .. module:: txnameObj
    :synopsis: Holds the classes and methods used to read and store the
-              information in the txname.txt files. 
+              information in the txname.txt files.
               Also contains the interpolation methods.
 
 .. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
@@ -20,32 +20,34 @@ from smodels.theory.element import Element
 from smodels.theory.topology import TopologyList
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.theory.auxiliaryFunctions import _memoize
-# from scipy.interpolate import griddata
 from scipy.linalg import svd
 import scipy.spatial.qhull as qhull
 import numpy as np
 import unum
 import copy
 import math
+from math import floor, log10
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
 logging.basicConfig(format=FORMAT)
 logger = logging.getLogger(__name__)
 logger.setLevel(level=logging.ERROR)
 
+round_to_n = lambda x, n: round(x, int( -np.sign(x)* int(floor(log10(abs(x)))) + (n - 1)))
+
 class TxName(object):
     """Holds the information related to one txname in the Txname.txt
     file (constraint, condition,...) as well as the _data.
     """
-    
-    
+
+
     def __init__(self, path, infoObj):
         self.path = path
         self.globalInfo = infoObj
         self.txnameData = None
         self._topologyList = TopologyList()
-        
-        logger.debug('Creating object based on txname file: %s' %self.path)        
+
+        logger.debug('Creating object based on txname file: %s' %self.path)
         #Open the info file and get the information:
         if not os.path.isfile(path):
             logger.error("Txname file %s not found" % path)
@@ -58,15 +60,15 @@ class TxName(object):
         txfile = open(self.path)
         content = concatenateLines (  txfile.readlines() )
         txfile.close()
-        
+
         #Get tags in info file:
         tags = [line.split(':', 1)[0].strip() for line in content]
         for i,tag in enumerate(tags):
             if not tag: continue
             line = content[i]
-            value = line.split(':',1)[1].strip()            
+            value = line.split(':',1)[1].strip()
             if tags.count(tag) == 1:
-                if ';' in value: value = value.split(';')                
+                if ';' in value: value = value.split(';')
                 if tag == 'upperLimits' or tag == 'efficiencyMap':
                     self.txnameData = TxNameData(value)
                     self.txnameData.dataTag = tag
@@ -76,27 +78,20 @@ class TxName(object):
                              % (tag, self.path))
                 continue
 
-                """
-        print "self.path=",self.path
-        print "self.globalInfo=",self.globalInfo
-        print "self.tnameData.dataTag=",self.txnameData.dataTag
-        print "self._V=",self.txnameData._V
-                """
-        
         #Builds up a list of elements appearing in constraints:
-        elements = []     
-        if hasattr(self,'constraint'):           
+        elements = []
+        if hasattr(self,'constraint'):
             elements += [Element(el) for el in elementsInStr(self.constraint)]
         if hasattr(self,'condition') and self.condition:
             conds = self.condition
             if not isinstance(conds,list): conds = [conds]
-            for cond in conds:                
+            for cond in conds:
                 for el in elementsInStr(cond):
                     newEl = Element(el)
                     if not newEl in elements: elements.append(newEl)
-        
+
         # Builds up TopologyList with all the elements appearing in constraints
-        # and conditions:        
+        # and conditions:
         for el in elements:
             el.sortBranches()
             self._topologyList.addElement(el)
@@ -107,46 +102,46 @@ class TxName(object):
     def __lt__ ( self, other ):
         """ sort by txName """
         return self.txName < other.txName
-        
+
     def addInfo(self,tag,value):
         """
         Adds the info field labeled by tag with value value to the object.
         :param tag: information label (string)
-        :param value: value for the field in string format 
+        :param value: value for the field in string format
         """
-        
+
         if tag == 'constraint' or tag == 'condition':
             if isinstance(value,list):
                 value = [val.replace("'","") for val in value]
-            else: value = value.replace("'","")            
-        
+            else: value = value.replace("'","")
+
         try:
             setattr(self,tag,eval(value, {'fb' : fb, 'pb' : pb, 'GeV' : GeV, 'TeV' : TeV}))
-        except SyntaxError:          
+        except SyntaxError:
             setattr(self,tag,value)
         except NameError:
             setattr(self,tag,value)
         except TypeError:
-            setattr(self,tag,value)            
-    
+            setattr(self,tag,value)
+
     def getInfo(self, infoLabel):
         """Returns the value of info field.
         :param infoLabel: label of the info field (string). It must be an attribute of
                           the TxNameInfo object
         """
-        
+
         if hasattr(self,infoLabel): return getattr(self,infoLabel)
         else: return False
-    
+
     def hasElementAs(self,element):
         """
         Verify if the conditions or constraint in Txname contains the element.
         Check both branch orderings.
-        :param element: Element object        
+        :param element: Element object
         :return: A copy of the element on the correct branch ordering appearing
                 in the Txname constraint or condition.
         """
-                
+
         for el in self._topologyList.getElements():
             if element.particlesMatch(el,branchOrder=True):
                 return element.copy()
@@ -155,7 +150,7 @@ class TxName(object):
                 if elementB.particlesMatch(el,branchOrder=True):
                     return elementB
         return False
-        
+
 
     def getEfficiencyFor(self,mass):
         """
@@ -164,15 +159,15 @@ class TxName(object):
         efficiency = 0.  For efficiency map results, checks if the mass falls
         inside the efficiency map grid.  If it does, returns the corresponding
         efficiency value, else returns efficiency = 0.
-        
+
         :param element: Element object
         :return: efficiency (float)
         """
-        
+
         #Check if the element appears in Txname:
         val = self.txnameData.getValueFor(mass)
         if type(val) == type(fb):
-            return 1.  #The element has an UL, return 1        
+            return 1.  #The element has an UL, return 1
         elif val is None or math.isnan(val):
             return 0.  #The element mass is outside the _data grid
         elif type(val) == type(1.):
@@ -180,17 +175,17 @@ class TxName(object):
         else:
             logger.error("Unknown txnameData value: %s" % (str(type(val))))
             raise SModelSError()
-            
+
 class TxNameData(object):
     """ Holds the _data for the Txname object.  It holds Upper limit values or
         efficiencies."""
-    
+
     def __init__(self,value,accept_errors_upto=.05):
         """
-        
+
         :param value: _data in string format
-        :param _accept_errors_upto: If None, do not allow extrapolations outside of 
-                convex hull.  If float value given, allow that much relative 
+        :param _accept_errors_upto: If None, do not allow extrapolations outside of
+                convex hull.  If float value given, allow that much relative
                 uncertainty on the upper limit / efficiency
                 when extrapolating outside convex hull.
                 This method can be used to loosen the equal branches assumption.
@@ -205,8 +200,8 @@ class TxNameData(object):
         return not self.__eq__ ( other )
 
     def __eq__ ( self, other ):
-        return self._data == other._data 
-        
+        return self._data == other._data
+
     def loadData(self):
         """
         Uses the information in _store_value to generate the _data grid used for
@@ -215,14 +210,14 @@ class TxNameData(object):
 
         if self._data:
             return
-        
-        if type(self._store_value)==str:            
-            self._data = eval(self._store_value, 
+
+        if type(self._store_value)==str:
+            self._data = eval(self._store_value,
                              {'fb':fb, 'pb':pb, 'GeV':GeV, 'TeV':TeV})
         else: ## the _data can also be given as lists, for debugging
             self._data = self._store_value
-        self.unit = 1.0 ## store the unit so that we can take arbitrary units for 
-                        ## the "z" values.  default is unitless, 
+        self.unit = 1.0 ## store the unit so that we can take arbitrary units for
+                        ## the "z" values.  default is unitless,
                         ## which we use for efficiency maps
         if len(self._data) < 1 or len(self._data[0]) < 2:
                 logger.error ( "input _data not in correct format. expecting sth " \
@@ -234,10 +229,10 @@ class TxNameData(object):
         if type(self._data[0][1])==unum.Unum:
             ## if its a unum, we store 1.0 * unit
             self.unit=self._data[0][1] / ( self._data[0][1].asNumber() )
-       
+
         self.computeV()
 
-    @_memoize       
+    @_memoize
     def getValueFor(self,massarray):
         """
         Interpolates the _data and returns the UL or efficiency for the
@@ -245,9 +240,9 @@ class TxNameData(object):
         :param massarray: mass array values (with units), i.e.
                           [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         """
-        
+
         self.loadData()
-        
+
         porig=self.flattenMassArray ( massarray ) ## flatten
         self.massarray = massarray
         if len(porig)!=self.full_dimensionality:
@@ -259,9 +254,9 @@ class TxNameData(object):
         P=np.dot(p,self._V)  ## rotate
         dp=self.countNonZeros ( P )
         self.projected_value = self.interpolate( [ P[:self.dimensionality] ] )
-        
+
         # self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
-        # self.projected_value = float(self.projected_value)        
+        # self.projected_value = float(self.projected_value)
         if dp != self.dimensionality: ## we have _data in different dimensions
             if self._accept_errors_upto == None:
                 return None
@@ -271,7 +266,7 @@ class TxNameData(object):
             return self._interpolateOutsideConvexHull ( massarray )
 
         return self._returnProjectedValue()
-        
+
     def flattenMassArray ( self, data ):
         """ flatten mass array and remove units """
         ret=[]
@@ -289,7 +284,7 @@ class TxNameData(object):
         bary = np.einsum('njk,nk->nj', temp[:, :d, :], delta)
         self.vtx = vertices
         self.wts = np.hstack((bary, 1 - bary.sum(axis=1, keepdims=True)))
-        v=self.xsec 
+        v=self.xsec
         if type (self.xsec[0]) == float:
             values = np.array ( [ float(x) for x in self.xsec ] )
         else:
@@ -320,10 +315,10 @@ class TxNameData(object):
         ## P[self.dimensionality:] is project point p in m dimensions
         # m=self.countNonZeros ( P ) ## dimensionality of input
         ## how far are we away from the "plane": distance alpha
-        alpha = float ( np.sqrt ( np.dot ( P[self.dimensionality:], 
+        alpha = float ( np.sqrt ( np.dot ( P[self.dimensionality:],
                         P[self.dimensionality:] ) ) )
         ## the value of the grid at the point projected to the "plane"
-        
+
         ## compute gradient
         gradient=[]
         for i in range ( self.dimensionality ):
@@ -331,7 +326,7 @@ class TxNameData(object):
             P2[i]+=alpha
             pv = self.interpolate ( [ P2[:self.dimensionality] ] )
             g=float ( ( pv - self.projected_value ) / alpha )
-            #g=float ( ( griddata( self.Mp, self.xsec, [ P2[:self.dimensionality]], 
+            #g=float ( ( griddata( self.Mp, self.xsec, [ P2[:self.dimensionality]],
             #            method="linear")[0] - self.projected_value ) / alpha )
             if math.isnan ( g ):
                 ## if we cannot compute a gradient, we return nan
@@ -355,11 +350,11 @@ class TxNameData(object):
             P4[i]-=gradient[i]
         # print "projected value", projected_value
         agp=self.interpolate ( [ P3[:self.dimensionality] ] )
-        #agp=griddata( self.Mp, self.xsec, [ P3[:self.dimensionality] ], 
+        #agp=griddata( self.Mp, self.xsec, [ P3[:self.dimensionality] ],
         #              method="linear")[0]
         #print "along gradient", ag
         agm=self.interpolate ( [ P4[:self.dimensionality] ] )
-        #agm=griddata( self.Mp, self.xsec, [ P4[:self.dimensionality] ], 
+        #agm=griddata( self.Mp, self.xsec, [ P4[:self.dimensionality] ],
         #              method="linear")[0]
         #print "along negative gradient",agm
         dep,dem=0.,0.
@@ -381,7 +376,7 @@ class TxNameData(object):
         porig=self.flattenMassArray ( massarray ) ## flatten
         p= ( (np.matrix(porig)[0] - self.delta_x ) ).tolist()[0]
         P=np.dot(p,self._V)
-        de = self._estimateExtrapolationError ( massarray ) 
+        de = self._estimateExtrapolationError ( massarray )
         if de < self._accept_errors_upto:
             return self._returnProjectedValue()
         if not math.isnan(de):
@@ -395,7 +390,7 @@ class TxNameData(object):
             logger.debug ( "projected value is None. Projected point not in " \
                     "convex hull? original point=%s" % self.massarray )
             return None
-        return self.projected_value * self.unit 
+        return self.projected_value * self.unit
 
     def countNonZeros ( self, mp ):
         """ count the nonzeros in a vector """
@@ -412,7 +407,7 @@ class TxNameData(object):
              return
         Morig=[]
         self.xsec=[]
-     
+
         for x,y in self._data:
             self.xsec.append ( y / self.unit )
             xp = self.flattenMassArray ( x )
@@ -421,15 +416,18 @@ class TxNameData(object):
         MT=aM.T.tolist()
         self.delta_x = np.matrix ( [ sum (x)/len(Morig) for x in MT ] )[0]
         M = []
+
+
         for Mx in Morig:
-            M.append ( ( np.matrix ( Mx ) - self.delta_x ).tolist()[0] )
+            m=( np.matrix ( Mx ) - self.delta_x ).tolist()[0]
+            M.append ( [ round_to_n ( x, 7 ) for x in m ] )
 
         U,s,Vt=svd(M)
         V=Vt.T
         self._V=V
         Mp=[]
 
-        ## the dimensionality of the whole mass space, disrespecting equal branches 
+        ## the dimensionality of the whole mass space, disrespecting equal branches
         ## assumption
         self.full_dimensionality = len(xp)
         self.dimensionality=0
@@ -448,17 +446,17 @@ class TxNameData(object):
 
 if __name__ == "__main__":
     import time
-    data = [ [ [[ 150.*GeV, 50.*GeV], [ 150.*GeV, 50.*GeV] ],  3.*fb ], 
-         [ [[ 200.*GeV,100.*GeV], [ 200.*GeV,100.*GeV] ],  5.*fb ], 
-         [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], 10.*fb ], 
-         [ [[ 300.*GeV,150.*GeV], [ 300.*GeV,150.*GeV] ], 13.*fb ], 
-         [ [[ 300.*GeV,200.*GeV], [ 300.*GeV,200.*GeV] ], 15.*fb ], 
-         [ [[ 300.*GeV,250.*GeV], [ 300.*GeV,250.*GeV] ], 20.*fb ], 
-         [ [[ 400.*GeV,100.*GeV], [ 400.*GeV,100.*GeV] ],  8.*fb ], 
-         [ [[ 400.*GeV,150.*GeV], [ 400.*GeV,150.*GeV] ], 10.*fb ], 
-         [ [[ 400.*GeV,200.*GeV], [ 400.*GeV,200.*GeV] ], 12.*fb ], 
-         [ [[ 400.*GeV,250.*GeV], [ 400.*GeV,250.*GeV] ], 15.*fb ], 
-         [ [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ], 17.*fb ], 
+    data = [ [ [[ 150.*GeV, 50.*GeV], [ 150.*GeV, 50.*GeV] ],  3.*fb ],
+         [ [[ 200.*GeV,100.*GeV], [ 200.*GeV,100.*GeV] ],  5.*fb ],
+         [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], 10.*fb ],
+         [ [[ 300.*GeV,150.*GeV], [ 300.*GeV,150.*GeV] ], 13.*fb ],
+         [ [[ 300.*GeV,200.*GeV], [ 300.*GeV,200.*GeV] ], 15.*fb ],
+         [ [[ 300.*GeV,250.*GeV], [ 300.*GeV,250.*GeV] ], 20.*fb ],
+         [ [[ 400.*GeV,100.*GeV], [ 400.*GeV,100.*GeV] ],  8.*fb ],
+         [ [[ 400.*GeV,150.*GeV], [ 400.*GeV,150.*GeV] ], 10.*fb ],
+         [ [[ 400.*GeV,200.*GeV], [ 400.*GeV,200.*GeV] ], 12.*fb ],
+         [ [[ 400.*GeV,250.*GeV], [ 400.*GeV,250.*GeV] ], 15.*fb ],
+         [ [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ], 17.*fb ],
          [ [[ 400.*GeV,350.*GeV], [ 400.*GeV,350.*GeV] ], 19.*fb ], ]
     txnameData=TxNameData ( data ) ## "upperlimit", _data )
     t0=time.time()
