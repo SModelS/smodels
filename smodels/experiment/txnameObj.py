@@ -96,6 +96,10 @@ class TxName(object):
 
     def __str__(self):
         return self.txName
+
+    def __lt__ ( self, other ):
+        """ sort by txName """
+        return self.txName < other.txName:
         
     def addInfo(self,tag,value):
         """
