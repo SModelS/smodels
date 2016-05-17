@@ -93,6 +93,7 @@ class Summary():
                 if 'Txnames' in lines[il+2]:
                     txnames = sorted(lines[il+2].split(':')[1].strip().split(','))
                 self.results.append(Output(l.split(),signalRegion,txnames))
+            if "Full" in l: break
             if missingLines:
                 self.missedTopos.append(MissOutput(l.split()))
 

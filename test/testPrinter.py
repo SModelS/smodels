@@ -13,17 +13,15 @@ sys.path.insert(0,"../")
 import unittest
 from smodels.installation import installDirectory
 from smodels.theory import slhaDecomposer
-from smodels.tools.physicsUnits import fb, GeV
+from smodels.tools.physicsUnits import fb, GeV, TeV
 from smodels.tools.printer import printout
 from smodels.theory.theoryPrediction import theoryPredictionsFor
-from smodels.experiment.databaseObj import Database
 from smodels.tools import printer, ioObjects
-from smodels.tools import missingTopologies
+from smodels.tools import coverage
 from smodels.tools import summaryReader
 from xml.etree import ElementTree
 import logging
-
-
+from databaseLoader import database
 
 class RunPrinterTest(unittest.TestCase):
 
@@ -37,7 +35,6 @@ class RunPrinterTest(unittest.TestCase):
         self.printerList = printer.MPrinter( self.stdoutPrinter,self.summaryPrinter,
                                              self.pythonPrinter,self.xmlPrinter)
         #Set the address of the database folder
-        self.database = Database("./database/" )
         self.slhafile = "%s/inputFiles/slha/gluino_squarks.slha" % (installDirectory() )
         self.runMain()
 
@@ -58,7 +55,7 @@ class RunPrinterTest(unittest.TestCase):
         #Add the decomposition result to the printers
         self.printerList.addObj(smstoplist)
     
-        listOfExpRes = self.database.getExpResults()
+        listOfExpRes = database.getExpResults()
         # Compute the theory predictions for each analysis
         allPredictions = []
         for expResult in listOfExpRes:
@@ -71,13 +68,13 @@ class RunPrinterTest(unittest.TestCase):
         results = ioObjects.ResultList(allPredictions,maxcond)
         self.printerList.addObj(results,objOutputLevel=2)
         
-        #Add missing topologies:
-        missingtopos = missingTopologies.MissingTopoList()
-        missingtopos.findMissingTopos(smstoplist)        
-        self.printerList.addObj(missingtopos)
+        #Add coverage information:
+        sqrts = max([xsec.info.sqrts for xsec in smstoplist.getTotalWeight()])
+        coverageInfo = coverage.Uncovered(smstoplist, False, False, sqrts)
+        self.printerList.addObj(coverageInfo.missingTopos)
         
         #Add additional information:
-        databaseVersion = self.database.databaseVersion
+        databaseVersion = database.databaseVersion
         outputStatus = ioObjects.OutputStatus([1,None], self.slhafile,
                                                {'sigmacut' : sigmacut.asNumber(fb), 
                                                 'minmassgap' : mingap.asNumber(GeV),
@@ -132,7 +129,7 @@ class RunPrinterTest(unittest.TestCase):
                     if raiseError:
                         raise AssertionError ( msg )
 
-    def textTest(self):
+    def testTextPrinter(self):
         outputfile = "%s/test/unitTestOutput/summary_print.txt" %installDirectory()
         samplefile = "%s/test/summary_default.txt" %installDirectory()
         #Test summary output
@@ -145,7 +142,7 @@ class RunPrinterTest(unittest.TestCase):
             raise AssertionError ( msg )
 
 
-    def pythonTest(self):
+    def testPythonPrinter(self):
         #Test python output
         from default_output import smodelsOutput as defaultOut
         from unitTestOutput.sms_output import smodelsOutput
@@ -157,7 +154,7 @@ class RunPrinterTest(unittest.TestCase):
         defaultOut['input file'] = defaultFile
         self.describeDifferences ( smodelsOutput, defaultOut, "./default_output.py", "./unitTestOutput/sms_output.py" )
 
-    def xmlTest(self):
+    def testXmlPrinter(self):
         defFile = "%s/test/default_output.xml" %installDirectory()
         outFile = "%s/test/unitTestOutput/sms_output.xml" %installDirectory()
         
@@ -181,11 +178,6 @@ class RunPrinterTest(unittest.TestCase):
             msg = "%s != %s" % ( defFile, outFile )
             raise AssertionError ( msg )
 
-    def testPrinters ( self ):
-        self.textTest()
-        self.pythonTest()
-        self.xmlTest()
-        
 
 if __name__ == "__main__":
     unittest.main()

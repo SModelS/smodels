@@ -12,8 +12,8 @@ sys.path.insert(0,"../")
 import unittest
 from smodels.tools.physicsUnits import GeV, pb
 from smodels.installation import installDirectory
-from smodels.experiment.databaseObj import Database
-database=Database ( "./database", verbosity='warning' )
+from databaseLoader import database
+# database=Database ( "./database", verbosity='warning' )
 
 class UpperLimitTest(unittest.TestCase):
 
