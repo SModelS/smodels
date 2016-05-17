@@ -41,7 +41,7 @@ class RunSModelSTest(unittest.TestCase):
                     (installDirectory() )
         outputfile = self.runMain(filename )
         sample = summaryReader.Summary(
-                "%s/test/summary_default.txt" %installDirectory())
+                "%s/test/gluino_squarks_default.txt" %installDirectory())
         #if not ( sample==outputfile ):
         #    print
         #    print "%s != %s" % ( os.path.basename(outputfile.filename), 
