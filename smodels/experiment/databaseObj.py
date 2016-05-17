@@ -378,7 +378,7 @@ class Database(object):
         """
         Checks the database folder and generates a list of ExpResult objects for
         each (globalInfo.txt,sms.py) pair.
-        
+       
         :returns: list of ExpResult objects 
   
         """
@@ -409,7 +409,7 @@ class Database(object):
 
 
     def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
-                      dataTypes = ['all']):
+                      dataTypes = ['all'], useSuperseded=False, useNonValidated=False):
         """
         Returns a list of ExpResult objects.
         
@@ -426,12 +426,19 @@ class Database(object):
         :param dataType: dataType of the analysis (all, efficiencyMap or upperLimit)
         :param datasetIDs: list of dataset ids ([ANA-CUT0,...])
         :param txnames: list of txnames ([TChiWZ,...])
+        :param useSuperseded: If False, the supersededBy results will not be included
+        :param useNonValidated: If False, the results with validated = False will not be included
         :returns: list of ExpResult objects or the ExpResult object if the list
                   contains only one result
                    
         """
         expResultList = []
         for expResult in self.expResultList:
+            superseded = None
+            if hasattr(expResult.globalInfo,'supersededBy'):
+                superseded = expResult.globalInfo.supersededBy.replace(" ","")
+            if superseded and (not useSuperseded):
+                continue
             ID = expResult.globalInfo.getInfo('id')
             # Skip analysis not containing any of the required ids:
             if analysisIDs != ['all']:
@@ -455,6 +462,8 @@ class Database(object):
                 newDataSet.dataInfo = dataset.dataInfo
                 newDataSet.txnameList = []
                 for txname in dataset.txnameList:
+                    if txname.validated is False and (not useNonValidated):
+                        continue
                     if txnames != ['all']:
                         if not txname.txName in txnames:
                             continue
