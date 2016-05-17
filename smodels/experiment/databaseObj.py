@@ -383,7 +383,11 @@ class Database(object):
   
         """
         resultsList = []
+        folders=[]
         for root, _, files in os.walk(self._base):
+            folders.append ( (root, files) )
+        folders.sort()
+        for root,files in folders:
             if "/.git/" in root:
                 continue
             if root[-11:] == "/validation":
