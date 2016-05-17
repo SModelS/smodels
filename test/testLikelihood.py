@@ -13,6 +13,10 @@ sys.path.append('..')
 import unittest
 from smodels.tools import likelihood as like
 import math
+import numpy
+import redirector
+
+numpy.seterr ( all="ignore" )
 
 
 
@@ -21,7 +25,7 @@ class TestLikelihood(unittest.TestCase):
     Unittest class to test likelihood functions.
     """
 
-    def test_mean_std(self):
+    def mest_mean_std(self):
         """
         Test if mean and standard deviation found
         are values that in turn would yield
@@ -53,7 +57,7 @@ class TestLikelihood(unittest.TestCase):
         self.assertTrue(exp_cl - 0.01 <= actual_cl <= exp_cl + 0.01)
 
 
-    def test_cl_from_erf(self):
+    def mest_cl_from_erf(self):
         """
         Test if _cl_from_erfs gives results as expected from
         error functions.
@@ -75,7 +79,7 @@ class TestLikelihood(unittest.TestCase):
 
 
 
-    def test_real_vs_estimated_mean(self):
+    def mest_real_vs_estimated_mean(self):
         """
         Test in reverse: from a certain expectation of
         behavior of the likelihood function to its
@@ -115,7 +119,7 @@ class TestLikelihood(unittest.TestCase):
         # check that computed mean is within twenty precent of expected mean:
         self.assertAlmostEqual(expected_mean, actual_mean, delta=0.1*expected_mean)
 
-    def test_unit_handling(self):
+    def mest_unit_handling(self):
         """
         Test the unit handling in the likelihood module.
         Compute a chi2 using upper limits and luminosity
@@ -167,7 +171,8 @@ class TestLikelihood(unittest.TestCase):
         obs =  2.42E+02 * fb # observed upper limit
         exp =  1.21E+02 * fb # expected upper limit
         lumi = 20.3 / fb # luminosity
-        chi2_actual = like.chi2(theo=theo, obs=obs, exp=exp, lumi=lumi)
+        with redirector.stderr_redirected():
+            chi2_actual = like.chi2(theo=theo, obs=obs, exp=exp, lumi=lumi)
 
         # Strip units
         theo = theo.asNumber(pb)
