@@ -209,7 +209,7 @@ class TextBasedPrinter(object):
             output += "Total Number of Elements: " + str(len(topo.elementList)) + '\n'
             if objOutputLevel == 2:
                 for el in topo.elementList:
-                    output += "\t\t "+ 73 * "." "\n"
+                    output += "\t\t "+ 73 * "." + "\n"
                     output += "\t\t Element: \n"
                     output += self._formatElement(el,1) + "\n"
 
