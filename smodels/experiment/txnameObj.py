@@ -169,6 +169,7 @@ class TxName(object):
         elif val is None or math.isnan(val):
             return 0.  #The element mass is outside the _data grid
         elif type(val) == type(1.):
+        #    print "returns",val
             return val  #The element has an eff
         else:
             logger.error("Unknown txnameData value: %s" % (str(type(val))))
@@ -194,7 +195,7 @@ class TxNameData(object):
         self._data = None
         self.loadData()
 
-    def round_to_n ( x, n ):
+    def round_to_n ( self, x, n ):
         if x==0.0:
             return x
         return round(x, int( -np.sign(x)* int(floor(log10(abs(x)))) + (n - 1)))
@@ -400,7 +401,7 @@ class TxNameData(object):
         """ count the nonzeros in a vector """
         nz=0
         for i in mp:
-            if abs(i)>10**-5:
+            if abs(i)>10**-4:
                 nz+=1
         return nz
 
@@ -421,7 +422,7 @@ class TxNameData(object):
         self.delta_x = np.matrix ( [ sum (x)/len(Morig) for x in MT ] )[0]
         M = []
 
-
+        # print "here"
         for Mx in Morig:
             m=( np.matrix ( Mx ) - self.delta_x ).tolist()[0]
             M.append ( [ self.round_to_n ( x, 7 ) for x in m ] )
@@ -441,6 +442,7 @@ class TxNameData(object):
             nz=self.countNonZeros ( mp )
             if nz>self.dimensionality:
                 self.dimensionality=nz
+        ## print "dim=",self.dimensionality
         self.MpCut=[]
         MpCut=[]
         for i in Mp:
