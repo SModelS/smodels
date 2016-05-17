@@ -35,3 +35,9 @@ debian/smodels.postinst.debhelper
 debian/smodels.prerm.debhelper
 debian/smodels.substvars
 debian/smodels/
+test/unitTestOutput/*.smodels
+test/unitTestOutput/sms_output.*
+test/unitTestOutput/summary_print.txt
+results/
+test/database/database.pcl
+
