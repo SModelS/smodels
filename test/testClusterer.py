@@ -22,8 +22,8 @@ class ClustererTest(unittest.TestCase):
         from smodels.tools.physicsUnits import GeV, pb, fb
         import copy
         
-        data = [ [ [[ 675.*GeV, 200.*GeV], [ 675.*GeV, 200.*GeV] ],  .03*fb ], 
-               [ [[ 725.*GeV,200.*GeV], [ 725.*GeV,200.*GeV] ], .06*fb ] ,
+        data = [ [ [[ 674.99*GeV, 199.999*GeV], [ 674.99*GeV, 199.999*GeV] ],  .03*fb ], 
+               [ [[ 725.0001*GeV,200.*GeV], [ 725.0001*GeV,200.*GeV] ], .06*fb ] ,
                [ [[ 750.*GeV,250.*GeV], [ 750.*GeV,250.*GeV] ], .03*fb ] ]
         txnameData=TxNameData(data)
         txname=TxName("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/T2bb.txt","info")

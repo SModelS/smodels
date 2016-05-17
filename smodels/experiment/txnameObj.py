@@ -425,11 +425,12 @@ class TxNameData(object):
         # print "here"
         for Mx in Morig:
             m=( np.matrix ( Mx ) - self.delta_x ).tolist()[0]
-            M.append ( [ self.round_to_n ( x, 7 ) for x in m ] )
+            M.append ( m )
+            # M.append ( [ self.round_to_n ( x, 7 ) for x in m ] )
 
         U,s,Vt=svd(M)
         V=Vt.T
-        self._V=V
+        self._V= V ## self.round ( V )
         Mp=[]
 
         ## the dimensionality of the whole mass space, disrespecting equal branches

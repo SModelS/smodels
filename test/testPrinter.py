@@ -21,37 +21,44 @@ from smodels.tools import printer, ioObjects
 from smodels.tools import missingTopologies
 from smodels.tools import summaryReader
 from xml.etree import ElementTree
-
-stdoutPrinter = printer.TxTPrinter(output = 'file', filename = './unitTestOutput/sms_output.txt')
-summaryPrinter = printer.SummaryPrinter(output = 'file', filename = './unitTestOutput/summary_print.txt')
-pythonPrinter = printer.PyPrinter(output = 'file', filename = './unitTestOutput/sms_output.py')
-xmlPrinter = printer.XmlPrinter(output = 'file', filename = './unitTestOutput/sms_output.xml')
-printerList = printer.MPrinter(stdoutPrinter,summaryPrinter,pythonPrinter,xmlPrinter)
-#Set the address of the database folder
-database = Database("./database/")
-slhafile = "%s/inputFiles/slha/gluino_squarks.slha" % \
-                    (installDirectory() )
+import logging
 
 
 
 class RunPrinterTest(unittest.TestCase):
+
+    def __init__ ( self, *args, **kwargs):
+        super(RunPrinterTest, self).__init__(*args, **kwargs)
+        self.logger = logging.getLogger(__name__)
+        self.stdoutPrinter = printer.TxTPrinter(output = 'file', filename = './unitTestOutput/sms_output.txt')
+        self.summaryPrinter = printer.SummaryPrinter(output = 'file', filename = './unitTestOutput/summary_print.txt')
+        self.pythonPrinter = printer.PyPrinter(output = 'file', filename = './unitTestOutput/sms_output.py')
+        self.xmlPrinter = printer.XmlPrinter(output = 'file', filename = './unitTestOutput/sms_output.xml')
+        self.printerList = printer.MPrinter( self.stdoutPrinter,self.summaryPrinter,
+                                             self.pythonPrinter,self.xmlPrinter)
+        #Set the address of the database folder
+        self.database = Database("./database/" )
+        self.slhafile = "%s/inputFiles/slha/gluino_squarks.slha" % (installDirectory() )
+        self.runMain()
+
+
     def runMain(self):
         """
         Main program. Displays basic use case.
     
         """
-    
+
         #Set main options for decomposition:
         sigmacut = 0.03 * fb
         mingap = 5. * GeV
     
         """ Decompose model (use slhaDecomposer for SLHA input or lheDecomposer for LHE input) """
-        smstoplist = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
+        smstoplist = slhaDecomposer.decompose(self.slhafile, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
     
         #Add the decomposition result to the printers
-        printerList.addObj(smstoplist)
+        self.printerList.addObj(smstoplist)
     
-        listOfExpRes = database.getExpResults()
+        listOfExpRes = self.database.getExpResults()
         # Compute the theory predictions for each analysis
         allPredictions = []
         for expResult in listOfExpRes:
@@ -62,38 +69,83 @@ class RunPrinterTest(unittest.TestCase):
         
         maxcond = 0.2
         results = ioObjects.ResultList(allPredictions,maxcond)
-        printerList.addObj(results,objOutputLevel=2)
+        self.printerList.addObj(results,objOutputLevel=2)
         
         #Add missing topologies:
         missingtopos = missingTopologies.MissingTopoList()
         missingtopos.findMissingTopos(smstoplist)        
-        printerList.addObj(missingtopos)
+        self.printerList.addObj(missingtopos)
         
         #Add additional information:
-        databaseVersion = database.databaseVersion
-        outputStatus = ioObjects.OutputStatus([1,None], slhafile,
+        databaseVersion = self.database.databaseVersion
+        outputStatus = ioObjects.OutputStatus([1,None], self.slhafile,
                                                {'sigmacut' : sigmacut.asNumber(fb), 
                                                 'minmassgap' : mingap.asNumber(GeV),
                                                 'maxcond': maxcond },
                                               databaseVersion)
         outputStatus.status = 1
-        printerList.addObj(outputStatus)
-        printerList.close()
-        self.assertEqual(True, True)
-        
-    def testPrinters(self):
-        self.runMain()
-        
+        self.printerList.addObj(outputStatus)
+        self.printerList.close()
+
+    def describeDifferences ( self, A, B, defFile, testFile ):
+        msg = "Dictionaries in %s and %s are different!" % ( defFile, testFile )
+        Akeys=A.keys()
+        Bkeys=B.keys()
+        Akeys.sort()
+        Bkeys.sort()
+        if Akeys != Bkeys:
+            self.logger.error ( "difference in keys:" )
+            self.logger.error ( Akeys )
+            self.logger.error ( Bkeys )
+            raise AssertionError ( msg )
+        for k in Akeys:
+            Alines = A[k]
+            Blines = B[k]
+            if type ( Alines ) != type([]):
+                if Alines != Blines:
+                    self.logger.error ( "k=%s:default=%s, unittest=%s" % ( k, Alines, Blines ) )
+                    raise AssertionError ( msg )
+            else:
+                if len(Alines)!=len(Blines):
+                    self.logger.error ( "k=%s: # lines: %d != %d" % ( k, len(Alines), len(Blines) )  )
+                    raise AssertionError ( msg )
+                else:
+                    raiseError=False
+                    for Aline,Bline in zip(Alines, Blines):
+                        if type(Aline)==type({}):
+                            for kk in Aline.keys():
+                                Akv = Aline[kk]
+                                Bkv = Bline[kk]
+                                if type ( Akv ) == float:
+                                    if abs ( Akv - Bkv ) > 10**-7:
+                                        self.logger.error ( "k=%s: kk=%s: %.13f != %.13f" % ( k, kk, Akv, Bkv ) )
+                                        raiseError=True
+                                else:
+                                    if Akv != Bkv:
+                                        self.logger.error ( "k=%s: kk=%s: %s != %s" % ( k, kk, Akv, Bkv ) )
+                                        raiseError=True
+                            continue
+                        if Aline!=Bline:
+                            self.logger.error ( Aline )
+                            self.logger.error ( Bline )
+                            raiseError=True
+                    if raiseError:
+                        raise AssertionError ( msg )
+
+    def textTest(self):
+        outputfile = "%s/test/unitTestOutput/summary_print.txt" %installDirectory()
+        samplefile = "%s/test/summary_default.txt" %installDirectory()
         #Test summary output
-        output = summaryReader.Summary(
-                "%s/test/unitTestOutput/summary_print.txt" %installDirectory())
-        sample = summaryReader.Summary(
-                "%s/test/summary_default.txt" %installDirectory())
+        output = summaryReader.Summary( outputfile )
+        sample = summaryReader.Summary( samplefile )
         try:
             self.assertEquals(sample, output)
         except AssertionError,e:
-            raise AssertionError ( "%s != %s" % ( sample, output ) )
-        
+            msg = "%s != %s" % ( sample, output ) 
+            raise AssertionError ( msg )
+
+
+    def pythonTest(self):
         #Test python output
         from default_output import smodelsOutput as defaultOut
         from unitTestOutput.sms_output import smodelsOutput
@@ -103,15 +155,15 @@ class RunPrinterTest(unittest.TestCase):
         defaultFile = defaultOut['input file']
         defaultFile = defaultFile[defaultFile.rfind('/'):]
         defaultOut['input file'] = defaultFile
-        try:
-            self.assertEquals(smodelsOutput,defaultOut)
-        except AssertionError,e:
-            msg = "%s != %s" % ( smodelsOutput, defaultOut )
-            raise AssertionError ( msg )
+        self.describeDifferences ( smodelsOutput, defaultOut, "./default_output.py", "./unitTestOutput/sms_output.py" )
+
+    def xmlTest(self):
+        defFile = "%s/test/default_output.xml" %installDirectory()
+        outFile = "%s/test/unitTestOutput/sms_output.xml" %installDirectory()
         
         #Test xml output
-        xmlDefault = ElementTree.parse("%s/test/default_output.xml" %installDirectory()).getroot()
-        xmlNew = ElementTree.parse("%s/test/unitTestOutput/sms_output.xml" %installDirectory()).getroot()
+        xmlDefault = ElementTree.parse( defFile ).getroot()
+        xmlNew = ElementTree.parse( outFile ).getroot()
         def compareXML(xmldefault,xmlnew):
             self.assertEqual(len(xmldefault),len(xmlnew))
             for i,el in enumerate(xmldefault):
@@ -123,7 +175,16 @@ class RunPrinterTest(unittest.TestCase):
                     self.assertEqual(el.tag,newel.tag)
                 else:                    
                     compareXML(el,newel)
-        compareXML(xmlDefault,xmlNew)
+        try:
+            compareXML(xmlDefault,xmlNew)
+        except AssertionError,e:
+            msg = "%s != %s" % ( defFile, outFile )
+            raise AssertionError ( msg )
+
+    def testPrinters ( self ):
+        self.textTest()
+        self.pythonTest()
+        self.xmlTest()
         
 
 if __name__ == "__main__":

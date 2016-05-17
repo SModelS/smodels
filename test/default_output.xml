@@ -53,12 +53,12 @@
             <DaughterMass_GeV>None</DaughterMass_GeV>
             <maxcond>0.0</maxcond>
             <AnalysisID>CMS-SUS-13-012</AnalysisID>
-            <upper_limit_fb>1.21416398627</upper_limit_fb>
-            <theory_prediction_fb>0.135698299765</theory_prediction_fb>
+            <upper_limit_fb>1.205</upper_limit_fb>
+            <theory_prediction_fb>0.137862650911</theory_prediction_fb>
             <lumi_fb-1>19.5</lumi_fb-1>
             <TxNames_List>
-                <TxNames>T2</TxNames>
                 <TxNames>T1</TxNames>
+                <TxNames>T2</TxNames>
             </TxNames_List>
             <DataSetID>3NJet6_1000HT1250_600MHTinf</DataSetID>
         </ExptRes>
@@ -93,10 +93,12 @@
             <DataSetID>None</DataSetID>
         </ExptRes>
     </ExptRes_List>
-    <smodels_version>1.0.90</smodels_version>
+    <maxcond>0.2</maxcond>
+    <minmassgap>5.0</minmassgap>
     <database_version>unittest</database_version>
-    <input_file>/home/lessa/smodels//inputFiles/slha/gluino_squarks.slha</input_file>
-    <sigmacut_fb>0.03</sigmacut_fb>
+    <input_file>/home/walten/git/smodels//inputFiles/slha/gluino_squarks.slha</input_file>
+    <sigmacut>0.03</sigmacut>
+    <smodels_version>1.0.90</smodels_version>
     <Missed_Topologies_List>
         <Missed_Topologies>
             <weight_fb>5.96E+01 </weight_fb>
@@ -149,5 +151,4 @@
             <element>[[[c,q],[W]],[[q]]]</element>
         </Missed_Topologies>
     </Missed_Topologies_List>
-    <mingap_GeV>5.0</mingap_GeV>
 </smodelsOutput>
