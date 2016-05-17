@@ -30,6 +30,10 @@ class ExpResult(object):
     """
         
     def __init__(self, path=None):
+        """
+        :param path: Path to the experimental result folder
+        """ 
+
         if path and os.path.isdir(path):
             self.path = path
             if not os.path.isfile(os.path.join(path, "globalInfo.txt")):

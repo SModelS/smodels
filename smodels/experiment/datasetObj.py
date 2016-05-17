@@ -25,7 +25,7 @@ class DataSet(object):
     """Holds the information to a data set folder (TxName objects, dataInfo,...)
     """
         
-    def __init__(self, path=None, info=None, createInfo=True ):
+    def __init__(self, path=None, info=None, createInfo=True):
         
         self.path = path
         self.globalInfo = info
