@@ -33,8 +33,6 @@ logging.basicConfig(format=FORMAT)
 logger = logging.getLogger(__name__)
 logger.setLevel(level=logging.ERROR)
 
-round_to_n = lambda x, n: round(x, int( -np.sign(x)* int(floor(log10(abs(x)))) + (n - 1)))
-
 class TxName(object):
     """Holds the information related to one txname in the Txname.txt
     file (constraint, condition,...) as well as the _data.
@@ -195,6 +193,12 @@ class TxNameData(object):
         self._V = None
         self._data = None
         self.loadData()
+
+    def round_to_n ( x, n ):
+        if x==0.0:
+            return x
+        return round(x, int( -np.sign(x)* int(floor(log10(abs(x)))) + (n - 1)))
+
 
     def __ne__ ( self, other ):
         return not self.__eq__ ( other )
@@ -420,7 +424,7 @@ class TxNameData(object):
 
         for Mx in Morig:
             m=( np.matrix ( Mx ) - self.delta_x ).tolist()[0]
-            M.append ( [ round_to_n ( x, 7 ) for x in m ] )
+            M.append ( [ self.round_to_n ( x, 7 ) for x in m ] )
 
         U,s,Vt=svd(M)
         V=Vt.T
