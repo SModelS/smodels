@@ -20,7 +20,7 @@ Decomposition output status: 1 #decomposition was successful
  Signal Region:  (UL)
  Txnames:  T5WW
 --------------------------------------------------------------------------------
-     CMS-SUS-13-012  8.00E+00    0.0  1.309E-01  1.205E+00  1.087E-01
+     CMS-SUS-13-012  8.00E+00    0.0  1.379E-01  1.205E+00  1.144E-01
  Signal Region:  3NJet6_1000HT1250_600MHTinf
  Txnames:  T1, T2
 --------------------------------------------------------------------------------
