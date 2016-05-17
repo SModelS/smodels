@@ -41,7 +41,11 @@ class ExpResult(object):
                 raise TypeError
             self.globalInfo = infoObj.Info(os.path.join(path, "globalInfo.txt"))
             self.datasets = []
+            folders=[]
             for root, _, files in os.walk(path):
+                folders.append ( (root, files) )
+            folders.sort()
+            for root, files in folders:
                 if 'dataInfo.txt' in files:  # data folder found
                     # Build data set
                     try:
