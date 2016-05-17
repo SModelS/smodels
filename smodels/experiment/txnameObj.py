@@ -75,6 +75,13 @@ class TxName(object):
                 logger.info("Ignoring unknown field %s found in file %s" \
                              % (tag, self.path))
                 continue
+
+                """
+        print "self.path=",self.path
+        print "self.globalInfo=",self.globalInfo
+        print "self.tnameData.dataTag=",self.txnameData.dataTag
+        print "self._V=",self.txnameData._V
+                """
         
         #Builds up a list of elements appearing in constraints:
         elements = []     
