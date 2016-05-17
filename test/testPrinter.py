@@ -13,12 +13,12 @@ sys.path.insert(0,"../")
 import unittest
 from smodels.installation import installDirectory
 from smodels.theory import slhaDecomposer
-from smodels.tools.physicsUnits import fb, GeV
+from smodels.tools.physicsUnits import fb, GeV, TeV
 from smodels.tools.printer import printout
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.experiment.databaseObj import Database
 from smodels.tools import printer, ioObjects
-from smodels.tools import missingTopologies
+from smodels.tools import coverage
 from smodels.tools import summaryReader
 from xml.etree import ElementTree
 
@@ -64,10 +64,10 @@ class RunPrinterTest(unittest.TestCase):
         results = ioObjects.ResultList(allPredictions,maxcond)
         printerList.addObj(results,objOutputLevel=2)
         
-        #Add missing topologies:
-        missingtopos = missingTopologies.MissingTopoList()
-        missingtopos.findMissingTopos(smstoplist)        
-        printerList.addObj(missingtopos)
+        #Add coverage information:
+        sqrts = max([xsec.info.sqrts for xsec in smstoplist.getTotalWeight()])
+        coverageInfo = coverage.Uncovered(smstoplist, False, False, sqrts)
+        printerList.addObj(coverageInfo.missingTopos)
         
         #Add additional information:
         databaseVersion = database.databaseVersion
