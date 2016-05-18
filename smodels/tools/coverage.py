@@ -18,12 +18,11 @@ class Uncovered(object):
     :ivar topoList: sms topology list
     :ivar sumL: if true, sum up electron and muon to lepton, for missing topos
     :ivar sumJet: if true, sum up jets, for missing topos
-    :ivar sqrts: set sqrts for printout of weights
     """
-    def __init__(self, topoList, sumL, sumJet, sqrts):
-        self.sqrts = sqrts
-        self.missingTopos = UncoveredList(sumL, sumJet, sqrts)
-        self.outsideGrid = UncoveredList(sumL, sumJet, sqrts) # FIXME change this to derived objects for printout
+    def __init__(self, topoList, sumL=True, sumJet=True):
+        self.sqrts = max([xsec.info.sqrts for xsec in topoList.getTotalWeight()])
+        self.missingTopos = UncoveredList(sumL, sumJet, self.sqrts)
+        self.outsideGrid = UncoveredList(sumL, sumJet, self.sqrts) # FIXME change this to derived objects for printout
         self.longCascade = UncoveredClassifier()
         self.asymmetricBranches = UncoveredClassifier()
         self.motherIDs = []
@@ -112,11 +111,11 @@ class UncoveredClassifier(object):
         self.classes = []
 
     def addToClasses(self, el):
-       motherPIDs = [abs(pid) for pid in el.getMothers()[0]]
-       motherPIDs.sort()
-       for entry in self.classes:
-           if entry.add(motherPIDs, el): return
-       self.classes.append(UncoveredClass(motherPIDs, el))
+        motherPIDs = [abs(pid) for pid in el.getMothers()[0]]
+        motherPIDs.sort()
+        for entry in self.classes:
+            if entry.add(motherPIDs, el): return
+        self.classes.append(UncoveredClass(motherPIDs, el))
 
 class UncoveredClass(object):
     def __init__(self, motherPIDs, el):
@@ -127,10 +126,11 @@ class UncoveredClass(object):
         self.contributingElements.append(el)
         return True
     def getWeight(self, sqrts):
-        xsec = 0.
+        xsec = 0.*fb
         for el in self.contributingElements:
-            if not el.weight.getXsecsFor(sqrts): continue
-            xsec += el.weight.getXsecsFor(sqrts)[0].value.asNumber(fb)
+            elxsec = el.weight.getXsecsFor(sqrts)            
+            if not elxsec: continue
+            xsec += elxsec[0].value            
         return xsec
 
   
@@ -156,8 +156,6 @@ class UncoveredList(object):
         self.sumJet = sumJet
         self.sqrts = sqrts
 
-    #def formatData(self,outputLevel): # FIXME this should not be the same for missing/outside grid topologies, what to do here - derived objects?
-    #    return self.formatUncoveredList(outputLevel)
 
     def addToTopos(self, el):
         """
@@ -204,34 +202,3 @@ class UncoveredList(object):
         li.sort()
         return str(li).replace("'", "").replace(" ", "")
     
-    
-#    def findMissingTopos(self, smstoplist, sumL=None, sumJet=None):
-#        """
-#        Loops over all the elements in smstoplist and checks if the elements
-#        are tested by any of the analysis in listOfAnalysis.
-#        
-#        :parameter smstoplist: list of topologies (TopologyLis object)
-#        :parameter sumL: if True, missing topologies will not distinguish e and mu
-#        :parameter sumJet: if True, missing topologies will not distinguish light quarks and gluons        
-#        """
-#        
-#        
-#        sqrts = max([xsec.info.sqrts for xsec in smstoplist.getTotalWeight()])
-#        self.sqrts = sqrts
-#        allMothers = []
-#        for el in smstoplist.getElements():
-#            for mEl in el.motherElements:
-#                cID = mEl[-1].elID
-#                if not cID in allMothers: allMothers.append(cID)
-#        for el in smstoplist.getElements():
-#            if el.elID in allMothers: continue
-#            if el.covered: continue
-#            motherCovered = False
-#            for mEl in el.motherElements:
-#                if mEl.covered: motherCovered = True
-#            if motherCovered: continue
-#            self.addToTopos(el, sumL, sumJet)
-#        for topo in self.topos:
-#            if not topo.weights.getXsecsFor(self.sqrts): continue
-#            topo.value = topo.weights.getXsecsFor(self.sqrts)[0].value/fb
-#        return
