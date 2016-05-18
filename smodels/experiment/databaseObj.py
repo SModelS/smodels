@@ -35,7 +35,7 @@ class Database(object):
     def __init__(self, base=None, force_load = None, verbosity='info' ):
         """
         :param force_load: force loading the text database ("txt"),
-            or serializer database ("pcl"), dont force anything if None
+            or binary database ("pcl"), dont force anything if None
         """
         self.force_load = force_load
         self.pclfilename = "database.pcl"
@@ -47,7 +47,7 @@ class Database(object):
         self.pcl_mtime = None, None
         self.pcl_db = None
         self.sw_format_version = "103" ## what format does the software support?
-        self.pcl_format_version = None ## what format is in the serializer file?
+        self.pcl_format_version = None ## what format is in the binary file?
         self.binfile = os.path.join ( self._base, self.pclfilename )
         self._setLogLevel ( self._verbosity )
         if self.force_load=="txt":
@@ -76,10 +76,10 @@ class Database(object):
         return True
 
     def loadDatabase ( self ):
-        """ if no serializer file is available, then 
-            load the database and create the serializer file.
-            if serializer file is available, then check if
-            it needs update, create new serializer file, in
+        """ if no binary file is available, then 
+            load the database and create the binary file.
+            if binary file is available, then check if
+            it needs update, create new binary file, in
             case it does need an update.
         """
         ## print "loadDatabase starts",os.path.exists ( self.binfile )
@@ -112,6 +112,8 @@ class Database(object):
             if f in [ "orig", "sms.root", "validation" ]:
                 continue
             if f[-1:]=="~":
+                continue
+            if f[0]==".":
                 continue
             if f[-3:]==".py":
                 continue
@@ -147,7 +149,7 @@ class Database(object):
         self.txt_mtime = lastm, count
 
     def loadBinaryFile ( self, lastm_only = False ):
-        """ load a serializer file, returning
+        """ load a binary database, returning
             last modified, file count, database.
         :param lastm_only: if true, the database itself is not read.
         :returns: database object, or None, if lastm_only == True.
@@ -176,13 +178,15 @@ class Database(object):
                 ##print "pcl_format_version",self.pcl_format_version
                 if not lastm_only:
                     if self.pcl_format_version != self.sw_format_version:
-                        logger.warning ( "binary file format (%s) and format supported by software (%s) disagree." % ( self.pcl_format_version, self.sw_format_version ) )
+                        logger.warning ( "binary file format (%s) and format " 
+                                         "supported by software (%s) disagree." % 
+                           ( self.pcl_format_version, self.sw_format_version ) )
                         logger.warning ( "will recreate binary." )
                         self.createBinaryFile()
                         return self
 
                     ## print self.pcl_format_version
-                    logger.info ( "loading serializer file %s format version %s" % 
+                    logger.info ( "loading binary db file %s format version %s" % 
                             ( self.binfile, self.pcl_format_version ) )
                     self.expResultList = serializer.load ( f )
                     t1=time.time()-t0
@@ -202,28 +206,32 @@ class Database(object):
 
     def checkBinaryFile ( self ):
         nu=self.needsUpdate()
-        logger.debug ( "Checking serializer file." )
+        logger.debug ( "Checking binary db file." )
         logger.debug ( "Binary file dates to %s(%d)" % \
                       ( time.ctime(self.pcl_mtime[0]),self.pcl_mtime[1] ) )
         logger.debug ( "Database dates to %s(%d)" % \
                       ( time.ctime(self.txt_mtime[0]),self.txt_mtime[1] ) )
         if nu:
-            logger.info ( "serializer file needs an update." )
+            logger.info ( "Binary db file needs an update." )
         else:
-            logger.info ( "serializer file does not need an update." )
+            logger.info ( "Binary db file does not need an update." )
         return nu
 
     def needsUpdate ( self ):
-        """ does the serializer file need an update? """
-        # logger.debug ( "needsUpdate?" )
-        self.lastModifiedAndFileCount()
-        self.loadBinaryFile ( lastm_only = True )
-        ##print "needs Update: text database",self.txt_mtime
-        ##print "needs Update: pcl database",self.pcl_mtime
-        return ( self.txt_mtime[0] > self.pcl_mtime[0] or \
-                 self.txt_mtime[1] != self.pcl_mtime[1]  or \
-                 self.sw_format_version != self.pcl_format_version
-            )
+        """ does the binary db file need an update? """
+        try:
+            # logger.debug ( "needsUpdate?" )
+            self.lastModifiedAndFileCount()
+            self.loadBinaryFile ( lastm_only = True )
+            ##print "needs Update: text database",self.txt_mtime
+            ##print "needs Update: pcl database",self.pcl_mtime
+            return ( self.txt_mtime[0] > self.pcl_mtime[0] or \
+                     self.txt_mtime[1] != self.pcl_mtime[1]  or \
+                     self.sw_format_version != self.pcl_format_version
+                )
+        except:
+            # if we encounter a problem, we rebuild the database.
+            return True
 
 
     def createBinaryFile ( self, filename=None ):
@@ -480,27 +488,27 @@ class Database(object):
         return expResultList
 
     def updateBinaryFile ( self ):
-        """ write a serializer file, but only if 
+        """ write a binar db file, but only if 
             necessary. """
         if self.needsUpdate():
-            logger.debug ( "serializer file needs an update." )
+            logger.debug ( "Binary db file needs an update." )
             self.createBinaryFile()
         else:
-            logger.debug ( "serializer file does not need an update." )
+            logger.debug ( "Binary db file does not need an update." )
 if __name__ == "__main__":
     import argparse
     """ Run as a script, this checks and/or writes database.pcl files """
     argparser = argparse.ArgumentParser(description='simple script to check \
             and/or write database.pcl files')
-    argparser.add_argument('-c', '--check', help='check serializer file',
+    argparser.add_argument('-c', '--check', help='check binary db file',
                            action='store_true')
     argparser.add_argument('-t', '--time', help='time reading db',
                            action='store_true')
-    argparser.add_argument('-r', '--read', help='read serializer file',
+    argparser.add_argument('-r', '--read', help='read binary db file',
                            action='store_true')
-    argparser.add_argument('-w', '--write', help='force writing serializer file',
+    argparser.add_argument('-w', '--write', help='force writing binary db file',
                            action='store_true')
-    argparser.add_argument('-u', '--update', help='update serializer file, if necessary',
+    argparser.add_argument('-u', '--update', help='update binary db file, if necessary',
                            action='store_true')
     argparser.add_argument('-d', '--debug', help='debug mode',
                            action='store_true')
@@ -529,7 +537,7 @@ if __name__ == "__main__":
         t0=time.time()
         expResult = db.loadBinaryFile ( lastm_only = False )
         t1=time.time()
-        print ( "Time it took reading serializer file: %.1f s." % (t1-t0) )
+        print ( "Time it took reading binary db file: %.1f s." % (t1-t0) )
         txtdb = db.loadTextDatabase()
         t2=time.time()
         print ( "Time it took reading text   file: %.1f s." % (t2-t1) )
