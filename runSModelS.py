@@ -228,8 +228,7 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
         
         if parser.getboolean("options", "testCoverage"):
             """ Look for missing topologies, add them to the output file """
-            sqrts =  max([xsec.info.sqrts for xsec in smstoplist.getTotalWeight()])
-            uncovered = coverage.Uncovered(smstoplist, sumL=True, sumJet=True, sqrts=sqrts)
+            uncovered = coverage.Uncovered(smstoplist)
             summaryPrinter.addObj(uncovered.missingTopos)
             stdoutPrinter.addObj(uncovered.missingTopos,2) 
             summaryPrinter.addObj(uncovered,2)
