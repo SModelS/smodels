@@ -125,7 +125,7 @@ class TextBasedPrinter(object):
         output = self._formatObj(obj,objOutputLevel)
         if output is False:
             return False
-        self.objList.append(obj)  
+        self.objList.append(obj)
         self.outputList.append(output)
         return True
     
@@ -503,7 +503,7 @@ class PyPrinter(TextBasedPrinter):
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
 
         TextBasedPrinter.__init__(self, output, filename, outputLevel)                
-        self.printingOrder = [OutputStatus,ResultList,UncoveredList]
+        self.printingOrder = [OutputStatus,ResultList,Uncovered]
 
     def flush(self):
         """
@@ -516,8 +516,7 @@ class PyPrinter(TextBasedPrinter):
             for iobj,obj in enumerate(self.objList):
                 if objType == type(obj):
                     objoutput = self.outputList[iobj]
-                    outputDict.update(objoutput)
-                
+                    outputDict.update(objoutput)        
         if outputDict:
             output = 'smodelsOutput = '+str(outputDict)
             if self.output == 'stdout':
@@ -652,11 +651,12 @@ class PyPrinter(TextBasedPrinter):
                 'chamix' : chamix, 'MM' : {}, 'sbotmix' : sbotmix,
                 'EXTPAR' : EXTPAR, 'mass' : mass}
 
-    def _formatUncoveredList(self, obj, objOutputLevel):
+    
+    def _formatUncovered(self, obj, objOutputLevel):
         """
-        Format data of the UncoveredList object of missing topology type.
+        Format data of the Uncovered object of missing topology type.
            
-        :param obj: A UncoveredList object to be printed.
+        :param obj: A Uncovered object to be printed.
         :param outputLevel: Defines object specific output level.    
         """
 
@@ -665,17 +665,56 @@ class PyPrinter(TextBasedPrinter):
         nprint = 10  # Number of missing topologies to be printed (ordered by cross-sections)
         
         missedTopos = []
-        for topo in sorted(obj.topos, key=lambda x: x.value, reverse=True)[:nprint]:
+        obj.missingTopos.topos = sorted(obj.missingTopos.topos, key=lambda x: x.value, 
+                                        reverse=True)
+        
+        for topo in obj.missingTopos.topos[:nprint]:
             missed = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : topo.value,
-                                'element' : str(topo.topo)}
-            
+                                'element' : str(topo.topo)}           
             if objOutputLevel==2:
                 contributing = []
                 for el in topo.contributingElements:
                     contributing.append(el.elID)
                 missed["element IDs"] = contributing
             missedTopos.append(missed)
-        return {'Missed Topologies': missedTopos}
+            
+        outsideGrid = []
+        for topo in obj.outsideGrid.topos:
+            for el in topo.contributingElements:
+                if not el.weight.getXsecsFor(obj.sqrts): continue
+                topo.value += el.weight.getXsecsFor(obj.sqrts)[0].value.asNumber(fb)
+        obj.outsideGrid.topos = sorted(obj.outsideGrid.topos, key=lambda x: x.value, 
+                                       reverse=True)        
+        for topo in obj.outsideGrid.topos[:nprint]:
+            outside = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : topo.value,
+                                'element' : str(topo.topo)}      
+            outsideGrid.append(outside)     
+        
+        longCascades = []        
+        obj.longCascade.classes = sorted(obj.longCascade.classes, key=lambda x: x.getWeight(obj.sqrts), 
+                                         reverse=True)        
+        for cascadeEntry in obj.longCascade.classes[:nprint]:
+            longc = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV),
+                     'weight (fb)' : cascadeEntry.getWeight(obj.sqrts).asNumber(fb), 
+                     'mother PIDs' : cascadeEntry.motherPIDs[0:2]}        
+            longCascades.append(longc)
+        
+        asymmetricBranches = []
+        obj.asymmetricBranches.classes = sorted(obj.asymmetricBranches.classes, key=lambda x: x.getWeight(obj.sqrts),
+                                                 reverse=True)
+        for asymmetricEntry in obj.asymmetricBranches.classes[:nprint]:
+            asymmetric = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 
+                    'weight (fb)' : asymmetricEntry.getWeight(obj.sqrts).asNumber(fb),
+                    'mother PIDs' : asymmetricEntry.motherPIDs[0:2]}         
+            asymmetricBranches.append(asymmetric)
+
+        
+        if objOutputLevel < 3:            
+            return {'Missed Topologies': missedTopos}
+        else:
+            return {'Missed Topologies': missedTopos, 'Long Cascades' : longCascades,
+                     'Asymmetric Branches': asymmetricBranches}
+    
 
 
 class XmlPrinter(PyPrinter):
@@ -685,7 +724,7 @@ class XmlPrinter(PyPrinter):
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
 
         TextBasedPrinter.__init__(self, output, filename, outputLevel)                
-        self.printingOrder = [OutputStatus,ResultList,UncoveredList]
+        self.printingOrder = [OutputStatus,ResultList,Uncovered]
         
     def convertToElement(self,pyObj,parent,tag=""):
         """
@@ -700,14 +739,14 @@ class XmlPrinter(PyPrinter):
         if not isinstance(pyObj,list) and not isinstance(pyObj,dict):
             parent.text = str(pyObj).lstrip().rstrip()
         elif isinstance(pyObj,dict):
-            for key,val in pyObj.items():
+            for key,val in sorted(pyObj.items()):
                 key = key.replace(" ","_").replace("(","").replace(")","")
                 newElement = ElementTree.Element(key)
                 self.convertToElement(val,newElement,tag=key)
                 parent.append(newElement)
         elif isinstance(pyObj,list):
             parent.tag += '_List'
-            for val in pyObj:
+            for val in sorted(pyObj):
                 newElement = ElementTree.Element(tag)
                 self.convertToElement(val,newElement,tag)
                 parent.append(newElement)        

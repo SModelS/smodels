@@ -69,9 +69,9 @@ class RunPrinterTest(unittest.TestCase):
         self.printerList.addObj(results,objOutputLevel=2)
         
         #Add coverage information:
-        sqrts = max([xsec.info.sqrts for xsec in smstoplist.getTotalWeight()])
-        coverageInfo = coverage.Uncovered(smstoplist, False, False, sqrts)
-        self.printerList.addObj(coverageInfo.missingTopos)
+        coverageInfo = coverage.Uncovered(smstoplist)
+        self.printerList.addObj(coverageInfo,3)
+        
         
         #Add additional information:
         databaseVersion = database.databaseVersion
