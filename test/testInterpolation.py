@@ -75,7 +75,7 @@ class InterpolationTest(unittest.TestCase):
              [ [[ 400.*GeV,250.*GeV], [ 400.*GeV,250.*GeV] ], 15.*fb ], 
              [ [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ], 17.*fb ], 
              [ [[ 400.*GeV,350.*GeV], [ 400.*GeV,350.*GeV] ], 19.*fb ], ]
-        txnameData=TxNameData ( data ) ## "upperlimit", data
+        txnameData=TxNameData ( data, "upperLimits" )
         result=txnameData.getValueFor([[ 300.*GeV,125.*GeV], [ 300.*GeV,125.*GeV] ])
         self.assertAlmostEquals( result.asNumber(pb),0.0115 ) 
 
@@ -92,7 +92,7 @@ class InterpolationTest(unittest.TestCase):
              [ [[ 400.*GeV,250.*GeV], [ 400.*GeV,250.*GeV] ], .15 ], 
              [ [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ], .17 ], 
              [ [[ 400.*GeV,350.*GeV], [ 400.*GeV,350.*GeV] ], .19 ], ]
-        txnameData=TxNameData ( data) ## "upperlimit", data )
+        txnameData=TxNameData ( data, "efficiencyMap" )
         result=txnameData.getValueFor([[ 300.*GeV,125.*GeV], [ 300.*GeV,125.*GeV] ])
         self.assertAlmostEquals( result,0.115 ) 
         
@@ -109,7 +109,7 @@ class InterpolationTest(unittest.TestCase):
              [ [[ 400.*GeV,250.*GeV], [ 400.*GeV,250.*GeV] ], .15 ], 
              [ [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ], .17 ], 
              [ [[ 400.*GeV,350.*GeV], [ 400.*GeV,350.*GeV] ], .19 ], ]
-        txnameData=TxNameData ( data)
+        txnameData=TxNameData ( data, "efficiencyMap" )
         result=txnameData.getValueFor([[ 300.*GeV,125.*GeV], [ 300.*GeV,123.*GeV] ])
         self.assertAlmostEquals( result,0.1144 ) 
 
@@ -126,7 +126,7 @@ class InterpolationTest(unittest.TestCase):
              [ [[ 400.*GeV,250.*GeV], [ 400.*GeV,250.*GeV] ], .15 ], 
              [ [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ], .17 ], 
              [ [[ 400.*GeV,350.*GeV], [ 400.*GeV,350.*GeV] ], .19 ], ]
-        txnameData=TxNameData ( data)
+        txnameData=TxNameData ( data, "efficiencyMap" )
         result=txnameData.getValueFor([[ 300.*GeV,125.*GeV], [ 300.*GeV,100.*GeV] ])
         self.assertEquals ( result, None )
        
