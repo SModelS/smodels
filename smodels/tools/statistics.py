@@ -8,7 +8,7 @@
 """
 
 from smodels.tools.physicsUnits import fb
-from smodels.theory.auxiliaryFunctions import _memoize
+from smodels.tools.caching import _memoize
 
 @_memoize
 def upperLimit ( Nobs, Nexp, sigmaexp, lumi, alpha=.05 ):
