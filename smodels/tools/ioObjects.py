@@ -134,7 +134,7 @@ class OutputStatus(object):
 
 
         self.outputfile = outputfile
-        self.inputfile = inputFile
+        self.inputfile = inputFile.replace("//","/")
         self.parameters = parameters
         self.filestatus = status[0]
         self.warnings = status[1]
