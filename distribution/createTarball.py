@@ -17,11 +17,17 @@ RED = "\033[31;11m"
 GREEN = "\033[32;11m"
 RESET = "\033[7;0m"
 
+dummyRun=True
+
 def comment( text ):
     print "%s[%s] %s %s" % ( RED, time.asctime(),text,RESET )
     f=open("create.log","a")
     f.write (  "[%s] %s\n" % ( time.asctime(),text ) )
     f.close()
+
+def isDummy ( ):
+    if dummyRun:
+        comment ( "DUMMY RUN!!!!" )
 
 def run ( cmd ):
     print "%scmd: %s%s" % (GREEN,cmd,RESET)
@@ -41,6 +47,7 @@ def getVersion():
 
 version = getVersion()
 dirname = "smodels-v%s" % version
+fastlimdir = "smodels-fastlim-v%s" % version
 
 def rmlog():
     """ clear the log file """
@@ -51,17 +58,18 @@ def mkdir():
     """
     Create a temporary directory for creating the tarball.
     """
-    comment ("Creating temporary directory %s" %  dirname )
-    run ("mkdir -p %s" % dirname)
+    for i in ( dirname, fastlimdir ):
+        comment ("Creating temporary directory %s" % i )
+        run ( "mkdir -p %s" % dirname )
 
 def rmdir():
     """
-    Remove the temporary directory.
+    Remove the temporary directories
     """
-    if os.path.exists(dirname):
-        comment ( "Removing temporary directory %s" % dirname )
-        run ("rm -rf %s" % dirname)
-
+    for i in ( dirname, fastlimdir ):
+        if os.path.exists(i):
+            comment ( "Removing temporary directory %s" % i )
+            run ("rm -rf %s" % i )
 
 def cp():
     """
@@ -74,10 +82,14 @@ def cp():
 
 def clone():
     """
-    Git clone smodels itself into dirname, then remove .git, .gitignore, distribution, and test.
+    Git clone smodels itself into dirname, then remove .git, .gitignore,
+    distribution, and test.
     """
     comment ( "Git-cloning smodels into %s (this might take a while)" % dirname )
-    run ("git clone git@smodels.hephy.at:smodels %s" % (dirname) )
+    cmd = "git clone git@smodels.hephy.at:smodels %s" % (dirname)
+    if isDummy:
+        cmd = "cp -a ../../smodels-v%s/* %s" % ( version, dirname )
+    run ( cmd )
     for i in os.listdir( dirname ):
         if i in [".git", ".gitignore", "distribution", "test"]:
             run ( "rm -rf %s/%s" % (dirname,i) )
@@ -102,10 +114,29 @@ def fetchDatabase():
     Execute 'git clone' to retrieve the database.
     """
     comment ( "git clone the database (this might take a while)" )
+    cmd = "cd %s; git clone -b v%s git@smodels.hephy.at:smodels-database"  % \
+            (dirname, version)
+    if isDummy:
+        cmd = "cd %s; cp -a ../../../smodels-database-v%s smodels-database" % \
+              ( dirname, version )
+    run ( cmd )
+    rmcmd = "cd smodels-database; rm -rf .git .gitignore *.tar *.pyc"
+    run ( rmcmd )
+
+def splitDatabase():
+    """
+    Split up between the official database and the optional database
+    """
+    comment ( "Now move all the non-official entries in the database." )
+    comment ( "debug cwd: %s" % os.getcwd() )
+    comment ( "debug dirname: %s" % dirname )
+    """
     cmd = "cd %s; git clone -b v%s git@smodels.hephy.at:smodels-database ;" \
         " rm -rf smodels-database/.git smodels-database/.gitignore " % \
             (dirname, version)
     run ( cmd )
+    """
+    sys.exit()
 
 def createTarball():
     """
@@ -187,6 +218,7 @@ def create():
     """
     Create a tarball for distribution.
     """
+    isDummy()
     rmlog() ## first remove the log file
     comment ( "Creating tarball for distribution, version %s" % version )
     # makeClean()
@@ -195,6 +227,7 @@ def create():
     ## cp()
     clone() ## ... clone smodels into it ...
     fetchDatabase() 
+    splitDatabase() ## split database into official and optional
     convertRecipes()
     makeDocumentation()
     rmExtraFiles() ## ... remove unneeded files ...
@@ -203,6 +236,7 @@ def create():
     test ()
     # rmdir(dirname)
     testDocumentation()
+    isDummy()
 
 
 if __name__ == "__main__":
