@@ -20,6 +20,10 @@ if v[0]==2 and v[1] < 7 and v[1] > 3:
     except ImportError,e:
         print "Error: python v",sys.version,"needs unittest2. Please install."
         sys.exit()
+from logging import ERROR
+from smodels.tools.printer import logger as pl
+pl.setLevel ( ERROR )
+
 
 def run():
     unittest.TextTestRunner().run( unittest.TestLoader().discover("./") )
