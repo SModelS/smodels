@@ -19,7 +19,7 @@ from smodels.tools.stringTools import concatenateLines
 from smodels.theory.element import Element
 from smodels.theory.topology import TopologyList
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
-from smodels.theory.auxiliaryFunctions import _memoize
+from smodels.tools.caching import _memoize
 from scipy.linalg import svd
 import scipy.spatial.qhull as qhull
 import numpy as np

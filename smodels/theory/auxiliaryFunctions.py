@@ -6,7 +6,6 @@
 
 """
 
-from functools import wraps
 from smodels.theory import crossSection
 from smodels.tools.physicsUnits import pb, GeV, fb
 import numpy as np
@@ -17,56 +16,6 @@ import copy
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 logger = logging.getLogger(__name__)
-
-
-def toString ( arg ):
-    try:
-        return "%.2f " % arg.asUnit(fb)
-    except Exception,e:
-        pass
-    try:
-        return "%.3f " % arg.asNumber(GeV)
-    except Exception,e:
-        pass
-    try:
-        return "%.2f " % arg.asUnit(1/fb)
-    except Exception,e:
-        pass
-    from smodels.experiment.txnameObj import TxNameData
-    if type(arg) == TxNameData:
-        return "%s" % arg
-    if type(arg) == float:
-        return "%.2f " % arg
-    if type(arg) == int:
-        return "%d " % arg
-    if type(arg) == str:
-        return "%s " % arg
-    if type(arg) in [ list, tuple ]:
-        argstring=""
-        for newarg in arg:
-            argstring += toString ( newarg )
-    #    print "argstring=",argstring
-        return argstring
-    return "%s " % ( str(arg) )
-            
-def _memoize(func):
-    """
-    Serves as a wrapper to cache the results of func, since this is a
-    computationally expensive function.
-    
-    """
-    cache = {}
-    @wraps(func)
-    def _wrap(*args):
-        """
-        Wrapper for the function to be memoized
-        """ 
-        argstring = toString ( args )
-        if argstring not in cache:
-            cache[argstring] = func(*args)
-        return cache[argstring]
-    return _wrap
-
 
 def massPosition(mass, txdata):
     """ Give mass position in upper limit space.    
