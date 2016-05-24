@@ -195,6 +195,16 @@ class TxNameData(object):
         self._data = None
         self.loadData()
 
+    def __str__ ( self ):
+        """ a simple string identifier, mostly for _memoize """
+        if self._data == None:
+            return "None"
+        if len ( self._data ) == 0:
+            return "[]"
+        if len ( self._data ) > 1:
+            return "[TxNameData] %s, %s ..." % ( self._data[0], self._data[1] )
+        return "[TxNameData] %s" % self._data[0]
+
     def round_to_n ( self, x, n ):
         if x==0.0:
             return x
@@ -294,11 +304,7 @@ class TxNameData(object):
             values = np.array ( [ float(x) for x in self.xsec ] )
         else:
             values = np.array ( [ x.asNumber() for x in self.xsec ] )
-        # print ("values=",(values[:]))
-        # print ("v=",(v[:]))
-        #print ("wts=",wts.shape)
         ret = np.einsum('nj,nj->n', np.take(values, self.vtx), self.wts)
-        #print ("retb=",ret[0])
         with np.errstate(invalid='ignore'):
             ret[np.any(self.wts < -1e-10, axis=1)] = fill_value
         return float(ret[0])

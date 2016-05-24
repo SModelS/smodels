@@ -32,6 +32,9 @@ def toString ( arg ):
         return "%.2f " % arg.asUnit(1/fb)
     except Exception,e:
         pass
+    from smodels.experiment.txnameObj import TxNameData
+    if type(arg) == TxNameData:
+        return "%s" % arg
     if type(arg) == float:
         return "%.2f " % arg
     if type(arg) == int:
