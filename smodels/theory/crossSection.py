@@ -81,7 +81,8 @@ class XSection(object):
     """
     def __init__(self):
         """
-        Initializes the object to store a cross-section value. All initial info is set to None.
+        Initializes the object to store a cross-section value. 
+        All initial info is set to None.
         """        
         self.info = XSectionInfo()
         self.value = None
@@ -90,9 +91,9 @@ class XSection(object):
 
     def __mul__(self, other):
         """
-        Multiplies the value of the cross-section by the factor other (should be a float or int).        
+        Multiplies the value of the cross-section by the factor other (should
+        be a float or int).        
         """
-
         
         newXsec = self.copy()
         if isinstance(other,float) or isinstance(other,int):
@@ -244,6 +245,12 @@ class XSectionList(object):
 
 
     def __getitem__(self, index):
+        if len(self)<=index:
+            txt = "Index in XSectionList out of bounds: idx(%d)>=length(%d). " \
+                   "(Are there cross sections given in the input?)" % \
+                   ( index, len(self) )
+            logger.error ( txt )
+            raise SModelSError ( txt )
         return self.xSections[index]
 
 
