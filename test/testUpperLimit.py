@@ -2,7 +2,7 @@
 
 """
 .. module:: testUpperLimit
-   :synopsis: Test smsInterpolation.upperLimit with various inputs
+   :synopsis: Test expResultObj.getUpperLimitFor with various inputs.
 
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
 
