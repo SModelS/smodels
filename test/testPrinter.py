@@ -28,14 +28,18 @@ class RunPrinterTest(unittest.TestCase):
     def __init__ ( self, *args, **kwargs):
         super(RunPrinterTest, self).__init__(*args, **kwargs)
         self.logger = logging.getLogger(__name__)
-        self.stdoutPrinter = printer.TxTPrinter(output = 'file', filename = './unitTestOutput/sms_output.txt')
-        self.summaryPrinter = printer.SummaryPrinter(output = 'file', filename = './unitTestOutput/summary_print.txt')
-        self.pythonPrinter = printer.PyPrinter(output = 'file', filename = './unitTestOutput/sms_output.py')
-        self.xmlPrinter = printer.XmlPrinter(output = 'file', filename = './unitTestOutput/sms_output.xml')
+        self.stdoutPrinter = printer.TxTPrinter(output = 'file', 
+                filename = './unitTestOutput/sms_output.txt')
+        self.summaryPrinter = printer.SummaryPrinter(output = 'file', 
+                filename = './unitTestOutput/summary_print.txt')
+        self.pythonPrinter = printer.PyPrinter(output = 'file', 
+                filename = './unitTestOutput/sms_output.py')
+        self.xmlPrinter = printer.XmlPrinter(output = 'file', 
+                filename = './unitTestOutput/sms_output.xml')
         self.printerList = printer.MPrinter( self.stdoutPrinter,self.summaryPrinter,
                                              self.pythonPrinter,self.xmlPrinter)
         #Set the address of the database folder
-        self.slhafile = "%s/inputFiles/slha/gluino_squarks.slha" % (installDirectory() )
+        self.slhafile = "%s/inputFiles/slha/gluino_squarks.slha" % installDirectory() 
         self.runMain()
 
 
