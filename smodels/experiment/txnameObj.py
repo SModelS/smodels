@@ -68,8 +68,7 @@ class TxName(object):
             if tags.count(tag) == 1:
                 if ';' in value: value = value.split(';')
                 if tag == 'upperLimits' or tag == 'efficiencyMap':
-                    self.txnameData = TxNameData(value)
-                    self.txnameData.dataTag = tag
+                    self.txnameData = TxNameData(value,tag)
                 else: self.addInfo(tag,value)
             else:
                 logger.info("Ignoring unknown field %s found in file %s" \
@@ -179,10 +178,11 @@ class TxNameData(object):
     """ Holds the _data for the Txname object.  It holds Upper limit values or
         efficiencies."""
 
-    def __init__(self,value,accept_errors_upto=.05):
+    def __init__(self,value,datatag,accept_errors_upto=.05):
         """
 
         :param value: _data in string format
+        :param datatag: the dataTag (upperLimits or efficiencyMap)
         :param _accept_errors_upto: If None, do not allow extrapolations outside of
                 convex hull.  If float value given, allow that much relative
                 uncertainty on the upper limit / efficiency
@@ -193,6 +193,7 @@ class TxNameData(object):
         self._store_value = value
         self._V = None
         self._data = None
+        self.dataTag = datatag
         self.loadData()
 
     def __str__ ( self ):
@@ -202,7 +203,7 @@ class TxNameData(object):
         if len ( self._data ) == 0:
             return "[]"
         if len ( self._data ) > 1:
-            return "[TxNameData] %s, %s ..." % ( self._data[0], self._data[1] )
+            return "[TxNameData] %s, %s ..." % ( self._data[0], self._data[-1] )
         return "[TxNameData] %s" % self._data[0]
 
     def round_to_n ( self, x, n ):
@@ -471,7 +472,7 @@ if __name__ == "__main__":
          [ [[ 400.*GeV,250.*GeV], [ 400.*GeV,250.*GeV] ], 15.*fb ],
          [ [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ], 17.*fb ],
          [ [[ 400.*GeV,350.*GeV], [ 400.*GeV,350.*GeV] ], 19.*fb ], ]
-    txnameData=TxNameData ( data ) ## "upperlimit", _data )
+    txnameData=TxNameData ( data, "upperLimits" ) ## "upperlimit", _data )
     t0=time.time()
     for masses in [ [[ 302.*GeV,123.*GeV], [ 302.*GeV,123.*GeV]],
                     [[ 254.*GeV,171.*GeV], [ 254.*GeV,170.*GeV]],
