@@ -124,8 +124,9 @@ class OutputStatus(object):
         """
 
         try:
-            with open(installation.installDirectory()+'/smodels/version', 'r') 
-                    as versionFile:
+            filename=os.path.join ( installation.installDirectory(),
+                                    '/smodels/version' )
+            with open( filename, 'r') as versionFile:
                 version = versionFile.readline()
             self.smodelsVersion = version.replace('\n','')
         except:
