@@ -21,7 +21,7 @@ from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.experiment.databaseObj import Database
 
 #Set the address of the database folder
-database = Database("../smodels-database/")
+database = Database("./smodels-database/")
 
 def main():
     """
