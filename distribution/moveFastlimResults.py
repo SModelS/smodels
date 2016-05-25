@@ -6,7 +6,7 @@
 import os
 import commands
 
-fastlimdir = "../smodels-fastlim"
+fastlimdir = "../../smodels-fastlim"
 
 def run ( cmd, dryrun=False ):
     if dryrun:
