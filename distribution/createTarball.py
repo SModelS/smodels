@@ -120,7 +120,7 @@ def fetchDatabase():
         cmd = "cd %s; cp -a ../../../smodels-database-v%s smodels-database" % \
               ( dirname, version )
     run ( cmd )
-    rmcmd = "cd %s/smodels-database; "
+    rmcmd = "cd %s/smodels-database; " \
             "rm -rf *.git *.gitignore *.py *.sh *.tar *.pyc" % \
              ( dirname )
     run ( rmcmd )
@@ -130,16 +130,16 @@ def splitDatabase():
     Split up between the official database and the optional database
     """
     comment ( "Now move all the non-official entries in the database." )
-    comment ( "debug cwd: %s" % os.getcwd() )
+    cwd=os.getcwd()
+    comment ( "debug cwd: %s" % cwd )
     comment ( "debug dirname: %s" % dirname )
+    dflag=""
+    if isDummy():
+        dflag="-d"
 
-    cmd = "cd %s/smodels-database/; " % dirname
-    """
-    cmd = "cd %s; git clone -b v%s git@smodels.hephy.at:smodels-database ;" \
-        " rm -rf smodels-database/.git smodels-database/.gitignore " % \
-            (dirname, version)
+    cmd = "cd %s/smodels-database/; %s/moveFastlimResults.py %s" % 
+          ( dirname, cwd, dflag )
     run ( cmd )
-    """
     sys.exit()
 
 def createTarball():
