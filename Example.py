@@ -18,7 +18,7 @@ from smodels.theory import lheDecomposer
 from smodels.tools.physicsUnits import fb, GeV
 from smodels.tools.printer import printout
 from smodels.theory.theoryPrediction import theoryPredictionsFor
-from smodels.experiment.databaseObjects import Database
+from smodels.experiment.databaseObjs import Database
 
 #Set the address of the database folder
 database = Database("../smodels-database/")
