@@ -77,7 +77,7 @@ def cp():
     """
     comment ( "Copying the files to %s" % dirname )
     for i in os.listdir("../"):
-        if i not in [".git", ".gitignore", "distribution", "test"]:
+        if i not in [".git", ".gitignore", "distribution", "test", "__pycache__" ]:
             run ("cp -r ../%s %s/" % (i, dirname))
 
 def clone():
@@ -121,7 +121,7 @@ def fetchDatabase():
               ( dirname, version )
     run ( cmd )
     rmcmd = "cd %s/smodels-database; " \
-            "rm -rf *.git *.gitignore *.py *.sh *.tar *.pyc" % \
+            "rm -rf .git .gitignore *.py *.sh *.tar *.pyc" % \
              ( dirname )
     run ( rmcmd )
 
@@ -134,13 +134,15 @@ def splitDatabase():
     comment ( "debug cwd: %s" % cwd )
     comment ( "debug dirname: %s" % dirname )
     dflag=""
-    if isDummy():
-        dflag="-d"
+    #if isDummy():
+    #    dflag="-d"
 
-    cmd = "cd %s/smodels-database/; %s/moveFastlimResults.py %s" % 
+    cmd = "cd %s/smodels-database/; %s/moveFastlimResults.py %s" % \
           ( dirname, cwd, dflag )
     run ( cmd )
-    sys.exit()
+
+    cmd = "cp ../smodels-fastlim/smodels-fastlim.tar.gz %s/smodels-fastlim-v%s.tar.gz" % ( cwd, version )
+    run ( cmd )
 
 def createTarball():
     """
@@ -225,7 +227,7 @@ def create():
     isDummy()
     rmlog() ## first remove the log file
     comment ( "Creating tarball for distribution, version %s" % version )
-    # makeClean()
+    makeClean()
     rmdir()
     mkdir() ## .. then create the temp dir
     ## cp()
