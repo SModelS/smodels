@@ -125,7 +125,7 @@ class OutputStatus(object):
 
         try:
             filename=os.path.join ( installation.installDirectory(),
-                                    '/smodels/version' )
+                                    'smodels/version' )
             with open( filename, 'r') as versionFile:
                 version = versionFile.readline()
             self.smodelsVersion = version.replace('\n','')
