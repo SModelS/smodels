@@ -13,11 +13,22 @@ import commands
 import os
 import time
 
+def getVersion():
+    """
+    Obtain the smodels version """
+    sys.path.insert(0,"../")
+    from smodels import installation
+    return installation.version()
+
+dummyRun=True
+version = getVersion()
+dirname = "smodels-v%s" % version
+fastlimdir = "smodels-fastlim-v%s" % version
+
 RED = "\033[31;11m"
 GREEN = "\033[32;11m"
 RESET = "\033[7;0m"
 
-dummyRun=True
 
 def comment( text ):
     print "%s[%s] %s %s" % ( RED, time.asctime(),text,RESET )
@@ -37,17 +48,6 @@ def run ( cmd ):
     print o
     f.write ( o + "\n" )
     f.close()
-
-def getVersion():
-    """
-    Obtain the smodels version """
-    sys.path.insert(0,"../")
-    from smodels import installation
-    return installation.version()
-
-version = getVersion()
-dirname = "smodels-v%s" % version
-fastlimdir = "smodels-fastlim-v%s" % version
 
 def rmlog():
     """ clear the log file """
@@ -71,15 +71,6 @@ def rmdir():
             comment ( "Removing temporary directory %s" % i )
             run ("rm -rf %s" % i )
 
-def cp():
-    """
-    Copy files to temporary directory.
-    """
-    comment ( "Copying the files to %s" % dirname )
-    for i in os.listdir("../"):
-        if i not in [".git", ".gitignore", "distribution", "test", "__pycache__" ]:
-            run ("cp -r ../%s %s/" % (i, dirname))
-
 def clone():
     """
     Git clone smodels itself into dirname, then remove .git, .gitignore,
@@ -91,7 +82,7 @@ def clone():
         cmd = "cp -a ../../smodels-v%s/* %s" % ( version, dirname )
     run ( cmd )
     for i in os.listdir( dirname ):
-        if i in [".git", ".gitignore", "distribution", "test"]:
+        if i in [".git", ".gitignore", "distribution", "test" ]:
             run ( "rm -rf %s/%s" % (dirname,i) )
 
 def rmpyc ():
@@ -99,7 +90,7 @@ def rmpyc ():
     Remove .pyc files.
     """
     comment ( "Removing all pyc files ... " )
-    run ("cd %s; rm -f *.pyc */*.pyc */*/*.pyc" % dirname)
+    run ("cd %s; rm -f *.pyc */*.pyc */*/*.pyc" % dirname )
 
 
 def makeClean ():
@@ -141,7 +132,7 @@ def splitDatabase():
           ( dirname, cwd, dflag )
     run ( cmd )
 
-    cmd = "cp ../smodels-fastlim/smodels-fastlim.tar.gz %s/smodels-fastlim-v%s.tar.gz" % ( cwd, version )
+    cmd = "mv ../../smodels-fastlim/smodels-fastlim.tar.gz %s/smodels-fastlim-v%s.tar.gz" % ( cwd, version )
     run ( cmd )
 
 def createTarball():
@@ -230,7 +221,6 @@ def create():
     makeClean()
     rmdir()
     mkdir() ## .. then create the temp dir
-    ## cp()
     clone() ## ... clone smodels into it ...
     fetchDatabase() 
     splitDatabase() ## split database into official and optional
