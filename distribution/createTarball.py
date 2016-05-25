@@ -20,7 +20,7 @@ def getVersion():
     from smodels import installation
     return installation.version()
 
-dummyRun=True
+dummyRun=False ## True
 version = getVersion()
 dirname = "smodels-v%s" % version
 fastlimdir = "smodels-fastlim-v%s" % version
@@ -39,6 +39,7 @@ def comment( text ):
 def isDummy ( ):
     if dummyRun:
         comment ( "DUMMY RUN!!!!" )
+    return dummyRun
 
 def run ( cmd ):
     print "%scmd: %s%s" % (GREEN,cmd,RESET)
@@ -78,7 +79,7 @@ def clone():
     """
     comment ( "Git-cloning smodels into %s (this might take a while)" % dirname )
     cmd = "git clone git@smodels.hephy.at:smodels %s" % (dirname)
-    if isDummy:
+    if dummyRun:
         cmd = "cp -a ../../smodels-v%s/* %s" % ( version, dirname )
     run ( cmd )
     for i in os.listdir( dirname ):
@@ -107,7 +108,7 @@ def fetchDatabase():
     comment ( "git clone the database (this might take a while)" )
     cmd = "cd %s; git clone -b v%s git@smodels.hephy.at:smodels-database"  % \
             (dirname, version)
-    if isDummy:
+    if dummyRun:
         cmd = "cd %s; cp -a ../../../smodels-database-v%s smodels-database" % \
               ( dirname, version )
     run ( cmd )
@@ -124,12 +125,8 @@ def splitDatabase():
     cwd=os.getcwd()
     comment ( "debug cwd: %s" % cwd )
     comment ( "debug dirname: %s" % dirname )
-    dflag=""
-    #if isDummy():
-    #    dflag="-d"
-
-    cmd = "cd %s/smodels-database/; %s/moveFastlimResults.py %s" % \
-          ( dirname, cwd, dflag )
+    cmd = "cd %s/smodels-database/; %s/moveFastlimResults.py" % \
+          ( dirname, cwd )
     run ( cmd )
 
     cmd = "mv ../../smodels-fastlim/smodels-fastlim.tgz %s/smodels-fastlim-v%s.tgz" % ( cwd, version )
@@ -147,7 +144,7 @@ def rmExtraFiles():
     Remove additional files.
     """
     comment ( "Remove a few unneeded files" )
-    extras = [ "inputFiles/slha/nobdecay.slha", "inputFiles/slha/lightEWinos.slha", "docs/documentation/smodels.log" ]
+    extras = [ "inputFiles/slha/nobdecay.slha", "docs/documentation/smodels.log" ]
     for i in extras:
         cmd = "rm -rf %s/%s" % ( dirname, i )
         run ( cmd )
