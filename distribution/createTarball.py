@@ -132,7 +132,7 @@ def splitDatabase():
           ( dirname, cwd, dflag )
     run ( cmd )
 
-    cmd = "mv ../../smodels-fastlim/smodels-fastlim.tar.gz %s/smodels-fastlim-v%s.tar.gz" % ( cwd, version )
+    cmd = "mv ../../smodels-fastlim/smodels-fastlim.tgz %s/smodels-fastlim-v%s.tgz" % ( cwd, version )
     run ( cmd )
 
 def createTarball():
