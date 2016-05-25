@@ -49,7 +49,7 @@ def isFastlim ( path, dryrun ):
     run ( cmd )
 
 def createFastlimTarball():
-    cmd = "cd %s; tar czvf smodels-fastlim.tar.gz ./" % fastlimdir
+    cmd = "cd %s; tar czvf smodels-fastlim.tgz ./" % fastlimdir
     run ( cmd )
 
 ## now traverse the *TeV dirs
