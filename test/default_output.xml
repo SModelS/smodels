@@ -96,9 +96,9 @@
     <maxcond>0.2</maxcond>
     <minmassgap>5.0</minmassgap>
     <database_version>unittest</database_version>
-    <input_file>/home/walten/git/smodels//inputFiles/slha/gluino_squarks.slha</input_file>
+    <input_file>/home/walten/git/smodels/inputFiles/slha/gluino_squarks.slha</input_file>
     <sigmacut>0.03</sigmacut>
-    <smodels_version>1.0.90</smodels_version>
+    <smodels_version>1.0.91</smodels_version>
     <Missed_Topologies_List>
         <Missed_Topologies>
             <weight_fb>59.5816892</weight_fb>

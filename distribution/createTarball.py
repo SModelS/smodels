@@ -120,7 +120,9 @@ def fetchDatabase():
         cmd = "cd %s; cp -a ../../../smodels-database-v%s smodels-database" % \
               ( dirname, version )
     run ( cmd )
-    rmcmd = "cd smodels-database; rm -rf .git .gitignore *.tar *.pyc"
+    rmcmd = "cd %s/smodels-database; "
+            "rm -rf *.git *.gitignore *.py *.sh *.tar *.pyc" % \
+             ( dirname )
     run ( rmcmd )
 
 def splitDatabase():
@@ -130,6 +132,8 @@ def splitDatabase():
     comment ( "Now move all the non-official entries in the database." )
     comment ( "debug cwd: %s" % os.getcwd() )
     comment ( "debug dirname: %s" % dirname )
+
+    cmd = "cd %s/smodels-database/; " % dirname
     """
     cmd = "cd %s; git clone -b v%s git@smodels.hephy.at:smodels-database ;" \
         " rm -rf smodels-database/.git smodels-database/.gitignore " % \
