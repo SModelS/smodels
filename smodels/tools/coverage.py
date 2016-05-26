@@ -156,6 +156,13 @@ class UncoveredClassifier(object):
             if entry.add(motherPIDs, el): return
         self.classes.append(UncoveredClass(motherPIDs, el))
 
+    def getSorted(self,sqrts):
+        """
+        Returns list of UncoveredClass objects in self.classes, sorted by weight
+        :ivar sqrts: sqrts for weight lookup
+        """
+        return sorted(self.classes, key=lambda x: x.getWeight(sqrts), reverse=True)
+
 class UncoveredClass(object):
     """
     Object collecting all elements contributing to the same uncovered class, defined by the mother PIDs.
