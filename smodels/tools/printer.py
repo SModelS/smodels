@@ -465,12 +465,12 @@ class TextBasedPrinter(object):
             output += "================================================================================\n"
             output += "Long cascade decay by produced mothers\n"
             output += "Mother1 Mother2 Weight (fb)\n"
-            for cascadeEntry in obj.longCascade.classes:
+            for cascadeEntry in obj.longCascade.getSorted(obj.sqrts):
                 output += "%s %s %10.3E # %s\n" %(cascadeEntry.motherPIDs[0], cascadeEntry.motherPIDs[1], cascadeEntry.getWeight(obj.sqrts), str(cascadeEntry.motherPIDs))
             output += "================================================================================\n"
             output += "Asymmetric branch decay by produced mothers\n"
             output += "Mother1 Mother2 Weight (fb)\n"
-            for asymmetricEntry in obj.asymmetricBranches.classes:
+            for asymmetricEntry in obj.asymmetricBranches.getSorted(obj.sqrts):
                 output += "%s %s %10.3E # %s\n" %(asymmetricEntry.motherPIDs[0], asymmetricEntry.motherPIDs[1], asymmetricEntry.getWeight(obj.sqrts),asymmetricEntry.motherPIDs)
             return output
 
