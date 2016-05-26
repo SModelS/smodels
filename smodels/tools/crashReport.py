@@ -88,21 +88,22 @@ class CrashReport(object):
         Create a message for an unknown error.
         
         """
-        message = ("\n\n\n"
-                   "================================================================================\n\n"
-                   "SModelS quit unexpectedly due to an unknown error. The error has been written to\n"
-                   + self.crashReportFileName + ".\n\n"
-                   "Please send this file to smodels-users@lists.oeaw.ac.at and shortly describe\n"
-                   "what you did to help making SModelS better!\n\n"
-                   "Alternatively, use the '--development' option when running runSModelS.py to\n"
-                   "prevent this message from showing up again.\n\n"
-                   "================================================================================")
+        message = ("\n\n\n" +"="*80+ "\n\n"
+          "SModelS quit unexpectedly due to an unforeseen error.\n"
+          "The error has been written to\n"
+          + self.crashReportFileName + ".\n\n"
+          "If you want to help make SModelS better, then please send this file to\n"
+          "smodels-users@lists.oeaw.ac.at and shortly describe what you did!\n\n"
+          "Alternatively, use the '--development' option when running runSModelS.py\n"
+          "to prevent this message from showing up again.\n\n"
+          + 80*"=" )
         return message
     
     
 def readCrashReportFile(crashReportFileName):
     """
-    Read a crash report file to use its input and parameter file sections for a SModelS run.
+    Read a crash report file to use its input and parameter file sections for a
+    SModelS run.
     
     :param crashReportFileName: relative location of the crash report file
     
