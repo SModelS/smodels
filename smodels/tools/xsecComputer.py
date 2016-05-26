@@ -262,7 +262,7 @@ def main(args):
     
     sqrtses = [item for sublist in args.sqrts for item in sublist]
     if len(sqrtses) == 0:
-        sqrtses = [8]
+        sqrtses = [8,13]
     sqrtses.sort()
     sqrtses = set(sqrtses)
     order = 0
