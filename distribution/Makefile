@@ -6,7 +6,7 @@ run:
 	./createTarball.py
 
 clean:
-	rm -rf smodels-v* 
+	rm -rf smodels-* 
 
 version:
 	@echo $(VERSION)
