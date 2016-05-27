@@ -4,7 +4,7 @@
       in various forms
 
 .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
-.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>    
+.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
 .. moduleauthor:: Suchita Kulkanri <suchita.kulkarni@gmail.com>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
@@ -32,26 +32,26 @@ logger = logging.getLogger(__name__)
 
 class MPrinter(object):
     """
-    Master Printer class to handle the Printers (one printer/output type)   
+    Master Printer class to handle the Printers (one printer/output type)
     """
     def __init__(self,*printerList):
-        
+
         self.Printers = printerList
-            
+
     def addObj(self,obj,objOutputLevel=None):
         """
         Adds the object to all its Printers:
         :param obj: An object which can be handled by the Printers.
         """
-        
+
         for printer in self.Printers:
             printer.addObj(obj,objOutputLevel)
-            
+
     def close(self):
         """
         Close all the Printers
         """
-        
+
         for printer in self.Printers:
             printer.close()
 
@@ -59,41 +59,41 @@ class MPrinter(object):
         """
         Ask all printers to write the output and clear their cache.
         """
-        
+
         for printer in self.Printers:
-            printer.flush()        
+            printer.flush()
 
 class TextBasedPrinter(object):
     """
     Super class to handle the printing of the text-based output
     """
-    
+
     def __init__(self, output, filename, outputLevel):
-            
+
         self.objList = []
         self.outputList = []
         self.outputLevel = outputLevel
         self.filename = filename
         self.output = output
         self.printingOrder = []
-        
-        
+
+
         if filename and os.path.isfile(filename):
             logger.warning("Removing file %s" %filename)
             os.remove(filename)
-        
+
     def close(self):
         """
         Closes the printer and print the objects added to the output defined
         """
-        
-        self.flush()        
+
+        self.flush()
 
     def flush(self):
         """
         Print the objects added to the output defined and removes them from the printer
         """
-                
+
         for objType in self.printingOrder:
             for iobj,objB in enumerate(self.objList):
                 if not self.outputList[iobj]: continue  #Skip empty output
@@ -109,7 +109,7 @@ class TextBasedPrinter(object):
                             outfile.close()
         self.objList = []
         self.outputList = []
-    
+
     def addObj(self,obj,objOutputLevel=None):
         """
         Adds object to the Printer. The object will be formatted according to the outputType
@@ -118,9 +118,9 @@ class TextBasedPrinter(object):
         :param outputLevel: Defines object specific output level. If set to None it will use
                             the printer outputLevel value.
         :return: True if the object has been added to the output. If the object does not belong
-                to printingOrder or has no output format defined, returns False.        
+                to printingOrder or has no output format defined, returns False.
         """
-        
+
         if objOutputLevel is None: objOutputLevel = self.outputLevel
         output = self._formatObj(obj,objOutputLevel)
         if output is False:
@@ -128,7 +128,7 @@ class TextBasedPrinter(object):
         self.objList.append(obj)
         self.outputList.append(output)
         return True
-    
+
 
     def _formatObj(self,obj,objOutputLevel):
         """
@@ -137,7 +137,7 @@ class TextBasedPrinter(object):
         :param obj: A object to be printed. Must match one of the types defined in formatObj
         :param outputLevel: Defines object specific output level.
         """
-        
+
         typeStr = type(obj).__name__
         try:
             formatFunction = getattr(self,'_format'+typeStr)
@@ -147,15 +147,15 @@ class TextBasedPrinter(object):
 
 
     def _formatDoc(self,obj,objOutputLevel):
-        
+
         return False
-        
+
     def _formatOutputStatus(self, obj, objOutputLevel):
         """
-        Format data for a OutputStatus object. 
-           
+        Format data for a OutputStatus object.
+
         :param obj: A OutputStatus object to be printed.
-        :param outputLevel: Defines object specific output level.   
+        :param outputLevel: Defines object specific output level.
         """
 
         outputLevel = objOutputLevel
@@ -163,25 +163,25 @@ class TextBasedPrinter(object):
 
         output = ""
         output += "Input status: " + str(obj.filestatus) + "\n"
-        output += "Decomposition output status: " + str(obj.status) + " " 
+        output += "Decomposition output status: " + str(obj.status) + " "
         output += obj.statusStrings[obj.status] + "\n"
         if obj.filestatus < 0: output += str(obj.warnings) + "\n"
         output += "# Input File: " + obj.inputfile + "\n"
         labels = obj.parameters.keys()
         labels.sort()
-        # for label, par in obj.parameters.items(): 
+        # for label, par in obj.parameters.items():
         for label in labels:
             par=obj.parameters[label]
             output += "# " + label + " = " + str(par) + '\n'
-        if obj.databaseVersion: 
+        if obj.databaseVersion:
             output += "# Database version: %s\n" % obj.databaseVersion
         output += "=" * 80 + "=\n"
         return output
 
     def _formatTopologyList(self, obj, objOutputLevel):
         """
-        Format data for a TopologyList object. 
-           
+        Format data for a TopologyList object.
+
         :param obj: A TopologyList object to be printed.
         :param outputLevel: Defines object specific output level.
         """
@@ -218,8 +218,8 @@ class TextBasedPrinter(object):
 
     def _formatElement(self, obj, objOutputLevel):
         """
-        Format data for a Element object. 
-           
+        Format data for a Element object.
+
         :param obj: A Element object to be printed.
         :param outputLevel: Defines object specific output level.
         """
@@ -237,17 +237,17 @@ class TextBasedPrinter(object):
         output += "\n"
         output += "\t\t The element PIDs are \n"
         for pidlist in obj.getPIDs():
-            output += "\t\t PIDs: "+ str(pidlist) + "\n"           
+            output += "\t\t PIDs: "+ str(pidlist) + "\n"
         output += "\t\t The element weights are: \n \t\t " + obj.weight.niceStr()
 
         return output
 
     def _formatTxName(self, obj, objOutputLevel):
         """
-        Format data for a TxName object. 
-           
+        Format data for a TxName object.
+
         :param obj: A TxName object to be printed.
-        :param outputLevel: Defines object specific output level.   
+        :param outputLevel: Defines object specific output level.
         """
 
         if not objOutputLevel: return None
@@ -257,29 +257,29 @@ class TextBasedPrinter(object):
         output += "Tx Label: "+obj.txName+'\n'
         if objOutputLevel == 2:
             output += "\t -----------------------------\n"
-            output += "\t Elements tested by analysis:\n"            
+            output += "\t Elements tested by analysis:\n"
             for el in obj._elements():
                 output += "\t    " + str(el.getParticles()) + "\n"
-                
+
         return output
 
     def _formatExpResult(self, obj, objOutputLevel):
         """
-        Format data for a ExpResult object. 
-           
+        Format data for a ExpResult object.
+
         :param obj: A ExpResult object to be printed.
-        :param outputLevel: Defines object specific output level.  
+        :param outputLevel: Defines object specific output level.
         """
 
         if not objOutputLevel: return None
-        
+
         txnames = []
         for dataset in obj.datasets:
             for txname in dataset.txnameList:
                 tx = txname.txName
-                if not tx in txnames: txnames.append(tx) 
-        
-        
+                if not tx in txnames: txnames.append(tx)
+
+
         output = ""
         output += "========================================================\n"
         output += "Experimental Result ID: " + obj.globalInfo.id + '\n'
@@ -293,7 +293,7 @@ class TextBasedPrinter(object):
                 for txname in dataset.txnameList:
                     for el in txname._topologyList.getElements():
                         if not str(el) in listOfelements: listOfelements.append(str(el))
-            for el in listOfelements:                
+            for el in listOfelements:
                 output += "\t    " + str(el) + "\n"
 
         return output
@@ -302,10 +302,10 @@ class TextBasedPrinter(object):
 
     def _formatTheoryPredictionList(self, obj, objOutputLevel):
         """
-        Format data for a TheoryPredictionList object. 
-           
+        Format data for a TheoryPredictionList object.
+
         :param obj: A TheoryPredictionList object to be printed.
-        :param outputLevel: Defines object specific output level.  
+        :param outputLevel: Defines object specific output level.
         """
 
         if not objOutputLevel: return None
@@ -313,15 +313,15 @@ class TextBasedPrinter(object):
         output = ""
         for theoryPrediction in obj:
             expRes = obj.expResult
-            info = expRes.globalInfo            
-            datasetInfo = theoryPrediction.dataset.dataInfo        
+            info = expRes.globalInfo
+            datasetInfo = theoryPrediction.dataset.dataInfo
             output += "\n"
             output += "---------------Analysis Label = " + info.id + "\n"
             output += "-------------------Dataset Label = " + str(datasetInfo.dataId) + "\n"
             output += "-------------------Txname Labels = " + str([str(txname) for txname in theoryPrediction.txnames]) + "\n"
             output += "Analysis sqrts: " + str(info.sqrts) + \
                     "\n"
-                    
+
             if theoryPrediction.mass:
                 for ibr, br in enumerate(theoryPrediction.mass):
                     output += "Masses in branch %i: " % ibr + str(br) + "\n"
@@ -338,7 +338,7 @@ class TextBasedPrinter(object):
                 for cond in theoryPrediction.conditions:
                     condlist.append(theoryPrediction.conditions[cond])
                 output += str(condlist) + "\n"
-                
+
             #Get upper limit for the respective prediction:
             if expRes.datasets[0].dataInfo.dataType == 'upperLimit':
                 experimentalLimit = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass)
@@ -352,7 +352,7 @@ class TextBasedPrinter(object):
     def _formatResultList(self, obj, objOutputLevel):
         """
         Format data of the ResultList object.
-           
+
         :param obj: A ResultList object to be printed.
         :param outputLevel: Defines object specific output level.
         """
@@ -368,24 +368,24 @@ class TextBasedPrinter(object):
             expResult = theoPred.expResult
             datasetID = theoPred.dataset.dataInfo.dataId
             dataType = expResult.datasets[0].dataInfo.dataType
-            txnames = theoPred.txnames       
+            txnames = theoPred.txnames
             if dataType == 'upperLimit':
                 ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass)
                 # Suggestion to obtain expected limits:
                 # expected = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass, expected=True)
-                signalRegion  = '(UL)'                
+                signalRegion  = '(UL)'
             elif dataType == 'efficiencyMap':
                 ul = expResult.getUpperLimitFor(dataID=datasetID)
                 # Suggestion to obtain expected limits:
                 # expected = expResult.getUpperLimitFor(dataID=datasetID, expected=True, compute=True)
-                signalRegion  = theoPred.dataset.dataInfo.dataId                
+                signalRegion  = theoPred.dataset.dataInfo.dataId
             else:
                 logger.error("Unknown dataType %s" %(str(dataType)))
                 raise SModelSError()
-            
+
             output += "%19s  " % (expResult.globalInfo.id)  # ana
             output += "%4s " % (expResult.globalInfo.sqrts/ TeV)  # sqrts
-            output += "%5s " % theoPred.getmaxCondition()  # condition violation            
+            output += "%5s " % theoPred.getmaxCondition()  # condition violation
             output += "%10.3E %10.3E " % (theoPred.value[0].value / fb, ul / fb)  # theory cross section , expt upper limit
             # Suggestion to obtain expected limits:
             # output += "%10.3E " % (expected / fb)  # expected upper limit
@@ -393,8 +393,8 @@ class TextBasedPrinter(object):
             output += " Signal Region:  "+signalRegion+"\n"
             if objOutputLevel == 2:
                 txnameStr = str([str(tx) for tx in txnames])
-                txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")              
-                output += " Txnames:  " + txnameStr + "\n"            
+                txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
+                output += " Txnames:  " + txnameStr + "\n"
             if not theoPred == obj.theoryPredictions[-1]: output += 80 * "-"+ "\n"
 
         output += "\n \n"
@@ -406,9 +406,9 @@ class TextBasedPrinter(object):
     def _formatUncoveredList(self, obj, objOutputLevel):
         """
         Format data of the UncoveredList object of missing topology type.
-           
+
         :param obj: A UncoveredList object to be printed.
-        :param outputLevel: Defines object specific output level.   
+        :param outputLevel: Defines object specific output level.
         """
 
         if not objOutputLevel: return None
@@ -435,7 +435,7 @@ class TextBasedPrinter(object):
                 for el in topo.contributingElements:
                     contributing.append(el.elID)
                 output += "Contributing elements %s\n" % str(contributing)
-                
+
         return output
 
     def _formatUncovered(self, obj, objOutputLevel):
@@ -465,12 +465,12 @@ class TextBasedPrinter(object):
             output += "================================================================================\n"
             output += "Long cascade decay by produced mothers\n"
             output += "Mother1 Mother2 Weight (fb)\n"
-            for cascadeEntry in obj.longCascade.classes:
+            for cascadeEntry in obj.longCascade.getSorted(obj.sqrts):
                 output += "%s %s %10.3E # %s\n" %(cascadeEntry.motherPIDs[0], cascadeEntry.motherPIDs[1], cascadeEntry.getWeight(obj.sqrts), str(cascadeEntry.motherPIDs))
             output += "================================================================================\n"
             output += "Asymmetric branch decay by produced mothers\n"
             output += "Mother1 Mother2 Weight (fb)\n"
-            for asymmetricEntry in obj.asymmetricBranches.classes:
+            for asymmetricEntry in obj.asymmetricBranches.getSorted(obj.sqrts):
                 output += "%s %s %10.3E # %s\n" %(asymmetricEntry.motherPIDs[0], asymmetricEntry.motherPIDs[1], asymmetricEntry.getWeight(obj.sqrts),asymmetricEntry.motherPIDs)
             return output
 
@@ -481,7 +481,7 @@ class TxTPrinter(TextBasedPrinter):
     """
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
 
-        TextBasedPrinter.__init__(self, output, filename, outputLevel)                
+        TextBasedPrinter.__init__(self, output, filename, outputLevel)
         self.printingOrder = [OutputStatus,TopologyList,Element,ExpResult,
                              TheoryPredictionList,ResultList,UncoveredList, Uncovered]
 
@@ -489,12 +489,12 @@ class SummaryPrinter(TextBasedPrinter):
     """
     Printer class to handle the printing of one single summary output
     """
-    
+
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
 
         TextBasedPrinter.__init__(self, output, filename, outputLevel)
         self.printingOrder = [OutputStatus,ResultList,UncoveredList, Uncovered]
-        
+
 
 class PyPrinter(TextBasedPrinter):
     """
@@ -502,8 +502,8 @@ class PyPrinter(TextBasedPrinter):
     """
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
 
-        TextBasedPrinter.__init__(self, output, filename, outputLevel)                
-        self.printingOrder = [OutputStatus,ResultList,Uncovered]
+        TextBasedPrinter.__init__(self, output, filename, outputLevel)
+        self.printingOrder = [OutputStatus,ResultList,UncoveredList]
 
     def flush(self):
         """
@@ -516,7 +516,7 @@ class PyPrinter(TextBasedPrinter):
             for iobj,obj in enumerate(self.objList):
                 if objType == type(obj):
                     objoutput = self.outputList[iobj]
-                    outputDict.update(objoutput)        
+                    outputDict.update(objoutput)
         if outputDict:
             output = 'smodelsOutput = '+str(outputDict)
             if self.output == 'stdout':
@@ -528,30 +528,30 @@ class PyPrinter(TextBasedPrinter):
                 with open(self.filename, "a") as outfile:
                     outfile.write(output)
                     outfile.close()
-                
+
         self.objList = []
         self.outputList = []
 
     def _formatOutputStatus(self, obj, objOutputLevel):
         """
-        Format data for a OutputStatus object. 
-           
+        Format data for a OutputStatus object.
+
         :param obj: A OutputStatus object to be printed.
-        :param outputLevel: Defines object specific output level.   
+        :param outputLevel: Defines object specific output level.
         """
-        
+
         if not objOutputLevel: return None
-        
+
         infoDict = dict(obj.parameters.items())
         infoDict['input file'] = obj.inputfile
-        infoDict['database version'] = obj.databaseVersion        
+        infoDict['database version'] = obj.databaseVersion
         infoDict['smodels version'] = obj.smodelsVersion
         return infoDict
-    
+
     def _formatResultList(self, obj, objOutputLevel):
         """
         Format data of the ResultList object.
-           
+
         :param obj: A ResultList object to be printed.
         :param outputLevel: Defines object specific output level.
         """
@@ -572,7 +572,7 @@ class PyPrinter(TextBasedPrinter):
                 ul = expResult.getUpperLimitFor(dataID=datasetID)
             else:
                 logger.error("Unknown dataType %s" %(str(dataType)))
-            value = theoryPrediction.value[0].value                     
+            value = theoryPrediction.value[0].value
             txnames = [txname.txName for txname in theoryPrediction.txnames]
             maxconds = theoryPrediction.getmaxCondition()
             mass = theoryPrediction.mass
@@ -584,18 +584,18 @@ class PyPrinter(TextBasedPrinter):
                 motherMass = None
             sqrts = dataset.globalInfo.sqrts
             ExptRes.append({'maxcond': maxconds, 'theory prediction (fb)': value.asNumber(fb),
-                        'upper limit (fb)': ul.asNumber(fb), 
+                        'upper limit (fb)': ul.asNumber(fb),
                         'TxNames': txnames,
-                        'DaughterMass (GeV)': daughterMass, 
+                        'DaughterMass (GeV)': daughterMass,
                         'MotherMass (GeV)': motherMass,
                         'AnalysisID': expID,
-                        'DataSetID' : datasetID, 
+                        'DataSetID' : datasetID,
                         'AnalysisSqrts (TeV)': sqrts.asNumber(TeV),
                         'lumi (fb-1)' : (dataset.globalInfo.lumi*fb).asNumber(),
                         'dataType' : dataType})
-            
+
         return {'ExptRes' : ExptRes}
-        
+
 
     def _formatTheoryPredictionList(self, obj, objOutputLevel):
         """
@@ -604,23 +604,23 @@ class PyPrinter(TextBasedPrinter):
         :param outputLevel: Defines object specific output level.
         :return: python dictionary
         """
-                
-        return self._formatResultList(obj,objOutputLevel)             
-        
-    
+
+        return self._formatResultList(obj,objOutputLevel)
+
+
     def _formatDoc(self, obj, objOutputLevel):
         """
         Format a pyslha object to be printed as a dictionary
-        
+
         :param obj: pyslha object
         :param outputLevel: Defines object specific output level.
         """
-        
+
         if not objOutputLevel: return None
-        
+
         MINPAR = dict(obj.blocks['MINPAR'].entries)
         EXTPAR = dict(obj.blocks['EXTPAR'].entries)
-        mass = OrderedDict(obj.blocks['MASS'].entries.items())       
+        mass = OrderedDict(obj.blocks['MASS'].entries.items())
         chimix = {}
         for key in obj.blocks['NMIX'].entries:
             val = obj.blocks['NMIX'].entries[key]
@@ -631,22 +631,22 @@ class PyPrinter(TextBasedPrinter):
         for key in obj.blocks['UMIX'].entries:
             val = obj.blocks['UMIX'].entries[key]
             newkey = 'U'+str(key[0])+str(key[1])
-            chamix[newkey] = val  
+            chamix[newkey] = val
         for key in obj.blocks['VMIX'].entries:
             val = obj.blocks['VMIX'].entries[key]
             newkey = 'V'+str(key[0])+str(key[1])
-            chamix[newkey] = val  
+            chamix[newkey] = val
         stopmix = {}
         for key in obj.blocks['STOPMIX'].entries:
             val = obj.blocks['STOPMIX'].entries[key]
             newkey = 'ST'+str(key[0])+str(key[1])
-            stopmix[newkey] = val  
-        sbotmix = {}  
+            stopmix[newkey] = val
+        sbotmix = {}
         for key in obj.blocks['SBOTMIX'].entries:
             val = obj.blocks['SBOTMIX'].entries[key]
             newkey = 'SB'+str(key[0])+str(key[1])
-            sbotmix[newkey] = val 
-        
+            sbotmix[newkey] = val
+
         return {'MINPAR' : MINPAR, 'chimix' : chimix, 'stopmix' : stopmix,
                 'chamix' : chamix, 'MM' : {}, 'sbotmix' : sbotmix,
                 'EXTPAR' : EXTPAR, 'mass' : mass}
@@ -654,16 +654,16 @@ class PyPrinter(TextBasedPrinter):
     
     def _formatUncovered(self, obj, objOutputLevel):
         """
-        Format data of the Uncovered object of missing topology type.
-           
-        :param obj: A Uncovered object to be printed.
-        :param outputLevel: Defines object specific output level.    
+        Format data of the UncoveredList object of missing topology type.
+
+        :param obj: A UncoveredList object to be printed.
+        :param outputLevel: Defines object specific output level.
         """
 
         if not objOutputLevel: return None
-        
+
         nprint = 10  # Number of missing topologies to be printed (ordered by cross-sections)
-        
+
         missedTopos = []
         obj.missingTopos.topos = sorted(obj.missingTopos.topos, key=lambda x: x.value, 
                                         reverse=True)
@@ -723,9 +723,9 @@ class XmlPrinter(PyPrinter):
     """
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
 
-        TextBasedPrinter.__init__(self, output, filename, outputLevel)                
-        self.printingOrder = [OutputStatus,ResultList,Uncovered]
-        
+        TextBasedPrinter.__init__(self, output, filename, outputLevel)
+        self.printingOrder = [OutputStatus,ResultList,UncoveredList]
+
     def convertToElement(self,pyObj,parent,tag=""):
         """
         Convert a python object (list,dict,string,...)
@@ -734,7 +734,7 @@ class XmlPrinter(PyPrinter):
         :param parent: XML Element parent
         :param tag: tag for the daughter element
         """
-    
+
         tag = tag.replace(" ","_").replace("(","").replace(")","")
         if not isinstance(pyObj,list) and not isinstance(pyObj,dict):
             parent.text = str(pyObj).lstrip().rstrip()
@@ -749,12 +749,12 @@ class XmlPrinter(PyPrinter):
             for val in sorted(pyObj):
                 newElement = ElementTree.Element(tag)
                 self.convertToElement(val,newElement,tag)
-                parent.append(newElement)        
-        
+                parent.append(newElement)
+
     def flush(self):
         """
         Get the python dictionaries generated by the object formatting
-        to the defined output and convert to XML 
+        to the defined output and convert to XML
         """
 
         outputDict = {}
@@ -763,12 +763,12 @@ class XmlPrinter(PyPrinter):
                 if objType == type(obj):
                     objoutput = self.outputList[iobj]
                     outputDict.update(objoutput)
-                
+
         if outputDict:
             root = ElementTree.Element('smodelsOutput')
-            self.convertToElement(outputDict,root)    
+            self.convertToElement(outputDict,root)
             rough_xml = ElementTree.tostring(root, 'utf-8')
-            nice_xml = minidom.parseString(rough_xml).toprettyxml(indent="    ")         
+            nice_xml = minidom.parseString(rough_xml).toprettyxml(indent="    ")
             if self.output == 'stdout':
                 sys.stdout.write(nice_xml)
             elif self.output == 'file':
@@ -778,20 +778,20 @@ class XmlPrinter(PyPrinter):
                 with open(self.filename, "a") as outfile:
                     outfile.write(nice_xml)
                     outfile.close()
-                
+
         self.objList = []
-        self.outputList = []        
+        self.outputList = []
 
 
 def printout(obj, outputLevel=1):
     """
     Simple function for printing the object to the screen
     :param obj: object to be printed
-    :param outputLevel: general control for the output depth to be printed 
+    :param outputLevel: general control for the output depth to be printed
                            (0 = no output, 1 = basic output, 2 = detailed output,...)
     """
-        
-    printer = TxTPrinter()    
+
+    printer = TxTPrinter()
     printer.outputLevel = outputLevel
     printer.output = 'stdout'
     printer.addObj(obj)

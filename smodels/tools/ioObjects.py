@@ -116,14 +116,17 @@ class OutputStatus(object):
     :ivar outputfile: path to outputfile
     
     """
-    def __init__(self, status, inputFile, parameters, databaseVersion, outputfile=None):
+    def __init__( self, status, inputFile, parameters, databaseVersion, 
+                  outputfile=None):
         """
         Initialize output. If one of the checks failed, exit.
         
         """
 
         try:
-            with open(installation.installDirectory()+'/smodels/version', 'r') as versionFile:
+            filename=os.path.join ( installation.installDirectory(),
+                                    'smodels/version' )
+            with open( filename, 'r') as versionFile:
                 version = versionFile.readline()
             self.smodelsVersion = version.replace('\n','')
         except:
@@ -131,7 +134,7 @@ class OutputStatus(object):
 
 
         self.outputfile = outputfile
-        self.inputfile = inputFile
+        self.inputfile = inputFile.replace("//","/")
         self.parameters = parameters
         self.filestatus = status[0]
         self.warnings = status[1]

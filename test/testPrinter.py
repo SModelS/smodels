@@ -11,7 +11,7 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.installation import installDirectory
+from smodels.installation import installDirectory as idir
 from smodels.theory import slhaDecomposer
 from smodels.tools.physicsUnits import fb, GeV, TeV
 from smodels.tools.printer import printout
@@ -22,20 +22,25 @@ from smodels.tools import summaryReader
 from xml.etree import ElementTree
 import logging
 from databaseLoader import database
+from os.path import join
 
 class RunPrinterTest(unittest.TestCase):
 
     def __init__ ( self, *args, **kwargs):
         super(RunPrinterTest, self).__init__(*args, **kwargs)
         self.logger = logging.getLogger(__name__)
-        self.stdoutPrinter = printer.TxTPrinter(output = 'file', filename = './unitTestOutput/sms_output.txt')
-        self.summaryPrinter = printer.SummaryPrinter(output = 'file', filename = './unitTestOutput/summary_print.txt')
-        self.pythonPrinter = printer.PyPrinter(output = 'file', filename = './unitTestOutput/sms_output.py')
-        self.xmlPrinter = printer.XmlPrinter(output = 'file', filename = './unitTestOutput/sms_output.xml')
+        self.stdoutPrinter = printer.TxTPrinter(output = 'file', 
+                filename = './unitTestOutput/sms_output.txt')
+        self.summaryPrinter = printer.SummaryPrinter(output = 'file', 
+                filename = './unitTestOutput/summary_print.txt')
+        self.pythonPrinter = printer.PyPrinter(output = 'file', 
+                filename = './unitTestOutput/sms_output.py')
+        self.xmlPrinter = printer.XmlPrinter(output = 'file', 
+                filename = './unitTestOutput/sms_output.xml')
         self.printerList = printer.MPrinter( self.stdoutPrinter,self.summaryPrinter,
                                              self.pythonPrinter,self.xmlPrinter)
         #Set the address of the database folder
-        self.slhafile = "%s/inputFiles/slha/gluino_squarks.slha" % (installDirectory() )
+        self.slhafile = join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
         self.runMain()
 
 
@@ -49,8 +54,10 @@ class RunPrinterTest(unittest.TestCase):
         sigmacut = 0.03 * fb
         mingap = 5. * GeV
     
-        """ Decompose model (use slhaDecomposer for SLHA input or lheDecomposer for LHE input) """
-        smstoplist = slhaDecomposer.decompose(self.slhafile, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
+        """ Decompose model (use slhaDecomposer for SLHA input or lheDecomposer
+            for LHE input) """
+        smstoplist = slhaDecomposer.decompose(self.slhafile, sigmacut, 
+                         doCompress=True, doInvisible=True, minmassgap=mingap )
     
         #Add the decomposition result to the printers
         self.printerList.addObj(smstoplist)
@@ -130,8 +137,8 @@ class RunPrinterTest(unittest.TestCase):
                         raise AssertionError ( msg )
 
     def testTextPrinter(self):
-        outputfile = "%s/test/unitTestOutput/summary_print.txt" %installDirectory()
-        samplefile = "%s/test/summary_default.txt" %installDirectory()
+        outputfile = join ( idir(), "test/unitTestOutput/summary_print.txt" )
+        samplefile = join ( idir(), "test/summary_default.txt" )
         #Test summary output
         output = summaryReader.Summary( outputfile )
         sample = summaryReader.Summary( samplefile )
@@ -155,8 +162,8 @@ class RunPrinterTest(unittest.TestCase):
         self.describeDifferences ( smodelsOutput, defaultOut, "./default_output.py", "./unitTestOutput/sms_output.py" )
 
     def testXmlPrinter(self):
-        defFile = "%s/test/default_output.xml" %installDirectory()
-        outFile = "%s/test/unitTestOutput/sms_output.xml" %installDirectory()
+        defFile = join ( idir(), "test/default_output.xml" )
+        outFile = join ( idir(), "test/unitTestOutput/sms_output.xml" )
         
         #Test xml output
         xmlDefault = ElementTree.parse( defFile ).getroot()
