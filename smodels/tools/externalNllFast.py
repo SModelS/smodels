@@ -135,7 +135,8 @@ class ExternalNllFast(ExternalTool):
         
         """
         if not os.path.exists(self.executablePath):
-            logger.error("Executable '%s' not found -- try compiling tool in smodels/lib!", self.executablePath)
+            logger.error("Executable '%s' not found. Maybe you didn't compile " \
+                         "the external tools in smodels/lib?", self.executablePath)
             return False
         if not os.access(self.executablePath, os.X_OK):
             logger.error("%s is not executable", self.executable)
