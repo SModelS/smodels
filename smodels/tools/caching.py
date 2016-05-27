@@ -36,6 +36,15 @@ def _toString ( arg ):
     #    print "argstring=",argstring
         return argstring
     return "%s " % ( str(arg) )
+    
+    
+_cache = {}
+
+def clearCache():
+    """
+    Clear the cache
+    """
+    _cache={}
             
 def _memoize(func):
     """
@@ -43,20 +52,13 @@ def _memoize(func):
     computationally expensive function.
     
     """
-    cache = {}
     @wraps(func)
     def _wrap(*args):
         """
         Wrapper for the function to be memoized
         """ 
         argstring = _toString ( args )
-        if argstring not in cache:
-            cache[argstring] = func(*args)
-        # print "[_wrap] len of cache is",len(cache)
-        # print "[_wrap] args=",args
-        ## print "[_wrap] argstring=",argstring
-        # import unum
-        # unum.Unum.VALUE_FORMAT = "%0.2E"
-        # print "[_wrap] ret=",cache[argstring] ## .asNumber(pb)
-        return cache[argstring]
+        if argstring not in _cache:
+            _cache[argstring] = func(*args)
+        return _cache[argstring]
     return _wrap
