@@ -78,8 +78,9 @@ class TxName(object):
                 logger.info("Ignoring unknown field %s found in file %s" \
                              % (tag, self.path))
                 continue
-        ident = self.globalInfo.id+":"+dataType[0] ## +":"+self._infoObj.dataId
+        ident = self.globalInfo.id+":"+dataType[0]+":"+ str(self._infoObj.dataId)
         ident += ":" + self.txName
+#        print "ident=",ident,"dataid=",self._infoObj.dataId
         self.txnameData = TxNameData( data, dataType, ident )
 
         #Builds up a list of elements appearing in constraints:
@@ -185,12 +186,12 @@ class TxNameData(object):
     """ Holds the _data for the Txname object.  It holds Upper limit values or
         efficiencies."""
 
-    def __init__(self,value,datatag,id,accept_errors_upto=.05):
+    def __init__(self,value,datatag,Id,accept_errors_upto=.05):
         """
 
         :param value: _data in string format
         :param datatag: the dataTag (upperLimits or efficiencyMap)
-        :param id: an identifier, must be unique for each TxNameData!
+        :param Id: an identifier, must be unique for each TxNameData!
         :param _accept_errors_upto: If None, do not allow extrapolations outside of
                 convex hull.  If float value given, allow that much relative
                 uncertainty on the upper limit / efficiency
@@ -199,22 +200,15 @@ class TxNameData(object):
         """
         self._store_value = value
         self.dataTag = datatag
-        self._id = id
+        self._id = Id
         self._accept_errors_upto=accept_errors_upto
         self._V = None
         self._data = None
         self.loadData()
 
     def __str__ ( self ):
-        """ a simple string identifier, mostly for _memoize """
-        ## return self._id
-        if self._data == None:
-            return "None"
-        if len ( self._data ) == 0:
-            return "[]"
-        if len ( self._data ) > 1:
-            return "[TxNameData] %s, %s ..." % ( self._data[0], self._data[-1] )
-        return "[TxNameData] %s" % self._data[0]
+        """ a simple unique string identifier, mostly for _memoize """
+        return self._id
 
     def round_to_n ( self, x, n ):
         if x==0.0:
