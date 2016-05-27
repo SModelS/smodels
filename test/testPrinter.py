@@ -99,8 +99,8 @@ class RunPrinterTest(unittest.TestCase):
         Bkeys.sort()
         if Akeys != Bkeys:
             self.logger.error ( "difference in keys:" )
-            self.logger.error ( Akeys )
-            self.logger.error ( Bkeys )
+            self.logger.error ( "This run: %s" % Akeys )
+            self.logger.error ( " Default: %s" % Bkeys )
             raise AssertionError ( msg )
         for k in Akeys:
             Alines = A[k]
@@ -159,7 +159,8 @@ class RunPrinterTest(unittest.TestCase):
         defaultFile = defaultOut['input file']
         defaultFile = defaultFile[defaultFile.rfind('/'):]
         defaultOut['input file'] = defaultFile
-        self.describeDifferences ( smodelsOutput, defaultOut, "./default_output.py", "./unitTestOutput/sms_output.py" )
+        self.describeDifferences ( smodelsOutput, defaultOut, 
+                "./default_output.py", "./unitTestOutput/sms_output.py" )
 
     def testXmlPrinter(self):
         defFile = join ( idir(), "test/default_output.xml" )
