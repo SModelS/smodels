@@ -43,7 +43,7 @@ class DataSet(object):
             #Get list of TxName objects:
             for txtfile in glob.iglob(os.path.join(path,"*.txt")):
                 try:                
-                    txname = txnameObj.TxName(txtfile,self.globalInfo)
+                    txname = txnameObj.TxName(txtfile,self.globalInfo,self.dataInfo)
                     self.txnameList.append(txname)
                 except TypeError: continue
 

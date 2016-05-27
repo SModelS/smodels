@@ -39,9 +39,9 @@ class TxName(object):
     """
 
 
-    def __init__(self, path, infoObj):
+    def __init__(self, path, globalObj, infoObj):
         self.path = path
-        self.globalInfo = infoObj
+        self.globalInfo = globalObj
         self.txnameData = None
         self._topologyList = TopologyList()
 
