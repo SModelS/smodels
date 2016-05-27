@@ -1,6 +1,6 @@
 Input status: 1
 Decomposition output status: 1 #decomposition was successful
-# Input File: /home/walten/git/smodels//inputFiles/slha/gluino_squarks.slha
+# Input File: /home/walten/git/smodels/inputFiles/slha/gluino_squarks.slha
 # maxcond = 0.2
 # minmassgap = 5.0
 # sigmacut = 0.03

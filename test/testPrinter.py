@@ -91,6 +91,18 @@ class RunPrinterTest(unittest.TestCase):
         self.printerList.addObj(outputStatus)
         self.printerList.close()
 
+    def describeDifferentValue ( self ):
+        if type ( Akv ) == float:
+            if abs ( Akv - Bkv ) > 10**-7:
+                self.logger.error ( 
+                        "k=%s: kk=%s: %.13f != %.13f" % ( k, kk, Akv, Bkv ) )
+                raiseError=True
+        else:
+            if Akv != Bkv:
+                self.logger.error ( 
+                        "k=%s: kk=%s: %s != %s" % ( k, kk, Akv, Bkv ) )
+                raiseError=True
+
     def describeDifferences ( self, A, B, defFile, testFile ):
         msg = "Dictionaries in %s and %s are different!" % ( defFile, testFile )
         Akeys=A.keys()
@@ -107,11 +119,13 @@ class RunPrinterTest(unittest.TestCase):
             Blines = B[k]
             if type ( Alines ) != type([]):
                 if Alines != Blines:
-                    self.logger.error ( "k=%s:default=%s, unittest=%s" % ( k, Alines, Blines ) )
+                    self.logger.error ( "k=%s:default=%s, unittest=%s" % 
+                                        ( k, Alines, Blines ) )
                     raise AssertionError ( msg )
             else:
                 if len(Alines)!=len(Blines):
-                    self.logger.error ( "k=%s: # lines: %d != %d" % ( k, len(Alines), len(Blines) )  )
+                    self.logger.error ( "k=%s: # lines: %d != %d" % 
+                                        ( k, len(Alines), len(Blines) )  )
                     raise AssertionError ( msg )
                 else:
                     raiseError=False
@@ -120,14 +134,7 @@ class RunPrinterTest(unittest.TestCase):
                             for kk in Aline.keys():
                                 Akv = Aline[kk]
                                 Bkv = Bline[kk]
-                                if type ( Akv ) == float:
-                                    if abs ( Akv - Bkv ) > 10**-7:
-                                        self.logger.error ( "k=%s: kk=%s: %.13f != %.13f" % ( k, kk, Akv, Bkv ) )
-                                        raiseError=True
-                                else:
-                                    if Akv != Bkv:
-                                        self.logger.error ( "k=%s: kk=%s: %s != %s" % ( k, kk, Akv, Bkv ) )
-                                        raiseError=True
+                                self.describeDifferentValue ( Akv, Bkv )
                             continue
                         if Aline!=Bline:
                             self.logger.error ( Aline )
