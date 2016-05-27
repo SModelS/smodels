@@ -42,6 +42,7 @@ class TxName(object):
     def __init__(self, path, globalObj, infoObj):
         self.path = path
         self.globalInfo = globalObj
+        # self.infoObj = infoObj
         self.txnameData = None
         self._topologyList = TopologyList()
 
@@ -61,6 +62,8 @@ class TxName(object):
 
         #Get tags in info file:
         tags = [line.split(':', 1)[0].strip() for line in content]
+        data = None
+        dataType = None
         for i,tag in enumerate(tags):
             if not tag: continue
             line = content[i]
@@ -68,12 +71,16 @@ class TxName(object):
             if tags.count(tag) == 1:
                 if ';' in value: value = value.split(';')
                 if tag == 'upperLimits' or tag == 'efficiencyMap':
-                    self.txnameData = TxNameData(value,tag)
+                    data = value
+                    dataType = tag
                 else: self.addInfo(tag,value)
             else:
                 logger.info("Ignoring unknown field %s found in file %s" \
                              % (tag, self.path))
                 continue
+        ident = self.globalInfo.id+":"+dataType[0] ## +":"+self.infoObj.dataId
+        ident += ":" + self.txName
+        self.txnameData = TxNameData( data, dataType, ident )
 
         #Builds up a list of elements appearing in constraints:
         elements = []
@@ -178,26 +185,29 @@ class TxNameData(object):
     """ Holds the _data for the Txname object.  It holds Upper limit values or
         efficiencies."""
 
-    def __init__(self,value,datatag,accept_errors_upto=.05):
+    def __init__(self,value,datatag,id,accept_errors_upto=.05):
         """
 
         :param value: _data in string format
         :param datatag: the dataTag (upperLimits or efficiencyMap)
+        :param id: an identifier, must be unique for each TxNameData!
         :param _accept_errors_upto: If None, do not allow extrapolations outside of
                 convex hull.  If float value given, allow that much relative
                 uncertainty on the upper limit / efficiency
                 when extrapolating outside convex hull.
                 This method can be used to loosen the equal branches assumption.
         """
-        self._accept_errors_upto=accept_errors_upto
         self._store_value = value
+        self.dataTag = datatag
+        self._id = id
+        self._accept_errors_upto=accept_errors_upto
         self._V = None
         self._data = None
-        self.dataTag = datatag
         self.loadData()
 
     def __str__ ( self ):
         """ a simple string identifier, mostly for _memoize """
+        ## return self._id
         if self._data == None:
             return "None"
         if len ( self._data ) == 0:
@@ -472,7 +482,7 @@ if __name__ == "__main__":
          [ [[ 400.*GeV,250.*GeV], [ 400.*GeV,250.*GeV] ], 15.*fb ],
          [ [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ], 17.*fb ],
          [ [[ 400.*GeV,350.*GeV], [ 400.*GeV,350.*GeV] ], 19.*fb ], ]
-    txnameData=TxNameData ( data, "upperLimits" ) ## "upperlimit", _data )
+    txnameData=TxNameData ( data, "upperLimits",  sys._getframe().f_code.co_name )
     t0=time.time()
     for masses in [ [[ 302.*GeV,123.*GeV], [ 302.*GeV,123.*GeV]],
                     [[ 254.*GeV,171.*GeV], [ 254.*GeV,170.*GeV]],
