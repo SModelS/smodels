@@ -160,7 +160,7 @@ class UncoveredClassifier(object):
         Returns list of UncoveredClass objects in self.classes, sorted by weight
         :ivar sqrts: sqrts for weight lookup
         """
-        return sorted(self.classes, key=lambda x: x.getWeight(sqrts), reverse=True)
+        return sorted(self.classes, key=lambda x: x.getWeight(sqrts).asNumber(fb), reverse=True)
 
 class UncoveredClass(object):
     """
@@ -185,7 +185,7 @@ class UncoveredClass(object):
         Calculate weight at sqrts
         :ivar sqrts: sqrts
         """
-        xsec = 0.
+        xsec = 0.*fb
         for el in self.contributingElements:
             elxsec = el.weight.getXsecsFor(sqrts)            
             if not elxsec: continue
