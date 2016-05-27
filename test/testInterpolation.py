@@ -11,13 +11,11 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.experiment.databaseObj import Database
+import math
 from smodels.experiment.txnameObj import TxNameData
 from smodels.tools.physicsUnits import GeV, TeV, pb, fb
-import math
-
 from databaseLoader import database
-# database = Database ( "./database/database.pcl" )
+
 
 class InterpolationTest(unittest.TestCase):
     def testInterpolation(self):
