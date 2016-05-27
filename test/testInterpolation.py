@@ -75,7 +75,8 @@ class InterpolationTest(unittest.TestCase):
              [ [[ 400.*GeV,250.*GeV], [ 400.*GeV,250.*GeV] ], 15.*fb ], 
              [ [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ], 17.*fb ], 
              [ [[ 400.*GeV,350.*GeV], [ 400.*GeV,350.*GeV] ], 19.*fb ], ]
-        txnameData=TxNameData ( data, "upperLimits" )
+        txnameData=TxNameData ( data, "upperLimits",
+                sys._getframe().f_code.co_name )
         result=txnameData.getValueFor([[ 300.*GeV,125.*GeV], [ 300.*GeV,125.*GeV] ])
         self.assertAlmostEquals( result.asNumber(pb),0.0115 ) 
 
@@ -92,7 +93,8 @@ class InterpolationTest(unittest.TestCase):
              [ [[ 400.*GeV,250.*GeV], [ 400.*GeV,250.*GeV] ], .15 ], 
              [ [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ], .17 ], 
              [ [[ 400.*GeV,350.*GeV], [ 400.*GeV,350.*GeV] ], .19 ], ]
-        txnameData=TxNameData ( data, "efficiencyMap" )
+        txnameData=TxNameData ( data, "efficiencyMap" ,
+                sys._getframe().f_code.co_name )
         result=txnameData.getValueFor([[ 300.*GeV,125.*GeV], [ 300.*GeV,125.*GeV] ])
         self.assertAlmostEquals( result,0.115 ) 
         
@@ -109,7 +111,8 @@ class InterpolationTest(unittest.TestCase):
              [ [[ 400.*GeV,250.*GeV], [ 400.*GeV,250.*GeV] ], .15 ], 
              [ [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ], .17 ], 
              [ [[ 400.*GeV,350.*GeV], [ 400.*GeV,350.*GeV] ], .19 ], ]
-        txnameData=TxNameData ( data, "efficiencyMap" )
+        txnameData=TxNameData ( data, "efficiencyMap",
+                sys._getframe().f_code.co_name )
         result=txnameData.getValueFor([[ 300.*GeV,125.*GeV], [ 300.*GeV,123.*GeV] ])
         self.assertAlmostEquals( result,0.1144 ) 
 
@@ -126,7 +129,8 @@ class InterpolationTest(unittest.TestCase):
              [ [[ 400.*GeV,250.*GeV], [ 400.*GeV,250.*GeV] ], .15 ], 
              [ [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ], .17 ], 
              [ [[ 400.*GeV,350.*GeV], [ 400.*GeV,350.*GeV] ], .19 ], ]
-        txnameData=TxNameData ( data, "efficiencyMap" )
+        txnameData=TxNameData ( data, "efficiencyMap",
+                sys._getframe().f_code.co_name )
         result=txnameData.getValueFor([[ 300.*GeV,125.*GeV], [ 300.*GeV,100.*GeV] ])
         self.assertEquals ( result, None )
        
