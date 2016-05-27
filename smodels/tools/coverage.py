@@ -30,12 +30,21 @@ class Uncovered(object):
         self.fill(topoList)
 
     def getAllMothers(self, topoList):
+        """
+        Find all IDs of mother elements, only most compressed element can be missing topology
+        :ivar topoList: sms topology list
+        """
         for el in topoList.getElements():
             for mEl in el.motherElements:
                 motherID = mEl[-1].elID
                 if not motherID in self.motherIDs: self.motherIDs.append(motherID)
 
     def fill(self, topoList):
+        """
+        Check all elements, categorise those not tested / missing, classify long cascade decays and asymmetric branches
+        Fills all corresponding objects
+        :ivar topoList: sms topology list
+        """
         for el in topoList.getElements():
             missing = self.isMissingTopo(el) #missing topo only if not mother, covered, mother covered
             if not missing: # if not missing check if it is actually tested
@@ -47,20 +56,36 @@ class Uncovered(object):
             elif self.hasAsymmetricBranches(el): self.asymmetricBranches.addToClasses(el) # if no long cascade, check for asymmetric branches
 
     def hasLongCascade(self, el):
+        """
+        Return True if element has more than 3 particles in the decay chain
+        :ivar el: Element
+        """
         if el._getLength() > 3: return True
         return False
 
     def hasAsymmetricBranches(self, el):
+        """
+        Return True if Element branches are not equal
+        :ivar el: Element
+        """
         if el.branches[0] == el.branches[1]: return False
         return True
 
     def isMissingTopo(self, el):
+        """
+        A missing topology is not a mother element, not covered, and does not have mother which is covered
+        :ivar el: Element
+        """
         if el.elID in self.motherIDs: return False
         if el.covered: return False
         if self.motherCovered(el): return False
         return True
 
     def motherCovered(self, el):
+        """
+        Recursively check if a mother of the given Element is covered
+        :ivar el: Element
+        """
         mothers = el.motherElements
         while mothers:
             newmothers = []
@@ -71,6 +96,10 @@ class Uncovered(object):
         return False
 
     def getMissingXsec(self, sqrts=None):
+        """
+        Calculate total missing topology cross section at sqrts. If no sqrts is given use self.sqrts
+        :ivar sqrts: sqrts
+        """
         xsec = 0.
         if not sqrts: sqrts = self.sqrts
         for topo in self.missingTopos.topos:
@@ -79,7 +108,7 @@ class Uncovered(object):
                 xsec += el.weight.getXsecsFor(sqrts)[0].value.asNumber(fb)
         return xsec
 
-    def getOutOfGridXsec(self, sqrts=None):
+    def getOutOfGridXsec(self, sqrts=None): #FIXME same as getMissingXsec but different object, should not be separate functions
         xsec = 0.
         if not sqrts: sqrts = self.sqrts
         for topo in self.outsideGrid.topos:
@@ -107,26 +136,56 @@ class Uncovered(object):
         return xsec
           
 class UncoveredClassifier(object):
+    """
+    Object collecting elements with long cascade decays or asymmetric branches.
+    Objects are grouped according to the initially produced particle PID pair.
+    """
     def __init__(self):
         self.classes = []
 
     def addToClasses(self, el):
+        """
+        Add Element in corresponding UncoveredClass, defined by mother PIDs.
+        If no corresponding class in self.classes, add new UncoveredClass
+        :ivar el: Element
+        """
         motherPIDs = [abs(pid) for pid in el.getMothers()[0]]
         motherPIDs.sort()
         for entry in self.classes:
             if entry.add(motherPIDs, el): return
         self.classes.append(UncoveredClass(motherPIDs, el))
 
+    def getSorted(self,sqrts):
+        """
+        Returns list of UncoveredClass objects in self.classes, sorted by weight
+        :ivar sqrts: sqrts for weight lookup
+        """
+        return sorted(self.classes, key=lambda x: x.getWeight(sqrts), reverse=True)
+
 class UncoveredClass(object):
+    """
+    Object collecting all elements contributing to the same uncovered class, defined by the mother PIDs.
+    :ivar motherPIDs: PID of initially produces particles, sorted and without charge information
+    :ivar el: Element
+    """
     def __init__(self, motherPIDs, el):
         self.motherPIDs = motherPIDs # holds list of mother PIDs as given by element.getMothers
         self.contributingElements = [el] # collect all contributing elements, to keep track of weights as well
     def add(self, motherPIDs, el):
+        """
+        Add Element to this UncoveredClass object if motherPIDs match and return True, else return False
+        :ivar motherPIDs: PID of initially produces particles, sorted and without charge information
+        :ivar el: Element
+        """
         if not motherPIDs == self.motherPIDs: return False
         self.contributingElements.append(el)
         return True
     def getWeight(self, sqrts):
-        xsec = 0.*fb
+        """
+        Calculate weight at sqrts
+        :ivar sqrts: sqrts
+        """
+        xsec = 0.
         for el in self.contributingElements:
             elxsec = el.weight.getXsecsFor(sqrts)            
             if not elxsec: continue
@@ -147,15 +206,16 @@ class UncoveredTopo(object):
 
 class UncoveredList(object):
     """
-    Object to find and collect MissingTopo objects, plus printout functionality
-    
+    Object to find and collect UncoveredTopo objects, plus printout functionality
+    :ivar sumL: if true sum electrons and muons to leptons
+    :ivar sumJet: if true, sum up jets
+    :ivar sqrts: sqrts, for printout
     """
     def __init__(self, sumL, sumJet, sqrts):
         self.topos = []
         self.sumL = sumL
         self.sumJet = sumJet
         self.sqrts = sqrts
-
 
     def addToTopos(self, el):
         """
@@ -201,4 +261,4 @@ class UncoveredList(object):
                 ve.sort()
         li.sort()
         return str(li).replace("'", "").replace(" ", "")
-    
+

@@ -12,7 +12,8 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 import os
-from smodels.installation import installDirectory
+from os.path import join, basename
+from smodels.installation import installDirectory as iDir
 from smodels.tools import summaryReader
 from runSModelS import main
 
@@ -22,30 +23,21 @@ class RunSModelSTest(unittest.TestCase):
         if suppressStdout:
             a=sys.stdout
             sys.stdout = open ( "stdout.log", "w" )
-        out = "%s/test/unitTestOutput" % installDirectory()
-        #if os.path.exists ( out ): 
-        #    os.unlink ( out )
-        main(filename, 
-             parameterFile="%s/test/testParameters.ini" %installDirectory(), 
-             outputDir= out,
-             verbosity = 'error' )
-        outputfile = summaryReader.Summary(
-                "%s/test/unitTestOutput/%s.smodels" % (installDirectory(),os.path.basename(filename)))
+        out = join ( iDir(), "test/unitTestOutput" )
+        main(filename, parameterFile=join ( iDir(), "test/testParameters.ini" ),
+             outputDir= out, verbosity = 'error' )
+        sfile = join ( iDir(), 
+                "test/unitTestOutput/%s.smodels" % basename ( filename ) )
+        outputfile = summaryReader.Summary( sfile )
         if suppressStdout:
             sys.stdout = a
         return outputfile
 
     def testGoodFile(self):
-
-        filename = "%s/inputFiles/slha/gluino_squarks.slha" % \
-                    (installDirectory() )
+        filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
         outputfile = self.runMain(filename )
-        sample = summaryReader.Summary(
-                "%s/test/gluino_squarks_default.txt" %installDirectory())
-        #if not ( sample==outputfile ):
-        #    print
-        #    print "%s != %s" % ( os.path.basename(outputfile.filename), 
-        #                         os.path.basename(sample.filename) )
+        sfile = join ( iDir(), "test/gluino_squarks_default.txt" )
+        sample = summaryReader.Summary( sfile )
         try:
             self.assertEquals(sample, outputfile )
         except AssertionError,e:
@@ -55,11 +47,10 @@ class RunSModelSTest(unittest.TestCase):
 
     def testBadFile(self):
 
-        filename = "%s/inputFiles/slha/I_dont_exist.slha" % \
-                    (installDirectory() )
+        filename = join ( iDir(), "inputFiles/slha/I_dont_exist.slha" )
         outputfile = self.runMain (filename ) 
-        sample = summaryReader.Summary(
-                "%s/test/summary_bad_default.txt" %installDirectory())
+        sfile = join ( iDir(), "test/summary_bad_default.txt" )
+        sample = summaryReader.Summary( sfile )
         try:
             self.assertEquals(sample, outputfile )
         except AssertionError,e:
