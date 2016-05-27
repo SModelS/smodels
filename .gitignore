@@ -39,5 +39,5 @@ test/unitTestOutput/*.smodels
 test/unitTestOutput/sms_output.*
 test/unitTestOutput/summary_print.txt
 results/
-test/database/database.pcl
+# test/database/database.pcl
 
