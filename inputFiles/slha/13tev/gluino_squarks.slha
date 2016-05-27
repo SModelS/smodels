@@ -1,0 +1,1571 @@
+#
+#                              ======================
+#                              | THE SUSYHIT OUTPUT |
+#                              ======================
+#
+#
+#              ------------------------------------------------------
+#              |     This is the output of the SUSY-HIT package     |
+#              |  created by A.Djouadi, M.Muehlleitner and M.Spira. |
+#              |  In case of problems with SUSY-HIT email to        |
+#              |           margarete.muehlleitner@cern.ch           |
+#              |           michael.spira@psi.ch                     |
+#              |           abdelhak.djouadi@cern.ch                 |
+#              ------------------------------------------------------
+#
+#              ------------------------------------------------------
+#              |  SUSY Les Houches Accord - MSSM Spectrum + Decays  |
+#              |              based on the decay programs           |
+#              |                                                    |
+#              |                     SDECAY 1.3b                    |
+#              |                                                    |
+#              |  Authors: M.Muhlleitner, A.Djouadi and Y.Mambrini  |
+#              |  Ref.:    Comput.Phys.Commun.168(2005)46           |
+#              |           [hep-ph/0311167]                         |
+#              |                                                    |
+#              |                     HDECAY 3.4                     |
+#              |                                                    |
+#              |  By: A.Djouadi,J.Kalinowski,M.Muhlleitner,M.Spira  |
+#              |  Ref.:    Comput.Phys.Commun.108(1998)56           |
+#              |           [hep-ph/9704448]                         |
+#              |                                                    |
+#              |                                                    |
+#              |  If not stated otherwise all DRbar couplings and   |
+#              |  soft SUSY breaking masses are given at the scale  |
+#              |  Q=  0.11606153E+04
+#              |                                                    |
+#              ------------------------------------------------------
+#
+#
+BLOCK DCINFO  # Decay Program information
+     1   SDECAY/HDECAY # decay calculator
+     2   1.3b  /3.4    # version number
+#
+BLOCK SPINFO  # Spectrum calculator information
+     1    SOFTSUSY    # spectrum calculator                
+     2    3.3.9       # version number                     
+#
+BLOCK MODSEL  # Model selection
+     1     0   #  nonUniversal                                     
+#
+BLOCK SMINPUTS  # Standard Model inputs
+         1     1.27908953E+02   # alpha_em^-1(M_Z)^MSbar
+         2     1.16637000E-05   # G_F [GeV^-2]
+         3     1.17200000E-01   # alpha_S(M_Z)^MSbar
+         4     9.11876000E+01   # M_Z pole mass
+         5     4.23000000E+00   # mb(mb)^MSbar
+         6     1.73200000E+02   # mt pole mass
+         7     1.77700000E+00   # mtau pole mass
+#
+BLOCK MINPAR  # Input parameters - minimal models
+         3     1.46180000E+01   # tanb                
+#
+BLOCK EXTPAR  # Input parameters - non-minimal models
+         0    -1.00000000E+00   # Set                 
+         1     1.29360000E+02   # M_1(MX)             
+         2     2.58720000E+02   # M_2(MX)             
+         3     7.76160000E+02   # M_3(MX)             
+        11     3.39670000E+03   # At(MX)              
+        12    -1.38510000E+02   # Ab(MX)              
+        13     0.00000000E+00   # Atau(MX)            
+        23     7.30150000E+02   # mu(MX)              
+        26     2.00000000E+03   # mA(pole)            
+        31     5.00000000E+03   # meL(MX)             
+        32     5.00000000E+03   # mmuL(MX)            
+        33     5.00000000E+03   # mtauL(MX)           
+        34     5.00000000E+03   # meR(MX)             
+        35     5.00000000E+03   # mmuR(MX)            
+        36     5.00000000E+03   # mtauR(MX)           
+        41     9.59920000E+02   # mqL1(MX)            
+        42     9.59920000E+02   # mqL2(MX)            
+        43     9.48300000E+02   # mqL3(MX)            
+        44     9.59920000E+02   # muR(MX)             
+        45     9.59920000E+02   # mcR(MX)             
+        46     1.49450000E+03   # mtR(MX)             
+        47     9.59920000E+02   # mdR(MX)             
+        48     9.59920000E+02   # msR(MX)             
+        49     1.39300000E+03   # mbR(MX)             
+#
+BLOCK MASS  # Mass Spectrum
+# PDG code           mass       particle
+        24     8.04311880E+01   # W+
+        25     1.27018939E+02   # h
+        35     1.99976010E+03   # H
+        36     2.00000001E+03   # A
+        37     2.00174344E+03   # H+
+         5     4.85697885E+00   # b-quark pole mass calculated from mb(mb)_Msbar
+   1000001     9.94319164E+02   # ~d_L
+   2000001     9.91705545E+02   # ~d_R
+   1000002     9.91506321E+02   # ~u_L
+   2000002     9.91299127E+02   # ~u_R
+   1000003     9.94319164E+02   # ~s_L
+   2000003     9.91705545E+02   # ~s_R
+   1000004     9.91506321E+02   # ~c_L
+   2000004     9.91299127E+02   # ~c_R
+   1000005     9.59388190E+02   # ~b_1
+   2000005     1.41435338E+03   # ~b_2
+   1000006     8.77790292E+02   # ~t_1
+   2000006     1.49482379E+03   # ~t_2
+   1000011     5.01018154E+03   # ~e_L
+   2000011     5.00415496E+03   # ~e_R
+   1000012     5.00926071E+03   # ~nu_eL
+   1000013     5.01018154E+03   # ~mu_L
+   2000013     5.00415496E+03   # ~mu_R
+   1000014     5.00926071E+03   # ~nu_muL
+   1000015     5.00544797E+03   # ~tau_1
+   2000015     5.01173686E+03   # ~tau_2
+   1000016     5.01020006E+03   # ~nu_tauL
+   1000021     8.65035125E+02   # ~g
+   1000022     1.28961570E+02   # ~chi_10
+   1000023     2.68892760E+02   # ~chi_20
+   1000025    -7.37876348E+02   # ~chi_30
+   1000035     7.45297421E+02   # ~chi_40
+   1000024     2.69035358E+02   # ~chi_1+
+   1000037     7.45927575E+02   # ~chi_2+
+#
+BLOCK NMIX  # Neutralino Mixing Matrix
+  1  1     9.97882376E-01   # N_11
+  1  2    -9.41430379E-03   # N_12
+  1  3     6.25993143E-02   # N_13
+  1  4    -1.49485687E-02   # N_14
+  2  1     1.78695467E-02   # N_21
+  2  2     9.90846801E-01   # N_22
+  2  3    -1.23608155E-01   # N_23
+  2  4     5.12281260E-02   # N_24
+  3  1    -3.30858711E-02   # N_31
+  3  2     5.18648182E-02   # N_32
+  3  3     7.04138487E-01   # N_33
+  3  4     7.07392647E-01   # N_34
+  4  1    -5.30732269E-02   # N_41
+  4  2     1.24274008E-01   # N_42
+  4  3     6.96413197E-01   # N_43
+  4  4    -7.04803421E-01   # N_44
+#
+BLOCK UMIX  # Chargino Mixing Matrix U
+  1  1     9.84463340E-01   # U_11
+  1  2    -1.75590238E-01   # U_12
+  2  1     1.75590238E-01   # U_21
+  2  2     9.84463340E-01   # U_22
+#
+BLOCK VMIX  # Chargino Mixing Matrix V
+  1  1     9.97331320E-01   # V_11
+  1  2    -7.30084752E-02   # V_12
+  2  1     7.30084752E-02   # V_21
+  2  2     9.97331320E-01   # V_22
+#
+BLOCK STOPMIX  # Stop Mixing Matrix
+  1  1     9.38072734E-01   # cos(theta_t)
+  1  2    -3.46438372E-01   # sin(theta_t)
+  2  1     3.46438372E-01   # -sin(theta_t)
+  2  2     9.38072734E-01   # cos(theta_t)
+#
+BLOCK SBOTMIX  # Sbottom Mixing Matrix
+  1  1     9.99823524E-01   # cos(theta_b)
+  1  2     1.87861879E-02   # sin(theta_b)
+  2  1    -1.87861879E-02   # -sin(theta_b)
+  2  2     9.99823524E-01   # cos(theta_b)
+#
+BLOCK STAUMIX  # Stau Mixing Matrix
+  1  1     2.98876711E-01   # cos(theta_tau)
+  1  2     9.54291733E-01   # sin(theta_tau)
+  2  1    -9.54291733E-01   # -sin(theta_tau)
+  2  2     2.98876711E-01   # cos(theta_tau)
+#
+BLOCK ALPHA  # Higgs mixing
+          -7.13603259E-02   # Mixing angle in the neutral Higgs boson sector
+#
+BLOCK HMIX Q=  1.16061527E+03  # DRbar Higgs Parameters
+         1     7.30150000E+02   # mu(Q)MSSM           
+         2     1.40504219E+01   # tan                 
+         3     2.41194249E+02   # higgs               
+         4     3.93778702E+06   # mA^2(Q)MSSM         
+#
+BLOCK GAUGE Q=  1.16061527E+03  # The gauge couplings
+     1     3.62017753E-01   # gprime(Q) DRbar
+     2     6.42363135E-01   # g(Q) DRbar
+     3     1.06038975E+00   # g3(Q) DRbar
+#
+BLOCK AU Q=  1.16061527E+03  # The trilinear couplings
+  1  1     3.39670000E+03   # A_u(Q) DRbar
+  2  2     3.39670000E+03   # A_c(Q) DRbar
+  3  3     3.39670000E+03   # A_t(Q) DRbar
+#
+BLOCK AD Q=  1.16061527E+03  # The trilinear couplings
+  1  1    -1.38510000E+02   # A_d(Q) DRbar
+  2  2    -1.38510000E+02   # A_s(Q) DRbar
+  3  3    -1.38510000E+02   # A_b(Q) DRbar
+#
+BLOCK AE Q=  1.16061527E+03  # The trilinear couplings
+  1  1     0.00000000E+00   # A_e(Q) DRbar
+  2  2     2.02708626E-08   # A_mu(Q) DRbar
+  3  3     2.03548233E-08   # A_tau(Q) DRbar
+#
+BLOCK Yu Q=  1.16061527E+03  # The Yukawa couplings
+  1  1     0.00000000E+00   # y_u(Q) DRbar
+  2  2     0.00000000E+00   # y_c(Q) DRbar
+  3  3     8.96771817E-01   # y_t(Q) DRbar
+#
+BLOCK Yd Q=  1.16061527E+03  # The Yukawa couplings
+  1  1     0.00000000E+00   # y_d(Q) DRbar
+  2  2     0.00000000E+00   # y_s(Q) DRbar
+  3  3     1.76767238E-01   # y_b(Q) DRbar
+#
+BLOCK Ye Q=  1.16061527E+03  # The Yukawa couplings
+  1  1     0.00000000E+00   # y_e(Q) DRbar
+  2  2     0.00000000E+00   # y_mu(Q) DRbar
+  3  3     1.45835467E-01   # y_tau(Q) DRbar
+#
+BLOCK MSOFT Q=  1.16061527E+03  # The soft SUSY breaking masses at the scale Q
+         1     1.29360000E+02   # M_1(Q)              
+         2     2.58720000E+02   # M_2(Q)              
+         3     7.76160000E+02   # M_3(Q)              
+        21     3.43487059E+06   # mH1^2(Q)            
+        22    -5.32924776E+05   # mH2^2(Q)            
+        31     5.00000000E+03   # meL(Q)              
+        32     5.00000000E+03   # mmuL(Q)             
+        33     5.00000000E+03   # mtauL(Q)            
+        34     5.00000000E+03   # meR(Q)              
+        35     5.00000000E+03   # mmuR(Q)             
+        36     5.00000000E+03   # mtauR(Q)            
+        41     9.59920000E+02   # mqL1(Q)             
+        42     9.59920000E+02   # mqL2(Q)             
+        43     9.48299999E+02   # mqL3(Q)             
+        44     9.59920000E+02   # muR(Q)              
+        45     9.59920000E+02   # mcR(Q)              
+        46     1.49450000E+03   # mtR(Q)              
+        47     9.59920000E+02   # mdR(Q)              
+        48     9.59920000E+02   # msR(Q)              
+        49     1.39300000E+03   # mbR(Q)              
+#
+#
+#
+#                             =================
+#                             |The decay table|
+#                             =================
+#
+# - The QCD corrections to the decays gluino -> squark  + quark
+#                                     squark -> gaugino + quark_prime
+#                                     squark -> squark_prime + Higgs
+#                                     squark -> gluino  + quark
+#   are included.
+#
+# - The multi-body decays for the inos, stops and sbottoms are included.
+#
+# - The loop induced decays for the gluino, neutralinos and stops
+#   are included.
+#
+# - The SUSY decays of the top quark are included.
+#
+#
+#         PDG            Width
+DECAY         6     1.45136155E+00   # top decays
+#          BR         NDA      ID1       ID2
+     1.00000000E+00    2           5        24   # BR(t ->  b    W+)
+#
+#         PDG            Width
+DECAY   1000021     4.56539663E-02   # gluino decays
+#          BR         NDA      ID1       ID2
+     1.04373826E-06    2     1000022        21   # BR(~g -> ~chi_10 g)
+     4.83704704E-09    2     1000023        21   # BR(~g -> ~chi_20 g)
+     3.82972450E-04    2     1000025        21   # BR(~g -> ~chi_30 g)
+     1.98740099E-04    2     1000035        21   # BR(~g -> ~chi_40 g)
+#           BR         NDA      ID1       ID2       ID3
+     1.22218299E-02    3     1000022         1        -1   # BR(~g -> ~chi_10 d  db)
+     4.82033470E-02    3     1000023         1        -1   # BR(~g -> ~chi_20 d  db)
+     2.90713755E-07    3     1000025         1        -1   # BR(~g -> ~chi_30 d  db)
+     3.33000672E-06    3     1000035         1        -1   # BR(~g -> ~chi_40 d  db)
+     4.07529745E-02    3     1000022         2        -2   # BR(~g -> ~chi_10 u  ub)
+     4.98826835E-02    3     1000023         2        -2   # BR(~g -> ~chi_20 u  ub)
+     2.30404590E-07    3     1000025         2        -2   # BR(~g -> ~chi_30 u  ub)
+     2.74056655E-06    3     1000035         2        -2   # BR(~g -> ~chi_40 u  ub)
+     1.22218299E-02    3     1000022         3        -3   # BR(~g -> ~chi_10 s  sb)
+     4.82033470E-02    3     1000023         3        -3   # BR(~g -> ~chi_20 s  sb)
+     2.90713755E-07    3     1000025         3        -3   # BR(~g -> ~chi_30 s  sb)
+     3.33000672E-06    3     1000035         3        -3   # BR(~g -> ~chi_40 s  sb)
+     4.07529745E-02    3     1000022         4        -4   # BR(~g -> ~chi_10 c  cb)
+     4.98826835E-02    3     1000023         4        -4   # BR(~g -> ~chi_20 c  cb)
+     2.30404590E-07    3     1000025         4        -4   # BR(~g -> ~chi_30 c  cb)
+     2.74056655E-06    3     1000035         4        -4   # BR(~g -> ~chi_40 c  cb)
+     4.78551248E-03    3     1000022         5        -5   # BR(~g -> ~chi_10 b  bb)
+     6.32194288E-02    3     1000023         5        -5   # BR(~g -> ~chi_20 b  bb)
+     2.31960069E-05    3     1000025         5        -5   # BR(~g -> ~chi_30 b  bb)
+     2.36021840E-05    3     1000035         5        -5   # BR(~g -> ~chi_40 b  bb)
+     7.21974158E-03    3     1000022         6        -6   # BR(~g -> ~chi_10 t  tb)
+     3.07844725E-02    3     1000023         6        -6   # BR(~g -> ~chi_20 t  tb)
+     9.80412828E-02    3     1000024         1        -2   # BR(~g -> ~chi_1+ d  ub)
+     9.80412828E-02    3    -1000024         2        -1   # BR(~g -> ~chi_1- u  db)
+     5.83250696E-06    3     1000037         1        -2   # BR(~g -> ~chi_2+ d  ub)
+     5.83250696E-06    3    -1000037         2        -1   # BR(~g -> ~chi_2- u  db)
+     9.80412828E-02    3     1000024         3        -4   # BR(~g -> ~chi_1+ s  cb)
+     9.80412828E-02    3    -1000024         4        -3   # BR(~g -> ~chi_1- c  sb)
+     5.83250696E-06    3     1000037         3        -4   # BR(~g -> ~chi_2+ s  cb)
+     5.83250696E-06    3    -1000037         4        -3   # BR(~g -> ~chi_2- c  sb)
+     9.95189855E-02    3     1000024         5        -6   # BR(~g -> ~chi_1+ b  tb)
+     9.95189855E-02    3    -1000024         6        -5   # BR(~g -> ~chi_1- t  bb)
+#
+#         PDG            Width
+DECAY   1000006     7.27235497E+00   # stop1 decays
+#          BR         NDA      ID1       ID2
+     3.34926886E-02    2     1000022         6   # BR(~t_1 -> ~chi_10 t )
+     2.90172618E-01    2     1000023         6   # BR(~t_1 -> ~chi_20 t )
+     6.48285917E-01    2     1000024         5   # BR(~t_1 -> ~chi_1+ b )
+     2.80487766E-02    2     1000037         5   # BR(~t_1 -> ~chi_2+ b )
+#
+#         PDG            Width
+DECAY   2000006     1.95256756E+02   # stop2 decays
+#          BR         NDA      ID1       ID2
+     1.49517206E-02    2     1000022         6   # BR(~t_2 -> ~chi_10 t )
+     5.20631105E-03    2     1000023         6   # BR(~t_2 -> ~chi_20 t )
+     3.82466730E-02    2     1000025         6   # BR(~t_2 -> ~chi_30 t )
+     2.80406888E-02    2     1000035         6   # BR(~t_2 -> ~chi_40 t )
+     1.07754183E-02    2     1000024         5   # BR(~t_2 -> ~chi_1+ b )
+     5.90295846E-02    2     1000037         5   # BR(~t_2 -> ~chi_2+ b )
+     2.67842616E-01    2     1000021         6   # BR(~t_2 -> ~g      t )
+     1.09817900E-01    2     1000006        25   # BR(~t_2 -> ~t_1    h )
+     1.81102860E-01    2     1000006        23   # BR(~t_2 -> ~t_1    Z )
+     2.84986228E-01    2     1000005        24   # BR(~t_2 -> ~b_1    W+)
+     1.75110955E-11    2     2000005        24   # BR(~t_2 -> ~b_2    W+)
+#
+#         PDG            Width
+DECAY   1000005     1.34903869E+01   # sbottom1 decays
+#          BR         NDA      ID1       ID2
+     1.06598132E-02    2     1000022         5   # BR(~b_1 -> ~chi_10 b )
+     2.30764289E-01    2     1000023         5   # BR(~b_1 -> ~chi_20 b )
+     3.65533102E-03    2     1000025         5   # BR(~b_1 -> ~chi_30 b )
+     4.06367213E-03    2     1000035         5   # BR(~b_1 -> ~chi_40 b )
+     4.22774148E-01    2    -1000024         6   # BR(~b_1 -> ~chi_1- t )
+     1.15068123E-01    2    -1000037         6   # BR(~b_1 -> ~chi_2- t )
+     2.12399966E-01    2     1000021         5   # BR(~b_1 -> ~g      b )
+     6.14657907E-04    2     1000006       -24   # BR(~b_1 -> ~t_1    W-)
+#
+#         PDG            Width
+DECAY   2000005     4.34519268E+01   # sbottom2 decays
+#          BR         NDA      ID1       ID2
+     1.76775847E-02    2     1000022         5   # BR(~b_2 -> ~chi_10 b )
+     1.15492750E-04    2     1000023         5   # BR(~b_2 -> ~chi_20 b )
+     5.37580469E-03    2     1000025         5   # BR(~b_2 -> ~chi_30 b )
+     5.26365100E-03    2     1000035         5   # BR(~b_2 -> ~chi_40 b )
+     2.17465466E-04    2    -1000024         6   # BR(~b_2 -> ~chi_1- t )
+     1.03996339E-02    2    -1000037         6   # BR(~b_2 -> ~chi_2- t )
+     9.54428364E-01    2     1000021         5   # BR(~b_2 -> ~g      b )
+     1.43533520E-03    2     1000005        25   # BR(~b_2 -> ~b_1    h )
+     1.48158909E-03    2     1000005        23   # BR(~b_2 -> ~b_1    Z )
+     3.60507965E-03    2     1000006       -24   # BR(~b_2 -> ~t_1    W-)
+#
+#         PDG            Width
+DECAY   1000002     1.47712529E+01   # sup_L decays
+#          BR         NDA      ID1       ID2
+     8.00355672E-03    2     1000022         2   # BR(~u_L -> ~chi_10 u)
+     2.22296588E-01    2     1000023         2   # BR(~u_L -> ~chi_20 u)
+     1.11091024E-04    2     1000025         2   # BR(~u_L -> ~chi_30 u)
+     6.62595319E-04    2     1000035         2   # BR(~u_L -> ~chi_40 u)
+     4.47320771E-01    2     1000024         1   # BR(~u_L -> ~chi_1+ d)
+     5.38302965E-04    2     1000037         1   # BR(~u_L -> ~chi_2+ d)
+     3.21067096E-01    2     1000021         2   # BR(~u_L -> ~g      u)
+#
+#         PDG            Width
+DECAY   2000002     6.82763785E+00   # sup_R decays
+#          BR         NDA      ID1       ID2
+     3.07048691E-01    2     1000022         2   # BR(~u_R -> ~chi_10 u)
+     8.77025927E-05    2     1000023         2   # BR(~u_R -> ~chi_20 u)
+     7.12004106E-05    2     1000025         2   # BR(~u_R -> ~chi_30 u)
+     1.74279326E-04    2     1000035         2   # BR(~u_R -> ~chi_40 u)
+     6.92618127E-01    2     1000021         2   # BR(~u_R -> ~g      u)
+#
+#         PDG            Width
+DECAY   1000001     1.48506929E+01   # sdown_L decays
+#          BR         NDA      ID1       ID2
+     9.76303043E-03    2     1000022         1   # BR(~d_L -> ~chi_10 d)
+     2.18946226E-01    2     1000023         1   # BR(~d_L -> ~chi_20 d)
+     1.81861163E-04    2     1000025         1   # BR(~d_L -> ~chi_30 d)
+     9.24840771E-04    2     1000035         1   # BR(~d_L -> ~chi_40 d)
+     4.35140820E-01    2    -1000024         2   # BR(~d_L -> ~chi_1- u)
+     3.15104106E-03    2    -1000037         2   # BR(~d_L -> ~chi_2- u)
+     3.31892181E-01    2     1000021         1   # BR(~d_L -> ~g      d)
+#
+#         PDG            Width
+DECAY   2000001     5.28057417E+00   # sdown_R decays
+#          BR         NDA      ID1       ID2
+     9.92948836E-02    2     1000022         1   # BR(~d_R -> ~chi_10 d)
+     2.83645676E-05    2     1000023         1   # BR(~d_R -> ~chi_20 d)
+     2.30706352E-05    2     1000025         1   # BR(~d_R -> ~chi_30 d)
+     5.64758889E-05    2     1000035         1   # BR(~d_R -> ~chi_40 d)
+     9.00597205E-01    2     1000021         1   # BR(~d_R -> ~g      d)
+#
+#         PDG            Width
+DECAY   1000004     1.47712529E+01   # scharm_L decays
+#          BR         NDA      ID1       ID2
+     8.00355672E-03    2     1000022         4   # BR(~c_L -> ~chi_10 c)
+     2.22296588E-01    2     1000023         4   # BR(~c_L -> ~chi_20 c)
+     1.11091024E-04    2     1000025         4   # BR(~c_L -> ~chi_30 c)
+     6.62595319E-04    2     1000035         4   # BR(~c_L -> ~chi_40 c)
+     4.47320771E-01    2     1000024         3   # BR(~c_L -> ~chi_1+ s)
+     5.38302965E-04    2     1000037         3   # BR(~c_L -> ~chi_2+ s)
+     3.21067096E-01    2     1000021         4   # BR(~c_L -> ~g      c)
+#
+#         PDG            Width
+DECAY   2000004     6.82763785E+00   # scharm_R decays
+#          BR         NDA      ID1       ID2
+     3.07048691E-01    2     1000022         4   # BR(~c_R -> ~chi_10 c)
+     8.77025927E-05    2     1000023         4   # BR(~c_R -> ~chi_20 c)
+     7.12004106E-05    2     1000025         4   # BR(~c_R -> ~chi_30 c)
+     1.74279326E-04    2     1000035         4   # BR(~c_R -> ~chi_40 c)
+     6.92618127E-01    2     1000021         4   # BR(~c_R -> ~g      c)
+#
+#         PDG            Width
+DECAY   1000003     1.48506929E+01   # sstrange_L decays
+#          BR         NDA      ID1       ID2
+     9.76303043E-03    2     1000022         3   # BR(~s_L -> ~chi_10 s)
+     2.18946226E-01    2     1000023         3   # BR(~s_L -> ~chi_20 s)
+     1.81861163E-04    2     1000025         3   # BR(~s_L -> ~chi_30 s)
+     9.24840771E-04    2     1000035         3   # BR(~s_L -> ~chi_40 s)
+     4.35140820E-01    2    -1000024         4   # BR(~s_L -> ~chi_1- c)
+     3.15104106E-03    2    -1000037         4   # BR(~s_L -> ~chi_2- c)
+     3.31892181E-01    2     1000021         3   # BR(~s_L -> ~g      s)
+#
+#         PDG            Width
+DECAY   2000003     5.28057417E+00   # sstrange_R decays
+#          BR         NDA      ID1       ID2
+     9.92948836E-02    2     1000022         3   # BR(~s_R -> ~chi_10 s)
+     2.83645676E-05    2     1000023         3   # BR(~s_R -> ~chi_20 s)
+     2.30706352E-05    2     1000025         3   # BR(~s_R -> ~chi_30 s)
+     5.64758889E-05    2     1000035         3   # BR(~s_R -> ~chi_40 s)
+     9.00597205E-01    2     1000021         3   # BR(~s_R -> ~g      s)
+#
+#         PDG            Width
+DECAY   1000011     6.78035696E+01   # selectron_L decays
+#          BR         NDA      ID1       ID2
+     9.26148078E-02    2     1000022        11   # BR(~e_L -> ~chi_10 e-)
+     3.02101871E-01    2     1000023        11   # BR(~e_L -> ~chi_20 e-)
+     3.20314555E-04    2     1000025        11   # BR(~e_L -> ~chi_30 e-)
+     2.58245822E-03    2     1000035        11   # BR(~e_L -> ~chi_40 e-)
+     5.84498251E-01    2    -1000024        12   # BR(~e_L -> ~chi_1- nu_e)
+     1.78822973E-02    2    -1000037        12   # BR(~e_L -> ~chi_2- nu_e)
+#
+#         PDG            Width
+DECAY   2000011     2.60555948E+01   # selectron_R decays
+#          BR         NDA      ID1       ID2
+     9.95935664E-01    2     1000022        11   # BR(~e_R -> ~chi_10 e-)
+     3.17954645E-04    2     1000023        11   # BR(~e_R -> ~chi_20 e-)
+     1.04915903E-03    2     1000025        11   # BR(~e_R -> ~chi_30 e-)
+     2.69722274E-03    2     1000035        11   # BR(~e_R -> ~chi_40 e-)
+#
+#         PDG            Width
+DECAY   1000013     6.78035696E+01   # smuon_L decays
+#          BR         NDA      ID1       ID2
+     9.26148078E-02    2     1000022        13   # BR(~mu_L -> ~chi_10 mu-)
+     3.02101871E-01    2     1000023        13   # BR(~mu_L -> ~chi_20 mu-)
+     3.20314555E-04    2     1000025        13   # BR(~mu_L -> ~chi_30 mu-)
+     2.58245822E-03    2     1000035        13   # BR(~mu_L -> ~chi_40 mu-)
+     5.84498251E-01    2    -1000024        14   # BR(~mu_L -> ~chi_1- nu_mu)
+     1.78822973E-02    2    -1000037        14   # BR(~mu_L -> ~chi_2- nu_mu)
+#
+#         PDG            Width
+DECAY   2000013     2.60555948E+01   # smuon_R decays
+#          BR         NDA      ID1       ID2
+     9.95935664E-01    2     1000022        13   # BR(~mu_R -> ~chi_10 mu-)
+     3.17954645E-04    2     1000023        13   # BR(~mu_R -> ~chi_20 mu-)
+     1.04915903E-03    2     1000025        13   # BR(~mu_R -> ~chi_30 mu-)
+     2.69722274E-03    2     1000035        13   # BR(~mu_R -> ~chi_40 mu-)
+#
+#         PDG            Width
+DECAY   1000015     3.37170888E+01   # stau_1 decays
+#          BR         NDA      ID1       ID2
+     7.21922260E-01    2     1000022        15   # BR(~tau_1 -> ~chi_10  tau-)
+     6.88449889E-02    2     1000023        15   # BR(~tau_1 -> ~chi_20  tau-)
+     2.52987742E-02    2     1000025        15   # BR(~tau_1 -> ~chi_30  tau-)
+     2.00323164E-02    2     1000035        15   # BR(~tau_1 -> ~chi_40  tau-)
+     1.33772634E-01    2    -1000024        16   # BR(~tau_1 -> ~chi_1-  nu_tau)
+     3.01290269E-02    2    -1000037        16   # BR(~tau_1 -> ~chi_2-  nu_tau)
+#
+#         PDG            Width
+DECAY   2000015     6.62507820E+01   # stau_2 decays
+#          BR         NDA      ID1       ID2
+     1.19477637E-01    2     1000022        15   # BR(~tau_2 -> ~chi_10  tau-)
+     2.75294448E-01    2     1000023        15   # BR(~tau_2 -> ~chi_20  tau-)
+     1.82256596E-02    2     1000025        15   # BR(~tau_2 -> ~chi_30  tau-)
+     2.31884303E-02    2     1000035        15   # BR(~tau_2 -> ~chi_40  tau-)
+     5.31199169E-01    2    -1000024        16   # BR(~tau_2 -> ~chi_1-  nu_tau)
+     3.26146557E-02    2    -1000037        16   # BR(~tau_2 -> ~chi_2-  nu_tau)
+#
+#         PDG            Width
+DECAY   1000012     6.78182499E+01   # snu_eL decays
+#          BR         NDA      ID1       ID2
+     9.89896353E-02    2     1000022        12   # BR(~nu_eL -> ~chi_10 nu_e)
+     2.89949057E-01    2     1000023        12   # BR(~nu_eL -> ~chi_20 nu_e)
+     1.44261041E-03    2     1000025        12   # BR(~nu_eL -> ~chi_30 nu_e)
+     6.89170465E-03    2     1000035        12   # BR(~nu_eL -> ~chi_40 nu_e)
+     5.99636782E-01    2     1000024        11   # BR(~nu_eL -> ~chi_1+ e-)
+     3.09021038E-03    2     1000037        11   # BR(~nu_eL -> ~chi_2+ e-)
+#
+#         PDG            Width
+DECAY   1000014     6.78182499E+01   # snu_muL decays
+#          BR         NDA      ID1       ID2
+     9.89896353E-02    2     1000022        14   # BR(~nu_muL -> ~chi_10 nu_mu)
+     2.89949057E-01    2     1000023        14   # BR(~nu_muL -> ~chi_20 nu_mu)
+     1.44261041E-03    2     1000025        14   # BR(~nu_muL -> ~chi_30 nu_mu)
+     6.89170465E-03    2     1000035        14   # BR(~nu_muL -> ~chi_40 nu_mu)
+     5.99636782E-01    2     1000024        13   # BR(~nu_muL -> ~chi_1+ mu-)
+     3.09021038E-03    2     1000037        13   # BR(~nu_muL -> ~chi_2+ mu-)
+#
+#         PDG            Width
+DECAY   1000016     6.98605523E+01   # snu_tauL decays
+#          BR         NDA      ID1       ID2
+     9.61138416E-02    2     1000022        16   # BR(~nu_tauL -> ~chi_10 nu_tau)
+     2.81526083E-01    2     1000023        16   # BR(~nu_tauL -> ~chi_20 nu_tau)
+     1.40072306E-03    2     1000025        16   # BR(~nu_tauL -> ~chi_30 nu_tau)
+     6.69160082E-03    2     1000035        16   # BR(~nu_tauL -> ~chi_40 nu_tau)
+     5.83145695E-01    2     1000024        15   # BR(~nu_tauL -> ~chi_1+ tau-)
+     3.11220558E-02    2     1000037        15   # BR(~nu_tauL -> ~chi_2+ tau-)
+#
+#         PDG            Width
+DECAY   1000024     1.38466665E-03   # chargino1+ decays
+#          BR         NDA      ID1       ID2
+     1.00000000E+00    2     1000022        24   # BR(~chi_1+ -> ~chi_10  W+)
+#
+#         PDG            Width
+DECAY   1000037     4.93892335E+00   # chargino2+ decays
+#          BR         NDA      ID1       ID2
+     3.06642702E-01    2     1000024        23   # BR(~chi_2+ -> ~chi_1+  Z )
+     8.97334058E-02    2     1000022        24   # BR(~chi_2+ -> ~chi_10  W+)
+     3.10073282E-01    2     1000023        24   # BR(~chi_2+ -> ~chi_20  W+)
+     2.93550610E-01    2     1000024        25   # BR(~chi_2+ -> ~chi_1+  h )
+#
+#         PDG            Width
+DECAY   1000022     0.00000000E+00   # neutralino1 decays
+#
+#         PDG            Width
+DECAY   1000023     1.12364506E-03   # neutralino2 decays
+#          BR         NDA      ID1       ID2
+     1.61522496E-01    2     1000022        23   # BR(~chi_20 -> ~chi_10   Z )
+     8.38477504E-01    2     1000022        25   # BR(~chi_20 -> ~chi_10   h )
+#
+#         PDG            Width
+DECAY   1000025     4.86632501E+00   # neutralino3 decays
+#          BR         NDA      ID1       ID2
+     7.17833224E-02    2     1000022        23   # BR(~chi_30 -> ~chi_10   Z )
+     2.54206357E-01    2     1000023        23   # BR(~chi_30 -> ~chi_20   Z )
+     3.03367763E-01    2     1000024       -24   # BR(~chi_30 -> ~chi_1+   W-)
+     3.03367763E-01    2    -1000024        24   # BR(~chi_30 -> ~chi_1-   W+)
+     2.68921674E-02    2     1000022        25   # BR(~chi_30 -> ~chi_10   h )
+     4.03826268E-02    2     1000023        25   # BR(~chi_30 -> ~chi_20   h )
+#
+#         PDG            Width
+DECAY   1000035     4.97288842E+00   # neutralino4 decays
+#          BR         NDA      ID1       ID2
+     2.74273425E-02    2     1000022        23   # BR(~chi_40 -> ~chi_10   Z )
+     4.63113545E-02    2     1000023        23   # BR(~chi_40 -> ~chi_20   Z )
+     3.03707890E-01    2     1000024       -24   # BR(~chi_40 -> ~chi_1+   W-)
+     3.03707890E-01    2    -1000024        24   # BR(~chi_40 -> ~chi_1-   W+)
+     7.10687246E-02    2     1000022        25   # BR(~chi_40 -> ~chi_10   h )
+     2.47776799E-01    2     1000023        25   # BR(~chi_40 -> ~chi_20   h )
+#
+#         PDG            Width
+DECAY        25     4.54945415E-03   # h decays
+#          BR         NDA      ID1       ID2
+     6.01660106E-01    2           5        -5   # BR(h -> b       bb     )
+     5.82954620E-02    2         -15        15   # BR(h -> tau+    tau-   )
+     2.06336596E-04    2         -13        13   # BR(h -> mu+     mu-    )
+     4.36108817E-04    2           3        -3   # BR(h -> s       sb     )
+     1.88301480E-02    2           4        -4   # BR(h -> c       cb     )
+     5.95796283E-02    2          21        21   # BR(h -> g       g      )
+     2.26081017E-03    2          22        22   # BR(h -> gam     gam    )
+     1.64014955E-03    2          22        23   # BR(h -> Z       gam    )
+     2.27626576E-01    2          24       -24   # BR(h -> W+      W-     )
+     2.94646747E-02    2          23        23   # BR(h -> Z       Z      )
+#
+#         PDG            Width
+DECAY        35     2.80798148E+01   # H decays
+#          BR         NDA      ID1       ID2
+     1.41811341E-01    2           5        -5   # BR(H -> b       bb     )
+     2.91358432E-02    2         -15        15   # BR(H -> tau+    tau-   )
+     1.03006055E-04    2         -13        13   # BR(H -> mu+     mu-    )
+     1.33512452E-04    2           3        -3   # BR(H -> s       sb     )
+     1.54605782E-07    2           4        -4   # BR(H -> c       cb     )
+     1.53442286E-02    2           6        -6   # BR(H -> t       tb     )
+     2.89204430E-05    2          21        21   # BR(H -> g       g      )
+     1.22593750E-07    2          22        22   # BR(H -> gam     gam    )
+     1.09647560E-08    2          23        22   # BR(H -> Z       gam    )
+     8.77432439E-06    2          24       -24   # BR(H -> W+      W-     )
+     4.37502836E-06    2          23        23   # BR(H -> Z       Z      )
+     3.73654633E-05    2          25        25   # BR(H -> h       h      )
+     1.55317171E-02    2     1000024  -1000024   # BR(H -> ~chi_1+ ~chi_1-)
+     6.25996650E-04    2     1000037  -1000037   # BR(H -> ~chi_2+ ~chi_2-)
+     2.10477986E-01    2     1000024  -1000037   # BR(H -> ~chi_1+ ~chi_2-)
+     2.10477986E-01    2     1000037  -1000024   # BR(H -> ~chi_2+ ~chi_1-)
+     6.53680745E-04    2     1000022   1000022   # BR(H -> ~chi_10 ~chi_10)
+     7.44793175E-03    2     1000023   1000023   # BR(H -> ~chi_20 ~chi_20)
+     5.09294717E-04    2     1000025   1000025   # BR(H -> ~chi_30 ~chi_30)
+     1.73292343E-03    2     1000035   1000035   # BR(H -> ~chi_40 ~chi_40)
+     4.44506167E-03    2     1000022   1000023   # BR(H -> ~chi_10 ~chi_20)
+     3.84527004E-02    2     1000022   1000025   # BR(H -> ~chi_10 ~chi_30)
+     2.42181485E-02    2     1000022   1000035   # BR(H -> ~chi_10 ~chi_40)
+     1.28034262E-01    2     1000023   1000025   # BR(H -> ~chi_20 ~chi_30)
+     7.08935274E-02    2     1000023   1000035   # BR(H -> ~chi_20 ~chi_40)
+     5.17285328E-03    2     1000025   1000035   # BR(H -> ~chi_30 ~chi_40)
+     1.56300961E-06    2     1000002  -1000002   # BR(H -> ~u_L    ~u_L*  )
+     2.79709117E-07    2     2000002  -2000002   # BR(H -> ~u_R    ~u_R*  )
+     1.56300961E-06    2     1000004  -1000004   # BR(H -> ~c_L    ~c_L*  )
+     2.79709117E-07    2     2000004  -2000004   # BR(H -> ~c_R    ~c_R*  )
+     9.47090196E-02    2     1000006  -1000006   # BR(H -> ~t_1    ~t_1*  )
+     1.86688848E-06    2     1000001  -1000001   # BR(H -> ~d_L    ~d_L*  )
+     6.82581758E-08    2     2000001  -2000001   # BR(H -> ~d_R    ~d_R*  )
+     1.86688848E-06    2     1000003  -1000003   # BR(H -> ~s_L    ~s_L*  )
+     6.82581758E-08    2     2000003  -2000003   # BR(H -> ~s_R    ~s_R*  )
+     1.70123815E-06    2     1000005  -1000005   # BR(H -> ~b_1    ~b_1*  )
+#
+#         PDG            Width
+DECAY        36     2.54225400E+01   # A decays
+#          BR         NDA      ID1       ID2
+     1.56683880E-01    2           5        -5   # BR(A -> b       bb     )
+     3.21866248E-02    2         -15        15   # BR(A -> tau+    tau-   )
+     1.13791346E-04    2         -13        13   # BR(A -> mu+     mu-    )
+     1.47538291E-04    2           3        -3   # BR(A -> s       sb     )
+     1.70859252E-07    2           4        -4   # BR(A -> c       cb     )
+     1.71555729E-02    2           6        -6   # BR(A -> t       tb     )
+     4.14222572E-05    2          21        21   # BR(A -> g       g      )
+     6.99837915E-09    2          22        22   # BR(A -> gam     gam    )
+     4.10018612E-08    2          23        22   # BR(A -> Z       gam    )
+     9.61059894E-06    2          23        25   # BR(A -> Z       h      )
+     2.07960339E-02    2     1000024  -1000024   # BR(A -> ~chi_1+ ~chi_1-)
+     3.14880145E-03    2     1000037  -1000037   # BR(A -> ~chi_2+ ~chi_2-)
+     2.29414544E-01    2     1000024  -1000037   # BR(A -> ~chi_1+ ~chi_2-)
+     2.29414544E-01    2     1000037  -1000024   # BR(A -> ~chi_2+ ~chi_1-)
+     7.86124158E-04    2     1000022   1000022   # BR(A -> ~chi_10 ~chi_10)
+     9.98294887E-03    2     1000023   1000023   # BR(A -> ~chi_20 ~chi_20)
+     9.27262869E-04    2     1000025   1000025   # BR(A -> ~chi_30 ~chi_30)
+     5.75383097E-03    2     1000035   1000035   # BR(A -> ~chi_40 ~chi_40)
+     5.59102703E-03    2     1000022   1000023   # BR(A -> ~chi_10 ~chi_20)
+     2.84199653E-02    2     1000022   1000025   # BR(A -> ~chi_10 ~chi_30)
+     4.02094695E-02    2     1000022   1000035   # BR(A -> ~chi_10 ~chi_40)
+     8.34355920E-02    2     1000023   1000025   # BR(A -> ~chi_20 ~chi_30)
+     1.33472112E-01    2     1000023   1000035   # BR(A -> ~chi_20 ~chi_40)
+     2.30908521E-03    2     1000025   1000035   # BR(A -> ~chi_30 ~chi_40)
+#
+#         PDG            Width
+DECAY        37     2.62384209E+01   # H+ decays
+#          BR         NDA      ID1       ID2
+     2.17825212E-04    2           4        -5   # BR(H+ -> c       bb     )
+     3.12129704E-02    2         -15        16   # BR(H+ -> tau+    nu_tau )
+     1.10349125E-04    2         -13        14   # BR(H+ -> mu+     nu_mu  )
+     1.39407624E-06    2           2        -5   # BR(H+ -> u       bb     )
+     6.83612333E-06    2           2        -3   # BR(H+ -> u       sb     )
+     1.40761080E-04    2           4        -3   # BR(H+ -> c       sb     )
+     1.51881391E-01    2           6        -5   # BR(H+ -> t       bb     )
+     9.34952753E-06    2          24        25   # BR(H+ -> W+      h      )
+     8.07195208E-13    2          24        36   # BR(H+ -> W+      A      )
+     9.89572642E-03    2     1000024   1000022   # BR(H+ -> ~chi_1+ ~chi_10)
+     3.81196930E-06    2     1000024   1000023   # BR(H+ -> ~chi_1+ ~chi_20)
+     2.27786652E-01    2     1000024   1000025   # BR(H+ -> ~chi_1+ ~chi_30)
+     2.26391079E-01    2     1000024   1000035   # BR(H+ -> ~chi_1+ ~chi_40)
+     5.98861774E-02    2     1000037   1000022   # BR(H+ -> ~chi_2+ ~chi_10)
+     2.39662858E-01    2     1000037   1000023   # BR(H+ -> ~chi_2+ ~chi_20)
+     3.26478065E-03    2     1000037   1000025   # BR(H+ -> ~chi_2+ ~chi_30)
+     9.42430842E-04    2     1000037   1000035   # BR(H+ -> ~chi_2+ ~chi_40)
+     3.96064570E-06    2     1000002  -1000001   # BR(H+ -> ~u_L    ~d_L*  )
+     3.96064570E-06    2     1000004  -1000003   # BR(H+ -> ~c_L    ~s_L*  )
+     4.85776866E-02    2     1000006  -1000005   # BR(H+ -> ~t_1    ~b_1*  )
+
+
+XSECTION  8.00E+03  2212 2212 2 1000001 1000003   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    2.00341927E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000022 1000023   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    2.00341927E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000002 2000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    7.61299324E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000003 1000021   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.80820626E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000004 2000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.60273542E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000002 2000003   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    2.40410313E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000003 2000003   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    2.40410313E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000005 1000023   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000004 1000022   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000002 1000023   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    2.20376120E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000004 1000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    3.20547084E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000002 1000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.24612679E-02 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000004 2000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000022 2000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 2000001 2000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.24211995E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000001 1000023   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.04177802E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000021 1000023   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    2.36403474E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000021 2000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    3.62618888E-02 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000001 1000004   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000004 1000021   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    2.40410313E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000004 2000004   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.60273542E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000001 2000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.40752240E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000037 1000037   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000003 1000003   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000002 1000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000022 2000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    2.00341927E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000001 1000037   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000003 1000003   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000025 1000037   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    2.80478698E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000005 1000021   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    2.00341927E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000001 1000022   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000001 1000023   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.60273542E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000006 1000006   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.08184641E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000001 2000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    3.20547084E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000004 1000005   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000024 1000024   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    5.95816892E-02 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000002 1000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    9.61641251E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000002 1000023   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000004 1000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000001 2000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.32225672E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000001 1000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    9.89689121E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000002 2000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000024 1000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.72294058E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000002 2000003   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000024 1000021   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    2.16369282E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000003 1000021   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    7.21230938E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000003 1000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 2000002 2000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.09386692E-02 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000025 1000035   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.60273542E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000001 2000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    2.00341927E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000001 1000024   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    3.84656500E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000001 2000003   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000002 2000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    5.20889011E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000004 1000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    2.40410313E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000024 1000035   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000002 1000003   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.40752240E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000021 1000022   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    2.36403474E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000021 2000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.09787376E-02 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000023 1000023   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    8.01367709E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000003 2000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    7.61299324E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000001 1000003   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000002 1000004   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    2.40410313E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000003 2000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 2000001 2000003   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    3.60615469E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000002 1000021   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.04177802E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000037 1000024   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000022 1000037   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000021 2000004   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.60273542E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000003 2000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000004 2000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000037 1000035   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000035 1000037   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000003 1000024   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000002 1000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000005 1000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000002 1000003   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000003 2000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000002 1000022   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000004 1000023   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000001 1000021   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    9.21572866E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000001 1000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.40239349E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000004 1000024   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000022 1000024   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    2.40410313E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000024 1000022   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000002 1000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.80820626E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000002 2000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    3.16540245E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000003 2000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000001 1000035   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 2000002 2000003   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    3.60615469E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000005 1000021   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    2.40410313E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000001 1000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    3.60615469E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000037 1000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000001 2000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    3.64622308E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000037 1000025   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000022 2000004   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000001 1000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.08184641E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000022 1000022   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.80820626E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000002 1000021   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    3.76642823E-02 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000002 2000004   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000003 1000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000002 2000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    8.81504480E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000001 1000021   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    7.61299324E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 2000002 2000004   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000021 1000024   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.72806949E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000001 1000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000003 2000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    2.80478698E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000001 1000021   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.06982589E-02 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000021 1000021   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.75499528E-02 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000004 1000023   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000003 1000021   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.40752240E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000004 1000021   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    2.00341927E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000004 1000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000002 -1000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000002 1000005   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000005 1000005   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000002 1000005   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000002 1000024   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    2.40410313E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 2000001 2000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.09386692E-02 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 2000003 2000003   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000021 2000003   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    5.60957397E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000001 1000005   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000003 1000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    6.01025782E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000005 2000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000001 1000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    3.20547084E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000001 -1000003   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000002 1000021   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    8.01367709E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 2000001 2000004   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000001 2000003   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000023 1000024   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    8.16193012E-02 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000003 1000003   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000002 2000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    5.60957397E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000004 1000004   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    2.00341927E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000024 1000023   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    3.27358709E-02 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000004 2000002   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000024 -1000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000024 1000025   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000004 1000021   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    3.20547084E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000002 -2000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000001 2000001   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    1.16198318E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000021 1000037   # Nevts: 10000 xsec unit: pb
+	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000001 1000003   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    2.49305494E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000002 2000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.16052469E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000003 1000021   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    8.61342069E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000004 2000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    2.44320987E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000002 2000003   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    2.99166593E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000003 2000003   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    3.66481481E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000004 1000001   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    4.88641975E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000002 1000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.55068018E-02 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000004 2000001   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.83240740E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 2000001 2000001   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.54569407E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000021 2000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    6.49595476E-02 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000001 1000004   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    9.97221977E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000004 2000004   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    2.44320987E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000001 2000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    6.71882715E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000003 1000003   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    6.10802469E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000002 1000001   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.83240740E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000003 1000003   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.83240740E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000006 1000006   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    2.31515132E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000001 2000001   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    4.88641975E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000002 1000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.46592592E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000004 1000001   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.83240740E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000001 2000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    2.01564814E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000001 1000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.23156914E-02 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000002 2000001   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.22160494E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000002 2000003   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    6.10802469E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000003 1000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.22160494E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 2000002 2000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.36120800E-02 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000001 2000001   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    3.05401234E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000001 2000003   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    4.98610989E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000002 2000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    7.94043208E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000004 1000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    3.66481481E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000002 1000003   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    5.48472087E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000021 2000001   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.96673105E-02 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000003 2000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.16052469E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000001 1000003   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.22160494E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000002 1000004   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    2.99166593E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000003 2000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.49583296E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 2000001 2000003   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    4.48749890E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000021 2000004   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    2.87114023E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000003 2000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.83240740E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000004 2000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    9.97221977E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000002 1000001   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.83240740E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000002 1000003   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    6.10802469E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000003 2000001   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    4.98610989E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000001 1000001   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.74513846E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000002 1000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    7.32962962E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000002 2000001   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    3.93902681E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000003 2000001   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.83240740E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 2000002 2000003   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    4.48749890E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000001 1000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    5.49722221E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000001 2000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    4.53736000E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000001 1000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.64916667E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000002 1000021   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    6.74717953E-02 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000002 2000004   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    4.98610989E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000003 1000001   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.83240740E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000002 2000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.09694417E-02 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 2000002 2000004   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.49583296E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000001 1000001   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    6.10802469E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000003 2000001   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    4.27561727E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000001 1000021   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.91648610E-02 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000021 1000021   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    5.89678414E-02 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000004 1000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.83240740E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000005 1000005   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.79209861E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 2000001 2000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.36120800E-02 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 2000003 2000003   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    4.98610989E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000021 2000003   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.00489908E-03 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000003 1000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    9.16203702E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -2000001 1000001   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    4.88641975E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 2000001 2000004   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    4.98610989E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000001 2000003   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    6.10802469E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000003 1000003   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    4.98610989E-05 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000002 2000001   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    8.55123456E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000004 1000004   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    3.05401234E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 -1000004 2000002   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.83240740E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000004 1000021   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    5.74228046E-04 SModelS 0.99
+
+XSECTION  8.00E+03  2212 2212 2 1000001 2000001   # Nevts: 10000 xsec unit: pb
+	0  2  0  0  0  0    1.44597187E-03 SModelS 0.99
+
+XSECTION  1.30E+04  2212 2212 2 1000001 1000003   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    2.49567827E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 2000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    9.86195444E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000003 2000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    3.11959783E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000003 1000021   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.47779863E-02 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 2000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    2.11327595E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000002 2000003   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.55979892E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 1000003   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    3.16991393E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 1000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.05663798E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000002 1000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    5.67766806E-02 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 1000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    3.16991393E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 2000001 2000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.09185924E-02 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000021 2000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    5.15012822E-01 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000001 1000004   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    6.23919567E-04 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 2000003   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    5.98761520E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 2000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    6.33982786E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 1000003   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    3.52212659E-04 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 1000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.40885063E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 1000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.76106329E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 2000004   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    5.98761520E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000006 1000006   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.33671429E-02 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000004 2000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    6.23919567E-04 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 2000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    7.39646583E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 1000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.30318684E-02 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 1000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    3.52212659E-04 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 2000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.51451443E-02 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000005 2000005   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    5.12227802E-04 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000001 1000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    6.45756752E-02 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 2000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.05663798E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 2000003   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    7.04425317E-04 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 2000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    2.46548861E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 2000002 2000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    6.51995947E-02 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 1000003   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    3.52212659E-04 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 2000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    6.33982786E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000001 2000003   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.24783913E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 2000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    9.50974178E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 1000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    6.69204052E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000002 1000003   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    5.92723588E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000021 2000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    2.13172452E-01 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 2000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    8.45310381E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000002 1000004   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    4.36743697E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 2000001 2000003   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.87175870E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 2000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.40885063E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000021 2000004   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    5.54174486E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 2000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    2.46548861E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000004 2000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    2.49567827E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 1000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    2.11327595E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 1000003   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    3.52212659E-04 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000003 2000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.24783913E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000003 1000003   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    3.11959783E-04 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000001 1000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    9.35879350E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 1000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    9.50974178E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000002 2000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    3.21318577E-02 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 2000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    3.16991393E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 2000002 2000003   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    4.67939675E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 1000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.09185924E-02 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 1000004   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    7.04425317E-04 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000001 2000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    3.24438175E-02 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 2000003   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    7.04425317E-04 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000002 1000021   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    5.26465762E-01 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 1000003   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    3.52212659E-04 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000002 2000004   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    9.35879350E-04 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 1000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    2.81770127E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 2000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    3.52212659E-04 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000002 2000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    8.51650209E-02 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 2000002 2000004   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.55979892E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 1000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    7.39646583E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000001 1000021   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.91374922E-01 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000021 1000021   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    6.86229424E-01 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 2000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    5.28318988E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 1000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.16230177E-02 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000005 1000005   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.04268896E-02 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 2000001 2000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    6.48876349E-02 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 2000004   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    7.04425317E-04 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 1000004   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    3.52212659E-04 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000021 2000003   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.07140401E-02 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 1000002   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    9.50974178E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000004 2000004   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    3.11959783E-04 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 1000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    9.86195444E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 2000001 2000004   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    6.23919567E-04 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 2000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    5.63540254E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 1000004   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    4.57876456E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 1000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.76106329E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000004 1000021   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    5.91119452E-03 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 2000003   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    3.52212659E-04 SModelS 1.0.90
+
+XSECTION  1.30E+04  2212 2212 2 1000001 2000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    9.35879350E-03 SModelS 1.0.90
