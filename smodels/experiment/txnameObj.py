@@ -42,7 +42,7 @@ class TxName(object):
     def __init__(self, path, globalObj, infoObj):
         self.path = path
         self.globalInfo = globalObj
-        # self.infoObj = infoObj
+        self._infoObj = infoObj
         self.txnameData = None
         self._topologyList = TopologyList()
 
@@ -78,7 +78,7 @@ class TxName(object):
                 logger.info("Ignoring unknown field %s found in file %s" \
                              % (tag, self.path))
                 continue
-        ident = self.globalInfo.id+":"+dataType[0] ## +":"+self.infoObj.dataId
+        ident = self.globalInfo.id+":"+dataType[0] ## +":"+self._infoObj.dataId
         ident += ":" + self.txName
         self.txnameData = TxNameData( data, dataType, ident )
 
