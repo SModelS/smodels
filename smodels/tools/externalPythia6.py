@@ -267,7 +267,8 @@ class ExternalPythia6(ExternalTool):
         
         """
         if not os.path.exists(self.executablePath):
-            logger.error("executable '%s' not found", self.executablePath)
+            logger.error("Executable '%s' not found. Maybe you didn't compile " \
+                         "the external tools in smodels/lib?", self.executablePath)
             if fix:
                 self.compile()
             return False
