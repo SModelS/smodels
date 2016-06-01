@@ -233,7 +233,7 @@ def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True, pythiacard=None
         pythiadir = "%s/log" % tool.tempDirectory()
         logger.error("No LHE events found in pythia output %s" % pythiadir )
         if not os.path.exists ( pythiadir ):
-            logger.error ("Will write dump pythia output to %s" % pythiadir )
+            logger.error ("Will dump pythia output to %s" % pythiadir )
             f=open ( pythiadir, "w" )
             for line in lhedata:
                 f.write ( line )
