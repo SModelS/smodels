@@ -230,8 +230,15 @@ def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True, pythiacard=None
         logger.info ( "keeping temporary directory at %s" % tool.tempDirectory() )
     lhedata = tool.run(slhafile, do_check=False, do_unlink=unlink )
     if not "<LesHouchesEvents" in lhedata:
-        logger.error("LHE events not found in pythia output")
-        raise SModelSError()
+        pythiadir = "%s/log" % tool.tempDirectory()
+        logger.error("No LHE events found in pythia output %s" % pythiadir )
+        if not os.path.exists ( pythiadir ):
+            logger.error ("Will write dump pythia output to %s" % pythiadir )
+            f=open ( pythiadir, "w" )
+            for line in lhedata:
+                f.write ( line )
+            f.close()
+        raise SModelSError( "No LHE events found in %s" % pythiadir )
 
     #Reset pythia card to its default value
     if pythiacard:
