@@ -187,16 +187,21 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
     predictionList = TheoryPredictionList()
     # Select elements belonging to expResult and apply efficiencies
     elements = _getElementsFrom(smsTopList, dataset)
-    if len(elements) == 0: return None
+    
+    #Check dataset sqrts format:
     if (dataset.globalInfo.sqrts/TeV).normalize()._unit:
             ID = dataset.globalInfo.id
             logger.error("Sqrts defined with wrong units for %s" %(ID) )
             return False
-
+            
+    #Remove unwanted cross-sections
+    newelements = []
     for el in elements:
-        for xsec in el.weight:          
-            if xsec.info.sqrts != dataset.globalInfo.sqrts:
-                el.weight.delete(xsec)
+        el.weight = el.weight.getXsecsFor(dataset.globalInfo.sqrts)
+        if not el.weight: continue
+        newelements.append(el)
+    elements = newelements
+    if len(elements) == 0: return None
 
     # Combine elements according to their respective constraints and masses
     # (For efficiencyMap analysis group all elements)
