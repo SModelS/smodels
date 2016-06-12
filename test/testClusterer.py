@@ -8,7 +8,7 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
-import sys
+import sys,os
 sys.path.insert(0,"../")
 import unittest
 
@@ -18,6 +18,7 @@ class ClustererTest(unittest.TestCase):
         from smodels.theory import lheReader, lheDecomposer, crossSection
         from smodels.theory import clusterTools
         from smodels.experiment.txnameObj import TxName, TxNameData
+        from smodels.experiment.infoObj import Info
         from smodels.installation import installDirectory
         from smodels.tools.physicsUnits import GeV, pb, fb
         import copy
@@ -25,8 +26,10 @@ class ClustererTest(unittest.TestCase):
         data = [[ [[ 674.99*GeV, 199.999*GeV], [ 674.99*GeV, 199.999*GeV] ],.03*fb ], 
                [ [[ 725.0001*GeV,200.*GeV], [ 725.0001*GeV,200.*GeV] ], .06*fb ] ,
                [ [[ 750.*GeV,250.*GeV], [ 750.*GeV,250.*GeV] ], .03*fb ] ]
-        txnameData=TxNameData(data, "efficiencyMap" )
-        txname=TxName("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/T2bb.txt","info")
+        info = Info(os.path.join("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/","dataInfo.txt"))
+        globalInfo = Info(os.path.join("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/","globalInfo.txt"))
+        txnameData=TxNameData(data, "efficiencyMap", Id=1)
+        txname=TxName("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/T2bb.txt",globalInfo,info)
         txname.txnameData = txnameData
 
         filename = "%sinputFiles/lhe/simplyGluino.lhe" % (installDirectory() )
