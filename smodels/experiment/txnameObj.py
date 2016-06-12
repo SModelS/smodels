@@ -208,7 +208,7 @@ class TxNameData(object):
 
     def __str__ ( self ):
         """ a simple unique string identifier, mostly for _memoize """
-        return self._id
+        return str ( self._id )
 
     def round_to_n ( self, x, n ):
         if x==0.0:

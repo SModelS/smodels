@@ -33,7 +33,6 @@ def _toString ( arg ):
         argstring=""
         for newarg in arg:
             argstring += _toString ( newarg )
-    #    print "argstring=",argstring
         return argstring
     return "%s " % ( str(arg) )
     
