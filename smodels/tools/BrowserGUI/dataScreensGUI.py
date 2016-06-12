@@ -554,9 +554,9 @@ class ULgetter(FloatLayout):
             return
         self.txname = txname
         self.ulLabel.text = "UL for %s :" %txname.txName
-        if not txname.txnameData.data:
+        if not txname.txnameData._data:
             txname.txnameData.loadData()
-        massarray =  txname.txnameData.data[0][0]
+        massarray =  txname.txnameData._data[0][0]
         for ib in range(len(self.massInput)):
             if ib == 0:
                 mLabel = "m"
