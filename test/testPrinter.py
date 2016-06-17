@@ -91,7 +91,7 @@ class RunPrinterTest(unittest.TestCase):
         self.printerList.addObj(outputStatus)
         self.printerList.close()
 
-    def describeDifferentValue ( self ):
+    def describeDifferentValue ( self, Akv, Bkv ):
         if type ( Akv ) == float:
             if abs ( Akv - Bkv ) > 10**-7:
                 self.logger.error ( 
