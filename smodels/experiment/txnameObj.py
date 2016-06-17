@@ -333,6 +333,9 @@ class TxNameData(object):
         ## how far are we away from the "plane": distance alpha
         alpha = float ( np.sqrt ( np.dot ( P[self.dimensionality:],
                         P[self.dimensionality:] ) ) )
+        if alpha == 0.:
+            ## no distance to the plane, so no extrapolation error
+            return 0.
         ## the value of the grid at the point projected to the "plane"
 
         ## compute gradient
