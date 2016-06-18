@@ -16,7 +16,6 @@ from smodels.theory import slhaDecomposer
 from smodels.theory import lheDecomposer
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.tools.physicsUnits import GeV, fb
-from smodels.tools.caching import clearCache
 from smodels.tools import ioObjects
 from smodels.tools import coverage
 from smodels.tools import crashReport, timeOut
@@ -99,7 +98,6 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
         runSingleFile ( inFile, inputFile, outputDir )
         if len(fileList) > 1: inputFile = os.path.join(inFile, inputFile)
         print("Now testing %s" %inputFile)
-        clearCache()
         currentFile = inputFile
         outputFile = os.path.join(outputDir, os.path.basename(inputFile))+'.smodels'
 
