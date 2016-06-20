@@ -19,7 +19,6 @@ import smodels.tools.printer as prt
 from smodels.experiment.exceptions import DatabaseNotFoundException
 
 log = logging.getLogger(__name__)
-currentFile = ""
 
 
 def runSingleFile (inputFile, outputDir, parser, databaseVersion, listOfExpRes, crashReport=True):
