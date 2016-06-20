@@ -19,7 +19,7 @@ from smodels.tools.physicsUnits import GeV, fb
 from smodels.tools import ioObjects
 from smodels.tools import coverage
 from smodels.tools import crashReport, timeOut
-import smodels.tools.printer as prt
+from smodels.tools.printer import MPrinter, TxTPrinter, PyPrinter,SummaryPrinter,XmlPrinter
 from smodels.experiment.exceptions import DatabaseNotFoundException
 
 log = logging.getLogger(__name__)
@@ -71,6 +71,10 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
         log.error("Unknown input type (must be SLHA or LHE): %s" % inputType)
         return
 
+    printerTypes = parser.get("stdout", "outputType").split(",")
+    if isinstance(printerTypes,str):
+        printerTypes = [printerTypes]   
+
     """ Check database location and load database"""
     try:
         databasePath = parser.get("path", "databasePath")
@@ -92,19 +96,28 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
 
     """ Create output directory if missing """
     if not os.path.isdir(outputDir): os.mkdir(outputDir)
+    
+    """ Setup output printers """
+    masterPrinter = MPrinter(printerList=[])    
+    for prt in printerTypes:
+        if prt == 'python':
+            masterPrinter.Printers.append(PyPrinter(output = 'file'))
+        elif prt == 'summary':        
+            masterPrinter.Printers.append(SummaryPrinter(output = 'file'))
+        elif prt == 'stdout':
+            masterPrinter.Printers.append(TxTPrinter(output = 'stdout'))
+        elif prt == 'xml':
+            masterPrinter.Printers.append(XmlPrinter(output = 'file'))            
+        else:
+            log.warning("Unknown printer format: %s" %prt)      
 
     """ loop over input files and run SModelS """
-    for inputFile in fileList:
+    for inputFile in fileList:        
         runSingleFile ( inFile, inputFile, outputDir )
         if len(fileList) > 1: inputFile = os.path.join(inFile, inputFile)
         print("Now testing %s" %inputFile)
-        currentFile = inputFile
-        outputFile = os.path.join(outputDir, os.path.basename(inputFile))+'.smodels'
-
-        if os.path.exists(outputFile):
-            log.warning("Removing old output file " + outputFile)
-        outfile = open(outputFile, 'w')
-        outfile.close()
+        currentFile = inputFile        
+        masterPrinter.setOutPutFiles(os.path.join(outputDir, os.path.basename(inputFile)))
 
         """ Check input file for errors """
         inputStatus = ioObjects.FileStatus()
@@ -113,12 +126,11 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
 
         """ Initialize output status and exit if there were errors in the input """
         outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile, 
-                dict(parser.items("parameters")), databaseVersion, outputFile)
-        if outputStatus.status < 0: continue
-
-        """ Setup output printers """
-        stdoutPrinter = prt.TxTPrinter(output = 'stdout')
-        summaryPrinter = prt.SummaryPrinter(output = 'file', filename = outputFile)
+                dict(parser.items("parameters")), databaseVersion)
+        masterPrinter.addObj(outputStatus)              
+        if outputStatus.status < 0:            
+            masterPrinter.flush()
+            continue
 
 
 
@@ -154,7 +166,7 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
         if parser.getboolean("stdout", "printDecomp"):
             outLevel = 1
             outLevel += parser.getboolean("stdout", "addElmentInfo")
-        stdoutPrinter.addObj(smstoplist,outLevel)
+        masterPrinter.addObj(smstoplist,outLevel)
 
 
         """
@@ -187,7 +199,7 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
         if parser.getboolean("stdout", "printAnalyses"):
             outLevel = 1
             outLevel += parser.getboolean("stdout", "addAnaInfo")          
-        for expResult in listOfExpRes: stdoutPrinter.addObj(expResult,outLevel)
+        for expResult in listOfExpRes: masterPrinter.addObj(expResult,outLevel)
     
         """
         Compute theory predictions
@@ -199,9 +211,6 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
         for expResult in listOfExpRes:     
             theorypredictions = theoryPredictionsFor(expResult, smstoplist)
             if not theorypredictions: continue
-            if parser.getboolean("stdout", "printResults"):
-                stdoutPrinter.addObj(theorypredictions)
-
             allPredictions += theorypredictions._theoryPredictions
 
     
@@ -216,24 +225,15 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
             outputStatus.updateStatus(1)
             outLevel = 1
             outLevel += parser.getboolean("file", "addConstraintInfo")
+            masterPrinter.addObj(results,outLevel)
         else:
             outputStatus.updateStatus(0) # no results after enforcing maxcond
-        stdoutPrinter.addObj(outputStatus)
-        summaryPrinter.addObj(outputStatus)
-        summaryPrinter.addObj(results,outLevel)
-        if parser.getboolean("stdout", "printResults"):
-            stdoutPrinter.addObj(results,outLevel)
-    
         
         if parser.getboolean("options", "testCoverage"):
             """ Look for missing topologies, add them to the output file """
             uncovered = coverage.Uncovered(smstoplist)
-            summaryPrinter.addObj(uncovered.missingTopos)
-            stdoutPrinter.addObj(uncovered.missingTopos,2) 
-            summaryPrinter.addObj(uncovered,2)
-            stdoutPrinter.addObj(uncovered,2) 
-        stdoutPrinter.close()
-        summaryPrinter.close()
+            masterPrinter.addObj(uncovered)        
+        masterPrinter.flush()
 
 
 if __name__ == "__main__":
