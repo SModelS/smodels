@@ -69,7 +69,7 @@ class ResultList(object):
         
         expResult = theoPred.expResult
         datasetID = theoPred.dataset.dataInfo.dataId
-        dataType = expResult.datasets[0].dataInfo.dataType 
+        dataType = expResult.datasets[0].dataInfo.dataType
         
         if dataType == 'upperLimit':
             ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass)

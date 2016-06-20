@@ -12,12 +12,8 @@ import logging
 from ConfigParser import SafeConfigParser
 from smodels.experiment.databaseObj import Database
 from smodels.installation import installDirectory
-from smodels.theory import slhaDecomposer
-from smodels.theory import lheDecomposer
-from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.tools.physicsUnits import GeV, fb
-from smodels.tools import ioObjects
-from smodels.tools import coverage
+from smodels.tools import testPoint
 from smodels.tools import crashReport, timeOut
 import smodels.tools.printer as prt
 from smodels.experiment.exceptions import DatabaseNotFoundException
@@ -26,8 +22,11 @@ log = logging.getLogger(__name__)
 currentFile = ""
 
 
-def runSingleFile ( inFile, inputFile, outputDir ):
-    return
+def runSingleFile (inputFile, outputDir, parser, databaseVersion, listOfExpRes, crashReport=True):
+    #try:
+    testPoint.testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes)
+    #except:
+    #    if crashReport: print("write crash report here") #FIXME want single file crash report here
 
 def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
     """
@@ -50,7 +49,6 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
     Read and check parameter file
     =========================
     """
-    global currentFile
     parser = SafeConfigParser()
     ret=parser.read(parameterFile)
     if ret == []:
@@ -93,147 +91,45 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
     """ Create output directory if missing """
     if not os.path.isdir(outputDir): os.mkdir(outputDir)
 
-    """ loop over input files and run SModelS """
-    for inputFile in fileList:
-        runSingleFile ( inFile, inputFile, outputDir )
-        if len(fileList) > 1: inputFile = os.path.join(inFile, inputFile)
-        print("Now testing %s" %inputFile)
-        currentFile = inputFile
-        outputFile = os.path.join(outputDir, os.path.basename(inputFile))+'.smodels'
+    """ Setup output printers """
+    stdoutPrinter = prt.TxTPrinter(output = 'stdout')
 
-        if os.path.exists(outputFile):
-            log.warning("Removing old output file " + outputFile)
-        outfile = open(outputFile, 'w')
-        outfile.close()
+    """
+    Load analysis database
+    ======================
+    """
 
-        """ Check input file for errors """
-        inputStatus = ioObjects.FileStatus()
-        if parser.getboolean("options", "checkInput"):
-            inputStatus.checkFile(inputType, inputFile, sigmacut)
+    """ In case that a list of analyses or txnames are given, retrieve list """
+    analyses = parser.get("database", "analyses").split(",")
+    txnames = parser.get("database", "txnames").split(",")
+    if parser.get("database", "dataselector") == "efficiencyMap":
+        dataTypes = ['efficiencyMap']
+        datasetIDs = ['all']
+    elif parser.get("database", "dataselector") == "upperLimit":
+        dataTypes = ['upperLimit']
+        datasetIDs = ['all']
+    else:
+        dataTypes = ['all']
+        datasetIDs = parser.get("database", "dataselector").split(",")
+    '''if parser.get("database", "datasets") == "None": datasetIDs = [None]
+    else: datasetIDs = parser.get("database", "datasets").split(",")'''
 
-        """ Initialize output status and exit if there were errors in the input """
-        outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile, 
-                dict(parser.items("parameters")), databaseVersion, outputFile)
-        if outputStatus.status < 0: continue
+    """ Load analyses """        
 
-        """ Setup output printers """
-        stdoutPrinter = prt.TxTPrinter(output = 'stdout')
-        summaryPrinter = prt.SummaryPrinter(output = 'file', filename = outputFile)
-
-
-
-        """
-        Decompose input file
-        ====================
-        """
-        try:
-            """ Decompose input SLHA file, store the output elements in smstoplist """
-            if inputType == 'slha':
-                smstoplist = slhaDecomposer.decompose(inputFile, sigmacut, 
-                        doCompress=parser.getboolean("options", "doCompress"),
-                        doInvisible=parser.getboolean("options", "doInvisible"), 
-                        minmassgap=minmassgap)
-            else:
-                smstoplist = lheDecomposer.decompose(inputFile, 
-                        doCompress=parser.getboolean("options", "doCompress"),
-                        doInvisible=parser.getboolean("options", "doInvisible"), 
-                        minmassgap=minmassgap)
-        except:
-            """ Update status to fail, print error message and exit """
-            outputStatus.updateStatus(-1)
-            continue
-
-        """ Print Decomposition output.
-            If no topologies with sigma > sigmacut are found, update status, write
-            output file, stop running """
-        if not smstoplist:
-            outputStatus.updateStatus(-3)
-            continue
-
-        outLevel = 0
-        if parser.getboolean("stdout", "printDecomp"):
-            outLevel = 1
-            outLevel += parser.getboolean("stdout", "addElmentInfo")
-        stdoutPrinter.addObj(smstoplist,outLevel)
-
-
-        """
-        Load analysis database
-        ======================
-        """
-
-        """ In case that a list of analyses or txnames are given, retrieve list """
-        analyses = parser.get("database", "analyses").split(",")
-        txnames = parser.get("database", "txnames").split(",")
-        if parser.get("database", "dataselector") == "efficiencyMap":
-            dataTypes = ['efficiencyMap']
-            datasetIDs = ['all']
-        elif parser.get("database", "dataselector") == "upperLimit":
-            dataTypes = ['upperLimit']
-            datasetIDs = ['all']
-        else:
-            dataTypes = ['all']
-            datasetIDs = parser.get("database", "dataselector").split(",")
-        '''if parser.get("database", "datasets") == "None": datasetIDs = [None]
-        else: datasetIDs = parser.get("database", "datasets").split(",")'''
-
-        """ Load analyses """        
-
-        listOfExpRes = database.getExpResults(analysisIDs=analyses, txnames=txnames, 
+    listOfExpRes = database.getExpResults(analysisIDs=analyses, txnames=txnames, 
                             datasetIDs=datasetIDs, dataTypes=dataTypes)
 
-        """ Print list of analyses loaded """
-        outLevel = 0
-        if parser.getboolean("stdout", "printAnalyses"):
-            outLevel = 1
-            outLevel += parser.getboolean("stdout", "addAnaInfo")          
-        for expResult in listOfExpRes: stdoutPrinter.addObj(expResult,outLevel)
-    
-        """
-        Compute theory predictions
-        ====================================================
-        """
-   
-        """ Get theory prediction for each analysis and print basic output """
-        allPredictions = []
-        for expResult in listOfExpRes:     
-            theorypredictions = theoryPredictionsFor(expResult, smstoplist)
-            if not theorypredictions: continue
-            if parser.getboolean("stdout", "printResults"):
-                stdoutPrinter.addObj(theorypredictions)
+    """ Print list of analyses loaded """
+    outLevel = 0
+    if parser.getboolean("stdout", "printAnalyses"):
+        outLevel = 1
+        outLevel += parser.getboolean("stdout", "addAnaInfo")          
+    for expResult in listOfExpRes: stdoutPrinter.addObj(expResult,outLevel)
 
-            allPredictions += theorypredictions._theoryPredictions
-
-    
-        """ Define result list that collects all theoryPrediction objects."""
-        maxcond = parser.getfloat("parameters", "maxcond")
-        results = ioObjects.ResultList(allPredictions,maxcond)
-        if not parser.getboolean("file", "expandedSummary"):
-            results.useBestResult()
-
-        outLevel = 0
-        if not results.isEmpty():
-            outputStatus.updateStatus(1)
-            outLevel = 1
-            outLevel += parser.getboolean("file", "addConstraintInfo")
-        else:
-            outputStatus.updateStatus(0) # no results after enforcing maxcond
-        stdoutPrinter.addObj(outputStatus)
-        summaryPrinter.addObj(outputStatus)
-        summaryPrinter.addObj(results,outLevel)
-        if parser.getboolean("stdout", "printResults"):
-            stdoutPrinter.addObj(results,outLevel)
-    
-        
-        if parser.getboolean("options", "testCoverage"):
-            """ Look for missing topologies, add them to the output file """
-            uncovered = coverage.Uncovered(smstoplist)
-            summaryPrinter.addObj(uncovered.missingTopos)
-            stdoutPrinter.addObj(uncovered.missingTopos,2) 
-            summaryPrinter.addObj(uncovered,2)
-            stdoutPrinter.addObj(uncovered,2) 
-        stdoutPrinter.close()
-        summaryPrinter.close()
+    """ loop over input files and run SModelS """
+    for inputFile in fileList:
+        if len(fileList) > 1: inputFile = os.path.join(inFile, inputFile)
+        runSingleFile ( inputFile, outputDir, parser, databaseVersion, listOfExpRes )
 
 
 if __name__ == "__main__":
@@ -274,7 +170,7 @@ if __name__ == "__main__":
     db=None
     if args.force_txt: db=True
     
-    if args.run_crashreport:
+    if args.run_crashreport: #FIXME overall crash report for the loop (before reading any input file)
         args.filename, args.parameterFile = crashReport.readCrashReportFile(
                 args.filename)
         with timeOut.Timeout(args.timeout):
