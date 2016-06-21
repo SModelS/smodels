@@ -10,11 +10,9 @@
 
 import sys,shutil,os
 sys.path.insert(0,"../")
-sys.path.insert(0,"./unitTestOutput")
 import unittest
 from os.path import join, basename
 from smodels.installation import installDirectory as iDir
-from smodels.tools import summaryReader
 from runSModelS import main
 import logging as logger
 import unum
@@ -87,27 +85,27 @@ class RunSModelSTest(unittest.TestCase):
     def testGoodFile(self):        
         filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
         outputfile = self.runMain(filename )
-        shutil.copyfile(outputfile,'unitTestOutput/output.py')
+        shutil.copyfile(outputfile,'./output.py')
         from gluino_squarks_default import smodelsOutputDefault
         from output import smodelsOutput
         ignoreFields = ['input file','smodels version']
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.01,ignore=ignoreFields)
         self.assertEqual(equals,True)
-        os.remove('unitTestOutput/output.py')
-        os.remove('unitTestOutput/output.pyc')
+        os.remove('./output.py')
+        os.remove('./output.pyc')
 
     def testBadFile(self):
    
         filename = join ( iDir(), "inputFiles/slha/I_dont_exist.slha" )
         outputfile = self.runMain (filename )
-        shutil.copyfile(outputfile,'unitTestOutput/bad_output.py')
+        shutil.copyfile(outputfile,'./bad_output.py')
         from bad_default import smodelsOutputDefault
         from bad_output import smodelsOutput
         ignoreFields = ['input file','smodels version']
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.,ignore=ignoreFields)
         self.assertEqual(equals,True)
-        os.remove('unitTestOutput/bad_output.py')
-        os.remove('unitTestOutput/bad_output.pyc')
+        os.remove('./bad_output.py')
+        os.remove('./bad_output.pyc')
 
 if __name__ == "__main__":
     unittest.main()
