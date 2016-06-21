@@ -19,7 +19,7 @@ from smodels.tools.physicsUnits import GeV, fb
 from smodels.tools import ioObjects
 from smodels.tools import coverage
 from smodels.tools import crashReport, timeOut
-from smodels.tools.printer import MPrinter, TxTPrinter, PyPrinter,SummaryPrinter,XmlPrinter
+from smodels.tools.printer import MPrinter
 from smodels.experiment.exceptions import DatabaseNotFoundException
 
 log = logging.getLogger(__name__)
@@ -71,9 +71,11 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
         log.error("Unknown input type (must be SLHA or LHE): %s" % inputType)
         return
 
+    """ Setup output printers """
     printerTypes = parser.get("stdout", "outputType").split(",")
     if isinstance(printerTypes,str):
-        printerTypes = [printerTypes]   
+        printerTypes = [printerTypes]
+    masterPrinter = MPrinter(printerList=printerTypes)             
 
     """ Check database location and load database"""
     try:
@@ -97,19 +99,7 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
     """ Create output directory if missing """
     if not os.path.isdir(outputDir): os.mkdir(outputDir)
     
-    """ Setup output printers """
-    masterPrinter = MPrinter(printerList=[])    
-    for prt in printerTypes:
-        if prt == 'python':
-            masterPrinter.Printers.append(PyPrinter(output = 'file'))
-        elif prt == 'summary':        
-            masterPrinter.Printers.append(SummaryPrinter(output = 'file'))
-        elif prt == 'stdout':
-            masterPrinter.Printers.append(TxTPrinter(output = 'stdout'))
-        elif prt == 'xml':
-            masterPrinter.Printers.append(XmlPrinter(output = 'file'))            
-        else:
-            log.warning("Unknown printer format: %s" %prt)      
+
 
     """ loop over input files and run SModelS """
     for inputFile in fileList:        

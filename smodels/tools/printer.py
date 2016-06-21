@@ -30,10 +30,25 @@ logger = logging.getLogger(__name__)
 class MPrinter(object):
     """
     Master Printer class to handle the Printers (one printer/output type)
+    :ivar printerList: list
     """
     def __init__(self,printerList):
 
-        self.Printers = printerList        
+        self.Printers = []
+        if isinstance(printerList,list):
+            for prt in printerList:
+                if isinstance(prt,BasicPrinter):
+                    self.Printer.append(prt)
+                elif prt == 'python':
+                    self.Printers.append(PyPrinter(output = 'file'))
+                elif prt == 'summary':        
+                    self.Printers.append(SummaryPrinter(output = 'file'))
+                elif prt == 'stdout':
+                    self.Printers.append(TxTPrinter(output = 'stdout'))
+                elif prt == 'xml':
+                    self.Printers.append(XmlPrinter(output = 'file'))            
+                else:
+                    logger.warning("Unknown printer format: %s" %str(prt))      
 
     def addObj(self,obj,objOutputLevel=None):
         """
