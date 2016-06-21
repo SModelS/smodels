@@ -37,8 +37,8 @@ class RunPrinterTest(unittest.TestCase):
                 filename = './unitTestOutput/sms_output.py')
         self.xmlPrinter = printer.XmlPrinter(output = 'file', 
                 filename = './unitTestOutput/sms_output.xml')
-        self.printerList = printer.MPrinter( self.stdoutPrinter,self.summaryPrinter,
-                                             self.pythonPrinter,self.xmlPrinter)
+        self.printerList = printer.MPrinter([self.stdoutPrinter,self.summaryPrinter,
+                                             self.pythonPrinter,self.xmlPrinter])
         #Set the address of the database folder
         self.slhafile = join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
         self.runMain()
@@ -89,7 +89,7 @@ class RunPrinterTest(unittest.TestCase):
                                               databaseVersion)
         outputStatus.status = 1
         self.printerList.addObj(outputStatus)
-        self.printerList.close()
+        self.printerList.flush()
 
     def describeDifferentValue ( self, Akv, Bkv ):
         if type ( Akv ) == float:
@@ -158,15 +158,15 @@ class RunPrinterTest(unittest.TestCase):
 
     def testPythonPrinter(self):
         #Test python output
-        from default_output import smodelsOutput as defaultOut
+        from gluino_squarks_default import smodelsOutputDefault
         from unitTestOutput.sms_output import smodelsOutput
         inputFile = smodelsOutput['input file']
         inputFile = inputFile[inputFile.rfind('/'):]
         smodelsOutput['input file'] = inputFile
-        defaultFile = defaultOut['input file']
+        defaultFile = smodelsOutputDefault['input file']
         defaultFile = defaultFile[defaultFile.rfind('/'):]
-        defaultOut['input file'] = defaultFile
-        self.describeDifferences ( smodelsOutput, defaultOut, 
+        smodelsOutputDefault['input file'] = defaultFile
+        self.describeDifferences ( smodelsOutput, smodelsOutputDefault, 
                 "./default_output.py", "./unitTestOutput/sms_output.py" )
 
     def testXmlPrinter(self):
