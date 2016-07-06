@@ -43,28 +43,47 @@ def runAllFiles ( fileList, inDir, outputDir, parser, databaseVersion, listOfExp
         log.error ( "no files given." )
         return
     if len(fileList ) == 1:
-        runSingleFile ( inputFile, outputDir, parser, databaseVersion, listOfExpRes )
+        runSingleFile ( fileList[0], outputDir, parser, databaseVersion, listOfExpRes )
         return
 
     """ loop over input files and run SModelS """
     ncpus = runtime.nCPUs()
-    log.error ("we have %d cores" % ncpus )
+    log.info ("we run on %d cores" % ncpus )
 
     cleanedList = []
     for f in fileList:
         tmp = os.path.join(inDir, f )
         if not os.path.isfile ( tmp ):
-            log.error ( "%s does not exist or is not a file. Skipping it." % tmp )
+            log.info ( "%s does not exist or is not a file. Skipping it." % tmp )
             continue
         cleanedList.append ( tmp )
 
+    runOnSingleCore = False
+    if runOnSingleCore:
+        runSetOfFiles ( cleanedList, outputDir, parser, databaseVersion, 
+                        listOfExpRes )
+        return
+
     ### now split up for every fork
     chunkedFiles = [ cleanedList[x::ncpus] for x in range(ncpus ) ]
-    for i in range(ncpus):
-        log.error ("chunk #%d: %s" % (i, chunkedFiles[i] ) )
-    #for inputFile in fileList:
-    #    inputFile = os.path.join(inDir, inputFile)
-    #    runSingleFile ( inputFile, outputDir, parser, databaseVersion, listOfExpRes )
+    children = []
+    for (i,chunk) in enumerate ( chunkedFiles ):
+        pid=os.fork()
+        if pid == 0:
+            log.info ("chunk #%d: pid %d (parent %d)." % 
+                    ( i, os.getpid(), os.getppid() ) )
+            log.info ( " `-> %s" % " ".join ( chunk ) )
+            runSetOfFiles ( chunk, outputDir, parser, databaseVersion, listOfExpRes )
+            return
+        if pid < 0:
+            log.error ( "fork did not succeed! Pid=%d" % pid )
+            sys.exit()
+        if pid > 0:
+            children.append ( pid )
+    for child in children:
+        os.waitpid ( child, 0 )
+        log.info ( "child %d terminated." % child )
+    log.info ( "all children terminated" )
 
 def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
     """
