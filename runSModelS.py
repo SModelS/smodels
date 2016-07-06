@@ -13,7 +13,7 @@ from ConfigParser import SafeConfigParser
 from smodels.experiment.databaseObj import Database
 from smodels.installation import installDirectory
 from smodels.tools.physicsUnits import GeV, fb
-from smodels.tools import testPoint
+from smodels.tools import testPoint, runtime
 from smodels.tools import crashReport, timeOut
 import smodels.tools.printer as prt
 from smodels.experiment.exceptions import DatabaseNotFoundException
@@ -26,6 +26,45 @@ def runSingleFile (inputFile, outputDir, parser, databaseVersion, listOfExpRes, 
     testPoint.testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes)
     #except:
     #    if crashReport: print("write crash report here") #FIXME want single file crash report here
+
+def runSetOfFiles ( inputFiles, outputDir, parser, databaseVersion, listOfExpRes, 
+                    crashReport=True ):
+    for inputFile in inputFiles:
+        #try:
+        testPoint.testPoint( inputFile, outputDir, parser, databaseVersion, 
+                             listOfExpRes )
+        #except:
+        #    if crashReport: print("write crash report here") 
+        #FIXME want single file crash report here
+
+def runAllFiles ( fileList, inDir, outputDir, parser, databaseVersion, listOfExpRes ):
+    """ run over all files """
+    if len( fileList ) == 0:
+        log.error ( "no files given." )
+        return
+    if len(fileList ) == 1:
+        runSingleFile ( inputFile, outputDir, parser, databaseVersion, listOfExpRes )
+        return
+
+    """ loop over input files and run SModelS """
+    ncpus = runtime.nCPUs()
+    log.error ("we have %d cores" % ncpus )
+
+    cleanedList = []
+    for f in fileList:
+        tmp = os.path.join(inDir, f )
+        if not os.path.isfile ( tmp ):
+            log.error ( "%s does not exist or is not a file. Skipping it." % tmp )
+            continue
+        cleanedList.append ( tmp )
+
+    ### now split up for every fork
+    chunkedFiles = [ cleanedList[x::ncpus] for x in range(ncpus ) ]
+    for i in range(ncpus):
+        log.error ("chunk #%d: %s" % (i, chunkedFiles[i] ) )
+    #for inputFile in fileList:
+    #    inputFile = os.path.join(inDir, inputFile)
+    #    runSingleFile ( inputFile, outputDir, parser, databaseVersion, listOfExpRes )
 
 def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
     """
@@ -125,10 +164,7 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
         outLevel += parser.getboolean("stdout", "addAnaInfo")          
     for expResult in listOfExpRes: stdoutPrinter.addObj(expResult,outLevel)
 
-    """ loop over input files and run SModelS """
-    for inputFile in fileList:
-        if len(fileList) > 1: inputFile = os.path.join(inFile, inputFile)
-        runSingleFile ( inputFile, outputDir, parser, databaseVersion, listOfExpRes )
+    runAllFiles ( fileList, inFile, outputDir, parser, databaseVersion, listOfExpRes )
 
 
 if __name__ == "__main__":
@@ -178,7 +214,8 @@ if __name__ == "__main__":
     else:
         try:
             with timeOut.Timeout(args.timeout):
-                main(args.filename, args.parameterFile, args.outputDir, args.verbose, db )
+                main( args.filename, args.parameterFile, args.outputDir, 
+                      args.verbose, db )
         except Exception:
             crashReportFacility = crashReport.CrashReport()
              
@@ -186,6 +223,7 @@ if __name__ == "__main__":
                 print(crashReport.createStackTrace())
             else:
                 print(crashReport.createStackTrace())
+                currentFile = "BANNER"
                 crashReportFacility.createCrashReportFile(currentFile, 
-                                args.parameterFile)
+                                args.parameterFile )
                 print(crashReportFacility.createUnknownErrorMessage())

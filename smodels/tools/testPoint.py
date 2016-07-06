@@ -16,6 +16,8 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """ Minimum value of cross-section for an element to be considered eligible
         for decomposition.  Too small sigmacut leads to too large decomposition
         time.  """
+    print ( "testPoint: %s" % inputFile )
+    return
     sigmacut = parser.getfloat("parameters", "sigmacut") * fb
     """ Minimum value for considering two states non-degenerate (only used for
         mass compression) """
