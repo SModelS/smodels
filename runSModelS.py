@@ -20,22 +20,21 @@ from smodels.experiment.exceptions import DatabaseNotFoundException
 
 log = logging.getLogger(__name__)
 
-
-def runSingleFile (inputFile, outputDir, parser, databaseVersion, listOfExpRes, crashReport=True):
-    #try:
-    testPoint.testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes)
-    #except:
-    #    if crashReport: print("write crash report here") #FIXME want single file crash report here
+def runSingleFile ( inputFile, outputDir, parser, databaseVersion, listOfExpRes, 
+                    crashReport=True):
+    try:
+        testPoint.testPoint( inputFile, outputDir, parser, databaseVersion, 
+                             listOfExpRes )
+    except Exception,e:
+        if crashReport: 
+            e.inputFile = inputFile
+            raise e
 
 def runSetOfFiles ( inputFiles, outputDir, parser, databaseVersion, listOfExpRes, 
                     crashReport=True ):
     for inputFile in inputFiles:
-        #try:
-        testPoint.testPoint( inputFile, outputDir, parser, databaseVersion, 
-                             listOfExpRes )
-        #except:
-        #    if crashReport: print("write crash report here") 
-        #FIXME want single file crash report here
+        runSingleFile( inputFile, outputDir, parser, databaseVersion, 
+                       listOfExpRes )
 
 def runAllFiles ( fileList, inDir, outputDir, parser, databaseVersion, listOfExpRes ):
     """ run over all files """
@@ -235,14 +234,13 @@ if __name__ == "__main__":
             with timeOut.Timeout(args.timeout):
                 main( args.filename, args.parameterFile, args.outputDir, 
                       args.verbose, db )
-        except Exception:
+        except Exception,e:
             crashReportFacility = crashReport.CrashReport()
              
             if args.development:
                 print(crashReport.createStackTrace())
             else:
                 print(crashReport.createStackTrace())
-                currentFile = "BANNER"
-                crashReportFacility.createCrashReportFile(currentFile, 
+                crashReportFacility.createCrashReportFile( e.inputFile, 
                                 args.parameterFile )
                 print(crashReportFacility.createUnknownErrorMessage())
