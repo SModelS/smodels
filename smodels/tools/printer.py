@@ -838,11 +838,12 @@ class XmlPrinter(PyPrinter):
                     objoutput = self.outputList[iobj]
                     outputDict.update(objoutput)
 
-        if outputDict:
+        logger.error("XML flush to %s" %(outputDict))
+        if outputDict:            
             root = ElementTree.Element('smodelsOutput')
             self.convertToElement(outputDict,root)
             rough_xml = ElementTree.tostring(root, 'utf-8')
-            nice_xml = minidom.parseString(rough_xml).toprettyxml(indent="    ")
+            nice_xml = minidom.parseString(rough_xml).toprettyxml(indent="    ")                        
             if self.output == 'stdout':
                 sys.stdout.write(nice_xml)
             elif self.output == 'file':
