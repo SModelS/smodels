@@ -51,7 +51,6 @@ class Uncovered(object):
                 if not el.tested:
                     self.outsideGrid.addToTopos(el) # not missing but not tested means we are outside the mass grid
                 continue
-            print 'missed',el,el.weight
             self.missingTopos.addToTopos(el) #keep track of all missing topologies
             if self.hasLongCascade(el): self.longCascade.addToClasses(el)
             elif self.hasAsymmetricBranches(el): self.asymmetricBranches.addToClasses(el) # if no long cascade, check for asymmetric branches

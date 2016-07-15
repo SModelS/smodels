@@ -1,154 +1,350 @@
 <?xml version="1.0" ?>
 <smodelsOutput>
+    <Asymmetric_Branches_List>
+        <Asymmetric_Branches>
+            <mother_PIDs_List>
+                <mother_PIDs>1000001</mother_PIDs>
+                <mother_PIDs>1000002</mother_PIDs>
+            </mother_PIDs_List>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>3.56407840477</weight_fb>
+        </Asymmetric_Branches>
+        <Asymmetric_Branches>
+            <mother_PIDs_List>
+                <mother_PIDs>1000001</mother_PIDs>
+                <mother_PIDs>1000021</mother_PIDs>
+            </mother_PIDs_List>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>12.3523157049</weight_fb>
+        </Asymmetric_Branches>
+        <Asymmetric_Branches>
+            <mother_PIDs_List>
+                <mother_PIDs>1000001</mother_PIDs>
+                <mother_PIDs>1000024</mother_PIDs>
+            </mother_PIDs_List>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>2.7099027892</weight_fb>
+        </Asymmetric_Branches>
+        <Asymmetric_Branches>
+            <mother_PIDs_List>
+                <mother_PIDs>1000002</mother_PIDs>
+                <mother_PIDs>1000002</mother_PIDs>
+            </mother_PIDs_List>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>4.03905825333</weight_fb>
+        </Asymmetric_Branches>
+        <Asymmetric_Branches>
+            <mother_PIDs_List>
+                <mother_PIDs>1000002</mother_PIDs>
+                <mother_PIDs>1000021</mother_PIDs>
+            </mother_PIDs_List>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>47.0513234567</weight_fb>
+        </Asymmetric_Branches>
+        <Asymmetric_Branches>
+            <mother_PIDs_List>
+                <mother_PIDs>1000002</mother_PIDs>
+                <mother_PIDs>2000002</mother_PIDs>
+            </mother_PIDs_List>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>3.3300708378</weight_fb>
+        </Asymmetric_Branches>
+        <Asymmetric_Branches>
+            <mother_PIDs_List>
+                <mother_PIDs>1000021</mother_PIDs>
+                <mother_PIDs>1000021</mother_PIDs>
+            </mother_PIDs_List>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>41.7762236779</weight_fb>
+        </Asymmetric_Branches>
+        <Asymmetric_Branches>
+            <mother_PIDs_List>
+                <mother_PIDs>1000021</mother_PIDs>
+                <mother_PIDs>1000024</mother_PIDs>
+            </mother_PIDs_List>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>6.66075946087</weight_fb>
+        </Asymmetric_Branches>
+        <Asymmetric_Branches>
+            <mother_PIDs_List>
+                <mother_PIDs>1000021</mother_PIDs>
+                <mother_PIDs>2000002</mother_PIDs>
+            </mother_PIDs_List>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>21.9702492144</weight_fb>
+        </Asymmetric_Branches>
+        <Asymmetric_Branches>
+            <mother_PIDs_List>
+                <mother_PIDs>1000024</mother_PIDs>
+                <mother_PIDs>1000024</mother_PIDs>
+            </mother_PIDs_List>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>59.5816892</weight_fb>
+        </Asymmetric_Branches>
+    </Asymmetric_Branches_List>
     <ExptRes_List>
         <ExptRes>
-            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
-            <dataType>upperLimit</dataType>
-            <MotherMass_GeV>991.776131301</MotherMass_GeV>
-            <DaughterMass_GeV>128.96157</DaughterMass_GeV>
-            <maxcond>0.0</maxcond>
             <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
-            <upper_limit_fb>17.1817110284</upper_limit_fb>
-            <theory_prediction_fb>6.61745469755</theory_prediction_fb>
-            <lumi_fb-1>20.3</lumi_fb-1>
-            <TxNames_List>
-                <TxNames>T6WW</TxNames>
-            </TxNames_List>
-            <DataSetID>None</DataSetID>
-        </ExptRes>
-        <ExptRes>
             <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
-            <dataType>upperLimit</dataType>
-            <MotherMass_GeV>991.299127</MotherMass_GeV>
+            <DataSetID>None</DataSetID>
             <DaughterMass_GeV>128.96157</DaughterMass_GeV>
-            <maxcond>0.0</maxcond>
-            <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
-            <upper_limit_fb>6.09712903685</upper_limit_fb>
-            <theory_prediction_fb>1.77320348007</theory_prediction_fb>
-            <lumi_fb-1>20.3</lumi_fb-1>
-            <TxNames_List>
-                <TxNames>T2</TxNames>
-            </TxNames_List>
-            <DataSetID>None</DataSetID>
-        </ExptRes>
-        <ExptRes>
-            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
-            <dataType>upperLimit</dataType>
             <MotherMass_GeV>865.035125</MotherMass_GeV>
-            <DaughterMass_GeV>128.96157</DaughterMass_GeV>
-            <maxcond>0.0</maxcond>
-            <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
-            <upper_limit_fb>32.336037769</upper_limit_fb>
-            <theory_prediction_fb>9.06887013429</theory_prediction_fb>
-            <lumi_fb-1>20.3</lumi_fb-1>
             <TxNames_List>
                 <TxNames>T5WW</TxNames>
             </TxNames_List>
-            <DataSetID>None</DataSetID>
+            <dataType>upperLimit</dataType>
+            <lumi_fb-1>20.3</lumi_fb-1>
+            <maxcond>0.0</maxcond>
+            <theory_prediction_fb>9.06887013429</theory_prediction_fb>
+            <upper_limit_fb>32.336037769</upper_limit_fb>
         </ExptRes>
         <ExptRes>
+            <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
             <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
-            <dataType>efficiencyMap</dataType>
-            <MotherMass_GeV>None</MotherMass_GeV>
-            <DaughterMass_GeV>None</DaughterMass_GeV>
+            <DataSetID>None</DataSetID>
+            <DaughterMass_GeV>128.96157</DaughterMass_GeV>
+            <MotherMass_GeV>865.035125</MotherMass_GeV>
+            <TxNames_List>
+                <TxNames>T1</TxNames>
+            </TxNames_List>
+            <dataType>upperLimit</dataType>
+            <lumi_fb-1>20.3</lumi_fb-1>
             <maxcond>0.0</maxcond>
+            <theory_prediction_fb>0.391736326975</theory_prediction_fb>
+            <upper_limit_fb>10.8183973714</upper_limit_fb>
+        </ExptRes>
+        <ExptRes>
+            <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
+            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
+            <DataSetID>None</DataSetID>
+            <DaughterMass_GeV>128.96157</DaughterMass_GeV>
+            <MotherMass_GeV>991.299127</MotherMass_GeV>
+            <TxNames_List>
+                <TxNames>T2</TxNames>
+            </TxNames_List>
+            <dataType>upperLimit</dataType>
+            <lumi_fb-1>20.3</lumi_fb-1>
+            <maxcond>0.0</maxcond>
+            <theory_prediction_fb>1.77320348007</theory_prediction_fb>
+            <upper_limit_fb>6.09712903685</upper_limit_fb>
+        </ExptRes>
+        <ExptRes>
+            <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
+            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
+            <DataSetID>None</DataSetID>
+            <DaughterMass_GeV>128.96157</DaughterMass_GeV>
+            <MotherMass_GeV>991.776131301</MotherMass_GeV>
+            <TxNames_List>
+                <TxNames>T6WW</TxNames>
+            </TxNames_List>
+            <dataType>upperLimit</dataType>
+            <lumi_fb-1>20.3</lumi_fb-1>
+            <maxcond>0.0</maxcond>
+            <theory_prediction_fb>6.61745469755</theory_prediction_fb>
+            <upper_limit_fb>17.1817110284</upper_limit_fb>
+        </ExptRes>
+        <ExptRes>
+            <AnalysisID>ATLAS-SUSY-2013-12</AnalysisID>
+            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
+            <DataSetID>None</DataSetID>
+            <DaughterMass_GeV>128.96157</DaughterMass_GeV>
+            <MotherMass_GeV>269.035358</MotherMass_GeV>
+            <TxNames_List>
+                <TxNames>TChiWZ</TxNames>
+            </TxNames_List>
+            <dataType>upperLimit</dataType>
+            <lumi_fb-1>20.3</lumi_fb-1>
+            <maxcond>0.0</maxcond>
+            <theory_prediction_fb>18.4709328281</theory_prediction_fb>
+            <upper_limit_fb>330.12067148</upper_limit_fb>
+        </ExptRes>
+        <ExptRes>
             <AnalysisID>CMS-SUS-13-012</AnalysisID>
-            <upper_limit_fb>1.205</upper_limit_fb>
-            <theory_prediction_fb>0.137862650911</theory_prediction_fb>
-            <lumi_fb-1>19.5</lumi_fb-1>
+            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
+            <DataSetID>3NJet6_1000HT1250_600MHTinf</DataSetID>
+            <DaughterMass_GeV>None</DaughterMass_GeV>
+            <MotherMass_GeV>None</MotherMass_GeV>
             <TxNames_List>
                 <TxNames>T1</TxNames>
                 <TxNames>T2</TxNames>
             </TxNames_List>
-            <DataSetID>3NJet6_1000HT1250_600MHTinf</DataSetID>
-        </ExptRes>
-        <ExptRes>
-            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
-            <dataType>upperLimit</dataType>
-            <MotherMass_GeV>269.035358</MotherMass_GeV>
-            <DaughterMass_GeV>128.96157</DaughterMass_GeV>
+            <dataType>efficiencyMap</dataType>
+            <lumi_fb-1>19.5</lumi_fb-1>
             <maxcond>0.0</maxcond>
-            <AnalysisID>ATLAS-SUSY-2013-12</AnalysisID>
-            <upper_limit_fb>330.12067148</upper_limit_fb>
-            <theory_prediction_fb>18.4709328281</theory_prediction_fb>
-            <lumi_fb-1>20.3</lumi_fb-1>
-            <TxNames_List>
-                <TxNames>TChiWZ</TxNames>
-            </TxNames_List>
-            <DataSetID>None</DataSetID>
-        </ExptRes>
-        <ExptRes>
-            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
-            <dataType>upperLimit</dataType>
-            <MotherMass_GeV>865.035125</MotherMass_GeV>
-            <DaughterMass_GeV>128.96157</DaughterMass_GeV>
-            <maxcond>0.0</maxcond>
-            <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
-            <upper_limit_fb>10.8183973714</upper_limit_fb>
-            <theory_prediction_fb>0.391736326975</theory_prediction_fb>
-            <lumi_fb-1>20.3</lumi_fb-1>
-            <TxNames_List>
-                <TxNames>T1</TxNames>
-            </TxNames_List>
-            <DataSetID>None</DataSetID>
+            <theory_prediction_fb>0.1379</theory_prediction_fb>
+            <upper_limit_fb>1.205</upper_limit_fb>
         </ExptRes>
     </ExptRes_List>
-    <maxcond>0.2</maxcond>
-    <minmassgap>5.0</minmassgap>
-    <database_version>unittest</database_version>
-    <input_file>/home/walten/git/smodels/inputFiles/slha/gluino_squarks.slha</input_file>
-    <sigmacut>0.03</sigmacut>
-    <smodels_version>1.0.91</smodels_version>
+    <Long_Cascades_List>
+        <Long_Cascades>
+            <mother_PIDs_List>
+                <mother_PIDs>1000001</mother_PIDs>
+                <mother_PIDs>1000002</mother_PIDs>
+            </mother_PIDs_List>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>4.10618475792</weight_fb>
+        </Long_Cascades>
+        <Long_Cascades>
+            <mother_PIDs_List>
+                <mother_PIDs>1000001</mother_PIDs>
+                <mother_PIDs>1000021</mother_PIDs>
+            </mother_PIDs_List>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>2.6218555581</weight_fb>
+        </Long_Cascades>
+        <Long_Cascades>
+            <mother_PIDs_List>
+                <mother_PIDs>1000002</mother_PIDs>
+                <mother_PIDs>1000002</mother_PIDs>
+            </mother_PIDs_List>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>5.21797000918</weight_fb>
+        </Long_Cascades>
+        <Long_Cascades>
+            <mother_PIDs_List>
+                <mother_PIDs>1000002</mother_PIDs>
+                <mother_PIDs>1000021</mother_PIDs>
+            </mother_PIDs_List>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>16.2564341924</weight_fb>
+        </Long_Cascades>
+        <Long_Cascades>
+            <mother_PIDs_List>
+                <mother_PIDs>1000002</mother_PIDs>
+                <mother_PIDs>2000001</mother_PIDs>
+            </mother_PIDs_List>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>2.6000872313</weight_fb>
+        </Long_Cascades>
+        <Long_Cascades>
+            <mother_PIDs_List>
+                <mother_PIDs>1000002</mother_PIDs>
+                <mother_PIDs>2000002</mother_PIDs>
+            </mother_PIDs_List>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>5.40823084157</weight_fb>
+        </Long_Cascades>
+        <Long_Cascades>
+            <mother_PIDs_List>
+                <mother_PIDs>1000021</mother_PIDs>
+                <mother_PIDs>2000001</mother_PIDs>
+            </mother_PIDs_List>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>12.8197955544</weight_fb>
+        </Long_Cascades>
+        <Long_Cascades>
+            <mother_PIDs_List>
+                <mother_PIDs>1000021</mother_PIDs>
+                <mother_PIDs>2000002</mother_PIDs>
+            </mother_PIDs_List>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>37.4342016604</weight_fb>
+        </Long_Cascades>
+        <Long_Cascades>
+            <mother_PIDs_List>
+                <mother_PIDs>2000001</mother_PIDs>
+                <mother_PIDs>2000002</mother_PIDs>
+            </mother_PIDs_List>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>9.96688850045</weight_fb>
+        </Long_Cascades>
+        <Long_Cascades>
+            <mother_PIDs_List>
+                <mother_PIDs>2000002</mother_PIDs>
+                <mother_PIDs>2000002</mother_PIDs>
+            </mother_PIDs_List>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>7.5232002509</weight_fb>
+        </Long_Cascades>
+    </Long_Cascades_List>
     <Missed_Topologies_List>
         <Missed_Topologies>
-            <weight_fb>59.5816892</weight_fb>
-            <sqrts_TeV>8.0</sqrts_TeV>
             <element>[[[W]],[[W]]]</element>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>59.5816892</weight_fb>
         </Missed_Topologies>
         <Missed_Topologies>
-            <weight_fb>7.81829732986</weight_fb>
+            <element>[[[b,t],[W]],[[jet,jet],[W]]]</element>
             <sqrts_TeV>8.0</sqrts_TeV>
-            <element>[[[b,t],[W]],[[q],[W]]]</element>
+            <weight_fb>9.20555840988</weight_fb>
         </Missed_Topologies>
         <Missed_Topologies>
-            <weight_fb>7.70220773132</weight_fb>
+            <element>[[[b,t],[W]],[[jet],[W]]]</element>
             <sqrts_TeV>8.0</sqrts_TeV>
-            <element>[[[c,q],[W]],[[q],[W]]]</element>
+            <weight_fb>7.95536325937</weight_fb>
         </Missed_Topologies>
         <Missed_Topologies>
-            <weight_fb>7.70220773132</weight_fb>
+            <element>[[[b,t],[W]],[[jet],[jet,jet],[W]]]</element>
             <sqrts_TeV>8.0</sqrts_TeV>
-            <element>[[[q],[W]],[[q,q],[W]]]</element>
+            <weight_fb>7.08185209961</weight_fb>
         </Missed_Topologies>
         <Missed_Topologies>
-            <weight_fb>5.22944065631</weight_fb>
+            <element>[[[jet,jet],[W]],[[jet,jet],[higgs]]]</element>
             <sqrts_TeV>8.0</sqrts_TeV>
-            <element>[[[q],[W]],[[q],[higgs]]]</element>
+            <weight_fb>7.60751420843</weight_fb>
         </Missed_Topologies>
         <Missed_Topologies>
-            <weight_fb>4.72499314641</weight_fb>
+            <element>[[[jet],[W]],[[jet,jet],[W]]]</element>
             <sqrts_TeV>8.0</sqrts_TeV>
-            <element>[[[q],[W]],[[q,q],[higgs]]]</element>
+            <weight_fb>15.6744768884</weight_fb>
         </Missed_Topologies>
         <Missed_Topologies>
-            <weight_fb>4.60277920494</weight_fb>
+            <element>[[[jet],[W]],[[jet],[jet,jet],[W]]]</element>
             <sqrts_TeV>8.0</sqrts_TeV>
-            <element>[[[b,t],[W]],[[c,q],[W]]]</element>
+            <weight_fb>7.08711270167</weight_fb>
         </Missed_Topologies>
         <Missed_Topologies>
-            <weight_fb>4.60277920494</weight_fb>
+            <element>[[[jet],[b,t],[W]],[[jet,jet],[W]]]</element>
             <sqrts_TeV>8.0</sqrts_TeV>
-            <element>[[[b,t],[W]],[[q,q],[W]]]</element>
+            <weight_fb>7.08185209961</weight_fb>
         </Missed_Topologies>
         <Missed_Topologies>
-            <weight_fb>4.52980532133</weight_fb>
+            <element>[[[jet],[jet,jet],[W]],[[jet,jet],[W]]]</element>
             <sqrts_TeV>8.0</sqrts_TeV>
-            <element>[[[b,t],[W]],[[q]]]</element>
+            <weight_fb>13.9533951428</weight_fb>
         </Missed_Topologies>
         <Missed_Topologies>
-            <weight_fb>4.46254473261</weight_fb>
+            <element>[[[jet]],[[jet,jet],[W]]]</element>
             <sqrts_TeV>8.0</sqrts_TeV>
-            <element>[[[c,q],[W]],[[q]]]</element>
+            <weight_fb>8.92508946522</weight_fb>
         </Missed_Topologies>
     </Missed_Topologies_List>
+    <OutputStatus>
+        <database_version>unittest</database_version>
+        <decomposition_status>1</decomposition_status>
+        <file_status>1</file_status>
+        <input_file>/home/lessa/smodels/inputFiles/slha/gluino_squarks.slha</input_file>
+        <maxcond>0.2</maxcond>
+        <minmassgap>5.0</minmassgap>
+        <sigmacut>0.03</sigmacut>
+        <smodels_version>1.0.91</smodels_version>
+        <warnings>Input file ok</warnings>
+    </OutputStatus>
+    <Outside_Grid_List>
+        <Outside_Grid>
+            <element>[[[W]],[[higgs]]]</element>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>95.8842392719</weight_fb>
+        </Outside_Grid>
+        <Outside_Grid>
+            <element>[[[b,b]],[[jet]]]</element>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>0.095450607115</weight_fb>
+        </Outside_Grid>
+        <Outside_Grid>
+            <element>[[[b],[W]],[[b],[W]]]</element>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>0.972999364825</weight_fb>
+        </Outside_Grid>
+        <Outside_Grid>
+            <element>[[[jet]],[[jet,jet]]]</element>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>2.27241375732</weight_fb>
+        </Outside_Grid>
+        <Outside_Grid>
+            <element>[[[jet]],[[t,t]]]</element>
+            <sqrts_TeV>8.0</sqrts_TeV>
+            <weight_fb>0.144003117723</weight_fb>
+        </Outside_Grid>
+    </Outside_Grid_List>
 </smodelsOutput>

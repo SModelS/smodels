@@ -19,7 +19,7 @@ from smodels.tools import printer, ioObjects
 from smodels.tools import coverage
 from smodels.tools import summaryReader
 from xml.etree import ElementTree
-import logging
+import logging as logger
 from databaseLoader import database
 import unum
 
@@ -76,9 +76,9 @@ class RunPrinterTest(unittest.TestCase):
 
     def __init__ ( self, *args, **kwargs):
         super(RunPrinterTest, self).__init__(*args, **kwargs)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logger.getLogger(__name__)
         
-        self.masterPrinter = printer.MPrinter(printerList=['stdout','summary','python','xml'])        
+        self.masterPrinter = printer.MPrinter(printerList=['summary','python','xml'])        
         #Set the address of the database folder
         self.slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
         self.masterPrinter.setOutPutFiles('./unitTestOutput/printer_output')
@@ -118,12 +118,12 @@ class RunPrinterTest(unittest.TestCase):
         
         #Add coverage information:
         coverageInfo = coverage.Uncovered(smstoplist)
-        self.masterPrinter.addObj(coverageInfo,3)
+        self.masterPrinter.addObj(coverageInfo,2)
         
         
         #Add additional information:
         databaseVersion = database.databaseVersion
-        outputStatus = ioObjects.OutputStatus([1,None], self.slhafile,
+        outputStatus = ioObjects.OutputStatus([1,'Input file ok'], self.slhafile,
                                                {'sigmacut' : sigmacut.asNumber(fb), 
                                                 'minmassgap' : mingap.asNumber(GeV),
                                                 'maxcond': maxcond },
@@ -133,16 +133,16 @@ class RunPrinterTest(unittest.TestCase):
         self.masterPrinter.flush()
 
     def testTextPrinter(self):
-        outputfile = os.path.join ( idir(), "test/unitTestOutput/printer_output.smodels" )
-        samplefile = os.path.join ( idir(), "test/summary_default.txt" )
+        outputfile = os.path.join( idir(), "test/unitTestOutput/printer_output.smodels")
+        samplefile = os.path.join( idir(), "test/gluino_squarks_default.txt")
         #Test summary output
-        output = summaryReader.Summary( outputfile )
-        sample = summaryReader.Summary( samplefile )
+        output = summaryReader.Summary(outputfile,allowedDiff=0.05)
+        sample = summaryReader.Summary(samplefile,allowedDiff=0.05)
         try:
             self.assertEquals(sample, output)
         except AssertionError,e:
-            msg = "%s != %s" % ( sample, output ) 
-            raise AssertionError ( msg )
+            msg = "%s != %s" %(sample, output) 
+            raise AssertionError(msg)
 
 
     def testPythonPrinter(self):
@@ -151,36 +151,48 @@ class RunPrinterTest(unittest.TestCase):
         from gluino_squarks_default import smodelsOutputDefault        
         from output import smodelsOutput
         ignoreFields = ['input file','smodels version']
-        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.01,ignore=ignoreFields)
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.05,ignore=ignoreFields)
         self.assertEqual(equals,True)
-        os.remove('./output.py')
-        os.remove('./output.pyc')
+        try:
+            os.remove('./output.py')
+            os.remove('./output.pyc')
+        except:
+            pass
 
 
 
-#     def testXmlPrinter(self):
-#         defFile = os.path.join ( idir(), "test/default_output.xml" )
-#         outFile = os.path.join ( idir(), "test/unitTestOutput/printer_output.xml" )
-#         
-#         #Test xml output
-#         xmlDefault = ElementTree.parse( defFile ).getroot()
-#         xmlNew = ElementTree.parse( outFile ).getroot()
-#         def compareXML(xmldefault,xmlnew):
-#             self.assertEqual(len(xmldefault),len(xmlnew))
-#             for i,el in enumerate(xmldefault):
-#                 newel = xmlnew[i]
-#                 self.assertEqual(len(el),len(newel))                
-#                 if len(el) == 0:
-#                     if el.tag == 'input_file': continue
-#                     self.assertEqual(el.text,newel.text)
-#                     self.assertEqual(el.tag,newel.tag)
-#                 else:                    
-#                     compareXML(el,newel)
-#         try:
-#             compareXML(xmlDefault,xmlNew)
-#         except AssertionError,e:
-#             msg = "%s != %s" % ( defFile, outFile )
-#             raise AssertionError ( msg )
+    def testXmlPrinter(self):
+        defFile = os.path.join ( idir(), "test/default_output.xml" )
+        outFile = os.path.join ( idir(), "test/unitTestOutput/printer_output.xml" )
+         
+        #Test xml output
+        xmlDefault = ElementTree.parse( defFile ).getroot()
+        xmlNew = ElementTree.parse( outFile ).getroot()
+        def compareXML(xmldefault,xmlnew,allowedDiff,ignore=[]):
+            self.assertEqual(len(xmldefault),len(xmlnew))
+            for i,el in enumerate(xmldefault):
+                newel = xmlnew[i]
+                self.assertEqual(len(el),len(newel))                
+                if len(el) == 0:
+                    if el.tag in ignore: continue
+                    try:
+                        el.text = eval(el.text)
+                        newel.text = eval(newel.text)
+                    except:
+                        pass
+                    if isinstance(el.text,float) and isinstance(newel.text,float) and newel.text != el.text:
+                        diff = 2.*abs(el.text-newel.text)/abs(el.text+newel.text)
+                        self.assertEqual(diff < allowedDiff,True)
+                    else:
+                        self.assertEqual(el.text,newel.text)
+                    self.assertEqual(el.tag,newel.tag)
+                else:                    
+                    compareXML(el,newel,allowedDiff,ignore)
+        try:
+            compareXML(xmlDefault,xmlNew,allowedDiff=0.05,ignore=['input_file','smodels_version'])
+        except AssertionError,e:
+            msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
+            raise AssertionError(msg)
 
 
 if __name__ == "__main__":
