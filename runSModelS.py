@@ -222,7 +222,7 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
         if parser.getboolean("options", "testCoverage"):
             """ Look for missing topologies, add them to the output file """
             uncovered = coverage.Uncovered(smstoplist)
-            masterPrinter.addObj(uncovered)        
+            masterPrinter.addObj(uncovered,2)        
         masterPrinter.flush()
 
 

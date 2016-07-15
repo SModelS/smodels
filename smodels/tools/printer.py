@@ -86,7 +86,6 @@ class BasicPrinter(object):
 
     def __init__(self, output, filename, outputLevel):
 
-        self.objList = []
         self.outputList = []
         self.outputLevel = outputLevel
         self.filename = filename
@@ -166,7 +165,7 @@ class TxTPrinter(BasicPrinter):
 
         BasicPrinter.__init__(self, output, filename, outputLevel)        
         self.printingOrder = [OutputStatus,TopologyList,Element,ExpResult,
-                             TheoryPredictionList,ResultList,UncoveredList,Uncovered]
+                             TheoryPredictionList,ResultList,Uncovered]
         self.outputLevel = [outputLevel]*len(self.printingOrder)
         self.toPrint = [None]*len(self.printingOrder)        
         
@@ -481,35 +480,56 @@ class TxTPrinter(BasicPrinter):
         """
 
         if not objOutputLevel: return None
+        
+        
+        nprint = 10  # Number of missing topologies to be printed (ordered by cross-sections)
 
         output = ""
-        if objOutputLevel == 1:
+        if objOutputLevel >= 1:
             output += "\nTotal missing topology cross section: %10.3E\n" %(obj.getMissingXsec())
             output += "Total cross section where we are outside the mass grid: %10.3E\n" %(obj.getOutOfGridXsec())
             output += "Total cross section in long cascade decays: %10.3E\n" %(obj.getLongCascadeXsec())
             output += "Total cross section in decays with asymmetric branches: %10.3E\n" %(obj.getAsymmetricXsec())
-            return output
-        if objOutputLevel ==2:
+        if objOutputLevel >= 2:
             output += "\nFull information on unconstrained cross sections\n"
             output += "================================================================================\n"
-            output += "Contributions outside the mass grid\n"
+            if len(obj.missingTopos.topos) == 0:
+                output += "No missing topologies found\n"
+            else:
+                for topo in obj.missingTopos.topos:
+                    if topo.value > 0.: continue
+                    for el in topo.contributingElements:
+                        if not el.weight.getXsecsFor(obj.missingTopos.sqrts): continue
+                        topo.value += el.weight.getXsecsFor(obj.missingTopos.sqrts)[0].value.asNumber(fb)        
+                output += "Missing topologies with the highest cross-sections (up to " + str(nprint) + "):\n"
+                output += "Sqrts (TeV)   Weight (fb)        Element description\n"        
+                for topo in sorted(obj.missingTopos.topos, key=lambda x: x.value, reverse=True)[:nprint]:
+                    output += "%5s %10.3E    # %45s\n" % (str(obj.missingTopos.sqrts.asNumber(TeV)),topo.value, str(topo.topo))
+                    if objOutputLevel >= 3:
+                        contributing = []
+                        for el in topo.contributingElements:
+                            contributing.append(el.elID)
+                        output += "Contributing elements %s\n" % str(contributing)            
+            output += "================================================================================\n"
+            output += "Contributions outside the mass grid (up to " + str(nprint) + "):\n"
             for topo in obj.outsideGrid.topos:
                 for el in topo.contributingElements:
                     if not el.weight.getXsecsFor(obj.sqrts): continue
                     topo.value += el.weight.getXsecsFor(obj.sqrts)[0].value.asNumber(fb)
-            for topo in sorted(obj.outsideGrid.topos, key=lambda x: x.value, reverse=True):
+            for topo in sorted(obj.outsideGrid.topos, key=lambda x: x.value, reverse=True)[:nprint]:
                 output += "%5s %10.3E    # %45s\n" % (str(obj.sqrts.asNumber(TeV)), topo.value, str(topo.topo))
             output += "================================================================================\n"
-            output += "Long cascade decay by produced mothers\n"
+            output += "Long cascade decay by produced mothers (up to " + str(nprint) + "):\n"
             output += "Mother1 Mother2 Weight (fb)\n"
-            for cascadeEntry in obj.longCascade.getSorted(obj.sqrts):
+            for cascadeEntry in obj.longCascade.getSorted(obj.sqrts)[:nprint]:
                 output += "%s %s %10.3E # %s\n" %(cascadeEntry.motherPIDs[0], cascadeEntry.motherPIDs[1], cascadeEntry.getWeight(obj.sqrts).asNumber(fb), str(cascadeEntry.motherPIDs))
             output += "================================================================================\n"
             output += "Asymmetric branch decay by produced mothers\n"
             output += "Mother1 Mother2 Weight (fb)\n"
-            for asymmetricEntry in obj.asymmetricBranches.getSorted(obj.sqrts):
+            for asymmetricEntry in obj.asymmetricBranches.getSorted(obj.sqrts)[:nprint]:
                 output += "%s %s %10.3E # %s\n" %(asymmetricEntry.motherPIDs[0], asymmetricEntry.motherPIDs[1], asymmetricEntry.getWeight(obj.sqrts).asNumber(fb),asymmetricEntry.motherPIDs)
-            return output
+        
+        return output
                       
 
 class SummaryPrinter(TxTPrinter):
@@ -572,10 +592,10 @@ class PyPrinter(BasicPrinter):
         
         outputDict = {}
         for iobj,obj in enumerate(self.toPrint):
-                if obj is None: continue
-                output = self._formatObj(obj,self.outputLevel[iobj])                
-                if not output: continue  #Skip empty output       
-                outputDict.update(output)
+            if obj is None: continue
+            output = self._formatObj(obj,self.outputLevel[iobj])                
+            if not output: continue  #Skip empty output       
+            outputDict.update(output)
                 
         output = 'smodelsOutput = '+str(outputDict)      
         if self.output == 'stdout':
@@ -600,7 +620,12 @@ class PyPrinter(BasicPrinter):
 
         if not objOutputLevel: return None
 
-        infoDict = dict(obj.parameters.items())
+        infoDict = {}
+        for key,val in obj.parameters.items():
+            try:
+                infoDict[key] = eval(val)
+            except:
+                infoDict[key] = val        
         infoDict['file status'] = obj.filestatus
         infoDict['decomposition status'] = obj.status
         infoDict['warnings'] = obj.warnings
@@ -726,13 +751,21 @@ class PyPrinter(BasicPrinter):
         nprint = 10  # Number of missing topologies to be printed (ordered by cross-sections)
 
         missedTopos = []
-        obj.missingTopos.topos = sorted(obj.missingTopos.topos, key=lambda x: x.value, 
-                                        reverse=True)
         
+        
+        for topo in obj.missingTopos.topos:
+            if topo.value > 0.: continue
+            for el in topo.contributingElements:
+                if not el.weight.getXsecsFor(obj.missingTopos.sqrts): continue
+                topo.value += el.weight.getXsecsFor(obj.missingTopos.sqrts)[0].value.asNumber(fb)
+        obj.missingTopos.topos = sorted(obj.missingTopos.topos, 
+                                        key=lambda x: [x.value,str(x.topo)], 
+                                        reverse=True)        
+    
         for topo in obj.missingTopos.topos[:nprint]:
             missed = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : topo.value,
                                 'element' : str(topo.topo)}           
-            if objOutputLevel==2:
+            if objOutputLevel>=3:
                 contributing = []
                 for el in topo.contributingElements:
                     contributing.append(el.elID)
@@ -741,10 +774,12 @@ class PyPrinter(BasicPrinter):
             
         outsideGrid = []
         for topo in obj.outsideGrid.topos:
+            if topo.value > 0.: continue
             for el in topo.contributingElements:
                 if not el.weight.getXsecsFor(obj.sqrts): continue
                 topo.value += el.weight.getXsecsFor(obj.sqrts)[0].value.asNumber(fb)
-        obj.outsideGrid.topos = sorted(obj.outsideGrid.topos, key=lambda x: x.value, 
+        obj.outsideGrid.topos = sorted(obj.outsideGrid.topos, 
+                                       key=lambda x: [x.value,str(x.topo)], 
                                        reverse=True)        
         for topo in obj.outsideGrid.topos[:nprint]:
             outside = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : topo.value,
@@ -752,7 +787,8 @@ class PyPrinter(BasicPrinter):
             outsideGrid.append(outside)     
         
         longCascades = []        
-        obj.longCascade.classes = sorted(obj.longCascade.classes, key=lambda x: x.getWeight(obj.sqrts), 
+        obj.longCascade.classes = sorted(obj.longCascade.classes, 
+                                         key=lambda x: [x.getWeight(obj.sqrts),x.motherPIDs[0:2]], 
                                          reverse=True)        
         for cascadeEntry in obj.longCascade.classes[:nprint]:
             longc = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV),
@@ -761,8 +797,9 @@ class PyPrinter(BasicPrinter):
             longCascades.append(longc)
         
         asymmetricBranches = []
-        obj.asymmetricBranches.classes = sorted(obj.asymmetricBranches.classes, key=lambda x: x.getWeight(obj.sqrts),
-                                                 reverse=True)
+        obj.asymmetricBranches.classes = sorted(obj.asymmetricBranches.classes, 
+                                                key=lambda x: [x.getWeight(obj.sqrts),x.motherPIDs[0:2]],
+                                                reverse=True)
         for asymmetricEntry in obj.asymmetricBranches.classes[:nprint]:
             asymmetric = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 
                     'weight (fb)' : asymmetricEntry.getWeight(obj.sqrts).asNumber(fb),
@@ -770,11 +807,11 @@ class PyPrinter(BasicPrinter):
             asymmetricBranches.append(asymmetric)
 
         
-        if objOutputLevel < 3:
+        if objOutputLevel < 2:
             return {'Missed Topologies': missedTopos}
         else:
             return {'Missed Topologies': missedTopos, 'Long Cascades' : longCascades,
-                     'Asymmetric Branches': asymmetricBranches}
+                     'Asymmetric Branches': asymmetricBranches, 'Outside Grid': outsideGrid}
     
 
 
@@ -784,8 +821,11 @@ class XmlPrinter(PyPrinter):
     """
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
 
-        BasicPrinter.__init__(self, output, filename, outputLevel)
-        self.toPrint = [OutputStatus,ResultList,Uncovered]
+        PyPrinter.__init__(self, output, filename, outputLevel)
+        self.printingOrder = [OutputStatus,ResultList,Uncovered]
+        self.outputLevel = [outputLevel]*len(self.printingOrder)
+        self.toPrint = [None]*len(self.printingOrder)
+
         
     def setOutPutFile(self,filename,overwrite=True):
         """
@@ -832,13 +872,13 @@ class XmlPrinter(PyPrinter):
         """
 
         outputDict = {}
-        for objType in self.toPrint:
-            for iobj,obj in enumerate(self.objList):
-                if objType == type(obj):
-                    objoutput = self.outputList[iobj]
-                    outputDict.update(objoutput)
+        for iobj,obj in enumerate(self.toPrint):
+            if obj is None: continue
+            output = self._formatObj(obj,self.outputLevel[iobj])  # Conver to python dictionaries              
+            if not output: continue  #Skip empty output            
+            outputDict.update(output)
 
-        logger.error("XML flush to %s" %(outputDict))
+        #Convert from python dictionaries to xml:
         if outputDict:            
             root = ElementTree.Element('smodelsOutput')
             self.convertToElement(outputDict,root)
@@ -854,22 +894,4 @@ class XmlPrinter(PyPrinter):
                     outfile.write(nice_xml)
                     outfile.close()
 
-        self.objList = []
-        self.outputList = []
-
-
-def printout(obj, outputLevel=1):
-    """
-    Simple function for printing the object to the screen
-    :param obj: object to be printed
-    :param outputLevel: general control for the output depth to be printed
-                           (0 = no output, 1 = basic output, 2 = detailed output,...)
-    """
-
-    printer = TxTPrinter()
-    printer.outputLevel = outputLevel
-    printer.output = 'stdout'
-    printer.addObj(obj)
-    printer.close()
-
-
+        self.toPrint = [None]*len(self.printingOrder)
