@@ -512,6 +512,7 @@ class TxTPrinter(BasicPrinter):
                         output += "Contributing elements %s\n" % str(contributing)            
             output += "================================================================================\n"
             output += "Contributions outside the mass grid (up to " + str(nprint) + "):\n"
+            output += "Sqrts (TeV)   Weight (fb)        Element description\n"
             for topo in obj.outsideGrid.topos:
                 for el in topo.contributingElements:
                     if not el.weight.getXsecsFor(obj.sqrts): continue
