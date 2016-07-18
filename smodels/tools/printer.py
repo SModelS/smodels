@@ -681,6 +681,8 @@ class PyPrinter(BasicPrinter):
                         'lumi (fb-1)' : (dataset.globalInfo.lumi*fb).asNumber(),
                         'dataType' : dataType})
 
+        ExptRes = sorted(ExptRes, key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
+                                                   res['AnalysisID'],res['DataSetID']])
         return {'ExptRes' : ExptRes}
 
 
@@ -789,22 +791,22 @@ class PyPrinter(BasicPrinter):
         
         longCascades = []        
         obj.longCascade.classes = sorted(obj.longCascade.classes, 
-                                         key=lambda x: [x.getWeight(obj.sqrts),x.motherPIDs[0:2]], 
+                                         key=lambda x: [x.getWeight(obj.sqrts),sorted(x.motherPIDs[0:2])], 
                                          reverse=True)        
         for cascadeEntry in obj.longCascade.classes[:nprint]:
             longc = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV),
                      'weight (fb)' : cascadeEntry.getWeight(obj.sqrts).asNumber(fb), 
-                     'mother PIDs' : cascadeEntry.motherPIDs[0:2]}        
+                     'mother PIDs' : sorted(cascadeEntry.motherPIDs[0:2])}        
             longCascades.append(longc)
         
         asymmetricBranches = []
         obj.asymmetricBranches.classes = sorted(obj.asymmetricBranches.classes, 
-                                                key=lambda x: [x.getWeight(obj.sqrts),x.motherPIDs[0:2]],
+                                                key=lambda x: [x.getWeight(obj.sqrts),sorted(x.motherPIDs[0:2])],
                                                 reverse=True)
         for asymmetricEntry in obj.asymmetricBranches.classes[:nprint]:
             asymmetric = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 
                     'weight (fb)' : asymmetricEntry.getWeight(obj.sqrts).asNumber(fb),
-                    'mother PIDs' : asymmetricEntry.motherPIDs[0:2]}         
+                    'mother PIDs' : sorted(asymmetricEntry.motherPIDs[0:2])}         
             asymmetricBranches.append(asymmetric)
 
         
@@ -861,7 +863,7 @@ class XmlPrinter(PyPrinter):
                 parent.append(newElement)
         elif isinstance(pyObj,list):
             parent.tag += '_List'
-            for val in sorted(pyObj):
+            for val in pyObj:
                 newElement = ElementTree.Element(tag)
                 self.convertToElement(val,newElement,tag)
                 parent.append(newElement)
