@@ -89,9 +89,11 @@ class RunSModelSTest(unittest.TestCase):
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
                                                  key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
                                                    res['AnalysisID'],res['DataSetID']])        
-        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.01,ignore=ignoreFields)        
-        os.remove('./output.py')
-        os.remove('./output.pyc')
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.01,ignore=ignoreFields)
+        try:        
+            os.remove('./output.py')
+            os.remove('./output.pyc')
+        except: pass
         self.assertEqual(equals,True)
 
     def testBadFile(self):
