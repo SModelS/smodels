@@ -84,19 +84,20 @@
     </Asymmetric_Branches_List>
     <ExptRes_List>
         <ExptRes>
-            <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
+            <AnalysisID>CMS-SUS-13-012</AnalysisID>
             <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
-            <DataSetID>None</DataSetID>
-            <DaughterMass_GeV>128.96157</DaughterMass_GeV>
-            <MotherMass_GeV>865.035125</MotherMass_GeV>
+            <DataSetID>3NJet6_1000HT1250_600MHTinf</DataSetID>
+            <DaughterMass_GeV>None</DaughterMass_GeV>
+            <MotherMass_GeV>None</MotherMass_GeV>
             <TxNames_List>
-                <TxNames>T5WW</TxNames>
+                <TxNames>T1</TxNames>
+                <TxNames>T2</TxNames>
             </TxNames_List>
-            <dataType>upperLimit</dataType>
-            <lumi_fb-1>20.3</lumi_fb-1>
+            <dataType>efficiencyMap</dataType>
+            <lumi_fb-1>19.5</lumi_fb-1>
             <maxcond>0.0</maxcond>
-            <theory_prediction_fb>9.06887013429</theory_prediction_fb>
-            <upper_limit_fb>32.336037769</upper_limit_fb>
+            <theory_prediction_fb>0.1379</theory_prediction_fb>
+            <upper_limit_fb>1.205</upper_limit_fb>
         </ExptRes>
         <ExptRes>
             <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
@@ -144,6 +145,21 @@
             <upper_limit_fb>17.1817110284</upper_limit_fb>
         </ExptRes>
         <ExptRes>
+            <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
+            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
+            <DataSetID>None</DataSetID>
+            <DaughterMass_GeV>128.96157</DaughterMass_GeV>
+            <MotherMass_GeV>865.035125</MotherMass_GeV>
+            <TxNames_List>
+                <TxNames>T5WW</TxNames>
+            </TxNames_List>
+            <dataType>upperLimit</dataType>
+            <lumi_fb-1>20.3</lumi_fb-1>
+            <maxcond>0.0</maxcond>
+            <theory_prediction_fb>9.06887013429</theory_prediction_fb>
+            <upper_limit_fb>32.336037769</upper_limit_fb>
+        </ExptRes>
+        <ExptRes>
             <AnalysisID>ATLAS-SUSY-2013-12</AnalysisID>
             <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
             <DataSetID>None</DataSetID>
@@ -157,22 +173,6 @@
             <maxcond>0.0</maxcond>
             <theory_prediction_fb>18.4709328281</theory_prediction_fb>
             <upper_limit_fb>330.12067148</upper_limit_fb>
-        </ExptRes>
-        <ExptRes>
-            <AnalysisID>CMS-SUS-13-012</AnalysisID>
-            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
-            <DataSetID>3NJet6_1000HT1250_600MHTinf</DataSetID>
-            <DaughterMass_GeV>None</DaughterMass_GeV>
-            <MotherMass_GeV>None</MotherMass_GeV>
-            <TxNames_List>
-                <TxNames>T1</TxNames>
-                <TxNames>T2</TxNames>
-            </TxNames_List>
-            <dataType>efficiencyMap</dataType>
-            <lumi_fb-1>19.5</lumi_fb-1>
-            <maxcond>0.0</maxcond>
-            <theory_prediction_fb>0.1379</theory_prediction_fb>
-            <upper_limit_fb>1.205</upper_limit_fb>
         </ExptRes>
     </ExptRes_List>
     <Long_Cascades_List>
