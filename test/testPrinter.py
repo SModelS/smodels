@@ -61,9 +61,9 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
                 logger.warning('Objects differ:\n   %s\n and\n   %s' %(str(obj1[key]),str(obj2[key])))
                 return False
     elif isinstance(obj1,list):
-        for ival,val in enumerate(sorted(obj1)):
-            if not equalObjs(val,sorted(obj2)[ival],allowedDiff):
-                logger.warning('Objects differ:\n   %s \n and\n   %s' %(str(val),str(sorted(obj2)[ival])))
+        for ival,val in enumerate(obj1):
+            if not equalObjs(val,obj2[ival],allowedDiff):
+                logger.warning('Objects differ:\n   %s \n and\n   %s' %(str(val),str(obj2[ival])))
                 return False
     else:
         return obj1 == obj2
@@ -151,6 +151,9 @@ class RunPrinterTest(unittest.TestCase):
         from gluino_squarks_default import smodelsOutputDefault        
         from output import smodelsOutput
         ignoreFields = ['input file','smodels version']
+        smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
+                                                 key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
+                                                   res['AnalysisID'],res['DataSetID']])
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.05,ignore=ignoreFields)
         self.assertEqual(equals,True)
         try:
