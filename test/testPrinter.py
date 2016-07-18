@@ -165,12 +165,12 @@ class RunPrinterTest(unittest.TestCase):
 
 
     def testXmlPrinter(self):
-        defFile = os.path.join ( idir(), "test/default_output.xml" )
-        outFile = os.path.join ( idir(), "test/unitTestOutput/printer_output.xml" )
-         
-        #Test xml output
-        xmlDefault = ElementTree.parse( defFile ).getroot()
-        xmlNew = ElementTree.parse( outFile ).getroot()
+        
+        def sortXML(xmltree):
+            for el in xmltree:        
+                sortXML(el)
+            xmltree[:] = sorted(xmltree, key=lambda el: [el.tag,ElementTree.tostring(el)])
+        
         def compareXML(xmldefault,xmlnew,allowedDiff,ignore=[]):
             self.assertEqual(len(xmldefault),len(xmlnew))
             for i,el in enumerate(xmldefault):
@@ -191,6 +191,15 @@ class RunPrinterTest(unittest.TestCase):
                     self.assertEqual(el.tag,newel.tag)
                 else:                    
                     compareXML(el,newel,allowedDiff,ignore)
+                    
+        defFile = os.path.join ( idir(), "test/default_output.xml" )
+        outFile = os.path.join ( idir(), "test/unitTestOutput/printer_output.xml" )
+         
+        #Test xml output
+        xmlDefault = ElementTree.parse( defFile ).getroot()
+        xmlNew = ElementTree.parse( outFile ).getroot()
+        sortXML(xmlDefault)
+        sortXML(xmlNew)
         try:
             compareXML(xmlDefault,xmlNew,allowedDiff=0.05,ignore=['input_file','smodels_version'])
         except AssertionError,e:
