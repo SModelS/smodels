@@ -13,78 +13,12 @@ from ConfigParser import SafeConfigParser
 from smodels.experiment.databaseObj import Database
 from smodels.installation import installDirectory
 from smodels.tools.physicsUnits import GeV, fb
-from smodels.tools import testPoint, runtime
+from smodels.tools.testPoint import runAllFiles
 from smodels.tools import crashReport, timeOut
 import smodels.tools.printer as prt
 from smodels.experiment.exceptions import DatabaseNotFoundException
 
 log = logging.getLogger(__name__)
-
-def runSingleFile ( inputFile, outputDir, parser, databaseVersion, listOfExpRes, 
-                    crashReport=True):
-    try:
-        testPoint.testPoint( inputFile, outputDir, parser, databaseVersion, 
-                             listOfExpRes )
-    except Exception,e:
-        if crashReport: 
-            e.inputFile = inputFile
-            raise e
-
-def runSetOfFiles ( inputFiles, outputDir, parser, databaseVersion, listOfExpRes, 
-                    crashReport=True ):
-    for inputFile in inputFiles:
-        runSingleFile( inputFile, outputDir, parser, databaseVersion, 
-                       listOfExpRes )
-
-def runAllFiles ( fileList, inDir, outputDir, parser, databaseVersion, listOfExpRes ):
-    """ run over all files """
-    if len( fileList ) == 0:
-        log.error ( "no files given." )
-        return
-    if len(fileList ) == 1:
-        runSingleFile ( fileList[0], outputDir, parser, databaseVersion, listOfExpRes )
-        return
-
-    """ loop over input files and run SModelS """
-    ncpusAll = runtime.nCPUs()
-    ncpus = parser.getint("parameters", "ncpus")
-    if ncpus < 1 or ncpus > ncpusAll: ncpus = ncpusAll
-    log.info ("we run on %d cores" % ncpus )
-
-    cleanedList = []
-    for f in fileList:
-        tmp = os.path.join(inDir, f )
-        if not os.path.isfile ( tmp ):
-            log.info ( "%s does not exist or is not a file. Skipping it." % tmp )
-            continue
-        cleanedList.append ( tmp )
-
-    runOnSingleCore = False
-    if runOnSingleCore:
-        runSetOfFiles ( cleanedList, outputDir, parser, databaseVersion, 
-                        listOfExpRes )
-        return
-
-    ### now split up for every fork
-    chunkedFiles = [ cleanedList[x::ncpus] for x in range(ncpus ) ]
-    children = []
-    for (i,chunk) in enumerate ( chunkedFiles ):
-        pid=os.fork()
-        if pid == 0:
-            log.info ("chunk #%d: pid %d (parent %d)." % 
-                    ( i, os.getpid(), os.getppid() ) )
-            log.info ( " `-> %s" % " ".join ( chunk ) )
-            runSetOfFiles ( chunk, outputDir, parser, databaseVersion, listOfExpRes )
-            return
-        if pid < 0:
-            log.error ( "fork did not succeed! Pid=%d" % pid )
-            sys.exit()
-        if pid > 0:
-            children.append ( pid )
-    for child in children:
-        os.waitpid ( child, 0 )
-        log.info ( "child %d terminated." % child )
-    log.info ( "all children terminated" )
 
 def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
     """
