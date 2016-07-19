@@ -118,6 +118,16 @@ class BasicPrinter(object):
                 return True
         return False
 
+    def openOutFile(self, filename, mode ):
+        """ creates and opens a data sink, 
+            creates path if needed """
+        d = os.path.dirname ( filename )
+        if not os.path.exists ( d ):
+            os.makedirs ( d )
+            logger.info ( "creating directory %s" % d )
+        return open ( filename, mode )
+
+
     def flush(self):
         """
         Format the objects added to the output, print them to the screen
@@ -134,7 +144,7 @@ class BasicPrinter(object):
                     if not self.filename:
                         logger.error('Filename not defined for printer')
                         return False
-                    with open(self.filename, "a") as outfile:
+                    with self.openOutFile(self.filename, "a") as outfile:
                         outfile.write(output)
                         outfile.close()
 
