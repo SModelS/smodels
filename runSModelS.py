@@ -46,7 +46,9 @@ def runAllFiles ( fileList, inDir, outputDir, parser, databaseVersion, listOfExp
         return
 
     """ loop over input files and run SModelS """
-    ncpus = runtime.nCPUs()
+    ncpusAll = runtime.nCPUs()
+    ncpus = parser.getint("parameters", "ncpus")
+    if ncpus < 1 or ncpus > ncpusAll: ncpus = ncpusAll
     log.info ("we run on %d cores" % ncpus )
 
     cleanedList = []
