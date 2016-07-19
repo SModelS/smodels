@@ -52,7 +52,7 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
             if not key in obj2:
                 logger.warning("Key %s missing" %key)
                 return False
-            if not equalObjs(obj1[key],obj2[key],allowedDiff):
+            if not equalObjs(obj1[key],obj2[key],allowedDiff, ignore=ignore ):
                 logger.warning('Objects differ:\n   %s\n and\n   %s' %(str(obj1[key]),str(obj2[key])))
                 return False
     elif isinstance(obj1,list):
@@ -94,7 +94,7 @@ class RunSModelSTest(unittest.TestCase):
             os.remove('./output.py')
             os.remove('./output.pyc')
         except: pass
-        self.assertEqual(equals,True)
+        self.assertTrue(equals)
 
     def testBadFile(self):
    
@@ -105,7 +105,7 @@ class RunSModelSTest(unittest.TestCase):
         from bad_output import smodelsOutput
         ignoreFields = ['input file','smodels version']
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.,ignore=ignoreFields)
-        self.assertEqual(equals,True)
+        self.assertTrue(equals )
         os.remove('./bad_output.py')
         os.remove('./bad_output.pyc')
 

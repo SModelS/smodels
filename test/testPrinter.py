@@ -57,7 +57,7 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
             if not key in obj2:
                 logger.warning("Key %s missing" %key)
                 return False
-            if not equalObjs(obj1[key],obj2[key],allowedDiff,ignore=[ "input file" ] ):
+            if not equalObjs(obj1[key],obj2[key],allowedDiff,ignore=ignore ):
                 logger.warning('Objects differ:\n   %s\n and\n   %s' %(str(obj1[key]),str(obj2[key])))
                 return False
     elif isinstance(obj1,list):
@@ -76,7 +76,6 @@ class RunPrinterTest(unittest.TestCase):
 
     def __init__ ( self, *args, **kwargs):
         super(RunPrinterTest, self).__init__(*args, **kwargs)
-        self.logger = logger.getLogger(__name__)
         
         self.masterPrinter = printer.MPrinter(printerList=['summary','python','xml'])        
         #Set the address of the database folder
@@ -155,7 +154,7 @@ class RunPrinterTest(unittest.TestCase):
                                                  key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
                                                    res['AnalysisID'],res['DataSetID']])
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.05,ignore=ignoreFields)
-        self.assertEqual(equals,True)
+        self.assertTrue(equals)
         try:
             os.remove('./output.py')
             os.remove('./output.pyc')
@@ -185,7 +184,7 @@ class RunPrinterTest(unittest.TestCase):
                         pass
                     if isinstance(el.text,float) and isinstance(newel.text,float) and newel.text != el.text:
                         diff = 2.*abs(el.text-newel.text)/abs(el.text+newel.text)
-                        self.assertEqual(diff < allowedDiff,True)
+                        self.assertTrue(diff < allowedDiff )
                     else:
                         self.assertEqual(el.text,newel.text)
                     self.assertEqual(el.tag,newel.tag)
