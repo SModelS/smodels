@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
-import os
-import logging
-from smodels.tools.physicsUnits import GeV, fb
 from smodels.tools import ioObjects
 from smodels.tools import coverage, runtime
 from smodels.theory import slhaDecomposer
 from smodels.theory import lheDecomposer
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 import smodels.tools.printer as prt
+import logging
+import os
+import sys
+from smodels.tools.physicsUnits import GeV, fb
 
 log = logging.getLogger(__name__)
 
@@ -171,19 +172,22 @@ def runAllFiles ( fileList, inDir, outputDir, parser, databaseVersion, listOfExp
     children = []
     for (i,chunk) in enumerate ( chunkedFiles ):
         pid=os.fork()
+        print "Forking: ",i,pid,os.getpid()
         if pid == 0:
             log.info ("chunk #%d: pid %d (parent %d)." %
                     ( i, os.getpid(), os.getppid() ) )
             log.info ( " `-> %s" % " ".join ( chunk ) )
             runSetOfFiles ( chunk, outputDir, parser, databaseVersion, listOfExpRes )
-            return
+            sys.exit()
+            # return
+            # continue
         if pid < 0:
             log.error ( "fork did not succeed! Pid=%d" % pid )
             sys.exit()
         if pid > 0:
             children.append ( pid )
     for child in children:
-        os.waitpid ( child, 0 )
-        log.info ( "child %d terminated." % child )
+        r = os.waitpid ( child, 0 )
+        log.info ( "child %d terminated: %s" % (child,r) )
     log.info ( "all children terminated" )
 
