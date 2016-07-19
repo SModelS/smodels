@@ -57,7 +57,7 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
             if not key in obj2:
                 logger.warning("Key %s missing" %key)
                 return False
-            if not equalObjs(obj1[key],obj2[key],allowedDiff):
+            if not equalObjs(obj1[key],obj2[key],allowedDiff,ignore=[ "input file" ] ):
                 logger.warning('Objects differ:\n   %s\n and\n   %s' %(str(obj1[key]),str(obj2[key])))
                 return False
     elif isinstance(obj1,list):
