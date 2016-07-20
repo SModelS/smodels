@@ -13,7 +13,7 @@ from ConfigParser import SafeConfigParser
 from smodels.experiment.databaseObj import Database
 from smodels.installation import installDirectory
 from smodels.tools.physicsUnits import GeV, fb
-from smodels.tools.testPoint import runAllFiles
+from smodels.tools.modelTester import runAllFiles
 from smodels.tools import crashReport, timeOut
 import smodels.tools.printer as prt
 from smodels.experiment.exceptions import DatabaseNotFoundException

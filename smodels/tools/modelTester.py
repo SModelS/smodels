@@ -1,5 +1,15 @@
 #!/usr/bin/env python
 
+"""
+.. module:: tools.modelTester
+   :synopsis: Functions to test (a set of) points, handling decomposition, result and coverage checks, parallelisation.
+    
+.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>    
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com> 
+
+"""
+
+
 from smodels.tools import ioObjects
 from smodels.tools import coverage, runtime
 from smodels.theory import slhaDecomposer
