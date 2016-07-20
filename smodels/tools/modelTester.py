@@ -24,16 +24,23 @@ from smodels.tools.physicsUnits import GeV, fb
 log = logging.getLogger(__name__)
 
 def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
-    """ Minimum value of cross-section for an element to be considered eligible
-        for decomposition.  Too small sigmacut leads to too large decomposition
-        time.  """
+    """
+    Test model point defined in input file (running decomposition, check results, test coverage)
+    
+    :parameter inputFile: path to input file
+    :parameter outputDir: path to directory where output is be stored
+    :parameter parser: ConfigParser storing information from parameter.ini file
+    :parameter databaseVersion: Database version (printed to output file)
+    :parameter listOfExpRes: list of ExpResult objects to be considered
+    """
+
+    # Get run parameters and options from the parser
     sigmacut = parser.getfloat("parameters", "sigmacut") * fb
-    """ Minimum value for considering two states non-degenerate (only used for
-        mass compression) """
     minmassgap = parser.getfloat("parameters", "minmassgap") * GeV
     inputType = parser.get("options", "inputType").lower()
 
 
+    # Initialize text output file
     outputFile = os.path.join(outputDir, os.path.basename(inputFile))+'.smodels'
 
     if os.path.exists(outputFile):
@@ -41,16 +48,16 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     outfile = open(outputFile, 'w')
     outfile.close()
 
-    """ Check input file for errors """
+    # Check input file for errors
     inputStatus = ioObjects.FileStatus()
     if parser.getboolean("options", "checkInput"):
         inputStatus.checkFile(inputType, inputFile, sigmacut)
-    """ Initialize output status and exit if there were errors in the input """
+    # Initialize output status and exit if there were errors in the input
     outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile,
             dict(parser.items("parameters")), databaseVersion, outputFile)
     if outputStatus.status < 0: return
 
-    """ Setup output printers """
+    # Setup output printers
     stdoutPrinter = prt.TxTPrinter(output = 'stdout')
     summaryPrinter = prt.SummaryPrinter(output = 'file', filename = outputFile)
 
@@ -123,7 +130,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         stdoutPrinter.addObj(results,outLevel)
 
     if parser.getboolean("options", "testCoverage"):
-        """ Look for missing topologies, add them to the output file """
+        """ Testing coverage of model point, add results to the output file """
         uncovered = coverage.Uncovered(smstoplist)
         summaryPrinter.addObj(uncovered.missingTopos)
         stdoutPrinter.addObj(uncovered.missingTopos,2)
@@ -134,6 +141,16 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
 
 def runSingleFile ( inputFile, outputDir, parser, databaseVersion, listOfExpRes,
                     crashReport=True):
+    """
+    Call testPoint on inputFile, write crash report in case of problems
+    
+    :parameter inputFile: path to input file
+    :parameter outputDir: path to directory where output is be stored
+    :parameter parser: ConfigParser storing information from parameter.ini file
+    :parameter databaseVersion: Database version (printed to output file)
+    :parameter listOfExpRes: list of ExpResult objects to be considered
+    :parameter crashReport: if True, write crash report in case of problems
+    """
     try:
         testPoint( inputFile, outputDir, parser, databaseVersion,
                              listOfExpRes )
@@ -144,12 +161,32 @@ def runSingleFile ( inputFile, outputDir, parser, databaseVersion, listOfExpRes,
 
 def runSetOfFiles ( inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
                     crashReport=True ):
+    """
+    Loop over all input files in inputFiles with testPoint
+    
+    :parameter inputFiles: list of input files to be tested
+    :parameter outputDir: path to directory where output is be stored
+    :parameter parser: ConfigParser storing information from parameter.ini file
+    :parameter databaseVersion: Database version (printed to output file)
+    :parameter listOfExpRes: list of ExpResult objects to be considered
+    :parameter crashReport: if True, write crash report in case of problems
+    """
     for inputFile in inputFiles:
         runSingleFile( inputFile, outputDir, parser, databaseVersion,
                        listOfExpRes )
 
 def runAllFiles ( fileList, inDir, outputDir, parser, databaseVersion, listOfExpRes ):
-    """ run over all files """
+    """
+    Loop over all input files in fileList with testPoint, using ncpus CPUs defined in parser
+    
+    :parameter fileList: list of input files to be tested
+    :parameter inDir: path to directory where input files are stored
+    :parameter outputDir: path to directory where output is stored
+    :parameter parser: ConfigParser storing information from parameter.ini file
+    :parameter databaseVersion: Database version (printed to output files)
+    :parameter listOfExpRes: list of ExpResult objects to be considered
+    """
+
     if len( fileList ) == 0:
         log.error ( "no files given." )
         return
