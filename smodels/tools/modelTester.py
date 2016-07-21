@@ -2,13 +2,13 @@
 
 """
 .. module:: tools.modelTester
-   :synopsis: Functions to test (a set of) points, handling decomposition, result and coverage checks, parallelisation.
+   :synopsis: Functions to test (a set of) points, handling decomposition,
+              result and coverage checks, parallelisation.
 
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
-
 
 from smodels.tools import ioObjects
 from smodels.tools import coverage, runtime
@@ -142,7 +142,7 @@ def testPoint( inputFile, outputDir, parser, databaseVersion, listOfExpRes ):
     summaryPrinter.close()
 
 def runSingleFile ( inputFile, outputDir, parser, databaseVersion, listOfExpRes,
-                    crashReport=True):
+                    timeout, development, parameterFile ):
     """
     Call testPoint on inputFile, write crash report in case of problems
 
@@ -152,17 +152,25 @@ def runSingleFile ( inputFile, outputDir, parser, databaseVersion, listOfExpRes,
     :parameter databaseVersion: Database version (printed to output file)
     :parameter listOfExpRes: list of ExpResult objects to be considered
     :parameter crashReport: if True, write crash report in case of problems
+    :param timeout: set a timeout for one model point (0 means no timeout)
     """
     try:
-        testPoint( inputFile, outputDir, parser, databaseVersion,
-                             listOfExpRes )
+        with timeOut.Timeout ( timeout ):
+            testPoint( inputFile, outputDir, parser, databaseVersion,
+                                 listOfExpRes )
     except Exception,e:
-        if crashReport:
-            e.inputFile = inputFile
-            raise e
+        crashReportFacility = crashReport.CrashReport()
+         
+        if development:
+            print(crashReport.createStackTrace())
+        else:
+            print(crashReport.createStackTrace())
+            crashReportFacility.createCrashReportFile( inputFile, parameterFile )
+            print(crashReportFacility.createUnknownErrorMessage())
+
 
 def runSetOfFiles ( inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
-                    crashReport=True ):
+                    timeout, development, parameterFile ):
     """
     Loop over all input files in inputFiles with testPoint
 
@@ -171,18 +179,19 @@ def runSetOfFiles ( inputFiles, outputDir, parser, databaseVersion, listOfExpRes
     :parameter parser: ConfigParser storing information from parameter.ini file
     :parameter databaseVersion: Database version (printed to output file)
     :parameter listOfExpRes: list of ExpResult objects to be considered
-    :parameter crashReport: if True, write crash report in case of problems
+    :parameter development: turn on development mode (e.g. no crash report)
+    :parameter parameterFile: parameter file, for crash reports
     """
-    if "inputFiles/slha/dont_exist.slha" in inputFiles:
-        inputFiles.remove ( "inputFiles/slha/dont_exist.slha" )
-        inputFiles.insert ( 0, "inputFiles/slha/dont_exist.slha" )
-    print "run over",inputFiles
+    #if "inputFiles/slha/dont_exist.slha" in inputFiles:
+    #    inputFiles.remove ( "inputFiles/slha/dont_exist.slha" )
+    #    inputFiles.insert ( 0, "inputFiles/slha/dont_exist.slha" )
+    #print "run over",inputFiles
     for inputFile in inputFiles:
         runSingleFile( inputFile, outputDir, parser, databaseVersion,
-                       listOfExpRes )
+                       listOfExpRes, timeout, development, parameterFile )
 
-def runAllFiles ( fileList, inDir, outputDir, parser, databaseVersion,
-                  listOfExpRes, timeout, development, parameterFile ):
+def test ( fileList, inDir, outputDir, parser, databaseVersion,
+           listOfExpRes, timeout, development, parameterFile ):
     """
     Loop over all input files in fileList with testPoint, using ncpus CPUs
     defined in parser
@@ -198,65 +207,53 @@ def runAllFiles ( fileList, inDir, outputDir, parser, databaseVersion,
     :param parameterFile: parameter file, for crash reports
     """
 
-    try:
-        with timeOut.Timeout ( timeout ):
-            if len( fileList ) == 0:
-                log.error ( "no files given." )
-                return
-            if len(fileList ) == 1:
-                runSingleFile ( fileList[0], outputDir, parser, databaseVersion,
-                                listOfExpRes )
-                return
+    if len( fileList ) == 0:
+        log.error ( "no files given." )
+        return
+    if len(fileList ) == 1:
+        runSingleFile ( fileList[0], outputDir, parser, databaseVersion,
+                        listOfExpRes, timeout, development, parameterFile )
+        return
 
-            """ loop over input files and run SModelS """
-            ncpusAll = runtime.nCPUs()
-            ncpus = parser.getint("parameters", "ncpus")
-            if ncpus < 1 or ncpus > ncpusAll: ncpus = ncpusAll
-            log.info ("we run on %d cores" % ncpus )
+    """ loop over input files and run SModelS """
+    ncpusAll = runtime.nCPUs()
+    ncpus = parser.getint("parameters", "ncpus")
+    if ncpus < 1 or ncpus > ncpusAll: ncpus = ncpusAll
+    log.info ("we run on %d cores" % ncpus )
 
-            cleanedList = []
-            for f in fileList:
-                tmp = os.path.join(inDir, f )
-                if not os.path.isfile ( tmp ):
-                    log.info ( "%s does not exist or is not a file. Skipping it." % tmp )
-                    continue
-                cleanedList.append ( tmp )
+    cleanedList = []
+    for f in fileList:
+        tmp = os.path.join(inDir, f )
+        if not os.path.isfile ( tmp ):
+            log.info ( "%s does not exist or is not a file. Skipping it." % tmp )
+            continue
+        cleanedList.append ( tmp )
 
-            runOnSingleCore = False
-            if runOnSingleCore:
-                runSetOfFiles ( cleanedList, outputDir, parser, databaseVersion,
-                                listOfExpRes )
-                return
+    runOnSingleCore = False
+    if runOnSingleCore:
+        runSetOfFiles ( cleanedList, outputDir, parser, databaseVersion,
+                        listOfExpRes, timeout, development, parameterFile )
+        return
 
-            ### now split up for every fork
-            chunkedFiles = [ cleanedList[x::ncpus] for x in range(ncpus ) ]
-            children = []
-            for (i,chunk) in enumerate ( chunkedFiles ):
-                pid=os.fork()
-                print "Forking: ",i,pid,os.getpid()
-                if pid == 0:
-                    log.info ("chunk #%d: pid %d (parent %d)." %
-                            ( i, os.getpid(), os.getppid() ) )
-                    log.info ( " `-> %s" % " ".join ( chunk ) )
-                    runSetOfFiles ( chunk, outputDir, parser, databaseVersion, 
-                                    listOfExpRes )
-                    sys.exit() ## not return, nor continue
-                if pid < 0:
-                    log.error ( "fork did not succeed! Pid=%d" % pid )
-                    sys.exit()
-                if pid > 0:
-                    children.append ( pid )
-            for child in children:
-                r = os.waitpid ( child, 0 )
-                log.info ( "child %d terminated: %s" % (child,r) )
-            log.info ( "all children terminated" )
-    except Exception,e:
-        crashReportFacility = crashReport.CrashReport()
-         
-        if development:
-            print(crashReport.createStackTrace())
-        else:
-            print(crashReport.createStackTrace())
-            crashReportFacility.createCrashReportFile( e.inputFile, parameterFile )
-            print(crashReportFacility.createUnknownErrorMessage())
-
+    ### now split up for every fork
+    chunkedFiles = [ cleanedList[x::ncpus] for x in range(ncpus ) ]
+    children = []
+    for (i,chunk) in enumerate ( chunkedFiles ):
+        pid=os.fork()
+        print "Forking: ",i,pid,os.getpid()
+        if pid == 0:
+            log.info ("chunk #%d: pid %d (parent %d)." %
+                    ( i, os.getpid(), os.getppid() ) )
+            log.info ( " `-> %s" % " ".join ( chunk ) )
+            runSetOfFiles ( chunk, outputDir, parser, databaseVersion, 
+                            listOfExpRes, timeout, development, parameterFile )
+            sys.exit() ## not return, nor continue
+        if pid < 0:
+            log.error ( "fork did not succeed! Pid=%d" % pid )
+            sys.exit()
+        if pid > 0:
+            children.append ( pid )
+    for child in children:
+        r = os.waitpid ( child, 0 )
+        log.info ( "child %d terminated: %s" % (child,r) )
+    log.info ( "all children terminated" )
