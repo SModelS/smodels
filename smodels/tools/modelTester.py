@@ -163,6 +163,7 @@ def runSingleFile ( inputFile, outputDir, parser, databaseVersion, listOfExpRes,
          
         if development:
             print(crashReport.createStackTrace())
+            raise e
         else:
             print(crashReport.createStackTrace())
             crashReportFacility.createCrashReportFile( inputFile, parameterFile )
@@ -182,16 +183,12 @@ def runSetOfFiles ( inputFiles, outputDir, parser, databaseVersion, listOfExpRes
     :parameter development: turn on development mode (e.g. no crash report)
     :parameter parameterFile: parameter file, for crash reports
     """
-    #if "inputFiles/slha/dont_exist.slha" in inputFiles:
-    #    inputFiles.remove ( "inputFiles/slha/dont_exist.slha" )
-    #    inputFiles.insert ( 0, "inputFiles/slha/dont_exist.slha" )
-    #print "run over",inputFiles
     for inputFile in inputFiles:
         runSingleFile( inputFile, outputDir, parser, databaseVersion,
                        listOfExpRes, timeout, development, parameterFile )
 
-def test ( fileList, inDir, outputDir, parser, databaseVersion,
-           listOfExpRes, timeout, development, parameterFile ):
+def testPoints ( fileList, inDir, outputDir, parser, databaseVersion,
+                 listOfExpRes, timeout, development, parameterFile ):
     """
     Loop over all input files in fileList with testPoint, using ncpus CPUs
     defined in parser

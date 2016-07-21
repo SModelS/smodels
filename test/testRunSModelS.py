@@ -16,22 +16,22 @@ import glob
 from os.path import join, basename
 from smodels.installation import installDirectory as iDir
 from smodels.tools import summaryReader
+from smodels.tools.timeOut import NoTime
 from runSModelS import main
 
 class RunSModelSTest(unittest.TestCase):
-    def runMain(self, filename ):
-        suppressStdout = True
+    def runMain(self, filename, timeout = 0, suppressStdout=True, development=False ):
         if suppressStdout:
             a=sys.stdout
             sys.stdout = open ( "stdout.log", "w" )
         out = join ( iDir(), "test/unitTestOutput" )
         main(filename, parameterFile=join ( iDir(), "test/testParameters.ini" ),
-             outputDir= out, verbosity = 'error', db= None, timeout = 0,
-             development = False )
+             outputDir= out, verbosity = 'error', db= None, timeout = timeout,
+             development = development )
         outputfile = None
         bname = basename ( filename )
-        if bname != "": ## supply an output file only for files, not for dirs
-            sfile = join ( iDir(), "test/unitTestOutput/%s.smodels" % bname )
+        sfile = join ( iDir(), "test/unitTestOutput/%s.smodels" % bname )
+        if os.path.exists ( sfile ):
             outputfile = summaryReader.Summary( sfile )
         if suppressStdout:
             sys.stdout = a
@@ -47,6 +47,14 @@ class RunSModelSTest(unittest.TestCase):
         nout = len( list ( glob.iglob ( "unitTestOutput/*smodels" )) )
         nin = len( list ( glob.iglob ( "%s/*slha" % filename )) )
         self.assertTrue ( nout == nin )
+
+    def timeoutRun(self):
+        filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
+        outputfile = self.runMain(filename, timeout=1, suppressStdout=True,
+                     development=True )
+
+    def testTimeout(self):
+        self.assertRaises ( NoTime, self.timeoutRun )
 
     def testGoodFile(self):
         filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
