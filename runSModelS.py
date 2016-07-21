@@ -14,13 +14,13 @@ from smodels.experiment.databaseObj import Database
 from smodels.installation import installDirectory
 from smodels.tools.physicsUnits import GeV, fb
 from smodels.tools.modelTester import runAllFiles
-from smodels.tools import crashReport, timeOut
+from smodels.tools import crashReport
 import smodels.tools.printer as prt
 from smodels.experiment.exceptions import DatabaseNotFoundException
 
 log = logging.getLogger(__name__)
 
-def main( inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
+def main( inFile, parameterFile, outputDir, verbosity, db, timeout, development ):
     """
     Provides a command line interface to basic SModelS functionalities.
     
@@ -34,12 +34,14 @@ def main( inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
             render a few parameters in the parameter file irrelevant.
             If None, load the database as described in parameterFile,
             If True, force loading the text database.
+    :param timeout: set a timeout for one model point (0 means no timeout)
+    :param development: turn on development mode (e.g. no crash report)
     
     """
 
     """
     Read and check parameter file
-    =========================
+    =============================
     """
     parser = SafeConfigParser()
     ret=parser.read(parameterFile)
@@ -118,14 +120,8 @@ def main( inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
         outLevel += parser.getboolean("stdout", "addAnaInfo")          
     for expResult in listOfExpRes: stdoutPrinter.addObj(expResult,outLevel)
 
-    runAllFiles ( fileList, inFile, outputDir, parser, databaseVersion, listOfExpRes )
-
-
-def run( inFile, parameterFile, outputDir, verbosity, db, timeout ):
-    """ call main, and handle crash reports and timeouts """
-    with timeOut.Timeout( timeout ):
-        main( args.filename, args.parameterFile, args.outputDir, args.verbose, 
-              db )
+    runAllFiles ( fileList, inFile, outputDir, parser, databaseVersion, 
+                  listOfExpRes, timeout, development, parameterFile )
 
 if __name__ == "__main__":
     import argparse
@@ -137,27 +133,28 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument('-f', '--filename', 
             help='name of SLHA or LHE input file, necessary input, if directory '
-                 'is given, loop all files in the directory', required=True)
+            'is given, loop all files in the directory', required=True)
     ap.add_argument('-p', '--parameterFile', 
             help='name of parameter file, optional argument, if not set, use '
-                           'all parameters from etc/parameters_default.ini', 
-                           default=parameterFile)
+            'all parameters from etc/parameters_default.ini', 
+            default=parameterFile)
     ap.add_argument('-o', '--outputDir', 
             help='name of output directory, optional argument, default is: ' +
-                           outputDir, default=outputDir)
-    ap.add_argument('--development', help='enable development output', 
+            outputDir, default=outputDir)
+    ap.add_argument('-d', '--development', help='enable development output', 
             action='store_true')
     ap.add_argument('-t', '--force_txt', help='force loading the text database',
             action='store_true')
-    ap.add_argument('--run-crashreport', 
+    ap.add_argument('-c', '--run-crashreport', 
             help='parse crash report file and use its contents for a SModelS run',
-                           action='store_true')
+            action='store_true')
     ap.add_argument('-v','--verbose', help='verbosity level. '
             'accepted values are: debug, info, warning, error.',
-                           default = "info", type = str )
-    ap.add_argument('--timeout', help='define a limit on the running time (in secs).'
-                           ' If not set, run without a time limit', 
-                           default = 0, type = int)
+            default = "info", type = str )
+    ap.add_argument('-T', '--timeout', 
+            help='define a limit on the running time (in secs).'
+            'If not set, run without a time limit', 
+            default = 0, type = int)
     
     
     args = ap.parse_args()
@@ -165,23 +162,13 @@ if __name__ == "__main__":
     db=None
     if args.force_txt: db=True
     
-    if args.run_crashreport: #FIXME overall crash report for the loop (before reading any input file)
+    if args.run_crashreport: 
+        # FIXME overall crash report for the loop (before reading any input file)
         args.filename, args.parameterFile = crashReport.readCrashReportFile(
                 args.filename)
-        run ( args.filename, args.parameterFile, args.outputDir, args.verbose,
-             db, args.timeout )
+        main ( args.filename, args.parameterFile, args.outputDir, args.verbose,
+               db, args.timeout, development=True )
         
     else:
-        try:
-            run( args.filename, args.parameterFile, args.outputDir, 
-                  args.verbose, db, args.timeout )
-        except Exception,e:
-            crashReportFacility = crashReport.CrashReport()
-             
-            if args.development:
-                print(crashReport.createStackTrace())
-            else:
-                print(crashReport.createStackTrace())
-                crashReportFacility.createCrashReportFile( e.inputFile, 
-                                args.parameterFile )
-                print(crashReportFacility.createUnknownErrorMessage())
+        main ( args.filename, args.parameterFile, args.outputDir, args.verbose, 
+              db, args.timeout, args.development )
