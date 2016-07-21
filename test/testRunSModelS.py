@@ -26,36 +26,24 @@ class RunSModelSTest(unittest.TestCase):
             sys.stdout = open ( "stdout.log", "w" )
         out = join ( iDir(), "test/unitTestOutput" )
         main(filename, parameterFile=join ( iDir(), "test/testParameters.ini" ),
-             outputDir= out, verbosity = 'error' )
-        sfile = join ( iDir(), 
-                "test/unitTestOutput/%s.smodels" % basename ( filename ) )
-        outputfile = summaryReader.Summary( sfile )
+             outputDir= out, verbosity = 'error', db= None, timeout = 0,
+             development = False )
+        outputfile = None
+        bname = basename ( filename )
+        if bname != "": ## supply an output file only for files, not for dirs
+            sfile = join ( iDir(), "test/unitTestOutput/%s.smodels" % bname )
+            outputfile = summaryReader.Summary( sfile )
         if suppressStdout:
             sys.stdout = a
         return outputfile
 
     def testMultipleFiles ( self ):
-        filename = join ( iDir(), "inputFiles/slha/" )
-        suppressStdout = True
-        if suppressStdout:
-            a=sys.stdout
-            sys.stdout = open ( "stdout.log", "w" )
         out = join ( iDir(), "test/unitTestOutput" )
         for i in os.listdir ( out ):
             if i[-8:]==".smodels":
                 os.unlink ( os.path.join ( out, i ) )
-        mypid = os.getpid()
-        try:
-            main(filename, parameterFile=join ( iDir(), "test/testParameters.ini" ),
-                 outputDir= out, verbosity = 'error' )
-        except SystemExit,e:
-            # the daughters!
-            return True
-            # pass
-        if mypid != os.getpid():
-            return True
-        if suppressStdout:
-            sys.stdout = a
+        filename = join ( iDir(), "inputFiles/slha/" )
+        self.runMain ( filename )
         nout = len( list ( glob.iglob ( "unitTestOutput/*smodels" )) )
         nin = len( list ( glob.iglob ( "%s/*slha" % filename )) )
         self.assertTrue ( nout == nin )
@@ -71,7 +59,6 @@ class RunSModelSTest(unittest.TestCase):
             msg = "%s != %s" % ( sample, outputfile )
             raise AssertionError ( msg )
         
-
     def testBadFile(self):
 
         filename = join ( iDir(), "inputFiles/slha/I_dont_exist.slha" )
