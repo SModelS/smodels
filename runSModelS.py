@@ -20,7 +20,7 @@ from smodels.experiment.exceptions import DatabaseNotFoundException
 
 log = logging.getLogger(__name__)
 
-def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
+def main( inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
     """
     Provides a command line interface to basic SModelS functionalities.
     
@@ -121,6 +121,12 @@ def main(inFile, parameterFile, outputDir, verbosity = 'info', db=None ):
     runAllFiles ( fileList, inFile, outputDir, parser, databaseVersion, listOfExpRes )
 
 
+def run( inFile, parameterFile, outputDir, verbosity, db, timeout ):
+    """ call main, and handle crash reports and timeouts """
+    with timeOut.Timeout( timeout ):
+        main( args.filename, args.parameterFile, args.outputDir, args.verbose, 
+              db )
+
 if __name__ == "__main__":
     import argparse
     """ Set default input and output files """
@@ -162,14 +168,13 @@ if __name__ == "__main__":
     if args.run_crashreport: #FIXME overall crash report for the loop (before reading any input file)
         args.filename, args.parameterFile = crashReport.readCrashReportFile(
                 args.filename)
-        with timeOut.Timeout(args.timeout):
-            main(args.filename, args.parameterFile, args.outputDir, args.verbose, db )
+        run ( args.filename, args.parameterFile, args.outputDir, args.verbose,
+             db, args.timeout )
         
     else:
         try:
-            with timeOut.Timeout(args.timeout):
-                main( args.filename, args.parameterFile, args.outputDir, 
-                      args.verbose, db )
+            run( args.filename, args.parameterFile, args.outputDir, 
+                  args.verbose, db, args.timeout )
         except Exception,e:
             crashReportFacility = crashReport.CrashReport()
              
