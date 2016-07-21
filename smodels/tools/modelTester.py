@@ -240,14 +240,14 @@ def test ( fileList, inDir, outputDir, parser, databaseVersion,
     children = []
     for (i,chunk) in enumerate ( chunkedFiles ):
         pid=os.fork()
-        print "Forking: ",i,pid,os.getpid()
+        # print "Forking: ",i,pid,os.getpid()
         if pid == 0:
             log.info ("chunk #%d: pid %d (parent %d)." %
                     ( i, os.getpid(), os.getppid() ) )
             log.info ( " `-> %s" % " ".join ( chunk ) )
             runSetOfFiles ( chunk, outputDir, parser, databaseVersion, 
                             listOfExpRes, timeout, development, parameterFile )
-            sys.exit() ## not return, nor continue
+            os._exit(0) ## not sys.exit(), return, nor continue
         if pid < 0:
             log.error ( "fork did not succeed! Pid=%d" % pid )
             sys.exit()
