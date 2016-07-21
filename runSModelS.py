@@ -13,7 +13,7 @@ from ConfigParser import SafeConfigParser
 from smodels.experiment.databaseObj import Database
 from smodels.installation import installDirectory
 from smodels.tools.physicsUnits import GeV, fb
-from smodels.tools.modelTester import test
+from smodels.tools.modelTester import testPoints
 from smodels.tools import crashReport
 import smodels.tools.printer as prt
 from smodels.experiment.exceptions import DatabaseNotFoundException
@@ -49,20 +49,6 @@ def main( inFile, parameterFile, outputDir, verbosity, db, timeout, development 
         log.error ( "No such file or directory: '%s'" % parameterFile )
         sys.exit()
 
-    """ Minimum value of cross-section for an element to be considered eligible
-        for decomposition.  Too small sigmacut leads to too large decomposition
-        time.  """
-    sigmacut = parser.getfloat("parameters", "sigmacut") * fb
-
-    """ Minimum value for considering two states non-degenerate (only used for
-        mass compression) """
-    minmassgap = parser.getfloat("parameters", "minmassgap") * GeV
-
-    inputType = parser.get("options", "inputType").lower()
-    if inputType != 'slha' and inputType != 'lhe':
-        log.error("Unknown input type (must be SLHA or LHE): %s" % inputType)
-        return
-
     """ Check database location and load database"""
     try:
         databasePath = parser.get("path", "databasePath")
@@ -70,7 +56,8 @@ def main( inFile, parameterFile, outputDir, verbosity, db, timeout, development 
         if database in [ None, True ]:
             force_load=None
             if database == True: force_load="txt"
-            database = Database(databasePath, force_load=force_load, verbosity=verbosity )
+            database = Database( databasePath, force_load=force_load, 
+                                 verbosity=verbosity )
         databaseVersion = database.databaseVersion
     except DatabaseNotFoundException:
         log.error("Database not found in %s" % os.path.realpath(databasePath))
@@ -110,8 +97,7 @@ def main( inFile, parameterFile, outputDir, verbosity, db, timeout, development 
 
     """ Load analyses """        
 
-    listOfExpRes = database.getExpResults(analysisIDs=analyses, txnames=txnames, 
-                            datasetIDs=datasetIDs, dataTypes=dataTypes)
+    listOfExpRes = database.getExpResults(analysisIDs=analyses, txnames=txnames,                            datasetIDs=datasetIDs, dataTypes=dataTypes)
 
     """ Print list of analyses loaded """
     outLevel = 0
@@ -120,8 +106,8 @@ def main( inFile, parameterFile, outputDir, verbosity, db, timeout, development 
         outLevel += parser.getboolean("stdout", "addAnaInfo")          
     for expResult in listOfExpRes: stdoutPrinter.addObj(expResult,outLevel)
 
-    test ( fileList, inFile, outputDir, parser, databaseVersion, 
-           listOfExpRes, timeout, development, parameterFile )
+    testPoints ( fileList, inFile, outputDir, parser, databaseVersion, 
+                 listOfExpRes, timeout, development, parameterFile )
 
 if __name__ == "__main__":
     import argparse
