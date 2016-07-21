@@ -13,7 +13,7 @@ from ConfigParser import SafeConfigParser
 from smodels.experiment.databaseObj import Database
 from smodels.installation import installDirectory
 from smodels.tools.physicsUnits import GeV, fb
-from smodels.tools.modelTester import runAllFiles
+from smodels.tools.modelTester import test
 from smodels.tools import crashReport
 import smodels.tools.printer as prt
 from smodels.experiment.exceptions import DatabaseNotFoundException
@@ -120,8 +120,8 @@ def main( inFile, parameterFile, outputDir, verbosity, db, timeout, development 
         outLevel += parser.getboolean("stdout", "addAnaInfo")          
     for expResult in listOfExpRes: stdoutPrinter.addObj(expResult,outLevel)
 
-    runAllFiles ( fileList, inFile, outputDir, parser, databaseVersion, 
-                  listOfExpRes, timeout, development, parameterFile )
+    test ( fileList, inFile, outputDir, parser, databaseVersion, 
+           listOfExpRes, timeout, development, parameterFile )
 
 if __name__ == "__main__":
     import argparse
