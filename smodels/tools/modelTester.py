@@ -21,6 +21,8 @@ import logging
 import os
 import sys
 from smodels.tools.physicsUnits import GeV, fb
+from smodels.experiment.exceptions import DatabaseNotFoundException
+from smodels.experiment.databaseObj import Database
 
 log = logging.getLogger(__name__)
 
@@ -254,3 +256,37 @@ def testPoints ( fileList, inDir, outputDir, parser, databaseVersion,
         r = os.waitpid ( child, 0 )
         log.info ( "child %d terminated: %s" % (child,r) )
     log.info ( "all children terminated" )
+
+def loadDatabase(parser, db, verbosity):
+    try:
+        databasePath = parser.get("path", "databasePath")
+        database = db
+        if database in [ None, True ]:
+            force_load=None
+            if database == True: force_load="txt"
+            database = Database( databasePath, force_load=force_load,
+                                 verbosity=verbosity )
+        databaseVersion = database.databaseVersion
+    except DatabaseNotFoundException:
+        log.error("Database not found in %s" % os.path.realpath(databasePath))
+        database = None
+        databaseVersion = None
+    return database, databaseVersion
+
+def loadDatabaseResults(parser, database):
+    """ In case that a list of analyses or txnames are given, retrieve list """
+    analyses = parser.get("database", "analyses").split(",")
+    txnames = parser.get("database", "txnames").split(",")
+    if parser.get("database", "dataselector") == "efficiencyMap":
+        dataTypes = ['efficiencyMap']
+        datasetIDs = ['all']
+    elif parser.get("database", "dataselector") == "upperLimit":
+        dataTypes = ['upperLimit']
+        datasetIDs = ['all']
+    else:
+        dataTypes = ['all']
+        datasetIDs = parser.get("database", "dataselector").split(",")
+
+    """ Load analyses """
+
+    return database.getExpResults(analysisIDs=analyses, txnames=txnames, datasetIDs=datasetIDs, dataTypes=dataTypes)
