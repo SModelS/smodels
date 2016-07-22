@@ -36,24 +36,14 @@ def main( inFile, parameterFile, outputDir, verbosity, db, timeout, development 
     
     """
 
-    """
-    Read and check parameter file
-    =============================
-    """
-    parser = SafeConfigParser()
-    ret=parser.read(parameterFile)
-    if ret == []:
-        log.error ( "No such file or directory: '%s'" % parameterFile )
-        sys.exit()
+    """ Read and check parameter file, exit parameterFile does not exist """
+    parser = modelTester.getParameters(parameterFile)
 
-    """ Check database location and load database"""
+    """ Check database location and load database, exit if not found """
     database, databaseVersion = modelTester.loadDatabase(parser, db, verbosity)
-    if databaseVersion == None: return # database was not found, exit
 
     """ Get list of input files to be tested """
-    if os.path.isdir(inFile):
-        fileList = os.listdir(inFile)
-    else: fileList = [inFile]
+    fileList = modelTester.getAllInputFiles(inFile)
 
     """ Create output directory if missing """
     if not os.path.isdir(outputDir): os.mkdir(outputDir)
@@ -61,15 +51,8 @@ def main( inFile, parameterFile, outputDir, verbosity, db, timeout, development 
     """ Setup output printers """
     stdoutPrinter = prt.TxTPrinter(output = 'stdout')
 
-    """ Load analysis database """
-    listOfExpRes = modelTester.loadDatabaseResults(parser, database)
-
-    """ Print list of analyses loaded """
-    outLevel = 0
-    if parser.getboolean("stdout", "printAnalyses"):
-        outLevel = 1
-        outLevel += parser.getboolean("stdout", "addAnaInfo")          
-    for expResult in listOfExpRes: stdoutPrinter.addObj(expResult,outLevel)
+    """ Load analysis database, print list """
+    listOfExpRes = modelTester.loadDatabaseResults(parser, database, stdoutPrinter)
 
     """ Test all input points """
     modelTester.testPoints ( fileList, inFile, outputDir, parser, databaseVersion, 
