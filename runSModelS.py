@@ -10,13 +10,10 @@ from __future__ import print_function
 import os, sys
 import logging
 from ConfigParser import SafeConfigParser
-from smodels.experiment.databaseObj import Database
 from smodels.installation import installDirectory
-from smodels.tools.physicsUnits import GeV, fb
-from smodels.tools.modelTester import testPoints
+from smodels.tools import modelTester
 from smodels.tools import crashReport
 import smodels.tools.printer as prt
-from smodels.experiment.exceptions import DatabaseNotFoundException
 
 log = logging.getLogger(__name__)
 
@@ -50,19 +47,8 @@ def main( inFile, parameterFile, outputDir, verbosity, db, timeout, development 
         sys.exit()
 
     """ Check database location and load database"""
-    try:
-        databasePath = parser.get("path", "databasePath")
-        database = db
-        if database in [ None, True ]:
-            force_load=None
-            if database == True: force_load="txt"
-            database = Database( databasePath, force_load=force_load, 
-                                 verbosity=verbosity )
-        databaseVersion = database.databaseVersion
-    except DatabaseNotFoundException:
-        log.error("Database not found in %s" % os.path.realpath(databasePath))
-        databaseVersion = None
-        return
+    database, databaseVersion = modelTester.loadDatabase(parser, db, verbosity)
+    if databaseVersion == None: return # database was not found, exit
 
     """ Get list of input files to be tested """
     if os.path.isdir(inFile):
@@ -75,29 +61,8 @@ def main( inFile, parameterFile, outputDir, verbosity, db, timeout, development 
     """ Setup output printers """
     stdoutPrinter = prt.TxTPrinter(output = 'stdout')
 
-    """
-    Load analysis database
-    ======================
-    """
-
-    """ In case that a list of analyses or txnames are given, retrieve list """
-    analyses = parser.get("database", "analyses").split(",")
-    txnames = parser.get("database", "txnames").split(",")
-    if parser.get("database", "dataselector") == "efficiencyMap":
-        dataTypes = ['efficiencyMap']
-        datasetIDs = ['all']
-    elif parser.get("database", "dataselector") == "upperLimit":
-        dataTypes = ['upperLimit']
-        datasetIDs = ['all']
-    else:
-        dataTypes = ['all']
-        datasetIDs = parser.get("database", "dataselector").split(",")
-    '''if parser.get("database", "datasets") == "None": datasetIDs = [None]
-    else: datasetIDs = parser.get("database", "datasets").split(",")'''
-
-    """ Load analyses """        
-
-    listOfExpRes = database.getExpResults(analysisIDs=analyses, txnames=txnames,                            datasetIDs=datasetIDs, dataTypes=dataTypes)
+    """ Load analysis database """
+    listOfExpRes = modelTester.loadDatabaseResults(parser, database)
 
     """ Print list of analyses loaded """
     outLevel = 0
@@ -106,7 +71,8 @@ def main( inFile, parameterFile, outputDir, verbosity, db, timeout, development 
         outLevel += parser.getboolean("stdout", "addAnaInfo")          
     for expResult in listOfExpRes: stdoutPrinter.addObj(expResult,outLevel)
 
-    testPoints ( fileList, inFile, outputDir, parser, databaseVersion, 
+    """ Test all input points """
+    modelTester.testPoints ( fileList, inFile, outputDir, parser, databaseVersion, 
                  listOfExpRes, timeout, development, parameterFile )
 
 if __name__ == "__main__":
