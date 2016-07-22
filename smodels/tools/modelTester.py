@@ -20,6 +20,7 @@ import smodels.tools.printer as prt
 import logging
 import os
 import sys
+from ConfigParser import SafeConfigParser
 from smodels.tools.physicsUnits import GeV, fb
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.experiment.databaseObj import Database
@@ -269,11 +270,10 @@ def loadDatabase(parser, db, verbosity):
         databaseVersion = database.databaseVersion
     except DatabaseNotFoundException:
         log.error("Database not found in %s" % os.path.realpath(databasePath))
-        database = None
-        databaseVersion = None
+        sys.exit()
     return database, databaseVersion
 
-def loadDatabaseResults(parser, database):
+def loadDatabaseResults(parser, database, stdoutPrinter):
     """ In case that a list of analyses or txnames are given, retrieve list """
     analyses = parser.get("database", "analyses").split(",")
     txnames = parser.get("database", "txnames").split(",")
@@ -289,4 +289,25 @@ def loadDatabaseResults(parser, database):
 
     """ Load analyses """
 
-    return database.getExpResults(analysisIDs=analyses, txnames=txnames, datasetIDs=datasetIDs, dataTypes=dataTypes)
+    ret = database.getExpResults(analysisIDs=analyses, txnames=txnames, datasetIDs=datasetIDs, dataTypes=dataTypes)
+    """ Print list of analyses loaded """
+    outLevel = 0
+    if parser.getboolean("stdout", "printAnalyses"):
+        outLevel = 1
+        outLevel += parser.getboolean("stdout", "addAnaInfo")
+    for expResult in ret: stdoutPrinter.addObj(expResult,outLevel)
+    return ret
+
+def getParameters(parameterFile):
+    parser = SafeConfigParser()
+    ret=parser.read(parameterFile)
+    if ret == []:
+        log.error ( "No such file or directory: '%s'" % parameterFile )
+        sys.exit()
+    return parser
+
+def getAllInputFiles(inFile):
+    if os.path.isdir(inFile):
+        fileList = os.listdir(inFile)
+    else: fileList = [inFile]
+    return fileList
