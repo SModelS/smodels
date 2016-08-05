@@ -104,12 +104,10 @@ As as example consider the following topology:
 .. image:: images/globTopB.png
    :width: 40%
 
-It contains 2 branches. The first (topmost) :ref:`branch <branch>` contains 3 vertices
-with 1 final state each in the first two vertices and zero in the third.
-On the other hand, the second :ref:`branch <branch>` contains 2 vertices with two 
-|final states| coming out of the first vertex and zero coming out of the second.
-*Notice that, for topologies ending with stable* Z\ :sub:`2` *-odd states,
-there are no final states coming out of the last vertex in the branch.*
+It contains 2 branches. The first (topmost) :ref:`branch <branch>` contains 2 vertices
+with 1 final state in each.
+On the other hand, the second :ref:`branch <branch>` contains 1 vertex with two 
+|final states|.
 
 Topologies are also a useful way to group |elements|. In this way,  topologies represent a list of elements sharing a common basic structure (same number of branches, vertices and
 final states in each vertex).
@@ -174,3 +172,37 @@ for each branch, as shown below:
 
 .. image:: images/massNotationB.png
    :height: 280px
+   
+Element Sorting
+---------------
+
+In order to improve the code performance, elements are sorted whenever possible.
+Sorting allows for an easy ordering of the elements belonging to a topology and
+faster element comparison.
+Elements are sorted according to its branches. Branches are compared following
+the following property order:
+
+* Number of vertices
+* Number of final states in each vertex
+* Final state particles (particles belonging to the same vertex are alphabetically sorted)
+* Mass array
+
+As an example, consider the three elements below:
+
+
+.. _elementsorting:
+
+.. image:: images/elSorting.png
+   :height: 280px
+   
+The correct ordering of the above elements is: 
+
+Element 3 < Element 2 < Element 1
+
+
+Element 1 is 'bigger' than the other two since it has a larger number of vertices.
+Elements 2 e 3  are identical, except for their masses. Since the mass array of
+Element 3 is smaller than the one in Element 2, the former is 'smaller' than the latter.
+Finally if all the branch features listed above are identical for both branches, the
+elements being compared are considered to be equal. 
+
