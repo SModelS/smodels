@@ -22,7 +22,7 @@ The construction of a global |topology| and the |bracket notation| used in SModl
 
 .. _topscheme:
 
-.. image:: images/topScheme.png
+.. image:: images/topSchemeB.png
    :width: 60%
 
 
@@ -73,7 +73,7 @@ It represents a series of cascade decays of a single initial Z\ :sub:`2`-odd
 state.
 The figure below shows an example of a branch.
 
-.. image:: images/branchTop.png
+.. image:: images/branchTopB.png
    :width: 40%
 
 Each branch is fully defined by its number of vertices and the number of 
@@ -83,7 +83,7 @@ If the particle labels of the final states are not specified (such as in the fig
 above), the branch belongs to a :ref:`global topology <topology>`. However, if it is dressed with its final states
 as in the figure below, the branch belongs to an |element|.
 
-.. image:: images/branchEl.png
+.. image:: images/branchElB.png
    :width: 40%
    
 * **Branches are described by the** `Branch Class <../../../documentation/build/html/theory.html#theory.branch.Branch>`_   
@@ -101,7 +101,7 @@ branches, number of vertices in each :ref:`branch <branch>` and number of
 |final states| coming out of each :ref:`vertex <vertex>`.
 As as example consider the following topology:
 
-.. image:: images/globTop.png
+.. image:: images/globTopB.png
    :width: 40%
 
 It contains 2 branches. The first (topmost) :ref:`branch <branch>` contains 3 vertices
@@ -132,7 +132,7 @@ Below we show an example of an element and the information it contains.
 
 .. _elementscheme:
 
-.. image:: images/element.png
+.. image:: images/elementB.png
    :width: 60%
 
 * **Elements are described by the** `Element Class <../../../documentation/build/html/theory.html#theory.element.Element>`_    
@@ -148,7 +148,7 @@ notation. The scheme below shows how to convert between the graphical and bracke
 
 .. _bracketnotation:
 
-.. image:: images/bracketNotation.png
+.. image:: images/bracketNotationB.png
    :height: 280px
 
 The brackets are ordered and nested in the following way.
@@ -172,5 +172,5 @@ for each branch, as shown below:
 
 .. _massnotation:
 
-.. image:: images/massNotation.png
+.. image:: images/massNotationB.png
    :height: 280px

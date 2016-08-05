@@ -301,16 +301,7 @@ class Element(object):
         vertparts = []
         for branch in self.branches:
             vertparts.append([len(ptcs) for ptcs in branch.particles])
-            if branch.masses:
-                vertnumb.append(len(branch.masses))                
-                if len(vertparts[len(vertparts) - 1]) == \
-                    vertnumb[len(vertnumb) - 1] - 1:
-                    # Append 0 for stable LSP
-                    vertparts[len(vertparts) - 1].append(0)
-            else:
-                #If masses are not defined assume there is a stable LSP at the end
-                vertparts[-1].append(0)
-                vertnumb.append(len(vertparts[-1]))
+            vertnumb.append(len(branch.particles))
                 
         return {"vertnumb" : vertnumb, "vertparts" : vertparts}
 
@@ -456,18 +447,15 @@ class Element(object):
         newelement = self.copy()
         newelement.motherElements = [ ("invisible", self.copy()) ]
 
-        vertnumb = self.getEinfo()["vertnumb"]
-        # Nothing to be compressed
-        if max(vertnumb) < 2:
-            return None
         # Loop over branches
         for ib, branch in enumerate(self.branches):
-            if vertnumb[ib] < 2:
-                continue
             particles = branch.particles
-            for ivertex in range(vertnumb[ib] - 2, -1, -1):
+            if not branch.particles:
+                continue # Nothing to be compressed
+            #Go over the branch starting at the end and remove invisible vertices: 
+            for ivertex in reversed(range(len(particles))):
                 if particles[ivertex].count('nu') == len(particles[ivertex]):
-                    newelement.branches[ib].masses.pop(ivertex + 1)
+                    newelement.branches[ib].masses.pop(ivertex+1)
                     newelement.branches[ib].particles.pop(ivertex)
                 else:
                     break
