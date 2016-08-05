@@ -48,7 +48,7 @@ class Topology(object):
     def __str__(self):
         """
         Return string with numbers of particles per vertex, e.g.
-        [1,0],[2,1,0]
+        [1],[2,1]
         
         :returns: string with number of final states in each branch
         """
@@ -201,7 +201,6 @@ class TopologyList(object):
         Add topologies sequentially, if provided.
         """
 
-        super(TopologyList, self).__init__()
         self.topos = []
         for topo in topologies:
             self.add(topo)

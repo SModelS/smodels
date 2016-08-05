@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Basic Input &mdash; SModelS 1.0.90 documentation</title>
+  <title>Basic Input &mdash; SModelS 1.0.91 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="SModelS 1.0.90 documentation" href="index.html"/>
+    <link rel="top" title="SModelS 1.0.91 documentation" href="index.html"/>
         <link rel="up" title="SModelS Structure" href="Structure.html"/>
         <link rel="next" title="Decomposition into Simplified Models" href="Decomposition.html"/>
         <link rel="prev" title="SModelS Structure" href="Structure.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0.90
+                1.0.91
               </div>
             
           
@@ -164,16 +164,16 @@ given in the two following forms:</p>
 be generated for any BSM model (through the use of your favorite MC generator). In this case, however,
 the precision of the results is limited to the MC statistics used to generate the file.</p>
 <p><em>In the case of SLHA input only</em>, the production cross sections for the BSM states also have to be included
-in the SLHA file as SLHA blocks, according to the <a class="reference internal" href="#xsecslha"><span class="std std-ref">SLHA cross-section format</span></a>
+in the SLHA file as SLHA blocks, according to the <a class="reference internal" href="#xsecslha"><span>SLHA cross-section format</span></a>
 (see <a class="reference download internal" href="_downloads/example.slha" download=""><code class="xref download docutils literal"><span class="pre">example</span> <span class="pre">file</span></code></a>).
 For the MSSM and some of its extensions, they may
 be calculated automatically using <a class="reference external" href="http://home.thep.lu.se/~torbjorn/Pythia.html">Pythia</a>
 and <a class="reference external" href="http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast">NLLfast</a>,
-as discussed in <a class="reference internal" href="Tools.html#xseccalc"><span class="std std-ref">Cross-section calculator</span></a>.</p>
+as discussed in <a class="reference internal" href="Tools.html#xseccalc"><span>Cross-section calculator</span></a>.</p>
 <p><em>In the case of LHE input</em>, the total production cross-section as well as
 the center-of-mass energy should be listed in the &lt;init&gt;&lt;/init&gt; block, according to the standard LHE format
 (see <a class="reference download internal" href="_downloads/example.slha" download=""><code class="xref download docutils literal"><span class="pre">example</span> <span class="pre">file</span></code></a>).
-Moreover, all the Z<sub>2</sub>-even particles (see definition in <a class="reference internal" href="TheoryDefinitions.html#final-states"><span class="std std-ref">final states</span></a>) should be set as stable, since
+Moreover, all the Z<sub>2</sub>-even particles (see definition in <a class="reference internal" href="TheoryDefinitions.html#final-states"><span>final states</span></a>) should be set as stable, since
 in SModelS they are effectively considered as final states.
 When generating the events it is also important to ensure that no mass smearing is applied, so the mass
 values for a given particle are the same throughout the LHE file.</p>
@@ -181,11 +181,11 @@ values for a given particle are the same throughout the LHE file.</p>
 <div class="section" id="new-particles">
 <h2>New Particles<a class="headerlink" href="#new-particles" title="Permalink to this headline">¶</a></h2>
 <p>Besides information about the masses and branching ratios, the user must also define
-which particles are Z<sub>2</sub>-odd states (<a class="reference internal" href="TheoryDefinitions.html#odd-states"><span class="std std-ref">Intermediate states</span></a>)
-and which are Z<sub>2</sub>-even (<a class="reference internal" href="TheoryDefinitions.html#final-states"><span class="std std-ref">Final states</span></a>).
+which particles are Z<sub>2</sub>-odd states (<a class="reference internal" href="TheoryDefinitions.html#odd-states"><span>Intermediate states</span></a>)
+and which are Z<sub>2</sub>-even (<a class="reference internal" href="TheoryDefinitions.html#final-states"><span>Final states</span></a>).
 These definitions must be given in the <a class="reference download internal" href="_downloads/particles.py" download=""><code class="xref download docutils literal"><span class="pre">particles.py</span></code></a> file, where some default values (for SM and MSSM particles)
 are already loaded.</p>
-<p>If the user wants to check the SLHA input file for possible errors (see <a class="reference internal" href="Tools.html#slhachecks"><span class="std std-ref">SLHA Checks</span></a>),
+<p>If the user wants to check the SLHA input file for possible errors (see <a class="reference internal" href="Tools.html#slhachecks"><span>SLHA Checks</span></a>),
 it is also necessary to define some of the particle&#8217;s quantum numbers, as illustrated in <a class="reference download internal" href="_downloads/particles.py" download=""><code class="xref download docutils literal"><span class="pre">particles.py</span></code></a>.</p>
 </div>
 <div class="section" id="slha-format-for-cross-sections">
@@ -246,7 +246,7 @@ implemented by the</strong> <a class="reference external" href="../../../documen
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.0.90',
+            VERSION:'1.0.91',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
