@@ -93,6 +93,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#topologies">Topologies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#elements">Elements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#bracket-notation">Bracket Notation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#element-sorting">Element Sorting</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="DatabaseDefinitions.html">Database Definitions</a></li>
@@ -215,12 +216,10 @@ branches, number of vertices in each <a class="reference internal" href="#branch
 <a class="reference internal" href="#final-states"><span>final states</span></a> coming out of each <a class="reference internal" href="#vertex"><span>vertex</span></a>.
 As as example consider the following topology:</p>
 <a class="reference internal image-reference" href="_images/globTopB.png"><img alt="_images/globTopB.png" src="_images/globTopB.png" style="width: 40%;" /></a>
-<p>It contains 2 branches. The first (topmost) <a class="reference internal" href="#branch"><span>branch</span></a> contains 3 vertices
-with 1 final state each in the first two vertices and zero in the third.
-On the other hand, the second <a class="reference internal" href="#branch"><span>branch</span></a> contains 2 vertices with two
-<a class="reference internal" href="#final-states"><span>final states</span></a> coming out of the first vertex and zero coming out of the second.
-<em>Notice that, for topologies ending with stable</em> Z<sub>2</sub> <em>-odd states,
-there are no final states coming out of the last vertex in the branch.</em></p>
+<p>It contains 2 branches. The first (topmost) <a class="reference internal" href="#branch"><span>branch</span></a> contains 2 vertices
+with 1 final state in each.
+On the other hand, the second <a class="reference internal" href="#branch"><span>branch</span></a> contains 1 vertex with two
+<a class="reference internal" href="#final-states"><span>final states</span></a>.</p>
 <p>Topologies are also a useful way to group <a class="reference internal" href="#element"><span>elements</span></a>. In this way,  topologies represent a list of elements sharing a common basic structure (same number of branches, vertices and
 final states in each vertex).</p>
 <ul class="simple">
@@ -265,6 +264,29 @@ also include the list of <a class="reference internal" href="#odd-states"><span>
 The <a class="reference internal" href="#odd-states"><span>intermediate state</span></a> masses can also be represented by a mass array
 for each branch, as shown below:</p>
 <a class="reference internal image-reference" href="_images/massNotationB.png" id="massnotation"><img alt="_images/massNotationB.png" id="massnotation" src="_images/massNotationB.png" style="height: 280px;" /></a>
+</div>
+<div class="section" id="element-sorting">
+<h2>Element Sorting<a class="headerlink" href="#element-sorting" title="Permalink to this headline">¶</a></h2>
+<p>In order to improve the code performance, elements are sorted whenever possible.
+Sorting allows for an easy ordering of the elements belonging to a topology and
+faster element comparison.
+Elements are sorted according to its branches. Branches are compared following
+the following property order:</p>
+<ul class="simple">
+<li>Number of vertices</li>
+<li>Number of final states in each vertex</li>
+<li>Final state particles (particles belonging to the same vertex are alphabetically sorted)</li>
+<li>Mass array</li>
+</ul>
+<p>As an example, consider the three elements below:</p>
+<a class="reference internal image-reference" href="_images/elSorting.png" id="elementsorting"><img alt="_images/elSorting.png" id="elementsorting" src="_images/elSorting.png" style="height: 280px;" /></a>
+<p>The correct ordering of the above elements is:</p>
+<p>Element 3 &lt; Element 2 &lt; Element 1</p>
+<p>Element 1 is &#8216;bigger&#8217; than the other two since it has a larger number of vertices.
+Elements 2 e 3  are identical, except for their masses. Since the mass array of
+Element 3 is smaller than the one in Element 2, the former is &#8216;smaller&#8217; than the latter.
+Finally if all the branch features listed above are identical for both branches, the
+elements being compared are considered to be equal.</p>
 </div>
 </div>
 
