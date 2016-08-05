@@ -29,7 +29,7 @@ class ElementIdTest(unittest.TestCase):
             theorypredictions = theoryPredictionsFor(res, topoList)
             if not theorypredictions: continue
             self.assertEquals(len(theorypredictions),1)
-            tpIDs = theorypredictions[0].IDs      
+            tpIDs = theorypredictions[0].IDs 
             self.assertEquals(sorted(tpIDs),sorted(listOfIDs[res.globalInfo.id]))
             
 

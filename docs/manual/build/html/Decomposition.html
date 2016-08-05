@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Decomposition into Simplified Models &mdash; SModelS 1.0.90 documentation</title>
+  <title>Decomposition into Simplified Models &mdash; SModelS 1.0.91 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="SModelS 1.0.90 documentation" href="index.html"/>
+    <link rel="top" title="SModelS 1.0.91 documentation" href="index.html"/>
         <link rel="up" title="SModelS Structure" href="Structure.html"/>
         <link rel="next" title="Theory Predictions" href="TheoryPredictions.html"/>
         <link rel="prev" title="Basic Input" href="BasicInput.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0.90
+                1.0.91
               </div>
             
           
@@ -158,38 +158,38 @@
   <span class="target" id="index-0"></span><div class="section" id="decomposition-into-simplified-models">
 <span id="decomposition"></span><h1>Decomposition into Simplified Models<a class="headerlink" href="#decomposition-into-simplified-models" title="Permalink to this headline">¶</a></h1>
 <p>Given an input model, the first task of SModelS is to decompose
-the full model into a sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>.
+the full model into a sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>.
 Based on the input format, which can be</p>
 <ul class="simple">
 <li>a SLHA (SUSY Les Houches Accord) file or</li>
 <li>a LHE (Les Houces Event) file</li>
 </ul>
-<p>as explained in the <a class="reference internal" href="BasicInput.html"><span class="doc">Basic Input</span></a> section,
+<p>as explained in the <a class="reference internal" href="BasicInput.html"><em>Basic Input</em></a> section,
 two distinct (but similar) decomposition methods are applied:
-the <a class="reference internal" href="#slhadecomp"><span class="std std-ref">SLHA-based</span></a> or the <a class="reference internal" href="#lhedecomp"><span class="std std-ref">LHE-based</span></a> decomposition.</p>
+the <a class="reference internal" href="#slhadecomp"><span>SLHA-based</span></a> or the <a class="reference internal" href="#lhedecomp"><span>LHE-based</span></a> decomposition.</p>
 <div class="section" id="slha-based-decomposition">
 <span id="slhadecomp"></span><h2>SLHA-based Decomposition<a class="headerlink" href="#slha-based-decomposition" title="Permalink to this headline">¶</a></h2>
 <p>The SLHA file describing the input model is required to contain the masses of all
 the BSM states as well as their production cross-sections and decay branching ratios. All the above information must follow the guidelines of the SLHA format. In particular, the cross-sections also have to be included
-as SLHA blocks according to the <a class="reference internal" href="BasicInput.html#xsecslha"><span class="std std-ref">SLHA cross-section format</span></a>.</p>
+as SLHA blocks according to the <a class="reference internal" href="BasicInput.html#xsecslha"><span>SLHA cross-section format</span></a>.</p>
 <p>Once the production cross-sections are read from the input file, all the cross-sections for <em>production
 of two</em> Z<sub>2</sub>-odd <em>states</em> are stored and serve as the initial step for the decomposition. (All the other cross-sections
 with a different number of Z<sub>2</sub>-odd states are ignored.)
 Starting from these primary mothers, all the possible decays are generated
 according to the information contained in the DECAY blocks. This procedure is represented in the figure below:</p>
 <a class="reference internal image-reference" href="_images/decomp1.png" id="decomp1"><img alt="_images/decomp1.png" id="decomp1" src="_images/decomp1.png" style="height: 320px;" /></a>
-<p>Each of the possible cascade decays for each mother corresponds to a <a class="reference internal" href="TheoryDefinitions.html#branch"><span class="std std-ref">branch</span></a>.
-In order to finally generate <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>, all the branches are combined in pairs according to the production cross-sections,
+<p>Each of the possible cascade decays for each mother corresponds to a <a class="reference internal" href="TheoryDefinitions.html#branch"><span>branch</span></a>.
+In order to finally generate <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>, all the branches are combined in pairs according to the production cross-sections,
 as shown below:</p>
 <a class="reference internal image-reference" href="_images/decomp2.png" id="decomp2"><img alt="_images/decomp2.png" id="decomp2" src="_images/decomp2.png" style="height: 410px;" /></a>
 <p>For instance, assume [b1,b2,b3] and [B1,B2] represent all possible branches (or cascade decays)
 for the primary mothers A and B, respectively. Then, if a production cross-section for <span class="math">\(pp \rightarrow A+B\)</span> is given in the input file, the following elements will be generated:</p>
 <blockquote>
 <div>[b1,B1], [b1,B2], [b2,B1], [b2,B2], [b3,B1] and [b3,B2]</div></blockquote>
-<p>Each of the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> generated according to the procedure just described will also
+<p>Each of the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> generated according to the procedure just described will also
 store its weight, which equals its production cross-section times all the branching ratios appearing in it.
-In order to avoid a too large number of elements, only those satisfying a <a class="reference internal" href="#minweight"><span class="std std-ref">minimum weight</span></a> requirement are kept.
-Furthermore, the elements are grouped according to their <a class="reference internal" href="TheoryDefinitions.html#topology"><span class="std std-ref">topologies</span></a>. The final output of the
+In order to avoid a too large number of elements, only those satisfying a <a class="reference internal" href="#minweight"><span>minimum weight</span></a> requirement are kept.
+Furthermore, the elements are grouped according to their <a class="reference internal" href="TheoryDefinitions.html#topology"><span>topologies</span></a>. The final output of the
 SLHA decomposition is a list of such topologies, where each topology contains a list of the elements generated during the decomposition.</p>
 <ul class="simple">
 <li><strong>The SLHA decomposition is implemented by the</strong> <a class="reference external" href="../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose">SLHA decompose method</a></li>
@@ -204,7 +204,7 @@ can be discarded, since they will fall well below the experimental limits. There
 whenever an element is generated with a weight below some minimum value, this element (and all elements derived from it) is ignored.
 The minimum weight to be considered is given by the <a class="reference external" href="../../../documentation/build/html/theory.html#build/html/theory.slhaDecomposer.decompose">sigcut</a> parameter
 and is easily adjustable (see <a class="reference external" href="../../../documentation/build/html/theory.html#build/html/theory.slhaDecomposer.decompose">slhaDecomposer.decompose</a>)</p>
-<p>Note that, when computing the <a class="reference internal" href="TheoryPredictions.html"><span class="doc">theory predictions</span></a>, the weight of several <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> can be combined together. Hence
+<p>Note that, when computing the <a class="reference internal" href="TheoryPredictions.html"><em>theory predictions</em></a>, the weight of several <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> can be combined together. Hence
 it is recommended to set the value of <a class="reference external" href="../../../documentation/build/html/theory.html#build/html/theory.slhaDecomposer.decompose">sigcut</a>
 approximately one order of magnitude below the minimum signal cross-sections the experimental data can constrain.</p>
 </div>
@@ -212,11 +212,11 @@ approximately one order of magnitude below the minimum signal cross-sections the
 <div class="section" id="lhe-based-decomposition">
 <span id="lhedecomp"></span><h2>LHE-based Decomposition<a class="headerlink" href="#lhe-based-decomposition" title="Permalink to this headline">¶</a></h2>
 <p>More general models can be input through an LHE event file containing parton-level events, including the production of the primary
-mothers and their cascade decays. Each event can then be directly mapped to an <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> with the element weight
+mothers and their cascade decays. Each event can then be directly mapped to an <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> with the element weight
 corresponding to the event weight.
 Finally, identical elements can be combined together (adding their weights). The procedure is represented in the example below:</p>
 <a class="reference internal image-reference" href="_images/eventExample.png" id="event"><img alt="_images/eventExample.png" id="event" src="_images/eventExample.png" style="height: 520px;" /></a>
-<p>Notice that, for the LHE decomposition, the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> generated are restricted to the events in the input file. Hence,
+<p>Notice that, for the LHE decomposition, the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> generated are restricted to the events in the input file. Hence,
 the uncertainties on the elements weights (and which elements are actually generated by the model)
 are fully dependent on the Monte Carlo statistics used to generate the LHE file.
 Also, when generating the events it is important to ensure that the no mass smearing is applied, so the events
@@ -228,22 +228,22 @@ always contain the mass value for a given particle.</p>
 <div class="section" id="compression-of-elements">
 <span id="elementcomp"></span><h2>Compression of Elements<a class="headerlink" href="#compression-of-elements" title="Permalink to this headline">¶</a></h2>
 <p>During the decomposition process it is possible to perform several simplifications on
-the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> generated. In both the <a class="reference internal" href="#lhedecomp"><span class="std std-ref">LHE</span></a> and <a class="reference internal" href="#slhadecomp"><span class="std std-ref">SLHA</span></a>-based decompositions, two useful
-simplifications are possible: <a class="reference internal" href="#masscomp"><span class="std std-ref">Mass Compression</span></a> and <a class="reference internal" href="#invcomp"><span class="std std-ref">Invisible Compression</span></a>.
-The main advantage of performing these compressions is that the simplified <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> is
+the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> generated. In both the <a class="reference internal" href="#lhedecomp"><span>LHE</span></a> and <a class="reference internal" href="#slhadecomp"><span>SLHA</span></a>-based decompositions, two useful
+simplifications are possible: <a class="reference internal" href="#masscomp"><span>Mass Compression</span></a> and <a class="reference internal" href="#invcomp"><span>Invisible Compression</span></a>.
+The main advantage of performing these compressions is that the simplified <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> is
 always shorter (has fewer cascade decay steps), which makes it more likely to be constrained by experimental
 results. The details behind the compression methods are as follows:</p>
 <div class="section" id="mass-compression">
 <span id="masscomp"></span><h3>Mass Compression<a class="headerlink" href="#mass-compression" title="Permalink to this headline">¶</a></h3>
-<p>In case of small mass differences, the decay of an <a class="reference internal" href="TheoryDefinitions.html#odd-states"><span class="std std-ref">intermediate state</span></a> to a nearly degenerate
-one will in most cases produce soft <a class="reference internal" href="TheoryDefinitions.html#final-states"><span class="std std-ref">final states</span></a>, which can not be experimentally detected.
-Consequently, it is a good approximation to neglect the soft <a class="reference internal" href="TheoryDefinitions.html#final-states"><span class="std std-ref">final states</span></a> and <em>compress</em> the respective
+<p>In case of small mass differences, the decay of an <a class="reference internal" href="TheoryDefinitions.html#odd-states"><span>intermediate state</span></a> to a nearly degenerate
+one will in most cases produce soft <a class="reference internal" href="TheoryDefinitions.html#final-states"><span>final states</span></a>, which can not be experimentally detected.
+Consequently, it is a good approximation to neglect the soft <a class="reference internal" href="TheoryDefinitions.html#final-states"><span>final states</span></a> and <em>compress</em> the respective
 decay, as shown below:</p>
 <a class="reference internal image-reference" href="_images/massComp.png" id="masscompfig"><img alt="_images/massComp.png" id="masscompfig" src="_images/massComp.png" style="height: 300px;" /></a>
-<p>After the compression, only the lightest of the two near-degenerate masses are kept in the element, as shown <a class="reference internal" href="#masscompfig"><span class="std std-ref">above</span></a>.
+<p>After the compression, only the lightest of the two near-degenerate masses are kept in the element, as shown <a class="reference internal" href="#masscompfig"><span>above</span></a>.
 The main parameter which controls the compression is <a class="reference external" href="../../../documentation/build/html/theory.html#build/html/theory.element.Element.massCompress">minmassgap</a>,
 which corresponds to the maximum value of <span class="math">\(\epsilon\)</span>
-in the <a class="reference internal" href="#masscompfig"><span class="std std-ref">figure above</span></a> to which the compression is performed:</p>
+in the <a class="reference internal" href="#masscompfig"><span>figure above</span></a> to which the compression is performed:</p>
 <div class="math">
 \[\begin{split}&amp; \mbox{if } |M_j - M_{j+1}| &lt; minmassgap \rightarrow \mbox{the decay is compressed}\\
 &amp; \mbox{if } |M_j - M_{j+1}| &gt; minmassgap \rightarrow \mbox{the decay is NOT compressed}\\\end{split}\]</div>
@@ -253,12 +253,12 @@ between 1-10 GeV; the default value is 5 GeV.</p>
 <ul class="simple">
 <li><strong>Mass compression is implemented by the</strong> <a class="reference external" href="../../../documentation/build/html/theory.html#build/html/theory.element.Element.massCompress">massCompress</a> <strong>method</strong></li>
 </ul>
-<p>and can be easily turned on/off by the flag <em>doCompress</em> in the <a class="reference internal" href="#slhadecomp"><span class="std std-ref">SLHA</span></a> or <a class="reference internal" href="#lhedecomp"><span class="std std-ref">LHE</span></a> decompositions</p>
+<p>and can be easily turned on/off by the flag <em>doCompress</em> in the <a class="reference internal" href="#slhadecomp"><span>SLHA</span></a> or <a class="reference internal" href="#lhedecomp"><span>LHE</span></a> decompositions</p>
 </div>
 <div class="section" id="invisible-compression">
 <span id="invcomp"></span><h3>Invisible Compression<a class="headerlink" href="#invisible-compression" title="Permalink to this headline">¶</a></h3>
 <p>Another class of compression is possible when
-the <a class="reference internal" href="TheoryDefinitions.html#final-states"><span class="std std-ref">final states</span></a> in the last decay as well as the last <a class="reference internal" href="TheoryDefinitions.html#odd-states"><span class="std std-ref">intermediate state</span></a>
+the <a class="reference internal" href="TheoryDefinitions.html#final-states"><span>final states</span></a> in the last decay as well as the last <a class="reference internal" href="TheoryDefinitions.html#odd-states"><span>intermediate state</span></a>
 are both invisible experimentally.
 The most common example is</p>
 <div class="math">
@@ -272,7 +272,7 @@ contain only invisible final states:</p>
 <ul class="simple">
 <li><strong>Invisible compression is implemented by the</strong> <a class="reference external" href="../../../documentation/build/html/theory.html#build/html/theory.element.Element.invisibleCompress">invisibleCompress</a> <strong>method</strong></li>
 </ul>
-<p>and can be easily turned on/off by the flag <em>doInvisible</em> in the <a class="reference internal" href="#slhadecomp"><span class="std std-ref">SLHA</span></a> or <a class="reference internal" href="#lhedecomp"><span class="std std-ref">LHE</span></a> decompositions</p>
+<p>and can be easily turned on/off by the flag <em>doInvisible</em> in the <a class="reference internal" href="#slhadecomp"><span>SLHA</span></a> or <a class="reference internal" href="#lhedecomp"><span>LHE</span></a> decompositions</p>
 </div>
 </div>
 </div>
@@ -318,7 +318,7 @@ contain only invisible final states:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.0.90',
+            VERSION:'1.0.91',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
