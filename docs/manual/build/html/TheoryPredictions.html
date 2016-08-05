@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Theory Predictions &mdash; SModelS 1.0.90 documentation</title>
+  <title>Theory Predictions &mdash; SModelS 1.0.91 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="SModelS 1.0.90 documentation" href="index.html"/>
+    <link rel="top" title="SModelS 1.0.91 documentation" href="index.html"/>
         <link rel="up" title="SModelS Structure" href="Structure.html"/>
         <link rel="next" title="Confronting Predictions with Experimental Limits" href="ConfrontPredictions.html"/>
         <link rel="prev" title="Decomposition into Simplified Models" href="Decomposition.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0.90
+                1.0.91
               </div>
             
           
@@ -159,79 +159,79 @@
             
   <span class="target" id="index-0"></span><div class="section" id="theory-predictions">
 <span id="theorypredictions"></span><h1>Theory Predictions<a class="headerlink" href="#theory-predictions" title="Permalink to this headline">¶</a></h1>
-<p>The <a class="reference internal" href="Decomposition.html"><span class="doc">decomposition</span></a> of the input model as a sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> is the
+<p>The <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> of the input model as a sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> is the
 first step for confronting the model with the experimental limits.
 The next step consists of computing the relevant signal
 (or <em>theory predictions</em>) for comparison with the experimental limits. Below we describe the procedure
 for the computation of the theory predictions after the model has been decomposed.</p>
 <div class="section" id="computing-theory-predictions">
 <h2>Computing Theory Predictions<a class="headerlink" href="#computing-theory-predictions" title="Permalink to this headline">¶</a></h2>
-<p>As discussed in <a class="reference internal" href="DatabaseDefinitions.html"><span class="doc">Database Definitions</span></a>, the SModelS  database allows
+<p>As discussed in <a class="reference internal" href="DatabaseDefinitions.html"><em>Database Definitions</em></a>, the SModelS  database allows
 for two types of experimental constraints:
-Upper Limit constraints   (see <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type results</span></a>) and Efficiency Map constraints (see <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type results</span></a>).
+Upper Limit constraints   (see <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type results</span></a>) and Efficiency Map constraints (see <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a>).
 Each of them requires different theoretical predictions to be compared against experimental data.</p>
-<p><a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type results</span></a> constrains the weight (<span class="math">\(\sigma \times BR\)</span>) of one <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>.
-Therefore SModelS must compute the theoretical value of <span class="math">\(\sigma \times BR\)</span> summing only over the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>
-appearing in the respective <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span class="std std-ref">constraint</span></a>.
+<p><a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type results</span></a> constrains the weight (<span class="math">\(\sigma \times BR\)</span>) of one <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>.
+Therefore SModelS must compute the theoretical value of <span class="math">\(\sigma \times BR\)</span> summing only over the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>
+appearing in the respective <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>constraint</span></a>.
 Once this theoretical value is known, it can be compared against the respective 95% upper limit extracted
-from the UL map (see <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type results</span></a>).</p>
-<p>On the other hand, <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type results</span></a> constrain the total signal (<span class="math">\(\sum \sigma \times BR \times \epsilon\)</span>) in a given signal region (<a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>).
-Consequently, in this case SModelS must compute <span class="math">\(\sigma \times BR \times \epsilon\)</span> for each <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a>, using the efficiency maps for
-the corresponding <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>. The final theoretical prediction is the sum over all <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>
+from the UL map (see <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type results</span></a>).</p>
+<p>On the other hand, <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a> constrain the total signal (<span class="math">\(\sum \sigma \times BR \times \epsilon\)</span>) in a given signal region (<a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>).
+Consequently, in this case SModelS must compute <span class="math">\(\sigma \times BR \times \epsilon\)</span> for each <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a>, using the efficiency maps for
+the corresponding <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>. The final theoretical prediction is the sum over all <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>
 with a non-zero value of <span class="math">\(\sigma \times BR \times \epsilon\)</span>.
-This value can then be compared with the signal upper limit for the respective <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">data set</span></a>.</p>
+This value can then be compared with the signal upper limit for the respective <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>data set</span></a>.</p>
 <p>Although the details of the theoretical prediction computation differ depending on the type
-of <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Result</span></a>, the overall procedure is common for both type of results. Below we schematically
+of <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a>, the overall procedure is common for both type of results. Below we schematically
 show the main steps of the theory prediction calculation:</p>
 <a class="reference internal image-reference" href="_images/theoryPredScheme.png"><img alt="_images/theoryPredScheme.png" src="_images/theoryPredScheme.png" style="height: 550px;" /></a>
 <p>As shown above the procedure can always be divided in two main steps:
-<em>Element Selection</em> and <em>Element Clustering</em>. The first step is trivial for <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type results</span></a>,
-but more involved for <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type results</span></a>, while the opposite is true for the clustering of <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>.
-Once the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> have been selected and clustered, the theory prediction for each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a> is given by
-the sum of all the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> weights (<span class="math">\(\sigma \times BR \times \epsilon\)</span>) belonging to the same cluster:</p>
+<em>Element Selection</em> and <em>Element Clustering</em>. The first step is trivial for <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type results</span></a>,
+but more involved for <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a>, while the opposite is true for the clustering of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>.
+Once the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> have been selected and clustered, the theory prediction for each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a> is given by
+the sum of all the <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> weights (<span class="math">\(\sigma \times BR \times \epsilon\)</span>) belonging to the same cluster:</p>
 <div class="math" id="equation-thpred">
 <span class="eqno">(1)</span>\[\mbox{theory prediction } = \sum_{cluster} (\mbox{element weight}) =  \sum_{cluster} (\sigma \times BR \times \epsilon)\]</div>
-<p>In the case of <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type results</span></a>, there might be several clusters (see <a class="reference internal" href="#ulcluster"><span class="std std-ref">Element Clustering</span></a>)
-for a given <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a> (or  <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Result</span></a> <a class="footnote-reference" href="#id9" id="id1">[*]</a>), resulting in a list of theory predictions
-for the corresponding <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>. Each theory prediction must then
+<p>In the case of <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type results</span></a>, there might be several clusters (see <a class="reference internal" href="#ulcluster"><span>Element Clustering</span></a>)
+for a given <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a> (or  <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a> <a class="footnote-reference" href="#id9" id="id1">[*]</a>), resulting in a list of theory predictions
+for the corresponding <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>. Each theory prediction must then
 be individually confronted with the 95% experimental upper limit obtained from the corresponding UL map.</p>
-<p>On the other hand, <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type results</span></a> always have a single cluster for a given <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>, since
-all <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> (with non-zero efficiencies) contribute to the theory prediction (signal).
-However, <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type results</span></a> typically have several <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Sets</span></a>, corresponding to distinct signal regions.
-Nonetheless, given a <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>,  the final theory prediction must be compared against the
+<p>On the other hand, <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a> always have a single cluster for a given <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>, since
+all <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> (with non-zero efficiencies) contribute to the theory prediction (signal).
+However, <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a> typically have several <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Sets</span></a>, corresponding to distinct signal regions.
+Nonetheless, given a <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>,  the final theory prediction must be compared against the
 signal upper limit for the corresponding signal region.
 Notice that this upper limit depends only on the number of expected and observed events in the signal region
 (as well as their uncertainties) and does not depend on the input model.</p>
-<p>By default only the best <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a> is shown for each <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Result</span></a>. The best <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a> is
+<p>By default only the best <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a> is shown for each <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a>. The best <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a> is
 the one with the largest <span class="math">\(\mbox{(expected signal)}/\mbox{(expected background)}\)</span> ratio.
-Since <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type results</span></a> only have a single <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>, the selection is trivial. On the other
-hand, for <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type results</span></a> with more than one <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>, only the best one is selected.
-If the user wants to have access to all the <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">data sets</span></a>, the default
+Since <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type results</span></a> only have a single <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>, the selection is trivial. On the other
+hand, for <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a> with more than one <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>, only the best one is selected.
+If the user wants to have access to all the <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>data sets</span></a>, the default
 behavior can be disabled using the variable <em>useBestDataset</em>.</p>
 <p>Below we describe in detail the method for computing the theory predictions for each type
-of <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Result</span></a> separately.</p>
+of <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a> separately.</p>
 <ul class="simple">
 <li><strong>Theory predictions are computed using the</strong> <a class="reference external" href="../../../documentation/build/html/theory.html#theory.theoryPrediction.theoryPredictionsFor">theoryPredictionsFor</a> <strong>method</strong></li>
 </ul>
 </div>
 <div class="section" id="theory-predictions-for-upper-limit-results">
 <span id="thepredul"></span><h2>Theory Predictions for Upper Limit Results<a class="headerlink" href="#theory-predictions-for-upper-limit-results" title="Permalink to this headline">¶</a></h2>
-<p>In order to compute the signal cross-sections for a given <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type result</span></a>, so it can be compared
-against the upper limits, it is first necessary to select the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> generated by the model
-<a class="reference internal" href="Decomposition.html"><span class="doc">decomposition</span></a> and then cluster them according to their masses.
+<p>In order to compute the signal cross-sections for a given <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type result</span></a>, so it can be compared
+against the upper limits, it is first necessary to select the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> generated by the model
+<a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> and then cluster them according to their masses.
 These two steps are described below.</p>
 <div class="section" id="element-selection">
 <span id="ulselection"></span><h3>Element Selection<a class="headerlink" href="#element-selection" title="Permalink to this headline">¶</a></h3>
-<p>An <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type result</span></a> holds upper limits for the cross-sections of an <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a>
-or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>. Consequently, the first step for computing the theory predictions for the corresponding
-analysis is to select the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> that appear in the <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span class="std std-ref">constraint</span></a>.
-This is conveniently done attributing to each <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> an efficiency equal to 1 (0)
-if the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> appears (does not appear) in the <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span class="std std-ref">constraint</span></a>.
-After all the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> weights (<span class="math">\(\sigma \times BR\)</span>) have been rescaled
+<p>An <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type result</span></a> holds upper limits for the cross-sections of an <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a>
+or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>. Consequently, the first step for computing the theory predictions for the corresponding
+analysis is to select the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> that appear in the <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>constraint</span></a>.
+This is conveniently done attributing to each <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> an efficiency equal to 1 (0)
+if the <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> appears (does not appear) in the <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>constraint</span></a>.
+After all the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> weights (<span class="math">\(\sigma \times BR\)</span>) have been rescaled
 by these &#8216;&#8217;trivial&#8217;&#8217; efficiencies, only the ones with non-zero weights are relevant for the analysis.
-The <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> selection is then trivially achieved by selecting all the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> with non-zero weights.</p>
+The <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> selection is then trivially achieved by selecting all the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> with non-zero weights.</p>
 <p>The procedure described above is illustrated graphically in the figure below for the simple example where the
-<a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span class="std std-ref">constraint</span></a> is <span class="math">\([[[e^+]],[[e^-]]]\,+\,[[[\mu^+]],[[\mu^-]]]\)</span>.</p>
+<a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>constraint</span></a> is <span class="math">\([[[e^+]],[[e^-]]]\,+\,[[[\mu^+]],[[\mu^-]]]\)</span>.</p>
 <a class="reference internal image-reference" href="_images/ULselection.png"><img alt="_images/ULselection.png" src="_images/ULselection.png" style="height: 500px;" /></a>
 <ul class="simple">
 <li><strong>The element selection is implemented by the</strong> <a class="reference external" href="../../../documentation/build/html/theory.html#theory.theoryPrediction._getElementsFrom">getElementsFrom</a> <strong>method</strong></li>
@@ -239,28 +239,28 @@ The <a class="reference internal" href="TheoryDefinitions.html#element"><span cl
 </div>
 <div class="section" id="element-clustering">
 <span id="ulcluster"></span><h3>Element Clustering<a class="headerlink" href="#element-clustering" title="Permalink to this headline">¶</a></h3>
-<p>Naively one would expect that after all the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> appearing in the <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span class="std std-ref">constraint</span></a>
+<p>Naively one would expect that after all the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> appearing in the <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>constraint</span></a>
 have been selected, it is trivial to compute the theory prediction: one must simply
-sum up the weights (<span class="math">\(\sigma \times BR\)</span>) of all the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>.
-However, the selected <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> usually differ in their masses <a class="footnote-reference" href="#id10" id="id2">[†]</a> and the
-experimental limit (see <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span class="std std-ref">Upper Limit constraint</span></a>) assumes that all the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> appearing
-in the <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span class="std std-ref">constraint</span></a> have the same mass (or mass array).
-As a result, the selected <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> must be grouped into <em>clusters</em> of equal masses.
-When grouping the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>, however, one must allow for small mass differences,
+sum up the weights (<span class="math">\(\sigma \times BR\)</span>) of all the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>.
+However, the selected <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> usually differ in their masses <a class="footnote-reference" href="#id10" id="id2">[†]</a> and the
+experimental limit (see <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>Upper Limit constraint</span></a>) assumes that all the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> appearing
+in the <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>constraint</span></a> have the same mass (or mass array).
+As a result, the selected <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> must be grouped into <em>clusters</em> of equal masses.
+When grouping the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>, however, one must allow for small mass differences,
 since the experimental efficiencies should not be strongly sensitive to small mass
-differences. For instance, assume two <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> contain identical mass arrays, except for the parent masses
-which differ by 1 MeV. In this case it is obvious that for all experimental purposes the two <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>
+differences. For instance, assume two <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> contain identical mass arrays, except for the parent masses
+which differ by 1 MeV. In this case it is obvious that for all experimental purposes the two <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>
 have identical masses and should contribute to the same theory prediction (e.g. their weights should be
 added when computing the signal cross-section).
 Unfortunately there is no way to
-unambiguously define &#8216;&#8217;similar masses&#8217;&#8217; and the definition should depend on the <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Result</span></a>, since
+unambiguously define &#8216;&#8217;similar masses&#8217;&#8217; and the definition should depend on the <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a>, since
 different results will be more or less dependent to mass differences. SModelS uses an UL map-dependent
-measure of the distance between two <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> masses, as described in <a class="reference internal" href="#massdist"><span class="std std-ref">Mass Distance</span></a>.</p>
-<p>If two of the selected <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> have a <a class="reference internal" href="#massdist"><span class="std std-ref">mass distance</span></a> smaller
+measure of the distance between two <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> masses, as described in <a class="reference internal" href="#massdist"><span>Mass Distance</span></a>.</p>
+<p>If two of the selected <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> have a <a class="reference internal" href="#massdist"><span>mass distance</span></a> smaller
 than a maximum value (defined by <a class="reference external" href="../../../documentation/build/html/theory.html#theory.clusterTools.clusterElements">maxDist</a>),
 they are gouped in the same mass cluster, as illustrated by the example below:</p>
 <a class="reference internal image-reference" href="_images/ULcluster.png"><img alt="_images/ULcluster.png" src="_images/ULcluster.png" style="height: 550px;" /></a>
-<p>Once all the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> have been clustered, their weights can finally be added together
+<p>Once all the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> have been clustered, their weights can finally be added together
 and compared against the experimental upper limit.</p>
 <ul class="simple">
 <li><strong>The clustering of elements is implemented by the</strong> <a class="reference external" href="../../../documentation/build/html/theory.html#theory.clusterTools.clusterElements">clusterElements</a>  <strong>method</strong>.</li>
@@ -268,24 +268,24 @@ and compared against the experimental upper limit.</p>
 </div>
 <div class="section" id="mass-distance">
 <span id="massdist"></span><h3>Mass Distance<a class="headerlink" href="#mass-distance" title="Permalink to this headline">¶</a></h3>
-<p>As mentioned <a class="reference internal" href="#ulcluster"><span class="std std-ref">above</span></a>, in order to cluster the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> it is necessary
-to determine whether two <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> have similar masses (see <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> and <a class="reference internal" href="TheoryDefinitions.html#bracketnotation"><span class="std std-ref">Bracket Notation</span></a>
-for more details on <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> mass).
+<p>As mentioned <a class="reference internal" href="#ulcluster"><span>above</span></a>, in order to cluster the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> it is necessary
+to determine whether two <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> have similar masses (see <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> and <a class="reference internal" href="TheoryDefinitions.html#bracketnotation"><span>Bracket Notation</span></a>
+for more details on <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> mass).
 Since an absolute definition of &#8216;&#8217;similar masses&#8217;&#8217; is not possible and the sensitivity to mass differences
-depend on the experimental result, SModelS uses an &#8216;&#8217;upper limit map-dependent&#8217;&#8217; definition. For each <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a>&#8216;s mass array,
-the upper limit for the corresponding mass values is obtained from the UL map (see <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type result</span></a>).
+depend on the experimental result, SModelS uses an &#8216;&#8217;upper limit map-dependent&#8217;&#8217; definition. For each <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a>&#8216;s mass array,
+the upper limit for the corresponding mass values is obtained from the UL map (see <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type result</span></a>).
 This way, each mass array is mapped to a single number (the cross-section upper limit for the experimental result).
-Then the distance between the two <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a>&#8216;s masses is simply given by the relative difference between their respective
+Then the distance between the two <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a>&#8216;s masses is simply given by the relative difference between their respective
 upper limits. More explicitly:</p>
 <div class="math">
 \[\begin{split}\mbox{Element } A\; (&amp; M_A = [[M1,M2,...],[m1,m2,...]]) \rightarrow \mbox{ Upper Limit}(M_A) = x\\
 \mbox{Element } B\; (&amp; M_B = [[M1',M2',...],[m1',m2',...]]) \rightarrow \mbox{ Upper Limit}(M_B) = y\\
                                     &amp; \Rightarrow \mbox{mass distance}(A,B) = \frac{|x-y|}{(x+y)/2}\end{split}\]</div>
-<p>where <span class="math">\(M_A,M_B\)</span> (<span class="math">\(x,y\)</span>) are the mass arrays (upper limits) for the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> A and B, respectively.
-If the mass distance of two <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> is smaller than <a class="reference external" href="../../../documentation/build/html/theory.html#theory.clusterTools.clusterElements">maxDist</a>,
+<p>where <span class="math">\(M_A,M_B\)</span> (<span class="math">\(x,y\)</span>) are the mass arrays (upper limits) for the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> A and B, respectively.
+If the mass distance of two <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> is smaller than <a class="reference external" href="../../../documentation/build/html/theory.html#theory.clusterTools.clusterElements">maxDist</a>,
 the two masses are considered similar.</p>
 <p>Notice that the above definition of mass distance quantifies the experimental analysis
-sensitivity to mass differences, which is the relevant parameter when <a class="reference internal" href="#ulcluster"><span class="std std-ref">clustering elements</span></a>.
+sensitivity to mass differences, which is the relevant parameter when <a class="reference internal" href="#ulcluster"><span>clustering elements</span></a>.
 Also, a check is performed to ensure that masses with very distinct values but similar upper limits are not
 clustered together.</p>
 <ul class="simple">
@@ -295,42 +295,42 @@ clustered together.</p>
 </div>
 <div class="section" id="theory-predictions-for-efficiency-map-results">
 <h2>Theory Predictions for Efficiency Map Results<a class="headerlink" href="#theory-predictions-for-efficiency-map-results" title="Permalink to this headline">¶</a></h2>
-<p>In order to compute the signal cross-sections for a given <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type result</span></a>, so it can be compared
-to the signal region limits, it is first necessary to apply the efficiencies (see <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type result</span></a>) to all the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> generated
-by the model <a class="reference internal" href="Decomposition.html"><span class="doc">decomposition</span></a>.
-Notice that typically a single  <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type result</span></a> contains several signal regions (<a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Sets</span></a>) and there will be a set of efficiencies
-(or efficiency maps) for each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">data set</span></a>. As a result, several theory predictions (one for each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">data set</span></a>) will be computed.
+<p>In order to compute the signal cross-sections for a given <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type result</span></a>, so it can be compared
+to the signal region limits, it is first necessary to apply the efficiencies (see <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type result</span></a>) to all the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> generated
+by the model <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a>.
+Notice that typically a single  <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type result</span></a> contains several signal regions (<a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Sets</span></a>) and there will be a set of efficiencies
+(or efficiency maps) for each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>data set</span></a>. As a result, several theory predictions (one for each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>data set</span></a>) will be computed.
 This procedure is similar (in nature) to
-the <a class="reference internal" href="#ulselection"><span class="std std-ref">Element Selection</span></a> applied in the case of an <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type result</span></a>, except that now it must be repeated for several <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">data sets</span></a>.</p>
-<p>After the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a>&#8216;s weights have being rescaled by the corresponding efficiencies for the given <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">data set</span></a> (signal region),
+the <a class="reference internal" href="#ulselection"><span>Element Selection</span></a> applied in the case of an <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type result</span></a>, except that now it must be repeated for several <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>data sets</span></a>.</p>
+<p>After the <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a>&#8216;s weights have being rescaled by the corresponding efficiencies for the given <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>data set</span></a> (signal region),
 all of them can be grouped together in a single cluster, which will provide a single theory prediction (signal
-cross-section) for the <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>. Hence the <a class="reference internal" href="#emcluster"><span class="std std-ref">element clustering</span></a> discussed below is completely trivial.
-On the other hand the <a class="reference internal" href="#emselection"><span class="std std-ref">element selection</span></a> is slightly more involved than in the <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type result</span></a>
+cross-section) for the <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>. Hence the <a class="reference internal" href="#emcluster"><span>element clustering</span></a> discussed below is completely trivial.
+On the other hand the <a class="reference internal" href="#emselection"><span>element selection</span></a> is slightly more involved than in the <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type result</span></a>
 case and will be discussed in more detail.</p>
 <div class="section" id="emselection">
 <span id="id4"></span><h3>Element Selection<a class="headerlink" href="#emselection" title="Permalink to this headline">¶</a></h3>
-<p>The element selection for the case of a <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type result</span></a> consists of rescaling all the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>
-weights by their efficiencies, according to the efficiency map of the corresponding <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>.
-The efficiency for a given <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a> depends both on the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> mass and on its topology and particle content.
-In practice the efficiencies for most of the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> will be extremely small (or zero), hence only a subset effectively
+<p>The element selection for the case of a <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type result</span></a> consists of rescaling all the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>
+weights by their efficiencies, according to the efficiency map of the corresponding <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>.
+The efficiency for a given <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a> depends both on the <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> mass and on its topology and particle content.
+In practice the efficiencies for most of the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> will be extremely small (or zero), hence only a subset effectively
 contributes after the element selection  <a class="footnote-reference" href="#id11" id="id5">[‡]</a>.</p>
-<p>In the figure below we illustrate the element selection for the case of  a <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type result</span></a>/<a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>:</p>
+<p>In the figure below we illustrate the element selection for the case of  a <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type result</span></a>/<a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>:</p>
 <a class="reference internal image-reference" href="_images/EMselection.png" id="emselectionfig"><img alt="_images/EMselection.png" id="emselectionfig" src="_images/EMselection.png" style="height: 500px;" /></a>
 <p>If, for instance, the analysis being considered vetoes <span class="math">\(jets\)</span> and <span class="math">\(\tau\)</span>&#8216;s in the final state,
-we will have <span class="math">\(\epsilon_2,\, \epsilon_4 \simeq 0\)</span> for the example in the <a class="reference internal" href="#emselectionfig"><span class="std std-ref">figure above</span></a>.
-Nonetheless, the element selection for a  <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a> is usually more inclusive than
-the one applied for the <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type result</span></a>, resulting in larger values for the theory prediction.</p>
+we will have <span class="math">\(\epsilon_2,\, \epsilon_4 \simeq 0\)</span> for the example in the <a class="reference internal" href="#emselectionfig"><span>figure above</span></a>.
+Nonetheless, the element selection for a  <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a> is usually more inclusive than
+the one applied for the <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type result</span></a>, resulting in larger values for the theory prediction.</p>
 <ul class="simple">
 <li><strong>The element selection is implemented by the</strong> <a class="reference external" href="../../../documentation/build/html/theory.html#theory.theoryPrediction._getElementsFrom">getElementsFrom</a> <strong>method</strong></li>
 </ul>
 </div>
 <div class="section" id="emcluster">
 <span id="id7"></span><h3>Element Clustering<a class="headerlink" href="#emcluster" title="Permalink to this headline">¶</a></h3>
-<p>Unlike the clustering required in the case of <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type result</span></a>
-(see <a class="reference internal" href="#ulcluster"><span class="std std-ref">Element Clustering for an UL analysis</span></a>), after the efficiencies have been
-applied to the element&#8217;s weights, there is no longer the necessity to group the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>
+<p>Unlike the clustering required in the case of <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type result</span></a>
+(see <a class="reference internal" href="#ulcluster"><span>Element Clustering for an UL analysis</span></a>), after the efficiencies have been
+applied to the element&#8217;s weights, there is no longer the necessity to group the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>
 according to their masses, since the mass differences have already been accounted for by the different efficiencies.
-As a result, after the <a class="reference internal" href="#emselection"><span class="std std-ref">element selection</span></a> all elements belong to a single cluster:</p>
+As a result, after the <a class="reference internal" href="#emselection"><span>element selection</span></a> all elements belong to a single cluster:</p>
 <a class="reference internal image-reference" href="_images/EMcluster.png"><img alt="_images/EMcluster.png" src="_images/EMcluster.png" style="height: 550px;" /></a>
 <ul class="simple">
 <li><strong>The (trivial) clustering of elements is implemented by the</strong> <a class="reference external" href="../../../documentation/build/html/theory.html#theory.clusterTools.clusterElements">clusterElements</a>  <strong>method</strong>.</li>
@@ -338,23 +338,23 @@ As a result, after the <a class="reference internal" href="#emselection"><span c
 <table class="docutils footnote" frame="void" id="id9" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[*]</a></td><td>As discussed in <a class="reference internal" href="DatabaseDefinitions.html#databasedefs"><span class="std std-ref">Database Definitions</span></a>,  <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type results</span></a> have a single <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>.</td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id1">[*]</a></td><td>As discussed in <a class="reference internal" href="DatabaseDefinitions.html#databasedefs"><span>Database Definitions</span></a>,  <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type results</span></a> have a single <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>.</td></tr>
 </tbody>
 </table>
 <table class="docutils footnote" frame="void" id="id10" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id2">[†]</a></td><td>When refering to an <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> mass, we mean all the <a class="reference internal" href="TheoryDefinitions.html#odd-states"><span class="std std-ref">intermediate state</span></a> masses
-appearing in the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> (or the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> mass array). Two <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> are considered to have identical
-masses if their mass arrays are identical (see <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> and <a class="reference internal" href="TheoryDefinitions.html#bracketnotation"><span class="std std-ref">Bracket Notation</span></a>
+<tr><td class="label"><a class="fn-backref" href="#id2">[†]</a></td><td>When refering to an <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> mass, we mean all the <a class="reference internal" href="TheoryDefinitions.html#odd-states"><span>intermediate state</span></a> masses
+appearing in the <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> (or the <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> mass array). Two <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> are considered to have identical
+masses if their mass arrays are identical (see <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> and <a class="reference internal" href="TheoryDefinitions.html#bracketnotation"><span>Bracket Notation</span></a>
 for more details).</td></tr>
 </tbody>
 </table>
 <table class="docutils footnote" frame="void" id="id11" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id5">[‡]</a></td><td>The number of <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> passing the selection also depends on the availability of efficiency maps
-for the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> generated by the decomposition. Whenever there are no efficiencies available for a
+<tr><td class="label"><a class="fn-backref" href="#id5">[‡]</a></td><td>The number of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> passing the selection also depends on the availability of efficiency maps
+for the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> generated by the decomposition. Whenever there are no efficiencies available for a
 element, the efficiency is taken to be zero.</td></tr>
 </tbody>
 </table>
@@ -403,7 +403,7 @@ element, the efficiency is taken to be zero.</td></tr>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.0.90',
+            VERSION:'1.0.91',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
