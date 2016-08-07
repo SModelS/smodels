@@ -1,5 +1,5 @@
 """
-.. module:: theory.branch
+.. module:: branch
    :synopsis: Module holding the branch class and methods.
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>

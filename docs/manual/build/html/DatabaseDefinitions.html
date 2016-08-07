@@ -42,6 +42,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -93,7 +94,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#experimental-result-efficiency-map-type">Experimental Result: Efficiency Map Type</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#data-set">Data Set</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-sets">Data Sets</a></li>
 </ul>
 </li>
 </ul>
@@ -129,20 +130,24 @@
 
 
 
+
+
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-          <li><a href="SModelSDefs.html">Basic Concepts and Definitions</a> &raquo;</li>
+        <li><a href="SModelSDefs.html">Basic Concepts and Definitions</a> &raquo;</li>
       
     <li>Database Definitions</li>
-      <li class="wy-breadcrumbs-aside">
-        
+    <li class="wy-breadcrumbs-aside">
+      
           
-            <a href="_sources/DatabaseDefinitions.txt" rel="nofollow"> View page source</a>
-          
+          <a href="_sources/DatabaseDefinitions.txt" rel="nofollow"> View page source</a>
         
-      </li>
+      
+    </li>
   </ul>
   <hr/>
 </div>
@@ -151,40 +156,42 @@
             
   <span class="target" id="index-0"></span><div class="section" id="database-definitions">
 <span id="databasedefs"></span><h1>Database Definitions<a class="headerlink" href="#database-definitions" title="Permalink to this headline">¶</a></h1>
-<p>The SModelS database collects experimental results from both ATLAS and CMS, which are
+<p>The so-called <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment">experiment module</a>
+contains the basic tools necessary for handling the database of experimental results.
+The SModelS database collects experimental results from both ATLAS and CMS, which are
 used to compute the experimental constraints on specific models.
 Starting with version 1.1, the SModelS database includes two types of experimental constraints:</p>
 <ul class="simple">
 <li>Upper Limit (UL) constraints: constrains on <span class="math">\(\sigma \times BR\)</span> of simplified models, provided
-by the experimental collaborations (see <a class="reference internal" href="#ultype"><span>UL-type results</span></a>);</li>
+by the experimental collaborations (see <a class="reference internal" href="#ultype"><span class="std std-ref">UL-type results</span></a>);</li>
 <li>Efficiency Map (EM) constraints: constrains the total signal (<span class="math">\(\sum \sigma \times BR \times \epsilon\)</span>) in
 a specific signal region.  The efficiencies in this case are either provided by the experimental collaborations or
-computed by theory groups (see <a class="reference internal" href="#emtype"><span>EM-type results</span></a>);</li>
+computed by theory groups (see <a class="reference internal" href="#emtype"><span class="std std-ref">EM-type results</span></a>);</li>
 </ul>
 <p>Although the two types of constraints above are very distinct,
 both the folder structure and the object structure of SModelS are sufficiently flexible to
-simutaneously handle both <a class="reference internal" href="#ultype"><span>UL-type</span></a> and <a class="reference internal" href="#emtype"><span>EM-type</span></a> results.
-Therefore, for both <a class="reference internal" href="#ultype"><span>UL-type</span></a> and <a class="reference internal" href="#emtype"><span>EM-type</span></a> constraints, the database obeys the following structure:</p>
+simutaneously handle both <a class="reference internal" href="#ultype"><span class="std std-ref">UL-type</span></a> and <a class="reference internal" href="#emtype"><span class="std std-ref">EM-type</span></a> results.
+Therefore, for both <a class="reference internal" href="#ultype"><span class="std std-ref">UL-type</span></a> and <a class="reference internal" href="#emtype"><span class="std std-ref">EM-type</span></a> constraints, the database obeys the following structure:</p>
 <ul>
 <li><dl class="first docutils">
-<dt><a class="reference internal" href="#database"><span>Database</span></a>: collects a list of <a class="reference internal" href="#expresult"><span>Experimental Results</span></a>.</dt>
+<dt><a class="reference internal" href="#database"><span class="std std-ref">Database</span></a>: collects a list of <a class="reference internal" href="#expresult"><span class="std std-ref">Experimental Results</span></a>.</dt>
 <dd><ul class="first last">
-<li><p class="first"><a class="reference internal" href="#expresult"><span>Experimental Result</span></a>: each <a class="reference internal" href="#expresult"><span>Experimental Result</span></a> corresponds to an experimental conference note or publication and contains
-a list of <a class="reference internal" href="#dataset"><span>Data Sets</span></a> as well as general information about the result (luminosity, publication reference,...).</p>
+<li><p class="first"><a class="reference internal" href="#expresult"><span class="std std-ref">Experimental Result</span></a>: each <a class="reference internal" href="#expresult"><span class="std std-ref">Experimental Result</span></a> corresponds to an experimental conference note or publication and contains
+a list of <a class="reference internal" href="#dataset"><span class="std std-ref">Data Sets</span></a> as well as general information about the result (luminosity, publication reference,...).</p>
 <blockquote>
 <div><ul>
-<li><p class="first"><a class="reference internal" href="#dataset"><span>Data Set</span></a>:
-a single <a class="reference internal" href="#dataset"><span>Data Set</span></a> corresponds to one signal region of the experimental
-note or publication <a class="footnote-reference" href="#id3" id="id1">[*]</a>. In case of <a class="reference internal" href="#ultype"><span>UL-type results</span></a> there is a single <a class="reference internal" href="#dataset"><span>Data Set</span></a>, usually corresponding to the best signal
-region (for more details see <a class="reference internal" href="#dataset"><span>Data Set</span></a>). For <a class="reference internal" href="#emtype"><span>EM-type results</span></a>, there is one <a class="reference internal" href="#dataset"><span>Data Set</span></a> for each signal region.
-Each <a class="reference internal" href="#dataset"><span>Data Set</span></a> contains the Upper Limit maps for <a class="reference internal" href="#ultype"><span>Upper Limit results</span></a> <em>or</em>
-the Efficiency maps for <a class="reference internal" href="#emtype"><span>Efficiency Map results</span></a>.</p>
+<li><p class="first"><a class="reference internal" href="#dataset"><span class="std std-ref">Data Set</span></a>:
+a single <a class="reference internal" href="#dataset"><span class="std std-ref">Data Set</span></a> corresponds to one signal region of the experimental
+note or publication <a class="footnote-reference" href="#id3" id="id1">[*]</a>. In case of <a class="reference internal" href="#ultype"><span class="std std-ref">UL-type results</span></a> there is a single <a class="reference internal" href="#dataset"><span class="std std-ref">Data Set</span></a>, usually corresponding to the best signal
+region (for more details see <a class="reference internal" href="#dataset"><span class="std std-ref">Data Set</span></a>). For <a class="reference internal" href="#emtype"><span class="std std-ref">EM-type results</span></a>, there is one <a class="reference internal" href="#dataset"><span class="std std-ref">Data Set</span></a> for each signal region.
+Each <a class="reference internal" href="#dataset"><span class="std std-ref">Data Set</span></a> contains the Upper Limit maps for <a class="reference internal" href="#ultype"><span class="std std-ref">Upper Limit results</span></a> <em>or</em>
+the Efficiency maps for <a class="reference internal" href="#emtype"><span class="std std-ref">Efficiency Map results</span></a>.</p>
 <blockquote>
 <div><ul class="simple">
-<li>Upper Limit map: contains the upper limit constraints for <a class="reference internal" href="#ultype"><span>UL-type results</span></a>. Each map refers to a single
-simplified model (or more precisely to a single <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>).</li>
-<li>Efficiency map: contains the efficiencies for <a class="reference internal" href="#emtype"><span>EM-type results</span></a>. Each map refers to a single
-simplified model (or more precisely to a single <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>).</li>
+<li>Upper Limit map: contains the upper limit constraints for <a class="reference internal" href="#ultype"><span class="std std-ref">UL-type results</span></a>. Each map refers to a single
+simplified model (or more precisely to a single <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>).</li>
+<li>Efficiency map: contains the efficiencies for <a class="reference internal" href="#emtype"><span class="std std-ref">EM-type results</span></a>. Each map refers to a single
+simplified model (or more precisely to a single <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>).</li>
 </ul>
 </div></blockquote>
 </li>
@@ -197,15 +204,15 @@ simplified model (or more precisely to a single <a class="reference internal" hr
 </li>
 </ul>
 <p>A summary of the above structure can be seen below. More details about the database folder structure and
-object struture can be found in <a class="reference internal" href="DatabaseStructure.html#databasestruct"><span>Database of Experimental Results</span></a>.</p>
+object struture can be found in <a class="reference internal" href="DatabaseStructure.html#databasestruct"><span class="std std-ref">Database of Experimental Results</span></a>.</p>
 <a class="reference internal image-reference" href="_images/databaseScheme.png" id="databasescheme"><img alt="_images/databaseScheme.png" id="databasescheme" src="_images/databaseScheme.png" style="height: 280px;" /></a>
 <p>In the following sections we describe in detail the main concepts and elements which constitute the SModelS database.</p>
 <div class="section" id="database">
 <span id="id2"></span><h2>Database<a class="headerlink" href="#database" title="Permalink to this headline">¶</a></h2>
 <p>Each publication or conference note can be included in the database
-as an <a class="reference internal" href="#expresult"><span>Experimental Result</span></a>. Hence, the database is simply a collection of experimental results.</p>
+as an <a class="reference internal" href="#expresult"><span class="std std-ref">Experimental Result</span></a>. Hence, the database is simply a collection of experimental results.</p>
 <ul class="simple">
-<li><strong>The Database is described by the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObjects.Database">Database Class</a></li>
+<li><strong>The Database is described by the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObj.Database">Database Class</a></li>
 </ul>
 </div>
 <div class="section" id="experimental-result">
@@ -213,10 +220,10 @@ as an <a class="reference internal" href="#expresult"><span>Experimental Result<
 <p>An experimental result contains all the relevant information corresponding to an experimental
 publication or conference note. In particular it holds general information about the experimental analysis,
 such as the corresponding luminosity, center of mass energy, publication reference, etc.
-The current version allows for two possible types of experimental results: one containing upper limit maps (<a class="reference internal" href="#ultype"><span>UL-type</span></a>)
-and one containing efficiency maps (<a class="reference internal" href="#emtype"><span>EM-type</span></a>).</p>
+The current version allows for two possible types of experimental results: one containing upper limit maps (<a class="reference internal" href="#ultype"><span class="std std-ref">UL-type</span></a>)
+and one containing efficiency maps (<a class="reference internal" href="#emtype"><span class="std std-ref">EM-type</span></a>).</p>
 <ul class="simple">
-<li><strong>Experimental Results are described by the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObjects.ExpResult">ExpResult Class</a></li>
+<li><strong>Experimental Results are described by the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.expResultObj.ExpResult">ExpResult Class</a></li>
 </ul>
 <div class="section" id="experimental-result-upper-limit-type">
 <span id="ultype"></span><h3>Experimental Result: Upper Limit Type<a class="headerlink" href="#experimental-result-upper-limit-type" title="Permalink to this headline">¶</a></h3>
@@ -226,22 +233,22 @@ These constraints are typically given in the format of Upper Limit maps, which c
 95% upper limit values on <span class="math">\(\sigma \times BR\)</span> as a function of the
 respective parameter space (usually BSM masses or slices over mass planes).
 The UL values usually assume the best signal region (for a given point in parameter space) or a combination
-of signal regions (at least for simple cut and count analyses). Hence, for UL results there is a single <a class="reference internal" href="#dataset"><span>Data Set</span></a>, containing one
+of signal regions (at least for simple cut and count analyses). Hence, for UL results there is a single <a class="reference internal" href="#dataset"><span class="std std-ref">Data Set</span></a>, containing one
 or more UL maps. An example of a UL map is shown below:</p>
 <a class="reference internal image-reference" href="_images/ULexample.png" id="ulplot"><img alt="_images/ULexample.png" id="ulplot" src="_images/ULexample.png" style="height: 480px;" /></a>
 <p>Within SModelS the above UL map is used to constrain the
-<a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> <span class="math">\([[[jet]],[[jet]]]\)</span>, where we are using the
-notation defined in <a class="reference internal" href="TheoryDefinitions.html#notation"><span>Bracket Notation</span></a>.
+<a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> <span class="math">\([[[jet]],[[jet]]]\)</span>, where we are using the
+notation defined in <a class="reference internal" href="TheoryDefinitions.html#notation"><span class="std std-ref">Bracket Notation</span></a>.
 Usually a single conference note/publication contains several UL maps, hence each
-UL-type experimental result contains several UL maps, each one constraining different <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>
-or sum of  <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>.
+UL-type experimental result contains several UL maps, each one constraining different <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>
+or sum of  <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>.
 <em>We also point out that the exclusion curve shown in the UL map above is never used by SModelS</em>.</p>
 <div class="section" id="upper-limit-constraint">
 <span id="ulconstraint"></span><h4>Upper Limit Constraint<a class="headerlink" href="#upper-limit-constraint" title="Permalink to this headline">¶</a></h4>
-<p>The upper limit constraint specifies which <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> is being constrained by the respective UL map.
-For simple constraints as the one shown in the <a class="reference internal" href="#ulplot"><span>UL map</span></a> above,
-there is a single <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> being constrained (<span class="math">\([[[jet]],[[jet]]]\)</span>).
-In some cases, however, the constraint corresponds to a sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>.
+<p>The upper limit constraint specifies which <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> is being constrained by the respective UL map.
+For simple constraints as the one shown in the <a class="reference internal" href="#ulplot"><span class="std std-ref">UL map</span></a> above,
+there is a single <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> being constrained (<span class="math">\([[[jet]],[[jet]]]\)</span>).
+In some cases, however, the constraint corresponds to a sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>.
 As an example, consider the <a class="reference external" href="https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-049/">ATLAS analysis</a> shown below:</p>
 <a class="reference internal image-reference" href="_images/constraintExample.png" id="constraintplot"><img alt="_images/constraintExample.png" id="constraintplot" src="_images/constraintExample.png" style="height: 580px;" /></a>
 <p>As we can see, the upper limits apply to the sum of the cross-sections:</p>
@@ -250,32 +257,32 @@ As an example, consider the <a class="reference external" href="https://atlas.we
 <p>In this case the UL constraint is simply:</p>
 <div class="math">
 \[[[[e^+]],[[e^-]]] + [[[\mu^+]],[[\mu^-]]]\]</div>
-<p>where it is understood that the sum is over the weights of the respective <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>
-and not over the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> themselves.</p>
+<p>where it is understood that the sum is over the weights of the respective <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>
+and not over the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> themselves.</p>
 <p>Note that the sum can be over particle charges, flavors or more complex combinations of elements.
-However, almost all analyses sum only over elements sharing a common  <a class="reference internal" href="TheoryDefinitions.html#topology"><span>topology</span></a>.</p>
-<p>Since using the <a class="reference internal" href="TheoryDefinitions.html#notation"><span>bracket notation</span></a> the constraints can be rather lenghty,
+However, almost all analyses sum only over elements sharing a common  <a class="reference internal" href="TheoryDefinitions.html#topology"><span class="std std-ref">topology</span></a>.</p>
+<p>Since using the <a class="reference internal" href="TheoryDefinitions.html#notation"><span class="std std-ref">bracket notation</span></a> the constraints can be rather lenghty,
 it is useful to define a shorthand notation for the constraints. SModelS
-adopts a notation based on the CMS SMS conventions, where each specific <a class="reference internal" href="#ulconstraint"><span>constraint</span></a> is
+adopts a notation based on the CMS SMS conventions, where each specific <a class="reference internal" href="#ulconstraint"><span class="std std-ref">constraint</span></a> is
 labeled as <em>T&lt;constraint name&gt;</em>, which we refer as <em>TxName</em>. For instance, the TxName corresponding to
-the constraint in the <a class="reference internal" href="#constraintplot"><span>example above</span></a> is <em>TSlepSlep</em>.
+the constraint in the <a class="reference internal" href="#constraintplot"><span class="std std-ref">example above</span></a> is <em>TSlepSlep</em>.
 A complete list of TxNames can be found <a class="reference external" href="http://smodels.hephy.at/wiki/SmsDictionary">here</a>.</p>
-<p>Finally, in some cases the UL constraint assumes specific constributions from each <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a>.
-For instance, in the <a class="reference internal" href="#constraintplot"><span>example above</span></a> it is implicitly assumed that
-both the electron and muon <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> contribute equally to the total cross-section.
-Hence these conditions must also be specified along with the constraint, as described in <a class="reference internal" href="#ulconditions"><span>UL conditions</span></a>.</p>
+<p>Finally, in some cases the UL constraint assumes specific constributions from each <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a>.
+For instance, in the <a class="reference internal" href="#constraintplot"><span class="std std-ref">example above</span></a> it is implicitly assumed that
+both the electron and muon <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> contribute equally to the total cross-section.
+Hence these conditions must also be specified along with the constraint, as described in <a class="reference internal" href="#ulconditions"><span class="std std-ref">UL conditions</span></a>.</p>
 </div>
 <div class="section" id="upper-limit-conditions">
 <span id="ulconditions"></span><h4>Upper Limit Conditions<a class="headerlink" href="#upper-limit-conditions" title="Permalink to this headline">¶</a></h4>
-<p>When the analysis <a class="reference internal" href="#ulconstraint"><span>constraints</span></a> are non-trivial (refer to a sum of elements), it is often the case
+<p>When the analysis <a class="reference internal" href="#ulconstraint"><span class="std std-ref">constraints</span></a> are non-trivial (refer to a sum of elements), it is often the case
 that there are implicit (or explicit) assumptions about the contribution of each element. For instance,
-in the <a class="reference internal" href="#constraintplot"><span>figure above</span></a>, it is implicitly assumed that each lepton flavor contributes equally
+in the <a class="reference internal" href="#constraintplot"><span class="std std-ref">figure above</span></a>, it is implicitly assumed that each lepton flavor contributes equally
 to the summed cross-section:</p>
 <div class="math">
 \[\sigma([[[e^+]],[[e^-]]]) = \sigma([[[\mu^+]],[[\mu^-]]])           \;\;\; \mbox{(condition)}\]</div>
 <p>Therefore, when applying these constraints to general models, one must also verify if
 these conditions are satisfied. Once again we can express these conditions in
-<a class="reference internal" href="TheoryDefinitions.html#notation"><span>bracket notation</span></a>:</p>
+<a class="reference internal" href="TheoryDefinitions.html#notation"><span class="std std-ref">bracket notation</span></a>:</p>
 <div class="math">
 \[[[[e^+]],[[e^-]]] = [[[\mu^+]],[[\mu^-]]]           \;\;\; \mbox{(condition)}\]</div>
 <p>where it is understood that the condition refers to the weights of the respective elements
@@ -296,51 +303,51 @@ maximum acceptable values.</p>
 </div>
 <div class="section" id="experimental-result-efficiency-map-type">
 <span id="emtype"></span><h3>Experimental Result: Efficiency Map Type<a class="headerlink" href="#experimental-result-efficiency-map-type" title="Permalink to this headline">¶</a></h3>
-<p>Unlike <a class="reference internal" href="#ultype"><span>UL-type results</span></a>, the main information held by Efficiency Map (EM) results are the efficiencies for simplified
+<p>Unlike <a class="reference internal" href="#ultype"><span class="std std-ref">UL-type results</span></a>, the main information held by Efficiency Map (EM) results are the efficiencies for simplified
 models. These may be provided by the experimental collaborations or independently computed by theory groups.
 Efficiency maps correspond to a grid of simulated acceptance times efficiency
 ( <span class="math">\(A \times \epsilon\)</span> ) values for a specific signal region. In the following we will refer to
 <span class="math">\(A \times \epsilon\)</span> simply as <em>efficiency</em>.
 Furthermore, additional information, such as the luminosity, number of observed and expected events, etc is also
 stored in a EM-type result.</p>
-<p>Another important difference between <a class="reference internal" href="#ultype"><span>UL-type results</span></a> and <a class="reference internal" href="#emtype"><span>EM-type results</span></a> is the existence of several signal regions, which in SModelS
-are mapped to <a class="reference internal" href="#dataset"><span>Data Sets</span></a>.  While <a class="reference internal" href="#ultype"><span>UL-type results</span></a> contain a single <a class="reference internal" href="#dataset"><span>Data Set</span></a> (&#8216;&#8217;signal region&#8217;&#8216;), EM results hold several <a class="reference internal" href="#dataset"><span>Data Sets</span></a>,
-one for each signal region (see the <a class="reference internal" href="#databasescheme"><span>Database Scheme</span></a> above).
-Each <a class="reference internal" href="#dataset"><span>Data Set</span></a> contains one or more efficiency maps, one for each <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>.
+<p>Another important difference between <a class="reference internal" href="#ultype"><span class="std std-ref">UL-type results</span></a> and <a class="reference internal" href="#emtype"><span class="std std-ref">EM-type results</span></a> is the existence of several signal regions, which in SModelS
+are mapped to <a class="reference internal" href="#dataset"><span class="std std-ref">Data Sets</span></a>.  While <a class="reference internal" href="#ultype"><span class="std std-ref">UL-type results</span></a> contain a single <a class="reference internal" href="#dataset"><span class="std std-ref">Data Set</span></a> (&#8216;&#8217;signal region&#8217;&#8216;), EM results hold several <a class="reference internal" href="#dataset"><span class="std std-ref">Data Sets</span></a>,
+one for each signal region (see the <a class="reference internal" href="#databasescheme"><span class="std std-ref">Database Scheme</span></a> above).
+Each <a class="reference internal" href="#dataset"><span class="std std-ref">Data Set</span></a> contains one or more efficiency maps, one for each <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>.
 The efficiency map is usually a function of the BSM masses appearing in the element, as shown by the example below:</p>
 <a class="reference internal image-reference" href="_images/EMexample.png" id="emplot"><img alt="_images/EMexample.png" id="emplot" src="_images/EMexample.png" style="height: 480px;" /></a>
 <p>Within SModelS the above EM map is used to compute the efficiency for the
-<a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> <span class="math">\([[[jet]],[[jet]]]\)</span>, where we are using the
-notation defined in <a class="reference internal" href="TheoryDefinitions.html#notation"><span>Bracket Notation</span></a>.
-Usually there are several EM maps for a single <a class="reference internal" href="#dataset"><span>data set</span></a>: one for each <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a>
-or sum of  <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>. In order to use a language similar to the one used in <a class="reference internal" href="#ultype"><span>UL-type results</span></a>, the <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> (or <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>)
+<a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> <span class="math">\([[[jet]],[[jet]]]\)</span>, where we are using the
+notation defined in <a class="reference internal" href="TheoryDefinitions.html#notation"><span class="std std-ref">Bracket Notation</span></a>.
+Usually there are several EM maps for a single <a class="reference internal" href="#dataset"><span class="std std-ref">data set</span></a>: one for each <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a>
+or sum of  <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>. In order to use a language similar to the one used in <a class="reference internal" href="#ultype"><span class="std std-ref">UL-type results</span></a>, the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> (or <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>)
 for which the efficiencies correspond to are still called <em>constraint</em>. Furthermore, the same <em>Txnames</em>
-can be used to label each efficiency map (see <a class="reference internal" href="#ulconstraint"><span>UL constraint</span></a>).</p>
-<p>Although efficiency maps are most useful for <a class="reference internal" href="#emtype"><span>EM-type results</span></a>, their concept can also be extended to
-<a class="reference internal" href="#ultype"><span>UL-type results</span></a>. For the latter, the efficiencies for a given element are either 1, if the element
-appears in the <a class="reference internal" href="#ulconstraint"><span>UL constraint</span></a>, or 0, otherwise. Atlhough trivial, this extension
-allows us to treat <a class="reference internal" href="#emtype"><span>EM-type results</span></a> and <a class="reference internal" href="#ultype"><span>UL-type results</span></a> in a very similar fashion (see <a class="reference internal" href="TheoryPredictions.html#theorypredictions"><span>Theory Predictions</span></a>).</p>
+can be used to label each efficiency map (see <a class="reference internal" href="#ulconstraint"><span class="std std-ref">UL constraint</span></a>).</p>
+<p>Although efficiency maps are most useful for <a class="reference internal" href="#emtype"><span class="std std-ref">EM-type results</span></a>, their concept can also be extended to
+<a class="reference internal" href="#ultype"><span class="std std-ref">UL-type results</span></a>. For the latter, the efficiencies for a given element are either 1, if the element
+appears in the <a class="reference internal" href="#ulconstraint"><span class="std std-ref">UL constraint</span></a>, or 0, otherwise. Atlhough trivial, this extension
+allows us to treat <a class="reference internal" href="#emtype"><span class="std std-ref">EM-type results</span></a> and <a class="reference internal" href="#ultype"><span class="std std-ref">UL-type results</span></a> in a very similar fashion (see <a class="reference internal" href="TheoryPredictions.html#theorypredictions"><span class="std std-ref">Theory Predictions</span></a>).</p>
 </div>
 </div>
-<div class="section" id="data-set">
-<span id="dataset"></span><h2>Data Set<a class="headerlink" href="#data-set" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="data-sets">
+<span id="dataset"></span><h2>Data Sets<a class="headerlink" href="#data-sets" title="Permalink to this headline">¶</a></h2>
 <p>Data sets are a way to conveniently group efficiency maps corresponding to the same signal region.
-As discussed in <a class="reference internal" href="#ultype"><span>UL-type results</span></a>, data sets are not necessary for UL-type results, since in this case there is a single &#8216;&#8217;signal region&#8217;&#8216;.
-Nonetheless,  data sets are also present in <a class="reference internal" href="#ultype"><span>UL-type results</span></a> in order to allow for a similar structure for both <a class="reference internal" href="#emtype"><span>EM-type</span></a>
-and <a class="reference internal" href="#ultype"><span>UL-type</span></a> results (see <a class="reference internal" href="#databasescheme"><span>database scheme</span></a>).</p>
-<p>For <a class="reference internal" href="#ultype"><span>UL-type results</span></a> the data set contains the UL maps as well as some basic information, such as the type of <a class="reference internal" href="#expresult"><span>Experimental Result</span></a> (UL).
-On the other hand, for <a class="reference internal" href="#emtype"><span>EM-type results</span></a>, each data set contains the EM maps for the corresponding signal region
+As discussed in <a class="reference internal" href="#ultype"><span class="std std-ref">UL-type results</span></a>, data sets are not necessary for UL-type results, since in this case there is a single &#8216;&#8217;signal region&#8217;&#8216;.
+Nonetheless,  data sets are also present in <a class="reference internal" href="#ultype"><span class="std std-ref">UL-type results</span></a> in order to allow for a similar structure for both <a class="reference internal" href="#emtype"><span class="std std-ref">EM-type</span></a>
+and <a class="reference internal" href="#ultype"><span class="std std-ref">UL-type</span></a> results (see <a class="reference internal" href="#databasescheme"><span class="std std-ref">database scheme</span></a>).</p>
+<p>For <a class="reference internal" href="#ultype"><span class="std std-ref">UL-type results</span></a> the data set contains the UL maps as well as some basic information, such as the type of <a class="reference internal" href="#expresult"><span class="std std-ref">Experimental Result</span></a> (UL).
+On the other hand, for <a class="reference internal" href="#emtype"><span class="std std-ref">EM-type results</span></a>, each data set contains the EM maps for the corresponding signal region
 as well as some additional information: the observed and expected number of events in the signal region, the signal upper
 limit, etc.</p>
 <ul class="simple">
-<li><strong>Data Sets are described by the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.datasetObject.DataSet">DataSet Class</a></li>
+<li><strong>Data Sets are described by the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.datasetObj.DataSet">DataSet Class</a></li>
 </ul>
-<p><em>More details about the database folder structure and object struture can be found in</em> <a class="reference internal" href="DatabaseStructure.html#databasestruct"><span>Database of Experimental Results</span></a>.</p>
+<p><em>More details about the database folder structure and object struture can be found in</em> <a class="reference internal" href="DatabaseStructure.html#databasestruct"><span class="std std-ref">Database of Experimental Results</span></a>.</p>
 <table class="docutils footnote" frame="void" id="id3" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label"><a class="fn-backref" href="#id1">[*]</a></td><td>The name <em>Data Set</em> is used instead of signal region because it is concept is slightly more general than the latter. For instance,
-in the case of <a class="reference internal" href="#ultype"><span>UL-type results</span></a> a <a class="reference internal" href="#dataset"><span>Data Set</span></a> may not correspond to a single signal region, but to a combination of signal regions.</td></tr>
+in the case of <a class="reference internal" href="#ultype"><span class="std std-ref">UL-type results</span></a> a <a class="reference internal" href="#dataset"><span class="std std-ref">Data Set</span></a> may not correspond to a single signal region, but to a combination of signal regions.</td></tr>
 </tbody>
 </table>
 </div>

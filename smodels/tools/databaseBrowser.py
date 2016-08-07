@@ -141,6 +141,7 @@ class Browser(object):
         Get an upper limit for the given experimental id, the txname, and the massarray.
         Can only be used for UL experimental results. 
         Interpolation is done, if necessary.
+        
         :param expid: experimental id (string)
         :param txname: txname (string). ONLY required for upper limit results
         :param massarray: list of masses with units, e.g.
