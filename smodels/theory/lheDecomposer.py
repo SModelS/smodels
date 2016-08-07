@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: theory.lheDecomposer
+.. module:: lheDecomposer
    :synopsis: Decomposition of LHE events and creation of TopologyLists.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>

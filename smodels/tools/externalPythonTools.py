@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: tools.externalPythonTools
+.. module:: externalPythonTools
    :synopsis: This module is to check the installation of python tools, 
               i.e. unum, scipy, numpy.
 

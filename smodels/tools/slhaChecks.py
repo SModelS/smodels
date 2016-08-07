@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: tools.slhaChecks
+.. module:: slhaChecks
    :synopsis: Check SLHA file for integrity.
 
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>

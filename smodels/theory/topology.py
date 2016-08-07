@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: theory.topology
+.. module:: topology
    :synopsis: Provides a Topology class and a TopologyList collection type.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -255,7 +255,8 @@ class TopologyList(object):
     def index(self,topo):
         """
         Uses bisect to find the index where of topo in the list.
-        If topo does not appear in the list, returns None
+        If topo does not appear in the list, returns None.
+        
         :param topo: Topology object
         :return: position of topo in the list. If topo does not    
                 appear in the list, return None.

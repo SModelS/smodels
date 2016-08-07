@@ -42,6 +42,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -123,20 +124,24 @@
 
 
 
+
+
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-          <li><a href="Structure.html">SModelS Structure</a> &raquo;</li>
+        <li><a href="Structure.html">SModelS Structure</a> &raquo;</li>
       
     <li>Confronting Predictions with Experimental Limits</li>
-      <li class="wy-breadcrumbs-aside">
-        
+    <li class="wy-breadcrumbs-aside">
+      
           
-            <a href="_sources/ConfrontPredictions.txt" rel="nofollow"> View page source</a>
-          
+          <a href="_sources/ConfrontPredictions.txt" rel="nofollow"> View page source</a>
         
-      </li>
+      
+    </li>
   </ul>
   <hr/>
 </div>
@@ -145,31 +150,31 @@
             
   <span class="target" id="index-0"></span><div class="section" id="confronting-predictions-with-experimental-limits">
 <span id="confrontpredictions"></span><h1>Confronting Predictions with Experimental Limits<a class="headerlink" href="#confronting-predictions-with-experimental-limits" title="Permalink to this headline">¶</a></h1>
-<p>Once the relevant signal cross-sections (or <a class="reference internal" href="TheoryPredictions.html#theorypredictions"><span>theory predictions</span></a>) have been computed
+<p>Once the relevant signal cross-sections (or <a class="reference internal" href="TheoryPredictions.html#theorypredictions"><span class="std std-ref">theory predictions</span></a>) have been computed
 for the input model, these must be compared to the respective upper limits.
-The upper limits for the signal are stored in the SModelS <a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a>
-and depend on the type of <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a>: <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type</span></a> or <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type</span></a>.</p>
-<p>In the case of a <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type result</span></a>, the theory predictions typically consist of a list of signal
+The upper limits for the signal are stored in the SModelS <a class="reference internal" href="DatabaseDefinitions.html#database"><span class="std std-ref">Database</span></a>
+and depend on the type of <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Result</span></a>: <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type</span></a> or <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type</span></a>.</p>
+<p>In the case of a <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type result</span></a>, the theory predictions typically consist of a list of signal
 cross-sections (one for each cluster) for
-the single <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a> (see <a class="reference internal" href="TheoryPredictions.html#thepredul"><span>Theory  Predictions for Upper Limit Results</span></a> for more details).
+the single <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a> (see <a class="reference internal" href="TheoryPredictions.html#thepredul"><span class="std std-ref">Theory  Predictions for Upper Limit Results</span></a> for more details).
 Each theory prediction must then be compared to its
 corresponding upper limit.  This limit is simply the cross-section upper limit provided by
-the experimental publication or conference note and is extracted from the corresponding UL map (see <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type results</span></a>).</p>
-<p>For <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a> there is a single cluster for each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>, and hence a single signal cross-section
+the experimental publication or conference note and is extracted from the corresponding UL map (see <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type results</span></a>).</p>
+<p>For <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type results</span></a> there is a single cluster for each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>, and hence a single signal cross-section
 value. This value must be compared to the upper limit for the corresponding signal region.
-This upper limit is easily computed using the number of observed and expected events for the <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>
-and their uncertainties and is typically stored in the <a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a>.
-Since most <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a> have several signal regions (<a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Sets</span></a>), there will be one theory prediction/upper limit
-for each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>. By default SModelS keeps only the best <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>, which is the one which maximizes
+This upper limit is easily computed using the number of observed and expected events for the <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>
+and their uncertainties and is typically stored in the <a class="reference internal" href="DatabaseDefinitions.html#database"><span class="std std-ref">Database</span></a>.
+Since most <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type results</span></a> have several signal regions (<a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Sets</span></a>), there will be one theory prediction/upper limit
+for each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>. By default SModelS keeps only the best <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>, which is the one which maximizes
 the ratio <span class="math">\(\mbox{(expected signal)}/\mbox{(expected background)}\)</span>.
-Thus each <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type result</span></a> will have a single theory prediction/upper limit, corresponding  to the best <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>.
-If the user wants to have access to all the <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>data sets</span></a>, the default
+Thus each <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type result</span></a> will have a single theory prediction/upper limit, corresponding  to the best <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>.
+If the user wants to have access to all the <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">data sets</span></a>, the default
 behavior can be disabled using the variable <em>useBestDataset</em>.</p>
-<p>The procedure described above can be applied to all the <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Results</span></a> in the database, resulting
-in a list of theory predictions and upper limits for each <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a>. A model can then be considered
+<p>The procedure described above can be applied to all the <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Results</span></a> in the database, resulting
+in a list of theory predictions and upper limits for each <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Result</span></a>. A model can then be considered
 excluded by the experimental results if, for one or more predictions, we have <em>theory prediction</em> <span class="math">\(&gt;\)</span> <em>upper limit</em> <a class="footnote-reference" href="#id2" id="id1">[*]</a>.</p>
 <ul class="simple">
-<li><strong>The upper limits for a given</strong>  <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type result</span></a> <strong>or</strong> <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type result</span></a> <strong>can be obtained using the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObjects.ExpResult.getUpperLimitFor">getUpperLimitFor  method</a></li>
+<li><strong>The upper limits for a given</strong>  <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type result</span></a> <strong>or</strong> <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type result</span></a> <strong>can be obtained using the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObjects.ExpResult.getUpperLimitFor">getUpperLimitFor  method</a></li>
 </ul>
 <table class="docutils footnote" frame="void" id="id2" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
