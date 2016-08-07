@@ -1,5 +1,5 @@
 """
-.. module:: tools.caching
+.. module:: caching
    :synopsis: The memoize technique, for caching.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>

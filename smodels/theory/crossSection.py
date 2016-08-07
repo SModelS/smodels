@@ -1,5 +1,5 @@
 """
-.. module:: theory.crossSection
+.. module:: crossSection
    :synopsis: Encapsulates the result of the computation of the reference
               cross section.
 

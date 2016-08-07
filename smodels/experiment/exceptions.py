@@ -1,10 +1,9 @@
 """
-.. module:: experiment.exceptions
+.. module:: exceptions
    :synopsis: Contains exceptions for SModelS's experiment package.
 
 .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
-
 
 """
 

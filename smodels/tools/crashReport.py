@@ -1,5 +1,5 @@
 """
-.. module:: tools.crashReport
+.. module:: crashReport
    :synopsis: Facility used in runSModelS.py to create and read SModelS crash report files.
 
 .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>

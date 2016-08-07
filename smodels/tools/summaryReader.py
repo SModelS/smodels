@@ -1,5 +1,5 @@
 """
-.. module:: tools.summaryReader
+.. module:: summaryReader
    :synopsis: Classes to read the summary.txt files.
 
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>

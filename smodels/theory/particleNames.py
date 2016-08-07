@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: theory.particleNames
+.. module:: particleNames
    :synopsis: Provides functions for getting particle names from pdg ids, and
               other helpers.
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: tools.missingTopologies
+.. module:: coverage
    :synopsis: Definitions of classes used to find, format missing topologies
     
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>    
