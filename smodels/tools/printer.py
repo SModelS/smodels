@@ -30,6 +30,7 @@ logger = logging.getLogger(__name__)
 class MPrinter(object):
     """
     Master Printer class to handle the Printers (one printer/output type)
+    
     :ivar printerList: list
     """
     def __init__(self,printerList):
@@ -53,6 +54,7 @@ class MPrinter(object):
     def addObj(self,obj,objOutputLevel=None):
         """
         Adds the object to all its Printers:
+        
         :param obj: An object which can be handled by the Printers.
         """
 
@@ -64,6 +66,7 @@ class MPrinter(object):
         Set the basename for the output files. Each printer will
         use this file name appended of the respective extension 
         (i.e. .py for a python printer, .smodels for a summary printer,...)
+        
         :param filename: Input file name
         """
         
@@ -103,6 +106,7 @@ class BasicPrinter(object):
         """
         Adds object to the Printer. The output level for printing will be set
         to objOutputLevel, if defined.
+        
         :param obj: A object to be printed. Must match one of the types defined in formatObj
         :param outputLevel: Defines object specific output level. If set to None it will use
                             the printer outputLevel value.
@@ -155,6 +159,7 @@ class BasicPrinter(object):
         """
         Method for formatting the output depending on the type of object
         and output.
+        
         :param obj: A object to be printed. Must match one of the types defined in formatObj
         :param outputLevel: Defines object specific output level.
         """
@@ -183,6 +188,7 @@ class TxTPrinter(BasicPrinter):
         """
         Set the basename for the text printer. The output filename will be
         filename.txt.
+        
         :param filename: Base filename
         :param overwrite: If True and the file already exists, it will be removed.
         """        

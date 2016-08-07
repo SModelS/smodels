@@ -1,5 +1,5 @@
 """
-.. module:: theory.element
+.. module:: element
    :synopsis: Module holding the Element class and its methods.
     
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>

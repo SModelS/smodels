@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: tools.externalPythia6
+.. module:: externalPythia6
    :synopsis: Wrapper for pythia6.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>

@@ -4,18 +4,26 @@ tools package
 Submodules
 ----------
 
-tools.BayesianUpperLimit module
--------------------------------
-
-.. automodule:: tools.BayesianUpperLimit
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 tools.asciiGraph module
 -----------------------
 
 .. automodule:: tools.asciiGraph
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tools.caching module
+--------------------
+
+.. automodule:: tools.caching
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tools.coverage module
+---------------------
+
+.. automodule:: tools.coverage
     :members:
     :undoc-members:
     :show-inheritance:
@@ -32,14 +40,6 @@ tools.databaseBrowser module
 ----------------------------
 
 .. automodule:: tools.databaseBrowser
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-tools.exclusion_CLs module
---------------------------
-
-.. automodule:: tools.exclusion_CLs
     :members:
     :undoc-members:
     :show-inheritance:
@@ -92,10 +92,10 @@ tools.lheChecks module
     :undoc-members:
     :show-inheritance:
 
-tools.missingTopologies module
-------------------------------
+tools.likelihood module
+-----------------------
 
-.. automodule:: tools.missingTopologies
+.. automodule:: tools.likelihood
     :members:
     :undoc-members:
     :show-inheritance:
@@ -120,6 +120,14 @@ tools.printer module
 --------------------
 
 .. automodule:: tools.printer
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tools.runtime module
+--------------------
+
+.. automodule:: tools.runtime
     :members:
     :undoc-members:
     :show-inheritance:
@@ -152,6 +160,14 @@ tools.summaryReader module
 --------------------------
 
 .. automodule:: tools.summaryReader
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tools.timeOut module
+--------------------
+
+.. automodule:: tools.timeOut
     :members:
     :undoc-members:
     :show-inheritance:

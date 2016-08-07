@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: theory.slhaDecomposer
+.. module:: slhaDecomposer
    :synopsis: Decomposition of SLHA events and creation of TopologyLists.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>

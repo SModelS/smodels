@@ -22,6 +22,8 @@
 Database Definitions
 ====================
 
+The so-called `experiment module <../../../documentation/build/html/experiment.html#experiment>`_ 
+contains the basic tools necessary for handling the database of experimental results.
 The SModelS database collects experimental results from both ATLAS and CMS, which are
 used to compute the experimental constraints on specific models.
 Starting with version 1.1, the SModelS database includes two types of experimental constraints:
@@ -71,7 +73,7 @@ Each publication or conference note can be included in the database
 as an :ref:`Experimental Result<ExpResult>`. Hence, the database is simply a collection of experimental results. 
 
 
-* **The Database is described by the** `Database Class <../../../documentation/build/html/experiment.html#experiment.databaseObjects.Database>`_
+* **The Database is described by the** `Database Class <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
 
 .. _ExpResult:
 
@@ -83,7 +85,7 @@ such as the corresponding luminosity, center of mass energy, publication referen
 The current version allows for two possible types of experimental results: one containing upper limit maps (|UL|)
 and one containing efficiency maps (|EM|).
 
-* **Experimental Results are described by the** `ExpResult Class <../../../documentation/build/html/experiment.html#experiment.databaseObjects.ExpResult>`_
+* **Experimental Results are described by the** `ExpResult Class <../../../documentation/build/html/experiment.html#experiment.expResultObj.ExpResult>`_
 
 .. _ULtype:
 
@@ -239,8 +241,8 @@ allows us to treat |EMrs| and |ULrs| in a very similar fashion (see :ref:`Theory
 
 .. _DataSet:
 
-Data Set
---------
+Data Sets
+---------
 
 Data sets are a way to conveniently group efficiency maps corresponding to the same signal region.
 As discussed in |ULrs|, data sets are not necessary for UL-type results, since in this case there is a single ''signal region''.
@@ -252,11 +254,27 @@ On the other hand, for |EMrs|, each data set contains the EM maps for the corres
 as well as some additional information: the observed and expected number of events in the signal region, the signal upper
 limit, etc.
 
-* **Data Sets are described by the** `DataSet Class <../../../documentation/build/html/experiment.html#experiment.datasetObject.DataSet>`_
+* **Data Sets are described by the** `DataSet Class <../../../documentation/build/html/experiment.html#experiment.datasetObj.DataSet>`_
 
 
 *More details about the database folder structure and object struture can be found in* :ref:`Database of Experimental Results<databaseStruct>`.
 
+   
+.. .. _TxName:
+..............
+..TxNames
+..-------
+..
+.. Each Upper limit and Efficiency map belonging to a |Dataset| refers to a specific simplified model or sum
+.. of simplified models.
+.. Within SModelS simplified models are represented by :ref:`elements <element>`, which
+.. can be textually represented by nested brackets (see :ref:`bracket notation <notation>`).
+.. However, it is often useful to have a shorter representation for the simplified models (or elements)
+.. corresponding to a UL map or EM.
+.. Since the experimental results refer to a limited number of simplified models, SModelS labels these
+.. following closely the CMS definitions. These labels are  
+ 
 
 .. [*] The name *Data Set* is used instead of signal region because it is concept is slightly more general than the latter. For instance,
-   in the case of |ULrs| a |Dataset| may not correspond to a single signal region, but to a combination of signal regions.    
+   in the case of |ULrs| a |Dataset| may not correspond to a single signal region, but to a combination of signal regions.
+ 

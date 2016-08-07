@@ -1,5 +1,5 @@
 """
-.. module:: theory.clusterTools
+.. module:: clusterTools
    :synopsis: Module holding the ElementCluster class and cluster methods used to combine similar elements according
       to the analysis.
         

@@ -189,3 +189,41 @@ contain only invisible final states:
 and can be easily turned on/off by the flag *doInvisible* in the :ref:`SLHA <slhaDecomp>` or :ref:`LHE <lheDecomp>` decompositions
 
  
+Element Sorting
+---------------
+
+In order to improve the code performance, elements are sorted whenever possible.
+Sorting allows for an easy ordering of the elements belonging to a topology and
+faster element comparison.
+Elements are sorted according to its branches. Branches are compared following
+the following property order:
+
+* Number of vertices
+* Number of final states in each vertex
+* Final state particles (particles belonging to the same vertex are alphabetically sorted)
+* Mass array
+
+As an example, consider the three elements below:
+
+
+.. _elementsorting:
+
+.. image:: images/elSorting.png
+   :height: 280px
+   
+The correct ordering of the above elements is: 
+
+Element 3 < Element 2 < Element 1
+
+
+Element 1 is 'bigger' than the other two since it has a larger number of vertices.
+Elements 2 and 3  are identical, except for their masses. Since the mass array of
+Element 3 is smaller than the one in Element 2, the former is 'smaller' than the latter.
+Finally if all the branch features listed above are identical for both branches, the
+elements being compared are considered to be equal.
+Futhermore, the branches belonging to the same element are also sorted.
+
+* **Element sorting is implemented by the** `sortBranches <../../../documentation/build/html/theory.html#theory.element.Element.sortBranches>`_ **method**
+  
+
+ 
