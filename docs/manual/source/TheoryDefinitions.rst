@@ -15,10 +15,10 @@ Theory Definitions
 
 The so-called `theory module <../../../documentation/build/html/theory.html#theory>`_ contains the basic tools necessary for decomposing the input model
 (either in LHE or SLHA format) into SMS |topologies| and using the output of the decomposition
-to compute the :doc:`theoretical prediction <TheoryPredictions>` for a given :ref:`experimental result <ExpResult>`.
+to compute the :ref:`theoretical prediction <theoryPredictions>` for a given :ref:`experimental result <ExpResult>`.
 
 
-SModelS applicability is currently restricted to models which contain an approximate Z\ :sub:`2` 
+SModelS applicability is currently restricted to models which contain a Z\ :sub:`2` 
 symmetry (R-Parity in SUSY, K-Parity in UED, ...). This is required in order 
 to provide a clear structure for the simplified model topologies appearing
 during the :ref:`decomposition <decomposition>` of the input model.
@@ -41,7 +41,7 @@ A representation of an element is shown below:
 .. _elementscheme:
 
 .. image:: images/elementB.png
-   :width: 60%
+   :width: 30%
    
 An element may also hold information about its corresponding weight (cross-section times branching ratio times efficiency).
 The overall properties of an element is shown in the scheme below:
@@ -49,7 +49,7 @@ The overall properties of an element is shown in the scheme below:
 .. _topscheme:
 
 .. image:: images/topSchemeB.png
-   :width: 60%
+   :width: 35%
 
 Below we describe in detail each of these properties and how they are implemented in SModelS.
 
@@ -60,10 +60,8 @@ Below we describe in detail each of these properties and how they are implemente
 
 Vertices
 ^^^^^^^^
-Each Z\ :sub:`2`-odd state appearing in an |element| ends with a vertex (see :ref:`scheme above <topscheme>`),
-which correspond to the decay of the Z\ :sub:`2`-odd state.
-The only exception is the last Z\ :sub:`2`-odd state appearing in one of the the topology :ref:`branches <branch>`,
-which is usually stable.
+Each Z\ :sub:`2`-odd decay is represented by a vertex containing its final states (one Z\ :sub:`2`-odd
+state and the Z\ :sub:`2`-even particles), as shown in the :ref:`scheme above <topscheme>`.
 
 .. _final states:
 
@@ -103,7 +101,7 @@ state.
 The figure below shows an example of a branch.
 
 .. image:: images/branchTopB.png
-   :width: 40%
+   :width: 25%
 
 The structure of each branch is fully defined by its number of vertices and the number of 
 :ref:`final states` coming out of each vertex. 
@@ -113,7 +111,7 @@ as shown below.
 
 
 .. image:: images/branchElB.png
-   :width: 40%
+   :width: 25%
    
 * **Branches are described by the** `Branch Class <../../../documentation/build/html/theory.html#theory.branch.Branch>`_   
 
@@ -130,7 +128,7 @@ notation. The scheme below shows how to convert between the graphical and bracke
 .. _bracketnotation:
 
 .. image:: images/bracketNotationB.png
-   :height: 280px
+   :width: 50%
 
 The brackets are ordered and nested in the following way.
 The outermost brackets correspond to the :ref:`branches <branch>` of the |element|.
@@ -155,7 +153,7 @@ for each branch, as shown below:
 .. _massnotation:
 
 .. image:: images/massNotationB.png
-   :height: 280px
+   :width: 65%
    
 .. _topology:
 
@@ -173,7 +171,7 @@ branches, number of vertices in each :ref:`branch <branch>` and number of
 As as example consider the following topology:
 
 .. image:: images/globTopB.png
-   :width: 40%
+   :width: 25%
 
 Within SModelS, elements are grouped according to their
 global topology. Hence  topologies represent a list of elements sharing a
