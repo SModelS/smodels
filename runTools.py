@@ -26,7 +26,8 @@ def main():
     xseccomputer.add_argument('-n', '--NLO', action='store_true', help="compute at the NLO level (default is LO)")
     xseccomputer.add_argument('-N', '--NLL', help="compute at the NLO+NLL level (takes precedence over NLO, default is LO)", action='store_true')
     xseccomputer.add_argument('-O', '--LOfromSLHA', help="use LO cross-sections from file to compute the NLO or NLL cross-sections", action='store_true')
-    xseccomputer.add_argument('-f', '--filename', help="SLHA file to compute cross sections for", required=True)
+    xseccomputer.add_argument('-f', '--filename', help="SLHA file to compute cross sections for. "
+            "If a directory is given, compute cross sections for all files in directory.", required=True)
 
     slhachecker = subparsers.add_parser('slhachecker', description="Perform several checks on a SLHA file.")
     slhachecker.add_argument('-xS', '--xsec', help='turn off the check for xsection blocks', action='store_false')
