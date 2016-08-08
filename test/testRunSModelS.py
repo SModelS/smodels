@@ -80,16 +80,15 @@ class RunSModelSTest(unittest.TestCase):
             raise AssertionError ( msg )
 
     def testCrash(self):
+        for f in os.listdir("."):
+            if ".crash" in f: os.remove(f)
+        if os.path.exists("crash_report_parameter"): os.remove("crash_report_parameter")
+        if os.path.exists("crash_report_input"): os.remove("crash_report_input")
         filename = join ( iDir(), "inputFiles/slha/broken.slha" )
         outputfile = self.runMain (filename )
-        ts = 0
-        cf = None
         for f in os.listdir("."):
-            if not ".crash" in f: continue
-            nts = f.replace("smodels-","").replace(".crash","")
-            if int(nts) > ts: cf = f
-        inp, par = crashReport.readCrashReportFile(cf)
-        print inp, par
+            if ".crash" in f: break
+        inp, par = crashReport.readCrashReportFile(f)
         self.assertEquals(open(filename).readlines(), open(inp).readlines())
         self.assertEquals(open("testParameters.ini").readlines(), open(par).readlines())
 
