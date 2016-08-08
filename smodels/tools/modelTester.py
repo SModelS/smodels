@@ -259,6 +259,15 @@ def testPoints ( fileList, inDir, outputDir, parser, databaseVersion,
     log.info ( "all children terminated" )
 
 def loadDatabase(parser, db, verbosity):
+    """
+    Load database
+    
+    :parameter parser: ConfigParser with path to database
+    :parameter db: binary database object
+    :parameter verbosity: Verbosity when loading database
+    :returns: database object, database version
+        
+    """
     try:
         databasePath = parser.get("path", "databasePath")
         database = db
@@ -274,6 +283,15 @@ def loadDatabase(parser, db, verbosity):
     return database, databaseVersion
 
 def loadDatabaseResults(parser, database, stdoutPrinter):
+    """
+    Load database entries specified in parser
+    
+    :parameter parser: ConfigParser, containing analysis and txnames selection
+    :parameter database: Database object
+    :parameter stdoutPrinter: Printer object for expResult printout
+    :returns: List of experimental results
+        
+    """
     """ In case that a list of analyses or txnames are given, retrieve list """
     analyses = parser.get("database", "analyses").split(",")
     txnames = parser.get("database", "txnames").split(",")
@@ -299,6 +317,13 @@ def loadDatabaseResults(parser, database, stdoutPrinter):
     return ret
 
 def getParameters(parameterFile):
+    """
+    Read parameter file, exit in case of errors
+    
+    :parameter parameterFile: Path to parameter File
+    :returns: ConfigParser read from parameterFile
+        
+    """
     parser = SafeConfigParser()
     ret=parser.read(parameterFile)
     if ret == []:
@@ -307,6 +332,13 @@ def getParameters(parameterFile):
     return parser
 
 def getAllInputFiles(inFile):
+    """
+    Given inFile, return list of all input files
+    
+    :parameter inFile: Path to input file or directory containing input files
+    :returns: List of all input files
+        
+    """
     if os.path.isdir(inFile):
         fileList = os.listdir(inFile)
     else: fileList = [inFile]
