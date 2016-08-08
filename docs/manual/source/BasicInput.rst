@@ -61,7 +61,7 @@ The following SLHA format for each cross-section block is assumed (see the `Les 
 .. _xsecblock:
 
 .. image:: images/xsecBlock.png
-   :height: 280px 
+   :width: 100% 
 
 The above example shows the cross-section for :math:`pp \rightarrow \tilde{\tau}_1^- + \tilde{\nu}_{\tau}`
 at a center-of-mass energy of 8 TeV and at leading order.

@@ -4,7 +4,7 @@
               reference cross sections and related functions.
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
-.. autofunction:: _getElementsFrom        
+.. autofunction:: _getElementsFrom    
 """
 
 from smodels.theory import clusterTools, crossSection, element
@@ -42,8 +42,7 @@ class TheoryPrediction(object):
         """
         Returns the maximum value from the list conditions
         
-        :returns: maximum condition value (float)
-        
+        :returns: maximum condition value (float)        
         """
 
         if not self.conditions: return 0.        
@@ -60,9 +59,9 @@ class TheoryPredictionList(object):
     An instance of this class represents a collection of theory prediction
     objects.
     
-    :ivar _theoryPredictions: list of TheoryPrediction objects   
-     
+    :ivar _theoryPredictions: list of TheoryPrediction objects     
     """
+    
     def __init__(self, theoryPredictions=None):
         """
         Initializes the list.
@@ -136,6 +135,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2, useBestDataset=
 def _getBestResults(dataSetResults):
     """
     Returns the best result according to the expected upper limit
+    
     :param dataSetResults: list of TheoryPredictionList objects
     :return: best result (TheoryPredictionList object)
     """
@@ -183,7 +183,8 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
     :parameter smsTopList: list of topologies containing elements (TopologyList object)
     :parameter maxMassDist: maximum mass distance for clustering elements (float)
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction objects
-    """     
+    """
+    
     predictionList = TheoryPredictionList()
     # Select elements belonging to expResult and apply efficiencies
     elements = _getElementsFrom(smsTopList, dataset)
@@ -266,8 +267,7 @@ def _combineElements(elements, dataset, maxDist):
     
     :parameter elements: list of elements (Element objects)
     :parameter expResult: Data Set to be considered (DataSet object)
-    :returns: list of element clusters (ElementCluster objects)
-    
+    :returns: list of element clusters (ElementCluster objects)    
     """
     
     clusters = []   
