@@ -98,7 +98,6 @@ if __name__ == "__main__":
     if args.force_txt: db=True
     
     if args.run_crashreport: 
-        # FIXME overall crash report for the loop (before reading any input file)
         args.filename, args.parameterFile = crashReport.readCrashReportFile(
                 args.filename)
         main ( args.filename, args.parameterFile, args.outputDir, args.verbose,

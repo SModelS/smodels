@@ -15,7 +15,7 @@ import os
 import glob
 from os.path import join, basename
 from smodels.installation import installDirectory as iDir
-from smodels.tools import summaryReader
+from smodels.tools import summaryReader, crashReport
 from smodels.tools.timeOut import NoTime
 from runSModelS import main
 
@@ -78,6 +78,20 @@ class RunSModelSTest(unittest.TestCase):
         except AssertionError,e:
             msg = "%s != %s" % ( sample, outputfile )
             raise AssertionError ( msg )
+
+    def testCrash(self):
+        filename = join ( iDir(), "inputFiles/slha/broken.slha" )
+        outputfile = self.runMain (filename )
+        ts = 0
+        cf = None
+        for f in os.listdir("."):
+            if not ".crash" in f: continue
+            nts = f.replace("smodels-","").replace(".crash","")
+            if int(nts) > ts: cf = f
+        inp, par = crashReport.readCrashReportFile(cf)
+        print inp, par
+        self.assertEquals(open(filename).readlines(), open(inp).readlines())
+        self.assertEquals(open("testParameters.ini").readlines(), open(par).readlines())
 
 if __name__ == "__main__":
     unittest.main()
