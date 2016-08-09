@@ -22,7 +22,8 @@ logger.setLevel(level=logging.ERROR)
 
 
 class DataSet(object):
-    """Holds the information to a data set folder (TxName objects, dataInfo,...)
+    """
+    Holds the information to a data set folder (TxName objects, dataInfo,...)
     """
         
     def __init__(self, path=None, info=None, createInfo=True):
@@ -118,9 +119,9 @@ class DataSet(object):
     
     def getSRUpperLimit(self,alpha = 0.05, expected = False, compute = False ):
         """
-        Computes the 95% upper limit on the signal*efficiency for a given
-        dataset (signal region)
+        Computes the 95% upper limit on the signal*efficiency for a given dataset (signal region). 
         Only to be used for efficiency map type results.
+        
         :param alpha: Can be used to change the C.L. value. The default value is 0.05 (= 95% C.L.)
         :param expected: Compute expected limit ( i.e. Nobserved = NexpectedBG )
         :param compute: If True, the upper limit will be computed

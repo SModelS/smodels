@@ -11,7 +11,7 @@
 
 import sys
 sys.path.insert(0,"../")
-from smodels.tools import xsecComputer
+from smodels.tools import xsecComputer, toolBox
 from smodels.tools.xsecComputer import LO, NLL
 from smodels.tools.physicsUnits import TeV, fb
 import unittest
@@ -22,6 +22,8 @@ class XSecTest(unittest.TestCase):
     # use different logging config for the unit tests.
     logging.config.fileConfig( "./logging.conf" )
     logger = logging.getLogger(__name__)
+
+    toolBox.ToolBox().compile() ## make sure the tools are compiled
 
     def testLOGlu(self):
         """ test the computation of LO cross section """

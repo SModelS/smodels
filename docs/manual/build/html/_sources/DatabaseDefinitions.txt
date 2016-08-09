@@ -22,6 +22,8 @@
 Database Definitions
 ====================
 
+The so-called `experiment module <../../../documentation/build/html/experiment.html#experiment>`_ 
+contains the basic tools necessary for handling the database of experimental results.
 The SModelS database collects experimental results from both ATLAS and CMS, which are
 used to compute the experimental constraints on specific models.
 Starting with version 1.1, the SModelS database includes two types of experimental constraints:
@@ -51,16 +53,16 @@ Therefore, for both |UL| and |EM| constraints, the database obeys the following 
             * Efficiency map: contains the efficiencies for |EMrs|. Each map refers to a single 
               simplified model (or more precisely to a single |element| or sum of |elements|).
 
-A summary of the above structure can be seen below. More details about the database folder structure and
-object struture can be found in :ref:`Database of Experimental Results<databaseStruct>`.
+A summary of the above structure can be seen below:
 
 .. _databaseScheme:
 
 .. image:: images/databaseScheme.png
-   :height: 280px
+   :width: 85%
 
 
 In the following sections we describe in detail the main concepts and elements which constitute the SModelS database.
+More details about the database folder structure and object struture can be found in :ref:`Database of Experimental Results<databaseStruct>`.
 
 .. _Database:
 
@@ -71,7 +73,7 @@ Each publication or conference note can be included in the database
 as an :ref:`Experimental Result<ExpResult>`. Hence, the database is simply a collection of experimental results. 
 
 
-* **The Database is described by the** `Database Class <../../../documentation/build/html/experiment.html#experiment.databaseObjects.Database>`_
+* **The Database is described by the** `Database Class <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
 
 .. _ExpResult:
 
@@ -83,7 +85,7 @@ such as the corresponding luminosity, center of mass energy, publication referen
 The current version allows for two possible types of experimental results: one containing upper limit maps (|UL|)
 and one containing efficiency maps (|EM|).
 
-* **Experimental Results are described by the** `ExpResult Class <../../../documentation/build/html/experiment.html#experiment.databaseObjects.ExpResult>`_
+* **Experimental Results are described by the** `ExpResult Class <../../../documentation/build/html/experiment.html#experiment.expResultObj.ExpResult>`_
 
 .. _ULtype:
 
@@ -102,7 +104,7 @@ or more UL maps. An example of a UL map is shown below:
 .. _ULplot:
 
 .. image:: images/ULexample.png
-   :height: 480px
+   :width: 60%
 
 Within SModelS the above UL map is used to constrain the
 :ref:`element<element>` :math:`[[[jet]],[[jet]]]`, where we are using the
@@ -127,7 +129,7 @@ As an example, consider the `ATLAS analysis <https://atlas.web.cern.ch/Atlas/GRO
 .. _constraintplot:
 
 .. image:: images/constraintExample.png
-   :height: 580px
+   :width: 80%
 
 As we can see, the upper limits apply to the sum of the cross-sections:
 
@@ -143,14 +145,7 @@ where it is understood that the sum is over the weights of the respective |eleme
 and not over the |elements| themselves.    
 
 Note that the sum can be over particle charges, flavors or more complex combinations of elements.
-However, almost all analyses sum only over elements sharing a common  |topology|.
-
-Since using the :ref:`bracket notation<notation>` the constraints can be rather lenghty, 
-it is useful to define a shorthand notation for the constraints. SModelS
-adopts a notation based on the CMS SMS conventions, where each specific :ref:`constraint <ULconstraint>` is
-labeled as *T<constraint name>*, which we refer as *TxName*. For instance, the TxName corresponding to 
-the constraint in the :ref:`example above <constraintplot>` is *TSlepSlep*.
-A complete list of TxNames can be found `here <http://smodels.hephy.at/wiki/SmsDictionary>`_. 
+However, almost all analyses sum only over elements sharing a common global |topology|.
 
 Finally, in some cases the UL constraint assumes specific constributions from each |element|.
 For instance, in the :ref:`example above <constraintplot>` it is implicitly assumed that
@@ -188,7 +183,8 @@ above, it might be reasonable to impose instead:
 .. math::
     [[[e^+]],[[e^-]]] \simeq [[[\mu^+]],[[\mu^-]]]           \;\;\; \mbox{(fuzzy condition)}
 
-The *departure* from the exact condition can then be properly quantified and one can decide whether the analysis upper limits are applicable or not to the model being considered.
+The *departure* from the exact condition can then be properly quantified and one can decide whether the analysis 
+upper limits are applicable or not to the model being considered.
 Concretely, for each condition a number between 0 and 1 is returned, 
 where 0 means the condition is exactly satisfied and 1 means it is maximally violated.
 Allowing for a :math:`20\%` violation of a condition corresponds approximately to 
@@ -213,34 +209,34 @@ stored in a EM-type result.
 
 Another important difference between |ULrs| and |EMrs| is the existence of several signal regions, which in SModelS
 are mapped to |Datasets|.  While |ULrs| contain a single |Dataset| (''signal region''), EM results hold several |Datasets|,
-one for each signal region (see the :ref:`Database Scheme<databaseScheme>` above).
+one for each signal region (see the :ref:`database scheme<databaseScheme>` above).
 Each |Dataset| contains one or more efficiency maps, one for each |element| or sum of |elements|. 
 The efficiency map is usually a function of the BSM masses appearing in the element, as shown by the example below:
 
 .. _EMplot:
 
 .. image:: images/EMexample.png
-   :height: 480px
+   :width: 60%
 
 Within SModelS the above EM map is used to compute the efficiency for the
 :ref:`element<element>` :math:`[[[jet]],[[jet]]]`, where we are using the
 notation defined in :ref:`Bracket Notation <notation>`.
 Usually there are several EM maps for a single |dataset|: one for each |element|
 or sum of  |elements|. In order to use a language similar to the one used in |ULrs|, the |element| (or |elements|)
-for which the efficiencies correspond to are still called *constraint*. Furthermore, the same *Txnames*
-can be used to label each efficiency map (see :ref:`UL constraint<ULconstraint>`).
+for which the efficiencies correspond to are still called *constraint*.
 
 
-Although efficiency maps are most useful for |EMrs|, their concept can also be extended to
+Although efficiencis are most useful for |EMrs|, their concept can also be extended to
 |ULrs|. For the latter, the efficiencies for a given element are either 1, if the element
 appears in the :ref:`UL constraint <ULconstraint>`, or 0, otherwise. Atlhough trivial, this extension
-allows us to treat |EMrs| and |ULrs| in a very similar fashion (see :ref:`Theory Predictions <theoryPredictions>`).
+allows us to treat |EMrs| and |ULrs| in a very similar fashion 
+(see :ref:`Theory Predictions <theoryPredictions>` for more details).
 
 
 .. _DataSet:
 
-Data Set
---------
+Data Sets
+---------
 
 Data sets are a way to conveniently group efficiency maps corresponding to the same signal region.
 As discussed in |ULrs|, data sets are not necessary for UL-type results, since in this case there is a single ''signal region''.
@@ -251,12 +247,35 @@ For |ULrs| the data set contains the UL maps as well as some basic information, 
 On the other hand, for |EMrs|, each data set contains the EM maps for the corresponding signal region
 as well as some additional information: the observed and expected number of events in the signal region, the signal upper
 limit, etc.
+In the folder structure shown in :ref:`database scheme <databaseScheme>`, the upper limit maps and efficiency maps
+for each |element| (or sum of |elements|) are stored in files labeled accoring to the :ref:`TxName convention <TxName>`.
 
-* **Data Sets are described by the** `DataSet Class <../../../documentation/build/html/experiment.html#experiment.datasetObject.DataSet>`_
+* **Data Sets are described by the** `DataSet Class <../../../documentation/build/html/experiment.html#experiment.datasetObj.DataSet>`_
 
 
-*More details about the database folder structure and object struture can be found in* :ref:`Database of Experimental Results<databaseStruct>`.
+   
+.. _TxName:
 
+TxName Convention
+-----------------
+
+
+Since using the :ref:`bracket notation<notation>` 
+to describe the simplified models appearing in the
+upper limit or efficiency maps can be rather lenghty, it is useful to define a shorthand notation for
+the :ref:`constraints <ULconstraint>`. SModelS adopts a notation based on 
+the CMS SMS conventions, where each specific :ref:`constraint <ULconstraint>` is
+labeled as *T<constraint name>*, which we refer as *TxName*. For instance, the TxName corresponding to 
+the constraint in the :ref:`example above <constraintplot>` is *TSlepSlep*.
+A complete list of TxNames can be found `here <http://smodels.hephy.at/wiki/SmsDictionary>`_.
+
+
+* **Upper limit and efficiency maps are described by the** `TxName Class <../../../documentation/build/html/experiment.html#experiment.txnameObj.TxName>`_
+
+ 
+*More details about the database folder structure and object
+struture can be found in* :ref:`Database of Experimental Results<databaseStruct>`. 
 
 .. [*] The name *Data Set* is used instead of signal region because it is concept is slightly more general than the latter. For instance,
-   in the case of |ULrs| a |Dataset| may not correspond to a single signal region, but to a combination of signal regions.    
+   in the case of |ULrs|, a |Dataset| may not correspond to a single signal region, but to a combination of signal regions.
+ 

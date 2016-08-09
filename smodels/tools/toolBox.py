@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: tools.toolBox
+.. module:: toolBox
    :synopsis: Contains a singleton-like class that keeps track of all external
       "HEP" tools, such as pythia, nllfast, etc. 
       Used primarily for installation and deployment.
@@ -110,8 +110,9 @@ class ToolBox(object):
                 instance.compile()
         if make and hasMade:
             ret += "Check again:\n"
-            ret += self.checkInstallation(self, colors, make=False)
-        # # logger.info(ret)
+            r = self.checkInstallation(self, colors, printit=False ) 
+            ret += str(r)
+            return r
         if printit:
             print (ret)
         return allOk

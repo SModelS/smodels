@@ -1,5 +1,5 @@
 """
-.. module:: tools.uniqueLogFilter
+.. module:: uniqueLogFilter
    :synopsis: Contains a stolen code snippet for a logging filter to
        have identical log messages appear only once.
 
