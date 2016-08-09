@@ -3,7 +3,7 @@
 """
 .. module:: runtime
     :synopsis: Tools to gather info about runtime enviroment,
-               currentl contains only the number of CPUs
+               currently contains only the number of CPUs
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
