@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: tools.asciiGraph
+.. module:: asciiGraph
    :synopsis: Contains a simple routine to draw ASCII-art Feynman-like graphs.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>

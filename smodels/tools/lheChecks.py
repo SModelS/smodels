@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: tools.lheChecks
+.. module:: lheChecks
    :synopsis: Check LHE file format.
 
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>

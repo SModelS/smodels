@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: tools.ioObjects
+.. module:: ioObjects
    :synopsis: Definitions of input/output parameters which are read from parameter.in.
     
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>    
@@ -116,8 +116,7 @@ class OutputStatus(object):
     :ivar outputfile: path to outputfile
     
     """
-    def __init__( self, status, inputFile, parameters, databaseVersion, 
-                  outputfile=None):
+    def __init__( self, status, inputFile, parameters, databaseVersion):
         """
         Initialize output. If one of the checks failed, exit.
         
@@ -132,8 +131,6 @@ class OutputStatus(object):
         except:
             self.smodelsVersion = None
 
-
-        self.outputfile = outputfile
         self.inputfile = inputFile.replace("//","/")
         self.parameters = parameters
         self.filestatus = status[0]
@@ -151,27 +148,6 @@ class OutputStatus(object):
             self.status = -4
         if self.filestatus < 0:
             self.status = -2
-        self.checkStatus()
-
-    def checkStatus(self):
-        """
-        Printout negative status.
-        
-        """
-        if self.status < 0:
-            # self.printout("stdout")
-            from smodels.tools import printer
-            tprinter = printer.TxTPrinter()
-            tprinter.output = 'stdout' 
-            tprinter.addObj ( self )
-            tprinter.close()
-            # self.printout("file", self.outputfile)
-            sprinter = printer.SummaryPrinter()
-            sprinter.output = 'file'
-            sprinter.filename = self.outputfile
-            sprinter.addObj ( self )
-            sprinter.close()
-        return self.status
 
 
     def updateStatus(self, status):
@@ -182,7 +158,6 @@ class OutputStatus(object):
         
         """
         self.status = status
-        return self.checkStatus()
 
     def updateSLHAStatus(self, status):
         """

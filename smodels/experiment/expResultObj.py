@@ -1,5 +1,5 @@
 """
-.. module:: experiment.expResult
+.. module:: expResultObj
    :synopsis: Contains class that encapsulates an experimental result
 
 .. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>

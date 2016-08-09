@@ -1,5 +1,5 @@
 """
-.. module:: theory.auxiliaryFunctions
+.. module:: auxiliaryFunctions
    :synopsis: A collection of functions used to evaluate fuzzy the conditions.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>

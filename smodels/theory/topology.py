@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: theory.topology
+.. module:: topology
    :synopsis: Provides a Topology class and a TopologyList collection type.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -48,7 +48,7 @@ class Topology(object):
     def __str__(self):
         """
         Return string with numbers of particles per vertex, e.g.
-        [1,0],[2,1,0]
+        [1],[2,1]
         
         :returns: string with number of final states in each branch
         """
@@ -201,7 +201,6 @@ class TopologyList(object):
         Add topologies sequentially, if provided.
         """
 
-        super(TopologyList, self).__init__()
         self.topos = []
         for topo in topologies:
             self.add(topo)
@@ -256,7 +255,8 @@ class TopologyList(object):
     def index(self,topo):
         """
         Uses bisect to find the index where of topo in the list.
-        If topo does not appear in the list, returns None
+        If topo does not appear in the list, returns None.
+        
         :param topo: Topology object
         :return: position of topo in the list. If topo does not    
                 appear in the list, return None.

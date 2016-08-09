@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: theory.slhaDecomposer
+.. module:: slhaDecomposer
    :synopsis: Decomposition of SLHA events and creation of TopologyLists.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -140,7 +140,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
                                                                   minmassgap)
 
                 for el in allElements:
-                    el.sortBranches()  #Make sure elements are sorted BEFORE adding them                    
+                    el.sortBranches()  #Make sure elements are sorted BEFORE adding them
                     smsTopList.addElement(el)                    
     smsTopList._setElementIds()
 

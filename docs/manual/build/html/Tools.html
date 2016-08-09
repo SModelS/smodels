@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>SModelS Tools &mdash; SModelS 1.0.90 documentation</title>
+  <title>SModelS Tools &mdash; SModelS 1.0.91 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="SModelS 1.0.90 documentation" href="index.html"/>
+    <link rel="top" title="SModelS 1.0.91 documentation" href="index.html"/>
         <link rel="next" title="Installation and Deployment" href="Installation.html"/>
         <link rel="prev" title="Database of Experimental Results" href="DatabaseStructure.html"/> 
 
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.0.90
+                1.0.91
               </div>
             
           
@@ -147,15 +147,15 @@
 <h1>SModelS Tools<a class="headerlink" href="#smodels-tools" title="Permalink to this headline">¶</a></h1>
 <p>Inside SModelS there are a number of tools that may be convenient for the user:</p>
 <ul class="simple">
-<li>a <a class="reference internal" href="#xseccalc"><span class="std std-ref">cross section calculator</span></a> based on <a class="reference external" href="http://home.thep.lu.se/~torbjorn/Pythia.html">Pythia6</a>  and
+<li>a <a class="reference internal" href="#xseccalc"><span>cross section calculator</span></a> based on <a class="reference external" href="http://home.thep.lu.se/~torbjorn/Pythia.html">Pythia6</a>  and
 <a class="reference external" href="http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast">NLLfast</a>,</li>
-<li><a class="reference internal" href="#filechecks"><span class="std std-ref">SLHA and LHE file checkers</span></a> to check your input files for completeness and sanity,</li>
-<li>a module for identifying <a class="reference internal" href="#misstops"><span class="std std-ref">missing topologies</span></a>.</li>
+<li><a class="reference internal" href="#filechecks"><span>SLHA and LHE file checkers</span></a> to check your input files for completeness and sanity,</li>
+<li>a module for identifying <a class="reference internal" href="#misstops"><span>missing topologies</span></a>.</li>
 </ul>
 <div class="section" id="cross-section-calculator">
 <span id="xseccalc"></span><h2>Cross-Section Calculator<a class="headerlink" href="#cross-section-calculator" title="Permalink to this headline">¶</a></h2>
 <p>This little tool computes LHC production cross-sections for <em>MSSM particles</em>
-and writes them out in <a class="reference internal" href="BasicInput.html#xsecblock"><span class="std std-ref">SLHA convention</span></a>. This can in particular be convenient for adding cross-sections to SLHA input files, see <a class="reference internal" href="BasicInput.html"><span class="doc">Basic Input</span></a>. The calculation is done at LO with <a class="reference external" href="http://home.thep.lu.se/~torbjorn/Pythia.html">Pythia6.4</a> ; K-factors for colored particles are computed with <a class="reference external" href="http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast">NLLfast</a> .</p>
+and writes them out in <a class="reference internal" href="BasicInput.html#xsecblock"><span>SLHA convention</span></a>. This can in particular be convenient for adding cross-sections to SLHA input files, see <a class="reference internal" href="BasicInput.html"><em>Basic Input</em></a>. The calculation is done at LO with <a class="reference external" href="http://home.thep.lu.se/~torbjorn/Pythia.html">Pythia6.4</a> ; K-factors for colored particles are computed with <a class="reference external" href="http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast">NLLfast</a> .</p>
 <p><strong>The usage of the cross-section calculator is:</strong></p>
 <p>runTools.py xseccomputer [-h]  [-h] -f FILENAME [-s SQRTS [SQRTS ...]] [-e NEVENTS] [-p] [-k] [-n] [-N] [-O]</p>
 <dl class="docutils">
@@ -221,12 +221,12 @@ and use NLLfast to compute the NLO or NLO+NLL cross-sections for squarks and glu
 <p>Further Pythia parameters are defined in <a class="reference download internal" href="_downloads/pythia.card" download=""><code class="xref download docutils literal"><span class="pre">etc/pythia.card</span></code></a>.</p>
 <p>A typical
 usage example is:</p>
-<div class="highlight-default"><div class="highlight"><pre><span class="n">runTools</span><span class="o">.</span><span class="n">py</span> <span class="n">xseccomputer</span> <span class="o">-</span><span class="n">s</span> <span class="mi">8</span> <span class="o">-</span><span class="n">e</span> <span class="mi">10000</span> <span class="o">-</span><span class="n">p</span> <span class="o">-</span><span class="n">f</span> <span class="n">compressedSpec</span><span class="o">.</span><span class="n">slha</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>runTools.py xseccomputer -s 8 -e 10000 -p -f compressedSpec.slha
 </pre></div>
 </div>
 <p>which will compute 8 TeV LO cross-sections (at the LHC) for all MSSM processes using 10k MC events.
 If, <em>after</em> the LO cross-sections have been computed, one wants to add the NLO+NLL cross-sections for gluinos and squarks:</p>
-<div class="highlight-default"><div class="highlight"><pre><span class="n">runTools</span><span class="o">.</span><span class="n">py</span> <span class="n">xseccomputer</span> <span class="o">-</span><span class="n">s</span> <span class="mi">8</span> <span class="o">-</span><span class="n">p</span> <span class="o">-</span><span class="n">N</span> <span class="o">-</span><span class="n">O</span> <span class="o">-</span><span class="n">f</span> <span class="n">compressedSpec</span><span class="o">.</span><span class="n">slha</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>runTools.py xseccomputer -s 8 -p -N -O -f compressedSpec.slha
 </pre></div>
 </div>
 <p>The resulting file will then contain LO cross-sections for all MSSM processes and NLO+NLL cross-sections for gluinos and squarks.
@@ -234,7 +234,7 @@ When reading the input file, SModelS will then use only the highest order cross-
 </div>
 <div class="section" id="input-file-checks">
 <span id="filechecks"></span><h2>Input File Checks<a class="headerlink" href="#input-file-checks" title="Permalink to this headline">¶</a></h2>
-<p>As discussed in <a class="reference internal" href="BasicInput.html"><span class="doc">Basic Input</span></a>, SModelS accepts both SLHA and LHE input files. It can be convenient to perform certain sanity checks on these files as described below.</p>
+<p>As discussed in <a class="reference internal" href="BasicInput.html"><em>Basic Input</em></a>, SModelS accepts both SLHA and LHE input files. It can be convenient to perform certain sanity checks on these files as described below.</p>
 <ul class="simple">
 <li><strong>The input file checks are implemented by the</strong> <a class="reference external" href="../../../documentation/build/html/tools.html#tools.ioObjects.FileStatus">FileStatus class</a></li>
 </ul>
@@ -263,7 +263,7 @@ When reading the input file, SModelS will then use only the highest order cross-
 </div></blockquote>
 <p>A typical
 usage example is:</p>
-<div class="highlight-default"><div class="highlight"><pre><span class="n">runTools</span><span class="o">.</span><span class="n">py</span> <span class="n">lhechecker</span> <span class="o">-</span><span class="n">f</span> <span class="n">gluino_squarks</span><span class="o">.</span><span class="n">lhe</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>runTools.py lhechecker -f gluino_squarks.lhe
 </pre></div>
 </div>
 </div>
@@ -273,8 +273,8 @@ usage example is:</p>
 <ul class="simple">
 <li>the file exists and is given in SLHA format,</li>
 <li>the file contains masses and decay branching ratios in standard SLHA format</li>
-<li>the file contains cross-sections according to the <a class="reference internal" href="BasicInput.html#xsecslha"><span class="std std-ref">SLHA format for cross-sections</span></a>,</li>
-<li>the lightest <a class="reference internal" href="TheoryDefinitions.html#odd-states"><span class="std std-ref">Z2-odd state</span></a> (the LSP in supersymmetric models) is neutral,</li>
+<li>the file contains cross-sections according to the <a class="reference internal" href="BasicInput.html#xsecslha"><span>SLHA format for cross-sections</span></a>,</li>
+<li>the lightest <a class="reference internal" href="TheoryDefinitions.html#odd-states"><span>Z2-odd state</span></a> (the LSP in supersymmetric models) is neutral,</li>
 <li>there are no stable charged particles nor displaced vertices (no non-prompt visible decays), as currently all the analyses considered by SModelS require a prompt MET signature.</li>
 </ul>
 <p>In addition, one can ask that</p>
@@ -289,7 +289,7 @@ In order to check that the lightest Z<sub>2</sub>-odd state has zero electric an
 <p>The list of quantum numbers is also required to check for displaced vertices or heavy charged particles.
 The check for long-lived (or stable) particles first verifies if these
 appear in one of the cross-section blocks and their cross-section
-exceeds the minimum cross-section value defined by <a class="reference internal" href="RunningSModelS.html#parameterfile"><span class="std std-ref">sigmacut</span></a> (see  <a class="reference internal" href="Decomposition.html#minweight"><span class="std std-ref">Minimum Decomposition Weight</span></a>).
+exceeds the minimum cross-section value defined by <a class="reference internal" href="RunningSModelS.html#parameterfile"><span>sigmacut</span></a> (see  <a class="reference internal" href="Decomposition.html#minweight"><span>Minimum Decomposition Weight</span></a>).
 If the cross-section is larger than sigmacut and the particle is stable,
 the checker verifies if it is neutral (both electric and color charges
 are zero). On the other hand, if the particle is unstable, but its lifetime (times <em>c</em>)
@@ -297,7 +297,7 @@ is larger than a minimum value (<em>default = 10 mm</em>), the particle is consi
 as a non-prompt decay.
 For non-prompt decays, all channels are then checked for visible decay products.
 If the branching ratio to visible decays times the maximum production cross-section
-for the particle exceeds <a class="reference internal" href="RunningSModelS.html#parameterfile"><span class="std std-ref">sigmacut</span></a>, the particle&#8217;s decay
+for the particle exceeds <a class="reference internal" href="RunningSModelS.html#parameterfile"><span>sigmacut</span></a>, the particle&#8217;s decay
 is considered as a displaced vertex.</p>
 <p><strong>The usage of the SLHA checker is:</strong></p>
 <p>runTools.py slhachecker [-h] [-xS] [-lsp] [-longlived] [-m DISPLACEMENT] [-s SIGMACUT] [-illegal] -f FILENAME</p>
@@ -358,7 +358,7 @@ visible displaced vertices</td></tr>
 </ul>
 <p>A typical
 usage example is:</p>
-<div class="highlight-default"><div class="highlight"><pre><span class="n">runTools</span><span class="o">.</span><span class="n">py</span> <span class="n">slhachecker</span> <span class="o">-</span><span class="n">m</span> <span class="mf">0.001</span> <span class="o">-</span><span class="n">s</span> <span class="mf">0.01</span> <span class="o">-</span><span class="n">f</span> <span class="n">lightSquarks</span><span class="o">.</span><span class="n">slha</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>runTools.py slhachecker -m 0.001 -s 0.01 -f lightSquarks.slha
 </pre></div>
 </div>
 <p>Running this will print the status flag and a message with potential warnings
@@ -367,20 +367,20 @@ and error messages.</p>
 </div>
 <div class="section" id="missing-topologies">
 <span id="misstops"></span><h2>Missing Topologies<a class="headerlink" href="#missing-topologies" title="Permalink to this headline">¶</a></h2>
-<p>Unlike the <a class="reference internal" href="#filechecks"><span class="std std-ref">file checks</span></a> and the <a class="reference internal" href="#xseccalc"><span class="std std-ref">cross-section calculator</span></a>, the missing topologies tool can be called only <em>after</em> the SMS <a class="reference internal" href="Decomposition.html"><span class="doc">decomposition</span></a> and <a class="reference internal" href="TheoryPredictions.html"><span class="doc">theory predictions</span></a> have been computed.
-Given the <a class="reference internal" href="Decomposition.html"><span class="doc">decomposition</span></a> output (list of <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>), as well as the <span class="xref doc">database</span>
-information, it finds the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> which are
-not tested by any of the <span class="xref std std-ref">analyses</span> in the <span class="xref doc">database</span>.</p>
-<p>To this end, the tool loops over all the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> found in the
-<a class="reference internal" href="Decomposition.html"><span class="doc">decomposition</span></a> and checks if they are tested by one or more <span class="xref std std-ref">analyses</span> in the <span class="xref doc">database</span>.
-If <a class="reference internal" href="Decomposition.html#masscomp"><span class="std std-ref">mass</span></a> or <a class="reference internal" href="Decomposition.html#invcomp"><span class="std std-ref">invisible compression</span></a>
-are turned on, elements which can be <a class="reference internal" href="Decomposition.html#elementcomp"><span class="std std-ref">compressed</span></a> are not considered, to avoid double counting.
-All the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> not appearing in any of the <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span class="std std-ref">constraints</span></a> in the <span class="xref doc">database</span> are then marked
+<p>Unlike the <a class="reference internal" href="#filechecks"><span>file checks</span></a> and the <a class="reference internal" href="#xseccalc"><span>cross-section calculator</span></a>, the missing topologies tool can be called only <em>after</em> the SMS <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> and <a class="reference internal" href="TheoryPredictions.html"><em>theory predictions</em></a> have been computed.
+Given the <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> output (list of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>), as well as the <code class="xref doc docutils literal"><span class="pre">database</span></code>
+information, it finds the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> which are
+not tested by any of the <span class="xref std std-ref">analyses</span> in the <code class="xref doc docutils literal"><span class="pre">database</span></code>.</p>
+<p>To this end, the tool loops over all the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> found in the
+<a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> and checks if they are tested by one or more <span class="xref std std-ref">analyses</span> in the <code class="xref doc docutils literal"><span class="pre">database</span></code>.
+If <a class="reference internal" href="Decomposition.html#masscomp"><span>mass</span></a> or <a class="reference internal" href="Decomposition.html#invcomp"><span>invisible compression</span></a>
+are turned on, elements which can be <a class="reference internal" href="Decomposition.html#elementcomp"><span>compressed</span></a> are not considered, to avoid double counting.
+All the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> not appearing in any of the <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>constraints</span></a> in the <code class="xref doc docutils literal"><span class="pre">database</span></code> are then marked
 as &#8220;missing&#8221;. A missing topology is then characterized
-by a sum over the missing <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> differing only by their
-masses (with the same <a class="reference internal" href="TheoryDefinitions.html#final-states"><span class="std std-ref">final states</span></a>) or electric charges.</p>
-<p>The missing topologies tool is normally called from within SModelS (e.g. when running <a class="reference internal" href="RunningSModelS.html#runsmodels"><span class="std std-ref">runSModelS.py</span></a>) by setting <strong>findMissingTopos=True</strong>
-in the <a class="reference internal" href="RunningSModelS.html#parameterfile"><span class="std std-ref">parameters file</span></a> .
+by a sum over the missing <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> differing only by their
+masses (with the same <a class="reference internal" href="TheoryDefinitions.html#final-states"><span>final states</span></a>) or electric charges.</p>
+<p>The missing topologies tool is normally called from within SModelS (e.g. when running <a class="reference internal" href="RunningSModelS.html#runsmodels"><span>runSModelS.py</span></a>) by setting <strong>findMissingTopos=True</strong>
+in the <a class="reference internal" href="RunningSModelS.html#parameterfile"><span>parameters file</span></a> .
 In the output, the missing topologies are ordered by cross section. By default only the ones with the ten largest cross-sections are shown.</p>
 <ul class="simple">
 <li><strong>The missing topologies tool is implemented by the</strong> <a class="reference external" href="../../../documentation/build/html/tools.html#tools.missingTopologies.MissingTopoList">MissingTopoList class</a></li>
@@ -388,13 +388,13 @@ In the output, the missing topologies are ordered by cross section. By default o
 </div>
 <div class="section" id="database-browser">
 <h2>Database Browser<a class="headerlink" href="#database-browser" title="Permalink to this headline">¶</a></h2>
-<p>In several cases the user might be interested in an easy way to directly access the <a class="reference internal" href="DatabaseDefinitions.html#database"><span class="std std-ref">Database</span></a> of <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Results</span></a>.
-This can be conveniently done using the database browser. The browser owns several methods to select  <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Results</span></a>
-or <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Sets</span></a> satisfying some user-defined conditions as well as to access the meta data and data inside each
-<a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Result</span></a>.</p>
+<p>In several cases the user might be interested in an easy way to directly access the <a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a> of <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Results</span></a>.
+This can be conveniently done using the database browser. The browser owns several methods to select  <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Results</span></a>
+or <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Sets</span></a> satisfying some user-defined conditions as well as to access the meta data and data inside each
+<a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a>.</p>
 <p>Unlike most of the other SModelS tools, the browser can not be directly accessed from the command line.
 However, several python example codes using the functionalities of the browser
-can be found in <a class="reference internal" href="Examples.html#examples"><span class="std std-ref">More Examples</span></a>.
+can be found in <a class="reference internal" href="Examples.html#examples"><span>More Examples</span></a>.
 Below we will quickly describe how to instantiate the browser and use its main functionalities.</p>
 <ul class="simple">
 <li><strong>The Database browser tool is implemented by the</strong>  <a class="reference external" href="../../../documentation/build/html/tools.html#tools.databaseBrowser.Browser">Browser class</a></li>
@@ -443,7 +443,7 @@ Below we will quickly describe how to instantiate the browser and use its main f
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.0.90',
+            VERSION:'1.0.91',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
