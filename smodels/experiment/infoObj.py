@@ -83,7 +83,9 @@ class Info(object):
             setattr(self,tag,value)             
         
     def getInfo(self, infoLabel):
-        """Returns the value of info field.
+        """
+        Returns the value of info field.
+        
         :param infoLabel: label of the info field (string). It must be an attribute
                           of the GlobalInfo object
         """

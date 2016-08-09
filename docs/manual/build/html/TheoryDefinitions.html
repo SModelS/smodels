@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Theory Definitions &mdash; SModelS 1.0.90 documentation</title>
+  <title>Theory Definitions &mdash; SModelS 1.0.91 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="SModelS 1.0.90 documentation" href="index.html"/>
+    <link rel="top" title="SModelS 1.0.91 documentation" href="index.html"/>
         <link rel="up" title="Basic Concepts and Definitions" href="SModelSDefs.html"/>
         <link rel="next" title="Database Definitions" href="DatabaseDefinitions.html"/>
         <link rel="prev" title="Basic Concepts and Definitions" href="SModelSDefs.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0.90
+                1.0.91
               </div>
             
           
@@ -86,13 +86,15 @@
 <li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="SModelSDefs.html">Basic Concepts and Definitions</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="">Theory Definitions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#vertices">Vertices</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#final-states-z2-even">Final States (Z<sub>2</sub>-even)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#intermediate-states-z2-odd">Intermediate States (Z<sub>2</sub>-odd)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#branches">Branches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#elements">Elements</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#vertices">Vertices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#final-states-z2-even">Final States (Z<sub>2</sub>-even)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#intermediate-states-z2-odd">Intermediate States (Z<sub>2</sub>-odd)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#branches">Branches</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#element-representation-bracket-notation">Element Representation: Bracket Notation</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#topologies">Topologies</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#elements">Elements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#bracket-notation">Bracket Notation</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="DatabaseDefinitions.html">Database Definitions</a></li>
@@ -151,23 +153,39 @@
             
   <span class="target" id="index-0"></span><div class="section" id="theory-definitions">
 <span id="theorydefs"></span><h1>Theory Definitions<a class="headerlink" href="#theory-definitions" title="Permalink to this headline">¶</a></h1>
-<p>The so-called theory module contains the basic tools necessary for decomposing the input model
-(either in LHE or SLHA format) into SMS <a class="reference internal" href="#topology"><span class="std std-ref">topologies</span></a> and using the output of the decomposition
-to compute the <a class="reference internal" href="TheoryPredictions.html"><span class="doc">theoretical prediction</span></a> for a given <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">experimental result</span></a>.</p>
-<p>We start by explaining the basic components: vertices, Z<sub>2</sub>-even and Z<sub>2</sub>-odd states shown in the scheme below.
-The construction of a global <a class="reference internal" href="#topology"><span class="std std-ref">topology</span></a> and the <a class="reference internal" href="#bracketnotation"><span class="std std-ref">bracket notation</span></a> used in SModleS are explained further below on this page.</p>
-<a class="reference internal image-reference" href="_images/topScheme.png" id="topscheme"><img alt="_images/topScheme.png" id="topscheme" src="_images/topScheme.png" style="width: 60%;" /></a>
+<p>The so-called <a class="reference external" href="../../../documentation/build/html/theory.html#theory">theory module</a> contains the basic tools necessary for decomposing the input model
+(either in LHE or SLHA format) into SMS <a class="reference internal" href="#topology"><span>topologies</span></a> and using the output of the decomposition
+to compute the <a class="reference internal" href="TheoryPredictions.html#theorypredictions"><span>theoretical prediction</span></a> for a given <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>experimental result</span></a>.</p>
+<p>SModelS applicability is currently restricted to models which contain a Z<sub>2</sub>
+symmetry (R-Parity in SUSY, K-Parity in UED, ...). This is required in order
+to provide a clear structure for the simplified model topologies appearing
+during the <a class="reference internal" href="Decomposition.html#decomposition"><span>decomposition</span></a> of the input model.
+Below we describe the basic concepts and language used in SModelS
+to describe the simplified model topologies.</p>
+<div class="section" id="elements">
+<span id="element"></span><h2>Elements<a class="headerlink" href="#elements" title="Permalink to this headline">¶</a></h2>
+<p>A simplified model topology representing a specific cascade decay of a pair of BSM states produced in
+the hard scattering is called an element in the SModelS language.
+Elements contain the final states (Z<sub>2</sub>-even) particles appearing in
+the cascade decay as well as the masses of the BSM (Z<sub>2</sub>-odd) states
+which have decayed or appear in the last step of the decay.
+A representation of an element is shown below:</p>
+<a class="reference internal image-reference" href="_images/elementB.png" id="elementscheme"><img alt="_images/elementB.png" id="elementscheme" src="_images/elementB.png" style="width: 30%;" /></a>
+<p>An element may also hold information about its corresponding weight (cross-section times branching ratio times efficiency).
+The overall properties of an element is shown in the scheme below:</p>
+<a class="reference internal image-reference" href="_images/topSchemeB.png" id="topscheme"><img alt="_images/topSchemeB.png" id="topscheme" src="_images/topSchemeB.png" style="width: 35%;" /></a>
+<p>Below we describe in detail each of these properties and how they are implemented in SModelS.</p>
+<ul class="simple">
+<li><strong>Elements are described by the</strong> <a class="reference external" href="../../../documentation/build/html/theory.html#theory.element.Element">Element Class</a></li>
+</ul>
 <div class="section" id="vertices">
-<span id="vertex"></span><h2>Vertices<a class="headerlink" href="#vertices" title="Permalink to this headline">¶</a></h2>
-<p>Each Z<sub>2</sub>-odd state appearing in a <a class="reference internal" href="#topology"><span class="std std-ref">topology</span></a> ends with a vertex (see <a class="reference internal" href="#topscheme"><span class="std std-ref">scheme above</span></a>)
-In most cases vertices correspond to the decay of the Z<sub>2</sub>-odd state.
-The only exceptions are topologies ending with a stable Z<sub>2</sub>-odd state.
-In this case the last vertex contains no outgoing <a class="reference internal" href="#final-states"><span class="std std-ref">final states</span></a> and indicates
-the stability of the last Z<sub>2</sub>-odd particle appearing in the <a class="reference internal" href="#branch"><span class="std std-ref">branch</span></a>.</p>
+<span id="vertex"></span><h3>Vertices<a class="headerlink" href="#vertices" title="Permalink to this headline">¶</a></h3>
+<p>Each Z<sub>2</sub>-odd decay is represented by a vertex containing its final states (one Z<sub>2</sub>-odd
+state and the Z<sub>2</sub>-even particles), as shown in the <a class="reference internal" href="#topscheme"><span>scheme above</span></a>.</p>
 </div>
 <div class="section" id="final-states-z2-even">
-<span id="final-states"></span><h2>Final States (Z<sub>2</sub>-even)<a class="headerlink" href="#final-states-z2-even" title="Permalink to this headline">¶</a></h2>
-<p>Final states indicate all Z<sub>2</sub>-even states coming out of a vertex (see <a class="reference internal" href="#topscheme"><span class="std std-ref">scheme above</span></a>).
+<span id="final-states"></span><h3>Final States (Z<sub>2</sub>-even)<a class="headerlink" href="#final-states-z2-even" title="Permalink to this headline">¶</a></h3>
+<p>Final states indicate all Z<sub>2</sub>-even states coming out of a vertex (see <a class="reference internal" href="#topscheme"><span>scheme above</span></a>).
 In most cases, these correspond to Standard Model particles (electrons, gauge bosons, Higgs,...).
 Note that, if the input model contains BSM states which are Z<sub>2</sub>-even (such as additional Higgs bosons),
 these also appear as final states.
@@ -178,93 +196,78 @@ are <em>not</em> classified as final states.</p>
 </ul>
 </div>
 <div class="section" id="intermediate-states-z2-odd">
-<span id="odd-states"></span><h2>Intermediate States (Z<sub>2</sub>-odd)<a class="headerlink" href="#intermediate-states-z2-odd" title="Permalink to this headline">¶</a></h2>
+<span id="odd-states"></span><h3>Intermediate States (Z<sub>2</sub>-odd)<a class="headerlink" href="#intermediate-states-z2-odd" title="Permalink to this headline">¶</a></h3>
 <p>The Z<sub>2</sub>-odd states are always assumed to consist of BSM particles with Z<sub>2</sub>
-conserving decays of the form: (Z<sub>2</sub>-odd state) <span class="math">\(\rightarrow\)</span>  (Z<sub>2</sub>-odd state&#8217;) + Final States.
-The only information kept from the intermediate states are their masses (see <a class="reference internal" href="#topscheme"><span class="std std-ref">scheme above</span></a>).
+conserving decays of the form: (Z<sub>2</sub>-odd state) <span class="math">\(\rightarrow\)</span>  (Z<sub>2</sub>-odd state&#8217;) + <a class="reference internal" href="#final-states"><span>final states</span></a>.
+The only information kept from the intermediate states are their masses (see <a class="reference internal" href="#topscheme"><span>scheme above</span></a>).
 If an intermediate state is stable and neutral, it is considered as a MET signal.</p>
 <ul class="simple">
 <li>Z<sub>2</sub>-odd <strong>states are defined (and can be easily modified) in</strong> <a class="reference download internal" href="_downloads/particles.py" download=""><code class="xref download docutils literal"><span class="pre">particles.py</span></code></a></li>
 </ul>
 </div>
 <div class="section" id="branches">
-<span id="branch"></span><h2>Branches<a class="headerlink" href="#branches" title="Permalink to this headline">¶</a></h2>
-<p>A branch is the basic substructure of a <a class="reference internal" href="#topology"><span class="std std-ref">topology</span></a>.
+<span id="branch"></span><h3>Branches<a class="headerlink" href="#branches" title="Permalink to this headline">¶</a></h3>
+<p>A branch is the basic substructure of an <a class="reference internal" href="#element"><span>element</span></a>.
 It represents a series of cascade decays of a single initial Z<sub>2</sub>-odd
 state.
 The figure below shows an example of a branch.</p>
-<a class="reference internal image-reference" href="_images/branchTop.png"><img alt="_images/branchTop.png" src="_images/branchTop.png" style="width: 40%;" /></a>
-<p>Each branch is fully defined by its number of vertices and the number of
-<a class="reference internal" href="#final-states"><span class="std std-ref">Final States (Z2-even)</span></a> coming out of each vertex. The particle labels for the <a class="reference internal" href="#final-states"><span class="std std-ref">final states</span></a>
-may or may not be specified.
-If the particle labels of the final states are not specified (such as in the figure
-above), the branch belongs to a <a class="reference internal" href="#topology"><span class="std std-ref">global topology</span></a>. However, if it is dressed with its final states
-as in the figure below, the branch belongs to an <a class="reference internal" href="#element"><span class="std std-ref">element</span></a>.</p>
-<a class="reference internal image-reference" href="_images/branchEl.png"><img alt="_images/branchEl.png" src="_images/branchEl.png" style="width: 40%;" /></a>
+<a class="reference internal image-reference" href="_images/branchTopB.png"><img alt="_images/branchTopB.png" src="_images/branchTopB.png" style="width: 25%;" /></a>
+<p>The structure of each branch is fully defined by its number of vertices and the number of
+<a class="reference internal" href="#final-states"><span>Final States (Z2-even)</span></a> coming out of each vertex.
+Furthermore,  the branch also holds the information about the particle labels for the <a class="reference internal" href="#final-states"><span>final states</span></a>
+coming out of each vertex and the masses of the <a class="reference internal" href="#odd-states"><span>intermediate states</span></a>,
+as shown below.</p>
+<a class="reference internal image-reference" href="_images/branchElB.png"><img alt="_images/branchElB.png" src="_images/branchElB.png" style="width: 25%;" /></a>
 <ul class="simple">
 <li><strong>Branches are described by the</strong> <a class="reference external" href="../../../documentation/build/html/theory.html#theory.branch.Branch">Branch Class</a></li>
 </ul>
 </div>
+<div class="section" id="element-representation-bracket-notation">
+<span id="notation"></span><h3>Element Representation: Bracket Notation<a class="headerlink" href="#element-representation-bracket-notation" title="Permalink to this headline">¶</a></h3>
+<p>The structure and final states of <a class="reference internal" href="#element"><span>elements</span></a> are represented in textual form using a nested brackets
+notation. The scheme below shows how to convert between the graphical and bracket representations of an element:</p>
+<a class="reference internal image-reference" href="_images/bracketNotationB.png" id="bracketnotation"><img alt="_images/bracketNotationB.png" id="bracketnotation" src="_images/bracketNotationB.png" style="width: 50%;" /></a>
+<p>The brackets are ordered and nested in the following way.
+The outermost brackets correspond to the <a class="reference internal" href="#branch"><span>branches</span></a> of the <a class="reference internal" href="#element"><span>element</span></a>.
+The branches are sorted according to their size (see <a class="reference internal" href="Decomposition.html#elementsorting"><span>element sorting</span></a>)
+and each branch contains an <em>ordered</em> list of <a class="reference internal" href="#vertex"><span>vertices</span></a>.
+Each vertex contains a list of the <a class="reference internal" href="#final-states"><span>final states</span></a> (sorted alphabetically) coming out of the vertex.
+Schematically, for the example in the <a class="reference internal" href="#bracketnotation"><span>figure above</span></a>, we have:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>element = [branch1, branch2]
+   branch1 = [vertex1]
+      vertex1 = [l+,l-]
+   branch2 = [vertex1,vertex2]
+      vertex1 = [l+]
+      vertex2 = [nu]
+</pre></div>
+</div>
+<p>Using the above scheme it is possible to unambiguously describe each <a class="reference internal" href="#element"><span>element</span></a> with a simple list of nested brackets.
+However, in order to fully specify all the information relative to a single <a class="reference internal" href="#element"><span>element</span></a>, we must
+also include the list of <a class="reference internal" href="#odd-states"><span>intermediate state</span></a> masses and the element weight.
+The <a class="reference internal" href="#odd-states"><span>intermediate state</span></a> masses can also be represented by a mass array
+for each branch, as shown below:</p>
+<a class="reference internal image-reference" href="_images/massNotationB.png" id="massnotation"><img alt="_images/massNotationB.png" id="massnotation" src="_images/massNotationB.png" style="width: 65%;" /></a>
+</div>
+</div>
 <div class="section" id="topologies">
 <span id="topology"></span><h2>Topologies<a class="headerlink" href="#topologies" title="Permalink to this headline">¶</a></h2>
-<p>Topologies describe the basic structure of an <a class="reference internal" href="#element"><span class="std std-ref">element</span></a>.
-Each global topology corresponds to a cascade decay chain <em>without</em>
-the final Z<sub>2</sub>-even states or  Z<sub>2</sub>-odd masses specified.
+<p>It is often useful to classify <a class="reference internal" href="#element"><span>elements</span></a> according to their
+overall structure or global topology.
+Each global topology corresponds to an <em>undressed</em>
+<a class="reference internal" href="#element"><span>element</span></a>, removed of its
+<a class="reference internal" href="#final-states"><span>final states</span></a> and Z<sub>2</sub>-odd masses.
 Therefore the global topology is fully determined by its number of
-branches, number of vertices in each <a class="reference internal" href="#branch"><span class="std std-ref">branch</span></a> and number of
-<a class="reference internal" href="#final-states"><span class="std std-ref">final states</span></a> coming out of each <a class="reference internal" href="#vertex"><span class="std std-ref">vertex</span></a>.
+branches, number of vertices in each <a class="reference internal" href="#branch"><span>branch</span></a> and number of
+<a class="reference internal" href="#final-states"><span>final states</span></a> coming out of each <a class="reference internal" href="#vertex"><span>vertex</span></a>.
 As as example consider the following topology:</p>
-<a class="reference internal image-reference" href="_images/globTop.png"><img alt="_images/globTop.png" src="_images/globTop.png" style="width: 40%;" /></a>
-<p>It contains 2 branches. The first (topmost) <a class="reference internal" href="#branch"><span class="std std-ref">branch</span></a> contains 3 vertices
-with 1 final state each in the first two vertices and zero in the third.
-On the other hand, the second <a class="reference internal" href="#branch"><span class="std std-ref">branch</span></a> contains 2 vertices with two
-<a class="reference internal" href="#final-states"><span class="std std-ref">final states</span></a> coming out of the first vertex and zero coming out of the second.
-<em>Notice that, for topologies ending with stable</em> Z<sub>2</sub> <em>-odd states,
-there are no final states coming out of the last vertex in the branch.</em></p>
-<p>Topologies are also a useful way to group <a class="reference internal" href="#element"><span class="std std-ref">elements</span></a>. In this way,  topologies represent a list of elements sharing a common basic structure (same number of branches, vertices and
+<a class="reference internal image-reference" href="_images/globTopB.png"><img alt="_images/globTopB.png" src="_images/globTopB.png" style="width: 25%;" /></a>
+<p>Within SModelS, elements are grouped according to their
+global topology. Hence  topologies represent a list of elements sharing a
+common basic structure (same number of branches, vertices and
 final states in each vertex).</p>
 <ul class="simple">
 <li><strong>Topologies are described by the</strong> <a class="reference external" href="../../../documentation/build/html/theory.html#theory.topology.Topology">Topology Class</a></li>
 </ul>
-</div>
-<div class="section" id="elements">
-<span id="element"></span><h2>Elements<a class="headerlink" href="#elements" title="Permalink to this headline">¶</a></h2>
-<p>Elements are <em>dressed</em> global topologies, where both the final state (Z<sub>2</sub>-even) particles and the
-BSM (Z<sub>2</sub>-odd) masses appearing in the topology have been defined.
-An element may also hold information about its corresponding weight (cross-section times branching ratio).
-An element is defined by its <a class="reference internal" href="#topology"><span class="std std-ref">global topology</span></a> properties (number of branches, vertices and particles in each vertex)
-plus its <a class="reference internal" href="#final-states"><span class="std std-ref">final states</span></a>, and a mass array containing the ordered Z<sub>2</sub>-odd masses
-appearing in the element.
-Below we show an example of an element and the information it contains.</p>
-<a class="reference internal image-reference" href="_images/element.png" id="elementscheme"><img alt="_images/element.png" id="elementscheme" src="_images/element.png" style="width: 60%;" /></a>
-<ul class="simple">
-<li><strong>Elements are described by the</strong> <a class="reference external" href="../../../documentation/build/html/theory.html#theory.element.Element">Element Class</a></li>
-</ul>
-</div>
-<div class="section" id="bracket-notation">
-<span id="notation"></span><h2>Bracket Notation<a class="headerlink" href="#bracket-notation" title="Permalink to this headline">¶</a></h2>
-<p>The structure and final states of <a class="reference internal" href="#element"><span class="std std-ref">elements</span></a> are represented in textual form using a nested brackets
-notation. The scheme below shows how to convert between the graphical and bracket representations of an element:</p>
-<a class="reference internal image-reference" href="_images/bracketNotation.png" id="bracketnotation"><img alt="_images/bracketNotation.png" id="bracketnotation" src="_images/bracketNotation.png" style="height: 280px;" /></a>
-<p>The brackets are ordered and nested in the following way.
-The outermost brackets correspond to the <a class="reference internal" href="#branch"><span class="std std-ref">branches</span></a> of the <a class="reference internal" href="#element"><span class="std std-ref">element</span></a>.
-The ordering for the branches is arbitrary and each branch contains
-an <em>ordered</em> list of <a class="reference internal" href="#vertex"><span class="std std-ref">vertices</span></a> and each vertex contains an <em>unordered</em> list of the <a class="reference internal" href="#final-states"><span class="std std-ref">final states</span></a>
-coming out of the vertex. Schematically, for the example in the <a class="reference internal" href="#bracketnotation"><span class="std std-ref">figure above</span></a>, we have:</p>
-<div class="highlight-default"><div class="highlight"><pre><span class="n">element</span> <span class="o">=</span> <span class="p">[</span><span class="n">branch1</span><span class="p">,</span> <span class="n">branch2</span><span class="p">]</span>
-   <span class="n">branch1</span> <span class="o">=</span> <span class="p">[</span><span class="n">vertex1</span><span class="p">,</span><span class="n">vertex2</span><span class="p">]</span>
-      <span class="n">vertex1</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="o">+</span><span class="p">]</span>
-      <span class="n">vertex2</span> <span class="o">=</span> <span class="p">[</span><span class="n">nu</span><span class="p">]</span>
-   <span class="n">branch2</span> <span class="o">=</span> <span class="p">[</span><span class="n">vertex1</span><span class="p">]</span>
-      <span class="n">vertex1</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="o">+</span><span class="p">,</span><span class="n">l</span><span class="o">-</span><span class="p">]</span>
-</pre></div>
-</div>
-<p>Using the above scheme it is possible to unambiguously describe each <a class="reference internal" href="#element"><span class="std std-ref">element</span></a> with a simple list of nested brackets.
-However, in order to fully specify all the information relative to a single <a class="reference internal" href="#element"><span class="std std-ref">element</span></a>, we must
-also include the list of <a class="reference internal" href="#odd-states"><span class="std std-ref">intermediate state</span></a> masses and the element weight.
-The <a class="reference internal" href="#odd-states"><span class="std std-ref">intermediate state</span></a> masses can also be represented by a mass array
-for each branch, as shown below:</p>
-<a class="reference internal image-reference" href="_images/massNotation.png" id="massnotation"><img alt="_images/massNotation.png" id="massnotation" src="_images/massNotation.png" style="height: 280px;" /></a>
 </div>
 </div>
 
@@ -309,7 +312,7 @@ for each branch, as shown below:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.0.90',
+            VERSION:'1.0.91',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

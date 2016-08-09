@@ -4,18 +4,18 @@ experiment package
 Submodules
 ----------
 
-experiment.databaseObjects module
----------------------------------
+experiment.databaseObj module
+-----------------------------
 
-.. automodule:: experiment.databaseObjects
+.. automodule:: experiment.databaseObj
     :members:
     :undoc-members:
     :show-inheritance:
 
-experiment.datasetObject module
--------------------------------
+experiment.datasetObj module
+----------------------------
 
-.. automodule:: experiment.datasetObject
+.. automodule:: experiment.datasetObj
     :members:
     :undoc-members:
     :show-inheritance:
@@ -28,18 +28,26 @@ experiment.exceptions module
     :undoc-members:
     :show-inheritance:
 
-experiment.infoObject module
-----------------------------
+experiment.expResultObj module
+------------------------------
 
-.. automodule:: experiment.infoObject
+.. automodule:: experiment.expResultObj
     :members:
     :undoc-members:
     :show-inheritance:
 
-experiment.txnameObject module
-------------------------------
+experiment.infoObj module
+-------------------------
 
-.. automodule:: experiment.txnameObject
+.. automodule:: experiment.infoObj
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+experiment.txnameObj module
+---------------------------
+
+.. automodule:: experiment.txnameObj
     :members:
     :undoc-members:
     :show-inheritance:

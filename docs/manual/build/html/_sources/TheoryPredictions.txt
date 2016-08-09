@@ -53,13 +53,13 @@ with a non-zero value of |sigBRe|.
 This value can then be compared with the signal upper limit for the respective |dataset|.
 
 Although the details of the theoretical prediction computation differ depending on the type
-of |ExpRes|, the overall procedure is common for both type of results. Below we schematically
+of |ExpRes| (|ULrs| or |EMrs|), the overall procedure is common for both type of results. Below we schematically
 show the main steps of the theory prediction calculation:
 
 .. _theoPredScheme
 
 .. image:: images/theoryPredScheme.png
-   :height: 550px 
+   :width: 90% 
 
 
 As shown above the procedure can always be divided in two main steps:
@@ -70,7 +70,7 @@ the sum of all the |element| weights (|sigBRe|) belonging to the same cluster:
 
 .. math::
    \mbox{theory prediction } = \sum_{cluster} (\mbox{element weight}) =  \sum_{cluster} (\sigma \times BR \times \epsilon)
-   :label: thpred
+
 
 In the case of |ULrs|, there might be several clusters (see :ref:`Element Clustering <ULcluster>`)
 for a given |Dataset| (or  |ExpRes| [*]_), resulting in a list of theory predictions 
@@ -91,7 +91,8 @@ the one with the largest :math:`\mbox{(expected signal)}/\mbox{(expected backgro
 Since |ULrs| only have a single |Dataset|, the selection is trivial. On the other
 hand, for |EMrs| with more than one |Dataset|, only the best one is selected.
 If the user wants to have access to all the |datasets|, the default
-behavior can be disabled using the variable *useBestDataset*.     
+behavior can be disabled using the variable 
+`useBestDataset <../../../documentation/build/html/theory.html#theory.theoryPrediction.theoryPredictionsFor>`_.     
 
 Below we describe in detail the method for computing the theory predictions for each type
 of |ExpRes| separately.
@@ -126,11 +127,11 @@ The procedure described above is illustrated graphically in the figure below for
 :ref:`constraint <ULconstraint>` is :math:`[[[e^+]],[[e^-]]]\,+\,[[[\mu^+]],[[\mu^-]]]`.
 
 .. image:: images/ULselection.png
-   :height: 500px 
+   :width: 85% 
 
 
 
-* **The element selection is implemented by the** `getElementsFrom <../../../documentation/build/html/theory.html#theory.theoryPrediction._getElementsFrom>`_ **method**
+* **The element selection is implemented by the** `getElementsFrom <../../../documentation/build/html/theory.html#theoryPrediction._getElementsFrom>`_ **method**
 
 .. _ULcluster:
 
@@ -152,7 +153,7 @@ have identical masses and should contribute to the same theory prediction (e.g. 
 added when computing the signal cross-section). 
 Unfortunately there is no way to
 unambiguously define ''similar masses'' and the definition should depend on the |ExpRes|, since
-different results will be more or less dependent to mass differences. SModelS uses an UL map-dependent
+different results will be more or less sensitive to mass differences. SModelS uses an UL map-dependent
 measure of the distance between two |element| masses, as described in :ref:`Mass Distance <massdist>`.
 
 
@@ -163,7 +164,7 @@ they are gouped in the same mass cluster, as illustrated by the example below:
 
 
 .. image:: images/ULcluster.png
-   :height: 550px
+   :width: 80%
 
 
 Once all the |elements| have been clustered, their weights can finally be added together
@@ -182,7 +183,7 @@ As mentioned :ref:`above <ULcluster>`, in order to cluster the |elements| it is 
 to determine whether two |elements| have similar masses (see |element| and :ref:`Bracket Notation <bracketnotation>`
 for more details on |element| mass).
 Since an absolute definition of ''similar masses'' is not possible and the sensitivity to mass differences
-depend on the experimental result, SModelS uses an ''upper limit map-dependent'' definition. For each |element|'s mass array,
+depends on the experimental result, SModelS uses an ''upper limit map-dependent'' definition. For each |element|'s mass array,
 the upper limit for the corresponding mass values is obtained from the UL map (see |ULr|).
 This way, each mass array is mapped to a single number (the cross-section upper limit for the experimental result).
 Then the distance between the two |element|'s masses is simply given by the relative difference between their respective
@@ -216,12 +217,13 @@ by the model :doc:`decomposition <Decomposition>`.
 Notice that typically a single  |EMr| contains several signal regions (|Datasets|) and there will be a set of efficiencies
 (or efficiency maps) for each |dataset|. As a result, several theory predictions (one for each |dataset|) will be computed.
 This procedure is similar (in nature) to 
-the :ref:`Element Selection<ULselection>` applied in the case of an |ULr|, except that now it must be repeated for several |datasets|.
+the :ref:`Element Selection<ULselection>` applied in the case of an |ULr|, except that now it must be repeated 
+for several |datasets| (signal regions).
 
 
 After the |element|'s weights have being rescaled by the corresponding efficiencies for the given |dataset| (signal region),
 all of them can be grouped together in a single cluster, which will provide a single theory prediction (signal
-cross-section) for the |Dataset|. Hence the :ref:`element clustering <EMcluster>` discussed below is completely trivial.
+cross-section) for each |Dataset|. Hence the :ref:`element clustering <EMcluster>` discussed below is completely trivial.
 On the other hand the :ref:`element selection <EMselection>` is slightly more involved than in the |ULr|
 case and will be discussed in more detail.
 
@@ -241,7 +243,7 @@ In the figure below we illustrate the element selection for the case of  a |EMr|
 .. _EMselectionfig:
 
 .. image:: images/EMselection.png
-   :height: 500px 
+   :width: 85% 
 
 If, for instance, the analysis being considered vetoes :math:`jets` and :math:`\tau`'s in the final state, 
 we will have :math:`\epsilon_2,\, \epsilon_4 \simeq 0` for the example in the :ref:`figure above <EMselectionfig>`.
@@ -249,7 +251,7 @@ Nonetheless, the element selection for a  |Dataset| is usually more inclusive th
 the one applied for the |ULr|, resulting in larger values for the theory prediction.
 
 
-* **The element selection is implemented by the** `getElementsFrom <../../../documentation/build/html/theory.html#theory.theoryPrediction._getElementsFrom>`_ **method**
+* **The element selection is implemented by the** `getElementsFrom <../../../documentation/build/html/theory.html#theoryPrediction._getElementsFrom>`_ **method**
 
 .. _EMcluster:
 
@@ -263,7 +265,7 @@ according to their masses, since the mass differences have already been accounte
 As a result, after the :ref:`element selection <EMselection>` all elements belong to a single cluster:
 
 .. image:: images/EMcluster.png
-   :height: 550px
+   :width: 80%
 
 * **The (trivial) clustering of elements is implemented by the** `clusterElements <../../../documentation/build/html/theory.html#theory.clusterTools.clusterElements>`_  **method**.
 
