@@ -379,6 +379,10 @@ def mn_sd(obs, exp=None, obs_err = 0.0, exp_err = 0.0, lumi=20000.0,\
         # needed for estimate of validity of approximation
         lumi = _in_picobarn(20.0*fb)
     mean, std = mean_std(obs, exp, obs_err, exp_err, lumi, lumi_err)
+
+    if mean == None or std == None:
+        return None, None
+
     return (mean*pb, std*pb)
 
 
@@ -423,11 +427,27 @@ def _check_cl95_from_mean_std(mean, std, obs, tol=0.01):
         return True
     return False
 
+def _background_fluctuations(mean, std, lumi=20000.0):
+    """(float, float, float) -> float
+    Return the fluctuations compared to the background.
+    that is, (nobs - nb) / nb.
+
+    """
+    return 1/((std**2*lumi/mean) - 1)
+
+def _n_observed(std, lumi=20000.0):
+    """
+    Return the number of observed events as
+    defined by the mean and standard deviation
+    of the Gaussian approximation of the likelihood.
+    """
+    return std**2 * lumi**2
+
 
 def _check_gaussian_approx(mean, std, lumi=20000.0):
     """(float, float, float) -> bool
     Check that there were only small fluctuations compared to the background:
-    This means (n_obs - b)/b <= 0.2.
+    This means (n_obs - b)/b <= 2sigma.
 
     Check also that the number of observed events is high enough for the
     Gaussian approximation:
@@ -442,11 +462,11 @@ def _check_gaussian_approx(mean, std, lumi=20000.0):
 
     # Check fluctuations compared to background:
     # Note that
-    # (n_obs - b)/b <= 0.2
+    # (n_obs - b)/b <= 2sigma
     # can be rewritten as
-    # 1/((std**2*lumi/mean) -1) <= 0.2
+    # 1/((std**2*lumi/mean) -1) <= 2sigma
     # because std = sqrt(nobs)/lumi and mean=nobs-b/lumi by construction
-    if 1/((std**2*lumi/mean) - 1) > 0.2:
+    if abs(1/((std**2*lumi/mean) - 1)) > abs(2*std):
         nobs = std**2 * lumi**2
         b = nobs - mean*lumi
         # Issue a warning if large fluctuations compared to background occur:
@@ -552,6 +572,11 @@ def chi2(theo, obs, exp=None, obs_err=0.0, exp_err=0.0,\
     1.5
 
     '''
+    if not isinstance(theo, Unum) and theo == None:
+        return None
+    if not isinstance(obs, Unum) and obs == None:
+        return None
+    
 
     mean, std = mn_sd(obs, exp, obs_err, exp_err, lumi, lumi_err)
 
