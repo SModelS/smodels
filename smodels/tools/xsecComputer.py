@@ -10,7 +10,7 @@
 
 """
 from smodels import installation
-from smodels.tools import toolBox
+from smodels.tools import toolBox, runtime
 from smodels.tools.physicsUnits import pb, TeV, GeV
 from smodels.theory import crossSection
 from smodels.tools import nllFast
@@ -323,7 +323,6 @@ def computeForBunch ( sqrtses, order, nevents, inputFiles, unlink,
     """ compute xsecs for a bunch of slha files """
     for inputFile in inputFiles:
         logger.info ( "computing xsec for %s" % inputFile )
-        print ( "computing xsec for %s" % inputFile )
         computeForOneFile ( sqrtses, order, nevents, inputFile, unlink, 
                             lOfromSLHA, tofile )
 
@@ -349,5 +348,27 @@ def main(args):
     order = getOrder ( args )
     checkAllowedSqrtses ( order, sqrtses )
     inputFiles = getInputFiles ( args )
-    computeForBunch ( sqrtses, order, args.nevents, inputFiles, not args.keep,
-                      args.LOfromSLHA, args.tofile )
+    ncpus = args.ncpus
+    if ncpus == -1: 
+        ncpus = runtime.nCPUs()
+    logger.info ( "We run on %d cpus" % ncpus )
+    children = []
+    for i in range(ncpus):
+        pid = os.fork()
+        chunk = inputFiles [ i::ncpus ]
+        if pid < 0:
+            logger.error ( "fork did not succeed! Pid=%d" % pid ) 
+            sys.exit()
+        if pid == 0:
+            logger.info ( "chunk #%d: pid %d (parent %d)." % 
+                       ( i, os.getpid(), os.getppid() ) )
+            logger.info ( " `-> %s" % " ".join ( chunk ) )
+            computeForBunch (  sqrtses, order, args.nevents, chunk, not args.keep,
+                               args.LOfromSLHA, args.tofile )
+            os._exit ( 0 )
+        if pid > 0:
+            children.append ( pid )
+    for child in children:
+        r = os.waitpid ( child, 0 )
+        logger.info ( "child %d terminated: %s" % (child,r) )
+    logger.info ( "all children terminated." )
