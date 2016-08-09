@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: tools.nllFast
+.. module:: nllFast
    :synopsis: This module provides methods to access the nllfast grid and
               compute k-factors (when available) to SUSY pair 
               production cross-sections.

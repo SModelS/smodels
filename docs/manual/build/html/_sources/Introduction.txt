@@ -45,9 +45,9 @@ This document describes the computer package that does all this.
 SModelS can be used just like an application, running :ref:`runSModelS.py <runSModelS>`.
 In addition, SModelS is also usable as a :ref:`library <exampleCode>`, providing functionality to
 
- * classify LHE events,
- * decompose SLHA events,
- * compute LO, NLO, NLL cross sections,
+ * decompose models into simplified models,
+ * confront input models with LHC constraints,
+ * compute LO, NLO, NLL SUSY cross sections,
  * identify missing topologies,
  * browse the SModelS database of SMS results
  * and a few more tasks.

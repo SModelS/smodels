@@ -34,7 +34,8 @@ logger = logging.getLogger(__name__)
 logger.setLevel(level=logging.ERROR)
 
 class TxName(object):
-    """Holds the information related to one txname in the Txname.txt
+    """
+    Holds the information related to one txname in the Txname.txt
     file (constraint, condition,...) as well as the _data.
     """
 
@@ -111,6 +112,7 @@ class TxName(object):
     def addInfo(self,tag,value):
         """
         Adds the info field labeled by tag with value value to the object.
+        
         :param tag: information label (string)
         :param value: value for the field in string format
         """
@@ -130,7 +132,9 @@ class TxName(object):
             setattr(self,tag,value)
 
     def getInfo(self, infoLabel):
-        """Returns the value of info field.
+        """
+        Returns the value of info field.
+        
         :param infoLabel: label of the info field (string). It must be an attribute of
                           the TxNameInfo object
         """
@@ -142,6 +146,7 @@ class TxName(object):
         """
         Verify if the conditions or constraint in Txname contains the element.
         Check both branch orderings.
+        
         :param element: Element object
         :return: A copy of the element on the correct branch ordering appearing
                 in the Txname constraint or condition.
@@ -183,12 +188,12 @@ class TxName(object):
             raise SModelSError()
 
 class TxNameData(object):
-    """ Holds the _data for the Txname object.  It holds Upper limit values or
-        efficiencies."""
+    """
+    Holds the _data for the Txname object.  It holds Upper limit values or efficiencies.
+    """
 
     def __init__(self,value,datatag,Id,accept_errors_upto=.05):
         """
-
         :param value: _data in string format
         :param datatag: the dataTag (upperLimits or efficiencyMap)
         :param Id: an identifier, must be unique for each TxNameData!
@@ -208,7 +213,7 @@ class TxNameData(object):
 
     def __str__ ( self ):
         """ a simple unique string identifier, mostly for _memoize """
-        return self._id
+        return str ( self._id )
 
     def round_to_n ( self, x, n ):
         if x==0.0:
@@ -257,6 +262,7 @@ class TxNameData(object):
         """
         Interpolates the _data and returns the UL or efficiency for the
         respective massarray
+        
         :param massarray: mass array values (with units), i.e.
                           [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         """
@@ -333,6 +339,9 @@ class TxNameData(object):
         ## how far are we away from the "plane": distance alpha
         alpha = float ( np.sqrt ( np.dot ( P[self.dimensionality:],
                         P[self.dimensionality:] ) ) )
+        if alpha == 0.:
+            ## no distance to the plane, so no extrapolation error
+            return 0.
         ## the value of the grid at the point projected to the "plane"
 
         ## compute gradient

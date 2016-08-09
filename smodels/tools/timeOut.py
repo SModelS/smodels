@@ -1,5 +1,5 @@
 """
-.. module:: tools.timeOut
+.. module:: timeOut
    :synopsis: Facility to implement a time out option when running smodels
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>

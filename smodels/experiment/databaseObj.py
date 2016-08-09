@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
 """
-.. module:: experiment.database
-   :synopsis: Contains Database class that represents the database of
-              experimental results.
+.. module:: databaseObj
+   :synopsis: Contains Database class that represents the database of experimental results.
 
 .. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -46,7 +45,7 @@ class Database(object):
         self.txt_mtime = None, None
         self.pcl_mtime = None, None
         self.pcl_db = None
-        self.sw_format_version = "104" ## what format does the software support?
+        self.sw_format_version = "105" ## what format does the software support?
         self.pcl_format_version = None ## what format is in the binary file?
         self.binfile = os.path.join ( self._base, self.pclfilename )
         self._setLogLevel ( self._verbosity )
@@ -100,8 +99,9 @@ class Database(object):
         self.expResultList = self._loadExpResults()
 
     def lastModifiedDir ( self, dirname, lastm ):
-        """ return the last modified timestamp of dirname,
-            working recursively 
+        """
+        Return the last modified timestamp of dirname, working recursively
+         
         :param dirname: directory name that is checked
         :param lastm: the most recent timestamp so far
         :returns: the most recent timestamp, and the number of files
@@ -149,8 +149,9 @@ class Database(object):
         self.txt_mtime = lastm, count
 
     def loadBinaryFile ( self, lastm_only = False ):
-        """ load a binary database, returning
-            last modified, file count, database.
+        """
+        Load a binary database, returning last modified, file count, database.
+        
         :param lastm_only: if true, the database itself is not read.
         :returns: database object, or None, if lastm_only == True.
         """
