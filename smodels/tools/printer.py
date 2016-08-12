@@ -147,7 +147,7 @@ class BasicPrinter(object):
                 elif self.output == 'file':
                     if not self.filename:
                         logger.error('Filename not defined for printer')
-                        return False
+                        return False   
                     with self.openOutFile(self.filename, "a") as outfile:
                         outfile.write(output)
                         outfile.close()
