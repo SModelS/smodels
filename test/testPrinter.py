@@ -74,17 +74,7 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
 
 class RunPrinterTest(unittest.TestCase):
 
-    def __init__ ( self, *args, **kwargs):
-        super(RunPrinterTest, self).__init__(*args, **kwargs)
-        
-        self.masterPrinter = printer.MPrinter(printerList=['summary','python','xml'])        
-        #Set the address of the database folder
-        self.slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
-        self.masterPrinter.setOutPutFiles('./unitTestOutput/printer_output')
-        self.runPrinterMain()
-
-
-    def runPrinterMain(self):
+    def runPrinterMain(self, slhafile, mprinter):
         """
         Main program. Displays basic use case.
     
@@ -96,11 +86,11 @@ class RunPrinterTest(unittest.TestCase):
     
         """ Decompose model (use slhaDecomposer for SLHA input or lheDecomposer
             for LHE input) """
-        smstoplist = slhaDecomposer.decompose(self.slhafile, sigmacut, 
+        smstoplist = slhaDecomposer.decompose(slhafile, sigmacut, 
                          doCompress=True, doInvisible=True, minmassgap=mingap )
     
         #Add the decomposition result to the printers
-        self.masterPrinter.addObj(smstoplist)
+        mprinter.addObj(smstoplist)
     
         listOfExpRes = database.getExpResults()
         # Compute the theory predictions for each analysis
@@ -113,25 +103,32 @@ class RunPrinterTest(unittest.TestCase):
         
         maxcond = 0.2
         results = ioObjects.ResultList(allPredictions,maxcond)
-        self.masterPrinter.addObj(results,objOutputLevel=2)
+        mprinter.addObj(results,objOutputLevel=2)
         
         #Add coverage information:
         coverageInfo = coverage.Uncovered(smstoplist)
-        self.masterPrinter.addObj(coverageInfo,2)
+        mprinter.addObj(coverageInfo,2)
         
         
         #Add additional information:
         databaseVersion = database.databaseVersion
-        outputStatus = ioObjects.OutputStatus([1,'Input file ok'], self.slhafile,
+        outputStatus = ioObjects.OutputStatus([1,'Input file ok'], slhafile,
                                                {'sigmacut' : sigmacut.asNumber(fb), 
                                                 'minmassgap' : mingap.asNumber(GeV),
                                                 'maxcond': maxcond },
                                               databaseVersion)
         outputStatus.status = 1
-        self.masterPrinter.addObj(outputStatus)
-        self.masterPrinter.flush()
+        mprinter.addObj(outputStatus)
+        mprinter.flush()
+        
+
 
     def testTextPrinter(self):
+        
+        mprinter = printer.MPrinter(printerList=['summary'])
+        slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
+        mprinter.setOutPutFiles('./unitTestOutput/printer_output')
+        self.runPrinterMain(slhafile,mprinter)
         
         outputfile = os.path.join( idir(), "test/unitTestOutput/printer_output.smodels")
         samplefile = os.path.join( idir(), "test/gluino_squarks_default.txt")
@@ -146,6 +143,13 @@ class RunPrinterTest(unittest.TestCase):
 
 
     def testPythonPrinter(self):
+        
+        
+        mprinter = printer.MPrinter(printerList=['python'])
+        slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
+        mprinter.setOutPutFiles('./unitTestOutput/printer_output')
+        self.runPrinterMain(slhafile,mprinter)
+        
         #Test python output
         shutil.copyfile('./unitTestOutput/printer_output.py','./output.py')
         from gluino_squarks_default import smodelsOutputDefault        
@@ -191,6 +195,12 @@ class RunPrinterTest(unittest.TestCase):
                     self.assertEqual(el.tag,newel.tag)
                 else:                    
                     compareXML(el,newel,allowedDiff,ignore)
+                    
+
+        mprinter = printer.MPrinter(printerList=['xml'])
+        slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
+        mprinter.setOutPutFiles('./unitTestOutput/printer_output')
+        self.runPrinterMain(slhafile,mprinter)                    
                     
         defFile = os.path.join ( idir(), "test/default_output.xml" )
         outFile = os.path.join ( idir(), "test/unitTestOutput/printer_output.xml" )
