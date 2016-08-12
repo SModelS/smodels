@@ -69,7 +69,7 @@ class ResultList(object):
         
         expResult = theoPred.expResult
         datasetID = theoPred.dataset.dataInfo.dataId
-        dataType = expResult.datasets[0].dataInfo.dataType 
+        dataType = expResult.datasets[0].dataInfo.dataType
         
         if dataType == 'upperLimit':
             ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass)
@@ -179,14 +179,6 @@ class OutputStatus(object):
         self.warnings += warning
         return
 
-    def formatData(self, outputLevel):
-        """
-        Access printout format.
-        
-        :param outputLevel: general control for the output depth to be printed 
-           (0 = no output, 1 = basic output, 2 = detailed output,...
-        """
-        return self.formatStatusData(outputLevel)
 
 
 class FileStatus(object):
@@ -281,14 +273,16 @@ class SlhaStatus(object):
         if not self.slha:
             self.status = -3, "Could not read input SLHA file"
             return
-        self.lsp = self.findLSP()
-        self.lspStatus = self.testLSP(checkLSP)
-        self.illegalDecays = self.findIllegalDecay(findIllegalDecays)
-        self.xsec = self.hasXsec(checkXsec)
-        self.decayBlocksStatus = self.findMissingDecayBlocks(findMissingDecayBlocks)
-        self.longlived = self.findLonglivedParticles(findLonglived)
-
-        self.status = self.evaluateStatus()
+        try:
+            self.lsp = self.findLSP()
+            self.lspStatus = self.testLSP(checkLSP)
+            self.illegalDecays = self.findIllegalDecay(findIllegalDecays)
+            self.xsec = self.hasXsec(checkXsec)
+            self.decayBlocksStatus = self.findMissingDecayBlocks(findMissingDecayBlocks)
+            self.longlived = self.findLonglivedParticles(findLonglived)
+            self.status = self.evaluateStatus()
+        except Exception,e:
+            self.status = -4, "Error checking SLHA file: "+str(e)
 
 
     def read(self):
