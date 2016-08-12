@@ -7,11 +7,11 @@
 """
 
 import os
-import datetime
+from datetime import datetime
 import platform
 import traceback
 import logging
-from smodels import installation
+from smodels.installation import installDirectory
 
 log = logging.getLogger(__name__)
 
@@ -22,8 +22,8 @@ class CrashReport(object):
     
     """    
     def __init__(self):        
-        timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S%f')
-        self.timestampHuman = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+        timestamp = datetime.now().strftime('%Y%m%d%H%M%S%f')
+        self.timestampHuman = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
         self.crashReportFileName = 'smodels-' + timestamp + '.crash'
 
 
@@ -48,7 +48,7 @@ class CrashReport(object):
         
         """
     
-        with open(installation.installDirectory()+'/smodels/version', 'r') as versionFile:
+        with open ( installDirectory()+'/smodels/version', 'r') as versionFile:
             version = versionFile.readline()
     
         with open(inputFileName, 'r') as inputFile:
@@ -58,27 +58,27 @@ class CrashReport(object):
             parameterFileContent = parameterFile.read()
     
         crashReportFile = open(self.crashReportFileName, 'w')
-        crashReportFile.write("================================================================================\n")
+        crashReportFile.write("="*80+"\n")
         crashReportFile.write("SModelS Crash Report File\n")
-        crashReportFile.write("================================================================================\n")
+        crashReportFile.write("="*80+"\n")
         crashReportFile.write("Timestamp: " + self.timestampHuman + "\n\n")
         crashReportFile.write("SModelS Version: " + version + "\n")
         crashReportFile.write("Platform: " + platform.platform() + "\n")
         crashReportFile.write("Python Version: " + platform.python_version() + "\n\n")
-        crashReportFile.write("================================================================================\n\n")
-        crashReportFile.write("--------------------------------------------------------------------------------\n")
+        crashReportFile.write("="*80+"\n\n")
+        crashReportFile.write("-"*80+"\n")
         crashReportFile.write("* Output\n")
-        crashReportFile.write("--------------------------------------------------------------------------------\n\n")
+        crashReportFile.write("-"*80+"\n\n")
         crashReportFile.write(traceback.format_exc() + "\n\n")
-        crashReportFile.write("--------------------------------------------------------------------------------\n")
+        crashReportFile.write("-"*80+"\n")
         crashReportFile.write("* Input File\n")
         crashReportFile.write("  " + os.path.basename(inputFileName) + "\n")
-        crashReportFile.write("--------------------------------------------------------------------------------\n\n")
+        crashReportFile.write("-"*80+"\n\n")
         crashReportFile.write(inputFileContent + "\n")
-        crashReportFile.write("--------------------------------------------------------------------------------\n")
+        crashReportFile.write("-"*80+"\n")
         crashReportFile.write("* Parameter File\n")
         crashReportFile.write("  " + os.path.basename(parameterFileName) + "\n")
-        crashReportFile.write("--------------------------------------------------------------------------------\n\n")
+        crashReportFile.write("-"*80+"\n\n")
         crashReportFile.write(parameterFileContent)
         crashReportFile.close()
         
