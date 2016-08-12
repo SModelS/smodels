@@ -5,14 +5,18 @@
    :synopsis: Tests runSModelS
 
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
 """
 
 import sys,shutil,os
 sys.path.insert(0,"../")
 import unittest
+import glob
 from os.path import join, basename
 from smodels.installation import installDirectory as iDir
+from smodels.tools import crashReport
+from smodels.tools.timeOut import NoTime
 from runSModelS import main
 import logging as logger
 import unum
@@ -67,25 +71,44 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
 
 
 class RunSModelSTest(unittest.TestCase):
-    def runMain(self, filename ):
-        suppressStdout = True
+    def runMain(self, filename, timeout = 0, suppressStdout=True, development=False):
         if suppressStdout:
             a=sys.stdout
-            sys.stdout = open ( "stdout.log", "w" )
-        out = join ( iDir(), "test/unitTestOutput" )
+            sys.stdout = open( "stdout.log", "w")
+        out = join( iDir(), "test/unitTestOutput" )
         main(filename, parameterFile=join ( iDir(), "test/testParameters.ini" ),
-             outputDir= out, verbosity = 'error' )
-        sfile = join ( iDir(), 
-                "test/unitTestOutput/%s.py" % basename ( filename ) )
+             outputDir= out, verbosity = 'error', db= None, timeout = timeout,
+             development = development)
+        sfile = join(iDir(),"test/unitTestOutput/%s.py" % basename(filename))
         return sfile
-
+    
+    
+    def testMultipleFiles( self ):
+        out = join( iDir(), "test/unitTestOutput")
+        for i in os.listdir( out ):
+            if i[-8:]==".smodels":
+                os.unlink( os.path.join ( out, i ))
+        dirname = join( iDir(), "inputFiles/slha/" )
+        self.runMain(dirname)
+        nout = len( list ( glob.iglob ( "unitTestOutput/*smodels" )) )
+        nin = len( list ( glob.iglob ( "%s/*slha" % dirname )) )
+        self.assertTrue( nout == nin )
+           
+    def timeoutRun(self):
+        filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
+        outputfile = self.runMain(filename, timeout=1, suppressStdout=True,
+                     development=True)
+    
+    def testTimeout(self):
+        self.assertRaises(NoTime, self.timeoutRun)               
+    
     def testGoodFile(self):        
         filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
-        outputfile = self.runMain(filename )
+        outputfile = self.runMain(filename)
         shutil.copyfile(outputfile,'./output.py')
         from gluino_squarks_default import smodelsOutputDefault
         from output import smodelsOutput
-        ignoreFields = ['input file','smodels version']
+        ignoreFields = ['input file','smodels version', 'ncpus']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
                                                  key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
                                                    res['AnalysisID'],res['DataSetID']])        
@@ -95,19 +118,32 @@ class RunSModelSTest(unittest.TestCase):
             os.remove('./output.pyc')
         except: pass
         self.assertTrue(equals)
-
-    def testBadFile(self):
    
-        filename = join ( iDir(), "inputFiles/slha/I_dont_exist.slha" )
-        outputfile = self.runMain (filename )
+   
+    def testBadFile(self):   
+        filename = join (iDir(), "inputFiles/slha/I_dont_exist.slha" )
+        outputfile = self.runMain(filename)
         shutil.copyfile(outputfile,'./bad_output.py')
         from bad_default import smodelsOutputDefault
         from bad_output import smodelsOutput
-        ignoreFields = ['input file','smodels version']
+        ignoreFields = ['input file','smodels version', 'ncpus']
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.,ignore=ignoreFields)
         self.assertTrue(equals )
         os.remove('./bad_output.py')
         os.remove('./bad_output.pyc')
+          
+    def testCrash(self):
+        for f in os.listdir("."):
+            if ".crash" in f: os.remove(f)
+        if os.path.exists("crash_report_parameter"): os.remove("crash_report_parameter")
+        if os.path.exists("crash_report_input"): os.remove("crash_report_input")
+        filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
+        outputfile = self.runMain(filename, timeout=1)
+        for f in os.listdir("."):
+            if ".crash" in f: break
+        inp, par = crashReport.readCrashReportFile(f)
+        self.assertEquals(open(filename).readlines(), open(inp).readlines())
+        self.assertEquals(open("testParameters.ini").readlines(), open(par).readlines())        
 
 if __name__ == "__main__":
     unittest.main()
