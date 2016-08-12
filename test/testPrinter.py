@@ -81,10 +81,10 @@ class RunPrinterTest(unittest.TestCase):
         #Set the address of the database folder
         self.slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
         self.masterPrinter.setOutPutFiles('./unitTestOutput/printer_output')
-        self.runMain()
+        self.runPrinterMain()
 
 
-    def runMain(self):
+    def runPrinterMain(self):
         """
         Main program. Displays basic use case.
     
@@ -132,6 +132,7 @@ class RunPrinterTest(unittest.TestCase):
         self.masterPrinter.flush()
 
     def testTextPrinter(self):
+        
         outputfile = os.path.join( idir(), "test/unitTestOutput/printer_output.smodels")
         samplefile = os.path.join( idir(), "test/gluino_squarks_default.txt")
         #Test summary output
@@ -149,7 +150,7 @@ class RunPrinterTest(unittest.TestCase):
         shutil.copyfile('./unitTestOutput/printer_output.py','./output.py')
         from gluino_squarks_default import smodelsOutputDefault        
         from output import smodelsOutput
-        ignoreFields = ['input file','smodels version']
+        ignoreFields = ['input file','smodels version', 'ncpus']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
                                                  key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
                                                    res['AnalysisID'],res['DataSetID']])
@@ -200,7 +201,7 @@ class RunPrinterTest(unittest.TestCase):
         sortXML(xmlDefault)
         sortXML(xmlNew)
         try:
-            compareXML(xmlDefault,xmlNew,allowedDiff=0.05,ignore=['input_file','smodels_version'])
+            compareXML(xmlDefault,xmlNew,allowedDiff=0.05,ignore=['input_file','smodels_version', 'ncpus'])
         except AssertionError,e:
             msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
             raise AssertionError(msg)
