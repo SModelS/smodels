@@ -33,7 +33,7 @@ def verbose_run():
     for series in alltests:
         for test in series:
             for t in test:
-                print "Running ",t.id()
+                print "[runCompleteTestSuite] now run",t.id()
                 t.run()
 
 if __name__ == "__main__":
