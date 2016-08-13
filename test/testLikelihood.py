@@ -259,8 +259,9 @@ class TestLikelihood(unittest.TestCase):
 
                 # Compute the chi2:
                 with redirector.stderr_redirected( ):
-                    chi2_actual = like.chi2(theo, observed_ul, expected_ul)
-                    chi2same_actual = like.chi2(theo, observed_ul, observed_ul)
+                    with redirector.stdout_redirected ():
+                        chi2_actual = like.chi2(theo, observed_ul, expected_ul)
+                        chi2same_actual = like.chi2(theo, observed_ul, observed_ul)
 
                 self.assertAlmostEqual(chi2_actual, chi2_expected, places=4)
                 self.assertAlmostEqual(chi2same_actual, chi2same_expected,
