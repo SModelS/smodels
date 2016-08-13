@@ -95,7 +95,7 @@ class RunSModelSTest(unittest.TestCase):
         self.assertTrue( nout == nin )
            
     def timeoutRun(self):
-        filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
+        filename = join ( iDir(), "inputFiles/slha/complicated.slha" )
         outputfile = self.runMain(filename, timeout=1, suppressStdout=True,
                      development=True)
     
