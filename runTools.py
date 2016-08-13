@@ -18,15 +18,26 @@ def main():
     subparsers = parser.add_subparsers(dest='subparser_name')
 
     xseccomputer = subparsers.add_parser('xseccomputer', description="Compute MSSM cross sections for a SLHA file.")
-    xseccomputer.add_argument('-s', '--sqrts', nargs='+', action='append', help="sqrt(s) TeV. Can supply more than one value. Default is both 8 and 13.", type=int, default=[])
-    xseccomputer.add_argument('-e', '--nevents', type=int, default=10000, help="number of events to be simulated.")
-    xseccomputer.add_argument('-p', '--tofile', action='store_true', help="write cross sections to file")
-    xseccomputer.add_argument('-q', '--query', action='store_true', help="only query if there are cross sections in the file")
-    xseccomputer.add_argument('-k', '--keep', action='store_true', help="do not unlink temporary directory")
-    xseccomputer.add_argument('-n', '--NLO', action='store_true', help="compute at the NLO level (default is LO)")
+    xseccomputer.add_argument('-s', '--sqrts', nargs='+', action='append', 
+        help="sqrt(s) TeV. Can supply more than one value. Default is both 8 and 13.",
+        type=int, default=[])
+    xseccomputer.add_argument('-e', '--nevents', type=int, default=10000, 
+        help="number of events to be simulated.")
+    xseccomputer.add_argument('-c', '--ncpus', type=int, default=-1, 
+        help="number of cores to be used simultaneously. -1 means 'all'. ")
+    xseccomputer.add_argument('-p', '--tofile', action='store_true', 
+        help="write cross sections to file")
+    xseccomputer.add_argument('-q', '--query', action='store_true', 
+        help="only query if there are cross sections in the file")
+    xseccomputer.add_argument('-k', '--keep', action='store_true', 
+        help="do not unlink temporary directory")
+    xseccomputer.add_argument('-n', '--NLO', action='store_true', 
+        help="compute at the NLO level (default is LO)")
     xseccomputer.add_argument('-N', '--NLL', help="compute at the NLO+NLL level (takes precedence over NLO, default is LO)", action='store_true')
     xseccomputer.add_argument('-O', '--LOfromSLHA', help="use LO cross-sections from file to compute the NLO or NLL cross-sections", action='store_true')
-    xseccomputer.add_argument('-f', '--filename', help="SLHA file to compute cross sections for", required=True)
+    xseccomputer.add_argument('-f', '--filename', required=True, 
+            help="SLHA file to compute cross sections for. "
+            "If a directory is given, compute cross sections for all files in directory." )
 
     slhachecker = subparsers.add_parser('slhachecker', description="Perform several checks on a SLHA file.")
     slhachecker.add_argument('-xS', '--xsec', help='turn off the check for xsection blocks', action='store_false')
