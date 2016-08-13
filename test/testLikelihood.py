@@ -197,7 +197,6 @@ class TestLikelihood(unittest.TestCase):
         SUSY T2 simplified model.
 
         """
-        ## print("test_computes_as_expected\n")
 
         # Some computed chi2 for the cMSSM per m0, m12 mass:
         cmssm = {(360, 320): {'theo': 0.159063876816674, 'ul':
@@ -242,7 +241,6 @@ class TestLikelihood(unittest.TestCase):
                 'chi2': 786.312657357, 'chi2same': 764.005750521,
                 'exp': 1.00471384525299}}
 
-
         for known_values in [cmssm, susyt2]:
             for key in known_values:
 
@@ -260,23 +258,13 @@ class TestLikelihood(unittest.TestCase):
                 chi2same_expected = di['chi2same']
 
                 # Compute the chi2:
-                chi2_actual = like.chi2(theo, observed_ul, expected_ul)
-                chi2same_actual = like.chi2(theo, observed_ul, observed_ul)
+                with redirector.stderr_redirected( ):
+                    chi2_actual = like.chi2(theo, observed_ul, expected_ul)
+                    chi2same_actual = like.chi2(theo, observed_ul, observed_ul)
 
                 self.assertAlmostEqual(chi2_actual, chi2_expected, places=4)
                 self.assertAlmostEqual(chi2same_actual, chi2same_expected,
                     places=4)
 
-
-
-
-
-
-
-
 if __name__ == '__main__':
     unittest.main(exit=False)
-
-
-
-
