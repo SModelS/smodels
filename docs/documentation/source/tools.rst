@@ -100,6 +100,14 @@ tools.likelihood module
     :undoc-members:
     :show-inheritance:
 
+tools.modelTester module
+------------------------
+
+.. automodule:: tools.modelTester
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 tools.nllFast module
 --------------------
 

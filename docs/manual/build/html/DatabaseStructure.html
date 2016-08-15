@@ -97,6 +97,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#database-object-structure">Database: Object Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#database-binary-pickle-format">Database: Binary (Pickle) Format</a></li>
 </ul>
 </li>
 </ul>
@@ -161,7 +162,7 @@ Below we describe both the <a class="reference internal" href="#folderstruct"><s
 <p>The <a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a> is organized as files in an ordinary (UNIX) directory hierarchy,
 with a thin python layer serving as the access to the database.
 The overall structure of the directory hierarchy and its contents is depicted in the scheme below (click to enlarge):</p>
-<a class="reference internal image-reference" href="_images/DatabaseFolders.png"><img alt="_images/DatabaseFolders.png" src="_images/DatabaseFolders.png" style="height: 400px;" /></a>
+<a class="reference internal image-reference" href="_images/DatabaseFolders.png"><img alt="_images/DatabaseFolders.png" src="_images/DatabaseFolders.png" style="width: 80%;" /></a>
 <p>As seen above, the top level of the SModelS database categorizes the analyses by LHC center-of-mass energies, <span class="math">\(\sqrt{s}\)</span>:</p>
 <ul class="simple">
 <li>8 TeV</li>
@@ -179,13 +180,13 @@ of the database.</p>
 <li>8TeV/CMS/CMS-SUS-12-024</li>
 <li>8TeV/ATLAS/ATLAS-CONF-2013-047</li>
 <li>...</li>
-<li><strong>The Database folder is described by the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObjects.Database">Database Class</a></li>
+<li><strong>The Database folder is described by the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObj.Database">Database Class</a></li>
 </ul>
 <div class="section" id="experimental-result-folder">
 <h3>Experimental Result Folder<a class="headerlink" href="#experimental-result-folder" title="Permalink to this headline">¶</a></h3>
 <p>Each <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a> folder contains:</p>
 <ul class="simple">
-<li>a folder for each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a> (<code class="docutils literal"><span class="pre">data-xx</span></code>)</li>
+<li>a folder for each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a> (e.g. <code class="docutils literal"><span class="pre">data-xx</span></code>)</li>
 <li>a <code class="docutils literal"><span class="pre">globalInfo.txt</span></code> file</li>
 </ul>
 <p>The <code class="docutils literal"><span class="pre">globalInfo.txt</span></code> file contains the meta information about the <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a>.
@@ -206,19 +207,19 @@ lastUpdate: 2015/5/11
 </pre></div>
 </div>
 <ul class="simple">
-<li><strong>Experimental Result folder is described by the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObjects.ExpResult">ExpResult Class</a></li>
-<li><strong>globalInfo files  are descrived by the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.infoObject.Info">Info Class</a></li>
+<li><strong>Experimental Result folder is described by the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.expResultObj.ExpResult">ExpResult Class</a></li>
+<li><strong>globalInfo files  are descrived by the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.infoObj.Info">Info Class</a></li>
 </ul>
 </div>
 <div class="section" id="data-set-folder">
 <h3>Data Set Folder<a class="headerlink" href="#data-set-folder" title="Permalink to this headline">¶</a></h3>
-<p>Each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a> folder (<code class="docutils literal"><span class="pre">data-xx</span></code>) contains:</p>
+<p>Each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a> folder (e.g. <code class="docutils literal"><span class="pre">data-xx</span></code>) contains:</p>
 <ul class="simple">
 <li>the Upper Limit maps for <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type results</span></a> or Efficiency maps for <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a> (<code class="docutils literal"><span class="pre">TxName.txt</span></code> files)</li>
 <li>a <code class="docutils literal"><span class="pre">dataInfo.txt</span></code> file containing meta information about the <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a></li>
-<li><strong>Data Set folders are  described by the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.datasetObject.DataSet">DataSet Class</a></li>
-<li><strong>TxName files are descrived by the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.txnameObject.TxName">TxName Class</a></li>
-<li><strong>dataInfo files  are descrived by the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.infoObject.Info">Info Class</a></li>
+<li><strong>Data Set folders are  described by the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.datasetObj.DataSet">DataSet Class</a></li>
+<li><strong>TxName files are descrived by the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.txnameObj.TxName">TxName Class</a></li>
+<li><strong>dataInfo files  are descrived by the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.infoObj.Info">Info Class</a></li>
 </ul>
 <div class="section" id="data-set-folder-upper-limit-type">
 <h4>Data Set Folder: Upper Limit Type<a class="headerlink" href="#data-set-folder-upper-limit-type" title="Permalink to this headline">¶</a></h4>
@@ -274,8 +275,8 @@ dataId: 3NJet6_1000HT1250_200MHT300
 observedN: 335
 expectedBG: 305
 bgError: 41
-upperLimit: 5.69591727931*fb
-expectedUpperLimit: 4.51473218837*fb
+upperLimit: 5.681*fb
+expectedUpperLimit: 4.585*fb
 </pre></div>
 </div>
 <p>For <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a>, each <code class="docutils literal"><span class="pre">TxName.txt</span></code> file contains the efficiency map for a given <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>
@@ -315,17 +316,40 @@ The second block of data contains the efficiency map as a function of the BSM ma
 The mapping is almost one-to-one, except for a few exceptions.
 Below we show the overall object structure  as well as the folders/files the objects
 represent (click to enlarge):</p>
-<a class="reference internal image-reference" href="_images/DatabaseObjects.png"><img alt="_images/DatabaseObjects.png" src="_images/DatabaseObjects.png" style="height: 400px;" /></a>
+<a class="reference internal image-reference" href="_images/DatabaseObjects.png"><img alt="_images/DatabaseObjects.png" src="_images/DatabaseObjects.png" style="width: 80%;" /></a>
 <p>The type of python object (python class, phyton list,...) is shown in brackets.
 For convenience, below we explicitly list the main database folders/files and the python objects they
 are mapped to:</p>
 <ul class="simple">
-<li><a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a> folder <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObjects.Database">Database Class</a></li>
-<li><a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a> folder <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObjects.ExpResult">ExpResult Class</a></li>
-<li><a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a> folder <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.datasetObject.DataSet">DataSet Class</a></li>
-<li><code class="docutils literal"><span class="pre">globalInfo.txt</span></code> file  <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.infoObject.Info">Info Class</a></li>
-<li><code class="docutils literal"><span class="pre">dataInfo.txt</span></code> file  <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.infoObject.Info">Info Class</a></li>
-<li><code class="docutils literal"><span class="pre">Txname.txt</span></code> file  <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.txnameObject.TxName">TxName Class</a></li>
+<li><a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a> folder <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObj.Database">Database Class</a></li>
+<li><a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a> folder <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObj.ExpResult">ExpResult Class</a></li>
+<li><a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a> folder <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.datasetObj.DataSet">DataSet Class</a></li>
+<li><code class="docutils literal"><span class="pre">globalInfo.txt</span></code> file  <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.infoObj.Info">Info Class</a></li>
+<li><code class="docutils literal"><span class="pre">dataInfo.txt</span></code> file  <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.infoObj.Info">Info Class</a></li>
+<li><code class="docutils literal"><span class="pre">Txname.txt</span></code> file  <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.txnameObj.TxName">TxName Class</a></li>
+</ul>
+</div>
+<div class="section" id="database-binary-pickle-format">
+<h2>Database: Binary (Pickle) Format<a class="headerlink" href="#database-binary-pickle-format" title="Permalink to this headline">¶</a></h2>
+<p>Due to the large number of experimental results contained in the SModelS <a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a>,
+parsing the <a class="reference internal" href="#folderstruct"><span>database folders</span></a> and building the corresponding
+<a class="reference internal" href="#objstruct"><span>database objects</span></a> may require a non-negligible cpu time. In some cases
+this task may be the most time consuming when testing a single input file.
+Furthermore this is a static task which does not have to be repeated everytime SModelS is run.
+In order to avoid these issues, SModelS serializes the
+<a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObj.Database">database object</a>
+into a pickle file (<em>&lt;database-path&gt;/database.pcl</em>), which can then be read directly when loading the database.
+Since reading the pickle file is much faster than parsing the <a class="reference internal" href="#folderstruct"><span>database folders</span></a>,
+there is a considerable speed improvement when using the pickle file.
+If any changes in the <a class="reference internal" href="#folderstruct"><span>database folder structure</span></a> or in the SModelS
+version are detected, SModelS will automatically re-build the pickle file.
+Although this action may take a few minutes, it is only performed once.</p>
+<p>SModelS automatically builds (if necessary) and loads the binary database when a
+<a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObj.Database">Database object</a>
+is created. Nonetheless, the user can enforce loading (parsing) the <em>text database</em> using the option <em>force_load = &#8216;txt&#8217;</em> in
+<a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObj.Database">Database</a> .</p>
+<ul class="simple">
+<li>The pickle file is created by the <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObj.Database.createBinaryFile">createBinaryFile method</a></li>
 </ul>
 </div>
 </div>
