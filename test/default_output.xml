@@ -87,8 +87,7 @@
             <AnalysisID>CMS-SUS-13-012</AnalysisID>
             <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
             <DataSetID>3NJet6_1000HT1250_600MHTinf</DataSetID>
-            <DaughterMass_GeV>None</DaughterMass_GeV>
-            <MotherMass_GeV>None</MotherMass_GeV>
+            <Mass_GeV>None</Mass_GeV>
             <TxNames_List>
                 <TxNames>T1</TxNames>
                 <TxNames>T2</TxNames>
@@ -103,8 +102,16 @@
             <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
             <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
             <DataSetID>None</DataSetID>
-            <DaughterMass_GeV>128.96157</DaughterMass_GeV>
-            <MotherMass_GeV>865.035125</MotherMass_GeV>
+            <Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>865.035125</Mass_GeV>
+                    <Mass_GeV>128.96157</Mass_GeV>
+                </Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>865.035125</Mass_GeV>
+                    <Mass_GeV>128.96157</Mass_GeV>
+                </Mass_GeV_List>
+            </Mass_GeV_List>
             <TxNames_List>
                 <TxNames>T1</TxNames>
             </TxNames_List>
@@ -118,8 +125,16 @@
             <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
             <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
             <DataSetID>None</DataSetID>
-            <DaughterMass_GeV>128.96157</DaughterMass_GeV>
-            <MotherMass_GeV>991.299127</MotherMass_GeV>
+            <Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>991.299127</Mass_GeV>
+                    <Mass_GeV>128.96157</Mass_GeV>
+                </Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>991.394247248</Mass_GeV>
+                    <Mass_GeV>128.96157</Mass_GeV>
+                </Mass_GeV_List>
+            </Mass_GeV_List>
             <TxNames_List>
                 <TxNames>T2</TxNames>
             </TxNames_List>
@@ -133,8 +148,18 @@
             <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
             <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
             <DataSetID>None</DataSetID>
-            <DaughterMass_GeV>128.96157</DaughterMass_GeV>
-            <MotherMass_GeV>991.776131301</MotherMass_GeV>
+            <Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>991.776131301</Mass_GeV>
+                    <Mass_GeV>269.035358</Mass_GeV>
+                    <Mass_GeV>128.96157</Mass_GeV>
+                </Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>992.825528458</Mass_GeV>
+                    <Mass_GeV>269.035358</Mass_GeV>
+                    <Mass_GeV>128.96157</Mass_GeV>
+                </Mass_GeV_List>
+            </Mass_GeV_List>
             <TxNames_List>
                 <TxNames>T6WW</TxNames>
             </TxNames_List>
@@ -148,8 +173,18 @@
             <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
             <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
             <DataSetID>None</DataSetID>
-            <DaughterMass_GeV>128.96157</DaughterMass_GeV>
-            <MotherMass_GeV>865.035125</MotherMass_GeV>
+            <Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>865.035125</Mass_GeV>
+                    <Mass_GeV>269.035358</Mass_GeV>
+                    <Mass_GeV>128.96157</Mass_GeV>
+                </Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>865.035125</Mass_GeV>
+                    <Mass_GeV>269.035358</Mass_GeV>
+                    <Mass_GeV>128.96157</Mass_GeV>
+                </Mass_GeV_List>
+            </Mass_GeV_List>
             <TxNames_List>
                 <TxNames>T5WW</TxNames>
             </TxNames_List>
@@ -163,8 +198,16 @@
             <AnalysisID>ATLAS-SUSY-2013-12</AnalysisID>
             <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
             <DataSetID>None</DataSetID>
-            <DaughterMass_GeV>128.96157</DaughterMass_GeV>
-            <MotherMass_GeV>269.035358</MotherMass_GeV>
+            <Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>269.035358</Mass_GeV>
+                    <Mass_GeV>128.96157</Mass_GeV>
+                </Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>268.89276</Mass_GeV>
+                    <Mass_GeV>128.96157</Mass_GeV>
+                </Mass_GeV_List>
+            </Mass_GeV_List>
             <TxNames_List>
                 <TxNames>TChiWZ</TxNames>
             </TxNames_List>
