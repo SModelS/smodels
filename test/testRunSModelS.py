@@ -19,8 +19,8 @@ from smodels.tools import crashReport
 from smodels.tools.timeOut import NoTime
 from runSModelS import main
 import logging as logger
+import redirector
 import unum
-
 
 def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
     """
@@ -72,16 +72,16 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
 
 class RunSModelSTest(unittest.TestCase):
     def runMain(self, filename, timeout = 0, suppressStdout=True, development=False):
+        to = None
         if suppressStdout:
-            a=sys.stdout
-            sys.stdout = open( "stdout.log", "w")
-        out = join( iDir(), "test/unitTestOutput" )
-        main(filename, parameterFile=join ( iDir(), "test/testParameters.ini" ),
-             outputDir= out, verbosity = 'error', db= None, timeout = timeout,
-             development = development)
-        sfile = join(iDir(),"test/unitTestOutput/%s.py" % basename(filename))
-        return sfile
-    
+            to = os.devnull
+        with redirector.stdout_redirected ( to = to ):
+            out = join( iDir(), "test/unitTestOutput" )
+            main(filename, parameterFile=join ( iDir(), "test/testParameters.ini" ),
+                 outputDir= out, verbosity = 'error', db= None, timeout = timeout,
+                 development = development)
+            sfile = join(iDir(),"test/unitTestOutput/%s.py" % basename(filename))
+            return sfile
     
     def testMultipleFiles( self ):
         out = join( iDir(), "test/unitTestOutput")
@@ -95,7 +95,7 @@ class RunSModelSTest(unittest.TestCase):
         self.assertTrue( nout == nin )
            
     def timeoutRun(self):
-        filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
+        filename = join ( iDir(), "inputFiles/slha/complicated.slha" )
         outputfile = self.runMain(filename, timeout=1, suppressStdout=True,
                      development=True)
     
@@ -127,10 +127,11 @@ class RunSModelSTest(unittest.TestCase):
         from bad_default import smodelsOutputDefault
         from bad_output import smodelsOutput
         ignoreFields = ['input file','smodels version', 'ncpus']
-        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.,ignore=ignoreFields)
-        self.assertTrue(equals )
+        equals = equalObjs( smodelsOutput,smodelsOutputDefault,allowedDiff=0.,
+                            ignore=ignoreFields)
         os.remove('./bad_output.py')
         os.remove('./bad_output.pyc')
+        self.assertTrue(equals )
           
     def testCrash(self):
         for f in os.listdir("."):
