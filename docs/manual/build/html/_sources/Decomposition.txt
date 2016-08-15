@@ -47,7 +47,7 @@ according to the information contained in the DECAY blocks. This procedure is re
 
 .. _decomp1:
 
-.. image:: images/decomp1.png
+.. image:: images/decomp1B.png
    :width: 45%
 
 
@@ -57,7 +57,7 @@ as shown below:
 
 .. _decomp2:
 
-.. image:: images/decomp2.png
+.. image:: images/decomp2B.png
    :width: 65%
 
 
@@ -141,7 +141,7 @@ decay, as shown below:
 
 .. _massCompfig:
 
-.. image:: images/massComp.png
+.. image:: images/massCompB.png
    :width: 80%
 
 After the compression, only the lightest of the two near-degenerate masses are kept in the element, as shown :ref:`above <massCompfig>`.
@@ -182,7 +182,7 @@ contain only invisible final states:
 
 .. _massInvpfig:
 
-.. image:: images/invComp.png
+.. image:: images/invCompB.png
    :width: 80%
 
 
@@ -218,18 +218,17 @@ The correct ordering of the above elements is:
 Element 3 < Element 2 < Element 1
 
 
-Element 1 is 'bigger' than the other two since it has a larger number of vertices.
+Element 1 is 'larger' than the other two since it has a larger number of vertices.
 Elements 2 and 3  are identical, except for their masses. Since the mass array of
 Element 3 is smaller than the one in Element 2, the former is 'smaller' than the latter.
 Finally if all the branch features listed above are identical for both branches, the
 elements being compared are considered to be equal.
-
 Futhermore, the branches belonging to the same element are also sorted. Hence, if an element
 has two branches::
 
-   element = [branch1, branch2]
+   element = [branch1, branch2],
 
-we have::
+it implies::
 
    branch1 < branch2
 
