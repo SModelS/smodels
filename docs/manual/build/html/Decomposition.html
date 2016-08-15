@@ -178,11 +178,11 @@ of two</em> Z<sub>2</sub>-odd <em>states</em> are stored and serve as the initia
 with a different number of Z<sub>2</sub>-odd states are ignored.)
 Starting from these primary mothers, all the possible decays are generated
 according to the information contained in the DECAY blocks. This procedure is represented in the figure below:</p>
-<a class="reference internal image-reference" href="_images/decomp1.png" id="decomp1"><img alt="_images/decomp1.png" id="decomp1" src="_images/decomp1.png" style="width: 45%;" /></a>
+<a class="reference internal image-reference" href="_images/decomp1B.png" id="decomp1"><img alt="_images/decomp1B.png" id="decomp1" src="_images/decomp1B.png" style="width: 45%;" /></a>
 <p>Each of the possible cascade decays for each mother corresponds to a <a class="reference internal" href="TheoryDefinitions.html#branch"><span>branch</span></a>.
 In order to finally generate <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>, all the branches are combined in pairs according to the production cross-sections,
 as shown below:</p>
-<a class="reference internal image-reference" href="_images/decomp2.png" id="decomp2"><img alt="_images/decomp2.png" id="decomp2" src="_images/decomp2.png" style="width: 65%;" /></a>
+<a class="reference internal image-reference" href="_images/decomp2B.png" id="decomp2"><img alt="_images/decomp2B.png" id="decomp2" src="_images/decomp2B.png" style="width: 65%;" /></a>
 <p>For instance, assume [b1,b2,b3] and [B1,B2] represent all possible branches (or cascade decays)
 for the primary mothers A and B, respectively. Then, if a production cross-section for <span class="math">\(pp \rightarrow A+B\)</span> is given in the input file, the following elements will be generated:</p>
 <blockquote>
@@ -240,7 +240,7 @@ results. The details behind the compression methods are as follows:</p>
 one will in most cases produce soft <a class="reference internal" href="TheoryDefinitions.html#final-states"><span>final states</span></a>, which can not be experimentally detected.
 Consequently, it is a good approximation to neglect the soft <a class="reference internal" href="TheoryDefinitions.html#final-states"><span>final states</span></a> and <em>compress</em> the respective
 decay, as shown below:</p>
-<a class="reference internal image-reference" href="_images/massComp.png" id="masscompfig"><img alt="_images/massComp.png" id="masscompfig" src="_images/massComp.png" style="width: 80%;" /></a>
+<a class="reference internal image-reference" href="_images/massCompB.png" id="masscompfig"><img alt="_images/massCompB.png" id="masscompfig" src="_images/massCompB.png" style="width: 80%;" /></a>
 <p>After the compression, only the lightest of the two near-degenerate masses are kept in the element, as shown <a class="reference internal" href="#masscompfig"><span>above</span></a>.
 The main parameter which controls the compression is <a class="reference external" href="../../../documentation/build/html/theory.html#theory.element.Element.massCompress">minmassgap</a>,
 which corresponds to the maximum value of <span class="math">\(\epsilon\)</span>
@@ -270,7 +270,7 @@ The most common example is</p>
 Hence it is possible to omit the last step in the cascade decay, resulting in a compressed element.
 Note that this compression can be applied consecutively to several steps of the cascade decay if all of them
 contain only invisible final states:</p>
-<a class="reference internal image-reference" href="_images/invComp.png" id="massinvpfig"><img alt="_images/invComp.png" id="massinvpfig" src="_images/invComp.png" style="width: 80%;" /></a>
+<a class="reference internal image-reference" href="_images/invCompB.png" id="massinvpfig"><img alt="_images/invCompB.png" id="massinvpfig" src="_images/invCompB.png" style="width: 80%;" /></a>
 <ul class="simple">
 <li><strong>Invisible compression is implemented by the</strong> <a class="reference external" href="../../../documentation/build/html/theory.html#theory.element.Element.invisibleCompress">invisibleCompress</a> <strong>method</strong></li>
 </ul>
@@ -295,17 +295,17 @@ the following properties:</p>
 <a class="reference internal image-reference" href="_images/elSorting.png" id="elementsorting"><img alt="_images/elSorting.png" id="elementsorting" src="_images/elSorting.png" style="width: 80%;" /></a>
 <p>The correct ordering of the above elements is:</p>
 <p>Element 3 &lt; Element 2 &lt; Element 1</p>
-<p>Element 1 is &#8216;bigger&#8217; than the other two since it has a larger number of vertices.
+<p>Element 1 is &#8216;larger&#8217; than the other two since it has a larger number of vertices.
 Elements 2 and 3  are identical, except for their masses. Since the mass array of
 Element 3 is smaller than the one in Element 2, the former is &#8216;smaller&#8217; than the latter.
 Finally if all the branch features listed above are identical for both branches, the
-elements being compared are considered to be equal.</p>
-<p>Futhermore, the branches belonging to the same element are also sorted. Hence, if an element
+elements being compared are considered to be equal.
+Futhermore, the branches belonging to the same element are also sorted. Hence, if an element
 has two branches:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">element</span> <span class="o">=</span> <span class="p">[</span><span class="n">branch1</span><span class="p">,</span> <span class="n">branch2</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">element</span> <span class="o">=</span> <span class="p">[</span><span class="n">branch1</span><span class="p">,</span> <span class="n">branch2</span><span class="p">],</span>
 </pre></div>
 </div>
-<p>we have:</p>
+<p>it implies:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">branch1</span> <span class="o">&lt;</span> <span class="n">branch2</span>
 </pre></div>
 </div>

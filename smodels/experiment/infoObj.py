@@ -68,7 +68,7 @@ class Info(object):
     def addInfo(self,tag,value):
         """
         Adds the info field labeled by tag with value value to the object.
-        If the attribute contains
+        
         :param tag: information label (string)
         :param value: value for the field in string format 
         """
