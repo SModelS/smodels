@@ -46,7 +46,7 @@ These functionalities include detailed checks of input SLHA files,
 running the |decomposition| and printing the :ref:`output <output>`,
 evaluating the :doc:`theory predictions <TheoryPredictions>` and comparing them to the experimental
 limits available in the :doc:`database <Database>`,
-determining :ref:`missing topologies <missTops>` and printing a :ref:`summary text file <output>`.
+determining :ref:`missing topologies <topCoverage>` and printing a :ref:`summary text file <output>`.
 
 These settings may be changed from their default values using the :ref:`parameter file <parameterFile>`.
 
@@ -97,7 +97,7 @@ Below we give more detailed information about each entry in the parameters file.
     Set to False to turn |invisible compression| off.
   * **doCompress** (True/False): turns |mass compression| on and off during the |decomposition|.
     Set to False to turn |mass compression| off.
-  * **findMissingTopos** (True/False): set to True to run the :ref:`missing topologies <missTops>` tool.
+  * **findMissingTopos** (True/False): set to True to run the :ref:`missing topologies <topCoverage>` tool.
 
 *default values*:
 
@@ -271,7 +271,7 @@ If both **expandedSummary** and **addConstraintInfo** are set to True
 .. literalinclude:: /images/summary.txt
    :lines: 45-46
 
-* if **findMissingTopos** = True,  a list of the :ref:`missing topologies <missTops>` and their cross sections at the given
+* if **findMissingTopos** = True,  a list of the :ref:`missing topologies <topCoverage>` and their cross sections at the given
   value of *sqrts* is also included. This list represents the |elements| or sum of |elements| 
   (shown using the :ref:`bracket notation <bracketNotation>`) with the highest
   weights (:math:`\sigma \times BR`) which are not tested by any |analysis|:

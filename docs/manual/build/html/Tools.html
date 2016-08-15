@@ -92,8 +92,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#slha-file-checker">SLHA File Checker</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#missing-topologies">Missing Topologies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#database-browser">Database Browser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#topology-coverage">Topology Coverage</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation and Deployment</a></li>
@@ -150,7 +150,8 @@
 <li>a <a class="reference internal" href="#xseccalc"><span>cross section calculator</span></a> based on <a class="reference external" href="http://home.thep.lu.se/~torbjorn/Pythia.html">Pythia6</a>  and
 <a class="reference external" href="http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast">NLLfast</a>,</li>
 <li><a class="reference internal" href="#filechecks"><span>SLHA and LHE file checkers</span></a> to check your input files for completeness and sanity,</li>
-<li>a module for identifying <a class="reference internal" href="#misstops"><span>missing topologies</span></a>.</li>
+<li>a <a class="reference internal" href="#databasebrowser"><span>Database Browser</span></a> to provide easy access to the <a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a> of experimental results,</li>
+<li>a module for identifying <a class="reference internal" href="#topcoverage"><span>missing topologies</span></a>.</li>
 </ul>
 <div class="section" id="cross-section-calculator">
 <span id="xseccalc"></span><h2>Cross-Section Calculator<a class="headerlink" href="#cross-section-calculator" title="Permalink to this headline">¶</a></h2>
@@ -365,8 +366,22 @@ usage example is:</p>
 and error messages.</p>
 </div>
 </div>
-<div class="section" id="missing-topologies">
-<span id="misstops"></span><h2>Missing Topologies<a class="headerlink" href="#missing-topologies" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="database-browser">
+<span id="databasebrowser"></span><h2>Database Browser<a class="headerlink" href="#database-browser" title="Permalink to this headline">¶</a></h2>
+<p>In several cases the user might be interested in an easy way to directly access the <a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a> of <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Results</span></a>.
+This can be conveniently done using the database browser. The browser owns several methods to select  <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Results</span></a>
+or <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Sets</span></a> satisfying some user-defined conditions as well as to access the meta data and data inside each
+<a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a>.</p>
+<p>Unlike most of the other SModelS tools, the browser can not be directly accessed from the command line.
+However, several python example codes using the functionalities of the browser
+can be found in <a class="reference internal" href="Examples.html#examples"><span>More Examples</span></a>.
+Below we will quickly describe how to instantiate the browser and use its main functionalities.</p>
+<ul class="simple">
+<li><strong>The Database browser tool is implemented by the</strong>  <a class="reference external" href="../../../documentation/build/html/tools.html#tools.databaseBrowser.Browser">Browser class</a></li>
+</ul>
+</div>
+<div class="section" id="topology-coverage">
+<span id="topcoverage"></span><h2>Topology Coverage<a class="headerlink" href="#topology-coverage" title="Permalink to this headline">¶</a></h2>
 <p>Unlike the <a class="reference internal" href="#filechecks"><span>file checks</span></a> and the <a class="reference internal" href="#xseccalc"><span>cross-section calculator</span></a>, the missing topologies tool can be called only <em>after</em> the SMS <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> and <a class="reference internal" href="TheoryPredictions.html"><em>theory predictions</em></a> have been computed.
 Given the <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> output (list of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>), as well as the <code class="xref doc docutils literal"><span class="pre">database</span></code>
 information, it finds the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> which are
@@ -384,20 +399,6 @@ in the <a class="reference internal" href="RunningSModelS.html#parameterfile"><s
 In the output, the missing topologies are ordered by cross section. By default only the ones with the ten largest cross-sections are shown.</p>
 <ul class="simple">
 <li><strong>The missing topologies tool is implemented by the</strong> <a class="reference external" href="../../../documentation/build/html/tools.html#tools.missingTopologies.MissingTopoList">MissingTopoList class</a></li>
-</ul>
-</div>
-<div class="section" id="database-browser">
-<h2>Database Browser<a class="headerlink" href="#database-browser" title="Permalink to this headline">¶</a></h2>
-<p>In several cases the user might be interested in an easy way to directly access the <a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a> of <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Results</span></a>.
-This can be conveniently done using the database browser. The browser owns several methods to select  <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Results</span></a>
-or <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Sets</span></a> satisfying some user-defined conditions as well as to access the meta data and data inside each
-<a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a>.</p>
-<p>Unlike most of the other SModelS tools, the browser can not be directly accessed from the command line.
-However, several python example codes using the functionalities of the browser
-can be found in <a class="reference internal" href="Examples.html#examples"><span>More Examples</span></a>.
-Below we will quickly describe how to instantiate the browser and use its main functionalities.</p>
-<ul class="simple">
-<li><strong>The Database browser tool is implemented by the</strong>  <a class="reference external" href="../../../documentation/build/html/tools.html#tools.databaseBrowser.Browser">Browser class</a></li>
 </ul>
 </div>
 </div>

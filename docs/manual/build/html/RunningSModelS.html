@@ -165,7 +165,7 @@ setting the <a class="reference internal" href="#parameterfile"><span>basic para
 running the <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> and printing the <a class="reference internal" href="#output"><span>output</span></a>,
 evaluating the <a class="reference internal" href="TheoryPredictions.html"><em>theory predictions</em></a> and comparing them to the experimental
 limits available in the <code class="xref doc docutils literal"><span class="pre">database</span></code>,
-determining <a class="reference internal" href="Tools.html#misstops"><span>missing topologies</span></a> and printing a <a class="reference internal" href="#output"><span>summary text file</span></a>.</p>
+determining <a class="reference internal" href="Tools.html#topcoverage"><span>missing topologies</span></a> and printing a <a class="reference internal" href="#output"><span>summary text file</span></a>.</p>
 <p>These settings may be changed from their default values using the <a class="reference internal" href="#parameterfile"><span>parameter file</span></a>.</p>
 <dl class="docutils">
 <dt><strong>usage:</strong></dt>
@@ -230,7 +230,7 @@ are performed, such as if the file contain charged stable particles, if there ar
 Set to False to turn <a class="reference internal" href="Decomposition.html#invcomp"><span>invisible compression</span></a> off.</li>
 <li><strong>doCompress</strong> (True/False): turns <a class="reference internal" href="Decomposition.html#masscomp"><span>mass compression</span></a> on and off during the <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a>.
 Set to False to turn <a class="reference internal" href="Decomposition.html#masscomp"><span>mass compression</span></a> off.</li>
-<li><strong>findMissingTopos</strong> (True/False): set to True to run the <a class="reference internal" href="Tools.html#misstops"><span>missing topologies</span></a> tool.</li>
+<li><strong>findMissingTopos</strong> (True/False): set to True to run the <a class="reference internal" href="Tools.html#topcoverage"><span>missing topologies</span></a> tool.</li>
 </ul>
 </li>
 </ul>
@@ -271,10 +271,10 @@ are given, only these analyses will be applied. For instance, setting analyses =
 will only use the <span class="xref std std-ref">analyses</span> from <a class="reference external" href="https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13008">CMS-PAS-SUS-13-008</a>
 and <a class="reference external" href="https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-024/">ATLAS-CONF-2013-024</a>.</li>
 <li><strong>txnames</strong> (list of constraints): set to all to use all available <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>analyses constraints</span></a>.
-If a list of <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>constraints</span></a> are given (using the <span class="xref std std-ref">Tx name shorthand</span>,
+If a list of <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>constraints</span></a> are given (using the <a class="reference internal" href="DatabaseDefinitions.html#txname"><span>Tx name shorthand</span></a>,
 only these <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>constraints</span></a> will be considered. For instance, setting txnames = T2 will
 only consider the analyses containing upper limits for <span class="math">\([[[jet]],[[jet]]]\)</span>.
-A list of all <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>constraints</span></a> and their <span class="xref std std-ref">Tx names</span> can be found <a class="reference external" href="http://smodels.hephy.at/wiki/SmsDictionary">here</a>)</li>
+A list of all <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>constraints</span></a> and their <a class="reference internal" href="DatabaseDefinitions.html#txname"><span>Tx names</span></a> can be found <a class="reference external" href="http://smodels.hephy.at/wiki/SmsDictionary">here</a>)</li>
 </ul>
 </li>
 </ul>
@@ -428,7 +428,7 @@ is also included just below the <span class="xref std std-ref">analysis</span> e
 <li>The last line of this block gives the maximum value of <em>r</em>, <span class="math">\(R = max(r)\)</span>.</li>
 </ul>
 <ul class="simple">
-<li>if <strong>findMissingTopos</strong> = True,  a list of the <a class="reference internal" href="Tools.html#misstops"><span>missing topologies</span></a> and their cross sections at the given
+<li>if <strong>findMissingTopos</strong> = True,  a list of the <a class="reference internal" href="Tools.html#topcoverage"><span>missing topologies</span></a> and their cross sections at the given
 value of <em>sqrts</em> is also included. This list represents the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>
 (shown using the <a class="reference internal" href="TheoryDefinitions.html#bracketnotation"><span>bracket notation</span></a>) with the highest
 weights (<span class="math">\(\sigma \times BR\)</span>) which are not tested by any <span class="xref std std-ref">analysis</span>:</li>
