@@ -254,3 +254,39 @@ class Browser(object):
         
         if not self._selectedExpResults: logger.warning("Zero results loaded.")
    
+
+def main(args):
+    """
+    IPython interface for browsing the Database.
+    """
+        
+    try:
+        import IPython
+    except ImportError as e:
+        print "Ipython is not installed. To use this script, please install ipython."
+        import sys
+        sys.exit()
+   
+    
+    from smodels.tools import databaseBrowser
+    from smodels.tools.physicsUnits import fb, pb, GeV, TeV
+    from smodels.tools import statistics
+    
+    def getHeader ():
+        from smodels.installation import installDirectory
+        header = ""
+        with open( installDirectory()+"/BANNER") as f:
+            lines=f.readlines()
+            for line in lines: header+=line
+    
+        header += "\n"
+        header += "fb, pb, GeV, TeV defined.\n"
+        header +=  "\nBrowser loaded for %s \n" %( args.path_to_database )
+        header += "Try 'print browser' for the list of available results.\n"
+        header += "More examples on how to access the database can be found in the SModelS manual.\n"
+        header += "\nType 'exit' to exit this session."
+                
+        return header
+        
+    browser = databaseBrowser.Browser(args.path_to_database)        
+    IPython.embed(header=getHeader())    

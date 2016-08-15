@@ -37,7 +37,7 @@ with a thin python layer serving as the access to the database.
 The overall structure of the directory hierarchy and its contents is depicted in the scheme below (click to enlarge):
 
 .. image:: images/DatabaseFolders.png
-   :height: 400px
+   :width: 80%
 
 As seen above, the top level of the SModelS database categorizes the analyses by LHC center-of-mass energies, |sqrts|:
 
@@ -58,14 +58,16 @@ The third level of the directory hierarchy encodes the |ExpRess|:
 * 8TeV/ATLAS/ATLAS-CONF-2013-047
 * ...
 
-* **The Database folder is described by the** `Database Class <../../../documentation/build/html/experiment.html#experiment.databaseObjects.Database>`_
+
+
+* **The Database folder is described by the** `Database Class <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
 
 Experimental Result Folder
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Each |ExpRes| folder contains: 
 
-* a folder for each |Dataset| (``data-xx``)
+* a folder for each |Dataset| (e.g. ``data-xx``)
 * a ``globalInfo.txt`` file
 
 The ``globalInfo.txt`` file contains the meta information about the |ExpRes|.
@@ -76,20 +78,20 @@ Here is the content of CMS-SUS-12-024/globalInfo.txt as an example:
 .. literalinclude:: /literals/globalInfo.txt
    :lines: 1-11
 
-* **Experimental Result folder is described by the** `ExpResult Class <../../../documentation/build/html/experiment.html#experiment.databaseObjects.ExpResult>`_
-* **globalInfo files  are descrived by the** `Info Class <../../../documentation/build/html/experiment.html#experiment.infoObject.Info>`_
+* **Experimental Result folder is described by the** `ExpResult Class <../../../documentation/build/html/experiment.html#experiment.expResultObj.ExpResult>`_
+* **globalInfo files  are descrived by the** `Info Class <../../../documentation/build/html/experiment.html#experiment.infoObj.Info>`_
 
 Data Set Folder
 ^^^^^^^^^^^^^^^
 
-Each |Dataset| folder (``data-xx``) contains:
+Each |Dataset| folder (e.g. ``data-xx``) contains:
 
 * the Upper Limit maps for |ULrs| or Efficiency maps for |EMrs| (``TxName.txt`` files)
 * a ``dataInfo.txt`` file containing meta information about the |Dataset|
 
-* **Data Set folders are  described by the** `DataSet Class <../../../documentation/build/html/experiment.html#experiment.datasetObject.DataSet>`_
-* **TxName files are descrived by the** `TxName Class <../../../documentation/build/html/experiment.html#experiment.txnameObject.TxName>`_
-* **dataInfo files  are descrived by the** `Info Class <../../../documentation/build/html/experiment.html#experiment.infoObject.Info>`_
+* **Data Set folders are  described by the** `DataSet Class <../../../documentation/build/html/experiment.html#experiment.datasetObj.DataSet>`_
+* **TxName files are descrived by the** `TxName Class <../../../documentation/build/html/experiment.html#experiment.txnameObj.TxName>`_
+* **dataInfo files  are descrived by the** `Info Class <../../../documentation/build/html/experiment.html#experiment.infoObj.Info>`_
 
 Data Set Folder: Upper Limit Type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -159,15 +161,44 @@ Below we show the overall object structure  as well as the folders/files the obj
 represent (click to enlarge):
 
 .. image:: images/DatabaseObjects.png
-   :height: 400px
+   :width: 80%
    
 The type of python object (python class, phyton list,...) is shown in brackets.
 For convenience, below we explicitly list the main database folders/files and the python objects they
 are mapped to:
 
-* |Database| folder :math:`\rightarrow` `Database Class <../../../documentation/build/html/experiment.html#experiment.databaseObjects.Database>`_
-* |ExpRes| folder :math:`\rightarrow` `ExpResult Class <../../../documentation/build/html/experiment.html#experiment.databaseObjects.ExpResult>`_
-* |Dataset| folder :math:`\rightarrow` `DataSet Class <../../../documentation/build/html/experiment.html#experiment.datasetObject.DataSet>`_
-* ``globalInfo.txt`` file  :math:`\rightarrow` `Info Class <../../../documentation/build/html/experiment.html#experiment.infoObject.Info>`_
-* ``dataInfo.txt`` file  :math:`\rightarrow` `Info Class <../../../documentation/build/html/experiment.html#experiment.infoObject.Info>`_
-* ``Txname.txt`` file  :math:`\rightarrow` `TxName Class <../../../documentation/build/html/experiment.html#experiment.txnameObject.TxName>`_
+* |Database| folder :math:`\rightarrow` `Database Class <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
+* |ExpRes| folder :math:`\rightarrow` `ExpResult Class <../../../documentation/build/html/experiment.html#experiment.databaseObj.ExpResult>`_
+* |Dataset| folder :math:`\rightarrow` `DataSet Class <../../../documentation/build/html/experiment.html#experiment.datasetObj.DataSet>`_
+* ``globalInfo.txt`` file  :math:`\rightarrow` `Info Class <../../../documentation/build/html/experiment.html#experiment.infoObj.Info>`_
+* ``dataInfo.txt`` file  :math:`\rightarrow` `Info Class <../../../documentation/build/html/experiment.html#experiment.infoObj.Info>`_
+* ``Txname.txt`` file  :math:`\rightarrow` `TxName Class <../../../documentation/build/html/experiment.html#experiment.txnameObj.TxName>`_
+
+
+Database: Binary (Pickle) Format
+--------------------------------
+
+Due to the large number of experimental results contained in the SModelS |Database|, 
+parsing the :ref:`database folders <folderStruct>` and building the corresponding 
+:ref:`database objects <objStruct>` may require a non-negligible cpu time. In some cases
+this task may be the most time consuming when testing a single input file.
+Furthermore this is a static task which does not have to be repeated everytime SModelS is run.
+In order to avoid these issues, SModelS serializes the 
+`database object <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
+into a pickle file (*<database-path>/database.pcl*), which can then be read directly when loading the database.
+Since reading the pickle file is much faster than parsing the :ref:`database folders <folderStruct>`,
+there is a considerable speed improvement when using the pickle file.
+If any changes in the :ref:`database folder structure <folderStruct>` or in the SModelS
+version are detected, SModelS will automatically re-build the pickle file.
+Although this action may take a few minutes, it is only performed once.
+
+
+SModelS automatically builds (if necessary) and loads the binary database when a 
+`Database object <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
+is created. Nonetheless, the user can enforce loading (parsing) the *text database* using the option *force_load = 'txt'* in 
+`Database <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_ .  
+
+
+* The pickle file is created by the `createBinaryFile method <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database.createBinaryFile>`_
+
+ 

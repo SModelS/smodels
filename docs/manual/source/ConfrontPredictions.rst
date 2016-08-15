@@ -54,7 +54,7 @@ The procedure described above can be applied to all the |ExpRess| in the databas
 in a list of theory predictions and upper limits for each |ExpRes|. A model can then be considered
 excluded by the experimental results if, for one or more predictions, we have *theory prediction* :math:`>` *upper limit* [*]_.
 
-* **The upper limits for a given**  |ULr| **or** |EMr| **can be obtained using the** `getUpperLimitFor  method <../../../documentation/build/html/experiment.html#experiment.databaseObjects.ExpResult.getUpperLimitFor>`_
+* **The upper limits for a given**  |ULr| **or** |EMr| **can be obtained using the** `getUpperLimitFor  method <../../../documentation/build/html/experiment.html#experiment.expResultObj.ExpResult.getUpperLimitFor>`_
 
 .. [*] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model
    is being tested by a large number of results simultaneoustly.
