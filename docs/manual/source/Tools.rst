@@ -29,7 +29,8 @@ Inside SModelS there are a number of tools that may be convenient for the user:
 * a :ref:`cross section calculator <xsecCalc>` based on `Pythia6 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_  and 
   `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_,
 * :ref:`SLHA and LHE file checkers <fileChecks>` to check your input files for completeness and sanity,
-* a module for identifying :ref:`missing topologies <missTops>`.
+* a :ref:`Database Browser <databaseBrowser>` to provide easy access to the |Database| of experimental results,
+* a module for identifying :ref:`missing topologies <topCoverage>`.
 
 .. _xsecCalc:
 
@@ -217,11 +218,28 @@ usage example is: ::
 Running this will print the status flag and a message with potential warnings
 and error messages.
 
+.. _databaseBrowser:
 
-.. _missTops:
+Database Browser
+----------------
 
-Missing Topologies
-------------------
+In several cases the user might be interested in an easy way to directly access the |Database| of |ExpRess|.
+This can be conveniently done using the database browser. The browser owns several methods to select  |ExpRess|
+or |Datasets| satisfying some user-defined conditions as well as to access the meta data and data inside each
+|ExpRes|. 
+
+Unlike most of the other SModelS tools, the browser can not be directly accessed from the command line.
+However, several python example codes using the functionalities of the browser
+can be found in :ref:`More Examples <Examples>`.
+Below we will quickly describe how to instantiate the browser and use its main functionalities.
+
+* **The Database browser tool is implemented by the**  `Browser class <../../../documentation/build/html/tools.html#tools.databaseBrowser.Browser>`_
+
+
+.. _topCoverage:
+
+Topology Coverage
+-----------------
 
 Unlike the :ref:`file checks <fileChecks>` and the :ref:`cross-section calculator <xsecCalc>`, the missing topologies tool can be called only *after* the SMS |decomposition| and |theory predictions| have been computed.
 Given the |decomposition| output (list of |elements|), as well as the |database|
@@ -243,17 +261,3 @@ In the output, the missing topologies are ordered by cross section. By default o
 
 * **The missing topologies tool is implemented by the** `MissingTopoList class <../../../documentation/build/html/tools.html#tools.missingTopologies.MissingTopoList>`_ 
 
-Database Browser
-----------------
-
-In several cases the user might be interested in an easy way to directly access the |Database| of |ExpRess|.
-This can be conveniently done using the database browser. The browser owns several methods to select  |ExpRess|
-or |Datasets| satisfying some user-defined conditions as well as to access the meta data and data inside each
-|ExpRes|. 
-
-Unlike most of the other SModelS tools, the browser can not be directly accessed from the command line.
-However, several python example codes using the functionalities of the browser
-can be found in :ref:`More Examples <Examples>`.
-Below we will quickly describe how to instantiate the browser and use its main functionalities.
-
-* **The Database browser tool is implemented by the**  `Browser class <../../../documentation/build/html/tools.html#tools.databaseBrowser.Browser>`_
