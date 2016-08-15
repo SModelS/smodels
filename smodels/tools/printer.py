@@ -680,17 +680,14 @@ class PyPrinter(BasicPrinter):
             maxconds = theoryPrediction.getmaxCondition()
             mass = theoryPrediction.mass
             if mass:
-                daughterMass = mass[0][-1].asNumber(GeV)
-                motherMass = mass[0][0].asNumber(GeV)
+                mass = [[m.asNumber(GeV) for m in mbr] for mbr in mass]
             else:
-                daughterMass = None
-                motherMass = None
+                mass = None
             sqrts = dataset.globalInfo.sqrts
             ExptRes.append({'maxcond': maxconds, 'theory prediction (fb)': value.asNumber(fb),
                         'upper limit (fb)': ul.asNumber(fb),
                         'TxNames': txnames,
-                        'DaughterMass (GeV)': daughterMass,
-                        'MotherMass (GeV)': motherMass,
+                        'Mass (GeV)': mass,
                         'AnalysisID': expID,
                         'DataSetID' : datasetID,
                         'AnalysisSqrts (TeV)': sqrts.asNumber(TeV),
