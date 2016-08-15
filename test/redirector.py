@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 """
-.. module: testLikelihood
-   :synopsis: Test likelihood functions module.
+.. module: redirector
+   :synopsis: Redirect stdout or stderr
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
@@ -23,6 +23,9 @@ def stdout_redirected(to=os.devnull, stdout=None):
     """
     http://stackoverflow.com/a/22434262/190597 (J.F. Sebastian)
     """
+    if to is None:
+        yield stdout
+        return
     if stdout is None:
        stdout = sys.stdout
 
@@ -42,13 +45,18 @@ def stdout_redirected(to=os.devnull, stdout=None):
             # restore stdout to its previous value
             #NOTE: dup2 makes stdout_fd inheritable unconditionally
             stdout.flush()
-            os.dup2(copied.fileno(), stdout_fd)  # $ exec >&copied
+            if stdout is not None:
+                os.dup2(copied.fileno(), stdout_fd)  # $ exec >&copied
 
 @contextlib.contextmanager
 def stderr_redirected(to=os.devnull, stderr=None):
     """
     http://stackoverflow.com/a/22434262/190597 (J.F. Sebastian)
     """
+    if to is None:
+        yield stderr
+        return
+
     if stderr is None:
        stderr = sys.stderr
 
@@ -71,7 +79,9 @@ def stderr_redirected(to=os.devnull, stderr=None):
             os.dup2(copied.fileno(), stderr_fd)  # $ exec >&copied
 
 if __name__ == '__main__':
-    print ( "test" )
-    with stdout_redirected():
+    print ( "test. this should appear." )
+    with stdout_redirected(  ):
 			print ( "redirected. this must not appear." )
-    print ( "test" )
+    with stdout_redirected( to = None ):
+			print ( "redirected trivially. this should appear." )
+    print ( "test. this should appear." )

@@ -10,7 +10,7 @@
 
 """
 from smodels import installation
-from smodels.tools import toolBox
+from smodels.tools import toolBox, runtime
 from smodels.tools.physicsUnits import pb, TeV, GeV
 from smodels.theory import crossSection
 from smodels.tools import nllFast
@@ -256,49 +256,18 @@ def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True, pythiacard=None
 
     return lheFile
 
-
-def main(args):
-    if args.query:
-        xsecsInfile = crossSection.getXsecFromSLHAFile(args.filename)
-        if xsecsInfile:
-            print "1"
-        else:
-            print "0"
-        return
-       
-    
-    sqrtses = [item for sublist in args.sqrts for item in sublist]
-    if len(sqrtses) == 0:
-        sqrtses = [8,13]
-    sqrtses.sort()
-    sqrtses = set(sqrtses)
-    order = 0
-    if args.NLO:
-        order = 1
-    if args.NLL:
-        order = 2
-    if order > 0:
-        for sqrts in sqrtses:
-            allowedsqrtses=[7, 8, 13, 14, 33, 100]
-            if not sqrts in allowedsqrtses:
-                logger.error("Cannot compute NLO or NLL xsecs for sqrts = %d "
-                             "TeV! Available are: %s TeV." % 
-                             (sqrts, allowedsqrtses ))
-                sys.exit(0)
-    inputFile = args.filename.strip()
-    if not os.path.exists(inputFile):
-        logger.error("File '%s' does not exist.", inputFile)
-        sys.exit(1)
-    if args.tofile:
+def computeForOneFile ( sqrtses, order, nevents, inputFile, unlink,
+                        lOfromSLHA, tofile ):
+    """ compute the cross sections for one file """
+    if tofile:
         logger.info("Computing SLHA cross section from %s, adding to "
                     "SLHA file." % inputFile )
         for s in sqrtses:
             ss = s*TeV 
-            xsecs = computeXSec( ss, order, args.nevents, inputFile, 
-                                 unlink=(not args.keep), loFromSlha=args.LOfromSLHA)
-            comment = "Nevts: " + str(args.nevents) + " xsec unit: pb"
+            xsecs = computeXSec( ss, order, nevents, inputFile, 
+                                 unlink= unlink, loFromSlha= lOfromSLHA)
+            comment = "Nevts: " + str(nevents) + " xsec unit: pb"
             addXSecToFile(xsecs, inputFile, comment)
-        sys.exit(0)
     else:
         logger.info("Computing SLHA cross section from %s." % inputFile )
         print
@@ -306,10 +275,100 @@ def main(args):
         print "======================="
         for s in sqrtses:
             ss = s*TeV 
-            xsecs = computeXSec(ss, order, args.nevents, inputFile, \
-                        unlink=(not args.keep), loFromSlha=args.LOfromSLHA )
+            xsecs = computeXSec(ss, order, nevents, inputFile, \
+                        unlink=unlink, loFromSlha=lOfromSLHA )
             for xsec in xsecs: 
                 print "%s %20s:  %.3e pb" % ( xsec.info.label,xsec.pid,xsec.value/pb )
         print
-        sys.exit(0)
 
+def queryCrossSections ( filename ):
+    if os.path.isdir ( filename ):
+        logger.error ( "Cannot query cross sections for a directory." )
+        sys.exit(-1)
+    xsecsInfile = crossSection.getXsecFromSLHAFile(filename)
+    if xsecsInfile:
+        print "1"
+    else:
+        print "0"
+
+def getOrder ( args ):
+    """ retrieve the order in perturbation theory from argument list """
+    if args.NLL:
+        return 2
+    if args.NLO:
+        return 1
+    return 0
+
+def getSqrtses ( args ):
+    """ extract the sqrtses from argument list """
+    sqrtses = [item for sublist in args.sqrts for item in sublist]
+    if len(sqrtses) == 0:
+        sqrtses = [8,13]
+    sqrtses.sort()
+    sqrtses = set(sqrtses)
+    return sqrtses
+
+def checkAllowedSqrtses ( order, sqrtses ):
+    """ check if the sqrtses are 'allowed' """
+    if order == 0: return
+    allowedsqrtses=[7, 8, 13, 14, 33, 100]
+    for sqrts in sqrtses:
+        if not sqrts in allowedsqrtses:
+            logger.error("Cannot compute NLO or NLL xsecs for sqrts = %d "
+                    "TeV! Available are: %s TeV." % (sqrts, allowedsqrtses ))
+            sys.exit(-2)
+
+def computeForBunch ( sqrtses, order, nevents, inputFiles, unlink,
+                        lOfromSLHA, tofile ):
+    """ compute xsecs for a bunch of slha files """
+    for inputFile in inputFiles:
+        logger.info ( "computing xsec for %s" % inputFile )
+        computeForOneFile ( sqrtses, order, nevents, inputFile, unlink, 
+                            lOfromSLHA, tofile )
+
+def getInputFiles ( args ):
+    """ geth the names of the slha files to run over """
+    inputPath  = args.filename.strip()
+    if not os.path.exists( inputPath ):
+        logger.error("Path '%s' does not exist.", inputFile)
+        sys.exit(1)
+    inputFiles = []
+    if os.path.isfile ( inputPath ):
+        inputFiles = [ inputPath ]
+    else:
+        files = os.listdir ( inputPath )
+        for f in files:
+            inputFiles.append ( os.path.join ( inputPath, f ) )
+    return inputFiles
+
+def main(args):
+    if args.query:
+        return queryCrossSections ( args.filename )
+    sqrtses = getSqrtses ( args )
+    order = getOrder ( args )
+    checkAllowedSqrtses ( order, sqrtses )
+    inputFiles = getInputFiles ( args )
+    ncpus = args.ncpus
+    if ncpus == -1: 
+        ncpus = runtime.nCPUs()
+    logger.info ( "We run on %d cpus" % ncpus )
+    children = []
+    for i in range(ncpus):
+        pid = os.fork()
+        chunk = inputFiles [ i::ncpus ]
+        if pid < 0:
+            logger.error ( "fork did not succeed! Pid=%d" % pid ) 
+            sys.exit()
+        if pid == 0:
+            logger.info ( "chunk #%d: pid %d (parent %d)." % 
+                       ( i, os.getpid(), os.getppid() ) )
+            logger.info ( " `-> %s" % " ".join ( chunk ) )
+            computeForBunch (  sqrtses, order, args.nevents, chunk, not args.keep,
+                               args.LOfromSLHA, args.tofile )
+            os._exit ( 0 )
+        if pid > 0:
+            children.append ( pid )
+    for child in children:
+        r = os.waitpid ( child, 0 )
+        logger.info ( "child %d terminated: %s" % (child,r) )
+    logger.info ( "all children terminated." )
