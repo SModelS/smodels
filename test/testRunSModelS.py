@@ -99,8 +99,8 @@ class RunSModelSTest(unittest.TestCase):
 
     def timeoutRun(self):
         filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
-        outputfile = self.runMain(filename, timeout=1, suppressStdout=False,
-                     development=True, inifile = "low_cut.ini" )
+        outputfile = self.runMain(filename, timeout=1, suppressStdout=True,
+                     development=True, inifile = "timeout.ini" )
 
     def testTimeout(self):
         self.assertRaises(NoTime, self.timeoutRun)
