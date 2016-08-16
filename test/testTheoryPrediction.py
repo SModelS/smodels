@@ -45,7 +45,6 @@ class IntegrationTest(unittest.TestCase):
         from smodels.installation import installDirectory
         from smodels.tools.physicsUnits import fb, GeV
         from smodels.theory import slhaDecomposer
-        from smodels.experiment.databaseObj import Database
         slhafile = '../inputFiles/slha/simplyGluino.slha'
         self.configureLogger()
         smstoplist = slhaDecomposer.decompose(slhafile, .1*fb, doCompress=True,

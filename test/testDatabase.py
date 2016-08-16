@@ -27,10 +27,9 @@ class DatabaseTest(unittest.TestCase):
         writer = Database ( "./database/", force_load = "txt" )
         binfile = "./.database.pcl"
         writer.createBinaryFile ( binfile )
-        ## reader1 = Database ( "./database/" )
-        reader2 = Database ( binfile )
+        reader = Database ( binfile )
         os.unlink ( binfile )
-        self.assertEqual( writer, reader2 )
+        self.assertEqual( writer, reader )
 
 if __name__ == "__main__":
     unittest.main()
