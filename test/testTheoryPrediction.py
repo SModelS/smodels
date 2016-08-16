@@ -11,6 +11,7 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.tools.physicsUnits import fb, GeV, pb
+from databaseLoader import database
 import inspect
 import os
 
@@ -49,7 +50,6 @@ class IntegrationTest(unittest.TestCase):
         self.configureLogger()
         smstoplist = slhaDecomposer.decompose(slhafile, .1*fb, doCompress=True,
                 doInvisible=True, minmassgap=5.*GeV)
-        database = Database ( "./database/" )
         listofanalyses = database.getExpResults( 
                 analysisIDs= [ "ATLAS-SUSY-2013-02" ], txnames = [ "T1" ] )
         if type(listofanalyses) != list:

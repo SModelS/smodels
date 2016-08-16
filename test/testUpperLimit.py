@@ -13,7 +13,6 @@ import unittest
 from smodels.tools.physicsUnits import GeV, pb
 from smodels.installation import installDirectory
 from databaseLoader import database
-# database=Database ( "./database", verbosity='warning' )
 
 class UpperLimitTest(unittest.TestCase):
 
