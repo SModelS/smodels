@@ -233,7 +233,7 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
     children = []
     for (i,chunk) in enumerate(chunkedFiles):
         pid=os.fork()
-        log.debug("Forking: ",i,pid,os.getpid())
+        log.debug("Forking: %s %s %s " % ( i,pid,os.getpid() ) )
         if pid == 0:
             log.info("chunk #%d: pid %d (parent %d)." %
                     ( i, os.getpid(), os.getppid() ) )
