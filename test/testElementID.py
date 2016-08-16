@@ -13,7 +13,7 @@ import unittest
 from smodels.installation import installDirectory
 from smodels.theory import slhaDecomposer
 from smodels.tools.physicsUnits import GeV
-from smodels.experiment.databaseObj import Database
+from databaseLoader import database
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 
 class ElementIdTest(unittest.TestCase):
@@ -23,7 +23,6 @@ class ElementIdTest(unittest.TestCase):
                      'ATLAS-SUSY-2013-05' : [23]}
         filename = "%sinputFiles/slha/compressedSpec.slha" % (installDirectory() )
         topoList = slhaDecomposer.decompose(filename,doCompress = True, doInvisible=True, minmassgap = 5*GeV)
-        database = Database("database/")
         resultlist = database.getExpResults()
         for res in resultlist:
             theorypredictions = theoryPredictionsFor(res, topoList)
