@@ -21,6 +21,7 @@ from runSModelS import main
 import logging as logger
 import redirector
 import unum
+import time
 
 def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
     """
@@ -98,7 +99,7 @@ class RunSModelSTest(unittest.TestCase):
         self.assertTrue( nout == nin )
 
     def timeoutRun(self):
-        filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
+        filename = join ( iDir(), "inputFiles/slha/complicated.slha" )
         outputfile = self.runMain(filename, timeout=1, suppressStdout=True,
                      development=True, inifile = "timeout.ini" )
 
@@ -122,7 +123,6 @@ class RunSModelSTest(unittest.TestCase):
         except: pass
         self.assertTrue(equals)
 
-
     def testBadFile(self):
         filename = join (iDir(), "inputFiles/slha/I_dont_exist.slha" )
         outputfile = self.runMain(filename)
@@ -136,18 +136,29 @@ class RunSModelSTest(unittest.TestCase):
         os.remove('./bad_output.pyc')
         self.assertTrue(equals )
 
-    def testCrash(self):
+    def cleanUp ( self ):
         for f in os.listdir("."):
             if ".crash" in f: os.remove(f)
-        if os.path.exists("crash_report_parameter"): os.remove("crash_report_parameter")
-        if os.path.exists("crash_report_input"): os.remove("crash_report_input")
+        for i in [ "crash_report_parameter", "crash_report_input" ]:
+            if os.path.exists ( i ): os.remove ( i )
+
+    def testCrash(self):
         filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
+        ctr=0
+        crash_file = None
+        self.cleanUp()
         outputfile = self.runMain(filename, timeout=1)
         for f in os.listdir("."):
-            if ".crash" in f: break
-        inp, par = crashReport.readCrashReportFile(f)
+            if ".crash" in f: 
+                crash_file = f
+                ctr+=1
+        self.assertEquals ( ctr, 1 )
+        inp, par = crashReport.readCrashReportFile(crash_file)
+
         self.assertEquals(open(filename).readlines(), open(inp).readlines())
-        self.assertEquals(open("testParameters.ini").readlines(), open(par).readlines())
+        self.assertEquals( open("testParameters.ini").readlines(), 
+                           open(par).readlines())
+        self.cleanUp()
 
 if __name__ == "__main__":
     unittest.main()
