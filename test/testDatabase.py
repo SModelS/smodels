@@ -23,9 +23,11 @@ class DatabaseTest(unittest.TestCase):
 
     def testWritePickle(self):
         """ tests writing pickle file """
+        binfile = "./.database.pcl"
+        if os.path.exists ( binfile ):
+            os.unlink ( binfile )
         self.logger.info ( "test writing pickle file """ )
         writer = Database ( "./database/", force_load = "txt" )
-        binfile = "./.database.pcl"
         writer.createBinaryFile ( binfile )
         reader = Database ( binfile )
         os.unlink ( binfile )
