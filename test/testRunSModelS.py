@@ -148,6 +148,14 @@ class RunSModelSTest(unittest.TestCase):
         crash_file = None
         self.cleanUp()
         outputfile = self.runMain(filename, timeout=1)
+        try:
+            ## trying to sync!!
+            import ctypes
+            libc = ctypes.CDLL("libc.so.6")
+            libc.sync()
+        except Exception,e:
+            pass
+        time.sleep(.1)
         for f in os.listdir("."):
             if ".crash" in f: 
                 crash_file = f
