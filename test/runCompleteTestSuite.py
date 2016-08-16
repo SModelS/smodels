@@ -36,23 +36,11 @@ def verbose_run():
                 print "[runCompleteTestSuite] now run",t.id()
                 t.run()
 
-def parallel_run ( verbose ):
-    if verbose:
-        print ("[runCompleteTestSuite] verbose run not implemented for parallel version" )
-    import testtools
-    suite = unittest.TestLoader().discover("./") 
-    concurrent_suite = testtools.ConcurrentStreamTestSuite(
-                                          lambda: ((case, None) for case in suite))
-    concurrent_suite.run(testtools.StreamResult())
-
 if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser('runs the complete test suite')
     ap.add_argument('-v','--verbose', help='run verbosely',action='store_true')
-    ap.add_argument('-p','--parallel', help='run in parallel',action='store_true')
     args = ap.parse_args()
-    if args.parallel:
-        parallel_run ( args.verbose )
     if args.verbose:
         verbose_run()
     else:
