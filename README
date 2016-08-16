@@ -1,5 +1,5 @@
 ============
-SModelS v1.0
+SModelS v1.1
 ============
 
 
@@ -11,7 +11,6 @@ SModelS is a Python library that requires Python version 2.6 or later
 
  * Pythia 6.4.27
  * NLL-fast 1.2 (7 TeV) and 2.1 (8 TeV)
- * PySLHA (modified version)
 
 These tools are built into SModelS, they need not be installed separately. 
 In addition to setuptools, SModelS depends on the following *external* Python libraries:
@@ -21,6 +20,7 @@ In addition to setuptools, SModelS depends on the following *external* Python li
  * argparse
  * docutils>=0.3
  * scipy>=0.9.0
+ * pyslha>=3.1.0
 
 For installation, SModelS makes use of Python's *setuptools*.
 Thus ::
@@ -61,7 +61,7 @@ followed by:
 
  * pip install nose unum argparse
  * pip install numpy
- * pip install pymc
+ * pip install pymc pyslha
  * export LC_ALL=C; export LANG=C; pip install scipy
 
 Note, that these steps can safely be done within a Python ``virtualenv``.
@@ -105,10 +105,9 @@ used to test runSModelS.py.
 Citation
 ========
 
-If you use this software please cite SModelS v1.0 as well as the programs 
+If you use this software please cite SModelS v1.1 as well as the programs 
 it makes use of (Pythia6.4, NLL-fast and PySLHA). For convenience, the relevant 
 citations are provided in bibtex format in references.bib. 
 
 For citing the experimental analyses in the database, you can use smodels-database/database.bib 
-
 
