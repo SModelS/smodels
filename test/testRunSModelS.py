@@ -58,12 +58,14 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
                 logger.warning("Key %s missing" %key)
                 return False
             if not equalObjs(obj1[key],obj2[key],allowedDiff, ignore=ignore ):
-                logger.warning('Objects differ:\n   %s\n and\n   %s' %(str(obj1[key]),str(obj2[key])))
+                logger.warning('Objects differ:\n   %s\n and\n   %s' %\
+                                (str(obj1[key]),str(obj2[key])))
                 return False
     elif isinstance(obj1,list):
         for ival,val in enumerate(obj1):
             if not equalObjs(val,obj2[ival],allowedDiff):
-                logger.warning('Objects differ:\n   %s \n and\n   %s' %(str(val),str(obj2[ival])))
+                logger.warning('Objects differ:\n   %s \n and\n   %s' %\
+                                (str(val),str(obj2[ival])))
                 return False
     else:
         return obj1 == obj2
