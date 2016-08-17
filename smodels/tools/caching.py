@@ -8,20 +8,20 @@
 """
 
 from functools import wraps                                                           
-from smodels.tools.physicsUnits import pb, GeV, fb
+from smodels.tools.physicsUnits import pb, GeV, fb, IncompatibleUnitsError
 
 def _toString ( arg ):
     try:
-        return "%.2f" % arg.asUnit(fb)
-    except Exception,e:
+        return "%.2f" % arg.asNumber(fb)
+    except (AttributeError,IncompatibleUnitsError),e:
         pass
     try:
         return "%.3f" % arg.asNumber(GeV)
-    except Exception,e:
+    except (AttributeError,IncompatibleUnitsError),e:
         pass
     try:
-        return "%.2f" % arg.asUnit(1/fb)
-    except Exception,e:
+        return "%.2f" % arg.asNumber(1/fb)
+    except (AttributeError,IncompatibleUnitsError),e:
         pass
     if type(arg) == float:
         return "%.2f" % arg

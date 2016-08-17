@@ -185,9 +185,10 @@ class RunPrinterTest(unittest.TestCase):
                     try:
                         el.text = eval(el.text)
                         newel.text = eval(newel.text)
-                    except:
+                    except (TypeError,NameError,SyntaxError):
                         pass
-                    if isinstance(el.text,float) and isinstance(newel.text,float) and newel.text != el.text:
+                    if isinstance(el.text,float) and isinstance(newel.text,float) \
+                            and newel.text != el.text:
                         diff = 2.*abs(el.text-newel.text)/abs(el.text+newel.text)
                         self.assertTrue(diff < allowedDiff )
                     else:
