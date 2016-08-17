@@ -204,7 +204,7 @@ class ExpResult(object):
         for key, val in valuesDict.items():
             try:
                 valuesDict[key] = list(set(val))
-            except:
+            except TypeError:
                 pass
         if not attribute:
             return valuesDict

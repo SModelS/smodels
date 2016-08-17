@@ -230,7 +230,7 @@ class Database(object):
                      self.txt_mtime[1] != self.pcl_mtime[1]  or \
                      self.sw_format_version != self.pcl_format_version
                 )
-        except:
+        except (IOError,DatabaseNotFoundException):
             # if we encounter a problem, we rebuild the database.
             return True
 

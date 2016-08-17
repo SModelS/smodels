@@ -109,7 +109,7 @@ class Browser(object):
         #Try to keep only the set of unique values
         for key,val in valuesDict.items():
             try: valuesDict[key] = list(set(val))
-            except: pass
+            except TypeError: pass
         if not attribute: return valuesDict
         elif not attribute in valuesDict:
             logger.warning("Could not find field %s in database" % attribute)
