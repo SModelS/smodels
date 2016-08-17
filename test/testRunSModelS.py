@@ -147,7 +147,8 @@ class RunSModelSTest(unittest.TestCase):
         ctr=0
         crash_file = None
         self.cleanUp()
-        outputfile = self.runMain(filename, timeout=1)
+        outputfile = self.runMain(filename, timeout=1, suppressStdout=True,
+                                   inifile= "timeout.ini" )
         try:
             ## trying to sync!!
             import ctypes
@@ -164,7 +165,7 @@ class RunSModelSTest(unittest.TestCase):
         inp, par = crashReport.readCrashReportFile(crash_file)
 
         self.assertEquals(open(filename).readlines(), open(inp).readlines())
-        self.assertEquals( open("testParameters.ini").readlines(), 
+        self.assertEquals( open("timeout.ini").readlines(), 
                            open(par).readlines())
         self.cleanUp()
 
