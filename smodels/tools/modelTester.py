@@ -15,6 +15,7 @@ from smodels.tools import coverage, runtime
 from smodels.theory import slhaDecomposer
 from smodels.theory import lheDecomposer
 from smodels.theory.theoryPrediction import theoryPredictionsFor
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools import crashReport, timeOut
 from smodels.tools.printer import MPrinter
 import logging
@@ -83,12 +84,8 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
                     doCompress=parser.getboolean("options", "doCompress"),
                     doInvisible=parser.getboolean("options", "doInvisible"),
                     minmassgap=minmassgap)
-    except timeOut.NoTime,nt:
-        # when running into timeout, always throw!
-        outputStatus.updateStatus(-1)
-        masterPrinter.flush()
-        raise nt
-    except:
+    except SModelSError,e:
+        print ( "Exception %s %s" % ( e, type(e) ) )
         """ Update status to fail, print error message and exit """
         outputStatus.updateStatus(-1)
         masterPrinter.flush()

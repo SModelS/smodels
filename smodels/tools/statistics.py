@@ -37,7 +37,8 @@ def _computeCLInterval( Nobs, Nexp, lumi, alpha=.05 ):
     return maxSignalEvents/lumi
 
 
-def _upperLimitMadAnalysis ( nev, xbg, sbg, cl=.95, numberoftoys=10000, upto = 5.0, return_nan=False ):
+def _upperLimitMadAnalysis ( nev, xbg, sbg, cl=.95, numberoftoys=10000, upto = 5.0, 
+                             return_nan=False ):
     """ upper limit obtained via mad analysis 5 code 
     :param nev: number of observed events
     :param sac: relative uncertainty in acceptance
@@ -54,13 +55,11 @@ def _upperLimitMadAnalysis ( nev, xbg, sbg, cl=.95, numberoftoys=10000, upto = 5
     try:
         ##print "upto=",upto,"max(nv,xbg,sbg)=",max(nev,xbg,sbg)
         return optimize.brentq ( f, 0, upto * max(nev,xbg,sbg) )
-    except Exception,e:
+    except RuntimeError,e:
         if not return_nan:
             return _upperLimitMadAnalysis ( nev, xbg, sbg, cl, 5*numberoftoys, 5.0*upto, upto>30. )
         else:
             return float("nan")
-
-
 
 def _getPValue(Nsig,Nobs,Nbg,NbgErr):
     """

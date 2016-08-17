@@ -122,7 +122,7 @@ class RunSModelSTest(unittest.TestCase):
         try:
             os.remove('./output.py')
             os.remove('./output.pyc')
-        except: pass
+        except OSError: pass
         self.assertTrue(equals)
 
     def testBadFile(self):
@@ -156,7 +156,7 @@ class RunSModelSTest(unittest.TestCase):
             import ctypes
             libc = ctypes.CDLL("libc.so.6")
             libc.sync()
-        except Exception,e:
+        except (OSError,AttributeError,ImportError),e:
             pass
         time.sleep(.1)
         for f in os.listdir("."):
