@@ -168,7 +168,7 @@ class BasicPrinter(object):
         try:
             formatFunction = getattr(self,'_format'+typeStr)
             return formatFunction(obj,objOutputLevel)
-        except:
+        except AttributeError,e:
             return False
 
 
