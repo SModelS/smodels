@@ -163,7 +163,7 @@ class RunPrinterTest(unittest.TestCase):
         try:
             os.remove('./output.py')
             os.remove('./output.pyc')
-        except:
+        except OSError:
             pass
 
 

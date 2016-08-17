@@ -179,7 +179,7 @@ def fuzzycomp(obj,other,allowedDiff=0.,ignore=[]):
                     val = eval(val)
                     oval = eval(other.__dict__[key])
                     diff = 2.*abs(val-oval)/abs(val+oval)                        
-                except:
+                except (NameError,TypeError):
                     diff = None
                 if diff > allowedDiff or diff is None:
                     return False

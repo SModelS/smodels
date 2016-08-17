@@ -641,7 +641,7 @@ class PyPrinter(BasicPrinter):
         for key,val in obj.parameters.items():
             try:
                 infoDict[key] = eval(val)
-            except:
+            except (NameError,TypeError):
                 infoDict[key] = val        
         infoDict['file status'] = obj.filestatus
         infoDict['decomposition status'] = obj.status

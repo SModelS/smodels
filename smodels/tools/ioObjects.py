@@ -128,7 +128,7 @@ class OutputStatus(object):
             with open( filename, 'r') as versionFile:
                 version = versionFile.readline()
             self.smodelsVersion = version.replace('\n','')
-        except:
+        except IOError:
             self.smodelsVersion = None
 
         self.inputfile = inputFile.replace("//","/")
@@ -291,7 +291,8 @@ class SlhaStatus(object):
         
         """
         try: ret = pyslha.readSLHAFile(self.filename)
-        except: return None
+        except (pyslha.AccessError,pyslha.ParseError,IOError): 
+            return None
         if not ret.blocks["MASS"]: return None
         return ret
 
