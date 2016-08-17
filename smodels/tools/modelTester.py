@@ -20,6 +20,7 @@ from smodels.tools.printer import MPrinter
 import logging
 import os
 import sys
+import time
 from ConfigParser import SafeConfigParser
 from smodels.tools.physicsUnits import GeV, fb
 from smodels.experiment.exceptions import DatabaseNotFoundException
@@ -82,6 +83,11 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
                     doCompress=parser.getboolean("options", "doCompress"),
                     doInvisible=parser.getboolean("options", "doInvisible"),
                     minmassgap=minmassgap)
+    except timeOut.NoTime,nt:
+        # when running into timeout, always throw!
+        outputStatus.updateStatus(-1)
+        masterPrinter.flush()
+        raise nt
     except:
         """ Update status to fail, print error message and exit """
         outputStatus.updateStatus(-1)
