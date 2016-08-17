@@ -281,7 +281,8 @@ class SlhaStatus(object):
             self.decayBlocksStatus = self.findMissingDecayBlocks(findMissingDecayBlocks)
             self.longlived = self.findLonglivedParticles(findLonglived)
             self.status = self.evaluateStatus()
-        except Exception,e:
+        ## except Exception,e:
+        except (SModelSError,TypeError,IOError,ValueError,AttributeError),e:
             self.status = -4, "Error checking SLHA file: "+str(e)
 
 

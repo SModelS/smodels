@@ -98,6 +98,8 @@ class RunSModelSTest(unittest.TestCase):
         self.runMain(dirname)
         nout = len( list ( glob.iglob ( "unitTestOutput/*smodels" )) )
         nin = len( list ( glob.iglob ( "%s/*slha" % dirname )) )
+        if nout != nin:
+            print ( "%d != %d" % ( nout, nin ) )
         self.assertTrue( nout == nin )
 
     def timeoutRun(self):
