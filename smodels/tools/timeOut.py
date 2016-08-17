@@ -29,7 +29,8 @@ class Timeout():
     def __init__(self, sec):
         self.sec = sec
         if type ( sec ) != int:
-            logger.warning ( "timeout set to a non-integral number of seconds. Will try to cast to integer." )
+            logger.warning ( "timeout set to a non-integral number of seconds."
+                             " Will try to cast to integer." )
             self.sec = int ( sec )
  
     def __enter__(self):
