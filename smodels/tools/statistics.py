@@ -15,12 +15,12 @@ from numpy import sqrt, random, exp, log
 import math
 
 @_memoize
-def upperLimit ( Nobs, Nexp, sigmaexp, lumi, alpha=.05 ):
+def upperLimit ( Nobs, Nexp, sigmaexp, lumi, alpha=.05, toys=10000 ):
     """ computes the 95% CL upper limit on the production cross section """
 
 #     ret = _getUL(Nobs, Nexp, sigmaexp,alpha)/lumi
 #     ret = _bayesianUpperLimit(Nobs,0.00001,Nexp,sigmaexp,1.-alpha)/lumi
-    ret = _upperLimitMadAnalysis ( Nobs, Nexp, sigmaexp, 1.-alpha ) / lumi
+    ret = _upperLimitMadAnalysis ( Nobs, Nexp, sigmaexp, 1.-alpha, toys ) / lumi
 
     return ret
 
