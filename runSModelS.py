@@ -78,7 +78,8 @@ if __name__ == "__main__":
     ap.add_argument('-t', '--force_txt', help='force loading the text database',
             action='store_true')
     ap.add_argument('-c', '--run-crashreport', 
-            help='parse crash report file and use its contents for a SModelS run',
+            help='parse crash report file and use its contents for a SModelS run --'
+                 ' supply the crash file via --filename',
             action='store_true')
     ap.add_argument('-v','--verbose', help='verbosity level. '
             'accepted values are: debug, info, warning, error.',
