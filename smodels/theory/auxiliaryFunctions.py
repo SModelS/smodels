@@ -63,7 +63,7 @@ def massAvg(massList, method='weighted', weights=None):
     """
     if not massList:
         return massList
-    if len(massList) == 1:
+    if massList.count(massList[0]) == len(massList):
         return massList[0]
 
     if method == 'weighted' and (not weights or len(weights) != len(massList)):
