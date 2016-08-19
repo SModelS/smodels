@@ -309,12 +309,15 @@ class Database(object):
         self._base = path
 
     def __str__(self):
-        idList = "Database version: " + self.databaseVersion + "\n---------- \n"
+        idList = "Database version: " + self.databaseVersion
+        idList += "\n"
+        idList += "-" * len(idList) + "\n"
         if self.expResultList == None:
-            idList += "no experimental results available!"
+            idList += "no experimental results available! "
         else:
             for expRes in self.expResultList:
-                idList += expRes.globalInfo.getInfo('id') + '\n'
+                idList += expRes.globalInfo.getInfo('id') + ', '
+        idList = idList[:-2] + '\n'
         return idList
 
 
