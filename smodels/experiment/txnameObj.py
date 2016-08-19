@@ -203,13 +203,12 @@ class TxNameData(object):
                 when extrapolating outside convex hull.
                 This method can be used to loosen the equal branches assumption.
         """
-        self._store_value = value
         self.dataTag = datatag
         self._id = Id
         self._accept_errors_upto=accept_errors_upto
         self._V = None
         self._data = None
-        self.loadData()
+        self.loadData( value )
 
     def __str__ ( self ):
         """ a simple unique string identifier, mostly for _memoize """
@@ -227,20 +226,19 @@ class TxNameData(object):
     def __eq__ ( self, other ):
         return self._data == other._data
 
-    def loadData(self):
+    def loadData(self,value):
         """
-        Uses the information in _store_value to generate the _data grid used for
+        Uses the information in value to generate the _data grid used for
         interpolation.
         """
 
         if self._data:
             return
 
-        if type(self._store_value)==str:
-            self._data = eval(self._store_value,
-                             {'fb':fb, 'pb':pb, 'GeV':GeV, 'TeV':TeV})
+        if type(value)==str:
+            self._data = eval(value, {'fb':fb, 'pb':pb, 'GeV':GeV, 'TeV':TeV})
         else: ## the _data can also be given as lists, for debugging
-            self._data = self._store_value
+            self._data = value
         self.unit = 1.0 ## store the unit so that we can take arbitrary units for
                         ## the "z" values.  default is unitless,
                         ## which we use for efficiency maps
