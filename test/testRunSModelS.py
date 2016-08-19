@@ -58,13 +58,18 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
                 logger.warning("Key %s missing" %key)
                 return False
             if not equalObjs(obj1[key],obj2[key],allowedDiff, ignore=ignore ):
-                logger.warning('Objects differ:\n   %s\n and\n   %s' %\
-                                (str(obj1[key]),str(obj2[key])))
+                logger.warning( "Dictionaries differ in key ``%s''" % key )
+                s1,s2 = str(obj1[key]),str(obj2[key]) 
+                if len(s1) + len(s2) > 200:
+		                logger.warning ( "The values are too long to print." )
+                else:
+										logger.warning( 'The values are: %s (this run) versus %s (default)'%\
+                                ( s1,s2 ) )
                 return False
     elif isinstance(obj1,list):
         for ival,val in enumerate(obj1):
             if not equalObjs(val,obj2[ival],allowedDiff):
-                logger.warning('Objects differ:\n   %s \n and\n   %s' %\
+                logger.warning('Lists differ:\n   %s (this run)\n and\n   %s (default)' %\
                                 (str(val),str(obj2[ival])))
                 return False
     else:
@@ -162,14 +167,14 @@ class RunSModelSTest(unittest.TestCase):
             pass
         time.sleep(.1)
         for f in os.listdir("."):
-            if ".crash" in f: 
+            if ".crash" in f:
                 crash_file = f
                 ctr+=1
         self.assertEquals ( ctr, 1 )
         inp, par = crashReport.readCrashReportFile(crash_file)
 
         self.assertEquals(open(filename).readlines(), open(inp).readlines())
-        self.assertEquals( open("timeout.ini").readlines(), 
+        self.assertEquals( open("timeout.ini").readlines(),
                            open(par).readlines())
         self.cleanUp()
 
