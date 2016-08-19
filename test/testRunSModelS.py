@@ -123,9 +123,10 @@ class RunSModelSTest(unittest.TestCase):
         from output import smodelsOutput
         ignoreFields = ['input file','smodels version', 'ncpus']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                                                 key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
-                                                   res['AnalysisID'],res['DataSetID']])
-        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.01,ignore=ignoreFields)
+                    key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
+                    res['AnalysisID'],res['DataSetID']])
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.01,
+                           ignore=ignoreFields)
         try:
             os.remove('./output.py')
             os.remove('./output.pyc')
