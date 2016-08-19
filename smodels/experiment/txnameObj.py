@@ -266,9 +266,6 @@ class TxNameData(object):
         :param massarray: mass array values (with units), i.e.
                           [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         """
-
-        self.loadData()
-
         porig=self.flattenMassArray ( massarray ) ## flatten
         self.massarray = massarray
         if len(porig)!=self.full_dimensionality:
