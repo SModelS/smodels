@@ -54,7 +54,8 @@ class DataSet(object):
         return not self.__eq__ ( other )
 
     def __str__ ( self ):
-        ret = "Dataset: %s" % ( ", ".join ( self.txnameList ) )
+        ret = "Dataset: %s" % ( ", ".join ( map ( str, self.txnameList ) ) )
+        return ret
 
     def __eq__ ( self, other ):
         if self.dataInfo != other.dataInfo:
