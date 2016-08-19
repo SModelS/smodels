@@ -391,11 +391,12 @@ class Database(object):
         :returns: list of ExpResult objects 
   
         """
-        resultsList = []
         folders=[]
         for root, _, files in os.walk(self._base):
             folders.append ( (root, files) )
         folders.sort()
+
+        roots = []
         for root,files in folders:
             if "/.git/" in root:
                 continue
@@ -407,9 +408,13 @@ class Database(object):
           #      logger.debug("Missing globalInfo.txt in %s", root)
                 continue
             else:
-                expres = ExpResult(root)
-                if expres:
-                    resultsList.append(expres)
+                roots.append ( root )
+
+        resultsList = []
+        for root in roots:
+            expres = ExpResult(root)
+            if expres:
+                resultsList.append(expres)
 
         if not resultsList:
             logger.warning("Zero results loaded.")
