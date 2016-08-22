@@ -36,12 +36,34 @@ def verbose_run():
                 print "[runCompleteTestSuite] now run",t.id()
                 t.run()
 
+def parallel_run ( verbose ):
+    if verbose:
+        print ("[runCompleteTestSuite] verbose run not implemented "
+               "for parallel version" )
+        return
+    try:
+        from concurrencytest import ConcurrentTestSuite, fork_for_tests
+    except ImportError,e:
+        print "Need to install the module concurrencytest."
+        print "pip install --user concurrencytest"
+        return
+    from smodels.tools import runtime
+    suite = unittest.TestLoader().discover("./") 
+    ## concurrent_suite = ConcurrentTestSuite(suite, fork_for_tests(1))
+    concurrent_suite = ConcurrentTestSuite(suite, fork_for_tests(runtime.nCPUs()))
+    runner = unittest.TextTestRunner()
+    runner.run(concurrent_suite)
+
 if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser('runs the complete test suite')
     ap.add_argument('-v','--verbose', help='run verbosely',action='store_true')
+    ap.add_argument('-p','--parallel', help='run in parallel',action='store_true')
     args = ap.parse_args()
+    if args.parallel:
+        parallel_run ( args.verbose )
+        sys.exit()
     if args.verbose:
         verbose_run()
-    else:
-        run()
+        sys.exit()
+    run()
