@@ -49,8 +49,12 @@ def parallel_run ( verbose ):
         return
     from smodels.tools import runtime
     suite = unittest.TestLoader().discover("./") 
-    ## concurrent_suite = ConcurrentTestSuite(suite, fork_for_tests(1))
-    concurrent_suite = ConcurrentTestSuite(suite, fork_for_tests(runtime.nCPUs()))
+    ncpus = runtime.nCPUs()
+    ## "shuffle" the tests, so that the heavy tests get distributed
+    ## more evenly among threads (didnt help, so I commented it out)
+    #suite._tests = [ item for sublist in [ suite._tests[x::ncpus] \
+    #    for x in range(ncpus) ] for item in sublist ]
+    concurrent_suite = ConcurrentTestSuite(suite, fork_for_tests( ncpus ))
     runner = unittest.TextTestRunner()
     runner.run(concurrent_suite)
 
