@@ -2,8 +2,24 @@ Known Issues, v1.1.0, ....
 =======================================================
 
   * Memory consumption can be quite high, especially in multi-core mode.
-    (There is no memory sharing between the processes).
+    (There is no memory sharing between the processes). 
+	  We intend to improve this in v1.2.
+
 	* If the database is rebuilt (e.g. because the content of the text database 
 		has been changed), the interpolations of the upper limits can vary
  	 by tiny amounts depending on a machine's specific CPU. As a consequence,
 	  the final results may differ slightly.
+	  We intend to make the code fully machine-independent in v1.2.
+
+	* For simplified models with more than two model parameters sometimes 
+	  we have results only for a lower dimensional hyperplane in the higher dimensional
+	  model. In this case we allow for very small extrapolations. An example would
+	  be associate squark-gluino production. It may be that we have a result only
+	  for m(squark) == m(gluino). In that case we extrapolate and report results
+	  also for m(squark) == m(gluino) +- epsilon. When, on the other hand upper limits are
+	  defined for a second "plane" in model space (say, for m(squark) = 0.5 m(gluino) ),
+	  then we interpolate between the two planes, but we do not extrapolate anymore.
+	  Though this behavior is not "wrong" (we are just conservative), 
+	  it introduces a small inconsistency with how we allow for tiny extrapolations. 
+	  We intend to make things more consistent in v1.2.
+	  
