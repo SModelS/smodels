@@ -181,7 +181,6 @@ class TxName(object):
         elif val is None or math.isnan(val):
             return 0.  #The element mass is outside the _data grid
         elif type(val) == type(1.):
-        #    print "returns",val
             return val  #The element has an eff
         else:
             logger.error("Unknown txnameData value: %s" % (str(type(val))))
@@ -274,17 +273,17 @@ class TxNameData(object):
         p= ( (np.matrix(porig)[0] - self.delta_x ) ).tolist()[0]
         P=np.dot(p,self._V)  ## rotate
         dp=self.countNonZeros ( P )
-        self.projected_value = self.interpolate( [ P[:self.dimensionality] ] )
+        self.projected_value = self.interpolate([ P[:self.dimensionality] ])
 
         # self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
         # self.projected_value = float(self.projected_value)
         if dp != self.dimensionality: ## we have _data in different dimensions
             if self._accept_errors_upto == None:
                 return None
-            logger.debug ( "attempting to interpolate outside of convex hull "\
+            logger.debug( "attempting to interpolate outside of convex hull "\
                     "(d=%d,dp=%d,masses=%s)" %
-                     ( self.dimensionality, dp, str(massarray) ) )
-            return self._interpolateOutsideConvexHull ( massarray )
+                     ( self.dimensionality, dp, str(massarray) ) )            
+            return self._interpolateOutsideConvexHull( massarray )
 
         return self._returnProjectedValue()
 
@@ -410,6 +409,9 @@ class TxNameData(object):
             logger.debug ( "projected value is None. Projected point not in " \
                     "convex hull? original point=%s" % self.massarray )
             return None
+        #Set value to zero if it is lower than machine precision (avoids fake negative values)
+        if abs(self.projected_value) < np.finfo(float).eps:
+            self.projected_value = 0.
         return self.projected_value * self.unit
 
     def countNonZeros ( self, mp ):
