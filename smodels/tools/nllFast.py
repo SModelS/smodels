@@ -185,12 +185,12 @@ def getProcessName(pIDs):
     #  - antisbottom-sbottom = st
     if pid1 in antisquarks and pid2 in squarks:
         process = 'sb'
-    elif pid1 in squarks and pid2 in squarks:
+    elif abs(pid1) in squarks and abs(pid2) in squarks:
         process = 'ss'
     elif pid1 == pid2 and pid1 in gluinos:
         process = 'gg'
-    elif pid1 in squarks and pid2 == 1000021 or \
-            pid2 in squarks and pid1 == 1000021:
+    elif abs(pid1) in squarks and pid2 == 1000021 or \
+            abs(pid2) in squarks and pid1 == 1000021:
         process = 'sg'
     elif abs(pid1) == pid2 and pid2 in third:
         process = 'st'
