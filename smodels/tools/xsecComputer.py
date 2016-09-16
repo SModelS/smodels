@@ -91,7 +91,7 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
         wlabel += ' (LO)'
     elif maxOrder == 1:
         wlabel += ' (NLO)'
-    elif maxOrder == 2:
+    elif maxOrder >= 2:
         wlabel += ' (NLO+NLL)'
     for ixsec, xsec in enumerate(xsecs):
         xsecs[ixsec].info.label = wlabel
@@ -106,7 +106,7 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
                 k = kNLO
             elif maxOrder == 2 and kNLL and kNLO:
                 k = kNLO * kNLL
-            elif maxOrder > 2:
+            elif maxOrder > 2 and kNLL and kNLO:
                 logger.warning("Unkown xsec order, using NLL+NLO k-factor, "
                                "if available")
                 k = kNLO * kNLL
