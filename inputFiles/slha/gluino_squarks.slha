@@ -668,649 +668,682 @@ DECAY        37     2.62384209E+01   # H+ decays
 
 
 XSECTION  8.00E+03  2212 2212 2 1000001 1000003   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    2.00341927E-04 SModelS 0.99
+  0  0  0  0  0  0    2.00341927E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000022 1000023   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    2.00341927E-04 SModelS 0.99
+  0  0  0  0  0  0    2.00341927E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000002 2000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    7.61299324E-04 SModelS 0.99
+  0  0  0  0  0  0    7.61299324E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000003 1000021   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.80820626E-04 SModelS 0.99
+  0  0  0  0  0  0    4.80820626E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000004 2000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.60273542E-04 SModelS 0.99
+  0  0  0  0  0  0    1.60273542E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000002 2000003   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    2.40410313E-04 SModelS 0.99
+  0  0  0  0  0  0    2.40410313E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000003 2000003   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    2.40410313E-04 SModelS 0.99
+  0  0  0  0  0  0    2.40410313E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000005 1000023   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000004 1000022   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000002 1000023   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    2.20376120E-03 SModelS 0.99
+  0  0  0  0  0  0    2.20376120E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000004 1000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    3.20547084E-04 SModelS 0.99
+  0  0  0  0  0  0    3.20547084E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000002 1000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.24612679E-02 SModelS 0.99
+  0  0  0  0  0  0    1.24612679E-02 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000004 2000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+  0  0  0  0  0  0    1.20205156E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000022 2000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+  0  0  0  0  0  0    1.20205156E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 2000001 2000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.24211995E-03 SModelS 0.99
+  0  0  0  0  0  0    1.24211995E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000001 1000023   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.04177802E-03 SModelS 0.99
+  0  0  0  0  0  0    1.04177802E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000021 1000023   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    2.36403474E-03 SModelS 0.99
+  0  0  0  0  0  0    2.36403474E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000021 2000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    3.62618888E-02 SModelS 0.99
+  0  0  0  0  0  0    3.62618888E-02 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000001 1000004   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+  0  0  0  0  0  0    8.01367709E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000004 1000021   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    2.40410313E-04 SModelS 0.99
+  0  0  0  0  0  0    2.40410313E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000004 2000004   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.60273542E-04 SModelS 0.99
+  0  0  0  0  0  0    1.60273542E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000001 2000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.40752240E-04 SModelS 0.99
+  0  0  0  0  0  0    4.40752240E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000037 1000037   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+  0  0  0  0  0  0    1.20205156E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000003 1000003   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000002 1000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+  0  0  0  0  0  0    1.20205156E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000022 2000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    2.00341927E-03 SModelS 0.99
+  0  0  0  0  0  0    2.00341927E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000001 1000037   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+  0  0  0  0  0  0    8.01367709E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000003 1000003   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+  0  0  0  0  0  0    1.20205156E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000025 1000037   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    2.80478698E-04 SModelS 0.99
+  0  0  0  0  0  0    2.80478698E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000005 1000021   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    2.00341927E-04 SModelS 0.99
+  0  0  0  0  0  0    2.00341927E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000001 1000022   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000001 1000023   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.60273542E-04 SModelS 0.99
+  0  0  0  0  0  0    1.60273542E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000006 1000006   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.08184641E-03 SModelS 0.99
+  0  0  0  0  0  0    1.08184641E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000001 2000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    3.20547084E-04 SModelS 0.99
+  0  0  0  0  0  0    3.20547084E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000004 1000005   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000024 1000024   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    5.95816892E-02 SModelS 0.99
+  0  0  0  0  0  0    5.95816892E-02 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000002 1000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    9.61641251E-04 SModelS 0.99
+  0  0  0  0  0  0    9.61641251E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000002 1000023   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000004 1000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+  0  0  0  0  0  0    1.20205156E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000001 2000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.32225672E-03 SModelS 0.99
+  0  0  0  0  0  0    1.32225672E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000001 1000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    9.89689121E-03 SModelS 0.99
+  0  0  0  0  0  0    9.89689121E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000002 2000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+  0  0  0  0  0  0    8.01367709E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000024 1000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.72294058E-03 SModelS 0.99
+  0  0  0  0  0  0    1.72294058E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000002 2000003   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000024 1000021   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    2.16369282E-03 SModelS 0.99
+  0  0  0  0  0  0    2.16369282E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000003 1000021   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    7.21230938E-04 SModelS 0.99
+  0  0  0  0  0  0    7.21230938E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000003 1000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+  0  0  0  0  0  0    8.01367709E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 2000002 2000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.09386692E-02 SModelS 0.99
+  0  0  0  0  0  0    1.09386692E-02 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000025 1000035   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.60273542E-04 SModelS 0.99
+  0  0  0  0  0  0    1.60273542E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000001 2000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    2.00341927E-04 SModelS 0.99
+  0  0  0  0  0  0    2.00341927E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000001 1000024   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    3.84656500E-03 SModelS 0.99
+  0  0  0  0  0  0    3.84656500E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000001 2000003   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000002 2000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    5.20889011E-04 SModelS 0.99
+  0  0  0  0  0  0    5.20889011E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000004 1000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    2.40410313E-04 SModelS 0.99
+  0  0  0  0  0  0    2.40410313E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000024 1000035   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000002 1000003   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.40752240E-04 SModelS 0.99
+  0  0  0  0  0  0    4.40752240E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000021 1000022   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    2.36403474E-03 SModelS 0.99
+  0  0  0  0  0  0    2.36403474E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000021 2000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.09787376E-02 SModelS 0.99
+  0  0  0  0  0  0    1.09787376E-02 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000023 1000023   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    8.01367709E-04 SModelS 0.99
+  0  0  0  0  0  0    8.01367709E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000003 2000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    7.61299324E-04 SModelS 0.99
+  0  0  0  0  0  0    7.61299324E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000001 1000003   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+  0  0  0  0  0  0    8.01367709E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000002 1000004   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    2.40410313E-04 SModelS 0.99
+  0  0  0  0  0  0    2.40410313E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000003 2000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+  0  0  0  0  0  0    1.20205156E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 2000001 2000003   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    3.60615469E-04 SModelS 0.99
+  0  0  0  0  0  0    3.60615469E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000002 1000021   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.04177802E-03 SModelS 0.99
+  0  0  0  0  0  0    1.04177802E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000037 1000024   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000022 1000037   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000021 2000004   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.60273542E-04 SModelS 0.99
+  0  0  0  0  0  0    1.60273542E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000003 2000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+  0  0  0  0  0  0    1.20205156E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000004 2000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+  0  0  0  0  0  0    8.01367709E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000037 1000035   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000035 1000037   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+  0  0  0  0  0  0    1.20205156E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000003 1000024   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000002 1000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+  0  0  0  0  0  0    1.20205156E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000005 1000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+  0  0  0  0  0  0    8.01367709E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000002 1000003   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000003 2000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000002 1000022   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+  0  0  0  0  0  0    8.01367709E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000004 1000023   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000001 1000021   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    9.21572866E-04 SModelS 0.99
+  0  0  0  0  0  0    9.21572866E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000001 1000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.40239349E-03 SModelS 0.99
+  0  0  0  0  0  0    1.40239349E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000004 1000024   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+  0  0  0  0  0  0    8.01367709E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000022 1000024   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    2.40410313E-04 SModelS 0.99
+  0  0  0  0  0  0    2.40410313E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000024 1000022   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000002 1000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.80820626E-04 SModelS 0.99
+  0  0  0  0  0  0    4.80820626E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000002 2000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    3.16540245E-03 SModelS 0.99
+  0  0  0  0  0  0    3.16540245E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000003 2000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+  0  0  0  0  0  0    1.20205156E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000001 1000035   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 2000002 2000003   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    3.60615469E-04 SModelS 0.99
+  0  0  0  0  0  0    3.60615469E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000005 1000021   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    2.40410313E-04 SModelS 0.99
+  0  0  0  0  0  0    2.40410313E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000001 1000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    3.60615469E-04 SModelS 0.99
+  0  0  0  0  0  0    3.60615469E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000037 1000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000001 2000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    3.64622308E-03 SModelS 0.99
+  0  0  0  0  0  0    3.64622308E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000037 1000025   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000022 2000004   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000001 1000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.08184641E-03 SModelS 0.99
+  0  0  0  0  0  0    1.08184641E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000022 1000022   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.80820626E-04 SModelS 0.99
+  0  0  0  0  0  0    4.80820626E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000002 1000021   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    3.76642823E-02 SModelS 0.99
+  0  0  0  0  0  0    3.76642823E-02 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000002 2000004   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000003 1000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+  0  0  0  0  0  0    1.20205156E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000002 2000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    8.81504480E-03 SModelS 0.99
+  0  0  0  0  0  0    8.81504480E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000001 1000021   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    7.61299324E-04 SModelS 0.99
+  0  0  0  0  0  0    7.61299324E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 2000002 2000004   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+  0  0  0  0  0  0    1.20205156E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000021 1000024   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.72806949E-03 SModelS 0.99
+  0  0  0  0  0  0    4.72806949E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000001 1000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-04 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000003 2000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    2.80478698E-04 SModelS 0.99
+  0  0  0  0  0  0    2.80478698E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000001 1000021   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.06982589E-02 SModelS 0.99
+  0  0  0  0  0  0    1.06982589E-02 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000021 1000021   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.75499528E-02 SModelS 0.99
+  0  0  0  0  0  0    1.75499528E-02 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000004 1000023   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000003 1000021   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.40752240E-04 SModelS 0.99
+  0  0  0  0  0  0    4.40752240E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000004 1000021   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    2.00341927E-04 SModelS 0.99
+  0  0  0  0  0  0    2.00341927E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000004 1000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+  0  0  0  0  0  0    1.20205156E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000002 -1000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000002 1000005   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000005 1000005   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+  0  0  0  0  0  0    8.01367709E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000002 1000005   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000002 1000024   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    2.40410313E-04 SModelS 0.99
+  0  0  0  0  0  0    2.40410313E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 2000001 2000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.09386692E-02 SModelS 0.99
+  0  0  0  0  0  0    1.09386692E-02 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 2000003 2000003   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000021 2000003   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    5.60957397E-04 SModelS 0.99
+  0  0  0  0  0  0    5.60957397E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000001 1000005   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000003 1000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    6.01025782E-04 SModelS 0.99
+  0  0  0  0  0  0    6.01025782E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000005 2000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000001 1000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    3.20547084E-04 SModelS 0.99
+  0  0  0  0  0  0    3.20547084E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000001 -1000003   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000002 1000021   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    8.01367709E-04 SModelS 0.99
+  0  0  0  0  0  0    8.01367709E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 2000001 2000004   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000001 2000003   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000023 1000024   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    8.16193012E-02 SModelS 0.99
+  0  0  0  0  0  0    8.16193012E-02 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000003 1000003   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000002 2000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    5.60957397E-04 SModelS 0.99
+  0  0  0  0  0  0    5.60957397E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000004 1000004   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    2.00341927E-04 SModelS 0.99
+  0  0  0  0  0  0    2.00341927E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000024 1000023   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    3.27358709E-02 SModelS 0.99
+  0  0  0  0  0  0    3.27358709E-02 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000004 2000002   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+  0  0  0  0  0  0    1.20205156E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000024 -1000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.20205156E-04 SModelS 0.99
+  0  0  0  0  0  0    1.20205156E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000024 1000025   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    8.01367709E-05 SModelS 0.99
+  0  0  0  0  0  0    8.01367709E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000004 1000021   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    3.20547084E-04 SModelS 0.99
+  0  0  0  0  0  0    3.20547084E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000002 -2000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000001 2000001   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    1.16198318E-03 SModelS 0.99
+  0  0  0  0  0  0    1.16198318E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000021 1000037   # Nevts: 10000 xsec unit: pb
-	0  0  0  0  0  0    4.00683855E-05 SModelS 0.99
+  0  0  0  0  0  0    4.00683855E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000001 1000003   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    2.49305494E-04 SModelS 0.99
+  0  2  0  0  0  0    2.49305494E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000002 2000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.16052469E-03 SModelS 0.99
+  0  2  0  0  0  0    1.16052469E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000003 1000021   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    8.61342069E-04 SModelS 0.99
+  0  2  0  0  0  0    8.61342069E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000004 2000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    2.44320987E-04 SModelS 0.99
+  0  2  0  0  0  0    2.44320987E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000002 2000003   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    2.99166593E-04 SModelS 0.99
+  0  2  0  0  0  0    2.99166593E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000003 2000003   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    3.66481481E-04 SModelS 0.99
+  0  2  0  0  0  0    3.66481481E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000004 1000001   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    4.88641975E-04 SModelS 0.99
+  0  2  0  0  0  0    4.88641975E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000002 1000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.55068018E-02 SModelS 0.99
+  0  2  0  0  0  0    1.55068018E-02 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000004 2000001   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.83240740E-04 SModelS 0.99
+  0  2  0  0  0  0    1.83240740E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 2000001 2000001   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.54569407E-03 SModelS 0.99
+  0  2  0  0  0  0    1.54569407E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000021 2000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    6.49595476E-02 SModelS 0.99
+  0  2  0  0  0  0    6.49595476E-02 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000001 1000004   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    9.97221977E-05 SModelS 0.99
+  0  2  0  0  0  0    9.97221977E-05 SModelS 1.0.91
+
+XSECTION  8.00E+03  2212 2212 2 -1000004 1000021   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    4.30671035E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000004 2000004   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    2.44320987E-04 SModelS 0.99
+  0  2  0  0  0  0    2.44320987E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000001 2000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    6.71882715E-04 SModelS 0.99
+  0  2  0  0  0  0    6.71882715E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000003 1000003   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    6.10802469E-05 SModelS 0.99
+  0  2  0  0  0  0    6.10802469E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000002 1000001   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.83240740E-04 SModelS 0.99
+  0  2  0  0  0  0    1.83240740E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000003 1000003   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.83240740E-04 SModelS 0.99
+  0  2  0  0  0  0    1.83240740E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000006 1000006   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    2.31515132E-03 SModelS 0.99
+  0  2  0  0  0  0    2.31515132E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000001 2000001   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    4.88641975E-04 SModelS 0.99
+  0  2  0  0  0  0    4.88641975E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000002 1000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.46592592E-03 SModelS 0.99
+  0  2  0  0  0  0    1.46592592E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000004 1000001   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.83240740E-04 SModelS 0.99
+  0  2  0  0  0  0    1.83240740E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000001 2000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    2.01564814E-03 SModelS 0.99
+  0  2  0  0  0  0    2.01564814E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000001 1000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.23156914E-02 SModelS 0.99
+  0  2  0  0  0  0    1.23156914E-02 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000002 2000001   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.22160494E-04 SModelS 0.99
+  0  2  0  0  0  0    1.22160494E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000002 2000003   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    6.10802469E-05 SModelS 0.99
+  0  2  0  0  0  0    6.10802469E-05 SModelS 1.0.91
+
+XSECTION  8.00E+03  2212 2212 2 -1000003 1000021   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.29201310E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000003 1000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.22160494E-04 SModelS 0.99
+  0  2  0  0  0  0    1.22160494E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 2000002 2000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.36120800E-02 SModelS 0.99
+  0  2  0  0  0  0    1.36120800E-02 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000001 2000001   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    3.05401234E-04 SModelS 0.99
+  0  2  0  0  0  0    3.05401234E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000001 2000003   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    4.98610989E-05 SModelS 0.99
+  0  2  0  0  0  0    4.98610989E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000002 2000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    7.94043208E-04 SModelS 0.99
+  0  2  0  0  0  0    7.94043208E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000004 1000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    3.66481481E-04 SModelS 0.99
+  0  2  0  0  0  0    3.66481481E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000002 1000003   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    5.48472087E-04 SModelS 0.99
+  0  2  0  0  0  0    5.48472087E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000021 2000001   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.96673105E-02 SModelS 0.99
+  0  2  0  0  0  0    1.96673105E-02 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000003 2000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.16052469E-03 SModelS 0.99
+  0  2  0  0  0  0    1.16052469E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000001 1000003   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.22160494E-04 SModelS 0.99
+  0  2  0  0  0  0    1.22160494E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000002 1000004   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    2.99166593E-04 SModelS 0.99
+  0  2  0  0  0  0    2.99166593E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000003 2000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.49583296E-04 SModelS 0.99
+  0  2  0  0  0  0    1.49583296E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 2000001 2000003   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    4.48749890E-04 SModelS 0.99
+  0  2  0  0  0  0    4.48749890E-04 SModelS 1.0.91
+
+XSECTION  8.00E+03  2212 2212 2 -2000002 1000021   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.86624115E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000021 2000004   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    2.87114023E-04 SModelS 0.99
+  0  2  0  0  0  0    2.87114023E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000003 2000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.83240740E-04 SModelS 0.99
+  0  2  0  0  0  0    1.83240740E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000004 2000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    9.97221977E-05 SModelS 0.99
+  0  2  0  0  0  0    9.97221977E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000002 1000001   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.83240740E-04 SModelS 0.99
+  0  2  0  0  0  0    1.83240740E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000002 1000003   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    6.10802469E-05 SModelS 0.99
+  0  2  0  0  0  0    6.10802469E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000003 2000001   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    4.98610989E-05 SModelS 0.99
+  0  2  0  0  0  0    4.98610989E-05 SModelS 1.0.91
+
+XSECTION  8.00E+03  2212 2212 2 -1000001 1000021   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.65090563E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000001 1000001   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.74513846E-03 SModelS 0.99
+  0  2  0  0  0  0    1.74513846E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000002 1000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    7.32962962E-04 SModelS 0.99
+  0  2  0  0  0  0    7.32962962E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000002 2000001   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    3.93902681E-03 SModelS 0.99
+  0  2  0  0  0  0    3.93902681E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000003 2000001   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.83240740E-04 SModelS 0.99
+  0  2  0  0  0  0    1.83240740E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 2000002 2000003   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    4.48749890E-04 SModelS 0.99
+  0  2  0  0  0  0    4.48749890E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000001 1000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    5.49722221E-04 SModelS 0.99
+  0  2  0  0  0  0    5.49722221E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000001 2000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    4.53736000E-03 SModelS 0.99
+  0  2  0  0  0  0    4.53736000E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000001 1000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.64916667E-03 SModelS 0.99
+  0  2  0  0  0  0    1.64916667E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000002 1000021   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    6.74717953E-02 SModelS 0.99
+  0  2  0  0  0  0    6.74717953E-02 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000002 2000004   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    4.98610989E-05 SModelS 0.99
+  0  2  0  0  0  0    4.98610989E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000003 1000001   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.83240740E-04 SModelS 0.99
+  0  2  0  0  0  0    1.83240740E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000002 2000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.09694417E-02 SModelS 0.99
+  0  2  0  0  0  0    1.09694417E-02 SModelS 1.0.91
+
+XSECTION  8.00E+03  2212 2212 2 -2000001 1000021   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.36379161E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 2000002 2000004   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.49583296E-04 SModelS 0.99
+  0  2  0  0  0  0    1.49583296E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000001 1000001   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    6.10802469E-04 SModelS 0.99
+  0  2  0  0  0  0    6.10802469E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000003 2000001   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    4.27561727E-04 SModelS 0.99
+  0  2  0  0  0  0    4.27561727E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000001 1000021   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.91648610E-02 SModelS 0.99
+  0  2  0  0  0  0    1.91648610E-02 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000021 1000021   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    5.89678414E-02 SModelS 0.99
+  0  2  0  0  0  0    5.89678414E-02 SModelS 1.0.91
+
+XSECTION  8.00E+03  2212 2212 2 -2000003 1000021   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    7.89563563E-04 SModelS 1.0.91
+
+XSECTION  8.00E+03  2212 2212 2 -2000004 1000021   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    3.58892528E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000004 1000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.83240740E-04 SModelS 0.99
+  0  2  0  0  0  0    1.83240740E-04 SModelS 1.0.91
+
+XSECTION  8.00E+03  2212 2212 2 -2000002 -1000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    4.98610989E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000005 1000005   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.79209861E-04 SModelS 0.99
+  0  2  0  0  0  0    1.79209861E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 2000001 2000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.36120800E-02 SModelS 0.99
+  0  2  0  0  0  0    1.36120800E-02 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 2000003 2000003   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    4.98610989E-05 SModelS 0.99
+  0  2  0  0  0  0    4.98610989E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000021 2000003   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.00489908E-03 SModelS 0.99
+  0  2  0  0  0  0    1.00489908E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000003 1000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    9.16203702E-04 SModelS 0.99
+  0  2  0  0  0  0    9.16203702E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -2000001 1000001   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    4.88641975E-04 SModelS 0.99
+  0  2  0  0  0  0    4.88641975E-04 SModelS 1.0.91
+
+XSECTION  8.00E+03  2212 2212 2 -2000001 -1000003   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    4.98610989E-05 SModelS 1.0.91
+
+XSECTION  8.00E+03  2212 2212 2 -1000002 1000021   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    1.43557011E-03 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 2000001 2000004   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    4.98610989E-05 SModelS 0.99
+  0  2  0  0  0  0    4.98610989E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000001 2000003   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    6.10802469E-05 SModelS 0.99
+  0  2  0  0  0  0    6.10802469E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000003 1000003   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    4.98610989E-05 SModelS 0.99
+  0  2  0  0  0  0    4.98610989E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000002 2000001   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    8.55123456E-04 SModelS 0.99
+  0  2  0  0  0  0    8.55123456E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000004 1000004   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    3.05401234E-04 SModelS 0.99
+  0  2  0  0  0  0    3.05401234E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 -1000004 2000002   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.83240740E-04 SModelS 0.99
+  0  2  0  0  0  0    1.83240740E-04 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000004 1000021   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    5.74228046E-04 SModelS 0.99
+  0  2  0  0  0  0    5.74228046E-04 SModelS 1.0.91
+
+XSECTION  8.00E+03  2212 2212 2 -2000002 -2000001   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    4.98610989E-05 SModelS 1.0.91
 
 XSECTION  8.00E+03  2212 2212 2 1000001 2000001   # Nevts: 10000 xsec unit: pb
-	0  2  0  0  0  0    1.44597187E-03 SModelS 0.99
+  0  2  0  0  0  0    1.44597187E-03 SModelS 1.0.91
