@@ -141,7 +141,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
 
                 for el in allElements:
                     el.sortBranches()  #Make sure elements are sorted BEFORE adding them
-                    smsTopList.addElement(el)                    
+                    smsTopList.addElement(el)
     smsTopList._setElementIds()
 
     logger.debug("slhaDecomposer done in " + str(time.time() - t1) + " s.")
