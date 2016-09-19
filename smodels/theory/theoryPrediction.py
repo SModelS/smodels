@@ -272,7 +272,7 @@ def _combineElements(elements, dataset, maxDist):
     
     clusters = []   
     
-    if dataset.dataInfo.dataType == 'efficiencyMap':
+    if dataset.dataInfo.dataType == 'efficiencyMap':        
         cluster = clusterTools.groupAll(elements)  
         clusters.append(cluster)
     elif dataset.dataInfo.dataType == 'upperLimit':
