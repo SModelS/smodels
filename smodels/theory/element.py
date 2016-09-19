@@ -349,7 +349,7 @@ class Element(object):
         :returns: list with the compressed elements (Element objects)        
         """
         added = True
-        newElements = [self.copy()]
+        newElements = [self]
         # Keep compressing the new topologies generated so far until no new
         # compressions can happen:
         while added:
@@ -401,7 +401,7 @@ class Element(object):
         if not sum(compVertices,[]): return None #Nothing to be compressed
         else:
             newelement = self.copy()
-            newelement.motherElements = [ ("mass", self.copy()) ]
+            newelement.motherElements = [ ("mass", self) ]
             for ibr,compbr in enumerate(compVertices):
                 if compbr:            
                     new_branch = newelement.branches[ibr]
@@ -445,7 +445,7 @@ class Element(object):
                   particles; None, if compression is not possible
         """
         newelement = self.copy()
-        newelement.motherElements = [ ("invisible", self.copy()) ]
+        newelement.motherElements = [ ("invisible", self) ]
 
         # Loop over branches
         for ib, branch in enumerate(self.branches):
@@ -474,16 +474,8 @@ class Element(object):
         
         :parameter el2: element (Element Object)  
         """
-        if len(self.motherElements)==0: 
-            # no mothers? then you yourself are mother!
-            tmp=self.copy()
-            self.motherElements.append ( ("combine", tmp) )
-        for m in el2.motherElements:
-            self.motherElements.append ( (m[0], m[1].copy()) )
-        if len(el2.motherElements)==0: 
-            # no mothers? then yo yourself are mother now
-            tmp=el2.copy()
-            self.motherElements.append ( ("combine", tmp) )
+        
+        self.motherElements += el2.motherElements
 
 
     def combinePIDs(self,el2):
