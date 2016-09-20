@@ -257,7 +257,7 @@ def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True, pythiacard=None
     return lheFile
 
 def computeForOneFile ( sqrtses, order, nevents, inputFile, unlink,
-                        lOfromSLHA, tofile ):
+                        lOfromSLHA, tofile, pythiacard=None ):
     """ compute the cross sections for one file """
     if tofile:
         logger.info("Computing SLHA cross section from %s, adding to "
@@ -265,7 +265,7 @@ def computeForOneFile ( sqrtses, order, nevents, inputFile, unlink,
         for s in sqrtses:
             ss = s*TeV 
             xsecs = computeXSec( ss, order, nevents, inputFile, 
-                                 unlink= unlink, loFromSlha= lOfromSLHA)
+                                 unlink= unlink, loFromSlha= lOfromSLHA, pythiacard=pythiacard)
             comment = "Nevts: " + str(nevents) + " xsec unit: pb"
             addXSecToFile(xsecs, inputFile, comment)
     else:
@@ -319,12 +319,12 @@ def checkAllowedSqrtses ( order, sqrtses ):
             sys.exit(-2)
 
 def computeForBunch ( sqrtses, order, nevents, inputFiles, unlink,
-                        lOfromSLHA, tofile ):
+                        lOfromSLHA, tofile, pythiacard=None ):
     """ compute xsecs for a bunch of slha files """
     for inputFile in inputFiles:
         logger.info ( "computing xsec for %s" % inputFile )
         computeForOneFile ( sqrtses, order, nevents, inputFile, unlink, 
-                            lOfromSLHA, tofile )
+                            lOfromSLHA, tofile, pythiacard=pythiacard )
 
 def getInputFiles ( args ):
     """ geth the names of the slha files to run over """
@@ -349,6 +349,11 @@ def main(args):
     checkAllowedSqrtses ( order, sqrtses )
     inputFiles = getInputFiles ( args )
     ncpus = args.ncpus
+
+    if hasattr(args, 'pythiacard'):
+        pythiacard = args.pythiacard
+    else:
+        pythiacard = None
     if ncpus == -1: 
         ncpus = runtime.nCPUs()
     logger.info ( "We run on %d cpus" % ncpus )
@@ -364,7 +369,7 @@ def main(args):
                        ( i, os.getpid(), os.getppid() ) )
             logger.info ( " `-> %s" % " ".join ( chunk ) )
             computeForBunch (  sqrtses, order, args.nevents, chunk, not args.keep,
-                               args.LOfromSLHA, args.tofile )
+                               args.LOfromSLHA, args.tofile, pythiacard=pythiacard)
             os._exit ( 0 )
         if pid > 0:
             children.append ( pid )
