@@ -295,11 +295,28 @@ class IndexCluster(object):
 def groupAll(elements):
     """
     Create a single cluster containing all the elements.
+    Skip mother elements which contain the daughter in the list (avoids double counting).
     
+    :param elements: List of Element objects
+    :return: ElementCluster object containing all unique elements 
     """
+   
+   
     cluster = ElementCluster()
-    cluster.elements = elements
-    cluster.txnames = list(set([el.txname for el in elements]))
+    cluster.elements = []
+    allmothers = []
+    #Collect the list of all mothers:
+    for el in elements:
+        allmothers += [elMom for tp,elMom in el.motherElements]
+        
+    for el in elements:
+        #Skip the element if it is a mother of another element in the list
+        if any((elMom is el) for elMom in allmothers):
+            continue
+        cluster.elements.append(el) 
+    
+    #Collect the txnames appearing in the cluster
+    cluster.txnames = list(set([el.txname for el in cluster.elements]))
     cluster.txnames.sort()
     return cluster
 
