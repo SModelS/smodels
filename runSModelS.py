@@ -65,7 +65,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument('-f', '--filename', 
             help='name of SLHA or LHE input file, necessary input, if directory '
-            'is given, loop all files in the directory', required=True)
+            'is given, loop over all files in the directory', required=True)
     ap.add_argument('-p', '--parameterFile', 
             help='name of parameter file, optional argument, if not set, use '
             'all parameters from etc/parameters_default.ini', 
