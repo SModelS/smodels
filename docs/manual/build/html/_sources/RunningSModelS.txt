@@ -52,18 +52,32 @@ These settings may be changed from their default values using the :ref:`paramete
 
 
 **usage:** 
-            runSModelS.py [-h] -f FILENAME [-p PARAMETERFILE] [-o OUTPUTFILE]
+		runSModelS.py [-h] -f FILENAME [-p PARAMETERFILE] [-o OUTPUTDIR] [-d]
+                     [-t] [-V] [-c] [-v VERBOSE] [-T TIMEOUT]
 
-*optional arguments*:
+optional arguments:
   -h, --help            show this help message and exit
   -f FILENAME, --filename FILENAME
-                        name of SLHA or LHE input file, necessary input
-  -p PARAMETERFILE, --parameterfile PARAMETERFILE
+                        name of SLHA or LHE input file, necessary input, if
+                        directory is given, loop all files in the directory
+  -p PARAMETERFILE, --parameterFile PARAMETERFILE
                         name of parameter file, optional argument, if not set,
-                        use all parameters from etc/parameters_default.ini.
-  -o OUTPUTFILE, --outputfile OUTPUTFILE
-                        name of output file, optional argument, default is:
-                        ./summary.txt
+                        use all parameters from etc/parameters_default.ini
+  -o OUTPUTDIR, --outputDir OUTPUTDIR
+                        name of output directory, optional argument, default
+                        is: results
+  -d, --development     enable development output
+  -t, --force_txt       force loading the text database
+  -V, --version         show program's version number and exit
+  -c, --run-crashreport
+                        parse crash report file and use its contents for a
+                        SModelS run.Supply the crash file simply via '--
+                        filename myfile.crash'
+  -v VERBOSE, --verbose VERBOSE
+                        verbosity level. accepted values are: debug, info,
+                        warning, error.
+  -T TIMEOUT, --timeout TIMEOUT
+                        define a limit on the running time (in secs).If not
 
 .. _parameterFile:
 

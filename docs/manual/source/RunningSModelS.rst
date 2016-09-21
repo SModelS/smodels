@@ -53,7 +53,7 @@ These settings may be changed from their default values using the :ref:`paramete
 
 **usage:** 
 		runSModelS.py [-h] -f FILENAME [-p PARAMETERFILE] [-o OUTPUTDIR] [-d]
-                     [-t] [-c] [-v VERBOSE] [-T TIMEOUT]
+                     [-t] [-V] [-c] [-v VERBOSE] [-T TIMEOUT]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -68,6 +68,7 @@ optional arguments:
                         is: results
   -d, --development     enable development output
   -t, --force_txt       force loading the text database
+  -V, --version         show program's version number and exit
   -c, --run-crashreport
                         parse crash report file and use its contents for a
                         SModelS run.Supply the crash file simply via '--
