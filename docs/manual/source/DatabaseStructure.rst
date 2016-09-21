@@ -180,7 +180,7 @@ Database: Binary (Pickle) Format
 
 Due to the large number of experimental results contained in the SModelS |Database|, 
 parsing the :ref:`database folders <folderStruct>` and building the corresponding 
-:ref:`database objects <objStruct>` may require a non-negligible cpu time. In some cases
+:ref:`database objects <objStruct>` may require a non-negligible CPU time. In some cases
 this task may be the most time consuming when testing a single input file.
 Furthermore this is a static task which does not have to be repeated everytime SModelS is run.
 In order to avoid these issues, SModelS serializes the 

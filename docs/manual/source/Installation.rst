@@ -51,11 +51,11 @@ In case everything fails, please contact smodels-users@lists.oeaw.ac.at
 
 Installation on Ubuntu 16.04
 ----------------------------
-sudo apt install python-scipy python-numpy python-docutils python-argparse
-pip install unum pyslha
-python setup.py install
-Note that the last two commands you either run as superuser, or with the
-"--user" flag.
+ * sudo apt install python-scipy python-numpy python-docutils python-argparse
+ * pip install unum pyslha
+ * python setup.py install
+
+Note that the last two commands you either run as superuser, or with the "--user" flag.
 
 Installation on SL6
 -------------------
@@ -64,8 +64,7 @@ Installation on an SL6 (Scientific Linux 6 or Scientific Linux CERN 6) machine
 is tricky, because SModelS requires a more recent version of *scipy* than is provided by SL6.
 We succeeded to install SModelS on SL6 by doing:
 
- * yum install gcc-c++ libstdc++-devel libevent-devel python-devel lapack \
-               lapack-devel blas blas-devel libgfortran python-distutils-extra
+ * yum install gcc-c++ libstdc++-devel libevent-devel python-devel lapack lapack-devel blas blas-devel libgfortran python-distutils-extra
 
 followed by:
 
