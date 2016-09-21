@@ -103,8 +103,8 @@ class ToolBox(object):
             maxl = 45
             if len(exe) > maxl + 4:
                 exe = "... " + instance.pathOfExecutable()[-maxl:]
-            ret += "%-12s [%-50s]:    %s\n" % (name, exe,
-                                               self.installationOk(ok, colors))
+            ret += "%-12s [%-50s]:  %s\n" % (name, exe,
+                                             self.installationOk(ok, colors))
             if not ok and make:
                 hasMade = True
                 instance.compile()
