@@ -14,6 +14,7 @@
 
 import sys
 import os
+import time
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -24,6 +25,23 @@ import os
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #needs_sphinx = '1.0'
+
+copying_file = open('../../../BANNER', 'r')
+lines = copying_file.readlines()
+copying_file.close()
+authors = ""
+start_parsing=False
+for line in lines:
+    if "Copyright" in line:
+        start_parsing = True
+    if not start_parsing: continue
+    to_add = line.replace ( " <smodels-users@lists.oeaw.ac.at>","" )
+    to_add = to_add.replace ( "Copyright (C) ","").replace ( "\n", "" )
+    if to_add[:5]=="2012-":
+        to_add = to_add[10:]
+    authors += to_add
+
+year = time.strftime("%Y")
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -48,7 +66,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'SModelS'
-copyright = u'2015, Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, Michael Traub, Wolfgang Waltenberger'
+copyright = u'%s, %s' % (year, authors )
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -203,10 +221,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
-latex_documents = [
-  ('index', 'SModelSManual.tex', u'SModelS Manual',
-   u'Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, Michael Traub, Wolfgang Waltenberger', 'manual'),
-]
+latex_documents = [ ('index', 'SModelSManual.tex', u'SModelS Manual', authors ) ]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
@@ -233,10 +248,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    ('index', 'smodelsmanual', u'SModelS Manual',
-     [u'Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, Michael Traub, Wolfgang Waltenberger'], 1)
-]
+man_pages = [ ('index', 'smodelsmanual', u'SModelS Manual', [ authors ], 1) ]
 
 # If true, show URL addresses after external links.
 #man_show_urls = False
@@ -248,9 +260,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'SModelSManual', u'SModelS Manual',
-   u'Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, Michael Traub, Wolfgang Waltenberger', 'SModelSManual', 'One line description of project.',
-   'Miscellaneous'),
+  ('index', 'SModelSManual', u'SModelS Manual', authors, 'SModelSManual', 
+    'SModelS -- a tool to make systematic use of LHC results.', 'Miscellaneous'),
 ]
 
 # Documents to append as an appendix to all manuals.

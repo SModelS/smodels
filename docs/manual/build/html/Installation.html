@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation and Deployment &mdash; SModelS 1.0.91 documentation</title>
+  <title>Installation and Deployment &mdash; SModelS 1.0.93 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="SModelS 1.0.91 documentation" href="index.html"/>
+    <link rel="top" title="SModelS 1.0.93 documentation" href="index.html"/>
         <link rel="next" title="Running SModelS" href="RunningSModelS.html"/>
         <link rel="prev" title="SModelS Tools" href="Tools.html"/> 
 
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.0.91
+                1.0.93
               </div>
             
           
@@ -147,8 +147,7 @@
 <blockquote>
 <div><ul class="simple">
 <li><a class="reference external" href="http://arxiv.org/abs/hep-ph/0603175">Pythia 6.4.27</a></li>
-<li><a class="reference external" href="http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast">NLL-fast</a> 1.2 (7 TeV) and 2.1 (8 TeV)</li>
-<li><a class="reference external" href="http://arxiv.org/abs/1305.4194">PySLHA</a> (modified version)</li>
+<li><a class="reference external" href="http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast">NLL-fast</a> 1.2 (7 TeV), 2.1 (8 TeV), and 3.1 (13 TeV)</li>
 </ul>
 </div></blockquote>
 <p>These tools are built into SModelS, they need not be installed separately.
@@ -160,11 +159,12 @@ In addition, SModelS depends on the following <em>external</em> Python libraries
 <li>argparse</li>
 <li>docutils&gt;=0.3</li>
 <li>scipy&gt;=0.9.0</li>
+<li>pyslha&gt;=3.1.0</li>
 </ul>
 </div></blockquote>
 <p>For installation, SModelS makes use of Python&#8217;s <em>setuptools</em>.
 Thus</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>python setup.py install
+<div class="highlight-python"><div class="highlight"><pre>python setup.py install
 </pre></div>
 </div>
 <p>should install the entire project, compile the internal Pythia and NLL-fast versions
@@ -175,7 +175,7 @@ the tools manually, by issuing &#8220;make&#8221; in the <em>lib/</em> directory
 In case the installation of the external libraries fails, you can also try to install
 them manually, then rerun setup.py.  For SL6 machines, a recipe is given below.</p>
 <p>There is also a diagnostic tool available:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>python smodels/tools/toolBox.py
+<div class="highlight-python"><div class="highlight"><pre>python smodels/tools/toolBox.py
 </pre></div>
 </div>
 <p>should list and check all internal tools (Pythia and NLL-fast) and external
@@ -231,7 +231,7 @@ Then perform the steps listed under <code class="docutils literal"><span class="
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015, Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, Michael Traub, Wolfgang Waltenberger.
+        &copy; Copyright 2016, Federico Ambrogi, Sabine Kraml, Suchita Kulkarni, Ursula Laa,Andre Lessa, Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, Michael Traub, Jory Sonneveld, Wolfgang Waltenberger.
 
     </p>
   </div>
@@ -253,7 +253,7 @@ Then perform the steps listed under <code class="docutils literal"><span class="
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.0.91',
+            VERSION:'1.0.93',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
