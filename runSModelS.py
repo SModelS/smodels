@@ -93,10 +93,6 @@ if __name__ == "__main__":
     
     args = ap.parse_args()
 
-    if args.version:
-       print ( version() )
-       sys.exit() 
-
     db=None
     if args.force_txt: db=True
     
