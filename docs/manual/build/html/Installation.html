@@ -189,11 +189,14 @@ For Ubuntu and SL6 machines, a recipe is given below.</p>
 </div>
 <div class="section" id="installation-on-ubuntu-16-04">
 <h2>Installation on Ubuntu 16.04<a class="headerlink" href="#installation-on-ubuntu-16-04" title="Permalink to this headline">¶</a></h2>
-<p>sudo apt install python-scipy python-numpy python-docutils python-argparse
-pip install unum pyslha
-python setup.py install
-Note that the last two commands you either run as superuser, or with the
-&#8220;&#8211;user&#8221; flag.</p>
+<blockquote>
+<div><ul class="simple">
+<li>sudo apt install python-scipy python-numpy python-docutils python-argparse</li>
+<li>pip install unum pyslha</li>
+<li>python setup.py install</li>
+</ul>
+</div></blockquote>
+<p>Note that the last two commands you either run as superuser, or with the &#8220;&#8211;user&#8221; flag.</p>
 </div>
 <div class="section" id="installation-on-sl6">
 <h2>Installation on SL6<a class="headerlink" href="#installation-on-sl6" title="Permalink to this headline">¶</a></h2>
@@ -201,13 +204,8 @@ Note that the last two commands you either run as superuser, or with the
 is tricky, because SModelS requires a more recent version of <em>scipy</em> than is provided by SL6.
 We succeeded to install SModelS on SL6 by doing:</p>
 <blockquote>
-<div><ul>
-<li><dl class="first docutils">
-<dt>yum install gcc-c++ libstdc++-devel libevent-devel python-devel lapack </dt>
-<dd><p class="first last">lapack-devel blas blas-devel libgfortran python-distutils-extra</p>
-</dd>
-</dl>
-</li>
+<div><ul class="simple">
+<li>yum install gcc-c++ libstdc++-devel libevent-devel python-devel lapack lapack-devel blas blas-devel libgfortran python-distutils-extra</li>
 </ul>
 </div></blockquote>
 <p>followed by:</p>

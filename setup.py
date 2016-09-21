@@ -9,8 +9,10 @@
 """
 
 import os
+import sys
 from setuptools import setup, Extension
-
+sys.path.insert ( 0, "./" )
+from smodels.installation import version, authors
 
 def read(fname):
     """
@@ -61,16 +63,11 @@ def compile():
     subprocess.call(["make", "-C", "lib" ])
 
 
-def version():
-    with open("smodels/version") as f: return f.readline().replace("\n","")
-
 compile()
 setup(
     name = "smodels",
     version = version(),
-    author = ("Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, "
-              "Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, "
-              "Michael Traub, Wolfgang Waltenberger"),
+    author = authors(),
     author_email="smodels-developers@lists.oeaw.ac.at ",
     scripts=[ "bin/smodels-config", "runSModelS.py" ],
     install_requires=[ 'docutils>=0.3', 'numpy', 'scipy>=0.9.0', \
@@ -90,7 +87,7 @@ setup(
     test_suite='test',
     long_description=read('README'),
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Topic :: Scientific/Engineering :: Physics",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     ]
