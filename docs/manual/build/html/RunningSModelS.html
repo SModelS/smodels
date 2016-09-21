@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Running SModelS &mdash; SModelS 1.0.91 documentation</title>
+  <title>Running SModelS &mdash; SModelS 1.0.93 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="SModelS 1.0.91 documentation" href="index.html"/>
+    <link rel="top" title="SModelS 1.0.93 documentation" href="index.html"/>
         <link rel="next" title="More Examples" href="Examples.html"/>
         <link rel="prev" title="Installation and Deployment" href="Installation.html"/> 
 
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.0.91
+                1.0.93
               </div>
             
           
@@ -215,7 +215,7 @@ Below we give more detailed information about each entry in the parameters file.
 </li>
 </ul>
 <p><em>default values</em>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>[path]
+<div class="highlight-python"><div class="highlight"><pre>[path]
 databasePath = ../smodels-database/
 </pre></div>
 </div>
@@ -235,7 +235,7 @@ Set to False to turn <a class="reference internal" href="Decomposition.html#mass
 </li>
 </ul>
 <p><em>default values</em>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">options</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">options</span><span class="p">]</span>
 <span class="n">inputType</span> <span class="o">=</span> <span class="n">SLHA</span> 
 <span class="n">checkInput</span> <span class="o">=</span> <span class="bp">True</span>
 <span class="n">doInvisible</span> <span class="o">=</span> <span class="bp">True</span>
@@ -258,7 +258,7 @@ are never enforced.
 </li>
 </ul>
 <p><em>default values</em>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">parameters</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">parameters</span><span class="p">]</span>
 <span class="n">sigmacut</span> <span class="o">=</span> <span class="mf">0.03</span> 
 <span class="n">minmassgap</span> <span class="o">=</span> <span class="mf">5.</span>
 <span class="n">maxcond</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -279,7 +279,7 @@ A list of all <a class="reference internal" href="DatabaseDefinitions.html#ulcon
 </li>
 </ul>
 <p><em>default values</em>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">database</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">database</span><span class="p">]</span>
 <span class="n">analyses</span> <span class="o">=</span> <span class="nb">all</span>
 <span class="n">txnames</span> <span class="o">=</span> <span class="nb">all</span>
 </pre></div>
@@ -299,7 +299,7 @@ respective analysis upper limits</li>
 </li>
 </ul>
 <p><em>default values</em>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">stdout</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">stdout</span><span class="p">]</span>
 <span class="n">printDecomp</span> <span class="o">=</span> <span class="bp">True</span>
 <span class="n">addElmentInfo</span> <span class="o">=</span> <span class="bp">False</span>
 <span class="n">printAnalyses</span> <span class="o">=</span> <span class="bp">False</span>
@@ -317,7 +317,7 @@ for each analysis printed to file.</li>
 </li>
 </ul>
 <p><em>default values</em>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="nb">file</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="nb">file</span><span class="p">]</span>
 <span class="n">expandedSummary</span> <span class="o">=</span> <span class="bp">True</span>
 <span class="n">addConstraintInfo</span> <span class="o">=</span> <span class="bp">True</span>
 </pre></div>
@@ -340,7 +340,7 @@ and the sum over all the <a class="reference internal" href="TheoryDefinitions.h
 <a class="reference internal" href="TheoryDefinitions.html#topology"><span>topology</span></a> are also explicitly shown, as well as the <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a>&#8216;s mass, <a class="reference internal" href="TheoryDefinitions.html#final-states"><span>final states</span></a>
 and weight:</li>
 </ul>
-<div class="highlight-python"><div class="highlight"><pre><span></span>===================================================== 
+<div class="highlight-python"><div class="highlight"><pre>===================================================== 
 Topology:
 Number of vertices: [3, 3] 
 Number of vertex parts: [[1, 1, 0], [1, 1, 0]]
@@ -364,7 +364,7 @@ selected in the <em>database</em> options (see <a class="reference internal" hre
 for each <span class="xref std std-ref">analysis</span> entry a list of all the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> appearing in the <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>analysis constraint</span></a>
 is also shown using the <a class="reference internal" href="TheoryDefinitions.html#bracketnotation"><span>bracket notation</span></a>:</li>
 </ul>
-<div class="highlight-python"><div class="highlight"><pre><span></span>========================================================
+<div class="highlight-python"><div class="highlight"><pre>========================================================
 Analysis Name: ATLAS-SUSY-2013-05
 Tx Label: T2bb
 Analysis Sqrts: 8.00E+00 [TeV]
@@ -379,7 +379,7 @@ For each <a class="reference internal" href="TheoryPredictions.html"><em>theory 
 in each branch, the cross-section value and the list of the <a class="reference internal" href="DatabaseDefinitions.html#ulconditions"><span>condition values</span></a> for the <a class="reference internal" href="TheoryPredictions.html#ulcluster"><span>cluster</span></a>
 and the corresponding <span class="xref std std-ref">analysis</span> upper limit are shown:</li>
 </ul>
-<div class="highlight-python"><div class="highlight"><pre><span></span>---------------Analysis Label = CMS-PAS-SUS-13-019:T2
+<div class="highlight-python"><div class="highlight"><pre>---------------Analysis Label = CMS-PAS-SUS-13-019:T2
 Analysis sqrts: 8.00E+00 [TeV]
 Masses in branch 0: [9.91E+02 [GeV], 1.29E+02 [GeV]]
 Masses in branch 1: [9.91E+02 [GeV], 1.29E+02 [GeV]]
@@ -391,7 +391,7 @@ Experimental limit: 3.76E-03 [pb]
 <ul class="simple">
 <li>possible (mostly harmless) warnings <a class="footnote-reference" href="#id4" id="id2">[†]</a></li>
 </ul>
-<div class="highlight-python"><div class="highlight"><pre><span></span>10:36:46.712 WARNING  __main__:46  Removing old output file in summary.txt
+<div class="highlight-python"><div class="highlight"><pre>10:36:46.712 WARNING  __main__:46  Removing old output file in summary.txt
 10:36:46.765 INFO     smodels.theory.slhaDecomposer:132 Ignoring higgs decays
 10:36:46.792 INFO     smodels.theory.crossSection:512 Ignoring 76 lower order cross-sections
 </pre></div>
@@ -446,7 +446,7 @@ Below we go step-by-step through this example code:</p>
 <li><em>Import the SModelS methods</em>. Import the methods to be used later. If the file is not located in the smodels
 installation folder simply add &#8220;sys.path.append(&lt;smodels installation path&gt;)&#8221; before importing smodels</li>
 </ul>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1">#Import basic functions (this file must be run under the installation folder</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c1">#Import basic functions (this file must be run under the installation folder</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">smodels.theory</span> <span class="kn">import</span> <span class="n">slhaDecomposer</span>
@@ -460,20 +460,20 @@ installation folder simply add &#8220;sys.path.append(&lt;smodels installation p
 <ul class="simple">
 <li><em>Set the address to the dabase</em>. Specify where the SModelS <code class="xref doc docutils literal"><span class="pre">database</span></code> has been installed</li>
 </ul>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1">#Set the address of the database folder</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c1">#Set the address of the database folder</span>
 <span class="n">smsHelpers</span><span class="o">.</span><span class="n">base</span><span class="o">=</span><span class="s2">&quot;/home/lessa/smodels-database/&quot;</span>
 </pre></div>
 </div>
 <ul class="simple">
 <li><em>Path to the input file</em>. Specify the location of the input file. It must be a SLHA or LHE file (see <a class="reference internal" href="BasicInput.html#basicinput"><span>Basic Input</span></a>)</li>
 </ul>
-<div class="highlight-python"><div class="highlight"><pre><span></span>    <span class="n">slhafile</span> <span class="o">=</span> <span class="s1">&#39;inputFiles/slha/lightSquarks.slha&#39;</span>
+<div class="highlight-python"><div class="highlight"><pre>    <span class="n">slhafile</span> <span class="o">=</span> <span class="s1">&#39;inputFiles/slha/lightSquarks.slha&#39;</span>
 </pre></div>
 </div>
 <ul class="simple">
 <li><em>Define the basic parameters for</em> <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a>. Specify the values of <a class="reference internal" href="Decomposition.html#minweight"><span>sigmacut</span></a> and <a class="reference internal" href="Decomposition.html#masscomp"><span>minmassgap</span></a>:</li>
 </ul>
-<div class="highlight-python"><div class="highlight"><pre><span></span>    <span class="n">sigmacut</span> <span class="o">=</span> <span class="mf">0.03</span> <span class="o">*</span> <span class="n">fb</span>
+<div class="highlight-python"><div class="highlight"><pre>    <span class="n">sigmacut</span> <span class="o">=</span> <span class="mf">0.03</span> <span class="o">*</span> <span class="n">fb</span>
     <span class="n">mingap</span> <span class="o">=</span> <span class="mf">5.</span> <span class="o">*</span> <span class="n">GeV</span>
 </pre></div>
 </div>
@@ -482,19 +482,19 @@ installation folder simply add &#8220;sys.path.append(&lt;smodels installation p
 of input format, choose either the <a class="reference external" href="../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose">slhaDecomposer.decompose</a> or
 <a class="reference external" href="../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose">lheDecomposer.decompose</a> method. The <strong>doCompress</strong> and <strong>doInvisible</strong> options turn on/off the <a class="reference internal" href="Decomposition.html#masscomp"><span>mass compression</span></a> and <a class="reference internal" href="Decomposition.html#invcomp"><span>invisible compression</span></a>, respectively</li>
 </ul>
-<div class="highlight-python"><div class="highlight"><pre><span></span>    <span class="n">smstoplist</span> <span class="o">=</span> <span class="n">slhaDecomposer</span><span class="o">.</span><span class="n">decompose</span><span class="p">(</span><span class="n">slhafile</span><span class="p">,</span> <span class="n">sigmacut</span><span class="p">,</span> <span class="n">doCompress</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">doInvisible</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">minmassgap</span><span class="o">=</span><span class="n">mingap</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre>    <span class="n">smstoplist</span> <span class="o">=</span> <span class="n">slhaDecomposer</span><span class="o">.</span><span class="n">decompose</span><span class="p">(</span><span class="n">slhafile</span><span class="p">,</span> <span class="n">sigmacut</span><span class="p">,</span> <span class="n">doCompress</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">doInvisible</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">minmassgap</span><span class="o">=</span><span class="n">mingap</span><span class="p">)</span>
 </pre></div>
 </div>
 <ul class="simple">
 <li><em>Print the decomposition output</em>. Set outputLevel = 0 (no output), 1 (basic output) or 2 (extended output)</li>
 </ul>
-<div class="highlight-python"><div class="highlight"><pre><span></span>    <span class="n">smstoplist</span><span class="o">.</span><span class="n">printout</span><span class="p">(</span><span class="n">outputLevel</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre>    <span class="n">smstoplist</span><span class="o">.</span><span class="n">printout</span><span class="p">(</span><span class="n">outputLevel</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 <ul class="simple">
 <li><em>Load the the analyses</em> <a class="reference internal" href="DatabaseDefinitions.html#database"><span>database</span></a>. Load the experimental <span class="xref std std-ref">analyses</span> and store the list of analyses</li>
 </ul>
-<div class="highlight-python"><div class="highlight"><pre><span></span>    <span class="n">listofanalyses</span> <span class="o">=</span> <span class="n">smsAnalysisFactory</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre>    <span class="n">listofanalyses</span> <span class="o">=</span> <span class="n">smsAnalysisFactory</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -502,13 +502,13 @@ of input format, choose either the <a class="reference external" href="../../../
 is a list of <a class="reference external" href="../../../documentation/build/html/theory.html#theory.theoryPrediction.TheoryPrediction">theory prediction objects</a>
 (for each analysis) with results for each <a class="reference internal" href="TheoryPredictions.html#ulcluster"><span>cluster</span></a></li>
 </ul>
-<div class="highlight-python"><div class="highlight"><pre><span></span>    <span class="n">analysesPredictions</span> <span class="o">=</span> <span class="p">[</span><span class="n">theoryPredictionFor</span><span class="p">(</span><span class="n">analysis</span><span class="p">,</span> <span class="n">smstoplist</span><span class="p">)</span> <span class="k">for</span> <span class="n">analysis</span> <span class="ow">in</span> <span class="n">listofanalyses</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre>    <span class="n">analysesPredictions</span> <span class="o">=</span> <span class="p">[</span><span class="n">theoryPredictionFor</span><span class="p">(</span><span class="n">analysis</span><span class="p">,</span> <span class="n">smstoplist</span><span class="p">)</span> <span class="k">for</span> <span class="n">analysis</span> <span class="ow">in</span> <span class="n">listofanalyses</span><span class="p">]</span>
 </pre></div>
 </div>
 <ul class="simple">
 <li><em>Print the output</em>. Loop over all analyses and results and print the <a class="reference internal" href="TheoryPredictions.html"><em>theory predictions</em></a> information</li>
 </ul>
-<div class="highlight-python"><div class="highlight"><pre><span></span>    <span class="k">for</span> <span class="n">analysisPred</span> <span class="ow">in</span> <span class="n">analysesPredictions</span><span class="p">:</span>
+<div class="highlight-python"><div class="highlight"><pre>    <span class="k">for</span> <span class="n">analysisPred</span> <span class="ow">in</span> <span class="n">analysesPredictions</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">analysisPred</span><span class="p">:</span> <span class="k">continue</span>  <span class="c1">#Skip non-applicable analyses</span>
         <span class="c1">#If the analysis prediction contains more than one theory prediction (cluster), loop over predictions:        </span>
         <span class="k">for</span> <span class="n">theoryPrediction</span> <span class="ow">in</span> <span class="n">analysisPred</span><span class="p">:</span>
@@ -523,7 +523,7 @@ is a list of <a class="reference external" href="../../../documentation/build/ht
 <li><em>Get analysis upper limit</em>. For each anlysis and <a class="reference internal" href="TheoryPredictions.html"><em>theory prediction</em></a>, obtain the experimental upper limit. This value can
 be compared to the <a class="reference internal" href="TheoryPredictions.html"><em>theory prediction</em></a> value to decide if a model is excluded or not.</li>
 </ul>
-<div class="highlight-python"><div class="highlight"><pre><span></span>            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Analysis UL = &quot;</span><span class="p">,</span><span class="n">theoryPrediction</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">getUpperLimitFor</span><span class="p">(</span><span class="n">theoryPrediction</span><span class="o">.</span><span class="n">mass</span><span class="p">))</span> 
+<div class="highlight-python"><div class="highlight"><pre>            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Analysis UL = &quot;</span><span class="p">,</span><span class="n">theoryPrediction</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">getUpperLimitFor</span><span class="p">(</span><span class="n">theoryPrediction</span><span class="o">.</span><span class="n">mass</span><span class="p">))</span> 
 </pre></div>
 </div>
 <table class="docutils footnote" frame="void" id="id3" rules="none">
@@ -563,7 +563,7 @@ a smaller output.</td></tr>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015, Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, Michael Traub, Wolfgang Waltenberger.
+        &copy; Copyright 2016, Federico Ambrogi, Sabine Kraml, Suchita Kulkarni, Ursula Laa,Andre Lessa, Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, Michael Traub, Jory Sonneveld, Wolfgang Waltenberger.
 
     </p>
   </div>
@@ -585,7 +585,7 @@ a smaller output.</td></tr>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.0.91',
+            VERSION:'1.0.93',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
