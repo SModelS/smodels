@@ -10,7 +10,7 @@ SModelS is a Python library that requires Python version 2.6 or later
 (but not version 3) with setuptools installed. Internally, SModelS uses the following tools:
 
  * Pythia 6.4.27
- * NLL-fast 1.2 (7 TeV) and 2.1 (8 TeV)
+ * NLL-fast 1.2 (7 TeV), 2.1 (8 TeV), and 3.1 (13 TeV)
 
 These tools are built into SModelS, they need not be installed separately. 
 In addition to setuptools, SModelS depends on the following *external* Python libraries:

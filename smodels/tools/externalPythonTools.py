@@ -3,7 +3,7 @@
 """
 .. module:: externalPythonTools
    :synopsis: This module is to check the installation of python tools, 
-              i.e. unum, scipy, numpy.
+              i.e. unum, scipy, numpy, pyslha.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
@@ -59,6 +59,7 @@ class ExternalPythonTool(object):
 
 pythonTools = { "unum" : ExternalPythonTool("unum"),
                 "numpy": ExternalPythonTool("numpy"),
+                "pyslha": ExternalPythonTool("pyslha"),
                 "scipy": ExternalPythonTool("scipy") }
 
 
