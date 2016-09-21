@@ -169,8 +169,12 @@ determining <a class="reference internal" href="Tools.html#topcoverage"><span>mi
 <p>These settings may be changed from their default values using the <a class="reference internal" href="#parameterfile"><span>parameter file</span></a>.</p>
 <dl class="docutils">
 <dt><strong>usage:</strong></dt>
-<dd>runSModelS.py [-h] -f FILENAME [-p PARAMETERFILE] [-o OUTPUTFILE]</dd>
-<dt><em>optional arguments</em>:</dt>
+<dd><dl class="first last docutils">
+<dt>runSModelS.py [-h] -f FILENAME [-p PARAMETERFILE] [-o OUTPUTDIR] [-d]</dt>
+<dd>[-t] [-V] [-c] [-v VERBOSE] [-T TIMEOUT]</dd>
+</dl>
+</dd>
+<dt>optional arguments:</dt>
 <dd><table class="first last docutils option-list" frame="void" rules="none">
 <col class="option" />
 <col class="description" />
@@ -181,17 +185,44 @@ determining <a class="reference internal" href="Tools.html#topcoverage"><span>mi
 <tr><td class="option-group" colspan="2">
 <kbd><span class="option">-f <var>FILENAME</var></span>, <span class="option">--filename <var>FILENAME</var></span></kbd></td>
 </tr>
-<tr><td>&nbsp;</td><td>name of SLHA or LHE input file, necessary input</td></tr>
+<tr><td>&nbsp;</td><td>name of SLHA or LHE input file, necessary input, if
+directory is given, loop all files in the directory</td></tr>
 <tr><td class="option-group" colspan="2">
-<kbd><span class="option">-p <var>PARAMETERFILE</var></span>, <span class="option">--parameterfile <var>PARAMETERFILE</var></span></kbd></td>
+<kbd><span class="option">-p <var>PARAMETERFILE</var></span>, <span class="option">--parameterFile <var>PARAMETERFILE</var></span></kbd></td>
 </tr>
 <tr><td>&nbsp;</td><td>name of parameter file, optional argument, if not set,
-use all parameters from etc/parameters_default.ini.</td></tr>
+use all parameters from etc/parameters_default.ini</td></tr>
 <tr><td class="option-group" colspan="2">
-<kbd><span class="option">-o <var>OUTPUTFILE</var></span>, <span class="option">--outputfile <var>OUTPUTFILE</var></span></kbd></td>
+<kbd><span class="option">-o <var>OUTPUTDIR</var></span>, <span class="option">--outputDir <var>OUTPUTDIR</var></span></kbd></td>
 </tr>
-<tr><td>&nbsp;</td><td>name of output file, optional argument, default is:
-./summary.txt</td></tr>
+<tr><td>&nbsp;</td><td>name of output directory, optional argument, default
+is: results</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-d</span>, <span class="option">--development</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>enable development output</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-t</span>, <span class="option">--force_txt</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>force loading the text database</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-V</span>, <span class="option">--version</span></kbd></td>
+<td>show program&#8217;s version number and exit</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-c</span>, <span class="option">--run-crashreport</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>parse crash report file and use its contents for a
+SModelS run.Supply the crash file simply via &#8216;&#8211;
+filename myfile.crash&#8217;</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-v <var>VERBOSE</var></span>, <span class="option">--verbose <var>VERBOSE</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>verbosity level. accepted values are: debug, info,
+warning, error.</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-T <var>TIMEOUT</var></span>, <span class="option">--timeout <var>TIMEOUT</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>define a limit on the running time (in secs).If not</td></tr>
 </tbody>
 </table>
 </dd>
