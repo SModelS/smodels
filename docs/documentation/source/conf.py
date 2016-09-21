@@ -14,6 +14,7 @@
 
 import sys
 import os
+import time
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -24,6 +25,23 @@ sys.path.insert(0, os.path.abspath('../../../smodels/'))
 sys.path.insert(0, os.path.abspath('../../../smodels/theory/'))
 sys.path.insert(0, os.path.abspath('../../../smodels/experiment/'))
 sys.path.insert(0, os.path.abspath('../smodels/tools/'))
+
+copying_file = open('../../../BANNER', 'r')
+lines = copying_file.readlines()
+copying_file.close()
+authors = ""
+start_parsing=False
+for line in lines:
+    if "Copyright" in line:
+        start_parsing = True
+    if not start_parsing: continue
+    to_add = line.replace ( " <smodels-users@lists.oeaw.ac.at>","" )
+    to_add = to_add.replace ( "Copyright (C) ","").replace ( "\n", "" )
+    if to_add[:5]=="2012-":
+        to_add = to_add[10:]
+authors += to_add
+
+year = time.strftime("%Y")
 
 # -- General configuration ------------------------------------------------
 
@@ -53,7 +71,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'SModelS'
-copyright = u'2015, Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, Michael Traub, Wolfgang Waltenberger'
+copyright = u'%s, %s' % ( year, authors )
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -209,9 +227,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'SModelS.tex', u'SModelS Documentation',
-   u'Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, Michael Traub, Wolfgang Waltenberger', 'manual'),
-]
+  ('index', 'SModelS.tex', u'SModelS Documentation', authors, 'manual' ) ]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
@@ -239,9 +255,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'smodels', u'SModelS Documentation',
-     [u'Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, Michael Traub, Wolfgang Waltenberger'], 1)
-]
+    ('index', 'smodels', u'SModelS Documentation', [ authors ], 1) ]
 
 # If true, show URL addresses after external links.
 #man_show_urls = False
@@ -253,8 +267,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'SModelS', u'SModelS Documentation',
-   u'Sabine Kraml, Suchita Kulkarni, Ursula Laa, Andre Lessa, Veronika Magerl, Wolfgang Magerl, Doris Proschofsky, Michael Traub, Wolfgang Waltenberger', 'SModelS', 'A tool for interpreting simplified-model results from the LHC.',
+  ('index', 'SModelS', u'SModelS Documentation', authors, 'SModelS', 'A tool for interpreting simplified-model results from the LHC.',
    'Miscellaneous'),
 ]
 
