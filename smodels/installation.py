@@ -40,7 +40,7 @@ def pythonDirectory():
 
 def authors():
     """ return the author list, taken from BANNER """
-    copying_file = open('%s/BANNER' % installDirectory(), 'r')
+    copying_file = open('%s/etc/BANNER' % installDirectory(), 'r')
     lines = copying_file.readlines()
     copying_file.close()
     authors = ""
@@ -93,7 +93,7 @@ def banner():
     Returns SModelS banner.
 
     """
-    f = open(installDirectory() + "BANNER")
+    f = open(installDirectory() + "/etc/BANNER")
     lines = f.readlines()
     f.close()
     return "".join(lines)
