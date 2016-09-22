@@ -1,8 +1,8 @@
 VERSION=`cat ../smodels/version`
 
-all: run
+all: tarballs
 
-run:
+tarballs:
 	./createTarballs.py
 
 clean:
