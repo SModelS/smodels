@@ -54,8 +54,7 @@ def main():
     
     dbBrowser = subparsers.add_parser('database-browser', description="Interface for browsing the Database.")
     dbBrowser.add_argument('-p', '--path_to_database', help='path to SModelS database', required=True)
-
-    
+    dbBrowser.add_argument('-t', '--text', help='load text database, dont even search for binary database file', action='store_true')
 
     args = parser.parse_args()
 
