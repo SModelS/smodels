@@ -130,8 +130,10 @@ def splitDatabase():
           ( dirname, cwd )
     run ( cmd )
 
-    cmd = "mv ../../smodels-fastlim/smodels-fastlim.tgz %s/smodels-fastlim-v%s.tgz" % ( cwd, version )
+    cmd = "mv ./smodels-fastlim.tgz %s/smodels-fastlim-v%s.tgz" % \
+          ( cwd, version )
     run ( cmd )
+    sys.exit()
 
 def createTarball():
     """
@@ -220,7 +222,7 @@ def create():
     rmdir()
     mkdir() ## .. then create the temp dir
     clone() ## ... clone smodels into it ...
-    fetchDatabase() 
+    fetchDatabase() ## git clone the database
     splitDatabase() ## split database into official and optional
     convertRecipes()
     makeDocumentation()
@@ -231,7 +233,6 @@ def create():
     # rmdir(dirname)
     testDocumentation()
     isDummy()
-
 
 if __name__ == "__main__":
     create()
