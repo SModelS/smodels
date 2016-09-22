@@ -3,7 +3,7 @@ VERSION=`cat ../smodels/version`
 all: run
 
 run:
-	./createTarball.py
+	./createTarballs.py
 
 clean:
 	rm -rf smodels-* 

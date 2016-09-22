@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 """
-.. module:: createTarball
-   :synopsis: Script that is meant to create the distribution tarball
+.. module:: createTarballs
+   :synopsis: Script that is meant to create the distribution tarballs
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
    
@@ -78,7 +78,8 @@ def clone():
     distribution, and test.
     """
     comment ( "Git-cloning smodels into %s (this might take a while)" % dirname )
-    cmd = "git clone git@smodels.hephy.at:smodels %s" % (dirname)
+    cmd = "git clone -b v%s git@smodels.hephy.at:smodels %s" % (version, dirname)
+    #cmd = "git clone git@smodels.hephy.at:smodels %s" % (dirname)
     if dummyRun:
         cmd = "cp -a ../../smodels-v%s/* %s" % ( version, dirname )
     run ( cmd )
