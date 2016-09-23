@@ -158,7 +158,7 @@
 <p>This little tool computes LHC production cross-sections for <em>MSSM particles</em>
 and writes them out in <a class="reference internal" href="BasicInput.html#xsecblock"><span>SLHA convention</span></a>. This can in particular be convenient for adding cross-sections to SLHA input files, see <a class="reference internal" href="BasicInput.html"><em>Basic Input</em></a>. The calculation is done at LO with <a class="reference external" href="http://home.thep.lu.se/~torbjorn/Pythia.html">Pythia6.4</a> ; K-factors for colored particles are computed with <a class="reference external" href="http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast">NLLfast</a> .</p>
 <p><strong>The usage of the cross-section calculator is:</strong></p>
-<p>runTools.py xseccomputer [-h]  [-h] -f FILENAME [-s SQRTS [SQRTS ...]] [-e NEVENTS] [-p] [-k] [-n] [-N] [-O]</p>
+<p>smodelsTools.py xseccomputer [-h]  [-h] -f FILENAME [-s SQRTS [SQRTS ...]] [-e NEVENTS] [-p] [-k] [-n] [-N] [-O]</p>
 <dl class="docutils">
 <dt><em>arguments</em>:</dt>
 <dd><table class="first last docutils option-list" frame="void" rules="none">
@@ -222,12 +222,12 @@ and use NLLfast to compute the NLO or NLO+NLL cross-sections for squarks and glu
 <p>Further Pythia parameters are defined in <a class="reference download internal" href="_downloads/pythia.card" download=""><code class="xref download docutils literal"><span class="pre">etc/pythia.card</span></code></a>.</p>
 <p>A typical
 usage example is:</p>
-<div class="highlight-python"><div class="highlight"><pre>runTools.py xseccomputer -s 8 -e 10000 -p -f compressedSpec.slha
+<div class="highlight-python"><div class="highlight"><pre>smodelsTools.py xseccomputer -s 8 -e 10000 -p -f compressedSpec.slha
 </pre></div>
 </div>
 <p>which will compute 8 TeV LO cross-sections (at the LHC) for all MSSM processes using 10k MC events.
 If, <em>after</em> the LO cross-sections have been computed, one wants to add the NLO+NLL cross-sections for gluinos and squarks:</p>
-<div class="highlight-python"><div class="highlight"><pre>runTools.py xseccomputer -s 8 -p -N -O -f compressedSpec.slha
+<div class="highlight-python"><div class="highlight"><pre>smodelsTools.py xseccomputer -s 8 -p -N -O -f compressedSpec.slha
 </pre></div>
 </div>
 <p>The resulting file will then contain LO cross-sections for all MSSM processes and NLO+NLL cross-sections for gluinos and squarks.
@@ -248,7 +248,7 @@ When reading the input file, SModelS will then use only the highest order cross-
 <li>the information on the total cross section and the center of mass energy can be found.</li>
 </ul>
 <p><strong>The usage of the LHE checker is simply:</strong></p>
-<p>runTools.py lhechecker [-h] -f FILENAME</p>
+<p>smodelsTools.py lhechecker [-h] -f FILENAME</p>
 <p><em>arguments</em>:</p>
 <blockquote>
 <div><table class="docutils option-list" frame="void" rules="none">
@@ -264,7 +264,7 @@ When reading the input file, SModelS will then use only the highest order cross-
 </div></blockquote>
 <p>A typical
 usage example is:</p>
-<div class="highlight-python"><div class="highlight"><pre>runTools.py lhechecker -f gluino_squarks.lhe
+<div class="highlight-python"><div class="highlight"><pre>smodelsTools.py lhechecker -f gluino_squarks.lhe
 </pre></div>
 </div>
 </div>
@@ -301,7 +301,7 @@ If the branching ratio to visible decays times the maximum production cross-sect
 for the particle exceeds <a class="reference internal" href="RunningSModelS.html#parameterfile"><span>sigmacut</span></a>, the particle&#8217;s decay
 is considered as a displaced vertex.</p>
 <p><strong>The usage of the SLHA checker is:</strong></p>
-<p>runTools.py slhachecker [-h] [-xS] [-lsp] [-longlived] [-m DISPLACEMENT] [-s SIGMACUT] [-illegal] -f FILENAME</p>
+<p>smodelsTools.py slhachecker [-h] [-xS] [-lsp] [-longlived] [-m DISPLACEMENT] [-s SIGMACUT] [-illegal] -f FILENAME</p>
 <dl class="docutils">
 <dt><em>arguments</em>:</dt>
 <dd><table class="first last docutils option-list" frame="void" rules="none">
@@ -359,7 +359,7 @@ visible displaced vertices</td></tr>
 </ul>
 <p>A typical
 usage example is:</p>
-<div class="highlight-python"><div class="highlight"><pre>runTools.py slhachecker -m 0.001 -s 0.01 -f lightSquarks.slha
+<div class="highlight-python"><div class="highlight"><pre>smodelsTools.py slhachecker -m 0.001 -s 0.01 -f lightSquarks.slha
 </pre></div>
 </div>
 <p>Running this will print the status flag and a message with potential warnings
