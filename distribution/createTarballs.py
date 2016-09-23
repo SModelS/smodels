@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 """
-.. module:: createTarball
-   :synopsis: Script that is meant to create the distribution tarball
+.. module:: createTarballs
+   :synopsis: Script that is meant to create the distribution tarballs
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
    
@@ -78,7 +78,8 @@ def clone():
     distribution, and test.
     """
     comment ( "Git-cloning smodels into %s (this might take a while)" % dirname )
-    cmd = "git clone git@smodels.hephy.at:smodels %s" % (dirname)
+    cmd = "git clone -b v%s git@smodels.hephy.at:smodels %s" % (version, dirname)
+    #cmd = "git clone git@smodels.hephy.at:smodels %s" % (dirname)
     if dummyRun:
         cmd = "cp -a ../../smodels-v%s/* %s" % ( version, dirname )
     run ( cmd )
@@ -129,8 +130,10 @@ def splitDatabase():
           ( dirname, cwd )
     run ( cmd )
 
-    cmd = "mv ../../smodels-fastlim/smodels-fastlim.tgz %s/smodels-fastlim-v%s.tgz" % ( cwd, version )
+    cmd = "mv ./smodels-fastlim.tgz %s/smodels-fastlim-v%s.tgz" % \
+          ( cwd, version )
     run ( cmd )
+    sys.exit()
 
 def createTarball():
     """
@@ -219,7 +222,7 @@ def create():
     rmdir()
     mkdir() ## .. then create the temp dir
     clone() ## ... clone smodels into it ...
-    fetchDatabase() 
+    fetchDatabase() ## git clone the database
     splitDatabase() ## split database into official and optional
     convertRecipes()
     makeDocumentation()
@@ -230,7 +233,6 @@ def create():
     # rmdir(dirname)
     testDocumentation()
     isDummy()
-
 
 if __name__ == "__main__":
     create()
