@@ -148,7 +148,7 @@ def addXSecToFile(xsecs, slhafile, comment=None, complain=True):
     # Check if file already contain cross-section blocks
     xSectionList = crossSection.getXsecFromSLHAFile(slhafile)
     if xSectionList and complain:
-        logger.warning("SLHA file already contains XSECTION blocks. Adding "
+        logger.info("SLHA file already contains XSECTION blocks. Adding "
                        "only missing cross-sections.")
 
     # Write cross-sections to file, if they do not overlap any cross-section in
