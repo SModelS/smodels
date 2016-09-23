@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 """
-.. module:: runTools
+.. module:: smodelsTools
    :synopsis: Command line program for SModelS tools.
 
 .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
 
@@ -14,9 +15,11 @@ from smodels.tools import slhaChecks, lheChecks, databaseBrowser
 
 
 def main():
-    parser = argparse.ArgumentParser(description="SModelS command line tool.")
+    parser = argparse.ArgumentParser(description="SModelS-tools command line tool.")
+
     subparsers = parser.add_subparsers(dest='subparser_name')
 
+    installation = subparsers.add_parser('installation', description="Print installation setup and exit.")
     xseccomputer = subparsers.add_parser('xseccomputer', description="Compute MSSM cross sections for a SLHA file.")
     xseccomputer.add_argument('-s', '--sqrts', nargs='+', action='append', 
         help="sqrt(s) TeV. Can supply more than one value. Default is both 8 and 13.",
@@ -58,6 +61,14 @@ def main():
 
     args = parser.parse_args()
 
+    if args.subparser_name == 'installation':
+        from smodels import installation
+        import sys
+        print installation.banner()
+        print "SModelS version:", installation.version()
+        print "Installation directory:",installation.installDirectory()
+        sys.exit()
+        
     if args.subparser_name == 'xseccomputer':
         xsecComputer.main(args)
     if args.subparser_name == 'slhachecker':
