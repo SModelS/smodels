@@ -186,7 +186,7 @@ determining <a class="reference internal" href="Tools.html#topcoverage"><span>mi
 <kbd><span class="option">-f <var>FILENAME</var></span>, <span class="option">--filename <var>FILENAME</var></span></kbd></td>
 </tr>
 <tr><td>&nbsp;</td><td>name of SLHA or LHE input file, necessary input, if
-directory is given, loop all files in the directory</td></tr>
+directory is given, loop over all files in the directory</td></tr>
 <tr><td class="option-group" colspan="2">
 <kbd><span class="option">-p <var>PARAMETERFILE</var></span>, <span class="option">--parameterFile <var>PARAMETERFILE</var></span></kbd></td>
 </tr>
@@ -239,7 +239,7 @@ Below we give more detailed information about each entry in the parameters file.
 <li><dl class="first docutils">
 <dt><em>path</em>: relevant folder paths</dt>
 <dd><ul class="first last simple">
-<li><strong>databasePath</strong> (path to database): the absolute (or relative) path to the <code class="xref doc docutils literal"><span class="pre">SModelS</span> <span class="pre">database</span></code></li>
+<li><strong>databasePath</strong> (path to database): the absolute (or relative) path to the <code class="xref doc docutils literal"><span class="pre">SModelS</span> <span class="pre">database</span></code>, can supply either the directory name of the database, or the file name of a pickle file (see <a class="reference internal" href="DatabaseStructure.html"><em>Database of Experimental Results</em></a>)</li>
 </ul>
 </dd>
 </dl>
@@ -284,7 +284,8 @@ sigmacut (see <a class="reference internal" href="Decomposition.html#minweight">
 <li><strong>maxcond</strong> (float): maximum allowed value (in the [0,1] interval) for the violation of <a class="reference internal" href="DatabaseDefinitions.html#ulconditions"><span>analysis conditions</span></a>.
 A zero value means the conditions are strictly enforced, while 1 means the conditions
 are never enforced.
-<em>Only relevant for printing the</em> <a class="reference internal" href="#fileout"><span>output summary</span></a></li>
+<em>Only relevant for printing the</em> <a class="reference internal" href="#fileout"><span>output summary</span></a>.</li>
+<li><strong>ncpus</strong> (int): number of CPUs. When processing multiple SLHA/LHE files, SModelS can run in a parallelized fashion, splitting up the input files in equal chunks. &#8220;-1&#8221; is equal to the number of CPU cores of the machine.</li>
 </ul>
 </li>
 </ul>
@@ -293,6 +294,7 @@ are never enforced.
 <span class="n">sigmacut</span> <span class="o">=</span> <span class="mf">0.03</span> 
 <span class="n">minmassgap</span> <span class="o">=</span> <span class="mf">5.</span>
 <span class="n">maxcond</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">ncpus</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 </pre></div>
 </div>
 <ul class="simple">
