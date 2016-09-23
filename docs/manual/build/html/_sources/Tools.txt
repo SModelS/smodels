@@ -43,7 +43,7 @@ and writes them out in :ref:`SLHA convention <xsecblock>`. This can in particula
 
 **The usage of the cross-section calculator is:**
 
-runTools.py xseccomputer [-h]  [-h] -f FILENAME [-s SQRTS [SQRTS ...]] [-e NEVENTS] [-p] [-k] [-n] [-N] [-O]
+smodelsTools.py xseccomputer [-h]  [-h] -f FILENAME [-s SQRTS [SQRTS ...]] [-e NEVENTS] [-p] [-k] [-n] [-N] [-O]
 
 *arguments*:
   -h, --help            show this help message and exit
@@ -83,12 +83,12 @@ Further Pythia parameters are defined in :download:`etc/pythia.card </images/pyt
 A typical
 usage example is: ::
 
-   runTools.py xseccomputer -s 8 -e 10000 -p -f compressedSpec.slha
+   smodelsTools.py xseccomputer -s 8 -e 10000 -p -f compressedSpec.slha
 
 which will compute 8 TeV LO cross-sections (at the LHC) for all MSSM processes using 10k MC events.
 If, *after* the LO cross-sections have been computed, one wants to add the NLO+NLL cross-sections for gluinos and squarks: ::
 
-   runTools.py xseccomputer -s 8 -p -N -O -f compressedSpec.slha
+   smodelsTools.py xseccomputer -s 8 -p -N -O -f compressedSpec.slha
 
 The resulting file will then contain LO cross-sections for all MSSM processes and NLO+NLL cross-sections for gluinos and squarks.
 When reading the input file, SModelS will then use only the highest order cross-sections available for each process.
@@ -119,7 +119,7 @@ For a LHE input file only very basic checks are performed, namely that
 
 **The usage of the LHE checker is simply:**
 
-runTools.py lhechecker [-h] -f FILENAME
+smodelsTools.py lhechecker [-h] -f FILENAME
 
 *arguments*:
 
@@ -131,7 +131,7 @@ runTools.py lhechecker [-h] -f FILENAME
 A typical
 usage example is: ::
 
-   runTools.py lhechecker -f gluino_squarks.lhe
+   smodelsTools.py lhechecker -f gluino_squarks.lhe
 
 .. _slhaChecks:
 
@@ -180,7 +180,7 @@ is considered as a displaced vertex.
 
 **The usage of the SLHA checker is:**
 
-runTools.py slhachecker [-h] [-xS] [-lsp] [-longlived] [-m DISPLACEMENT] [-s SIGMACUT] [-illegal] -f FILENAME
+smodelsTools.py slhachecker [-h] [-xS] [-lsp] [-longlived] [-m DISPLACEMENT] [-s SIGMACUT] [-illegal] -f FILENAME
 
 *arguments*:
   -h, --help            show this help message and exit
@@ -213,7 +213,7 @@ In some more detail:
 A typical
 usage example is: ::
 
-   runTools.py slhachecker -m 0.001 -s 0.01 -f lightSquarks.slha
+   smodelsTools.py slhachecker -m 0.001 -s 0.01 -f lightSquarks.slha
 
 Running this will print the status flag and a message with potential warnings
 and error messages.
