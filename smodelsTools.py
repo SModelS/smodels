@@ -67,6 +67,7 @@ def main():
         print installation.banner()
         print "SModelS version:", installation.version()
         print "Installation directory:",installation.installDirectory()
+        print "Binaries:",__file__
         sys.exit()
         
     if args.subparser_name == 'xseccomputer':
