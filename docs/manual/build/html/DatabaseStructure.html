@@ -159,17 +159,19 @@
 Below we describe both the <a class="reference internal" href="#folderstruct"><span>directory</span></a> and <a class="reference internal" href="#objstruct"><span>object</span></a> structure of the  <a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a>.</p>
 <div class="section" id="database-directory-structure">
 <span id="folderstruct"></span><h2>Database: Directory Structure<a class="headerlink" href="#database-directory-structure" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a> is organized as files in an ordinary (UNIX) directory hierarchy,
-with a thin python layer serving as the access to the database.
-The overall structure of the directory hierarchy and its contents is depicted in the scheme below (click to enlarge):</p>
+<p>The <a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a> is organized as files in an ordinary (UNIX)
+directory hierarchy, with a thin python layer serving as the access to the
+database.  The overall structure of the directory hierarchy and its contents is
+depicted in the scheme below (click to enlarge):</p>
 <a class="reference internal image-reference" href="_images/DatabaseFolders.png"><img alt="_images/DatabaseFolders.png" src="_images/DatabaseFolders.png" style="width: 80%;" /></a>
-<p>As seen above, the top level of the SModelS database categorizes the analyses by LHC center-of-mass energies, <span class="math">\(\sqrt{s}\)</span>:</p>
+<p>As seen above, the top level of the SModelS database categorizes the analyses
+by LHC center-of-mass energies, <span class="math">\(\sqrt{s}\)</span>:</p>
 <ul class="simple">
 <li>8 TeV</li>
 <li>13 TeV</li>
 </ul>
-<p>Also, the top level directory contains a file called <code class="docutils literal"><span class="pre">version</span></code> with the version string
-of the database.</p>
+<p>Also, the top level directory contains a file called <code class="docutils literal"><span class="pre">version</span></code> with the
+version string of the database.</p>
 <p>The second level splits the results up between the different experiments:</p>
 <ul class="simple">
 <li>8TeV/CMS/</li>
@@ -190,9 +192,9 @@ of the database.</p>
 <li>a <code class="docutils literal"><span class="pre">globalInfo.txt</span></code> file</li>
 </ul>
 <p>The <code class="docutils literal"><span class="pre">globalInfo.txt</span></code> file contains the meta information about the <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a>.
-It defines the center-of-mass energy <span class="math">\(\sqrt{s}\)</span>, the integrated luminosity, the id used to identify the result
-and additional information about the source of the data.
-Here is the content of CMS-SUS-12-024/globalInfo.txt as an example:</p>
+It defines the center-of-mass energy <span class="math">\(\sqrt{s}\)</span>, the integrated luminosity, the id
+used to identify the result and additional information about the source of the
+data.  Here is the content of CMS-SUS-12-024/globalInfo.txt as an example:</p>
 <div class="highlight-python"><div class="highlight"><pre>sqrts: 8.0*TeV
 lumi: 19.4/fb
 id: CMS-SUS-12-024
@@ -223,16 +225,18 @@ lastUpdate: 2015/5/11
 </ul>
 <div class="section" id="data-set-folder-upper-limit-type">
 <h4>Data Set Folder: Upper Limit Type<a class="headerlink" href="#data-set-folder-upper-limit-type" title="Permalink to this headline">¶</a></h4>
-<p>Since <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type results</span></a> have a single dataset (see <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Sets</span></a>), the info file only holds some trivial
-information, such as the type of <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a> (UL) and the dataset id (None).
-Here is the content of CMS-SUS-12-024/data/dataInfo.txt  as an example:</p>
+<p>Since <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type results</span></a> have a single dataset (see <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Sets</span></a>), the info file only holds
+some trivial information, such as the type of <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a> (UL) and the dataset id
+(None). Here is the content of CMS-SUS-12-024/data/dataInfo.txt as an
+example:</p>
 <div class="highlight-python"><div class="highlight"><pre>dataType: upperLimit
 dataId: None
 </pre></div>
 </div>
-<p>For <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type results</span></a>, each <code class="docutils literal"><span class="pre">TxName.txt</span></code> file contains the UL map for a given <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>
-(see <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Results</span></a>) as well as some meta information, including the corresponding <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>constraint</span></a> and the <a class="reference internal" href="DatabaseDefinitions.html#ulconditions"><span>conditions</span></a>.
-Here is the first few lines of CMS-SUS-12-024/data/T1tttt.txt:</p>
+<p>For <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type results</span></a>, each <code class="docutils literal"><span class="pre">TxName.txt</span></code> file contains the UL map for a given <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a>
+or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> (see <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Results</span></a>) as well as some meta information,
+including the corresponding <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>constraint</span></a> and the <a class="reference internal" href="DatabaseDefinitions.html#ulconditions"><span>conditions</span></a>.  The
+first few lines of CMS-SUS-12-024/data/T1tttt.txt read:</p>
 <div class="highlight-python"><div class="highlight"><pre>txName: T1tttt
 conditionDescription: None
 condition: None
@@ -244,10 +248,12 @@ axes: 2*Eq(mother,x)_Eq(lsp,y)
 publishedData: True
 </pre></div>
 </div>
-<p>As seen above, the first block of data in the <code class="docutils literal"><span class="pre">T1tttt.txt</span></code> file contains information about
-the <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> (<span class="math">\([[[t,t]],[[t,t]]]\)</span>) for which the data refers to as well as reference to the original data source and
-some additional information.
-The second block of data contains the upper limit map as a function of the BSM masses:</p>
+<p>As seen above, the first block of data in the <code class="docutils literal"><span class="pre">T1tttt.txt</span></code> file contains
+information about the <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a>
+(<span class="math">\([[[\mbox{t},\mbox{t}]],[[\mbox{t},\mbox{t}]]]\)</span>) for which the data
+refers to as well as reference to the original data source and some additional
+information.  The second block of data contains the upper limit map as a
+function of the BSM masses:</p>
 <div class="highlight-python"><div class="highlight"><pre>upperLimits: [[[[400.0*GeV, 0.0*GeV], [400.0*GeV, 0.0*GeV]], 1.815773*pb],
 [[[400.0*GeV, 25.0*GeV], [400.0*GeV, 25.0*GeV]], 1.806528*pb],
 [[[400.0*GeV, 50.0*GeV], [400.0*GeV, 50.0*GeV]], 2.139336*pb],
@@ -258,7 +264,7 @@ The second block of data contains the upper limit map as a function of the BSM m
 [[[400.0*GeV, 175.0*GeV], [400.0*GeV, 175.0*GeV]], 3.561787*pb],
 [[[425.0*GeV, 0.0*GeV], [425.0*GeV, 0.0*GeV]], 1.318791*pb],
 [[[425.0*GeV, 25.0*GeV], [425.0*GeV, 25.0*GeV]], 1.348072*pb],
-[[[425.0*GeV, 50.0*GeV], [425.0*GeV, 50.0*GeV]], 1.730015*pb],
+	...
 </pre></div>
 </div>
 <p>As we can see, the UL map is given as a python array with the structure:
@@ -266,10 +272,11 @@ The second block of data contains the upper limit map as a function of the BSM m
 </div>
 <div class="section" id="data-set-folder-efficiency-map-type">
 <h4>Data Set Folder: Efficiency Map Type<a class="headerlink" href="#data-set-folder-efficiency-map-type" title="Permalink to this headline">¶</a></h4>
-<p>For <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a> the <code class="docutils literal"><span class="pre">dataInfo.txt</span></code> contains relevant information,
-such as an id to identify the <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a> (signal region), the number of observed and expected background
-events for the corresponding signal region and the respective signal upper limits.
-Here is the content of CMS-SUS-13-012-eff/3NJet6_1000HT1250_200MHT300/dataInfo.txt  as an example:</p>
+<p>For <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a> the <code class="docutils literal"><span class="pre">dataInfo.txt</span></code> contains relevant information, such as an id to
+identify the <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a> (signal region), the number of observed and expected
+background events for the corresponding signal region and the respective signal
+upper limits.  Here is the content of
+CMS-SUS-13-012-eff/3NJet6_1000HT1250_200MHT300/dataInfo.txt as an example:</p>
 <div class="highlight-python"><div class="highlight"><pre>dataType: efficiencyMap
 dataId: 3NJet6_1000HT1250_200MHT300
 observedN: 335
@@ -279,8 +286,9 @@ upperLimit: 5.681*fb
 expectedUpperLimit: 4.585*fb
 </pre></div>
 </div>
-<p>For <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a>, each <code class="docutils literal"><span class="pre">TxName.txt</span></code> file contains the efficiency map for a given <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>
-(see <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Results</span></a>) as well as some meta information.
+<p>For <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a>, each <code class="docutils literal"><span class="pre">TxName.txt</span></code> file contains the efficiency map for a given
+<a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> (see <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Results</span></a>) as well as some meta
+information.
 Here is the first few lines of CMS-SUS-13-012-eff/3NJet6_1000HT1250_200MHT300/T2.txt:</p>
 <div class="highlight-python"><div class="highlight"><pre>txName: T2
 conditionDescription: None
@@ -292,9 +300,10 @@ axes: 2*Eq(mother,x)_Eq(lsp,y)
 publishedData: False
 </pre></div>
 </div>
-<p>As seen above, the first block of data in the <code class="docutils literal"><span class="pre">T2.txt</span></code> file contains information about
-the <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> (<span class="math">\([[[jet]],[[jet]]]\)</span>) for which the efficiencies refers to as well as
-reference to the original data source and some additional information.
+<p>As seen above, the first block of data in the <code class="docutils literal"><span class="pre">T2.txt</span></code> file contains
+information about the <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> (<span class="math">\([[[\mbox{jet}]],[[\mbox{jet}]]]\)</span>) for which the
+efficiencies refers to as well as reference to the original data source and
+some additional information.
 The second block of data contains the efficiency map as a function of the BSM masses:</p>
 <div class="highlight-python"><div class="highlight"><pre>efficiencyMap: [[[[312.5*GeV, 12.5*GeV], [312.5*GeV, 12.5*GeV]], 0.00109159516643],
 [[[312.5*GeV, 62.5*GeV], [312.5*GeV, 62.5*GeV]], 0.00118171251453],
@@ -302,7 +311,7 @@ The second block of data contains the efficiency map as a function of the BSM ma
 [[[312.5*GeV, 162.5*GeV], [312.5*GeV, 162.5*GeV]], 0.000442121102215],
 [[[312.5*GeV, 212.5*GeV], [312.5*GeV, 212.5*GeV]], 0.000321709109432],
 [[[312.5*GeV, 262.5*GeV], [312.5*GeV, 262.5*GeV]], 2.38697309434e-05],
-[[[362.5*GeV, 12.5*GeV], [362.5*GeV, 12.5*GeV]], 0.00256536121411],
+	...
 </pre></div>
 </div>
 <p>As we can see the efficiency map is given as a python array with the structure:
@@ -312,14 +321,15 @@ The second block of data contains the efficiency map as a function of the BSM ma
 </div>
 <div class="section" id="database-object-structure">
 <span id="objstruct"></span><h2>Database: Object Structure<a class="headerlink" href="#database-object-structure" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="#folderstruct"><span>Database  folder structure</span></a> is mapped to python objects in SModelS.
+<p>The <a class="reference internal" href="#folderstruct"><span>Database  folder structure</span></a> is mapped to python
+objects in SModelS.
 The mapping is almost one-to-one, except for a few exceptions.
 Below we show the overall object structure  as well as the folders/files the objects
 represent (click to enlarge):</p>
 <a class="reference internal image-reference" href="_images/DatabaseObjects.png"><img alt="_images/DatabaseObjects.png" src="_images/DatabaseObjects.png" style="width: 80%;" /></a>
 <p>The type of python object (python class, phyton list,...) is shown in brackets.
-For convenience, below we explicitly list the main database folders/files and the python objects they
-are mapped to:</p>
+For convenience, below we explicitly list the main database folders/files and
+the python objects they are mapped to:</p>
 <ul class="simple">
 <li><a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a> folder <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObj.Database">Database Class</a></li>
 <li><a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a> folder <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObj.ExpResult">ExpResult Class</a></li>
@@ -331,22 +341,26 @@ are mapped to:</p>
 </div>
 <div class="section" id="database-binary-pickle-format">
 <h2>Database: Binary (Pickle) Format<a class="headerlink" href="#database-binary-pickle-format" title="Permalink to this headline">¶</a></h2>
-<p>Due to the large number of experimental results contained in the SModelS <a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a>,
-parsing the <a class="reference internal" href="#folderstruct"><span>database folders</span></a> and building the corresponding
-<a class="reference internal" href="#objstruct"><span>database objects</span></a> may require a non-negligible CPU time. In some cases
-this task may be the most time consuming when testing a single input file.
-Furthermore this is a static task which does not have to be repeated everytime SModelS is run.
-In order to avoid these issues, SModelS serializes the
+<p>Due to the large number of experimental results contained in the SModelS
+<a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a>, parsing the <a class="reference internal" href="#folderstruct"><span>database folders</span></a> and building the
+corresponding <a class="reference internal" href="#objstruct"><span>database objects</span></a> may require a non-negligible
+CPU time. In some cases this task may be the most time consuming task when
+testing a single input file.  Furthermore this procedure does not have to be
+repeated every time SModelS is run.</p>
+<p>In order to avoid these issues, SModelS serializes the
 <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObj.Database">database object</a>
-into a pickle file (<em>&lt;database-path&gt;/database.pcl</em>), which can then be read directly when loading the database.
+into a pickle file (<em>&lt;database-path&gt;/database.pcl</em>), which can then be read
+directly when loading the database.
 Since reading the pickle file is much faster than parsing the <a class="reference internal" href="#folderstruct"><span>database folders</span></a>,
 there is a considerable speed improvement when using the pickle file.
-If any changes in the <a class="reference internal" href="#folderstruct"><span>database folder structure</span></a> or in the SModelS
-version are detected, SModelS will automatically re-build the pickle file.
-Although this action may take a few minutes, it is only performed once.</p>
+If any changes in the <a class="reference internal" href="#folderstruct"><span>database folder structure</span></a>
+are detected or the SModelS version has changed,
+SModelS will automatically re-build the pickle file.
+This action may take a few minutes, but it is only performed once.</p>
 <p>SModelS automatically builds (if necessary) and loads the binary database when a
 <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObj.Database">Database object</a>
-is created. Nonetheless, the user can enforce loading (parsing) the <em>text database</em> using the option <em>force_load = &#8216;txt&#8217;</em> in
+is created. Nonetheless, the user can enforce loading (parsing) the <em>text
+database</em> using the option <em>force_load = &#8216;txt&#8217;</em> in
 <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObj.Database">Database</a> .</p>
 <ul class="simple">
 <li>The pickle file is created by the <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObj.Database.createBinaryFile">createBinaryFile method</a></li>

@@ -3,7 +3,7 @@
 """
 .. module:: setup
    :synopsis: Setup script for SModelS.
-   
+
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
@@ -17,7 +17,7 @@ from smodels.installation import version, authors
 def read(fname):
     """
     Simple method to read a file (fname) located in the current folder.
-    
+
     """
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
@@ -36,10 +36,10 @@ def dataFiles ():
     List all config files and binaries
 
     """
-    ret = [("", [ "BANNER", "README", "COPYING" ])]
-    ret.append ( ( "smodels/", [ "smodels/version" ] ) )
-
-    for directory in ["inputFiles/slha/", "inputFiles/lhe/", "lib/nllfast/nllfast-1.2/", "lib/nllfast/nllfast-2.1/", "lib/pythia6/", "etc"]:
+    ret = [("", [ "README", "COPYING" ])]
+    ret.append ( ("smodels/", [ "smodels/version" ]) )
+    # ret.append ( ("share", [ "share/shareme" ]) )
+    for directory in ["inputFiles/slha/", "inputFiles/lhe/", "lib/nllfast/nllfast-1.2/", "lib/nllfast/nllfast-2.1/", "lib/nllfast/nllfast-3.1/", "lib/pythia6/", "etc/"]:
         ret.append ((directory, listDirectory (directory)))
 
     return ret
@@ -69,7 +69,7 @@ setup(
     version = version(),
     author = authors(),
     author_email="smodels-developers@lists.oeaw.ac.at ",
-    scripts=[ "bin/smodels-config", "runSModelS.py" ],
+    scripts=[ "bin/smodels-config", "runSModelS.py", "smodelsTools.py" ],
     install_requires=[ 'docutils>=0.3', 'numpy', 'scipy>=0.9.0', \
                          'unum', 'argparse', 'pyslha>=3.1.0' ],
     data_files=dataFiles() ,
@@ -81,9 +81,9 @@ setup(
                 "supersymmetry UEDs"),
     url="http://smodels.hephy.at/",
     packages=['smodels',
-                'smodels.theory',
-                'smodels.tools',
-                'smodels.experiment'],
+              'smodels.theory',
+              'smodels.tools',
+              'smodels.experiment'],
     test_suite='test',
     long_description=read('README'),
     classifiers=[

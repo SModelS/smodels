@@ -59,7 +59,7 @@ optional arguments:
   -h, --help            show this help message and exit
   -f FILENAME, --filename FILENAME
                         name of SLHA or LHE input file, necessary input, if
-                        directory is given, loop all files in the directory
+                        directory is given, loop over all files in the directory
   -p PARAMETERFILE, --parameterFile PARAMETERFILE
                         name of parameter file, optional argument, if not set,
                         use all parameters from etc/parameters_default.ini
@@ -93,7 +93,7 @@ If no parameter file is specified the default parameters stored in
 Below we give more detailed information about each entry in the parameters file.
 
 * *path*: relevant folder paths
-   * **databasePath** (path to database): the absolute (or relative) path to the :doc:`SModelS database <Database>`
+   * **databasePath** (path to database): the absolute (or relative) path to the :doc:`SModelS database <Database>`, can supply either the directory name of the database, or the file name of a pickle file (see :doc:`Database of Experimental Results <DatabaseStructure>`)
 
 *default values*:
 
@@ -128,12 +128,13 @@ Below we give more detailed information about each entry in the parameters file.
   * **maxcond** (float): maximum allowed value (in the [0,1] interval) for the violation of :ref:`analysis conditions <ULconditions>`.
     A zero value means the conditions are strictly enforced, while 1 means the conditions
     are never enforced. 
-    *Only relevant for printing the* :ref:`output summary <fileOut>`
+    *Only relevant for printing the* :ref:`output summary <fileOut>`.
+  * **ncpus** (int): number of CPUs. When processing multiple SLHA/LHE files, SModelS can run in a parallelized fashion, splitting up the input files in equal chunks. "-1" is equal to the number of CPU cores of the machine.
 
 *default values*:
 
 .. literalinclude:: /images/parameters_default.ini
-   :lines: 9-12  
+   :lines: 9-13  
    
 * *database*: select a subset of the available :doc:`database analyses <Database>`
 
@@ -150,7 +151,7 @@ Below we give more detailed information about each entry in the parameters file.
 *default values*:
 
 .. literalinclude:: /images/parameters_default.ini
-   :lines: 13-15  
+   :lines: 14-16  
    
    
 * *stdout*: basic options for the :ref:`screen output <screenOut>`
@@ -168,7 +169,7 @@ Below we give more detailed information about each entry in the parameters file.
 *default values*:
 
 .. literalinclude:: /images/parameters_default.ini
-   :lines: 16-21
+   :lines: 17-22
    
 * *file*: basic options for the :ref:`file output <fileOut>`
 
@@ -180,7 +181,7 @@ Below we give more detailed information about each entry in the parameters file.
 *default values*:
 
 .. literalinclude:: /images/parameters_default.ini
-   :lines: 22-24             
+   :lines: 23-25             
 
 
 
