@@ -32,20 +32,22 @@ Below we describe both the :ref:`directory <folderStruct>` and :ref:`object <obj
 Database: Directory Structure
 -----------------------------
 
-The :ref:`Database <Database>` is organized as files in an ordinary (UNIX) directory hierarchy,
-with a thin python layer serving as the access to the database.
-The overall structure of the directory hierarchy and its contents is depicted in the scheme below (click to enlarge):
+The :ref:`Database <Database>` is organized as files in an ordinary (UNIX)
+directory hierarchy, with a thin python layer serving as the access to the
+database.  The overall structure of the directory hierarchy and its contents is
+depicted in the scheme below (click to enlarge):
 
 .. image:: images/DatabaseFolders.png
    :width: 80%
 
-As seen above, the top level of the SModelS database categorizes the analyses by LHC center-of-mass energies, |sqrts|:
+As seen above, the top level of the SModelS database categorizes the analyses
+by LHC center-of-mass energies, |sqrts|:
 
 * 8 TeV
 * 13 TeV
 
-Also, the top level directory contains a file called ``version`` with the version string
-of the database.
+Also, the top level directory contains a file called ``version`` with the
+version string of the database.
 
 The second level splits the results up between the different experiments:
 
@@ -59,7 +61,6 @@ The third level of the directory hierarchy encodes the |ExpRess|:
 * ...
 
 
-
 * **The Database folder is described by the** `Database Class <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
 
 Experimental Result Folder
@@ -71,9 +72,9 @@ Each |ExpRes| folder contains:
 * a ``globalInfo.txt`` file
 
 The ``globalInfo.txt`` file contains the meta information about the |ExpRes|.
-It defines the center-of-mass energy |sqrts|, the integrated luminosity, the id used to identify the result
-and additional information about the source of the data.
-Here is the content of CMS-SUS-12-024/globalInfo.txt as an example:
+It defines the center-of-mass energy |sqrts|, the integrated luminosity, the id
+used to identify the result and additional information about the source of the
+data.  Here is the content of CMS-SUS-12-024/globalInfo.txt as an example:
       
 .. literalinclude:: /literals/globalInfo.txt
    :lines: 1-11
@@ -96,24 +97,28 @@ Each |Dataset| folder (e.g. ``data-xx``) contains:
 Data Set Folder: Upper Limit Type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Since |ULrs| have a single dataset (see |Datasets|), the info file only holds some trivial
-information, such as the type of |ExpRes| (UL) and the dataset id (None).
-Here is the content of CMS-SUS-12-024/data/dataInfo.txt  as an example:
+Since |ULrs| have a single dataset (see |Datasets|), the info file only holds
+some trivial information, such as the type of |ExpRes| (UL) and the dataset id
+(None). Here is the content of CMS-SUS-12-024/data/dataInfo.txt as an
+example:
 
 .. literalinclude:: /literals/dataInfo.txt
    :lines: 1-2
 
-For |ULrs|, each ``TxName.txt`` file contains the UL map for a given |element| or sum of |elements|
-(see |ExpRess|) as well as some meta information, including the corresponding |constraint| and the |conditions|.
-Here is the first few lines of CMS-SUS-12-024/data/T1tttt.txt:
+For |ULrs|, each ``TxName.txt`` file contains the UL map for a given |element|
+or sum of |elements| (see |ExpRess|) as well as some meta information,
+including the corresponding |constraint| and the |conditions|.  The
+first few lines of CMS-SUS-12-024/data/T1tttt.txt read:
 
 .. literalinclude:: /literals/T1tttt.txt
    :lines: 1-9
    
-As seen above, the first block of data in the ``T1tttt.txt`` file contains information about
-the |element| (:math:`[[[t,t]],[[t,t]]]`) for which the data refers to as well as reference to the original data source and
-some additional information.
-The second block of data contains the upper limit map as a function of the BSM masses:
+As seen above, the first block of data in the ``T1tttt.txt`` file contains
+information about the |element| 
+(:math:`[[[\mbox{t},\mbox{t}]],[[\mbox{t},\mbox{t}]]]`) for which the data
+refers to as well as reference to the original data source and some additional
+information.  The second block of data contains the upper limit map as a
+function of the BSM masses:
 
 .. literalinclude:: /literals/T1tttt.txt
    :lines: 10-20
@@ -124,24 +129,27 @@ As we can see, the UL map is given as a python array with the structure:
 Data Set Folder: Efficiency Map Type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For |EMrs| the ``dataInfo.txt`` contains relevant information,
-such as an id to identify the |dataset| (signal region), the number of observed and expected background
-events for the corresponding signal region and the respective signal upper limits. 
-Here is the content of CMS-SUS-13-012-eff/3NJet6_1000HT1250_200MHT300/dataInfo.txt  as an example:
+For |EMrs| the ``dataInfo.txt`` contains relevant information, such as an id to
+identify the |dataset| (signal region), the number of observed and expected
+background events for the corresponding signal region and the respective signal
+upper limits.  Here is the content of
+CMS-SUS-13-012-eff/3NJet6_1000HT1250_200MHT300/dataInfo.txt as an example:
 
 .. literalinclude:: /literals/dataInfo-eff.txt
    :lines: 1-7
 
-For |EMrs|, each ``TxName.txt`` file contains the efficiency map for a given |element| or sum of |elements|
-(see |ExpRess|) as well as some meta information.
+For |EMrs|, each ``TxName.txt`` file contains the efficiency map for a given
+|element| or sum of |elements| (see |ExpRess|) as well as some meta
+information.
 Here is the first few lines of CMS-SUS-13-012-eff/3NJet6_1000HT1250_200MHT300/T2.txt:
 
 .. literalinclude:: /literals/T2.txt
    :lines: 1-8
    
-As seen above, the first block of data in the ``T2.txt`` file contains information about
-the |element| (:math:`[[[jet]],[[jet]]]`) for which the efficiencies refers to as well as 
-reference to the original data source and some additional information.
+As seen above, the first block of data in the ``T2.txt`` file contains
+information about the |element| (:math:`[[[\mbox{jet}]],[[\mbox{jet}]]]`) for which the
+efficiencies refers to as well as reference to the original data source and
+some additional information.
 The second block of data contains the efficiency map as a function of the BSM masses:
 
 .. literalinclude:: /literals/T2.txt
@@ -155,7 +163,8 @@ As we can see the efficiency map is given as a python array with the structure:
 Database: Object Structure
 --------------------------
 
-The :ref:`Database  folder structure <folderStruct>` is mapped to python objects in SModelS.
+The :ref:`Database  folder structure <folderStruct>` is mapped to python
+objects in SModelS.
 The mapping is almost one-to-one, except for a few exceptions.
 Below we show the overall object structure  as well as the folders/files the objects
 represent (click to enlarge):
@@ -164,8 +173,8 @@ represent (click to enlarge):
    :width: 80%
    
 The type of python object (python class, phyton list,...) is shown in brackets.
-For convenience, below we explicitly list the main database folders/files and the python objects they
-are mapped to:
+For convenience, below we explicitly list the main database folders/files and
+the python objects they are mapped to:
 
 * |Database| folder :math:`\rightarrow` `Database Class <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
 * |ExpRes| folder :math:`\rightarrow` `ExpResult Class <../../../documentation/build/html/experiment.html#experiment.databaseObj.ExpResult>`_
@@ -178,27 +187,29 @@ are mapped to:
 Database: Binary (Pickle) Format
 --------------------------------
 
-Due to the large number of experimental results contained in the SModelS |Database|, 
-parsing the :ref:`database folders <folderStruct>` and building the corresponding 
-:ref:`database objects <objStruct>` may require a non-negligible CPU time. In some cases
-this task may be the most time consuming when testing a single input file.
-Furthermore this is a static task which does not have to be repeated everytime SModelS is run.
+Due to the large number of experimental results contained in the SModelS
+|Database|, parsing the :ref:`database folders <folderStruct>` and building the
+corresponding :ref:`database objects <objStruct>` may require a non-negligible
+CPU time. In some cases this task may be the most time consuming task when
+testing a single input file.  Furthermore this procedure does not have to be
+repeated every time SModelS is run.
+
 In order to avoid these issues, SModelS serializes the 
 `database object <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
-into a pickle file (*<database-path>/database.pcl*), which can then be read directly when loading the database.
+into a pickle file (*<database-path>/database.pcl*), which can then be read
+directly when loading the database.
 Since reading the pickle file is much faster than parsing the :ref:`database folders <folderStruct>`,
 there is a considerable speed improvement when using the pickle file.
-If any changes in the :ref:`database folder structure <folderStruct>` or in the SModelS
-version are detected, SModelS will automatically re-build the pickle file.
-Although this action may take a few minutes, it is only performed once.
-
+If any changes in the :ref:`database folder structure <folderStruct>` 
+are detected or the SModelS version has changed,
+SModelS will automatically re-build the pickle file.
+This action may take a few minutes, but it is only performed once.
 
 SModelS automatically builds (if necessary) and loads the binary database when a 
 `Database object <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
-is created. Nonetheless, the user can enforce loading (parsing) the *text database* using the option *force_load = 'txt'* in 
+is created. Nonetheless, the user can enforce loading (parsing) the *text
+database* using the option *force_load = 'txt'* in 
 `Database <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_ .  
 
 
-* The pickle file is created by the `createBinaryFile method <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database.createBinaryFile>`_
-
- 
+* The pickle file is created by the `createBinaryFile method <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database.createBinaryFile>`_ 
