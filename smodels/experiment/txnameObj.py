@@ -272,12 +272,15 @@ class TxNameData(object):
             return None
         p= ( (np.matrix(porig)[0] - self.delta_x ) ).tolist()[0]
         P=np.dot(p,self._V)  ## rotate
-        dp=self.countNonZeros ( P )
+        dp=self.countNonZeros(P)
+        #Make sure the approximate zeros in P are set to zero (useful for 1-D data)
+        if dp < self.dimensionality:           
+            P = np.append(P[:1],[0.]*(self.dimensionality-dp))
         self.projected_value = self.interpolate([ P[:self.dimensionality] ])
 
         # self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
         # self.projected_value = float(self.projected_value)
-        if dp != self.dimensionality: ## we have _data in different dimensions
+        if dp > self.dimensionality: ## we have _data in different dimensions
             if self._accept_errors_upto == None:
                 return None
             logger.debug( "attempting to interpolate outside of convex hull "\
@@ -464,7 +467,16 @@ class TxNameData(object):
         self.MpCut=[]
         MpCut=[]
         for i in Mp:
-            MpCut.append ( i[:self.dimensionality].tolist() )
+            if self.dimensionality > 1:
+                MpCut.append(i[:self.dimensionality].tolist() )
+            else:
+                MpCut.append([i[0].tolist(),0.])
+        if self.dimensionality == 1:
+            logger.debug("1-D data found. Extending to a small 2-D band around the line.")
+            MpCut += [[pt[0],pt[1]+0.0001] for pt in MpCut]
+            self.xsec += self.xsec
+            self.dimensionality = 2
+             
         self.Mp=MpCut ## also keep the rotated points, with truncated zeros
         self.tri = qhull.Delaunay( self.Mp )
 
