@@ -34,6 +34,7 @@ class MPrinter(object):
     :ivar printerList: list
     """
     def __init__(self,printerList):
+        self.name = "master"
 
         self.Printers = []
         if isinstance(printerList,list):
@@ -77,10 +78,14 @@ class MPrinter(object):
     def flush(self):
         """
         Ask all printers to write the output and clear their cache.
+        If the printers return anything other than None, 
+        we pass it on.
         """
-
+        ret = {}
         for printer in self.Printers:
-            printer.flush()
+            t = printer.flush()
+            ret[printer.name]=t
+        return ret
 
 class BasicPrinter(object):
     """
@@ -88,6 +93,7 @@ class BasicPrinter(object):
     """
 
     def __init__(self, output, filename, outputLevel):
+        self.name = "basic"
 
         self.outputList = []
         self.outputLevel = outputLevel
@@ -177,8 +183,8 @@ class TxTPrinter(BasicPrinter):
     Printer class to handle the printing of one single text output
     """
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
-
         BasicPrinter.__init__(self, output, filename, outputLevel)        
+        self.name = "txt"
         self.printingOrder = [OutputStatus,TopologyList,Element,ExpResult,
                              TheoryPredictionList,ResultList,Uncovered]
         self.outputLevel = [outputLevel]*len(self.printingOrder)
@@ -556,8 +562,8 @@ class SummaryPrinter(TxTPrinter):
     """
 
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
-
         TxTPrinter.__init__(self, output, filename, outputLevel)
+        self.name = "summary"
         self.printingOrder = [OutputStatus,ResultList,UncoveredList, Uncovered]
         self.outputLevel = [outputLevel]*len(self.printingOrder)
         self.toPrint = [None]*len(self.printingOrder)
@@ -582,8 +588,8 @@ class PyPrinter(BasicPrinter):
     Printer class to handle the printing of one single pythonic output
     """
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
-
         BasicPrinter.__init__(self, output, filename, outputLevel)
+        self.name = "py"
         self.printingOrder = [OutputStatus,ResultList,Uncovered]
         self.outputLevel = [outputLevel]*len(self.printingOrder)
         self.toPrint = [None]*len(self.printingOrder)
@@ -626,6 +632,9 @@ class PyPrinter(BasicPrinter):
                 outfile.close()
 
         self.toPrint = [None]*len(self.printingOrder)
+        ## it is a special feature of the python printer
+        ## that we also return the output dictionary
+        return outputDict
 
     def _formatOutputStatus(self, obj, objOutputLevel):
         """
@@ -836,8 +845,8 @@ class XmlPrinter(PyPrinter):
     Printer class to handle the printing of one single XML output
     """
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
-
         PyPrinter.__init__(self, output, filename, outputLevel)
+        self.name = "xml"
         self.printingOrder = [OutputStatus,ResultList,Uncovered]
         self.outputLevel = [outputLevel]*len(self.printingOrder)
         self.toPrint = [None]*len(self.printingOrder)
