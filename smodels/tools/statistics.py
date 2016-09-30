@@ -17,33 +17,60 @@ from numpy import sqrt, random, exp, log
 import math
 
 @_memoize
-def upperLimit ( Nobs, Nexp, sigmaexp, lumi, alpha=.05, toys=50000 ):
+def upperLimit ( Nobs, Nexp, sigmaexp, lumi, alpha=.05, toys=200000 ):
     """ computes the 95% CL upper limit on the production cross section """
-    ret = _upperLimitMadAnalysis ( Nobs, Nexp, sigmaexp, 1.-alpha, toys ) / lumi
+    #ret = _upperLimitMadAnalysis ( Nobs, Nexp, sigmaexp, 1.-alpha, toys ) / lumi
+    #print "ret=",ret
+    computer = UpperLimitComputer ( toys, lumi, 1.-alpha )
+    ret = computer.compute ( Nobs, Nexp, sigmaexp, 5. )
+    #print "ret=",ret
     return ret
 
-def _upperLimitMadAnalysis ( nev, xbg, sbg, cl=.95, numberoftoys=50000, upto = 5.0, 
-                             return_nan=False ):
-    """ upper limit obtained via mad analysis 5 code 
-    :param nev: number of observed events
-    :param sac: relative uncertainty in acceptance
-    :param sbg: uncertainty in background
-    :param  cl: desired CL
-    :param numberoftoys: how many toy experiments do we make?
-    :param upto: search for 95% upto this number times nev
+class UpperLimitComputer:
+    def __init__ ( self, numberoftoys, lumi, cl=.95):
+        """
+        :param numberoftoys: how many toy experiments do we make?
+        :param lumi: integrated luminosity
+        :param cl: desired CL
+        """
+        self.origNToys=numberoftoys
+        self.currentNToys = self.origNToys
+        self.lumi = lumi
+        self.cl = cl
 
-    """
-    
-    def f( sig ):
-        return CLs ( nev, xbg, sbg, sig, numberoftoys ) - cl
-    try:
-        return optimize.brentq ( f, 0, upto * max(nev,xbg,sbg) )
-    except (ValueError,RuntimeError),e:
-        if not return_nan:
-            return _upperLimitMadAnalysis ( nev, xbg, sbg, cl, 5*numberoftoys, 
-                                            5.0*upto, upto>30. )
-        else:
-            return float("nan")
+    def f( self, sig ):
+        # self.currentNToys=int ( self.currentNToys * 1.10 )
+        cls = CLs ( self.nev, self.xbg, self.sbg, sig, self.currentNToys ) - self.cl
+        # print "[ULC] running",sig," with",self.currentNToys,"cls=",cls
+        return cls
+
+    def compute ( self, nev, xbg, sbg, upto=5.0, return_nan=False ):
+        """ upper limit obtained via mad analysis 5 code 
+        :param nev: number of observed events
+        :param sac: relative uncertainty in acceptance
+        :param xbg: expected bg
+        :param sbg: uncertainty in background
+        :param upto: defines the interval to be probed
+        """
+        self.nev = nev
+        self.xbg = xbg
+        self.sbg = sbg
+        self.currentNToys = self.origNToys
+        
+        try:
+            ## up = upto ## 5. ##  upto * max(nev,xbg,sbg)
+            dn = max( 0, nev - xbg )
+            up = upto * max( dn + math.sqrt(nev), dn + math.sqrt(xbg),sbg)
+            #print "checking between 0 and ",up ## ,self.f(0),self.f(up)
+            return optimize.brentq ( self.f, 0, up, rtol=1e-3 ) / self.lumi
+        except (ValueError,RuntimeError),e:
+            #print "exception: >>",type(e),e
+            if not return_nan:
+                # print "compute again, upto=",upto
+                # self.origNToys = 5* self.origNToys
+                return self.compute ( nev, xbg, sbg, 5.0*upto, upto>200. )
+            else:
+                return float("nan")
 
 def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
     """ this method has been taken from MadAnalysis5, see
@@ -62,7 +89,8 @@ def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
     # generate a set of expected-number-of-background-events, one for each toy
     # experiment, distributed according to a Gaussian with the specified mean
     # and uncertainty
-    ExpectedBGs = scipy.stats.norm.rvs(loc=ExpectedBG, scale=BGError, size=NumToyExperiments)
+    ExpectedBGs = scipy.stats.norm.rvs( loc=ExpectedBG, scale=BGError, 
+                                        size=NumToyExperiments )
 
     # Ignore values in the tail of the Gaussian extending to negative numbers
     ExpectedBGs = [value for value in ExpectedBGs if value > 0]
