@@ -222,12 +222,12 @@ and use NLLfast to compute the NLO or NLO+NLL cross-sections for squarks and glu
 <p>Further Pythia parameters are defined in <a class="reference download internal" href="_downloads/pythia.card" download=""><code class="xref download docutils literal"><span class="pre">etc/pythia.card</span></code></a>.</p>
 <p>A typical
 usage example is:</p>
-<div class="highlight-python"><div class="highlight"><pre>smodelsTools.py xseccomputer -s 8 -e 10000 -p -f compressedSpec.slha
+<div class="highlight-python"><div class="highlight"><pre><span></span>smodelsTools.py xseccomputer -s 8 -e 10000 -p -f compressedSpec.slha
 </pre></div>
 </div>
 <p>which will compute 8 TeV LO cross-sections (at the LHC) for all MSSM processes using 10k MC events.
 If, <em>after</em> the LO cross-sections have been computed, one wants to add the NLO+NLL cross-sections for gluinos and squarks:</p>
-<div class="highlight-python"><div class="highlight"><pre>smodelsTools.py xseccomputer -s 8 -p -N -O -f compressedSpec.slha
+<div class="highlight-python"><div class="highlight"><pre><span></span>smodelsTools.py xseccomputer -s 8 -p -N -O -f compressedSpec.slha
 </pre></div>
 </div>
 <p>The resulting file will then contain LO cross-sections for all MSSM processes and NLO+NLL cross-sections for gluinos and squarks.
@@ -264,7 +264,7 @@ When reading the input file, SModelS will then use only the highest order cross-
 </div></blockquote>
 <p>A typical
 usage example is:</p>
-<div class="highlight-python"><div class="highlight"><pre>smodelsTools.py lhechecker -f gluino_squarks.lhe
+<div class="highlight-python"><div class="highlight"><pre><span></span>smodelsTools.py lhechecker -f gluino_squarks.lhe
 </pre></div>
 </div>
 </div>
@@ -359,7 +359,7 @@ visible displaced vertices</td></tr>
 </ul>
 <p>A typical
 usage example is:</p>
-<div class="highlight-python"><div class="highlight"><pre>smodelsTools.py slhachecker -m 0.001 -s 0.01 -f lightSquarks.slha
+<div class="highlight-python"><div class="highlight"><pre><span></span>smodelsTools.py slhachecker -m 0.001 -s 0.01 -f lightSquarks.slha
 </pre></div>
 </div>
 <p>Running this will print the status flag and a message with potential warnings
