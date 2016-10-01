@@ -81,7 +81,6 @@ class TxName(object):
                 continue
         ident = self.globalInfo.id+":"+dataType[0]+":"+ str(self._infoObj.dataId)
         ident += ":" + self.txName
-#        print "ident=",ident,"dataid=",self._infoObj.dataId
         self.txnameData = TxNameData( data, dataType, ident )
 
         #Builds up a list of elements appearing in constraints:
@@ -275,7 +274,7 @@ class TxNameData(object):
         dp=self.countNonZeros(P)
         #Make sure the approximate zeros in P are set to zero (useful for 1-D data)
         if dp < self.dimensionality:           
-            P = np.append(P[:1],[0.]*(self.dimensionality-dp))
+            P = np.append(P[:dp],[0.]*(self.dimensionality-dp))
         self.projected_value = self.interpolate([ P[:self.dimensionality] ])
 
         # self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
