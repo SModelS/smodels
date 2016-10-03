@@ -78,7 +78,9 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
         xsecsInfile = crossSection.getXsecFromSLHAFile(slhafile)
         loXsecs = crossSection.XSectionList()
         for xsec in xsecsInfile:
-            if xsec.info.order == 0: loXsecs.add(xsec)
+            if xsec.info.order == 0 and xsec.info.sqrts == sqrts:
+                loXsecs.add(xsec)
+                
     else:
         if not lhefile or not os.path.isfile(lhefile):
             lheFile = runPythia(slhafile, nevts, sqrts / TeV, lhefile, unlink=unlink,pythiacard=pythiacard)
