@@ -299,10 +299,24 @@ def loadDatabaseResults(parser, database):
     else:
         dataTypes = ['all']
         datasetIDs = parser.get("database", "dataselector").split(",")
+    
+    useSuperseded=False
+    useNonValidated=False
+    if parser.has_option("database","useSuperseded"):
+        useSuperseded = parser.getboolean("database", "usesuperseded")        
+    if parser.has_option("database","useNonValidated"):
+        useNonValidated = parser.getboolean("database", "usenonvalidated")
+    if useSuperseded:
+        log.info('Including superseded results')
+    if useNonValidated:
+        log.info('Including non-validated results')
+
 
     """ Load analyses """
 
-    ret = database.getExpResults(analysisIDs=analyses, txnames=txnames, datasetIDs=datasetIDs, dataTypes=dataTypes)
+    ret = database.getExpResults(analysisIDs=analyses, txnames=txnames, 
+                                 datasetIDs=datasetIDs, dataTypes=dataTypes,
+                                 useSuperseded=useSuperseded, useNonValidated=useNonValidated)
     """ Print list of analyses loaded """
     outLevel = 0
     if parser.getboolean("stdout", "printAnalyses"):
