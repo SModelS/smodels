@@ -128,8 +128,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     outLevel = 0
     if not results.isEmpty():
         outputStatus.updateStatus(1)
-        outLevel = 1
-        outLevel += parser.getboolean("file", "addConstraintInfo")
+        outLevel = 2 # by default we always print txnames with the results
         masterPrinter.addObj(results,outLevel)
     else:
         outputStatus.updateStatus(0) # no results after enforcing maxcond
