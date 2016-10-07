@@ -125,7 +125,7 @@ class RunSModelSTest(unittest.TestCase):
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
                     res['AnalysisID'],res['DataSetID']])
-        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.01,
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                            ignore=ignoreFields)
         try:
             os.remove('./output.py')
