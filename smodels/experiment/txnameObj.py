@@ -472,8 +472,8 @@ class TxNameData(object):
                 MpCut.append([i[0].tolist(),0.])
         if self.dimensionality == 1:
             logger.debug("1-D data found. Extending to a small 2-D band around the line.")
-            MpCut += [[pt[0],pt[1]+0.0001] for pt in MpCut]
-            self.xsec += self.xsec
+            MpCut += [[pt[0],pt[1]+0.0001] for pt in MpCut] + [[pt[0],pt[1]-0.0001] for pt in MpCut]
+            self.xsec += self.xsec + self.xsec
             self.dimensionality = 2
              
         self.Mp=MpCut ## also keep the rotated points, with truncated zeros
