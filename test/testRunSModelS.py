@@ -61,9 +61,9 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
                 logger.warning( "Dictionaries differ in key ``%s''" % key )
                 s1,s2 = str(obj1[key]),str(obj2[key]) 
                 if len(s1) + len(s2) > 200:
-		                logger.warning ( "The values are too long to print." )
+                    logger.warning ( "The values are too long to print." )
                 else:
-										logger.warning( 'The values are: %s (this run) versus %s (default)'%\
+                    logger.warning( 'The values are: %s (this run) versus %s (default)'%\
                                 ( s1,s2 ) )
                 return False
     elif isinstance(obj1,list):
@@ -101,10 +101,10 @@ class RunSModelSTest(unittest.TestCase):
                 os.unlink( os.path.join ( out, i ))
         dirname = join( iDir(), "inputFiles/slha/" )
         self.runMain(dirname)
-        nout = len( list ( glob.iglob ( "unitTestOutput/*smodels" )) )
-        nin = len( list ( glob.iglob ( "%s/*slha" % dirname )) )
+        nout = len([i for i in glob.iglob("unitTestOutput/*smodels") if not "~" in i])
+        nin = len([i for i in glob.iglob("%s/*slha" % dirname) if not "~" in i])
         if nout != nin:
-            print ( "%d != %d" % ( nout, nin ) )
+            logger.error("Number of output file (%d) differ from number of input files (%d)" % (nout, nin))
         self.assertTrue( nout == nin )
 
     def timeoutRun(self):
