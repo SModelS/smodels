@@ -143,11 +143,13 @@ class BasicPrinter(object):
         Format the objects added to the output, print them to the screen
         or file and remove them from the printer.
         """
+        ret=""
 
         for iobj,obj in enumerate(self.toPrint):
                 if obj is None: continue
                 output = self._formatObj(obj,self.outputLevel[iobj])                
                 if not output: continue  #Skip empty output                
+                ret += output
                 if self.output == 'stdout':
                     sys.stdout.write(output)
                 elif self.output == 'file':
@@ -159,7 +161,7 @@ class BasicPrinter(object):
                         outfile.close()
 
         self.toPrint = [None]*len(self.printingOrder)  #Reset printing objects
-
+        return ret
 
     def _formatObj(self,obj,objOutputLevel):
         """
@@ -900,6 +902,7 @@ class XmlPrinter(PyPrinter):
             if not output: continue  #Skip empty output            
             outputDict.update(output)
 
+        root = None
         #Convert from python dictionaries to xml:
         if outputDict:            
             root = ElementTree.Element('smodelsOutput')
@@ -915,5 +918,7 @@ class XmlPrinter(PyPrinter):
                 with open(self.filename, "a") as outfile:
                     outfile.write(nice_xml)
                     outfile.close()
+            ret = nice_xml
 
         self.toPrint = [None]*len(self.printingOrder)
+        return root
