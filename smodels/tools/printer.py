@@ -36,19 +36,19 @@ class MPrinter(object):
     def __init__(self,printerList):
         self.name = "master"
 
-        self.Printers = []
+        self.Printers = {}
         if isinstance(printerList,list):
             for prt in printerList:
                 if isinstance(prt,BasicPrinter):
-                    self.Printer.append(prt)
+                    self.Printer['basic'] = prt
                 elif prt == 'python':
-                    self.Printers.append(PyPrinter(output = 'file'))
+                    self.Printers['python'] = PyPrinter(output = 'file')
                 elif prt == 'summary':        
-                    self.Printers.append(SummaryPrinter(output = 'file'))
+                    self.Printers['summary']= SummaryPrinter(output = 'file')
                 elif prt == 'stdout':
-                    self.Printers.append(TxTPrinter(output = 'stdout'))
+                    self.Printers['stdout'] = TxTPrinter(output = 'stdout')
                 elif prt == 'xml':
-                    self.Printers.append(XmlPrinter(output = 'file'))            
+                    self.Printers['xml'] = XmlPrinter(output = 'file')            
                 else:
                     logger.warning("Unknown printer format: %s" %str(prt))      
 
@@ -57,10 +57,23 @@ class MPrinter(object):
         Adds the object to all its Printers:
         
         :param obj: An object which can be handled by the Printers.
+        :param objOutputLevel: Output level for object. It can be a single interger
+                              or a dictionary with an outputlevel for each printer
+                            (e.g. {'python' : 3, 'xml' : 0, 'stdout' : 1})
         """
-
-        for printer in self.Printers:
-            printer.addObj(obj,objOutputLevel)
+        
+        objLevels = {}
+        if isinstance(objOutputLevel,int) or objOutputLevel is None:
+            for key in self.Printers:
+                objLevels[key] = objOutputLevel                
+        elif isinstance(objOutputLevel,dict):
+            objLevels = dict(objOutputLevel.items())
+        
+        for printerType,outputLevel in objLevels.items(): 
+            if not printerType in self.Printers:
+                logger.info('Printer type %s not found in printers' %printerType)
+                continue
+            self.Printers[printerType].addObj(obj,outputLevel)
             
     def setOutPutFiles(self,filename):
         """
@@ -71,7 +84,7 @@ class MPrinter(object):
         :param filename: Input file name
         """
         
-        for printer in self.Printers:
+        for printer in self.Printers.values():
             printer.setOutPutFile(filename)
 
 
@@ -82,9 +95,8 @@ class MPrinter(object):
         we pass it on.
         """
         ret = {}
-        for printer in self.Printers:
-            t = printer.flush()
-            ret[printer.name]=t
+        for printerType,printer in self.Printers.items():
+            ret[printerType] = printer.flush()
         return ret
 
 class BasicPrinter(object):
