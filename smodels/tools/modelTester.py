@@ -39,6 +39,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     :parameter parser: ConfigParser storing information from parameter.ini file
     :parameter databaseVersion: Database version (printed to output file)
     :parameter listOfExpRes: list of ExpResult objects to be considered
+    :returns: output of printers
     """
 
     """Get run parameters and options from the parser"""
@@ -64,8 +65,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
             dict(parser.items("parameters")), databaseVersion)
     masterPrinter.addObj(outputStatus)              
     if outputStatus.status < 0:          
-        masterPrinter.flush()
-        return
+        return masterPrinter.flush()
     
 
     """
@@ -88,16 +88,14 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         print ( "Exception %s %s" % ( e, type(e) ) )
         """ Update status to fail, print error message and exit """
         outputStatus.updateStatus(-1)
-        masterPrinter.flush()
-        return
+        return masterPrinter.flush()
 
     """ Print Decomposition output.
         If no topologies with sigma > sigmacut are found, update status, write
         output file, stop running """
     if not smstoplist:
         outputStatus.updateStatus(-3)
-        masterPrinter.flush()
-        return
+        return masterPrinter.flush()
 
     outLevel = 0
     if parser.getboolean("stdout", "printDecomp"):
@@ -138,7 +136,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         uncovered = coverage.Uncovered(smstoplist)
         masterPrinter.addObj(uncovered,2)
     
-    masterPrinter.flush()
+    return masterPrinter.flush()
 
 def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
                     timeout, development, parameterFile):
@@ -152,11 +150,12 @@ def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
     :parameter listOfExpRes: list of ExpResult objects to be considered
     :parameter crashReport: if True, write crash report in case of problems
     :param timeout: set a timeout for one model point (0 means no timeout)
+    :returns: output of printers
     """
     try:
         with timeOut.Timeout(timeout):
-            testPoint(inputFile, outputDir, parser, databaseVersion,
-                                 listOfExpRes)
+            return testPoint(inputFile, outputDir, parser, databaseVersion,
+                             listOfExpRes)
     except Exception,e:
         crashReportFacility = crashReport.CrashReport()
          
@@ -167,7 +166,7 @@ def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
             print(crashReport.createStackTrace())
             crashReportFacility.createCrashReportFile( inputFile, parameterFile )
             print(crashReportFacility.createUnknownErrorMessage())
-
+    return None
 
 def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
                     timeout, development, parameterFile):
@@ -181,10 +180,13 @@ def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
     :parameter listOfExpRes: list of ExpResult objects to be considered
     :parameter development: turn on development mode (e.g. no crash report)
     :parameter parameterFile: parameter file, for crash reports
+    :returns: printers output
     """
+    a={}
     for inputFile in inputFiles:
-        runSingleFile(inputFile, outputDir, parser, databaseVersion,
-                       listOfExpRes, timeout, development, parameterFile)
+        a[inputFile] = runSingleFile(inputFile, outputDir, parser, databaseVersion,
+                                  listOfExpRes, timeout, development, parameterFile)
+    return a
 
 def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
                  listOfExpRes, timeout, development, parameterFile):
@@ -201,15 +203,15 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
     :param timeout: set a timeout for one model point (0 means no timeout)
     :param development: turn on development mode (e.g. no crash report)
     :param parameterFile: parameter file, for crash reports
+    :returns: printer(s) output, if not run in parallel mode
     """
 
     if len( fileList ) == 0:
         log.error ( "no files given." )
-        return
+        return None
     if len(fileList ) == 1:
-        runSingleFile ( fileList[0], outputDir, parser, databaseVersion,
-                        listOfExpRes, timeout, development, parameterFile )
-        return
+        return runSingleFile ( fileList[0], outputDir, parser, databaseVersion,
+                               listOfExpRes, timeout, development, parameterFile )
 
     """ loop over input files and run SModelS """
     ncpusAll = runtime.nCPUs()
@@ -226,9 +228,8 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
         cleanedList.append( tmp )
 
     if ncpus == 1:
-        runSetOfFiles( cleanedList, outputDir, parser, databaseVersion,
-                        listOfExpRes, timeout, development, parameterFile )
-        return
+        return runSetOfFiles( cleanedList, outputDir, parser, databaseVersion,
+                              listOfExpRes, timeout, development, parameterFile )
 
     ### now split up for every fork
     chunkedFiles = [cleanedList[x::ncpus] for x in range(ncpus)]
@@ -252,6 +253,8 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
         r = os.waitpid ( child, 0 )
         log.info ( "child %d terminated: %s" % (child,r) )
     log.info ( "all children terminated" )
+    log.info ( "returning no output, because we are in parallel mode" )
+    return None
 
 def loadDatabase(parser, db, verbosity):
     """
