@@ -547,7 +547,7 @@ class PyPrinter(BasicPrinter):
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
         BasicPrinter.__init__(self, output, filename, outputLevel)
         self.name = "py"
-        self.printingOrder = [OutputStatus,ResultList,Uncovered]
+        self.printingOrder = [OutputStatus,TopologyList,Element,ResultList,Uncovered]
         self.outputLevel = [outputLevel]*len(self.printingOrder)
         self.toPrint = [None]*len(self.printingOrder)
         
@@ -574,7 +574,7 @@ class PyPrinter(BasicPrinter):
         for iobj,obj in enumerate(self.toPrint):
             if obj is None: continue
             output = self._formatObj(obj,self.outputLevel[iobj])                
-            if not output: continue  #Skip empty output       
+            if not output: continue  #Skip empty output
             outputDict.update(output)
                 
         output = 'smodelsOutput = '+str(outputDict)      
@@ -592,6 +592,45 @@ class PyPrinter(BasicPrinter):
         ## it is a special feature of the python printer
         ## that we also return the output dictionary
         return outputDict
+
+    def _formatTopologyList(self, obj, objOutputLevel):
+        """
+        Format data for a TopologyList object.
+
+        :param obj: A TopologyList object to be printed.
+        :param outputLevel: Defines object specific output level.
+        """
+
+        if not objOutputLevel: return None
+
+        elements = []
+
+        for topo in obj:
+            for el in topo.elementList:
+                thisEl = self._formatElement(el,1)
+                if thisEl: elements.append(thisEl)
+
+        return {"Elements": elements}
+
+    def _formatElement(self, obj, objOutputLevel):
+        """
+        Format data for a Element object.
+
+        :param obj: A Element object to be printed.
+        :param outputLevel: Defines object specific output level.
+        """
+
+        if not objOutputLevel: return None
+
+        elDic = {}
+        elDic["ID"] = obj.elID
+        elDic["Particles"] = obj.getParticles()
+        elDic["Masses"] = obj.getMasses()
+        elDic["PIDs"] = obj.getPIDs()
+        elDic["sqrts (TeV)"] = obj.weight.info.sqrts.asNumber(TeV)
+        elDic["Weight (fb)"] = obj.weight.value.asNumber(fb)
+
+        return elDic
 
     def _formatOutputStatus(self, obj, objOutputLevel):
         """
@@ -804,7 +843,7 @@ class XmlPrinter(PyPrinter):
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
         PyPrinter.__init__(self, output, filename, outputLevel)
         self.name = "xml"
-        self.printingOrder = [OutputStatus,ResultList,Uncovered]
+        self.printingOrder = [OutputStatus,TopologyList,ResultList,Uncovered]
         self.outputLevel = [outputLevel]*len(self.printingOrder)
         self.toPrint = [None]*len(self.printingOrder)
 
