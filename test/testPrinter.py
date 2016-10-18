@@ -103,7 +103,7 @@ class RunPrinterTest(unittest.TestCase):
         
         maxcond = 0.2
         results = ioObjects.ResultList(allPredictions,maxcond)
-        mprinter.addObj(results,objOutputLevel=2)
+        mprinter.addObj(results,objOutputLevel = 2)
         
         #Add coverage information:
         coverageInfo = coverage.Uncovered(smstoplist)
