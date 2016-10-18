@@ -47,6 +47,8 @@ class MPrinter(object):
                     self.Printers['summary']= SummaryPrinter(output = 'file')
                 elif prt == 'stdout':
                     self.Printers['stdout'] = TxTPrinter(output = 'stdout')
+                elif prt == 'log':
+                    self.Printers['log'] = TxTPrinter(output = 'file')
                 elif prt == 'xml':
                     self.Printers['xml'] = XmlPrinter(output = 'file')            
                 else:
@@ -198,7 +200,7 @@ class TxTPrinter(BasicPrinter):
     """
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
         BasicPrinter.__init__(self, output, filename, outputLevel)        
-        self.name = "txt"
+        self.name = "log"
         self.printingOrder = [OutputStatus,TopologyList,Element,ExpResult,
                              TheoryPredictionList,ResultList,Uncovered]
         self.outputLevel = [outputLevel]*len(self.printingOrder)
@@ -207,13 +209,13 @@ class TxTPrinter(BasicPrinter):
     def setOutPutFile(self,filename,overwrite=True):
         """
         Set the basename for the text printer. The output filename will be
-        filename.txt.
+        filename.log.
         
         :param filename: Base filename
         :param overwrite: If True and the file already exists, it will be removed.
         """        
         
-        self.filename = filename +'.txt'    
+        self.filename = filename +'.' + self.name    
         if overwrite and os.path.isfile(self.filename):
             logger.warning("Removing old output file " + self.filename)
             os.remove(self.filename)
