@@ -36,19 +36,21 @@ class MPrinter(object):
     def __init__(self,printerList):
         self.name = "master"
 
-        self.Printers = []
+        self.Printers = {}
         if isinstance(printerList,list):
             for prt in printerList:
                 if isinstance(prt,BasicPrinter):
-                    self.Printer.append(prt)
+                    self.Printer['basic'] = prt
                 elif prt == 'python':
-                    self.Printers.append(PyPrinter(output = 'file'))
+                    self.Printers['python'] = PyPrinter(output = 'file')
                 elif prt == 'summary':        
-                    self.Printers.append(SummaryPrinter(output = 'file'))
+                    self.Printers['summary']= SummaryPrinter(output = 'file')
                 elif prt == 'stdout':
-                    self.Printers.append(TxTPrinter(output = 'stdout'))
+                    self.Printers['stdout'] = TxTPrinter(output = 'stdout')
+                elif prt == 'log':
+                    self.Printers['log'] = TxTPrinter(output = 'file')
                 elif prt == 'xml':
-                    self.Printers.append(XmlPrinter(output = 'file'))            
+                    self.Printers['xml'] = XmlPrinter(output = 'file')            
                 else:
                     logger.warning("Unknown printer format: %s" %str(prt))      
 
@@ -57,10 +59,23 @@ class MPrinter(object):
         Adds the object to all its Printers:
         
         :param obj: An object which can be handled by the Printers.
+        :param objOutputLevel: Output level for object. It can be a single interger
+                              or a dictionary with an outputlevel for each printer
+                            (e.g. {'python' : 3, 'xml' : 0, 'stdout' : 1})
         """
-
-        for printer in self.Printers:
-            printer.addObj(obj,objOutputLevel)
+        
+        objLevels = {}
+        if isinstance(objOutputLevel,int) or objOutputLevel is None:
+            for key in self.Printers:
+                objLevels[key] = objOutputLevel                
+        elif isinstance(objOutputLevel,dict):
+            objLevels = dict(objOutputLevel.items())
+        
+        for printerType,outputLevel in objLevels.items(): 
+            if not printerType in self.Printers:
+                logger.info('Printer type %s not found in printers' %printerType)
+                continue
+            self.Printers[printerType].addObj(obj,outputLevel)
             
     def setOutPutFiles(self,filename):
         """
@@ -71,7 +86,7 @@ class MPrinter(object):
         :param filename: Input file name
         """
         
-        for printer in self.Printers:
+        for printer in self.Printers.values():
             printer.setOutPutFile(filename)
 
 
@@ -82,9 +97,8 @@ class MPrinter(object):
         we pass it on.
         """
         ret = {}
-        for printer in self.Printers:
-            t = printer.flush()
-            ret[printer.name]=t
+        for printerType,printer in self.Printers.items():
+            ret[printerType] = printer.flush()
         return ret
 
 class BasicPrinter(object):
@@ -186,7 +200,7 @@ class TxTPrinter(BasicPrinter):
     """
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
         BasicPrinter.__init__(self, output, filename, outputLevel)        
-        self.name = "txt"
+        self.name = "log"
         self.printingOrder = [OutputStatus,TopologyList,Element,ExpResult,
                              TheoryPredictionList,ResultList,Uncovered]
         self.outputLevel = [outputLevel]*len(self.printingOrder)
@@ -195,13 +209,13 @@ class TxTPrinter(BasicPrinter):
     def setOutPutFile(self,filename,overwrite=True):
         """
         Set the basename for the text printer. The output filename will be
-        filename.txt.
+        filename.log.
         
         :param filename: Base filename
         :param overwrite: If True and the file already exists, it will be removed.
         """        
         
-        self.filename = filename +'.txt'    
+        self.filename = filename +'.' + self.name    
         if overwrite and os.path.isfile(self.filename):
             logger.warning("Removing old output file " + self.filename)
             os.remove(self.filename)
@@ -301,27 +315,6 @@ class TxTPrinter(BasicPrinter):
         output += "\t\t The element weights are: \n \t\t " + obj.weight.niceStr()
 
         return output
-
-#    def _formatTxName(self, obj, objOutputLevel):
-#        """
-#        Format data for a TxName object.
-#
-#        :param obj: A TxName object to be printed.
-#        :param outputLevel: Defines object specific output level.
-#        """
-#
-#        if not objOutputLevel: return None
-#
-#        output = ""
-#        output += "========================================================\n"
-#        output += "Tx Label: "+obj.txName+'\n'
-#        if objOutputLevel == 2:
-#            output += "\t -----------------------------\n"
-#            output += "\t Elements tested by analysis:\n"
-#            for el in obj._elements():
-#                output += "\t    " + str(el.getParticles()) + "\n"
-#
-#        return output
 
     def _formatExpResult(self, obj, objOutputLevel):
         """
@@ -463,41 +456,6 @@ class TxTPrinter(BasicPrinter):
 
         return output
 
-#    def _formatUncoveredList(self, obj, objOutputLevel):
-#        """
-#        Format data of the UncoveredList object of missing topology type.
-#
-#        :param obj: A UncoveredList object to be printed.
-#        :param outputLevel: Defines object specific output level.
-#        """
-#
-#        if not objOutputLevel: return None
-#
-#        nprint = 10  # Number of missing topologies to be printed (ordered by cross-sections)
-#
-#        output = ""
-#        output += "\n" + 80 * "=" + "\n"
-#        if len(obj.topos) == 0: return output + "No missing topologies found\n"
-#
-#        for topo in obj.topos:
-#            if topo.value > 0.: continue
-#            for el in topo.contributingElements:
-#                if not el.weight.getXsecsFor(obj.sqrts): continue
-#                topo.value += el.weight.getXsecsFor(obj.sqrts)[0].value.asNumber(fb)
-#
-#        output += "Missing topologies with the highest cross-sections (up to " + str(nprint) + "):\n"
-#        output += "Sqrts (TeV)   Weight (fb)        Element description\n"
-#
-#        for topo in sorted(obj.topos, key=lambda x: x.value, reverse=True)[:nprint]:
-#            output += "%5s %10.3E    # %45s\n" % (str(obj.sqrts.asNumber(TeV)), topo.value, str(topo.topo))
-#            if objOutputLevel==2:
-#                contributing = []
-#                for el in topo.contributingElements:
-#                    contributing.append(el.elID)
-#                output += "Contributing elements %s\n" % str(contributing)
-#
-#        return output
-
     def _formatUncovered(self, obj, objOutputLevel):
         """
         Format all uncovered data
@@ -589,7 +547,7 @@ class PyPrinter(BasicPrinter):
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
         BasicPrinter.__init__(self, output, filename, outputLevel)
         self.name = "py"
-        self.printingOrder = [OutputStatus,ResultList,Uncovered]
+        self.printingOrder = [OutputStatus,TopologyList,Element,ResultList,Uncovered]
         self.outputLevel = [outputLevel]*len(self.printingOrder)
         self.toPrint = [None]*len(self.printingOrder)
         
@@ -616,7 +574,7 @@ class PyPrinter(BasicPrinter):
         for iobj,obj in enumerate(self.toPrint):
             if obj is None: continue
             output = self._formatObj(obj,self.outputLevel[iobj])                
-            if not output: continue  #Skip empty output       
+            if not output: continue  #Skip empty output
             outputDict.update(output)
                 
         output = 'smodelsOutput = '+str(outputDict)      
@@ -634,6 +592,45 @@ class PyPrinter(BasicPrinter):
         ## it is a special feature of the python printer
         ## that we also return the output dictionary
         return outputDict
+
+    def _formatTopologyList(self, obj, objOutputLevel):
+        """
+        Format data for a TopologyList object.
+
+        :param obj: A TopologyList object to be printed.
+        :param outputLevel: Defines object specific output level.
+        """
+
+        if not objOutputLevel: return None
+
+        elements = []
+
+        for topo in obj:
+            for el in topo.elementList:
+                thisEl = self._formatElement(el,1)
+                if thisEl: elements.append(thisEl)
+
+        return {"Elements": elements}
+
+    def _formatElement(self, obj, objOutputLevel):
+        """
+        Format data for a Element object.
+
+        :param obj: A Element object to be printed.
+        :param outputLevel: Defines object specific output level.
+        """
+
+        if not objOutputLevel: return None
+
+        elDic = {}
+        elDic["ID"] = obj.elID
+        elDic["Particles"] = obj.getParticles()
+        elDic["Masses"] = obj.getMasses()
+        elDic["PIDs"] = obj.getPIDs()
+        elDic["sqrts (TeV)"] = obj.weight.info.sqrts.asNumber(TeV)
+        elDic["Weight (fb)"] = obj.weight.value.asNumber(fb)
+
+        return elDic
 
     def _formatOutputStatus(self, obj, objOutputLevel):
         """
@@ -846,7 +843,7 @@ class XmlPrinter(PyPrinter):
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
         PyPrinter.__init__(self, output, filename, outputLevel)
         self.name = "xml"
-        self.printingOrder = [OutputStatus,ResultList,Uncovered]
+        self.printingOrder = [OutputStatus,TopologyList,ResultList,Uncovered]
         self.outputLevel = [outputLevel]*len(self.printingOrder)
         self.toPrint = [None]*len(self.printingOrder)
 

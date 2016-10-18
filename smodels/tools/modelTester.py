@@ -134,7 +134,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     if parser.getboolean("options", "testCoverage"):
         """ Testing coverage of model point, add results to the output file """
         uncovered = coverage.Uncovered(smstoplist)
-        masterPrinter.addObj(uncovered,2)
+        masterPrinter.addObj(uncovered,{'python' : 2, 'xml' : 2, 'stdout' : 3,'summary':2,'log':3})
     
     return masterPrinter.flush()
 
