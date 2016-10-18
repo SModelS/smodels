@@ -314,27 +314,6 @@ class TxTPrinter(BasicPrinter):
 
         return output
 
-#    def _formatTxName(self, obj, objOutputLevel):
-#        """
-#        Format data for a TxName object.
-#
-#        :param obj: A TxName object to be printed.
-#        :param outputLevel: Defines object specific output level.
-#        """
-#
-#        if not objOutputLevel: return None
-#
-#        output = ""
-#        output += "========================================================\n"
-#        output += "Tx Label: "+obj.txName+'\n'
-#        if objOutputLevel == 2:
-#            output += "\t -----------------------------\n"
-#            output += "\t Elements tested by analysis:\n"
-#            for el in obj._elements():
-#                output += "\t    " + str(el.getParticles()) + "\n"
-#
-#        return output
-
     def _formatExpResult(self, obj, objOutputLevel):
         """
         Format data for a ExpResult object.
@@ -474,41 +453,6 @@ class TxTPrinter(BasicPrinter):
         output += "The highest r value is = " + str(obj.getR(obj.theoryPredictions[0])) + "\n"
 
         return output
-
-#    def _formatUncoveredList(self, obj, objOutputLevel):
-#        """
-#        Format data of the UncoveredList object of missing topology type.
-#
-#        :param obj: A UncoveredList object to be printed.
-#        :param outputLevel: Defines object specific output level.
-#        """
-#
-#        if not objOutputLevel: return None
-#
-#        nprint = 10  # Number of missing topologies to be printed (ordered by cross-sections)
-#
-#        output = ""
-#        output += "\n" + 80 * "=" + "\n"
-#        if len(obj.topos) == 0: return output + "No missing topologies found\n"
-#
-#        for topo in obj.topos:
-#            if topo.value > 0.: continue
-#            for el in topo.contributingElements:
-#                if not el.weight.getXsecsFor(obj.sqrts): continue
-#                topo.value += el.weight.getXsecsFor(obj.sqrts)[0].value.asNumber(fb)
-#
-#        output += "Missing topologies with the highest cross-sections (up to " + str(nprint) + "):\n"
-#        output += "Sqrts (TeV)   Weight (fb)        Element description\n"
-#
-#        for topo in sorted(obj.topos, key=lambda x: x.value, reverse=True)[:nprint]:
-#            output += "%5s %10.3E    # %45s\n" % (str(obj.sqrts.asNumber(TeV)), topo.value, str(topo.topo))
-#            if objOutputLevel==2:
-#                contributing = []
-#                for el in topo.contributingElements:
-#                    contributing.append(el.elID)
-#                output += "Contributing elements %s\n" % str(contributing)
-#
-#        return output
 
     def _formatUncovered(self, obj, objOutputLevel):
         """
