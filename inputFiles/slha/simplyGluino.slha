@@ -280,3 +280,9 @@ DECAY   1000022     0.00000000E+00   # neutralino1 decays
 
 XSECTION  8.00E+03  2212 2212 2 1000021 1000021   # Nevts: 10000 xsec unit: pb
 	0  2  0  0  0  0    5.72168935E-01 SModelS 0.99
+
+XSECTION  1.30E+04  2212 2212 2 1000021 1000021   # Nevts: 10000 xsec unit: pb
+  0  0  0  0  0  0    2.23034920E+00 SModelS 1.0.93
+
+XSECTION  1.30E+04  2212 2212 2 1000021 1000021   # Nevts: 10000 xsec unit: pb
+  0  2  0  0  0  0    4.30903465E+00 SModelS 1.0.93

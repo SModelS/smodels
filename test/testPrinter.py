@@ -61,6 +61,10 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
                 logger.warning('Objects differ:\n   %s\n and\n   %s' %(str(obj1[key]),str(obj2[key])))
                 return False
     elif isinstance(obj1,list):
+        if len(obj1) != len(obj2):
+            logger.warning("Objects differ in length:\n %s (len = %i) \n and\n %s (len = %i)" 
+                            %(str(obj1),len(obj1),str(obj2),len(obj2)))
+            return False
         for ival,val in enumerate(obj1):
             if not equalObjs(val,obj2[ival],allowedDiff):
                 logger.warning('Objects differ:\n   %s \n and\n   %s' %(str(val),str(obj2[ival])))
@@ -72,9 +76,45 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
 
 
 
+def sortXML(xmltree):
+    for el in xmltree:        
+        sortXML(el)
+    xmltree[:] = sorted(xmltree, key=lambda el: [el.tag,ElementTree.tostring(el)])
+
+def compareXML(xmldefault,xmlnew,allowedDiff,ignore=[]):
+    if len(xmldefault) != len(xmlnew):
+        return False
+    for i,el in enumerate(xmldefault):
+        newel = xmlnew[i]
+        if len(el) != len(newel):
+            return False                
+        if len(el) == 0:
+            if el.tag in ignore: continue
+            try:
+                el.text = eval(el.text)
+                newel.text = eval(newel.text)
+            except (TypeError,NameError,SyntaxError):
+                pass
+            if isinstance(el.text,float) and isinstance(newel.text,float) \
+                    and newel.text != el.text:
+                diff = 2.*abs(el.text-newel.text)/abs(el.text+newel.text)
+                if diff > allowedDiff:
+                    return False
+            else:
+                if el.text != newel.text:
+                    return False
+            if el.tag != newel.tag:
+                return False
+        else:                    
+            compareXML(el,newel,allowedDiff,ignore)
+
+    return True
+
+
+
 class RunPrinterTest(unittest.TestCase):
 
-    def runPrinterMain(self, slhafile, mprinter):
+    def runPrinterMain(self, slhafile, mprinter,addTopList=False):
         """
         Main program. Displays basic use case.
     
@@ -90,7 +130,8 @@ class RunPrinterTest(unittest.TestCase):
                          doCompress=True, doInvisible=True, minmassgap=mingap )
     
         #Add the decomposition result to the printers
-        mprinter.addObj(smstoplist)
+        if addTopList:
+            mprinter.addObj(smstoplist)
     
         listOfExpRes = database.getExpResults()
         # Compute the theory predictions for each analysis
@@ -143,16 +184,16 @@ class RunPrinterTest(unittest.TestCase):
 
 
     def testPythonPrinter(self):
-        
-        
+         
+         
         mprinter = printer.MPrinter(printerList=['python'])
         slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
         mprinter.setOutPutFiles('./unitTestOutput/printer_output')
         self.runPrinterMain(slhafile,mprinter)
-        
+         
         #Test python output
         shutil.copyfile('./unitTestOutput/printer_output.py','./output.py')
-        from gluino_squarks_default import smodelsOutputDefault        
+        from gluino_squarks_default import smodelsOutputDefault 
         from output import smodelsOutput
         ignoreFields = ['input file','smodels version', 'ncpus']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
@@ -166,36 +207,33 @@ class RunPrinterTest(unittest.TestCase):
         except OSError:
             pass
 
+    def testPythonPrinterSimple(self):
+
+        mprinter = printer.MPrinter(printerList=['python'])
+        slhafile = os.path.join ( idir(), "inputFiles/slha/simplyGluino.slha" )
+        mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple')
+        self.runPrinterMain(slhafile,mprinter,addTopList=True)
+       
+        #Test python output
+        shutil.copyfile('./unitTestOutput/printer_output_simple.py','./outputSimple.py')
+        from simplyGluino_default import smodelsOutputDefault    
+        from outputSimple import smodelsOutput
+        
+        ignoreFields = ['input file','smodels version', 'ncpus']
+        smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
+                                                 key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
+                                                   res['AnalysisID'],res['DataSetID']])
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.05,ignore=ignoreFields)
+        self.assertTrue(equals)
+        try:
+            os.remove('./outputSimple.py')
+            os.remove('./outputSimple.pyc')
+        except OSError:
+            pass
 
 
     def testXmlPrinter(self):
         
-        def sortXML(xmltree):
-            for el in xmltree:        
-                sortXML(el)
-            xmltree[:] = sorted(xmltree, key=lambda el: [el.tag,ElementTree.tostring(el)])
-        
-        def compareXML(xmldefault,xmlnew,allowedDiff,ignore=[]):
-            self.assertEqual(len(xmldefault),len(xmlnew))
-            for i,el in enumerate(xmldefault):
-                newel = xmlnew[i]
-                self.assertEqual(len(el),len(newel))                
-                if len(el) == 0:
-                    if el.tag in ignore: continue
-                    try:
-                        el.text = eval(el.text)
-                        newel.text = eval(newel.text)
-                    except (TypeError,NameError,SyntaxError):
-                        pass
-                    if isinstance(el.text,float) and isinstance(newel.text,float) \
-                            and newel.text != el.text:
-                        diff = 2.*abs(el.text-newel.text)/abs(el.text+newel.text)
-                        self.assertTrue(diff < allowedDiff )
-                    else:
-                        self.assertEqual(el.text,newel.text)
-                    self.assertEqual(el.tag,newel.tag)
-                else:                    
-                    compareXML(el,newel,allowedDiff,ignore)
                     
 
         mprinter = printer.MPrinter(printerList=['xml'])
@@ -212,10 +250,34 @@ class RunPrinterTest(unittest.TestCase):
         sortXML(xmlDefault)
         sortXML(xmlNew)
         try:
-            compareXML(xmlDefault,xmlNew,allowedDiff=0.05,ignore=['input_file','smodels_version', 'ncpus'])
+            self.assertTrue(compareXML(xmlDefault,xmlNew,allowedDiff=0.05,ignore=['input_file','smodels_version', 'ncpus']))
         except AssertionError,e:
             msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
             raise AssertionError(msg)
+
+
+    def testXmlPrinterSimple(self):
+
+
+        mprinter = printer.MPrinter(printerList=['xml'])
+        slhafile = os.path.join ( idir(), "inputFiles/slha/simplyGluino.slha" )
+        mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple')
+        self.runPrinterMain(slhafile,mprinter,addTopList=True)                    
+                    
+        defFile = os.path.join ( idir(), "test/default_outputSimplyGluino.xml" )
+        outFile = os.path.join ( idir(), "test/unitTestOutput/printer_output_simple.xml" )
+         
+        #Test xml output
+        xmlDefault = ElementTree.parse( defFile ).getroot()
+        xmlNew = ElementTree.parse( outFile ).getroot()
+        sortXML(xmlDefault)
+        sortXML(xmlNew)
+        try:
+            self.assertTrue(compareXML(xmlDefault,xmlNew,allowedDiff=0.05,ignore=['input_file','smodels_version', 'ncpus']))
+        except AssertionError,e:
+            msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
+            raise AssertionError(msg)
+        
 
 
 if __name__ == "__main__":
