@@ -622,13 +622,18 @@ class PyPrinter(BasicPrinter):
 
         if not objOutputLevel: return None
 
+
         elDic = {}
         elDic["ID"] = obj.elID
         elDic["Particles"] = obj.getParticles()
         elDic["Masses"] = obj.getMasses()
         elDic["PIDs"] = obj.getPIDs()
-        elDic["sqrts (TeV)"] = obj.weight.info.sqrts.asNumber(TeV)
-        elDic["Weight (fb)"] = obj.weight.value.asNumber(fb)
+        elDic["Weights"] = []
+        for xsec in obj.weight:
+            wDic = {}
+            wDic["sqrts (TeV)"] = xsec.info.sqrts.asNumber(TeV)
+            wDic["Weight (fb)"] = xsec.value.asNumber(fb)
+            elDic["Weights"].append(wDic)
 
         return elDic
 
