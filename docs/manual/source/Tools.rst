@@ -43,7 +43,7 @@ and writes them out in :ref:`SLHA convention <xsecblock>`. This can in particula
 
 **The usage of the cross-section calculator is:**
 
-smodelsTools.py xseccomputer [-h]  [-h] -f FILENAME [-s SQRTS [SQRTS ...]] [-e NEVENTS] [-p] [-k] [-n] [-N] [-O]
+smodelsTools.py xseccomputer [-h] -f FILENAME [-s SQRTS [SQRTS ...]] [-e NEVENTS] [-p] [-k] [-n] [-N] [-O]
 
 *arguments*:
   -h, --help            show this help message and exit
