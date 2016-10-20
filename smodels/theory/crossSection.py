@@ -522,7 +522,7 @@ class XSectionList(object):
         if len(self) != len(newList):
             logger.info("Ignoring %i lower order cross-sections",
                            (len(self) - len(newList)))
-            self.xSections = newList.xSections
+        self.xSections = newList.xSections
             
     def order(self):
         """
