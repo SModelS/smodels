@@ -36,7 +36,10 @@ class IntegrationTest(unittest.TestCase):
         for pred in theorypredictions:
             m0=str ( int ( pred.mass[0][0]/GeV )  )
             w=pred.value.getDictionary()[(None,None)]
-            predval=w['8 TeV (NLL)']
+            for key in w:
+                if '8' in key and 'TeV' in key:
+                    predval=w[key]
+                    break
             defpredval=defpreds[expresult.getValuesFor('id')[0]+\
                 ":"+pred.txnames[0].getInfo("txName") ]
             self.assertAlmostEqual ( predval / fb, defpredval / fb )
