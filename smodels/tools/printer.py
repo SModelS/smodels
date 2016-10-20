@@ -641,7 +641,6 @@ class PyPrinter(BasicPrinter):
             xsecs = xsecs[0]
             sqrtsStr = 'xsec '+str(sqrts.asNumber(TeV))+' TeV'
             elDic["Weights (fb)"][sqrtsStr] = xsecs
-        
         return elDic
 
     def _formatOutputStatus(self, obj, objOutputLevel):
