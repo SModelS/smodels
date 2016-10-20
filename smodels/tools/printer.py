@@ -191,6 +191,7 @@ class BasicPrinter(object):
             formatFunction = getattr(self,'_format'+typeStr)
             return formatFunction(obj,objOutputLevel)
         except AttributeError,e:
+            logger.debug('Error formating object %s: \n %s' %(typeStr,e))
             return False
 
 
@@ -600,7 +601,7 @@ class PyPrinter(BasicPrinter):
         :param obj: A TopologyList object to be printed.
         :param outputLevel: Defines object specific output level.
         """
-
+        
         if not objOutputLevel: return None
 
         elements = []
@@ -609,8 +610,9 @@ class PyPrinter(BasicPrinter):
             for el in topo.elementList:
                 thisEl = self._formatElement(el,1)
                 if thisEl: elements.append(thisEl)
-
-        return {"Elements": elements}
+                
+        
+        return {"Element": elements}
 
     def _formatElement(self, obj, objOutputLevel):
         """
@@ -622,14 +624,24 @@ class PyPrinter(BasicPrinter):
 
         if not objOutputLevel: return None
 
+
         elDic = {}
         elDic["ID"] = obj.elID
-        elDic["Particles"] = obj.getParticles()
-        elDic["Masses"] = obj.getMasses()
+        elDic["Particles"] = str(obj.getParticles())
+        elDic["Masses (GeV)"] = [[m.asNumber(GeV) for m in br] for br in obj.getMasses()]
         elDic["PIDs"] = obj.getPIDs()
-        elDic["sqrts (TeV)"] = obj.weight.info.sqrts.asNumber(TeV)
-        elDic["Weight (fb)"] = obj.weight.value.asNumber(fb)
-
+        elDic["Weights (fb)"] = {}
+        sqrts = [info.sqrts for info in obj.weight.getInfo()]
+        allsqrts = sorted(list(set(sqrts)))
+        for sqrts in allsqrts:
+            xsecs = [xsec.value.asNumber(fb) for xsec in obj.weight.getXsecsFor(sqrts)]
+            if len(xsecs) != 1:
+                logger.warning("Element cross-sections contain multiple values for %s .\
+                Only the first cross-section will be printed" %str(sqrt))
+            xsecs = xsecs[0]
+            sqrtsStr = 'xsec '+str(sqrts.asNumber(TeV))+' TeV'
+            elDic["Weights (fb)"][sqrtsStr] = xsecs
+        
         return elDic
 
     def _formatOutputStatus(self, obj, objOutputLevel):
