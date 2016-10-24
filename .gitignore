@@ -43,4 +43,6 @@ test/unitTestOutput/
 distribution/create.log
 distribution/smodels-*
 # test/database/database.pcl
+*~
+*.crash
 

@@ -67,6 +67,10 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
                                 ( s1,s2 ) )
                 return False
     elif isinstance(obj1,list):
+        if len(obj1) != len(obj2):
+            logger.warning('Lists differ in length:\n   %i (this run)\n and\n   %i (default)' %\
+                                (len(obj1),len(obj2)))
+            return False
         for ival,val in enumerate(obj1):
             if not equalObjs(val,obj2[ival],allowedDiff):
                 logger.warning('Lists differ:\n   %s (this run)\n and\n   %s (default)' %\
@@ -132,6 +136,25 @@ class RunSModelSTest(unittest.TestCase):
             os.remove('./output.pyc')
         except OSError: pass
         self.assertTrue(equals)
+    
+    def testGoodFile13(self):
+        
+        filename = join ( iDir(), "inputFiles/slha/simplyGluino.slha" )
+        outputfile = self.runMain(filename)
+        shutil.copyfile(outputfile,'./output13.py')
+        from simplyGluino_default import smodelsOutputDefault
+        from output13 import smodelsOutput
+        ignoreFields = ['input file','smodels version', 'ncpus', 'Element']
+        smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
+                    key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
+                    res['AnalysisID'],res['DataSetID']])
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
+                           ignore=ignoreFields)
+        try:
+            os.remove('./output13.py')
+            os.remove('./output13.pyc')
+        except OSError: pass
+        self.assertTrue(equals)        
 
     def testBadFile(self):
         filename = join (iDir(), "inputFiles/slha/I_dont_exist.slha" )
