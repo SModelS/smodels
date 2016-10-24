@@ -556,3 +556,12 @@ if __name__ == "__main__":
         for expResult in listOfExpRes:
             print (expResult)
 
+class ExpResultList(object):
+    """
+    Holds a list of ExpResult objects for printout.
+    
+    :ivar expResultList: list of ExpResult objects 
+        
+    """
+    def __init__(self, expResList):
+        self.expResultList = expResList

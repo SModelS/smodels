@@ -16,6 +16,7 @@ from smodels.theory.topology import TopologyList
 from smodels.theory.element import Element
 from smodels.theory.theoryPrediction import TheoryPredictionList
 from smodels.experiment.expResultObj import ExpResult
+from smodels.experiment.databaseObj import ExpResultList
 from smodels.tools.ioObjects import OutputStatus, ResultList
 from smodels.tools.coverage import UncoveredList, Uncovered
 from smodels.tools.physicsUnits import GeV, fb, TeV
@@ -202,7 +203,7 @@ class TxTPrinter(BasicPrinter):
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
         BasicPrinter.__init__(self, output, filename, outputLevel)        
         self.name = "log"
-        self.printingOrder = [OutputStatus,TopologyList,Element,ExpResult,
+        self.printingOrder = [ExpResultList,OutputStatus,TopologyList,Element,ExpResult,
                              TheoryPredictionList,ResultList,Uncovered]
         self.outputLevel = [outputLevel]*len(self.printingOrder)
         self.toPrint = [None]*len(self.printingOrder)        
@@ -316,6 +317,24 @@ class TxTPrinter(BasicPrinter):
         output += "\t\t The element weights are: \n \t\t " + obj.weight.niceStr()
 
         return output
+
+    def _formatExpResultList(self, obj, objOutputLevel):
+        """
+        Format data for a ExpResultList object.
+
+        :param obj: A ExpResultList object to be printed.
+        :param outputLevel: Defines object specific output level.
+        """
+
+        if not objOutputLevel: return None
+
+        output = ""
+
+        for expRes in obj.expResultList:
+            output += self._formatExpResult(expRes, objOutputLevel)
+
+        return output
+
 
     def _formatExpResult(self, obj, objOutputLevel):
         """
