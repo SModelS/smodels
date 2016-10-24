@@ -25,7 +25,7 @@ import time
 from ConfigParser import SafeConfigParser
 from smodels.tools.physicsUnits import GeV, fb
 from smodels.experiment.exceptions import DatabaseNotFoundException
-from smodels.experiment.databaseObj import Database
+from smodels.experiment.databaseObj import Database, ExpResultList
 
 log = logging.getLogger(__name__)
 
@@ -49,7 +49,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
 
 
     """Setup output printers"""
-    printerTypes = parser.get("stdout", "outputType").split(",")
+    printerTypes = parser.get("printer", "outputType").split(",")
     if isinstance(printerTypes,str):
         printerTypes = [printerTypes]
     masterPrinter = MPrinter(printerList=printerTypes)
@@ -98,10 +98,11 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         return masterPrinter.flush()
 
     outLevel = 0
-    if parser.getboolean("stdout", "printDecomp"):
+    if parser.getboolean("printer", "printDecomp"):
         outLevel = 1
-        outLevel += parser.getboolean("stdout", "addElmentInfo")
-    masterPrinter.addObj(smstoplist,outLevel)
+        outLevel += parser.getboolean("printer", "addElmentInfo")
+    outLevelPy = int(parser.getboolean("printer","addElementList"))
+    masterPrinter.addObj(smstoplist,{'python' : outLevelPy, 'xml' : outLevelPy, 'stdout' : outLevel,'summary':None,'log':outLevel})
     
     for expResult in listOfExpRes: masterPrinter.addObj(expResult,outLevel)
 
@@ -120,14 +121,17 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """ Define result list that collects all theoryPrediction objects."""
     maxcond = parser.getfloat("parameters", "maxcond")
     results = ioObjects.ResultList(allPredictions,maxcond)
-    if not parser.getboolean("file", "expandedSummary"):
+    if not parser.getboolean("printer", "expandedSummary"):
         results.useBestResult()
 
-    outLevel = 0
     if not results.isEmpty():
         outputStatus.updateStatus(1)
+        outLevelStdout = 2
+        if parser.getboolean("printer","printExtendedResults"):
+            masterPrinter.addObj(allPredictions,2) #by default giving full available output if extendedResults requested
+            outLevelStdout = None
         outLevel = 2 # by default we always print txnames with the results
-        masterPrinter.addObj(results,outLevel)
+        masterPrinter.addObj(results,{'python' : outLevel, 'xml' : outLevel, 'stdout' : outLevelStdout,'summary':outLevel,'log':outLevelStdout})
     else:
         outputStatus.updateStatus(0) # no results after enforcing maxcond
 
@@ -320,10 +324,12 @@ def loadDatabaseResults(parser, database):
                                  datasetIDs=datasetIDs, dataTypes=dataTypes,
                                  useSuperseded=useSuperseded, useNonValidated=useNonValidated)
     """ Print list of analyses loaded """
-    outLevel = 0
-    if parser.getboolean("stdout", "printAnalyses"):
+    if parser.getboolean("database", "printDatabase"):
+        databasePrinter = MPrinter(["stdout"])
         outLevel = 1
-        outLevel += parser.getboolean("stdout", "addAnaInfo")
+        outLevel += parser.getboolean("database", "addAnaInfo")
+        databasePrinter.addObj(ExpResultList(ret),outLevel)
+        databasePrinter.flush()
     return ret
 
 def getParameters(parameterFile):
