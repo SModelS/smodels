@@ -26,6 +26,29 @@
             <upper_limit_fb>0.385711556676</upper_limit_fb>
         </ExptRes>
         <ExptRes>
+            <AnalysisID>CMS-SUS-PAS-15-002</AnalysisID>
+            <AnalysisSqrts_TeV>13</AnalysisSqrts_TeV>
+            <DataSetID>None</DataSetID>
+            <Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>675.0</Mass_GeV>
+                    <Mass_GeV>200.0</Mass_GeV>
+                </Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>675.0</Mass_GeV>
+                    <Mass_GeV>200.0</Mass_GeV>
+                </Mass_GeV_List>
+            </Mass_GeV_List>
+            <TxNames_List>
+                <TxNames>T1</TxNames>
+            </TxNames_List>
+            <dataType>upperLimit</dataType>
+            <lumi_fb-1>2.2</lumi_fb-1>
+            <maxcond>0.0</maxcond>
+            <theory_prediction_fb>4309.03465</theory_prediction_fb>
+            <upper_limit_fb>167.641313231</upper_limit_fb>
+        </ExptRes>
+        <ExptRes>
             <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
             <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
             <DataSetID>None</DataSetID>
