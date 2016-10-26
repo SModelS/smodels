@@ -272,9 +272,6 @@ class TxNameData(object):
         p= ( (np.matrix(porig)[0] - self.delta_x ) ).tolist()[0]
         P=np.dot(p,self._V)  ## rotate
         dp=self.countNonZeros(P)
-        #Make sure the approximate zeros in P are set to zero (useful for 1-D data)
-        if dp < self.dimensionality:           
-            P = np.append(P[:dp],[0.]*(self.dimensionality-dp))
         self.projected_value = self.interpolate([ P[:self.dimensionality] ])
 
         # self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
