@@ -49,14 +49,6 @@ Thus each |EMr| will have a single theory prediction/upper limit, corresponding 
 If the user wants to have access to all the |datasets|, the default
 behavior can be disabled using the variable *useBestDataset*.
 
-In addition to upper limits, a |Likelihood| can be computed from |EMrs|. This is a simple poisson
-convoluted with Gaussian using the errors on the number of background events (from the :ref:`Database <database>`) and
-signal events (by default 20%).
-A |Chi2| can be computed from the likelihood using a test statistic -2*log(|Likelihood|/max(|Likelihood| (s))
-where the |Likelihood| is maximized over the number of signal events.
-By definition, this occurs at :math:`n_s = n_{\mathrm{obs}} - n_b`, or the difference between the number
-of observed and predicted background events.
-
 
 The procedure described above can be applied to all the |ExpRess| in the database, resulting
 in a list of theory predictions and upper limits for each |ExpRes|. A model can then be considered
@@ -64,5 +56,22 @@ excluded by the experimental results if, for one or more predictions, we have *t
 
 * **The upper limits for a given**  |ULr| **or** |EMr| **can be obtained using the** `getUpperLimitFor  method <../../../documentation/build/html/experiment.html#experiment.expResultObj.ExpResult.getUpperLimitFor>`_
 
+For |EMrs| a likelihood can also be computed (in addition to the upper limits above). This is a simple Poisson
+convoluted with a Gaussian using event counts and errors on the number of background events (from the :ref:`Database <database>`) and
+signal efficiencies (by default 20%).
+
+A :math:`\chi^2` is also computed from the likelihood using a test statistic 
+
+-2*log(likelihood(:math:`s_{\mathrm{theo}}`)/max(likelihood (:math:`s_{\mathrm{max}}`))
+
+where the likelihood in the denominator is maximized over the number of signal events `s`.
+The maximum likelihood occurs by definition at :math:`n_s = n_{\mathrm{obs}} - n_b`, or the difference between the number
+of observed and predicted background events.
+The prediction for the number of signal events :math:`s_{\mathrm{theo}}` is computed from the given theory input.
+
+
+
+
 .. [*] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model
    is being tested by a large number of results simultaneously.
+
