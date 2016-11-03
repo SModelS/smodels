@@ -92,14 +92,6 @@ tools.lheChecks module
     :undoc-members:
     :show-inheritance:
 
-tools.likelihood module
------------------------
-
-.. automodule:: tools.likelihood
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 tools.modelTester module
 ------------------------
 
