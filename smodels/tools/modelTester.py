@@ -104,7 +104,6 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     outLevelPy = int(parser.getboolean("printer","addElementList"))
     masterPrinter.addObj(smstoplist,{'python' : outLevelPy, 'xml' : outLevelPy, 'stdout' : outLevel,'summary':None,'log':outLevel})
     
-    for expResult in listOfExpRes: masterPrinter.addObj(expResult,outLevel)
 
     """
     Compute theory predictions
@@ -137,8 +136,12 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
 
     if parser.getboolean("options", "testCoverage"):
         """ Testing coverage of model point, add results to the output file """
+        outLevel = 2
+        outLevelPy = 2
+        outLevel += parser.getboolean("printer", "addElmentInfo")
+	outLevelPy += parser.getboolean("printer","addElementList")
         uncovered = coverage.Uncovered(smstoplist)
-        masterPrinter.addObj(uncovered,{'python' : 2, 'xml' : 2, 'stdout' : 3,'summary':2,'log':3})
+        masterPrinter.addObj(uncovered,{'python' : outLevelPy, 'xml' : outLevelPy, 'stdout' : outLevel,'summary':2,'log':outLevel})
     
     return masterPrinter.flush()
 
