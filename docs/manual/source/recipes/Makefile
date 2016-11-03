@@ -1,4 +1,4 @@
-all: convert remove_ipynb
+all: convert # remove_ipynb
 
 convert:
 	./convert.sh
