@@ -56,20 +56,21 @@ excluded by the experimental results if, for one or more predictions, we have *t
 
 * **The upper limits for a given**  |ULr| **or** |EMr| **can be obtained using the** `getUpperLimitFor  method <../../../documentation/build/html/experiment.html#experiment.expResultObj.ExpResult.getUpperLimitFor>`_
 
-For |EMrs| a likelihood can also be computed (in addition to the upper limits above). This is a simple Poisson
-convoluted with a Gaussian using event counts and errors on the number of background events (from the :ref:`Database <database>`) and
-signal efficiencies (by default 20%).
+For |EMrs| a :math:`\chi^2` can also be computed (in addition to the upper limits above).
+The :math:`\chi^2` is computed from the likelihood using:
 
-A :math:`\chi^2` is also computed from the likelihood using a test statistic 
+.. math::
+   \chi^2 = -2 log(\frac{L(n_{signal})}{L_{max)})
+ 
+where :math:`L(n_{signal})` is the likelihood for a given number of signal events. 
+The likelihood is computed using a simple Poisson convoluted with a Gaussian using 
+the number of observed events (:math:`n_{obs}`), the number of expected background events
+(:math:`n_{b}`) and its error (:math:`\delta_{b}`)
+and the number of signal events (:math:`n_{sig}`) and its error (20% by default).
+While :math:`n_{obs})`, :math:`n_{b}` and :math:`\delta_{b}` are directly extracted from the :ref:`Database <database>`,
+:math:`n_{sig}` is obtained from from the :ref:`theoryPredictions` calculation.
 
--2*log(likelihood(:math:`s_{\mathrm{theo}}`)/max(likelihood (:math:`s_{\mathrm{max}}`))
-
-where the likelihood in the denominator is maximized over the number of signal events `s`.
-The maximum likelihood occurs by definition at :math:`n_s = n_{\mathrm{obs}} - n_b`, or the difference between the number
-of observed and predicted background events.
-The prediction for the number of signal events :math:`s_{\mathrm{theo}}` is computed from the given theory input.
-
-
+* **The** :math:`\chi^2` **for a given** |EMr| **is computed using the** `chi2  method <../../../documentation/build/html/tools.html#tools.statistics.chi2>`_
 
 
 .. [*] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model

@@ -122,49 +122,38 @@ def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
         return 1.-(p_SplusB / p_b) # 1 - CLs
 
 
-def likelihood ( nsig, nobs, nb, deltab, deltas, ntoys=100000):
-        """ (float, float, float, float, float, int) -> float
-        :param nsig: predicted signal
-        :param nobs: number of observed events
-        :param nb: predicted background
-        :param deltab: uncertainty on background
-        :param deltas: uncertainty on signal
-        :param ntoys: number of toys to use in integral
-
-
+def likelihood(nsig, nobs, nb, deltab, deltas, ntoys=100000):
+        """ 
         Return the likelihood to observe nobs events given the
-        predicted background nb, error on this background deltab,
-        expected number of signal events nsig, and if given
-        the error on the signal deltas.
-        Assume an error of 20% on the signal if no error is given.
+        predicted background nb, error on this background (deltab),
+        expected number of signal events nsig and the error on the signal (deltas).
+                
+        :param nsig: predicted signal (float)
+        :param nobs: number of observed events (float)
+        :param nb: predicted background (float)
+        :param deltab: uncertainty on background (float)
+        :param deltas: uncertainty on signal (float)
+        :param ntoys: number of toys to use in integral (int)
 
-        Why not a simple gamma function for the factorial:
-        -----------------------------------------------------
-        The scipy.stats.poisson.pmf probability mass function
-        for the Poisson distribution only works for discrete
-        numbers. The gamma distribution is used to create a
-        continuous Poisson distribution.
-
-        Why not a simple gamma function for the factorial:
-        -----------------------------------------------------
-        The gamma function does not yield results for integers
-        larger than 170. Since the expression for the Poisson
-        probability mass function as a whole should not be huge,
-        the exponent of the log of this expression is calculated
-        instead to avoid using large numbers.
-
-        # Example of T1 result for mgluino=500, mlsp=200:
-        >>> round(likelihood( 384.899, 298, 111.0, 11.0, 0.2*384.899), 4)
-        0.0002
-
-        # Example of T1 result for mgluino=700, mlsp=100:
-        >>> round(likelihood( 157.57, 2167., 2120.0, 110.0, 0.2*157.57), 3)
-        0.002
-
-        # Example of T1 result for mgluino=1100, mlsp=900:
-        >>> round(likelihood( 4.82, 2166, 2120.0, 110.0, 0.2*4.82), 3)
-        0.003
+        :return: likelihood to observe nobs events (float)
+        
         """
+
+#    Why not a simple gamma function for the factorial:
+#     -----------------------------------------------------
+#     The scipy.stats.poisson.pmf probability mass function
+#     for the Poisson distribution only works for discrete
+#     numbers. The gamma distribution is used to create a
+#     continuous Poisson distribution.
+# 
+#     Why not a simple gamma function for the factorial:
+#     -----------------------------------------------------
+#     The gamma function does not yield results for integers
+#     larger than 170. Since the expression for the Poisson
+#     probability mass function as a whole should not be huge,
+#     the exponent of the log of this expression is calculated
+#     instead to avoid using large numbers.
+
 
         total_integrand = 0.
 
@@ -201,67 +190,56 @@ def likelihood ( nsig, nobs, nb, deltab, deltas, ntoys=100000):
                     lambda_b = nb + smear_b*deltab
                     lambda_s = nsig + smear_s*deltas
 
-
                 # total predicted
                 mean = lambda_b + lambda_s
 
                 # value of integrand, poisson likelihood value
-                # poisson_integrand = e (-mean) * mean^nobs / nobs! 
-                # Make sure that 
+                # poisson_integrand = e^(-mean)*mean^nobs/nobs! 
 
-                poisson_integrand = exp(    nobs * log ( mean ) - mean - math.lgamma(nobs + 1 ) )
+                poisson_integrand = exp(nobs*log(mean) - mean - math.lgamma(nobs + 1))
                 total_integrand += poisson_integrand
 
         # Return the likelihood normalized by the number of toys.
         return total_integrand/float(ntoys)
 
 
-def chi2 ( nsig, nobs, nb, deltab, deltas, ntoys=100000):
-        """ (float, float, float, float, float, int) -> float
-        :param nsig: predicted signal
-        :param nobs: number of observed events
-        :param nb: predicted background
-        :param deltab: uncertainty in background
-        :param deltas_pct: relative uncertainty in signal acceptance
-        :param ntoys: number of toys to use in integral
-
-
-        Return a chi2 for a given number of observed events nobs
+def chi2(nsig, nobs, nb, deltab, deltas=None, ntoys=100000):
+        """ 
+        Computes the chi2 for a given number of observed events nobs
         given the predicted background nb, error on this background deltab,
-        expected number of signal events nsig, and if given
-        the error on signal deltas.
-        Assume an error of 20% on the signal if no error is given.
+        expected number of signal events nsig and, if given, the error on signal (deltas).
+        If deltas is not given, assume an error of 20% on the signal.
+        
+        :param nsig: predicted signal (float)
+        :param nobs: number of observed events (float)
+        :param nb: predicted background (float)
+        :param deltab: uncertainty in background (float)
+        :param deltas_pct: relative uncertainty in signal acceptance (float)
+        :param ntoys: number of toys to use in integral (int)
 
-        # Example of T1 result for mgluino=500, mlsp=200:
-        >>> int(round(chi2( 384.9, 298., 111.0, 11.0, 0.2*384.9), 1))
-        7
-
-        # Example of T1 result for mgluino=700, mlsp=100:
-        >>> int(round(chi2( 157.57, 2167., 2120.0, 110.0, 0.2*157.57)))
-        1
-
-        # Example of T1 result for mgluino=1100, mlsp=900:
-        >>> round(chi2( 4.82, 2166, 2120.0, 110.0, 0.2*4.82), 1)
-        0.1
-
+        :return: chi2 (float)
 
         """
+        
+        #Set signal error to 20%, if not defined
+        if deltas is None:
+            detas = 0.2*nsig        
+        
         # Check that the background is not already excluded by the number
         # of observed events:
         if nobs - nb < -10:
             # In this case, we do not want to punish the signal also:
             return nan
 
-
         # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
-        llhd = likelihood ( nsig, nobs, nb, deltab, deltas, ntoys)
+        llhd = likelihood(nsig, nobs, nb, deltab, deltas, ntoys)
 
+        #Percentual signal error:
         deltas_pct = deltas/(1.0*nsig)
-
-        # Compute the maximum likelihood H1, which sits at nsig=nobs-nb:
-        maxllhd = likelihood ( nobs - nb, nobs, nb, deltab,
-                # keep same % error on signal
-                deltas_pct * (nobs - nb), ntoys)
+        
+        # Compute the maximum likelihood H1, which sits at nsig=nobs-nb
+        #(keeping the same % error on signal):
+        maxllhd = likelihood(nobs - nb, nobs, nb, deltab, deltas_pct*(nobs - nb), ntoys)
 
         # Return the test statistic -2log(H0/H1)
         return -2*log(llhd/maxllhd)
