@@ -295,7 +295,8 @@ class TxNameData(object):
         return ret
 
     def interpolate(self, uvw, fill_value=np.nan):
-        simplex = self.tri.find_simplex(uvw)
+        tol = sys.float_info.epsilon * 1e6
+        simplex = self.tri.find_simplex(uvw, tol=tol)
         vertices = np.take(self.tri.simplices, simplex, axis=0)
         temp = np.take(self.tri.transform, simplex, axis=0)
         d=temp.shape[2]
