@@ -3,10 +3,10 @@
 """
 .. module:: statistics
    :synopsis: Code that computes CLs, p values, etc.
-        
+
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
-        
+
 """
 
 import logging
@@ -45,7 +45,7 @@ class UpperLimitComputer:
         return cls
 
     def compute ( self, nev, xbg, sbg, upto=5.0, return_nan=False ):
-        """ upper limit obtained via mad analysis 5 code 
+        """ upper limit obtained via mad analysis 5 code
         :param nev: number of observed events
         :param sac: relative uncertainty in acceptance
         :param xbg: expected bg
@@ -56,7 +56,7 @@ class UpperLimitComputer:
         self.xbg = xbg
         self.sbg = sbg
         self.currentNToys = self.origNToys
-        
+
         try:
             ## up = upto ## 5. ##  upto * max(nev,xbg,sbg)
             dn = max( 0, nev - xbg )
@@ -78,7 +78,7 @@ def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
 
         Thanks to the MadAnalysis for granting us the permission to use
         the code here! """
-        
+
     ## testing whether scipy is there
     try:
         import scipy.stats
@@ -89,7 +89,7 @@ def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
     # generate a set of expected-number-of-background-events, one for each toy
     # experiment, distributed according to a Gaussian with the specified mean
     # and uncertainty
-    ExpectedBGs = scipy.stats.norm.rvs( loc=ExpectedBG, scale=BGError, 
+    ExpectedBGs = scipy.stats.norm.rvs( loc=ExpectedBG, scale=BGError,
                                         size=NumToyExperiments )
 
     # Ignore values in the tail of the Gaussian extending to negative numbers
@@ -123,11 +123,11 @@ def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
 
 
 def likelihood(nsig, nobs, nb, deltab, deltas, ntoys=100000):
-        """ 
+        """
         Return the likelihood to observe nobs events given the
         predicted background nb, error on this background (deltab),
         expected number of signal events nsig and the error on the signal (deltas).
-                
+
         :param nsig: predicted signal (float)
         :param nobs: number of observed events (float)
         :param nb: predicted background (float)
@@ -136,7 +136,7 @@ def likelihood(nsig, nobs, nb, deltab, deltas, ntoys=100000):
         :param ntoys: number of toys to use in integral (int)
 
         :return: likelihood to observe nobs events (float)
-        
+
         """
 
 #    Why not a simple gamma function for the factorial:
@@ -145,7 +145,7 @@ def likelihood(nsig, nobs, nb, deltab, deltas, ntoys=100000):
 #     for the Poisson distribution only works for discrete
 #     numbers. The gamma distribution is used to create a
 #     continuous Poisson distribution.
-# 
+#
 #     Why not a simple gamma function for the factorial:
 #     -----------------------------------------------------
 #     The gamma function does not yield results for integers
@@ -175,6 +175,8 @@ def likelihood(nsig, nobs, nb, deltab, deltas, ntoys=100000):
                 # using their widths as errors:
                 lambda_b = nb + smear_b*deltab
                 lambda_s = nsig + smear_s*deltas
+                # smearing is done with random.normal numbers:
+                # stats.normal.pdf can also be used but is much slower
 
                 # Make sure these numbers are not always negative:
                 # count number of tries to obtain positive mean
@@ -194,7 +196,7 @@ def likelihood(nsig, nobs, nb, deltab, deltas, ntoys=100000):
                 mean = lambda_b + lambda_s
 
                 # value of integrand, poisson likelihood value
-                # poisson_integrand = e^(-mean)*mean^nobs/nobs! 
+                # poisson_integrand = e^(-mean)*mean^nobs/nobs!
 
                 poisson_integrand = exp(nobs*log(mean) - mean - math.lgamma(nobs + 1))
                 total_integrand += poisson_integrand
@@ -204,12 +206,12 @@ def likelihood(nsig, nobs, nb, deltab, deltas, ntoys=100000):
 
 
 def chi2(nsig, nobs, nb, deltab, deltas=None, ntoys=100000):
-        """ 
+        """
         Computes the chi2 for a given number of observed events nobs
         given the predicted background nb, error on this background deltab,
         expected number of signal events nsig and, if given, the error on signal (deltas).
         If deltas is not given, assume an error of 20% on the signal.
-        
+
         :param nsig: predicted signal (float)
         :param nobs: number of observed events (float)
         :param nb: predicted background (float)
@@ -220,11 +222,11 @@ def chi2(nsig, nobs, nb, deltab, deltas=None, ntoys=100000):
         :return: chi2 (float)
 
         """
-        
+
         #Set signal error to 20%, if not defined
         if deltas is None:
-            detas = 0.2*nsig        
-        
+            deltas = 0.2*nsig
+
         # Check that the background is not already excluded by the number
         # of observed events:
         if nobs - nb < -10:
@@ -236,9 +238,9 @@ def chi2(nsig, nobs, nb, deltab, deltas=None, ntoys=100000):
 
         #Percentual signal error:
         deltas_pct = deltas/(1.0*nsig)
-        
-        # Compute the maximum likelihood H1, which sits at nsig=nobs-nb
-        #(keeping the same % error on signal):
+
+        # Compute the maximum likelihood H1, which sits at nsig = nobs - nb
+        # (keeping the same % error on signal):
         maxllhd = likelihood(nobs - nb, nobs, nb, deltab, deltas_pct*(nobs - nb), ntoys)
 
         # Return the test statistic -2log(H0/H1)
