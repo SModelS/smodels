@@ -13,9 +13,6 @@ sys.path.insert(0,"../")
 import unittest
 from smodels.tools import statistics
 from smodels.tools.physicsUnits import fb
-import scipy.stats
-import math
-import random
 from math import floor, log10
 import numpy as np
 
