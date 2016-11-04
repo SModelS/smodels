@@ -60,15 +60,18 @@ For |EMrs| a :math:`\chi^2` can also be computed (in addition to the upper limit
 The :math:`\chi^2` is computed from the likelihood using:
 
 .. math::
-   \chi^2 = -2 log(\frac{L(n_{signal})}{L_{max)})
+   \chi^2 = -2 \log(\frac{L(n_{sig})}{L_{max}})
+   
+   
  
 where :math:`L(n_{signal})` is the likelihood for a given number of signal events. 
-The likelihood is computed using a simple Poisson convoluted with a Gaussian using 
+The likelihood is computed using a simple Poisson convoluted with a Gaussian as a function of 
 the number of observed events (:math:`n_{obs}`), the number of expected background events
 (:math:`n_{b}`) and its error (:math:`\delta_{b}`)
-and the number of signal events (:math:`n_{sig}`) and its error (20% by default).
-While :math:`n_{obs})`, :math:`n_{b}` and :math:`\delta_{b}` are directly extracted from the :ref:`Database <database>`,
-:math:`n_{sig}` is obtained from from the :ref:`theoryPredictions` calculation.
+and the number of signal events (:math:`n_{sig}`) and its error (:math:`\delta_{s}).
+While :math:`n_{obs}`, :math:`n_{b}` and :math:`\delta_{b}` are directly extracted from the |Dataset|,
+:math:`n_{sig}` is obtained from from the :ref:`theoryPredictions` calculation and 
+:math:`\delta_{s} = 20\% n_{sig}` by default.
 
 * **The** :math:`\chi^2` **for a given** |EMr| **is computed using the** `chi2  method <../../../documentation/build/html/tools.html#tools.statistics.chi2>`_
 

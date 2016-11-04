@@ -41,6 +41,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -121,18 +122,22 @@
 
 
 
+
+
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
     <li>Installation and Deployment</li>
-      <li class="wy-breadcrumbs-aside">
-        
+    <li class="wy-breadcrumbs-aside">
+      
           
-            <a href="_sources/Installation.txt" rel="nofollow"> View page source</a>
-          
+          <a href="_sources/Installation.txt" rel="nofollow"> View page source</a>
         
-      </li>
+      
+    </li>
   </ul>
   <hr/>
 </div>
@@ -165,7 +170,7 @@ In addition, SModelS depends on the following <em>external</em> Python libraries
 </div></blockquote>
 <p>For installation, SModelS makes use of Python&#8217;s <em>setuptools</em>.
 Thus</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>python setup.py install
+<div class="highlight-default"><div class="highlight"><pre><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span>
 </pre></div>
 </div>
 <p>should install the entire project, compile the internal Pythia and NLL-fast versions
@@ -180,7 +185,7 @@ In case the installation of the external libraries fails, you can also try to in
 them manually, then rerun setup.py.
 For Ubuntu and SL6 machines, a recipe is given below.</p>
 <p>There is also a diagnostic tool available:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>python smodels/tools/toolBox.py
+<div class="highlight-default"><div class="highlight"><pre><span class="n">python</span> <span class="n">smodels</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">toolBox</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
 <p>should list and check all internal tools (Pythia and NLL-fast) and external
