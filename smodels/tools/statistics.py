@@ -175,6 +175,7 @@ def likelihood(nsig, nobs, nb, deltab, deltas, ntoys=100000):
                 # using their widths as errors:
                 lambda_b = nb + smear_b*deltab
                 lambda_s = nsig + smear_s*deltas
+                mean = lambda_b + lambda_s
                 # smearing is done with random.normal numbers:
                 # stats.normal.pdf can also be used but is much slower
 
@@ -186,18 +187,20 @@ def likelihood(nsig, nobs, nb, deltab, deltas, ntoys=100000):
 
                 # Keep searching for positive lambda_b, lambda_s
                 # for a maximum number of tries positive_tries:
-                while (lambda_b < 0. or lambda_s < 0.) and try_positive < positive_tries:
+                while mean < 0. and try_positive < positive_tries:
                     try_positive += 1
                     smear_b, smear_s = random.normal(), random.normal()
                     lambda_b = nb + smear_b*deltab
                     lambda_s = nsig + smear_s*deltas
-
-                # total predicted
-                mean = lambda_b + lambda_s
+                    # total predicted
+                    mean = lambda_b + lambda_s
+                
+                #Cut integral at negative mean values
+                if mean < 0.:
+                    continue
 
                 # value of integrand, poisson likelihood value
                 # poisson_integrand = e^(-mean)*mean^nobs/nobs!
-
                 poisson_integrand = exp(nobs*log(mean) - mean - math.lgamma(nobs + 1))
                 total_integrand += poisson_integrand
 
@@ -227,12 +230,6 @@ def chi2(nsig, nobs, nb, deltab, deltas=None, ntoys=100000):
         if deltas is None:
             deltas = 0.2*nsig
 
-        # Check that the background is not already excluded by the number
-        # of observed events:
-        if nobs - nb < -10:
-            # In this case, we do not want to punish the signal also:
-            return nan
-
         # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
         llhd = likelihood(nsig, nobs, nb, deltab, deltas, ntoys)
 
@@ -240,9 +237,12 @@ def chi2(nsig, nobs, nb, deltab, deltas=None, ntoys=100000):
         deltas_pct = deltas/(1.0*nsig)
 
         # Compute the maximum likelihood H1, which sits at nsig = nobs - nb
-        # (keeping the same % error on signal):
-        maxllhd = likelihood(nobs - nb, nobs, nb, deltab, deltas_pct*(nobs - nb), ntoys)
+        # (keeping the same % error on signal):        
+        maxllhd = likelihood(nobs-nb, nobs, nb, deltab, deltas_pct*(nobs-nb), ntoys)
 
+        
+        if llhd == 0.:
+            return float('inf')
         # Return the test statistic -2log(H0/H1)
         return -2*log(llhd/maxllhd)
 
