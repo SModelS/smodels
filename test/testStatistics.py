@@ -67,7 +67,7 @@ class StatisticsTest(unittest.TestCase):
         {'mgluino':  700, 'mlsp':  300, 'nsig':   147.084, 'nobs':  167.631, 'nb':  126.0 , 'deltab': 13.0 , 'llhd': 0.00012707 , 'chi2': 10.1408114 },
         {'mgluino':  700, 'mlsp':  400, 'nsig':   420.524, 'nobs':  2332.28, 'nb':  2120.0, 'deltab': 110.0, 'llhd': 0.00100854 , 'chi2': 2.28195399 },
         {'mgluino':  700, 'mlsp':  500, 'nsig':   186.726, 'nobs':  2162.70, 'nb':  2120.0, 'deltab': 110.0, 'llhd': 0.00165411 , 'chi2': 1.40477590 },
-        {'mgluino':  700, 'mlsp':  600, 'nsig':   5.18888, 'nobs':  24.3271, 'nb':  37.0  , 'deltab': 6.0  , 'llhd': 0.00545866 , 'chi2': None       },
+        {'mgluino':  700, 'mlsp':  600, 'nsig':   5.18888, 'nobs':  24.3271, 'nb':  37.0  , 'deltab': 6.0  , 'llhd': 0.00545866 , 'chi2': 4.3836    },
         {'mgluino':  800, 'mlsp':  100, 'nsig':   169.670, 'nobs':  213.312, 'nb':  126.0 , 'deltab': 13.0 , 'llhd': 0.00116298 , 'chi2': 5.09803029 },
         {'mgluino':  800, 'mlsp':  200, 'nsig':   152.221, 'nobs':  212.732, 'nb':  126.0 , 'deltab': 13.0 , 'llhd': 0.00223053 , 'chi2': 3.81519907 },
         {'mgluino':  800, 'mlsp':  300, 'nsig':   98.6749, 'nobs':  175.141, 'nb':  126.0 , 'deltab': 13.0 , 'llhd': 0.00298021 , 'chi2': 3.72566221 },
@@ -81,8 +81,8 @@ class StatisticsTest(unittest.TestCase):
         {'mgluino':  900, 'mlsp':  400, 'nsig':   44.8312, 'nobs':  140.979, 'nb':  126.0 , 'deltab': 13.0 , 'llhd': 0.00692173 , 'chi2': 2.34800741 },
         {'mgluino':  900, 'mlsp':  500, 'nsig':   24.4723, 'nobs':  120.688, 'nb':  126.0 , 'deltab': 13.0 , 'llhd': 0.00601021 , 'chi2': 2.72454478 },
         {'mgluino':  900, 'mlsp':  600, 'nsig':   67.0446, 'nobs':  2165.25, 'nb':  2120.0, 'deltab': 110.0, 'llhd': 0.00328372 , 'chi2': 0.03101810 },
-        {'mgluino':  900, 'mlsp':  700, 'nsig':   1.00167, 'nobs':  5.0    , 'nb':  5.2   , 'deltab': 1.4  , 'llhd': 0.13964962 , 'chi2': None       },
-        {'mgluino':  900, 'mlsp':  800, 'nsig':   0.86634, 'nobs':  24.0   , 'nb':  37.0  , 'deltab': 6.0  , 'llhd': 0.01303119 , 'chi2': None       },
+        {'mgluino':  900, 'mlsp':  700, 'nsig':   1.00167, 'nobs':  5.0    , 'nb':  5.2   , 'deltab': 1.4  , 'llhd': 0.13964962 , 'chi2': 0.107139   },
+        {'mgluino':  900, 'mlsp':  800, 'nsig':   0.86634, 'nobs':  24.0   , 'nb':  37.0  , 'deltab': 6.0  , 'llhd': 0.01303119 , 'chi2': 2.638323       },
         {'mgluino': 1000, 'mlsp':  100, 'nsig':   11.7426, 'nobs':  11.8786, 'nb':  4.9   , 'deltab': 1.6  , 'llhd': 0.05712388 , 'chi2': 1.07498870 },
         {'mgluino': 1000, 'mlsp':  200, 'nsig':   9.85815, 'nobs':  7.98535, 'nb':  4.9   , 'deltab': 1.6  , 'llhd': 0.03180710 , 'chi2': 2.63593288 },
         {'mgluino': 1000, 'mlsp':  300, 'nsig':   6.80275, 'nobs':  6.14772, 'nb':  4.9   , 'deltab': 1.6  , 'llhd': 0.04255251 , 'chi2': 2.25703866 },
@@ -101,7 +101,7 @@ class StatisticsTest(unittest.TestCase):
         {'mgluino': 1100, 'mlsp':  700, 'nsig':   4.74108, 'nobs':  120.211, 'nb':  126.0 , 'deltab': 13.0 , 'llhd': 0.01979279 , 'chi2': 0.33853966 },
         {'mgluino': 1100, 'mlsp':  800, 'nsig':   1.79622, 'nobs':  120.858, 'nb':  126.0 , 'deltab': 13.0 , 'llhd': 0.02187799 , 'chi2': 0.12720810 },
         {'mgluino': 1100, 'mlsp':  900, 'nsig':   4.82397, 'nobs':  2166.20, 'nb':  2120.0, 'deltab': 110.0, 'llhd': 0.00313424 , 'chi2': 0.11213416 },
-        {'mgluino': 1100, 'mlsp': 1000, 'nsig':   0.1606 , 'nobs':  25.0 ,   'nb':  37.0  , 'deltab': 6.0 ,  'llhd': 0.01796058 , 'chi2': None}]
+        {'mgluino': 1100, 'mlsp': 1000, 'nsig':   0.1606 , 'nobs':  25.0 ,   'nb':  37.0  , 'deltab': 6.0 ,  'llhd': 0.01796058 , 'chi2': 1.980854}]
 
 
 
