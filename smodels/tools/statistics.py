@@ -139,20 +139,20 @@ def likelihood(nsig, nobs, nb, deltab, deltas, ntoys=100000):
 
         """
 
-#    Why not a simple gamma function for the factorial:
-#     -----------------------------------------------------
-#     The scipy.stats.poisson.pmf probability mass function
-#     for the Poisson distribution only works for discrete
-#     numbers. The gamma distribution is used to create a
-#     continuous Poisson distribution.
-#
-#     Why not a simple gamma function for the factorial:
-#     -----------------------------------------------------
-#     The gamma function does not yield results for integers
-#     larger than 170. Since the expression for the Poisson
-#     probability mass function as a whole should not be huge,
-#     the exponent of the log of this expression is calculated
-#     instead to avoid using large numbers.
+        #     Why not a simple gamma function for the factorial:
+        #     -----------------------------------------------------
+        #     The scipy.stats.poisson.pmf probability mass function
+        #     for the Poisson distribution only works for discrete
+        #     numbers. The gamma distribution is used to create a
+        #     continuous Poisson distribution.
+        #
+        #     Why not a simple gamma function for the factorial:
+        #     -----------------------------------------------------
+        #     The gamma function does not yield results for integers
+        #     larger than 170. Since the expression for the Poisson
+        #     probability mass function as a whole should not be huge,
+        #     the exponent of the log of this expression is calculated
+        #     instead to avoid using large numbers.
 
 
         total_integrand = 0.
@@ -216,7 +216,7 @@ def chi2(nsig, nobs, nb, deltab, deltas=None, ntoys=100000):
         :param nobs: number of observed events (float)
         :param nb: predicted background (float)
         :param deltab: uncertainty in background (float)
-        :param deltas_pct: relative uncertainty in signal acceptance (float)
+        :param deltas: uncertainty in signal acceptance (float)
         :param ntoys: number of toys to use in integral (int)
 
         :return: chi2 (float)
