@@ -30,9 +30,6 @@
   
 
   
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="SModelS 1.0.93 documentation" href="index.html"/>
         <link rel="up" title="SModelS Structure" href="Structure.html"/>
         <link rel="next" title="Database of Experimental Results" href="DatabaseStructure.html"/>
@@ -86,20 +83,24 @@
             
             
                 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="SModelSDefs.html">Basic Concepts and Definitions</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="Structure.html">SModelS Structure</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="BasicInput.html">Basic Input</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Decomposition.html">Decomposition into Simplified Models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="TheoryPredictions.html">Theory Predictions</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Confronting Predictions with Experimental Limits</a></li>
-<li class="toctree-l2"><a class="reference internal" href="DatabaseStructure.html">Database of Experimental Results</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="Tools.html">SModelS Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation and Deployment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RunningSModelS.html">Running SModelS</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="SModelsDocs.html">SModelS Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SModelSDefs.html">Basic Concepts and Definitions</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="Structure.html">SModelS Structure</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="BasicInput.html">Basic Input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Decomposition.html">Decomposition into Simplified Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TheoryPredictions.html">Theory Predictions</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="">Confronting Predictions with Experimental Limits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DatabaseStructure.html">Database of Experimental Results</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Tools.html">SModelS Tools</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">More Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CodeDocs.html">SModelS Code Documentation</a></li>
 </ul>
 
             
@@ -130,6 +131,8 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
+          <li><a href="SModelsDocs.html">SModelS Documentation</a> &raquo;</li>
+      
           <li><a href="Structure.html">SModelS Structure</a> &raquo;</li>
       
     <li>Confronting Predictions with Experimental Limits</li>
@@ -148,33 +151,33 @@
             
   <span class="target" id="index-0"></span><div class="section" id="confronting-predictions-with-experimental-limits">
 <span id="confrontpredictions"></span><h1>Confronting Predictions with Experimental Limits<a class="headerlink" href="#confronting-predictions-with-experimental-limits" title="Permalink to this headline">¶</a></h1>
-<p>Once the relevant signal cross-sections (or <a class="reference internal" href="TheoryPredictions.html#theorypredictions"><span class="std std-ref">theory predictions</span></a>) have been computed
+<p>Once the relevant signal cross-sections (or <a class="reference internal" href="TheoryPredictions.html#theorypredictions"><span>theory predictions</span></a>) have been computed
 for the input model, these must be compared to the respective upper limits.
-The upper limits for the signal are stored in the SModelS <a class="reference internal" href="DatabaseDefinitions.html#database"><span class="std std-ref">Database</span></a>
-and depend on the type of <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Result</span></a>: <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type</span></a> or <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type</span></a>.</p>
-<p>In the case of a <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type result</span></a>, the theory predictions typically consist of a list of signal
+The upper limits for the signal are stored in the SModelS <a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a>
+and depend on the type of <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a>: <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type</span></a> or <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type</span></a>.</p>
+<p>In the case of a <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type result</span></a>, the theory predictions typically consist of a list of signal
 cross-sections (one for each cluster) for
-the single <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a> (see <a class="reference internal" href="TheoryPredictions.html#thepredul"><span class="std std-ref">Theory  Predictions for Upper Limit Results</span></a> for more details).
+the single <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a> (see <a class="reference internal" href="TheoryPredictions.html#thepredul"><span>Theory  Predictions for Upper Limit Results</span></a> for more details).
 Each theory prediction must then be compared to its
 corresponding upper limit.  This limit is simply the cross-section upper limit provided by
-the experimental publication or conference note and is extracted from the corresponding UL map (see <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type results</span></a>).</p>
-<p>For <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type results</span></a> there is a single cluster for each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>, and hence a single signal cross-section
+the experimental publication or conference note and is extracted from the corresponding UL map (see <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type results</span></a>).</p>
+<p>For <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a> there is a single cluster for each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>, and hence a single signal cross-section
 value. This value must be compared to the upper limit for the corresponding signal region.
-This upper limit is easily computed using the number of observed and expected events for the <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>
-and their uncertainties and is typically stored in the <a class="reference internal" href="DatabaseDefinitions.html#database"><span class="std std-ref">Database</span></a>.
-Since most <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type results</span></a> have several signal regions (<a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Sets</span></a>), there will be one theory prediction/upper limit
-for each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>. By default SModelS keeps only the best <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>, which is the one which maximizes
+This upper limit is easily computed using the number of observed and expected events for the <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>
+and their uncertainties and is typically stored in the <a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a>.
+Since most <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a> have several signal regions (<a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Sets</span></a>), there will be one theory prediction/upper limit
+for each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>. By default SModelS keeps only the best <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>, which is the one which maximizes
 the ratio <span class="math">\(\mbox{(expected signal)}/\mbox{(expected background)}\)</span>.
-Thus each <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type result</span></a> will have a single theory prediction/upper limit, corresponding  to the best <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>.
-If the user wants to have access to all the <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">data sets</span></a>, the default
+Thus each <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type result</span></a> will have a single theory prediction/upper limit, corresponding  to the best <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>.
+If the user wants to have access to all the <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>data sets</span></a>, the default
 behavior can be disabled using the variable <em>useBestDataset</em>.</p>
-<p>The procedure described above can be applied to all the <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Results</span></a> in the database, resulting
-in a list of theory predictions and upper limits for each <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Result</span></a>. A model can then be considered
+<p>The procedure described above can be applied to all the <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Results</span></a> in the database, resulting
+in a list of theory predictions and upper limits for each <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a>. A model can then be considered
 excluded by the experimental results if, for one or more predictions, we have <em>theory prediction</em> <span class="math">\(&gt;\)</span> <em>upper limit</em> <a class="footnote-reference" href="#id2" id="id1">[*]</a>.</p>
 <ul class="simple">
-<li><strong>The upper limits for a given</strong>  <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type result</span></a> <strong>or</strong> <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type result</span></a> <strong>can be obtained using the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.expResultObj.ExpResult.getUpperLimitFor">getUpperLimitFor  method</a></li>
+<li><strong>The upper limits for a given</strong>  <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type result</span></a> <strong>or</strong> <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type result</span></a> <strong>can be obtained using the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.expResultObj.ExpResult.getUpperLimitFor">getUpperLimitFor  method</a></li>
 </ul>
-<p>For <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type results</span></a> a <span class="math">\(\chi^2\)</span> can also be computed (in addition to the upper limits above).
+<p>For <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a> a <span class="math">\(\chi^2\)</span> can also be computed (in addition to the upper limits above).
 The <span class="math">\(\chi^2\)</span> is computed from the likelihood using:</p>
 <div class="math">
 \[\chi^2 = -2 \log(\frac{L(n_{\mathrm{signal}})}{L_{\mathrm{max}}})\]</div>
@@ -183,11 +186,11 @@ The likelihood is computed using a simple Poisson convoluted with a Gaussian as 
 the number of observed events (<span class="math">\(n_{\mathrm{obs}}\)</span>), the number of expected background events
 (<span class="math">\(n_{b}\)</span>) and its error (<span class="math">\(\delta_{b}\)</span>)
 and the number of signal events (<span class="math">\(n_{\mathrm{signal}}\)</span>) and its error (<span class="math">\(\delta_{s})\)</span>).
-While <span class="math">\(n_{\mathrm{obs}}\)</span>, <span class="math">\(n_{b}\)</span> and <span class="math">\(\delta_{b}\)</span> are directly extracted from the <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a>,
-<span class="math">\(n_{\mathrm{signal}}\)</span> is obtained from from the <a class="reference internal" href="TheoryPredictions.html#theorypredictions"><span class="std std-ref">Theory Predictions</span></a> calculation and
+While <span class="math">\(n_{\mathrm{obs}}\)</span>, <span class="math">\(n_{b}\)</span> and <span class="math">\(\delta_{b}\)</span> are directly extracted from the <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a>,
+<span class="math">\(n_{\mathrm{signal}}\)</span> is obtained from from the <a class="reference internal" href="TheoryPredictions.html#theorypredictions"><span>Theory Predictions</span></a> calculation and
 <span class="math">\(\delta_{s} = 20\%~\cdot n_{\mathrm{signal}}\)</span> by default.</p>
 <ul class="simple">
-<li><strong>The</strong> <span class="math">\(\chi^2\)</span> <strong>for a given</strong> <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type result</span></a> <strong>is computed using the</strong> <a class="reference external" href="../../../documentation/build/html/tools.html#tools.statistics.chi2">chi2  method</a></li>
+<li><strong>The</strong> <span class="math">\(\chi^2\)</span> <strong>for a given</strong> <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type result</span></a> <strong>is computed using the</strong> <a class="reference external" href="../../../documentation/build/html/tools.html#tools.statistics.chi2">chi2  method</a></li>
 </ul>
 <table class="docutils footnote" frame="void" id="id2" rules="none">
 <colgroup><col class="label" /><col /></colgroup>

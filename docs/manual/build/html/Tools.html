@@ -30,11 +30,9 @@
   
 
   
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="SModelS 1.0.93 documentation" href="index.html"/>
-        <link rel="next" title="Installation and Deployment" href="Installation.html"/>
+        <link rel="up" title="SModelS Documentation" href="SModelsDocs.html"/>
+        <link rel="next" title="More Examples" href="Examples.html"/>
         <link rel="prev" title="Database of Experimental Results" href="DatabaseStructure.html"/> 
 
   
@@ -85,23 +83,27 @@
             
             
                 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="SModelSDefs.html">Basic Concepts and Definitions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Structure.html">SModelS Structure</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">SModelS Tools</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#cross-section-calculator">Cross-Section Calculator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#input-file-checks">Input File Checks</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#lhe-file-checker">LHE File Checker</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#slha-file-checker">SLHA File Checker</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#database-browser">Database Browser</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#topology-coverage">Topology Coverage</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation and Deployment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RunningSModelS.html">Running SModelS</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="SModelsDocs.html">SModelS Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SModelSDefs.html">Basic Concepts and Definitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Structure.html">SModelS Structure</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">SModelS Tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cross-section-calculator">Cross-Section Calculator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#input-file-checks">Input File Checks</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#lhe-file-checker">LHE File Checker</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#slha-file-checker">SLHA File Checker</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#database-browser">Database Browser</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#topology-coverage">Topology Coverage</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">More Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CodeDocs.html">SModelS Code Documentation</a></li>
 </ul>
 
             
@@ -132,6 +134,8 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
+          <li><a href="SModelsDocs.html">SModelS Documentation</a> &raquo;</li>
+      
     <li>SModelS Tools</li>
       <li class="wy-breadcrumbs-aside">
         
@@ -150,16 +154,19 @@
 <h1>SModelS Tools<a class="headerlink" href="#smodels-tools" title="Permalink to this headline">¶</a></h1>
 <p>Inside SModelS there are a number of tools that may be convenient for the user:</p>
 <ul class="simple">
-<li>a <a class="reference internal" href="#xseccalc"><span class="std std-ref">cross section calculator</span></a> based on <a class="reference external" href="http://home.thep.lu.se/~torbjorn/Pythia.html">Pythia6</a>  and
+<li>a <a class="reference internal" href="#xseccalc"><span>cross section calculator</span></a> based on <a class="reference external" href="http://home.thep.lu.se/~torbjorn/Pythia.html">Pythia6</a>  and
 <a class="reference external" href="http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast">NLLfast</a>,</li>
-<li><a class="reference internal" href="#filechecks"><span class="std std-ref">SLHA and LHE file checkers</span></a> to check your input files for completeness and sanity,</li>
-<li>a <a class="reference internal" href="#databasebrowser"><span class="std std-ref">Database Browser</span></a> to provide easy access to the <a class="reference internal" href="DatabaseDefinitions.html#database"><span class="std std-ref">Database</span></a> of experimental results,</li>
-<li>a module for identifying <a class="reference internal" href="#topcoverage"><span class="std std-ref">missing topologies</span></a>.</li>
+<li><a class="reference internal" href="#filechecks"><span>SLHA and LHE file checkers</span></a> to check your input files for completeness and sanity,</li>
+<li>a <a class="reference internal" href="#databasebrowser"><span>Database Browser</span></a> to provide easy access to the <a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a> of experimental results,</li>
+<li>a module for identifying <a class="reference internal" href="#topcoverage"><span>missing topologies</span></a>.</li>
 </ul>
 <div class="section" id="cross-section-calculator">
 <span id="xseccalc"></span><h2>Cross-Section Calculator<a class="headerlink" href="#cross-section-calculator" title="Permalink to this headline">¶</a></h2>
 <p>This little tool computes LHC production cross-sections for <em>MSSM particles</em>
-and writes them out in <a class="reference internal" href="BasicInput.html#xsecblock"><span class="std std-ref">SLHA convention</span></a>. This can in particular be convenient for adding cross-sections to SLHA input files, see <a class="reference internal" href="BasicInput.html"><span class="doc">Basic Input</span></a>. The calculation is done at LO with <a class="reference external" href="http://home.thep.lu.se/~torbjorn/Pythia.html">Pythia6.4</a> ; K-factors for colored particles are computed with <a class="reference external" href="http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast">NLLfast</a> .</p>
+and writes them out in <a class="reference internal" href="BasicInput.html#xsecblock"><span>SLHA convention</span></a>. This can in particular be
+convenient for adding cross-sections to SLHA input files, see <a class="reference internal" href="BasicInput.html"><em>Basic Input</em></a>.
+The calculation is done at LO with <a class="reference external" href="http://home.thep.lu.se/~torbjorn/Pythia.html">Pythia6.4</a> ; K-factors
+for colored particles are computed with <a class="reference external" href="http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast">NLLfast</a> .</p>
 <p><strong>The usage of the cross-section calculator is:</strong></p>
 <p>smodelsTools.py xseccomputer [-h] -f FILENAME [-s SQRTS [SQRTS ...]] [-e NEVENTS] [-p] [-k] [-n] [-N] [-O]</p>
 <dl class="docutils">
@@ -174,14 +181,21 @@ and writes them out in <a class="reference internal" href="BasicInput.html#xsecb
 <tr><td class="option-group" colspan="2">
 <kbd><span class="option">-s <var>SQRTS</var></span>, <span class="option">--sqrts <var>SQRTS</var></span></kbd></td>
 </tr>
-<tr><td>&nbsp;</td><td>sqrt(s) TeV. Can supply more than one value.</td></tr>
+<tr><td>&nbsp;</td><td>sqrt(s) TeV. Can supply more than one value. Default is both 8 and 13.</td></tr>
 <tr><td class="option-group" colspan="2">
 <kbd><span class="option">-e <var>NEVENTS</var></span>, <span class="option">--nevents <var>NEVENTS</var></span></kbd></td>
 </tr>
 <tr><td>&nbsp;</td><td>number of events to be simulated.</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-c <var>NCPUS</var></span>, <span class="option">--ncpus <var>NCPUS</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>number of cores to be used simultaneously. -1 means  &#8216;all&#8217;.</td></tr>
 <tr><td class="option-group">
 <kbd><span class="option">-p</span>, <span class="option">--tofile</span></kbd></td>
 <td>write cross sections to file</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-q</span>, <span class="option">--query</span></kbd></td>
+<td>only query if there are cross sections in the file</td></tr>
 <tr><td class="option-group">
 <kbd><span class="option">-k</span>, <span class="option">--keep</span></kbd></td>
 <td>do not unlink temporary directory</td></tr>
@@ -190,28 +204,31 @@ and writes them out in <a class="reference internal" href="BasicInput.html#xsecb
 <td>compute at the NLO level (default is LO)</td></tr>
 <tr><td class="option-group">
 <kbd><span class="option">-N</span>, <span class="option">--NLL</span></kbd></td>
-<td>compute at the NLO+NLL level (takes precedence over NLO,
-default is LO)</td></tr>
+<td>compute at the NLO+NLL level (takes precedence over
+NLO, default is LO)</td></tr>
 <tr><td class="option-group" colspan="2">
 <kbd><span class="option">-O</span>, <span class="option">--LOfromSLHA</span></kbd></td>
 </tr>
 <tr><td>&nbsp;</td><td>use LO cross-sections from file to compute the NLO or
-NLO+NLL cross-sections</td></tr>
+NLL cross-sections</td></tr>
 <tr><td class="option-group" colspan="2">
 <kbd><span class="option">-f <var>FILENAME</var></span>, <span class="option">--filename <var>FILENAME</var></span></kbd></td>
 </tr>
-<tr><td>&nbsp;</td><td>SLHA file to compute cross sections for</td></tr>
+<tr><td>&nbsp;</td><td>SLHA file to compute cross sections for. If a
+directory is given, compute cross sections for all
+files in directory.</td></tr>
 </tbody>
 </table>
 </dd>
 </dl>
 <p>Some more explanations:</p>
 <ul class="simple">
-<li><em>-s</em> (int): an integer with the value (in TeV) of the LHC center-of-mass energy for computing the cross-sections</li>
+<li><em>-s</em> (int): an integer (or integers) with the value (in TeV) of the LHC center-of-mass energy for computing the cross-sections</li>
 <li><em>-e</em> (int): the number of Monte Carlo events when running Pythia</li>
 <li><em>-p</em>: if set, the cross-sections will be written back to the file. If in the input file already
 contains cross-sections, only the non-overlapping ones will be written. If not set, the cross-sections
 will be written to the screen.</li>
+<li><em>-q</em>: if set, will only check if the input file already contains cross-sections.</li>
 <li><em>-k</em>: if set, keep the temporary directory containing the Pythia run output. This option is only
 relevant when checking for errors when running Pythia.</li>
 <li><em>-n</em>: if set, use Pythia and NLLfast to compute NLO cross-sections. Note that since NLLfast only contains
@@ -225,20 +242,25 @@ and use NLLfast to compute the NLO or NLO+NLL cross-sections for squarks and glu
 <p>Further Pythia parameters are defined in <a class="reference download internal" href="_downloads/pythia.card" download=""><code class="xref download docutils literal"><span class="pre">etc/pythia.card</span></code></a>.</p>
 <p>A typical
 usage example is:</p>
-<div class="highlight-default"><div class="highlight"><pre><span class="n">smodelsTools</span><span class="o">.</span><span class="n">py</span> <span class="n">xseccomputer</span> <span class="o">-</span><span class="n">s</span> <span class="mi">8</span> <span class="o">-</span><span class="n">e</span> <span class="mi">10000</span> <span class="o">-</span><span class="n">p</span> <span class="o">-</span><span class="n">f</span> <span class="n">compressedSpec</span><span class="o">.</span><span class="n">slha</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>smodelsTools.py xseccomputer -s 8 13 -e 10000 -p -f compressedSpec.slha
 </pre></div>
 </div>
-<p>which will compute 8 TeV LO cross-sections (at the LHC) for all MSSM processes using 10k MC events.
+<p>which will compute 8 TeV and 13 TeV LO cross-sections (at the LHC) for all MSSM processes using 10k MC events.
 If, <em>after</em> the LO cross-sections have been computed, one wants to add the NLO+NLL cross-sections for gluinos and squarks:</p>
-<div class="highlight-default"><div class="highlight"><pre><span class="n">smodelsTools</span><span class="o">.</span><span class="n">py</span> <span class="n">xseccomputer</span> <span class="o">-</span><span class="n">s</span> <span class="mi">8</span> <span class="o">-</span><span class="n">p</span> <span class="o">-</span><span class="n">N</span> <span class="o">-</span><span class="n">O</span> <span class="o">-</span><span class="n">f</span> <span class="n">compressedSpec</span><span class="o">.</span><span class="n">slha</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>smodelsTools.py xseccomputer -s 8 13 -p -N -O -f compressedSpec.slha
 </pre></div>
 </div>
-<p>The resulting file will then contain LO cross-sections for all MSSM processes and NLO+NLL cross-sections for gluinos and squarks.
+<p>The resulting file will then contain LO cross-sections for all MSSM processes and NLO+NLL cross-sections for
+the available processes in <a class="reference external" href="http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast">NLLfast</a>
+(gluino and squark production).
 When reading the input file, SModelS will then use only the highest order cross-sections available for each process.</p>
+<ul class="simple">
+<li><strong>The cross-section calculation is implemented by the</strong> <a class="reference external" href="../../../documentation/build/html/tools.html#tools.xsecComputer.computeXSec">computeXSec function</a></li>
+</ul>
 </div>
 <div class="section" id="input-file-checks">
 <span id="filechecks"></span><h2>Input File Checks<a class="headerlink" href="#input-file-checks" title="Permalink to this headline">¶</a></h2>
-<p>As discussed in <a class="reference internal" href="BasicInput.html"><span class="doc">Basic Input</span></a>, SModelS accepts both SLHA and LHE input files. It can be convenient to perform certain sanity checks on these files as described below.</p>
+<p>As discussed in <a class="reference internal" href="BasicInput.html"><em>Basic Input</em></a>, SModelS accepts both SLHA and LHE input files. It can be convenient to perform certain sanity checks on these files as described below.</p>
 <ul class="simple">
 <li><strong>The input file checks are implemented by the</strong> <a class="reference external" href="../../../documentation/build/html/tools.html#tools.ioObjects.FileStatus">FileStatus class</a></li>
 </ul>
@@ -261,13 +283,16 @@ When reading the input file, SModelS will then use only the highest order cross-
 <tr><td class="option-group">
 <kbd><span class="option">-h</span>, <span class="option">--help</span></kbd></td>
 <td>show this help message and exit</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-f <var>FILENAME</var></span>, <span class="option">--filename <var>FILENAME</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>name of input LHE file</td></tr>
 </tbody>
 </table>
-<p>-f FILENAME, &#8211;filename FILENAME</p>
 </div></blockquote>
 <p>A typical
 usage example is:</p>
-<div class="highlight-default"><div class="highlight"><pre><span class="n">smodelsTools</span><span class="o">.</span><span class="n">py</span> <span class="n">lhechecker</span> <span class="o">-</span><span class="n">f</span> <span class="n">gluino_squarks</span><span class="o">.</span><span class="n">lhe</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>smodelsTools.py lhechecker -f gluino_squarks.lhe
 </pre></div>
 </div>
 </div>
@@ -276,9 +301,9 @@ usage example is:</p>
 <p>The SLHA file checker allows to perform quite rigorous checks of SLHA input files. Concretely, it verifies that</p>
 <ul class="simple">
 <li>the file exists and is given in SLHA format,</li>
-<li>the file contains masses and decay branching ratios in standard SLHA format</li>
-<li>the file contains cross-sections according to the <a class="reference internal" href="BasicInput.html#xsecslha"><span class="std std-ref">SLHA format for cross-sections</span></a>,</li>
-<li>the lightest <a class="reference internal" href="TheoryDefinitions.html#odd-states"><span class="std std-ref">Z2-odd state</span></a> (the LSP in supersymmetric models) is neutral,</li>
+<li>the file contains masses and decay branching ratios in standard SLHA format,</li>
+<li>the file contains cross-sections according to the <a class="reference internal" href="BasicInput.html#xsecslha"><span>SLHA format for cross-sections</span></a>,</li>
+<li>the lightest <a class="reference internal" href="TheoryDefinitions.html#odd-states"><span>Z2-odd state</span></a> (the LSP in supersymmetric models) is neutral,</li>
 <li>there are no stable charged particles nor displaced vertices (no non-prompt visible decays), as currently all the analyses considered by SModelS require a prompt MET signature.</li>
 </ul>
 <p>In addition, one can ask that</p>
@@ -293,7 +318,7 @@ In order to check that the lightest Z<sub>2</sub>-odd state has zero electric an
 <p>The list of quantum numbers is also required to check for displaced vertices or heavy charged particles.
 The check for long-lived (or stable) particles first verifies if these
 appear in one of the cross-section blocks and their cross-section
-exceeds the minimum cross-section value defined by <a class="reference internal" href="RunningSModelS.html#parameterfile"><span class="std std-ref">sigmacut</span></a> (see  <a class="reference internal" href="Decomposition.html#minweight"><span class="std std-ref">Minimum Decomposition Weight</span></a>).
+exceeds the minimum cross-section value defined by <a class="reference internal" href="RunningSModelS.html#parameterfile"><span>sigmacut</span></a> (see  <a class="reference internal" href="Decomposition.html#minweight"><span>Minimum Decomposition Weight</span></a>).
 If the cross-section is larger than sigmacut and the particle is stable,
 the checker verifies if it is neutral (both electric and color charges
 are zero). On the other hand, if the particle is unstable, but its lifetime (times <em>c</em>)
@@ -301,7 +326,7 @@ is larger than a minimum value (<em>default = 10 mm</em>), the particle is consi
 as a non-prompt decay.
 For non-prompt decays, all channels are then checked for visible decay products.
 If the branching ratio to visible decays times the maximum production cross-section
-for the particle exceeds <a class="reference internal" href="RunningSModelS.html#parameterfile"><span class="std std-ref">sigmacut</span></a>, the particle&#8217;s decay
+for the particle exceeds <a class="reference internal" href="RunningSModelS.html#parameterfile"><span>sigmacut</span></a>, the particle&#8217;s decay
 is considered as a displaced vertex.</p>
 <p><strong>The usage of the SLHA checker is:</strong></p>
 <p>smodelsTools.py slhachecker [-h] [-xS] [-lsp] [-longlived] [-m DISPLACEMENT] [-s SIGMACUT] [-illegal] -f FILENAME</p>
@@ -362,7 +387,7 @@ visible displaced vertices</td></tr>
 </ul>
 <p>A typical
 usage example is:</p>
-<div class="highlight-default"><div class="highlight"><pre><span class="n">smodelsTools</span><span class="o">.</span><span class="n">py</span> <span class="n">slhachecker</span> <span class="o">-</span><span class="n">m</span> <span class="mf">0.001</span> <span class="o">-</span><span class="n">s</span> <span class="mf">0.01</span> <span class="o">-</span><span class="n">f</span> <span class="n">lightSquarks</span><span class="o">.</span><span class="n">slha</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>smodelsTools.py slhachecker -m 0.001 -s 0.01 -f lightSquarks.slha
 </pre></div>
 </div>
 <p>Running this will print the status flag and a message with potential warnings
@@ -371,34 +396,136 @@ and error messages.</p>
 </div>
 <div class="section" id="database-browser">
 <span id="databasebrowser"></span><h2>Database Browser<a class="headerlink" href="#database-browser" title="Permalink to this headline">¶</a></h2>
-<p>In several cases the user might be interested in an easy way to directly access the <a class="reference internal" href="DatabaseDefinitions.html#database"><span class="std std-ref">Database</span></a> of <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Results</span></a>.
-This can be conveniently done using the database browser. The browser owns several methods to select  <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Results</span></a>
-or <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Sets</span></a> satisfying some user-defined conditions as well as to access the meta data and data inside each
-<a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Result</span></a>.</p>
-<p>Unlike most of the other SModelS tools, the browser can not be directly accessed from the command line.
-However, several python example codes using the functionalities of the browser
-can be found in <a class="reference internal" href="Examples.html#examples"><span class="std std-ref">More Examples</span></a>.
-Below we will quickly describe how to instantiate the browser and use its main functionalities.</p>
+<p>In several cases the user might be interested in an easy way to directly access the <a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a> of <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Results</span></a>.
+This can be conveniently done using the database browser. The browser owns several methods to select  <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Results</span></a>
+or <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Sets</span></a> satisfying some user-defined conditions as well as to access the meta data and data inside each
+<a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a>.</p>
+<p>An interface to the <a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a> browser is provided through an ipython session.</p>
+<p><strong>The usage of the browser interface is:</strong></p>
+<p>smodelsTools.py database-browser [-h] -p PATH_TO_DATABASE [-t]</p>
+<dl class="docutils">
+<dt><em>arguments</em>:</dt>
+<dd><table class="first last docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-h</span>, <span class="option">--help</span></kbd></td>
+<td>show this help message and exit</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-p <var>PATH_TO_DATABASE</var></span>, <span class="option">--path_to_database <var>PATH_TO_DATABASE</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>path to SModelS database</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-t</span>, <span class="option">--text</span></kbd></td>
+<td>load text database, dont even search for binary
+database file</td></tr>
+</tbody>
+</table>
+</dd>
+</dl>
+<p>In some more detail:</p>
+<ul class="simple">
+<li><em>-p</em>: path to the database folder</li>
+<li><em>-t</em>: if set, force the text database to be loaded (ignores the <a class="reference internal" href="DatabaseStructure.html#databasepickle"><span>pickle file</span></a>)</li>
+</ul>
+<p>A typical usage example is:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>smodelsTools.py database-browser -p ./smodels-database
+</pre></div>
+</div>
+<p>Loading the database may take a few seconds if the <a class="reference internal" href="DatabaseStructure.html#databasepickle"><span>binary database file</span></a> exists.
+Otherwise the <a class="reference internal" href="DatabaseStructure.html#databasepickle"><span>pickle file</span></a> will be created.
+The user can then use the ipython session (including its auto-complete functions)
+to select specific experimental results (or groups of experimental results),
+check upper limits and/or efficiencies for specific masses/topologies and access all the available
+information in the database.
+A simple example is given below:</p>
+<div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="k">print</span> <span class="n">browser</span>  <span class="c1">#Print all experimental results in the browser</span>
+<span class="p">[</span><span class="s1">&#39;ATLAS-SUSY-2015-09&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-PAS-15-002&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2012-105&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2012-166&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-001&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-007&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-024&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-024&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-025&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-028&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-035&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-035&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-036&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-037&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-037&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-047&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-047&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-048&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-048&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-049&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-049&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-053&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-053&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-054&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-061&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-061&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-062&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-062&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-065&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-089&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-093&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-093&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-02&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-02&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-04&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-04&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-05&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-05&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-08&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-09&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-09&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-11&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-11&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-12&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-14&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-15&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-15&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-16&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-16&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-18&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-18&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-19&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-21&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-23&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2014-03&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-PAS-SUS-12-022&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-PAS-SUS-12-026&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-PAS-SUS-13-015&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-PAS-SUS-13-015&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-PAS-SUS-13-016&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-PAS-SUS-13-016&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-PAS-SUS-13-018&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-PAS-SUS-13-023&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-PAS-SUS-14-011&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-12-024&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-12-024&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-12-028&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-13-002&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-13-004&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-13-006&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-13-006&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-13-007&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-13-007&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-13-011&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-13-011&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-13-012&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-13-013&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-13-013&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-13-019&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-14-010&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-14-021&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-14-021&#39;</span><span class="p">]</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">browser</span><span class="o">.</span><span class="n">selectExpResultsWith</span><span class="p">(</span><span class="n">txName</span> <span class="o">=</span> <span class="s1">&#39;T1tttt&#39;</span><span class="p">,</span> <span class="n">dataType</span> <span class="o">=</span> <span class="s1">&#39;upperLimit&#39;</span><span class="p">)</span> <span class="c1">#Select only the UL results with the topology T1tttt</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="k">print</span> <span class="n">browser</span> <span class="c1">#Print all experimental results in the browser (after selection)</span>
+<span class="p">[</span><span class="s1">&#39;ATLAS-SUSY-2015-09&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-PAS-15-002&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2012-105&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-007&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-CONF-2013-061&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-04&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-09&#39;</span><span class="p">,</span> <span class="s1">&#39;ATLAS-SUSY-2013-18&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-PAS-SUS-12-026&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-PAS-SUS-13-016&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-PAS-SUS-14-011&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-12-024&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-12-028&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-13-002&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-13-004&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-13-007&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-13-012&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-13-013&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-13-019&#39;</span><span class="p">,</span> <span class="s1">&#39;CMS-SUS-14-010&#39;</span><span class="p">]</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="n">gluinoMass</span><span class="p">,</span> <span class="n">LSPmass</span> <span class="o">=</span> <span class="mf">800.</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">100.</span><span class="o">*</span><span class="n">GeV</span>  <span class="c1">#Define masses for the T1tttt topology</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="n">browser</span><span class="o">.</span><span class="n">getULFor</span><span class="p">(</span><span class="s1">&#39;CMS-SUS-PAS-15-002&#39;</span><span class="p">,</span><span class="s1">&#39;T1tttt&#39;</span><span class="p">,[[</span><span class="n">gluinoMass</span><span class="p">,</span><span class="n">LSPmass</span><span class="p">],[</span><span class="n">gluinoMass</span><span class="p">,</span><span class="n">LSPmass</span><span class="p">]])</span> <span class="c1">#Get UL for a specific experimental result</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="mf">5.03E-02</span> <span class="p">[</span><span class="n">pb</span><span class="p">]</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">6</span><span class="p">]:</span> <span class="k">for</span> <span class="n">expResult</span> <span class="ow">in</span> <span class="n">browser</span><span class="p">:</span>  <span class="c1">#Get the upper limits for all the selected results for the given topology and mass</span>
+   <span class="o">...</span><span class="p">:</span>     <span class="k">print</span> <span class="n">expResult</span><span class="o">.</span><span class="n">getValuesFor</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">),</span><span class="s1">&#39;UL = &#39;</span><span class="p">,</span><span class="n">expResult</span><span class="o">.</span><span class="n">getUpperLimitFor</span><span class="p">(</span><span class="n">txname</span><span class="o">=</span><span class="s1">&#39;T1tttt&#39;</span><span class="p">,</span><span class="n">mass</span><span class="o">=</span><span class="p">[[</span><span class="n">gluinoMass</span><span class="p">,</span><span class="n">LSPmass</span><span class="p">],[</span><span class="n">gluinoMass</span><span class="p">,</span><span class="n">LSPmass</span><span class="p">]])</span>
+   <span class="o">...</span><span class="p">:</span>
+<span class="p">[</span><span class="s1">&#39;ATLAS-SUSY-2015-09&#39;</span><span class="p">]</span> <span class="n">UL</span> <span class="o">=</span>  <span class="bp">None</span>
+<span class="p">[</span><span class="s1">&#39;CMS-SUS-PAS-15-002&#39;</span><span class="p">]</span> <span class="n">UL</span> <span class="o">=</span>  <span class="mf">5.03E-02</span> <span class="p">[</span><span class="n">pb</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;ATLAS-CONF-2012-105&#39;</span><span class="p">]</span> <span class="n">UL</span> <span class="o">=</span>  <span class="mf">6.70E-02</span> <span class="p">[</span><span class="n">pb</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;ATLAS-CONF-2013-007&#39;</span><span class="p">]</span> <span class="n">UL</span> <span class="o">=</span>  <span class="mf">2.40E-02</span> <span class="p">[</span><span class="n">pb</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;ATLAS-CONF-2013-061&#39;</span><span class="p">]</span> <span class="n">UL</span> <span class="o">=</span>  <span class="mf">1.25E-02</span> <span class="p">[</span><span class="n">pb</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;ATLAS-SUSY-2013-04&#39;</span><span class="p">]</span> <span class="n">UL</span> <span class="o">=</span>  <span class="mf">1.40E-02</span> <span class="p">[</span><span class="n">pb</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;ATLAS-SUSY-2013-09&#39;</span><span class="p">]</span> <span class="n">UL</span> <span class="o">=</span>  <span class="mf">1.73E-02</span> <span class="p">[</span><span class="n">pb</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;ATLAS-SUSY-2013-18&#39;</span><span class="p">]</span> <span class="n">UL</span> <span class="o">=</span>  <span class="mf">4.30E-03</span> <span class="p">[</span><span class="n">pb</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-PAS-SUS-12-026&#39;</span><span class="p">]</span> <span class="n">UL</span> <span class="o">=</span>  <span class="mf">4.60E-02</span> <span class="p">[</span><span class="n">pb</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-PAS-SUS-13-016&#39;</span><span class="p">]</span> <span class="n">UL</span> <span class="o">=</span>  <span class="mf">3.55E-02</span> <span class="p">[</span><span class="n">pb</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-PAS-SUS-14-011&#39;</span><span class="p">]</span> <span class="n">UL</span> <span class="o">=</span>  <span class="mf">2.47E-02</span> <span class="p">[</span><span class="n">pb</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-SUS-12-024&#39;</span><span class="p">]</span> <span class="n">UL</span> <span class="o">=</span>  <span class="mf">3.62E-02</span> <span class="p">[</span><span class="n">pb</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-SUS-12-028&#39;</span><span class="p">]</span> <span class="n">UL</span> <span class="o">=</span>  <span class="mf">5.31E-02</span> <span class="p">[</span><span class="n">pb</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-SUS-13-002&#39;</span><span class="p">]</span> <span class="n">UL</span> <span class="o">=</span>  <span class="mf">3.48E-02</span> <span class="p">[</span><span class="n">pb</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-SUS-13-004&#39;</span><span class="p">]</span> <span class="n">UL</span> <span class="o">=</span>  <span class="mf">2.47E-02</span> <span class="p">[</span><span class="n">pb</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-SUS-13-007&#39;</span><span class="p">]</span> <span class="n">UL</span> <span class="o">=</span>  <span class="mf">6.00E-03</span> <span class="p">[</span><span class="n">pb</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-SUS-13-012&#39;</span><span class="p">]</span> <span class="n">UL</span> <span class="o">=</span>  <span class="mf">2.14E-02</span> <span class="p">[</span><span class="n">pb</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-SUS-13-013&#39;</span><span class="p">]</span> <span class="n">UL</span> <span class="o">=</span>  <span class="mf">1.90E-02</span> <span class="p">[</span><span class="n">pb</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-SUS-13-019&#39;</span><span class="p">]</span> <span class="n">UL</span> <span class="o">=</span>  <span class="mf">1.35E-02</span> <span class="p">[</span><span class="n">pb</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-SUS-14-010&#39;</span><span class="p">]</span> <span class="n">UL</span> <span class="o">=</span>  <span class="mf">4.82E-03</span> <span class="p">[</span><span class="n">pb</span><span class="p">]</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">7</span><span class="p">]:</span> <span class="k">for</span> <span class="n">expResult</span> <span class="ow">in</span> <span class="n">browser</span><span class="p">:</span>  <span class="c1">#Print the luminosities for the selected experimental results</span>
+   <span class="o">...</span><span class="p">:</span>     <span class="k">print</span> <span class="n">expResult</span><span class="o">.</span><span class="n">getValuesFor</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">),</span><span class="n">expResult</span><span class="o">.</span><span class="n">getValuesFor</span><span class="p">(</span><span class="s1">&#39;lumi&#39;</span><span class="p">)</span>
+   <span class="o">...</span><span class="p">:</span>
+<span class="p">[</span><span class="s1">&#39;ATLAS-SUSY-2015-09&#39;</span><span class="p">]</span> <span class="p">[</span><span class="mf">3.20E+00</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fb</span><span class="p">]]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-SUS-PAS-15-002&#39;</span><span class="p">]</span> <span class="p">[</span><span class="mf">2.20E+00</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fb</span><span class="p">]]</span>
+<span class="p">[</span><span class="s1">&#39;ATLAS-CONF-2012-105&#39;</span><span class="p">]</span> <span class="p">[</span><span class="mf">5.80E+00</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fb</span><span class="p">]]</span>
+<span class="p">[</span><span class="s1">&#39;ATLAS-CONF-2013-007&#39;</span><span class="p">]</span> <span class="p">[</span><span class="mf">2.07E+01</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fb</span><span class="p">]]</span>
+<span class="p">[</span><span class="s1">&#39;ATLAS-CONF-2013-061&#39;</span><span class="p">]</span> <span class="p">[</span><span class="mf">2.01E+01</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fb</span><span class="p">]]</span>
+<span class="p">[</span><span class="s1">&#39;ATLAS-SUSY-2013-04&#39;</span><span class="p">]</span> <span class="p">[</span><span class="mf">2.03E+01</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fb</span><span class="p">]]</span>
+<span class="p">[</span><span class="s1">&#39;ATLAS-SUSY-2013-09&#39;</span><span class="p">]</span> <span class="p">[</span><span class="mf">2.03E+01</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fb</span><span class="p">]]</span>
+<span class="p">[</span><span class="s1">&#39;ATLAS-SUSY-2013-18&#39;</span><span class="p">]</span> <span class="p">[</span><span class="mf">2.01E+01</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fb</span><span class="p">]]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-PAS-SUS-12-026&#39;</span><span class="p">]</span> <span class="p">[</span><span class="mf">9.20E+00</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fb</span><span class="p">]]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-PAS-SUS-13-016&#39;</span><span class="p">]</span> <span class="p">[</span><span class="mf">1.97E+01</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fb</span><span class="p">]]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-PAS-SUS-14-011&#39;</span><span class="p">]</span> <span class="p">[</span><span class="mf">1.93E+01</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fb</span><span class="p">]]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-SUS-12-024&#39;</span><span class="p">]</span> <span class="p">[</span><span class="mf">1.94E+01</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fb</span><span class="p">]]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-SUS-12-028&#39;</span><span class="p">]</span> <span class="p">[</span><span class="mf">1.17E+01</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fb</span><span class="p">]]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-SUS-13-002&#39;</span><span class="p">]</span> <span class="p">[</span><span class="mf">1.95E+01</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fb</span><span class="p">]]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-SUS-13-004&#39;</span><span class="p">]</span> <span class="p">[</span><span class="mf">1.93E+01</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fb</span><span class="p">]]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-SUS-13-007&#39;</span><span class="p">]</span> <span class="p">[</span><span class="mf">1.93E+01</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fb</span><span class="p">]]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-SUS-13-012&#39;</span><span class="p">]</span> <span class="p">[</span><span class="mf">1.95E+01</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fb</span><span class="p">]]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-SUS-13-013&#39;</span><span class="p">]</span> <span class="p">[</span><span class="mf">1.95E+01</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fb</span><span class="p">]]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-SUS-13-019&#39;</span><span class="p">]</span> <span class="p">[</span><span class="mf">1.95E+01</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fb</span><span class="p">]]</span>
+<span class="p">[</span><span class="s1">&#39;CMS-SUS-14-010&#39;</span><span class="p">]</span> <span class="p">[</span><span class="mf">1.95E+01</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">fb</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>Further python example codes using the functionalities of the browser
+can be found in <a class="reference internal" href="Examples.html#examples"><span>More Examples</span></a>.</p>
 <ul class="simple">
 <li><strong>The Database browser tool is implemented by the</strong>  <a class="reference external" href="../../../documentation/build/html/tools.html#tools.databaseBrowser.Browser">Browser class</a></li>
 </ul>
 </div>
 <div class="section" id="topology-coverage">
 <span id="topcoverage"></span><h2>Topology Coverage<a class="headerlink" href="#topology-coverage" title="Permalink to this headline">¶</a></h2>
-<p>Unlike the <a class="reference internal" href="#filechecks"><span class="std std-ref">file checks</span></a> and the <a class="reference internal" href="#xseccalc"><span class="std std-ref">cross-section calculator</span></a>, the missing topologies tool can be called only <em>after</em> the SMS <a class="reference internal" href="Decomposition.html"><span class="doc">decomposition</span></a> and <a class="reference internal" href="TheoryPredictions.html"><span class="doc">theory predictions</span></a> have been computed.
-Given the <a class="reference internal" href="Decomposition.html"><span class="doc">decomposition</span></a> output (list of <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a>), as well as the <span class="xref doc">database</span>
-information, it finds the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> which are
-not tested by any of the <span class="xref std std-ref">analyses</span> in the <span class="xref doc">database</span>.</p>
-<p>To this end, the tool loops over all the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> found in the
-<a class="reference internal" href="Decomposition.html"><span class="doc">decomposition</span></a> and checks if they are tested by one or more <span class="xref std std-ref">analyses</span> in the <span class="xref doc">database</span>.
-If <a class="reference internal" href="Decomposition.html#masscomp"><span class="std std-ref">mass</span></a> or <a class="reference internal" href="Decomposition.html#invcomp"><span class="std std-ref">invisible compression</span></a>
-are turned on, elements which can be <a class="reference internal" href="Decomposition.html#elementcomp"><span class="std std-ref">compressed</span></a> are not considered, to avoid double counting.
-All the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> not appearing in any of the <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span class="std std-ref">constraints</span></a> in the <span class="xref doc">database</span> are then marked
+<p>Unlike the <a class="reference internal" href="#databasebrowser"><span>database browser</span></a>, the <a class="reference internal" href="#filechecks"><span>file checks</span></a> and the <a class="reference internal" href="#xseccalc"><span>cross-section calculator</span></a>,
+the missing topologies tool can not be independently accessed.
+It requires the output from the SMS <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> and <a class="reference internal" href="TheoryPredictions.html"><em>theory predictions</em></a>.
+Given the <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> output (list of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>), as well as the <code class="xref doc docutils literal"><span class="pre">database</span></code>
+information, it finds the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> which are
+not tested by any of the <span class="xref std std-ref">analyses</span> in the <code class="xref doc docutils literal"><span class="pre">database</span></code>.</p>
+<p>To this end, the tool loops over all the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> found in the
+<a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> and checks if they are tested by one or more <span class="xref std std-ref">analyses</span> in the <code class="xref doc docutils literal"><span class="pre">database</span></code>.
+If <a class="reference internal" href="Decomposition.html#masscomp"><span>mass</span></a> or <a class="reference internal" href="Decomposition.html#invcomp"><span>invisible compression</span></a>
+are turned on, elements which can be <a class="reference internal" href="Decomposition.html#elementcomp"><span>compressed</span></a> are not considered, to avoid double counting.
+All the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> not appearing in any of the <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>constraints</span></a> in the <code class="xref doc docutils literal"><span class="pre">database</span></code> are then marked
 as &#8220;missing&#8221;. A missing topology is then characterized
-by a sum over the missing <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> differing only by their
-masses (with the same <a class="reference internal" href="TheoryDefinitions.html#final-states"><span class="std std-ref">final states</span></a>) or electric charges.</p>
-<p>The missing topologies tool is normally called from within SModelS (e.g. when running <a class="reference internal" href="RunningSModelS.html#runsmodels"><span class="std std-ref">runSModelS.py</span></a>) by setting <strong>findMissingTopos=True</strong>
-in the <a class="reference internal" href="RunningSModelS.html#parameterfile"><span class="std std-ref">parameters file</span></a> .
+by a sum over the missing <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> differing only by their
+masses (with the same <a class="reference internal" href="TheoryDefinitions.html#final-states"><span>final states</span></a>) or electric charges.</p>
+<p>The missing topologies tool is normally called from within SModelS (e.g. when running <a class="reference internal" href="RunningSModelS.html#runsmodels"><span>runSModelS.py</span></a>) by setting <strong>findMissingTopos=True</strong>
+in the <a class="reference internal" href="RunningSModelS.html#parameterfile"><span>parameters file</span></a> .
 In the output, the missing topologies are ordered by cross section. By default only the ones with the ten largest cross-sections are shown.</p>
 <ul class="simple">
 <li><strong>The missing topologies tool is implemented by the</strong> <a class="reference external" href="../../../documentation/build/html/tools.html#tools.missingTopologies.MissingTopoList">MissingTopoList class</a></li>
@@ -413,7 +540,7 @@ In the output, the missing topologies are ordered by cross section. By default o
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="Installation.html" class="btn btn-neutral float-right" title="Installation and Deployment" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="Examples.html" class="btn btn-neutral float-right" title="More Examples" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="DatabaseStructure.html" class="btn btn-neutral" title="Database of Experimental Results" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>

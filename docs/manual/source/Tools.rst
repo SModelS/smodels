@@ -38,7 +38,10 @@ Cross-Section Calculator
 ------------------------
 
 This little tool computes LHC production cross-sections for *MSSM particles*
-and writes them out in :ref:`SLHA convention <xsecblock>`. This can in particular be convenient for adding cross-sections to SLHA input files, see :doc:`Basic Input <BasicInput>`. The calculation is done at LO with `Pythia6.4 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_ ; K-factors for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_ .
+and writes them out in :ref:`SLHA convention <xsecblock>`. This can in particular be 
+convenient for adding cross-sections to SLHA input files, see :doc:`Basic Input <BasicInput>`. 
+The calculation is done at LO with `Pythia6.4 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_ ; K-factors 
+for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_ .
 
 
 **The usage of the cross-section calculator is:**
@@ -48,26 +51,32 @@ smodelsTools.py xseccomputer [-h] -f FILENAME [-s SQRTS [SQRTS ...]] [-e NEVENTS
 *arguments*:
   -h, --help            show this help message and exit
   -s SQRTS, --sqrts SQRTS
-                        sqrt(s) TeV. Can supply more than one value.
+                        sqrt(s) TeV. Can supply more than one value. Default is both 8 and 13.
   -e NEVENTS, --nevents NEVENTS
                         number of events to be simulated.
+  -c NCPUS, --ncpus NCPUS
+                        number of cores to be used simultaneously. -1 means  'all'.
   -p, --tofile          write cross sections to file
+  -q, --query           only query if there are cross sections in the file
   -k, --keep            do not unlink temporary directory
   -n, --NLO             compute at the NLO level (default is LO)
-  -N, --NLL             compute at the NLO+NLL level (takes precedence over NLO,
-                        default is LO)
+  -N, --NLL             compute at the NLO+NLL level (takes precedence over
+                        NLO, default is LO)
   -O, --LOfromSLHA      use LO cross-sections from file to compute the NLO or
-                        NLO+NLL cross-sections
+                        NLL cross-sections
   -f FILENAME, --filename FILENAME
-                        SLHA file to compute cross sections for
+                        SLHA file to compute cross sections for. If a
+                        directory is given, compute cross sections for all
+                        files in directory.
 
 Some more explanations:
 
-* *-s* (int): an integer with the value (in TeV) of the LHC center-of-mass energy for computing the cross-sections
+* *-s* (int): an integer (or integers) with the value (in TeV) of the LHC center-of-mass energy for computing the cross-sections
 * *-e* (int): the number of Monte Carlo events when running Pythia
 * *-p*: if set, the cross-sections will be written back to the file. If in the input file already
   contains cross-sections, only the non-overlapping ones will be written. If not set, the cross-sections
   will be written to the screen.
+* *-q*: if set, will only check if the input file already contains cross-sections.  
 * *-k*: if set, keep the temporary directory containing the Pythia run output. This option is only
   relevant when checking for errors when running Pythia.
 * *-n*: if set, use Pythia and NLLfast to compute NLO cross-sections. Note that since NLLfast only contains
@@ -83,15 +92,19 @@ Further Pythia parameters are defined in :download:`etc/pythia.card </images/pyt
 A typical
 usage example is: ::
 
-   smodelsTools.py xseccomputer -s 8 -e 10000 -p -f compressedSpec.slha
+   smodelsTools.py xseccomputer -s 8 13 -e 10000 -p -f compressedSpec.slha
 
-which will compute 8 TeV LO cross-sections (at the LHC) for all MSSM processes using 10k MC events.
+which will compute 8 TeV and 13 TeV LO cross-sections (at the LHC) for all MSSM processes using 10k MC events.
 If, *after* the LO cross-sections have been computed, one wants to add the NLO+NLL cross-sections for gluinos and squarks: ::
 
-   smodelsTools.py xseccomputer -s 8 -p -N -O -f compressedSpec.slha
+   smodelsTools.py xseccomputer -s 8 13 -p -N -O -f compressedSpec.slha
 
-The resulting file will then contain LO cross-sections for all MSSM processes and NLO+NLL cross-sections for gluinos and squarks.
+The resulting file will then contain LO cross-sections for all MSSM processes and NLO+NLL cross-sections for 
+the available processes in `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_  
+(gluino and squark production).
 When reading the input file, SModelS will then use only the highest order cross-sections available for each process.
+
+* **The cross-section calculation is implemented by the** `computeXSec function <../../../documentation/build/html/tools.html#tools.xsecComputer.computeXSec>`_
 
 
 .. _fileChecks:
@@ -123,9 +136,8 @@ smodelsTools.py lhechecker [-h] -f FILENAME
 
 *arguments*:
 
-  -h, --help            show this help message and exit
-  
-  -f FILENAME, --filename FILENAME
+  -h, --help                        show this help message and exit  
+  -f FILENAME, --filename FILENAME  name of input LHE file
   
 
 A typical
@@ -142,7 +154,7 @@ The SLHA file checker allows to perform quite rigorous checks of SLHA input file
 
 * the file exists and is given in SLHA format,
 
-* the file contains masses and decay branching ratios in standard SLHA format
+* the file contains masses and decay branching ratios in standard SLHA format,
 
 * the file contains cross-sections according to the :ref:`SLHA format for cross-sections <xsecSLHA>`,
 
@@ -226,12 +238,105 @@ Database Browser
 In several cases the user might be interested in an easy way to directly access the |Database| of |ExpRess|.
 This can be conveniently done using the database browser. The browser owns several methods to select  |ExpRess|
 or |Datasets| satisfying some user-defined conditions as well as to access the meta data and data inside each
-|ExpRes|. 
+|ExpRes|.
 
-Unlike most of the other SModelS tools, the browser can not be directly accessed from the command line.
-However, several python example codes using the functionalities of the browser
+An interface to the |Database| browser is provided through an ipython session.
+
+**The usage of the browser interface is:**
+
+smodelsTools.py database-browser [-h] -p PATH_TO_DATABASE [-t]
+
+*arguments*:
+  -h, --help            show this help message and exit
+  -p PATH_TO_DATABASE, --path_to_database PATH_TO_DATABASE
+                        path to SModelS database
+  -t, --text            load text database, dont even search for binary
+                        database file
+
+In some more detail:
+
+* *-p*: path to the database folder 
+* *-t*: if set, force the text database to be loaded (ignores the :ref:`pickle file <databasePickle>`)
+
+A typical usage example is: ::
+
+    smodelsTools.py database-browser -p ./smodels-database
+
+Loading the database may take a few seconds if the :ref:`binary database file <databasePickle>` exists.
+Otherwise the :ref:`pickle file <databasePickle>` will be created.
+The user can then use the ipython session (including its auto-complete functions)
+to select specific experimental results (or groups of experimental results),
+check upper limits and/or efficiencies for specific masses/topologies and access all the available
+information in the database.
+A simple example is given below:
+
+.. code-block:: ipython
+
+   In [1]: print browser  #Print all experimental results in the browser
+   ['ATLAS-SUSY-2015-09', 'CMS-SUS-PAS-15-002', 'ATLAS-CONF-2012-105', 'ATLAS-CONF-2012-166', 'ATLAS-CONF-2013-001', 'ATLAS-CONF-2013-007', 'ATLAS-CONF-2013-024', 'ATLAS-CONF-2013-024', 'ATLAS-CONF-2013-025', 'ATLAS-CONF-2013-028', 'ATLAS-CONF-2013-035', 'ATLAS-CONF-2013-035', 'ATLAS-CONF-2013-036', 'ATLAS-CONF-2013-037', 'ATLAS-CONF-2013-037', 'ATLAS-CONF-2013-047', 'ATLAS-CONF-2013-047', 'ATLAS-CONF-2013-048', 'ATLAS-CONF-2013-048', 'ATLAS-CONF-2013-049', 'ATLAS-CONF-2013-049', 'ATLAS-CONF-2013-053', 'ATLAS-CONF-2013-053', 'ATLAS-CONF-2013-054', 'ATLAS-CONF-2013-061', 'ATLAS-CONF-2013-061', 'ATLAS-CONF-2013-062', 'ATLAS-CONF-2013-062', 'ATLAS-CONF-2013-065', 'ATLAS-CONF-2013-089', 'ATLAS-CONF-2013-093', 'ATLAS-CONF-2013-093', 'ATLAS-SUSY-2013-02', 'ATLAS-SUSY-2013-02', 'ATLAS-SUSY-2013-04', 'ATLAS-SUSY-2013-04', 'ATLAS-SUSY-2013-05', 'ATLAS-SUSY-2013-05', 'ATLAS-SUSY-2013-08', 'ATLAS-SUSY-2013-09', 'ATLAS-SUSY-2013-09', 'ATLAS-SUSY-2013-11', 'ATLAS-SUSY-2013-11', 'ATLAS-SUSY-2013-12', 'ATLAS-SUSY-2013-14', 'ATLAS-SUSY-2013-15', 'ATLAS-SUSY-2013-15', 'ATLAS-SUSY-2013-16', 'ATLAS-SUSY-2013-16', 'ATLAS-SUSY-2013-18', 'ATLAS-SUSY-2013-18', 'ATLAS-SUSY-2013-19', 'ATLAS-SUSY-2013-21', 'ATLAS-SUSY-2013-23', 'ATLAS-SUSY-2014-03', 'CMS-PAS-SUS-12-022', 'CMS-PAS-SUS-12-026', 'CMS-PAS-SUS-13-015', 'CMS-PAS-SUS-13-015', 'CMS-PAS-SUS-13-016', 'CMS-PAS-SUS-13-016', 'CMS-PAS-SUS-13-018', 'CMS-PAS-SUS-13-023', 'CMS-PAS-SUS-14-011', 'CMS-SUS-12-024', 'CMS-SUS-12-024', 'CMS-SUS-12-028', 'CMS-SUS-13-002', 'CMS-SUS-13-004', 'CMS-SUS-13-006', 'CMS-SUS-13-006', 'CMS-SUS-13-007', 'CMS-SUS-13-007', 'CMS-SUS-13-011', 'CMS-SUS-13-011', 'CMS-SUS-13-012', 'CMS-SUS-13-013', 'CMS-SUS-13-013', 'CMS-SUS-13-019', 'CMS-SUS-14-010', 'CMS-SUS-14-021', 'CMS-SUS-14-021']
+   
+   In [2]: browser.selectExpResultsWith(txName = 'T1tttt', dataType = 'upperLimit') #Select only the UL results with the topology T1tttt
+   
+   In [3]: print browser #Print all experimental results in the browser (after selection)
+   ['ATLAS-SUSY-2015-09', 'CMS-SUS-PAS-15-002', 'ATLAS-CONF-2012-105', 'ATLAS-CONF-2013-007', 'ATLAS-CONF-2013-061', 'ATLAS-SUSY-2013-04', 'ATLAS-SUSY-2013-09', 'ATLAS-SUSY-2013-18', 'CMS-PAS-SUS-12-026', 'CMS-PAS-SUS-13-016', 'CMS-PAS-SUS-14-011', 'CMS-SUS-12-024', 'CMS-SUS-12-028', 'CMS-SUS-13-002', 'CMS-SUS-13-004', 'CMS-SUS-13-007', 'CMS-SUS-13-012', 'CMS-SUS-13-013', 'CMS-SUS-13-019', 'CMS-SUS-14-010']
+   
+   In [4]: gluinoMass, LSPmass = 800.*GeV, 100.*GeV  #Define masses for the T1tttt topology
+   
+   In [5]: browser.getULFor('CMS-SUS-PAS-15-002','T1tttt',[[gluinoMass,LSPmass],[gluinoMass,LSPmass]]) #Get UL for a specific experimental result
+   Out[5]: 5.03E-02 [pb]
+     
+   In [6]: for expResult in browser:  #Get the upper limits for all the selected results for the given topology and mass
+      ...:     print expResult.getValuesFor('id'),'UL = ',expResult.getUpperLimitFor(txname='T1tttt',mass=[[gluinoMass,LSPmass],[gluinoMass,LSPmass]])
+      ...:     
+   ['ATLAS-SUSY-2015-09'] UL =  None
+   ['CMS-SUS-PAS-15-002'] UL =  5.03E-02 [pb]
+   ['ATLAS-CONF-2012-105'] UL =  6.70E-02 [pb]
+   ['ATLAS-CONF-2013-007'] UL =  2.40E-02 [pb]
+   ['ATLAS-CONF-2013-061'] UL =  1.25E-02 [pb]
+   ['ATLAS-SUSY-2013-04'] UL =  1.40E-02 [pb]
+   ['ATLAS-SUSY-2013-09'] UL =  1.73E-02 [pb]
+   ['ATLAS-SUSY-2013-18'] UL =  4.30E-03 [pb]
+   ['CMS-PAS-SUS-12-026'] UL =  4.60E-02 [pb]
+   ['CMS-PAS-SUS-13-016'] UL =  3.55E-02 [pb]
+   ['CMS-PAS-SUS-14-011'] UL =  2.47E-02 [pb]
+   ['CMS-SUS-12-024'] UL =  3.62E-02 [pb]
+   ['CMS-SUS-12-028'] UL =  5.31E-02 [pb]
+   ['CMS-SUS-13-002'] UL =  3.48E-02 [pb]
+   ['CMS-SUS-13-004'] UL =  2.47E-02 [pb]
+   ['CMS-SUS-13-007'] UL =  6.00E-03 [pb]
+   ['CMS-SUS-13-012'] UL =  2.14E-02 [pb]
+   ['CMS-SUS-13-013'] UL =  1.90E-02 [pb]
+   ['CMS-SUS-13-019'] UL =  1.35E-02 [pb]
+   ['CMS-SUS-14-010'] UL =  4.82E-03 [pb]
+      
+   In [7]: for expResult in browser:  #Print the luminosities for the selected experimental results
+      ...:     print expResult.getValuesFor('id'),expResult.getValuesFor('lumi')
+      ...:     
+   ['ATLAS-SUSY-2015-09'] [3.20E+00 [1/fb]]
+   ['CMS-SUS-PAS-15-002'] [2.20E+00 [1/fb]]
+   ['ATLAS-CONF-2012-105'] [5.80E+00 [1/fb]]
+   ['ATLAS-CONF-2013-007'] [2.07E+01 [1/fb]]
+   ['ATLAS-CONF-2013-061'] [2.01E+01 [1/fb]]
+   ['ATLAS-SUSY-2013-04'] [2.03E+01 [1/fb]]
+   ['ATLAS-SUSY-2013-09'] [2.03E+01 [1/fb]]
+   ['ATLAS-SUSY-2013-18'] [2.01E+01 [1/fb]]
+   ['CMS-PAS-SUS-12-026'] [9.20E+00 [1/fb]]
+   ['CMS-PAS-SUS-13-016'] [1.97E+01 [1/fb]]
+   ['CMS-PAS-SUS-14-011'] [1.93E+01 [1/fb]]
+   ['CMS-SUS-12-024'] [1.94E+01 [1/fb]]
+   ['CMS-SUS-12-028'] [1.17E+01 [1/fb]]
+   ['CMS-SUS-13-002'] [1.95E+01 [1/fb]]
+   ['CMS-SUS-13-004'] [1.93E+01 [1/fb]]
+   ['CMS-SUS-13-007'] [1.93E+01 [1/fb]]
+   ['CMS-SUS-13-012'] [1.95E+01 [1/fb]]
+   ['CMS-SUS-13-013'] [1.95E+01 [1/fb]]
+   ['CMS-SUS-13-019'] [1.95E+01 [1/fb]]
+   ['CMS-SUS-14-010'] [1.95E+01 [1/fb]]
+
+
+
+Further python example codes using the functionalities of the browser
 can be found in :ref:`More Examples <Examples>`.
-Below we will quickly describe how to instantiate the browser and use its main functionalities.
 
 * **The Database browser tool is implemented by the**  `Browser class <../../../documentation/build/html/tools.html#tools.databaseBrowser.Browser>`_
 
@@ -241,7 +346,9 @@ Below we will quickly describe how to instantiate the browser and use its main f
 Topology Coverage
 -----------------
 
-Unlike the :ref:`file checks <fileChecks>` and the :ref:`cross-section calculator <xsecCalc>`, the missing topologies tool can be called only *after* the SMS |decomposition| and |theory predictions| have been computed.
+Unlike the :ref:`database browser <databaseBrowser>`, the :ref:`file checks <fileChecks>` and the :ref:`cross-section calculator <xsecCalc>`, 
+the missing topologies tool can not be independently accessed.
+It requires the output from the SMS |decomposition| and |theory predictions|.
 Given the |decomposition| output (list of |elements|), as well as the |database|
 information, it finds the |elements| which are
 not tested by any of the |analyses| in the |database|.
