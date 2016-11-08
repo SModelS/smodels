@@ -30,12 +30,9 @@
   
 
   
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="SModelS 1.0.93 documentation" href="index.html"/>
         <link rel="next" title="Running SModelS" href="RunningSModelS.html"/>
-        <link rel="prev" title="SModelS Tools" href="Tools.html"/> 
+        <link rel="prev" title="SModelS Manual" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -85,11 +82,7 @@
             
             
                 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="SModelSDefs.html">Basic Concepts and Definitions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Structure.html">SModelS Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Tools.html">SModelS Tools</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation and Deployment</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Installation and Deployment</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#standard-installation">Standard Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installation-on-ubuntu-16-04">Installation on Ubuntu 16.04</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installation-on-sl6">Installation on SL6</a></li>
@@ -97,7 +90,9 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="RunningSModelS.html">Running SModelS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SModelsDocs.html">SModelS Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">More Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CodeDocs.html">SModelS Code Documentation</a></li>
 </ul>
 
             
@@ -168,7 +163,7 @@ In addition, SModelS depends on the following <em>external</em> Python libraries
 </div></blockquote>
 <p>For installation, SModelS makes use of Python&#8217;s <em>setuptools</em>.
 Thus</p>
-<div class="highlight-default"><div class="highlight"><pre><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>python setup.py install
 </pre></div>
 </div>
 <p>should install the entire project, compile the internal Pythia and NLL-fast versions
@@ -183,7 +178,7 @@ In case the installation of the external libraries fails, you can also try to in
 them manually, then rerun setup.py.
 For Ubuntu and SL6 machines, a recipe is given below.</p>
 <p>There is also a diagnostic tool available:</p>
-<div class="highlight-default"><div class="highlight"><pre><span class="n">python</span> <span class="n">smodels</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">toolBox</span><span class="o">.</span><span class="n">py</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>python smodels/tools/toolBox.py
 </pre></div>
 </div>
 <p>should list and check all internal tools (Pythia and NLL-fast) and external
@@ -239,7 +234,7 @@ Then perform the steps listed under <code class="docutils literal"><span class="
         <a href="RunningSModelS.html" class="btn btn-neutral float-right" title="Running SModelS" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="Tools.html" class="btn btn-neutral" title="SModelS Tools" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral" title="SModelS Manual" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

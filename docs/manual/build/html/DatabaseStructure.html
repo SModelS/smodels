@@ -30,9 +30,6 @@
   
 
   
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="SModelS 1.0.93 documentation" href="index.html"/>
         <link rel="up" title="SModelS Structure" href="Structure.html"/>
         <link rel="next" title="SModelS Tools" href="Tools.html"/>
@@ -86,29 +83,29 @@
             
             
                 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="SModelSDefs.html">Basic Concepts and Definitions</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="Structure.html">SModelS Structure</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="BasicInput.html">Basic Input</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Decomposition.html">Decomposition into Simplified Models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="TheoryPredictions.html">Theory Predictions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ConfrontPredictions.html">Confronting Predictions with Experimental Limits</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Database of Experimental Results</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#database-directory-structure">Database: Directory Structure</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#experimental-result-folder">Experimental Result Folder</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#data-set-folder">Data Set Folder</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#database-object-structure">Database: Object Structure</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#database-binary-pickle-format">Database: Binary (Pickle) Format</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="Tools.html">SModelS Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation and Deployment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RunningSModelS.html">Running SModelS</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="SModelsDocs.html">SModelS Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SModelSDefs.html">Basic Concepts and Definitions</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="Structure.html">SModelS Structure</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="BasicInput.html">Basic Input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Decomposition.html">Decomposition into Simplified Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="TheoryPredictions.html">Theory Predictions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ConfrontPredictions.html">Confronting Predictions with Experimental Limits</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="">Database of Experimental Results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#database-directory-structure">Database: Directory Structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#database-object-structure">Database: Object Structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#database-binary-pickle-format">Database: Binary (Pickle) Format</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Tools.html">SModelS Tools</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="Examples.html">More Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CodeDocs.html">SModelS Code Documentation</a></li>
 </ul>
 
             
@@ -139,6 +136,8 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
+          <li><a href="SModelsDocs.html">SModelS Documentation</a> &raquo;</li>
+      
           <li><a href="Structure.html">SModelS Structure</a> &raquo;</li>
       
     <li>Database of Experimental Results</li>
@@ -158,11 +157,11 @@
   <span class="target" id="databasestruct"><span id="index-0"></span></span><div class="section" id="database-of-experimental-results">
 <h1>Database of Experimental Results<a class="headerlink" href="#database-of-experimental-results" title="Permalink to this headline">¶</a></h1>
 <p>SModelS stores all the information about the experimental results in the
-<a class="reference internal" href="DatabaseDefinitions.html#database"><span class="std std-ref">Database</span></a>.
-Below we describe both the <a class="reference internal" href="#folderstruct"><span class="std std-ref">directory</span></a> and <a class="reference internal" href="#objstruct"><span class="std std-ref">object</span></a> structure of the  <a class="reference internal" href="DatabaseDefinitions.html#database"><span class="std std-ref">Database</span></a>.</p>
+<a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a>.
+Below we describe both the <a class="reference internal" href="#folderstruct"><span>directory</span></a> and <a class="reference internal" href="#objstruct"><span>object</span></a> structure of the  <a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a>.</p>
 <div class="section" id="database-directory-structure">
 <span id="folderstruct"></span><h2>Database: Directory Structure<a class="headerlink" href="#database-directory-structure" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="DatabaseDefinitions.html#database"><span class="std std-ref">Database</span></a> is organized as files in an ordinary (UNIX)
+<p>The <a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a> is organized as files in an ordinary (UNIX)
 directory hierarchy, with a thin python layer serving as the access to the
 database.  The overall structure of the directory hierarchy and its contents is
 depicted in the scheme below (click to enlarge):</p>
@@ -180,7 +179,7 @@ version string of the database.</p>
 <li>8TeV/CMS/</li>
 <li>8TeV/ATLAS/</li>
 </ul>
-<p>The third level of the directory hierarchy encodes the <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Results</span></a>:</p>
+<p>The third level of the directory hierarchy encodes the <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Results</span></a>:</p>
 <ul class="simple">
 <li>8TeV/CMS/CMS-SUS-12-024</li>
 <li>8TeV/ATLAS/ATLAS-CONF-2013-047</li>
@@ -189,26 +188,26 @@ version string of the database.</p>
 </ul>
 <div class="section" id="experimental-result-folder">
 <h3>Experimental Result Folder<a class="headerlink" href="#experimental-result-folder" title="Permalink to this headline">¶</a></h3>
-<p>Each <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Result</span></a> folder contains:</p>
+<p>Each <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a> folder contains:</p>
 <ul class="simple">
-<li>a folder for each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a> (e.g. <code class="docutils literal"><span class="pre">data-xx</span></code>)</li>
+<li>a folder for each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a> (e.g. <code class="docutils literal"><span class="pre">data-xx</span></code>)</li>
 <li>a <code class="docutils literal"><span class="pre">globalInfo.txt</span></code> file</li>
 </ul>
-<p>The <code class="docutils literal"><span class="pre">globalInfo.txt</span></code> file contains the meta information about the <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Result</span></a>.
+<p>The <code class="docutils literal"><span class="pre">globalInfo.txt</span></code> file contains the meta information about the <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a>.
 It defines the center-of-mass energy <span class="math">\(\sqrt{s}\)</span>, the integrated luminosity, the id
 used to identify the result and additional information about the source of the
 data.  Here is the content of CMS-SUS-12-024/globalInfo.txt as an example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span class="n">sqrts</span><span class="p">:</span> <span class="mf">8.0</span><span class="o">*</span><span class="n">TeV</span>
-<span class="n">lumi</span><span class="p">:</span> <span class="mf">19.4</span><span class="o">/</span><span class="n">fb</span>
-<span class="nb">id</span><span class="p">:</span> <span class="n">CMS</span><span class="o">-</span><span class="n">SUS</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">024</span>
-<span class="n">prettyName</span><span class="p">:</span> \<span class="n">slash</span><span class="p">{</span><span class="n">E</span><span class="p">}</span><span class="n">_</span><span class="p">{</span><span class="n">T</span><span class="p">}</span><span class="o">+</span><span class="n">b</span>
-<span class="n">url</span><span class="p">:</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">twiki</span><span class="o">.</span><span class="n">cern</span><span class="o">.</span><span class="n">ch</span><span class="o">/</span><span class="n">twiki</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">view</span><span class="o">/</span><span class="n">CMSPublic</span><span class="o">/</span><span class="n">PhysicsResultsSUS12024</span>
-<span class="n">arxiv</span><span class="p">:</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">arxiv</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="nb">abs</span><span class="o">/</span><span class="mf">1305.2390</span>
-<span class="n">publication</span><span class="p">:</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">sciencedirect</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">science</span><span class="o">/</span><span class="n">article</span><span class="o">/</span><span class="n">pii</span><span class="o">/</span><span class="n">S0370269313005339</span>
-<span class="n">contact</span><span class="p">:</span> <span class="n">Keith</span> <span class="n">Ulmer</span> <span class="o">&lt;</span><span class="n">keith</span><span class="o">.</span><span class="n">ulmer</span><span class="nd">@cern</span><span class="o">.</span><span class="n">ch</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">Josh</span> <span class="n">Thompson</span> <span class="o">&lt;</span><span class="n">joshua</span><span class="o">.</span><span class="n">thompson</span><span class="nd">@cern</span><span class="o">.</span><span class="n">ch</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">Alessandro</span> <span class="n">Gaz</span> <span class="o">&lt;</span><span class="n">alessandro</span><span class="o">.</span><span class="n">gaz</span><span class="nd">@cern</span><span class="o">.</span><span class="n">ch</span><span class="o">&gt;</span>
-<span class="n">private</span><span class="p">:</span> <span class="k">False</span>
-<span class="n">implementedBy</span><span class="p">:</span> <span class="n">Wolfgang</span> <span class="n">Waltenberger</span>
-<span class="n">lastUpdate</span><span class="p">:</span> <span class="mi">2015</span><span class="o">/</span><span class="mi">5</span><span class="o">/</span><span class="mi">11</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>sqrts: 8.0*TeV
+lumi: 19.4/fb
+id: CMS-SUS-12-024
+prettyName: \slash{E}_{T}+b
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS12024
+arxiv: http://arxiv.org/abs/1305.2390
+publication: http://www.sciencedirect.com/science/article/pii/S0370269313005339
+contact: Keith Ulmer &lt;keith.ulmer@cern.ch&gt;, Josh Thompson &lt;joshua.thompson@cern.ch&gt;, Alessandro Gaz &lt;alessandro.gaz@cern.ch&gt;
+private: False
+implementedBy: Wolfgang Waltenberger
+lastUpdate: 2015/5/11
 </pre></div>
 </div>
 <ul class="simple">
@@ -218,56 +217,56 @@ data.  Here is the content of CMS-SUS-12-024/globalInfo.txt as an example:</p>
 </div>
 <div class="section" id="data-set-folder">
 <h3>Data Set Folder<a class="headerlink" href="#data-set-folder" title="Permalink to this headline">¶</a></h3>
-<p>Each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a> folder (e.g. <code class="docutils literal"><span class="pre">data-xx</span></code>) contains:</p>
+<p>Each <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a> folder (e.g. <code class="docutils literal"><span class="pre">data-xx</span></code>) contains:</p>
 <ul class="simple">
-<li>the Upper Limit maps for <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type results</span></a> or Efficiency maps for <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type results</span></a> (<code class="docutils literal"><span class="pre">TxName.txt</span></code> files)</li>
-<li>a <code class="docutils literal"><span class="pre">dataInfo.txt</span></code> file containing meta information about the <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a></li>
+<li>the Upper Limit maps for <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type results</span></a> or Efficiency maps for <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a> (<code class="docutils literal"><span class="pre">TxName.txt</span></code> files)</li>
+<li>a <code class="docutils literal"><span class="pre">dataInfo.txt</span></code> file containing meta information about the <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a></li>
 <li><strong>Data Set folders are  described by the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.datasetObj.DataSet">DataSet Class</a></li>
 <li><strong>TxName files are descrived by the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.txnameObj.TxName">TxName Class</a></li>
 <li><strong>dataInfo files  are descrived by the</strong> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.infoObj.Info">Info Class</a></li>
 </ul>
 <div class="section" id="data-set-folder-upper-limit-type">
 <h4>Data Set Folder: Upper Limit Type<a class="headerlink" href="#data-set-folder-upper-limit-type" title="Permalink to this headline">¶</a></h4>
-<p>Since <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type results</span></a> have a single dataset (see <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Sets</span></a>), the info file only holds
-some trivial information, such as the type of <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Result</span></a> (UL) and the dataset id
+<p>Since <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type results</span></a> have a single dataset (see <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Sets</span></a>), the info file only holds
+some trivial information, such as the type of <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a> (UL) and the dataset id
 (None). Here is the content of CMS-SUS-12-024/data/dataInfo.txt as an
 example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span class="n">dataType</span><span class="p">:</span> <span class="n">upperLimit</span>
-<span class="n">dataId</span><span class="p">:</span> <span class="k">None</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>dataType: upperLimit
+dataId: None
 </pre></div>
 </div>
-<p>For <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span class="std std-ref">UL-type results</span></a>, each <code class="docutils literal"><span class="pre">TxName.txt</span></code> file contains the UL map for a given <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a>
-or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> (see <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Results</span></a>) as well as some meta information,
-including the corresponding <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span class="std std-ref">constraint</span></a> and the <a class="reference internal" href="DatabaseDefinitions.html#ulconditions"><span class="std std-ref">conditions</span></a>.  The
+<p>For <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type results</span></a>, each <code class="docutils literal"><span class="pre">TxName.txt</span></code> file contains the UL map for a given <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a>
+or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> (see <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Results</span></a>) as well as some meta information,
+including the corresponding <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>constraint</span></a> and the <a class="reference internal" href="DatabaseDefinitions.html#ulconditions"><span>conditions</span></a>.  The
 first few lines of CMS-SUS-12-024/data/T1tttt.txt read:</p>
-<div class="highlight-default"><div class="highlight"><pre><span class="n">txName</span><span class="p">:</span> <span class="n">T1tttt</span>
-<span class="n">conditionDescription</span><span class="p">:</span> <span class="k">None</span>
-<span class="n">condition</span><span class="p">:</span> <span class="k">None</span>
-<span class="n">constraint</span><span class="p">:</span> <span class="p">[[[</span><span class="s">&#39;t&#39;</span><span class="p">,</span><span class="s">&#39;t&#39;</span><span class="p">]],[[</span><span class="s">&#39;t&#39;</span><span class="p">,</span><span class="s">&#39;t&#39;</span><span class="p">]]]</span>
-<span class="n">checked</span><span class="p">:</span> <span class="n">A</span>
-<span class="n">figureUrl</span><span class="p">:</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">twiki</span><span class="o">.</span><span class="n">cern</span><span class="o">.</span><span class="n">ch</span><span class="o">/</span><span class="n">twiki</span><span class="o">/</span><span class="n">pub</span><span class="o">/</span><span class="n">CMSPublic</span><span class="o">/</span><span class="n">PhysicsResultsSUS12024</span><span class="o">/</span><span class="n">T1tttt_exclusions_corrected</span><span class="o">.</span><span class="n">pdf</span>
-<span class="n">validated</span><span class="p">:</span> <span class="k">None</span>
-<span class="n">axes</span><span class="p">:</span> <span class="mi">2</span><span class="o">*</span><span class="n">Eq</span><span class="p">(</span><span class="n">mother</span><span class="p">,</span><span class="n">x</span><span class="p">)</span><span class="n">_Eq</span><span class="p">(</span><span class="n">lsp</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
-<span class="n">publishedData</span><span class="p">:</span> <span class="k">True</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>txName: T1tttt
+conditionDescription: None
+condition: None
+constraint: [[[&#39;t&#39;,&#39;t&#39;]],[[&#39;t&#39;,&#39;t&#39;]]]
+checked: A
+figureUrl: https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS12024/T1tttt_exclusions_corrected.pdf
+validated: None
+axes: 2*Eq(mother,x)_Eq(lsp,y)
+publishedData: True
 </pre></div>
 </div>
 <p>As seen above, the first block of data in the <code class="docutils literal"><span class="pre">T1tttt.txt</span></code> file contains
-information about the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a>
+information about the <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a>
 (<span class="math">\([[[\mbox{t},\mbox{t}]],[[\mbox{t},\mbox{t}]]]\)</span>) for which the data
 refers to as well as reference to the original data source and some additional
 information.  The second block of data contains the upper limit map as a
 function of the BSM masses:</p>
-<div class="highlight-default"><div class="highlight"><pre><span class="n">upperLimits</span><span class="p">:</span> <span class="p">[[[[</span><span class="mf">400.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">0.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">],</span> <span class="p">[</span><span class="mf">400.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">0.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">]],</span> <span class="mf">1.815773</span><span class="o">*</span><span class="n">pb</span><span class="p">],</span>
-<span class="p">[[[</span><span class="mf">400.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">25.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">],</span> <span class="p">[</span><span class="mf">400.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">25.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">]],</span> <span class="mf">1.806528</span><span class="o">*</span><span class="n">pb</span><span class="p">],</span>
-<span class="p">[[[</span><span class="mf">400.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">50.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">],</span> <span class="p">[</span><span class="mf">400.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">50.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">]],</span> <span class="mf">2.139336</span><span class="o">*</span><span class="n">pb</span><span class="p">],</span>
-<span class="p">[[[</span><span class="mf">400.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">75.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">],</span> <span class="p">[</span><span class="mf">400.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">75.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">]],</span> <span class="mf">2.472143</span><span class="o">*</span><span class="n">pb</span><span class="p">],</span>
-<span class="p">[[[</span><span class="mf">400.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">100.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">],</span> <span class="p">[</span><span class="mf">400.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">100.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">]],</span> <span class="mf">2.92975</span><span class="o">*</span><span class="n">pb</span><span class="p">],</span>
-<span class="p">[[[</span><span class="mf">400.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">125.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">],</span> <span class="p">[</span><span class="mf">400.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">125.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">]],</span> <span class="mf">3.387357</span><span class="o">*</span><span class="n">pb</span><span class="p">],</span>
-<span class="p">[[[</span><span class="mf">400.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">150.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">],</span> <span class="p">[</span><span class="mf">400.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">150.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">]],</span> <span class="mf">3.474572</span><span class="o">*</span><span class="n">pb</span><span class="p">],</span>
-<span class="p">[[[</span><span class="mf">400.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">175.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">],</span> <span class="p">[</span><span class="mf">400.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">175.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">]],</span> <span class="mf">3.561787</span><span class="o">*</span><span class="n">pb</span><span class="p">],</span>
-<span class="p">[[[</span><span class="mf">425.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">0.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">],</span> <span class="p">[</span><span class="mf">425.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">0.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">]],</span> <span class="mf">1.318791</span><span class="o">*</span><span class="n">pb</span><span class="p">],</span>
-<span class="p">[[[</span><span class="mf">425.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">25.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">],</span> <span class="p">[</span><span class="mf">425.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">25.0</span><span class="o">*</span><span class="n">GeV</span><span class="p">]],</span> <span class="mf">1.348072</span><span class="o">*</span><span class="n">pb</span><span class="p">],</span>
-	<span class="o">...</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>upperLimits: [[[[400.0*GeV, 0.0*GeV], [400.0*GeV, 0.0*GeV]], 1.815773*pb],
+[[[400.0*GeV, 25.0*GeV], [400.0*GeV, 25.0*GeV]], 1.806528*pb],
+[[[400.0*GeV, 50.0*GeV], [400.0*GeV, 50.0*GeV]], 2.139336*pb],
+[[[400.0*GeV, 75.0*GeV], [400.0*GeV, 75.0*GeV]], 2.472143*pb],
+[[[400.0*GeV, 100.0*GeV], [400.0*GeV, 100.0*GeV]], 2.92975*pb],
+[[[400.0*GeV, 125.0*GeV], [400.0*GeV, 125.0*GeV]], 3.387357*pb],
+[[[400.0*GeV, 150.0*GeV], [400.0*GeV, 150.0*GeV]], 3.474572*pb],
+[[[400.0*GeV, 175.0*GeV], [400.0*GeV, 175.0*GeV]], 3.561787*pb],
+[[[425.0*GeV, 0.0*GeV], [425.0*GeV, 0.0*GeV]], 1.318791*pb],
+[[[425.0*GeV, 25.0*GeV], [425.0*GeV, 25.0*GeV]], 1.348072*pb],
+	...
 </pre></div>
 </div>
 <p>As we can see, the UL map is given as a python array with the structure:
@@ -275,46 +274,46 @@ function of the BSM masses:</p>
 </div>
 <div class="section" id="data-set-folder-efficiency-map-type">
 <h4>Data Set Folder: Efficiency Map Type<a class="headerlink" href="#data-set-folder-efficiency-map-type" title="Permalink to this headline">¶</a></h4>
-<p>For <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type results</span></a> the <code class="docutils literal"><span class="pre">dataInfo.txt</span></code> contains relevant information, such as an id to
-identify the <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a> (signal region), the number of observed and expected
+<p>For <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a> the <code class="docutils literal"><span class="pre">dataInfo.txt</span></code> contains relevant information, such as an id to
+identify the <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a> (signal region), the number of observed and expected
 background events for the corresponding signal region and the respective signal
 upper limits.  Here is the content of
 CMS-SUS-13-012-eff/3NJet6_1000HT1250_200MHT300/dataInfo.txt as an example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span class="n">dataType</span><span class="p">:</span> <span class="n">efficiencyMap</span>
-<span class="n">dataId</span><span class="p">:</span> <span class="mi">3</span><span class="n">NJet6_1000HT1250_200MHT300</span>
-<span class="n">observedN</span><span class="p">:</span> <span class="mi">335</span>
-<span class="n">expectedBG</span><span class="p">:</span> <span class="mi">305</span>
-<span class="n">bgError</span><span class="p">:</span> <span class="mi">41</span>
-<span class="n">upperLimit</span><span class="p">:</span> <span class="mf">5.681</span><span class="o">*</span><span class="n">fb</span>
-<span class="n">expectedUpperLimit</span><span class="p">:</span> <span class="mf">4.585</span><span class="o">*</span><span class="n">fb</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>dataType: efficiencyMap
+dataId: 3NJet6_1000HT1250_200MHT300
+observedN: 335
+expectedBG: 305
+bgError: 41
+upperLimit: 5.681*fb
+expectedUpperLimit: 4.585*fb
 </pre></div>
 </div>
-<p>For <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span class="std std-ref">EM-type results</span></a>, each <code class="docutils literal"><span class="pre">TxName.txt</span></code> file contains the efficiency map for a given
-<a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">elements</span></a> (see <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Results</span></a>) as well as some meta
+<p>For <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a>, each <code class="docutils literal"><span class="pre">TxName.txt</span></code> file contains the efficiency map for a given
+<a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> (see <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Results</span></a>) as well as some meta
 information.
 Here is the first few lines of CMS-SUS-13-012-eff/3NJet6_1000HT1250_200MHT300/T2.txt:</p>
-<div class="highlight-default"><div class="highlight"><pre><span class="n">txName</span><span class="p">:</span> <span class="n">T2</span>
-<span class="n">conditionDescription</span><span class="p">:</span> <span class="k">None</span>
-<span class="n">condition</span><span class="p">:</span> <span class="k">None</span>
-<span class="n">constraint</span><span class="p">:</span> <span class="p">[[[</span><span class="s">&#39;jet&#39;</span><span class="p">]],[[</span><span class="s">&#39;jet&#39;</span><span class="p">]]]</span>
-<span class="n">figureUrl</span><span class="p">:</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">twiki</span><span class="o">.</span><span class="n">cern</span><span class="o">.</span><span class="n">ch</span><span class="o">/</span><span class="n">twiki</span><span class="o">/</span><span class="n">pub</span><span class="o">/</span><span class="n">CMSPublic</span><span class="o">/</span><span class="n">PhysicsResultsSUS13012</span><span class="o">/</span><span class="n">Fig_7a</span><span class="o">.</span><span class="n">pdf</span>
-<span class="n">validated</span><span class="p">:</span> <span class="k">None</span>
-<span class="n">axes</span><span class="p">:</span> <span class="mi">2</span><span class="o">*</span><span class="n">Eq</span><span class="p">(</span><span class="n">mother</span><span class="p">,</span><span class="n">x</span><span class="p">)</span><span class="n">_Eq</span><span class="p">(</span><span class="n">lsp</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
-<span class="n">publishedData</span><span class="p">:</span> <span class="k">False</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>txName: T2
+conditionDescription: None
+condition: None
+constraint: [[[&#39;jet&#39;]],[[&#39;jet&#39;]]]
+figureUrl: https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS13012/Fig_7a.pdf
+validated: None
+axes: 2*Eq(mother,x)_Eq(lsp,y)
+publishedData: False
 </pre></div>
 </div>
 <p>As seen above, the first block of data in the <code class="docutils literal"><span class="pre">T2.txt</span></code> file contains
-information about the <a class="reference internal" href="TheoryDefinitions.html#element"><span class="std std-ref">element</span></a> (<span class="math">\([[[\mbox{jet}]],[[\mbox{jet}]]]\)</span>) for which the
+information about the <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> (<span class="math">\([[[\mbox{jet}]],[[\mbox{jet}]]]\)</span>) for which the
 efficiencies refers to as well as reference to the original data source and
 some additional information.
 The second block of data contains the efficiency map as a function of the BSM masses:</p>
-<div class="highlight-default"><div class="highlight"><pre><span class="n">efficiencyMap</span><span class="p">:</span> <span class="p">[[[[</span><span class="mf">312.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">12.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">],</span> <span class="p">[</span><span class="mf">312.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">12.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">]],</span> <span class="mf">0.00109159516643</span><span class="p">],</span>
-<span class="p">[[[</span><span class="mf">312.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">62.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">],</span> <span class="p">[</span><span class="mf">312.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">62.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">]],</span> <span class="mf">0.00118171251453</span><span class="p">],</span>
-<span class="p">[[[</span><span class="mf">312.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">112.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">],</span> <span class="p">[</span><span class="mf">312.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">112.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">]],</span> <span class="mf">0.00073833631219</span><span class="p">],</span>
-<span class="p">[[[</span><span class="mf">312.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">162.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">],</span> <span class="p">[</span><span class="mf">312.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">162.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">]],</span> <span class="mf">0.000442121102215</span><span class="p">],</span>
-<span class="p">[[[</span><span class="mf">312.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">212.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">],</span> <span class="p">[</span><span class="mf">312.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">212.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">]],</span> <span class="mf">0.000321709109432</span><span class="p">],</span>
-<span class="p">[[[</span><span class="mf">312.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">262.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">],</span> <span class="p">[</span><span class="mf">312.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">,</span> <span class="mf">262.5</span><span class="o">*</span><span class="n">GeV</span><span class="p">]],</span> <span class="mf">2.38697309434e-05</span><span class="p">],</span>
-	<span class="o">...</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>efficiencyMap: [[[[312.5*GeV, 12.5*GeV], [312.5*GeV, 12.5*GeV]], 0.00109159516643],
+[[[312.5*GeV, 62.5*GeV], [312.5*GeV, 62.5*GeV]], 0.00118171251453],
+[[[312.5*GeV, 112.5*GeV], [312.5*GeV, 112.5*GeV]], 0.00073833631219],
+[[[312.5*GeV, 162.5*GeV], [312.5*GeV, 162.5*GeV]], 0.000442121102215],
+[[[312.5*GeV, 212.5*GeV], [312.5*GeV, 212.5*GeV]], 0.000321709109432],
+[[[312.5*GeV, 262.5*GeV], [312.5*GeV, 262.5*GeV]], 2.38697309434e-05],
+	...
 </pre></div>
 </div>
 <p>As we can see the efficiency map is given as a python array with the structure:
@@ -324,7 +323,7 @@ The second block of data contains the efficiency map as a function of the BSM ma
 </div>
 <div class="section" id="database-object-structure">
 <span id="objstruct"></span><h2>Database: Object Structure<a class="headerlink" href="#database-object-structure" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="#folderstruct"><span class="std std-ref">Database  folder structure</span></a> is mapped to python
+<p>The <a class="reference internal" href="#folderstruct"><span>Database  folder structure</span></a> is mapped to python
 objects in SModelS.
 The mapping is almost one-to-one, except for a few exceptions.
 Below we show the overall object structure  as well as the folders/files the objects
@@ -334,19 +333,19 @@ represent (click to enlarge):</p>
 For convenience, below we explicitly list the main database folders/files and
 the python objects they are mapped to:</p>
 <ul class="simple">
-<li><a class="reference internal" href="DatabaseDefinitions.html#database"><span class="std std-ref">Database</span></a> folder <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObj.Database">Database Class</a></li>
-<li><a class="reference internal" href="DatabaseDefinitions.html#expresult"><span class="std std-ref">Experimental Result</span></a> folder <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObj.ExpResult">ExpResult Class</a></li>
-<li><a class="reference internal" href="DatabaseDefinitions.html#dataset"><span class="std std-ref">Data Set</span></a> folder <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.datasetObj.DataSet">DataSet Class</a></li>
+<li><a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a> folder <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObj.Database">Database Class</a></li>
+<li><a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>Experimental Result</span></a> folder <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObj.ExpResult">ExpResult Class</a></li>
+<li><a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>Data Set</span></a> folder <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.datasetObj.DataSet">DataSet Class</a></li>
 <li><code class="docutils literal"><span class="pre">globalInfo.txt</span></code> file  <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.infoObj.Info">Info Class</a></li>
 <li><code class="docutils literal"><span class="pre">dataInfo.txt</span></code> file  <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.infoObj.Info">Info Class</a></li>
 <li><code class="docutils literal"><span class="pre">Txname.txt</span></code> file  <span class="math">\(\rightarrow\)</span> <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.txnameObj.TxName">TxName Class</a></li>
 </ul>
 </div>
 <div class="section" id="database-binary-pickle-format">
-<h2>Database: Binary (Pickle) Format<a class="headerlink" href="#database-binary-pickle-format" title="Permalink to this headline">¶</a></h2>
+<span id="databasepickle"></span><h2>Database: Binary (Pickle) Format<a class="headerlink" href="#database-binary-pickle-format" title="Permalink to this headline">¶</a></h2>
 <p>Due to the large number of experimental results contained in the SModelS
-<a class="reference internal" href="DatabaseDefinitions.html#database"><span class="std std-ref">Database</span></a>, parsing the <a class="reference internal" href="#folderstruct"><span class="std std-ref">database folders</span></a> and building the
-corresponding <a class="reference internal" href="#objstruct"><span class="std std-ref">database objects</span></a> may require a non-negligible
+<a class="reference internal" href="DatabaseDefinitions.html#database"><span>Database</span></a>, parsing the <a class="reference internal" href="#folderstruct"><span>database folders</span></a> and building the
+corresponding <a class="reference internal" href="#objstruct"><span>database objects</span></a> may require a non-negligible
 CPU time. In some cases this task may be the most time consuming task when
 testing a single input file.  Furthermore this procedure does not have to be
 repeated every time SModelS is run.</p>
@@ -354,9 +353,9 @@ repeated every time SModelS is run.</p>
 <a class="reference external" href="../../../documentation/build/html/experiment.html#experiment.databaseObj.Database">database object</a>
 into a pickle file (<em>&lt;database-path&gt;/database.pcl</em>), which can then be read
 directly when loading the database.
-Since reading the pickle file is much faster than parsing the <a class="reference internal" href="#folderstruct"><span class="std std-ref">database folders</span></a>,
+Since reading the pickle file is much faster than parsing the <a class="reference internal" href="#folderstruct"><span>database folders</span></a>,
 there is a considerable speed improvement when using the pickle file.
-If any changes in the <a class="reference internal" href="#folderstruct"><span class="std std-ref">database folder structure</span></a>
+If any changes in the <a class="reference internal" href="#folderstruct"><span>database folder structure</span></a>
 are detected or the SModelS version has changed,
 SModelS will automatically re-build the pickle file.
 This action may take a few minutes, but it is only performed once.</p>
