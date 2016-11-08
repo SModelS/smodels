@@ -163,7 +163,7 @@ def likelihood(nsig, nobs, nb, deltab, deltas, ntoys=100000):
         # Make sure mean below is not always negative, but limit
         # number of tries to search for lambda_b>0, lambda_s>0
         # to avoid getting stuck:
-        positive_tries = 50
+        max_tries = 50
 
 
         for i in range(ntoys):
@@ -187,7 +187,7 @@ def likelihood(nsig, nobs, nb, deltab, deltas, ntoys=100000):
 
                 # Keep searching for positive lambda_b, lambda_s
                 # for a maximum number of tries positive_tries:
-                while mean < 0. and try_positive < positive_tries:
+                while mean < 0. and try_positive < max_tries:
                     try_positive += 1
                     smear_b, smear_s = random.normal(), random.normal()
                     lambda_b = nb + smear_b*deltab
@@ -196,7 +196,7 @@ def likelihood(nsig, nobs, nb, deltab, deltas, ntoys=100000):
                     mean = lambda_b + lambda_s
                 
                 #Cut integral at negative mean values
-                if mean < 0.:
+                if mean <= 0.:
                     continue
 
                 # value of integrand, poisson likelihood value
