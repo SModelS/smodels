@@ -194,7 +194,7 @@ def likelihood(nsig, nobs, nb, deltab, deltas, ntoys=100000):
                     lambda_s = nsig + smear_s*deltas
                     # total predicted
                     mean = lambda_b + lambda_s
-                
+
                 #Cut integral at negative mean values
                 if mean <= 0.:
                     continue
@@ -240,9 +240,11 @@ def chi2(nsig, nobs, nb, deltab, deltas=None, ntoys=100000):
         # (keeping the same % error on signal):        
         maxllhd = likelihood(nobs-nb, nobs, nb, deltab, deltas_pct*(nobs-nb), ntoys)
 
-        
+        # Return infinite likelihood if it is zero
+        # This can happen in case e.g. nb >> nobs
         if llhd == 0.:
             return float('inf')
+
         # Return the test statistic -2log(H0/H1)
         return -2*log(llhd/maxllhd)
 
