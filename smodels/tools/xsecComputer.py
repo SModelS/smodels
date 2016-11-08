@@ -313,7 +313,7 @@ def getSqrtses ( args ):
 def checkAllowedSqrtses ( order, sqrtses ):
     """ check if the sqrtses are 'allowed' """
     if order == 0: return
-    allowedsqrtses=[7, 8, 13, 14, 33, 100]
+    allowedsqrtses=[7, 8, 13]
     for sqrts in sqrtses:
         if not sqrts in allowedsqrtses:
             logger.error("Cannot compute NLO or NLL xsecs for sqrts = %d "

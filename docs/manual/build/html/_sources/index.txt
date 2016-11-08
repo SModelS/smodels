@@ -31,17 +31,14 @@ Contents
 --------
 
 .. toctree::
-   :maxdepth: 2
-
-   Introduction   
-   SModelSDefs   
-   Structure
-   Tools
+   :maxdepth: 1
+     
    Installation
    RunningSModelS
+   SModelsDocs
    Examples
-
-**Additional documentation about the code structure can be found** `here <../../../documentation/build/html/index.html>`_   
+   CodeDocs
+   
 
 
 Indices and tables

@@ -14,6 +14,7 @@
 .. |constraint| replace:: :ref:`constraint <ULconstraint>`
 .. |constraints| replace:: :ref:`constraints <ULconstraint>`
 .. |runSModelS| replace:: :ref:`runSModelS.py <runSModelS>`
+.. |database| replace:: :ref:`database <Database>`
 
 .. _runningSModelS:
 
@@ -22,12 +23,12 @@ Running SModelS
 
 For the first-time user, SModelS ships with a command-line tool :ref:`runSModelS.py <runSModelS>`, which
 takes an SLHA or LHE file as input (see :doc:`Basic Input <BasicInput>`), and reports on the SMS
-|decomposition| and |theory predictions| in a simple :ref:`output text file <fileOut>`.
+|decomposition| and |theory predictions| in several :ref:`output formats <smodelsOutput>`.
 
 For users more familiar with Python and the SModelS basics, an example
 code :ref:`Example.py <exampleCode>` is provided showing how to access
-the main SModelS functionalities: :doc:`decomposition <Decomposition>`, :doc:`analysis database <Database>`
-and :doc:`computation of theory predictions <TheoryPredictions>`.
+the main SModelS functionalities: :ref:`decomposition <Decomposition>`, |database|
+and :ref:`computation of theory predictions <TheoryPredictions>`.
 
 The commandline tool (:ref:`runSModelS.py <runSModelS>`) and the example Python
 code (:ref:`Example.py <exampleCode>`) are described below.
@@ -45,39 +46,61 @@ setting the :ref:`basic parameters <parameterFile>`.
 These functionalities include detailed checks of input SLHA files,
 running the |decomposition| and printing the :ref:`output <output>`,
 evaluating the :doc:`theory predictions <TheoryPredictions>` and comparing them to the experimental
-limits available in the :doc:`database <Database>`,
-determining :ref:`missing topologies <topCoverage>` and printing a :ref:`summary text file <output>`.
+limits available in the |database|,
+determining :ref:`missing topologies <topCoverage>` and printing the :ref:`output <smodelsOutput>`
+in several available formats.
 
-These settings may be changed from their default values using the :ref:`parameter file <parameterFile>`.
 
+**The usage of runSModelS is:**
 
-**usage:** 
-		runSModelS.py [-h] -f FILENAME [-p PARAMETERFILE] [-o OUTPUTDIR] [-d]
-                     [-t] [-V] [-c] [-v VERBOSE] [-T TIMEOUT]
+   runSModelS.py [-h] -f FILENAME [-p PARAMETERFILE] [-o OUTPUTDIR] [-d] [-t] [-V] [-c] [-v VERBOSE] [-T TIMEOUT]
 
-optional arguments:
+*arguments*:
   -h, --help            show this help message and exit
   -f FILENAME, --filename FILENAME
                         name of SLHA or LHE input file, necessary input, if
-                        directory is given, loop over all files in the directory
+                        directory is given, loop over all files in the
+                        directory
   -p PARAMETERFILE, --parameterFile PARAMETERFILE
                         name of parameter file, optional argument, if not set,
                         use all parameters from etc/parameters_default.ini
   -o OUTPUTDIR, --outputDir OUTPUTDIR
-                        name of output directory, optional argument, default
-                        is: results
+                        name of output directory, optional argument, default is: results
   -d, --development     enable development output
   -t, --force_txt       force loading the text database
   -V, --version         show program's version number and exit
   -c, --run-crashreport
                         parse crash report file and use its contents for a
-                        SModelS run.Supply the crash file simply via '--
+                        SModelS run. Supply the crash file simply via '--
                         filename myfile.crash'
   -v VERBOSE, --verbose VERBOSE
                         verbosity level. accepted values are: debug, info,
                         warning, error.
   -T TIMEOUT, --timeout TIMEOUT
                         define a limit on the running time (in secs).If not
+                        set, run without a time limit
+
+
+
+
+In some more detail:
+
+* *-f*: path to the input (SLHA or LHE) file or a folder containing input files.
+* *-p*: path to the  :ref:`parameter file <parameterFile>`, where most options are defined.
+* *-o*: path to the output folder, where the output files will be stored. The default folder is ./results .
+* *-d*: if set, SModelS will run in development mode and exit if any errors are found.
+* *-c*: if set, SModelS will in run in crash mode. It takes as input a .crash file in order to reproduce the crash error.
+* *-v*: sets the verbosity level (debug, info, warning, error). Default value is info.
+* *-T*: (int) define a time limit for the running time (in secs).
+
+A typical
+usage example is: ::
+
+   runSModelS.py -f lightSquarks.slha -p parameters.ini -o ./
+
+The resulting output will be generated in the current folder, according to the printer options set in the 
+:ref:`parameter file <parameterFile>`.
+
 
 .. _parameterFile:
 
@@ -187,7 +210,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 
 
-.. _output:
+.. _smodelsOutput:
 
 The Output
 ^^^^^^^^^^
