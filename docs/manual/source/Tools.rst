@@ -347,24 +347,33 @@ Topology Coverage
 -----------------
 
 Unlike the :ref:`database browser <databaseBrowser>`, the :ref:`file checks <fileChecks>` and the :ref:`cross-section calculator <xsecCalc>`, 
-the missing topologies tool can not be independently accessed.
+the topology coverage tool can not be independently accessed.
 It requires the output from the SMS |decomposition| and |theory predictions|.
 Given the |decomposition| output (list of |elements|), as well as the |database|
-information, it finds the |elements| which are
+information, it finds and classifies the |elements| which are
 not tested by any of the |analyses| in the |database|.
+There are four classes of coverage information:
+
+* missingTopos are topologies that do not match any constraint in the |database|
+* outsideGrid collects contributions from elements that in principle match a database entry, but are not constrained because the mass vector is outside the mass grid in the database entry
+* longCascade entries sum up the cross section contribution going into long cascade decays (more than one intermediate particle in one of the branches), grouped by the initially produced particle PIDs
+* asymetricBranches sums up cross section contributions where the first branch differs from the second branch (but that are not considered as long cascade decays), as for the longCascade class entries are grouped by the initally produced particle PIDs
 
 To this end, the tool loops over all the |elements| found in the
 |decomposition| and checks if they are tested by one or more |analyses| in the |database|.
 If :ref:`mass <massComp>` or :ref:`invisible compression <invComp>`
 are turned on, elements which can be :ref:`compressed <elementComp>` are not considered, to avoid double counting.
 All the |elements| not appearing in any of the |constraints| in the |database| are then marked
-as "missing". A missing topology is then characterized
+as "missing".
+An |element| that is not missing, but not tested, is counted as an "outsideGrid" contribution.
+A missing topology or outsideGrid contribution is then characterized
 by a sum over the missing |elements| differing only by their
 masses (with the same |final states|) or electric charges.
+Any "missing" element is further checked, and if applicable counted in a longCascade or asymetricBranches contribution.
 
-The missing topologies tool is normally called from within SModelS (e.g. when running :ref:`runSModelS.py <runSModelS>`) by setting **findMissingTopos=True**
+The topology coverage tool is normally called from within SModelS (e.g. when running :ref:`runSModelS.py <runSModelS>`) by setting **testCoverage=True**
 in the :ref:`parameters file <parameterFile>` .
-In the output, the missing topologies are ordered by cross section. By default only the ones with the ten largest cross-sections are shown.
+In the output, contributions in each category are ordered by cross section. By default only the ones with the ten largest cross-sections are shown.
 
-* **The missing topologies tool is implemented by the** `MissingTopoList class <../../../documentation/build/html/tools.html#tools.missingTopologies.MissingTopoList>`_ 
+* **The topology coverage tool is implemented by the** `Uncovered class <../../../documentation/build/html/tools.html#tools.coverage.Uncovered>`_ 
 
