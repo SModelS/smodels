@@ -225,6 +225,7 @@ files in directory.</td></tr>
 <ul class="simple">
 <li><em>-s</em> (int): an integer (or integers) with the value (in TeV) of the LHC center-of-mass energy for computing the cross-sections</li>
 <li><em>-e</em> (int): the number of Monte Carlo events when running Pythia</li>
+<li><em>-c</em> (int): number of cpu cores to be used. It is only used when cross-sections are being computed for multiple SLHA files</li>
 <li><em>-p</em>: if set, the cross-sections will be written back to the file. If in the input file already
 contains cross-sections, only the non-overlapping ones will be written. If not set, the cross-sections
 will be written to the screen.</li>
@@ -237,7 +238,7 @@ results for production of squarks and gluinos, only these cross-sections will be
 results for production of squarks and gluinos, only these cross-sections will be generated</li>
 <li><em>-O</em>: if set, SModelS will read the LO cross-sections from the input file
 and use NLLfast to compute the NLO or NLO+NLL cross-sections for squarks and gluinos</li>
-<li><em>-f</em>: name of input SLHA file</li>
+<li><em>-f</em>: name of input SLHA file or a folder containing SLHA files</li>
 </ul>
 <p>Further Pythia parameters are defined in <a class="reference download internal" href="_downloads/pythia.card" download=""><code class="xref download docutils literal"><span class="pre">etc/pythia.card</span></code></a>.</p>
 <p>A typical
@@ -511,25 +512,46 @@ can be found in <a class="reference internal" href="Examples.html#examples"><spa
 <div class="section" id="topology-coverage">
 <span id="topcoverage"></span><h2>Topology Coverage<a class="headerlink" href="#topology-coverage" title="Permalink to this headline">¶</a></h2>
 <p>Unlike the <a class="reference internal" href="#databasebrowser"><span>database browser</span></a>, the <a class="reference internal" href="#filechecks"><span>file checks</span></a> and the <a class="reference internal" href="#xseccalc"><span>cross-section calculator</span></a>,
-the missing topologies tool can not be independently accessed.
+the topology coverage tool can not be independently accessed.
 It requires the output from the SMS <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> and <a class="reference internal" href="TheoryPredictions.html"><em>theory predictions</em></a>.
-Given the <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> output (list of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>), as well as the <code class="xref doc docutils literal"><span class="pre">database</span></code>
-information, it finds the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> which are
-not tested by any of the <span class="xref std std-ref">analyses</span> in the <code class="xref doc docutils literal"><span class="pre">database</span></code>.</p>
-<p>To this end, the tool loops over all the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> found in the
-<a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> and checks if they are tested by one or more <span class="xref std std-ref">analyses</span> in the <code class="xref doc docutils literal"><span class="pre">database</span></code>.
-If <a class="reference internal" href="Decomposition.html#masscomp"><span>mass</span></a> or <a class="reference internal" href="Decomposition.html#invcomp"><span>invisible compression</span></a>
-are turned on, elements which can be <a class="reference internal" href="Decomposition.html#elementcomp"><span>compressed</span></a> are not considered, to avoid double counting.
-All the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> not appearing in any of the <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>constraints</span></a> in the <code class="xref doc docutils literal"><span class="pre">database</span></code> are then marked
-as &#8220;missing&#8221;. A missing topology is then characterized
-by a sum over the missing <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> differing only by their
-masses (with the same <a class="reference internal" href="TheoryDefinitions.html#final-states"><span>final states</span></a>) or electric charges.</p>
-<p>The missing topologies tool is normally called from within SModelS (e.g. when running <a class="reference internal" href="RunningSModelS.html#runsmodels"><span>runSModelS.py</span></a>) by setting <strong>findMissingTopos=True</strong>
-in the <a class="reference internal" href="RunningSModelS.html#parameterfile"><span>parameters file</span></a> .
-In the output, the missing topologies are ordered by cross section. By default only the ones with the ten largest cross-sections are shown.</p>
+Given the <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> output (list of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>), as well as the <a class="reference internal" href="DatabaseDefinitions.html#database"><span>database</span></a>
+information, it finds and classifies the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> which are
+not tested by any of the <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>experimental results</span></a> in the <a class="reference internal" href="DatabaseDefinitions.html#database"><span>database</span></a>.
+These elements are grouped into the following classes:</p>
 <ul class="simple">
-<li><strong>The missing topologies tool is implemented by the</strong> <a class="reference external" href="../../../documentation/build/html/tools.html#tools.missingTopologies.MissingTopoList">MissingTopoList class</a></li>
+<li><em>missingTopos</em>: <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> which are not tested by any of the <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>experimental results</span></a> in the <a class="reference internal" href="DatabaseDefinitions.html#database"><span>database</span></a> (independent of the element mass);</li>
+<li><em>outsideGrid</em>: <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> which could be tested by one or more experimental result, but are not constrained because the mass vector is outside the mass grid;</li>
+<li><em>longCascade</em>: <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> with long cascade decays (more than one intermediate particle in one of the <a class="reference internal" href="TheoryDefinitions.html#branch"><span>branches</span></a>);</li>
+<li><em>asymetricBranches</em>: <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> where the first <a class="reference internal" href="TheoryDefinitions.html#branch"><span>branch</span></a> differs from the second <a class="reference internal" href="TheoryDefinitions.html#branch"><span>branch</span></a> (but that are not considered as long cascade decays).</li>
 </ul>
+<p>In order to classify the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>, the tool loops over all the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> found in the
+<a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> and checks if they are tested by one or more <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>experimental results</span></a> in the <a class="reference internal" href="DatabaseDefinitions.html#database"><span>database</span></a> <a class="footnote-reference" href="#id4" id="id3">[*]</a>.
+All the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> which are not tested by any of the <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>experimental results</span></a> in the <a class="reference internal" href="DatabaseDefinitions.html#database"><span>database</span></a> (independent of their masses)
+are added to the <em>missingTopos</em> class.
+The remaining <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> which do appear in one or more of the <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>experimental results</span></a>, but have
+not been tested because their masses fall outside the efficiency or upper limit grids (see <a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a> and <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type results</span></a>),
+are added to the <em>outsideGrid</em> class.</p>
+<p>Usually the list of  <em>missing</em> or <em>outsideGrid</em> elements is considerably long.
+Hence, to compress this list, all <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> differing only by their
+masses (with the same <a class="reference internal" href="TheoryDefinitions.html#final-states"><span>final states</span></a>) or electric charges are combined into a
+<em>missing</em> or <em>outsideGrid</em> topology.
+The <em>missing</em> topologies are then further classified (if applicable) into longCascade or asymetricBranches topologies.</p>
+<p>The topologies for each of the four categories are then grouped according to the final state (for the <em>missingTopos</em> and
+<em>outsideGrid</em> classes) or according to the PDG ids of the mother masses (for the <em>longCascade</em> and
+<em>asymetricBranches</em> classes).</p>
+<p>The topology coverage tool is normally called from within SModelS (e.g. when running <a class="reference internal" href="RunningSModelS.html#runsmodels"><span>runSModelS.py</span></a>) by setting <strong>testCoverage=True</strong>
+in the <a class="reference internal" href="RunningSModelS.html#parameterfile"><span>parameters file</span></a>.
+In the output, contributions in each category are ordered by cross section.
+By default only the ones with the ten largest cross-sections are shown.</p>
+<ul class="simple">
+<li><strong>The topology coverage tool is implemented by the</strong> <a class="reference external" href="../../../documentation/build/html/tools.html#tools.coverage.Uncovered">Uncovered class</a></li>
+</ul>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[*]</a></td><td>If <a class="reference internal" href="Decomposition.html#masscomp"><span>mass</span></a> or <a class="reference internal" href="Decomposition.html#invcomp"><span>invisible compression</span></a> are turned on, elements which can be <a class="reference internal" href="Decomposition.html#elementcomp"><span>compressed</span></a> are not considered, to avoid double counting.</td></tr>
+</tbody>
+</table>
 </div>
 </div>
 
