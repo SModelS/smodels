@@ -160,7 +160,7 @@ code (<a class="reference internal" href="#examplecode"><span>Example.py</span><
 with the option of turning various features on or off, as well as
 setting the <a class="reference internal" href="#parameterfile"><span>basic parameters</span></a>.</p>
 <p>These functionalities include detailed checks of input SLHA files,
-running the <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> and printing the <span class="xref std std-ref">output</span>,
+running the <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a>,
 evaluating the <a class="reference internal" href="TheoryPredictions.html"><em>theory predictions</em></a> and comparing them to the experimental
 limits available in the <a class="reference internal" href="DatabaseDefinitions.html#database"><span>database</span></a>,
 determining <a class="reference internal" href="Tools.html#topcoverage"><span>missing topologies</span></a> and printing the <a class="reference internal" href="#smodelsoutput"><span>output</span></a>
@@ -226,7 +226,7 @@ set, run without a time limit</td></tr>
 <p>In some more detail:</p>
 <ul class="simple">
 <li><em>-f</em>: path to the input (SLHA or LHE) file or a folder containing input files.</li>
-<li><em>-p</em>: path to the  <a class="reference internal" href="#parameterfile"><span>parameter file</span></a>, where most options are defined.</li>
+<li><em>-p</em>: path to the  <a class="reference internal" href="#parameterfile"><span>parameters file</span></a>, where most options are defined.</li>
 <li><em>-o</em>: path to the output folder, where the output files will be stored. The default folder is ./results .</li>
 <li><em>-d</em>: if set, SModelS will run in development mode and exit if any errors are found.</li>
 <li><em>-c</em>: if set, SModelS will in run in crash mode. It takes as input a .crash file in order to reproduce the crash error.</li>
@@ -238,136 +238,89 @@ usage example is:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span>runSModelS.py -f lightSquarks.slha -p parameters.ini -o ./
 </pre></div>
 </div>
-<p>The resulting output will be generated in the current folder, according to the printer options set in the
-<a class="reference internal" href="#parameterfile"><span>parameter file</span></a>.</p>
+<p>The resulting <a class="reference internal" href="#smodelsoutput"><span>output</span></a> will be generated in the current folder, according to the printer options set in the
+<a class="reference internal" href="#parameterfile"><span>parameters file</span></a>.</p>
 <div class="section" id="the-parameters-file">
 <span id="parameterfile"></span><h3>The Parameters File<a class="headerlink" href="#the-parameters-file" title="Permalink to this headline">¶</a></h3>
-<p>The basic options and parameters used by <em>runSModelS.py</em> are defined in the parameter file.
+<p>The basic options and parameters used by <em>runSModelS.py</em> are defined in the parameters file.
 An example parameter file, including all available parameters together
 with a short description, is stored in <a class="reference download internal" href="_downloads/parameters.ini" download=""><code class="xref download docutils literal"><span class="pre">parameters.ini</span></code></a>.
 If no parameter file is specified the default parameters stored in
 <a class="reference download internal" href="_downloads/parameters_default.ini" download=""><code class="xref download docutils literal"><span class="pre">/etc/parameters_default.ini</span></code></a> are used.
 Below we give more detailed information about each entry in the parameters file.</p>
-<ul>
-<li><dl class="first docutils">
-<dt><em>path</em>: relevant folder paths</dt>
-<dd><ul class="first last simple">
-<li><strong>databasePath</strong> (path to database): the absolute (or relative) path to the <code class="xref doc docutils literal"><span class="pre">SModelS</span> <span class="pre">database</span></code>, can supply either the directory name of the database, or the file name of a pickle file (see <a class="reference internal" href="DatabaseStructure.html"><em>Database of Experimental Results</em></a>)</li>
+<ul class="simple">
+<li><em>path</em>: relevant folder paths<ul>
+<li><strong>databasePath</strong>: the absolute (or relative) path to the <a class="reference internal" href="DatabaseDefinitions.html#database"><span>database</span></a>. The user can supply either the directory name of the database, or the path to the <a class="reference internal" href="DatabaseStructure.html#databasepickle"><span>pickle file</span></a>.</li>
 </ul>
-</dd>
-</dl>
 </li>
 </ul>
-<p><em>default values</em>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>[path]
-databasePath = ../smodels-database/
-</pre></div>
+<div class="line-block">
+<div class="line"><br /></div>
 </div>
 <ul class="simple">
 <li><em>options</em>: main options for turning SModelS features on and off<ul>
 <li><strong>inputType</strong> (SLHA/LHE): determines the type of input file (see <a class="reference internal" href="BasicInput.html"><em>Basic Input</em></a>).
 Must be SLHA for a SLHA input file or LHE for a LHE input file.</li>
-<li><strong>checkInput</strong> (True/False): if True, <em>runSModelS.py</em> will run several <a class="reference internal" href="Tools.html#filechecks"><span>consistency checks</span></a> on the input file.
-Makes sure that the file contains all the necessary information. For a SLHA file input <a class="reference internal" href="Tools.html#slhachecks"><span>further checks</span></a>
-are performed, such as if the file contain charged stable particles, if there are inconsistent decays,...</li>
+<li><strong>checkInput</strong> (True/False): if True, <em>runSModelS.py</em> will run the <a class="reference internal" href="Tools.html#filechecks"><span>file check tool</span></a> on the input file and verify if the input contains all the necessary information.</li>
 <li><strong>doInvisible</strong> (True/False): turns <a class="reference internal" href="Decomposition.html#invcomp"><span>invisible compression</span></a> on and off during the <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a>.
 Set to False to turn <a class="reference internal" href="Decomposition.html#invcomp"><span>invisible compression</span></a> off.</li>
 <li><strong>doCompress</strong> (True/False): turns <a class="reference internal" href="Decomposition.html#masscomp"><span>mass compression</span></a> on and off during the <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a>.
 Set to False to turn <a class="reference internal" href="Decomposition.html#masscomp"><span>mass compression</span></a> off.</li>
-<li><strong>findMissingTopos</strong> (True/False): set to True to run the <a class="reference internal" href="Tools.html#topcoverage"><span>missing topologies</span></a> tool.</li>
+<li><strong>testCoverage</strong> (True/False): set to True to run the <a class="reference internal" href="Tools.html#topcoverage"><span>coverage</span></a> tool.</li>
 </ul>
 </li>
 </ul>
-<p><em>default values</em>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">options</span><span class="p">]</span>
-<span class="n">inputType</span> <span class="o">=</span> <span class="n">SLHA</span> 
-<span class="n">checkInput</span> <span class="o">=</span> <span class="bp">True</span>
-<span class="n">doInvisible</span> <span class="o">=</span> <span class="bp">True</span>
-<span class="n">doCompress</span> <span class="o">=</span> <span class="bp">True</span>
-<span class="n">findMissingTopos</span> <span class="o">=</span> <span class="bp">True</span>
-</pre></div>
+<div class="line-block">
+<div class="line"><br /></div>
 </div>
 <ul class="simple">
 <li><em>parameters</em>: basic parameter values for running SModelS<ul>
-<li><strong>sigmacut</strong> (float): minimum value for the <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> weight (in fb). During <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a>
-all elements with weights below sigmacut are neglected. Too Small values of
-sigmacut (see <a class="reference internal" href="Decomposition.html#minweight"><span>Minimum Decomposition Weight</span></a>) will result in longer running time, while too large values might eliminate relevant <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>.</li>
+<li><strong>sigmacut</strong> (float): minimum value for an <a class="reference internal" href="TheoryDefinitions.html#element"><span>element</span></a> weight (in fb). <a class="reference internal" href="TheoryDefinitions.html#element"><span>Elements</span></a> with a weight below sigmacut are neglected during <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> (see <a class="reference internal" href="Decomposition.html#minweight"><span>Minimum Decomposition Weight</span></a>). Depending on the input model, the running time may increase considerably if sigmacut is too low, while too large values might eliminate relevant <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>.</li>
 <li><strong>minmassgap</strong> (float): maximum mass difference value (in GeV) for perfoming <a class="reference internal" href="Decomposition.html#masscomp"><span>mass compression</span></a>.
 <em>Only used if doCompress = True</em></li>
-<li><strong>maxcond</strong> (float): maximum allowed value (in the [0,1] interval) for the violation of <a class="reference internal" href="DatabaseDefinitions.html#ulconditions"><span>analysis conditions</span></a>.
-A zero value means the conditions are strictly enforced, while 1 means the conditions
-are never enforced.
+<li><strong>maxcond</strong> (float): maximum allowed value (in the [0,1] interval) for the violation of <a class="reference internal" href="DatabaseDefinitions.html#ulconditions"><span>upper limit conditions</span></a>. A zero value means the conditions are strictly enforced, while 1 means the conditions are never enforced.
 <em>Only relevant for printing the</em> <a class="reference internal" href="#fileout"><span>output summary</span></a>.</li>
 <li><strong>ncpus</strong> (int): number of CPUs. When processing multiple SLHA/LHE files, SModelS can run in a parallelized fashion, splitting up the input files in equal chunks. &#8220;-1&#8221; is equal to the number of CPU cores of the machine.</li>
 </ul>
 </li>
 </ul>
-<p><em>default values</em>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">parameters</span><span class="p">]</span>
-<span class="n">sigmacut</span> <span class="o">=</span> <span class="mf">0.03</span> 
-<span class="n">minmassgap</span> <span class="o">=</span> <span class="mf">5.</span>
-<span class="n">maxcond</span> <span class="o">=</span> <span class="mf">0.2</span>
-<span class="n">ncpus</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-</pre></div>
+<div class="line-block">
+<div class="line"><br /></div>
 </div>
 <ul class="simple">
-<li><em>database</em>: select a subset of the available <code class="xref doc docutils literal"><span class="pre">database</span> <span class="pre">analyses</span></code><ul>
-<li><strong>analyses</strong> (list of analyses name): set to all to use all available analyses. If a list of analyses names
-are given, only these analyses will be applied. For instance, setting analyses = CMS-PAS-SUS-13-008, ATLAS-CONF-2013-024
-will only use the <span class="xref std std-ref">analyses</span> from <a class="reference external" href="https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13008">CMS-PAS-SUS-13-008</a>
+<li><em>database</em>: allows for selection of a subset of <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>experimental results</span></a> from the <a class="reference internal" href="DatabaseDefinitions.html#database"><span>database</span></a><ul>
+<li><strong>analyses</strong> (list of results): set to all to use all available results. If a list of <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>experimental results</span></a>
+are given, only these analyses will be used. For instance, setting analyses = CMS-PAS-SUS-13-008,ATLAS-CONF-2013-024
+will only use the <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>experimental results</span></a> from <a class="reference external" href="https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13008">CMS-PAS-SUS-13-008</a>
 and <a class="reference external" href="https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-024/">ATLAS-CONF-2013-024</a>.</li>
-<li><strong>txnames</strong> (list of constraints): set to all to use all available <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>analyses constraints</span></a>.
-If a list of <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>constraints</span></a> are given (using the <a class="reference internal" href="DatabaseDefinitions.html#txname"><span>Tx name shorthand</span></a>,
-only these <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>constraints</span></a> will be considered. For instance, setting txnames = T2 will
-only consider the analyses containing upper limits for <span class="math">\([[[jet]],[[jet]]]\)</span>.
-A list of all <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>constraints</span></a> and their <a class="reference internal" href="DatabaseDefinitions.html#txname"><span>Tx names</span></a> can be found <a class="reference external" href="http://smodels.hephy.at/wiki/SmsDictionary">here</a>)</li>
+<li><strong>txnames</strong> (list of topologies): set to all to use all available simplified model <a class="reference internal" href="TheoryDefinitions.html#topology"><span>topologies</span></a>. The <a class="reference internal" href="TheoryDefinitions.html#topology"><span>topologies</span></a> are labeled according to the <a class="reference internal" href="DatabaseDefinitions.html#txname"><span>txname convention</span></a>.
+If a list of <a class="reference internal" href="DatabaseDefinitions.html#txname"><span>txnames</span></a> are given, only the corresponding <a class="reference internal" href="TheoryDefinitions.html#topology"><span>topologies</span></a> will be considered. For instance, setting txnames = T2 will
+only consider <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>experimental results</span></a> containing upper limits for <span class="math">\([[[jet]],[[jet]]]\)</span> and the <a class="reference internal" href="#smodelsoutput"><span>output</span></a> will only contain constraints for this topology.
+<em>A list of all</em> <a class="reference internal" href="TheoryDefinitions.html#topology"><span>topologies</span></a> <em>and their corresponding</em> <a class="reference internal" href="DatabaseDefinitions.html#txname"><span>txnames</span></a> <em>can be found</em> <a class="reference external" href="http://smodels.hephy.at/wiki/SmsDictionary">here</a></li>
+<li><strong>dataselector</strong> (list of datasets): set to all to use all available <a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>data sets</span></a>. If dataselector = upperLimit (efficiencyMap), only <a class="reference internal" href="DatabaseDefinitions.html#ultype"><span>UL-type results</span></a> (<a class="reference internal" href="DatabaseDefinitions.html#emtype"><span>EM-type results</span></a>) will be used. Furthermore, if
+a list of signal regions (<a class="reference internal" href="DatabaseDefinitions.html#dataset"><span>data sets</span></a>) is given, only the <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>experimental results</span></a> containing these datasets will be used. For instance, if dataselector = SRA mCT150,SRA mCT200, only
+these signal regions will be used.</li>
+<li><strong>printDatabase</strong> (True/False): set to True to print the list of selected <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>experimental results</span></a> to stdout. False elsewise.</li>
+<li><strong>addAnaInfo</strong> : (True/False): set to True to include detailed information about the <a class="reference internal" href="DatabaseDefinitions.html#txname"><span>txnames</span></a> tested by each <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>experimental result</span></a>. <em>Only used if printDatabase=True</em>.</li>
 </ul>
 </li>
 </ul>
-<p><em>default values</em>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">database</span><span class="p">]</span>
-<span class="n">analyses</span> <span class="o">=</span> <span class="nb">all</span>
-<span class="n">txnames</span> <span class="o">=</span> <span class="nb">all</span>
-</pre></div>
+<div class="line-block">
+<div class="line"><br /></div>
 </div>
 <ul class="simple">
-<li><em>stdout</em>: basic options for the <a class="reference internal" href="#screenout"><span>screen output</span></a><ul>
-<li><strong>printDecomp</strong> (True/False): set to True to print basic information from the <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> (<a class="reference internal" href="TheoryDefinitions.html#topology"><span>topologies</span></a>, total weights, ...)</li>
-<li><strong>addElmentInfo</strong> (True/False): set to True to include detailed information about the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> generated by the <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a>
-<em>Only used if printDecomp=True</em>.</li>
-<li><strong>printAnalyses</strong> (True/False): set to True to print basic information about the analyses being used
-(list of <code class="xref doc docutils literal"><span class="pre">analysis</span> <span class="pre">names</span></code>, luminosities,...)</li>
-<li><strong>addAnaInfo</strong> (True/False): set to True to include detailed information about the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> tested by each <span class="xref std std-ref">analysis</span> (<a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>
-appearing in the <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>analysis constraint</span></a>). <em>Only used if printAnalyses=True</em>.</li>
-<li><strong>printResults</strong> (True/False): set to True to print information about the <a class="reference internal" href="TheoryPredictions.html"><em>theory predictions</em></a> computed and the
-respective analysis upper limits</li>
+<li><em>printer</em>: main options for the <a class="reference internal" href="#smodelsoutput"><span>output</span></a> format<ul>
+<li><strong>outputType</strong> (list of outputs): use to list all the output formats to be generated. Available output formats are: summary, stdout, log, python, xml (type log redirects stdout to .log output file)</li>
+<li><strong>printDecomp</strong> : (True/False): set to True to print basic information from the <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a> (<a class="reference internal" href="TheoryDefinitions.html#topology"><span>topologies</span></a>, total weights, ...). <em>Only used for the stdout or log-type output</em>.</li>
+<li><strong>addElmentInfo</strong> : (True/False): set to True to include detailed information about the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> generated by the <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a>. <em>Only used if printDecomp=True and for the stdout or log-type output</em>.</li>
+<li><strong>printExtendedResults</strong> : (True/False): set to True to print basic information about the <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>experimental results</span></a> being used
+(list of <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>experimental results</span></a>, luminosities,...). <em>Only used for the stdout or log-type output</em>.</li>
+<li><strong>expandedSummary</strong> (True/False): set True to include in the summary output all applicable <a class="reference internal" href="DatabaseDefinitions.html#expresult"><span>experimental results</span></a>, False for only the strongest one. <em>Only used for the summary-type output</em>.</li>
+<li><strong>addElementList</strong> (True/False): set True to include in the xml and python output all information about all <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> generated in the <a class="reference internal" href="Decomposition.html"><em>decomposition</em></a>. If set to True the
+output file can be quite large. <em>Only used for the python or xml-type output</em>.</li>
 </ul>
 </li>
 </ul>
-<p><em>default values</em>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">stdout</span><span class="p">]</span>
-<span class="n">printDecomp</span> <span class="o">=</span> <span class="bp">True</span>
-<span class="n">addElmentInfo</span> <span class="o">=</span> <span class="bp">False</span>
-<span class="n">printAnalyses</span> <span class="o">=</span> <span class="bp">False</span>
-<span class="n">addAnaInfo</span> <span class="o">=</span> <span class="bp">False</span>
-<span class="n">printResults</span> <span class="o">=</span> <span class="bp">True</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li><em>file</em>: basic options for the <a class="reference internal" href="#fileout"><span>file output</span></a><ul>
-<li><strong>expandedSummary</strong> (True/False): set to True to print to file all applicable analyses. Set to False to print only
-the most constraining analysis.</li>
-<li><strong>addConstraintInfo</strong> (True/False): set to True to include the analysis <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>constraint</span></a> in <a class="reference internal" href="TheoryDefinitions.html#bracketnotation"><span>bracket notation</span></a>
-for each analysis printed to file.</li>
-</ul>
-</li>
-</ul>
-<p><em>default values</em>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="nb">file</span><span class="p">]</span>
-<span class="n">expandedSummary</span> <span class="o">=</span> <span class="bp">True</span>
-<span class="n">addConstraintInfo</span> <span class="o">=</span> <span class="bp">True</span>
-</pre></div>
-</div>
 </div>
 <div class="section" id="the-output">
 <span id="smodelsoutput"></span><h3>The Output<a class="headerlink" href="#the-output" title="Permalink to this headline">¶</a></h3>
@@ -405,9 +358,9 @@ Total Number of Elements: 30
 </pre></div>
 </div>
 <ul class="simple">
-<li>a list of all the <span class="xref std std-ref">analyses</span> considered (if <strong>printAnalyses</strong> = True). Note that this list correspond to all the analyses
+<li>a list of all the <a href="#id5"><span class="problematic" id="id6">|analyses|</span></a> considered (if <strong>printAnalyses</strong> = True). Note that this list correspond to all the analyses
 selected in the <em>database</em> options (see <a class="reference internal" href="#parameterfile"><span>parameters file</span></a>). If <strong>addAnaInfo</strong> = True,
-for each <span class="xref std std-ref">analysis</span> entry a list of all the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> appearing in the <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>analysis constraint</span></a>
+for each <a href="#id7"><span class="problematic" id="id8">|analysis|</span></a> entry a list of all the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> appearing in the <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>analysis constraint</span></a>
 is also shown using the <a class="reference internal" href="TheoryDefinitions.html#bracketnotation"><span>bracket notation</span></a>:</li>
 </ul>
 <div class="highlight-python"><div class="highlight"><pre><span></span>========================================================
@@ -420,10 +373,10 @@ Analysis Sqrts: 8.00E+00 [TeV]
 </pre></div>
 </div>
 <ul class="simple">
-<li>a list of all the <a class="reference internal" href="TheoryPredictions.html"><em>theory predictions</em></a> obtained and the corresponding <span class="xref std std-ref">analysis</span> upper limit (if <strong>printResults</strong> = True).
+<li>a list of all the <a class="reference internal" href="TheoryPredictions.html"><em>theory predictions</em></a> obtained and the corresponding <a href="#id9"><span class="problematic" id="id10">|analysis|</span></a> upper limit (if <strong>printResults</strong> = True).
 For each <a class="reference internal" href="TheoryPredictions.html"><em>theory prediction</em></a> entry, the <code class="xref doc docutils literal"><span class="pre">analysis</span> <span class="pre">name</span></code>, <em>sqrts</em>, the <a class="reference internal" href="TheoryPredictions.html#ulcluster"><span>cluster</span></a> average mass
 in each branch, the cross-section value and the list of the <a class="reference internal" href="DatabaseDefinitions.html#ulconditions"><span>condition values</span></a> for the <a class="reference internal" href="TheoryPredictions.html#ulcluster"><span>cluster</span></a>
-and the corresponding <span class="xref std std-ref">analysis</span> upper limit are shown:</li>
+and the corresponding <a href="#id11"><span class="problematic" id="id12">|analysis|</span></a> upper limit are shown:</li>
 </ul>
 <div class="highlight-python"><div class="highlight"><pre><span></span>---------------Analysis Label = CMS-PAS-SUS-13-019:T2
 Analysis sqrts: 8.00E+00 [TeV]
@@ -458,17 +411,17 @@ These flags should be consulted in case of unexpected/missing results:</li>
 <li>the version of the <code class="xref doc docutils literal"><span class="pre">database</span></code> used to obtain the results:</li>
 </ul>
 <ul class="simple">
-<li>the list of <span class="xref std std-ref">analyses</span> which constrain the input model.
-For each <span class="xref std std-ref">analysis</span>, the <code class="xref doc docutils literal"><span class="pre">analysis</span> <span class="pre">name</span></code>, the value of the <span class="xref std std-ref">analysis</span>
+<li>the list of <a href="#id13"><span class="problematic" id="id14">|analyses|</span></a> which constrain the input model.
+For each <a href="#id15"><span class="problematic" id="id16">|analysis|</span></a>, the <code class="xref doc docutils literal"><span class="pre">analysis</span> <span class="pre">name</span></code>, the value of the <a href="#id17"><span class="problematic" id="id18">|analysis|</span></a>
 center-of-mass energy (<em>sqrts</em>), the amount of <a class="reference internal" href="DatabaseDefinitions.html#ulconditions"><span>condition</span></a> violation,
 the <a class="reference internal" href="TheoryPredictions.html"><em>theory prediction</em></a> value (value for the relevant signal cross-section),
 the experimental upper limit and the ratio (<em>r</em>) of the signal cross-section and the
 upper limit (<span class="math">\(r = theory\, prediction/upper\, limit\)</span>) are printed.
-A value of <span class="math">\(r\ge 1\)</span> indicates that the model is likely excluded by the corresponding <span class="xref std std-ref">analysis</span>.</li>
+A value of <span class="math">\(r\ge 1\)</span> indicates that the model is likely excluded by the corresponding <a href="#id19"><span class="problematic" id="id20">|analysis|</span></a>.</li>
 </ul>
 <ul class="simple">
 <li>if  <strong>addConstraintInfo</strong> = True, the <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>analysis constraint</span></a> in <a class="reference internal" href="TheoryDefinitions.html#bracketnotation"><span>bracket notation</span></a>
-is also included just below the <span class="xref std std-ref">analysis</span> entry:</li>
+is also included just below the <a href="#id21"><span class="problematic" id="id22">|analysis|</span></a> entry:</li>
 </ul>
 <ul class="simple">
 <li>The last line of this block gives the maximum value of <em>r</em>, <span class="math">\(R = max(r)\)</span>.</li>
@@ -477,7 +430,7 @@ is also included just below the <span class="xref std std-ref">analysis</span> e
 <li>if <strong>findMissingTopos</strong> = True,  a list of the <a class="reference internal" href="Tools.html#topcoverage"><span>missing topologies</span></a> and their cross sections at the given
 value of <em>sqrts</em> is also included. This list represents the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>
 (shown using the <a class="reference internal" href="TheoryDefinitions.html#bracketnotation"><span>bracket notation</span></a>) with the highest
-weights (<span class="math">\(\sigma \times BR\)</span>) which are not tested by any <span class="xref std std-ref">analysis</span>:</li>
+weights (<span class="math">\(\sigma \times BR\)</span>) which are not tested by any <a href="#id23"><span class="problematic" id="id24">|analysis|</span></a>:</li>
 </ul>
 </div>
 </div>
@@ -538,7 +491,7 @@ of input format, choose either the <a class="reference external" href="../../../
 </pre></div>
 </div>
 <ul class="simple">
-<li><em>Load the the analyses</em> <a class="reference internal" href="DatabaseDefinitions.html#database"><span>database</span></a>. Load the experimental <span class="xref std std-ref">analyses</span> and store the list of analyses</li>
+<li><em>Load the the analyses</em> <a class="reference internal" href="DatabaseDefinitions.html#database"><span>database</span></a>. Load the experimental <a href="#id25"><span class="problematic" id="id26">|analyses|</span></a> and store the list of analyses</li>
 </ul>
 <div class="highlight-python"><div class="highlight"><pre><span></span>    <span class="n">listofanalyses</span> <span class="o">=</span> <span class="n">smsAnalysisFactory</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 </pre></div>

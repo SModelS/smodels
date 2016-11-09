@@ -4,8 +4,6 @@
 .. |elements| replace:: :ref:`elements <element>`
 .. |topology| replace:: :ref:`topology <topology>`
 .. |topologies| replace:: :ref:`topologies <topology>`
-.. |analysis| replace:: :ref:`analysis <ULanalysis>`
-.. |analyses| replace:: :ref:`analyses <ULanalysis>`
 .. |decomposition| replace:: :doc:`decomposition <Decomposition>`
 .. |theory predictions| replace:: :doc:`theory predictions <TheoryPredictions>`
 .. |theory prediction| replace:: :doc:`theory prediction <TheoryPredictions>`
@@ -18,8 +16,15 @@
 .. |ExpRes| replace:: :ref:`Experimental Result<ExpResult>`
 .. |ExpRess| replace:: :ref:`Experimental Results<ExpResult>`
 .. |Database| replace:: :ref:`Database <Database>`
+.. |database| replace:: :ref:`database <Database>`
 .. |Dataset| replace:: :ref:`Data Set<DataSet>`
 .. |Datasets| replace:: :ref:`Data Sets<DataSet>`
+.. |results| replace:: :ref:`experimental results <ExpResult>`
+.. |branches| replace:: :ref:`branches <branch>`
+.. |branch| replace:: :ref:`branch <branch>`
+.. |EMrs| replace:: :ref:`EM-type results <EMtype>`
+.. |ULrs| replace:: :ref:`UL-type results <ULtype>`
+
 
 SModelS Tools
 =============
@@ -73,6 +78,7 @@ Some more explanations:
 
 * *-s* (int): an integer (or integers) with the value (in TeV) of the LHC center-of-mass energy for computing the cross-sections
 * *-e* (int): the number of Monte Carlo events when running Pythia
+* *-c* (int): number of cpu cores to be used. It is only used when cross-sections are being computed for multiple SLHA files
 * *-p*: if set, the cross-sections will be written back to the file. If in the input file already
   contains cross-sections, only the non-overlapping ones will be written. If not set, the cross-sections
   will be written to the screen.
@@ -85,7 +91,7 @@ Some more explanations:
   results for production of squarks and gluinos, only these cross-sections will be generated
 * *-O*: if set, SModelS will read the LO cross-sections from the input file
   and use NLLfast to compute the NLO or NLO+NLL cross-sections for squarks and gluinos
-* *-f*: name of input SLHA file
+* *-f*: name of input SLHA file or a folder containing SLHA files
 
 Further Pythia parameters are defined in :download:`etc/pythia.card </images/pythia.card>`.
 
@@ -351,29 +357,41 @@ the topology coverage tool can not be independently accessed.
 It requires the output from the SMS |decomposition| and |theory predictions|.
 Given the |decomposition| output (list of |elements|), as well as the |database|
 information, it finds and classifies the |elements| which are
-not tested by any of the |analyses| in the |database|.
-There are four classes of coverage information:
+not tested by any of the |results| in the |database|.
+These elements are grouped into the following classes:
 
-* missingTopos are topologies that do not match any constraint in the |database|
-* outsideGrid collects contributions from elements that in principle match a database entry, but are not constrained because the mass vector is outside the mass grid in the database entry
-* longCascade entries sum up the cross section contribution going into long cascade decays (more than one intermediate particle in one of the branches), grouped by the initially produced particle PIDs
-* asymetricBranches sums up cross section contributions where the first branch differs from the second branch (but that are not considered as long cascade decays), as for the longCascade class entries are grouped by the initally produced particle PIDs
+* *missingTopos*: |elements| which are not tested by any of the |results| in the |database| (independent of the element mass);
+* *outsideGrid*: |elements| which could be tested by one or more experimental result, but are not constrained because the mass vector is outside the mass grid;
+* *longCascade*: |elements| with long cascade decays (more than one intermediate particle in one of the |branches|);
+* *asymetricBranches*: |elements| where the first |branch| differs from the second |branch| (but that are not considered as long cascade decays).
 
-To this end, the tool loops over all the |elements| found in the
-|decomposition| and checks if they are tested by one or more |analyses| in the |database|.
-If :ref:`mass <massComp>` or :ref:`invisible compression <invComp>`
-are turned on, elements which can be :ref:`compressed <elementComp>` are not considered, to avoid double counting.
-All the |elements| not appearing in any of the |constraints| in the |database| are then marked
-as "missing".
-An |element| that is not missing, but not tested, is counted as an "outsideGrid" contribution.
-A missing topology or outsideGrid contribution is then characterized
-by a sum over the missing |elements| differing only by their
-masses (with the same |final states|) or electric charges.
-Any "missing" element is further checked, and if applicable counted in a longCascade or asymetricBranches contribution.
+In order to classify the |elements|, the tool loops over all the |elements| found in the
+|decomposition| and checks if they are tested by one or more |results| in the |database| [*]_.
+All the |elements| which are not tested by any of the |results| in the |database| (independent of their masses)
+are added to the *missingTopos* class.
+The remaining |elements| which do appear in one or more of the |results|, but have
+not been tested because their masses fall outside the efficiency or upper limit grids (see |EMrs| and |ULrs|),
+are added to the *outsideGrid* class.
+
+
+Usually the list of  *missing* or *outsideGrid* elements is considerably long.
+Hence, to compress this list, all |elements| differing only by their
+masses (with the same |final states|) or electric charges are combined into a 
+*missing* or *outsideGrid* topology.
+The *missing* topologies are then further classified (if applicable) into longCascade or asymetricBranches topologies.
+
+
+The topologies for each of the four categories are then grouped according to the final state (for the *missingTopos* and
+*outsideGrid* classes) or according to the PDG ids of the mother masses (for the *longCascade* and
+*asymetricBranches* classes). 
+
 
 The topology coverage tool is normally called from within SModelS (e.g. when running :ref:`runSModelS.py <runSModelS>`) by setting **testCoverage=True**
-in the :ref:`parameters file <parameterFile>` .
-In the output, contributions in each category are ordered by cross section. By default only the ones with the ten largest cross-sections are shown.
+in the :ref:`parameters file <parameterFile>`.
+In the output, contributions in each category are ordered by cross section. 
+By default only the ones with the ten largest cross-sections are shown.
 
 * **The topology coverage tool is implemented by the** `Uncovered class <../../../documentation/build/html/tools.html#tools.coverage.Uncovered>`_ 
 
+
+.. [*] If :ref:`mass <massComp>` or :ref:`invisible compression <invComp>` are turned on, elements which can be :ref:`compressed <elementComp>` are not considered, to avoid double counting.

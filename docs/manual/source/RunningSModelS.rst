@@ -6,8 +6,6 @@
 .. |elements| replace:: :ref:`elements <element>`
 .. |topology| replace:: :ref:`topology <topology>`
 .. |topologies| replace:: :ref:`topologies <topology>`
-.. |analysis| replace:: :ref:`analysis <ULanalysis>`
-.. |analyses| replace:: :ref:`analyses <ULanalysis>`
 .. |decomposition| replace:: :doc:`decomposition <Decomposition>`
 .. |theory predictions| replace:: :doc:`theory predictions <TheoryPredictions>`
 .. |theory prediction| replace:: :doc:`theory prediction <TheoryPredictions>`
@@ -15,6 +13,22 @@
 .. |constraints| replace:: :ref:`constraints <ULconstraint>`
 .. |runSModelS| replace:: :ref:`runSModelS.py <runSModelS>`
 .. |database| replace:: :ref:`database <Database>`
+.. |output| replace:: :ref:`output <smodelsOutput>`
+.. |results| replace:: :ref:`experimental results <ExpResult>`
+.. |txnames| replace:: :ref:`txnames <TxName>`
+.. |EM| replace:: :ref:`EM-type <EMtype>`
+.. |UL| replace:: :ref:`UL-type <ULtype>`
+.. |EMr| replace:: :ref:`EM-type result <EMtype>`
+.. |ULr| replace:: :ref:`UL-type result <ULtype>`
+.. |EMrs| replace:: :ref:`EM-type results <EMtype>`
+.. |ULrs| replace:: :ref:`UL-type results <ULtype>`
+.. |ExpRes| replace:: :ref:`Experimental Result<ExpResult>`
+.. |ExpRess| replace:: :ref:`Experimental Results<ExpResult>`
+.. |Dataset| replace:: :ref:`Data Set<DataSet>`
+.. |Datasets| replace:: :ref:`Data Sets<DataSet>`
+.. |dataset| replace:: :ref:`data set<DataSet>`
+.. |datasets| replace:: :ref:`data sets<DataSet>`
+
 
 .. _runningSModelS:
 
@@ -44,10 +58,10 @@ with the option of turning various features on or off, as well as
 setting the :ref:`basic parameters <parameterFile>`.
 
 These functionalities include detailed checks of input SLHA files,
-running the |decomposition| and printing the :ref:`output <output>`,
+running the |decomposition|,
 evaluating the :doc:`theory predictions <TheoryPredictions>` and comparing them to the experimental
 limits available in the |database|,
-determining :ref:`missing topologies <topCoverage>` and printing the :ref:`output <smodelsOutput>`
+determining :ref:`missing topologies <topCoverage>` and printing the |output|
 in several available formats.
 
 
@@ -86,7 +100,7 @@ in several available formats.
 In some more detail:
 
 * *-f*: path to the input (SLHA or LHE) file or a folder containing input files.
-* *-p*: path to the  :ref:`parameter file <parameterFile>`, where most options are defined.
+* *-p*: path to the  :ref:`parameters file <parameterFile>`, where most options are defined.
 * *-o*: path to the output folder, where the output files will be stored. The default folder is ./results .
 * *-d*: if set, SModelS will run in development mode and exit if any errors are found.
 * *-c*: if set, SModelS will in run in crash mode. It takes as input a .crash file in order to reproduce the crash error.
@@ -98,8 +112,8 @@ usage example is: ::
 
    runSModelS.py -f lightSquarks.slha -p parameters.ini -o ./
 
-The resulting output will be generated in the current folder, according to the printer options set in the 
-:ref:`parameter file <parameterFile>`.
+The resulting |output| will be generated in the current folder, according to the printer options set in the 
+:ref:`parameters file <parameterFile>`.
 
 
 .. _parameterFile:
@@ -108,106 +122,67 @@ The resulting output will be generated in the current folder, according to the p
 The Parameters File
 ^^^^^^^^^^^^^^^^^^^
 
-The basic options and parameters used by *runSModelS.py* are defined in the parameter file.
+The basic options and parameters used by *runSModelS.py* are defined in the parameters file.
 An example parameter file, including all available parameters together
 with a short description, is stored in :download:`parameters.ini <images/parameters.ini>`.
 If no parameter file is specified the default parameters stored in 
 :download:`/etc/parameters_default.ini <images/parameters_default.ini>` are used.
 Below we give more detailed information about each entry in the parameters file.
 
+
+
+
 * *path*: relevant folder paths
-   * **databasePath** (path to database): the absolute (or relative) path to the :doc:`SModelS database <Database>`, can supply either the directory name of the database, or the file name of a pickle file (see :doc:`Database of Experimental Results <DatabaseStructure>`)
 
-*default values*:
-
-.. literalinclude:: /images/parameters_default.ini
-   :lines: 1-2
-   
+  * **databasePath**: the absolute (or relative) path to the |database|. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`.
+|
 * *options*: main options for turning SModelS features on and off
 
   * **inputType** (SLHA/LHE): determines the type of input file (see :doc:`Basic Input <BasicInput>`). 
     Must be SLHA for a SLHA input file or LHE for a LHE input file.
-  * **checkInput** (True/False): if True, *runSModelS.py* will run several :ref:`consistency checks <fileChecks>` on the input file.
-    Makes sure that the file contains all the necessary information. For a SLHA file input :ref:`further checks <slhaChecks>`
-    are performed, such as if the file contain charged stable particles, if there are inconsistent decays,...
+  * **checkInput** (True/False): if True, *runSModelS.py* will run the :ref:`file check tool <fileChecks>` on the input file and verify if the input contains all the necessary information.
   * **doInvisible** (True/False): turns |invisible compression| on and off during the |decomposition|.
     Set to False to turn |invisible compression| off.
   * **doCompress** (True/False): turns |mass compression| on and off during the |decomposition|.
     Set to False to turn |mass compression| off.
-  * **findMissingTopos** (True/False): set to True to run the :ref:`missing topologies <topCoverage>` tool.
-
-*default values*:
-
-.. literalinclude:: /images/parameters_default.ini
-   :lines: 3-8
-   
+  * **testCoverage** (True/False): set to True to run the :ref:`coverage <topCoverage>` tool.
+|
 * *parameters*: basic parameter values for running SModelS
 
-  * **sigmacut** (float): minimum value for the |element| weight (in fb). During |decomposition| 
-    all elements with weights below sigmacut are neglected. Too Small values of 
-    sigmacut (see :ref:`Minimum Decomposition Weight <minweight>`) will result in longer running time, while too large values might eliminate relevant |elements|.  
+  * **sigmacut** (float): minimum value for an |element| weight (in fb). :ref:`Elements <element>` with a weight below sigmacut are neglected during |decomposition| (see :ref:`Minimum Decomposition Weight <minweight>`). Depending on the input model, the running time may increase considerably if sigmacut is too low, while too large values might eliminate relevant |elements|.  
   * **minmassgap** (float): maximum mass difference value (in GeV) for perfoming :ref:`mass compression <massComp>`.
     *Only used if doCompress = True*
-  * **maxcond** (float): maximum allowed value (in the [0,1] interval) for the violation of :ref:`analysis conditions <ULconditions>`.
-    A zero value means the conditions are strictly enforced, while 1 means the conditions
-    are never enforced. 
+  * **maxcond** (float): maximum allowed value (in the [0,1] interval) for the violation of :ref:`upper limit conditions <ULconditions>`. A zero value means the conditions are strictly enforced, while 1 means the conditions are never enforced. 
     *Only relevant for printing the* :ref:`output summary <fileOut>`.
   * **ncpus** (int): number of CPUs. When processing multiple SLHA/LHE files, SModelS can run in a parallelized fashion, splitting up the input files in equal chunks. "-1" is equal to the number of CPU cores of the machine.
+|   
+* *database*: allows for selection of a subset of :ref:`experimental results <ExpResult>` from the |database|
 
-*default values*:
-
-.. literalinclude:: /images/parameters_default.ini
-   :lines: 9-13  
-   
-* *database*: select a subset of the available :doc:`database analyses <Database>`
-
-  * **analyses** (list of analyses name): set to all to use all available analyses. If a list of analyses names
-    are given, only these analyses will be applied. For instance, setting analyses = CMS-PAS-SUS-13-008, ATLAS-CONF-2013-024
-    will only use the |analyses| from `CMS-PAS-SUS-13-008 <https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13008>`_
+  * **analyses** (list of results): set to all to use all available results. If a list of :ref:`experimental results <ExpResult>`
+    are given, only these analyses will be used. For instance, setting analyses = CMS-PAS-SUS-13-008,ATLAS-CONF-2013-024
+    will only use the |results| from `CMS-PAS-SUS-13-008 <https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13008>`_
     and `ATLAS-CONF-2013-024 <https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-024/>`_.
-  * **txnames** (list of constraints): set to all to use all available :ref:`analyses constraints <ULconstraint>`.
-    If a list of |constraints| are given (using the :ref:`Tx name shorthand <Txname>`,
-    only these |constraints| will be considered. For instance, setting txnames = T2 will
-    only consider the analyses containing upper limits for :math:`[[[jet]],[[jet]]]`.
-    A list of all |constraints| and their :ref:`Tx names <Txname>` can be found `here <http://smodels.hephy.at/wiki/SmsDictionary>`_)
+  * **txnames** (list of topologies): set to all to use all available simplified model |topologies|. The |topologies| are labeled according to the :ref:`txname convention <TxName>`. 
+    If a list of |txnames| are given, only the corresponding |topologies| will be considered. For instance, setting txnames = T2 will
+    only consider |results| containing upper limits for :math:`[[[jet]],[[jet]]]` and the |output| will only contain constraints for this topology.
+    *A list of all* |topologies| *and their corresponding* |txnames| *can be found* `here <http://smodels.hephy.at/wiki/SmsDictionary>`_
+  * **dataselector** (list of datasets): set to all to use all available |datasets|. If dataselector = upperLimit (efficiencyMap), only |ULrs| (|EMrs|) will be used. Furthermore, if
+    a list of signal regions (|datasets|) is given, only the |results| containing these datasets will be used. For instance, if dataselector = SRA mCT150,SRA mCT200, only
+    these signal regions will be used. 
+  * **printDatabase** (True/False): set to True to print the list of selected |results| to stdout. False elsewise. 
+  * **addAnaInfo** : (True/False): set to True to include detailed information about the |txnames| tested by each :ref:`experimental result <ExpResult>`. *Only used if printDatabase=True*.
+|
+* *printer*: main options for the |output| format
 
-*default values*:
-
-.. literalinclude:: /images/parameters_default.ini
-   :lines: 14-16  
+  * **outputType** (list of outputs): use to list all the output formats to be generated. Available output formats are: summary, stdout, log, python, xml (type log redirects stdout to .log output file)
+  * **printDecomp** : (True/False): set to True to print basic information from the |decomposition| (|topologies|, total weights, ...). *Only used for the stdout or log-type output*.
+  * **addElmentInfo** : (True/False): set to True to include detailed information about the |elements| generated by the |decomposition|. *Only used if printDecomp=True and for the stdout or log-type output*.
+  * **printExtendedResults** : (True/False): set to True to print basic information about the |results| being used 
+    (list of |results|, luminosities,...). *Only used for the stdout or log-type output*.
+  * **expandedSummary** (True/False): set True to include in the summary output all applicable |results|, False for only the strongest one. *Only used for the summary-type output*.
+  * **addElementList** (True/False): set True to include in the xml and python output all information about all |elements| generated in the |decomposition|. If set to True the
+    output file can be quite large. *Only used for the python or xml-type output*.
    
-   
-* *stdout*: basic options for the :ref:`screen output <screenOut>`
-
-  * **printDecomp** (True/False): set to True to print basic information from the |decomposition| (|topologies|, total weights, ...)
-  * **addElmentInfo** (True/False): set to True to include detailed information about the |elements| generated by the |decomposition|
-    *Only used if printDecomp=True*.
-  * **printAnalyses** (True/False): set to True to print basic information about the analyses being used 
-    (list of :doc:`analysis names <AnalysesNames>`, luminosities,...)
-  * **addAnaInfo** (True/False): set to True to include detailed information about the |elements| tested by each |analysis| (|elements|
-    appearing in the :ref:`analysis constraint <ULconstraint>`). *Only used if printAnalyses=True*.
-  * **printResults** (True/False): set to True to print information about the |theory predictions| computed and the
-    respective analysis upper limits
-
-*default values*:
-
-.. literalinclude:: /images/parameters_default.ini
-   :lines: 17-22
-   
-* *file*: basic options for the :ref:`file output <fileOut>`
-
-  * **expandedSummary** (True/False): set to True to print to file all applicable analyses. Set to False to print only
-    the most constraining analysis.
-  * **addConstraintInfo** (True/False): set to True to include the analysis |constraint| in :ref:`bracket notation <BracketNotation>`
-    for each analysis printed to file.
-
-*default values*:
-
-.. literalinclude:: /images/parameters_default.ini
-   :lines: 23-25             
-
-
-
 
 
 .. _smodelsOutput:
