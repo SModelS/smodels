@@ -44,6 +44,10 @@ class XSectionInfo(object):
             return False
         return True
 
+    def __str__(self):
+        if not self.order:
+            return str(self.sqrts)
+        return "%s (%s)" % ( self.sqrts, self.order )
 
     def __ne__(self, other):
         if type(other) != type(XSectionInfo()):

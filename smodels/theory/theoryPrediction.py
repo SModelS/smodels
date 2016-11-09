@@ -22,13 +22,13 @@ class TheoryPrediction(object):
     for an analysis.
     
     :ivar analysis: holds the analysis (ULanalysis or EManalysis object)
-                    to which the prediction refers to
+                    to which the prediction refers
     :ivar value: value of the theory prediction 
                 (relevant cross-section to be compared with the experimental limits).
                 It is a XSection object.
     :ivar conditions: list of values for the analysis conditions
                       (only for upper limit-type analysis, e.g. analysis=ULanalysis)
-    :ivar mass: mass of the cluster to which the theory prediction refers to
+    :ivar mass: mass of the cluster to which the theory prediction refers
                 (only for upper limit-type analysis, e.g. analysis=ULanalysis)   
                  
     """
@@ -37,6 +37,54 @@ class TheoryPrediction(object):
         self.value = None
         self.conditions = None
         self.mass = None
+
+    def likelihood ( self, xsecinfo = None ):
+        """
+        compute the likelihood of this theory prediction,
+        for the assigned dataset.
+        :param xsecinfo: if specified, give likelihood for the given XSecInfo
+                         ( =sqrt(s) and perturbation order ), 
+                         else return a list for all XSecInfos defined
+                         in the dataset
+        :return: likelihood
+        """
+        if not hasattr ( self, "dataset" ):
+            return None
+        lumi = self.dataset.globalInfo.lumi
+        ret= []
+        for v in self.value:
+            if xsecinfo and xsecinfo != v.info:
+                continue
+            nsig = ( v.value * lumi ).asNumber()
+            llhd = self.dataset.likelihood ( nsig )
+            if xsecinfo:
+                return llhd
+            ret.append ( ( v.info, llhd ) )
+        return ret
+
+    def chi2 ( self, xsecinfo=None ):
+        """
+        compute the chi2 of this theory prediction, for the assigned dataset.
+        :param xsecinfo: if specified, give chi2 for the given XSecInfo
+                         ( =sqrt(s) and perturbation order ), 
+                         else return a list for all XSecInfos defined
+                         in the dataset
+        :return: chi2
+        """
+        if not hasattr ( self, "dataset" ):
+            return None
+        lumi = self.dataset.globalInfo.lumi
+        ret= []
+        for v in self.value:
+            if xsecinfo and xsecinfo != v.info:
+                continue
+            nsig = ( v.value * lumi ).asNumber()
+            llhd = self.dataset.chi2 ( nsig )
+            if xsecinfo:
+                return llhd
+            ret.append ( ( v.info, llhd ) )
+        return ret
+
         
     def getmaxCondition(self):
         """
@@ -53,6 +101,10 @@ class TheoryPrediction(object):
             maxcond = max(maxcond,value)
         return maxcond
     
+    def __str__(self):
+        return "%s:%s" % ( self.analysis, self.value )
+
+
 
 class TheoryPredictionList(object):
     """
