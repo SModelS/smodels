@@ -8,14 +8,11 @@
 
 from __future__ import print_function
 import os, sys
-import logging
 from ConfigParser import SafeConfigParser
 from smodels.installation import installDirectory, version
 from smodels.tools import modelTester
 from smodels.tools import crashReport
 import smodels.tools.printer as prt
-
-log = logging.getLogger(__name__)
 
 def main( inFile, parameterFile, outputDir, verbosity, db, timeout, development ):
     """
