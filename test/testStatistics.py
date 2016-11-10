@@ -12,15 +12,37 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.tools import statistics
-from smodels.tools.physicsUnits import fb
+from smodels.tools.physicsUnits import fb, TeV
+from smodels.theory.crossSection import XSectionInfo
+from smodels.theory.theoryPrediction import theoryPredictionsFor
+from databaseLoader import database
+from smodels.theory import slhaDecomposer
 from math import floor, log10
 import numpy as np
+import math
 
 class StatisticsTest(unittest.TestCase):
     def testUpperLimit(self):
         re = statistics.upperLimit ( 100., 100., 0., 20./fb   )
         self.assertAlmostEqual ( re.asNumber ( fb ), 1.06, 1 )
 
+    def testPredictionInterface(self):
+        """ A simple test to see that the interface in datasetObj
+        and TheoryPrediction to the statistics tools is working correctly
+        """
+        expRes = database.getExpResults( analysisIDs=['CMS-SUS-13-012'] )[0]
+        slhafile="../inputFiles/slha/simplyGluino.slha"
+        smstoplist = slhaDecomposer.decompose( slhafile )
+        selector = XSectionInfo ( 8*TeV )
+        prediction = theoryPredictionsFor ( expRes, smstoplist )[0]
+        pred_signal_strength = prediction.value[0].value
+        ill = math.log ( prediction.likelihood( selector ) )
+        ichi2=prediction.chi2( selector )
+        nsig = float ( pred_signal_strength * expRes.globalInfo.lumi )
+        dll = math.log ( statistics.likelihood ( nsig, 4, 2.2, 1.1, 0.2 ) )
+        dchi2 = statistics.chi2 ( nsig, 4, 2.2, 1.1, 0.2 )
+        self.assertAlmostEqual ( ill, dll, places=1 )
+        self.assertAlmostEqual ( ichi2, dchi2, places=1 )
 
     def round_to_sign(self, x, sig=3):
         """
@@ -51,7 +73,7 @@ class StatisticsTest(unittest.TestCase):
 
         """
 
-        expected_values = [ 
+        expected_values = [
         # mgluino          mlsp          nsig               nobs              nb             deltab           llhd                 chi2
         # ----------       ----------    ---------------    ----------------  ----------     ----------       -------------------- ----------------
         {'mgluino':  500, 'mlsp':  200, 'nsig':   384.898, 'nobs':  298.413, 'nb':  111.0 , 'deltab': 11.0 , 'llhd': 0.00024197 , 'chi2': 7.37662043 },
@@ -128,7 +150,7 @@ class StatisticsTest(unittest.TestCase):
             if not chi2_expected==None and not np.isnan(chi2_expected):
                 chi2_expected = self.round_to_sign(chi2_expected, 2)
                 # Check that chi2 values agree:
-                self.assertAlmostEqual(chi2_actual, chi2_expected, delta=2*1e-1)
+                self.assertAlmostEqual(chi2_actual, chi2_expected, delta=0.22 )
             else:
                 self.assertTrue(chi2_actual == None or np.isnan(chi2_actual))
 
@@ -152,10 +174,6 @@ class StatisticsTest(unittest.TestCase):
                         delta=2*1e-1)
             else:
                 self.assertTrue(likelihood_actual == None or np.isnan(likelihood_actual))
-
-
-
-
 
 if __name__ == "__main__":
     unittest.main()
