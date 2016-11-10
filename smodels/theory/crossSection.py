@@ -20,6 +20,11 @@ FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
 logging.basicConfig(format=FORMAT)
 logger = logging.getLogger(__name__)
 
+## orders in perturbation theory
+LO = 0
+NLO = 1
+NLL = 2
+
 
 class XSectionInfo(object):
     """
@@ -29,10 +34,16 @@ class XSectionInfo(object):
     mass, order and label).
     
     """
-    def __init__(self):
-        self.sqrts = None
-        self.order = None
-        self.label = None
+    def __init__(self, sqrts = None, order = None, label = None ):
+        """
+        Constructor.
+        :param: sqrts  center of mass energy, with unit
+        :param: order perturbation order of xsec computation
+        :param: label, a string that describes the xsec computation
+        """
+        self.sqrts = sqrts
+        self.order = order
+        self.label = label
 
 
     def __eq__(self, other):
@@ -632,11 +643,11 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
             # Assume LO xsecs, if not defined in the reader
             xsec.info.order = 0
         wlabel = str( sqrtS / TeV ) + ' TeV'
-        if xsec.info.order == 0:
+        if xsec.info.order == LO:
             wlabel += ' (LO)'
-        elif xsec.info.order == 1:
+        elif xsec.info.order == NLO:
             wlabel += ' (NLO)'
-        elif xsec.info.order == 2:
+        elif xsec.info.order == NLL:
             wlabel += ' (NLL)'
         xsec.info.label = wlabel
         xsec.value = 0. * pb
