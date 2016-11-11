@@ -98,11 +98,12 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         return masterPrinter.flush()
 
     outLevel = 0
-    if parser.getboolean("printer", "printDecomp"):
+    if parser.getboolean("stdout-printer", "printDecomp"):
         outLevel = 1
-        outLevel += parser.getboolean("printer", "addElmentInfo")
-    outLevelPy = int(parser.getboolean("printer","addElementList"))
-    masterPrinter.addObj(smstoplist,{'python' : outLevelPy, 'xml' : outLevelPy, 'stdout' : outLevel,'summary':None,'log':outLevel})
+        outLevel += parser.getboolean("stdout-printer", "addElmentInfo")
+    outLevelPy = int(parser.getboolean("python-printer","addElementList"))
+    outLevelXml = int(parser.getboolean("xml-printer","addElementList"))
+    masterPrinter.addObj(smstoplist,{'python' : outLevelPy, 'xml' : outLevelXml, 'stdout' : outLevel,'summary':None,'log':outLevel})
     
 
     """
@@ -120,13 +121,13 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """ Define result list that collects all theoryPrediction objects."""
     maxcond = parser.getfloat("parameters", "maxcond")
     results = ioObjects.ResultList(allPredictions,maxcond)
-    if not parser.getboolean("printer", "expandedSummary"):
+    if not parser.getboolean("summary-printer", "expandedSummary"):
         results.useBestResult()
 
     if not results.isEmpty():
         outputStatus.updateStatus(1)
         outLevelStdout = 2
-        if parser.getboolean("printer","printExtendedResults"):
+        if parser.getboolean("stdout-printer","printExtendedResults"):
             masterPrinter.addObj(allPredictions,2) #by default giving full available output if extendedResults requested
             outLevelStdout = None
         outLevel = 2 # by default we always print txnames with the results
@@ -138,10 +139,11 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         """ Testing coverage of model point, add results to the output file """
         outLevel = 2
         outLevelPy = 2
-        outLevel += parser.getboolean("printer", "addElmentInfo")
-	outLevelPy += parser.getboolean("printer","addElementList")
+        outLevel += parser.getboolean("stdout-printer", "addElmentInfo")
+    	outLevelPy += parser.getboolean("python-printer","addElementList")
+        outLevelXml += parser.getboolean("xml-printer","addElementList")
         uncovered = coverage.Uncovered(smstoplist)
-        masterPrinter.addObj(uncovered,{'python' : outLevelPy, 'xml' : outLevelPy, 'stdout' : outLevel,'summary':2,'log':outLevel})
+        masterPrinter.addObj(uncovered,{'python' : outLevelPy, 'xml' : outLevelXml, 'stdout' : outLevel,'summary':2,'log':outLevel})
     
     return masterPrinter.flush()
 
