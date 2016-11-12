@@ -203,7 +203,7 @@ class TxTPrinter(BasicPrinter):
     def __init__(self, output = 'stdout', filename = None, outputLevel = 1):
         BasicPrinter.__init__(self, output, filename, outputLevel)        
         self.name = "log"
-        self.printingOrder = [ExpResultList,OutputStatus,TopologyList,Element,ExpResult,
+        self.printingOrder = [OutputStatus,ExpResultList,TopologyList,Element,ExpResult,
                              TheoryPredictionList,ResultList,Uncovered]
         self.outputLevel = [outputLevel]*len(self.printingOrder)
         self.toPrint = [None]*len(self.printingOrder)        
