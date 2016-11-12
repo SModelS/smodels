@@ -56,6 +56,16 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     masterPrinter.setOutPutFiles(os.path.join(outputDir, os.path.basename(inputFile)))  
     
 
+    """ Print list of analyses loaded """
+    if parser.getboolean("stdout-printer", "printDatabase"):
+        outLevel = 1
+        outLevel += parser.getboolean("stdout-printer", "addAnaInfo")        
+        if 'stdout' in masterPrinter.Printers:
+            masterPrinter.addObj(ExpResultList(listOfExpRes),{'stdout' : outLevel})
+        if 'log' in masterPrinter.Printers:
+            masterPrinter.addObj(ExpResultList(listOfExpRes),{'log' : outLevel})
+
+
     """Check input file for errors"""
     inputStatus = ioObjects.FileStatus()
     if parser.getboolean("options", "checkInput"):
@@ -137,6 +147,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
 
     if parser.getboolean("options", "testCoverage"):
         """ Testing coverage of model point, add results to the output file """
+        
         outLevel = 2
         outLevelPy = 2
         outLevel += parser.getboolean("stdout-printer", "addElmentInfo")
@@ -328,13 +339,6 @@ def loadDatabaseResults(parser, database):
     ret = database.getExpResults(analysisIDs=analyses, txnames=txnames, 
                                  datasetIDs=datasetIDs, dataTypes=dataTypes,
                                  useSuperseded=useSuperseded, useNonValidated=useNonValidated)
-    """ Print list of analyses loaded """
-    if parser.getboolean("database", "printDatabase"):
-        databasePrinter = MPrinter(["stdout"])
-        outLevel = 1
-        outLevel += parser.getboolean("database", "addAnaInfo")
-        databasePrinter.addObj(ExpResultList(ret),outLevel)
-        databasePrinter.flush()
     return ret
 
 def getParameters(parameterFile):
