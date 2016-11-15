@@ -57,7 +57,7 @@ class TheoryPrediction(object):
                 continue
             nsig = ( v.value * lumi ).asNumber()
             llhd = self.dataset.likelihood ( nsig )
-            if xsecinfo:
+            if xsecinfo or len(self.value) ==1:
                 return llhd
             ret.append ( ( v.info, llhd ) )
         return ret
@@ -80,7 +80,7 @@ class TheoryPrediction(object):
                 continue
             nsig = ( v.value * lumi ).asNumber()
             llhd = self.dataset.chi2 ( nsig )
-            if xsecinfo:
+            if xsecinfo or len(self.value)==1:
                 return llhd
             ret.append ( ( v.info, llhd ) )
         return ret
