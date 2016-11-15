@@ -145,6 +145,10 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     else:
         outputStatus.updateStatus(0) # no results after enforcing maxcond
 
+    if parser.getboolean("options","computeStatistics"):
+        bestEMres = ioObjects.BestEMResult(results.getBestExpected())
+        masterPrinter.addObj(bestEMres,1)
+
     if parser.getboolean("options", "testCoverage"):
         """ Testing coverage of model point, add results to the output file """
         

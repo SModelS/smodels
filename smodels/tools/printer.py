@@ -17,7 +17,7 @@ from smodels.theory.element import Element
 from smodels.theory.theoryPrediction import TheoryPredictionList
 from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.databaseObj import ExpResultList
-from smodels.tools.ioObjects import OutputStatus, ResultList
+from smodels.tools.ioObjects import OutputStatus, ResultList, BestEMResult
 from smodels.tools.coverage import UncoveredList, Uncovered
 from smodels.tools.physicsUnits import GeV, fb, TeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
@@ -204,7 +204,7 @@ class TxTPrinter(BasicPrinter):
         BasicPrinter.__init__(self, output, filename, outputLevel)        
         self.name = "log"
         self.printingOrder = [OutputStatus,ExpResultList,TopologyList,Element,ExpResult,
-                             TheoryPredictionList,ResultList,Uncovered]
+                             TheoryPredictionList,ResultList,BestEMResult,Uncovered]
         self.outputLevel = [outputLevel]*len(self.printingOrder)
         self.toPrint = [None]*len(self.printingOrder)        
         
@@ -473,6 +473,20 @@ class TxTPrinter(BasicPrinter):
         output += "\n \n"
         output += 80 * "=" + "\n"
         output += "The highest r value is = " + str(obj.getR(obj.theoryPredictions[0])) + "\n"
+
+        return output
+
+    def _formatBestEMResult(self, obj, objOutputLevel):
+        """
+        Format statistics output for most sensitive EM type result
+        """
+        if not objOutputLevel: return None
+        if not obj.theoryPrediction: return None
+
+        output = "\n"
+        output += "Best EM result: %s - %s (%s TeV)\n" %(obj.theoryPrediction.expResult.globalInfo.id, obj.theoryPrediction.dataset.dataInfo.dataId, obj.theoryPrediction.expResult.globalInfo.sqrts/TeV)
+        output += "Likelihood = %10.3E\n" %obj.likelihood
+        output += "Chi2 = %10.3E\n" %obj.chi2
 
         return output
 
