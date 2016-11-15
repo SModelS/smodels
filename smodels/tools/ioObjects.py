@@ -87,6 +87,27 @@ class ResultList(object):
         """
         self.theoryPredictions = sorted(self.theoryPredictions, key=self.getR, reverse=True)
 
+    def getBestExpected(self):
+        """
+        Find EM result with the highest expected R vaue.
+        :returns: Theory Prediction object
+        """
+        rexpMax = -1.
+        bestExp = None
+        for tP in self.theoryPredictions:
+            expResult = tP.expResult
+            datasetID = tP.dataset.dataInfo.dataId
+            dataType = expResult.datasets[0].dataInfo.dataType
+            if dataType != 'efficiencyMap':
+                continue
+            ulExp = expResult.getUpperLimitFor(dataID=datasetID, expected = True)
+            rexp = tP.value[0].value/ulExp
+            if rexp > rexpMax:
+                rexpMax = rexp
+                bestExp = tP
+        return bestExp
+
+
     def useBestResult(self):
         """ 
         Restricts the list of predictions to the best result only.        
@@ -103,7 +124,17 @@ class ResultList(object):
         """
         return len(self.theoryPredictions) == 0
 
+class BestEMResult(object):
+    """
+    Class holding the best EM result (highest expected r value), for evaluation of chi2 and likelihood
+    :ivar bestRes: TheoryPrediction object corresponding to the best EM result
+    """
 
+    def __init__(self, bestRes):
+        self.theoryPrediction = bestRes
+        if not bestRes: return
+        self.chi2 = self.theoryPrediction.chi2()
+        self.likelihood = self.theoryPrediction.likelihood()
 
 class OutputStatus(object):
     """
