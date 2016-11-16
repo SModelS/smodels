@@ -60,11 +60,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     if parser.getboolean("stdout-printer", "printDatabase"):
         outLevel = 1
         outLevel += parser.getboolean("stdout-printer", "addAnaInfo")        
-        if 'stdout' in masterPrinter.Printers:
-            masterPrinter.addObj(ExpResultList(listOfExpRes),{'stdout' : outLevel})
-        if 'log' in masterPrinter.Printers:
-            masterPrinter.addObj(ExpResultList(listOfExpRes),{'log' : outLevel})
-
+        masterPrinter.addObj(ExpResultList(listOfExpRes),{'stdout' : outLevel,'log' : outLevel})
 
     """Check input file for errors"""
     inputStatus = ioObjects.FileStatus()
