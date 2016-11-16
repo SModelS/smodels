@@ -73,10 +73,8 @@ class MPrinter(object):
             objLevels = dict(objOutputLevel.items())
         
         for printerType,outputLevel in objLevels.items(): 
-            if not printerType in self.Printers:
-                logger.info('Printer type %s not found in printers' %printerType)
-                continue
-            self.Printers[printerType].addObj(obj,outputLevel)
+            if printerType in self.Printers:
+                self.Printers[printerType].addObj(obj,outputLevel)
             
     def setOutPutFiles(self,filename):
         """

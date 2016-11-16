@@ -31,6 +31,7 @@
 .. |dataset| replace:: :ref:`data set<DataSet>`
 .. |datasets| replace:: :ref:`data sets<DataSet>`
 .. |parameters| replace:: :ref:`parameters file <parameterFile>`
+.. |ssigBRe| replace:: :math:`\sum \sigma \times BR \times \epsilon`
 
 
 .. _runningSModelS:
@@ -246,19 +247,26 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
    :lines: 933-991
    
 
-* a list of all the |theory predictions| obtained and the corresponding |expres| upper limit (if **printResults** = True).
-  For each |theory prediction| entry, the :doc:`analysis name <AnalysesNames>`, *sqrts*, the :ref:`cluster <ULcluster>` average mass
-  in each branch, the cross-section value and the list of the :ref:`condition values <ULconditions>` for the :ref:`cluster <ULcluster>`
-  and the corresponding |analysis| upper limit are shown:
-
+* a list of all the |theory predictions| obtained (if **printResults** = True). and the corresponding |expres| upper limit .
+  For each |theory prediction| entry, the corresponding |expres| *id*, its *sqrts*, the list of :ref:`condition values <ULconditions>`
+  (if applicable), the |theory prediction| value (|ssigBRe|), the corresponding experimental upper limit and their ratio
+  (see :ref:`confronting predictions <confrontPredictions>`). Furthermore, the corresponding signal region (|dataset|) for
+  |EMrs| is also shown: 
+  
 .. literalinclude:: /images/screenoutput.txt
    :lines: 17896-17915
+
+
+.. _logOut:
+
+Log Output
+**********
+
+The log-type output is identical to the :ref:`screen output <screenOut>`, except that it is
+redirected to a .log file. The filename is set as the <input file>.log and stored in the output folder
+(see the :ref:`runSModelS options <runSModelS>`).
+
    
-* possible (mostly harmless) warnings [*]_
-
-.. literalinclude:: /images/screenoutput.txt
-   :lines: 1,3,7   
-
 
 .. _fileOut:
 
