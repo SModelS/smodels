@@ -131,7 +131,7 @@ class RunPrinterTest(unittest.TestCase):
     
         #Add the decomposition result to the printers
         if addTopList:
-            mprinter.addObj(smstoplist)
+            mprinter.addObj(smstoplist,1)
     
         listOfExpRes = database.getExpResults()
         # Compute the theory predictions for each analysis
@@ -159,7 +159,7 @@ class RunPrinterTest(unittest.TestCase):
                                                 'maxcond': maxcond },
                                               databaseVersion)
         outputStatus.status = 1
-        mprinter.addObj(outputStatus)
+        mprinter.addObj(outputStatus,1)
         mprinter.flush()
         
 
