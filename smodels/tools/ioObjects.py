@@ -59,11 +59,11 @@ class ResultList(object):
         self.theoryPredictions.append(theoPred)
         return True
 
-    def getR(self, theoPred):
+    def getR(self, theoPred, expected = False):
         """
         Calculate R value.
         
-        :paramtheoPredr theoPred: Theory Prediction object
+        :parameter theoPredr theoPred: Theory Prediction object
         :returns: R value = weight / upper limit        
         """
         
@@ -72,13 +72,14 @@ class ResultList(object):
         dataType = expResult.datasets[0].dataInfo.dataType
         
         if dataType == 'upperLimit':
-            ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass)
+            ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass, expected = expected)
         elif dataType == 'efficiencyMap':
-            ul = expResult.getUpperLimitFor(dataID=datasetID)
+            ul = expResult.getUpperLimitFor(dataID=datasetID, expected=expected)
         else:
             logger.error("Unknown dataType %s" %(str(dataType)))
         
         return theoPred.value[0].value/ul
+
 
     def sort(self):
         """
