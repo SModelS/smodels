@@ -14,7 +14,7 @@ from smodels.tools import ioObjects
 from smodels.tools import coverage, runtime
 from smodels.theory import slhaDecomposer
 from smodels.theory import lheDecomposer
-from smodels.theory.theoryPrediction import theoryPredictionsFor
+from smodels.theory.theoryPrediction import theoryPredictionsFor, TheoryPredictionList
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools import crashReport, timeOut
 from smodels.tools.printer import MPrinter
@@ -69,7 +69,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """Initialize output status and exit if there were errors in the input"""
     outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile,
             dict(parser.items("parameters")), databaseVersion)
-    masterPrinter.addObj(outputStatus)              
+    masterPrinter.addObj(outputStatus, 1)              
     if outputStatus.status < 0:          
         return masterPrinter.flush()
     
@@ -132,18 +132,16 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
 
     if not results.isEmpty():
         outputStatus.updateStatus(1)
-        outLevelStdout = 2
+        outLevelStdout = 1
+        outLevel = 1
+        outLevelStdout += parser.getboolean("options","computeStatistics")
+        outLevel += parser.getboolean("options","computeStatistics")
         if parser.getboolean("stdout-printer","printExtendedResults"):
-            masterPrinter.addObj(allPredictions,2) #by default giving full available output if extendedResults requested
+            masterPrinter.addObj(TheoryPredictionList(allPredictions),{'stdout': outLevelStdout, 'log':outLevelStdout}) #by default giving full available output if extendedResults requested
             outLevelStdout = None
-        outLevel = 2 # by default we always print txnames with the results
         masterPrinter.addObj(results,{'python' : outLevel, 'xml' : outLevel, 'stdout' : outLevelStdout,'summary':outLevel,'log':outLevelStdout})
     else:
         outputStatus.updateStatus(0) # no results after enforcing maxcond
-
-    if parser.getboolean("options","computeStatistics"):
-        bestEMres = ioObjects.BestEMResult(results.getBestExpected())
-        masterPrinter.addObj(bestEMres,1)
 
     if parser.getboolean("options", "testCoverage"):
         """ Testing coverage of model point, add results to the output file """
