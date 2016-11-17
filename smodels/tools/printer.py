@@ -136,8 +136,7 @@ class BasicPrinter(object):
         for iobj,objType in enumerate(self.printingOrder):
             if isinstance(obj,objType):
                 self.toPrint[iobj] = obj
-                if not objOutputLevel is None:
-                    self.outputLevel[iobj] = objOutputLevel
+                self.outputLevel[iobj] = objOutputLevel
                 return True
         return False
 
@@ -383,23 +382,22 @@ class TxTPrinter(BasicPrinter):
 
         output = ""
         for theoryPrediction in obj:
-            expRes = obj.expResult
-            info = expRes.globalInfo
-            datasetInfo = theoryPrediction.dataset.dataInfo
+            expRes = theoryPrediction.expResult
+            info = theoryPrediction.dataset.dataInfo
             output += "\n"
-            output += "---------------Analysis Label = " + info.id + "\n"
-            output += "-------------------Dataset Label = " + str(datasetInfo.dataId) + "\n"
+            output += "---------------Analysis Label = " + expRes.globalInfo.id + "\n"
+            output += "-------------------Dataset Label = " + str(info.dataId).replace("None","(UL)") + "\n"
             output += "-------------------Txname Labels = " + str([str(txname) for txname in theoryPrediction.txnames]) + "\n"
-            output += "Analysis sqrts: " + str(info.sqrts) + \
+            output += "Analysis sqrts: " + str(expRes.globalInfo.sqrts) + \
                     "\n"
+
 
             if theoryPrediction.mass:
                 for ibr, br in enumerate(theoryPrediction.mass):
                     output += "Masses in branch %i: " % ibr + str(br) + "\n"
             if not theoryPrediction.IDs[0]==0: output += "Contributing elements: " + str(theoryPrediction.IDs) + "\n"
-            if objOutputLevel == 2:
-                for pidList in theoryPrediction.PIDs:
-                    output += "PIDs:" + str(pidList) + "\n"
+            for pidList in theoryPrediction.PIDs:
+                output += "PIDs:" + str(pidList) + "\n"
             output += "Theory prediction: " + str(theoryPrediction.value) + "\n"
             output += "Theory conditions:"
             if not theoryPrediction.conditions:
@@ -413,10 +411,19 @@ class TxTPrinter(BasicPrinter):
             #Get upper limit for the respective prediction:
             if expRes.datasets[0].dataInfo.dataType == 'upperLimit':
                 experimentalLimit = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass)
+                expectedExperimentalLimit = None # we dont normally have expected limits for UL type results
             elif expRes.datasets[0].dataInfo.dataType == 'efficiencyMap':
                 experimentalLimit = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.dataInfo.dataId)
+                if objOutputLevel > 1:
+                    expectedExperimentalLimit = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.dataInfo.dataId, expected = True)
+                    chi2 = theoryPrediction.chi2()
+                    likelihood = theoryPrediction.likelihood()
 
-            output += "Experimental limit: " + str(experimentalLimit) + "\n"
+            output += "Observed experimental limit: " + str(experimentalLimit) + "\n"
+            if type(expectedExperimentalLimit) != type(None):
+                output += "Expected experimental limit: " + str(expectedExperimentalLimit) + "\n"
+                output += "Chi2: " + str(chi2) + "\n"
+                output += "Likelihood: " + str(likelihood) + "\n"
 
         return output
 
@@ -432,7 +439,9 @@ class TxTPrinter(BasicPrinter):
 
         output = ""
 
-        output += "#Analysis  Sqrts  Cond. Violation  Theory_Value(fb)  Exp_limit(fb)  r\n\n"
+        output += "#Analysis  Sqrts  Cond. Violation  Theory_Value(fb)  Exp_limit(fb)  r"
+        if objOutputLevel > 1: output += " r_expected chi2 likelihood"
+        output += "\n\n"
         # Suggestion to obtain expected limits:
         # output += "#Analysis  Tx_Name  Sqrts  Cond. Violation  PredTheory(fb)  ULobserved (fb) ULexpected (fb)  r\n\n"
         for theoPred in obj.theoryPredictions:
@@ -460,12 +469,16 @@ class TxTPrinter(BasicPrinter):
             output += "%10.3E %10.3E " % (theoPred.value[0].value / fb, ul / fb)  # theory cross section , expt upper limit
             # Suggestion to obtain expected limits:
             # output += "%10.3E " % (expected / fb)  # expected upper limit
-            output += "%10.3E\n" % obj.getR(theoPred)
+            output += "%10.3E" % obj.getR(theoPred)
+            if objOutputLevel > 1:
+                if dataType == 'efficiencyMap':
+                    output += " %10.3E %10.3E %10.3E" % (obj.getR(theoPred, expected=True), theoPred.chi2(), theoPred.likelihood())
+                else: output += " None None None"
+            output += "\n"
             output += " Signal Region:  "+signalRegion+"\n"
-            if objOutputLevel == 2:
-                txnameStr = str([str(tx) for tx in txnames])
-                txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
-                output += " Txnames:  " + txnameStr + "\n"
+            txnameStr = str([str(tx) for tx in txnames])
+            txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
+            output += " Txnames:  " + txnameStr + "\n"
             if not theoPred == obj.theoryPredictions[-1]: output += 80 * "-"+ "\n"
 
         output += "\n \n"
