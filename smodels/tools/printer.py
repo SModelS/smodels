@@ -200,7 +200,8 @@ class BasicPrinter(object):
             formatFunction = getattr(self,'_format'+typeStr)
             return formatFunction(obj)
         except AttributeError,e:
-            logger.debug('Error formating object %s: \n %s' %(typeStr,e))
+            #logger.debug
+            print('Error formating object %s: \n %s' %(typeStr,e))
             return False
 
 
@@ -264,7 +265,7 @@ class TxTPrinter(BasicPrinter):
         :param obj: A TopologyList object to be printed.
         """
 
-        if not hasattr(self,'printDecomp') or not self.printDecomp:
+        if not hasattr(self,'printdecomp') or not self.printdecomp:
             return None
 
         old_vertices = ""
@@ -286,11 +287,11 @@ class TxTPrinter(BasicPrinter):
             totxsec = topo.getTotalWeight()
             output += "Total Global topology weight :\n" + totxsec.niceStr() + '\n'
             output += "Total Number of Elements: " + str(len(topo.elementList)) + '\n'
-            if not hasattr(self,'addElmentInfo') or not self.addElmentInfo:
-                for el in topo.elementList:
-                    output += "\t\t "+ 73 * "." + "\n"
-                    output += "\t\t Element: \n"
-                    output += self._formatElement(el,1) + "\n"
+            if not hasattr(self,'addelmentinfo') or not self.addelmentinfo: continue
+            for el in topo.elementList:
+                output += "\t\t "+ 73 * "." + "\n"
+                output += "\t\t Element: \n"
+                output += self._formatElement(el) + "\n"
 
         return output
 
@@ -314,7 +315,7 @@ class TxTPrinter(BasicPrinter):
         output += "\t\t The element PIDs are \n"
         for pidlist in obj.getPIDs():
             output += "\t\t PIDs: "+ str(pidlist) + "\n"
-        output += "\t\t The element weights are: \n \t\t " + obj.weight.niceStr()
+        output += "\t\t The element weights are: \n \t\t " + obj.weight.niceStr().replace("\n", "\n \t\t ")
 
         return output
 
@@ -325,13 +326,15 @@ class TxTPrinter(BasicPrinter):
         :param obj: A ExpResultList object to be printed.
         """
         
-        if not hasattr(self,"printDatabase") or not self.printDatabase:
+        if not hasattr(self,"printdatabase") or not self.printdatabase:
             return None
+
+        output = ""
 
         for expRes in obj.expResultList:
             output += self._formatExpResult(expRes)
 
-        return output
+        return output+"\n"
 
 
     def _formatExpResult(self, obj):
@@ -353,7 +356,7 @@ class TxTPrinter(BasicPrinter):
         output += "Experimental Result ID: " + obj.globalInfo.id + '\n'
         output += "Tx Labels: " + str(txnames) + '\n'
         output += "Sqrts: " + str(obj.globalInfo.sqrts) + '\n'
-        if not hasattr(self,"addAnaInfo") or not self.addAnaInfo:
+        if hasattr(self,"addanainfo") and self.addanainfo:
             output += "\t -----------------------------\n"
             output += "\t Elements tested by analysis:\n"
             listOfelements = []
@@ -377,7 +380,7 @@ class TxTPrinter(BasicPrinter):
         obj.sort()
         
         
-        if hasattr(self,"printExtendedResults") and self.printExtendedResults:
+        if hasattr(self,"printextendedresults") and self.printextendedresults:
             return self._formatExpandedResultList(obj)
                 
         if hasattr(self,"expandedSummary") and not self.expandedSummary:            
@@ -457,7 +460,7 @@ class TxTPrinter(BasicPrinter):
             if not theoryPrediction.IDs[0]==0: output += "Contributing elements: " + str(theoryPrediction.IDs) + "\n"
             for pidList in theoryPrediction.PIDs:
                 output += "PIDs:" + str(pidList) + "\n"
-            output += "Theory prediction: " + str(theoryPrediction.value) + "\n"
+            output += "Theory prediction: " + str(theoryPrediction.xsection.value) + "\n"
             output += "Theory conditions:"
             if not theoryPrediction.conditions:
                 output += "  " + str(theoryPrediction.conditions) + "\n"
@@ -475,7 +478,7 @@ class TxTPrinter(BasicPrinter):
 
             output += "Observed experimental limit: " + str(upperLimit) + "\n"
             if hasattr(theoryPrediction,'expectedUL') and not theoryPrediction.expectedUL is None:
-                output += "Expected experimental limit (fb): " + str(theoryPrediction.expectedUL.asNumber(fb)) + "\n"
+                output += "Expected experimental limit: " + str(theoryPrediction.expectedUL) + "\n"
                 output += "Chi2: " + str(theoryPrediction.chi2) + "\n"
                 output += "Likelihood: " + str(theoryPrediction.likelihood) + "\n"
 
@@ -518,7 +521,7 @@ class TxTPrinter(BasicPrinter):
                 output += "Sqrts (TeV)   Weight (fb)        Element description\n"        
                 for topo in sorted(uncovEntry.topos, key=lambda x: x.value, reverse=True)[:nprint]:
                     output += "%5s %10.3E    # %45s\n" % (str(obj.missingTopos.sqrts.asNumber(TeV)),topo.value, str(topo.topo))
-                    if hasattr(self,"addElmentInfo") and self.addElmentInfo:
+                    if hasattr(self,"addelmentinfo") and self.addelmentinfo:
                         contributing = []
                         for el in topo.contributingElements:
                             contributing.append(el.elID)
@@ -530,7 +533,7 @@ class TxTPrinter(BasicPrinter):
             output += "Mother1 Mother2 Weight (fb)\n"
             for ent in uncovEntry.getSorted(obj.sqrts)[:nprint]:
                 output += "%s %s %10.3E # %s\n" %(ent.motherPIDs[0], ent.motherPIDs[1], ent.getWeight(obj.sqrts).asNumber(fb), str(ent.motherPIDs))
-                if hasattr(self,"addElmentInfo") and self.addElmentInfo:
+                if hasattr(self,"addelmentinfo") and self.addelmentinfo:
                     contributing = []
                     for el in ent.contributingElements:
                         contributing.append(el.elID)
@@ -628,7 +631,7 @@ class PyPrinter(BasicPrinter):
         :param obj: A TopologyList object to be printed.
         """
                 
-        if not hasattr(self,'addElementList') or not self.addElementList:
+        if not hasattr(self,'addelementlist') or not self.addelementlist:
             return None
 
         elements = []
@@ -808,7 +811,7 @@ class PyPrinter(BasicPrinter):
         for topo in obj.missingTopos.topos[:nprint]:
             missed = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : topo.value,
                                 'element' : str(topo.topo)}           
-            if hasattr(self,"addElementList") and self.addElementList:
+            if hasattr(self,"addelementlist") and self.addelementlist:
                 contributing = []
                 for el in topo.contributingElements:
                     contributing.append(el.elID)
