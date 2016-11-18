@@ -34,15 +34,10 @@ class IntegrationTest(unittest.TestCase):
             import sys
             sys.exit(-1)
         for pred in theorypredictions:
-            m0=str ( int ( pred.mass[0][0]/GeV )  )
-            w=pred.value.getDictionary()[(None,None)]
-            for key in w:
-                if '8' in key and 'TeV' in key:
-                    predval=w[key]
-                    break
-            defpredval=defpreds[expresult.getValuesFor('id')[0]+\
-                ":"+pred.txnames[0].getInfo("txName") ]
-            self.assertAlmostEqual ( predval / fb, defpredval / fb )
+            m0=str(int(pred.mass[0][0]/GeV))
+            predval=pred.xsection.value
+            defpredval = defpreds.values()[0]
+            self.assertAlmostEqual( predval/fb, defpredval/fb)
 
     def testIntegration(self):
         from smodels.installation import installDirectory
