@@ -12,7 +12,7 @@
 import logging
 from smodels.tools.physicsUnits import fb
 from smodels.tools.caching import _memoize
-from scipy import stats, optimize, integrate,special
+from scipy import stats, optimize, integrate
 from numpy import sqrt, random, exp, log, nan
 import math
 
@@ -122,7 +122,7 @@ def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
         return 1.-(p_SplusB / p_b) # 1 - CLs
 
 
-def likelihood(nsig, nobs, nb, deltab, deltas, ntoys=100000):
+def likelihood(nsig, nobs, nb, deltab, deltas):
         """
         Return the likelihood to observe nobs events given the
         predicted background nb, error on this background (deltab),
@@ -133,12 +133,15 @@ def likelihood(nsig, nobs, nb, deltab, deltas, ntoys=100000):
         :param nb: predicted background (float)
         :param deltab: uncertainty on background (float)
         :param deltas: uncertainty on signal (float)
-        :param ntoys: number of toys to use in integral (int)
 
         :return: likelihood to observe nobs events (float)
 
         """
-
+        
+        #Set signal error to 20%, if not defined
+        if deltas is None:
+            deltas = 0.2*nsig        
+            
         #     Why not a simple gamma function for the factorial:
         #     -----------------------------------------------------
         #     The scipy.stats.poisson.pmf probability mass function
@@ -153,62 +156,43 @@ def likelihood(nsig, nobs, nb, deltab, deltas, ntoys=100000):
         #     probability mass function as a whole should not be huge,
         #     the exponent of the log of this expression is calculated
         #     instead to avoid using large numbers.
+            
+        
+        #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
+        def prob(x,nsig, nobs, nb, deltab, deltas):
+            poisson = exp(nobs*log(x) - x - math.lgamma(nobs + 1))
+            gaussian = stats.norm.pdf(x,loc=nb+nsig,scale=sqrt(deltab**2 + deltas**2))
+            
+            return poisson*gaussian
+        
+        #Compute maximum value for integrand:        
+        sigma2 = deltab**2 + deltas**2
+        xm = nb+nsig- sigma2
+        xmax =max(xm*(1.+sqrt(1. + 4.*nobs*sigma2/xm**2))/2.,
+                  xm*(1.-sqrt(1. + 4.*nobs*sigma2/xm**2))/2.)
+
+        #Define initial integration range:
+        nrange = 5.
+        a = max(0.,xmax-nrange*sqrt(sigma2))
+        b = xmax+nrange*sqrt(sigma2)        
+        like,likeErr = integrate.quad(prob,a,b,(nsig, nobs, nb, deltab, deltas),
+                                      epsabs=1e-100,epsrel=1e-3)
+        
+        #Increase integration range until integral converges
+        like_old = like*2.
+        while abs(like_old-like)/like > 0.01:
+            like_old = like
+            nrange = nrange*2
+            a = max(0.,xmax-nrange*sqrt(sigma2))
+            b = xmax+nrange*sqrt(sigma2)        
+            like,likeErr = integrate.quad(prob,a,b,(nsig, nobs, nb, deltab, deltas),
+                                      epsabs=1e-100,epsrel=1e-3)
+
+                
+        return like
 
 
-        total_integrand = 0.
-
-        ## perform double Gaussian integral by Monte Carlo
-
-
-        # Make sure mean below is not always negative, but limit
-        # number of tries to search for lambda_b>0, lambda_s>0
-        # to avoid getting stuck:
-        max_tries = 50
-
-
-        for i in range(ntoys):
-
-                # Compute two random numbers:
-                smear_b, smear_s = random.normal(), random.normal()
-
-                # Smear background and signal with a Gaussian
-                # using their widths as errors:
-                lambda_b = nb + smear_b*deltab
-                lambda_s = nsig + smear_s*deltas
-                mean = lambda_b + lambda_s
-                # smearing is done with random.normal numbers:
-                # stats.normal.pdf can also be used but is much slower
-
-                # Make sure these numbers are not always negative:
-                # count number of tries to obtain positive mean
-                # and stay below a maximum to avoid lengthy
-                # computations:
-                try_positive = 0
-
-                # Keep searching for positive lambda_b, lambda_s
-                # for a maximum number of tries positive_tries:
-                while mean < 0. and try_positive < max_tries:
-                    try_positive += 1
-                    smear_b, smear_s = random.normal(), random.normal()
-                    lambda_b = nb + smear_b*deltab
-                    lambda_s = nsig + smear_s*deltas
-                    # total predicted
-                    mean = lambda_b + lambda_s
-
-                #Cut integral at negative mean values
-                if mean <= 0.:
-                    continue
-
-                # value of integrand, poisson likelihood value
-                # poisson_integrand = e^(-mean)*mean^nobs/nobs!
-                poisson_integrand = exp(nobs*log(mean) - mean - math.lgamma(nobs + 1))
-                total_integrand += poisson_integrand
-
-        # Return the likelihood normalized by the number of toys.
-        return total_integrand/float(ntoys)
-
-
-def chi2(nsig, nobs, nb, deltab, deltas=None, ntoys=100000):
+def chi2(nsig, nobs, nb, deltab, deltas=None):
         """
         Computes the chi2 for a given number of observed events nobs
         given the predicted background nb, error on this background deltab,
@@ -220,7 +204,6 @@ def chi2(nsig, nobs, nb, deltab, deltas=None, ntoys=100000):
         :param nb: predicted background (float)
         :param deltab: uncertainty in background (float)
         :param deltas: uncertainty in signal acceptance (float)
-        :param ntoys: number of toys to use in integral (int)
 
         :return: chi2 (float)
 
@@ -231,14 +214,14 @@ def chi2(nsig, nobs, nb, deltab, deltas=None, ntoys=100000):
             deltas = 0.2*nsig
 
         # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
-        llhd = likelihood(nsig, nobs, nb, deltab, deltas, ntoys)
+        llhd = likelihood(nsig, nobs, nb, deltab, deltas)
 
         #Percentual signal error:
         deltas_pct = deltas/(1.0*nsig)
 
         # Compute the maximum likelihood H1, which sits at nsig = nobs - nb
         # (keeping the same % error on signal):        
-        maxllhd = likelihood(nobs-nb, nobs, nb, deltab, deltas_pct*(nobs-nb), ntoys)
+        maxllhd = likelihood(nobs-nb, nobs, nb, deltab, deltas_pct*(nobs-nb))
 
         # Return infinite likelihood if it is zero
         # This can happen in case e.g. nb >> nobs

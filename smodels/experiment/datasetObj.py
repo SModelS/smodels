@@ -102,7 +102,7 @@ class DataSet(object):
         else:
             return valuesDict[attribute]
 
-    def likelihood ( self, nsig, deltas=.2, ntoys=100000 ):
+    def likelihood ( self, nsig, deltas=None):
         """
         Computes the likelihood to observe nobs events, 
         given a predicted signal "nsig", assuming "deltas"
@@ -110,29 +110,27 @@ class DataSet(object):
         The values observedN, expectedBG, and bgError 
         are part of dataInfo.
         :param nsig: predicted signal (float)
-        :param deltas: uncertainty on signal (float)
-        :param ntoys: number of toys to use in integral (int)
+        :param deltas: uncertainty on signal (float). If None, default value (20%) will be used.
 
         :return: likelihood to observe nobs events (float)
         """
         
         return statistics.likelihood(nsig, self.dataInfo.observedN, 
-                self.dataInfo.expectedBG, self.dataInfo.bgError, deltas, ntoys)
+                self.dataInfo.expectedBG, self.dataInfo.bgError, deltas)
 
-    def chi2( self, nsig, deltas=.2, ntoys=100000 ):
+    def chi2( self, nsig, deltas=None):
         """
         Computes the chi2 for a given number of observed events "nobs",
         given number of signal events "nsig", and error on signal "deltas".
         nobs, expectedBG and bgError are part of dataInfo.
         :param nsig: predicted signal (float)
-        :param deltas: relative uncertainty in signal acceptance (float)
-        :param ntoys: number of toys to use in integral (int)
+        :param deltas: relative uncertainty in signal (float). If None, default value (20%) will be used.
 
         :return: chi2 (float)
         """
         
         return statistics.chi2(nsig, self.dataInfo.observedN, 
-                self.dataInfo.expectedBG, self.dataInfo.bgError, deltas, ntoys)
+                self.dataInfo.expectedBG, self.dataInfo.bgError, deltas)
 
     def getAttributes(self,showPrivate=False):
         """
