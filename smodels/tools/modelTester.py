@@ -97,7 +97,6 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         outputStatus.updateStatus(-3)
         return masterPrinter.flush()
 
-    outLevel = 0
     masterPrinter.addObj(smstoplist)
     
 
