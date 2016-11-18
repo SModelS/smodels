@@ -255,12 +255,18 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   
 .. literalinclude:: /images/screenoutput.txt
    :lines: 17896-17915
+
+
+.. _logOut:
+
+Log Output
+**********
+
+The log-type output is identical to the :ref:`screen output <screenOut>`, except that it is
+redirected to a .log file. The filename is set as the <input file>.log and stored in the output folder
+(see the :ref:`runSModelS options <runSModelS>`).
+
    
-* possible (mostly harmless) warnings [*]_
-
-.. literalinclude:: /images/screenoutput.txt
-   :lines: 1,3,7   
-
 
 .. _fileOut:
 

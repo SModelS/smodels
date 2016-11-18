@@ -14,6 +14,7 @@ from smodels.tools import statistics
 from smodels.tools.physicsUnits import fb
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
+
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
 logging.basicConfig(format=FORMAT)
 logger = logging.getLogger(__name__)
@@ -114,9 +115,9 @@ class DataSet(object):
 
         :return: likelihood to observe nobs events (float)
         """
-        import smodels.tools.statistics
-        return statistics.likelihood ( nsig, self.dataInfo.observedN, 
-                self.dataInfo.expectedBG, self.dataInfo.bgError, deltas, ntoys )
+        
+        return statistics.likelihood(nsig, self.dataInfo.observedN, 
+                self.dataInfo.expectedBG, self.dataInfo.bgError, deltas, ntoys)
 
     def chi2( self, nsig, deltas=.2, ntoys=100000 ):
         """
@@ -129,9 +130,9 @@ class DataSet(object):
 
         :return: chi2 (float)
         """
-        import smodels.tools.statistics
-        return statistics.chi2 ( nsig, self.dataInfo.observedN, 
-                self.dataInfo.expectedBG, self.dataInfo.bgError, deltas, ntoys )
+        
+        return statistics.chi2(nsig, self.dataInfo.observedN, 
+                self.dataInfo.expectedBG, self.dataInfo.bgError, deltas, ntoys)
 
     def getAttributes(self,showPrivate=False):
         """
