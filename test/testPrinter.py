@@ -220,7 +220,7 @@ class RunPrinterTest(unittest.TestCase):
         mprinter = printer.MPrinter()
         mprinter.Printers['python'] = printer.PyPrinter(output = 'file')
         #Define options:
-        mprinter.Printers['python'].addElementList = True
+        mprinter.Printers['python'].addelementlist = True
          
         slhafile = os.path.join ( idir(), "inputFiles/slha/simplyGluino.slha" )
         mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple')
@@ -250,7 +250,7 @@ class RunPrinterTest(unittest.TestCase):
         mprinter = printer.MPrinter()
         mprinter.Printers['xml'] = printer.XmlPrinter(output = 'file')
         #Define options:
-        mprinter.Printers['xml'].addElementList = False                    
+        mprinter.Printers['xml'].addelementlist = False                    
   
         slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
         mprinter.setOutPutFiles('./unitTestOutput/printer_output')
@@ -276,7 +276,7 @@ class RunPrinterTest(unittest.TestCase):
         mprinter = printer.MPrinter()
         mprinter.Printers['xml'] = printer.XmlPrinter(output = 'file')
         #Define options:
-        mprinter.Printers['xml'].addElementList = True   
+        mprinter.Printers['xml'].addelementlist = True   
  
         slhafile = os.path.join ( idir(), "inputFiles/slha/simplyGluino.slha" )
         mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple')
