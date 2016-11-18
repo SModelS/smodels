@@ -110,15 +110,15 @@ class RunSModelSTest(unittest.TestCase):
         if nout != nin:
             logger.error("Number of output file (%d) differ from number of input files (%d)" % (nout, nin))
         self.assertTrue( nout == nin )
- 
+   
     def timeoutRun(self):
         filename = join ( iDir(), "inputFiles/slha/complicated.slha" )
         outputfile = self.runMain(filename, timeout=1, suppressStdout=True,
                      development=True, inifile = "timeout.ini" )
- 
+   
     def testTimeout(self):
         self.assertRaises(NoTime, self.timeoutRun)
-
+ 
     def testGoodFile(self):
         filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
         outputfile = self.runMain(filename)
@@ -138,7 +138,7 @@ class RunSModelSTest(unittest.TestCase):
         self.assertTrue(equals)
     
     def testGoodFile13(self):
-         
+          
         filename = join ( iDir(), "inputFiles/slha/simplyGluino.slha" )
         outputfile = self.runMain(filename)
         shutil.copyfile(outputfile,'./output13.py')
@@ -155,7 +155,7 @@ class RunSModelSTest(unittest.TestCase):
             os.remove('./output13.pyc')
         except OSError: pass
         self.assertTrue(equals)        
- 
+  
     def testBadFile(self):
         filename = join (iDir(), "inputFiles/slha/I_dont_exist.slha" )
         outputfile = self.runMain(filename)
@@ -168,13 +168,13 @@ class RunSModelSTest(unittest.TestCase):
         os.remove('./bad_output.py')
         os.remove('./bad_output.pyc')
         self.assertTrue(equals )
-
+  
     def cleanUp ( self ):
         for f in os.listdir("."):
             if ".crash" in f: os.remove(f)
         for i in [ "crash_report_parameter", "crash_report_input" ]:
             if os.path.exists ( i ): os.remove ( i )
-
+  
     def testCrash(self):
         filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
         ctr=0
@@ -196,7 +196,7 @@ class RunSModelSTest(unittest.TestCase):
                 ctr+=1
         self.assertEquals ( ctr, 1 )
         inp, par = crashReport.readCrashReportFile(crash_file)
- 
+   
         self.assertEquals(open(filename).readlines(), open(inp).readlines())
         self.assertEquals( open("timeout.ini").readlines(),
                            open(par).readlines())
