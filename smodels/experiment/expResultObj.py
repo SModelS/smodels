@@ -144,7 +144,10 @@ class ExpResult(object):
             if compute:
                 upperLimit = useDataset.getSRUpperLimit(alpha, expected, compute)
             else:
-                upperLimit = useDataset.dataInfo.upperLimit
+                if expected:
+                    upperLimit = useDataset.dataInfo.expectedUpperLimit
+                else:
+                    upperLimit = useDataset.dataInfo.upperLimit
                 if (upperLimit/fb).normalize()._unit:
                     logger.error("Upper limit defined with wrong units for %s and %s"
                                   %(dataset.globalInfo.id,dataset.dataInfo.dataId))

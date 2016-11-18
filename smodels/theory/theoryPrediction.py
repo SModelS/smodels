@@ -23,7 +23,7 @@ class TheoryPrediction(object):
     
     :ivar analysis: holds the analysis (ULanalysis or EManalysis object)
                     to which the prediction refers
-    :ivar value: value of the theory prediction 
+    :ivar xsection: xsection of the theory prediction 
                 (relevant cross-section to be compared with the experimental limits).
                 It is a XSection object.
     :ivar conditions: list of values for the analysis conditions
@@ -34,63 +34,36 @@ class TheoryPrediction(object):
     """
     def __init__(self):
         self.analysis = None
-        self.value = None
+        self.xsection = None
         self.conditions = None
-        self.mass = None
+        self.mass = None        
 
-    def likelihood ( self, xsecinfo = None ):
+    def computeStatistics(self):
         """
-        compute the likelihood of this theory prediction,
-        for the assigned dataset.
-        :param xsecinfo: if specified, give likelihood for the given XSecInfo
-                         ( =sqrt(s) and perturbation order ), 
-                         else return a list for all XSecInfos defined
-                         in the dataset
-        :return: likelihood
+        Compute the likelihood, chi-square and expected upper limit for this theory prediction.
+        The resulting values are stored as the likelihood, chi2 and expectedUL attributes.        
         """
-        if not hasattr ( self, "dataset" ):
-            return None
-        lumi = self.dataset.globalInfo.lumi
-        ret= []
-        for v in self.value:
-            if xsecinfo and xsecinfo != v.info:
-                continue
-            nsig = ( v.value * lumi ).asNumber()
-            llhd = self.dataset.likelihood ( nsig )
-            if xsecinfo or len(self.value) ==1:
-                return llhd
-            ret.append ( ( v.info, llhd ) )
-        return ret
-
-    def chi2 ( self, xsecinfo=None ):
-        """
-        compute the chi2 of this theory prediction, for the assigned dataset.
-        :param xsecinfo: if specified, give chi2 for the given XSecInfo
-                         ( =sqrt(s) and perturbation order ), 
-                         else return a list for all XSecInfos defined
-                         in the dataset
-        :return: chi2
-        """
-        if not hasattr ( self, "dataset" ):
-            return None
-        lumi = self.dataset.globalInfo.lumi
-        ret= []
-        for v in self.value:
-            if xsecinfo and xsecinfo != v.info:
-                continue
-            nsig = ( v.value * lumi ).asNumber()
-            llhd = self.dataset.chi2 ( nsig )
-            if xsecinfo or len(self.value)==1:
-                return llhd
-            ret.append ( ( v.info, llhd ) )
-        return ret
-
+        if not hasattr(self, "dataset") or self.dataset.dataInfo.dataType == 'upperLimit':
+            self.likelihood = None
+            self.chi2 = None
+            self.expectedUL = None
+            return
+        
+        lumi = self.dataset.globalInfo.lumi  
+        nsig = (self.xsection.value*lumi).asNumber()
+        llhd = self.dataset.likelihood(nsig)
+        chi2 = self.dataset.chi2(nsig)
+        expectedUL = self.dataset.getSRUpperLimit(alpha = 0.05, expected = True)
+        
+        self.likelihood =  llhd
+        self.chi2 =  chi2
+        self.expectedUL = expectedUL
         
     def getmaxCondition(self):
         """
-        Returns the maximum value from the list conditions
+        Returns the maximum xsection from the list conditions
         
-        :returns: maximum condition value (float)        
+        :returns: maximum condition xsection (float)        
         """
 
         if not self.conditions: return 0.        
@@ -102,7 +75,7 @@ class TheoryPrediction(object):
         return maxcond
     
     def __str__(self):
-        return "%s:%s" % ( self.analysis, self.value )
+        return "%s:%s" % ( self.analysis, self.xsection )
 
 
 
@@ -210,10 +183,7 @@ def _getBestResults(dataSetResults):
             logger.error("Multiple data sets should only exist for efficiency map results!")
             raise SModelSError()                    
         pred = predList[0]
-        if len(pred.value) != 1:
-            logger.error("Signal region prediction should correspond to a single cross-section!")
-            raise SModelSError()
-        xsec = pred.value[0]        
+        xsec = pred.xsection        
         expectedR = xsec.value/dataset.getSRUpperLimit(0.05,True,False)
         if expectedR > bestExpectedR or (expectedR == bestExpectedR and xsec.value > bestXsec):
             bestExpectedR = expectedR
@@ -265,7 +235,7 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
         theoryPrediction = TheoryPrediction()
         theoryPrediction.dataset = dataset
         theoryPrediction.txnames = cluster.txnames  
-        theoryPrediction.value = _evalConstraint(cluster)            
+        theoryPrediction.xsection = _evalConstraint(cluster)
         theoryPrediction.conditions = _evalConditions(cluster)
         theoryPrediction.cluster = cluster
         theoryPrediction.mass = cluster.getAvgMass()
@@ -395,8 +365,8 @@ def _evalConditions(cluster):
         # Loop over conditions
         for cond in conditions:
             exprvalue = _evalExpression(cond,cluster)
-            if type(exprvalue) == type(crossSection.XSectionList()):
-                conditionVals[cond] = exprvalue[0].value
+            if type(exprvalue) == type(crossSection.XSection()):
+                conditionVals[cond] = exprvalue.value
             else:
                 conditions[cond] = exprvalue
     
@@ -417,7 +387,7 @@ def _evalExpression(stringExpr,cluster):
     
     :parameter stringExpr: string containing the expression to be evaluated
     :parameter cluster: cluster of elements (ElementCluster object)
-    :returns: value for the expression. Can be a XSectionList object, a float or not numerical (None,string,...)
+    :returns: xsection for the expression. Can be a XSection object, a float or not numerical (None,string,...)
     
     """
 
@@ -446,6 +416,5 @@ def _evalExpression(stringExpr,cluster):
     if type(exprvalue) == type(crossSection.XSectionList()):
         if len(exprvalue) != 1:
             logger.error("Evaluation of expression "+expr+" returned multiple values.")
-        return exprvalue
-    else:
-        return exprvalue
+        return exprvalue[0] #Return XSection object
+    return exprvalue

@@ -58,7 +58,7 @@ class ResultList(object):
         
         self.theoryPredictions.append(theoPred)
         return True
-
+    
     def getR(self, theoPred, expected = False):
         """
         Calculate R value.
@@ -78,8 +78,7 @@ class ResultList(object):
         else:
             logger.error("Unknown dataType %s" %(str(dataType)))
         
-        return theoPred.value[0].value/ul
-
+        return (theoPred.xsection.value/ul).asNumber()    
 
     def sort(self):
         """
@@ -109,15 +108,6 @@ class ResultList(object):
         return bestExp
 
 
-    def useBestResult(self):
-        """ 
-        Restricts the list of predictions to the best result only.        
-        """
-        self.sort()
-        if self.theoryPredictions:
-            self.theoryPredictions = [self.theoryPredictions[0]]
-
-
     def isEmpty(self):
         """
         Check if outputarray is empty.
@@ -125,17 +115,6 @@ class ResultList(object):
         """
         return len(self.theoryPredictions) == 0
 
-class BestEMResult(object):
-    """
-    Class holding the best EM result (highest expected r value), for evaluation of chi2 and likelihood
-    :ivar bestRes: TheoryPrediction object corresponding to the best EM result
-    """
-
-    def __init__(self, bestRes):
-        self.theoryPrediction = bestRes
-        if not bestRes: return
-        self.chi2 = self.theoryPrediction.chi2()
-        self.likelihood = self.theoryPrediction.likelihood()
 
 class OutputStatus(object):
     """

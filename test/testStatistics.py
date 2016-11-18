@@ -33,16 +33,16 @@ class StatisticsTest(unittest.TestCase):
         expRes = database.getExpResults( analysisIDs=['CMS-SUS-13-012'] )[0]
         slhafile="../inputFiles/slha/simplyGluino.slha"
         smstoplist = slhaDecomposer.decompose( slhafile )
-        selector = XSectionInfo ( 8*TeV )
         prediction = theoryPredictionsFor ( expRes, smstoplist )[0]
-        pred_signal_strength = prediction.value[0].value
-        ill = math.log ( prediction.likelihood( selector ) )
-        ichi2=prediction.chi2( selector )
-        nsig = float ( pred_signal_strength * expRes.globalInfo.lumi )
-        dll = math.log ( statistics.likelihood ( nsig, 4, 2.2, 1.1, 0.2 ) )
-        dchi2 = statistics.chi2 ( nsig, 4, 2.2, 1.1, 0.2 )
-        self.assertAlmostEqual ( ill, dll, places=1 )
-        self.assertAlmostEqual ( ichi2, dchi2, places=1 )
+        pred_signal_strength = prediction.xsection.value
+        prediction.computeStatistics()
+        ill = math.log (prediction.likelihood)
+        ichi2=prediction.chi2
+        nsig = float(pred_signal_strength * expRes.globalInfo.lumi )
+        dll = math.log(statistics.likelihood ( nsig, 4, 2.2, 1.1, 0.2 ))
+        dchi2 = statistics.chi2( nsig, 4, 2.2, 1.1, 0.2 )
+        self.assertAlmostEqual( ill, dll, places=1 )
+        self.assertAlmostEqual( ichi2, dchi2, places=1 )
 
     def round_to_sign(self, x, sig=3):
         """
