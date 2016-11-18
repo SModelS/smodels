@@ -131,7 +131,7 @@ class RunPrinterTest(unittest.TestCase):
     
         #Add the decomposition result to the printers
         if addTopList:
-            mprinter.addObj(smstoplist,1)
+            mprinter.addObj(smstoplist)
     
         listOfExpRes = database.getExpResults()
         # Compute the theory predictions for each analysis
@@ -144,11 +144,11 @@ class RunPrinterTest(unittest.TestCase):
         
         maxcond = 0.2
         results = ioObjects.ResultList(allPredictions,maxcond)
-        mprinter.addObj(results,objOutputLevel = 2)
+        mprinter.addObj(results)
         
         #Add coverage information:
         coverageInfo = coverage.Uncovered(smstoplist)
-        mprinter.addObj(coverageInfo,2)
+        mprinter.addObj(coverageInfo)
         
         
         #Add additional information:
@@ -159,18 +159,22 @@ class RunPrinterTest(unittest.TestCase):
                                                 'maxcond': maxcond },
                                               databaseVersion)
         outputStatus.status = 1
-        mprinter.addObj(outputStatus,1)
+        mprinter.addObj(outputStatus)
         mprinter.flush()
         
 
 
     def testTextPrinter(self):
-        
-        mprinter = printer.MPrinter(printerList=['summary'])
+         
+        mprinter = printer.MPrinter()
+        mprinter.Printers['summary'] = printer.SummaryPrinter(output = 'file')        
+        #Define options:
+        mprinter.Printers['summary'].expandedSummary = True
+         
         slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
         mprinter.setOutPutFiles('./unitTestOutput/printer_output')
         self.runPrinterMain(slhafile,mprinter)
-        
+         
         outputfile = os.path.join( idir(), "test/unitTestOutput/printer_output.smodels")
         samplefile = os.path.join( idir(), "test/gluino_squarks_default.txt")
         #Test summary output
@@ -181,16 +185,20 @@ class RunPrinterTest(unittest.TestCase):
         except AssertionError,e:
             msg = "%s != %s" %(sample, output) 
             raise AssertionError(msg)
-
-
+ 
+ 
     def testPythonPrinter(self):
-         
-         
-        mprinter = printer.MPrinter(printerList=['python'])
+           
+           
+        mprinter = printer.MPrinter()
+        mprinter.Printers['python'] = printer.PyPrinter(output = 'file')
+        #Define options:
+        mprinter.Printers['python'].addElementList = False
+               
         slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
         mprinter.setOutPutFiles('./unitTestOutput/printer_output')
         self.runPrinterMain(slhafile,mprinter)
-         
+           
         #Test python output
         shutil.copyfile('./unitTestOutput/printer_output.py','./output.py')
         from gluino_squarks_default import smodelsOutputDefault 
@@ -206,19 +214,23 @@ class RunPrinterTest(unittest.TestCase):
             os.remove('./output.pyc')
         except OSError:
             pass
-
+ 
     def testPythonPrinterSimple(self):
-
-        mprinter = printer.MPrinter(printerList=['python'])
+ 
+        mprinter = printer.MPrinter()
+        mprinter.Printers['python'] = printer.PyPrinter(output = 'file')
+        #Define options:
+        mprinter.Printers['python'].addElementList = True
+         
         slhafile = os.path.join ( idir(), "inputFiles/slha/simplyGluino.slha" )
         mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple')
         self.runPrinterMain(slhafile,mprinter,addTopList=True)
-       
+        
         #Test python output
         shutil.copyfile('./unitTestOutput/printer_output_simple.py','./outputSimple.py')
         from simplyGluino_default import smodelsOutputDefault    
         from outputSimple import smodelsOutput
-        
+         
         ignoreFields = ['input file','smodels version', 'ncpus']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
                                                  key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
@@ -230,20 +242,23 @@ class RunPrinterTest(unittest.TestCase):
             os.remove('./outputSimple.pyc')
         except OSError:
             pass
-
-
+  
+  
     def testXmlPrinter(self):
-        
-                    
-
-        mprinter = printer.MPrinter(printerList=['xml'])
+          
+  
+        mprinter = printer.MPrinter()
+        mprinter.Printers['xml'] = printer.XmlPrinter(output = 'file')
+        #Define options:
+        mprinter.Printers['xml'].addElementList = False                    
+  
         slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
         mprinter.setOutPutFiles('./unitTestOutput/printer_output')
         self.runPrinterMain(slhafile,mprinter)                    
-                    
+                      
         defFile = os.path.join ( idir(), "test/default_output.xml" )
         outFile = os.path.join ( idir(), "test/unitTestOutput/printer_output.xml" )
-         
+           
         #Test xml output
         xmlDefault = ElementTree.parse( defFile ).getroot()
         xmlNew = ElementTree.parse( outFile ).getroot()
@@ -254,19 +269,22 @@ class RunPrinterTest(unittest.TestCase):
         except AssertionError,e:
             msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
             raise AssertionError(msg)
-
-
+ 
+ 
     def testXmlPrinterSimple(self):
-
-
-        mprinter = printer.MPrinter(printerList=['xml'])
+ 
+        mprinter = printer.MPrinter()
+        mprinter.Printers['xml'] = printer.XmlPrinter(output = 'file')
+        #Define options:
+        mprinter.Printers['xml'].addElementList = True   
+ 
         slhafile = os.path.join ( idir(), "inputFiles/slha/simplyGluino.slha" )
         mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple')
         self.runPrinterMain(slhafile,mprinter,addTopList=True)                    
-                    
+                     
         defFile = os.path.join ( idir(), "test/default_outputSimplyGluino.xml" )
         outFile = os.path.join ( idir(), "test/unitTestOutput/printer_output_simple.xml" )
-         
+          
         #Test xml output
         xmlDefault = ElementTree.parse( defFile ).getroot()
         xmlNew = ElementTree.parse( outFile ).getroot()
@@ -277,7 +295,7 @@ class RunPrinterTest(unittest.TestCase):
         except AssertionError,e:
             msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
             raise AssertionError(msg)
-        
+         
 
 
 if __name__ == "__main__":

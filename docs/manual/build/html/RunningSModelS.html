@@ -88,6 +88,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#the-parameters-file">The Parameters File</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#the-output">The Output</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#screen-stdout-output">Screen (Stdout) Output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#log-output">Log Output</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#summary-file-output">Summary File Output</a></li>
 </ul>
 </li>
@@ -363,7 +364,7 @@ Below we explain in detail the information contained in each type of output. For
 that all printer options are set to True, so the output information is maximal.</p>
 <div class="section" id="screen-stdout-output">
 <span id="screenout"></span><h4>Screen (Stdout) Output<a class="headerlink" href="#screen-stdout-output" title="Permalink to this headline">¶</a></h4>
-<p>The stdout (or <a href="#id4"><span class="problematic" id="id5">|logOut|</span></a>) are intended to provide extensive information on the SModelS results.
+<p>The stdout (or <a href="#id3"><span class="problematic" id="id4">|logOut|</span></a>) are intended to provide extensive information on the SModelS results.
 It is most convenient if the input is a single file and not a folder, since the output is quite extense.
 If all the options in <strong>stdout-printer</strong> are set to True (see <a class="reference internal" href="#parameterfile"><span>parameters file</span></a>), the screen output contains the following information:</p>
 <ul class="simple">
@@ -500,14 +501,12 @@ For each <a class="reference internal" href="TheoryPredictions.html"><em>theory 
 --------------------------------------------------------------------------------
 </pre></div>
 </div>
-<ul class="simple">
-<li>possible (mostly harmless) warnings <a class="footnote-reference" href="#id2" id="id1">[*]</a></li>
-</ul>
-<div class="highlight-python"><div class="highlight"><pre><span></span>Input status: 1
-# Input File: inputFiles/slha/gluino_squarks.slha
-# sigmacut = 0.03
-</pre></div>
 </div>
+<div class="section" id="log-output">
+<span id="logout"></span><h4>Log Output<a class="headerlink" href="#log-output" title="Permalink to this headline">¶</a></h4>
+<p>The log-type output is identical to the <a class="reference internal" href="#screenout"><span>screen output</span></a>, except that it is
+redirected to a .log file. The filename is set as the &lt;input file&gt;.log and stored in the output folder
+(see the <a class="reference internal" href="#runsmodels"><span>runSModelS options</span></a>).</p>
 </div>
 <div class="section" id="summary-file-output">
 <span id="fileout"></span><h4>Summary File Output<a class="headerlink" href="#summary-file-output" title="Permalink to this headline">¶</a></h4>
@@ -524,17 +523,17 @@ These flags should be consulted in case of unexpected/missing results:</li>
 <li>the version of the <code class="xref doc docutils literal"><span class="pre">database</span></code> used to obtain the results:</li>
 </ul>
 <ul class="simple">
-<li>the list of <a href="#id6"><span class="problematic" id="id7">|analyses|</span></a> which constrain the input model.
-For each <a href="#id8"><span class="problematic" id="id9">|analysis|</span></a>, the <code class="xref doc docutils literal"><span class="pre">analysis</span> <span class="pre">name</span></code>, the value of the <a href="#id10"><span class="problematic" id="id11">|analysis|</span></a>
+<li>the list of <a href="#id5"><span class="problematic" id="id6">|analyses|</span></a> which constrain the input model.
+For each <a href="#id7"><span class="problematic" id="id8">|analysis|</span></a>, the <code class="xref doc docutils literal"><span class="pre">analysis</span> <span class="pre">name</span></code>, the value of the <a href="#id9"><span class="problematic" id="id10">|analysis|</span></a>
 center-of-mass energy (<em>sqrts</em>), the amount of <a class="reference internal" href="DatabaseDefinitions.html#ulconditions"><span>condition</span></a> violation,
 the <a class="reference internal" href="TheoryPredictions.html"><em>theory prediction</em></a> value (value for the relevant signal cross-section),
 the experimental upper limit and the ratio (<em>r</em>) of the signal cross-section and the
 upper limit (<span class="math">\(r = theory\, prediction/upper\, limit\)</span>) are printed.
-A value of <span class="math">\(r\ge 1\)</span> indicates that the model is likely excluded by the corresponding <a href="#id12"><span class="problematic" id="id13">|analysis|</span></a>.</li>
+A value of <span class="math">\(r\ge 1\)</span> indicates that the model is likely excluded by the corresponding <a href="#id11"><span class="problematic" id="id12">|analysis|</span></a>.</li>
 </ul>
 <ul class="simple">
 <li>if  <strong>addConstraintInfo</strong> = True, the <a class="reference internal" href="DatabaseDefinitions.html#ulconstraint"><span>analysis constraint</span></a> in <a class="reference internal" href="TheoryDefinitions.html#bracketnotation"><span>bracket notation</span></a>
-is also included just below the <a href="#id14"><span class="problematic" id="id15">|analysis|</span></a> entry:</li>
+is also included just below the <a href="#id13"><span class="problematic" id="id14">|analysis|</span></a> entry:</li>
 </ul>
 <ul class="simple">
 <li>The last line of this block gives the maximum value of <em>r</em>, <span class="math">\(R = max(r)\)</span>.</li>
@@ -543,7 +542,7 @@ is also included just below the <a href="#id14"><span class="problematic" id="id
 <li>if <strong>findMissingTopos</strong> = True,  a list of the <a class="reference internal" href="Tools.html#topcoverage"><span>missing topologies</span></a> and their cross sections at the given
 value of <em>sqrts</em> is also included. This list represents the <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> or sum of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a>
 (shown using the <a class="reference internal" href="TheoryDefinitions.html#bracketnotation"><span>bracket notation</span></a>) with the highest
-weights (<span class="math">\(\sigma \times BR\)</span>) which are not tested by any <a href="#id16"><span class="problematic" id="id17">|analysis|</span></a>:</li>
+weights (<span class="math">\(\sigma \times BR\)</span>) which are not tested by any <a href="#id15"><span class="problematic" id="id16">|analysis|</span></a>:</li>
 </ul>
 </div>
 </div>
@@ -604,7 +603,7 @@ of input format, choose either the <a class="reference external" href="../../../
 </pre></div>
 </div>
 <ul class="simple">
-<li><em>Load the the analyses</em> <a class="reference internal" href="DatabaseDefinitions.html#database"><span>database</span></a>. Load the experimental <a href="#id18"><span class="problematic" id="id19">|analyses|</span></a> and store the list of analyses</li>
+<li><em>Load the the analyses</em> <a class="reference internal" href="DatabaseDefinitions.html#database"><span>database</span></a>. Load the experimental <a href="#id17"><span class="problematic" id="id18">|analyses|</span></a> and store the list of analyses</li>
 </ul>
 <div class="highlight-python"><div class="highlight"><pre><span></span>    <span class="n">listofanalyses</span> <span class="o">=</span> <span class="n">smsAnalysisFactory</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 </pre></div>
@@ -638,15 +637,15 @@ be compared to the <a class="reference internal" href="TheoryPredictions.html"><
 <div class="highlight-python"><div class="highlight"><pre><span></span>            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Analysis UL = &quot;</span><span class="p">,</span><span class="n">theoryPrediction</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">getUpperLimitFor</span><span class="p">(</span><span class="n">theoryPrediction</span><span class="o">.</span><span class="n">mass</span><span class="p">))</span> 
 </pre></div>
 </div>
-<table class="docutils footnote" frame="void" id="id2" rules="none">
+<table class="docutils footnote" frame="void" id="id1" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[*]</a></td><td>For an SLHA <a class="reference internal" href="BasicInput.html#basicinput"><span>input file</span></a>, the decay of <a class="reference internal" href="TheoryDefinitions.html#final-states"><span>final states</span></a> (or Z<sub>2</sub>-even particles
+<tr><td class="label">[*]</td><td>For an SLHA <a class="reference internal" href="BasicInput.html#basicinput"><span>input file</span></a>, the decay of <a class="reference internal" href="TheoryDefinitions.html#final-states"><span>final states</span></a> (or Z<sub>2</sub>-even particles
 such as the Higgs, W,...) are always ignored during the decomposition. Furthermore, if there are two cross-sections
 at different calculation order (say LO and NLO) for the same process, only the highest order is used.</td></tr>
 </tbody>
 </table>
-<table class="docutils footnote" frame="void" id="id3" rules="none">
+<table class="docutils footnote" frame="void" id="id2" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label">[†]</td><td>The list of <a class="reference internal" href="TheoryDefinitions.html#element"><span>elements</span></a> can be extremely long. Try setting <strong>addElmentInfo</strong> = False and/or <strong>printDecomp</strong> = False to obtain

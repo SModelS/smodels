@@ -43,7 +43,10 @@ class ElementCluster(object):
         totxsec = crossSection.XSectionList()
         for el in self.elements:
             totxsec.combineWith(el.weight)
-        return totxsec
+        if len(totxsec) != 1:
+            logger.error("Cluster total cross-section should have a single value")
+            raise SModelSError()
+        return totxsec[0]
 
     def getAvgMass(self):
         """

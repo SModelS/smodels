@@ -36,7 +36,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
 
     :parameter inputFile: path to input file
     :parameter outputDir: path to directory where output is be stored
-    :parameter parser: ConfigParser storing information from parameter.ini file
+    :parameter parser: ConfigParser storing information from parameters file
     :parameter databaseVersion: Database version (printed to output file)
     :parameter listOfExpRes: list of ExpResult objects to be considered
     :returns: output of printers
@@ -49,18 +49,12 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
 
 
     """Setup output printers"""
-    printerTypes = parser.get("printer", "outputType").split(",")
-    if isinstance(printerTypes,str):
-        printerTypes = [printerTypes]
-    masterPrinter = MPrinter(printerList=printerTypes)
+    masterPrinter = MPrinter()
+    masterPrinter.setPrinterOptions(parser)
     masterPrinter.setOutPutFiles(os.path.join(outputDir, os.path.basename(inputFile)))  
     
-
-    """ Print list of analyses loaded """
-    if parser.getboolean("stdout-printer", "printDatabase"):
-        outLevel = 1
-        outLevel += parser.getboolean("stdout-printer", "addAnaInfo")        
-        masterPrinter.addObj(ExpResultList(listOfExpRes),{'stdout' : outLevel,'log' : outLevel})
+    """ Add list of analyses loaded to printer"""
+    masterPrinter.addObj(ExpResultList(listOfExpRes))
 
     """Check input file for errors"""
     inputStatus = ioObjects.FileStatus()
@@ -69,7 +63,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """Initialize output status and exit if there were errors in the input"""
     outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile,
             dict(parser.items("parameters")), databaseVersion)
-    masterPrinter.addObj(outputStatus, 1)              
+    masterPrinter.addObj(outputStatus)              
     if outputStatus.status < 0:          
         return masterPrinter.flush()
     
@@ -104,12 +98,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         return masterPrinter.flush()
 
     outLevel = 0
-    if parser.getboolean("stdout-printer", "printDecomp"):
-        outLevel = 1
-        outLevel += parser.getboolean("stdout-printer", "addElmentInfo")
-    outLevelPy = int(parser.getboolean("python-printer","addElementList"))
-    outLevelXml = int(parser.getboolean("xml-printer","addElementList"))
-    masterPrinter.addObj(smstoplist,{'python' : outLevelPy, 'xml' : outLevelXml, 'stdout' : outLevel,'summary':None,'log':outLevel})
+    masterPrinter.addObj(smstoplist)
     
 
     """
@@ -123,36 +112,26 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         theorypredictions = theoryPredictionsFor(expResult, smstoplist)
         if not theorypredictions: continue
         allPredictions += theorypredictions._theoryPredictions
+    
+    """Compute chi-square and likelihood"""
+    if parser.getboolean("options","computeStatistics"):
+        for theoPred in allPredictions:
+            theoPred.computeStatistics()
 
     """ Define result list that collects all theoryPrediction objects."""
     maxcond = parser.getfloat("parameters", "maxcond")
     results = ioObjects.ResultList(allPredictions,maxcond)
-    if not parser.getboolean("summary-printer", "expandedSummary"):
-        results.useBestResult()
 
     if not results.isEmpty():
         outputStatus.updateStatus(1)
-        outLevelStdout = 1
-        outLevel = 1
-        outLevelStdout += parser.getboolean("options","computeStatistics")
-        outLevel += parser.getboolean("options","computeStatistics")
-        if parser.getboolean("stdout-printer","printExtendedResults"):
-            masterPrinter.addObj(TheoryPredictionList(allPredictions),{'stdout': outLevelStdout, 'log':outLevelStdout}) #by default giving full available output if extendedResults requested
-            outLevelStdout = None
-        masterPrinter.addObj(results,{'python' : outLevel, 'xml' : outLevel, 'stdout' : outLevelStdout,'summary':outLevel,'log':outLevelStdout})
+        masterPrinter.addObj(results)
     else:
         outputStatus.updateStatus(0) # no results after enforcing maxcond
 
     if parser.getboolean("options", "testCoverage"):
         """ Testing coverage of model point, add results to the output file """
-        
-        outLevel = 2
-        outLevelPy = 2
-        outLevel += parser.getboolean("stdout-printer", "addElmentInfo")
-    	outLevelPy += parser.getboolean("python-printer","addElementList")
-        outLevelXml += parser.getboolean("xml-printer","addElementList")
         uncovered = coverage.Uncovered(smstoplist)
-        masterPrinter.addObj(uncovered,{'python' : outLevelPy, 'xml' : outLevelXml, 'stdout' : outLevel,'summary':2,'log':outLevel})
+        masterPrinter.addObj(uncovered)
     
     return masterPrinter.flush()
 
