@@ -420,7 +420,7 @@ class TxTPrinter(BasicPrinter):
             output += " Txnames:  " + txnameStr + "\n"
             if hasattr(theoPred,'expectedUL') and not theoPred.expectedUL is None:
                 rexpected = (value/theoPred.expectedUL).asNumber()
-                output += "r_expected, chi2, likelihood = %10.3E %10.3E %10.3E" % (rexpected, theoPred.chi2, theoPred.likelihood)            
+                output += " r_expected, chi2, likelihood = %10.3E %10.3E %10.3E\n" % (rexpected, theoPred.chi2, theoPred.likelihood)            
             
             if not theoPred == obj.theoryPredictions[-1]: output += 80 * "-"+ "\n"
 
