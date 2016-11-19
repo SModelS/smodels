@@ -137,11 +137,11 @@ def likelihood(nsig, nobs, nb, deltab, deltas):
         :return: likelihood to observe nobs events (float)
 
         """
-        
+
         #Set signal error to 20%, if not defined
         if deltas is None:
-            deltas = 0.2*nsig        
-            
+            deltas = 0.2*nsig
+
         #     Why not a simple gamma function for the factorial:
         #     -----------------------------------------------------
         #     The scipy.stats.poisson.pmf probability mass function
@@ -156,18 +156,18 @@ def likelihood(nsig, nobs, nb, deltab, deltas):
         #     probability mass function as a whole should not be huge,
         #     the exponent of the log of this expression is calculated
         #     instead to avoid using large numbers.
-            
-        
+
+
         #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
         def prob(x,nsig, nobs, nb, deltab, deltas):
             poisson = exp(nobs*log(x) - x - math.lgamma(nobs + 1))
             gaussian = stats.norm.pdf(x,loc=nb+nsig,scale=sqrt(deltab**2 + deltas**2))
-            
+
             return poisson*gaussian
-        
-        #Compute maximum value for the integrand:        
+
+        #Compute maximum value for the integrand:
         sigma2 = deltab**2 + deltas**2
-        xm = nb+nsig- sigma2
+        xm = nb + nsig - sigma2
         #If nb + nsig = sigma2, shift the values slightly:
         if xm == 0.:
             xm = 0.001
@@ -176,22 +176,22 @@ def likelihood(nsig, nobs, nb, deltab, deltas):
         #Define initial integration range:
         nrange = 5.
         a = max(0.,xmax-nrange*sqrt(sigma2))
-        b = xmax+nrange*sqrt(sigma2)        
+        b = xmax+nrange*sqrt(sigma2)
         like = integrate.quad(prob,a,b,(nsig, nobs, nb, deltab, deltas),
                                       epsabs=0.,epsrel=1e-3)[0]
-        
-        #Increase integration range until integral converges        
+
+        #Increase integration range until integral converges
         err = 1.
-        while err > 0.01:            
+        while err > 0.01:
             like_old = like
             nrange = nrange*2
             a = max(0.,xmax-nrange*sqrt(sigma2))
-            b = xmax+nrange*sqrt(sigma2)        
+            b = xmax+nrange*sqrt(sigma2)
             like = integrate.quad(prob,a,b,(nsig, nobs, nb, deltab, deltas),
                                       epsabs=0.,epsrel=1e-3)[0]
             err = abs(like_old-like)/like
 
-                
+
         return like
 
 
@@ -223,7 +223,7 @@ def chi2(nsig, nobs, nb, deltab, deltas=None):
         deltas_pct = deltas/(1.0*nsig)
 
         # Compute the maximum likelihood H1, which sits at nsig = nobs - nb
-        # (keeping the same % error on signal):        
+        # (keeping the same % error on signal):
         maxllhd = likelihood(nobs-nb, nobs, nb, deltab, deltas_pct*(nobs-nb))
 
         # Return infinite likelihood if it is zero
