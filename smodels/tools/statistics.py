@@ -12,7 +12,7 @@
 import logging
 from smodels.tools.physicsUnits import fb
 from smodels.tools.caching import _memoize
-from scipy import stats, optimize, integrate
+from scipy import stats, optimize, integrate, special
 from numpy import sqrt, exp, log, sign
 import math
 
@@ -191,6 +191,11 @@ def likelihood(nsig, nobs, nb, deltab, deltas):
                                       epsabs=0.,epsrel=1e-3)[0]
             err = abs(like_old-like)/like
 
+        #Renormalize the likelihood to account for the cut at x = 0.
+        #The integral of the gaussian from 0 to infinity gives:
+        #(1/2)*(1 + Erf(mu/sqrt(2*sigma2))), so we need to divide by it
+        #(for mu - sigma >> 0, the normalization gives 1.)
+#         like = 2.*like/(1. + special.erf((nb+nsig)/sqrt(2.*sigma2)))
                 
         return like
 
