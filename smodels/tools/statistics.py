@@ -13,7 +13,7 @@ import logging
 from smodels.tools.physicsUnits import fb
 from smodels.tools.caching import _memoize
 from scipy import stats, optimize, integrate
-from numpy import sqrt, random, exp, log, nan
+from numpy import sqrt, exp, log, sign
 import math
 
 @_memoize
@@ -165,28 +165,31 @@ def likelihood(nsig, nobs, nb, deltab, deltas):
             
             return poisson*gaussian
         
-        #Compute maximum value for integrand:        
+        #Compute maximum value for the integrand:        
         sigma2 = deltab**2 + deltas**2
         xm = nb+nsig- sigma2
-        xmax =max(xm*(1.+sqrt(1. + 4.*nobs*sigma2/xm**2))/2.,
-                  xm*(1.-sqrt(1. + 4.*nobs*sigma2/xm**2))/2.)
+        #If nb + nsig = sigma2, shift the values slightly:
+        if xm == 0.:
+            xm = 0.001
+        xmax = xm*(1.+sign(xm)*sqrt(1. + 4.*nobs*sigma2/xm**2))/2.
 
         #Define initial integration range:
         nrange = 5.
         a = max(0.,xmax-nrange*sqrt(sigma2))
         b = xmax+nrange*sqrt(sigma2)        
-        like,likeErr = integrate.quad(prob,a,b,(nsig, nobs, nb, deltab, deltas),
-                                      epsabs=1e-100,epsrel=1e-3)
+        like = integrate.quad(prob,a,b,(nsig, nobs, nb, deltab, deltas),
+                                      epsabs=0.,epsrel=1e-3)[0]
         
-        #Increase integration range until integral converges
-        like_old = like*2.
-        while abs(like_old-like)/like > 0.01:
+        #Increase integration range until integral converges        
+        err = 1.
+        while err > 0.01:            
             like_old = like
             nrange = nrange*2
             a = max(0.,xmax-nrange*sqrt(sigma2))
             b = xmax+nrange*sqrt(sigma2)        
-            like,likeErr = integrate.quad(prob,a,b,(nsig, nobs, nb, deltab, deltas),
-                                      epsabs=1e-100,epsrel=1e-3)
+            like = integrate.quad(prob,a,b,(nsig, nobs, nb, deltab, deltas),
+                                      epsabs=0.,epsrel=1e-3)[0]
+            err = abs(like_old-like)/like
 
                 
         return like
