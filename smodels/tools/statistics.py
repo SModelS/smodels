@@ -195,7 +195,8 @@ def likelihood(nsig, nobs, nb, deltab, deltas):
         #The integral of the gaussian from 0 to infinity gives:
         #(1/2)*(1 + Erf(mu/sqrt(2*sigma2))), so we need to divide by it
         #(for mu - sigma >> 0, the normalization gives 1.)
-#         like = 2.*like/(1. + special.erf((nb+nsig)/sqrt(2.*sigma2)))
+        norm = (1./2.)*(1. + special.erf((nb+nsig)/sqrt(2.*sigma2)))
+        like = like/norm
                 
         return like
 
