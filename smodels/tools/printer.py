@@ -287,7 +287,7 @@ class TxTPrinter(BasicPrinter):
             totxsec = topo.getTotalWeight()
             output += "Total Global topology weight :\n" + totxsec.niceStr() + '\n'
             output += "Total Number of Elements: " + str(len(topo.elementList)) + '\n'
-            if not hasattr(self,'addelmentinfo') or not self.addelmentinfo: continue
+            if not hasattr(self,'addelementinfo') or not self.addelementinfo: continue
             for el in topo.elementList:
                 output += "\t\t "+ 73 * "." + "\n"
                 output += "\t\t Element: \n"
@@ -462,7 +462,7 @@ class TxTPrinter(BasicPrinter):
             if theoryPrediction.mass:
                 for ibr, br in enumerate(theoryPrediction.mass):
                     output += "Masses in branch %i: " % ibr + str(br) + "\n"
-            if hasattr(self,"addelmentinfo") and self.addelmentinfo:
+            if hasattr(self,"addelementinfo") and self.addelementinfo:
                 if not theoryPrediction.IDs[0]==0: output += "Contributing elements: " + str(theoryPrediction.IDs) + "\n"
             for pidList in theoryPrediction.PIDs:
                 output += "PIDs:" + str(pidList) + "\n"
@@ -528,7 +528,7 @@ class TxTPrinter(BasicPrinter):
                 output += "Sqrts (TeV)   Weight (fb)        Element description\n"        
                 for topo in sorted(uncovEntry.topos, key=lambda x: x.value, reverse=True)[:nprint]:
                     output += "%5s %10.3E    # %45s\n" % (str(obj.missingTopos.sqrts.asNumber(TeV)),topo.value, str(topo.topo))
-                    if hasattr(self,"addelmentinfo") and self.addelmentinfo:
+                    if hasattr(self,"addelementinfo") and self.addelementinfo:
                         contributing = []
                         for el in topo.contributingElements:
                             contributing.append(el.elID)
@@ -540,7 +540,7 @@ class TxTPrinter(BasicPrinter):
             output += "Mother1 Mother2 Weight (fb)\n"
             for ent in uncovEntry.getSorted(obj.sqrts)[:nprint]:
                 output += "%s %s %10.3E # %s\n" %(ent.motherPIDs[0], ent.motherPIDs[1], ent.getWeight(obj.sqrts).asNumber(fb), str(ent.motherPIDs))
-                if hasattr(self,"addelmentinfo") and self.addelmentinfo:
+                if hasattr(self,"addelementinfo") and self.addelementinfo:
                     contributing = []
                     for el in ent.contributingElements:
                         contributing.append(el.elID)
