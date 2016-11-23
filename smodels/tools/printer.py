@@ -255,7 +255,7 @@ class TxTPrinter(BasicPrinter):
             output += "# " + label + " = " + str(par) + '\n'
         if obj.databaseVersion:
             output += "# Database version: %s\n" % obj.databaseVersion
-        output += "=" * 80 + "=\n"
+        output += "=" * 80 + "\n"
         return output
 
     def _formatTopologyList(self, obj):
@@ -391,7 +391,7 @@ class TxTPrinter(BasicPrinter):
         output = ""
 
         rvalues = []
-        output += "#Analysis  Sqrts  Cond. Violation  Theory_Value(fb)  Exp_limit(fb)  r"
+        output += "#Analysis  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r  r_expected"
         output += "\n\n"
         for theoPred in obj.theoryPredictions:
             expResult = theoPred.expResult
@@ -400,30 +400,35 @@ class TxTPrinter(BasicPrinter):
             txnames = theoPred.txnames
             if dataType == 'upperLimit':
                 ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass)
+                ul_expected = None
                 signalRegion  = '(UL)'
             elif dataType == 'efficiencyMap':
                 ul = expResult.getUpperLimitFor(dataID=datasetID)
+                ul_expected = expResult.getUpperLimitFor(dataID=datasetID, expected=True)
                 signalRegion  = theoPred.dataset.dataInfo.dataId
             else:
                 logger.error("Unknown dataType %s" %(str(dataType)))
                 raise SModelSError()
             value = theoPred.xsection.value
+
             r = (value/ul).asNumber()
+            if type(ul_expected)==type(None): r_expected = None
+            else: r_expected = (value/ul_expected).asNumber()
             rvalues.append(r)
 
             output += "%19s  " % (expResult.globalInfo.id)  # ana
             output += "%4s " % (expResult.globalInfo.sqrts/ TeV)  # sqrts
             output += "%5s " % theoPred.getmaxCondition()  # condition violation
             output += "%10.3E %10.3E " % (value.asNumber(fb), ul.asNumber(fb))  # theory cross section , expt upper limit
-            output += "%10.3E" % r
+            if r_expected: output += "%10.3E %10.3E" % (r, r_expected)
+            else: output += "%10.3E  N/A" %r
             output += "\n"
             output += " Signal Region:  "+signalRegion+"\n"
             txnameStr = str([str(tx) for tx in txnames])
             txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
             output += " Txnames:  " + txnameStr + "\n"
             if hasattr(theoPred,'expectedUL') and not theoPred.expectedUL is None:
-                rexpected = (value/theoPred.expectedUL).asNumber()
-                output += " r_expected, chi2, likelihood = %10.3E %10.3E %10.3E\n" % (rexpected, theoPred.chi2, theoPred.likelihood)            
+                output += " Chi2, Likelihood = %10.3E %10.3E\n" % (theoPred.chi2, theoPred.likelihood)            
             
             if not theoPred == obj.theoryPredictions[-1]: output += 80 * "-"+ "\n"
 
@@ -457,7 +462,8 @@ class TxTPrinter(BasicPrinter):
             if theoryPrediction.mass:
                 for ibr, br in enumerate(theoryPrediction.mass):
                     output += "Masses in branch %i: " % ibr + str(br) + "\n"
-            if not theoryPrediction.IDs[0]==0: output += "Contributing elements: " + str(theoryPrediction.IDs) + "\n"
+            if hasattr(self,"addelmentinfo") and self.addelmentinfo:
+                if not theoryPrediction.IDs[0]==0: output += "Contributing elements: " + str(theoryPrediction.IDs) + "\n"
             for pidList in theoryPrediction.PIDs:
                 output += "PIDs:" + str(pidList) + "\n"
             output += "Theory prediction: " + str(theoryPrediction.xsection.value) + "\n"
@@ -477,8 +483,9 @@ class TxTPrinter(BasicPrinter):
                 upperLimit = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.dataInfo.dataId)
 
             output += "Observed experimental limit: " + str(upperLimit) + "\n"
+            if expRes.datasets[0].dataInfo.dataType == 'efficiencyMap':
+                output += "Expected experimental limit: " + str(expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.dataInfo.dataId,expected=True)) + "\n"
             if hasattr(theoryPrediction,'expectedUL') and not theoryPrediction.expectedUL is None:
-                output += "Expected experimental limit: " + str(theoryPrediction.expectedUL) + "\n"
                 output += "Chi2: " + str(theoryPrediction.chi2) + "\n"
                 output += "Likelihood: " + str(theoryPrediction.likelihood) + "\n"
 
@@ -709,8 +716,10 @@ class PyPrinter(BasicPrinter):
             if dataType == 'upperLimit':
                 ul = expResult.getUpperLimitFor(txname=theoryPrediction.txnames[0],
                                                 mass=theoryPrediction.mass)
+                ulExpected = None
             elif dataType == 'efficiencyMap':
                 ul = expResult.getUpperLimitFor(dataID=datasetID)
+                ulExpected = expResult.getUpperLimitFor(dataID=datasetID, expected=True).asNumber(fb)
             else:
                 logger.error("Unknown dataType %s" %(str(dataType)))
                 continue            
@@ -725,6 +734,7 @@ class PyPrinter(BasicPrinter):
             sqrts = dataset.globalInfo.sqrts
             resDict = {'maxcond': maxconds, 'theory prediction (fb)': value.asNumber(fb),
                         'upper limit (fb)': ul.asNumber(fb),
+                        'expected upper limit (fb)': ulExpected,
                         'TxNames': txnames,
                         'Mass (GeV)': mass,
                         'AnalysisID': expID,
@@ -733,7 +743,6 @@ class PyPrinter(BasicPrinter):
                         'lumi (fb-1)' : (dataset.globalInfo.lumi*fb).asNumber(),
                         'dataType' : dataType}            
             if hasattr(theoryPrediction,'expectedUL') and not theoryPrediction.expectedUL is None:
-                resDict['expectedUL (fb)'] = theoryPrediction.expectedUL.asNumber(fb)
                 resDict['chi2'] = theoryPrediction.chi2
                 resDict['likelihood'] = theoryPrediction.likelihood                
             ExptRes.append(resDict)
