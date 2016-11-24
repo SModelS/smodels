@@ -5,7 +5,7 @@
    :synopsis: Functions to test (a set of) points, handling decomposition,
               result and coverage checks, parallelisation.
 
-.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
+.. moduleauthor:: Ursula Laa <ursula.laa@lpsc.in2p3.fr>
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """

@@ -4,7 +4,7 @@
       in various forms
 
 .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
-.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
+.. moduleauthor:: Ursula Laa <ursula.laa@lpsc.in2p3.fr>
 .. moduleauthor:: Suchita Kulkanri <suchita.kulkarni@gmail.com>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
