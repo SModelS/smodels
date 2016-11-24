@@ -16,7 +16,7 @@ from smodels.particles import rEven, rOdd, ptcDic
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import itertools
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("smodels")
 
 
 def getName(pdg):

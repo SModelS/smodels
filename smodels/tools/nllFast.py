@@ -22,7 +22,7 @@ import operator
 from smodels import installation
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("smodels")
 
 squarks = [1000001,
            2000001,

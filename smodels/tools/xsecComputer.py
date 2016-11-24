@@ -21,7 +21,7 @@ import cStringIO
 import logging
 import sys
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("smodels")
 
 LO= 0  ## simple variables used to increase readability the perturbation order 
 NLO=1

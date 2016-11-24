@@ -19,7 +19,7 @@ from smodels.theory import lheDecomposer
 from smodels.theory import crossSection
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("smodels")
 
 
 def _printParticle(label):

@@ -17,7 +17,7 @@ from smodels.tools import externalNllFast
 from smodels.tools import externalPythonTools
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("smodels")
 
 
 class ToolBox(object):

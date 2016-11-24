@@ -30,8 +30,8 @@ from math import floor, log10
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
 logging.basicConfig(format=FORMAT)
-logger = logging.getLogger(__name__)
-logger.setLevel(level=logging.ERROR)
+logger = logging.getLogger("smodels")
+#logger.setLevel(level=logging.ERROR)
 
 class TxName(object):
     """

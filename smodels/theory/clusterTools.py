@@ -13,7 +13,7 @@ from smodels.tools.physicsUnits import fb, MeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import logging,sys
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("smodels")
 
 
 class ElementCluster(object):
