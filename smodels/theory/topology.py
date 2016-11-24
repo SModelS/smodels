@@ -15,7 +15,7 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.theory.auxiliaryFunctions import index_bisect
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("smodels")
 
 
 class Topology(object):

@@ -13,8 +13,11 @@ from smodels.installation import installDirectory, version
 from smodels.tools import modelTester
 from smodels.tools import crashReport
 import smodels.tools.printer as prt
+import logging
 
-def main( inFile, parameterFile, outputDir, verbosity, db, timeout, development ):
+logger = logging.getLogger("smodels")
+
+def main( inFile, parameterFile, outputDir, db, timeout, development ):
     """
     Provides a command line interface to basic SModelS functionalities.
     
@@ -37,7 +40,7 @@ def main( inFile, parameterFile, outputDir, verbosity, db, timeout, development 
     parser = modelTester.getParameters(parameterFile)
 
     """ Check database location and load database, exit if not found """
-    database, databaseVersion = modelTester.loadDatabase(parser, db, verbosity)
+    database, databaseVersion = modelTester.loadDatabase(parser, db)
 
     """ Get list of input files to be tested """
     fileList = modelTester.getAllInputFiles(inFile)
@@ -92,13 +95,23 @@ if __name__ == "__main__":
 
     db=None
     if args.force_txt: db=True
+    level = args.verbose.lower()
+    if level == 'debug':
+        logger.setLevel(level=logging.DEBUG)
+    if level == 'info':
+        logger.setLevel(level=logging.INFO)
+    if level == 'warning':
+        logger.setLevel(level=logging.WARNING)
+    if level == 'error':
+        pass
+
     
     if args.run_crashreport: 
         args.filename, args.parameterFile = crashReport.readCrashReportFile(
                 args.filename)
-        main(args.filename, args.parameterFile, args.outputDir, args.verbose,
+        main(args.filename, args.parameterFile, args.outputDir,
                db, args.timeout, development=True )
         
     else:
-        main(args.filename, args.parameterFile, args.outputDir, args.verbose, 
+        main(args.filename, args.parameterFile, args.outputDir, 
               db, args.timeout, args.development)

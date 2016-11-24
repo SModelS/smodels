@@ -17,7 +17,7 @@ import smodels.particles
 import copy
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("smodels")
 
 
 def decompose(lhefile, inputXsecs=None, nevts=None, doCompress=False,

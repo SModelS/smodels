@@ -27,7 +27,7 @@ from smodels.tools.physicsUnits import GeV, fb
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.experiment.databaseObj import Database, ExpResultList
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("smodels")
 
 def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """
@@ -252,13 +252,12 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
     log.info ( "returning no output, because we are in parallel mode" )
     return None
 
-def loadDatabase(parser, db, verbosity):
+def loadDatabase(parser, db):
     """
     Load database
     
     :parameter parser: ConfigParser with path to database
     :parameter db: binary database object
-    :parameter verbosity: Verbosity when loading database
     :returns: database object, database version
         
     """
@@ -268,8 +267,7 @@ def loadDatabase(parser, db, verbosity):
         if database in [ None, True ]:
             force_load=None
             if database == True: force_load="txt"
-            database = Database( databasePath, force_load=force_load,
-                                 verbosity=verbosity )
+            database = Database( databasePath, force_load=force_load)
         databaseVersion = database.databaseVersion
     except DatabaseNotFoundException:
         log.error("Database not found in %s" % os.path.realpath(databasePath))

@@ -12,7 +12,7 @@ from smodels.tools.physicsUnits import TeV, pb
 import logging
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("smodels")
 
 
 class LheReader(object):

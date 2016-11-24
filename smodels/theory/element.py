@@ -13,7 +13,7 @@ from smodels.particles import rEven, ptcDic
 import logging
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("smodels")
 
 
 class Element(object):
