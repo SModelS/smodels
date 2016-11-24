@@ -4,7 +4,7 @@
 .. module:: coverage
    :synopsis: Definitions of classes used to find, format missing topologies
     
-.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>    
+.. moduleauthor:: Ursula Laa <ursula.laa@lpsc.in2p3.fr>    
 .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
 
 """
