@@ -13,7 +13,7 @@ from smodels.tools.externalTool import ExternalTool
 import commands
 import os
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("smodels")
 
 
 class ExternalNllFast(ExternalTool):

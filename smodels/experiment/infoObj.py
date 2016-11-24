@@ -15,9 +15,9 @@ from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
 FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
 logging.basicConfig(format=FORMAT)
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("smodels")
 
-logger.setLevel(level=logging.WARNING)
+#logger.setLevel(level=logging.WARNING)
 
 class Info(object):
     """

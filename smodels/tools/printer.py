@@ -25,7 +25,7 @@ from collections import OrderedDict
 from xml.dom import minidom
 from xml.etree import ElementTree
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("smodels")
 
 
 class MPrinter(object):
@@ -200,8 +200,7 @@ class BasicPrinter(object):
             formatFunction = getattr(self,'_format'+typeStr)
             return formatFunction(obj)
         except AttributeError,e:
-            #logger.debug
-            print('Error formating object %s: \n %s' %(typeStr,e))
+            logger.debug('Error formating object %s: \n %s' %(typeStr,e))
             return False
 
 

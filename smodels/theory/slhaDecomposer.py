@@ -20,7 +20,7 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import logging
 import sys
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("smodels")
 
 def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
               minmassgap=-1.*GeV, useXSecs=None):

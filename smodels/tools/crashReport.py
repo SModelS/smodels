@@ -13,7 +13,7 @@ import traceback
 import logging
 from smodels.installation import installDirectory
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("smodels")
 
 
 class CrashReport(object):
