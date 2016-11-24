@@ -15,7 +15,7 @@ import logging
 import copy
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("smodels")
 
 def massPosition(mass, txdata):
     """ Give mass position in upper limit space.    

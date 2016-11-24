@@ -10,7 +10,7 @@
 """
 from smodels.tools.physicsUnits import fb
 import logging, sys
-log = logging.getLogger(__name__)
+log = logging.getLogger("smodels")
 
 class Uncovered(object):
     """

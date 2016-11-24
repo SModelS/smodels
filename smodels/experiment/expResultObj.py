@@ -16,7 +16,7 @@ from smodels.experiment import datasetObj
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.tools.physicsUnits import fb
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("smodels")
 
 class ExpResult(object):
     """

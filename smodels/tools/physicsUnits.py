@@ -12,7 +12,7 @@ import unum
 import logging
 from unum import IncompatibleUnitsError
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("smodels")
 
 
 # description see

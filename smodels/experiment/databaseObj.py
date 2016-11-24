@@ -20,7 +20,7 @@ from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.tools.physicsUnits import fb
 import cPickle as serializer
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("smodels")
 
 class Database(object):
     """
@@ -31,7 +31,7 @@ class Database(object):
         
     """
     
-    def __init__(self, base=None, force_load = None, verbosity='info' ):
+    def __init__(self, base=None, force_load = None, verbosity=None ):
         """
         :param force_load: force loading the text database ("txt"),
             or binary database ("pcl"), dont force anything if None
@@ -48,7 +48,7 @@ class Database(object):
         self.sw_format_version = "111" ## what format does the software support?
         self.pcl_format_version = None ## what format is in the binary file?
         self.binfile = os.path.join ( self._base, self.pclfilename )
-        self._setLogLevel ( self._verbosity )
+        if verbosity: self._setLogLevel ( self._verbosity )
         if self.force_load=="txt":
             self.loadTextDatabase()
             return

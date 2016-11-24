@@ -21,7 +21,7 @@ from smodels.theory.theoryPrediction import TheoryPrediction
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("smodels")
 
 class ResultList(object):
     """
