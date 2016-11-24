@@ -4,7 +4,7 @@
 .. module:: slhaChecks
    :synopsis: Check SLHA file for integrity.
 
-.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
+.. moduleauthor:: Ursula Laa <ursula.laa@lpsc.in2p3.fr>
 .. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
 .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
 

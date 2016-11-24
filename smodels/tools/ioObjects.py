@@ -4,7 +4,7 @@
 .. module:: ioObjects
    :synopsis: Definitions of input/output parameters which are read from parameter.in.
     
-.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>    
+.. moduleauthor:: Ursula Laa <ursula.laa@lpsc.in2p3.fr>    
 .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
