@@ -2,7 +2,7 @@
 .. module:: summaryReader
    :synopsis: Classes to read the summary.txt files.
 
-.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
+.. moduleauthor:: Ursula Laa <ursula.laa@lpsc.in2p3.fr>
 
 """
 
