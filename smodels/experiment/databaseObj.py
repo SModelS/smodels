@@ -18,7 +18,10 @@ from smodels.experiment import datasetObj
 from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.tools.physicsUnits import fb
-import cPickle as serializer
+try:
+    import cPickle as serializer
+except ImportError as e:
+    import pickle as serializer
 
 logger = logging.getLogger("smodels")
 
@@ -193,7 +196,7 @@ class Database(object):
                     t1=time.time()-t0
                     logger.info ( "Loaded database from %s in %.1f secs." % \
                             ( self.binfile, t1 ) )
-        except EOFError,e:
+        except EOFError as e:
             ## print "eoferror",e
             os.unlink ( self.binfile )
             if lastm_only:

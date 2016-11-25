@@ -7,7 +7,6 @@
 
 """
 
-import cPickle as pickle
 import logging
 import os
 from smodels.experiment import infoObj
