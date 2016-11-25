@@ -13,15 +13,15 @@ from smodels.tools.physicsUnits import pb, GeV, fb, IncompatibleUnitsError
 def _toString ( arg ):
     try:
         return "%.2f" % arg.asNumber(fb)
-    except (AttributeError,IncompatibleUnitsError),e:
+    except (AttributeError,IncompatibleUnitsError) as e:
         pass
     try:
         return "%.3f" % arg.asNumber(GeV)
-    except (AttributeError,IncompatibleUnitsError),e:
+    except (AttributeError,IncompatibleUnitsError) as e:
         pass
     try:
         return "%.2f" % arg.asNumber(1/fb)
-    except (AttributeError,IncompatibleUnitsError),e:
+    except (AttributeError,IncompatibleUnitsError) as e:
         pass
     if type(arg) == float:
         return "%.2f" % arg

@@ -63,7 +63,7 @@ class UpperLimitComputer:
             up = upto * max( dn + math.sqrt(nev), dn + math.sqrt(xbg),sbg)
             #print "checking between 0 and ",up ## ,self.f(0),self.f(up)
             return optimize.brentq ( self.f, 0, up, rtol=1e-3 ) / self.lumi
-        except (ValueError,RuntimeError),e:
+        except (ValueError,RuntimeError) as e:
             #print "exception: >>",type(e),e
             if not return_nan:
                 # print "compute again, upto=",upto
@@ -245,4 +245,4 @@ def chi2(nsig, nobs, nb, deltab, deltas=None):
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
-    print upperLimit ( 4, 3.6, 0.1, 20. / fb )
+    print ( upperLimit ( 4, 3.6, 0.1, 20. / fb ) )
