@@ -11,11 +11,10 @@ from smodels.tools.physicsUnits import pb, GeV, fb
 import numpy as np
 from scipy import stats
 from collections import Iterable
-import logging
 import copy
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
-logger = logging.getLogger("smodels")
+from smodels.tools.smodelsLogging import logger
 
 def massPosition(mass, txdata):
     """ Give mass position in upper limit space.    

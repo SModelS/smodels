@@ -9,15 +9,10 @@
 
 """
 
-import logging,os,sys
+import os,sys
 from smodels.tools.physicsUnits import GeV, fb, TeV, pb
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
-
-FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
-logging.basicConfig(format=FORMAT)
-logger = logging.getLogger("smodels")
-
-#logger.setLevel(level=logging.WARNING)
+from smodels.tools.smodelsLogging import logger
 
 class Info(object):
     """

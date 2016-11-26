@@ -13,10 +13,9 @@ sys.path.insert(0,"../")
 from smodels.theory import slhaDecomposer
 from smodels.tools.physicsUnits import GeV, fb
 import unittest
-import logging
 
 class CompressionTest(unittest.TestCase):
-    logger = logging.getLogger(__name__)
+    from smodels.tools.smodelsLogging import logger
 
     def testInvisiblePositive(self):
         """ test the invisible compression, a positive example """

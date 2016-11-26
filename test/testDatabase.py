@@ -12,14 +12,13 @@ import sys
 sys.path.insert(0,"../")
 from smodels.experiment.databaseObj import Database
 import unittest
-import logging
 import logging.config
 import os
 
 class DatabaseTest(unittest.TestCase):
     # use different logging config for the unit tests.
     logging.config.fileConfig( "./logging.conf" )
-    logger = logging.getLogger(__name__)
+    from smodels.tools.smodelsLogging import logger
 
     def testWritePickle(self):
         """ tests writing pickle file """

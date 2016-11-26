@@ -13,9 +13,7 @@ from smodels.theory import crossSection
 from smodels.theory.element import Element
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.theory.auxiliaryFunctions import index_bisect
-import logging
-
-logger = logging.getLogger("smodels")
+from smodels.tools.smodelsLogging import logger
 
 
 class Topology(object):

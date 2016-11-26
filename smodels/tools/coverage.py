@@ -8,9 +8,8 @@
 .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
 
 """
+import sys
 from smodels.tools.physicsUnits import fb
-import logging, sys
-log = logging.getLogger("smodels")
 
 class Uncovered(object):
     """

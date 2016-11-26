@@ -14,10 +14,9 @@ from smodels.tools import xsecComputer
 from smodels.tools.xsecComputer import NLL
 from smodels.tools.physicsUnits import GeV, fb, TeV
 import unittest
-import logging
 
 class TxTest(unittest.TestCase):
-    logger = logging.getLogger(__name__)
+    from smodels.tools.smodelsLogging import logger
 
     def testT1(self):
         self.logger.info ( "T1" )

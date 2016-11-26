@@ -11,6 +11,7 @@
 from __future__ import print_function
 from smodels.tools.externalTool import ExternalTool
 from smodels.tools import externalTool
+from smodels.tools.smodelsLogging import logger
 from smodels import installation
 import tempfile
 import os
@@ -18,12 +19,6 @@ import shutil
 import commands
 import urllib
 import tarfile
-import logging
-
-FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'                                                              
-logging.basicConfig(format=FORMAT)
-logger = logging.getLogger("smodels")
-
 
 class ExternalPythia6(ExternalTool):
     """

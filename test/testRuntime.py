@@ -11,10 +11,9 @@ import sys
 sys.path.insert(0,"../")
 from smodels.tools import runtime
 import unittest
-import logging
 
 class TxTest(unittest.TestCase):
-    logger = logging.getLogger(__name__)
+    from smodels.tools.smodelsLogging import logger
 
     def testNCPUs(self):
         ncpus = runtime.nCPUs()

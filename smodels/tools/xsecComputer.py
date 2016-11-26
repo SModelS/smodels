@@ -14,14 +14,12 @@ from smodels.tools import toolBox, runtime
 from smodels.tools.physicsUnits import pb, TeV, GeV
 from smodels.theory import crossSection
 from smodels.tools import nllFast
+from smodels.tools.smodelsLogging import logger
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import os
 import pyslha
 import cStringIO
-import logging
 import sys
-
-logger = logging.getLogger("smodels")
 
 LO= 0  ## simple variables used to increase readability the perturbation order 
 NLO=1

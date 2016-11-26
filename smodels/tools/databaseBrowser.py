@@ -7,15 +7,10 @@
 
 """
 
-import logging
 from smodels.experiment.databaseObj import Database,ExpResult
 import numpy, unum
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-
-
-FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
-logging.basicConfig(format=FORMAT)
-logger = logging.getLogger("smodels")
+from smodels.tools.smodelsLogging import logger
 
 #logger.setLevel(level=logging.INFO)
 
