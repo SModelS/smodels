@@ -12,10 +12,9 @@ import sys
 sys.path.insert(0,"../")
 from smodels.tools import toolBox
 import unittest
-import logging
 
 class TestToolBox(unittest.TestCase):
-    logger = logging.getLogger(__name__)
+    from smodels.tools.smodelsLogging import logger
 
     def testToolBox(self):
         self.logger.info ( "ToolBox" )

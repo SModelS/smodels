@@ -7,7 +7,6 @@
 
 """
 
-import logging
 import os
 from smodels.experiment import infoObj
 from smodels.experiment import txnameObj
@@ -15,7 +14,7 @@ from smodels.experiment import datasetObj
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.tools.physicsUnits import fb
 
-logger = logging.getLogger("smodels")
+from smodels.tools.smodelsLogging import logger
 
 class ExpResult(object):
     """

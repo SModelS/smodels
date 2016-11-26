@@ -11,13 +11,11 @@
 from smodels.theory import lheReader, topology, crossSection, element
 from smodels.theory import branch
 from smodels.tools.physicsUnits import fb, GeV
+from smodels.tools.smodelsLogging import logger
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import pyslha
 import smodels.particles
 import copy
-import logging
-
-logger = logging.getLogger("smodels")
 
 
 def decompose(lhefile, inputXsecs=None, nevts=None, doCompress=False,

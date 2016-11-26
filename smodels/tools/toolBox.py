@@ -15,10 +15,7 @@ import types
 from smodels.tools import externalPythia6
 from smodels.tools import externalNllFast
 from smodels.tools import externalPythonTools
-import logging
-
-logger = logging.getLogger("smodels")
-
+from smodels.tools.smodelsLogging import logger
 
 class ToolBox(object):
     """

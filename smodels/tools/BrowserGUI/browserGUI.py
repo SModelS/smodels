@@ -8,9 +8,7 @@
 """
 
 from kivy.logger import Logger
-import logging
 Logger.setLevel(logging.WARNING)
-
 
 import sys,os
 sys.path.append('../')
@@ -18,8 +16,6 @@ sys.path.append(os.path.join(os.getenv("HOME"),'smodels'))
 from databaseBrowser import Browser
 from dataScreensGUI import MainScreen
 from kivy.app import App
-
-
     
 class databaseBrowserGUIApp(App):
     """

@@ -18,7 +18,6 @@ from smodels.theory.theoryPrediction import theoryPredictionsFor
 from databaseLoader import database
 from smodels.theory import slhaDecomposer
 from math import floor, log10
-import logging as logger
 import numpy as np
 import math
 

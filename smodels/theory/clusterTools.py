@@ -7,13 +7,13 @@
         
 """
 
+import sys
 from smodels.theory import crossSection
 from smodels.theory.auxiliaryFunctions import massAvg, massPosition, distance
 from smodels.tools.physicsUnits import fb, MeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-import logging,sys
 
-logger = logging.getLogger("smodels")
+from smodels.tools.smodelsLogging import logger
 
 
 class ElementCluster(object):

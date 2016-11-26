@@ -10,11 +10,8 @@ import os
 from datetime import datetime
 import platform
 import traceback
-import logging
 from smodels.installation import installDirectory
-
-log = logging.getLogger("smodels")
-
+from smodels.tools.smodelsLogging import logger
 
 class CrashReport(object):
     """
@@ -117,7 +114,7 @@ def readCrashReportFile(crashReportFileName):
     for line in crashReportFileContent:
         if lineNumber == 1:
             if not line.rstrip() == "SModelS Crash Report File":
-                log.error("ERROR: Not a SModelS crash report file!")
+                logger.error("ERROR: Not a SModelS crash report file!")
                 break
             
         if line.rstrip() == "* Input File":
