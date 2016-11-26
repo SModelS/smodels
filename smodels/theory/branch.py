@@ -6,14 +6,12 @@
         
 """
 
+import sys
 from smodels.theory.particleNames import simParticles, elementsInStr
 from smodels.tools.physicsUnits import fb
-import logging
 from smodels.particles import rEven, ptcDic
-import sys
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-
-logger = logging.getLogger("smodels")
+from smodels.tools.smodelsLogging import logger
 
 
 class Branch(object):

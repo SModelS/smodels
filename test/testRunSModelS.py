@@ -18,12 +18,11 @@ from smodels.installation import installDirectory as iDir
 from smodels.tools import crashReport
 from smodels.tools.timeOut import NoTime
 from runSModelS import main
-import logging
 import redirector
 import unum
 import time
 
-logger = logging.getLogger("smodels")
+from smodels.tools.smodelsLogging import logger, setLogLevel
 
 def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
     """
@@ -94,14 +93,7 @@ class RunSModelSTest(unittest.TestCase):
             to = os.devnull
         with redirector.stdout_redirected ( to = to ):
             out = join( iDir(), "test/unitTestOutput" )
-            if level == 'debug':
-                logger.setLevel(level=logging.DEBUG)
-            if level == 'info':
-                logger.setLevel(level=logging.INFO)
-            if level == 'warning':
-                logger.setLevel(level=logging.WARNING)
-            if level == 'error':
-                pass
+            setLogLevel ( level )
             main(filename, parameterFile=join ( iDir(), "test/%s" % inifile ),
                  outputDir= out, db= None, timeout = timeout,
                  development = development)

@@ -20,9 +20,7 @@ import numpy
 import operator
 
 from smodels import installation
-import logging
-
-logger = logging.getLogger("smodels")
+from smodels.tools.smodelsLogging import logger
 
 squarks = [1000001,
            2000001,

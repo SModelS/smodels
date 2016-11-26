@@ -13,9 +13,7 @@ from smodels.installation import installDirectory, version
 from smodels.tools import modelTester
 from smodels.tools import crashReport
 import smodels.tools.printer as prt
-import logging
-
-logger = logging.getLogger("smodels")
+from smodels.tools import smodelsLogging
 
 def main( inFile, parameterFile, outputDir, db, timeout, development ):
     """
@@ -95,16 +93,7 @@ if __name__ == "__main__":
 
     db=None
     if args.force_txt: db=True
-    level = args.verbose.lower()
-    if level == 'debug':
-        logger.setLevel(level=logging.DEBUG)
-    if level == 'info':
-        logger.setLevel(level=logging.INFO)
-    if level == 'warning':
-        logger.setLevel(level=logging.WARNING)
-    if level == 'error':
-        pass
-
+    smodelsLogging.setLogLevel ( args.verbose )
     
     if args.run_crashreport: 
         args.filename, args.parameterFile = crashReport.readCrashReportFile(

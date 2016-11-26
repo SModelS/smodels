@@ -11,16 +11,14 @@
 
 import copy
 import time
+import sys
+import pyslha
 from smodels.theory import element, topology, crossSection
 from smodels.theory.branch import Branch, decayBranches
-import pyslha
 from smodels.tools.physicsUnits import fb, GeV
 import smodels.particles
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-import logging
-import sys
-
-logger = logging.getLogger("smodels")
+from smodels.tools.smodelsLogging import logger
 
 def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
               minmassgap=-1.*GeV, useXSecs=None):

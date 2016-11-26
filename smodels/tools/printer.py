@@ -11,7 +11,7 @@
 """
 
 from __future__ import print_function
-import logging,sys,os
+import sys,os
 from smodels.theory.topology import TopologyList
 from smodels.theory.element import Element
 from smodels.theory.theoryPrediction import TheoryPredictionList
@@ -21,11 +21,11 @@ from smodels.tools.ioObjects import OutputStatus, ResultList
 from smodels.tools.coverage import UncoveredList, Uncovered
 from smodels.tools.physicsUnits import GeV, fb, TeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
+from smodels.tools.smodelsLogging import logger
 from collections import OrderedDict
 from xml.dom import minidom
 from xml.etree import ElementTree
 
-logger = logging.getLogger("smodels")
 
 
 class MPrinter(object):

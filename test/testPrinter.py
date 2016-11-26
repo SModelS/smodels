@@ -14,12 +14,12 @@ import unittest
 from smodels.installation import installDirectory as idir
 from smodels.theory import slhaDecomposer
 from smodels.tools.physicsUnits import fb, GeV, TeV
+from smodels.tools.smodelsLogging import logger
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.tools import printer, ioObjects
 from smodels.tools import coverage
 from smodels.tools import summaryReader
 from xml.etree import ElementTree
-import logging as logger
 from databaseLoader import database
 import unum
 

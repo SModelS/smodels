@@ -9,8 +9,8 @@
 
 """
 
-import logging
 from smodels.tools.physicsUnits import fb
+from smodels.tools.smodelsLogging import logger
 from smodels.tools.caching import _memoize
 from scipy import stats, optimize, integrate, special
 from numpy import sqrt, exp, log, sign
@@ -83,8 +83,8 @@ def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
     try:
         import scipy.stats
     except ImportError:
-        logging.warning('scipy is not installed... the CLs module cannot be used.')
-        logging.warning('Please install scipy.')
+        logger.warning('scipy is not installed... the CLs module cannot be used.')
+        logger.warning('Please install scipy.')
         return False
     # generate a set of expected-number-of-background-events, one for each toy
     # experiment, distributed according to a Gaussian with the specified mean

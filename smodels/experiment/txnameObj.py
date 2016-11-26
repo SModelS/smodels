@@ -12,12 +12,13 @@
 
 """
 
-import logging,os,sys
+import os,sys
 from smodels.tools.physicsUnits import GeV, fb, TeV, pb
 from smodels.theory.particleNames import elementsInStr
 from smodels.tools.stringTools import concatenateLines
 from smodels.theory.element import Element
 from smodels.theory.topology import TopologyList
+from smodels.tools.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.caching import _memoize
 from scipy.linalg import svd
@@ -28,10 +29,6 @@ import copy
 import math
 from math import floor, log10
 
-FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
-logging.basicConfig(format=FORMAT)
-logger = logging.getLogger("smodels")
-#logger.setLevel(level=logging.ERROR)
 
 class TxName(object):
     """

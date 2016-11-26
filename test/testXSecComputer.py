@@ -18,13 +18,12 @@ from smodels.theory import crossSection
 import tempfile
 import unittest
 import argparse
-import logging
 import logging.config
 
 class XSecTest(unittest.TestCase):
     # use different logging config for the unit tests.
     logging.config.fileConfig( "./logging.conf" )
-    logger = logging.getLogger(__name__)
+    from smodels.tools.smodelsLogging import logger
 
     toolBox.ToolBox().compile() ## make sure the tools are compiled
 

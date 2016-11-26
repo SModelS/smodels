@@ -7,9 +7,7 @@
 """
 
 import signal
-import logging
-
-logger = logging.getLogger("smodels")
+from smodels.tools.smodelsLogging import logger
 
 class NoTime(Exception):
     """

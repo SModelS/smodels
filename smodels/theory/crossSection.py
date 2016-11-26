@@ -11,14 +11,10 @@
 from smodels.tools.physicsUnits import TeV, pb
 from smodels.theory import lheReader
 import smodels.particles
-import logging
 import pyslha
 import sys
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-
-FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
-logging.basicConfig(format=FORMAT)
-logger = logging.getLogger("smodels")
+from smodels.tools.smodelsLogging import logger
 
 ## orders in perturbation theory
 LO = 0

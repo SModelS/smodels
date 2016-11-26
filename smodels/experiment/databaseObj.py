@@ -11,19 +11,19 @@
 """
 
 import sys
-import logging
 import os
 import time
 from smodels.experiment import datasetObj
 from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.tools.physicsUnits import fb
+
 try:
     import cPickle as serializer
 except ImportError as e:
     import pickle as serializer
 
-logger = logging.getLogger("smodels")
+from smodels.tools.smodelsLogging import logger, setLogLevel
 
 class Database(object):
     """
@@ -51,7 +51,7 @@ class Database(object):
         self.sw_format_version = "111" ## what format does the software support?
         self.pcl_format_version = None ## what format is in the binary file?
         self.binfile = os.path.join ( self._base, self.pclfilename )
-        if verbosity: self._setLogLevel ( self._verbosity )
+        setLogLevel ( self._verbosity )
         if self.force_load=="txt":
             self.loadTextDatabase()
             return
@@ -363,19 +363,6 @@ class Database(object):
             return 'error'
         return level.lower()
 
-
-    def _setLogLevel(self, level='error'):
-        level = level.lower()
-        if level == 'debug':
-            logger.setLevel(level=logging.DEBUG)
-        if level == 'info':
-            logger.setLevel(level=logging.INFO)
-        if level == 'warning':
-            logger.setLevel(level=logging.WARNING)
-        if level == 'error':
-            pass
-
-    
     def _loadExpResults(self):
         """
         Checks the database folder and generates a list of ExpResult objects for
