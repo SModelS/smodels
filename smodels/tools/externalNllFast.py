@@ -9,11 +9,10 @@
 """
 
 from __future__ import print_function
-from smodels.tools.externalTool import ExternalTool
 import commands
 import os
-import logging
-logger = logging.getLogger("smodels")
+from smodels.tools.externalTool import ExternalTool
+from smodels.tools.smodelsLogging import logger
 
 
 class ExternalNllFast(ExternalTool):

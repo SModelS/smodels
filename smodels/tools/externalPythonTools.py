@@ -9,10 +9,7 @@
 
 """
 
-import logging
-
-logger = logging.getLogger("smodels")
-
+from smodels.tools.smodelsLogging import logger
 
 class ExternalPythonTool(object):
     """

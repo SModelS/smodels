@@ -10,11 +10,8 @@ from smodels.theory.particleNames import elementsInStr
 from smodels.theory.branch import Branch
 from smodels.theory import crossSection
 from smodels.particles import rEven, ptcDic
-import logging
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-
-logger = logging.getLogger("smodels")
-
+from smodels.tools.smodelsLogging import logger
 
 class Element(object):
     """

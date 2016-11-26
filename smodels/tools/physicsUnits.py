@@ -9,11 +9,8 @@
 """
 
 import unum
-import logging
 from unum import IncompatibleUnitsError
-
-logger = logging.getLogger("smodels")
-
+from smodels.tools.smodelsLogging import logger
 
 # description see
 # http://home.scarlet.be/be052320/Unum.html

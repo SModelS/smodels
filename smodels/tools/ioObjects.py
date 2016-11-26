@@ -19,9 +19,7 @@ from smodels.particles import qNumbers, rEven
 from smodels.theory import crossSection
 from smodels.theory.theoryPrediction import TheoryPrediction
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-import logging
-
-logger = logging.getLogger("smodels")
+from smodels.tools.smodelsLogging import logger
 
 class ResultList(object):
     """

@@ -11,12 +11,11 @@
 
 import sys
 import copy
-import logging
 from smodels.particles import rEven, rOdd, ptcDic
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import itertools
 
-logger = logging.getLogger("smodels")
+from smodels.tools.smodelsLogging import logger
 
 
 def getName(pdg):
