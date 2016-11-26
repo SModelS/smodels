@@ -17,7 +17,7 @@ if suppressStdout:
     a=sys.stdout
     sys.stdout = open ( "stdout.log", "w" )
 t0=time.time()
-main( filename, parameterFile, out )
+main( filename, parameterFile, "/tmp", None, 0, True )
 t1=time.time()
 
 if suppressStdout:
