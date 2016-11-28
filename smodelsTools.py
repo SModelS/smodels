@@ -12,10 +12,15 @@
 import argparse
 from smodels.tools import xsecComputer
 from smodels.tools import slhaChecks, lheChecks, databaseBrowser
+from smodels.tools import smodelsLogging
 
 
 def main():
     parser = argparse.ArgumentParser(description="SModelS-tools command line tool.")
+
+    parser.add_argument('-v','--verbose', help='verbosity level. '
+                        'accepted values are: debug, info, warning, error.',
+                                    default = "info", type = str )
 
     subparsers = parser.add_subparsers(dest='subparser_name')
 
@@ -60,6 +65,8 @@ def main():
     dbBrowser.add_argument('-t', '--text', help='load text database, dont even search for binary database file', action='store_true')
 
     args = parser.parse_args()
+
+    smodelsLogging.setLogLevel ( args.verbose )
 
     if args.subparser_name == 'installation':
         from smodels import installation
