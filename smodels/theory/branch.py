@@ -174,6 +174,11 @@ class Branch(object):
         
         return len(self.masses)
 
+    def __lt__( self, b2 ):
+        return self.__cmp__ ( b2 ) == -1
+
+    def __eq__( self, b2 ):
+        return self.__cmp__ ( b2 ) == 0
 
     def _addDecay(self, br, massDictionary):
         """
