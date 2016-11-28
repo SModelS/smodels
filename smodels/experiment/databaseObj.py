@@ -48,7 +48,7 @@ class Database(object):
         self.txt_mtime = None, None
         self.pcl_mtime = None, None
         self.pcl_db = None
-        self.sw_format_version = "111" ## what format does the software support?
+        self.sw_format_version = "112" ## what format does the software support?
         self.pcl_format_version = None ## what format is in the binary file?
         self.binfile = os.path.join ( self._base, self.pclfilename )
         setLogLevel ( self._verbosity )
@@ -167,12 +167,18 @@ class Database(object):
             return None
 
         try:
-            with open ( self.binfile, "r" ) as f:
+            with open ( self.binfile, "rb" ) as f:
                 t0=time.time()
+                self.pcl_python = serializer.load ( f )
                 self.pcl_format_version = serializer.load ( f )
                 self.pcl_mtime = serializer.load ( f )
                 self._databaseVersion = serializer.load ( f )
                 if not lastm_only:
+                    if self.pcl_python != sys.version:
+                        logger.warning ( "binary file was written with different "
+                                         "python version. Regenerating." )
+                        self.createBinaryFile()
+                        return self
                     if self.pcl_format_version != self.sw_format_version:
                         logger.warning ( "binary file format (%s) and format " 
                                          "supported by software (%s) disagree." % 
@@ -239,13 +245,14 @@ class Database(object):
         if binfile == None:
             binfile = self.binfile
         logger.debug (  " * create %s" % self.binfile )
-        with open ( binfile, "w" ) as f:
-            # serializer.dump ( self.binfile, f )
+        with open ( binfile, "wb" ) as f:
             logger.debug (  " * load text database" )
             self.loadTextDatabase() 
             logger.debug (  " * write %s version %s" % ( self.binfile,
                        self.sw_format_version ) )
             ptcl = serializer.HIGHEST_PROTOCOL
+            self.pcl_python = sys.version
+            serializer.dump ( self.pcl_python, f, protocol=ptcl )
             serializer.dump ( self.sw_format_version, f, protocol=ptcl )
             serializer.dump ( self.txt_mtime, f, protocol=ptcl )
             serializer.dump ( self._databaseVersion, f, protocol=ptcl )
