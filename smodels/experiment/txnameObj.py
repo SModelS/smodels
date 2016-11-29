@@ -72,11 +72,10 @@ class TxName(object):
                 if tag == 'upperLimits' or tag == 'efficiencyMap':
                     data = value
                     dataType = tag
-                else: 
-                    if tag == 'expectedUpperLimits':
-                        expectedData = value
-                        dataType = 'upperLimits'
-                    else: self.addInfo(tag,value)
+                elif tag == 'expectedUpperLimits':
+                    expectedData = value
+                    dataType = 'upperLimits'
+                else: self.addInfo(tag,value)
             else:
                 logger.info("Ignoring unknown field %s found in file %s" \
                              % (tag, self.path))
@@ -122,10 +121,12 @@ class TxName(object):
         :param expected: query self.txnameDataExp
         """
         if not expected:
-            return self.txnameData.getValueFor ( massarray )
-        if not self.txnameDataExp:
-            raise SModelSError ( "%s does not have expected values" % self.txName )
-        return self.txnameDataExp.getValueFor ( massarray )
+            return self.txnameData.getValueFor( massarray )
+        else:
+            if not self.txnameDataExp:
+                return None
+            else:
+                return self.txnameDataExp.getValueFor( massarray )
 
 
     def addInfo(self,tag,value):

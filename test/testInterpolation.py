@@ -33,8 +33,8 @@ class InterpolationTest(unittest.TestCase):
                     datasetIDs=[None], txnames=["T2bb" ] )
         txname=expRes[0].datasets[0].txnameList[0]
         m = [[650.0*GeV, 50.0*GeV], [650.0*GeV, 50.0*GeV]]
-        with self.assertRaises ( SModelSError ):
-            expected = txname.getValueFor ( m, expected = True )
+        expected = txname.getValueFor ( m, expected = True )
+        self.assertTrue(expected is None)
 
     def testInterpolation(self):
         # print database
