@@ -15,8 +15,10 @@ from smodels.tools.ioObjects import SlhaStatus
 from smodels.tools.physicsUnits import fb
 
 def main(args):   
-    status = SlhaStatus(args.filename, maxDisplacement=args.displacement,
-                        sigmacut=args.sigmacut*fb, checkLSP=args.lsp,
-                        findIllegalDecays=args.illegal, checkXsec=args.xsec,
-                        findLonglived=args.longlived, findMissingDecayBlocks=args.decayBlocks) # pylint: disable-msg=C0103
+    status = SlhaStatus ( args.filename, maxDisplacement=args.displacement,
+                 sigmacut=args.sigmacut*fb, checkLSP=args.lsp,
+                 findIllegalDecays=args.illegal, checkXsec=args.xsec,
+                 findLonglived=args.longlived, 
+                 findMissingDecayBlocks=args.decayBlocks) # pylint: disable-msg=C0103
+
     print(status.status)
