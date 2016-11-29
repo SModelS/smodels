@@ -82,7 +82,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
                     doCompress=parser.getboolean("options", "doCompress"),
                     doInvisible=parser.getboolean("options", "doInvisible"),
                     minmassgap=minmassgap)
-    except SModelSError,e:
+    except SModelSError as e:
         print ( "Exception %s %s" % ( e, type(e) ) )
         """ Update status to fail, print error message and exit """
         outputStatus.updateStatus(-1)
