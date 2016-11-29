@@ -233,9 +233,10 @@ class RunPrinterTest(unittest.TestCase):
          
         ignoreFields = ['input file','smodels version', 'ncpus']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
-                                                 key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
-                                                   res['AnalysisID'],res['DataSetID']])
-        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.05,ignore=ignoreFields)
+                       key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
+                                        res['AnalysisID'],res['DataSetID']])
+        equals = equalObjs( smodelsOutput,smodelsOutputDefault,allowedDiff=0.05,
+                            ignore=ignoreFields )
         self.assertTrue(equals)
         try:
             os.remove('./outputSimple.py')
