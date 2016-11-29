@@ -15,9 +15,27 @@ import math
 from smodels.experiment.txnameObj import TxNameData
 from smodels.tools.physicsUnits import GeV, TeV, pb, fb
 from databaseLoader import database
-
+from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
 class InterpolationTest(unittest.TestCase):
+    def testExpected(self):
+        expRes = database.getExpResults(analysisIDs=["CMS-PAS-SUS-12-026"], 
+                    datasetIDs=[None], txnames=[ "T1tttt" ] )
+        txname=expRes[0].datasets[0].txnameList[0]
+        m = [[650.0*GeV, 50.0*GeV], [650.0*GeV, 50.0*GeV]]
+        observed = txname.getValueFor ( m, expected = False )
+        expected = txname.getValueFor ( m, expected = True )
+        delta = abs ( ( ( observed - expected ) / observed ).asNumber() )
+        self.assertTrue ( delta > .55 and delta < .60 )
+
+    def testExpectedFails(self):
+        expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2013-05"], 
+                    datasetIDs=[None], txnames=["T2bb" ] )
+        txname=expRes[0].datasets[0].txnameList[0]
+        m = [[650.0*GeV, 50.0*GeV], [650.0*GeV, 50.0*GeV]]
+        with self.assertRaises ( SModelSError ):
+            expected = txname.getValueFor ( m, expected = True )
+
     def testInterpolation(self):
         # print database
         expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2013-05"], 

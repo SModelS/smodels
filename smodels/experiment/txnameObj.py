@@ -36,12 +36,12 @@ class TxName(object):
     file (constraint, condition,...) as well as the _data.
     """
 
-
     def __init__(self, path, globalObj, infoObj):
         self.path = path
         self.globalInfo = globalObj
         self._infoObj = infoObj
         self.txnameData = None
+        self.txnameDataExp = None ## expected Data
         self._topologyList = TopologyList()
 
         logger.debug('Creating object based on txname file: %s' %self.path)
@@ -61,6 +61,7 @@ class TxName(object):
         #Get tags in info file:
         tags = [line.split(':', 1)[0].strip() for line in content]
         data = None
+        expectedData = None
         dataType = None
         for i,tag in enumerate(tags):
             if not tag: continue
@@ -71,7 +72,11 @@ class TxName(object):
                 if tag == 'upperLimits' or tag == 'efficiencyMap':
                     data = value
                     dataType = tag
-                else: self.addInfo(tag,value)
+                else: 
+                    if tag == 'expectedUpperLimits':
+                        expectedData = value
+                        dataType = 'upperLimits'
+                    else: self.addInfo(tag,value)
             else:
                 logger.info("Ignoring unknown field %s found in file %s" \
                              % (tag, self.path))
@@ -79,6 +84,8 @@ class TxName(object):
         ident = self.globalInfo.id+":"+dataType[0]+":"+ str(self._infoObj.dataId)
         ident += ":" + self.txName
         self.txnameData = TxNameData( data, dataType, ident )
+        if expectedData:
+            self.txnameDataExp = TxNameData( expectedData, dataType, ident )
 
         #Builds up a list of elements appearing in constraints:
         elements = []
@@ -104,6 +111,22 @@ class TxName(object):
     def __lt__ ( self, other ):
         """ sort by txName """
         return self.txName < other.txName
+
+    def getValueFor(self,massarray,expected=False ):
+        """ 
+        Access txnameData and txnameDataExp to get value for 
+        massarray.
+
+        :param massarray: mass array values (with units), i.e.
+                          [[100*GeV,10*GeV],[100*GeV,10*GeV]]
+        :param expected: query self.txnameDataExp
+        """
+        if not expected:
+            return self.txnameData.getValueFor ( massarray )
+        if not self.txnameDataExp:
+            raise SModelSError ( "%s does not have expected values" % self.txName )
+        return self.txnameDataExp.getValueFor ( massarray )
+
 
     def addInfo(self,tag,value):
         """
