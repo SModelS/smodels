@@ -48,7 +48,7 @@ class Database(object):
         self.txt_mtime = None, None
         self.pcl_mtime = None, None
         self.pcl_db = None
-        self.sw_format_version = "112" ## what format does the software support?
+        self.sw_format_version = "113" ## what format does the software support?
         self.pcl_format_version = None ## what format is in the binary file?
         self.binfile = os.path.join ( self._base, self.pclfilename )
         setLogLevel ( self._verbosity )
@@ -410,7 +410,7 @@ class Database(object):
 
 
     def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
-                      dataTypes = ['all'], useSuperseded=False, useNonValidated=False):
+                    dataTypes = ['all'], useSuperseded=False, useNonValidated=False):
         """
         Returns a list of ExpResult objects.
         
@@ -428,7 +428,8 @@ class Database(object):
         :param datasetIDs: list of dataset ids ([ANA-CUT0,...])
         :param txnames: list of txnames ([TChiWZ,...])
         :param useSuperseded: If False, the supersededBy results will not be included
-        :param useNonValidated: If False, the results with validated = False will not be included
+        :param useNonValidated: If False, the results with validated = False 
+                                will not be included
         :returns: list of ExpResult objects or the ExpResult object if the list
                   contains only one result
                    
