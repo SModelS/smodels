@@ -90,6 +90,9 @@ class LheReader(object):
         """
         return self
 
+    def __next__(self):
+        """ for python3 """
+        return self.next()
 
     def event(self):
         """
