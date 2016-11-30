@@ -133,10 +133,43 @@ class Browser(object):
                 if "_" == field[0]: fields.remove(field)
 
         return fields
-
-    def getULFor(self,expid,txname,massarray):
+        
+    def getEfficiencyFor(self,expid,dataset,txname,massarray):
         """
-        Get an upper limit for the given experimental id, the txname, and the massarray.
+        Get an efficiency for the given experimental id, 
+        the dataset name, the txname, and the massarray.
+        Can only be used for EfficiencyMap-type experimental results.
+        Interpolation is done, if necessary.
+
+        :param expid: experimental id (string)
+        :param dataset: dataset name (string)
+        :param txname: txname (string).
+        :param massarray: list of masses with units, e.g.
+                          [[ 400.*GeV, 100.*GeV],[400.*GeV, 100.*GeV]]
+        :return: efficiency
+        """
+        #First select the experimental results matching the id and the result type:
+        expres = None
+        for expResult in self:
+            if expResult.getValuesFor('id')[0] != expid:
+                continue
+            else:
+                if 'efficiencyMap' in expResult.getValuesFor('dataType'):
+                    expres = expResult
+                    break
+
+        if not expres:
+            logger.warning( "Could not find efficiencyMap result %s."\
+                   " getEfficiencyForr can only be\
+            used for efficiencyMap results." % (expid))
+            return None
+
+        return expres.getEfficiencyFor ( dataset, txname, massarray )
+
+    def getULFor(self,expid,txname,massarray, expected=False ):
+        """
+        Get an upper limit for the given experimental id, the txname, 
+        and the massarray.
         Can only be used for UL experimental results.
         Interpolation is done, if necessary.
 
@@ -144,6 +177,8 @@ class Browser(object):
         :param txname: txname (string). ONLY required for upper limit results
         :param massarray: list of masses with units, e.g.
                           [[ 400.*GeV, 100.*GeV],[400.*GeV, 100.*GeV]]
+        :param expected: If true, return expected upper limit, otherwise
+                         return observed upper limit.
         :return: upper limit [fb]
         """
 
@@ -158,7 +193,7 @@ class Browser(object):
                     break
 
         if not expres:
-            logger.warning( "Could not find UL result %s . getULFor can only be\
+            logger.warning( "Could not find UL result %s. getULFor can only be\
             used for upper-limit results." % (expid))
             return None
 
@@ -166,11 +201,10 @@ class Browser(object):
         for tx in txnames:
             if not tx.txName == txname:
                 continue
-            return tx.txnameData.getValueFor(massarray)
+            return tx.getValueFor(massarray,expected)
 
         logger.warning( "Could not find TxName %s ." % (txname))
         return None
-
 
     def getULForSR(self,expid,datasetID):
         """
@@ -261,8 +295,8 @@ def main(args):
     try:
         import IPython
     except ImportError as e:
-        print "Ipython is not installed. ",
-        print "To use this script, please install ipython."
+        print ( "IPython is not installed. ", )
+        print ( "To use this script, please install ipython." )
         import sys
         sys.exit()
 

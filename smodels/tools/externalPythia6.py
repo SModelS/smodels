@@ -16,7 +16,10 @@ from smodels import installation
 import tempfile
 import os
 import shutil
-import commands
+try:
+    import commands as executor
+except ImportError:
+    import subprocess as executor
 import urllib
 import tarfile
 
@@ -193,15 +196,16 @@ class ExternalPythia6(ExternalTool):
         cmd = "cd %s ; %s < %s" % \
              (self.tempDirectory(), self.executablePath, cfg)
         logger.debug("Now running " + str(cmd))
-        Out = commands.getoutput(cmd)
+        out = executor.getoutput(cmd)
+        # out = subprocess.check_output ( cmd, shell=True, universal_newlines=True )
         if do_unlink:
             self.unlink( unlinkdir=True )
         else:
             f = open(self.tempDirectory() + "/log", "w")
             f.write (cmd + "\n\n\n")
-            f.write (Out + "\n")
+            f.write (out + "\n")
             f.close()
-        return Out
+        return out
 
     def chmod(self):
         """ 
@@ -224,7 +228,9 @@ class ExternalPythia6(ExternalTool):
         """
         logger.info("Trying to compile pythia:")
         cmd = "cd %s; make" % self.srcPath
-        outputMessage = commands.getoutput(cmd)
+        outputMessage = executor.getoutput(cmd)
+        #outputMessage = subprocess.check_output ( cmd, shell=True, 
+        #                                          universal_newlines=True )
         logger.info(outputMessage)
 
 
@@ -289,7 +295,7 @@ class ExternalPythia6(ExternalTool):
                     logger.error("Expected >>>%s<<< found >>>%s<<<", line,
                                  output[nr])
                     return False
-        except Exception, e:
+        except Exception as e:
             logger.error("Something is wrong with the setup: exception %s", e)
             return False
         return True

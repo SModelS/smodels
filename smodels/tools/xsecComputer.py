@@ -9,6 +9,7 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
+from __future__ import print_function
 from smodels import installation
 from smodels.tools import toolBox, runtime
 from smodels.tools.physicsUnits import pb, TeV, GeV
@@ -18,7 +19,10 @@ from smodels.tools.smodelsLogging import logger
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import os
 import pyslha
-import cStringIO
+try:
+    import cStringIO as io
+except ImportError as e:
+    import io
 import sys
 
 LO= 0  ## simple variables used to increase readability the perturbation order 
@@ -53,7 +57,7 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
         raise SModelSError()
     try:
         f=pyslha.readSLHAFile(slhafile)
-    except pyslha.ParseError,e:
+    except pyslha.ParseError as e:
         logger.error("File cannot be parsed as SLHA file: %s" % e )
         raise SModelSError()
 
@@ -252,7 +256,7 @@ def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True, pythiacard=None
         lheFile = open(lhefile, 'r')
     else:
         # Create memory only file object
-        lheFile = cStringIO.StringIO(lhedata)
+        lheFile = io.StringIO(lhedata)
 
     return lheFile
 
@@ -270,16 +274,16 @@ def computeForOneFile ( sqrtses, order, nevents, inputFile, unlink,
             addXSecToFile(xsecs, inputFile, comment)
     else:
         logger.info("Computing SLHA cross section from %s." % inputFile )
-        print
-        print "     Cross sections:"
-        print "======================="
+        print()
+        print( "     Cross sections:" )
+        print( "=======================" )
         for s in sqrtses:
             ss = s*TeV 
             xsecs = computeXSec(ss, order, nevents, inputFile, \
                         unlink=unlink, loFromSlha=lOfromSLHA )
             for xsec in xsecs: 
-                print "%s %20s:  %.3e pb" % ( xsec.info.label,xsec.pid,xsec.value/pb )
-        print
+                print( "%s %20s:  %.3e pb" % ( xsec.info.label,xsec.pid,xsec.value/pb ) )
+        print()
 
 def queryCrossSections ( filename ):
     if os.path.isdir ( filename ):
@@ -287,9 +291,9 @@ def queryCrossSections ( filename ):
         sys.exit(-1)
     xsecsInfile = crossSection.getXsecFromSLHAFile(filename)
     if xsecsInfile:
-        print "1"
+        print ( "1" )
     else:
-        print "0"
+        print ( "0" )
 
 def getOrder ( args ):
     """ retrieve the order in perturbation theory from argument list """

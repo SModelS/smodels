@@ -10,8 +10,11 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
 """
-
-import commands
+#
+try:
+    import commands as executor
+except ImportError:
+    import subprocess as executor
 import os
 from smodels.tools import toolBox
 import pyslha
@@ -205,7 +208,8 @@ def runNLLfast(nll_run, nllpath):
     """
     current_dir = os.getcwd()
     os.chdir(nllpath)
-    nll_output = commands.getoutput(nll_run)
+    nll_output = executor.getoutput(nll_run)
+    # nll_output = subprocess.check_output ( nll_run, shell=True, universal_newlines=True )
     os.chdir(current_dir)
     return nll_output
 

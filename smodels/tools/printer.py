@@ -119,10 +119,26 @@ class BasicPrinter(object):
         self.printingOrder = []
         self.toPrint = []
 
-
         if filename and os.path.isfile(filename):
             logger.warning("Removing file %s" %filename)
             os.remove(filename)
+
+    @property
+    def filename(self):
+        return self._filename
+
+    @filename.setter
+    def filename(self,fn):
+        self._filename=fn
+        self.mkdir()
+
+    def mkdir(self ):
+        """ create directory to file, if necessary """
+        if not self.filename:
+            return
+        dirname = os.path.dirname ( self.filename )
+        if not os.path.exists ( dirname ):
+            os.makedirs ( dirname )
             
     def setOptions(self,options):
         """
