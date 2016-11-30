@@ -153,7 +153,7 @@ class OutputStatus(object):
                                1: "#decomposition was successful"}
 
         self.status = 0
-        if not self.databaseVersion or self.databaseVersion < 0:
+        if not self.databaseVersion:
             self.status = -4
         if self.filestatus < 0:
             self.status = -2
