@@ -9,7 +9,10 @@
 """
 
 from __future__ import print_function
-import commands
+try:
+    import commands as executor
+except ImportError:
+    import subprocess as executor
 import os
 from smodels.tools.externalTool import ExternalTool
 from smodels.tools.smodelsLogging import logger
@@ -51,7 +54,8 @@ class ExternalNllFast(ExternalTool):
         """
         logger.info("Trying to compile %s", self.name)
         cmd = "cd %s; make" % self.srcPath
-        out = commands.getoutput(cmd)
+        out = executor.getoutput(cmd)
+        # out = subprocess.check_output ( cmd, shell=True, universal_newlines=True )
         logger.info(out)
         return True
 
@@ -98,7 +102,8 @@ class ExternalNllFast(ExternalTool):
         
         """
         cmd = "cd %s; %s %s" % (self.cdPath, self.executablePath, params)
-        out = commands.getoutput(cmd)
+        out = executor.getoutput(cmd)
+        # out = subprocess.check_output ( cmd, shell=True, universal_newlines=True )
         out = out.split("\n")
         return out
 

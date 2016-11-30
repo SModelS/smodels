@@ -15,20 +15,20 @@ def nCPUs():
     try:
         import multiprocessing
         return multiprocessing.cpu_count()
-    except ImportError,e:
+    except ImportError as e:
         pass
     try:
         import psutil
         return psutil.NUM_CPUS
-    except ImportError,e:
+    except ImportError as e:
         pass
     try:
         import os
         res = int(os.sysconf('SC_NPROCESSORS_ONLN'))
         if res>0: return res
-    except ImportError,e:
+    except ImportError as e:
         pass
     return None
 
 if __name__ == "__main__":
-    print "This machine has %d CPUs" % nCPUs()
+    print ( "This machine has %d CPUs" % nCPUs() )

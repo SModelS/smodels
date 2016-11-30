@@ -291,7 +291,7 @@ class SlhaStatus(object):
             self.longlived = self.findLonglivedParticles(findLonglived)
             self.status = self.evaluateStatus()
         ## except Exception,e:
-        except (SModelSError,TypeError,IOError,ValueError,AttributeError),e:
+        except (SModelSError,TypeError,IOError,ValueError,AttributeError) as e:
             self.status = -4, "Error checking SLHA file: "+str(e)
 
 
