@@ -35,6 +35,7 @@ class ClustererTest(unittest.TestCase):
         filename = "%sinputFiles/lhe/simplyGluino.lhe" % (installDirectory() )
         reader = lheReader.LheReader(filename)
         event = reader.next()
+        reader.close()
         event_xsec=event.metainfo["totalxsec"]
         self.assertTrue ( abs ( event_xsec - 0.262 * pb ) < .1 *pb )
         xsecs = crossSection.getXsecFromLHEFile(filename)

@@ -182,7 +182,7 @@ class RunPrinterTest(unittest.TestCase):
         sample = summaryReader.Summary(samplefile,allowedDiff=0.05)
         try:
             self.assertEquals(sample, output)
-        except AssertionError,e:
+        except AssertionError as e:
             msg = "%s != %s" %(sample, output) 
             raise AssertionError(msg)
  
@@ -267,7 +267,7 @@ class RunPrinterTest(unittest.TestCase):
         sortXML(xmlNew)
         try:
             self.assertTrue(compareXML(xmlDefault,xmlNew,allowedDiff=0.05,ignore=['input_file','smodels_version', 'ncpus']))
-        except AssertionError,e:
+        except AssertionError as e:
             msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
             raise AssertionError(msg)
  
@@ -293,7 +293,7 @@ class RunPrinterTest(unittest.TestCase):
         sortXML(xmlNew)
         try:
             self.assertTrue(compareXML(xmlDefault,xmlNew,allowedDiff=0.05,ignore=['input_file','smodels_version', 'ncpus']))
-        except AssertionError,e:
+        except AssertionError as e:
             msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
             raise AssertionError(msg)
          

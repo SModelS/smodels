@@ -184,7 +184,7 @@ def _getBestResults(dataSetResults):
             raise SModelSError()                    
         pred = predList[0]
         xsec = pred.xsection        
-        expectedR = xsec.value/dataset.getSRUpperLimit(0.05,True,False)
+        expectedR = ( xsec.value/dataset.getSRUpperLimit(0.05,True,False) ).asNumber()
         if expectedR > bestExpectedR or (expectedR == bestExpectedR and xsec.value > bestXsec):
             bestExpectedR = expectedR
             bestPredList = predList
