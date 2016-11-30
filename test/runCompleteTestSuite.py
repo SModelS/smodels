@@ -9,6 +9,7 @@
     
 """
 
+from __future__ import print_function
 import sys
 sys.path.insert(0,"../")
 v=sys.version_info
@@ -17,8 +18,8 @@ if v[0] > 2 or ( v[0]==2 and v[1] > 6 ):
 if v[0]==2 and v[1] < 7 and v[1] > 3:
     try:
         import unittest2 as unittest
-    except ImportError,e:
-        print "Error: python v",sys.version,"needs unittest2. Please install."
+    except ImportError as e:
+        print ( "Error: python v",sys.version,"needs unittest2. Please install." )
         sys.exit()
 from smodels.tools.smodelsLogging import setLogLevel
 setLogLevel ( "error" )
@@ -31,7 +32,7 @@ def verbose_run():
     for series in alltests:
         for test in series:
             for t in test:
-                print "[runCompleteTestSuite] now run",t.id()
+                print ( "[runCompleteTestSuite] now run",t.id() )
                 t.run()
 
 def parallel_run ( verbose ):
@@ -41,9 +42,9 @@ def parallel_run ( verbose ):
         return
     try:
         from concurrencytest import ConcurrentTestSuite, fork_for_tests
-    except ImportError,e:
-        print "Need to install the module concurrencytest."
-        print "pip install --user concurrencytest"
+    except ImportError as e:
+        print ( "Need to install the module concurrencytest." )
+        print ( "pip install --user concurrencytest" )
         return
     from smodels.tools import runtime
     suite = unittest.TestLoader().discover("./") 
