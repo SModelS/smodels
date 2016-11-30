@@ -62,6 +62,9 @@ class Topology(object):
         ret = (self.__cmp__(other)==0 )
         return ret
 
+    def __lt__(self,other):
+        return self.__cmp__(other)<0
+
     def __cmp__(self,other):
         """
         Compares the topology with other.

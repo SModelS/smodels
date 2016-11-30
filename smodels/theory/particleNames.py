@@ -185,10 +185,10 @@ def simParticles(plist1, plist2, useDict=True):
         if not isinstance(p,str) or not isinstance(plist2[i],str):
             logger.error("Input must be a list of particle strings")
             raise SModelSError()
-        elif not p in ptcDic.keys() + rEven.values():
+        elif not p in list ( ptcDic.keys() ) + list ( rEven.values() ):
             logger.error("Unknow particle: %s" %p)
             raise SModelSError()
-        elif not plist2[i] in ptcDic.keys() + rEven.values():
+        elif not plist2[i] in list ( ptcDic.keys() ) + list ( rEven.values() ):
             logger.error("Unknow particle: %s" %plist2[i])
             raise SModelSError()
                         

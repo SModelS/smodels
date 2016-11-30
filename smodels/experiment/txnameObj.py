@@ -51,6 +51,7 @@ class TxName(object):
             raise SModelSError()
         txtFile = open(path,'r')
         txdata = txtFile.read()
+        txtFile.close()
         if not "txName" in txdata: raise TypeError
         if not 'upperLimits' in txdata and not 'efficiencyMap' in txdata:
             raise TypeError
