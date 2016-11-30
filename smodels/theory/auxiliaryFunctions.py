@@ -196,7 +196,7 @@ def _flattenList(inlist, dims=None):
     """
     flat = []
     for item in inlist:
-        if isinstance(item, Iterable) and not isinstance(item, basestring):
+        if isinstance(item, Iterable) and not isinstance(item, str ):
             if not dims is None:
                 dims.append(len(item))
             for x in _flattenList(item, dims):
