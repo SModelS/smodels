@@ -87,6 +87,14 @@ class ExpResult(object):
             label += txnames + ','
         return label[:-1]
 
+    def getDataset(self, dataId ):
+        """
+        retrieve dataset by dataId
+        """
+        for dataset in self.datasets:
+            if dataset.dataInfo.dataId == dataId:
+                return dataset
+        return None
 
     def getTxNames(self):
         """
@@ -97,7 +105,17 @@ class ExpResult(object):
             txnames += dataset.txnameList
         return txnames
 
-    
+    def getEfficiencyFor ( self, dataset, txname, mass ):
+        """
+        Convenience function. Get the efficiency for
+        a specific dataset for a a specific txname.
+        Equivalent to:
+        self.getDataset ( dataset ).getEfficiencyFor ( txname, mass )
+        """
+        dataset = self.getDataset ( dataset )
+        if dataset: return dataset.getEfficiencyFor ( txname, mass )
+        return None
+
     def getUpperLimitFor(self, dataID=None, alpha=0.05, expected=False,
                           txname=None, mass=None, compute=False):
         """
