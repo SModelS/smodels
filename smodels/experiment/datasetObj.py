@@ -58,6 +58,24 @@ class DataSet(object):
             return False
         return True
 
+    def getTxName(self,txname):
+        """
+        get one specific txName object.
+        """
+        for tn in self.txnameList:
+            if tn.txName == txname:
+                return tn
+        return None
+
+    def getEfficiencyFor(self,txname,mass):
+        """
+        convenience function.
+        same as self.getTxName(txname).getEfficiencyFor(m)
+        """
+        txname = self.getTxName(txname)
+        if txname: return txname.getEfficiencyFor(mass)
+        return None
+
     def getValuesFor(self,attribute=None):
         """
         Returns a list for the possible values appearing in the DataSet
@@ -65,8 +83,8 @@ class DataSet(object):
 
 
         :param attribute: name of a field in the database (string). If not defined
-                          it will return a dictionary with all fields and their respective
-                          values
+                          it will return a dictionary with all fields and 
+                          their respective values
         :return: list of values
         """
 
