@@ -47,7 +47,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
 
     try:
         f=pyslha.readSLHAFile ( slhafile )
-    except pyslha.ParseError,e:
+    except pyslha.ParseError as e:
         logger.error ( "The file %s cannot be parsed as an SLHA file: %s" % (slhafile, e) )
         raise SModelSError()
 
@@ -182,7 +182,7 @@ def _getDictionariesFromSLHA(slhafile):
         brDic[-pid] = brsConj
     # Get mass list for all particles
     massDic = dict(res.blocks['MASS'].items())
-    for pid in massDic.keys()[:]:
+    for pid in list ( massDic.keys() )[:]:
         massDic[pid] *= GeV
         massDic[pid] = abs(massDic[pid])
         if not -pid in massDic: massDic[-pid] = massDic[pid]    
