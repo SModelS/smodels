@@ -27,7 +27,7 @@ class ExternalPythonTool(object):
         try:
             i = __import__(importname)
             self.pythonPath = i.__file__.replace("/__init__.pyc", "")
-        except ImportError, e:
+        except ImportError as e:
             logger.error("could not find %s: %s" % (importname, e))
 
 

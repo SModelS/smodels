@@ -9,6 +9,7 @@
 
 """
 
+from __future__ import print_function
 import argparse
 from smodels.tools import xsecComputer
 from smodels.tools import slhaChecks, lheChecks, databaseBrowser
@@ -71,10 +72,10 @@ def main():
     if args.subparser_name == 'installation':
         from smodels import installation
         import sys
-        print installation.banner()
-        print "SModelS version:", installation.version()
-        print "Installation directory:",installation.installDirectory()
-        print "Binaries:",__file__
+        print ( installation.banner() )
+        print ( "SModelS version:", installation.version() )
+        print ( "Installation directory:",installation.installDirectory() )
+        print ( "Binaries:",__file__ )
         sys.exit()
         
     if args.subparser_name == 'xseccomputer':
