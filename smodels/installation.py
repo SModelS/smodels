@@ -53,6 +53,8 @@ def authors():
         to_add = to_add.replace ( "Copyright (C) ","").replace ( "\n", "" )
         if to_add[:5]=="2012-":
             to_add = to_add[10:]
+        if len(authors)>0:
+            authors+=" "
         authors += to_add
     return authors
 
