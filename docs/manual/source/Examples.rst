@@ -7,20 +7,20 @@ More Examples
 
 Below a few examples are given for how to utilize SModelS and some of the :doc:`SModelS tools <Tools>` as a Python library:
 
-* :download:`How to load the database <recipes/load_database.html>` (download the python code :download:`here <recipes/load_database.py>`)
+* `How to load the database <_downloads/load_database.html>`_ (download the python code :download:`here <recipes/load_database.py>`, IPython notebook :download:`here <recipes/load_database.ipynb>`)
 
-* :download:`How to obtain experimental upper limits <recipes/lookup_upper_limit.html>` (download the python code :download:`here <recipes/lookup_upper_limit.py>`)
+* `How to obtain experimental upper limits <_downloads/lookup_upper_limit.html>`_ (download the python code :download:`here <recipes/lookup_upper_limit.py>`, IPython notebook :download:`here <recipes/lookup_upper_limit.ipynb>`)
 
-* :download:`How to compute leading order cross-sections (for MSSM) <recipes/lo_xsecs_from_slha.html>` (download the python code :download:`here <recipes/lo_xsecs_from_slha.py>`)
+* `How to compute leading order cross-sections (for MSSM) <_downloads/lo_xsecs_from_slha.html>`_ (download the python code :download:`here <recipes/lo_xsecs_from_slha.py>`, IPython notebook :download:`here <recipes/lo_xsecs_from_slha.ipynb>`)
 
-* :download:`How to compute next-to-leading order cross-sections (for MSSM) <recipes/nll_xsecs_from_slha.html>` (download the python code :download:`here <recipes/nll_xsecs_from_slha.py>`)
+* `How to compute next-to-leading order cross-sections (for MSSM) <_downloads/nll_xsecs_from_slha.html>`_ (download the python code :download:`here <recipes/nll_xsecs_from_slha.py>`, IPython notebook :download:`here <recipes/nll_xsecs_from_slha.ipynb>`)
 
-* :download:`How to print decomposition results <recipes/print_decomposition.html>` (download the python code :download:`here <recipes/print_decomposition.py>`)
+* `How to print decomposition results <_downloads/print_decomposition.html>`_ (download the python code :download:`here <recipes/print_decomposition.py>`, IPython notebook :download:`here <recipes/print_decomposition.ipynb>`)
 
-* :download:`How to print theory predictions <recipes/print_theoryPrediction.html>` (download the python code :download:`here <recipes/print_theoryPrediction.py>`)
+* `How to print theory predictions <_downloads/print_theoryPrediction.html>`_ (download the python code :download:`here <recipes/print_theoryPrediction.py>`, IPython notebook :download:`here <recipes/print_theoryPrediction.ipynb>`)
 
-* :download:`How to compare theory predictions with experimental limits <recipes/compareUL.html>` (download the python code :download:`here <recipes/compareUL.py>`)
+* `How to compare theory predictions with experimental limits <_downloads/compareUL.html>`_ (download the python code :download:`here <recipes/compareUL.py>`, IPython notebook :download:`here <recipes/compareUL.ipynb>`)
 
-* :download:`How to find missing topologies <recipes/missingTopologies.html>` (download the python code :download:`here <recipes/missingTopologies.py>`)
+* `How to find missing topologies <_downloads/missingTopologies.html>`_ (download the python code :download:`here <recipes/missingTopologies.py>`, IPython notebook :download:`here <recipes/missingTopologies.ipynb>`)
 
-* :download:`How to generate ascii graphs <recipes/ascii_graph_from_lhe.html>` (download the python code :download:`here <recipes/ascii_graph_from_lhe.py>`)
+* `How to generate ascii graphs <_downloads/ascii_graph_from_lhe.html>`_ (download the python code :download:`here <recipes/ascii_graph_from_lhe.py>`, IPython notebook :download:`here <recipes/ascii_graph_from_lhe.ipynb>`)
