@@ -183,7 +183,10 @@ class ExpResult(object):
                 return False
             for tx in self.getTxNames():
                 if tx == txname or tx.txName == txname:
-                    upperLimit = tx.txnameData.getValueFor(mass)
+                    if expected:
+                        if not tx.txnameDataExp: upperLimit = None
+                        else: upperLimit = tx.txnameDataExp.getValueFor(mass)
+                    else: upperLimit = tx.txnameData.getValueFor(mass)
         else:
             logger.warning("Unkown data type: %s. Data will be ignored.", 
                            self.datasets[0].dataInfo.dataType)

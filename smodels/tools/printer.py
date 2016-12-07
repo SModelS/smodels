@@ -415,7 +415,7 @@ class TxTPrinter(BasicPrinter):
             txnames = theoPred.txnames
             if dataType == 'upperLimit':
                 ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass)
-                ul_expected = None
+                ul_expected = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass, expected=True)
                 signalRegion  = '(UL)'
             elif dataType == 'efficiencyMap':
                 ul = expResult.getUpperLimitFor(dataID=datasetID)
@@ -494,12 +494,14 @@ class TxTPrinter(BasicPrinter):
             #Get upper limit for the respective prediction:
             if expRes.datasets[0].dataInfo.dataType == 'upperLimit':
                 upperLimit = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass)
+                upperLimitExp = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass,expected=True)
             elif expRes.datasets[0].dataInfo.dataType == 'efficiencyMap':
                 upperLimit = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.dataInfo.dataId)
+                upperLimitExp = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.dataInfo.dataId,expected=True)
 
             output += "Observed experimental limit: " + str(upperLimit) + "\n"
-            if expRes.datasets[0].dataInfo.dataType == 'efficiencyMap':
-                output += "Expected experimental limit: " + str(expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.dataInfo.dataId,expected=True)) + "\n"
+            if not type(upperLimitExp)==type(None):
+                output += "Expected experimental limit: " + str(upperLimitExp) + "\n"
             if hasattr(theoryPrediction,'expectedUL') and not theoryPrediction.expectedUL is None:
                 output += "Chi2: " + str(theoryPrediction.chi2) + "\n"
                 output += "Likelihood: " + str(theoryPrediction.likelihood) + "\n"
