@@ -63,6 +63,13 @@ class MPrinter(object):
                 logger.warning("Unknown printer format: %s" %str(prt))
                 continue
             
+            #Copy stdout options to log options:
+            if 'log' in printerTypes:
+                if parser.has_section('stdout-printer') and not parser.has_section('log-printer'):
+                    parser.add_section('log-printer')
+                    for option,val in parser.items('stdout-printer'):
+                        parser.set('log-printer',option,val)
+            
             #Set printer-specific options:
             if parser.has_section(prt+'-printer'):
                 newPrinter.setOptions(parser.items(prt+'-printer'))
