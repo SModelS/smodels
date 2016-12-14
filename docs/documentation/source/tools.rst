@@ -140,6 +140,14 @@ tools.slhaChecks module
     :undoc-members:
     :show-inheritance:
 
+tools.smodelsLogging module
+---------------------------
+
+.. automodule:: tools.smodelsLogging
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 tools.statistics module
 -----------------------
 

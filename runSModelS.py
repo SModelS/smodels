@@ -62,14 +62,14 @@ if __name__ == "__main__":
     """ Get the name of input SLHA file and parameter file """
     ap = argparse.ArgumentParser()
     ap.add_argument('-f', '--filename', 
-            help='name of SLHA or LHE input file, necessary input, if directory '
-            'is given, loop over all files in the directory', required=True)
+            help='name of SLHA or LHE input file or a directory path (required argument). '
+            'If a directory is given, loop over all files in the directory', required=True)
     ap.add_argument('-p', '--parameterFile', 
-            help='name of parameter file, optional argument, if not set, use '
+            help='name of parameter file (optional argumen). If not set, use '
             'all parameters from etc/parameters_default.ini', 
             default=parameterFile)
     ap.add_argument('-o', '--outputDir', 
-            help='name of output directory, optional argument, default is: ' +
+            help='name of output directory (optional argument). The default is: ' +
             outputDir, default=outputDir)
     ap.add_argument('-d', '--development', help='enable development output', 
             action='store_true')
@@ -77,14 +77,14 @@ if __name__ == "__main__":
             action='store_true')
     ap.add_argument('-V', '--version', action='version', version = version() )
     ap.add_argument('-c', '--run-crashreport', 
-            help='parse crash report file and use its contents for a SModelS run.'
+            help='parse crash report file and use its contents for a SModelS run. '
                  "Supply the crash file simply via '--filename myfile.crash'",
             action='store_true')
     ap.add_argument('-v','--verbose', help='verbosity level. '
-            'accepted values are: debug, info, warning, error.',
+            'Accepted values are: debug, info, warning, error.',
             default = "info", type = str )
     ap.add_argument('-T', '--timeout', 
-            help='define a limit on the running time (in secs).'
+            help='define a limit on the running time (in secs). '
             'If not set, run without a time limit', 
             default = 0, type = int)
     
