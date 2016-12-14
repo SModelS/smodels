@@ -404,8 +404,8 @@ class TxTPrinter(BasicPrinter):
         
         if hasattr(self,"printextendedresults") and self.printextendedresults:
             return self._formatExpandedResultList(obj)
-                
-        if hasattr(self,"expandedSummary") and not self.expandedSummary:            
+        
+        if hasattr(self,"expandedsummary") and not self.expandedsummary:                       
             theoPredictions = [obj.theoryPredictions[0]]
         else:
             theoPredictions = obj.theoryPredictions
@@ -415,7 +415,7 @@ class TxTPrinter(BasicPrinter):
         rvalues = []
         output += "#Analysis  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r  r_expected"
         output += "\n\n"
-        for theoPred in obj.theoryPredictions:
+        for theoPred in theoPredictions:
             expResult = theoPred.expResult
             datasetID = theoPred.dataset.dataInfo.dataId
             dataType = expResult.datasets[0].dataInfo.dataType
