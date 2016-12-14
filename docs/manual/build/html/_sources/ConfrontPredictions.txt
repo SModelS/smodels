@@ -56,6 +56,12 @@ excluded by the experimental results if, for one or more predictions, we have *t
 
 * **The upper limits for a given**  |ULr| **or** |EMr| **can be obtained using the** `getUpperLimitFor  method <../../../documentation/build/html/experiment.html#experiment.expResultObj.ExpResult.getUpperLimitFor>`_
 
+.. _likelihoodCalc:
+
+Likelihood Computation
+----------------------
+
+
 For |EMrs| a :math:`\chi^2` can also be computed (in addition to the upper limits above).
 The :math:`\chi^2` is computed from the likelihood using:
 
