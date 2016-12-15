@@ -234,8 +234,8 @@ class TxTPrinter(BasicPrinter):
     def __init__(self, output = 'stdout', filename = None):
         BasicPrinter.__init__(self, output, filename)        
         self.name = "log"
-        self.printingOrder = [OutputStatus,ExpResultList,TopologyList,Element,ExpResult,
-                             TheoryPredictionList,ResultList,Uncovered]
+        self.printingOrder = [OutputStatus,ExpResultList,TopologyList,
+                             ResultList,Uncovered]
         self.toPrint = [None]*len(self.printingOrder)        
         
     def setOutPutFile(self,filename,overwrite=True):
@@ -280,6 +280,7 @@ class TxTPrinter(BasicPrinter):
         output += "=" * 80 + "\n"
         return output
 
+
     def _formatTopologyList(self, obj):
         """
         Format data for a TopologyList object.
@@ -294,7 +295,7 @@ class TxTPrinter(BasicPrinter):
         output = ""
         output += "   ======================================================= \n"
         output += " || \t \t\t\t\t\t\t || \n"
-        output += " || \t \t Global topologies table \t \t ||\n"
+        output += " || \t \t Topologies Table \t \t ||\n"
         output += " || \t \t\t\t\t\t\t || \n"
         output += "   ======================================================= \n"
         for topo in obj:
@@ -341,6 +342,7 @@ class TxTPrinter(BasicPrinter):
 
         return output
 
+
     def _formatExpResultList(self, obj):
         """
         Format data for a ExpResultList object.
@@ -352,6 +354,13 @@ class TxTPrinter(BasicPrinter):
             return None
 
         output = ""
+        
+        output += "   ======================================================= \n"
+        output += " || \t \t\t\t\t\t\t || \n"
+        output += " || \t \t Selected Experimental Results \t \t ||\n"
+        output += " || \t \t\t\t\t\t\t || \n"
+        output += "   ======================================================= \n"
+        
 
         for expRes in obj.expResultList:
             output += self._formatExpResult(expRes)
@@ -391,7 +400,154 @@ class TxTPrinter(BasicPrinter):
 
         return output
     
+
+    def _formatResultList(self, obj):
+        """
+        Format data for a ResultList object.
+
+        :param obj: A ResultList object to be printed.
+        """
+
+        output = ""
+        output += "   ======================================================= \n"
+        output += " || \t \t\t\t\t\t\t || \n"
+        output += " || \t Theory Predictions and \t\t\t || \n"
+        output += " || \t Experimental Constraints \t\t \t ||\n"
+        output += " || \t \t\t\t\t\t\t || \n"
+        output += "   ======================================================= \n"
+                
+        
+        for theoryPrediction in obj.theoryPredictions:
+            expRes = theoryPrediction.expResult
+            info = theoryPrediction.dataset.dataInfo
+            output += "\n"
+            output += "---------------Analysis Label = " + expRes.globalInfo.id + "\n"
+            output += "-------------------Dataset Label = " + str(info.dataId).replace("None","(UL)") + "\n"
+            output += "-------------------Txname Labels = " + str([str(txname) for txname in theoryPrediction.txnames]) + "\n"
+            output += "Analysis sqrts: " + str(expRes.globalInfo.sqrts) + \
+                    "\n"
+
+            if hasattr(self,"printextendedresults") and self.printextendedresults:
+                if theoryPrediction.mass:
+                    for ibr, br in enumerate(theoryPrediction.mass):
+                        output += "Masses in branch %i: " % ibr + str(br) + "\n"                
+                if not theoryPrediction.IDs[0]==0:
+                    output += "Contributing elements: " + str(theoryPrediction.IDs) + "\n"
+                for pidList in theoryPrediction.PIDs:
+                    output += "PIDs:" + str(pidList) + "\n"
+            output += "Theory prediction: " + str(theoryPrediction.xsection.value) + "\n"
+            output += "Theory conditions:"
+            if not theoryPrediction.conditions:
+                output += "  " + str(theoryPrediction.conditions) + "\n"
+            else:
+                condlist = []
+                for cond in theoryPrediction.conditions:
+                    condlist.append(theoryPrediction.conditions[cond])
+                output += str(condlist) + "\n"
+
+            #Get upper limit for the respective prediction:
+            if expRes.datasets[0].dataInfo.dataType == 'upperLimit':
+                upperLimit = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass)
+                upperLimitExp = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass,expected=True)
+            elif expRes.datasets[0].dataInfo.dataType == 'efficiencyMap':
+                upperLimit = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.dataInfo.dataId)
+                upperLimitExp = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.dataInfo.dataId,expected=True)
+
+            output += "Observed experimental limit: " + str(upperLimit) + "\n"
+            if not upperLimitExp is None:
+                output += "Expected experimental limit: " + str(upperLimitExp) + "\n"
+            if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
+                output += "Chi2: " + str(theoryPrediction.chi2) + "\n"
+                output += "Likelihood: " + str(theoryPrediction.likelihood) + "\n"
+
+        return output
+
+
+    def _formatUncovered(self, obj):
+        """
+        Format all uncovered data.
+        
+        :param obj: Uncovered object to be printed.
+        """
+                
+        nprint = 10  # Number of missing topologies to be printed (ordered by cross-sections)
+
+        output = ""
+        output += "\nTotal missing topology cross section: %10.3E\n" %(obj.getMissingXsec())
+        output += "Total cross section where we are outside the mass grid: %10.3E\n" %(obj.getOutOfGridXsec())
+        output += "Total cross section in long cascade decays: %10.3E\n" %(obj.getLongCascadeXsec())
+        output += "Total cross section in decays with asymmetric branches: %10.3E\n" %(obj.getAsymmetricXsec())        
+        output += "\nFull information on unconstrained cross sections\n"
+        output += "================================================================================\n"
+        for ix, uncovEntry in enumerate([obj.missingTopos, obj.outsideGrid]):
+            if len(uncovEntry.topos) == 0:
+                if ix == 0:
+                    output += "No missing topologies found\n"
+                else:
+                    output += "No contributions outside the mass grid\n"
+            else:
+                for topo in uncovEntry.topos:
+                    if topo.value > 0.: continue
+                    for el in topo.contributingElements:
+                        if not el.weight.getXsecsFor(obj.missingTopos.sqrts): continue
+                        topo.value += el.weight.getXsecsFor(obj.missingTopos.sqrts)[0].value.asNumber(fb)
+                if ix==0:
+                    output += "Missing topologies with the highest cross-sections (up to " + str(nprint) + "):\n"
+                else:
+                    output += "Contributions outside the mass grid (up to " + str(nprint) + "):\n"
+                output += "Sqrts (TeV)   Weight (fb)        Element description\n"        
+                for topo in sorted(uncovEntry.topos, key=lambda x: x.value, reverse=True)[:nprint]:
+                    output += "%5s %10.3E    # %45s\n" % (str(obj.missingTopos.sqrts.asNumber(TeV)),topo.value, str(topo.topo))
+                    if hasattr(self, "addcoverageid") and self.addcoverageid:
+                        contributing = []
+                        for el in topo.contributingElements:
+                            contributing.append(el.elID)
+                        output += "Contributing elements %s\n" % str(contributing)            
+            output += "================================================================================\n"
+        for ix, uncovEntry in enumerate([obj.longCascade, obj.asymmetricBranches]):
+            if ix==0: output += "Long cascade decay by produced mothers (up to " + str(nprint) + "):\n"
+            else: output += "Asymmetric branch decay by produced mothers\n"
+            output += "Mother1 Mother2 Weight (fb)\n"
+            for ent in uncovEntry.getSorted(obj.sqrts)[:nprint]:
+                output += "%s %s %10.3E # %s\n" %(ent.motherPIDs[0], ent.motherPIDs[1], ent.getWeight(obj.sqrts).asNumber(fb), str(ent.motherPIDs))
+                if hasattr(self, "addcoverageid") and self.addcoverageid:
+                    contributing = []
+                    for el in ent.contributingElements:
+                        contributing.append(el.elID)
+                    output += "Contributing elements %s\n" % str(contributing)
+            if ix==0:
+                output += "================================================================================\n"
+        
+        return output
+                      
+
+class SummaryPrinter(TxTPrinter):
+    """
+    Printer class to handle the printing of one single summary output.
+    It uses the facilities of the TxTPrinter.
+    """
+
+    def __init__(self, output = 'stdout', filename = None):
+        TxTPrinter.__init__(self, output, filename)
+        self.name = "summary"
+        self.printingOrder = [OutputStatus,ResultList, Uncovered]
+        self.toPrint = [None]*len(self.printingOrder)
+        
     
+    def setOutPutFile(self,filename,overwrite=True):
+        """
+        Set the basename for the text printer. The output filename will be
+        filename.smodels.
+        :param filename: Base filename
+        :param overwrite: If True and the file already exists, it will be removed.
+        """        
+        
+        self.filename = filename +'.smodels'
+        if overwrite and os.path.isfile(self.filename):
+            logger.warning("Removing old output file " + self.filename)
+            os.remove(self.filename)
+            
+            
     def _formatResultList(self, obj):
         """
         Format data of the ResultList object.
@@ -400,11 +556,7 @@ class TxTPrinter(BasicPrinter):
         """
         
         obj.sort()
-        
-        
-        if hasattr(self,"printextendedresults") and self.printextendedresults:
-            return self._formatExpandedResultList(obj)
-        
+
         if hasattr(self,"expandedsummary") and not self.expandedsummary:                       
             theoPredictions = [obj.theoryPredictions[0]]
         else:
@@ -459,148 +611,7 @@ class TxTPrinter(BasicPrinter):
         output += "The highest r value is = " + str(max(rvalues)) + "\n"
 
         return output
-
-
-
-    def _formatExpandedResultList(self, obj):
-        """
-        Format data for a ResultList object.
-
-        :param obj: A ResultList object to be printed.
-        """
-
-        output = ""
-        for theoryPrediction in obj.theoryPredictions:
-            expRes = theoryPrediction.expResult
-            info = theoryPrediction.dataset.dataInfo
-            output += "\n"
-            output += "---------------Analysis Label = " + expRes.globalInfo.id + "\n"
-            output += "-------------------Dataset Label = " + str(info.dataId).replace("None","(UL)") + "\n"
-            output += "-------------------Txname Labels = " + str([str(txname) for txname in theoryPrediction.txnames]) + "\n"
-            output += "Analysis sqrts: " + str(expRes.globalInfo.sqrts) + \
-                    "\n"
-
-
-            if theoryPrediction.mass:
-                for ibr, br in enumerate(theoryPrediction.mass):
-                    output += "Masses in branch %i: " % ibr + str(br) + "\n"
-            if hasattr(self,"addelementinfo") and self.addelementinfo:
-                if not theoryPrediction.IDs[0]==0: output += "Contributing elements: " + str(theoryPrediction.IDs) + "\n"
-            for pidList in theoryPrediction.PIDs:
-                output += "PIDs:" + str(pidList) + "\n"
-            output += "Theory prediction: " + str(theoryPrediction.xsection.value) + "\n"
-            output += "Theory conditions:"
-            if not theoryPrediction.conditions:
-                output += "  " + str(theoryPrediction.conditions) + "\n"
-            else:
-                condlist = []
-                for cond in theoryPrediction.conditions:
-                    condlist.append(theoryPrediction.conditions[cond])
-                output += str(condlist) + "\n"
-
-            #Get upper limit for the respective prediction:
-            if expRes.datasets[0].dataInfo.dataType == 'upperLimit':
-                upperLimit = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass)
-                upperLimitExp = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass,expected=True)
-            elif expRes.datasets[0].dataInfo.dataType == 'efficiencyMap':
-                upperLimit = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.dataInfo.dataId)
-                upperLimitExp = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.dataInfo.dataId,expected=True)
-
-            output += "Observed experimental limit: " + str(upperLimit) + "\n"
-            if not type(upperLimitExp)==type(None):
-                output += "Expected experimental limit: " + str(upperLimitExp) + "\n"
-            if hasattr(theoryPrediction,'expectedUL') and not theoryPrediction.expectedUL is None:
-                output += "Chi2: " + str(theoryPrediction.chi2) + "\n"
-                output += "Likelihood: " + str(theoryPrediction.likelihood) + "\n"
-
-        return output
-
-
-
-    def _formatUncovered(self, obj):
-        """
-        Format all uncovered data.
-        
-        :param obj: Uncovered object to be printed.
-        """
-                
-        nprint = 10  # Number of missing topologies to be printed (ordered by cross-sections)
-
-        output = ""
-        output += "\nTotal missing topology cross section: %10.3E\n" %(obj.getMissingXsec())
-        output += "Total cross section where we are outside the mass grid: %10.3E\n" %(obj.getOutOfGridXsec())
-        output += "Total cross section in long cascade decays: %10.3E\n" %(obj.getLongCascadeXsec())
-        output += "Total cross section in decays with asymmetric branches: %10.3E\n" %(obj.getAsymmetricXsec())        
-        output += "\nFull information on unconstrained cross sections\n"
-        output += "================================================================================\n"
-        for ix, uncovEntry in enumerate([obj.missingTopos, obj.outsideGrid]):
-            if len(uncovEntry.topos) == 0:
-                if ix == 0:
-                    output += "No missing topologies found\n"
-                else:
-                    output += "No contributions outside the mass grid\n"
-            else:
-                for topo in uncovEntry.topos:
-                    if topo.value > 0.: continue
-                    for el in topo.contributingElements:
-                        if not el.weight.getXsecsFor(obj.missingTopos.sqrts): continue
-                        topo.value += el.weight.getXsecsFor(obj.missingTopos.sqrts)[0].value.asNumber(fb)
-                if ix==0:
-                    output += "Missing topologies with the highest cross-sections (up to " + str(nprint) + "):\n"
-                else:
-                    output += "Contributions outside the mass grid (up to " + str(nprint) + "):\n"
-                output += "Sqrts (TeV)   Weight (fb)        Element description\n"        
-                for topo in sorted(uncovEntry.topos, key=lambda x: x.value, reverse=True)[:nprint]:
-                    output += "%5s %10.3E    # %45s\n" % (str(obj.missingTopos.sqrts.asNumber(TeV)),topo.value, str(topo.topo))
-                    if hasattr(self,"addelementinfo") and self.addelementinfo:
-                        contributing = []
-                        for el in topo.contributingElements:
-                            contributing.append(el.elID)
-                        output += "Contributing elements %s\n" % str(contributing)            
-            output += "================================================================================\n"
-        for ix, uncovEntry in enumerate([obj.longCascade, obj.asymmetricBranches]):
-            if ix==0: output += "Long cascade decay by produced mothers (up to " + str(nprint) + "):\n"
-            else: output += "Asymmetric branch decay by produced mothers\n"
-            output += "Mother1 Mother2 Weight (fb)\n"
-            for ent in uncovEntry.getSorted(obj.sqrts)[:nprint]:
-                output += "%s %s %10.3E # %s\n" %(ent.motherPIDs[0], ent.motherPIDs[1], ent.getWeight(obj.sqrts).asNumber(fb), str(ent.motherPIDs))
-                if hasattr(self,"addelementinfo") and self.addelementinfo:
-                    contributing = []
-                    for el in ent.contributingElements:
-                        contributing.append(el.elID)
-                    output += "Contributing elements %s\n" % str(contributing)
-            if ix==0:
-                output += "================================================================================\n"
-        
-        return output
-                      
-
-class SummaryPrinter(TxTPrinter):
-    """
-    Printer class to handle the printing of one single summary output.
-    It uses the facilities of the TxTPrinter.
-    """
-
-    def __init__(self, output = 'stdout', filename = None):
-        TxTPrinter.__init__(self, output, filename)
-        self.name = "summary"
-        self.printingOrder = [OutputStatus,ResultList,UncoveredList, Uncovered]
-        self.toPrint = [None]*len(self.printingOrder)
-        
-    
-    def setOutPutFile(self,filename,overwrite=True):
-        """
-        Set the basename for the text printer. The output filename will be
-        filename.smodels.
-        :param filename: Base filename
-        :param overwrite: If True and the file already exists, it will be removed.
-        """        
-        
-        self.filename = filename +'.smodels'
-        if overwrite and os.path.isfile(self.filename):
-            logger.warning("Removing old output file " + self.filename)
-            os.remove(self.filename)
-                     
+            
 
 
 class PyPrinter(BasicPrinter):
@@ -610,7 +621,7 @@ class PyPrinter(BasicPrinter):
     def __init__(self, output = 'stdout', filename = None):
         BasicPrinter.__init__(self, output, filename)
         self.name = "py"
-        self.printingOrder = [OutputStatus,TopologyList,Element,ResultList,Uncovered]
+        self.printingOrder = [OutputStatus,TopologyList,ResultList,Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
         
     def setOutPutFile(self,filename,overwrite=True):
@@ -655,6 +666,7 @@ class PyPrinter(BasicPrinter):
         ## that we also return the output dictionary
         return outputDict
 
+
     def _formatTopologyList(self, obj):
         """
         Format data for a TopologyList object.
@@ -674,6 +686,7 @@ class PyPrinter(BasicPrinter):
                 
         
         return {"Element": elements}
+
 
     def _formatElement(self, obj):
         """
@@ -700,6 +713,7 @@ class PyPrinter(BasicPrinter):
             elDic["Weights (fb)"][sqrtsStr] = xsecs
         return elDic
 
+
     def _formatOutputStatus(self, obj):
         """
         Format data for a OutputStatus object.
@@ -720,6 +734,7 @@ class PyPrinter(BasicPrinter):
         infoDict['database version'] = obj.databaseVersion
         infoDict['smodels version'] = obj.smodelsVersion
         return {'OutputStatus' : infoDict}
+
 
     def _formatResultList(self, obj):
         """
@@ -766,7 +781,7 @@ class PyPrinter(BasicPrinter):
                         'AnalysisSqrts (TeV)': sqrts.asNumber(TeV),
                         'lumi (fb-1)' : (dataset.globalInfo.lumi*fb).asNumber(),
                         'dataType' : dataType}            
-            if hasattr(theoryPrediction,'expectedUL') and not theoryPrediction.expectedUL is None:
+            if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
                 resDict['chi2'] = theoryPrediction.chi2
                 resDict['likelihood'] = theoryPrediction.likelihood                
             ExptRes.append(resDict)
@@ -776,7 +791,6 @@ class PyPrinter(BasicPrinter):
         
 
         return {'ExptRes' : ExptRes}
-
 
 
     def _formatDoc(self, obj):
@@ -915,6 +929,7 @@ class XmlPrinter(PyPrinter):
             logger.warning("Removing old output file " + self.filename)
             os.remove(self.filename)        
 
+
     def convertToElement(self,pyObj,parent,tag=""):
         """
         Convert a python object (list,dict,string,...)
@@ -939,6 +954,7 @@ class XmlPrinter(PyPrinter):
                 newElement = ElementTree.Element(tag)
                 self.convertToElement(val,newElement,tag)
                 parent.append(newElement)
+
 
     def flush(self):
         """
