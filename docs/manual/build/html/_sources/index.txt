@@ -1,4 +1,4 @@
-.. index:: SModelS Manual
+.. index:: SModelS v1.1 Manual
 
 .. SModelS Manual index file
 
