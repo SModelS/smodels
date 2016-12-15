@@ -295,7 +295,7 @@ class TxTPrinter(BasicPrinter):
         output = ""
         output += "   ======================================================= \n"
         output += " || \t \t\t\t\t\t\t || \n"
-        output += " || \t \t Topologies Table \t \t ||\n"
+        output += " || \t \t Topologies Table \t\t \t ||\n"
         output += " || \t \t\t\t\t\t\t || \n"
         output += "   ======================================================= \n"
         for topo in obj:
@@ -427,14 +427,6 @@ class TxTPrinter(BasicPrinter):
             output += "Analysis sqrts: " + str(expRes.globalInfo.sqrts) + \
                     "\n"
 
-            if hasattr(self,"printextendedresults") and self.printextendedresults:
-                if theoryPrediction.mass:
-                    for ibr, br in enumerate(theoryPrediction.mass):
-                        output += "Masses in branch %i: " % ibr + str(br) + "\n"                
-                if not theoryPrediction.IDs[0]==0:
-                    output += "Contributing elements: " + str(theoryPrediction.IDs) + "\n"
-                for pidList in theoryPrediction.PIDs:
-                    output += "PIDs:" + str(pidList) + "\n"
             output += "Theory prediction: " + str(theoryPrediction.xsection.value) + "\n"
             output += "Theory conditions:"
             if not theoryPrediction.conditions:
@@ -459,6 +451,16 @@ class TxTPrinter(BasicPrinter):
             if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
                 output += "Chi2: " + str(theoryPrediction.chi2) + "\n"
                 output += "Likelihood: " + str(theoryPrediction.likelihood) + "\n"
+
+            if hasattr(self,"printextendedresults") and self.printextendedresults:
+                if theoryPrediction.mass:
+                    for ibr, br in enumerate(theoryPrediction.mass):
+                        output += "Masses in branch %i: " % ibr + str(br) + "\n"                
+                if not theoryPrediction.IDs[0]==0:
+                    output += "Contributing elements: " + str(theoryPrediction.IDs) + "\n"
+                for pidList in theoryPrediction.PIDs:
+                    output += "PIDs:" + str(pidList) + "\n"
+
 
         return output
 

@@ -5,7 +5,7 @@ Decomposition output status: 1 #decomposition was successful
 # minmassgap = 5.
 # ncpus = 1
 # sigmacut = 0.03
-# Database version: 1.0.93
+# Database version: 1.1.0
 ================================================================================
 #Analysis  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r  r_expected
 
@@ -133,8 +133,8 @@ Sqrts (TeV)   Weight (fb)        Element description
   8.0  8.124E+00    #                     [[[b,t],[W]],[[jet],[W]]]
   8.0  7.608E+00    #         [[[jet,jet],[W]],[[jet,jet],[higgs]]]
   8.0  7.087E+00    #           [[[jet],[W]],[[jet],[jet,jet],[W]]]
-  8.0  7.082E+00    #           [[[b,t],[W]],[[jet],[jet,jet],[W]]]
   8.0  7.082E+00    #           [[[jet],[b,t],[W]],[[jet,jet],[W]]]
+  8.0  7.082E+00    #           [[[b,t],[W]],[[jet],[jet,jet],[W]]]
   8.0  6.396E+00    #             [[[jet],[W]],[[jet,jet],[higgs]]]
 ================================================================================
 Contributions outside the mass grid (up to 10):

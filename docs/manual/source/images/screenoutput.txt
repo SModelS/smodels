@@ -5,8 +5,13 @@ Decomposition output status: 1 #decomposition was successful
 # minmassgap = 5.
 # ncpus = 1
 # sigmacut = 0.03
-# Database version: 1.0.93
+# Database version: 1.1.0
 ================================================================================
+   ======================================================= 
+ || 	 						 || 
+ || 	 	 Selected Experimental Results 	 	 ||
+ || 	 						 || 
+   ======================================================= 
 ========================================================
 Experimental Result ID: ATLAS-SUSY-2015-09
 Tx Labels: ['T1tttt']
@@ -933,7 +938,7 @@ Sqrts: 8.00E+00 [TeV]
 
    ======================================================= 
  || 	 						 || 
- || 	 	 Global topologies table 	 	 ||
+ || 	 	 Topologies Table 		 	 ||
  || 	 						 || 
    ======================================================= 
 ===================================================== 
@@ -17894,41 +17899,53 @@ Total Number of Elements: 99
 		 The element weights are: 
  		 Sqrts: 8.00E+00 [TeV], Weight:1.02E-04 [pb]
  		 
+   ======================================================= 
+ || 	 						 || 
+ || 	 Theory Predictions and 			 || 
+ || 	 Experimental Constraints 		 	 ||
+ || 	 						 || 
+   ======================================================= 
 
 ---------------Analysis Label = CMS-SUS-13-006
 -------------------Dataset Label = MET_100
 -------------------Txname Labels = ['TChiWH']
 Analysis sqrts: 8.00E+00 [TeV]
-Masses in branch 0: [2.69E+02 [GeV], 1.29E+02 [GeV]]
-Masses in branch 1: [2.69E+02 [GeV], 1.29E+02 [GeV]]
-Contributing elements: [11, 14]
-PIDs:[[1000024, 1000022], [1000023, 1000022]]
-PIDs:[[-1000024, -1000022], [1000023, 1000022]]
 Theory prediction: 2.11E-04 [pb]
 Theory conditions:  None
 Observed experimental limit: 3.87E-01 [fb]
 Expected experimental limit: 3.88E-01 [fb]
 Chi2: 1.540030833
 Likelihood: 0.055544509844
+Masses in branch 0: [2.69E+02 [GeV], 1.29E+02 [GeV]]
+Masses in branch 1: [2.69E+02 [GeV], 1.29E+02 [GeV]]
+Contributing elements: [11, 14]
+PIDs:[[1000024, 1000022], [1000023, 1000022]]
+PIDs:[[-1000024, -1000022], [1000023, 1000022]]
 
 ---------------Analysis Label = CMS-SUS-13-019
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['T2']
 Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 1.77E-03 [pb]
+Theory conditions:  None
+Observed experimental limit: 3.76E-03 [pb]
 Masses in branch 0: [9.91E+02 [GeV], 1.29E+02 [GeV]]
 Masses in branch 1: [9.91E+02 [GeV], 1.29E+02 [GeV]]
 Contributing elements: [17, 18]
 PIDs:[[2000002, 1000022], [2000002, 1000022]]
 PIDs:[[-2000002, -1000022], [2000002, 1000022]]
 PIDs:[[2000002, 1000022], [2000001, 1000022]]
-Theory prediction: 1.77E-03 [pb]
-Theory conditions:  None
-Observed experimental limit: 3.76E-03 [pb]
 
 ---------------Analysis Label = CMS-SUS-13-012
 -------------------Dataset Label = 6NJet8_1250HT1500_450MHTinf
 -------------------Txname Labels = ['T1', 'T2', 'T5WW']
 Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 1.26E-04 [pb]
+Theory conditions:  None
+Observed experimental limit: 2.73E-01 [fb]
+Expected experimental limit: 1.53E-01 [fb]
+Chi2: 0.179109645317
+Likelihood: 0.147618377681
 Contributing elements: [32, 33, 34, 17, 18, 477, 478, 479, 480, 484, 485, 486, 490, 491, 495]
 PIDs:[[1000021, 1000022], [1000021, 1000022]]
 PIDs:[[2000002, 1000022], [2000002, 1000022]]
@@ -17938,17 +17955,14 @@ PIDs:[[1000021, 1000024, 1000022], [1000021, 1000024, 1000022]]
 PIDs:[[1000021, 1000024, 1000022], [1000021, -1000024, -1000022]]
 PIDs:[[1000021, -1000024, -1000022], [1000021, -1000024, -1000022]]
 PIDs:[[1000021, -1000024, -1000022], [1000021, 1000024, 1000022]]
-Theory prediction: 1.26E-04 [pb]
-Theory conditions:  None
-Observed experimental limit: 2.73E-01 [fb]
-Expected experimental limit: 1.53E-01 [fb]
-Chi2: 0.179109645317
-Likelihood: 0.147618377681
 
 ---------------Analysis Label = ATLAS-SUSY-2013-02
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['T6WW']
 Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 6.62E-03 [pb]
+Theory conditions:  None
+Observed experimental limit: 1.72E-02 [pb]
 Masses in branch 0: [9.92E+02 [GeV], 2.69E+02 [GeV], 1.29E+02 [GeV]]
 Masses in branch 1: [9.93E+02 [GeV], 2.69E+02 [GeV], 1.29E+02 [GeV]]
 Contributing elements: [221, 222, 223, 225, 226, 227, 228, 233, 236, 238]
@@ -17967,44 +17981,44 @@ PIDs:[[-1000001, 1000024, 1000022], [1000001, -1000024, -1000022]]
 PIDs:[[-1000004, -1000024, -1000022], [1000001, -1000024, -1000022]]
 PIDs:[[-1000002, -1000024, -1000022], [1000001, -1000024, -1000022]]
 PIDs:[[1000001, -1000024, -1000022], [1000001, -1000024, -1000022]]
-Theory prediction: 6.62E-03 [pb]
-Theory conditions:  None
-Observed experimental limit: 1.72E-02 [pb]
 
 ---------------Analysis Label = ATLAS-SUSY-2013-02
 -------------------Dataset Label = SR2jt
 -------------------Txname Labels = ['T1', 'T2']
 Analysis sqrts: 8.00E+00 [TeV]
-Contributing elements: [32, 33, 34, 17, 18]
-PIDs:[[1000021, 1000022], [1000021, 1000022]]
-PIDs:[[2000002, 1000022], [2000002, 1000022]]
-PIDs:[[-2000002, -1000022], [2000002, 1000022]]
-PIDs:[[2000002, 1000022], [2000001, 1000022]]
 Theory prediction: 5.53E-04 [pb]
 Theory conditions:  None
 Observed experimental limit: 1.82E+00 [fb]
 Expected experimental limit: 1.51E+00 [fb]
 Chi2: 0.0418571563813
 Likelihood: 0.0254248352573
+Contributing elements: [32, 33, 34, 17, 18]
+PIDs:[[1000021, 1000022], [1000021, 1000022]]
+PIDs:[[2000002, 1000022], [2000002, 1000022]]
+PIDs:[[-2000002, -1000022], [2000002, 1000022]]
+PIDs:[[2000002, 1000022], [2000001, 1000022]]
 
 ---------------Analysis Label = ATLAS-SUSY-2013-02
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['T2']
 Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 1.77E-03 [pb]
+Theory conditions:  None
+Observed experimental limit: 6.10E-03 [pb]
 Masses in branch 0: [9.91E+02 [GeV], 1.29E+02 [GeV]]
 Masses in branch 1: [9.91E+02 [GeV], 1.29E+02 [GeV]]
 Contributing elements: [17, 18]
 PIDs:[[2000002, 1000022], [2000002, 1000022]]
 PIDs:[[-2000002, -1000022], [2000002, 1000022]]
 PIDs:[[2000002, 1000022], [2000001, 1000022]]
-Theory prediction: 1.77E-03 [pb]
-Theory conditions:  None
-Observed experimental limit: 6.10E-03 [pb]
 
 ---------------Analysis Label = ATLAS-SUSY-2013-02
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['T5WW']
 Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 9.07E-03 [pb]
+Theory conditions:  None
+Observed experimental limit: 3.23E-02 [pb]
 Masses in branch 0: [8.65E+02 [GeV], 2.69E+02 [GeV], 1.29E+02 [GeV]]
 Masses in branch 1: [8.65E+02 [GeV], 2.69E+02 [GeV], 1.29E+02 [GeV]]
 Contributing elements: [477, 478, 479, 480, 484, 485, 486, 490, 491, 495]
@@ -18012,211 +18026,48 @@ PIDs:[[1000021, 1000024, 1000022], [1000021, 1000024, 1000022]]
 PIDs:[[1000021, 1000024, 1000022], [1000021, -1000024, -1000022]]
 PIDs:[[1000021, -1000024, -1000022], [1000021, -1000024, -1000022]]
 PIDs:[[1000021, -1000024, -1000022], [1000021, 1000024, 1000022]]
-Theory prediction: 9.07E-03 [pb]
-Theory conditions:  None
-Observed experimental limit: 3.23E-02 [pb]
 
 ---------------Analysis Label = ATLAS-CONF-2013-047
 -------------------Dataset Label = A Medium
 -------------------Txname Labels = ['T1', 'T2']
 Analysis sqrts: 8.00E+00 [TeV]
-Contributing elements: [32, 33, 34, 17, 18]
-PIDs:[[1000021, 1000022], [1000021, 1000022]]
-PIDs:[[2000002, 1000022], [2000002, 1000022]]
-PIDs:[[-2000002, -1000022], [2000002, 1000022]]
-PIDs:[[2000002, 1000022], [2000001, 1000022]]
 Theory prediction: 5.24E-04 [pb]
 Theory conditions:  None
 Observed experimental limit: 2.52E+00 [fb]
 Expected experimental limit: 2.10E+00 [fb]
 Chi2: 0.0144700040892
 Likelihood: 0.0183300161927
+Contributing elements: [32, 33, 34, 17, 18]
+PIDs:[[1000021, 1000022], [1000021, 1000022]]
+PIDs:[[2000002, 1000022], [2000002, 1000022]]
+PIDs:[[-2000002, -1000022], [2000002, 1000022]]
+PIDs:[[2000002, 1000022], [2000001, 1000022]]
 
 ---------------Analysis Label = CMS-SUS-13-012
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['T2']
 Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 1.77E-03 [pb]
+Theory conditions:  None
+Observed experimental limit: 1.08E-02 [pb]
+Expected experimental limit: 6.10E-03 [pb]
 Masses in branch 0: [9.91E+02 [GeV], 1.29E+02 [GeV]]
 Masses in branch 1: [9.91E+02 [GeV], 1.29E+02 [GeV]]
 Contributing elements: [17, 18]
 PIDs:[[2000002, 1000022], [2000002, 1000022]]
 PIDs:[[-2000002, -1000022], [2000002, 1000022]]
 PIDs:[[2000002, 1000022], [2000001, 1000022]]
-Theory prediction: 1.77E-03 [pb]
-Theory conditions:  None
-Observed experimental limit: 1.08E-02 [pb]
-Expected experimental limit: 6.10E-03 [pb]
 
 ---------------Analysis Label = ATLAS-SUSY-2013-04
 -------------------Dataset Label = GtGrid_SR_8ij80_0bjet
 -------------------Txname Labels = ['T5WW']
 Analysis sqrts: 8.00E+00 [TeV]
-Masses in branch 0: [8.65E+02 [GeV], 2.69E+02 [GeV], 1.29E+02 [GeV]]
-Masses in branch 1: [8.65E+02 [GeV], 2.69E+02 [GeV], 1.29E+02 [GeV]]
-Contributing elements: [477, 478, 479, 480, 484, 485, 486, 490, 491, 495]
-PIDs:[[1000021, 1000024, 1000022], [1000021, 1000024, 1000022]]
-PIDs:[[1000021, 1000024, 1000022], [1000021, -1000024, -1000022]]
-PIDs:[[1000021, -1000024, -1000022], [1000021, -1000024, -1000022]]
-PIDs:[[1000021, -1000024, -1000022], [1000021, 1000024, 1000022]]
 Theory prediction: 4.16E-05 [pb]
 Theory conditions:  None
 Observed experimental limit: 2.75E-01 [fb]
 Expected experimental limit: 1.49E-01 [fb]
 Chi2: 0.0630580532534
 Likelihood: 0.236733084593
-
----------------Analysis Label = CMS-SUS-12-028
--------------------Dataset Label = (UL)
--------------------Txname Labels = ['T2']
-Analysis sqrts: 8.00E+00 [TeV]
-Masses in branch 0: [9.91E+02 [GeV], 1.29E+02 [GeV]]
-Masses in branch 1: [9.91E+02 [GeV], 1.29E+02 [GeV]]
-Contributing elements: [17, 18]
-PIDs:[[2000002, 1000022], [2000002, 1000022]]
-PIDs:[[-2000002, -1000022], [2000002, 1000022]]
-PIDs:[[2000002, 1000022], [2000001, 1000022]]
-Theory prediction: 1.77E-03 [pb]
-Theory conditions:  None
-Observed experimental limit: 1.64E-02 [pb]
-Expected experimental limit: 9.67E-03 [pb]
-
----------------Analysis Label = CMS-SUS-13-006
--------------------Dataset Label = (UL)
--------------------Txname Labels = ['TChiWH']
-Analysis sqrts: 8.00E+00 [TeV]
-Masses in branch 0: [2.69E+02 [GeV], 1.29E+02 [GeV]]
-Masses in branch 1: [2.69E+02 [GeV], 1.29E+02 [GeV]]
-Contributing elements: [11, 14]
-PIDs:[[1000024, 1000022], [1000023, 1000022]]
-PIDs:[[-1000024, -1000022], [1000023, 1000022]]
-Theory prediction: 9.59E-02 [pb]
-Theory conditions:  None
-Observed experimental limit: 1.13E+00 [pb]
-
----------------Analysis Label = ATLAS-SUSY-2013-12
--------------------Dataset Label = (UL)
--------------------Txname Labels = ['TChiWZ']
-Analysis sqrts: 8.00E+00 [TeV]
-Masses in branch 0: [2.69E+02 [GeV], 1.29E+02 [GeV]]
-Masses in branch 1: [2.69E+02 [GeV], 1.29E+02 [GeV]]
-Contributing elements: [10, 13]
-PIDs:[[1000024, 1000022], [1000023, 1000022]]
-PIDs:[[-1000024, -1000022], [1000023, 1000022]]
-Theory prediction: 1.85E-02 [pb]
-Theory conditions:  None
-Observed experimental limit: 3.30E-01 [pb]
-
----------------Analysis Label = CMS-SUS-13-019
--------------------Dataset Label = (UL)
--------------------Txname Labels = ['T1']
-Analysis sqrts: 8.00E+00 [TeV]
-Masses in branch 0: [8.65E+02 [GeV], 1.29E+02 [GeV]]
-Masses in branch 1: [8.65E+02 [GeV], 1.29E+02 [GeV]]
-Contributing elements: [32, 33, 34]
-PIDs:[[1000021, 1000022], [1000021, 1000022]]
-Theory prediction: 3.92E-04 [pb]
-Theory conditions:  None
-Observed experimental limit: 9.69E-03 [pb]
-
----------------Analysis Label = CMS-SUS-13-006
--------------------Dataset Label = (UL)
--------------------Txname Labels = ['TChiWZ']
-Analysis sqrts: 8.00E+00 [TeV]
-Masses in branch 0: [2.69E+02 [GeV], 1.29E+02 [GeV]]
-Masses in branch 1: [2.69E+02 [GeV], 1.29E+02 [GeV]]
-Contributing elements: [10, 13]
-PIDs:[[1000024, 1000022], [1000023, 1000022]]
-PIDs:[[-1000024, -1000022], [1000023, 1000022]]
-Theory prediction: 1.85E-02 [pb]
-Theory conditions:  None
-Observed experimental limit: 4.64E-01 [pb]
-
----------------Analysis Label = ATLAS-SUSY-2013-02
--------------------Dataset Label = (UL)
--------------------Txname Labels = ['T1']
-Analysis sqrts: 8.00E+00 [TeV]
-Masses in branch 0: [8.65E+02 [GeV], 1.29E+02 [GeV]]
-Masses in branch 1: [8.65E+02 [GeV], 1.29E+02 [GeV]]
-Contributing elements: [32, 33, 34]
-PIDs:[[1000021, 1000022], [1000021, 1000022]]
-Theory prediction: 3.92E-04 [pb]
-Theory conditions:  None
-Observed experimental limit: 1.08E-02 [pb]
-
----------------Analysis Label = CMS-SUS-13-012
--------------------Dataset Label = (UL)
--------------------Txname Labels = ['T1']
-Analysis sqrts: 8.00E+00 [TeV]
-Masses in branch 0: [8.65E+02 [GeV], 1.29E+02 [GeV]]
-Masses in branch 1: [8.65E+02 [GeV], 1.29E+02 [GeV]]
-Contributing elements: [32, 33, 34]
-PIDs:[[1000021, 1000022], [1000021, 1000022]]
-Theory prediction: 3.92E-04 [pb]
-Theory conditions:  None
-Observed experimental limit: 1.11E-02 [pb]
-Expected experimental limit: 8.01E-03 [pb]
-
----------------Analysis Label = ATLAS-SUSY-2013-11
--------------------Dataset Label = (UL)
--------------------Txname Labels = ['TChiWZ']
-Analysis sqrts: 8.00E+00 [TeV]
-Masses in branch 0: [2.69E+02 [GeV], 1.29E+02 [GeV]]
-Masses in branch 1: [2.69E+02 [GeV], 1.29E+02 [GeV]]
-Contributing elements: [10, 13]
-PIDs:[[1000024, 1000022], [1000023, 1000022]]
-PIDs:[[-1000024, -1000022], [1000023, 1000022]]
-Theory prediction: 1.85E-02 [pb]
-Theory conditions:  None
-Observed experimental limit: 9.22E-01 [pb]
-
----------------Analysis Label = ATLAS-CONF-2013-054
--------------------Dataset Label = 7j80 flavor 0 b-jets
--------------------Txname Labels = ['T1', 'T2']
-Analysis sqrts: 8.00E+00 [TeV]
-Contributing elements: [32, 33, 34, 17, 18]
-PIDs:[[1000021, 1000022], [1000021, 1000022]]
-PIDs:[[2000002, 1000022], [2000002, 1000022]]
-PIDs:[[-2000002, -1000022], [2000002, 1000022]]
-PIDs:[[2000002, 1000022], [2000001, 1000022]]
-Theory prediction: 6.52E-06 [pb]
-Theory conditions:  None
-Observed experimental limit: 5.00E-01 [fb]
-Expected experimental limit: 4.63E-01 [fb]
-Chi2: 0.0753098153215
-Likelihood: 0.0925287066913
-
----------------Analysis Label = CMS-SUS-12-028
--------------------Dataset Label = (UL)
--------------------Txname Labels = ['T1']
-Analysis sqrts: 8.00E+00 [TeV]
-Masses in branch 0: [8.65E+02 [GeV], 1.29E+02 [GeV]]
-Masses in branch 1: [8.65E+02 [GeV], 1.29E+02 [GeV]]
-Contributing elements: [32, 33, 34]
-PIDs:[[1000021, 1000022], [1000021, 1000022]]
-Theory prediction: 3.92E-04 [pb]
-Theory conditions:  None
-Observed experimental limit: 3.16E-02 [pb]
-Expected experimental limit: 1.97E-02 [pb]
-
----------------Analysis Label = ATLAS-CONF-2013-024
--------------------Dataset Label = SR1: MET > 200
--------------------Txname Labels = ['TGQqtt']
-Analysis sqrts: 8.00E+00 [TeV]
-Masses in branch 0: [9.91E+02 [GeV], 1.29E+02 [GeV]]
-Masses in branch 1: [8.65E+02 [GeV], 1.29E+02 [GeV]]
-Contributing elements: [29]
-PIDs:[[2000002, 1000022], [1000021, 1000022]]
-Theory prediction: 3.07E-06 [pb]
-Theory conditions:  None
-Observed experimental limit: 4.90E-01 [fb]
-Expected experimental limit: 5.55E-01 [fb]
-Chi2: 0.16197905433
-Likelihood: 0.0721315437538
-
----------------Analysis Label = ATLAS-CONF-2013-089
--------------------Dataset Label = (UL)
--------------------Txname Labels = ['T5WW']
-Analysis sqrts: 8.00E+00 [TeV]
 Masses in branch 0: [8.65E+02 [GeV], 2.69E+02 [GeV], 1.29E+02 [GeV]]
 Masses in branch 1: [8.65E+02 [GeV], 2.69E+02 [GeV], 1.29E+02 [GeV]]
 Contributing elements: [477, 478, 479, 480, 484, 485, 486, 490, 491, 495]
@@ -18224,29 +18075,192 @@ PIDs:[[1000021, 1000024, 1000022], [1000021, 1000024, 1000022]]
 PIDs:[[1000021, 1000024, 1000022], [1000021, -1000024, -1000022]]
 PIDs:[[1000021, -1000024, -1000022], [1000021, -1000024, -1000022]]
 PIDs:[[1000021, -1000024, -1000022], [1000021, 1000024, 1000022]]
+
+---------------Analysis Label = CMS-SUS-12-028
+-------------------Dataset Label = (UL)
+-------------------Txname Labels = ['T2']
+Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 1.77E-03 [pb]
+Theory conditions:  None
+Observed experimental limit: 1.64E-02 [pb]
+Expected experimental limit: 9.67E-03 [pb]
+Masses in branch 0: [9.91E+02 [GeV], 1.29E+02 [GeV]]
+Masses in branch 1: [9.91E+02 [GeV], 1.29E+02 [GeV]]
+Contributing elements: [17, 18]
+PIDs:[[2000002, 1000022], [2000002, 1000022]]
+PIDs:[[-2000002, -1000022], [2000002, 1000022]]
+PIDs:[[2000002, 1000022], [2000001, 1000022]]
+
+---------------Analysis Label = CMS-SUS-13-006
+-------------------Dataset Label = (UL)
+-------------------Txname Labels = ['TChiWH']
+Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 9.59E-02 [pb]
+Theory conditions:  None
+Observed experimental limit: 1.13E+00 [pb]
+Masses in branch 0: [2.69E+02 [GeV], 1.29E+02 [GeV]]
+Masses in branch 1: [2.69E+02 [GeV], 1.29E+02 [GeV]]
+Contributing elements: [11, 14]
+PIDs:[[1000024, 1000022], [1000023, 1000022]]
+PIDs:[[-1000024, -1000022], [1000023, 1000022]]
+
+---------------Analysis Label = ATLAS-SUSY-2013-12
+-------------------Dataset Label = (UL)
+-------------------Txname Labels = ['TChiWZ']
+Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 1.85E-02 [pb]
+Theory conditions:  None
+Observed experimental limit: 3.30E-01 [pb]
+Masses in branch 0: [2.69E+02 [GeV], 1.29E+02 [GeV]]
+Masses in branch 1: [2.69E+02 [GeV], 1.29E+02 [GeV]]
+Contributing elements: [10, 13]
+PIDs:[[1000024, 1000022], [1000023, 1000022]]
+PIDs:[[-1000024, -1000022], [1000023, 1000022]]
+
+---------------Analysis Label = CMS-SUS-13-019
+-------------------Dataset Label = (UL)
+-------------------Txname Labels = ['T1']
+Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 3.92E-04 [pb]
+Theory conditions:  None
+Observed experimental limit: 9.69E-03 [pb]
+Masses in branch 0: [8.65E+02 [GeV], 1.29E+02 [GeV]]
+Masses in branch 1: [8.65E+02 [GeV], 1.29E+02 [GeV]]
+Contributing elements: [32, 33, 34]
+PIDs:[[1000021, 1000022], [1000021, 1000022]]
+
+---------------Analysis Label = CMS-SUS-13-006
+-------------------Dataset Label = (UL)
+-------------------Txname Labels = ['TChiWZ']
+Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 1.85E-02 [pb]
+Theory conditions:  None
+Observed experimental limit: 4.64E-01 [pb]
+Masses in branch 0: [2.69E+02 [GeV], 1.29E+02 [GeV]]
+Masses in branch 1: [2.69E+02 [GeV], 1.29E+02 [GeV]]
+Contributing elements: [10, 13]
+PIDs:[[1000024, 1000022], [1000023, 1000022]]
+PIDs:[[-1000024, -1000022], [1000023, 1000022]]
+
+---------------Analysis Label = ATLAS-SUSY-2013-02
+-------------------Dataset Label = (UL)
+-------------------Txname Labels = ['T1']
+Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 3.92E-04 [pb]
+Theory conditions:  None
+Observed experimental limit: 1.08E-02 [pb]
+Masses in branch 0: [8.65E+02 [GeV], 1.29E+02 [GeV]]
+Masses in branch 1: [8.65E+02 [GeV], 1.29E+02 [GeV]]
+Contributing elements: [32, 33, 34]
+PIDs:[[1000021, 1000022], [1000021, 1000022]]
+
+---------------Analysis Label = CMS-SUS-13-012
+-------------------Dataset Label = (UL)
+-------------------Txname Labels = ['T1']
+Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 3.92E-04 [pb]
+Theory conditions:  None
+Observed experimental limit: 1.11E-02 [pb]
+Expected experimental limit: 8.01E-03 [pb]
+Masses in branch 0: [8.65E+02 [GeV], 1.29E+02 [GeV]]
+Masses in branch 1: [8.65E+02 [GeV], 1.29E+02 [GeV]]
+Contributing elements: [32, 33, 34]
+PIDs:[[1000021, 1000022], [1000021, 1000022]]
+
+---------------Analysis Label = ATLAS-SUSY-2013-11
+-------------------Dataset Label = (UL)
+-------------------Txname Labels = ['TChiWZ']
+Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 1.85E-02 [pb]
+Theory conditions:  None
+Observed experimental limit: 9.22E-01 [pb]
+Masses in branch 0: [2.69E+02 [GeV], 1.29E+02 [GeV]]
+Masses in branch 1: [2.69E+02 [GeV], 1.29E+02 [GeV]]
+Contributing elements: [10, 13]
+PIDs:[[1000024, 1000022], [1000023, 1000022]]
+PIDs:[[-1000024, -1000022], [1000023, 1000022]]
+
+---------------Analysis Label = ATLAS-CONF-2013-054
+-------------------Dataset Label = 7j80 flavor 0 b-jets
+-------------------Txname Labels = ['T1', 'T2']
+Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 6.52E-06 [pb]
+Theory conditions:  None
+Observed experimental limit: 5.00E-01 [fb]
+Expected experimental limit: 4.63E-01 [fb]
+Chi2: 0.0753098153215
+Likelihood: 0.0925287066913
+Contributing elements: [32, 33, 34, 17, 18]
+PIDs:[[1000021, 1000022], [1000021, 1000022]]
+PIDs:[[2000002, 1000022], [2000002, 1000022]]
+PIDs:[[-2000002, -1000022], [2000002, 1000022]]
+PIDs:[[2000002, 1000022], [2000001, 1000022]]
+
+---------------Analysis Label = CMS-SUS-12-028
+-------------------Dataset Label = (UL)
+-------------------Txname Labels = ['T1']
+Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 3.92E-04 [pb]
+Theory conditions:  None
+Observed experimental limit: 3.16E-02 [pb]
+Expected experimental limit: 1.97E-02 [pb]
+Masses in branch 0: [8.65E+02 [GeV], 1.29E+02 [GeV]]
+Masses in branch 1: [8.65E+02 [GeV], 1.29E+02 [GeV]]
+Contributing elements: [32, 33, 34]
+PIDs:[[1000021, 1000022], [1000021, 1000022]]
+
+---------------Analysis Label = ATLAS-CONF-2013-024
+-------------------Dataset Label = SR1: MET > 200
+-------------------Txname Labels = ['TGQqtt']
+Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 3.07E-06 [pb]
+Theory conditions:  None
+Observed experimental limit: 4.90E-01 [fb]
+Expected experimental limit: 5.55E-01 [fb]
+Chi2: 0.16197905433
+Likelihood: 0.0721315437538
+Masses in branch 0: [9.91E+02 [GeV], 1.29E+02 [GeV]]
+Masses in branch 1: [8.65E+02 [GeV], 1.29E+02 [GeV]]
+Contributing elements: [29]
+PIDs:[[2000002, 1000022], [1000021, 1000022]]
+
+---------------Analysis Label = ATLAS-CONF-2013-089
+-------------------Dataset Label = (UL)
+-------------------Txname Labels = ['T5WW']
+Analysis sqrts: 8.00E+00 [TeV]
 Theory prediction: 9.07E-03 [pb]
 Theory conditions:  None
 Observed experimental limit: 1.75E+00 [pb]
+Masses in branch 0: [8.65E+02 [GeV], 2.69E+02 [GeV], 1.29E+02 [GeV]]
+Masses in branch 1: [8.65E+02 [GeV], 2.69E+02 [GeV], 1.29E+02 [GeV]]
+Contributing elements: [477, 478, 479, 480, 484, 485, 486, 490, 491, 495]
+PIDs:[[1000021, 1000024, 1000022], [1000021, 1000024, 1000022]]
+PIDs:[[1000021, 1000024, 1000022], [1000021, -1000024, -1000022]]
+PIDs:[[1000021, -1000024, -1000022], [1000021, -1000024, -1000022]]
+PIDs:[[1000021, -1000024, -1000022], [1000021, 1000024, 1000022]]
 
 ---------------Analysis Label = ATLAS-CONF-2013-061
 -------------------Dataset Label = SR-0l-4j-B
 -------------------Txname Labels = ['TGQbbq']
 Analysis sqrts: 8.00E+00 [TeV]
-Masses in branch 0: [9.91E+02 [GeV], 1.29E+02 [GeV]]
-Masses in branch 1: [8.65E+02 [GeV], 1.29E+02 [GeV]]
-Contributing elements: [26]
-PIDs:[[2000002, 1000022], [1000021, 1000022]]
 Theory prediction: 3.94E-07 [pb]
 Theory conditions:  None
 Observed experimental limit: 3.30E-01 [fb]
 Expected experimental limit: 2.06E-01 [fb]
 Chi2: 1.01008222891
 Likelihood: 0.114066361521
+Masses in branch 0: [9.91E+02 [GeV], 1.29E+02 [GeV]]
+Masses in branch 1: [8.65E+02 [GeV], 1.29E+02 [GeV]]
+Contributing elements: [26]
+PIDs:[[2000002, 1000022], [1000021, 1000022]]
 
 ---------------Analysis Label = ATLAS-CONF-2013-089
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['T6WW']
 Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 6.62E-03 [pb]
+Theory conditions:  None
+Observed experimental limit: 4.01E+01 [pb]
 Masses in branch 0: [9.92E+02 [GeV], 2.69E+02 [GeV], 1.29E+02 [GeV]]
 Masses in branch 1: [9.93E+02 [GeV], 2.69E+02 [GeV], 1.29E+02 [GeV]]
 Contributing elements: [221, 222, 223, 225, 226, 227, 228, 233, 236, 238]
@@ -18265,9 +18279,6 @@ PIDs:[[-1000001, 1000024, 1000022], [1000001, -1000024, -1000022]]
 PIDs:[[-1000004, -1000024, -1000022], [1000001, -1000024, -1000022]]
 PIDs:[[-1000002, -1000024, -1000022], [1000001, -1000024, -1000022]]
 PIDs:[[1000001, -1000024, -1000022], [1000001, -1000024, -1000022]]
-Theory prediction: 6.62E-03 [pb]
-Theory conditions:  None
-Observed experimental limit: 4.01E+01 [pb]
 
 Total missing topology cross section:  2.767E+02
 Total cross section where we are outside the mass grid:  6.286E+01
@@ -18292,10 +18303,10 @@ Contributing elements [268, 269, 274, 275, 282, 283, 295, 296, 304, 305, 312, 31
 Contributing elements [471, 472, 473, 474, 482, 488, 493, 497]
   8.0  7.087E+00    #           [[[jet],[W]],[[jet],[jet,jet],[W]]]
 Contributing elements [646, 647, 648, 649, 667, 668, 669, 670, 671, 672, 673, 674, 675, 676, 677, 678, 679, 680, 681, 682, 694, 695, 696, 697, 702, 703, 704, 705, 706, 707, 708, 709, 721, 722, 723, 724, 725, 726, 727, 728, 729, 730, 731, 732]
-  8.0  7.082E+00    #           [[[b,t],[W]],[[jet],[jet,jet],[W]]]
-Contributing elements [869, 870, 871, 872, 873, 874, 875, 876, 877, 878, 879, 880, 881, 882, 883, 884, 909, 910, 911, 912, 913, 914, 915, 916, 917, 918, 919, 920, 921, 922, 923, 924]
   8.0  7.082E+00    #           [[[jet],[b,t],[W]],[[jet,jet],[W]]]
 Contributing elements [971, 972, 973, 974, 975, 976, 977, 978, 1011, 1012, 1013, 1014, 1015, 1016, 1017, 1018, 1051, 1052, 1053, 1054, 1055, 1056, 1057, 1058, 1091, 1092, 1093, 1094, 1095, 1096, 1097, 1098]
+  8.0  7.082E+00    #           [[[b,t],[W]],[[jet],[jet,jet],[W]]]
+Contributing elements [869, 870, 871, 872, 873, 874, 875, 876, 877, 878, 879, 880, 881, 882, 883, 884, 909, 910, 911, 912, 913, 914, 915, 916, 917, 918, 919, 920, 921, 922, 923, 924]
   8.0  6.396E+00    #             [[[jet],[W]],[[jet,jet],[higgs]]]
 Contributing elements [285, 291, 297, 302, 315, 321]
 ================================================================================

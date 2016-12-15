@@ -1,0 +1,17 @@
+smodelsOutput = {
+'OutputStatus': {'minmassgap': 5.0, 'input file': 'inputFiles/slha/gluino_squarks.slha', 'decomposition status': 1, 'warnings': 'Input file ok', 'ncpus': 1, 'maxcond': 0.2, 'smodels version': '1.1.0', 'database version': '1.1.0', 'sigmacut': 0.03, 'file status': 1}, 
+'Element': [{'Particles': '[[], []]', 'Weights (fb)': {'xsec 8.0 TeV': 0.48082062}, 'PIDs': [[[1000022], [1000022]]], 'Masses (GeV)': [[128.96157], [128.96157]], 'ID': 1}, 
+{'Particles': "[[], [['W+']]]", 'Weights (fb)': {'xsec 8.0 TeV': 0.2404103}, 'PIDs': [[[1000022], [1000024, 1000022]]], 'Masses (GeV)': [[128.96157], [269.035358, 128.96157]], 'ID': 2}, ...],
+'ExptRes': [{'AnalysisID': 'ATLAS-CONF-2013-061','dataType': 'efficiencyMap', 'DataSetID': 'SR-0l-4j-B','AnalysisSqrts (TeV)': 8,'lumi (fb-1)': 20.1,
+'TxNames': ['TGQbbq'],'theory prediction (fb)': 0.0003935, 'upper limit (fb)': 0.33, 'expected upper limit (fb)': 0.206, 
+'maxcond': 0.0, 'Mass (GeV)': [[991.299127, 128.96157], [865.035125, 128.96157]], 'chi2': 1.010082, 'likelihood': 0.1140}, 
+{'AnalysisSqrts (TeV)': 8, 'chi2': 0.161, 'dataType': 'efficiencyMap', 'Mass (GeV)': [[991.299127, 128.96157], [865.035125, 128.96157]], 
+'maxcond': 0.0, 'expected upper limit (fb)': 0.555, 'likelihood': 0.07213, 'AnalysisID': 'ATLAS-CONF-2013-024', 
+'upper limit (fb)': 0.49, 'theory prediction (fb)': 0.003073, 'lumi (fb-1)': 20.5, 'TxNames': ['TGQqtt'], 
+'DataSetID': 'SR1: MET > 200'}, ...],
+'Missed Topologies': [{'weight (fb)': 16.00759, 'sqrts (TeV)': 8.0, 'element IDs': [270, 271, 272, 273, 276, 277, 278, 279, 286, 287, 288, 289, 298, 299, 300, 301, 306, 307, 308, 309, 316, 317, 318, 319], 
+'element': '[[[jet],[W]],[[jet,jet],[W]]]'}, ...],
+'Outside Grid': [{'weight (fb)': 59.581, 'sqrts (TeV)': 8.0, 'element': '[[[W]],[[W]]]'}, {'weight (fb)': 2.27241, 'sqrts (TeV)': 8.0, 'element': '[[[jet]],[[jet,jet]]]'}, ...],
+'Long Cascades': [{'weight (fb)': 37.4342, 'sqrts (TeV)': 8.0, 'mother PIDs': [1000021, 2000002]}, {'weight (fb)': 16.2564, 'sqrts (TeV)': 8.0, 'mother PIDs': [1000002, 1000021]}, ...],
+'Asymmetric Branches': [{'weight (fb)': 47.2530, 'sqrts (TeV)': 8.0, 'mother PIDs': [1000002, 1000021]}, {'weight (fb)': 43.2417, 'sqrts (TeV)': 8.0, 'mother PIDs': [1000021, 1000021]}, ...]}
+
