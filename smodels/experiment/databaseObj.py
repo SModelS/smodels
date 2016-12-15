@@ -41,6 +41,7 @@ class Database(object):
         """
         self.force_load = force_load
         self.pclfilename = "database.pcl"
+        self.hasFastLim = False # True if any ExpResult is from fastlim
         self._validateBase(base)
         self._verbosity = verbosity 
         self._databaseVersion = None
@@ -338,7 +339,6 @@ class Database(object):
             logger.error('There is no version file %s', vfile )
             return 'unknown version'
 
-
     @property
     def verbosity(self):
         """
@@ -402,6 +402,9 @@ class Database(object):
             expres = ExpResult(root)
             if expres:
                 resultsList.append(expres)
+                contact = expres.globalInfo.getInfo("contact")
+                if contact and "fastlim" in contact.lower():
+                    self.hasFastLim = True
 
         if not resultsList:
             logger.warning("Zero results loaded.")
