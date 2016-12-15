@@ -326,14 +326,22 @@ Below we describe in detail the blocks contained in the summary output:
    :lines: 120-123
        
 
-* if **findMissingTopos** = True,  a list of the :ref:`missing topologies <topCoverage>` and their cross sections at the given
-  value of *sqrts* is also included. This list represents the |elements| or sum of |elements| 
-  (shown using the :ref:`bracket notation <bracketNotation>`) with the highest
-  weights (:math:`\sigma \times BR`) which are not tested by any |analysis|:
+* information about the missing topologies with highest cross-sections: 
 
+.. literalinclude:: /images/summaryoutput.txt
+   :lines: 127-131
+   
+* information about the topologies which are outside the  |express| grid
+  (see :ref:`coverage tool <topCoverage>` for more details):
 
-.. literalinclude:: /images/summary.txt
-   :lines: 48-53
+.. literalinclude:: /images/summaryoutput.txt
+   :lines: 140-143   
+   
+* information about  topologies which are outside the  |express| grid
+  (see :ref:`coverage tool <topCoverage>` for more details):
+
+.. literalinclude:: /images/summaryoutput.txt
+   :lines: 140-143    
 
 .. _exampleCode:
 
