@@ -326,7 +326,7 @@ def computeForBunch ( sqrtses, order, nevents, inputFiles, unlink,
                         lOfromSLHA, tofile, pythiacard=None ):
     """ compute xsecs for a bunch of slha files """
     for inputFile in inputFiles:
-        logger.info ( "computing xsec for %s" % inputFile )
+        logger.debug ( "computing xsec for %s" % inputFile )
         computeForOneFile ( sqrtses, order, nevents, inputFile, unlink, 
                             lOfromSLHA, tofile, pythiacard=pythiacard )
 
@@ -369,9 +369,9 @@ def main(args):
             logger.error ( "fork did not succeed! Pid=%d" % pid ) 
             sys.exit()
         if pid == 0:
-            logger.info ( "chunk #%d: pid %d (parent %d)." % 
+            logger.debug ( "chunk #%d: pid %d (parent %d)." % 
                        ( i, os.getpid(), os.getppid() ) )
-            logger.info ( " `-> %s" % " ".join ( chunk ) )
+            logger.debug ( " `-> %s" % " ".join ( chunk ) )
             computeForBunch (  sqrtses, order, args.nevents, chunk, not args.keep,
                                args.LOfromSLHA, args.tofile, pythiacard=pythiacard)
             os._exit ( 0 )
@@ -379,5 +379,5 @@ def main(args):
             children.append ( pid )
     for child in children:
         r = os.waitpid ( child, 0 )
-        logger.info ( "child %d terminated: %s" % (child,r) )
-    logger.info ( "all children terminated." )
+        logger.debug ( "child %d terminated: %s" % (child,r) )
+    logger.debug ( "all children terminated." )
