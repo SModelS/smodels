@@ -282,8 +282,10 @@ def loadDatabaseResults(parser, database):
         
     """
     """ In case that a list of analyses or txnames are given, retrieve list """
-    analyses = parser.get("database", "analyses").split(",")
-    txnames = parser.get("database", "txnames").split(",")
+    tmp = parser.get("database", "analyses").split(",")
+    analyses = [ x.strip() for x in tmp ]
+    tmp_tx = parser.get("database", "txnames").split(",")
+    txnames = [ x.strip() for x in tmp_tx ]
     if parser.get("database", "dataselector") == "efficiencyMap":
         dataTypes = ['efficiencyMap']
         datasetIDs = ['all']
@@ -292,7 +294,8 @@ def loadDatabaseResults(parser, database):
         datasetIDs = ['all']
     else:
         dataTypes = ['all']
-        datasetIDs = parser.get("database", "dataselector").split(",")
+        tmp_dIDs = parser.get("database", "dataselector").split(",")
+        datasetIDs = [ x.strip() for x in tmp_dIDs ]
     
     useSuperseded=False
     useNonValidated=False
