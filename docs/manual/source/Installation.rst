@@ -57,6 +57,16 @@ Installation on Ubuntu 16.04
 
 Note that the last two commands you either run as superuser, or with the "--user" flag.
 
+Installation on Anaconda
+------------------------
+
+Another easy and platform independent way of installing SModelS
+without superuser priviledges is via `Anaconda <https://www.continuum.io/downloads>`_
+
+After installation of anaconda, execute the following within your anaconda enviroment:
+
+ * pip install pyslha unum
+
 Installation on SL6
 -------------------
 
