@@ -117,7 +117,7 @@ In some more detail:
 A typical
 usage example is: ::
 
-   runSModelS.py -f lightSquarks.slha -p parameters.ini -o ./
+   runSModelS.py -f lightSquarks.slha -p parameters.ini -o ./ -v warning
 
 The resulting |output| will be generated in the current folder, according to the printer options set in the 
 |parameters|.
