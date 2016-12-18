@@ -5,7 +5,7 @@
    :synopsis: Script that is meant to create the distribution tarballs
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
-   
+
 """
 
 import sys
@@ -49,6 +49,27 @@ def run ( cmd ):
     print o
     f.write ( o + "\n" )
     f.close()
+
+def removeNonValidated():
+    """ remove all non-validated analyses from
+        database """
+    comment ( "Now remove non-validated results." )
+    from smodels.experiment.databaseObj import Database
+    d = Database ( "%s/smodels-database" % dirname )
+    # d = Database ( "%s/smodels-database" % dirname, force_load = "txt" )
+    ers = d.expResultList
+    comment ( "Loaded the database with %d results." % ( len(ers) ) )
+    for er in ers:
+        if hasattr ( er.globalInfo, "private" ) and er.globalInfo.private:
+            comment ( "%s is private. delete!" % ( er.globalInfo.id ) )
+            cmd = "rm -r %s" % ( er.path )
+            run ( cmd )
+        else:
+            comment ( "%s is public." % ( er.globalInfo.id) )
+            for dataset in er.datasets:
+                for txn in dataset.txnameList:
+                    if txn.validated in [ None, False ]:
+                        comment ( "%s/%s/%s is not validated. Delete!" % ( er, dataset, txn) )
 
 def rmlog():
     """ clear the log file """
@@ -133,7 +154,7 @@ def splitDatabase():
     cmd = "mv ./smodels-fastlim.tgz %s/smodels-fastlim-v%s.tgz" % \
           ( cwd, version )
     run ( cmd )
-    sys.exit()
+    # sys.exit()
 
 def createTarball():
     """
@@ -208,7 +229,7 @@ def test ():
 def testDocumentation():
     """ Test the documentation """
     comment ( "Test the documentation" )
-    cmd="ls %s/docs/manual/build/html/index.html" % dirname 
+    cmd="ls %s/docs/manual/build/html/index.html" % dirname
     run (cmd)
 
 def create():
@@ -224,6 +245,7 @@ def create():
     clone() ## ... clone smodels into it ...
     fetchDatabase() ## git clone the database
     splitDatabase() ## split database into official and optional
+    removeNonValidated() ## remove all non-validated analyses
     convertRecipes()
     makeDocumentation()
     rmExtraFiles() ## ... remove unneeded files ...
@@ -235,4 +257,5 @@ def create():
     isDummy()
 
 if __name__ == "__main__":
-    create()
+    removeNonValidated()
+    # create()
