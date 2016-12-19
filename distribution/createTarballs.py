@@ -55,8 +55,8 @@ def removeNonValidated():
         database """
     comment ( "Now remove non-validated results." )
     from smodels.experiment.databaseObj import Database
-    d = Database ( "%s/smodels-database" % dirname )
-    # d = Database ( "%s/smodels-database" % dirname, force_load = "txt" )
+    # d = Database ( "%s/smodels-database" % dirname )
+    d = Database ( "%s/smodels-database" % dirname, force_load = "txt" )
     ers = d.expResultList
     comment ( "Loaded the database with %d results." % ( len(ers) ) )
     for er in ers:
@@ -65,11 +65,13 @@ def removeNonValidated():
             cmd = "rm -r %s" % ( er.path )
             run ( cmd )
         else:
-            comment ( "%s is public." % ( er.globalInfo.id) )
+            # comment ( "%s is public." % ( er.globalInfo.id) )
             for dataset in er.datasets:
                 for txn in dataset.txnameList:
                     if txn.validated in [ None, False ]:
-                        comment ( "%s/%s/%s is not validated. Delete!" % ( er, dataset, txn) )
+                        comment ( "%s/%s/%s is not validated. Delete it." % ( er, dataset, txn ) )
+                        cmd="rm %s" % txn.path
+                        run ( cmd )
 
 def rmlog():
     """ clear the log file """
@@ -257,5 +259,5 @@ def create():
     isDummy()
 
 if __name__ == "__main__":
-    removeNonValidated()
-    # create()
+    # removeNonValidated()
+    create()
