@@ -55,16 +55,25 @@ class Database(object):
         setLogLevel ( self._verbosity )
         if self.force_load=="txt":
             self.loadTextDatabase()
+            self.printFastlimBanner()
             return
         if self.force_load=="pcl":
             self.loadBinaryFile()
+            self.printFastlimBanner()
             return
         if self.force_load in [ None, "none", "None" ]:
             self.loadDatabase()
+            self.printFastlimBanner()
             return
         logger.error ( "when initialising database: force_load=%s is not " \
                        "recognized. Valid values are: pcl, txt, None." % force_load )
         sys.exit()
+
+    def printFastlimBanner ( self ):
+        """ check if fastlim appears in data.
+            If yes, print a statement to stdout. """
+        if not self.hasFastLim: return
+        # logger.info ( "Fastlim v1.1 results loaded. Please cite: arXiv:1402.0492 (Eur.Phys.J. C74 (2014) no.11, 3163)" )
 
     def __eq__ ( self, other ):
         """ compare two database 

@@ -255,7 +255,9 @@ def loadDatabase(parser, db):
     Load database
     
     :parameter parser: ConfigParser with path to database
-    :parameter db: binary database object
+    :parameter db: binary database object. If None, then database is loaded,
+                   according to databasePath. If True, then database is loaded,
+                   and text mode is forced.
     :returns: database object, database version
         
     """
