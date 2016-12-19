@@ -27,24 +27,26 @@ def main():
 
     installation = subparsers.add_parser('installation', description="Print installation setup and exit.")
     xseccomputer = subparsers.add_parser('xseccomputer', description="Compute MSSM cross sections for a SLHA file.")
-    xseccomputer.add_argument('-s', '--sqrts', nargs='+', action='append', 
+    xseccomputer.add_argument('-s', '--sqrts', nargs='+', action='append',
         help="sqrt(s) TeV. Can supply more than one value. Default is both 8 and 13.",
         type=int, default=[])
-    xseccomputer.add_argument('-e', '--nevents', type=int, default=10000, 
+    xseccomputer.add_argument('-e', '--nevents', type=int, default=10000,
         help="number of events to be simulated.")
-    xseccomputer.add_argument('-c', '--ncpus', type=int, default=-1, 
+    xseccomputer.add_argument('-v', '--verbosity', type=str, default="info",
+        help="Verbosity (debug, info, warning, error)")
+    xseccomputer.add_argument('-c', '--ncpus', type=int, default=-1,
         help="number of cores to be used simultaneously. -1 means 'all'. ")
-    xseccomputer.add_argument('-p', '--tofile', action='store_true', 
+    xseccomputer.add_argument('-p', '--tofile', action='store_true',
         help="write cross sections to file")
-    xseccomputer.add_argument('-q', '--query', action='store_true', 
+    xseccomputer.add_argument('-q', '--query', action='store_true',
         help="only query if there are cross sections in the file")
-    xseccomputer.add_argument('-k', '--keep', action='store_true', 
+    xseccomputer.add_argument('-k', '--keep', action='store_true',
         help="do not unlink temporary directory")
-    xseccomputer.add_argument('-n', '--NLO', action='store_true', 
+    xseccomputer.add_argument('-n', '--NLO', action='store_true',
         help="compute at the NLO level (default is LO)")
     xseccomputer.add_argument('-N', '--NLL', help="compute at the NLO+NLL level (takes precedence over NLO, default is LO)", action='store_true')
     xseccomputer.add_argument('-O', '--LOfromSLHA', help="use LO cross-sections from file to compute the NLO or NLL cross-sections", action='store_true')
-    xseccomputer.add_argument('-f', '--filename', required=True, 
+    xseccomputer.add_argument('-f', '--filename', required=True,
             help="SLHA file to compute cross sections for. "
             "If a directory is given, compute cross sections for all files in directory." )
 
@@ -60,7 +62,7 @@ def main():
 
     lhechecker = subparsers.add_parser('lhechecker', description="Check if the input file has LHE format.")
     lhechecker.add_argument('-f', '--filename', help='name of input LHE file', required=True)
-    
+
     dbBrowser = subparsers.add_parser('database-browser', description="Interface for browsing the Database.")
     dbBrowser.add_argument('-p', '--path_to_database', help='path to SModelS database', required=True)
     dbBrowser.add_argument('-t', '--text', help='load text database, dont even search for binary database file', action='store_true')
@@ -77,7 +79,7 @@ def main():
         print ( "Installation directory:",installation.installDirectory() )
         print ( "Binaries:",__file__ )
         sys.exit()
-        
+
     if args.subparser_name == 'xseccomputer':
         xsecComputer.main(args)
     if args.subparser_name == 'slhachecker':
@@ -85,7 +87,7 @@ def main():
     if args.subparser_name == 'lhechecker':
         lheChecks.main(args)
     if args.subparser_name == 'database-browser':
-        databaseBrowser.main(args)        
+        databaseBrowser.main(args)
 
 if __name__ == '__main__':
     main()
