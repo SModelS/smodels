@@ -88,6 +88,7 @@ class XSecTest(unittest.TestCase):
         xargs.keep = False
         xargs.tofile = True
         xargs.filename = tmpfile
+        xargs.verbosity = "info"
         #Compute LO cross-sections
         xsecComputer.main(xargs)
         #Compute NLL cross-sections

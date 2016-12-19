@@ -13,9 +13,7 @@ from smodels.tools.externalTool import ExternalTool
 from smodels.tools import externalTool
 from smodels.tools.smodelsLogging import logger
 from smodels import installation
-import tempfile
 import os
-import shutil
 try:
     import commands as executor
 except ImportError:
@@ -66,17 +64,6 @@ class ExternalPythia6(ExternalTool):
         if not os.path.exists(nFile):
             raise IOError("config file %s does not exist" % nFile)
         return nFile
-
-
-    def tempDirectory(self):
-        """
-        Return the temporary directory name.
-        
-        """
-        if self.tempdir == None:
-            self.tempdir = tempfile.mkdtemp()
-            shutil.copy(self.cfgfile, self.tempdir + "/temp.cfg")
-        return self.tempdir
 
 
 
@@ -178,6 +165,7 @@ class ExternalPythia6(ExternalTool):
                         it will be taken as is
         :param do_unlink: clean up temporary files after run?
         :param do_compile: if true, we try to compile binary if it isnt installed.
+        :param do_check: check installation, before running 
         :returns: stdout and stderr, or error message
         
         """
@@ -188,10 +176,12 @@ class ExternalPythia6(ExternalTool):
                     logger.error("couldnt find pythia6 binary." )
                     self.complain()
                 logger.warning("couldnt find pythia6 binary. I have been asked to try to compile it, though. Lets see.")
+                # self.compile()
                 self.complain()
         slha = self.checkFileExists(slhaFile)
         cfg = self.absPath(cfgfile)
         logger.debug("running with " + str(cfg))
+        import shutil
         shutil.copy(slha, self.tempDirectory() + "/fort.61")
         cmd = "cd %s ; %s < %s" % \
              (self.tempDirectory(), self.executablePath, cfg)
@@ -226,7 +216,7 @@ class ExternalPythia6(ExternalTool):
         Compile pythia_lhe.
         
         """
-        logger.info("Trying to compile pythia:")
+        logger.info("Trying to compile pythia in %s" % self.srcPath )
         cmd = "cd %s; make" % self.srcPath
         outputMessage = executor.getoutput(cmd)
         #outputMessage = subprocess.check_output ( cmd, shell=True, 
@@ -262,7 +252,7 @@ class ExternalPythia6(ExternalTool):
         Check if installation of tool is correct by looking for executable and
         running it.
 
-        :param compile: should it try to fix the situation, if something is wrong?
+        :param fix: should it try to fix the situation, if something is wrong?
 
         :returns: True, if everything is ok
         
