@@ -62,12 +62,25 @@ class ExternalTool(object):
         
         """
         if path == None:
-            return self.tempdir + "/temp.cfg"
+            return self.tempDirectory() + "/temp.cfg"
         installdir = installation.installDirectory()
         path = path.replace("<install>", installdir)
         path = path.replace(".egg/smodels", ".egg/")
         path = os.path.abspath(path)
         return path
+
+    def tempDirectory(self):
+        """
+        Return the temporary directory name.
+        
+        """
+        import tempfile
+        import shutil
+        if self.tempdir in [ None, "" ]:
+            self.tempdir = tempfile.mkdtemp()
+            shutil.copy(self.cfgfile, self.tempdir + "/temp.cfg")
+        return self.tempdir
+
 
 
 def ok(b):

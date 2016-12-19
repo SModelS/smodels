@@ -15,7 +15,7 @@ from smodels.tools import toolBox, runtime
 from smodels.tools.physicsUnits import pb, TeV, GeV
 from smodels.theory import crossSection
 from smodels.tools import nllFast
-from smodels.tools.smodelsLogging import logger
+from smodels.tools.smodelsLogging import logger, setLogLevel
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import os
 import pyslha
@@ -232,6 +232,16 @@ def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True, pythiacard=None
 
     if unlink==False:
         logger.info ( "keeping temporary directory at %s" % tool.tempDirectory() )
+    r = tool.checkInstallation()
+    if r == False:
+        logger.info ( "Installation check failed." )
+        sys.exit()
+    #logger.info ( "cfgfile=%s" % tool.cfgfile )
+    #logger.info ( "executable=%s" % tool.executable )
+    #logger.info ( "tempdir=%s" % tool.tempdir )
+    #logger.info ( "nevents=%s" % tool.nevents )
+    tool.replaceInCfgFile({"NEVENTS": nevts, "SQRTS":1000 * sqrts})
+    tool.setParameter("MSTP(163)", "6")
     lhedata = tool.run(slhafile, do_check=False, do_unlink=unlink )
     if not "<LesHouchesEvents" in lhedata:
         pythiadir = "%s/log" % tool.tempDirectory()
@@ -346,6 +356,7 @@ def getInputFiles ( args ):
     return inputFiles
 
 def main(args):
+    setLogLevel ( args.verbosity )
     if args.query:
         return queryCrossSections ( args.filename )
     sqrtses = getSqrtses ( args )
