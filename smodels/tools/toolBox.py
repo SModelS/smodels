@@ -84,7 +84,7 @@ class ToolBox(object):
         return ret
 
 
-    def checkInstallation(self, colors=True, make=False, printit=True ):
+    def checkInstallation(self, colors=True, make=False, printit=True, long=False ):
         """
         Checks if all tools listed are installed properly, 
         returns True if everything is ok, False otherwise.
@@ -92,15 +92,16 @@ class ToolBox(object):
         ret = "The following tools are found in the Toolbox:\n"
         hasMade = False
         allOk=True
+        maxl = 45
+        if long: maxl=75
         for(name, instance) in self.tools.items():
             ok = instance.checkInstallation()
             if not ok:
                 allOk=False
             exe = instance.pathOfExecutable()
-            maxl = 45
             if len(exe) > maxl + 4:
                 exe = "... " + instance.pathOfExecutable()[-maxl:]
-            ret += "%-12s [%-50s]:  %s\n" % (name, exe,
+            ret += ( "%-12s [%-"+str(maxl+5)+"s]:  %s\n" ) % (name, exe,
                                              self.installationOk(ok, colors))
             if not ok and make:
                 hasMade = True
@@ -147,10 +148,13 @@ if __name__ == "__main__":
             if all external "HEP" tools are installed and compiled')
     argparser.add_argument('-n', '--nocolors', help='turn off colors',
                            action='store_true')
+    argparser.add_argument('-l', '--long', help='long output lines',
+                           action='store_true')
     argparser.add_argument('-m', '--make', help='compile packages if needed',
                            action='store_true')
     args = argparser.parse_args()
     tmp = ToolBox()
     if args.make:
         tmp.compile()
-    tmp.checkInstallation(colors=not args.nocolors, printit=True )
+    tmp.checkInstallation(colors=not args.nocolors, printit=True, 
+           long = args.long )
