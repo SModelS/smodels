@@ -49,7 +49,7 @@ class Database(object):
         self.txt_mtime = None, None
         self.pcl_mtime = None, None
         self.pcl_db = None
-        self.sw_format_version = "113" ## what format does the software support?
+        self.sw_format_version = "114" ## what format does the software support?
         self.pcl_format_version = None ## what format is in the binary file?
         self.binfile = os.path.join ( self._base, self.pclfilename )
         setLogLevel ( self._verbosity )
@@ -199,6 +199,7 @@ class Database(object):
 
                     logger.info ( "loading binary db file %s format version %s" % 
                             ( self.binfile, self.pcl_format_version ) )
+                    self.hasFastLim = serializer.load ( f )
                     self.expResultList = serializer.load ( f )
                     t1=time.time()-t0
                     logger.info ( "Loaded database from %s in %.1f secs." % \
@@ -266,6 +267,7 @@ class Database(object):
             serializer.dump ( self.sw_format_version, f, protocol=ptcl )
             serializer.dump ( self.txt_mtime, f, protocol=ptcl )
             serializer.dump ( self._databaseVersion, f, protocol=ptcl )
+            serializer.dump ( self.hasFastLim, f, protocol=ptcl )
             serializer.dump ( self.expResultList, f, protocol=ptcl )
             logger.info (  " * done writing %s in %.1f secs." % \
                     ( self.binfile, time.time()-t0 ) )
