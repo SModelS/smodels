@@ -42,12 +42,14 @@ def isDummy ( ):
     return dummyRun
 
 def run ( cmd ):
-    print "%scmd: %s%s" % (GREEN,cmd,RESET)
+    cmd=cmd.strip()
+    print ( "%scmd: %s%s" % (GREEN,cmd,RESET) )
     f=open("create.log","a")
     f.write ( "cmd: %s\n" % (cmd) )
     o=commands.getoutput ( cmd )
-    print o
-    f.write ( o + "\n" )
+    if len(o)>0:
+        print (o)
+        f.write ( o + "\n" )
     f.close()
 
 def removeNonValidated():
@@ -88,7 +90,26 @@ def removeNonValidated():
                           (er) )
                 cmd = "rm -rf %s" % er.path
                 run ( cmd )
-                
+    # comment ( "base=%s" % d.base )
+    for tev in os.listdir ( d.base ):
+        fullpath = os.path.join ( d.base, tev )
+        if not os.path.isdir ( fullpath ):
+            continue
+        tevHasResults=False
+        for experiment in os.listdir ( fullpath ):
+            exppath = os.path.join ( fullpath, experiment )
+            if not os.path.isdir ( exppath ):
+                continue
+            if os.listdir ( exppath ) == []:
+                comment ( "%s/%s is empty. Delete it!" % ( tev, experiment ) )
+                cmd = "rm -rf %s" % exppath
+                run ( cmd )
+            else:
+                tevHasResults=True
+        if not tevHasResults:
+            comment ( "%s is empty. Delete it!" % ( tev ) )
+            cmd = "rm -rf %s" % fullpath
+            run ( cmd )
 
 def rmlog():
     """ clear the log file """
@@ -289,5 +310,5 @@ def create():
 
 if __name__ == "__main__":
     # cleanDatabase()
-    # removeNonValidated()
-    create()
+    removeNonValidated()
+    # create()
