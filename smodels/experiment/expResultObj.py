@@ -105,7 +105,7 @@ class ExpResult(object):
             txnames += dataset.txnameList
         return txnames
 
-    def getEfficiencyFor ( self, dataset, txname, mass ):
+    def getEfficiencyFor ( self, txname, mass, dataset=None):
         """
         Convenience function. Get the efficiency for
         a specific dataset for a a specific txname.
@@ -131,7 +131,7 @@ class ExpResult(object):
                       (= 95% C.L.) (only for  efficiency-map results)
         :param expected: Compute expected limit, i.e. Nobserved = NexpectedBG
                          (only for efficiency-map results)
-        :param txname: TxName object (only for UL-type results)
+        :param txname: TxName object or txname string (only for UL-type results)
         :param mass: Mass array with units (only for UL-type results)
         :param compute: If True, the upper limit will be computed
                         from expected and observed number of events. 
@@ -175,9 +175,9 @@ class ExpResult(object):
                              computing ULs for upper-limit results.")
                 return False
             if not isinstance(txname, txnameObj.TxName) and \
-               not isinstance(txname, str):
-                 logger.error("txname must be a TxName object or a string")
-                 return False
+            not isinstance(txname, str):
+                logger.error("txname must be a TxName object or a string")
+                return False
             if not isinstance(mass, list):
                 logger.error("mass must be a mass array")
                 return False
