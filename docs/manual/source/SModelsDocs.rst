@@ -1,14 +1,13 @@
-.. index:: SModelS User Guide
+.. index:: Anatomy of SModelS
 
 
 
-SModelS User Guide
+Anatomy of SModelS
 ==================
 
 .. toctree::
    :maxdepth: 2
    
-   News
    Introduction
    SModelSDefs
    Structure
