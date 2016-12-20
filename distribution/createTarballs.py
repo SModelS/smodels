@@ -65,13 +65,30 @@ def removeNonValidated():
             cmd = "rm -r %s" % ( er.path )
             run ( cmd )
         else:
-            # comment ( "%s is public." % ( er.globalInfo.id) )
+            hasDataSets=False
             for dataset in er.datasets:
+                hasTxNames=False
                 for txn in dataset.txnameList:
                     if txn.validated in [ None, False ]:
-                        comment ( "%s/%s/%s is not validated. Delete it." % ( er, dataset, txn ) )
+                        comment ( "%s/%s/%s is not validated. Delete it." % \
+                                  ( er, dataset, txn ) )
                         cmd="rm %s" % txn.path
                         run ( cmd )
+                    else:
+                        hasTxNames=True
+                if not hasTxNames:
+                        comment ( "%s/%s has no validated txnames. remove folder." %\
+                                  (er, dataset ) )
+                        cmd = "rm -rf %s" % dataset.path
+                        run ( cmd )
+                if hasTxNames:
+                    hasDataSets=True
+            if not hasDataSets:
+                comment ( "%s has no validated datasets. remove folder." % \
+                          (er) )
+                cmd = "rm -rf %s" % er.path
+                run ( cmd )
+                
 
 def rmlog():
     """ clear the log file """
@@ -140,6 +157,17 @@ def fetchDatabase():
             "rm -rf .git .gitignore *.py *.sh *.tar *.pyc" % \
              ( dirname )
     run ( rmcmd )
+
+def cleanDatabase():
+    """
+    Clean up the database, e.g. remove orig and validation folders
+    """
+    walker = os.walk ( "%s/smodels-database" % dirname )
+    for record in walker:
+        File=record[0]
+        if "orig" in File or ".git" in File or "validation" in File:
+            cmd = "rm -rf %s" % File
+            run ( cmd )
 
 def splitDatabase():
     """
@@ -246,6 +274,7 @@ def create():
     mkdir() ## .. then create the temp dir
     clone() ## ... clone smodels into it ...
     fetchDatabase() ## git clone the database
+    cleanDatabase() ## clean up database, remove orig, validated
     splitDatabase() ## split database into official and optional
     removeNonValidated() ## remove all non-validated analyses
     convertRecipes()
@@ -259,5 +288,6 @@ def create():
     isDummy()
 
 if __name__ == "__main__":
+    # cleanDatabase()
     # removeNonValidated()
     create()
