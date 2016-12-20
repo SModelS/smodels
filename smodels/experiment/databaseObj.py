@@ -73,7 +73,7 @@ class Database(object):
         """ check if fastlim appears in data.
             If yes, print a statement to stdout. """
         if not self.hasFastLim: return
-        # logger.info ( "Fastlim v1.1 results loaded. Please cite: arXiv:1402.0492 (Eur.Phys.J. C74 (2014) no.11, 3163)" )
+        logger.info ( "FastLim v1.1 efficiencies loaded. Please cite: arXiv:1402.0492, EPJC74 (2014) 11" )
 
     def __eq__ ( self, other ):
         """ compare two database 
@@ -185,7 +185,7 @@ class Database(object):
                 self._databaseVersion = serializer.load ( f )
                 if not lastm_only:
                     if self.pcl_python != sys.version:
-                        logger.warning ( "binary file was written with different "
+                        logger.warning ( "binary file was written with a different "
                                          "python version. Regenerating." )
                         self.createBinaryFile()
                         return self
