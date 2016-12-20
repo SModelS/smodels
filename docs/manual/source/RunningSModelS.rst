@@ -262,57 +262,123 @@ Below we go step-by-step through this example code:
   installation folder simply add "sys.path.append(<smodels installation path>)" before importing smodels
 
 .. literalinclude:: /examples/Example.py
-   :lines: 11-19
+   :lines: 15-19
 
-* *Set the address to the dabase*. Specify where the SModelS :doc:`database <Database>` has been installed
+* *Set the address to the dabase*. Specify where the SModelS :doc:`database <databaseStruct>` has been installed
+  and load the database
 
 .. literalinclude:: /examples/Example.py
    :lines: 21-22
    
-* *Path to the input file*. Specify the location of the input file. It must be a SLHA or LHE file (see :ref:`Basic Input <BasicInput>`)
+* *Path to the input file*. Specify the location of the input file. It must be a 
+  SLHA or LHE file (see :ref:`Basic Input <BasicInput>`)
 
 .. literalinclude:: /examples/Example.py
-   :lines: 32
+   :lines: 31
    
-* *Define the basic parameters for* |decomposition|. Specify the values of :ref:`sigmacut <minweight>` and :ref:`minmassgap <massComp>`:   
+* *Define the basic parameters for* |decomposition|. 
+  Specify the values of :ref:`sigmacut <minweight>` and :ref:`minmassgap <massComp>`:   
 
 .. literalinclude:: /examples/Example.py
-   :lines: 36-37
+   :lines: 35-36
    
 * *Perform the* |decomposition|. Depending on the type
-  of input format, choose either the `slhaDecomposer.decompose <../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose>`_ or
+  of input format, choose either 
+  the `slhaDecomposer.decompose <../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose>`_ or
   `lheDecomposer.decompose <../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose>`_ method. The **doCompress** and **doInvisible** options turn on/off the |mass compression| and |invisible compression|, respectively
   
 .. literalinclude:: /examples/Example.py
-   :lines: 40
+   :lines: 39-40
    
-* *Print the decomposition output*. Set outputLevel = 0 (no output), 1 (basic output) or 2 (extended output)   
+* *Print the decomposition output*. Basic information about the decomposition results
+  can be accessed through the 
+  `topology list <../../../documentation/build/html/theory.html#theory.topology.TopologyList>`_
+  and `topology  <../../../documentation/build/html/theory.html#theory.topology.Topology>`_ objects:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 44
+   :lines: 45-55
    
-* *Load the the analyses* :ref:`database <Database>`. Load the experimental |analyses| and store the list of analyses   
+*output:*
 
-.. literalinclude:: /examples/Example.py
-   :lines: 47
+.. literalinclude:: /images/ExampleOutput.txt
+   :lines: 2-8
+
    
-* *Compute the* |theory predictions|. For each analysis in list of analyses compute the |theory predictions|. The output
-  is a list of `theory prediction objects <../../../documentation/build/html/theory.html#theory.theoryPrediction.TheoryPrediction>`_
-  (for each analysis) with results for each :ref:`cluster <ULcluster>`
+* *Load the experimental results to be used*. Load the |express| which will be used to constrain the
+  input model. By default all results are used, but the    
+  `getExpResults  <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database.getExpResults>`_ 
+  method can also be used to select specific results: 
   
 .. literalinclude:: /examples/Example.py
-   :lines: 50
+   :lines: 61
    
-* *Print the output*. Loop over all analyses and results and print the |theory predictions| information
+* *Print basic information about the results loaded*. The selected list of |express| can be used
+  to obtain basic information about the results. Below we show how to count the number of |ULrs|
+  and |EMrs| loaded:    
 
 .. literalinclude:: /examples/Example.py
-   :lines: 53-61
+   :lines: 63-71
+
+*output:*
+
+.. literalinclude:: /images/ExampleOutput.txt
+   :lines: 10   
    
-* *Get analysis upper limit*. For each anlysis and |theory prediction|, obtain the experimental upper limit. This value can
-  be compared to the |theory prediction| value to decide if a model is excluded or not.
+   
+* *Compute the* |theory predictions|. For each |expres| in list of selected results,
+  compute the |theory predictions|. The output
+  is a list of `theory prediction objects <../../../documentation/build/html/theory.html#theory.theoryPrediction.TheoryPrediction>`_
+  (for each |expres|):
+  
+.. literalinclude:: /examples/Example.py
+   :lines: 77-78
+   
+* *Print the results*. For each |expres|, loop over the corresponding |theory predictions|
+  and print the relevant information:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 64
+   :lines: 81-93
+   
+*output:*
+
+.. literalinclude:: /images/ExampleOutput.txt
+   :lines: 14-21   
+   
+* *Get experimental upper limit*. For each |theory prediction|, get the corresponding
+  experimental upper limit. This value can
+  be compared to the |theory prediction| value to decide if a model is excluded or not:
+
+.. literalinclude:: /examples/Example.py
+   :lines: 96-97
+   
+*output:*
+
+.. literalinclude:: /images/ExampleOutput.txt
+   :lines: 22   
+   
+* *Compute the r-value*. Compute the |theory prediction|/upper limit ratio in order
+  to verify which experimental results likely exclude the input model. Also determine
+  the most constraining result:
+
+.. literalinclude:: /examples/Example.py
+   :lines: 98-102
+   
+*output:*
+
+.. literalinclude:: /images/ExampleOutput.txt
+   :lines: 23   
+
+* *Print the most constraing experimental result*. Using the largest *r*-value,
+  determine if the model has been excluded or not by the selected |express|:
+
+.. literalinclude:: /examples/Example.py
+   :lines: 104-108
+
+
+*output:*
+
+.. literalinclude:: /images/ExampleOutput.txt
+   :lines: 411-412   
 
 .. [*] For an SLHA :ref:`input file <BasicInput>`, the decay of :ref:`final states <final states>` (or Z\ :sub:`2`-even particles
        such as the Higgs, W,...) are always ignored during the decomposition. Furthermore, if there are two cross-sections

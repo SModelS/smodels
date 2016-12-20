@@ -3,8 +3,8 @@
 .. SModelS Manual index file
 
 
-SModelS Manual
-==============
+SModelS User Manual
+===================
 
 **These pages constitute the SModelS manual.**
 
@@ -33,6 +33,7 @@ Contents
 .. toctree::
    :maxdepth: 1
      
+   ReleaseUpdate  
    Installation
    RunningSModelS
    SModelsDocs
