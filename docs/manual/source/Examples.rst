@@ -28,6 +28,8 @@ Below a few examples are given for how to utilize SModelS and some of the :doc:`
 
 * `How to compare theory predictions with experimental limits <_downloads/compareUL.html>`_ (download the python code :download:`here <recipes/compareUL.py>`, IPython notebook :download:`here <recipes/compareUL.ipynb>`)
 
+* `How to compute the likelihood and chi2 for a theory predictions <_downloads/compute_likelihood.html>`_ (download the python code :download:`here <recipes/compute_likelihood.py>`, IPython notebook :download:`here <recipes/compute_likelihood.ipynb>`)
+
 * `How to find missing topologies <_downloads/missingTopologies.html>`_ (download the python code :download:`here <recipes/missingTopologies.py>`, IPython notebook :download:`here <recipes/missingTopologies.ipynb>`)
 
 * `How to generate ascii graphs <_downloads/ascii_graph_from_lhe.html>`_ (download the python code :download:`here <recipes/ascii_graph_from_lhe.py>`, IPython notebook :download:`here <recipes/ascii_graph_from_lhe.ipynb>`)
