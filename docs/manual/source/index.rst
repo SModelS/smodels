@@ -33,6 +33,7 @@ Contents
 .. toctree::
    :maxdepth: 1
      
+   News
    Installation
    RunningSModelS
    SModelsDocs

@@ -342,7 +342,7 @@ A simple example is given below:
 
 
 Further python example codes using the functionalities of the browser
-can be found in :ref:`More Examples <Examples>`.
+can be found in :ref:`Howto's <Examples>`.
 
 * **The Database browser tool is implemented by the**  `Browser class <../../../documentation/build/html/tools.html#tools.databaseBrowser.Browser>`_
 
