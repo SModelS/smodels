@@ -120,9 +120,10 @@ def mkdir():
     """
     Create a temporary directory for creating the tarball.
     """
-    for i in ( dirname, fastlimdir ):
+    ## for i in ( dirname, fastlimdir ):
+    for i in ( [ dirname ] ): ## , fastlimdir ):
         comment ("Creating temporary directory %s" % i )
-        run ( "mkdir -p %s" % dirname )
+        run ( "mkdir -p %s" % i )
 
 def rmdir():
     """
@@ -310,5 +311,5 @@ def create():
 
 if __name__ == "__main__":
     # cleanDatabase()
-    removeNonValidated()
-    # create()
+    # removeNonValidated()
+    create()
