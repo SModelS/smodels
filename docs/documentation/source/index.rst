@@ -1,10 +1,10 @@
 .. SModelS documentation master file.
 
 
-SModelS Documentation
-=====================
+SModelS Code Documentation
+==========================
 
-**These pages constitute the SModelS documentation.**
+**These pages constitute the SModelS code documentation.**
 
 **The SModelS manual can be found** `here <../../../manual/build/html/index.html>`_  
 
