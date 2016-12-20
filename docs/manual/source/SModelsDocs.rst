@@ -1,9 +1,9 @@
-.. index:: Anatomy of SModelS
+.. index:: SModelS Guide
 
 
 
-Anatomy of SModelS
-==================
+SModelS Guide
+=============
 
 .. toctree::
    :maxdepth: 2
