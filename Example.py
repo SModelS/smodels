@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import print_function
+
 
 """
 .. module:: Example
@@ -19,7 +19,7 @@ from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.experiment.databaseObj import Database
 
 #Set the path to the database folder
-database = Database("./smodels-database/")
+database = Database("../smodels-database/")
 
 def main():
     """
@@ -36,24 +36,24 @@ def main():
     mingap = 5. * GeV
 
     """ Decompose model (use slhaDecomposer for SLHA input or lheDecomposer for LHE input) """
-    smstoplist = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
-    # smstoplist = lheDecomposer.decompose(lhefile, doCompress=True,doInvisible=True, minmassgap=mingap)
+    toplist = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
+    # toplist = lheDecomposer.decompose(lhefile, doCompress=True,doInvisible=True, minmassgap=mingap)
     
     #How to access some basic information from decomposition:
     # Print basic information from decomposition:
-    print("\n\033[1m Decomposition Results: \033[0m")
-    print("\t \033[31m Total number of topologies: %i \033[0m" %len(smstoplist))
-    nel = sum([len(top.elementList) for top in smstoplist])
-    print("\t \033[31m Total number of elements = %i  \033[0m" %nel)    
+    print "\n Decomposition Results: "
+    print "\t  Total number of topologies: %i " %len(toplist)
+    nel = sum([len(top.elementList) for top in toplist])
+    print "\t  Total number of elements = %i " %nel    
     #Print information about the m-th topology:
     m = 3
-    top = smstoplist[m]
-    print("\t\t %i-th topology  = " %m,top,"with total cross-section =",top.getTotalWeight())
+    top = toplist[m]
+    print "\t\t %i-th topology  = " %m,top,"with total cross-section =",top.getTotalWeight()
     #Print information about the n-th element in the m-th topology:
     n = 0
     el = top.elementList[n]
-    print("\t\t %i-th element from %i-th topology  = " %(n,m),el,
-          "\n\t\t\twith cross-section =",el.weight,"\n\t\t\tand masses = ",el.getMasses()) 
+    print "\t\t %i-th element from %i-th topology  = " %(n,m),el,
+    print "\n\t\t\twith cross-section =",el.weight,"\n\t\t\tand masses = ",el.getMasses() 
             
     
                                                                                                                                             
@@ -68,48 +68,44 @@ def main():
         elif  expType == 'efficiencyMap':
             nEM += 1
     #Print basic information about the loaded database:
-    print("\n\033[94m Loaded Database with %i UL results and %i EM results \033[0m" %(nUL,nEM))
+    print "\n Loaded Database with %i UL results and %i EM results " %(nUL,nEM)
 
     # Compute the theory predictions for each experimental result and print the results:
-    print("\n\033[40;1mTheory Predictions and Constraints:\033[0m")
+    print("\n Theory Predictions and Constraints:")
     rmax = 0.
     bestResult = None
     for expResult in listOfExpRes:
-        predictions = theoryPredictionsFor(expResult, smstoplist)
+        predictions = theoryPredictionsFor(expResult, toplist)
         if not predictions: continue #Skip if there are no constraints from this result
-        print('\n \033[31m %s \033[0m' %expResult.globalInfo.id)
+        print('\n %s ' %expResult.globalInfo.id)
         for theoryPrediction in predictions:
             dataset = theoryPrediction.dataset
             datasetID = dataset.dataInfo.dataId            
             mass = theoryPrediction.mass
             txnames = [str(txname) for txname in theoryPrediction.txnames]
             PIDs =  theoryPrediction.PIDs         
-            print("------------------------")
-            print("Dataset = ",datasetID)   #Analysis name
-            print("TxNames = ",txnames)   
-            print("Prediction Mass = ",mass)    #Value for average cluster mass (average mass of the elements in cluster)
-            print("Prediction PIDs = ",PIDs)    #Value for average cluster mass (average mass of the elements in cluster)
-            print("Theory Prediction = ",theoryPrediction.xsection)   #Signal cross-section
-            print("Condition Violation = ",theoryPrediction.conditions)  #Condition violation values
+            print "------------------------"
+            print "Dataset = ",datasetID   #Analysis name
+            print "TxNames = ",txnames   
+            print "Prediction Mass = ",mass    #Value for average cluster mass (average mass of the elements in cluster)
+            print "Prediction PIDs = ",PIDs    #Value for average cluster mass (average mass of the elements in cluster)
+            print "Theory Prediction = ",theoryPrediction.xsection   #Signal cross-section
+            print "Condition Violation = ",theoryPrediction.conditions  #Condition violation values
               
             #Get upper limit for the respective prediction:
-            if expResult.getValuesFor('dataType')[0] == 'upperLimit':
-                ul = expResult.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=mass)                     
-            elif expResult.getValuesFor('dataType')[0] == 'efficiencyMap':
-                ul = expResult.getUpperLimitFor(dataID=datasetID)
-            else: print('weird:',expResult.getValuesFor('dataType'))
-            print("Theory Prediction UL = ",ul)
+            ul = expResult.getUpperLimitFor(txname=txnames[0],mass=mass,dataID=datasetID)                     
+            print "Theory Prediction UL = ",ul
             r = theoryPrediction.xsection.value/ul
-            print("R = ",r)
+            print "R = ",r
             if r > rmax:
                 rmax = r
                 bestResult = expResult.globalInfo.id
             
-    print("\nThe largest r-value (theory/upper limit ratio) is ",rmax)
+    print "\nThe largest r-value (theory/upper limit ratio) is ",rmax
     if rmax > 1.:
-        print("\033[31m (The input model is likely excluded by %s) \033[0m" %bestResult)
+        print "(The input model is likely excluded by %s)" %bestResult
     else:
-        print("\033[92m (The input model is not excluded by the simplified model results) \033[0m")
+        print "(The input model is not excluded by the simplified model results)"
       
     
 
