@@ -21,3 +21,7 @@ class TxTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+    # a=TxTest("testNCPUs")
+    # a.testNCPUs()
+    # a.debug()
+    # a.run()
