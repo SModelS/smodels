@@ -197,22 +197,22 @@ Below we describe in detail the blocks contained in the summary output:
   The |element| cross-section (weight) as well as its description in :ref:`bracket notation <bracketNotation>`
   is included.
 
-.. literalinclude:: /images/screenoutput.txt
+.. literalinclude:: /images/summaryoutput.txt
    :lines: 126-130 
    
 * detailed information about the topologies which are outside the  |express| grid:
 
-.. literalinclude:: /images/screenoutput.txt
+.. literalinclude:: /images/summaryoutput.txt
    :lines: 139-143
    
 * information about the missing topologies with long cascade decays:
 
-.. literalinclude:: /images/screenoutput.txt
+.. literalinclude:: /images/summaryoutput.txt
    :lines: 146-150
 
 * information about the missing topologies with asymmetric decays:
 
-.. literalinclude:: /images/screenoutput.txt
+.. literalinclude:: /images/summaryoutput.txt
    :lines: 159-163
 
 
