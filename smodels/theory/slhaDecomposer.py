@@ -161,15 +161,21 @@ def _getDictionariesFromSLHA(slhafile):
     # Get mass and branching ratios for all particles
     brDic = {}
     for pid in res.decays.keys():
+        if not pid in rEven + rOdd:
+            logger.warning("Particle %i not defined in particles.py, its decays will be ignored" %(pid))
+            continue
         if pid in rEven:
             logger.info("Ignoring %s decays",smodels.particles.rEven[pid])
-            continue
+            continue         
         brs = []
         for decay in res.decays[pid].decays:
             nEven = nOdd = 0.
             for pidd in decay.ids:
                 if pidd in rOdd: nOdd += 1
                 elif pidd in rEven: nEven += 1
+                else:
+                    logger.warning("Particle %i not defined in particles.py,decay %i -> [%s] will be ignored" %(pidd,pid,decay.ids))
+                    break
             if nOdd + nEven == len(decay.ids) and nOdd == 1:
                 brs.append(decay)
             else:
