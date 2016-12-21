@@ -298,5 +298,6 @@ Since the output information and options are the same as described for :ref:`pyt
 we simply show below an excerpt of the xml file to illustrate the output format:
 
 .. literalinclude:: /images/xmloutput.txt
+   :language: xml
    :lines: 1-2,85,300-328,45077,45078-45104
 
