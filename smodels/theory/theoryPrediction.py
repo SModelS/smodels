@@ -37,37 +37,16 @@ class TheoryPrediction(object):
         self.xsection = None
         self.conditions = None
         self.mass = None        
-        self._hasStatistics = False ## have we yet computed likelihoods?
-
-    @property
-    def likelihood(self):
-        self.computeStatistics()
-        return self._likelihood
-      
-    @property
-    def chi2(self):
-        self.computeStatistics()
-        return self._chi2
-
-    @property
-    def expectedUL(self):
-        self.computeStatistics()
-        return self._expectedUL
 
     def computeStatistics(self):
         """
-        Compute the likelihood, chi-square and expected upper limit for this
-        theory prediction.  The resulting values are stored as the likelihood,
-        chi2 and expectedUL attributes.        
+        Compute the likelihood, chi-square and expected upper limit for this theory prediction.
+        The resulting values are stored as the likelihood, chi2 and expectedUL attributes.        
         """
-        if self._hasStatistics:
-                return
-        if not hasattr(self, "dataset") or \
-                self.dataset.dataInfo.dataType == 'upperLimit':
-            self._likelihood = None
-            self._chi2 = None
-            self._expectedUL = None
-            self._hasStatistics = True
+        if not hasattr(self, "dataset") or self.dataset.dataInfo.dataType == 'upperLimit':
+            self.likelihood = None
+            self.chi2 = None
+            self.expectedUL = None
             return
         
         lumi = self.dataset.globalInfo.lumi  
@@ -76,10 +55,9 @@ class TheoryPrediction(object):
         chi2 = self.dataset.chi2(nsig)
         expectedUL = self.dataset.getSRUpperLimit(alpha = 0.05, expected = True)
         
-        self._likelihood =  llhd
-        self._chi2 =  chi2
-        self._expectedUL = expectedUL
-        self._hasStatistics = True
+        self.likelihood =  llhd
+        self.chi2 =  chi2
+        self.expectedUL = expectedUL
         
     def getmaxCondition(self):
         """
