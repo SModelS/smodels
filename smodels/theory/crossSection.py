@@ -563,7 +563,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
         for pid in production[2:]:
             if not pid in smodels.particles.rOdd.keys():
                 # ignore production of R-Even Particles
-                logger.warning("Ignoring cross-section for "+str(production)+" production") 
+                logger.warning("Particle %i not defined in particles.py, cross-section for %s production will be ignored" %(pid,str(production)))                 
                 break
         process = f.xsections.get ( production )
         for pxsec in process.xsecs:
