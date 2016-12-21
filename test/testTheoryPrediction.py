@@ -46,6 +46,7 @@ class IntegrationTest(unittest.TestCase):
             predval=pred.xsection.value 
             defpredval = defpreds[id]
             self.assertAlmostEqual( predval/fb, defpredval/fb)
+            pred.computeStatistics()
             self.assertAlmostEqual ( pred.chi2, self.predchi2()[id] )
 
     def testIntegration(self):
