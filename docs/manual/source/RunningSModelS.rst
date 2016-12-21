@@ -142,7 +142,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 * *path*: relevant folder paths
 
-  * **databasePath**: the absolute (or relative) path to the |database|. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`.
+  * **databasePath**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`.
 |
 * *options*: main options for turning SModelS features on and off
 
@@ -196,7 +196,6 @@ Below we give more detailed information about each entry in the parameters file.
   * **addCoverageID** (True/False): set to True to print the list of element IDs contributing to each missing topology (see :ref:`coverage <topCoverage>`).
     *Only used if testCoverage = True*. This option should be used along with *addElementInfo = True* so the user can precisely identify
     which elements were classified as missing.
-    
 |
 * *summary-printer*: options for the summary printer
 
@@ -264,7 +263,7 @@ Below we go step-by-step through this example code:
 .. literalinclude:: /examples/Example.py
    :lines: 15-19
 
-* *Set the address to the dabase*. Specify where the SModelS :doc:`database <databaseStruct>` has been installed
+* *Set the address to the dabase*. Specify where the SModelS :ref:`database <databaseStruct>` has been installed
   and load the database
 
 .. literalinclude:: /examples/Example.py
