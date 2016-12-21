@@ -48,8 +48,16 @@ code :ref:`Example.py <exampleCode>` is provided showing how to access
 the main SModelS functionalities: :ref:`decomposition <Decomposition>`, |database|
 and :ref:`computation of theory predictions <TheoryPredictions>`.
 
+
 The commandline tool (:ref:`runSModelS.py <runSModelS>`) and the example Python
 code (:ref:`Example.py <exampleCode>`) are described below.
+
+
+.. note:: For non-MSSM input models the user needs to modify *particles.py* 
+          and specify which BSM particles are even or odd under the assumed
+          Z\ :sub:`2` symmetry (see :ref:`adding new particles <newParticles>`).
+
+
 
 .. _runSModelS:
 
