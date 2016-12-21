@@ -56,6 +56,8 @@ def decompose(lhefile, inputXsecs=None, nevts=None, doCompress=False,
         eventweight = xSectionList.getXsecsFor(momPDG)
         # Get event element
         newElement = elementFromEvent(event, eventweight)
+        if not newElement:
+            continue
         allElements = [newElement]
         # Perform compression
         if doCompress or doInvisible:
@@ -89,6 +91,10 @@ def elementFromEvent(event, weight=None):
     # Create branch list
     finalBranchList = []
     for ip, particle in enumerate(event.particles):
+        if not particle.pdg in smodels.particles.rEven.keys() +  smodels.particles.rOdd.keys():
+            logger.warning("Particle %i not defined in particles.py, events containing this particle will be ignored" %(particle.pdg))
+            return None
+        
         # Particle came from initial state (primary mother)
         if 1 in particle.moms:
             mombranch = branch.Branch()
