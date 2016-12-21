@@ -35,6 +35,7 @@ in SModelS they are effectively considered as final states.
 When generating the events it is also important to ensure that no mass smearing is applied, so the mass
 values for a given particle are the same throughout the LHE file.
 
+.. _newParticles:
 
 New Particles
 -------------
