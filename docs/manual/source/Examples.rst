@@ -4,10 +4,6 @@
 
 How To's
 ========
-=======
-.. index:: Howto's
-
-.. _Examples:
 
 
 Below a few examples are given for how to utilize SModelS and some of the :doc:`SModelS tools <Tools>` as a Python library:
