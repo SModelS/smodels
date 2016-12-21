@@ -33,7 +33,12 @@ def verbose_run():
         for test in series:
             for t in test:
                 print ( "[runCompleteTestSuite] now run",t.id() )
-                t.run()
+                try:
+                    a=t.debug()
+                except Exception as e:
+                    print ( "[runCompleteTestSuite] FAILED! %s" % str(e) )
+                #a=t.run() ## python3
+                # print ( "a=",a )
 
 def parallel_run ( verbose ):
     if verbose:
