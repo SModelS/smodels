@@ -202,7 +202,7 @@ latex_elements = {
 'pointsize': '18pt',
 
 # Additional stuff for the LaTeX preamble.
-'preamble': '\\renewcommand{\\footnote}[1][0]{\\footnotemark\\footnotetext}',
+'preamble': '\\renewcommand{\\footnote}[1][0]{\\footnotemark\\footnotetext}\n\\renewcommand{\\phantomsection}{\\par}',
 #'preamble': '',
 }
 
