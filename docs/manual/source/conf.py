@@ -199,9 +199,10 @@ latex_elements = {
 #'papersize': 'letterpaper',
 
 # The font size ('10pt', '11pt' or '12pt').
-'pointsize': '18pt'
+'pointsize': '18pt',
 
 # Additional stuff for the LaTeX preamble.
+'preamble': '\\renewcommand{\\footnote}[1][0]{\\footnotemark\\footnotetext}',
 #'preamble': '',
 }
 
