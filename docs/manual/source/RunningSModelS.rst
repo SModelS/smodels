@@ -264,20 +264,19 @@ users more familiar with Python and the SModelS language may prefer to write the
 A simple example code for this purpose is provided in :download:`examples/Example.py`.
 Below we go step-by-step through this example code:
 
-* *Import the SModelS methods*. Import the methods to be used later. If the file is not located in the smodels
-  installation folder simply add "sys.path.append(<smodels installation path>)" before importing smodels
+* *Import the SModelS methods*. If the file is not located in the smodels
+  installation folder, simply add "sys.path.append(<smodels installation path>)" before importing smodels
 
 .. literalinclude:: /examples/Example.py
    :lines: 15-19
 
-* *Set the path to the database folder*. Specify where the SModelS :ref:`database <databaseStruct>` has been installed
-  and load the database
+* *Set the path to the database folder*. Specify where the SModelS :ref:`database <databaseStruct>` has been installed and load the database.
 
 .. literalinclude:: /examples/Example.py
    :lines: 21-22
    
 * *Path to the input file*. Specify the location of the input file. It must be a 
-  SLHA or LHE file (see :ref:`Basic Input <BasicInput>`)
+  SLHA or LHE file (see :ref:`Basic Input <BasicInput>`).
 
 .. literalinclude:: /examples/Example.py
    :lines: 31
@@ -291,7 +290,7 @@ Below we go step-by-step through this example code:
 * |Decompose| *model*. Depending on the type
   of input format, choose either 
   the `slhaDecomposer.decompose <../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose>`_ or
-  `lheDecomposer.decompose <../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose>`_ method. The **doCompress** and **doInvisible** options turn the |mass compression| and |invisible compression| on/off
+  `lheDecomposer.decompose <../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose>`_ method. The **doCompress** and **doInvisible** options turn the |mass compression| and |invisible compression| on/off.
   
 .. literalinclude:: /examples/Example.py
    :lines: 39-40
@@ -384,5 +383,5 @@ Alternatively, the `getExpResults  <../../../documentation/build/html/experiment
    :lines: 411-412   
 
 **Notes:**
-- For an SLHA :ref:`input file <BasicInput>`, the decay of :ref:`final states <final states>` (or Z\ :sub:`2`-even particles such as the Higgs, W,...) are always ignored during the decomposition. Furthermore, if there are two cross-sections at different calculation order (say LO and NLO) for the same process, only the highest order is used.
-- The list of |elements| can be extremely long. Try setting **addElmentInfo** = False and/or **printDecomp** = False to obtain a smaller output.       
+ * For an SLHA :ref:`input file <BasicInput>`, the decay of :ref:`final states <final states>` (or Z\ :sub:`2`-even particles such as the Higgs, W,...) are always ignored during the decomposition. Furthermore, if there are two cross-sections at different calculation order (say LO and NLO) for the same process, only the highest order is used.
+ * The list of |elements| can be extremely long. Try setting **addElmentInfo** = False and/or **printDecomp** = False to obtain a smaller output.       
