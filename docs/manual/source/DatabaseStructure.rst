@@ -210,7 +210,7 @@ This action may take a few minutes, but it is only performed once.
 SModelS automatically builds (if necessary) and loads the binary database when a 
 `Database object <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
 is created. Nonetheless, the user can enforce loading (parsing) the *text
-database* using the option *force_load = 'txt'* in 
+database* using the option *force_load = 'txt'* in the constructor of
 `Database <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_ .  
 
 
