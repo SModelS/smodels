@@ -1,4 +1,4 @@
-.. index:: Running SModelS
+.. index:: Using SModelS
 
 .. |invisible compression| replace:: :ref:`invisible compression <invComp>`
 .. |mass compression| replace:: :ref:`mass compression <massComp>`
@@ -7,6 +7,7 @@
 .. |topology| replace:: :ref:`topology <topology>`
 .. |topologies| replace:: :ref:`topologies <topology>`
 .. |decomposition| replace:: :doc:`decomposition <Decomposition>`
+.. |Decompose| replace:: :doc:`Decompose <Decomposition>`
 .. |theory predictions| replace:: :doc:`theory predictions <TheoryPredictions>`
 .. |theory prediction| replace:: :doc:`theory prediction <TheoryPredictions>`
 .. |constraint| replace:: :ref:`constraint <ULconstraint>`
@@ -39,17 +40,15 @@
 Running SModelS
 ===============
 
-For the first-time user, SModelS ships with a command-line tool :ref:`runSModelS.py <runSModelS>`, which
-takes an SLHA or LHE file as input (see :doc:`Basic Input <BasicInput>`), and reports on the SMS
-|decomposition| and |theory predictions| in several :ref:`output formats <smodelsOutput>`.
+SModelS can take SLHA or LHE files as input (see :doc:`Basic Input <BasicInput>`). It ships with a command-line tool :ref:`runSModelS.py <runSModelS>`, which reports on the SMS |decomposition| and |theory predictions| in several :ref:`output formats <smodelsOutput>`.  
 
-For users more familiar with Python and the SModelS basics, an example
+For users more familiar with python and the SModelS basics, an example
 code :ref:`Example.py <exampleCode>` is provided showing how to access
 the main SModelS functionalities: :ref:`decomposition <Decomposition>`, |database|
 and :ref:`computation of theory predictions <TheoryPredictions>`.
 
 
-The commandline tool (:ref:`runSModelS.py <runSModelS>`) and the example Python
+The command-line tool (:ref:`runSModelS.py <runSModelS>`) and the example Python
 code (:ref:`Example.py <exampleCode>`) are described below.
 
 
@@ -155,7 +154,7 @@ Below we give more detailed information about each entry in the parameters file.
 * *options*: main options for turning SModelS features on and off
 
   * **inputType** (SLHA/LHE): determines the type of input file (see :doc:`Basic Input <BasicInput>`). 
-    Must be SLHA for a SLHA input file(s) or LHE for a LHE input file(s).
+    Must be *SLHA* for SLHA input files or *LHE* for LHE input files.
   * **checkInput** (True/False): if True, *runSModelS.py* will run the :ref:`file check tool <fileChecks>` on the input file and verify if the input contains all the necessary information.
   * **doInvisible** (True/False): turns |invisible compression| on and off during the |decomposition|.
     Set to False to turn |invisible compression| off.
@@ -209,9 +208,9 @@ Below we give more detailed information about each entry in the parameters file.
 
   * **expandedSummary** (True/False): set True to include in the summary output all applicable |results|, False for only the strongest one.
 |
-* *python-printer*: options for the python printer
+* *python-printer*: options for the Python printer
 
-  * **addElementList** (True/False): set True to include in the python output all information about all |elements| generated in the |decomposition|. If set to True the
+  * **addElementList** (True/False): set True to include in the Python output all information about all |elements| generated in the |decomposition|. If set to True the
     output file can be quite large.
 |
 * *xml-printer*: options for the xml printer
@@ -242,8 +241,8 @@ The following formats are available:
 
  * a :ref:`python dictionary <pyOut>` printed to a file containing information about the |decomposition|, the
    |theory predictions| and the :ref:`missing topologies <topCoverage>`. The output can be significantly long, if
-   all options in the |parameters| are set to True. However this output can be easily imported to a python enviroment, making it
-   easy to access the desired information. For users familiar with the python language this is the recommended
+   all options in the |parameters| are set to True. However this output can be easily imported to a Python enviroment, making it
+   easy to access the desired information. For users familiar with the Python language this is the recommended
    format. 
    
  * a :ref:`xml file <pyOut>` containing information about the |decomposition|, the
@@ -271,7 +270,7 @@ Below we go step-by-step through this example code:
 .. literalinclude:: /examples/Example.py
    :lines: 15-19
 
-* *Set the address to the dabase*. Specify where the SModelS :ref:`database <databaseStruct>` has been installed
+* *Set the path to the database folder*. Specify where the SModelS :ref:`database <databaseStruct>` has been installed
   and load the database
 
 .. literalinclude:: /examples/Example.py
@@ -283,27 +282,26 @@ Below we go step-by-step through this example code:
 .. literalinclude:: /examples/Example.py
    :lines: 31
    
-* *Define the basic parameters for* |decomposition|. 
+* *Set main options for decomposition* |decomposition|. 
   Specify the values of :ref:`sigmacut <minweight>` and :ref:`minmassgap <massComp>`:   
 
 .. literalinclude:: /examples/Example.py
    :lines: 35-36
    
-* *Perform the* |decomposition|. Depending on the type
+* |Decompose| *model*. Depending on the type
   of input format, choose either 
   the `slhaDecomposer.decompose <../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose>`_ or
-  `lheDecomposer.decompose <../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose>`_ method. The **doCompress** and **doInvisible** options turn on/off the |mass compression| and |invisible compression|, respectively
+  `lheDecomposer.decompose <../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose>`_ method. The **doCompress** and **doInvisible** options turn the |mass compression| and |invisible compression| on/off
   
 .. literalinclude:: /examples/Example.py
    :lines: 39-40
    
-* *Print the decomposition output*. Basic information about the decomposition results
-  can be accessed through the 
+* *Access basic information* from decomposition, using the 
   `topology list <../../../documentation/build/html/theory.html#theory.topology.TopologyList>`_
   and `topology  <../../../documentation/build/html/theory.html#theory.topology.Topology>`_ objects:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 45-55
+   :lines: 43-55
    
 *output:*
 
@@ -311,20 +309,19 @@ Below we go step-by-step through this example code:
    :lines: 2-8
 
    
-* *Load the experimental results to be used*. Load the |express| which will be used to constrain the
-  input model. By default all results are used, but the    
-  `getExpResults  <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database.getExpResults>`_ 
-  method can also be used to select specific results: 
+* *Load the* |express| to be used to constrain the input model.
+  input model. Here, all results are used:
   
 .. literalinclude:: /examples/Example.py
-   :lines: 61
-   
-* *Print basic information about the results loaded*. The selected list of |express| can be used
-  to obtain basic information about the results. Below we show how to count the number of |ULrs|
-  and |EMrs| loaded:    
+   :lines: 59
+
+Alternatively, the `getExpResults  <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database.getExpResults>`_ method takes as arguments specific results to be loaded.
+  
+* *Print basic information about the results loaded*.
+  Below we show how to count the number of |ULrs| and |EMrs| loaded:    
 
 .. literalinclude:: /examples/Example.py
-   :lines: 63-71
+   :lines: 63-70
 
 *output:*
 
@@ -332,9 +329,9 @@ Below we go step-by-step through this example code:
    :lines: 10   
    
    
-* *Compute the* |theory predictions|. For each |expres| in list of selected results,
-  compute the |theory predictions|. The output
-  is a list of `theory prediction objects <../../../documentation/build/html/theory.html#theory.theoryPrediction.TheoryPrediction>`_
+* *Compute the* |theory predictions| for each |expres|.
+  The output is a list of 
+  `theory prediction objects <../../../documentation/build/html/theory.html#theory.theoryPrediction.TheoryPrediction>`_
   (for each |expres|):
   
 .. literalinclude:: /examples/Example.py
@@ -351,9 +348,8 @@ Below we go step-by-step through this example code:
 .. literalinclude:: /images/ExampleOutput.txt
    :lines: 14-21   
    
-* *Get experimental upper limit*. For each |theory prediction|, get the corresponding
-  experimental upper limit. This value can
-  be compared to the |theory prediction| value to decide if a model is excluded or not:
+* *Get the corresponding upper limit*. This value can
+  be compared to the |theory prediction| to decide whether a model is excluded or not:
 
 .. literalinclude:: /examples/Example.py
    :lines: 96-97
@@ -363,23 +359,23 @@ Below we go step-by-step through this example code:
 .. literalinclude:: /images/ExampleOutput.txt
    :lines: 22   
    
-* *Compute the r-value*. Compute the |theory prediction|/upper limit ratio in order
-  to verify which experimental results likely exclude the input model. Also determine
-  the most constraining result:
+* *Compute the r-value*, i.e. the ratio |theory prediction|/upper limit. 
+  A value of r>= 1 means that an experimental result excludes the input model.
+  Also determine the most constraining result:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 98-102
+   :lines: 100-104
    
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
    :lines: 23   
 
-* *Print the most constraing experimental result*. Using the largest *r*-value,
+* *Print the most constraining experimental result*. Using the largest *r*-value,
   determine if the model has been excluded or not by the selected |express|:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 104-108
+   :lines: 107-111
 
 
 *output:*
@@ -387,8 +383,6 @@ Below we go step-by-step through this example code:
 .. literalinclude:: /images/ExampleOutput.txt
    :lines: 411-412   
 
-.. [*] For an SLHA :ref:`input file <BasicInput>`, the decay of :ref:`final states <final states>` (or Z\ :sub:`2`-even particles
-       such as the Higgs, W,...) are always ignored during the decomposition. Furthermore, if there are two cross-sections
-       at different calculation order (say LO and NLO) for the same process, only the highest order is used.
-.. [*] The list of |elements| can be extremely long. Try setting **addElmentInfo** = False and/or **printDecomp** = False to obtain
-       a smaller output.       
+**Notes:**
+- For an SLHA :ref:`input file <BasicInput>`, the decay of :ref:`final states <final states>` (or Z\ :sub:`2`-even particles such as the Higgs, W,...) are always ignored during the decomposition. Furthermore, if there are two cross-sections at different calculation order (say LO and NLO) for the same process, only the highest order is used.
+- The list of |elements| can be extremely long. Try setting **addElmentInfo** = False and/or **printDecomp** = False to obtain a smaller output.       

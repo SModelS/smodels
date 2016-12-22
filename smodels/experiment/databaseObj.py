@@ -30,6 +30,8 @@ class Database(object):
     Database object. Holds a list of ExpResult objects.
     
     :ivar base: path to the database (string)
+    :ivar force_load: force loading the text database ("txt"),
+        or binary database ("pcl"), dont force anything if None
     :ivar expResultList: list of ExpResult objects 
         
     """
