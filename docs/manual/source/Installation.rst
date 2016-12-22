@@ -91,3 +91,33 @@ In some distributions like SL5, the Python default version may be smaller than
 2.6.  In these cases, ``virtualenv`` has to be set up for a Python version >=         2.6.  E.g. for Python 2.6, do ``virtualenv --python=python2.6 <envname>``,            and modify by hand the first line in the executable from ``#!/usr/bin/env python``
 to ``#!/usr/bin/env python2.6``.
 Then perform the steps listed under ``Installation on SL6``.
+
+
+Adding fastlim data
+-------------------
+
+The official SModelS database can be augmented with data from the 
+`fastlim <http://cern.ch/fastlim>`_ database. 
+A tarball with the *properly converted* fastlim efficiency maps can be found in our 
+`download section <http://smodels.hephy.at/downloads/v1.1>`_.
+The tarball then needs to be exploded in the top level directory of the database.
+
+That is, the following steps need to be performed:
+
+ * cd smodels-database
+ * wget http://smodels.hephy.at/downloads/v1.1/smodels-fastlim-v1.1.tgz
+ * tar xzvf smodels-fastlim-v1.1.tgz
+ * rm smodels-fastlim-v1.1.tgz
+
+Please make sure, that when using their efficiency maps, fastlim gets proper
+acknowledgement, see the bibtex file in the smodels-fastlim tarball.
+
+Adding one's own results
+------------------------
+
+As will be explained in :doc:`Database of Experimental Results <DatabaseStructure>`, the database of
+experimental results is organized as files in an ordinary directory hierarchy.
+Therefore, adding additional experimental results is a matter of copying and
+editing text files.  The next time the
+:ref:`Database <Database>` class is instantiated, the binary (Pickle) database
+file is updated automatically.
