@@ -70,7 +70,7 @@ def version(astuple=False):
     l.strip()
     if not astuple:
         return l
-    a = l.split(".")
+    a = l.replace(" ",".",1).split(".")
     for ctr,el in enumerate(a):
         try:
             a[ctr]=int(el)
