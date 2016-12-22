@@ -1,8 +1,11 @@
 #!/bin/sh
 
+CMD=ipython
+# CMD=jupyter
+
 for i in `ls *.ipynb`; do
-	ipython nbconvert --to html $i;
-	ipython nbconvert --to python $i;
+	$CMD nbconvert --to html $i;
+  $CMD nbconvert --to python $i;
 done
 
 mkdir -p ../../build/html/_downloads/
