@@ -221,13 +221,13 @@ Below we describe in detail the blocks contained in the summary output:
 Python Output
 -------------
 
-The python-type output is similar to the :ref:`screen output <screenOut>`, however
-converted to a python dictionary. If all options are set to True,
+The Python-type output is similar to the :ref:`screen output <screenOut>`, however
+converted to a Python dictionary. If all options are set to True,
 it includes information about the |decomposition|, the list of |theory predictions| and model :ref:`coverage <topCoverage>`. 
 The output is printed to the file <input file>.py and stored in the output folder
 (see the :ref:`runSModelS options <runSModelS>`).
 
-Below we describe in detail the dictionary keys and values contained in the python dictionary output:
+Below we describe in detail the dictionary keys and values contained in the Python dictionary output:
 
 * information about the basic input parameters and the status of the run stored under the *OutputStatus* key:
 

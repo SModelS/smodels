@@ -33,7 +33,7 @@ Database: Directory Structure
 -----------------------------
 
 The :ref:`Database <Database>` is organized as files in an ordinary (UNIX)
-directory hierarchy, with a thin python layer serving as the access to the
+directory hierarchy, with a thin Python layer serving as the access to the
 database.  The overall structure of the directory hierarchy and its contents is
 depicted in the scheme below (click to enlarge):
 
@@ -123,7 +123,7 @@ function of the BSM masses:
 .. literalinclude:: /literals/T1tttt.txt
    :lines: 10-20
 
-As we can see, the UL map is given as a python array with the structure: 
+As we can see, the UL map is given as a Python array with the structure: 
 :math:`[[\mbox{masses},\mbox{upper limit}], [\mbox{masses},\mbox{upper limit}],...]`.
 
 Data Set Folder: Efficiency Map Type
@@ -155,7 +155,7 @@ The second block of data contains the efficiency map as a function of the BSM ma
 .. literalinclude:: /literals/T2.txt
    :lines: 9-15
 
-As we can see the efficiency map is given as a python array with the structure: 
+As we can see the efficiency map is given as a Python array with the structure: 
 :math:`[[\mbox{masses},\mbox{efficiency}], [\mbox{masses},\mbox{efficiency}],...]`.
 
 .. _objStruct:
@@ -163,7 +163,7 @@ As we can see the efficiency map is given as a python array with the structure:
 Database: Object Structure
 --------------------------
 
-The :ref:`Database  folder structure <folderStruct>` is mapped to python
+The :ref:`Database  folder structure <folderStruct>` is mapped to Python
 objects in SModelS.
 The mapping is almost one-to-one, except for a few exceptions.
 Below we show the overall object structure  as well as the folders/files the objects
@@ -172,9 +172,9 @@ represent (click to enlarge):
 .. image:: images/DatabaseObjects.png
    :width: 80%
    
-The type of python object (python class, phyton list,...) is shown in brackets.
+The type of Python object (Python class, Python list,...) is shown in brackets.
 For convenience, below we explicitly list the main database folders/files and
-the python objects they are mapped to:
+the Python objects they are mapped to:
 
 * |Database| folder :math:`\rightarrow` `Database Class <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
 * |ExpRes| folder :math:`\rightarrow` `ExpResult Class <../../../documentation/build/html/experiment.html#experiment.databaseObj.ExpResult>`_

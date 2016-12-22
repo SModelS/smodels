@@ -42,7 +42,7 @@ Running SModelS
 
 SModelS can take SLHA or LHE files as input (see :doc:`Basic Input <BasicInput>`). It ships with a command-line tool :ref:`runSModelS.py <runSModelS>`, which reports on the SMS |decomposition| and |theory predictions| in several :ref:`output formats <smodelsOutput>`.  
 
-For users more familiar with python and the SModelS basics, an example
+For users more familiar with Python and the SModelS basics, an example
 code :ref:`Example.py <exampleCode>` is provided showing how to access
 the main SModelS functionalities: :ref:`decomposition <Decomposition>`, |database|
 and :ref:`computation of theory predictions <TheoryPredictions>`.

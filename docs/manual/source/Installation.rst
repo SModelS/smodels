@@ -30,7 +30,7 @@ Thus ::
 should install the entire project, compile the internal Pythia and NLL-fast versions
 using gfortran. It should also resolve the external dependencies, i.e. install
 the Python libraries listed above using e.g. *pip*.
-If the python libraries are installed in a system folder (as is the default behavior),
+If the Python libraries are installed in a system folder (as is the default behavior),
 it will be necessary to run the install command with superuser privilege.
 Alternatively, one can run setup.py with the argument "--user".
 
@@ -87,7 +87,7 @@ Pip can also be called with the "--user" option.
 Installation on SL5 and similar distributions
 ---------------------------------------------
 
-In some distributions like SL5, the python default version may be smaller than
-2.6.  In these cases, ``virtualenv`` has to be set up for a python version >=         2.6.  E.g. for python 2.6, do ``virtualenv --python=python2.6 <envname>``,            and modify by hand the first line in the executable from ``#!/usr/bin/env python``
+In some distributions like SL5, the Python default version may be smaller than
+2.6.  In these cases, ``virtualenv`` has to be set up for a Python version >=         2.6.  E.g. for Python 2.6, do ``virtualenv --python=python2.6 <envname>``,            and modify by hand the first line in the executable from ``#!/usr/bin/env python``
 to ``#!/usr/bin/env python2.6``.
 Then perform the steps listed under ``Installation on SL6``.
