@@ -20,7 +20,7 @@ Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
 Theory Prediction =  8.00E+00 [TeV]:1.32E-04 [pb]
 Condition Violation =  None
 Theory Prediction UL =  4.90E-01 [fb]
-R =  2.69E-01 
+r =  2.69E-01 
 
  ATLAS-CONF-2013-037 
 ------------------------

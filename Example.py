@@ -18,7 +18,7 @@ from smodels.tools.physicsUnits import fb, GeV
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.experiment.databaseObj import Database
 
-#Set the path to the database folder
+# Set the path to the database folder
 database = Database("../smodels-database/")
 
 def main():
@@ -27,20 +27,19 @@ def main():
 
     """
     
-    #Path to input file name (either a SLHA or LHE file)
+    # Path to input file (either a SLHA or LHE file)
     slhafile = 'inputFiles/slha/lightEWinos.slha'
-#     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
+    # lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
 
-    #Set main options for decomposition:
+    # Set main options for decomposition
     sigmacut = 0.3 * fb
     mingap = 5. * GeV
 
-    """ Decompose model (use slhaDecomposer for SLHA input or lheDecomposer for LHE input) """
+    # Decompose model (use slhaDecomposer for SLHA input or lheDecomposer for LHE input)
     toplist = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
     # toplist = lheDecomposer.decompose(lhefile, doCompress=True,doInvisible=True, minmassgap=mingap)
     
-    #How to access some basic information from decomposition:
-    # Print basic information from decomposition:
+    # Access basic information from decomposition, using the topology list and topology objects:
     print "\n Decomposition Results: "
     print "\t  Total number of topologies: %i " %len(toplist)
     nel = sum([len(top.elementList) for top in toplist])
@@ -55,11 +54,12 @@ def main():
     print "\t\t %i-th element from %i-th topology  = " %(n,m),el,
     print "\n\t\t\twith cross-section =",el.weight,"\n\t\t\tand masses = ",el.getMasses() 
             
-    
-                                                                                                                                            
-    # Load all analyses from database
+    # Load the experimental results to be used.
+    # In this case, all results are employed.
     listOfExpRes = database.getExpResults()
-    #Count number of loaded UL and EM experimental results:
+
+    # Print basic information about the results loaded.
+    # Count the number of loaded UL and EM experimental results:
     nUL, nEM = 0, 0
     for exp in listOfExpRes:
         expType = exp.getValuesFor('dataType')[0]
@@ -67,16 +67,16 @@ def main():
             nUL += 1
         elif  expType == 'efficiencyMap':
             nEM += 1
-    #Print basic information about the loaded database:
     print "\n Loaded Database with %i UL results and %i EM results " %(nUL,nEM)
 
-    # Compute the theory predictions for each experimental result and print the results:
+
+    # Compute the theory predictions for each experimental result and print them:
     print("\n Theory Predictions and Constraints:")
     rmax = 0.
     bestResult = None
     for expResult in listOfExpRes:
         predictions = theoryPredictionsFor(expResult, toplist)
-        if not predictions: continue #Skip if there are no constraints from this result
+        if not predictions: continue # Skip if there are no constraints from this result
         print('\n %s ' %expResult.globalInfo.id)
         for theoryPrediction in predictions:
             dataset = theoryPrediction.dataset
@@ -92,15 +92,18 @@ def main():
             print "Theory Prediction = ",theoryPrediction.xsection   #Signal cross-section
             print "Condition Violation = ",theoryPrediction.conditions  #Condition violation values
               
-            #Get upper limit for the respective prediction:
+            # Get the corresponding upper limit:
             ul = expResult.getUpperLimitFor(txname=txnames[0],mass=mass,dataID=datasetID)                     
             print "Theory Prediction UL = ",ul
+
+            # Compute the r-value
             r = theoryPrediction.xsection.value/ul
-            print "R = ",r
+            print "r = ",r
             if r > rmax:
                 rmax = r
                 bestResult = expResult.globalInfo.id
             
+    # Print the most constraining experimental result
     print "\nThe largest r-value (theory/upper limit ratio) is ",rmax
     if rmax > 1.:
         print "(The input model is likely excluded by %s)" %bestResult

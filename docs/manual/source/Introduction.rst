@@ -56,17 +56,17 @@ For example code for various tasks, see :ref:`Examples`
 
 **References**:
 
-.. [c1] https://twiki.cern.ch/twiki/bin/view/AtlasPublic/SupersymmetryPublicResults
+ [1] https://twiki.cern.ch/twiki/bin/view/AtlasPublic/SupersymmetryPublicResults
 
-.. [c2] https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS
+ [2] https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS
 
  [3] Heavy Flavor Averaging Group Collaboration, Y. Amhis et al.,
  Averages of B-Hadron, C-Hadron, and tau-lepton properties as of
- early 2012, 1207.1158. and HFAG2013 update at http://www.slac.
- stanford.edu/xorg/hfag/
+ early 2012, 1207.1158. and HFAG2013 update at 
+ http://www.slac.stanford.edu/xorg/hfag/
 
  [4] LHCb Collaboration, R. Aaij et al., First evidence for the decay
- B s → μ + μ - , Phys. Rev. Lett. 110, 021801 (2013), 1211.2674
+ B s → μ+ μ- , Phys. Rev. Lett. 110, 021801 (2013), 1211.2674
 
  [5] ATLAS Collaboration, G. Aad et al., Observation of a new particle
  in the search for the Standard Model Higgs boson with the ATLAS

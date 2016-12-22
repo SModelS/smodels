@@ -11,5 +11,6 @@ The basic SModelS framework consists of the following main parts:
    BasicInput
    Decomposition
    TheoryPredictions
-   ConfrontPredictions
    DatabaseStructure
+   ConfrontPredictions
+   OutputDescription
