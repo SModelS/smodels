@@ -5,6 +5,7 @@
 
 import os
 import commands
+import sys
 
 fastlimdir = "../../smodels-fastlim"
 
@@ -63,13 +64,28 @@ def traverse( dryrun ):
                 continue
             for analysis in os.listdir ( fulldir ):
                 fullpath = os.path.join ( fulldir, analysis )
-                gif=open ( fullpath + "/globalInfo.txt" )
+                gi = fullpath + "/globalInfo.txt"
+                if not os.path.exists ( gi ):
+                    continue
+                gif=open ( gi )
                 lines=gif.readlines()
                 for line in lines:
                     if "fastlim" in line:
                         isFastlim ( fullpath, dryrun )
                         break
                 gif.close()
+
+def error ( text ):
+    print "ERROR: %s" % text
+
+def moveBibFile ( dryrun ):
+    """ move fastlim-specific bibliography file """
+    fastlim_bib = "references-fastlim.bib"
+    if not os.path.exists ( fastlim_bib ):
+        error ( "%s is missing!" % fastlim_bib )
+    else:
+        cmd = "mv %s %s" % ( fastlim_bib, fastlimdir )
+        run ( cmd, dryrun )
 
 if __name__ == "__main__":
     import argparse
@@ -82,4 +98,5 @@ if __name__ == "__main__":
     rmDirs()
     mkDirs()
     traverse( args.dryrun )
+    moveBibFile ( args.dryrun )
     createFastlimTarball()
