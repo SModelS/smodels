@@ -109,6 +109,8 @@ That is, the following steps need to be performed:
  * tar xzvf smodels-fastlim-v1.1.tgz
  * rm smodels-fastlim-v1.1.tgz
 
+SModelS auto-detects fastlim results and issues an acknowledgement.
+
 Please make sure, that when using their efficiency maps, fastlim gets proper
 acknowledgement, see the bibtex file in the smodels-fastlim tarball.
 
