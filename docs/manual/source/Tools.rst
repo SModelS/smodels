@@ -246,7 +246,7 @@ This can be conveniently done using the database browser. The browser owns sever
 or |Datasets| satisfying some user-defined conditions as well as to access the meta data and data inside each
 |ExpRes|.
 
-An interface to the |Database| browser is provided through an ipython session.
+An interface to the |Database| browser is provided through an IPython session.
 
 **The usage of the browser interface is:**
 
@@ -270,13 +270,13 @@ A typical usage example is: ::
 
 Loading the database may take a few seconds if the :ref:`binary database file <databasePickle>` exists.
 Otherwise the :ref:`pickle file <databasePickle>` will be created.
-The user can then use the ipython session (including its auto-complete functions)
+The user can then use the IPython session (including its auto-complete functions)
 to select specific experimental results (or groups of experimental results),
 check upper limits and/or efficiencies for specific masses/topologies and access all the available
 information in the database.
 A simple example is given below:
 
-.. code-block:: ipython
+.. code-block:: IPython
 
    In [1]: print browser  #Print all experimental results in the browser
    ['ATLAS-SUSY-2015-09', 'CMS-SUS-PAS-15-002', 'ATLAS-CONF-2012-105', 'ATLAS-CONF-2012-166', 'ATLAS-CONF-2013-001', 'ATLAS-CONF-2013-007', 'ATLAS-CONF-2013-024', 'ATLAS-CONF-2013-024', 'ATLAS-CONF-2013-025', 'ATLAS-CONF-2013-028', 'ATLAS-CONF-2013-035', 'ATLAS-CONF-2013-035', 'ATLAS-CONF-2013-036', 'ATLAS-CONF-2013-037', 'ATLAS-CONF-2013-037', 'ATLAS-CONF-2013-047', 'ATLAS-CONF-2013-047', 'ATLAS-CONF-2013-048', 'ATLAS-CONF-2013-048', 'ATLAS-CONF-2013-049', 'ATLAS-CONF-2013-049', 'ATLAS-CONF-2013-053', 'ATLAS-CONF-2013-053', 'ATLAS-CONF-2013-054', 'ATLAS-CONF-2013-061', 'ATLAS-CONF-2013-061', 'ATLAS-CONF-2013-062', 'ATLAS-CONF-2013-062', 'ATLAS-CONF-2013-065', 'ATLAS-CONF-2013-089', 'ATLAS-CONF-2013-093', 'ATLAS-CONF-2013-093', 'ATLAS-SUSY-2013-02', 'ATLAS-SUSY-2013-02', 'ATLAS-SUSY-2013-04', 'ATLAS-SUSY-2013-04', 'ATLAS-SUSY-2013-05', 'ATLAS-SUSY-2013-05', 'ATLAS-SUSY-2013-08', 'ATLAS-SUSY-2013-09', 'ATLAS-SUSY-2013-09', 'ATLAS-SUSY-2013-11', 'ATLAS-SUSY-2013-11', 'ATLAS-SUSY-2013-12', 'ATLAS-SUSY-2013-14', 'ATLAS-SUSY-2013-15', 'ATLAS-SUSY-2013-15', 'ATLAS-SUSY-2013-16', 'ATLAS-SUSY-2013-16', 'ATLAS-SUSY-2013-18', 'ATLAS-SUSY-2013-18', 'ATLAS-SUSY-2013-19', 'ATLAS-SUSY-2013-21', 'ATLAS-SUSY-2013-23', 'ATLAS-SUSY-2014-03', 'CMS-PAS-SUS-12-022', 'CMS-PAS-SUS-12-026', 'CMS-PAS-SUS-13-015', 'CMS-PAS-SUS-13-015', 'CMS-PAS-SUS-13-016', 'CMS-PAS-SUS-13-016', 'CMS-PAS-SUS-13-018', 'CMS-PAS-SUS-13-023', 'CMS-PAS-SUS-14-011', 'CMS-SUS-12-024', 'CMS-SUS-12-024', 'CMS-SUS-12-028', 'CMS-SUS-13-002', 'CMS-SUS-13-004', 'CMS-SUS-13-006', 'CMS-SUS-13-006', 'CMS-SUS-13-007', 'CMS-SUS-13-007', 'CMS-SUS-13-011', 'CMS-SUS-13-011', 'CMS-SUS-13-012', 'CMS-SUS-13-013', 'CMS-SUS-13-013', 'CMS-SUS-13-019', 'CMS-SUS-14-010', 'CMS-SUS-14-021', 'CMS-SUS-14-021']
@@ -341,7 +341,7 @@ A simple example is given below:
 
 
 
-Further python example codes using the functionalities of the browser
+Further Python example codes using the functionalities of the browser
 can be found in :ref:`Howto's <Examples>`.
 
 * **The Database browser tool is implemented by the**  `Browser class <../../../documentation/build/html/tools.html#tools.databaseBrowser.Browser>`_
