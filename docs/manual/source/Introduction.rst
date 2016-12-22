@@ -66,7 +66,7 @@ For example code for various tasks, see :ref:`Examples`
  http://www.slac.stanford.edu/xorg/hfag/
 
  [4] LHCb Collaboration, R. Aaij et al., First evidence for the decay
- B s → μ+ μ- , Phys. Rev. Lett. 110, 021801 (2013), 1211.2674
+ B\ :sub:`s` → μ\ :sup:`+` μ\ :sup:`-` , Phys. Rev. Lett. 110, 021801 (2013), 1211.2674
 
  [5] ATLAS Collaboration, G. Aad et al., Observation of a new particle
  in the search for the Standard Model Higgs boson with the ATLAS
