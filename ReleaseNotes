@@ -2,11 +2,11 @@ Release v1.1.0, ....
 =======================================================
 
   * Initial support for efficiency maps (Andre Lessa and Wolfgang Waltenberger)
-	* Major speedups (Andre Lessa and Wolfgang Waltenberger)
-	* Support for much faster binary, caching database (Wolfgang Waltenberger)
-	* Support for likelihoods and chi-2 computation (Jory Sonneveld)
-	* Database with more analyses (Federico Ambrogi and Suchita Kulkarni)
-	* Added fastlim results to database (Andre Lessa and Wolfgang Waltenberger)
+  * Major speedups (Andre Lessa and Wolfgang Waltenberger)
+  * Support for much faster binary, caching database (Wolfgang Waltenberger)
+  * Support for likelihoods and chi-2 computation (Jory Sonneveld)
+  * Database with more analyses (Federico Ambrogi and Suchita Kulkarni)
+  * Added fastlim results to database (Andre Lessa and Wolfgang Waltenberger)
 
 
 Release v1.0.4, Fri 11 Mar 2016 11:18:46 AM CET 
