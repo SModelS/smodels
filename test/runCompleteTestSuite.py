@@ -29,16 +29,20 @@ def run():
 
 def verbose_run():
     alltests = unittest.TestLoader().discover("./") 
+    n_tests, n_failed = 0, 0
     for series in alltests:
         for test in series:
             for t in test:
-                print ( "[runCompleteTestSuite] now run",t.id() )
+                print ( "[runCompleteTestSuite]",t.id() )
+                n_tests += 1
                 try:
                     a=t.debug()
                 except Exception as e:
+                    n_failed += 1
                     print ( "[runCompleteTestSuite] FAILED! %s" % str(e) )
                 #a=t.run() ## python3
                 # print ( "a=",a )
+    print( "[runCompleteTestSuite] %d/%d tests failed." % ( n_failed, n_tests ))
 
 def parallel_run ( verbose ):
     if verbose:
