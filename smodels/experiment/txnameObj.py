@@ -317,9 +317,11 @@ class TxNameData(object):
         return ret
 
     def interpolate(self, uvw, fill_value=np.nan):
-        tol = sys.float_info.epsilon * 1e6
+        tol = 1e-6
+        # tol = sys.float_info.epsilon * 1e10
         simplex = self.tri.find_simplex(uvw, tol=tol)
-        # print ( "simplex=",simplex )
+        if simplex[0]==-1: ## not inside any simplex?
+            return fill_value
         vertices = np.take(self.tri.simplices, simplex, axis=0)
         temp = np.take(self.tri.transform, simplex, axis=0)
         d=temp.shape[2]
@@ -333,8 +335,10 @@ class TxNameData(object):
         else:
             values = np.array ( [ x.asNumber() for x in self.xsec ] )
         ret = np.einsum('nj,nj->n', np.take(values, self.vtx), self.wts)
-        with np.errstate(invalid='ignore'):
-            ret[np.any(self.wts < -1e-10, axis=1)] = fill_value
+        # the following was just a test to see if the point is outside the
+        # convex hull, but we check this via simplex[0]==-1, anyways.
+        #with np.errstate(invalid='ignore'):
+        #    ret[np.any(self.wts < -1e-10, axis=1)] = fill_value
         return float(ret[0])
 
 
