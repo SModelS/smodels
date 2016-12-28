@@ -33,7 +33,7 @@ from math import floor, log10
 class TxName(object):
     """
     Holds the information related to one txname in the Txname.txt
-    file (constraint, condition,...) as well as the _data.
+    file (constraint, condition,...) as well as the data.
     """
 
     def __init__(self, path, globalObj, infoObj):
@@ -200,7 +200,7 @@ class TxName(object):
         if type(val) == type(fb):
             return 1.  #The element has an UL, return 1
         elif val is None or math.isnan(val):
-            return 0.  #The element mass is outside the _data grid
+            return 0.  #The element mass is outside the data grid
         elif type(val) == type(1.):
             return val  #The element has an eff
         else:
@@ -209,12 +209,12 @@ class TxName(object):
 
 class TxNameData(object):
     """
-    Holds the _data for the Txname object.  It holds Upper limit values or efficiencies.
+    Holds the data for the Txname object.  It holds Upper limit values or efficiencies.
     """
 
     def __init__(self,value,datatag,Id,accept_errors_upto=.05):
         """
-        :param value: _data in string format
+        :param value: values in string format
         :param datatag: the dataTag (upperLimits or efficiencyMap)
         :param Id: an identifier, must be unique for each TxNameData!
         :param _accept_errors_upto: If None, do not allow extrapolations outside of
@@ -227,7 +227,6 @@ class TxNameData(object):
         self._id = Id
         self._accept_errors_upto=accept_errors_upto
         self._V = None
-        self._data = None
         self.loadData( value )
 
     def __str__ ( self ):
@@ -244,41 +243,39 @@ class TxNameData(object):
         return not self.__eq__ ( other )
 
     def __eq__ ( self, other ):
-        return self._data == other._data
+        return self._id == other._id
 
     def loadData(self,value):
         """
-        Uses the information in value to generate the _data grid used for
+        Uses the information in value to generate the data grid used for
         interpolation.
         """
 
-        if self._data:
+        if self._V:
             return
 
         if type(value)==str:
-            self._data = eval(value, {'fb':fb, 'pb':pb, 'GeV':GeV, 'TeV':TeV})
-        else: ## the _data can also be given as lists, for debugging
-            self._data = value
+            value = eval(value, {'fb':fb, 'pb':pb, 'GeV':GeV, 'TeV':TeV})
         self.unit = 1.0 ## store the unit so that we can take arbitrary units for
                         ## the "z" values.  default is unitless,
                         ## which we use for efficiency maps
-        if len(self._data) < 1 or len(self._data[0]) < 2:
-                logger.error ( "input _data not in correct format. expecting sth " \
+        if len(value) < 1 or len(value[0]) < 2:
+                logger.error ( "input value not in correct format. expecting sth " \
                                "like [ [ [[ 300.*GeV,100.*GeV], "\
                                "[ 300.*GeV,100.*GeV] ], 10.*fb ], ... ] "\
                                "for upper limits or [ [ [[ 300.*GeV,100.*GeV],"\
                                " [ 300.*GeV,100.*GeV] ], .1 ], ... ] for "\
                                "efficiency maps" )
-        if type(self._data[0][1])==unum.Unum:
+        if type(value[0][1])==unum.Unum:
             ## if its a unum, we store 1.0 * unit
-            self.unit=self._data[0][1] / ( self._data[0][1].asNumber() )
+            self.unit=value[0][1] / ( value[0][1].asNumber() )
 
-        self.computeV()
+        self.computeV( value )
 
     @_memoize
     def getValueFor(self,massarray):
         """
-        Interpolates the _data and returns the UL or efficiency for the
+        Interpolates the value and returns the UL or efficiency for the
         respective massarray
         
         :param massarray: mass array values (with units), i.e.
@@ -288,7 +285,7 @@ class TxNameData(object):
         self.massarray = massarray
         if len(porig)!=self.full_dimensionality:
             logger.error ( "dimensional error. I have been asked to compare a "\
-                    "%d-dimensional mass vector with %d-dimensional _data!" % \
+                    "%d-dimensional mass vector with %d-dimensional data!" % \
                     ( len(porig), self.full_dimensionality ) )
             return None
         p= ( (np.matrix(porig)[0] - self.delta_x ) ).tolist()[0]
@@ -298,7 +295,7 @@ class TxNameData(object):
 
         # self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
         # self.projected_value = float(self.projected_value)
-        if dp > self.dimensionality: ## we have _data in different dimensions
+        if dp > self.dimensionality: ## we have data in different dimensions
             if self._accept_errors_upto == None:
                 return None
             logger.debug( "attempting to interpolate outside of convex hull "\
@@ -327,14 +324,14 @@ class TxNameData(object):
         d=temp.shape[2]
         delta = uvw - temp[:, d]
         bary = np.einsum('njk,nk->nj', temp[:, :d, :], delta)
-        self.vtx = vertices
-        self.wts = np.hstack((bary, 1 - bary.sum(axis=1, keepdims=True)))
+        vtx = vertices
+        wts = np.hstack((bary, 1 - bary.sum(axis=1, keepdims=True)))
         v=self.xsec
         if type (self.xsec[0]) == float:
             values = np.array ( [ float(x) for x in self.xsec ] )
         else:
             values = np.array ( [ x.asNumber() for x in self.xsec ] )
-        ret = np.einsum('nj,nj->n', np.take(values, self.vtx), self.wts)
+        ret = np.einsum('nj,nj->n', np.take(values, vtx), wts)
         # the following was just a test to see if the point is outside the
         # convex hull, but we check this via simplex[0]==-1, anyways.
         #with np.errstate(invalid='ignore'):
@@ -449,15 +446,14 @@ class TxNameData(object):
                 nz+=1
         return nz
 
-    def computeV ( self ):
-        """ compute rotation matrix _V, rotate and truncate also
-            '_data' points and store in self.Mp """
+    def computeV ( self, values ):
+        """ compute rotation matrix _V, and triangulation self.tri """
         if self._V!=None:
              return
         Morig=[]
         self.xsec=[]
 
-        for x,y in self._data:
+        for x,y in values:
             self.xsec.append ( y / self.unit )
             xp = self.flattenMassArray ( x )
             Morig.append ( xp )
@@ -488,7 +484,7 @@ class TxNameData(object):
             if nz>self.dimensionality:
                 self.dimensionality=nz
         ## print "dim=",self.dimensionality
-        self.MpCut=[]
+        # self.MpCut=[]
         MpCut=[]
         for i in Mp:
             if self.dimensionality > 1:
@@ -501,8 +497,8 @@ class TxNameData(object):
             self.xsec += self.xsec + self.xsec
             self.dimensionality = 2
              
-        self.Mp=MpCut ## also keep the rotated points, with truncated zeros
-        self.tri = qhull.Delaunay( self.Mp )
+        # self.Mp=MpCut ## also keep the rotated points, with truncated zeros
+        self.tri = qhull.Delaunay( MpCut )
 
 if __name__ == "__main__":
     import time
