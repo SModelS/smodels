@@ -117,10 +117,10 @@ ATLAS-CONF-2013-089  8.00E+00    0.0  6.617E+00  4.010E+04  1.650E-04  N/A
 ================================================================================
 The highest r value is = 0.545037998842
 
-Total missing topology cross section:  2.767E+02
-Total cross section where we are outside the mass grid:  6.286E+01
-Total cross section in long cascade decays:  1.096E+02
-Total cross section in decays with asymmetric branches:  1.630E+02
+Total missing topology cross section (fb):  2.767E+02
+Total cross section where we are outside the mass grid (fb):  6.286E+01
+Total cross section in long cascade decays (fb):  1.096E+02
+Total cross section in decays with asymmetric branches (fb):  1.630E+02
 
 Full information on unconstrained cross sections
 ================================================================================

@@ -18280,10 +18280,10 @@ PIDs:[[-1000004, -1000024, -1000022], [1000001, -1000024, -1000022]]
 PIDs:[[-1000002, -1000024, -1000022], [1000001, -1000024, -1000022]]
 PIDs:[[1000001, -1000024, -1000022], [1000001, -1000024, -1000022]]
 
-Total missing topology cross section:  2.767E+02
-Total cross section where we are outside the mass grid:  6.286E+01
-Total cross section in long cascade decays:  1.096E+02
-Total cross section in decays with asymmetric branches:  1.630E+02
+Total missing topology cross section (fb):  2.767E+02
+Total cross section where we are outside the mass grid (fb):  6.286E+01
+Total cross section in long cascade decays (fb):  1.096E+02
+Total cross section in decays with asymmetric branches (fb):  1.630E+02
 
 Full information on unconstrained cross sections
 ================================================================================
