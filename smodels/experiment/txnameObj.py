@@ -437,7 +437,7 @@ class TxNameData(object):
                     "convex hull? original point=%s" % self.massarray )
             return None
         #Set value to zero if it is lower than machine precision (avoids fake negative values)
-        if abs(self.projected_value) < np.finfo(float).eps:
+        if abs(self.projected_value) < 100.*sys.float_info.epsilon:
             self.projected_value = 0.
         return self.projected_value * self.unit
 
