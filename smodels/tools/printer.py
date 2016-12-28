@@ -475,10 +475,10 @@ class TxTPrinter(BasicPrinter):
         nprint = 10  # Number of missing topologies to be printed (ordered by cross-sections)
 
         output = ""
-        output += "\nTotal missing topology cross section: %10.3E\n" %(obj.getMissingXsec())
-        output += "Total cross section where we are outside the mass grid: %10.3E\n" %(obj.getOutOfGridXsec())
-        output += "Total cross section in long cascade decays: %10.3E\n" %(obj.getLongCascadeXsec())
-        output += "Total cross section in decays with asymmetric branches: %10.3E\n" %(obj.getAsymmetricXsec())        
+        output += "\nTotal missing topology cross section (fb): %10.3E\n" %(obj.getMissingXsec())
+        output += "Total cross section where we are outside the mass grid (fb): %10.3E\n" %(obj.getOutOfGridXsec())
+        output += "Total cross section in long cascade decays (fb): %10.3E\n" %(obj.getLongCascadeXsec())
+        output += "Total cross section in decays with asymmetric branches (fb): %10.3E\n" %(obj.getAsymmetricXsec())        
         output += "\nFull information on unconstrained cross sections\n"
         output += "================================================================================\n"
         for ix, uncovEntry in enumerate([obj.missingTopos, obj.outsideGrid]):
