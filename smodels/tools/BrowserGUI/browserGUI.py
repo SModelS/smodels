@@ -8,6 +8,7 @@
 """
 
 from kivy.logger import Logger
+import logging
 Logger.setLevel(logging.WARNING)
 
 import sys,os
@@ -32,7 +33,7 @@ class databaseBrowserGUIApp(App):
 if __name__ == "__main__":
     
     #First check if the database folder exists:
-    databasePath = os.path.join(os.getenv("HOME"),'smodels-database/database_light.pcl')
+    databasePath = os.path.join(os.getenv("HOME"),'smodels-database/database.pcl')
     if  len(sys.argv) > 1:
         databasePath = sys.argv[1]
     if not os.path.isdir(databasePath) and not os.path.isfile(databasePath):

@@ -51,7 +51,7 @@ class Database(object):
         self.txt_mtime = None, None
         self.pcl_mtime = None, None
         self.pcl_db = None
-        self.sw_format_version = "114" ## what format does the software support?
+        self.sw_format_version = "115" ## what format does the software support?
         self.pcl_format_version = None ## what format is in the binary file?
         self.binfile = os.path.join ( self._base, self.pclfilename )
         setLogLevel ( self._verbosity )
