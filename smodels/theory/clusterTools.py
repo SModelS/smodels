@@ -121,9 +121,9 @@ class ElementCluster(object):
             return None
         else:
             #Check the data types
-            for txname in self.txnames:                
-                if not txname.txnameData._data:
-                    txname.txnameData.loadData()  #Make sure the _data is loaded
+            #for txname in self.txnames:                
+            #    if not txname.txnameData._data:
+            #        txname.txnameData.loadData()  #Make sure the _data is loaded
                     
             dataTag = list(set([txname.txnameData.dataTag for txname in self.txnames]))            
             if len(dataTag) != 1:
