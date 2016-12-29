@@ -57,23 +57,25 @@ def getPdg(name):
 def elementsInStr(instring):
     """
     Parse instring and return a list of elements appearing in instring.
-    
     instring can also be a list of strings.
     
     :returns: list of elements appearing in instring in string format
     
     """
     
+    outstr = ""
     if type(instring) == type('st'):
         outstr = instring
     elif type(instring) == type([]):
-        outstr = ""
         for st in instring:
             if type(st) != type('st'):
                 logger.error("Input must be a string or a list of strings")
                 raise SModelSError()
             # Combine list of strings in a single string
             outstr += st
+    else:
+        raise SModelSError ( "syntax error in constraint/condition: ``%s''." \
+              "Check your constraints and conditions in your database." % str(instring) )
 
     elements = []
     outstr = outstr.replace(" ", "").replace("'", "")
