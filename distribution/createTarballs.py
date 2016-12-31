@@ -71,7 +71,8 @@ def removeNonValidated():
             for dataset in er.datasets:
                 hasTxNames=False
                 for txn in dataset.txnameList:
-                    if txn.validated in [ None, False ]:
+#                    if txn.validated in [ None, False ]:
+                    if txn.validated in [ False ]:
                         comment ( "%s/%s/%s is not validated. Delete it." % \
                                   ( er, dataset, txn ) )
                         cmd="rm %s" % txn.path
