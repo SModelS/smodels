@@ -210,7 +210,10 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
     """ loop over input files and run SModelS """
     ncpusAll = runtime.nCPUs()
     ncpus = parser.getint("parameters", "ncpus")
-    if ncpus < 1 or ncpus > ncpusAll: ncpus = ncpusAll
+    if ncpus == 0 or ncpus < -1:
+        logger.error ( "Weird number of ncpus given in ini file: %d" % ncpus )
+        sys.exit()
+    if ncpus == -1 or ncpus > ncpusAll: ncpus = ncpusAll
     logger.info ("Running SModelS on %d cores" % ncpus )
 
     cleanedList = []
