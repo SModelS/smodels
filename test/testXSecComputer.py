@@ -31,33 +31,33 @@ class XSecTest(unittest.TestCase):
         """ test the computation of LO cross section """
         self.logger.info ( "test LO xsecs @ 8 TeV" )
         slhafile="../inputFiles/slha/simplyGluino.slha"
-        w = xsecComputer.computeXSec(8*TeV,LO,1000, slhafile ).getDictionary()
+        w = xsecComputer.computeXSec(8*TeV,LO,100, slhafile ).getDictionary()
         w8lo= w[(1000021, 1000021)]['8 TeV (LO)'].asNumber( fb )
-        self.assertAlmostEqual(w8lo, 268.4799000000022  ) ## 268.48 fb
+        self.assertAlmostEqual(w8lo, 268.2255 ) 
 
     def testNLLGlu(self):
         """ test the computation of NLL cross section """
         self.logger.info ( "test NLL xsecs @ 8 TeV" )
         slhafile="../inputFiles/slha/simplyGluino.slha"
-        w = xsecComputer.computeXSec(8*TeV,NLL,1000, slhafile ).getDictionary()
+        w = xsecComputer.computeXSec(8*TeV,NLL,100, slhafile ).getDictionary()
         w8nll= w[(1000021, 1000021)]['8 TeV (NLO+NLL)'].asNumber( fb )
-        self.assertAlmostEqual(w8nll, 583.1651907900048 ) ## 583.165 fb
+        self.assertAlmostEqual(w8nll, 582.61261, 4 )
 
     def testLOGlu13(self):
         """ test the computation of LO cross section """
         self.logger.info ( "test LO xsecs @ 13 TeV" )
         slhafile="../inputFiles/slha/simplyGluino.slha"
-        w = xsecComputer.computeXSec( 13*TeV,LO,1000, slhafile ).getDictionary()
+        w = xsecComputer.computeXSec( 13*TeV,LO,100, slhafile ).getDictionary()
         w13lo= w[(1000021, 1000021)]['13 TeV (LO)'].asNumber( fb )
-        self.assertAlmostEqual(w13lo, 2247.2357000000325 )
+        self.assertAlmostEqual(w13lo, 2240.7303 )
 
     def testNLLGlu13(self):
         """ test the computation of NLL cross section """
         self.logger.info ( "test NLL xsecs @ 13 TeV" )
         slhafile="../inputFiles/slha/simplyGluino.slha"
-        w = xsecComputer.computeXSec( 13*TeV,NLL,1000, slhafile ).getDictionary()
+        w = xsecComputer.computeXSec( 13*TeV,NLL,100, slhafile ).getDictionary()
         w13nll= w[(1000021, 1000021)]['13 TeV (NLO+NLL)'].asNumber( fb )
-        self.assertAlmostEqual(w13nll, 4341.659372400062)
+        self.assertAlmostEqual(w13nll, 4329.091, 3 )
         
     def testXSecMain(self):
         """ test the main routine for computation of LO and NLL cross section for several sqrts"""
@@ -79,7 +79,7 @@ class XSecTest(unittest.TestCase):
         xargs = argparse.Namespace()
         xargs.sqrts = [[8.,13.]]
         xargs.ncpus = 1
-        xargs.nevents = 1000
+        xargs.nevents = 100
         #Compute LO xsecs:
         xargs.query = False
         xargs.NLL = False
@@ -102,13 +102,13 @@ class XSecTest(unittest.TestCase):
         #Check 8 TeV xsecs:
         lo = xsecsInfile.getXsecsFor('8 TeV (LO)')[0].value.asNumber(fb)
         nll = xsecsInfile.getXsecsFor('8 TeV (NLL)')[0].value.asNumber(fb)
-        self.assertAlmostEqual(lo,268.479900,3)
-        self.assertAlmostEqual(nll,583.165191,3)
+        self.assertAlmostEqual(lo,268.2255,3)
+        self.assertAlmostEqual(nll,582.612609,3)
         #Check 13 TeV xsecs:
         lo = xsecsInfile.getXsecsFor('13 TeV (LO)')[0].value.asNumber(fb)
         nll = xsecsInfile.getXsecsFor('13 TeV (NLL)')[0].value.asNumber(fb)
-        self.assertAlmostEqual(lo,2247.23570,2)
-        self.assertAlmostEqual(nll,4341.65931,2)
+        self.assertAlmostEqual(lo,2240.7303,2 )
+        self.assertAlmostEqual(nll,4329.09094,2)
 
         
         
