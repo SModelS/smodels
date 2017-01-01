@@ -369,7 +369,10 @@ def main(args):
         pythiacard = args.pythiacard
     else:
         pythiacard = None
-    if ncpus == -1: 
+    if ncpus < -1 or ncpus == 0:
+        logger.error ( "Weird number of CPUs given: %d" % ncpus )
+        sys.exit()
+    if ncpus == -1:
         ncpus = runtime.nCPUs()
     logger.info ( "We run on %d cpus" % ncpus )
     children = []
