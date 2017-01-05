@@ -24,22 +24,18 @@ libraries:
  * scipy>=0.9.0
  * pyslha>=3.1.0
 
-For installation, SModelS makes use of Python's *setuptools*.
-Thus ::
+If Python's *setuptools* is installed in your machine, SModelS and its dependencies
+can be installed with::
   python setup.py install
 
-should install the entire project, compile the internal Pythia and NLL-fast versions
-using gfortran. It should also resolve the external dependencies, i.e. install
-the Python libraries listed above using e.g. *pip*.
 If the python libraries are installed in a system folder (as is the default behavior),
 it will be necessary to run the install command with superuser privilege.
-Alternatively, one can run setup.py with the argument "--user".
+Alternatively, one can run setup.py with the "--user" flag::
+  python setup.py install --user
 
-In case the compilation of SModelS fails, it is advised to try to compile
-the tools manually, by issuing "make" in the *lib/* directory.
-In case the installation of the external libraries fails, you can also try to install
-them manually, then rerun setup.py.
-For Ubuntu and SL6 machines, a recipe is given below.
+If *setuptools* is not installed, you can try to install the external libraries
+manually and then rerun setup.py
+For Ubuntu, SL6 machines and other platforms, a recipe is given below.
 
 There is also a diagnostic tool available: ::
 
@@ -53,7 +49,7 @@ In case everything fails, please contact smodels-users@lists.oeaw.ac.at
 
 Installation on Ubuntu 16.04
 ----------------------------
-sudo apt install python-scipy python-numpy python-docutils python-argparse
+sudo apt install python-setuptools python-scipy python-numpy python-docutils python-argparse
 pip install unum pyslha
 python setup.py install
 Note that the last two commands you either run as superuser, or with the
@@ -87,6 +83,25 @@ In some distributions like SL5, the python default version may be smaller than
 modify by hand the first line in the executable from ``#!/usr/bin/env python``
 to ``#!/usr/bin/env python2.6``.
 Then perform the steps listed under ``Installation on SL6``.
+
+
+Installation on other platforms or without superuser privileges using Anaconda
+----------------------------------------------------------------------------------
+
+Another easy and platform independent way of installing SModelS
+without superuser priviledges is via Anaconda (https://www.continuum.io/downloads).
+Anaconda provides a local installation of pip as well as several additional python packages.
+
+First download and install Anaconda for Python 2.7. Make sure Anaconda's bin and lib folders
+are added to your system and python paths::
+  PATH="<anaconda-folder>/bin:$PATH"
+  PYTHONPATH=$PYTHONPATH:"<anaconda-folder>/lib/python2.7/site-packages"
+
+Now you should be able to install SModelS as a user::
+  python setup.py install --user
+
+In order to make sure all libraries have been correctly installed, you can run::
+  python smodels/tools/toolBox.py
 
 
 

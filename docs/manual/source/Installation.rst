@@ -32,13 +32,15 @@ using gfortran. It should also resolve the external dependencies, i.e. install
 the Python libraries listed above using e.g. *pip*.
 If the Python libraries are installed in a system folder (as is the default behavior),
 it will be necessary to run the install command with superuser privilege.
-Alternatively, one can run setup.py with the argument "--user".
+Alternatively, one can run setup.py with the argument "--user" ::
+
+  python setup.py install --user
 
 In case the compilation of SModelS fails, it is advised to try to compile
 the tools manually, by issuing "make" in the *lib/* directory.
 In case the installation of the external libraries fails, you can also try to install
 them manually, then rerun setup.py.
-For Ubuntu and SL6 machines, a recipe is given below.
+For Ubuntu, SL6 machines and other platforms, a recipe is given below.
 
 There is also a diagnostic tool available: ::
 
@@ -49,6 +51,8 @@ should list and check all internal tools (Pythia and NLL-fast) and external
 
 In case everything fails, please contact smodels-users@lists.oeaw.ac.at
 
+
+
 Installation on Ubuntu 16.04
 ----------------------------
  * sudo apt install python-scipy python-numpy python-docutils python-argparse
@@ -57,15 +61,6 @@ Installation on Ubuntu 16.04
 
 Note that the last two commands you either run as superuser, or with the "--user" flag.
 
-Installation on Anaconda
-------------------------
-
-Another easy and platform independent way of installing SModelS
-without superuser priviledges is via `Anaconda <https://www.continuum.io/downloads>`_
-
-After installation of anaconda, execute the following within your anaconda enviroment:
-
- * pip install pyslha unum
 
 Installation on SL6
 -------------------
@@ -93,6 +88,29 @@ to ``#!/usr/bin/env python2.6``.
 Then perform the steps listed under ``Installation on SL6``.
 
 
+
+Installation on other platforms or without superuser privileges using Anaconda
+------------------------------------------------------------------------------
+
+Another easy and platform independent way of installing SModelS
+without superuser priviledges is via `Anaconda <https://www.continuum.io/downloads>`_ .
+Anaconda provides a local installation of pip as well as several additional python packages.
+
+First download and install Anaconda for Python 2.7. Make sure Anaconda's bin and lib folders
+are added to your system and python paths ::
+
+    PATH="<anaconda-folder>/bin:$PATH"
+    PYTHONPATH=$PYTHONPATH:"<anaconda-folder>/lib/python2.7/site-packages"
+
+Now you should be able to run the SModelS installation (in the smodels top folder) as a user ::
+   
+   python setup.py install --user
+
+In order to make sure all libraries have been correctly installed, you can run ::
+   
+   python smodels/tools/toolBox.py
+
+
 Adding fastlim data
 -------------------
 
@@ -105,9 +123,9 @@ The tarball then needs to be exploded in the top level directory of the database
 That is, the following steps need to be performed:
 
  * cd smodels-database
- * wget http://smodels.hephy.at/downloads/v1.1/smodels-fastlim-v1.1.tgz
- * tar xzvf smodels-fastlim-v1.1.tgz
- * rm smodels-fastlim-v1.1.tgz
+ * wget http://smodels.hephy.at/downloads/v1.1.0/smodels-fastlim-v1.1.0.tgz
+ * tar -xzvf smodels-fastlim-v1.1.0.tgz
+ * rm smodels-fastlim-v1.1.0.tgz
 
 SModelS auto-detects fastlim results and issues an acknowledgement.
 
