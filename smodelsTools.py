@@ -73,11 +73,12 @@ def main():
 
     if args.subparser_name == 'installation':
         from smodels import installation
-        import sys
+        import sys, os
         print ( installation.banner() )
         print ( "SModelS version:", installation.version() )
         print ( "Installation directory:",installation.installDirectory() )
-        print ( "Binaries:",__file__ )
+        path = os.path.abspath(os.path.realpath(__file__))
+        print ( "This binary:",path )
         sys.exit()
 
     if args.subparser_name == 'xseccomputer':
