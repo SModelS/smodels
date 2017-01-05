@@ -55,6 +55,7 @@ In case everything fails, please contact smodels-users@lists.oeaw.ac.at
 
 Installation on Ubuntu 16.04
 ----------------------------
+
  * sudo apt install python-scipy python-numpy python-docutils python-argparse
  * pip install unum pyslha
  * python setup.py install
@@ -103,20 +104,22 @@ are added to your system and python paths ::
     PYTHONPATH=$PYTHONPATH:"<anaconda-folder>/lib/python2.7/site-packages"
 
 Now you should be able to run the SModelS installation (in the smodels top folder) as a user ::
-   
+
    python setup.py install --user
 
 In order to make sure all libraries have been correctly installed, you can run ::
-   
+
    python smodels/tools/toolBox.py
 
+
+.. _addingFastlim:
 
 Adding fastlim data
 -------------------
 
-The official SModelS database can be augmented with data from the 
-`fastlim <http://cern.ch/fastlim>`_ database. 
-A tarball with the *properly converted* fastlim efficiency maps can be found in our 
+The official SModelS database can be augmented with data from the
+`fastlim <http://cern.ch/fastlim>`_ database.
+A tarball with the *properly converted* fastlim efficiency maps can be found in our
 `download section <http://smodels.hephy.at/downloads/v1.1>`_.
 The tarball then needs to be exploded in the top level directory of the database.
 
