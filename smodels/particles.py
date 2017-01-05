@@ -15,7 +15,7 @@
    
    HOW TO ADD NEW PARTICLES: simply add a new entry in rOdd (rEven) if the
    particle is Z2-odd (Z2-even). For now all decays of Z2-even particles are
-   ignored. Z2-odd particles are decayed assuming Z2 convervation.
+   ignored. Z2-odd particles are decayed assuming Z2 conservation.
    
    If you want to use slhaChecks to verify your input file (in the case of SLHA input
    only), also include the quantum numbers of the new particles in the qNumbers dictionary below.
