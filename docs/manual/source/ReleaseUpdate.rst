@@ -7,12 +7,11 @@
 .. |topology| replace:: :ref:`topology <topology>`
 .. |topologies| replace:: :ref:`topologies <topology>`
 .. |decomposition| replace:: :doc:`decomposition <Decomposition>`
-.. |theory predictions| replace:: :doc:`theory predictions <TheoryPredictions>`
-.. |theory prediction| replace:: :doc:`theory prediction <TheoryPredictions>`
 .. |constraint| replace:: :ref:`constraint <ULconstraint>`
 .. |constraints| replace:: :ref:`constraints <ULconstraint>`
 .. |runSModelS| replace:: :ref:`runSModelS.py <runSModelS>`
 .. |database| replace:: :ref:`database <Database>`
+.. |Fastlim| replace:: :ref:`Fastlim <addingFastlim>`
 .. |output| replace:: :ref:`output <smodelsOutput>`
 .. |results| replace:: :ref:`experimental results <ExpResult>`
 .. |txnames| replace:: :ref:`txnames <TxName>`
@@ -48,9 +47,10 @@ as follows:
   (see :ref:`likelihood calculation <likelihoodCalc>`)
 * Inclusion of a database broswer tool for easy access to the information
   stored in the database (see :ref:`database browser <databaseBrowser>`)
+* The database now supports also a more efficient :ref:`binary format <databasePickle>`
 * Performance improvement for the |decomposition| of the input model
 * Inclusion of new simplified results to the |database| (including a few 13 TeV results) 
+* |Fastlim| efficiency maps can now also be used in SModelS
 
 
-
-
+.. |decomposition| replace:: :doc:`decomposition <Decomposition>`
