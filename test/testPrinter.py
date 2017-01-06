@@ -18,7 +18,7 @@ from smodels.tools.smodelsLogging import logger
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.tools import printer, ioObjects
 from smodels.tools import coverage
-from smodels.tools import summaryReader
+import summaryReader
 from xml.etree import ElementTree
 from databaseLoader import database
 import unum
