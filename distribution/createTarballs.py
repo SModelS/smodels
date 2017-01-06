@@ -185,15 +185,23 @@ def cleanDatabase():
     """
     Clean up the database, e.g. remove orig and validation folders
     """
+    comment ( "Now cleaning up database in %s/smodels-database" % dirname )
     walker = os.walk ( "%s/smodels-database" % dirname )
     for record in walker:
         File=record[0]
-        removals = [ "orig", ".git", "validation", "run_convert.sh", "checkFastlimValidation.py", 
-                     "checkFastlimValidation.ipynb", "convert.py", "sms.root" ]
+        # comment ( "Now in %s" % File )
+        # comment ( "Now in %s: %s" % (File, record[1] ) )
+        removals = [ "orig", ".git", "validation" ]
+        rmFiles = [ "run_convert.sh", "checkFastlimValidation.py",  \
+                    "checkFastlimValidation.ipynb", "convert.py", "sms.root" ]
         for r in removals:
             if r in File:
                 cmd = "rm -rf %s" % File
                 run ( cmd )
+        for rf in rmFiles:
+            fullpath = os.path.join ( File, rf )
+            if os.path.exists ( fullpath):
+                os.unlink ( fullpath )
 
 def splitDatabase():
     """
@@ -314,6 +322,6 @@ def create():
     isDummy()
 
 if __name__ == "__main__":
-    # cleanDatabase()
+    cleanDatabase()
     # removeNonValidated()
-    create()
+    # create()
