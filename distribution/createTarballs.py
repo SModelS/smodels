@@ -188,9 +188,12 @@ def cleanDatabase():
     walker = os.walk ( "%s/smodels-database" % dirname )
     for record in walker:
         File=record[0]
-        if "orig" in File or ".git" in File or "validation" in File:
-            cmd = "rm -rf %s" % File
-            run ( cmd )
+        removals = [ "orig", ".git", "validation", "run_convert.sh", "checkFastlimValidation.py", 
+                     "checkFastlimValidation.ipynb", "convert.py", "sms.root" ]
+        for r in removals:
+            if r in File:
+                cmd = "rm -rf %s" % File
+                run ( cmd )
 
 def splitDatabase():
     """
