@@ -69,7 +69,7 @@ setup(
     version = version(),
     author = authors(),
     author_email="smodels-developers@lists.oeaw.ac.at ",
-    scripts=[ "bin/smodels-config", "runSModelS.py", "smodelsTools.py" ],
+    scripts=[ "smodels-config", "runSModelS.py", "smodelsTools.py" ],
     install_requires=[ 'docutils>=0.3', 'numpy', 'scipy>=0.9.0', \
                          'unum', 'argparse', 'pyslha>=3.1.0' ],
     data_files=dataFiles() ,
