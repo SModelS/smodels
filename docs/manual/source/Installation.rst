@@ -16,7 +16,7 @@ following tools:
 
 These tools are built into SModelS and require gfortran, but they need not be installed separately.
 In addition to setuptools, SModelS depends on the following *external* Python
-libraries:
+libraries [*]_:
 
  * unum
  * numpy
@@ -142,3 +142,10 @@ Therefore, adding additional experimental results is a matter of copying and
 editing text files.  The next time the
 :ref:`Database <Database>` class is instantiated, the binary (Pickle) database
 file is updated automatically.
+
+.. [*] The :ref:`database browser <databaseBrowser>` interface provided by smodelsTools.py also
+   requires IPython. However, all the other SModelS functionalities are independent of IPython.
+
+
+
+ 
