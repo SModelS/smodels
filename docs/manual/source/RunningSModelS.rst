@@ -37,14 +37,16 @@
 
 .. _runningSModelS:
 
-Running SModelS
-===============
+Using SModelS
+=============
 
-SModelS can take SLHA or LHE files as input (see :doc:`Basic Input <BasicInput>`). It ships with a command-line tool :ref:`runSModelS.py <runSModelS>`, which reports on the SMS |decomposition| and |theory predictions| in several :ref:`output formats <smodelsOutput>`.  
+SModelS can take SLHA or LHE files as input (see :doc:`Basic Input <BasicInput>`).
+It ships with a command-line tool :ref:`runSModelS.py <runSModelS>`, which reports
+on the SMS |decomposition| and |theory predictions| in several :ref:`output formats <smodelsOutput>`.  
 
 For users more familiar with Python and the SModelS basics, an example
 code :ref:`Example.py <exampleCode>` is provided showing how to access
-the main SModelS functionalities: :ref:`decomposition <Decomposition>`, |database|
+the main SModelS functionalities: :ref:`decomposition <Decomposition>`, the |database|
 and :ref:`computation of theory predictions <TheoryPredictions>`.
 
 
@@ -55,6 +57,9 @@ code (:ref:`Example.py <exampleCode>`) are described below.
 .. note:: For non-MSSM input models the user needs to modify *particles.py* 
           and specify which BSM particles are even or odd under the assumed
           Z\ :sub:`2` symmetry (see :ref:`adding new particles <newParticles>`).
+          Finally, if the user wants to check the input files for possible issues using
+          SModelS'  :ref:`SLHA and LHE file checkers <fileChecks>`, it is
+          also necessary to define the BSM particle quantum numbers in *particles.py*.
 
 
 
@@ -67,13 +72,17 @@ runSModelS.py
 *runSModelS.py* covers several different applications of the SModelS functionality,
 with the option of turning various features on or off, as well as
 setting the :ref:`basic parameters <parameterFile>`.
-
 These functionalities include detailed checks of input SLHA files,
 running the |decomposition|,
 evaluating the :doc:`theory predictions <TheoryPredictions>` and comparing them to the experimental
 limits available in the |database|,
 determining :ref:`missing topologies <topCoverage>` and printing the |output|
 in several available formats.
+
+Starting on v1.1, *runSModelS.py* is equipped with two additional
+functionalities. First, it can process a folder containing a set of SLHA or LHE
+file, second, it supports parallelization of this input folder.
+
 
 
 **The usage of runSModelS is:**
@@ -119,7 +128,9 @@ In some more detail:
 * *-d*: if set, SModelS will run in development mode and exit if any errors are found.
 * *-c*: if set, SModelS will in run in crash mode. It takes as input a .crash file in order to reproduce the crash error.
 * *-v*: sets the verbosity level (debug, info, warning, error). Default value is info.
-* *-T*: (int) define a time limit for the running time (in secs).
+* *-T*: (int) defines a time limit for the running time (in secs) for a
+  single input file. If a directory is given as input, the timeout will be applied for
+  each individual file. 
 
 A typical
 usage example is: ::
@@ -140,7 +151,7 @@ The Parameters File
 The basic options and parameters used by *runSModelS.py* are defined in the parameters file.
 An example parameter file, including all available parameters together
 with a short description, is stored in :download:`parameters.ini <images/parameters.ini>`.
-If no parameter file is specified the default parameters stored in 
+If no parameter file is specified, the default parameters stored in 
 :download:`/etc/parameters_default.ini <images/parameters_default.ini>` are used.
 Below we give more detailed information about each entry in the parameters file.
 
@@ -161,7 +172,8 @@ Below we give more detailed information about each entry in the parameters file.
   * **doCompress** (True/False): turns |mass compression| on and off during the |decomposition|.
     Set to False to turn |mass compression| off.
   * **computeStatistics** (True/False): turns the likelihood and :math:`\chi^2` computation on and off 
-    (see :ref:`likelihood calculation <likelihoodCalc>`). If True, the likelihood and :math:`\chi^2` values are computed for the most sensitive |EMr|.    
+    (see :ref:`likelihood calculation <likelihoodCalc>`).
+    If True, the likelihood and :math:`\chi^2` values are computed for the |EMrs|.    
   * **testCoverage** (True/False): set to True to run the :ref:`coverage <topCoverage>` tool.
 |
 * *parameters*: basic parameter values for running SModelS
@@ -171,7 +183,9 @@ Below we give more detailed information about each entry in the parameters file.
     *Only used if doCompress = True*
   * **maxcond** (float): maximum allowed value (in the [0,1] interval) for the violation of :ref:`upper limit conditions <ULconditions>`. A zero value means the conditions are strictly enforced, while 1 means the conditions are never enforced. 
     *Only relevant for printing the* :ref:`output summary <fileOut>`.
-  * **ncpus** (int): number of CPUs. When processing multiple SLHA/LHE files, SModelS can run in a parallelized fashion, splitting up the input files in equal chunks. "-1" is equal to the number of CPU cores of the machine.
+  * **ncpus** (int): number of CPUs. When processing multiple SLHA/LHE files, 
+    SModelS can run in a parallelized fashion, splitting up the input files in equal chunks.
+    *ncpus = -1* uses the total number of CPU cores of the machine.
 |   
 * *database*: allows for selection of a subset of :ref:`experimental results <ExpResult>` from the |database|
 
@@ -181,7 +195,9 @@ Below we give more detailed information about each entry in the parameters file.
     and `ATLAS-CONF-2013-024 <https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-024/>`_.
   * **txnames** (list of topologies): set to all to use all available simplified model |topologies|. The |topologies| are labeled according to the :ref:`txname convention <TxName>`. 
     If a list of |txnames| are given, only the corresponding |topologies| will be considered. For instance, setting txnames = T2 will
-    only consider |results| containing upper limits for :math:`[[[jet]],[[jet]]]` and the |output| will only contain constraints for this topology.
+    only consider |results| containing upper limits for 
+    :math:`pp \to \tilde{q} + \tilde{q} \to  (jet+\tilde{\chi}_1^0) + (jet+\tilde{\chi}_1^0)`
+    and the |output| will only contain constraints for this topology.
     *A list of all* |topologies| *and their corresponding* |txnames| *can be found* `here <http://smodels.hephy.at/wiki/SmsDictionary>`_
   * **dataselector** (list of datasets): set to all to use all available |datasets|. If dataselector = upperLimit (efficiencyMap), only |ULrs| (|EMrs|) will be used. Furthermore, if
     a list of signal regions (|datasets|) is given, only the |results| containing these datasets will be used. For instance, if dataselector = SRA mCT150,SRA mCT200, only
@@ -229,7 +245,7 @@ The Output
 The results of |runSModelS| are printed to the formats specified by the **outputType** in the  |parameters|.
 The following formats are available: 
 
- * a human-readable :ref:`screen output <screenOut>` or :ref:`log output <logOut>`. These are intended to
+ * a human-readable :ref:`screen output (stdout) <screenOut>` or :ref:`log output <logOut>`. These are intended to
    provide detailed information about the |database|, the |decomposition|, the
    |theory predictions| and the :ref:`missing topologies <topCoverage>`. The 
    output complexity can be controlled through several options in the |parameters|. Due to its size, this output
@@ -281,7 +297,7 @@ Below we go step-by-step through this example code:
 .. literalinclude:: /examples/Example.py
    :lines: 31
    
-* *Set main options for decomposition* |decomposition|. 
+* *Set main options for* |decomposition|. 
   Specify the values of :ref:`sigmacut <minweight>` and :ref:`minmassgap <massComp>`:   
 
 .. literalinclude:: /examples/Example.py
@@ -309,12 +325,13 @@ Below we go step-by-step through this example code:
 
    
 * *Load the* |express| to be used to constrain the input model.
-  input model. Here, all results are used:
+  Here, all results are used:
   
 .. literalinclude:: /examples/Example.py
    :lines: 59
 
-Alternatively, the `getExpResults  <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database.getExpResults>`_ method takes as arguments specific results to be loaded.
+Alternatively, the `getExpResults  <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database.getExpResults>`_ method
+can take as arguments specific results to be loaded.
   
 * *Print basic information about the results loaded*.
   Below we show how to count the number of |ULrs| and |EMrs| loaded:    
@@ -345,7 +362,7 @@ Alternatively, the `getExpResults  <../../../documentation/build/html/experiment
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 14-21   
+   :lines: 14-21
    
 * *Get the corresponding upper limit*. This value can
   be compared to the |theory prediction| to decide whether a model is excluded or not:
@@ -359,7 +376,7 @@ Alternatively, the `getExpResults  <../../../documentation/build/html/experiment
    :lines: 22   
    
 * *Compute the r-value*, i.e. the ratio |theory prediction|/upper limit. 
-  A value of r>= 1 means that an experimental result excludes the input model.
+  A value of :math:`r \geq 1` means that an experimental result excludes the input model.
   Also determine the most constraining result:
 
 .. literalinclude:: /examples/Example.py
@@ -380,7 +397,13 @@ Alternatively, the `getExpResults  <../../../documentation/build/html/experiment
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 411-412   
+   :lines: 411-412
+   
+
+It is worth noting that SModelS does not include any statistical treatment for
+the results, for instance, correction factors like the "look elsewhere effect".
+Due to this, the results are claimed to be "likely excluded" in the output.   
+   
 
 **Notes:**
  * For an SLHA :ref:`input file <BasicInput>`, the decay of :ref:`final states <final states>` (or Z\ :sub:`2`-even particles such as the Higgs, W,...) are always ignored during the decomposition. Furthermore, if there are two cross-sections at different calculation order (say LO and NLO) for the same process, only the highest order is used.

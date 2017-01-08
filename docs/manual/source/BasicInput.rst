@@ -16,7 +16,7 @@ given in the two following forms:
   (see an example file :download:`here <examples/example.lhe>`)
 
 The SLHA format is usually more compact and best suited for supersymmetric models. On the other hand, a LHE file can always
-be generated for any BSM model (through the use of your favorite MC generator). In this case, however,
+be generated for any BSM model (through the use of your favorite MC generator).[*]_ In this case, however,
 the precision of the results is limited to the MC statistics used to generate the file.
 
 *In the case of SLHA input only*, the production cross sections for the BSM states also have to be included
@@ -72,3 +72,8 @@ the highest order will be used.*
 
 * **Reading of cross-sections from an input file is
   implemented by the** `getXsecFromSLHAFile <../../../documentation/build/html/theory.html#theory.crossSection.getXsecFromSLHAFile>`_ **method** 
+
+  
+.. [*] SModelS can easily be used for non-SUSY models as long as they present a  Z\ :sub:`2`-type symmetry.
+   However, it is the responsibility of the user to make sure that the SMS results
+   in the database actually apply to the model under consideration.
