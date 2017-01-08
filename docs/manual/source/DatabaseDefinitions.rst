@@ -24,15 +24,17 @@ Database Definitions
 
 The so-called `experiment module <../../../documentation/build/html/experiment.html#experiment>`_ 
 contains the basic tools necessary for handling the database of experimental results.
-The SModelS database collects experimental results from both ATLAS and CMS, which are
-used to compute the experimental constraints on specific models.
+The SModelS database collects experimental
+results of SUSY searches from both ATLAS and CMS, which are used to compute the
+experimental constraints on specific models.
 Starting with version 1.1, the SModelS database includes two types of experimental constraints:
 
 *  Upper Limit (UL) constraints: constrains on :math:`\sigma \times BR` of simplified models, provided 
    by the experimental collaborations (see |ULrs|);
 *  Efficiency Map (EM) constraints: constrains the total signal (:math:`\sum \sigma \times BR \times \epsilon`) in
-   a specific signal region.  The efficiencies in this case are either provided by the experimental collaborations or
-   computed by theory groups (see |EMrs|); 
+   a specific signal region. Here :math:`\epsilon` denotes the acceptance times efficiency.  
+   These are either provided by the experimental collaborations or computed by
+   theory groups (see |EMrs|); 
 
 Although the two types of constraints above are very distinct,
 both the folder structure and the object structure of SModelS are sufficiently flexible to
@@ -40,8 +42,8 @@ simutaneously handle both |UL| and |EM| results.
 Therefore, for both |UL| and |EM| constraints, the database obeys the following structure:
 
 * :ref:`Database <Database>`: collects a list of |ExpRess|.
-   * |ExpRes|: each |ExpRes| corresponds to an experimental conference note or publication and contains 
-     a list of |Datasets| as well as general information about the result (luminosity, publication reference,...).
+   * |ExpRes|: each |ExpRes| corresponds to an experimental preliminary result (i.e. a CONF-NOTE or PAS) or
+     publication and contains a list of |Datasets| as well as general information about the result (luminosity, publication reference,...).
       * |Dataset|:
         a single |Dataset| corresponds to one signal region of the experimental
         note or publication [*]_. In case of |ULrs| there is a single |Dataset|, usually corresponding to the best signal
@@ -53,7 +55,7 @@ Therefore, for both |UL| and |EM| constraints, the database obeys the following 
             * Efficiency map: contains the efficiencies for |EMrs|. Each map refers to a single 
               simplified model (or more precisely to a single |element| or sum of |elements|).
 
-A summary of the above structure can be seen below:
+A schematic summary of the above structure can be seen below:
 
 .. _databaseScheme:
 
@@ -79,10 +81,12 @@ as an :ref:`Experimental Result<ExpResult>`. Hence, the database is simply a col
 
 Experimental Result
 -------------------
-An experimental result contains all the relevant information corresponding to an experimental
-publication or conference note. In particular it holds general information about the experimental analysis,
-such as the corresponding luminosity, center of mass energy, publication reference, etc.
-The current version allows for two possible types of experimental results: one containing upper limit maps (|UL|)
+An experimental result contains all the relevant information corresponding to an
+experimental publication or preliminary result. In particular it holds general
+information about the experimental analysis, such as the corresponding
+luminosity, center of mass energy, publication reference, etc. The current
+version allows for two possible types of experimental results: one containing
+upper limit maps (|UL|)
 and one containing efficiency maps (|EM|).
 
 * **Experimental Results are described by the** `ExpResult Class <../../../documentation/build/html/experiment.html#experiment.expResultObj.ExpResult>`_
