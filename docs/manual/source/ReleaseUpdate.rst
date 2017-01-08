@@ -41,15 +41,15 @@ has undergone significant structural changes. Version 1.1 comes
 with many new features. The major novelties of this release are 
 as follows:
 
-* The inclusion of efficiency maps (see |EMrs|)
-* A new and more flexible database format (see :ref:`Database structure <databaseStruct>`)
-* Inclusion of likelihood and :math:`\chi^2` calculation for |EMrs| 
+* the inclusion of efficiency maps (see |EMrs|)
+* a new and more flexible database format (see :ref:`Database structure <databaseStruct>`)
+* inclusion of likelihood and :math:`\chi^2` calculation for |EMrs| 
   (see :ref:`likelihood calculation <likelihoodCalc>`)
-* Inclusion of a database broswer tool for easy access to the information
+* inclusion of a database broswer tool for easy access to the information
   stored in the database (see :ref:`database browser <databaseBrowser>`)
-* The database now supports also a more efficient :ref:`binary format <databasePickle>`
-* Performance improvement for the |decomposition| of the input model
-* Inclusion of new simplified results to the |database| (including a few 13 TeV results) 
+* the database now supports also a more efficient :ref:`binary format <databasePickle>`
+* performance improvement for the |decomposition| of the input model
+* inclusion of new simplified results to the |database| (including a few 13 TeV results) 
 * |Fastlim| efficiency maps can now also be used in SModelS
 
 
