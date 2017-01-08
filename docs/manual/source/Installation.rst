@@ -110,10 +110,13 @@ In order to make sure all libraries have been correctly installed, you can run
  * python smodels/tools/toolBox.py
 
 
+Adding results to the database
+------------------------------
+
 .. _addingFastlim:
 
 Adding fastlim data
--------------------
+^^^^^^^^^^^^^^^^^^^
 
 The official SModelS database can be augmented with data from the
 `fastlim <http://cern.ch/fastlim>`_ database.
@@ -128,20 +131,25 @@ That is, the following steps need to be performed:
  * tar -xzvf smodels-fastlim-v1.1.x.tgz
  * rm smodels-fastlim-v1.1.x.tgz
 
+Once the fastlim folders have been added to the database,
 SModelS auto-detects fastlim results and issues an acknowledgement.
+When using these results, please properly cite the fastlim paper; for
+convenience, a bibtex file is provided in the smodels-fastlim tarball.
 
-Please make sure, that when using their efficiency maps, fastlim gets proper
-acknowledgement, see the bibtex file in the smodels-fastlim tarball.
 
 Adding one's own results
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-As will be explained in :doc:`Database of Experimental Results <DatabaseStructure>`, the database of
-experimental results is organized as files in an ordinary directory hierarchy.
-Therefore, adding additional experimental results is a matter of copying and
-editing text files.  The next time the
-:ref:`Database <Database>` class is instantiated, the binary (Pickle) database
-file is updated automatically.
+The :ref:`Database of Experimental Results <databaseStruct>`  is
+organized as files in an ordinary directory hierarchy. Therefore,
+adding additional experimental results is a matter of copying and editing text
+files.  
+Once the new folders and files have been added following the
+:ref:`database structure format <folderStruct>`, SModelS
+automatically rebuilds the binary (Pickle) database file.
+The added results will then be available for using with the
+the SModelS tools.
+
 
 .. [*] The :ref:`database browser <databaseBrowser>` interface provided by smodelsTools.py also
    requires IPython. However, all the other SModelS functionalities are independent of IPython.

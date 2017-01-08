@@ -2,13 +2,12 @@
 
 
 
-SModelS Guide
-=============
+Detailed Guide to SModelS
+=========================
 
 .. toctree::
    :maxdepth: 2
    
-   Introduction
    SModelSDefs
    Structure
    Tools
