@@ -14,13 +14,14 @@ Theory Definitions
 ==================
 
 The so-called `theory module <../../../documentation/build/html/theory.html#theory>`_ contains the basic tools necessary for decomposing the input model
-(either in LHE or SLHA format) into SMS |topologies| and using the output of the decomposition
+(either in LHE or SLHA format) into simplified model |topologies| and using the output of the decomposition
 to compute the :ref:`theoretical prediction <theoryPredictions>` for a given :ref:`experimental result <ExpResult>`.
 
 
-SModelS applicability is currently restricted to models which contain a Z\ :sub:`2` 
-symmetry (R-Parity in SUSY, K-Parity in UED, ...). This is required in order 
-to provide a clear structure for the simplified model topologies appearing
+The applicability of SModelS is currently restricted to models which contain a Z\ :sub:`2` 
+symmetry (R-Parity in SUSY, K-Parity in UED, ...) and result in a
+missing transverse energy (MET) final state at experiments. This is required in
+order to provide a clear structure for the simplified model topologies appearing
 during the :ref:`decomposition <decomposition>` of the input model.
 Below we describe the basic concepts and language used in SModelS
 to describe the simplified model topologies.
@@ -43,15 +44,29 @@ A representation of an element is shown below:
 .. image:: images/elementB.png
    :width: 30%
    
-An element may also hold information about its corresponding weight (cross-section times branching ratio times efficiency).
-The overall properties of an element is shown in the scheme below:
+An element may also hold information about its corresponding 
+weight (cross-section times branching ratio times efficiency[*]_ ).
+The overall properties of an element are illustrated in the scheme below:
 
 .. _topscheme:
 
 .. image:: images/topSchemeB.png
    :width: 35%
 
-Below we describe in detail each of these properties and how they are implemented in SModelS.
+SModelS works under the inherent assumption that, for collider purposes,
+all the essential properties of a BSM model can be encapsulated by its
+elements.
+Such assumption is extremely helpful to cast the theoretical predictions of a
+specific BSM model in a model-independent framework, which can then be compared
+against the corresponding experimental limits.
+For instance, as shown in the :ref:`scheme above <elementscheme>`, only the
+masses of the BSM states are stored and other properties, such as their spins or
+other quantum numbers are ignored.
+
+
+Below we describe in more detail the element properties and their implementation
+in SModelS.
+
 
 * **Elements are described by the** `Element Class <../../../documentation/build/html/theory.html#theory.element.Element>`_    
 
@@ -98,13 +113,13 @@ Branches
 A branch is the basic substructure of an |element|.
 It represents a series of cascade decays of a single initial Z\ :sub:`2`-odd
 state.
-The figure below shows an example of a branch.
+The diagram below illustrates an example of a branch.
 
 .. image:: images/branchTopB.png
    :width: 25%
 
 The structure of each branch is fully defined by its number of vertices and the number of 
-:ref:`final states` coming out of each vertex. 
+|final states| coming out of each vertex. 
 Furthermore,  the branch also holds the information about the particle labels for the |final states|
 coming out of each vertex and the masses of the :ref:`intermediate states <odd states>`,
 as shown below.
@@ -130,7 +145,7 @@ notation. The scheme below shows how to convert between the graphical and bracke
 .. image:: images/bracketNotationB.png
    :width: 50%
 
-The brackets are ordered and nested in the following way.
+The brackets are ordered and nested in the following way. 
 The outermost brackets correspond to the :ref:`branches <branch>` of the |element|.
 The branches are sorted according to their size (see :ref:`element sorting <elementsorting>`) 
 and each branch contains an *ordered* list of :ref:`vertices <vertex>`.
@@ -161,22 +176,25 @@ Topologies
 ----------
 
 It is often useful to classify |elements| according to their
-overall structure or global topology.
-Each global topology corresponds to an *undressed*
+overall structure or topology.
+Each topology corresponds to an *undressed*
 |element|, removed of its
 |final states| and Z\ :sub:`2`-odd masses.
-Therefore the global topology is fully determined by its number of
+Therefore the topology is fully determined by its number of
 branches, number of vertices in each :ref:`branch <branch>` and number of
 |final states| coming out of each :ref:`vertex <vertex>`.
-As as example consider the following topology:
+An example of a topology is shown below:
 
 .. image:: images/globTopB.png
    :width: 25%
 
 Within SModelS, elements are grouped according to their
-global topology. Hence  topologies represent a list of elements sharing a
+topology. Hence  topologies represent a list of elements sharing a
 common basic structure (same number of branches, vertices and
 final states in each vertex).
 
 * **Topologies are described by the** `Topology Class <../../../documentation/build/html/theory.html#theory.topology.Topology>`_   
 
+.. [*] In order to treat the UL and EM map results on the same footing
+   SModelS applies a trivial binary efficiency to elements for UL 
+   type results as will be explained in detail later.
