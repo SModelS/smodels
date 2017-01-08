@@ -6,7 +6,7 @@ tarballs:
 	./createTarballs.py
 
 clean:
-	rm -rf smodels-* 
+	rm -rf smodels-*  create.log
 
 version:
 	@echo $(VERSION)
