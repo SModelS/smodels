@@ -96,13 +96,16 @@ and one containing efficiency maps (|EM|).
 Experimental Result: Upper Limit Type
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Upper Limit (UL) experimental results contains the experimental constraints on the cross-section times branching ratio
-( :math:`\sigma \times BR` ) from a specific experimental publication or conference note.
-These constraints are typically given in the format of Upper Limit maps, which correspond to
-95% upper limit values on :math:`\sigma \times BR` as a function of the
-respective parameter space (usually BSM masses or slices over mass planes).
-The UL values usually assume the best signal region (for a given point in parameter space) or a combination
-of signal regions (at least for simple cut and count analyses). Hence, for UL results there is a single |Dataset|, containing one
+Upper Limit (UL) experimental results contains the experimental constraints on
+the cross-section times branching ratio
+( :math:`\sigma \times BR` ) for Simplified Models from a specific experimental publication or preliminary
+result. These constraints are typically given in the format of Upper Limit maps,
+which correspond to 95% confidence level (C.L.) upper limit values on :math:`\sigma \times BR`
+as a function of the respective parameter space (usually BSM masses
+or slices over mass planes). The UL values usually assume the best signal region
+(for a given point in parameter space), a combination of signal regions or
+more involved limits from other methods.
+Hence, for UL results there is a single |Dataset|, containing one
 or more UL maps. An example of a UL map is shown below:
 
 .. _ULplot:
@@ -110,12 +113,15 @@ or more UL maps. An example of a UL map is shown below:
 .. image:: images/ULexample.png
    :width: 60%
 
-Within SModelS the above UL map is used to constrain the
-:ref:`element<element>` :math:`[[[jet]],[[jet]]]`, where we are using the
-notation defined in :ref:`Bracket Notation <notation>`.
-Usually a single conference note/publication contains several UL maps, hence each
-UL-type experimental result contains several UL maps, each one constraining different |elements|
-or sum of  |elements|.
+Within SModelS, the above UL map is used to constrain the
+simplified model :math:`\tilde{q} + \tilde{q} \to \left(jet+\tilde{\chi}_1^0\right) + \left(jet+\tilde{\chi}_1^0\right)`.
+Using the SModelS notation this simplified model is mapped to the
+:ref:`element<element>` :math:`[[[jet]],[[jet]]]`, using the notation defined in
+:ref:`Bracket Notation <notation>`.
+Usually a single preliminary result/publication contains several UL maps, hence
+each UL-type experimental result contains several UL maps, each one constraining
+different simplified
+models (|elements| or sum of  |elements|).
 *We also point out that the exclusion curve shown in the UL map above is never used by SModelS*.
 
 
@@ -124,7 +130,8 @@ or sum of  |elements|.
 Upper Limit Constraint
 ~~~~~~~~~~~~~~~~~~~~~~
 
-The upper limit constraint specifies which |element| or sum of |elements| is being constrained by the respective UL map.
+The upper limit constraint specifies which simplified model
+(represented by an |element| or sum of |elements|) is being constrained by the respective UL map.
 For simple constraints as the one shown in the :ref:`UL map <ULplot>` above, 
 there is a single |element| being constrained (:math:`[[[jet]],[[jet]]]`).
 In some cases, however, the constraint corresponds to a sum of :ref:`elements <element>`.
@@ -149,7 +156,7 @@ where it is understood that the sum is over the weights of the respective |eleme
 and not over the |elements| themselves.    
 
 Note that the sum can be over particle charges, flavors or more complex combinations of elements.
-However, almost all analyses sum only over elements sharing a common global |topology|.
+However, almost all experimental results sum only over elements sharing a common |topology|.
 
 Finally, in some cases the UL constraint assumes specific constributions from each |element|.
 For instance, in the :ref:`example above <constraintplot>` it is implicitly assumed that
@@ -189,8 +196,8 @@ above, it might be reasonable to impose instead:
 
 The *departure* from the exact condition can then be properly quantified and one can decide whether the analysis 
 upper limits are applicable or not to the model being considered.
-Concretely, for each condition a number between 0 and 1 is returned, 
-where 0 means the condition is exactly satisfied and 1 means it is maximally violated.
+Concretely, SModelS computes for each condition a number between 0 and 1, where
+0 means the condition is exactly satisfied and 1 means it is maximally violated.
 Allowing for a :math:`20\%` violation of a condition corresponds approximately to 
 a ''condition violation value'' (or simply condition value) of 0.2.
 The condition values  are given as an output of SModelS, so the user can decide what are the
@@ -204,10 +211,11 @@ Experimental Result: Efficiency Map Type
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Unlike |ULrs|, the main information held by Efficiency Map (EM) results are the efficiencies for simplified
-models. These may be provided by the experimental collaborations or independently computed by theory groups.
+models (represented by an |element| or sum of |elements|).
+These may be provided by the experimental collaborations or independently computed by theory groups.
 Efficiency maps correspond to a grid of simulated acceptance times efficiency 
 ( :math:`A \times \epsilon` ) values for a specific signal region. In the following we will refer to 
-:math:`A \times \epsilon` simply as *efficiency*. 
+:math:`A \times \epsilon` simply as *efficiency* and denote it by :math:`\epsilon`. 
 Furthermore, additional information, such as the luminosity, number of observed and expected events, etc is also
 stored in a EM-type result.
 
