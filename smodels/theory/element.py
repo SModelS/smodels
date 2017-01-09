@@ -49,17 +49,17 @@ class Element(object):
                     nel = 0
                     if elements:
                         nel = len(elements)
-                    logging.error("Malformed input string. Number of elements "
+                    logger.error("Malformed input string. Number of elements "
                                   "is %d (expected 1) in: ``%s''", nel, info)
-                    return False
+                    return None
                 else:
                     el = elements[0]
                     branches = elementsInStr(el[1:-1])
                     if not branches or len(branches) != 2:
-                        logging.error("Malformed input string. Number of "
+                        logger.error("Malformed input string. Number of "
                                       "branches is %d (expected 2) in: ``%s''",
                                       len(branches), info)
-                        return False
+                        return None
                     self.branches = []                    
                     for branch in branches:
                         self.branches.append(Branch(branch))
