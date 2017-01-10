@@ -51,7 +51,7 @@ for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~
 
 **The usage of the cross-section calculator is:**
 
-smodelsTools.py xseccomputer [-h] -f FILENAME [-s SQRTS [SQRTS ...]] [-e NEVENTS] [-p] [-k] [-n] [-N] [-O]
+   smodelsTools.py xseccomputer [-h] -f FILENAME [-s SQRTS [SQRTS ...]] [-e NEVENTS] [-v VERBOSITY] [-c NCPUS] [-p] [-q] [-k] [-n] [-N] [-O]
 
 *arguments*:
   -h, --help            show this help message and exit
@@ -73,6 +73,9 @@ smodelsTools.py xseccomputer [-h] -f FILENAME [-s SQRTS [SQRTS ...]] [-e NEVENTS
                         SLHA file to compute cross sections for. If a
                         directory is given, compute cross sections for all
                         files in directory.
+  -v VERBOSITY, --verbosity VERBOSITY
+                        Verbosity (debug, info, warning, error)
+                        
 
 Some more explanations:
 
@@ -98,12 +101,12 @@ Further Pythia parameters are defined in :download:`etc/pythia.card </images/pyt
 A typical
 usage example is: ::
 
-   smodelsTools.py xseccomputer -s 8 13 -e 10000 -p -f compressedSpec.slha
+   smodelsTools.py xseccomputer -s 8 13 -e 10000 -p -f inputFiles/slha/compressedSpec.slha
 
 which will compute 8 TeV and 13 TeV LO cross-sections (at the LHC) for all MSSM processes using 10k MC events.
 If, *after* the LO cross-sections have been computed, one wants to add the NLO+NLL cross-sections for gluinos and squarks: ::
 
-   smodelsTools.py xseccomputer -s 8 13 -p -N -O -f compressedSpec.slha
+   smodelsTools.py xseccomputer -s 8 13 -p -N -O -f inputFiles/slha/compressedSpec.slha
 
 The resulting file will then contain LO cross-sections for all MSSM processes and NLO+NLL cross-sections for 
 the available processes in `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_  
@@ -118,7 +121,8 @@ When reading the input file, SModelS will then use only the highest order cross-
 Input File Checks
 -----------------
 
-As discussed in :doc:`Basic Input <BasicInput>`, SModelS accepts both SLHA and LHE input files. It can be convenient to perform certain sanity checks on these files as described below.
+As discussed in :doc:`Basic Input <BasicInput>`,
+SModelS accepts both SLHA and LHE input files. It can be convenient to perform certain sanity checks on these files as described below.
 
 * **The input file checks are implemented by the** `FileStatus class <../../../documentation/build/html/tools.html#tools.ioObjects.FileStatus>`_
 
@@ -149,7 +153,7 @@ smodelsTools.py lhechecker [-h] -f FILENAME
 A typical
 usage example is: ::
 
-   smodelsTools.py lhechecker -f gluino_squarks.lhe
+   smodelsTools.py lhechecker -f inputFiles/slha/gluino_squarks.lhe
 
 .. _slhaChecks:
 
@@ -171,7 +175,7 @@ The SLHA file checker allows to perform quite rigorous checks of SLHA input file
 
 In addition, one can ask that
 
-* all decays listed in the DECAY block are kinematically allowed, *i.e.* the sum of masses of the decay products may not exceed the mother mass. *NB This check for "illegal decays" is turned off by default.*
+* all decays listed in the DECAY block are kinematically allowed, *i.e.* the sum of masses of the decay products may not exceed the mother mass. *This check for "illegal decays" is turned off by default.*
 
 If any of the above tests fail (return a negative result), an error message is shown.
 
@@ -198,7 +202,7 @@ is considered as a displaced vertex.
 
 **The usage of the SLHA checker is:**
 
-smodelsTools.py slhachecker [-h] [-xS] [-lsp] [-longlived] [-m DISPLACEMENT] [-s SIGMACUT] [-illegal] -f FILENAME
+smodelsTools.py slhachecker [-h] [-xS] [-lsp] [-longlived] [-m DISPLACEMENT] [-s SIGMACUT] [-illegal] [-dB] -f FILENAME
 
 *arguments*:
   -h, --help            show this help message and exit
@@ -231,7 +235,7 @@ In some more detail:
 A typical
 usage example is: ::
 
-   smodelsTools.py slhachecker -m 0.001 -s 0.01 -f lightSquarks.slha
+   smodelsTools.py slhachecker -m 0.001 -s 0.01 -f inputFiles/slha/lightSquarks.slha
 
 Running this will print the status flag and a message with potential warnings
 and error messages.
@@ -360,10 +364,12 @@ information, it finds and classifies the |elements| which are
 not tested by any of the |results| in the |database|.
 These elements are grouped into the following classes:
 
-* *missingTopos*: |elements| which are not tested by any of the |results| in the |database| (independent of the element mass);
-* *outsideGrid*: |elements| which could be tested by one or more experimental result, but are not constrained because the mass vector is outside the mass grid;
-* *longCascade*: |elements| with long cascade decays (more than one intermediate particle in one of the |branches|);
-* *asymetricBranches*: |elements| where the first |branch| differs from the second |branch| (but that are not considered as long cascade decays).
+* *missingTopos*: |elements| which are not tested by any of the |results| in the |database| (independent of the element mass).
+  The missing topologies are further classified as:
+   * *longCascade*: |elements| with long cascade decays (more than one intermediate particle in one of the |branches|);
+   * *asymetricBranches*: |elements| where the first |branch| differs from the second |branch| (but that are not considered as long cascade decays).
+
+* *outsideGrid*: |elements| which could be tested by one or more experimental result, but are not constrained because the mass array is outside the mass grid;
 
 In order to classify the |elements|, the tool loops over all the |elements| found in the
 |decomposition| and checks if they are tested by one or more |results| in the |database| [*]_.
