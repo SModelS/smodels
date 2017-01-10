@@ -408,3 +408,4 @@ Due to this, the results are claimed to be "likely excluded" in the output.
 **Notes:**
  * For an SLHA :ref:`input file <BasicInput>`, the decay of :ref:`final states <final states>` (or Z\ :sub:`2`-even particles such as the Higgs, W,...) are always ignored during the decomposition. Furthermore, if there are two cross-sections at different calculation order (say LO and NLO) for the same process, only the highest order is used.
  * The list of |elements| can be extremely long. Try setting **addElmentInfo** = False and/or **printDecomp** = False to obtain a smaller output.       
+
