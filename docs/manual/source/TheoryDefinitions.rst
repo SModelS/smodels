@@ -10,8 +10,8 @@
 
 .. _theoryDefs:
 
-Theory Definitions
-==================
+Simplified Model Definitions
+============================
 
 The so-called `theory module <../../../documentation/build/html/theory.html#theory>`_ contains the basic tools necessary for decomposing the input model
 (either in LHE or SLHA format) into simplified model |topologies| and using the output of the decomposition
