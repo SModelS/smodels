@@ -25,9 +25,10 @@
 Theory Predictions
 ==================
 
-The :doc:`decomposition <Decomposition>` of the input model as a sum of |elements| is the
+The :doc:`decomposition <Decomposition>` of the input model as a sum of |elements|
+(simplified models) is the
 first step for confronting the model with the experimental limits.
-The next step consists of computing the relevant signal 
+The next step consists of computing the relevant signal cross-sections
 (or *theory predictions*) for comparison with the experimental limits. Below we describe the procedure
 for the computation of the theory predictions after the model has been decomposed.
 
@@ -43,14 +44,18 @@ Each of them requires different theoretical predictions to be compared against e
 |ULrs| constrains the weight (|sigBR|) of one |element| or sum of |elements|.
 Therefore SModelS must compute the theoretical value of |sigBR| summing only over the |elements|
 appearing in the respective :ref:`constraint <ULconstraint>`.
-Once this theoretical value is known, it can be compared against the respective 95% upper limit extracted
-from the UL map (see |ULrs|).
+This is done applying a 1 (zero) efficiency (:math:`\epsilon`) for the
+elements which appear (do not appear) in the :ref:`constraint <ULconstraint>`.
+Then the final theoretical prediction is the sum over all
+|elements| with a non-zero value of |ssigBRe|. This value can then be compared with the
+respective 95% C.L. upper limit extracted from the UL map (see |ULrs|).
 
 On the other hand, |EMrs| constrain the total signal (|ssigBRe|) in a given signal region (|Dataset|).
 Consequently, in this case SModelS must compute |sigBRe| for each |element|, using the efficiency maps for
 the corresponding |Dataset|. The final theoretical prediction is the sum over all |elements|
 with a non-zero value of |sigBRe|.
-This value can then be compared with the signal upper limit for the respective |dataset|.
+This value can then be compared with the signal upper limit for the respective 
+signal region (|dataset|).
 
 Although the details of the theoretical prediction computation differ depending on the type
 of |ExpRes| (|ULrs| or |EMrs|), the overall procedure is common for both type of results. Below we schematically
@@ -63,38 +68,15 @@ show the main steps of the theory prediction calculation:
 
 
 As shown above the procedure can always be divided in two main steps:
-*Element Selection* and *Element Clustering*. The first step is trivial for |ULrs|,
-but more involved for |EMrs|, while the opposite is true for the clustering of |elements|.
+*Element Selection* and *Element Clustering*.
 Once the |elements| have been selected and clustered, the theory prediction for each |Dataset| is given by
 the sum of all the |element| weights (|sigBRe|) belonging to the same cluster:
 
 .. math::
    \mbox{theory prediction } = \sum_{cluster} (\mbox{element weight}) =  \sum_{cluster} (\sigma \times BR \times \epsilon)
 
-
-In the case of |ULrs|, there might be several clusters (see :ref:`Element Clustering <ULcluster>`)
-for a given |Dataset| (or  |ExpRes| [*]_), resulting in a list of theory predictions 
-for the corresponding |Dataset|. Each theory prediction must then
-be individually confronted with the 95% experimental upper limit obtained from the corresponding UL map.
-
-On the other hand, |EMrs| always have a single cluster for a given |Dataset|, since
-all |elements| (with non-zero efficiencies) contribute to the theory prediction (signal).
-However, |EMrs| typically have several |Datasets|, corresponding to distinct signal regions.
-Nonetheless, given a |Dataset|,  the final theory prediction must be compared against the
-signal upper limit for the corresponding signal region.
-Notice that this upper limit depends only on the number of expected and observed events in the signal region
-(as well as their uncertainties) and does not depend on the input model.
-
-
-By default only the best |Dataset| is shown for each |ExpRes|. The best |Dataset| is
-the one with the largest :math:`\mbox{(expected signal)}/\mbox{(expected background)}` ratio.
-Since |ULrs| only have a single |Dataset|, the selection is trivial. On the other
-hand, for |EMrs| with more than one |Dataset|, only the best one is selected.
-If the user wants to have access to all the |datasets|, the default
-behavior can be disabled using the variable 
-`useBestDataset <../../../documentation/build/html/theory.html#theory.theoryPrediction.theoryPredictionsFor>`_.     
-
-Below we describe in detail the method for computing the theory predictions for each type
+Below we describe in detail the *element selection* and *element clustering* 
+methods for computing the theory predictions for each type
 of |ExpRes| separately.
 
 * **Theory predictions are computed using the** `theoryPredictionsFor <../../../documentation/build/html/theory.html#theory.theoryPrediction.theoryPredictionsFor>`_ **method** 
@@ -104,10 +86,10 @@ of |ExpRes| separately.
 Theory Predictions for Upper Limit Results
 ------------------------------------------
 
-In order to compute the signal cross-sections for a given |ULr|, so it can be compared
-against the upper limits, it is first necessary to select the |elements| generated by the model 
-:doc:`decomposition <Decomposition>` and then cluster them according to their masses.
-These two steps are described below. 
+Computation of the signal cross-sections for a given
+|ULr| takes place in two steps. First selection of the
+|elements| generated by the model :doc:`decomposition <Decomposition>` and then clustering
+of the selected elements according to their masses. These two steps are described below.
 
 .. _ULselection:
 
@@ -116,11 +98,12 @@ Element Selection
 
 An |ULr| holds upper limits for the cross-sections of an |element|
 or sum of |elements|. Consequently, the first step for computing the theory predictions for the corresponding
-analysis is to select the |elements| that appear in the :ref:`constraint <ULconstraint>`.
+experimental result is to select the |elements| that appear in the :ref:`UL result constraint <ULconstraint>`.
 This is conveniently done attributing to each |element| an efficiency equal to 1 (0) 
 if the |element| appears (does not appear) in the :ref:`constraint <ULconstraint>`.
 After all the |elements| weights (:math:`\sigma \times BR`) have been rescaled
-by these ''trivial'' efficiencies, only the ones with non-zero weights are relevant for the analysis.
+by these ''trivial'' efficiencies, only the ones with non-zero weights are relevant for the signal
+cross-section.
 The |element| selection is then trivially achieved by selecting all the |elements| with non-zero weights.
 
 The procedure described above is illustrated graphically in the figure below for the simple example where the 
@@ -140,7 +123,7 @@ Element Clustering
 
 Naively one would expect that after all the |elements| appearing in the :ref:`constraint <ULconstraint>`
 have been selected, it is trivial to compute the theory prediction: one must simply 
-sum up the weights (|sigBR|) of all the |elements|.
+sum up the weights (|sigBR|) of all the selected |elements|.
 However, the selected |elements| usually differ in their masses [*]_ and the
 experimental limit (see :ref:`Upper Limit constraint <ULconstraint>`) assumes that all the |elements| appearing
 in the :ref:`constraint <ULconstraint>` have the same mass (or mass array).
@@ -237,7 +220,6 @@ weights by their efficiencies, according to the efficiency map of the correspond
 The efficiency for a given |Dataset| depends both on the |element| mass and on its topology and particle content. 
 In practice the efficiencies for most of the |elements| will be extremely small (or zero), hence only a subset effectively
 contributes after the element selection  [*]_.
-
 In the figure below we illustrate the element selection for the case of  a |EMr|/|Dataset|:
 
 .. _EMselectionfig:
@@ -248,7 +230,7 @@ In the figure below we illustrate the element selection for the case of  a |EMr|
 If, for instance, the analysis being considered vetoes :math:`jets` and :math:`\tau`'s in the final state, 
 we will have :math:`\epsilon_2,\, \epsilon_4 \simeq 0` for the example in the :ref:`figure above <EMselectionfig>`.
 Nonetheless, the element selection for a  |Dataset| is usually more inclusive than
-the one applied for the |ULr|, resulting in larger values for the theory prediction.
+the one applied for the |ULr|, resulting in less conservative values for the theory prediction.
 
 
 * **The element selection is implemented by the** `getElementsFrom <../../../documentation/build/html/theory.html#theoryPrediction._getElementsFrom>`_ **method**
