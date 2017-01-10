@@ -13,4 +13,3 @@ The basic SModelS framework consists of the following main parts:
    TheoryPredictions
    DatabaseStructure
    ConfrontPredictions
-   OutputDescription

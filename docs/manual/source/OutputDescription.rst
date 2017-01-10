@@ -35,8 +35,8 @@
 
 .. _outputDescription:
 
-SModelS Output
-==============
+Output Description
+==================
 
 A detailed description of the possible output formats generated
 by :ref:`running SModelS <runningSModelS>` and their content are given below.

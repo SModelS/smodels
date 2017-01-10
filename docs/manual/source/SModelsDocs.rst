@@ -10,4 +10,4 @@ Detailed Guide to SModelS
    
    SModelSDefs
    Structure
-   Tools
+   OutputDescription

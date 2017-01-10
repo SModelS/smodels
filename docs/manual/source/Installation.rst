@@ -115,7 +115,7 @@ Adding results to the database
 
 .. _addingFastlim:
 
-Adding fastlim data
+Adding FastLim data
 ^^^^^^^^^^^^^^^^^^^
 
 The official SModelS database can be augmented with data from the
