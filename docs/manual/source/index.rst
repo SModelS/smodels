@@ -36,6 +36,7 @@ Contents
    ReleaseUpdate  
    Installation
    RunningSModelS
+   Tools
    SModelsDocs
    Examples
    CodeDocs
