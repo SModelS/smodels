@@ -19,6 +19,7 @@
 .. |Database| replace:: :ref:`Database <Database>`
 .. |element| replace:: :ref:`element <element>`
 .. |elements| replace:: :ref:`elements <element>`
+.. |bracket notation| replace:: :ref:`bracket notation <bracketNotation>`
 
 Database of Experimental Results
 ================================
@@ -48,7 +49,6 @@ by LHC center-of-mass energies, |sqrts|:
 
 Also, the top level directory contains a file called ``version`` with the
 version string of the database.
-
 The second level splits the results up between the different experiments:
 
 * 8TeV/CMS/
@@ -68,7 +68,7 @@ Experimental Result Folder
 
 Each |ExpRes| folder contains: 
 
-* a folder for each |Dataset| (e.g. ``data-xx``)
+* a folder for each |Dataset| (e.g. ``data``)
 * a ``globalInfo.txt`` file
 
 The ``globalInfo.txt`` file contains the meta information about the |ExpRes|.
@@ -85,7 +85,7 @@ data.  Here is the content of CMS-SUS-12-024/globalInfo.txt as an example:
 Data Set Folder
 ^^^^^^^^^^^^^^^
 
-Each |Dataset| folder (e.g. ``data-xx``) contains:
+Each |Dataset| folder (e.g. ``data``) contains:
 
 * the Upper Limit maps for |ULrs| or Efficiency maps for |EMrs| (``TxName.txt`` files)
 * a ``dataInfo.txt`` file containing meta information about the |Dataset|
@@ -105,23 +105,23 @@ example:
 .. literalinclude:: /literals/dataInfo.txt
    :lines: 1-2
 
-For |ULrs|, each ``TxName.txt`` file contains the UL map for a given |element|
-or sum of |elements| (see |ExpRess|) as well as some meta information,
-including the corresponding |constraint| and the |conditions|.  The
+For |ULrs|, each ``TxName.txt`` file contains the UL map for a given simplified model
+(|element| or sum of |elements|) as well as some meta information,
+including the corresponding |constraint| and |conditions|.  The
 first few lines of CMS-SUS-12-024/data/T1tttt.txt read:
 
 .. literalinclude:: /literals/T1tttt.txt
-   :lines: 1-9
+   :lines: 1-8
    
 As seen above, the first block of data in the ``T1tttt.txt`` file contains
-information about the |element| 
+information about the |element| in |bracket notation|
 (:math:`[[[\mbox{t},\mbox{t}]],[[\mbox{t},\mbox{t}]]]`) for which the data
 refers to as well as reference to the original data source and some additional
-information.  The second block of data contains the upper limit map as a
+information.  The second block of data contains the upper limits as a
 function of the BSM masses:
 
 .. literalinclude:: /literals/T1tttt.txt
-   :lines: 10-20
+   :lines: 9-19
 
 As we can see, the UL map is given as a Python array with the structure: 
 :math:`[[\mbox{masses},\mbox{upper limit}], [\mbox{masses},\mbox{upper limit}],...]`.
@@ -139,7 +139,7 @@ CMS-SUS-13-012-eff/3NJet6_1000HT1250_200MHT300/dataInfo.txt as an example:
    :lines: 1-7
 
 For |EMrs|, each ``TxName.txt`` file contains the efficiency map for a given
-|element| or sum of |elements| (see |ExpRess|) as well as some meta
+simplified model (|element| or sum of |elements|) as well as some meta
 information.
 Here is the first few lines of CMS-SUS-13-012-eff/3NJet6_1000HT1250_200MHT300/T2.txt:
 
@@ -147,10 +147,11 @@ Here is the first few lines of CMS-SUS-13-012-eff/3NJet6_1000HT1250_200MHT300/T2
    :lines: 1-8
    
 As seen above, the first block of data in the ``T2.txt`` file contains
-information about the |element| (:math:`[[[\mbox{jet}]],[[\mbox{jet}]]]`) for which the
+information about the |element| (:math:`[[[\mbox{jet}]],[[\mbox{jet}]]]`) 
+in |bracket notation| for which the
 efficiencies refers to as well as reference to the original data source and
 some additional information.
-The second block of data contains the efficiency map as a function of the BSM masses:
+The second block of data contains the efficiencies as a function of the BSM masses:
 
 .. literalinclude:: /literals/T2.txt
    :lines: 9-15

@@ -38,14 +38,15 @@ Each theory prediction must then be compared to its
 corresponding upper limit.  This limit is simply the cross-section upper limit provided by
 the experimental publication or conference note and is extracted from the corresponding UL map (see |ULrs|).
 
-For |EMrs| there is a single cluster for each |Dataset|, and hence a single signal cross-section
+For |EMrs| there is a single cluster for each |Dataset| (or signal region), and hence a single signal cross-section
 value. This value must be compared to the upper limit for the corresponding signal region.
 This upper limit is easily computed using the number of observed and expected events for the |Dataset|
 and their uncertainties and is typically stored in the :ref:`Database <database>`.
 Since most |EMrs| have several signal regions (|Datasets|), there will be one theory prediction/upper limit
 for each |Dataset|. By default SModelS keeps only the best |Dataset|, which is the one which maximizes
-the ratio :math:`\mbox{(expected signal)}/\mbox{(expected background)}`.
-Thus each |EMr| will have a single theory prediction/upper limit, corresponding  to the best |Dataset|.
+the ratio :math:`\mbox{(expected signal)}/\mbox{(expected limit)}`.
+Thus each |EMr| will have a single theory prediction/upper limit, corresponding  to the best |Dataset|
+(based on the expected limit).
 If the user wants to have access to all the |datasets|, the default
 behavior can be disabled using the variable *useBestDataset*.
 
@@ -62,7 +63,7 @@ Likelihood Computation
 ----------------------
 
 
-For |EMrs| a :math:`\chi^2` can also be computed (in addition to the upper limits above).
+For |EMrs| a :math:`\chi^2`-value can also be computed (in addition to the upper limits above).
 The :math:`\chi^2` is computed from the likelihood using:
 
 .. math::
@@ -71,12 +72,13 @@ The :math:`\chi^2` is computed from the likelihood using:
    
  
 where :math:`L(n_{\mathrm{signal}})` is the likelihood for a given number of signal events. 
-The likelihood is computed using a simple Poisson convoluted with a Gaussian as a function of 
+The likelihood is computed using a simple Poisson convoluted with a Gaussian (for the
+background and signal uncertainties) as a function of 
 the number of observed events (:math:`n_{\mathrm{obs}}`), the number of expected background events
 (:math:`n_{b}`) and its error (:math:`\delta_{b}`)
 and the number of signal events (:math:`n_{\mathrm{signal}}`) and its error (:math:`\delta_{s})`).
 While :math:`n_{\mathrm{obs}}`, :math:`n_{b}` and :math:`\delta_{b}` are directly extracted from the |Dataset|,
-:math:`n_{\mathrm{signal}}` is obtained from from the :ref:`theoryPredictions` calculation and 
+:math:`n_{\mathrm{signal}}` is obtained from the :ref:`theoryPredictions` calculation and 
 :math:`\delta_{s} = 20\%~\cdot n_{\mathrm{signal}}` by default.
 
 * **The** :math:`\chi^2` **for a given** |EMr| **is computed using the** `chi2  method <../../../documentation/build/html/tools.html#tools.statistics.chi2>`_

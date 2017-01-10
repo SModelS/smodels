@@ -20,13 +20,13 @@ Decomposition into Simplified Models
 ====================================
 
 Given an input model, the first task of SModelS is to decompose 
-the full model into a sum of :ref:`elements <element>`. 
+the full model into a sum of Simplified Models (or :ref:`elements <element>` in SModelS language).
 Based on the input format, which can be  
  
-* a SLHA (SUSY Les Houches Accord) file or  
-* a LHE (Les Houces Event) file
+* a SLHA file or  
+* a LHE file
 
-as explained in the :doc:`Basic Input <BasicInput>` section,  
+(see :doc:`Basic Input <BasicInput>`),
 two distinct (but similar) decomposition methods are applied:
 the :ref:`SLHA-based <slhaDecomp>` or the :ref:`LHE-based <lheDecomp>` decomposition.
 
@@ -87,7 +87,8 @@ For most practical purposes, however, elements with extremely small weights (cro
 can be discarded, since they will fall well below the experimental limits. Therefore, during the SLHA decomposition,
 whenever an element is generated with a weight below some minimum value, this element (and all elements derived from it) is ignored.
 The minimum weight to be considered is given by the `sigcut <../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose>`_ parameter 
-and is easily adjustable (see `slhaDecomposer.decompose <../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose>`_)
+and is easily adjustable 
+(see `slhaDecomposer.decompose <../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose>`_).
 
 Note that, when computing the |theory predictions|, the weight of several |elements| can be combined together. Hence
 it is recommended to set the value of `sigcut <../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose>`_
@@ -173,7 +174,8 @@ The most common example is
 .. math::
    A \rightarrow \nu + B
 
-as the last step of the decay chain, where :math:`B` is an insivible particle leading to a MET signature. Since both the neutrino and 
+as the last step of the decay chain, where :math:`B` is an insivible particle leading to a MET signature.
+Since both the neutrino and 
 :math:`B` are invisible, for all experimental purposes the effective MET object is :math:`B + \nu = A`.
 Hence it is possible to omit the last step in the cascade decay, resulting in a compressed element. 
 Note that this compression can be applied consecutively to several steps of the cascade decay if all of them 
@@ -193,11 +195,11 @@ and can be easily turned on/off by the flag *doInvisible* in the :ref:`SLHA <slh
 Element Sorting
 ---------------
 
-In order to improve the code performance, elements created during decomposition and
-sharing a commong global |topology| are sorted. 
+In order to improve the code performance, |elements| created during |decomposition| and
+sharing a commong |topology| are sorted. 
 Sorting allows for an easy ordering of the elements belonging to a topology and
 faster element comparison.
-Elements are sorted according to its branches. Branches are compared according to
+Elements are sorted according to their branches. Branches are compared according to
 the following properties:
 
 * Number of vertices
@@ -224,13 +226,15 @@ Element 3 is smaller than the one in Element 2, the former is 'smaller' than the
 Finally if all the branch features listed above are identical for both branches, the
 elements being compared are considered to be equal.
 Futhermore, the branches belonging to the same element are also sorted. Hence, if an element
-has two branches::
+has two branches:
 
+.. math::
    element = [branch1, branch2],
 
-it implies::
+it implies
 
-   branch1 < branch2
+.. math::
+   branch1 < branch2.
 
 
 
