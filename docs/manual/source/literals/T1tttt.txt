@@ -2,19 +2,12 @@ txName: T1tttt
 conditionDescription: None
 condition: None
 constraint: [[['t','t']],[['t','t']]]
-checked: A
 figureUrl: https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS12024/T1tttt_exclusions_corrected.pdf
-validated: None
+validated: True
 axes: 2*Eq(mother,x)_Eq(lsp,y)
 publishedData: True
 upperLimits: [[[[400.0*GeV, 0.0*GeV], [400.0*GeV, 0.0*GeV]], 1.815773*pb],
 [[[400.0*GeV, 25.0*GeV], [400.0*GeV, 25.0*GeV]], 1.806528*pb],
 [[[400.0*GeV, 50.0*GeV], [400.0*GeV, 50.0*GeV]], 2.139336*pb],
 [[[400.0*GeV, 75.0*GeV], [400.0*GeV, 75.0*GeV]], 2.472143*pb],
-[[[400.0*GeV, 100.0*GeV], [400.0*GeV, 100.0*GeV]], 2.92975*pb],
-[[[400.0*GeV, 125.0*GeV], [400.0*GeV, 125.0*GeV]], 3.387357*pb],
-[[[400.0*GeV, 150.0*GeV], [400.0*GeV, 150.0*GeV]], 3.474572*pb],
-[[[400.0*GeV, 175.0*GeV], [400.0*GeV, 175.0*GeV]], 3.561787*pb],
-[[[425.0*GeV, 0.0*GeV], [425.0*GeV, 0.0*GeV]], 1.318791*pb],
-[[[425.0*GeV, 25.0*GeV], [425.0*GeV, 25.0*GeV]], 1.348072*pb],
 	...

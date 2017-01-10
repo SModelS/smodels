@@ -50,7 +50,7 @@ Screen (Stdout) Output
 
 The stdout (or :ref:`log output <logOut>`) is intended to provide extensive information about
 the |database|, the |decomposition|, the  |theory predictions| and the :ref:`missing topologies <topCoverage>`.
-It is most convenient if the input is a single file and not a folder, since the output is quite extense.
+It is most convenient if the input is a single file and not a folder, since the output is quite extensive.
 If all the options in **stdout-printer** are set to True (see |parameters|), the screen output contains the following information:
 
 * information about the basic input parameters and the status of the run:
@@ -60,7 +60,7 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
 
 * a list of all the |express| considered (if **printDatabase** = True). Note that this list corresponds to all the results
   selected in the **database** options (see |parameters|). If **addAnaInfo** = True,
-  for each |express| entry a list of all the simplified models (or |elements|) constrained by the analysis
+  for each |expres| entry a list of all the simplified models (or |elements|) constrained by the analysis
   is also shown using the :ref:`bracket notation <bracketNotation>`:
 
 .. literalinclude:: /images/screenoutput.txt
@@ -74,13 +74,13 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   weight, the PIDs of the :ref:`intermediate particles <odd states>` contributing to the |element| and the element ID:
 
 .. literalinclude:: /images/screenoutput.txt
-   :lines: 939-997
+   :lines: 939-984
    
 
 * a list of all the |theory predictions| obtained and the corresponding |expres| upper limit.
   For each |expres|, the corresponding *id*, signal region (|dataset|) and *sqrts* as well as
   the constrained simplified models (|txnames|) are printed.
-  After this basic information, the signal cross-section (theory prediction),
+  After this basic information, the signal cross-section (|theory prediction|),
   the list of :ref:`condition values <ULconditions>`  (if applicable) and the corresponding observed
   upper limit are shown. Also, if available, the expected upper limit is included.
   If  **computeStatistics** = True, the :math:`\chi^2` and likelihood values are printed 
