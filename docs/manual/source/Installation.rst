@@ -101,13 +101,13 @@ Here we assume a version of gfortran is already installed in your system.
     PATH="<anaconda-folder>/bin:$PATH"
     PYTHONPATH=$PYTHONPATH:"<anaconda-folder>/lib/python2.7/site-packages"
  
-and then install SModelS as a user:
+and then install SModelS as a user: ::
  
- * python setup.py install --user
+ python setup.py install --user
 
-In order to make sure all libraries have been correctly installed, you can run
+In order to make sure all libraries have been correctly installed, you can run ::
    
- * python smodels/tools/toolBox.py
+ python smodels/tools/toolBox.py
 
 
 Adding results to the database
@@ -124,12 +124,12 @@ A tarball with the *properly converted* fastlim efficiency maps can be found in 
 `download section <http://smodels.hephy.at/downloads/v1.1>`_.
 The tarball then needs to be exploded in the top level directory of the database.
 
-That is, the following steps need to be performed:
+That is, the following steps need to be performed ::
 
- * mv smodels-fastlim-v1.1.x.tgz <smodels-database folder>
- * cd <smodels-database folder>
- * tar -xzvf smodels-fastlim-v1.1.x.tgz
- * rm smodels-fastlim-v1.1.x.tgz
+ mv smodels-fastlim-v1.1.x.tgz <smodels-database folder>
+ cd <smodels-database folder>
+ tar -xzvf smodels-fastlim-v1.1.x.tgz
+ rm smodels-fastlim-v1.1.x.tgz
 
 Once the fastlim folders have been added to the database,
 SModelS auto-detects fastlim results and issues an acknowledgement.

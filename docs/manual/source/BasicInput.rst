@@ -12,7 +12,7 @@ given in the two following forms:
 
 * a SLHA (SUSY Les Houches Accord) file containing masses, branching ratios and cross-sections for the BSM states
   (see an example file :download:`here <examples/example.slha>`)
-* a LHE (Les Houces Event) file containing parton level events
+* a LHE (Les Houches Event) file containing parton level events
   (see an example file :download:`here <examples/example.lhe>`)
 
 The SLHA format is usually more compact and best suited for supersymmetric models. On the other hand, a LHE file can always
