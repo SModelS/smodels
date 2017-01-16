@@ -67,7 +67,7 @@ For |EMrs| a :math:`\chi^2`-value can also be computed (in addition to the upper
 The :math:`\chi^2` is computed from the likelihood using:
 
 .. math::
-   \chi^2 = -2 \log(\frac{L(n_{\mathrm{signal}})}{L_{\mathrm{max}}})
+   \chi^2 = -2 \log\left(\frac{L(n_{\mathrm{signal}})}{L_{\mathrm{max}}}\right)
    
    
  

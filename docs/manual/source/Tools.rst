@@ -24,7 +24,8 @@
 .. |branch| replace:: :ref:`branch <branch>`
 .. |EMrs| replace:: :ref:`EM-type results <EMtype>`
 .. |ULrs| replace:: :ref:`UL-type results <ULtype>`
-
+.. |br| raw:: html
+   <br />
 
 SModelS Tools
 =============
@@ -77,24 +78,25 @@ for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~
                         Verbosity (debug, info, warning, error)
                         
 
-Some more explanations:
-
-* *-s* (int): an integer (or integers) with the value (in TeV) of the LHC center-of-mass energy for computing the cross-sections
-* *-e* (int): the number of Monte Carlo events when running Pythia
-* *-c* (int): number of cpu cores to be used. It is only used when cross-sections are being computed for multiple SLHA files
-* *-p*: if set, the cross-sections will be written back to the file. If in the input file already
-  contains cross-sections, only the non-overlapping ones will be written. If not set, the cross-sections
-  will be written to the screen.
-* *-q*: if set, will only check if the input file already contains cross-sections.  
-* *-k*: if set, keep the temporary directory containing the Pythia run output. This option is only
-  relevant when checking for errors when running Pythia.
-* *-n*: if set, use Pythia and NLLfast to compute NLO cross-sections. Note that since NLLfast only contains
-  results for production of squarks and gluinos, only these cross-sections will be generated
-* *-N*: if set, use Pythia and NLLfast to compute NLO+NLL cross-sections. Note that since NLLfast only contains
-  results for production of squarks and gluinos, only these cross-sections will be generated
-* *-O*: if set, SModelS will read the LO cross-sections from the input file
-  and use NLLfast to compute the NLO or NLO+NLL cross-sections for squarks and gluinos
-* *-f*: name of input SLHA file or a folder containing SLHA files
+*Some more explanations*:
+  -s SQRTS, --sqrts SQRTS 
+                        (int) an integer (or integers) with the value (in TeV) of the LHC center-of-mass energy for computing the cross-sections
+  -e NEVENTS, --nevents NEVENTS 
+                        (int) the number of Monte Carlo events when running Pythia
+  -c NCPUS, --ncpus NCPUS 
+                        (int) number of cpu cores to be used.
+                        It is only used when cross-sections are computed for multiple SLHA files.
+  -p, --tofile          if set, the cross-sections will be written back to the file. 
+    If in the input file already contains cross-sections, only the non-overlapping ones will be written. 
+    If not set, the cross-sections will be written to the screen.
+  -q, --query           if set, will only check if the input file already contains cross-sections.  
+  -k, --keep            if set, keep the temporary directory containing the Pythia run output. This option is only relevant when checking for errors when running Pythia.
+  -n, --NLO             if set, use Pythia and NLLfast to compute NLO cross-sections. Note that since NLLfast only contains results for production of squarks and gluinos, only these cross-sections will be generated
+  -N, --NLL             if set, use Pythia and NLLfast to compute NLO+NLL cross-sections. 
+                        Note that since NLLfast only contains results for production of squarks and gluinos, only these cross-sections will be generated
+  -O, --LOfromSLHA      if set, SModelS will read the LO cross-sections from the input file and use NLLfast to compute the NLO or NLO+NLL cross-sections for squarks and gluinos
+  -f FILENAME, --filename FILENAME
+                        name of input SLHA file or a folder containing SLHA files
 
 Further Pythia parameters are defined in :download:`etc/pythia.card </images/pythia.card>`.
 
@@ -142,7 +144,7 @@ For a LHE input file only very basic checks are performed, namely that
 
 **The usage of the LHE checker is simply:**
 
-smodelsTools.py lhechecker [-h] -f FILENAME
+   smodelsTools.py lhechecker [-h] -f FILENAME
 
 *arguments*:
 
@@ -221,16 +223,19 @@ smodelsTools.py slhachecker [-h] [-xS] [-lsp] [-longlived] [-m DISPLACEMENT] [-s
                         name of input SLHA file
 
 
-In some more detail:
-
-* *-f*: path to the input file
-* *-xS*: if this flag is set, the check for a cross section block will not be performed
-* *-lsp*: if this flag is set, the check for a neutral LSP will not be performed
-* *-longlived*: if this flag is set, check for non-prompt visible decays or stable charged particles will not be performed
-* *-m* (float): use this to set the value of c*tau (in meters) where a decay is no longer considered prompt
-* *-s* (float): use this to set the value of sigmacut, that is used as a cutoff for relevant non-promt decays or long lived charged particle production
-* *-illegal*: if this flag is set, the check for illegal (kinematically forbidden) decays will be performed
-* *-dB*: if this flag is set, the check for missing decay blocks will not be performed
+*In some more detail*:
+  -xS, --xsec           if this flag is set, the check for a cross section block will not be performed
+  -lsp, --lsp           if this flag is set, the check for a neutral LSP will not be performed
+  -longlived, --longlived
+                        if this flag is set, check for non-prompt visible decays or stable charged particles will not be performed
+  -m DISPLACEMENT, --displacement DISPLACEMENT 
+                        (float) use this to set the value of c*tau (in meters) where a decay is no longer considered prompt
+  -s SIGMACUT, --sigmacut SIGMACUT 
+                        (float) use this to set the value of sigmacut, that is used as a cutoff for relevant non-promt decays or long lived charged particle production
+  -illegal, --illegal   if this flag is set, the check for illegal (kinematically forbidden) decays will be performed
+  -dB, --decayBlocks    if this flag is set, the check for missing decay blocks will not be performed
+  -f FILENAME, --filename FILENAME 
+                        path to the input file
 
 A typical
 usage example is: ::
@@ -263,10 +268,10 @@ smodelsTools.py database-browser [-h] -p PATH_TO_DATABASE [-t]
   -t, --text            load text database, dont even search for binary
                         database file
 
-In some more detail:
-
-* *-p*: path to the database folder 
-* *-t*: if set, force the text database to be loaded (ignores the :ref:`pickle file <databasePickle>`)
+*In some more detail*:
+  -p PATH_TO_DATABASE, --path_to_database PATH_TO_DATABASE 
+                        path to the database folder 
+  -t, --text            if set, force the text database to be loaded (ignores the :ref:`pickle file <databasePickle>`)
 
 A typical usage example is: ::
 
