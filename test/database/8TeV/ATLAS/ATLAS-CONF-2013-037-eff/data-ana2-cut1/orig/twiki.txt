@@ -1,1 +1,0 @@
-||[[https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-037-eff/data-ana2-cut/|ATLAS-CONF-2013-037-eff/data-ana2-cut]]<<BR>>ss_by: ||[[smsDictionary#T1bbbt|T1bbbt]]||2*Eq(mother,x)_Eq(lsp,y)||[[None|None]]||None||None||None||
