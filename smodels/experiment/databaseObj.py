@@ -108,7 +108,7 @@ class Database(object):
     def loadTextDatabase ( self ):
         """ simply loads the textdabase """
         if self._databaseVersion:
-            logger.info ( "Asked to load database, but has already been loaded. Ignore." )
+            logger.debug ( "Asked to load database, but has already been loaded. Ignore." )
             return
         logger.info ( "Parsing text database at %s" % self._base )
         self._databaseVersion = self._getDatabaseVersion
