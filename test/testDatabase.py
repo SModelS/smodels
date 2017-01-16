@@ -26,7 +26,7 @@ class DatabaseTest(unittest.TestCase):
         if os.path.exists ( binfile ):
             os.unlink ( binfile )
         self.logger.info ( "test writing pickle file """ )
-        writer = Database ( "./database/", force_load = "txt" )
+        writer = Database ( "./tinydb/", force_load = "txt" )
         writer.createBinaryFile ( binfile )
         reader = Database ( binfile )
         os.unlink ( binfile )
