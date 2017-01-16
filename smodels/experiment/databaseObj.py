@@ -107,6 +107,9 @@ class Database(object):
 
     def loadTextDatabase ( self ):
         """ simply loads the textdabase """
+        if self._databaseVersion:
+            logger.info ( "Asked to load database, but has already been loaded. Ignore." )
+            return
         logger.info ( "Parsing text database at %s" % self._base )
         self._databaseVersion = self._getDatabaseVersion
         self.expResultList = self._loadExpResults()
@@ -272,7 +275,7 @@ class Database(object):
             serializer.dump ( self.hasFastLim, f, protocol=ptcl )
             serializer.dump ( self.expResultList, f, protocol=ptcl )
             logger.info (  " * done writing %s in %.1f secs." % \
-                    ( self.binfile, time.time()-t0 ) )
+                    ( binfile, time.time()-t0 ) )
 
     @property
     def databaseVersion(self):
