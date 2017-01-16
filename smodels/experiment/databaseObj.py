@@ -318,7 +318,7 @@ class Database(object):
 
         path = tmp + '/'
         if not os.path.exists(path):
-            logger.error('%s is no valid path!', path)
+            logger.error('%s is no valid path!' % path)
             raise DatabaseNotFoundException("Database not found")
         self._base = path
 
