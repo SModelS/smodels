@@ -272,7 +272,7 @@ class SlhaStatus(object):
     :ivar findLonglived: if True find stable charged particles and displaced vertices
     
     """
-    def __init__(self, filename, maxDisplacement=.01, sigmacut=.01 * fb,
+    def __init__(self, filename, maxDisplacement=.01, sigmacut=.03 * fb,
                  checkLSP=True, findMissingDecayBlocks=True,
                  findIllegalDecays=False, checkXsec=True, findLonglived=True):
         self.filename = filename
