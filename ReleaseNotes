@@ -1,16 +1,17 @@
 Release v1.1.0, Thu 05 Jan 2017 07:18:56 PM CET
 =======================================================
 
-  * The inclusion of efficiency maps
-  * A new and more flexible database format
-  * Inclusion of likelihood and chi2 calculation for efficiency maps
-  * Inclusion of a database broswer tool for easy access to the information
+  * the inclusion of efficiency maps
+  * a new and more flexible database format
+  * extended information on topology coverage
+  * inclusion of likelihood and chi2 calculation for efficiency maps
+  * inclusion of a database broswer tool for easy access to the information
     stored in the database
-  * The database now supports also a more efficient binary format
-  * Performance improvement for the decomposition of the input model
-  * Inclusion of new simplified results to the database
+  * the database now supports also a more efficient binary format
+  * performance improvement for the decomposition of the input model
+  * inclusion of new simplified results to the database
 	  (including a few 13 TeV results)
-  * Fastlim efficiency maps can now also be used in SModelS
+  * fastlim efficiency maps can now also be used in SModelS
 
 Release v1.0.4, Fri 11 Mar 2016 11:18:46 AM CET
 =======================================================
