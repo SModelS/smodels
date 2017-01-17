@@ -166,9 +166,8 @@ and can be easily turned on/off by the flag *doCompress* in the :ref:`SLHA <slha
 Invisible Compression
 ^^^^^^^^^^^^^^^^^^^^^
 
-Another class of compression is possible when
-the :ref:`final states <final states>` in the last decay as well as the last :ref:`intermediate state <odd states>`
-are both invisible experimentally. 
+Another type of compression is possible when
+the :ref:`final states <final states>` of the last decay are invisible.
 The most common example is 
 
 .. math::

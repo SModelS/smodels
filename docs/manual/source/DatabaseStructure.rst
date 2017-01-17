@@ -14,8 +14,8 @@
 .. |ULrs| replace:: :ref:`UL-type results <ULtype>`
 .. |ExpRes| replace:: :ref:`Experimental Result<ExpResult>`
 .. |ExpRess| replace:: :ref:`Experimental Results<ExpResult>`
-.. |Dataset| replace:: :ref:`Data Set<DataSet>`
-.. |Datasets| replace:: :ref:`Data Sets<DataSet>`
+.. |Dataset| replace:: :ref:`DataSet<DataSet>`
+.. |Datasets| replace:: :ref:`DataSets<DataSet>`
 .. |Database| replace:: :ref:`Database <Database>`
 .. |element| replace:: :ref:`element <element>`
 .. |elements| replace:: :ref:`elements <element>`
@@ -91,8 +91,8 @@ Each |Dataset| folder (e.g. ``data``) contains:
 * a ``dataInfo.txt`` file containing meta information about the |Dataset|
 
 * **Data Set folders are  described by the** `DataSet Class <../../../documentation/build/html/experiment.html#experiment.datasetObj.DataSet>`_
-* **TxName files are descrived by the** `TxName Class <../../../documentation/build/html/experiment.html#experiment.txnameObj.TxName>`_
-* **dataInfo files  are descrived by the** `Info Class <../../../documentation/build/html/experiment.html#experiment.infoObj.Info>`_
+* **TxName files are described by the** `TxName Class <../../../documentation/build/html/experiment.html#experiment.txnameObj.TxName>`_
+* **dataInfo files are described by the** `Info Class <../../../documentation/build/html/experiment.html#experiment.infoObj.Info>`_
 
 Data Set Folder: Upper Limit Type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -113,12 +113,7 @@ first few lines of CMS-SUS-12-024/data/T1tttt.txt read:
 .. literalinclude:: /literals/T1tttt.txt
    :lines: 1-8
    
-As seen above, the first block of data in the ``T1tttt.txt`` file contains
-information about the |element| in |bracket notation|
-(:math:`[[[\mbox{t},\mbox{t}]],[[\mbox{t},\mbox{t}]]]`) for which the data
-refers to as well as reference to the original data source and some additional
-information.  The second block of data contains the upper limits as a
-function of the BSM masses:
+The second block of data contains the upper limits as a function of the BSM masses:
 
 .. literalinclude:: /literals/T1tttt.txt
    :lines: 9-19
@@ -193,7 +188,7 @@ Database: Binary (Pickle) Format
 Due to the large number of experimental results contained in the SModelS
 |Database|, parsing the :ref:`database folders <folderStruct>` and building the
 corresponding :ref:`database objects <objStruct>` may require a non-negligible
-CPU time. In some cases this task may be the most time consuming task when
+CPU time. In some cases this may be the most time consuming task when
 testing a single input file.  Furthermore this procedure does not have to be
 repeated every time SModelS is run.
 
