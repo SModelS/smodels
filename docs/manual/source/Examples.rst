@@ -14,9 +14,9 @@ Below a few examples are given for how to utilize SModelS and some of the :doc:`
 
 * `How to obtain experimental efficiencies <_downloads/lookup_efficiency.html>`_ (download the Python code :download:`here <recipes/lookup_efficiency.py>`, IPython notebook :download:`here <recipes/lookup_efficiency.ipynb>`)
 
-* `How to compute leading order cross-sections (for MSSM) <_downloads/lo_xsecs_from_slha.html>`_ (download the Python code :download:`here <recipes/lo_xsecs_from_slha.py>`, IPython notebook :download:`here <recipes/lo_xsecs_from_slha.ipynb>`)
+* `How to compute leading order cross sections (for MSSM) <_downloads/lo_xsecs_from_slha.html>`_ (download the Python code :download:`here <recipes/lo_xsecs_from_slha.py>`, IPython notebook :download:`here <recipes/lo_xsecs_from_slha.ipynb>`)
 
-* `How to compute next-to-leading order cross-sections (for MSSM) <_downloads/nll_xsecs_from_slha.html>`_ (download the Python code :download:`here <recipes/nll_xsecs_from_slha.py>`, IPython notebook :download:`here <recipes/nll_xsecs_from_slha.ipynb>`)
+* `How to compute next-to-leading order cross sections (for MSSM) <_downloads/nll_xsecs_from_slha.html>`_ (download the Python code :download:`here <recipes/nll_xsecs_from_slha.py>`, IPython notebook :download:`here <recipes/nll_xsecs_from_slha.ipynb>`)
 
 * `How to print decomposition results <_downloads/print_decomposition.html>`_ (download the Python code :download:`here <recipes/print_decomposition.py>`, IPython notebook :download:`here <recipes/print_decomposition.ipynb>`)
 
