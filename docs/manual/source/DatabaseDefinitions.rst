@@ -97,7 +97,7 @@ Experimental Result: Upper Limit Type
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Upper Limit (UL) experimental results contains the experimental constraints on
-the cross-section times branching ratio
+the cross section times branching ratio
 ( :math:`\sigma \times BR` ) for Simplified Models from a specific experimental publication or preliminary
 result. These constraints are typically given in the format of Upper Limit maps,
 which correspond to 95% confidence level (C.L.) upper limit values on :math:`\sigma \times BR`
@@ -142,7 +142,7 @@ As an example, consider the `ATLAS analysis <https://atlas.web.cern.ch/Atlas/GRO
 .. image:: images/constraintExample.png
    :width: 80%
 
-As we can see, the upper limits apply to the sum of the cross-sections:
+As we can see, the upper limits apply to the sum of the cross sections:
 
 .. math::
     \sigma = \sigma([[[e^+]],[[e^-]]]) + \sigma([[[\mu^+]],[[\mu^-]]])
@@ -160,7 +160,7 @@ However, almost all experimental results sum only over elements sharing a common
 
 Finally, in some cases the UL constraint assumes specific constributions from each |element|.
 For instance, in the :ref:`example above <constraintplot>` it is implicitly assumed that
-both the electron and muon |elements| contribute equally to the total cross-section.
+both the electron and muon |elements| contribute equally to the total cross section.
 Hence these conditions must also be specified along with the constraint, as described in :ref:`UL conditions<ULconditions>`.
 
 .. _ULconditions:
@@ -171,7 +171,7 @@ Upper Limit Conditions
 When the analysis :ref:`constraints <ULconstraint>` are non-trivial (refer to a sum of elements), it is often the case
 that there are implicit (or explicit) assumptions about the contribution of each element. For instance,
 in the :ref:`figure above <constraintplot>`, it is implicitly assumed that each lepton flavor contributes equally
-to the summed cross-section:
+to the summed cross section:
 
 .. math::    
     \sigma([[[e^+]],[[e^-]]]) = \sigma([[[\mu^+]],[[\mu^-]]])           \;\;\; \mbox{(condition)}

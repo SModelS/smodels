@@ -40,17 +40,17 @@ Inside SModelS there are a number of tools that may be convenient for the user:
 
 .. _xsecCalc:
 
-Cross-Section Calculator
+Cross Section Calculator
 ------------------------
 
-This little tool computes LHC production cross-sections for *MSSM particles*
+This little tool computes LHC production cross sections for *MSSM particles*
 and writes them out in :ref:`SLHA convention <xsecblock>`. This can in particular be 
-convenient for adding cross-sections to SLHA input files, see :doc:`Basic Input <BasicInput>`. 
+convenient for adding cross sections to SLHA input files, see :doc:`Basic Input <BasicInput>`. 
 The calculation is done at LO with `Pythia6.4 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_ ; K-factors 
 for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_ .
 
 
-**The usage of the cross-section calculator is:**
+**The usage of the cross section calculator is:**
 
    smodelsTools.py xseccomputer [-h] -f FILENAME [-s SQRTS [SQRTS ...]] [-e NEVENTS] [-v VERBOSITY] [-c NCPUS] [-p] [-q] [-k] [-n] [-N] [-O]
 
@@ -68,8 +68,8 @@ for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~
   -n, --NLO             compute at the NLO level (default is LO)
   -N, --NLL             compute at the NLO+NLL level (takes precedence over
                         NLO, default is LO)
-  -O, --LOfromSLHA      use LO cross-sections from file to compute the NLO or
-                        NLL cross-sections
+  -O, --LOfromSLHA      use LO cross sections from file to compute the NLO or
+                        NLL cross sections
   -f FILENAME, --filename FILENAME
                         SLHA file to compute cross sections for. If a
                         directory is given, compute cross sections for all
@@ -80,21 +80,21 @@ for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~
 
 *Some more explanations*:
   -s SQRTS, --sqrts SQRTS 
-                        (int) an integer (or integers) with the value (in TeV) of the LHC center-of-mass energy for computing the cross-sections
+                        (int) an integer (or integers) with the value (in TeV) of the LHC center-of-mass energy for computing the cross sections
   -e NEVENTS, --nevents NEVENTS 
                         (int) the number of Monte Carlo events when running Pythia
   -c NCPUS, --ncpus NCPUS 
                         (int) number of cpu cores to be used.
-                        It is only used when cross-sections are computed for multiple SLHA files.
-  -p, --tofile          if set, the cross-sections will be written back to the file. 
-    If in the input file already contains cross-sections, only the non-overlapping ones will be written. 
-    If not set, the cross-sections will be written to the screen.
-  -q, --query           if set, will only check if the input file already contains cross-sections.  
+                        It is only used when cross sections are computed for multiple SLHA files.
+  -p, --tofile          if set, the cross sections will be written back to the file. 
+    If in the input file already contains cross sections, only the non-overlapping ones will be written. 
+    If not set, the cross sections will be written to the screen.
+  -q, --query           if set, will only check if the input file already contains cross sections.  
   -k, --keep            if set, keep the temporary directory containing the Pythia run output. This option is only relevant when checking for errors when running Pythia.
-  -n, --NLO             if set, use Pythia and NLLfast to compute NLO cross-sections. Note that since NLLfast only contains results for production of squarks and gluinos, only these cross-sections will be generated
-  -N, --NLL             if set, use Pythia and NLLfast to compute NLO+NLL cross-sections. 
-                        Note that since NLLfast only contains results for production of squarks and gluinos, only these cross-sections will be generated
-  -O, --LOfromSLHA      if set, SModelS will read the LO cross-sections from the input file and use NLLfast to compute the NLO or NLO+NLL cross-sections for squarks and gluinos
+  -n, --NLO             if set, use Pythia and NLLfast to compute NLO cross sections. Note that since NLLfast only contains results for production of squarks and gluinos, only these cross sections will be generated
+  -N, --NLL             if set, use Pythia and NLLfast to compute NLO+NLL cross sections. 
+                        Note that since NLLfast only contains results for production of squarks and gluinos, only these cross sections will be generated
+  -O, --LOfromSLHA      if set, SModelS will read the LO cross sections from the input file and use NLLfast to compute the NLO or NLO+NLL cross sections for squarks and gluinos
   -f FILENAME, --filename FILENAME
                         name of input SLHA file or a folder containing SLHA files
 
@@ -105,17 +105,17 @@ usage example is: ::
 
    smodelsTools.py xseccomputer -s 8 13 -e 10000 -p -f inputFiles/slha/compressedSpec.slha
 
-which will compute 8 TeV and 13 TeV LO cross-sections (at the LHC) for all MSSM processes using 10k MC events.
-If, *after* the LO cross-sections have been computed, one wants to add the NLO+NLL cross-sections for gluinos and squarks: ::
+which will compute 8 TeV and 13 TeV LO cross sections (at the LHC) for all MSSM processes using 10k MC events.
+If, *after* the LO cross sections have been computed, one wants to add the NLO+NLL cross sections for gluinos and squarks: ::
 
    smodelsTools.py xseccomputer -s 8 13 -p -N -O -f inputFiles/slha/compressedSpec.slha
 
-The resulting file will then contain LO cross-sections for all MSSM processes and NLO+NLL cross-sections for 
+The resulting file will then contain LO cross sections for all MSSM processes and NLO+NLL cross sections for 
 the available processes in `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_  
 (gluino and squark production).
-When reading the input file, SModelS will then use only the highest order cross-sections available for each process.
+When reading the input file, SModelS will then use only the highest order cross sections available for each process.
 
-* **The cross-section calculation is implemented by the** `computeXSec function <../../../documentation/build/html/tools.html#tools.xsecComputer.computeXSec>`_
+* **The cross section calculation is implemented by the** `computeXSec function <../../../documentation/build/html/tools.html#tools.xsecComputer.computeXSec>`_
 
 
 .. _fileChecks:
@@ -168,7 +168,7 @@ The SLHA file checker allows to perform quite rigorous checks of SLHA input file
 
 * the file contains masses and decay branching ratios in standard SLHA format,
 
-* the file contains cross-sections according to the :ref:`SLHA format for cross-sections <xsecSLHA>`,
+* the file contains cross sections according to the :ref:`SLHA format for cross sections <xsecSLHA>`,
 
 
 * the lightest :ref:`Z2-odd state <odd states>` (the LSP in supersymmetric models) is neutral,
@@ -189,15 +189,15 @@ In order to check that the lightest Z\ :sub:`2`-odd state has zero electric and 
 
 The list of quantum numbers is also required to check for displaced vertices or heavy charged particles.
 The check for long-lived (or stable) particles first verifies if these
-appear in one of the cross-section blocks and their cross-section
-exceeds the minimum cross-section value defined by :ref:`sigmacut <parameterFile>` (see  :ref:`Minimum Decomposition Weight <minweight>`).
-If the cross-section is larger than sigmacut and the particle is stable,
+appear in one of the cross section blocks and their cross section
+exceeds the minimum cross section value defined by :ref:`sigmacut <parameterFile>` (see  :ref:`Minimum Decomposition Weight <minweight>`).
+If the cross section is larger than sigmacut and the particle is stable,
 the checker verifies if it is neutral (both electric and color charges
 are zero). On the other hand, if the particle is unstable, but its lifetime (times *c*)
 is larger than a minimum value (*default = 10 mm*), the particle is considered
 as a non-prompt decay.
 For non-prompt decays, all channels are then checked for visible decay products.
-If the branching ratio to visible decays times the maximum production cross-section
+If the branching ratio to visible decays times the maximum production cross section
 for the particle exceeds :ref:`sigmacut <parameterFile>`, the particle's decay
 is considered as a displaced vertex.
 
@@ -255,8 +255,6 @@ This can be conveniently done using the database browser. The browser owns sever
 or |Datasets| satisfying some user-defined conditions as well as to access the meta data and data inside each
 |ExpRes|.
 
-An interface to the |Database| browser is provided through an IPython session.
-
 **The usage of the browser interface is:**
 
 smodelsTools.py database-browser [-h] -p PATH_TO_DATABASE [-t]
@@ -279,7 +277,7 @@ A typical usage example is: ::
 
 Loading the database may take a few seconds if the :ref:`binary database file <databasePickle>` exists.
 Otherwise the :ref:`pickle file <databasePickle>` will be created.
-The user can then use the IPython session (including its auto-complete functions)
+Starting the browser opens an IPython session, which can be used 
 to select specific experimental results (or groups of experimental results),
 check upper limits and/or efficiencies for specific masses/topologies and access all the available
 information in the database.
@@ -361,7 +359,7 @@ can be found in :ref:`Howto's <Examples>`.
 Topology Coverage
 -----------------
 
-Unlike the :ref:`database browser <databaseBrowser>`, the :ref:`file checks <fileChecks>` and the :ref:`cross-section calculator <xsecCalc>`, 
+Unlike the :ref:`database browser <databaseBrowser>`, the :ref:`file checks <fileChecks>` and the :ref:`cross section calculator <xsecCalc>`, 
 the topology coverage tool can not be independently accessed.
 It requires the output from the SMS |decomposition| and |theory predictions|.
 Given the |decomposition| output (list of |elements|), as well as the |database|
@@ -372,7 +370,7 @@ These elements are grouped into the following classes:
 * *missingTopos*: |elements| which are not tested by any of the |results| in the |database| (independent of the element mass).
   The missing topologies are further classified as:
    * *longCascade*: |elements| with long cascade decays (more than one intermediate particle in one of the |branches|);
-   * *asymetricBranches*: |elements| where the first |branch| differs from the second |branch| (but that are not considered as long cascade decays).
+   * *asymmetricBranches*: |elements| where the first |branch| differs from the second |branch| (but that are not considered as long cascade decays).
 
 * *outsideGrid*: |elements| which could be tested by one or more experimental result, but are not constrained because the mass array is outside the mass grid;
 
@@ -387,20 +385,20 @@ are added to the *outsideGrid* class.
 
 Usually the list of  *missing* or *outsideGrid* elements is considerably long.
 Hence, to compress this list, all |elements| differing only by their
-masses (with the same |final states|) or electric charges are combined into a 
-*missing* or *outsideGrid* topology.
-The *missing* topologies are then further classified (if applicable) into longCascade or asymetricBranches topologies.
+masses (with the same |final states|) or electric charges are combined. Moreover, by default, electrons and muons
+are combined to light leptons (denoted "l"): gluons and light quarks are combined into jets.
+The *missing* topologies are then further classified (if applicable) into *longCascade* or *asymmetricBranches* topologies.
 
 
 The topologies for each of the four categories are then grouped according to the final state (for the *missingTopos* and
 *outsideGrid* classes) or according to the PDG ids of the mother masses (for the *longCascade* and
-*asymetricBranches* classes). 
+*asymmetricBranches* classes). 
 
 
 The topology coverage tool is normally called from within SModelS (e.g. when running :ref:`runSModelS.py <runSModelS>`) by setting **testCoverage=True**
 in the :ref:`parameters file <parameterFile>`.
 In the output, contributions in each category are ordered by cross section. 
-By default only the ones with the ten largest cross-sections are shown.
+By default only the ones with the ten largest cross sections are shown.
 
 * **The topology coverage tool is implemented by the** `Uncovered class <../../../documentation/build/html/tools.html#tools.coverage.Uncovered>`_ 
 

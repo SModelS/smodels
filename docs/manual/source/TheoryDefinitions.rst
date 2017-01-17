@@ -45,7 +45,7 @@ A representation of an element is shown below:
    :width: 30%
    
 An element may also hold information about its corresponding 
-weight (cross-section times branching ratio times efficiency[*]_ ).
+weight (cross section times branching ratio times efficiency[*]_ ).
 The overall properties of an element are illustrated in the scheme below:
 
 .. _topscheme:
@@ -60,8 +60,9 @@ Such assumption is extremely helpful to cast the theoretical predictions of a
 specific BSM model in a model-independent framework, which can then be compared
 against the corresponding experimental limits.
 For instance, as shown in the :ref:`scheme above <elementscheme>`, only the
-masses of the BSM states are stored and other properties, such as their spins or
-other quantum numbers are ignored.
+masses of the BSM states are used and other properties, such as their spins or
+other quantum numbers are ignored. (The PIDs, however, are kept for the purpose
+of book-keeping).
 
 
 Below we describe in more detail the element properties and their implementation
