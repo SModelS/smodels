@@ -45,6 +45,7 @@ as follows:
 * a new and more flexible database format (see :ref:`Database structure <databaseStruct>`)
 * inclusion of likelihood and :math:`\chi^2` calculation for |EMrs| 
   (see :ref:`likelihood calculation <likelihoodCalc>`)
+* extended information on :ref:`topology coverage <topCoverage>` 
 * inclusion of a database broswer tool for easy access to the information
   stored in the database (see :ref:`database browser <databaseBrowser>`)
 * the database now supports also a more efficient :ref:`binary format <databasePickle>`
