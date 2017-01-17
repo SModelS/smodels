@@ -35,7 +35,7 @@ class ElementCluster(object):
 
     def getTotalXSec(self):
         """
-        Return the sum over the cross-sections of all elements belonging to
+        Return the sum over the cross sections of all elements belonging to
         the cluster.
         
         :returns: sum of weights of all the elements in the cluster (XSectionList object)
@@ -44,7 +44,7 @@ class ElementCluster(object):
         for el in self.elements:
             totxsec.combineWith(el.weight)
         if len(totxsec) != 1:
-            logger.error("Cluster total cross-section should have a single value")
+            logger.error("Cluster total cross section should have a single value")
             raise SModelSError()
         return totxsec[0]
 

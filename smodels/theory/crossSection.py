@@ -24,9 +24,9 @@ NLL = 2
 
 class XSectionInfo(object):
     """
-    An instance of this class represents information regarding a cross-section.
+    An instance of this class represents information regarding a cross section.
     
-    This class is used to store information of a cross-section (center of
+    This class is used to store information of a cross section (center of
     mass, order and label).
     
     """
@@ -82,9 +82,9 @@ class XSectionInfo(object):
 
 class XSection(object):
     """
-    An instance of this class represents a cross-section.
+    An instance of this class represents a cross section.
     
-    This class is used to store the information of a single cross-section
+    This class is used to store the information of a single cross section
     (value, paritcle ids, center of mass, order and label).
     
     order = 0 (LO), 1 (NLO) or 2 (NLL).
@@ -92,7 +92,7 @@ class XSection(object):
     """
     def __init__(self):
         """
-        Initializes the object to store a cross-section value. 
+        Initializes the object to store a cross section value. 
         All initial info is set to None.
         """        
         self.info = XSectionInfo()
@@ -102,7 +102,7 @@ class XSection(object):
 
     def __mul__(self, other):
         """
-        Multiplies the value of the cross-section by the factor other (should
+        Multiplies the value of the cross section by the factor other (should
         be a float or int).        
         """
         
@@ -171,7 +171,7 @@ class XSection(object):
 
     def __str__(self):
         """
-        Generate cross-section information in string format.        
+        Generate cross section information in string format.        
         """
         st = self.info.label + ':' + str(self.value)
         return st
@@ -200,7 +200,7 @@ class XSection(object):
 
     def _zeroXSec(self):
         """
-        Replace the cross-section value by zero.
+        Replace the cross section value by zero.
         
         """
         self.value = 0. * pb
@@ -208,14 +208,14 @@ class XSection(object):
 
 class XSectionList(object):
     """
-    An instance of this class represents a list of cross-sections.
+    An instance of this class represents a list of cross sections.
     
-    This class is used to store a list of cross-sections.
+    This class is used to store a list of cross sections.
     
     """
     def __init__(self, infoList=None):
         """
-        If infoList is defined, create entries with zero cross-sections
+        If infoList is defined, create entries with zero cross sections
         according to infoList. infoList must be a list of XSectionInfo objects.
         
         """
@@ -353,7 +353,7 @@ class XSectionList(object):
 
     def _zeroXSecs(self):
         """
-        Replace the cross-section values in the list by zero.
+        Replace the cross section values in the list by zero.
         
         """
         for xsec in self:
@@ -362,7 +362,7 @@ class XSectionList(object):
 
     def delete(self, xSec):
         """
-        Delete the cross-section entry from the list.
+        Delete the cross section entry from the list.
         
         """
         for ixsec, xsec in enumerate(self):
@@ -372,7 +372,7 @@ class XSectionList(object):
 
     def getInfo(self):
         """
-        Get basic info about the cross-sections appearing in the list (order,
+        Get basic info about the cross sections appearing in the list (order,
         value and label).
         
         :returns: list of XSectionInfo objects
@@ -422,7 +422,7 @@ class XSectionList(object):
 
     def getMaxXsec(self):
         """
-        Get the maximum cross-section value appearing in the list.
+        Get the maximum cross section value appearing in the list.
         
         """
         maxxsec = 0. * pb
@@ -433,7 +433,7 @@ class XSectionList(object):
 
     def getMinXsec(self):
         """
-        Get minimum cross-section value appearing in the list.
+        Get minimum cross section value appearing in the list.
         
         """
         if len(self) > 0:
@@ -450,8 +450,8 @@ class XSectionList(object):
         Convert the list of XSection objects to a nested dictionary.
         
         First level keys are the particles IDs (if groupBy == pids) or labels
-        (if groupBy == labels) and values are the cross-section labels or
-        particle IDs and the cross-section value. 
+        (if groupBy == labels) and values are the cross section labels or
+        particle IDs and the cross section value. 
         
         """
         xSecDictionary = {}
@@ -477,12 +477,12 @@ class XSectionList(object):
 
     def combineWith(self, newXsecs):
         """
-        Add a new list of cross-sections.
+        Add a new list of cross sections.
         
-        If the new cross-sections already appear (have same order and sqrts),
+        If the new cross sections already appear (have same order and sqrts),
         add its value to the original value, otherwise append it to the list.
-        The particle IDs are ignored when adding cross-sections. Hence, they
-        are set to (None, None) if any cross-sections are combined.
+        The particle IDs are ignored when adding cross sections. Hence, they
+        are set to (None, None) if any cross sections are combined.
         
         """
         newList = newXsecs
@@ -500,7 +500,7 @@ class XSectionList(object):
 
     def removeLowerOrder(self):
         """
-        Keep only the highest order cross-section for each process in the list.
+        Keep only the highest order cross section for each process in the list.
         
         Remove order information and set default labels.
         
@@ -525,19 +525,19 @@ class XSectionList(object):
                         removeXsec = True
                         break
                 if not removeXsec:
-                    # Erase cross-section labels and information
+                    # Erase cross section labels and information
                     newxsec.info.label = str(newxsec.info.sqrts)
                     newxsec.info.order = None
                     newList.add(newxsec)
 
         if len(self) != len(newList):
-            logger.info("Ignoring %i lower order cross-sections",
+            logger.info("Ignoring %i lower order cross sections",
                            (len(self) - len(newList)))
         self.xSections = newList.xSections
             
     def order(self):
         """
-        Order the cross-section in the list by their PDG pairs
+        Order the cross section in the list by their PDG pairs
         """
         
         self.xSections = sorted(self.xSections, key=lambda xsec: xsec.pid)
@@ -545,17 +545,17 @@ class XSectionList(object):
 
 def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
     """
-    Obtain cross-sections for pair production of R-odd particles from input SLHA file.
-    The default unit for cross-section is pb.
+    Obtain cross sections for pair production of R-odd particles from input SLHA file.
+    The default unit for cross section is pb.
     
-    :parameter slhafile: SLHA input file with cross-sections
-    :parameter useXSecs: if defined enables the user to select cross-sections to
+    :parameter slhafile: SLHA input file with cross sections
+    :parameter useXSecs: if defined enables the user to select cross sections to
                      use. Must be a XSecInfoList object
-    :parameter xsecUnit: cross-section unit in the input file (must be a Unum unit)
+    :parameter xsecUnit: cross section unit in the input file (must be a Unum unit)
     :returns: a XSectionList object    
      
     """
-    # Store information about all cross-sections in the SLHA file
+    # Store information about all cross sections in the SLHA file
     xSecsInFile = XSectionList()
     f=pyslha.readSLHAFile ( slhafile )
     for production in f.xsections:
@@ -563,7 +563,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
         for pid in production[2:]:
             if not pid in smodels.particles.rOdd.keys():
                 # ignore production of R-Even Particles
-                logger.warning("Particle %i not defined in particles.py, cross-section for %s production will be ignored" %(pid,str(production)))                 
+                logger.warning("Particle %i not defined in particles.py, cross section for %s production will be ignored" %(pid,str(production)))                 
                 break
         process = f.xsections.get ( production )
         for pxsec in process.xsecs:
@@ -594,19 +594,19 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
 
 def getXsecFromLHEFile(lhefile, addEvents=True):
     """
-    Obtain cross-sections from input LHE file.
+    Obtain cross sections from input LHE file.
     
     :parameter lhefile: LHE input file with unweighted MC events
-    :parameter addEvents: if True, add cross-sections with the same mothers,
+    :parameter addEvents: if True, add cross sections with the same mothers,
                       otherwise return the event weight for each pair of mothers
     :returns: a XSectionList object
     
     """
-    # Store information about all cross-sections in the LHE file
+    # Store information about all cross sections in the LHE file
     xSecsInFile = XSectionList()
     reader = lheReader.LheReader(lhefile)
     if not type ( reader.metainfo["totalxsec"] ) == type ( pb) :
-        logger.error("Cross-section information not found in LHE file.")        
+        logger.error("cross section information not found in LHE file.")        
         raise SModelSError()
     elif not reader.metainfo["nevents"]:
         logger.error("Total number of events information not found in LHE " +
@@ -617,7 +617,7 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
                      "file.")
         raise SModelSError()
 
-    # Common cross-section info
+    # Common cross section info
     totxsec = reader.metainfo["totalxsec"]
     nevts = reader.metainfo["nevents"]
     sqrtS = reader.metainfo["sqrts"]
@@ -629,7 +629,7 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
     for event in reader:
         allpids.append(tuple(sorted(event.getMom())))
     pids = set(allpids)
-    # Generate zero cross-sections for all independent pids
+    # Generate zero cross sections for all independent pids
     for pid in pids:
         xsec = XSection()
         xsec.info.sqrts = sqrtS
@@ -648,7 +648,7 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
         xsec.info.label = wlabel
         xsec.value = 0. * pb
         xsec.pid = pid
-        # If addEvents = False, set cross-section value to event weight
+        # If addEvents = False, set cross section value to event weight
         if not addEvents:
             xsec.value = eventCs
         xSecsInFile.add(xsec)

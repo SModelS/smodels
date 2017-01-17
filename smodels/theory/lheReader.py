@@ -36,8 +36,8 @@ class LheReader(object):
         else: self.file = filename
         self.metainfo = {"nevents" : None, "totalxsec" : None, "sqrts" : None}
 
-        # Get global information from file (cross-section sqrts, total
-        # cross-section, total number of events)
+        # Get global information from file (cross section sqrts, total
+        # cross section, total number of events)
         self.file.seek(0)
         line = self.file.readline()
         nevts = None

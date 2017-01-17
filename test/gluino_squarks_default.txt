@@ -38,7 +38,7 @@ The highest r value is = 3.85E-01
 
 Full information on unconstrained cross sections
 ================================================================================
-Missing topologies with the highest cross-sections (up to 10):
+Missing topologies with the highest cross sections (up to 10):
 Sqrts (TeV)   Weight (fb)        Element description
   8.0  5.958E+01    #                                 [[[W]],[[W]]]
   8.0  1.601E+01    #                 [[[jet],[W]],[[jet,jet],[W]]]

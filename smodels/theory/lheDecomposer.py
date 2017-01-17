@@ -24,7 +24,7 @@ def decompose(lhefile, inputXsecs=None, nevts=None, doCompress=False,
     Perform LHE-based decomposition. 
 
     :param lhefile: LHE file with e.g. pythia events
-    :param inputXsecs: xSectionList object with cross-sections for the mothers
+    :param inputXsecs: xSectionList object with cross sections for the mothers
            appearing in the LHE file. If None, use information from file.
     :param nevts: (maximum) number of events used in the decomposition. If
                   None, all events from file are processed.
@@ -42,7 +42,7 @@ def decompose(lhefile, inputXsecs=None, nevts=None, doCompress=False,
 
     reader = lheReader.LheReader(lhefile, nevts)
     smsTopList = topology.TopologyList()
-    # Get cross-section from file (= event weight, assuming a common weight for
+    # Get cross section from file (= event weight, assuming a common weight for
     # all events)
     if not inputXsecs:
         xSectionList = crossSection.getXsecFromLHEFile(lhefile,

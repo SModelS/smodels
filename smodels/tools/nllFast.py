@@ -4,7 +4,7 @@
 .. module:: nllFast
    :synopsis: This module provides methods to access the nllfast grid and
               compute k-factors (when available) to SUSY pair 
-              production cross-sections.
+              production cross sections.
 
 .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
