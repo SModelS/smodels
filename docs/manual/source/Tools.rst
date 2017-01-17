@@ -17,8 +17,8 @@
 .. |ExpRess| replace:: :ref:`Experimental Results<ExpResult>`
 .. |Database| replace:: :ref:`Database <Database>`
 .. |database| replace:: :ref:`database <Database>`
-.. |Dataset| replace:: :ref:`Data Set<DataSet>`
-.. |Datasets| replace:: :ref:`Data Sets<DataSet>`
+.. |Dataset| replace:: :ref:`DataSet<DataSet>`
+.. |Datasets| replace:: :ref:`DataSets<DataSet>`
 .. |results| replace:: :ref:`experimental results <ExpResult>`
 .. |branches| replace:: :ref:`branches <branch>`
 .. |branch| replace:: :ref:`branch <branch>`
@@ -30,7 +30,7 @@
 SModelS Tools
 =============
 
-Inside SModelS there are a number of tools that may be convenient for the user:
+Inside SModelS there is a number of tools that may be convenient for the user:
 
 * a :ref:`cross section calculator <xsecCalc>` based on `Pythia6 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_  and 
   `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_,

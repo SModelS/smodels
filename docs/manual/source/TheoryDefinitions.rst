@@ -56,7 +56,7 @@ The overall properties of an element are illustrated in the scheme below:
 SModelS works under the inherent assumption that, for collider purposes,
 all the essential properties of a BSM model can be encapsulated by its
 elements.
-Such assumption is extremely helpful to cast the theoretical predictions of a
+Such an assumption is extremely helpful to cast the theoretical predictions of a
 specific BSM model in a model-independent framework, which can then be compared
 against the corresponding experimental limits.
 For instance, as shown in the :ref:`scheme above <elementscheme>`, only the

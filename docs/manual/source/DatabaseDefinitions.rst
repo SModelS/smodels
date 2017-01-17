@@ -8,8 +8,8 @@
 .. |ULrs| replace:: :ref:`UL-type results <ULtype>`
 .. |ExpRes| replace:: :ref:`Experimental Result<ExpResult>`
 .. |ExpRess| replace:: :ref:`Experimental Results<ExpResult>`
-.. |Dataset| replace:: :ref:`Data Set<DataSet>`
-.. |Datasets| replace:: :ref:`Data Sets<DataSet>`
+.. |Dataset| replace:: :ref:`DataSet<DataSet>`
+.. |Datasets| replace:: :ref:`DataSets<DataSet>`
 .. |dataset| replace:: :ref:`data set<DataSet>`
 .. |datasets| replace:: :ref:`data sets<DataSet>`
 .. |element| replace:: :ref:`element <element>`
@@ -96,7 +96,7 @@ and one containing efficiency maps (|EM|).
 Experimental Result: Upper Limit Type
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Upper Limit (UL) experimental results contains the experimental constraints on
+Upper Limit (UL) experimental results contain the experimental constraints on
 the cross section times branching ratio
 ( :math:`\sigma \times BR` ) for Simplified Models from a specific experimental publication or preliminary
 result. These constraints are typically given in the format of Upper Limit maps,
