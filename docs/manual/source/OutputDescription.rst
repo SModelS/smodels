@@ -26,8 +26,8 @@
 .. |ExpRess| replace:: :ref:`Experimental Results<ExpResult>`
 .. |expres| replace:: :ref:`experimental result<ExpResult>`
 .. |express| replace:: :ref:`experimental results<ExpResult>`
-.. |Dataset| replace:: :ref:`Data Set<DataSet>`
-.. |Datasets| replace:: :ref:`Data Sets<DataSet>`
+.. |Dataset| replace:: :ref:`DataSet<DataSet>`
+.. |Datasets| replace:: :ref:`DataSets<DataSet>`
 .. |dataset| replace:: :ref:`data set<DataSet>`
 .. |datasets| replace:: :ref:`data sets<DataSet>`
 .. |parameters| replace:: :ref:`parameters file <parameterFile>`
