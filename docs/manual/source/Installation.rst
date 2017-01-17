@@ -120,16 +120,16 @@ Adding FastLim data
 
 The official SModelS database can be augmented with data from the
 `fastlim <http://cern.ch/fastlim>`_ database.
-A tarball with the *properly converted* fastlim efficiency maps can be found in our
+A tarball with the *properly converted* fastlim-1.0 efficiency maps can be found in our
 `download section <http://smodels.hephy.at/downloads/v1.1>`_.
 The tarball then needs to be exploded in the top level directory of the database.
 
 That is, the following steps need to be performed ::
 
- mv smodels-fastlim-v1.1.x.tgz <smodels-database folder>
+ mv smodels-v1.1-fastlim-1.0.tgz <smodels-database folder>
  cd <smodels-database folder>
- tar -xzvf smodels-fastlim-v1.1.x.tgz
- rm smodels-fastlim-v1.1.x.tgz
+ tar -xzvf smodels-v1.1-fastlim-1.0.tgz
+ rm smodels-v1.1-fastlim-1.0.tgz
 
 Once the fastlim folders have been added to the database,
 SModelS auto-detects fastlim results and issues an acknowledgement.
