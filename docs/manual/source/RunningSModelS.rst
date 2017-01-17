@@ -59,7 +59,7 @@ code (:ref:`Example.py <exampleCode>`) are described below.
           Z\ :sub:`2` symmetry (see :ref:`adding new particles <newParticles>`).
           Finally, if the user wants to check the input files for possible issues using
           SModelS'  :ref:`SLHA and LHE file checkers <fileChecks>`, it is
-          also necessary to define the BSM particle quantum numbers in *particles.py*.
+          also necessary to define the BSM particle quantum numbers in *particles.py* [#]_.
 
 
 
@@ -189,7 +189,7 @@ Below we give more detailed information about each entry in the parameters file.
 
   * **analyses** (list of results): set to all to use all available results. If a list of :ref:`experimental results <ExpResult>`
     are given, only these analyses will be used. For instance, setting analyses = CMS-PAS-SUS-13-008,ATLAS-CONF-2013-024
-    will only use the |results| from `CMS-PAS-SUS-13-008 <https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13008>`_
+    will only use the |results| from `CMS-PAS-SUS-13-008 <~\cite{Barducci:2016pcb}.~\cite{Barducci:2016pcb}.https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13008>`_
     and `ATLAS-CONF-2013-024 <https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-024/>`_.
   * **txnames** (list of topologies): set to all to use all available simplified model |topologies|. The |topologies| are labeled according to the :ref:`txname convention <TxName>`.
     If a list of |txnames| are given, only the corresponding |topologies| will be considered. For instance, setting txnames = T2 will
@@ -407,3 +407,4 @@ Due to this, the results are claimed to be "likely excluded" in the output.
  * For an SLHA :ref:`input file <BasicInput>`, the decay of :ref:`final states <final states>` (or Z\ :sub:`2`-even particles such as the Higgs, W,...) are always ignored during the decomposition. Furthermore, if there are two cross-sections at different calculation order (say LO and NLO) for the same process, only the highest order is used.
  * The list of |elements| can be extremely long. Try setting **addElmentInfo** = False and/or **printDecomp** = False to obtain a smaller output.
 
+.. [#] We note that SLHA files including decay tables and cross sections, together with the corresponding *particles.py*, can conveniently be generated via the SModelS-micrOMEGAS interface, see `arXiv:1606.03834 <http://www.arXiv.org/abs/1606.03834>`_
