@@ -47,7 +47,7 @@ class Database(object):
         self._validateBase(base)
         self._verbosity = verbosity 
         self._databaseVersion = None
-        self.expResultList = None
+        self.expResultList = []
         self.txt_mtime = None, None
         self.pcl_mtime = None, None
         self.pcl_db = None
@@ -78,7 +78,7 @@ class Database(object):
         logger.info ( "FastLim v1.1 efficiencies loaded. Please cite: arXiv:1402.0492, EPJC74 (2014) 11" )
 
     def __eq__ ( self, other ):
-        """ compare two database 
+        """ compare two databases
         """
         if self.databaseVersion != other.databaseVersion:
             return False
@@ -107,7 +107,7 @@ class Database(object):
 
     def loadTextDatabase ( self ):
         """ simply loads the textdabase """
-        if self._databaseVersion:
+        if self._databaseVersion and len(self.expResultList)>0:
             logger.debug ( "Asked to load database, but has already been loaded. Ignore." )
             return
         logger.info ( "Parsing text database at %s" % self._base )
