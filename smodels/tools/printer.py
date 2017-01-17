@@ -472,7 +472,7 @@ class TxTPrinter(BasicPrinter):
         :param obj: Uncovered object to be printed.
         """
                 
-        nprint = 10  # Number of missing topologies to be printed (ordered by cross-sections)
+        nprint = 10  # Number of missing topologies to be printed (ordered by cross sections)
 
         output = ""
         output += "\nTotal missing topology cross section (fb): %10.3E\n" %(obj.getMissingXsec())
@@ -494,7 +494,7 @@ class TxTPrinter(BasicPrinter):
                         if not el.weight.getXsecsFor(obj.missingTopos.sqrts): continue
                         topo.value += el.weight.getXsecsFor(obj.missingTopos.sqrts)[0].value.asNumber(fb)
                 if ix==0:
-                    output += "Missing topologies with the highest cross-sections (up to " + str(nprint) + "):\n"
+                    output += "Missing topologies with the highest cross sections (up to " + str(nprint) + "):\n"
                 else:
                     output += "Contributions outside the mass grid (up to " + str(nprint) + "):\n"
                 output += "Sqrts (TeV)   Weight (fb)        Element description\n"        
@@ -708,8 +708,8 @@ class PyPrinter(BasicPrinter):
         for sqrts in allsqrts:
             xsecs = [xsec.value.asNumber(fb) for xsec in obj.weight.getXsecsFor(sqrts)]
             if len(xsecs) != 1:
-                logger.warning("Element cross-sections contain multiple values for %s .\
-                Only the first cross-section will be printed" %str(sqrt))
+                logger.warning("Element cross sections contain multiple values for %s .\
+                Only the first cross section will be printed" %str(sqrt))
             xsecs = xsecs[0]
             sqrtsStr = 'xsec '+str(sqrts.asNumber(TeV))+' TeV'
             elDic["Weights (fb)"][sqrtsStr] = xsecs
@@ -843,7 +843,7 @@ class PyPrinter(BasicPrinter):
         :param obj: A Uncovered object to be printed.
         """
 
-        nprint = 10  # Number of missing topologies to be printed (ordered by cross-sections)
+        nprint = 10  # Number of missing topologies to be printed (ordered by cross sections)
 
         missedTopos = []
         

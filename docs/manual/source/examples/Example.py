@@ -47,12 +47,12 @@ def main():
     #Print information about the m-th topology:
     m = 3
     top = toplist[m]
-    print "\t\t %i-th topology  = " %m,top,"with total cross-section =",top.getTotalWeight()
+    print "\t\t %i-th topology  = " %m,top,"with total cross section =",top.getTotalWeight()
     #Print information about the n-th element in the m-th topology:
     n = 0
     el = top.elementList[n]
     print "\t\t %i-th element from %i-th topology  = " %(n,m),el,
-    print "\n\t\t\twith cross-section =",el.weight,"\n\t\t\tand masses = ",el.getMasses() 
+    print "\n\t\t\twith cross section =",el.weight,"\n\t\t\tand masses = ",el.getMasses() 
             
     # Load the experimental results to be used.
     # In this case, all results are employed.
@@ -89,12 +89,12 @@ def main():
             print "TxNames = ",txnames   
             print "Prediction Mass = ",mass    #Value for average cluster mass (average mass of the elements in cluster)
             print "Prediction PIDs = ",PIDs    #Value for average cluster mass (average mass of the elements in cluster)
-            print "Theory Prediction = ",theoryPrediction.xsection   #Signal cross-section
+            print "Theory Prediction = ",theoryPrediction.xsection   #Signal cross section
             print "Condition Violation = ",theoryPrediction.conditions  #Condition violation values
               
             # Get the corresponding upper limit:
             ul = expResult.getUpperLimitFor(txname=txnames[0],mass=mass,dataID=datasetID)                     
-            print "Theory Prediction UL = ",ul
+            print "UL for theory prediction = ",ul
 
             # Compute the r-value
             r = theoryPrediction.xsection.value/ul

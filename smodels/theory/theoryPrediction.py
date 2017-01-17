@@ -24,7 +24,7 @@ class TheoryPrediction(object):
     :ivar analysis: holds the analysis (ULanalysis or EManalysis object)
                     to which the prediction refers
     :ivar xsection: xsection of the theory prediction 
-                (relevant cross-section to be compared with the experimental limits).
+                (relevant cross section to be compared with the experimental limits).
                 It is a XSection object.
     :ivar conditions: list of values for the analysis conditions
                       (only for upper limit-type analysis, e.g. analysis=ULanalysis)
@@ -217,7 +217,7 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
             logger.error("Sqrts defined with wrong units for %s" %(ID) )
             return False
             
-    #Remove unwanted cross-sections
+    #Remove unwanted cross sections
     newelements = []
     for el in elements:
         el.weight = el.weight.getXsecsFor(dataset.globalInfo.sqrts)
@@ -322,7 +322,7 @@ def _evalConstraint(cluster):
     For efficiency map results, sum all the elements' weights.
     
     :parameter cluster: cluster of elements (ElementCluster object)
-    :returns: cluster cross-section
+    :returns: cluster cross section
     """
 
     if cluster.getDataType() == 'efficiencyMap':
@@ -391,9 +391,9 @@ def _evalExpression(stringExpr,cluster):
     
     """
 
-#Get cross-section info from cluster (to generate zero cross-section values):
+#Get cross section info from cluster (to generate zero cross section values):
     infoList = cluster.elements[0].weight.getInfo()    
-#Generate elements appearing in the string expression with zero cross-sections:
+#Generate elements appearing in the string expression with zero cross sections:
     elements = []
     for elStr in elementsInStr(stringExpr):
         el = element.Element(elStr)
