@@ -75,7 +75,7 @@ class XSecTest(unittest.TestCase):
         fnew.close()        
         self.logger.info ("test NLL xsecs @ 8 and 13 TeV" )
         #Set overall options:
-        #Options for cross-section calculation:
+        #Options for cross section calculation:
         xargs = argparse.Namespace()
         xargs.sqrts = [[8.,13.]]
         xargs.ncpus = 1
@@ -89,9 +89,9 @@ class XSecTest(unittest.TestCase):
         xargs.tofile = True
         xargs.filename = tmpfile
         xargs.verbosity = "info"
-        #Compute LO cross-sections
+        #Compute LO cross sections
         xsecComputer.main(xargs)
-        #Compute NLL cross-sections
+        #Compute NLL cross sections
         xargs.NLL = True
         xargs.LOfromSLHA = True
         xsecComputer.main(xargs)

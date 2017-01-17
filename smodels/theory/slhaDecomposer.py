@@ -30,7 +30,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     :param doInvisible: turn invisible compression on/off
     :param minmassgap: maximum value (in GeV) for considering two R-odd particles
                        degenerate (only revelant for doCompress=True )
-    :param useXSecs: optionally a dictionary with cross-sections for pair
+    :param useXSecs: optionally a dictionary with cross sections for pair
                  production, by default reading the cross sections
                  from the SLHA file.
     :returns: list of topologies (TopologyList object)
@@ -51,23 +51,23 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
         logger.error ( "The file %s cannot be parsed as an SLHA file: %s" % (slhafile, e) )
         raise SModelSError()
 
-    # Get cross-section from file
+    # Get cross section from file
     xSectionList = crossSection.getXsecFromSLHAFile(slhafile, useXSecs)
     # Get BRs and masses from file
     brDic, massDic = _getDictionariesFromSLHA(slhafile)
-    # Only use the highest order cross-sections for each process
+    # Only use the highest order cross sections for each process
     xSectionList.removeLowerOrder()
     # Order xsections by PDGs to improve performance
     xSectionList.order()
 
-    # Get maximum cross-sections (weights) for single particles (irrespective
+    # Get maximum cross sections (weights) for single particles (irrespective
     # of sqrtS)
     maxWeight = {}
     for pid in xSectionList.getPIDs():
         maxWeight[pid] = xSectionList.getXsecsFor(pid).getMaxXsec()    
 
     # Generate dictionary, where keys are the PIDs and values 
-    # are the list of cross-sections for the PID pair (for performance)
+    # are the list of cross sections for the PID pair (for performance)
     xSectionListDict = {}    
     for pids in xSectionList.getPIDpairs():
         xSectionListDict[pids] = xSectionList.getXsecsFor(pids)
@@ -106,7 +106,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     
     smsTopList = topology.TopologyList()
     # Combine pairs of branches into elements according to production
-    # cross-section list
+    # cross section list
     for pids in xSectionList.getPIDpairs():
         weightList = xSectionListDict[pids]
         minBR = (sigcut/weightList.getMaxXsec()).asNumber()

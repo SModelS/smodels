@@ -57,7 +57,7 @@ if __name__ == "__main__":
     import argparse
     """ Set default input and output files """
     parameterFile = "%s/etc/parameters_default.ini" % installDirectory()
-    outputDir = "results"
+    outputDir = "./results/"
 
     """ Get the name of input SLHA file and parameter file """
     ap = argparse.ArgumentParser()
@@ -69,7 +69,7 @@ if __name__ == "__main__":
             'all parameters from etc/parameters_default.ini', 
             default=parameterFile)
     ap.add_argument('-o', '--outputDir', 
-            help='name of output directory (optional argument). The default is: ' +
+            help='name of output directory (optional argument). The default folder is: ' +
             outputDir, default=outputDir)
     ap.add_argument('-d', '--development', help='enable development output', 
             action='store_true')

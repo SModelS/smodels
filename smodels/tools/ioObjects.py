@@ -248,7 +248,7 @@ class LheStatus(object):
         elif not nevents:
             return -1, "No events found in the input LHE file %s" % self.filename
         elif (not type(totxsec) == type(1 * fb)) or (not totxsec.asNumber()):
-            return -1, "Total cross-section not found in the input LHE file %s" % self.filename
+            return -1, "Total cross section not found in the input LHE file %s" % self.filename
         return 1, "Input file ok"
 
 
@@ -428,8 +428,8 @@ class SlhaStatus(object):
             if "XSECTION" in line:
                 return 1, "XSECTION table present"
 
-        msg = "XSECTION table is missing. Please include the cross-section information and try again.\n"
-        msg += "\n\t For MSSM models, it is possible to compute the MSSM cross-sections"
+        msg = "XSECTION table is missing. Please include the cross section information and try again.\n"
+        msg += "\n\t For MSSM models, it is possible to compute the MSSM cross sections"
         msg += " using Pythia through the command:\n\n"
         msg += "\t  ./smodelsTools.py xseccomputer -p -f " + self.filename + " \n\n"
         msg += "\t For more options and information run: ./smodelsTools.py xseccomputer -h\n"
@@ -598,7 +598,7 @@ class SlhaStatus(object):
         if not findLonglived:
             return 0, "Did not check for long lived particles"
 
-        # Get list of cross-sections:
+        # Get list of cross sections:
         xsecList = crossSection.getXsecFromSLHAFile(self.filename)
         # Check if any of particles being produced have visible displaced vertices
         # with a weight > sigmacut
