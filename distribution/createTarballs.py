@@ -221,8 +221,9 @@ def cleanDatabase():
             fullpath = os.path.join ( File, rf )
             if os.path.exists ( fullpath):
                 os.unlink ( fullpath )
-        if "globalInfo.txt" in File:
-            clearGlobalInfo ( File )
+        gIpath = os.path.join ( File, "globalInfo.txt" )
+        if os.path.exists ( gIpath ):
+            clearGlobalInfo ( gIpath )
 
 def splitDatabase():
     """
@@ -343,5 +344,6 @@ def create():
     isDummy()
 
 if __name__ == "__main__":
+    # cleanDatabase()
     # clearGlobalInfo ( "./globalInfo.txt" )
     create()
