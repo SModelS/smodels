@@ -23,7 +23,7 @@ def getVersion():
 dummyRun=False ## True
 version = getVersion()
 dirname = "smodels-v%s" % version
-fastlimdir = "smodels-fastlim-v%s" % version
+fastlimdir = "smodels-v%s-fastlim-1.0" % version[:3]
 
 RED = "\033[31;11m"
 GREEN = "\033[32;11m"
@@ -215,8 +215,8 @@ def splitDatabase():
           ( dirname, cwd )
     run ( cmd )
 
-    cmd = "mv ./smodels-fastlim.tgz %s/smodels-fastlim-v%s.tgz" % \
-          ( cwd, version )
+    cmd = "mv ./smodels-fastlim.tgz %s/smodels-v%s-fastlim-1.0.tgz" % \
+          ( cwd, version[:3] )
     run ( cmd )
     # sys.exit()
 
