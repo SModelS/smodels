@@ -31,10 +31,10 @@ NLL=2
 
 def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loFromSlha=None, pythiacard=None ):
     """
-    Run pythia and compute SUSY cross-sections for the input SLHA file.
+    Run pythia and compute SUSY cross sections for the input SLHA file.
 
     :param sqrts: sqrt{s} to run Pythia, given as a unum (e.g. 7.*TeV)
-    :param maxOrder: maximum order to compute the cross-section, given as an integer
+    :param maxOrder: maximum order to compute the cross section, given as an integer
                 if maxOrder == 0, compute only LO pythia xsecs
                 if maxOrder == 1, apply NLO K-factors from NLLfast (if available)
                 if maxOrder == 2, apply NLO+NLL K-factors from NLLfast (if available)
@@ -72,11 +72,11 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
 
     if lhefile:
         if os.path.isfile(lhefile):
-            logger.warning("Using LO cross-sections from " + lhefile)
+            logger.warning("Using LO cross sections from " + lhefile)
         else:
             logger.info("Writing pythia LHE output to " + lhefile)
     if loFromSlha:
-        logger.info("Using LO cross-sections from " + slhafile)
+        logger.info("Using LO cross sections from " + slhafile)
         xsecsInfile = crossSection.getXsecFromSLHAFile(slhafile)
         loXsecs = crossSection.XSectionList()
         for xsec in xsecsInfile:
@@ -120,25 +120,25 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
                     # Apply k-factor
                     xsecs[i] = xsec * k
 
-    # Remove zero cross-sections
+    # Remove zero cross sections
     while len(xsecs) > 0 and xsecs.getMinXsec() == 0. * pb:
         for xsec in xsecs:
             if xsec.value == 0. * pb:
                 xsecs.delete(xsec)
                 break
     if maxOrder > 0 and len(xsecs) == 0:
-        logger.warning("No NLO or NLL cross-sections available.")
+        logger.warning("No NLO or NLL cross sections available.")
         
     return xsecs
 
 
 def addXSecToFile(xsecs, slhafile, comment=None, complain=True):
     """
-    Write cross-sections to an SLHA file.
+    Write cross sections to an SLHA file.
     
-    :param xsecs: a XSectionList object containing the cross-sections
-    :param slhafile: target file for writing the cross-sections in SLHA format
-    :param comment: optional comment to be added to each cross-section block
+    :param xsecs: a XSectionList object containing the cross sections
+    :param slhafile: target file for writing the cross sections in SLHA format
+    :param comment: optional comment to be added to each cross section block
     :param complain: complain if there are already cross sections in file
     
     """
@@ -147,15 +147,15 @@ def addXSecToFile(xsecs, slhafile, comment=None, complain=True):
         logger.error("SLHA file not found.")
         raise SModelSError()
     if len(xsecs) == 0:
-        logger.warning("No cross-sections available.")
+        logger.warning("No cross sections available.")
         return False
-    # Check if file already contain cross-section blocks
+    # Check if file already contain cross section blocks
     xSectionList = crossSection.getXsecFromSLHAFile(slhafile)
     if xSectionList and complain:
         logger.info("SLHA file already contains XSECTION blocks. Adding "
-                       "only missing cross-sections.")
+                       "only missing cross sections.")
 
-    # Write cross-sections to file, if they do not overlap any cross-section in
+    # Write cross sections to file, if they do not overlap any cross section in
     # the file
     outfile = open(slhafile, 'a')
     for xsec in xsecs:
@@ -180,7 +180,7 @@ def xsecToBlock(xsec, inPDGs=(2212, 2212), comment=None, xsecUnit = pb):
                    (default = 2212,2212)
 
     :param comment: is added at the end of the header as a comment
-    :param xsecUnit: unit of cross-sections to be written (default is pb). Must be a Unum unit.
+    :param xsecUnit: unit of cross sections to be written (default is pb). Must be a Unum unit.
 
     """
     if type(xsec) != type(crossSection.XSection()):
