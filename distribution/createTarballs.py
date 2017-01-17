@@ -181,6 +181,25 @@ def fetchDatabase():
              ( dirname )
     run ( rmcmd )
 
+
+def clearGlobalInfo ( filename ):
+    f=open(filename)
+    lines=f.readlines()
+    f.close()
+    g=open("/tmp/globalInfo.txt","w")
+    skip = [ "publishedData", "validated", "axes", "comment", "contact", "private", \
+             "prettyName" ]
+    for line in lines:
+        to_skip = False
+        for s in skip:
+            if line.find(s)==0:
+                to_skip = True
+        if not to_skip:
+            g.write ( line )
+    g.close()
+    cmd = "cp /tmp/globalInfo.txt %s" % filename 
+    run ( cmd )
+
 def cleanDatabase():
     """
     Clean up the database, e.g. remove orig and validation folders
@@ -202,6 +221,8 @@ def cleanDatabase():
             fullpath = os.path.join ( File, rf )
             if os.path.exists ( fullpath):
                 os.unlink ( fullpath )
+        if "globalInfo.txt" in File:
+            clearGlobalInfo ( File )
 
 def splitDatabase():
     """
@@ -322,6 +343,5 @@ def create():
     isDummy()
 
 if __name__ == "__main__":
-    # cleanDatabase()
-    # removeNonValidated()
+    # clearGlobalInfo ( "./globalInfo.txt" )
     create()
