@@ -26,19 +26,19 @@
 Confronting Predictions with Experimental Limits
 ================================================
 
-Once the relevant signal cross-sections (or :ref:`theory predictions <theoryPredictions>`) have been computed
+Once the relevant signal cross sections (or :ref:`theory predictions <theoryPredictions>`) have been computed
 for the input model, these must be compared to the respective upper limits.
 The upper limits for the signal are stored in the SModelS :ref:`Database <database>`
 and depend on the type of |ExpRes|: |UL| or |EM|.
 
 In the case of a |ULr|, the theory predictions typically consist of a list of signal
-cross-sections (one for each cluster) for
+cross sections (one for each cluster) for
 the single |Dataset| (see :ref:`Theory  Predictions for Upper Limit Results <thePredUL>` for more details).
 Each theory prediction must then be compared to its
-corresponding upper limit.  This limit is simply the cross-section upper limit provided by
+corresponding upper limit.  This limit is simply the cross section upper limit provided by
 the experimental publication or conference note and is extracted from the corresponding UL map (see |ULrs|).
 
-For |EMrs| there is a single cluster for each |Dataset| (or signal region), and hence a single signal cross-section
+For |EMrs| there is a single cluster for each |Dataset| (or signal region), and hence a single signal cross section
 value. This value must be compared to the upper limit for the corresponding signal region.
 This upper limit is easily computed using the number of observed and expected events for the |Dataset|
 and their uncertainties and is typically stored in the :ref:`Database <database>`.

@@ -10,7 +10,7 @@ Basic Model Input
 The main input for SModelS is the full model definition, which can be
 given in the two following forms:
 
-* a SLHA (SUSY Les Houches Accord) file containing masses, branching ratios and cross-sections for the BSM states
+* a SLHA (SUSY Les Houches Accord) file containing masses, branching ratios and cross sections for the BSM states
   (see an example file :download:`here <examples/example.slha>`)
 * a LHE (Les Houches Event) file containing parton level events
   (see an example file :download:`here <examples/example.lhe>`)
@@ -20,14 +20,14 @@ be generated for any BSM model (through the use of your favorite MC generator). 
 the precision of the results is limited to the MC statistics used to generate the file.
 
 *In the case of SLHA input only*, the production cross sections for the BSM states also have to be included
-in the SLHA file as SLHA blocks, according to the :ref:`SLHA cross-section format <xsecSLHA>` 
+in the SLHA file as SLHA blocks, according to the :ref:`SLHA cross section format <xsecSLHA>` 
 (see :download:`example file <examples/example.slha>`).
 For the MSSM and some of its extensions, they may
 be calculated automatically using `Pythia <http://home.thep.lu.se/~torbjorn/Pythia.html>`_ 
 and `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_, 
-as discussed in :ref:`Cross-section calculator <xsecCalc>`.
+as discussed in :ref:`cross section calculator <xsecCalc>`.
 
-*In the case of LHE input*, the total production cross-section as well as 
+*In the case of LHE input*, the total production cross section as well as 
 the center-of-mass energy should be listed in the <init></init> block, according to the standard LHE format
 (see :download:`example file <examples/example.slha>`).
 Moreover, all the Z\ :sub:`2`-even particles (see definition in :ref:`final states <final states>`) should be set as stable, since
@@ -55,12 +55,12 @@ the :download:`particles.py <images/particles.py>` file.
 .. _xsecSLHA:
 
 
-SLHA Format for Cross-Sections
+SLHA Format for Cross Sections
 ------------------------------
 
-A list of cross-section blocks (one for each production process)
+A list of cross section blocks (one for each production process)
 must be included in the SLHA file for the SLHA-based Decomposition. 
-The SLHA format for each cross-section block is shown below
+The SLHA format for each cross section block is shown below
 (see the `Les Houches note <http://phystev.cnrs.fr/wiki/2013:groups:tools:slha>`_):
 
 .. _xsecblock:
@@ -68,13 +68,13 @@ The SLHA format for each cross-section block is shown below
 .. image:: images/xsecBlock.png
    :width: 100% 
 
-The above example shows the cross-section for :math:`pp \rightarrow \tilde{\tau}_1^- + \tilde{\nu}_{\tau}`
+The above example shows the cross section for :math:`pp \rightarrow \tilde{\tau}_1^- + \tilde{\nu}_{\tau}`
 at a center-of-mass energy of 8 TeV and at leading order.
-The only information used by SModelS are the center-of-mass energy, the outgoing particle PDGs, the cross-section value
-and the QCD order. *If the input file contains two cross-sections for the same process  but at different QCD orders, only 
+The only information used by SModelS are the center-of-mass energy, the outgoing particle PDGs, the cross section value
+and the QCD order. *If the input file contains two cross sections for the same process  but at different QCD orders, only 
 the highest order will be used.*
 
-* **Reading of cross-sections from an input file is
+* **Reading of cross sections from an input file is
   implemented by the** `getXsecFromSLHAFile <../../../documentation/build/html/theory.html#theory.crossSection.getXsecFromSLHAFile>`_ **method** 
 
   

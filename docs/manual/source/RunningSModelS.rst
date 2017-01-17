@@ -160,23 +160,21 @@ Below we give more detailed information about each entry in the parameters file.
 
   * **databasePath**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`.
 |
-* *options*: main options for turning SModelS features on and off
+* *options*: main options for turning SModelS features on or off
 
   * **inputType** (SLHA/LHE): determines the type of input file (see :doc:`Basic Input <BasicInput>`).
     Must be *SLHA* for SLHA input files or *LHE* for LHE input files.
   * **checkInput** (True/False): if True, *runSModelS.py* will run the :ref:`file check tool <fileChecks>` on the input file and verify if the input contains all the necessary information.
-  * **doInvisible** (True/False): turns |invisible compression| on and off during the |decomposition|.
-    Set to False to turn |invisible compression| off.
-  * **doCompress** (True/False): turns |mass compression| on and off during the |decomposition|.
-    Set to False to turn |mass compression| off.
-  * **computeStatistics** (True/False): turns the likelihood and :math:`\chi^2` computation on and off
+  * **doInvisible** (True/False): turns |invisible compression| on or off during the |decomposition|.
+  * **doCompress** (True/False): turns |mass compression| on or off during the |decomposition|.
+  * **computeStatistics** (True/False): turns the likelihood and :math:`\chi^2` computation on or off
     (see :ref:`likelihood calculation <likelihoodCalc>`).
     If True, the likelihood and :math:`\chi^2` values are computed for the |EMrs|.
   * **testCoverage** (True/False): set to True to run the :ref:`coverage <topCoverage>` tool.
 |
 * *parameters*: basic parameter values for running SModelS
 
-  * **sigmacut** (float): minimum value for an |element| weight (in fb). :ref:`Elements <element>` with a weight below sigmacut are neglected during |decomposition| (see :ref:`Minimum Decomposition Weight <minweight>`). Depending on the input model, the running time may increase considerably if sigmacut is too low, while too large values might eliminate relevant |elements|.
+  * **sigmacut** (float): minimum value for an |element| weight (in fb). :ref:`Elements <element>` with a weight below sigmacut are neglected during the |decomposition| of SLHA files (see :ref:`Minimum Decomposition Weight <minweight>`). Depending on the input model, the running time may increase considerably if sigmacut is too low, while too large values might eliminate relevant |elements|.
   * **minmassgap** (float): maximum mass difference value (in GeV) for perfoming :ref:`mass compression <massComp>`.
     *Only used if doCompress = True*
   * **maxcond** (float): maximum allowed value (in the [0,1] interval) for the violation of :ref:`upper limit conditions <ULconditions>`. A zero value means the conditions are strictly enforced, while 1 means the conditions are never enforced.
@@ -187,14 +185,13 @@ Below we give more detailed information about each entry in the parameters file.
 |
 * *database*: allows for selection of a subset of :ref:`experimental results <ExpResult>` from the |database|
 
-  * **analyses** (list of results): set to all to use all available results. If a list of :ref:`experimental results <ExpResult>`
-    are given, only these analyses will be used. For instance, setting analyses = CMS-PAS-SUS-13-008,ATLAS-CONF-2013-024
+  * **analyses** (list of results): set to all to use all available results. If a list of :ref:`experimental analyses <ExpResult>`
+    is given, only these will be used. For instance, setting analyses = CMS-PAS-SUS-13-008,ATLAS-CONF-2013-024
     will only use the |results| from `CMS-PAS-SUS-13-008 <~\cite{Barducci:2016pcb}.~\cite{Barducci:2016pcb}.https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13008>`_
     and `ATLAS-CONF-2013-024 <https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-024/>`_.
   * **txnames** (list of topologies): set to all to use all available simplified model |topologies|. The |topologies| are labeled according to the :ref:`txname convention <TxName>`.
     If a list of |txnames| are given, only the corresponding |topologies| will be considered. For instance, setting txnames = T2 will
-    only consider |results| containing upper limits for
-    :math:`pp \to \tilde{q} + \tilde{q} \to  (jet+\tilde{\chi}_1^0) + (jet+\tilde{\chi}_1^0)`
+    only consider |results| for :math:`pp \to \tilde{q} + \tilde{q} \to  (jet+\tilde{\chi}_1^0) + (jet+\tilde{\chi}_1^0)`
     and the |output| will only contain constraints for this topology.
     *A list of all* |topologies| *and their corresponding* |txnames| *can be found* `here <http://smodels.hephy.at/wiki/SmsDictionary>`_
   * **dataselector** (list of datasets): set to all to use all available |datasets|. If dataselector = upperLimit (efficiencyMap), only |ULrs| (|EMrs|) will be used. Furthermore, if
@@ -211,9 +208,9 @@ Below we give more detailed information about each entry in the parameters file.
   * **printDatabase** (True/False): set to True to print the list of selected |results| to stdout. False elsewise.
   * **addAnaInfo**  (True/False): set to True to include detailed information about the |txnames| tested by each :ref:`experimental result <ExpResult>`. *Only used if printDatabase=True*.
   * **printDecomp** (True/False): set to True to print basic information from the |decomposition| (|topologies|, total weights, ...).
-  * **addElmentInfo**  (True/False): set to True to include detailed information about the |elements| generated by the |decomposition|. *Only used if printDecomp=True*.
+  * **addElementInfo**  (True/False): set to True to include detailed information about the |elements| generated by the |decomposition|. *Only used if printDecomp=True*.
   * **printExtendedResults** (True/False): set to True to print extended information about the  |theory predictions|, including the PIDs of the particles
-    contributing to the theory prediction cross-section, their masses and the expected upper limit (if available).
+    contributing to the predicted cross section, their masses and the expected upper limit (if available).
   * **addCoverageID** (True/False): set to True to print the list of element IDs contributing to each missing topology (see :ref:`coverage <topCoverage>`).
     *Only used if testCoverage = True*. This option should be used along with *addElementInfo = True* so the user can precisely identify
     which elements were classified as missing.
@@ -240,7 +237,7 @@ Below we give more detailed information about each entry in the parameters file.
 The Output
 ----------
 
-The results of |runSModelS| are printed to the formats specified by the **outputType** in the  |parameters|.
+The results of |runSModelS| are printed to the format(s) specified by the **outputType** in the |parameters|.
 The following formats are available:
 
  * a human-readable :ref:`screen output (stdout) <screenOut>` or :ref:`log output <logOut>`. These are intended to
@@ -249,7 +246,7 @@ The following formats are available:
    output complexity can be controlled through several options in the |parameters|. Due to its size, this output
    is not suitable for storing the results from a large scan, being more appropriate for a single file input.
 
- * a human-readable text file output containing a :ref:`summary  of the output <fileOut>`. This format
+ * a human-readable text file output containing a :ref:`summary of the output <fileOut>`. This format
    contains the main SModelS results: the |theory predictions| and the :ref:`missing topologies <topCoverage>`.
    It can be used for a large scan, since the output can be made quite compact, using the options in the |parameters|.
 
@@ -404,7 +401,7 @@ Due to this, the results are claimed to be "likely excluded" in the output.
 
 
 **Notes:**
- * For an SLHA :ref:`input file <BasicInput>`, the decay of :ref:`final states <final states>` (or Z\ :sub:`2`-even particles such as the Higgs, W,...) are always ignored during the decomposition. Furthermore, if there are two cross-sections at different calculation order (say LO and NLO) for the same process, only the highest order is used.
- * The list of |elements| can be extremely long. Try setting **addElmentInfo** = False and/or **printDecomp** = False to obtain a smaller output.
+ * For an SLHA :ref:`input file <BasicInput>`, the decay of :ref:`final states <final states>` (or Z\ :sub:`2`-even particles such as the Higgs, W,...) are always ignored during the decomposition. Furthermore, if there are two cross sections at different calculation order (say LO and NLO) for the same process, only the highest order is used.
+ * The list of |elements| can be extremely long. Try setting **addElementInfo** = False and/or **printDecomp** = False to obtain a smaller output.
 
 .. [#] We note that SLHA files including decay tables and cross sections, together with the corresponding *particles.py*, can conveniently be generated via the SModelS-micrOMEGAS interface, see `arXiv:1606.03834 <http://www.arXiv.org/abs/1606.03834>`_
