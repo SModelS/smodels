@@ -235,9 +235,9 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
         pid=os.fork()
         logger.debug("Forking: %s %s %s " % ( i,pid,os.getpid() ) )
         if pid == 0:
-            logger.info("chunk #%d: pid %d (parent %d)." %
+            logger.debug("chunk #%d: pid %d (parent %d)." %
                     ( i, os.getpid(), os.getppid() ) )
-            logger.info( " `-> %s" % " ".join ( chunk ) )
+            logger.debug( " `-> %s" % " ".join ( chunk ) )
             runSetOfFiles(chunk, outputDir, parser, databaseVersion, 
                             listOfExpRes, timeout, development, parameterFile)
             os._exit(0) ## not sys.exit(), return, nor continue
@@ -248,9 +248,9 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
             children.append ( pid )
     for child in children:
         r = os.waitpid ( child, 0 )
-        logger.info ( "child %d terminated: %s" % (child,r) )
-    logger.info ( "all children terminated" )
-    logger.info ( "returning no output, because we are in parallel mode" )
+        logger.debug ( "child %d terminated: %s" % (child,r) )
+    logger.debug ( "all children terminated" )
+    logger.debug ( "returning no output, because we are in parallel mode" )
     return None
 
 def loadDatabase(parser, db):
