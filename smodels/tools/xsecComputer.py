@@ -344,7 +344,7 @@ def getInputFiles ( args ):
     """ geth the names of the slha files to run over """
     inputPath  = args.filename.strip()
     if not os.path.exists( inputPath ):
-        logger.error("Path '%s' does not exist.", inputFile)
+        logger.error( "Path %s does not exist." % inputPath )
         sys.exit(1)
     inputFiles = []
     if os.path.isfile ( inputPath ):
@@ -374,7 +374,11 @@ def main(args):
         sys.exit()
     if ncpus == -1:
         ncpus = runtime.nCPUs()
-    logger.info ( "We run on %d cpus" % ncpus )
+    ncpus = min ( len(inputFiles), ncpus )
+    if ncpus == 1:
+        logger.info ( "We run on a single cpu" )
+    else:
+        logger.info ( "We run on %d cpus" % ncpus )
     children = []
     for i in range(ncpus):
         pid = os.fork()
