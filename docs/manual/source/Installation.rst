@@ -1,5 +1,13 @@
 .. index:: Installation and Deployment
 
+.. |EM| replace:: :ref:`EM-type <EMtype>`
+.. |UL| replace:: :ref:`UL-type <ULtype>`
+.. |EMr| replace:: :ref:`EM-type result <EMtype>`
+.. |ULr| replace:: :ref:`UL-type result <ULtype>`
+.. |EMrs| replace:: :ref:`EM-type results <EMtype>`
+.. |ULrs| replace:: :ref:`UL-type results <ULtype>`
+.. |database| replace:: :ref:`database <Database>`
+
 Installation and Deployment
 ===========================
 
@@ -112,6 +120,33 @@ In order to make sure all libraries have been correctly installed, you can run :
 
 Adding results to the database
 ------------------------------
+
+
+The installation procedure explained above also installs SModelS'
+:ref:`database of experimental results <DatabaseDefinitions>`
+in the smodels-database subdirectory.
+The database version at the time of the SModelS v1.1.0 release is ''1.1.0
+(Silvester 2016)'' and contains 133 (non-superseded) results (94
+|ULrs| and 39 |EMrs|) from 25 ATLAS and 23
+CMS SUSY searches. Among these, 120 results are official ATLAS and CMS results
+from Run 1 at 8 TeV. Ten |EMrs| were ''home-grown'' by us using MadAnalysis5 and
+CheckMATE recasting.  Regarding the early 13 TeV data,
+there are currently three results: two UL maps from CMS and one UL map from
+ATLAS (this will be extended soon).
+The database also includes 33 preliminary results from 13 ATLAS and 3 CMS notes
+which were superseeded by published data; they are kept in the database for
+information but are not used with default settings in SModelS.
+The complete list of analyses and results included in the database can be
+consulted at `http://smodels.hephy.at/wiki/ListOfAnalysesv11 <http://smodels.hephy.at/wiki/ListOfAnalysesv11>`_.
+We note that all the results in the official database release have been
+carefully validated  and the validation material can be
+found at `http://smodels.hephy.at/wiki/Validation11 <http://smodels.hephy.at/wiki/Validation11>`_).
+
+The database can conveniently be updated independently from SModelS code
+updates. It suffices to unpack any new database tarball and replace the database
+directory. In the same fashion, one can easily add additional results as
+explained below.
+
 
 .. _addingFastlim:
 
