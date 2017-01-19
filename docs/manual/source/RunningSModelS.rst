@@ -54,12 +54,14 @@ The command-line tool (:ref:`runSModelS.py <runSModelS>`) and the example Python
 code (:ref:`Example.py <exampleCode>`) are described below.
 
 
-.. note:: For non-MSSM input models the user needs to modify *particles.py*
+.. note:: For For non-MSSM (incl. non-SUSY) input models the user needs to modify *particles.py*
           and specify which BSM particles are even or odd under the assumed
           Z\ :sub:`2` symmetry (see :ref:`adding new particles <newParticles>`).
           Finally, if the user wants to check the input files for possible issues using
           SModelS'  :ref:`SLHA and LHE file checkers <fileChecks>`, it is
           also necessary to define the BSM particle quantum numbers in *particles.py* [#]_.
+          
+         
 
 
 
@@ -96,39 +98,28 @@ file, second, it supports parallelization of this input folder.
                         (required argument). If a directory is given, loop
                         over all files in the directory
   -p PARAMETERFILE, --parameterFile PARAMETERFILE
-                        name of parameter file (optional argumen). If not set,
-                        use all parameters from etc/parameters_default.ini
+                        name of parameter file, where most options are defined
+                        (optional argument). If not set, use all parameters
+                        from etc/parameters_default.ini
   -o OUTPUTDIR, --outputDir OUTPUTDIR
                         name of output directory (optional argument). The
-                        default is: results
-  -d, --development     enable development output
+                        default folder is: ./results/
+  -d, --development     if set, SModelS will run in development mode and exit
+                        if any errors are found.
   -t, --force_txt       force loading the text database
   -V, --version         show program's version number and exit
-  -c, --run-crashreport 
+  -c, --run-crashreport
                         parse crash report file and use its contents for a
                         SModelS run. Supply the crash file simply via '--
                         filename myfile.crash'
   -v VERBOSE, --verbose VERBOSE
-                        verbosity level. accepted values are: debug, info,
-                        warning, error.
+                        sets the verbosity level (debug, info, warning,
+                        error). Default value is info.
   -T TIMEOUT, --timeout TIMEOUT
                         define a limit on the running time (in secs).If not
-                        set, run without a time limit
-
-
-*In some more detail*:
-  -f FILENAME, --filename FILENAME
-                         path to the input (SLHA or LHE) file or a folder containing input files.
-  -p PARAMETERFILE, --parameterFile PARAMETERFILE
-                         path to the |parameters|, where most options are defined.
-  -o OUTPUTDIR, --outputDir OUTPUTDIR
-                         path to the output folder, where the output files will be stored. The default folder is ./results.
-  -d, --development      if set, SModelS will run in development mode and exit if any errors are found.
-  -c, --run-crashreport  if set, SModelS will in run in crash mode. It takes as input a .crash file in order to reproduce the crash error.
-  -v VERBOSE, --verbose VERBOSE
-                         sets the verbosity level (debug, info, warning, error). Default value is info.
-  -T TIMEOUT, --timeout TIMEOUT
-                         (int) defines a time limit for the running time (in secs) for a single input file. If a directory is given as input, the timeout will be applied for each individual file.
+                        set, run without a time limit. If a directory is given
+                        as input, the timeout will be applied for each
+                        individual file.
 
 
 A typical usage example is: ::
@@ -174,9 +165,12 @@ Below we give more detailed information about each entry in the parameters file.
 |
 * *parameters*: basic parameter values for running SModelS
 
-  * **sigmacut** (float): minimum value for an |element| weight (in fb). :ref:`Elements <element>` with a weight below sigmacut are neglected during the |decomposition| of SLHA files (see :ref:`Minimum Decomposition Weight <minweight>`). Depending on the input model, the running time may increase considerably if sigmacut is too low, while too large values might eliminate relevant |elements|.
-  * **minmassgap** (float): maximum mass difference value (in GeV) for perfoming :ref:`mass compression <massComp>`.
-    *Only used if doCompress = True*
+  * **sigmacut** (float): minimum value for an |element| weight (in fb). :ref:`Elements <element>` 
+    with a weight below sigmacut are neglected during the |decomposition|
+    of SLHA files (see :ref:`Minimum Decomposition Weight <minweight>`).
+    The default value is 0.03 fb. Note that, depending on the input model, the running time may increase considerably if sigmacut is too low, while too large values might eliminate relevant |elements|.
+  * **minmassgap** (float): maximum value of the mass difference (in GeV) for
+    perfoming :ref:`mass compression <massComp>`. *Only used if doCompress = True*
   * **maxcond** (float): maximum allowed value (in the [0,1] interval) for the violation of :ref:`upper limit conditions <ULconditions>`. A zero value means the conditions are strictly enforced, while 1 means the conditions are never enforced.
     *Only relevant for printing the* :ref:`output summary <fileOut>`.
   * **ncpus** (int): number of CPUs. When processing multiple SLHA/LHE files,
@@ -185,9 +179,9 @@ Below we give more detailed information about each entry in the parameters file.
 |
 * *database*: allows for selection of a subset of :ref:`experimental results <ExpResult>` from the |database|
 
-  * **analyses** (list of results): set to all to use all available results. If a list of :ref:`experimental analyses <ExpResult>`
+  * **analyses** (list of results): set to *all* to use all available results. If a list of :ref:`experimental analyses <ExpResult>`
     is given, only these will be used. For instance, setting analyses = CMS-PAS-SUS-13-008,ATLAS-CONF-2013-024
-    will only use the |results| from `CMS-PAS-SUS-13-008 <~\cite{Barducci:2016pcb}.~\cite{Barducci:2016pcb}.https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13008>`_
+    will only use the |results| from `CMS-PAS-SUS-13-008 <https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13008>`_
     and `ATLAS-CONF-2013-024 <https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-024/>`_.
   * **txnames** (list of topologies): set to all to use all available simplified model |topologies|. The |topologies| are labeled according to the :ref:`txname convention <TxName>`.
     If a list of |txnames| are given, only the corresponding |topologies| will be considered. For instance, setting txnames = T2 will
@@ -205,7 +199,7 @@ Below we give more detailed information about each entry in the parameters file.
 |
 * *stdout-printer*: options for the stdout or log printer
 
-  * **printDatabase** (True/False): set to True to print the list of selected |results| to stdout. False elsewise.
+  * **printDatabase** (True/False): set to True to print the list of selected |results| to stdout.
   * **addAnaInfo**  (True/False): set to True to include detailed information about the |txnames| tested by each :ref:`experimental result <ExpResult>`. *Only used if printDatabase=True*.
   * **printDecomp** (True/False): set to True to print basic information from the |decomposition| (|topologies|, total weights, ...).
   * **addElementInfo**  (True/False): set to True to include detailed information about the |elements| generated by the |decomposition|. *Only used if printDecomp=True*.
@@ -275,8 +269,8 @@ users more familiar with Python and the SModelS language may prefer to write the
 A simple example code for this purpose is provided in :download:`examples/Example.py`.
 Below we go step-by-step through this example code:
 
-* *Import the SModelS methods*. If the file is not located in the smodels
-  installation folder, simply add "sys.path.append(<smodels installation path>)" before importing smodels
+* *Import the SModelS methods*. If the example code file is not located in
+  the smodels installation folder, simply add "sys.path.append(<smodels installation path>)" before importing smodels
 
 .. literalinclude:: /examples/Example.py
    :lines: 15-19
@@ -401,7 +395,17 @@ Due to this, the results are claimed to be "likely excluded" in the output.
 
 
 **Notes:**
- * For an SLHA :ref:`input file <BasicInput>`, the decay of :ref:`final states <final states>` (or Z\ :sub:`2`-even particles such as the Higgs, W,...) are always ignored during the decomposition. Furthermore, if there are two cross sections at different calculation order (say LO and NLO) for the same process, only the highest order is used.
- * The list of |elements| can be extremely long. Try setting **addElementInfo** = False and/or **printDecomp** = False to obtain a smaller output.
+ * For an SLHA :ref:`input file <BasicInput>`, the decays of :ref:`final states <final states>` 
+   (or Z\ :sub:`2`-even particles such as the Higgs, W,...) are always ignored during
+   the decomposition. Furthermore, if there are two cross sections at different
+   calculation order (say LO and NLO) for the same process, only the highest order is used.
+ * The list of |elements| can be extremely long. Try setting **addElementInfo** = False
+   and/or **printDecomp** = False to obtain a smaller output.
+ * A comment of caution is in order regarding naively using the highest :math:`r`-value
+   reported by SModelS, as this does not necessarily come from the most sensitive analysis.
+   For a rigorous statistical interpretation, one should use the  :math:`r`-value of
+   the result with the highest *expected* :math:`r` (:math:`r_{exp}`).
+   Unfortunately, for |ULrs|, the expected limits are often not available;
+   :math:`r_{exp}` is then reported as N/A in the SModelS output.   
 
 .. [#] We note that SLHA files including decay tables and cross sections, together with the corresponding *particles.py*, can conveniently be generated via the SModelS-micrOMEGAS interface, see `arXiv:1606.03834 <http://www.arXiv.org/abs/1606.03834>`_
