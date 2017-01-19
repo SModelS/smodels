@@ -63,7 +63,7 @@ A schematic summary of the above structure can be seen below:
    :width: 85%
 
 
-In the following sections we describe in detail the main concepts and elements which constitute the SModelS database.
+In the following sections we describe the main concepts and elements which constitute the SModelS database.
 More details about the database folder structure and object struture can be found in :ref:`Database of Experimental Results<databaseStruct>`.
 
 .. _Database:
@@ -288,6 +288,6 @@ A complete list of TxNames can be found `here <http://smodels.hephy.at/wiki/SmsD
 *More details about the database folder structure and object
 struture can be found in* :ref:`Database of Experimental Results<databaseStruct>`. 
 
-.. [*] The name *Data Set* is used instead of signal region because it is concept is slightly more general than the latter. For instance,
+.. [*] The name *Data Set* is used instead of signal region because its concept is slightly more general. For instance,
    in the case of |ULrs|, a |Dataset| may not correspond to a single signal region, but to a combination of signal regions.
  

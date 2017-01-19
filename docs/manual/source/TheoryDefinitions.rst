@@ -19,7 +19,7 @@ to compute the :ref:`theoretical prediction <theoryPredictions>` for a given :re
 
 
 The applicability of SModelS is currently restricted to models which contain a Z\ :sub:`2` 
-symmetry (R-Parity in SUSY, K-Parity in UED, ...) and result in a
+symmetry (R-parity in SUSY, K-parity in UED, ...) and result in a
 missing transverse energy (MET) final state at experiments. This is required in
 order to provide a clear structure for the simplified model topologies appearing
 during the :ref:`decomposition <decomposition>` of the input model.
@@ -45,7 +45,7 @@ A representation of an element is shown below:
    :width: 30%
    
 An element may also hold information about its corresponding 
-weight (cross section times branching ratio times efficiency[*]_ ).
+weight (cross section times branching ratio times efficiency). [*]_
 The overall properties of an element are illustrated in the scheme below:
 
 .. _topscheme:
@@ -61,8 +61,7 @@ specific BSM model in a model-independent framework, which can then be compared
 against the corresponding experimental limits.
 For instance, as shown in the :ref:`scheme above <elementscheme>`, only the
 masses of the BSM states are used and other properties, such as their spins or
-other quantum numbers are ignored. (The PIDs, however, are kept for the purpose
-of book-keeping).
+other quantum numbers are ignored (the PID's are, however, stored for book-keeping).
 
 
 Below we describe in more detail the element properties and their implementation
@@ -196,6 +195,6 @@ final states in each vertex).
 
 * **Topologies are described by the** `Topology Class <../../../documentation/build/html/theory.html#theory.topology.Topology>`_   
 
-.. [*] In order to treat the UL and EM map results on the same footing
-   SModelS applies a trivial binary efficiency to elements for UL 
-   type results as will be explained in detail later.
+.. [*] In order to treat the UL and EM map results on the same footing,
+   SModelS applies a trivial binary efficiency to elements for UL-type
+   results as will be explained in detail later.

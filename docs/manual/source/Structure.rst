@@ -3,7 +3,7 @@
 SModelS Structure
 =================
 
-The basic SModelS framework consists of the following main parts:
+The main ingredients relevant for SModelS are:
 
 .. toctree::
    :maxdepth: 1
@@ -15,4 +15,4 @@ The basic SModelS framework consists of the following main parts:
    ConfrontPredictions
 
    
-In the following we discuss in detail each task performed by SModelS.
+In the following we discuss each of these in more detail.

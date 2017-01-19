@@ -99,7 +99,7 @@ Data Set Folder: Upper Limit Type
 
 Since |ULrs| have a single dataset (see |Datasets|), the info file only holds
 some trivial information, such as the type of |ExpRes| (UL) and the dataset id
-(None). Here is the content of CMS-SUS-12-024/data/dataInfo.txt as an
+(None for UL-type results). Here is the content of CMS-SUS-12-024/data/dataInfo.txt as an
 example:
 
 .. literalinclude:: /literals/dataInfo.txt
