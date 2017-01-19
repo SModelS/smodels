@@ -65,13 +65,13 @@ if __name__ == "__main__":
             help='name of SLHA or LHE input file or a directory path (required argument). '
             'If a directory is given, loop over all files in the directory', required=True)
     ap.add_argument('-p', '--parameterFile', 
-            help='name of parameter file (optional argumen). If not set, use '
+            help='name of parameter file, where most options are defined (optional argument). If not set, use '
             'all parameters from etc/parameters_default.ini', 
             default=parameterFile)
     ap.add_argument('-o', '--outputDir', 
             help='name of output directory (optional argument). The default folder is: ' +
             outputDir, default=outputDir)
-    ap.add_argument('-d', '--development', help='enable development output', 
+    ap.add_argument('-d', '--development', help='if set, SModelS will run in development mode and exit if any errors are found.',
             action='store_true')
     ap.add_argument('-t', '--force_txt', help='force loading the text database',
             action='store_true')
@@ -80,12 +80,12 @@ if __name__ == "__main__":
             help='parse crash report file and use its contents for a SModelS run. '
                  "Supply the crash file simply via '--filename myfile.crash'",
             action='store_true')
-    ap.add_argument('-v','--verbose', help='verbosity level. '
-            'Accepted values are: debug, info, warning, error.',
+    ap.add_argument('-v','--verbose', help='sets the verbosity level (debug, info, warning, error). Default value is info.',
             default = "info", type = str )
     ap.add_argument('-T', '--timeout', 
-            help='define a limit on the running time (in secs). '
-            'If not set, run without a time limit', 
+            help='define a limit on the running time (in secs).'
+                 'If not set, run without a time limit. If a directory is given as input, '
+                 'the timeout will be  applied for each individual file.',
             default = 0, type = int)
     
     
