@@ -1,4 +1,4 @@
-Known Issues, v1.1.0, ....
+Known Issues, v1.1.0
 =======================================================
 
  * Memory consumption can be quite high, especially in multi-core mode.
