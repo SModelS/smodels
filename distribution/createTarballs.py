@@ -197,7 +197,7 @@ def clearGlobalInfo ( filename ):
         if not to_skip:
             g.write ( line )
     g.close()
-    cmd = "cp /tmp/globalInfo.txt %s" % filename 
+    cmd = "cp /tmp/globalInfo.txt %s" % filename
     run ( cmd )
 
 def cleanDatabase():
@@ -205,7 +205,8 @@ def cleanDatabase():
     Clean up the database, e.g. remove orig and validation folders
     """
     comment ( "Now cleaning up database in %s/smodels-database" % dirname )
-    walker = os.walk ( "%s/smodels-database" % dirname )
+    fullpath = "%s/smodels-database" % dirname
+    walker = os.walk ( fullpath )
     for record in walker:
         File=record[0]
         # comment ( "Now in %s" % File )
@@ -221,6 +222,12 @@ def cleanDatabase():
             fullpath = os.path.join ( File, rf )
             if os.path.exists ( fullpath):
                 os.unlink ( fullpath )
+    # clearGlobalInfos ( fullpath )
+
+def clearGlobalInfos( path ):
+    walker = os.walk ( path )
+    for record in walker:
+        File=record[0]
         gIpath = os.path.join ( File, "globalInfo.txt" )
         if os.path.exists ( gIpath ):
             clearGlobalInfo ( gIpath )
@@ -236,10 +243,11 @@ def splitDatabase():
     cmd = "cd %s/smodels-database/; %s/moveFastlimResults.py" % \
           ( dirname, cwd )
     run ( cmd )
-
     cmd = "mv ./smodels-fastlim.tgz %s/smodels-v%s-fastlim-1.0.tgz" % \
           ( cwd, version[:3] )
     run ( cmd )
+    clearGlobalInfos ( "%s/smodels-database/" % dirname )
+
     # sys.exit()
 
 def createTarball():
@@ -344,6 +352,9 @@ def create():
     isDummy()
 
 if __name__ == "__main__":
+    # fetchDatabase()
+    cleanDatabase()
+    splitDatabase()
     # cleanDatabase()
     # clearGlobalInfo ( "./globalInfo.txt" )
-    create()
+    # create()
