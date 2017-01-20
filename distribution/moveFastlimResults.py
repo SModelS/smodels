@@ -6,6 +6,9 @@
 import os
 import commands
 import sys
+sys.path.insert(0,"." )
+
+from createTarballs import clearGlobalInfos
 
 fastlimdir = "../../smodels-fastlim"
 
@@ -48,6 +51,7 @@ def isFastlim ( path, dryrun ):
     run ( cmd )
     cmd = "rm -r %s/%s/sms.root" % ( fastlimdir, path )
     run ( cmd )
+    clearGlobalInfos ( fastlimdir )
 
 def createFastlimTarball():
     cmd = "cd %s; tar czvf ../smodels-fastlim.tgz ./" % fastlimdir
@@ -70,7 +74,7 @@ def traverse( dryrun ):
                 gif=open ( gi )
                 lines=gif.readlines()
                 for line in lines:
-                    if "fastlim" in line:
+                    if "fastlim" in line and "contact" in line:
                         isFastlim ( fullpath, dryrun )
                         break
                 gif.close()
@@ -90,7 +94,7 @@ def moveBibFile ( dryrun ):
 if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser()
-    ap.add_argument( '-d', '--dryrun', 
+    ap.add_argument( '-d', '--dryrun',
             help='Dry-run, dont actuall move or create anything',
             action='store_true')
     args = ap.parse_args()
