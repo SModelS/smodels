@@ -125,9 +125,10 @@ Adding results to the database
 The installation procedure explained above also installs SModelS'
 :ref:`database of experimental results <DatabaseDefinitions>`
 in the smodels-database subdirectory.
-The database version at the time of the SModelS v1.1.0 release is ''1.1.0
-(Silvester 2016)'' and contains 133 (non-superseded) results (94
-|ULrs| and 39 |EMrs|) from 25 ATLAS and 23
+The database version at the time of the SModelS v1.1.0 release is ``1.1.0
+(Silvester 2016)'' and contains 133 results for testing new physics models. 
+More concretely, these are 94
+|ULrs| and 39 |EMrs| from 25 ATLAS and 23
 CMS SUSY searches. Among these, 120 results are official ATLAS and CMS results
 from Run 1 at 8 TeV. Ten |EMrs| were ''home-grown'' by us using MadAnalysis5 and
 CheckMATE recasting.  Regarding the early 13 TeV data,
