@@ -164,14 +164,6 @@ tools.stringTools module
     :undoc-members:
     :show-inheritance:
 
-tools.summaryReader module
---------------------------
-
-.. automodule:: tools.summaryReader
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 tools.timeOut module
 --------------------
 
@@ -184,14 +176,6 @@ tools.toolBox module
 --------------------
 
 .. automodule:: tools.toolBox
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-tools.uniqueLogFilter module
-----------------------------
-
-.. automodule:: tools.uniqueLogFilter
     :members:
     :undoc-members:
     :show-inheritance:
