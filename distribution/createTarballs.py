@@ -353,8 +353,8 @@ def create():
 
 if __name__ == "__main__":
     # fetchDatabase()
-    cleanDatabase()
-    splitDatabase()
+    # cleanDatabase()
+    # splitDatabase()
     # cleanDatabase()
     # clearGlobalInfo ( "./globalInfo.txt" )
-    # create()
+    create()
