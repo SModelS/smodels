@@ -35,7 +35,7 @@ Inside SModelS there is a number of tools that may be convenient for the user:
 * a :ref:`cross section calculator <xsecCalc>` based on `Pythia6 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_  and 
   `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_,
 * :ref:`SLHA and LHE file checkers <fileChecks>` to check your input files for completeness and sanity,
-* a :ref:`Database Browser <databaseBrowser>` to provide easy access to the |Database| of experimental results,
+* a :ref:`database Browser <databaseBrowser>` to provide easy access to the |database| of experimental results,
 * a module for identifying :ref:`missing topologies <topCoverage>`.
 
 .. _xsecCalc:
@@ -43,7 +43,7 @@ Inside SModelS there is a number of tools that may be convenient for the user:
 Cross Section Calculator
 ------------------------
 
-This little tool computes LHC production cross sections for *MSSM particles*
+This tool computes LHC production cross sections for *MSSM particles*
 and writes them out in :ref:`SLHA convention <xsecblock>`. This can in particular be 
 convenient for adding cross sections to SLHA input files, see :doc:`Basic Input <BasicInput>`. 
 The calculation is done at LO with `Pythia6.4 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_ ; K-factors 
@@ -78,7 +78,7 @@ for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~
                         Verbosity (debug, info, warning, error)
                         
 
-*Some more explanations*:
+*In some more detail*:
   -s SQRTS, --sqrts SQRTS 
                         (int) an integer (or integers) with the value (in TeV) of the LHC center-of-mass energy for computing the cross sections
   -e NEVENTS, --nevents NEVENTS 
@@ -223,20 +223,6 @@ smodelsTools.py slhachecker [-h] [-xS] [-lsp] [-longlived] [-m DISPLACEMENT] [-s
                         name of input SLHA file
 
 
-*In some more detail*:
-  -xS, --xsec           if this flag is set, the check for a cross section block will not be performed
-  -lsp, --lsp           if this flag is set, the check for a neutral LSP will not be performed
-  -longlived, --longlived
-                        if this flag is set, check for non-prompt visible decays or stable charged particles will not be performed
-  -m DISPLACEMENT, --displacement DISPLACEMENT 
-                        (float) use this to set the value of c*tau (in meters) where a decay is no longer considered prompt
-  -s SIGMACUT, --sigmacut SIGMACUT 
-                        (float) use this to set the value of sigmacut, that is used as a cutoff for relevant non-promt decays or long lived charged particle production
-  -illegal, --illegal   if this flag is set, the check for illegal (kinematically forbidden) decays will be performed
-  -dB, --decayBlocks    if this flag is set, the check for missing decay blocks will not be performed
-  -f FILENAME, --filename FILENAME 
-                        path to the input file
-
 A typical
 usage example is: ::
 
@@ -250,7 +236,7 @@ and error messages.
 Database Browser
 ----------------
 
-In several cases the user might be interested in an easy way to directly access the |Database| of |ExpRess|.
+In several cases the user might be interested in an easy way to directly access the |database| of |ExpRess|.
 This can be conveniently done using the database browser. The browser owns several methods to select  |ExpRess|
 or |Datasets| satisfying some user-defined conditions as well as to access the meta data and data inside each
 |ExpRes|.
@@ -265,11 +251,6 @@ smodelsTools.py database-browser [-h] -p PATH_TO_DATABASE [-t]
                         path to SModelS database
   -t, --text            load text database, dont even search for binary
                         database file
-
-*In some more detail*:
-  -p PATH_TO_DATABASE, --path_to_database PATH_TO_DATABASE 
-                        path to the database folder 
-  -t, --text            if set, force the text database to be loaded (ignores the :ref:`pickle file <databasePickle>`)
 
 A typical usage example is: ::
 
