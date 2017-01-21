@@ -116,6 +116,9 @@ def rmlog():
     """ clear the log file """
     cmd="rm -f create.log"
     commands.getoutput ( cmd )
+    cmd="rm -f %s/smodels-database/create.log" % dirname
+    commands.getoutput ( cmd )
+
 
 def mkdir():
     """
@@ -142,7 +145,7 @@ def clone():
     """
     comment ( "Git-cloning smodels into %s (this might take a while)" % dirname )
     cmd = "git clone -b v%s git@smodels.hephy.at:smodels %s" % (version, dirname)
-    #cmd = "git clone git@smodels.hephy.at:smodels %s" % (dirname)
+#     cmd = "git clone git@smodels.hephy.at:smodels %s" % (dirname)
     if dummyRun:
         cmd = "cp -a ../../smodels-v%s/* %s" % ( version, dirname )
     run ( cmd )
@@ -172,6 +175,7 @@ def fetchDatabase():
     comment ( "git clone the database (this might take a while)" )
     cmd = "cd %s; git clone -b v%s git@smodels.hephy.at:smodels-database"  % \
             (dirname, version)
+            
     if dummyRun:
         cmd = "cd %s; cp -a ../../../smodels-database-v%s smodels-database" % \
               ( dirname, version )
@@ -187,7 +191,7 @@ def clearGlobalInfo ( filename ):
     lines=f.readlines()
     f.close()
     g=open("/tmp/globalInfo.txt","w")
-    skip = [ "publishedData", "validated", "axes", "comment", "contact", "private", \
+    skip = [ "publishedData", "validated", "axes", "comment", "private", \
              "prettyName" ]
     for line in lines:
         to_skip = False
@@ -213,7 +217,7 @@ def cleanDatabase():
         # comment ( "Now in %s: %s" % (File, record[1] ) )
         removals = [ "orig", ".git", "validation" ]
         rmFiles = [ "run_convert.sh", "checkFastlimValidation.py",  \
-                    "checkFastlimValidation.ipynb", "convert.py", "sms.root" ]
+                    "checkFastlimValidation.ipynb", "convert.py", "sms.root", "general.comment" ]
         for r in removals:
             if r in File:
                 cmd = "rm -rf %s" % File
@@ -345,8 +349,9 @@ def create():
     makeDocumentation()
     rmExtraFiles() ## ... remove unneeded files ...
     rmpyc() ## ...  remove the pyc files created by makeDocumentation ...
+    rmlog()  ##Make sure to remove log files
     createTarball() ## here we go! create!
-    test ()
+    test ()    
     # rmdir(dirname)
     testDocumentation()
     isDummy()
