@@ -217,7 +217,7 @@ def cleanDatabase():
         # comment ( "Now in %s: %s" % (File, record[1] ) )
         removals = [ "orig", ".git", "validation" ]
         rmFiles = [ "run_convert.sh", "checkFastlimValidation.py",  \
-                    "checkFastlimValidation.ipynb", "convert.py", "sms.root", "general.comment" ]
+                    "checkFastlimValidation.ipynb", "convert.py","convertCMS.py", "sms.root", "general.comment" ]
         for r in removals:
             if r in File:
                 cmd = "rm -rf %s" % File
