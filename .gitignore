@@ -44,6 +44,8 @@ distribution/create.log
 distribution/smodels-*
 docs/manual/source/recipes/*.html
 docs/manual/source/recipes/*.py
+cpp/libSModelS.so
+cpp/run
 # test/database/database.pcl
 *~
 *.crash
