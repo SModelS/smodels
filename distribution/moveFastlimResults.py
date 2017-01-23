@@ -90,6 +90,15 @@ def moveBibFile ( dryrun ):
     else:
         cmd = "mv %s %s" % ( fastlim_bib, fastlimdir )
         run ( cmd, dryrun )
+        
+def moveReadmeFile ( dryrun ):
+    """ move fastlim-specific README file """
+    fastlim_readme = "README_fastlim"
+    if not os.path.exists ( fastlim_readme ):
+        error ( "%s is missing!" % fastlim_readme )
+    else:
+        cmd = "mv %s %s" % ( fastlim_readme, os.path.join(fastlimdir,'README' ))
+        run ( cmd, dryrun )        
 
 if __name__ == "__main__":
     import argparse
@@ -103,4 +112,5 @@ if __name__ == "__main__":
     mkDirs()
     traverse( args.dryrun )
     moveBibFile ( args.dryrun )
+    moveReadmeFile ( args.dryrun )
     createFastlimTarball()
