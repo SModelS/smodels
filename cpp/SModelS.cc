@@ -19,6 +19,8 @@ SModelS::SModelS( const std::string & parameterfile )
   PyRun_SimpleString("import time");
   PyRun_SimpleString("t0=time.time()");
   PyRun_SimpleString("import modelTester");
+  PyRun_SimpleString("import smodelsLogging");
+  // PyRun_SimpleString("smodelsLogging.setLogLevel ( \"debug\" ) ");
 	// PyObject* myModuleString = PyString_FromString((char*)"modelTester");
 	// PyObject* myModule = PyImport_Import( myModuleString );
   loadDatabase ( parameterfile );
@@ -36,7 +38,7 @@ void SModelS::loadDatabase ( const string & parameterfile )
 	buffer << "parameterFile='" << parameterfile << "'";
   PyRun_SimpleString( buffer.str().c_str() );
   PyRun_SimpleString( "parser = modelTester.getParameters( parameterFile )" );
-  PyRun_SimpleString( "database, databaseVersion = modelTester.loadDatabase(parser, None, 'info' )" );
+  PyRun_SimpleString( "database, databaseVersion = modelTester.loadDatabase(parser, None )" );
   PyRun_SimpleString( "listOfExpRes = modelTester.loadDatabaseResults(parser, database)" );
   PyRun_SimpleString( "print '[smodels.cpp] %d experimental results found.' % len(listOfExpRes) " );
 }
