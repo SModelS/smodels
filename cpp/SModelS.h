@@ -12,7 +12,7 @@ class SModelS {
   public:
     SModelS( const std::string & parameterfile );
     ~SModelS();
-    void run ( const std::string & file );
+    int run ( const std::string & file );
 
   private:
     void loadDatabase( const std::string & parameterfile );
