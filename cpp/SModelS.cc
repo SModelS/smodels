@@ -29,7 +29,7 @@ SModelS::SModelS( const std::string & parameterfile )
 SModelS::~SModelS ()
 {
   Py_Finalize();
-  cout << "[smodels.cpp] ends!" << endl;
+  // cout << "[SModelS.cc] destroyed." << endl;
 }
 
 void SModelS::loadDatabase ( const string & parameterfile )
@@ -43,7 +43,7 @@ void SModelS::loadDatabase ( const string & parameterfile )
   PyRun_SimpleString( "print '[smodels.cpp] %d experimental results found.' % len(listOfExpRes) " );
 }
 
-void SModelS::run ( const string & inFile )
+int SModelS::run ( const string & inFile )
 {
   cout << "[smodels.cpp] now running over " << inFile << endl;
 	ostringstream buffer;
@@ -51,4 +51,5 @@ void SModelS::run ( const string & inFile )
   PyRun_SimpleString( buffer.str().c_str() );
   PyRun_SimpleString( "fileList = modelTester.getAllInputFiles( inFile )" );
   PyRun_SimpleString( "modelTester.testPoints( fileList, inFile, 'results', parser, databaseVersion, listOfExpRes, 900, False, parameterFile )" );
+  return 0;
 }
