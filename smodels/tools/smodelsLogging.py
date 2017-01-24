@@ -19,15 +19,15 @@ class ColoredLogger:
     def error ( self, msg, *args, **kwargs):
         msg = "%s%s%s" % ( colors.error, msg, colors.reset )
         return _logger.error ( msg, *args, **kwargs )
-    def warn ( self, msg, *args, **kwargs):
+    def warning ( self, msg, *args, **kwargs):
         msg = "%s%s%s" % ( colors.warn, msg, colors.reset )
-        return _logger.error ( msg, *args, **kwargs )
+        return _logger.warning ( msg, *args, **kwargs )
     def info ( self, msg, *args, **kwargs):
         msg = "%s%s%s" % ( colors.info, msg, colors.reset )
-        return _logger.error ( msg, *args, **kwargs )
+        return _logger.info ( msg, *args, **kwargs )
     def debug ( self, msg, *args, **kwargs):
         msg = "%s%s%s" % ( colors.debug, msg, colors.reset )
-        return _logger.error ( msg, *args, **kwargs )
+        return _logger.debug ( msg, *args, **kwargs )
 
 logger = ColoredLogger()
 
