@@ -5,34 +5,38 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
-
-import logging
+    
 from smodels.tools.colors import colors
-
-FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in %(lineno)s: %(message)s'
-logging.basicConfig(format=FORMAT)
-_logger = logging.getLogger("smodels")
+import logging
 
 class ColoredLogger:
+
     def __init__ ( self ):
-        pass
+        FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in' \
+                 ' %(lineno)s: %(message)s'
+        logging.basicConfig(format=FORMAT)
+        self._logger = logging.getLogger("smodels")
+    def setLevel ( self, level ):
+        return self._logger.setLevel ( level )
+    def set_level ( level ):
+        return self._logger.setLevel ( level )
     def error ( self, msg, *args, **kwargs):
         msg = "%s%s%s" % ( colors.error, msg, colors.reset )
-        return _logger.error ( msg, *args, **kwargs )
+        return self._logger.error ( msg, *args, **kwargs )
     def warning ( self, msg, *args, **kwargs):
         msg = "%s%s%s" % ( colors.warn, msg, colors.reset )
-        return _logger.warning ( msg, *args, **kwargs )
+        return self._logger.warning ( msg, *args, **kwargs )
     def info ( self, msg, *args, **kwargs):
         msg = "%s%s%s" % ( colors.info, msg, colors.reset )
-        return _logger.info ( msg, *args, **kwargs )
+        return self._logger.info ( msg, *args, **kwargs )
     def debug ( self, msg, *args, **kwargs):
         msg = "%s%s%s" % ( colors.debug, msg, colors.reset )
-        return _logger.debug ( msg, *args, **kwargs )
+        return self._logger.debug ( msg, *args, **kwargs )
 
 logger = ColoredLogger()
 
 def setLogLevel ( level ):
-    """ set the log level of the central logger. 
+    """ set the log level of the central logger.
         can either be directly an integer ( e.g. logging.DEBUG ),
         or "debug", "info", "warning", or "error".
     """
@@ -42,8 +46,9 @@ def setLogLevel ( level ):
         return
     level = level.lower()
     levels = { "debug": logging.DEBUG, "info": logging.INFO,
+               "warn": logging.WARNING,
                "warning": logging.WARNING, "error": logging.ERROR }
     if not level in levels:
         logger.error ( "Unknown log level ``%s'' supplied!" % level )
         return
-    logger.setLevel ( level= levels[level] )
+    logger.setLevel ( level = levels[level] )
