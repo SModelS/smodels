@@ -1,27 +1,28 @@
 // This is our program to read slha files and compute cross sections
 
 #include "Pythia8/Pythia.h"
+#include <sstream>
 using namespace Pythia8;
-int main() {
+
+int run( int nevents, int sqrts /* in TeV */ ) {
   // Generator. Process selection. LHC initialization. Histogram.
   Pythia pythia;
   pythia.readFile("pythia8.cfg");
-  int nEvent   = pythia.mode("Main:numberOfEvents");
-  int nAbort   = pythia.mode("Main:timesAllowErrors");
-  double eCM   = pythia.parm("Beams:eCM");
-  // LHAupFromPYTHIA8 myLHA(&pythia.process, &pythia.info);
-  // myLHA.openLHEF("pythia8.lhe");
+  ostringstream o1, o2;
+  o1 << "Main:numberOfEvents=" << nevents;
+  pythia.readString( o1.str() );
+  o2 << "Beams:eCM=" << sqrts * 1000;
+  pythia.readString( o2.str() );
   pythia.init();
-  // myLHA.initLHEF();
 
   // Begin event loop. Generate event. Skip if error. List first one.
-  for (int iEvent = 0; iEvent < nEvent; ++iEvent) {
+  for (int iEvent = 0; iEvent < nevents; ++iEvent ) {
     if (!pythia.next()) continue;
-    //myLHA.setEvent(); myLHA.eventLHEF();
   }
   pythia.stat();
-  /* cout << "end pythia.stat" << endl;
-  myLHA.updateSigma();
-  myLHA.closeLHEF(true); */
   return 0;
+}
+
+int main( int argc, const char * argv[] ) {
+  return run ( 100, 7 );
 }
