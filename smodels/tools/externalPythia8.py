@@ -296,4 +296,4 @@ if __name__ == "__main__":
     output = tool.run(slhapath)
     isok = (len (output.split("\n")) > 570)
     print("run: " + externalTool.ok (isok))
-    tool.unlink()
+    # tool.unlink()
