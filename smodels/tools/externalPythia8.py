@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 """
-.. module:: externalPythia6
-   :synopsis: Wrapper for pythia6.
+.. module:: externalPythia8
+   :synopsis: Wrapper for pythia8.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
@@ -21,15 +21,15 @@ except ImportError:
 import urllib
 import tarfile
 
-class ExternalPythia6(ExternalTool):
+class ExternalPythia8(ExternalTool):
     """
-    An instance of this class represents the installation of pythia6.
+    An instance of this class represents the installation of pythia8.
     
     """
     def __init__(self,
-                 configFile="<install>/etc/pythia.card",
-                 executablePath="<install>/lib/pythia6/pythia_lhe",
-                 srcPath="<install>/lib/pythia6/"):
+                 configFile="<install>/lib/pythia8/pythia8.cfg",
+                 executablePath="<install>/lib/pythia8/pythia8.exe",
+                 srcPath="<install>/lib/pythia8/"):
         """ 
         :param configFile: Location of the config file, full path; copy this
         file and provide tools to change its content and to provide a template
@@ -41,7 +41,7 @@ class ExternalPythia6(ExternalTool):
         
         """
         ExternalTool.__init__(self)
-        self.name = "pythia6"
+        self.name = "pythia8"
         self.executablePath = self.absPath(executablePath)
         self.executable = None
         self.srcPath = self.absPath(srcPath)
@@ -173,14 +173,13 @@ class ExternalPythia6(ExternalTool):
             ci=self.checkInstallation()
             if not ci:
                 if not do_compile:
-                    logger.error("couldnt find pythia6 binary." )
+                    logger.error("couldnt find pythia8 binary." )
                     self.complain()
-                logger.warning("couldnt find pythia6 binary. I have been asked to try to compile it, though. Lets see.")
+                logger.warning("couldnt find pythia8 binary. I have been asked to try to compile it, though. Lets see.")
                 # self.compile()
                 self.complain()
         slha = self.checkFileExists(slhaFile)
         cfg = self.absPath(cfgfile)
-        ck_cfg = self.checkFileExists(cfg)
         logger.debug("running with " + str(cfg))
         import shutil
         shutil.copy(slha, self.tempDirectory() + "/fort.61")
@@ -271,21 +270,10 @@ class ExternalPythia6(ExternalTool):
         slhaFile = "/inputFiles/slha/gluino_squarks.slha"
         slhaPath = installation.installDirectory() + slhaFile
         try:
-            output = self.run(slhaPath, "<install>/etc/pythia_test.card",
+            output = self.run(slhaPath, "<install>/lib/pythia8/pythia8.cfg",
                     do_compile=False, do_check=False ) 
             output = output.split("\n")
-            if output[-1].find("The following floating-point") > -1:
-                output.pop()
-
-            output.pop()
-            val = (" ********* Fraction of events that fail fragmentation "
-                   "cuts =  0.00000 *********")
-            lines = {-1 : val}
-            for (nr, line) in lines.items():
-                if output[nr].find(line) == -1:
-                    logger.error("Expected >>>%s<<< found >>>%s<<<", line,
-                                 output[nr])
-                    return False
+            print ( "output0=",output[0] )
         except Exception as e:
             logger.error("Something is wrong with the setup: exception %s", e)
             return False
@@ -293,23 +281,19 @@ class ExternalPythia6(ExternalTool):
 
 
 if __name__ == "__main__":
-    #from smodelsLogging import setLogLevel
-    #setLogLevel ( "debug" )
-    tool = ExternalPythia6()
-    print("[externalPythia6] installed: " + str(tool.installDirectory()))
+    tool = ExternalPythia8()
+    print("installed: " + str(tool.installDirectory()))
     td_exists = externalTool.ok(os.path.exists(tool.tempDirectory()))
-    print("[externalPythia6] temporary directory: %s: %s" % (str(tool.tempDirectory()),
+    print("temporary directory: %s: %s" % (str(tool.tempDirectory()),
                                            td_exists))
-    print("[externalPythia6] check: " + externalTool.ok(tool.checkInstallation()))
-    print("[externalPythia6] seconds per event: %d" % tool.secondsPerEvent)
+    print("check: " + externalTool.ok(tool.checkInstallation()))
+    print("seconds per event: %d" % tool.secondsPerEvent)
     tool.replaceInCfgFile({"NEVENTS": 1, "SQRTS":8000})
     tool.setParameter("MSTP(163)", "6")
     slhafile = "inputFiles/slha/simplyGluino.slha"
     slhapath = os.path.join ( installation.installDirectory(), slhafile )
-    # print ( "[externalPythia6] slhapath:",slhapath )
-    output = tool.run(slhapath, do_unlink=True, do_check=False )
-    n = len (output.split("\n"))
-    # print ( "n: ",n )
-    isok = ( n > 380)
-    print("[externalPythia6] run: " + externalTool.ok (isok))
-    # tool.unlink()
+    print ( "slhafile=", slhapath )
+    output = tool.run(slhapath)
+    isok = (len (output.split("\n")) > 570)
+    print("run: " + externalTool.ok (isok))
+    tool.unlink()
