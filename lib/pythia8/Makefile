@@ -19,3 +19,5 @@ copy_slha:
 	cp ../../inputFiles/slha/simplyGluino.slha test.slha
 
 test: all copy_slha run
+
+.PHONY:
