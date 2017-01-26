@@ -190,7 +190,7 @@ def clearGlobalInfo ( filename ):
     f=open(filename)
     lines=f.readlines()
     f.close()
-    g=open("/tmp/globalInfo.txt","w")
+    g=open("/tmp/tmp.txt","w")
     skip = [ "publishedData", "validated", "axes", "comment", "private", \
              "prettyName" ]
     for line in lines:
@@ -201,7 +201,7 @@ def clearGlobalInfo ( filename ):
         if not to_skip:
             g.write ( line )
     g.close()
-    cmd = "cp /tmp/globalInfo.txt %s" % filename
+    cmd = "cp /tmp/tmp.txt %s" % filename
     run ( cmd )
 
 def cleanDatabase():
@@ -226,12 +226,16 @@ def cleanDatabase():
             fullpath = os.path.join ( File, rf )
             if os.path.exists ( fullpath):
                 os.unlink ( fullpath )
-    # clearGlobalInfos ( fullpath )
 
 def clearGlobalInfos( path ):
     walker = os.walk ( path )
     for record in walker:
         File=record[0]
+        # print ( "record=",record )
+        for i in record[2]:
+            if i[0]=="T" and i[-4:]==".txt":        
+                fullpath = os.path.join ( File, i )
+                clearGlobalInfo ( fullpath )
         gIpath = os.path.join ( File, "globalInfo.txt" )
         if os.path.exists ( gIpath ):
             clearGlobalInfo ( gIpath )
@@ -357,9 +361,10 @@ def create():
     isDummy()
 
 if __name__ == "__main__":
+    clearGlobalInfos ( "%s/smodels-database/" % dirname )
     # fetchDatabase()
     # cleanDatabase()
     # splitDatabase()
     # cleanDatabase()
     # clearGlobalInfo ( "./globalInfo.txt" )
-    create()
+    # create()
