@@ -134,7 +134,7 @@ def rmdir():
     """
     Remove the temporary directories
     """
-    for i in ( dirname ): ## , fastlimdir ):
+    for i in ( dirname, ): ## fastlimdir ):
         if os.path.exists(i):
             comment ( "Removing temporary directory %s" % i )
             run ("rm -rf %s" % i )
@@ -192,9 +192,10 @@ def clearGlobalInfo ( filename ):
     lines=f.readlines()
     f.close()
     g=open("/tmp/tmp.txt","w")
-    skip = [ "publishedData", "validated", "comment", "private", \
+    skip = [ "publishedData", "comment", "private", \
              "prettyName" ]
-    skip.append ( "axes" )
+    #skip.append ( "validated" )
+    #skip.append ( "axes" )
     for line in lines:
         to_skip = False
         for s in skip:
