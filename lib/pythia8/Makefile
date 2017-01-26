@@ -6,8 +6,16 @@ EXES := $(SRC:.cc=.exe)
 
 all: $(EXES)
 
+clean:
+	rm -rf $(EXES) test.slha
+
 %.exe: %.cc
 	$(CXX) $(CXXFLAGS) -o $@ $< -lpythia8 -lLHAPDF
 
 run:
 	pythia8.exe
+
+copy_slha:
+	cp ../../inputFiles/slha/simplyGluino.slha test.slha
+
+test: all copy_slha run
