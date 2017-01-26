@@ -269,7 +269,6 @@ class TxNameData(object):
         for b in branch:
             els = []
             for element in b:
-                # print ( "removing units from %s" % element )
                 if type(element)==unum.Unum:
                     els.append ( element.asNumber ( GeV ) )
                 else:
@@ -279,7 +278,6 @@ class TxNameData(object):
             
             # value = eval(value, {'fb':fb, 'pb':pb, 'GeV':GeV, 'TeV':TeV})
     def removeUnits ( self, value ):
-        # print ( "removing units from %s" % value )
         if type(value[0][1])==unum.Unum:
             ## if its a unum, we store 1.0 * unit
             self.unit=value[0][1] / ( value[0][1].asNumber() )
@@ -294,7 +292,6 @@ class TxNameData(object):
                     newbranch = self.removeGeV ( branch )
                 newpoint.append ( newbranch )
             ret.append ( newpoint )
-        # print ( "result=%s" % ret )
         return ret
 
     def loadData(self,value):
@@ -313,8 +310,6 @@ class TxNameData(object):
             value = self.convertString ( value )
         else:
             value = self.removeUnits ( value )
-
-        # print ( "value=%s" % value[:2] )
 
         if len(value) < 1 or len(value[0]) < 2:
                 logger.error ( "input value not in correct format. expecting sth " \
@@ -341,15 +336,10 @@ class TxNameData(object):
                     "%d-dimensional mass vector with %d-dimensional data!" % \
                     ( len(porig), self.full_dimensionality ) )
             return None
-        #print ( "getValueFor delta_x = %s" % self.delta_x )
-        #print ( "getValueFor porig = %s" % porig )
         p= ( (np.matrix(porig)[0] - self.delta_x ) ).tolist()[0]
         P=np.dot(p,self._V)  ## rotate
         dp=self.countNonZeros(P)
         self.projected_value = self.interpolate([ P[:self.dimensionality] ])
-
-        # self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
-        # self.projected_value = float(self.projected_value)
         if dp > self.dimensionality: ## we have data in different dimensions
             if self._accept_errors_upto == None:
                 return None
@@ -384,16 +374,11 @@ class TxNameData(object):
         bary = np.einsum('njk,nk->nj', temp[:, :d, :], delta)
         vtx = vertices
         wts = np.hstack((bary, 1 - bary.sum(axis=1, keepdims=True)))
-        v=self.xsec
-        if type (self.xsec[0]) == float:
+        if type (self.xsec[0]) in [ float, int, np.int64, np.float64 ]:
             values = np.array ( [ float(x) for x in self.xsec ] )
         else:
             values = np.array ( [ x.asNumber() for x in self.xsec ] )
         ret = np.einsum('nj,nj->n', np.take(values, vtx), wts)
-        # the following was just a test to see if the point is outside the
-        # convex hull, but we check this via simplex[0]==-1, anyways.
-        #with np.errstate(invalid='ignore'):
-        #    ret[np.any(self.wts < -1e-10, axis=1)] = fill_value
         return float(ret[0])
 
 
@@ -427,8 +412,6 @@ class TxNameData(object):
             P2[i]+=alpha
             pv = self.interpolate ( [ P2[:self.dimensionality] ] )
             g=float ( ( pv - self.projected_value ) / alpha )
-            #g=float ( ( griddata( self.Mp, self.xsec, [ P2[:self.dimensionality]],
-            #            method="linear")[0] - self.projected_value ) / alpha )
             if math.isnan ( g ):
                 ## if we cannot compute a gradient, we return nan
                 return float("nan")
@@ -447,11 +430,7 @@ class TxNameData(object):
             P3[i]+=gradient[i]
             P4[i]-=gradient[i]
         agp=self.interpolate ( [ P3[:self.dimensionality] ] )
-        #agp=griddata( self.Mp, self.xsec, [ P3[:self.dimensionality] ],
-        #              method="linear")[0]
         agm=self.interpolate ( [ P4[:self.dimensionality] ] )
-        #agm=griddata( self.Mp, self.xsec, [ P4[:self.dimensionality] ],
-        #              method="linear")[0]
         dep,dem=0.,0.
         if self.projected_value == 0.:
             if agp!=0.:
@@ -503,12 +482,12 @@ class TxNameData(object):
         if self._V!=None:
              return
         Morig=[]
-        self.xsec=[]
-        # print ( "computeV.values=",values[:5] )
+        self.xsec = np.ndarray ( shape = (len(values), ) )
 
-        for x,y in values:
+        for ctr,(x,y) in enumerate(values):
             # self.xsec.append ( y / self.unit )
-            self.xsec.append ( y )
+            # self.xsec.append ( y )
+            self.xsec[ctr]=y
             xp = self.flattenMassArray ( x )
             Morig.append ( xp )
         aM=np.matrix ( Morig )
@@ -546,7 +525,12 @@ class TxNameData(object):
             logger.debug("1-D data found. Extending to a small 2-D band around the line.")
             MpCut += [[pt[0],pt[1]+0.0001] for pt in MpCut] + [[pt[0],pt[1]-0.0001] for pt in MpCut]
             self._1dim = True
-            self.xsec += self.xsec + self.xsec
+            lx=len(self.xsec)
+            newxsec = np.ndarray ( shape=(3*lx,) )
+            for i in range(3):
+                newxsec[ i*lx : (i+1)*lx ] = self.xsec
+            self.xsec = newxsec
+            #self.xsec += self.xsec + self.xsec
             self.dimensionality = 2
         else:
             self._1dim = False
