@@ -13,6 +13,9 @@ clean:
 	$(CXX) $(CXXFLAGS) -o $@ $< -lpythia8 -lLHAPDF
 
 run:
+	pythia8.exe -f test.slha -n 10 -c ./pythia8.cfg
+
+help:
 	pythia8.exe -h
 
 copy_slha:
