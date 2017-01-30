@@ -11,15 +11,15 @@
 from __future__ import print_function
 from smodels.tools.externalTool import ExternalTool
 from smodels.tools import externalTool
-from smodels.tools.smodelsLogging import logger
+from smodels.tools.smodelsLogging import logger, setLogLevel
 from smodels import installation
 import os
 try:
-    import commands as executor
+    import commands as executor #python2 
 except ImportError:
-    import subprocess as executor
-import urllib
-import tarfile
+    import subprocess as executor # python3
+    
+setLogLevel ( "debug" )
 
 class ExternalPythia8(ExternalTool):
     """
@@ -48,7 +48,8 @@ class ExternalPythia8(ExternalTool):
         self.tempdir = None
         self.cfgfile = self.checkFileExists(configFile)
         self.keepTempDir = False
-        self.nevents = None
+        self.nevents = 10000
+        self.sqrts = 13
         self.secondsPerEvent = 10
 
         self.unlink()
@@ -102,51 +103,6 @@ class ExternalPythia8(ExternalTool):
                 os.rmdir(self.tempdir)
                 self.tempdir = None
 
-
-    def replaceInCfgFile(self, replacements={"NEVENTS": 10000, "SQRTS":8000}):
-        """
-        Replace strings in the config file by other strings, similar to
-        setParameter.
-
-        This is introduced as a simple mechanism to make changes to the
-        parameter file.
-        
-        :param replacements: dictionary of strings and values; the strings will
-                             be replaced with the values; the dictionary keys 
-                             must be strings present in the config file
-        
-        """
-        f = open(self.tempDirectory() + "/temp.cfg")
-        lines = f.readlines()
-        f.close()
-        f = open(self.tempDirectory() + "/temp.cfg", "w")
-        for line in lines:
-            for (key, value) in replacements.items():
-                if key == "NEVENTS":
-                    self.nevents = int(value)
-                line = line.replace(key, str(value))
-            f.write(line)
-        f.close()
-
-
-    def setParameter(self, param="MSTP(163)", value=6):
-        """
-        Modifies the config file, similar to .replaceInCfgFile.
-        
-        It will set param to value, overwriting possible old values.
-        
-        """
-        f = open(self.tempdir + "/temp.cfg")
-        lines = f.readlines()
-        f.close()
-        f = open(self.tempdir + "/temp.cfg", "w")
-        for line in lines:  # # copy all but lines with "param"
-            if not param in line:
-                f.write(line)
-        f.write("%s=%s\n" % (param, str(value)))
-        f.close()
-
-
     def complain ( self ):
         import sys
         logger.error("please fix manually, e.g. try 'make' in smodels/lib, " \
@@ -154,7 +110,7 @@ class ExternalPythia8(ExternalTool):
         sys.exit(0)
 
     def run(self, slhaFile, cfgfile=None, do_unlink=True, do_compile=False,
-            do_check=True ):
+            do_check=False ):
         """
         Run Pythia.
         
@@ -169,6 +125,7 @@ class ExternalPythia8(ExternalTool):
         :returns: stdout and stderr, or error message
         
         """
+        logger.debug ( "started .run" )
         if do_check:
             ci=self.checkInstallation()
             if not ci:
@@ -179,22 +136,23 @@ class ExternalPythia8(ExternalTool):
                 # self.compile()
                 self.complain()
         slha = self.checkFileExists(slhaFile)
-        cfg = self.absPath(cfgfile)
-        logger.debug("running with " + str(cfg))
-        import shutil
-        shutil.copy(slha, self.tempDirectory() + "/fort.61")
-        cmd = "cd %s ; %s < %s" % \
-             (self.tempDirectory(), self.executablePath, cfg)
+        logger.debug ( "file check: " + slha )
+        if cfgfile != None:
+            self.cfgfile = cfgfile
+        cfg = self.absPath(self.cfgfile)
+        logger.debug("running with cfgfile " + str(cfg))
+        cmd = "%s -n %d -f %s -s %d -c %s" % \
+             ( self.executablePath, self.nevents, slha, self.sqrts, cfg )
         logger.debug("Now running " + str(cmd))
         out = executor.getoutput(cmd)
         # out = subprocess.check_output ( cmd, shell=True, universal_newlines=True )
-        if do_unlink:
-            self.unlink( unlinkdir=True )
-        else:
-            f = open(self.tempDirectory() + "/log", "w")
+        if not do_unlink:
+            tempfile = self.tempDirectory() + "/log"
+            f = open( tempfile, "w")
             f.write (cmd + "\n\n\n")
             f.write (out + "\n")
             f.close()
+            logger.debug ( "stored everything in %s" % tempfile )
         return out
 
     def chmod(self):
@@ -224,33 +182,9 @@ class ExternalPythia8(ExternalTool):
         logger.info(outputMessage)
 
 
-    def fetch(self):
-        """
-        Fetch and unpack tarball.
-        
-        """
-        tempFile = "/tmp/pythia.tar.gz"
-        fileHandle = open(tempFile, "w")
-        logger.debug("Fetching tarball...")
-        url = "http://smodels.hephy.at/externaltools/pythia/pythia.tar.gz"
-        link = urllib.urlopen(url)
-        lines = link.readlines()
-        for line in lines:
-            fileHandle.write(line)
-        link.close()
-        fileHandle.close()
-        logger.debug("... done.")
-        logger.debug("Untarring...")
-        tar = tarfile.open(tempFile)
-        for item in tar:
-            tar.extract(item, self.srcPath)
-        logger.debug("... done.")
-
-
     def checkInstallation(self, fix=False ):
         """
-        Check if installation of tool is correct by looking for executable and
-        running it.
+        Check if installation of tool is correct by looking for executable
 
         :param fix: should it try to fix the situation, if something is wrong?
 
@@ -267,33 +201,16 @@ class ExternalPythia8(ExternalTool):
             logger.error("%s is not executable", self.executable)
             self.chmod()
             return False
-        slhaFile = "/inputFiles/slha/gluino_squarks.slha"
-        slhaPath = installation.installDirectory() + slhaFile
-        try:
-            output = self.run(slhaPath, "<install>/lib/pythia8/pythia8.cfg",
-                    do_compile=False, do_check=False ) 
-            output = output.split("\n")
-            print ( "output0=",output[0] )
-        except Exception as e:
-            logger.error("Something is wrong with the setup: exception %s", e)
-            return False
         return True
-
 
 if __name__ == "__main__":
     tool = ExternalPythia8()
-    print("installed: " + str(tool.installDirectory()))
-    td_exists = externalTool.ok(os.path.exists(tool.tempDirectory()))
-    print("temporary directory: %s: %s" % (str(tool.tempDirectory()),
-                                           td_exists))
-    print("check: " + externalTool.ok(tool.checkInstallation()))
-    print("seconds per event: %d" % tool.secondsPerEvent)
-    tool.replaceInCfgFile({"NEVENTS": 1, "SQRTS":8000})
-    tool.setParameter("MSTP(163)", "6")
+    tool.nevents=10
+    logger.info("installed: " + str(tool.installDirectory()))
+    logger.info("check: " + externalTool.ok(tool.checkInstallation()))
+    logger.info("seconds per event: %d" % tool.secondsPerEvent)
     slhafile = "inputFiles/slha/simplyGluino.slha"
     slhapath = os.path.join ( installation.installDirectory(), slhafile )
-    print ( "slhafile=", slhapath )
-    output = tool.run(slhapath)
-    isok = (len (output.split("\n")) > 570)
-    print("run: " + externalTool.ok (isok))
-    # tool.unlink()
+    logger.info ( "slhafile: " + slhapath )
+    output = tool.run(slhapath, do_unlink = False)
+    logger.info ( "done." )
