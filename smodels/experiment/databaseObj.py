@@ -480,7 +480,13 @@ class Database(object):
                 newDataSet.dataInfo = dataset.dataInfo
                 newDataSet.txnameList = []
                 for txname in dataset.txnameList:
-                    if txname.validated is False and (not useNonValidated):
+                    if type(txname.validated) == str:
+                        txname.validated = txname.validated.lower()
+                    # print ( "txname",txname.validated,type(txname.validated) )
+                    if ( txname.validated not in [ True, False, "true", "false", "n/a", "tbd", None, "none" ] ):
+                        logger.error ( "value of validated field '%s' in %s unknown." % ( txname.validated, expResult ) )
+                    if txname.validated not in [ True, "true", "n/a" ] and (not useNonValidated ):
+#                    if txname.validated is False and (not useNonValidated):
                         continue
                     if txnames != ['all']:
                         if not txname.txName in txnames:
