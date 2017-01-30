@@ -12,6 +12,7 @@ from __future__ import print_function
 from smodels.tools.externalTool import ExternalTool
 from smodels.tools import externalTool
 from smodels.tools.smodelsLogging import logger, setLogLevel
+from smodels.tools.physicsUnits import fb, pb, TeV
 from smodels import installation
 import os
 try:
@@ -125,6 +126,7 @@ class ExternalPythia8(ExternalTool):
         :returns: stdout and stderr, or error message
         
         """
+        self.xsecs = {}
         logger.debug ( "started .run" )
         if do_check:
             ci=self.checkInstallation()
@@ -153,7 +155,37 @@ class ExternalPythia8(ExternalTool):
             f.write (out + "\n")
             f.close()
             logger.debug ( "stored everything in %s" % tempfile )
-        return out
+        self.parse ( out )
+        return self.xsecs
+
+    def getProcess ( self, token ):
+        return (100021,100021)
+
+    def getXSec ( self, token ):
+        return 3.0 * fb
+
+    def parseLine ( self, line ):
+        tmp = line.split ( "|" )
+        tokens = [ x.strip() for x in tmp[1:-1]  ]
+        process = self.getProcess ( tokens[0] )
+        xsec = self.getXSec ( tokens[-1] )
+        self.xsecs[ process ] = xsec
+
+    def parse( self, out ):
+        lines = out.split ("\n")
+        # print ( "Parsing outfile with %d lines." % len(lines) )
+        begin,end=1,0
+        for ctr,line in enumerate(lines):
+            if "--  PYTHIA Event and Cross Section Statistics" in line:
+                begin=ctr+7
+            if "End PYTHIA Event and Cross Section Statistics" in line:
+                end=ctr-3
+        if begin > end:
+            logger.error ( "could not parse pythia8 file correctly." )
+            return None
+        # print ( "need to look at %d to %d" % ( begin,end ) )
+        for line in lines[begin:end]:
+            self.parseLine ( line )
 
     def chmod(self):
         """ 
@@ -213,4 +245,4 @@ if __name__ == "__main__":
     slhapath = os.path.join ( installation.installDirectory(), slhafile )
     logger.info ( "slhafile: " + slhapath )
     output = tool.run(slhapath, do_unlink = False)
-    logger.info ( "done." )
+    logger.info ( "done: %s" % output )
