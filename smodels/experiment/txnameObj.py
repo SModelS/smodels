@@ -68,19 +68,19 @@ class TxName(object):
             if not tag: continue
             line = content[i]
             value = line.split(':',1)[1].strip()
-            if tags.count(tag) == 1:
-                if ';' in value: value = value.split(';')
-                if tag == 'upperLimits' or tag == 'efficiencyMap':
-                    data = value
-                    dataType = tag
-                elif tag == 'expectedUpperLimits':
-                    expectedData = value
-                    dataType = 'upperLimits'
-                else: self.addInfo(tag,value)
-            else:
-                logger.info("Ignoring unknown field %s found in file %s" \
+            if tags.count(tag) != 1:
+                logger.info("Duplicated field %s found in file %s" \
                              % (tag, self.path))
-                continue
+            if ';' in value: value = value.split(';')
+            if tag == 'upperLimits' or tag == 'efficiencyMap':
+                data = value
+                dataType = tag
+            elif tag == 'expectedUpperLimits':
+                expectedData = value
+                dataType = 'upperLimits'
+            else:
+                self.addInfo(tag,value)
+
         ident = self.globalInfo.id+":"+dataType[0]+":"+ str(self._infoObj.dataId)
         ident += ":" + self.txName
         self.txnameData = TxNameData( data, dataType, ident )
@@ -90,12 +90,12 @@ class TxName(object):
         #Builds up a list of elements appearing in constraints:
         elements = []
         if hasattr(self,'constraint'):
-            elements += [Element(el) for el in elementsInStr(self.constraint)]
+            elements += [Element(el) for el in elementsInStr(str(self.constraint))]
         if hasattr(self,'condition') and self.condition:
             conds = self.condition
             if not isinstance(conds,list): conds = [conds]
             for cond in conds:
-                for el in elementsInStr(cond):
+                for el in elementsInStr(str(cond)):
                     newEl = Element(el)
                     if not newEl in elements: elements.append(newEl)
 
@@ -480,7 +480,7 @@ class TxNameData(object):
     def computeV ( self, values ):
         """ compute rotation matrix _V, and triangulation self.tri """
         if self._V!=None:
-             return
+            return
         Morig=[]
         self.xsec = np.ndarray ( shape = (len(values), ) )
 
