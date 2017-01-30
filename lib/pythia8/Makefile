@@ -13,7 +13,7 @@ clean:
 	$(CXX) $(CXXFLAGS) -o $@ $< -lpythia8 -lLHAPDF
 
 run:
-	pythia8.exe
+	pythia8.exe -h
 
 copy_slha:
 	cp ../../inputFiles/slha/simplyGluino.slha test.slha
