@@ -12,7 +12,7 @@ from __future__ import print_function
 from smodels.tools.externalTool import ExternalTool
 from smodels.tools import externalTool
 from smodels.tools.smodelsLogging import logger, setLogLevel
-from smodels.tools.physicsUnits import fb, pb, TeV
+from smodels.tools.physicsUnits import fb, pb, TeV, mb
 from smodels import installation
 import os
 try:
@@ -159,17 +159,46 @@ class ExternalPythia8(ExternalTool):
         return self.xsecs
 
     def getProcess ( self, token ):
+        """ obtain the process identifier from the pythia8 output """
+        parrow = token.find ( "->" ) 
+        if parrow < 1:
+            logger.error ( "cannot parse pythia8 output" )
+            return None
+        process = token[parrow+2:-4].strip()
+        s1 = process.find ( " " )
+        p1 = process [ : s1 ]
+        s2 = process [ s1+1 : ].find ( " " )
+        if s2 == -1:
+            s2 = len( process )
+        else:
+            s2 += s1+1
+        p2 = process [ s1+1 : s2 ]
+
+        """
+        print ( "process >>%s<<" % ( process ) )
+        print ( "cut off >>%s<<" % process[s1+1 : ] )
+        print ( "s2t off >>%s<<" % process[s1+1 : ] )
+        print ( "p2 >>%s<<" % p2 )
+        print ( "particles >>%s<< and >>%s<< " % ( p1, p2 ) )
+        """
+        particles = { "gluino": 1000021, "~chi_10": 1000022,
+                      "~chi_1+": 1000024 }
         return (100021,100021)
 
     def getXSec ( self, token ):
-        return 3.0 * fb
+        """ obtain the cross section from the pythia8 output """
+        value, error = map ( float, token.split () )
+        # print ( "xsec: >>%s<<" % (value * mb) )
+        return value * mb
 
     def parseLine ( self, line ):
         tmp = line.split ( "|" )
         tokens = [ x.strip() for x in tmp[1:-1]  ]
         process = self.getProcess ( tokens[0] )
         xsec = self.getXSec ( tokens[-1] )
-        self.xsecs[ process ] = xsec
+        if not process in self.xsecs.keys():
+            self.xsecs [ process ] = 0. * fb
+        self.xsecs[ process ] += xsec
 
     def parse( self, out ):
         lines = out.split ("\n")
