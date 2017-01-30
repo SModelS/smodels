@@ -39,8 +39,8 @@ class Element(object):
         self.motherElements = []
         self.elID = 0
         self.covered = False
-        self.tested = False 
-        
+        self.tested = False
+                
         if info:
             # Create element from particle string
             if type(info) == type(str()):
