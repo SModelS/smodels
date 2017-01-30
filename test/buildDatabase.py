@@ -6,3 +6,4 @@ from smodels.experiment.databaseObj import Database
 
 d=Database("./database/")
 print(d)
+print ( d.getExpResults() )
