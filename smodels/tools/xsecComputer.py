@@ -14,6 +14,7 @@ from smodels import installation
 from smodels.tools import toolBox, runtime
 from smodels.tools.physicsUnits import pb, TeV, GeV
 from smodels.theory import crossSection
+from smodels.theory.crossSection import LO, NLO, NLL
 from smodels.tools import nllFast
 from smodels.tools.smodelsLogging import logger, setLogLevel
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
@@ -25,11 +26,117 @@ except ImportError as e:
     import io
 import sys
 
-LO= 0  ## simple variables used to increase readability the perturbation order 
-NLO=1
-NLL=2
+def _checkSLHA ( slhafile ):
+    if not os.path.isfile(slhafile):
+        logger.error("SLHA file %s not found.", slhafile)
+        raise SModelSError()
+    try:
+        f=pyslha.readSLHAFile(slhafile)
+    except pyslha.ParseError as e:
+        logger.error("File cannot be parsed as SLHA file: %s" % e )
+        raise SModelSError()
 
-def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loFromSlha=None, pythiacard=None ):
+def _checkSqrts ( sqrts ):
+    if type(sqrts)==type(float) or type(sqrts)==type(int):
+        logger.warning("sqrt(s) given as scalar, will add TeV as unit." )
+        sqrts=float(sqrts)*TeV
+    return sqrts
+
+def _checkMaxOrder ( maxOrder ):
+    smaxorder={ "LO": 0, "NLO": 1, "NLL": 2 }
+    if maxOrder in smaxorder.keys():
+        logger.warning("maxorder given as string, please supply integer.")
+        maxOrder=smaxorder[maxOrder]
+    return maxOrder
+
+def addHigherOrders ( loXsecs, sqrts, maxOrder ):
+    """ add higher order xsecs """
+    xsecs = loXsecs
+    wlabel = str(int(sqrts / TeV)) + ' TeV'
+    if maxOrder == 0:
+        wlabel += ' (LO)'
+    elif maxOrder == 1:
+        wlabel += ' (NLO)'
+    elif maxOrder >= 2:
+        wlabel += ' (NLO+NLL)'
+    for ixsec, xsec in enumerate(xsecs):
+        xsecs[ixsec].info.label = wlabel
+        xsecs[ixsec].info.order = maxOrder
+
+    if maxOrder > 0:
+        pIDs = loXsecs.getPIDpairs()
+        for pID in pIDs:
+            k = 0.
+            kNLO, kNLL = nllFast.getKfactorsFor(pID, sqrts, slhafile)
+            if maxOrder == 1 and kNLO:
+                k = kNLO
+            elif maxOrder == 2 and kNLL and kNLO:
+                k = kNLO * kNLL
+            elif maxOrder > 2 and kNLL and kNLO:
+                logger.warning("Unkown xsec order, using NLL+NLO k-factor, "
+                               "if available")
+                k = kNLO * kNLL
+            k = float(k)
+            for i, xsec in enumerate(xsecs):
+                if set(xsec.pid) == set(pID):
+                    # Apply k-factor
+                    xsecs[i] = xsec * k
+
+    # Remove zero cross sections
+    while len(xsecs) > 0 and xsecs.getMinXsec() == 0. * pb:
+        for xsec in xsecs:
+            if xsec.value == 0. * pb:
+                xsecs.delete(xsec)
+                break
+    if maxOrder > 0 and len(xsecs) == 0:
+        logger.warning("No NLO or NLL cross sections available.")
+
+    #for i in xsecs:
+    #    logger.error ( "xsec=%s (%s)" % (i,type(i)) )
+    return xsecs
+
+def computeXSec8(sqrts, maxOrder, nevts, slhafile, unlink=True, loFromSlha=None,
+                  pythiacard=None ):
+    """
+    Run pythia8 and compute SUSY cross sections for the input SLHA file.
+
+    :param sqrts: sqrt{s} to run Pythia, given as a unum (e.g. 7.*TeV)
+    :param maxOrder: maximum order to compute the cross section, given as an integer
+                if maxOrder == 0, compute only LO pythia xsecs
+                if maxOrder == 1, apply NLO K-factors from NLLfast (if available)
+                if maxOrder == 2, apply NLO+NLL K-factors from NLLfast (if available)
+    :param nevts: number of events for pythia run
+    :param slhafile: SLHA file
+    :param unlink: Clean up temp directory after running pythia
+
+    :param loFromSlha: If True, uses the LO xsecs from the SLHA file to compute the
+                       higher order xsecs
+    :param pythiaCard: Ignored. For compatibility with pythia6.
+    :returns: XSectionList object
+
+    """
+    _checkSLHA ( slhafile )
+    sqrts = _checkSqrts ( sqrts )
+    maxOrder = _checkMaxOrder ( maxOrder )
+
+    if loFromSlha:
+        logger.info("Using LO cross sections from " + slhafile)
+        xsecsInfile = crossSection.getXsecFromSLHAFile(slhafile)
+        loXsecs = crossSection.XSectionList()
+        for xsec in xsecsInfile:
+            if xsec.info.order == 0 and xsec.info.sqrts == sqrts:
+                loXsecs.add(xsec)
+    else:
+        logger.info("get LO cross sections from pythia8" )
+        box = toolBox.ToolBox()
+        tool = box.get("pythia8")
+        loXsecs = tool.run ( slhafile )
+
+    xsecs = addHigherOrders ( loXsecs, sqrts, maxOrder )
+    return xsecs
+
+def computeXSec( sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, 
+                 loFromSlha=None, pythiacard=None ):
     """
     Run pythia and compute SUSY cross sections for the input SLHA file.
 
@@ -52,23 +159,9 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
     :returns: XSectionList object
 
     """
-    if not os.path.isfile(slhafile):
-        logger.error("SLHA file %s not found.", slhafile)
-        raise SModelSError()
-    try:
-        f=pyslha.readSLHAFile(slhafile)
-    except pyslha.ParseError as e:
-        logger.error("File cannot be parsed as SLHA file: %s" % e )
-        raise SModelSError()
-
-    if type(sqrts)==type(float) or type(sqrts)==type(int):
-        logger.warning("sqrt(s) given as scalar, will add TeV as unit." )
-        sqrts=float(sqrts)*TeV
-
-    smaxorder={ "LO": 0, "NLO": 1, "NLL": 2 }
-    if maxOrder in smaxorder.keys():
-        logger.warning("maxorder given as string, please supply integer.")
-        maxOrder=smaxorder[maxOrder]
+    _checkSLHA ( slhafile )
+    sqrts = _checkSqrts ( sqrts )
+    maxOrder = _checkMaxOrder ( maxOrder )
 
     if lhefile:
         if os.path.isfile(lhefile):
@@ -128,6 +221,9 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
                 break
     if maxOrder > 0 and len(xsecs) == 0:
         logger.warning("No NLO or NLL cross sections available.")
+
+    for i in xsecs:
+        logger.error ( "xsec=%s (%s)" % (i,type(i)) )
         
     return xsecs
 
@@ -278,9 +374,9 @@ def computeForOneFile ( sqrtses, order, nevents, inputFile, unlink,
                     "SLHA file." % inputFile )
         for s in sqrtses:
             ss = s*TeV 
-            xsecs = computeXSec( ss, order, nevents, inputFile, 
-                                 unlink= unlink, loFromSlha= lOfromSLHA, pythiacard=pythiacard)
-            comment = "Nevts: " + str(nevents) + " xsec unit: pb"
+            xsecs = computeXSec8( ss, order, nevents, inputFile, 
+                       unlink= unlink, loFromSlha= lOfromSLHA, pythiacard=pythiacard)
+            comment = str(nevents) + " events, xsecs in pb, pythia8 for LO"
             addXSecToFile(xsecs, inputFile, comment)
     else:
         logger.info("Computing SLHA cross section from %s." % inputFile )
@@ -289,7 +385,7 @@ def computeForOneFile ( sqrtses, order, nevents, inputFile, unlink,
         print( "=======================" )
         for s in sqrtses:
             ss = s*TeV 
-            xsecs = computeXSec(ss, order, nevents, inputFile, \
+            xsecs = computeXSec8(ss, order, nevents, inputFile, \
                         unlink=unlink, loFromSlha=lOfromSLHA )
             for xsec in xsecs: 
                 print( "%s %20s:  %.3e pb" % ( xsec.info.label,xsec.pid,xsec.value/pb ) )

@@ -17,10 +17,7 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
 ## orders in perturbation theory
-LO = 0
-NLO = 1
-NLL = 2
-
+LO,NLO,NLL = range(3)
 
 class XSectionInfo(object):
     """
@@ -173,7 +170,7 @@ class XSection(object):
         """
         Generate cross section information in string format.        
         """
-        st = self.info.label + ':' + str(self.value)
+        st = self.info.label + ':' + str(self.value)+ " " + str(self.pid)
         return st
     
     def niceStr(self):
