@@ -111,33 +111,20 @@ class ExternalPythia8(ExternalTool):
                " or file a complaint at smodels-users@lists.oeaw.ac.at" )
         sys.exit(0)
 
-    def run(self, slhaFile, cfgfile=None, do_unlink=True, do_compile=False,
-            do_check=False ):
+    def run( self, slhaFile, lhefile=None, unlink=True ):
         """
-        Run Pythia.
+        Run pythia8.
         
         :param slhaFile: SLHA file
-        :param cfgfile: optionally supply a new config file; if not supplied,
-                        use the one supplied at construction time; 
-                        this config file will not be touched or copied;  
-                        it will be taken as is
-        :param do_unlink: clean up temporary files after run?
-        :param do_compile: if true, we try to compile binary if it isnt installed.
-        :param do_check: check installation, before running 
-        :returns: stdout and stderr, or error message
+        :param lhefile: option to write LHE output to file; if None, do not write
+                        output to disk. If lhe file exists, use its events for
+                        xsecs calculation.
+        :param unlink: clean up temporary files after run?
+        :returns: List of cross sections
         
         """
         self.xsecs = {}
         logger.debug ( "started .run" )
-        if do_check:
-            ci=self.checkInstallation()
-            if not ci:
-                if not do_compile:
-                    logger.error("couldnt find pythia8 binary." )
-                    self.complain()
-                logger.warning("couldnt find pythia8 binary. I have been asked to try to compile it, though. Lets see.")
-                # self.compile()
-                self.complain()
         slha = self.checkFileExists(slhaFile)
         logger.debug ( "file check: " + slha )
         if cfgfile != None:
@@ -148,7 +135,7 @@ class ExternalPythia8(ExternalTool):
              ( self.executablePath, self.nevents, slha, self.sqrts, cfg )
         logger.debug("Now running " + str(cmd))
         out = executor.getoutput(cmd)
-        if not do_unlink:
+        if not unlink:
             tempfile = self.tempDirectory() + "/log"
             f = open( tempfile, "w")
             f.write (cmd + "\n\n\n")
@@ -293,7 +280,7 @@ if __name__ == "__main__":
     slhafile = "inputFiles/slha/simplyGluino.slha"
     slhapath = os.path.join ( installation.installDirectory(), slhafile )
     logger.info ( "slhafile: " + slhapath )
-    output = tool.run(slhapath, do_unlink = True )
+    output = tool.run(slhapath, unlink = True )
     #for i in output:
     #    print ( "%s" % i )
     logger.info ( "done: %s" % output )
