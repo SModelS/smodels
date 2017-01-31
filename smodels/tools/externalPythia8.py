@@ -14,7 +14,9 @@ from smodels.tools import externalTool
 from smodels.tools.smodelsLogging import logger, setLogLevel
 from smodels.tools.physicsUnits import fb, pb, TeV, mb
 from smodels import installation
-import os
+from smodels.tools.pythia8particles import particles
+import os, sys
+
 try:
     import commands as executor #python2 
 except ImportError:
@@ -181,20 +183,16 @@ class ExternalPythia8(ExternalTool):
         print ( "s2t off >>%s<<" % process[s1+1 : ] )
         print ( "p2 >>%s<<" % p2 )
         """
-        particles = { "gluino": 1000021, "~chi_10": 1000022, "~chi_1+": 1000024,
-            "~d_1": 1000001, "~u_1": 1000002, "~d_2": 1000003, "~u_2": 1000004,
-            "~d_3": 1000005, "~d_4": 2000001, "~u_4": 2000002, "~d_5": 2000003,
-            "~d_6": 2000005, "~chi_20": 1000023, "~chi_30": 1000025,
-            "~chi_40": 1000035, "~chi_2+": 1000037, "~e_1": 1000011 }
-          1000035 }
         for key, value in particles.items():
             particles[key+"bar"]=-value
         ret = [ None, None ]
-        if p[0] in particles.keys():
-            ret[0]=particles[p[0] ]
-        if p[1] in particles.keys():
-            ret[1]=particles[p[1] ]
-        logger.debug ( "particles >>%s<< and >>%s<<: %s " % ( p[0], p[1], ret ) )
+        for i in [0,1]:
+            if p[i] in particles.keys():
+                ret[i]=particles[p[i] ]
+            else:
+                logger.error ( "particle >>%s<< unknown. " \
+                        "Check pythia8particles.py." % p[i] )
+                sys.exit()
         return tuple ( ret )
 
     def getXSec ( self, token ):
