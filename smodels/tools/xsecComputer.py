@@ -26,74 +26,81 @@ except ImportError as e:
     import io
 import sys
 
-def _checkSLHA ( slhafile ):
-    if not os.path.isfile(slhafile):
-        logger.error("SLHA file %s not found.", slhafile)
-        raise SModelSError()
-    try:
-        f=pyslha.readSLHAFile(slhafile)
-    except pyslha.ParseError as e:
-        logger.error("File cannot be parsed as SLHA file: %s" % e )
-        raise SModelSError()
+class XSecComputer:
+    """ cross section computer class, what else? """
+    def __init_ ( self ):
+        pass
 
-def _checkSqrts ( sqrts ):
-    if type(sqrts)==type(float) or type(sqrts)==type(int):
-        logger.warning("sqrt(s) given as scalar, will add TeV as unit." )
-        sqrts=float(sqrts)*TeV
-    return sqrts
+    def _checkSLHA ( self, slhafile ):
+        if not os.path.isfile(slhafile):
+            logger.error("SLHA file %s not found.", slhafile)
+            raise SModelSError()
+        try:
+            f=pyslha.readSLHAFile(slhafile)
+        except pyslha.ParseError as e:
+            logger.error("File cannot be parsed as SLHA file: %s" % e )
+            raise SModelSError()
 
-def _checkMaxOrder ( maxOrder ):
-    smaxorder={ "LO": 0, "NLO": 1, "NLL": 2 }
-    if maxOrder in smaxorder.keys():
-        logger.warning("maxorder given as string, please supply integer.")
-        maxOrder=smaxorder[maxOrder]
-    return maxOrder
+    def _checkSqrts ( self, sqrts ):
+        if type(sqrts)==type(float) or type(sqrts)==type(int):
+            logger.warning("sqrt(s) given as scalar, will add TeV as unit." )
+            sqrts=float(sqrts)*TeV
+        return sqrts
 
-def addHigherOrders ( loXsecs, sqrts, maxOrder ):
-    """ add higher order xsecs """
-    xsecs = loXsecs
-    wlabel = str(int(sqrts / TeV)) + ' TeV'
-    if maxOrder == 0:
-        wlabel += ' (LO)'
-    elif maxOrder == 1:
-        wlabel += ' (NLO)'
-    elif maxOrder >= 2:
-        wlabel += ' (NLO+NLL)'
-    for ixsec, xsec in enumerate(xsecs):
-        xsecs[ixsec].info.label = wlabel
-        xsecs[ixsec].info.order = maxOrder
+    def _checkMaxOrder ( self, maxOrder ):
+        smaxorder={ "LO": 0, "NLO": 1, "NLL": 2 }
+        if maxOrder in smaxorder.keys():
+            logger.warning("maxorder given as string, please supply integer.")
+            maxOrder=smaxorder[maxOrder]
+        return maxOrder
 
-    if maxOrder > 0:
-        pIDs = loXsecs.getPIDpairs()
-        for pID in pIDs:
-            k = 0.
-            kNLO, kNLL = nllFast.getKfactorsFor(pID, sqrts, slhafile)
-            if maxOrder == 1 and kNLO:
-                k = kNLO
-            elif maxOrder == 2 and kNLL and kNLO:
-                k = kNLO * kNLL
-            elif maxOrder > 2 and kNLL and kNLO:
-                logger.warning("Unkown xsec order, using NLL+NLO k-factor, "
-                               "if available")
-                k = kNLO * kNLL
-            k = float(k)
-            for i, xsec in enumerate(xsecs):
-                if set(xsec.pid) == set(pID):
-                    # Apply k-factor
-                    xsecs[i] = xsec * k
+    def addHigherOrders ( self, loXsecs, sqrts, maxOrder ):
+        """ add higher order xsecs """
+        xsecs = loXsecs
+        wlabel = str(int(sqrts / TeV)) + ' TeV'
+        if maxOrder == 0:
+            wlabel += ' (LO)'
+        elif maxOrder == 1:
+            wlabel += ' (NLO)'
+        elif maxOrder >= 2:
+            wlabel += ' (NLO+NLL)'
+        for ixsec, xsec in enumerate(xsecs):
+            xsecs[ixsec].info.label = wlabel
+            xsecs[ixsec].info.order = maxOrder
 
-    # Remove zero cross sections
-    while len(xsecs) > 0 and xsecs.getMinXsec() == 0. * pb:
-        for xsec in xsecs:
-            if xsec.value == 0. * pb:
-                xsecs.delete(xsec)
-                break
-    if maxOrder > 0 and len(xsecs) == 0:
-        logger.warning("No NLO or NLL cross sections available.")
+        if maxOrder > 0:
+            pIDs = loXsecs.getPIDpairs()
+            for pID in pIDs:
+                k = 0.
+                kNLO, kNLL = nllFast.getKfactorsFor(pID, sqrts, slhafile)
+                if maxOrder == 1 and kNLO:
+                    k = kNLO
+                elif maxOrder == 2 and kNLL and kNLO:
+                    k = kNLO * kNLL
+                elif maxOrder > 2 and kNLL and kNLO:
+                    logger.warning("Unkown xsec order, using NLL+NLO k-factor, "
+                                   "if available")
+                    k = kNLO * kNLL
+                k = float(k)
+                for i, xsec in enumerate(xsecs):
+                    if set(xsec.pid) == set(pID):
+                        # Apply k-factor
+                        xsecs[i] = xsec * k
 
-    #for i in xsecs:
-    #    logger.error ( "xsec=%s (%s)" % (i,type(i)) )
-    return xsecs
+        # Remove zero cross sections
+        while len(xsecs) > 0 and xsecs.getMinXsec() == 0. * pb:
+            for xsec in xsecs:
+                if xsec.value == 0. * pb:
+                    xsecs.delete(xsec)
+                    break
+        if maxOrder > 0 and len(xsecs) == 0:
+            logger.warning("No NLO or NLL cross sections available.")
+
+        #for i in xsecs:
+        #    logger.error ( "xsec=%s (%s)" % (i,type(i)) )
+        return xsecs
+
+computer = XSecComputer()
 
 def computeXSec8(sqrts, maxOrder, nevts, slhafile, unlink=True, loFromSlha=None,
                   pythiacard=None ):
@@ -115,9 +122,9 @@ def computeXSec8(sqrts, maxOrder, nevts, slhafile, unlink=True, loFromSlha=None,
     :returns: XSectionList object
 
     """
-    _checkSLHA ( slhafile )
-    sqrts = _checkSqrts ( sqrts )
-    maxOrder = _checkMaxOrder ( maxOrder )
+    computer._checkSLHA ( slhafile )
+    sqrts = computer._checkSqrts ( sqrts )
+    maxOrder = computer._checkMaxOrder ( maxOrder )
 
     if loFromSlha:
         logger.info("Using LO cross sections from " + slhafile)
@@ -130,12 +137,13 @@ def computeXSec8(sqrts, maxOrder, nevts, slhafile, unlink=True, loFromSlha=None,
         logger.info("get LO cross sections from pythia8" )
         box = toolBox.ToolBox()
         tool = box.get("pythia8")
+        tool.nevents = nevts
         loXsecs = tool.run ( slhafile )
 
     xsecs = addHigherOrders ( loXsecs, sqrts, maxOrder )
     return xsecs
 
-def computeXSec( sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, 
+def computeXSec6( sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, 
                  loFromSlha=None, pythiacard=None ):
     """
     Run pythia and compute SUSY cross sections for the input SLHA file.
@@ -159,9 +167,9 @@ def computeXSec( sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True,
     :returns: XSectionList object
 
     """
-    _checkSLHA ( slhafile )
-    sqrts = _checkSqrts ( sqrts )
-    maxOrder = _checkMaxOrder ( maxOrder )
+    computer._checkSLHA ( slhafile )
+    sqrts = computer._checkSqrts ( sqrts )
+    maxOrder = computer._checkMaxOrder ( maxOrder )
 
     if lhefile:
         if os.path.isfile(lhefile):
@@ -177,56 +185,14 @@ def computeXSec( sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True,
                 loXsecs.add(xsec)
                 
     else:
-        if not lhefile or not os.path.isfile(lhefile):
-            lheFile = runPythia(slhafile, nevts, sqrts / TeV, lhefile, unlink=unlink,pythiacard=pythiacard)
-        else:
-            lheFile = open(lhefile, 'r')
-        loXsecs = crossSection.getXsecFromLHEFile(lheFile)
-    xsecs = loXsecs
-    wlabel = str(int(sqrts / TeV)) + ' TeV'
-    if maxOrder == 0:
-        wlabel += ' (LO)'
-    elif maxOrder == 1:
-        wlabel += ' (NLO)'
-    elif maxOrder >= 2:
-        wlabel += ' (NLO+NLL)'
-    for ixsec, xsec in enumerate(xsecs):
-        xsecs[ixsec].info.label = wlabel
-        xsecs[ixsec].info.order = maxOrder
-
-    if maxOrder > 0:
-        pIDs = loXsecs.getPIDpairs()
-        for pID in pIDs:
-            k = 0.
-            kNLO, kNLL = nllFast.getKfactorsFor(pID, sqrts, slhafile)
-            if maxOrder == 1 and kNLO:
-                k = kNLO
-            elif maxOrder == 2 and kNLL and kNLO:
-                k = kNLO * kNLL
-            elif maxOrder > 2 and kNLL and kNLO:
-                logger.warning("Unkown xsec order, using NLL+NLO k-factor, "
-                               "if available")
-                k = kNLO * kNLL
-            k = float(k)
-            for i, xsec in enumerate(xsecs):
-                if set(xsec.pid) == set(pID):
-                    # Apply k-factor
-                    xsecs[i] = xsec * k
-
-    # Remove zero cross sections
-    while len(xsecs) > 0 and xsecs.getMinXsec() == 0. * pb:
-        for xsec in xsecs:
-            if xsec.value == 0. * pb:
-                xsecs.delete(xsec)
-                break
-    if maxOrder > 0 and len(xsecs) == 0:
-        logger.warning("No NLO or NLL cross sections available.")
-
-    for i in xsecs:
-        logger.error ( "xsec=%s (%s)" % (i,type(i)) )
-        
+        logger.info("get LO cross sections from pythia6" )
+        tool = toolBox.ToolBox().get("pythia6")
+        tool.nevents = nevts
+        tool.sqrts = sqrts / TeV
+        tool.pythiacard = pythiacard
+        loXsecs = tool.run( slhafile, lhefile, unlink=unlink )
+    xsecs = addHigherOrders ( loXsecs, sqrts, maxOrder )
     return xsecs
-
 
 def addXSecToFile(xsecs, slhafile, comment=None, complain=True):
     """
@@ -298,73 +264,6 @@ def xsecToBlock(xsec, inPDGs=(2212, 2212), comment=None, xsecUnit = pb):
             str("%16.8E" % (xsec.value / xsecUnit) ) + " SModelS " + installation.version()
 
     return "\n" + header + "\n" + entry
-
-
-def runPythia(slhafile, nevts, sqrts, lhefile=None, unlink=True, pythiacard=None ):
-    """
-    Execute pythia_lhe with n events, at sqrt(s)=sqrts.
-
-    :param slhafile: input SLHA file
-    :param nevts: number of events to be generated
-    :param sqrts: center of mass sqrt{s} (in TeV)
-    :param lhefile: option to write LHE output to file; ff None, do not write
-                    output to disk.
-    :param unlink: Clean up temp directory after running pythia
-    :param pythiaCard: Optional path to pythia.card. If None, uses /etc/pythia.card
-    
-    :returns: file object with the LHE events
-
-    """
-    box = toolBox.ToolBox()
-    tool = box.get("pythia6")
-    #Change pythia card, if defined:
-    if pythiacard:
-        pythiacard_default = tool.cfgfile
-        tool.cfgfile = pythiacard
-    # Check if template config file exists
-    tool.unlink()
-    tool.replaceInCfgFile({"NEVENTS": nevts, "SQRTS":1000 * sqrts})
-    tool.setParameter("MSTP(163)", "6")
-
-    if unlink==False:
-        logger.info ( "keeping temporary directory at %s" % tool.tempDirectory() )
-    r = tool.checkInstallation()
-    if r == False:
-        logger.info ( "Installation check failed." )
-        sys.exit()
-    #logger.info ( "cfgfile=%s" % tool.cfgfile )
-    #logger.info ( "executable=%s" % tool.executable )
-    #logger.info ( "tempdir=%s" % tool.tempdir )
-    #logger.info ( "nevents=%s" % tool.nevents )
-    tool.replaceInCfgFile({"NEVENTS": nevts, "SQRTS":1000 * sqrts})
-    tool.setParameter("MSTP(163)", "6")
-    lhedata = tool.run(slhafile, do_check=False, do_unlink=unlink )
-    if not "<LesHouchesEvents" in lhedata:
-        pythiadir = "%s/log" % tool.tempDirectory()
-        logger.error("No LHE events found in pythia output %s" % pythiadir )
-        if not os.path.exists ( pythiadir ):
-            logger.error ("Will dump pythia output to %s" % pythiadir )
-            f=open ( pythiadir, "w" )
-            for line in lhedata:
-                f.write ( line )
-            f.close()
-        raise SModelSError( "No LHE events found in %s" % pythiadir )
-
-    #Reset pythia card to its default value
-    if pythiacard:
-        tool.cfgfile = pythiacard_default
-
-    # Generate file object with lhe events
-    if lhefile:
-        lheFile = open(lhefile, 'w')
-        lheFile.write(lhedata)
-        lheFile.close()
-        lheFile = open(lhefile, 'r')
-    else:
-        # Create memory only file object
-        lheFile = io.StringIO(lhedata)
-
-    return lheFile
 
 def computeForOneFile ( sqrtses, order, nevents, inputFile, unlink,
                         lOfromSLHA, tofile, pythiacard=None ):
@@ -460,6 +359,13 @@ def main(args):
     checkAllowedSqrtses ( order, sqrtses )
     inputFiles = getInputFiles ( args )
     ncpus = args.ncpus
+    pythiaVersion = 8
+
+    if hasattr(args, 'pythia6' ):
+        pythiaVersion = 6
+        if hasattr(args, 'pythia8'):
+            logger.error ( "cannot both use pythia6 and pythia8 for LO xsecs." )
+            sys.exit()
 
     if hasattr(args, 'pythiacard'):
         pythiacard = args.pythiacard
