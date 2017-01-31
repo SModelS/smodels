@@ -166,24 +166,36 @@ class ExternalPythia8(ExternalTool):
             return None
         process = token[parrow+2:-4].strip()
         s1 = process.find ( " " )
-        p1 = process [ : s1 ]
+        p=[ None, None ]
+        p[0] = process [ : s1 ]
         s2 = process [ s1+1 : ].find ( " " )
         if s2 == -1:
             s2 = len( process )
         else:
             s2 += s1+1
-        p2 = process [ s1+1 : s2 ]
+        p[1] = process [ s1+1 : s2 ]
 
         """
         print ( "process >>%s<<" % ( process ) )
         print ( "cut off >>%s<<" % process[s1+1 : ] )
         print ( "s2t off >>%s<<" % process[s1+1 : ] )
         print ( "p2 >>%s<<" % p2 )
-        print ( "particles >>%s<< and >>%s<< " % ( p1, p2 ) )
         """
-        particles = { "gluino": 1000021, "~chi_10": 1000022,
-                      "~chi_1+": 1000024 }
-        return (100021,100021)
+        particles = { "gluino": 1000021, "~chi_10": 1000022, "~chi_1+": 1000024,
+            "~d_1": 1000001, "~u_1": 1000002, "~d_2": 1000003, "~u_2": 1000004,
+            "~d_3": 1000005, "~d_4": 2000001, "~u_4": 2000002, "~d_5": 2000003,
+            "~d_6": 2000005, "~chi_20": 1000023, "~chi_30": 1000025,
+            "~chi_40": 1000035, "~chi_2+": 1000037, "~e_1": 1000011 }
+          1000035 }
+        for key, value in particles.items():
+            particles[key+"bar"]=-value
+        ret = [ None, None ]
+        if p[0] in particles.keys():
+            ret[0]=particles[p[0] ]
+        if p[1] in particles.keys():
+            ret[1]=particles[p[1] ]
+        logger.debug ( "particles >>%s<< and >>%s<<: %s " % ( p[0], p[1], ret ) )
+        return tuple ( ret )
 
     def getXSec ( self, token ):
         """ obtain the cross section from the pythia8 output """
