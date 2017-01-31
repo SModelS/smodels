@@ -13,6 +13,7 @@ from smodels.tools.externalTool import ExternalTool
 from smodels.tools import externalTool
 from smodels.tools.smodelsLogging import logger, setLogLevel
 from smodels.tools.physicsUnits import fb, pb, TeV, mb
+from smodels.theory.crossSection import XSection, XSectionInfo, LO, XSectionList
 from smodels import installation
 from smodels.tools.pythia8particles import particles
 import os, sys
@@ -22,8 +23,6 @@ try:
 except ImportError:
     import subprocess as executor # python3
     
-setLogLevel ( "debug" )
-
 class ExternalPythia8(ExternalTool):
     """
     An instance of this class represents the installation of pythia8.
@@ -149,7 +148,6 @@ class ExternalPythia8(ExternalTool):
              ( self.executablePath, self.nevents, slha, self.sqrts, cfg )
         logger.debug("Now running " + str(cmd))
         out = executor.getoutput(cmd)
-        # out = subprocess.check_output ( cmd, shell=True, universal_newlines=True )
         if not do_unlink:
             tempfile = self.tempDirectory() + "/log"
             f = open( tempfile, "w")
@@ -158,7 +156,16 @@ class ExternalPythia8(ExternalTool):
             f.close()
             logger.debug ( "stored everything in %s" % tempfile )
         self.parse ( out )
-        return self.xsecs
+        ret = XSectionList()
+        for key,value in self.xsecs.items():
+            xsec = XSection()
+            xsec.info = XSectionInfo( self.sqrts * TeV, LO, 
+                                      "%d TeV (LO)" % self.sqrts )
+            xsec.value = value
+            xsec.pid = key
+            ret.add ( xsec )
+        self.xsecs.clear()
+        return ret
 
     def getProcess ( self, token ):
         """ obtain the process identifier from the pythia8 output """
@@ -199,13 +206,15 @@ class ExternalPythia8(ExternalTool):
         """ obtain the cross section from the pythia8 output """
         value, error = map ( float, token.split () )
         # print ( "xsec: >>%s<<" % (value * mb) )
-        return value * mb
+        return (value * mb).asUnit ( fb )
 
     def parseLine ( self, line ):
         tmp = line.split ( "|" )
         tokens = [ x.strip() for x in tmp[1:-1]  ]
         process = self.getProcess ( tokens[0] )
         xsec = self.getXSec ( tokens[-1] )
+        if xsec < 1e-8 * fb:
+            return
         if not process in self.xsecs.keys():
             self.xsecs [ process ] = 0. * fb
         self.xsecs[ process ] += xsec
@@ -275,6 +284,7 @@ class ExternalPythia8(ExternalTool):
         return True
 
 if __name__ == "__main__":
+    setLogLevel ( "debug" )
     tool = ExternalPythia8()
     tool.nevents=10
     logger.info("installed: " + str(tool.installDirectory()))
@@ -283,5 +293,7 @@ if __name__ == "__main__":
     slhafile = "inputFiles/slha/simplyGluino.slha"
     slhapath = os.path.join ( installation.installDirectory(), slhafile )
     logger.info ( "slhafile: " + slhapath )
-    output = tool.run(slhapath, do_unlink = False)
+    output = tool.run(slhapath, do_unlink = True )
+    #for i in output:
+    #    print ( "%s" % i )
     logger.info ( "done: %s" % output )
