@@ -127,8 +127,6 @@ class ExternalPythia8(ExternalTool):
         logger.debug ( "started .run" )
         slha = self.checkFileExists(slhaFile)
         logger.debug ( "file check: " + slha )
-        if cfgfile != None:
-            self.cfgfile = cfgfile
         cfg = self.absPath(self.cfgfile)
         logger.debug("running with cfgfile " + str(cfg))
         cmd = "%s -n %d -f %s -s %d -c %s" % \
