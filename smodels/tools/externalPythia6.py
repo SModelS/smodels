@@ -12,8 +12,10 @@ from __future__ import print_function
 from smodels.tools.externalTool import ExternalTool
 from smodels.tools import externalTool
 from smodels.tools.smodelsLogging import logger
+from smodels.theory import crossSection
 from smodels import installation
-import os
+import os, sys, io
+
 try:
     import commands as executor
 except ImportError:
@@ -123,6 +125,7 @@ class ExternalPythia6(ExternalTool):
         f.close()
         f = open(self.tempDirectory() + "/temp.cfg", "w")
         for line in lines:
+            # print ( "line=%s" % line )
             for (key, value) in replacements.items():
                 if key == "NEVENTS":
                     self.nevents = int(value)
@@ -167,7 +170,7 @@ class ExternalPythia6(ExternalTool):
         :returns: List of cross sections
 
         """
-        if os.path.isfile ( lhefile ):
+        if lhefile and os.path.isfile ( lhefile ):
             lheFile = open(lhefile, 'r')
             xsecsInfile = crossSection.getXsecFromSLHAFile(slhafile)
             loXsecs = crossSection.XSectionList()
@@ -177,12 +180,12 @@ class ExternalPythia6(ExternalTool):
             return loXsecs
 
         #Change pythia card, if defined:
-        if pythiacard:
+        if self.pythiacard:
             pythiacard_default = self.cfgfile
-            self.cfgfile = pythiacard
+            self.cfgfile = self.pythiacard
         # Check if template config file exists
         self.unlink()
-        self.replaceInCfgFile({"NEVENTS": nevts, "SQRTS":1000 * self.sqrts})
+        self.replaceInCfgFile({"NEVENTS": self.nevents, "SQRTS":1000 * self.sqrts})
         self.setParameter("MSTP(163)", "6")
 
         if unlink==False:
@@ -191,9 +194,9 @@ class ExternalPythia6(ExternalTool):
         if r == False:
             logger.info ( "Installation check failed." )
             sys.exit()
-        self.replaceInCfgFile({"NEVENTS": nevts, "SQRTS":1000 * self.sqrts})
+        self.replaceInCfgFile({"NEVENTS": self.nevents, "SQRTS":1000 * self.sqrts})
         self.setParameter("MSTP(163)", "6")
-        lhedata = self.run(slhafile, do_check=False, do_unlink=unlink )
+        lhedata = self._run(slhafile, unlink=unlink )
         if not "<LesHouchesEvents" in lhedata:
             pythiadir = "%s/log" % self.tempDirectory()
             logger.error("No LHE events found in pythia output %s" % pythiadir )
@@ -206,7 +209,7 @@ class ExternalPythia6(ExternalTool):
             raise SModelSError( "No LHE events found in %s" % pythiadir )
 
         #Reset pythia card to its default value
-        if pythiacard:
+        if self.pythiacard:
             self.cfgfile = pythiacard_default
 
         # Generate file object with lhe events
@@ -217,11 +220,13 @@ class ExternalPythia6(ExternalTool):
             lheFile = open(lhefile, 'r')
         else:
             # Create memory only file object
+            if sys.version[0]=="2":
+                lhedata = unicode ( lhedata )
             lheFile = io.StringIO(lhedata)
         return crossSection.getXsecFromLHEFile ( lheFile )
 
 
-    def _run(self, slhaFile, cfgfile=None, do_unlink=True, do_compile=False,
+    def _run(self, slhaFile, cfgfile=None, unlink=True, do_compile=False,
             do_check=True ):
         """
         Really Run Pythia.
@@ -231,7 +236,7 @@ class ExternalPythia6(ExternalTool):
                         use the one supplied at construction time;
                         this config file will not be touched or copied;
                         it will be taken as is
-        :param do_unlink: clean up temporary files after run?
+        :param unlink: clean up temporary files after run?
         :param do_compile: if true, we try to compile binary if it isnt installed.
         :param do_check: check installation, before running
         :returns: stdout and stderr, or error message
@@ -256,8 +261,7 @@ class ExternalPythia6(ExternalTool):
              (self.tempDirectory(), self.executablePath, cfg)
         logger.debug("Now running " + str(cmd))
         out = executor.getoutput(cmd)
-        # out = subprocess.check_output ( cmd, shell=True, universal_newlines=True )
-        if do_unlink:
+        if unlink:
             self.unlink( unlinkdir=True )
         else:
             f = open(self.tempDirectory() + "/log", "w")
@@ -316,12 +320,10 @@ class ExternalPythia6(ExternalTool):
         logger.debug("... done.")
 
 
-    def checkInstallation(self, fix=False ):
+    def checkInstallation( self ):
         """
         Check if installation of tool is correct by looking for executable and
         running it.
-
-        :param fix: should it try to fix the situation, if something is wrong?
 
         :returns: True, if everything is ok
 
@@ -329,18 +331,17 @@ class ExternalPythia6(ExternalTool):
         if not os.path.exists(self.executablePath):
             logger.error("Executable '%s' not found. Maybe you didn't compile " \
                          "the external tools in smodels/lib?", self.executablePath)
-            if fix:
-                self.compile()
             return False
         if not os.access(self.executablePath, os.X_OK):
             logger.error("%s is not executable", self.executable)
             self.chmod()
             return False
+        return True
+        """
         slhaFile = "/inputFiles/slha/gluino_squarks.slha"
         slhaPath = installation.installDirectory() + slhaFile
         try:
-            output = self.run(slhaPath, "<install>/etc/pythia_test.card",
-                    do_compile=False, do_check=False )
+            output = self.run(slhaPath, "<install>/etc/pythia_test.card" )
             output = output.split("\n")
             if output[-1].find("The following floating-point") > -1:
                 output.pop()
@@ -355,9 +356,10 @@ class ExternalPythia6(ExternalTool):
                                  output[nr])
                     return False
         except Exception as e:
-            logger.error("Something is wrong with the setup: exception %s", e)
+            logger.error("Something is wrong with the setup: exception %s" % e)
             return False
         return True
+            """
 
 
 if __name__ == "__main__":
@@ -375,7 +377,7 @@ if __name__ == "__main__":
     slhafile = "inputFiles/slha/simplyGluino.slha"
     slhapath = os.path.join ( installation.installDirectory(), slhafile )
     # print ( "[externalPythia6] slhapath:",slhapath )
-    output = tool.run(slhapath, do_unlink=True, do_check=False )
+    output = tool.run(slhapath, unlink=True, do_check=False )
     n = len (output.split("\n"))
     # print ( "n: ",n )
     isok = ( n > 380)

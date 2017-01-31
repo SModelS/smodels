@@ -54,7 +54,7 @@ class XSecComputer:
             maxOrder=smaxorder[maxOrder]
         return maxOrder
 
-    def addHigherOrders ( self, loXsecs, sqrts, maxOrder ):
+    def addHigherOrders ( self, loXsecs, sqrts, maxOrder, slhafile ):
         """ add higher order xsecs """
         xsecs = loXsecs
         wlabel = str(int(sqrts / TeV)) + ' TeV'
@@ -140,7 +140,7 @@ def computeXSec8(sqrts, maxOrder, nevts, slhafile, unlink=True, loFromSlha=None,
         tool.nevents = nevts
         loXsecs = tool.run ( slhafile )
 
-    xsecs = addHigherOrders ( loXsecs, sqrts, maxOrder )
+    xsecs = computer.addHigherOrders ( loXsecs, sqrts, maxOrder, slhafile )
     return xsecs
 
 def computeXSec6( sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, 
@@ -191,7 +191,7 @@ def computeXSec6( sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True,
         tool.sqrts = sqrts / TeV
         tool.pythiacard = pythiacard
         loXsecs = tool.run( slhafile, lhefile, unlink=unlink )
-    xsecs = addHigherOrders ( loXsecs, sqrts, maxOrder )
+    xsecs = computer.addHigherOrders ( loXsecs, sqrts, maxOrder, slhafile )
     return xsecs
 
 def addXSecToFile(xsecs, slhafile, comment=None, complain=True):
@@ -266,15 +266,19 @@ def xsecToBlock(xsec, inPDGs=(2212, 2212), comment=None, xsecUnit = pb):
     return "\n" + header + "\n" + entry
 
 def computeForOneFile ( sqrtses, order, nevents, inputFile, unlink,
-                        lOfromSLHA, tofile, pythiacard=None ):
+                        lOfromSLHA, tofile, pythiaversion, pythiacard=None ):
     """ compute the cross sections for one file """
     if tofile:
         logger.info("Computing SLHA cross section from %s, adding to "
                     "SLHA file." % inputFile )
         for s in sqrtses:
             ss = s*TeV 
-            xsecs = computeXSec8( ss, order, nevents, inputFile, 
-                       unlink= unlink, loFromSlha= lOfromSLHA, pythiacard=pythiacard)
+            if pythiaversion == 6:
+                xsecs = computeXSec6( ss, order, nevents, inputFile, 
+                           unlink= unlink, loFromSlha= lOfromSLHA, pythiacard=pythiacard)
+            else:
+                xsecs = computeXSec8( ss, order, nevents, inputFile, 
+                           unlink= unlink, loFromSlha= lOfromSLHA, pythiacard=pythiacard)
             comment = str(nevents) + " events, xsecs in pb, pythia8 for LO"
             addXSecToFile(xsecs, inputFile, comment)
     else:
@@ -328,12 +332,12 @@ def checkAllowedSqrtses ( order, sqrtses ):
             sys.exit(-2)
 
 def computeForBunch ( sqrtses, order, nevents, inputFiles, unlink,
-                        lOfromSLHA, tofile, pythiacard=None ):
+                        lOfromSLHA, tofile, pythiaversion, pythiacard=None ):
     """ compute xsecs for a bunch of slha files """
     for inputFile in inputFiles:
         logger.debug ( "computing xsec for %s" % inputFile )
         computeForOneFile ( sqrtses, order, nevents, inputFile, unlink, 
-                            lOfromSLHA, tofile, pythiacard=pythiacard )
+                            lOfromSLHA, tofile, pythiaversion, pythiacard=pythiacard )
 
 def getInputFiles ( args ):
     """ geth the names of the slha files to run over """
@@ -361,9 +365,9 @@ def main(args):
     ncpus = args.ncpus
     pythiaVersion = 8
 
-    if hasattr(args, 'pythia6' ):
+    if hasattr(args, 'pythia6' ) and args.pythia6 == True:
         pythiaVersion = 6
-        if hasattr(args, 'pythia8'):
+        if hasattr(args, 'pythia8') and args.pythia8 == True:
             logger.error ( "cannot both use pythia6 and pythia8 for LO xsecs." )
             sys.exit()
 
@@ -393,7 +397,8 @@ def main(args):
                        ( i, os.getpid(), os.getppid() ) )
             logger.debug ( " `-> %s" % " ".join ( chunk ) )
             computeForBunch (  sqrtses, order, args.nevents, chunk, not args.keep,
-                               args.LOfromSLHA, args.tofile, pythiacard=pythiacard)
+                               args.LOfromSLHA, args.tofile, pythiaVersion, 
+                               pythiacard=pythiacard)
             os._exit ( 0 )
         if pid > 0:
             children.append ( pid )
