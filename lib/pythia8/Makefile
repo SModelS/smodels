@@ -21,6 +21,13 @@ help:
 copy_slha:
 	cp ../../inputFiles/slha/simplyGluino.slha test.slha
 
+particles:
+	./parseXml.py
+
+upload_particles: particles
+	cp pythia8particles.py ../../smodels/tools/
+	
+
 test: all copy_slha run
 
 .PHONY:
