@@ -125,11 +125,12 @@ class ExternalNllFast(ExternalTool):
         if not pdf in ["cteq", "cteq6", "mstw", "mstw2008"]:
             return None
         if not squarkmass:
-            return self.run_("%s %s %s") % (process, pdf, gluinomass)
+            return self.run_("%s %s %s" % (process, pdf, gluinomass) )
         if not gluinomass:
-            return self.run_("%s %s %s") % (process, pdf, squarkmass)
-        return self.run_("%s %s %s %s") % \
-                (process, pdf, squarkmass, gluinomass)
+            return self.run_("%s %s %s" % (process, pdf, squarkmass) )
+        print ( "process=%s" % process )
+        return self.run_("%s %s %s %s" % \
+                (process, pdf, squarkmass, gluinomass) )
 
 
     def checkInstallation(self):
