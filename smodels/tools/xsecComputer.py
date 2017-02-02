@@ -165,25 +165,30 @@ class XSecComputer:
         xsecs = self.addHigherOrders ( sqrts, slhafile )
         for xsec in [ self.loXsecs[0] ]:
             logger.debug ( "now writing out xsecs: %s" % xsec )
+        logger.debug ( "how many NLL xsecs? %d" % len(xsecs) )
         return xsecs
 
     def computeForOneFile ( self, sqrtses, inputFile, unlink,
                             lOfromSLHA, tofile, pythiacard=None ):
-        """ compute the cross sections for one file """
-        # computer = XSecComputer( order, nevents, pythiaVersion )
+        """
+        compute the cross sections for one file.
+        :param sqrtses: list of sqrt{s} tu run pythia, as a unum (e.g. 7*TeV)
+            
+        """
         if tofile:
             logger.info("Computing SLHA cross section from %s, adding to "
                         "SLHA file." % inputFile )
             for s in sqrtses:
                 ss = s*TeV 
-                xsecs = self.compute( ss, inputFile, 
-                           unlink= unlink, loFromSlha= lOfromSLHA, pythiacard=pythiacard)
-                comment = str(self.nevents) + " events, xsecs in pb, pythia%d for LO" % \
-                          self.pythiaVersion
+                xsecs = self.compute( ss, inputFile, unlink= unlink, 
+                                      loFromSlha= lOfromSLHA, pythiacard=pythiacard )
+                comment = str(self.nevents)+" events, xsecs in pb, pythia%d for LO"%\
+                                              self.pythiaVersion
                 #for xsec in [ computer.loXsecs[0] ]:
                 #    logger.debug ( "now writing out xsecs: %s" % xsec )
-                addXSecToFile(self.loXsecs, inputFile, comment+" [LO]" )
-                addXSecToFile(xsecs, inputFile, comment)
+                if tofile == "all":
+                    self.addXSecToFile(self.loXsecs, inputFile, comment+" [LO]" )
+                self.addXSecToFile(xsecs, inputFile, comment)
         else:
             logger.info("Computing SLHA cross section from %s." % inputFile )
             print()
@@ -193,88 +198,91 @@ class XSecComputer:
                 ss = s*TeV 
                 xsecs = self.compute( ss, inputFile, unlink=unlink, loFromSlha=lOfromSLHA )
                 for xsec in xsecs: 
-                    print( "%s %20s:  %.3e pb" % ( xsec.info.label,xsec.pid,xsec.value/pb ) )
+                    print( "%s %20s:  %.3e pb" % \
+                            ( xsec.info.label,xsec.pid,xsec.value/pb ) )
             print()
 
+    def computeForBunch ( self, sqrtses, inputFiles, unlink,
+                            lOfromSLHA, tofile, pythiacard=None ):
+        """ compute xsecs for a bunch of slha files """
+        # computer = XSecComputer( order, nevents, pythiaVersion )
+        for inputFile in inputFiles:
+            logger.debug ( "computing xsec for %s" % inputFile )
+            self.computeForOneFile ( sqrtses, inputFile, unlink, lOfromSLHA, 
+                                     tofile, pythiacard=pythiacard )
 
-def addXSecToFile(xsecs, slhafile, comment=None, complain=True):
-    """
-    Write cross sections to an SLHA file.
-    
-    :param xsecs: a XSectionList object containing the cross sections
-    :param slhafile: target file for writing the cross sections in SLHA format
-    :param comment: optional comment to be added to each cross section block
-    :param complain: complain if there are already cross sections in file
-    
-    """
-    
-    if not os.path.isfile(slhafile):
-        logger.error("SLHA file not found.")
-        raise SModelSError()
-    if len(xsecs) == 0:
-        logger.warning("No cross sections available.")
-        return False
-    # Check if file already contain cross section blocks
-    xSectionList = crossSection.getXsecFromSLHAFile(slhafile)
-    if xSectionList and complain:
-        logger.info("SLHA file already contains XSECTION blocks. Adding "
-                       "only missing cross sections.")
+    def addXSecToFile( self, xsecs, slhafile, comment=None, complain=True):
+        """
+        Write cross sections to an SLHA file.
+        
+        :param xsecs: a XSectionList object containing the cross sections
+        :param slhafile: target file for writing the cross sections in SLHA format
+        :param comment: optional comment to be added to each cross section block
+        :param complain: complain if there are already cross sections in file
+        
+        """
+        
+        if not os.path.isfile(slhafile):
+            logger.error("SLHA file not found.")
+            raise SModelSError()
+        if len(xsecs) == 0:
+            logger.warning("No cross sections available.")
+            return False
+        # Check if file already contain cross section blocks
+        xSectionList = crossSection.getXsecFromSLHAFile(slhafile)
+        if xSectionList and complain:
+            logger.info("SLHA file already contains XSECTION blocks. Adding "
+                           "only missing cross sections.")
 
-    # Write cross sections to file, if they do not overlap any cross section in
-    # the file
-    outfile = open(slhafile, 'a')
-    for xsec in xsecs:
-        writeXsec = True
-        for oldxsec in xSectionList:
-            if oldxsec.info == xsec.info and set(oldxsec.pid) == set(xsec.pid):
-                writeXsec = False
-                break
-        if writeXsec:
-            outfile.write(xsecToBlock(xsec, (2212, 2212), comment) + "\n")
-    outfile.close()
+        # Write cross sections to file, if they do not overlap any cross section in
+        # the file
+        outfile = open(slhafile, 'a')
+        for xsec in xsecs:
+            writeXsec = True
+            for oldxsec in xSectionList:
+                if oldxsec.info == xsec.info and set(oldxsec.pid) == set(xsec.pid):
+                    writeXsec = False
+                    break
+            if writeXsec:
+                outfile.write( self.xsecToBlock(xsec, (2212, 2212), comment) + "\n")
+        outfile.close()
 
-    return True
+        return True
 
-def xsecToBlock(xsec, inPDGs=(2212, 2212), comment=None, xsecUnit = pb):
-    """
-    Generate a string for a XSECTION block in the SLHA format from a XSection
-    object.
+    def xsecToBlock( self, xsec, inPDGs=(2212, 2212), comment=None, xsecUnit = pb):
+        """
+        Generate a string for a XSECTION block in the SLHA format from a XSection
+        object.
 
-    :param inPDGs: defines the PDGs of the incoming states
-                   (default = 2212,2212)
+        :param inPDGs: defines the PDGs of the incoming states
+                       (default = 2212,2212)
 
-    :param comment: is added at the end of the header as a comment
-    :param xsecUnit: unit of cross sections to be written (default is pb). Must be a Unum unit.
+        :param comment: is added at the end of the header as a comment
+        :param xsecUnit: unit of cross sections to be written (default is pb). 
+                         Must be a Unum unit.
 
-    """
-    if type(xsec) != type(crossSection.XSection()):
-        logger.error("Wrong input")
-        raise SModelSError()
-    # Sqrt(s) in GeV
-    header = "XSECTION  " + str(xsec.info.sqrts / GeV)
-    for pdg in inPDGs:
-        # PDGs of incoming states
-        header += " " + str(pdg)
-    # Number of outgoing states
-    header += " " + str(len(xsec.pid))
-    for pid in xsec.pid:
-        # PDGs of outgoing states
-        header += " " + str(pid)
-    if comment:
-        header += "   # " + str(comment)  # Comment
-    entry = "  0  " + str(xsec.info.order) + "  0  0  0  0  " + \
-            str("%16.8E" % (xsec.value / xsecUnit) ) + " SModelS " + installation.version()
+        """
+        if type(xsec) != type(crossSection.XSection()):
+            logger.error("Wrong input")
+            raise SModelSError()
+        # Sqrt(s) in GeV
+        header = "XSECTION  " + str(xsec.info.sqrts / GeV)
+        for pdg in inPDGs:
+            # PDGs of incoming states
+            header += " " + str(pdg)
+        # Number of outgoing states
+        header += " " + str(len(xsec.pid))
+        for pid in xsec.pid:
+            # PDGs of outgoing states
+            header += " " + str(pid)
+        if comment:
+            header += "   # " + str(comment)  # Comment
+        entry = "  0  " + str(xsec.info.order) + "  0  0  0  0  " + \
+                str( "%16.8E" % (xsec.value / xsecUnit) ) + " SModelS " + \
+                     installation.version()
 
-    return "\n" + header + "\n" + entry
+        return "\n" + header + "\n" + entry
 
-def computeForBunch ( sqrtses, order, nevents, inputFiles, unlink,
-                        lOfromSLHA, tofile, pythiaVersion, pythiacard=None ):
-    """ compute xsecs for a bunch of slha files """
-    computer = XSecComputer( order, nevents, pythiaVersion )
-    for inputFile in inputFiles:
-        logger.debug ( "computing xsec for %s" % inputFile )
-        computer.computeForOneFile ( sqrtses, inputFile, unlink, 
-                                     lOfromSLHA, tofile, pythiacard=pythiacard )
 
 class ArgsStandardizer:
     """ simple class to collect all argument manipulators """
@@ -331,6 +339,39 @@ class ArgsStandardizer:
         sqrtses = set(sqrtses)
         return sqrtses
 
+    def checkNCPUs ( self, ncpus, inputFiles ):
+        if ncpus < -1 or ncpus == 0:
+            logger.error ( "Weird number of CPUs given: %d" % ncpus )
+            sys.exit()
+        if ncpus == -1:
+            ncpus = runtime.nCPUs()
+        ncpus = min ( len(inputFiles), ncpus )
+        if ncpus == 1:
+            logger.info ( "We run on a single cpu" )
+        else:
+            logger.info ( "We run on %d cpus" % ncpus )
+        return ncpus
+
+    def getPythiaVersion ( self, args ):
+        pythiaVersion = 8
+
+        if hasattr(args, 'pythia6' ) and args.pythia6 == True:
+            pythiaVersion = 6
+            if hasattr(args, 'pythia8') and args.pythia8 == True:
+                logger.error ( "cannot both use pythia6 and pythia8 for LO xsecs." )
+                sys.exit()
+        return pythiaVersion
+
+    def writeToFile ( self, args ):
+        toFile = None
+        if args.tofile:
+            toFile="highest"
+        if args.alltofile:
+            if toFile=="highest":
+                logger.warn ( "Specified both --tofile and --alltofile. Will use "\
+                              "--alltofile" )
+            toFile="all"
+        return toFile
 
 def main(args):
     canonizer = ArgsStandardizer()
@@ -341,29 +382,13 @@ def main(args):
     order = canonizer.getOrder ( args )
     canonizer.checkAllowedSqrtses ( order, sqrtses )
     inputFiles = canonizer.getInputFiles ( args )
-    ncpus = args.ncpus
-    pythiaVersion = 8
+    ncpus = canonizer.checkNCPUs ( args.ncpus, inputFiles )
+    pythiaVersion = canonizer.getPythiaVersion ( args )
 
-    if hasattr(args, 'pythia6' ) and args.pythia6 == True:
-        pythiaVersion = 6
-        if hasattr(args, 'pythia8') and args.pythia8 == True:
-            logger.error ( "cannot both use pythia6 and pythia8 for LO xsecs." )
-            sys.exit()
-
+    pythiacard = None
     if hasattr(args, 'pythiacard'):
         pythiacard = args.pythiacard
-    else:
-        pythiacard = None
-    if ncpus < -1 or ncpus == 0:
-        logger.error ( "Weird number of CPUs given: %d" % ncpus )
-        sys.exit()
-    if ncpus == -1:
-        ncpus = runtime.nCPUs()
-    ncpus = min ( len(inputFiles), ncpus )
-    if ncpus == 1:
-        logger.info ( "We run on a single cpu" )
-    else:
-        logger.info ( "We run on %d cpus" % ncpus )
+
     children = []
     for i in range(ncpus):
         pid = os.fork()
@@ -375,9 +400,10 @@ def main(args):
             logger.debug ( "chunk #%d: pid %d (parent %d)." % 
                        ( i, os.getpid(), os.getppid() ) )
             logger.debug ( " `-> %s" % " ".join ( chunk ) )
-            computeForBunch (  sqrtses, order, args.nevents, chunk, not args.keep,
-                               args.LOfromSLHA, args.tofile, pythiaVersion, 
-                               pythiacard=pythiacard)
+            computer = XSecComputer( order, args.nevents, pythiaVersion )
+            toFile = canonizer.writeToFile ( args )
+            computer.computeForBunch (  sqrtses, chunk, not args.keep,
+                                args.LOfromSLHA, toFile, pythiacard=pythiacard )
             os._exit ( 0 )
         if pid > 0:
             children.append ( pid )
