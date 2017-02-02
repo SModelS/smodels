@@ -94,8 +94,15 @@ class XSection(object):
         """        
         self.info = XSectionInfo()
         self.value = None
-        self.pid = (None, None)
+        self._pid = (None, None)
 
+    @property
+    def pid(self):
+        return self._pid
+
+    @pid.setter
+    def pid(self,pn):
+        self._pid = tuple ( sorted (pn) )
 
     def __mul__(self, other):
         """
@@ -136,7 +143,8 @@ class XSection(object):
 
     def __eq__(self, other):
         """
-        Compare two XSection objects. Returns True if .info and type and value and pid are equal.        
+        Compare two XSection objects. Returns True if .info and type and value and 
+        pid are equal.        
         """
 
         if type(other) != type(XSection()):
@@ -152,7 +160,8 @@ class XSection(object):
 
     def __ne__(self, other):
         """
-        Compare two XSection objects. Returns True if .info or type or value or pid is not equal.        
+        Compare two XSection objects. Returns True if .info or type or value or 
+        pid is not equal.        
         """
 
         if type(other) != type(XSection()):
@@ -208,6 +217,7 @@ class XSectionList(object):
     An instance of this class represents a list of cross sections.
     
     This class is used to store a list of cross sections.
+    The list is sorted by cross section, highest cross section first.
     
     """
     def __init__(self, infoList=None):
@@ -225,7 +235,6 @@ class XSectionList(object):
                 newentry.pid = (None, None)
                 newentry.info = info.copy()
                 self.add(newentry)
-
 
     def __mul__(self, other):
         newList = self.copy()
@@ -305,7 +314,6 @@ class XSectionList(object):
             raise SModelSError()
         else:
             self.xSections.append(newxsec.copy())
-
 
     def _addValue(self, newxsec):
         """
@@ -532,13 +540,17 @@ class XSectionList(object):
                            (len(self) - len(newList)))
         self.xSections = newList.xSections
             
-    def order(self):
+    def _order(self):
         """
         Order the cross section in the list by their PDG pairs
         """
         
         self.xSections = sorted(self.xSections, key=lambda xsec: xsec.pid)
 
+    def sort ( self ):
+        """ sort the xsecs by the values """
+        self.xSections = sorted(self.xSections, 
+                key=lambda xsec: xsec.value.asNumber(pb ), reverse=True )
 
 def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
     """
