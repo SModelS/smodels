@@ -33,6 +33,7 @@ class XSecTest(unittest.TestCase):
         slhafile="../inputFiles/slha/simplyGluino.slha"
         computer = xsecComputer.XSecComputer ( LO, 100, 6 )
         w = computer.compute(8*TeV, slhafile ).getDictionary()
+        # print ( w )
         w8lo= w[(1000021, 1000021)]['8 TeV (LO)'].asNumber( fb )
         self.assertAlmostEqual(w8lo, 268.2255 ) 
 
@@ -92,6 +93,7 @@ class XSecTest(unittest.TestCase):
         xargs.keep = False
         xargs.tofile = True
         xargs.alltofile = False
+        xargs.pythia6 = True
         xargs.filename = tmpfile
         xargs.verbosity = "info"
         #Compute LO cross sections
