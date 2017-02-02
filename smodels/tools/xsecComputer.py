@@ -168,6 +168,7 @@ class XSecComputer:
         #for xsec in self.loXsecs:
         #    logger.debug ( "now writing out xsecs: %s" % xsec.value )
         logger.debug ( "how many NLL xsecs? %d" % len(self.xsecs) )
+        return self.xsecs
 
     def computeForOneFile ( self, sqrtses, inputFile, unlink,
                             lOfromSLHA, tofile, pythiacard=None ):
