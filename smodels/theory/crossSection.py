@@ -540,7 +540,7 @@ class XSectionList(object):
                            (len(self) - len(newList)))
         self.xSections = newList.xSections
             
-    def _order(self):
+    def order(self):
         """
         Order the cross section in the list by their PDG pairs
         """
