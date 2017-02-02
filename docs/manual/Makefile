@@ -52,7 +52,10 @@ recipes:
 clean:
 	rm -rf $(BUILDDIR)/*
 
-html: recipes htmlnorecipes
+RstFilesFromHelp:
+	rstFromHelpFiles.py
+
+html: recipes RstFilesFromHelp htmlnorecipes
 
 htmlnorecipes:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
