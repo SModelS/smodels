@@ -10,6 +10,26 @@ substitutes = { "~u_L": "~u_1", "~u_R": "~u_2", "~c_L": "~u_3", "~c_R": "~u_4",
                 "~tau_1-": "~e_5", "~tau_2-": "~e_6"
 }
 
+def split_line ( line ):
+    """ split line after spaces, but not with a () bracket """
+    newline = line
+    tokens=[]
+    inBracket=False
+    s=""
+    for char in newline:
+        if char == "(":
+            inBracket = True
+        if char == ")":
+            inBracket = False
+        if char in [ " ", "	" ] and not inBracket and len(s)>0:
+            tokens.append ( s )
+            s=""
+            continue
+        s+=char
+    if len(s)>0:
+        tokens.append ( s )
+    return tokens
+
 def create():
     f=open("/usr/share/pythia8-data/xmldoc/ParticleData.xml")
     g=open("pythia8particles.py","w")
@@ -27,9 +47,11 @@ def create():
             deletes = [ '<particle id="', '"', '=', 'name', 'antiName' ]
             for d in deletes:
                 line = line.replace ( d, "" )
-            print ( line )
-            tokens = line.split()
-            # print ( tokens )
+            print ( "line=%s" % line )
+            tokens = split_line ( line )
+            print ( "tokens=%s" % tokens )
+            if tokens[1] == "void":
+                continue
             pids[ tokens[1] ] = int( tokens[0] )
             if tokens[1] in substitutes.keys():
                 pids[ substitutes [ tokens[1] ] ] = pids [ tokens[1] ]
@@ -46,5 +68,6 @@ def create():
     g.close()
 
 if __name__ == "__main__":
+    #print ( split_line ( "Upsilon(3S)[3PJ(8)]" ) ) 
     create()
 
