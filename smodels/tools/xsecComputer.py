@@ -162,11 +162,12 @@ class XSecComputer:
             tool.pythiacard = pythiacard
             loXsecs = tool.run( slhafile, lhefile, unlink=unlink )
         self.loXsecs = loXsecs
-        xsecs = self.addHigherOrders ( sqrts, slhafile )
-        for xsec in [ self.loXsecs[0] ]:
-            logger.debug ( "now writing out xsecs: %s" % xsec )
-        logger.debug ( "how many NLL xsecs? %d" % len(xsecs) )
-        return xsecs
+        self.loXsecs.sort()
+        self.xsecs = self.addHigherOrders ( sqrts, slhafile )
+        self.xsecs.sort()
+        #for xsec in self.loXsecs:
+        #    logger.debug ( "now writing out xsecs: %s" % xsec.value )
+        logger.debug ( "how many NLL xsecs? %d" % len(self.xsecs) )
 
     def computeForOneFile ( self, sqrtses, inputFile, unlink,
                             lOfromSLHA, tofile, pythiacard=None ):
@@ -180,15 +181,15 @@ class XSecComputer:
                         "SLHA file." % inputFile )
             for s in sqrtses:
                 ss = s*TeV 
-                xsecs = self.compute( ss, inputFile, unlink= unlink, 
-                                      loFromSlha= lOfromSLHA, pythiacard=pythiacard )
-                comment = str(self.nevents)+" events, xsecs in pb, pythia%d for LO"%\
-                                              self.pythiaVersion
-                #for xsec in [ computer.loXsecs[0] ]:
-                #    logger.debug ( "now writing out xsecs: %s" % xsec )
+                self.compute( ss, inputFile, unlink= unlink, 
+                              loFromSlha= lOfromSLHA, pythiacard=pythiacard )
                 if tofile == "all":
-                    self.addXSecToFile(self.loXsecs, inputFile, comment+" [LO]" )
-                self.addXSecToFile(xsecs, inputFile, comment)
+                    comment = str(self.nevents)+" evts, pythia%d [pb]"%\
+                                              self.pythiaVersion
+                    self.addXSecToFile(self.loXsecs, inputFile, comment )
+                comment = str(self.nevents)+" events, [pb], pythia%d for LO"%\
+                                              self.pythiaVersion
+                self.addXSecToFile( self.xsecs, inputFile, comment)
         else:
             logger.info("Computing SLHA cross section from %s." % inputFile )
             print()
@@ -196,8 +197,8 @@ class XSecComputer:
             print( "=======================" )
             for s in sqrtses:
                 ss = s*TeV 
-                xsecs = self.compute( ss, inputFile, unlink=unlink, loFromSlha=lOfromSLHA )
-                for xsec in xsecs: 
+                self.compute( ss, inputFile, unlink=unlink, loFromSlha=lOfromSLHA )
+                for xsec in self.xsecs: 
                     print( "%s %20s:  %.3e pb" % \
                             ( xsec.info.label,xsec.pid,xsec.value/pb ) )
             print()
@@ -276,9 +277,9 @@ class XSecComputer:
             # PDGs of outgoing states
             header += " " + str(pid)
         if comment:
-            header += "   # " + str(comment)  # Comment
+            header += " # " + str(comment)  # Comment
         entry = "  0  " + str(xsec.info.order) + "  0  0  0  0  " + \
-                str( "%16.8E" % (xsec.value / xsecUnit) ) + " SModelS " + \
+                str( "%16.8E" % (xsec.value / xsecUnit) ) + " SModelSv" + \
                      installation.version()
 
         return "\n" + header + "\n" + entry

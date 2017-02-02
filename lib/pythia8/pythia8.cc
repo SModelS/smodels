@@ -24,7 +24,7 @@ int run( int nevents, float sqrts /* in TeV */, const string & slhafile,
   pythia.readString ( o3.str() );
   pythia.init();
 
-  // Begin event loop. Generate event. Skip if error. List first one.
+  // Begin event loop. Generate event. Skip if error.
   for (int iEvent = 0; iEvent < nevents; ++iEvent ) {
     if (!pythia.next()) continue;
   }
@@ -97,5 +97,5 @@ int main( int argc, const char * argv[] ) {
     help ( argv[0] );
   };
 
-  return run ( 100, 7, slhafile, cfgfile );
+  return run ( nevents, sqrts, slhafile, cfgfile );
 }

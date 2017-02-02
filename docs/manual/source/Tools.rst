@@ -32,7 +32,7 @@ SModelS Tools
 
 Inside SModelS there is a number of tools that may be convenient for the user:
 
-* a :ref:`cross section calculator <xsecCalc>` based on `Pythia6 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_  and 
+* a :ref:`cross section calculator <xsecCalc>` based on `Pythia8 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_ (or `Pythia6 <http://pythia6.hepforge.org>`_) and 
   `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_,
 * :ref:`SLHA and LHE file checkers <fileChecks>` to check your input files for completeness and sanity,
 * a :ref:`database Browser <databaseBrowser>` to provide easy access to the |database| of experimental results,
@@ -46,37 +46,15 @@ Cross Section Calculator
 This tool computes LHC production cross sections for *MSSM particles*
 and writes them out in :ref:`SLHA convention <xsecblock>`. This can in particular be 
 convenient for adding cross sections to SLHA input files, see :doc:`Basic Input <BasicInput>`. 
-The calculation is done at LO with `Pythia6.4 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_ ; K-factors 
+The calculation is done at LO with `Pythia8 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_ or `Pythia6.4 <http://pythia6.hepforge.org>`_ ; K-factors 
 for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_ .
 
 
 **The usage of the cross section calculator is:**
 
-   smodelsTools.py xseccomputer [-h] -f FILENAME [-s SQRTS [SQRTS ...]] [-e NEVENTS] [-v VERBOSITY] [-c NCPUS] [-p] [-q] [-k] [-n] [-N] [-O]
+.. include:: XSecComputer.rst
 
-*arguments*:
-  -h, --help            show this help message and exit
-  -s SQRTS, --sqrts SQRTS
-                        sqrt(s) TeV. Can supply more than one value. Default is both 8 and 13.
-  -e NEVENTS, --nevents NEVENTS
-                        number of events to be simulated.
-  -c NCPUS, --ncpus NCPUS
-                        number of cores to be used simultaneously. -1 means  'all'.
-  -p, --tofile          write cross sections to file
-  -q, --query           only query if there are cross sections in the file
-  -k, --keep            do not unlink temporary directory
-  -n, --NLO             compute at the NLO level (default is LO)
-  -N, --NLL             compute at the NLO+NLL level (takes precedence over
-                        NLO, default is LO)
-  -O, --LOfromSLHA      use LO cross sections from file to compute the NLO or
-                        NLL cross sections
-  -f FILENAME, --filename FILENAME
-                        SLHA file to compute cross sections for. If a
-                        directory is given, compute cross sections for all
-                        files in directory.
-  -v VERBOSITY, --verbosity VERBOSITY
-                        Verbosity (debug, info, warning, error)
-                        
+
 
 *In some more detail*:
   -s SQRTS, --sqrts SQRTS 
