@@ -153,8 +153,6 @@ Below we give more detailed information about each entry in the parameters file.
 |
 * *options*: main options for turning SModelS features on or off
 
-  * **inputType** (SLHA/LHE): determines the type of input file (see :doc:`Basic Input <BasicInput>`).
-    Must be *SLHA* for SLHA input files or *LHE* for LHE input files.
   * **checkInput** (True/False): if True, *runSModelS.py* will run the :ref:`file check tool <fileChecks>` on the input file and verify if the input contains all the necessary information.
   * **doInvisible** (True/False): turns |invisible compression| on or off during the |decomposition|.
   * **doCompress** (True/False): turns |mass compression| on or off during the |decomposition|.

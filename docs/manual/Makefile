@@ -52,7 +52,11 @@ recipes:
 clean:
 	rm -rf $(BUILDDIR)/*
 
-html: recipes htmlnorecipes
+html: copy_files recipes htmlnorecipes
+
+copy_files:
+	cp ../../parameters.ini source/images/
+	cp ../../etc/parameters_default.ini source/images/
 
 htmlnorecipes:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
