@@ -16,7 +16,7 @@ from smodels.theory import slhaDecomposer
 from smodels.theory import lheDecomposer
 from smodels.theory.theoryPrediction import theoryPredictionsFor, TheoryPredictionList
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-from smodels.tools import crashReport, timeOut
+from smodels.tools import crashReport, timeOut 
 from smodels.tools.printer import MPrinter
 import os
 import sys
@@ -43,7 +43,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """Get run parameters and options from the parser"""
     sigmacut = parser.getfloat("parameters", "sigmacut") * fb
     minmassgap = parser.getfloat("parameters", "minmassgap") * GeV
-    inputType = parser.get("options", "inputType").lower()
+    inputType = runtime.filetype ( inputFile )
 
 
     """Setup output printers"""
@@ -57,7 +57,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """Check input file for errors"""
     inputStatus = ioObjects.FileStatus()
     if parser.getboolean("options", "checkInput"):
-        inputStatus.checkFile(inputType, inputFile, sigmacut)
+        inputStatus.checkFile( inputFile, sigmacut)
     """Initialize output status and exit if there were errors in the input"""
     outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile,
             dict(parser.items("parameters")), databaseVersion)
