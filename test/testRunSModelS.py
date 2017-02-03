@@ -169,7 +169,7 @@ class RunSModelSTest(unittest.TestCase):
                             ignore=ignoreFields)
         os.remove('./bad_output.py')
         os.remove('./bad_output.pyc')
-        self.assertTrue(equals )
+        self.assertTrue( equals )
   
     def cleanUp ( self ):
         for f in os.listdir("."):
