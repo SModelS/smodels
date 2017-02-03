@@ -20,6 +20,7 @@ from smodels.theory import crossSection
 from smodels.theory.theoryPrediction import TheoryPrediction
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
+from smodels.tools import runtime
 
 class ResultList(object):
     """
@@ -207,7 +208,8 @@ class FileStatus(object):
         self.status = 0, "File not checked\n"
 
 
-    def checkFile(self, inputType, inputFile, sigmacut=None):
+    def checkFile(self, inputFile, sigmacut=None):
+        inputType = runtime.filetype ( inputFile )
 
         if inputType == 'lhe':
             self.filestatus = LheStatus(inputFile)
@@ -217,7 +219,7 @@ class FileStatus(object):
             self.status = self.filestatus.status
         else:
             self.filestatus = None
-            self.status = -5, 'Unknown input type: %s' % self.inputType
+            self.status = -5, 'Unknown input type: %s' % inputType 
 
 
 class LheStatus(object):
