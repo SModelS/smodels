@@ -176,23 +176,7 @@ is considered as a displaced vertex.
 
 **The usage of the SLHA checker is:**
 
-smodelsTools.py slhachecker [-h] [-xS] [-lsp] [-longlived] [-m DISPLACEMENT] [-s SIGMACUT] [-illegal] [-dB] -f FILENAME
-
-*arguments*:
-  -h, --help            show this help message and exit
-  -xS, --xsec           turn off the check for xsection blocks
-  -lsp, --lsp           turn off the check for charged lsp
-  -longlived, --longlived
-                        turn off the check for stable charged particles and
-                        visible displaced vertices
-  -m DISPLACEMENT, --displacement DISPLACEMENT
-                        give maximum displacement of secondary vertex in m
-  -s SIGMACUT, --sigmacut SIGMACUT
-                        give sigmacut in fb
-  -illegal, --illegal   turn on check for kinematically forbidden decays
-  -dB, --decayBlocks    turn off the check for missing decay blocks
-  -f FILENAME, --filename FILENAME
-                        name of input SLHA file
+.. include:: SlhaChecker.rst
 
 
 A typical
@@ -215,14 +199,9 @@ or |Datasets| satisfying some user-defined conditions as well as to access the m
 
 **The usage of the browser interface is:**
 
-smodelsTools.py database-browser [-h] -p PATH_TO_DATABASE [-t]
 
-*arguments*:
-  -h, --help            show this help message and exit
-  -p PATH_TO_DATABASE, --path_to_database PATH_TO_DATABASE
-                        path to SModelS database
-  -t, --text            load text database, dont even search for binary
-                        database file
+.. include:: DatabaseBrowser.rst
+
 
 A typical usage example is: ::
 
