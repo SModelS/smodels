@@ -47,6 +47,8 @@ docs/manual/source/recipes/*.html
 docs/manual/source/recipes/*.py
 docs/manual/source/XSecComputer.rst
 docs/manual/source/LheChecker.rst
+docs/manual/source/SlhaChecker.rst
+docs/manual/source/DatabaseBrowser.rst
 # test/database/database.pcl
 *~
 *.crash
