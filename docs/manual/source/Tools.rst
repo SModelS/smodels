@@ -122,13 +122,7 @@ For a LHE input file only very basic checks are performed, namely that
 
 **The usage of the LHE checker is simply:**
 
-   smodelsTools.py lhechecker [-h] -f FILENAME
-
-*arguments*:
-
-  -h, --help                        show this help message and exit  
-  -f FILENAME, --filename FILENAME  name of input LHE file
-  
+.. include:: LheChecker.rst
 
 A typical
 usage example is: ::
