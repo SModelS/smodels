@@ -49,3 +49,4 @@ def run ( tool, rstfile ):
 
 
 run ( "xseccomputer", "XSecComputer" )
+run ( "lhechecker", "LheChecker" )

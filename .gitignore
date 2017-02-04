@@ -45,6 +45,8 @@ distribution/create.log
 distribution/smodels-*
 docs/manual/source/recipes/*.html
 docs/manual/source/recipes/*.py
+docs/manual/source/XSecComputer.rst
+docs/manual/source/LheChecker.rst
 # test/database/database.pcl
 *~
 *.crash
