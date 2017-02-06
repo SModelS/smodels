@@ -141,18 +141,7 @@ class ToolBox(object):
             return None
         return self.tools[tool]
 
-
-if __name__ == "__main__":
-    """ Run as a script we report on the status of the installation. """
-    argparser = argparse.ArgumentParser(description='simple script to check \
-            if all external "HEP" tools are installed and compiled')
-    argparser.add_argument('-n', '--nocolors', help='turn off colors',
-                           action='store_true')
-    argparser.add_argument('-l', '--long', help='long output lines',
-                           action='store_true')
-    argparser.add_argument('-m', '--make', help='compile packages if needed',
-                           action='store_true')
-    args = argparser.parse_args()
+def main ( args ):
     tmp = ToolBox()
     if args.make:
         tmp.compile()
