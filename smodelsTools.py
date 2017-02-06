@@ -12,7 +12,7 @@
 from __future__ import print_function
 import argparse
 from smodels.tools import xsecComputer
-from smodels.tools import slhaChecks, lheChecks, databaseBrowser
+from smodels.tools import slhaChecks, lheChecks, databaseBrowser, toolBox
 from smodels.tools import smodelsLogging
 
 
@@ -67,6 +67,14 @@ def main():
     dbBrowser.add_argument('-p', '--path_to_database', help='path to SModelS database', required=True)
     dbBrowser.add_argument('-t', '--text', help='load text database, dont even search for binary database file', action='store_true')
 
+    toolbox = subparsers.add_parser( 'toolbox', description=
+								                     "Facility to control external dependencies")
+    toolbox.add_argument('-n', '--nocolors', help='turn off colors',
+                           action='store_true')
+    toolbox.add_argument('-l', '--long', help='long output lines',
+                           action='store_true')
+    toolbox.add_argument('-m', '--make', help='compile packages if needed',
+                           action='store_true')
     args = parser.parse_args()
 
     smodelsLogging.setLogLevel ( args.verbose )
@@ -80,7 +88,8 @@ def main():
         path = os.path.abspath(os.path.realpath(__file__))
         print ( "This binary:",path )
         sys.exit()
-
+    if args.subparser_name == 'toolbox':
+        toolBox.main ( args )
     if args.subparser_name == 'xseccomputer':
         xsecComputer.main(args)
     if args.subparser_name == 'slhachecker':
