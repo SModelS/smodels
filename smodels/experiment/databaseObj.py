@@ -16,7 +16,7 @@ import time
 from smodels.experiment import datasetObj
 from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.exceptions import DatabaseNotFoundException
-from smodels.tools.physicsUnits import fb
+from smodels.tools.physicsUnits import fb, TeV
 
 try:
     import cPickle as serializer
@@ -328,10 +328,32 @@ class Database(object):
         idList += "-" * len(idList) + "\n"
         if self.expResultList == None:
             idList += "no experimental results available! "
-        else:
-            for expRes in self.expResultList:
-                idList += expRes.globalInfo.getInfo('id') + ', '
+            return idList
+        idList += "%d experimental results: " % \
+                   len ( self.expResultList ) 
+        atlas,cms = [],[]
+        datasets = 0
+        txnames = 0
+        s = { 8:0, 13:0  }
+        for expRes in self.expResultList:
+            Id = expRes.globalInfo.getInfo('id')
+            sqrts = expRes.globalInfo.getInfo('sqrts').asNumber ( TeV )
+            if not sqrts in s.keys():
+                s[sqrts] = 0
+            s[sqrts]+=1
+            datasets += len ( expRes.datasets )
+            for ds in expRes.datasets:
+                txnames += len ( ds.txnameList )
+            if "ATLAS" in Id:
+                atlas.append ( expRes )
+            if "CMS" in Id:
+                cms.append ( expRes )
+        idList += "%d CMS, %d ATLAS, " % ( len(cms), len(atlas) )
+        for sqrts in s.keys():
+            idList += "%d @ %d TeV, " % ( s[sqrts], sqrts )
+            # idList += expRes.globalInfo.getInfo('id') + ', '
         idList = idList[:-2] + '\n'
+        idList += "%d datasets, %d txnames.\n" % ( datasets, txnames )
         return idList
 
 
