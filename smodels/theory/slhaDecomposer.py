@@ -161,7 +161,7 @@ def _getDictionariesFromSLHA(slhafile):
     # Get mass and branching ratios for all particles
     brDic = {}
     for pid in res.decays.keys():
-        if not pid in rEven + rOdd:
+        if not pid in list(rEven) + list(rOdd):
             logger.warning("Particle %i not defined in particles.py, its decays will be ignored" %(pid))
             continue
         if pid in rEven:
