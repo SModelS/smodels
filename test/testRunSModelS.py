@@ -133,10 +133,8 @@ class RunSModelSTest(unittest.TestCase):
                     res['AnalysisID'],res['DataSetID']])
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                            ignore=ignoreFields)
-        try:
-            os.remove('./output.py')
-            os.remove('./output.pyc')
-        except OSError: pass
+        for i in [ './output.py', './output.pyc' ]:
+            if os.path.exists ( i ): os.remove ( i )
         self.assertTrue(equals)
     
     def testGoodFile13(self):
@@ -152,10 +150,10 @@ class RunSModelSTest(unittest.TestCase):
                     res['AnalysisID'],res['DataSetID']])
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                            ignore=ignoreFields)
-        try:
-            os.remove('./output13.py')
-            os.remove('./output13.pyc')
-        except OSError: pass
+        for i in [ './output13.py', './output13.pyc' ]:
+            if os.path.exists ( i ):
+                continue
+                os.remove ( i )
         self.assertTrue(equals)        
   
     def testBadFile(self):
@@ -167,9 +165,10 @@ class RunSModelSTest(unittest.TestCase):
         ignoreFields = ['input file','smodels version', 'ncpus']
         equals = equalObjs( smodelsOutput,smodelsOutputDefault,allowedDiff=0.,
                             ignore=ignoreFields)
-        os.remove('./bad_output.py')
-        os.remove('./bad_output.pyc')
-        self.assertTrue(equals )
+        for i in [ "./bad_output.py", "./bad_output.pyc" ]:
+            if os.path.exists ( i ):
+                os.remove( i )
+        self.assertTrue( equals )
   
     def cleanUp ( self ):
         for f in os.listdir("."):
