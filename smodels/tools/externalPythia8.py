@@ -131,7 +131,14 @@ class ExternalPythia8(ExternalTool):
         logger.debug("running with cfgfile " + str(cfg))
         cmd = "%s -n %d -f %s -s %d -c %s" % \
              ( self.executablePath, self.nevents, slha, self.sqrts, cfg )
-        logger.debug("Now running " + str(cmd))
+        xmldoc = self.executablePath.replace ( "pythia8.exe", "xml.doc" )
+        if os.path.exists (xmldoc ):
+            logger.info ( "xml.doc found at %s." % xmldoc )
+            with open ( xmldoc ) as f:
+                xmlDir = f.read()
+                logger.debug ( "adding -x %s" % xmlDir )
+                cmd += " -x %s" % xmlDir.strip()
+        logger.debug("Now running ''%s''" % str(cmd) )
         out = executor.getoutput(cmd)
         if not unlink:
             tempfile = self.tempDirectory() + "/log"
