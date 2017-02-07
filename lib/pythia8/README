@@ -2,4 +2,4 @@ Dependencies:
 =============
 
 Ubuntu:
-apt install liblhapdf-dev libpythia8-dev
+apt install libpythia8-dev
