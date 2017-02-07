@@ -214,9 +214,11 @@ class ExternalPythia8(ExternalTool):
             if "End PYTHIA Event and Cross Section Statistics" in line:
                 end=ctr-3
         if begin > end:
-            logger.error ( "could not parse pythia8 file correctly." )
+            logger.error ( "could not parse pythia8 output file correctly." )
+            with open("/tmp/pythia8.log", "w" ) as f:
+                f.write ( out )
+                logger.error ( "see /tmp/pythia8.log for more details" )
             return None
-        # print ( "need to look at %d to %d" % ( begin,end ) )
         for line in lines[begin:end]:
             self.parseLine ( line )
 
