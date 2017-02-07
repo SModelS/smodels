@@ -1,9 +1,7 @@
 CXX      := g++
-LHALIB   := lhapdfdummy 
-PYTHIA8HOME := $(HOME)/git/pythia8/
-CXXFLAGS := -O2 -I$(PYTHIA8HOME)/include
-LDFLAGS  := -L$(PYTHIA8HOME)/lib/archive
-XMLDOC   := $(PYTHIA8HOME)/xmldoc # ../xmldoc
+LHALIB   := lhapdfdummy # LHAPDF
+CXXFLAGS := -O2 -I/usr/include/Pythia8
+LDFLAGS  := -L/usr/lib/
 SRC := pythia8.cc
 
 EXES := $(SRC:.cc=.exe)
@@ -14,11 +12,10 @@ clean:
 	rm -rf $(EXES) test.slha
 
 %.exe: %.cc
-	echo $(XMLDOC) > xml.doc
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< -lpythia8 -l$(LHALIB)
 
 run:
-	pythia8.exe -f test.slha -n 10 -c ./pythia8.cfg -x $(XMLDOC)
+	pythia8.exe -f test.slha -n 10 -c ./pythia8.cfg
 
 help:
 	pythia8.exe -h

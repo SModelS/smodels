@@ -1,19 +1,18 @@
 // This is our program to read slha files and compute cross sections
 
-#include "Pythia8/Pythia.h"
+#include "Pythia.h"
+// #include "Pythia8/Pythia.h"
 #include <sstream>
 #include <cstdlib>
 using namespace Pythia8;
 using namespace std;
 
 int run( int nevents, float sqrts /* in TeV */, const string & slhafile,
-         const string & cfgfile )
+         const string & cfgfile, const string & xmldir )
 {
   cout << "[pythia8.exe] we run with " << nevents << ", sqrts=" << sqrts << " TeV"
        << ", slhafile=" << slhafile << endl;
-  // exit( 0 );
-  // Generator. Process selection. LHC initialization. Histogram.
-  Pythia pythia;
+  Pythia pythia ( xmldir, false );
   pythia.readFile( cfgfile );
   ostringstream o1, o2, o3;
   o1 << "Main:numberOfEvents=" << nevents;
@@ -40,6 +39,7 @@ void help( const char * name )
   cout << "        -s <sqrts>:    center-of mass energy, in TeV [13]." << endl;
   cout << "        -f <slhafile>: slhafile [test.slha]." << endl;
   cout << "        -c <cfgfile>: the pythia8 config file [./pythia8.cfg]." << endl;
+  cout << "        -x <xmldir>: the pythia8 xmldoc dir [../xmldoc]." << endl;
   exit( 0 );
 };
 
@@ -48,6 +48,7 @@ int main( int argc, const char * argv[] ) {
   float sqrts = 13;
   string slhafile = "test.slha";
   string cfgfile = "./pythia8.cfg";
+  string xmlDir = "../xmldoc";
   for ( int i=1; i!=argc ; ++i )
   {
     string s = argv[i];
@@ -80,6 +81,14 @@ int main( int argc, const char * argv[] ) {
       continue;
     }
 
+    if ( s== "-x" )
+    {
+      if ( argc < i+2 ) help ( argv[0] );
+      xmlDir = argv[i+1];
+      i++;
+      continue;
+    }
+
     if ( (s== "-s") )
     {
       if ( argc < i+2 ) help ( argv[0] );
@@ -97,5 +106,5 @@ int main( int argc, const char * argv[] ) {
     help ( argv[0] );
   };
 
-  return run ( nevents, sqrts, slhafile, cfgfile );
+  return run ( nevents, sqrts, slhafile, cfgfile, xmlDir );
 }
