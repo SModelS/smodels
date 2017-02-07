@@ -17,6 +17,7 @@ from os.path import join, basename
 from smodels.installation import installDirectory as iDir
 from smodels.tools import crashReport
 from smodels.tools.timeOut import NoTime
+from databaseLoader import database ## to make sure the db exists
 from runSModelS import main
 import redirector
 import unum
@@ -189,19 +190,22 @@ class RunSModelSTest(unittest.TestCase):
             import ctypes
             libc = ctypes.CDLL("libc.so.6")
             libc.sync()
-        except (OSError,AttributeError,ImportError),e:
+        except (OSError,AttributeError,ImportError) as e:
             pass
         time.sleep(.1)
         for f in os.listdir("."):
             if ".crash" in f:
                 crash_file = f
                 ctr+=1
-        self.assertEquals ( ctr, 1 )
+        self.assertEqual ( ctr, 1 )
         inp, par = crashReport.readCrashReportFile(crash_file)
    
-        self.assertEquals(open(filename).readlines(), open(inp).readlines())
-        self.assertEquals( open("timeout.ini").readlines(),
-                           open(par).readlines())
+        with open(filename) as f:
+            with open(inp) as g:
+                self.assertEqual(f.readlines(), g.readlines())
+        with open("timeout.ini") as f:
+            with open(par) as g:
+               self.assertEqual( f.readlines(), g.readlines())
         self.cleanUp()
 
 if __name__ == "__main__":

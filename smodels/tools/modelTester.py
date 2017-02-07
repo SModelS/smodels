@@ -21,7 +21,10 @@ from smodels.tools.printer import MPrinter
 import os
 import sys
 import time
-from ConfigParser import SafeConfigParser
+try:
+    from ConfigParser import SafeConfigParser
+except ImportError as e:
+    from configparser import ConfigParser
 from smodels.tools.physicsUnits import GeV, fb
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.experiment.databaseObj import Database, ExpResultList
@@ -150,7 +153,7 @@ def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
         with timeOut.Timeout(timeout):
             return testPoint(inputFile, outputDir, parser, databaseVersion,
                              listOfExpRes)
-    except Exception,e:
+    except Exception as e:
         crashReportFacility = crashReport.CrashReport()
          
         if development:
@@ -329,7 +332,10 @@ def getParameters(parameterFile):
     :returns: ConfigParser read from parameterFile
         
     """
-    parser = SafeConfigParser()
+    try:
+        parser = ConfigParser( inline_comment_prefixes=( ';', ) )
+    except Exception as e:
+        parser = SafeConfigParser()
     ret=parser.read(parameterFile)
     if ret == []:
         logger.error ( "No such file or directory: '%s'" % parameterFile )

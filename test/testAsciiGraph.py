@@ -40,6 +40,7 @@ class AsciiTest(unittest.TestCase):
         #for (idx,line) in enumerate(d1):
         #        print "%d >>%s<< >>%s<<" % (idx,line, d2[idx] )
         #print d1==d2
+        reader.close()
         self.assertEqual(d1,d2)
 
 

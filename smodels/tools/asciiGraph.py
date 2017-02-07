@@ -70,7 +70,7 @@ def _drawBranch(branch, upwards, labels, htmlFormat, border, l):
     if not upwards:
         order = [1, 0]
     html = "<br>"
-    lengthdiff = l - len(lines[0]) / 5
+    lengthdiff = int ( l - len(lines[0]) / 5 )
     if border:
         if l == 2:
             lines[0] += " "
