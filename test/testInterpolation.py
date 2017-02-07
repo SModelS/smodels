@@ -44,10 +44,10 @@ class InterpolationTest(unittest.TestCase):
         txname=expRes[0].datasets[0].txnameList[0] # T2bb
         result=txname.txnameData.getValueFor(
                 [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ])
-        self.assertAlmostEquals( result.asNumber(pb),0.162457 )
+        self.assertAlmostEqual( result.asNumber(pb),0.162457 )
         result=txname.txnameData.getValueFor(
                 [[ 300.*GeV,125.*GeV], [ 300.*GeV,125.*GeV] ])
-        self.assertAlmostEquals( result.asNumber(pb),0.237745 )
+        self.assertAlmostEqual( result.asNumber(pb),0.237745 )
     def test6D(self):
         # print database
         expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2013-05"], 
@@ -56,13 +56,13 @@ class InterpolationTest(unittest.TestCase):
         txname=expRes[0].datasets[0].txnameList[0] # T6bbWW
         result=txname.txnameData.getValueFor(
                 [[ 300.*GeV,105.*GeV,100.*GeV], [ 300.*GeV,105.*GeV,100.*GeV] ])
-        self.assertAlmostEquals( result.asNumber(pb),0.176266 )
+        self.assertAlmostEqual( result.asNumber(pb),0.176266 )
         result=txname.txnameData.getValueFor(
                 [[ 300.*GeV,270.*GeV,200.*GeV], [ 300.*GeV,270.*GeV,200.*GeV] ])
-        self.assertAlmostEquals( result.asNumber(pb), 87.0403 )
+        self.assertAlmostEqual( result.asNumber(pb), 87.0403 )
         result=txname.txnameData.getValueFor(
                 [[ 300.*GeV,270.*GeV,200.*GeV], [ 300.*GeV,271.*GeV,200.*GeV] ])
-        self.assertAlmostEquals( result.asNumber(pb), 88.6505675 )
+        self.assertAlmostEqual( result.asNumber(pb), 88.6505675 )
     def testOutsidePlane(self):
         expRes = database.getExpResults( analysisIDs=["ATLAS-SUSY-2013-05"], 
                                          txnames=["T2bb" ] )
@@ -70,10 +70,10 @@ class InterpolationTest(unittest.TestCase):
         txname=expRes[0].datasets[0].txnameList[0] # T6bbWW
         result=txname.txnameData.getValueFor(
                 [[ 300.*GeV,127.*GeV], [ 300.*GeV,127.5*GeV] ])
-        self.assertAlmostEquals( result.asNumber(pb),0.24452092 )
+        self.assertAlmostEqual( result.asNumber(pb),0.24452092 )
         result=txname.txnameData.getValueFor(
                 [[ 600.*GeV,120.*GeV], [ 600.*GeV,130.*GeV] ])
-        self.assertAlmostEquals( result.asNumber(pb),0.0197154 )
+        self.assertAlmostEqual( result.asNumber(pb),0.0197154 )
         result=txname.txnameData.getValueFor(
                 [[ 300.*GeV,120.*GeV], [ 300.*GeV,130.*GeV] ])
         self.assertTrue ( result == None )
@@ -94,7 +94,7 @@ class InterpolationTest(unittest.TestCase):
         txnameData=TxNameData ( data, "upperLimits",
                 sys._getframe().f_code.co_name )
         result=txnameData.getValueFor([[ 300.*GeV,125.*GeV], [ 300.*GeV,125.*GeV] ])
-        self.assertAlmostEquals( result.asNumber(pb),0.0115 ) 
+        self.assertAlmostEqual( result.asNumber(pb),0.0115 ) 
 
     def testEfficiencyMaps(self):
         data = [ [ [[ 150.*GeV, 50.*GeV], [ 150.*GeV, 50.*GeV] ],  .03 ], 
@@ -112,7 +112,7 @@ class InterpolationTest(unittest.TestCase):
         txnameData=TxNameData ( data, "efficiencyMap" ,
                 sys._getframe().f_code.co_name )
         result=txnameData.getValueFor([[ 300.*GeV,125.*GeV], [ 300.*GeV,125.*GeV] ])
-        self.assertAlmostEquals( result,0.115 ) 
+        self.assertAlmostEqual( result,0.115 ) 
         
     def testOutsideConvexHull( self ):
         data = [ [ [[ 150.*GeV, 50.*GeV], [ 150.*GeV, 50.*GeV] ],  .03 ], 
@@ -130,7 +130,7 @@ class InterpolationTest(unittest.TestCase):
         txnameData=TxNameData ( data, "efficiencyMap",
                 sys._getframe().f_code.co_name )
         result=txnameData.getValueFor([[ 300.*GeV,125.*GeV], [ 300.*GeV,123.*GeV] ])
-        self.assertAlmostEquals( result,0.1144 ) 
+        self.assertAlmostEqual( result,0.1144 ) 
 
     def testOutsideConvexHull2( self ):
         data = [ [ [[ 150.*GeV, 50.*GeV], [ 150.*GeV, 50.*GeV] ],  .03 ], 
@@ -148,7 +148,7 @@ class InterpolationTest(unittest.TestCase):
         txnameData=TxNameData ( data, "efficiencyMap",
                 sys._getframe().f_code.co_name )
         result=txnameData.getValueFor([[ 300.*GeV,125.*GeV], [ 300.*GeV,100.*GeV] ])
-        self.assertEquals ( result, None )
+        self.assertEqual ( result, None )
        
 
 if __name__ == "__main__":
