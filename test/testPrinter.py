@@ -23,7 +23,7 @@ from xml.etree import ElementTree
 from databaseLoader import database
 import unum
 
-def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
+def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None ):
     """
     Compare two objects.
     The numerical values are compared up to the precision defined by allowedDiff.
@@ -57,8 +57,8 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
             if not key in obj2:
                 logger.warning("Key %s missing" %key)
                 return False
-            if not equalObjs(obj1[key],obj2[key],allowedDiff,ignore=ignore ):
-                logger.warning('Objects differ:\n   %s\n and\n   %s' %(str(obj1[key]),str(obj2[key])))
+            if not equalObjs(obj1[key],obj2[key],allowedDiff,ignore=ignore, where=key ):
+                logger.warning('Objects differ in %s:\n   %s\n and\n   %s' %(where, str(obj1[key]),str(obj2[key])))
                 return False
     elif isinstance(obj1,list):
         if len(obj1) != len(obj2):
@@ -66,8 +66,8 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
                             %(str(obj1),len(obj1),str(obj2),len(obj2)))
             return False
         for ival,val in enumerate(obj1):
-            if not equalObjs(val,obj2[ival],allowedDiff):
-                logger.warning('Objects differ:\n   %s \n and\n   %s' %(str(val),str(obj2[ival])))
+            if not equalObjs(val,obj2[ival],allowedDiff, where = where ):
+                logger.warning('Objects differ:\n   %s \n and\n   %s' %( str(val),str(obj2[ival])))
                 return False
     else:
         return obj1 == obj2
@@ -181,7 +181,7 @@ class RunPrinterTest(unittest.TestCase):
         output = summaryReader.Summary(outputfile,allowedDiff=0.05)
         sample = summaryReader.Summary(samplefile,allowedDiff=0.05)
         try:
-            self.assertEquals(sample, output)
+            self.assertEqual(sample, output)
         except AssertionError as e:
             msg = "%s != %s" %(sample, output) 
             raise AssertionError(msg)
@@ -205,9 +205,10 @@ class RunPrinterTest(unittest.TestCase):
         from output import smodelsOutput
         ignoreFields = ['input file','smodels version', 'ncpus']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
-                                                 key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
-                                                   res['AnalysisID'],res['DataSetID']])
-        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.05,ignore=ignoreFields)
+                      key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
+                                       res['AnalysisID'],res['DataSetID']])
+        equals = equalObjs( smodelsOutput,smodelsOutputDefault,allowedDiff=0.05,
+                            ignore=ignoreFields, where = "top" )
         self.assertTrue(equals)
         try:
             os.remove('./output.py')

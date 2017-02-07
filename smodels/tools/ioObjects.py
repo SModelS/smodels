@@ -425,10 +425,10 @@ class SlhaStatus(object):
         """
         if not checkXsec:
             return 0, "Did not check for missing XSECTION table"
-        f = open(self.filename)
-        for line in f:
-            if "XSECTION" in line:
-                return 1, "XSECTION table present"
+        with open(self.filename) as f:
+            for line in f:
+                if "XSECTION" in line:
+                    return 1, "XSECTION table present"
 
         msg = "XSECTION table is missing. Please include the cross section information and try again.\n"
         msg += "\n\t For MSSM models, it is possible to compute the MSSM cross sections"
