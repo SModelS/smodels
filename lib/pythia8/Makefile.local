@@ -1,8 +1,8 @@
 CXX      := g++
 LHALIB   := lhapdfdummy 
 PYTHIA8HOME := $(HOME)/git/pythia8/
-CXXFLAGS := -O2 -I$(PYTHIA8HOME)/include
-LDFLAGS  := -L$(PYTHIA8HOME)/lib/archive
+CXXFLAGS := -O2 -I$(PYTHIA8HOME)/include -I$(PYTHIA8HOME)/include/Pythia8/
+LDFLAGS  := -L$(PYTHIA8HOME)/lib/archive -L$(PYTHIA8HOME)/lib
 XMLDOC   := $(PYTHIA8HOME)/xmldoc # ../xmldoc
 SRC := pythia8.cc
 
