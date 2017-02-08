@@ -36,13 +36,15 @@ class Database(object):
         
     """
     
-    def __init__(self, base=None, force_load = None, verbosity=None ):
+    def __init__(self, base=None, force_load = None, verbosity=None,
+                 pclfilename = "database.pcl" ):
         """
         :param force_load: force loading the text database ("txt"),
             or binary database ("pcl"), dont force anything if None
+        :param pclfilename: filename of the binary (pickled) database file
         """
         self.force_load = force_load
-        self.pclfilename = "database.pcl"
+        self.pclfilename = pclfilename
         self.hasFastLim = False # True if any ExpResult is from fastlim
         self._validateBase(base)
         self._verbosity = verbosity 
