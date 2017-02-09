@@ -1,4 +1,5 @@
-## Makefile for use with pythia8 tarball (compile pythia8 with --enable-shared)
+## Makefile for use with pythia8 tarball compile pythia8 with:
+## configure --enable-shared --with-lhapdf5 
 
 CXX      := g++
 LHALIB   := LHAPDF
