@@ -1,5 +1,7 @@
 ## Makefile for use with pythia8 tarball compile pythia8 with:
 ## configure --enable-shared
+## on a mac, for now please use the DYLD_LIBRARY_PATH variable  
+## for pythia8.exe to find the shared object.
 
 CXX      := g++
 LHALIB   := # -lLHAPDF
