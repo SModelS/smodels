@@ -703,9 +703,10 @@ class PyPrinter(BasicPrinter):
         elDic["Masses (GeV)"] = [[m.asNumber(GeV) for m in br] for br in obj.getMasses()]
         elDic["PIDs"] = obj.getPIDs()
         elDic["Weights (fb)"] = {}
-        sqrts = [info.sqrts for info in obj.weight.getInfo()]
+        sqrts = [info.sqrts.asNumber(TeV) for info in obj.weight.getInfo()]
         allsqrts = sorted(list(set(sqrts)))
-        for sqrts in allsqrts:
+        for ssqrts in allsqrts:
+            sqrts = ssqrts * TeV
             xsecs = [xsec.value.asNumber(fb) for xsec in obj.weight.getXsecsFor(sqrts)]
             if len(xsecs) != 1:
                 logger.warning("Element cross sections contain multiple values for %s .\
