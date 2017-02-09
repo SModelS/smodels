@@ -21,10 +21,10 @@ clean:
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< -lpythia8 $(LHALIB)
 
 run:
-	pythia8.exe -f test.slha -n 10 -c ./pythia8.cfg -x $(XMLDOC)
+	./pythia8.exe -f test.slha -n 10 -c ./pythia8.cfg -x $(XMLDOC)
 
 help:
-	pythia8.exe -h
+	./pythia8.exe -h
 
 copy_slha:
 	cp ../../inputFiles/slha/simplyGluino.slha test.slha
