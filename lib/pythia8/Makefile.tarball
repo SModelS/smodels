@@ -1,0 +1,40 @@
+## Makefile for use with pythia8 tarball (compile pythia8 with --enable-shared)
+
+CXX      := g++
+LHALIB   := LHAPDF
+PYTHIA8HOME := $(HOME)/Downloads/pythia8223/
+CXXFLAGS := -O2 -I$(PYTHIA8HOME)/include -I$(PYTHIA8HOME)/include/Pythia8/
+LDFLAGS  := -L$(PYTHIA8HOME)/lib/archive -L$(PYTHIA8HOME)/lib -Wl,-rpath,$(PYTHIA8HOME)/lib -ldl
+XMLDOC   := $(PYTHIA8HOME)/share/Pythia8/xmldoc
+SRC := pythia8.cc
+
+EXES := $(SRC:.cc=.exe)
+
+all: $(EXES)
+
+clean:
+	rm -rf $(EXES) test.slha
+
+%.exe: %.cc
+	echo $(XMLDOC) > xml.doc
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< -lpythia8 -l$(LHALIB)
+
+run:
+	pythia8.exe -f test.slha -n 10 -c ./pythia8.cfg -x $(XMLDOC)
+
+help:
+	pythia8.exe -h
+
+copy_slha:
+	cp ../../inputFiles/slha/simplyGluino.slha test.slha
+
+particles:
+	./parseXml.py
+
+upload_particles: particles
+	cp pythia8particles.py ../../smodels/tools/
+	
+
+test: all copy_slha run
+
+.PHONY:
