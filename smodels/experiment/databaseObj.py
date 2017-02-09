@@ -209,13 +209,14 @@ class Database(object):
                     t1=time.time()-t0
                     logger.info ( "Loaded database from %s in %.1f secs." % \
                             ( self.binfile(), t1 ) )
-        except EOFError as e:
+        except (EOFError,ValueError) as e:
             os.unlink ( self.binfile() )
             if lastm_only:
                 self.pcl_format_version = -1
                 self.pcl_mtime = 0
                 return self
-            logger.error ( "%s is not a binary database file! recreate it!" % self.binfile )
+            logger.error ( "%s is not a binary database file, recreate it." % \
+                            self.binfile() )
             self.createBinaryFile()
         return self
 
@@ -312,7 +313,10 @@ class Database(object):
 
         if tmp[-4:]==".pcl":
             if not os.path.exists ( tmp ):
-                logger.error ( "File not found: %s" % tmp )
+                if self.force_load == "pcl":
+                    logger.error ( "File not found: %s" % tmp )
+                    sys.exit()
+                logger.info ( "File not found: %s. Will generate." % tmp )
                 self._base = os.path.dirname ( tmp )
                 self.pclfilename = os.path.basename ( tmp )
                 return
