@@ -12,8 +12,4 @@
 import sys
 sys.path.insert(0,"../")
 from smodels.experiment.databaseObj import Database
-database = Database ( "./database/", verbosity="warning", 
-                      pclfilename="database%d.pcl" % int ( sys.version[0] ) )
-#filename="./database/database.pcl"
-#database = Database ( filename, force_load="pcl", verbosity="warning" )
-# database = Database ( "./database/", verbosity="warning" )
+database = Database ( "./database/database%d.pcl" % int ( sys.version[0] ) )
