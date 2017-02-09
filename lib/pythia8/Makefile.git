@@ -2,7 +2,7 @@
 ## (git clone https://github.com/mortenpi/pythia8 )
 
 CXX      := g++
-LHALIB   := lhapdfdummy 
+LHALIB   := -llhapdfdummy 
 PYTHIA8HOME := $(HOME)/git/pythia8/
 CXXFLAGS := -O2 -I$(PYTHIA8HOME)/include -I$(PYTHIA8HOME)/include/Pythia8/
 LDFLAGS  := -L$(PYTHIA8HOME)/lib/archive -L$(PYTHIA8HOME)/lib 
@@ -18,7 +18,7 @@ clean:
 
 %.exe: %.cc
 	echo $(XMLDOC) > xml.doc
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< -lpythia8 -l$(LHALIB)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< -lpythia8 $(LHALIB)
 
 run:
 	pythia8.exe -f test.slha -n 10 -c ./pythia8.cfg -x $(XMLDOC)
