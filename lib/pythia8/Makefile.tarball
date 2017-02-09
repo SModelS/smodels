@@ -1,8 +1,8 @@
 ## Makefile for use with pythia8 tarball compile pythia8 with:
-## configure --enable-shared --with-lhapdf5 
+## configure --enable-shared
 
 CXX      := g++
-LHALIB   := LHAPDF
+LHALIB   := # -lLHAPDF
 PYTHIA8HOME := $(HOME)/Downloads/pythia8223/
 CXXFLAGS := -O2 -I$(PYTHIA8HOME)/include -I$(PYTHIA8HOME)/include/Pythia8/
 LDFLAGS  := -L$(PYTHIA8HOME)/lib/archive -L$(PYTHIA8HOME)/lib -Wl,-rpath,$(PYTHIA8HOME)/lib -ldl
@@ -18,7 +18,7 @@ clean:
 
 %.exe: %.cc
 	echo $(XMLDOC) > xml.doc
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< -lpythia8 -l$(LHALIB)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< -lpythia8 $(LHALIB)
 
 run:
 	pythia8.exe -f test.slha -n 10 -c ./pythia8.cfg -x $(XMLDOC)
