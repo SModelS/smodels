@@ -1,5 +1,5 @@
 CXX      := g++
-LHALIB   := lhapdfdummy # LHAPDF
+LHALIB   := -llhapdfdummy # LHAPDF
 CXXFLAGS := -O2 -I/usr/include/Pythia8
 LDFLAGS  := -L/usr/lib/
 SRC := pythia8.cc
@@ -12,7 +12,7 @@ clean:
 	rm -rf $(EXES) test.slha
 
 %.exe: %.cc
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< -lpythia8 -l$(LHALIB)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< -lpythia8 $(LHALIB)
 
 run:
 	pythia8.exe -f test.slha -n 10 -c ./pythia8.cfg
