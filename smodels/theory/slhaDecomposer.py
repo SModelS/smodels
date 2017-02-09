@@ -142,7 +142,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
                     smsTopList.addElement(el)
     smsTopList._setElementIds()
 
-    logger.debug("slhaDecomposer done in " + str(time.time() - t1) + " s.")
+    logger.debug("slhaDecomposer done in %.2f s." % (time.time() -t1 ) )
     return smsTopList
 
 
