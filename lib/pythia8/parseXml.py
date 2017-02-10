@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from __future__ import print_function
+import os
 
 substitutes = { "~u_L": "~u_1", "~u_R": "~u_2", "~c_L": "~u_3", "~c_R": "~u_4",
                 "~d_L": "~d_1", "~d_R": "~d_2", "~s_L": "~d_3", "~s_R": "~d_4",
@@ -9,6 +10,12 @@ substitutes = { "~u_L": "~u_1", "~u_R": "~u_2", "~c_L": "~u_3", "~c_R": "~u_4",
                 "~t_1": "~u_5", "~t_2": "~u_6", "~tau_L-": "~e_5", "~tau_R-": "~e_6",
                 "~tau_1-": "~e_5", "~tau_2-": "~e_6"
 }
+
+def isSlepton ( name ):
+    """ is a particle a slepton? """
+    if "~e" in name or "~mu" in name or "~tau" in name:
+        return True
+    return False
 
 def split_line ( line ):
     """ split line after spaces, but not with a () bracket """
@@ -31,7 +38,11 @@ def split_line ( line ):
     return tokens
 
 def create():
-    f=open("/usr/share/pythia8-data/xmldoc/ParticleData.xml")
+    xmldoc_dir = "/usr/share/pythia8-data/xmldoc"
+    if os.path.exists ( "xml.doc" ):
+        with open ( "xml.doc" ) as f:
+            xmldoc_dir = f.read().strip()
+    f=open("%s/ParticleData.xml" % xmldoc_dir )
     g=open("pythia8particles.py","w")
     g.write ( "# created via smodels/lib/parseXml.py,")
     g.write ( " parsing pythia8's ParticleData.xml.\n" )
@@ -47,18 +58,23 @@ def create():
             deletes = [ '<particle id="', '"', '=', 'name', 'antiName' ]
             for d in deletes:
                 line = line.replace ( d, "" )
-            print ( "line=%s" % line )
+            #print ( "line=%s" % line )
             tokens = split_line ( line )
-            print ( "tokens=%s" % tokens )
             if tokens[1] == "void":
                 continue
             pids[ tokens[1] ] = int( tokens[0] )
             if tokens[1] in substitutes.keys():
                 pids[ substitutes [ tokens[1] ] ] = pids [ tokens[1] ]
+                if isSlepton ( tokens[1] ):
+                    pids[ substitutes [ tokens[1] ]+"-" ] = pids [ tokens[1] ]
             if len(tokens)>2:
                 pids[ tokens[2] ] = - int ( tokens[0] )
                 if tokens[1] in substitutes.keys():
                     pids[ substitutes [ tokens[1] ]+"bar" ] = pids [ tokens[2] ]
+                    if isSlepton ( tokens[1] ):
+                        pids[ substitutes [ tokens[1] ]+"+" ] = pids [ tokens[1] ]
+            #if "e_" in tokens[1]:
+            #    print ( "tokens=%s, %s" % ( tokens, substitutes [tokens[1]] ) )
 
     for key, value in pids.items():
         g.write ( '  "%s":%d,\n' % ( key, value ) )
