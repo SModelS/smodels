@@ -429,7 +429,8 @@ class Database(object):
 
 
     def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
-                    dataTypes = ['all'], useSuperseded=False, useNonValidated=False):
+                    dataTypes = ['all'], useSuperseded=False, useNonValidated=False,
+                    onlyWithExpected = False ):
         """
         Returns a list of ExpResult objects.
         
@@ -449,6 +450,8 @@ class Database(object):
         :param useSuperseded: If False, the supersededBy results will not be included
         :param useNonValidated: If False, the results with validated = False 
                                 will not be included
+        :param onlyWithExpected: Return only those results that have expected values also.
+                              Note that this is trivially fulfilled for all efficiency maps.
         :returns: list of ExpResult objects or the ExpResult object if the list
                   contains only one result
                    
@@ -485,6 +488,9 @@ class Database(object):
                     if txnames != ['all']:
                         if not txname.txName in txnames:
                             continue
+                    if onlyWithExpected and dataset.dataInfo.dataType == "upperLimit" and \
+                                not txname.txnameDataExp:
+                        continue
                     newDataSet.txnameList.append(txname)
                 # Skip data set not containing any of the required txnames:
                 if not newDataSet.txnameList:
