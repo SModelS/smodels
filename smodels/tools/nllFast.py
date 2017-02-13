@@ -126,7 +126,7 @@ def getKfactorsFor(pIDs, sqrts, slhafile, pdf='cteq'):
         return (None, None)
 
     # Obtain k-factors from the NLLfast decoupled grid
-    kfacs = getDecoupledKfactors(nllpath,process,energy,pdf,min(gluinomass,squarkmass))
+    kfacs = tool.getDecoupledKfactors(process,energy,pdf,min(gluinomass,squarkmass))
     # Decoupling limit is satisfied, do not interpolate
     if not kfacs:
         logger.warning("Error obtaining k-factors from the NLLfast decoupled grid for " + process)
@@ -144,7 +144,7 @@ def getKfactorsFor(pIDs, sqrts, slhafile, pdf='cteq'):
             nll_output = tool.runForDecoupled ( energy, nllinput )
             #nll_run = "./nllfast_" + energy + " %s %s %s %s" % nllinput
             #nll_output = tool.run(nll_run )
-            kfacs = getKfactorsFrom(nll_output)        
+            kfacs = tool.getKfactorsFrom(nll_output)        
         kFacsVector.append([dcpl_mass, kfacs]) #Second point for interpolation (non-decoupled grid)
 
     if len(kFacsVector) < 2:
@@ -157,31 +157,11 @@ def getKfactorsFor(pIDs, sqrts, slhafile, pdf='cteq'):
                         max(squarkmass, gluinomass))
     return kFacs
 
-
-def getDecoupledKfactors(nllpath,process,energy,pdf,mass):
-    """
-    Compute k-factors in the decoupled (squark or gluino) regime for the process.
-    If a decoupled grid does not exist for the process, return None
-    """
-        
-    if process != 'sb' and process != 'gg': return None
-    elif process == 'sb': process_dcpl = 'sdcpl'
-    elif process == 'gg': process_dcpl = 'gdcpl'    
-    nll_run = "./nllfast_" + energy + " %s %s %s" % \
-                      (process_dcpl, pdf, mass)
-    e = energy.replace ( "TeV", "" ).replace ( "*", "" )
-    tool = toolBox.ToolBox().get ( "nllfast%d" % int ( e ) )
-    nll_output = tool.run(nll_run )
-    if "K_NLO" in nll_output:
-        return tool.getKfactorsFrom(nll_output)
-    else: return None
-
-
-
 if __name__ == "__main__":
     """
     Calculate k factors for a pid pair.
     """
     slhaF = installation.installDirectory() + "inputFiles/slha/T1.slha"
+    # tool = toolBox.ToolBox().get ( "nllfast13" )
     kNLO, kNLL = getKfactorsFor((1000021, 1000021), 13.*TeV, slhaF)
     print("nlo, nll = " + str(kNLO) + ", " + str(kNLL))
