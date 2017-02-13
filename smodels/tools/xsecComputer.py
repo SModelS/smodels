@@ -14,7 +14,6 @@ from smodels import installation
 from smodels.tools import toolBox, runtime
 from smodels.tools.physicsUnits import pb, TeV, GeV
 from smodels.theory import crossSection
-from smodels.tools import nllFast
 from smodels.tools.smodelsLogging import logger, setLogLevel
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import os
@@ -103,9 +102,10 @@ def computeXSec(sqrts, maxOrder, nevts, slhafile, lhefile=None, unlink=True, loF
 
     if maxOrder > 0:
         pIDs = loXsecs.getPIDpairs()
+        nllfast = toolBox.ToolBox().get("nllfast%d" % sqrts.asNumber(TeV) )
         for pID in pIDs:
             k = 0.
-            kNLO, kNLL = nllFast.getKfactorsFor(pID, sqrts, slhafile)
+            kNLO, kNLL = nllfast.getKfactorsFor(pID, slhafile )
             if maxOrder == 1 and kNLO:
                 k = kNLO
             elif maxOrder == 2 and kNLL and kNLO:
