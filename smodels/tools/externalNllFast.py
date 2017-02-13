@@ -235,6 +235,23 @@ class ExternalNllFast(ExternalTool):
             process = 'st'
         return process
 
+    def getDecoupledKfactors( self, process, energy, pdf, mass ):
+        """
+        Compute k-factors in the decoupled (squark or gluino) regime for the process.
+        If a decoupled grid does not exist for the process, return None
+        """
+            
+        if process != 'sb' and process != 'gg': return None
+        elif process == 'sb': process_dcpl = 'sdcpl'
+        elif process == 'gg': process_dcpl = 'gdcpl'    
+        nll_run = "./nllfast_" + energy + " %s %s %s" % \
+                          (process_dcpl, pdf, mass)
+        e = energy.replace ( "TeV", "" ).replace ( "*", "" )
+        # tool = toolBox.ToolBox().get ( "nllfast%d" % int ( e ) )
+        nll_output = self.run(nll_run )
+        if "K_NLO" in nll_output:
+            return self.getKfactorsFrom(nll_output)
+        else: return None
 
     def oldrun(self, process, pdf, squarkmass, gluinomass):
         """
