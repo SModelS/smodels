@@ -9,6 +9,7 @@
 """
 from __future__ import print_function
 import operator
+import pyslha
 
 squarks = [1000001,
            2000001,
@@ -300,6 +301,122 @@ class ExternalNllFast(ExternalTool):
         self.unlink("gg")
         return True
 
+    def getKfactorsFor( self, pIDs, slhafile, pdf='cteq' ):
+        """
+        Read the NLLfast grid and returns a pair of k-factors (NLO and NLL) for 
+        the PIDs pair.
+
+        :returns: k-factors = None, if NLLfast does not contain the process; uses
+                  the slhafile to obtain the SUSY spectrum.
+        
+        """
+        if not os.path.isfile(slhafile):
+            logger.error("SLHA file %s not found", slhafile)
+            return False
+
+        # box = toolBox.ToolBox()
+        # Set up NLLfast run, the old way
+        # sqrtS = float(sqrts/TeV)
+        energy = str(int(self.sqrts)) + 'TeV'
+        # toolname = "nllfast%d" % int(sqrtS)
+        # tool = box.get(toolname)
+        # Get process name (in NLLfast notation)
+        process = self.getProcessName(pIDs)
+        if not process:
+            # Return k-factors = None, if NLLfast does not have the process
+            return (None, None)
+
+        # Obtain relevant masses
+        readfile = pyslha.readSLHAFile(slhafile)
+        masses=readfile.blocks['MASS']
+        check_pids=squarks+gluinos+third
+        for check in check_pids:
+            if not check in masses.entries:
+                logger.error ( "cannot compute k factor for pdgid %d: " \
+                  " no particle mass given. will set mass to inf." % check )
+                masses.entries[check]=1.e10
+
+        gluinomass = abs(masses.entries[1000021])
+        squarkmass = sum([abs(masses.entries[pid])
+                          for pid in squarks]) / 8.
+        pid1, pid2 = sorted(pIDs)
+        if pid1 in antisquarks and pid2 in squarks:
+            squarkmass = (abs(masses.entries[abs(pid1)]) +
+                          abs(masses.entries[pid2])) / 2.
+        elif pid1 in squarks and pid2 in squarks:
+            squarkmass = (abs(masses.entries[pid1]) + abs(masses.entries[pid2])) / 2.
+        elif abs(pid1) == pid2 and pid2 in third:
+            squarkmass = abs(masses.entries[abs(pid1)])
+
+        #if tool == None:
+        #    logger.warning("No NLLfast data for sqrts = " + str(sqrts))
+        #    return (None, None)
+        nllpath = self.installDirectory()
+        self.pathOfExecutable()
+        self.checkInstallation()
+        nll_output = self.compute ( energy, pIDs, pdf, squarkmass, gluinomass )
+
+        # If run was successful, return k-factors:
+        if "K_NLO" in nll_output:
+            # NLLfast ran ok, try to get the k-factors
+            kFacs = self.getKfactorsFrom(nll_output)
+            if not kFacs or min(kFacs) <= 0.:
+                logger.warning("Error obtaining k-factors")
+                return (None, None)
+            else:
+                return kFacs
+        # If run was not successful, check for decoupling error messages:
+        elif not "too low/high" in nll_output.lower():
+            logger.warning("Error running NLLfast")
+            return (None, None)
+
+        # Check for decoupling cases with a decoupling grid (only for sb and gg)
+        doDecoupling = False
+        if "too low/high gluino" in nll_output.lower():        
+            if gluinomass > 500. and process == 'sb': 
+                doDecoupling = True
+                dcpl_mass = gluinomass
+        elif "too low/high squark" in nll_output.lower():
+            if squarkmass > 500. and process == 'gg':
+                doDecoupling = True
+                dcpl_mass = squarkmass
+
+        # If process do not have decoupled grids, return None:
+        if not doDecoupling:
+            logger.warning("Masses out of NLLfast grid for " + process)
+            return (None, None)
+
+        # Obtain k-factors from the NLLfast decoupled grid
+        kfacs = self.getDecoupledKfactors(process,energy,pdf,min(gluinomass,squarkmass))
+        # Decoupling limit is satisfied, do not interpolate
+        if not kfacs:
+            logger.warning("Error obtaining k-factors from the NLLfast decoupled grid for " + process)
+            return (None, None)
+        elif dcpl_mass/min(gluinomass,squarkmass) > 10.:    
+            return kfacs
+        # Interpolate between the non-decoupled and decoupled grids
+        else:
+            kFacsVector = [[10.*min(gluinomass,squarkmass),kfacs]]  #First point for interpolation (decoupled grid)
+            kfacs = None        
+            while not kfacs and dcpl_mass > 500.:
+                dcpl_mass -= 100.  # Reduce decoupled mass, until NLLfast produces results
+                if process == 'sb': nllinput = (process, pdf, squarkmass, dcpl_mass)
+                else:  nllinput = (process, pdf, dcpl_mass, gluinomass)
+                nll_output = self.runForDecoupled ( energy, nllinput )
+                #nll_run = "./nllfast_" + energy + " %s %s %s %s" % nllinput
+                #nll_output = tool.run(nll_run )
+                kfacs = self.getKfactorsFrom(nll_output)        
+            kFacsVector.append([dcpl_mass, kfacs]) #Second point for interpolation (non-decoupled grid)
+
+        if len(kFacsVector) < 2:
+            logger.warning("Not enough points for interpolation in the decoupling "
+                           "limit")
+            return (None, None)
+        else:
+            # Interpolate k-factors
+            kFacs = self.interpolateKfactors(kFacsVector,
+                            max(squarkmass, gluinomass))
+        return kFacs
 
 class ExternalNllFast7(ExternalNllFast):
     """
