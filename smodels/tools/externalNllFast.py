@@ -107,8 +107,17 @@ class ExternalNllFast(ExternalTool):
         out = out.split("\n")
         return out
 
+    def run ( self, this ):
+        """
+        Run. Code taken from nllFast.runNLLfast
+        """
+        current_dir = os.getcwd()
+        os.chdir ( self.cdPath )
+        nll_output = executor.getoutput( this )
+        os.chdir(current_dir)
+        return nll_output
 
-    def run(self, process, pdf, squarkmass, gluinomass):
+    def oldrun(self, process, pdf, squarkmass, gluinomass):
         """
         Execute nllfast.
         

@@ -101,7 +101,8 @@ def getKfactorsFor(pIDs, sqrts, slhafile, pdf='cteq'):
                   (process, pdf, squarkmass, gluinomass)
 
     # Run NLLfast
-    nll_output = runNLLfast(nll_run, nllpath)
+    nll_output = tool.run( nll_run )
+    # nll_output = runNLLfast(nll_run, nllpath)
 
     # If run was successful, return k-factors:
     if "K_NLO" in nll_output:
@@ -150,7 +151,7 @@ def getKfactorsFor(pIDs, sqrts, slhafile, pdf='cteq'):
             if process == 'sb': nllinput = (process, pdf, squarkmass, dcpl_mass)
             else:  nllinput = (process, pdf, dcpl_mass, gluinomass)
             nll_run = "./nllfast_" + energy + " %s %s %s %s" % nllinput
-            nll_output = runNLLfast(nll_run, nllpath)
+            nll_output = tool.run(nll_run )
             kfacs = getKfactorsFrom(nll_output)        
         kFacsVector.append([dcpl_mass, kfacs]) #Second point for interpolation (non-decoupled grid)
 
@@ -282,7 +283,9 @@ def getDecoupledKfactors(nllpath,process,energy,pdf,mass):
     elif process == 'gg': process_dcpl = 'gdcpl'    
     nll_run = "./nllfast_" + energy + " %s %s %s" % \
                       (process_dcpl, pdf, mass)
-    nll_output = runNLLfast(nll_run, nllpath)
+    e = energy.replace ( "TeV", "" ).replace ( "*", "" )
+    tool = toolBox.ToolBox().get ( "nllfast%d" % int ( e ) )
+    nll_output = tool.run(nll_run )
     if "K_NLO" in nll_output:
         return getKfactorsFrom(nll_output)
     else: return None
