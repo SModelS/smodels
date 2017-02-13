@@ -27,6 +27,10 @@ class NllFastTest(unittest.TestCase):
         o = nllFast.getKfactorsFor ( (1000001, 1000001 ), 13*TeV, "../inputFiles/slha/gluino_squarks.slha" )
         self.assertAlmostEqual ( o[0], 1.24 )
         self.assertAlmostEqual ( o[1], 1.01 )
+    def testWeakino8 (self):
+        o = nllFast.getKfactorsFor ( (1000022, 1000022 ), 13*TeV, "../inputFiles/slha/complicated.slha" )
+        self.assertEqual ( o[0], None )
+        self.assertEqual ( o[1], None )
 
 if __name__ == "__main__":
     unittest.main()
