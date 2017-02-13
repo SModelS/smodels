@@ -53,8 +53,14 @@ def getKfactorsFor(pIDs, sqrts, slhafile, pdf='cteq'):
         logger.error("SLHA file %s not found", slhafile)
         return False
 
+    box = toolBox.ToolBox()
+    # Set up NLLfast run, the old way
+    sqrtS = float(sqrts/TeV)
+    energy = str(int(sqrtS)) + 'TeV'
+    toolname = "nllfast%d" % int(sqrtS)
+    tool = box.get(toolname)
     # Get process name (in NLLfast notation)
-    process = getProcessName(pIDs)
+    process = tool.getProcessName(pIDs)
     if not process:
         # Return k-factors = None, if NLLfast does not have the process
         return (None, None)
@@ -81,33 +87,18 @@ def getKfactorsFor(pIDs, sqrts, slhafile, pdf='cteq'):
     elif abs(pid1) == pid2 and pid2 in third:
         squarkmass = abs(masses.entries[abs(pid1)])
 
-    # Set up NLLfast run, the old way
-    sqrtS = float(sqrts/TeV)
-    energy = str(int(sqrtS)) + 'TeV'
-    toolname = "nllfast%d" % int(sqrtS)
-    box = toolBox.ToolBox()
-    tool = box.get(toolname)
     if tool == None:
         logger.warning("No NLLfast data for sqrts = " + str(sqrts))
         return (None, None)
     nllpath = tool.installDirectory()
     tool.pathOfExecutable()
     tool.checkInstallation()
-    if process == "st":
-        nll_run = "./nllfast_" + energy + " %s %s %s" % \
-                  (process, pdf, squarkmass)
-    else:
-        nll_run = "./nllfast_" + energy + " %s %s %s %s" % \
-                  (process, pdf, squarkmass, gluinomass)
-
-    # Run NLLfast
-    nll_output = tool.run( nll_run )
-    # nll_output = runNLLfast(nll_run, nllpath)
+    nll_output = tool.compute ( energy, pIDs, pdf, squarkmass, gluinomass )
 
     # If run was successful, return k-factors:
     if "K_NLO" in nll_output:
         # NLLfast ran ok, try to get the k-factors
-        kFacs = getKfactorsFrom(nll_output)
+        kFacs = tool.getKfactorsFrom(nll_output)
         if not kFacs or min(kFacs) <= 0.:
             logger.warning("Error obtaining k-factors")
             return (None, None)
@@ -150,8 +141,9 @@ def getKfactorsFor(pIDs, sqrts, slhafile, pdf='cteq'):
             dcpl_mass -= 100.  # Reduce decoupled mass, until NLLfast produces results
             if process == 'sb': nllinput = (process, pdf, squarkmass, dcpl_mass)
             else:  nllinput = (process, pdf, dcpl_mass, gluinomass)
-            nll_run = "./nllfast_" + energy + " %s %s %s %s" % nllinput
-            nll_output = tool.run(nll_run )
+            nll_output = tool.runForDecoupled ( energy, nllinput )
+            #nll_run = "./nllfast_" + energy + " %s %s %s %s" % nllinput
+            #nll_output = tool.run(nll_run )
             kfacs = getKfactorsFrom(nll_output)        
         kFacsVector.append([dcpl_mass, kfacs]) #Second point for interpolation (non-decoupled grid)
 
@@ -161,116 +153,10 @@ def getKfactorsFor(pIDs, sqrts, slhafile, pdf='cteq'):
         return (None, None)
     else:
         # Interpolate k-factors
-        kFacs = interpolateKfactors(kFacsVector,
+        kFacs = tool.interpolateKfactors(kFacsVector,
                         max(squarkmass, gluinomass))
     return kFacs
 
-
-
-def getProcessName(pIDs):
-    """
-    Return the process name (in NLLfast notation) for the pair production of
-    pIDs.
-    
-    :returns: None, if the particle ID pair is not contained in NLLfast
-    
-    """
-    pid1, pid2 = sorted(pIDs)
-    process = None
-
-    # Obtain the type of process:
-    #  - gluino-gluino production = gg
-    #  - squark-antisquark = sb
-    #  - squark-squark = ss
-    #  - squark-gluino = sg
-    #  - antistop-stop
-    #  - antisbottom-sbottom = st
-    if pid1 in antisquarks and pid2 in squarks:
-        process = 'sb'
-    elif abs(pid1) in squarks and abs(pid2) in squarks:
-        process = 'ss'
-    elif pid1 == pid2 and pid1 in gluinos:
-        process = 'gg'
-    elif abs(pid1) in squarks and pid2 == 1000021 or \
-            abs(pid2) in squarks and pid1 == 1000021:
-        process = 'sg'
-    elif abs(pid1) == pid2 and pid2 in third:
-        process = 'st'
-
-    return process
-
-
-def runNLLfast(nll_run, nllpath):
-    """
-    Execute NLLfast with command nll_run at nllpath.
-    
-    :returns: NLLfast output as a string
-    
-    """
-    current_dir = os.getcwd()
-    os.chdir(nllpath)
-    nll_output = executor.getoutput(nll_run)
-    # nll_output = subprocess.check_output ( nll_run, shell=True, universal_newlines=True )
-    os.chdir(current_dir)
-    return nll_output
-
-
-def getKfactorsFrom(output):
-    """
-    Read NLLfast output and return the k-factors.
-    
-    """
-    if not output:
-        return False
-    else:
-        lines = output.split('\n')
-        il = 0
-        line = lines[il]
-        process = False
-        while not "K_NLO" in line and il < len(lines) - 2:
-            if "process" in line:
-                process = line[line.find("process:") + 8:].replace(" ", "")
-            il += 1
-            line = lines[il]
-        if not process:
-            return False
-        # Line with header
-        line = lines[il]
-        # Count number of mass entries
-        nmass = line.count('GeV')
-        # Line with values
-        line = lines[il + 2]
-        data = [eval(x) for x in line.split()]
-        if len(data) != nmass + 11:
-            return False
-        else:
-            kFacs = data[9 + nmass:]
-
-    return kFacs
-
-
-def interpolateKfactors(kFacsVector, xval):
-    """
-    Interpolate a list of k-factor  values from
-    kFacsVector = [[x0,[k1,k2,..]], [x1,[k1,k2,..],...].
-    
-    :returns: list of interpolated k-factor values at x-value xval
-    
-    """
-    kFacs = []
-
-    xpts = [x[0] for x in kFacsVector]
-    ypts = [x[1] for x in kFacsVector]
-    coeffs = numpy.matrix.transpose(numpy.polyfit(xpts, ypts, len(xpts) - 1))
-    for ik in range(len(ypts[0])):
-        kfac = 0.
-        for ip, coeff in enumerate(coeffs[ik]):
-            kfac += coeff * xval ** (len(xpts) - 1 - ip)
-        if kfac <= 0.:
-            kfac = 1.
-        kFacs.append(kfac)
-
-    return kFacs
 
 def getDecoupledKfactors(nllpath,process,energy,pdf,mass):
     """
@@ -287,7 +173,7 @@ def getDecoupledKfactors(nllpath,process,energy,pdf,mass):
     tool = toolBox.ToolBox().get ( "nllfast%d" % int ( e ) )
     nll_output = tool.run(nll_run )
     if "K_NLO" in nll_output:
-        return getKfactorsFrom(nll_output)
+        return tool.getKfactorsFrom(nll_output)
     else: return None
 
 
@@ -295,7 +181,6 @@ def getDecoupledKfactors(nllpath,process,energy,pdf,mass):
 if __name__ == "__main__":
     """
     Calculate k factors for a pid pair.
-    
     """
     slhaF = installation.installDirectory() + "inputFiles/slha/T1.slha"
     kNLO, kNLL = getKfactorsFor((1000021, 1000021), 13.*TeV, slhaF)
