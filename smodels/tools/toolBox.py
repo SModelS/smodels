@@ -144,6 +144,6 @@ def main ( args ):
     tmp = ToolBox()
     if args.make:
         tmp.compile()
-    if args.nocolors:
-        colors.on = False
+    if args.colors:
+        colors.on = True
     tmp.checkInstallation( printit=True, long = args.long )
