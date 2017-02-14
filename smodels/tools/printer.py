@@ -509,9 +509,9 @@ class TxTPrinter(BasicPrinter):
         for ix, uncovEntry in enumerate([obj.longCascade, obj.asymmetricBranches]):
             if ix==0: output += "Long cascade decay by produced mothers (up to " + str(nprint) + "):\n"
             else: output += "Asymmetric branch decay by produced mothers\n"
-            output += "Mother1 Mother2 Weight (fb)\n"
+            output += "Mother1 Mother2 Weight (fb) # allMothers\n"
             for ent in uncovEntry.getSorted(obj.sqrts)[:nprint]:
-                output += "%s %s %10.3E # %s\n" %(ent.motherPIDs[0], ent.motherPIDs[1], ent.getWeight(obj.sqrts).asNumber(fb), str(ent.motherPIDs))
+                output += "%s %s %10.3E # %s\n" %(ent.motherPIDs[0][0], ent.motherPIDs[0][1], ent.getWeight(obj.sqrts).asNumber(fb), str(ent.motherPIDs))
                 if hasattr(self, "addcoverageid") and self.addcoverageid:
                     contributing = []
                     for el in ent.contributingElements:
@@ -884,22 +884,22 @@ class PyPrinter(BasicPrinter):
         
         longCascades = []        
         obj.longCascade.classes = sorted(obj.longCascade.classes, 
-                                         key=lambda x: [x.getWeight(obj.sqrts),sorted(x.motherPIDs[0:2])], 
+                                         key=lambda x: [x.getWeight(obj.sqrts),x.motherPIDs], 
                                          reverse=True)        
         for cascadeEntry in obj.longCascade.classes[:nprint]:
             longc = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV),
                      'weight (fb)' : cascadeEntry.getWeight(obj.sqrts).asNumber(fb), 
-                     'mother PIDs' : sorted(cascadeEntry.motherPIDs[0:2])}        
+                     'mother PIDs' : cascadeEntry.motherPIDs}        
             longCascades.append(longc)
         
         asymmetricBranches = []
         obj.asymmetricBranches.classes = sorted(obj.asymmetricBranches.classes, 
-                                                key=lambda x: [x.getWeight(obj.sqrts),sorted(x.motherPIDs[0:2])],
+                                                key=lambda x: [x.getWeight(obj.sqrts),x.motherPIDs],
                                                 reverse=True)
         for asymmetricEntry in obj.asymmetricBranches.classes[:nprint]:
             asymmetric = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 
                     'weight (fb)' : asymmetricEntry.getWeight(obj.sqrts).asNumber(fb),
-                    'mother PIDs' : sorted(asymmetricEntry.motherPIDs[0:2])}         
+                    'mother PIDs' : asymmetricEntry.motherPIDs}         
             asymmetricBranches.append(asymmetric)
 
 
