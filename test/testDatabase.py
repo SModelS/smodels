@@ -2,7 +2,7 @@
 
 """
 .. module:: testDatabase
-   :synopsis: performs tests with database loading, pickle writing, ....
+   :synopsis: performs tests with database loading, pickle writing, filtering
     
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
     
@@ -31,6 +31,19 @@ class DatabaseTest(unittest.TestCase):
         reader = Database ( binfile )
         os.unlink ( binfile )
         self.assertEqual( writer, reader )
+
+    def testSelectors(self):
+        from databaseLoader import database 
+        validated = database.getExpResults ( useNonValidated = False )
+        nonval = database.getExpResults ( useNonValidated = True )
+        #print ( "validated=",len(validated),map ( str, validated ) )
+        #print ( "non val=",len(nonval) )
+        self.assertTrue ( len(validated)==7 )
+        self.assertTrue ( len(nonval)==8 )
+
+
+
+
 
 if __name__ == "__main__":
     unittest.main()
