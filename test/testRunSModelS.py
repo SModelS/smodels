@@ -153,7 +153,6 @@ class RunSModelSTest(unittest.TestCase):
                            ignore=ignoreFields)
         for i in [ './output13.py', './output13.pyc' ]:
             if os.path.exists ( i ):
-                continue
                 os.remove ( i )
         self.assertTrue(equals)        
   

@@ -95,6 +95,7 @@ class XSecTest(unittest.TestCase):
         xargs.alltofile = False
         xargs.pythia6 = True
         xargs.filename = tmpfile
+        xargs.colors = False
         xargs.verbosity = "info"
         #Compute LO cross sections
         xsecComputer.main(xargs)
