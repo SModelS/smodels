@@ -4,7 +4,7 @@ condition: None
 constraint: [[['jet','jet']],[['jet','jet']]]
 figureUrl: https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS13012/Fig_7b.pdf
 dataUrl: https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS13012/c_AccEffMap_T1qqqq.tar
-validated: None
+validated: True
 axes: 2*Eq(mother,x)_Eq(lsp,y)
 publishedData: False
 efficiencyMap: [[[[412.5*GeV, 37.5*GeV], [412.5*GeV, 37.5*GeV]], 0.000139291813789],
