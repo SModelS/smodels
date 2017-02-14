@@ -33,7 +33,11 @@ class ColoredLogger:
         msg = "%s%s%s" % ( colors.debug, msg, colors.reset )
         return self._logger.debug ( msg, *args, **kwargs )
 
-logger = ColoredLogger()
+FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in' \
+         ' %(lineno)s: %(message)s'
+logging.basicConfig(format=FORMAT)
+#logger = ColoredLogger()
+logger = logging.getLogger("smodels")
 
 def setLogLevel ( level ):
     """ set the log level of the central logger.
