@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: externalTool
+.. module:: wrapperBase
    :synopsis: Wrapper code for external tools: base class
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
@@ -13,12 +13,12 @@ import inspect
 from smodels import installation
 
 
-class ExternalTool(object):
+class WrapperBase(object):
     """
     An instance of this class represents the installation of an external tool.
     
     An external tool encapsulates a tool that is executed via
-    commands.getoutput. It defines how the tool is tested for proper
+    commands.getoutput. The wrapper defines how the tool is tested for proper
     installation and how the tool is executed.
     
     """
