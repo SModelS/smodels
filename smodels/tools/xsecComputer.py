@@ -380,6 +380,9 @@ def main(args):
     setLogLevel ( args.verbosity )
     if args.query:
         return canonizer.queryCrossSections ( args.filename )
+    if args.colors:
+        from smodels.tools.colors import colors
+        colors.on = True
     sqrtses = canonizer.getSqrtses ( args )
     order = canonizer.getOrder ( args )
     canonizer.checkAllowedSqrtses ( order, sqrtses )
