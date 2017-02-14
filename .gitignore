@@ -54,6 +54,9 @@ docs/manual/source/DatabaseBrowser.rst
 test/database/database*.pcl
 lib/pythia8/pythia82*
 lib/pythia8/xml.doc
+cpp/libSModelS.so
+cpp/run
+# test/database/database.pcl
 *~
 *.crash
 
