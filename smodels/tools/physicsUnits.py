@@ -35,6 +35,7 @@ cm = unum.Unum.unit('cm', 0.01 * m )
 
 fb = unum.Unum.unit('fb')
 pb = unum.Unum.unit('pb', 1000 * fb)
+mb = unum.Unum.unit('mb', 10**12 * fb )
 
 eV = unum.Unum.unit('eV')
 keV = unum.Unum.unit('keV', 10 ** 3 * eV)

@@ -13,6 +13,7 @@
 import argparse
 import types
 from smodels.tools import externalPythia6
+from smodels.tools import externalPythia8
 from smodels.tools import externalNllFast
 from smodels.tools import externalPythonTools
 from smodels.tools.smodelsLogging import logger
@@ -42,6 +43,7 @@ class ToolBox(object):
         
         """
         self.add(externalPythia6.ExternalPythia6())
+        self.add(externalPythia8.ExternalPythia8())
         for(sqrts, tool) in externalNllFast.nllFastTools.items():
                 self.add(tool)
         for(name, tool) in externalPythonTools.pythonTools.items():
