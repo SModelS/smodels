@@ -19,7 +19,7 @@ class TestToolBox(unittest.TestCase):
     def testToolBox(self):
         self.logger.info ( "ToolBox" )
         box = toolBox.ToolBox()
-        ok=box.checkInstallation ( colors=False, make=True, printit=False )
+        ok=box.checkInstallation ( make=True, printit=False )
         self.assertTrue ( ok )
 
 if __name__ == "__main__":
