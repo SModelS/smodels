@@ -4,7 +4,7 @@ condition: None
 constraint: [[['b'],['W']],[['b'],['W']]]
 checked: VM
 figureUrl: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-05/figaux_09.png
-validated: None
+validated: True
 axes: 2*Eq(mother,300.0)_Eq(inter0,x)_Eq(lsp,y)
 publishedData: True
 upperLimits: [[[[150.0*GeV, 105.0*GeV, 100.0*GeV], [150.0*GeV, 105.0*GeV, 100.0*GeV]], 28.8953*pb],
