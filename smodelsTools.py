@@ -37,11 +37,17 @@ def main():
     xseccomputer.add_argument('-c', '--ncpus', type=int, default=-1,
         help="number of cores to be used simultaneously. -1 means 'all'. ")
     xseccomputer.add_argument('-p', '--tofile', action='store_true',
-        help="write cross sections to file")
+        help="write cross sections to file (only highest order)")
+    xseccomputer.add_argument('-P', '--alltofile', action='store_true',
+        help="write all cross sections to file, including lower orders")
     xseccomputer.add_argument('-q', '--query', action='store_true',
         help="only query if there are cross sections in the file")
     xseccomputer.add_argument('-k', '--keep', action='store_true',
         help="do not unlink temporary directory")
+    xseccomputer.add_argument('-6', '--pythia6', action='store_true',
+        help="use pythia6 for LO cross sections")
+    xseccomputer.add_argument('-8', '--pythia8', action='store_true',
+        help="use pythia8 for LO cross sections (default)")
     xseccomputer.add_argument('-n', '--NLO', action='store_true',
         help="compute at the NLO level (default is LO)")
     xseccomputer.add_argument('-N', '--NLL', help="compute at the NLO+NLL level (takes precedence over NLO, default is LO)", action='store_true')
