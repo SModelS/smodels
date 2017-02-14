@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: externalPythia8
+.. module:: pythia8Wrapper
    :synopsis: Wrapper for pythia8.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
@@ -9,8 +9,8 @@
 """
 
 from __future__ import print_function
-from smodels.tools.externalTool import ExternalTool
-from smodels.tools import externalTool
+from smodels.tools.wrapperBase import WrapperBase
+from smodels.tools import wrapperBase
 from smodels.tools.smodelsLogging import logger, setLogLevel
 from smodels.tools.physicsUnits import fb, pb, TeV, mb
 from smodels.theory.crossSection import XSection, XSectionInfo, LO, XSectionList
@@ -23,7 +23,7 @@ try:
 except ImportError:
     import subprocess as executor # python3
     
-class ExternalPythia8(ExternalTool):
+class Pythia8Wrapper(WrapperBase):
     """
     An instance of this class represents the installation of pythia8.
     
@@ -42,7 +42,7 @@ class ExternalPythia8(ExternalTool):
         self.secondsPerEvent * self.nevents > CPU time, we terminate Pythia.
         
         """
-        ExternalTool.__init__(self)
+        WrapperBase.__init__(self)
         self.name = "pythia8"
         self.executablePath = self.absPath(executablePath)
         self.executable = None
@@ -279,10 +279,10 @@ class ExternalPythia8(ExternalTool):
 
 if __name__ == "__main__":
     setLogLevel ( "debug" )
-    tool = ExternalPythia8()
+    tool = Pythia8Wrapper()
     tool.nevents=10
     logger.info("installed: " + str(tool.installDirectory()))
-    logger.info("check: " + externalTool.ok(tool.checkInstallation()))
+    logger.info("check: " + wrapperBase.ok(tool.checkInstallation()))
     logger.info("seconds per event: %d" % tool.secondsPerEvent)
     slhafile = "inputFiles/slha/simplyGluino.slha"
     slhapath = os.path.join ( installation.installDirectory(), slhafile )
