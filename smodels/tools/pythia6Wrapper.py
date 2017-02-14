@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: externalPythia6
+.. module:: Pythia6Wrapper
    :synopsis: Wrapper for pythia6.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
@@ -9,8 +9,9 @@
 """
 
 from __future__ import print_function
-from smodels.tools.externalTool import ExternalTool
-from smodels.tools import externalTool
+from smodels.tools.wrapperBase import WrapperBase
+from smodels.tools import wrapperBase
+from smodels.tools.physicsUnits import pb
 from smodels.tools.smodelsLogging import logger
 from smodels.theory import crossSection
 from smodels import installation
@@ -23,7 +24,7 @@ except ImportError:
 import urllib
 import tarfile
 
-class ExternalPythia6(ExternalTool):
+class Pythia6Wrapper(WrapperBase):
     """
     An instance of this class represents the installation of pythia6.
 
@@ -42,7 +43,7 @@ class ExternalPythia6(ExternalTool):
         self.secondsPerEvent * self.nevents > CPU time, we terminate Pythia.
 
         """
-        ExternalTool.__init__(self)
+        WrapperBase.__init__(self)
         self.name = "pythia6"
         self.executablePath = self.absPath(executablePath)
         self.executable = None
@@ -365,21 +366,21 @@ class ExternalPythia6(ExternalTool):
 if __name__ == "__main__":
     #from smodelsLogging import setLogLevel
     #setLogLevel ( "debug" )
-    tool = ExternalPythia6()
-    print("[externalPythia6] installed: " + str(tool.installDirectory()))
-    td_exists = externalTool.ok(os.path.exists(tool.tempDirectory()))
-    print("[externalPythia6] temporary directory: %s: %s" % (str(tool.tempDirectory()),
+    tool = Pythia6Wrapper()
+    print("[Pythia6Wrapper] installed: " + str(tool.installDirectory()))
+    td_exists = wrapperBase.ok(os.path.exists(tool.tempDirectory()))
+    print("[Pythia6Wrapper] temporary directory: %s: %s" % (str(tool.tempDirectory()),
                                            td_exists))
-    print("[externalPythia6] check: " + externalTool.ok(tool.checkInstallation()))
-    print("[externalPythia6] seconds per event: %d" % tool.secondsPerEvent)
+    print("[Pythia6Wrapper] check: " + wrapperBase.ok(tool.checkInstallation()))
+    print("[Pythia6Wrapper] seconds per event: %d" % tool.secondsPerEvent)
     tool.replaceInCfgFile({"NEVENTS": 1, "SQRTS":8000})
     tool.setParameter("MSTP(163)", "6")
     slhafile = "inputFiles/slha/simplyGluino.slha"
     slhapath = os.path.join ( installation.installDirectory(), slhafile )
-    # print ( "[externalPythia6] slhapath:",slhapath )
-    output = tool.run(slhapath, unlink=True, do_check=False )
-    n = len (output.split("\n"))
+    # print ( "[Pythia6Wrapper] slhapath:",slhapath )
+    xsec = tool.run(slhapath, unlink=True )
+    # n = len (output.split("\n"))
     # print ( "n: ",n )
-    isok = ( n > 380)
-    print("[externalPythia6] run: " + externalTool.ok (isok))
+    isok = abs ( xsec[0].value.asNumber ( pb ) - 2.80E-01  ) < 1e-5
+    print("[Pythia6Wrapper] run: " + wrapperBase.ok (isok))
     # tool.unlink()

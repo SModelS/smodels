@@ -12,9 +12,9 @@
 
 import argparse
 import types
-from smodels.tools import externalPythia6
-from smodels.tools import externalPythia8
-from smodels.tools import externalNllFast
+from smodels.tools import pythia6Wrapper
+from smodels.tools import pythia8Wrapper
+from smodels.tools import nllFastWrapper
 from smodels.tools import externalPythonTools
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.colors import colors
@@ -43,9 +43,9 @@ class ToolBox(object):
         Initializes singleton instance (done only once for the entire class).
         
         """
-        self.add(externalPythia6.ExternalPythia6())
-        self.add(externalPythia8.ExternalPythia8())
-        for(sqrts, tool) in externalNllFast.nllFastTools.items():
+        self.add(pythia6Wrapper.Pythia6Wrapper())
+        self.add(pythia8Wrapper.Pythia8Wrapper())
+        for(sqrts, tool) in nllFastWrapper.nllFastTools.items():
                 self.add(tool)
         for(name, tool) in externalPythonTools.pythonTools.items():
                 self.add(tool)
