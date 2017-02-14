@@ -1,3 +1,6 @@
+## Used to build against the official ubuntu packages: libpythia8-dev libpythia8v5
+## Please dont used this as the ubuntu packages are usually outdated.
+
 CXX      := g++
 LHALIB   := -llhapdfdummy # LHAPDF
 CXXFLAGS := -O2 -I/usr/include/Pythia8
