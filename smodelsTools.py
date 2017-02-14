@@ -77,7 +77,7 @@ def main():
 
     toolbox = subparsers.add_parser( 'toolbox', description=
 								                     "Facility to control external dependencies")
-    toolbox.add_argument('-n', '--nocolors', help='turn off colors',
+    toolbox.add_argument('-c', '--colors', help='turn on colors',
                            action='store_true')
     toolbox.add_argument('-l', '--long', help='long output lines',
                            action='store_true')
