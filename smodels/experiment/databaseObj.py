@@ -267,8 +267,8 @@ class Database(object):
             self.loadTextDatabase() 
             logger.debug (  " * write %s version %s" % ( self.binfile,
                        self.sw_format_version ) )
-            ptcl = serializer.HIGHEST_PROTOCOL
             self.pcl_python = sys.version
+            ptcl = serializer.HIGHEST_PROTOCOL
             serializer.dump ( self.pcl_python, f, protocol=ptcl )
             serializer.dump ( self.sw_format_version, f, protocol=ptcl )
             serializer.dump ( self.txt_mtime, f, protocol=ptcl )
