@@ -89,37 +89,7 @@ file, second, it supports parallelization of this input folder.
 
 **The usage of runSModelS is:**
 
-   runSModelS.py [-h] -f FILENAME [-p PARAMETERFILE] [-o OUTPUTDIR] [-d] [-t] [-V] [-c] [-v VERBOSE] [-T TIMEOUT]
-
-*arguments*:
-  -h, --help            show this help message and exit
-  -f FILENAME, --filename FILENAME
-                        name of SLHA or LHE input file or a directory path
-                        (required argument). If a directory is given, loop
-                        over all files in the directory
-  -p PARAMETERFILE, --parameterFile PARAMETERFILE
-                        name of parameter file, where most options are defined
-                        (optional argument). If not set, use all parameters
-                        from etc/parameters_default.ini
-  -o OUTPUTDIR, --outputDir OUTPUTDIR
-                        name of output directory (optional argument). The
-                        default folder is: ./results/
-  -d, --development     if set, SModelS will run in development mode and exit
-                        if any errors are found.
-  -t, --force_txt       force loading the text database
-  -V, --version         show program's version number and exit
-  -c, --run-crashreport
-                        parse crash report file and use its contents for a
-                        SModelS run. Supply the crash file simply via '--
-                        filename myfile.crash'
-  -v VERBOSE, --verbose VERBOSE
-                        sets the verbosity level (debug, info, warning,
-                        error). Default value is info.
-  -T TIMEOUT, --timeout TIMEOUT
-                        define a limit on the running time (in secs).If not
-                        set, run without a time limit. If a directory is given
-                        as input, the timeout will be applied for each
-                        individual file.
+.. include:: RunSModelS.rst
 
 
 A typical usage example is: ::
