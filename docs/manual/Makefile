@@ -55,6 +55,7 @@ clean:
 copy_files:
 	cp ../../parameters.ini source/images/
 	cp ../../etc/parameters_default.ini source/images/
+	cp ../../cpp/run.cpp source/images/
 
 RstFilesFromHelp:
 	rstFromHelpFiles.py
