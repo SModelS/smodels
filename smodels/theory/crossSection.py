@@ -102,6 +102,9 @@ class XSection(object):
 
     @pid.setter
     def pid(self,pn):
+        if None in pn:
+            self._pid = pn
+            return
         self._pid = tuple ( sorted (pn) )
 
     def __mul__(self, other):
