@@ -273,6 +273,8 @@ def loadDatabase(parser, db):
         if database in [ None, True ]:
             force_load=None
             if database == True: force_load="txt"
+            if os.path.isfile ( databasePath ):
+                force_load="pcl"
             database = Database( databasePath, force_load=force_load)
         databaseVersion = database.databaseVersion
     except DatabaseNotFoundException:
