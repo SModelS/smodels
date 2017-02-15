@@ -306,7 +306,7 @@ class Database(object):
         tmp = os.path.realpath(path)
         if os.path.isfile ( tmp ):
             self._base = os.path.dirname ( tmp )
-            self.force_load = "pcl" 
+            self.force_load = None
             self.pclfilename = os.path.basename ( tmp )
             # logger.debug ( "pclfilename is now %s" % self.pclfilename)
             return
