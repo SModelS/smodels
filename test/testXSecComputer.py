@@ -23,7 +23,8 @@ import logging.config
 class XSecTest(unittest.TestCase):
     # use different logging config for the unit tests.
     logging.config.fileConfig( "./logging.conf" )
-    from smodels.tools.smodelsLogging import logger
+    from smodels.tools.smodelsLogging import logger, setLogLevel
+    setLogLevel ( "warn" )
 
     toolBox.ToolBox().compile() ## make sure the tools are compiled
 
@@ -96,7 +97,7 @@ class XSecTest(unittest.TestCase):
         xargs.pythia6 = True
         xargs.filename = tmpfile
         xargs.colors = False
-        xargs.verbosity = "info"
+        xargs.verbosity = "warning"
         #Compute LO cross sections
         xsecComputer.main(xargs)
         #Compute NLL cross sections
