@@ -1,7 +1,7 @@
 #!/bin/sh
 
-CMD=ipython
-# CMD=jupyter
+# CMD=ipython
+CMD=jupyter
 
 for i in `ls *.ipynb`; do
 	$CMD nbconvert --to html $i;
