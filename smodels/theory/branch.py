@@ -8,7 +8,7 @@
 
 import sys
 from smodels.theory.particleNames import simParticles, elementsInStr
-from smodels.tools.physicsUnits import fb
+from smodels.tools.physicsUnits import fb, MeV
 from smodels.particles import rEven, ptcDic
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
@@ -79,7 +79,17 @@ class Branch(object):
         :param other:  branch to be compared (Branch object)
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
+
+        def massesEqual ( l1, l2 ):
+            """ check if lists of masses are equal,
+                allowing for 10 MeV of mass differences """
+            if len(l1) != len(l2): return False
+            for e1,e2 in zip (l1,l2):
+                if abs ( (e1 - e2).asNumber(MeV)  ) > 10.:
+                    return False
+            return True
         
+        # print ( type ( self.masses[0] ) )
         if self.vertnumb != other.vertnumb:
             comp = self.vertnumb > other.vertnumb
             if comp: return 1
@@ -92,7 +102,7 @@ class Branch(object):
             comp = self.particles > other.particles
             if comp: return 1
             else: return -1
-        elif self.masses != other.masses:
+        elif not massesEqual ( self.masses, other.masses ):
             comp = self.masses > other.masses
             if comp: return 1
             else: return -1

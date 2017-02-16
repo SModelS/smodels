@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: externalPythia6
+.. module:: Pythia6Wrapper
    :synopsis: Wrapper for pythia6.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
@@ -9,11 +9,14 @@
 """
 
 from __future__ import print_function
-from smodels.tools.externalTool import ExternalTool
-from smodels.tools import externalTool
+from smodels.tools.wrapperBase import WrapperBase
+from smodels.tools import wrapperBase
+from smodels.tools.physicsUnits import pb
 from smodels.tools.smodelsLogging import logger
+from smodels.theory import crossSection
 from smodels import installation
-import os
+import os, sys, io
+
 try:
     import commands as executor
 except ImportError:
@@ -21,26 +24,26 @@ except ImportError:
 import urllib
 import tarfile
 
-class ExternalPythia6(ExternalTool):
+class Pythia6Wrapper(WrapperBase):
     """
     An instance of this class represents the installation of pythia6.
-    
+
     """
     def __init__(self,
                  configFile="<install>/etc/pythia.card",
                  executablePath="<install>/lib/pythia6/pythia_lhe",
                  srcPath="<install>/lib/pythia6/"):
-        """ 
+        """
         :param configFile: Location of the config file, full path; copy this
         file and provide tools to change its content and to provide a template
         :param executablePath: Location of executable, full path (pythia_lhe)
-        
+
         nevents - Keep track of how many events we run over for each event we
         only allow a certain computation time if
         self.secondsPerEvent * self.nevents > CPU time, we terminate Pythia.
-        
+
         """
-        ExternalTool.__init__(self)
+        WrapperBase.__init__(self)
         self.name = "pythia6"
         self.executablePath = self.absPath(executablePath)
         self.executable = None
@@ -48,28 +51,30 @@ class ExternalPythia6(ExternalTool):
         self.tempdir = None
         self.cfgfile = self.checkFileExists(configFile)
         self.keepTempDir = False
-        self.nevents = None
+        self.nevents = 10000
+        self.sqrts = 8 # sqrt(s) in TeV
         self.secondsPerEvent = 10
+        self.pythiacard = None
 
         self.unlink()
 
     def checkFileExists(self, inputFile):
         """
         Check if file exists, raise an IOError if it does not.
-        
+
         :returns: absolute file name if file exists.
-        
+
         """
         nFile = self.absPath(inputFile)
         if not os.path.exists(nFile):
-            raise IOError("config file %s does not exist" % nFile)
+            raise IOError("file %s does not exist" % nFile)
         return nFile
 
 
 
     def __str__(self):
-        """ 
-        Describe the current status 
+        """
+        Describe the current status
 
         """
         ret = "tool: %s\n" % (self.name)
@@ -82,9 +87,9 @@ class ExternalPythia6(ExternalTool):
     def unlink(self, unlinkdir=True):
         """
         Remove temporary files.
-        
+
         :param unlinkdir: remove temp directory completely
-        
+
         """
         if self.tempdir == None:
             return
@@ -110,17 +115,18 @@ class ExternalPythia6(ExternalTool):
 
         This is introduced as a simple mechanism to make changes to the
         parameter file.
-        
+
         :param replacements: dictionary of strings and values; the strings will
-                             be replaced with the values; the dictionary keys 
+                             be replaced with the values; the dictionary keys
                              must be strings present in the config file
-        
+
         """
         f = open(self.tempDirectory() + "/temp.cfg")
         lines = f.readlines()
         f.close()
         f = open(self.tempDirectory() + "/temp.cfg", "w")
         for line in lines:
+            # print ( "line=%s" % line )
             for (key, value) in replacements.items():
                 if key == "NEVENTS":
                     self.nevents = int(value)
@@ -132,9 +138,9 @@ class ExternalPythia6(ExternalTool):
     def setParameter(self, param="MSTP(163)", value=6):
         """
         Modifies the config file, similar to .replaceInCfgFile.
-        
+
         It will set param to value, overwriting possible old values.
-        
+
         """
         f = open(self.tempdir + "/temp.cfg")
         lines = f.readlines()
@@ -146,28 +152,96 @@ class ExternalPythia6(ExternalTool):
         f.write("%s=%s\n" % (param, str(value)))
         f.close()
 
-
     def complain ( self ):
         import sys
         logger.error("please fix manually, e.g. try 'make' in smodels/lib, " \
                " or file a complaint at smodels-users@lists.oeaw.ac.at" )
         sys.exit(0)
 
-    def run(self, slhaFile, cfgfile=None, do_unlink=True, do_compile=False,
+    def run( self, slhafile, lhefile=None, unlink=True ):
+        """
+        Execute pythia_lhe with n events, at sqrt(s)=sqrts.
+
+        :param slhafile: input SLHA file
+        :param lhefile: option to write LHE output to file; if None, do not write
+                        output to disk. If lhe file exists, use its events for
+                        xsecs calculation.
+        :param unlink: Clean up temp directory after running pythia
+
+        :returns: List of cross sections
+
+        """
+        if lhefile and os.path.isfile ( lhefile ):
+            lheFile = open(lhefile, 'r')
+            xsecsInfile = crossSection.getXsecFromSLHAFile(slhafile)
+            loXsecs = crossSection.XSectionList()
+            for xsec in xsecsInfile:
+                if xsec.info.order == LO and xsec.info.sqrts == self.sqrts:
+                    loXsecs.add(xsec)
+            return loXsecs
+
+        #Change pythia card, if defined:
+        if self.pythiacard:
+            pythiacard_default = self.cfgfile
+            self.cfgfile = self.pythiacard
+        # Check if template config file exists
+        self.unlink()
+        self.replaceInCfgFile({"NEVENTS": self.nevents, "SQRTS":1000 * self.sqrts})
+        self.setParameter("MSTP(163)", "6")
+
+        if unlink==False:
+            logger.info ( "keeping temporary directory at %s" % self.tempDirectory() )
+        r = self.checkInstallation()
+        if r == False:
+            logger.info ( "Installation check failed." )
+            sys.exit()
+        self.replaceInCfgFile({"NEVENTS": self.nevents, "SQRTS":1000 * self.sqrts})
+        self.setParameter("MSTP(163)", "6")
+        lhedata = self._run(slhafile, unlink=unlink )
+        if not "<LesHouchesEvents" in lhedata:
+            pythiadir = "%s/log" % self.tempDirectory()
+            logger.error("No LHE events found in pythia output %s" % pythiadir )
+            if not os.path.exists ( pythiadir ):
+                logger.error ("Will dump pythia output to %s" % pythiadir )
+                f=open ( pythiadir, "w" )
+                for line in lhedata:
+                    f.write ( line )
+                f.close()
+            raise SModelSError( "No LHE events found in %s" % pythiadir )
+
+        #Reset pythia card to its default value
+        if self.pythiacard:
+            self.cfgfile = pythiacard_default
+
+        # Generate file object with lhe events
+        if lhefile:
+            lheFile = open(lhefile, 'w')
+            lheFile.write(lhedata)
+            lheFile.close()
+            lheFile = open(lhefile, 'r')
+        else:
+            # Create memory only file object
+            if sys.version[0]=="2":
+                lhedata = unicode ( lhedata )
+            lheFile = io.StringIO(lhedata)
+        return crossSection.getXsecFromLHEFile ( lheFile )
+
+
+    def _run(self, slhaFile, cfgfile=None, unlink=True, do_compile=False,
             do_check=True ):
         """
-        Run Pythia.
-        
+        Really Run Pythia.
+
         :param slhaFile: SLHA file
         :param cfgfile: optionally supply a new config file; if not supplied,
-                        use the one supplied at construction time; 
-                        this config file will not be touched or copied;  
+                        use the one supplied at construction time;
+                        this config file will not be touched or copied;
                         it will be taken as is
-        :param do_unlink: clean up temporary files after run?
+        :param unlink: clean up temporary files after run?
         :param do_compile: if true, we try to compile binary if it isnt installed.
-        :param do_check: check installation, before running 
+        :param do_check: check installation, before running
         :returns: stdout and stderr, or error message
-        
+
         """
         if do_check:
             ci=self.checkInstallation()
@@ -180,6 +254,7 @@ class ExternalPythia6(ExternalTool):
                 self.complain()
         slha = self.checkFileExists(slhaFile)
         cfg = self.absPath(cfgfile)
+        ck_cfg = self.checkFileExists(cfg)
         logger.debug("running with " + str(cfg))
         import shutil
         shutil.copy(slha, self.tempDirectory() + "/fort.61")
@@ -187,8 +262,7 @@ class ExternalPythia6(ExternalTool):
              (self.tempDirectory(), self.executablePath, cfg)
         logger.debug("Now running " + str(cmd))
         out = executor.getoutput(cmd)
-        # out = subprocess.check_output ( cmd, shell=True, universal_newlines=True )
-        if do_unlink:
+        if unlink:
             self.unlink( unlinkdir=True )
         else:
             f = open(self.tempDirectory() + "/log", "w")
@@ -198,7 +272,7 @@ class ExternalPythia6(ExternalTool):
         return out
 
     def chmod(self):
-        """ 
+        """
         chmod 755 on pythia executable, if it exists.
         Do nothing, if it doesnt exist.
         """
@@ -214,12 +288,12 @@ class ExternalPythia6(ExternalTool):
     def compile(self):
         """
         Compile pythia_lhe.
-        
+
         """
         logger.info("Trying to compile pythia in %s" % self.srcPath )
         cmd = "cd %s; make" % self.srcPath
         outputMessage = executor.getoutput(cmd)
-        #outputMessage = subprocess.check_output ( cmd, shell=True, 
+        #outputMessage = subprocess.check_output ( cmd, shell=True,
         #                                          universal_newlines=True )
         logger.info(outputMessage)
 
@@ -227,7 +301,7 @@ class ExternalPythia6(ExternalTool):
     def fetch(self):
         """
         Fetch and unpack tarball.
-        
+
         """
         tempFile = "/tmp/pythia.tar.gz"
         fileHandle = open(tempFile, "w")
@@ -247,31 +321,28 @@ class ExternalPythia6(ExternalTool):
         logger.debug("... done.")
 
 
-    def checkInstallation(self, fix=False ):
+    def checkInstallation( self ):
         """
         Check if installation of tool is correct by looking for executable and
         running it.
 
-        :param fix: should it try to fix the situation, if something is wrong?
-
         :returns: True, if everything is ok
-        
+
         """
         if not os.path.exists(self.executablePath):
             logger.error("Executable '%s' not found. Maybe you didn't compile " \
                          "the external tools in smodels/lib?", self.executablePath)
-            if fix:
-                self.compile()
             return False
         if not os.access(self.executablePath, os.X_OK):
             logger.error("%s is not executable", self.executable)
             self.chmod()
             return False
+        return True
+        """
         slhaFile = "/inputFiles/slha/gluino_squarks.slha"
         slhaPath = installation.installDirectory() + slhaFile
         try:
-            output = self.run(slhaPath, "<install>/etc/pythia_test.card",
-                    do_compile=False, do_check=False ) 
+            output = self.run(slhaPath, "<install>/etc/pythia_test.card" )
             output = output.split("\n")
             if output[-1].find("The following floating-point") > -1:
                 output.pop()
@@ -286,24 +357,30 @@ class ExternalPythia6(ExternalTool):
                                  output[nr])
                     return False
         except Exception as e:
-            logger.error("Something is wrong with the setup: exception %s", e)
+            logger.error("Something is wrong with the setup: exception %s" % e)
             return False
         return True
+            """
 
 
 if __name__ == "__main__":
-    tool = ExternalPythia6()
-    print("installed: " + str(tool.installDirectory()))
-    td_exists = externalTool.ok(os.path.exists(tool.tempDirectory()))
-    print("temporary directory: %s: %s" % (str(tool.tempDirectory()),
+    #from smodelsLogging import setLogLevel
+    #setLogLevel ( "debug" )
+    tool = Pythia6Wrapper()
+    print("[Pythia6Wrapper] installed: " + str(tool.installDirectory()))
+    td_exists = wrapperBase.ok(os.path.exists(tool.tempDirectory()))
+    print("[Pythia6Wrapper] temporary directory: %s: %s" % (str(tool.tempDirectory()),
                                            td_exists))
-    print("check: " + externalTool.ok(tool.checkInstallation()))
-    print("seconds per event: %d" % tool.secondsPerEvent)
+    print("[Pythia6Wrapper] check: " + wrapperBase.ok(tool.checkInstallation()))
+    print("[Pythia6Wrapper] seconds per event: %d" % tool.secondsPerEvent)
     tool.replaceInCfgFile({"NEVENTS": 1, "SQRTS":8000})
     tool.setParameter("MSTP(163)", "6")
-    slhafile = "/inputFiles/slha/andrePT4.slha"
-    slhapath = installation.installDirectory() + slhafile
-    output = tool.run(slhafile)
-    isok = (len (output.split("\n")) > 570)
-    print("run: " + externalTool.ok (isok))
-    tool.unlink()
+    slhafile = "inputFiles/slha/simplyGluino.slha"
+    slhapath = os.path.join ( installation.installDirectory(), slhafile )
+    # print ( "[Pythia6Wrapper] slhapath:",slhapath )
+    xsec = tool.run(slhapath, unlink=True )
+    # n = len (output.split("\n"))
+    # print ( "n: ",n )
+    isok = abs ( xsec[0].value.asNumber ( pb ) - 2.80E-01  ) < 1e-5
+    print("[Pythia6Wrapper] run: " + wrapperBase.ok (isok))
+    # tool.unlink()
