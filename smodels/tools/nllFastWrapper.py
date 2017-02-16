@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-.. module:: externalNllFast
+.. module:: nllFastWrapper
    :synopsis: This module provides methods to access the nllfast grid and             
               compute k-factors (when available) to SUSY pair                         
               production cross sections.                                              
@@ -35,11 +35,11 @@ try:
 except ImportError:
     import subprocess as executor
 import os
-from smodels.tools.externalTool import ExternalTool
+from smodels.tools.wrapperBase import WrapperBase
 from smodels.tools.smodelsLogging import logger
 
 
-class ExternalNllFast(ExternalTool):
+class NllFastWrapper(WrapperBase):
     """
     An instance of this class represents the installation of nllfast.
 
@@ -54,7 +54,7 @@ class ExternalNllFast(ExternalTool):
         :srcPath: the path of the source code, for compilation
 
         """
-        ExternalTool.__init__(self)
+        WrapperBase.__init__(self)
         self.sqrts = int(sqrts)
         self.name = "nllfast%d" % sqrts
         self.nllfastVersion = nllfastVersion
@@ -345,43 +345,43 @@ class ExternalNllFast(ExternalTool):
                             max(squarkmass, gluinomass))
         return kFacs
 
-class ExternalNllFast7(ExternalNllFast):
+class NllFastWrapper7(NllFastWrapper):
     """
     An instance of this class represents the installation of nllfast 7.
 
     """
     def __init__(self):
-        ExternalNllFast.__init__(self, 7, "1.2",
+        NllFastWrapper.__init__(self, 7, "1.2",
                                  testParams="gg cteq 500 600",
                                  testCondition="500.     600.    0.193E+00  "
                                  "0.450E+00  0.497E+00")
 
 
-class ExternalNllFast8(ExternalNllFast):
+class NllFastWrapper8(NllFastWrapper):
     """
     An instance of this class represents the installation of nllfast 8.
 
     """
     def __init__(self):
-        ExternalNllFast.__init__(self, 8, "2.1",
+        NllFastWrapper.__init__(self, 8, "2.1",
                                  testParams="gg cteq 500 600",
                                  testCondition="500.     600.    0.406E+00  "
                                  "0.873E+00  0.953E+00")
 
-class ExternalNllFast13(ExternalNllFast):
+class NllFastWrapper13(NllFastWrapper):
     """
     An instance of this class represents the installation of nllfast 8.
 
     """
     def __init__(self):
-        ExternalNllFast.__init__(self, 13, "3.1",
+        NllFastWrapper.__init__(self, 13, "3.1",
                                  testParams="gg cteq 500 600",
                                  testCondition="600.    0.394E+01  0.690E+01  "
                                  "0.731E+01    0.394E+00" )
 
-nllFastTools = { 7 : ExternalNllFast7(),
-                 8 : ExternalNllFast8(),
-                13 : ExternalNllFast13() }
+nllFastTools = { 7 : NllFastWrapper7(),
+                 8 : NllFastWrapper8(),
+                13 : NllFastWrapper13() }
 
 
 if __name__ == "__main__":
