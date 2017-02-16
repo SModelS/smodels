@@ -51,7 +51,7 @@ docs/manual/source/LheChecker.rst
 docs/manual/source/SlhaChecker.rst
 docs/manual/source/ToolBox.rst
 docs/manual/source/DatabaseBrowser.rst
-test/database/database*.pcl
+test/database/databas*.pcl
 lib/pythia8/pythia82*
 lib/pythia8/xml.doc
 cpp/libSModelS.so
