@@ -1,6 +1,9 @@
 #!/bin/sh
 
 VER='8223'
+[ -z "$1" ] && { echo "pythia8 version is not given, use pythia$VER"; } || 
+		{ VER="$1"; echo "set to version pythia$VER"; }
+
 TARBALL="pythia$VER.tgz"
 URL=http://home.thep.lu.se/~torbjorn/pythia8/$TARBALL
 
