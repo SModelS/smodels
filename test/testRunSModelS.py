@@ -36,6 +36,8 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
     :param ignore: List of keys to be ignored
     :return: True/False
     """
+    if type(obj1) in [ float, int ] and type ( obj2) in [ float, int ]:
+        obj1,obj2=float(obj1),float(obj2)
 
     if type(obj1) != type(obj2):
         logger.info("Data types differ (%s,%s)" %(type(obj1),type(obj2)))
