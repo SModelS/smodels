@@ -12,10 +12,12 @@
 
 import argparse
 import types
-from smodels.tools import externalPythia6
-from smodels.tools import externalNllFast
+from smodels.tools import pythia6Wrapper
+from smodels.tools import pythia8Wrapper
+from smodels.tools import nllFastWrapper
 from smodels.tools import externalPythonTools
 from smodels.tools.smodelsLogging import logger
+from smodels.tools.colors import colors
 
 class ToolBox(object):
     """
@@ -41,8 +43,9 @@ class ToolBox(object):
         Initializes singleton instance (done only once for the entire class).
         
         """
-        self.add(externalPythia6.ExternalPythia6())
-        for(sqrts, tool) in externalNllFast.nllFastTools.items():
+        self.add(pythia6Wrapper.Pythia6Wrapper())
+        self.add(pythia8Wrapper.Pythia8Wrapper())
+        for(sqrts, tool) in nllFastWrapper.nllFastTools.items():
                 self.add(tool)
         for(name, tool) in externalPythonTools.pythonTools.items():
                 self.add(tool)
@@ -64,32 +67,28 @@ class ToolBox(object):
         return self.tools.keys()
 
 
-    def installationOk(self, ok, colors):
+    def installationOk(self, ok ):
         """
         Returns color coded string to signal installation issues.
         """
-        green = '\033[0;32m'
-        red = '\033[0;31m'
-        reset = '\033[;0m'
         if ok == True:
-            ret = "installation ok!"
-            if colors:
-                ret = "%s%s%s" % (green, ret, reset)
+            ret = "%sinstallation ok!%s" % (colors.green, colors.reset)
             return ret
-        ret = "problem with installation"
+        ret = "%sproblem with installation" % colors.red
         if type(ok) == types.StringType:
             ret += " (%s)" % ok
-        if colors:
-            ret = "%s%s%s" % (red, ret, reset)
+        ret += colors.reset
         return ret
 
 
-    def checkInstallation(self, colors=True, make=False, printit=True, long=False ):
+    def checkInstallation(self, make=False, printit=True, long=False ):
         """
         Checks if all tools listed are installed properly, 
         returns True if everything is ok, False otherwise.
         """
-        ret = "The following tools are found in the Toolbox:\n"
+        from smodels.tools.colors import colors
+        ret = "%sThe following tools have been found in the Toolbox:%s\n" % \
+               ( colors.yellow, colors.reset )
         hasMade = False
         allOk=True
         maxl = 45
@@ -102,13 +101,13 @@ class ToolBox(object):
             if len(exe) > maxl + 4:
                 exe = "... " + instance.pathOfExecutable()[-maxl:]
             ret += ( "%-12s [%-"+str(maxl+5)+"s]:  %s\n" ) % (name, exe,
-                                             self.installationOk(ok, colors))
+                                             self.installationOk(ok ))
             if not ok and make:
                 hasMade = True
                 instance.compile()
         if make and hasMade:
             ret += "Check again:\n"
-            r = self.checkInstallation(self, colors, printit=False ) 
+            r = self.checkInstallation(self, printit=False ) 
             ret += str(r)
             return r
         if printit:
@@ -145,5 +144,6 @@ def main ( args ):
     tmp = ToolBox()
     if args.make:
         tmp.compile()
-    tmp.checkInstallation(colors=not args.nocolors, printit=True, 
-           long = args.long )
+    if args.colors:
+        colors.on = True
+    tmp.checkInstallation( printit=True, long = args.long )

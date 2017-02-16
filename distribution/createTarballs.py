@@ -173,9 +173,12 @@ def fetchDatabase():
     """
     Execute 'git clone' to retrieve the database.
     """
+    dbversion = version
+    if dbversion.find("-")>0:
+        dbversion=dbversion[:dbversion.find("-")]
     comment ( "git clone the database (this might take a while)" )
     cmd = "cd %s; git clone -b v%s git@smodels.hephy.at:smodels-database"  % \
-            (dirname, version)
+            (dirname, dbversion)
             
     if dummyRun:
         cmd = "cd %s; cp -a ../../../smodels-database-v%s smodels-database" % \

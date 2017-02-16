@@ -267,8 +267,8 @@ class Database(object):
             self.loadTextDatabase() 
             logger.debug (  " * write %s version %s" % ( self.binfile,
                        self.sw_format_version ) )
-            ptcl = serializer.HIGHEST_PROTOCOL
             self.pcl_python = sys.version
+            ptcl = serializer.HIGHEST_PROTOCOL
             serializer.dump ( self.pcl_python, f, protocol=ptcl )
             serializer.dump ( self.sw_format_version, f, protocol=ptcl )
             serializer.dump ( self.txt_mtime, f, protocol=ptcl )
@@ -306,7 +306,7 @@ class Database(object):
         tmp = os.path.realpath(path)
         if os.path.isfile ( tmp ):
             self._base = os.path.dirname ( tmp )
-            self.force_load = "pcl" 
+            # self.force_load = None
             self.pclfilename = os.path.basename ( tmp )
             # logger.debug ( "pclfilename is now %s" % self.pclfilename)
             return
@@ -483,7 +483,16 @@ class Database(object):
                 newDataSet.dataInfo = dataset.dataInfo
                 newDataSet.txnameList = []
                 for txname in dataset.txnameList:
-                    if txname.validated is False and (not useNonValidated):
+                    if type(txname.validated) == str:
+                        txname.validated = txname.validated.lower()
+                    # print ( "txname",txname.validated,type(txname.validated) )
+                    if ( txname.validated not in [ True, False, "true", "false", "n/a", "tbd", None, "none" ] ):
+                        logger.error ( "value of validated field '%s' in %s unknown." % ( txname.validated, expResult ) )
+                    if txname.validated in [ None, "none" ]:
+                        logger.warning ( "validated is None in %s/%s/%s. Please set to True, False, N/A, or tbd." % \
+                            ( expResult.globalInfo.id, dataset.dataInfo.dataId, txname ) )
+                    if txname.validated not in [ None, True, "true", "n/a", "tbd" ] and (not useNonValidated ):
+#                    if txname.validated is False and (not useNonValidated):
                         continue
                     if txnames != ['all']:
                         if not txname.txName in txnames:
