@@ -14,7 +14,7 @@ XMLDOC   := $(PYTHIA8HOME)/share/Pythia8/xmldoc
 all: install_pythia8 pythia8.exe
 
 install_pythia8:
-	./installer.sh
+	./installer.sh $(PYTHIAVER)
 
 clean:
 	rm -rf $(EXES) test.slha pythia$(PYTHIAVER) pythia$(PYTHIAVER).tgz
