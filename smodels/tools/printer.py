@@ -269,7 +269,7 @@ class TxTPrinter(BasicPrinter):
         output += obj.statusStrings[obj.status] + "\n"
         if obj.filestatus < 0: output += str(obj.warnings) + "\n"
         output += "# Input File: " + obj.inputfile + "\n"
-        labels = obj.parameters.keys()
+        labels = list ( obj.parameters.keys() )
         labels.sort()
         # for label, par in obj.parameters.items():
         for label in labels:
