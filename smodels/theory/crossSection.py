@@ -17,10 +17,7 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
 ## orders in perturbation theory
-LO = 0
-NLO = 1
-NLL = 2
-
+LO,NLO,NLL = range(3)
 
 class XSectionInfo(object):
     """
@@ -97,8 +94,18 @@ class XSection(object):
         """        
         self.info = XSectionInfo()
         self.value = None
-        self.pid = (None, None)
+        self._pid = (None, None)
 
+    @property
+    def pid(self):
+        return self._pid
+
+    @pid.setter
+    def pid(self,pn):
+        if None in pn:
+            self._pid = pn
+            return
+        self._pid = tuple ( sorted (pn) )
 
     def __mul__(self, other):
         """
@@ -139,7 +146,8 @@ class XSection(object):
 
     def __eq__(self, other):
         """
-        Compare two XSection objects. Returns True if .info and type and value and pid are equal.        
+        Compare two XSection objects. Returns True if .info and type and value and 
+        pid are equal.        
         """
 
         if type(other) != type(XSection()):
@@ -155,7 +163,8 @@ class XSection(object):
 
     def __ne__(self, other):
         """
-        Compare two XSection objects. Returns True if .info or type or value or pid is not equal.        
+        Compare two XSection objects. Returns True if .info or type or value or 
+        pid is not equal.        
         """
 
         if type(other) != type(XSection()):
@@ -173,7 +182,7 @@ class XSection(object):
         """
         Generate cross section information in string format.        
         """
-        st = self.info.label + ':' + str(self.value)
+        st = self.info.label + ':' + str(self.value)+ " " + str(self.pid)
         return st
     
     def niceStr(self):
@@ -211,6 +220,7 @@ class XSectionList(object):
     An instance of this class represents a list of cross sections.
     
     This class is used to store a list of cross sections.
+    The list is sorted by cross section, highest cross section first.
     
     """
     def __init__(self, infoList=None):
@@ -228,7 +238,6 @@ class XSectionList(object):
                 newentry.pid = (None, None)
                 newentry.info = info.copy()
                 self.add(newentry)
-
 
     def __mul__(self, other):
         newList = self.copy()
@@ -308,7 +317,6 @@ class XSectionList(object):
             raise SModelSError()
         else:
             self.xSections.append(newxsec.copy())
-
 
     def _addValue(self, newxsec):
         """
@@ -542,6 +550,10 @@ class XSectionList(object):
         
         self.xSections = sorted(self.xSections, key=lambda xsec: xsec.pid)
 
+    def sort ( self ):
+        """ sort the xsecs by the values """
+        self.xSections = sorted(self.xSections, 
+                key=lambda xsec: xsec.value.asNumber(pb ), reverse=True )
 
 def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
     """

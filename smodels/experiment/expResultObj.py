@@ -230,7 +230,7 @@ class ExpResult(object):
                 pass
         if not attribute:
             return valuesDict
-        elif not attribute in valuesDict:
+        elif not attribute in valuesDict.keys():
             logger.warning("Could not find field %s in %s", attribute, self.path)
             return False
         else:

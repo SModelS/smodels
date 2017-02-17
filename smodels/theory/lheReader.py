@@ -65,6 +65,9 @@ class LheReader(object):
         # Return file to initial reader position
         self.file.seek(0)
 
+    def close(self):
+        """ close file handle """
+        self.file.close()
 
     def next(self):
         """

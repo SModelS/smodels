@@ -16,12 +16,15 @@ from smodels.theory import slhaDecomposer
 from smodels.theory import lheDecomposer
 from smodels.theory.theoryPrediction import theoryPredictionsFor, TheoryPredictionList
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-from smodels.tools import crashReport, timeOut
+from smodels.tools import crashReport, timeOut 
 from smodels.tools.printer import MPrinter
 import os
 import sys
 import time
-from ConfigParser import SafeConfigParser
+try:
+    from ConfigParser import SafeConfigParser
+except ImportError as e:
+    from configparser import ConfigParser
 from smodels.tools.physicsUnits import GeV, fb
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.experiment.databaseObj import Database, ExpResultList
@@ -43,7 +46,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """Get run parameters and options from the parser"""
     sigmacut = parser.getfloat("parameters", "sigmacut") * fb
     minmassgap = parser.getfloat("parameters", "minmassgap") * GeV
-    inputType = parser.get("options", "inputType").lower()
+    inputType = runtime.filetype ( inputFile )
 
 
     """Setup output printers"""
@@ -57,7 +60,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """Check input file for errors"""
     inputStatus = ioObjects.FileStatus()
     if parser.getboolean("options", "checkInput"):
-        inputStatus.checkFile(inputType, inputFile, sigmacut)
+        inputStatus.checkFile( inputFile, sigmacut)
     """Initialize output status and exit if there were errors in the input"""
     outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile,
             dict(parser.items("parameters")), databaseVersion)
@@ -150,7 +153,7 @@ def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
         with timeOut.Timeout(timeout):
             return testPoint(inputFile, outputDir, parser, databaseVersion,
                              listOfExpRes)
-    except Exception,e:
+    except Exception as e:
         crashReportFacility = crashReport.CrashReport()
          
         if development:
@@ -270,6 +273,8 @@ def loadDatabase(parser, db):
         if database in [ None, True ]:
             force_load=None
             if database == True: force_load="txt"
+            if os.path.isfile ( databasePath ):
+                force_load="pcl"
             database = Database( databasePath, force_load=force_load)
         databaseVersion = database.databaseVersion
     except DatabaseNotFoundException:
@@ -329,7 +334,10 @@ def getParameters(parameterFile):
     :returns: ConfigParser read from parameterFile
         
     """
-    parser = SafeConfigParser()
+    try:
+        parser = ConfigParser( inline_comment_prefixes=( ';', ) )
+    except Exception as e:
+        parser = SafeConfigParser()
     ret=parser.read(parameterFile)
     if ret == []:
         logger.error ( "No such file or directory: '%s'" % parameterFile )
