@@ -181,7 +181,7 @@ def fuzzycomp(obj,other,allowedDiff=0.,ignore=[]):
                     diff = 2.*abs(val-oval)/abs(val+oval)                        
                 except (NameError,TypeError):
                     diff = None
-                if diff > allowedDiff or diff is None:
+                if diff is None or diff > allowedDiff:
                     return False
         return True
     else:

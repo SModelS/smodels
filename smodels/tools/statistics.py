@@ -98,8 +98,9 @@ def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
     # For each toy experiment, get the actual number of background events by
     # taking one value from a Poisson distribution created using the expected
     # number of events.
-    ToyBGs = scipy.stats.poisson.rvs(ExpectedBGs)
-    ToyBGs = map(float, ToyBGs)
+    # print ( "ExpectedBGs=",ExpectedBGs)
+    ToyBGs = map ( scipy.stats.poisson.rvs, ExpectedBGs )
+    ToyBGs = list ( map(float, ToyBGs) )
 
     # The probability for the background alone to fluctutate as LOW as
     # observed = the fraction of the toy experiments with backgrounds as low as
@@ -109,8 +110,8 @@ def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
 
     # Toy MC for background+signal
     ExpectedBGandS = [expectedbg + SigHypothesis for expectedbg in ExpectedBGs]
-    ToyBplusS = scipy.stats.poisson.rvs(ExpectedBGandS)
-    ToyBplusS = map(float, ToyBplusS)
+    ToyBplusS = map ( scipy.stats.poisson.rvs, ExpectedBGandS)
+    ToyBplusS = list ( map(float, ToyBplusS) )
 
     # Calculate the fraction of these that are >= the number observed,
     # giving p_(S+B). Divide by (1 - p_b) a la the CLs prescription.
