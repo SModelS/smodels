@@ -17,6 +17,7 @@ from os.path import join, basename
 from smodels.installation import installDirectory as iDir
 from smodels.tools import crashReport
 from smodels.tools.timeOut import NoTime
+from databaseLoader import database ## to make sure the db exists
 from runSModelS import main
 import redirector
 import unum
@@ -35,6 +36,8 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
     :param ignore: List of keys to be ignored
     :return: True/False
     """
+    if type(obj1) in [ float, int ] and type ( obj2) in [ float, int ]:
+        obj1,obj2=float(obj1),float(obj2)
 
     if type(obj1) != type(obj2):
         logger.info("Data types differ (%s,%s)" %(type(obj1),type(obj2)))
@@ -133,10 +136,8 @@ class RunSModelSTest(unittest.TestCase):
                     res['AnalysisID'],res['DataSetID']])
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                            ignore=ignoreFields)
-        try:
-            os.remove('./output.py')
-            os.remove('./output.pyc')
-        except OSError: pass
+        for i in [ './output.py', './output.pyc' ]:
+            if os.path.exists ( i ): os.remove ( i )
         self.assertTrue(equals)
     
     def testGoodFile13(self):
@@ -152,10 +153,9 @@ class RunSModelSTest(unittest.TestCase):
                     res['AnalysisID'],res['DataSetID']])
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                            ignore=ignoreFields)
-        try:
-            os.remove('./output13.py')
-            os.remove('./output13.pyc')
-        except OSError: pass
+        for i in [ './output13.py', './output13.pyc' ]:
+            if os.path.exists ( i ):
+                os.remove ( i )
         self.assertTrue(equals)        
   
     def testBadFile(self):
@@ -167,9 +167,10 @@ class RunSModelSTest(unittest.TestCase):
         ignoreFields = ['input file','smodels version', 'ncpus']
         equals = equalObjs( smodelsOutput,smodelsOutputDefault,allowedDiff=0.,
                             ignore=ignoreFields)
-        os.remove('./bad_output.py')
-        os.remove('./bad_output.pyc')
-        self.assertTrue(equals )
+        for i in [ "./bad_output.py", "./bad_output.pyc" ]:
+            if os.path.exists ( i ):
+                os.remove( i )
+        self.assertTrue( equals )
   
     def cleanUp ( self ):
         for f in os.listdir("."):
@@ -189,19 +190,22 @@ class RunSModelSTest(unittest.TestCase):
             import ctypes
             libc = ctypes.CDLL("libc.so.6")
             libc.sync()
-        except (OSError,AttributeError,ImportError),e:
+        except (OSError,AttributeError,ImportError) as e:
             pass
         time.sleep(.1)
         for f in os.listdir("."):
             if ".crash" in f:
                 crash_file = f
                 ctr+=1
-        self.assertEquals ( ctr, 1 )
+        self.assertEqual ( ctr, 1 )
         inp, par = crashReport.readCrashReportFile(crash_file)
    
-        self.assertEquals(open(filename).readlines(), open(inp).readlines())
-        self.assertEquals( open("timeout.ini").readlines(),
-                           open(par).readlines())
+        with open(filename) as f:
+            with open(inp) as g:
+                self.assertEqual(f.readlines(), g.readlines())
+        with open("timeout.ini") as f:
+            with open(par) as g:
+               self.assertEqual( f.readlines(), g.readlines())
         self.cleanUp()
 
 if __name__ == "__main__":

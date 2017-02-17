@@ -38,7 +38,7 @@ def stdout_redirected(to=os.devnull, stdout=None):
             os.dup2(fileno(to), stdout_fd)  # $ exec >&to
         except ValueError:  # filename
             with open(to, 'wb') as to_file:
-	              os.dup2(to_file.fileno(), stdout_fd)  # $ exec > to
+                os.dup2(to_file.fileno(), stdout_fd)  # $ exec > to
         try:
             yield stdout # allow code to be run with the redirected stdout
         finally:
@@ -69,7 +69,7 @@ def stderr_redirected(to=os.devnull, stderr=None):
             os.dup2(fileno(to), stderr_fd)  # $ exec >&to
         except ValueError:  # filename
             with open(to, 'wb') as to_file:
-	              os.dup2(to_file.fileno(), stderr_fd)  # $ exec > to
+                os.dup2(to_file.fileno(), stderr_fd)  # $ exec > to
         try:
             yield stderr # allow code to be run with the redirected stderr
         finally:
@@ -81,7 +81,7 @@ def stderr_redirected(to=os.devnull, stderr=None):
 if __name__ == '__main__':
     print ( "test. this should appear." )
     with stdout_redirected(  ):
-			print ( "redirected. this must not appear." )
+        print ( "redirected. this must not appear." )
     with stdout_redirected( to = None ):
-			print ( "redirected trivially. this should appear." )
+        print ( "redirected trivially. this should appear." )
     print ( "test. this should appear." )

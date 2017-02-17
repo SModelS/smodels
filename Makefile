@@ -3,6 +3,9 @@ all: externaltools
 externaltools:
 	cd lib && make
 
+clean:
+	cd lib && make clean
+
 buildrpm:
 	$(PYTHON) setup.py bdist_rpm --force-arch x86_64
 

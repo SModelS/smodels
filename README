@@ -6,14 +6,16 @@
 Installation
 ============
 
-SModelS is a Python library that requires Python version 2.6 or later (but not
-version 3) with Python's setuptools and gfortran installed. Internally, SModelS uses the
-following tools:
+SModelS is a Python library that requires Python version 2.6 or later (including
+version 3) with Python's setuptools installed.
+if SModelS is to compute cross sections, it uses the following tools internally:
 
- * Pythia 6.4.27
- * NLL-fast 1.2 (7 TeV), 2.1 (8 TeV), and 3.1 (13 TeV)
+ * Pythia 8.223 (requires a C++ compiler)
+ * Pythia 6.4.27 (obsolete)
+ * NLL-fast 1.2 (7 TeV), 2.1 (8 TeV), and 3.1 (13 TeV) (requires a gfortran compiler)
 
-These tools are built into SModelS and require gfortran, but they need not be installed separately.
+These tools are built into SModelS and require gfortran and C++.
+They need not be installed separately, as the SModelS build system takes care of that.
 In addition to setuptools, SModelS depends on the following *external* Python
 libraries:
 
@@ -37,7 +39,7 @@ Alternatively, one can run setup.py with the "--user" flag::
   python setup.py install --user
 
 If *setuptools* is not installed, you can try to install the external libraries
-manually and then rerun setup.py. 
+manually and then rerun setup.py.
 For Ubuntu, SL6 machines and other platforms, a recipe is given below.
 
 There is also a diagnostic tool available: ::
@@ -60,6 +62,15 @@ Installation on Ubuntu machines should be straightforward with superuser privile
  * python setup.py install
 Note that the last command you either run as superuser, or with the
 "--user" flag.
+
+Installation on SL7
+-------------------
+
+Installation on an SL7 or CentOS7 is straightforward:
+
+ * yum install gcc-c++ scipy numpy
+
+ * pip install unum pyslha argparse
 
 Installation on SL6
 -------------------
@@ -104,14 +115,21 @@ Here we assume a version of gfortran is already installed in your system.
 
     PATH="<anaconda-folder>/bin:$PATH"
     PYTHONPATH=$PYTHONPATH:"<anaconda-folder>/lib/python2.7/site-packages"
- 
+
 and then install SModelS as a user:
- 
+
  * python setup.py install --user
 
 In order to make sure all libraries have been correctly installed, you can run
-   
+
  * python smodels/tools/toolBox.py
+
+
+Installation of C++ interface
+-----------------------------
+
+SModelS v1.1.1 comes with a simple C++ interface, see the cpp directory.
+Obviously, a C++ compiler is need, alongside with the python developers               (header) files (libpython-dev on ubuntu, python-devel on rpm-based distros).
 
 
 Running SModelS
@@ -141,7 +159,7 @@ Citation
 ========
 
 If you use this software please cite SModelS v1.1 as well as the programs
-it makes use of (Pythia6.4, NLL-fast and PySLHA). For convenience, the relevant
+it makes use of (Pythia8.223/Pythia6.4.27, NLL-fast and PySLHA). For your convenience, the relevant
 citations are provided in bibtex format in references.bib.
 
 For citing the experimental analyses in the database, you can use

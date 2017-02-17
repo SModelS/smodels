@@ -14,15 +14,16 @@ Installation and Deployment
 Standard Installation
 ---------------------
 
-SModelS is a Python library that requires Python version 2.6 or later (but not
-version 3) with Python's setuptools and gfortran installed. Internally, SModelS uses the
+SModelS is a Python library that requires Python version 2.6 or later (including
+version 3) with Python's setuptools installed. Internally, SModelS uses the
 following tools:
 
+ * `Pythia 8.223 <https://arxiv.org/abs/1410.3012>`_ (requires a C++ compiler)
+ * `Pythia 6.4.27 <http://arxiv.org/abs/hep-ph/0603175>`_ (obsolete)
+ * `NLL-fast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_ 1.2 (7 TeV), 2.1 (8 TeV), and 3.1 (13 TeV) (requires a fortran compiler)
 
- * `Pythia 6.4.27 <http://arxiv.org/abs/hep-ph/0603175>`_
- * `NLL-fast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_ 1.2 (7 TeV), 2.1 (8 TeV), and 3.1 (13 TeV)
-
-These tools are built into SModelS and require gfortran, but they need not be installed separately.
+These tools are built into SModelS and require gfortran and C++.
+They need not be installed separately, as the SModelS build system takes care of that.
 In addition to setuptools, SModelS depends on the following *external* Python
 libraries [*]_:
 
@@ -67,6 +68,15 @@ Installation on Ubuntu machines should be straightforward with superuser privile
 
 Note that the last command can be run as superuser, or with the "--user" flag.
 
+Installation on SL7
+-------------------
+
+Installation on an SL7 or CentOS7 is straightforward:
+
+ * yum install gcc-c++ scipy numpy
+
+ * pip install unum pyslha argparse
+
 
 Installation on SL6
 -------------------
@@ -108,14 +118,22 @@ Here we assume a version of gfortran is already installed in your system.
 
     PATH="<anaconda-folder>/bin:$PATH"
     PYTHONPATH=$PYTHONPATH:"<anaconda-folder>/lib/python2.7/site-packages"
- 
+
 and then install SModelS as a user: ::
- 
+
  python setup.py install --user
 
 In order to make sure all libraries have been correctly installed, you can run ::
-   
+
  python smodels/tools/toolBox.py
+
+
+Installation of C++ interface
+-----------------------------
+
+SModelS v1.1.1 comes with a simple C++ interface, see the cpp directory.
+Obviously, a C++ compiler is need, alongside with the python developers
+(header) files (libpython-dev on ubuntu, python-devel on rpm-based distros).
 
 
 Adding results to the database
@@ -126,7 +144,7 @@ The installation procedure explained above also installs SModelS'
 :ref:`database of experimental results <DatabaseDefinitions>`
 in the smodels-database subdirectory.
 The database version at the time of the SModelS v1.1.0 release is ``1.1.0
-(Silvester 2016)'' and contains 133 results for testing new physics models. 
+(Silvester 2016)'' and contains 133 results for testing new physics models.
 More concretely, these are 94
 |ULrs| and 39 |EMrs| from 25 ATLAS and 23
 CMS SUSY searches. Among these, 120 results are official ATLAS and CMS results
@@ -179,7 +197,7 @@ Adding one's own results
 The :ref:`Database of Experimental Results <databaseStruct>`  is
 organized as files in an ordinary directory hierarchy. Therefore,
 adding additional experimental results is a matter of copying and editing text
-files.  
+files.
 Once the new folders and files have been added following the
 :ref:`database structure format <folderStruct>`, SModelS
 automatically rebuilds the binary (Pickle) database file.
@@ -192,4 +210,4 @@ the SModelS tools.
 
 
 
- 
+

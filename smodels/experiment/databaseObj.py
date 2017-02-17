@@ -16,14 +16,13 @@ import time
 from smodels.experiment import datasetObj
 from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.exceptions import DatabaseNotFoundException
-from smodels.tools.physicsUnits import fb
+from smodels.tools.physicsUnits import fb, TeV
+from smodels.tools.smodelsLogging import logger
 
 try:
     import cPickle as serializer
 except ImportError as e:
     import pickle as serializer
-
-from smodels.tools.smodelsLogging import logger, setLogLevel
 
 class Database(object):
     """
@@ -36,16 +35,16 @@ class Database(object):
         
     """
     
-    def __init__(self, base=None, force_load = None, verbosity=None ):
+    def __init__(self, base=None, force_load = None ):
         """
         :param force_load: force loading the text database ("txt"),
             or binary database ("pcl"), dont force anything if None
+        :param pclfilename: filename of the binary (pickled) database file
         """
         self.force_load = force_load
         self.pclfilename = "database.pcl"
         self.hasFastLim = False # True if any ExpResult is from fastlim
         self._validateBase(base)
-        self._verbosity = verbosity 
         self._databaseVersion = None
         self.expResultList = []
         self.txt_mtime = None, None
@@ -53,8 +52,6 @@ class Database(object):
         self.pcl_db = None
         self.sw_format_version = "115" ## what format does the software support?
         self.pcl_format_version = None ## what format is in the binary file?
-        self.binfile = os.path.join ( self._base, self.pclfilename )
-        setLogLevel ( self._verbosity )
         if self.force_load=="txt":
             self.loadTextDatabase()
             self.printFastlimBanner()
@@ -70,6 +67,9 @@ class Database(object):
         logger.error ( "when initialising database: force_load=%s is not " \
                        "recognized. Valid values are: pcl, txt, None." % force_load )
         sys.exit()
+
+    def binfile ( self ):
+        return os.path.join ( self._base, self.pclfilename )
 
     def printFastlimBanner ( self ):
         """ check if fastlim appears in data.
@@ -96,7 +96,7 @@ class Database(object):
             it needs update, create new binary file, in
             case it does need an update.
         """
-        if not os.path.exists ( self.binfile ):
+        if not os.path.exists ( self.binfile() ):
 #             self.loadTextDatabase()
             self.createBinaryFile()
         else:
@@ -178,11 +178,11 @@ class Database(object):
         if self.pcl_db:
             return self.pcl_db
 
-        if not os.path.exists ( self.binfile ):
+        if not os.path.exists ( self.binfile() ):
             return None
 
         try:
-            with open ( self.binfile, "rb" ) as f:
+            with open ( self.binfile(), "rb" ) as f:
                 t0=time.time()
                 self.pcl_python = serializer.load ( f )
                 self.pcl_format_version = serializer.load ( f )
@@ -203,19 +203,20 @@ class Database(object):
                         return self
 
                     logger.info ( "loading binary db file %s format version %s" % 
-                            ( self.binfile, self.pcl_format_version ) )
+                            ( self.binfile(), self.pcl_format_version ) )
                     self.hasFastLim = serializer.load ( f )
                     self.expResultList = serializer.load ( f )
                     t1=time.time()-t0
                     logger.info ( "Loaded database from %s in %.1f secs." % \
-                            ( self.binfile, t1 ) )
-        except EOFError as e:
-            os.unlink ( self.binfile )
+                            ( self.binfile(), t1 ) )
+        except (EOFError,ValueError) as e:
+            os.unlink ( self.binfile() )
             if lastm_only:
                 self.pcl_format_version = -1
                 self.pcl_mtime = 0
                 return self
-            logger.error ( "%s is not a binary database file! recreate it!" % self.binfile )
+            logger.error ( "%s is not a binary database file, recreate it." % \
+                            self.binfile() )
             self.createBinaryFile()
         return self
 
@@ -259,15 +260,15 @@ class Database(object):
                 ( time.ctime ( self.txt_mtime[0] ), self.txt_mtime[1] ) )
         binfile = filename
         if binfile == None:
-            binfile = self.binfile
-        logger.debug (  " * create %s" % self.binfile )
+            binfile = self.binfile()
+        logger.debug (  " * create %s" % self.binfile() )
         with open ( binfile, "wb" ) as f:
             logger.debug (  " * load text database" )
             self.loadTextDatabase() 
             logger.debug (  " * write %s version %s" % ( self.binfile,
                        self.sw_format_version ) )
-            ptcl = serializer.HIGHEST_PROTOCOL
             self.pcl_python = sys.version
+            ptcl = serializer.HIGHEST_PROTOCOL
             serializer.dump ( self.pcl_python, f, protocol=ptcl )
             serializer.dump ( self.sw_format_version, f, protocol=ptcl )
             serializer.dump ( self.txt_mtime, f, protocol=ptcl )
@@ -305,14 +306,22 @@ class Database(object):
         tmp = os.path.realpath(path)
         if os.path.isfile ( tmp ):
             self._base = os.path.dirname ( tmp )
-            self.force_load = "pcl" 
+            # self.force_load = None
             self.pclfilename = os.path.basename ( tmp )
+            # logger.debug ( "pclfilename is now %s" % self.pclfilename)
             return
 
         if tmp[-4:]==".pcl":
             if not os.path.exists ( tmp ):
-                logger.error ( "File not found: %s" % tmp )
-                sys.exit()
+                if self.force_load == "pcl":
+                    logger.error ( "File not found: %s" % tmp )
+                    sys.exit()
+                logger.info ( "File not found: %s. Will generate." % tmp )
+                self._base = os.path.dirname ( tmp )
+                self.pclfilename = os.path.basename ( tmp )
+                return
+                #if self.force_load in [ "txt", None, "None", "none" ]:
+                #sys.exit()
             logger.error ( "Supplied a pcl filename, but %s is not a file." % tmp )
             sys.exit()
 
@@ -328,10 +337,32 @@ class Database(object):
         idList += "-" * len(idList) + "\n"
         if self.expResultList == None:
             idList += "no experimental results available! "
-        else:
-            for expRes in self.expResultList:
-                idList += expRes.globalInfo.getInfo('id') + ', '
+            return idList
+        idList += "%d experimental results: " % \
+                   len ( self.expResultList ) 
+        atlas,cms = [],[]
+        datasets = 0
+        txnames = 0
+        s = { 8:0, 13:0  }
+        for expRes in self.expResultList:
+            Id = expRes.globalInfo.getInfo('id')
+            sqrts = expRes.globalInfo.getInfo('sqrts').asNumber ( TeV )
+            if not sqrts in s.keys():
+                s[sqrts] = 0
+            s[sqrts]+=1
+            datasets += len ( expRes.datasets )
+            for ds in expRes.datasets:
+                txnames += len ( ds.txnameList )
+            if "ATLAS" in Id:
+                atlas.append ( expRes )
+            if "CMS" in Id:
+                cms.append ( expRes )
+        idList += "%d CMS, %d ATLAS, " % ( len(cms), len(atlas) )
+        for sqrts in s.keys():
+            idList += "%d @ %d TeV, " % ( s[sqrts], sqrts )
+            # idList += expRes.globalInfo.getInfo('id') + ', '
         idList = idList[:-2] + '\n'
+        idList += "%d datasets, %d txnames.\n" % ( datasets, txnames )
         return idList
 
 
@@ -354,37 +385,6 @@ class Database(object):
         except IOError:
             logger.error('There is no version file %s', vfile )
             return 'unknown version'
-
-    @property
-    def verbosity(self):
-        """
-        Tells the level the logger is set to.
-        
-        """
-        return self._verbosity
-
-
-    @verbosity.setter
-    def verbosity(self, level):
-        """
-        Set the logger to specified level.
-        
-        """
-        level = self._validateLevel(level)
-        self._verbosity = level
-        self._setLogLevel(level)
-
-
-    def _validateLevel(self, level):
-        """
-        Validates given level for Python's logger module.
-        
-        """
-        if not level.lower() in ['debug', 'info', 'warning', 'error']:
-            logger.error('No valid level for verbosity: %s! Browser will ' +
-                         'use default setting!' % level)
-            return 'error'
-        return level.lower()
 
     def _loadExpResults(self):
         """
@@ -429,7 +429,8 @@ class Database(object):
 
 
     def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
-                    dataTypes = ['all'], useSuperseded=False, useNonValidated=False):
+                    dataTypes = ['all'], useSuperseded=False, useNonValidated=False,
+                    onlyWithExpected = False ):
         """
         Returns a list of ExpResult objects.
         
@@ -449,6 +450,8 @@ class Database(object):
         :param useSuperseded: If False, the supersededBy results will not be included
         :param useNonValidated: If False, the results with validated = False 
                                 will not be included
+        :param onlyWithExpected: Return only those results that have expected values also.
+                              Note that this is trivially fulfilled for all efficiency maps.
         :returns: list of ExpResult objects or the ExpResult object if the list
                   contains only one result
                    
@@ -480,11 +483,23 @@ class Database(object):
                 newDataSet.dataInfo = dataset.dataInfo
                 newDataSet.txnameList = []
                 for txname in dataset.txnameList:
-                    if txname.validated is False and (not useNonValidated):
+                    if type(txname.validated) == str:
+                        txname.validated = txname.validated.lower()
+                    # print ( "txname",txname.validated,type(txname.validated) )
+                    if ( txname.validated not in [ True, False, "true", "false", "n/a", "tbd", None, "none" ] ):
+                        logger.error ( "value of validated field '%s' in %s unknown." % ( txname.validated, expResult ) )
+                    if txname.validated in [ None, "none" ]:
+                        logger.warning ( "validated is None in %s/%s/%s. Please set to True, False, N/A, or tbd." % \
+                            ( expResult.globalInfo.id, dataset.dataInfo.dataId, txname ) )
+                    if txname.validated not in [ None, True, "true", "n/a", "tbd" ] and (not useNonValidated ):
+#                    if txname.validated is False and (not useNonValidated):
                         continue
                     if txnames != ['all']:
                         if not txname.txName in txnames:
                             continue
+                    if onlyWithExpected and dataset.dataInfo.dataType == "upperLimit" and \
+                                not txname.txnameDataExp:
+                        continue
                     newDataSet.txnameList.append(txname)
                 # Skip data set not containing any of the required txnames:
                 if not newDataSet.txnameList:
@@ -517,6 +532,7 @@ class ExpResultList(object):
 
 if __name__ == "__main__":
     import argparse
+    from smodels.tools.smodelsLogging import setLogLevel
     """ Run as a script, this checks and/or writes database.pcl files """
     argparser = argparse.ArgumentParser(description='simple script to check \
             and/or write database.pcl files')
@@ -537,18 +553,12 @@ if __name__ == "__main__":
     args = argparser.parse_args()
     logger.setLevel(level=logging.INFO )
     if args.debug:
-        logger.setLevel(level=logging.DEBUG )
+        setLogLevel(level=logging.DEBUG )
     if args.write:
         db = Database ( args.database, force_load="txt" )
-        if args.debug:
-            db.verbosity = "debug"
-        logger.debug ( "%s" % db )
         db.createBinaryFile()
         sys.exit()
     db = Database ( args.database )
-    if args.debug:
-        db.verbosity = "debug"
-    logger.debug ( "%s" % db )
     if args.update:
         db.updateBinaryFile()
     if args.check:

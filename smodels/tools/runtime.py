@@ -3,11 +3,36 @@
 """
 .. module:: runtime
     :synopsis: Tools to gather info about runtime enviroment,
-               currently contains only the number of CPUs
+               ( nCPUs() ), or obtain file type ( filetype() )
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
+
+def filetype ( filename ):
+    """ obtain information about the filetype of an input file,
+        currently only used to discriminate between slha and lhe
+        files.
+
+        :returns: filetype as string("slha" or "lhe"), 
+                  None if file does not exist, or filetype is unknown.
+    """
+    import os
+    if not os.path.exists ( filename ):
+        return None
+    if filename[-5:].lower() == ".slha":
+        return "slha"
+    if filename[-4:].lower() == ".lhe":
+        return "lhe"
+    with open ( filename ) as f:
+        for line in f:
+            if "<LesHouchesEvents" in line:
+                return "lhe"
+            if "<event>" in line:
+                return "lhe"
+            if "BLOCK " in line:
+                return "slha"
+    return None
 
 def nCPUs():
     """ obtain the number of CPU cores on the machine, for several

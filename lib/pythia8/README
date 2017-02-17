@@ -1,0 +1,4 @@
+Dependencies:
+=============
+The installer needs either wget or curl installed. Make sure, "make" and "g++"
+are installed on your machine.
