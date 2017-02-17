@@ -1,12 +1,9 @@
-Release v1.1.1, Tue 14 Feb 2017 05:09:46 PM CET 
+Release v1.1.0patch1, Tue 21 Feb 2017
 =======================================================
 
-  * pythia8 support
-  * colored loggers
-  * improved binary database
-  * automated SLHA and LHE file detection
   * pions added to final state particles
-  * smodelsTools.py now also supports toolbox
+  * added compatibility with python3
+  * small performance improvement
 
 Release v1.1.0, Mon 23 Jan 2017 08:00:00 PM CET
 =======================================================
