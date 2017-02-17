@@ -55,7 +55,7 @@ class Cache:
         """
         if len(Cache._cache_order)<Cache.n_stored:
             return
-        ns2 = Cache.n_stored / 2
+        ns2 = int ( Cache.n_stored / 2 )
         for i in range ( ns2 ):
             Cache._cache.pop ( Cache._cache_order[i] ) ## remove 
         Cache._cache_order=Cache._cache_order[ ns2 : ]

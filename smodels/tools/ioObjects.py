@@ -20,6 +20,7 @@ from smodels.theory import crossSection
 from smodels.theory.theoryPrediction import TheoryPrediction
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
+from smodels.tools import runtime
 
 class ResultList(object):
     """
@@ -207,7 +208,8 @@ class FileStatus(object):
         self.status = 0, "File not checked\n"
 
 
-    def checkFile(self, inputType, inputFile, sigmacut=None):
+    def checkFile(self, inputFile, sigmacut=None):
+        inputType = runtime.filetype ( inputFile )
 
         if inputType == 'lhe':
             self.filestatus = LheStatus(inputFile)
@@ -217,7 +219,7 @@ class FileStatus(object):
             self.status = self.filestatus.status
         else:
             self.filestatus = None
-            self.status = -5, 'Unknown input type: %s' % self.inputType
+            self.status = -5, 'Unknown input type: %s' % inputType 
 
 
 class LheStatus(object):
@@ -423,10 +425,10 @@ class SlhaStatus(object):
         """
         if not checkXsec:
             return 0, "Did not check for missing XSECTION table"
-        f = open(self.filename)
-        for line in f:
-            if "XSECTION" in line:
-                return 1, "XSECTION table present"
+        with open(self.filename) as f:
+            for line in f:
+                if "XSECTION" in line:
+                    return 1, "XSECTION table present"
 
         msg = "XSECTION table is missing. Please include the cross section information and try again.\n"
         msg += "\n\t For MSSM models, it is possible to compute the MSSM cross sections"
@@ -697,7 +699,7 @@ class Qnumbers:
             self.charge3 = self.l[1]
             self.cdim = self.l[2]
 
-SMmasses = {1: 4.8e-3 , 2: 2.3e-3 , 3: 95e-2 , 4: 1.275 , 5: 4.18 , 6: 173.21 , 11: 0.51099e-3 , 12: 0, 13: 105.658e-3 , 14: 0 , 15: 1.177682 , 16: 0 , 21: 0 , 22: 0 , 23: 91.1876 , 24: 80.385 , 25: 125.5}
+SMmasses = {1: 4.8e-3 , 2: 2.3e-3 , 3: 95e-2 , 4: 1.275 , 5: 4.18 , 6: 173.21 , 11: 0.51099e-3 , 12: 0, 13: 105.658e-3 , 14: 0 , 15: 1.177682 , 16: 0 , 21: 0 , 22: 0 , 23: 91.1876 , 24: 80.385 , 25: 125.5, 111: 0.135, 211: 0.140}
 
-SMvisible = [1, 2, 3, 4, 5, 6, 11, 13, 15, 21, 22, 23, 24, 25]
+SMvisible = [1, 2, 3, 4, 5, 6, 11, 13, 15, 21, 22, 23, 24, 25, 211, 111]
 SMinvisible = [12, 14, 16]

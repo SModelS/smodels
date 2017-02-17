@@ -12,7 +12,7 @@
 from __future__ import print_function
 import argparse
 from smodels.tools import xsecComputer
-from smodels.tools import slhaChecks, lheChecks, databaseBrowser
+from smodels.tools import slhaChecks, lheChecks, databaseBrowser, toolBox
 from smodels.tools import smodelsLogging
 
 
@@ -37,11 +37,19 @@ def main():
     xseccomputer.add_argument('-c', '--ncpus', type=int, default=-1,
         help="number of cores to be used simultaneously. -1 means 'all'. ")
     xseccomputer.add_argument('-p', '--tofile', action='store_true',
-        help="write cross sections to file")
+        help="write cross sections to file (only highest order)")
+    xseccomputer.add_argument('-P', '--alltofile', action='store_true',
+        help="write all cross sections to file, including lower orders")
     xseccomputer.add_argument('-q', '--query', action='store_true',
         help="only query if there are cross sections in the file")
+    xseccomputer.add_argument('-C', '--colors', action='store_true',
+        help="colored output" )
     xseccomputer.add_argument('-k', '--keep', action='store_true',
         help="do not unlink temporary directory")
+    xseccomputer.add_argument('-6', '--pythia6', action='store_true',
+        help="use pythia6 for LO cross sections")
+    xseccomputer.add_argument('-8', '--pythia8', action='store_true',
+        help="use pythia8 for LO cross sections (default)")
     xseccomputer.add_argument('-n', '--NLO', action='store_true',
         help="compute at the NLO level (default is LO)")
     xseccomputer.add_argument('-N', '--NLL', help="compute at the NLO+NLL level (takes precedence over NLO, default is LO)", action='store_true')
@@ -67,6 +75,14 @@ def main():
     dbBrowser.add_argument('-p', '--path_to_database', help='path to SModelS database', required=True)
     dbBrowser.add_argument('-t', '--text', help='load text database, dont even search for binary database file', action='store_true')
 
+    toolbox = subparsers.add_parser( 'toolbox', description=
+								                     "Facility to control external dependencies")
+    toolbox.add_argument('-c', '--colors', help='turn on colors',
+                           action='store_true')
+    toolbox.add_argument('-l', '--long', help='long output lines',
+                           action='store_true')
+    toolbox.add_argument('-m', '--make', help='compile packages if needed',
+                           action='store_true')
     args = parser.parse_args()
 
     smodelsLogging.setLogLevel ( args.verbose )
@@ -80,7 +96,8 @@ def main():
         path = os.path.abspath(os.path.realpath(__file__))
         print ( "This binary:",path )
         sys.exit()
-
+    if args.subparser_name == 'toolbox':
+        toolBox.main ( args )
     if args.subparser_name == 'xseccomputer':
         xsecComputer.main(args)
     if args.subparser_name == 'slhachecker':
