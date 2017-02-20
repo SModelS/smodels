@@ -2,8 +2,7 @@ Release v1.1.0patch1, Tue 21 Feb 2017
 =======================================================
 
   * pions added to final state particles
-  * added compatibility with python3
-  * small performance improvement
+  * added full list of PIDs in asymmetric and long topologies coverage output
 
 Release v1.1.0, Mon 23 Jan 2017 08:00:00 PM CET
 =======================================================
