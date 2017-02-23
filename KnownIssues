@@ -1,7 +1,7 @@
 Known Issues, v1.1.0patch1
 =======================================================
 
- * In case of a very heavy ~uR, the cross section computations for the other 
+ * In case of a very heavy ~uR, the Pythia 6 cross sections for the other 
    squarks can be quite wrong, since the phase space is initialized for all 
    squarks using the ~uR mass. 
 
