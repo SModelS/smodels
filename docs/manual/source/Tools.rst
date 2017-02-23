@@ -372,8 +372,10 @@ The *missing* topologies are then further classified (if applicable) into *longC
 
 
 The topologies for each of the four categories are then grouped according to the final state (for the *missingTopos* and
-*outsideGrid* classes) or according to the PDG ids of the mother masses (for the *longCascade* and
+*outsideGrid* classes) or according to the PDG ids of the initially produced motherparticles (for the *longCascade* and
 *asymmetricBranches* classes). 
+We note that for the latter the |elements| deriving from different mother particles, but with the same |final states| and mass configuration cannot be distinguished, and are therefore combined in this grouping.
+The full list of mother PDG id pairs can be accessed in the python printout or the comment of the text printout.
 
 
 The topology coverage tool is normally called from within SModelS (e.g. when running :ref:`runSModelS.py <runSModelS>`) by setting **testCoverage=True**
