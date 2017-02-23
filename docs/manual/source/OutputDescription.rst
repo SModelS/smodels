@@ -126,7 +126,7 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   If **addCoverageID** = True, all the |elements| IDs contributing to the missing topology are shown.
 
 .. literalinclude:: /images/screenoutput.txt
-   :lines: 18323-18327     
+   :lines: 18323-18327,18344-18345   
 
 * information about the missing topologies with asymmetric decays.
   The asymmetric branch decays are classified by the initially produced mother particles.
@@ -214,7 +214,7 @@ Below we describe in detail the blocks contained in the summary output:
 * information about the missing topologies with long cascade decays:
 
 .. literalinclude:: /images/summaryoutput.txt
-   :lines: 146-150
+   :lines: 146-150,158
 
 * information about the missing topologies with asymmetric decays:
 
