@@ -19,7 +19,7 @@ install_pythia8:
 clean:
 	rm -rf $(EXES) test.slha pythia$(PYTHIAVER) pythia$(PYTHIAVER).tgz
 
-pythia8.exe:
+pythia8.exe: pythia8.cc
 	echo $(XMLDOC) > xml.doc
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ pythia8.cc -lpythia8 -ldl
 
