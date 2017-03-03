@@ -10,10 +10,13 @@ using namespace std;
 void checkEntry ( ParticleDataEntry & entry )
 {
     cout << endl;
-    if ( entry.mWidth() > 100. ) // widths greater than 100 GeV are suspicious
+    int id = entry.id();
+    // widths greater than 100 GeV for BSM particles. suspicious!
+    if ( (abs(id) > 999999) && ( entry.mWidth() > 100. ) )
     {
-      cout << "[ParticleDataEntry] entry has very large particle width: "
-           << entry.mWidth() << "! Will set to 1 GeV." << endl;
+      cout << "[ParticleDataEntry] entry " << id << " has very large particle width: "
+           << entry.mWidth() << "! (Is there no decay table in the slha file?)" 
+           << endl;
       entry.setMWidth(1.0);
       entry.clearChannels();
       entry.addChannel ( 1, 1.0, 100, 1, -1 );
