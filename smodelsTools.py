@@ -43,7 +43,7 @@ def main():
     xseccomputer.add_argument('-q', '--query', action='store_true',
         help="only query if there are cross sections in the file")
     xseccomputer.add_argument('-C', '--colors', action='store_true',
-        help="colored output" )
+        help="colored terminal output" )
     xseccomputer.add_argument('-k', '--keep', action='store_true',
         help="do not unlink temporary directory")
     xseccomputer.add_argument('-6', '--pythia6', action='store_true',
@@ -77,7 +77,7 @@ def main():
 
     toolbox = subparsers.add_parser( 'toolbox', description=
 								                     "Facility to control external dependencies")
-    toolbox.add_argument('-c', '--colors', help='turn on colors',
+    toolbox.add_argument('-c', '--colors', help='turn on terminal colors',
                            action='store_true')
     toolbox.add_argument('-l', '--long', help='long output lines',
                            action='store_true')
