@@ -124,7 +124,7 @@ class Pythia8Wrapper(WrapperBase):
         
         """
         self.xsecs = {}
-        logger.debug ( "started .run" )
+        logger.debug ( "wrapper.run()" )
         slha = self.checkFileExists(slhaFile)
         logger.debug ( "file check: " + slha )
         cfg = self.absPath(self.cfgfile)

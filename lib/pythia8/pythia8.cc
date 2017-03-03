@@ -7,6 +7,65 @@
 using namespace Pythia8;
 using namespace std;
 
+void checkEntry ( ParticleDataEntry & entry )
+{
+    cout << endl;
+    if ( entry.mWidth() > 100. ) // widths greater than 100 GeV are suspicious
+    {
+      cout << "[ParticleDataEntry] entry has very large particle width: "
+           << entry.mWidth() << "! Will set to 1 GeV." << endl;
+      entry.setMWidth(1.0);
+      entry.clearChannels();
+      entry.addChannel ( 1, 1.0, 100, 1, -1 );
+    }
+    /*
+    cout << "[ParticleDataEntry] id=" << entry.id() << " w=" 
+         << entry.mWidth() << " mMin=" << entry.mMin() 
+         << " mMax=" << entry.mMax() << " fw=" << entry.doForceWidth()
+         << " m0=" << entry.m0() << " mayDecay=" << entry.mayDecay() 
+         << " uBW=" << entry.useBreitWigner() << " channels=" << entry.sizeChannels()
+         << endl;
+    for ( int i=0; i< entry.sizeChannels() ; i++ )
+    {
+      DecayChannel c = entry.channel ( i );
+      cout << "[DecayChannel] onM=" << c.onMode() << " m="
+           << c.multiplicity() << " bR=" << c.bRatio() << " changed=" 
+           << c.hasChanged() << " width=" << c.onShellWidth();
+      for ( int p=0; p< c.multiplicity() ; p++ )
+      {
+        cout << " pdg=" << c.product(p) << " ";
+      };
+      cout << endl;
+    };
+    */
+}
+
+void check ( ParticleData & data )
+{
+  int ctr=0;
+  int last = 1;
+  while ( last != 0 )
+  {
+    ctr++;
+    int now = data.nextId( last );
+    if ( now == 0 )
+    {
+      // cout << "[pythia8.cc] we hit the end of the particle table" << endl;
+      return;
+    } else {
+      ParticleDataEntry * entry = data.particleDataEntryPtr ( now );
+      checkEntry ( *entry );
+    }
+    if ( ctr > 10000 )
+    {
+      cout << "[pythia8.cc] we have more than 10,000 particles in our database."
+              " This cannot be. I stop." << endl;
+      exit(-1);
+    }
+    last = now;
+  }
+}
+
 int run( int nevents, float sqrts /* in TeV */, const string & slhafile,
          const string & cfgfile, const string & xmldir )
 {
@@ -21,13 +80,16 @@ int run( int nevents, float sqrts /* in TeV */, const string & slhafile,
   pythia.readString( o2.str() );
   o3 << "SLHA:file=" << slhafile;
   pythia.readString ( o3.str() );
+  pythia.readString ( "SLHA:allowUserOverride = true" );
   pythia.init();
+  check ( pythia.particleData );
 
   // Begin event loop. Generate event. Skip if error.
   for (int iEvent = 0; iEvent < nevents; ++iEvent ) {
     if (!pythia.next()) continue;
   }
   pythia.stat();
+  pythia.particleData.listAll();
   return 0;
 }
 
