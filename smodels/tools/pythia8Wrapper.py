@@ -146,7 +146,7 @@ class Pythia8Wrapper(WrapperBase):
             f.write (cmd + "\n\n\n")
             f.write (out + "\n")
             f.close()
-            logger.debug ( "stored everything in %s" % tempfile )
+            logger.info ( "stored everything in %s" % tempfile )
         self.parse ( out )
         ret = XSectionList()
         for key,value in self.xsecs.items():
