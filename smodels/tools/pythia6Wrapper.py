@@ -15,6 +15,7 @@ from smodels.tools.physicsUnits import pb
 from smodels.tools.smodelsLogging import logger
 from smodels.theory import crossSection
 from smodels import installation
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import os, sys, io
 
 try:

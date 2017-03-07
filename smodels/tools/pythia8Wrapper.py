@@ -53,6 +53,7 @@ class Pythia8Wrapper(WrapperBase):
         self.nevents = 10000
         self.sqrts = 13
         self.secondsPerEvent = 10
+        self.pythiacard = None
 
         self.unlink()
 
@@ -123,6 +124,13 @@ class Pythia8Wrapper(WrapperBase):
         :returns: List of cross sections
         
         """
+        
+        #Change pythia configuration file, if defined:
+        if self.pythiacard:
+            pythiacard_default = self.cfgfile
+            self.cfgfile = self.pythiacard
+
+        
         self.xsecs = {}
         logger.debug ( "wrapper.run()" )
         slha = self.checkFileExists(slhaFile)
@@ -157,6 +165,12 @@ class Pythia8Wrapper(WrapperBase):
             xsec.pid = key
             ret.add ( xsec )
         self.xsecs.clear()
+        
+        
+        #Reset pythia card to its default value
+        if self.pythiacard:
+            self.cfgfile = pythiacard_default
+        
         return ret
 
     def getProcess ( self, token ):
