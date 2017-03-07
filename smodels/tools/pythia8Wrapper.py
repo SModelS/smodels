@@ -13,10 +13,11 @@ from smodels.tools.wrapperBase import WrapperBase
 from smodels.tools import wrapperBase
 from smodels.tools.smodelsLogging import logger, setLogLevel
 from smodels.tools.physicsUnits import fb, pb, TeV, mb
-from smodels.theory.crossSection import XSection, XSectionInfo, LO, XSectionList
+from smodels.theory.crossSection import getXsecFromLHEFile
 from smodels import installation
 from smodels.tools.pythia8particles import particles
-import os, sys
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
+import os, sys, io
 
 try:
     import commands as executor #python2 
@@ -137,9 +138,10 @@ class Pythia8Wrapper(WrapperBase):
         logger.debug ( "file check: " + slha )
         cfg = self.absPath(self.cfgfile)
         logger.debug("running with cfgfile " + str(cfg))
-        cmd = "%s -n %d -f %s -s %d -c %s" % \
-             ( self.executablePath, self.nevents, slha, self.sqrts, cfg )
-        xmldoc = self.executablePath.replace ( "pythia8.exe", "xml.doc" )
+        lhefile = self.tempDirectory() + "/events.lhe"
+        cmd = "%s -n %d -f %s -s %d -c %s -l %s" % \
+             ( self.executablePath, self.nevents, slha, self.sqrts, cfg, lhefile )
+        xmldoc = self.executablePath.replace ( "pythia8.exe", "xml.doc" )        
         if os.path.exists (xmldoc ):
             logger.info ( "xml.doc found at %s." % xmldoc )
             with open ( xmldoc ) as f:
@@ -148,24 +150,28 @@ class Pythia8Wrapper(WrapperBase):
                 cmd += " -x %s" % xmlDir.strip()
         logger.debug("Now running ''%s''" % str(cmd) )
         out = executor.getoutput(cmd)
+        if not os.path.isfile(lhefile):
+            raise SModelSError( "LHE file %s not found" % lhefile )
+        lheF = open(lhefile,'r')
+        lhedata = lheF.read()
+        lheF.close()        
+        os.remove(lhefile)        
+        if not "<LesHouchesEvents" in lhedata:
+            raise SModelSError("No LHE events found in pythia output")                
         if not unlink:
             tempfile = self.tempDirectory() + "/log"
             f = open( tempfile, "w")
             f.write (cmd + "\n\n\n")
             f.write (out + "\n")
+            f.write (lhedata + "\n")
             f.close()
             logger.info ( "stored everything in %s" % tempfile )
-        self.parse ( out )
-        ret = XSectionList()
-        for key,value in self.xsecs.items():
-            xsec = XSection()
-            xsec.info = XSectionInfo( self.sqrts * TeV, LO, 
-                                      "%d TeV (LO)" % self.sqrts )
-            xsec.value = value
-            xsec.pid = key
-            ret.add ( xsec )
-        self.xsecs.clear()
-        
+            
+        # Create memory only file object
+        if sys.version[0]=="2":
+            lhedata = unicode( lhedata )
+        lheFile = io.StringIO(lhedata)
+        ret = getXsecFromLHEFile(lheFile)            
         
         #Reset pythia card to its default value
         if self.pythiacard:
@@ -173,75 +179,6 @@ class Pythia8Wrapper(WrapperBase):
         
         return ret
 
-    def getProcess ( self, token ):
-        """ obtain the process identifier from the pythia8 output """
-        parrow = token.find ( "->" ) 
-        if parrow < 1:
-            logger.error ( "cannot parse pythia8 output" )
-            return None
-        process = token[parrow+2:-4].strip()
-        s1 = process.find ( " " )
-        p=[ None, None ]
-        p[0] = process [ : s1 ]
-        s2 = process [ s1+1 : ].find ( " " )
-        if s2 == -1:
-            s2 = len( process )
-        else:
-            s2 += s1+1
-        p[1] = process [ s1+1 : s2 ]
-
-        """
-        print ( "process >>%s<<" % ( process ) )
-        print ( "cut off >>%s<<" % process[s1+1 : ] )
-        print ( "s2t off >>%s<<" % process[s1+1 : ] )
-        print ( "p2 >>%s<<" % p2 )
-        """
-        for key, value in particles.items():
-            particles[key+"bar"]=-value
-        ret = [ None, None ]
-        for i in [0,1]:
-            if p[i] in particles.keys():
-                ret[i]=particles[p[i] ]
-            else:
-                logger.error ( "particle >>%s<< unknown. " \
-                        "Check pythia8particles.py." % p[i] )
-                sys.exit()
-        return tuple ( ret )
-
-    def getXSec ( self, token ):
-        """ obtain the cross section from the pythia8 output """
-        value, error = map ( float, token.split () )
-        # print ( "xsec: >>%s<<" % (value * mb) )
-        return (value * mb).asUnit ( fb )
-
-    def parseLine ( self, line ):
-        tmp = line.split ( "|" )
-        tokens = [ x.strip() for x in tmp[1:-1]  ]
-        process = self.getProcess ( tokens[0] )
-        xsec = self.getXSec ( tokens[-1] )
-        if xsec < 1e-8 * fb:
-            return
-        if not process in self.xsecs.keys():
-            self.xsecs [ process ] = 0. * fb
-        self.xsecs[ process ] += xsec
-
-    def parse( self, out ):
-        lines = out.split ("\n")
-        # print ( "Parsing outfile with %d lines." % len(lines) )
-        begin,end=1,0
-        for ctr,line in enumerate(lines):
-            if "--  PYTHIA Event and Cross Section Statistics" in line:
-                begin=ctr+7
-            if "End PYTHIA Event and Cross Section Statistics" in line:
-                end=ctr-3
-        if begin > end:
-            logger.error ( "could not parse pythia8 output file correctly." )
-            with open("/tmp/pythia8.log", "w" ) as f:
-                f.write ( out )
-                logger.error ( "see /tmp/pythia8.log for more details" )
-            return None
-        for line in lines[begin:end]:
-            self.parseLine ( line )
 
     def chmod(self):
         """ 
