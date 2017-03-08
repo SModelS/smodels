@@ -17,7 +17,7 @@ install_pythia8:
 	./installer.sh $(PYTHIAVER)
 
 clean:
-	rm -rf $(EXES) test.slha pythia$(PYTHIAVER) pythia$(PYTHIAVER).tgz
+	rm -rf $(EXES) test.slha pythia$(PYTHIAVER) pythia$(PYTHIAVER).tgz pythia8.exe events.lhe
 
 pythia8.exe: pythia8.cc
 	echo $(XMLDOC) > xml.doc
