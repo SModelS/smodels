@@ -28,7 +28,7 @@ squarks = [1000000 + i for i in range(1,5)]
 squarks += [2000000 + i for i in range(1,5)]
 
 logger = logging.getLogger()
-logger.setLevel(logging.WARNING)
+logger.setLevel(logging.ERROR)
 
 
 def compareXSections(dictA,dictB,nevts,relError = 0.1):
@@ -74,7 +74,7 @@ def debugFile(slhafile,nevts=10000):
 #     print 'Pythia 6:'
 #     for key,val in sorted(w6.items()):
 #         print key,val.values()[0]
-#     
+#       
 #     print 'Pythia 8:'
 #     for key,val in sorted(w8.items()):
 #         print key,val.values()[0]
@@ -98,6 +98,8 @@ def checkFiles(slha6,slha8,Nevents = 50000):
     if not comp:
         return (slha6,slha8,True)
     
+    
+    #Remove degenerate squarks
     f = pyslha.readSLHAFile(slha6)
     masses = f.blocks['MASS']
     squarksMasses = [abs(mass) for pid,mass in masses.items() if pid in squarks]
@@ -111,10 +113,13 @@ def checkFiles(slha6,slha8,Nevents = 50000):
         os.close(slhaF)
         comp = debugFile(slhafile, nevts=Nevents)
         os.remove(slhafile)
-        
+    
+    #Remove the antisbottom-gluino xsec (seems to be missing in Pythia 8):
+    if (-1000005, 1000021) in comp:
+        comp.remove((-1000005, 1000021))
     
     if comp:
-        logger.debug(str(comp))
+        logger.error(str(comp))
         return (slha6,slha8,False)
     else:        
         return (slha6,slha8,True)
@@ -122,32 +127,34 @@ def checkFiles(slha6,slha8,Nevents = 50000):
 
 def checkFolders(slha6Folder,slha8Folder):
     
+    badFiles = []
     
     slhaFiles = []
-    for slha6 in glob.glob(slha6Folder+'/*.slha'):
-          slha8 = slha6.replace('.slha','_new.slha').replace(slha6Folder,slha8Folder)
-          if not os.path.isfile(slha8):
-              continue
-          testF = open(slha8,'r')
-          test = testF.read()
-          testF.close()
-          if 'XSECTION' in test:
-              slhaFiles.append((slha6,slha8))          
+    for slha6 in glob.glob(os.path.join(slha6Folder,'*.slha')):
+        slha8 = slha6.replace('.slha','_new.slha').replace(slha6Folder,slha8Folder)
+        if not os.path.isfile(slha8):
+            continue
+        slhaFiles.append((slha6,slha8))          
     
-    pool = multiprocessing.Pool(processes=45)
+    
+    pool = multiprocessing.Pool(processes=40)
     jobs = [pool.apply_async(checkFiles,args=slha) for slha in slhaFiles]
     for job in jobs:
         slha6,slha8,good = job.get(timeout=500)
         if not good:
             logger.error('Files %s and %s differ' %(slha6,slha8))
+            badFiles.append(slha6)
         else:
-            logger.warning('File %s OK' %os.path.basename(slha6))            
+            os.remove(slha8)
+            logger.warning('File %s OK' %os.path.basename(slha6))
+            
+    return badFiles            
             
 if __name__ == "__main__":    
 
     if len(sys.argv) == 2:
         print debugFile(sys.argv[1])
     elif len(sys.argv) == 3:
-        checkFolders(sys.argv[1],sys.argv[2])
+        print checkFolders(sys.argv[1],sys.argv[2])
         
             
