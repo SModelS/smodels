@@ -58,7 +58,11 @@ class MPrinter(object):
             elif prt == 'log':
                 newPrinter = TxTPrinter(output = 'file')
             elif prt == 'xml':
-                newPrinter = XmlPrinter(output = 'file')            
+                newPrinter = XmlPrinter(output = 'file')           
+            elif prt == 'slha':
+                newPrinter = SLHAPrinter(output = 'file')
+                if parser.getboolean("options", "doCompress") or parser.getboolean("options", "doInvisible"):
+                    newPrinter.docompress = 1
             else:
                 logger.warning("Unknown printer format: %s" %str(prt))
                 continue
@@ -992,3 +996,118 @@ class XmlPrinter(PyPrinter):
 
         self.toPrint = [None]*len(self.printingOrder)
         return root
+
+class SLHAPrinter(TxTPrinter):
+    """
+    Printer class to handle the printing of slha format summary output.
+    It uses the facilities of the TxTPrinter.
+    """
+
+    def __init__(self, output = 'file', filename = None):
+        TxTPrinter.__init__(self, output, filename)
+        self.name = "slha"
+        self.docompress = 0
+        self.printingOrder = [OutputStatus,ResultList, Uncovered]
+        self.toPrint = [None]*len(self.printingOrder)
+
+
+    def setOutPutFile(self,filename,overwrite=True):
+        """
+        Set the basename for the text printer. The output filename will be
+        filename.smodels.
+        :param filename: Base filename
+        :param overwrite: If True and the file already exists, it will be removed.
+        """
+
+        self.filename = filename +'.smodelsslha'
+        if overwrite and os.path.isfile(self.filename):
+            logger.warning("Removing old output file " + self.filename)
+            os.remove(self.filename)
+
+    def _formatOutputStatus(self, obj):
+        
+        smodelsversion = obj.smodelsVersion
+        if not smodelsversion.startswith("v"): smodelsversion = "v" + smodelsversion
+        output = "BLOCK SModelS_Settings\n"
+        output += " 0 %-25s #SModelS version\n" %(smodelsversion)
+        output += " 1 %-25s #database version\n" %(obj.databaseVersion.replace(" ",""))
+        output += " 2 %-25s #maximum condition violation\n" % (obj.parameters['maxcond'])
+        output += " 3 %-25s #compression (0 off, 1 on)\n" % (self.docompress)
+        output += " 3 %-25s #minimum mass gap for mass compression [GeV]\n" % (obj.parameters['minmassgap'])
+        output += " 4 %-25s #sigmacut [fb]\n\n" % (obj.parameters['sigmacut'])
+        return output
+
+    def _formatResultList(self, obj):
+        output = "BLOCK SModelS_Exclusion\n"
+        if obj.isEmpty():
+            excluded = -1
+        else:
+            firstResult = obj.theoryPredictions[0]
+            r = obj.getR(firstResult)
+            if r > 1: excluded = 1
+            else: excluded = 0
+        output += " 0 0 %-30s #output status (-1 not tested, 0 not excluded, 1 excluded)\n" % (excluded)
+        if excluded == 0: rList = [firstResult]
+        elif excluded == 1: rList = obj.theoryPredictions
+        else: rList = []
+        cter = 1
+        for theoPred in rList:
+            expResult = theoPred.expResult
+            datasetID = theoPred.dataset.dataInfo.dataId
+            dataType = expResult.datasets[0].dataInfo.dataType
+            txnames = theoPred.txnames
+            if dataType == 'upperLimit':
+                ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass)
+                ul_expected = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass, expected=True)
+                signalRegion  = '(UL)'
+            elif dataType == 'efficiencyMap':
+                ul = expResult.getUpperLimitFor(dataID=datasetID)
+                ul_expected = expResult.getUpperLimitFor(dataID=datasetID, expected=True)
+                signalRegion  = theoPred.dataset.dataInfo.dataId
+            else:
+                logger.error("Unknown dataType %s" %(str(dataType)))
+                raise SModelSError()
+            value = theoPred.xsection.value
+            r = (value/ul).asNumber()
+            if type(ul_expected)==type(None): r_expected = None
+            else: r_expected = (value/ul_expected).asNumber()
+            txnameStr = str([str(tx) for tx in txnames])
+            txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
+
+            if r <1 and not excluded == 0: break
+            output += " %d 0 %-30s #txname \n" % (cter, txnameStr )
+            output += " %d 1 %-30.3E #r value\n" % (cter, r)
+            if not r_expected: output += " %d 1 N/A                            #expected r value\n" % (cter)
+            else: output += " %d 2 %-30.3E #expected r value\n" % (cter, r_expected)
+            output += " %d 3 %-30.2f #condition violation\n" % (cter, theoPred.getmaxCondition())
+            output += " %d 4 %-30s #analysis\n" % (cter, expResult.globalInfo.id)
+            output += " %d 5 %-30s #signal region \n" %(cter, signalRegion.replace(" ","_"))
+            if hasattr(theoPred,'expectedUL') and not theoPred.expectedUL is None:
+                output += " %d 6 %-30.3E #Chi2\n" % (cter, theoPred.chi2)
+                output += " %d 7 %-30.3E #Likelihood\n" % (cter, theoPred.likelihood)
+            else:
+                output += " %d 6 N/A                            #Chi2\n" % (cter)
+                output += " %d 7 N/A                            #Likelihood\n" % (cter)
+            output += "\n"
+            cter += 1
+        return output
+
+    def _formatUncovered(self, obj):
+        output = ""
+        for ix, uncovEntry in enumerate([obj.missingTopos, obj.outsideGrid]):
+            if ix==0: output += "BLOCK SModelS_Missing_Topos #sqrts[TeV] weight[fb] description\n"
+            else: output += "\nBLOCK SModelS_Outside_Grid #sqrts[TeV] weight[fb] description\n"
+            cter = 0
+            for t in sorted(uncovEntry.topos, key=lambda x: x.value, reverse=True):
+                output += " %d %d %10.3E %s\n" % (cter, obj.missingTopos.sqrts/TeV, t.value, str(t.topo))
+                cter += 1
+                if cter > 9: break
+        for ix, uncovEntry in enumerate([obj.longCascade, obj.asymmetricBranches]):
+            if ix==0: output += "\nBLOCK SModelS_Long_Cascade #Mother1 Mother2 Weight[fb] allMothers\n"
+            else: output += "\nBLOCK SModelS_Asymmetric_Branches #Mother1 Mother2 Weight[fb] allMothers\n"
+            cter = 0
+            for ent in uncovEntry.getSorted(obj.sqrts):
+                output += " %d %s %s %10.3E %s\n" %(cter, ent.motherPIDs[0][0], ent.motherPIDs[0][1], ent.getWeight(obj.sqrts).asNumber(fb), str(ent.motherPIDs).replace(" ",""))
+                cter += 1
+                if cter > 9: break
+        return output
