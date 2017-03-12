@@ -28,10 +28,10 @@ squarks = [1000000 + i for i in range(1,5)]
 squarks += [2000000 + i for i in range(1,5)]
 
 logger = logging.getLogger()
-logger.setLevel(logging.ERROR)
+logger.setLevel(logging.WARNING)
 
 
-def compareXSections(dictA,dictB,nevts,relError = 0.1):
+def compareXSections(dictA,dictB,nevts,relError = 0.1):    
 
     missingXsecs = set(dictA.keys()).symmetric_difference(set(dictB.keys()))
     commonXsecs = set(dictA.keys()).intersection(set(dictB.keys()))
@@ -42,7 +42,6 @@ def compareXSections(dictA,dictB,nevts,relError = 0.1):
     
     diffXsecs = []
 
-    equalXsecs = True
     for xsec in commonXsecs:
         diff = abs(dictA[xsec].values()[0] - dictB[xsec].values()[0])
         if diff > 2.*mcError and (diff/(abs(dictA[xsec].values()[0] + dictB[xsec].values()[0]))).asNumber() > relError:
@@ -74,11 +73,10 @@ def debugFile(slhafile,nevts=10000):
 #     print 'Pythia 6:'
 #     for key,val in sorted(w6.items()):
 #         print key,val.values()[0]
-#       
+#             
 #     print 'Pythia 8:'
 #     for key,val in sorted(w8.items()):
 #         print key,val.values()[0]
-    
     
     comp = compareXSections(w6,w8,nevts,relError=0.1)
         
@@ -93,6 +91,7 @@ def checkFiles(slha6,slha8,Nevents = 50000):
     xsecs6 = getXsecFromSLHAFile(slha6)    
     w6 = xsecs6.getXsecsFor('8 TeV (LO)').getDictionary()
     w8 = xsecs8.getXsecsFor('8 TeV (LO)').getDictionary()
+
     comp = compareXSections(w6,w8,Nevents,relError=0.1)
     
     if not comp:
@@ -104,13 +103,14 @@ def checkFiles(slha6,slha8,Nevents = 50000):
     masses = f.blocks['MASS']
     squarksMasses = [abs(mass) for pid,mass in masses.items() if pid in squarks]
     avgmass = sum(squarksMasses)/len(squarksMasses)
-    if abs(max(squarksMasses)-avgmass) > 0.5 or  abs(min(squarksMasses)-avgmass) > 0.5:
+    if abs(max(squarksMasses)-avgmass) > 0.1 or  abs(min(squarksMasses)-avgmass) > 0.1:
         for pid in squarks:
             f.blocks['MASS'][pid] = avgmass
             
         slhaF,slhafile = tempfile.mkstemp(suffix='.slha', dir='./')
         os.write(slhaF,f.write())            
         os.close(slhaF)
+        logger.warning("Testing degenerate squarks for %s with average mass %s" %(slha6,avgmass))
         comp = debugFile(slhafile, nevts=Nevents)
         os.remove(slhafile)
     
@@ -131,13 +131,14 @@ def checkFolders(slha6Folder,slha8Folder):
     
     slhaFiles = []
     for slha6 in glob.glob(os.path.join(slha6Folder,'*.slha')):
+#         if not '21725753' in slha6: continue
         slha8 = slha6.replace('.slha','_new.slha').replace(slha6Folder,slha8Folder)
         if not os.path.isfile(slha8):
             continue
         slhaFiles.append((slha6,slha8))          
     
     
-    pool = multiprocessing.Pool(processes=40)
+    pool = multiprocessing.Pool(processes=5)
     jobs = [pool.apply_async(checkFiles,args=slha) for slha in slhaFiles]
     for job in jobs:
         slha6,slha8,good = job.get(timeout=500)
