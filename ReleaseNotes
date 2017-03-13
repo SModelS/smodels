@@ -1,3 +1,13 @@
+Release v1.1.1pre1, Mon 13 Mar 2017
+=======================================================
+
+  * pythia8 support
+  * colored loggers
+  * improved binary database
+  * automated SLHA and LHE file detection
+  * smodelsTools.py now also supports toolbox
+  * C++ interface
+
 Release v1.1.0patch1, Tue 21 Feb 2017
 =======================================================
 
