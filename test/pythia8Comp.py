@@ -106,9 +106,7 @@ def debugFile(slhafile,nevts=10000,forceDegenerate=False):
     if (-2000001, 1000021) in w6:
         w6.pop((-2000001, 1000021))
     if (-1000003, 1000021) in w6:
-        w6.pop((-1000003, 1000021))
-
-        
+        w6.pop((-1000003, 1000021))        
     #Remove the antisbottom-gluino xsec (seems to be missing in Pythia 8):
     if (-1000024, 1000021) in w6:
         totxsec = w6[(-1000024, 1000021)].values()[0]
