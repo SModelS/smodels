@@ -89,6 +89,7 @@ class NllFastWrapper(WrapperBase):
         :returns: list of interpolated k-factor values at x-value xval
 
         """
+        import numpy
         kFacs = []
 
         xpts = [x[0] for x in kFacsVector]
