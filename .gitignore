@@ -45,18 +45,10 @@ distribution/create.log
 distribution/smodels-*
 docs/manual/source/recipes/*.html
 docs/manual/source/recipes/*.py
-docs/manual/source/XSecComputer.rst
-docs/manual/source/RunSModelS.rst
-docs/manual/source/LheChecker.rst
-docs/manual/source/SlhaChecker.rst
-docs/manual/source/ToolBox.rst
-docs/manual/source/DatabaseBrowser.rst
-test/database/databas*.pcl
-lib/pythia8/pythia82*
+test/database/database.pcl
+lib/pythia8/pythia8223.tgz
+lib/pythia8/pythia8223
 lib/pythia8/xml.doc
-cpp/libSModelS.so
-cpp/run
-# test/database/database.pcl
 *~
 *.crash
 
