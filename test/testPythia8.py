@@ -8,22 +8,18 @@
     
 """
 
-import sys,os
+import sys
 sys.path.insert(0,"../")
 from smodels.tools import xsecComputer, toolBox
-from smodels.tools.xsecComputer import LO, NLL
+from smodels.tools.xsecComputer import LO
 from smodels.tools.physicsUnits import TeV, fb
-from smodels.theory import crossSection
 from unum import Unum
-import tempfile
 import unittest
-import argparse
-import logging.config
 from math import sqrt
 
 Unum.VALUE_FORMAT = "%.4f"  
 
-Nevents = 50000
+Nevents = 10000
 
 def compareXSections(dictA,dictB,nevts,relError = 0.1):
 
@@ -34,8 +30,6 @@ def compareXSections(dictA,dictB,nevts,relError = 0.1):
     totXsec = max(totXsecA,totXsecB)*fb
     mcError = totXsec/sqrt(float(nevts))
     
-    diffXsecs = []
-
     equalXsecs = True
     for xsec in commonXsecs:
         diff = abs(dictA[xsec].values()[0] - dictB[xsec].values()[0])
@@ -61,27 +55,24 @@ def compareXSections(dictA,dictB,nevts,relError = 0.1):
 
 class XSecTest(unittest.TestCase):
     # use different logging config for the unit tests.
-    logging.config.fileConfig( "./logging.conf" )
-    from smodels.tools.smodelsLogging import logger, setLogLevel
-    setLogLevel ( "warn" )
 
     toolBox.ToolBox().compile() ## make sure the tools are compiled
 
     def testLOGlu(self):
         """ test the computation of LO cross section and compare with pythia6 """
-        self.logger.info ("test LO xsecs @ 8 TeV")
+
         slhafile  = "../inputFiles/slha/gluino_squarks.slha"
         computer6 = xsecComputer.XSecComputer(LO, Nevents, 6)
         computer8 = xsecComputer.XSecComputer(LO, Nevents, 8)
         w6 = computer6.compute(8*TeV, slhafile).getDictionary()
         w8 = computer8.compute(8*TeV, slhafile, pythiacard = './pythia8_to_pythia6.cfg').getDictionary()
-        self.assertEqual(compareXSections(w6, w8,Nevents),[]) 
+        self.assertEqual(compareXSections(w6, w8,Nevents),True) 
         slhafile  = "../inputFiles/slha/lightEWinos.slha"
         computer6 = xsecComputer.XSecComputer(LO, Nevents, 6)
         computer8 = xsecComputer.XSecComputer(LO, Nevents, 8)
         w6 = computer6.compute(8*TeV, slhafile).getDictionary()
         w8 = computer8.compute(8*TeV, slhafile, pythiacard = './pythia8_to_pythia6.cfg').getDictionary()
-        self.assertEqual(compareXSections(w6, w8,Nevents),[]) 
+        self.assertEqual(compareXSections(w6, w8,Nevents),True) 
         
 
 if __name__ == "__main__":
