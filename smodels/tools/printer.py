@@ -1033,8 +1033,8 @@ class SLHAPrinter(TxTPrinter):
         output += " 1 %-25s #database version\n" %(obj.databaseVersion.replace(" ",""))
         output += " 2 %-25s #maximum condition violation\n" % (obj.parameters['maxcond'])
         output += " 3 %-25s #compression (0 off, 1 on)\n" % (self.docompress)
-        output += " 3 %-25s #minimum mass gap for mass compression [GeV]\n" % (obj.parameters['minmassgap'])
-        output += " 4 %-25s #sigmacut [fb]\n\n" % (obj.parameters['sigmacut'])
+        output += " 4 %-25s #minimum mass gap for mass compression [GeV]\n" % (obj.parameters['minmassgap'])
+        output += " 5 %-25s #sigmacut [fb]\n\n" % (obj.parameters['sigmacut'])
         return output
 
     def _formatResultList(self, obj):
@@ -1077,7 +1077,7 @@ class SLHAPrinter(TxTPrinter):
             if r <1 and not excluded == 0: break
             output += " %d 0 %-30s #txname \n" % (cter, txnameStr )
             output += " %d 1 %-30.3E #r value\n" % (cter, r)
-            if not r_expected: output += " %d 1 N/A                            #expected r value\n" % (cter)
+            if not r_expected: output += " %d 2 N/A                            #expected r value\n" % (cter)
             else: output += " %d 2 %-30.3E #expected r value\n" % (cter, r_expected)
             output += " %d 3 %-30.2f #condition violation\n" % (cter, theoPred.getmaxCondition())
             output += " %d 4 %-30s #analysis\n" % (cter, expResult.globalInfo.id)
