@@ -49,6 +49,11 @@ test/database/database.pcl
 lib/pythia8/pythia8223.tgz
 lib/pythia8/pythia8223
 lib/pythia8/xml.doc
+docs/manual/source/DatabaseBrowser.rst
+docs/manual/source/LheChecker.rst
+docs/manual/source/RunSModelS.rst
+docs/manual/source/SlhaChecker.rst
+docs/manual/source/ToolBox.rst
+docs/manual/source/XSecComputer.rst
 *~
 *.crash
-
