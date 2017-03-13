@@ -120,12 +120,18 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
    :lines: 18312-18316  
    
 * information about the missing topologies with long cascade decays.
+  The long cascade decays are classified by the initially produced mother particles.
+  If more than one pair of mothers are contributing to the same class of elements, the full list is given in the comment.
+  For definiteness all lists are sorted.
   If **addCoverageID** = True, all the |elements| IDs contributing to the missing topology are shown.
 
 .. literalinclude:: /images/screenoutput.txt
-   :lines: 18323-18327     
+   :lines: 18323-18327,18344-18345   
 
 * information about the missing topologies with asymmetric decays.
+  The asymmetric branch decays are classified by the initially produced mother particles.
+  If more than one pair of mothers are contributing to the same class of elements, the full list is given in the comment.
+  For definiteness all lists are sorted.
   If **addCoverageID** = True, all the |elements| IDs contributing to the missing topology are shown.
 
 .. literalinclude:: /images/screenoutput.txt
@@ -208,7 +214,7 @@ Below we describe in detail the blocks contained in the summary output:
 * information about the missing topologies with long cascade decays:
 
 .. literalinclude:: /images/summaryoutput.txt
-   :lines: 146-150
+   :lines: 146-150,158
 
 * information about the missing topologies with asymmetric decays:
 
@@ -273,6 +279,7 @@ Below we describe in detail the dictionary keys and values contained in the Pyth
 * a list of topologies with long cascade decays (if **testCoverage** = True),
   stored under the *Long Cascades* key.
   For each list entry, the |element| cross section (weight) and the PIDs of the mothers are included.
+  The mother PIDs are given in a nested list, as more than one pair might contribute to the same class of |elements|.
 
 .. literalinclude:: /images/pythonoutput.txt
    :lines: 15  
@@ -280,6 +287,7 @@ Below we describe in detail the dictionary keys and values contained in the Pyth
 * a list of topologies with asymmetric branch decays (if **testCoverage** = True),
   stored under the *Asymmetric Branches* key.
   For each list entry, the |element| cross section (weight) and the PIDs of the mothers are included.
+  The mother PIDs are given in a nested list, as more than one pair might contribute to the same class of |elements|.
 
 .. literalinclude:: /images/pythonoutput.txt
    :lines: 16

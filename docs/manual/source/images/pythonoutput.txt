@@ -12,6 +12,5 @@ smodelsOutput = {
 'Missed Topologies': [{'weight (fb)': 16.00759, 'sqrts (TeV)': 8.0, 'element IDs': [270, 271, 272, 273, 276, 277, 278, 279, 286, 287, 288, 289, 298, 299, 300, 301, 306, 307, 308, 309, 316, 317, 318, 319], 
 'element': '[[[jet],[W]],[[jet,jet],[W]]]'}, ...],
 'Outside Grid': [{'weight (fb)': 59.581, 'sqrts (TeV)': 8.0, 'element': '[[[W]],[[W]]]'}, {'weight (fb)': 2.27241, 'sqrts (TeV)': 8.0, 'element': '[[[jet]],[[jet,jet]]]'}, ...],
-'Long Cascades': [{'weight (fb)': 37.4342, 'sqrts (TeV)': 8.0, 'mother PIDs': [1000021, 2000002]}, {'weight (fb)': 16.2564, 'sqrts (TeV)': 8.0, 'mother PIDs': [1000002, 1000021]}, ...],
-'Asymmetric Branches': [{'weight (fb)': 47.2530, 'sqrts (TeV)': 8.0, 'mother PIDs': [1000002, 1000021]}, {'weight (fb)': 43.2417, 'sqrts (TeV)': 8.0, 'mother PIDs': [1000021, 1000021]}, ...]}
-
+'Long Cascades': [{'weight (fb)': 37.4342, 'sqrts (TeV)': 8.0, 'mother PIDs': [[1000002, 1000021]]}, {'weight (fb)': 16.2564, 'sqrts (TeV)': 8.0, 'mother PIDs':  [[1000021, 1000021]]}, ...],
+'Asymmetric Branches': [{'weight (fb)': 47.2530, 'sqrts (TeV)': 8.0, 'mother PIDs': [[1000002, 1000021]]}, {'weight (fb)': 3.6085628898688245, 'sqrts (TeV)': 8.0, 'mother PIDs': [[1000001, 1000002], [1000002, 1000003]]}, ...]}

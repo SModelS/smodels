@@ -128,7 +128,11 @@ rEven = {25 : "higgs",
          -2  : "q",
          -3  : "q",
          21  : "g",
-         -21  : "g" }
+         -21  : "g",
+         111: "pi",
+         -111: "pi",
+         211: "pi",
+         -211: "pi" }
 
 #Particle dictionary. Convenient for defining multiple particles with one label.
 ptcDic = {"e"  : ["e+",  "e-"],
@@ -142,8 +146,8 @@ ptcDic = {"e"  : ["e+",  "e-"],
           "L+" : ["e+",  "mu+", "ta+"],
           "L-" : ["e-",  "mu-", "ta-"],
           "L"  : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-"],
-          "jet" : [ "q", "g", "c" ],
-          "all" : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-", "W+", "W-","Z","photon","higgs","t+","t-","b","c","q","g","c"]}
+          "jet" : [ "q", "g", "c", "pi" ],
+          "all" : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-", "W+", "W-","Z","photon","higgs","t+","t-","b","c","q","g","c","pi"]}
 
 #Quantum numbers for the new particles. Just used by tools.slhaChecks
 #PDG: (spin*2, electrical charge*3, color dimension)
