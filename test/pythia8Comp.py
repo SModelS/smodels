@@ -28,7 +28,7 @@ squarks = [1000000 + i for i in range(1,5)]
 squarks += [2000000 + i for i in range(1,5)]
 
 logger = logging.getLogger()
-logger.setLevel(logging.WARNING)
+logger.setLevel(logging.DEBUG)
 
 
 def compareXSections(dictA,dictB,nevts,relError = 0.1):    
@@ -63,8 +63,26 @@ def compareXSections(dictA,dictB,nevts,relError = 0.1):
                 
     return diffXsecs
 
-def debugFile(slhafile,nevts=10000):
+def debugFile(slhafile,nevts=10000,forceDegenerate=False):
     #Individual file debugging:
+    
+    if forceDegenerate:
+        f = pyslha.readSLHAFile(slhafile)
+        masses = f.blocks['MASS']
+        squarksMasses = [abs(mass) for pid,mass in masses.items() if pid in squarks]
+        avgmass = sum(squarksMasses)/len(squarksMasses)
+        if abs(max(squarksMasses)-avgmass) > 0.1 or  abs(min(squarksMasses)-avgmass) > 0.1:
+            for pid in squarks:
+                f.blocks['MASS'][pid] = avgmass
+                
+            slhaF,slhafile_new = tempfile.mkstemp(suffix='.slha', dir='./')
+            os.write(slhaF,f.write())            
+            os.close(slhaF)
+            logger.warning("Testing degenerate squarks for %s with average mass %s" %(slhafile,avgmass))
+        comp = debugFile(slhafile_new, nevts=nevts,forceDegenerate=False)
+        os.remove(slhafile_new)
+        return comp
+    
     computer6 = xsecComputer.XSecComputer(LO, nevts, 6)
     computer8 = xsecComputer.XSecComputer(LO, nevts, 8)
     w6 = computer6.compute(8*TeV, slhafile, pythiacard = './my_pythia6.card').getDictionary()
@@ -73,12 +91,34 @@ def debugFile(slhafile,nevts=10000):
 #     print 'Pythia 6:'
 #     for key,val in sorted(w6.items()):
 #         print key,val.values()[0]
-#             
+#              
 #     print 'Pythia 8:'
 #     for key,val in sorted(w8.items()):
 #         print key,val.values()[0]
     
+    
+    #Remove the antisbottom-gluino xsec (seems to be missing in Pythia 8):
+    if (-1000005, 1000021) in w6:
+        w6.pop((-1000005, 1000021))
+    #Remove the antisdown-gluino xsec (seems to be missing in Pythia 8):
+    if (-1000001, 1000021) in w6:
+        w6.pop((-1000001, 1000021))
+    if (-2000001, 1000021) in w6:
+        w6.pop((-2000001, 1000021))
+    if (-1000003, 1000021) in w6:
+        w6.pop((-1000003, 1000021))
+
+        
+    #Remove the antisbottom-gluino xsec (seems to be missing in Pythia 8):
+    if (-1000024, 1000021) in w6:
+        totxsec = w6[(-1000024, 1000021)].values()[0]
+        if (1000021, 1000024) in w6:
+            totxsec += w6[(1000021, 1000024)].values()[0]
+        w6.pop((-1000024, 1000021))
+        w6[(1000021, 1000024)] = {'8 TeV (LO)' : totxsec}    
+    
     comp = compareXSections(w6,w8,nevts,relError=0.1)
+
         
     return comp 
 
@@ -92,32 +132,33 @@ def checkFiles(slha6,slha8,Nevents = 50000):
     w6 = xsecs6.getXsecsFor('8 TeV (LO)').getDictionary()
     w8 = xsecs8.getXsecsFor('8 TeV (LO)').getDictionary()
 
+
+    #Remove the antisbottom-gluino xsec (seems to be missing in Pythia 8):
+    if (-1000005, 1000021) in w6:
+        w6.pop((-1000005, 1000021))
+    #Remove the antisdown-gluino xsec (seems to be missing in Pythia 8):
+    if (-1000001, 1000021) in w6:
+        w6.pop((-1000001, 1000021))
+    if (-2000001, 1000021) in w6:
+        w6.pop((-2000001, 1000021))
+    if (-1000003, 1000021) in w6:
+        w6.pop((-1000003, 1000021))
+    #Remove the antisbottom-gluino xsec (seems to be missing in Pythia 8):
+    if (-1000024, 1000021) in w6:
+        totxsec = w6[(-1000024, 1000021)].values()[0]
+        if (1000021, 1000024) in w6:
+            totxsec += w6[(1000021, 1000024)].values()[0]
+        w6.pop((-1000024, 1000021))
+        w6[(1000021, 1000024)] = {'8 TeV (LO)' : totxsec}
+
     comp = compareXSections(w6,w8,Nevents,relError=0.1)
     
     if not comp:
         return (slha6,slha8,True)
-    
-    
-    #Remove degenerate squarks
-    f = pyslha.readSLHAFile(slha6)
-    masses = f.blocks['MASS']
-    squarksMasses = [abs(mass) for pid,mass in masses.items() if pid in squarks]
-    avgmass = sum(squarksMasses)/len(squarksMasses)
-    if abs(max(squarksMasses)-avgmass) > 0.1 or  abs(min(squarksMasses)-avgmass) > 0.1:
-        for pid in squarks:
-            f.blocks['MASS'][pid] = avgmass
-            
-        slhaF,slhafile = tempfile.mkstemp(suffix='.slha', dir='./')
-        os.write(slhaF,f.write())            
-        os.close(slhaF)
-        logger.warning("Testing degenerate squarks for %s with average mass %s" %(slha6,avgmass))
-        comp = debugFile(slhafile, nevts=Nevents)
-        os.remove(slhafile)
-    
-    #Remove the antisbottom-gluino xsec (seems to be missing in Pythia 8):
-    if (-1000005, 1000021) in comp:
-        comp.remove((-1000005, 1000021))
-    
+    else:
+        #Check for the case of degenerate squarks
+        comp = debugFile(slha6,nevts=Nevents,forceDegenerate=True)
+        
     if comp:
         logger.error(str(comp))
         return (slha6,slha8,False)
@@ -131,7 +172,7 @@ def checkFolders(slha6Folder,slha8Folder):
     
     slhaFiles = []
     for slha6 in glob.glob(os.path.join(slha6Folder,'*.slha')):
-#         if not '21725753' in slha6: continue
+#         if not '2241053' in slha6: continue
         slha8 = slha6.replace('.slha','_new.slha').replace(slha6Folder,slha8Folder)
         if not os.path.isfile(slha8):
             continue
@@ -154,8 +195,14 @@ def checkFolders(slha6Folder,slha8Folder):
 if __name__ == "__main__":    
 
     if len(sys.argv) == 2:
+        logger.setLevel(logging.DEBUG)
         print debugFile(sys.argv[1])
-    elif len(sys.argv) == 3:
+        print debugFile(sys.argv[1],forceDegenerate=True)
+    elif len(sys.argv) >= 3:
+        if len(sys.argv) == 4:
+            logger.setLevel(logging.DEBUG)
+        else:
+            logger.setLevel(logging.WARNING)
         print checkFolders(sys.argv[1],sys.argv[2])
         
             
