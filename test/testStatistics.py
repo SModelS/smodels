@@ -12,8 +12,7 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.tools import statistics
-from smodels.tools.physicsUnits import fb, TeV
-from smodels.theory.crossSection import XSectionInfo
+from smodels.tools.physicsUnits import fb
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from databaseLoader import database
 from smodels.theory import slhaDecomposer
