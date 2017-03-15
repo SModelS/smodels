@@ -247,9 +247,9 @@ class TxNameData(object):
 
     def convertString ( self, value ):
         if not "GeV" in value:
-            raise SModelSExperimentError ( "data string malformed: %s" % value )
+            raise SModelSError("data string malformed: %s" % value)
         if "TeV" in value or "MeV" in value:
-            raise SModelSExperimentError ( "data string malformed: %s" % value )
+            raise SModelSError("data string malformed: %s" % value)
         s = value.replace ( "GeV", "" ).replace( "*", "" )
         if "fb" in value:
             self.unit = fb
@@ -415,20 +415,20 @@ class TxNameData(object):
             if math.isnan ( g ):
                 ## if we cannot compute a gradient, we return nan
                 return float("nan")
-            gradient.append ( g )
+            gradient.append(g)
         ## normalize gradient
-        C= float ( np.sqrt ( np.dot ( gradient, gradient ) ) )
+        C= float(np.sqrt( np.dot ( gradient, gradient ) ))
         if C == 0.:
             ## zero gradient? we return 0.
             return 0.
-        for i,j in enumerate(gradient):
-            gradient[i]=gradient[i]/C*alpha
+        for i,grad in enumerate(gradient):
+            gradient[i]=grad/C*alpha
         ## walk one alpha along gradient
         P3=copy.deepcopy(P)
         P4=copy.deepcopy(P)
-        for i,j in enumerate(gradient):
-            P3[i]+=gradient[i]
-            P4[i]-=gradient[i]
+        for grad in gradient:
+            P3[i]+= grad
+            P4[i]-= grad
         agp=self.interpolate ( [ P3[:self.dimensionality] ] )
         agm=self.interpolate ( [ P4[:self.dimensionality] ] )
         dep,dem=0.,0.
@@ -447,10 +447,7 @@ class TxNameData(object):
     def _interpolateOutsideConvexHull ( self, massarray ):
         """ experimental routine, meant to check if we can interpolate outside
             convex hull """
-        porig=self.flattenMassArray ( massarray ) ## flatten
-        p= ( (np.matrix(porig)[0] - self.delta_x ) ).tolist()[0]
-        P=np.dot(p,self._V)
-        de = self._estimateExtrapolationError ( massarray )
+        de = self._estimateExtrapolationError(massarray)
         if de < self._accept_errors_upto:
             return self._returnProjectedValue()
         if not math.isnan(de):
@@ -500,7 +497,7 @@ class TxNameData(object):
             M.append ( m )
             # M.append ( [ self.round_to_n ( x, 7 ) for x in m ] )
 
-        U,s,Vt=svd(M)
+        Vt=svd(M)[2]
         V=Vt.T
         self._V= V ## self.round ( V )
         Mp=[]
