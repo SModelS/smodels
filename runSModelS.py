@@ -7,11 +7,10 @@
 """
 
 from __future__ import print_function
-import os, sys
+import os
 from smodels.installation import installDirectory, version
 from smodels.tools import modelTester
 from smodels.tools import crashReport
-import smodels.tools.printer as prt
 from smodels.tools import smodelsLogging
 
 def main( inFile, parameterFile, outputDir, db, timeout, development ):
