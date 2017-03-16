@@ -6,6 +6,7 @@
 
 """
 
+import os
 from smodels.tools.colors import colors
 import logging
 
