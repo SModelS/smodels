@@ -63,7 +63,7 @@ def compareXSections(dictA,dictB,nevts,relError = 0.1):
                 
     return diffXsecs
 
-def debugFile(slhafile,nevts=10000,forceDegenerate=False):
+def debugFile(slhafile,nevts=50000,forceDegenerate=False):
     #Individual file debugging:
     
     if forceDegenerate:
@@ -98,22 +98,22 @@ def debugFile(slhafile,nevts=10000,forceDegenerate=False):
     
     
     #Remove the antisbottom-gluino xsec (seems to be missing in Pythia 8):
-    if (-1000005, 1000021) in w6:
-        w6.pop((-1000005, 1000021))
+#    if (-1000005, 1000021) in w6:
+#        w6.pop((-1000005, 1000021))
     #Remove the antisdown-gluino xsec (seems to be missing in Pythia 8):
-    if (-1000001, 1000021) in w6:
-        w6.pop((-1000001, 1000021))
-    if (-2000001, 1000021) in w6:
-        w6.pop((-2000001, 1000021))
-    if (-1000003, 1000021) in w6:
-        w6.pop((-1000003, 1000021))        
+#    if (-1000001, 1000021) in w6:
+#        w6.pop((-1000001, 1000021))
+#    if (-2000001, 1000021) in w6:
+#        w6.pop((-2000001, 1000021))
+#    if (-1000003, 1000021) in w6:
+#        w6.pop((-1000003, 1000021))        
     #Remove the antisbottom-gluino xsec (seems to be missing in Pythia 8):
-    if (-1000024, 1000021) in w6:
-        totxsec = w6[(-1000024, 1000021)].values()[0]
-        if (1000021, 1000024) in w6:
-            totxsec += w6[(1000021, 1000024)].values()[0]
-        w6.pop((-1000024, 1000021))
-        w6[(1000021, 1000024)] = {'8 TeV (LO)' : totxsec}    
+#    if (-1000024, 1000021) in w6:
+#        totxsec = w6[(-1000024, 1000021)].values()[0]
+#        if (1000021, 1000024) in w6:
+#            totxsec += w6[(1000021, 1000024)].values()[0]
+#        w6.pop((-1000024, 1000021))
+#        w6[(1000021, 1000024)] = {'8 TeV (LO)' : totxsec}    
     
     comp = compareXSections(w6,w8,nevts,relError=0.1)
 
@@ -132,22 +132,22 @@ def checkFiles(slha6,slha8,Nevents = 50000):
 
 
     #Remove the antisbottom-gluino xsec (seems to be missing in Pythia 8):
-    if (-1000005, 1000021) in w6:
-        w6.pop((-1000005, 1000021))
+#    if (-1000005, 1000021) in w6:
+#        w6.pop((-1000005, 1000021))
     #Remove the antisdown-gluino xsec (seems to be missing in Pythia 8):
-    if (-1000001, 1000021) in w6:
-        w6.pop((-1000001, 1000021))
-    if (-2000001, 1000021) in w6:
-        w6.pop((-2000001, 1000021))
-    if (-1000003, 1000021) in w6:
-        w6.pop((-1000003, 1000021))
+#    if (-1000001, 1000021) in w6:
+#        w6.pop((-1000001, 1000021))
+#    if (-2000001, 1000021) in w6:
+#        w6.pop((-2000001, 1000021))
+#    if (-1000003, 1000021) in w6:
+#        w6.pop((-1000003, 1000021))
     #Remove the antisbottom-gluino xsec (seems to be missing in Pythia 8):
-    if (-1000024, 1000021) in w6:
-        totxsec = w6[(-1000024, 1000021)].values()[0]
-        if (1000021, 1000024) in w6:
-            totxsec += w6[(1000021, 1000024)].values()[0]
-        w6.pop((-1000024, 1000021))
-        w6[(1000021, 1000024)] = {'8 TeV (LO)' : totxsec}
+#    if (-1000024, 1000021) in w6:
+#        totxsec = w6[(-1000024, 1000021)].values()[0]
+#        if (1000021, 1000024) in w6:
+#            totxsec += w6[(1000021, 1000024)].values()[0]
+#        w6.pop((-1000024, 1000021))
+#        w6[(1000021, 1000024)] = {'8 TeV (LO)' : totxsec}
 
     comp = compareXSections(w6,w8,Nevents,relError=0.1)
     
@@ -170,7 +170,7 @@ def checkFolders(slha6Folder,slha8Folder):
     
     slhaFiles = []
     for slha6 in glob.glob(os.path.join(slha6Folder,'*.slha')):
-#         if not '2241053' in slha6: continue
+
         slha8 = slha6.replace('.slha','_new.slha').replace(slha6Folder,slha8Folder)
         if not os.path.isfile(slha8):
             continue
@@ -195,7 +195,7 @@ if __name__ == "__main__":
     if len(sys.argv) == 2:
         logger.setLevel(logging.DEBUG)
         print debugFile(sys.argv[1])
-        print debugFile(sys.argv[1],forceDegenerate=True)
+#        print debugFile(sys.argv[1],forceDegenerate=True)
     elif len(sys.argv) >= 3:
         if len(sys.argv) == 4:
             logger.setLevel(logging.DEBUG)
