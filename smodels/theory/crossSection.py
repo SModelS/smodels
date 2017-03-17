@@ -571,7 +571,6 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
     xSecsInFile = XSectionList()
     f=pyslha.readSLHAFile ( slhafile )
     for production in f.xsections:
-        useXSecs = False
         for pid in production[2:]:
             if not pid in smodels.particles.rOdd.keys():
                 # ignore production of R-Even Particles
