@@ -207,10 +207,10 @@ class ExpResult(object):
         :return: list of values or value
         
         """
-        fieldDict = self.__dict__.items()[:]
+        fieldDict = list ( self.__dict__.items() )
         valuesDict = {}
         while fieldDict:
-            for field, value in fieldDict[:]:
+            for field, value in fieldDict:
                 if not '<smodels.experiment' in str(value):
                     if not field in valuesDict:
                         valuesDict[field] = [value]
@@ -218,8 +218,8 @@ class ExpResult(object):
                 else:
                     if isinstance(value, list):
                         for entry in value:
-                            fieldDict += entry.__dict__.items()[:]
-                    else: fieldDict += value.__dict__.items()[:]
+                            fieldDict += entry.__dict__.items()
+                    else: fieldDict += value.__dict__.items()
                 fieldDict.remove((field, value))
 
         # Try to keep only the set of unique values
