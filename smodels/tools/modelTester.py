@@ -25,7 +25,7 @@ try:
     from ConfigParser import SafeConfigParser
 except ImportError as e:
     from configparser import ConfigParser
-from smodels.tools.physicsUnits import GeV, fb
+from smodels.tools.physicsUnits import GeV, fb, TeV
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.experiment.databaseObj import Database, ExpResultList
 from smodels.tools.smodelsLogging import logger
@@ -130,7 +130,11 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
 
     if parser.getboolean("options", "testCoverage"):
         """ Testing coverage of model point, add results to the output file """
-        uncovered = coverage.Uncovered(smstoplist)
+        if  parser.has_option("options","coverageSqrts"):
+            sqrts = parser.getfloat("options", "coverageSqrts")*TeV
+        else:
+            sqrts = None
+        uncovered = coverage.Uncovered(smstoplist,sqrts=sqrts)
         masterPrinter.addObj(uncovered)
     
     return masterPrinter.flush()

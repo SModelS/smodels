@@ -17,9 +17,16 @@ class Uncovered(object):
     :ivar topoList: sms topology list
     :ivar sumL: if true, sum up electron and muon to lepton, for missing topos
     :ivar sumJet: if true, sum up jets, for missing topos
+    :ivar sqrts: Center of mass energy. If defined it will only consider cross-sections
+                for this value. Otherwise the highest sqrts value will be used.
     """
-    def __init__(self, topoList, sumL=True, sumJet=True):
-        self.sqrts = max([xsec.info.sqrts for xsec in topoList.getTotalWeight()])
+    def __init__(self, topoList, sumL=True, sumJet=True, sqrts=None):
+        
+        
+        if sqrts is None:
+            self.sqrts = max([xsec.info.sqrts for xsec in topoList.getTotalWeight()])
+        else:
+            self.sqrts = sqrts
         self.missingTopos = UncoveredList(sumL, sumJet, self.sqrts)
         self.outsideGrid = UncoveredList(sumL, sumJet, self.sqrts) # FIXME change this to derived objects for printout
         self.longCascade = UncoveredClassifier()
