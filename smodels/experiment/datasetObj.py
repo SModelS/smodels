@@ -40,8 +40,6 @@ class DataSet(object):
             for txtfile in glob.iglob(os.path.join(path,"*.txt")):
                 try:
                     txname = txnameObj.TxName(txtfile,self.globalInfo,self.dataInfo)
-                    logger.debug ( "Has only zeroes=%d" % txname.hasOnlyZeroes() )
-                    logger.debug ( "discard_zeroes=%s" % (discard_zeroes) )
                     if discard_zeroes and txname.hasOnlyZeroes():
                         logger.warning ( "%s has zeroes only. discard it." % \
                                          txname.txName )
