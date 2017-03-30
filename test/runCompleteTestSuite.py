@@ -46,7 +46,7 @@ def verbose_run():
                     print ( "%s FAILED: %s%s" % \
                             ( colors.error, str(e), colors.reset ) )
                     continue
-                print ( "%s ok%s" % ( colors.info, colors.reset ) ) 
+                print ( "%sok%s" % ( colors.info, colors.reset ) ) 
 
                 #a=t.run() ## python3
                 # print ( "a=",a )
