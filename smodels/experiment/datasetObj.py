@@ -20,7 +20,8 @@ class DataSet(object):
     Holds the information to a data set folder (TxName objects, dataInfo,...)
     """
 
-    def __init__(self, path=None, info=None, createInfo=True):
+    def __init__(self, path=None, info=None, createInfo=True, discard_zeroes=True):
+        """ :param discard_zeroes: discard txnames with zero-only results """
 
         self.path = path
         self.globalInfo = info
@@ -39,6 +40,11 @@ class DataSet(object):
             for txtfile in glob.iglob(os.path.join(path,"*.txt")):
                 try:
                     txname = txnameObj.TxName(txtfile,self.globalInfo,self.dataInfo)
+                    logger.debug ( "has only zeroes=%d" % txname.hasOnlyZeroes() )
+                    if discard_zeroes and txname.hasOnlyZeroes():
+                        logger.warning ( "%s has zeroes only. discard it." % \
+                                         txname.txName )
+                        continue
                     self.txnameList.append(txname)
                 except TypeError: continue
 

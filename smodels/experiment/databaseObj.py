@@ -36,13 +36,14 @@ class Database(object):
         
     """
     
-    def __init__(self, base=None, force_load = None ):
+    def __init__(self, base=None, force_load = None, discard_zeroes = False ):
         """
         :param force_load: force loading the text database ("txt"),
             or binary database ("pcl"), dont force anything if None
-        :param pclfilename: filename of the binary (pickled) database file
+        :param discard_zeroes: discard txnames with only zeroes as entries.
         """
         self.force_load = force_load
+        self.discard_zeroes = discard_zeroes
         self.pclfilename = "database.pcl"
         self.hasFastLim = False # True if any ExpResult is from fastlim
         self._validateBase(base)
@@ -415,7 +416,7 @@ class Database(object):
 
         resultsList = []
         for root in roots:
-            expres = ExpResult(root)
+            expres = ExpResult(root, discard_zeroes = self.discard_zeroes )
             if expres:
                 resultsList.append(expres)
                 contact = expres.globalInfo.getInfo("contact")
@@ -430,7 +431,7 @@ class Database(object):
 
     def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
                     dataTypes = ['all'], useSuperseded=False, useNonValidated=False,
-                    onlyWithExpected = False ):
+                    onlyWithExpected = False, discard_zeroes = False ):
         """
         Returns a list of ExpResult objects.
         
@@ -450,8 +451,9 @@ class Database(object):
         :param useSuperseded: If False, the supersededBy results will not be included
         :param useNonValidated: If False, the results with validated = False 
                                 will not be included
-        :param onlyWithExpected: Return only those results that have expected values also.
-                              Note that this is trivially fulfilled for all efficiency maps.
+        :param onlyWithExpected: Return only those results that have expected values 
+                 also. Note that this is trivially fulfilled for all efficiency maps.
+        :param discard_zeroes: Discard results that consist only of zeroes.
         :returns: list of ExpResult objects or the ExpResult object if the list
                   contains only one result
                    
@@ -479,7 +481,8 @@ class Database(object):
                 if datasetIDs != ['all']:
                     if not dataset.dataInfo.dataId in datasetIDs:
                         continue
-                newDataSet = datasetObj.DataSet(dataset.path, dataset.globalInfo,False)
+                newDataSet = datasetObj.DataSet( dataset.path, dataset.globalInfo,
+                                               False, discard_zeroes=discard_zeroes )
                 newDataSet.dataInfo = dataset.dataInfo
                 newDataSet.txnameList = []
                 for txname in dataset.txnameList:
@@ -502,7 +505,7 @@ class Database(object):
                         continue
                     newDataSet.txnameList.append(txname)
                 # Skip data set not containing any of the required txnames:
-                if not newDataSet.txnameList:
+                if not newDataSet.txnameList or newDataSet.txnameList == []:
                     continue
                 newExpResult.datasets.append(newDataSet)
             # Skip analysis not containing any of the required txnames:
