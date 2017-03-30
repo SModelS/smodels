@@ -27,9 +27,10 @@ class ExpResult(object):
                     in <path>    
     """
         
-    def __init__(self, path=None):
+    def __init__(self, path=None, discard_zeroes = True ):
         """
         :param path: Path to the experimental result folder
+        :param discard_zeroes: Discard maps with only zeroes
         """ 
 
         if path and os.path.isdir(path):
@@ -47,7 +48,8 @@ class ExpResult(object):
                 if 'dataInfo.txt' in files:  # data folder found
                     # Build data set
                     try:
-                        dataset = datasetObj.DataSet(root, self.globalInfo)
+                        dataset = datasetObj.DataSet(root, self.globalInfo,
+                                discard_zeroes = discard_zeroes )
                         self.datasets.append(dataset)
                     except TypeError:
                         continue
@@ -68,21 +70,24 @@ class ExpResult(object):
     def __str__(self):
         label = self.globalInfo.getInfo('id') + ": "
         dataIDs = [dataset.dataInfo.dataId for dataset in self.datasets]
+        ct_dids=0
         if dataIDs:
             for dataid in dataIDs:
                 if dataid:
+                    ct_dids+=1
                     label += dataid + ","
-        label = label[:-1]
-        label += ':'
+        label = "%s(%d):" % ( label[:-1], ct_dids )
         txnames = []
         for dataset in self.datasets:
             for txname in dataset.txnameList:
                 tx = txname.txName
                 if not tx in txnames:
+                    
                     txnames.append(tx)
         if isinstance(txnames, list):
             for txname in txnames:
                 label += txname + ','
+            label = "%s(%d)," % (label[:-1], len(txnames) )
         else:
             label += txnames + ','
         return label[:-1]
