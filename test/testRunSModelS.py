@@ -98,7 +98,7 @@ class RunSModelSTest(unittest.TestCase):
             out = join( iDir(), "test/unitTestOutput" )
             setLogLevel ( level )
             main(filename, parameterFile=join ( iDir(), "test/%s" % inifile ),
-                 outputDir= out, db= None, timeout = timeout,
+                 outputDir= out, db= database, timeout = timeout,
                  development = development)
             sfile = join(iDir(),"test/unitTestOutput/%s.py" % basename(filename))
             return sfile
