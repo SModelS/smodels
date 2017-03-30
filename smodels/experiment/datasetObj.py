@@ -40,7 +40,8 @@ class DataSet(object):
             for txtfile in glob.iglob(os.path.join(path,"*.txt")):
                 try:
                     txname = txnameObj.TxName(txtfile,self.globalInfo,self.dataInfo)
-                    logger.debug ( "has only zeroes=%d" % txname.hasOnlyZeroes() )
+                    logger.debug ( "Has only zeroes=%d" % txname.hasOnlyZeroes() )
+                    logger.debug ( "discard_zeroes=%s" % (discard_zeroes) )
                     if discard_zeroes and txname.hasOnlyZeroes():
                         logger.warning ( "%s has zeroes only. discard it." % \
                                          txname.txName )
@@ -89,7 +90,7 @@ class DataSet(object):
 
 
         :param attribute: name of a field in the database (string). If not defined
-                          it will return a dictionary with all fields and 
+                          it will return a dictionary with all fields and
                           their respective values
         :return: list of values
         """
@@ -123,18 +124,18 @@ class DataSet(object):
 
     def likelihood ( self, nsig, deltas=None):
         """
-        Computes the likelihood to observe nobs events, 
+        Computes the likelihood to observe nobs events,
         given a predicted signal "nsig", assuming "deltas"
         error on the signal efficiency.
-        The values observedN, expectedBG, and bgError 
+        The values observedN, expectedBG, and bgError
         are part of dataInfo.
         :param nsig: predicted signal (float)
         :param deltas: uncertainty on signal (float). If None, default value (20%) will be used.
 
         :return: likelihood to observe nobs events (float)
         """
-        
-        return statistics.likelihood(nsig, self.dataInfo.observedN, 
+
+        return statistics.likelihood(nsig, self.dataInfo.observedN,
                 self.dataInfo.expectedBG, self.dataInfo.bgError, deltas)
 
     def chi2( self, nsig, deltas=None):
@@ -147,8 +148,8 @@ class DataSet(object):
 
         :return: chi2 (float)
         """
-        
-        return statistics.chi2(nsig, self.dataInfo.observedN, 
+
+        return statistics.chi2(nsig, self.dataInfo.observedN,
                 self.dataInfo.expectedBG, self.dataInfo.bgError, deltas)
 
     def getAttributes(self,showPrivate=False):

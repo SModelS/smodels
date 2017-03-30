@@ -273,13 +273,15 @@ def loadDatabase(parser, db):
     """
     try:
         databasePath = parser.get("path", "databasePath")
+        discard_zeroes = parser.getboolean("database", "discard_zeroes")
         database = db
         if database in [ None, True ]:
             force_load=None
             if database == True: force_load="txt"
             if os.path.isfile ( databasePath ):
                 force_load="pcl"
-            database = Database( databasePath, force_load=force_load)
+            database = Database( databasePath, force_load=force_load, \
+                                 discard_zeroes = discard_zeroes )
         databaseVersion = database.databaseVersion
     except DatabaseNotFoundException:
         logger.error("Database not found in %s" % os.path.realpath(databasePath))
