@@ -273,7 +273,7 @@ def loadDatabase(parser, db):
     """
     try:
         databasePath = parser.get("path", "databasePath")
-        discard_zeroes = parser.getboolean("database", "discard_zeroes")
+        discard_zeroes = parser.getboolean("database", "discardZeroes")
         database = db
         if database in [ None, True ]:
             force_load=None
