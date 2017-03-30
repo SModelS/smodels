@@ -272,7 +272,15 @@ def loadDatabase(parser, db):
         
     """
     try:
-        databasePath = parser.get("path", "databasePath")
+        dp = parser.get ( "path", "databasePath" )
+        logger.error ( "``[path] databasePath'' in ini file is deprecated; " \
+           "use ``[database] path'' instead. (See e.g. etc/parameters_default.ini)" )
+        parser.set ( "database", "path", dp )
+    except Exception as e:
+        ## path.databasePath not set. This is good.
+        pass
+    try:
+        databasePath = parser.get("database", "path")
         discard_zeroes = parser.getboolean("database", "discardZeroes")
         database = db
         if database in [ None, True ]:
