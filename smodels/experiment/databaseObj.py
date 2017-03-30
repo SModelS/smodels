@@ -83,8 +83,9 @@ class Database(object):
         logger.info ( "FastLim v1.1 efficiencies loaded. Please cite: arXiv:1402.0492, EPJC74 (2014) 11" )
 
     def __eq__ ( self, other ):
-        """ compare two databases
-        """
+        """ compare two databases """
+        if type ( other ) != type ( self ):
+            return False
         if self.databaseVersion != other.databaseVersion:
             return False
         if len(self.expResultList ) != len (other.expResultList):

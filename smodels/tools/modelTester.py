@@ -280,10 +280,11 @@ def loadDatabase(parser, db):
         ## path.databasePath not set. This is good.
         pass
     try:
-        databasePath = parser.get("database", "path")
-        discard_zeroes = parser.getboolean("database", "discardZeroes")
         database = db
+        # logger.error ( "database=db: %s" % database )
         if database in [ None, True ]:
+            databasePath = parser.get( "database", "path" )
+            discard_zeroes = parser.getboolean( "database", "discardZeroes" )
             force_load=None
             if database == True: force_load="txt"
             if os.path.isfile ( databasePath ):
