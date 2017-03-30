@@ -38,6 +38,7 @@ class Database(object):
     
     def __init__(self, base=None, force_load = None, discard_zeroes = False ):
         """
+        :param base: path to the database (string)
         :param force_load: force loading the text database ("txt"),
             or binary database ("pcl"), dont force anything if None
         :param discard_zeroes: discard txnames with only zeroes as entries.
@@ -51,8 +52,10 @@ class Database(object):
         self.expResultList = []
         self.txt_mtime = None, None
         self.pcl_mtime = None, None
+        self.pcl_hasFastLim = False
+        self.pcl_discard_zeroes = False
         self.pcl_db = None
-        self.sw_format_version = "116" ## what format does the software support?
+        self.sw_format_version = "117" ## what format does the software support?
         self.pcl_format_version = None ## what format is in the binary file?
         if self.force_load=="txt":
             self.loadTextDatabase()
@@ -207,6 +210,7 @@ class Database(object):
                     logger.info ( "loading binary db file %s format version %s" % 
                             ( self.binfile(), self.pcl_format_version ) )
                     self.hasFastLim = serializer.load ( f )
+                    self.discard_zeroes = serializer.load ( f )
                     self.expResultList = serializer.load ( f )
                     t1=time.time()-t0
                     logger.info ( "Loaded database from %s in %.1f secs." % \
@@ -243,7 +247,9 @@ class Database(object):
             self.loadBinaryFile ( lastm_only = True )
             return ( self.txt_mtime[0] > self.pcl_mtime[0] or \
                      self.txt_mtime[1] != self.pcl_mtime[1]  or \
-                     self.sw_format_version != self.pcl_format_version
+                     self.sw_format_version != self.pcl_format_version or \
+                     self.hasFastLim != self.pcl_hasFastLim or \
+                     self.discard_zeroes != self.pcl_discard_zeroes
                 )
         except (IOError,DatabaseNotFoundException,TypeError,ValueError):
             # if we encounter a problem, we rebuild the database.
@@ -263,11 +269,11 @@ class Database(object):
         binfile = filename
         if binfile == None:
             binfile = self.binfile()
-        logger.debug (  " * create %s" % self.binfile() )
+        logger.debug (  " * create %s" % binfile )
         with open ( binfile, "wb" ) as f:
             logger.debug (  " * load text database" )
             self.loadTextDatabase() 
-            logger.debug (  " * write %s version %s" % ( self.binfile,
+            logger.debug (  " * write %s version %s" % ( binfile,
                        self.sw_format_version ) )
             self.pcl_python = sys.version
             ptcl = serializer.HIGHEST_PROTOCOL
@@ -275,7 +281,8 @@ class Database(object):
             serializer.dump ( self.sw_format_version, f, protocol=ptcl )
             serializer.dump ( self.txt_mtime, f, protocol=ptcl )
             serializer.dump ( self._databaseVersion, f, protocol=ptcl )
-            serializer.dump ( self.hasFastLim, f, protocol=ptcl )
+            serializer.dump ( self.pcl_hasFastLim, f, protocol=ptcl )
+            serializer.dump ( self.pcl_discard_zeroes, f, protocol=ptcl )
             serializer.dump ( self.expResultList, f, protocol=ptcl )
             logger.info (  " * done writing %s in %.1f secs." % \
                     ( binfile, time.time()-t0 ) )
@@ -500,8 +507,8 @@ class Database(object):
                     if txnames != ['all']:
                         if not txname.txName in txnames:
                             continue
-                    if onlyWithExpected and dataset.dataInfo.dataType == "upperLimit" and \
-                                not txname.txnameDataExp:
+                    if onlyWithExpected and dataset.dataInfo.dataType == \
+                        "upperLimit" and not txname.txnameDataExp:
                         continue
                     newDataSet.txnameList.append(txname)
                 # Skip data set not containing any of the required txnames:
