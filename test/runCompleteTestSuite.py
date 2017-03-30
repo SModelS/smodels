@@ -36,7 +36,8 @@ def verbose_run():
     for series in alltests:
         for test in series:
             for t in test:
-                print ( "[runCompleteTestSuite] %s" % t.id(), end="" )
+                print ( "[#%3d] %s ... " % ( n_tests, t.id() ), end="" )
+                sys.stdout.flush()
                 n_tests += 1
                 try:
                     a=t.debug()
