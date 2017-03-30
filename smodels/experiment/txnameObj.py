@@ -36,7 +36,7 @@ class TxName(object):
     file (constraint, condition,...) as well as the data.
     """
 
-    def __init__(self, path, globalObj, infoObj):
+    def __init__(self, path, globalObj, infoObj ):
         self.path = path
         self.globalInfo = globalObj
         self._infoObj = infoObj
@@ -55,9 +55,7 @@ class TxName(object):
         if not "txName" in txdata: raise TypeError
         if not 'upperLimits' in txdata and not 'efficiencyMap' in txdata:
             raise TypeError
-        txfile = open(self.path)
-        content = concatenateLines (  txfile.readlines() )
-        txfile.close()
+        content = concatenateLines (  txdata.split("\n") )
 
         #Get tags in info file:
         tags = [line.split(':', 1)[0].strip() for line in content]
@@ -104,6 +102,18 @@ class TxName(object):
         for el in elements:
             el.sortBranches()
             self._topologyList.addElement(el)
+
+    def hasOnlyZeroes ( self ):
+        ozs = self.txnameData.onlyZeroValues()
+        if self.txnameDataExp:
+            e_ozs = self.txnameDataExp.onlyZeroValues()
+            if ozs and e_ozs:
+                return True
+            if (ozs and not e_ozs) or (e_ozs and not ozs):
+                logger.warning ( "%s is weird. One of the (expected, observed) results is zeroes-only, the other one isnt." )
+                return False
+        return ozs
+
 
     def __str__(self):
         return self.txName
@@ -473,6 +483,20 @@ class TxNameData(object):
             if abs(i)>10**-4:
                 nz+=1
         return nz
+
+    def onlyZeroValues ( self ):
+        """ check if the map is zeroes only """
+        eps = sys.float_info.epsilon
+        negative_values = bool ( sum ( [ x < -eps for x in self.xsec ] ) )
+        if negative_values:
+            for x in self.xsec:
+                if x < -eps:
+                    logger.error ( "negative error in result: %f, %s" % \
+                                   ( x, self._id) )
+                    sys.exit()
+        if sum(self.xsec) > 0.:
+            return False
+        return True
 
     def computeV ( self, values ):
         """ compute rotation matrix _V, and triangulation self.tri """
