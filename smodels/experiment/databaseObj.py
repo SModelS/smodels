@@ -194,6 +194,8 @@ class Database(object):
                 self.pcl_format_version = serializer.load ( f )
                 self.pcl_mtime = serializer.load ( f )
                 self._databaseVersion = serializer.load ( f )
+                self.pcl_hasFastLim = serializer.load ( f )
+                self.pcl_discard_zeroes = serializer.load ( f )
                 if not lastm_only:
                     if self.pcl_python != sys.version:
                         logger.warning ( "binary file was written with a different "
@@ -210,8 +212,6 @@ class Database(object):
 
                     logger.info ( "loading binary db file %s format version %s" % 
                             ( self.binfile(), self.pcl_format_version ) )
-                    self.hasFastLim = serializer.load ( f )
-                    self.discard_zeroes = serializer.load ( f )
                     self.expResultList = serializer.load ( f )
                     t1=time.time()-t0
                     logger.info ( "Loaded database from %s in %.1f secs." % \
@@ -243,9 +243,10 @@ class Database(object):
     def needsUpdate ( self ):
         """ does the binary db file need an update? """
         try:
-            # logger.debug ( "needsUpdate?" )
             self.lastModifiedAndFileCount()
             self.loadBinaryFile ( lastm_only = True )
+            #logger.debug ( "needsUpdate? discard_zeroes=%d %d" % \
+            #      ( self.discard_zeroes, self.pcl_discard_zeroes )  )
             return ( self.txt_mtime[0] > self.pcl_mtime[0] or \
                      self.txt_mtime[1] != self.pcl_mtime[1]  or \
                      self.sw_format_version != self.pcl_format_version or \
@@ -282,8 +283,8 @@ class Database(object):
             serializer.dump ( self.sw_format_version, f, protocol=ptcl )
             serializer.dump ( self.txt_mtime, f, protocol=ptcl )
             serializer.dump ( self._databaseVersion, f, protocol=ptcl )
-            serializer.dump ( self.pcl_hasFastLim, f, protocol=ptcl )
-            serializer.dump ( self.pcl_discard_zeroes, f, protocol=ptcl )
+            serializer.dump ( self.hasFastLim, f, protocol=ptcl )
+            serializer.dump ( self.discard_zeroes, f, protocol=ptcl )
             serializer.dump ( self.expResultList, f, protocol=ptcl )
             logger.info (  " * done writing %s in %.1f secs." % \
                     ( binfile, time.time()-t0 ) )
