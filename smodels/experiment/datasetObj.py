@@ -41,8 +41,8 @@ class DataSet(object):
                 try:
                     txname = txnameObj.TxName(txtfile,self.globalInfo,self.dataInfo)
                     if discard_zeroes and txname.hasOnlyZeroes():
-                        logger.warning ( "%s has zeroes only. discard it." % \
-                                         txname.txName )
+                        logger.warning ( "%s, %s has only zeroes. discard it." % \
+                                         ( self.path, txname.txName ) )
                         continue
                     self.txnameList.append(txname)
                 except TypeError: continue
