@@ -50,8 +50,8 @@ class DataSet(object):
                     self.txnameList.append(txname)
                 except TypeError: continue
 
-        self.txnameList.sort()
-        self.checkForRedundancy()
+            self.txnameList.sort()
+            self.checkForRedundancy()
 
     def checkForRedundancy ( self ):
         """ In case of efficiency maps, check if any txnames have overlapping
