@@ -55,7 +55,7 @@ class Database(object):
         self.pcl_hasFastLim = False
         self.pcl_discard_zeroes = False
         self.pcl_db = None
-        self.sw_format_version = "117" ## what format does the software support?
+        self.sw_format_version = "118" ## what format does the software support?
         self.pcl_format_version = None ## what format is in the binary file?
         if self.force_load=="txt":
             self.loadTextDatabase()
