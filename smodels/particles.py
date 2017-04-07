@@ -149,7 +149,7 @@ ptcDic = {"e"  : ["e+",  "e-"],
           "jet" : [ "q", "g", "c", "pi" ],
           "all" : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-", "W+", "W-","Z","photon","higgs","t+","t-","b","c","q","g","c","pi"]}
 
-#Quantum numbers for the new particles. Just used by tools.slhaChecks
+#Quantum numbers for the new particles.
 #PDG: (spin*2, electrical charge*3, color dimension)
 qNumbers={
  35:[0,0,1],
@@ -183,4 +183,12 @@ qNumbers={
  2000006:[0,2,3],
  1000005:[0,-1,3],
  2000005:[0,-1,3],
+}
+
+#Final states. Define final state labels:
+
+finalStates = {
+"HSCP" : [[1,3,1],[1,-3,1],[0,3,1],[0,-3,1],[2,3,1],[2,-3,1]],
+"MET" : [[1,0,1],[0,0,1],[2,0,1]],
+"RHadron" : [[1,0,3],[0,0,3],[2,0,3],[1,0,8],[0,0,8],[2,0,8]]
 }
