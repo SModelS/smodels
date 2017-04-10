@@ -11,11 +11,11 @@
 
 import copy
 import time
-import sys
 import pyslha
 from smodels.theory import element, topology, crossSection
 from smodels.theory.branch import Branch, decayBranches
-from smodels.tools.physicsUnits import fb, GeV
+from smodels.tools.physicsUnits import fb, GeV, mm, m, MeV,fm
+import math
 import smodels.particles
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
@@ -59,6 +59,8 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     xSectionList.removeLowerOrder()
     # Order xsections by PDGs to improve performance
     xSectionList.order()
+    #Reweight decays by fraction of prompt decays and add fraction of long-lived
+    brDic = _getPromptDecays(slhafile,brDic)
 
     # Get maximum cross sections (weights) for single particles (irrespective
     # of sqrtS)
@@ -83,7 +85,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
         branchList[-1].masses = [massDic[pid]]
         branchList[-1].maxWeight = maxWeight[pid]
 
-    # Generate final branches (after all R-odd particles have decayed)    
+    # Generate final branches (after all R-odd particles have decayed)
     finalBranchList = decayBranches(branchList, brDic, massDic, sigcut)
     # Generate dictionary, where keys are the PIDs and values are the list of branches for the PID (for performance)
     branchListDict = {}
@@ -139,6 +141,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
 
                 for el in allElements:
                     el.sortBranches()  #Make sure elements are sorted BEFORE adding them
+                    el.setFinalState() #Set the final state according to the last particle in the cascade decay
                     smsTopList.addElement(el)
     smsTopList._setElementIds()
 
@@ -171,7 +174,7 @@ def _getDictionariesFromSLHA(slhafile):
     
     # Get mass and branching ratios for all particles
     brDic = {}
-    writeIgnoreMessage ( res.decays.keys(), rEven, rOdd )
+    writeIgnoreMessage( res.decays.keys(), rEven, rOdd )
 
     for pid in res.decays.keys():
         if not pid in list(rOdd):
@@ -204,3 +207,46 @@ def _getDictionariesFromSLHA(slhafile):
  
     return brDic, massDic
 
+
+
+def _getPromptDecays(slhafile,brDic,l_inner=10.*mm,gb_inner=10,l_outer=1.*m,gb_outer=0.6):
+    """
+    Using the widths in the slhafile, reweights the BR dictionary with the fraction
+    of prompt decays and add the fraction of "long-lived decays".
+    The fraction of prompt decays and "long-lived decays" are defined as:
+    F_prompt = 1 - exp(-width*l_inner/gb_inner)
+    F_long = exp(-width*l_outer/gb_outer)
+    where l_inner is the inner radius of the detector, l_outer is the outer radius
+    and gb_x is the estimate for the kinematical factor gamma*beta for each case.
+    We use gb_outer = 10 and gb_inner= 0.5
+    :param widthDic: Dictionary with the widths of the particles
+    :param l_inner: Radius of the inner tracker
+    :param gb_inner: Effective gamma*beta factor to be used for prompt decays
+    :param l_outer: Radius of the outer detector
+    :param gb_outer: Effective gamma*beta factor to be used for long-lived decays
+    
+    :return: Dictionary = {pid : decay}
+    """
+    
+    hc = 197.327*MeV*fm  #hbar * c
+        
+    #Get the widths:
+    res = pyslha.readSLHAFile(slhafile)
+    decays = res.decays    
+        
+    for pid in brDic:
+        width = decays[abs(pid)].totalwidth*GeV
+        Fprompt = 1. - math.exp(-width*l_inner/(gb_inner*hc))
+        Flong = math.exp(-width*l_outer/(gb_outer*hc))
+        for decay in brDic[pid]:
+            decay.br *= Fprompt  #Reweight by prompt fraction
+            
+        #Add long-lived fraction:
+        if Flong:
+            stableFraction = pyslha.Decay(br=Flong,ids=[],nda=0)
+            brDic[pid].append(stableFraction) 
+        if (Flong+Fprompt) > 1.:
+            logger.error("Sum of decay fractions > 1 for "+str(pid))
+            return False
+        
+    return brDic

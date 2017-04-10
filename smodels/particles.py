@@ -149,6 +149,9 @@ ptcDic = {"e"  : ["e+",  "e-"],
           "jet" : [ "q", "g", "c", "pi" ],
           "all" : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-", "W+", "W-","Z","photon","higgs","t+","t-","b","c","q","g","c","pi"]}
 
+#Include all R-even particles:
+ptcDic['ALL'] = rEven.values() + ptcDic.keys()
+
 #Quantum numbers for the new particles.
 #PDG: (spin*2, electrical charge*3, color dimension)
 qNumbers={
@@ -185,7 +188,8 @@ qNumbers={
  2000005:[0,-1,3],
 }
 
-#Final states. Define final state labels:
+#Final states. Define final state labels
+#according to the qNumbers tuples.
 
 finalStates = {
 "HSCP" : [[1,3,1],[1,-3,1],[0,3,1],[0,-3,1],[2,3,1],[2,-3,1]],

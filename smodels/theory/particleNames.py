@@ -9,9 +9,7 @@
 
 """
 
-import sys
-import copy
-from smodels.particles import rEven, rOdd, ptcDic
+from smodels.particles import rEven, rOdd, ptcDic, qNumbers, finalStates
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import itertools
 
@@ -232,4 +230,27 @@ def simParticles(plist1, plist2, useDict=True):
         if plist in extendedL2: return True
         
     return False
+
+def getFinalStateLabel(pid):
+    """
+    Given the particle PID, returns the label corresponding to its final state
+    (e.g. 1000022 -> MET, 1000023 -> HSCP,...)
+    :parameter pid: PDG code for particle (must appear in particles.py)
+    :return: Final state string (e.g. MET, HSCP,...)
+    """
+
+    if not abs(pid) in qNumbers:
+        logger.error("qNumbers are not defined for %i. Please, add it to particles.py." %pid)
+        raise SModelSError
+    elif not pid in qNumbers:  #Use the anti-particle info:
+        pidQnumber = qNumbers[abs(pid)]
+        pidQnumber[1] = -pidQnumber[1] #Flip the charge sign
+    else:    
+        pidQnumber = qNumbers[pid]
+    for key,qnumberList in finalStates.items():
+        if pidQnumber in qnumberList:
+            return key
+    
+    logger.error("Final state for %i not found. Please, add it to particles.py." %pid)
+    raise SModelSError
 

@@ -6,13 +6,11 @@
         
 """
 
-import sys
-from smodels.theory.particleNames import simParticles, elementsInStr
+from smodels.theory.particleNames import simParticles, elementsInStr, getFinalStateLabel
 from smodels.tools.physicsUnits import fb, MeV
-from smodels.particles import rEven, ptcDic
+from smodels.particles import rEven, ptcDic, finalStates
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
-
 
 class Branch(object):
     """
@@ -40,6 +38,8 @@ class Branch(object):
         self.maxWeight = None
         self.vertnumb = None
         self.vertparts = None
+        self.stable = False
+        self.finalState = None
         if type(info) == type(str()):
             branch = elementsInStr(info)
             if not branch or len(branch) > 1:
@@ -106,6 +106,10 @@ class Branch(object):
             comp = self.masses > other.masses
             if comp: return 1
             else: return -1
+        elif self.finalState != other.finalState:
+            comp = self.finalState > other.finalState
+            if comp: return 1
+            else: return -1            
         else:
             return 0  #Branches are equal
 
@@ -126,12 +130,38 @@ class Branch(object):
 
         self.vertnumb = len(self.particles)
         self.vertparts = [len(v) for v in self.particles]
+        
+    def setFinalState(self,finalState=None):
+        """
+        If finalState = None, define the branch final state according to the PID of the
+        last R-odd particle appearing in the cascade decay.
+        Else set the final state to the finalState given
+        :parameter finalState: String defining the final state
+        """
+        
+        if finalState:
+            if not finalState in finalStates:
+                logger.error("Final state %s has not been defined. Add it to particles.py." %finalState)
+                raise SModelSError
+            else:
+                self.finalState = finalState        
+        else:
+            fStates = set()
+            for pidList in self.PIDs:
+                fStates.add(getFinalStateLabel(pidList[-1]))
+            
+            if len(fStates) != 1:
+                logger.error("Error obtaining the final state for branch %s" %self)
+                raise SModelSError
+            else:
+                self.finalState = list(fStates)[0]
 
     
     def particlesMatch(self, other):
         """
         Compare two Branches for matching particles, 
-        allow for inclusive particle labels (such as the ones defined in particles.py)
+        allow for inclusive particle labels (such as the ones defined in particles.py).
+        Includes the final state in the comparison. 
         
         :parameter other: branch to be compared (Branch object)
         :returns: True if branches are equal (particles and masses match); False otherwise.              
@@ -150,7 +180,11 @@ class Branch(object):
 
         for iv,vertex in enumerate(self.particles):
             if not simParticles(vertex,other.particles[iv]):
-                return False                        
+                return False   
+        
+        if self.finalState != other.finalState:
+            return False
+                             
         return True
    
 
@@ -165,6 +199,7 @@ class Branch(object):
         newbranch.masses = self.masses[:]
         newbranch.particles = self.particles[:]
         newbranch.PIDs = []
+        newbranch.stable = self.stable
         self.setInfo()
         newbranch.vertnumb = self.vertnumb
         newbranch.vertparts = self.vertparts[:]
@@ -207,7 +242,8 @@ class Branch(object):
         if len(self.PIDs) != 1:
             logger.error("During decay the branch should \
                             not have multiple PID lists!")
-            return False   
+            return False
+        
 
         for partID in br.ids:
             # Add R-even particles to final state
@@ -229,6 +265,9 @@ class Branch(object):
             newBranch.masses.append(newmass[0])
         if not self.maxWeight is None:
             newBranch.maxWeight = self.maxWeight * br.br
+        #If there are no daughters, assume branch is stable
+        if not br.ids:
+            newBranch.stable = True
 
         return newBranch
 
@@ -251,20 +290,27 @@ class Branch(object):
         if not self.PIDs[0][-1]:
             # Do nothing if there is no R-odd daughter (relevant for RPV decays
             # of the LSP)
-            return []
+            self.stable = True
+            return self
         #If decay table is not defined, assume daughter is stable:
-        if not self.PIDs[0][-1] in brDictionary: return []
+        if not self.PIDs[0][-1] in brDictionary:
+            self.stable = True
+            return self
         # List of possible decays (brs) for R-odd daughter in branch        
-        brs = brDictionary[self.PIDs[0][-1]]
-        if len(brs) == 0:
-            # Daughter is stable, there are no new branches
-            return []
+        brs = brDictionary[self.PIDs[0][-1]]       
         newBranches = []
         for br in brs:
-            if not br.br: continue  #Skip zero BRs
-            # Generate a new branch for each possible decay
+            if not br.br:
+                continue  #Skip zero BRs            
+            # Generate a new branch for each possible decay (including "stable decays")
             newBranches.append(self._addDecay(br, massDictionary))
-        return newBranches
+        
+        if not newBranches:
+            # Daughter is stable, there are no new branches
+            self.stable = True
+            return self
+        else:                       
+            return newBranches
 
 
 def decayBranches(branchList, brDictionary, massDictionary,
@@ -274,33 +320,31 @@ def decayBranches(branchList, brDictionary, massDictionary,
     
     :parameter branchList: list of Branch() objects containing the initial mothers
     :parameter brDictionary: dictionary with the decay information
-                                 for all intermediate states (values are br objects, see pyslha)
+                             for all intermediate states (values are br objects, see pyslha).
+                            It may also contain information about long-lived particles.
     :parameter massDictionary: dictionary containing the masses for all intermediate states.
+    :parameter promptDictionary: optional dictionary with the fraction of prompt and non-prompt decays.
+                        Allows to deal with quasi-stable or long-lived particles
+                        If not given, all particles are considered to
+                        always decay promptly or to be stable.    
     :parameter sigcut: minimum sigma*BR to be generated, by default sigcut = 0.
                    (all branches are kept)
     :returns: list of branches (Branch objects)    
     """
 
-    finalBranchList = []
-    while branchList:
-        # Store branches after adding one step cascade decay
-        newBranchList = []
-        for inbranch in branchList:
-            if sigcut.asNumber() > 0. and inbranch.maxWeight < sigcut:
-                # Remove the branches above sigcut and with length > topmax
-                continue
-            # Add all possible decays of the R-odd daughter to the original
-            # branch (if any)
-            newBranches = inbranch.decayDaughter(brDictionary, massDictionary)
-            if newBranches:
-                # New branches were generated, add them for next iteration
-                newBranchList.extend(newBranches)
-            else:
-                # All particles have already decayed, store final branch
-                finalBranchList.append(inbranch)
-        # Use new branches (if any) for next iteration step
-        branchList = newBranchList
+    #Check for stable branches
+    stableBranches = [branch for branch in branchList if branch.stable]
+    unstableBranches = [branch for branch in branchList if not branch.stable]
         
-    #Sort list by initial branch PID:
-    finalBranchList = sorted(finalBranchList, key=lambda branch: branch.PIDs)
-    return finalBranchList
+    if not unstableBranches:
+        #All branches have been decayed:
+        finalBranches = sorted(stableBranches, key=lambda branch: branch.PIDs)
+        return finalBranches
+    else:
+        #Decayed unstable branches
+        newBranches = []
+        for branch in unstableBranches:
+            newBranches += [br for br in branch.decayDaughter(brDictionary, massDictionary) 
+                           if br.maxWeight > sigcut]
+        
+        return decayBranches(newBranches+stableBranches,brDictionary, massDictionary,sigcut)

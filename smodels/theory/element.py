@@ -118,7 +118,22 @@ class Element(object):
             br.sortParticles()
         #Now sort branches
         self.branches = sorted(self.branches)
-
+        
+    def setFinalState(self,finalStates=None):
+        """
+        If finalStates = None, define the element final states according to the PID of the
+        last R-odd particle appearing in the cascade decay.
+        Else set the final states according to the finalStates list (must
+        match the branch ordering)
+        
+        :parameter finalStates: List with final state labels (must match the branch ordering)
+        """
+        #Set the final state of each branch
+        if finalStates is None:
+            fs = [None]*len(self.branches)
+        
+        for i,br in enumerate(self.branches):
+            br.setFinalState(fs[i])
 
     def particlesMatch(self, other, branchOrder=False):
         """
@@ -227,6 +242,18 @@ class Element(object):
         for branch in self.branches:
             ptcarray.append(branch.particles)
         return ptcarray
+    
+    def getFinalStates(self):
+        """
+        Get the array of particles in the element.
+        
+        :returns: list of particle strings                
+        """
+        
+        fsarray = []
+        for branch in self.branches:
+            fsarray.append(branch.finalState)
+        return fsarray    
 
 
     def getMasses(self):
@@ -251,9 +278,9 @@ class Element(object):
         """
         
         pids = []
-        for ipid,PIDlist in enumerate(self.branches[0].PIDs):            
-            for ipid2,PIDlist2 in enumerate(self.branches[1].PIDs):
-                pids.append([self.branches[0].PIDs[ipid],self.branches[1].PIDs[ipid2]])
+        for PIDlist in self.branches[0].PIDs:            
+            for PIDlist2 in self.branches[1].PIDs:
+                pids.append([PIDlist,PIDlist2])
         
         return pids
 
