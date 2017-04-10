@@ -436,7 +436,7 @@ class Database(object):
 
     def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
                     dataTypes = ['all'], useSuperseded=False, useNonValidated=False,
-                    onlyWithExpected = False, discard_zeroes = False ):
+                    onlyWithExpected = False ):
         """
         Returns a list of ExpResult objects.
         
@@ -458,7 +458,6 @@ class Database(object):
                                 will not be included
         :param onlyWithExpected: Return only those results that have expected values 
                  also. Note that this is trivially fulfilled for all efficiency maps.
-        :param discard_zeroes: Discard results that consist only of zeroes.
         :returns: list of ExpResult objects or the ExpResult object if the list
                   contains only one result
                    
@@ -487,7 +486,7 @@ class Database(object):
                     if not dataset.dataInfo.dataId in datasetIDs:
                         continue
                 newDataSet = datasetObj.DataSet( dataset.path, dataset.globalInfo,
-                                               False, discard_zeroes=discard_zeroes )
+                                          False, discard_zeroes=self.discard_zeroes )
                 newDataSet.dataInfo = dataset.dataInfo
                 newDataSet.txnameList = []
                 for txname in dataset.txnameList:
