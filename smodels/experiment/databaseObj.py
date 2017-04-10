@@ -54,7 +54,6 @@ class Database(object):
         self.pcl_mtime = None, None
         self.pcl_hasFastLim = False
         self.pcl_discard_zeroes = False
-        self.pcl_db = None
         self.sw_format_version = "118" ## what format does the software support?
         self.pcl_format_version = None ## what format is in the binary file?
         if self.force_load=="txt":
@@ -181,9 +180,6 @@ class Database(object):
             ## loaded
             return None
 
-        if self.pcl_db:
-            return self.pcl_db
-
         if not os.path.exists ( self.binfile() ):
             return None
 
@@ -250,7 +246,7 @@ class Database(object):
             return ( self.txt_mtime[0] > self.pcl_mtime[0] or \
                      self.txt_mtime[1] != self.pcl_mtime[1]  or \
                      self.sw_format_version != self.pcl_format_version or \
-                     self.hasFastLim != self.pcl_hasFastLim or \
+            #         self.hasFastLim != self.pcl_hasFastLim or \
                      self.discard_zeroes != self.pcl_discard_zeroes
                 )
         except (IOError,DatabaseNotFoundException,TypeError,ValueError):
