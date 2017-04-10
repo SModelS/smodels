@@ -131,6 +131,8 @@ class Element(object):
         #Set the final state of each branch
         if finalStates is None:
             fs = [None]*len(self.branches)
+        else:
+            fs = finalStates[:]
         
         for i,br in enumerate(self.branches):
             br.setFinalState(fs[i])
@@ -138,7 +140,8 @@ class Element(object):
     def particlesMatch(self, other, branchOrder=False):
         """
         Compare two Elements for matching particles only.
-        Allow for inclusive particle labels (such as the ones defined in particles.py).
+        Allow for inclusive particle labels (such as the ones defined in particles.py)
+        and includes final state comparison.
         If branchOrder = False, check both branch orderings.
         
         :parameter other: element to be compared (Element object)

@@ -178,12 +178,12 @@ class Branch(object):
         if self.vertparts != other.vertparts:
             return False
 
-        for iv,vertex in enumerate(self.particles):
-            if not simParticles(vertex,other.particles[iv]):
-                return False   
-        
         if self.finalState != other.finalState:
             return False
+
+        for iv,vertex in enumerate(self.particles):
+            if not simParticles(vertex,other.particles[iv]):
+                return False
                              
         return True
    
@@ -198,6 +198,7 @@ class Branch(object):
         newbranch = Branch()
         newbranch.masses = self.masses[:]
         newbranch.particles = self.particles[:]
+        newbranch.finalState = self.finalState
         newbranch.PIDs = []
         newbranch.stable = self.stable
         self.setInfo()
