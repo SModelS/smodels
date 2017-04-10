@@ -382,14 +382,17 @@ class TxNameData(object):
         d=temp.shape[2]
         delta = uvw - temp[:, d]
         bary = np.einsum('njk,nk->nj', temp[:, :d, :], delta)
-        vtx = vertices
         wts = np.hstack((bary, 1 - bary.sum(axis=1, keepdims=True)))
         if type (self.xsec[0]) in [ float, int, np.int64, np.float64 ]:
             values = np.array ( [ float(x) for x in self.xsec ] )
         else:
             values = np.array ( [ x.asNumber() for x in self.xsec ] )
-        ret = np.einsum('nj,nj->n', np.take(values, vtx), wts)
-        return float(ret[0])
+        ret = np.einsum('nj,nj->n', np.take(values, vertices), wts)[0]
+        minXsec = min(np.take(values, vertices)[0])
+        if ret < minXsec:
+            logger.debug('Interpolation below simplex values. Will take the smallest simplex value.')
+            ret = minXsec
+        return float(ret)
 
 
     def _estimateExtrapolationError ( self, massarray ):
