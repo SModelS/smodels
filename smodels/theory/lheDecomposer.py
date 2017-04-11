@@ -103,6 +103,8 @@ def elementFromEvent(event, weight=None):
             mombranch.PIDs = [[particle.pdg]]           
             if weight:
                 mombranch.maxWeight = weight.getMaxXsec()
+            else:
+                mombranch.maxWeight = 0.*fb
             # Get simple BR and Mass dictionaries for the corresponding branch
             branchBR = brDic[ip]
             branchMass = massDic[ip]
@@ -119,6 +121,7 @@ def elementFromEvent(event, weight=None):
     newElement = element.Element(finalBranchList)
     if weight:
         newElement.weight = copy.deepcopy(weight)
+    newElement.setFinalState()
 
     return newElement
 

@@ -396,12 +396,15 @@ def _evalExpression(stringExpr,cluster):
     """
 
 #Get cross section info from cluster (to generate zero cross section values):
-    infoList = cluster.elements[0].weight.getInfo()    
+    infoList = cluster.elements[0].weight.getInfo()
+#Get final state info
+    finalStates = cluster.elements[0].getFinalStates()      
 #Generate elements appearing in the string expression with zero cross sections:
     elements = []
     for elStr in elementsInStr(stringExpr):
         el = element.Element(elStr)
         el.weight = crossSection.XSectionList(infoList)
+        el.setFinalState(finalStates)
         elements.append(el)
 
 #Replace elements in strings by their weights and add weights from cluster to the elements list:

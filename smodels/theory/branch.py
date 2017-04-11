@@ -292,11 +292,11 @@ class Branch(object):
             # Do nothing if there is no R-odd daughter (relevant for RPV decays
             # of the LSP)
             self.stable = True
-            return self
+            return [self]
         #If decay table is not defined, assume daughter is stable:
         if not self.PIDs[0][-1] in brDictionary:
             self.stable = True
-            return self
+            return [self]
         # List of possible decays (brs) for R-odd daughter in branch        
         brs = brDictionary[self.PIDs[0][-1]]       
         newBranches = []
@@ -309,7 +309,7 @@ class Branch(object):
         if not newBranches:
             # Daughter is stable, there are no new branches
             self.stable = True
-            return self
+            return [self]
         else:                       
             return newBranches
 
@@ -346,6 +346,6 @@ def decayBranches(branchList, brDictionary, massDictionary,
         newBranches = []
         for branch in unstableBranches:
             newBranches += [br for br in branch.decayDaughter(brDictionary, massDictionary) 
-                           if br.maxWeight > sigcut]
+                           if br.maxWeight >= sigcut]
         
         return decayBranches(newBranches+stableBranches,brDictionary, massDictionary,sigcut)
