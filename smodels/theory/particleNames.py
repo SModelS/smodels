@@ -71,7 +71,7 @@ def elementsInStr(instring,removeQuotes=True):
     elif type(instring) == type([]):
         for st in instring:
             if type(st) != type('st'):
-                logger.error("Input must be a string or a list of strings")
+                logger.error("Input must be a string or a list of strings. Type %s found:\n %s" %(type(st),str(st)))
                 raise SModelSError()
             # Combine list of strings in a single string
             outstr += st
