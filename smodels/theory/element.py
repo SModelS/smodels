@@ -9,7 +9,7 @@
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.branch import Branch
 from smodels.theory import crossSection
-from smodels.particles import rEven, ptcDic
+from smodels.particles import rEven, ptcDic, finalStates
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -333,7 +333,7 @@ class Element(object):
                     logger.error("Wrong syntax")
                     raise SModelSError()
                 for ptc in vertex:
-                    if not ptc in rEven.values() and not ptc in ptcDic:
+                    if not ptc in rEven.values() and not ptc in ptcDic and not ptc in finalStates:
                         logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
                         raise SModelSError()
         return True

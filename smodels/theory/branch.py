@@ -8,7 +8,7 @@
 
 from smodels.theory.particleNames import simParticles, elementsInStr, getFinalStateLabel
 from smodels.tools.physicsUnits import fb, MeV
-from smodels.particles import rEven, ptcDic
+from smodels.particles import rEven, ptcDic, finalStates
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -52,7 +52,7 @@ class Branch(object):
                     # Syntax check:
                     for ptc in ptcs:
                         if not ptc in rEven.values() \
-                                and not ptc in ptcDic:
+                                and not ptc in ptcDic and not ptc in finalStates:
                             logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
                             raise SModelSError()
                     self.particles.append(ptcs)
