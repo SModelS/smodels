@@ -121,7 +121,6 @@ def elementFromEvent(event, weight=None):
     newElement = element.Element(finalBranchList)
     if weight:
         newElement.weight = copy.deepcopy(weight)
-    newElement.setFinalState()
 
     return newElement
 
