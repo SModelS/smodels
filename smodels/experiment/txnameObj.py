@@ -101,10 +101,6 @@ class TxName(object):
         # and conditions:
         for el in elements:
             el.sortBranches()
-            if hasattr(self,'finalStates'):
-                el.setFinalState(self.finalStates)
-            else:
-                el.setFinalState(["MET","MET"])
             self._topologyList.addElement(el)
 
     def hasOnlyZeroes ( self ):

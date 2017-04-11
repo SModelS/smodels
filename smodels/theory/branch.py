@@ -8,7 +8,7 @@
 
 from smodels.theory.particleNames import simParticles, elementsInStr, getFinalStateLabel
 from smodels.tools.physicsUnits import fb, MeV
-from smodels.particles import rEven, ptcDic, finalStates
+from smodels.particles import rEven, ptcDic
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -39,7 +39,6 @@ class Branch(object):
         self.vertnumb = None
         self.vertparts = None
         self.stable = False
-        self.finalState = None
         if type(info) == type(str()):
             branch = elementsInStr(info)
             if not branch or len(branch) > 1:
@@ -106,10 +105,6 @@ class Branch(object):
             comp = self.masses > other.masses
             if comp: return 1
             else: return -1
-        elif self.finalState != other.finalState:
-            comp = self.finalState > other.finalState
-            if comp: return 1
-            else: return -1            
         else:
             return 0  #Branches are equal
 
@@ -131,30 +126,7 @@ class Branch(object):
         self.vertnumb = len(self.particles)
         self.vertparts = [len(v) for v in self.particles]
         
-    def setFinalState(self,finalState=None):
-        """
-        If finalState = None, define the branch final state according to the PID of the
-        last R-odd particle appearing in the cascade decay.
-        Else set the final state to the finalState given
-        :parameter finalState: String defining the final state
-        """
-        
-        if finalState:
-            if not finalState in finalStates:
-                logger.error("Final state %s has not been defined. Add it to particles.py." %finalState)
-                raise SModelSError
-            else:
-                self.finalState = finalState        
-        else:
-            fStates = set()
-            for pidList in self.PIDs:
-                fStates.add(getFinalStateLabel(pidList[-1]))
-            
-            if len(fStates) != 1:
-                logger.error("Error obtaining the final state for branch %s" %self)
-                raise SModelSError
-            else:
-                self.finalState = list(fStates)[0]
+
 
     
     def particlesMatch(self, other):
@@ -178,9 +150,6 @@ class Branch(object):
         if self.vertparts != other.vertparts:
             return False
 
-        if self.finalState != other.finalState:
-            return False
-
         for iv,vertex in enumerate(self.particles):
             if not simParticles(vertex,other.particles[iv]):
                 return False
@@ -198,7 +167,6 @@ class Branch(object):
         newbranch = Branch()
         newbranch.masses = self.masses[:]
         newbranch.particles = self.particles[:]
-        newbranch.finalState = self.finalState
         newbranch.PIDs = []
         newbranch.stable = self.stable
         self.setInfo()
@@ -268,8 +236,8 @@ class Branch(object):
             newBranch.maxWeight = self.maxWeight * br.br
         #If there are no daughters, assume branch is stable
         if not br.ids:
-            newBranch.stable = True
-
+            newBranch.setStable()
+            
         return newBranch
 
 
@@ -295,7 +263,7 @@ class Branch(object):
             return [self]
         #If decay table is not defined, assume daughter is stable:
         if not self.PIDs[0][-1] in brDictionary:
-            self.stable = True
+            self.setStable()            
             return [self]
         # List of possible decays (brs) for R-odd daughter in branch        
         brs = brDictionary[self.PIDs[0][-1]]       
@@ -308,10 +276,21 @@ class Branch(object):
         
         if not newBranches:
             # Daughter is stable, there are no new branches
-            self.stable = True
+            self.setStable()
             return [self]
         else:                       
             return newBranches
+        
+    def setStable(self):
+        """
+        Set the branch stable attribute to true and define the final state
+        vertex (e.g. MET, HSCP,...)
+        """
+
+        self.stable = True
+        #Append final state as last vertex
+        finalstate = getFinalStateLabel(self.PIDs[0][-1])
+        self.particles.append([finalstate])            
 
 
 def decayBranches(branchList, brDictionary, massDictionary,
