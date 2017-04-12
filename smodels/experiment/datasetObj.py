@@ -44,7 +44,7 @@ class DataSet(object):
                 try:
                     txname = txnameObj.TxName(txtfile,self.globalInfo,self.dataInfo)
                     if discard_zeroes and txname.hasOnlyZeroes():
-                        logger.warning ( "%s, %s has only zeroes. discard it." % \
+                        logger.debug ( "%s, %s has only zeroes. discard it." % \
                                          ( self.path, txname.txName ) )
                         continue
                     self.txnameList.append(txname)
@@ -62,8 +62,13 @@ class DataSet(object):
         logger.debug ( "checking for redundancy" )
         datasetElements = []
         for tx in self.txnameList:
-            for el in elementsInStr(tx.constraint):
-                datasetElements.append(Element(el))
+            for el in elementsInStr(str(tx.constraint)):
+                newEl = Element(el)
+                if hasattr(tx, 'finalState'):
+                    newEl.setFinalState(tx.finalState)
+                else:
+                    newEl.setFinalState(['MET','MET'])
+                datasetElements.append(newEl)
         combos = itertools.combinations ( datasetElements, 2 )
         for x,y in combos:
             if x.particlesMatch ( y ):
