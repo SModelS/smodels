@@ -91,8 +91,8 @@ def elementFromEvent(event, weight=None):
     # Create branch list
     finalBranchList = []
     for ip, particle in enumerate(event.particles):
-        keys = list(smodels.particles.rEven.keys()) + \
-               list(smodels.particles.rOdd.keys()) + list(smodels.particles.finalStates.keys())
+        keys = list ( smodels.particles.rEven.keys() ) + \
+               list ( smodels.particles.rOdd.keys() )
         if not particle.pdg in keys:
             logger.warning("Particle %i not defined in particles.py, events containing this particle will be ignored" %(particle.pdg))
             return None
@@ -121,6 +121,7 @@ def elementFromEvent(event, weight=None):
     newElement = element.Element(finalBranchList)
     if weight:
         newElement.weight = copy.deepcopy(weight)
+    newElement.setFinalState()
 
     return newElement
 

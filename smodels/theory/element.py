@@ -9,7 +9,7 @@
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.branch import Branch
 from smodels.theory import crossSection
-from smodels.particles import rEven, ptcDic, finalStates
+from smodels.particles import rEven, ptcDic
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -119,6 +119,23 @@ class Element(object):
         #Now sort branches
         self.branches = sorted(self.branches)
         
+    def setFinalState(self,finalStates=None):
+        """
+        If finalStates = None, define the element final states according to the PID of the
+        last R-odd particle appearing in the cascade decay.
+        Else set the final states according to the finalStates list (must
+        match the branch ordering)
+        
+        :parameter finalStates: List with final state labels (must match the branch ordering)
+        """
+        #Set the final state of each branch
+        if finalStates is None:
+            fs = [None]*len(self.branches)
+        else:
+            fs = finalStates[:]
+        
+        for i,br in enumerate(self.branches):
+            br.setFinalState(fs[i])
 
     def particlesMatch(self, other, branchOrder=False):
         """
@@ -229,7 +246,19 @@ class Element(object):
             ptcarray.append(branch.particles)
         return ptcarray
     
-    
+    def getFinalStates(self):
+        """
+        Get the array of particles in the element.
+        
+        :returns: list of particle strings                
+        """
+        
+        fsarray = []
+        for branch in self.branches:
+            fsarray.append(branch.finalState)
+        return fsarray    
+
+
     def getMasses(self):
         """
         Get the array of masses in the element.    
@@ -333,41 +362,10 @@ class Element(object):
                     logger.error("Wrong syntax")
                     raise SModelSError()
                 for ptc in vertex:
-                    if not ptc in rEven.values() and not ptc in ptcDic and not ptc in finalStates:
+                    if not ptc in rEven.values() and not ptc in ptcDic:
                         logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
                         raise SModelSError()
         return True
-    
-    def hasFinalState(self):
-        """
-        Checks if the element particles contain the final state labels
-        defined in particles.py
-        :return: True/False
-        """
-        
-        fs = [branch.hasFinalState() for branch in self.branches]
-        if False in fs:
-            return False
-        else:
-            return True
-        
-    def setFinalState(self,finalstates=None):
-        """
-        If finalstates = None, define the element final states according to the PID of the
-        last R-odd particle appearing in the cascade decay.
-        Else set the final states according to the finalStates list (must
-        match the branch ordering)
-        
-        :parameter finalStates: List with final state labels (must match the branch ordering)
-        """
-        #Set the final state of each branch
-        if finalStates is None:
-            fs = [None]*len(self.branches)
-        else:
-            fs = finalStates[:]
-        
-        for i,br in enumerate(self.branches):
-            br.setFinalState(fs[i])        
 
     
     def compressElement(self, doCompress, doInvisible, minmassgap):

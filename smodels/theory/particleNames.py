@@ -106,7 +106,7 @@ def elementsInStr(instring,removeQuotes=True):
                 ptc = ptc.replace("'","")
                 if not ptc:
                     continue
-                if not ptc in rEven.values() and not ptc in ptcDic and not ptc in finalStates:
+                if not ptc in rEven.values() and not ptc in ptcDic:
                     logger.error("Unknown particle. Add " + ptc + " to smodels/particles.py")
                     raise SModelSError()
 
@@ -158,7 +158,7 @@ def vertInStr(instring):
             for ptc in vertices[-1]:
                 if not ptc:
                     continue
-                if not ptc in rEven.values() and not ptc in ptcDic and not ptc in finalStates:
+                if not ptc in rEven.values() and not ptc in ptcDic:
                     logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
                     raise SModelSError()
             vertStr = ""
@@ -192,10 +192,10 @@ def simParticles(plist1, plist2, useDict=True):
         if not isinstance(p,str) or not isinstance(plist2[i],str):
             logger.error("Input must be a list of particle strings")
             raise SModelSError()
-        elif not p in list(ptcDic.keys()) + list(rEven.values()) + list(finalStates.keys()):
+        elif not p in list ( ptcDic.keys() ) + list ( rEven.values() ):
             logger.error("Unknow particle: %s" %p)
             raise SModelSError()
-        elif not plist2[i] in list(ptcDic.keys()) + list(rEven.values()) + list(finalStates.keys()):
+        elif not plist2[i] in list ( ptcDic.keys() ) + list ( rEven.values() ):
             logger.error("Unknow particle: %s" %plist2[i])
             raise SModelSError()
                         

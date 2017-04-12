@@ -100,9 +100,11 @@ class TxName(object):
         # Builds up TopologyList with all the elements appearing in constraints
         # and conditions:
         for el in elements:
-            if not el.hasFinalState():
-                el.setFinalState(['MET','MET'])
             el.sortBranches()
+            if hasattr(self,'finalStates'):
+                el.setFinalState(self.finalStates)
+            else:
+                el.setFinalState(["MET","MET"])
             self._topologyList.addElement(el)
 
     def hasOnlyZeroes ( self ):
