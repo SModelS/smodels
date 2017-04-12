@@ -8,12 +8,15 @@
 """
 
 
-import os,glob
+import os,glob,sys
 from smodels.experiment import txnameObj,infoObj
 from smodels.tools import statistics
 from smodels.tools.physicsUnits import fb
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.smodelsLogging import logger
+from smodels.theory.particleNames import elementsInStr
+from smodels.theory.element import Element
+import itertools
 
 class DataSet(object):
     """
@@ -41,13 +44,36 @@ class DataSet(object):
                 try:
                     txname = txnameObj.TxName(txtfile,self.globalInfo,self.dataInfo)
                     if discard_zeroes and txname.hasOnlyZeroes():
-                        logger.warning ( "%s has zeroes only. discard it." % \
-                                         txname.txName )
+                        logger.warning ( "%s, %s has only zeroes. discard it." % \
+                                         ( self.path, txname.txName ) )
                         continue
                     self.txnameList.append(txname)
                 except TypeError: continue
 
-        self.txnameList.sort()
+            self.txnameList.sort()
+            self.checkForRedundancy()
+
+    def checkForRedundancy ( self ):
+        """ In case of efficiency maps, check if any txnames have overlapping
+            constraints. This would result in double counting, so we dont 
+            allow it. """
+        if self.dataInfo.dataType == "upperLimit": 
+            return False
+        logger.debug ( "checking for redundancy" )
+        datasetElements = []
+        for tx in self.txnameList:
+            for el in elementsInStr(tx.constraint):
+                datasetElements.append(Element(el))
+        combos = itertools.combinations ( datasetElements, 2 )
+        for x,y in combos:
+            if x.particlesMatch ( y ):
+                errmsg ="Constraints (%s) appearing in dataset %s, %s overlap "\
+                        "(may result in double counting)." % \
+                        (x,self.dataInfo.dataId,self.globalInfo.id )
+                logger.error( errmsg )
+                raise SModelSError ( errmsg )
+#                return True
+#        return False
 
     def __ne__ ( self, other ):
         return not self.__eq__ ( other )

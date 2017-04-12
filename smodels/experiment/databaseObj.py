@@ -54,8 +54,7 @@ class Database(object):
         self.pcl_mtime = None, None
         self.pcl_hasFastLim = False
         self.pcl_discard_zeroes = False
-        self.pcl_db = None
-        self.sw_format_version = "117" ## what format does the software support?
+        self.sw_format_version = "118" ## what format does the software support?
         self.pcl_format_version = None ## what format is in the binary file?
         if self.force_load=="txt":
             self.loadTextDatabase()
@@ -181,9 +180,6 @@ class Database(object):
             ## loaded
             return None
 
-        if self.pcl_db:
-            return self.pcl_db
-
         if not os.path.exists ( self.binfile() ):
             return None
 
@@ -250,7 +246,7 @@ class Database(object):
             return ( self.txt_mtime[0] > self.pcl_mtime[0] or \
                      self.txt_mtime[1] != self.pcl_mtime[1]  or \
                      self.sw_format_version != self.pcl_format_version or \
-                     self.hasFastLim != self.pcl_hasFastLim or \
+            #         self.hasFastLim != self.pcl_hasFastLim or \
                      self.discard_zeroes != self.pcl_discard_zeroes
                 )
         except (IOError,DatabaseNotFoundException,TypeError,ValueError):
@@ -440,7 +436,7 @@ class Database(object):
 
     def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
                     dataTypes = ['all'], useSuperseded=False, useNonValidated=False,
-                    onlyWithExpected = False, discard_zeroes = False ):
+                    onlyWithExpected = False ):
         """
         Returns a list of ExpResult objects.
         
@@ -462,7 +458,6 @@ class Database(object):
                                 will not be included
         :param onlyWithExpected: Return only those results that have expected values 
                  also. Note that this is trivially fulfilled for all efficiency maps.
-        :param discard_zeroes: Discard results that consist only of zeroes.
         :returns: list of ExpResult objects or the ExpResult object if the list
                   contains only one result
                    
@@ -491,7 +486,7 @@ class Database(object):
                     if not dataset.dataInfo.dataId in datasetIDs:
                         continue
                 newDataSet = datasetObj.DataSet( dataset.path, dataset.globalInfo,
-                                               False, discard_zeroes=discard_zeroes )
+                                          False, discard_zeroes=self.discard_zeroes )
                 newDataSet.dataInfo = dataset.dataInfo
                 newDataSet.txnameList = []
                 for txname in dataset.txnameList:
