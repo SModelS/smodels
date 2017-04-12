@@ -337,6 +337,37 @@ class Element(object):
                         logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
                         raise SModelSError()
         return True
+    
+    def hasFinalState(self):
+        """
+        Checks if the element particles contain the final state labels
+        defined in particles.py
+        :return: True/False
+        """
+        
+        fs = [branch.hasFinalState() for branch in self.branches]
+        if False in fs:
+            return False
+        else:
+            return True
+        
+    def setFinalState(self,finalstates=None):
+        """
+        If finalstates = None, define the element final states according to the PID of the
+        last R-odd particle appearing in the cascade decay.
+        Else set the final states according to the finalStates list (must
+        match the branch ordering)
+        
+        :parameter finalStates: List with final state labels (must match the branch ordering)
+        """
+        #Set the final state of each branch
+        if finalStates is None:
+            fs = [None]*len(self.branches)
+        else:
+            fs = finalStates[:]
+        
+        for i,br in enumerate(self.branches):
+            br.setFinalState(fs[i])        
 
     
     def compressElement(self, doCompress, doInvisible, minmassgap):

@@ -155,6 +155,43 @@ class Branch(object):
                 return False
                              
         return True
+    
+    def hasFinalState(self):
+        """
+        Checks if the last particle in the branch belongs to one of the final state labels
+        defined in particles.py
+        :return: True/False
+        """
+        
+        for ptc in self.particles[-1]:
+            if not ptc in finalStates:
+                return False
+        return True    
+    
+    def setFinalState(self,finalState=None):
+        """
+        If finalState = None, define the branch final state according to the PID of the
+        last R-odd particle appearing in the cascade decay.
+        Else set the final state to the finalState given
+        :parameter finalState: String defining the final state
+        """
+        
+        if finalState:
+            if not finalState in finalStates:
+                logger.error("Final state %s has not been defined. Add it to particles.py." %finalState)
+                raise SModelSError
+            else:
+                self.particles.append([finalState])        
+        else:
+            fStates = set()
+            for pidList in self.PIDs:
+                fStates.add(getFinalStateLabel(pidList[-1]))
+            
+            if len(fStates) != 1:
+                logger.error("Error obtaining the final state for branch %s" %self)
+                raise SModelSError
+            else:
+                self.particles.append(list(fStates))    
    
 
     def copy(self):
