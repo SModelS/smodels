@@ -125,7 +125,7 @@ class TheoryPredictionList(object):
         else:
             return self.__add__(theoPredList)        
 
-def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2, useBestDataset=False):
+def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2, useBestDataset=True):
     """
     Compute theory predictions for the given experimental result, using the list of elements
     in smsTopList.

@@ -106,7 +106,7 @@ def elementsInStr(instring,removeQuotes=True):
                 ptc = ptc.replace("'","")
                 if not ptc:
                     continue
-                if not ptc in rEven.values() and not ptc in ptcDic and ptc != '*':
+                if not ptc in rEven.values() and not ptc in ptcDic:
                     logger.error("Unknown particle. Add " + ptc + " to smodels/particles.py")
                     raise SModelSError()
 
@@ -158,7 +158,7 @@ def vertInStr(instring):
             for ptc in vertices[-1]:
                 if not ptc:
                     continue
-                if not ptc in rEven.values() and not ptc in ptcDic and ptc != '*':
+                if not ptc in rEven.values() and not ptc in ptcDic:
                     logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
                     raise SModelSError()
             vertStr = ""
