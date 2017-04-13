@@ -11,7 +11,6 @@ from smodels.tools.physicsUnits import fb, MeV
 from smodels.particles import rEven, ptcDic, finalStates
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
-from smodels.theory.auxiliaryFunctions import wildcardFactory
 
 class Branch(object):
     """
@@ -175,6 +174,10 @@ class Branch(object):
         :parameter other: branch to be compared (Branch object)
         :returns: True if branches are equal (particles and masses match); False otherwise.              
         """
+
+        #First of all check final state:
+        if self.finalState != other.finalState:
+            return False
         
         #If branches match, particles must match (useful if one of the branches is a wildcard)
         if self == other:
@@ -189,9 +192,6 @@ class Branch(object):
         if self.vertnumb != other.vertnumb:
             return False
         if self.vertparts != other.vertparts:
-            return False
-
-        if self.finalState != other.finalState:
             return False
 
         for iv,vertex in enumerate(self.particles):

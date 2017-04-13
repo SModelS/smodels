@@ -157,9 +157,7 @@ class Element(object):
                                 check the same branch ordering
         :returns: True, if particles match; False, else;        
         """
-        
-        if self == other:
-            return True
+
         
         if type(self) != type(other):
             return False
