@@ -76,7 +76,10 @@ class Element(object):
                 for ib, branch in enumerate(info):
                     self.branches[ib] = branch.copy()
         
-        self.setFinalState(finalState)
+        if finalState is None:
+            self.setFinalState([finalState]*len(self.branches))
+        else:
+            self.setFinalState(finalState)
     
     def __cmp__(self,other):
         """
