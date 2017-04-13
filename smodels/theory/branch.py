@@ -183,7 +183,7 @@ class Branch(object):
         if self == other:
             return True        
         
-        if type (other) != type(self):
+        if not isinstance(other,Branch):
             return False        
         
         #Make sure number of vertices and particles have been defined
@@ -327,6 +327,28 @@ class Branch(object):
             return [self]
         else:                       
             return newBranches
+
+
+
+class BranchWildcard(Branch):
+    """
+    A branch wildcard class. It will return True when compared to any other branch object.
+    """
+    
+    def __init__(self):
+        Branch.__init__(self)
+        
+    def __str__(self):
+        return '[*]'
+
+    def __cmp__(self,other):
+        if isinstance(other,Branch):
+            return 0
+        else:
+            return -1
+
+    def __eq__(self,other):
+        return self.__cmp__(other) == 0
 
 
 def decayBranches(branchList, brDictionary, massDictionary,

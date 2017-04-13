@@ -7,12 +7,11 @@
 """
 
 from smodels.theory.particleNames import elementsInStr
-from smodels.theory.branch import Branch
+from smodels.theory.branch import Branch,BranchWildcard
 from smodels.theory import crossSection
 from smodels.particles import rEven, ptcDic
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
-from smodels.theory.auxiliaryFunctions import wildcardFactory
 
 class Element(object):
     """
@@ -68,7 +67,7 @@ class Element(object):
                     self.branches = []                    
                     for branch in branches:
                         if branch == '[*]':
-                            self.branches.append(wildcardFactory(Branch,name='[*]'))
+                            self.branches.append(BranchWildcard())
                         else:
                             self.branches.append(Branch(branch))
             # Create element from branch pair
@@ -159,7 +158,7 @@ class Element(object):
         """
 
         
-        if type(self) != type(other):
+        if not isinstance(other,Element):
             return False
         
         if len(self.branches) != len(other.branches):
