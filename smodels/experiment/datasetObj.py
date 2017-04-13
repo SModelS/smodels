@@ -8,7 +8,7 @@
 """
 
 
-import os,glob,sys
+import os,glob
 from smodels.experiment import txnameObj,infoObj
 from smodels.tools import statistics
 from smodels.tools.physicsUnits import fb
@@ -62,12 +62,12 @@ class DataSet(object):
         logger.debug ( "checking for redundancy" )
         datasetElements = []
         for tx in self.txnameList:
+            if hasattr(tx, 'finalState'):
+                finalState = tx.finalState
+            else:
+                finalState = ['MET','MET']            
             for el in elementsInStr(str(tx.constraint)):
-                newEl = Element(el)
-                if hasattr(tx, 'finalState'):
-                    newEl.setFinalState(tx.finalState)
-                else:
-                    newEl.setFinalState(['MET','MET'])
+                newEl = Element(el,finalState)
                 datasetElements.append(newEl)
         combos = itertools.combinations ( datasetElements, 2 )
         for x,y in combos:

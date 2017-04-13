@@ -27,13 +27,17 @@ class Element(object):
                           Holds a pair of (whence, mother element), where
                           whence describes what process generated the element    
     """
-    def __init__(self, info=None):
+    def __init__(self, info=None, finalState=None):
         """
         Initializes the element. If info is defined, tries to generate
         the element using it.
         
         :parameter info: string describing the element in bracket notation
                          (e.g. [[[e+],[jet]],[[e-],[jet]]])
+                         
+        :parameter finalState: list containing the final state labels for each branch
+                         (e.g. ['MET', 'HSCP'] or ['MET','MET'])
+                         
         """
         self.branches = [Branch(), Branch()]
         self.weight = crossSection.XSectionList()
@@ -63,8 +67,8 @@ class Element(object):
                         return None
                     self.branches = []                    
                     for branch in branches:
-                        if branch == '*':
-                            self.branches.append(wildcardFactory(Branch))
+                        if branch == '[*]':
+                            self.branches.append(wildcardFactory(Branch,name='[*]'))
                         else:
                             self.branches.append(Branch(branch))
             # Create element from branch pair
@@ -72,7 +76,7 @@ class Element(object):
                 for ib, branch in enumerate(info):
                     self.branches[ib] = branch.copy()
         
-        self.setFinalState()
+        self.setFinalState(finalState)
     
     def __cmp__(self,other):
         """
@@ -107,9 +111,10 @@ class Element(object):
         
         :returns: string representation of the element (in bracket notation)    
         """
-        particleString = str(self.getParticles()).replace(" ", "").\
-                replace("'", "")
-        return particleString
+        
+        elStr = "["+",".join([str(br) for br in self.branches])+"]"
+        elStr = elStr.replace(" ", "").replace("'", "")
+        return elStr
     
     def sortBranches(self):
         """
@@ -124,7 +129,7 @@ class Element(object):
         #Now sort branches
         self.branches = sorted(self.branches)
         
-    def setFinalState(self,finalStates=None):
+    def setFinalState(self,finalStates):
         """
         If finalStates = None, define the element final states according to the PID of the
         last R-odd particle appearing in the cascade decay.
@@ -133,14 +138,9 @@ class Element(object):
         
         :parameter finalStates: List with final state labels (must match the branch ordering)
         """
-        #Set the final state of each branch
-        if finalStates is None:
-            fs = [None]*len(self.branches)
-        else:
-            fs = finalStates[:]
-        
+
         for i,br in enumerate(self.branches):
-            br.setFinalState(fs[i])
+            br.setFinalState(finalStates[i])
 
     def particlesMatch(self, other, branchOrder=False):
         """
@@ -155,6 +155,8 @@ class Element(object):
         :returns: True, if particles match; False, else;        
         """
         
+        if self == other:
+            return True
         
         if type(self) != type(other):
             return False
@@ -186,7 +188,9 @@ class Element(object):
         
         :returns: copy of element (Element object)   
         """
-        newel = Element()
+
+        #Allows for derived classes (like wildcard classes)
+        newel = self.__class__()
         newel.branches = []
         for branch in self.branches:
             newel.branches.append(branch.copy())

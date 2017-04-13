@@ -87,25 +87,25 @@ class TxName(object):
             self.txnameDataExp = TxNameData( expectedData, dataType, ident )
 
         #Builds up a list of elements appearing in constraints:
+        if hasattr(self,'finalState'):
+            finalState = self.finalState
+        else:
+            finalState = ["MET","MET"]        
         elements = []
         if hasattr(self,'constraint'):
-            elements += [Element(el) for el in elementsInStr(str(self.constraint))]
+            elements += [Element(el,finalState) for el in elementsInStr(str(self.constraint))]
         if hasattr(self,'condition') and self.condition:
             conds = self.condition
             if not isinstance(conds,list): conds = [conds]
             for cond in conds:
                 for el in elementsInStr(str(cond)):
-                    newEl = Element(el)
+                    newEl = Element(el,finalState)
                     if not newEl in elements: elements.append(newEl)
 
         # Builds up TopologyList with all the elements appearing in constraints
         # and conditions:
         for el in elements:
             el.sortBranches()
-            if hasattr(self,'finalState'):
-                el.setFinalState(self.finalState)
-            else:
-                el.setFinalState(["MET","MET"])
             self._topologyList.addElement(el)
 
     def hasOnlyZeroes ( self ):

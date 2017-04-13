@@ -25,13 +25,16 @@ class Branch(object):
                 to a nested list (PIDs = [[pid1,pid2,...],[pidA,pidB,...])
     :ivar maxWeight: weight of the branch (XSection object)
     """
-    def __init__(self, info=None):
+    def __init__(self, info=None, finalState=None):
         """
         Initializes the branch. If info is defined, tries to generate
         the branch using it.
         
         :parameter info: string describing the branch in bracket notation
                          (e.g. [[e+],[jet]])
+
+        :parameter finalState: final state label string for the branch
+                         (e.g. 'MET' or 'HSCP')                         
         """
         self.masses = []
         self.particles = []
@@ -48,8 +51,6 @@ class Branch(object):
                 raise SModelSError()
             else:
                 branch = branch[0]
-                if branch == '*': 
-                    return wildcardFactory(Branch)
                 vertices = elementsInStr(branch[1:-1])
                 for vertex in vertices:
                     ptcs = vertex[1:-1].split(',')
@@ -63,7 +64,7 @@ class Branch(object):
             self.vertnumb = len(self.particles)
             self.vertparts = [len(v) for v in self.particles]
         
-        self.setFinalState()
+        self.setFinalState(finalState)
 
 
     def __str__(self):
@@ -175,8 +176,12 @@ class Branch(object):
         :returns: True if branches are equal (particles and masses match); False otherwise.              
         """
         
+        #If branches match, particles must match (useful if one of the branches is a wildcard)
+        if self == other:
+            return True        
+        
         if type (other) != type(self):
-            return False
+            return False        
         
         #Make sure number of vertices and particles have been defined
         self.setInfo()
@@ -192,7 +197,7 @@ class Branch(object):
         for iv,vertex in enumerate(self.particles):
             if not simParticles(vertex,other.particles[iv]):
                 return False
-                             
+              
         return True
    
 
@@ -203,7 +208,9 @@ class Branch(object):
         
         :returns: Branch object
         """
-        newbranch = Branch()
+        
+        #Allows for derived classes (like wildcard classes)
+        newbranch = self.__class__()
         newbranch.masses = self.masses[:]
         newbranch.particles = self.particles[:]
         newbranch.finalState = self.finalState
