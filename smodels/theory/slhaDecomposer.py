@@ -140,8 +140,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
                                                                   minmassgap)
 
                 for el in allElements:
-                    el.sortBranches()  #Make sure elements are sorted BEFORE adding them
-                    el.setFinalState() #Set the final state according to the last particle in the cascade decay
+                    el.sortBranches()  #Make sure elements are sorted BEFORE adding them                    
                     smsTopList.addElement(el)
     smsTopList._setElementIds()
 

@@ -11,6 +11,7 @@ from smodels.tools.physicsUnits import fb, MeV
 from smodels.particles import rEven, ptcDic, finalStates
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
+from smodels.theory.auxiliaryFunctions import wildcardFactory
 
 class Branch(object):
     """
@@ -47,6 +48,8 @@ class Branch(object):
                 raise SModelSError()
             else:
                 branch = branch[0]
+                if branch == '*': 
+                    return wildcardFactory(Branch)
                 vertices = elementsInStr(branch[1:-1])
                 for vertex in vertices:
                     ptcs = vertex[1:-1].split(',')
@@ -59,6 +62,8 @@ class Branch(object):
                     self.particles.append(ptcs)
             self.vertnumb = len(self.particles)
             self.vertparts = [len(v) for v in self.particles]
+        
+        self.setFinalState()
 
 
     def __str__(self):
@@ -144,8 +149,9 @@ class Branch(object):
                 logger.error("Final state %s has not been defined. Add it to particles.py." %finalState)
                 raise SModelSError
             else:
-                self.finalState = finalState        
-        else:
+                self.finalState = finalState
+        #If PIDs have been defined, use it:     
+        elif self.PIDs:
             fStates = set()
             for pidList in self.PIDs:
                 fStates.add(getFinalStateLabel(pidList[-1]))
@@ -155,7 +161,9 @@ class Branch(object):
                 raise SModelSError
             else:
                 self.finalState = list(fStates)[0]
-
+        #Else do nothing
+        else:
+            self.finalState = None
     
     def particlesMatch(self, other):
         """

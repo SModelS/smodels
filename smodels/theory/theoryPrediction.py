@@ -10,7 +10,6 @@
 from smodels.theory import clusterTools, crossSection, element
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.auxiliaryFunctions import cSim, cGtr  #DO NOT REMOVE
-import sys
 from smodels.tools.physicsUnits import TeV,fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
@@ -126,7 +125,7 @@ class TheoryPredictionList(object):
         else:
             return self.__add__(theoPredList)        
 
-def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2, useBestDataset=True):
+def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2, useBestDataset=False):
     """
     Compute theory predictions for the given experimental result, using the list of elements
     in smsTopList.

@@ -12,6 +12,7 @@ from smodels.theory import crossSection
 from smodels.particles import rEven, ptcDic
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
+from smodels.theory.auxiliaryFunctions import wildcardFactory
 
 class Element(object):
     """
@@ -62,12 +63,16 @@ class Element(object):
                         return None
                     self.branches = []                    
                     for branch in branches:
-                        self.branches.append(Branch(branch))
+                        if branch == '*':
+                            self.branches.append(wildcardFactory(Branch))
+                        else:
+                            self.branches.append(Branch(branch))
             # Create element from branch pair
             elif type(info) == type([]) and type(info[0]) == type(Branch()):
                 for ib, branch in enumerate(info):
                     self.branches[ib] = branch.copy()
         
+        self.setFinalState()
     
     def __cmp__(self,other):
         """
@@ -476,11 +481,16 @@ class Element(object):
         :returns: compressed copy of the element, if element ends with invisible
                   particles; None, if compression is not possible
         """
+        
+
         newelement = self.copy()
         newelement.motherElements = [ ("invisible", self) ]
 
         # Loop over branches
         for ib, branch in enumerate(self.branches):
+            #Make sure to only compress branches ending up in MET
+            if not branch.finalState == 'MET':
+                continue
             particles = branch.particles
             if not branch.particles:
                 continue # Nothing to be compressed

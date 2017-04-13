@@ -81,6 +81,7 @@ class TxName(object):
 
         ident = self.globalInfo.id+":"+dataType[0]+":"+ str(self._infoObj.dataId)
         ident += ":" + self.txName
+        
         self.txnameData = TxNameData( data, dataType, ident )
         if expectedData:
             self.txnameDataExp = TxNameData( expectedData, dataType, ident )
@@ -101,8 +102,8 @@ class TxName(object):
         # and conditions:
         for el in elements:
             el.sortBranches()
-            if hasattr(self,'finalStates'):
-                el.setFinalState(self.finalStates)
+            if hasattr(self,'finalState'):
+                el.setFinalState(self.finalState)
             else:
                 el.setFinalState(["MET","MET"])
             self._topologyList.addElement(el)
@@ -552,7 +553,7 @@ class TxNameData(object):
                 MpCut.append([i[0].tolist(),0.])
         if self.dimensionality == 1:
             logger.debug("1-D data found. Extending to a small 2-D band around the line.")
-            MpCut += [[pt[0],pt[1]+0.0001] for pt in MpCut] + [[pt[0],pt[1]-0.0001] for pt in MpCut]
+            MpCut += [[pt[0],pt[1]+0.001] for pt in MpCut] + [[pt[0],pt[1]-0.001] for pt in MpCut]
             self._1dim = True
             lx=len(self.xsec)
             newxsec = np.ndarray ( shape=(3*lx,) )

@@ -167,7 +167,7 @@ class UncoveredClassifier(object):
         for pids in el.getMothers():
             cPIDs = []
             for pid in pids:
-              cPIDs.append(abs(pid))
+                cPIDs.append(abs(pid))
             cPIDs.sort()
             if not cPIDs in allPIDs:
                 allPIDs.append(cPIDs)
@@ -248,7 +248,7 @@ class UncoveredTopo(object):
     :ivar weights: weights dictionary
     """
     def __init__(self, topo, weights, contributingElements=[]):
-        self.topo = topo
+        self.topo = topo        
         self.contributingElements = contributingElements
         self.value = 0. # weight for sqrts set in uncoveredList, only set this in printout
 
@@ -273,6 +273,7 @@ class UncoveredList(object):
         :parameter el: element to be added
         """
         name = self.orderbranches(self.generalName(el.__str__()))
+        name = name + ' (%s)'%(str(el.getFinalStates()).replace('[','').replace(']',''))
         for topo in self.topos:
             if name == topo.topo:
                 topo.contributingElements.append(el)

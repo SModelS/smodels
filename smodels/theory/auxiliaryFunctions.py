@@ -221,3 +221,41 @@ def index_bisect(inlist, el):
         if inlist[mid] < el: lo = mid+1
         else: hi = mid
     return lo
+
+
+def wildcardFactory(objClass,name='*'):
+    """
+    Generates a wildcard object which will match any other object of the same type
+    :parameter objClass: a class or instance of a class
+    :parameter name: String to represent the wildcard object
+    
+    :return: An instance of the Wildcard class.
+    """
+    
+    if not isinstance(objClass,type):
+        inputClass = objClass.__class__
+    else:
+        inputClass = objClass
+    
+    class Wildcard(inputClass):
+        """
+        A wildcard class. It will return True when compared to any other object.
+        """
+        
+        def __init__(self,name):
+            inputClass.__init__()
+            self._name = name
+            
+        def __str__(self):
+            return self._name
+
+        def __cmp__(self,other):
+            if type(other).__name__ == type(self).__name__:
+                return 0
+            return -1
+
+        def __eq__(self,other):
+            return self.__cmp__(other) == 0        
+    Wildcard.__name__ = '%s' %inputClass.__name__
+    Wildcard.__module__ = '%s' %inputClass.__module__
+    return Wildcard(name) 
