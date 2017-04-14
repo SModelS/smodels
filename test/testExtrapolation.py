@@ -51,7 +51,7 @@ class ExtrapolationTest(unittest.TestCase):
         
         self.assertAlmostEquals( result.asNumber(pb),0.0125 )
 
-        result=self.tryWith([[ 275.*GeV,174.*GeV], [ 275.*GeV,176.*GeV] ])
+        result=self.tryWith([[ 275.*GeV,185.*GeV], [ 275.*GeV,165.*GeV] ])
         self.assertTrue ( result == None )
 
     def show ( self ):

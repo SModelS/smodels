@@ -22,6 +22,7 @@ from smodels.tools.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.caching import _memoize
 from scipy.linalg import svd
+from scipy.interpolate import interp1d
 import scipy.spatial.qhull as qhull
 import numpy as np
 import unum
@@ -323,7 +324,7 @@ class TxNameData(object):
         :param massarray: mass array values (with units), i.e.
                           [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         """
-        porig=self.flattenMassArray ( massarray ) ## flatten
+        porig=self.flattenMassArray(massarray) ## flatten and remove irrelevant masses
         
         self.massarray = massarray ## only for bookkeeping and better error msgs
         if len(porig)!=self.full_dimensionality:
@@ -331,9 +332,9 @@ class TxNameData(object):
                     "%d-dimensional mass vector with %d-dimensional data!" % \
                     ( len(porig), self.full_dimensionality ) )
             return None
-        p= ( (np.matrix(porig)[0] - self.delta_x ) ).tolist()[0]
+        p= ((np.matrix(porig)[0] - self.delta_x)).tolist()[0]
         P=np.dot(p,self._V)  ## rotate
-        dp=self.countNonZeros(P)
+        dp = self.countNonZeros(P)
         self.projected_value = self.interpolate([ P[:self.dimensionality] ])
         if dp > self.dimensionality: ## we have data in different dimensions
             if self._accept_errors_upto == None:
@@ -370,8 +371,6 @@ class TxNameData(object):
             if massShape != self._massShape:
                 raise SModelSError("Inconsistent mass formats in:\n %s" %value)
                         
-        
-
     def flattenMassArray(self, data):
         """
         Flatten mass array and remove units according to the data mass shape.
@@ -394,7 +393,12 @@ class TxNameData(object):
         return ret
 
     def interpolate(self, uvw, fill_value=np.nan):
-        tol = 1e-6
+        
+        tol = 1e-6        
+        #Deal with 1D interpolation separately:
+        if self.dimensionality == 1:
+            return self.tri(uvw[0])[0]
+        
         # tol = sys.float_info.epsilon * 1e10
         simplex = self.tri.find_simplex(uvw, tol=tol)
         if simplex[0]==-1: ## not inside any simplex?
@@ -415,7 +419,6 @@ class TxNameData(object):
             logger.debug('Interpolation below simplex values. Will take the smallest simplex value.')
             ret = minXsec
         return float(ret)
-
 
     def _estimateExtrapolationError ( self, massarray ):
         """ when projecting a point p from n to the point P in m dimensions, we
@@ -482,6 +485,7 @@ class TxNameData(object):
     def _interpolateOutsideConvexHull ( self, massarray ):
         """ experimental routine, meant to check if we can interpolate outside
             convex hull """
+            
         de = self._estimateExtrapolationError(massarray)
         if de < self._accept_errors_upto:
             return self._returnProjectedValue()
@@ -562,26 +566,14 @@ class TxNameData(object):
                 self.dimensionality=nz
         MpCut=[]
         for i in Mp:
-            if self.dimensionality > 1:
-                MpCut.append(i[:self.dimensionality].tolist() )
-            elif self.full_dimensionality > 1:
-                MpCut.append([i[0].tolist(),0.])
-        if self.dimensionality == 1 and self.full_dimensionality > 1:
-            logger.debug("1-D data found. Extending to a small 2-D band around the line.")
-            MpCut += [[pt[0],pt[1]+0.001] for pt in MpCut] + [[pt[0],pt[1]-0.001] for pt in MpCut]
-            self._1dim = True
-            lx=len(self.xsec)
-            newxsec = np.ndarray ( shape=(3*lx,) )
-            for i in range(3):
-                newxsec[ i*lx : (i+1)*lx ] = self.xsec
-            self.xsec = newxsec
-            #self.xsec += self.xsec + self.xsec
-            self.dimensionality = 2
-        else:
-            self._1dim = False
-             
+            MpCut.append(i[:self.dimensionality].tolist() )
+
+        if self.dimensionality > 1:             
         # self.Mp=MpCut ## also keep the rotated points, with truncated zeros
-        self.tri = qhull.Delaunay( MpCut )
+            self.tri = qhull.Delaunay(MpCut)
+        else:
+            MpCut = [pt[0] for pt in MpCut]
+            self.tri = interp1d(MpCut,self.xsec,bounds_error=False,fill_value=None)
         
         
     def _getMassArrayFrom(self,pt,unit=GeV):
