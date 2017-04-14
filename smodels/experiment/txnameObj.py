@@ -349,27 +349,35 @@ class TxNameData(object):
 
     def getMassShape(self,value):
         """
-        Checks the mass shape of all the points in the data.
+        Checks the mass shape of all the points in the data and store it
+        for future use.
         If there are wildcards (mass or branch = None), store their positions.
         
         :param value: list of data points
         """
+
         
-        def getPointShape(mass):
-            
-            if isinstance(mass,list):
-                return [getPointShape(m) for m in mass]
-            elif isinstance(mass,(float,int)):
-                return type(mass)
-            elif mass == '*':
-                return None
-        
-        self._massShape = getPointShape(value[0][0])
+        self._massShape = self.getPointShape(value[0][0])
         
         for pt in value:
-            massShape = getPointShape(pt[0])
+            massShape = self.getPointShape(pt[0])
             if massShape != self._massShape:
                 raise SModelSError("Inconsistent mass formats in:\n %s" %value)
+
+    def getPointShape(self,mass):
+        """
+        Checks the mass shape of input point.
+        If there are wildcards (mass or branch = None), store their positions.
+        
+        :param value: mass array
+        """        
+        
+        if isinstance(mass,list):
+            return [self.getPointShape(m) for m in mass]
+        elif isinstance(mass,(float,int)):
+            return type(mass)
+        elif mass == '*':
+            return None
                         
     def flattenMassArray(self, data):
         """
@@ -573,7 +581,7 @@ class TxNameData(object):
             self.tri = qhull.Delaunay(MpCut)
         else:
             MpCut = [pt[0] for pt in MpCut]
-            self.tri = interp1d(MpCut,self.xsec,bounds_error=False,fill_value=None)
+            self.tri = interp1d_picklable(MpCut,self.xsec,bounds_error=False,fill_value=None)
         
         
     def _getMassArrayFrom(self,pt,unit=GeV):
@@ -609,7 +617,24 @@ class TxNameData(object):
             
         return massArray
 
-        
+     
+class interp1d_picklable:
+    """ class wrapper for piecewise linear function
+    """
+    def __init__(self, xi, yi, **kwargs):
+        self.xi = xi
+        self.yi = yi
+        self.args = kwargs
+        self.f = interp1d(xi, yi, **kwargs)
+
+    def __call__(self, xnew):
+        return self.f(xnew)
+
+    def __getstate__(self):
+        return self.xi, self.yi, self.args
+
+    def __setstate__(self, state):
+        self.f = interp1d(state[0], state[1], **state[2])        
 
 if __name__ == "__main__":
     import time
