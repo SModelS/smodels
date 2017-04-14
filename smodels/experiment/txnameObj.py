@@ -13,7 +13,7 @@
 """
 
 import os,sys
-from smodels.tools.physicsUnits import GeV, fb, TeV, pb
+from smodels.tools.physicsUnits import GeV, fb, TeV, pb, MeV, keV
 from smodels.theory.particleNames import elementsInStr
 from smodels.tools.stringTools import concatenateLines
 from smodels.theory.element import Element
@@ -242,6 +242,7 @@ class TxNameData(object):
         self._id = Id
         self._accept_errors_upto=accept_errors_upto
         self._V = None
+        self._massShape = None
         self.loadData( value )
 
     def __str__ ( self ):
@@ -260,55 +261,29 @@ class TxNameData(object):
     def __eq__ ( self, other ):
         return self._id == other._id
 
-    def convertString ( self, value ):
-        if not "GeV" in value:
-            raise SModelSError("data string malformed: %s" % value)
-        if "TeV" in value or "MeV" in value:
-            raise SModelSError("data string malformed: %s" % value)
-        s = value.replace ( "GeV", "" ).replace( "*", "" )
-        if "fb" in value:
-            self.unit = fb
-            s = s.replace ( "fb", "" )
-            return eval ( s )
-        if "pb" in value:
-            self.unit = pb
-            s = s.replace ( "pb", "" )
-            return eval ( s )
-        self.unit = 1
-        return eval ( s )
-
-    def removeGeV ( self, branch ):
-        if type ( branch ) == float:
-            return branch
-        ret = []
-        for b in branch:
-            els = []
-            for element in b:
-                if type(element)==unum.Unum:
-                    els.append ( element.asNumber ( GeV ) )
-                else:
-                    els.append ( element )
-            ret.append ( els )
-        return ret
-            
-            # value = eval(value, {'fb':fb, 'pb':pb, 'GeV':GeV, 'TeV':TeV})
-    def removeUnits ( self, value ):
-        if type(value[0][1])==unum.Unum:
-            ## if its a unum, we store 1.0 * unit
-            self.unit=value[0][1] / ( value[0][1].asNumber() )
-        ret = []
-        for point in value:
-            newpoint = []
-            for branch in point:
-                newbranch=branch
-                if type (branch) == unum.Unum:
-                    newbranch = ( branch / self.unit ).asNumber()
-                else:
-                    newbranch = self.removeGeV ( branch )
-                newpoint.append ( newbranch )
-            ret.append ( newpoint )
-        return ret
-
+    def convertString(self, value):
+        return eval(value,{'fb':fb,'pb':pb,'GeV':GeV,'TeV':TeV,
+                           'MeV':MeV,'keV': keV, '*': '*'})
+           
+    def removeUnits(self, value):
+        
+        if isinstance(value,list):
+            for i,pt in enumerate(value):
+                value[i] = self.removeUnits(pt)
+            return value
+        else:
+            if isinstance(value,unum.Unum):
+                try:
+                    return value.asNumber(GeV)
+                except unum.IncompatibleUnitsError:
+                    try:
+                        self.unit = 1.*pb
+                        return value.asNumber(pb)
+                    except unum.IncompatibleUnitsError:
+                        raise SModelSError('Invalid data unit in %s' %str(value))
+            else:
+                return value   
+        
     def loadData(self,value):
         """
         Uses the information in value to generate the data grid used for
@@ -322,9 +297,10 @@ class TxNameData(object):
                         ## which we use for efficiency maps
 
         if type(value) == str:
-            value = self.convertString ( value )
+            value = self.convertString(value)
+            value = self.removeUnits(value)
         else:
-            value = self.removeUnits ( value )
+            value = self.removeUnits(value)
 
         if len(value) < 1 or len(value[0]) < 2:
                 logger.error ( "input value not in correct format. expecting sth " \
@@ -333,7 +309,10 @@ class TxNameData(object):
                                "for upper limits or [ [ [[ 300.*GeV,100.*GeV],"\
                                " [ 300.*GeV,100.*GeV] ], .1 ], ... ] for "\
                                "efficiency maps. Received %s" % value[:80] )
-        self.computeV( value )
+        
+        self.getMassShape(value)        
+        
+        self.computeV(value)
 
     @_memoize
     def getValueFor(self,massarray):
@@ -345,6 +324,7 @@ class TxNameData(object):
                           [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         """
         porig=self.flattenMassArray ( massarray ) ## flatten
+        
         self.massarray = massarray ## only for bookkeeping and better error msgs
         if len(porig)!=self.full_dimensionality:
             logger.error ( "dimensional error. I have been asked to compare a "\
@@ -365,15 +345,52 @@ class TxNameData(object):
 
         return self._returnProjectedValue()
 
-    def flattenMassArray ( self, data ):
-        """ flatten mass array and remove units """
+
+    def getMassShape(self,value):
+        """
+        Checks the mass shape of all the points in the data.
+        If there are wildcards (mass or branch = None), store their positions.
+        
+        :param value: list of data points
+        """
+        
+        def getPointShape(mass):
+            
+            if isinstance(mass,list):
+                return [getPointShape(m) for m in mass]
+            elif isinstance(mass,(float,int)):
+                return type(mass)
+            elif mass == '*':
+                return None
+        
+        self._massShape = getPointShape(value[0][0])
+        
+        for pt in value:
+            massShape = getPointShape(pt[0])
+            if massShape != self._massShape:
+                raise SModelSError("Inconsistent mass formats in:\n %s" %value)
+                        
+        
+
+    def flattenMassArray(self, data):
+        """
+        Flatten mass array and remove units according to the data mass shape.
+        If there are wildcards in the data, the respective masses (or branches)
+        will be removed from data.
+        """
+        
+       
         ret=[]
-        for i in data:
-            for j in i:
-                if type(j) == unum.Unum:
-                    ret.append ( j.asNumber(GeV) )
+        for i,br in enumerate(data):
+            if self._massShape[i] is None:
+                continue
+            for j,m in enumerate(br):
+                if self._massShape[i][j] is None:
+                    continue
+                if isinstance(m,unum.Unum):
+                    ret.append(m.asNumber(GeV))
                 else:
-                    ret.append ( j )
+                    ret.append(m)
         return ret
 
     def interpolate(self, uvw, fill_value=np.nan):
@@ -506,20 +523,18 @@ class TxNameData(object):
             return False
         return True
 
-    def computeV ( self, values ):
+    def computeV(self, values):
         """ compute rotation matrix _V, and triangulation self.tri """
         if self._V!=None:
             return
         Morig=[]
-        self.xsec = np.ndarray ( shape = (len(values), ) )
-        self.massdim = np.array(values[0][0]).shape
-
+        self.xsec = np.ndarray(shape = (len(values),))
         for ctr,(x,y) in enumerate(values):
             # self.xsec.append ( y / self.unit )
             # self.xsec.append ( y )
             self.xsec[ctr]=y
-            xp = self.flattenMassArray ( x )
-            Morig.append ( xp )
+            xp = self.flattenMassArray(x)
+            Morig.append( xp )
         aM=np.matrix ( Morig )
         MT=aM.T.tolist()
         self.delta_x = np.matrix ( [ sum (x)/len(Morig) for x in MT ] )[0]
@@ -549,9 +564,9 @@ class TxNameData(object):
         for i in Mp:
             if self.dimensionality > 1:
                 MpCut.append(i[:self.dimensionality].tolist() )
-            else:
+            elif self.full_dimensionality > 1:
                 MpCut.append([i[0].tolist(),0.])
-        if self.dimensionality == 1:
+        if self.dimensionality == 1 and self.full_dimensionality > 1:
             logger.debug("1-D data found. Extending to a small 2-D band around the line.")
             MpCut += [[pt[0],pt[1]+0.001] for pt in MpCut] + [[pt[0],pt[1]-0.001] for pt in MpCut]
             self._1dim = True
@@ -585,13 +600,22 @@ class TxNameData(object):
             logger.error("Wrong point dimensions (%i), it should be %i" 
                          %(len(pt),self.dimensionality))
             return None
-        fullpt = np.append(pt,[0.]*(self.full_dimensionality-len(pt)))
+        fullpt = np.append(pt,[0.]*(self.full_dimensionality-len(pt)))        
         mass = np.dot(self._V,fullpt) + self.delta_x
-        mass = mass.reshape(self.massdim).tolist()
-        if unit:
-            mass = [[m*unit for m in br] for br in mass]
+        mass = mass.tolist()
+        massArray = []
+        for br in self._massShape:
+            if br is None:
+                massArray.append('*')
+            else:
+                massArray.append([])
+                for m in enumerate(br):
+                    if m is None:
+                        massArray[-1].append('*')
+                    else:
+                        massArray[-1].append(mass.pop(0)*unit)
             
-        return mass
+        return massArray
 
         
 
