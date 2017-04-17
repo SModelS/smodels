@@ -23,7 +23,7 @@ class SlhaTest(unittest.TestCase):
         
     def testBadFile(self):
         filename = "%sinputFiles/slha/nobdecay.slha" % (installDirectory() )
-        st=slhaChecks.SlhaStatus(filename)
+        st=slhaChecks.SlhaStatus(filename,checkLSP=True,findLonglived=True)
         self.assertEquals (st.status, (-1, '#ERROR: special signatures in this point.\n#Warnings:\n##Visible decays of longlived particles / stable charged particles: [1000005]\n#1000005 : c*tau = inf\n\n'))
 
 if __name__ == "__main__":
