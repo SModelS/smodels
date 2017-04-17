@@ -13,12 +13,9 @@
 from __future__ import print_function
 import sys,os
 from smodels.theory.topology import TopologyList
-from smodels.theory.element import Element
-from smodels.theory.theoryPrediction import TheoryPredictionList
-from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.databaseObj import ExpResultList
 from smodels.tools.ioObjects import OutputStatus, ResultList
-from smodels.tools.coverage import UncoveredList, Uncovered
+from smodels.tools.coverage import Uncovered
 from smodels.tools.physicsUnits import GeV, fb, TeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
@@ -195,7 +192,7 @@ class BasicPrinter(object):
         """
         ret=""
 
-        for iobj,obj in enumerate(self.toPrint):
+        for obj in self.toPrint:
                 if obj is None: continue
                 output = self._formatObj(obj)                
                 if not output: continue  #Skip empty output                
@@ -229,7 +226,6 @@ class BasicPrinter(object):
         except AttributeError as e:
             logger.debug('Error formating object %s: \n %s' %(typeStr,e))
             return False
-
 
 class TxTPrinter(BasicPrinter):
     """
@@ -368,7 +364,7 @@ class TxTPrinter(BasicPrinter):
         output += "   ======================================================= \n"
         
 
-        for expRes in obj.expResultList:
+        for expRes in obj.expResultList:    
             output += self._formatExpResult(expRes)
 
         return output+"\n"
@@ -528,7 +524,6 @@ class TxTPrinter(BasicPrinter):
         
         return output
                       
-
 class SummaryPrinter(TxTPrinter):
     """
     Printer class to handle the printing of one single summary output.
@@ -620,8 +615,6 @@ class SummaryPrinter(TxTPrinter):
 
         return output
             
-
-
 class PyPrinter(BasicPrinter):
     """
     Printer class to handle the printing of one single pythonic output
@@ -652,7 +645,7 @@ class PyPrinter(BasicPrinter):
         """
         
         outputDict = {}
-        for iobj,obj in enumerate(self.toPrint):
+        for obj in self.toPrint:
             if obj is None: continue
             output = self._formatObj(obj)                
             if not output: continue  #Skip empty output
@@ -716,7 +709,7 @@ class PyPrinter(BasicPrinter):
             xsecs = [xsec.value.asNumber(fb) for xsec in obj.weight.getXsecsFor(sqrts)]
             if len(xsecs) != 1:
                 logger.warning("Element cross sections contain multiple values for %s .\
-                Only the first cross section will be printed" %str(sqrt))
+                Only the first cross section will be printed" %str(sqrts))
             xsecs = xsecs[0]
             sqrtsStr = 'xsec '+str(sqrts.asNumber(TeV))+' TeV'
             elDic["Weights (fb)"][sqrtsStr] = xsecs
@@ -912,8 +905,6 @@ class PyPrinter(BasicPrinter):
         return {'Missed Topologies': missedTopos, 'Long Cascades' : longCascades,
                      'Asymmetric Branches': asymmetricBranches, 'Outside Grid': outsideGrid}
     
-
-
 class XmlPrinter(PyPrinter):
     """
     Printer class to handle the printing of one single XML output
@@ -972,7 +963,7 @@ class XmlPrinter(PyPrinter):
         """
 
         outputDict = {}
-        for iobj,obj in enumerate(self.toPrint):
+        for obj in self.toPrint:
             if obj is None: continue
             output = self._formatObj(obj)  # Conver to python dictionaries                        
             if not output: continue  #Skip empty output            
@@ -994,7 +985,6 @@ class XmlPrinter(PyPrinter):
                 with open(self.filename, "a") as outfile:
                     outfile.write(nice_xml)
                     outfile.close()
-            ret = nice_xml
 
         self.toPrint = [None]*len(self.printingOrder)
         return root

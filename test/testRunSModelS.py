@@ -157,7 +157,23 @@ class RunSModelSTest(unittest.TestCase):
             if os.path.exists ( i ):
                 continue
                 os.remove ( i )
-        self.assertTrue(equals)        
+        self.assertTrue(equals)
+        
+    def testGoodFileHSCP(self):
+        filename = join ( iDir(), "inputFiles/slha/longLived.slha" )
+        outputfile = self.runMain(filename)
+        shutil.copyfile(outputfile,'./output.py')
+        from longLived_default import smodelsOutputDefault
+        from output import smodelsOutput
+        ignoreFields = ['input file','smodels version', 'ncpus']
+        smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
+                    key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
+                    res['AnalysisID'],res['DataSetID']])
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
+                           ignore=ignoreFields)
+        for i in [ './output.py', './output.pyc' ]:
+            if os.path.exists ( i ): os.remove ( i )
+        self.assertTrue(equals)               
   
     def testBadFile(self):
         filename = join (iDir(), "inputFiles/slha/I_dont_exist.slha" )

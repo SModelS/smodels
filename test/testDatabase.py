@@ -38,9 +38,8 @@ class DatabaseTest(unittest.TestCase):
         validated = database.getExpResults ( useNonValidated = False )
         nonval = database.getExpResults ( useNonValidated = True )
         #print ( "validated=",len(validated),map ( str, validated ) )
-        #print ( "non val=",len(nonval) )
-        self.assertTrue ( len(validated)==7 )
-        self.assertTrue ( len(nonval)==8 )
+        self.assertTrue ( len(validated)==8 )
+        self.assertTrue ( len(nonval)==9 )
 
 
 

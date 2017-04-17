@@ -14,13 +14,12 @@ from smodels.tools import ioObjects
 from smodels.tools import coverage, runtime
 from smodels.theory import slhaDecomposer
 from smodels.theory import lheDecomposer
-from smodels.theory.theoryPrediction import theoryPredictionsFor, TheoryPredictionList
+from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools import crashReport, timeOut 
 from smodels.tools.printer import MPrinter
 import os
 import sys
-import time
 try:
     from ConfigParser import SafeConfigParser
 except ImportError as e:

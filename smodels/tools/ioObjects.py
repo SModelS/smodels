@@ -275,8 +275,8 @@ class SlhaStatus(object):
     
     """
     def __init__(self, filename, maxDisplacement=.01, sigmacut=.03 * fb,
-                 checkLSP=True, findMissingDecayBlocks=True,
-                 findIllegalDecays=False, checkXsec=True, findLonglived=True):
+                 checkLSP=False, findMissingDecayBlocks=True,
+                 findIllegalDecays=False, checkXsec=True, findLonglived=False):
         self.filename = filename
         self.maxDisplacement = maxDisplacement
         self.sigmacut = sigmacut
