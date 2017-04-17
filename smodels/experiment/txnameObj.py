@@ -220,6 +220,7 @@ class TxName(object):
         elif type(val) == type(1.):
             return val  #The element has an eff
         else:
+            
             logger.error("Unknown txnameData value: %s" % (str(type(val))))
             raise SModelSError()
 
@@ -405,7 +406,11 @@ class TxNameData(object):
         tol = 1e-6        
         #Deal with 1D interpolation separately:
         if self.dimensionality == 1:
-            return self.tri(uvw[0])[0]
+            ret = self.tri(uvw[0])[0]
+            if ret is None:
+                return fill_value
+            else:
+                return float(ret)
         
         # tol = sys.float_info.epsilon * 1e10
         simplex = self.tri.find_simplex(uvw, tol=tol)

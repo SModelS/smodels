@@ -266,8 +266,6 @@ def _getElementsFrom(smsTopList, dataset):
     elements = []
     for txname in dataset.txnameList:
         for top in smsTopList:
-            itop = txname._topologyList.index(top)  #Check if the topology appear in txname
-            if itop is None: continue   
             for el in top.getElements():
                 newEl = txname.hasElementAs(el)  #Check if element appears in txname
                 if not newEl: continue
@@ -279,7 +277,6 @@ def _getElementsFrom(smsTopList, dataset):
                 newEl.weight *= eff
                 newEl.txname = txname
                 elements.append(newEl) #Save element with correct branch ordering
-
     return elements
 
 
