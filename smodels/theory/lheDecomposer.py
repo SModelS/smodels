@@ -167,7 +167,7 @@ def _getDictionariesFromEvent(event):
             # Ignore R-even particles and initial state particles
             continue
         ibranch = branches[ip]  # Get particle branch
-        massDic[ibranch][particle.pdg] = particle.mass* GeV
+        massDic[ibranch][particle.pdg] = round(particle.mass,1)* GeV
         # Create empty BRs
         brDic[ibranch][particle.pdg] = [pyslha.Decay(0., 0, [], particle.pdg)]
 
