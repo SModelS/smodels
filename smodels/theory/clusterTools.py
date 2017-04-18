@@ -311,7 +311,7 @@ def groupAll(elements):
     #Collect the list of all mothers:
     for el in elements:
         allmothers += [elMom[1].elID for elMom in el.motherElements]
-    
+
     for el in elements:
         #Skip the element if it is a mother of another element in the list
         if any((elMom is el.elID) for elMom in allmothers):

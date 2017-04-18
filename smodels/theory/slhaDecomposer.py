@@ -200,8 +200,7 @@ def _getDictionariesFromSLHA(slhafile):
     # Get mass list for all particles
     massDic = dict(res.blocks['MASS'].items())
     for pid in list ( massDic.keys() )[:]:
-        massDic[pid] *= GeV
-        massDic[pid] = abs(massDic[pid])
+        massDic[pid] = round(abs(massDic[pid]),1)*GeV
         if not -pid in massDic: massDic[-pid] = massDic[pid]    
  
     return brDic, massDic
