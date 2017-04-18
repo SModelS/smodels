@@ -341,8 +341,10 @@ class Element(object):
         vertnumb = []
         vertparts = []
         for branch in self.branches:
-            vertparts.append([len(ptcs) for ptcs in branch.particles])
-            vertnumb.append(len(branch.particles))
+            if branch.vertnumb is None:
+                branch.setInfo()
+            vertparts.append(branch.vertparts)
+            vertnumb.append(branch.vertnumb)
                 
         return {"vertnumb" : vertnumb, "vertparts" : vertparts}
 

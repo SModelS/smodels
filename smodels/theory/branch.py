@@ -169,11 +169,11 @@ class Branch(object):
         #First of all check final state:
         if self.finalState != other.finalState:
             return False
-        
-        #If branches match, particles must match (useful if one of the branches is a wildcard)
-        if self == other:
+
+        #If particles are identical, avoid further checks
+        if self.particles == other.particles:
             return True        
-        
+       
         if not isinstance(other,Branch):
             return False        
         
@@ -328,6 +328,12 @@ class BranchWildcard(Branch):
     
     def __init__(self):
         Branch.__init__(self)
+        self.masses = ListWildcard()
+        self.particles =  ListWildcard()
+        self.PIDs = ListWildcard()
+        self.vertnumb = IntWildcard()
+        self.vertparts = ListWildcard()
+        self.finalState = ListWildcard()        
         
     def __str__(self):
         return '[*]'
@@ -340,7 +346,56 @@ class BranchWildcard(Branch):
 
     def __eq__(self,other):
         return self.__cmp__(other) == 0
+    
+    def setInfo(self):
+        """
+        Defines the number of vertices (vertnumb) and number of
+        particles in each vertex (vertpats) properties, if they have not
+        been defined yet.
+        """
 
+        self.vertnumb = IntWildcard()
+        self.vertparts = ListWildcard()
+        
+class IntWildcard(int):
+    """
+    A integer wildcard class. It will return True when compared to any other integer object.
+    """
+    
+    def __init__(self):
+        int.__init__(self)
+        
+    def __str__(self):
+        return '*'    
+
+    def __cmp__(self,other):
+        if isinstance(other,int):
+            return 0
+        else:
+            return -1
+
+    def __eq__(self,other):
+        return self.__cmp__(other) == 0          
+    
+class ListWildcard(list):    
+    """
+    A list wildcard class. It will return True when compared to any other list object.
+    """
+    
+    def __init__(self):
+        int.__init__(self)
+        
+    def __str__(self):
+        return '[*]'    
+
+    def __cmp__(self,other):
+        if isinstance(other,list):
+            return 0
+        else:
+            return -1
+
+    def __eq__(self,other):
+        return self.__cmp__(other) == 0  
 
 def decayBranches(branchList, brDictionary, massDictionary,
                   sigcut=0. *fb):

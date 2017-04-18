@@ -14,6 +14,7 @@ from smodels.theory.element import Element
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.theory.auxiliaryFunctions import index_bisect
 from smodels.tools.smodelsLogging import logger
+import itertools
 
 
 class Topology(object):
@@ -73,12 +74,17 @@ class Topology(object):
         :param other:  topology to be compared (Topology object)
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
-                
-        if sorted(self.vertnumb,reverse=True) != sorted(other.vertnumb,reverse=True):
-            comp = sorted(self.vertnumb,reverse=True) > sorted(other.vertnumb,reverse=True)
-            if comp: return 1
-            else: return -1  
-        elif sorted(self.vertparts) != sorted(other.vertparts):
+        
+        vMatch = False
+        for v1 in itertools.permutations(self.vertparts):
+            if vMatch:
+                break
+            for v2 in itertools.permutations(other.vertparts):
+                if v1 == v2:
+                    vMatch = True
+                    break
+        
+        if not vMatch:
             comp = sorted(self.vertparts) > sorted(other.vertparts)
             if comp: return 1
             else: return -1 
