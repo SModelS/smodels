@@ -1095,6 +1095,11 @@ class SLHAPrinter(TxTPrinter):
     def _formatUncovered(self, obj):
         output = ""
         for ix, uncovEntry in enumerate([obj.missingTopos, obj.outsideGrid]):
+            for topo in uncovEntry.topos:
+                if topo.value > 0.: continue
+                for el in topo.contributingElements:
+                    if not el.weight.getXsecsFor(obj.missingTopos.sqrts): continue
+                    topo.value += el.weight.getXsecsFor(obj.missingTopos.sqrts)[0].value.asNumber(fb)
             if ix==0: output += "BLOCK SModelS_Missing_Topos #sqrts[TeV] weight[fb] description\n"
             else: output += "\nBLOCK SModelS_Outside_Grid #sqrts[TeV] weight[fb] description\n"
             cter = 0
