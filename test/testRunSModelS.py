@@ -162,16 +162,17 @@ class RunSModelSTest(unittest.TestCase):
     def testGoodFileHSCP(self):
         filename = join ( iDir(), "inputFiles/slha/longLived.slha" )
         outputfile = self.runMain(filename)
-        shutil.copyfile(outputfile,'./output.py')
+        shutil.copyfile(outputfile,'./outputHSCP.py')
         from longLived_default import smodelsOutputDefault
-        from output import smodelsOutput
+        from outputHSCP import smodelsOutput
         ignoreFields = ['input file','smodels version', 'ncpus']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
                     res['AnalysisID'],res['DataSetID']])
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                            ignore=ignoreFields)
-        for i in [ './output.py', './output.pyc' ]:
+            
+        for i in [ './outputHSC.py', './outputHSCP.pyc' ]:
             if os.path.exists ( i ): os.remove ( i )
         self.assertTrue(equals)               
   
