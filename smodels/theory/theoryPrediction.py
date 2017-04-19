@@ -266,6 +266,8 @@ def _getElementsFrom(smsTopList, dataset):
     elements = []
     for txname in dataset.txnameList:
         for top in smsTopList:
+            hasTop = txname._topologyList.hasTopology(top)
+            if not hasTop: continue
             for el in top.getElements():
                 newEl = txname.hasElementAs(el)  #Check if element appears in txname
                 if not newEl: continue

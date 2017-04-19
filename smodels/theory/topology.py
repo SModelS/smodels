@@ -75,21 +75,15 @@ class Topology(object):
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
         
-        vMatch = False
+        #Check for any permutation of branches:
         for v1 in itertools.permutations(self.vertparts):
-            if vMatch:
-                break
             for v2 in itertools.permutations(other.vertparts):
                 if v1 == v2:
-                    vMatch = True
-                    break
+                    return 0
         
-        if not vMatch:
-            comp = sorted(self.vertparts) > sorted(other.vertparts)
-            if comp: return 1
-            else: return -1 
-        else:
-            return 0        
+        comp = sorted(self.vertparts) > sorted(other.vertparts)
+        if comp: return 1
+        else: return -1 
 
 
     def checkConsistency(self):
@@ -274,6 +268,21 @@ class TopologyList(object):
             return i
         
         return None
+    
+
+    def hasTopology(self,topo):
+        """
+        Checks if topo appears in any of the topologies in the list.
+        
+        :param topo: Topology object
+        :return: True if topo appears in the list, False otherwise.
+        """
+
+        for t in self:
+            if t == topo:
+                return True
+        
+        return False    
 
     
     def add(self, newTopology):
