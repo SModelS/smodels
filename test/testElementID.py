@@ -19,8 +19,8 @@ from smodels.theory.theoryPrediction import theoryPredictionsFor
 class ElementIdTest(unittest.TestCase):
     def testGoodFile(self):
 
-        listOfIDs = {'ATLAS-CONF-2013-037': [28, 29, 30, 31, 24, 25, 26, 27], 
-                     'ATLAS-SUSY-2013-05' : [23]}
+        listOfIDs = {'ATLAS-CONF-2013-037': [70, 71, 72, 73, 74, 75, 76, 77], 
+                     'ATLAS-SUSY-2013-05' : [69]}
         filename = "%sinputFiles/slha/compressedSpec.slha" % (installDirectory() )
         topoList = slhaDecomposer.decompose(filename,doCompress = True, doInvisible=True, minmassgap = 5*GeV)
         resultlist = database.getExpResults()
@@ -28,7 +28,7 @@ class ElementIdTest(unittest.TestCase):
             theorypredictions = theoryPredictionsFor(res, topoList)
             if not theorypredictions: continue
             self.assertEquals(len(theorypredictions),1)
-            tpIDs = theorypredictions[0].IDs 
+            tpIDs = theorypredictions[0].IDs
             self.assertEquals(sorted(tpIDs),sorted(listOfIDs[res.globalInfo.id]))
             
 
