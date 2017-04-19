@@ -279,7 +279,21 @@ def _getElementsFrom(smsTopList, dataset):
                 newEl.weight *= eff
                 newEl.txname = txname
                 elements.append(newEl) #Save element with correct branch ordering
-    return elements
+
+
+    #Remove duplicated elements:
+    allmothers = []
+    #First collect the list of all mothers:
+    for el in elements:
+        allmothers += [elMom[1].elID for elMom in el.motherElements]
+    elementsClean = []
+    for el in elements:
+        #Skip the element if it is a mother of another element in the list
+        if any((elMom is el.elID) for elMom in allmothers):
+            continue
+        elementsClean.append(el)
+        
+    return elementsClean
 
 
 def _combineElements(elements, dataset, maxDist):

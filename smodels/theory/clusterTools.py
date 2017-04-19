@@ -7,7 +7,6 @@
         
 """
 
-import sys
 from smodels.theory import crossSection
 from smodels.theory.auxiliaryFunctions import massAvg, massPosition, distance
 from smodels.tools.physicsUnits import fb, MeV
@@ -307,15 +306,8 @@ def groupAll(elements):
    
     cluster = ElementCluster()
     cluster.elements = []
-    allmothers = []
-    #Collect the list of all mothers:
-    for el in elements:
-        allmothers += [elMom[1].elID for elMom in el.motherElements]
 
     for el in elements:
-        #Skip the element if it is a mother of another element in the list
-        if any((elMom is el.elID) for elMom in allmothers):
-            continue
         cluster.elements.append(el) 
     
     #Collect the txnames appearing in the cluster
