@@ -221,6 +221,7 @@ class TxNameData(object):
     """
     Holds the data for the Txname object.  It holds Upper limit values or efficiencies.
     """
+    _keep_values = False ## keep the original values, only for debugging
 
     def __init__(self,value,datatag,Id,accept_errors_upto=.05):
         """
@@ -238,6 +239,8 @@ class TxNameData(object):
         self._accept_errors_upto=accept_errors_upto
         self._V = None
         self.loadData( value )
+        if self._keep_values:
+            self.value = value
 
     def __str__ ( self ):
         """ a simple unique string identifier, mostly for _memoize """
