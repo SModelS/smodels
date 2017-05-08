@@ -1,6 +1,6 @@
 sqrts: 13*TeV
 lumi: 2.2/fb
-id: CMS-SUS-PAS-15-002
+id: CMS-PAS-SUS-15-002
 url: http://cms-results.web.cern.ch/cms-results/public-results/superseded/SUS-15-002/index.html
 supersedes: None
 comment: Only CDS entry https://cds.cern.ch/record/2114817
