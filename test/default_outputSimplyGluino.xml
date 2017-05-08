@@ -26,7 +26,7 @@
             <upper_limit_fb>0.385711556676</upper_limit_fb>
         </ExptRes>
         <ExptRes>
-            <AnalysisID>CMS-SUS-PAS-15-002</AnalysisID>
+            <AnalysisID>CMS-PAS-SUS-15-002</AnalysisID>
             <AnalysisSqrts_TeV>13</AnalysisSqrts_TeV>
             <DataSetID>None</DataSetID>
             <Mass_GeV_List>
