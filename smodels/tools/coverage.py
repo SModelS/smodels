@@ -8,7 +8,7 @@
 .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
 
 """
-import copy
+import copy, sys
 from smodels.tools.physicsUnits import fb
 
 class Uncovered(object):
@@ -32,6 +32,7 @@ class Uncovered(object):
         self.longCascade = UncoveredClassifier()
         self.asymmetricBranches = UncoveredClassifier()
         self.motherIDs = []
+        self.prevMothers = []
         self.getAllMothers(topoList)
         self.fill(topoList)
         self.asymmetricBranches.combine()
@@ -54,14 +55,27 @@ class Uncovered(object):
         :ivar topoList: sms topology list
         """
         for el in topoList.getElements():
+            if self.inPrevMothers(el): continue
+            self.addPrevMothers(el)
             missing = self.isMissingTopo(el) #missing topo only if not mother, covered, mother covered
             if not missing: # if not missing check if it is actually tested
-                if not el.tested:
+                if el.covered and not el.tested:
+                    if not el.weight.getXsecsFor(self.sqrts): continue
+                    el.missingX =  el.weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
                     self.outsideGrid.addToTopos(el) # not missing but not tested means we are outside the mass grid
                 continue
             self.missingTopos.addToTopos(el) #keep track of all missing topologies
             if self.hasLongCascade(el): self.longCascade.addToClasses(el)
             elif self.hasAsymmetricBranches(el): self.asymmetricBranches.addToClasses(el) # if no long cascade, check for asymmetric branches
+
+    def inPrevMothers(self, el): #check if smaller element with same mother has already been checked
+        for mEl in el.motherElements:
+            if mEl[-1].elID in self.prevMothers: return True
+        return False
+
+    def addPrevMothers(self, el): #add mother elements of currently tested element to previous mothers
+        for mEl in el.motherElements:
+            self.prevMothers.append(mEl[-1].elID)
 
     def hasLongCascade(self, el):
         """
@@ -86,22 +100,30 @@ class Uncovered(object):
         """
         if el.elID in self.motherIDs: return False
         if el.covered: return False
-        if self.motherCovered(el): return False
+        missingX = self.getMissingX(el)
+        if not missingX: return False
+        el.missingX = missingX
         return True
 
-    def motherCovered(self, el):
+    def getMissingX(self,el):
         """
-        Recursively check if a mother of the given Element is covered
+        Calculate total missing cross section of element, by recursively checking if mothers are covered
         :ivar el: Element
+        :returns: missing cross section in fb as number
         """
         mothers = el.motherElements
+        if not mothers: return el.weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
+        missingX = 0.
         while mothers:
             newmothers = []
             for mother in mothers:
-                if mother[-1].covered: return True
-                newmothers += mother[-1].motherElements
+                if mother[-1].covered: continue
+                if not mother[-1].motherElements:
+                    if not el.weight.getXsecsFor(self.sqrts): continue
+                    missingX += mother[-1].weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
+                else: newmothers += mother[-1].motherElements
             mothers = newmothers
-        return False
+        return missingX
 
     def getMissingXsec(self, sqrts=None):
         """
@@ -112,8 +134,8 @@ class Uncovered(object):
         if not sqrts: sqrts = self.sqrts
         for topo in self.missingTopos.topos:
             for el in topo.contributingElements:
-                if not el.weight.getXsecsFor(sqrts): continue
-                xsec += el.weight.getXsecsFor(sqrts)[0].value.asNumber(fb)
+                #if not el.missingX: continue
+                xsec += el.missingX #.weight.getXsecsFor(sqrts)[0].value.asNumber(fb)
         return xsec
 
     def getOutOfGridXsec(self, sqrts=None): #FIXME same as getMissingXsec but different object, should not be separate functions
@@ -130,8 +152,7 @@ class Uncovered(object):
         if not sqrts: sqrts = self.sqrts
         for uncovClass in self.longCascade.classes:
             for el in uncovClass.contributingElements:
-                if not el.weight.getXsecsFor(sqrts): continue
-                xsec += el.weight.getXsecsFor(sqrts)[0].value.asNumber(fb)
+                xsec += el.missingX
         return xsec
 
     def getAsymmetricXsec(self, sqrts=None):
@@ -139,8 +160,7 @@ class Uncovered(object):
         if not sqrts: sqrts = self.sqrts
         for uncovClass in self.asymmetricBranches.classes:
             for el in uncovClass.contributingElements:
-                if not el.weight.getXsecsFor(sqrts): continue
-                xsec += el.weight.getXsecsFor(sqrts)[0].value.asNumber(fb)
+                xsec += el.missingX
         return xsec
           
 class UncoveredClassifier(object):
@@ -195,7 +215,7 @@ class UncoveredClassifier(object):
         Returns list of UncoveredClass objects in self.classes, sorted by weight
         :ivar sqrts: sqrts for weight lookup
         """
-        return sorted(self.classes, key=lambda x: x.getWeight(sqrts).asNumber(fb), reverse=True)
+        return sorted(self.classes, key=lambda x: x.getWeight(), reverse=True)
 
 class UncoveredClass(object):
     """
@@ -220,16 +240,14 @@ class UncoveredClass(object):
         for el in other.contributingElements:
             self.contributingElements.append(el)
 
-    def getWeight(self, sqrts):
+    def getWeight(self):
         """
         Calculate weight at sqrts
         :ivar sqrts: sqrts
         """
-        xsec = 0.*fb
+        xsec = 0.
         for el in self.contributingElements:
-            elxsec = el.weight.getXsecsFor(sqrts)            
-            if not elxsec: continue
-            xsec += elxsec[0].value            
+            xsec += el.missingX     
         return xsec
 
     def isSubset(self, other):
@@ -247,7 +265,7 @@ class UncoveredTopo(object):
     :ivar topo: topology description
     :ivar weights: weights dictionary
     """
-    def __init__(self, topo, weights, contributingElements=[]):
+    def __init__(self, topo, contributingElements=[]):
         self.topo = topo
         self.contributingElements = contributingElements
         self.value = 0. # weight for sqrts set in uncoveredList, only set this in printout
@@ -277,7 +295,7 @@ class UncoveredList(object):
             if name == topo.topo:
                 topo.contributingElements.append(el)
                 return
-        self.topos.append(UncoveredTopo(name, el.weight, [el]))
+        self.topos.append(UncoveredTopo(name, [el]))
         return
 
     def generalName(self, instr):

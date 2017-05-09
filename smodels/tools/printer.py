@@ -495,8 +495,7 @@ class TxTPrinter(BasicPrinter):
                 for topo in uncovEntry.topos:
                     if topo.value > 0.: continue
                     for el in topo.contributingElements:
-                        if not el.weight.getXsecsFor(obj.missingTopos.sqrts): continue
-                        topo.value += el.weight.getXsecsFor(obj.missingTopos.sqrts)[0].value.asNumber(fb)
+                        topo.value += el.missingX
                 if ix==0:
                     output += "Missing topologies with the highest cross sections (up to " + str(nprint) + "):\n"
                 else:
@@ -515,7 +514,7 @@ class TxTPrinter(BasicPrinter):
             else: output += "Asymmetric branch decay by produced mothers\n"
             output += "Mother1 Mother2 Weight (fb) # allMothers\n"
             for ent in uncovEntry.getSorted(obj.sqrts)[:nprint]:
-                output += "%s %s %10.3E # %s\n" %(ent.motherPIDs[0][0], ent.motherPIDs[0][1], ent.getWeight(obj.sqrts).asNumber(fb), str(ent.motherPIDs))
+                output += "%s %s %10.3E # %s\n" %(ent.motherPIDs[0][0], ent.motherPIDs[0][1], ent.getWeight(), str(ent.motherPIDs))
                 if hasattr(self, "addcoverageid") and self.addcoverageid:
                     contributing = []
                     for el in ent.contributingElements:
@@ -856,8 +855,7 @@ class PyPrinter(BasicPrinter):
         for topo in obj.missingTopos.topos:
             if topo.value > 0.: continue
             for el in topo.contributingElements:
-                if not el.weight.getXsecsFor(obj.missingTopos.sqrts): continue
-                topo.value += el.weight.getXsecsFor(obj.missingTopos.sqrts)[0].value.asNumber(fb)
+                topo.value += el.missingX
         obj.missingTopos.topos = sorted(obj.missingTopos.topos, 
                                         key=lambda x: [x.value,str(x.topo)], 
                                         reverse=True)        
@@ -876,8 +874,7 @@ class PyPrinter(BasicPrinter):
         for topo in obj.outsideGrid.topos:
             if topo.value > 0.: continue
             for el in topo.contributingElements:
-                if not el.weight.getXsecsFor(obj.sqrts): continue
-                topo.value += el.weight.getXsecsFor(obj.sqrts)[0].value.asNumber(fb)
+                topo.value += el.missingX
         obj.outsideGrid.topos = sorted(obj.outsideGrid.topos, 
                                        key=lambda x: [x.value,str(x.topo)], 
                                        reverse=True)        
@@ -888,21 +885,21 @@ class PyPrinter(BasicPrinter):
         
         longCascades = []        
         obj.longCascade.classes = sorted(obj.longCascade.classes, 
-                                         key=lambda x: [x.getWeight(obj.sqrts),x.motherPIDs], 
+                                         key=lambda x: [x.getWeight(),x.motherPIDs], 
                                          reverse=True)        
         for cascadeEntry in obj.longCascade.classes[:nprint]:
             longc = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV),
-                     'weight (fb)' : cascadeEntry.getWeight(obj.sqrts).asNumber(fb), 
+                     'weight (fb)' : cascadeEntry.getWeight(), 
                      'mother PIDs' : cascadeEntry.motherPIDs}        
             longCascades.append(longc)
         
         asymmetricBranches = []
         obj.asymmetricBranches.classes = sorted(obj.asymmetricBranches.classes, 
-                                                key=lambda x: [x.getWeight(obj.sqrts),x.motherPIDs],
+                                                key=lambda x: [x.getWeight(),x.motherPIDs],
                                                 reverse=True)
         for asymmetricEntry in obj.asymmetricBranches.classes[:nprint]:
             asymmetric = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 
-                    'weight (fb)' : asymmetricEntry.getWeight(obj.sqrts).asNumber(fb),
+                    'weight (fb)' : asymmetricEntry.getWeight(),
                     'mother PIDs' : asymmetricEntry.motherPIDs}         
             asymmetricBranches.append(asymmetric)
 
@@ -1099,7 +1096,7 @@ class SLHAPrinter(TxTPrinter):
                 if topo.value > 0.: continue
                 for el in topo.contributingElements:
                     if not el.weight.getXsecsFor(obj.missingTopos.sqrts): continue
-                    topo.value += el.weight.getXsecsFor(obj.missingTopos.sqrts)[0].value.asNumber(fb)
+                    topo.value += el.missingX
             if ix==0: output += "BLOCK SModelS_Missing_Topos #sqrts[TeV] weight[fb] description\n"
             else: output += "\nBLOCK SModelS_Outside_Grid #sqrts[TeV] weight[fb] description\n"
             cter = 0
@@ -1112,7 +1109,7 @@ class SLHAPrinter(TxTPrinter):
             else: output += "\nBLOCK SModelS_Asymmetric_Branches #Mother1 Mother2 Weight[fb] allMothers\n"
             cter = 0
             for ent in uncovEntry.getSorted(obj.sqrts):
-                output += " %d %s %s %10.3E %s\n" %(cter, ent.motherPIDs[0][0], ent.motherPIDs[0][1], ent.getWeight(obj.sqrts).asNumber(fb), str(ent.motherPIDs).replace(" ",""))
+                output += " %d %s %s %10.3E %s\n" %(cter, ent.motherPIDs[0][0], ent.motherPIDs[0][1], ent.getWeight(), str(ent.motherPIDs).replace(" ",""))
                 cter += 1
                 if cter > 9: break
         return output
