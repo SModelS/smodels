@@ -31,6 +31,12 @@ void SModelS::initialize ( const string & parameterfile, const string & installd
   Py_SetProgramName( (char *) (const char *) "SModelS" ); // huh??
   Py_Initialize();
   PyRun_SimpleString("import sys");
+  PyRun_SimpleString("import os");
+	ostringstream check_path;
+  check_path << "if not os.path.exists('" << installdir << "/smodels/version'): print "
+             << "('WARNING: installation directory " << installdir << " does not point"
+             << " to a SModelS installation!')";
+  PyRun_SimpleString( check_path.str().c_str() );
 	ostringstream set_path;
 	set_path << "sys.path.insert(0,'" << installdir << "') ";
   PyRun_SimpleString( set_path.str().c_str() );
