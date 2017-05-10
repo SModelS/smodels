@@ -40,6 +40,8 @@ test/unitTestOutput/*.smodels
 test/unitTestOutput/sms_output.*
 test/unitTestOutput/summary_print.txt
 results/
+cpp/run
+cpp/libSModelS.so
 test/unitTestOutput/
 distribution/create.log
 distribution/smodels-*
