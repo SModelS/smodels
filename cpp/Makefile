@@ -12,13 +12,11 @@ GCC=g++
 all: library exe
 
 library:
-	$(GCC) SModelS.cc -I. $(libpython) -shared -fPIC -o libSModelS.so # $(LDFLAGS) -L$(LIBDIR)/lib
+	$(GCC) SModelS.cc -I. $(libpython) -shared -fPIC -o libSModelS.so
 
 exe:
-	$(GCC) run.cpp -I. -Wl,-rpath,`pwd` -L. -o run -l SModelS # $(LDFLAGS) -L$(LIBDIR)/lib
-
-run: .PHONY 
-  # consider setting also PYTHONPATH or even PYTHONHOME
-	LD_LIBRARY_PATH=. ./run
+	## run.cpp is meant as an example, tweak the code and integrate it in your framework!
+	$(GCC) run.cpp -I. -Wl,-rpath,`pwd` -L. -o run -ldl -lpthread -lutil -l SModelS
+	## done. now adapt parameters.ini and execute ./run
 
 .PHONY:
