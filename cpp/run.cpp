@@ -2,6 +2,8 @@
 #include <iostream>
 #include <string>
 
+/** example only */
+
 using namespace std;
 
 int main( int argc, char * argv[] )
