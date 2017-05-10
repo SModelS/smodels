@@ -510,8 +510,8 @@ class TxTPrinter(BasicPrinter):
                         output += "Contributing elements %s\n" % str(contributing)            
             output += "================================================================================\n"
         for ix, uncovEntry in enumerate([obj.longCascade, obj.asymmetricBranches]):
-            if ix==0: output += "Long cascade decay by produced mothers (up to " + str(nprint) + "):\n"
-            else: output += "Asymmetric branch decay by produced mothers\n"
+            if ix==0: output += "Missing topos: long cascade decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV))
+            else: output += "Missing topos: asymmetric branches (w/o long cascades, up to %s), sqrts = %d TeV\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV))
             output += "Mother1 Mother2 Weight (fb) # allMothers\n"
             for ent in uncovEntry.getSorted(obj.sqrts)[:nprint]:
                 output += "%s %s %10.3E # %s\n" %(ent.motherPIDs[0][0], ent.motherPIDs[0][1], ent.getWeight(), str(ent.motherPIDs))
