@@ -82,7 +82,8 @@ class Uncovered(object):
             if mEl[-1].elID in self.prevMothers: return True
         return False
 
-    def inOutsideGridMothers(self, el): #check if smaller element with same mother has already been checked
+    def inOutsideGridMothers(self, el): #check if this element or smaller element with same mother has already been checked
+        if el.elID in self.outsideGridMothers: return True
         for mEl in el.motherElements:
             if mEl[-1].elID in self.outsideGridMothers: return True
         return False
@@ -128,7 +129,9 @@ class Uncovered(object):
         mothers = el.motherElements
         alreadyChecked = [] # for sanity check
         # if element has no mothers, the full cross section is missing
-        if not mothers: return el.weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
+        if not mothers:
+            if not el.weight.getXsecsFor(self.sqrts): return 0.
+            return el.weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
         missingX = 0. # keep track of full missing cross section
         while mothers: # recursive loop to check all mothers
             newmothers = []
