@@ -129,19 +129,19 @@ class Uncovered(object):
         mothers = el.motherElements
         alreadyChecked = [] # for sanity check
         # if element has no mothers, the full cross section is missing
-        if not mothers:
-            if not el.weight.getXsecsFor(self.sqrts): return 0.
-            return el.weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
-        missingX = 0. # keep track of full missing cross section
+        if not el.weight.getXsecsFor(self.sqrts): return 0.
+        missingX =  el.weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
+        if not mothers: return missingX
         while mothers: # recursive loop to check all mothers
             newmothers = []
             for mother in mothers:
                 if mother[-1].elID in alreadyChecked: continue # sanity check, to avoid double counting
                 alreadyChecked.append(mother[-1].elID) # now checking, so adding to alreadyChecked
-                if mother[-1].covered: continue # do not count cross section if mother is covered, do not continue recursion for this contribution
-                if not mother[-1].motherElements: # end of recursion if element has no mothers, we add its cross section to missingX
-                    if not el.weight.getXsecsFor(self.sqrts): continue # if no weight at this sqrts, nothing to add
-                    missingX += mother[-1].weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
+                if mother[-1].covered:
+                    if not mother[-1].weight.getXsecsFor(self.sqrts): continue
+                    missingX -= mother[-1].weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
+                    continue # do not count cross section if mother is covered, do not continue recursion for this contribution
+                if not mother[-1].motherElements: continue # end of recursion if element has no mothers, we keep its cross section in missingX
                 else: newmothers += mother[-1].motherElements # if element has mother element, check also if those are covered before adding the cross section contribution
             mothers = newmothers # all new mothers will be checked until we reached the end of all recursions
         return missingX
@@ -156,18 +156,20 @@ class Uncovered(object):
         # this is so we can find the smallest covered but not tested element in a chain of compressed elements
         mothers = el.motherElements
         alreadyChecked = []
-        if not mothers: return el.weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
-        missingX = 0.
+        if not el.weight.getXsecsFor(self.sqrts): return 0.
+        missingX =  el.weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
+        if not mothers: return missingX
         while mothers:
             newmothers = []
             for mother in mothers:
                 if mother[-1].elID in alreadyChecked: continue # sanity check, to avoid double counting
                 alreadyChecked.append(mother[-1].elID) # now checking, so adding to alreadyChecked
-                if mother[-1].tested: continue
+                if mother[-1].tested:
+                    if not mother[-1].weight.getXsecsFor(self.sqrts): continue
+                    missingX -= mother[-1].weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
+                    continue
                 self.outsideGridMothers.append(mother[-1].elID) # mother element is not tested, but should no longer be considered as outside grid, because we already count its contribution here
-                if not mother[-1].motherElements:
-                    if not el.weight.getXsecsFor(self.sqrts): continue
-                    missingX += mother[-1].weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
+                if not mother[-1].motherElements: continue
                 else: newmothers += mother[-1].motherElements
             mothers = newmothers
         return missingX
