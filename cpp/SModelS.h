@@ -13,8 +13,8 @@ class SModelS {
     /*** construction from a parameter.ini file.
      *   \paramname verbosity set the verbosity of SModelS. Values are:
      *   debug, info, warn, error */
-    SModelS( const std::string & parameterfile, const std::string & verbosity );
-    SModelS( const std::string & parameterfile );
+    SModelS( const std::string & parameterfile, const std::string & installdir, const std::string & verbosity );
+    SModelS( const std::string & parameterfile, const std::string & installdir );
     ~SModelS();
     /** run over a single slha file. */
     int run ( const std::string & slhafile );
@@ -22,6 +22,7 @@ class SModelS {
   private:
     void loadDatabase ( const std::string & parameterfile );
     void initialize ( const std::string & parameterfile, 
+                      const std::string & installdir,
                       const std::string & verbosity );
 };
 

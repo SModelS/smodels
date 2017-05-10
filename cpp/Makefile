@@ -15,7 +15,7 @@ library:
 	$(GCC) SModelS.cc -I. $(libpython) -shared -fPIC -o libSModelS.so # $(LDFLAGS) -L$(LIBDIR)/lib
 
 exe:
-	$(GCC) run.cpp -I. -L. -o run -l SModelS # $(LDFLAGS) -L$(LIBDIR)/lib
+	$(GCC) run.cpp -I. -Wl,-rpath,`pwd` -L. -o run -l SModelS # $(LDFLAGS) -L$(LIBDIR)/lib
 
 run: .PHONY 
   # consider setting also PYTHONPATH or even PYTHONHOME
