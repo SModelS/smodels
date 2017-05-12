@@ -3,6 +3,12 @@ all: externaltools
 externaltools:
 	cd lib && make
 
+pythia6:
+	cd lib && make pythia6
+
+pythia8:
+	cd lib && make pythia8
+
 clean:
 	cd lib && make clean
 
