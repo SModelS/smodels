@@ -391,6 +391,10 @@ class Element(object):
                                (if mass difference < minmassgap, perform mass compression)
         :returns: list with the compressed elements (Element objects)        
         """
+        
+        if not doCompress and not doInvisible:
+            return []
+        
         added = True
         newElements = [self]
         # Keep compressing the new topologies generated so far until no new

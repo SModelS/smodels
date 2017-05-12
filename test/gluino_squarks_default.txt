@@ -58,7 +58,7 @@ Contributions outside the mass grid
   8.0  1.440E-01    #                             [[[jet]],[[t,t]]]
   8.0  9.545E-02    #                             [[[b,b]],[[jet]]]
 ================================================================================
-Long cascade decay by produced mothers (up to 10):
+Missing topos: long cascade decays (up to 10 entries), sqrts = 8 TeV:
 Mother1 Mother2 Weight (fb) # allMothers
 1000021 2000002  3.743E+01 # [[1000021, 2000002]]
 1000002 1000021  1.626E+01 # [[1000002, 1000021]]
@@ -71,7 +71,7 @@ Mother1 Mother2 Weight (fb) # allMothers
 1000001 1000021  2.622E+00 # [[1000001, 1000021]]
 1000002 2000001  2.600E+00 # [[1000002, 2000001], [1000002, 2000003]]
 ================================================================================
-Asymmetric branch decay by produced mothers
+Missing topos: asymmetric branches (w/o long cascades, up to 10), sqrts = 8 TeV
 Mother1 Mother2 Weight (fb) # allMothers
 1000024 1000024  5.958E+01 # [[1000024, 1000024]]
 1000002 1000021  4.725E+01 # [[1000002, 1000021]]
