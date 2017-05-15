@@ -57,8 +57,8 @@ should list and check all internal tools (Pythia and NLL-fast) and external
 In case everything fails, please contact smodels-users@lists.oeaw.ac.at
 
 
-Installation on Ubuntu 16.04
-----------------------------
+Installation on Ubuntu >= 16.04
+-------------------------------
 
 Installation on Ubuntu machines should be straightforward with superuser privileges
 (if you do not have superuser privileges see instructions below):
