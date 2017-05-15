@@ -1,5 +1,7 @@
 .. index:: C++ Interface
 
+.. _Cpp:
+
 C++ Interface
 =============
 

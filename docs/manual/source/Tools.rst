@@ -11,12 +11,11 @@
 .. |constraints| replace:: :ref:`constraints <ULconstraint>`
 .. |intermediate states| replace:: :ref:`intermediate states <odd states>`
 .. |final states| replace:: :ref:`final states <final states>`
-.. |database| replace:: :doc:`database <Database>`
+.. |database| replace:: :ref:`database <Database>`
 .. |bracket notation| replace:: :ref:`bracket notation <bracketNotation>`
 .. |ExpRes| replace:: :ref:`Experimental Result<ExpResult>`
 .. |ExpRess| replace:: :ref:`Experimental Results<ExpResult>`
 .. |Database| replace:: :ref:`Database <Database>`
-.. |database| replace:: :ref:`database <Database>`
 .. |Dataset| replace:: :ref:`DataSet<DataSet>`
 .. |Datasets| replace:: :ref:`DataSets<DataSet>`
 .. |results| replace:: :ref:`experimental results <ExpResult>`
@@ -24,8 +23,6 @@
 .. |branch| replace:: :ref:`branch <branch>`
 .. |EMrs| replace:: :ref:`EM-type results <EMtype>`
 .. |ULrs| replace:: :ref:`UL-type results <ULtype>`
-.. |br| raw:: html
-   <br />
 
 SModelS Tools
 =============
@@ -299,8 +296,8 @@ information, it finds and classifies the |elements| which are
 not tested by any of the |results| in the |database|.
 These elements are grouped into the following classes:
 
-* *missingTopos*: |elements| which are not tested by any of the |results| in the |database| (independent of the element mass).
-  The missing topologies are further classified as:
+* *missingTopos*: |elements| which are not tested by any of the |results| in the |database| (independent of the element mass). The missing topologies are further classified as:
+
    * *longCascade*: |elements| with long cascade decays (more than one intermediate particle in one of the |branches|);
    * *asymmetricBranches*: |elements| where the first |branch| differs from the second |branch| (but that are not considered as long cascade decays).
 
