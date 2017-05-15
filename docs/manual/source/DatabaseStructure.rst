@@ -185,29 +185,57 @@ the Python objects they are mapped to:
 Database: Binary (Pickle) Format
 --------------------------------
 
-Due to the large number of experimental results contained in the SModelS
-|Database|, parsing the :ref:`database folders <folderStruct>` and building the
-corresponding :ref:`database objects <objStruct>` may require a non-negligible
-CPU time. In some cases this may be the most time consuming task when
-testing a single input file.  Furthermore this procedure does not have to be
-repeated every time SModelS is run.
+At the first time of instantiating the 
+`Database <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
+class, the text files in *<database-path>*.
+are loaded and parsed, and the corresponding                                                    
+data objects are built. The efficiency and upper limit maps themselves are                                                                    
+subjected to standard preprocessing steps such as a principal component                                                                       
+analysis and Delaunay triangulation (see Figure below).
+The simplices defined during triangulation are then used for linearly interpolating the data grid,                                            
+thus allowing SModelS to compute efficiencies or upper limits for arbitrary                                                                   
+mass values (as long as they fall inside the data grid).                                                                                      
+This procedure provides an efficient and numerically robust way of                                                                            
+dealing with generic data grids, including arbitrary parametrizations of the mass parameter space,                                            
+irregular data grids and asymmetric branches.                                                                                                 
+                                                                                                                                              
+.. image:: images/delaunay.png
 
-In order to avoid these issues, SModelS serializes the 
-`database object <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
-into a pickle file (*<database-path>/database.pcl*), which can then be read
-directly when loading the database.
-Since reading the pickle file is much faster than parsing the :ref:`database folders <folderStruct>`,
-there is a considerable speed improvement when using the pickle file.
-If any changes in the :ref:`database folder structure <folderStruct>` 
-are detected or the SModelS version has changed,
-SModelS will automatically re-build the pickle file.
-This action may take a few minutes, but it is only performed once.
+..
+ %\caption{Delaunay triangulation of an upper limit map with three mass                                                                        %parameters. The colors show the upper limit values.}
 
-SModelS automatically builds (if necessary) and loads the binary database when a 
-`Database object <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
-is created. Nonetheless, the user can enforce loading (parsing) the *text
-database* using the option *force_load = 'txt'* in the constructor of
+For the sake of efficiency, the entire database -- including the Delaunay                                                                     
+triangulation -- is then serialized into a pickle                                                                                             
+file (*<database-path>/database.pcl*), which will be read directly the next time the database is loaded.                                                                       
+If any changes in the database folder structure are detected, the python or the SModelS                                                       
+version has changed, SModelS will automatically re-build the pickle file. This                                                                
+action may take a few minutes, but it is again performed only once.                                                                           
+If desired, the pickling process can be skipped using the option *force_load = `txt'*
+in the constructor of
 `Database <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_ .  
 
+
+..
+ Due to the large number of experimental results contained in the SModelS
+ |Database|, parsing the :ref:`database folders <folderStruct>` and building the
+ corresponding :ref:`database objects <objStruct>` may require a non-negligible
+ CPU time. In some cases this may be the most time consuming task when
+ testing a single input file.  Furthermore this procedure does not have to be
+ repeated every time SModelS is run.
+ In order to avoid these issues, SModelS serializes the 
+ `database object <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
+ into a pickle file (*<database-path>/database.pcl*), which can then be read
+ directly when loading the database.
+ Since reading the pickle file is much faster than parsing the :ref:`database folders <folderStruct>`,
+ there is a considerable speed improvement when using the pickle file.
+ If any changes in the :ref:`database folder structure <folderStruct>` 
+ are detected or the SModelS version has changed,
+ SModelS will automatically re-build the pickle file.
+ This action may take a few minutes, but it is only performed once.
+ SModelS automatically builds (if necessary) and loads the binary database when a 
+ `Database object <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
+ is created. Nonetheless, the user can enforce loading (parsing) the *text
+ database* using the option *force_load = 'txt'* in the constructor of
+ `Database <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_ .  
 
 * The pickle file is created by the `createBinaryFile method <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database.createBinaryFile>`_ 
