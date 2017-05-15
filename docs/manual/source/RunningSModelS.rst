@@ -120,7 +120,7 @@ Below we give more detailed information about each entry in the parameters file.
 * *path*: relevant folder paths
 
   * **databasePath**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`.
-|
+
 * *options*: main options for turning SModelS features on or off
 
   * **checkInput** (True/False): if True, *runSModelS.py* will run the :ref:`file check tool <fileChecks>` on the input file and verify if the input contains all the necessary information.
@@ -130,7 +130,7 @@ Below we give more detailed information about each entry in the parameters file.
     (see :ref:`likelihood calculation <likelihoodCalc>`).
     If True, the likelihood and :math:`\chi^2` values are computed for the |EMrs|.
   * **testCoverage** (True/False): set to True to run the :ref:`coverage <topCoverage>` tool.
-|
+
 * *parameters*: basic parameter values for running SModelS
 
   * **sigmacut** (float): minimum value for an |element| weight (in fb). :ref:`Elements <element>` 
@@ -144,7 +144,7 @@ Below we give more detailed information about each entry in the parameters file.
   * **ncpus** (int): number of CPUs. When processing multiple SLHA/LHE files,
     SModelS can run in a parallelized fashion, splitting up the input files in equal chunks.
     *ncpus = -1* uses the total number of CPU cores of the machine.
-|
+
 * *database*: allows for selection of a subset of :ref:`experimental results <ExpResult>` from the |database|
 
   * **analyses** (list of results): set to *all* to use all available results. If a list of :ref:`experimental analyses <ExpResult>`
@@ -159,12 +159,12 @@ Below we give more detailed information about each entry in the parameters file.
   * **dataselector** (list of datasets): set to all to use all available |datasets|. If dataselector = upperLimit (efficiencyMap), only |ULrs| (|EMrs|) will be used. Furthermore, if
     a list of signal regions (|datasets|) is given, only the |results| containing these datasets will be used. For instance, if dataselector = SRA mCT150,SRA mCT200, only
     these signal regions will be used.
-|
+
 * *printer*: main options for the |output| format
 
   * **outputType** (list of outputs): use to list all the output formats to be generated.
     Available output formats are: summary, stdout, log, python, xml.
-|
+
 * *stdout-printer*: options for the stdout or log printer
 
   * **printDatabase** (True/False): set to True to print the list of selected |results| to stdout.
@@ -176,16 +176,16 @@ Below we give more detailed information about each entry in the parameters file.
   * **addCoverageID** (True/False): set to True to print the list of element IDs contributing to each missing topology (see :ref:`coverage <topCoverage>`).
     *Only used if testCoverage = True*. This option should be used along with *addElementInfo = True* so the user can precisely identify
     which elements were classified as missing.
-|
+
 * *summary-printer*: options for the summary printer
 
   * **expandedSummary** (True/False): set True to include in the summary output all applicable |results|, False for only the strongest one.
-|
+
 * *python-printer*: options for the Python printer
 
   * **addElementList** (True/False): set True to include in the Python output all information about all |elements| generated in the |decomposition|. If set to True the
     output file can be quite large.
-|
+
 * *xml-printer*: options for the xml printer
 
   * **addElementList** (True/False): set True to include in the xml output all information about all |elements| generated in the |decomposition|. If set to True the

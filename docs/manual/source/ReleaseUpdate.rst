@@ -1,7 +1,5 @@
 .. index:: What's New in version |version|
 
-.. |invisible compression| replace:: :ref:`invisible compression <invComp>`
-.. |mass compression| replace:: :ref:`mass compression <massComp>`
 .. |element| replace:: :ref:`element <element>`
 .. |elements| replace:: :ref:`elements <element>`
 .. |topology| replace:: :ref:`topology <topology>`
@@ -31,11 +29,12 @@
 .. |datasets| replace:: :ref:`data sets<DataSet>`
 .. |parameters| replace:: :ref:`parameters file <parameterFile>`
 .. |ssigBRe| replace:: :math:`\sum \sigma \times BR \times \epsilon`
+.. |Cpp| replace:: :ref:`C++ Interface<Cpp>`
 
 
 
 What's New in Version 1.1
-=========================
+===========================
 Since the publication of SModelS v1.0 in December 2014, the code base
 has undergone significant structural changes. Version 1.1 comes
 with many new features. The major novelties of this release are 
@@ -53,5 +52,8 @@ as follows:
 * inclusion of new simplified results to the |database| (including a few 13 TeV results) 
 * |Fastlim| efficiency maps can now also be used in SModelS
 
+**New in Version 1.1.1:**
 
-.. |decomposition| replace:: :doc:`decomposition <Decomposition>`
+* |Cpp|
+* Support for pythia8 (see :ref:`Cross Section Calculator <xsecCalc>`)
+
