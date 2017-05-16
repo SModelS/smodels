@@ -40,7 +40,7 @@ def pythonDirectory():
 
 def authors():
     """ return the author list, taken from BANNER """
-    copying_file = open('%s/etc/BANNER' % installDirectory(), 'r')
+    copying_file = open('%s/smodels/share/BANNER' % installDirectory(), 'r')
     lines = copying_file.readlines()
     copying_file.close()
     authors = ""
@@ -95,7 +95,7 @@ def banner():
     Returns SModelS banner.
 
     """
-    f = open(installDirectory() + "/etc/BANNER")
+    f = open(installDirectory() + "/smodels/share/BANNER")
     lines = f.readlines()
     f.close()
     return "".join(lines)
@@ -115,8 +115,7 @@ def printHelp():
     print("--copyright:  print SModelS copyright")
     sys.exit(0)
 
-
-if __name__ == "__main__":
+def main():
     # print( banner() )
     if len(sys.argv) < 2:
         printHelp()
@@ -141,3 +140,6 @@ if __name__ == "__main__":
             sys.exit(0)
     print("Error: cannot parse %s.\n" % i )
     printHelp()
+
+if __name__ == "__main__":
+    main()

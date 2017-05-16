@@ -18,7 +18,7 @@ from smodels.installation import installDirectory as iDir
 from smodels.tools import crashReport
 from smodels.tools.timeOut import NoTime
 from databaseLoader import database ## to make sure the db exists
-from runSModelS import main
+from smodels.tools.runSModelS import run
 import redirector
 import unum
 import time
@@ -97,7 +97,7 @@ class RunSModelSTest(unittest.TestCase):
         with redirector.stdout_redirected ( to = to ):
             out = join( iDir(), "test/unitTestOutput" )
             setLogLevel ( level )
-            main(filename, parameterFile=join ( iDir(), "test/%s" % inifile ),
+            run(filename, parameterFile=join ( iDir(), "test/%s" % inifile ),
                  outputDir= out, db= database, timeout = timeout,
                  development = development)
             sfile = join(iDir(),"test/unitTestOutput/%s.py" % basename(filename))
