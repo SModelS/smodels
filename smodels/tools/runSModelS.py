@@ -63,11 +63,11 @@ def main():
     if args.run_crashreport: 
         args.filename, args.parameterFile = crashReport.readCrashReportFile(
                 args.filename)
-        main(args.filename, args.parameterFile, args.outputDir,
+        run(args.filename, args.parameterFile, args.outputDir,
                db, args.timeout, development=True )
         
     else:
-        main(args.filename, args.parameterFile, args.outputDir, 
+        run(args.filename, args.parameterFile, args.outputDir, 
               db, args.timeout, args.development)
 
 def run( inFile, parameterFile, outputDir, db, timeout, development ):
