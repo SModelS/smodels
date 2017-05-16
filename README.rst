@@ -44,10 +44,14 @@ used to test runSModelS.py.
 Citation
 ========
 
-If you use this software please cite SModelS v1.1 as well as the programs
+If you use this software please cite the SModelS v1.1 manual_, 
+the original SModelS publication_, as well as the programs
 it makes use of (Pythia8.223/Pythia6.4.27, NLL-fast and PySLHA). 
 For your convenience, the relevant
 citations are provided in bibtex format in references.bib.
 
 For citing the experimental analyses in the database, you can use
 ``smodels-database/database.bib``.
+
+.. _manual: https://arxiv.org/abs/1701.06586
+.. _publication: https://inspirehep.net/record/1269436
