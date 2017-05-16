@@ -24,7 +24,7 @@ pythia8.exe: pythia8.cc
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ pythia8.cc -lpythia8 -ldl
 
 run:
-	./pythia8.exe -f ../../inputFiles/slha/simplyGluino.slha -n 10 -c ./pythia8.cfg -x $(XMLDOC)
+	./pythia8.exe -f ../../inputFiles/slha/simplyGluino.slha -n 10 -c ../../smodels/etc/pythia8.cfg -x $(XMLDOC)
 
 help:
 	./pythia8.exe -h
