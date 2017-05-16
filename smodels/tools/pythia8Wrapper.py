@@ -30,7 +30,7 @@ class Pythia8Wrapper(WrapperBase):
     
     """
     def __init__(self,
-                 configFile="<install>/lib/pythia8/pythia8.cfg",
+                 configFile="<install>/smodels/etc/pythia8.cfg",
                  executablePath="<install>/lib/pythia8/pythia8.exe",
                  srcPath="<install>/lib/pythia8/"):
         """ 
