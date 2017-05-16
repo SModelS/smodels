@@ -41,11 +41,11 @@ def dataFiles ():
 
     """
     ret = [("", [ "README", "INSTALLATION", "COPYING" ])]
-    ret.append ( ("smodels/", [ "smodels/version", "smodels/share/BANNER" ]) )
+    ret.append ( ("smodels/", [ "smodels/version" ]) )
     # ret.append ( ("share", [ "share/shareme" ]) )
     for directory in ["inputFiles/slha/", "inputFiles/lhe/", "smodels/share/",
-            "lib/nllfast/nllfast-1.2/", "lib/nllfast/nllfast-2.1/", 
-            "lib/nllfast/nllfast-3.1/", "lib/pythia6/", "lib/pythia8/", "etc/"]:
+          "smodels/etc/", "lib/nllfast/nllfast-1.2/", "lib/nllfast/nllfast-2.1/", 
+          "lib/nllfast/nllfast-3.1/", "lib/pythia6/", "lib/pythia8/" ]:
         ret.append ((directory, listDirectory (directory)))
 
     return ret
@@ -94,6 +94,7 @@ setup(
               'smodels.theory',
               'smodels.tools',
               'smodels.experiment'],
+    include_package_data = True,
     test_suite='test',
     long_description=read('README'),
     classifiers=[

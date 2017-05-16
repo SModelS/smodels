@@ -1,5 +1,4 @@
 include README COPYING MANIFEST.in Makefile
 include lib/Makefile lib/*/Makefile lib/*/*/Makefile lib/*/*.f lib/*/*/*.f lib/*/*/*.grid 
-include smodels/share/BANNER
 include inputFiles/*/*
 include etc/*

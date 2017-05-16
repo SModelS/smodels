@@ -16,7 +16,7 @@ from smodels.tools import smodelsLogging
 def main():
     import argparse
     """ Set default input and output files """
-    parameterFile = "%s/etc/parameters_default.ini" % installDirectory()
+    parameterFile = "%s/smodels/etc/parameters_default.ini" % installDirectory()
     outputDir = "./results/"
 
     """ Get the name of input SLHA file and parameter file """
@@ -26,7 +26,7 @@ def main():
             'If a directory is given, loop over all files in the directory', required=True)
     ap.add_argument('-p', '--parameterFile', 
             help='name of parameter file, where most options are defined (optional argument). If not set, use '
-            'all parameters from etc/parameters_default.ini', 
+            'all parameters from smodels/etc/parameters_default.ini', 
             default=parameterFile)
     ap.add_argument('-o', '--outputDir', 
             help='name of output directory (optional argument). The default folder is: ' +
@@ -77,7 +77,7 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
     :param inputFile: input file name (either a SLHA or LHE file)
                       or directory name (path to directory containing input files)
     :param parameterFile: File containing the input parameters (default =
-                          /etc/parameters_default.ini)
+                          smodels/etc/parameters_default.ini)
     :param outputDir: Output directory to write a summary of results to
     :param db: supply a smodels.experiment.databaseObj.Database object, so
             the database doesn't have to be loaded anymore. Will
