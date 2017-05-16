@@ -58,7 +58,7 @@ copy_files:
 	cp ../../cpp/run.cpp source/images/
 
 RstFilesFromHelp:
-	rstFromHelpFiles.py
+	./rstFromHelpFiles.py
 
 html: copy_files recipes RstFilesFromHelp htmlnorecipes
 

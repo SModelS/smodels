@@ -34,11 +34,21 @@
 
 
 What's New in Version 1.1
-===========================
+=========================
 Since the publication of SModelS v1.0 in December 2014, the code base
 has undergone significant structural changes. Version 1.1 comes
 with many new features. The major novelties of this release are 
 as follows:
+
+New in Version 1.1.1:
+^^^^^^^^^^^^^^^^^^^^^
+
+* |Cpp|
+* Support for pythia8 (see :ref:`Cross Section Calculator <xsecCalc>`)
+* Fixes and improvements in missing topologies
+
+New in Version 1.1.0:
+^^^^^^^^^^^^^^^^^^^^^
 
 * the inclusion of efficiency maps (see |EMrs|)
 * a new and more flexible database format (see :ref:`Database structure <databaseStruct>`)
@@ -52,8 +62,4 @@ as follows:
 * inclusion of new simplified results to the |database| (including a few 13 TeV results) 
 * |Fastlim| efficiency maps can now also be used in SModelS
 
-**New in Version 1.1.1:**
-
-* |Cpp|
-* Support for pythia8 (see :ref:`Cross Section Calculator <xsecCalc>`)
 
