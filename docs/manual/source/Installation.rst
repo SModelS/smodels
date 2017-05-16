@@ -36,11 +36,13 @@ libraries [*]_:
 
 If Python's *setuptools* is installed in your machine, SModelS and its dependencies
 can be installed with::
+
   python setup.py install
 
 If the python libraries are installed in a system folder (as is the default behavior),
 it will be necessary to run the install command with superuser privilege.
 Alternatively, one can run setup.py with the "--user" flag::
+
   python setup.py install --user
 
 If *setuptools* is not installed, you can try to install the external libraries
@@ -139,11 +141,8 @@ Obviously, a C++ compiler is need, alongside with the python developers
 Adding results to the database
 ------------------------------
 
-
-The installation procedure explained above also installs SModelS'
-:ref:`database of experimental results <DatabaseDefinitions>`
-in the smodels-database subdirectory.
-The database version at the time of the SModelS v1.1.0 release is ``1.1.0
+The installation procedure explained above also installs SModelS' :ref:`database of experimental results <databaseDefs>` in the smodels-database subdirectory.
+The database version at the time of the SModelS v1.1.0 release is ''1.1.0
 (Silvester 2016)'' and contains 133 results for testing new physics models.
 More concretely, these are 94
 |ULrs| and 39 |EMrs| from 25 ATLAS and 23
