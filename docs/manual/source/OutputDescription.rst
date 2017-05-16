@@ -41,7 +41,7 @@ Output Description
 A detailed description of the possible output formats generated
 by :ref:`running SModelS <runningSModelS>` and their content is given below.
 For simplicity we will assume that all printer options
-in the |parameters| are set to True, so the output information is maximal.
+in the |parameters| are set to True, so the output information is maximal [*]_.
 
 .. _screenOut:
 
@@ -309,3 +309,4 @@ we simply show below an excerpt of the xml file to illustrate the output format:
    :language: xml
    :lines: 1-2,85,300-328,45077,45078-45104
 
+.. [*] Some of the output may change depending on the database version used.

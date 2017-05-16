@@ -6,7 +6,7 @@ How To's
 ========
 
 
-Below a few examples are given for how to utilize SModelS and some of the :doc:`SModelS tools <Tools>` as a Python library:
+Below a few examples are given for how to utilize SModelS and some of the :doc:`SModelS tools <Tools>` as a Python library [*]_:
 
 * `How to load the database <_downloads/load_database.html>`_ (download the Python code :download:`here <recipes/load_database.py>`, IPython notebook :download:`here <recipes/load_database.ipynb>`)
 
@@ -37,3 +37,4 @@ Examples using the Database Browser:
 
 * `How to select specific results <_downloads/browserExample3.html>`_ (download the Python code :download:`here <recipes/browserExample3.py>`, IPython notebook :download:`here <recipes/browserExample3.ipynb>`)
 
+.. [*] Some of the output may change depending on the database version used.
