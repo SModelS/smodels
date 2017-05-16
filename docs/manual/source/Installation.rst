@@ -130,8 +130,8 @@ In order to make sure all libraries have been correctly installed, you can run :
  python smodels/tools/toolBox.py
 
 
-Installation of C++ interface
------------------------------
+Installation of the C++ interface
+---------------------------------
 
 SModelS v1.1.1 comes with a simple C++ interface, see the cpp directory.
 Obviously, a C++ compiler is need, alongside with the python developers
