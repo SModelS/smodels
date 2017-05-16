@@ -45,7 +45,12 @@ New in Version 1.1.1:
 
 * |Cpp|
 * Support for pythia8 (see :ref:`Cross Section Calculator <xsecCalc>`)
-* Fixes and improvements in missing topologies
+* improved binary database
+* automated SLHA and LHE file detection
+* Fix and improvements for missing topologies
+* Added SLHA-type output
+* Small improvements in interpolation and clustering
+
 
 New in Version 1.1.0:
 ^^^^^^^^^^^^^^^^^^^^^

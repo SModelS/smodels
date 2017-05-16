@@ -8,6 +8,8 @@ Release v1.1.1, Thu 18 May 2017
   * smodelsTools.py now also supports toolbox
   * C++ interface
   * Fix and improvements for missing topologies
+  * Added SLHA-type output
+  * Small improvements in interpolation and clustering
 
 Release v1.1.0patch1, Tue 21 Feb 2017
 =======================================================
