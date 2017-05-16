@@ -39,8 +39,8 @@ class Element(object):
         self.motherElements = []
         self.elID = 0
         self.covered = False
-        self.tested = False 
-        
+        self.tested = False
+                
         if info:
             # Create element from particle string
             if type(info) == type(str()):
@@ -350,6 +350,10 @@ class Element(object):
                                (if mass difference < minmassgap, perform mass compression)
         :returns: list with the compressed elements (Element objects)        
         """
+        
+        if not doCompress and not doInvisible:
+            return []
+        
         added = True
         newElements = [self]
         # Keep compressing the new topologies generated so far until no new

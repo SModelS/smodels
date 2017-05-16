@@ -20,6 +20,14 @@ tools.caching module
     :undoc-members:
     :show-inheritance:
 
+tools.colors module
+-------------------
+
+.. automodule:: tools.colors
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 tools.coverage module
 ---------------------
 
@@ -44,34 +52,10 @@ tools.databaseBrowser module
     :undoc-members:
     :show-inheritance:
 
-tools.externalNllFast module
-----------------------------
-
-.. automodule:: tools.externalNllFast
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-tools.externalPythia6 module
-----------------------------
-
-.. automodule:: tools.externalPythia6
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 tools.externalPythonTools module
 --------------------------------
 
 .. automodule:: tools.externalPythonTools
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-tools.externalTool module
--------------------------
-
-.. automodule:: tools.externalTool
     :members:
     :undoc-members:
     :show-inheritance:
@@ -100,10 +84,10 @@ tools.modelTester module
     :undoc-members:
     :show-inheritance:
 
-tools.nllFast module
---------------------
+tools.nllFastWrapper module
+---------------------------
 
-.. automodule:: tools.nllFast
+.. automodule:: tools.nllFastWrapper
     :members:
     :undoc-members:
     :show-inheritance:
@@ -120,6 +104,38 @@ tools.printer module
 --------------------
 
 .. automodule:: tools.printer
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tools.pythia6Wrapper module
+---------------------------
+
+.. automodule:: tools.pythia6Wrapper
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tools.pythia8Wrapper module
+---------------------------
+
+.. automodule:: tools.pythia8Wrapper
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tools.pythia8particles module
+-----------------------------
+
+.. automodule:: tools.pythia8particles
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tools.pythonTools module
+------------------------
+
+.. automodule:: tools.pythonTools
     :members:
     :undoc-members:
     :show-inheritance:
@@ -176,6 +192,14 @@ tools.toolBox module
 --------------------
 
 .. automodule:: tools.toolBox
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tools.wrapperBase module
+------------------------
+
+.. automodule:: tools.wrapperBase
     :members:
     :undoc-members:
     :show-inheritance:

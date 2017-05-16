@@ -63,25 +63,58 @@ Likelihood Computation
 ----------------------
 
 
-For |EMrs| a :math:`\chi^2`-value can also be computed (in addition to the upper limits above).
-The :math:`\chi^2` is computed from the likelihood using:
+In the case of |EMrs|, additional statistical information
+about the constrained model can be provided by the SModelS output.
+Following the `CMS NOTE 2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_, we construct a simplified
+likelihood which describes the plausibility of the data :math:`D`, given a signal strength :math:`\mu`:
 
 .. math::
-   \chi^2 = -2 \log\left(\frac{L(n_{\mathrm{signal}})}{L_{\mathrm{max}}}\right)
-   
-   
- 
-where :math:`L(n_{\mathrm{signal}})` is the likelihood for a given number of signal events. 
-The likelihood is computed using a simple Poisson convoluted with a Gaussian (for the
-background and signal uncertainties) as a function of 
-the number of observed events (:math:`n_{\mathrm{obs}}`), the number of expected background events
-(:math:`n_{b}`) and its error (:math:`\delta_{b}`)
-and the number of signal events (:math:`n_{\mathrm{signal}}`) and its error (:math:`\delta_{s})`).
-While :math:`n_{\mathrm{obs}}`, :math:`n_{b}` and :math:`\delta_{b}` are directly extracted from the |dataset|,
-:math:`n_{\mathrm{signal}}` is obtained from the :ref:`theoryPredictions` calculation and 
-:math:`\delta_{s} = 20\%~\cdot n_{\mathrm{signal}}` by default.
+   \mathcal{L}(\mu,\theta|D) =  P\left(D|\mu + b + \theta \right) p(\theta)
+
+
+Here, :math:`\theta` denotes the nuisance parameter that describes the
+variations in the signal and background contribtions due to systematic
+effects. We assume :math:`p(\theta)` to follow a Gaussian distribution centered
+around zero and with a variance of :math:`\delta^2`,
+whereas :math:`P(D)` corresponds to a counting variable and is thus 
+properly described by a Poissonian. The complete likelihood thus reads:
+
+.. math::
+   \mathcal{L}(\mu,\theta|D) = \frac{(\mu + b + \theta)^{n_{obs}} e^{\mu + b + \theta}}{n_{obs}!} exp \left( -\frac{\theta^2}{2\delta^2} \right)
+
+where :math:`n_{obs}` is the number of observed events in the signal region.
+A test statistic :math:`T` can now be constructed from a likelihood ratio test:
+
+.. math::
+   \begin{split}T = -2 \ln \frac{H_0}{H_1} = -2 \ln \left(\frac{\mathcal{L}(\mu=n_{\mathrm{signal}},\theta|D)}{sup\{\mathcal{L}(\mu,\theta|D) : \mu \in \mathbb{R}^+ \}}\right)\end{split}
+
+As the signal hypothesis in the numerator presents a special case of the
+likelihood in the denominator, the Neyman-Pearson lemma holds, and we 
+can assume :math:`T` to be distributed according to a :math:`\chi^2` distribution 
+with one degree of freedom. Because :math:`H_0` assumes the signal strength of 
+a particular model, :math:`T=0`  corresponds to a perfect match between that
+model's prediction and the measured data. :math:`T \gtrsim 1.96` corresponds to
+a 95\% confidence level upper limit. 
+While :math:`n_{\mathrm{obs}}`, :math:`b`  and :math:`\delta_{b}` are directly extracted from
+the data set 
+(coined *observedN*, *expectedBG* and *bgError*, respectively),
+:math:`n_{\mathrm{signal}}` is obtained from the calculation of the 
+theory predictions. A default 20\% systematical uncertainty is assumed for :math:`n_{\mathrm{signal}}`,
+resulting in :math:`\delta^2 = \delta_{b}^2 + \left(0.2 n_{\mathrm{signal}}\right)^2`.
+
+SModelS reports the :math:`\chi^2` (:math:`T` values) and likelihood *for each* |EMr|, 
+together with the observed and expected :math:`r` values.  
+We note that in the general case analyses may be correlated, so summing up the :math:`T`
+values will no longer follow a :math:`\chi^2_{(n)}`  distribution. 
+Therefore, for a conservative interpretation, only the result with the best expected limit should be used. 
+Moreover, for a statistically rigorous usage in scans, it is recommended to check that the analysis giving the 
+best expected limit does not wildly jump within 
+continuous regions of parameter space that give roughly the same phenomenology. 
+
+
 
 * **The** :math:`\chi^2` **for a given** |EMr| **is computed using the** `chi2  method <../../../documentation/build/html/tools.html#tools.statistics.chi2>`_
+* **The likelihood for a given** |EMr| **is computed using the** `likelihood  method <../../../documentation/build/html/tools.html#tools.statistics.likelihood>`_
 
 
 .. [*] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model

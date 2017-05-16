@@ -130,16 +130,10 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
 
                 newElement = element.Element([branch1, branch2])
                 newElement.weight = weightList*finalBR
-                allElements = [newElement]
-                # Perform compression
-                if doCompress or doInvisible:
-                    allElements += newElement.compressElement(doCompress,
-                                                                  doInvisible,
-                                                                  minmassgap)
-
-                for el in allElements:
-                    el.sortBranches()  #Make sure elements are sorted BEFORE adding them
-                    smsTopList.addElement(el)
+                newElement.sortBranches()  #Make sure elements are sorted BEFORE adding them
+                smsTopList.addElement(newElement)
+    
+    smsTopList.compressElements(doCompress, doInvisible, minmassgap)
     smsTopList._setElementIds()
 
     logger.debug("slhaDecomposer done in %.2f s." % (time.time() -t1 ) )
@@ -198,8 +192,7 @@ def _getDictionariesFromSLHA(slhafile):
     # Get mass list for all particles
     massDic = dict(res.blocks['MASS'].items())
     for pid in list ( massDic.keys() )[:]:
-        massDic[pid] *= GeV
-        massDic[pid] = abs(massDic[pid])
+        massDic[pid] = round(abs(massDic[pid]),1)*GeV
         if not -pid in massDic: massDic[-pid] = massDic[pid]    
  
     return brDic, massDic

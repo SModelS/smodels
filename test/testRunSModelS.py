@@ -18,7 +18,7 @@ from smodels.installation import installDirectory as iDir
 from smodels.tools import crashReport
 from smodels.tools.timeOut import NoTime
 from databaseLoader import database ## to make sure the db exists
-from runSModelS import main
+from smodels.tools.runSModelS import run
 import redirector
 import unum
 import time
@@ -36,6 +36,8 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
     :param ignore: List of keys to be ignored
     :return: True/False
     """
+    if type(obj1) in [ float, int ] and type ( obj2) in [ float, int ]:
+        obj1,obj2=float(obj1),float(obj2)
 
     if type(obj1) != type(obj2):
         logger.info("Data types differ (%s,%s)" %(type(obj1),type(obj2)))
@@ -95,8 +97,8 @@ class RunSModelSTest(unittest.TestCase):
         with redirector.stdout_redirected ( to = to ):
             out = join( iDir(), "test/unitTestOutput" )
             setLogLevel ( level )
-            main(filename, parameterFile=join ( iDir(), "test/%s" % inifile ),
-                 outputDir= out, db= None, timeout = timeout,
+            run(filename, parameterFile=join ( iDir(), "test/%s" % inifile ),
+                 outputDir= out, db= database, timeout = timeout,
                  development = development)
             sfile = join(iDir(),"test/unitTestOutput/%s.py" % basename(filename))
             return sfile
@@ -151,6 +153,8 @@ class RunSModelSTest(unittest.TestCase):
                     res['AnalysisID'],res['DataSetID']])
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                            ignore=ignoreFields)
+        if not equals:
+            print "output13.py and simplyGluino_default.py differ!"
         for i in [ './output13.py', './output13.pyc' ]:
             if os.path.exists ( i ):
                 continue

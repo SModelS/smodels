@@ -89,37 +89,7 @@ file, second, it supports parallelization of this input folder.
 
 **The usage of runSModelS is:**
 
-   runSModelS.py [-h] -f FILENAME [-p PARAMETERFILE] [-o OUTPUTDIR] [-d] [-t] [-V] [-c] [-v VERBOSE] [-T TIMEOUT]
-
-*arguments*:
-  -h, --help            show this help message and exit
-  -f FILENAME, --filename FILENAME
-                        name of SLHA or LHE input file or a directory path
-                        (required argument). If a directory is given, loop
-                        over all files in the directory
-  -p PARAMETERFILE, --parameterFile PARAMETERFILE
-                        name of parameter file, where most options are defined
-                        (optional argument). If not set, use all parameters
-                        from etc/parameters_default.ini
-  -o OUTPUTDIR, --outputDir OUTPUTDIR
-                        name of output directory (optional argument). The
-                        default folder is: ./results/
-  -d, --development     if set, SModelS will run in development mode and exit
-                        if any errors are found.
-  -t, --force_txt       force loading the text database
-  -V, --version         show program's version number and exit
-  -c, --run-crashreport
-                        parse crash report file and use its contents for a
-                        SModelS run. Supply the crash file simply via '--
-                        filename myfile.crash'
-  -v VERBOSE, --verbose VERBOSE
-                        sets the verbosity level (debug, info, warning,
-                        error). Default value is info.
-  -T TIMEOUT, --timeout TIMEOUT
-                        define a limit on the running time (in secs).If not
-                        set, run without a time limit. If a directory is given
-                        as input, the timeout will be applied for each
-                        individual file.
+.. include:: RunSModelS.rst
 
 
 A typical usage example is: ::
@@ -141,7 +111,7 @@ The basic options and parameters used by *runSModelS.py* are defined in the para
 An example parameter file, including all available parameters together
 with a short description, is stored in :download:`parameters.ini <images/parameters.ini>`.
 If no parameter file is specified, the default parameters stored in
-:download:`/etc/parameters_default.ini <images/parameters_default.ini>` are used.
+:download:`smodels/etc/parameters_default.ini <images/parameters_default.ini>` are used.
 Below we give more detailed information about each entry in the parameters file.
 
 
@@ -150,7 +120,7 @@ Below we give more detailed information about each entry in the parameters file.
 * *path*: relevant folder paths
 
   * **databasePath**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`.
-|
+
 * *options*: main options for turning SModelS features on or off
 
   * **checkInput** (True/False): if True, *runSModelS.py* will run the :ref:`file check tool <fileChecks>` on the input file and verify if the input contains all the necessary information.
@@ -160,7 +130,7 @@ Below we give more detailed information about each entry in the parameters file.
     (see :ref:`likelihood calculation <likelihoodCalc>`).
     If True, the likelihood and :math:`\chi^2` values are computed for the |EMrs|.
   * **testCoverage** (True/False): set to True to run the :ref:`coverage <topCoverage>` tool.
-|
+
 * *parameters*: basic parameter values for running SModelS
 
   * **sigmacut** (float): minimum value for an |element| weight (in fb). :ref:`Elements <element>` 
@@ -174,7 +144,7 @@ Below we give more detailed information about each entry in the parameters file.
   * **ncpus** (int): number of CPUs. When processing multiple SLHA/LHE files,
     SModelS can run in a parallelized fashion, splitting up the input files in equal chunks.
     *ncpus = -1* uses the total number of CPU cores of the machine.
-|
+
 * *database*: allows for selection of a subset of :ref:`experimental results <ExpResult>` from the |database|
 
   * **analyses** (list of results): set to *all* to use all available results. If a list of :ref:`experimental analyses <ExpResult>`
@@ -189,12 +159,12 @@ Below we give more detailed information about each entry in the parameters file.
   * **dataselector** (list of datasets): set to all to use all available |datasets|. If dataselector = upperLimit (efficiencyMap), only |ULrs| (|EMrs|) will be used. Furthermore, if
     a list of signal regions (|datasets|) is given, only the |results| containing these datasets will be used. For instance, if dataselector = SRA mCT150,SRA mCT200, only
     these signal regions will be used.
-|
+
 * *printer*: main options for the |output| format
 
   * **outputType** (list of outputs): use to list all the output formats to be generated.
     Available output formats are: summary, stdout, log, python, xml.
-|
+
 * *stdout-printer*: options for the stdout or log printer
 
   * **printDatabase** (True/False): set to True to print the list of selected |results| to stdout.
@@ -206,16 +176,16 @@ Below we give more detailed information about each entry in the parameters file.
   * **addCoverageID** (True/False): set to True to print the list of element IDs contributing to each missing topology (see :ref:`coverage <topCoverage>`).
     *Only used if testCoverage = True*. This option should be used along with *addElementInfo = True* so the user can precisely identify
     which elements were classified as missing.
-|
+
 * *summary-printer*: options for the summary printer
 
   * **expandedSummary** (True/False): set True to include in the summary output all applicable |results|, False for only the strongest one.
-|
+
 * *python-printer*: options for the Python printer
 
   * **addElementList** (True/False): set True to include in the Python output all information about all |elements| generated in the |decomposition|. If set to True the
     output file can be quite large.
-|
+
 * *xml-printer*: options for the xml printer
 
   * **addElementList** (True/False): set True to include in the xml output all information about all |elements| generated in the |decomposition|. If set to True the

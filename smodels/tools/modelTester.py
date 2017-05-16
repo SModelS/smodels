@@ -25,7 +25,7 @@ try:
     from ConfigParser import SafeConfigParser
 except ImportError as e:
     from configparser import ConfigParser
-from smodels.tools.physicsUnits import GeV, fb
+from smodels.tools.physicsUnits import GeV, fb, TeV
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.experiment.databaseObj import Database, ExpResultList
 from smodels.tools.smodelsLogging import logger
@@ -130,7 +130,11 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
 
     if parser.getboolean("options", "testCoverage"):
         """ Testing coverage of model point, add results to the output file """
-        uncovered = coverage.Uncovered(smstoplist)
+        if  parser.has_option("options","coverageSqrts"):
+            sqrts = parser.getfloat("options", "coverageSqrts")*TeV
+        else:
+            sqrts = None
+        uncovered = coverage.Uncovered(smstoplist,sqrts=sqrts)
         masterPrinter.addObj(uncovered)
     
     return masterPrinter.flush()
@@ -268,12 +272,25 @@ def loadDatabase(parser, db):
         
     """
     try:
-        databasePath = parser.get("path", "databasePath")
+        dp = parser.get ( "path", "databasePath" )
+        logger.error ( "``[path] databasePath'' in ini file is deprecated; " \
+           "use ``[database] path'' instead. (See e.g. smodels/etc/parameters_default.ini)" )
+        parser.set ( "database", "path", dp )
+    except Exception as e:
+        ## path.databasePath not set. This is good.
+        pass
+    try:
         database = db
+        # logger.error ( "database=db: %s" % database )
         if database in [ None, True ]:
+            databasePath = parser.get( "database", "path" )
+            discard_zeroes = parser.getboolean( "database", "discardZeroes" )
             force_load=None
             if database == True: force_load="txt"
-            database = Database( databasePath, force_load=force_load)
+            if os.path.isfile ( databasePath ):
+                force_load="pcl"
+            database = Database( databasePath, force_load=force_load, \
+                                 discard_zeroes = discard_zeroes )
         databaseVersion = database.databaseVersion
     except DatabaseNotFoundException:
         logger.error("Database not found in %s" % os.path.realpath(databasePath))

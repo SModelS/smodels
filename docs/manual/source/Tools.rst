@@ -11,12 +11,11 @@
 .. |constraints| replace:: :ref:`constraints <ULconstraint>`
 .. |intermediate states| replace:: :ref:`intermediate states <odd states>`
 .. |final states| replace:: :ref:`final states <final states>`
-.. |database| replace:: :doc:`database <Database>`
+.. |database| replace:: :ref:`database <Database>`
 .. |bracket notation| replace:: :ref:`bracket notation <bracketNotation>`
 .. |ExpRes| replace:: :ref:`Experimental Result<ExpResult>`
 .. |ExpRess| replace:: :ref:`Experimental Results<ExpResult>`
 .. |Database| replace:: :ref:`Database <Database>`
-.. |database| replace:: :ref:`database <Database>`
 .. |Dataset| replace:: :ref:`DataSet<DataSet>`
 .. |Datasets| replace:: :ref:`DataSets<DataSet>`
 .. |results| replace:: :ref:`experimental results <ExpResult>`
@@ -24,19 +23,18 @@
 .. |branch| replace:: :ref:`branch <branch>`
 .. |EMrs| replace:: :ref:`EM-type results <EMtype>`
 .. |ULrs| replace:: :ref:`UL-type results <ULtype>`
-.. |br| raw:: html
-   <br />
+
+.. _smodelsTools:
 
 SModelS Tools
 =============
 
 Inside SModelS there is a number of tools that may be convenient for the user:
 
-* a :ref:`cross section calculator <xsecCalc>` based on `Pythia6 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_  and 
+* a :ref:`cross section calculator <xsecCalc>` based on `Pythia8 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_ (or `Pythia6 <http://pythia6.hepforge.org>`_) and 
   `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_,
 * :ref:`SLHA and LHE file checkers <fileChecks>` to check your input files for completeness and sanity,
-* a :ref:`database Browser <databaseBrowser>` to provide easy access to the |database| of experimental results,
-* a module for identifying :ref:`missing topologies <topCoverage>`.
+* a :ref:`database Browser <databaseBrowser>` to provide easy access to the |database| of experimental results.
 
 .. _xsecCalc:
 
@@ -46,59 +44,18 @@ Cross Section Calculator
 This tool computes LHC production cross sections for *MSSM particles*
 and writes them out in :ref:`SLHA convention <xsecblock>`. This can in particular be 
 convenient for adding cross sections to SLHA input files, see :doc:`Basic Input <BasicInput>`. 
-The calculation is done at LO with `Pythia6.4 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_ ; K-factors 
+The calculation is done at LO with `Pythia8 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_ or `Pythia6.4 <http://pythia6.hepforge.org>`_ ; K-factors 
 for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_ .
 
 
 **The usage of the cross section calculator is:**
 
-   smodelsTools.py xseccomputer [-h] -f FILENAME [-s SQRTS [SQRTS ...]] [-e NEVENTS] [-v VERBOSITY] [-c NCPUS] [-p] [-q] [-k] [-n] [-N] [-O]
+.. include:: XSecComputer.rst
 
-*arguments*:
-  -h, --help            show this help message and exit
-  -s SQRTS, --sqrts SQRTS
-                        sqrt(s) TeV. Can supply more than one value. Default is both 8 and 13.
-  -e NEVENTS, --nevents NEVENTS
-                        number of events to be simulated.
-  -c NCPUS, --ncpus NCPUS
-                        number of cores to be used simultaneously. -1 means  'all'.
-  -p, --tofile          write cross sections to file
-  -q, --query           only query if there are cross sections in the file
-  -k, --keep            do not unlink temporary directory
-  -n, --NLO             compute at the NLO level (default is LO)
-  -N, --NLL             compute at the NLO+NLL level (takes precedence over
-                        NLO, default is LO)
-  -O, --LOfromSLHA      use LO cross sections from file to compute the NLO or
-                        NLL cross sections
-  -f FILENAME, --filename FILENAME
-                        SLHA file to compute cross sections for. If a
-                        directory is given, compute cross sections for all
-                        files in directory.
-  -v VERBOSITY, --verbosity VERBOSITY
-                        Verbosity (debug, info, warning, error)
-                        
 
-*In some more detail*:
-  -s SQRTS, --sqrts SQRTS 
-                        (int) an integer (or integers) with the value (in TeV) of the LHC center-of-mass energy for computing the cross sections
-  -e NEVENTS, --nevents NEVENTS 
-                        (int) the number of Monte Carlo events when running Pythia
-  -c NCPUS, --ncpus NCPUS 
-                        (int) number of cpu cores to be used.
-                        It is only used when cross sections are computed for multiple SLHA files.
-  -p, --tofile          if set, the cross sections will be written back to the file. 
-    If in the input file already contains cross sections, only the non-overlapping ones will be written. 
-    If not set, the cross sections will be written to the screen.
-  -q, --query           if set, will only check if the input file already contains cross sections.  
-  -k, --keep            if set, keep the temporary directory containing the Pythia run output. This option is only relevant when checking for errors when running Pythia.
-  -n, --NLO             if set, use Pythia and NLLfast to compute NLO cross sections. Note that since NLLfast only contains results for production of squarks and gluinos, only these cross sections will be generated
-  -N, --NLL             if set, use Pythia and NLLfast to compute NLO+NLL cross sections. 
-                        Note that since NLLfast only contains results for production of squarks and gluinos, only these cross sections will be generated
-  -O, --LOfromSLHA      if set, SModelS will read the LO cross sections from the input file and use NLLfast to compute the NLO or NLO+NLL cross sections for squarks and gluinos
-  -f FILENAME, --filename FILENAME
-                        name of input SLHA file or a folder containing SLHA files
-
-Further Pythia parameters are defined in :download:`etc/pythia.card </images/pythia.card>`.
+Further Pythia parameters are defined in :download:`smodels/etc/pythia8.cfg </images/pythia8.cfg>` (for Pythia 8)
+or :download:`smodels/etc/pythia.card </images/pythia.card>` (for Pythia 6).
+.
 
 A typical
 usage example is: ::
@@ -144,13 +101,7 @@ For a LHE input file only very basic checks are performed, namely that
 
 **The usage of the LHE checker is simply:**
 
-   smodelsTools.py lhechecker [-h] -f FILENAME
-
-*arguments*:
-
-  -h, --help                        show this help message and exit  
-  -f FILENAME, --filename FILENAME  name of input LHE file
-  
+.. include:: LheChecker.rst
 
 A typical
 usage example is: ::
@@ -204,23 +155,7 @@ is considered as a displaced vertex.
 
 **The usage of the SLHA checker is:**
 
-smodelsTools.py slhachecker [-h] [-xS] [-lsp] [-longlived] [-m DISPLACEMENT] [-s SIGMACUT] [-illegal] [-dB] -f FILENAME
-
-*arguments*:
-  -h, --help            show this help message and exit
-  -xS, --xsec           turn off the check for xsection blocks
-  -lsp, --lsp           turn off the check for charged lsp
-  -longlived, --longlived
-                        turn off the check for stable charged particles and
-                        visible displaced vertices
-  -m DISPLACEMENT, --displacement DISPLACEMENT
-                        give maximum displacement of secondary vertex in m
-  -s SIGMACUT, --sigmacut SIGMACUT
-                        give sigmacut in fb
-  -illegal, --illegal   turn on check for kinematically forbidden decays
-  -dB, --decayBlocks    turn off the check for missing decay blocks
-  -f FILENAME, --filename FILENAME
-                        name of input SLHA file
+.. include:: SlhaChecker.rst
 
 
 A typical
@@ -243,14 +178,9 @@ or |Datasets| satisfying some user-defined conditions as well as to access the m
 
 **The usage of the browser interface is:**
 
-smodelsTools.py database-browser [-h] -p PATH_TO_DATABASE [-t]
 
-*arguments*:
-  -h, --help            show this help message and exit
-  -p PATH_TO_DATABASE, --path_to_database PATH_TO_DATABASE
-                        path to SModelS database
-  -t, --text            load text database, dont even search for binary
-                        database file
+.. include:: DatabaseBrowser.rst
+
 
 A typical usage example is: ::
 
@@ -335,55 +265,3 @@ can be found in :ref:`Howto's <Examples>`.
 * **The Database browser tool is implemented by the**  `Browser class <../../../documentation/build/html/tools.html#tools.databaseBrowser.Browser>`_
 
 
-.. _topCoverage:
-
-Topology Coverage
------------------
-
-Unlike the :ref:`database browser <databaseBrowser>`, the :ref:`file checks <fileChecks>` and the :ref:`cross section calculator <xsecCalc>`, 
-the topology coverage tool can not be independently accessed.
-It requires the output from the SMS |decomposition| and |theory predictions|.
-Given the |decomposition| output (list of |elements|), as well as the |database|
-information, it finds and classifies the |elements| which are
-not tested by any of the |results| in the |database|.
-These elements are grouped into the following classes:
-
-* *missingTopos*: |elements| which are not tested by any of the |results| in the |database| (independent of the element mass).
-  The missing topologies are further classified as:
-   * *longCascade*: |elements| with long cascade decays (more than one intermediate particle in one of the |branches|);
-   * *asymmetricBranches*: |elements| where the first |branch| differs from the second |branch| (but that are not considered as long cascade decays).
-
-* *outsideGrid*: |elements| which could be tested by one or more experimental result, but are not constrained because the mass array is outside the mass grid;
-
-In order to classify the |elements|, the tool loops over all the |elements| found in the
-|decomposition| and checks if they are tested by one or more |results| in the |database| [*]_.
-All the |elements| which are not tested by any of the |results| in the |database| (independent of their masses)
-are added to the *missingTopos* class.
-The remaining |elements| which do appear in one or more of the |results|, but have
-not been tested because their masses fall outside the efficiency or upper limit grids (see |EMrs| and |ULrs|),
-are added to the *outsideGrid* class.
-
-
-Usually the list of  *missing* or *outsideGrid* elements is considerably long.
-Hence, to compress this list, all |elements| differing only by their
-masses (with the same |final states|) or electric charges are combined. Moreover, by default, electrons and muons
-are combined to light leptons (denoted "l"): gluons and light quarks are combined into jets.
-The *missing* topologies are then further classified (if applicable) into *longCascade* or *asymmetricBranches* topologies.
-
-
-The topologies for each of the four categories are then grouped according to the final state (for the *missingTopos* and
-*outsideGrid* classes) or according to the PDG ids of the initially produced motherparticles (for the *longCascade* and
-*asymmetricBranches* classes). 
-We note that for the latter the |elements| deriving from different mother particles, but with the same |final states| and mass configuration cannot be distinguished, and are therefore combined in this grouping.
-The full list of mother PDG id pairs can be accessed in the python printout or the comment of the text printout.
-
-
-The topology coverage tool is normally called from within SModelS (e.g. when running :ref:`runSModelS.py <runSModelS>`) by setting **testCoverage=True**
-in the :ref:`parameters file <parameterFile>`.
-In the output, contributions in each category are ordered by cross section. 
-By default only the ones with the ten largest cross sections are shown.
-
-* **The topology coverage tool is implemented by the** `Uncovered class <../../../documentation/build/html/tools.html#tools.coverage.Uncovered>`_ 
-
-
-.. [*] If :ref:`mass <massComp>` or :ref:`invisible compression <invComp>` are turned on, elements which can be :ref:`compressed <elementComp>` are not considered, to avoid double counting.
