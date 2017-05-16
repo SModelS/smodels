@@ -163,7 +163,7 @@ Below we give more detailed information about each entry in the parameters file.
 * *printer*: main options for the |output| format
 
   * **outputType** (list of outputs): use to list all the output formats to be generated.
-    Available output formats are: summary, stdout, log, python, xml.
+    Available output formats are: summary, stdout, log, python, xml, slha.
 
 * *stdout-printer*: options for the stdout or log printer
 
@@ -222,6 +222,10 @@ The following formats are available:
    |theory predictions| and the :ref:`missing topologies <topCoverage>`. The output can be significantly long, if
    all options are set to True. Due to its broad usage, the xml output can be easily converted to the
    user's preferred format.
+   
+ * a :ref:`SLHA file <slhaOut>` containing information about the 
+   |theory predictions| and the :ref:`missing topologies <topCoverage>`. The output follows a SLHA-type
+   format and contains a summary of the most constraining results and the missed topologies.
 
 A detailed explanation of the information contained in each type of output is given
 in :ref:`SModels Output <outputDescription>`.
@@ -266,14 +270,14 @@ Below we go step-by-step through this example code:
   `lheDecomposer.decompose <../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose>`_ method. The **doCompress** and **doInvisible** options turn the |mass compression| and |invisible compression| on/off.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 39-40
+   :lines: 39-43
 
 * *Access basic information* from decomposition, using the
   `topology list <../../../documentation/build/html/theory.html#theory.topology.TopologyList>`_
   and `topology  <../../../documentation/build/html/theory.html#theory.topology.Topology>`_ objects:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 43-55
+   :lines: 46-58
 
 *output:*
 
@@ -285,7 +289,7 @@ Below we go step-by-step through this example code:
   Here, all results are used:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 59
+   :lines: 62
 
 Alternatively, the `getExpResults  <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database.getExpResults>`_ method
 can take as arguments specific results to be loaded.
@@ -294,7 +298,7 @@ can take as arguments specific results to be loaded.
   Below we show how to count the number of |ULrs| and |EMrs| loaded:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 63-70
+   :lines: 66-73
 
 *output:*
 
@@ -308,13 +312,13 @@ can take as arguments specific results to be loaded.
   (for each |expres|):
 
 .. literalinclude:: /examples/Example.py
-   :lines: 77-78
+   :lines: 80-81
 
 * *Print the results*. For each |expres|, loop over the corresponding |theory predictions|
   and print the relevant information:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 81-93
+   :lines: 84-96
 
 *output:*
 
@@ -325,7 +329,7 @@ can take as arguments specific results to be loaded.
   be compared to the |theory prediction| to decide whether a model is excluded or not:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 96-97
+   :lines: 99-100
 
 *output:*
 
@@ -334,10 +338,11 @@ can take as arguments specific results to be loaded.
 
 * *Compute the r-value*, i.e. the ratio |theory prediction|/upper limit.
   A value of :math:`r \geq 1` means that an experimental result excludes the input model.
-  Also determine the most constraining result:
+  For |EMrs| also compute the :math:`\chi^2` and :ref:`likelihood <likelihoodCalc>`.
+  Determine the most constraining result:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 100-104
+   :lines: 103-111
 
 *output:*
 
@@ -348,13 +353,26 @@ can take as arguments specific results to be loaded.
   determine if the model has been excluded or not by the selected |express|:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 107-111
+   :lines: 114-118
 
 
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 411-412
+   :lines: 418-419
+   
+   
+* *Identify missing topologies*. Using the output from decomposition, identify
+  the :ref:`missing topologies <topCoverage>` and print some basic information:
+
+.. literalinclude:: /examples/Example.py
+   :lines: 123-142
+
+
+*output:*
+
+.. literalinclude:: /images/ExampleOutput.txt
+   :lines: 421-432,440-445   
 
 
 It is worth noting that SModelS does not include any statistical treatment for
