@@ -233,7 +233,7 @@ class Browser(object):
         for dataset in expres.datasets:
             if dataset.dataInfo.dataId != datasetID:
                 continue
-            return dataset.getUpperLimit()
+            return dataset.getSRUpperLimit()
 
         logger.warning ( "Could not find dataset %s ." % (datasetID))
         return None
