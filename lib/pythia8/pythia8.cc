@@ -65,7 +65,7 @@ void help( const char * name )
   cout << "        -n <nevents>:  number of events to simulate [10000]." << endl;
   cout << "        -s <sqrts>:    center-of mass energy, in TeV [13]." << endl;
   cout << "        -f <slhafile>: slhafile [test.slha]." << endl;
-  cout << "        -c <cfgfile>: the pythia8 config file [./pythia8.cfg]." << endl;
+  cout << "        -c <cfgfile>: the pythia8 config file [../../smodels/etc/pythia8.cfg]." << endl;
   cout << "        -l <lhefile>: the lhe output file [./events.lhe]." << endl;
   cout << "        -x <xmldir>: the pythia8 xmldoc dir [../xmldoc]." << endl;
   exit( 0 );
@@ -75,7 +75,7 @@ int main( int argc, const char * argv[] ) {
   int nevents = 10000;
   float sqrts = 13;
   string slhafile = "test.slha";
-  string cfgfile = "./pythia8.cfg";
+  string cfgfile = "../../smodels/etc/pythia8.cfg";
   string lhefile = "./events.lhe";
   string xmlDir = "../xmldoc";
   for ( int i=1; i!=argc ; ++i )
