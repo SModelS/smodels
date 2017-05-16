@@ -61,7 +61,7 @@ Although the details of the theoretical prediction computation differ depending 
 of |ExpRes| (|ULrs| or |EMrs|), the overall procedure is common for both type of results. Below we schematically
 show the main steps of the theory prediction calculation:
 
-.. _theoPredScheme
+.. _theoPredScheme:
 
 .. image:: images/theoryPredScheme.png
    :width: 90% 

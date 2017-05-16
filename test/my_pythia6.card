@@ -1,0 +1,19 @@
+! Pythia6 template configuration used when running smodels, for
+! the computation of the LO cross sections. 
+IMSS(1)=11     ! Spectrum from external SLHA file
+MSTP(161)=66
+MSTP(162)=67
+MSTP(163)=68
+IMSS(21)=61    ! LUN number for SLHA File
+IMSS(22)=61
+MSTP(41)=0     ! No decays
+MSTP(42)=0     ! no mass smearing (narrow width approximation)
+MSTP(81)=0     ! multiple parton interactions 1 is Pythia default
+MSTP(61)=0     ! No ISR
+MSTP(71)=0     ! No FSR
+MSTP(111)=0    ! No hadronization
+MSTJ(1)=0      ! No fragmentation
+MSEL=39
+end
+NEVENTS,0,0,SQRTSD0
+end

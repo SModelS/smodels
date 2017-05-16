@@ -12,6 +12,9 @@
 from __future__ import print_function
 import sys
 sys.path.insert(0,"../")
+from smodels.tools.colors import colors
+colors.on = True
+
 v=sys.version_info
 if v[0] > 2 or ( v[0]==2 and v[1] > 6 ):
     import unittest
@@ -33,13 +36,18 @@ def verbose_run():
     for series in alltests:
         for test in series:
             for t in test:
-                print ( "[runCompleteTestSuite]",t.id() )
+                print ( "[#%3d] %s ... " % ( n_tests, t.id() ), end="" )
+                sys.stdout.flush()
                 n_tests += 1
                 try:
                     a=t.debug()
                 except Exception as e:
                     n_failed += 1
-                    print ( "[runCompleteTestSuite] FAILED! %s" % str(e) )
+                    print ( "%s FAILED: %s%s" % \
+                            ( colors.error, str(e), colors.reset ) )
+                    continue
+                print ( "%sok%s" % ( colors.info, colors.reset ) ) 
+
                 #a=t.run() ## python3
                 # print ( "a=",a )
     print( "[runCompleteTestSuite] %d/%d tests failed." % ( n_failed, n_tests ))
