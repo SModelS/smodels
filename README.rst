@@ -24,11 +24,11 @@ Running SModelS
 SModelS provides a command-line tool (runSModelS.py) for the basic functionalities,
 which can be executed as:
 
-./runSModelS.py -p <parameter file> -f <input file or directory> -o <output directory>
+``./runSModelS.py -p <parameter file> -f <input file or directory> -o <output directory>``
 
 For help instructions:
 
-./runSModelS.py -h
+``./runSModelS.py -h``
 
 An example file on how to call the SModelS libraries from your own
 Python code can be found in Example.py.
@@ -50,4 +50,4 @@ For your convenience, the relevant
 citations are provided in bibtex format in references.bib.
 
 For citing the experimental analyses in the database, you can use
-``smodels-database/database.bib``
+``smodels-database/database.bib``.
