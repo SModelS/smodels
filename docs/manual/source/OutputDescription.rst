@@ -308,5 +308,60 @@ we simply show below an excerpt of the xml file to illustrate the output format:
 .. literalinclude:: /images/gluino_squarks.slha.xml
    :language: xml
    :lines: 1-2,85,300-328,45077,45078-45104
+   
+   
+.. _slhaOut:
+
+SLHA Output
+-----------
+
+An SLHA-type output format is also available containing a summary of
+the |theory predictions| and  :ref:`missing topologies <topCoverage>`.  
+The file contains the SLHA-type blocks: *SModelS_Settings*, *SModelS_Exclusion*,  
+*SModelS_Missing_Topos*, *SModelS_Outside_Grid*,  *SModelS_Long_Cascade* and *SModelS_Asymmetric_Branches*.
+Below we give a description of each block together with a sample output.
+
+* information about the main input parameters:
+
+.. literalinclude:: /images/gluino_squarks.slha.smodelsslha
+   :lines: 1-7
+
+* information about the status of the input model: excluded (1), not excluded (0) or not tested (-1):
+
+.. literalinclude:: /images/gluino_squarks.slha.smodelsslha
+   :lines: 9-10
+
+* followed by the list of experimental results. If the model is excluded, all results with :math:`r`-value greater
+  than one are shown. If the point is not excluded, only the result with the highest :math:`r`-value is displayed. 
+  For each experimental result, the :ref:`Txname <TxName>`, the :math:`r`-value,
+  the :ref:`condition violation <ULconditions>` and the experimental result ID are shown.
+  If **computeStatistics** = True, the :math:`\chi^2` and likelihood values 
+  for |EMrs| are also printed:
+
+.. literalinclude:: /images/gluino_squarks.slha.smodelsslha
+   :lines: 11-18
+
+* a list of missing topologies (up to 10) and their weights (if **testCoverage** = True):
+
+.. literalinclude:: /images/gluino_squarks.slha.smodelsslha
+   :lines: 20-23
+   
+* a list of topologies which are outside the |express| grid (if **testCoverage** = True):
+
+.. literalinclude:: /images/gluino_squarks.slha.smodelsslha
+   :lines: 32-34  
+   
+* a list of topologies with long cascade decays (if **testCoverage** = True):
+
+.. literalinclude:: /images/gluino_squarks.slha.smodelsslha
+   :lines: 36-38 
+  
+* a list of topologies with asymmetric branch decays (if **testCoverage** = True):
+
+.. literalinclude:: /images/gluino_squarks.slha.smodelsslha
+   :lines: 48-51
+
+   
+   
 
 .. [*] Some of the output may change depending on the database version used.
