@@ -1,4 +1,4 @@
-Release v1.1.1, Thu 11 May 2017
+Release v1.1.1, Thu 18 May 2017
 =======================================================
 
   * pythia8 support
@@ -7,6 +7,7 @@ Release v1.1.1, Thu 11 May 2017
   * automated SLHA and LHE file detection
   * smodelsTools.py now also supports toolbox
   * C++ interface
+  * Fix and improvements for missing topologies
 
 Release v1.1.0patch1, Tue 21 Feb 2017
 =======================================================
