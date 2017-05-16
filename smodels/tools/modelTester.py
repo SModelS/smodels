@@ -274,7 +274,7 @@ def loadDatabase(parser, db):
     try:
         dp = parser.get ( "path", "databasePath" )
         logger.error ( "``[path] databasePath'' in ini file is deprecated; " \
-           "use ``[database] path'' instead. (See e.g. etc/parameters_default.ini)" )
+           "use ``[database] path'' instead. (See e.g. smodels/etc/parameters_default.ini)" )
         parser.set ( "database", "path", dp )
     except Exception as e:
         ## path.databasePath not set. This is good.
