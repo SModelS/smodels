@@ -259,14 +259,14 @@ Below we describe in detail the dictionary keys and values contained in the Pyth
   likelihood values (if **computeStatistics** = True) are also included.
   
 .. literalinclude:: /images/gluino_squarks.slha.py
-   :lines: 5-11
+   :lines: 5-9
 
 * a list of missing topologies (if **testCoverage** = True), stored under the *Missed Topologies* key.
   For each list entry, the |element| cross section (weight), the |element| IDs contributing to the topology and the |element|
   description in :ref:`bracket notation <bracketNotation>` is included.
 
 .. literalinclude:: /images/gluino_squarks.slha.py
-   :lines: 12-13
+   :lines: 10-11
    
 * a list of topologies which are outside the  |express| grid (if **testCoverage** = True),
   stored under the *Outside Grid* key.
@@ -274,7 +274,7 @@ Below we describe in detail the dictionary keys and values contained in the Pyth
   and the |element| description in :ref:`bracket notation <bracketNotation>` is included.
 
 .. literalinclude:: /images/gluino_squarks.slha.py
-   :lines: 14  
+   :lines: 12  
    
 * a list of topologies with long cascade decays (if **testCoverage** = True),
   stored under the *Long Cascades* key.
@@ -282,7 +282,7 @@ Below we describe in detail the dictionary keys and values contained in the Pyth
   The mother PIDs are given in a nested list, as more than one pair might contribute to the same class of |elements|.
 
 .. literalinclude:: /images/gluino_squarks.slha.py
-   :lines: 15  
+   :lines: 13  
   
 * a list of topologies with asymmetric branch decays (if **testCoverage** = True),
   stored under the *Asymmetric Branches* key.
@@ -290,7 +290,7 @@ Below we describe in detail the dictionary keys and values contained in the Pyth
   The mother PIDs are given in a nested list, as more than one pair might contribute to the same class of |elements|.
 
 .. literalinclude:: /images/gluino_squarks.slha.py
-   :lines: 16
+   :lines: 14
 
 
 .. _xmlOut:
