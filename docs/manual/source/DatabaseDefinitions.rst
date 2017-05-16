@@ -48,8 +48,8 @@ Therefore, for both |UL| and |EM| constraints, the database obeys the following 
         a single |Dataset| corresponds to one signal region of the experimental
         note or publication [*]_. In case of |ULrs| there is a single |Dataset|, usually corresponding to the best signal
         region (for more details see |Dataset|). For |EMrs|, there is one |Dataset| for each signal region.
-        Each |Dataset| contains the Upper Limit maps for :ref:`Upper Limit results <ULtype>` *or* 
-        the Efficiency maps for :ref:`Efficiency Map results <EMtype>`. 
+        Each |Dataset| contains the Upper Limit maps for :ref:`Upper Limit results <ULtype>` *or* the Efficiency maps for :ref:`Efficiency Map results <EMtype>`. 
+
             * Upper Limit map: contains the upper limit constraints for |ULrs|. Each map refers to a single 
               simplified model (or more precisely to a single |element| or sum of |elements|).
             * Efficiency map: contains the efficiencies for |EMrs|. Each map refers to a single 

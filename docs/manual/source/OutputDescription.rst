@@ -162,7 +162,7 @@ The output is printed to the file <input file>.smodels and stored in the output 
 
 Below we describe in detail the blocks contained in the summary output:
 
-* information about the basic input parameters and the status of the run::
+* information about the basic input parameters and the status of the run:
 
 .. literalinclude:: /images/summaryoutput.txt
    :lines: 1-8
