@@ -15,7 +15,7 @@ energy, for which a large variety of SMS results from ATLAS and CMS are
 available. 
 
 
-For instructions on how to install SModelS, see INSTALLATION.
+For instructions on how to install SModelS, see INSTALLATION.rst.
 
 
 Running SModelS
@@ -50,4 +50,4 @@ For your convenience, the relevant
 citations are provided in bibtex format in references.bib.
 
 For citing the experimental analyses in the database, you can use
-smodels-database/database.bib
+``smodels-database/database.bib``

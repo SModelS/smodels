@@ -44,7 +44,7 @@ def dataFiles ():
     List all config files and binaries
 
     """
-    ret = [("", [ "README.rst", "INSTALLATION", "COPYING" ])]
+    ret = [("", [ "README.rst", "INSTALLATION.rst", "COPYING" ])]
     ret.append ( ("smodels/", [ "smodels/version" ]) )
     # ret.append ( ("share", [ "share/shareme" ]) )
     for directory in ["inputFiles/slha/", "inputFiles/lhe/", "smodels/share/",
