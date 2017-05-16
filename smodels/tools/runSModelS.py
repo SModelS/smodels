@@ -20,7 +20,8 @@ def main():
     outputDir = "./results/"
 
     """ Get the name of input SLHA file and parameter file """
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser( description=
+            "Run SModelS over SLHA/LHE input files." )
     ap.add_argument('-f', '--filename', 
             help='name of SLHA or LHE input file or a directory path (required argument). '
             'If a directory is given, loop over all files in the directory', required=True)
