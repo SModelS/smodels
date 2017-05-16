@@ -386,11 +386,11 @@ def create():
     isDummy()
 
 if __name__ == "__main__":
+    create()
     # clearGlobalInfos ( "%s/smodels-database/" % dirname )
     # fetchDatabase()
     # cleanDatabase()
     # splitDatabase()
     # cleanDatabase()
     # clearGlobalInfo ( "./globalInfo.txt" )
-    runExample()
-    # create()
+    #runExample()
