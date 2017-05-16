@@ -40,7 +40,7 @@ def dataFiles ():
     List all config files and binaries
 
     """
-    ret = [("", [ "README", "INSTALLATION", "COPYING" ])]
+    ret = [("", [ "README.rst", "INSTALLATION", "COPYING" ])]
     ret.append ( ("smodels/", [ "smodels/version" ]) )
     # ret.append ( ("share", [ "share/shareme" ]) )
     for directory in ["inputFiles/slha/", "inputFiles/lhe/", "smodels/share/",
@@ -96,7 +96,7 @@ setup(
               'smodels.experiment'],
     include_package_data = True,
     test_suite='test',
-    long_description=read('README'),
+    long_description=read('README.rst'),
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Topic :: Scientific/Engineering :: Physics",
