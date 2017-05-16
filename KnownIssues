@@ -1,9 +1,9 @@
-Known Issues, v1.1.0
+Known Issues, v1.1.0patch1
 =======================================================
 
- * In case of a very heavy ~uR, the cross section computations (done by pythia6) 
-   for the other squarks can be quite wrong, since the phase space is initialized 
-   for all squarks using the ~uR mass. 
+ * In case of a very heavy ~uR, the Pythia 6 cross sections for the other 
+   squarks can be quite wrong, since the phase space is initialized for all 
+   squarks using the ~uR mass. 
 
  * Memory consumption can be quite high, especially in multi-core mode.
    (There is no memory sharing between the processes). 

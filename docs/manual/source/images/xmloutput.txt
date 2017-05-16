@@ -54,6 +54,11 @@
                 <mother_PIDs>1000001</mother_PIDs>
                 <mother_PIDs>1000002</mother_PIDs>
             </mother_PIDs_List>
+                <mother_PIDs_List>
+                    <mother_PIDs>1000002</mother_PIDs>
+                    <mother_PIDs>1000003</mother_PIDs>
+                </mother_PIDs_List>
+            </mother_PIDs_List>
             <sqrts_TeV>8.0</sqrts_TeV>
             <weight_fb>3.56407840477</weight_fb>
         </Asymmetric_Branches>
