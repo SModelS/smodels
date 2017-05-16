@@ -40,8 +40,8 @@ def dataFiles ():
     List all config files and binaries
 
     """
-    ret = [("", [ "README", "COPYING" ])]
-    ret.append ( ("smodels/", [ "smodels/version" ]) )
+    ret = [("", [ "README", "INSTALLATION", "COPYING" ])]
+    ret.append ( ("smodels/", [ "smodels/version", "smodels/share/BANNER" ]) )
     # ret.append ( ("share", [ "share/shareme" ]) )
     for directory in ["inputFiles/slha/", "inputFiles/lhe/", "smodels/share/",
             "lib/nllfast/nllfast-1.2/", "lib/nllfast/nllfast-2.1/", 

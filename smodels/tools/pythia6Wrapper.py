@@ -343,7 +343,7 @@ class Pythia6Wrapper(WrapperBase):
         slhaFile = "/inputFiles/slha/gluino_squarks.slha"
         slhaPath = installation.installDirectory() + slhaFile
         try:
-            output = self.run(slhaPath, "<install>/etc/pythia_test.card" )
+            output = self.run(slhaPath, "<install>/smodels/share/pythia_test.card" )
             output = output.split("\n")
             if output[-1].find("The following floating-point") > -1:
                 output.pop()
