@@ -31,7 +31,7 @@ class Pythia6Wrapper(WrapperBase):
 
     """
     def __init__(self,
-                 configFile="<install>/etc/pythia.card",
+                 configFile="<install>/smodels/etc/pythia.card",
                  executablePath="<install>/lib/pythia6/pythia_lhe",
                  srcPath="<install>/lib/pythia6/"):
         """

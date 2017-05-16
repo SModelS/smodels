@@ -111,7 +111,7 @@ The basic options and parameters used by *runSModelS.py* are defined in the para
 An example parameter file, including all available parameters together
 with a short description, is stored in :download:`parameters.ini <images/parameters.ini>`.
 If no parameter file is specified, the default parameters stored in
-:download:`/etc/parameters_default.ini <images/parameters_default.ini>` are used.
+:download:`smodels/etc/parameters_default.ini <images/parameters_default.ini>` are used.
 Below we give more detailed information about each entry in the parameters file.
 
 
