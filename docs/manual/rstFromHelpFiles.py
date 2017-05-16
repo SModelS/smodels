@@ -36,9 +36,9 @@ def write ( c, f ):
         if isIn == "newargument" and lastIn == "argument":
             new = "\n" + new
         hasNewLine = new[-1:] == "\n"
-        pnew = new.replace ( "\n", "" )
         if False:
-            print ( "isIn='%s' lastIn='%s' now write: >>%s<< hasNL=%d" % \
+            pnew = new.replace ( "\n", "" )
+            print ( "isIn='%s' lastIn='%s' now write: >>%s ...<< hasNL=%d" % \
                        ( isIn, lastIn, pnew[:30], hasNewLine ) )
         f.write ( new )
         lastIn = isIn
@@ -60,5 +60,5 @@ run ( "xseccomputer", "XSecComputer" )
 run ( "lhechecker", "LheChecker" )
 run ( "slhachecker", "SlhaChecker" )
 run ( "database-browser", "DatabaseBrowser" )
-run ( "toolbox", "ToolBox" )
+## run ( "toolbox", "ToolBox" )
 runSModelS()
