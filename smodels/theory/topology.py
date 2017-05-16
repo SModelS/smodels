@@ -338,6 +338,27 @@ class TopologyList(object):
         for top in self.topos:
             elements.extend(top.elementList)
         return elements
+    
+    def compressElements(self,doCompress,doInvisible,minmassgap):        
+        """
+        Compress all elements in the list and included the compressed
+        elements in the topology list.
+        
+        :parameter doCompress: if True, perform mass compression
+        :parameter doInvisible: if True, perform invisible compression
+        :parameter minmassgap: value (in GeV) of the maximum 
+                               mass difference for compression
+                               (if mass difference < minmassgap, perform mass compression)
+
+        """
+        
+        for el in self.getElements():
+            newElements = el.compressElement(doCompress,doInvisible,minmassgap)
+            if not newElements:
+                continue
+            for newelement in newElements:
+                newelement.sortBranches()  #Make sure elements are sorted BEFORE adding them
+                self.addElement(newelement)
 
     def _setElementIds(self):
         """

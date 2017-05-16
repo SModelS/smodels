@@ -12,8 +12,7 @@
 
 """ Import basic functions (this file must be executed in the installation folder) """
 
-from smodels.theory import slhaDecomposer
-from smodels.theory import lheDecomposer
+from smodels.theory import slhaDecomposer,lheDecomposer
 from smodels.tools.physicsUnits import fb, GeV
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.experiment.databaseObj import Database
@@ -29,15 +28,18 @@ def main():
     
     # Path to input file (either a SLHA or LHE file)
     slhafile = 'inputFiles/slha/lightEWinos.slha'
-    # lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
+    lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
 
     # Set main options for decomposition
     sigmacut = 0.3 * fb
     mingap = 5. * GeV
 
     # Decompose model (use slhaDecomposer for SLHA input or lheDecomposer for LHE input)
-    toplist = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
-    # toplist = lheDecomposer.decompose(lhefile, doCompress=True,doInvisible=True, minmassgap=mingap)
+    slhaInput = True
+    if slhaInput:
+        toplist = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
+    else:
+        toplist = lheDecomposer.decompose(lhefile, doCompress=True,doInvisible=True, minmassgap=mingap)
     
     # Access basic information from decomposition, using the topology list and topology objects:
     print "\n Decomposition Results: "

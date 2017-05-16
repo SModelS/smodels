@@ -1,1 +1,4 @@
-smodels/installation.py
+#!/usr/bin/env python
+
+from smodels.installation import main
+main()

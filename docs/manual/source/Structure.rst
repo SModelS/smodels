@@ -13,6 +13,7 @@ The main ingredients relevant for SModelS are:
    TheoryPredictions
    DatabaseStructure
    ConfrontPredictions
+   Coverage
 
    
 In the following we discuss each of these in more detail.

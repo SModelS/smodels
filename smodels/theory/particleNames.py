@@ -54,10 +54,14 @@ def getPdg(name):
     return None
 
 
-def elementsInStr(instring):
+def elementsInStr(instring,removeQuotes=True):
     """
     Parse instring and return a list of elements appearing in instring.
     instring can also be a list of strings.
+    
+    :param instring: string containing elements (e.g. "[[['e+']],[['e-']]]+[[['mu+']],[['mu-']]]")
+    :param removeQuotes: If True, it will remove the quotes from the particle labels.
+                         Set to False, if one wants to run eval on the output.
     
     :returns: list of elements appearing in instring in string format
     
@@ -78,7 +82,9 @@ def elementsInStr(instring):
               "Check your constraints and conditions in your database." % str(instring) )
 
     elements = []
-    outstr = outstr.replace(" ", "").replace("'", "")
+    outstr = outstr.replace(" ", "")
+    if removeQuotes:
+        outstr = outstr.replace("'", "")
     elStr = ""
     nc = 0
     # Parse the string and looks for matching ['s and ]'s, when the matching is
@@ -99,6 +105,7 @@ def elementsInStr(instring):
             ptclist = elements[-1].replace(']', ',').replace('[', ',').\
                     split(',')
             for ptc in ptclist:
+                ptc = ptc.replace("'","")
                 if not ptc:
                     continue
                 if not ptc in rEven.values() and not ptc in ptcDic:

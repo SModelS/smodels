@@ -36,7 +36,7 @@ class TxName(object):
     file (constraint, condition,...) as well as the data.
     """
 
-    def __init__(self, path, globalObj, infoObj):
+    def __init__(self, path, globalObj, infoObj ):
         self.path = path
         self.globalInfo = globalObj
         self._infoObj = infoObj
@@ -55,9 +55,7 @@ class TxName(object):
         if not "txName" in txdata: raise TypeError
         if not 'upperLimits' in txdata and not 'efficiencyMap' in txdata:
             raise TypeError
-        txfile = open(self.path)
-        content = concatenateLines (  txfile.readlines() )
-        txfile.close()
+        content = concatenateLines (  txdata.split("\n") )
 
         #Get tags in info file:
         tags = [line.split(':', 1)[0].strip() for line in content]
@@ -68,19 +66,19 @@ class TxName(object):
             if not tag: continue
             line = content[i]
             value = line.split(':',1)[1].strip()
-            if tags.count(tag) == 1:
-                if ';' in value: value = value.split(';')
-                if tag == 'upperLimits' or tag == 'efficiencyMap':
-                    data = value
-                    dataType = tag
-                elif tag == 'expectedUpperLimits':
-                    expectedData = value
-                    dataType = 'upperLimits'
-                else: self.addInfo(tag,value)
-            else:
-                logger.info("Ignoring unknown field %s found in file %s" \
+            if tags.count(tag) != 1:
+                logger.info("Duplicated field %s found in file %s" \
                              % (tag, self.path))
-                continue
+            if ';' in value: value = value.split(';')
+            if tag == 'upperLimits' or tag == 'efficiencyMap':
+                data = value
+                dataType = tag
+            elif tag == 'expectedUpperLimits':
+                expectedData = value
+                dataType = 'upperLimits'
+            else:
+                self.addInfo(tag,value)
+
         ident = self.globalInfo.id+":"+dataType[0]+":"+ str(self._infoObj.dataId)
         ident += ":" + self.txName
         self.txnameData = TxNameData( data, dataType, ident )
@@ -90,12 +88,12 @@ class TxName(object):
         #Builds up a list of elements appearing in constraints:
         elements = []
         if hasattr(self,'constraint'):
-            elements += [Element(el) for el in elementsInStr(self.constraint)]
+            elements += [Element(el) for el in elementsInStr(str(self.constraint))]
         if hasattr(self,'condition') and self.condition:
             conds = self.condition
             if not isinstance(conds,list): conds = [conds]
             for cond in conds:
-                for el in elementsInStr(cond):
+                for el in elementsInStr(str(cond)):
                     newEl = Element(el)
                     if not newEl in elements: elements.append(newEl)
 
@@ -104,6 +102,18 @@ class TxName(object):
         for el in elements:
             el.sortBranches()
             self._topologyList.addElement(el)
+
+    def hasOnlyZeroes ( self ):
+        ozs = self.txnameData.onlyZeroValues()
+        if self.txnameDataExp:
+            e_ozs = self.txnameDataExp.onlyZeroValues()
+            if ozs and e_ozs:
+                return True
+            if (ozs and not e_ozs) or (e_ozs and not ozs):
+                logger.warning ( "%s is weird. One of the (expected, observed) results is zeroes-only, the other one isnt." )
+                return False
+        return ozs
+
 
     def __str__(self):
         return self.txName
@@ -211,11 +221,12 @@ class TxNameData(object):
     """
     Holds the data for the Txname object.  It holds Upper limit values or efficiencies.
     """
+    _keep_values = False ## keep the original values, only for debugging
 
     def __init__(self,value,datatag,Id,accept_errors_upto=.05):
         """
         :param value: values in string format
-        :param datatag: the dataTag (upperLimits or efficiencyMap)
+        :param dataTag: the dataTag (upperLimits or efficiencyMap)
         :param Id: an identifier, must be unique for each TxNameData!
         :param _accept_errors_upto: If None, do not allow extrapolations outside of
                 convex hull.  If float value given, allow that much relative
@@ -228,6 +239,8 @@ class TxNameData(object):
         self._accept_errors_upto=accept_errors_upto
         self._V = None
         self.loadData( value )
+        if self._keep_values:
+            self.value = value
 
     def __str__ ( self ):
         """ a simple unique string identifier, mostly for _memoize """
@@ -245,6 +258,55 @@ class TxNameData(object):
     def __eq__ ( self, other ):
         return self._id == other._id
 
+    def convertString ( self, value ):
+        if not "GeV" in value:
+            raise SModelSError("data string malformed: %s" % value)
+        if "TeV" in value or "MeV" in value:
+            raise SModelSError("data string malformed: %s" % value)
+        s = value.replace ( "GeV", "" ).replace( "*", "" )
+        if "fb" in value:
+            self.unit = fb
+            s = s.replace ( "fb", "" )
+            return eval ( s )
+        if "pb" in value:
+            self.unit = pb
+            s = s.replace ( "pb", "" )
+            return eval ( s )
+        self.unit = 1
+        return eval ( s )
+
+    def removeGeV ( self, branch ):
+        if type ( branch ) == float:
+            return branch
+        ret = []
+        for b in branch:
+            els = []
+            for element in b:
+                if type(element)==unum.Unum:
+                    els.append ( element.asNumber ( GeV ) )
+                else:
+                    els.append ( element )
+            ret.append ( els )
+        return ret
+            
+            # value = eval(value, {'fb':fb, 'pb':pb, 'GeV':GeV, 'TeV':TeV})
+    def removeUnits ( self, value ):
+        if type(value[0][1])==unum.Unum:
+            ## if its a unum, we store 1.0 * unit
+            self.unit=value[0][1] / ( value[0][1].asNumber() )
+        ret = []
+        for point in value:
+            newpoint = []
+            for branch in point:
+                newbranch=branch
+                if type (branch) == unum.Unum:
+                    newbranch = ( branch / self.unit ).asNumber()
+                else:
+                    newbranch = self.removeGeV ( branch )
+                newpoint.append ( newbranch )
+            ret.append ( newpoint )
+        return ret
+
     def loadData(self,value):
         """
         Uses the information in value to generate the data grid used for
@@ -253,23 +315,22 @@ class TxNameData(object):
 
         if self._V:
             return
-
-        if type(value)==str:
-            value = eval(value, {'fb':fb, 'pb':pb, 'GeV':GeV, 'TeV':TeV})
         self.unit = 1.0 ## store the unit so that we can take arbitrary units for
                         ## the "z" values.  default is unitless,
                         ## which we use for efficiency maps
+
+        if type(value) == str:
+            value = self.convertString ( value )
+        else:
+            value = self.removeUnits ( value )
+
         if len(value) < 1 or len(value[0]) < 2:
                 logger.error ( "input value not in correct format. expecting sth " \
                                "like [ [ [[ 300.*GeV,100.*GeV], "\
                                "[ 300.*GeV,100.*GeV] ], 10.*fb ], ... ] "\
                                "for upper limits or [ [ [[ 300.*GeV,100.*GeV],"\
                                " [ 300.*GeV,100.*GeV] ], .1 ], ... ] for "\
-                               "efficiency maps" )
-        if type(value[0][1])==unum.Unum:
-            ## if its a unum, we store 1.0 * unit
-            self.unit=value[0][1] / ( value[0][1].asNumber() )
-
+                               "efficiency maps. Received %s" % value[:80] )
         self.computeV( value )
 
     @_memoize
@@ -282,7 +343,7 @@ class TxNameData(object):
                           [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         """
         porig=self.flattenMassArray ( massarray ) ## flatten
-        self.massarray = massarray
+        self.massarray = massarray ## only for bookkeeping and better error msgs
         if len(porig)!=self.full_dimensionality:
             logger.error ( "dimensional error. I have been asked to compare a "\
                     "%d-dimensional mass vector with %d-dimensional data!" % \
@@ -292,9 +353,6 @@ class TxNameData(object):
         P=np.dot(p,self._V)  ## rotate
         dp=self.countNonZeros(P)
         self.projected_value = self.interpolate([ P[:self.dimensionality] ])
-
-        # self.projected_value = griddata( self.Mp, self.xsec, [ P[:self.dimensionality] ], method="linear")[0]
-        # self.projected_value = float(self.projected_value)
         if dp > self.dimensionality: ## we have data in different dimensions
             if self._accept_errors_upto == None:
                 return None
@@ -310,7 +368,10 @@ class TxNameData(object):
         ret=[]
         for i in data:
             for j in i:
-                ret.append ( j.asNumber(GeV) )
+                if type(j) == unum.Unum:
+                    ret.append ( j.asNumber(GeV) )
+                else:
+                    ret.append ( j )
         return ret
 
     def interpolate(self, uvw, fill_value=np.nan):
@@ -324,19 +385,17 @@ class TxNameData(object):
         d=temp.shape[2]
         delta = uvw - temp[:, d]
         bary = np.einsum('njk,nk->nj', temp[:, :d, :], delta)
-        vtx = vertices
         wts = np.hstack((bary, 1 - bary.sum(axis=1, keepdims=True)))
-        v=self.xsec
-        if type (self.xsec[0]) == float:
+        if type (self.xsec[0]) in [ float, int, np.int64, np.float64 ]:
             values = np.array ( [ float(x) for x in self.xsec ] )
         else:
             values = np.array ( [ x.asNumber() for x in self.xsec ] )
-        ret = np.einsum('nj,nj->n', np.take(values, vtx), wts)
-        # the following was just a test to see if the point is outside the
-        # convex hull, but we check this via simplex[0]==-1, anyways.
-        #with np.errstate(invalid='ignore'):
-        #    ret[np.any(self.wts < -1e-10, axis=1)] = fill_value
-        return float(ret[0])
+        ret = np.einsum('nj,nj->n', np.take(values, vertices), wts)[0]
+        minXsec = min(np.take(values, vertices)[0])
+        if ret < minXsec:
+            logger.debug('Interpolation below simplex values. Will take the smallest simplex value.')
+            ret = minXsec
+        return float(ret)
 
 
     def _estimateExtrapolationError ( self, massarray ):
@@ -369,37 +428,25 @@ class TxNameData(object):
             P2[i]+=alpha
             pv = self.interpolate ( [ P2[:self.dimensionality] ] )
             g=float ( ( pv - self.projected_value ) / alpha )
-            #g=float ( ( griddata( self.Mp, self.xsec, [ P2[:self.dimensionality]],
-            #            method="linear")[0] - self.projected_value ) / alpha )
             if math.isnan ( g ):
                 ## if we cannot compute a gradient, we return nan
                 return float("nan")
-            gradient.append ( g )
+            gradient.append(g)
         ## normalize gradient
-        # print "gradient=",gradient
-        C= float ( np.sqrt ( np.dot ( gradient, gradient ) ) )
+        C= float(np.sqrt( np.dot ( gradient, gradient ) ))
         if C == 0.:
             ## zero gradient? we return 0.
             return 0.
-        for i,j in enumerate(gradient):
-            gradient[i]=gradient[i]/C*alpha
-            #print "gradient after=",gradient[i]
-        #print "^^^^^^"
+        for i,grad in enumerate(gradient):
+            gradient[i]=grad/C*alpha
         ## walk one alpha along gradient
         P3=copy.deepcopy(P)
         P4=copy.deepcopy(P)
-        for i,j in enumerate(gradient):
-            P3[i]+=gradient[i]
-            P4[i]-=gradient[i]
-        # print "projected value", projected_value
+        for grad in gradient:
+            P3[i]+= grad
+            P4[i]-= grad
         agp=self.interpolate ( [ P3[:self.dimensionality] ] )
-        #agp=griddata( self.Mp, self.xsec, [ P3[:self.dimensionality] ],
-        #              method="linear")[0]
-        #print "along gradient", ag
         agm=self.interpolate ( [ P4[:self.dimensionality] ] )
-        #agm=griddata( self.Mp, self.xsec, [ P4[:self.dimensionality] ],
-        #              method="linear")[0]
-        #print "along negative gradient",agm
         dep,dem=0.,0.
         if self.projected_value == 0.:
             if agp!=0.:
@@ -416,10 +463,7 @@ class TxNameData(object):
     def _interpolateOutsideConvexHull ( self, massarray ):
         """ experimental routine, meant to check if we can interpolate outside
             convex hull """
-        porig=self.flattenMassArray ( massarray ) ## flatten
-        p= ( (np.matrix(porig)[0] - self.delta_x ) ).tolist()[0]
-        P=np.dot(p,self._V)
-        de = self._estimateExtrapolationError ( massarray )
+        de = self._estimateExtrapolationError(massarray)
         if de < self._accept_errors_upto:
             return self._returnProjectedValue()
         if not math.isnan(de):
@@ -446,15 +490,32 @@ class TxNameData(object):
                 nz+=1
         return nz
 
+    def onlyZeroValues ( self ):
+        """ check if the map is zeroes only """
+        eps = sys.float_info.epsilon
+        negative_values = bool ( sum ( [ x < -eps for x in self.xsec ] ) )
+        if negative_values:
+            for x in self.xsec:
+                if x < -eps:
+                    logger.error ( "negative error in result: %f, %s" % \
+                                   ( x, self._id) )
+                    sys.exit()
+        if sum(self.xsec) > 0.:
+            return False
+        return True
+
     def computeV ( self, values ):
         """ compute rotation matrix _V, and triangulation self.tri """
         if self._V!=None:
-             return
+            return
         Morig=[]
-        self.xsec=[]
+        self.xsec = np.ndarray ( shape = (len(values), ) )
+        self.massdim = np.array(values[0][0]).shape
 
-        for x,y in values:
-            self.xsec.append ( y / self.unit )
+        for ctr,(x,y) in enumerate(values):
+            # self.xsec.append ( y / self.unit )
+            # self.xsec.append ( y )
+            self.xsec[ctr]=y
             xp = self.flattenMassArray ( x )
             Morig.append ( xp )
         aM=np.matrix ( Morig )
@@ -462,13 +523,12 @@ class TxNameData(object):
         self.delta_x = np.matrix ( [ sum (x)/len(Morig) for x in MT ] )[0]
         M = []
 
-        # print "here"
         for Mx in Morig:
             m=( np.matrix ( Mx ) - self.delta_x ).tolist()[0]
             M.append ( m )
             # M.append ( [ self.round_to_n ( x, 7 ) for x in m ] )
 
-        U,s,Vt=svd(M)
+        Vt=svd(M)[2]
         V=Vt.T
         self._V= V ## self.round ( V )
         Mp=[]
@@ -483,8 +543,6 @@ class TxNameData(object):
             nz=self.countNonZeros ( mp )
             if nz>self.dimensionality:
                 self.dimensionality=nz
-        ## print "dim=",self.dimensionality
-        # self.MpCut=[]
         MpCut=[]
         for i in Mp:
             if self.dimensionality > 1:
@@ -495,13 +553,45 @@ class TxNameData(object):
             logger.debug("1-D data found. Extending to a small 2-D band around the line.")
             MpCut += [[pt[0],pt[1]+0.0001] for pt in MpCut] + [[pt[0],pt[1]-0.0001] for pt in MpCut]
             self._1dim = True
-            self.xsec += self.xsec + self.xsec
+            lx=len(self.xsec)
+            newxsec = np.ndarray ( shape=(3*lx,) )
+            for i in range(3):
+                newxsec[ i*lx : (i+1)*lx ] = self.xsec
+            self.xsec = newxsec
+            #self.xsec += self.xsec + self.xsec
             self.dimensionality = 2
         else:
             self._1dim = False
              
         # self.Mp=MpCut ## also keep the rotated points, with truncated zeros
         self.tri = qhull.Delaunay( MpCut )
+        
+        
+    def _getMassArrayFrom(self,pt,unit=GeV):
+        """
+        Transforms the point pt in the PCA space to the original mass array
+        :param pt: point with the dimentions of the data dimensionality (e.g. [x,y])
+        :param unit: Unit for returning the mass array. If None, it will be
+                     returned unitless
+        :return: Mass array (e.g. [[mass1,mass2],[mass3,mass4]])
+        """
+        
+        if self._V is None:
+            logger.error("Data has not been loaded")
+            return None
+        if len(pt) != self.dimensionality:
+            logger.error("Wrong point dimensions (%i), it should be %i" 
+                         %(len(pt),self.dimensionality))
+            return None
+        fullpt = np.append(pt,[0.]*(self.full_dimensionality-len(pt)))
+        mass = np.dot(self._V,fullpt) + self.delta_x
+        mass = mass.reshape(self.massdim).tolist()
+        if unit:
+            mass = [[m*unit for m in br] for br in mass]
+            
+        return mass
+
+        
 
 if __name__ == "__main__":
     import time

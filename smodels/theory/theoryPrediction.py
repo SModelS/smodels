@@ -67,12 +67,16 @@ class TheoryPrediction(object):
         """
 
         if not self.conditions: return 0.        
-        maxcond = 0.
+        # maxcond = 0.
+        values = [ 0. ]
         for value in self.conditions.values():
             if value == 'N/A': return value
             if value == None: continue
-            maxcond = max(maxcond,value)
-        return maxcond
+            #print ( "value=",value,type(value),float(value) )
+            #maxcond = max(maxcond,float(value))
+            values.append ( float(value) )
+        return max(values)
+        # return maxcond
     
     def __str__(self):
         return "%s:%s" % ( self.analysis, self.xsection )

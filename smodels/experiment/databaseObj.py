@@ -16,8 +16,9 @@ import time
 from smodels.experiment import datasetObj
 from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.exceptions import DatabaseNotFoundException
-from smodels.tools.physicsUnits import fb, TeV
+from smodels.tools.physicsUnits import TeV
 from smodels.tools.smodelsLogging import logger
+import logging
 
 try:
     import cPickle as serializer
@@ -35,13 +36,15 @@ class Database(object):
         
     """
     
-    def __init__(self, base=None, force_load = None ):
+    def __init__(self, base=None, force_load = None, discard_zeroes = False ):
         """
+        :param base: path to the database (string)
         :param force_load: force loading the text database ("txt"),
             or binary database ("pcl"), dont force anything if None
-        :param pclfilename: filename of the binary (pickled) database file
+        :param discard_zeroes: discard txnames with only zeroes as entries.
         """
         self.force_load = force_load
+        self.discard_zeroes = discard_zeroes
         self.pclfilename = "database.pcl"
         self.hasFastLim = False # True if any ExpResult is from fastlim
         self._validateBase(base)
@@ -49,8 +52,9 @@ class Database(object):
         self.expResultList = []
         self.txt_mtime = None, None
         self.pcl_mtime = None, None
-        self.pcl_db = None
-        self.sw_format_version = "115" ## what format does the software support?
+        self.pcl_hasFastLim = False
+        self.pcl_discard_zeroes = False
+        self.sw_format_version = "118" ## what format does the software support?
         self.pcl_format_version = None ## what format is in the binary file?
         if self.force_load=="txt":
             self.loadTextDatabase()
@@ -78,8 +82,9 @@ class Database(object):
         logger.info ( "FastLim v1.1 efficiencies loaded. Please cite: arXiv:1402.0492, EPJC74 (2014) 11" )
 
     def __eq__ ( self, other ):
-        """ compare two databases
-        """
+        """ compare two databases """
+        if type ( other ) != type ( self ):
+            return False
         if self.databaseVersion != other.databaseVersion:
             return False
         if len(self.expResultList ) != len (other.expResultList):
@@ -175,9 +180,6 @@ class Database(object):
             ## loaded
             return None
 
-        if self.pcl_db:
-            return self.pcl_db
-
         if not os.path.exists ( self.binfile() ):
             return None
 
@@ -188,6 +190,8 @@ class Database(object):
                 self.pcl_format_version = serializer.load ( f )
                 self.pcl_mtime = serializer.load ( f )
                 self._databaseVersion = serializer.load ( f )
+                self.pcl_hasFastLim = serializer.load ( f )
+                self.pcl_discard_zeroes = serializer.load ( f )
                 if not lastm_only:
                     if self.pcl_python != sys.version:
                         logger.warning ( "binary file was written with a different "
@@ -204,7 +208,6 @@ class Database(object):
 
                     logger.info ( "loading binary db file %s format version %s" % 
                             ( self.binfile(), self.pcl_format_version ) )
-                    self.hasFastLim = serializer.load ( f )
                     self.expResultList = serializer.load ( f )
                     t1=time.time()-t0
                     logger.info ( "Loaded database from %s in %.1f secs." % \
@@ -236,12 +239,15 @@ class Database(object):
     def needsUpdate ( self ):
         """ does the binary db file need an update? """
         try:
-            # logger.debug ( "needsUpdate?" )
             self.lastModifiedAndFileCount()
             self.loadBinaryFile ( lastm_only = True )
+            #logger.debug ( "needsUpdate? discard_zeroes=%d %d" % \
+            #      ( self.discard_zeroes, self.pcl_discard_zeroes )  )
             return ( self.txt_mtime[0] > self.pcl_mtime[0] or \
                      self.txt_mtime[1] != self.pcl_mtime[1]  or \
-                     self.sw_format_version != self.pcl_format_version
+                     self.sw_format_version != self.pcl_format_version or \
+            #         self.hasFastLim != self.pcl_hasFastLim or \
+                     self.discard_zeroes != self.pcl_discard_zeroes
                 )
         except (IOError,DatabaseNotFoundException,TypeError,ValueError):
             # if we encounter a problem, we rebuild the database.
@@ -261,19 +267,20 @@ class Database(object):
         binfile = filename
         if binfile == None:
             binfile = self.binfile()
-        logger.debug (  " * create %s" % self.binfile() )
+        logger.debug (  " * create %s" % binfile )
         with open ( binfile, "wb" ) as f:
             logger.debug (  " * load text database" )
             self.loadTextDatabase() 
-            logger.debug (  " * write %s version %s" % ( self.binfile,
+            logger.debug (  " * write %s version %s" % ( binfile,
                        self.sw_format_version ) )
-            ptcl = serializer.HIGHEST_PROTOCOL
             self.pcl_python = sys.version
+            ptcl = serializer.HIGHEST_PROTOCOL
             serializer.dump ( self.pcl_python, f, protocol=ptcl )
             serializer.dump ( self.sw_format_version, f, protocol=ptcl )
             serializer.dump ( self.txt_mtime, f, protocol=ptcl )
             serializer.dump ( self._databaseVersion, f, protocol=ptcl )
             serializer.dump ( self.hasFastLim, f, protocol=ptcl )
+            serializer.dump ( self.discard_zeroes, f, protocol=ptcl )
             serializer.dump ( self.expResultList, f, protocol=ptcl )
             logger.info (  " * done writing %s in %.1f secs." % \
                     ( binfile, time.time()-t0 ) )
@@ -306,7 +313,7 @@ class Database(object):
         tmp = os.path.realpath(path)
         if os.path.isfile ( tmp ):
             self._base = os.path.dirname ( tmp )
-            self.force_load = "pcl" 
+            # self.force_load = None
             self.pclfilename = os.path.basename ( tmp )
             # logger.debug ( "pclfilename is now %s" % self.pclfilename)
             return
@@ -408,14 +415,13 @@ class Database(object):
             if root[-5:] == "/orig":
                 continue
             if not 'globalInfo.txt' in files:
-          #      logger.debug("Missing globalInfo.txt in %s", root)
                 continue
             else:
                 roots.append ( root )
 
         resultsList = []
         for root in roots:
-            expres = ExpResult(root)
+            expres = ExpResult(root, discard_zeroes = self.discard_zeroes )
             if expres:
                 resultsList.append(expres)
                 contact = expres.globalInfo.getInfo("contact")
@@ -450,8 +456,8 @@ class Database(object):
         :param useSuperseded: If False, the supersededBy results will not be included
         :param useNonValidated: If False, the results with validated = False 
                                 will not be included
-        :param onlyWithExpected: Return only those results that have expected values also.
-                              Note that this is trivially fulfilled for all efficiency maps.
+        :param onlyWithExpected: Return only those results that have expected values 
+                 also. Note that this is trivially fulfilled for all efficiency maps.
         :returns: list of ExpResult objects or the ExpResult object if the list
                   contains only one result
                    
@@ -479,21 +485,31 @@ class Database(object):
                 if datasetIDs != ['all']:
                     if not dataset.dataInfo.dataId in datasetIDs:
                         continue
-                newDataSet = datasetObj.DataSet(dataset.path, dataset.globalInfo,False)
+                newDataSet = datasetObj.DataSet( dataset.path, dataset.globalInfo,
+                                          False, discard_zeroes=self.discard_zeroes )
                 newDataSet.dataInfo = dataset.dataInfo
                 newDataSet.txnameList = []
                 for txname in dataset.txnameList:
-                    if txname.validated is False and (not useNonValidated):
+                    if type(txname.validated) == str:
+                        txname.validated = txname.validated.lower()
+                    # print ( "txname",txname.validated,type(txname.validated) )
+                    if (txname.validated not in [True, False, "true", "false", "n/a", "tbd", None, "none"]):
+                        logger.error("value of validated field '%s' in %s unknown." % (txname.validated, expResult))
+                    if txname.validated in [None, "none"]: ## FIXME after 1.1.1 this becomes a warning msg?
+                        logger.debug("validated is None in %s/%s/%s. Please set to True, False, N/A, or tbd." % \
+                            ( expResult.globalInfo.id, dataset.dataInfo.dataId, txname ) )
+                    if txname.validated not in [ None, True, "true", "n/a", "tbd" ] and (not useNonValidated ):
+#                    if txname.validated is False and (not useNonValidated):
                         continue
                     if txnames != ['all']:
                         if not txname.txName in txnames:
                             continue
-                    if onlyWithExpected and dataset.dataInfo.dataType == "upperLimit" and \
-                                not txname.txnameDataExp:
+                    if onlyWithExpected and dataset.dataInfo.dataType == \
+                        "upperLimit" and not txname.txnameDataExp:
                         continue
                     newDataSet.txnameList.append(txname)
                 # Skip data set not containing any of the required txnames:
-                if not newDataSet.txnameList:
+                if not newDataSet.txnameList or newDataSet.txnameList == []:
                     continue
                 newExpResult.datasets.append(newDataSet)
             # Skip analysis not containing any of the required txnames:

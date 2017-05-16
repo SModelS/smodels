@@ -28,14 +28,22 @@ dirname = "smodels-v%s" % version
 
 RED = "\033[31;11m"
 GREEN = "\033[32;11m"
+YELLOW = "\033[33;11m"
 RESET = "\033[7;0m"
 
 
-def comment( text ):
-    print "%s[%s] %s %s" % ( RED, time.asctime(),text,RESET )
+def comment( text, urgency="info" ):
+    col=YELLOW
+    pre=""
+    if "err" in urgency.lower():
+        pre="ERROR: "
+        col=RED
+    print "%s[%s] %s%s %s" % ( col, time.asctime(), pre, text, RESET )
     f=open("create.log","a")
     f.write (  "[%s] %s\n" % ( time.asctime(),text ) )
     f.close()
+    if col == RED:
+        sys.exit(-1)
 
 def isDummy ( ):
     if dummyRun:
@@ -52,6 +60,7 @@ def run ( cmd ):
         print (o)
         f.write ( o + "\n" )
     f.close()
+    return o
 
 def removeNonValidated():
     """ remove all non-validated analyses from
@@ -173,9 +182,12 @@ def fetchDatabase():
     """
     Execute 'git clone' to retrieve the database.
     """
+    dbversion = version
+    if dbversion.find("-")>0:
+        dbversion=dbversion[:dbversion.find("-")]
     comment ( "git clone the database (this might take a while)" )
     cmd = "cd %s; git clone -b v%s git@smodels.hephy.at:smodels-database"  % \
-            (dirname, version)
+            (dirname, dbversion)
             
     if dummyRun:
         cmd = "cd %s; cp -a ../../../smodels-database-v%s smodels-database" % \
@@ -317,8 +329,16 @@ def runExample ():
     Execute Example.py.
     """
     comment ( "Now run Example.py ..." )
-    cmd = "cd %s/; ./Example.py" % dirname
+    cmd = "cd %s/; ./Example.py | tee out.log" % dirname
     run (cmd)
+    comment ( "Now check diff" )
+    cmd = "diff %s/out.log default.log" % dirname
+    d = run ( cmd )
+    if len ( d ) > 0:
+        comment ( "Example test failed!!", "error" )
+    else:
+        comment ( "Looking good." )
+
 
 def test ():
     """
@@ -372,4 +392,5 @@ if __name__ == "__main__":
     # splitDatabase()
     # cleanDatabase()
     # clearGlobalInfo ( "./globalInfo.txt" )
-    create()
+    runExample()
+    # create()
