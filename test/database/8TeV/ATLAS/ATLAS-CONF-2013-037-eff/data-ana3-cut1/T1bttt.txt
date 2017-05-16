@@ -2,7 +2,7 @@ txName: T1bttt
 conditionDescription: None
 condition: None
 constraint: [[['b','t']],[['t','t']]]
-validated: None
+validated: N/A
 axes: 2*Eq(mother,x)_Eq(lsp,y)
 publishedData: False
 efficiencyMap: [[[[410.0*GeV, 60.0*GeV], [410.0*GeV, 60.0*GeV]], 0.0],

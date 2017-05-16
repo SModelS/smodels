@@ -13,6 +13,7 @@ import sys
 from setuptools import setup, Extension
 sys.path.insert ( 0, "./" )
 from smodels.installation import version, authors
+import subprocess
 
 def read(fname):
     """
@@ -23,12 +24,19 @@ def read(fname):
 
 
 def listDirectory (dirname):
+    """ list all files in directory, skip subdirs """
     if dirname[-1] == "/":
         dirname = dirname[:-1]
     files = os.listdir (dirname)
     ret = []
     for file in files:
-        ret.append (dirname + "/" + file)
+        fullname = dirname + "/" + file
+        extension = os.path.splitext ( file )[1]
+        if os.path.isdir ( fullname ) or \
+                extension in [ ".out", ".tgz", ".cc", ".f" ] or \
+                file in [ "Makefile", "REAME" ]:
+            continue
+        ret.append ( fullname )
     return ret
 
 def dataFiles ():
@@ -36,10 +44,12 @@ def dataFiles ():
     List all config files and binaries
 
     """
-    ret = [("", [ "README", "COPYING" ])]
+    ret = [("", [ "README.rst", "INSTALLATION", "COPYING" ])]
     ret.append ( ("smodels/", [ "smodels/version" ]) )
     # ret.append ( ("share", [ "share/shareme" ]) )
-    for directory in ["inputFiles/slha/", "inputFiles/lhe/", "lib/nllfast/nllfast-1.2/", "lib/nllfast/nllfast-2.1/", "lib/nllfast/nllfast-3.1/", "lib/pythia6/", "etc/"]:
+    for directory in ["inputFiles/slha/", "inputFiles/lhe/", "smodels/share/",
+          "smodels/etc/", "lib/nllfast/nllfast-1.2/", "lib/nllfast/nllfast-2.1/",
+          "lib/nllfast/nllfast-3.1/", "lib/pythia6/", "lib/pythia8/" ]:
         ret.append ((directory, listDirectory (directory)))
 
     return ret
@@ -59,18 +69,21 @@ def compile():
             needs_build = True
     if not needs_build:
         return
-    import subprocess
     subprocess.call(["make", "-C", "lib" ])
 
-
 compile()
+
 setup(
     name = "smodels",
     version = version(),
     author = authors(),
     author_email="smodels-developers@lists.oeaw.ac.at ",
-    scripts=[ "smodels-config", "runSModelS.py", "smodelsTools.py" ],
-    install_requires=[ 'docutils>=0.3', 'numpy', 'scipy>=0.9.0', \
+    entry_points = {
+            'console_scripts': ['smodels-config=smodels.installation:main',
+                           'runSModelS.py=smodels.tools.runSModelS:main',
+                           'smodelsTools.py=smodels.tools.smodelsTools:main' ]
+    },
+    install_requires=[ 'docutils>=0.3', 'scipy', 'numpy', 'scipy>=0.9.0', \
                          'unum', 'argparse', 'pyslha>=3.1.0' ],
     data_files=dataFiles() ,
     description=("A tool for interpreting simplified-model results from the "
@@ -84,8 +97,9 @@ setup(
               'smodels.theory',
               'smodels.tools',
               'smodels.experiment'],
+    include_package_data = True,
     test_suite='test',
-    long_description=read('README'),
+    long_description=read('README.rst'),
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Topic :: Scientific/Engineering :: Physics",

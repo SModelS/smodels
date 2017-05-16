@@ -6,7 +6,7 @@ How To's
 ========
 
 
-Below a few examples are given for how to utilize SModelS and some of the :doc:`SModelS tools <Tools>` as a Python library:
+Below a few examples are given for how to utilize SModelS and some of the :doc:`SModelS tools <Tools>` as a Python library [*]_:
 
 * `How to load the database <_downloads/load_database.html>`_ (download the Python code :download:`here <recipes/load_database.py>`, IPython notebook :download:`here <recipes/load_database.ipynb>`)
 
@@ -29,3 +29,12 @@ Below a few examples are given for how to utilize SModelS and some of the :doc:`
 * `How to find missing topologies <_downloads/missingTopologies.html>`_ (download the Python code :download:`here <recipes/missingTopologies.py>`, IPython notebook :download:`here <recipes/missingTopologies.ipynb>`)
 
 * `How to generate ascii graphs <_downloads/ascii_graph_from_lhe.html>`_ (download the Python code :download:`here <recipes/ascii_graph_from_lhe.py>`, IPython notebook :download:`here <recipes/ascii_graph_from_lhe.ipynb>`)
+
+Examples using the Database Browser:
+------------------------------------
+
+* `How to obtain upper limits <_downloads/browserExample2.html>`_ (download the Python code :download:`here <recipes/browserExample2.py>`, IPython notebook :download:`here <recipes/browserExample2.ipynb>`)
+
+* `How to select specific results <_downloads/browserExample3.html>`_ (download the Python code :download:`here <recipes/browserExample3.py>`, IPython notebook :download:`here <recipes/browserExample3.ipynb>`)
+
+.. [*] Some of the output may change depending on the database version used.

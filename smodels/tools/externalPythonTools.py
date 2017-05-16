@@ -30,6 +30,8 @@ class ExternalPythonTool(object):
         except ImportError as e:
             logger.error("could not find %s: %s" % (importname, e))
 
+    def compile ( self ):
+        pass
 
     def pathOfExecutable (self):
         """
