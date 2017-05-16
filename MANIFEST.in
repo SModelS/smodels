@@ -1,4 +1,4 @@
-include README COPYING MANIFEST.in Makefile
+include README.rst COPYING MANIFEST.in Makefile
 include lib/Makefile lib/*/Makefile lib/*/*/Makefile lib/*/*.f lib/*/*/*.f lib/*/*/*.grid 
 include inputFiles/*/*
 include etc/*
