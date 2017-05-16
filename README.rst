@@ -1,7 +1,6 @@
-
-                               ==============
-                                SModelS v1.1
-                               ==============
+==============
+SModelS v1.1
+==============
 
 SModelS -- A tool for interpreting simplified-model results from the LHC.
 
@@ -35,7 +34,7 @@ An example file on how to call the SModelS libraries from your own
 Python code can be found in Example.py.
 
 Detailed explanations on how to use SModelS, including explanations of the
-output, can be found in the section ``Running SModelS'' of the SModelS manual
+output, can be found in the section ''Running SModelS'' of the SModelS manual
 (docs/Manual.html).
 
 A few example input files are provided in the inputFiles folder and can be
