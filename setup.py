@@ -13,6 +13,7 @@ import sys
 from setuptools import setup, Extension
 sys.path.insert ( 0, "./" )
 from smodels.installation import version, authors
+import subprocess
 
 def read(fname):
     """
@@ -30,7 +31,10 @@ def listDirectory (dirname):
     ret = []
     for file in files:
         fullname = dirname + "/" + file
-        if os.path.isdir ( fullname ):
+        extension = os.path.splitext ( file )[1]
+        if os.path.isdir ( fullname ) or \
+                extension in [ ".out", ".tgz", ".cc", ".f" ] or \
+                file in [ "Makefile", "REAME" ]:
             continue
         ret.append ( fullname )
     return ret
@@ -44,7 +48,7 @@ def dataFiles ():
     ret.append ( ("smodels/", [ "smodels/version" ]) )
     # ret.append ( ("share", [ "share/shareme" ]) )
     for directory in ["inputFiles/slha/", "inputFiles/lhe/", "smodels/share/",
-          "smodels/etc/", "lib/nllfast/nllfast-1.2/", "lib/nllfast/nllfast-2.1/", 
+          "smodels/etc/", "lib/nllfast/nllfast-1.2/", "lib/nllfast/nllfast-2.1/",
           "lib/nllfast/nllfast-3.1/", "lib/pythia6/", "lib/pythia8/" ]:
         ret.append ((directory, listDirectory (directory)))
 
@@ -65,11 +69,10 @@ def compile():
             needs_build = True
     if not needs_build:
         return
-    import subprocess
     subprocess.call(["make", "-C", "lib" ])
 
-
 compile()
+
 setup(
     name = "smodels",
     version = version(),

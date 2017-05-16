@@ -65,7 +65,7 @@ class WrapperBase(object):
             return self.tempDirectory() + "/temp.cfg"
         installdir = installation.installDirectory()
         path = path.replace("<install>", installdir)
-        path = path.replace(".egg/smodels", ".egg/")
+        # path = path.replace(".egg/smodels", ".egg/")
         path = os.path.abspath(path)
         return path
 
