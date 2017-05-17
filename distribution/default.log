@@ -63,6 +63,7 @@ Theory Prediction =  8.00E+00 [TeV]:6.31E-04 [pb] (None, None)
 Condition Violation =  None
 UL for theory prediction =  1.33E+01 [fb]
 r =  4.75E-02 
+Chi2, likelihood= 0.0898530073687 0.00318216355164
 
  ATLAS-SUSY-2013-04 
 ------------------------
@@ -74,6 +75,7 @@ Theory Prediction =  8.00E+00 [TeV]:4.80E-05 [pb] (None, None)
 Condition Violation =  None
 UL for theory prediction =  1.03E+00 [fb]
 r =  4.66E-02 
+Chi2, likelihood= 0.257969644776 0.0289685949181
 
  ATLAS-SUSY-2013-09 
 ------------------------
@@ -118,6 +120,7 @@ Theory Prediction =  8.00E+00 [TeV]:9.69E-05 [pb] (1000021, 1000021)
 Condition Violation =  None
 UL for theory prediction =  3.32E-01 [fb]
 r =  2.92E-01 
+Chi2, likelihood= -0.00572505189559 0.19435846758
 
  CMS-PAS-SUS-13-016 
 ------------------------
@@ -140,6 +143,7 @@ Theory Prediction =  8.00E+00 [TeV]:2.55E-06 [pb] (1000021, 1000021)
 Condition Violation =  None
 UL for theory prediction =  2.11E-01 [fb]
 r =  1.21E-02 
+Chi2, likelihood= 0.0334797104513 0.279787989771
 
  CMS-SUS-12-024 
 ------------------------
@@ -162,17 +166,9 @@ Theory Prediction =  8.00E+00 [TeV]:1.54E-04 [pb] (1000021, 1000021)
 Condition Violation =  None
 UL for theory prediction =  2.62E-01 [fb]
 r =  5.88E-01 
+Chi2, likelihood= 1.62454694512 0.0975238512723
 
  CMS-SUS-12-028 
-------------------------
-Dataset =  None
-TxNames =  ['T1tttt']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:6.70E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  5.04E-01 [pb]
-r =  1.33E-03 
 ------------------------
 Dataset =  None
 TxNames =  ['T1bbbb']
@@ -182,6 +178,15 @@ Theory Prediction =  8.00E+00 [TeV]:7.11E-03 [pb] (None, None)
 Condition Violation =  None
 UL for theory prediction =  2.73E-02 [pb]
 r =  2.61E-01 
+------------------------
+Dataset =  None
+TxNames =  ['T1tttt']
+Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
+Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
+Theory Prediction =  8.00E+00 [TeV]:6.70E-04 [pb] (None, None)
+Condition Violation =  None
+UL for theory prediction =  5.04E-01 [pb]
+r =  1.33E-03 
 
  CMS-SUS-13-004 
 ------------------------
@@ -235,6 +240,7 @@ Theory Prediction =  8.00E+00 [TeV]:2.89E-06 [pb] (1000021, 1000021)
 Condition Violation =  None
 UL for theory prediction =  1.56E-01 [fb]
 r =  1.86E-02 
+Chi2, likelihood= 2.03041147471 0.192812457339
 
  CMS-SUS-13-012 
 ------------------------
@@ -257,6 +263,7 @@ Theory Prediction =  8.00E+00 [TeV]:7.52E-05 [pb] (None, None)
 Condition Violation =  None
 UL for theory prediction =  1.22E+00 [fb]
 r =  6.18E-02 
+Chi2, likelihood= 0.350827924395 0.0362914905871
 
  CMS-SUS-13-013 
 ------------------------
@@ -279,6 +286,7 @@ Theory Prediction =  8.00E+00 [TeV]:4.71E-06 [pb] (1000021, 1000021)
 Condition Violation =  None
 UL for theory prediction =  2.60E-01 [fb]
 r =  1.81E-02 
+Chi2, likelihood= -0.0183775250259 0.222918952023
 
  CMS-SUS-13-019 
 ------------------------
@@ -313,3 +321,35 @@ r =  3.82E-02
 
 The largest r-value (theory/upper limit ratio) is  1.20E+00 
 (The input model is likely excluded by CMS-SUS-13-006)
+
+Total missing topology cross section (fb):  2.706E+03
+
+Total cross section where we are outside the mass grid (fb):  5.177E+01
+
+Total cross section in long cascade decays (fb):  3.011E+02
+
+Total cross section in decays with asymmetric branches (fb):  2.368E+03
+
+Missing topologies (up to 3):
+Topology: [[],[]]
+Contributing elements (up to 2):
+[[],[]] cross-section (fb): 0.450694497
+Topology: [[],[[Z]]]
+Contributing elements (up to 2):
+[[],[[Z]]] cross-section (fb): 0.806086059351
+Topology: [[],[[jet,jet]]]
+Contributing elements (up to 2):
+[[],[[c,q]]] cross-section (fb): 38.5133200055
+[[],[[q,q]]] cross-section (fb): 38.5133200055
+
+Elements outside the grid (up to 2):
+Topology: [[[l,nu]],[[l,nu]]]
+Contributing elements (up to 4):
+[[[e+,nu]],[[e-,nu]]] cross-section (fb): 12.9436916018
+	mass: [[1.34E+02 [GeV], 6.81E+01 [GeV]], [1.34E+02 [GeV], 6.81E+01 [GeV]]]
+[[[e+,nu]],[[mu-,nu]]] cross-section (fb): 12.9436916018
+	mass: [[1.34E+02 [GeV], 6.81E+01 [GeV]], [1.34E+02 [GeV], 6.81E+01 [GeV]]]
+[[[e-,nu]],[[mu+,nu]]] cross-section (fb): 12.9436916018
+	mass: [[1.34E+02 [GeV], 6.81E+01 [GeV]], [1.34E+02 [GeV], 6.81E+01 [GeV]]]
+[[[mu+,nu]],[[mu-,nu]]] cross-section (fb): 12.9436916018
+	mass: [[1.34E+02 [GeV], 6.81E+01 [GeV]], [1.34E+02 [GeV], 6.81E+01 [GeV]]]
