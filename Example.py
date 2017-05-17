@@ -19,7 +19,7 @@ from smodels.experiment.databaseObj import Database
 from smodels.tools import coverage
 
 # Set the path to the database folder
-database = Database("../smodels-database/")
+database = Database("./smodels-database/")
 
 def main():
     """
