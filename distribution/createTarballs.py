@@ -332,7 +332,7 @@ def runExample ():
     cmd = "cd %s/; ./Example.py | tee out.log" % dirname
     run (cmd)
     comment ( "Now check diff" )
-    cmd = "diff %s/out.log default.log" % dirname
+    cmd = "diff -u %s/out.log default.log" % dirname
     d = run ( cmd )
     if len ( d ) > 0:
         comment ( "Example test failed!!", "error" )
