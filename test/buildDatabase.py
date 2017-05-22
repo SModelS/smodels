@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 
 import sys, os, time
 sys.path.insert(0,"../")
@@ -23,4 +23,3 @@ print ( "Database is %.1f MB." % ( s.st_size / 1000. / 1000. ) )
 d=Database( pcl )
 t2=time.time()
 print ( "Reading the database took %.2f seconds." % ( t2 - t1 ) )
-print ( d.getExpResults() )
