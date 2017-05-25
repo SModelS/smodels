@@ -83,7 +83,7 @@ class TxName(object):
         ident += ":" + self.txName
         self.txnameData = TxNameData( data, dataType, ident )
         if expectedData:
-            self.txnameDataExp = TxNameData( expectedData, dataType, ident )
+            self.txnameDataExp = TxNameData( expectedData, dataType, ident+'_expected' )
 
         #Builds up a list of elements appearing in constraints:
         elements = []
@@ -256,6 +256,8 @@ class TxNameData(object):
         return not self.__eq__ ( other )
 
     def __eq__ ( self, other ):
+        if type(other) != type(self):
+            return False
         return self._id == other._id
 
     def convertString ( self, value ):
