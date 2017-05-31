@@ -40,12 +40,15 @@ class Database(object):
         
     """
     
-    def __init__(self, base=None, force_load = None, discard_zeroes = False ):
+    def __init__( self, base=None, force_load = None, discard_zeroes = False,
+                  progressbar = False  ):
         """
         :param base: path to the database (string)
         :param force_load: force loading the text database ("txt"),
             or binary database ("pcl"), dont force anything if None
         :param discard_zeroes: discard txnames with only zeroes as entries.
+        :param progressbar: show a progressbar when building pickle file 
+                            (needs the python-progressbar module)
         """
         self.force_load = force_load
         self.discard_zeroes = discard_zeroes
@@ -60,6 +63,14 @@ class Database(object):
         self.pcl_discard_zeroes = False
         self.sw_format_version = "118" ## what format does the software support?
         self.pcl_format_version = None ## what format is in the binary file?
+        self.progressbar = None
+        if progressbar:
+            try:
+                import progressbar as P
+                self.progressbar = P.ProgressBar( widgets= [ P.Percentage(), P.Bar( marker=P.RotatingMarker() ), P.ETA() ] )
+            except ImportError as e:
+                logger.warning ( "progressbar requested, but python-progressbar is not installed." )
+
         if self.force_load=="txt":
             self.loadTextDatabase()
             self.printFastlimBanner()
@@ -423,8 +434,13 @@ class Database(object):
             else:
                 roots.append ( root )
 
+        if self.progressbar:
+            self.progressbar.maxval = len ( roots )
+            self.progressbar.start()
         resultsList = []
-        for root in roots:
+        for ctr,root in enumerate(roots):
+            if self.progressbar:
+                self.progressbar.update(ctr)
             expres = ExpResult(root, discard_zeroes = self.discard_zeroes )
             if expres:
                 resultsList.append(expres)
@@ -434,6 +450,8 @@ class Database(object):
 
         if not resultsList:
             logger.warning("Zero results loaded.")
+        if self.progressbar:
+            self.progressbar.finish()
 
         return resultsList
 
