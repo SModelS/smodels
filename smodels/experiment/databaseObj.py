@@ -67,7 +67,7 @@ class Database(object):
         if progressbar:
             try:
                 import progressbar as P
-                self.progressbar = P.ProgressBar( widgets= [ "Building Database", P.Percentage(), P.Bar( marker=P.RotatingMarker() ), P.ETA() ] )
+                self.progressbar = P.ProgressBar( widgets= [ "Building Database ", P.Percentage(), P.Bar( marker=P.RotatingMarker() ), P.ETA() ] )
             except ImportError as e:
                 logger.warning ( "progressbar requested, but python-progressbar is not installed." )
 
