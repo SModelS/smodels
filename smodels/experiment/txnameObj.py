@@ -256,6 +256,8 @@ class TxNameData(object):
         return not self.__eq__ ( other )
 
     def __eq__ ( self, other ):
+        if type(self) != type ( other ):
+            return False
         return self._id == other._id
 
     def convertString ( self, value ):
