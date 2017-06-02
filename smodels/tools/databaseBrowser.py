@@ -307,7 +307,7 @@ def main(args):
     def getHeader ():
         from smodels.installation import installDirectory
         header = ""
-        with open( installDirectory()+"/etc/BANNER") as f:
+        with open( installDirectory()+"/smodels/share/BANNER") as f:
             lines=f.readlines()
             for line in lines: header+=line
 
