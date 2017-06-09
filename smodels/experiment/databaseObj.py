@@ -29,6 +29,44 @@ try:
 except ImportError as e:
     import pickle as serializer
 
+class Meta(object):
+    """ The Meta object holds all meta information regarding the 
+        database, like number of analyses, last time of modification, ...
+        Needed to understand if we have to re-pickle. """
+
+    def __init__ ( self, mtime, filecount, hasFastLim, discard_zeroes, \
+                   format_version, python, databaseVersion ):
+        """
+        :param mtime: last modification time stamps
+        :param filecount: number of files
+        :param hasFastLim: fastlim in the database?
+        :param discard_zeroes: do we discard zeroes?
+        :param format_version: format version of pickle file
+        :param python: python version
+        :param databaseVersion: version of database
+        """
+        self.mtime = mtime
+        self.filecount = filecount
+        self.hasFastLim = hasFastLim
+        self.discard_zeroes = discard_zeroes
+        self.format_version = format_version
+        self.python = python
+        self.databaseVersion = databaseVersion
+
+    def needsUpdate ( self, last ):
+        """ do we need an update, with respect to <last> """
+        if self.mtime > last.mtime: ## someone tinkered
+            return True
+        if self.filecount != last.filecount:
+            return True ## number of files changed
+        if self.discard_zoeres != last.discard_zeroes:
+            return True ## flag changed
+        if self.format_version != last.format_version:
+            return True ## pickle file format version changed
+        if self.python != last.python:
+            return True ## different python
+        return False
+
 class Database(object):
     """
     Database object. Holds a list of ExpResult objects.
@@ -39,7 +77,7 @@ class Database(object):
     :ivar expResultList: list of ExpResult objects 
         
     """
-    
+
     def __init__( self, base=None, force_load = None, discard_zeroes = False,
                   progressbar = False  ):
         """
@@ -51,18 +89,14 @@ class Database(object):
                             (needs the python-progressbar module)
         """
         self.force_load = force_load
-        self.discard_zeroes = discard_zeroes
-        self.pclfilename = "database.pcl"
-        self.hasFastLim = False # True if any ExpResult is from fastlim
+        self.pclfilename = "db%s.pcl" % sys.version[0]
         self._validateBase(base)
-        self._databaseVersion = None
         self.expResultList = []
-        self.txt_mtime = None, None
-        self.pcl_mtime = None, None
-        self.pcl_hasFastLim = False
-        self.pcl_discard_zeroes = False
-        self.sw_format_version = "118" ## what format does the software support?
-        self.pcl_format_version = None ## what format is in the binary file?
+        # self.txt_meta = Database.Meta.init()
+        self.txt_meta = Meta ( None, None, None, discard_zeroes, 200, 
+                               sys.version, None )
+        self.txt_meta.discard_zeroes = discard_zeroes
+        self.pcl_meta = Meta ( None, None, None, None, None, None, None )
         self.progressbar = None
         if progressbar:
             try:
@@ -93,14 +127,14 @@ class Database(object):
     def printFastlimBanner ( self ):
         """ check if fastlim appears in data.
             If yes, print a statement to stdout. """
-        if not self.hasFastLim: return
+        if not self.txt_meta.hasFastLim: return
         logger.info ( "FastLim v1.1 efficiencies loaded. Please cite: arXiv:1402.0492, EPJC74 (2014) 11" )
 
     def __eq__ ( self, other ):
         """ compare two databases """
         if type ( other ) != type ( self ):
             return False
-        if self.databaseVersion != other.databaseVersion:
+        if self.txt_meta.databaseVersion != other.txt_meta.databaseVersion:
             return False
         if len(self.expResultList ) != len (other.expResultList):
             return False
@@ -127,11 +161,11 @@ class Database(object):
 
     def loadTextDatabase ( self ):
         """ simply loads the textdabase """
-        if self._databaseVersion and len(self.expResultList)>0:
+        if self.txt_meta.databaseVersion and len(self.expResultList)>0:
             logger.debug ( "Asked to load database, but has already been loaded. Ignore." )
             return
         logger.info ( "Parsing text database at %s" % self._base )
-        self._databaseVersion = self._getDatabaseVersion
+        self.txt_meta.databaseVersion = self._getDatabaseVersion
         self.expResultList = self._loadExpResults()
 
     def lastModifiedDir ( self, dirname, lastm ):
@@ -165,7 +199,7 @@ class Database(object):
         return (ret,ctr)
 
     def lastModifiedAndFileCount( self ):
-        if self.txt_mtime[0]:
+        if self.txt_meta.mtime:
             ## already evaluated
             return
         versionfile = os.path.join ( self._base, "version" ) 
@@ -181,7 +215,8 @@ class Database(object):
                 continue
             (lastm,tcount) = self.lastModifiedDir ( subdir, lastm )
             count+=tcount+1
-        self.txt_mtime = lastm, count
+        self.txt_meta.mtime = lastm
+        self.txt_meta.filecount = count
 
     def loadBinaryFile ( self, lastm_only = False ):
         """
@@ -190,7 +225,7 @@ class Database(object):
         :param lastm_only: if true, the database itself is not read.
         :returns: database object, or None, if lastm_only == True.
         """
-        if lastm_only and self.pcl_mtime[0]:
+        if lastm_only and self.pcl_meta.mtime:
             ## doesnt need to load database, and mtime is already
             ## loaded
             return None
@@ -201,28 +236,15 @@ class Database(object):
         try:
             with open ( self.binfile(), "rb" ) as f:
                 t0=time.time()
-                self.pcl_python = serializer.load ( f )
-                self.pcl_format_version = serializer.load ( f )
-                self.pcl_mtime = serializer.load ( f )
-                self._databaseVersion = serializer.load ( f )
-                self.pcl_hasFastLim = serializer.load ( f )
-                self.pcl_discard_zeroes = serializer.load ( f )
+                self.pcl_meta = serializer.load ( f )
                 if not lastm_only:
-                    if self.pcl_python != sys.version:
-                        logger.warning ( "binary file was written with a different "
-                                         "python version. Regenerating." )
+                    if self.pcl_meta.needsUpdate ( self.txt_meta ):
+                        logger.warning ( "Something changed in the environment."
+                                         "Regenerating." )
                         self.createBinaryFile()
                         return self
-                    if self.pcl_format_version != self.sw_format_version:
-                        logger.warning ( "binary file format (%s) and format " 
-                                         "supported by software (%s) disagree." % 
-                           ( self.pcl_format_version, self.sw_format_version ) )
-                        logger.warning ( "will recreate binary." )
-                        self.createBinaryFile()
-                        return self
-
                     logger.info ( "loading binary db file %s format version %s" % 
-                            ( self.binfile(), self.pcl_format_version ) )
+                            ( self.binfile(), self.pcl_meta.format_version ) )
                     self.expResultList = serializer.load ( f )
                     t1=time.time()-t0
                     logger.info ( "Loaded database from %s in %.1f secs." % \
@@ -230,8 +252,8 @@ class Database(object):
         except (EOFError,ValueError) as e:
             os.unlink ( self.binfile() )
             if lastm_only:
-                self.pcl_format_version = -1
-                self.pcl_mtime = 0
+                self.pcl_meta.format_version = -1
+                self.pcl_meta.mtime = 0
                 return self
             logger.error ( "%s is not a binary database file, recreate it." % \
                             self.binfile() )
@@ -242,9 +264,9 @@ class Database(object):
         nu=self.needsUpdate()
         logger.debug ( "Checking binary db file." )
         logger.debug ( "Binary file dates to %s(%d)" % \
-                      ( time.ctime(self.pcl_mtime[0]),self.pcl_mtime[1] ) )
+                      ( time.ctime(self.pcl_meta.mtime),self.pcl_meta.filecount ) )
         logger.debug ( "Database dates to %s(%d)" % \
-                      ( time.ctime(self.txt_mtime[0]),self.txt_mtime[1] ) )
+                      ( time.ctime(self.txt_meta.mtime),self.txt_meta.filecount ) )
         if nu:
             logger.info ( "Binary db file needs an update." )
         else:
@@ -256,14 +278,7 @@ class Database(object):
         try:
             self.lastModifiedAndFileCount()
             self.loadBinaryFile ( lastm_only = True )
-            #logger.debug ( "needsUpdate? discard_zeroes=%d %d" % \
-            #      ( self.discard_zeroes, self.pcl_discard_zeroes )  )
-            return ( self.txt_mtime[0] > self.pcl_mtime[0] or \
-                     self.txt_mtime[1] != self.pcl_mtime[1]  or \
-                     self.sw_format_version != self.pcl_format_version or \
-            #         self.hasFastLim != self.pcl_hasFastLim or \
-                     self.discard_zeroes != self.pcl_discard_zeroes
-                )
+            return ( self.pcl_meta.needsUpdate ( self.txt_meta ) )
         except (IOError,DatabaseNotFoundException,TypeError,ValueError):
             # if we encounter a problem, we rebuild the database.
             return True
@@ -278,7 +293,7 @@ class Database(object):
         logger.debug ( " * compute last modified timestamp." )
         self.lastModifiedAndFileCount()
         logger.debug (  " * compute timestamp: %s filecount: %d" % \
-                ( time.ctime ( self.txt_mtime[0] ), self.txt_mtime[1] ) )
+                ( time.ctime ( self.txt_meta.mtime ), self.txt_meta.filecount ) )
         binfile = filename
         if binfile == None:
             binfile = self.binfile()
@@ -287,15 +302,9 @@ class Database(object):
             logger.debug (  " * load text database" )
             self.loadTextDatabase() 
             logger.debug (  " * write %s version %s" % ( binfile,
-                       self.sw_format_version ) )
-            self.pcl_python = sys.version
+                       self.txt_meta.format_version ) )
             ptcl = serializer.HIGHEST_PROTOCOL
-            serializer.dump ( self.pcl_python, f, protocol=ptcl )
-            serializer.dump ( self.sw_format_version, f, protocol=ptcl )
-            serializer.dump ( self.txt_mtime, f, protocol=ptcl )
-            serializer.dump ( self._databaseVersion, f, protocol=ptcl )
-            serializer.dump ( self.hasFastLim, f, protocol=ptcl )
-            serializer.dump ( self.discard_zeroes, f, protocol=ptcl )
+            serializer.dump ( self.txt_meta, f, protocol=ptcl )
             serializer.dump ( self.expResultList, f, protocol=ptcl )
             logger.info (  " * done writing %s in %.1f secs." % \
                     ( binfile, time.time()-t0 ) )
@@ -306,7 +315,7 @@ class Database(object):
         The version of the database, read from the 'version' file.
         
         """
-        return self._databaseVersion
+        return self.txt_meta.databaseVersion
 
 
     @property
@@ -441,12 +450,12 @@ class Database(object):
         for ctr,root in enumerate(roots):
             if self.progressbar:
                 self.progressbar.update(ctr)
-            expres = ExpResult(root, discard_zeroes = self.discard_zeroes )
+            expres = ExpResult(root, discard_zeroes = self.txt_meta.discard_zeroes )
             if expres:
                 resultsList.append(expres)
                 contact = expres.globalInfo.getInfo("contact")
                 if contact and "fastlim" in contact.lower():
-                    self.hasFastLim = True
+                    self.txt_meta.hasFastLim = True
 
         if not resultsList:
             logger.warning("Zero results loaded.")
@@ -508,7 +517,7 @@ class Database(object):
                     if not dataset.dataInfo.dataId in datasetIDs:
                         continue
                 newDataSet = datasetObj.DataSet( dataset.path, dataset.globalInfo,
-                                          False, discard_zeroes=self.discard_zeroes )
+                       False, discard_zeroes=self.txt_meta.discard_zeroes )
                 newDataSet.dataInfo = dataset.dataInfo
                 newDataSet.txnameList = []
                 for txname in dataset.txnameList:
