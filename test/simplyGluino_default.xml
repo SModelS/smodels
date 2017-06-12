@@ -82,7 +82,7 @@
         <maxcond>0.2</maxcond>
         <minmassgap>5.0</minmassgap>
         <sigmacut>0.03</sigmacut>
-        <smodels_version>1.0.93</smodels_version>
+        <smodels_version>1.1.1</smodels_version>
         <warnings>Input file ok</warnings>
     </OutputStatus>
     <Outside_Grid_List/>

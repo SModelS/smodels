@@ -30,7 +30,7 @@ except ImportError as e:
     import pickle as serializer
 
 class Meta(object):
-    """ The Meta object holds all meta information regarding the 
+    """ The Meta object holds all meta information regarding the
         database, like number of analyses, last time of modification, ...
         Needed to understand if we have to re-pickle. """
 
@@ -53,6 +53,10 @@ class Meta(object):
         self.python = python
         self.databaseVersion = databaseVersion
 
+    def sameAs ( self, other ):
+        """ check if it is the same database version """
+        return (self.databaseVersion == other.databaseVersion)
+
     def needsUpdate ( self, current ):
         """ do we need an update, with respect to <current>.
             so <current> is the text database, <self> the pcl.
@@ -60,6 +64,8 @@ class Meta(object):
         if self.mtime < current.mtime: ## someone tinkered
             return True
         if self.filecount != current.filecount:
+            return True ## number of files changed
+        if self.databaseVersion != current.databaseVersion:
             return True ## number of files changed
         if self.discard_zeroes != current.discard_zeroes:
             return True ## flag changed
@@ -72,12 +78,12 @@ class Meta(object):
 class Database(object):
     """
     Database object. Holds a list of ExpResult objects.
-    
+
     :ivar base: path to the database (string)
     :ivar force_load: force loading the text database ("txt"),
         or binary database ("pcl"), dont force anything if None
-    :ivar expResultList: list of ExpResult objects 
-        
+    :ivar expResultList: list of ExpResult objects
+
     """
 
     def __init__( self, base=None, force_load = None, discard_zeroes = False,
@@ -87,7 +93,7 @@ class Database(object):
         :param force_load: force loading the text database ("txt"),
             or binary database ("pcl"), dont force anything if None
         :param discard_zeroes: discard txnames with only zeroes as entries.
-        :param progressbar: show a progressbar when building pickle file 
+        :param progressbar: show a progressbar when building pickle file
                             (needs the python-progressbar module)
         """
         self.force_load = force_load
@@ -95,7 +101,7 @@ class Database(object):
         self._validateBase(base)
         self.expResultList = []
         # self.txt_meta = Database.Meta.init()
-        self.txt_meta = Meta ( None, None, None, discard_zeroes, 200, 
+        self.txt_meta = Meta ( None, None, None, discard_zeroes, 200,
                                sys.version, None )
         self.pcl_meta = Meta ( None, None, None, None, None, None, None )
         self.progressbar = None
@@ -133,11 +139,11 @@ class Database(object):
 
     def __eq__ ( self, other ):
         """ compare two databases """
-        if type ( other ) != type ( self ):
+        if type ( self ) != type ( other ):
             return False
-        if self.txt_meta.databaseVersion != other.txt_meta.databaseVersion:
+        if not self.txt_meta.sameAs ( other.txt_meta ):
             return False
-        if len(self.expResultList ) != len (other.expResultList):
+        if len( self.expResultList ) != len (other.expResultList):
             return False
         for ( myres, otherres ) in zip ( self.expResultList, other.expResultList ):
             if myres != otherres:
@@ -145,7 +151,7 @@ class Database(object):
         return True
 
     def loadDatabase ( self ):
-        """ if no binary file is available, then 
+        """ if no binary file is available, then
             load the database and create the binary file.
             if binary file is available, then check if
             it needs update, create new binary file, in
@@ -173,7 +179,7 @@ class Database(object):
         """
         Return the last modified timestamp of dirname, working recursively,
         plus the number of files.
-         
+
         :param dirname: directory name that is checked
         :param lastm: the most recent timestamp so far
         :returns: the most recent timestamp, and the number of files
@@ -204,7 +210,7 @@ class Database(object):
         if self.txt_meta.mtime:
             ## already evaluated
             return
-        versionfile = os.path.join ( self._base, "version" ) 
+        versionfile = os.path.join ( self._base, "version" )
         if not os.path.exists ( versionfile ):
             logger.error("%s does not exist." % versionfile )
             sys.exit()
@@ -223,7 +229,7 @@ class Database(object):
     def loadBinaryFile ( self, lastm_only = False ):
         """
         Load a binary database, returning last modified, file count, database.
-        
+
         :param lastm_only: if true, the database itself is not read.
         :returns: database object, or None, if lastm_only == True.
         """
@@ -239,13 +245,14 @@ class Database(object):
             with open ( self.binfile(), "rb" ) as f:
                 t0=time.time()
                 self.pcl_meta = serializer.load ( f )
+                self.txt_meta = self.pcl_meta ## 
                 if not lastm_only:
                     if self.pcl_meta.needsUpdate ( self.txt_meta ):
                         logger.warning ( "Something changed in the environment."
                                          "Regenerating." )
                         self.createBinaryFile()
                         return self
-                    logger.info ( "loading binary db file %s format version %s" % 
+                    logger.info ( "loading binary db file %s format version %s" %
                             ( self.binfile(), self.pcl_meta.format_version ) )
                     self.expResultList = serializer.load ( f )
                     t1=time.time()-t0
@@ -302,9 +309,10 @@ class Database(object):
         logger.debug (  " * create %s" % binfile )
         with open ( binfile, "wb" ) as f:
             logger.debug (  " * load text database" )
-            self.loadTextDatabase() 
-            logger.debug (  " * write %s version %s" % ( binfile,
-                       self.txt_meta.format_version ) )
+            self.loadTextDatabase()
+            logger.debug (  " * write %s db version %s, format version %s" % \
+                    ( binfile, self.txt_meta.databaseVersion,
+                      self.txt_meta.format_version ) )
             ptcl = serializer.HIGHEST_PROTOCOL
             serializer.dump ( self.txt_meta, f, protocol=ptcl )
             serializer.dump ( self.expResultList, f, protocol=ptcl )
@@ -315,7 +323,7 @@ class Database(object):
     def databaseVersion(self):
         """
         The version of the database, read from the 'version' file.
-        
+
         """
         return self.txt_meta.databaseVersion
 
@@ -324,16 +332,16 @@ class Database(object):
     def base(self):
         """
         This is the path to the base directory where to find the database.
-        
+
         """
         return self._base
 
 
     def _validateBase(self, path):
         """
-        Validates the base directory to locate the database. 
+        Validates the base directory to locate the database.
         Raises an exception if something is wrong with the path.
-    
+
         """
         logger.debug('Try to set the path for the database to: %s', path)
         tmp = os.path.realpath(path)
@@ -372,7 +380,7 @@ class Database(object):
             idList += "no experimental results available! "
             return idList
         idList += "%d experimental results: " % \
-                   len ( self.expResultList ) 
+                   len ( self.expResultList )
         atlas,cms = [],[]
         datasets = 0
         txnames = 0
@@ -403,7 +411,7 @@ class Database(object):
     def _getDatabaseVersion(self):
         """
         Retrieves the version of the database using the version file.
-        
+
         """
         try:
             vfile = os.path.join ( self._base, "version" )
@@ -423,9 +431,9 @@ class Database(object):
         """
         Checks the database folder and generates a list of ExpResult objects for
         each (globalInfo.txt,sms.py) pair.
-       
-        :returns: list of ExpResult objects 
-  
+
+        :returns: list of ExpResult objects
+
         """
         folders=[]
         for root, _, files in os.walk(self._base):
@@ -472,7 +480,7 @@ class Database(object):
                     onlyWithExpected = False ):
         """
         Returns a list of ExpResult objects.
-        
+
         Each object refers to an analysisID containing one (for UL) or more
         (for Efficiency maps) dataset (signal region) and each dataset
         containing one or more TxNames.  If analysisIDs is defined, returns
@@ -481,19 +489,19 @@ class Database(object):
         datasetIDs is defined, returns only the results matching one of the IDs
         in the list.  If txname is defined, returns only the results matching
         one of the Tx names in the list.
-        
+
         :param analysisID: list of analysis ids ([CMS-SUS-13-006,...])
         :param dataType: dataType of the analysis (all, efficiencyMap or upperLimit)
         :param datasetIDs: list of dataset ids ([ANA-CUT0,...])
         :param txnames: list of txnames ([TChiWZ,...])
         :param useSuperseded: If False, the supersededBy results will not be included
-        :param useNonValidated: If False, the results with validated = False 
+        :param useNonValidated: If False, the results with validated = False
                                 will not be included
-        :param onlyWithExpected: Return only those results that have expected values 
+        :param onlyWithExpected: Return only those results that have expected values
                  also. Note that this is trivially fulfilled for all efficiency maps.
         :returns: list of ExpResult objects or the ExpResult object if the list
                   contains only one result
-                   
+
         """
         expResultList = []
         for expResult in self.expResultList:
@@ -506,11 +514,11 @@ class Database(object):
             # Skip analysis not containing any of the required ids:
             if analysisIDs != ['all']:
                 if not ID in analysisIDs:
-                    continue              
+                    continue
             newExpResult = ExpResult()
             newExpResult.path = expResult.path
             newExpResult.globalInfo = expResult.globalInfo
-            newExpResult.datasets = []            
+            newExpResult.datasets = []
             for dataset in expResult.datasets:
                 if dataTypes != ['all']:
                     if not dataset.dataInfo.dataType in dataTypes:
@@ -552,7 +560,7 @@ class Database(object):
         return expResultList
 
     def updateBinaryFile ( self ):
-        """ write a binar db file, but only if 
+        """ write a binar db file, but only if
             necessary. """
         if self.needsUpdate():
             logger.debug ( "Binary db file needs an update." )
@@ -563,9 +571,9 @@ class Database(object):
 class ExpResultList(object):
     """
     Holds a list of ExpResult objects for printout.
-    
-    :ivar expResultList: list of ExpResult objects 
-        
+
+    :ivar expResultList: list of ExpResult objects
+
     """
     def __init__(self, expResList):
         self.expResultList = expResList
@@ -573,9 +581,9 @@ class ExpResultList(object):
 if __name__ == "__main__":
     import argparse
     from smodels.tools.smodelsLogging import setLogLevel
-    """ Run as a script, this checks and/or writes database.pcl files """
+    """ Run as a script, this checks and/or writes dbX.pcl files """
     argparser = argparse.ArgumentParser(description='simple script to check \
-            and/or write database.pcl files')
+            and/or write dbX.pcl files')
     argparser.add_argument('-c', '--check', help='check binary db file',
                            action='store_true')
     argparser.add_argument('-t', '--time', help='time reading db',
@@ -588,7 +596,7 @@ if __name__ == "__main__":
                            action='store_true')
     argparser.add_argument('-d', '--debug', help='debug mode',
                            action='store_true')
-    argparser.add_argument('-D', '--database', help='directory name of database', 
+    argparser.add_argument('-D', '--database', help='directory name of database',
                             default="../../../smodels-database/" )
     args = argparser.parse_args()
     logger.setLevel(level=logging.INFO )
@@ -613,7 +621,7 @@ if __name__ == "__main__":
         print ( "Time it took reading text   file: %.1f s." % (t2-t1) )
     if args.read:
         db = db.loadBinaryFile ( lastm_only = False )
-        listOfExpRes = db.getExpResults() 
+        listOfExpRes = db.getExpResults()
         for expResult in listOfExpRes:
             print (expResult)
 

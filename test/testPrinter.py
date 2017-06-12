@@ -261,7 +261,7 @@ class RunPrinterTest(unittest.TestCase):
         mprinter.setOutPutFiles('./unitTestOutput/printer_output')
         self.runPrinterMain(slhafile,mprinter)                    
                       
-        defFile = os.path.join ( idir(), "test/default_output.xml" )
+        defFile = os.path.join ( idir(), "test/default.xml" )
         outFile = os.path.join ( idir(), "test/unitTestOutput/printer_output.xml" )
            
         #Test xml output
@@ -287,7 +287,7 @@ class RunPrinterTest(unittest.TestCase):
         mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple')
         self.runPrinterMain(slhafile,mprinter,addTopList=True)                    
                      
-        defFile = os.path.join ( idir(), "test/default_outputSimplyGluino.xml" )
+        defFile = os.path.join ( idir(), "test/simplyGluino_default.xml" )
         outFile = os.path.join ( idir(), "test/unitTestOutput/printer_output_simple.xml" )
           
         #Test xml output
