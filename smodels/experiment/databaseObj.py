@@ -44,7 +44,7 @@ class Database(object):
     def __init__( self, base=None, force_load = None, discard_zeroes = False,
                   progressbar = False  ):
         """
-        :param base: path to the database (string)
+        :param base: path to the database, or pickle file (string)
         :param force_load: force loading the text database ("txt"),
             or binary database ("pcl"), dont force anything if None
         :param discard_zeroes: discard txnames with only zeroes as entries.
@@ -52,16 +52,17 @@ class Database(object):
                             (needs the python-progressbar module)
         """
         self.force_load = force_load
-        pclfilename = "db%s.pcl" % sys.version[0]
-        self._validateBase(base)
-        self.expResultList = []
-        self.txt_meta = Meta( discard_zeroes = discard_zeroes )
+        self.base, pclfile = self.checkPathName(base)
         self.pcl_meta = Meta( pclfilename )
+        self.expResultList = []
+        self.txt_meta = Meta( base, discard_zeroes = discard_zeroes )
         self.progressbar = None
         if progressbar:
             try:
                 import progressbar as P
-                self.progressbar = P.ProgressBar( widgets= [ "Building Database ", P.Percentage(), P.Bar( marker=P.RotatingMarker() ), P.ETA() ] )
+                self.progressbar = P.ProgressBar( widgets= 
+                        [ "Building Database ", P.Percentage(), 
+                          P.Bar( marker=P.RotatingMarker() ), P.ETA() ] )
             except ImportError as e:
                 logger.warning ( "progressbar requested, but python-progressbar is not installed." )
 
@@ -292,20 +293,17 @@ class Database(object):
         return self._base
 
 
-    def _validateBase(self, path):
+    def checkPathName(self, path):
         """
-        Validates the base directory to locate the database.
-        Raises an exception if something is wrong with the path.
+        checks the path name,
+        returns the base directory and the pickle file name
+        """
 
-        """
         logger.debug('Try to set the path for the database to: %s', path)
         tmp = os.path.realpath(path)
         if os.path.isfile ( tmp ):
-            self._base = os.path.dirname ( tmp )
-            # self.force_load = None
-            self.pcl_meta.pathname = os.path.basename ( tmp )
-            # logger.debug ( "pclfilename is now %s" % self.pclfilename)
-            return
+            base = os.path.dirname ( tmp )
+            return ( base, tmp )
 
         if tmp[-4:]==".pcl":
             if not os.path.exists ( tmp ):
@@ -313,9 +311,9 @@ class Database(object):
                     logger.error ( "File not found: %s" % tmp )
                     sys.exit()
                 logger.info ( "File not found: %s. Will generate." % tmp )
-                self._base = os.path.dirname ( tmp )
-                self.pcl_meta.pathname = os.path.basename ( tmp )
-                return
+                base = os.path.dirname ( tmp )
+                # self.pcl_meta.pathname = os.path.basename ( tmp )
+                return ( base, tmp )
                 #if self.force_load in [ "txt", None, "None", "none" ]:
                 #sys.exit()
             logger.error ( "Supplied a pcl filename, but %s is not a file." % tmp )
@@ -325,7 +323,7 @@ class Database(object):
         if not os.path.exists(path):
             logger.error('%s is no valid path!' % path)
             raise DatabaseNotFoundException("Database not found")
-        self._base = path
+        return ( path, path + "db%d.pcl" % sys.version[0] )
 
     def __str__(self):
         idList = "Database version: " + self.databaseVersion
