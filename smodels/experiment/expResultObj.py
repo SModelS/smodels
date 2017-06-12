@@ -8,13 +8,19 @@
 """
 
 import os
+import sys
 from smodels.experiment import infoObj
 from smodels.experiment import txnameObj
 from smodels.experiment import datasetObj
+from smodels.experiment import metaObj
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.tools.physicsUnits import fb
-
 from smodels.tools.smodelsLogging import logger
+
+try:
+    import cPickle as serializer
+except ImportError as e:
+    import pickle as serializer
 
 class ExpResult(object):
     """
@@ -27,10 +33,12 @@ class ExpResult(object):
                     in <path>    
     """
         
-    def __init__(self, path=None, discard_zeroes = True ):
+    def __init__( self, path = None, discard_zeroes = True,
+                  pcl_file = False ):
         """
         :param path: Path to the experimental result folder
         :param discard_zeroes: Discard maps with only zeroes
+        :param pcl_file: Write and maintain pickle file
         """ 
 
         if path and os.path.isdir(path):
@@ -53,6 +61,11 @@ class ExpResult(object):
                         self.datasets.append(dataset)
                     except TypeError:
                         continue
+
+    def writePickle ( self ):
+        """ write the pickle file """
+        meta =  None
+        pass 
 
     def __eq__(self, other ):
         if self.globalInfo != other.globalInfo:

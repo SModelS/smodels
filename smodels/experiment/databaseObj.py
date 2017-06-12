@@ -52,13 +52,11 @@ class Database(object):
                             (needs the python-progressbar module)
         """
         self.force_load = force_load
-        self.pclfilename = "db%s.pcl" % sys.version[0]
+        pclfilename = "db%s.pcl" % sys.version[0]
         self._validateBase(base)
         self.expResultList = []
-        # self.txt_meta = Database.Meta.init()
-        self.txt_meta = Meta ( None, None, None, discard_zeroes, 200,
-                               sys.version, None )
-        self.pcl_meta = Meta ( None, None, None, None, None, None, None )
+        self.txt_meta = Meta( discard_zeroes = discard_zeroes )
+        self.pcl_meta = Meta( pclfilename )
         self.progressbar = None
         if progressbar:
             try:
@@ -84,7 +82,7 @@ class Database(object):
         sys.exit()
 
     def binfile ( self ):
-        return os.path.join ( self._base, self.pclfilename )
+        return os.path.join ( self._base, self.pcl_meta.pathname )
 
     def printFastlimBanner ( self ):
         """ check if fastlim appears in data.
@@ -132,7 +130,7 @@ class Database(object):
 
     def lastModifiedDir ( self, dirname, lastm ):
         """
-        Return the last modified timestamp of dirname, working recursively,
+        Return the last modified timestamp of dirname (working recursively)
         plus the number of files.
 
         :param dirname: directory name that is checked
@@ -199,7 +197,9 @@ class Database(object):
         try:
             with open ( self.binfile(), "rb" ) as f:
                 t0=time.time()
+                pclfilename = self.pcl_meta.pathname
                 self.pcl_meta = serializer.load ( f )
+                self.pcl_meta.pathname = pclfilename
                 self.txt_meta = self.pcl_meta ## 
                 if not lastm_only:
                     if self.pcl_meta.needsUpdate ( self.txt_meta ):
@@ -303,7 +303,7 @@ class Database(object):
         if os.path.isfile ( tmp ):
             self._base = os.path.dirname ( tmp )
             # self.force_load = None
-            self.pclfilename = os.path.basename ( tmp )
+            self.pcl_meta.pathname = os.path.basename ( tmp )
             # logger.debug ( "pclfilename is now %s" % self.pclfilename)
             return
 
@@ -314,7 +314,7 @@ class Database(object):
                     sys.exit()
                 logger.info ( "File not found: %s. Will generate." % tmp )
                 self._base = os.path.dirname ( tmp )
-                self.pclfilename = os.path.basename ( tmp )
+                self.pcl_meta.pathname = os.path.basename ( tmp )
                 return
                 #if self.force_load in [ "txt", None, "None", "none" ]:
                 #sys.exit()
