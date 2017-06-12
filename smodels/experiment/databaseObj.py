@@ -52,9 +52,10 @@ class Database(object):
         """
         self.force_load = force_load
         base, pclfile = self.checkPathName(base)
+        # logger.error  ( "base,pclfile=%s,%s" % (base,pclfile ) )
         self.pcl_meta = Meta( pclfile )
         self.expResultList = []
-        self.txt_meta = Meta.fromTextDatabase ( base, discard_zeroes = discard_zeroes )
+        self.txt_meta = Meta ( base, discard_zeroes = discard_zeroes )
         self.progressbar = None
         if progressbar:
             try:

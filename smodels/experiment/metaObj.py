@@ -2,7 +2,7 @@
 
 """
 .. module:: metaObj
-   :synopsis: Contains the Meta object used to track the provenance of 
+   :synopsis: Contains the Meta object used to track the provenance of
               the pickle file.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
@@ -20,37 +20,29 @@ class Meta(object):
         database, like number of analyses, last time of modification, ...
         This info is needed to understand if we have to re-pickle. """
 
-    def __init__ ( self, pathname=None, mtime=None, filecount=None, 
-                   hasFastLim=None, discard_zeroes=None,
-                   databaseVersion=None, format_version=current_version, 
+    def __init__ ( self, pathname, discard_zeroes=None, mtime=None, filecount=None,
+                   hasFastLim=None, databaseVersion=None, format_version=current_version,
                    python=sys.version ):
         """
         :param pathname: filename of pickle file, or dirname of text files
+        :param discard_zeroes: do we discard zeroes?
         :param mtime: last modification time stamps
         :param filecount: number of files
         :param hasFastLim: fastlim in the database?
-        :param discard_zeroes: do we discard zeroes?
         :param databaseVersion: version of database
         :param format_version: format version of pickle file
         :param python: python version
         """
         self.pathname = pathname
+        self.discard_zeroes = discard_zeroes
         self.mtime = mtime
         self.filecount = filecount
         self.hasFastLim = hasFastLim
-        self.discard_zeroes = discard_zeroes
         self.format_version = format_version
         self.python = python
         self.databaseVersion = databaseVersion
         self.versionFromFile()
         self.determineLastModified()
-
-    @classmethod
-    def fromTextDatabase ( cls, pathname, discard_zeroes ):
-        mtime,filecount=None, None
-        filecount=0
-        hasFastLim=None
-        return cls ( pathname, mtime, filecount, hasFastLim, discard_zeroes )
 
     def versionFromFile ( self ):
         """
@@ -74,7 +66,7 @@ class Meta(object):
 
     def isPickle ( self ):
         """ is this meta info from a pickle file? """
-        if os.path.isfile ( self.pathname ):
+        if not os.path.isdir ( self.pathname ):
             return True
 
     def determineLastModified ( self ):
