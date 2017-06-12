@@ -118,37 +118,6 @@ class Database(object):
         logger.info ( "Parsing text database at %s" % self.txt_meta.pathname )
         self.expResultList = self._loadExpResults()
 
-    def lastModifiedDir ( self, dirname, lastm ):
-        """
-        Return the last modified timestamp of dirname (working recursively)
-        plus the number of files.
-
-        :param dirname: directory name that is checked
-        :param lastm: the most recent timestamp so far
-        :returns: the most recent timestamp, and the number of files
-        """
-        ret = lastm
-        ctr=0
-        for f in os.listdir ( dirname ):
-            if f in [ "orig", "sms.root", "validation" ]:
-                continue
-            if f[-1:]=="~":
-                continue
-            if f[0]==".":
-                continue
-            if f[-3:]==".py":
-                continue
-            lf = os.path.join ( dirname, f )
-            if os.path.isdir ( lf ):
-                (ret,tctr) = self.lastModifiedDir ( lf, ret )
-                ctr+=tctr+1
-            else:
-                ctr+=1
-                tmp = os.stat ( lf ).st_mtime
-                if tmp > ret:
-                    ret = tmp
-        return (ret,ctr)
-
     def loadBinaryFile ( self, lastm_only = False ):
         """
         Load a binary database, returning last modified, file count, database.
@@ -210,9 +179,8 @@ class Database(object):
     def needsUpdate ( self ):
         """ does the binary db file need an update? """
         try:
-            self.txt_meta.determineLastModified()
             self.loadBinaryFile ( lastm_only = True )
-            logger.error ( "needs update?" )
+            # logger.error ( "needs update?" )
             return ( self.pcl_meta.needsUpdate ( self.txt_meta ) )
         except (IOError,DatabaseNotFoundException,TypeError,ValueError):
             # if we encounter a problem, we rebuild the database.

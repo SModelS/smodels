@@ -18,12 +18,11 @@ class Meta(object):
 
     """ The Meta object holds all meta information regarding the
         database, like number of analyses, last time of modification, ...
-        Needed to understand if we have to re-pickle. """
+        This info is needed to understand if we have to re-pickle. """
 
     def __init__ ( self, pathname=None, mtime=None, filecount=None, 
                    hasFastLim=None, discard_zeroes=None,
-                   databaseVersion=None,
-                   format_version=current_version, 
+                   databaseVersion=None, format_version=current_version, 
                    python=sys.version ):
         """
         :param pathname: filename of pickle file, or dirname of text files
@@ -52,10 +51,6 @@ class Meta(object):
         filecount=0
         hasFastLim=None
         return cls ( pathname, mtime, filecount, hasFastLim, discard_zeroes )
-        versionfile = os.path.join ( self.pathname, "version" )
-        if not os.path.exists ( versionfile ):
-            logger.error("%s does not exist." % versionfile )
-            sys.exit()
 
     def versionFromFile ( self ):
         """
