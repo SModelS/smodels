@@ -23,7 +23,6 @@ from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.tools.physicsUnits import TeV
 from smodels.tools.smodelsLogging import logger
-import logging
 
 try:
     import cPickle as serializer
@@ -52,10 +51,10 @@ class Database(object):
                             (needs the python-progressbar module)
         """
         self.force_load = force_load
-        self.base, pclfile = self.checkPathName(base)
-        self.pcl_meta = Meta( pclfilename )
+        base, pclfile = self.checkPathName(base)
+        self.pcl_meta = Meta( pclfile )
         self.expResultList = []
-        self.txt_meta = Meta( base, discard_zeroes = discard_zeroes )
+        self.txt_meta = Meta.fromTextDatabase ( base, discard_zeroes = discard_zeroes )
         self.progressbar = None
         if progressbar:
             try:
@@ -68,28 +67,19 @@ class Database(object):
 
         if self.force_load=="txt":
             self.loadTextDatabase()
-            self.printFastlimBanner()
+            self.txt_meta.printFastlimBanner()
             return
         if self.force_load=="pcl":
             self.loadBinaryFile()
-            self.printFastlimBanner()
+            self.pcl_meta.printFastlimBanner()
             return
         if self.force_load in [ None, "none", "None" ]:
             self.loadDatabase()
-            self.printFastlimBanner()
+            self.txt_meta.printFastlimBanner()
             return
         logger.error ( "when initialising database: force_load=%s is not " \
                        "recognized. Valid values are: pcl, txt, None." % force_load )
         sys.exit()
-
-    def binfile ( self ):
-        return os.path.join ( self._base, self.pcl_meta.pathname )
-
-    def printFastlimBanner ( self ):
-        """ check if fastlim appears in data.
-            If yes, print a statement to stdout. """
-        if not self.txt_meta.hasFastLim: return
-        logger.info ( "FastLim v1.1 efficiencies loaded. Please cite: arXiv:1402.0492, EPJC74 (2014) 11" )
 
     def __eq__ ( self, other ):
         """ compare two databases """
@@ -111,7 +101,7 @@ class Database(object):
             it needs update, create new binary file, in
             case it does need an update.
         """
-        if not os.path.exists ( self.binfile() ):
+        if not os.path.exists ( self.pcl_meta.pathname ):
 #             self.loadTextDatabase()
             self.createBinaryFile()
         else:
@@ -125,8 +115,7 @@ class Database(object):
         if self.txt_meta.databaseVersion and len(self.expResultList)>0:
             logger.debug ( "Asked to load database, but has already been loaded. Ignore." )
             return
-        logger.info ( "Parsing text database at %s" % self._base )
-        self.txt_meta.databaseVersion = self._getDatabaseVersion
+        logger.info ( "Parsing text database at %s" % self.txt_meta.pathname )
         self.expResultList = self._loadExpResults()
 
     def lastModifiedDir ( self, dirname, lastm ):
@@ -160,26 +149,6 @@ class Database(object):
                     ret = tmp
         return (ret,ctr)
 
-    def lastModifiedAndFileCount( self ):
-        if self.txt_meta.mtime:
-            ## already evaluated
-            return
-        versionfile = os.path.join ( self._base, "version" )
-        if not os.path.exists ( versionfile ):
-            logger.error("%s does not exist." % versionfile )
-            sys.exit()
-        lastm = os.stat(versionfile).st_mtime
-        count=1
-        topdir = os.listdir ( self._base )
-        for File in topdir:
-            subdir = os.path.join ( self._base, File )
-            if not os.path.isdir ( subdir ) or File in [ ".git" ]:
-                continue
-            (lastm,tcount) = self.lastModifiedDir ( subdir, lastm )
-            count+=tcount+1
-        self.txt_meta.mtime = lastm
-        self.txt_meta.filecount = count
-
     def loadBinaryFile ( self, lastm_only = False ):
         """
         Load a binary database, returning last modified, file count, database.
@@ -192,16 +161,15 @@ class Database(object):
             ## loaded
             return None
 
-        if not os.path.exists ( self.binfile() ):
+        if not os.path.exists ( self.pcl_meta.pathname ):
             return None
 
         try:
-            with open ( self.binfile(), "rb" ) as f:
+            with open ( self.pcl_meta.pathname, "rb" ) as f:
                 t0=time.time()
                 pclfilename = self.pcl_meta.pathname
                 self.pcl_meta = serializer.load ( f )
                 self.pcl_meta.pathname = pclfilename
-                self.txt_meta = self.pcl_meta ## 
                 if not lastm_only:
                     if self.pcl_meta.needsUpdate ( self.txt_meta ):
                         logger.warning ( "Something changed in the environment."
@@ -209,20 +177,21 @@ class Database(object):
                         self.createBinaryFile()
                         return self
                     logger.info ( "loading binary db file %s format version %s" %
-                            ( self.binfile(), self.pcl_meta.format_version ) )
+                            ( self.pcl_meta.pathname, self.pcl_meta.format_version ) )
                     self.expResultList = serializer.load ( f )
                     t1=time.time()-t0
                     logger.info ( "Loaded database from %s in %.1f secs." % \
-                            ( self.binfile(), t1 ) )
+                            ( self.pcl_meta.pathname, t1 ) )
         except (EOFError,ValueError) as e:
-            os.unlink ( self.binfile() )
+            os.unlink ( self.pcl_meta.pathname )
             if lastm_only:
                 self.pcl_meta.format_version = -1
                 self.pcl_meta.mtime = 0
                 return self
             logger.error ( "%s is not a binary database file, recreate it." % \
-                            self.binfile() )
+                            self.pcl_meta.pathname )
             self.createBinaryFile()
+        # self.txt_meta = self.pcl_meta
         return self
 
     def checkBinaryFile ( self ):
@@ -241,8 +210,9 @@ class Database(object):
     def needsUpdate ( self ):
         """ does the binary db file need an update? """
         try:
-            self.lastModifiedAndFileCount()
+            self.txt_meta.determineLastModified()
             self.loadBinaryFile ( lastm_only = True )
+            logger.error ( "needs update?" )
             return ( self.pcl_meta.needsUpdate ( self.txt_meta ) )
         except (IOError,DatabaseNotFoundException,TypeError,ValueError):
             # if we encounter a problem, we rebuild the database.
@@ -256,12 +226,11 @@ class Database(object):
         logger.info ( "Creating binary database " )
         logger.info ( "(this may take a few minutes, but it's done only once!)" )
         logger.debug ( " * compute last modified timestamp." )
-        self.lastModifiedAndFileCount()
         logger.debug (  " * compute timestamp: %s filecount: %d" % \
                 ( time.ctime ( self.txt_meta.mtime ), self.txt_meta.filecount ) )
         binfile = filename
         if binfile == None:
-            binfile = self.binfile()
+            binfile = self.pcl_meta.pathname
         logger.debug (  " * create %s" % binfile )
         with open ( binfile, "wb" ) as f:
             logger.debug (  " * load text database" )
@@ -290,7 +259,7 @@ class Database(object):
         This is the path to the base directory where to find the database.
 
         """
-        return self._base
+        return self.txt_meta.pathname
 
 
     def checkPathName(self, path):
@@ -298,7 +267,6 @@ class Database(object):
         checks the path name,
         returns the base directory and the pickle file name
         """
-
         logger.debug('Try to set the path for the database to: %s', path)
         tmp = os.path.realpath(path)
         if os.path.isfile ( tmp ):
@@ -323,7 +291,7 @@ class Database(object):
         if not os.path.exists(path):
             logger.error('%s is no valid path!' % path)
             raise DatabaseNotFoundException("Database not found")
-        return ( path, path + "db%d.pcl" % sys.version[0] )
+        return ( path, path + "db%s.pcl" % sys.version[0] )
 
     def __str__(self):
         idList = "Database version: " + self.databaseVersion
@@ -359,27 +327,6 @@ class Database(object):
         idList += "%d datasets, %d txnames.\n" % ( datasets, txnames )
         return idList
 
-
-    @property
-    def _getDatabaseVersion(self):
-        """
-        Retrieves the version of the database using the version file.
-
-        """
-        try:
-            vfile = os.path.join ( self._base, "version" )
-            versionFile = open( vfile )
-            content = versionFile.readlines()
-            versionFile.close()
-            line = content[0].strip()
-            logger.debug("Found version file %s with content ``%s''" \
-                   % ( vfile, line) )
-            return line
-
-        except IOError:
-            logger.error('There is no version file %s', vfile )
-            return 'unknown version'
-
     def _loadExpResults(self):
         """
         Checks the database folder and generates a list of ExpResult objects for
@@ -389,7 +336,7 @@ class Database(object):
 
         """
         folders=[]
-        for root, _, files in os.walk(self._base):
+        for root, _, files in os.walk(self.txt_meta.pathname):
             folders.append ( (root, files) )
         folders.sort()
 

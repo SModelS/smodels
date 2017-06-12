@@ -9,7 +9,9 @@
 
 """
 
+import os
 import sys
+from smodels.tools.smodelsLogging import logger
 
 class Meta(object):
     current_version = 201 ## the current format version
@@ -20,17 +22,18 @@ class Meta(object):
 
     def __init__ ( self, pathname=None, mtime=None, filecount=None, 
                    hasFastLim=None, discard_zeroes=None,
+                   databaseVersion=None,
                    format_version=current_version, 
-                   python=sys.version, databaseVersion=None ):
+                   python=sys.version ):
         """
         :param pathname: filename of pickle file, or dirname of text files
         :param mtime: last modification time stamps
         :param filecount: number of files
         :param hasFastLim: fastlim in the database?
         :param discard_zeroes: do we discard zeroes?
+        :param databaseVersion: version of database
         :param format_version: format version of pickle file
         :param python: python version
-        :param databaseVersion: version of database
         """
         self.pathname = pathname
         self.mtime = mtime
@@ -40,10 +43,116 @@ class Meta(object):
         self.format_version = format_version
         self.python = python
         self.databaseVersion = databaseVersion
+        self.versionFromFile()
+        self.determineLastModified()
+
+    @classmethod
+    def fromTextDatabase ( cls, pathname, discard_zeroes ):
+        mtime,filecount=None, None
+        filecount=0
+        hasFastLim=None
+        return cls ( pathname, mtime, filecount, hasFastLim, discard_zeroes )
+        versionfile = os.path.join ( self.pathname, "version" )
+        if not os.path.exists ( versionfile ):
+            logger.error("%s does not exist." % versionfile )
+            sys.exit()
+
+    @classmethod
+    def fromPickleFile ( cls ):
+        if not os.path.exists ( self.pathname ) and not os.path.isfile ( self.pathname ):
+            raise SModelSExperimentError ( "trying to create Meta object from non-existing pickle file" )
+
+    def versionFromFile ( self ):
+        """
+        Retrieves the version of the database using the version file.
+        """
+        if self.databaseVersion or self.isPickle():
+            return
+        try:
+            vfile = os.path.join ( self.pathname, "version" )
+            versionFile = open( vfile )
+            content = versionFile.readlines()
+            versionFile.close()
+            line = content[0].strip()
+            logger.debug("Found version file %s with content ``%s''" \
+                   % ( vfile, line) )
+            return line
+
+        except IOError:
+            logger.error('There is no version file %s', vfile )
+            return 'unknown version'
+
+    def isPickle ( self ):
+        """ is this meta info from a pickle file? """
+        if os.path.isfile ( self.pathname ):
+            return True
+
+    def determineLastModified ( self ):
+        """ compute the last modified timestamp, plus count
+            number of files. Only if text db """
+        if self.isPickle() or self.mtime:
+            return
+        versionfile = os.path.join ( self.pathname, "version" )
+        if not os.path.exists ( versionfile ):
+            logger.error("%s does not exist." % versionfile )
+            sys.exit()
+        lastm = os.stat(versionfile).st_mtime
+        count=1
+        topdir = os.listdir ( self.pathname )
+        for File in topdir:
+            subdir = os.path.join ( self.pathname, File )
+            if not os.path.isdir ( subdir ) or File in [ ".git" ]:
+                continue
+            (lastm,tcount) = self.lastModifiedSubDir ( subdir, lastm )
+            count+=tcount+1
+        self.mtime=lastm
+        self.filecount = count
+
+    def lastModifiedSubDir ( self, subdir, lastm ):
+        """
+        Return the last modified timestamp of subdir (working recursively)
+        plus the number of files.
+
+        :param subdir: directory name that is checked
+        :param lastm: the most recent timestamp so far, plus number of files
+        :returns: the most recent timestamp, and the number of files
+        """
+        ret = lastm
+        ctr=0
+        for f in os.listdir ( subdir ):
+            if f in [ "orig", "sms.root", "validation", ".git" ]:
+                continue
+            if f[-1:]=="~":
+                continue
+            if f[0]==".":
+                continue
+            if f[-3:]==".py":
+                continue
+            lf = os.path.join ( subdir, f )
+            if os.path.isdir ( lf ):
+                (ret,tctr) = self.lastModifiedSubDir ( lf, ret )
+                ctr+=tctr+1
+            else:
+                ctr+=1
+                tmp = os.stat ( lf ).st_mtime
+                if tmp > ret:
+                    ret = tmp
+        return (ret,ctr)
 
     def sameAs ( self, other ):
         """ check if it is the same database version """
+        if type(self) != type(other):
+            return False
         return (self.databaseVersion == other.databaseVersion)
+
+    def printFastlimBanner ( self ):
+        """ check if fastlim appears in data.
+            If yes, print a statement to stdout. """
+        if not self.hasFastLim: return
+        logger.info ( "FastLim v1.1 efficiencies loaded. Please cite: arXiv:1402.0492, EPJC74 (2014) 11" )
+
+    def __eq__ ( self, other ):
+        return self == other
 
     def needsUpdate ( self, current ):
         """ do we need an update, with respect to <current>.
