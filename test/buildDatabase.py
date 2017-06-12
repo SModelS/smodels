@@ -8,8 +8,13 @@ from smodels.tools.colors import colors
 colors.on = True
 setLogLevel ( "debug" )
 
-# dir = "../../smodels-database/"
-dir = "tinydb/"
-d=Database( dir, discard_zeroes = True )
+def build ( force=False ):
+    Dir = "tinydb/"
+    force_load = None
+    if force: force_load = "txt"
+    d=Database( Dir, force_load = force_load, discard_zeroes = True )
 
-# print ( "version", d.databaseVersion )
+force=False
+if len(sys.argv)>1 and sys.argv[1]=="-f":
+    force=True
+build(force)
