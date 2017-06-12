@@ -3,7 +3,7 @@
 .. _databaseStruct:
 
 .. |constraint| replace:: :ref:`constraint <ULconstraint>`
-.. |conditions| replace:: :ref:`conditions <ULconditions>` 
+.. |conditions| replace:: :ref:`conditions <ULconditions>`
 .. |fb-1| replace:: :math:`\mathrm{fb}^{-1}`
 .. |sqrts| replace:: :math:`\sqrt{s}`
 .. |EM| replace:: :ref:`EM-type <EMtype>`
@@ -24,8 +24,8 @@
 Database of Experimental Results
 ================================
 
-SModelS stores all the information about the experimental results in the 
-|Database|. 
+SModelS stores all the information about the experimental results in the
+|Database|.
 Below we describe both the :ref:`directory <folderStruct>` and :ref:`object <objStruct>` structure of the  |Database|.
 
 .. _folderStruct:
@@ -66,7 +66,7 @@ The third level of the directory hierarchy encodes the |ExpRess|:
 Experimental Result Folder
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Each |ExpRes| folder contains: 
+Each |ExpRes| folder contains:
 
 * a folder for each |Dataset| (e.g. ``data``)
 * a ``globalInfo.txt`` file
@@ -75,7 +75,7 @@ The ``globalInfo.txt`` file contains the meta information about the |ExpRes|.
 It defines the center-of-mass energy |sqrts|, the integrated luminosity, the id
 used to identify the result and additional information about the source of the
 data.  Here is the content of CMS-SUS-12-024/globalInfo.txt as an example:
-      
+
 .. literalinclude:: /literals/globalInfo.txt
    :lines: 1-11
 
@@ -112,13 +112,13 @@ first few lines of CMS-SUS-12-024/data/T1tttt.txt read:
 
 .. literalinclude:: /literals/T1tttt.txt
    :lines: 1-8
-   
+
 The second block of data contains the upper limits as a function of the BSM masses:
 
 .. literalinclude:: /literals/T1tttt.txt
    :lines: 9-19
 
-As we can see, the UL map is given as a Python array with the structure: 
+As we can see, the UL map is given as a Python array with the structure:
 :math:`[[\mbox{masses},\mbox{upper limit}], [\mbox{masses},\mbox{upper limit}],...]`.
 
 Data Set Folder: Efficiency Map Type
@@ -140,9 +140,9 @@ Here is the first few lines of CMS-SUS-13-012-eff/3NJet6_1000HT1250_200MHT300/T2
 
 .. literalinclude:: /literals/T2.txt
    :lines: 1-8
-   
+
 As seen above, the first block of data in the ``T2.txt`` file contains
-information about the |element| (:math:`[[[\mbox{jet}]],[[\mbox{jet}]]]`) 
+information about the |element| (:math:`[[[\mbox{jet}]],[[\mbox{jet}]]]`)
 in |bracket notation| for which the
 efficiencies refers to as well as reference to the original data source and
 some additional information.
@@ -151,7 +151,7 @@ The second block of data contains the efficiencies as a function of the BSM mass
 .. literalinclude:: /literals/T2.txt
    :lines: 9-15
 
-As we can see the efficiency map is given as a Python array with the structure: 
+As we can see the efficiency map is given as a Python array with the structure:
 :math:`[[\mbox{masses},\mbox{efficiency}], [\mbox{masses},\mbox{efficiency}],...]`.
 
 .. _objStruct:
@@ -167,7 +167,7 @@ represent (click to enlarge):
 
 .. image:: images/DatabaseObjects.png
    :width: 80%
-   
+
 The type of Python object (Python class, Python list,...) is shown in brackets.
 For convenience, below we explicitly list the main database folders/files and
 the Python objects they are mapped to:
@@ -185,34 +185,35 @@ the Python objects they are mapped to:
 Database: Binary (Pickle) Format
 --------------------------------
 
-At the first time of instantiating the 
+At the first time of instantiating the
 `Database <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
 class, the text files in *<database-path>*.
-are loaded and parsed, and the corresponding                                                    
-data objects are built. The efficiency and upper limit maps themselves are                                                                    
-subjected to standard preprocessing steps such as a principal component                                                                       
+are loaded and parsed, and the corresponding
+data objects are built. The efficiency and upper limit maps themselves are
+subjected to standard preprocessing steps such as a principal component
 analysis and Delaunay triangulation (see Figure below).
-The simplices defined during triangulation are then used for linearly interpolating the data grid,                                            
-thus allowing SModelS to compute efficiencies or upper limits for arbitrary                                                                   
-mass values (as long as they fall inside the data grid).                                                                                      
-This procedure provides an efficient and numerically robust way of                                                                            
-dealing with generic data grids, including arbitrary parametrizations of the mass parameter space,                                            
-irregular data grids and asymmetric branches.                                                                                                 
-                                                                                                                                              
+The simplices defined during triangulation are then used for linearly interpolating the data grid,
+thus allowing SModelS to compute efficiencies or upper limits for arbitrary
+mass values (as long as they fall inside the data grid).
+This procedure provides an efficient and numerically robust way of
+dealing with generic data grids, including arbitrary parametrizations of the mass parameter space,
+irregular data grids and asymmetric branches.
+
 .. image:: images/delaunay.png
 
 ..
  %\caption{Delaunay triangulation of an upper limit map with three mass                                                                        %parameters. The colors show the upper limit values.}
 
-For the sake of efficiency, the entire database -- including the Delaunay                                                                     
-triangulation -- is then serialized into a pickle                                                                                             
-file (*<database-path>/database.pcl*), which will be read directly the next time the database is loaded.                                                                       
-If any changes in the database folder structure are detected, the python or the SModelS                                                       
-version has changed, SModelS will automatically re-build the pickle file. This                                                                
-action may take a few minutes, but it is again performed only once.                                                                           
+For the sake of efficiency, the entire database -- including the Delaunay
+triangulation -- is then serialized into a pickle file
+(*<database-path>/db2.pcl* or *<database-path>/db3.pcl*), which will be read
+directly the next time the database is loaded.  If any changes in the database
+folder structure are detected, the python or the SModelS version has changed,
+SModelS will automatically re-build the pickle file. This action may
+take a few minutes, but it is again performed only once.
 If desired, the pickling process can be skipped using the option *force_load = `txt'*
 in the constructor of
-`Database <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_ .  
+`Database <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_ .
 
 
 ..
@@ -222,20 +223,20 @@ in the constructor of
  CPU time. In some cases this may be the most time consuming task when
  testing a single input file.  Furthermore this procedure does not have to be
  repeated every time SModelS is run.
- In order to avoid these issues, SModelS serializes the 
+ In order to avoid these issues, SModelS serializes the
  `database object <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
- into a pickle file (*<database-path>/database.pcl*), which can then be read
+ into a pickle file (*<database-path>/db2.pcl* or *<database-path>/db3.pcl*), which can then be read
  directly when loading the database.
  Since reading the pickle file is much faster than parsing the :ref:`database folders <folderStruct>`,
  there is a considerable speed improvement when using the pickle file.
- If any changes in the :ref:`database folder structure <folderStruct>` 
+ If any changes in the :ref:`database folder structure <folderStruct>`
  are detected or the SModelS version has changed,
  SModelS will automatically re-build the pickle file.
  This action may take a few minutes, but it is only performed once.
- SModelS automatically builds (if necessary) and loads the binary database when a 
+ SModelS automatically builds (if necessary) and loads the binary database when a
  `Database object <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
  is created. Nonetheless, the user can enforce loading (parsing) the *text
  database* using the option *force_load = 'txt'* in the constructor of
- `Database <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_ .  
+ `Database <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_ .
 
-* The pickle file is created by the `createBinaryFile method <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database.createBinaryFile>`_ 
+* The pickle file is created by the `createBinaryFile method <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database.createBinaryFile>`_
