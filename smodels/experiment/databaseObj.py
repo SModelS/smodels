@@ -53,17 +53,19 @@ class Meta(object):
         self.python = python
         self.databaseVersion = databaseVersion
 
-    def needsUpdate ( self, last ):
-        """ do we need an update, with respect to <last> """
-        if self.mtime > last.mtime: ## someone tinkered
+    def needsUpdate ( self, current ):
+        """ do we need an update, with respect to <current>.
+            so <current> is the text database, <self> the pcl.
+        """
+        if self.mtime < current.mtime: ## someone tinkered
             return True
-        if self.filecount != last.filecount:
+        if self.filecount != current.filecount:
             return True ## number of files changed
-        if self.discard_zoeres != last.discard_zeroes:
+        if self.discard_zeroes != current.discard_zeroes:
             return True ## flag changed
-        if self.format_version != last.format_version:
+        if self.format_version != current.format_version:
             return True ## pickle file format version changed
-        if self.python != last.python:
+        if self.python != current.python:
             return True ## different python
         return False
 
@@ -95,7 +97,6 @@ class Database(object):
         # self.txt_meta = Database.Meta.init()
         self.txt_meta = Meta ( None, None, None, discard_zeroes, 200, 
                                sys.version, None )
-        self.txt_meta.discard_zeroes = discard_zeroes
         self.pcl_meta = Meta ( None, None, None, None, None, None, None )
         self.progressbar = None
         if progressbar:
@@ -170,7 +171,8 @@ class Database(object):
 
     def lastModifiedDir ( self, dirname, lastm ):
         """
-        Return the last modified timestamp of dirname, working recursively
+        Return the last modified timestamp of dirname, working recursively,
+        plus the number of files.
          
         :param dirname: directory name that is checked
         :param lastm: the most recent timestamp so far
