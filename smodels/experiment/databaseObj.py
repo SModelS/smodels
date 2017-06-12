@@ -225,8 +225,7 @@ class Database(object):
     @property
     def base(self):
         """
-        This is the path to the base directory where to find the database.
-
+        This is the path to the base directory.
         """
         return self.txt_meta.pathname
 
@@ -329,12 +328,10 @@ class Database(object):
         for ctr,root in enumerate(roots):
             if self.progressbar:
                 self.progressbar.update(ctr)
-            expres = ExpResult(root, discard_zeroes = self.txt_meta.discard_zeroes )
+            # expres = ExpResult(root, discard_zeroes = self.txt_meta.discard_zeroes )
+            expres = self.createExpResult ( root )
             if expres:
                 resultsList.append(expres)
-                contact = expres.globalInfo.getInfo("contact")
-                if contact and "fastlim" in contact.lower():
-                    self.txt_meta.hasFastLim = True
 
         if not resultsList:
             logger.warning("Zero results loaded.")
@@ -343,6 +340,29 @@ class Database(object):
 
         return resultsList
 
+    def createExpResult ( self, root ):
+        """ create, from pickle file or text files """
+        pclfile = "%s/.db%s.pcl" % ( root, sys.version )
+        txtmeta = Meta ( root, self.txt_meta.discard_zeroes )
+        expres = None
+        try:
+            if os.path.exists ( pclfile ):
+                f=open(pclfile,"rb" )
+                ## read meta from pickle
+                pclmeta = serializer.load ( f )
+                if not pclmeta.needsUpdate ( txtmeta ):
+                    logger.info ( "we can use expres from pickle file %s" % pclfile )
+                    expres = serializer.load ( f )
+        except IOError as e:
+            logger.error ( "exception %s" % e )
+        if not expres:
+            expres = ExpResult(root, discard_zeroes = self.txt_meta.discard_zeroes )
+        if expres:
+            expres.writePickle()
+            contact = expres.globalInfo.getInfo("contact")
+            if contact and "fastlim" in contact.lower():
+                self.txt_meta.hasFastLim = True
+        return expres
 
     def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
                     dataTypes = ['all'], useSuperseded=False, useNonValidated=False,

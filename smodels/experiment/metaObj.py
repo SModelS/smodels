@@ -49,7 +49,7 @@ class Meta(object):
         Retrieves the version of the database using the version file.
         """
         if self.databaseVersion or self.isPickle():
-            return
+            return self.databaseVersion
         try:
             vfile = os.path.join ( self.pathname, "version" )
             versionFile = open( vfile )
@@ -74,12 +74,15 @@ class Meta(object):
             number of files. Only if text db """
         if self.isPickle() or self.mtime:
             return
+        lastm = 0
+        count = 0
         versionfile = os.path.join ( self.pathname, "version" )
         if not os.path.exists ( versionfile ):
-            logger.error("%s does not exist." % versionfile )
-            sys.exit()
-        lastm = os.stat(versionfile).st_mtime
-        count=1
+            logger.debug("%s does not exist." % versionfile )
+            # sys.exit()
+        else:
+            lastm = os.stat(versionfile).st_mtime
+            count=1
         topdir = os.listdir ( self.pathname )
         for File in topdir:
             subdir = os.path.join ( self.pathname, File )
