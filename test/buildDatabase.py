@@ -12,4 +12,4 @@ setLogLevel ( "debug" )
 dir = "tinydb/"
 d=Database( dir, discard_zeroes = True )
 
-print ( "version", d.databaseVersion )
+# print ( "version", d.databaseVersion )

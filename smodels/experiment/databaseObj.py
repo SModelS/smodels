@@ -18,6 +18,7 @@ os.environ["OMP_NUM_THREADS"]="2"
 import sys
 import time
 from smodels.experiment import datasetObj
+from smodels.experiment.metaObj import Meta
 from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.tools.physicsUnits import TeV
@@ -28,52 +29,6 @@ try:
     import cPickle as serializer
 except ImportError as e:
     import pickle as serializer
-
-class Meta(object):
-    """ The Meta object holds all meta information regarding the
-        database, like number of analyses, last time of modification, ...
-        Needed to understand if we have to re-pickle. """
-
-    def __init__ ( self, mtime, filecount, hasFastLim, discard_zeroes, \
-                   format_version, python, databaseVersion ):
-        """
-        :param mtime: last modification time stamps
-        :param filecount: number of files
-        :param hasFastLim: fastlim in the database?
-        :param discard_zeroes: do we discard zeroes?
-        :param format_version: format version of pickle file
-        :param python: python version
-        :param databaseVersion: version of database
-        """
-        self.mtime = mtime
-        self.filecount = filecount
-        self.hasFastLim = hasFastLim
-        self.discard_zeroes = discard_zeroes
-        self.format_version = format_version
-        self.python = python
-        self.databaseVersion = databaseVersion
-
-    def sameAs ( self, other ):
-        """ check if it is the same database version """
-        return (self.databaseVersion == other.databaseVersion)
-
-    def needsUpdate ( self, current ):
-        """ do we need an update, with respect to <current>.
-            so <current> is the text database, <self> the pcl.
-        """
-        if self.mtime < current.mtime: ## someone tinkered
-            return True
-        if self.filecount != current.filecount:
-            return True ## number of files changed
-        if self.databaseVersion != current.databaseVersion:
-            return True ## number of files changed
-        if self.discard_zeroes != current.discard_zeroes:
-            return True ## flag changed
-        if self.format_version != current.format_version:
-            return True ## pickle file format version changed
-        if self.python != current.python:
-            return True ## different python
-        return False
 
 class Database(object):
     """
