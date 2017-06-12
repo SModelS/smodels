@@ -57,11 +57,6 @@ class Meta(object):
             logger.error("%s does not exist." % versionfile )
             sys.exit()
 
-    @classmethod
-    def fromPickleFile ( cls ):
-        if not os.path.exists ( self.pathname ) and not os.path.isfile ( self.pathname ):
-            raise SModelSExperimentError ( "trying to create Meta object from non-existing pickle file" )
-
     def versionFromFile ( self ):
         """
         Retrieves the version of the database using the version file.
