@@ -117,10 +117,6 @@ Below we give more detailed information about each entry in the parameters file.
 
 
 
-* *path*: relevant folder paths
-
-  * **databasePath**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`.
-
 * *options*: main options for turning SModelS features on or off
 
   * **checkInput** (True/False): if True, *runSModelS.py* will run the :ref:`file check tool <fileChecks>` on the input file and verify if the input contains all the necessary information.
@@ -147,6 +143,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 * *database*: allows for selection of a subset of :ref:`experimental results <ExpResult>` from the |database|
 
+  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`.
   * **analyses** (list of results): set to *all* to use all available results. If a list of :ref:`experimental analyses <ExpResult>`
     is given, only these will be used. For instance, setting analyses = CMS-PAS-SUS-13-008,ATLAS-CONF-2013-024
     will only use the |results| from `CMS-PAS-SUS-13-008 <https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13008>`_
@@ -159,6 +156,7 @@ Below we give more detailed information about each entry in the parameters file.
   * **dataselector** (list of datasets): set to all to use all available |datasets|. If dataselector = upperLimit (efficiencyMap), only |ULrs| (|EMrs|) will be used. Furthermore, if
     a list of signal regions (|datasets|) is given, only the |results| containing these datasets will be used. For instance, if dataselector = SRA mCT150,SRA mCT200, only
     these signal regions will be used.
+  * **discardZeroes** (True/False): set to True to discard all efficiency maps with zero-only entries.
 
 * *printer*: main options for the |output| format
 
