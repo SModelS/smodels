@@ -48,6 +48,7 @@ class Meta(object):
         """
         Retrieves the version of the database using the version file.
         """
+        # logger.error ( "versionFromFile, %s, %s, %s" % ( self.pathname, self.databaseVersion, self.isPickle() ) )
         if self.databaseVersion or self.isPickle():
             return self.databaseVersion
         try:
@@ -58,10 +59,12 @@ class Meta(object):
             line = content[0].strip()
             logger.debug("Found version file %s with content ``%s''" \
                    % ( vfile, line) )
-            return line
+            self.databaseVersion = line
+            # return line
         except IOError:
+            pass
             # logger.error('There is no version file %s', vfile )
-            return 'unknown version'
+            # return 'unknown version'
 
     def __str__ ( self ):
         ret  = "Meta: path =%s\n" % self.pathname

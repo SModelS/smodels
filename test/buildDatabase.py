@@ -15,6 +15,7 @@ def build ( force=False ):
     d=Database( Dir, force_load = force_load, discard_zeroes = True )
     if force:
         d.createBinaryFile()
+    print ( d.databaseVersion )
 
 force=False
 if len(sys.argv)>1 and sys.argv[1]=="-f":
