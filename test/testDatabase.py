@@ -18,8 +18,9 @@ import os
 
 class DatabaseTest(unittest.TestCase):
     # use different logging config for the unit tests.
-    logging.config.fileConfig( "./logging.conf" )
-    from smodels.tools.smodelsLogging import logger
+
+    from smodels.tools.smodelsLogging import getLogger
+    logger = getLogger ( toFile="smodels.log" )
 
     def testWritePickle(self):
         """ tests writing pickle file """
@@ -28,6 +29,7 @@ class DatabaseTest(unittest.TestCase):
             os.unlink ( binfile )
         self.logger.info ( "test writing pickle file """ )
         writer = Database ( "./tinydb/", force_load = "txt" )
+        # writer = Database ( "./tinydb/" )
         writer.createBinaryFile ( binfile )
         reader = Database ( binfile, force_load="pcl" )
         os.unlink ( binfile )

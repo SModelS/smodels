@@ -49,16 +49,23 @@ class ColorizedStreamHandler(logging.StreamHandler):
 
         return msg
 
-def getLogger ():
+def getLogger( toFile = None ):
     FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in' \
        ' %(lineno)s: %(message)s'
     logging.basicConfig(format=FORMAT)
     formatter = logging.Formatter( FORMAT )
-    ch = ColorizedStreamHandler()
-    ch.setFormatter ( formatter )
     logger = logging.getLogger("smodels")
-    logger.addHandler(ch)
-    logger.propagate = False
+    if toFile:
+        ch = logging.FileHandler ( toFile )
+        logger.handlers = [ ch ]
+        logger.setLevel ( logging.INFO )
+        # logger.propagate = False
+    else:
+        ch = ColorizedStreamHandler()
+        ch.setFormatter ( formatter )
+        logger.handlers = [ ch ]
+        # logger.addHandler(ch)
+        logger.propagate = False
     return logger
 
 logger = getLogger()

@@ -19,10 +19,8 @@ import os
 
 class IntegrationTest(unittest.TestCase):
     def configureLogger(self):
-        import logging.config
-        fc= inspect.getabsfile(self.configureLogger).replace ( 
-                "testTheoryPrediction.py", "integration.conf" )
-        logging.config.fileConfig( fname=fc, disable_existing_loggers=False )
+        from smodels.tools.smodelsLogging import getLogger, setLogLevel
+        self.logger = getLogger ( toFile="smodels.log" )
 
     def predictions(self):
         return { 'ATLAS-SUSY-2013-02': 572.168935 * fb,

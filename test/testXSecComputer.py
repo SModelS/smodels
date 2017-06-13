@@ -22,8 +22,8 @@ import logging.config
 
 class XSecTest(unittest.TestCase):
     # use different logging config for the unit tests.
-    logging.config.fileConfig( "./logging.conf" )
-    from smodels.tools.smodelsLogging import logger, setLogLevel
+    from smodels.tools.smodelsLogging import getLogger, setLogLevel
+    logger = getLogger ( toFile="smodels.log" )
     setLogLevel ( "warn" )
 
     toolBox.ToolBox().compile() ## make sure the tools are compiled
