@@ -25,7 +25,7 @@ libraries:
  * scipy>=0.9.0
  * pyslha>=3.1.0
 
-In addition, the :ref:`cross section computer <xsecCalc>` provided by :ref:`smodelsTools.py <smodelsTools>` 
+In addition, the :ref:`cross section computer <xsecCalc>` provided by :ref:`smodelsTools.py <smodelsTools>`
 requires:
 
  * `Pythia 8.2 <https://arxiv.org/abs/1410.3012>`_ (requires a C++ compiler) or `Pythia 6.4.27 <http://arxiv.org/abs/hep-ph/0603175>`_ (requires gfortran)
@@ -175,6 +175,8 @@ That is, the following steps need to be performed ::
  tar -xzvf smodels-v1.1-fastlim-1.0.tgz
  rm smodels-v1.1-fastlim-1.0.tgz
 
+Efficiencies with a relative statistical uncertainty greater than 25%
+we consider to be zero. Also, per default we discard zeroes-only results.
 Once the fastlim folders have been added to the database,
 SModelS auto-detects fastlim results and issues an acknowledgement.
 When using these results, please properly cite the fastlim paper; for
