@@ -10,6 +10,7 @@ setLogLevel ( "debug" )
 
 def build ( force=False ):
     Dir = "tinydb/"
+    Dir = "database/"
     force_load = None
     if force: force_load = "txt"
     d=Database( Dir, force_load = force_load, discard_zeroes = True )

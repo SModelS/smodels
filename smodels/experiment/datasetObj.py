@@ -59,7 +59,7 @@ class DataSet(object):
             allow it. """
         if self.dataInfo.dataType == "upperLimit": 
             return False
-        logger.debug ( "checking for redundancy" )
+        logger.debug ( "checking for overlapping constraints." )
         datasetElements = []
         for tx in self.txnameList:
             for el in elementsInStr(tx.constraint):

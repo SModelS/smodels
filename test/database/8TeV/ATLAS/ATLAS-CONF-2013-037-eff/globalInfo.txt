@@ -1,8 +1,0 @@
-sqrts: 8*TeV
-lumi: 20.7/fb
-id: ATLAS-CONF-2013-037
-url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-037/
-implementedBy: Wolfgang Waltenberger
-contact: fastlim
-comment: created from fastlim-1.0
-lastUpdate: 2015/03/03

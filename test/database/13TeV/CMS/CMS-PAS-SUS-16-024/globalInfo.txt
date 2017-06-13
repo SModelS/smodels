@@ -1,9 +1,0 @@
-sqrts: 13*TeV
-lumi: 12.9/fb
-id: CMS-PAS-SUS-16-024
-url: http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-024/
-comment: https://cds.cern.ch/record/2205168
-private: False
-implementedBy: nicki
-lastUpdate: 2017/1/23
-

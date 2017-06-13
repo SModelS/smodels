@@ -2,7 +2,7 @@ txName: T1tttt
 conditionDescription: None
 condition: None
 constraint: [[['t','t']],[['t','t']]]
-figureUrl: https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS12026/curve_T1tttt_overlay_observed.pdf
+figureUrl: https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS12026/curve_T1tttt_overlay_observed.pdf 
 dataUrl: https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS12026/Limit_T1tttt.root;https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS12026
 validated: True
 axes: 2*Eq(mother,x)_Eq(lsp,y)

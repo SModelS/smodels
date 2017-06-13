@@ -69,7 +69,7 @@ class ExpResult(object):
         """ write the pickle file """
         meta = metaObj.Meta ( self.path, self.discard_zeroes, databaseVersion=dbVersion )
         pclfile = "%s/.%s" % ( self.path, meta.getPickleFileName() )
-        logger.debug ( "writing expRes pickle file %s" % pclfile )
+        logger.debug ( "writing expRes pickle file %s, mtime=%s" % (pclfile, meta.cTime() ) )
         f=open ( pclfile, "wb" )
         serializer.dump ( meta, f )
         serializer.dump ( self, f )

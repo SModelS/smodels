@@ -103,7 +103,7 @@ class Database(object):
             case it does need an update.
         """
         if not os.path.exists ( self.pcl_meta.pathname ):
-#             self.loadTextDatabase()
+            self.loadTextDatabase()
             self.createBinaryFile()
         else:
             if self.needsUpdate():
@@ -204,9 +204,9 @@ class Database(object):
         with open ( binfile, "wb" ) as f:
             logger.debug (  " * load text database" )
             self.loadTextDatabase()
-            logger.debug (  " * write %s db version %s, format version %s" % \
+            logger.debug (  " * write %s db version %s, format version %s, %s" % \
                     ( binfile, self.txt_meta.databaseVersion,
-                      self.txt_meta.format_version ) )
+                      self.txt_meta.format_version, self.txt_meta.cTime() ) )
             ptcl = serializer.HIGHEST_PROTOCOL
             serializer.dump ( self.txt_meta, f, protocol=ptcl )
             serializer.dump ( self.expResultList, f, protocol=ptcl )
@@ -342,23 +342,35 @@ class Database(object):
 
     def createExpResult ( self, root ):
         """ create, from pickle file or text files """
-        txtmeta = Meta ( root, self.txt_meta.discard_zeroes )
+        txtmeta = Meta ( root, discard_zeroes = self.txt_meta.discard_zeroes, 
+                         hasFastLim=None, databaseVersion = self.databaseVersion )
         pclfile = "%s/.%s" % ( root, txtmeta.getPickleFileName() )
+        logger.debug ( "Creating %s, pcl=%s" % (root,pclfile ) )
         expres = None
         try:
-            if os.path.exists ( pclfile ):
+            # logger.info ( "%s exists? %d" % ( pclfile,os.path.exists ( pclfile ) ) )
+            if not self.force_load=="txt" and os.path.exists ( pclfile ):
+                # logger.info ( "%s exists" % ( pclfile ) )
                 with open(pclfile,"rb" ) as f:
+                    logger.info ( "Loading: %s" % pclfile )
                     ## read meta from pickle
                     pclmeta = serializer.load ( f )
                     if not pclmeta.needsUpdate ( txtmeta ):
                         logger.debug ( "we can use expres from pickle file %s" % pclfile )
                         expres = serializer.load ( f )
+                    else:
+                        logger.debug ( "we cannot use expres from pickle file %s" % pclfile )
+                        logger.info ( "txt meta %s" % txtmeta )
+                        logger.info ( "pcl meta %s" % pclmeta )
+                        logger.info ( "pcl meta needs update %s" % pclmeta.needsUpdate ( txtmeta ) )
         except IOError as e:
             logger.error ( "exception %s" % e )
-        if not expres:
+        if not expres: ## create from text file
+            #logger.error ( "I couldnt recycle the pickle file. Why is that?" )
+            #sys.exit()
             expres = ExpResult(root, discard_zeroes = self.txt_meta.discard_zeroes )
+            if expres: expres.writePickle( self.databaseVersion )
         if expres:
-            expres.writePickle( self.databaseVersion )
             contact = expres.globalInfo.getInfo("contact")
             if contact and "fastlim" in contact.lower():
                 self.txt_meta.hasFastLim = True
