@@ -47,10 +47,8 @@ distribution/create.log
 distribution/smodels-*
 docs/manual/source/recipes/*.html
 docs/manual/source/recipes/*.py
-test/database/db2.pcl
-test/database/db3.pcl
-test/tinydb/db2.pcl
-test/tinydb/db3.pcl
+test/database/*.pcl
+test/tinydb/*.pcl
 lib/pythia8/.*.tgz
 lib/pythia8/pythia8223
 lib/pythia8/xml.doc
