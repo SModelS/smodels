@@ -65,11 +65,11 @@ class ExpResult(object):
                 except TypeError:
                     continue
 
-    def writePickle ( self ):
+    def writePickle ( self, dbVersion ):
         """ write the pickle file """
         pclfile = "%s/.db%s.pcl" % ( self.path, sys.version[0] )
         logger.debug ( "writing expRes pickle file %s" % pclfile )
-        meta = metaObj.Meta ( self.path, self.discard_zeroes, databaseVersion=True )
+        meta = metaObj.Meta ( self.path, self.discard_zeroes, databaseVersion=dbVersion )
         f=open ( pclfile, "wb" )
         serializer.dump ( meta, f )
         serializer.dump ( self, f )

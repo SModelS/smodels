@@ -59,10 +59,19 @@ class Meta(object):
             logger.debug("Found version file %s with content ``%s''" \
                    % ( vfile, line) )
             return line
-
         except IOError:
-            logger.error('There is no version file %s', vfile )
+            # logger.error('There is no version file %s', vfile )
             return 'unknown version'
+
+    def __str__ ( self ):
+        ret  = "Meta: path =%s\n" % self.pathname
+        ret += "      mtime=%.1f" % self.mtime
+        ret += ", filecount=%d" % self.filecount
+        ret += ", discard_0=%d" % self.discard_zeroes
+        ret += ", fl=%s" % self.hasFastLim
+        ret += ", format_version=%d" % self.format_version
+        ret += ", dbVersion=%s" % self.databaseVersion
+        return ret
 
     def isPickle ( self ):
         """ is this meta info from a pickle file? """

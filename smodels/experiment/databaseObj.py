@@ -328,7 +328,6 @@ class Database(object):
         for ctr,root in enumerate(roots):
             if self.progressbar:
                 self.progressbar.update(ctr)
-            # expres = ExpResult(root, discard_zeroes = self.txt_meta.discard_zeroes )
             expres = self.createExpResult ( root )
             if expres:
                 resultsList.append(expres)
@@ -342,23 +341,28 @@ class Database(object):
 
     def createExpResult ( self, root ):
         """ create, from pickle file or text files """
-        pclfile = "%s/.db%s.pcl" % ( root, sys.version )
+        pclfile = "%s/.db%s.pcl" % ( root, sys.version[0] )
         txtmeta = Meta ( root, self.txt_meta.discard_zeroes )
         expres = None
         try:
+            logger.info ( "query %s" % pclfile )
             if os.path.exists ( pclfile ):
-                f=open(pclfile,"rb" )
-                ## read meta from pickle
-                pclmeta = serializer.load ( f )
-                if not pclmeta.needsUpdate ( txtmeta ):
-                    logger.info ( "we can use expres from pickle file %s" % pclfile )
-                    expres = serializer.load ( f )
+                with open(pclfile,"rb" ) as f:
+                    logger.info ( "%s is open" % pclfile )
+                    ## read meta from pickle
+                    pclmeta = serializer.load ( f )
+                    logger.info ( "%s metaed: %d " % ( pclfile, pclmeta.needsUpdate(txtmeta) ) )
+                    logger.info ( "pclmeta:\n%s" % pclmeta )
+                    logger.info ( "txtmeta:\n%s" % txtmeta )
+                    if not pclmeta.needsUpdate ( txtmeta ):
+                        logger.info ( "we can use expres from pickle file %s" % pclfile )
+                        expres = serializer.load ( f )
         except IOError as e:
             logger.error ( "exception %s" % e )
         if not expres:
             expres = ExpResult(root, discard_zeroes = self.txt_meta.discard_zeroes )
         if expres:
-            expres.writePickle()
+            expres.writePickle( self.databaseVersion )
             contact = expres.globalInfo.getInfo("contact")
             if contact and "fastlim" in contact.lower():
                 self.txt_meta.hasFastLim = True
