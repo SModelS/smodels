@@ -52,7 +52,6 @@ class Database(object):
         """
         self.force_load = force_load
         base, pclfile = self.checkPathName(base, discard_zeroes )
-        # logger.error  ( "base,pclfile=%s,%s" % (base,pclfile ) )
         self.pcl_meta = Meta( pclfile )
         self.expResultList = []
         self.txt_meta = Meta ( base, discard_zeroes = discard_zeroes )
@@ -140,8 +139,10 @@ class Database(object):
                 pclfilename = self.pcl_meta.pathname
                 self.pcl_meta = serializer.load ( f )
                 self.pcl_meta.pathname = pclfilename
+                if self.force_load == "pcl":
+                    self.txt_meta = self.pcl_meta
                 if not lastm_only:
-                    if self.pcl_meta.needsUpdate ( self.txt_meta ):
+                    if not self.force_load == "pcl" and self.pcl_meta.needsUpdate ( self.txt_meta ):
                         logger.warning ( "Something changed in the environment."
                                          "Regenerating." )
                         self.createBinaryFile()
