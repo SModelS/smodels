@@ -44,6 +44,13 @@ class Meta(object):
         self.versionFromFile()
         self.determineLastModified()
 
+    def getPickleFileName ( self ):
+        """ get canonical pickle file name """
+        hfl=0
+        if self.hasFastLim:
+            hfl=1
+        return "db%s%d%d.pcl" % ( self.python[0], self.discard_zeroes, hfl )
+
     def versionFromFile ( self ):
         """
         Retrieves the version of the database using the version file.

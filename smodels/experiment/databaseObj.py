@@ -51,7 +51,7 @@ class Database(object):
                             (needs the python-progressbar module)
         """
         self.force_load = force_load
-        base, pclfile = self.checkPathName(base)
+        base, pclfile = self.checkPathName(base, discard_zeroes )
         # logger.error  ( "base,pclfile=%s,%s" % (base,pclfile ) )
         self.pcl_meta = Meta( pclfile )
         self.expResultList = []
@@ -230,7 +230,7 @@ class Database(object):
         return self.txt_meta.pathname
 
 
-    def checkPathName(self, path):
+    def checkPathName( self, path, discard_zeroes ):
         """
         checks the path name,
         returns the base directory and the pickle file name
@@ -259,7 +259,8 @@ class Database(object):
         if not os.path.exists(path):
             logger.error('%s is no valid path!' % path)
             raise DatabaseNotFoundException("Database not found")
-        return ( path, path + "db%s.pcl" % sys.version[0] )
+        m=Meta ( path, discard_zeroes = discard_zeroes )
+        return ( path, path + m.getPickleFileName() )
 
     def __str__(self):
         idList = "Database version: " + self.databaseVersion
@@ -341,21 +342,16 @@ class Database(object):
 
     def createExpResult ( self, root ):
         """ create, from pickle file or text files """
-        pclfile = "%s/.db%s.pcl" % ( root, sys.version[0] )
         txtmeta = Meta ( root, self.txt_meta.discard_zeroes )
+        pclfile = "%s/.%s" % ( root, txtmeta.getPickleFileName() )
         expres = None
         try:
-            logger.info ( "query %s" % pclfile )
             if os.path.exists ( pclfile ):
                 with open(pclfile,"rb" ) as f:
-                    logger.info ( "%s is open" % pclfile )
                     ## read meta from pickle
                     pclmeta = serializer.load ( f )
-                    logger.info ( "%s metaed: %d " % ( pclfile, pclmeta.needsUpdate(txtmeta) ) )
-                    logger.info ( "pclmeta:\n%s" % pclmeta )
-                    logger.info ( "txtmeta:\n%s" % txtmeta )
                     if not pclmeta.needsUpdate ( txtmeta ):
-                        logger.info ( "we can use expres from pickle file %s" % pclfile )
+                        logger.debug ( "we can use expres from pickle file %s" % pclfile )
                         expres = serializer.load ( f )
         except IOError as e:
             logger.error ( "exception %s" % e )

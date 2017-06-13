@@ -67,9 +67,9 @@ class ExpResult(object):
 
     def writePickle ( self, dbVersion ):
         """ write the pickle file """
-        pclfile = "%s/.db%s.pcl" % ( self.path, sys.version[0] )
-        logger.debug ( "writing expRes pickle file %s" % pclfile )
         meta = metaObj.Meta ( self.path, self.discard_zeroes, databaseVersion=dbVersion )
+        pclfile = "%s/.%s" % ( self.path, meta.getPickleFileName() )
+        logger.debug ( "writing expRes pickle file %s" % pclfile )
         f=open ( pclfile, "wb" )
         serializer.dump ( meta, f )
         serializer.dump ( self, f )

@@ -206,7 +206,7 @@ irregular data grids and asymmetric branches.
 
 For the sake of efficiency, the entire database -- including the Delaunay
 triangulation -- is then serialized into a pickle file
-(*<database-path>/db2.pcl* or *<database-path>/db3.pcl*), which will be read
+(*<database-path>/db[X].pcl*, with [X] depending on the setup), which will be read
 directly the next time the database is loaded.  If any changes in the database
 folder structure are detected, the python or the SModelS version has changed,
 SModelS will automatically re-build the pickle file. This action may
@@ -225,7 +225,7 @@ in the constructor of
  repeated every time SModelS is run.
  In order to avoid these issues, SModelS serializes the
  `database object <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
- into a pickle file (*<database-path>/db2.pcl* or *<database-path>/db3.pcl*), which can then be read
+ into a pickle file (*<database-path>/db[X].pcl*), which can then be read
  directly when loading the database.
  Since reading the pickle file is much faster than parsing the :ref:`database folders <folderStruct>`,
  there is a considerable speed improvement when using the pickle file.
