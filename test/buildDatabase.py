@@ -9,13 +9,9 @@ colors.on = True
 setLogLevel ( "debug" )
 
 dir = "../../smodels-database/"
-dir = "database/"
-pcl = "%sdatabase_dz.pcl" % dir
-if os.path.exists ( pcl ):
-    os.unlink ( pcl )
-t0=time.time()
-d=Database( pcl, discard_zeroes = True )
+d=Database( dir, discard_zeroes = True )
 print(d)
+sys.exit()
 t1=time.time()
 print ( "Building the database took %.2f seconds." % ( t1 - t0 ) )
 s = os.stat ( pcl )

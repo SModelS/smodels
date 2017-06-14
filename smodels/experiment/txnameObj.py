@@ -27,6 +27,7 @@ import numpy as np
 import unum
 import copy
 import math
+import time
 from math import floor, log10
 
 
@@ -44,7 +45,8 @@ class TxName(object):
         self.txnameDataExp = None ## expected Data
         self._topologyList = TopologyList()
 
-        logger.debug('Creating object based on txname file: %s' %self.path)
+        logger.debug( '%s: creating object based on txname file: %s' % \
+                      ( time.asctime(), self.path ) )
         #Open the info file and get the information:
         if not os.path.isfile(path):
             logger.error("Txname file %s not found" % path)
@@ -399,6 +401,48 @@ class TxNameData(object):
             ret = minXsec
         return float(ret)
 
+    def checkZeroSimplex ( self, simplex, zeroes ):
+        """ check if the simplex has zero-only vertices """
+        for idx in simplex:
+            if idx not in zeroes:
+                return False
+        return True
+
+    def zeroIndices ( self ):
+        """ return list of indices for vertices with zero xsec """
+        zeroes = []
+        for i,x in enumerate ( self.xsec ):
+            if x < 1e-9:
+                zeroes.append ( i )
+        return zeroes
+
+    def checkRemovableVertices ( self ):
+        """ check if any of the vertices in the triangulation
+            is removable, because all adjacent simplices are zero-only """
+        t0=time.time()
+        zeroes = self.zeroIndices() ## first get the zero indices
+        hull=self.tri.convex_hull # then get convex hull
+        removables = []
+        zeroSimplices = []
+        for ctr,s in enumerate(self.tri.simplices):
+            if self.checkZeroSimplex ( s, zeroes ):
+                zeroSimplices.append ( ctr )
+
+        for i in zeroes: ## for all zero indices
+            allSimplicesZero=True
+            if i in hull: ## dont remove from hull. (sure?)
+                continue
+            for ctr,s in enumerate(self.tri.simplices):
+                if not i in s:
+                    continue ## check only adjacent simplices
+                if not ctr in zeroSimplices:
+                    allSimplicesZero = False
+                    break
+            if allSimplicesZero:
+                removables.append ( i )
+        logger.error ( "checkRemovables spent %.3f s on %s simplices, Found %d." % \
+                       ( time.time() - t0, ctr, len(removables) ) )
+        return removables
 
     def _estimateExtrapolationError ( self, massarray ):
         """ when projecting a point p from n to the point P in m dimensions, we
@@ -506,13 +550,15 @@ class TxNameData(object):
             return False
         return True
 
-    def computeV ( self, values ):
+    def computeV ( self, values, again=False ):
         """ compute rotation matrix _V, and triangulation self.tri """
         if self._V!=None:
             return
         Morig=[]
         self.xsec = np.ndarray ( shape = (len(values), ) )
         self.massdim = np.array(values[0][0]).shape
+        if self._keep_values:
+            self.points = values ## to visualise triangulation, etc
 
         for ctr,(x,y) in enumerate(values):
             # self.xsec.append ( y / self.unit )
@@ -567,7 +613,21 @@ class TxNameData(object):
              
         # self.Mp=MpCut ## also keep the rotated points, with truncated zeros
         self.tri = qhull.Delaunay( MpCut )
-        
+        if again:
+            return
+        removables = self.checkRemovableVertices() ## check if we can remove vertices
+        # removables = []
+        if len ( removables ) > 0:
+            logger.error  ( "we can remove %d points in %s!" % ( len(removables), self._id ) )
+            newvalues = []
+            for ctr,value in enumerate ( values ):
+                if ctr not in removables:
+                    newvalues.append ( value )
+                #else:
+                #    logger.error ( "removing %s %s" % ( ctr, value ) )
+            self._V = None
+            ## start over!
+            self.computeV ( newvalues, again=True )
         
     def _getMassArrayFrom(self,pt,unit=GeV):
         """
