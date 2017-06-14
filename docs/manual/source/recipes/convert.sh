@@ -1,7 +1,9 @@
 #!/bin/sh
 
-# CMD=ipython
-CMD=jupyter
+CMD=`which jupyter`
+[ "$CMD"=="" ] && CMD=`which ipython`;
+echo $CMD
+## CMD=jupyter
 
 for i in `ls *.ipynb`; do
 	$CMD nbconvert --to html $i || echo "\nERROR: cannot execute $CMD nbconvert. Maybe install $CMD-nbconvert?\n\n";
