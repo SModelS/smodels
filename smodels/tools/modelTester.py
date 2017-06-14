@@ -289,7 +289,11 @@ def loadDatabase(parser, db):
         if database in [ None, True ]:
             databasePath = parser.get( "database", "path" )
             checkForSemicolon ( databasePath, "database", "path" )
-            discard_zeroes = parser.getboolean( "database", "discardZeroes" )
+            discard_zeroes = True
+            try:
+                discard_zeroes = parser.getboolean( "database", "discardZeroes" )
+            except Exception as e: ## too complicated to be more specific
+                logger.info ( "database:discardZeroes is not given in config file. Defaulting to 'True'." )
             force_load=None
             if database == True: force_load="txt"
             if os.path.isfile ( databasePath ):
