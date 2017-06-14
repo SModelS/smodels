@@ -205,7 +205,7 @@ def clearGlobalInfo ( filename ):
     f.close()
     g=open("/tmp/tmp.txt","w")
     skip = [ "publishedData", "comment", "private", \
-             "prettyName" ]
+             "prettyName", "susyProcess" ]
     #skip.append ( "validated" )
     #skip.append ( "axes" )
     for line in lines:
@@ -329,10 +329,10 @@ def runExample ():
     Execute Example.py.
     """
     comment ( "Now run Example.py ..." )
-    cmd = "cd %s/; ./Example.py | tee out.log" % dirname
+    cmd = "cd %s/; ./Example.py 2>&1 | tee out.log" % dirname
     run (cmd)
     comment ( "Now check diff" )
-    cmd = "diff -u %s/out.log default.log" % dirname
+    cmd = "diff -u default.log %s/out.log" % dirname
     d = run ( cmd )
     if len ( d ) > 0:
         comment ( "Example test failed!!", "error" )
@@ -393,4 +393,4 @@ if __name__ == "__main__":
     # splitDatabase()
     # cleanDatabase()
     # clearGlobalInfo ( "./globalInfo.txt" )
-    #runExample()
+    # runExample()
