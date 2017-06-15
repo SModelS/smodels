@@ -242,7 +242,7 @@ class TxNameData(object):
         self._V = None
         self.loadData( value )
         if self._keep_values:
-            self.value = value
+            self.origdata = value
 
     def __str__ ( self ):
         """ a simple unique string identifier, mostly for _memoize """
@@ -409,39 +409,49 @@ class TxNameData(object):
         return True
 
     def zeroIndices ( self ):
-        """ return list of indices for vertices with zero xsec """
-        zeroes = []
+        """ return list of indices for vertices with zero xsec.
+            dont consider vertices on the convex hull. """
+        zeroes = set()
         for i,x in enumerate ( self.xsec ):
-            if x < 1e-9:
-                zeroes.append ( i )
+            if i in self.tri.convex_hull:
+                continue
+            if x < 1.e-9:
+                zeroes.add ( i )
         return zeroes
 
     def checkRemovableVertices ( self ):
         """ check if any of the vertices in the triangulation
             is removable, because all adjacent simplices are zero-only """
-        t0=time.time()
-        zeroes = self.zeroIndices() ## first get the zero indices
-        hull=self.tri.convex_hull # then get convex hull
-        removables = []
-        zeroSimplices = []
+        # t0=time.time()
+        ## first get indices of zeroes not on the hull
+        zeroes = self.zeroIndices() 
+        if len(zeroes)<2: # a single zero cannot be removable
+            return []
+        removables = set()
+        zeroSimplices = [] ## all zero-only simplices, by index
+        verticesInSimplices = { x:[] for x in zeroes }
         for ctr,s in enumerate(self.tri.simplices):
             if self.checkZeroSimplex ( s, zeroes ):
                 zeroSimplices.append ( ctr )
+            for vtx in s: ## remember which vertex is in which simplex
+                if not vtx in zeroes: ## only needed for zeroes though
+                    continue
+                verticesInSimplices[vtx].append ( ctr )
 
-        for i in zeroes: ## for all zero indices
+        for vtx in zeroes: ## for all zero vertices
             allSimplicesZero=True
-            if i in hull: ## dont remove from hull. (sure?)
-                continue
-            for ctr,s in enumerate(self.tri.simplices):
-                if not i in s:
-                    continue ## check only adjacent simplices
-                if not ctr in zeroSimplices:
-                    allSimplicesZero = False
+            simplices = verticesInSimplices[vtx]
+            for simplex in simplices: ## go through all simplces with our vtx
+                if not simplex in zeroSimplices: ## not a zero simplex?
+                    allSimplicesZero=False
                     break
             if allSimplicesZero:
-                removables.append ( i )
-        logger.error ( "checkRemovables spent %.3f s on %s simplices, Found %d." % \
-                       ( time.time() - t0, ctr, len(removables) ) )
+                removables.add ( vtx )
+        """
+        logger.error ( "checkRemovables spent %.3f s on %s simplices." \
+                       "We had %d zeroes. Found %d removables." % \
+                       ( time.time() - t0, ctr, len(zeroes), len(removables) ) )
+        """
         return removables
 
     def _estimateExtrapolationError ( self, massarray ):
@@ -550,15 +560,13 @@ class TxNameData(object):
             return False
         return True
 
-    def computeV ( self, values, again=False ):
+    def computeV ( self, values ):
         """ compute rotation matrix _V, and triangulation self.tri """
         if self._V!=None:
             return
         Morig=[]
         self.xsec = np.ndarray ( shape = (len(values), ) )
         self.massdim = np.array(values[0][0]).shape
-        if self._keep_values:
-            self.points = values ## to visualise triangulation, etc
 
         for ctr,(x,y) in enumerate(values):
             # self.xsec.append ( y / self.unit )
@@ -613,21 +621,19 @@ class TxNameData(object):
              
         # self.Mp=MpCut ## also keep the rotated points, with truncated zeros
         self.tri = qhull.Delaunay( MpCut )
-        if again:
+        # removables = self.checkRemovableVertices() # check if we can remove vertices
+        removables = []
+        if len ( removables ) == 0:
             return
-        removables = self.checkRemovableVertices() ## check if we can remove vertices
-        # removables = []
-        if len ( removables ) > 0:
-            logger.error  ( "we can remove %d points in %s!" % ( len(removables), self._id ) )
-            newvalues = []
-            for ctr,value in enumerate ( values ):
-                if ctr not in removables:
-                    newvalues.append ( value )
-                #else:
-                #    logger.error ( "removing %s %s" % ( ctr, value ) )
-            self._V = None
-            ## start over!
-            self.computeV ( newvalues, again=True )
+        logger.error ( "we can remove %d points in %s!" % \
+                       ( len(removables), self._id ) )
+        newvalues = []
+        for ctr,value in enumerate ( values ):
+            if ctr not in removables:
+                newvalues.append ( value )
+        self._V = None
+        ## start over!
+        self.computeV ( newvalues )
         
     def _getMassArrayFrom(self,pt,unit=GeV):
         """
