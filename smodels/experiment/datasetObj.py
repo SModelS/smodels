@@ -42,14 +42,12 @@ class DataSet(object):
             #Get list of TxName objects:
             for txtfile in glob.iglob(os.path.join(path,"*.txt")):
                 try:
-                    txname = txnameObj.TxName(txtfile,self.globalInfo,self.dataInfo)
+                    txname = txnameObj.TxName( txtfile,self.globalInfo,self.dataInfo,
+                                               discard_zeroes )
                     if discard_zeroes and txname.hasOnlyZeroes():
                         logger.debug ( "%s, %s has only zeroes. discard it." % \
                                          ( self.path, txname.txName ) )
                         continue
-                    txname.computeV() ## only now do we compute V
-                    # txname.removeExtraZeroes() ## and now remove the zeroes
-                    txname.cleanUp() ## and clean up
                     self.txnameList.append(txname)
                 except TypeError: continue
 

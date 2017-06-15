@@ -37,7 +37,7 @@ class TxName(object):
     file (constraint, condition,...) as well as the data.
     """
 
-    def __init__(self, path, globalObj, infoObj ):
+    def __init__(self, path, globalObj, infoObj, discard_zeroes ):
         self.path = path
         self.globalInfo = globalObj
         self._infoObj = infoObj
@@ -86,6 +86,8 @@ class TxName(object):
         self.txnameData = TxNameData( data, dataType, ident )
         if expectedData:
             self.txnameDataExp = TxNameData( expectedData, dataType, ident )
+        if discard_zeroes and self.hasOnlyZeroes():
+            return
 
         #Builds up a list of elements appearing in constraints:
         elements = []
@@ -104,6 +106,10 @@ class TxName(object):
         for el in elements:
             el.sortBranches()
             self._topologyList.addElement(el)
+
+        self.computeV()
+        self.removeExtraZeroes() ## and now remove the zeroes
+        self.cleanUp() ## and clean up
 
     def computeV ( self ):
         """ compute V of observed and expected """
@@ -635,8 +641,16 @@ class TxNameData(object):
         # self.Mp=MpCut ## also keep the rotated points, with truncated zeros
         self.tri = qhull.Delaunay( MpCut )
 
+    def hasNoZeroes ( self ):
+        """ maybe we have no zeroes at all? """
+        for i in self.xsec:
+            if abs ( i ) < 1e-9:
+                return False
+        return True
+
     def removeExtraZeroes ( self ):
         """ remove redundant zeroes in the triangulation """
+        if self.hasNoZeroes(): return ## no zeros? we return immediately.
         removables = self.checkRemovableVertices() # check if we can remove vertices
         if len ( removables ) == 0:
             return
@@ -654,7 +668,8 @@ class TxNameData(object):
     def cleanUp ( self ):
         if self._keep_values:
             return
-        del self.value
+        if hasattr ( self, "value" ):
+            del self.value
         
     def _getMassArrayFrom(self,pt,unit=GeV):
         """
