@@ -11,7 +11,7 @@ SModelS is a Python library that requires Python version 2.6 or later with the P
 and pyslha (>=3.1.).
 if SModelS is to compute cross sections, it uses the following tools internally:
 
- * Pythia 8.223 (requires a C++ compiler)
+ * Pythia 8.226 (requires a C++ compiler)
  * Pythia 6.4.27 (obsolete)
  * NLL-fast 1.2 (7 TeV), 2.1 (8 TeV), and 3.1 (13 TeV) (requires a gfortran compiler)
 
