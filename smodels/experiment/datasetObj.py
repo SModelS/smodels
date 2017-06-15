@@ -47,6 +47,9 @@ class DataSet(object):
                         logger.debug ( "%s, %s has only zeroes. discard it." % \
                                          ( self.path, txname.txName ) )
                         continue
+                    txname.computeV() ## only now do we compute V
+                    # txname.removeExtraZeroes() ## and now remove the zeroes
+                    txname.cleanUp() ## and clean up
                     self.txnameList.append(txname)
                 except TypeError: continue
 

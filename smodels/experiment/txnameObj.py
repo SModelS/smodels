@@ -105,6 +105,22 @@ class TxName(object):
             el.sortBranches()
             self._topologyList.addElement(el)
 
+    def computeV ( self ):
+        """ compute V of observed and expected """
+        self.txnameData.computeV()
+        if self.txnameDataExp:
+            self.txnameDataExp.computeV()
+
+    def removeExtraZeroes ( self ):
+        self.txnameData.removeExtraZeroes()
+        if self.txnameDataExp:
+            self.txnameDataExp.removeExtraZeroes()
+    
+    def cleanUp ( self ):
+        self.txnameData.cleanUp()
+        if self.txnameDataExp:
+            self.txnameDataExp.cleanUp()
+
     def hasOnlyZeroes ( self ):
         ozs = self.txnameData.onlyZeroValues()
         if self.txnameDataExp:
@@ -271,13 +287,13 @@ class TxNameData(object):
         if "fb" in value:
             self.unit = fb
             s = s.replace ( "fb", "" )
-            return eval ( s )
+            self.value = eval ( s )
         if "pb" in value:
             self.unit = pb
             s = s.replace ( "pb", "" )
-            return eval ( s )
+            self.value = eval ( s )
         self.unit = 1
-        return eval ( s )
+        self.value = eval ( s )
 
     def removeGeV ( self, branch ):
         if type ( branch ) == float:
@@ -309,7 +325,7 @@ class TxNameData(object):
                     newbranch = self.removeGeV ( branch )
                 newpoint.append ( newbranch )
             ret.append ( newpoint )
-        return ret
+        self.value = ret
 
     def loadData(self,value):
         """
@@ -324,18 +340,22 @@ class TxNameData(object):
                         ## which we use for efficiency maps
 
         if type(value) == str:
-            value = self.convertString ( value )
+            self.convertString ( value )
         else:
-            value = self.removeUnits ( value )
+            self.removeUnits ( value )
 
-        if len(value) < 1 or len(value[0]) < 2:
+        if len(self.value) < 1 or len(self.value[0]) < 2:
                 logger.error ( "input value not in correct format. expecting sth " \
                                "like [ [ [[ 300.*GeV,100.*GeV], "\
                                "[ 300.*GeV,100.*GeV] ], 10.*fb ], ... ] "\
                                "for upper limits or [ [ [[ 300.*GeV,100.*GeV],"\
                                " [ 300.*GeV,100.*GeV] ], .1 ], ... ] for "\
-                               "efficiency maps. Received %s" % value[:80] )
-        self.computeV( value )
+                               "efficiency maps. Received %s" % self.value[:80] )
+        # self.computeV()
+        self.xsec = np.ndarray ( shape = (len(self.value), ) )
+        self.massdim = np.array(self.value[0][0]).shape
+        for ctr,(x,y) in enumerate(self.value):
+            self.xsec[ctr]=y
 
     @_memoize
     def getValueFor(self,massarray):
@@ -422,7 +442,7 @@ class TxNameData(object):
     def checkRemovableVertices ( self ):
         """ check if any of the vertices in the triangulation
             is removable, because all adjacent simplices are zero-only """
-        # t0=time.time()
+        t0=time.time()
         ## first get indices of zeroes not on the hull
         zeroes = self.zeroIndices() 
         if len(zeroes)<2: # a single zero cannot be removable
@@ -447,11 +467,9 @@ class TxNameData(object):
                     break
             if allSimplicesZero:
                 removables.add ( vtx )
-        """
         logger.error ( "checkRemovables spent %.3f s on %s simplices." \
                        "We had %d zeroes. Found %d removables." % \
                        ( time.time() - t0, ctr, len(zeroes), len(removables) ) )
-        """
         return removables
 
     def _estimateExtrapolationError ( self, massarray ):
@@ -560,18 +578,13 @@ class TxNameData(object):
             return False
         return True
 
-    def computeV ( self, values ):
+    def computeV ( self ):
         """ compute rotation matrix _V, and triangulation self.tri """
         if self._V!=None:
             return
         Morig=[]
-        self.xsec = np.ndarray ( shape = (len(values), ) )
-        self.massdim = np.array(values[0][0]).shape
 
-        for ctr,(x,y) in enumerate(values):
-            # self.xsec.append ( y / self.unit )
-            # self.xsec.append ( y )
-            self.xsec[ctr]=y
+        for ctr,(x,y) in enumerate(self.value):
             xp = self.flattenMassArray ( x )
             Morig.append ( xp )
         aM=np.matrix ( Morig )
@@ -621,19 +634,27 @@ class TxNameData(object):
              
         # self.Mp=MpCut ## also keep the rotated points, with truncated zeros
         self.tri = qhull.Delaunay( MpCut )
-        # removables = self.checkRemovableVertices() # check if we can remove vertices
-        removables = []
+
+    def removeExtraZeroes ( self ):
+        """ remove redundant zeroes in the triangulation """
+        removables = self.checkRemovableVertices() # check if we can remove vertices
         if len ( removables ) == 0:
             return
         logger.error ( "we can remove %d points in %s!" % \
                        ( len(removables), self._id ) )
         newvalues = []
-        for ctr,value in enumerate ( values ):
+        for ctr,value in enumerate ( self.value ):
             if ctr not in removables:
                 newvalues.append ( value )
         self._V = None
+        self.value = newvalues
         ## start over!
-        self.computeV ( newvalues )
+        self.computeV ()
+
+    def cleanUp ( self ):
+        if self._keep_values:
+            return
+        del self.value
         
     def _getMassArrayFrom(self,pt,unit=GeV):
         """
