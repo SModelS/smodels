@@ -14,7 +14,7 @@ from smodels.tools.smodelsLogging import logger
 from smodels.tools.caching import _memoize
 from scipy import stats, optimize, integrate, special
 from numpy import sqrt, exp, log, sign
-import numpy 
+import numpy
 import math
 
 @_memoize
@@ -99,7 +99,7 @@ def CLsCov(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
     # generate a set of expected-number-of-background-events, one for each toy
     # experiment, distributed according to a Gaussian with the specified mean
     # and uncertainty
-    ExpectedBGs = numpy.random.multivariate_normal( mean=ExpectedBG, 
+    ExpectedBGs = numpy.random.multivariate_normal( mean=ExpectedBG,
             cov=BGError, size=NumToyExperiments )
 
     ## discard all negatives
@@ -152,7 +152,7 @@ def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
     # numpy.random.multivariate_normal ( [1.,5.], [[1.0,0.0],[0.0,1.0]], 10 )
     ExpectedBGs = scipy.stats.norm.rvs( loc=ExpectedBG, scale=BGError,
                                         size=NumToyExperiments )
-    #ExpectedBGs = numpy.random.normal( loc=ExpectedBG, 
+    #ExpectedBGs = numpy.random.normal( loc=ExpectedBG,
     #        scale=BGError, size=NumToyExperiments )
 
     # All negative coordinates are drawn again
@@ -307,8 +307,8 @@ def chi2(nsig, nobs, nb, deltab, deltas=None):
 
 
 if __name__ == "__main__":
-    print ( "CLs=",CLs ( 10, 7., 2., 11.0, 100 ) ) 
-    print ( "CLsC=",CLsCov ( [25,15], [7.,15.], [[1.415,0.],[0.,10.]], [11.0,14.00], 100 ) ) 
+    print ( "CLs=", CLs ( 10, 7., 2., 11.0, 100 ) )
+    print ( "CLsC=", CLsCov ( [25,15], [7.,15.], [[1.415,0.],[0.,10.]], [11.0,14.00], 100 ) )
     # import doctest
     # doctest.testmod()
     # print ( upperLimit ( 4, 3.6, 0.1, 20. / fb ) )
