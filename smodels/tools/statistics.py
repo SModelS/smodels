@@ -14,6 +14,7 @@ from smodels.tools.smodelsLogging import logger
 from smodels.tools.caching import _memoize
 from scipy import stats, optimize, integrate, special
 from numpy import sqrt, exp, log, sign
+import numpy 
 import math
 
 @_memoize
@@ -39,15 +40,28 @@ class UpperLimitComputer:
         self.cl = cl
 
     def f( self, sig ):
-        # self.currentNToys=int ( self.currentNToys * 1.10 )
         cls = CLs ( self.nev, self.xbg, self.sbg, sig, self.currentNToys ) - self.cl
-        # print "[ULC] running",sig," with",self.currentNToys,"cls=",cls
         return cls
+
+    def fCov( self, sig ):
+        cls = CLs ( self.nev, self.xbg, self.sbg, sig, self.currentNToys ) - self.cl
+        return cls
+
+    def computeWithCov ( self, nev, xbg, sbg ):
+        """ compute upper limit, exploiting covariance matrix.
+            Might merge with .compute
+        :param nev: number of events per dataset (vector)
+        :param xbg: expected bg per dataset (vector)
+        :param sbg: uncertainty on background (cov matrix)
+        """
+        self.nev = nev
+        self.xbg = xbg
+        self.sbg = sbg
+        self.currentNToys = self.origNToys
 
     def compute ( self, nev, xbg, sbg, upto=5.0, return_nan=False ):
         """ upper limit obtained via mad analysis 5 code
         :param nev: number of observed events
-        :param sac: relative uncertainty in acceptance
         :param xbg: expected bg
         :param sbg: uncertainty in background
         :param upto: defines the interval to be probed
@@ -72,6 +86,25 @@ class UpperLimitComputer:
             else:
                 return float("nan")
 
+def CLsCov(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
+    """ CLs, with vectors and covariances """
+    ## testing whether scipy is there
+    try:
+        import scipy.stats
+    except ImportError:
+        logger.warning('scipy is not installed... the CLs module cannot be used.')
+        logger.warning('Please install scipy.')
+        return False
+    # generate a set of expected-number-of-background-events, one for each toy
+    # experiment, distributed according to a Gaussian with the specified mean
+    # and uncertainty
+    ExpectedBGs = numpy.random.multivariate_normal( mean=ExpectedBG, 
+            cov=BGError, size=NumToyExperiments )
+
+    ## discard all negatives
+    ExpectedBGs = [value for value in ExpectedBGs if (value > 0).all() ]
+
+
 def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
     """ this method has been taken from MadAnalysis5, see
         Official website: <https://launchpad.net/madanalysis5>
@@ -89,10 +122,11 @@ def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
     # generate a set of expected-number-of-background-events, one for each toy
     # experiment, distributed according to a Gaussian with the specified mean
     # and uncertainty
+    # numpy.random.multivariate_normal ( [1.,5.], [[1.0,0.0],[0.0,1.0]], 10 )
     ExpectedBGs = scipy.stats.norm.rvs( loc=ExpectedBG, scale=BGError,
                                         size=NumToyExperiments )
 
-    # Ignore values in the tail of the Gaussian extending to negative numbers
+    # All negative coordinates are drawn again
     ExpectedBGs = [value for value in ExpectedBGs if value > 0]
 
     # For each toy experiment, get the actual number of background events by
@@ -244,6 +278,8 @@ def chi2(nsig, nobs, nb, deltab, deltas=None):
 
 
 if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
-    print ( upperLimit ( 4, 3.6, 0.1, 20. / fb ) )
+    print ( "CLs=",CLs ( 10, 7., 2., 11.0, 100 ) ) 
+    print ( "CLsC=",CLsCov ( [10,13], [7.,15.], [[2.,0.],[0.,1.5]], [11.0,14.00], 100 ) ) 
+    # import doctest
+    # doctest.testmod()
+    # print ( upperLimit ( 4, 3.6, 0.1, 20. / fb ) )
