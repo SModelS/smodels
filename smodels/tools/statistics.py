@@ -88,6 +88,7 @@ class UpperLimitComputer:
 
 def CLsCov(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
     """ CLs, with vectors and covariances """
+    import IPython
     ## testing whether scipy is there
     try:
         import scipy.stats
@@ -103,6 +104,32 @@ def CLsCov(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
 
     ## discard all negatives
     ExpectedBGs = [value for value in ExpectedBGs if (value > 0).all() ]
+
+    ## complain if too many negatives
+    p = float(len(ExpectedBGs )) / NumToyExperiments
+    if p < 0.9:
+        logger.warning ( "only %d%s of points are all-positive" % (100*p,"%"))
+
+    ToyBGs = list ( map ( scipy.stats.poisson.rvs, ExpectedBGs ) )
+
+    # The probability for the background alone to fluctutate as LOW as
+    # observed = the fraction of the toy experiments with backgrounds as low as
+    # observed = p_b.
+    # NB (1 - this p_b) corresponds to what is usually called p_b for CLs.
+    p_b = scipy.stats.percentileofscore(ToyBGs, NumObserved, kind='weak')*.01
+
+    # Toy MC for background+signal
+    ExpectedBGandS = [expectedbg + SigHypothesis for expectedbg in ExpectedBGs]
+    ToyBplusS = list ( map ( scipy.stats.poisson.rvs, ExpectedBGandS) )
+
+    # Calculate the fraction of these that are >= the number observed,
+    # giving p_(S+B). Divide by (1 - p_b) a la the CLs prescription.
+    p_SplusB = scipy.stats.percentileofscore(ToyBplusS, NumObserved, kind='weak')*.01
+
+    if p_SplusB>p_b:
+        return 0.
+    else:
+        return 1.-(p_SplusB / p_b) # 1 - CLs
 
 
 def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
@@ -125,6 +152,8 @@ def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
     # numpy.random.multivariate_normal ( [1.,5.], [[1.0,0.0],[0.0,1.0]], 10 )
     ExpectedBGs = scipy.stats.norm.rvs( loc=ExpectedBG, scale=BGError,
                                         size=NumToyExperiments )
+    #ExpectedBGs = numpy.random.normal( loc=ExpectedBG, 
+    #        scale=BGError, size=NumToyExperiments )
 
     # All negative coordinates are drawn again
     ExpectedBGs = [value for value in ExpectedBGs if value > 0]
@@ -279,7 +308,7 @@ def chi2(nsig, nobs, nb, deltab, deltas=None):
 
 if __name__ == "__main__":
     print ( "CLs=",CLs ( 10, 7., 2., 11.0, 100 ) ) 
-    print ( "CLsC=",CLsCov ( [10,13], [7.,15.], [[2.,0.],[0.,1.5]], [11.0,14.00], 100 ) ) 
+    print ( "CLsC=",CLsCov ( [25,15], [7.,15.], [[1.415,0.],[0.,10.]], [11.0,14.00], 100 ) ) 
     # import doctest
     # doctest.testmod()
     # print ( upperLimit ( 4, 3.6, 0.1, 20. / fb ) )
