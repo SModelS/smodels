@@ -1,0 +1,7 @@
+dataId: SR1: MET > 200
+dataType: efficiencyMap
+observedN: 15
+expectedBG: 17.5
+bgError: 3.2
+upperLimit: 0.49*fb
+expectedUpperLimit: 0.555*fb

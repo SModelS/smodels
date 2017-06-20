@@ -132,8 +132,8 @@ class ExpResult(object):
         """
         Computes the 95% upper limit (UL) on the signal cross section according
         to the type of result.
-        For an Efficiency Map type, returns  the UL for the signal*efficiency
-        for the given dataSet ID (signal region).  For  an Upper Limit type,
+        For an Efficiency Map type, returns the UL for the signal*efficiency
+        for the given dataSet ID (signal region). For an Upper Limit type,
         returns the UL for the signal*BR for for the given mass array and
         Txname.
         
@@ -154,9 +154,15 @@ class ExpResult(object):
         
         """
         if self.datasets[0].dataInfo.dataType == 'efficiencyMap':
+            if dataID == None:
+                """ FIXME when no dataID is given, and we have a covariance
+                    matrix, compute the combined CL UL """
+                print ( "globalInfo covariance matrix? %s" % self.globalInfo.covariance )
+                if hasCovarianceMatrix:
+                    return combinedUL
             if not dataID or not isinstance(dataID, str):
                 logger.error("The data set ID must be defined when computing ULs" \
-                             " for efficiency-map results.")
+                             " for efficiency-map results (as there is no covariance matrix).")
                 return False
             
             useDataset = False

@@ -405,9 +405,14 @@ def chi2(nsig, nobs, nb, deltab, deltas=None):
 
 
 if __name__ == "__main__":
+    f=open("bla.txt","w")
     computer = UpperLimitComputer ( 1000, 1. / fb, .95 )
-    print ( computer.computeEff ( nev=4, xbg=4.0, sbg=0.0001, sig=1. ) )
-    print ( computer.computeMV ( [4], [3.6], [[0.1**2]], [1.] ) )
+    for i in range(1000):
+        eff = computer.computeEff ( nev=4, xbg=3.6, sbg=0.1, sig=1. )
+        mv = computer.computeMV ( [4], [3.6], [[0.1**2]], [1.] ) 
+        print ( eff, mv )
+        f.write ( "%.2f %.2f\n" % ( eff, mv ) )
+    f.close()
     # print ( computer.computeMV ( [4,4], [3.6,3.6], [[0.1**2,0.08**2],[0.08**2,0.1**2]], [1.,1.] ) )
     # print ( LLHD ( [4,4], [3.6,3.6], [[0.1**2,0.08**2],[0.08**2,0.1**2]], [4,4], 100 ) )
     # print ( computer.computeMV ( [4,4,4], [3.6,3.6,3.6], [[0.1**2,0,0],[0.,0.1**2,0],[0.,0,0.1**2]], [0.02,.02,.02] ) )
@@ -425,4 +430,4 @@ if __name__ == "__main__":
                   [ -381.1, 38.3, 111.2, 92.5, 61.0, 36.4, 20.6, 11.2 ],
     ]
     # print ( LLHD ( dummy_nobs, dummy_nbg, dummy_cov,dummy_si, 100 ) )
-    print ( computer.computeMV ( dummy_nobs, dummy_nbg, dummy_cov,dummy_si ) )
+    # print ( computer.computeMV ( dummy_nobs, dummy_nbg, dummy_cov,dummy_si ) )
