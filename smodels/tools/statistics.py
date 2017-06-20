@@ -9,6 +9,7 @@
 
 """
 
+from __future__ import print_function
 from smodels.tools.physicsUnits import fb
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.caching import _memoize
@@ -43,23 +44,9 @@ class UpperLimitComputer:
         cls = CLs ( self.nev, self.xbg, self.sbg, sig, self.currentNToys ) - self.cl
         return cls
 
-    def fCov( self, sig ):
-        cls = CLs ( self.nev, self.xbg, self.sbg, sig, self.currentNToys ) - self.cl
-        return cls
-
-    def computeWithCov ( self, nev, xbg, sbg ):
-        """ compute upper limit, exploiting covariance matrix.
-            Might merge with .compute
-        :param nev: number of events per dataset (vector)
-        :param xbg: expected bg per dataset (vector)
-        :param sbg: uncertainty on background (cov matrix)
-        """
-        self.nev = nev
-        self.xbg = xbg
-        self.sbg = sbg
-        self.currentNToys = self.origNToys
-
     def compute ( self, nev, xbg, sbg, upto=5.0, return_nan=False ):
+        if type (nev) not in [ list, tuple ]:
+            return self.compute1d ( nev, xbg, sbg, upto, return_nan )
         """ upper limit obtained via mad analysis 5 code
         :param nev: number of observed events
         :param xbg: expected bg
@@ -86,10 +73,39 @@ class UpperLimitComputer:
             else:
                 return float("nan")
 
-def CLsCov(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
+
+    def compute1d ( self, nev, xbg, sbg, upto=5.0, return_nan=False ):
+        """ upper limit obtained via mad analysis 5 code
+        :param nev: number of observed events
+        :param xbg: expected bg
+        :param sbg: uncertainty in background
+        :param upto: defines the interval to be probed
+        """
+        self.nev = nev
+        self.xbg = xbg
+        self.sbg = sbg
+        self.currentNToys = self.origNToys
+
+        try:
+            ## up = upto ## 5. ##  upto * max(nev,xbg,sbg)
+            dn = max( 0, nev - xbg )
+            up = upto * max( dn + math.sqrt(nev), dn + math.sqrt(xbg),sbg)
+            #print "checking between 0 and ",up ## ,self.f(0),self.f(up)
+            return optimize.brentq ( self.f, 0, up, rtol=1e-3 ) / self.lumi
+        except (ValueError,RuntimeError) as e:
+            #print "exception: >>",type(e),e
+            if not return_nan:
+                # print "compute again, upto=",upto
+                # self.origNToys = 5* self.origNToys
+                return self.compute ( nev, xbg, sbg, 5.0*upto, upto>200. )
+            else:
+                return float("nan")
+
+def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
     """ CLs, with vectors and covariances """
-    import IPython
     ## testing whether scipy is there
+    if type(NumObserved) not in [ list, tuple ]:
+        return CLs1D ( NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments )
     try:
         import scipy.stats
     except ImportError:
@@ -132,9 +148,10 @@ def CLsCov(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
         return 1.-(p_SplusB / p_b) # 1 - CLs
 
 
-def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
+def CLs1D(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
     """ this method has been taken from MadAnalysis5, see
         Official website: <https://launchpad.net/madanalysis5>
+        It is for the 1d case only .
 
         Thanks to the MadAnalysis for granting us the permission to use
         the code here! """
@@ -307,8 +324,18 @@ def chi2(nsig, nobs, nb, deltab, deltas=None):
 
 
 if __name__ == "__main__":
-    print ( "CLs=", CLs ( 10, 7., 2., 11.0, 100 ) )
-    print ( "CLsC=", CLsCov ( [25,15], [7.,15.], [[1.415,0.],[0.,10.]], [11.0,14.00], 100 ) )
+    """
+    f=open("bla.txt","w")
+    for i in range(100):
+        cls1 = CLs ( 10, 7., 2., 11.0, 20000 )
+        cls2 = CLs ( [10], [7.], [[4.0]], [11.0], 20000 )
+        print ( "CLs =", cls1 )
+        print ( "CLsC=", cls2 )
+        f.write ( "%.3f %.3f\n" % ( cls1, cls2 ) )
+    f.close()
+    """
+    #print ( "CLsC=", CLsCov ( [25,15], [7.,15.], [[1.415,0.],[0.,10.]], [11.0,14.00], 100 ) )
     # import doctest
     # doctest.testmod()
-    # print ( upperLimit ( 4, 3.6, 0.1, 20. / fb ) )
+    print ( upperLimit ( [4], [3.6], [[0.1**2]], 20. / fb, .05, 1000 ) )
+    print ( upperLimit ( 4, 3.6, 0.1, 20. / fb, .05, 1000 ) )
