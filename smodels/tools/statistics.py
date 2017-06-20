@@ -53,7 +53,7 @@ class UpperLimitComputer:
         cls = CLsMV ( self.nev, self.xbg, self.sbg, sig, self.currentNToys ) - self.cl
         return cls
 
-    def computeMV ( self, nev, xbg, sbg, sig ):
+    def computeMV ( self, nev, xbg, sbg, sig, upto=5. ):
         """ upper limit obtained via mad analysis 5 code, given for signal strength mu
         :param nev: number of observed events per dataset
         :param xbg: expected bg per dataset 
@@ -66,10 +66,20 @@ class UpperLimitComputer:
         self.currentNToys = self.origNToys
         self.sig = numpy.array ( sig )
         llhds={}
-        for mu in numpy.arange ( 0.0, 10., .2 ):
-            sig = mu * self.sig
-            llhds[float(mu)]= ( LLHD ( nev, xbg, sbg, sig, self.currentNToys ) )
-        norm = sum ( llhds.values() )
+        dx = upto/20.
+        last = 1.0
+        start=0.0
+        while True:
+            for mu in numpy.arange ( start, upto, dx ):
+                sig = mu * self.sig
+                llhds[float(mu)]= ( LLHD ( nev, xbg, sbg, sig, self.currentNToys ) )
+            norm = sum ( llhds.values() )
+            last = llhds[mu]/norm
+            if last < .0007:
+                break
+            start = upto
+            upto = 2*upto
+            print ( "last=%f. need to extend to %f" % ( last, upto ) )
         for k,v in llhds.items():
             llhds[k]=v/norm
         keys = llhds.keys()
@@ -77,10 +87,11 @@ class UpperLimitComputer:
         cdf = 0.
         for k in keys:
             v = llhds[k]
-            print ( k,v )
+            # print ( k,v )
             cdf += v
             if cdf > .95:
-                return k
+                f = ( cdf - .95 ) / v
+                return k + dx * ( 1 - f )
 
     def computeEff ( self, nev, xbg, sbg, sig, upto=5.0, return_nan=False ):
         """ upper limit obtained via mad analysis 5 code, given on signal strength mu
@@ -167,7 +178,6 @@ def LLHD(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
     llhd = 0.
     for bg in ExpectedBGs:
         nexp = bg + SigHypothesis
-        # print ( "NO=",NumObserved, "nexp=",nexp )
         llhd += numpy.prod ( numpy.exp ( NumObserved * numpy.log ( nexp ) - nexp - special.gammaln( NumObserved +numpy.array ( [1]*len(NumObserved)  ) ) ) )
     llhd = llhd / len(ExpectedBGs )
     return llhd
@@ -395,23 +405,10 @@ def chi2(nsig, nobs, nb, deltab, deltas=None):
 
 
 if __name__ == "__main__":
-    """
-    f=open("bla.txt","w")
-    for i in range(100):
-        cls1 = CLs ( 10, 7., 2., 11.0, 20000 )
-        cls2 = CLs ( [10], [7.], [[4.0]], [11.0], 20000 )
-        print ( "CLs =", cls1 )
-        print ( "CLsC=", cls2 )
-        f.write ( "%.3f %.3f\n" % ( cls1, cls2 ) )
-    f.close()
-    """
-    #print ( "CLsC=", CLsCov ( [25,15], [7.,15.], [[1.415,0.],[0.,10.]], [11.0,14.00], 100 ) )
-    #import doctest
-    #doctest.testmod()
     computer = UpperLimitComputer ( 1000, 1. / fb, .95 )
     print ( computer.computeEff ( nev=4, xbg=4.0, sbg=0.0001, sig=1. ) )
     print ( computer.computeMV ( [4], [3.6], [[0.1**2]], [1.] ) )
-    # print ( computer.computeMV ( [4,4], [3.6,3.6], [[0.1**2,0.08**2],[0.08**2,0.1**2]], [4,4] ) )
+    # print ( computer.computeMV ( [4,4], [3.6,3.6], [[0.1**2,0.08**2],[0.08**2,0.1**2]], [1.,1.] ) )
     # print ( LLHD ( [4,4], [3.6,3.6], [[0.1**2,0.08**2],[0.08**2,0.1**2]], [4,4], 100 ) )
     # print ( computer.computeMV ( [4,4,4], [3.6,3.6,3.6], [[0.1**2,0,0],[0.,0.1**2,0],[0.,0,0.1**2]], [0.02,.02,.02] ) )
 
@@ -427,13 +424,5 @@ if __name__ == "__main__":
                   [ -719.8, 78.1, 212.1, 174.3, 114.1, 67.6, 38.0, 20.6 ],
                   [ -381.1, 38.3, 111.2, 92.5, 61.0, 36.4, 20.6, 11.2 ],
     ]
-    """
-    ndc = len ( dummy_cov )
-    for i in range( ndc ):
-        for j in range( ndc ):
-            if dummy_cov[i][j]!=dummy_cov[j][i]:
-                print ( "asymmetric", i,j, dummy_cov[i][j],dummy_cov[j][i] )
-                sys.exit()
-  """
     # print ( LLHD ( dummy_nobs, dummy_nbg, dummy_cov,dummy_si, 100 ) )
-    # print ( computer.computeMV ( dummy_nobs, dummy_nbg, dummy_cov,dummy_si ) )
+    print ( computer.computeMV ( dummy_nobs, dummy_nbg, dummy_cov,dummy_si ) )
