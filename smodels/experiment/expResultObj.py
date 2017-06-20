@@ -8,6 +8,7 @@
 """
 
 import os
+import numpy
 from smodels.experiment import infoObj
 from smodels.experiment import txnameObj
 from smodels.experiment import datasetObj
@@ -154,12 +155,18 @@ class ExpResult(object):
         
         """
         if self.datasets[0].dataInfo.dataType == 'efficiencyMap':
-            if dataID == None:
-                """ FIXME when no dataID is given, and we have a covariance
+            if dataID == None and hasattr ( self.globalInfo, "covariance" ):
+                """ when no dataID is given, but we have a covariance
                     matrix, compute the combined CL UL """
-                print ( "globalInfo covariance matrix? %s" % self.globalInfo.covariance )
-                if hasCovarianceMatrix:
-                    return combinedUL
+                cov = self.globalInfo.covariance
+                if type ( cov ) != list:
+                    logger.error ( "covariance field has wrong type." )
+                    sys.exit()
+                if len ( cov ) < 2:
+                    logger.error ( "covariance matrix has length %d." % len(cov) )
+                    sys.exit()
+                print ( "cov=",cov )
+                return 13.
             if not dataID or not isinstance(dataID, str):
                 logger.error("The data set ID must be defined when computing ULs" \
                              " for efficiency-map results (as there is no covariance matrix).")
