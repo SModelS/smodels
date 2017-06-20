@@ -17,6 +17,7 @@ from scipy import stats, optimize, integrate, special
 from numpy import sqrt, exp, log, sign
 import numpy
 import math
+import sys
 
 @_memoize
 def upperLimit ( Nobs, Nexp, sigmaexp, lumi, alpha=.05, toys=200000 ):
@@ -40,14 +41,80 @@ class UpperLimitComputer:
         self.lumi = lumi
         self.cl = cl
 
-    def f( self, sig ):
+    def f( self, mu ):
+        # print ( "try sig=",sig )
+        sig = self.sig * mu
         cls = CLs ( self.nev, self.xbg, self.sbg, sig, self.currentNToys ) - self.cl
         return cls
 
+    def fMV( self, mu ):
+        # print ( "MV try sig=",sig )
+        sig = [ mu*x for x in self.sig ]
+        cls = CLsMV ( self.nev, self.xbg, self.sbg, sig, self.currentNToys ) - self.cl
+        return cls
+
+    def computeMV ( self, nev, xbg, sbg, sig ):
+        """ upper limit obtained via mad analysis 5 code, given for signal strength mu
+        :param nev: number of observed events per dataset
+        :param xbg: expected bg per dataset 
+        :param sbg: uncertainty in background per dataset
+        :param sig: expected number of signals per dataset
+        """
+        self.nev = nev
+        self.xbg = xbg
+        self.sbg = sbg
+        self.currentNToys = self.origNToys
+        self.sig = numpy.array ( sig )
+        llhds={}
+        for mu in numpy.arange ( 0.0, 10., .2 ):
+            sig = mu * self.sig
+            llhds[float(mu)]= ( LLHD ( nev, xbg, sbg, sig, self.currentNToys ) )
+        norm = sum ( llhds.values() )
+        for k,v in llhds.items():
+            llhds[k]=v/norm
+        keys = llhds.keys()
+        keys.sort()
+        cdf = 0.
+        for k in keys:
+            v = llhds[k]
+            print ( k,v )
+            cdf += v
+            if cdf > .95:
+                return k
+
+    def computeEff ( self, nev, xbg, sbg, sig, upto=5.0, return_nan=False ):
+        """ upper limit obtained via mad analysis 5 code, given on signal strength mu
+        :param nev: number of observed events
+        :param xbg: expected bg
+        :param sbg: uncertainty in background
+        :param sig: expected number of signals
+        :param upto: defines the interval to be probed
+        """
+        self.nev = nev
+        self.xbg = xbg
+        self.sbg = sbg
+        self.sig = sig
+        self.currentNToys = self.origNToys
+
+        try:
+            ## up = upto ## 5. ##  upto * max(nev,xbg,sbg)
+            dn = max( 0, nev - xbg )
+            #print ( "Eff: dn=", dn )
+            up = upto * max( dn + math.sqrt(nev), dn + math.sqrt(xbg),sbg) / sig
+            #print ( "Eff up=",up )
+            #print "checking between 0 and ",up ## ,self.f(0),self.f(up)
+            return optimize.brentq ( self.f, 0, up, rtol=1e-3 )
+        except (ValueError,RuntimeError) as e:
+            #print "exception: >>",type(e),e
+            if not return_nan:
+                # print "compute again, upto=",upto
+                # self.origNToys = 5* self.origNToys
+                return self.computeEff ( nev, xbg, sbg, eff, 5.0*upto, upto>200. )
+            else:
+                return float("nan")
+
     def compute ( self, nev, xbg, sbg, upto=5.0, return_nan=False ):
-        if type (nev) not in [ list, tuple ]:
-            return self.compute1d ( nev, xbg, sbg, upto, return_nan )
-        """ upper limit obtained via mad analysis 5 code
+        """ upper limit obtained via mad analysis 5 code, given for sigma
         :param nev: number of observed events
         :param xbg: expected bg
         :param sbg: uncertainty in background
@@ -73,39 +140,10 @@ class UpperLimitComputer:
             else:
                 return float("nan")
 
-
-    def compute1d ( self, nev, xbg, sbg, upto=5.0, return_nan=False ):
-        """ upper limit obtained via mad analysis 5 code
-        :param nev: number of observed events
-        :param xbg: expected bg
-        :param sbg: uncertainty in background
-        :param upto: defines the interval to be probed
-        """
-        self.nev = nev
-        self.xbg = xbg
-        self.sbg = sbg
-        self.currentNToys = self.origNToys
-
-        try:
-            ## up = upto ## 5. ##  upto * max(nev,xbg,sbg)
-            dn = max( 0, nev - xbg )
-            up = upto * max( dn + math.sqrt(nev), dn + math.sqrt(xbg),sbg)
-            #print "checking between 0 and ",up ## ,self.f(0),self.f(up)
-            return optimize.brentq ( self.f, 0, up, rtol=1e-3 ) / self.lumi
-        except (ValueError,RuntimeError) as e:
-            #print "exception: >>",type(e),e
-            if not return_nan:
-                # print "compute again, upto=",upto
-                # self.origNToys = 5* self.origNToys
-                return self.compute ( nev, xbg, sbg, 5.0*upto, upto>200. )
-            else:
-                return float("nan")
-
-def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
-    """ CLs, with vectors and covariances """
+def LLHD(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
+    """ next attempt. compute llhd at SigHypothesis half-numerically,
+        half-analytically """
     ## testing whether scipy is there
-    if type(NumObserved) not in [ list, tuple ]:
-        return CLs1D ( NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments )
     try:
         import scipy.stats
     except ImportError:
@@ -119,7 +157,38 @@ def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
             cov=BGError, size=NumToyExperiments )
 
     ## discard all negatives
-    ExpectedBGs = [value for value in ExpectedBGs if (value > 0).all() ]
+    ExpectedBGs = [ value for value in ExpectedBGs if (value > 0).all() ]
+
+    ## complain if too many negatives
+    p = float(len(ExpectedBGs )) / NumToyExperiments
+    if p < 0.9:
+        logger.warning ( "only %d%s of points are all-positive" % (100*p,"%"))
+
+    llhd = 0.
+    for bg in ExpectedBGs:
+        nexp = bg + SigHypothesis
+        # print ( "NO=",NumObserved, "nexp=",nexp )
+        llhd += numpy.prod ( numpy.exp ( NumObserved * numpy.log ( nexp ) - nexp - special.gammaln( NumObserved +numpy.array ( [1]*len(NumObserved)  ) ) ) )
+    llhd = llhd / len(ExpectedBGs )
+    return llhd
+
+def CLsMV(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
+    """ CLs, with vectors and covariances """
+    ## testing whether scipy is there
+    try:
+        import scipy.stats
+    except ImportError:
+        logger.warning('scipy is not installed... the CLs module cannot be used.')
+        logger.warning('Please install scipy.')
+        return False
+    # generate a set of expected-number-of-background-events, one for each toy
+    # experiment, distributed according to a Gaussian with the specified mean
+    # and uncertainty
+    ExpectedBGs = numpy.random.multivariate_normal( mean=ExpectedBG,
+            cov=BGError, size=NumToyExperiments )
+
+    ## discard all negatives
+    ExpectedBGs = [ value for value in ExpectedBGs if (value > 0).all() ]
 
     ## complain if too many negatives
     p = float(len(ExpectedBGs )) / NumToyExperiments
@@ -132,6 +201,8 @@ def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
     # observed = the fraction of the toy experiments with backgrounds as low as
     # observed = p_b.
     # NB (1 - this p_b) corresponds to what is usually called p_b for CLs.
+    #print ( "ToyBGs=", ToyBGs[:3] )
+    #print ( "NumObs=", NumObserved )
     p_b = scipy.stats.percentileofscore(ToyBGs, NumObserved, kind='weak')*.01
 
     # Toy MC for background+signal
@@ -148,7 +219,7 @@ def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
         return 1.-(p_SplusB / p_b) # 1 - CLs
 
 
-def CLs1D(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
+def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
     """ this method has been taken from MadAnalysis5, see
         Official website: <https://launchpad.net/madanalysis5>
         It is for the 1d case only .
@@ -335,7 +406,34 @@ if __name__ == "__main__":
     f.close()
     """
     #print ( "CLsC=", CLsCov ( [25,15], [7.,15.], [[1.415,0.],[0.,10.]], [11.0,14.00], 100 ) )
-    # import doctest
-    # doctest.testmod()
-    print ( upperLimit ( [4], [3.6], [[0.1**2]], 20. / fb, .05, 1000 ) )
-    print ( upperLimit ( 4, 3.6, 0.1, 20. / fb, .05, 1000 ) )
+    #import doctest
+    #doctest.testmod()
+    computer = UpperLimitComputer ( 1000, 1. / fb, .95 )
+    print ( computer.computeEff ( nev=4, xbg=4.0, sbg=0.0001, sig=1. ) )
+    print ( computer.computeMV ( [4], [3.6], [[0.1**2]], [1.] ) )
+    # print ( computer.computeMV ( [4,4], [3.6,3.6], [[0.1**2,0.08**2],[0.08**2,0.1**2]], [4,4] ) )
+    # print ( LLHD ( [4,4], [3.6,3.6], [[0.1**2,0.08**2],[0.08**2,0.1**2]], [4,4], 100 ) )
+    # print ( computer.computeMV ( [4,4,4], [3.6,3.6,3.6], [[0.1**2,0,0],[0.,0.1**2,0],[0.,0,0.1**2]], [0.02,.02,.02] ) )
+
+    dummy_nobs = [ 1964, 877, 354, 182, 82, 36, 15, 11 ]
+    dummy_nbg = [ 2006.4, 836.4, 350., 147.1, 62., 26.2, 11.1, 4.7 ]
+    dummy_si = [ 47., 29.4, 21.1, 14.3, 9.4, 7.1, 4.7, 4.3 ]
+    dummy_cov = [ [ 16787.2, -1691.3, -4520.3, -3599.9, -2286.4, -1316.5, -719.8, -381.1 ] ,
+                  [ -1691.3, 603.1, 754.6, 513.3, 294., 154.9, 78.1, 38.3 ],
+                  [ -4520.3, 754.6, 1454., 1110.9, 691.1, 392.3, 212.1, 111.2 ],
+                  [ -3599.9, 513.3, 1110.9, 871.2, 551.8, 318.1, 174.3, 92.5 ],
+                  [ -2286.4, 294., 691.1, 551.8, 353.9, 206.2, 114.1, 61. ],
+                  [ -1316.5, 154.9, 392.3, 318.1, 206.2, 121.3, 67.6, 36.4 ],
+                  [ -719.8, 78.1, 212.1, 174.3, 114.1, 67.6, 38.0, 20.6 ],
+                  [ -381.1, 38.3, 111.2, 92.5, 61.0, 36.4, 20.6, 11.2 ],
+    ]
+    """
+    ndc = len ( dummy_cov )
+    for i in range( ndc ):
+        for j in range( ndc ):
+            if dummy_cov[i][j]!=dummy_cov[j][i]:
+                print ( "asymmetric", i,j, dummy_cov[i][j],dummy_cov[j][i] )
+                sys.exit()
+  """
+    # print ( LLHD ( dummy_nobs, dummy_nbg, dummy_cov,dummy_si, 100 ) )
+    # print ( computer.computeMV ( dummy_nobs, dummy_nbg, dummy_cov,dummy_si ) )
