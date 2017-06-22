@@ -154,7 +154,7 @@ class ExpResult(object):
         for ds in self.datasets:
                 nobs.append ( ds.dataInfo.observedN )
                 nb.append ( ds.dataInfo.expectedBG )
-        print ( "cov=", cov )
+        # print ( "cov=", cov )
         ret = computer.computeMV ( nobs, nb, cov, effs )
         return ret
 

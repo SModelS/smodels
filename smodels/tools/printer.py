@@ -14,7 +14,7 @@ from __future__ import print_function
 import sys,os
 from smodels.theory.topology import TopologyList
 from smodels.theory.element import Element
-from smodels.theory.theoryPrediction import TheoryPredictionList
+from smodels.theory.theoryPrediction import TheoryPredictionList, groupPredictions
 from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.databaseObj import ExpResultList
 from smodels.tools.ioObjects import OutputStatus, ResultList
@@ -402,6 +402,28 @@ class TxTPrinter(BasicPrinter):
 
         return output
     
+    def addCombinedLimits(self, theoryPredictions ):
+        """ collects combinable theoryPreds, then computes theory prediction for it
+        """
+        theoryPredLists = groupPredictions ( theoryPredictions )
+        ret = ""
+        for theoryPreds in theoryPredLists:
+            if len(theoryPreds)<2:
+                continue
+            signals = []
+            e = theoryPreds[0].expResult
+            Id = e.globalInfo.id
+            ret += "---------------Analysis Label = " + Id + "\n"
+            ret += "-------------------Combined Datasets: "
+            for theoryPred in theoryPreds:
+                ret += theoryPred.dataset.dataInfo.dataId + ", "
+                signals.append ( theoryPred.xsection.value )
+            ret = ret[:-2] + "\n"
+            upperLimit = e.getCombinedUpperLimitFor ( signals )
+            ret += "Observed experimental limit: %s\n" % ( upperLimit )
+        ret += "\n"
+        return ret
+
 
     def _formatResultList(self, obj):
         """
@@ -418,6 +440,10 @@ class TxTPrinter(BasicPrinter):
         output += " || \t \t\t\t\t\t\t || \n"
         output += "   ======================================================= \n"
                 
+        try:
+            output += self.addCombinedLimits ( obj.theoryPredictions )
+        except Exception as e:
+            output += "bla %s" % str(e)
         
         for theoryPrediction in obj.theoryPredictions:
             expRes = theoryPrediction.expResult

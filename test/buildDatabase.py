@@ -23,9 +23,10 @@ print (e)
 sig1,sig2=1.0*fb,1.0*fb
 y1,y2=float(sig1*e0.globalInfo.lumi),float(sig2*e0.globalInfo.lumi)
 print ( "yields",y1,y2 )
-print ( "upper limit", e0.getCombinedUpperLimitFor ( [ sig1 , sig2 ] ) )
-print ( "upper limit", e0.getUpperLimitFor ( "SR1: MET > 200" ) / y1 )
-print ( "upper limit", e0.getUpperLimitFor ( "SR2: MET > 300" ) / y2 )
+print ( "signals",sig1,sig2 )
+print ( "upper limit combined", e0.getCombinedUpperLimitFor ( [ sig1 , sig2 ] ) )
+print ( "upper limit SR1", e0.getUpperLimitFor ( "SR1: MET > 200" ) / y1 )
+print ( "upper limit SR2", e0.getUpperLimitFor ( "SR2: MET > 300" ) / y2 )
 
 tpred = theoryPredictionsFor ( e0, smstoplist )
 print ( "theorypredfor=%s" % tpred )

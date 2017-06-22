@@ -109,7 +109,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """ Get theory prediction for each analysis and print basic output """
     allPredictions = []
     for expResult in listOfExpRes:
-        theorypredictions = theoryPredictionsFor(expResult, smstoplist)
+        theorypredictions = theoryPredictionsFor(expResult, smstoplist,useBestDataset=False)
         if not theorypredictions: continue
         allPredictions += theorypredictions._theoryPredictions
     

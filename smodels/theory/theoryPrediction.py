@@ -101,6 +101,9 @@ class TheoryPredictionList(object):
         if theoryPredictions and isinstance(theoryPredictions,list):
             self._theoryPredictions = theoryPredictions
 
+    def append(self,theoryPred):
+        self._theoryPredictions.append ( theoryPred )
+
     def __str__(self):
         if len ( self._theoryPredictions ) == 0:
             return "no predictions."
@@ -149,19 +152,6 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2, useBestDataset=
 
     dataSetResults = []
 
-    """
-    if len(expResult.datasets)>1 and hasattr ( expResult.globalInfo, "covariance" ):
-        print ( "theory Prediction combined" )
-        signals = []
-        for dataset in expResult.datasets:
-            predList = _getDataSetPredictions(dataset,smsTopList,maxMassDist)
-            xs = predList[0].xsection.value
-            signals.append ( xs )
-        ul = expResult.getCombinedUpperLimitFor ( signals )
-        print ( "for nothing:", ul )
-        pred = _getDataSetPredictions(dataset,smsTopList,maxMassDist)
-        return pred
-    """
     #Compute predictions for each data set (for UL analyses there is one single set)
     for dataset in expResult.datasets:
         predList = _getDataSetPredictions(dataset,smsTopList,maxMassDist)
@@ -442,3 +432,25 @@ def _evalExpression(stringExpr,cluster):
             logger.error("Evaluation of expression "+expr+" returned multiple values.")
         return exprvalue[0] #Return XSection object
     return exprvalue
+
+def groupPredictions ( theoryPredictions ):
+    """ group all theory predictions that 
+        -) belong to the same expRes
+        -) whose expRes has a covariance matrix
+        -) whose dataType is efficiencyMap
+
+        return all such groups as TheoryPredictionLists.
+    """
+    expReses = {}
+    for theoryPred in theoryPredictions:
+        expRes = theoryPred.expResult
+        if not hasattr ( expRes.globalInfo, "covariance" ):
+            continue ## we need a covariance matrix
+        info = theoryPred.dataset.dataInfo
+        if not info.dataType == 'efficiencyMap':
+            continue ## it must be efficiency maps
+        Id = expRes.globalInfo.id
+        if not Id in expReses.keys():
+            expReses[Id]=TheoryPredictionList()
+        expReses[Id].append( theoryPred )
+    return list ( expReses.values() )
