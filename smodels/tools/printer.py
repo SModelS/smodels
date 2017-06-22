@@ -421,6 +421,9 @@ class TxTPrinter(BasicPrinter):
             ret += "Analysis sqrts: " + str(e.globalInfo.sqrts) + "\n"
             for theoryPred in theoryPreds:
                 v = theoryPred.xsection.value
+                unfolded_v = v / .1 # theoryPred.dataset.getEfficiencyFor ( "T2tt", 0 )
+                ret += "Theory prediction / effs: %s\n" % v
+                ret += "Theory conditions: %s\n" % theoryPred.conditions
                 signals.append ( v )
             upperLimit = e.getCombinedUpperLimitFor ( signals )
             ret += "Observed experimental limit: %s\n" % ( upperLimit )
