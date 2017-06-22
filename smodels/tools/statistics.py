@@ -53,26 +53,28 @@ class UpperLimitComputer:
         cls = CLsMV ( self.nev, self.xbg, self.sbg, sig, self.currentNToys ) - self.cl
         return cls
 
-    def computeMV ( self, nev, xbg, cov, sig, upto=5. ):
+    def computeMV ( self, nev, xbg, cov, eff ):
         """ upper limit obtained from combined efficiencies
         :param nev: number of observed events per dataset
         :param xbg: expected bg per dataset 
         :param cov: uncertainty in background, as a covariance matrix
-        :param sig: expected number of signals per dataset
+        :param eff: dataset effective signal efficiencies
+        :returns: upper limit on production xsec
         """
-        if type(sig[0] ) == type(fb):
-            sig = [ float(x.asUnit(fb) * self.lumi) for x in sig ]
-        sigs = numpy.array ( sig )
+        #if type(sig[0] ) == type(fb):
+        #    sig = [ float(x.asUnit(fb) * self.lumi) for x in sig ]
+        effs = numpy.array ( eff )
+        # sigs = numpy.array ( sig )
         llhds={}
+        start = 0.0
+        upto = 5 * max ( nev + xbg ) / min(eff)
         dx = upto/20.
-        last = 1.0
-        start=0.0
         while True:
-            for mu in numpy.arange ( start, upto, dx ):
-                csig = mu * sigs
-                llhds[float(mu)]= ( LLHD ( nev, xbg, cov, csig, self.origNToys ) )
+            for sig in numpy.arange ( start, upto, dx ):
+                csig = sig * effs
+                llhds[float(sig)]= ( LLHD ( nev, xbg, cov, csig, self.origNToys ) )
             norm = sum ( llhds.values() )
-            last = llhds[mu]/norm
+            last = llhds[sig]/norm
             if last < .0007:
                 break
             start = upto

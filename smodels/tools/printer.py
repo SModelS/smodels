@@ -410,7 +410,8 @@ class TxTPrinter(BasicPrinter):
         for theoryPreds in theoryPredLists:
             if len(theoryPreds)<2:
                 continue
-            signals = []
+            # signals = []
+            effs = []
             e = theoryPreds[0].expResult
             Id = e.globalInfo.id
             ret += "---------------Analysis Label = " + Id + "\n"
@@ -429,11 +430,13 @@ class TxTPrinter(BasicPrinter):
                 eff = theoryPred.cluster.getEffectiveEfficiency()
                 # ret += "Elements in cluster: %s\n" % cluster.elements 
                 unfolded_v = v / eff # theoryPred.dataset.getEfficiencyFor ( "T2tt", 0 )
+                ret += "Effective efficiency: %s\n" % eff
                 ret += "Theory prediction / effs: %s\n" % unfolded_v
-                signals.append ( v )
-            upperLimit = e.getCombinedUpperLimitFor ( signals )
+                effs.append ( eff )
+                #signals.append ( float(v.asNumber(fb)) )
+            upperLimit = e.getCombinedUpperLimitFor ( effs )
             ret += "Observed experimental limit: %s\n" % ( upperLimit )
-            expectedUpperLimit = e.getCombinedUpperLimitFor ( signals, expected=True )
+            expectedUpperLimit = e.getCombinedUpperLimitFor ( effs, expected=True )
             ret += "Expected experimental limit: %s\n" % ( expectedUpperLimit )
         ret += "\n"
         return ret
