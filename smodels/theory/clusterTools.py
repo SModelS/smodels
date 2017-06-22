@@ -48,6 +48,21 @@ class ElementCluster(object):
             raise SModelSError()
         return totxsec[0]
 
+    def getEffectiveEfficiency ( self ):
+        """ 
+        get the 'effective' efficiency, that is the sum of all efficiencies
+        of all elements, weighted with the "weights" (=xsecs )
+        the cluster's total xsec, divided by this number gives the total
+        "unfolded" cross section.
+        """
+        eff = 0.
+        totalw = 0.
+        for el in self.elements:
+            w = float ( el.weight[0].value.asNumber(fb) )
+            eff += w * el.eff
+            totalw += w
+        return eff / totalw
+
     def getAvgMass(self):
         """
         Return the average mass of all elements belonging to the cluster.

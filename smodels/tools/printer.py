@@ -419,11 +419,17 @@ class TxTPrinter(BasicPrinter):
                 ret += theoryPred.dataset.dataInfo.dataId + ", "
             ret = ret[:-2] + "\n"
             ret += "Analysis sqrts: " + str(e.globalInfo.sqrts) + "\n"
+            conditions = set ( [ x.conditions for x in theoryPreds ] )
+            if len(conditions)>1:
+                logger.error ( "inconsistent conditions" )
+            ret += "Theory conditions: %s\n" % conditions.pop()
+                
             for theoryPred in theoryPreds:
                 v = theoryPred.xsection.value
-                unfolded_v = v / .1 # theoryPred.dataset.getEfficiencyFor ( "T2tt", 0 )
-                ret += "Theory prediction / effs: %s\n" % v
-                ret += "Theory conditions: %s\n" % theoryPred.conditions
+                eff = theoryPred.cluster.getEffectiveEfficiency()
+                # ret += "Elements in cluster: %s\n" % cluster.elements 
+                unfolded_v = v / eff # theoryPred.dataset.getEfficiencyFor ( "T2tt", 0 )
+                ret += "Theory prediction / effs: %s\n" % unfolded_v
                 signals.append ( v )
             upperLimit = e.getCombinedUpperLimitFor ( signals )
             ret += "Observed experimental limit: %s\n" % ( upperLimit )
