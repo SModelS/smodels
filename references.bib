@@ -2,7 +2,7 @@
 % When you are using SModelS for a publication, please cite:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% SModelS proper: \cite{smodels:v11,Kraml:2013mwa,smodels:wiki}
+% SModelS proper: \cite{Ambrogi:2017neo,Kraml:2013mwa,smodels:wiki}
 %
 % PySLHA: \cite{Buckley:2013jua}
 %
@@ -17,17 +17,23 @@
 % Please use database.bib and this file for references. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
  
- 
+%%% contains utf-8, see: https://inspirehep.net/info/faq/general#utf8
+%%% add \usepackage[utf8]{inputenc} to your latex preamble
+
+
  %%% SModelS v1.1 release %%%
-@article{smodels:v11,
-      author         = "Ambrogi Federico, Kraml Sabine, Kulkarni Suchita, Laa Ursula, Lessa Andre, Magerl Veronika and Sonneveld Jory and Traub Michael and Waltenberger, Wolfgang",
+@article{Ambrogi:2017neo,
+      author         = "Ambrogi, Federico and Kraml, Sabine and Kulkarni, Suchita
+                        and Laa, Ursula and Lessa, Andre and Magerl, Veronika and
+                        Sonneveld, Jory and Traub, Michael and Waltenberger,
+                        Wolfgang",
       title          = "{SModelS v1.1 user manual}",
       year           = "2017",
       eprint         = "1701.06586",
       archivePrefix  = "arXiv",
       primaryClass   = "hep-ph",
-      reportNumber   = "LPSC17001, HEPHY-PUB 981/17",
-	  SLACcitation   = "%%CITATION = ARXIV:1701.06586;%%"
+      reportNumber   = "LPSC17001, HEPHY-PUB-981-17",
+      SLACcitation   = "%%CITATION = ARXIV:1701.06586;%%"
 }
 
 %%% original SModelS paper %%%
@@ -54,13 +60,9 @@
       note = "{http://smodels.hephy.at}",
 }
 
-%%% contains utf-8, see: https://inspirehep.net/info/faq/general#utf8
-%%% add \usepackage[utf8]{inputenc} to your latex preamble
-
-
 %%% Pythia 8.2 %%%
 @article{Sjostrand:2014zea,
-      author         = "Sjöstrand, Torbjörn and Ask, Stefan and Christiansen,
+      author         = "Sj{\"o}strand, Torbj{\"o}rn and Ask, Stefan and Christiansen,
                         Jesper R. and Corke, Richard and Desai, Nishita and Ilten,
                         Philip and Mrenna, Stephen and Prestel, Stefan and
                         Rasmussen, Christine O. and Skands, Peter Z.",
@@ -95,20 +97,6 @@
       reportNumber   = "FERMILAB-PUB-06-052-CD-T, LU-TP-06-13",
       SLACcitation   = "%%CITATION = HEP-PH/0603175;%%",
 }
-
-%%% PySLHA %%%
-@article{Buckley:2013jua,
-      author         = "Buckley, Andy",
-      title          = "{PySLHA: a Pythonic interface to SUSY Les Houches Accord
-                        data}",
-      year           = "2013",
-      eprint         = "1305.4194",
-      archivePrefix  = "arXiv",
-      primaryClass   = "hep-ph",
-      reportNumber   = "MCNET-13-06",
-      SLACcitation   = "%%CITATION = ARXIV:1305.4194;%%",
-}
-
 
 %%% NLL-fast citations %%%
 
@@ -238,7 +226,6 @@ note = "{http://pauli.uni-muenster.de/\~akule\_01/nllwiki/index.php/NLL-fast}",
 note = "{http://phystev.cnrs.fr/wiki/2013:groups:tools:slha}",
 }
 
-
 @article{Skands:2003cj,
       author         = "Skands, Peter Z. and Allanach, B.C. and Baer, H. and
                         Balazs, C. and Belanger, G. and others",
@@ -273,3 +260,18 @@ note = "{http://phystev.cnrs.fr/wiki/2013:groups:tools:slha}",
       reportNumber   = "FERMILAB-PUB-06-337-T, CERN-LCGAPP-2006-03",
       SLACcitation   = "%%CITATION = HEP-PH/0609017;%%",
 }
+
+@article{Buckley:2013jua,
+      author         = "Buckley, Andy",
+      title          = "{PySLHA: a Pythonic interface to SUSY Les Houches Accord
+                        data}",
+      year           = "2013",
+      eprint         = "1305.4194",
+      archivePrefix  = "arXiv",
+      primaryClass   = "hep-ph",
+      reportNumber   = "MCNET-13-06",
+      SLACcitation   = "%%CITATION = ARXIV:1305.4194;%%",
+}
+
+
+
