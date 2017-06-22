@@ -417,10 +417,15 @@ class TxTPrinter(BasicPrinter):
             ret += "-------------------Combined Datasets: "
             for theoryPred in theoryPreds:
                 ret += theoryPred.dataset.dataInfo.dataId + ", "
-                signals.append ( theoryPred.xsection.value )
             ret = ret[:-2] + "\n"
+            ret += "Analysis sqrts: " + str(e.globalInfo.sqrts) + "\n"
+            for theoryPred in theoryPreds:
+                v = theoryPred.xsection.value
+                signals.append ( v )
             upperLimit = e.getCombinedUpperLimitFor ( signals )
             ret += "Observed experimental limit: %s\n" % ( upperLimit )
+            expectedUpperLimit = e.getCombinedUpperLimitFor ( signals, expected=True )
+            ret += "Expected experimental limit: %s\n" % ( expectedUpperLimit )
         ret += "\n"
         return ret
 

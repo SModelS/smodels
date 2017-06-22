@@ -131,12 +131,13 @@ class ExpResult(object):
     def hasCovarianceMatrix ( self ):
         return hasattr ( self.globalInfo, "covariance" )
 
-    def getCombinedUpperLimitFor ( self, effs ):
+    def getCombinedUpperLimitFor ( self, effs, expected=False ):
         """
         Prototype. Get combined upper limit. Effs are the
         signal efficiencies in the datasets. The order is defined
-        in the dataset itself. The limit is given on sigma!
-        ( Not sigma * eff )
+        in the dataset itself.
+        :param expected: return expected, not observed value
+        :returns: upper limit on sigma (not sigma*eff)
         """
         if not hasattr ( self.globalInfo, "covariance" ):
             logger.error ( "no covariance matrix given" )
@@ -155,7 +156,10 @@ class ExpResult(object):
                 nobs.append ( ds.dataInfo.observedN )
                 nb.append ( ds.dataInfo.expectedBG )
         # print ( "cov=", cov )
-        ret = computer.computeMV ( nobs, nb, cov, effs )
+        no = nobs
+        if expected:
+            no = nb
+        ret = computer.computeMV ( no, nb, cov, effs )
         return ret
 
     def getUpperLimitFor(self, dataID=None, alpha=0.05, expected=False,
