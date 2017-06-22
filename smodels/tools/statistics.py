@@ -53,26 +53,24 @@ class UpperLimitComputer:
         cls = CLsMV ( self.nev, self.xbg, self.sbg, sig, self.currentNToys ) - self.cl
         return cls
 
-    def computeMV ( self, nev, xbg, sbg, sig, upto=5. ):
-        """ upper limit obtained via mad analysis 5 code, given for signal strength mu
+    def computeMV ( self, nev, xbg, cov, sig, upto=5. ):
+        """ upper limit obtained from combined efficiencies
         :param nev: number of observed events per dataset
         :param xbg: expected bg per dataset 
-        :param sbg: uncertainty in background per dataset
+        :param cov: uncertainty in background, as a covariance matrix
         :param sig: expected number of signals per dataset
         """
-        self.nev = nev
-        self.xbg = xbg
-        self.sbg = sbg
-        self.currentNToys = self.origNToys
-        self.sig = numpy.array ( sig )
+        if type(sig[0] ) == type(fb):
+            sig = [ float(x.asUnit(fb) * self.lumi) for x in sig ]
+        sigs = numpy.array ( sig )
         llhds={}
         dx = upto/20.
         last = 1.0
         start=0.0
         while True:
             for mu in numpy.arange ( start, upto, dx ):
-                sig = mu * self.sig
-                llhds[float(mu)]= ( LLHD ( nev, xbg, sbg, sig, self.currentNToys ) )
+                csig = mu * sigs
+                llhds[float(mu)]= ( LLHD ( nev, xbg, cov, csig, self.origNToys ) )
             norm = sum ( llhds.values() )
             last = llhds[mu]/norm
             if last < .0007:
@@ -87,11 +85,10 @@ class UpperLimitComputer:
         cdf = 0.
         for k in keys:
             v = llhds[k]
-            # print ( k,v )
             cdf += v
-            if cdf > .95:
+            if cdf > .95: # perform a simple linear interpolation over cdf
                 f = ( cdf - .95 ) / v
-                return k + dx * ( 1 - f )
+                return (k + dx * ( 1 - f )) / self.lumi
 
     def computeEff ( self, nev, xbg, sbg, sig, upto=5.0, return_nan=False ):
         """ upper limit obtained via mad analysis 5 code, given on signal strength mu
@@ -114,7 +111,7 @@ class UpperLimitComputer:
             up = upto * max( dn + math.sqrt(nev), dn + math.sqrt(xbg),sbg) / sig
             #print ( "Eff up=",up )
             #print "checking between 0 and ",up ## ,self.f(0),self.f(up)
-            return optimize.brentq ( self.f, 0, up, rtol=1e-3 )
+            return optimize.brentq ( self.f, 0, up, rtol=1e-3 ) / self.lumi
         except (ValueError,RuntimeError) as e:
             #print "exception: >>",type(e),e
             if not return_nan:
@@ -152,8 +149,7 @@ class UpperLimitComputer:
                 return float("nan")
 
 def LLHD(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
-    """ next attempt. compute llhd at SigHypothesis half-numerically,
-        half-analytically """
+    """ compute llhd at SigHypothesis half numerically, half analytically. """
     ## testing whether scipy is there
     try:
         import scipy.stats
@@ -179,7 +175,7 @@ def LLHD(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
     for bg in ExpectedBGs:
         nexp = bg + SigHypothesis
         llhd += numpy.prod ( numpy.exp ( NumObserved * numpy.log ( nexp ) - nexp - special.gammaln( NumObserved +numpy.array ( [1]*len(NumObserved)  ) ) ) )
-    llhd = llhd / len(ExpectedBGs )
+    llhd = llhd / len( ExpectedBGs )
     return llhd
 
 def CLsMV(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):

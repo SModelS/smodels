@@ -26,8 +26,6 @@ from collections import OrderedDict
 from xml.dom import minidom
 from xml.etree import ElementTree
 
-
-
 class MPrinter(object):
     """
     Master Printer class to handle the Printers (one printer/output type)

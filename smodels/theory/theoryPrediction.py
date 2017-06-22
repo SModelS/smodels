@@ -101,6 +101,12 @@ class TheoryPredictionList(object):
         if theoryPredictions and isinstance(theoryPredictions,list):
             self._theoryPredictions = theoryPredictions
 
+    def __str__(self):
+        if len ( self._theoryPredictions ) == 0:
+            return "no predictions."
+        ret = "%d predictions: " % len ( self._theoryPredictions )
+        ret += ", ".join ( [ str(s) for s in self._theoryPredictions ] )
+        return ret
 
     def __iter__(self):      
         for theoryPrediction in self._theoryPredictions:
@@ -142,6 +148,20 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2, useBestDataset=
     """
 
     dataSetResults = []
+
+    """
+    if len(expResult.datasets)>1 and hasattr ( expResult.globalInfo, "covariance" ):
+        print ( "theory Prediction combined" )
+        signals = []
+        for dataset in expResult.datasets:
+            predList = _getDataSetPredictions(dataset,smsTopList,maxMassDist)
+            xs = predList[0].xsection.value
+            signals.append ( xs )
+        ul = expResult.getCombinedUpperLimitFor ( signals )
+        print ( "for nothing:", ul )
+        pred = _getDataSetPredictions(dataset,smsTopList,maxMassDist)
+        return pred
+    """
     #Compute predictions for each data set (for UL analyses there is one single set)
     for dataset in expResult.datasets:
         predList = _getDataSetPredictions(dataset,smsTopList,maxMassDist)
@@ -218,7 +238,7 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
     #Check dataset sqrts format:
     if (dataset.globalInfo.sqrts/TeV).normalize()._unit:
             ID = dataset.globalInfo.id
-            logger.error("Sqrts defined with wrong units for %s" %(ID) )
+            logger.error( "Sqrt(s) defined with wrong units for %s" % (ID) )
             return False
             
     #Remove unwanted cross sections

@@ -128,6 +128,36 @@ class ExpResult(object):
         if dataset: return dataset.getEfficiencyFor ( txname, mass )
         return None
 
+    def hasCovarianceMatrix ( self ):
+        return hasattr ( self.globalInfo, "covariance" )
+
+    def getCombinedUpperLimitFor ( self, effs ):
+        """
+        Prototype. Get combined upper limit. Effs are the
+        signal efficiencies in the datasets. The order is defined
+        in the dataset itself. The limit is given on sigma!
+        ( Not sigma * eff )
+        """
+        if not hasattr ( self.globalInfo, "covariance" ):
+            logger.error ( "no covariance matrix given" )
+            sys.exit()
+        cov = self.globalInfo.covariance
+        if type ( cov ) != list:
+            logger.error ( "covariance field has wrong type." )
+            sys.exit()
+        if len ( cov ) < 2:
+            logger.error ( "covariance matrix has length %d." % len(cov) )
+            sys.exit()
+        from smodels.tools.statistics import UpperLimitComputer
+        computer = UpperLimitComputer ( 2000, self.globalInfo.lumi )
+        nobs, nb = [], []
+        for ds in self.datasets:
+                nobs.append ( ds.dataInfo.observedN )
+                nb.append ( ds.dataInfo.expectedBG )
+        print ( "cov=", cov )
+        ret = computer.computeMV ( nobs, nb, cov, effs )
+        return ret
+
     def getUpperLimitFor(self, dataID=None, alpha=0.05, expected=False,
                           txname=None, mass=None, compute=False):
         """
@@ -135,7 +165,7 @@ class ExpResult(object):
         to the type of result.
         For an Efficiency Map type, returns the UL for the signal*efficiency
         for the given dataSet ID (signal region). For an Upper Limit type,
-        returns the UL for the signal*BR for for the given mass array and
+        returns the UL for the signal*BR for the given mass array and
         Txname.
         
         :param dataID: dataset ID (string) (only for efficiency-map type results)
@@ -155,18 +185,6 @@ class ExpResult(object):
         
         """
         if self.datasets[0].dataInfo.dataType == 'efficiencyMap':
-            if dataID == None and hasattr ( self.globalInfo, "covariance" ):
-                """ when no dataID is given, but we have a covariance
-                    matrix, compute the combined CL UL """
-                cov = self.globalInfo.covariance
-                if type ( cov ) != list:
-                    logger.error ( "covariance field has wrong type." )
-                    sys.exit()
-                if len ( cov ) < 2:
-                    logger.error ( "covariance matrix has length %d." % len(cov) )
-                    sys.exit()
-                print ( "cov=",cov )
-                return 13.
             if not dataID or not isinstance(dataID, str):
                 logger.error("The data set ID must be defined when computing ULs" \
                              " for efficiency-map results (as there is no covariance matrix).")
