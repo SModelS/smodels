@@ -16,6 +16,7 @@ from smodels.tools.caching import _memoize
 from scipy import stats, optimize, integrate, special
 from numpy import sqrt, exp, log, sign
 import numpy
+from numpy import array
 import math
 import sys
 
@@ -41,10 +42,16 @@ class UpperLimitComputer:
         self.lumi = lumi
         self.cl = cl
 
-    def f( self, mu ):
+    def fEff( self, mu ):
         # print ( "try sig=",sig )
         sig = self.sig * mu
         cls = CLs ( self.nev, self.xbg, self.sbg, sig, self.currentNToys ) - self.cl
+        return cls
+
+    def f( self, sig ):
+        # self.currentNToys=int ( self.currentNToys * 1.10 )
+        cls = CLs ( self.nev, self.xbg, self.sbg, sig, self.currentNToys ) - self.cl
+        # print "[ULC] running",sig," with",self.currentNToys,"cls=",cls
         return cls
 
     def fMV( self, mu ):
@@ -56,7 +63,7 @@ class UpperLimitComputer:
     def computeMV ( self, nev, xbg, cov, eff ):
         """ upper limit obtained from combined efficiencies
         :param nev: number of observed events per dataset
-        :param xbg: expected bg per dataset 
+        :param xbg: expected bg per dataset
         :param cov: uncertainty in background, as a covariance matrix
         :param eff: dataset effective signal efficiencies
         :returns: upper limit on production xsec
@@ -66,20 +73,25 @@ class UpperLimitComputer:
         effs = numpy.array ( eff )
         # sigs = numpy.array ( sig )
         llhds={}
-        start = 0.0
         upto = 5 * max ( nev + xbg ) / min(eff)
         dx = upto/20.
+        start = dx/2.
         while True:
             for sig in numpy.arange ( start, upto, dx ):
                 csig = sig * effs
-                llhds[float(sig)]= ( LLHD ( nev, xbg, cov, csig, self.origNToys ) )
+                l = LLHD ( nev, xbg, cov, csig, self.origNToys )
+                llhds[float(sig)]=l
             norm = sum ( llhds.values() )
             last = llhds[sig]/norm
             if last < .0007:
-                break
-            start = upto
+                break ## ok, we sampled well enough?
+            if last < .00001:
+                ## dubious! we may have sampled to scarcely!
+                logger.error ( "when integrating pdf, last bin is suspiciously small %f" % last )
+
+            start = upto + dx/2.
             upto = 2*upto
-            print ( "last=%f. need to extend to %f" % ( last, upto ) )
+            logger.error ( "last=%f. need to extend to %f" % ( last, upto ) )
         for k,v in llhds.items():
             llhds[k]=v/norm
         keys = llhds.keys()
@@ -88,9 +100,14 @@ class UpperLimitComputer:
         for k in keys:
             v = llhds[k]
             cdf += v
+            # print ( "k=",k,"v=",v,"cdf=",cdf )
             if cdf > .95: # perform a simple linear interpolation over cdf
                 f = ( cdf - .95 ) / v
-                return (k + dx * ( 1 - f )) / self.lumi
+                # ret = ( k - f * dx )
+                ret = ( k + dx * ( .5 - f ) )
+                # print ( "ret=",ret )
+                # return (k + dx * ( 1 - f )) / self.lumi
+                return ret / self.lumi
 
     def computeEff ( self, nev, xbg, sbg, sig, upto=5.0, return_nan=False ):
         """ upper limit obtained via mad analysis 5 code, given on signal strength mu
@@ -113,7 +130,7 @@ class UpperLimitComputer:
             up = upto * max( dn + math.sqrt(nev), dn + math.sqrt(xbg),sbg) / sig
             #print ( "Eff up=",up )
             #print "checking between 0 and ",up ## ,self.f(0),self.f(up)
-            return optimize.brentq ( self.f, 0, up, rtol=1e-3 ) / self.lumi
+            return optimize.brentq ( self.fEff, 0, up, rtol=1e-3 ) / self.lumi
         except (ValueError,RuntimeError) as e:
             #print "exception: >>",type(e),e
             if not return_nan:
@@ -281,6 +298,87 @@ def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
     else:
         return 1.-(p_SplusB / p_b) # 1 - CLs
 
+def likelihoodMV(nsig, nobs, nb, covb, deltas):
+        """
+        Return the likelihood to observe nobs events in len(nobs)
+        datasets given the predicted backgrounds nb, 
+        and the covariance matrix on these backgrounds (covb),
+        expected numbers of signal events nsig and the 
+        errors on the signals (deltas).
+
+        :param nsig: predicted signals (1d array)
+        :param nobs: numbers of observed events (1d array)
+        :param nb: predicted backgrounds (1d array)
+        :param covb: covariance matrix of backgrounds (2d array)
+        :param deltas: uncertainties on signals (1d array). If None, then
+                       assume 20% uncertainty.
+
+        :return: likelihood to observe nobs events (float)
+
+        """
+
+        #Set signal error to 20%, if not defined
+        if deltas is None:
+            deltas = 0.2*nsig
+
+        #     Why not a simple poisson function for the factorial
+        #     -----------------------------------------------------
+        #     The scipy.stats.poisson.pmf probability mass function
+        #     for the Poisson distribution only works for discrete
+        #     numbers. The gamma distribution is used to create a
+        #     continuous Poisson distribution.
+        #
+        #     Why not a simple gamma function for the factorial:
+        #     -----------------------------------------------------
+        #     The gamma function does not yield results for integers
+        #     larger than 170. Since the expression for the Poisson
+        #     probability mass function as a whole should not be huge,
+        #     the exponent of the log of this expression is calculated
+        #     instead to avoid using large numbers.
+
+
+        #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
+        def prob(x,nsig, nobs, nb, covb, deltas):
+            poisson = numpy.exp(nobs*numpy.log(x) - x - math.lgamma(nobs + 1))
+            gaussian = stats.norm.pdf(x,loc=nb+nsig,scale=sqrt(covb+numpy.diag(deltas**2)))
+
+            return poisson*gaussian
+
+        #Compute maximum value for the integrand:
+        sigma2 = covb + numpy.diag ( deltas**2 )
+        xm = nb + nsig - sigma2
+        #If nb + nsig = sigma2, shift the values slightly:
+        if xm == 0.:
+            xm = 0.001
+        xmax = xm*(1.+sign(xm)*sqrt(1. + 4.*nobs*sigma2/xm**2))/2.
+
+        #Define initial integration range:
+        nrange = 5.
+        a = max(0.,xmax-nrange*sqrt(sigma2))
+        b = xmax+nrange*sqrt(sigma2)
+        like = integrate.quad(prob,a,b,(nsig, nobs, nb, covb, deltas),
+                                      epsabs=0.,epsrel=1e-3)[0]
+
+        #Increase integration range until integral converges
+        err = 1.
+        while err > 0.01:
+            like_old = like
+            nrange = nrange*2
+            a = max(0.,xmax-nrange*sqrt(sigma2))
+            b = xmax+nrange*sqrt(sigma2)
+            like = integrate.quad(prob,a,b,(nsig, nobs, nb, covb, deltas),
+                                      epsabs=0.,epsrel=1e-3)[0]
+            err = abs(like_old-like)/like
+
+        #Renormalize the likelihood to account for the cut at x = 0.
+        #The integral of the gaussian from 0 to infinity gives:
+        #(1/2)*(1 + Erf(mu/sqrt(2*sigma2))), so we need to divide by it
+        #(for mu - sigma >> 0, the normalization gives 1.)
+        norm = (1./2.)*(1. + special.erf((nb+nsig)/sqrt(2.*sigma2)))[0][0]
+        like = like/norm
+        return like
+
+
 
 def likelihood(nsig, nobs, nb, deltab, deltas):
         """
@@ -403,17 +501,29 @@ def chi2(nsig, nobs, nb, deltab, deltas=None):
 
 
 if __name__ == "__main__":
+    """
     f=open("bla.txt","w")
     computer = UpperLimitComputer ( 1000, 1. / fb, .95 )
-    for i in range(1000):
-        eff = computer.computeEff ( nev=4, xbg=3.6, sbg=0.1, sig=1. )
-        mv = computer.computeMV ( [4], [3.6], [[0.1**2]], [1.] ) 
-        print ( eff, mv )
-        f.write ( "%.2f %.2f\n" % ( eff, mv ) )
+    import random
+    for i in range(100):
+        xbg=random.uniform ( 2, 19 )
+        nev = int ( abs ( random.gauss ( xbg, math.sqrt(xbg) ) ) )
+        sbg = abs ( random.gauss ( xbg / 10., xbg / 20.)  )
+        # nev,xbg,sbg=4,3.6,.1
+        sig = computer.compute ( nev, xbg, sbg ).asNumber(fb)
+        eff = computer.computeEff ( nev, xbg, sbg, sig=1. ).asNumber(fb)
+        mv = computer.computeMV ( [nev], [xbg], [[sbg**2]], [1.] ).asNumber(fb)
+        print ( sig, eff, mv )
+        f.write ( "%.2f %.2f %.2f\n" % ( sig, eff, mv ) )
     f.close()
+    """
     # print ( computer.computeMV ( [4,4], [3.6,3.6], [[0.1**2,0.08**2],[0.08**2,0.1**2]], [1.,1.] ) )
     # print ( LLHD ( [4,4], [3.6,3.6], [[0.1**2,0.08**2],[0.08**2,0.1**2]], [4,4], 100 ) )
     # print ( computer.computeMV ( [4,4,4], [3.6,3.6,3.6], [[0.1**2,0,0],[0.,0.1**2,0],[0.,0,0.1**2]], [0.02,.02,.02] ) )
+
+    nsig,nobs,nb,deltab,deltas=1,4,3.6,.1,None
+    print ( likelihood(nsig, nobs, nb, deltab, deltas) )
+    print ( likelihoodMV(array([nsig]), array([nobs]), array([nb]), array([[deltab**2]]), deltas) )
 
     dummy_nobs = [ 1964, 877, 354, 182, 82, 36, 15, 11 ]
     dummy_nbg = [ 2006.4, 836.4, 350., 147.1, 62., 26.2, 11.1, 4.7 ]
