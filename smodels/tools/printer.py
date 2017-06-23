@@ -438,6 +438,8 @@ class TxTPrinter(BasicPrinter):
             ret += "Observed experimental limit: %s\n" % ( upperLimit )
             expectedUpperLimit = e.getCombinedUpperLimitFor ( effs, expected=True )
             ret += "Expected experimental limit: %s\n" % ( expectedUpperLimit )
+            ret += "Observed r-Value: %s\n" % ( unfolded_v / upperLimit )
+            ret += "Expected r-Value: %s\n" % ( unfolded_v / expectedUpperLimit )
         ret += "\n"
         return ret
 
@@ -493,6 +495,9 @@ class TxTPrinter(BasicPrinter):
             output += "Observed experimental limit: " + str(upperLimit) + "\n"
             if not upperLimitExp is None:
                 output += "Expected experimental limit: " + str(upperLimitExp) + "\n"
+            output += "Observed r-Value: %s\n" % ( theoryPrediction.xsection.value / upperLimit )
+            if not upperLimitExp is None:
+                output += "Expected r-Value: %s\n" % ( theoryPrediction.xsection.value / upperLimitExp )
             if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
                 output += "Chi2: " + str(theoryPrediction.chi2) + "\n"
                 output += "Likelihood: " + str(theoryPrediction.likelihood) + "\n"

@@ -302,7 +302,7 @@ def likelihood(nsig, nobs, nb, deltab, deltas):
         if deltas is None:
             deltas = 0.2*nsig
 
-        #     Why not a simple gamma function for the factorial:
+        #     Why not a simple poisson function for the factorial
         #     -----------------------------------------------------
         #     The scipy.stats.poisson.pmf probability mass function
         #     for the Poisson distribution only works for discrete
@@ -321,7 +321,7 @@ def likelihood(nsig, nobs, nb, deltab, deltas):
         #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
         def prob(x,nsig, nobs, nb, deltab, deltas):
             poisson = exp(nobs*log(x) - x - math.lgamma(nobs + 1))
-            gaussian = stats.norm.pdf(x,loc=nb+nsig,scale=sqrt(deltab**2 + deltas**2))
+            gaussian = stats.norm.pdf(x,loc=nb+nsig,scale=sqrt(deltab**2+deltas**2))
 
             return poisson*gaussian
 

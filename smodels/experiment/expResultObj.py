@@ -8,6 +8,7 @@
 """
 
 import os
+import sys
 import numpy
 from smodels.experiment import infoObj
 from smodels.experiment import txnameObj
@@ -140,7 +141,10 @@ class ExpResult(object):
         :returns: upper limit on sigma (not sigma*eff)
         """
         if not hasattr ( self.globalInfo, "covariance" ):
-            logger.error ( "no covariance matrix given" )
+            logger.error ( "no covariance matrix given in globalInfo.txt for %s" % self.globalInfo.id )
+            sys.exit()
+        if not hasattr ( self.globalInfo, "datasetOrder" ):
+            logger.error ( "datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id )
             sys.exit()
         cov = self.globalInfo.covariance
         if type ( cov ) != list:
@@ -151,11 +155,21 @@ class ExpResult(object):
             sys.exit()
         from smodels.tools.statistics import UpperLimitComputer
         computer = UpperLimitComputer ( 2000, self.globalInfo.lumi )
-        nobs, nb = [], []
+        datasetOrder = self.globalInfo.datasetOrder
+        if len ( datasetOrder ) != len ( self.datasets ):
+            logger.error ( "Number of elements in datasetOrder(%d) not equals number of datasets(%d) in %s." % ( len(datasetOrder), len(self.datasets), self.globalInfo.id ) )
+            sys.exit()
+        dsDict={} ## make sure we respect datasetOrder.
         for ds in self.datasets:
-                nobs.append ( ds.dataInfo.observedN )
-                nb.append ( ds.dataInfo.expectedBG )
-        # print ( "cov=", cov )
+            dsDict[ds.dataInfo.dataId]=ds
+        nobs, nb = [], []
+        for dsname in datasetOrder:
+            if not dsname in dsDict.keys():
+                logger.error ( "dataset %s appears in datasetOrder, but not as dataset in %s" % ( dsname, self.globalInfo.id ) )
+                sys.exit()
+            ds = dsDict[dsname]
+            nobs.append ( ds.dataInfo.observedN )
+            nb.append ( ds.dataInfo.expectedBG )
         no = nobs
         if expected:
             no = nb
