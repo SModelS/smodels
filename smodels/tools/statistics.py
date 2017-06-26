@@ -298,6 +298,16 @@ def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
     else:
         return 1.-(p_SplusB / p_b) # 1 - CLs
 
+class LikelihoodComputer:
+    def __init__ ( self, nsig, nobs, nb, covb, deltas ):
+        self.nsig = nsig
+        self.nobs = nobs
+        self.nb = nb
+        self.covb = covb
+        self.deltas = deltas
+        if deltas is None:
+            self.deltas = 0.2*nsig
+
 def likelihoodMV(nsig, nobs, nb, covb, deltas):
         """
         Return the likelihood to observe nobs events in len(nobs)
@@ -316,6 +326,7 @@ def likelihoodMV(nsig, nobs, nb, covb, deltas):
         :return: likelihood to observe nobs events (float)
 
         """
+        computer = LikelihoodComputer ( nsig, nobs, nb, covb, deltas )
 
         #Set signal error to 20%, if not defined
         if deltas is None:
@@ -338,43 +349,54 @@ def likelihoodMV(nsig, nobs, nb, covb, deltas):
 
 
         #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
-        def prob(x,nsig, nobs, nb, covb, deltas):
-            poisson = numpy.exp(nobs*numpy.log(x) - x - math.lgamma(nobs + 1))
-            gaussian = stats.norm.pdf(x,loc=nb+nsig,scale=sqrt(covb+numpy.diag(deltas**2)))
-
-            return poisson*gaussian
+        # def prob(x0, x1, nsig, nobs, nb, covb, deltas):
+        def probMV( *xar ):
+            x = numpy.array ( xar )
+            poisson = numpy.exp(computer.nobs*numpy.log(x) - x - special.gammaln(computer.nobs + 1))
+            gaussian = stats.norm.pdf(x,loc=computer.nb+computer.nsig,scale=sqrt(computer.covb+numpy.diag(computer.deltas**2)))
+            # print ( "poissonian",(poisson*gaussian)[0][0] ) ## FIXME so wrong
+            return (poisson*gaussian)[0][0]
 
         #Compute maximum value for the integrand:
         sigma2 = covb + numpy.diag ( deltas**2 )
         xm = nb + nsig - sigma2
         #If nb + nsig = sigma2, shift the values slightly:
-        if xm == 0.:
-            xm = 0.001
+        print ( "xm=",xm )
+        #if xm == 0.:
+        #    xm = 0.001
         xmax = xm*(1.+sign(xm)*sqrt(1. + 4.*nobs*sigma2/xm**2))/2.
 
         #Define initial integration range:
         nrange = 5.
-        a = max(0.,xmax-nrange*sqrt(sigma2))
-        b = xmax+nrange*sqrt(sigma2)
-        like = integrate.quad(prob,a,b,(nsig, nobs, nb, covb, deltas),
-                                      epsabs=0.,epsrel=1e-3)[0]
+        #a = max(0.,xmax-nrange*sqrt(sigma2))
+        #b = xmax+nrange*sqrt(sigma2)
+        a = numpy.array ( [1.]*len(nobs) ) # FIXME wrong
+        b = numpy.array ( [2.]*len(nobs) ) # FIXME wrong
+        print ( "a=",a )
+        print ( "b=",b )
+        like = integrate.nquad( probMV, [a,b] )[0] ## fixme so wrong
+        #                              epsabs=0.,epsrel=1e-3)[0]
 
         #Increase integration range until integral converges
         err = 1.
-        while err > 0.01:
+        while False:# err > 0.01:  wrong
             like_old = like
             nrange = nrange*2
-            a = max(0.,xmax-nrange*sqrt(sigma2))
-            b = xmax+nrange*sqrt(sigma2)
-            like = integrate.quad(prob,a,b,(nsig, nobs, nb, covb, deltas),
-                                      epsabs=0.,epsrel=1e-3)[0]
+            #a = max(0.,xmax-nrange*sqrt(sigma2))
+            #b = xmax+nrange*sqrt(sigma2)
+            a = numpy.array ( [0.]*len(nobs) ) ## FIXME wrong
+            b = numpy.array ( [4.]*len(nobs) ) ## FIXME wrong
+            like = integrate.nquad(probMV,[a,b])[0] #,(nsig, nobs, nb, covb, deltas),
+#                                      epsabs=0.,epsrel=1e-3)[0] FIXME so wrong
             err = abs(like_old-like)/like
 
+        print ( "like=", like )
         #Renormalize the likelihood to account for the cut at x = 0.
         #The integral of the gaussian from 0 to infinity gives:
         #(1/2)*(1 + Erf(mu/sqrt(2*sigma2))), so we need to divide by it
         #(for mu - sigma >> 0, the normalization gives 1.)
         norm = (1./2.)*(1. + special.erf((nb+nsig)/sqrt(2.*sigma2)))[0][0]
+        print ( "norm=",norm )
         like = like/norm
         return like
 
@@ -523,7 +545,7 @@ if __name__ == "__main__":
 
     nsig,nobs,nb,deltab,deltas=1,4,3.6,.1,None
     print ( likelihood(nsig, nobs, nb, deltab, deltas) )
-    print ( likelihoodMV(array([nsig]), array([nobs]), array([nb]), array([[deltab**2]]), deltas) )
+    print ( likelihoodMV(array([nsig,nsig]), array([nobs,nobs]), array([nb,nb]), numpy.diag([deltab**2,deltab**2]), deltas) )
 
     dummy_nobs = [ 1964, 877, 354, 182, 82, 36, 15, 11 ]
     dummy_nbg = [ 2006.4, 836.4, 350., 147.1, 62., 26.2, 11.1, 4.7 ]
