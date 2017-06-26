@@ -351,11 +351,13 @@ class LikelihoodComputer:
 
             #Define initial integration range:
             nrange = 5.
+            print ( "xmax=",xmax)
             a = max(0.,xmax-nrange*sqrt(sigma2))
             b = xmax+nrange*sqrt(sigma2)
             print ( "mv,a,b,",a[0][0],b[0][0] )
             #a = numpy.array ( [1.]*len(nobs) ) # FIXME wrong
             #b = numpy.array ( [2.]*len(nobs) ) # FIXME wrong
+            self.nsig, self.deltas = nsig, deltas ## store for integration
             like = integrate.nquad( self.probMV, [[a,b]] )[0] ## fixme so wrong
             #                              epsabs=0.,epsrel=1e-3)[0]
 
