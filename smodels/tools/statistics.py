@@ -300,6 +300,16 @@ def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
 
 class LikelihoodComputer:
     def __init__ ( self, nsig, nobs, nb, covb, deltas ):
+        """
+        :param nsig: predicted signals (float or 1d array)
+        :param nobs: numbers of observed events (float or 1d array)
+        :param nb: predicted backgrounds (float or 1d array)
+        :param covb: covariance matrix of backgrounds (float or 2d array)
+        :param deltas: uncertainties on signals (float or 1d array).
+                       If None, then assume 20% uncertainty.
+
+        :return: likelihood to observe nobs events (float)
+        """
         self.nsig = nsig
         self.nobs = nobs
         self.nb = nb
@@ -308,178 +318,140 @@ class LikelihoodComputer:
         if deltas is None:
             self.deltas = 0.2*nsig
 
-def likelihoodMV(nsig, nobs, nb, covb, deltas):
-        """
-        Return the likelihood to observe nobs events in len(nobs)
-        datasets given the predicted backgrounds nb, 
-        and the covariance matrix on these backgrounds (covb),
-        expected numbers of signal events nsig and the 
-        errors on the signals (deltas).
+    #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
+    # def prob(x0, x1, nsig, nobs, nb, covb, deltas):
+    def probMV( self, *xar ):
+        x = numpy.array ( xar )
+        poisson = numpy.exp(self.nobs*numpy.log(x) - x - special.gammaln(self.nobs + 1))
+        gaussian = stats.norm.pdf(x,loc=self.nb+self.nsig,scale=sqrt(self.covb+numpy.diag(self.deltas**2)))
+        # print ( "poissonian",(poisson*gaussian)[0][0] ) ## FIXME so wrong
+        return (poisson*gaussian)[0][0]
 
-        :param nsig: predicted signals (1d array)
-        :param nobs: numbers of observed events (1d array)
-        :param nb: predicted backgrounds (1d array)
-        :param covb: covariance matrix of backgrounds (2d array)
-        :param deltas: uncertainties on signals (1d array). If None, then
-                       assume 20% uncertainty.
+    #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
+    def prob( self, x ):
+        poisson = exp(self.nobs*log(x) - x - math.lgamma(self.nobs + 1))
+        gaussian = stats.norm.pdf( x, loc=self.nb+self.nsig,\
+                                   scale=sqrt(self.covb+self.deltas**2))
+        return poisson*gaussian
 
-        :return: likelihood to observe nobs events (float)
+    def mvLikelihood( self ):
+            #     Why not a simple poisson function for the factorial
+            #     -----------------------------------------------------
+            #     The scipy.stats.poisson.pmf probability mass function
+            #     for the Poisson distribution only works for discrete
+            #     numbers. The gamma distribution is used to create a
+            #     continuous Poisson distribution.
+            #
+            #     Why not a simple gamma function for the factorial:
+            #     -----------------------------------------------------
+            #     The gamma function does not yield results for integers
+            #     larger than 170. Since the expression for the Poisson
+            #     probability mass function as a whole should not be huge,
+            #     the exponent of the log of this expression is calculated
+            #     instead to avoid using large numbers.
 
-        """
-        computer = LikelihoodComputer ( nsig, nobs, nb, covb, deltas )
+            #Compute maximum value for the integrand:
+            sigma2 = self.covb + numpy.diag ( self.deltas**2 )
+            xm = self.nb + self.nsig - sigma2
+            #If nb + nsig = sigma2, shift the values slightly:
+            #if xm == 0.:
+            #    xm = 0.001
+            xmax = xm*(1.+sign(xm)*sqrt(1. + 4.*self.nobs*sigma2/xm**2))/2.
 
-        #Set signal error to 20%, if not defined
-        if deltas is None:
-            deltas = 0.2*nsig
-
-        #     Why not a simple poisson function for the factorial
-        #     -----------------------------------------------------
-        #     The scipy.stats.poisson.pmf probability mass function
-        #     for the Poisson distribution only works for discrete
-        #     numbers. The gamma distribution is used to create a
-        #     continuous Poisson distribution.
-        #
-        #     Why not a simple gamma function for the factorial:
-        #     -----------------------------------------------------
-        #     The gamma function does not yield results for integers
-        #     larger than 170. Since the expression for the Poisson
-        #     probability mass function as a whole should not be huge,
-        #     the exponent of the log of this expression is calculated
-        #     instead to avoid using large numbers.
-
-
-        #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
-        # def prob(x0, x1, nsig, nobs, nb, covb, deltas):
-        def probMV( *xar ):
-            x = numpy.array ( xar )
-            poisson = numpy.exp(computer.nobs*numpy.log(x) - x - special.gammaln(computer.nobs + 1))
-            gaussian = stats.norm.pdf(x,loc=computer.nb+computer.nsig,scale=sqrt(computer.covb+numpy.diag(computer.deltas**2)))
-            # print ( "poissonian",(poisson*gaussian)[0][0] ) ## FIXME so wrong
-            return (poisson*gaussian)[0][0]
-
-        #Compute maximum value for the integrand:
-        sigma2 = covb + numpy.diag ( deltas**2 )
-        xm = nb + nsig - sigma2
-        #If nb + nsig = sigma2, shift the values slightly:
-        print ( "xm=",xm )
-        #if xm == 0.:
-        #    xm = 0.001
-        xmax = xm*(1.+sign(xm)*sqrt(1. + 4.*nobs*sigma2/xm**2))/2.
-
-        #Define initial integration range:
-        nrange = 5.
-        #a = max(0.,xmax-nrange*sqrt(sigma2))
-        #b = xmax+nrange*sqrt(sigma2)
-        a = numpy.array ( [1.]*len(nobs) ) # FIXME wrong
-        b = numpy.array ( [2.]*len(nobs) ) # FIXME wrong
-        print ( "a=",a )
-        print ( "b=",b )
-        like = integrate.nquad( probMV, [a,b] )[0] ## fixme so wrong
-        #                              epsabs=0.,epsrel=1e-3)[0]
-
-        #Increase integration range until integral converges
-        err = 1.
-        while False:# err > 0.01:  wrong
-            like_old = like
-            nrange = nrange*2
-            #a = max(0.,xmax-nrange*sqrt(sigma2))
-            #b = xmax+nrange*sqrt(sigma2)
-            a = numpy.array ( [0.]*len(nobs) ) ## FIXME wrong
-            b = numpy.array ( [4.]*len(nobs) ) ## FIXME wrong
-            like = integrate.nquad(probMV,[a,b])[0] #,(nsig, nobs, nb, covb, deltas),
-#                                      epsabs=0.,epsrel=1e-3)[0] FIXME so wrong
-            err = abs(like_old-like)/like
-
-        print ( "like=", like )
-        #Renormalize the likelihood to account for the cut at x = 0.
-        #The integral of the gaussian from 0 to infinity gives:
-        #(1/2)*(1 + Erf(mu/sqrt(2*sigma2))), so we need to divide by it
-        #(for mu - sigma >> 0, the normalization gives 1.)
-        norm = (1./2.)*(1. + special.erf((nb+nsig)/sqrt(2.*sigma2)))[0][0]
-        print ( "norm=",norm )
-        like = like/norm
-        return like
-
-
-
-def likelihood(nsig, nobs, nb, deltab, deltas):
-        """
-        Return the likelihood to observe nobs events given the
-        predicted background nb, error on this background (deltab),
-        expected number of signal events nsig and the error on the signal (deltas).
-
-        :param nsig: predicted signal (float)
-        :param nobs: number of observed events (float)
-        :param nb: predicted background (float)
-        :param deltab: uncertainty on background (float)
-        :param deltas: uncertainty on signal (float)
-
-        :return: likelihood to observe nobs events (float)
-
-        """
-
-        #Set signal error to 20%, if not defined
-        if deltas is None:
-            deltas = 0.2*nsig
-
-        #     Why not a simple poisson function for the factorial
-        #     -----------------------------------------------------
-        #     The scipy.stats.poisson.pmf probability mass function
-        #     for the Poisson distribution only works for discrete
-        #     numbers. The gamma distribution is used to create a
-        #     continuous Poisson distribution.
-        #
-        #     Why not a simple gamma function for the factorial:
-        #     -----------------------------------------------------
-        #     The gamma function does not yield results for integers
-        #     larger than 170. Since the expression for the Poisson
-        #     probability mass function as a whole should not be huge,
-        #     the exponent of the log of this expression is calculated
-        #     instead to avoid using large numbers.
-
-
-        #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
-        def prob(x,nsig, nobs, nb, deltab, deltas):
-            poisson = exp(nobs*log(x) - x - math.lgamma(nobs + 1))
-            gaussian = stats.norm.pdf(x,loc=nb+nsig,scale=sqrt(deltab**2+deltas**2))
-
-            return poisson*gaussian
-
-        #Compute maximum value for the integrand:
-        sigma2 = deltab**2 + deltas**2
-        xm = nb + nsig - sigma2
-        #If nb + nsig = sigma2, shift the values slightly:
-        if xm == 0.:
-            xm = 0.001
-        xmax = xm*(1.+sign(xm)*sqrt(1. + 4.*nobs*sigma2/xm**2))/2.
-
-        #Define initial integration range:
-        nrange = 5.
-        a = max(0.,xmax-nrange*sqrt(sigma2))
-        b = xmax+nrange*sqrt(sigma2)
-        like = integrate.quad(prob,a,b,(nsig, nobs, nb, deltab, deltas),
-                                      epsabs=0.,epsrel=1e-3)[0]
-
-        #Increase integration range until integral converges
-        err = 1.
-        while err > 0.01:
-            like_old = like
-            nrange = nrange*2
+            #Define initial integration range:
+            nrange = 5.
             a = max(0.,xmax-nrange*sqrt(sigma2))
             b = xmax+nrange*sqrt(sigma2)
-            like = integrate.quad(prob,a,b,(nsig, nobs, nb, deltab, deltas),
-                                      epsabs=0.,epsrel=1e-3)[0]
-            err = abs(like_old-like)/like
+            #a = numpy.array ( [1.]*len(nobs) ) # FIXME wrong
+            #b = numpy.array ( [2.]*len(nobs) ) # FIXME wrong
+            like = integrate.nquad( self.probMV, [[a,b]] )[0] ## fixme so wrong
+            #                              epsabs=0.,epsrel=1e-3)[0]
 
-        #Renormalize the likelihood to account for the cut at x = 0.
-        #The integral of the gaussian from 0 to infinity gives:
-        #(1/2)*(1 + Erf(mu/sqrt(2*sigma2))), so we need to divide by it
-        #(for mu - sigma >> 0, the normalization gives 1.)
-        norm = (1./2.)*(1. + special.erf((nb+nsig)/sqrt(2.*sigma2)))
-        like = like/norm
+            #Increase integration range until integral converges
+            err = 1.
+            while False:# err > 0.01:  wrong
+                like_old = like
+                nrange = nrange*2
+                a = max(0.,xmax-nrange*sqrt(sigma2))
+                b = xmax+nrange*sqrt(sigma2)
+                #a = numpy.array ( [0.]*len(nobs) ) ## FIXME wrong
+                #b = numpy.array ( [4.]*len(nobs) ) ## FIXME wrong
+                like = integrate.nquad(probMV,[a,b])[0] #,(nsig, nobs, nb, covb, deltas),
+    #                                      epsabs=0.,epsrel=1e-3)[0] FIXME so wrong
+                err = abs(like_old-like)/like
 
-        return like
+            #print ( "mvLikelihood, like=", like )
+            #Renormalize the likelihood to account for the cut at x = 0.
+            #The integral of the gaussian from 0 to infinity gives:
+            #(1/2)*(1 + Erf(mu/sqrt(2*sigma2))), so we need to divide by it
+            #(for mu - sigma >> 0, the normalization gives 1.)
+            norm = (1./2.)*(1. + special.erf((self.nb+self.nsig)/sqrt(2.*sigma2)))[0][0]
+            # print ( "mvLikelihood, norm=",norm )
+            like = like/norm
+            return like
 
+    def likelihood ( self ):
+        # print ( "llhd, typensig=",type(self.nsig) )
+        if type(self.nsig) in [ int, float, numpy.float64 ]:
+            return self.likelihood1d()
+        return self.mvLikelihood()
+
+    def likelihood1d( self ):
+            #     Why not a simple poisson function for the factorial
+            #     -----------------------------------------------------
+            #     The scipy.stats.poisson.pmf probability mass function
+            #     for the Poisson distribution only works for discrete
+            #     numbers. The gamma distribution is used to create a
+            #     continuous Poisson distribution.
+            #
+            #     Why not a simple gamma function for the factorial:
+            #     -----------------------------------------------------
+            #     The gamma function does not yield results for integers
+            #     larger than 170. Since the expression for the Poisson
+            #     probability mass function as a whole should not be huge,
+            #     the exponent of the log of this expression is calculated
+            #     instead to avoid using large numbers.
+
+            #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
+            def prob(x,nsig, nobs, nb, deltab, deltas):
+                poisson = exp(nobs*log(x) - x - math.lgamma(nobs + 1))
+                gaussian = stats.norm.pdf(x,loc=nb+nsig,scale=sqrt(deltab**2 + deltas**2))
+                return poisson*gaussian
+
+
+
+            #Compute maximum value for the integrand:
+            sigma2 = self.covb + self.deltas**2
+            xm = self.nb + self.nsig - sigma2
+            #If nb + nsig = sigma2, shift the values slightly:
+            if xm == 0.:
+                xm = 0.001
+            xmax = xm*(1.+sign(xm)*sqrt(1. + 4.*self.nobs*sigma2/xm**2))/2.
+
+            #Define initial integration range:
+            nrange = 5.
+            a = max(0.,xmax-nrange*sqrt(sigma2))
+            b = xmax+nrange*sqrt(sigma2)
+            like = integrate.quad(self.prob,a,b,epsabs=0.,epsrel=1e-3)[0]
+
+            #Increase integration range until integral converges
+            err = 1.
+            while err > 0.01:
+                like_old = like
+                nrange = nrange*2
+                a = max(0.,xmax-nrange*sqrt(sigma2))
+                b = xmax+nrange*sqrt(sigma2)
+                like = integrate.quad(self.prob,a,b, epsabs=0.,epsrel=1e-3)[0]
+                err = abs(like_old-like)/like
+
+            #Renormalize the likelihood to account for the cut at x = 0.
+            #The integral of the gaussian from 0 to infinity gives:
+            #(1/2)*(1 + Erf(mu/sqrt(2*sigma2))), so we need to divide by it
+            #(for mu - sigma >> 0, the normalization gives 1.)
+            norm = (1./2.)*(1. + special.erf((self.nb+self.nsig)/sqrt(2.*sigma2)))
+            like = like/norm
+
+            return like
 
 def chi2(nsig, nobs, nb, deltab, deltas=None):
         """
@@ -521,7 +493,6 @@ def chi2(nsig, nobs, nb, deltab, deltas=None):
         return -2*log(llhd/maxllhd)
 
 
-
 if __name__ == "__main__":
     """
     f=open("bla.txt","w")
@@ -543,9 +514,13 @@ if __name__ == "__main__":
     # print ( LLHD ( [4,4], [3.6,3.6], [[0.1**2,0.08**2],[0.08**2,0.1**2]], [4,4], 100 ) )
     # print ( computer.computeMV ( [4,4,4], [3.6,3.6,3.6], [[0.1**2,0,0],[0.,0.1**2,0],[0.,0,0.1**2]], [0.02,.02,.02] ) )
 
-    nsig,nobs,nb,deltab,deltas=1,4,3.6,.1,None
-    print ( likelihood(nsig, nobs, nb, deltab, deltas) )
-    print ( likelihoodMV(array([nsig,nsig]), array([nobs,nobs]), array([nb,nb]), numpy.diag([deltab**2,deltab**2]), deltas) )
+    nsig_,nobs_,nb_,deltab_,deltas_=1,4,3.6,.1,None
+    computer = LikelihoodComputer ( nsig_, nobs_, nb_, deltab_**2, deltas_ )
+    print ( "1d, computer:", computer.likelihood()  )
+    computer = LikelihoodComputer (array([nsig_]), array([nobs_]), array([nb_]), numpy.diag([deltab_**2]), deltas_)
+    print ( "mv 1d, computer:",computer.likelihood() )
+    # print ( likelihoodMV(array([nsig]), array([nobs]), array([nb]), numpy.diag([deltab**2]), deltas) )
+    # print ( likelihoodMV(array([nsig,nsig]), array([nobs,nobs]), array([nb,nb]), numpy.diag([deltab**2,deltab**2]), deltas) )
 
     dummy_nobs = [ 1964, 877, 354, 182, 82, 36, 15, 11 ]
     dummy_nbg = [ 2006.4, 836.4, 350., 147.1, 62., 26.2, 11.1, 4.7 ]
