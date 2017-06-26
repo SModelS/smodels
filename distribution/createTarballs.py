@@ -286,7 +286,8 @@ def rmExtraFiles():
     Remove additional files.
     """
     comment ( "Remove a few unneeded files" )
-    extras = [ "inputFiles/slha/nobdecay.slha", "docs/documentation/smodels.log" ]
+    extras = [ "inputFiles/slha/nobdecay.slha", "inputFiles/slha/broken.slha", 
+               "docs/documentation/smodels.log", "inputFiles/slha/complicated.slha" ]
     for i in extras:
         cmd = "rm -rf %s/%s" % ( dirname, i )
         run ( cmd )
