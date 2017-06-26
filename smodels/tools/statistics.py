@@ -299,24 +299,15 @@ def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
         return 1.-(p_SplusB / p_b) # 1 - CLs
 
 class LikelihoodComputer:
-    def __init__ ( self, nsig, nobs, nb, covb, deltas ):
+    def __init__ ( self, nobs, nb, covb ):
         """
-        :param nsig: predicted signals (float or 1d array)
         :param nobs: numbers of observed events (float or 1d array)
         :param nb: predicted backgrounds (float or 1d array)
         :param covb: covariance matrix of backgrounds (float or 2d array)
-        :param deltas: uncertainties on signals (float or 1d array).
-                       If None, then assume 20% uncertainty.
-
-        :return: likelihood to observe nobs events (float)
         """
-        self.nsig = nsig
         self.nobs = nobs
         self.nb = nb
         self.covb = covb
-        self.deltas = deltas
-        if deltas is None:
-            self.deltas = 0.2*nsig
 
     #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
     # def prob(x0, x1, nsig, nobs, nb, covb, deltas):
@@ -334,7 +325,7 @@ class LikelihoodComputer:
                                    scale=sqrt(self.covb+self.deltas**2))
         return poisson*gaussian
 
-    def mvLikelihood( self ):
+    def _mvLikelihood( self, nsig, deltas ):
             #     Why not a simple poisson function for the factorial
             #     -----------------------------------------------------
             #     The scipy.stats.poisson.pmf probability mass function
@@ -351,8 +342,8 @@ class LikelihoodComputer:
             #     instead to avoid using large numbers.
 
             #Compute maximum value for the integrand:
-            sigma2 = self.covb + numpy.diag ( self.deltas**2 )
-            xm = self.nb + self.nsig - sigma2
+            sigma2 = self.covb + numpy.diag ( deltas**2 )
+            xm = self.nb + nsig - sigma2
             #If nb + nsig = sigma2, shift the values slightly:
             #if xm == 0.:
             #    xm = 0.001
@@ -362,6 +353,7 @@ class LikelihoodComputer:
             nrange = 5.
             a = max(0.,xmax-nrange*sqrt(sigma2))
             b = xmax+nrange*sqrt(sigma2)
+            print ( "mv,a,b,",a[0][0],b[0][0] )
             #a = numpy.array ( [1.]*len(nobs) ) # FIXME wrong
             #b = numpy.array ( [2.]*len(nobs) ) # FIXME wrong
             like = integrate.nquad( self.probMV, [[a,b]] )[0] ## fixme so wrong
@@ -369,14 +361,14 @@ class LikelihoodComputer:
 
             #Increase integration range until integral converges
             err = 1.
-            while False:# err > 0.01:  wrong
+            while err > 0.01: # wrong
                 like_old = like
                 nrange = nrange*2
                 a = max(0.,xmax-nrange*sqrt(sigma2))
                 b = xmax+nrange*sqrt(sigma2)
                 #a = numpy.array ( [0.]*len(nobs) ) ## FIXME wrong
                 #b = numpy.array ( [4.]*len(nobs) ) ## FIXME wrong
-                like = integrate.nquad(probMV,[a,b])[0] #,(nsig, nobs, nb, covb, deltas),
+                like = integrate.nquad(self.probMV,[[a,b]])[0] #,(nsig, nobs, nb, covb, deltas),
     #                                      epsabs=0.,epsrel=1e-3)[0] FIXME so wrong
                 err = abs(like_old-like)/like
 
@@ -385,18 +377,18 @@ class LikelihoodComputer:
             #The integral of the gaussian from 0 to infinity gives:
             #(1/2)*(1 + Erf(mu/sqrt(2*sigma2))), so we need to divide by it
             #(for mu - sigma >> 0, the normalization gives 1.)
-            norm = (1./2.)*(1. + special.erf((self.nb+self.nsig)/sqrt(2.*sigma2)))[0][0]
-            # print ( "mvLikelihood, norm=",norm )
+            norm = (1./2.)*(1. + special.erf((self.nb+nsig)/sqrt(2.*sigma2)))[0][0]
             like = like/norm
             return like
 
-    def likelihood ( self ):
-        # print ( "llhd, typensig=",type(self.nsig) )
-        if type(self.nsig) in [ int, float, numpy.float64 ]:
-            return self.likelihood1d()
-        return self.mvLikelihood()
+    def likelihood ( self, nsig, deltas = None ):
+        if type(deltas) == type(None):
+            deltas = 0.2*nsig
+        if type( nsig ) in [ int, float, numpy.float64 ]:
+            return self._likelihood1d( nsig, deltas )
+        return self._mvLikelihood( nsig, deltas )
 
-    def likelihood1d( self ):
+    def _likelihood1d( self, nsig, deltas ):
             #     Why not a simple poisson function for the factorial
             #     -----------------------------------------------------
             #     The scipy.stats.poisson.pmf probability mass function
@@ -412,17 +404,9 @@ class LikelihoodComputer:
             #     the exponent of the log of this expression is calculated
             #     instead to avoid using large numbers.
 
-            #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
-            def prob(x,nsig, nobs, nb, deltab, deltas):
-                poisson = exp(nobs*log(x) - x - math.lgamma(nobs + 1))
-                gaussian = stats.norm.pdf(x,loc=nb+nsig,scale=sqrt(deltab**2 + deltas**2))
-                return poisson*gaussian
-
-
-
             #Compute maximum value for the integrand:
-            sigma2 = self.covb + self.deltas**2
-            xm = self.nb + self.nsig - sigma2
+            sigma2 = self.covb + deltas**2
+            xm = self.nb + nsig - sigma2
             #If nb + nsig = sigma2, shift the values slightly:
             if xm == 0.:
                 xm = 0.001
@@ -432,7 +416,10 @@ class LikelihoodComputer:
             nrange = 5.
             a = max(0.,xmax-nrange*sqrt(sigma2))
             b = xmax+nrange*sqrt(sigma2)
+            #print ( "1d,a,b,",a,b )
+            self.nsig, self.deltas = nsig, deltas ## store for integral
             like = integrate.quad(self.prob,a,b,epsabs=0.,epsrel=1e-3)[0]
+            #print ( "1d,like",like )
 
             #Increase integration range until integral converges
             err = 1.
@@ -448,50 +435,42 @@ class LikelihoodComputer:
             #The integral of the gaussian from 0 to infinity gives:
             #(1/2)*(1 + Erf(mu/sqrt(2*sigma2))), so we need to divide by it
             #(for mu - sigma >> 0, the normalization gives 1.)
-            norm = (1./2.)*(1. + special.erf((self.nb+self.nsig)/sqrt(2.*sigma2)))
+            norm = (1./2.)*(1. + special.erf((self.nb+nsig)/sqrt(2.*sigma2)))
             like = like/norm
 
             return like
 
-def chi2(nsig, nobs, nb, deltab, deltas=None):
-        """
-        Computes the chi2 for a given number of observed events nobs
-        given the predicted background nb, error on this background deltab,
-        expected number of signal events nsig and, if given, the error on signal (deltas).
-        If deltas is not given, assume an error of 20% on the signal.
+    def chi2( self, nsig, deltas=None ):
+            """
+            Computes the chi2 for a given number of observed events nobs
+            given the predicted background nb, error on this background deltab,
+            expected number of signal events nsig and, if given, the error on signal (deltas).
+            :return: chi2 (float)
 
-        :param nsig: predicted signal (float)
-        :param nobs: number of observed events (float)
-        :param nb: predicted background (float)
-        :param deltab: uncertainty in background (float)
-        :param deltas: uncertainty in signal acceptance (float)
+            """
+            if deltas == None:
+                deltas = 0.2 * nsig
+            # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
+            llhd = self.likelihood( nsig, deltas )
 
-        :return: chi2 (float)
+            #Percentual signal error:
+            deltas_pct = deltas / float(nsig)
 
-        """
+            # Compute the maximum likelihood H1, which sits at nsig = nobs - nb
+            # (keeping the same % error on signal):
+            dn = self.nobs-self.nb
+            deltas = deltas_pct*( dn )
+            maxllhd = self.likelihood( dn, deltas )
 
-        #Set signal error to 20%, if not defined
-        if deltas is None:
-            deltas = 0.2*nsig
+            # Return infinite likelihood if it is zero
+            # This can happen in case e.g. nb >> nobs
+            if llhd == 0.:
+                return float('inf')
 
-        # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
-        llhd = likelihood(nsig, nobs, nb, deltab, deltas)
+            chi2=-2*log(llhd/maxllhd)
 
-        #Percentual signal error:
-        deltas_pct = deltas/(1.0*nsig)
-
-        # Compute the maximum likelihood H1, which sits at nsig = nobs - nb
-        # (keeping the same % error on signal):
-        maxllhd = likelihood(nobs-nb, nobs, nb, deltab, deltas_pct*(nobs-nb))
-
-        # Return infinite likelihood if it is zero
-        # This can happen in case e.g. nb >> nobs
-        if llhd == 0.:
-            return float('inf')
-
-        # Return the test statistic -2log(H0/H1)
-        return -2*log(llhd/maxllhd)
-
+            # Return the test statistic -2log(H0/H1)
+            return chi2
 
 if __name__ == "__main__":
     """
@@ -515,10 +494,12 @@ if __name__ == "__main__":
     # print ( computer.computeMV ( [4,4,4], [3.6,3.6,3.6], [[0.1**2,0,0],[0.,0.1**2,0],[0.,0,0.1**2]], [0.02,.02,.02] ) )
 
     nsig_,nobs_,nb_,deltab_,deltas_=1,4,3.6,.1,None
-    computer = LikelihoodComputer ( nsig_, nobs_, nb_, deltab_**2, deltas_ )
-    print ( "1d, computer:", computer.likelihood()  )
-    computer = LikelihoodComputer (array([nsig_]), array([nobs_]), array([nb_]), numpy.diag([deltab_**2]), deltas_)
-    print ( "mv 1d, computer:",computer.likelihood() )
+    computer = LikelihoodComputer ( nobs_, nb_, deltab_**2 )
+    print ( "1d, computer:", computer.likelihood( nsig_, deltas_ )  )
+    computer = LikelihoodComputer ( array([nobs_]), array([nb_]), numpy.diag([deltab_**2]) )
+    print ( "mv 1d, computer:",computer.likelihood( array([nsig_]), deltas_) )
+    computer = LikelihoodComputer ( array([nobs_,nobs_]), array([nb_,nb_]), numpy.diag([deltab_**2,deltab_**2]) )
+    computer.likelihood ( array([nsig_,nsig_]), deltas_  )
     # print ( likelihoodMV(array([nsig]), array([nobs]), array([nb]), numpy.diag([deltab**2]), deltas) )
     # print ( likelihoodMV(array([nsig,nsig]), array([nobs,nobs]), array([nb,nb]), numpy.diag([deltab**2,deltab**2]), deltas) )
 

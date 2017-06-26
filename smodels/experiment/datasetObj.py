@@ -159,8 +159,9 @@ class DataSet(object):
         :return: likelihood to observe nobs events (float)
         """
 
-        return statistics.likelihood(nsig, self.dataInfo.observedN,
-                self.dataInfo.expectedBG, self.dataInfo.bgError, deltas)
+        computer = statistics.LikelihoodComputer ( self.dataInfo.observedN,
+                self.dataInfo.expectedBG, self.dataInfo.bgError**2 )
+        return computer.likelihood( nsig, deltas )
 
     def chi2( self, nsig, deltas=None):
         """
@@ -172,9 +173,9 @@ class DataSet(object):
 
         :return: chi2 (float)
         """
-
-        return statistics.chi2(nsig, self.dataInfo.observedN,
-                self.dataInfo.expectedBG, self.dataInfo.bgError, deltas)
+        computer = statistics.LikelihoodComputer ( self.dataInfo.observedN,
+                self.dataInfo.expectedBG, self.dataInfo.bgError**2 )
+        return computer.chi2( nsig, deltas )
 
     def getAttributes(self,showPrivate=False):
         """

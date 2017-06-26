@@ -12,6 +12,7 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.tools import statistics
+from smodels.tools import oldstatistics
 from smodels.tools.physicsUnits import fb
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from databaseLoader import database
@@ -38,8 +39,10 @@ class StatisticsTest(unittest.TestCase):
         ill = math.log(prediction.likelihood)
         ichi2 = prediction.chi2
         nsig = (pred_signal_strength*expRes.globalInfo.lumi).asNumber()
-        dll = math.log(statistics.likelihood(nsig, 4, 2.2, 1.1, 0.2*nsig ))
-        dchi2 = statistics.chi2(nsig, 4, 2.2, 1.1, 0.2*nsig )
+        computer = statistics.LikelihoodComputer ( 4, 2.2, 1.1**2 )
+        dll = math.log( computer.likelihood( nsig, 0.2*nsig ) )
+        ## dchi2 = statistics.chi2(nsig, 4, 2.2, 1.1, 0.2*nsig )
+        dchi2 = computer.chi2( nsig, 0.2*nsig )
         self.assertAlmostEqual(ill, dll, places=2)
         self.assertAlmostEqual(ichi2, dchi2, places=2)
 
@@ -138,8 +141,10 @@ class StatisticsTest(unittest.TestCase):
 
 #             logger.error("\nns="+str(nsig)+";\nnobs = "+str(nobs)+";\nnb="+str(nb)+";\ndb="+str(deltab))
             # Chi2 as computed by statistics module:
-            chi2_actual = statistics.chi2( nsig, nobs, nb,
-                deltab, deltas)
+            computer = statistics.LikelihoodComputer ( nobs, nb, deltab**2 )
+            chi2_actual = computer.chi2( nsig, deltas )
+            #chi2_actual = statistics.chi2( nsig, nobs, nb,
+            #    deltab, deltas)
             
 #             logger.error("chi2= "+str(chi2_actual))
             #print('chi2act', chi2_actual)
@@ -159,8 +164,11 @@ class StatisticsTest(unittest.TestCase):
 
 
             # likelihood as computed by statistics module:
-            likelihood_actual = statistics.likelihood( nsig,
-                nobs, nb, deltab, deltas)
+            computer = statistics.LikelihoodComputer( nobs, nb, deltab**2 )
+            #likelihood_actual = statistics.likelihood( nsig,
+            #    nobs, nb, deltab, deltas)
+            likelihood_actual = computer.likelihood(nsig, deltas)
+            # likelihood_actual = statistics.likelihood()
 #             logger.error("llk= "+str(likelihood_actual)+" nsig="+str(nsig)+" nobs = "+str(nobs)+" nb="+str(nb)+"+-"+str(deltab))
             #print('llhdactual', likelihood_actual)
             if not likelihood_actual==None and not np.isnan(likelihood_actual):

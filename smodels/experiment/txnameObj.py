@@ -237,7 +237,7 @@ class TxNameData(object):
         self.dataTag = datatag
         self._id = Id
         self._accept_errors_upto=accept_errors_upto
-        self._V = None
+        self._V = None ## rotation matrix, derived from PCA
         self.loadData( value )
         if self._keep_values:
             self.value = value
@@ -566,7 +566,7 @@ class TxNameData(object):
             self._1dim = False
              
         # self.Mp=MpCut ## also keep the rotated points, with truncated zeros
-        self.tri = qhull.Delaunay( MpCut )
+        self.tri = qhull.Delaunay( MpCut ) ## triangulation
         
         
     def _getMassArrayFrom(self,pt,unit=GeV):
