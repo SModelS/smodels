@@ -109,6 +109,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """ Get theory prediction for each analysis and print basic output """
     allPredictions = []
     for expResult in listOfExpRes:
+        logger.error ("FIXME maybe need to set useBestDataset to FALSE")
         theorypredictions = theoryPredictionsFor(expResult, smstoplist,useBestDataset=True )
         if not theorypredictions: continue
         allPredictions += theorypredictions._theoryPredictions

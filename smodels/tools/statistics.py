@@ -351,6 +351,10 @@ class LikelihoodComputer:
             print ( "self.nb=",self.nb )
             print ( "nsig=", nsig )
             xmax = xm*(1.+sign(xm)*sqrt(1. + 4.*self.nobs*sigma2/xm**2))/2.
+            xmax2 = xm/2.*(1.+sign(xm)*sqrt(1. + 4.*self.nobs*sigma2/xm**2))
+            self.nsig, self.deltas = nsig, deltas ## store for integration
+            print ( "xmax,p(xmax)=", xmax, self.probMV ( xmax ) )
+            print ( "xmax2,p(xmax2)=", xmax2, self.probMV ( xmax2 ) )
 
             #Define initial integration range:
             nrange = 5.
@@ -504,6 +508,7 @@ if __name__ == "__main__":
     print ( "1d, computer:", computer.likelihood( nsig_, deltas_ )  )
     computer = LikelihoodComputer ( array([nobs_]), array([nb_]), numpy.diag([deltab_**2]) )
     print ( "mv 1d, computer:",computer.likelihood( array([nsig_]), deltas_) )
+    sys.exit()
     computer = LikelihoodComputer ( array([nobs_,nobs_]), array([nb_,nb_]), numpy.diag([deltab_**2,deltab_**2]) )
     computer.likelihood ( array([nsig_,nsig_]), deltas_  )
     # print ( likelihoodMV(array([nsig]), array([nobs]), array([nb]), numpy.diag([deltab**2]), deltas) )
