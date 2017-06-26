@@ -347,6 +347,9 @@ class LikelihoodComputer:
             #If nb + nsig = sigma2, shift the values slightly:
             #if xm == 0.:
             #    xm = 0.001
+            print ( "self.nobs=",self.nobs )
+            print ( "self.nb=",self.nb )
+            print ( "nsig=", nsig )
             xmax = xm*(1.+sign(xm)*sqrt(1. + 4.*self.nobs*sigma2/xm**2))/2.
 
             #Define initial integration range:
@@ -360,6 +363,7 @@ class LikelihoodComputer:
             self.nsig, self.deltas = nsig, deltas ## store for integration
             like = integrate.nquad( self.probMV, [[a,b]] )[0] ## fixme so wrong
             #                              epsabs=0.,epsrel=1e-3)[0]
+            print ( "like=", like )
 
             #Increase integration range until integral converges
             err = 1.
