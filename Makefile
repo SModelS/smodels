@@ -1,9 +1,9 @@
 VER=$(shell cat smodels/version)
 
+all: externaltools
+
 version:
 	@echo $(VER)
-
-all: externaltools
 
 externaltools:
 	cd lib && make
