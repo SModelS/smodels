@@ -335,7 +335,7 @@ def runExample ():
     comment ( "Now check diff" )
     cmd = "diff -u default.log %s/out.log" % dirname
     d = run ( cmd )
-    if len ( d ) > 2:
+    if len ( d ) > 3:
         comment ( "Example test failed!!", "error" )
     else:
         comment ( "Looking good." )
