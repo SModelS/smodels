@@ -304,9 +304,9 @@ def makeDocumentation():
     """
     create the documentation via sphinx """
     comment ( "Creating the documentation" )
-    cmd = "cd %s/docs/manual/; make html; rm -r make.bat Makefile source " % dirname
+    cmd = "cd %s/docs/manual/; make clean html; rm -r make.bat Makefile source " % dirname
     run (cmd)
-    cmd = "cd %s/docs/documentation/; make html; rm -r make.bat  Makefile source update" % dirname
+    cmd = "cd %s/docs/documentation/; make clean html; rm -r make.bat  Makefile source update" % dirname
     run (cmd)
 
 def explode ():
