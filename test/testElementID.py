@@ -21,7 +21,7 @@ class ElementIdTest(unittest.TestCase):
 
         listOfIDs = {'ATLAS-CONF-2013-037': [28, 29, 30, 31, 24, 25, 26, 27], 
                      'ATLAS-SUSY-2013-05' : [23]}
-        filename = "%sinputFiles/slha/compressedSpec.slha" % (installDirectory() )
+        filename = "%sinputFiles/slha/higgsinoStop.slha" % (installDirectory() )
         topoList = slhaDecomposer.decompose(filename,doCompress = True, doInvisible=True, minmassgap = 5*GeV)
         resultlist = database.getExpResults()
         for res in resultlist:
