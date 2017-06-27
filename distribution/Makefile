@@ -17,4 +17,4 @@ hidden:
 
 upload:
 	scp ../ReleaseNotes smodels*.tgz smodels.hephy.at:/var/www/downloads/v$(VERSION)/
-	scp -r smodels-v$(VERSION)/docs smodels.hephy.at:/var/www/docs/v$(VERSION)
+	scp -r smodels-v$(VERSION)/docs/* smodels.hephy.at:/var/www/docs/v$(VERSION)
