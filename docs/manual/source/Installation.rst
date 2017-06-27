@@ -143,7 +143,7 @@ Adding results to the database
 ------------------------------
 
 The installation procedure explained above also installs SModelS'
-:ref:`database of experimental results <DatabaseDefinitions>`
+:ref:`database of experimental results <databaseStruct>`
 in the smodels-database subdirectory.
 The complete list of analyses and results included in the database can be
 consulted at `http://smodels.hephy.at/wiki/ListOfAnalysesv11 <http://smodels.hephy.at/wiki/ListOfAnalysesv11>`_.
