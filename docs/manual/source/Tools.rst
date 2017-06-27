@@ -197,66 +197,36 @@ A simple example is given below:
 .. code-block:: IPython
 
    In [1]: print browser  #Print all experimental results in the browser
-   ['ATLAS-SUSY-2015-09', 'CMS-SUS-PAS-15-002', 'ATLAS-CONF-2012-105', 'ATLAS-CONF-2012-166', 'ATLAS-CONF-2013-001', 'ATLAS-CONF-2013-007', 'ATLAS-CONF-2013-024', 'ATLAS-CONF-2013-024', 'ATLAS-CONF-2013-025', 'ATLAS-CONF-2013-028', 'ATLAS-CONF-2013-035', 'ATLAS-CONF-2013-035', 'ATLAS-CONF-2013-036', 'ATLAS-CONF-2013-037', 'ATLAS-CONF-2013-037', 'ATLAS-CONF-2013-047', 'ATLAS-CONF-2013-047', 'ATLAS-CONF-2013-048', 'ATLAS-CONF-2013-048', 'ATLAS-CONF-2013-049', 'ATLAS-CONF-2013-049', 'ATLAS-CONF-2013-053', 'ATLAS-CONF-2013-053', 'ATLAS-CONF-2013-054', 'ATLAS-CONF-2013-061', 'ATLAS-CONF-2013-061', 'ATLAS-CONF-2013-062', 'ATLAS-CONF-2013-062', 'ATLAS-CONF-2013-065', 'ATLAS-CONF-2013-089', 'ATLAS-CONF-2013-093', 'ATLAS-CONF-2013-093', 'ATLAS-SUSY-2013-02', 'ATLAS-SUSY-2013-02', 'ATLAS-SUSY-2013-04', 'ATLAS-SUSY-2013-04', 'ATLAS-SUSY-2013-05', 'ATLAS-SUSY-2013-05', 'ATLAS-SUSY-2013-08', 'ATLAS-SUSY-2013-09', 'ATLAS-SUSY-2013-09', 'ATLAS-SUSY-2013-11', 'ATLAS-SUSY-2013-11', 'ATLAS-SUSY-2013-12', 'ATLAS-SUSY-2013-14', 'ATLAS-SUSY-2013-15', 'ATLAS-SUSY-2013-15', 'ATLAS-SUSY-2013-16', 'ATLAS-SUSY-2013-16', 'ATLAS-SUSY-2013-18', 'ATLAS-SUSY-2013-18', 'ATLAS-SUSY-2013-19', 'ATLAS-SUSY-2013-21', 'ATLAS-SUSY-2013-23', 'ATLAS-SUSY-2014-03', 'CMS-PAS-SUS-12-022', 'CMS-PAS-SUS-12-026', 'CMS-PAS-SUS-13-015', 'CMS-PAS-SUS-13-015', 'CMS-PAS-SUS-13-016', 'CMS-PAS-SUS-13-016', 'CMS-PAS-SUS-13-018', 'CMS-PAS-SUS-13-023', 'CMS-PAS-SUS-14-011', 'CMS-SUS-12-024', 'CMS-SUS-12-024', 'CMS-SUS-12-028', 'CMS-SUS-13-002', 'CMS-SUS-13-004', 'CMS-SUS-13-006', 'CMS-SUS-13-006', 'CMS-SUS-13-007', 'CMS-SUS-13-007', 'CMS-SUS-13-011', 'CMS-SUS-13-011', 'CMS-SUS-13-012', 'CMS-SUS-13-013', 'CMS-SUS-13-013', 'CMS-SUS-13-019', 'CMS-SUS-14-010', 'CMS-SUS-14-021', 'CMS-SUS-14-021']
+   ['ATLAS-SUSY-2015-01', 'ATLAS-SUSY-2015-01', 'ATLAS-SUSY-2015-02', 'ATLAS-SUSY-2015-02', ...
    
    In [2]: browser.selectExpResultsWith(txName = 'T1tttt', dataType = 'upperLimit') #Select only the UL results with the topology T1tttt
    
    In [3]: print browser #Print all experimental results in the browser (after selection)
-   ['ATLAS-SUSY-2015-09', 'CMS-SUS-PAS-15-002', 'ATLAS-CONF-2012-105', 'ATLAS-CONF-2013-007', 'ATLAS-CONF-2013-061', 'ATLAS-SUSY-2013-04', 'ATLAS-SUSY-2013-09', 'ATLAS-SUSY-2013-18', 'CMS-PAS-SUS-12-026', 'CMS-PAS-SUS-13-016', 'CMS-PAS-SUS-14-011', 'CMS-SUS-12-024', 'CMS-SUS-12-028', 'CMS-SUS-13-002', 'CMS-SUS-13-004', 'CMS-SUS-13-007', 'CMS-SUS-13-012', 'CMS-SUS-13-013', 'CMS-SUS-13-019', 'CMS-SUS-14-010']
+   ['ATLAS-SUSY-2015-09', 'CMS-PAS-SUS-15-002', 'CMS-PAS-SUS-16-014', ...
    
    In [4]: gluinoMass, LSPmass = 800.*GeV, 100.*GeV  #Define masses for the T1tttt topology
    
-   In [5]: browser.getULFor('CMS-SUS-PAS-15-002','T1tttt',[[gluinoMass,LSPmass],[gluinoMass,LSPmass]]) #Get UL for a specific experimental result
+   In [5]: browser.getULFor('CMS-PAS-SUS-15-002','T1tttt',[[gluinoMass,LSPmass],[gluinoMass,LSPmass]]) #Get UL for a specific experimental result
    Out[5]: 5.03E-02 [pb]
      
-   In [6]: for expResult in browser:  #Get the upper limits for all the selected results for the given topology and mass
+   In [6]: for expResult in browser[:5]:  #Get the upper limits for the first of the selected results for the given topology and mass
       ...:     print expResult.getValuesFor('id'),'UL = ',expResult.getUpperLimitFor(txname='T1tttt',mass=[[gluinoMass,LSPmass],[gluinoMass,LSPmass]])
       ...:     
-   ['ATLAS-SUSY-2015-09'] UL =  None
-   ['CMS-SUS-PAS-15-002'] UL =  5.03E-02 [pb]
-   ['ATLAS-CONF-2012-105'] UL =  6.70E-02 [pb]
-   ['ATLAS-CONF-2013-007'] UL =  2.40E-02 [pb]
-   ['ATLAS-CONF-2013-061'] UL =  1.25E-02 [pb]
-   ['ATLAS-SUSY-2013-04'] UL =  1.40E-02 [pb]
-   ['ATLAS-SUSY-2013-09'] UL =  1.73E-02 [pb]
-   ['ATLAS-SUSY-2013-18'] UL =  4.30E-03 [pb]
-   ['CMS-PAS-SUS-12-026'] UL =  4.60E-02 [pb]
-   ['CMS-PAS-SUS-13-016'] UL =  3.55E-02 [pb]
-   ['CMS-PAS-SUS-14-011'] UL =  2.47E-02 [pb]
-   ['CMS-SUS-12-024'] UL =  3.62E-02 [pb]
-   ['CMS-SUS-12-028'] UL =  5.31E-02 [pb]
-   ['CMS-SUS-13-002'] UL =  3.48E-02 [pb]
-   ['CMS-SUS-13-004'] UL =  2.47E-02 [pb]
-   ['CMS-SUS-13-007'] UL =  6.00E-03 [pb]
-   ['CMS-SUS-13-012'] UL =  2.14E-02 [pb]
-   ['CMS-SUS-13-013'] UL =  1.90E-02 [pb]
-   ['CMS-SUS-13-019'] UL =  1.35E-02 [pb]
-   ['CMS-SUS-14-010'] UL =  4.82E-03 [pb]
+      ['ATLAS-SUSY-2015-09'] UL =  None
+      ['CMS-PAS-SUS-15-002'] UL =  5.03E-02 [pb]
+      ['CMS-PAS-SUS-16-014'] UL =  4.10E-02 [pb]
+      ['CMS-PAS-SUS-16-015'] UL =  1.80E-02 [pb]
+      ['CMS-PAS-SUS-16-016'] UL =  5.76E-02 [pb]
+
       
-   In [7]: for expResult in browser:  #Print the luminosities for the selected experimental results
+   In [7]: for expResult in browser[:5]:  #Print the luminosities for the first five of the selected experimental results
       ...:     print expResult.getValuesFor('id'),expResult.getValuesFor('lumi')
       ...:     
-   ['ATLAS-SUSY-2015-09'] [3.20E+00 [1/fb]]
-   ['CMS-SUS-PAS-15-002'] [2.20E+00 [1/fb]]
-   ['ATLAS-CONF-2012-105'] [5.80E+00 [1/fb]]
-   ['ATLAS-CONF-2013-007'] [2.07E+01 [1/fb]]
-   ['ATLAS-CONF-2013-061'] [2.01E+01 [1/fb]]
-   ['ATLAS-SUSY-2013-04'] [2.03E+01 [1/fb]]
-   ['ATLAS-SUSY-2013-09'] [2.03E+01 [1/fb]]
-   ['ATLAS-SUSY-2013-18'] [2.01E+01 [1/fb]]
-   ['CMS-PAS-SUS-12-026'] [9.20E+00 [1/fb]]
-   ['CMS-PAS-SUS-13-016'] [1.97E+01 [1/fb]]
-   ['CMS-PAS-SUS-14-011'] [1.93E+01 [1/fb]]
-   ['CMS-SUS-12-024'] [1.94E+01 [1/fb]]
-   ['CMS-SUS-12-028'] [1.17E+01 [1/fb]]
-   ['CMS-SUS-13-002'] [1.95E+01 [1/fb]]
-   ['CMS-SUS-13-004'] [1.93E+01 [1/fb]]
-   ['CMS-SUS-13-007'] [1.93E+01 [1/fb]]
-   ['CMS-SUS-13-012'] [1.95E+01 [1/fb]]
-   ['CMS-SUS-13-013'] [1.95E+01 [1/fb]]
-   ['CMS-SUS-13-019'] [1.95E+01 [1/fb]]
-   ['CMS-SUS-14-010'] [1.95E+01 [1/fb]]
-
+      ['ATLAS-SUSY-2015-09'] [3.20E+00 [1/fb]]
+      ['CMS-PAS-SUS-15-002'] [2.20E+00 [1/fb]]
+      ['CMS-PAS-SUS-16-014'] [1.29E+01 [1/fb]]
+      ['CMS-PAS-SUS-16-015'] [1.29E+01 [1/fb]]
+      ['CMS-PAS-SUS-16-016'] [1.29E+01 [1/fb]]
 
 
 Further Python example codes using the functionalities of the browser
