@@ -60,12 +60,12 @@ or :download:`smodels/etc/pythia.card </images/pythia.card>` (for Pythia 6).
 A typical
 usage example is: ::
 
-   smodelsTools.py xseccomputer -s 8 13 -e 10000 -p -f inputFiles/slha/compressedSpec.slha
+   smodelsTools.py xseccomputer -s 8 13 -e 10000 -p -f inputFiles/slha/higgsinoStop.slha
 
 which will compute 8 TeV and 13 TeV LO cross sections (at the LHC) for all MSSM processes using 10k MC events.
 If, *after* the LO cross sections have been computed, one wants to add the NLO+NLL cross sections for gluinos and squarks: ::
 
-   smodelsTools.py xseccomputer -s 8 13 -p -N -O -f inputFiles/slha/compressedSpec.slha
+   smodelsTools.py xseccomputer -s 8 13 -p -N -O -f inputFiles/slha/higgsinoStop.slha
 
 The resulting file will then contain LO cross sections for all MSSM processes and NLO+NLL cross sections for 
 the available processes in `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_  
