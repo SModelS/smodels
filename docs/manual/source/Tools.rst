@@ -219,7 +219,7 @@ A simple example is given below:
       ['CMS-PAS-SUS-16-016'] UL =  5.76E-02 [pb]
 
       
-   In [7]: for expResult in browser[:5]:  #Print the luminosities for the first five of the selected experimental results
+   In [7]: for expResult in browser[:5]:  #Print the luminosities for the first five selected experimental results
       ...:     print expResult.getValuesFor('id'),expResult.getValuesFor('lumi')
       ...:     
       ['ATLAS-SUSY-2015-09'] [3.20E+00 [1/fb]]
