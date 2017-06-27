@@ -56,6 +56,7 @@ copy_files:
 	cp ../../parameters.ini source/images/
 	cp ../../smodels/etc/parameters_default.ini source/images/
 	cp ../../cpp/run.cpp source/images/
+	cp ../../Example.py source/examples/
 
 RstFilesFromHelp:
 	./rstFromHelpFiles.py
