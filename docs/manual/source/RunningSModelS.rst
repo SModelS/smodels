@@ -357,7 +357,7 @@ can take as arguments specific results to be loaded.
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 418-419
+   :lines: 322-323
    
    
 * *Identify missing topologies*. Using the output from decomposition, identify
@@ -370,7 +370,7 @@ can take as arguments specific results to be loaded.
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 421-432,440-445   
+   :lines: 325-336,344-349   
 
 
 It is worth noting that SModelS does not include any statistical treatment for

@@ -7,7 +7,7 @@
 			with cross section = ['8.00E+00 [TeV]:3.64E-04 [pb] (1000025, 1000037)'] 
 			and masses =  [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.66E+02 [GeV], 6.81E+01 [GeV]]]
 
- Loaded Database with 42 UL results and 30 EM results 
+ Loaded Database with 40 UL results and 18 EM results 
 
  Theory Predictions and Constraints:
 
@@ -19,80 +19,8 @@ Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 
 Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
 Theory Prediction =  8.00E+00 [TeV]:6.70E-04 [pb] (None, None)
 Condition Violation =  None
-UL for theory prediction =  3.69E-02 [pb]
+UL for theory prediction =  3.69E+01 [fb]
 r =  1.82E-02 
-
- ATLAS-CONF-2013-024 
-------------------------
-Dataset =  SR1: MET > 200
-TxNames =  ['T1bbbb', 'T1bbqq', 'T1bbtt', 'T1tttt']
-Prediction Mass =  None
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]], [[1000021, 1000022], [1000021, 1000023, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:1.55E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  4.90E-01 [fb]
-r =  3.16E-01 
-Chi2, likelihood= 0.997292717589 0.0475049832963
-
- ATLAS-CONF-2013-037 
-------------------------
-Dataset =  SRbC3
-TxNames =  ['T1bbtt', 'T1tttt']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:4.57E-05 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  4.00E-01 [fb]
-r =  1.14E-01 
-Chi2, likelihood= 0.131808400669 0.0958209625241
-
- ATLAS-CONF-2013-047 
-------------------------
-Dataset =  E Loose
-TxNames =  ['T1bbbb', 'T1bbqq', 'T1bbtt', 'T1tttt']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:3.62E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  4.55E+00 [fb]
-r =  7.96E-02 
-Chi2, likelihood= 3.40840041776 0.00270349753858
-
- ATLAS-CONF-2013-048 
-------------------------
-Dataset =  SR M100
-TxNames =  ['T1bbtt', 'T1tttt']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:4.25E-06 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  2.70E-01 [fb]
-r =  1.58E-02 
-Chi2, likelihood= 0.295069554163 0.126718020448
-
- ATLAS-CONF-2013-053 
-------------------------
-Dataset =  SRB
-TxNames =  ['T1bbbb', 'T1bbqq']
-Prediction Mass =  None
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]], [[1000021, 1000022], [1000021, 1000023, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:1.59E-05 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  1.30E+00 [fb]
-r =  1.22E-02 
-Chi2, likelihood= 0.00760949322743 0.030853686529
-
- ATLAS-CONF-2013-054 
-------------------------
-Dataset =  8j50 flavor >=2 b-jets
-TxNames =  ['T1bbbb', 'T1bbqq', 'T1bbtt', 'T1tttt']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:5.84E-05 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  1.10E+00 [fb]
-r =  5.31E-02 
-Chi2, likelihood= 0.276489628378 0.0287015841335
 
  ATLAS-CONF-2013-061 
 ------------------------
@@ -102,7 +30,7 @@ Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 
 Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
 Theory Prediction =  8.00E+00 [TeV]:7.11E-03 [pb] (None, None)
 Condition Violation =  None
-UL for theory prediction =  3.01E-02 [pb]
+UL for theory prediction =  3.01E+01 [fb]
 r =  2.36E-01 
 ------------------------
 Dataset =  None
@@ -111,32 +39,8 @@ Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 
 Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
 Theory Prediction =  8.00E+00 [TeV]:6.70E-04 [pb] (None, None)
 Condition Violation =  None
-UL for theory prediction =  9.61E-02 [pb]
+UL for theory prediction =  9.61E+01 [fb]
 r =  6.97E-03 
-
- ATLAS-CONF-2013-061 
-------------------------
-Dataset =  SR-0l-4j-B
-TxNames =  ['T1bbbb', 'T1bbqq', 'T1bbtt', 'T1tttt']
-Prediction Mass =  None
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]], [[1000021, 1000022], [1000021, 1000023, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:1.29E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  3.30E-01 [fb]
-r =  3.90E-01 
-Chi2, likelihood= 0.0974589659036 0.180024333729
-
- ATLAS-CONF-2013-062 
-------------------------
-Dataset =  incHL6j_e
-TxNames =  ['T1bbtt', 'T1tttt']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:7.40E-06 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  2.30E-01 [fb]
-r =  3.22E-02 
-Chi2, likelihood= -0.0150421800026 0.241656118997
 
  ATLAS-SUSY-2013-02 
 ------------------------
@@ -146,7 +50,7 @@ Prediction Mass =  [[1.35E+02 [GeV], 6.81E+01 [GeV]], [1.35E+02 [GeV], 6.81E+01 
 Prediction PIDs =  [[[1000023, 1000022], [1000024, 1000022]], [[1000023, 1000022], [-1000024, -1000022]], [[-1000024, -1000022], [1000024, 1000022]], [[1000024, 1000022], [-1000024, -1000022]], [[1000024, 1000022], [1000024, 1000022]], [[-1000024, -1000022], [-1000024, -1000022]], [[1000024, 1000022], [1000023, 1000022]], [[-1000024, -1000022], [1000023, 1000022]]]
 Theory Prediction =  8.00E+00 [TeV]:1.53E+00 [pb] (None, None)
 Condition Violation =  None
-UL for theory prediction =  2.33E+04 [pb]
+UL for theory prediction =  2.33E+07 [fb]
 r =  6.56E-05 
 
  ATLAS-SUSY-2013-02 
@@ -158,7 +62,7 @@ Prediction PIDs =  [[[1000023, 1000022], [1000024, 1000022]], [[1000023, 1000022
 Theory Prediction =  8.00E+00 [TeV]:6.31E-04 [pb] (None, None)
 Condition Violation =  None
 UL for theory prediction =  1.33E+01 [fb]
-r =  4.75E-02 
+r =  4.74E-02 
 Chi2, likelihood= 0.0898530073687 0.00318216355164
 
  ATLAS-SUSY-2013-04 
@@ -169,8 +73,8 @@ Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 
 Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
 Theory Prediction =  8.00E+00 [TeV]:4.80E-05 [pb] (None, None)
 Condition Violation =  None
-UL for theory prediction =  1.03E+00 [fb]
-r =  4.66E-02 
+UL for theory prediction =  1.04E+00 [fb]
+r =  4.62E-02 
 Chi2, likelihood= 0.257969644776 0.0289685949181
 
  ATLAS-SUSY-2013-09 
@@ -181,7 +85,7 @@ Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 
 Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
 Theory Prediction =  8.00E+00 [TeV]:6.70E-04 [pb] (None, None)
 Condition Violation =  None
-UL for theory prediction =  2.90E-02 [pb]
+UL for theory prediction =  2.90E+01 [fb]
 r =  2.31E-02 
 
  ATLAS-SUSY-2013-12 
@@ -203,7 +107,7 @@ Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 
 Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
 Theory Prediction =  8.00E+00 [TeV]:7.11E-03 [pb] (None, None)
 Condition Violation =  None
-UL for theory prediction =  4.35E-02 [pb]
+UL for theory prediction =  4.35E+01 [fb]
 r =  1.63E-01 
 
  ATLAS-SUSY-2013-18 
@@ -239,7 +143,7 @@ Theory Prediction =  8.00E+00 [TeV]:2.55E-06 [pb] (1000021, 1000021)
 Condition Violation =  None
 UL for theory prediction =  2.11E-01 [fb]
 r =  1.21E-02 
-Chi2, likelihood= 0.0334797104513 0.279787989771
+Chi2, likelihood= 0.0334798380625 0.279787858226
 
  CMS-SUS-12-024 
 ------------------------
@@ -260,20 +164,11 @@ Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 
 Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
 Theory Prediction =  8.00E+00 [TeV]:1.54E-04 [pb] (1000021, 1000021)
 Condition Violation =  None
-UL for theory prediction =  2.62E-01 [fb]
-r =  5.88E-01 
-Chi2, likelihood= 1.62454694512 0.0975238512723
+UL for theory prediction =  4.25E-01 [fb]
+r =  3.63E-01 
+Chi2, likelihood= 0.668332321002 0.079633029569
 
  CMS-SUS-12-028 
-------------------------
-Dataset =  None
-TxNames =  ['T1bbbb']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:7.11E-03 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  2.78E-02 [pb]
-r =  2.56E-01 
 ------------------------
 Dataset =  None
 TxNames =  ['T1tttt']
@@ -283,8 +178,6 @@ Theory Prediction =  8.00E+00 [TeV]:6.70E-04 [pb] (None, None)
 Condition Violation =  None
 UL for theory prediction =  5.11E-01 [pb]
 r =  1.31E-03 
-
- CMS-SUS-13-004 
 ------------------------
 Dataset =  None
 TxNames =  ['T1bbbb']
@@ -292,8 +185,10 @@ Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 
 Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
 Theory Prediction =  8.00E+00 [TeV]:7.11E-03 [pb] (None, None)
 Condition Violation =  None
-UL for theory prediction =  2.16E-02 [pb]
-r =  3.29E-01 
+UL for theory prediction =  2.78E-02 [pb]
+r =  2.56E-01 
+
+ CMS-SUS-13-004 
 ------------------------
 Dataset =  None
 TxNames =  ['T1tttt']
@@ -303,6 +198,15 @@ Theory Prediction =  8.00E+00 [TeV]:6.70E-04 [pb] (None, None)
 Condition Violation =  None
 UL for theory prediction =  1.40E-01 [pb]
 r =  4.80E-03 
+------------------------
+Dataset =  None
+TxNames =  ['T1bbbb']
+Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
+Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
+Theory Prediction =  8.00E+00 [TeV]:7.11E-03 [pb] (None, None)
+Condition Violation =  None
+UL for theory prediction =  2.16E-02 [pb]
+r =  3.29E-01 
 
  CMS-SUS-13-006 
 ------------------------
@@ -312,7 +216,7 @@ Prediction Mass =  [[1.35E+02 [GeV], 6.81E+01 [GeV]], [1.35E+02 [GeV], 6.81E+01 
 Prediction PIDs =  [[[1000023, 1000022], [1000024, 1000022]], [[1000023, 1000022], [-1000024, -1000022]], [[1000024, 1000022], [1000023, 1000022]], [[-1000024, -1000022], [1000023, 1000022]]]
 Theory Prediction =  8.00E+00 [TeV]:1.40E+00 [pb] (None, None)
 Condition Violation =  {'cGtr([[[mu+,mu-]],[[l,nu]]],[[[e+,e-]],[[l,nu]]])': 0.00E+00 }
-UL for theory prediction =  1.17E+00 [pb]
+UL for theory prediction =  1.17E+03 [fb]
 r =  1.20E+00 
 
  CMS-SUS-13-007 
@@ -323,7 +227,7 @@ Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 
 Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
 Theory Prediction =  8.00E+00 [TeV]:6.70E-04 [pb] (None, None)
 Condition Violation =  None
-UL for theory prediction =  3.48E-02 [pb]
+UL for theory prediction =  3.48E+01 [fb]
 r =  1.93E-02 
 
  CMS-SUS-13-007 
@@ -358,7 +262,7 @@ Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
 Theory Prediction =  8.00E+00 [TeV]:7.51E-05 [pb] (None, None)
 Condition Violation =  None
 UL for theory prediction =  1.22E+00 [fb]
-r =  6.17E-02 
+r =  6.16E-02 
 Chi2, likelihood= 0.351017877145 0.0362880439165
 
  CMS-SUS-13-013 
@@ -369,7 +273,7 @@ Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 
 Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
 Theory Prediction =  8.00E+00 [TeV]:6.70E-04 [pb] (None, None)
 Condition Violation =  None
-UL for theory prediction =  3.35E-02 [pb]
+UL for theory prediction =  3.35E+01 [fb]
 r =  2.00E-02 
 
  CMS-SUS-13-013 
@@ -380,8 +284,8 @@ Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 
 Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
 Theory Prediction =  8.00E+00 [TeV]:4.71E-06 [pb] (1000021, 1000021)
 Condition Violation =  None
-UL for theory prediction =  2.60E-01 [fb]
-r =  1.81E-02 
+UL for theory prediction =  2.58E-01 [fb]
+r =  1.83E-02 
 Chi2, likelihood= -0.0183775250259 0.222918952023
 
  CMS-SUS-13-019 
@@ -412,19 +316,19 @@ Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 
 Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
 Theory Prediction =  8.00E+00 [TeV]:6.70E-04 [pb] (None, None)
 Condition Violation =  None
-UL for theory prediction =  1.75E-02 [pb]
+UL for theory prediction =  1.75E+01 [fb]
 r =  3.82E-02 
 
 The largest r-value (theory/upper limit ratio) is  1.20E+00 
 (The input model is likely excluded by CMS-SUS-13-006)
 
-Total missing topology cross section (fb):  2.429E+03
+Total missing topology cross section (fb):  2.706E+03
 
-Total cross section where we are outside the mass grid (fb):  3.228E+02
+Total cross section where we are outside the mass grid (fb):  5.214E+01
 
 Total cross section in long cascade decays (fb):  3.011E+02
 
-Total cross section in decays with asymmetric branches (fb):  2.091E+03
+Total cross section in decays with asymmetric branches (fb):  2.368E+03
 
 Missing topologies (up to 3):
 Topology: [[],[]]
@@ -439,12 +343,10 @@ Contributing elements (up to 2):
 [[],[[q,q]]] cross-section (fb): 38.5133200055
 
 Elements outside the grid (up to 2):
-Topology: [[[b,b]],[[jet,jet]]]
+Topology: [[[W]],[[Z]]]
 Contributing elements (up to 4):
-[[[b,b]],[[c,q]]] cross-section (fb): 135.508906894
-	mass: [[1.35E+02 [GeV], 6.81E+01 [GeV]], [1.34E+02 [GeV], 6.81E+01 [GeV]]]
-[[[b,b]],[[q,q]]] cross-section (fb): 135.508906894
-	mass: [[1.35E+02 [GeV], 6.81E+01 [GeV]], [1.34E+02 [GeV], 6.81E+01 [GeV]]]
+[[[W+]],[[Z]]] cross-section (fb): 0.363795519075
+	mass: [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.66E+02 [GeV], 6.81E+01 [GeV]]]
 Topology: [[[l,nu]],[[l,nu]]]
 Contributing elements (up to 4):
 [[[e+,nu]],[[e-,nu]]] cross-section (fb): 12.9436916018
