@@ -239,28 +239,28 @@ users more familiar with Python and the SModelS language may prefer to write the
 A simple example code for this purpose is provided in :download:`examples/Example.py`.
 Below we go step-by-step through this example code:
 
-* *Import the SModelS methods*. If the example code file is not located in
-  the smodels installation folder, simply add "sys.path.append(<smodels installation path>)" before importing smodels
+* *Import the SModelS modules and methods*. If the example code file is not located in
+  the smodels installation folder, simply add "sys.path.append(<smodels installation path>)" before importing smodels. Set SModelS verbosity level.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 15-19
+   :lines: 15-21
 
 * *Set the path to the database folder*. Specify where the SModelS :ref:`database <databaseStruct>` has been installed and load the database.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 21-22
+   :lines: 23-24
 
 * *Path to the input file*. Specify the location of the input file. It must be a
   SLHA or LHE file (see :ref:`Basic Input <BasicInput>`).
 
 .. literalinclude:: /examples/Example.py
-   :lines: 31
+   :lines: 33
 
 * *Set main options for* |decomposition|.
   Specify the values of :ref:`sigmacut <minweight>` and :ref:`minmassgap <massComp>`:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 35-36
+   :lines: 37-38
 
 * |Decompose| *model*. Depending on the type
   of input format, choose either
@@ -268,14 +268,14 @@ Below we go step-by-step through this example code:
   `lheDecomposer.decompose <../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose>`_ method. The **doCompress** and **doInvisible** options turn the |mass compression| and |invisible compression| on/off.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 39-43
+   :lines: 41-45
 
 * *Access basic information* from decomposition, using the
   `topology list <../../../documentation/build/html/theory.html#theory.topology.TopologyList>`_
   and `topology  <../../../documentation/build/html/theory.html#theory.topology.Topology>`_ objects:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 46-58
+   :lines: 48-60
 
 *output:*
 
@@ -287,7 +287,7 @@ Below we go step-by-step through this example code:
   Here, all results are used:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 62
+   :lines: 64
 
 Alternatively, the `getExpResults  <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database.getExpResults>`_ method
 can take as arguments specific results to be loaded.
@@ -296,7 +296,7 @@ can take as arguments specific results to be loaded.
   Below we show how to count the number of |ULrs| and |EMrs| loaded:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 66-73
+   :lines: 68-75
 
 *output:*
 
@@ -310,13 +310,13 @@ can take as arguments specific results to be loaded.
   (for each |expres|):
 
 .. literalinclude:: /examples/Example.py
-   :lines: 80-81
+   :lines: 82-83
 
 * *Print the results*. For each |expres|, loop over the corresponding |theory predictions|
   and print the relevant information:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 84-96
+   :lines: 86-98
 
 *output:*
 
@@ -327,7 +327,7 @@ can take as arguments specific results to be loaded.
   be compared to the |theory prediction| to decide whether a model is excluded or not:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 99-100
+   :lines: 101-102
 
 *output:*
 
@@ -340,7 +340,7 @@ can take as arguments specific results to be loaded.
   Determine the most constraining result:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 103-111
+   :lines: 105-113
 
 *output:*
 
@@ -351,7 +351,7 @@ can take as arguments specific results to be loaded.
   determine if the model has been excluded or not by the selected |express|:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 114-118
+   :lines: 116-120
 
 
 *output:*
@@ -364,7 +364,7 @@ can take as arguments specific results to be loaded.
   the :ref:`missing topologies <topCoverage>` and print some basic information:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 123-142
+   :lines: 125-144
 
 
 *output:*
