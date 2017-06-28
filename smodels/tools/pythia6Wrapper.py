@@ -98,7 +98,7 @@ class Pythia6Wrapper(WrapperBase):
         if self.keepTempDir:
             logger.warn("Keeping everything in " + self.tempdir)
             return
-        logger.debug("Unlinking " + self.tempdir)
+        logger.debug( "Unlinking " + self.tempdir )
         for inputFile in ["fort.61", "fort.68", "log"]:
             if os.path.exists(self.tempdir + "/" + inputFile):
                 os.unlink(self.tempdir + "/" + inputFile)
@@ -188,7 +188,10 @@ class Pythia6Wrapper(WrapperBase):
             pythiacard_default = self.cfgfile
             self.cfgfile = self.pythiacard
         # Check if template config file exists
-        self.unlink()
+        if unlink:
+            self.unlink()
+        else:
+            self.tempdir = None
         self.replaceInCfgFile({"NEVENTS": self.nevents, "SQRTS":1000 * self.sqrts})
         self.setParameter("MSTP(163)", "6")
 
@@ -216,6 +219,8 @@ class Pythia6Wrapper(WrapperBase):
         if self.pythiacard:
             self.cfgfile = pythiacard_default
 
+        #if not unlink:
+        #    lhefile = self.tempdir + "/events.lhe"
         # Generate file object with lhe events
         if lhefile:
             lheFile = open(lhefile, 'w')
