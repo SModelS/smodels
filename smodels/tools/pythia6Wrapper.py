@@ -11,9 +11,10 @@
 from __future__ import print_function
 from smodels.tools.wrapperBase import WrapperBase
 from smodels.tools import wrapperBase
-from smodels.tools.physicsUnits import pb
+from smodels.tools.physicsUnits import pb, TeV
 from smodels.tools.smodelsLogging import logger
 from smodels.theory import crossSection
+from smodels.theory.crossSection import LO
 from smodels import installation
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import os, sys, io
@@ -177,7 +178,8 @@ class Pythia6Wrapper(WrapperBase):
             xsecsInfile = crossSection.getXsecFromSLHAFile(slhafile)
             loXsecs = crossSection.XSectionList()
             for xsec in xsecsInfile:
-                if xsec.info.order == LO and xsec.info.sqrts == self.sqrts:
+                if xsec.info.order == LO and \
+                        float (xsec.info.sqrts.asNumber(TeV)) == self.sqrts:
                     loXsecs.add(xsec)
             return loXsecs
 
