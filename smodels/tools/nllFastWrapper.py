@@ -14,6 +14,7 @@
 from __future__ import print_function
 import operator
 import pyslha
+import sys
 
 squarks = [1000001,
            2000001,
@@ -58,7 +59,7 @@ class NllFastWrapper(WrapperBase):
         self.sqrts = int(sqrts)
         self.name = "nllfast%d" % sqrts
         self.nllfastVersion = nllfastVersion
-        path = "<install>/lib/nllfast/nllfast-"
+        path = "<install>/smodels/lib/nllfast/nllfast-"
         location = path + self.nllfastVersion + "/"
         self.cdPath = self.absPath(location)
         self.executablePath = self.cdPath + "/nllfast_%dTeV" % self.sqrts
@@ -77,7 +78,11 @@ class NllFastWrapper(WrapperBase):
         cmd = "cd %s; make" % self.srcPath
         out = executor.getoutput(cmd)
         # out = subprocess.check_output ( cmd, shell=True, universal_newlines=True )
-        logger.info(out)
+        logger.debug(out)
+        if not os.path.exists ( self.executablePath ):
+            logger.error ( "Compilation of nllfast failed." )
+            sys.exit()
+        logger.info ( "Compilation of nllfast succeeded!" )
         return True
 
     def _interpolateKfactors( self, kFacsVector, xval):
@@ -222,9 +227,10 @@ class NllFastWrapper(WrapperBase):
 
         """
         if not os.path.exists(self.executablePath):
-            logger.error("Executable '%s' not found. Maybe you didn't compile " \
-                         "the external tools in smodels/lib?", self.executablePath)
-            return False
+            #logger.error("Executable '%s' not found. Maybe you didn't compile " \
+            #             "the external tools in smodels/lib?", self.executablePath)
+            logger.warn("Nllfast executable not found. Building it now." )
+            self.compile()
         if not os.access(self.executablePath, os.X_OK):
             logger.error("%s is not executable", self.executable)
             return False

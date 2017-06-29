@@ -48,8 +48,9 @@ def dataFiles ():
     ret.append ( ("smodels/", [ "smodels/version" ]) )
     # ret.append ( ("share", [ "share/shareme" ]) )
     for directory in ["inputFiles/slha/", "inputFiles/lhe/", "smodels/share/",
-          "smodels/etc/", "lib/nllfast/nllfast-1.2/", "lib/nllfast/nllfast-2.1/",
-          "lib/nllfast/nllfast-3.1/", "lib/pythia6/", "lib/pythia8/" ]:
+          "smodels/etc/", "smodels/lib/nllfast/nllfast-1.2/", 
+          "smodels/lib/nllfast/nllfast-2.1/", "smodels/lib/nllfast/nllfast-3.1/", 
+          "smodels/lib/pythia6/", "smodels/lib/pythia8/" ]:
         ret.append ((directory, listDirectory (directory)))
 
     return ret

@@ -1,4 +1,4 @@
 include README.rst COPYING MANIFEST.in Makefile
-include lib/Makefile lib/*/Makefile lib/*/*/Makefile lib/*/*.f lib/*/*/*.f lib/*/*/*.grid 
+include smodels/lib/Makefile smodels/lib/*/Makefile smodels/lib/*/*/Makefile smodels/lib/*/*.f smodels/lib/*/*/*.f smodels/lib/*/*/*.grid 
 include inputFiles/*/*
 include etc/*
