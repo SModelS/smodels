@@ -15,6 +15,7 @@ pythia8:
 	cd smodels/lib && make pythia8
 
 clean:
+	yes | rm -rf build
 	cd smodels/lib && make clean
 
 buildrpm:

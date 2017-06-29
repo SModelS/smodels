@@ -33,8 +33,8 @@ def listDirectory (dirname):
         fullname = dirname + "/" + file
         extension = os.path.splitext ( file )[1]
         if os.path.isdir ( fullname ) or \
-                extension in [ ".out", ".tgz", ".cc", ".f" ] or \
-                file in [ "Makefile", "REAME" ]:
+                extension in [ ".out", ".tgz", ".1" ] or \
+                file in [ "Makefile", "README" ]:
             continue
         ret.append ( fullname )
     return ret
@@ -46,7 +46,6 @@ def dataFiles ():
     """
     ret = [("", [ "README.rst", "INSTALLATION.rst", "COPYING" ])]
     ret.append ( ("smodels/", [ "smodels/version" ]) )
-    # ret.append ( ("share", [ "share/shareme" ]) )
     for directory in ["inputFiles/slha/", "inputFiles/lhe/", "smodels/share/",
           "smodels/etc/", "smodels/lib/nllfast/nllfast-1.2/", 
           "smodels/lib/nllfast/nllfast-2.1/", "smodels/lib/nllfast/nllfast-3.1/", 
@@ -70,9 +69,9 @@ def compile():
             needs_build = True
     if not needs_build:
         return
-    subprocess.call(["make", "-C", "lib" ])
+    subprocess.call(["make", "-C", "smodels/lib" ])
 
-compile()
+# compile() ## not needed anymore as we perform compilation-on-demand now
 
 setup(
     name = "smodels",

@@ -301,7 +301,7 @@ class Pythia6Wrapper(WrapperBase):
         Compile pythia_lhe.
 
         """
-        logger.info("Trying to compile pythia in %s" % self.srcPath )
+        logger.info("Trying to compile Pythia6 in %s" % self.srcPath )
         cmd = "cd %s; make" % self.srcPath
         outputMessage = executor.getoutput(cmd)
         #outputMessage = subprocess.check_output ( cmd, shell=True,

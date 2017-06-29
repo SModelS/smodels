@@ -142,7 +142,7 @@ class Pythia8Wrapper(WrapperBase):
         cmd = "%s -n %d -f %s -s %d -c %s -l %s" % \
              ( self.executablePath, self.nevents, slha, self.sqrts, cfg, lhefile )
         xmldoc = self.executablePath.replace ( "pythia8.exe", "xml.doc" )        
-        logger.error ( "exe path=%s" % self.executablePath )
+        logger.debug ( "exe path=%s" % self.executablePath )
         if not os.path.exists ( self.executablePath ):
             logger.warn ( "Pythia8 executable does not exist. Will build it now." )
             self.compile()
