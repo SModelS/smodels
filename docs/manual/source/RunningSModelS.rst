@@ -156,7 +156,6 @@ Below we give more detailed information about each entry in the parameters file.
   * **dataselector** (list of datasets): set to all to use all available |datasets|. If dataselector = upperLimit (efficiencyMap), only |ULrs| (|EMrs|) will be used. Furthermore, if
     a list of signal regions (|datasets|) is given, only the |results| containing these datasets will be used. For instance, if dataselector = SRA mCT150,SRA mCT200, only
     these signal regions will be used.
-  * **discardZeroes** (True/False): set to True to discard all efficiency maps with zero-only entries.
 
 * *printer*: main options for the |output| format
 
