@@ -60,4 +60,4 @@ For citing the experimental analyses in the database, you can use
 .. _pythia8: http://home.thep.lu.se/~torbjorn/Pythia.html
 .. _pyslha: http://www.insectnation.org/projects/pyslha.html
 .. _NLL-fast: http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast 
-.. _SModelS online manual: http://smodels.hephy.at/docs/current/manual/build/html/index.html
+.. _SModelS online manual: http://smodels.readthedocs.io/
