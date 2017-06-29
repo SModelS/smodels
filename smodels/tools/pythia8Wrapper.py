@@ -31,8 +31,8 @@ class Pythia8Wrapper(WrapperBase):
     """
     def __init__(self,
                  configFile="<install>/smodels/etc/pythia8.cfg",
-                 executablePath="<install>/lib/pythia8/pythia8.exe",
-                 srcPath="<install>/lib/pythia8/"):
+                 executablePath="<install>/smodels/lib/pythia8/pythia8.exe",
+                 srcPath="<install>/smodels/lib/pythia8/"):
         """ 
         :param configFile: Location of the config file, full path; copy this
         file and provide tools to change its content and to provide a template
@@ -142,14 +142,20 @@ class Pythia8Wrapper(WrapperBase):
         cmd = "%s -n %d -f %s -s %d -c %s -l %s" % \
              ( self.executablePath, self.nevents, slha, self.sqrts, cfg, lhefile )
         xmldoc = self.executablePath.replace ( "pythia8.exe", "xml.doc" )        
+        logger.debug ( "exe path=%s" % self.executablePath )
+        if not os.path.exists ( self.executablePath ):
+            logger.warn ( "Pythia8 executable does not exist. Will build it now." )
+            self.compile()
         if os.path.exists (xmldoc ):
-            logger.info ( "xml.doc found at %s." % xmldoc )
+            logger.debug ( "xml.doc found at %s." % xmldoc )
             with open ( xmldoc ) as f:
                 xmlDir = f.read()
-                logger.debug ( "adding -x %s" % xmlDir )
-                cmd += " -x %s" % xmlDir.strip()
+                toadd = os.path.join ( os.path.dirname ( xmldoc ) , xmlDir.strip() )
+                logger.debug ( "adding -x %s" % toadd )
+                cmd += " -x %s" % toadd
         logger.debug("Now running ''%s''" % str(cmd) )
         out = executor.getoutput(cmd)
+        logger.debug ( "out=%s" % out )
         if not os.path.isfile(lhefile):
             raise SModelSError( "LHE file %s not found" % lhefile )
         lheF = open(lhefile,'r')
@@ -199,12 +205,15 @@ class Pythia8Wrapper(WrapperBase):
         Compile pythia_lhe.
         
         """
-        logger.info("Trying to compile pythia in %s" % self.srcPath )
+        logger.info("Trying to compile pythia8 in %s" % self.srcPath )
         cmd = "cd %s; make" % self.srcPath
         outputMessage = executor.getoutput(cmd)
         #outputMessage = subprocess.check_output ( cmd, shell=True, 
         #                                          universal_newlines=True )
         logger.info(outputMessage)
+        if not os.path.exists ( self.executablePath ):
+            logger.error ( "Compilation of Pythia8 failed." )
+            sys.exit()
 
 
     def checkInstallation(self, fix=False ):

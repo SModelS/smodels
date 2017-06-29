@@ -1,21 +1,22 @@
 VER=$(shell cat smodels/version)
 
+all: externaltools
+
 version:
 	@echo $(VER)
 
-all: externaltools
-
 externaltools:
-	cd lib && make
+	cd smodels/lib && make
 
 pythia6:
-	cd lib && make pythia6
+	cd smodels/lib && make pythia6
 
 pythia8:
-	cd lib && make pythia8
+	cd smodels/lib && make pythia8
 
 clean:
-	cd lib && make clean
+	yes | rm -rf build dist
+	cd smodels/lib && make clean
 
 buildrpm:
 	$(PYTHON) setup.py bdist_rpm --force-arch x86_64

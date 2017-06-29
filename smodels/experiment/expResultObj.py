@@ -64,6 +64,12 @@ class ExpResult(object):
                 return False
         return True
 
+    def __lt__ ( self, other ):
+        """ experimental results are sorted alphabetically according
+            to their description strings """
+        return str(self) < str(other)
+
+
     def __ne__(self, other ):
         return not self.__eq__ ( other )
 

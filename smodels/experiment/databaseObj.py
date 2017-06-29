@@ -10,8 +10,12 @@
 
 """
 
-import sys
 import os
+## sweet spot for numpy multi-threading is 2? More threads
+## make some weaker machines freeze when building the pickle file.
+## Anyhow, we parallelize at a higher level.
+os.environ["OMP_NUM_THREADS"]="2"
+import sys
 import time
 from smodels.experiment import datasetObj
 from smodels.experiment.expResultObj import ExpResult
@@ -36,7 +40,7 @@ class Database(object):
         
     """
     
-    def __init__(self, base=None, force_load = None, discard_zeroes = False ):
+    def __init__(self, base=None, force_load = None, discard_zeroes = True ):
         """
         :param base: path to the database (string)
         :param force_load: force loading the text database ("txt"),

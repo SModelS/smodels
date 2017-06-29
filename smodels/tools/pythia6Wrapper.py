@@ -11,9 +11,10 @@
 from __future__ import print_function
 from smodels.tools.wrapperBase import WrapperBase
 from smodels.tools import wrapperBase
-from smodels.tools.physicsUnits import pb
+from smodels.tools.physicsUnits import pb, TeV
 from smodels.tools.smodelsLogging import logger
 from smodels.theory import crossSection
+from smodels.theory.crossSection import LO
 from smodels import installation
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import os, sys, io
@@ -32,8 +33,8 @@ class Pythia6Wrapper(WrapperBase):
     """
     def __init__(self,
                  configFile="<install>/smodels/etc/pythia.card",
-                 executablePath="<install>/lib/pythia6/pythia_lhe",
-                 srcPath="<install>/lib/pythia6/"):
+                 executablePath="<install>/smodels/lib/pythia6/pythia_lhe",
+                 srcPath="<install>/smodels/lib/pythia6/"):
         """
         :param configFile: Location of the config file, full path; copy this
         file and provide tools to change its content and to provide a template
@@ -97,7 +98,7 @@ class Pythia6Wrapper(WrapperBase):
         if self.keepTempDir:
             logger.warn("Keeping everything in " + self.tempdir)
             return
-        logger.debug("Unlinking " + self.tempdir)
+        logger.debug( "Unlinking " + self.tempdir )
         for inputFile in ["fort.61", "fort.68", "log"]:
             if os.path.exists(self.tempdir + "/" + inputFile):
                 os.unlink(self.tempdir + "/" + inputFile)
@@ -177,7 +178,8 @@ class Pythia6Wrapper(WrapperBase):
             xsecsInfile = crossSection.getXsecFromSLHAFile(slhafile)
             loXsecs = crossSection.XSectionList()
             for xsec in xsecsInfile:
-                if xsec.info.order == LO and xsec.info.sqrts == self.sqrts:
+                if xsec.info.order == LO and \
+                        float (xsec.info.sqrts.asNumber(TeV)) == self.sqrts:
                     loXsecs.add(xsec)
             return loXsecs
 
@@ -186,7 +188,10 @@ class Pythia6Wrapper(WrapperBase):
             pythiacard_default = self.cfgfile
             self.cfgfile = self.pythiacard
         # Check if template config file exists
-        self.unlink()
+        if unlink:
+            self.unlink()
+        else:
+            self.tempdir = None
         self.replaceInCfgFile({"NEVENTS": self.nevents, "SQRTS":1000 * self.sqrts})
         self.setParameter("MSTP(163)", "6")
 
@@ -214,6 +219,8 @@ class Pythia6Wrapper(WrapperBase):
         if self.pythiacard:
             self.cfgfile = pythiacard_default
 
+        #if not unlink:
+        #    lhefile = self.tempdir + "/events.lhe"
         # Generate file object with lhe events
         if lhefile:
             lheFile = open(lhefile, 'w')
@@ -259,6 +266,9 @@ class Pythia6Wrapper(WrapperBase):
         logger.debug("running with " + str(cfg))
         import shutil
         shutil.copy(slha, self.tempDirectory() + "/fort.61")
+        if not os.path.exists ( self.executablePath ):
+            logger.warn ( "Pythia6 executable does not exist. Will build it now." )
+            self.compile()
         cmd = "cd %s ; %s < %s" % \
              (self.tempDirectory(), self.executablePath, cfg)
         logger.debug("Now running " + str(cmd))
@@ -291,12 +301,16 @@ class Pythia6Wrapper(WrapperBase):
         Compile pythia_lhe.
 
         """
-        logger.info("Trying to compile pythia in %s" % self.srcPath )
+        logger.info("Trying to compile Pythia6 in %s" % self.srcPath )
         cmd = "cd %s; make" % self.srcPath
         outputMessage = executor.getoutput(cmd)
         #outputMessage = subprocess.check_output ( cmd, shell=True,
         #                                          universal_newlines=True )
         logger.info(outputMessage)
+        if not os.path.exists ( self.executablePath ):
+            logger.error ( "Compilation of Pythia8 failed." )
+            sys.exit()
+
 
 
     def fetch(self):
@@ -331,11 +345,10 @@ class Pythia6Wrapper(WrapperBase):
 
         """
         if not os.path.exists(self.executablePath):
-            logger.error("Executable '%s' not found. Maybe you didn't compile " \
-                         "the external tools in smodels/lib?", self.executablePath)
-            return False
+            logger.warning("Pythia6 executable not found. Building now. " )
+            self.compile()
         if not os.access(self.executablePath, os.X_OK):
-            logger.error("%s is not executable", self.executable)
+            logger.warning("%s is not executable. Trying to chmod.", self.executable)
             self.chmod()
             return False
         return True

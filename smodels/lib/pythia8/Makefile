@@ -3,7 +3,7 @@
 ## on a mac, for now please use the DYLD_LIBRARY_PATH variable  
 ## for pythia8.exe to find the shared object.
 
-PYTHIAVER := 8223
+PYTHIAVER := 8226
 
 CXX      := g++
 PYTHIA8HOME := pythia$(PYTHIAVER)/
@@ -17,7 +17,7 @@ install_pythia8:
 	./installer.sh $(PYTHIAVER)
 
 clean:
-	rm -rf $(EXES) test.slha pythia$(PYTHIAVER) pythia$(PYTHIAVER).tgz pythia8.exe events.lhe
+	rm -rf $(EXES) test.slha pythia$(PYTHIAVER) .pythia*.tgz* pythia*.tgz*  pythia8.exe events.lhe
 
 pythia8.exe: pythia8.cc
 	echo $(XMLDOC) > xml.doc

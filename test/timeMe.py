@@ -3,7 +3,7 @@
 import time
 import sys
 sys.path.insert(0,"../")
-from runSModelS import main
+from smodels.tools.runSModelS import run
 from smodels.installation import installDirectory
 
 filename = "%s/inputFiles/slha/gluino_squarks.slha" % \
@@ -17,7 +17,7 @@ if suppressStdout:
     a=sys.stdout
     sys.stdout = open ( "stdout.log", "w" )
 t0=time.time()
-main( filename, parameterFile, "/tmp", None, 0, True )
+run( filename, parameterFile, "/tmp", None, 0, True )
 t1=time.time()
 
 if suppressStdout:

@@ -17,6 +17,8 @@ from smodels.tools.physicsUnits import fb, GeV, TeV
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.experiment.databaseObj import Database
 from smodels.tools import coverage
+from smodels.tools.smodelsLogging import setLogLevel
+setLogLevel("info")
 
 # Set the path to the database folder
 database = Database("./smodels-database/")
