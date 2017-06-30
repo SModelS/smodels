@@ -354,7 +354,7 @@ class Database(object):
             if not self.force_load=="txt" and os.path.exists ( pclfile ):
                 # logger.info ( "%s exists" % ( pclfile ) )
                 with open(pclfile,"rb" ) as f:
-                    logger.info ( "Loading: %s" % pclfile )
+                    logger.debug ( "Loading: %s" % pclfile )
                     ## read meta from pickle
                     pclmeta = serializer.load ( f )
                     if not pclmeta.needsUpdate ( txtmeta ):
