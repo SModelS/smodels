@@ -24,6 +24,10 @@ buildrpm:
 builddeb: buildrpm
 	cd dist && fakeroot alien smodels-$(VER)-1.x86_64.rpm
 
+pypi:
+	python setup.py sdist bdist_wheel
+	twine upload dist/*
+
 tarballs:
 	cd distribution && make tarballs
 

@@ -362,9 +362,9 @@ class Database(object):
                         expres = serializer.load ( f )
                     else:
                         logger.debug ( "we cannot use expres from pickle file %s" % pclfile )
-                        logger.info ( "txt meta %s" % txtmeta )
-                        logger.info ( "pcl meta %s" % pclmeta )
-                        logger.info ( "pcl meta needs update %s" % pclmeta.needsUpdate ( txtmeta ) )
+                        logger.debug ( "txt meta %s" % txtmeta )
+                        logger.debug ( "pcl meta %s" % pclmeta )
+                        logger.debug ( "pcl meta needs update %s" % pclmeta.needsUpdate ( txtmeta ) )
         except IOError as e:
             logger.error ( "exception %s" % e )
         if not expres: ## create from text file
