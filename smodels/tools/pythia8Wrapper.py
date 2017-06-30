@@ -48,6 +48,7 @@ class Pythia8Wrapper(WrapperBase):
         self.executablePath = self.absPath(executablePath)
         self.executable = None
         self.srcPath = self.absPath(srcPath)
+        self.compiler = "C++"
         self.tempdir = None
         self.cfgfile = self.checkFileExists(configFile)
         self.keepTempDir = False
@@ -107,12 +108,6 @@ class Pythia8Wrapper(WrapperBase):
                 os.rmdir(self.tempdir)
                 self.tempdir = None
 
-    def complain ( self ):
-        import sys
-        logger.error("please fix manually, e.g. try 'make' in smodels/lib, " \
-               " or file a complaint at smodels-users@lists.oeaw.ac.at" )
-        sys.exit(0)
-
     def run( self, slhaFile, lhefile=None, unlink=True ):
         """
         Run pythia8.
@@ -143,9 +138,7 @@ class Pythia8Wrapper(WrapperBase):
              ( self.executablePath, self.nevents, slha, self.sqrts, cfg, lhefile )
         xmldoc = self.executablePath.replace ( "pythia8.exe", "xml.doc" )        
         logger.debug ( "exe path=%s" % self.executablePath )
-        if not os.path.exists ( self.executablePath ):
-            logger.warn ( "Pythia8 executable does not exist. Will build it now." )
-            self.compile()
+        self.checkInstallation ( compile=True )
         if os.path.exists (xmldoc ):
             logger.debug ( "xml.doc found at %s." % xmldoc )
             with open ( xmldoc ) as f:
@@ -197,44 +190,6 @@ class Pythia8Wrapper(WrapperBase):
         import stat
         mode = stat.S_IRWXU | stat.S_IRWXG | stat.S_IXOTH | stat.S_IROTH
         os.chmod ( self.executablePath, mode )
-        return True
-
-
-    def compile(self):
-        """
-        Compile pythia_lhe.
-        
-        """
-        logger.info("Trying to compile pythia8 in %s" % self.srcPath )
-        cmd = "cd %s; make" % self.srcPath
-        outputMessage = executor.getoutput(cmd)
-        #outputMessage = subprocess.check_output ( cmd, shell=True, 
-        #                                          universal_newlines=True )
-        logger.info(outputMessage)
-        if not os.path.exists ( self.executablePath ):
-            logger.error ( "Compilation of Pythia8 failed." )
-            sys.exit()
-
-
-    def checkInstallation(self, fix=False ):
-        """
-        Check if installation of tool is correct by looking for executable
-
-        :param fix: should it try to fix the situation, if something is wrong?
-
-        :returns: True, if everything is ok
-        
-        """
-        if not os.path.exists(self.executablePath):
-            logger.error("Executable '%s' not found. Maybe you didn't compile " \
-                         "the external tools in smodels/lib?", self.executablePath)
-            if fix:
-                self.compile()
-            return False
-        if not os.access(self.executablePath, os.X_OK):
-            logger.error("%s is not executable", self.executable)
-            self.chmod()
-            return False
         return True
 
 if __name__ == "__main__":
