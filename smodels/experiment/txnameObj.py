@@ -530,7 +530,18 @@ class TxNameData(object):
             M.append ( m )
             # M.append ( [ self.round_to_n ( x, 7 ) for x in m ] )
 
-        Vt=svd(M)[2]
+        try:
+            Vt=svd(M)[2]
+        except ValueError as e:
+            logger.error ( "SVD failed: %s" % e )
+            if len(M) > 10000:
+                n = math.ceil ( len(M) / 10000. )
+                logger.error ( "Trying to run SVD with every %dth entry." % n )
+                Vt=svd(M[::n])[2]
+            else:
+                logger.error ( "Dont know what to do" )
+                raise e
+        
         V=Vt.T
         self._V= V ## self.round ( V )
         Mp=[]
