@@ -305,9 +305,15 @@ class LikelihoodComputer:
         :param nb: predicted backgrounds (float or 1d array)
         :param covb: covariance matrix of backgrounds (float or 2d array)
         """
-        self.nobs = nobs
-        self.nb = nb
-        self.covb = covb
+        self.nobs = self.convert ( nobs )
+        self.nb = self.convert ( nb )
+        self.covb = self.convert ( covb )
+
+    def convert ( self, x ):
+        """ turn everything into numpy arrays """
+        if type ( x ) in ( list, tuple ):
+            return array ( x )
+        return x
 
     #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
     # def prob(x0, x1 )
@@ -417,6 +423,7 @@ class LikelihoodComputer:
             return like
 
     def likelihood ( self, nsig, deltas = None ):
+        nsig = self.convert ( nsig )
         if type(deltas) == type(None):
             deltas = 0.2*nsig
         if type( nsig ) in [ int, float, numpy.float64 ]:
@@ -471,7 +478,7 @@ class LikelihoodComputer:
             #(1/2)*(1 + Erf(mu/sqrt(2*sigma2))), so we need to divide by it
             #(for mu - sigma >> 0, the normalization gives 1.)
             norm = (1./2.)*(1. + special.erf((self.nb+nsig)/sqrt(2.*sigma2)))
-            print ( "norm=", norm )
+            # print ( "norm=", norm )
             like = like/norm
 
             return like
@@ -484,13 +491,16 @@ class LikelihoodComputer:
             :return: chi2 (float)
 
             """
+            nsig = self.convert ( nsig )
             if deltas == None:
                 deltas = 0.2 * nsig
             # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
             llhd = self.likelihood( nsig, deltas )
 
+            print ( "deltas=",deltas )
+            print ( "nsig=",nsig )
             #Percentual signal error:
-            deltas_pct = deltas / float(nsig)
+            deltas_pct = deltas / nsig ## float(nsig)
 
             # Compute the maximum likelihood H1, which sits at nsig = nobs - nb
             # (keeping the same % error on signal):
@@ -530,15 +540,18 @@ if __name__ == "__main__":
     # print ( computer.computeMV ( [4,4,4], [3.6,3.6,3.6], [[0.1**2,0,0],[0.,0.1**2,0],[0.,0,0.1**2]], [0.02,.02,.02] ) )
 
     nsig_,nobs_,nb_,deltab_,deltas_=1,4,3.6,.1,None
-    #computer = LikelihoodComputer ( nobs_, nb_, deltab_**2 )
+    computer = LikelihoodComputer ( nobs_, nb_, deltab_**2 )
     #print ( "1d, computer:", computer.likelihood( nsig_, deltas_ )  )
+    #print ( "1d, chi2:",computer.chi2 ( nsig_ ) )
     computer = LikelihoodComputer ( array([nobs_]), array([nb_]), numpy.diag([deltab_**2]) )
-    print ( "mv 1d, computer:",computer.likelihood( array([nsig_]), deltas_) )
+    print ( "mv 1d, computer:",computer.likelihood( [nsig_], deltas_) )
+    print ( "mv 1d, chi2:",computer.chi2 ( [nsig_] ) )
     #sys.exit()
     cov = numpy.diag ([deltab_**2,deltab_**2])
     computer = LikelihoodComputer ( array([nobs_,nobs_]), array([nb_,nb_]), cov )
     l = computer.likelihood ( array([nsig_,nsig_]), deltas_  )
     print ( "mv 2d, computer:", l )
+    print ( "mv 2d, chi2:", computer.chi2 ( array([nsig_,nsig_]) ) )
     # print ( likelihoodMV(array([nsig]), array([nobs]), array([nb]), numpy.diag([deltab**2]), deltas) )
     # print ( likelihoodMV(array([nsig,nsig]), array([nobs,nobs]), array([nb,nb]), numpy.diag([deltab**2,deltab**2]), deltas) )
 
