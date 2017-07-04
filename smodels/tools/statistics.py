@@ -310,13 +310,13 @@ class LikelihoodComputer:
         self.covb = covb
 
     #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
-    # def prob(x0, x1, nsig, nobs, nb, covb, deltas):
+    # def prob(x0, x1 )
     def probMV( self, *xar ):
         x = numpy.array ( xar )
         poisson = numpy.exp(self.nobs*numpy.log(x) - x - special.gammaln(self.nobs + 1))
-        gaussian = stats.norm.pdf(x,loc=self.nb+self.nsig,scale=sqrt(self.covb+numpy.diag(self.deltas**2)))
-        # print ( "poissonian",(poisson*gaussian)[0][0] ) ## FIXME so wrong
-        return (poisson*gaussian)[0][0]
+        gaussian = stats.multivariate_normal.pdf(x,mean=self.nb+self.nsig,cov=(self.covb+numpy.diag(self.deltas**2)))
+        ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
+        return ret
 
     #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
     def prob( self, x ):
@@ -343,52 +343,77 @@ class LikelihoodComputer:
 
             #Compute maximum value for the integrand:
             sigma2 = self.covb + numpy.diag ( deltas**2 )
-            xm = self.nb + nsig - sigma2
+            dsigma2 = numpy.diag ( sigma2 )
+            #print ( "sigma2=", sigma2 )
+            #print ( "dsigma2=", dsigma2 )
+            ## for now deal with variances only
+            xm = self.nb + nsig - dsigma2
             #If nb + nsig = sigma2, shift the values slightly:
+            for ctr,i in enumerate(xm):
+                if i == 0.:
+                    xm[ctr]=1e-3
             #if xm == 0.:
             #    xm = 0.001
+            """
             print ( "self.nobs=",self.nobs )
             print ( "self.nb=",self.nb )
             print ( "nsig=", nsig )
-            xmax = xm*(1.+sign(xm)*sqrt(1. + 4.*self.nobs*sigma2/xm**2))/2.
-            xmax2 = xm/2.*(1.+sign(xm)*sqrt(1. + 4.*self.nobs*sigma2/xm**2))
+            print ( "xm=", xm )
+            print ( "sigma2/xm2=", dsigma2/xm**2 )
+            """
+            xmax = xm*(1.+sign(xm)*sqrt(1. + 4.*self.nobs*dsigma2/xm**2))/2.
+            #print ( "xmax=", nsig )
             self.nsig, self.deltas = nsig, deltas ## store for integration
-            print ( "xmax,p(xmax)=", xmax, self.probMV ( xmax ) )
-            print ( "xmax2,p(xmax2)=", xmax2, self.probMV ( xmax2 ) )
+            #print ( "xmax,p(xmax)=", xmax, self.probMV ( xmax ) )
 
             #Define initial integration range:
             nrange = 5.
-            print ( "xmax=",xmax)
-            a = max(0.,xmax-nrange*sqrt(sigma2))
-            b = xmax+nrange*sqrt(sigma2)
-            print ( "mv,a,b,",a[0][0],b[0][0] )
+            #print ( "xmax=",xmax)
+            #import IPython
+            #IPython.embed()
+            low = xmax-nrange*sqrt(dsigma2)
+            low[low<0.] = 0. ## set all negatives to zero!
+            #print ( "low=",low )
+            # a = max(0.,xmax-nrange*sqrt(sigma2))
+            up = xmax+nrange*sqrt(dsigma2)
+            #print ( "up=",up )
+            #print ( "low,up,mv",low[0],up[0],self.probMV(xmax) )
             #a = numpy.array ( [1.]*len(nobs) ) # FIXME wrong
             #b = numpy.array ( [2.]*len(nobs) ) # FIXME wrong
             self.nsig, self.deltas = nsig, deltas ## store for integration
-            like = integrate.nquad( self.probMV, [[a,b]] )[0] ## fixme so wrong
+            like = integrate.nquad( self.probMV, zip(low,up) )[0] ## fixme so wrong
             #                              epsabs=0.,epsrel=1e-3)[0]
-            print ( "like=", like )
+            #print ( "like=", like )
 
+            norm = (1./2.)*(1. + special.erf((self.nb+nsig)/sqrt(2.*dsigma2)))#[0][0]
+            #norm=1.
+            #print ( "norm=", norm )
             #Increase integration range until integral converges
             err = 1.
             while err > 0.01: # wrong
                 like_old = like
                 nrange = nrange*2
-                a = max(0.,xmax-nrange*sqrt(sigma2))
-                b = xmax+nrange*sqrt(sigma2)
+                low = xmax-nrange*sqrt(dsigma2)
+                low[low<0.] = 0. ## set all negatives to zero!
+                up = xmax+nrange*sqrt(dsigma2)
+                #print ( "integrating from",low,"to",up )
                 #a = numpy.array ( [0.]*len(nobs) ) ## FIXME wrong
                 #b = numpy.array ( [4.]*len(nobs) ) ## FIXME wrong
-                like = integrate.nquad(self.probMV,[[a,b]])[0] #,(nsig, nobs, nb, covb, deltas),
-    #                                      epsabs=0.,epsrel=1e-3)[0] FIXME so wrong
+                like = integrate.nquad(self.probMV,zip(low,up))[0]
+ #                                      epsabs=0.,epsrel=1e-3)[0] FIXME so wrong
                 err = abs(like_old-like)/like
+                #print ( "like_old,like,err=",like_old/norm,like/norm,err )
 
             #print ( "mvLikelihood, like=", like )
             #Renormalize the likelihood to account for the cut at x = 0.
             #The integral of the gaussian from 0 to infinity gives:
             #(1/2)*(1 + Erf(mu/sqrt(2*sigma2))), so we need to divide by it
             #(for mu - sigma >> 0, the normalization gives 1.)
-            norm = (1./2.)*(1. + special.erf((self.nb+nsig)/sqrt(2.*sigma2)))[0][0]
-            like = like/norm
+            norm = (1./2.)*(1. + special.erf((self.nb+nsig)/sqrt(2.*dsigma2)))#[0][0]
+            # norm = 1.
+            #print ( "like=",like)
+            like = like/ reduce(lambda x, y: x*y, norm ) 
+            #print ( "like=",like)
             return like
 
     def likelihood ( self, nsig, deltas = None ):
@@ -446,6 +471,7 @@ class LikelihoodComputer:
             #(1/2)*(1 + Erf(mu/sqrt(2*sigma2))), so we need to divide by it
             #(for mu - sigma >> 0, the normalization gives 1.)
             norm = (1./2.)*(1. + special.erf((self.nb+nsig)/sqrt(2.*sigma2)))
+            print ( "norm=", norm )
             like = like/norm
 
             return like
@@ -504,13 +530,15 @@ if __name__ == "__main__":
     # print ( computer.computeMV ( [4,4,4], [3.6,3.6,3.6], [[0.1**2,0,0],[0.,0.1**2,0],[0.,0,0.1**2]], [0.02,.02,.02] ) )
 
     nsig_,nobs_,nb_,deltab_,deltas_=1,4,3.6,.1,None
-    computer = LikelihoodComputer ( nobs_, nb_, deltab_**2 )
-    print ( "1d, computer:", computer.likelihood( nsig_, deltas_ )  )
+    #computer = LikelihoodComputer ( nobs_, nb_, deltab_**2 )
+    #print ( "1d, computer:", computer.likelihood( nsig_, deltas_ )  )
     computer = LikelihoodComputer ( array([nobs_]), array([nb_]), numpy.diag([deltab_**2]) )
     print ( "mv 1d, computer:",computer.likelihood( array([nsig_]), deltas_) )
-    sys.exit()
-    computer = LikelihoodComputer ( array([nobs_,nobs_]), array([nb_,nb_]), numpy.diag([deltab_**2,deltab_**2]) )
-    computer.likelihood ( array([nsig_,nsig_]), deltas_  )
+    #sys.exit()
+    cov = numpy.diag ([deltab_**2,deltab_**2])
+    computer = LikelihoodComputer ( array([nobs_,nobs_]), array([nb_,nb_]), cov )
+    l = computer.likelihood ( array([nsig_,nsig_]), deltas_  )
+    print ( "mv 2d, computer:", l )
     # print ( likelihoodMV(array([nsig]), array([nobs]), array([nb]), numpy.diag([deltab**2]), deltas) )
     # print ( likelihoodMV(array([nsig,nsig]), array([nobs,nobs]), array([nb,nb]), numpy.diag([deltab**2,deltab**2]), deltas) )
 
