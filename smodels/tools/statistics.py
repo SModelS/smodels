@@ -14,9 +14,8 @@ from smodels.tools.physicsUnits import fb
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.caching import _memoize
 from scipy import stats, optimize, integrate, special
-from numpy import sqrt, exp, log, sign
+from numpy import sqrt, exp, log, sign, array, matrix
 import numpy
-from numpy import array
 import math
 import sys
 
@@ -331,6 +330,50 @@ class LikelihoodComputer:
                                    scale=sqrt(self.covb+self.deltas**2))
         return poisson*gaussian
 
+    def findMax ( self ):
+            #Compute maximum value for the integrand:
+            sigma2 = self.covb + numpy.diag ( self.deltas**2 )
+            dsigma2 = numpy.diag ( sigma2 )
+            #print ( "sigma2=", sigma2 )
+            #print ( "dsigma2=", dsigma2 )
+            ## for now deal with variances only
+            ntot = self.nb + self.nsig
+            xm = self.nb + self.nsig - dsigma2
+            #If nb + nsig = sigma2, shift the values slightly:
+            for ctr,i in enumerate(xm):
+                if i == 0.:
+                    xm[ctr]=1e-3
+            print ( "self.nobs=",self.nobs )
+            print ( "self.nb=",self.nb )
+            print ( "nsig=", self.nsig )
+            print ( "ntot=", ntot )
+            print ( "sigma2=", sigma2 )
+            weight = ( numpy.matrix (sigma2 ) )**(-1) ## weight matrix
+            q = self.nobs / numpy.diag ( weight ) ## q_i= nobs_i * w_ii^-1
+            p = ntot - 1. / numpy.diag ( weight )
+            xmax1 = p/2. * ( 1 + sqrt ( 1. + 4*q / p**2 ) ) ## no cov iteration
+            print ( "xmax1 w/ cov,p(xmax)=", xmax1, self.probMV ( *xmax1 ) )
+            ndims = len(p)
+            print ( "ndims=", ndims )
+            for i in range(ndims):
+                for j in range(ndims):
+                    if i==j: 
+                        continue ## treat covariance terms
+                    p[i]+=(ntot[j]-xmax1[j])*weight[i,j] / weight[i,i]
+            xmax = p/2. * ( 1 + sqrt ( 1. + 4*q / p**2 ) )
+            print ( "xmax2 w/ cov,p(xmax2)=", xmax, self.probMV ( *xmax ) )
+            return xmax
+
+    def findMaxNoCov ( self ):
+            """ find maximum in gauss*poisson function, disregarding
+                off-diagonal elements in covariance matrix """
+            sigma2 = self.covb + numpy.diag ( self.deltas**2 )
+            dsigma2 = numpy.diag ( sigma2 )
+            xm = self.nb + self.nsig - dsigma2
+            xmax = xm*(1.+sign(xm)*sqrt(1. + 4.*self.nobs*dsigma2/xm**2))/2.
+            print ( "xmax no cov,p(xmax)=", xmax, self.probMV ( *xmax ) )
+            return xmax
+
     def _mvLikelihood( self, nsig, deltas ):
             #     Why not a simple poisson function for the factorial
             #     -----------------------------------------------------
@@ -353,23 +396,17 @@ class LikelihoodComputer:
             #print ( "sigma2=", sigma2 )
             #print ( "dsigma2=", dsigma2 )
             ## for now deal with variances only
+            ntot = self.nb + nsig
             xm = self.nb + nsig - dsigma2
             #If nb + nsig = sigma2, shift the values slightly:
             for ctr,i in enumerate(xm):
                 if i == 0.:
                     xm[ctr]=1e-3
-            #if xm == 0.:
-            #    xm = 0.001
-            """
-            print ( "self.nobs=",self.nobs )
-            print ( "self.nb=",self.nb )
-            print ( "nsig=", nsig )
-            print ( "xm=", xm )
-            print ( "sigma2/xm2=", dsigma2/xm**2 )
-            """
-            xmax = xm*(1.+sign(xm)*sqrt(1. + 4.*self.nobs*dsigma2/xm**2))/2.
-            #print ( "xmax=", nsig )
             self.nsig, self.deltas = nsig, deltas ## store for integration
+            xmax = self.findMaxNoCov ()
+            # xmax = xm*(1.+sign(xm)*sqrt(1. + 4.*self.nobs*dsigma2/xm**2))/2.
+            print ( "xmax=", xmax )
+            print ( "xmax2=", self.findMax ( ) )
             #print ( "xmax,p(xmax)=", xmax, self.probMV ( xmax ) )
 
             #Define initial integration range:
@@ -543,15 +580,17 @@ if __name__ == "__main__":
     computer = LikelihoodComputer ( nobs_, nb_, deltab_**2 )
     #print ( "1d, computer:", computer.likelihood( nsig_, deltas_ )  )
     #print ( "1d, chi2:",computer.chi2 ( nsig_ ) )
-    computer = LikelihoodComputer ( array([nobs_]), array([nb_]), numpy.diag([deltab_**2]) )
+    computer = LikelihoodComputer ( [nobs_], [nb_], numpy.diag([deltab_**2]) )
     print ( "mv 1d, computer:",computer.likelihood( [nsig_], deltas_) )
     print ( "mv 1d, chi2:",computer.chi2 ( [nsig_] ) )
     #sys.exit()
     cov = numpy.diag ([deltab_**2,deltab_**2])
-    computer = LikelihoodComputer ( array([nobs_,nobs_]), array([nb_,nb_]), cov )
+    cov[0,1] = .01
+    cov[1,0] = .01
+    computer = LikelihoodComputer ( [nobs_,nobs_], [nb_,nb_], cov )
     l = computer.likelihood ( array([nsig_,nsig_]), deltas_  )
     print ( "mv 2d, computer:", l )
-    print ( "mv 2d, chi2:", computer.chi2 ( array([nsig_,nsig_]) ) )
+    print ( "mv 2d, chi2:", computer.chi2 ( [nsig_,nsig_] ) )
     # print ( likelihoodMV(array([nsig]), array([nobs]), array([nb]), numpy.diag([deltab**2]), deltas) )
     # print ( likelihoodMV(array([nsig,nsig]), array([nobs,nobs]), array([nb,nb]), numpy.diag([deltab**2,deltab**2]), deltas) )
 
