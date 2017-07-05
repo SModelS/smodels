@@ -343,25 +343,27 @@ class LikelihoodComputer:
             for ctr,i in enumerate(xm):
                 if i == 0.:
                     xm[ctr]=1e-3
+            """
             print ( "self.nobs=",self.nobs )
             print ( "self.nb=",self.nb )
             print ( "nsig=", self.nsig )
             print ( "ntot=", ntot )
             print ( "sigma2=", sigma2 )
+            """
             weight = ( numpy.matrix (sigma2 ) )**(-1) ## weight matrix
             q = self.nobs / numpy.diag ( weight ) ## q_i= nobs_i * w_ii^-1
             p = ntot - 1. / numpy.diag ( weight )
             xmax1 = p/2. * ( 1 + sqrt ( 1. + 4*q / p**2 ) ) ## no cov iteration
-            print ( "xmax1 w/ cov,p(xmax)=", xmax1, self.probMV ( *xmax1 ) )
+            #print ( "xmax1 w/ cov,p(xmax)=", xmax1, self.probMV ( *xmax1 ) )
             ndims = len(p)
-            print ( "ndims=", ndims )
+            #print ( "ndims=", ndims )
             for i in range(ndims):
                 for j in range(ndims):
                     if i==j: 
                         continue ## treat covariance terms
                     p[i]+=(ntot[j]-xmax1[j])*weight[i,j] / weight[i,i]
             xmax = p/2. * ( 1 + sqrt ( 1. + 4*q / p**2 ) )
-            print ( "xmax2 w/ cov,p(xmax2)=", xmax, self.probMV ( *xmax ) )
+            #print ( "xmax2 w/ cov,p(xmax2)=", xmax, self.probMV ( *xmax ) )
             return xmax
 
     def findMaxNoCov ( self ):
@@ -371,7 +373,7 @@ class LikelihoodComputer:
             dsigma2 = numpy.diag ( sigma2 )
             xm = self.nb + self.nsig - dsigma2
             xmax = xm*(1.+sign(xm)*sqrt(1. + 4.*self.nobs*dsigma2/xm**2))/2.
-            print ( "xmax no cov,p(xmax)=", xmax, self.probMV ( *xmax ) )
+            # print ( "xmax no cov,p(xmax)=", xmax, self.probMV ( *xmax ) )
             return xmax
 
     def _mvLikelihood( self, nsig, deltas ):
@@ -405,8 +407,8 @@ class LikelihoodComputer:
             self.nsig, self.deltas = nsig, deltas ## store for integration
             xmax = self.findMaxNoCov ()
             # xmax = xm*(1.+sign(xm)*sqrt(1. + 4.*self.nobs*dsigma2/xm**2))/2.
-            print ( "xmax=", xmax )
-            print ( "xmax2=", self.findMax ( ) )
+            #print ( "xmax=", xmax )
+            #print ( "xmax2=", self.findMax ( ) )
             #print ( "xmax,p(xmax)=", xmax, self.probMV ( xmax ) )
 
             #Define initial integration range:
@@ -534,8 +536,8 @@ class LikelihoodComputer:
             # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
             llhd = self.likelihood( nsig, deltas )
 
-            print ( "deltas=",deltas )
-            print ( "nsig=",nsig )
+            #print ( "deltas=",deltas )
+            #print ( "nsig=",nsig )
             #Percentual signal error:
             deltas_pct = deltas / nsig ## float(nsig)
 
