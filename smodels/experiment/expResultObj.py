@@ -140,7 +140,7 @@ class ExpResult(object):
         :param effs: the signal efficiencies for all datasets, 
                 the efficiencies must be sorted according to datasetOrder
         :param expected: return expected, not observed value
-        :returns: upper limit on sigma (not sigma*eff)
+        :returns: upper limit on sigma (*not* sigma*eff)
         """
         if not hasattr ( self.globalInfo, "covariance" ):
             logger.error ( "no covariance matrix given in globalInfo.txt for %s" % self.globalInfo.id )
@@ -160,7 +160,7 @@ class ExpResult(object):
         datasetOrder = self.globalInfo.datasetOrder
         if type ( datasetOrder ) == str:
             datasetOrder = tuple ( [ datasetOrder ] ) ## for debugging, allow one dataset
-        print ( "datasetOrder=", datasetOrder )
+        # print ( "datasetOrder=", datasetOrder )
         if len ( datasetOrder ) != len ( self.datasets ):
             logger.error ( "Number of elements in datasetOrder(%d) not equals number of datasets(%d) in %s." % ( len(datasetOrder), len(self.datasets), self.globalInfo.id ) )
             sys.exit()

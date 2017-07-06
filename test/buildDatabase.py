@@ -23,26 +23,27 @@ results=d.getExpResults()
 
 massvec = [[400.*GeV,75*GeV], [400*GeV,75*GeV]]
 
-for e in results:
+for e in results[:]:
     print ( e.globalInfo.id )
-    e0 = e
-    sig1,sig2=1.0*fb,1.0*fb
-    y1,y2=float(sig1*e0.globalInfo.lumi),float(sig2*e0.globalInfo.lumi)
-    eff1 = e0.getEfficiencyFor ( "T2tt", massvec, "SR1: MET > 200" )
-    eff2 = e0.getEfficiencyFor ( "T2tt", massvec, "SR2: MET > 300" )
-    sig1,sig2=1.,1.
-    print ( "yields",y1,y2 )
-    print ( "signals",sig1, sig2 )
-    print ( "signals",eff1, eff2 )
+    dsets = [ "SR1: MET > 200", "SR2: MET > 300" ]
+    topo = "T2tt"
+    effs = []
+    for ds in dsets:
+        eff = e.getEfficiencyFor ( topo, massvec, ds )
+        if not eff: continue
+        effs.append ( eff )
+        ul = e.getUpperLimitFor ( ds )
+        eul = e.getUpperLimitFor ( ds, expected=True )
+        print ( "observed upper limit",ds," (on sigma*eff)", ul )
+        print ( "expected upper limit",ds," (on sigma*eff)", eul )
+        print ( "observed upper limit",ds," (on sigma)", ul/eff )
+        print ( "expected upper limit",ds," (on sigma)", eul/eff )
+        print ( "eff", eff )
     try:
-        print ( "upper limit combined", e0.getCombinedUpperLimitFor ( [ eff1 , eff2 ] ) )
+        print ( "observed upper limit combined (on sigma)", e.getCombinedUpperLimitFor ( effs ) )
+        print ( "expected upper limit combined (on sigma)", e.getCombinedUpperLimitFor ( effs, expected=True ) )
     except SModelSExperimentError as e:
         print ( "exception: %s" % e )
         
-    print ( "upper limit SR1", e0.getUpperLimitFor ( "SR1: MET > 200" )  )
-    print ( "eff1", e0.getEfficiencyFor ( "T2tt", massvec, "SR1: MET > 200" ) )
-    print ( "upper limit SR2", e0.getUpperLimitFor ( "SR2: MET > 300" )  )
-    print ( "eff2", e0.getEfficiencyFor ( "T2tt", massvec, "SR2: MET > 300" ) )
-
-    tpred = theoryPredictionsFor ( e0, smstoplist, useBestDataset=False )
+    tpred = theoryPredictionsFor ( e, smstoplist, useBestDataset=False )
     print ( "theorypredfor=%s" % tpred )
