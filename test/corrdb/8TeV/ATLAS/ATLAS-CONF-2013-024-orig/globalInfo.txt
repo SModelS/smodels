@@ -1,10 +1,10 @@
-id: ATLAS-CONF-2013-024
+id: ATLAS-CONF-2013-024-orig
 sqrts: 8*TeV
 lumi: 20.5/fb
 prettyName: 0 lepton + 6 (2 b-)jets + Etmiss
 url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-024/
 contact: fastlim
-datasetOrder: "SR1: MET > 200", "SR2: MET > 300"
-covariance: [ [ 1.0, 0.0 ], [ 0.0, 1.0 ] ]
+datasetOrder: "SR1: MET > 200"
+covariance: [ [ 1. ] ]
 implementedBy: WW
 lastUpdate: 2016/08/16

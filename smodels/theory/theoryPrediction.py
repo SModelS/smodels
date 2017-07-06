@@ -79,7 +79,11 @@ class TheoryPrediction(object):
         # return maxcond
     
     def __str__(self):
-        return "%s:%s" % ( self.analysis, self.xsection )
+        ret = "%s:%s" % ( self.analysis, self.xsection )
+        self.computeStatistics()
+        ret += ", effEff=%f" % self.effectiveEff
+        ret += ", llhd=%f." % self.likelihood
+        return ret
 
 
 
@@ -253,6 +257,7 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
         theoryPrediction.conditions = _evalConditions(cluster)
         theoryPrediction.cluster = cluster
         theoryPrediction.mass = cluster.getAvgMass()
+        theoryPrediction.effectiveEff = cluster.getEffectiveEfficiency()
         theoryPrediction.PIDs = cluster.getPIDs()
         theoryPrediction.IDs = cluster.getIDs()
         predictionList._theoryPredictions.append(theoryPrediction)

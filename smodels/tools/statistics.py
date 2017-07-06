@@ -44,19 +44,19 @@ class UpperLimitComputer:
     def fEff( self, mu ):
         # print ( "try sig=",sig )
         sig = self.sig * mu
-        cls = CLs ( self.nev, self.xbg, self.sbg, sig, self.currentNToys ) - self.cl
+        cls = self.CLs ( sig ) - self.cl
         return cls
 
     def f( self, sig ):
         # self.currentNToys=int ( self.currentNToys * 1.10 )
-        cls = CLs ( self.nev, self.xbg, self.sbg, sig, self.currentNToys ) - self.cl
+        cls = self.CLs ( sig ) - self.cl
         # print "[ULC] running",sig," with",self.currentNToys,"cls=",cls
         return cls
 
     def fMV( self, mu ):
         # print ( "MV try sig=",sig )
         sig = [ mu*x for x in self.sig ]
-        cls = CLsMV ( self.nev, self.xbg, self.sbg, sig, self.currentNToys ) - self.cl
+        cls = self.CLsMV ( sig ) - self.cl
         return cls
 
     def computeMV ( self, nev, xbg, cov, eff ):
@@ -75,10 +75,14 @@ class UpperLimitComputer:
         upto = 5 * max ( nev + xbg ) / min(eff)
         dx = upto/20.
         start = dx/2.
+        computer = LikelihoodComputer ( nev, xbg, cov )
         while True:
             for sig in numpy.arange ( start, upto, dx ):
                 csig = sig * effs
-                l = LLHD ( nev, xbg, cov, csig, self.origNToys )
+                #lold = LLHD ( nev, xbg, cov, csig, 10*self.origNToys )
+                #print ( "l=",lold,"ntoys=",self.origNToys )
+                l = computer.likelihood ( csig )
+                # print ( "l2=",l )
                 llhds[float(sig)]=l
             norm = sum ( llhds.values() )
             last = llhds[sig]/norm
@@ -139,6 +143,65 @@ class UpperLimitComputer:
             else:
                 return float("nan")
 
+    def CLs( self, SigHypothesis ):
+        """ this method has been taken from MadAnalysis5, see
+            Official website: <https://launchpad.net/madanalysis5>
+            It is for the 1d case only .
+
+            Thanks to the MadAnalysis for granting us the permission to use
+            the code here! """
+        NumObserved = self.nev
+        ExpectedBG = self.xbg
+        BGError = self.sbg
+        NumToyExperiments = self.currentNToys
+
+        ## testing whether scipy is there
+        try:
+            import scipy.stats
+        except ImportError:
+            logger.warning('scipy is not installed... the CLs module cannot be used.')
+            logger.warning('Please install scipy.')
+            return False
+        # generate a set of expected-number-of-background-events, one for each toy
+        # experiment, distributed according to a Gaussian with the specified mean
+        # and uncertainty
+        # numpy.random.multivariate_normal ( [1.,5.], [[1.0,0.0],[0.0,1.0]], 10 )
+        ExpectedBGs = scipy.stats.norm.rvs( loc=ExpectedBG, scale=BGError,
+                                            size=NumToyExperiments )
+        #ExpectedBGs = numpy.random.normal( loc=ExpectedBG,
+        #        scale=BGError, size=NumToyExperiments )
+
+        # All negative coordinates are drawn again
+        ExpectedBGs = [value for value in ExpectedBGs if value > 0]
+
+        # For each toy experiment, get the actual number of background events by
+        # taking one value from a Poisson distribution created using the expected
+        # number of events.
+        # print ( "ExpectedBGs=",ExpectedBGs)
+        ToyBGs = map ( scipy.stats.poisson.rvs, ExpectedBGs )
+        ToyBGs = list ( map(float, ToyBGs) )
+
+        # The probability for the background alone to fluctutate as LOW as
+        # observed = the fraction of the toy experiments with backgrounds as low as
+        # observed = p_b.
+        # NB (1 - this p_b) corresponds to what is usually called p_b for CLs.
+        p_b = scipy.stats.percentileofscore(ToyBGs, NumObserved, kind='weak')*.01
+
+        # Toy MC for background+signal
+        ExpectedBGandS = [expectedbg + SigHypothesis for expectedbg in ExpectedBGs]
+        ToyBplusS = map ( scipy.stats.poisson.rvs, ExpectedBGandS)
+        ToyBplusS = list ( map(float, ToyBplusS) )
+
+        # Calculate the fraction of these that are >= the number observed,
+        # giving p_(S+B). Divide by (1 - p_b) a la the CLs prescription.
+        p_SplusB = scipy.stats.percentileofscore(ToyBplusS, NumObserved, kind='weak')*.01
+
+        if p_SplusB>p_b:
+            return 0.
+        else:
+            return 1.-(p_SplusB / p_b) # 1 - CLs
+
+
     def compute ( self, nev, xbg, sbg, upto=5.0, return_nan=False ):
         """ upper limit obtained via mad analysis 5 code, given for sigma
         :param nev: number of observed events
@@ -165,137 +228,56 @@ class UpperLimitComputer:
                 return self.compute ( nev, xbg, sbg, 5.0*upto, upto>200. )
             else:
                 return float("nan")
+                
+    def CLsMV( self, SigHypothesis ):
+        """ CLs, with vectors and covariances """
+        ## testing whether scipy is there
+        NumObserved = self.nev
+        ExpectedBG = self.xbg
+        BGError = self.sbg
+        NumToyExperiments = self.currentNToys
+        try:
+            import scipy.stats
+        except ImportError:
+            logger.warning('scipy is not installed... the CLs module cannot be used.')
+            logger.warning('Please install scipy.')
+            return False
+        # generate a set of expected-number-of-background-events, one for each toy
+        # experiment, distributed according to a Gaussian with the specified mean
+        # and uncertainty
+        ExpectedBGs = numpy.random.multivariate_normal( mean=ExpectedBG,
+                cov=BGError, size=NumToyExperiments )
 
-def LLHD(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
-    """ compute llhd at SigHypothesis half numerically, half analytically. """
-    ## testing whether scipy is there
-    try:
-        import scipy.stats
-    except ImportError:
-        logger.warning('scipy is not installed... the CLs module cannot be used.')
-        logger.warning('Please install scipy.')
-        return False
-    # generate a set of expected-number-of-background-events, one for each toy
-    # experiment, distributed according to a Gaussian with the specified mean
-    # and uncertainty
-    ExpectedBGs = numpy.random.multivariate_normal( mean=ExpectedBG,
-            cov=BGError, size=NumToyExperiments )
+        ## discard all negatives
+        ExpectedBGs = [ value for value in ExpectedBGs if (value > 0).all() ]
 
-    ## discard all negatives
-    ExpectedBGs = [ value for value in ExpectedBGs if (value > 0).all() ]
+        ## complain if too many negatives
+        p = float(len(ExpectedBGs )) / NumToyExperiments
+        if p < 0.9:
+            logger.warning ( "only %d%s of points are all-positive" % (100*p,"%"))
 
-    ## complain if too many negatives
-    p = float(len(ExpectedBGs )) / NumToyExperiments
-    if p < 0.9:
-        logger.warning ( "only %d%s of points are all-positive" % (100*p,"%"))
+        ToyBGs = list ( map ( scipy.stats.poisson.rvs, ExpectedBGs ) )
 
-    llhd = 0.
-    for bg in ExpectedBGs:
-        nexp = bg + SigHypothesis
-        llhd += numpy.prod ( numpy.exp ( NumObserved * numpy.log ( nexp ) - nexp - special.gammaln( NumObserved +numpy.array ( [1]*len(NumObserved)  ) ) ) )
-    llhd = llhd / len( ExpectedBGs )
-    return llhd
+        # The probability for the background alone to fluctutate as LOW as
+        # observed = the fraction of the toy experiments with backgrounds as low as
+        # observed = p_b.
+        # NB (1 - this p_b) corresponds to what is usually called p_b for CLs.
+        #print ( "ToyBGs=", ToyBGs[:3] )
+        #print ( "NumObs=", NumObserved )
+        p_b = scipy.stats.percentileofscore(ToyBGs, NumObserved, kind='weak')*.01
 
-def CLsMV(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
-    """ CLs, with vectors and covariances """
-    ## testing whether scipy is there
-    try:
-        import scipy.stats
-    except ImportError:
-        logger.warning('scipy is not installed... the CLs module cannot be used.')
-        logger.warning('Please install scipy.')
-        return False
-    # generate a set of expected-number-of-background-events, one for each toy
-    # experiment, distributed according to a Gaussian with the specified mean
-    # and uncertainty
-    ExpectedBGs = numpy.random.multivariate_normal( mean=ExpectedBG,
-            cov=BGError, size=NumToyExperiments )
+        # Toy MC for background+signal
+        ExpectedBGandS = [expectedbg + SigHypothesis for expectedbg in ExpectedBGs]
+        ToyBplusS = list ( map ( scipy.stats.poisson.rvs, ExpectedBGandS) )
 
-    ## discard all negatives
-    ExpectedBGs = [ value for value in ExpectedBGs if (value > 0).all() ]
+        # Calculate the fraction of these that are >= the number observed,
+        # giving p_(S+B). Divide by (1 - p_b) a la the CLs prescription.
+        p_SplusB = scipy.stats.percentileofscore(ToyBplusS, NumObserved, kind='weak')*.01
 
-    ## complain if too many negatives
-    p = float(len(ExpectedBGs )) / NumToyExperiments
-    if p < 0.9:
-        logger.warning ( "only %d%s of points are all-positive" % (100*p,"%"))
-
-    ToyBGs = list ( map ( scipy.stats.poisson.rvs, ExpectedBGs ) )
-
-    # The probability for the background alone to fluctutate as LOW as
-    # observed = the fraction of the toy experiments with backgrounds as low as
-    # observed = p_b.
-    # NB (1 - this p_b) corresponds to what is usually called p_b for CLs.
-    #print ( "ToyBGs=", ToyBGs[:3] )
-    #print ( "NumObs=", NumObserved )
-    p_b = scipy.stats.percentileofscore(ToyBGs, NumObserved, kind='weak')*.01
-
-    # Toy MC for background+signal
-    ExpectedBGandS = [expectedbg + SigHypothesis for expectedbg in ExpectedBGs]
-    ToyBplusS = list ( map ( scipy.stats.poisson.rvs, ExpectedBGandS) )
-
-    # Calculate the fraction of these that are >= the number observed,
-    # giving p_(S+B). Divide by (1 - p_b) a la the CLs prescription.
-    p_SplusB = scipy.stats.percentileofscore(ToyBplusS, NumObserved, kind='weak')*.01
-
-    if p_SplusB>p_b:
-        return 0.
-    else:
-        return 1.-(p_SplusB / p_b) # 1 - CLs
-
-
-def CLs(NumObserved, ExpectedBG, BGError, SigHypothesis, NumToyExperiments):
-    """ this method has been taken from MadAnalysis5, see
-        Official website: <https://launchpad.net/madanalysis5>
-        It is for the 1d case only .
-
-        Thanks to the MadAnalysis for granting us the permission to use
-        the code here! """
-
-    ## testing whether scipy is there
-    try:
-        import scipy.stats
-    except ImportError:
-        logger.warning('scipy is not installed... the CLs module cannot be used.')
-        logger.warning('Please install scipy.')
-        return False
-    # generate a set of expected-number-of-background-events, one for each toy
-    # experiment, distributed according to a Gaussian with the specified mean
-    # and uncertainty
-    # numpy.random.multivariate_normal ( [1.,5.], [[1.0,0.0],[0.0,1.0]], 10 )
-    ExpectedBGs = scipy.stats.norm.rvs( loc=ExpectedBG, scale=BGError,
-                                        size=NumToyExperiments )
-    #ExpectedBGs = numpy.random.normal( loc=ExpectedBG,
-    #        scale=BGError, size=NumToyExperiments )
-
-    # All negative coordinates are drawn again
-    ExpectedBGs = [value for value in ExpectedBGs if value > 0]
-
-    # For each toy experiment, get the actual number of background events by
-    # taking one value from a Poisson distribution created using the expected
-    # number of events.
-    # print ( "ExpectedBGs=",ExpectedBGs)
-    ToyBGs = map ( scipy.stats.poisson.rvs, ExpectedBGs )
-    ToyBGs = list ( map(float, ToyBGs) )
-
-    # The probability for the background alone to fluctutate as LOW as
-    # observed = the fraction of the toy experiments with backgrounds as low as
-    # observed = p_b.
-    # NB (1 - this p_b) corresponds to what is usually called p_b for CLs.
-    p_b = scipy.stats.percentileofscore(ToyBGs, NumObserved, kind='weak')*.01
-
-    # Toy MC for background+signal
-    ExpectedBGandS = [expectedbg + SigHypothesis for expectedbg in ExpectedBGs]
-    ToyBplusS = map ( scipy.stats.poisson.rvs, ExpectedBGandS)
-    ToyBplusS = list ( map(float, ToyBplusS) )
-
-    # Calculate the fraction of these that are >= the number observed,
-    # giving p_(S+B). Divide by (1 - p_b) a la the CLs prescription.
-    p_SplusB = scipy.stats.percentileofscore(ToyBplusS, NumObserved, kind='weak')*.01
-
-    if p_SplusB>p_b:
-        return 0.
-    else:
-        return 1.-(p_SplusB / p_b) # 1 - CLs
+        if p_SplusB>p_b:
+            return 0.
+        else:
+            return 1.-(p_SplusB / p_b) # 1 - CLs
 
 class LikelihoodComputer:
     def __init__ ( self, nobs, nb, covb ):
@@ -446,6 +428,9 @@ class LikelihoodComputer:
                 #b = numpy.array ( [4.]*len(nobs) ) ## FIXME wrong
                 like = integrate.nquad(self.probMV,zip(low,up))[0]
  #                                      epsabs=0.,epsrel=1e-3)[0] FIXME so wrong
+                if like == 0.:
+                    err = 1.
+                    continue
                 err = abs(like_old-like)/like
                 #print ( "like_old,like,err=",like_old/norm,like/norm,err )
 
@@ -462,6 +447,7 @@ class LikelihoodComputer:
             return like
 
     def likelihood ( self, nsig, deltas = None ):
+        """ compute likelihood for nsig, marginalized the nuisances """
         nsig = self.convert ( nsig )
         if type(deltas) == type(None):
             deltas = 0.2*nsig
@@ -560,7 +546,6 @@ class LikelihoodComputer:
 if __name__ == "__main__":
     """
     f=open("bla.txt","w")
-    computer = UpperLimitComputer ( 1000, 1. / fb, .95 )
     import random
     for i in range(100):
         xbg=random.uniform ( 2, 19 )
@@ -574,13 +559,16 @@ if __name__ == "__main__":
         f.write ( "%.2f %.2f %.2f\n" % ( sig, eff, mv ) )
     f.close()
     """
-    # print ( computer.computeMV ( [4,4], [3.6,3.6], [[0.1**2,0.08**2],[0.08**2,0.1**2]], [1.,1.] ) )
-    # print ( LLHD ( [4,4], [3.6,3.6], [[0.1**2,0.08**2],[0.08**2,0.1**2]], [4,4], 100 ) )
+    computer = UpperLimitComputer ( 1000, 1. / fb, .95 )
+    print ( computer.computeMV ( [4,4], [3.6,3.6], [[0.1**2,0.08**2],[0.08**2,0.1**2]], [.1,.1] ) )
+    print ( computer.computeMV ( [4,4], [3.6,3.6], [[0.1**2,0.08**2],[0.08**2,0.1**2]], [.01,.01] ) )
     # print ( computer.computeMV ( [4,4,4], [3.6,3.6,3.6], [[0.1**2,0,0],[0.,0.1**2,0],[0.,0,0.1**2]], [0.02,.02,.02] ) )
 
     nsig_,nobs_,nb_,deltab_,deltas_=1,4,3.6,.1,None
+    # print ( "LLHD", LLHD ( [nobs_], [nb_], [[deltab_**2]], [ nsig_ ], 1000 ) )
+    # print ( "LLHD", LLHD ( [nobs_,nobs_], [nb_,nb_], [[deltab_**2,0.**2],[0.**2,deltab_**2]], [ nobs_, nobs_ ], 100 ) )
     computer = LikelihoodComputer ( nobs_, nb_, deltab_**2 )
-    #print ( "1d, computer:", computer.likelihood( nsig_, deltas_ )  )
+    print ( "1d, computer:", computer.likelihood( nsig_, deltas_ )  )
     #print ( "1d, chi2:",computer.chi2 ( nsig_ ) )
     computer = LikelihoodComputer ( [nobs_], [nb_], numpy.diag([deltab_**2]) )
     print ( "mv 1d, computer:",computer.likelihood( [nsig_], deltas_) )

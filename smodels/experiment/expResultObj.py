@@ -13,7 +13,7 @@ import numpy
 from smodels.experiment import infoObj
 from smodels.experiment import txnameObj
 from smodels.experiment import datasetObj
-from smodels.experiment.exceptions import DatabaseNotFoundException
+from smodels.experiment.exceptions import DatabaseNotFoundException, SModelSExperimentError
 from smodels.tools.physicsUnits import fb
 
 from smodels.tools.smodelsLogging import logger
@@ -137,25 +137,30 @@ class ExpResult(object):
         Prototype. Get combined upper limit. Effs are the
         signal efficiencies in the datasets. The order is defined
         in the dataset itself.
+        :param effs: the signal efficiencies for all datasets, 
+                the efficiencies must be sorted according to datasetOrder
         :param expected: return expected, not observed value
         :returns: upper limit on sigma (not sigma*eff)
         """
         if not hasattr ( self.globalInfo, "covariance" ):
             logger.error ( "no covariance matrix given in globalInfo.txt for %s" % self.globalInfo.id )
-            sys.exit()
+            raise SModelSExperimentError ( "no covariance matrix given in globalInfo.txt for %s" % self.globalInfo.id )
         if not hasattr ( self.globalInfo, "datasetOrder" ):
             logger.error ( "datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id )
-            sys.exit()
+            raise SModelSExperimentError ( "datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id )
         cov = self.globalInfo.covariance
         if type ( cov ) != list:
             logger.error ( "covariance field has wrong type." )
             sys.exit()
-        if len ( cov ) < 2:
+        if len ( cov ) < 1:
             logger.error ( "covariance matrix has length %d." % len(cov) )
             sys.exit()
         from smodels.tools.statistics import UpperLimitComputer
         computer = UpperLimitComputer ( 2000, self.globalInfo.lumi )
         datasetOrder = self.globalInfo.datasetOrder
+        if type ( datasetOrder ) == str:
+            datasetOrder = tuple ( [ datasetOrder ] ) ## for debugging, allow one dataset
+        print ( "datasetOrder=", datasetOrder )
         if len ( datasetOrder ) != len ( self.datasets ):
             logger.error ( "Number of elements in datasetOrder(%d) not equals number of datasets(%d) in %s." % ( len(datasetOrder), len(self.datasets), self.globalInfo.id ) )
             sys.exit()
@@ -214,7 +219,7 @@ class ExpResult(object):
                     useDataset = dataset
                     break
             if useDataset is False:
-                logger.error("The data set ID not found.")
+                logger.error("Data set ID ``%s'' not found." % dataID )
                 return False
                 
             if compute:
