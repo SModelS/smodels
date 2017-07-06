@@ -61,6 +61,7 @@ class UpperLimitComputer:
         :param eff: dataset effective signal efficiencies
         :returns: upper limit on *production* xsec (efficiencies unfolded)
         """
+        print ( "getUpperLimit on Sigma: nev=", nev, "xbg=",xbg,"cov=",cov,"eff=",eff )
         #if type(sig[0] ) == type(fb):
         #    sig = [ float(x.asUnit(fb) * self.lumi) for x in sig ]
         effs = numpy.array ( eff )
@@ -323,6 +324,9 @@ class LikelihoodComputer:
             return xmax
 
     def _mvLikelihood( self, nsig, deltas ):
+            # compute the likelihood of observing nsig signal events
+
+
             #     Why not a simple poisson function for the factorial
             #     -----------------------------------------------------
             #     The scipy.stats.poisson.pmf probability mass function
@@ -372,29 +376,22 @@ class LikelihoodComputer:
             #a = numpy.array ( [1.]*len(nobs) ) # FIXME wrong
             #b = numpy.array ( [2.]*len(nobs) ) # FIXME wrong
             self.nsig, self.deltas = nsig, deltas ## store for integration
-            like = integrate.nquad( self.probMV, zip(low,up) )[0] ## fixme so wrong
-            #                              epsabs=0.,epsrel=1e-3)[0]
-            #print ( "like=", like )
+            like = integrate.nquad( self.probMV, zip(low,up),\
+                                       opts={"epsabs":0., "epsrel":1e-3})[0]
 
             norm = (1./2.)*(1. + special.erf((self.nb+nsig)/sqrt(2.*dsigma2)))#[0][0]
-            #norm=1.
-            #print ( "norm=", norm )
-            #Increase integration range until integral converges
             err = 1.
             while err > 0.01: # wrong
                 like_old = like
                 nrange = nrange*2
+                # print ( "disgma2=",dsigma2, "nrange=",nrange,"like=",like_old )
                 low = xmax-nrange*sqrt(dsigma2)
                 low[low<0.] = 0. ## set all negatives to zero!
                 up = xmax+nrange*sqrt(dsigma2)
-                #print ( "integrating from",low,"to",up )
-                #a = numpy.array ( [0.]*len(nobs) ) ## FIXME wrong
-                #b = numpy.array ( [4.]*len(nobs) ) ## FIXME wrong
-                like = integrate.nquad(self.probMV,zip(low,up))[0]
- #                                      epsabs=0.,epsrel=1e-3)[0] FIXME so wrong
-                if like == 0.:
-                    err = 1.
-                    continue
+                like = integrate.nquad(self.probMV,zip(low,up),\
+                                       opts={"epsabs":0., "epsrel":1e-3})[0]
+                if like == 0.: ## too large!
+                    return 0.
                 err = abs(like_old-like)/like
                 #print ( "like_old,like,err=",like_old/norm,like/norm,err )
 
@@ -414,7 +411,7 @@ class LikelihoodComputer:
         """ compute likelihood for nsig, marginalized the nuisances """
         nsig = self.convert ( nsig )
         if type(deltas) == type(None):
-            deltas = 0.2*nsig
+            deltas = 1e-5*nsig
         if type( nsig ) in [ int, float, numpy.float64 ]:
             return self._likelihood1d( nsig, deltas )
         return self._mvLikelihood( nsig, deltas )
@@ -508,6 +505,15 @@ class LikelihoodComputer:
             return chi2
 
 if __name__ == "__main__":
+    computer = UpperLimitComputer ( 50000, 20.5 / fb, .95 )
+    nsig_,nobs_,nb_,deltab_,eff_=1,15,17.5,3.2,0.00454755
+    #nsig_,nobs_,nb_,deltab_,eff_=1,15,17.5,1.0,1.
+    ul = computer.ulSigmaTimesEpsilon ( nobs_, nb_, deltab_ )
+    print ( "    ulSigmaTimesEpsilon=",ul)
+    print ( "                 ul/eff=",ul/eff_)
+    uls = computer.ulSigma ( [nobs_], [nb_], [[deltab_**2]], [eff_] )
+    print ( "                ulSigma=",uls)
+    sys.exit()
     computer = UpperLimitComputer ( 1000, 1. / fb, .95 )
     nsig_,nobs_,nb_,deltab_,deltas_,covb_=1,4,3.6,.1,None,.08**2
     print ( computer.ulSigma ( [nobs_,nobs_], [nb_,nb_], [[deltab_**2,covb_],[covb_,deltab_**2]], [.1,.1] ) )
