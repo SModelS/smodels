@@ -178,7 +178,7 @@ class ExpResult(object):
         no = nobs
         if expected:
             no = nb
-        ret = computer.computeMV ( no, nb, cov, effs )
+        ret = computer.ulSigma ( no, nb, cov, effs )
         return ret
 
     def getUpperLimitFor(self, dataID=None, alpha=0.05, expected=False,

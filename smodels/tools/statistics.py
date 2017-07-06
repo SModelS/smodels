@@ -25,7 +25,7 @@ def upperLimit ( Nobs, Nexp, sigmaexp, lumi, alpha=.05, toys=200000 ):
     #ret = _upperLimitMadAnalysis ( Nobs, Nexp, sigmaexp, 1.-alpha, toys ) / lumi
     #print "ret=",ret
     computer = UpperLimitComputer ( toys, lumi, 1.-alpha )
-    ret = computer.compute ( Nobs, Nexp, sigmaexp, 5. )
+    ret = computer.ulSigmaTimesEpsilon ( Nobs, Nexp, sigmaexp, 5. )
     #print "ret=",ret
     return ret
 
@@ -41,31 +41,25 @@ class UpperLimitComputer:
         self.lumi = lumi
         self.cl = cl
 
-    def fEff( self, mu ):
-        # print ( "try sig=",sig )
-        sig = self.sig * mu
-        cls = self.CLs ( sig ) - self.cl
-        return cls
+    def root_func ( self, sig ):
+        """ The function whose root is to be found (CLs - 0.95 ) """
+        return self.CLs ( sig ) - self.cl
 
-    def f( self, sig ):
-        # self.currentNToys=int ( self.currentNToys * 1.10 )
-        cls = self.CLs ( sig ) - self.cl
-        # print "[ULC] running",sig," with",self.currentNToys,"cls=",cls
-        return cls
-
-    def fMV( self, mu ):
+    """
+    def root_funcMV( self, mu ):
         # print ( "MV try sig=",sig )
         sig = [ mu*x for x in self.sig ]
         cls = self.CLsMV ( sig ) - self.cl
         return cls
+    """
 
-    def computeMV ( self, nev, xbg, cov, eff ):
+    def ulSigma ( self, nev, xbg, cov, eff ):
         """ upper limit obtained from combined efficiencies
         :param nev: number of observed events per dataset
         :param xbg: expected bg per dataset
         :param cov: uncertainty in background, as a covariance matrix
         :param eff: dataset effective signal efficiencies
-        :returns: upper limit on production xsec
+        :returns: upper limit on *production* xsec (efficiencies unfolded)
         """
         #if type(sig[0] ) == type(fb):
         #    sig = [ float(x.asUnit(fb) * self.lumi) for x in sig ]
@@ -111,37 +105,6 @@ class UpperLimitComputer:
                 # print ( "ret=",ret )
                 # return (k + dx * ( 1 - f )) / self.lumi
                 return ret / self.lumi
-
-    def computeEff ( self, nev, xbg, sbg, sig, upto=5.0, return_nan=False ):
-        """ upper limit obtained via mad analysis 5 code, given on signal strength mu
-        :param nev: number of observed events
-        :param xbg: expected bg
-        :param sbg: uncertainty in background
-        :param sig: expected number of signals
-        :param upto: defines the interval to be probed
-        """
-        self.nev = nev
-        self.xbg = xbg
-        self.sbg = sbg
-        self.sig = sig
-        self.currentNToys = self.origNToys
-
-        try:
-            ## up = upto ## 5. ##  upto * max(nev,xbg,sbg)
-            dn = max( 0, nev - xbg )
-            #print ( "Eff: dn=", dn )
-            up = upto * max( dn + math.sqrt(nev), dn + math.sqrt(xbg),sbg) / sig
-            #print ( "Eff up=",up )
-            #print "checking between 0 and ",up ## ,self.f(0),self.f(up)
-            return optimize.brentq ( self.fEff, 0, up, rtol=1e-3 ) / self.lumi
-        except (ValueError,RuntimeError) as e:
-            #print "exception: >>",type(e),e
-            if not return_nan:
-                # print "compute again, upto=",upto
-                # self.origNToys = 5* self.origNToys
-                return self.computeEff ( nev, xbg, sbg, eff, 5.0*upto, upto>200. )
-            else:
-                return float("nan")
 
     def CLs( self, SigHypothesis ):
         """ this method has been taken from MadAnalysis5, see
@@ -202,12 +165,14 @@ class UpperLimitComputer:
             return 1.-(p_SplusB / p_b) # 1 - CLs
 
 
-    def compute ( self, nev, xbg, sbg, upto=5.0, return_nan=False ):
+    def ulSigmaTimesEpsilon ( self, nev, xbg, sbg, upto=5.0, return_nan=False ):
         """ upper limit obtained via mad analysis 5 code, given for sigma
         :param nev: number of observed events
         :param xbg: expected bg
         :param sbg: uncertainty in background
         :param upto: defines the interval to be probed
+        :returns: upper limit on xsec * epsilon (i.e. efficiencies *not*
+                  unfolded)
         """
         self.nev = nev
         self.xbg = xbg
@@ -218,14 +183,13 @@ class UpperLimitComputer:
             ## up = upto ## 5. ##  upto * max(nev,xbg,sbg)
             dn = max( 0, nev - xbg )
             up = upto * max( dn + math.sqrt(nev), dn + math.sqrt(xbg),sbg)
-            #print "checking between 0 and ",up ## ,self.f(0),self.f(up)
-            return optimize.brentq ( self.f, 0, up, rtol=1e-3 ) / self.lumi
+            return optimize.brentq ( self.root_func, 0, up, rtol=1e-3 ) / self.lumi
         except (ValueError,RuntimeError) as e:
             #print "exception: >>",type(e),e
             if not return_nan:
                 # print "compute again, upto=",upto
                 # self.origNToys = 5* self.origNToys
-                return self.compute ( nev, xbg, sbg, 5.0*upto, upto>200. )
+                return self.ulSigmaTimesEpsilon ( nev, xbg, sbg, 5.0*upto, upto>200. )
             else:
                 return float("nan")
                 
@@ -544,27 +508,12 @@ class LikelihoodComputer:
             return chi2
 
 if __name__ == "__main__":
-    """
-    f=open("bla.txt","w")
-    import random
-    for i in range(100):
-        xbg=random.uniform ( 2, 19 )
-        nev = int ( abs ( random.gauss ( xbg, math.sqrt(xbg) ) ) )
-        sbg = abs ( random.gauss ( xbg / 10., xbg / 20.)  )
-        # nev,xbg,sbg=4,3.6,.1
-        sig = computer.compute ( nev, xbg, sbg ).asNumber(fb)
-        eff = computer.computeEff ( nev, xbg, sbg, sig=1. ).asNumber(fb)
-        mv = computer.computeMV ( [nev], [xbg], [[sbg**2]], [1.] ).asNumber(fb)
-        print ( sig, eff, mv )
-        f.write ( "%.2f %.2f %.2f\n" % ( sig, eff, mv ) )
-    f.close()
-    """
     computer = UpperLimitComputer ( 1000, 1. / fb, .95 )
-    print ( computer.computeMV ( [4,4], [3.6,3.6], [[0.1**2,0.08**2],[0.08**2,0.1**2]], [.1,.1] ) )
-    print ( computer.computeMV ( [4,4], [3.6,3.6], [[0.1**2,0.08**2],[0.08**2,0.1**2]], [.01,.01] ) )
-    # print ( computer.computeMV ( [4,4,4], [3.6,3.6,3.6], [[0.1**2,0,0],[0.,0.1**2,0],[0.,0,0.1**2]], [0.02,.02,.02] ) )
+    nsig_,nobs_,nb_,deltab_,deltas_,covb_=1,4,3.6,.1,None,.08**2
+    print ( computer.ulSigma ( [nobs_,nobs_], [nb_,nb_], [[deltab_**2,covb_],[covb_,deltab_**2]], [.1,.1] ) )
+    print ( computer.ulSigma ( [nobs_,nobs_], [nb_,nb_], [[deltab_**2,covb_],[covb_,deltab_**2]], [.01,.01] ) )
+    # print ( computer.ulSigma ( [4,4,4], [3.6,3.6,3.6], [[0.1**2,0,0],[0.,0.1**2,0],[0.,0,0.1**2]], [0.02,.02,.02] ) )
 
-    nsig_,nobs_,nb_,deltab_,deltas_=1,4,3.6,.1,None
     # print ( "LLHD", LLHD ( [nobs_], [nb_], [[deltab_**2]], [ nsig_ ], 1000 ) )
     # print ( "LLHD", LLHD ( [nobs_,nobs_], [nb_,nb_], [[deltab_**2,0.**2],[0.**2,deltab_**2]], [ nobs_, nobs_ ], 100 ) )
     computer = LikelihoodComputer ( nobs_, nb_, deltab_**2 )
@@ -597,4 +546,4 @@ if __name__ == "__main__":
                   [ -381.1, 38.3, 111.2, 92.5, 61.0, 36.4, 20.6, 11.2 ],
     ]
     # print ( LLHD ( dummy_nobs, dummy_nbg, dummy_cov,dummy_si, 100 ) )
-    # print ( computer.computeMV ( dummy_nobs, dummy_nbg, dummy_cov,dummy_si ) )
+    # print ( computer.ulSigma ( dummy_nobs, dummy_nbg, dummy_cov,dummy_si ) )
