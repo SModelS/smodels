@@ -6,7 +6,9 @@ from smodels.tools.physicsUnits import fb
 import math
 import random
 
+
 def run():
+    f=open("bru.txt","w")
     computer = UpperLimitComputer ( 50000, 20.5 / fb, .95 )
     for i in range(100):
         nsig_,nobs_,nb_,deltab_,eff_=1,15,17.5,3.2,0.00454755
@@ -15,5 +17,7 @@ def run():
         ul = computer.ulSigmaTimesEpsilon ( nobs_, nb_, deltab_ )
         uls = computer.ulSigma ( [nobs_], [nb_], [[deltab_**2]], [eff_] )
         print ( ul/eff_, uls )
+        f.write ( "%f %f %f %f\n" % ( nb_, nobs_, ul.asNumber(fb)/eff_, uls.asNumber(fb) ) )
+    f.close()
 
 run()
