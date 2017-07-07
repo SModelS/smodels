@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from __future__ import print_function
 import sys, os, time
 sys.path.insert(0,"../")
 from smodels.experiment.databaseObj import Database
@@ -59,25 +60,25 @@ for e in results[:1]:
         mass = theoryPrediction.mass
         txnames = [str(txname) for txname in theoryPrediction.txnames]
         PIDs =  theoryPrediction.PIDs         
-        print "------------------------"
-        print "Dataset = ",datasetID   #Analysis name
-        print "TxNames = ",txnames   
-        print "Prediction Mass = ",mass    #Value for average cluster mass (average mass of the elements in cluster)
-        print "Prediction PIDs = ",PIDs    #Value for average cluster mass (average mass of the elements in cluster)
-        print "Theory Prediction = ",theoryPrediction.xsection   #Signal cross section
-        print "Condition Violation = ",theoryPrediction.conditions  #Condition violation values
+        print ( "------------------------" )
+        print ( "Dataset = ",datasetID )  #Analysis name
+        print ( "TxNames = ",txnames )  
+        print ( "Prediction Mass = ",mass )   #Value for average cluster mass (average mass of the elements in cluster)
+        print ( "Prediction PIDs = ",PIDs )   #Value for average cluster mass (average mass of the elements in cluster)
+        print ( "Theory Prediction = ",theoryPrediction.xsection )  #Signal cross section
+        print ( "Effective efficiency= ",theoryPrediction.effectiveEff ) # effective efficiency
+        print ( "Condition Violation = ",theoryPrediction.conditions ) #Condition violation values
           
-        # Get the corresponding upper limit:
-        ul = theoryPrediction.expResult.getUpperLimitFor(txname=txnames[0],mass=mass,dataID=datasetID)                     
-        print "UL for theory prediction = ",ul
+        ul = theoryPrediction.getUpperLimitFor(txname=txnames[0],mass=mass,dataID=datasetID)                     
+        print ( "UL for theory prediction = ",ul )
 
         # Compute the r-value
         r = theoryPrediction.xsection.value/ul
-        print "r = ",r
+        print ( "r = ",r )
         #Compute likelihhod and chi^2 for EM-type results:
         if dataset.dataInfo.dataType == 'efficiencyMap':
             theoryPrediction.computeStatistics()
-            print 'Chi2, likelihood=', theoryPrediction.chi2, theoryPrediction.likelihood
+            print ( 'Chi2, likelihood=', theoryPrediction.chi2, theoryPrediction.likelihood )
         if r > 1.0:
             rmax = r
             bestResult = theoryPrediction.expResult.globalInfo.id

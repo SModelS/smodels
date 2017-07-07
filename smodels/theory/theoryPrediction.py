@@ -10,7 +10,7 @@
 from smodels.theory import clusterTools, crossSection, element
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.auxiliaryFunctions import cSim, cGtr  #DO NOT REMOVE
-import sys
+import sys, copy
 from smodels.tools.physicsUnits import TeV,fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
@@ -41,6 +41,12 @@ class TheoryPrediction(object):
         self.effectiveEff = None
         self.conditions = None
         self.mass = None
+
+    def getUpperLimitFor ( self, **args ):
+        """ convenience function. treat combinations separately. """
+        if "dataID" in args.keys() and args["dataID"]=="all":
+            return self.combinedUL ## * self.effectiveEff
+        return self.expResult.getUpperLimitFor ( **args )
 
     def computeStatistics(self):
         """
@@ -200,7 +206,7 @@ def theoryPredictionsFor( expResult, smsTopList, maxMassDist=0.2,
 def _mergePredictions ( preds, combinedUL, combinedEUL ):
     """ merge theory predictions, for the combined prediction. """
     if len(preds) == 0: return None
-    ret=preds[0] ## FIXME very wrong.
+    ret=copy.deepcopy( preds[0] ) ## FIXME very wrong.
     print ( "combinedUL=",combinedUL )
     ret.xsection.value = ret.xsection.value / preds[0].effectiveEff
     ret.combinedUL = combinedUL
