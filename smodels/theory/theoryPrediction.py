@@ -2,9 +2,9 @@
 .. module:: theoryPrediction
    :synopsis: Provides a class to encapsulate the results of the computation of
               reference cross sections and related functions.
-        
+
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
-.. autofunction:: _getElementsFrom    
+.. autofunction:: _getElementsFrom
 """
 
 from smodels.theory import clusterTools, crossSection, element
@@ -20,53 +20,57 @@ class TheoryPrediction(object):
     """
     An instance of this class represents the results of the theory prediction
     for an analysis.
-    
+
     :ivar analysis: holds the analysis (ULanalysis or EManalysis object)
                     to which the prediction refers
-    :ivar xsection: xsection of the theory prediction 
+    :ivar xsection: xsection of the theory prediction
                 (relevant cross section to be compared with the experimental limits).
+                For EM-type analyses, it corresponds to sigma*eff, for
+                UL-type analyses, eff is considered to be 1.
                 It is a XSection object.
+    :ivar effectiveEff: the effective efficiency for EM-type analyses.
     :ivar conditions: list of values for the analysis conditions
                       (only for upper limit-type analysis, e.g. analysis=ULanalysis)
     :ivar mass: mass of the cluster to which the theory prediction refers
-                (only for upper limit-type analysis, e.g. analysis=ULanalysis)   
-                 
+                (only for upper limit-type analysis, e.g. analysis=ULanalysis)
+
     """
     def __init__(self):
         self.analysis = None
         self.xsection = None
+        self.effectiveEff = None
         self.conditions = None
-        self.mass = None        
+        self.mass = None
 
     def computeStatistics(self):
         """
         Compute the likelihood, chi-square and expected upper limit for this theory prediction.
-        The resulting values are stored as the likelihood, chi2 and expectedUL attributes.        
+        The resulting values are stored as the likelihood, chi2 and expectedUL attributes.
         """
         if not hasattr(self, "dataset") or self.dataset.dataInfo.dataType == 'upperLimit':
             self.likelihood = None
             self.chi2 = None
             self.expectedUL = None
             return
-        
-        lumi = self.dataset.globalInfo.lumi  
+
+        lumi = self.dataset.globalInfo.lumi
         nsig = (self.xsection.value*lumi).asNumber()
         llhd = self.dataset.likelihood(nsig)
         chi2 = self.dataset.chi2(nsig)
         expectedUL = self.dataset.getSRUpperLimit(alpha = 0.05, expected = True)
-        
+
         self.likelihood =  llhd
         self.chi2 =  chi2
         self.expectedUL = expectedUL
-        
+
     def getmaxCondition(self):
         """
         Returns the maximum xsection from the list conditions
-        
-        :returns: maximum condition xsection (float)        
+
+        :returns: maximum condition xsection (float)
         """
 
-        if not self.conditions: return 0.        
+        if not self.conditions: return 0.
         # maxcond = 0.
         values = [ 0. ]
         for value in self.conditions.values():
@@ -77,12 +81,12 @@ class TheoryPrediction(object):
             values.append ( float(value) )
         return max(values)
         # return maxcond
-    
+
     def __str__(self):
         ret = "%s:%s" % ( self.analysis, self.xsection )
-        self.computeStatistics()
-        ret += ", effEff=%f" % self.effectiveEff
-        ret += ", llhd=%f." % self.likelihood
+        #self.computeStatistics()
+        #ret += ", effEff=%f" % self.effectiveEff
+        #ret += ", llhd=%f." % self.likelihood
         return ret
 
 
@@ -91,16 +95,16 @@ class TheoryPredictionList(object):
     """
     An instance of this class represents a collection of theory prediction
     objects.
-    
-    :ivar _theoryPredictions: list of TheoryPrediction objects     
+
+    :ivar _theoryPredictions: list of TheoryPrediction objects
     """
-    
+
     def __init__(self, theoryPredictions=None):
         """
         Initializes the list.
-        
+
         :parameter theoryPredictions: list of TheoryPrediction objects
-        """        
+        """
         self._theoryPredictions = []
         if theoryPredictions and isinstance(theoryPredictions,list):
             self._theoryPredictions = theoryPredictions
@@ -115,7 +119,7 @@ class TheoryPredictionList(object):
         ret += ", ".join ( [ str(s) for s in self._theoryPredictions ] )
         return ret
 
-    def __iter__(self):      
+    def __iter__(self):
         for theoryPrediction in self._theoryPredictions:
             yield theoryPrediction
 
@@ -124,7 +128,7 @@ class TheoryPredictionList(object):
 
     def __len__(self):
         return len(self._theoryPredictions)
-    
+
     def __add__(self,theoPredList):
         if isinstance(theoPredList,TheoryPredictionList):
             res = TheoryPredictionList()
@@ -132,62 +136,116 @@ class TheoryPredictionList(object):
             return res
         else:
             return None
-        
+
     def __radd__(self, theoPredList):
         if theoPredList == 0:
             return self
         else:
-            return self.__add__(theoPredList)        
+            return self.__add__(theoPredList)
 
-def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2, useBestDataset=True):
+def theoryPredictionsFor( expResult, smsTopList, maxMassDist=0.2,
+                          useBestDataset=True, combinedResults=True ):
     """
-    Compute theory predictions for the given experimental result, using the list of elements
-    in smsTopList.
-    For each Txname appearing in expResult, it collects the elements and efficiencies, 
-    combine the masses (if needed) and compute the conditions (if existing).
-    
+    Compute theory predictions for the given experimental result, using the list of
+    elements in smsTopList.
+    For each Txname appearing in expResult, it collects the elements and
+    efficiencies, combine the masses (if needed) and compute the conditions
+    (if exist).
+
     :parameter expResult: expResult to be considered (ExpResult object)
-    :parameter smsTopList: list of topologies containing elements (TopologyList object)
+    :parameter smsTopList: list of topologies containing elements
+                           (TopologyList object)
     :parameter maxMassDist: maximum mass distance for clustering elements (float)
     :parameter useBestDataset: If True, uses only the best dataset (signal region).
                If False, returns predictions for all datasets.
-    :returns:  a TheoryPredictionList object containing a list of TheoryPrediction objects    
+    :parameter combinedResults: add theory predictions that result from
+               combining datasets.
+    :returns:  a TheoryPredictionList object containing a list of TheoryPrediction
+               objects
     """
 
-    dataSetResults = []
+    combResults = []
+    preds = _sortPredictions ( expResult, smsTopList, maxMassDist, combinedResults )
+    for xsecinfo,preds in preds.items():
+        effs = [ pred.effectiveEff for pred in preds ]
+        cul = expResult.getCombinedUpperLimitFor ( effs )
+        eul = None # expResult.getCombinedUpperLimitFor ( effs, expected=True )
+        combResults.append ( _mergePredictions ( preds, cul, eul ) )
 
+    dataSetResults = []
     #Compute predictions for each data set (for UL analyses there is one single set)
     for dataset in expResult.datasets:
         predList = _getDataSetPredictions(dataset,smsTopList,maxMassDist)
         if predList: dataSetResults.append(predList)
     if not dataSetResults: return None
-    
-    #For results with more than one dataset, select the best data set 
+
+    #For results with more than one dataset, select the best data set
     #according to the expect upper limit
     if useBestDataset:
         bestResults = _getBestResults(dataSetResults)
         bestResults.expResult = expResult
+        for i in combResults:
+            bestResults.append ( i )
         for theoPred in bestResults:
-            theoPred.expResult = expResult    
+            theoPred.expResult = expResult
         return bestResults
-    else:        
+    else:
         allResults = sum(dataSetResults)
-        for theoPred in allResults: theoPred.expResult = expResult
+        for i in combResults:
+            allResults.append ( i )
+        for theoPred in allResults:
+            theoPred.expResult = expResult
         return allResults
+
+def _mergePredictions ( preds, combinedUL, combinedEUL ):
+    """ merge theory predictions, for the combined prediction. """
+    if len(preds) == 0: return None
+    ret=preds[0] ## FIXME very wrong.
+    print ( "combinedUL=",combinedUL )
+    ret.xsection.value = ret.xsection.value / preds[0].effectiveEff
+    ret.combinedUL = combinedUL
+    ret.combinedExpectedUL = combinedEUL
+    # ret.dataset = FIXME special
+    ret.dataset.dataInfo.dataId = "all"
+    return ret
+
+def _sortPredictions ( expResult, smsTopList, maxMassDist, combine ):
+    """ returns list of predictions, sorted by XSectionInfo """
+    preds={}
+    if not hasattr ( expResult.globalInfo, "covariance" ) or \
+       not hasattr ( expResult.globalInfo, "datasetOrder" ) or \
+       not combine:
+        return preds
+    dsOrder = expResult.globalInfo.datasetOrder
+    print ( "alrighty! combining results!", dsOrder )
+    if type ( dsOrder ) == str:
+        ## for debugging only, we allow a single dataset
+        dsOrder = [ dsOrder ]
+    for dsname in dsOrder:
+        dataset=expResult.getDataset ( dsname )
+        # print ( "dsname=",dsname )
+        predList = _getDataSetPredictions(dataset,smsTopList,maxMassDist)
+        if predList:
+            for pred in predList:
+                info = pred.xsection.info
+                if not info in preds.keys():
+                    preds[info]=[]
+                preds[info].append ( pred )
+    return preds
 
 def _getBestResults(dataSetResults):
     """
     Returns the best result according to the expected upper limit
-    
+
     :param dataSetResults: list of TheoryPredictionList objects
     :return: best result (TheoryPredictionList object)
     """
-        
+
     #In the case of UL analyses or efficiency-maps with a single signal region
-    #return the single result:        
+    #return the single result:
     if len(dataSetResults) == 1:
         return dataSetResults[0]
-    
+
     #For efficiency-map analyses with multipler signal regions,
     #select the best one according to the expected upper limit:
     bestExpectedR = 0.
@@ -199,42 +257,42 @@ def _getBestResults(dataSetResults):
         dataset = predList[0].dataset
         if dataset.dataInfo.dataType != 'efficiencyMap':
             logger.error("Multiple data sets should only exist for efficiency map results!")
-            raise SModelSError()                    
+            raise SModelSError()
         pred = predList[0]
-        xsec = pred.xsection        
+        xsec = pred.xsection
         expectedR = ( xsec.value/dataset.getSRUpperLimit(0.05,True,False) ).asNumber()
         if expectedR > bestExpectedR or (expectedR == bestExpectedR and xsec.value > bestXsec):
             bestExpectedR = expectedR
             bestPredList = predList
             bestXsec = xsec.value
-    
+
     return bestPredList
 
-def _getDataSetPredictions(dataset,smsTopList,maxMassDist):   
+def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
     """
     Compute theory predictions for a given data set.
     For upper-limit results returns the list of theory predictions for the experimental result.
     For efficiency-map results returns the list of theory predictions for the signal region.
     Uses the list of elements in smsTopList.
-    For each Txname appearing in dataset, it collects the elements and efficiencies, 
+    For each Txname appearing in dataset, it collects the elements and efficiencies,
     combine the masses (if needed) and compute the conditions (if existing).
-    
+
     :parameter dataset: Data Set to be considered (DataSet object)
     :parameter smsTopList: list of topologies containing elements (TopologyList object)
     :parameter maxMassDist: maximum mass distance for clustering elements (float)
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction objects
     """
-    
+
     predictionList = TheoryPredictionList()
     # Select elements belonging to expResult and apply efficiencies
     elements = _getElementsFrom(smsTopList, dataset)
-    
+
     #Check dataset sqrts format:
     if (dataset.globalInfo.sqrts/TeV).normalize()._unit:
             ID = dataset.globalInfo.id
             logger.error( "Sqrt(s) defined with wrong units for %s" % (ID) )
             return False
-            
+
     #Remove unwanted cross sections
     newelements = []
     for el in elements:
@@ -247,12 +305,12 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
     # Combine elements according to their respective constraints and masses
     # (For efficiencyMap analysis group all elements)
     clusters = _combineElements(elements, dataset, maxDist=maxMassDist)
-    
-    # Collect results and evaluate conditions    
+
+    # Collect results and evaluate conditions
     for cluster in clusters:
         theoryPrediction = TheoryPrediction()
         theoryPrediction.dataset = dataset
-        theoryPrediction.txnames = cluster.txnames  
+        theoryPrediction.txnames = cluster.txnames
         theoryPrediction.xsection = _evalConstraint(cluster)
         theoryPrediction.conditions = _evalConditions(cluster)
         theoryPrediction.cluster = cluster
@@ -261,29 +319,29 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
         theoryPrediction.PIDs = cluster.getPIDs()
         theoryPrediction.IDs = cluster.getIDs()
         predictionList._theoryPredictions.append(theoryPrediction)
-        
+
 
     if len(predictionList) == 0: return None
     else: return predictionList
 
 def _getElementsFrom(smsTopList, dataset):
     """
-    Get elements that belong to any of the TxNames in dataset 
-    (appear in any of constraints in the result).    
+    Get elements that belong to any of the TxNames in dataset
+    (appear in any of constraints in the result).
     Loop over all elements in smsTopList and returns a copy of the elements belonging
     to any of the constraints (i.e. have efficiency != 0). The copied elements
     have their weights multiplied by their respective efficiencies.
-    
+
     :parameter dataset:  Data Set to be considered (DataSet object)
     :parameter smsTopList: list of topologies containing elements (TopologyList object)
-    :returns: list of elements (Element objects)    
+    :returns: list of elements (Element objects)
     """
-    
+
     elements = []
     for txname in dataset.txnameList:
         for top in smsTopList:
             itop = txname._topologyList.index(top)  #Check if the topology appear in txname
-            if itop is None: continue   
+            if itop is None: continue
             for el in top.getElements():
                 newEl = txname.hasElementAs(el)  #Check if element appears in txname
                 if not newEl: continue
@@ -301,45 +359,45 @@ def _getElementsFrom(smsTopList, dataset):
 
 def _combineElements(elements, dataset, maxDist):
     """
-    Combine elements according to the data set type.    
+    Combine elements according to the data set type.
     If expResult == upper limit type, first group elements with different TxNames
     and then into mass clusters.
     If expResult == efficiency map type, group all elements into a single cluster.
-    
+
     :parameter elements: list of elements (Element objects)
     :parameter expResult: Data Set to be considered (DataSet object)
-    :returns: list of element clusters (ElementCluster objects)    
+    :returns: list of element clusters (ElementCluster objects)
     """
-    
-    clusters = []   
-    
-    if dataset.dataInfo.dataType == 'efficiencyMap':        
-        cluster = clusterTools.groupAll(elements)  
+
+    clusters = []
+
+    if dataset.dataInfo.dataType == 'efficiencyMap':
+        cluster = clusterTools.groupAll(elements)
         clusters.append(cluster)
     elif dataset.dataInfo.dataType == 'upperLimit':
-        txnames = list(set([el.txname for el in elements]))        
+        txnames = list(set([el.txname for el in elements]))
         for txname in txnames:
             txnameEls = []
             for element in elements:
                 if not element.txname == txname:
                     continue
                 else: txnameEls.append(element)
-            txnameClusters = clusterTools.clusterElements(txnameEls, maxDist)         
+            txnameClusters = clusterTools.clusterElements(txnameEls, maxDist)
             clusters += txnameClusters
     else:
-        logger.warning("Unkown data type: %s. Data will be ignored." 
+        logger.warning("Unkown data type: %s. Data will be ignored."
                        % dataset.dataInfo.dataType)
-                
+
     return clusters
 
 
 def _evalConstraint(cluster):
     """
-    Evaluate the constraint inside an element cluster.      
+    Evaluate the constraint inside an element cluster.
     If the cluster refers to a specific TxName, sum all the elements' weights
     according to the analysis constraint.
     For efficiency map results, sum all the elements' weights.
-    
+
     :parameter cluster: cluster of elements (ElementCluster object)
     :returns: cluster cross section
     """
@@ -358,20 +416,20 @@ def _evalConstraint(cluster):
     else:
         logger.error("Unknown data type %s" %(str(cluster.getDataType())))
         raise SModelSError()
-    
+
 
 def _evalConditions(cluster):
     """
     Evaluate the conditions (if any) inside an element cluster.
-    
-    :parameter cluster: cluster of elements (ElementCluster object)    
-    :returns: list of condition values (floats) if analysis type == upper limit. None, otherwise.    
+
+    :parameter cluster: cluster of elements (ElementCluster object)
+    :returns: list of condition values (floats) if analysis type == upper limit. None, otherwise.
     """
 
     conditionVals = {}
     for txname in cluster.txnames:
         if not txname.condition or txname.condition == "not yet assigned":
-            continue        
+            continue
         #Make sure conditions is always a list
         if isinstance(txname.condition,str):
             conditions =  [txname.condition]
@@ -380,7 +438,7 @@ def _evalConditions(cluster):
         else:
             logger.error("Conditions should be a list or a string")
             raise SModelSError()
-            
+
         # Loop over conditions
         for cond in conditions:
             exprvalue = _evalExpression(cond,cluster)
@@ -388,30 +446,30 @@ def _evalConditions(cluster):
                 conditionVals[cond] = exprvalue.value
             else:
                 conditions[cond] = exprvalue
-    
+
     if not conditionVals:
         return None
-    else:            
-        return conditionVals    
-        
-        
+    else:
+        return conditionVals
+
+
 def _evalExpression(stringExpr,cluster):
     """
     Auxiliary method to evaluate a string expression using the weights of the elements in the cluster.
-    Replaces the elements in stringExpr (in bracket notation) by their weights and evaluate the 
+    Replaces the elements in stringExpr (in bracket notation) by their weights and evaluate the
     expression.
     e.g. computes the total weight of string expressions such as "[[[e^+]],[[e^-]]]+[[[mu^+]],[[mu^-]]]"
     or ratios of weights of string expressions such as "[[[e^+]],[[e^-]]]/[[[mu^+]],[[mu^-]]]"
-    and so on...    
-    
+    and so on...
+
     :parameter stringExpr: string containing the expression to be evaluated
     :parameter cluster: cluster of elements (ElementCluster object)
     :returns: xsection for the expression. Can be a XSection object, a float or not numerical (None,string,...)
-    
+
     """
 
 #Get cross section info from cluster (to generate zero cross section values):
-    infoList = cluster.elements[0].weight.getInfo()    
+    infoList = cluster.elements[0].weight.getInfo()
 #Generate elements appearing in the string expression with zero cross sections:
     elements = []
     for elStr in elementsInStr(stringExpr):
@@ -421,8 +479,8 @@ def _evalExpression(stringExpr,cluster):
 
 #Replace elements in strings by their weights and add weights from cluster to the elements list:
     expr = stringExpr[:].replace("'","").replace(" ","")
-    for iel, el in enumerate(elements):        
-        expr = expr.replace(str(el), "elements["+ str(iel) +"].weight")        
+    for iel, el in enumerate(elements):
+        expr = expr.replace(str(el), "elements["+ str(iel) +"].weight")
         for el1 in cluster.elements:
             if el1.particlesMatch(el):
                 el.weight.combineWith(el1.weight)
@@ -438,14 +496,15 @@ def _evalExpression(stringExpr,cluster):
         return exprvalue[0] #Return XSection object
     return exprvalue
 
+"""
 def groupPredictions ( theoryPredictions ):
-    """ group all theory predictions that 
+    group all theory predictions that
         -) belong to the same expRes
         -) whose expRes has a covariance matrix
         -) whose dataType is efficiencyMap
 
         return all such groups as TheoryPredictionLists.
-    """
+    
     expReses = {}
     for theoryPred in theoryPredictions:
         expRes = theoryPred.expResult
@@ -459,3 +518,4 @@ def groupPredictions ( theoryPredictions ):
             expReses[Id]=TheoryPredictionList()
         expReses[Id].append( theoryPred )
     return list ( expReses.values() )
+"""

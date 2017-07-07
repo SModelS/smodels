@@ -51,8 +51,9 @@ class ElementCluster(object):
     def getEffectiveEfficiency ( self ):
         """ 
         get the 'effective' efficiency, that is the sum of all efficiencies
-        of all elements, weighted with the "weights" (=xsecs )
-        the cluster's total xsec, divided by this number gives the total
+        of all elements, weighted with the cross section of each element.
+
+        The cluster's total xsec, divided by this number gives the total
         "unfolded" cross section.
         """
         eff = 0.

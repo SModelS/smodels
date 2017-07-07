@@ -402,9 +402,10 @@ class TxTPrinter(BasicPrinter):
 
         return output
     
+    """
     def addCombinedLimits(self, theoryPredictions ):
-        """ collects combinable theoryPreds, then computes theory prediction for it
-        """
+        collects combinable theoryPreds, then computes theory prediction for it
+        
         theoryPredLists = groupPredictions ( theoryPredictions )
         ret = ""
         for theoryPreds in theoryPredLists:
@@ -442,6 +443,7 @@ class TxTPrinter(BasicPrinter):
             ret += "Expected r-Value: %s\n" % ( unfolded_v / expectedUpperLimit )
         ret += "\n"
         return ret
+    """
 
 
     def _formatResultList(self, obj):
@@ -459,10 +461,10 @@ class TxTPrinter(BasicPrinter):
         output += " || \t \t\t\t\t\t\t || \n"
         output += "   ======================================================= \n"
                 
-        try:
-            output += self.addCombinedLimits ( obj.theoryPredictions )
-        except Exception as e:
-            output += "bla %s" % str(e)
+        #try:
+        #    output += self.addCombinedLimits ( obj.theoryPredictions )
+        #except Exception as e:
+        #    output += "bla %s" % str(e)
         
         for theoryPrediction in obj.theoryPredictions:
             expRes = theoryPrediction.expResult

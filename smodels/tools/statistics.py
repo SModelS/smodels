@@ -61,23 +61,18 @@ class UpperLimitComputer:
         :param eff: dataset effective signal efficiencies
         :returns: upper limit on *production* xsec (efficiencies unfolded)
         """
-        print ( "getUpperLimit on Sigma: nev=", nev, "xbg=",xbg,"cov=",cov,"eff=",eff )
-        #if type(sig[0] ) == type(fb):
+        #if type(sig[0] ) == type(fb): ## make it work for sigmas also?
         #    sig = [ float(x.asUnit(fb) * self.lumi) for x in sig ]
         effs = numpy.array ( eff )
-        # sigs = numpy.array ( sig )
         llhds={}
         upto = 5 * max ( nev + xbg ) / min(eff)
-        dx = upto/20.
+        dx = upto / 5. ## FIXME
         start = dx/2.
         computer = LikelihoodComputer ( nev, xbg, cov )
         while True:
             for sig in numpy.arange ( start, upto, dx ):
                 csig = sig * effs
-                #lold = LLHD ( nev, xbg, cov, csig, 10*self.origNToys )
-                #print ( "l=",lold,"ntoys=",self.origNToys )
                 l = computer.likelihood ( csig )
-                # print ( "l2=",l )
                 llhds[float(sig)]=l
             norm = sum ( llhds.values() )
             last = llhds[sig]/norm
@@ -92,19 +87,25 @@ class UpperLimitComputer:
             logger.error ( "last=%f. need to extend to %f" % ( last, upto ) )
         for k,v in llhds.items():
             llhds[k]=v/norm
+        return self.interp ( llhds, dx )
+
+    def interp ( self, llhds, dx ):
+        """ interpolate likelihoods to have the best possible
+            estimate for the 95% CL
+        :param llhds: dictionary of (normalized) likelihoods
+        :param dx: step size in sigma_sig
+        :returns: 95% CL
+        """
         keys = llhds.keys()
         keys.sort()
         cdf = 0.
         for k in keys:
             v = llhds[k]
             cdf += v
-            # print ( "k=",k,"v=",v,"cdf=",cdf )
             if cdf > .95: # perform a simple linear interpolation over cdf
                 f = ( cdf - .95 ) / v
                 # ret = ( k - f * dx )
                 ret = ( k + dx * ( .5 - f ) )
-                # print ( "ret=",ret )
-                # return (k + dx * ( 1 - f )) / self.lumi
                 return ret / self.lumi
 
     def CLs( self, SigHypothesis ):
@@ -290,27 +291,17 @@ class LikelihoodComputer:
             for ctr,i in enumerate(xm):
                 if i == 0.:
                     xm[ctr]=1e-3
-            """
-            print ( "self.nobs=",self.nobs )
-            print ( "self.nb=",self.nb )
-            print ( "nsig=", self.nsig )
-            print ( "ntot=", ntot )
-            print ( "sigma2=", sigma2 )
-            """
             weight = ( numpy.matrix (sigma2 ) )**(-1) ## weight matrix
             q = self.nobs / numpy.diag ( weight ) ## q_i= nobs_i * w_ii^-1
             p = ntot - 1. / numpy.diag ( weight )
             xmax1 = p/2. * ( 1 + sqrt ( 1. + 4*q / p**2 ) ) ## no cov iteration
-            #print ( "xmax1 w/ cov,p(xmax)=", xmax1, self.probMV ( *xmax1 ) )
             ndims = len(p)
-            #print ( "ndims=", ndims )
             for i in range(ndims):
                 for j in range(ndims):
                     if i==j: 
                         continue ## treat covariance terms
                     p[i]+=(ntot[j]-xmax1[j])*weight[i,j] / weight[i,i]
             xmax = p/2. * ( 1 + sqrt ( 1. + 4*q / p**2 ) )
-            #print ( "xmax2 w/ cov,p(xmax2)=", xmax, self.probMV ( *xmax ) )
             return xmax
 
     def findMaxNoCov ( self ):
@@ -356,62 +347,44 @@ class LikelihoodComputer:
                     xm[ctr]=1e-3
             self.nsig, self.deltas = nsig, deltas ## store for integration
             xmax = self.findMaxNoCov ()
-            # xmax = xm*(1.+sign(xm)*sqrt(1. + 4.*self.nobs*dsigma2/xm**2))/2.
-            #print ( "xmax=", xmax )
-            #print ( "xmax2=", self.findMax ( ) )
-            #print ( "xmax,p(xmax)=", xmax, self.probMV ( xmax ) )
-
             #Define initial integration range:
             nrange = 5.
-            #print ( "xmax=",xmax)
-            #import IPython
-            #IPython.embed()
             low = xmax-nrange*sqrt(dsigma2)
             low[low<0.] = 0. ## set all negatives to zero!
-            #print ( "low=",low )
-            # a = max(0.,xmax-nrange*sqrt(sigma2))
             up = xmax+nrange*sqrt(dsigma2)
-            #print ( "up=",up )
-            #print ( "low,up,mv",low[0],up[0],self.probMV(xmax) )
-            #a = numpy.array ( [1.]*len(nobs) ) # FIXME wrong
-            #b = numpy.array ( [2.]*len(nobs) ) # FIXME wrong
             self.nsig, self.deltas = nsig, deltas ## store for integration
-            like = integrate.nquad( self.probMV, zip(low,up),\
-                                       opts={"epsabs":0., "epsrel":1e-3})[0]
-
+            ## first integral can be course, we will anyhow do another round
+            opts = { "epsabs":1e-2, "epsrel":1e-1 }
+            like = integrate.nquad( self.probMV, zip(low,up),opts=opts )[0]
             norm = (1./2.)*(1. + special.erf((self.nb+nsig)/sqrt(2.*dsigma2)))#[0][0]
             err = 1.
             while err > 0.01: # wrong
+                opts = { "epsabs":1e-4, "epsrel":1e-2 }
                 like_old = like
                 nrange = nrange*2
-                # print ( "disgma2=",dsigma2, "nrange=",nrange,"like=",like_old )
                 low = xmax-nrange*sqrt(dsigma2)
                 low[low<0.] = 0. ## set all negatives to zero!
                 up = xmax+nrange*sqrt(dsigma2)
-                like = integrate.nquad(self.probMV,zip(low,up),\
-                                       opts={"epsabs":0., "epsrel":1e-3})[0]
+                res = integrate.nquad(self.probMV,zip(low,up),opts=opts)
+                like = res[0]
                 if like == 0.: ## too large!
                     return 0.
                 err = abs(like_old-like)/like
-                #print ( "like_old,like,err=",like_old/norm,like/norm,err )
+                ## print ( "res=",res[1]/res[0],"err=",err,"nrange=",nrange )
 
-            #print ( "mvLikelihood, like=", like )
             #Renormalize the likelihood to account for the cut at x = 0.
             #The integral of the gaussian from 0 to infinity gives:
             #(1/2)*(1 + Erf(mu/sqrt(2*sigma2))), so we need to divide by it
             #(for mu - sigma >> 0, the normalization gives 1.)
             norm = (1./2.)*(1. + special.erf((self.nb+nsig)/sqrt(2.*dsigma2)))#[0][0]
-            # norm = 1.
-            #print ( "like=",like)
             like = like/ reduce(lambda x, y: x*y, norm ) 
-            #print ( "like=",like)
             return like
 
     def likelihood ( self, nsig, deltas = None ):
         """ compute likelihood for nsig, marginalized the nuisances """
         nsig = self.convert ( nsig )
         if type(deltas) == type(None):
-            deltas = 1e-5*nsig
+            deltas = 1e-5*nsig ## FIXME for backwards compatibility
         if type( nsig ) in [ int, float, numpy.float64 ]:
             return self._likelihood1d( nsig, deltas )
         return self._mvLikelihood( nsig, deltas )
@@ -457,6 +430,8 @@ class LikelihoodComputer:
                 a = max(0.,xmax-nrange*sqrt(sigma2))
                 b = xmax+nrange*sqrt(sigma2)
                 like = integrate.quad(self.prob,a,b, epsabs=0.,epsrel=1e-3)[0]
+                if like == 0.:
+                    return like
                 err = abs(like_old-like)/like
 
             #Renormalize the likelihood to account for the cut at x = 0.
