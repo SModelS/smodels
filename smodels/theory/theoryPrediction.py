@@ -207,10 +207,17 @@ def _mergePredictions ( preds, combinedUL, combinedEUL ):
     """ merge theory predictions, for the combined prediction. """
     if len(preds) == 0: return None
     ret=copy.deepcopy( preds[0] ) ## FIXME very wrong.
+    eff, wtot = 0., 0.
+    for pred in preds:
+        w = pred.xsection.value.asNumber(fb)
+        eff += pred.effectiveEff * w
+        wtot += w
+    eff = eff / wtot
     print ( "combinedUL=",combinedUL )
-    ret.xsection.value = ret.xsection.value / preds[0].effectiveEff
+    ret.xsection.value = ret.xsection.value ## / preds[0].effectiveEff
     ret.combinedUL = combinedUL
     ret.combinedExpectedUL = combinedEUL
+    ret.effectiveEff = eff
     # ret.dataset = FIXME special
     ret.dataset.dataInfo.dataId = "all"
     return ret
