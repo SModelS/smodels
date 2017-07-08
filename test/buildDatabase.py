@@ -69,7 +69,7 @@ for e in results[:1]:
         print ( "Effective efficiency= ",theoryPrediction.effectiveEff ) # effective efficiency
         print ( "Condition Violation = ",theoryPrediction.conditions ) #Condition violation values
           
-        ul = theoryPrediction.getUpperLimitFor(txname=txnames[0],mass=mass,dataID=datasetID)                     
+        ul = theoryPrediction.getUpperLimitFor(txname=txnames[0],dataID=datasetID)                     
         print ( "UL for theory prediction = ",ul )
 
         # Compute the r-value

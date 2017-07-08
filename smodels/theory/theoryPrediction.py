@@ -46,6 +46,7 @@ class TheoryPrediction(object):
         """ convenience function. treat combinations separately. """
         if "dataID" in args.keys() and args["dataID"]=="all":
             return self.combinedUL * self.effectiveEff
+        args["mass"]=self.mass
         return self.expResult.getUpperLimitFor ( **args )
 
     def computeStatistics(self):
