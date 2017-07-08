@@ -45,7 +45,7 @@ class TheoryPrediction(object):
     def getUpperLimitFor ( self, **args ):
         """ convenience function. treat combinations separately. """
         if "dataID" in args.keys() and args["dataID"]=="all":
-            return self.combinedUL ## * self.effectiveEff
+            return self.combinedUL * self.effectiveEff
         return self.expResult.getUpperLimitFor ( **args )
 
     def computeStatistics(self):
@@ -214,7 +214,7 @@ def _mergePredictions ( preds, combinedUL, combinedEUL ):
         wtot += w
     eff = eff / wtot
     print ( "combinedUL=",combinedUL )
-    ret.xsection.value = ret.xsection.value ## / preds[0].effectiveEff
+    ret.xsection.value = ret.xsection.value / ret.effectiveEff * eff ## / preds[0].effectiveEff
     ret.combinedUL = combinedUL
     ret.combinedExpectedUL = combinedEUL
     ret.effectiveEff = eff

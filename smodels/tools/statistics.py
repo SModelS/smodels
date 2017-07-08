@@ -66,7 +66,7 @@ class UpperLimitComputer:
         effs = numpy.array ( eff )
         llhds={}
         upto = 5 * max ( nev + xbg ) / min(eff)
-        dx = upto / 5. ## FIXME
+        dx = upto / 50. ## FIXME
         start = dx/2.
         computer = LikelihoodComputer ( nev, xbg, cov )
         while True:
