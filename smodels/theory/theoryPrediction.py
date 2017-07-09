@@ -45,13 +45,13 @@ class TheoryPrediction(object):
     def dataId ( self ):
         """ return id of dataset,
             or "all" for combined results """
-        if self.dataset == None: ## combined result
+        if type(self.dataset) == list:
             return "all"
         return self.dataset.dataInfo.dataId
 
     def dataType ( self ):
         """ return EM / UL """
-        if self.dataset == None: ## combined result
+        if type ( self.dataset ) == list:
             ## combined result? must be efficiencyMap!
             return "efficiencyMap"
         return self.dataset.dataInfo.dataType
@@ -68,10 +68,16 @@ class TheoryPrediction(object):
         Compute the likelihood, chi-square and expected upper limit for this theory prediction.
         The resulting values are stored as the likelihood, chi2 and expectedUL attributes.
         """
-        if not hasattr(self, "dataset") or self.dataset == None or \
-                self.dataset.dataInfo.dataType == 'upperLimit':
-            ## FIXME need to write procedure for combined results!!
+        if type ( self.dataset ) == list:
+            ## a prediction for a combined result? special 
             logger.error ( "need to write procedure to compute likelihood for MVA" )
+            self.likelihood = None
+            self.chi2 = None
+            self.expectedUL = None
+            return
+
+        if self.dataset.dataInfo.dataType == 'upperLimit':
+            ## FIXME need to write procedure for combined results!!
             self.likelihood = None
             self.chi2 = None
             self.expectedUL = None
@@ -239,8 +245,7 @@ def _mergePredictions ( preds, combinedUL, combinedEUL ):
         ret.combinedExpectedUL = combinedEUL * eff
     ret.effectiveEff = eff
     # ret.dataset = FIXME special
-    ret.dataset = None ## we dont need "dataset"
-    # ret.dataset.dataInfo.dataId = "all"
+    ret.dataset = [ x.dataset for x in preds ] # we collect all datasets
     return ret
 
 def _sortPredictions ( expResult, smsTopList, maxMassDist, combine ):
