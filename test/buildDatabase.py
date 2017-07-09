@@ -39,19 +39,6 @@ for e in results[:1]:
         #print ( "observed upper limit",ds," (on sigma)", ul/eff )
         #print ( "expected upper limit",ds," (on sigma)", eul/eff )
         #print ( "eff", eff )
-    try:
-        t0=time.time()
-        cul = None ## e.getCombinedUpperLimitFor ( effs )
-        t1=time.time()
-        dt=t1-t0
-        print ( "observed upper limit combined (on sigma)", cul,"in",dt,"s" )
-        ecul = None ## e.getCombinedUpperLimitFor ( effs, expected=True )
-        t2=time.time()
-        dt2=t2-t1
-        print ( "expected upper limit combined (on sigma)", ecul )
-    except SModelSExperimentError as e:
-        print ( "exception: %s" % e )
-        
     predictions = theoryPredictionsFor ( e, smstoplist, useBestDataset=False, combinedResults=True )
     print ( "theorypredfor=%s" % predictions )
     for theoryPrediction in predictions:
@@ -69,7 +56,7 @@ for e in results[:1]:
         print ( "Effective efficiency= ",theoryPrediction.effectiveEff ) # effective efficiency
         print ( "Condition Violation = ",theoryPrediction.conditions ) #Condition violation values
           
-        ul = theoryPrediction.getUpperLimitFor(txname=txnames[0],dataID=datasetID)                     
+        ul = theoryPrediction.getUpperLimit()                     
         print ( "UL for theory prediction = ",ul )
 
         # Compute the r-value

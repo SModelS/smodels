@@ -42,12 +42,12 @@ class TheoryPrediction(object):
         self.conditions = None
         self.mass = None
 
-    def getUpperLimitFor ( self, **args ):
-        """ convenience function. treat combinations separately. """
-        if "dataID" in args.keys() and args["dataID"]=="all":
+    def getUpperLimit ( self ):
+        """ Get the upper limit on sigma*eff """
+        if self.dataset.dataInfo.dataId == "all":
             return self.combinedUL * self.effectiveEff
-        args["mass"]=self.mass
-        return self.expResult.getUpperLimitFor ( **args )
+        return self.expResult.getUpperLimitFor ( mass=self.mass, \
+                              dataID=self.dataset.dataInfo.dataId, txname = self.txnames[0] )
 
     def computeStatistics(self):
         """
@@ -231,7 +231,6 @@ def _sortPredictions ( expResult, smsTopList, maxMassDist, combine ):
        not combine:
         return preds
     dsOrder = expResult.globalInfo.datasetOrder
-    print ( "alrighty! combining results!", dsOrder )
     if type ( dsOrder ) == str:
         ## for debugging only, we allow a single dataset
         dsOrder = [ dsOrder ]
