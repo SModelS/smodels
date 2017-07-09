@@ -83,6 +83,8 @@ class DataSet(object):
         return ret
 
     def __eq__ ( self, other ):
+        if type ( other ) != type ( self ):
+            return False
         if self.dataInfo != other.dataInfo:
             return False
         if len(self.txnameList ) != len ( other.txnameList ):

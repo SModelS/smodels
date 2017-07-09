@@ -9,7 +9,7 @@
 
 from smodels.theory import clusterTools, crossSection, element
 from smodels.theory.particleNames import elementsInStr
-from smodels.theory.auxiliaryFunctions import cSim, cGtr  #DO NOT REMOVE
+from smodels.theory.auxiliaryFunctions import cSim, cGtr # DO NOT REMOVE
 import sys, copy
 from smodels.tools.physicsUnits import TeV,fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
@@ -42,19 +42,36 @@ class TheoryPrediction(object):
         self.conditions = None
         self.mass = None
 
+    def dataId ( self ):
+        """ return id of dataset,
+            or "all" for combined results """
+        if self.dataset == None: ## combined result
+            return "all"
+        return self.dataset.dataInfo.dataId
+
+    def dataType ( self ):
+        """ return EM / UL """
+        if self.dataset == None: ## combined result
+            ## combined result? must be efficiencyMap!
+            return "efficiencyMap"
+        return self.dataset.dataInfo.dataType
+
     def getUpperLimit ( self ):
         """ Get the upper limit on sigma*eff """
-        if self.dataset.dataInfo.dataId == "all":
-            return self.combinedUL * self.effectiveEff
+        if self.dataId() == "all":
+            return self.combinedUL
         return self.expResult.getUpperLimitFor ( mass=self.mass, \
-                              dataID=self.dataset.dataInfo.dataId, txname = self.txnames[0] )
+                              dataID=self.dataId(), txname = self.txnames[0] )
 
     def computeStatistics(self):
         """
         Compute the likelihood, chi-square and expected upper limit for this theory prediction.
         The resulting values are stored as the likelihood, chi2 and expectedUL attributes.
         """
-        if not hasattr(self, "dataset") or self.dataset.dataInfo.dataType == 'upperLimit':
+        if not hasattr(self, "dataset") or self.dataset == None or \
+                self.dataset.dataInfo.dataType == 'upperLimit':
+            ## FIXME need to write procedure for combined results!!
+            logger.error ( "need to write procedure to compute likelihood for MVA" )
             self.likelihood = None
             self.chi2 = None
             self.expectedUL = None
@@ -216,11 +233,14 @@ def _mergePredictions ( preds, combinedUL, combinedEUL ):
     eff = eff / wtot
     print ( "combinedUL=",combinedUL )
     ret.xsection.value = ret.xsection.value / ret.effectiveEff * eff ## / preds[0].effectiveEff
-    ret.combinedUL = combinedUL
-    ret.combinedExpectedUL = combinedEUL
+    ret.combinedUL = combinedUL * eff
+    ret.combinedExpectedUL = None
+    if combinedEUL:
+        ret.combinedExpectedUL = combinedEUL * eff
     ret.effectiveEff = eff
     # ret.dataset = FIXME special
-    ret.dataset.dataInfo.dataId = "all"
+    ret.dataset = None ## we dont need "dataset"
+    # ret.dataset.dataInfo.dataId = "all"
     return ret
 
 def _sortPredictions ( expResult, smsTopList, maxMassDist, combine ):

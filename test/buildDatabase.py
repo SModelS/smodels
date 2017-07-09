@@ -42,8 +42,7 @@ for e in results[:1]:
     predictions = theoryPredictionsFor ( e, smstoplist, useBestDataset=False, combinedResults=True )
     print ( "theorypredfor=%s" % predictions )
     for theoryPrediction in predictions:
-        dataset = theoryPrediction.dataset
-        datasetID = dataset.dataInfo.dataId            
+        datasetID = theoryPrediction.dataId()
         mass = theoryPrediction.mass
         txnames = [str(txname) for txname in theoryPrediction.txnames]
         PIDs =  theoryPrediction.PIDs         
@@ -63,7 +62,7 @@ for e in results[:1]:
         r = theoryPrediction.xsection.value/ul
         print ( "r = ",r )
         #Compute likelihhod and chi^2 for EM-type results:
-        if dataset.dataInfo.dataType == 'efficiencyMap':
+        if theoryPrediction.dataType() == 'efficiencyMap':
             theoryPrediction.computeStatistics()
             print ( 'Chi2, likelihood=', theoryPrediction.chi2, theoryPrediction.likelihood )
         if r > 1.0:
