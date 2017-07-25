@@ -35,18 +35,21 @@ def verbose_run():
     n_tests, n_failed = 0, 0
     for series in alltests:
         for test in series:
-            for t in test:
-                print ( "[#%3d] %s ... " % ( n_tests, t.id() ), end="" )
-                sys.stdout.flush()
-                n_tests += 1
-                try:
-                    a=t.debug()
-                except Exception as e:
-                    n_failed += 1
-                    print ( "%s FAILED: %s%s" % \
-                            ( colors.error, str(e), colors.reset ) )
-                    continue
-                print ( "%sok%s" % ( colors.info, colors.reset ) ) 
+            try:
+                for t in test:
+                    print ( "[#%3d] %s ... " % ( n_tests, t.id() ), end="" )
+                    sys.stdout.flush()
+                    n_tests += 1
+                    try:
+                        a=t.debug()
+                    except Exception as e:
+                        n_failed += 1
+                        print ( "%s FAILED: %s%s" % \
+                                ( colors.error, str(e), colors.reset ) )
+                        continue
+                    print ( "%sok%s" % ( colors.info, colors.reset ) ) 
+            except Exception as e:
+                print ( "dfd %s" % e )
 
                 #a=t.run() ## python3
                 # print ( "a=",a )

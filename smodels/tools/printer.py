@@ -14,7 +14,7 @@ from __future__ import print_function
 import sys,os
 from smodels.theory.topology import TopologyList
 from smodels.theory.element import Element
-from smodels.theory.theoryPrediction import TheoryPredictionList, groupPredictions
+from smodels.theory.theoryPrediction import TheoryPredictionList 
 from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.databaseObj import ExpResultList
 from smodels.tools.ioObjects import OutputStatus, ResultList
@@ -402,50 +402,6 @@ class TxTPrinter(BasicPrinter):
 
         return output
     
-    """
-    def addCombinedLimits(self, theoryPredictions ):
-        collects combinable theoryPreds, then computes theory prediction for it
-        
-        theoryPredLists = groupPredictions ( theoryPredictions )
-        ret = ""
-        for theoryPreds in theoryPredLists:
-            if len(theoryPreds)<2:
-                continue
-            # signals = []
-            effs = []
-            e = theoryPreds[0].expResult
-            Id = e.globalInfo.id
-            ret += "---------------Analysis Label = " + Id + "\n"
-            ret += "-------------------Combined Datasets: "
-            for theoryPred in theoryPreds:
-                ret += theoryPred.dataset.dataInfo.dataId + ", "
-            ret = ret[:-2] + "\n"
-            ret += "Analysis sqrts: " + str(e.globalInfo.sqrts) + "\n"
-            conditions = set ( [ x.conditions for x in theoryPreds ] )
-            if len(conditions)>1:
-                logger.error ( "inconsistent conditions" )
-            ret += "Theory conditions: %s\n" % conditions.pop()
-                
-            for theoryPred in theoryPreds:
-                v = theoryPred.xsection.value
-                eff = theoryPred.cluster.getEffectiveEfficiency()
-                # ret += "Elements in cluster: %s\n" % cluster.elements 
-                unfolded_v = v / eff # theoryPred.dataset.getEfficiencyFor ( "T2tt", 0 )
-                ret += "Effective efficiency: %s\n" % eff
-                ret += "Theory prediction / effs: %s\n" % unfolded_v
-                effs.append ( eff )
-                #signals.append ( float(v.asNumber(fb)) )
-            upperLimit = e.getCombinedUpperLimitFor ( effs )
-            ret += "Observed experimental limit: %s\n" % ( upperLimit )
-            expectedUpperLimit = e.getCombinedUpperLimitFor ( effs, expected=True )
-            ret += "Expected experimental limit: %s\n" % ( expectedUpperLimit )
-            ret += "Observed r-Value: %s\n" % ( unfolded_v / upperLimit )
-            ret += "Expected r-Value: %s\n" % ( unfolded_v / expectedUpperLimit )
-        ret += "\n"
-        return ret
-    """
-
-
     def _formatResultList(self, obj):
         """
         Format data for a ResultList object.
