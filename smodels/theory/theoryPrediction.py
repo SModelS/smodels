@@ -113,9 +113,8 @@ class TheoryPrediction(object):
         # return maxcond
 
     def __str__(self):
-        ret = "%s:%s" % ( self.analysis, self.xsection )
+        ret = "%s:%s, eff=%.3g" % ( self.analysis, self.xsection, self.effectiveEff )
         #self.computeStatistics()
-        #ret += ", effEff=%f" % self.effectiveEff
         #ret += ", llhd=%f." % self.likelihood
         return ret
 
@@ -237,7 +236,7 @@ def _mergePredictions ( preds, combinedUL, combinedEUL ):
         eff += pred.effectiveEff * w
         wtot += w
     eff = eff / wtot
-    print ( "combinedUL=",combinedUL )
+    # print ( "combinedUL=",combinedUL )
     ret.xsection.value = ret.xsection.value / ret.effectiveEff * eff ## / preds[0].effectiveEff
     ret.combinedUL = combinedUL * eff
     ret.combinedExpectedUL = None
