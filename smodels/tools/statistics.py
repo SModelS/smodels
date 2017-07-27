@@ -65,31 +65,45 @@ class UpperLimitComputer:
         #    sig = [ float(x.asUnit(fb) * self.lumi) for x in sig ]
         effs = numpy.array ( eff )
         llhds={}
-        upto = 5 * max ( nev + xbg ) / min(eff)
+        upto = 5 * max ( nev + xbg ) * len(eff) / sum(eff)
         dx = upto / 50. ## FIXME
         start = dx/2.
+        # start = 0.
         computer = LikelihoodComputer ( nev, xbg, cov )
+        #print ( "compute ulSigma",nev,xbg,cov,eff )
+        #print ( "start,upto=",start,upto )
         while True:
+            lst = [] ## also store in list
             for sig in numpy.arange ( start, upto, dx ):
                 csig = sig * effs
                 l = computer.likelihood ( csig )
                 llhds[float(sig)]=l
+                lst.append ( l )
+
+            ##print ( "likelihoods",llhds )
             norm = sum ( llhds.values() )
+            #print ( "norm",norm )
             last = llhds[sig]/norm
+            # print ( "maximum at bin #", lst.index ( max ( lst ) ) )
+            if lst.index ( max ( lst ) ) == 0 and lst[0]/lst[1] > 2.:
+                upto = .2 * upto
+                logger.error ( "maximum is too close to the left. lets go for smaller range: %f" % upto )
+                dx = upto / 50. ## FIXME
+                start = dx/2.
+                continue ## and again
             if last < .0007:
                 break ## ok, we sampled well enough?
             if last < .00001:
-                ## dubious! we may have sampled to scarcely!
+                ## dubious! we may have sampled too scarcely!
                 logger.error ( "when integrating pdf, last bin is suspiciously small %f" % last )
-
             start = upto + dx/2.
             upto = 2*upto
             logger.error ( "last=%f. need to extend to %f" % ( last, upto ) )
         for k,v in llhds.items():
             llhds[k]=v/norm
-        return self.interp ( llhds, dx )
+        return self.interpolate ( llhds, dx )
 
-    def interp ( self, llhds, dx ):
+    def interpolate ( self, llhds, dx ):
         """ interpolate likelihoods to have the best possible
             estimate for the 95% CL
         :param llhds: dictionary of (normalized) likelihoods
@@ -353,7 +367,7 @@ class LikelihoodComputer:
             low[low<0.] = 0. ## set all negatives to zero!
             up = xmax+nrange*sqrt(dsigma2)
             self.nsig, self.deltas = nsig, deltas ## store for integration
-            ## first integral can be course, we will anyhow do another round
+            ## first integral can be coarse, we will anyhow do another round
             opts = { "epsabs":1e-2, "epsrel":1e-1 }
             like = integrate.nquad( self.probMV, zip(low,up),opts=opts )[0]
             norm = (1./2.)*(1. + special.erf((self.nb+nsig)/sqrt(2.*dsigma2)))#[0][0]

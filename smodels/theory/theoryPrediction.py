@@ -133,6 +133,7 @@ class TheoryPrediction(object):
        # return a lengthy description
        ret =  "[theoryPrediction] analysis: %s\n" % self.analysis
        ret += "     prediction (sigma*eff): %s\n" % self.xsection
+       ret += "         prediction (sigma): %s\n" % ( self.xsection.value / self.effectiveEff )
        ret += "       effective efficiency: %s\n" % self.effectiveEff
        ds = "None"
        if type (self.dataset) == list:
