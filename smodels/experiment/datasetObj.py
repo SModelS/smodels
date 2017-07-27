@@ -156,9 +156,9 @@ class DataSet(object):
         The values observedN, expectedBG, and bgError
         are part of dataInfo.
         :param nsig: predicted signal (float)
-        :param deltas: uncertainty on signal (float). If None, default value (20%) will be used.
-
-        :return: likelihood to observe nobs events (float)
+        :param deltas: uncertainty on signal (float). 
+            If None, default value (20%) will be used.
+        :returns: likelihood to observe nobs events (float)
         """
 
         computer = statistics.LikelihoodComputer ( self.dataInfo.observedN,

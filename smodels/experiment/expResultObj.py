@@ -15,8 +15,8 @@ from smodels.experiment import txnameObj
 from smodels.experiment import datasetObj
 from smodels.experiment.exceptions import DatabaseNotFoundException, SModelSExperimentError
 from smodels.tools.physicsUnits import fb
-
 from smodels.tools.smodelsLogging import logger
+from smodels.tools import statistics
 
 class ExpResult(object):
     """
@@ -131,6 +131,47 @@ class ExpResult(object):
 
     def hasCovarianceMatrix ( self ):
         return hasattr ( self.globalInfo, "covariance" )
+
+    def combinedLikelihood ( self, nsig, deltas=None ):
+        """
+        Computes the (combined) likelihood to observe nobs events, given a 
+        predicted signal "nsig", with nsig being a vector with one entry per
+        dataset.  nsig has to obey the datasetOrder. Deltas is the error on
+        the signal efficiency. 
+        :param nsig: predicted signal (list)
+        :param deltas: uncertainty on signal (None,float, or list).
+        :returns: likelihood to observe nobs events (float)
+        """
+        if len ( self.datasets ) == 1: return self.datasets[0].likelihood ( nsig )
+        if not hasattr ( self.globalInfo, "covariance" ):
+            logger.error ( "asked for combined likelihood, but no covariance error given." )
+            return None
+        nobs = [ x.dataInfo.observedN for x in self.datasets ]
+        bg = [ x.dataInfo.expectedBG for x in self.datasets ]
+        cov = self.globalInfo.covariance
+        computer = statistics.LikelihoodComputer ( nobs, bg, cov )
+        # print ( "computing combined likelihood for",nsig,"ds=",len(self.datasets ) )
+        return computer.likelihood ( nsig, deltas )
+
+    def totalChi2 ( self, nsig, deltas=None ):
+        """
+        Computes the total chi2 for a given number of observed events, given a
+        predicted signal "nsig", with nsig being a vector with one entry per
+        dataset. nsig has to obey the datasetOrder. Deltas is the error on
+        the signal efficiency. 
+        :param nsig: predicted signal (list)
+        :param deltas: uncertainty on signal (None,float, or list).
+        :returns: chi2 (float)
+        """
+        if len ( self.datasets ) == 1: return self.datasets[0].chi2 ( nsig )
+        if not hasattr ( self.globalInfo, "covariance" ):
+            logger.error ( "asked for combined likelihood, but no covariance error given." )
+            return None
+        nobs = [ x.dataInfo.observedN for x in self.datasets ]
+        bg = [ x.dataInfo.expectedBG for x in self.datasets ]
+        cov = self.globalInfo.covariance
+        computer = statistics.LikelihoodComputer ( nobs, bg, cov )
+        return computer.chi2 ( nsig, deltas )
 
     def getCombinedUpperLimitFor ( self, effs, expected=False ):
         """
