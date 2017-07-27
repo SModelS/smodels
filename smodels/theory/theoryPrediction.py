@@ -60,9 +60,15 @@ class TheoryPrediction(object):
         """ Get the upper limit on sigma*eff """
         if self.dataId() == "all":
             return self.combinedUL
-        return self.expResult.getUpperLimitFor ( mass=self.mass, \
+        if not hasattr ( self, "_ul" ):
+            ## store it for future retrieval
+            self._ul = self.expResult.getUpperLimitFor ( mass=self.mass, \
                               dataID=self.dataId(), txname = self.txnames[0] )
+        return self._ul
 
+    def getRValue ( self ):
+        """ get the r value = theory prediction / experimental upper limit """
+        return self.xsection.value / self.getUpperLimit ()
     def computeStatistics(self):
         """
         Compute the likelihood, chi-square and expected upper limit for this theory prediction.
@@ -113,12 +119,31 @@ class TheoryPrediction(object):
         # return maxcond
 
     def __str__(self):
-        ret = "%s:%s, eff=%.3g" % ( self.analysis, self.xsection, self.effectiveEff )
+        ret = "%s:%s" % ( self.analysis, self.xsection )
         #self.computeStatistics()
         #ret += ", llhd=%f." % self.likelihood
         return ret
 
+    def isCombined ( self ):
+       """ does this theory pred stem from combining several datasets?
+           (implies the existence of a covariance matrix) """
+       return type(self.dataset)==list
 
+    def describe ( self ):
+       # return a lengthy description
+       ret =  "[theoryPrediction] analysis: %s\n" % self.analysis
+       ret += "     prediction (sigma*eff): %s\n" % self.xsection
+       ret += "       effective efficiency: %s\n" % self.effectiveEff
+       ds = "None"
+       if type (self.dataset) == list:
+            ds = "multiple (combined)"
+       else:
+            ds = self.dataset.dataInfo.dataId
+       ret += "                   datasets: %s\n" % ds
+       ret += "      exp limit (sigma*eff): %s\n" % self.getUpperLimit()
+       ret += "          exp limit (sigma): %s\n" % (self.getUpperLimit() / self.effectiveEff )
+       ret += "                          r: %f\n" % ( self.xsection.value / self.getUpperLimit() )
+       return ret
 
 class TheoryPredictionList(object):
     """
