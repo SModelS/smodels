@@ -287,14 +287,19 @@ class LikelihoodComputer:
             ## for now deal with variances only
             ntot = self.nb + self.nsig
             xm = self.nb + self.nsig - dsigma2
+            #print ( "[findMax] xm=", xm )
             #If nb + nsig = sigma2, shift the values slightly:
             for ctr,i in enumerate(xm):
                 if i == 0.:
                     xm[ctr]=1e-3
+            cov = numpy.matrix (sigma2 )
             weight = ( numpy.matrix (sigma2 ) )**(-1) ## weight matrix
-            q = self.nobs / numpy.diag ( weight ) ## q_i= nobs_i * w_ii^-1
-            p = ntot - 1. / numpy.diag ( weight )
+            q = self.nobs * numpy.diag ( cov ) ## q_i= nobs_i * w_ii^-1
+            p = ntot - numpy.diag ( cov )
+            #print ( "[findMax] q=", q )
+            #print ( "[findMax] p=", p )
             xmax1 = p/2. * ( 1 + sqrt ( 1. + 4*q / p**2 ) ) ## no cov iteration
+            #print ( "[findMax] xmax1=", xmax1 )
             ndims = len(p)
             for i in range(ndims):
                 for j in range(ndims):
@@ -310,6 +315,7 @@ class LikelihoodComputer:
             sigma2 = self.covb + numpy.diag ( self.deltas**2 )
             dsigma2 = numpy.diag ( sigma2 )
             xm = self.nb + self.nsig - dsigma2
+            print ( "[findMaxNoCov] xm=", xm )
             xmax = xm*(1.+sign(xm)*sqrt(1. + 4.*self.nobs*dsigma2/xm**2))/2.
             # print ( "xmax no cov,p(xmax)=", xmax, self.probMV ( *xmax ) )
             return xmax
@@ -346,18 +352,24 @@ class LikelihoodComputer:
                 if i == 0.:
                     xm[ctr]=1e-3
             self.nsig, self.deltas = nsig, deltas ## store for integration
-            xmax = self.findMaxNoCov ()
+            # xmax = self.findMaxNoCov ()
+            xmax = self.findMax ()
+
             #Define initial integration range:
             nrange = 5.
             low = xmax-nrange*sqrt(dsigma2)
             low[low<0.] = 0. ## set all negatives to zero!
             up = xmax+nrange*sqrt(dsigma2)
-            self.nsig, self.deltas = nsig, deltas ## store for integration
             ## first integral can be course, we will anyhow do another round
             opts = { "epsabs":1e-2, "epsrel":1e-1 }
             like = integrate.nquad( self.probMV, zip(low,up),opts=opts )[0]
             norm = (1./2.)*(1. + special.erf((self.nb+nsig)/sqrt(2.*dsigma2)))#[0][0]
+            norms = reduce(lambda x, y: x*y, norm )
             err = 1.
+            #print ( "found xmax at", xmax, "l=",self.probMV(*xmax) )
+            #print ( "found xmax2 at", xmax2, "l2=",self.probMV(*xmax2) )
+            # sys.exit()
+            # print ( "like=", self.probMV(*xmax)/ norms )
             while err > 0.01: # wrong
                 opts = { "epsabs":1e-4, "epsrel":1e-2 }
                 like_old = like
@@ -376,8 +388,8 @@ class LikelihoodComputer:
             #The integral of the gaussian from 0 to infinity gives:
             #(1/2)*(1 + Erf(mu/sqrt(2*sigma2))), so we need to divide by it
             #(for mu - sigma >> 0, the normalization gives 1.)
-            norm = (1./2.)*(1. + special.erf((self.nb+nsig)/sqrt(2.*dsigma2)))#[0][0]
-            like = like/ reduce(lambda x, y: x*y, norm ) 
+            like = like/ norms ## reduce(lambda x, y: x*y, norm ) 
+            # print ( "like now=", like )
             return like
 
     def likelihood ( self, nsig, deltas = None ):
