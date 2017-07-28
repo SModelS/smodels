@@ -76,7 +76,9 @@ class UpperLimitComputer:
             lst = [] ## also store in list
             for sig in numpy.arange ( start, upto, dx ):
                 csig = sig * effs
-                l = computer.likelihood ( csig )
+                # l = computer.likelihood ( csig )
+                # FIXME marginalize or profile?
+                l = computer.profileLikelihood ( csig )
                 llhds[float(sig)]=l
                 lst.append ( l )
 
@@ -280,6 +282,9 @@ class LikelihoodComputer:
     # def prob(x0, x1 )
     def probMV( self, *xar ):
         x = numpy.array ( xar )
+        if sum ( x<0. ) > 0:
+            logger.error ( "negative values for x: %s" % x )
+            sys.exit() 
         poisson = numpy.exp(self.nobs*numpy.log(x) - x - special.gammaln(self.nobs + 1))
         gaussian = stats.multivariate_normal.pdf(x,mean=self.nb+self.nsig,cov=(self.covb+numpy.diag(self.deltas**2)))
         ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
@@ -296,7 +301,7 @@ class LikelihoodComputer:
             #Compute maximum value for the integrand:
             sigma2 = self.covb + numpy.diag ( self.deltas**2 )
             dsigma2 = numpy.diag ( sigma2 )
-            #print ( "sigma2=", sigma2 )
+            #print ( "[findMax] sigma2=", sigma2 )
             #print ( "dsigma2=", dsigma2 )
             ## for now deal with variances only
             ntot = self.nb + self.nsig
@@ -312,15 +317,16 @@ class LikelihoodComputer:
             p = ntot - numpy.diag ( cov )
             #print ( "[findMax] q=", q )
             #print ( "[findMax] p=", p )
-            xmax1 = p/2. * ( 1 + sqrt ( 1. + 4*q / p**2 ) ) ## no cov iteration
-            #print ( "[findMax] xmax1=", xmax1 )
+            xmax1 = p/2. * ( 1 + sign(p) * sqrt ( 1. + 4*q / p**2 ) ) ## no cov iteration
             ndims = len(p)
             for i in range(ndims):
                 for j in range(ndims):
                     if i==j: 
                         continue ## treat covariance terms
                     p[i]+=(ntot[j]-xmax1[j])*weight[i,j] / weight[i,i]
-            xmax = p/2. * ( 1 + sqrt ( 1. + 4*q / p**2 ) )
+            xmax = p/2. * ( 1 + sign(p)* sqrt ( 1. + 4*q / p**2 ) )
+            #print ( "[findMax] xmax1=", xmax1 )
+            #print ( "[findMax] xmax=", xmax )
             return xmax
 
     def findMaxNoCov ( self ):
@@ -334,8 +340,16 @@ class LikelihoodComputer:
             # print ( "xmax no cov,p(xmax)=", xmax, self.probMV ( *xmax ) )
             return xmax
 
+    def _mvProfileLikelihood( self, nsig, deltas ):
+            # compute the profiled (not normalized) likelihood of observing
+            # nsig signal events
+            self.nsig, self.deltas = nsig, deltas ## store for integration
+            xmax = self.findMax ()
+            return self.probMV ( *xmax )
+
     def _mvLikelihood( self, nsig, deltas ):
-            # compute the likelihood of observing nsig signal events
+            # compute the marginalized likelihood of observing nsig signal
+            # events
 
 
             #     Why not a simple poisson function for the factorial
@@ -368,6 +382,7 @@ class LikelihoodComputer:
             self.nsig, self.deltas = nsig, deltas ## store for integration
             # xmax = self.findMaxNoCov ()
             xmax = self.findMax ()
+            #print ( "found xmax at", xmax, "l=",self.probMV(*xmax) )
 
             #Define initial integration range:
             nrange = 5.
@@ -380,7 +395,6 @@ class LikelihoodComputer:
             norm = (1./2.)*(1. + special.erf((self.nb+nsig)/sqrt(2.*dsigma2)))#[0][0]
             norms = reduce(lambda x, y: x*y, norm )
             err = 1.
-            #print ( "found xmax at", xmax, "l=",self.probMV(*xmax) )
             #print ( "found xmax2 at", xmax2, "l2=",self.probMV(*xmax2) )
             # sys.exit()
             # print ( "like=", self.probMV(*xmax)/ norms )
@@ -405,6 +419,17 @@ class LikelihoodComputer:
             like = like/ norms ## reduce(lambda x, y: x*y, norm ) 
             # print ( "like now=", like )
             return like
+            
+    def profileLikelihood ( self, nsig, deltas = None ):
+        """ compute the profiled likelihood for nsig.
+            Warning: not normalized. """
+        nsig = self.convert ( nsig )
+        if type(deltas) == type(None):
+            deltas = 1e-5*nsig ## FIXME for backwards compatibility
+        if type( nsig ) in [ int, float, numpy.float64 ]:
+            ## FIXME write profiled likelihood for 1d case.
+            return self._likelihood1d( nsig, deltas )
+        return self._mvProfileLikelihood( nsig, deltas )
 
     def likelihood ( self, nsig, deltas = None ):
         """ compute likelihood for nsig, marginalized the nuisances """
