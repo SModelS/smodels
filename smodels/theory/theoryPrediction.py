@@ -69,17 +69,20 @@ class TheoryPrediction(object):
     def getRValue ( self ):
         """ get the r value = theory prediction / experimental upper limit """
         return self.xsection.value / self.getUpperLimit ()
+
     def computeStatistics(self):
         """
-        Compute the likelihood, chi-square and expected upper limit for this theory prediction.
+        Compute the likelihood, chi2 and expected upper limit for this theory prediction.
         The resulting values are stored as the likelihood, chi2 and expectedUL attributes.
         """
         if type ( self.dataset ) == list:
             ## a prediction for a combined result? special 
-            logger.error ( "need to write procedure to compute likelihood for MVA" )
-            self.likelihood = None
-            self.chi2 = None
-            self.expectedUL = None
+            lumi = self.expResult.globalInfo.lumi
+            pred = (self.xsection.value*lumi).asNumber() / self.effectiveEff
+            nsig = [ pred * x for x in self.efficiencies ]
+            self.likelihood = self.expResult.combinedLikelihood ( nsig )
+            self.chi2 = self.expResult.totalChi2 ( nsig )
+            # self.expectedUL = None
             return
 
         if self.dataset.dataInfo.dataType == 'upperLimit':
@@ -133,6 +136,7 @@ class TheoryPrediction(object):
        # return a lengthy description
        ret =  "[theoryPrediction] analysis: %s\n" % self.analysis
        ret += "     prediction (sigma*eff): %s\n" % self.xsection
+       ret += "         prediction (sigma): %s\n" % ( self.xsection.value / self.effectiveEff )
        ret += "       effective efficiency: %s\n" % self.effectiveEff
        ds = "None"
        if type (self.dataset) == list:
@@ -254,11 +258,13 @@ def theoryPredictionsFor( expResult, smsTopList, maxMassDist=0.2,
 def _mergePredictions ( preds, combinedUL, combinedEUL ):
     """ merge theory predictions, for the combined prediction. """
     if len(preds) == 0: return None
-    ret=copy.deepcopy( preds[0] ) ## FIXME very wrong.
+    ret=copy.deepcopy( preds[0] ) 
+    ret.efficiencies = []
     eff, wtot = 0., 0.
     for pred in preds:
         w = pred.xsection.value.asNumber(fb)
         eff += pred.effectiveEff * w
+        ret.efficiencies.append ( pred.effectiveEff )
         wtot += w
     eff = eff / wtot
     # print ( "combinedUL=",combinedUL )
