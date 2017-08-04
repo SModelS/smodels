@@ -132,6 +132,17 @@ class ExpResult(object):
     def hasCovarianceMatrix ( self ):
         return hasattr ( self.globalInfo, "covariance" )
 
+    def isUncorrelatedWith ( self, other ):
+        """
+        can this expResult be safely assumed to be approximately uncorrelated
+        with "other"? "Other" can be another expResult, or a dataset of
+        an expResult. 
+        """
+        if self == other: return False
+        if other.globalInfo.dirName ( 1 ) != self.globalInfo.dirName ( 1 ):
+            return True
+        return None ## FIXME implement
+
     def combinedLikelihood ( self, nsig, deltas=None ):
         """
         Computes the (combined) likelihood to observe nobs events, given a 

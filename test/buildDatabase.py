@@ -21,11 +21,16 @@ d=Database( dir, discard_zeroes = True )
 print(d)
 results=d.getExpResults()
 
+print ( "is uncorrelated?" )
+print ( results[0].isUncorrelatedWith ( results[1] ) )
+sys.exit()
+
 massvec = [[400.*GeV,75*GeV], [400*GeV,75*GeV]]
 
 for e in results[:1]:
     print ( e.globalInfo.id )
     dsets = [ "SR1: MET > 200", "SR2: MET > 300" ]
+    # dsets = [ "sr0", "sr1" ]
     topo = "T2tt"
     effs = []
     for ds in dsets:
@@ -59,7 +64,8 @@ for e in results[:1]:
         print ( "UL for theory prediction = ",ul )
 
         # Compute the r-value
-        r = theoryPrediction.xsection.value/ul
+        ## r = theoryPrediction.xsection.value/ul
+        r = theoryPrediction.getRValue()
         print ( "r = ",r )
         #Compute likelihhod and chi^2 for EM-type results:
         if theoryPrediction.dataType() == 'efficiencyMap':
@@ -69,3 +75,4 @@ for e in results[:1]:
             rmax = r
             bestResult = theoryPrediction.expResult.globalInfo.id
         
+        print ( theoryPrediction.describe() )

@@ -57,6 +57,13 @@ class Info(object):
             return False
         return True
 
+    def dirName ( self, up=0 ):
+        """ directory name of path. If up>0, 
+            we step up 'up' directory levels.
+        """
+        s_up = "/".join ( [ ".." ] * up )
+        os.path.abspath ( os.path.join ( self.globalInfo.dirName(), s_up ) )
+
     def __ne__ ( self, other ):
         return not self.__eq__ ( other )
         

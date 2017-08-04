@@ -165,6 +165,28 @@ class DataSet(object):
                 self.dataInfo.expectedBG, self.dataInfo.bgError**2 )
         return computer.likelihood( nsig, deltas )
 
+    def isUncorrelatedWith ( self, other ):
+        """
+        can it be safely assumed that this dataset is approximately
+        uncorrelated with "other"?
+        "other" can be a dataset or an expResult, in which case it is
+        true only if we are uncorrelated with all datasets of "other".
+
+        Two datasets of the same exp Result are considered never to be
+        uncorrelated.
+
+        """
+        if other == self: return False
+        if type(other) == type(self): ## comparing with another dataset
+            if self.globalInfo.path == other.globalInfo.path:
+                return False ## same expResult? -> correlated!
+            if self.globalInfo.dirName ( 1 ) != other.globalInfo.dirName ( 1 ):
+                ## different folders? uncorrelated!
+                return True
+            ## different expResults
+            return None ## FIXME implement
+                
+
     def chi2( self, nsig, deltas=None):
         """
         Computes the chi2 for a given number of observed events "nobs",
