@@ -141,6 +141,14 @@ class ExpResult(object):
         if self == other: return False
         if other.globalInfo.dirName ( 1 ) != self.globalInfo.dirName ( 1 ):
             return True
+        # print ( "%s combinable with %s?" % ( self.globalInfo.id, other.globalInfo.id ) )
+        if hasattr ( self.globalInfo, "combinableWith" ):
+            #print ( "check: %s, %s" % (other.globalInfo.id, self.globalInfo.combinableWith) )
+            if other.globalInfo.id in self.globalInfo.combinableWith:
+                return True
+        if hasattr ( other.globalInfo, "combinableWith" ):
+            if self.globalInfo.id in other.globalInfo.combinableWith:
+                return True
         return None ## FIXME implement
 
     def combinedLikelihood ( self, nsig, deltas=None ):
