@@ -15,6 +15,7 @@ from smodels.tools.smodelsLogging import logger
 from smodels.tools.caching import _memoize
 from scipy import stats, optimize, integrate, special
 from numpy import sqrt, exp, log, sign, array, matrix
+from functools import reduce
 import numpy
 import math
 import sys
@@ -45,14 +46,6 @@ class UpperLimitComputer:
         """ The function whose root is to be found (CLs - 0.95 ) """
         return self.CLs ( sig ) - self.cl
 
-    """
-    def root_funcMV( self, mu ):
-        # print ( "MV try sig=",sig )
-        sig = [ mu*x for x in self.sig ]
-        cls = self.CLsMV ( sig ) - self.cl
-        return cls
-    """
-
     def ulSigma ( self, nev, xbg, cov, eff ):
         """ upper limit obtained from combined efficiencies
         :param nev: number of observed events per dataset
@@ -61,11 +54,10 @@ class UpperLimitComputer:
         :param eff: dataset effective signal efficiencies
         :returns: upper limit on *production* xsec (efficiencies unfolded)
         """
-        #if type(sig[0] ) == type(fb): ## make it work for sigmas also?
-        #    sig = [ float(x.asUnit(fb) * self.lumi) for x in sig ]
         effs = numpy.array ( eff )
         llhds={}
-        upto = 5 * max ( nev + xbg ) * len(eff) / sum(eff)
+        ## 
+        upto = 5 * math.sqrt ( max ( nev + xbg ) ) * len(eff) / sum(eff)
         dx = upto / 50. ## FIXME
         start = dx/2.
         # start = 0.
@@ -87,7 +79,7 @@ class UpperLimitComputer:
             #print ( "norm",norm )
             last = llhds[sig]/norm
             # print ( "maximum at bin #", lst.index ( max ( lst ) ) )
-            if lst.index ( max ( lst ) ) == 0 and lst[0]/lst[1] > 2.:
+            if lst.index ( max ( lst ) ) == 0 and lst[0]/lst[1] > 1.1:
                 upto = .2 * upto
                 logger.error ( "maximum is too close to the left. lets go for smaller range: %f" % upto )
                 dx = upto / 50. ## FIXME
@@ -103,7 +95,37 @@ class UpperLimitComputer:
             logger.error ( "last=%f. need to extend to %f" % ( last, upto ) )
         for k,v in llhds.items():
             llhds[k]=v/norm
-        return self.interpolate ( llhds, dx )
+        ## now find the 95% quantile by interpolation
+        ret = self.interpolate ( llhds, dx )
+        self.plot ( llhds, dx )
+        return ret
+
+    def plot ( self, llhds, dx ):
+        """ function to plot likelihoods and the 95% CL, for 
+            debugging purposes """
+        return 
+        import ROOT, ctypes
+        xvals = list ( llhds.keys() )
+        xvals.sort()
+        yvals = []
+        for x in xvals:
+            yvals.append ( llhds[x] )
+        c_xvals = (ctypes.c_float * len(xvals))(*xvals)
+        c_yvals = (ctypes.c_float * len(yvals))(*yvals)
+        logger.error ( "Plotting likelihoods." )
+        t=ROOT.TGraph ( len ( xvals ), c_xvals, c_yvals )
+        for ctr,(x,y) in enumerate ( zip ( xvals, yvals ) ):
+            t.SetPoint ( ctr, x, y )
+            # logger.error ( "x,y=%s,%s" % ( x,y ) )
+        t.Draw("AC*")
+        cl95 = self.interpolate  ( llhds, dx ) * self.lumi
+        t3=ROOT.TLine ( cl95, 0., cl95, max(yvals) )
+        t3.SetLineColor(ROOT.kRed)
+        t3.SetLineStyle(2)
+        t3.Draw("SAME")
+        logger.error ( "95 pc ul=%s" % cl95 )
+
+        ROOT.c1.Print ( "plot.png" )
 
     def interpolate ( self, llhds, dx ):
         """ interpolate likelihoods to have the best possible
@@ -112,13 +134,19 @@ class UpperLimitComputer:
         :param dx: step size in sigma_sig
         :returns: 95% CL
         """
-        keys = llhds.keys()
+        keys = list ( llhds.keys() )
         keys.sort()
         cdf = 0.
-        for k in keys:
+        for ctr,k in enumerate(keys):
             v = llhds[k]
             cdf += v
             if cdf > .95: # perform a simple linear interpolation over cdf
+                if ctr < 0.1 * len(keys):
+                    logger.error ( "for the 95% CL we needed fewer than 10% of points. bad." )
+                    sys.exit()
+                if ctr > 0.9 * len(keys):
+                    logger.error ( "for the 95% CL we needed more than 90% of points. bad." )
+                    sys.exit()
                 f = ( cdf - .95 ) / v
                 # ret = ( k - f * dx )
                 ret = ( k + dx * ( .5 - f ) )

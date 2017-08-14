@@ -156,7 +156,8 @@ class TheoryPrediction(object):
        ret += "      obs limit (sigma*eff): %s\n" % self.getUpperLimit()
        ret += "      exp limit (sigma*eff): %s\n" % self.getUpperLimit( expected=True )
        ret += "          obs limit (sigma): %s\n" % (self.getUpperLimit() / self.effectiveEff )
-       ret += "                          r: %f\n" % ( self.xsection.value / self.getUpperLimit() )
+       ret += "                      obs r: %f\n" % ( self.xsection.value / self.getUpperLimit() )
+       ret += "                      exp r: %f\n" % ( self.xsection.value / self.getUpperLimit( expected=True ) )
        return ret
 
 class TheoryPredictionList(object):
