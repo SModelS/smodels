@@ -56,14 +56,23 @@ class TheoryPrediction(object):
             return "efficiencyMap"
         return self.dataset.dataInfo.dataType
 
-    def getUpperLimit ( self ):
-        """ Get the upper limit on sigma*eff """
+    def getUpperLimit ( self, expected=False ):
+        """ Get the upper limit on sigma*eff 
+        :param expected: return expected Upper Limit, instead of observed.
+        """
         if self.dataId() == "all":
+            if expected:
+                return self.combinedExpectedUL
             return self.combinedUL
+        if expected:
+            if not hasattr ( self, "_eul" ):
+                self._eul = self.expResult.getUpperLimitFor ( mass=self.mass, \
+                           dataID=self.dataId(), expected=expected, txname = self.txnames[0])
+            return self._eul
         if not hasattr ( self, "_ul" ):
             ## store it for future retrieval
             self._ul = self.expResult.getUpperLimitFor ( mass=self.mass, \
-                              dataID=self.dataId(), txname = self.txnames[0] )
+                           dataID=self.dataId(), expected=expected, txname = self.txnames[0])
         return self._ul
 
     def getRValue ( self ):
@@ -144,8 +153,9 @@ class TheoryPrediction(object):
        else:
             ds = self.dataset.dataInfo.dataId
        ret += "                   datasets: %s\n" % ds
-       ret += "      exp limit (sigma*eff): %s\n" % self.getUpperLimit()
-       ret += "          exp limit (sigma): %s\n" % (self.getUpperLimit() / self.effectiveEff )
+       ret += "      obs limit (sigma*eff): %s\n" % self.getUpperLimit()
+       ret += "      exp limit (sigma*eff): %s\n" % self.getUpperLimit( expected=True )
+       ret += "          obs limit (sigma): %s\n" % (self.getUpperLimit() / self.effectiveEff )
        ret += "                          r: %f\n" % ( self.xsection.value / self.getUpperLimit() )
        return ret
 
@@ -227,7 +237,7 @@ def theoryPredictionsFor( expResult, smsTopList, maxMassDist=0.2,
     for xsecinfo,preds in preds.items():
         effs = [ pred.effectiveEff for pred in preds ]
         cul = expResult.getCombinedUpperLimitFor ( effs )
-        eul = None # expResult.getCombinedUpperLimitFor ( effs, expected=True )
+        eul = expResult.getCombinedUpperLimitFor ( effs, expected=True )
         combResults.append ( _mergePredictions ( preds, cul, eul ) )
 
     dataSetResults = []
@@ -271,7 +281,7 @@ def _mergePredictions ( preds, combinedUL, combinedEUL ):
     ret.xsection.value = ret.xsection.value / ret.effectiveEff * eff ## / preds[0].effectiveEff
     ret.combinedUL = combinedUL * eff
     ret.combinedExpectedUL = None
-    if combinedEUL:
+    if combinedEUL is not None:
         ret.combinedExpectedUL = combinedEUL * eff
     ret.effectiveEff = eff
     # ret.dataset = FIXME special
@@ -563,27 +573,3 @@ def _evalExpression(stringExpr,cluster):
             logger.error("Evaluation of expression "+expr+" returned multiple values.")
         return exprvalue[0] #Return XSection object
     return exprvalue
-
-"""
-def groupPredictions ( theoryPredictions ):
-    group all theory predictions that
-        -) belong to the same expRes
-        -) whose expRes has a covariance matrix
-        -) whose dataType is efficiencyMap
-
-        return all such groups as TheoryPredictionLists.
-    
-    expReses = {}
-    for theoryPred in theoryPredictions:
-        expRes = theoryPred.expResult
-        if not hasattr ( expRes.globalInfo, "covariance" ):
-            continue ## we need a covariance matrix
-        info = theoryPred.dataset.dataInfo
-        if not info.dataType == 'efficiencyMap':
-            continue ## it must be efficiency maps
-        Id = expRes.globalInfo.id
-        if not Id in expReses.keys():
-            expReses[Id]=TheoryPredictionList()
-        expReses[Id].append( theoryPred )
-    return list ( expReses.values() )
-"""
