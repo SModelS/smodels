@@ -194,9 +194,8 @@ class ExpResult(object):
 
     def getCombinedUpperLimitFor ( self, effs, expected=False ):
         """
-        Prototype. Get combined upper limit. Effs are the
-        signal efficiencies in the datasets. The order is defined
-        in the dataset itself.
+        Get combined upper limit. Effs are the signal efficiencies in the
+        datasets. The order is defined in the dataset itself.
         :param effs: the signal efficiencies for all datasets 
                      (adding up the efficiencies for all txnames)
                      the efficiencies must be sorted according to datasetOrder

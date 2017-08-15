@@ -165,6 +165,12 @@ class DataSet(object):
                 self.dataInfo.expectedBG, self.dataInfo.bgError**2 )
         return computer.likelihood( nsig, deltas )
 
+    def folderName ( self ):
+        """
+        Name of the folder in text database.
+        """
+        return os.path.basename ( self.path )
+
     def isUncorrelatedWith ( self, other ):
         """
         can it be safely assumed that this dataset is approximately

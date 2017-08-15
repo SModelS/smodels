@@ -12,11 +12,12 @@ from smodels.tools.physicsUnits import pb, fb, GeV
 from smodels.theory import slhaDecomposer
 
 colors.on = True
-# setLogLevel ( "debug" )
+setLogLevel ( "debug" )
 
 smstoplist = smstoplist = slhaDecomposer.decompose( "T2tt.slha" )
 # print ( "smstoplist=",len(smstoplist ) )
-dir = "corrdb/"
+# dir = "corrdb/"
+dir = "/home/walten/git/smodels-database"
 d=Database( dir, discard_zeroes = True )
 print(d)
 results=d.getExpResults()

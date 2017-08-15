@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 from __future__ import print_function
 import sys, os, time
@@ -16,7 +16,11 @@ setLogLevel ( "debug" )
 
 smstoplist = smstoplist = slhaDecomposer.decompose( "T2tt.slha" )
 print ( "smstoplist=",len(smstoplist ) )
-dir = "covdb2/"
+dir = "covdb/"
+
+if len ( sys.argv) > 1:
+    dir = sys.argv[1]
+
 d=Database( dir, discard_zeroes = True )
 print(d)
 

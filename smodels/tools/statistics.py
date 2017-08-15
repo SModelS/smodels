@@ -57,8 +57,25 @@ class UpperLimitComputer:
         effs = numpy.array ( eff )
         llhds={}
         ## 
-        upto = 5 * math.sqrt ( max ( nev + xbg ) ) * len(eff) / sum(eff)
-        dx = upto / 50. ## FIXME
+        """
+        logger.error ( "nev=%s" % nev )
+        logger.error ( "xbg=%s" % xbg )
+        logger.error ( "tot=%s" % (nev + xbg ) )
+        logger.error ( "max=%s" % max (nev + xbg ) )
+        logger.error ( "eff=%s" % eff )
+        logger.error ( "cov=%s" % cov )
+        """
+        ul_cands = []
+        for i,e in enumerate ( eff ):
+            ul_cands.append ( math.sqrt ( nev[i] + 2*math.sqrt(cov[i][i]) ) / eff[i] )
+            ul_cands.append ( math.sqrt ( xbg[i] + 2*math.sqrt(cov[i][i]) ) / eff[i] )
+        ### a rough heuristic to determine an upper limit for integration.
+        upto = 2 * max ( ul_cands )
+        # upto = 5 * math.sqrt ( max ( nev + xbg ) ) * len(eff) / sum(eff)
+        # logger.error ( "upto=%s" % upto )
+        first_upto = upto
+        n_bins = 50.
+        dx = upto / n_bins ## FIXME
         start = dx/2.
         # start = 0.
         computer = LikelihoodComputer ( nev, xbg, cov )
@@ -77,55 +94,108 @@ class UpperLimitComputer:
             ##print ( "likelihoods",llhds )
             norm = sum ( llhds.values() )
             #print ( "norm",norm )
-            last = llhds[sig]/norm
+            last = lst[-1]/norm
             # print ( "maximum at bin #", lst.index ( max ( lst ) ) )
             if lst.index ( max ( lst ) ) == 0 and lst[0]/lst[1] > 1.1:
-                upto = .2 * upto
-                logger.error ( "maximum is too close to the left. lets go for smaller range: %f" % upto )
-                dx = upto / 50. ## FIXME
+                upto = .24 * upto
+                logger.error ( "maximum is too close to the left (first two bins are %g, %g). lets go for smaller range: %f" % ( lst[0], lst[1], upto ) )
+                dx = upto / n_bins
                 start = dx/2.
+                llhds={}
                 continue ## and again
-            if last < .0007:
-                break ## ok, we sampled well enough?
-            if last < .00001:
+            if last < 1e-8:
                 ## dubious! we may have sampled too scarcely!
-                logger.error ( "when integrating pdf, last bin is suspiciously small %f" % last )
+                upto = .23 * upto
+                logger.error ( "when integrating pdf, last bin is suspiciously small: %g. Take 23 pc the range: %s." % ( last, upto ) )
+                dx = upto / n_bins ## FIXME
+                llhds={}
+                continue
+            else:
+                if last < .0005: ## last bin contributes > 1e-7 and < .0005?
+                    break ## ok, we sampled well enough.
+            if last > 1e-2:
+                ## the last bin contributes so much, better start from scratch
+                logger.error ( "very large last bin: %g. extend by factor of 3.5." % last )
+                llhds={}
+                upto = 3.5 * upto
+                dx = upto / n_bins
+                continue
             start = upto + dx/2.
             upto = 2*upto
-            logger.error ( "last=%f. need to extend to %f" % ( last, upto ) )
+            logger.error ( "last bin contributes %f to integral. need to extend to %f" % ( last, upto ) )
         for k,v in llhds.items():
             llhds[k]=v/norm
         ## now find the 95% quantile by interpolation
         ret = self.interpolate ( llhds, dx )
-        self.plot ( llhds, dx )
+        self.plot ( llhds, dx, first_upto, upto, ret, computer, effs )
         return ret
 
-    def plot ( self, llhds, dx ):
+    def plot ( self, llhds, dx, upto, final_upto, cl95, computer, effs ):
         """ function to plot likelihoods and the 95% CL, for 
-            debugging purposes """
-        return 
-        import ROOT, ctypes
+            debugging purposes.
+        :param llhds: the likelihood values, as a dictionary
+        :param dx: the delta x between the likelihood values. FIXME redundant.
+        :param upto: first guess for how far we need to integrate.
+        :param final_upto: last guess for how far we need to integrate.
+        :param cl95: final 95% CL upper limit.
+        :param xmax: maximum likelihood computer
+        """
+        expected = ( computer.nobs == computer.nb ).all()
+        logger.error ( "expected=%s", expected )
+        import ROOT 
         xvals = list ( llhds.keys() )
         xvals.sort()
         yvals = []
         for x in xvals:
             yvals.append ( llhds[x] )
-        c_xvals = (ctypes.c_float * len(xvals))(*xvals)
-        c_yvals = (ctypes.c_float * len(yvals))(*yvals)
-        logger.error ( "Plotting likelihoods." )
-        t=ROOT.TGraph ( len ( xvals ), c_xvals, c_yvals )
+        lumi = self.lumi.asNumber(1/fb)
+        logger.error ( "Plotting likelihoods: int.upto: %s, int.upto1: %s, cl95: %s" % \
+                       ( upto/lumi, final_upto/lumi, cl95 ) )
+        t=ROOT.TGraph ( len ( xvals )) 
+        l=ROOT.TLegend( .6,.7,.98,.93)
         for ctr,(x,y) in enumerate ( zip ( xvals, yvals ) ):
-            t.SetPoint ( ctr, x, y )
+            xv = x / lumi
+            t.SetPoint ( ctr, xv, y )
             # logger.error ( "x,y=%s,%s" % ( x,y ) )
         t.Draw("AC*")
-        cl95 = self.interpolate  ( llhds, dx ) * self.lumi
-        t3=ROOT.TLine ( cl95, 0., cl95, max(yvals) )
+        logger.error ( "integral %f" % t.Integral() )
+        t.GetXaxis().SetTitle ( "cross section [fb]" )
+        title = " likelihood for signal cross section              "
+        if expected:
+            title = "expected" + title
+        else:
+            title = "observed" + title
+        t.SetTitle ( title )
+        t3=ROOT.TLine ( cl95.asNumber(fb), 0., cl95.asNumber(fb), max(yvals) )
+        t3.SetLineStyle(3)
         t3.SetLineColor(ROOT.kRed)
-        t3.SetLineStyle(2)
+        t3.SetLineWidth(2)
         t3.Draw("SAME")
+        l.AddEntry(t3,"95% limit","L" )
+        t4=ROOT.TLine ( upto/lumi, 0., upto/lumi, max(yvals) )
+        t4.SetLineColor(ROOT.kBlue)
+        t4.SetLineStyle(4)
+        t4.SetLineWidth(2)
+        t4.Draw("SAME")
+        l.AddEntry(t4,"first guess for integration upper limit","L" )
+        t5=ROOT.TLine ( final_upto/lumi, 0., final_upto/lumi, max(yvals) )
+        t5.SetLineColor(ROOT.kGreen )
+        t5.SetLineStyle(2)
+        t5.SetLineWidth(2)
+        t5.Draw("SAME")
+        l.AddEntry(t5,"final upper int limit","L" )
+        xmax = ( ( computer.nobs - computer.nb ) / effs / lumi )[0]
+        logger.error ( "xmax=%s" % xmax )
+        t6=ROOT.TLine ( xmax, 0., xmax, max(yvals) )
+        t6.SetLineColor(ROOT.kCyan )
+        t6.SetLineStyle(2)
+        t6.SetLineWidth(2)
+        t6.Draw("SAME")
+        l.AddEntry(t6,"max value","L" )
         logger.error ( "95 pc ul=%s" % cl95 )
-
-        ROOT.c1.Print ( "plot.png" )
+        l.Draw()
+        fname = "plot%d.png" % expected
+        ROOT.c1.Print ( fname )
 
     def interpolate ( self, llhds, dx ):
         """ interpolate likelihoods to have the best possible
@@ -325,26 +395,23 @@ class LikelihoodComputer:
                                    scale=sqrt(self.covb+self.deltas**2))
         return poisson*gaussian
 
-    def findMax ( self ):
-            #Compute maximum value for the integrand:
-            sigma2 = self.covb + numpy.diag ( self.deltas**2 )
+    def getMax ( self, nobs, nb, nsig, covb, deltas ):
+            """ Compute maximum value of out likelihood 
+            (a Poissonian times a Gaussian).
+            """ 
+            sigma2 = covb + numpy.diag ( deltas**2 )
             dsigma2 = numpy.diag ( sigma2 )
-            #print ( "[findMax] sigma2=", sigma2 )
-            #print ( "dsigma2=", dsigma2 )
             ## for now deal with variances only
-            ntot = self.nb + self.nsig
-            xm = self.nb + self.nsig - dsigma2
-            #print ( "[findMax] xm=", xm )
+            ntot = nb + nsig
+            xm = nb + nsig - dsigma2
             #If nb + nsig = sigma2, shift the values slightly:
             for ctr,i in enumerate(xm):
                 if i == 0.:
                     xm[ctr]=1e-3
             cov = numpy.matrix (sigma2 )
             weight = ( numpy.matrix (sigma2 ) )**(-1) ## weight matrix
-            q = self.nobs * numpy.diag ( cov ) ## q_i= nobs_i * w_ii^-1
+            q = nobs * numpy.diag ( cov ) ## q_i= nobs_i * w_ii^-1
             p = ntot - numpy.diag ( cov )
-            #print ( "[findMax] q=", q )
-            #print ( "[findMax] p=", p )
             xmax1 = p/2. * ( 1 + sign(p) * sqrt ( 1. + 4*q / p**2 ) ) ## no cov iteration
             ndims = len(p)
             for i in range(ndims):
@@ -353,9 +420,13 @@ class LikelihoodComputer:
                         continue ## treat covariance terms
                     p[i]+=(ntot[j]-xmax1[j])*weight[i,j] / weight[i,i]
             xmax = p/2. * ( 1 + sign(p)* sqrt ( 1. + 4*q / p**2 ) )
-            #print ( "[findMax] xmax1=", xmax1 )
-            #print ( "[findMax] xmax=", xmax )
             return xmax
+
+    def findMax ( self ):
+            """ Compute maximum value of out likelihood 
+            (a Poissonian times a Gaussian).
+            """ 
+            return self.getMax ( self.nobs, self.nb, self.nsig, self.covb, self.deltas )
 
     def findMaxNoCov ( self ):
             """ find maximum in gauss*poisson function, disregarding
@@ -363,7 +434,7 @@ class LikelihoodComputer:
             sigma2 = self.covb + numpy.diag ( self.deltas**2 )
             dsigma2 = numpy.diag ( sigma2 )
             xm = self.nb + self.nsig - dsigma2
-            print ( "[findMaxNoCov] xm=", xm )
+            # print ( "[findMaxNoCov] xm=", xm )
             xmax = xm*(1.+sign(xm)*sqrt(1. + 4.*self.nobs*dsigma2/xm**2))/2.
             # print ( "xmax no cov,p(xmax)=", xmax, self.probMV ( *xmax ) )
             return xmax

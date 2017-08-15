@@ -151,11 +151,14 @@ class TheoryPrediction(object):
        if type (self.dataset) == list:
             ds = "multiple (combined)"
        else:
-            ds = self.dataset.dataInfo.dataId
+            dataId = self.dataset.dataInfo.dataId
+            folderName = self.dataset.dataInfo.path
+            ds = "%s (%s)" % ( dataId, self.dataset.folderName() )
        ret += "                   datasets: %s\n" % ds
        ret += "      obs limit (sigma*eff): %s\n" % self.getUpperLimit()
        ret += "      exp limit (sigma*eff): %s\n" % self.getUpperLimit( expected=True )
        ret += "          obs limit (sigma): %s\n" % (self.getUpperLimit() / self.effectiveEff )
+       ret += "          exp limit (sigma): %s\n" % (self.getUpperLimit( expected=True ) / self.effectiveEff )
        ret += "                      obs r: %f\n" % ( self.xsection.value / self.getUpperLimit() )
        ret += "                      exp r: %f\n" % ( self.xsection.value / self.getUpperLimit( expected=True ) )
        return ret
@@ -295,7 +298,7 @@ def _sortPredictions ( expResult, smsTopList, maxMassDist, combine ):
     if not hasattr ( expResult.globalInfo, "covariance" ) or \
        not hasattr ( expResult.globalInfo, "datasetOrder" ) or \
        not combine:
-        return preds
+           return preds
     dsOrder = expResult.globalInfo.datasetOrder
     if type ( dsOrder ) == str:
         ## for debugging only, we allow a single dataset
