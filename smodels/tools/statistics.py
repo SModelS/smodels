@@ -396,9 +396,8 @@ class LikelihoodComputer:
         return poisson*gaussian
 
     def getMax ( self, nobs, nb, nsig, covb, deltas ):
-            """ Compute maximum value of out likelihood 
-            (a Poissonian times a Gaussian).
-            """ 
+            """ Compute nuisance parameter x that 
+            maximizes our likelihood (poisson*gauss).  """
             sigma2 = covb + numpy.diag ( deltas**2 )
             dsigma2 = numpy.diag ( sigma2 )
             ## for now deal with variances only
@@ -423,9 +422,8 @@ class LikelihoodComputer:
             return xmax
 
     def findMax ( self ):
-            """ Compute maximum value of out likelihood 
-            (a Poissonian times a Gaussian).
-            """ 
+            """ Compute nuisance parameter x that maximizes our likelihood (poisson*gauss). 
+            """
             return self.getMax ( self.nobs, self.nb, self.nsig, self.covb, self.deltas )
 
     def findMaxNoCov ( self ):
