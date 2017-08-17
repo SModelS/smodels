@@ -152,7 +152,7 @@ class UpperLimitComputer:
         logger.error ( "Plotting likelihoods: int.upto: %s, int.upto1: %s, cl95: %s" % \
                        ( upto/lumi, final_upto/lumi, cl95 ) )
         t=ROOT.TGraph ( len ( xvals )) 
-        l=ROOT.TLegend( .6,.7,.98,.93)
+        l=ROOT.TLegend( .6,.7,.98,.89)
         for ctr,(x,y) in enumerate ( zip ( xvals, yvals ) ):
             xv = x / lumi
             t.SetPoint ( ctr, xv, y )
@@ -160,12 +160,16 @@ class UpperLimitComputer:
         t.Draw("AC*")
         logger.error ( "integral %f" % t.Integral() )
         t.GetXaxis().SetTitle ( "cross section [fb]" )
-        title = " likelihood for signal cross section              "
+        title = " likelihood for signal cross section (%d SRs)" % len(effs)
         if expected:
             title = "expected" + title
         else:
             title = "observed" + title
-        t.SetTitle ( title )
+        t.SetTitle ( "" )
+        tt = ROOT.TText ( .1, .92, title )
+        tt.SetTextSize(.04)
+        tt.SetNDC()
+        tt.Draw()
         t3=ROOT.TLine ( cl95.asNumber(fb), 0., cl95.asNumber(fb), max(yvals) )
         t3.SetLineStyle(3)
         t3.SetLineColor(ROOT.kRed)
@@ -184,7 +188,15 @@ class UpperLimitComputer:
         t5.SetLineWidth(2)
         t5.Draw("SAME")
         l.AddEntry(t5,"final upper int limit","L" )
-        xmax = ( ( computer.nobs - computer.nb ) / effs / lumi )[0]
+        s_effs = effs
+        logger.error ( "nobs=%s" % computer.nobs )
+        logger.error ( "effs=%s" % effs )
+        logger.error ( "mx=%s" % (computer.findMax()*effs) )
+        s_delta = computer.nobs - computer.nb #+ computer.findMax()*effs
+        if type ( effs ) in [ list, numpy.ndarray ]:
+            s_effs = sum ( effs )
+            s_delta = sum ( s_delta )
+        xmax = s_delta / s_effs / lumi
         logger.error ( "xmax=%s" % xmax )
         t6=ROOT.TLine ( xmax, 0., xmax, max(yvals) )
         t6.SetLineColor(ROOT.kCyan )
@@ -411,13 +423,13 @@ class LikelihoodComputer:
             weight = ( numpy.matrix (sigma2 ) )**(-1) ## weight matrix
             q = nobs * numpy.diag ( cov ) ## q_i= nobs_i * w_ii^-1
             p = ntot - numpy.diag ( cov )
-            xmax1 = p/2. * ( 1 + sign(p) * sqrt ( 1. + 4*q / p**2 ) ) ## no cov iteration
+            xmax = p/2. * ( 1 + sign(p) * sqrt ( 1. + 4*q / p**2 ) ) ## no cov iteration
             ndims = len(p)
             for i in range(ndims):
                 for j in range(ndims):
                     if i==j: 
                         continue ## treat covariance terms
-                    p[i]+=(ntot[j]-xmax1[j])*weight[i,j] / weight[i,i]
+                    p[i]+=(ntot[j]-xmax[j])*weight[i,j] / weight[i,i]
             xmax = p/2. * ( 1 + sign(p)* sqrt ( 1. + 4*q / p**2 ) )
             return xmax
 
