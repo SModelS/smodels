@@ -188,17 +188,9 @@ class UpperLimitComputer:
         t5.SetLineWidth(2)
         t5.Draw("SAME")
         l.AddEntry(t5,"final upper int limit","L" )
-        s_effs = effs
-        logger.error ( "nobs=%s" % computer.nobs )
-        logger.error ( "effs=%s" % effs )
-        logger.error ( "mx=%s" % (computer.findMax()*effs) )
-        s_delta = computer.nobs - computer.nb #+ computer.findMax()*effs
-        if type ( effs ) in [ list, numpy.ndarray ]:
-            s_effs = sum ( effs )
-            s_delta = sum ( s_delta )
-        xmax = s_delta / s_effs / lumi
-        logger.error ( "xmax=%s" % xmax )
-        t6=ROOT.TLine ( xmax, 0., xmax, max(yvals) )
+        sigma_max = computer.findMuMax( effs, self.lumi ).asNumber(fb)
+        logger.error ( "sigma_max=%s" % sigma_max )
+        t6=ROOT.TLine ( sigma_max, 0., sigma_max, max(yvals) )
         t6.SetLineColor(ROOT.kCyan )
         t6.SetLineStyle(2)
         t6.SetLineWidth(2)
@@ -219,17 +211,18 @@ class UpperLimitComputer:
         keys = list ( llhds.keys() )
         keys.sort()
         cdf = 0.
+        quant = .95 ## 95% quantile
         for ctr,k in enumerate(keys):
             v = llhds[k]
             cdf += v
-            if cdf > .95: # perform a simple linear interpolation over cdf
+            if cdf > quant: # perform a simple linear interpolation over cdf
                 if ctr < 0.1 * len(keys):
                     logger.error ( "for the 95% CL we needed fewer than 10% of points. bad." )
                     sys.exit()
                 if ctr > 0.9 * len(keys):
                     logger.error ( "for the 95% CL we needed more than 90% of points. bad." )
                     sys.exit()
-                f = ( cdf - .95 ) / v
+                f = ( cdf - quant ) / v
                 # ret = ( k - f * dx )
                 ret = ( k + dx * ( .5 - f ) )
                 return ret / self.lumi
@@ -382,6 +375,16 @@ class LikelihoodComputer:
         self.nb = self.convert ( nb )
         self.covb = self.convert ( covb )
 
+    def findMuMax ( self, effs, lumi ):
+        # find the most likely signal strength mu
+        # FIXME what about the profiled nuisances?
+        s_delta = self.nobs - self.nb # - self.findMax()*effs
+        if type ( effs ) in [ list, numpy.ndarray ]:
+            s_effs = sum ( effs )
+            s_delta = sum ( s_delta )
+        sigma_max = s_delta / s_effs / lumi
+        return sigma_max
+
     def convert ( self, x ):
         """ turn everything into numpy arrays """
         if type ( x ) in ( list, tuple ):
@@ -421,16 +424,31 @@ class LikelihoodComputer:
                     xm[ctr]=1e-3
             cov = numpy.matrix (sigma2 )
             weight = ( numpy.matrix (sigma2 ) )**(-1) ## weight matrix
-            q = nobs * numpy.diag ( cov ) ## q_i= nobs_i * w_ii^-1
-            p = ntot - numpy.diag ( cov )
-            xmax = p/2. * ( 1 + sign(p) * sqrt ( 1. + 4*q / p**2 ) ) ## no cov iteration
+            diag_cov = numpy.diag(cov)
+            q = nobs * diag_cov ## q_i= nobs_i * w_ii^-1
+            p = ntot - diag_cov
+            # we start with assuming all nuisances and covariances to be zero
+            xmax = p/2. * ( 1 + sign(p) * sqrt ( 1. + 4*q / p**2 ) )
+            # logger.error ( "xmax 1  = %s" % xmax )
             ndims = len(p)
-            for i in range(ndims):
-                for j in range(ndims):
-                    if i==j: 
-                        continue ## treat covariance terms
-                    p[i]+=(ntot[j]-xmax[j])*weight[i,j] / weight[i,i]
-            xmax = p/2. * ( 1 + sign(p)* sqrt ( 1. + 4*q / p**2 ) )
+            for itr in range(3): ## correct a maximum of three times
+                for i in range(ndims):
+                    for j in range(ndims):
+                        if i==j: 
+                            continue ## treat covariance terms
+                        p[i]=ntot[i] - diag_cov[i] + (ntot[j]-xmax[j])*weight[i,j] / weight[i,i]
+                        # p[i]+=(ntot[j]-xmax[j])*weight[i,j] / weight[i,i]
+                new_xmax = p/2. * ( 1 + sign(p)* sqrt ( 1. + 4*q / p**2 ) )
+                if sum ( abs ( new_xmax - xmax ) / xmax ) < 1e-3:
+                    ## smaller 1% change? stop!
+                    xmax = new_xmax
+                    break
+                if itr == 2:
+                    logger.error ( "profiling did not converge! " )
+                    xmax = new_xmax
+                    break
+                xmax = new_xmax
+                # logger.error ( "xmax %d = %s" % (itr+2, xmax ) )
             return xmax
 
     def findMax ( self ):
