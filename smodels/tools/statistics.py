@@ -54,9 +54,9 @@ class UpperLimitComputer:
         :param eff: dataset effective signal efficiencies
         :returns: upper limit on *production* xsec (efficiencies unfolded)
         """
+        computer = LikelihoodComputer ( nev, xbg, cov )
         effs = numpy.array ( eff )
         llhds={}
-        ## 
         """
         logger.error ( "nev=%s" % nev )
         logger.error ( "xbg=%s" % xbg )
@@ -65,20 +65,20 @@ class UpperLimitComputer:
         logger.error ( "eff=%s" % eff )
         logger.error ( "cov=%s" % cov )
         """
-        ul_cands = []
-        for i,e in enumerate ( eff ):
-            ul_cands.append ( math.sqrt ( nev[i] + 2*math.sqrt(cov[i][i]) ) / eff[i] )
-            ul_cands.append ( math.sqrt ( xbg[i] + 2*math.sqrt(cov[i][i]) ) / eff[i] )
+        #ul_cands = []
+        #for i,e in enumerate ( eff ):
+        #    ul_cands.append ( math.sqrt ( nev[i] + 2*math.sqrt(cov[i][i]) ) / eff[i] )
+        #    ul_cands.append ( math.sqrt ( xbg[i] + 2*math.sqrt(cov[i][i]) ) / eff[i] )
         ### a rough heuristic to determine an upper limit for integration.
-        upto = 2 * max ( ul_cands )
+        # upto = 2 * max ( ul_cands )
+        upto = computer.findMuMax ( eff ) + 5.*computer.getSigmaMu ( eff )
         # upto = 5 * math.sqrt ( max ( nev + xbg ) ) * len(eff) / sum(eff)
         # logger.error ( "upto=%s" % upto )
         first_upto = upto
-        n_bins = 50.
+        n_bins = 100.
         dx = upto / n_bins ## FIXME
         start = dx/2.
         # start = 0.
-        computer = LikelihoodComputer ( nev, xbg, cov )
         #print ( "compute ulSigma",nev,xbg,cov,eff )
         #print ( "start,upto=",start,upto )
         while True:
@@ -141,7 +141,7 @@ class UpperLimitComputer:
         :param xmax: maximum likelihood computer
         """
         expected = ( computer.nobs == computer.nb ).all()
-        logger.error ( "expected=%s", expected )
+        # logger.error ( "expected=%s", expected )
         import ROOT 
         xvals = list ( llhds.keys() )
         xvals.sort()
@@ -158,7 +158,7 @@ class UpperLimitComputer:
             t.SetPoint ( ctr, xv, y )
             # logger.error ( "x,y=%s,%s" % ( x,y ) )
         t.Draw("AC*")
-        logger.error ( "integral %f" % t.Integral() )
+        # logger.error ( "integral %f" % t.Integral() )
         t.GetXaxis().SetTitle ( "cross section [fb]" )
         title = " likelihood for signal cross section (%d SRs)" % len(effs)
         if expected:
@@ -184,19 +184,26 @@ class UpperLimitComputer:
         l.AddEntry(t4,"first guess for integration upper limit","L" )
         t5=ROOT.TLine ( final_upto/lumi, 0., final_upto/lumi, max(yvals) )
         t5.SetLineColor(ROOT.kGreen )
-        t5.SetLineStyle(2)
+        t5.SetLineStyle(5)
         t5.SetLineWidth(2)
         t5.Draw("SAME")
         l.AddEntry(t5,"final upper int limit","L" )
-        sigma_max = computer.findMuMax( effs, self.lumi ).asNumber(fb)
-        logger.error ( "sigma_max=%s" % sigma_max )
+        sigma_max = computer.findMuMax( effs, lumi )
+        # logger.error ( "sigma_max=%s" % sigma_max )
         t6=ROOT.TLine ( sigma_max, 0., sigma_max, max(yvals) )
         t6.SetLineColor(ROOT.kCyan )
-        t6.SetLineStyle(2)
+        t6.SetLineStyle(6)
         t6.SetLineWidth(2)
         t6.Draw("SAME")
         l.AddEntry(t6,"max value","L" )
-        logger.error ( "95 pc ul=%s" % cl95 )
+        maxp1 = sigma_max + 1. * computer.getSigmaMu ( effs, lumi )
+        t7=ROOT.TLine ( maxp1, 0., maxp1, max(yvals) )
+        t7.SetLineColor(ROOT.kMagenta )
+        t7.SetLineStyle(7)
+        t7.SetLineWidth(2)
+        t7.Draw("SAME")
+        l.AddEntry(t7,"max + 1*sigma","L" )
+        # logger.error ( "95 pc ul=%s" % cl95 )
         l.Draw()
         fname = "plot%d.png" % expected
         ROOT.c1.Print ( fname )
@@ -375,15 +382,31 @@ class LikelihoodComputer:
         self.nb = self.convert ( nb )
         self.covb = self.convert ( covb )
 
-    def findMuMax ( self, effs, lumi ):
-        # find the most likely signal strength mu
-        # FIXME what about the profiled nuisances?
+    def findMuMax ( self, effs, lumi=1. ):
+        """
+        find the most likely signal strength mu
+        FIXME what about the profiled nuisances?
+        :param lumi: return yield (lumi=1.) or cross section ("real" lumi)
+        :returns: maximal mu, either as signal yield (lumi=1.), or as cross section.
+        """
         s_delta = self.nobs - self.nb # - self.findMax()*effs
+        s_effs = effs
         if type ( effs ) in [ list, numpy.ndarray ]:
             s_effs = sum ( effs )
             s_delta = sum ( s_delta )
         sigma_max = s_delta / s_effs / lumi
         return sigma_max
+
+    def getSigmaMu ( self, effs, lumi = 1. ):
+        """
+        get a rough estimate for the variance of mu around mu_max
+        FIXME need to do this more thorougly.
+        """
+        s_effs = effs
+        if type ( effs ) in [ list, numpy.ndarray ]:
+            s_effs = sum ( effs )
+        return math.sqrt ( sum (self.nobs ) + sum ( numpy.diag ( self.covb ) ) ) / s_effs / lumi
+
 
     def convert ( self, x ):
         """ turn everything into numpy arrays """
@@ -431,7 +454,7 @@ class LikelihoodComputer:
             xmax = p/2. * ( 1 + sign(p) * sqrt ( 1. + 4*q / p**2 ) )
             # logger.error ( "xmax 1  = %s" % xmax )
             ndims = len(p)
-            for itr in range(3): ## correct a maximum of three times
+            for itr in range(5): ## correct a maximum of three times
                 for i in range(ndims):
                     for j in range(ndims):
                         if i==j: 
@@ -439,12 +462,13 @@ class LikelihoodComputer:
                         p[i]=ntot[i] - diag_cov[i] + (ntot[j]-xmax[j])*weight[i,j] / weight[i,i]
                         # p[i]+=(ntot[j]-xmax[j])*weight[i,j] / weight[i,i]
                 new_xmax = p/2. * ( 1 + sign(p)* sqrt ( 1. + 4*q / p**2 ) )
-                if sum ( abs ( new_xmax - xmax ) / xmax ) < 1e-3:
-                    ## smaller 1% change? stop!
+                change = sum ( abs ( new_xmax - xmax ) / xmax ) / len(xmax)
+                if change < 1e-3:
+                    ## smaller 0.1% change? stop!
                     xmax = new_xmax
                     break
-                if itr == 2:
-                    logger.error ( "profiling did not converge! " )
+                if itr == 4:
+                    logger.error ( "profiling did not converge in three steps: %s vs %s. change=%f " % (xmax, new_xmax,change ) )
                     xmax = new_xmax
                     break
                 xmax = new_xmax
