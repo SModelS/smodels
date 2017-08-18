@@ -128,7 +128,7 @@ class UpperLimitComputer:
         ## now find the 95% quantile by interpolation
         ret = self.interpolate ( llhds, dx )
         self.plot ( llhds, dx, first_upto, upto, ret, computer, effs )
-        computer.plotLTheta ( ret )
+        computer.plotLTheta ( )
         return ret
 
     def plot ( self, llhds, dx, upto, final_upto, cl95, computer, effs ):
@@ -501,17 +501,17 @@ class LikelihoodComputer:
             theta_max = self.findMaxTheta ()
             return self.probMV ( *theta_max )
 
-    def plotLTheta ( self, nsig ):
+    def plotLTheta ( self, nsig=None ):
         """ plot the likelihood, but as a function of the nuisance theta! """
         import ROOT
         oldsig = self.nsig
         # self.nsig = nsig.asNumber(fb)
         theta_max = self.findMaxTheta ()
-        v_tm = self.probMV ( *theta_max )
-        logger.error ( "point at %s %s" % ( theta_max, v_tm ) )
+        # v_tm = self.probMV ( *theta_max )
+        # logger.error ( "point at %s %s" % ( theta_max, v_tm ) )
         rng = list ( numpy.arange ( 0.1, 1.9, .05 ) )
         t=ROOT.TGraph(len(rng))
-        t.SetTitle ( "#theta, in multiples of max(#theta)" )
+        t.SetTitle ( "#theta, in multiples of max(#theta), %d SRs" % len(theta_max) )
         NLLs = []
         llhds=[]
         for ctr,i in enumerate(rng):
