@@ -57,7 +57,7 @@ class TheoryPrediction(object):
         return self.dataset.dataInfo.dataType
 
     def getUpperLimit ( self, expected=False ):
-        """ Get the upper limit on sigma*eff 
+        """ Get the upper limit on sigma*eff
         :param expected: return expected Upper Limit, instead of observed.
         """
         if self.dataId() == "all":
@@ -85,7 +85,7 @@ class TheoryPrediction(object):
         The resulting values are stored as the likelihood, chi2 and expectedUL attributes.
         """
         if type ( self.dataset ) == list:
-            ## a prediction for a combined result? special 
+            ## a prediction for a combined result? special
             lumi = self.expResult.globalInfo.lumi
             pred = (self.xsection.value*lumi).asNumber() / self.effectiveEff
             nsig = [ pred * x for x in self.efficiencies ]
@@ -272,7 +272,7 @@ def theoryPredictionsFor( expResult, smsTopList, maxMassDist=0.2,
 def _mergePredictions ( preds, combinedUL, combinedEUL ):
     """ merge theory predictions, for the combined prediction. """
     if len(preds) == 0: return None
-    ret=copy.deepcopy( preds[0] ) 
+    ret=copy.deepcopy( preds[0] )
     ret.efficiencies = []
     eff, wtot = 0., 0.
     for pred in preds:
@@ -305,7 +305,10 @@ def _sortPredictions ( expResult, smsTopList, maxMassDist, combine ):
         dsOrder = [ dsOrder ]
     for dsname in dsOrder:
         dataset=expResult.getDataset ( dsname )
-        # print ( "dsname=",dsname )
+        if dataset == None:
+            txt = "In %s: dataset %s does not exist." % \
+                  ( expResult.globalInfo.id, dsname )
+            raise SModelSError ( txt )
         predList = _getDataSetPredictions(dataset,smsTopList,maxMassDist)
         if predList:
             for pred in predList:

@@ -407,6 +407,10 @@ class Database(object):
         """
         folders=[]
         for root, _, files in os.walk(self._base):
+            base = os.path.basename ( root )
+            if len(base)>0 and base[0] == ".":
+                ## hidden directory, ignore
+                continue
             folders.append ( (root, files) )
         folders.sort()
 
