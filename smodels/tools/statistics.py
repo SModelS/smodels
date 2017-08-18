@@ -128,6 +128,7 @@ class UpperLimitComputer:
         ## now find the 95% quantile by interpolation
         ret = self.interpolate ( llhds, dx )
         self.plot ( llhds, dx, first_upto, upto, ret, computer, effs )
+        computer.plotLTheta ( ret )
         return ret
 
     def plot ( self, llhds, dx, upto, final_upto, cl95, computer, effs ):
@@ -189,7 +190,6 @@ class UpperLimitComputer:
         t5.Draw("SAME")
         l.AddEntry(t5,"final upper int limit","L" )
         sigma_max = computer.findMuMax( effs, lumi )
-        # logger.error ( "sigma_max=%s" % sigma_max )
         t6=ROOT.TLine ( sigma_max, 0., sigma_max, max(yvals) )
         t6.SetLineColor(ROOT.kCyan )
         t6.SetLineStyle(6)
@@ -433,8 +433,8 @@ class LikelihoodComputer:
                                    scale=sqrt(self.covb+self.deltas**2))
         return poisson*gaussian
 
-    def getMax ( self, nobs, nb, nsig, covb, deltas ):
-            """ Compute nuisance parameter x that 
+    def getMaxTheta ( self, nobs, nb, nsig, covb, deltas ):
+            """ Compute nuisance parameter theta that 
             maximizes our likelihood (poisson*gauss).  """
             sigma2 = covb + numpy.diag ( deltas**2 )
             dsigma2 = numpy.diag ( sigma2 )
@@ -475,13 +475,16 @@ class LikelihoodComputer:
                 # logger.error ( "xmax %d = %s" % (itr+2, xmax ) )
             return xmax
 
-    def findMax ( self ):
-            """ Compute nuisance parameter x that maximizes our likelihood (poisson*gauss). 
+    def findMaxTheta ( self ):
+            """ Compute nuisance parameter theta that maximizes our likelihood
+                (poisson*gauss). 
             """
-            return self.getMax ( self.nobs, self.nb, self.nsig, self.covb, self.deltas )
+            return self.getMaxTheta ( self.nobs, self.nb, self.nsig, self.covb, \
+                                      self.deltas )
 
-    def findMaxNoCov ( self ):
-            """ find maximum in gauss*poisson function, disregarding
+    def findMaxThetaNoCov ( self ):
+            """ find nuisance parameter theta that maximizes our likelihood 
+                (gauss*poisson) function, disregarding
                 off-diagonal elements in covariance matrix """
             sigma2 = self.covb + numpy.diag ( self.deltas**2 )
             dsigma2 = numpy.diag ( sigma2 )
@@ -495,8 +498,39 @@ class LikelihoodComputer:
             # compute the profiled (not normalized) likelihood of observing
             # nsig signal events
             self.nsig, self.deltas = nsig, deltas ## store for integration
-            xmax = self.findMax ()
-            return self.probMV ( *xmax )
+            theta_max = self.findMaxTheta ()
+            return self.probMV ( *theta_max )
+
+    def plotLTheta ( self, nsig ):
+        """ plot the likelihood, but as a function of the nuisance theta! """
+        import ROOT
+        oldsig = self.nsig
+        # self.nsig = nsig.asNumber(fb)
+        theta_max = self.findMaxTheta ()
+        v_tm = self.probMV ( *theta_max )
+        logger.error ( "point at %s %s" % ( theta_max, v_tm ) )
+        rng = list ( numpy.arange ( 0.1, 1.9, .05 ) )
+        t=ROOT.TGraph(len(rng))
+        t.SetTitle ( "#theta, in multiples of max(#theta)" )
+        NLLs = []
+        llhds=[]
+        for ctr,i in enumerate(rng):
+            v=i*theta_max
+            L = self.probMV ( *v )
+            llhds.append ( L )
+            if L > 0.:
+                nll = - math.log ( L )
+                NLLs.append ( nll )
+                t.SetPoint( ctr, i, nll )
+            else:
+                t.SetPoint( ctr, i, 450. ) ## float("nan") )
+        for ctr,L in enumerate(llhds):
+            if L == 0.:
+                t.SetPoint ( ctr, rng[ctr], 1.1*max(NLLs) )
+        # t.SetPoint(0,theta_max, - math.log ( self.probMV ( *theta_max ) ) )
+        t.Draw("AC*")
+        ROOT.c1.Print("Ltheta.png" )
+        self.nsig = oldsig
 
     def _mvLikelihood( self, nsig, deltas ):
             # compute the marginalized likelihood of observing nsig signal
@@ -532,14 +566,14 @@ class LikelihoodComputer:
                     xm[ctr]=1e-3
             self.nsig, self.deltas = nsig, deltas ## store for integration
             # xmax = self.findMaxNoCov ()
-            xmax = self.findMax ()
+            theta_max = self.findMaxTheta ()
             #print ( "found xmax at", xmax, "l=",self.probMV(*xmax) )
 
             #Define initial integration range:
             nrange = 5.
-            low = xmax-nrange*sqrt(dsigma2)
+            low = theta_max-nrange*sqrt(dsigma2)
             low[low<0.] = 0. ## set all negatives to zero!
-            up = xmax+nrange*sqrt(dsigma2)
+            up = theta_max+nrange*sqrt(dsigma2)
             ## first integral can be coarse, we will anyhow do another round
             opts = { "epsabs":1e-2, "epsrel":1e-1 }
             like = integrate.nquad( self.probMV, zip(low,up),opts=opts )[0]
@@ -553,9 +587,9 @@ class LikelihoodComputer:
                 opts = { "epsabs":1e-4, "epsrel":1e-2 }
                 like_old = like
                 nrange = nrange*2
-                low = xmax-nrange*sqrt(dsigma2)
+                low = theta_max-nrange*sqrt(dsigma2)
                 low[low<0.] = 0. ## set all negatives to zero!
-                up = xmax+nrange*sqrt(dsigma2)
+                up = theta_max+nrange*sqrt(dsigma2)
                 res = integrate.nquad(self.probMV,zip(low,up),opts=opts)
                 like = res[0]
                 if like == 0.: ## too large!
