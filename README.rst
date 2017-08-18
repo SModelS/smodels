@@ -40,7 +40,7 @@ An example file on how to call the SModelS libraries from your own
 Python code can be found in *Example.py*.
 
 Detailed explanations on how to use SModelS, including explanations of the
-output, can be found in the section `Using SModelS <http://smodels.readthedocs.io/en/latest/RunningSModelS.htm>`_ of the `SModelS online manual`_.
+output, can be found in the section `Using SModelS <http://smodels.readthedocs.io/en/latest/RunningSModelS.html>`_ of the `SModelS online manual`_.
 
 A few example input files are provided in the inputFiles folder and can be
 used to test *runSModelS.py*.
