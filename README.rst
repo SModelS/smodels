@@ -21,7 +21,7 @@ Installation
 ============
 
 For instructions on how to install SModelS, see INSTALLATION.rst or
-the `installation section <http://smodels.readthedocs.io/en/latest/Installation.html>`_ in the manual.
+the section `Installation <http://smodels.readthedocs.io/en/latest/Installation.html>`_ of the `SModelS online manual`_.
 
 
 Running SModelS
@@ -40,7 +40,7 @@ An example file on how to call the SModelS libraries from your own
 Python code can be found in *Example.py*.
 
 Detailed explanations on how to use SModelS, including explanations of the
-output, can be found in the section ''Running SModelS'' of the `SModelS online manual`_.
+output, can be found in the section `Using SModelS <http://smodels.readthedocs.io/en/latest/RunningSModelS.htm>`_ of the `SModelS online manual`_.
 
 A few example input files are provided in the inputFiles folder and can be
 used to test *runSModelS.py*.
