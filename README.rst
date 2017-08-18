@@ -17,6 +17,9 @@ energy, for which a large variety of SMS results from ATLAS and CMS are
 available. 
 
 
+Installation
+============
+
 For instructions on how to install SModelS, see INSTALLATION.rst.
 
 
