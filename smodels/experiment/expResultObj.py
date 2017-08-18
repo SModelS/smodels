@@ -16,6 +16,7 @@ from smodels.experiment import datasetObj
 from smodels.experiment.exceptions import DatabaseNotFoundException, SModelSExperimentError
 from smodels.tools.physicsUnits import fb
 from smodels.tools.smodelsLogging import logger
+from smodels.tools.stringTools import cleanWalk
 from smodels.tools import statistics
 
 class ExpResult(object):
@@ -43,7 +44,7 @@ class ExpResult(object):
             self.globalInfo = infoObj.Info(os.path.join(path, "globalInfo.txt"))
             self.datasets = []
             folders=[]
-            for root, _, files in os.walk(path):
+            for root, _, files in cleanWalk(path):
                 folders.append ( (root, files) )
             folders.sort()
             for root, files in folders:
@@ -210,7 +211,7 @@ class ExpResult(object):
             raise SModelSExperimentError ( "datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id )
         cov = self.globalInfo.covariance
         if type ( cov ) != list:
-            logger.error ( "covariance field has wrong type." )
+            logger.error ( "covariance field has wrong type: %s" % type(cov) )
             sys.exit()
         if len ( cov ) < 1:
             logger.error ( "covariance matrix has length %d." % len(cov) )

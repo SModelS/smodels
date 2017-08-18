@@ -21,6 +21,7 @@ from smodels.experiment import datasetObj
 from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.tools.physicsUnits import TeV
+from smodels.tools.stringTools import cleanWalk
 from smodels.tools.smodelsLogging import logger
 import logging
 
@@ -406,11 +407,7 @@ class Database(object):
   
         """
         folders=[]
-        for root, _, files in os.walk(self._base):
-            base = os.path.basename ( root )
-            if len(base)>0 and base[0] == ".":
-                ## hidden directory, ignore
-                continue
+        for root, _, files in cleanWalk(self._base):
             folders.append ( (root, files) )
         folders.sort()
 
