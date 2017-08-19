@@ -65,14 +65,7 @@ class UpperLimitComputer:
         logger.error ( "eff=%s" % eff )
         logger.error ( "cov=%s" % cov )
         """
-        #ul_cands = []
-        #for i,e in enumerate ( eff ):
-        #    ul_cands.append ( math.sqrt ( nev[i] + 2*math.sqrt(cov[i][i]) ) / eff[i] )
-        #    ul_cands.append ( math.sqrt ( xbg[i] + 2*math.sqrt(cov[i][i]) ) / eff[i] )
-        ### a rough heuristic to determine an upper limit for integration.
-        # upto = 2 * max ( ul_cands )
         upto = computer.findMuMax ( eff ) + 5.*computer.getSigmaMu ( eff )
-        # upto = 5 * math.sqrt ( max ( nev + xbg ) ) * len(eff) / sum(eff)
         # logger.error ( "upto=%s" % upto )
         first_upto = upto
         n_bins = 100.
@@ -389,7 +382,12 @@ class LikelihoodComputer:
         :param lumi: return yield (lumi=1.) or cross section ("real" lumi)
         :returns: maximal mu, either as signal yield (lumi=1.), or as cross section.
         """
-        s_delta = self.nobs - self.nb # - self.findMax()*effs
+        self.nsig = self.nobs - self.nb
+        self.deltas = numpy.array ( [0.] * len(self.nobs ) )
+        theta_max = self.findMaxTheta()
+        logger.error ( "findingMuMax=%s" % theta_max )
+        logger.error ( "sum(effs)=%s" % sum(effs) )
+        s_delta = self.nobs - self.nb# - self.findMaxTheta() *effs
         s_effs = effs
         if type ( effs ) in [ list, numpy.ndarray ]:
             s_effs = sum ( effs )
