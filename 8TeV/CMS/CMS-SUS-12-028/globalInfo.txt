@@ -1,0 +1,10 @@
+id: CMS-SUS-12-028
+sqrts: 8*TeV
+lumi: 11.7/fb
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS12028
+arxiv: http://arxiv.org/abs/1303.2985
+publication: Eur. Phys. J. C 73 (2013) 2568
+contact: Edward Laird <edward.laird@cern.ch>, Rob Bainbridge <robert.bainbridge@cern.ch>
+supersedes: CMS-PAS-SUS-12-016
+implementedBy: Andre Lessa
+lastUpdate: 2016/11/2

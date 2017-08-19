@@ -1,0 +1,9 @@
+id: CMS-SUS-13-002
+sqrts: 8*TeV
+lumi: 19.5/fb
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13002
+arxiv: http://arxiv.org/abs/1404.5801v2
+publication: http://journals.aps.org/prd/abstract/10.1103/PhysRevD.90.032006
+supersedes: CMS-PAS-SUS-12-026
+implementedBy: Andre Lessa
+lastUpdate: 2016/12/24
