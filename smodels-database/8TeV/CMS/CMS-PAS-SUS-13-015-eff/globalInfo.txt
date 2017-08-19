@@ -1,0 +1,7 @@
+id: CMS-PAS-SUS-13-015
+sqrts: 8*TeV
+lumi: 19.4/fb
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13015
+publication: http://cds.cern.ch/record/1635353/files/SUS-13-015-pas.pdf
+implementedBy: Federico A
+lastUpdate: 2016/9/29

@@ -1,0 +1,7 @@
+id: ATLAS-CONF-2013-065
+sqrts: 8.0*TeV
+lumi: 20.3/fb
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-065/ http://cds.cern.ch/record/1562840
+supersededBy: ATLAS-SUSY-2013-19
+implementedBy: Andre Lessa
+lastUpdate: 2016/10/3

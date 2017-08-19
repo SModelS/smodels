@@ -1,0 +1,7 @@
+dataId: MET4_HT4_nb3
+dataType: efficiencyMap
+observedN: 4
+expectedBG: 2.1
+bgError: 1.1
+upperLimit: 3.8500E-01*fb
+expectedUpperLimit: 2.6167E-01*fb

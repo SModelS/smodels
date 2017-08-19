@@ -1,0 +1,7 @@
+dataId: mu350Nb3
+dataType: efficiencyMap
+observedN: 0
+expectedBG: 0.6
+bgError: 0.58
+upperLimit: 1.550E-01*fb
+expectedUpperLimit: 1.548E-01*fb
