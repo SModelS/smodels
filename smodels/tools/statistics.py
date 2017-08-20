@@ -65,7 +65,7 @@ class UpperLimitComputer:
         logger.error ( "eff=%s" % eff )
         logger.error ( "cov=%s" % cov )
         """
-        upto = computer.findMuMax ( eff ) + 5.*computer.getSigmaMu ( eff )
+        upto = computer.findMuHat ( eff ) + 5.*computer.getSigmaMu ( eff )
         # logger.error ( "upto=%s" % upto )
         first_upto = upto
         n_bins = 100.
@@ -125,7 +125,7 @@ class UpperLimitComputer:
         return ret
 
     def plot ( self, llhds, dx, upto, final_upto, cl95, computer, effs ):
-        """ function to plot likelihoods and the 95% CL, for 
+        """ function to plot likelihoods and the 95% CL, for
             debugging purposes.
         :param llhds: the likelihood values, as a dictionary
         :param dx: the delta x between the likelihood values. FIXME redundant.
@@ -136,7 +136,7 @@ class UpperLimitComputer:
         """
         expected = ( computer.nobs == computer.nb ).all()
         # logger.error ( "expected=%s", expected )
-        import ROOT 
+        import ROOT
         xvals = list ( llhds.keys() )
         xvals.sort()
         yvals = []
@@ -145,7 +145,7 @@ class UpperLimitComputer:
         lumi = self.lumi.asNumber(1/fb)
         logger.error ( "Plotting likelihoods: int.upto: %s, int.upto1: %s, cl95: %s" % \
                        ( upto/lumi, final_upto/lumi, cl95 ) )
-        t=ROOT.TGraph ( len ( xvals )) 
+        t=ROOT.TGraph ( len ( xvals ))
         l=ROOT.TLegend( .6,.7,.98,.89)
         for ctr,(x,y) in enumerate ( zip ( xvals, yvals ) ):
             xv = x / lumi
@@ -182,7 +182,7 @@ class UpperLimitComputer:
         t5.SetLineWidth(2)
         t5.Draw("SAME")
         l.AddEntry(t5,"final upper int limit","L" )
-        sigma_max = computer.findMuMax( effs, lumi )
+        sigma_max = computer.findMuHat( effs, lumi )
         t6=ROOT.TLine ( sigma_max, 0., sigma_max, max(yvals) )
         t6.SetLineColor(ROOT.kCyan )
         t6.SetLineStyle(6)
@@ -313,7 +313,7 @@ class UpperLimitComputer:
                 return self.ulSigmaTimesEpsilon ( nev, xbg, sbg, 5.0*upto, upto>200. )
             else:
                 return float("nan")
-                
+
     def CLsMV( self, SigHypothesis ):
         """ CLs, with vectors and covariances """
         ## testing whether scipy is there
@@ -375,25 +375,59 @@ class LikelihoodComputer:
         self.nb = self.convert ( nb )
         self.covb = self.convert ( covb )
 
-    def findMuMax ( self, effs, lumi=1. ):
+    def dLdMu ( self, mu, effs, theta_hat ):
+        """ dL/dmu * ( 1/L ), if L is the likelihood. The function
+            whose root gives us muhat, i.e. the mu that maximizes
+            the likelihood. """
+        denominator = mu*effs + self.nb + theta_hat
+        ret = self.nobs * effs / denominator - effs
+        if type (ret ) in [ numpy.array, numpy.ndarray, list ]:
+            ret = sum ( ret )
+        return ret
+
+    def findMuHat ( self, effs, lumi=1. ):
         """
         find the most likely signal strength mu
         FIXME what about the profiled nuisances?
         :param lumi: return yield (lumi=1.) or cross section ("real" lumi)
-        :returns: maximal mu, either as signal yield (lumi=1.), or as cross section.
+        :returns: mu_hat, either as signal yield (lumi=1.), or as cross section.
         """
+        if ( self.nb == self.nobs ).all():
+            return 0. / lumi
+        if type ( effs ) in [ list, numpy.ndarray ]:
+            effs = numpy.array ( effs )
         self.nsig = self.nobs - self.nb
         self.deltas = numpy.array ( [0.] * len(self.nobs ) )
-        theta_max = self.findMaxTheta()
-        logger.error ( "findingMuMax=%s" % theta_max )
-        logger.error ( "sum(effs)=%s" % sum(effs) )
-        s_delta = self.nobs - self.nb# - self.findMaxTheta() *effs
-        s_effs = effs
+        theta_hat = self.findThetaHat()
+        logger.error ( "   theta hat=%s" % theta_hat )
+        logger.error ( "        nobs=%s" % self.nobs )
+        logger.error ( "          nb=%s" % self.nb )
+        logger.error ( "        effs=%s" % effs )
+        s_delta = effs * ( self.nobs - self.nb - theta_hat )
+        ## s_delta = ( self.nobs - self.nb - theta_hat )
+        s_effs = None
         if type ( effs ) in [ list, numpy.ndarray ]:
-            s_effs = sum ( effs )
+            s_effs = sum ( effs**2 )
+            # s_effs = sum ( effs )
             s_delta = sum ( s_delta )
-        sigma_max = s_delta / s_effs / lumi
-        return sigma_max
+        else:
+            # s_effs = effs
+            s_effs = effs**2
+        mu_ini = s_delta / s_effs ## first vague guess for mu_hat.
+        ## used only to find the brackets for brentq
+        logger.error ( "   sum(effs*2)=%s" % s_effs )
+        logger.error ( "   lumi       =%s" % lumi )
+        logger.error ( "   mu_ini*lumi=%s" % mu_ini )
+        check = sum ( self.nobs * effs / (mu_ini * effs + self.nb ) - effs )
+        logger.error ( "   check  =%s" % check )
+        for i in numpy.arange ( -1.*mu_ini, 5.*mu_ini, .5*mu_ini ):
+            logger.error ( " mu=%s, p=%s" % ( i, self.dLdMu ( i, effs, theta_hat ) ) )
+        mu_hat = optimize.brentq ( self.dLdMu, .1*mu_ini, 4*mu_ini, args=(effs, theta_hat ) )
+        logger.error ( " brent    =%s" % ( mu_hat/lumi) )
+        check = sum ( self.nobs * effs / ( mu_hat * effs + self.nb ) - effs )
+        logger.error ( "   check(B) =%s" % check )
+        logger.error ( "   mu_hat  =%s" % (mu_hat/lumi) )
+        return mu_hat / lumi
 
     def getSigmaMu ( self, effs, lumi = 1. ):
         """
@@ -416,23 +450,30 @@ class LikelihoodComputer:
     # def prob(x0, x1 )
     def probMV( self, *xar ):
         x = numpy.array ( xar )
-        if sum ( x<0. ) > 0:
-            logger.error ( "negative values for x: %s" % x )
-            sys.exit() 
-        poisson = numpy.exp(self.nobs*numpy.log(x) - x - special.gammaln(self.nobs + 1))
-        gaussian = stats.multivariate_normal.pdf(x,mean=self.nb+self.nsig,cov=(self.covb+numpy.diag(self.deltas**2)))
+        #if sum ( x<0. ) > 0:
+        #    logger.error ( "negative values for x: %s" % x )
+        #    sys.exit()
+        #poisson = numpy.exp(self.nobs*numpy.log(x) - x - special.gammaln(self.nobs + 1))
+        #gaussian = stats.multivariate_normal.pdf(x,mean=self.nb+self.nsig,cov=(self.covb+numpy.diag(self.deltas**2)))
+        ntot = self.nb + self.nsig
+        poisson = numpy.exp(self.nobs*numpy.log(x+ntot) - x -ntot - special.gammaln(self.nobs + 1))
+        gaussian = stats.multivariate_normal.pdf(x,mean=[0.]*len(x),cov=(self.covb+numpy.diag(self.deltas**2)))
         ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
         return ret
 
     #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
     def prob( self, x ):
-        poisson = exp(self.nobs*log(x) - x - math.lgamma(self.nobs + 1))
-        gaussian = stats.norm.pdf( x, loc=self.nb+self.nsig,\
+        #poisson = exp(self.nobs*log(x) - x - math.lgamma(self.nobs + 1))
+        #gaussian = stats.norm.pdf( x, loc=self.nb+self.nsig,\
+        #                           scale=sqrt(self.covb+self.deltas**2))
+        ntot = self.nb + self.nsig
+        poisson = exp(self.nobs*log(x+ntot) - x - ntot - math.lgamma(self.nobs + 1))
+        gaussian = stats.norm.pdf( x, loc=0.,\
                                    scale=sqrt(self.covb+self.deltas**2))
         return poisson*gaussian
 
-    def getMaxTheta ( self, nobs, nb, nsig, covb, deltas ):
-            """ Compute nuisance parameter theta that 
+    def getThetaHat ( self, nobs, nb, nsig, covb, deltas ):
+            """ Compute nuisance parameter theta that
             maximizes our likelihood (poisson*gauss).  """
             sigma2 = covb + numpy.diag ( deltas**2 )
             dsigma2 = numpy.diag ( sigma2 )
@@ -455,7 +496,7 @@ class LikelihoodComputer:
             for itr in range(5): ## correct a maximum of three times
                 for i in range(ndims):
                     for j in range(ndims):
-                        if i==j: 
+                        if i==j:
                             continue ## treat covariance terms
                         p[i]=ntot[i] - diag_cov[i] + (ntot[j]-xmax[j])*weight[i,j] / weight[i,i]
                         # p[i]+=(ntot[j]-xmax[j])*weight[i,j] / weight[i,i]
@@ -471,17 +512,18 @@ class LikelihoodComputer:
                     break
                 xmax = new_xmax
                 # logger.error ( "xmax %d = %s" % (itr+2, xmax ) )
-            return xmax
+            return xmax - nb - nsig ## FIXME wrong!!!
+            # return xmax
 
-    def findMaxTheta ( self ):
+    def findThetaHat ( self ):
             """ Compute nuisance parameter theta that maximizes our likelihood
-                (poisson*gauss). 
+                (poisson*gauss).
             """
-            return self.getMaxTheta ( self.nobs, self.nb, self.nsig, self.covb, \
+            return self.getThetaHat ( self.nobs, self.nb, self.nsig, self.covb, \
                                       self.deltas )
 
-    def findMaxThetaNoCov ( self ):
-            """ find nuisance parameter theta that maximizes our likelihood 
+    def findThetaHatNoCov ( self ):
+            """ find nuisance parameter theta that maximizes our likelihood
                 (gauss*poisson) function, disregarding
                 off-diagonal elements in covariance matrix """
             sigma2 = self.covb + numpy.diag ( self.deltas**2 )
@@ -496,37 +538,46 @@ class LikelihoodComputer:
             # compute the profiled (not normalized) likelihood of observing
             # nsig signal events
             self.nsig, self.deltas = nsig, deltas ## store for integration
-            theta_max = self.findMaxTheta ()
-            return self.probMV ( *theta_max )
+            theta_hat = self.findThetaHat ()
+            return self.probMV ( *theta_hat )
 
     def plotLTheta ( self, nsig=None ):
         """ plot the likelihood, but as a function of the nuisance theta! """
         import ROOT
         oldsig = self.nsig
         # self.nsig = nsig.asNumber(fb)
-        theta_max = self.findMaxTheta ()
-        # v_tm = self.probMV ( *theta_max )
-        # logger.error ( "point at %s %s" % ( theta_max, v_tm ) )
-        rng = list ( numpy.arange ( 0.1, 1.9, .05 ) )
+        theta_hat = self.findThetaHat ()
+        # v_tm = self.probMV ( *theta_hat )
+        # logger.error ( "point at %s %s" % ( theta_hat, v_tm ) )
+        # rng = list ( numpy.arange ( 0.1, 1.9, .05 ) )
+        rng = list ( numpy.arange ( -1e10, 1e10, 1e8 ) )
         t=ROOT.TGraph(len(rng))
-        t.SetTitle ( "#theta, in multiples of max(#theta), %d SRs" % len(theta_max) )
+        t.SetTitle ( "#theta, in multiples of max(#theta), %d SRs" % len(theta_hat) )
         NLLs = []
         llhds=[]
         for ctr,i in enumerate(rng):
-            v=i*theta_max
+            v=i*theta_hat
             L = self.probMV ( *v )
             llhds.append ( L )
+            t.SetPoint( ctr, i, L )
+            """
             if L > 0.:
                 nll = - math.log ( L )
                 NLLs.append ( nll )
                 t.SetPoint( ctr, i, nll )
             else:
                 t.SetPoint( ctr, i, 450. ) ## float("nan") )
+            """
         for ctr,L in enumerate(llhds):
             if L == 0.:
-                t.SetPoint ( ctr, rng[ctr], 1.1*max(NLLs) )
-        # t.SetPoint(0,theta_max, - math.log ( self.probMV ( *theta_max ) ) )
+                pass
+                # t.SetPoint ( ctr, rng[ctr], 1.1*max(NLLs) )
+        # t.SetPoint(0,theta_hat, - math.log ( self.probMV ( *theta_hat ) ) )
         t.Draw("AC*")
+        line = ROOT.TLine ( 1., min(llhds), 1., max(llhds) )
+        line.SetLineColor ( ROOT.kRed )
+        line.SetLineStyle(2)
+        line.Draw()
         ROOT.c1.Print("Ltheta.png" )
         self.nsig = oldsig
 
@@ -564,14 +615,14 @@ class LikelihoodComputer:
                     xm[ctr]=1e-3
             self.nsig, self.deltas = nsig, deltas ## store for integration
             # xmax = self.findMaxNoCov ()
-            theta_max = self.findMaxTheta ()
+            theta_hat = self.findThetaHat ()
             #print ( "found xmax at", xmax, "l=",self.probMV(*xmax) )
 
             #Define initial integration range:
             nrange = 5.
-            low = theta_max-nrange*sqrt(dsigma2)
+            low = theta_hat-nrange*sqrt(dsigma2)
             low[low<0.] = 0. ## set all negatives to zero!
-            up = theta_max+nrange*sqrt(dsigma2)
+            up = theta_hat+nrange*sqrt(dsigma2)
             ## first integral can be coarse, we will anyhow do another round
             opts = { "epsabs":1e-2, "epsrel":1e-1 }
             like = integrate.nquad( self.probMV, zip(low,up),opts=opts )[0]
@@ -585,9 +636,9 @@ class LikelihoodComputer:
                 opts = { "epsabs":1e-4, "epsrel":1e-2 }
                 like_old = like
                 nrange = nrange*2
-                low = theta_max-nrange*sqrt(dsigma2)
+                low = theta_hat-nrange*sqrt(dsigma2)
                 low[low<0.] = 0. ## set all negatives to zero!
-                up = theta_max+nrange*sqrt(dsigma2)
+                up = theta_hat+nrange*sqrt(dsigma2)
                 res = integrate.nquad(self.probMV,zip(low,up),opts=opts)
                 like = res[0]
                 if like == 0.: ## too large!
@@ -599,10 +650,10 @@ class LikelihoodComputer:
             #The integral of the gaussian from 0 to infinity gives:
             #(1/2)*(1 + Erf(mu/sqrt(2*sigma2))), so we need to divide by it
             #(for mu - sigma >> 0, the normalization gives 1.)
-            like = like/ norms ## reduce(lambda x, y: x*y, norm ) 
+            like = like/ norms ## reduce(lambda x, y: x*y, norm )
             # print ( "like now=", like )
             return like
-            
+
     def profileLikelihood ( self, nsig, deltas = None ):
         """ compute the profiled likelihood for nsig.
             Warning: not normalized. """
