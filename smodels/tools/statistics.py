@@ -488,7 +488,7 @@ class LikelihoodComputer:
             weight = ( numpy.matrix (sigma2 ) )**(-1) ## weight matrix
             diag_cov = numpy.diag(cov)
             q = nobs * diag_cov ## q_i= nobs_i * w_ii^-1
-            p = ntot - diag_cov
+            p = ntot - diag_cov ## caveat, this is usually called '-p', not 'p'
             # we start with assuming all nuisances and covariances to be zero
             xmax = p/2. * ( 1 + sign(p) * sqrt ( 1. + 4*q / p**2 ) )
             # logger.error ( "xmax 1  = %s" % xmax )
