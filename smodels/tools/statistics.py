@@ -385,6 +385,32 @@ class LikelihoodComputer:
             ret = sum ( ret )
         return ret
 
+    def plotMuHatRootFinding ( self, effs, theta_hat, lumi, mu_hat ):
+        """ plot the function whose root gives us mu_hat: 1/L dL/dmu.
+        """
+        mu_c = ( self.nobs - self.nb - theta_hat ) / effs
+        mu_ini = sum ( mu_c ) / len(mu_c)
+
+        rnge = numpy.arange ( -1.*mu_ini, 4.*mu_ini, .5*mu_ini )
+        import ROOT
+        r=ROOT.TGraph ( len(rnge) )
+        r.SetTitle ( "1/L dL/d#mu" ) ##  #frac{1}{L}#frac{dL}#frac{d#mu}" )
+        mu_c = ( self.nobs - self.nb - theta_hat ) / effs
+        logger.error ( "mu_c = %s " % (mu_c/lumi) )
+        for ctr,i in enumerate(rnge):
+            dldmu = self.dLdMu ( i, effs, theta_hat )
+            # logger.error ( " mu=%s, p=%s" % ( i, dldmu ) )
+            r.SetPoint ( ctr, i / lumi, dldmu )
+        r.Draw("AC*")
+        r.GetHistogram().SetXTitle ( "#mu [fb]" )
+        r2=ROOT.TGraph ( 1 )
+        r2.SetPoint(0,mu_hat/lumi, 0. )
+        r2.SetMarkerStyle(29)
+        r2.SetMarkerColor(ROOT.kRed)
+        r2.SetMarkerSize(2)
+        r2.Draw("PSAME" )
+        ROOT.c1.Print ( "dldmu.pdf" )
+
     def findMuHat ( self, effs, lumi=1. ):
         """
         find the most likely signal strength mu
@@ -403,26 +429,11 @@ class LikelihoodComputer:
         logger.error ( "        nobs=%s" % self.nobs )
         logger.error ( "          nb=%s" % self.nb )
         logger.error ( "        effs=%s" % effs )
-        s_delta = effs * ( self.nobs - self.nb - theta_hat )
-        ## s_delta = ( self.nobs - self.nb - theta_hat )
-        s_effs = None
-        if type ( effs ) in [ list, numpy.ndarray ]:
-            s_effs = sum ( effs**2 )
-            # s_effs = sum ( effs )
-            s_delta = sum ( s_delta )
-        else:
-            # s_effs = effs
-            s_effs = effs**2
-        mu_ini = s_delta / s_effs ## first vague guess for mu_hat.
-        ## used only to find the brackets for brentq
-        logger.error ( "   sum(effs*2)=%s" % s_effs )
-        logger.error ( "   lumi       =%s" % lumi )
-        logger.error ( "   mu_ini*lumi=%s" % mu_ini )
-        check = sum ( self.nobs * effs / (mu_ini * effs + self.nb ) - effs )
-        logger.error ( "   check  =%s" % check )
-        for i in numpy.arange ( -1.*mu_ini, 5.*mu_ini, .5*mu_ini ):
-            logger.error ( " mu=%s, p=%s" % ( i, self.dLdMu ( i, effs, theta_hat ) ) )
-        mu_hat = optimize.brentq ( self.dLdMu, .1*mu_ini, 4*mu_ini, args=(effs, theta_hat ) )
+        mu_c = ( self.nobs - self.nb - theta_hat ) / effs
+        ## find mu_hat by finding the root of 1/L dL/dmu. We know 
+        ## that the zero has to be between min(mu_c) and max(mu_c).
+        mu_hat = optimize.brentq ( self.dLdMu, min(mu_c), max(mu_c), args=(effs, theta_hat ) )
+        # self.plotMuHatRootFinding( effs, theta_hat, lumi, mu_hat ) 
         logger.error ( " brent    =%s" % ( mu_hat/lumi) )
         check = sum ( self.nobs * effs / ( mu_hat * effs + self.nb ) - effs )
         logger.error ( "   check(B) =%s" % check )
@@ -543,16 +554,18 @@ class LikelihoodComputer:
 
     def plotLTheta ( self, nsig=None ):
         """ plot the likelihood, but as a function of the nuisance theta! """
+        if ( self.nobs == self.nb ).all():
+            # only plot we this isnt the 'expected' case.
+            return 
         import ROOT
         oldsig = self.nsig
-        # self.nsig = nsig.asNumber(fb)
         theta_hat = self.findThetaHat ()
-        # v_tm = self.probMV ( *theta_hat )
-        # logger.error ( "point at %s %s" % ( theta_hat, v_tm ) )
-        # rng = list ( numpy.arange ( 0.1, 1.9, .05 ) )
+        v_tm = self.probMV ( *theta_hat )
+        logger.error ( "point at %s %s" % ( theta_hat, v_tm ) )
         rng = list ( numpy.arange ( -1e10, 1e10, 1e8 ) )
+        rng = list ( numpy.arange ( -1.2e9, 1.2e9, 0.8e7 ) )
         t=ROOT.TGraph(len(rng))
-        t.SetTitle ( "#theta, in multiples of max(#theta), %d SRs" % len(theta_hat) )
+        t.SetTitle ( "L(#theta/#hat{#theta}), %d SRs" % len(theta_hat) )
         NLLs = []
         llhds=[]
         for ctr,i in enumerate(rng):
@@ -560,20 +573,21 @@ class LikelihoodComputer:
             L = self.probMV ( *v )
             llhds.append ( L )
             t.SetPoint( ctr, i, L )
-            """
             if L > 0.:
                 nll = - math.log ( L )
                 NLLs.append ( nll )
-                t.SetPoint( ctr, i, nll )
+                t.SetPoint( ctr, i, L )
             else:
                 t.SetPoint( ctr, i, 450. ) ## float("nan") )
-            """
+        mNLL = min(NLLs)
         for ctr,L in enumerate(llhds):
             if L == 0.:
                 pass
                 # t.SetPoint ( ctr, rng[ctr], 1.1*max(NLLs) )
         # t.SetPoint(0,theta_hat, - math.log ( self.probMV ( *theta_hat ) ) )
         t.Draw("AC*")
+        t.GetHistogram().SetXTitle ( "#theta/#hat{#theta}" )
+        # line = ROOT.TLine ( 1., min(NLLs), 1., max(NLLs) )
         line = ROOT.TLine ( 1., min(llhds), 1., max(llhds) )
         line.SetLineColor ( ROOT.kRed )
         line.SetLineStyle(2)
