@@ -57,17 +57,8 @@ class UpperLimitComputer:
         computer = LikelihoodComputer ( nev, xbg, cov )
         effs = numpy.array ( eff )
         llhds={}
-        """
-        logger.error ( "nev=%s" % nev )
-        logger.error ( "xbg=%s" % xbg )
-        logger.error ( "tot=%s" % (nev + xbg ) )
-        logger.error ( "max=%s" % max (nev + xbg ) )
-        logger.error ( "eff=%s" % eff )
-        logger.error ( "cov=%s" % cov )
-        """
         mu_hat = computer.findMuHat ( eff )
         upto = mu_hat + 5.*computer.getSigmaMu ( eff, 1., mu_hat )
-        # logger.error ( "upto=%s" % upto )
         first_upto = upto
         n_bins = 100.
         dx = upto / n_bins ## FIXME
@@ -122,7 +113,7 @@ class UpperLimitComputer:
         ## now find the 95% quantile by interpolation
         ret = self.interpolate ( llhds, dx )
         self.plot ( llhds, dx, first_upto, upto, ret, computer, effs )
-        computer.plotLTheta ( )
+        # computer.plotLTheta ( )
         return ret
 
     def plot ( self, llhds, dx, upto, final_upto, cl95, computer, effs ):
@@ -426,19 +417,23 @@ class LikelihoodComputer:
         self.nsig = self.nobs - self.nb
         self.deltas = numpy.array ( [0.] * len(self.nobs ) )
         theta_hat = self.findThetaHat()
-        logger.error ( "   theta hat=%s" % theta_hat )
-        logger.error ( "        nobs=%s" % self.nobs )
-        logger.error ( "          nb=%s" % self.nb )
-        logger.error ( "        effs=%s" % effs )
+        logger.error ( "   theta hat=%s" % theta_hat[:11] )
+        logger.error ( "        nobs=%s" % self.nobs[:11] )
+        logger.error ( "          nb=%s" % self.nb[:11] )
+        logger.error ( "        effs=%s" % effs[:11] )
         mu_c = ( self.nobs - self.nb - theta_hat ) / effs
         ## find mu_hat by finding the root of 1/L dL/dmu. We know 
         ## that the zero has to be between min(mu_c) and max(mu_c).
-        mu_hat = optimize.brentq ( self.dLdMu, min(mu_c), max(mu_c), args=(effs, theta_hat ) )
+        lower,upper = min(mu_c),max(mu_c)
+        try:
+            mu_hat = optimize.brentq ( self.dLdMu, lower, upper, args=(effs, theta_hat ) )
+        except ValueError as e:
+            logger.error ( "could not find root of dLdMu! Values are [%f=%f,%f=%f]. This should not happen, but for now we proceed with larger range." % ( lower,self.dLdMu(lower,effs,theta_hat),upper,self.dLdMu(upper,effs,theta_hat)) )
+            mu_hat = optimize.brentq ( self.dLdMu, 0., 5*upper, args=(effs, theta_hat ) )
         # self.plotMuHatRootFinding( effs, theta_hat, lumi, mu_hat ) 
-        logger.error ( " brent    =%s" % ( mu_hat/lumi) )
-        check = sum ( self.nobs * effs / ( mu_hat * effs + self.nb ) - effs )
-        logger.error ( "   check(B) =%s" % check )
         logger.error ( "   mu_hat  =%s" % (mu_hat/lumi) )
+        check = sum ( self.nobs * effs / ( mu_hat * effs + self.nb ) - effs )
+        logger.error ( "   check(mu_hat) =%s" % check )
         return mu_hat / lumi
 
     def getSigmaMu ( self, effs, lumi, mu_hat ):
@@ -472,7 +467,12 @@ class LikelihoodComputer:
         #poisson = numpy.exp(self.nobs*numpy.log(x) - x - special.gammaln(self.nobs + 1))
         #gaussian = stats.multivariate_normal.pdf(x,mean=self.nb+self.nsig,cov=(self.covb+numpy.diag(self.deltas**2)))
         ntot = self.nb + self.nsig
-        poisson = numpy.exp(self.nobs*numpy.log(x+ntot) - x -ntot - special.gammaln(self.nobs + 1))
+        xtot = x+ntot
+        for ctr,i in enumerate ( xtot ):
+            if i==0.:
+                logger.info ( "encountered a zero in probMV at position %d. Will set to small value." % ctr )
+                xtot[ctr]=1e-20
+        poisson = numpy.exp(self.nobs*numpy.log(xtot) - x -ntot - special.gammaln(self.nobs + 1))
         gaussian = stats.multivariate_normal.pdf(x,mean=[0.]*len(x),cov=(self.covb+numpy.diag(self.deltas**2)))
         ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
         return ret
@@ -495,12 +495,7 @@ class LikelihoodComputer:
             dsigma2 = numpy.diag ( sigma2 )
             ## for now deal with variances only
             ntot = nb + nsig
-            xm = nb + nsig - dsigma2
-            #If nb + nsig = sigma2, shift the values slightly:
-            for ctr,i in enumerate(xm):
-                if i == 0.:
-                    xm[ctr]=1e-3
-            cov = numpy.matrix (sigma2 )
+            cov = numpy.matrix ( sigma2 )
             weight = ( numpy.matrix (sigma2 ) )**(-1) ## weight matrix
             diag_cov = numpy.diag(cov)
             q = nobs * diag_cov ## q_i= nobs_i * w_ii^-1
@@ -509,7 +504,7 @@ class LikelihoodComputer:
             xmax = p/2. * ( 1 + sign(p) * sqrt ( 1. + 4*q / p**2 ) )
             # logger.error ( "xmax 1  = %s" % xmax )
             ndims = len(p)
-            for itr in range(5): ## correct a maximum of three times
+            for itr in range(41): ## correct a maximum of three times
                 for i in range(ndims):
                     for j in range(ndims):
                         if i==j:
@@ -517,13 +512,20 @@ class LikelihoodComputer:
                         p[i]=ntot[i] - diag_cov[i] + (ntot[j]-xmax[j])*weight[i,j] / weight[i,i]
                         # p[i]+=(ntot[j]-xmax[j])*weight[i,j] / weight[i,i]
                 new_xmax = p/2. * ( 1 + sign(p)* sqrt ( 1. + 4*q / p**2 ) )
+                for ctr,i in enumerate(xmax):
+                    if i==0.: ## watch out for zeroes.
+                        xmax[ctr]=1e-20
+                # logger.error ( "xmax=%s" % xmax )
                 change = sum ( abs ( new_xmax - xmax ) / xmax ) / len(xmax)
+                # logger.error ( "change=%s" % change )
+                if math.isnan ( change ):
+                    sys.exit()
                 if change < 1e-3:
                     ## smaller 0.1% change? stop!
                     xmax = new_xmax
                     break
-                if itr == 4:
-                    logger.error ( "profiling did not converge in three steps: %s vs %s. change=%f " % (xmax, new_xmax,change ) )
+                if itr == 5:
+                    logger.error ( "profiling did not converge in %d steps: %s vs %s. change=%f " % (itr, xmax[:3], new_xmax[:3],change ) )
                     xmax = new_xmax
                     break
                 xmax = new_xmax
