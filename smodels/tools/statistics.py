@@ -65,7 +65,8 @@ class UpperLimitComputer:
         logger.error ( "eff=%s" % eff )
         logger.error ( "cov=%s" % cov )
         """
-        upto = computer.findMuHat ( eff ) + 5.*computer.getSigmaMu ( eff )
+        mu_hat = computer.findMuHat ( eff )
+        upto = mu_hat + 5.*computer.getSigmaMu ( eff, 1., mu_hat )
         # logger.error ( "upto=%s" % upto )
         first_upto = upto
         n_bins = 100.
@@ -189,7 +190,7 @@ class UpperLimitComputer:
         t6.SetLineWidth(2)
         t6.Draw("SAME")
         l.AddEntry(t6,"max value","L" )
-        maxp1 = sigma_max + 1.96 * computer.getSigmaMu ( effs, lumi )
+        maxp1 = sigma_max + 1.96 * computer.getSigmaMu ( effs, lumi, sigma_max )
         t7=ROOT.TLine ( maxp1, 0., maxp1, max(yvals) )
         t7.SetLineColor(ROOT.kMagenta )
         t7.SetLineStyle(7)
@@ -440,15 +441,19 @@ class LikelihoodComputer:
         logger.error ( "   mu_hat  =%s" % (mu_hat/lumi) )
         return mu_hat / lumi
 
-    def getSigmaMu ( self, effs, lumi = 1. ):
+    def getSigmaMu ( self, effs, lumi, mu_hat ):
         """
         get a rough estimate for the variance of mu around mu_max
         FIXME need to do this more thorougly.
         """
-        s_effs = effs
+        s_effs = numpy.array ( effs )
+        # ret = math.sqrt ( sum ( ( mu_hat * lumi * s_effs + self.nb )**2 / (self.nobs * s_effs**2 ) ) ) / lumi
+        # logger.info ( "cov = %s" % (ret) )
         if type ( effs ) in [ list, numpy.ndarray ]:
             s_effs = sum ( effs )
-        return math.sqrt ( sum (self.nobs ) + sum ( numpy.diag ( self.covb ) ) ) / s_effs / lumi
+        sgm_mu = math.sqrt ( sum (self.nobs ) + sum ( numpy.diag ( self.covb ) ) ) / s_effs / lumi
+        logger.info ( "sgm_mu = %s" % sgm_mu )
+        return sgm_mu
 
 
     def convert ( self, x ):
