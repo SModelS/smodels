@@ -40,6 +40,10 @@ class Info(object):
             infoFile.close()
             
             #Get tags in info file:
+            for line in content:
+                if line.count(":") == 0:
+                    err = "found line that does not follow key:value structure in %s" % path
+                    raise SModelSError ( err )
             tags = [line.split(':', 1)[0].strip() for line in content]
             for i,tag in enumerate(tags):
                 if not tag: continue
