@@ -113,7 +113,7 @@ class UpperLimitComputer:
         ## now find the 95% quantile by interpolation
         ret = self.interpolate ( llhds, dx )
         self.plot ( llhds, dx, first_upto, upto, ret, computer, effs, norm )
-        # computer.plotLTheta ( )
+        computer.plotLTheta ( nsig=mu_hat*effs )
         return ret
 
     def plot ( self, llhds, dx, upto, final_upto, cl95, computer, effs, norm ):
@@ -456,7 +456,7 @@ class LikelihoodComputer:
             
         # self.plotMuHatRootFinding( effs, theta_hat, lumi, mu_hat ) 
         logger.error ( "   mu_hat  =%s" % (mu_hat/lumi) )
-        logger.error ( "   nsig    =%s" % (self.nsig) )
+        logger.error ( "   nsig    =%s" % (self.nsig[:10]) )
         check = sum ( self.nobs * effs / ( mu_hat * effs + self.nb ) - effs )
         logger.error ( "   check(mu_hat) =%s" % check )
         logger.error ( "   check(p(mu_hat)) =%s" % self.profileLikelihood ( mu_hat * effs ) )
@@ -495,8 +495,8 @@ class LikelihoodComputer:
         xtot = theta+ntot
         for ctr,i in enumerate ( xtot ):
             if i==0.:
-                logger.info ( "encountered a zero in probMV at position %d. Will set to small value." % ctr )
-                xtot[ctr]=1e-20
+                # logger.debug ( "encountered a zero in probMV at position %d. Will set to small value." % ctr )
+                xtot[ctr]=1e-30
         poisson = numpy.exp(self.nobs*numpy.log(xtot) - theta - ntot - special.gammaln(self.nobs + 1))
         gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=(self.covb+numpy.diag(self.deltas**2)))
         ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
@@ -538,6 +538,9 @@ class LikelihoodComputer:
                 for ctr,i in enumerate(xmax):
                     if i==0.: ## watch out for zeroes.
                         xmax[ctr]=1e-20
+                for ctr,i in enumerate(new_xmax):
+                    if i==0.: ## watch out for zeroes.
+                        new_xmax[ctr]=1e-20
                 # logger.error ( "xmax=%s" % xmax )
                 change = sum ( abs ( new_xmax - xmax ) / xmax ) / len(xmax)
                 # logger.error ( "change=%s" % change )
@@ -547,8 +550,11 @@ class LikelihoodComputer:
                     ## smaller 0.1% change? stop!
                     xmax = new_xmax
                     break
-                if itr == 5:
-                    logger.error ( "profiling did not converge in %d steps: %s vs %s. change=%f " % (itr, xmax[:3], new_xmax[:3],change ) )
+                if itr == 40:
+                    logger.error ( "profiling did not converge in %d steps. Diff is %f." % (itr, change ) )
+                    for ctr,(x1,x2) in enumerate(zip(xmax,new_xmax )):
+                        if (x1+x2)!=0. and abs(x1-x2)/abs(x1+x2) > 1e-4:
+                            logger.error ( "  profile problem is in bin %d: %f versus %f." % ( ctr, x1, x2 ) )
                     xmax = new_xmax
                     break
                 xmax = new_xmax
@@ -583,19 +589,24 @@ class LikelihoodComputer:
             return self.probMV ( *theta_hat )
 
     def plotLTheta ( self, nsig=None ):
-        """ plot the likelihood, but as a function of the nuisance theta! """
+        """ plot the likelihood, but as a function of the nuisance theta! 
+        :param nsig: plot it at nsig. If None, plot at mu_hat=0.
+        """
         if ( self.nobs == self.nb ).all():
             # only plot we this isnt the 'expected' case.
             return 
         import ROOT
         oldsig = self.nsig
+        s_mu="#hat{#mu}"
+        if nsig == None:
+            self.nsig = [0.] * len(self.nobs)
+            s_mu="#mu=0"
         theta_hat = self.findThetaHat ()
         v_tm = self.probMV ( *theta_hat )
-        logger.error ( "point at %s %s" % ( theta_hat, v_tm ) )
-        rng = list ( numpy.arange ( -1e10, 1e10, 1e8 ) )
-        rng = list ( numpy.arange ( -1.2e9, 1.2e9, 0.8e7 ) )
+        logger.error ( "point at %s %s" % ( theta_hat[:10], v_tm ) )
+        rng = list ( numpy.arange ( -2., 2., 0.1 ) )
         t=ROOT.TGraph(len(rng))
-        t.SetTitle ( "L(#theta/#hat{#theta}), %d SRs" % len(theta_hat) )
+        t.SetTitle ( "L(%s,#theta/#hat{#theta}), %d SRs" % (s_mu, len(theta_hat) ) )
         NLLs = []
         llhds=[]
         for ctr,i in enumerate(rng):
@@ -606,7 +617,7 @@ class LikelihoodComputer:
             if L > 0.:
                 nll = - math.log ( L )
                 NLLs.append ( nll )
-                t.SetPoint( ctr, i, L )
+                t.SetPoint( ctr, i, nll )
             else:
                 t.SetPoint( ctr, i, 450. ) ## float("nan") )
         mNLL = min(NLLs)
