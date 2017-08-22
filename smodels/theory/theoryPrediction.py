@@ -149,7 +149,7 @@ class TheoryPrediction(object):
        ret += "       effective efficiency: %s\n" % self.effectiveEff
        ds = "None"
        if type (self.dataset) == list:
-            ds = "multiple (combined)"
+            ds = "multiple (%d combined)" % len(self.dataset)
        else:
             dataId = self.dataset.dataInfo.dataId
             folderName = self.dataset.dataInfo.path
