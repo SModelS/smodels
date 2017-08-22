@@ -78,7 +78,8 @@ class UpperLimitComputer:
 
             ##print ( "likelihoods",llhds )
             norm = sum ( llhds.values() )
-            #print ( "norm",norm )
+            if norm == 0.:
+                logger.error ( "Zero norm!" )
             last = lst[-1]/norm
             # print ( "maximum at bin #", lst.index ( max ( lst ) ) )
             if lst.index ( max ( lst ) ) == 0 and lst[0]/lst[1] > 1.1:
@@ -494,7 +495,7 @@ class LikelihoodComputer:
         ntot = self.nb + self.nsig
         xtot = theta+ntot
         for ctr,i in enumerate ( xtot ):
-            if i==0.:
+            if i==0. or i<0.:
                 # logger.debug ( "encountered a zero in probMV at position %d. Will set to small value." % ctr )
                 xtot[ctr]=1e-30
         poisson = numpy.exp(self.nobs*numpy.log(xtot) - theta - ntot - special.gammaln(self.nobs + 1))
@@ -515,59 +516,41 @@ class LikelihoodComputer:
             """ Compute nuisance parameter theta that
             maximizes our likelihood (poisson*gauss).  """
             sigma2 = covb + numpy.diag ( deltas**2 )
-            dsigma2 = numpy.diag ( sigma2 )
             ## for now deal with variances only
             ntot = nb + nsig
             cov = numpy.matrix ( sigma2 )
-            weight = ( numpy.matrix (sigma2 ) )**(-1) ## weight matrix
+            weight = cov**(-1) ## weight matrix
             diag_cov = numpy.diag(cov)
-            q = nobs * diag_cov ## q_i= nobs_i * w_ii^-1
-            p = ntot - diag_cov ## caveat, this is usually called '-p', not 'p'
-            # we start with assuming all nuisances and covariances to be zero
-            xmax = p/2. * ( 1 + sign(p) * sqrt ( 1. + 4*q / p**2 ) )
-            # logger.error ( "xmax 1  = %s" % xmax )
+            # first: no covariances:
+            q = diag_cov * ( ntot - nobs )
+            p = ntot + diag_cov
+            thetamax = -p/2. * ( 1 - sign(p) * sqrt ( 1. - 4*q / p**2 ) )
+            return thetamax
+            thetamax1 = thetamax
+            #logger.error ( "thetamax after 0 %s: %s" % ( thetamax[:3], self.probMV ( *thetamax ) ) )
             ndims = len(p)
-            for itr in range(41): ## correct a maximum of three times
+            tries=0
+            for ctr in range(tries):
+                q = diag_cov * ( ntot - nobs )
+                p = ntot + diag_cov
                 for i in range(ndims):
+                    #q[i] = diag_cov[i] * ( ntot[i] - nobs[i] )
+                    #p[i] = ntot[i] + diag_cov[i]
                     for j in range(ndims):
-                        if i==j:
-                            continue ## treat covariance terms
-                        p[i]=ntot[i] - diag_cov[i] + (ntot[j]-xmax[j])*weight[i,j] / weight[i,i]
-                        # p[i]+=(ntot[j]-xmax[j])*weight[i,j] / weight[i,i]
-                new_xmax = p/2. * ( 1 + sign(p)* sqrt ( 1. + 4*q / p**2 ) )
-                for ctr,i in enumerate(xmax):
-                    if i==0.: ## watch out for zeroes.
-                        xmax[ctr]=1e-20
-                for ctr,i in enumerate(new_xmax):
-                    if i==0.: ## watch out for zeroes.
-                        new_xmax[ctr]=1e-20
-                # logger.error ( "xmax=%s" % xmax )
-                change = sum ( abs ( new_xmax - xmax ) / xmax ) / len(xmax)
-                # logger.error ( "change=%s" % change )
-                if math.isnan ( change ):
-                    sys.exit()
-                if change < 1e-3:
-                    ## smaller 0.1% change? stop!
-                    xmax = new_xmax
-                    break
-                if itr == 40:
-                    logger.error ( "profiling did not converge in %d steps. Diff is %f." % (itr, change ) )
-                    for ctr,(x1,x2) in enumerate(zip(xmax,new_xmax )):
-                        if (x1+x2)!=0. and abs(x1-x2)/abs(x1+x2) > 1e-4:
-                            logger.error ( "  profile problem is in bin %d: %f versus %f." % ( ctr, x1, x2 ) )
-                    xmax = new_xmax
-                    break
-                xmax = new_xmax
-                # logger.error ( "xmax %d = %s" % (itr+2, xmax ) )
-            return xmax - nb - nsig ## FIXME wrong!!!
-            # return xmax
+                        if i==j: continue
+                        q[i] += thetamax[j]*ntot[i]*diag_cov[i]*weight[i,j]
+                        p[i] += thetamax[j]*weight[i,j]*diag_cov[i]
+                    thetamax = -p/2. * ( 1 - sign(p) * sqrt ( 1. - 4*q / p**2 ) )
+            #logger.error ( "thetamax after %d: %s: %s" % (tries, thetamax[:3], self.probMV ( *thetamax ) ) )
+            return thetamax
 
     def findThetaHat ( self ):
             """ Compute nuisance parameter theta that maximizes our likelihood
                 (poisson*gauss).
             """
-            return self.getThetaHat ( self.nobs, self.nb, self.nsig, self.covb, \
-                                      self.deltas )
+            ret = self.getThetaHat ( self.nobs, self.nb, self.nsig, self.covb, \
+                                     self.deltas )
+            return ret
 
     def findThetaHatNoCov ( self ):
             """ find nuisance parameter theta that maximizes our likelihood
@@ -598,15 +581,15 @@ class LikelihoodComputer:
         import ROOT
         oldsig = self.nsig
         s_mu="#hat{#mu}"
-        if nsig == None:
+        if type(nsig) == type(None):
             self.nsig = [0.] * len(self.nobs)
             s_mu="#mu=0"
         theta_hat = self.findThetaHat ()
         v_tm = self.probMV ( *theta_hat )
         logger.error ( "point at %s %s" % ( theta_hat[:10], v_tm ) )
-        rng = list ( numpy.arange ( -2., 2., 0.1 ) )
+        rng = list ( numpy.arange ( 0., 2., 0.05 ) )
         t=ROOT.TGraph(len(rng))
-        t.SetTitle ( "L(%s,#theta/#hat{#theta}), %d SRs" % (s_mu, len(theta_hat) ) )
+        t.SetTitle ( "-ln L(%s,#theta/#hat{#theta}), %d SRs" % (s_mu, len(theta_hat) ) )
         NLLs = []
         llhds=[]
         for ctr,i in enumerate(rng):
