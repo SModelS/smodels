@@ -32,6 +32,6 @@ for e in d.getExpResults():
     #    print ( ds.dataInfo.dataId )
     predictions = theoryPredictionsFor ( e, smstoplist, useBestDataset=False, 
                                          combinedResults=True )
-    for pred in predictions:
+    for pred in predictions[-1:]:
         print ( pred.describe() )
 

@@ -112,11 +112,11 @@ class UpperLimitComputer:
             llhds[k]=v/norm
         ## now find the 95% quantile by interpolation
         ret = self.interpolate ( llhds, dx )
-        self.plot ( llhds, dx, first_upto, upto, ret, computer, effs )
+        self.plot ( llhds, dx, first_upto, upto, ret, computer, effs, norm )
         # computer.plotLTheta ( )
         return ret
 
-    def plot ( self, llhds, dx, upto, final_upto, cl95, computer, effs ):
+    def plot ( self, llhds, dx, upto, final_upto, cl95, computer, effs, norm ):
         """ function to plot likelihoods and the 95% CL, for
             debugging purposes.
         :param llhds: the likelihood values, as a dictionary
@@ -135,8 +135,10 @@ class UpperLimitComputer:
         for x in xvals:
             yvals.append ( llhds[x] )
         lumi = self.lumi.asNumber(1/fb)
-        logger.error ( "Plotting likelihoods: int.upto: %s, int.upto1: %s, cl95: %s" % \
+        logger.warning ( "Plotting likelihoods: int.upto: %s, int.upto1: %s, cl95: %s" % \
                        ( upto/lumi, final_upto/lumi, cl95 ) )
+        #for k,v in llhds.items():
+        #    logger.warning ( "llhd(%s)=%s" % ( k,v*norm ) )
         t=ROOT.TGraph ( len ( xvals ))
         l=ROOT.TLegend( .6,.7,.98,.89)
         for ctr,(x,y) in enumerate ( zip ( xvals, yvals ) ):
@@ -403,6 +405,13 @@ class LikelihoodComputer:
         r2.Draw("PSAME" )
         ROOT.c1.Print ( "dldmu.pdf" )
 
+    def findInitialMuHat ( self, effs, lumi=1. ):
+        """
+        find a very rough initial mu_hat, simply by minimizing
+        sum [ (nobs - nb - mu*eff)*Cov* nobs - nb - mu*eff)^T ]
+        """
+        return None
+
     def findMuHat ( self, effs, lumi=1. ):
         """
         find the most likely signal strength mu
@@ -414,26 +423,46 @@ class LikelihoodComputer:
             return 0. / lumi
         if type ( effs ) in [ list, numpy.ndarray ]:
             effs = numpy.array ( effs )
-        self.nsig = self.nobs - self.nb
+        ## we need a very rough initial guess for mu(hat), to come
+        ## up with a first theta
+        self.nsig = numpy.array ( [0.] * len(self.nobs ) )
         self.deltas = numpy.array ( [0.] * len(self.nobs ) )
-        theta_hat = self.findThetaHat()
-        logger.error ( "   theta hat=%s" % theta_hat[:11] )
-        logger.error ( "        nobs=%s" % self.nobs[:11] )
-        logger.error ( "          nb=%s" % self.nb[:11] )
-        logger.error ( "        effs=%s" % effs[:11] )
-        mu_c = ( self.nobs - self.nb - theta_hat ) / effs
-        ## find mu_hat by finding the root of 1/L dL/dmu. We know 
-        ## that the zero has to be between min(mu_c) and max(mu_c).
-        lower,upper = min(mu_c),max(mu_c)
-        try:
-            mu_hat = optimize.brentq ( self.dLdMu, lower, upper, args=(effs, theta_hat ) )
-        except ValueError as e:
-            logger.error ( "could not find root of dLdMu! Values are [%f=%f,%f=%f]. This should not happen, but for now we proceed with larger range." % ( lower,self.dLdMu(lower,effs,theta_hat),upper,self.dLdMu(upper,effs,theta_hat)) )
-            mu_hat = optimize.brentq ( self.dLdMu, 0., 5*upper, args=(effs, theta_hat ) )
+
+        ## we start with theta_hat being all zeroes
+        theta_hat = numpy.array ( [0.] * len(self.nobs ) )
+        mu_hat_old = 0.
+        mu_hat = 1.
+        ctr=0
+        logger.error ( "        nobs=%s" % list ( self.nobs[:11] ) )
+        logger.error ( "          nb=%s" % list ( self.nb[:11] ) )
+        logger.error ( "        effs=%s" % list ( effs[:11] ) )
+        while abs ( mu_hat - mu_hat_old )/ mu_hat > 1e-3:
+            mu_hat_old = mu_hat
+            logger.error ( "theta hat[%d]=%s" % (ctr,list( theta_hat[:11] ) ) )
+            logger.error ( "   mu hat[%d]=%s" % (ctr, mu_hat ) )
+            mu_c = ( self.nobs - self.nb - theta_hat ) / effs
+            ## find mu_hat by finding the root of 1/L dL/dmu. We know 
+            ## that the zero has to be between min(mu_c) and max(mu_c).
+            lower,upper = min(mu_c),max(mu_c)
+            try:
+                lower,upper=0.,6*upper ## FIXME
+                mu_hat = optimize.brentq ( self.dLdMu, lower, upper, args=(effs, theta_hat ) )
+            except ValueError as e:
+                logger.error ( "could not find root of dLdMu! Values are [%f=%f,%f=%f]. This should not happen, but for now we proceed with larger range." % ( lower,self.dLdMu(lower,effs,theta_hat),upper,self.dLdMu(upper,effs,theta_hat)) )
+                mu_hat = optimize.brentq ( self.dLdMu, 0., 6*upper, args=(effs, theta_hat ) )
+            self.nsig = mu_hat * effs
+            theta_hat = self.findThetaHat()
+            ctr+=1
+            
         # self.plotMuHatRootFinding( effs, theta_hat, lumi, mu_hat ) 
         logger.error ( "   mu_hat  =%s" % (mu_hat/lumi) )
+        logger.error ( "   nsig    =%s" % (self.nsig) )
         check = sum ( self.nobs * effs / ( mu_hat * effs + self.nb ) - effs )
         logger.error ( "   check(mu_hat) =%s" % check )
+        logger.error ( "   check(p(mu_hat)) =%s" % self.profileLikelihood ( mu_hat * effs ) )
+        logger.error ( "   check(p(nsig)) =%s" % self.profileLikelihood ( self.nsig ) )
+        logger.error ( "   check(p(1.05*nsig)) =%s" % self.profileLikelihood ( 1.05*self.nsig, numpy.array( [0.]*len(self.nsig) ) ) )
+        logger.error ( "   check(p(0.95*nsig)) =%s" % self.profileLikelihood ( 0.95*self.nsig ) )
         return mu_hat / lumi
 
     def getSigmaMu ( self, effs, lumi, mu_hat ):
@@ -459,32 +488,26 @@ class LikelihoodComputer:
 
     #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
     # def prob(x0, x1 )
-    def probMV( self, *xar ):
-        x = numpy.array ( xar )
-        #if sum ( x<0. ) > 0:
-        #    logger.error ( "negative values for x: %s" % x )
-        #    sys.exit()
-        #poisson = numpy.exp(self.nobs*numpy.log(x) - x - special.gammaln(self.nobs + 1))
-        #gaussian = stats.multivariate_normal.pdf(x,mean=self.nb+self.nsig,cov=(self.covb+numpy.diag(self.deltas**2)))
+    def probMV( self, *thetaA ):
+        """ probability, for nuicance parameters theta """
+        theta = numpy.array ( thetaA )
         ntot = self.nb + self.nsig
-        xtot = x+ntot
+        xtot = theta+ntot
         for ctr,i in enumerate ( xtot ):
             if i==0.:
                 logger.info ( "encountered a zero in probMV at position %d. Will set to small value." % ctr )
                 xtot[ctr]=1e-20
-        poisson = numpy.exp(self.nobs*numpy.log(xtot) - x -ntot - special.gammaln(self.nobs + 1))
-        gaussian = stats.multivariate_normal.pdf(x,mean=[0.]*len(x),cov=(self.covb+numpy.diag(self.deltas**2)))
+        poisson = numpy.exp(self.nobs*numpy.log(xtot) - theta - ntot - special.gammaln(self.nobs + 1))
+        gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=(self.covb+numpy.diag(self.deltas**2)))
         ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
         return ret
 
     #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
-    def prob( self, x ):
-        #poisson = exp(self.nobs*log(x) - x - math.lgamma(self.nobs + 1))
-        #gaussian = stats.norm.pdf( x, loc=self.nb+self.nsig,\
-        #                           scale=sqrt(self.covb+self.deltas**2))
+    def prob( self, theta ):
+        """ probability for nuisance parameter theta, 1d case. """
         ntot = self.nb + self.nsig
-        poisson = exp(self.nobs*log(x+ntot) - x - ntot - math.lgamma(self.nobs + 1))
-        gaussian = stats.norm.pdf( x, loc=0.,\
+        poisson = exp(self.nobs*log(theta+ntot) - theta - ntot - math.lgamma(self.nobs + 1))
+        gaussian = stats.norm.pdf( theta, loc=0.,\
                                    scale=sqrt(self.covb+self.deltas**2))
         return poisson*gaussian
 
@@ -679,11 +702,13 @@ class LikelihoodComputer:
         """ compute the profiled likelihood for nsig.
             Warning: not normalized. """
         nsig = self.convert ( nsig )
-        if type(deltas) == type(None):
-            deltas = 1e-5*nsig ## FIXME for backwards compatibility
         if type( nsig ) in [ int, float, numpy.float64 ]:
+            if type(deltas) == type(None):
+                deltas = 1e-9*nsig ## FIXME for backwards compatibility
             ## FIXME write profiled likelihood for 1d case.
             return self._likelihood1d( nsig, deltas )
+        if type(deltas) == type(None):
+            deltas = numpy.array ( [1e-9*nsig]*len(nsig) ) ## FIXME for backwards compatibility
         return self._mvProfileLikelihood( nsig, deltas )
 
     def likelihood ( self, nsig, deltas = None ):
@@ -760,7 +785,7 @@ class LikelihoodComputer:
             """
             nsig = self.convert ( nsig )
             if deltas == None:
-                deltas = 0.2 * nsig
+                deltas = 1e-5 * nsig
             # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
             llhd = self.likelihood( nsig, deltas )
 
