@@ -290,8 +290,7 @@ class LikelihoodComputer:
             try:
                 self.timer["fmin"]-=time.time()
                 # ret = optimize.fmin_bfgs ( self.nll, ini, fprime=self.nllprime )
-                ret = optimize.fmin_cg ( self.nll, ini, fprime=self.nllprime )
-                logger.error ( "ret=%s" % ret )
+                ret = optimize.fmin_cg ( self.nll, ini, fprime=self.nllprime, disp=False )
                 # ret = optimize.fmin ( self.nll, ini, full_output=False, disp=False, xtol=0.01, ftol=0.01 )
                 self.timer["fmin"]+=time.time()
                 return ret
