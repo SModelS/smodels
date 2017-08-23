@@ -30,7 +30,8 @@ class LikelihoodComputer:
         self.nobs = self.convert ( nobs )
         self.nb = self.convert ( nb )
         self.covb = self.convert ( covb )
-        self.timer = { "fmin": 0., "theta_hat_ini": 0., "brentq": 0. }
+        self.timer = { "fmin": 0., "theta_hat_ini": 0., "brentq": 0., "profile": 0.,
+                       "find_mu_hat": 0. }
 
     def printProfilingStats ( self ):
         print ()
@@ -44,7 +45,15 @@ class LikelihoodComputer:
         """ dL/dmu * ( 1/L ), if L is the likelihood. The function
             whose root gives us muhat, i.e. the mu that maximizes
             the likelihood. """
-        denominator = mu*effs + self.nb + theta_hat
+        denominator = mu*effs + self.nb + theta_hat 
+        for ctr,d in enumerate ( denominator ):
+            if d==0.:
+                if (self.nobs[ctr]*effs[ctr]) == 0.:
+                    logger.info ( "zero denominator, but numerator also zero, so we set denom to 1." )
+                    denominator[ctr]=1.
+                else:
+                    logger.error ( "we have a zero value in the denominator at pos %d, with a non-zero numerator. dont know how to handle." % ctr )
+                    sys.exit()
         ret = self.nobs * effs / denominator - effs
         if type (ret ) in [ numpy.array, numpy.ndarray, list ]:
             ret = sum ( ret )
@@ -54,9 +63,10 @@ class LikelihoodComputer:
         """ plot the function whose root gives us mu_hat: 1/L dL/dmu.
         """
         mu_c = numpy.abs ( self.nobs - self.nb - theta_hat ) / effs
-        mu_ini = sum ( mu_c ) / len(mu_c)
+        # mu_ini = sum ( mu_c ) / len(mu_c)
+        mu_ini = 2. * max ( mu_c )
 
-        rnge = numpy.arange ( -0.*mu_ini, 6.*mu_ini, .03*mu_ini )
+        rnge = numpy.arange ( -0.*mu_ini, 2*mu_ini, .03*mu_ini )
         import ROOT
         r=ROOT.TGraph ( len(rnge) )
         r.SetTitle ( "1/L dL/d#mu" ) ##  #frac{1}{L}#frac{dL}#frac{d#mu}" )
@@ -89,6 +99,7 @@ class LikelihoodComputer:
         """
         if ( self.nb == self.nobs ).all():
             return 0. / lumi
+        self.timer["find_mu_hat"]-=time.time()
         if type ( effs ) in [ list, numpy.ndarray ]:
             effs = numpy.array ( effs )
         if sum ( effs<0. ):
@@ -103,9 +114,9 @@ class LikelihoodComputer:
         theta_hat = numpy.array ( [0.] * len(self.nobs ) )
         mu_hat_old = 0.
         mu_hat = 1.
-        logger.info ( "        nobs=%s" % list ( self.nobs[:11] ) )
-        logger.info ( "          nb=%s" % list ( self.nb[:11] ) )
-        logger.info ( "        effs=%s" % list ( effs[:11] ) )
+        #logger.info ( "        nobs=%s" % list ( self.nobs[:11] ) )
+        #logger.info ( "          nb=%s" % list ( self.nb[:11] ) )
+        #logger.info ( "        effs=%s" % list ( effs[:11] ) )
         ctr=0
         while abs ( mu_hat - mu_hat_old )/ mu_hat > 1e-2 and ctr < 20:
             ctr+=1
@@ -115,7 +126,7 @@ class LikelihoodComputer:
             mu_c = numpy.abs ( self.nobs - self.nb - theta_hat ) / effs
             ## find mu_hat by finding the root of 1/L dL/dmu. We know 
             ## that the zero has to be between min(mu_c) and max(mu_c).
-            lower,upper = 0.,max(mu_c)
+            lower,upper = 0.,3.*max(mu_c)
             lower_v = self.dLdMu ( lower, effs, theta_hat )
             upper_v = self.dLdMu ( upper, effs, theta_hat )
             total_sign = numpy.sign ( lower_v * upper_v )
@@ -137,6 +148,7 @@ class LikelihoodComputer:
         #logger.info ( "   check(p(nsig)) =%s" % self.profileLikelihood ( self.nsig ) )
         #logger.info ( "   check(p(1.05*nsig)) =%s" % self.profileLikelihood ( 1.05*self.nsig, numpy.array( [0.]*len(self.nsig) ) ) )
         #logger.info ( "   check(p(0.95*nsig)) =%s" % self.profileLikelihood ( 0.95*self.nsig ) )
+        self.timer["find_mu_hat"]+=time.time()
         return mu_hat / lumi
 
     def getSigmaMu ( self, effs, lumi, mu_hat ):
@@ -276,10 +288,15 @@ class LikelihoodComputer:
             self.timer["theta_hat_ini"]-=time.time()
             ini = self.getThetaHat ( self.nobs, self.nb, nsig, self.covb, deltas, 0 ) 
             self.timer["theta_hat_ini"]+=time.time()
-            self.timer["fmin"]-=time.time()
-            ret = optimize.fmin ( self.nll, ini, full_output=False, disp=False, xtol=0.001, ftol=0.001 )
-            self.timer["fmin"]+=time.time()
-            # logger.warning ( "find theta_hat: ini=%s ret=%s" % ( ini[:2], ret[:2] ) )
+            try:
+                self.timer["fmin"]-=time.time()
+                ret = optimize.fmin ( self.nll, ini, full_output=False, disp=False, xtol=0.01, ftol=0.01 )
+                self.timer["fmin"]+=time.time()
+                return ret
+            except Exception as e:
+                logger.error ( "exception: %s. ini=%s" % (e,ini[-3:]) )
+                logger.error ( "cov-1=%s" % (self.covb+numpy.diag(deltas))**(-1) )
+                sys.exit()
             return ret
 
     def _mvProfileLikelihood( self, nsig, deltas ):
@@ -416,6 +433,7 @@ class LikelihoodComputer:
     def profileLikelihood ( self, nsig, deltas = None ):
         """ compute the profiled likelihood for nsig.
             Warning: not normalized. """
+        self.timer["profile"]-=time.time()
         nsig = self.convert ( nsig )
         if type( nsig ) in [ int, float, numpy.float64 ]:
             if type(deltas) == type(None):
@@ -424,7 +442,9 @@ class LikelihoodComputer:
             return self._likelihood1d( nsig, deltas )
         if type(deltas) == type(None):
             deltas = numpy.array ( [1e-9*nsig]*len(nsig) ) ## FIXME for backwards compatibility
-        return self._mvProfileLikelihood( nsig, deltas )
+        ret = self._mvProfileLikelihood( nsig, deltas )
+        self.timer["profile"]+=time.time()
+        return ret
 
     def likelihood ( self, nsig, deltas = None ):
         """ compute likelihood for nsig, marginalized the nuisances """

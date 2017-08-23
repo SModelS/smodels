@@ -59,7 +59,10 @@ class UpperLimitComputer:
         mu_hat = computer.findMuHat ( eff )
         sigma_mu = computer.getSigmaMu ( eff, 1., mu_hat )
         if True: ## super-awkward approximation
-            return ( mu_hat + 1.96 * sigma_mu ) / self.lumi
+            ret = ( mu_hat + 1.96 * sigma_mu ) / self.lumi
+            computer.printProfilingStats()
+            return ret
+
         effs = numpy.array ( eff )
         llhds={}
         upto = mu_hat + 5.* sigma_mu
