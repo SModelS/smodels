@@ -190,23 +190,23 @@ class LikelihoodComputer:
 
     def nll ( self, theta ):
         """ probability, for nuicance parameters theta, 
-        as a negative log likelihood. FIXME not yet there. """
-        # theta = numpy.array ( thetaA )
-        ntot = self.nb + self.nsig
-        xtot = theta+ntot
-        for ctr,i in enumerate ( xtot ):
-            if i==0. or i<0.:
-                # logger.debug ( "encountered a zero in probMV at position %d. Will set to small value." % ctr )
-                xtot[ctr]=1e-30
-        logpoisson = self.nobs*numpy.log(xtot) - theta - ntot - special.gammaln(self.nobs + 1)
-        #logger.warning ( "logpoisson=%s" % logpoisson )
-        #logger.warning ( "loggaussian=%s" % loggaussian )
+        as a negative log likelihood. """
+        xtot = theta + self.nb + self.nsig
+        xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
+        logpoisson = self.nobs*numpy.log(xtot) - xtot - special.gammaln(self.nobs+1)
         cov = self.covb+numpy.diag(self.deltas**2)
-        gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=cov)
-        # logger.warning ( "gaussian=%s" % gaussian )
-        #logger.warning ( "real log gaussian=%s" % math.log(gaussian) )
-        ret = - ( math.log(gaussian) + sum(logpoisson) )
-        return ret
+        loggaussian = stats.multivariate_normal.logpdf(theta,cov=cov) # mean 0
+        nll_ = - loggaussian - sum(logpoisson)
+        return nll_
+
+    def nllprime ( self, theta ):
+        """ the derivative of nll as a function of the thetas. 
+        Makes it easier to find the maximum likelihood. """
+        xtot = theta + self.nb + self.nsig
+        xtot[xtot==0.] = 1e-30 ## turn zeroes to small values
+        weight = ( self.covb+numpy.diag(self.deltas**2) )**(-1)
+        nllp_ = 1. - self.nobs / xtot + theta * weight
+        return nllp_[0]
 
     #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
     def prob( self, theta ):
@@ -234,7 +234,6 @@ class LikelihoodComputer:
             thetamaxes = []
             thetamax = -p/2. * ( 1 - sign(p) * sqrt ( 1. - 4*q / p**2 ) )
             thetamaxes.append ( thetamax )
-            #logger.error ( "thetamax after 0 %s: %s" % ( thetamax[:3], self.probMV ( *thetamax ) ) )
             ndims = len(p)
             def distance ( theta1, theta2 ):
                 for ctr,i in enumerate ( theta1 ):
@@ -290,7 +289,10 @@ class LikelihoodComputer:
             self.timer["theta_hat_ini"]+=time.time()
             try:
                 self.timer["fmin"]-=time.time()
-                ret = optimize.fmin ( self.nll, ini, full_output=False, disp=False, xtol=0.01, ftol=0.01 )
+                # ret = optimize.fmin_bfgs ( self.nll, ini, fprime=self.nllprime )
+                ret = optimize.fmin_cg ( self.nll, ini, fprime=self.nllprime )
+                logger.error ( "ret=%s" % ret )
+                # ret = optimize.fmin ( self.nll, ini, full_output=False, disp=False, xtol=0.01, ftol=0.01 )
                 self.timer["fmin"]+=time.time()
                 return ret
             except Exception as e:
