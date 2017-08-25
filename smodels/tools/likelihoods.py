@@ -177,13 +177,14 @@ class LikelihoodComputer:
     def probMV( self, *thetaA ):
         """ probability, for nuicance parameters theta """
         theta = numpy.array ( thetaA )
-        ntot = self.nb + self.nsig
-        xtot = theta+ntot
+        # ntot = self.nb + self.nsig
+        xtot = theta + self.ntot
         for ctr,i in enumerate ( xtot ):
             if i==0. or i<0.:
                 # logger.debug ( "encountered a zero in probMV at position %d. Will set to small value." % ctr )
                 xtot[ctr]=1e-30
-        poisson = numpy.exp(self.nobs*numpy.log(xtot) - theta - ntot - special.gammaln(self.nobs + 1))
+        poisson = numpy.exp(self.nobs*numpy.log(xtot) - theta - self.ntot - self.gammaln)
+        # poisson = numpy.exp(self.nobs*numpy.log(xtot) - theta - ntot - special.gammaln(self.nobs + 1))
         gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=(self.covb+numpy.diag(self.deltas**2)))
         ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
         return ret
@@ -191,19 +192,20 @@ class LikelihoodComputer:
     def nll ( self, theta ):
         """ probability, for nuicance parameters theta, 
         as a negative log likelihood. """
-        xtot = theta + self.nb + self.nsig
+        xtot = theta + self.ntot
         xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
-        logpoisson = self.nobs*numpy.log(xtot) - xtot - special.gammaln(self.nobs+1)
-        loggaussian = stats.multivariate_normal.logpdf(theta,cov=self.cov_tot) # mean 0
+        #logpoisson = self.nobs*numpy.log(xtot) - xtot - special.gammaln(self.nobs+1)
+        logpoisson = self.nobs*numpy.log(xtot) - xtot - self.gammaln
+        loggaussian = stats.multivariate_normal.logpdf(theta,cov=self.cov_tot)
         nll_ = - loggaussian - sum(logpoisson)
         return nll_
 
     def nllprime ( self, theta ):
         """ the derivative of nll as a function of the thetas. 
         Makes it easier to find the maximum likelihood. """
-        xtot = theta + self.nb + self.nsig
+        xtot = theta + self.ntot
         xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
-        nllp_ = numpy.ones(len(self.nobs)) - self.nobs / xtot + numpy.dot( theta , self.weight )
+        nllp_ = self.ones - self.nobs / xtot + numpy.dot( theta , self.weight )
         # nllp_ = 1. - self.nobs / xtot + numpy.dot( theta , weight )
         # logger.debug ( "nllp_=%s" % nllp_ )
         #logger.info ( "nllp: covb^-1=%s, nllp=%s, theta=%s" % ( weight, nllp_, theta ) )
@@ -212,7 +214,7 @@ class LikelihoodComputer:
     def nllHess ( self, theta ):
         """ the Hessian of nll as a function of the thetas. 
         Makes it easier to find the maximum likelihood. """
-        xtot = theta + self.nb + self.nsig
+        xtot = theta + self.ntot
         xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
         nllh_ = self.weight + numpy.diag ( self.nobs / (xtot**2) )
         return nllh_
@@ -298,9 +300,13 @@ class LikelihoodComputer:
             self.timer["theta_hat_ini"]+=time.time()
             self.cov_tot = self.covb+numpy.diag(self.deltas**2)
             self.weight = numpy.linalg.inv ( self.cov_tot )
+            self.ntot = self.nb + self.nsig
+            self.ones = numpy.ones ( len (self.nobs) )
+            self.gammaln = special.gammaln(self.nobs + 1)
             try:
                 self.timer["fmin2"]-=time.time()
-                ret = optimize.fmin_ncg ( self.nll, ini, fprime=self.nllprime, fhess=self.nllHess )
+                # ret = optimize.fmin_ncg ( self.nll, ini, fprime=self.nllprime, fhess=self.nllHess )
+                ret = optimize.fmin_ncg ( self.nll, ini, fprime=self.nllprime, fhess=self.nllHess, avextol=1e-5 )
                 self.timer["fmin2"]+=time.time()
                 return ret
             except Exception as e:

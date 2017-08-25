@@ -135,7 +135,7 @@ class UpperLimitComputer:
         """
         expected = ( computer.nobs == computer.nb ).all()
         # logger.error ( "expected=%s", expected )
-        import ROOT
+        import ROOT, time
         xvals = list ( llhds.keys() )
         xvals.sort()
         yvals = []
@@ -185,6 +185,10 @@ class UpperLimitComputer:
         t6.Draw("SAME")
         l.AddEntry(t6,"max value","L" )
         maxp1 = sigma_max + 1.96 * computer.getSigmaMu ( effs, lumi, sigma_max )
+        ts = ROOT.TText ( .01, .01, time.asctime() )
+        ts.SetNDC()
+        ts.SetTextSize(.03)
+        ts.Draw()
         t7=ROOT.TLine ( maxp1, 0., maxp1, max(yvals) )
         t7.SetLineColor(ROOT.kMagenta )
         t7.SetLineStyle(7)
