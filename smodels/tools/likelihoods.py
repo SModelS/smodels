@@ -315,13 +315,6 @@ class LikelihoodComputer:
                 sys.exit()
             return ini
 
-    def _mvProfileLikelihood( self, nsig, deltas ):
-            # compute the profiled (not normalized) likelihood of observing
-            # nsig signal events
-            # self.nsig, self.deltas = nsig, deltas ## store for integration
-            theta_hat = self.findThetaHat ( nsig, deltas )
-            return self.probMV ( *theta_hat )
-
     def plotLTheta ( self, nsig=None ):
         """ plot the likelihood, but as a function of the nuisance theta! 
         :param nsig: plot it at nsig. If None, plot at mu_hat=0.
@@ -458,7 +451,10 @@ class LikelihoodComputer:
             return self._likelihood1d( nsig, deltas )
         if type(deltas) == type(None):
             deltas = numpy.array ( [1e-9*nsig]*len(nsig) ) ## FIXME for backwards compatibility
-        ret = self._mvProfileLikelihood( nsig, deltas )
+        # compute the profiled (not normalized) likelihood of observing
+        # nsig signal events
+        theta_hat = self.findThetaHat ( nsig, deltas )
+        ret = self.probMV ( *theta_hat )
         self.timer["profile"]+=time.time()
         return ret
 
