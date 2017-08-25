@@ -58,7 +58,7 @@ class UpperLimitComputer:
         computer = LikelihoodComputer ( nev, xbg, cov )
         mu_hat = computer.findMuHat ( eff )
         sigma_mu = computer.getSigmaMu ( eff, 1., mu_hat )
-        if True: ## super-awkward approximation
+        if False: ## super-awkward super-fast approximation
             ret = ( mu_hat + 1.96 * sigma_mu ) / self.lumi
             computer.printProfilingStats()
             return ret
@@ -66,8 +66,7 @@ class UpperLimitComputer:
         effs = numpy.array ( eff )
         llhds={}
         upto = mu_hat + 5.* sigma_mu
-        first_upto = upto
-        n_bins = 100.
+        n_bins = 50.
         dx = upto / n_bins ## FIXME
         start = dx/2.
         # start = 0.
@@ -120,18 +119,17 @@ class UpperLimitComputer:
             llhds[k]=v/norm
         ## now find the 95% quantile by interpolation
         ret = self.interpolate ( llhds, dx )
-        self.plot ( llhds, dx, first_upto, upto, ret, computer, effs, norm )
+        self.plot ( llhds, dx, upto, ret, computer, effs, norm )
         computer.plotLTheta ( nsig=mu_hat*effs )
         computer.printProfilingStats()
         return ret
 
-    def plot ( self, llhds, dx, upto, final_upto, cl95, computer, effs, norm ):
+    def plot ( self, llhds, dx, upto, cl95, computer, effs, norm ):
         """ function to plot likelihoods and the 95% CL, for
             debugging purposes.
         :param llhds: the likelihood values, as a dictionary
         :param dx: the delta x between the likelihood values. FIXME redundant.
-        :param upto: first guess for how far we need to integrate.
-        :param final_upto: last guess for how far we need to integrate.
+        :param upto: guess for how far we need to integrate.
         :param cl95: final 95% CL upper limit.
         :param xmax: maximum likelihood computer
         """
@@ -144,8 +142,8 @@ class UpperLimitComputer:
         for x in xvals:
             yvals.append ( llhds[x] )
         lumi = self.lumi.asNumber(1/fb)
-        logger.warning ( "Plotting likelihoods: int.upto: %s, int.upto1: %s, cl95: %s" % \
-                       ( upto/lumi, final_upto/lumi, cl95 ) )
+        logger.warning ( "Plotting likelihoods: int.upto: %s, cl95: %s" % \
+                       ( upto/lumi, cl95 ) )
         #for k,v in llhds.items():
         #    logger.warning ( "llhd(%s)=%s" % ( k,v*norm ) )
         t=ROOT.TGraph ( len ( xvals ))
@@ -178,13 +176,7 @@ class UpperLimitComputer:
         t4.SetLineStyle(4)
         t4.SetLineWidth(2)
         t4.Draw("SAME")
-        l.AddEntry(t4,"first guess for integration upper limit","L" )
-        t5=ROOT.TLine ( final_upto/lumi, 0., final_upto/lumi, max(yvals) )
-        t5.SetLineColor(ROOT.kGreen )
-        t5.SetLineStyle(5)
-        t5.SetLineWidth(2)
-        t5.Draw("SAME")
-        l.AddEntry(t5,"final upper int limit","L" )
+        l.AddEntry(t4,"guess for integration upper limit","L" )
         sigma_max = computer.findMuHat( effs, lumi )
         t6=ROOT.TLine ( sigma_max, 0., sigma_max, max(yvals) )
         t6.SetLineColor(ROOT.kCyan )

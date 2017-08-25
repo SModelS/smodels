@@ -30,8 +30,8 @@ class LikelihoodComputer:
         self.nobs = self.convert ( nobs )
         self.nb = self.convert ( nb )
         self.covb = self.convert ( covb )
-        self.timer = { "fmin": 0., "theta_hat_ini": 0., "brentq": 0., "profile": 0.,
-                       "find_mu_hat": 0. }
+        self.timer = { "fmin1": 0., "fmin2": 0., "theta_hat_ini": 0., "brentq": 0., 
+                       "profile": 0., "find_mu_hat": 0. }
 
     def printProfilingStats ( self ):
         print ()
@@ -194,8 +194,7 @@ class LikelihoodComputer:
         xtot = theta + self.nb + self.nsig
         xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
         logpoisson = self.nobs*numpy.log(xtot) - xtot - special.gammaln(self.nobs+1)
-        cov = self.covb+numpy.diag(self.deltas**2)
-        loggaussian = stats.multivariate_normal.logpdf(theta,cov=cov) # mean 0
+        loggaussian = stats.multivariate_normal.logpdf(theta,cov=self.cov_tot) # mean 0
         nll_ = - loggaussian - sum(logpoisson)
         return nll_
 
@@ -203,10 +202,20 @@ class LikelihoodComputer:
         """ the derivative of nll as a function of the thetas. 
         Makes it easier to find the maximum likelihood. """
         xtot = theta + self.nb + self.nsig
-        xtot[xtot==0.] = 1e-30 ## turn zeroes to small values
-        weight = ( self.covb+numpy.diag(self.deltas**2) )**(-1)
-        nllp_ = 1. - self.nobs / xtot + theta * weight
-        return nllp_[0]
+        xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
+        nllp_ = numpy.ones(len(self.nobs)) - self.nobs / xtot + numpy.dot( theta , self.weight )
+        # nllp_ = 1. - self.nobs / xtot + numpy.dot( theta , weight )
+        # logger.debug ( "nllp_=%s" % nllp_ )
+        #logger.info ( "nllp: covb^-1=%s, nllp=%s, theta=%s" % ( weight, nllp_, theta ) )
+        return nllp_
+
+    def nllHess ( self, theta ):
+        """ the Hessian of nll as a function of the thetas. 
+        Makes it easier to find the maximum likelihood. """
+        xtot = theta + self.nb + self.nsig
+        xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
+        nllh_ = self.weight + numpy.diag ( self.nobs / (xtot**2) )
+        return nllh_
 
     #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
     def prob( self, theta ):
@@ -287,18 +296,18 @@ class LikelihoodComputer:
             self.timer["theta_hat_ini"]-=time.time()
             ini = self.getThetaHat ( self.nobs, self.nb, nsig, self.covb, deltas, 0 ) 
             self.timer["theta_hat_ini"]+=time.time()
+            self.cov_tot = self.covb+numpy.diag(self.deltas**2)
+            self.weight = numpy.linalg.inv ( self.cov_tot )
             try:
-                self.timer["fmin"]-=time.time()
-                # ret = optimize.fmin_bfgs ( self.nll, ini, fprime=self.nllprime )
-                ret = optimize.fmin_cg ( self.nll, ini, fprime=self.nllprime, disp=False )
-                # ret = optimize.fmin ( self.nll, ini, full_output=False, disp=False, xtol=0.01, ftol=0.01 )
-                self.timer["fmin"]+=time.time()
+                self.timer["fmin2"]-=time.time()
+                ret = optimize.fmin_ncg ( self.nll, ini, fprime=self.nllprime, fhess=self.nllHess )
+                self.timer["fmin2"]+=time.time()
                 return ret
             except Exception as e:
                 logger.error ( "exception: %s. ini=%s" % (e,ini[-3:]) )
                 logger.error ( "cov-1=%s" % (self.covb+numpy.diag(deltas))**(-1) )
                 sys.exit()
-            return ret
+            return ini
 
     def _mvProfileLikelihood( self, nsig, deltas ):
             # compute the profiled (not normalized) likelihood of observing
