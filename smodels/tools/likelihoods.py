@@ -306,7 +306,7 @@ class LikelihoodComputer:
             try:
                 self.timer["fmin2"]-=time.time()
                 # ret = optimize.fmin_ncg ( self.nll, ini, fprime=self.nllprime, fhess=self.nllHess )
-                ret = optimize.fmin_ncg ( self.nll, ini, fprime=self.nllprime, fhess=self.nllHess, avextol=1e-5 )
+                ret = optimize.fmin_ncg ( self.nll, ini, fprime=self.nllprime, fhess=self.nllHess, avextol=1e-5, epsilon=1.4901161193847656e-8 )
                 self.timer["fmin2"]+=time.time()
                 return ret
             except Exception as e:
