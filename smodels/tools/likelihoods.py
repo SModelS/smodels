@@ -34,6 +34,7 @@ class LikelihoodComputer:
                        "profile": 0., "find_mu_hat": 0. }
 
     def printProfilingStats ( self ):
+        return
         print ()
         print ( "Profiling likelihood, %d SRs:" % len(self.nobs) )
         print ( "=================================" )
@@ -49,7 +50,7 @@ class LikelihoodComputer:
         for ctr,d in enumerate ( denominator ):
             if d==0.:
                 if (self.nobs[ctr]*effs[ctr]) == 0.:
-                    logger.info ( "zero denominator, but numerator also zero, so we set denom to 1." )
+                    logger.debug ( "zero denominator, but numerator also zero, so we set denom to 1." )
                     denominator[ctr]=1.
                 else:
                     logger.error ( "we have a zero value in the denominator at pos %d, with a non-zero numerator. dont know how to handle." % ctr )
@@ -62,6 +63,7 @@ class LikelihoodComputer:
     def plotMuHatRootFinding ( self, effs, theta_hat, lumi, mu_hat ):
         """ plot the function whose root gives us mu_hat: 1/L dL/dmu.
         """
+        return
         mu_c = numpy.abs ( self.nobs - self.nb - theta_hat ) / effs
         # mu_ini = sum ( mu_c ) / len(mu_c)
         mu_ini = 2. * max ( mu_c )
@@ -140,9 +142,9 @@ class LikelihoodComputer:
             theta_hat = self.findThetaHat( mu_hat * effs )
             ctr+=1
             
-        logger.info ( "   mu_hat  =%s" % (mu_hat/lumi) )
-        logger.info ( "   nsig    =%s" % (self.nsig[:10]) )
-        check = sum ( self.nobs * effs / ( mu_hat * effs + self.nb ) - effs )
+        #logger.info ( "   mu_hat  =%s" % (mu_hat/lumi) )
+        #logger.info ( "   nsig    =%s" % (self.nsig[:10]) )
+        #check = sum ( self.nobs * effs / ( mu_hat * effs + self.nb ) - effs )
         #logger.info ( "   check(mu_hat) =%s" % check )
         #logger.info ( "   check(p(mu_hat)) =%s" % self.profileLikelihood ( mu_hat * effs ) )
         #logger.info ( "   check(p(nsig)) =%s" % self.profileLikelihood ( self.nsig ) )
@@ -162,7 +164,7 @@ class LikelihoodComputer:
         if type ( effs ) in [ list, numpy.ndarray ]:
             s_effs = sum ( effs )
         sgm_mu = math.sqrt ( sum (self.nobs ) + sum ( numpy.diag ( self.covb ) ) ) / s_effs / lumi
-        logger.info ( "sgm_mu = %s" % sgm_mu )
+        # logger.info ( "sgm_mu = %s" % sgm_mu )
         return sgm_mu
 
 
@@ -194,7 +196,7 @@ class LikelihoodComputer:
         as a negative log likelihood. """
         xtot = theta + self.ntot
         xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
-        #logpoisson = self.nobs*numpy.log(xtot) - xtot - special.gammaln(self.nobs+1)
+        # logger.info  ( "theta=%s" % theta )
         logpoisson = self.nobs*numpy.log(xtot) - xtot - self.gammaln
         loggaussian = stats.multivariate_normal.logpdf(theta,cov=self.cov_tot)
         nll_ = - loggaussian - sum(logpoisson)
@@ -305,12 +307,22 @@ class LikelihoodComputer:
             self.gammaln = special.gammaln(self.nobs + 1)
             try:
                 self.timer["fmin2"]-=time.time()
-                # ret = optimize.fmin_ncg ( self.nll, ini, fprime=self.nllprime, fhess=self.nllHess )
-                ret = optimize.fmin_ncg ( self.nll, ini, fprime=self.nllprime, fhess=self.nllHess, avextol=1e-5 )
+                ret_c = optimize.fmin_ncg ( self.nll, ini, fprime=self.nllprime, fhess=self.nllHess, full_output=True, disp=0 )
+                if ret_c[-1] not in [0]:
+                    logger.debug ( "ncg failed. reverting to tnc" )
+                    bounds = [ ( -3*x,3*x ) for x in self.nobs ]
+                    ret_c = optimize.fmin_tnc ( self.nll, ret_c[0], fprime=self.nllprime, disp=0, bounds=bounds )
+                    if ret_c[-1] not in [ 0, 1, 2 ]:
+                        logger.info ( "tnc failed also: %s" % str(ret_c) )
+                        sys.exit()
+                    else:
+                        logger.debug ( "tnc worked." )
+                
+                ret = ret_c[0]
                 self.timer["fmin2"]+=time.time()
                 return ret
             except Exception as e:
-                logger.error ( "exception: %s. ini=%s" % (e,ini[-3:]) )
+                logger.error ( "exception: %s. ini[-3:]=%s" % (e,ini[-3:]) )
                 logger.error ( "cov-1=%s" % (self.covb+numpy.diag(deltas))**(-1) )
                 sys.exit()
             return ini
@@ -319,6 +331,7 @@ class LikelihoodComputer:
         """ plot the likelihood, but as a function of the nuisance theta! 
         :param nsig: plot it at nsig. If None, plot at mu_hat=0.
         """
+        return
         if ( self.nobs == self.nb ).all():
             # only plot we this isnt the 'expected' case.
             return 
@@ -410,7 +423,7 @@ class LikelihoodComputer:
             up = theta_hat+nrange*sqrt(dsigma2)
             ## first integral can be coarse, we will anyhow do another round
             opts = { "epsabs":1e-2, "epsrel":1e-1 }
-            like = integrate.nquad( self.probMV, zip(low,up),opts=opts )[0]
+            like = integrate.nquad( self.probMV, list(zip(low,up)),opts=opts )[0]
             norm = (1./2.)*(1. + special.erf((self.nb+nsig)/sqrt(2.*dsigma2)))#[0][0]
             norms = reduce(lambda x, y: x*y, norm )
             err = 1.
@@ -441,14 +454,16 @@ class LikelihoodComputer:
 
     def profileLikelihood ( self, nsig, deltas = None ):
         """ compute the profiled likelihood for nsig.
-            Warning: not normalized. """
+            Warning: not normalized. 
+            Returns profile likelihood and error code (0=no error)
+        """
         self.timer["profile"]-=time.time()
         nsig = self.convert ( nsig )
         if type( nsig ) in [ int, float, numpy.float64 ]:
             if type(deltas) == type(None):
                 deltas = 1e-9*nsig ## FIXME for backwards compatibility
             ## FIXME write profiled likelihood for 1d case.
-            return self._likelihood1d( nsig, deltas )
+            return self._likelihood1d( nsig, deltas ),0
         if type(deltas) == type(None):
             deltas = numpy.array ( [1e-9*nsig]*len(nsig) ) ## FIXME for backwards compatibility
         # compute the profiled (not normalized) likelihood of observing
@@ -456,7 +471,7 @@ class LikelihoodComputer:
         theta_hat = self.findThetaHat ( nsig, deltas )
         ret = self.probMV ( *theta_hat )
         self.timer["profile"]+=time.time()
-        return ret
+        return (ret,0)
 
     def likelihood ( self, nsig, deltas = None ):
         """ compute likelihood for nsig, marginalized the nuisances """

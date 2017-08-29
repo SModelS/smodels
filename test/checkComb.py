@@ -13,6 +13,7 @@ from smodels.theory import slhaDecomposer
 
 colors.on = True
 setLogLevel ( "debug" )
+setLogLevel ( "info" )
 
 smstoplist = smstoplist = slhaDecomposer.decompose( "T2tt.slha" )
 print ( "smstoplist=",len(smstoplist ) )

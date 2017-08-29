@@ -65,7 +65,7 @@ class UpperLimitComputer:
 
         effs = numpy.array ( eff )
         llhds={}
-        upto = mu_hat + 5.* sigma_mu
+        upto = mu_hat + 4. * sigma_mu
         n_bins = 50.
         dx = upto / n_bins ## FIXME
         start = dx/2.
@@ -78,7 +78,7 @@ class UpperLimitComputer:
                 csig = sig * effs
                 # l = computer.likelihood ( csig )
                 # FIXME marginalize or profile?
-                l = computer.profileLikelihood ( csig )
+                l,err = computer.profileLikelihood ( csig )
                 llhds[float(sig)]=l
                 lst.append ( l )
 
@@ -95,10 +95,11 @@ class UpperLimitComputer:
                 start = dx/2.
                 llhds={}
                 continue ## and again
-            if last < 1e-8:
+            if last < 1e-20:
                 ## dubious! we may have sampled too scarcely!
                 upto = .23 * upto
                 logger.error ( "when integrating pdf, last bin is suspiciously small: %g. Take 23 pc the range: %s." % ( last, upto ) )
+                # logger.error ( "here are the last 10 bins  %s" % (llhds) )
                 dx = upto / n_bins ## FIXME
                 llhds={}
                 continue
@@ -133,6 +134,7 @@ class UpperLimitComputer:
         :param cl95: final 95% CL upper limit.
         :param xmax: maximum likelihood computer
         """
+        return
         expected = ( computer.nobs == computer.nb ).all()
         # logger.error ( "expected=%s", expected )
         import ROOT, time
