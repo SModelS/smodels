@@ -198,7 +198,7 @@ class LikelihoodComputer:
         xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
         # logger.info  ( "theta=%s" % theta )
         logpoisson = self.nobs*numpy.log(xtot) - xtot - self.gammaln
-        loggaussian = stats.multivariate_normal.logpdf(theta,cov=self.cov_tot)
+        loggaussian = stats.multivariate_normal.logpdf(theta,mean=[0.]*len(theta),cov=self.cov_tot)
         nll_ = - loggaussian - sum(logpoisson)
         return nll_
 
