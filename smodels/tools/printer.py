@@ -424,10 +424,11 @@ class TxTPrinter(BasicPrinter):
         
         for theoryPrediction in obj.theoryPredictions:
             expRes = theoryPrediction.expResult
-            info = theoryPrediction.dataset.dataInfo
+            # info = theoryPrediction.dataset.dataInfo
+            dataId = theoryPrediction.dataId()
             output += "\n"
             output += "---------------Analysis Label = " + expRes.globalInfo.id + "\n"
-            output += "-------------------Dataset Label = " + str(info.dataId).replace("None","(UL)") + "\n"
+            output += "-------------------Dataset Label = " + str(dataId).replace("None","(UL)") + "\n"
             output += "-------------------Txname Labels = " + str([str(txname) for txname in theoryPrediction.txnames]) + "\n"
             output += "Analysis sqrts: " + str(expRes.globalInfo.sqrts) + \
                     "\n"
@@ -447,8 +448,8 @@ class TxTPrinter(BasicPrinter):
                 upperLimit = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass)
                 upperLimitExp = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass,expected=True)
             elif expRes.datasets[0].dataInfo.dataType == 'efficiencyMap':
-                upperLimit = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.dataInfo.dataId)
-                upperLimitExp = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.dataInfo.dataId,expected=True)
+                upperLimit = expRes.getUpperLimitFor(dataID=theoryPrediction.dataId() )
+                upperLimitExp = expRes.getUpperLimitFor(dataID=theoryPrediction.dataId(), expected=True)
 
             output += "Observed experimental limit: " + str(upperLimit) + "\n"
             if not upperLimitExp is None:
@@ -758,20 +759,24 @@ class PyPrinter(BasicPrinter):
         ExptRes = []
         for theoryPrediction in obj.theoryPredictions:            
             expResult = theoryPrediction.expResult
-            dataset = theoryPrediction.dataset
+            # dataset = theoryPrediction.dataset
             expID = expResult.globalInfo.id
-            datasetID = dataset.dataInfo.dataId
-            dataType = dataset.dataInfo.dataType
-            if dataType == 'upperLimit':
-                ul = expResult.getUpperLimitFor(txname=theoryPrediction.txnames[0],
-                                                mass=theoryPrediction.mass)
-                ulExpected = None
-            elif dataType == 'efficiencyMap':
-                ul = expResult.getUpperLimitFor(dataID=datasetID)
-                ulExpected = expResult.getUpperLimitFor(dataID=datasetID, expected=True).asNumber(fb)
+            datasetID = theoryPrediction.dataId()
+            dataType = theoryPrediction.dataType()
+            if datasetID == "combined":
+                ul = theoryPrediction.getUpperLimit()
+                ulExpected = theoryPrediction.getUpperLimit ( expected = True ).asNumber(fb)
             else:
-                logger.error("Unknown dataType %s" %(str(dataType)))
-                continue            
+                if dataType == 'upperLimit':
+                    ul = expResult.getUpperLimitFor(txname=theoryPrediction.txnames[0],
+                                                    mass=theoryPrediction.mass)
+                    ulExpected = None
+                elif dataType == 'efficiencyMap':
+                    ul = expResult.getUpperLimitFor(dataID=datasetID)
+                    ulExpected = expResult.getUpperLimitFor(dataID=datasetID, expected=True).asNumber(fb)
+                else:
+                    logger.error("Unknown dataType %s" %(str(dataType)))
+                    continue            
             value = theoryPrediction.xsection.value
             txnames = [txname.txName for txname in theoryPrediction.txnames]
             maxconds = theoryPrediction.getmaxCondition()
@@ -780,7 +785,7 @@ class PyPrinter(BasicPrinter):
                 mass = [[m.asNumber(GeV) for m in mbr] for mbr in mass]
             else:
                 mass = None
-            sqrts = dataset.globalInfo.sqrts
+            sqrts = expResult.globalInfo.sqrts
             resDict = {'maxcond': maxconds, 'theory prediction (fb)': value.asNumber(fb),
                         'upper limit (fb)': ul.asNumber(fb),
                         'expected upper limit (fb)': ulExpected,
@@ -789,7 +794,7 @@ class PyPrinter(BasicPrinter):
                         'AnalysisID': expID,
                         'DataSetID' : datasetID,
                         'AnalysisSqrts (TeV)': sqrts.asNumber(TeV),
-                        'lumi (fb-1)' : (dataset.globalInfo.lumi*fb).asNumber(),
+                        'lumi (fb-1)' : (expResult.globalInfo.lumi*fb).asNumber(),
                         'dataType' : dataType}            
             if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
                 resDict['chi2'] = theoryPrediction.chi2

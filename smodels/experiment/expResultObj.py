@@ -268,6 +268,9 @@ class ExpResult(object):
         :return: upper limit (Unum object)
         
         """
+        if dataID == "combined":
+            logger.error ( "you are asking for upper limit for the combined dataset. Use .getCombinedUpperLimitFor method instead." )
+            sys.exit()
         if self.datasets[0].dataInfo.dataType == 'efficiencyMap':
             if not dataID or not isinstance(dataID, str):
                 logger.error("The data set ID must be defined when computing ULs" \

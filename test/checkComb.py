@@ -32,14 +32,18 @@ if len ( sys.argv) > 1:
 d=Database( dir, discard_zeroes = True )
 print(d)
 
+expRes = d.getExpResults( datasetIDs=['all'] )
+
+print ( "%d results." % len(expRes) )
+
 massvec = [[400.*GeV,75*GeV], [400*GeV,75*GeV]]
 
-for e in d.getExpResults():
+for e in expRes:
     print ( e.globalInfo.id )
     #for ds in e.datasets:
     #    print ( ds.dataInfo.dataId )
     predictions = theoryPredictionsFor ( e, smstoplist, useBestDataset=False, 
                                          combinedResults=True )
-    for pred in predictions[-1:]:
+    for pred in predictions[:]:
         print ( pred.describe() )
 

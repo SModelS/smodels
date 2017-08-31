@@ -44,9 +44,9 @@ class TheoryPrediction(object):
 
     def dataId ( self ):
         """ return id of dataset,
-            or "all" for combined results """
+            or "combined" for combined results """
         if type(self.dataset) == list:
-            return "all"
+            return "combined"
         return self.dataset.dataInfo.dataId
 
     def dataType ( self ):
@@ -60,7 +60,7 @@ class TheoryPrediction(object):
         """ Get the upper limit on sigma*eff
         :param expected: return expected Upper Limit, instead of observed.
         """
-        if self.dataId() == "all":
+        if self.dataId() == "combined":
             if expected:
                 return self.combinedExpectedUL
             return self.combinedUL
