@@ -49,7 +49,7 @@ def verbose_run():
                         continue
                     print ( "%sok%s" % ( colors.info, colors.reset ) ) 
             except Exception as e:
-                print ( "dfd %s" % e )
+                print ( "Exception: %s" % e )
 
                 #a=t.run() ## python3
                 # print ( "a=",a )

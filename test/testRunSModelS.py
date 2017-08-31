@@ -143,7 +143,7 @@ class RunSModelSTest(unittest.TestCase):
     def testGoodFile13(self):
           
         filename = join ( iDir(), "inputFiles/slha/simplyGluino.slha" )
-        outputfile = self.runMain(filename,suppressStdout = False )
+        outputfile = self.runMain(filename,suppressStdout = True )
         shutil.copyfile(outputfile,'./output13.py')
         from simplyGluino_default import smodelsOutputDefault
         from output13 import smodelsOutput

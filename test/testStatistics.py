@@ -12,6 +12,7 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.tools import statistics
+from smodels.tools import likelihoods
 from smodels.tools.physicsUnits import fb
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from databaseLoader import database
@@ -38,11 +39,11 @@ class StatisticsTest(unittest.TestCase):
         ill = math.log(prediction.likelihood)
         ichi2 = prediction.chi2
         nsig = (pred_signal_strength*expRes.globalInfo.lumi).asNumber()
-        computer = statistics.LikelihoodComputer ( 4, 2.2, 1.1**2 )
-        dll = math.log( computer.likelihood( nsig, 0.002*nsig ) )
+        computer = likelihoods.LikelihoodComputer ( 4, 2.2, 1.1**2 )
+        dll = math.log( computer.likelihood( nsig, 0.2*nsig ) )
+        self.assertAlmostEqual(ill, dll, places=2)
         ## dchi2 = statistics.chi2(nsig, 4, 2.2, 1.1, 0.2*nsig )
         dchi2 = computer.chi2( nsig, 0.2*nsig )
-        self.assertAlmostEqual(ill, dll, places=2)
         self.assertAlmostEqual(ichi2, dchi2, places=2)
 
     def round_to_sign(self, x, sig=3):
@@ -62,7 +63,6 @@ class StatisticsTest(unittest.TestCase):
         and expected upper limit and a theory prediction
         with the previously known result for the value of
         the chi2.
-
 
         All values of nobs, nsig, nb, deltab come from the
         SModelS database and are for the T1 simplified model
@@ -136,24 +136,11 @@ class StatisticsTest(unittest.TestCase):
             nb = d['nb']
             deltab = d['deltab']
             deltas = 0.2*d['nsig']
-
-
-#             logger.error("\nns="+str(nsig)+";\nnobs = "+str(nobs)+";\nnb="+str(nb)+";\ndb="+str(deltab))
+            # print ("ns="+str(nsig)+"; nobs = "+str(nobs)+"; nb="+str(nb)+"; db="+str(deltab))
             # Chi2 as computed by statistics module:
-            computer = statistics.LikelihoodComputer ( nobs, nb, deltab**2 )
+            computer = likelihoods.LikelihoodComputer ( nobs, nb, deltab**2 )
             chi2_actual = computer.chi2( nsig, deltas )
-            #chi2_actual = statistics.chi2( nsig, nobs, nb,
-            #    deltab, deltas)
-            
-#             logger.error("chi2= "+str(chi2_actual))
-            #print('chi2act', chi2_actual)
-#             if not chi2_actual==None and not np.isnan(chi2_actual) and chi2_actual > 1:
-#                 chi2_actual = self.round_to_sign(chi2_actual, 2)
-
-            # The previously computed chi2:
-            # (using:ntoys=100000)
             chi2_expected = d['chi2']
-            #print('chi2exp', chi2_expected)            
             if not chi2_expected==None and not np.isnan(chi2_expected):
 #                 chi2_expected = self.round_to_sign(chi2_expected, 2)
                 # Check that chi2 values agree:                                

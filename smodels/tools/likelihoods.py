@@ -21,6 +21,11 @@ import math
 import sys
 
 class LikelihoodComputer:
+
+    """ the default value for delta_s, the assumed relative error
+    on signal yields. """
+    deltas_default = 0.2
+
     def __init__ ( self, nobs, nb, covb ):
         """
         :param nobs: numbers of observed events (float or 1d array)
@@ -54,7 +59,6 @@ class LikelihoodComputer:
                     denominator[ctr]=1.
                 else:
                     logger.error ( "we have a zero value in the denominator at pos %d, with a non-zero numerator. dont know how to handle." % ctr )
-                    sys.exit()
         ret = self.nobs * effs / denominator - effs
         if type (ret ) in [ numpy.array, numpy.ndarray, list ]:
             ret = sum ( ret )
@@ -110,7 +114,7 @@ class LikelihoodComputer:
         ## we need a very rough initial guess for mu(hat), to come
         ## up with a first theta
         self.nsig = numpy.array ( [0.] * len(self.nobs ) )
-        self.deltas = numpy.array ( [0.] * len(self.nobs ) )
+        self.deltas = numpy.array ( [0.] * len(self.nobs) )
 
         ## we start with theta_hat being all zeroes
         theta_hat = numpy.array ( [0.] * len(self.nobs ) )
@@ -222,12 +226,17 @@ class LikelihoodComputer:
         return nllh_
 
     #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
-    def prob( self, theta ):
-        """ probability for nuisance parameter theta, 1d case. """
+    def prob( self, x ):
+    # def prob( self, theta ):
+        """ probability for x = ntot + theta """
+        """ FIXME this should be rewritten in terms of theta. """
         ntot = self.nb + self.nsig
-        poisson = exp(self.nobs*log(theta+ntot) - theta - ntot - math.lgamma(self.nobs + 1))
-        gaussian = stats.norm.pdf( theta, loc=0.,\
+        poisson = exp(self.nobs*log(x) - x - math.lgamma(self.nobs + 1))
+        # poisson = exp(self.nobs*log(theta+ntot) - theta - ntot - math.lgamma(self.nobs + 1))
+        gaussian = stats.norm.pdf( x, loc=ntot,\
                                    scale=sqrt(self.covb+self.deltas**2))
+        #gaussian = stats.norm.pdf( theta, loc=0.,\
+        #                           scale=sqrt(self.covb+self.deltas**2))
         return poisson*gaussian
 
     def getThetaHat ( self, nobs, nb, nsig, covb, deltas, max_iterations ):
@@ -292,9 +301,10 @@ class LikelihoodComputer:
                 (poisson*gauss).
             """
             if type(deltas) == type(None):
-                 deltas = 0.
+                 deltas = self.deltas_default * nsig
                  if type(nsig) in [ list, numpy.ndarray, numpy.array ]:
-                    deltas = numpy.array ( [0.]*len(nsig) )
+                    # deltas = numpy.array ( [0.] * len(nsig) )
+                    deltas = numpy.array ( self.deltas_default * nsig )
             ## first step is to disregard the covariances and solve the
             ## quadratic equations
             self.timer["theta_hat_ini"]-=time.time()
@@ -311,9 +321,11 @@ class LikelihoodComputer:
                 if ret_c[-1] not in [0]:
                     logger.debug ( "ncg failed. reverting to tnc" )
                     bounds = [ ( -3*x,3*x ) for x in self.nobs ]
+                    ini = ret_c
                     ret_c = optimize.fmin_tnc ( self.nll, ret_c[0], fprime=self.nllprime, disp=0, bounds=bounds )
                     if ret_c[-1] not in [ 0, 1, 2 ]:
                         logger.info ( "tnc failed also: %s" % str(ret_c) )
+                        logger.info ( "ini was %s" % str(ini) )
                         sys.exit()
                     else:
                         logger.debug ( "tnc worked." )
@@ -461,11 +473,11 @@ class LikelihoodComputer:
         nsig = self.convert ( nsig )
         if type( nsig ) in [ int, float, numpy.float64 ]:
             if type(deltas) == type(None):
-                deltas = 1e-9*nsig ## FIXME for backwards compatibility
+                deltas = self.deltas_default * nsig 
             ## FIXME write profiled likelihood for 1d case.
             return self._likelihood1d( nsig, deltas ),0
         if type(deltas) == type(None):
-            deltas = numpy.array ( [1e-9*nsig]*len(nsig) ) ## FIXME for backwards compatibility
+            deltas = numpy.array ( self.deltas_default * nsig ) ## FIXME for backwards compatibility
         # compute the profiled (not normalized) likelihood of observing
         # nsig signal events
         theta_hat = self.findThetaHat ( nsig, deltas )
@@ -477,7 +489,7 @@ class LikelihoodComputer:
         """ compute likelihood for nsig, marginalized the nuisances """
         nsig = self.convert ( nsig )
         if type(deltas) == type(None):
-            deltas = 1e-5*nsig ## FIXME for backwards compatibility
+            deltas = self.deltas_default * nsig ## FIXME for backwards compatibility
         if type( nsig ) in [ int, float, numpy.float64 ]:
             return self._likelihood1d( nsig, deltas )
         return self._mvLikelihood( nsig, deltas )
@@ -513,7 +525,6 @@ class LikelihoodComputer:
             #print ( "1d,a,b,",a,b )
             self.nsig, self.deltas = nsig, deltas ## store for integral
             like = integrate.quad(self.prob,a,b,epsabs=0.,epsrel=1e-3)[0]
-            #print ( "1d,like",like )
 
             #Increase integration range until integral converges
             err = 1.
@@ -547,7 +558,7 @@ class LikelihoodComputer:
             """
             nsig = self.convert ( nsig )
             if deltas == None:
-                deltas = 1e-5 * nsig
+                deltas = self.deltas_default * nsig
             # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
             llhd = self.likelihood( nsig, deltas )
 

@@ -9,7 +9,10 @@ from smodels.experiment.exceptions import SModelSExperimentError
 from smodels.tools.smodelsLogging import setLogLevel
 from smodels.tools.colors import colors
 from smodels.tools.physicsUnits import pb, fb, GeV
+from smodels.tools.likelihoods import LikelihoodComputer
 from smodels.theory import slhaDecomposer
+
+LikelihoodComputer.deltas_default = 1e-12
 
 colors.on = True
 setLogLevel ( "debug" )
