@@ -65,22 +65,28 @@ class UpperLimitComputer:
 
         effs = numpy.array ( eff )
         llhds={}
-        upto = mu_hat + 4. * sigma_mu
+        upto = mu_hat + 4.0 * sigma_mu
         n_bins = 50.
         dx = upto / n_bins ## FIXME
         start = dx/2.
         # start = 0.
         #print ( "compute ulSigma",nev,xbg,cov,eff )
         #print ( "start,upto=",start,upto )
+        errs = []
+
         while True:
             lst = [] ## also store in list
+            # for sig in [ 947.567985654831431930, 1579.279976091385833570, 2210.991966527939894149 ]:
             for sig in numpy.arange ( start, upto, dx ):
                 csig = sig * effs
                 # l = computer.likelihood ( csig )
                 # FIXME marginalize or profile?
                 l,err = computer.profileLikelihood ( csig )
+                # logger.error ( "llhd %.18f -> %s [%s]" % ( sig, l, err ) )
                 llhds[float(sig)]=l
                 lst.append ( l )
+                errs.append ( err )
+            # sys.exit()
 
             ##print ( "likelihoods",llhds )
             norm = sum ( llhds.values() )
@@ -120,12 +126,12 @@ class UpperLimitComputer:
             llhds[k]=v/norm
         ## now find the 95% quantile by interpolation
         ret = self.interpolate ( llhds, dx )
-        self.plot ( llhds, dx, upto, ret, computer, effs, norm )
+        self.plot ( llhds, dx, upto, ret, computer, effs, norm, errs )
         computer.plotLTheta ( nsig=mu_hat*effs )
         computer.printProfilingStats()
         return ret
 
-    def plot ( self, llhds, dx, upto, cl95, computer, effs, norm ):
+    def plot ( self, llhds, dx, upto, cl95, computer, effs, norm, errs ):
         """ function to plot likelihoods and the 95% CL, for
             debugging purposes.
         :param llhds: the likelihood values, as a dictionary
@@ -134,9 +140,7 @@ class UpperLimitComputer:
         :param cl95: final 95% CL upper limit.
         :param xmax: maximum likelihood computer
         """
-        return
         expected = ( computer.nobs == computer.nb ).all()
-        # logger.error ( "expected=%s", expected )
         import ROOT, time
         xvals = list ( llhds.keys() )
         xvals.sort()
@@ -144,24 +148,31 @@ class UpperLimitComputer:
         for x in xvals:
             yvals.append ( llhds[x] )
         lumi = self.lumi.asNumber(1/fb)
-        logger.warning ( "Plotting likelihoods: int.upto: %s, cl95: %s" % \
-                       ( upto/lumi, cl95 ) )
-        #for k,v in llhds.items():
-        #    logger.warning ( "llhd(%s)=%s" % ( k,v*norm ) )
+        s_expected = "observed"
+        if expected:
+            s_expected = "expected"
+        logger.warning ( "Plotting %s likelihoods: int.upto: %s, cl95: %s" % \
+                       ( s_expected, upto/lumi, cl95 ) )
         t=ROOT.TGraph ( len ( xvals ))
+        n_errs = numpy.array ( errs )
+        t_err=ROOT.TGraph ( len ( n_errs[n_errs!=0] ) )
+        t_err.SetMarkerColor ( ROOT.kRed )
+        t_err.SetMarkerStyle ( 21 )
         l=ROOT.TLegend( .6,.7,.98,.89)
+        errctr=0
         for ctr,(x,y) in enumerate ( zip ( xvals, yvals ) ):
             xv = x / lumi
             t.SetPoint ( ctr, xv, y )
+            if errs[ctr]!=0:
+                t_err.SetPoint ( errctr, xv, y )
+                errctr+=1
             # logger.error ( "x,y=%s,%s" % ( x,y ) )
         t.Draw("AC*")
+        if errctr>0:
+            t_err.Draw("*SAME")
         # logger.error ( "integral %f" % t.Integral() )
         t.GetXaxis().SetTitle ( "cross section [fb]" )
-        title = " likelihood for signal cross section (%d SRs)" % len(effs)
-        if expected:
-            title = "expected" + title
-        else:
-            title = "observed" + title
+        title = "%s likelihood for signal cross section (%d SRs)" % (s_expected, len(effs) )
         t.SetTitle ( "" )
         tt = ROOT.TText ( .1, .92, title )
         tt.SetTextSize(.04)

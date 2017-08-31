@@ -67,7 +67,6 @@ class LikelihoodComputer:
     def plotMuHatRootFinding ( self, effs, theta_hat, lumi, mu_hat ):
         """ plot the function whose root gives us mu_hat: 1/L dL/dmu.
         """
-        return
         mu_c = numpy.abs ( self.nobs - self.nb - theta_hat ) / effs
         # mu_ini = sum ( mu_c ) / len(mu_c)
         mu_ini = 2. * max ( mu_c )
@@ -143,7 +142,7 @@ class LikelihoodComputer:
             self.timer["brentq"]-=time.time()
             mu_hat = optimize.brentq ( self.dLdMu, lower, upper, args=(effs, theta_hat ) )
             self.timer["brentq"]+=time.time()
-            theta_hat = self.findThetaHat( mu_hat * effs )
+            theta_hat,err = self.findThetaHat( mu_hat * effs )
             ctr+=1
             
         #logger.info ( "   mu_hat  =%s" % (mu_hat/lumi) )
@@ -317,33 +316,36 @@ class LikelihoodComputer:
             self.gammaln = special.gammaln(self.nobs + 1)
             try:
                 self.timer["fmin2"]-=time.time()
+                # first use NCG
                 ret_c = optimize.fmin_ncg ( self.nll, ini, fprime=self.nllprime, fhess=self.nllHess, full_output=True, disp=0 )
-                if ret_c[-1] not in [0]:
-                    logger.debug ( "ncg failed. reverting to tnc" )
-                    bounds = [ ( -3*x,3*x ) for x in self.nobs ]
-                    ini = ret_c
-                    ret_c = optimize.fmin_tnc ( self.nll, ret_c[0], fprime=self.nllprime, disp=0, bounds=bounds )
-                    if ret_c[-1] not in [ 0, 1, 2 ]:
-                        logger.info ( "tnc failed also: %s" % str(ret_c) )
-                        logger.info ( "ini was %s" % str(ini) )
-                        sys.exit()
-                    else:
-                        logger.debug ( "tnc worked." )
+                # then always continue with TNC
+                bounds = [ ( -10*x, 10*x ) for x in self.nobs ]
+                ini = ret_c
+                ret_c = optimize.fmin_tnc ( self.nll, ret_c[0], fprime=self.nllprime, disp=0, bounds=bounds )
+                if ret_c[-1] not in [ 0, 1, 2 ]:
+                    logger.info ( "tnc failed also: %s" % ( str(ret_c[-2:]) ) )
+                    #logger.info ( "ini was %s" % str(ini[:]) )
+                    return ret_c[0],ret_c[-1]
+                    # ret_c = optimize.fmin_l_bfgs_b ( self.nll, ret_c[0], fprime=self.nllprime, disp=5, bounds=bounds )
+                    # logger.info ( "ret3 %s" % str(ret3[:]) )
+                    # sys.exit()
+                else:
+                    return ret_c[0],0
+                    logger.debug ( "tnc worked." )
                 
                 ret = ret_c[0]
                 self.timer["fmin2"]+=time.time()
-                return ret
+                return ret,-2
             except Exception as e:
                 logger.error ( "exception: %s. ini[-3:]=%s" % (e,ini[-3:]) )
                 logger.error ( "cov-1=%s" % (self.covb+numpy.diag(deltas))**(-1) )
                 sys.exit()
-            return ini
+            return ini,-1
 
     def plotLTheta ( self, nsig=None ):
         """ plot the likelihood, but as a function of the nuisance theta! 
         :param nsig: plot it at nsig. If None, plot at mu_hat=0.
         """
-        return
         if ( self.nobs == self.nb ).all():
             # only plot we this isnt the 'expected' case.
             return 
@@ -354,14 +356,14 @@ class LikelihoodComputer:
             nsig = [0.] * len(self.nobs)
             s_mu="#mu=0"
         self.nsig = nsig
-        theta_hat = self.findThetaHat ( nsig, self.deltas )
+        theta_hat,err = self.findThetaHat ( nsig, self.deltas )
         theta_hat_1 = .9 * theta_hat
         v_tm = self.probMV ( *theta_hat )
         v_tm1 = self.probMV ( *theta_hat_1 )
         #logger.error ( "point  at %s %s" % ( theta_hat[:10], v_tm ) )
         #logger.error ( "point0 at %s %s" % ( theta_hat_0[:10], v_tm0 ) )
         #logger.error ( "point1 at %s %s" % ( theta_hat_1[:10], v_tm1 ) )
-        rng = list ( numpy.arange ( 0., 2., 0.05 ) )
+        rng = list ( numpy.arange ( 0.3, 1.7, 0.05 ) )
         t=ROOT.TGraph(len(rng))
         t.SetTitle ( "-ln L(%s,#theta/#hat{#theta}), %d SRs" % (s_mu, len(theta_hat) ) )
         NLLs = []
@@ -425,7 +427,7 @@ class LikelihoodComputer:
             for ctr,i in enumerate(xm):
                 if i == 0.:
                     xm[ctr]=1e-3
-            theta_hat = self.findThetaHat ( nsig, deltas )
+            theta_hat,err = self.findThetaHat ( nsig, deltas )
             #print ( "found xmax at", xmax, "l=",self.probMV(*xmax) )
 
             #Define initial integration range:
@@ -477,13 +479,14 @@ class LikelihoodComputer:
             ## FIXME write profiled likelihood for 1d case.
             return self._likelihood1d( nsig, deltas ),0
         if type(deltas) == type(None):
-            deltas = numpy.array ( self.deltas_default * nsig ) ## FIXME for backwards compatibility
+            deltas = numpy.array ( self.deltas_default * nsig )
         # compute the profiled (not normalized) likelihood of observing
         # nsig signal events
-        theta_hat = self.findThetaHat ( nsig, deltas )
+        theta_hat,err = self.findThetaHat ( nsig, deltas )
         ret = self.probMV ( *theta_hat )
+        # logger.error ( "theta_hat, err=%s, %s, %s" % ( theta_hat[0], err, ret ) )
         self.timer["profile"]+=time.time()
-        return (ret,0)
+        return (ret,err)
 
     def likelihood ( self, nsig, deltas = None ):
         """ compute likelihood for nsig, marginalized the nuisances """
