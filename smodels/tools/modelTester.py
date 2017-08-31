@@ -190,6 +190,33 @@ def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
                                   listOfExpRes, timeout, development, parameterFile)
     return a
 
+def _cleanList ( fileList, inDir ):
+    """ clean up list of files """
+    cleanedList = []
+    for f in fileList:
+        tmp = os.path.join(inDir, f )
+        if not os.path.isfile ( tmp ):
+            logger.info ( "%s does not exist or is not a file. Skipping it." % tmp )
+            continue
+        cleanedList.append( tmp )
+    return cleanedList
+
+def _determineNCPus ( cpus_wanted, n_files ):
+    """ determine the number of CPUs that are to be used.
+    :param cpus_wanted: number of CPUs specified in parameter file
+    :param n_files: number of files to be run on
+    :returns: number of CPUs that are to be used
+    """
+    ncpusAll = runtime.nCPUs()
+    # ncpus = parser.getint("parameters", "ncpus")
+    ncpus = cpus_wanted
+    if ncpus == 0 or ncpus < -1:
+        logger.error ( "Weird number of ncpus given in ini file: %d" % ncpus )
+        sys.exit()
+    if ncpus == -1 or ncpus > ncpusAll: ncpus = ncpusAll
+    ncpus = min ( n_files, ncpus )
+    return ncpus
+
 def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
                  listOfExpRes, timeout, development, parameterFile):
     """
@@ -207,30 +234,16 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
     :param parameterFile: parameter file, for crash reports
     :returns: printer(s) output, if not run in parallel mode
     """
-
     if len( fileList ) == 0:
         logger.error ( "no files given." )
         return None
-    if len(fileList ) == 1:
-        return runSingleFile ( fileList[0], outputDir, parser, databaseVersion,
+
+    cleanedList = _cleanList ( fileList, inDir )
+    if len(cleanedList) == 1:
+        return runSingleFile ( cleanedList[0], outputDir, parser, databaseVersion,
                                listOfExpRes, timeout, development, parameterFile )
-
-    """ loop over input files and run SModelS """
-    ncpusAll = runtime.nCPUs()
-    ncpus = parser.getint("parameters", "ncpus")
-    if ncpus == 0 or ncpus < -1:
-        logger.error ( "Weird number of ncpus given in ini file: %d" % ncpus )
-        sys.exit()
-    if ncpus == -1 or ncpus > ncpusAll: ncpus = ncpusAll
+    ncpus = _determineNCPus ( parser.getint("parameters", "ncpus"), len(cleanedList) )
     logger.info ("Running SModelS on %d cores" % ncpus )
-
-    cleanedList = []
-    for f in fileList:
-        tmp = os.path.join(inDir, f )
-        if not os.path.isfile ( tmp ):
-            logger.info ( "%s does not exist or is not a file. Skipping it." % tmp )
-            continue
-        cleanedList.append( tmp )
 
     if ncpus == 1:
         return runSetOfFiles( cleanedList, outputDir, parser, databaseVersion,

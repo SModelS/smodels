@@ -25,6 +25,7 @@ class LikelihoodComputer:
     """ the default value for delta_s, the assumed relative error
     on signal yields. """
     deltas_default = 0.2
+    debug_mode = False
 
     def __init__ ( self, nobs, nb, covb ):
         """
@@ -67,6 +68,7 @@ class LikelihoodComputer:
     def plotMuHatRootFinding ( self, effs, theta_hat, lumi, mu_hat ):
         """ plot the function whose root gives us mu_hat: 1/L dL/dmu.
         """
+        if not self.debug_mode: return
         mu_c = numpy.abs ( self.nobs - self.nb - theta_hat ) / effs
         # mu_ini = sum ( mu_c ) / len(mu_c)
         mu_ini = 2. * max ( mu_c )
@@ -323,7 +325,10 @@ class LikelihoodComputer:
                 ini = ret_c
                 ret_c = optimize.fmin_tnc ( self.nll, ret_c[0], fprime=self.nllprime, disp=0, bounds=bounds )
                 if ret_c[-1] not in [ 0, 1, 2 ]:
-                    logger.info ( "tnc failed also: %s" % ( str(ret_c[-2:]) ) )
+                    is_expected=False
+                    if ( self.nobs == self.nb ).all():
+                        is_expected=True
+                    logger.info ( "tnc failed also: %s [%d]" % ( str(ret_c[-2:]), is_expected ) )
                     #logger.info ( "ini was %s" % str(ini[:]) )
                     return ret_c[0],ret_c[-1]
                     # ret_c = optimize.fmin_l_bfgs_b ( self.nll, ret_c[0], fprime=self.nllprime, disp=5, bounds=bounds )
@@ -346,6 +351,7 @@ class LikelihoodComputer:
         """ plot the likelihood, but as a function of the nuisance theta! 
         :param nsig: plot it at nsig. If None, plot at mu_hat=0.
         """
+        if not self.debug_mode: return
         if ( self.nobs == self.nb ).all():
             # only plot we this isnt the 'expected' case.
             return 

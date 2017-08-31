@@ -32,6 +32,8 @@ def upperLimit ( Nobs, Nexp, sigmaexp, lumi, alpha=.05, toys=200000 ):
     return ret
 
 class UpperLimitComputer:
+    debug_mode = False
+
     def __init__ ( self, numberoftoys, lumi, cl=.95):
         """
         :param numberoftoys: how many toy experiments do we make?
@@ -140,6 +142,7 @@ class UpperLimitComputer:
         :param cl95: final 95% CL upper limit.
         :param xmax: maximum likelihood computer
         """
+        if not self.debug_mode: return
         expected = ( computer.nobs == computer.nb ).all()
         import ROOT, time
         xvals = list ( llhds.keys() )

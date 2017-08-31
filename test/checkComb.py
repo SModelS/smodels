@@ -10,15 +10,19 @@ from smodels.tools.smodelsLogging import setLogLevel
 from smodels.tools.colors import colors
 from smodels.tools.physicsUnits import pb, fb, GeV
 from smodels.tools.likelihoods import LikelihoodComputer
+from smodels.tools.statistics import UpperLimitComputer
 from smodels.theory import slhaDecomposer
 
 LikelihoodComputer.deltas_default = 1e-12
+LikelihoodComputer.debug_mode = True
+UpperLimitComputer.debug_mode = True
+
 
 colors.on = True
 setLogLevel ( "debug" )
 setLogLevel ( "info" )
 
-smstoplist = smstoplist = slhaDecomposer.decompose( "T2tt.slha" )
+smstoplist = smstoplist = slhaDecomposer.decompose( "T2tt_528_324_528_324.slha" )
 print ( "smstoplist=",len(smstoplist ) )
 dir = "covdb/"
 
