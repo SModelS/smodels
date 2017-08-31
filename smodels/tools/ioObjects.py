@@ -65,6 +65,8 @@ class ResultList(object):
         :parameter theoPredr theoPred: Theory Prediction object
         :returns: R value = weight / upper limit        
         """
+        return theoPred.getRValue( expected )
+        """ FIXME is all now in theory prediction (I hope)
         
         expResult = theoPred.expResult
         datasetID = theoPred.dataset.dataInfo.dataId
@@ -78,6 +80,7 @@ class ResultList(object):
             logger.error("Unknown dataType %s" %(str(dataType)))
         
         return (theoPred.xsection.value/ul).asNumber()    
+        """
 
     def sort(self):
         """

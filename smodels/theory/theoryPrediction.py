@@ -75,8 +75,10 @@ class TheoryPrediction(object):
                            dataID=self.dataId(), expected=expected, txname = self.txnames[0])
         return self._ul
 
-    def getRValue ( self ):
+    def getRValue ( self, expected = False ):
         """ get the r value = theory prediction / experimental upper limit """
+        if expected:
+            return self.xsection.value / self.getExpectedUpperLimit ()
         return self.xsection.value / self.getUpperLimit ()
 
     def computeStatistics(self):

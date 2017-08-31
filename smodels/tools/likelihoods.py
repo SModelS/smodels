@@ -443,7 +443,9 @@ class LikelihoodComputer:
             up = theta_hat+nrange*sqrt(dsigma2)
             ## first integral can be coarse, we will anyhow do another round
             opts = { "epsabs":1e-2, "epsrel":1e-1 }
+            logger.error ( "compute llhd for %s" % nsig )
             like = integrate.nquad( self.probMV, list(zip(low,up)),opts=opts )[0]
+            logger.error ( "done compute llhd for %s" % nsig )
             norm = (1./2.)*(1. + special.erf((self.nb+nsig)/sqrt(2.*dsigma2)))#[0][0]
             norms = reduce(lambda x, y: x*y, norm )
             err = 1.
@@ -495,13 +497,14 @@ class LikelihoodComputer:
         return (ret,err)
 
     def likelihood ( self, nsig, deltas = None ):
-        """ compute likelihood for nsig, marginalized the nuisances """
+        """ compute likelihood for nsig, profiling the nuisances """
         nsig = self.convert ( nsig )
         if type(deltas) == type(None):
             deltas = self.deltas_default * nsig ## FIXME for backwards compatibility
         if type( nsig ) in [ int, float, numpy.float64 ]:
             return self._likelihood1d( nsig, deltas )
-        return self._mvLikelihood( nsig, deltas )
+        return self.profileLikelihood ( nsig, deltas )[0]
+        # return self._mvLikelihood( nsig, deltas )
 
     def _likelihood1d( self, nsig, deltas ):
             #     Why not a simple poisson function for the factorial
