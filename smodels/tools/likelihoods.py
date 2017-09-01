@@ -578,7 +578,14 @@ class LikelihoodComputer:
             #print ( "deltas=",deltas )
             #print ( "nsig=",nsig )
             #Percentual signal error:
-            deltas_pct = deltas / nsig ## float(nsig)
+            denom = nsig
+            if type(denom)==float and denom == 0.:
+                denom = 1e10 ## when nsig is zero, then so is deltas
+            if type(denom)==numpy.ndarray:
+                ## when nsig is zero, then so is deltas
+                denom [ denom == 0. ] = 1e10
+
+            deltas_pct = deltas / denom ## float(nsig)
 
             # Compute the maximum likelihood H1, which sits at nsig = nobs - nb
             # (keeping the same % error on signal):
