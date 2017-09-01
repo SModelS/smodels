@@ -22,7 +22,7 @@ colors.on = True
 setLogLevel ( "debug" )
 setLogLevel ( "info" )
 
-smstoplist = smstoplist = slhaDecomposer.decompose( "T2tt_533_40_533_40.slha" )
+smstoplist = smstoplist = slhaDecomposer.decompose( "T2tt_239_45_239_45.slha" )
 print ( "smstoplist=",len(smstoplist ) )
 dir = "covdb/"
 

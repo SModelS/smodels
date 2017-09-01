@@ -109,6 +109,7 @@ class LikelihoodComputer:
         self.timer["find_mu_hat"]-=time.time()
         if type ( effs ) in [ list, numpy.ndarray ]:
             effs = numpy.array ( effs )
+        effs[effs==0.]=1e-20
         if sum ( effs<0. ):
             logger.error ( "Negative efficiencies!" )
             sys.exit()

@@ -62,6 +62,7 @@ class ElementCluster(object):
             w = float ( el.weight[0].value.asNumber(fb) )
             eff += w * el.eff
             totalw += w
+        if totalw == 0.: return 0.
         return eff / totalw
 
     def getAvgMass(self):

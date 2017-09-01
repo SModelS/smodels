@@ -311,13 +311,15 @@ def _sortPredictions ( expResult, smsTopList, maxMassDist, combine ):
             txt = "In %s: dataset %s does not exist." % \
                   ( expResult.globalInfo.id, dsname )
             raise SModelSError ( txt )
-        predList = _getDataSetPredictions(dataset,smsTopList,maxMassDist)
+        predList = _getDataSetPredictions(dataset,smsTopList,maxMassDist,True)
         if predList:
             for pred in predList:
                 info = pred.xsection.info
                 if not info in preds.keys():
                     preds[info]=[]
                 preds[info].append ( pred )
+        else:
+            logger.error ( "this is the culprit. we have no predlist. but we need one for combination. lets make one artificially." )
     return preds
 
 def _getBestResults(dataSetResults):
@@ -355,24 +357,30 @@ def _getBestResults(dataSetResults):
 
     return bestPredList
 
-def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
+def _getDataSetPredictions(dataset,smsTopList,maxMassDist,force_creation=False):
     """
     Compute theory predictions for a given data set.
-    For upper-limit results returns the list of theory predictions for the experimental result.
-    For efficiency-map results returns the list of theory predictions for the signal region.
-    Uses the list of elements in smsTopList.
+    For upper-limit results returns the list of theory predictions for the
+    experimental result.  For efficiency-map results returns the list of theory
+    predictions for the signal region.  Uses the list of elements in
+    smsTopList.
     For each Txname appearing in dataset, it collects the elements and efficiencies,
     combine the masses (if needed) and compute the conditions (if existing).
 
     :parameter dataset: Data Set to be considered (DataSet object)
-    :parameter smsTopList: list of topologies containing elements (TopologyList object)
+    :parameter smsTopList: list of topologies containing elements 
+                           (TopologyList object)
     :parameter maxMassDist: maximum mass distance for clustering elements (float)
-    :returns:  a TheoryPredictionList object containing a list of TheoryPrediction objects
+    :parameter force_creation: force creation of a prediction, even if efficiency
+                               is zero. We need this to have consistent input for
+                               combinations.
+    :returns:  a TheoryPredictionList object containing a list of TheoryPrediction 
+               objects
     """
 
     predictionList = TheoryPredictionList()
     # Select elements belonging to expResult and apply efficiencies
-    elements = _getElementsFrom(smsTopList, dataset)
+    elements = _getElementsFrom(smsTopList, dataset,force_creation)
 
     #Check dataset sqrts format:
     if (dataset.globalInfo.sqrts/TeV).normalize()._unit:
@@ -411,7 +419,7 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
     if len(predictionList) == 0: return None
     else: return predictionList
 
-def _getElementsFrom(smsTopList, dataset):
+def _getElementsFrom(smsTopList, dataset, force_creation):
     """
     Get elements that belong to any of the TxNames in dataset
     (appear in any of constraints in the result).
@@ -420,7 +428,10 @@ def _getElementsFrom(smsTopList, dataset):
     have their weights multiplied by their respective efficiencies.
 
     :parameter dataset:  Data Set to be considered (DataSet object)
-    :parameter smsTopList: list of topologies containing elements (TopologyList object)
+    :parameter smsTopList: list of topologies containing elements 
+                           (TopologyList object)
+    :parameter force_creation: force creation of element, even if eff == 0. 
+                               This is needed for combined results.
     :returns: list of elements (Element objects)
     """
 
@@ -434,7 +445,7 @@ def _getElementsFrom(smsTopList, dataset):
                 if not newEl: continue
                 el.covered = True
                 eff = txname.getEfficiencyFor(newEl.getMasses())
-                if not eff: continue
+                if not eff and not force_creation: continue
                 el.tested = True
                 newEl.eff = eff
                 newEl.weight *= eff
