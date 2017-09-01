@@ -403,6 +403,9 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist,force_creation=False):
 
     # Collect results and evaluate conditions
     for cluster in clusters:
+        if cluster.getEffectiveEfficiency() == 0.:
+            ## zeroes only? we skip.
+            continue
         theoryPrediction = TheoryPrediction()
         theoryPrediction.dataset = dataset
         theoryPrediction.txnames = cluster.txnames
