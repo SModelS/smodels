@@ -242,6 +242,9 @@ def theoryPredictionsFor( expResult, smsTopList, maxMassDist=0.2,
     preds = _sortPredictions ( expResult, smsTopList, maxMassDist, combinedResults )
     for xsecinfo,preds in preds.items():
         effs = [ pred.effectiveEff for pred in preds ]
+        if sum ( effs ) == 0.:
+            logger.warning ( "all efficiencies of combination are zero. will skip." )
+            break
         cul = expResult.getCombinedUpperLimitFor ( effs )
         eul = expResult.getCombinedUpperLimitFor ( effs, expected=True )
         combResults.append ( _mergePredictions ( preds, cul, eul ) )
@@ -403,9 +406,6 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist,force_creation=False):
 
     # Collect results and evaluate conditions
     for cluster in clusters:
-        if cluster.getEffectiveEfficiency() == 0.:
-            ## zeroes only? we skip.
-            continue
         theoryPrediction = TheoryPrediction()
         theoryPrediction.dataset = dataset
         theoryPrediction.txnames = cluster.txnames
@@ -417,7 +417,6 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist,force_creation=False):
         theoryPrediction.PIDs = cluster.getPIDs()
         theoryPrediction.IDs = cluster.getIDs()
         predictionList._theoryPredictions.append(theoryPrediction)
-
 
     if len(predictionList) == 0: return None
     else: return predictionList
