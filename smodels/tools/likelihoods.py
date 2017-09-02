@@ -117,14 +117,9 @@ class LikelihoodComputer:
         ## up with a first theta
         self.nsig = numpy.array ( [0.] * len(self.nobs ) )
         self.deltas = numpy.array ( [0.] * len(self.nobs) )
-
         ## we start with theta_hat being all zeroes
         theta_hat = numpy.array ( [0.] * len(self.nobs ) )
-        mu_hat_old = 0.
-        mu_hat = 1.
-        #logger.info ( "        nobs=%s" % list ( self.nobs[:11] ) )
-        #logger.info ( "          nb=%s" % list ( self.nb[:11] ) )
-        #logger.info ( "        effs=%s" % list ( effs[:11] ) )
+        mu_hat_old, mu_hat = 0., 1.
         ctr=0
         while abs ( mu_hat - mu_hat_old )/ mu_hat > 1e-2 and ctr < 20:
             ctr+=1
@@ -140,6 +135,9 @@ class LikelihoodComputer:
             total_sign = numpy.sign ( lower_v * upper_v )
             if total_sign > -.5:
                 logger.error ( "weird. cant find a zero in the Brent bracket for finding mu(hat)" )
+                if upper_v < lower_v < 0.:
+                    ## seems like we really want to go for mu_hat = 0.
+                    return 0. / lumi
                 self.plotMuHatRootFinding( effs, theta_hat, lumi, None ) 
                 sys.exit()
             self.timer["brentq"]-=time.time()
@@ -148,14 +146,6 @@ class LikelihoodComputer:
             theta_hat,err = self.findThetaHat( mu_hat * effs )
             ctr+=1
             
-        #logger.info ( "   mu_hat  =%s" % (mu_hat/lumi) )
-        #logger.info ( "   nsig    =%s" % (self.nsig[:10]) )
-        #check = sum ( self.nobs * effs / ( mu_hat * effs + self.nb ) - effs )
-        #logger.info ( "   check(mu_hat) =%s" % check )
-        #logger.info ( "   check(p(mu_hat)) =%s" % self.profileLikelihood ( mu_hat * effs ) )
-        #logger.info ( "   check(p(nsig)) =%s" % self.profileLikelihood ( self.nsig ) )
-        #logger.info ( "   check(p(1.05*nsig)) =%s" % self.profileLikelihood ( 1.05*self.nsig, numpy.array( [0.]*len(self.nsig) ) ) )
-        #logger.info ( "   check(p(0.95*nsig)) =%s" % self.profileLikelihood ( 0.95*self.nsig ) )
         self.timer["find_mu_hat"]+=time.time()
         return mu_hat / lumi
 
