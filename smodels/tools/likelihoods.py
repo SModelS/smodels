@@ -583,10 +583,12 @@ class LikelihoodComputer:
             deltas = deltas_pct*( dn )
             maxllhd = self.likelihood( dn, deltas )
 
+            print ( "chi2: llhd=%s, maxllhd=%s" % ( llhd, maxllhd ) )
             # Return infinite likelihood if it is zero
             # This can happen in case e.g. nb >> nobs
             if llhd == 0.:
-                return float('inf')
+                ## set to insanely small number
+                llhd = 1e-300
 
             chi2=-2*log(llhd/maxllhd)
 

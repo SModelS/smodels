@@ -22,7 +22,7 @@ colors.on = True
 setLogLevel ( "debug" )
 setLogLevel ( "info" )
 
-smstoplist = smstoplist = slhaDecomposer.decompose( "T2tt_239_45_239_45.slha" )
+smstoplist = smstoplist = slhaDecomposer.decompose( "T5tctc_639_79_59_639_79_59.slha" )
 print ( "smstoplist=",len(smstoplist ) )
 dir = "covdb/"
 
@@ -44,6 +44,6 @@ for e in expRes:
     #    print ( ds.dataInfo.dataId )
     predictions = theoryPredictionsFor ( e, smstoplist, useBestDataset=False, 
                                          combinedResults=True )
-    for pred in predictions[:]:
+    for pred in predictions[-1:]:
         print ( pred.describe() )
 

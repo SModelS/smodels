@@ -144,6 +144,8 @@ class TheoryPrediction(object):
        return type(self.dataset)==list
 
     def describe ( self ):
+       if not hasattr ( self, "chi2" ):
+           self.computeStatistics()
        # return a lengthy description
        ret =  "[theoryPrediction] analysis: %s\n" % self.analysis
        ret += "     prediction (sigma*eff): %s\n" % self.xsection
@@ -163,6 +165,7 @@ class TheoryPrediction(object):
        ret += "          exp limit (sigma): %s\n" % (self.getUpperLimit( expected=True ) / self.effectiveEff )
        ret += "                      obs r: %f\n" % ( self.xsection.value / self.getUpperLimit() )
        ret += "                      exp r: %f\n" % ( self.xsection.value / self.getUpperLimit( expected=True ) )
+       ret += "                       chi2: %f\n" % ( self.chi2 )
        return ret
 
 class TheoryPredictionList(object):
