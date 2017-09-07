@@ -69,14 +69,16 @@ class LikelihoodComputer:
         """ plot the function whose root gives us mu_hat: 1/L dL/dmu.
         """
         if not self.debug_mode: return
+        if ( self.nobs == self.nb ).all():
+            return ## not for expected 
         mu_c = numpy.abs ( self.nobs - self.nb - theta_hat ) / effs
         # mu_ini = sum ( mu_c ) / len(mu_c)
         mu_ini = 2. * max ( mu_c )
 
-        rnge = numpy.arange ( -0.*mu_ini, 2*mu_ini, .03*mu_ini )
+        rnge = numpy.arange ( -0.*mu_ini, 2*mu_ini, .01*mu_ini )
         import ROOT
         r=ROOT.TGraph ( len(rnge) )
-        r.SetTitle ( "1/L dL/d#mu" ) ##  #frac{1}{L}#frac{dL}#frac{d#mu}" )
+        r.SetTitle ( "- #partial/#partial#mu ln(L)" ) ##  #frac{1}{L}#frac{dL}#frac{d#mu}" )
         mu_c = ( self.nobs - self.nb - theta_hat ) / effs
         # logger.error ( "mu_c = %s " % (mu_c/lumi) )
         for ctr,i in enumerate(rnge):
@@ -129,17 +131,23 @@ class LikelihoodComputer:
             mu_c = numpy.abs ( self.nobs - self.nb - theta_hat ) / effs
             ## find mu_hat by finding the root of 1/L dL/dmu. We know 
             ## that the zero has to be between min(mu_c) and max(mu_c).
-            lower,upper = 0.,3.*max(mu_c)
+            lower,upper = 0.*max(mu_c),3.*max(mu_c)
             lower_v = self.dLdMu ( lower, effs, theta_hat )
             upper_v = self.dLdMu ( upper, effs, theta_hat )
             total_sign = numpy.sign ( lower_v * upper_v )
             if total_sign > -.5:
-                logger.error ( "weird. cant find a zero in the Brent bracket for finding mu(hat)" )
                 if upper_v < lower_v < 0.:
                     ## seems like we really want to go for mu_hat = 0.
                     return 0. / lumi
-                self.plotMuHatRootFinding( effs, theta_hat, lumi, None ) 
-                sys.exit()
+                logger.debug ( "weird. cant find a zero in the Brent bracket for finding mu(hat). Let me try with a very small value." )
+                lower = 1e-4*max(mu_c)
+                lower_v = self.dLdMu ( lower, effs, theta_hat )
+                total_sign = numpy.sign ( lower_v * upper_v )
+                if total_sign > -.5:
+                    logger.error ( "cant find zero in Brentq bracket. l,u=%s,%s" % ( lower, upper ) )
+                    self.plotMuHatRootFinding( effs, theta_hat, lumi, None ) 
+                    sys.exit()
+                # return 0. / lumi
             self.timer["brentq"]-=time.time()
             mu_hat = optimize.brentq ( self.dLdMu, lower, upper, args=(effs, theta_hat ) )
             self.timer["brentq"]+=time.time()
@@ -319,7 +327,7 @@ class LikelihoodComputer:
                     is_expected=False
                     if ( self.nobs == self.nb ).all():
                         is_expected=True
-                    logger.info ( "tnc failed also: %s [%d]" % ( str(ret_c[-2:]), is_expected ) )
+                    logger.debug ( "tnc failed also: %s [%d]" % ( str(ret_c[-2:]), is_expected ) )
                     #logger.info ( "ini was %s" % str(ini[:]) )
                     return ret_c[0],ret_c[-1]
                     # ret_c = optimize.fmin_l_bfgs_b ( self.nll, ret_c[0], fprime=self.nllprime, disp=5, bounds=bounds )

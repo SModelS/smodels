@@ -791,6 +791,7 @@ class PyPrinter(BasicPrinter):
                         'expected upper limit (fb)': ulExpected,
                         'TxNames': txnames,
                         'Mass (GeV)': mass,
+                        'efficiency': theoryPrediction.effectiveEff,
                         'AnalysisID': expID,
                         'DataSetID' : datasetID,
                         'AnalysisSqrts (TeV)': sqrts.asNumber(TeV),

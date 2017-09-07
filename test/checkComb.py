@@ -16,11 +16,10 @@ from smodels.tools import printer
 from smodels.theory import slhaDecomposer
 
 LikelihoodComputer.deltas_default = 1e-12
-# LikelihoodComputer.debug_mode = True
-#UpperLimitComputer.debug_mode = True
+LikelihoodComputer.debug_mode = True
+UpperLimitComputer.debug_mode = True
 
-prt = printer.PyPrinter( output="file", filename = "./smodelsOutput.py" )
-prt.setOutPutFile ( "./out" )
+prt = printer.PyPrinter( output="file", filename = "./out.py" )
 
 colors.on = True
 setLogLevel ( "debug" )
