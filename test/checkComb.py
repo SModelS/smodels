@@ -11,18 +11,24 @@ from smodels.tools.colors import colors
 from smodels.tools.physicsUnits import pb, fb, GeV
 from smodels.tools.likelihoods import LikelihoodComputer
 from smodels.tools.statistics import UpperLimitComputer
+from smodels.tools import ioObjects
+from smodels.tools import printer
 from smodels.theory import slhaDecomposer
 
 LikelihoodComputer.deltas_default = 1e-12
-LikelihoodComputer.debug_mode = True
-UpperLimitComputer.debug_mode = True
+# LikelihoodComputer.debug_mode = True
+#UpperLimitComputer.debug_mode = True
 
+prt = printer.PyPrinter( output="file", filename = "./smodelsOutput.py" )
+prt.setOutPutFile ( "./out" )
 
 colors.on = True
 setLogLevel ( "debug" )
 setLogLevel ( "info" )
 
-smstoplist = smstoplist = slhaDecomposer.decompose( "T5tctc_639_79_59_639_79_59.slha" )
+file = "T2tt_533_40_533_40.slha"
+
+smstoplist = smstoplist = slhaDecomposer.decompose( file )
 print ( "smstoplist=",len(smstoplist ) )
 dir = "covdb/"
 
@@ -36,14 +42,15 @@ expRes = d.getExpResults( datasetIDs=['all'] )
 
 print ( "%d results." % len(expRes) )
 
-massvec = [[400.*GeV,75*GeV], [400*GeV,75*GeV]]
-
 for e in expRes:
     print ( e.globalInfo.id )
     #for ds in e.datasets:
     #    print ( ds.dataInfo.dataId )
     predictions = theoryPredictionsFor ( e, smstoplist, useBestDataset=False, 
                                          combinedResults=True )
-    for pred in predictions[-1:]:
+    results = ioObjects.ResultList(predictions )
+    prt.addObj ( results )
+    for pred in predictions[:]:
         print ( pred.describe() )
 
+prt.flush()
