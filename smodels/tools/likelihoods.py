@@ -49,7 +49,7 @@ class LikelihoodComputer:
         print ()
 
     def dLdMu ( self, mu, effs, theta_hat ):
-        """ dL/dmu * ( 1/L ), if L is the likelihood. The function
+        """ d ln L/dmu, if L is the likelihood. The function
             whose root gives us muhat, i.e. the mu that maximizes
             the likelihood. """
         denominator = mu*effs + self.nb + theta_hat 
@@ -157,18 +157,29 @@ class LikelihoodComputer:
         self.timer["find_mu_hat"]+=time.time()
         return mu_hat / lumi
 
-    def getSigmaMu ( self, effs, lumi, mu_hat ):
+    def getSigmaMu ( self, effs, lumi, mu_hat, theta_hat ):
         """
         get a rough estimate for the variance of mu around mu_max
         FIXME need to do this more thorougly.
         """
-        s_effs = numpy.array ( effs )
-        # ret = math.sqrt ( sum ( ( mu_hat * lumi * s_effs + self.nb )**2 / (self.nobs * s_effs**2 ) ) ) / lumi
+        # print ( "lumi=",lumi )
+        #print ( "mu_hat=%s" % mu_hat )
+        #print ( "theta_hat=%s" % str(theta_hat) )
+        #print ( "eff=%s" % effs )
+        #print ( "nb=%s" % self.nb )
+        #print ( "mu_hat * effs=%s" % (mu_hat * effs + self.nb + theta_hat[0] ) )
+        # num = mu_hat * effs + self.nb + theta_hat[0]
+        # fisher = math.sqrt ( sum ( num**2 / ( self.nobs * effs**2 ) ) )
+        #fisher = math.sqrt ( sum ( num ) )
+        #logger.error ( "sigma_mu=%s" % ret )
+        #print ( "fisher=%s, %s" % (fisher, fisher/lumi) )
+        #return fisher # / lumi
         # logger.info ( "cov = %s" % (ret) )
         if type ( effs ) in [ list, numpy.ndarray ]:
             s_effs = sum ( effs )
         sgm_mu = math.sqrt ( sum (self.nobs ) + sum ( numpy.diag ( self.covb ) ) ) / s_effs / lumi
-        # logger.info ( "sgm_mu = %s" % sgm_mu )
+        logger.error ( "sgm_mu = %s, sqrt(nobs)=%s, sqrt(cov)=%s" % \
+                       ( sgm_mu, math.sqrt ( sum ( self.nobs ) ), math.sqrt ( sum ( numpy.diag ( self.covb ) ) ) ) )
         return sgm_mu
 
 
@@ -327,7 +338,7 @@ class LikelihoodComputer:
                     is_expected=False
                     if ( self.nobs == self.nb ).all():
                         is_expected=True
-                    logger.debug ( "tnc failed also: %s [%d]" % ( str(ret_c[-2:]), is_expected ) )
+                    # logger.debug ( "tnc failed also: %s [%d]" % ( str(ret_c[-2:]), is_expected ) )
                     #logger.info ( "ini was %s" % str(ini[:]) )
                     return ret_c[0],ret_c[-1]
                     # ret_c = optimize.fmin_l_bfgs_b ( self.nll, ret_c[0], fprime=self.nllprime, disp=5, bounds=bounds )

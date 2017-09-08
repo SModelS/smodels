@@ -23,7 +23,7 @@ prt = printer.PyPrinter( output="file", filename = "./out.py" )
 
 colors.on = True
 setLogLevel ( "debug" )
-setLogLevel ( "info" )
+# setLogLevel ( "info" )
 
 file = "T2tt_533_40_533_40.slha"
 

@@ -59,13 +59,10 @@ class UpperLimitComputer:
         """
         computer = LikelihoodComputer ( nev, xbg, cov )
         mu_hat = computer.findMuHat ( eff )
-        sigma_mu = computer.getSigmaMu ( eff, 1., mu_hat )
-        if False: ## super-awkward super-fast approximation
-            ret = ( mu_hat + 1.96 * sigma_mu ) / self.lumi
-            computer.printProfilingStats()
-            return ret
-
         effs = numpy.array ( eff )
+        theta_hat = computer.findThetaHat ( mu_hat * effs )
+        sigma_mu = computer.getSigmaMu ( effs, 1., mu_hat, theta_hat )
+
         llhds={}
         upto = mu_hat + 4.0 * sigma_mu
         n_bins = 50.
@@ -193,14 +190,16 @@ class UpperLimitComputer:
         t4.SetLineWidth(2)
         t4.Draw("SAME")
         l.AddEntry(t4,"guess for integration upper limit","L" )
-        sigma_max = computer.findMuHat( effs, lumi )
-        t6=ROOT.TLine ( sigma_max, 0., sigma_max, max(yvals) )
+        mu_hat = computer.findMuHat( effs, lumi )
+        t6=ROOT.TLine ( mu_hat, 0., mu_hat, max(yvals) )
         t6.SetLineColor(ROOT.kCyan )
         t6.SetLineStyle(6)
         t6.SetLineWidth(2)
         t6.Draw("SAME")
-        l.AddEntry(t6,"max value","L" )
-        maxp1 = sigma_max + 1.96 * computer.getSigmaMu ( effs, lumi, sigma_max )
+        l.AddEntry(t6,"#hat{#mu}","L" )
+        theta_hat = computer.findThetaHat ( mu_hat * effs )
+        sigma_mu = computer.getSigmaMu ( effs, lumi, mu_hat, theta_hat )
+        maxp1 = mu_hat + 1.96 * sigma_mu
         ts = ROOT.TText ( .01, .01, time.asctime() )
         ts.SetNDC()
         ts.SetTextSize(.03)
@@ -210,7 +209,7 @@ class UpperLimitComputer:
         t7.SetLineStyle(7)
         t7.SetLineWidth(2)
         t7.Draw("SAME")
-        l.AddEntry(t7,"max + 1.96*sigma","L" )
+        l.AddEntry(t7,"#hat{#mu} + 1.96*#sigma","L" )
         # logger.error ( "95 pc ul=%s" % cl95 )
         l.Draw()
         fname = "plot%d.png" % expected
