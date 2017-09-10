@@ -168,7 +168,7 @@ class LikelihoodComputer:
         #print ( "eff=%s" % effs )
         #print ( "nb=%s" % self.nb )
         #print ( "mu_hat * effs=%s" % (mu_hat * effs + self.nb + theta_hat[0] ) )
-        # num = mu_hat * effs + self.nb + theta_hat[0]
+        #num = mu_hat * effs + self.nb + theta_hat[0]
         # fisher = math.sqrt ( sum ( num**2 / ( self.nobs * effs**2 ) ) )
         #fisher = math.sqrt ( sum ( num ) )
         #logger.error ( "sigma_mu=%s" % ret )
@@ -178,8 +178,9 @@ class LikelihoodComputer:
         if type ( effs ) in [ list, numpy.ndarray ]:
             s_effs = sum ( effs )
         sgm_mu = math.sqrt ( sum (self.nobs ) + sum ( numpy.diag ( self.covb ) ) ) / s_effs / lumi
-        logger.error ( "sgm_mu = %s, sqrt(nobs)=%s, sqrt(cov)=%s" % \
-                       ( sgm_mu, math.sqrt ( sum ( self.nobs ) ), math.sqrt ( sum ( numpy.diag ( self.covb ) ) ) ) )
+        #logger.error ( "sgm_mu = %s, sqrt(nobs)=%s, sqrt(cov)=%s" % \
+        #               ( sgm_mu, math.sqrt ( sum ( self.nobs ) ), math.sqrt ( sum ( numpy.diag ( self.covb ) ) ) ) )
+        # logger.error ( "num=%s" % num )
         return sgm_mu
 
 
@@ -324,14 +325,19 @@ class LikelihoodComputer:
             self.cov_tot = self.covb+numpy.diag(self.deltas**2)
             self.weight = numpy.linalg.inv ( self.cov_tot )
             self.ntot = self.nb + self.nsig
-            self.ones = numpy.ones ( len (self.nobs) )
+            self.ones = 1.
+            if type ( self.nobs) in [ list, numpy.ndarray ]:
+                self.ones = numpy.ones ( len (self.nobs) )
             self.gammaln = special.gammaln(self.nobs + 1)
             try:
                 self.timer["fmin2"]-=time.time()
                 # first use NCG
                 ret_c = optimize.fmin_ncg ( self.nll, ini, fprime=self.nllprime, fhess=self.nllHess, full_output=True, disp=0 )
                 # then always continue with TNC
-                bounds = [ ( -10*x, 10*x ) for x in self.nobs ]
+                if type ( self.nobs ) in [ int, float ]:
+                    bounds = [ ( -10*self.nobs, 10*self.nobs ) ]
+                else:
+                    bounds = [ ( -10*x, 10*x ) for x in self.nobs ]
                 ini = ret_c
                 ret_c = optimize.fmin_tnc ( self.nll, ret_c[0], fprime=self.nllprime, disp=0, bounds=bounds )
                 if ret_c[-1] not in [ 0, 1, 2 ]:

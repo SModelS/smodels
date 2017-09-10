@@ -26,6 +26,7 @@ setLogLevel ( "debug" )
 # setLogLevel ( "info" )
 
 file = "T2tt_533_40_533_40.slha"
+file = "T2tt.slha"
 
 smstoplist = smstoplist = slhaDecomposer.decompose( file )
 print ( "smstoplist=",len(smstoplist ) )
