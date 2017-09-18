@@ -150,7 +150,7 @@ ptcDic = {"e"  : ["e+",  "e-"],
           "all" : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-", "W+", "W-","Z","photon","higgs","t+","t-","b","c","q","g","c","pi"]}
 
 #Include all R-even particles:
-ptcDic['*'] = rEven.values() + ptcDic.keys()
+ptcDic['?'] = rEven.values() + ptcDic.keys()
 
 #Quantum numbers for the new particles.
 #PDG: (spin*2, electrical charge*3, color dimension)

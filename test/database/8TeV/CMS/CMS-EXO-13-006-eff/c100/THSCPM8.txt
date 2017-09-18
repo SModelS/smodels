@@ -1,6 +1,5 @@
 txName: THSCPM8
-constraint: [[['*','*']],[['*','*']]]
-finalState: ['HSCP', 'HSCP']
+constraint: [[['?','?']],[['?','?']]]
 condition: None
 conditionDescription: None
 susyProcess: pp --> squark squark, squark --> quark quark stau_1
@@ -8,6 +7,7 @@ dataUrl: None
 source: SModelS
 validated: N/A
 axes: [[x, y], [x, y]]
+finalState: ['HSCP', 'HSCP']
 efficiencyMap: [[[[2.5500E+02*GeV,2.0000E+02*GeV],[2.5500E+02*GeV,2.0000E+02*GeV]],0.452],
 [[[2.5500E+02*GeV,2.5000E+02*GeV],[2.5500E+02*GeV,2.5000E+02*GeV]],0.481],
 [[[3.5500E+02*GeV,1.8000E+02*GeV],[3.5500E+02*GeV,1.8000E+02*GeV]],0.508],

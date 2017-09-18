@@ -80,10 +80,17 @@ class Topology(object):
             for v2 in itertools.permutations(other.vertparts):
                 if v1 == v2:
                     return 0
-        
-        comp = sorted(self.vertparts) > sorted(other.vertparts)
-        if comp: return 1
-        else: return -1 
+
+        if sorted(self.vertnumb,reverse=True) != sorted(other.vertnumb,reverse=True):
+            comp = sorted(self.vertnumb,reverse=True) > sorted(other.vertnumb,reverse=True)
+            if comp: return 1
+            else: return -1  
+        elif sorted(self.vertparts) != sorted(other.vertparts):
+            comp = sorted(self.vertparts) > sorted(other.vertparts)
+            if comp: return 1
+            else: return -1 
+        else:
+            return 0 
 
 
     def checkConsistency(self):

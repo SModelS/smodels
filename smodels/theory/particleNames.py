@@ -106,7 +106,7 @@ def elementsInStr(instring,removeQuotes=True):
                 ptc = ptc.replace("'","")
                 if not ptc:
                     continue
-                if not ptc in rEven.values() and not ptc in ptcDic:
+                if not ptc in rEven.values() and not ptc in ptcDic and ptc != '*':
                     logger.error("Unknown particle. Add " + ptc + " to smodels/particles.py")
                     raise SModelSError()
 

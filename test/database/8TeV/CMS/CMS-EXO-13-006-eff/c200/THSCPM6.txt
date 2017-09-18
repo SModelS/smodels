@@ -1,6 +1,5 @@
 txName: THSCPM6
-constraint: [[*],[['*'],[ '*']]]
-finalState: ['MET', 'HSCP']
+constraint: [[*],[['?'],[ '?']]]
 condition: None
 conditionDescription: None
 susyProcess: pp --> squark squark, squark squark --> quark quark lsp lsp, lsp --> tau tau_1
@@ -8,6 +7,7 @@ dataUrl: None
 source: SModelS
 validated: N/A
 axes: [['*'], [x, y, z]]
+finalState: ['MET', 'HSCP']
 efficiencyMap: [[['*',[4.0500E+02*GeV,3.5000E+02*GeV,3.2000E+02*GeV]],0.305],
 [['*',[4.0500E+02*GeV,4.0000E+02*GeV,3.2000E+02*GeV]],0.318],
 [['*',[4.0500E+02*GeV,3.5000E+02*GeV,3.4000E+02*GeV]],0.305],

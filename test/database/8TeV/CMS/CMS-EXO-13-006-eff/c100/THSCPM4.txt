@@ -1,6 +1,5 @@
 txName: THSCPM4
-constraint: [[*],[['*']]]
-finalState: ['MET', 'HSCP']
+constraint: [[*],[['?']]]
 condition: None
 conditionDescription: None
 susyProcess: pp --> squark squark, squark --> quark chargino_1 (quark lsp)
@@ -8,6 +7,7 @@ dataUrl: None
 source: SModelS
 validated: N/A
 axes: [['*'], [x, y]]
+finalState: ['MET', 'HSCP']
 efficiencyMap: [[['*',[2.5500E+02*GeV,2.0000E+02*GeV]],0.248],
 [['*',[2.5500E+02*GeV,2.1000E+02*GeV]],0.25],
 [['*',[2.5500E+02*GeV,2.3000E+02*GeV]],0.255],

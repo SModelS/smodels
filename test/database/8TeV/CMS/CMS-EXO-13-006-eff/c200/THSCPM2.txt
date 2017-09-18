@@ -1,6 +1,5 @@
 txName: THSCPM2
 constraint: [[*],[]]
-finalState: ['MET', 'HSCP']
 condition: None
 conditionDescription: None
 susyProcess: pp --> lsp chargino^pm_1, chargino^pm_1 lsp --> chargino^pm_1 lsp
@@ -8,6 +7,7 @@ dataUrl: None
 source: SModelS
 validated: N/A
 axes: [['*'], [x]]
+finalState: ['MET', 'HSCP']
 efficiencyMap: [[['*',[3.2000E+02*GeV]],0.274],
 [['*',[3.3000E+02*GeV]],0.278],
 [['*',[3.4000E+02*GeV]],0.286],
