@@ -85,7 +85,7 @@ class TxName(object):
         
         self.txnameData = TxNameData( data, dataType, ident )
         if expectedData:
-            self.txnameDataExp = TxNameData( expectedData, dataType, ident )
+            self.txnameDataExp = TxNameData( expectedData, dataType, ident+'_expected' )
 
         #Builds up a list of elements appearing in constraints:
         if hasattr(self,'finalState'):

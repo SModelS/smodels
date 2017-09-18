@@ -764,24 +764,33 @@ class PyPrinter(BasicPrinter):
                 logger.error("Unknown dataType %s" %(str(dataType)))
                 continue            
             value = theoryPrediction.xsection.value
-            txnames = [txname.txName for txname in theoryPrediction.txnames]
+            sqrts = dataset.globalInfo.sqrts
+            cluster = theoryPrediction.cluster
+            txnamesDict = {}
+            for el in cluster.elements:
+                if not el.txname.txName in txnamesDict:
+                    txnamesDict[el.txname.txName] = el.weight[0].value.asNumber(fb)
+                else:
+                    txnamesDict[el.txname.txName] += el.weight[0].value.asNumber(fb)            
             maxconds = theoryPrediction.getmaxCondition()
             mass = theoryPrediction.mass
             if mass:
                 mass = [[m.asNumber(GeV) for m in mbr] for mbr in mass]
             else:
                 mass = None
-            sqrts = dataset.globalInfo.sqrts
+            
             resDict = {'maxcond': maxconds, 'theory prediction (fb)': value.asNumber(fb),
                         'upper limit (fb)': ul.asNumber(fb),
                         'expected upper limit (fb)': ulExpected,
-                        'TxNames': txnames,
+                        'TxNames': sorted(txnamesDict.keys()),
                         'Mass (GeV)': mass,
                         'AnalysisID': expID,
                         'DataSetID' : datasetID,
                         'AnalysisSqrts (TeV)': sqrts.asNumber(TeV),
                         'lumi (fb-1)' : (dataset.globalInfo.lumi*fb).asNumber(),
-                        'dataType' : dataType}            
+                        'dataType' : dataType}  
+            if hasattr(self,"addtxweights") and self.addtxweights:
+                resDict['TxNames weights (fb)'] =  txnamesDict
             if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
                 resDict['chi2'] = theoryPrediction.chi2
                 resDict['likelihood'] = theoryPrediction.likelihood                

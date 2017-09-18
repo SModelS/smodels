@@ -17,6 +17,7 @@
 .. |output| replace:: :ref:`output <smodelsOutput>`
 .. |results| replace:: :ref:`experimental results <ExpResult>`
 .. |txnames| replace:: :ref:`txnames <TxName>`
+.. |txname| replace:: :ref:`txname <TxName>`
 .. |EM| replace:: :ref:`EM-type <EMtype>`
 .. |UL| replace:: :ref:`UL-type <ULtype>`
 .. |EMr| replace:: :ref:`EM-type result <EMtype>`
@@ -182,6 +183,8 @@ Below we give more detailed information about each entry in the parameters file.
 
   * **addElementList** (True/False): set True to include in the Python output all information about all |elements| generated in the |decomposition|. If set to True the
     output file can be quite large.
+
+  * **addTxWeights** (True/False): set True to print the weights of each |txname| contributing to the total |theory prediction| value.
 
 * *xml-printer*: options for the xml printer
 
