@@ -6,7 +6,7 @@
 
 """
 
-from smodels.theory import crossSection,branch
+from smodels.theory import crossSection
 from smodels.tools.physicsUnits import pb, GeV, fb
 import numpy as np
 from scipy import stats
@@ -221,4 +221,3 @@ def index_bisect(inlist, el):
         if inlist[mid] < el: lo = mid+1
         else: hi = mid
     return lo
-

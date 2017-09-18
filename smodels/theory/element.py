@@ -491,8 +491,6 @@ class Element(object):
         :returns: compressed copy of the element, if element ends with invisible
                   particles; None, if compression is not possible
         """
-        
-
         newelement = self.copy()
         newelement.motherElements = [ ("invisible", self) ]
 

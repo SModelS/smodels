@@ -7,6 +7,7 @@
         
 """
 
+import sys
 from smodels.theory import crossSection
 from smodels.theory.auxiliaryFunctions import massAvg, massPosition, distance
 from smodels.tools.physicsUnits import fb, MeV

@@ -82,7 +82,6 @@ class TxName(object):
 
         ident = self.globalInfo.id+":"+dataType[0]+":"+ str(self._infoObj.dataId)
         ident += ":" + self.txName
-        
         self.txnameData = TxNameData( data, dataType, ident )
         if expectedData:
             self.txnameDataExp = TxNameData( expectedData, dataType, ident+'_expected' )
@@ -219,7 +218,6 @@ class TxName(object):
         elif type(val) == type(1.):
             return val  #The element has an eff
         else:
-            
             logger.error("Unknown txnameData value: %s" % (str(type(val))))
             raise SModelSError()
 
@@ -437,6 +435,7 @@ class TxNameData(object):
             ret = minXsec
         return float(ret)
 
+
     def _estimateExtrapolationError ( self, massarray ):
         """ when projecting a point p from n to the point P in m dimensions, we
             estimate the expected extrapolation error with the following
@@ -502,7 +501,6 @@ class TxNameData(object):
     def _interpolateOutsideConvexHull ( self, massarray ):
         """ experimental routine, meant to check if we can interpolate outside
             convex hull """
-            
         de = self._estimateExtrapolationError(massarray)
         if de < self._accept_errors_upto:
             return self._returnProjectedValue()

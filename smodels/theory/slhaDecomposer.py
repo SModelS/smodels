@@ -85,7 +85,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
         branchList[-1].masses = [massDic[pid]]
         branchList[-1].maxWeight = maxWeight[pid]
 
-    # Generate final branches (after all R-odd particles have decayed)
+    # Generate final branches (after all R-odd particles have decayed)    
     finalBranchList = decayBranches(branchList, brDic, massDic, sigcut)
     # Generate dictionary, where keys are the PIDs and values are the list of branches for the PID (for performance)
     branchListDict = {}

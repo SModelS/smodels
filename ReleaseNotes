@@ -1,7 +1,12 @@
-Release v1.x, ??
+Release v1.2, ??
 =======================================================
 
   * added option in python printer to print the contribution from each txname
+  * added finalState property for Elements (backwards compatible)
+  * improvements in some error msgs
+  * introduced wildcard branches
+  * allows for non-prompt (long-lived) BSM particles
+  * added final state definitions in particles.py
 
 
 Release v1.1.1, Tue 27 Jun 2017

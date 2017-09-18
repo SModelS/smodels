@@ -12,6 +12,7 @@ from smodels.particles import rEven, ptcDic, finalStates
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
+
 class Branch(object):
     """
     An instance of this class represents a branch.    
@@ -187,8 +188,7 @@ class Branch(object):
 
         for iv,vertex in enumerate(self.particles):
             if not simParticles(vertex,other.particles[iv]):
-                return False
-              
+                return False                        
         return True
    
 
@@ -249,8 +249,7 @@ class Branch(object):
         if len(self.PIDs) != 1:
             logger.error("During decay the branch should \
                             not have multiple PID lists!")
-            return False
-        
+            return False   
 
         for partID in br.ids:
             # Add R-even particles to final state
