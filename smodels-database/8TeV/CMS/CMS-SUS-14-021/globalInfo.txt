@@ -1,7 +1,0 @@
-id: CMS-SUS-14-021
-sqrts: 8*TeV
-lumi: 19.7/fb
-url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS14021
-arxiv: http://arxiv.org/abs/1512.08002
-implementedBy: Andre Lessa
-lastUpdate: 2016/11/2

@@ -1,7 +1,0 @@
-dataId: mu450Nb2
-dataType: efficiencyMap
-observedN: 0
-expectedBG: 0
-bgError: 0.72
-upperLimit: 1.553E-01*fb
-expectedUpperLimit: 1.553E-01*fb

@@ -1,8 +1,0 @@
-id: CMS-SUS-15-008
-sqrts: 13*TeV
-lumi: 2.3/fb
-url: http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-15-008/index.html
-arxiv: http://arxiv.org/abs/1605.03171
-publication: http://dx.doi.org/10.1140/epjc/s10052-016-4261-z
-implementedBy: Federico Ambrogi
-lastUpdate: 2017/2/27

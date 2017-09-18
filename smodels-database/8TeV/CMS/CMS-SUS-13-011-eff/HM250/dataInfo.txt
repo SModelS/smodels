@@ -1,7 +1,0 @@
-dataId: HM250
-dataType: efficiencyMap
-observedN: 3
-expectedBG: 9.5
-bgError: 2.8
-upperLimit: 2.4696E-01*fb
-expectedUpperLimit: 4.7010E-01*fb
