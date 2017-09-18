@@ -259,6 +259,10 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
     logger.debug ( "returning no output, because we are in parallel mode" )
     return None
 
+def checkForSemicolon ( strng, section, var ):
+    if ";" in strng:
+        logger.warning ( "A semicolon (;) has been found in [%s] %s, in your config file. If this was meant as comment, then please a space before it." % ( section, var) )
+
 def loadDatabase(parser, db):
     """
     Load database
@@ -273,7 +277,7 @@ def loadDatabase(parser, db):
     try:
         dp = parser.get ( "path", "databasePath" )
         logger.error ( "``[path] databasePath'' in ini file is deprecated; " \
-           "use ``[database] path'' instead. (See e.g. etc/parameters_default.ini)" )
+           "use ``[database] path'' instead. (See e.g. smodels/etc/parameters_default.ini)" )
         parser.set ( "database", "path", dp )
     except Exception as e:
         ## path.databasePath not set. This is good.
@@ -283,7 +287,12 @@ def loadDatabase(parser, db):
         # logger.error ( "database=db: %s" % database )
         if database in [ None, True ]:
             databasePath = parser.get( "database", "path" )
-            discard_zeroes = parser.getboolean( "database", "discardZeroes" )
+            checkForSemicolon ( databasePath, "database", "path" )
+            discard_zeroes = True
+            try:
+                discard_zeroes = parser.getboolean( "database", "discardZeroes" )
+            except Exception as e: ## too complicated to be more specific
+                logger.info ( "database:discardZeroes is not given in config file. Defaulting to 'True'." )
             force_load=None
             if database == True: force_load="txt"
             if os.path.isfile ( databasePath ):
@@ -292,7 +301,7 @@ def loadDatabase(parser, db):
                                  discard_zeroes = discard_zeroes )
         databaseVersion = database.databaseVersion
     except DatabaseNotFoundException:
-        logger.error("Database not found in %s" % os.path.realpath(databasePath))
+        logger.error("Database not found in ``%s''" % os.path.realpath(databasePath))
         sys.exit()
     return database, databaseVersion
 

@@ -1,9 +1,4 @@
-Release v1.1.1, Thu 11 May 2017
-=======================================================
-
-  * to be written!
-
-Release v1.1.1pre1, Mon 13 Mar 2017
+Release v1.1.1, Tue 27 Jun 2017
 =======================================================
 
   * pythia8 support
@@ -12,13 +7,16 @@ Release v1.1.1pre1, Mon 13 Mar 2017
   * automated SLHA and LHE file detection
   * smodelsTools.py now also supports toolbox
   * C++ interface
+  * Fix and improvements for missing topologies
+  * Added SLHA-type output
+  * Small improvements in interpolation and clustering
 
 Release v1.1.0patch1, Tue 21 Feb 2017
 =======================================================
 
   * pions added to final state particles
   * added full list of PIDs in asymmetric and long topologies coverage output
-  * fix in CMS-SUS-12-024-eff and ATLAS-SUSY-2013-11-eff
+  * fix in CMS-SUS-12-024-eff, ATLAS-SUSY-2013-11-eff and CMS-SUS-13-013-eff
 
 Release v1.1.0, Mon 23 Jan 2017 08:00:00 PM CET
 =======================================================

@@ -15,17 +15,8 @@ Standard Installation
 ---------------------
 
 SModelS is a Python library that requires Python version 2.6 or later (including
-version 3) with Python's setuptools installed. Internally, SModelS uses the
-following tools:
-
- * `Pythia 8.223 <https://arxiv.org/abs/1410.3012>`_ (requires a C++ compiler)
- * `Pythia 6.4.27 <http://arxiv.org/abs/hep-ph/0603175>`_ (obsolete)
- * `NLL-fast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_ 1.2 (7 TeV), 2.1 (8 TeV), and 3.1 (13 TeV) (requires a fortran compiler)
-
-These tools are built into SModelS and require gfortran and C++.
-They need not be installed separately, as the SModelS build system takes care of that.
-In addition to setuptools, SModelS depends on the following *external* Python
-libraries [*]_:
+version 3) with the following *external* Python
+libraries:
 
  * unum
  * numpy
@@ -34,13 +25,25 @@ libraries [*]_:
  * scipy>=0.9.0
  * pyslha>=3.1.0
 
+In addition, the :ref:`cross section computer <xsecCalc>` provided by :ref:`smodelsTools.py <smodelsTools>`
+requires:
+
+ * `Pythia 8.2 <https://arxiv.org/abs/1410.3012>`_ (requires a C++ compiler) or `Pythia 6.4.27 <http://arxiv.org/abs/hep-ph/0603175>`_ (requires gfortran)
+ * `NLL-fast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_ 1.2 (7 TeV), 2.1 (8 TeV), and 3.1 (13 TeV) (requires a fortran compiler)
+
+These tools need not be installed separately, as the SModelS build system takes care of that. The current default is that both Pythia6 and Pythia8 are installed together with NLLfast. However, the user can easily adapt the Makefile in the lib/ directory to fit his or her needs.
+Finally, the :ref:`database browser <databaseBrowser>` provided by :ref:`smodelsTools.py <smodelsTools>`
+requires `IPython <https://ipython.org/>`_.
+
 If Python's *setuptools* is installed in your machine, SModelS and its dependencies
 can be installed with::
+
   python setup.py install
 
 If the python libraries are installed in a system folder (as is the default behavior),
 it will be necessary to run the install command with superuser privilege.
 Alternatively, one can run setup.py with the "--user" flag::
+
   python setup.py install --user
 
 If *setuptools* is not installed, you can try to install the external libraries
@@ -49,7 +52,7 @@ For Ubuntu, SL6 machines and other platforms, a recipe is given below.
 
 There is also a diagnostic tool available: ::
 
-   python smodels/tools/toolBox.py
+   python smodelsTools.py toolbox
 
 should list and check all internal tools (Pythia and NLL-fast) and external
 (numpy, scipy, unum, ... ) dependencies.
@@ -57,8 +60,8 @@ should list and check all internal tools (Pythia and NLL-fast) and external
 In case everything fails, please contact smodels-users@lists.oeaw.ac.at
 
 
-Installation on Ubuntu 16.04
-----------------------------
+Installation on Ubuntu >= 16.04
+-------------------------------
 
 Installation on Ubuntu machines should be straightforward with superuser privileges
 (if you do not have superuser privileges see instructions below):
@@ -123,13 +126,13 @@ and then install SModelS as a user: ::
 
  python setup.py install --user
 
-In order to make sure all libraries have been correctly installed, you can run ::
+In order to make sure all libraries have been correctly installed, you can run: ::
 
- python smodels/tools/toolBox.py
+    python smodelsTools.py toolBox
 
 
-Installation of C++ interface
------------------------------
+Installation of the C++ interface
+---------------------------------
 
 SModelS v1.1.1 comes with a simple C++ interface, see the cpp directory.
 Obviously, a C++ compiler is need, alongside with the python developers
@@ -139,27 +142,14 @@ Obviously, a C++ compiler is need, alongside with the python developers
 Adding results to the database
 ------------------------------
 
-
 The installation procedure explained above also installs SModelS'
-:ref:`database of experimental results <DatabaseDefinitions>`
+:ref:`database of experimental results <databaseStruct>`
 in the smodels-database subdirectory.
-The database version at the time of the SModelS v1.1.0 release is ``1.1.0
-(Silvester 2016)'' and contains 133 results for testing new physics models.
-More concretely, these are 94
-|ULrs| and 39 |EMrs| from 25 ATLAS and 23
-CMS SUSY searches. Among these, 120 results are official ATLAS and CMS results
-from Run 1 at 8 TeV. Ten |EMrs| were ''home-grown'' by us using MadAnalysis5 and
-CheckMATE recasting.  Regarding the early 13 TeV data,
-there are currently three results: two UL maps from CMS and one UL map from
-ATLAS (this will be extended soon).
-The database also includes 33 preliminary results from 13 ATLAS and 3 CMS notes
-which were superseeded by published data; they are kept in the database for
-information but are not used with default settings in SModelS.
 The complete list of analyses and results included in the database can be
 consulted at `http://smodels.hephy.at/wiki/ListOfAnalysesv11 <http://smodels.hephy.at/wiki/ListOfAnalysesv11>`_.
 We note that all the results in the official database release have been
 carefully validated  and the validation material can be
-found at `http://smodels.hephy.at/wiki/Validationv11 <http://smodels.hephy.at/wiki/Validationv11>`_).
+found at `http://smodels.hephy.at/wiki/Validationv11 <http://smodels.hephy.at/wiki/Validationv11>`_.
 
 The database can conveniently be updated independently from SModelS code
 updates. It suffices to unpack any new database tarball and replace the database
@@ -185,6 +175,8 @@ That is, the following steps need to be performed ::
  tar -xzvf smodels-v1.1-fastlim-1.0.tgz
  rm smodels-v1.1-fastlim-1.0.tgz
 
+Efficiencies with a relative statistical uncertainty greater than 25%
+we consider to be zero. Also, per default we discard zeroes-only results.
 Once the fastlim folders have been added to the database,
 SModelS auto-detects fastlim results and issues an acknowledgement.
 When using these results, please properly cite the fastlim paper; for
@@ -203,10 +195,6 @@ Once the new folders and files have been added following the
 automatically rebuilds the binary (Pickle) database file.
 The added results will then be available for using with the
 the SModelS tools.
-
-
-.. [*] The :ref:`database browser <databaseBrowser>` interface provided by smodelsTools.py also
-   requires IPython. However, all the other SModelS functionalities are independent of IPython.
 
 
 

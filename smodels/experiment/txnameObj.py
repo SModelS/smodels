@@ -263,6 +263,8 @@ class TxNameData(object):
         return not self.__eq__ ( other )
 
     def __eq__ ( self, other ):
+        if type(self) != type ( other ):
+            return False
         return self._id == other._id
 
     def convertString(self, value):
@@ -564,7 +566,9 @@ class TxNameData(object):
             M.append ( m )
             # M.append ( [ self.round_to_n ( x, 7 ) for x in m ] )
 
-        Vt=svd(M)[2]
+        ## we dont need thousands of points for SVD
+        n = int ( math.ceil ( len(M) / 2000. ) )
+        Vt=svd(M[::n])[2]
         V=Vt.T
         self._V= V ## self.round ( V )
         Mp=[]

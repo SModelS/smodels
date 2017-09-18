@@ -111,16 +111,12 @@ The basic options and parameters used by *runSModelS.py* are defined in the para
 An example parameter file, including all available parameters together
 with a short description, is stored in :download:`parameters.ini <images/parameters.ini>`.
 If no parameter file is specified, the default parameters stored in
-:download:`/etc/parameters_default.ini <images/parameters_default.ini>` are used.
+:download:`smodels/etc/parameters_default.ini <images/parameters_default.ini>` are used.
 Below we give more detailed information about each entry in the parameters file.
 
 
 
 
-* *path*: relevant folder paths
-
-  * **databasePath**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`.
-|
 * *options*: main options for turning SModelS features on or off
 
   * **checkInput** (True/False): if True, *runSModelS.py* will run the :ref:`file check tool <fileChecks>` on the input file and verify if the input contains all the necessary information.
@@ -130,7 +126,7 @@ Below we give more detailed information about each entry in the parameters file.
     (see :ref:`likelihood calculation <likelihoodCalc>`).
     If True, the likelihood and :math:`\chi^2` values are computed for the |EMrs|.
   * **testCoverage** (True/False): set to True to run the :ref:`coverage <topCoverage>` tool.
-|
+
 * *parameters*: basic parameter values for running SModelS
 
   * **sigmacut** (float): minimum value for an |element| weight (in fb). :ref:`Elements <element>` 
@@ -144,9 +140,10 @@ Below we give more detailed information about each entry in the parameters file.
   * **ncpus** (int): number of CPUs. When processing multiple SLHA/LHE files,
     SModelS can run in a parallelized fashion, splitting up the input files in equal chunks.
     *ncpus = -1* uses the total number of CPU cores of the machine.
-|
+
 * *database*: allows for selection of a subset of :ref:`experimental results <ExpResult>` from the |database|
 
+  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`.
   * **analyses** (list of results): set to *all* to use all available results. If a list of :ref:`experimental analyses <ExpResult>`
     is given, only these will be used. For instance, setting analyses = CMS-PAS-SUS-13-008,ATLAS-CONF-2013-024
     will only use the |results| from `CMS-PAS-SUS-13-008 <https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13008>`_
@@ -159,12 +156,12 @@ Below we give more detailed information about each entry in the parameters file.
   * **dataselector** (list of datasets): set to all to use all available |datasets|. If dataselector = upperLimit (efficiencyMap), only |ULrs| (|EMrs|) will be used. Furthermore, if
     a list of signal regions (|datasets|) is given, only the |results| containing these datasets will be used. For instance, if dataselector = SRA mCT150,SRA mCT200, only
     these signal regions will be used.
-|
+
 * *printer*: main options for the |output| format
 
   * **outputType** (list of outputs): use to list all the output formats to be generated.
-    Available output formats are: summary, stdout, log, python, xml.
-|
+    Available output formats are: summary, stdout, log, python, xml, slha.
+
 * *stdout-printer*: options for the stdout or log printer
 
   * **printDatabase** (True/False): set to True to print the list of selected |results| to stdout.
@@ -176,16 +173,16 @@ Below we give more detailed information about each entry in the parameters file.
   * **addCoverageID** (True/False): set to True to print the list of element IDs contributing to each missing topology (see :ref:`coverage <topCoverage>`).
     *Only used if testCoverage = True*. This option should be used along with *addElementInfo = True* so the user can precisely identify
     which elements were classified as missing.
-|
+
 * *summary-printer*: options for the summary printer
 
   * **expandedSummary** (True/False): set True to include in the summary output all applicable |results|, False for only the strongest one.
-|
+
 * *python-printer*: options for the Python printer
 
   * **addElementList** (True/False): set True to include in the Python output all information about all |elements| generated in the |decomposition|. If set to True the
     output file can be quite large.
-|
+
 * *xml-printer*: options for the xml printer
 
   * **addElementList** (True/False): set True to include in the xml output all information about all |elements| generated in the |decomposition|. If set to True the
@@ -222,6 +219,10 @@ The following formats are available:
    |theory predictions| and the :ref:`missing topologies <topCoverage>`. The output can be significantly long, if
    all options are set to True. Due to its broad usage, the xml output can be easily converted to the
    user's preferred format.
+   
+ * a :ref:`SLHA file <slhaOut>` containing information about the 
+   |theory predictions| and the :ref:`missing topologies <topCoverage>`. The output follows a SLHA-type
+   format and contains a summary of the most constraining results and the missed topologies.
 
 A detailed explanation of the information contained in each type of output is given
 in :ref:`SModels Output <outputDescription>`.
@@ -237,28 +238,28 @@ users more familiar with Python and the SModelS language may prefer to write the
 A simple example code for this purpose is provided in :download:`examples/Example.py`.
 Below we go step-by-step through this example code:
 
-* *Import the SModelS methods*. If the example code file is not located in
-  the smodels installation folder, simply add "sys.path.append(<smodels installation path>)" before importing smodels
+* *Import the SModelS modules and methods*. If the example code file is not located in
+  the smodels installation folder, simply add "sys.path.append(<smodels installation path>)" before importing smodels. Set SModelS verbosity level.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 15-19
+   :lines: 15-21
 
 * *Set the path to the database folder*. Specify where the SModelS :ref:`database <databaseStruct>` has been installed and load the database.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 21-22
+   :lines: 23-24
 
 * *Path to the input file*. Specify the location of the input file. It must be a
   SLHA or LHE file (see :ref:`Basic Input <BasicInput>`).
 
 .. literalinclude:: /examples/Example.py
-   :lines: 31
+   :lines: 33
 
 * *Set main options for* |decomposition|.
   Specify the values of :ref:`sigmacut <minweight>` and :ref:`minmassgap <massComp>`:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 35-36
+   :lines: 37-38
 
 * |Decompose| *model*. Depending on the type
   of input format, choose either
@@ -266,14 +267,14 @@ Below we go step-by-step through this example code:
   `lheDecomposer.decompose <../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose>`_ method. The **doCompress** and **doInvisible** options turn the |mass compression| and |invisible compression| on/off.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 39-40
+   :lines: 41-45
 
 * *Access basic information* from decomposition, using the
   `topology list <../../../documentation/build/html/theory.html#theory.topology.TopologyList>`_
   and `topology  <../../../documentation/build/html/theory.html#theory.topology.Topology>`_ objects:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 43-55
+   :lines: 48-60
 
 *output:*
 
@@ -285,7 +286,7 @@ Below we go step-by-step through this example code:
   Here, all results are used:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 59
+   :lines: 64
 
 Alternatively, the `getExpResults  <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database.getExpResults>`_ method
 can take as arguments specific results to be loaded.
@@ -294,7 +295,7 @@ can take as arguments specific results to be loaded.
   Below we show how to count the number of |ULrs| and |EMrs| loaded:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 63-70
+   :lines: 68-75
 
 *output:*
 
@@ -308,13 +309,13 @@ can take as arguments specific results to be loaded.
   (for each |expres|):
 
 .. literalinclude:: /examples/Example.py
-   :lines: 77-78
+   :lines: 82-83
 
 * *Print the results*. For each |expres|, loop over the corresponding |theory predictions|
   and print the relevant information:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 81-93
+   :lines: 86-98
 
 *output:*
 
@@ -325,7 +326,7 @@ can take as arguments specific results to be loaded.
   be compared to the |theory prediction| to decide whether a model is excluded or not:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 96-97
+   :lines: 101-102
 
 *output:*
 
@@ -334,10 +335,11 @@ can take as arguments specific results to be loaded.
 
 * *Compute the r-value*, i.e. the ratio |theory prediction|/upper limit.
   A value of :math:`r \geq 1` means that an experimental result excludes the input model.
-  Also determine the most constraining result:
+  For |EMrs| also compute the :math:`\chi^2` and :ref:`likelihood <likelihoodCalc>`.
+  Determine the most constraining result:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 100-104
+   :lines: 105-113
 
 *output:*
 
@@ -348,13 +350,26 @@ can take as arguments specific results to be loaded.
   determine if the model has been excluded or not by the selected |express|:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 107-111
+   :lines: 116-120
 
 
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 411-412
+   :lines: 322-323
+   
+   
+* *Identify missing topologies*. Using the output from decomposition, identify
+  the :ref:`missing topologies <topCoverage>` and print some basic information:
+
+.. literalinclude:: /examples/Example.py
+   :lines: 125-144
+
+
+*output:*
+
+.. literalinclude:: /images/ExampleOutput.txt
+   :lines: 325-336,344-349   
 
 
 It is worth noting that SModelS does not include any statistical treatment for

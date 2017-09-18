@@ -129,8 +129,8 @@ def cSim(*weights):
         xsecRes.info = info
         for weightA in weights:
             for weightB in weights:
-                a = weightA.getXsecsFor(info.label)[0].value / fb
-                b = weightB.getXsecsFor(info.label)[0].value / fb
+                a = weightA.getXsecsFor(info.label)[0].value.asNumber ( fb )
+                b = weightB.getXsecsFor(info.label)[0].value.asNumber ( fb )
                 if a + b == 0.:
                     continue
                 res = max(res, abs(a - b) / abs(a + b))

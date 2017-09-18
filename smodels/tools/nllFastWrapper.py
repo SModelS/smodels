@@ -14,6 +14,11 @@
 from __future__ import print_function
 import operator
 import pyslha
+import sys
+try:
+    import commands as executor
+except ImportError:
+    import subprocess as executor
 
 squarks = [1000001,
            2000001,
@@ -30,10 +35,6 @@ third = [1000005,
          2000006]
 gluinos = [1000021]
 
-try:
-    import commands as executor
-except ImportError:
-    import subprocess as executor
 import os
 from smodels.tools.wrapperBase import WrapperBase
 from smodels.tools.smodelsLogging import logger
@@ -58,27 +59,15 @@ class NllFastWrapper(WrapperBase):
         self.sqrts = int(sqrts)
         self.name = "nllfast%d" % sqrts
         self.nllfastVersion = nllfastVersion
-        path = "<install>/lib/nllfast/nllfast-"
+        path = "<install>/smodels/lib/nllfast/nllfast-"
         location = path + self.nllfastVersion + "/"
         self.cdPath = self.absPath(location)
         self.executablePath = self.cdPath + "/nllfast_%dTeV" % self.sqrts
         self.testParams = testParams
         self.testCondition = testCondition
         self.srcPath = self.cdPath
+        self.compiler = "gfortran"
         self.executable = ""
-
-
-    def compile(self):
-        """
-        Try to compile nllfast.
-
-        """
-        logger.info("Trying to compile %s", self.name)
-        cmd = "cd %s; make" % self.srcPath
-        out = executor.getoutput(cmd)
-        # out = subprocess.check_output ( cmd, shell=True, universal_newlines=True )
-        logger.info(out)
-        return True
 
     def _interpolateKfactors( self, kFacsVector, xval):
         """
@@ -214,27 +203,6 @@ class NllFastWrapper(WrapperBase):
     def _runForDecoupled ( self, energy, nllinput ):
         nll_run = "./nllfast_" + energy + " %s %s %s %s" % nllinput
         return self._run ( nll_run )
-
-    def checkInstallation(self):
-        """
-        Checks if installation of tool is valid by looking for executable and
-        executing it.
-
-        """
-        if not os.path.exists(self.executablePath):
-            logger.error("Executable '%s' not found. Maybe you didn't compile " \
-                         "the external tools in smodels/lib?", self.executablePath)
-            return False
-        if not os.access(self.executablePath, os.X_OK):
-            logger.error("%s is not executable", self.executable)
-            return False
-        cmd = "cd %s; %s %s" % (self.cdPath, self.executablePath, self.testParams)
-        out = executor.getoutput(cmd)
-        out = out.split("\n")
-        if out[-1].find(self.testCondition) == -1:
-            logger.error("Setup invalid: " + str(out))
-            return False
-        return True
 
     def getKfactorsFor( self, pIDs, slhafile, pdf='cteq' ):
         """

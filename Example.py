@@ -13,9 +13,12 @@
 """ Import basic functions (this file must be executed in the installation folder) """
 
 from smodels.theory import slhaDecomposer,lheDecomposer
-from smodels.tools.physicsUnits import fb, GeV
+from smodels.tools.physicsUnits import fb, GeV, TeV
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.experiment.databaseObj import Database
+from smodels.tools import coverage
+from smodels.tools.smodelsLogging import setLogLevel
+setLogLevel("info")
 
 # Set the path to the database folder
 database = Database("./smodels-database/")
@@ -101,6 +104,10 @@ def main():
             # Compute the r-value
             r = theoryPrediction.xsection.value/ul
             print "r = ",r
+            #Compute likelihhod and chi^2 for EM-type results:
+            if dataset.dataInfo.dataType == 'efficiencyMap':
+                theoryPrediction.computeStatistics()
+                print 'Chi2, likelihood=', theoryPrediction.chi2, theoryPrediction.likelihood
             if r > rmax:
                 rmax = r
                 bestResult = expResult.globalInfo.id
@@ -112,8 +119,31 @@ def main():
     else:
         print "(The input model is not excluded by the simplified model results)"
       
+    #Find out missing topologies for sqrts=8*TeV:
+    uncovered = coverage.Uncovered(toplist,sqrts=8.*TeV)
+    #Print uncovered cross-sections:
+    print "\nTotal missing topology cross section (fb): %10.3E\n" %(uncovered.getMissingXsec())
+    print "Total cross section where we are outside the mass grid (fb): %10.3E\n" %(uncovered.getOutOfGridXsec())
+    print  "Total cross section in long cascade decays (fb): %10.3E\n" %(uncovered.getLongCascadeXsec())
+    print  "Total cross section in decays with asymmetric branches (fb): %10.3E\n" %(uncovered.getAsymmetricXsec())        
     
-
-
+    #Print some of the missing topologies:
+    print 'Missing topologies (up to 3):'
+    for topo in uncovered.missingTopos.topos[:3]:
+        print 'Topology:',topo.topo
+        print 'Contributing elements (up to 2):'
+        for el in topo.contributingElements[:2]:
+            print el,'cross-section (fb):', el.missingX
+    
+    #Print elements with long cascade decay:
+    print '\nElements outside the grid (up to 2):'
+    for topo in uncovered.outsideGrid.topos[:2]:
+        print 'Topology:',topo.topo
+        print 'Contributing elements (up to 4):'
+        for el in topo.contributingElements[:4]:
+            print el,'cross-section (fb):', el.missingX
+            print '\tmass:',el.getMasses()
+        
+        
 if __name__ == '__main__':
     main()

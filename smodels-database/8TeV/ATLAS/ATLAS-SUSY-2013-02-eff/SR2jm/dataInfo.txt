@@ -1,0 +1,7 @@
+dataId: SR2jm
+dataType: efficiencyMap
+observedN: 715
+expectedBG: 760
+bgError: 50
+upperLimit: 4.2419E+00*fb
+expectedUpperLimit: 5.5524E+00*fb

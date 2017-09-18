@@ -54,11 +54,12 @@ clean:
 
 copy_files:
 	cp ../../parameters.ini source/images/
-	cp ../../etc/parameters_default.ini source/images/
+	cp ../../smodels/etc/parameters_default.ini source/images/
 	cp ../../cpp/run.cpp source/images/
+	cp ../../Example.py source/examples/
 
 RstFilesFromHelp:
-	rstFromHelpFiles.py
+	./rstFromHelpFiles.py
 
 html: copy_files recipes RstFilesFromHelp htmlnorecipes
 
@@ -189,3 +190,6 @@ pseudoxml:
 	$(SPHINXBUILD) -b pseudoxml $(ALLSPHINXOPTS) $(BUILDDIR)/pseudoxml
 	@echo
 	@echo "Build finished. The pseudo-XML files are in $(BUILDDIR)/pseudoxml."
+
+zip:
+	cd build/html && zip -r ../../manual.zip ./ 

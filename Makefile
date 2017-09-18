@@ -1,16 +1,32 @@
+VER=$(shell cat smodels/version)
+
 all: externaltools
 
+version:
+	@echo $(VER)
+
 externaltools:
-	cd lib && make
+	cd smodels/lib && make
+
+pythia6:
+	cd smodels/lib && make pythia6
+
+pythia8:
+	cd smodels/lib && make pythia8
 
 clean:
-	cd lib && make clean
+	yes | rm -rf build dist
+	cd smodels/lib && make clean
 
 buildrpm:
 	$(PYTHON) setup.py bdist_rpm --force-arch x86_64
 
 builddeb: buildrpm
-	cd dist && fakeroot alien smodels-1.0.93-1.x86_64.rpm
+	cd dist && fakeroot alien smodels-$(VER)-1.x86_64.rpm
+
+pypi:
+	python setup.py sdist bdist_wheel
+	twine upload dist/*
 
 tarballs:
 	cd distribution && make tarballs

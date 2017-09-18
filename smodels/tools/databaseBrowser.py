@@ -233,7 +233,7 @@ class Browser(object):
         for dataset in expres.datasets:
             if dataset.dataInfo.dataId != datasetID:
                 continue
-            return dataset.getUpperLimit()
+            return dataset.getSRUpperLimit()
 
         logger.warning ( "Could not find dataset %s ." % (datasetID))
         return None
@@ -307,7 +307,7 @@ def main(args):
     def getHeader ():
         from smodels.installation import installDirectory
         header = ""
-        with open( installDirectory()+"/etc/BANNER") as f:
+        with open( installDirectory()+"smodels/share/BANNER") as f:
             lines=f.readlines()
             for line in lines: header+=line
 

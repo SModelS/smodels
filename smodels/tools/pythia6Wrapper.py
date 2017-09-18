@@ -11,9 +11,10 @@
 from __future__ import print_function
 from smodels.tools.wrapperBase import WrapperBase
 from smodels.tools import wrapperBase
-from smodels.tools.physicsUnits import pb
+from smodels.tools.physicsUnits import pb, TeV
 from smodels.tools.smodelsLogging import logger
 from smodels.theory import crossSection
+from smodels.theory.crossSection import LO
 from smodels import installation
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import os, sys, io
@@ -31,9 +32,9 @@ class Pythia6Wrapper(WrapperBase):
 
     """
     def __init__(self,
-                 configFile="<install>/etc/pythia.card",
-                 executablePath="<install>/lib/pythia6/pythia_lhe",
-                 srcPath="<install>/lib/pythia6/"):
+                 configFile="<install>/smodels/etc/pythia.card",
+                 executablePath="<install>/smodels/lib/pythia6/pythia_lhe",
+                 srcPath="<install>/smodels/lib/pythia6/"):
         """
         :param configFile: Location of the config file, full path; copy this
         file and provide tools to change its content and to provide a template
@@ -49,6 +50,7 @@ class Pythia6Wrapper(WrapperBase):
         self.executablePath = self.absPath(executablePath)
         self.executable = None
         self.srcPath = self.absPath(srcPath)
+        self.compiler = "gfortran"
         self.tempdir = None
         self.cfgfile = self.checkFileExists(configFile)
         self.keepTempDir = False
@@ -97,7 +99,7 @@ class Pythia6Wrapper(WrapperBase):
         if self.keepTempDir:
             logger.warn("Keeping everything in " + self.tempdir)
             return
-        logger.debug("Unlinking " + self.tempdir)
+        logger.debug( "Unlinking " + self.tempdir )
         for inputFile in ["fort.61", "fort.68", "log"]:
             if os.path.exists(self.tempdir + "/" + inputFile):
                 os.unlink(self.tempdir + "/" + inputFile)
@@ -153,12 +155,6 @@ class Pythia6Wrapper(WrapperBase):
         f.write("%s=%s\n" % (param, str(value)))
         f.close()
 
-    def complain ( self ):
-        import sys
-        logger.error("please fix manually, e.g. try 'make' in smodels/lib, " \
-               " or file a complaint at smodels-users@lists.oeaw.ac.at" )
-        sys.exit(0)
-
     def run( self, slhafile, lhefile=None, unlink=True ):
         """
         Execute pythia_lhe with n events, at sqrt(s)=sqrts.
@@ -177,7 +173,8 @@ class Pythia6Wrapper(WrapperBase):
             xsecsInfile = crossSection.getXsecFromSLHAFile(slhafile)
             loXsecs = crossSection.XSectionList()
             for xsec in xsecsInfile:
-                if xsec.info.order == LO and xsec.info.sqrts == self.sqrts:
+                if xsec.info.order == LO and \
+                        float (xsec.info.sqrts.asNumber(TeV)) == self.sqrts:
                     loXsecs.add(xsec)
             return loXsecs
 
@@ -186,7 +183,10 @@ class Pythia6Wrapper(WrapperBase):
             pythiacard_default = self.cfgfile
             self.cfgfile = self.pythiacard
         # Check if template config file exists
-        self.unlink()
+        if unlink:
+            self.unlink()
+        else:
+            self.tempdir = None
         self.replaceInCfgFile({"NEVENTS": self.nevents, "SQRTS":1000 * self.sqrts})
         self.setParameter("MSTP(163)", "6")
 
@@ -214,6 +214,8 @@ class Pythia6Wrapper(WrapperBase):
         if self.pythiacard:
             self.cfgfile = pythiacard_default
 
+        #if not unlink:
+        #    lhefile = self.tempdir + "/events.lhe"
         # Generate file object with lhe events
         if lhefile:
             lheFile = open(lhefile, 'w')
@@ -245,14 +247,7 @@ class Pythia6Wrapper(WrapperBase):
 
         """
         if do_check:
-            ci=self.checkInstallation()
-            if not ci:
-                if not do_compile:
-                    logger.error("couldnt find pythia6 binary." )
-                    self.complain()
-                logger.warning("couldnt find pythia6 binary. I have been asked to try to compile it, though. Lets see.")
-                # self.compile()
-                self.complain()
+            self.checkInstallation( do_compile )
         slha = self.checkFileExists(slhaFile)
         cfg = self.absPath(cfgfile)
         ck_cfg = self.checkFileExists(cfg)
@@ -271,98 +266,6 @@ class Pythia6Wrapper(WrapperBase):
             f.write (out + "\n")
             f.close()
         return out
-
-    def chmod(self):
-        """
-        chmod 755 on pythia executable, if it exists.
-        Do nothing, if it doesnt exist.
-        """
-        if not os.path.exists ( self.executablePath ):
-            logger.error("%s doesnt exist" % self.executablePath )
-            return False
-        import stat
-        mode = stat.S_IRWXU | stat.S_IRWXG | stat.S_IXOTH | stat.S_IROTH
-        os.chmod ( self.executablePath, mode )
-        return True
-
-
-    def compile(self):
-        """
-        Compile pythia_lhe.
-
-        """
-        logger.info("Trying to compile pythia in %s" % self.srcPath )
-        cmd = "cd %s; make" % self.srcPath
-        outputMessage = executor.getoutput(cmd)
-        #outputMessage = subprocess.check_output ( cmd, shell=True,
-        #                                          universal_newlines=True )
-        logger.info(outputMessage)
-
-
-    def fetch(self):
-        """
-        Fetch and unpack tarball.
-
-        """
-        tempFile = "/tmp/pythia.tar.gz"
-        fileHandle = open(tempFile, "w")
-        logger.debug("Fetching tarball...")
-        url = "http://smodels.hephy.at/externaltools/pythia/pythia.tar.gz"
-        link = urllib.urlopen(url)
-        lines = link.readlines()
-        for line in lines:
-            fileHandle.write(line)
-        link.close()
-        fileHandle.close()
-        logger.debug("... done.")
-        logger.debug("Untarring...")
-        tar = tarfile.open(tempFile)
-        for item in tar:
-            tar.extract(item, self.srcPath)
-        logger.debug("... done.")
-
-
-    def checkInstallation( self ):
-        """
-        Check if installation of tool is correct by looking for executable and
-        running it.
-
-        :returns: True, if everything is ok
-
-        """
-        if not os.path.exists(self.executablePath):
-            logger.error("Executable '%s' not found. Maybe you didn't compile " \
-                         "the external tools in smodels/lib?", self.executablePath)
-            return False
-        if not os.access(self.executablePath, os.X_OK):
-            logger.error("%s is not executable", self.executable)
-            self.chmod()
-            return False
-        return True
-        """
-        slhaFile = "/inputFiles/slha/gluino_squarks.slha"
-        slhaPath = installation.installDirectory() + slhaFile
-        try:
-            output = self.run(slhaPath, "<install>/etc/pythia_test.card" )
-            output = output.split("\n")
-            if output[-1].find("The following floating-point") > -1:
-                output.pop()
-
-            output.pop()
-            val = (" ********* Fraction of events that fail fragmentation "
-                   "cuts =  0.00000 *********")
-            lines = {-1 : val}
-            for (nr, line) in lines.items():
-                if output[nr].find(line) == -1:
-                    logger.error("Expected >>>%s<<< found >>>%s<<<", line,
-                                 output[nr])
-                    return False
-        except Exception as e:
-            logger.error("Something is wrong with the setup: exception %s" % e)
-            return False
-        return True
-            """
-
 
 if __name__ == "__main__":
     #from smodelsLogging import setLogLevel

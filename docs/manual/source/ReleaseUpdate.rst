@@ -1,7 +1,5 @@
 .. index:: What's New in version |version|
 
-.. |invisible compression| replace:: :ref:`invisible compression <invComp>`
-.. |mass compression| replace:: :ref:`mass compression <massComp>`
 .. |element| replace:: :ref:`element <element>`
 .. |elements| replace:: :ref:`elements <element>`
 .. |topology| replace:: :ref:`topology <topology>`
@@ -31,6 +29,7 @@
 .. |datasets| replace:: :ref:`data sets<DataSet>`
 .. |parameters| replace:: :ref:`parameters file <parameterFile>`
 .. |ssigBRe| replace:: :math:`\sum \sigma \times BR \times \epsilon`
+.. |Cpp| replace:: :ref:`C++ Interface<Cpp>`
 
 
 
@@ -40,6 +39,21 @@ Since the publication of SModelS v1.0 in December 2014, the code base
 has undergone significant structural changes. Version 1.1 comes
 with many new features. The major novelties of this release are 
 as follows:
+
+New in Version 1.1.1:
+^^^^^^^^^^^^^^^^^^^^^
+
+* |Cpp|
+* Support for pythia8 (see :ref:`Cross Section Calculator <xsecCalc>`)
+* improved binary database
+* automated SLHA and LHE file detection
+* Fix and improvements for missing topologies
+* Added SLHA-type output
+* Small improvements in interpolation and clustering
+
+
+New in Version 1.1.0:
+^^^^^^^^^^^^^^^^^^^^^
 
 * the inclusion of efficiency maps (see |EMrs|)
 * a new and more flexible database format (see :ref:`Database structure <databaseStruct>`)
@@ -54,4 +68,3 @@ as follows:
 * |Fastlim| efficiency maps can now also be used in SModelS
 
 
-.. |decomposition| replace:: :doc:`decomposition <Decomposition>`

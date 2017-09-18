@@ -42,14 +42,14 @@ simutaneously handle both |UL| and |EM| results.
 Therefore, for both |UL| and |EM| constraints, the database obeys the following structure:
 
 * :ref:`Database <Database>`: collects a list of |ExpRess|.
-   * |ExpRes|: each |ExpRes| corresponds to an experimental preliminary result (i.e. a CONF-NOTE or PAS) or
-     publication and contains a list of |Datasets| as well as general information about the result (luminosity, publication reference,...).
+   * |ExpRes|: each |ExpRes| corresponds to an experimental preliminary result (i.e. a CONF-NOTE or PAS) or publication and contains a list of |Datasets| as well as general information about the result (luminosity, publication reference,...).
+
       * |Dataset|:
         a single |Dataset| corresponds to one signal region of the experimental
         note or publication [*]_. In case of |ULrs| there is a single |Dataset|, usually corresponding to the best signal
         region (for more details see |Dataset|). For |EMrs|, there is one |Dataset| for each signal region.
-        Each |Dataset| contains the Upper Limit maps for :ref:`Upper Limit results <ULtype>` *or* 
-        the Efficiency maps for :ref:`Efficiency Map results <EMtype>`. 
+        Each |Dataset| contains the Upper Limit maps for :ref:`Upper Limit results <ULtype>` *or* the Efficiency maps for :ref:`Efficiency Map results <EMtype>`. 
+
             * Upper Limit map: contains the upper limit constraints for |ULrs|. Each map refers to a single 
               simplified model (or more precisely to a single |element| or sum of |elements|).
             * Efficiency map: contains the efficiencies for |EMrs|. Each map refers to a single 
@@ -286,7 +286,7 @@ A complete list of TxNames can be found `here <http://smodels.hephy.at/wiki/SmsD
 
  
 *More details about the database folder structure and object
-struture can be found in* :ref:`Database of Experimental Results<databaseStruct>`. 
+structure can be found in* :ref:`Database of Experimental Results<databaseStruct>`. 
 
 .. [*] The name *Data Set* is used instead of signal region because its concept is slightly more general. For instance,
    in the case of |ULrs|, a |Dataset| may not correspond to a single signal region, but to a combination of signal regions.
