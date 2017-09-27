@@ -266,3 +266,6 @@ texinfo_documents = [
 #texinfo_no_detailmenu = False
 
 nitpicky = True
+
+#Run make whenever sphinx is built:
+os.system("cd .. && make copy_files recipes RstFilesFromHelp")
