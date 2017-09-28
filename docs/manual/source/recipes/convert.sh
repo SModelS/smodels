@@ -17,5 +17,3 @@ for i in `ls *.ipynb`; do
   $CMD --to python $i;
 done
 
-mkdir -p ../../build/html/_downloads/
-cp *.html ../../build/html/_downloads/
