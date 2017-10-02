@@ -16,7 +16,7 @@ Below a few examples are given for how to utilize SModelS and some of the :doc:`
 
 * `How to compute leading order cross sections (for MSSM) <lo_xsecs_from_slha.html>`_ (download the Python code :download:`here <recipes/lo_xsecs_from_slha.py>`, IPython notebook :download:`here <recipes/lo_xsecs_from_slha.ipynb>`)
 
-* `How to compute next-to-leading order cross sections (for MSSM) <_downloads/nll_xsecs_from_slha.html>`_ (download the Python code :download:`here <recipes/nll_xsecs_from_slha.py>`, IPython notebook :download:`here <recipes/nll_xsecs_from_slha.ipynb>`)
+* `How to compute next-to-leading order cross sections (for MSSM) <nll_xsecs_from_slha.html>`_ (download the Python code :download:`here <recipes/nll_xsecs_from_slha.py>`, IPython notebook :download:`here <recipes/nll_xsecs_from_slha.ipynb>`)
 
 * `How to print decomposition results <print_decomposition.html>`_ (download the Python code :download:`here <recipes/print_decomposition.py>`, IPython notebook :download:`here <recipes/print_decomposition.ipynb>`)
 
@@ -30,8 +30,8 @@ Below a few examples are given for how to utilize SModelS and some of the :doc:`
 
 * `How to generate ascii graphs <ascii_graph_from_lhe.html>`_ (download the Python code :download:`here <recipes/ascii_graph_from_lhe.py>`, IPython notebook :download:`here <recipes/ascii_graph_from_lhe.ipynb>`)
 
-Examples using the Database Browser:
-------------------------------------
+Examples using the Database Browser
+-----------------------------------
 
 * `How to obtain upper limits <browserExample2.html>`_ (download the Python code :download:`here <recipes/browserExample2.py>`, IPython notebook :download:`here <recipes/browserExample2.ipynb>`)
 
