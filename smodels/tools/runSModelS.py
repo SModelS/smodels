@@ -75,8 +75,8 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
     """
     Provides a command line interface to basic SModelS functionalities.
     
-    :param inputFile: input file name (either a SLHA or LHE file)
-                      or directory name (path to directory containing input files)
+    :param inFile: input file name (either a SLHA or LHE file)
+                   or directory name (path to directory containing input files)
     :param parameterFile: File containing the input parameters (default =
                           smodels/etc/parameters_default.ini)
     :param outputDir: Output directory to write a summary of results to
@@ -97,7 +97,7 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
     database, databaseVersion = modelTester.loadDatabase(parser, db)
 
     """ Get list of input files to be tested """
-    fileList = modelTester.getAllInputFiles(inFile)
+    fileList, inDir = modelTester.getAllInputFiles(inFile)
 
     """ Create output directory if missing """
     if not os.path.isdir(outputDir): os.mkdir(outputDir)
@@ -106,7 +106,7 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
     listOfExpRes = modelTester.loadDatabaseResults(parser, database)
 
     """ Test all input points """
-    modelTester.testPoints( fileList, inFile, outputDir, parser, databaseVersion, 
+    modelTester.testPoints( fileList, inDir, outputDir, parser, databaseVersion, 
                  listOfExpRes, timeout, development, parameterFile )
 
 if __name__ == "__main__":

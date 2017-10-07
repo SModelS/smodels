@@ -65,6 +65,7 @@ class UpperLimitComputer:
 
         llhds={}
         upto = mu_hat + 4.0 * sigma_mu
+        first_upto = upto
         n_bins = 50.
         dx = upto / n_bins ## FIXME
         start = dx/2.
@@ -125,7 +126,7 @@ class UpperLimitComputer:
             llhds[k]=v/norm
         ## now find the 95% quantile by interpolation
         ret = self.interpolate ( llhds, dx )
-        self.plot ( llhds, dx, upto, ret, computer, effs, norm, errs )
+        self.plot ( llhds, dx, first_upto, ret, computer, effs, norm, errs )
         computer.plotLTheta ( nsig=mu_hat*effs )
         computer.printProfilingStats()
         return ret
@@ -158,7 +159,7 @@ class UpperLimitComputer:
         t_err=ROOT.TGraph ( len ( n_errs[n_errs!=0] ) )
         t_err.SetMarkerColor ( ROOT.kRed )
         t_err.SetMarkerStyle ( 21 )
-        l=ROOT.TLegend( .6,.7,.98,.89)
+        l=ROOT.TLegend( .58,.7,.98,.89)
         errctr=0
         for ctr,(x,y) in enumerate ( zip ( xvals, yvals ) ):
             xv = x / lumi
@@ -183,20 +184,20 @@ class UpperLimitComputer:
         t3.SetLineColor(ROOT.kGreen)
         t3.SetLineWidth(3)
         t3.Draw("SAME")
-        l.AddEntry(t3,"95% limit","L" )
+        l.AddEntry(t3,"95%s limit [%.1f fb]" % ("%", cl95.asNumber(fb) ),"L" )
         t4=ROOT.TLine ( upto/lumi, 0., upto/lumi, max(yvals) )
         t4.SetLineColor(ROOT.kBlue)
         t4.SetLineStyle(4)
         t4.SetLineWidth(2)
         t4.Draw("SAME")
-        l.AddEntry(t4,"guess for integration upper limit","L" )
+        l.AddEntry(t4,"guess for integration ul [%.1f fb]" % (upto/lumi),"L" )
         mu_hat = computer.findMuHat( effs, lumi )
         t6=ROOT.TLine ( mu_hat, 0., mu_hat, max(yvals) )
         t6.SetLineColor(ROOT.kCyan )
         t6.SetLineStyle(6)
         t6.SetLineWidth(2)
         t6.Draw("SAME")
-        l.AddEntry(t6,"#hat{#mu}","L" )
+        l.AddEntry(t6,"#hat{#mu} [%.1f fb]" % ( mu_hat),"L" )
         theta_hat = computer.findThetaHat ( mu_hat * effs )
         sigma_mu = computer.getSigmaMu ( effs, lumi, mu_hat, theta_hat )
         maxp1 = mu_hat + 1.96 * sigma_mu
@@ -209,7 +210,7 @@ class UpperLimitComputer:
         t7.SetLineStyle(7)
         t7.SetLineWidth(2)
         t7.Draw("SAME")
-        l.AddEntry(t7,"#hat{#mu} + 1.96*#sigma","L" )
+        l.AddEntry(t7,"#hat{#mu} + 1.96*#sigma [%.1f fb]" % maxp1,"L" )
         # logger.error ( "95 pc ul=%s" % cl95 )
         l.Draw()
         fname = "plot%d.png" % expected

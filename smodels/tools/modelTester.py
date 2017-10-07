@@ -238,6 +238,8 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
         logger.error ( "no files given." )
         return None
 
+    print ( "fileList=%s" % fileList )
+    print ( "inDir=%s" % inDir )
     cleanedList = _cleanList ( fileList, inDir )
     if len(cleanedList) == 1:
         return runSingleFile ( cleanedList[0], outputDir, parser, databaseVersion,
@@ -392,5 +394,6 @@ def getAllInputFiles(inFile):
     """
     if os.path.isdir(inFile):
         fileList = os.listdir(inFile)
-    else: fileList = [inFile]
-    return fileList
+        return fileList, inFile
+    fileList = [ os.path.basename ( inFile ) ]
+    return fileList, os.path.dirname ( inFile )
