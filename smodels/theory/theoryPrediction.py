@@ -36,7 +36,6 @@ class TheoryPrediction(object):
 
     """
     def __init__(self):
-        self.analysis = None
         self.xsection = None
         self.effectiveEff = None
         self.conditions = None
@@ -48,6 +47,12 @@ class TheoryPrediction(object):
         if type(self.dataset) == list:
             return "combined"
         return self.dataset.dataInfo.dataId
+
+    def analysisId ( self ):
+        """ return name of analysis """
+        if type(self.dataset) == list:
+            return self.dataset[0].globalInfo.id
+        return self.dataset.globalInfo.id
 
     def dataType ( self ):
         """ return EM / UL """
@@ -133,40 +138,48 @@ class TheoryPrediction(object):
         # return maxcond
 
     def __str__(self):
-        ret = "%s:%s" % ( self.analysis, self.xsection )
+        ret = "%s:%s" % ( self.analysisId(), self.xsection )
         #self.computeStatistics()
         #ret += ", llhd=%f." % self.likelihood
         return ret
 
     def isCombined ( self ):
-       """ does this theory pred stem from combining several datasets?
-           (implies the existence of a covariance matrix) """
-       return type(self.dataset)==list
+        """ does this theory pred stem from combining several datasets?
+            (implies the existence of a covariance matrix) """
+        return type(self.dataset)==list
 
     def describe ( self ):
-       if not hasattr ( self, "chi2" ):
-           self.computeStatistics()
-       # return a lengthy description
-       ret =  "[theoryPrediction] analysis: %s\n" % self.analysis
-       ret += "     prediction (sigma*eff): %s\n" % self.xsection
-       ret += "         prediction (sigma): %s\n" % ( self.xsection.value / self.effectiveEff )
-       ret += "       effective efficiency: %s\n" % self.effectiveEff
-       ds = "None"
-       if type (self.dataset) == list:
+        if not hasattr ( self, "chi2" ):
+            self.computeStatistics()
+        # return a lengthy description
+        ret =  "[theoryPrediction] analysis: %s\n" % self.analysisId()
+        ret += "     prediction (sigma*eff): %s\n" % self.xsection
+        ret += "         prediction (sigma): %s\n" % ( self.xsection.value / self.effectiveEff )
+        ret += "       effective efficiency: %s\n" % self.effectiveEff
+        ds = "None"
+        if type (self.dataset) == list:
             ds = "multiple (%d combined)" % len(self.dataset)
-       else:
+        else:
             dataId = self.dataset.dataInfo.dataId
             folderName = self.dataset.dataInfo.path
             ds = "%s (%s)" % ( dataId, self.dataset.folderName() )
-       ret += "                   datasets: %s\n" % ds
-       ret += "      obs limit (sigma*eff): %s\n" % self.getUpperLimit()
-       ret += "      exp limit (sigma*eff): %s\n" % self.getUpperLimit( expected=True )
-       ret += "          obs limit (sigma): %s\n" % (self.getUpperLimit() / self.effectiveEff )
-       ret += "          exp limit (sigma): %s\n" % (self.getUpperLimit( expected=True ) / self.effectiveEff )
-       ret += "                      obs r: %f\n" % ( self.xsection.value / self.getUpperLimit() )
-       ret += "                      exp r: %f\n" % ( self.xsection.value / self.getUpperLimit( expected=True ) )
-       ret += "                       chi2: %f\n" % ( self.chi2 )
-       return ret
+        ret += "                   datasets: %s\n" % ds
+        ret += "      obs limit (sigma*eff): %s\n" % self.getUpperLimit()
+        ret += "      exp limit (sigma*eff): %s\n" % self.getUpperLimit( expected=True )
+        ret += "          obs limit (sigma): %s\n" % (self.getUpperLimit() / self.effectiveEff )
+        eul_ = self.getUpperLimit( expected=True )
+        eul = eul_
+        if type(eul)!=type(None):
+            eul = eul / self.effectiveEff
+         
+        ret += "          exp limit (sigma): %s\n" % ( eul )
+        ret += "                      obs r: %f\n" % ( self.xsection.value / self.getUpperLimit() )
+        exp_r = None
+        if type(eul_)!=type(None):
+                exp_r = self.xsection.value / eul_
+        ret += "                      exp r: %s\n" % ( exp_r )
+        ret += "                       chi2: %s\n" % ( self.chi2 )
+        return ret
 
 class TheoryPredictionList(object):
     """
