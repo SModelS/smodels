@@ -448,8 +448,12 @@ class TxTPrinter(BasicPrinter):
                 upperLimit = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass)
                 upperLimitExp = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass,expected=True)
             elif expRes.datasets[0].dataInfo.dataType == 'efficiencyMap':
-                upperLimit = expRes.getUpperLimitFor(dataID=theoryPrediction.dataId() )
-                upperLimitExp = expRes.getUpperLimitFor(dataID=theoryPrediction.dataId(), expected=True)
+                if theoryPrediction.dataId() == "combined":
+                    upperLimit = theoryPrediction.getUpperLimit()
+                    upperLimitExp = theoryPrediction.getUpperLimit( expected=True )
+                else:
+                    upperLimit = expRes.getUpperLimitFor(dataID=theoryPrediction.dataId() )
+                    upperLimitExp = expRes.getUpperLimitFor(dataID=theoryPrediction.dataId(), expected=True)
 
             output += "Observed experimental limit: " + str(upperLimit) + "\n"
             if not upperLimitExp is None:
