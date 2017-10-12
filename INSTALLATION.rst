@@ -21,6 +21,12 @@ They need not be installed separately, as the SModelS build system takes care of
 (The database browser interface provided by smodelsTools.py also requires IPython.
 However, all the other SModelS functionalities are independent of IPython.)
 
+If *pip* is installed in your machine, installing SModelS might be as easy as this::
+  pip install smodels
+ 
+Note, that in this case, *gfortran* and *g++* need to be installed separately,
+if one wishes to compute cross sections with pythia6 and pythia8, respectively.
+
 If Python's *setuptools* is installed in your machine, SModelS and its dependencies
 can be installed with::
   python setup.py install
