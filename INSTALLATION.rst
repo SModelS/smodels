@@ -7,8 +7,9 @@
 Installation
 ============
 
-SModelS is a Python library that requires Python version 2.6 or later with the Python packages setuptools, unum, numpy, argparse, docutils (>=0.3), scipy (>=0.9.0),
-and pyslha (>=3.1.).
+SModelS is a Python library that requires Python version 2.6 or later with the
+Python packages setuptools, unum, numpy, argparse, docutils (>=0.3), scipy
+(>=0.9.0), and pyslha (>=3.1.).
 if SModelS is to compute cross sections, it uses the following tools internally:
 
  * Pythia 8.226 (requires a C++ compiler)
@@ -16,7 +17,9 @@ if SModelS is to compute cross sections, it uses the following tools internally:
  * NLL-fast 1.2 (7 TeV), 2.1 (8 TeV), and 3.1 (13 TeV) (requires a gfortran compiler)
 
 These tools are built into SModelS and require gfortran and C++.
-They need not be installed separately, as the SModelS build system takes care of that. As per default, NLL-fast and both Pythia6 and Pythia8 are installed. However, the user can easily adapt the Makefile, to fit his or her needs.
+They need not be installed separately, as the SModelS build system takes care of that. 
+As per default, NLL-fast and both Pythia6 and Pythia8 are installed. However,
+the user can easily adapt the Makefile, to fit his or her needs.
 
 (The database browser interface provided by smodelsTools.py also requires IPython.
 However, all the other SModelS functionalities are independent of IPython.)
