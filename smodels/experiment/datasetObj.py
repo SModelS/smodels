@@ -122,7 +122,7 @@ class DataSet(object):
         """
 
 
-        fieldDict = self.__dict__.items()[:]
+        fieldDict = list ( self.__dict__.items() )
         valuesDict = {}
         while fieldDict:
             for field,value in fieldDict[:]:
@@ -131,8 +131,8 @@ class DataSet(object):
                     else: valuesDict[field].append(value)
                 else:
                     if isinstance(value,list):
-                        for entry in value: fieldDict += entry.__dict__.items()[:]
-                    else: fieldDict += value.__dict__.items()[:]
+                        for entry in value: fieldDict += list ( entry.__dict__.items() )
+                    else: fieldDict += list ( value.__dict__.items() )
                 fieldDict.remove((field,value))
 
         #Try to keep only the set of unique values

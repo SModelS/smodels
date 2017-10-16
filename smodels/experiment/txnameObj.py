@@ -192,6 +192,15 @@ class TxName(object):
                     return elementB
         return False
 
+    def hasLikelihood ( self ):
+        """ can I construct a likelihood for this map? 
+        True for all efficiency maps, and for upper limits maps
+        with expected Values. """
+        if self._infoObj.dataType == "efficiencyMap":
+            return True
+        if self.txnameDataExp != None:
+            return True
+        return False
 
     def getEfficiencyFor(self,mass):
         """

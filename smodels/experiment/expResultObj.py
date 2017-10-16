@@ -76,6 +76,9 @@ class ExpResult(object):
     def __ne__(self, other ):
         return not self.__eq__ ( other )
 
+    def id(self):
+        return self.globalInfo.getInfo('id')
+
     def __str__(self):
         label = self.globalInfo.getInfo('id') + ": "
         dataIDs = [dataset.dataInfo.dataId for dataset in self.datasets]
