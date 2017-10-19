@@ -29,12 +29,12 @@ class OverrideInstall(install):
         for filepath in self.get_outputs():
             # if self.install_scripts in filepath:
             if "smodels/lib/" in filepath:
-                print ("Overriding setuptools mode of scripts ...")
+                #print ("Overriding setuptools mode of scripts ...")
                 #log.info("Changing ownership of %s to uid:%s gid %s" %
                 #         (filepath, uid, gid))
                 #os.chown(filepath, uid, gid)
-                print ("Changing permissions of %s to %s" %
-                         ( os.path.dirname ( filepath ), oct(mode)))
+                # print ("Changing permissions of %s to %s" %
+                #         ( os.path.dirname ( filepath ), oct(mode)))
                 os.chmod( os.path.dirname ( filepath ), mode )
 
 def read(fname):
@@ -87,7 +87,9 @@ def compile():
         return
     needs_build = False
     for i in sys.argv[1:]:
-        if i in ["build", "build_ext", "build_clib", "install", "install_lib", "bdist", "bdist_rpm", "bdist_dumb", "bdist_wininst", "bdist_wheel", "develop"]:
+        if i in [ "build", "build_ext", "build_clib", "install", 
+                  "install_lib", "bdist", "bdist_rpm", "bdist_dumb", 
+                  "bdist_wininst", "bdist_wheel", "develop"]:
             needs_build = True
     if not needs_build:
         return
