@@ -86,7 +86,11 @@ rOdd = {1000021 : "gluino",
        -1000016 : "sneutrino",
        -2000012 : "sneutrino",
        -2000014 : "sneutrino",
-       -2000016 : "sneutrino"
+       -2000016 : "sneutrino",
+        1000111 : "he+",
+       -1000111 : "he-",
+        1000255 : "s0",
+       -1000255 : "s0"
 }
 
 rEven = {25 : "higgs",
@@ -187,6 +191,8 @@ qNumbers={
  1000005:[0,-1,3],
  2000005:[0,-1,3],
  2000004:[0,2,3],
+ 1000111:[1,3,1],
+ 1000255:[0,0,1]
 }
 
 #Final states. Define final state labels
