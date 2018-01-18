@@ -590,7 +590,7 @@ class TxNameData(object):
         fullpt = np.append(pt,[0.]*(self.full_dimensionality-len(pt)))
         mass = np.dot(self._V,fullpt) + self.delta_x
         mass = mass.reshape(self.massdim).tolist()
-        if unit:
+        if isinstance(unit,unum.Unum):
             mass = [[m*unit for m in br] for br in mass]
             
         return mass
