@@ -11,47 +11,50 @@
 
 import sys
 import copy
-from smodels.particles import rEven, rOdd, ptcDic
+from smodels.particleClass import SMList, BSMList, SMparticles, ptcDic
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import itertools
-
 from smodels.tools.smodelsLogging import logger
 
-
-def getName(pdg):
-    """
-    Convert pdg number to particle name according to the dictionaries rOdd and
-    rEven.
+"""
+def getObjectFromPdg(pdg):
+    
+    Convert pdg number to particle object according to the Particle class.
 
     :type pdg: int
-    :returns: particle name (e.g. gluino, mu-, ...)
+    :returns: Particles object 
+      
+    found = False
+    for particle in SMList+BSMList:
+		if particle.pdg==pdg: 
+			found = True
+			p = particle
+    if found: return p
+    else: return False
+
+def getObjectFromName(name):
     
-    """
-    p = int(pdg)
-    if p in rOdd:
-        return rOdd[p]
-    if p in rEven:
-        return rEven[p]
-    else:
-        return False
+    Convert particle name to particle object according to the Particle class.
 
-
-def getPdg(name):
-    """
-    Convert a name to the pdg number according to the dictionaries rOdd and
-    rEven.
-
-    :type name: string
-    :returns: particle pdg; None, if name could not be resolved
-    
-    """
-    for (pdg, pname) in rOdd.items():
-        if name == pname:
-            return abs(pdg)
-    for (pdg, pname) in rEven.items():
-        if name == pname:
-            return abs(pdg)
-    return None
+    :type name: str
+    :returns: Particles object 
+        
+    found = False
+    for particle in SMList+BSMList:
+		if particle.label==name: 
+			found = True
+			p = particle
+    if found: return p
+    else: return False
+"""
+def getNamesList(particleList):
+	""" 
+	Convert list of particles to list of particle names according to the Particle class.
+	:type particleList: list of instances of Particles class
+	:returns: list of str
+	"""
+	NamesList = [particle.label for particle in particleList]
+	return NamesList
 
 
 def elementsInStr(instring,removeQuotes=True):
@@ -108,8 +111,8 @@ def elementsInStr(instring,removeQuotes=True):
                 ptc = ptc.replace("'","")
                 if not ptc:
                     continue
-                if not ptc in rEven.values() and not ptc in ptcDic:
-                    logger.error("Unknown particle. Add " + ptc + " to smodels/particles.py")
+                if not ptc in SMparticles and not ptc in ptcDic:
+                    logger.error("Unknown particle. Add " + ptc + " to smodels/particleClass.py")
                     raise SModelSError()
 
     # Check if there are not unmatched ['s and/or ]'s in the string
@@ -160,7 +163,7 @@ def vertInStr(instring):
             for ptc in vertices[-1]:
                 if not ptc:
                     continue
-                if not ptc in rEven.values() and not ptc in ptcDic:
+                if not ptc in SMparticles and not ptc in ptcDic:
                     logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
                     raise SModelSError()
             vertStr = ""
@@ -194,11 +197,11 @@ def simParticles(plist1, plist2, useDict=True):
         if not isinstance(p,str) or not isinstance(plist2[i],str):
             logger.error("Input must be a list of particle strings")
             raise SModelSError()
-        elif not p in list ( ptcDic.keys() ) + list ( rEven.values() ):
-            logger.error("Unknow particle: %s" %p)
+        elif not p in list ( ptcDic.keys() ) + SMparticles :
+            logger.error("Unknown particle: %s" %p)
             raise SModelSError()
-        elif not plist2[i] in list ( ptcDic.keys() ) + list ( rEven.values() ):
-            logger.error("Unknow particle: %s" %plist2[i])
+        elif not plist2[i] in list ( ptcDic.keys() ) + SMparticles :
+            logger.error("Unknown particle: %s" %plist2[i])
             raise SModelSError()
                         
         
@@ -214,13 +217,13 @@ def simParticles(plist1, plist2, useDict=True):
         if not p in ptcDic:
             extendedL1.append([p])
         else:
-            extendedL1.append(ptcDic[p])
+            extendedL1.append(getNamesList(ptcDic[p]))
     extendedL2 = []    
     for i,p in enumerate(plist2):
         if not p in ptcDic:
             extendedL2.append([p])
         else:
-            extendedL2.append(ptcDic[p])
+            extendedL2.append(getNamesList(ptcDic[p]))
     
     #Generate all combinations of particle lists (already sorted to avoid ordering issues)
     #e.g. [[q,g,c],[mu+]] -> [[q,mu+],[g,mu+],[c,mu+]]

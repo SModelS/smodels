@@ -9,7 +9,7 @@
 import sys
 from smodels.theory.particleNames import simParticles, elementsInStr
 from smodels.tools.physicsUnits import fb, MeV
-from smodels.particles import rEven, ptcDic
+from smodels.particleClass import SMpdgs, SMparticles, ptcDic, SMList, BSMList, getObjectFromPdg
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -52,9 +52,9 @@ class Branch(object):
                     ptcs = vertex[1:-1].split(',')
                     # Syntax check:
                     for ptc in ptcs:
-                        if not ptc in rEven.values() \
+                        if not ptc in SMparticles \
                                 and not ptc in ptcDic:
-                            logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
+                            logger.error("Unknown particle. Add " + ptc + " to smodels/particleClass.py")
                             raise SModelSError()
                     self.particles.append(ptcs)
             self.vertnumb = len(self.particles)
@@ -122,7 +122,7 @@ class Branch(object):
     def particlesMatch(self, other):
         """
         Compare two Branches for matching particles, 
-        allow for inclusive particle labels (such as the ones defined in particles.py)
+        allow for inclusive particle labels (such as the ones defined in particleClass.py)
         
         :parameter other: branch to be compared (Branch object)
         :returns: True if branches are equal (particles and masses match); False otherwise.              
@@ -202,8 +202,8 @@ class Branch(object):
 
         for partID in br.ids:
             # Add R-even particles to final state
-            if partID in rEven:
-                newparticles.append(rEven[partID])
+            if partID in SMpdgs:
+                newparticles.append(getObjectFromPdg(partID).label)
             else:
                 # Add masses of non R-even particles to mass vector
                 newmass.append(massDictionary[partID])
@@ -295,3 +295,5 @@ def decayBranches(branchList, brDictionary, massDictionary,
     #Sort list by initial branch PID:
     finalBranchList = sorted(finalBranchList, key=lambda branch: branch.PIDs)
     return finalBranchList
+
+

@@ -14,6 +14,7 @@ from smodels.tools import ioObjects
 from smodels.tools import coverage, runtime
 from smodels.theory import slhaDecomposer
 from smodels.theory import lheDecomposer
+import smodels.particleClass 
 from smodels.theory.theoryPrediction import theoryPredictionsFor, TheoryPredictionList
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools import crashReport, timeOut 
@@ -76,6 +77,8 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     try:
         """ Decompose input SLHA file, store the output elements in smstoplist """
         if inputType == 'slha':
+			# Update mass and width of particles with file 
+            smodels.particleClass.UpdateParticles(inputFile, smodels.particleClass.BSMList)
             smstoplist = slhaDecomposer.decompose(inputFile, sigmacut,
                     doCompress=parser.getboolean("options", "doCompress"),
                     doInvisible=parser.getboolean("options", "doInvisible"),

@@ -9,7 +9,7 @@
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.branch import Branch
 from smodels.theory import crossSection
-from smodels.particles import rEven, ptcDic
+from smodels.particleClass import SMparticles, ptcDic
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -123,7 +123,7 @@ class Element(object):
     def particlesMatch(self, other, branchOrder=False):
         """
         Compare two Elements for matching particles only.
-        Allow for inclusive particle labels (such as the ones defined in particles.py).
+        Allow for inclusive particle labels (such as the ones defined in particleClass.py).
         If branchOrder = False, check both branch orderings.
         
         :parameter other: element to be compared (Element object)
@@ -332,8 +332,8 @@ class Element(object):
                     logger.error("Wrong syntax")
                     raise SModelSError()
                 for ptc in vertex:
-                    if not ptc in rEven.values() and not ptc in ptcDic:
-                        logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
+                    if not ptc in SMparticles and not ptc in ptcDic:
+                        logger.error("Unknown particle. Add " + ptc + " to smodels/particleClass.py")
                         raise SModelSError()
         return True
 
@@ -498,3 +498,4 @@ class Element(object):
             if not pidlist in elPIDs:
                 self.branches[0].PIDs.append(pidlist[0])
                 self.branches[1].PIDs.append(pidlist[1])
+

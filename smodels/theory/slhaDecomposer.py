@@ -16,7 +16,7 @@ import pyslha
 from smodels.theory import element, topology, crossSection
 from smodels.theory.branch import Branch, decayBranches
 from smodels.tools.physicsUnits import fb, GeV
-import smodels.particles
+import smodels.particleClass
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -53,8 +53,18 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
 
     # Get cross section from file
     xSectionList = crossSection.getXsecFromSLHAFile(slhafile, useXSecs)
-    # Get BRs and masses from file
-    brDic, massDic = _getDictionariesFromSLHA(slhafile)
+
+    # Get BRs and masses from updated particle class
+    massList = [particle.mass for particle in smodels.particleClass.BSMList]
+    massDic = dict(zip(smodels.particleClass.BSMpdgs, massList))
+
+    widthList = [particle.width for particle in smodels.particleClass.BSMList]
+    widthDic = dict(zip(smodels.particleClass.BSMpdgs, widthList))
+ 
+    brList = [particle.branches for particle in smodels.particleClass.BSMList]
+    brDic = dict(zip(smodels.particleClass.BSMpdgs, brList))
+    #brDic, massDic, widthDic = _getDictionariesFromSLHA(slhafile)
+
     # Only use the highest order cross sections for each process
     xSectionList.removeLowerOrder()
     # Order xsections by PDGs to improve performance
@@ -139,61 +149,5 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     logger.debug("slhaDecomposer done in %.2f s." % (time.time() -t1 ) )
     return smsTopList
 
-def writeIgnoreMessage ( keys, rEven, rOdd ):
-    msg = ""
-    for pid in keys:
-        if not pid in list(rEven) + list(rOdd):
-            logger.warning("Particle %i not defined in particles.py, its decays will be ignored" %(pid))
-            continue
-        if pid in rEven:
-            msg += "%s, " % smodels.particles.rEven[pid]
-            continue         
-    if len(msg)>0:
-            logger.info ( "Ignoring %s decays" % msg[:-2] )
 
-def _getDictionariesFromSLHA(slhafile):
-    """
-    Create mass and BR dictionaries from an SLHA file.
-    Ignore decay blocks with R-parity violating or unknown decays
-
-    """
-
-    res = pyslha.readSLHAFile(slhafile)
-
-    rOdd = smodels.particles.rOdd.keys()
-    rEven = smodels.particles.rEven.keys()
-    
-    # Get mass and branching ratios for all particles
-    brDic = {}
-    writeIgnoreMessage ( res.decays.keys(), rEven, rOdd )
-
-    for pid in res.decays.keys():
-        if not pid in list(rOdd):
-            continue
-        brs = []
-        for decay in res.decays[pid].decays:
-            nEven = nOdd = 0.
-            for pidd in decay.ids:
-                if pidd in rOdd: nOdd += 1
-                elif pidd in rEven: nEven += 1
-                else:
-                    logger.warning("Particle %i not defined in particles.py,decay %i -> [%s] will be ignored" %(pidd,pid,decay.ids))
-                    break
-            if nOdd + nEven == len(decay.ids) and nOdd == 1:
-                brs.append(decay)
-            else:
-                logger.info("Ignoring decay: %i -> [%s]",pid,decay.ids)
-
-        brsConj = copy.deepcopy(brs)
-        for br in brsConj:
-            br.ids = [-x for x in br.ids]
-        brDic[pid] = brs
-        brDic[-pid] = brsConj
-    # Get mass list for all particles
-    massDic = dict(res.blocks['MASS'].items())
-    for pid in list ( massDic.keys() )[:]:
-        massDic[pid] = round(abs(massDic[pid]),1)*GeV
-        if not -pid in massDic: massDic[-pid] = massDic[pid]    
- 
-    return brDic, massDic
 
