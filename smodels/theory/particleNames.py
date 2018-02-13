@@ -11,7 +11,7 @@
 
 import sys
 import copy
-from smodels.particleClass import SMList, BSMList, SMparticles, ptcDic
+from smodels.particleClass import SMList, BSMList, SMparticles, ptcDict
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import itertools
 from smodels.tools.smodelsLogging import logger
@@ -106,12 +106,12 @@ def elementsInStr(instring,removeQuotes=True):
             elStr = ""
             # Syntax checks
             ptclist = elements[-1].replace(']', ',').replace('[', ',').\
-                    split(',')
+                    split(',')       
             for ptc in ptclist:
                 ptc = ptc.replace("'","")
                 if not ptc:
                     continue
-                if not ptc in SMparticles and not ptc in ptcDic:
+                if not ptc in SMparticles and not ptc in ptcDict:
                     logger.error("Unknown particle. Add " + ptc + " to smodels/particleClass.py")
                     raise SModelSError()
 
@@ -163,8 +163,8 @@ def vertInStr(instring):
             for ptc in vertices[-1]:
                 if not ptc:
                     continue
-                if not ptc in SMparticles and not ptc in ptcDic:
-                    logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
+                if not ptc in SMparticles and not ptc in ptcDict:
+                    logger.error("Unknown particle. Add " + ptc + " to smodels/particleClass.py")
                     raise SModelSError()
             vertStr = ""
 
@@ -194,13 +194,13 @@ def simParticles(plist1, plist2, useDict=True):
     if len(plist1) != len(plist2):
         return False
     for i,p in enumerate(plist1):
-        if not isinstance(p,str) or not isinstance(plist2[i],str):
+        if not isinstance(p.label,str) or not isinstance(plist2[i],str):
             logger.error("Input must be a list of particle strings")
             raise SModelSError()
-        elif not p in list ( ptcDic.keys() ) + SMparticles :
+        elif not p.label in list ( ptcDict.keys() ) + SMparticles :
             logger.error("Unknown particle: %s" %p)
             raise SModelSError()
-        elif not plist2[i] in list ( ptcDic.keys() ) + SMparticles :
+        elif not plist2[i] in list ( ptcDict.keys() ) + SMparticles :
             logger.error("Unknown particle: %s" %plist2[i])
             raise SModelSError()
                         
@@ -214,16 +214,16 @@ def simParticles(plist1, plist2, useDict=True):
     #e.g. [jet,mu+] -> [[q,g,c],[mu+]], [jet,mu] -> [[q,g,c],[mu+,mu-]] 
     extendedL1 = []    
     for i,p in enumerate(plist1):
-        if not p in ptcDic:
-            extendedL1.append([p])
+        if not p.label in ptcDict:
+            extendedL1.append([p.label])
         else:
-            extendedL1.append(getNamesList(ptcDic[p]))
+            extendedL1.append(getNamesList(ptcDict[p]))
     extendedL2 = []    
     for i,p in enumerate(plist2):
-        if not p in ptcDic:
+        if not p in ptcDict:
             extendedL2.append([p])
         else:
-            extendedL2.append(getNamesList(ptcDic[p]))
+            extendedL2.append(getNamesList(ptcDict[p]))
     
     #Generate all combinations of particle lists (already sorted to avoid ordering issues)
     #e.g. [[q,g,c],[mu+]] -> [[q,mu+],[g,mu+],[c,mu+]]

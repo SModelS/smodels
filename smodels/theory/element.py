@@ -9,7 +9,7 @@
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.branch import Branch
 from smodels.theory import crossSection
-from smodels.particleClass import SMparticles, ptcDic
+from smodels.particleClass import SMparticles, ptcDict, getObjectFromPdg
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -102,6 +102,7 @@ class Element(object):
         
         :returns: string representation of the element (in bracket notation)    
         """
+       
         particleString = str(self.getParticles()).replace(" ", "").\
                 replace("'", "")
         return particleString
@@ -131,7 +132,6 @@ class Element(object):
                                 check the same branch ordering
         :returns: True, if particles match; False, else;        
         """
-        
         
         if type(self) != type(other):
             return False
@@ -173,7 +173,7 @@ class Element(object):
         return newel
 
 
-    def setMasses(self, mass, sameOrder=True, opposOrder=False):
+    #def setMasses(self, mass, sameOrder=True, opposOrder=False):
         """
         Set the element masses to the input mass array.
         
@@ -185,6 +185,7 @@ class Element(object):
         :parameter opposOrder: if True, set the masses to the opposite branch ordering.
                                If True and sameOrder=True, set the masses to the
                                smaller of the two orderings.             
+        """
         """
         if sameOrder and opposOrder:
             newmass = sorted(mass)
@@ -201,7 +202,7 @@ class Element(object):
 
         for i, mass in enumerate(newmass):
             self.branches[i].masses = mass[:]
-
+        """
 
     def switchBranches(self):
         """
@@ -225,7 +226,8 @@ class Element(object):
         
         ptcarray = []
         for branch in self.branches:
-            ptcarray.append(branch.particles)
+            particleNames = [[particle.label for particle in particleList ] for particleList in branch.particles ]
+            ptcarray.append(particleNames)                
         return ptcarray
 
 
@@ -237,7 +239,10 @@ class Element(object):
         """
         massarray = []
         for branch in self.branches:
-            massarray.append(branch.masses)
+            masses = [particle.mass for particleList in branch.intmParticles for particle in particleList ]
+            particleNames = [[particle.label for particle in particleList ] for particleList in branch.intmParticles ]
+            massarray.append(masses)
+
         return massarray
 
     def getPIDs(self):
@@ -250,11 +255,14 @@ class Element(object):
         :returns: list of PDG ids
         """
         
+        particles = []
         pids = []
-        for ipid,PIDlist in enumerate(self.branches[0].PIDs):            
-            for ipid2,PIDlist2 in enumerate(self.branches[1].PIDs):
-                pids.append([self.branches[0].PIDs[ipid],self.branches[1].PIDs[ipid2]])
-        
+        for ipid,PIDlist in enumerate(self.branches[0].intmParticles):         
+            for ipid2,PIDlist2 in enumerate(self.branches[1].intmParticles):
+                particles.append([self.branches[0].intmParticles[ipid],self.branches[1].intmParticles[ipid2]])
+           
+        pids = [[[particle.pdg for particle in particleList ] for particleList in outerlist ] for outerlist in particles]
+  
         return pids
 
     def getDaughters(self):
@@ -332,7 +340,7 @@ class Element(object):
                     logger.error("Wrong syntax")
                     raise SModelSError()
                 for ptc in vertex:
-                    if not ptc in SMparticles and not ptc in ptcDic:
+                    if not ptc in SMparticles and not ptc in ptcDict:
                         logger.error("Unknown particle. Add " + ptc + " to smodels/particleClass.py")
                         raise SModelSError()
         return True
@@ -413,7 +421,7 @@ class Element(object):
                     new_branch = newelement.branches[ibr]
                     ncomp = 0
                     for iv in compbr:
-                        new_branch.masses.pop(iv-ncomp)
+                        new_branch.intmParticles.pop(iv-ncomp)
                         new_branch.particles.pop(iv-ncomp)
                         ncomp +=1
                     new_branch.setInfo() 
@@ -460,8 +468,9 @@ class Element(object):
                 continue # Nothing to be compressed
             #Go over the branch starting at the end and remove invisible vertices: 
             for ivertex in reversed(range(len(particles))):
-                if particles[ivertex].count('nu') == len(particles[ivertex]):
-                    newelement.branches[ib].masses.pop(ivertex+1)
+                if all(particle.label == 'nu' for particle in particles[ivertex] ):
+                #if particles[ivertex].count('nu') == len(particles[ivertex]):
+                    newelement.branches[ib].intmParticles.pop(ivertex+1)
                     newelement.branches[ib].particles.pop(ivertex)
                 else:
                     break
@@ -496,6 +505,6 @@ class Element(object):
         newelPIDs = el2.getPIDs()
         for pidlist in newelPIDs:                    
             if not pidlist in elPIDs:
-                self.branches[0].PIDs.append(pidlist[0])
-                self.branches[1].PIDs.append(pidlist[1])
+                self.branches[0].intmParticles.append(getObjectFromPdg(pidlist[0])) 
+                self.branches[1].intmParticles.append(getObjectFromPdg(pidlist[1])) 
 
