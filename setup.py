@@ -11,9 +11,31 @@
 import os
 import sys
 from setuptools import setup, Extension
+from setuptools.command.install import install
+from setuptools.command.install_scripts import install_scripts
 sys.path.insert ( 0, "./" )
 from smodels.installation import version, authors
 import subprocess
+
+class OverrideInstall(install):
+
+    def run(self):
+        #uid, gid = 0, 0
+        mode = 0777
+        install.run(self) # calling install.run(self) insures that everything 
+                # that happened previously still happens, 
+        # so the installation does not break! 
+        # here we start with doing our overriding and private magic ..
+        for filepath in self.get_outputs():
+            # if self.install_scripts in filepath:
+            if "smodels/lib/" in filepath:
+                #print ("Overriding setuptools mode of scripts ...")
+                #log.info("Changing ownership of %s to uid:%s gid %s" %
+                #         (filepath, uid, gid))
+                #os.chown(filepath, uid, gid)
+                # print ("Changing permissions of %s to %s" %
+                #         ( os.path.dirname ( filepath ), oct(mode)))
+                os.chmod( os.path.dirname ( filepath ), mode )
 
 def read(fname):
     """
@@ -65,7 +87,9 @@ def compile():
         return
     needs_build = False
     for i in sys.argv[1:]:
-        if i in ["build", "build_ext", "build_clib", "install", "install_lib", "bdist", "bdist_rpm", "bdist_dumb", "bdist_wininst", "bdist_wheel", "develop"]:
+        if i in [ "build", "build_ext", "build_clib", "install", 
+                  "install_lib", "bdist", "bdist_rpm", "bdist_dumb", 
+                  "bdist_wininst", "bdist_wheel", "develop"]:
             needs_build = True
     if not needs_build:
         return
@@ -88,6 +112,7 @@ setup(
     data_files=dataFiles() ,
     description=("A tool for interpreting simplified-model results from the "
                    "LHC"),
+    cmdclass={'install': OverrideInstall},
     license="GPLv3",
     # use_2to3 = True,
     keywords=("simplified models LHC BSM theories interpretation "

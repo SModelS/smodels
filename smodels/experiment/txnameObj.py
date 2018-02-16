@@ -611,7 +611,8 @@ class TxNameData(object):
             return None
         fullpt = np.append(pt,[0.]*(self.full_dimensionality-len(pt)))        
         mass = np.dot(self._V,fullpt) + self.delta_x
-        mass = mass.tolist()
+        mass = mass.reshape(self.massdim).tolist()
+
         massArray = []
         for br in self._massShape:
             if br is None:

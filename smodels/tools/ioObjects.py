@@ -76,7 +76,14 @@ class ResultList(object):
             ul = expResult.getUpperLimitFor(dataID=datasetID, expected=expected)
         else:
             logger.error("Unknown dataType %s" %(str(dataType)))
-        
+        if type(ul)==bool and ul==False:
+            logger.info ( "upper limit is False. cannot compute r value." )
+            return None
+        if ul == 0. * fb:
+            logger.info ( "upper limit is 0. cannot compute r value." )
+            return None
+        #if type(ul) == bool and ul == False:
+        #    return None
         return (theoPred.xsection.value/ul).asNumber()    
 
     def sort(self):
