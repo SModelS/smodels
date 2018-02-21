@@ -105,6 +105,7 @@ class TxName(object):
         # Builds up TopologyList with all the elements appearing in constraints
         # and conditions:
         for el in elements:
+            el.sortBranches()
             self._topologyList.addElement(el)
 
     def hasOnlyZeroes ( self ):
@@ -548,6 +549,7 @@ class TxNameData(object):
             return
         Morig=[]
         self.xsec = np.ndarray(shape = (len(values),))
+        
         for ctr,(x,y) in enumerate(values):
             # self.xsec.append ( y / self.unit )
             # self.xsec.append ( y )
@@ -590,7 +592,7 @@ class TxNameData(object):
             self.tri = qhull.Delaunay(MpCut)
         else:
             MpCut = [pt[0] for pt in MpCut]
-            self.tri = interp1d_picklable(MpCut,self.xsec,bounds_error=False,fill_value=None)
+            self.tri = interp1d_picklable(MpCut,self.xsec,bounds_error=False,fill_value=None)           
         
         
     def _getMassArrayFrom(self,pt,unit=GeV):
@@ -610,10 +612,12 @@ class TxNameData(object):
                          %(len(pt),self.dimensionality))
             return None
         fullpt = np.append(pt,[0.]*(self.full_dimensionality-len(pt)))        
-        mass = np.dot(self._V,fullpt) + self.delta_x
-        mass = mass.reshape(self.massdim).tolist()
-
-        massArray = []
+        mass = np.dot(self._V,fullpt) + self.delta_x        
+        mass = mass.tolist()
+        mass = mass[0]
+        if isinstance(unit,unum.Unum):
+            mass = [m*unit for m in mass]
+        massArray = []        
         for br in self._massShape:
             if br is None:
                 massArray.append('*')
@@ -623,7 +627,7 @@ class TxNameData(object):
                     if m is None:
                         massArray[-1].append('*')
                     else:
-                        massArray[-1].append(mass.pop(0)*unit)
+                        massArray[-1].append(mass.pop(0)) 
             
         return massArray
 
@@ -633,10 +637,7 @@ class interp1d_picklable:
     """
     def __init__(self, xi, yi, **kwargs):
         self.xi = xi
-        self.yi = yi
-        self.points = [[x] for x in xi]
-        self.delta_X = 0.
-        self._V = 1.
+        self.yi = yi  
         self.args = kwargs
         self.f = interp1d(xi, yi, **kwargs)
 
@@ -647,6 +648,7 @@ class interp1d_picklable:
         return self.xi, self.yi, self.args
 
     def __setstate__(self, state):
+        self.points = [[x] for x in state[0]] 
         self.f = interp1d(state[0], state[1], **state[2])        
 
 if __name__ == "__main__":
