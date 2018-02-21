@@ -634,6 +634,9 @@ class interp1d_picklable:
     def __init__(self, xi, yi, **kwargs):
         self.xi = xi
         self.yi = yi
+        self.points = [[x] for x in xi]
+        self.delta_X = 0.
+        self._V = 1.
         self.args = kwargs
         self.f = interp1d(xi, yi, **kwargs)
 
