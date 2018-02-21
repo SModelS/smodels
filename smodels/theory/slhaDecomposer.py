@@ -16,7 +16,8 @@ import pyslha
 from smodels.theory import element, topology, crossSection
 from smodels.theory.branch import Branch, decayBranches
 from smodels.tools.physicsUnits import fb, GeV
-from smodels.particleClass import BSMList, BSMpdgs, getObjectFromPdg
+from smodels.particleDefinitions import BSMList, BSMpdgs
+from smodels.theory.particleNames import getObjectFromPdg
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -71,6 +72,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
         xSectionListDict[pids] = xSectionList.getXsecsFor(pids)
 
     # Create 1-particle branches with all possible mothers
+    
     branchList = []
     for pid in maxWeight:
         branchList.append(Branch())
@@ -79,10 +81,10 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
             logger.error ( "pid %d does not appear in BSMList" % pid )
         branchList[-1].maxWeight = maxWeight[pid]
 
-    # Generate final branches (after all R-odd particles have decayed)    
+    # Generate final branches (after all R-odd particles have decayed)   
+
     finalBranchList = decayBranches(branchList, sigcut)
-    print "finalBranchList"
-    print finalBranchList
+
     # Generate dictionary, where keys are the PIDs and values are the list of branches for the PID (for performance)
     branchListDict = {}
     for branch in finalBranchList:

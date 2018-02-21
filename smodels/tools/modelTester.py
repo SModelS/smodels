@@ -14,7 +14,8 @@ from smodels.tools import ioObjects
 from smodels.tools import coverage, runtime
 from smodels.theory import slhaDecomposer
 from smodels.theory import lheDecomposer
-import smodels.particleClass 
+import smodels.particleDefinitions
+from smodels.theory.updateParticles import updateParticles
 from smodels.theory.theoryPrediction import theoryPredictionsFor, TheoryPredictionList
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools import crashReport, timeOut 
@@ -78,7 +79,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         """ Decompose input SLHA file, store the output elements in smstoplist """
         if inputType == 'slha':
 			# Update mass and width of particles with file 
-            smodels.particleClass.UpdateParticles(inputFile, smodels.particleClass.BSMList)
+            updateParticles(inputFile, smodels.particleDefinitions.BSMList)
             smstoplist = slhaDecomposer.decompose(inputFile, sigmacut,
                     doCompress=parser.getboolean("options", "doCompress"),
                     doInvisible=parser.getboolean("options", "doInvisible"),
@@ -114,6 +115,9 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     for expResult in listOfExpRes:
         theorypredictions = theoryPredictionsFor(expResult, smstoplist)
         if not theorypredictions: continue
+        #print "\n \n \n"
+        #for tp in theorypredictions._theoryPredictions: print tp.xsection
+        #print "\n \n \n"
         allPredictions += theorypredictions._theoryPredictions
     
     """Compute chi-square and likelihood"""

@@ -7,11 +7,13 @@
 """
 
 import sys
-from smodels.theory.particleNames import simParticles, elementsInStr
+#from smodels.theory.particleClass import simParticles
 from smodels.tools.physicsUnits import fb, MeV
-from smodels.particleClass import SMpdgs, SMparticles, BSMpdgs, ptcDict, getObjectFromPdg, getObjectFromName
+from smodels.particleDefinitions import SMpdgs, SMparticles, BSMpdgs, particleLists
+from smodels.theory.particleNames import elementsInStr, getObjectFromPdg, getObjectFromName , simParticles, getNamesList
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
+#from smodels.particleClass import simParticles
 
 
 class Branch(object):
@@ -43,24 +45,23 @@ class Branch(object):
         self.vertparts = None
         
         if type(info) == type(str()):
-            branch = elementsInStr(info)
+            branch = elementsInStr(info)            
             if not branch or len(branch) > 1:
                 logger.error("Wrong input string " + info)
                 raise SModelSError()
-            else:
+            else:                
                 branch = branch[0]
-                vertices = elementsInStr(branch[1:-1])
+                vertices = elementsInStr(branch[1:-1])           
                 for vertex in vertices:
                     particleNames = vertex[1:-1].split(',')
+                    ptcs = []
                     for name in particleNames:
-                        if type(getObjectFromName(name)) == list:
-                            ptcs = [particle for particle in getObjectFromName(name)]
-                        else: ptcs = getObjectFromName(name) 
+                        ptcs.append(getObjectFromName(name))
                     # Syntax check:
                     for ptc in particleNames:
                         if not ptc in SMparticles \
-                                and not ptc in ptcDict:
-                            logger.error("Unknown particle. Add " + ptc + " to smodels/particleClass.py")
+                                and not ptc in getNamesList(particleLists):
+                            logger.error("Unknown particle. Add " + ptc + " to smodels/particleDefinitions.py")
                             raise SModelSError()
 
                     self.particles.append(ptcs)
@@ -130,12 +131,13 @@ class Branch(object):
     def particlesMatch(self, other):
         """
         Compare two Branches for matching particles, 
-        allow for inclusive particle labels (such as the ones defined in particleClass.py)
+        allow for inclusive particle labels (such as the ones defined in particleDefinitions.py)
         
         :parameter other: branch to be compared (Branch object)
         :returns: True if branches are equal (particles and masses match); False otherwise.              
         """
-        
+
+
         if type (other) != type(self):
             return False
         #Make sure number of vertices and particles have been defined
@@ -143,10 +145,26 @@ class Branch(object):
         other.setInfo()
         if self.vertnumb != other.vertnumb:
             return False
+        
         if self.vertparts != other.vertparts:
             return False
-
+     
         for iv,vertex in enumerate(self.particles): 
+            
+            for i,p in enumerate(vertex):
+                if not p.label in list ( getNamesList(particleLists) ) + SMparticles :
+                    logger.error("Unknown particle: %s" %p)
+                    raise SModelSError()
+                    
+                if type(other.particles[iv][i]) ==str:
+                    if not other.particles[iv][i] in list ( getNamesList(particleLists) ) + SMparticles :
+                        logger.error("Unknown particle: %s" %other.particles[iv][i])
+                        raise SModelSError()
+                else:
+                    if not other.particles[iv][i].label in list ( getNamesList(particleLists) ) + SMparticles :
+                        logger.error("Unknown particle: %s" %other.particles[iv][i].label)
+                        raise SModelSError()                
+                
             if not simParticles(vertex,other.particles[iv]):
                 return False           
                              
@@ -196,7 +214,7 @@ class Branch(object):
         :parameter br: Decay object (see pyslha). Contains information about the decay.
         :returns: extended branch (Branch object). False if there was an error.
         """
-      
+        
         newBranch = self.copy()
         newparticles = []
         newintmParticles = []
@@ -209,6 +227,7 @@ class Branch(object):
             # Add R-even particles to final state
             if partID in SMpdgs:
                 newparticles.append(getObjectFromPdg(partID))
+                
             else:
                 # Add non R-even particles to intermediate state    ;masses of non R-even particles to mass vector
                 newintmParticles.append(getObjectFromPdg(partID))
@@ -237,6 +256,7 @@ class Branch(object):
         :returns: list of extended branches (Branch objects). Empty list if daughter is stable or
                   if daughterID was not defined.
         """   
+
         if len(self.intmParticles) != 1: # PIDs
             logger.error("Can not decay branch with multiple PID lists")
             return False                
@@ -247,7 +267,7 @@ class Branch(object):
         #If decay table is not defined, assume daughter is stable:
         if not self.intmParticles[0][-1].pdg in BSMpdgs: return [] #PIDs without .pdg
         # List of possible decays (brs) for R-odd daughter in branch        
-        brs = self.intmParticles[0][-1].branches  #getObjectFromPdg(self.PIDs[0][-1]).branches 
+        brs = self.intmParticles[0][-1].branches 
         if len(brs) == 0:
             # Daughter is stable, there are no new branches
             return []
@@ -295,5 +315,7 @@ def decayBranches(branchList, sigcut=0. *fb):
     #Sort list by initial branch PID:
     finalBranchList = sorted(finalBranchList, key=lambda branch:  branch.intmParticles[0][0].pdg)  
     return finalBranchList
+
+
 
 

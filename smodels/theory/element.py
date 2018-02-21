@@ -9,7 +9,8 @@
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.branch import Branch
 from smodels.theory import crossSection
-from smodels.particleClass import SMparticles, ptcDict, getObjectFromPdg
+from smodels.particleDefinitions import SMparticles
+from smodels.theory.particleNames import getObjectFromPdg, getNamesList
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -45,6 +46,7 @@ class Element(object):
             # Create element from particle string
             if type(info) == type(str()):
                 elements = elementsInStr(info)
+
                 if not elements or len(elements) > 1:
                     nel = 0
                     if elements:
@@ -54,7 +56,7 @@ class Element(object):
                     return None
                 else:
                     el = elements[0]
-                    branches = elementsInStr(el[1:-1])
+                    branches = elementsInStr(el[1:-1])                 
                     if not branches or len(branches) != 2:
                         logger.error("Malformed input string. Number of "
                                       "branches is %d (expected 2) in: ``%s''",
@@ -63,6 +65,7 @@ class Element(object):
                     self.branches = []                    
                     for branch in branches:
                         self.branches.append(Branch(branch))
+                         
             # Create element from branch pair
             elif type(info) == type([]) and type(info[0]) == type(Branch()):
                 for ib, branch in enumerate(info):
@@ -124,7 +127,7 @@ class Element(object):
     def particlesMatch(self, other, branchOrder=False):
         """
         Compare two Elements for matching particles only.
-        Allow for inclusive particle labels (such as the ones defined in particleClass.py).
+        Allow for inclusive particle labels (such as the ones defined in particleDefinitions.py).
         If branchOrder = False, check both branch orderings.
         
         :parameter other: element to be compared (Element object)
@@ -132,7 +135,7 @@ class Element(object):
                                 check the same branch ordering
         :returns: True, if particles match; False, else;        
         """
-        
+
         if type(self) != type(other):
             return False
         
@@ -225,9 +228,17 @@ class Element(object):
         """
         
         ptcarray = []
-        for branch in self.branches:
-            particleNames = [[particle.label for particle in particleList ] for particleList in branch.particles ]
-            ptcarray.append(particleNames)                
+        
+        if type(self.branches[0].particles[0][0]) == str:
+            for branch in self.branches:
+                ptcarray.append(branch.particles)
+        
+        else:
+            for branch in self.branches:
+                particleNames = [[particle.label for particle in particleList ] for particleList in branch.particles ]
+                ptcarray.append(particleNames)                
+
+    
         return ptcarray
 
 
@@ -340,8 +351,8 @@ class Element(object):
                     logger.error("Wrong syntax")
                     raise SModelSError()
                 for ptc in vertex:
-                    if not ptc in SMparticles and not ptc in ptcDict:
-                        logger.error("Unknown particle. Add " + ptc + " to smodels/particleClass.py")
+                    if not ptc in SMparticles and not ptc in getNamesList(particleLists):
+                        logger.error("Unknown particle. Add " + ptc + " to smodels/particleDefinitions.py")
                         raise SModelSError()
         return True
 

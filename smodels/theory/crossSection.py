@@ -10,7 +10,7 @@
 
 from smodels.tools.physicsUnits import TeV, pb
 from smodels.theory import lheReader
-from smodels.particleClass import BSMpdgs
+from smodels.particleDefinitions import BSMpdgs
 import pyslha
 import sys
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
@@ -574,7 +574,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
         for pid in production[2:]:
             if not pid in BSMpdgs:
                 # ignore production of R-Even Particles
-                logger.warning("Particle %i not defined in particleClass.py, cross section for %s production will be ignored" %(pid,str(production)))                 
+                logger.warning("Particle %i not defined in particleDefinitions.py, cross section for %s production will be ignored" %(pid,str(production)))                 
                 break
         process = f.xsections.get ( production )
         for pxsec in process.xsecs:

@@ -73,6 +73,7 @@ class Uncovered(object):
                         el.missingX =  outsideX # for combined printing function, call outside grid weight missingX as well
                         self.outsideGrid.addToTopos(el) # add to list of outsideGrid topos
                 continue
+
             self.missingTopos.addToTopos(el) #keep track of all missing topologies
             if self.hasLongCascade(el): self.longCascade.addToClasses(el)
             elif self.hasAsymmetricBranches(el): self.asymmetricBranches.addToClasses(el) # if no long cascade, check for asymmetric branches
@@ -339,6 +340,7 @@ class UncoveredList(object):
         in the list, add weight to topology
         :parameter el: element to be added
         """
+
         name = self.orderbranches(self.generalName(el.__str__()))
         for topo in self.topos:
             if name == topo.topo:
@@ -354,13 +356,15 @@ class UncoveredList(object):
         :parameter instr: element as string
         :returns: string of generalized element
         """
-        from smodels.theory.particleNames import ptcDic
+        from smodels.theory.particleDefinitions import particleLists
         if self.sumL: exch = ["W", "l", "t", "ta"]
         else: exch = ["W", "e", "mu", "t", "ta"]
         if self.sumJet: exch.append("jet")
         for pn in exch:
-            for on in ptcDic[pn]:
-                instr = instr.replace(on, pn).replace("hijetjets","higgs")
+            for particleList in particleLists:
+                if pn == particleList.label: particles = particleList.particles
+                for on in particles:
+                    instr = instr.replace(on.label, pn).replace("hijetjets","higgs")
         return instr
 
     def orderbranches(self, instr):
