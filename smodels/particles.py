@@ -202,5 +202,5 @@ finalStates = {
 "HSCP" : [[1,3,1],[1,-3,1],[0,3,1],[0,-3,1],[2,3,1],[2,-3,1]],
 "MET" : [[1,0,1],[0,0,1],[2,0,1]],
 "RHadronG" : [[1,0,8]],  #Gluino-like RHadron
-"RHadronQ" : [[0,2,3],[0,-1,3]]  #Squark-like RHadron
+"RHadronQ" : [[0,2,3],[0,-1,3],[0,-2,3],[0,1,3]]  #Squark-like RHadron
 }
