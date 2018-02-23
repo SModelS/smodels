@@ -379,15 +379,8 @@ class TxNameData(object):
 
     def interpolate(self, point, fill_value=np.nan):
         
-        tol = 1e-6        
-        #Deal with 1D interpolation separately:
-        if self.dimensionality == 1:
-            ret = self.tri(point)[0]
-            if ret is None:
-                return fill_value
-            else:
-                return float(ret)
-        
+        tol = 1e-6
+
         # tol = sys.float_info.epsilon * 1e10
         simplex = self.tri.find_simplex(point, tol=tol)
         if simplex==-1: ## not inside any simplex?
@@ -567,10 +560,8 @@ class TxNameData(object):
 
         if self.dimensionality > 1:
             self.tri = qhull.Delaunay(MpCut)
-        else:
-            MpCut = [pt[0] for pt in MpCut]
-            self.tri = interp1d_picklable(MpCut,self.xsec,
-                                          bounds_error=False,fill_value=None)           
+        else:            
+            self.tri = Delaunay1D(MpCut)           
         
         
     def _getMassArrayFrom(self,pt,unit=GeV):
@@ -598,17 +589,96 @@ class TxNameData(object):
         return mass
 
      
-class interp1d_picklable:
-    """ class wrapper for piecewise linear function
+class Delaunay1D:
     """
-    def __init__(self, xi, yi, **kwargs):
-        self.xi = xi
-        self.yi = yi  
-        self.args = kwargs
-        self.points = [[x] for x in xi]
-        self.f = interp1d(xi, yi, **kwargs)
-
+    Uses a 1D data array to interpolate the data.
+    The attribute simplices is list of N-1 pair of ints with the indices of the points 
+    forming the simplices (e.g. [[0,1],[1,2],[3,4],...]).    
+    """
+    
+    def __init__(self,data):
         
+        self.points = None
+        self.simplices = None
+        self.transform = None
+        if data and self.checkData(data):            
+            self.points = sorted(data)
+            #Create simplices as the point intervals (using the sorted data)
+            self.simplices = np.array([[data.index(self.points[i+1]),data.index(pt)] 
+                                       for i,pt in enumerate(self.points[:-1])])
+            transform = []
+            #Create trivial transformation to the baryocentric coordinates:
+            for simplex in self.simplices:
+                xmax,xmin = data[simplex[0]][0],data[simplex[1]][0]
+                transform.append([[1./(xmax-xmin)],[xmin]])
+            self.transform = np.array(transform)
+        else:
+            raise SModelSError()
+        
+    def find_simplex(self,x,tol=0.):
+        """
+        Find 1D data interval (simplex) to which x belongs
+        
+        :param x: Point (float) without units
+        :param tol: Tolerance. If x is outside the data range with distance < tol, extrapolate.
+        
+        :return: simplex index (int)
+        """
+        
+        xi = self.find_index(self.points,x)
+        if xi == -1:
+            if abs(x-self.points[0]) < tol:
+                return 0
+            else:
+                return -1
+        elif xi == len(self.simplices):
+            if abs(x-self.points[-1]) < tol:
+                return xi-1
+            else:
+                return -1
+        else:
+            return xi    
+    
+    def checkData(self,data):
+        """
+        Define the simplices according to data. Compute and store
+        the transformation matrix and simplices self.point.
+        """
+        if not isinstance(data,list):
+            logger.error("Input data for 1D Delaunay should be a list.")
+            return False
+        for pt in data:
+            if (not isinstance(pt,list)) or len(pt) != 1 or (not isinstance(pt[0],float)):
+                logger.error("Input data for 1D Delaunay is in wrong format. It should be [[x1],[x2],..]")
+                return False
+        return True
+    
+    
+    def find_index(self,xlist, x):
+        """
+        Efficient way to find x in a list.
+        Returns the index (i) of xlist such that xlist[i] < x <= xlist[i+1].
+        If x > max(xlist), returns the length of the list.
+        If x < min(xlist), returns 0.        vertices = np.take(self.tri.simplices, simplex, axis=0)
+        temp = np.take(self.tri.transform, simplex, axis=0)
+        d=temp.shape[2]
+        delta = uvw - temp[:, d]
+
+
+        :param xlist: List of x-type objects
+        :param x: object to be searched for.
+
+        :return: Index of the list such that xlist[i] < x <= xlist[i+1].
+        """
+
+        lo = 0    
+        hi = len(xlist)
+        while lo < hi:
+            mid = (lo+hi)//2
+            if xlist[mid] < x: lo = mid+1
+            else: hi = mid
+        return lo-1     
+
 
 if __name__ == "__main__":
     import time
