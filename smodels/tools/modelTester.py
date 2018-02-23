@@ -308,8 +308,7 @@ def loadDatabase(parser, db):
     except DatabaseNotFoundException:
         logger.error("Database not found in ``%s''" % os.path.realpath(databasePath))
         sys.exit()
-    print ("modeltester")
-    print database.expResultList[0].datasets[0].txnameList[0]._topologyList.getElements()[0].branches[0].particles[0][0]
+
     return database, databaseVersion
 
 def loadDatabaseResults(parser, database):

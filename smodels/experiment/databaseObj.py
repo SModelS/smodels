@@ -161,8 +161,6 @@ class Database(object):
                             ( self.pcl_meta.pathname, self.pcl_meta.format_version ) )
                     self.expResultList = serializer.load ( f )
 
-                    print ("database")
-                    print self.expResultList[0].datasets[0].txnameList[0]._topologyList.getElements()[0].branches[0].particles[0][0]
                     t1=time.time()-t0
                     logger.info ( "Loaded database from %s in %.1f secs." % \
                             ( self.pcl_meta.pathname, t1 ) )
