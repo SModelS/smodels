@@ -115,9 +115,6 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     for expResult in listOfExpRes:
         theorypredictions = theoryPredictionsFor(expResult, smstoplist)
         if not theorypredictions: continue
-        #print "\n \n \n"
-        #for tp in theorypredictions._theoryPredictions: print tp.xsection
-        #print "\n \n \n"
         allPredictions += theorypredictions._theoryPredictions
     
     """Compute chi-square and likelihood"""
@@ -311,6 +308,8 @@ def loadDatabase(parser, db):
     except DatabaseNotFoundException:
         logger.error("Database not found in ``%s''" % os.path.realpath(databasePath))
         sys.exit()
+    print ("modeltester")
+    print database.expResultList[0].datasets[0].txnameList[0]._topologyList.getElements()[0].branches[0].particles[0][0]
     return database, databaseVersion
 
 def loadDatabaseResults(parser, database):
@@ -354,7 +353,7 @@ def loadDatabaseResults(parser, database):
 
     ret = database.getExpResults(analysisIDs=analyses, txnames=txnames, 
                                  datasetIDs=datasetIDs, dataTypes=dataTypes,
-                                 useSuperseded=useSuperseded, useNonValidated=useNonValidated)
+                                 useSuperseded=useSuperseded, useNonValidated=useNonValidated)                             
     return ret
 
 def getParameters(parameterFile):

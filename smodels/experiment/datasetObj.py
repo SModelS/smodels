@@ -22,7 +22,6 @@ class DataSet(object):
     """
     Holds the information to a data set folder (TxName objects, dataInfo,...)
     """
-
     def __init__(self, path=None, info=None, createInfo=True, discard_zeroes=True):
         """ :param discard_zeroes: discard txnames with zero-only results """
 
@@ -49,6 +48,7 @@ class DataSet(object):
                         continue
                     self.txnameList.append(txname)
                 except TypeError: continue
+                  
 
             self.txnameList.sort()
             self.checkForRedundancy()

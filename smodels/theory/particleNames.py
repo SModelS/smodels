@@ -205,16 +205,16 @@ def simParticles(plist1, plist2, useDict=True):
     
                         
     for i,p in enumerate(plist1):
-        if hasattr(plist2[i], 'label'):
-            if not isinstance(p.label,str) or not isinstance(plist2[i].label,str) :
-                logger.error("Input must be two lists of particle or particle list objects")
-                raise SModelSError()
-            
+        #if hasattr(plist2[i], 'label'):
+        if not isinstance(p.label,str) or not isinstance(plist2[i].label,str) :
+            logger.error("Input must be two lists of particle or particle list objects")
+            raise SModelSError()
+        """    
         if type(plist2[i]) == str:            
             if not isinstance(p.label,str) or not isinstance(plist2[i],str) :
                 logger.error("Input must be two lists of str")
                 raise SModelSError()
-            
+        """    
     l1 = sorted(getNamesList(plist1))       
 
     if type(plist2[0])==str: l2 = sorted(plist2)

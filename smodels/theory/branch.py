@@ -155,15 +155,16 @@ class Branch(object):
                 if not p.label in list ( getNamesList(particleLists) ) + SMparticles :
                     logger.error("Unknown particle: %s" %p)
                     raise SModelSError()
-                    
+                """    
                 if type(other.particles[iv][i]) ==str:
                     if not other.particles[iv][i] in list ( getNamesList(particleLists) ) + SMparticles :
                         logger.error("Unknown particle: %s" %other.particles[iv][i])
                         raise SModelSError()
-                else:
-                    if not other.particles[iv][i].label in list ( getNamesList(particleLists) ) + SMparticles :
-                        logger.error("Unknown particle: %s" %other.particles[iv][i].label)
-                        raise SModelSError()                
+                """
+                #else:
+                if not other.particles[iv][i].label in list ( getNamesList(particleLists) ) + SMparticles :
+                    logger.error("Unknown particle: %s" %other.particles[iv][i].label)
+                    raise SModelSError()                
                 
             if not simParticles(vertex,other.particles[iv]):
                 return False           

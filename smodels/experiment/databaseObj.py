@@ -60,6 +60,7 @@ class Database(object):
         self.expResultList = []
         self.txt_meta = Meta ( base, discard_zeroes = discard_zeroes )
         self.progressbar = None
+                
         if progressbar:
             try:
                 import progressbar as P
@@ -75,15 +76,16 @@ class Database(object):
             return
         if self.force_load=="pcl":
             self.loadBinaryFile()
-            self.pcl_meta.printFastlimBanner()
+            self.pcl_meta.printFastlimBanner()            
             return
         if self.force_load in [ None, "none", "None" ]:
             self.loadDatabase()
-            self.txt_meta.printFastlimBanner()
+            self.txt_meta.printFastlimBanner()                                    
             return
         logger.error ( "when initialising database: force_load=%s is not " \
                        "recognized. Valid values are: pcl, txt, None." % force_load )
         sys.exit()
+
 
     def __eq__ ( self, other ):
         """ compare two databases """
@@ -104,17 +106,19 @@ class Database(object):
             if binary file is available, then check if
             it needs update, create new binary file, in
             case it does need an update.
-        """
+        """        
         if not os.path.exists ( self.pcl_meta.pathname ):
             logger.info ( "Creating binary database " )
             logger.info ( "(this may take a few minutes, but it's done only once!)" )
             self.loadTextDatabase()
-            self.createBinaryFile()
+            self.createBinaryFile()            
         else:
             if self.needsUpdate():
-                self.createBinaryFile()
+                self.createBinaryFile()                
             else:
                 self.loadBinaryFile( lastm_only = False )
+                
+                
 
     def loadTextDatabase ( self ):
         """ simply loads the textdabase """
@@ -130,32 +134,35 @@ class Database(object):
 
         :param lastm_only: if true, the database itself is not read.
         :returns: database object, or None, if lastm_only == True.
-        """
+        """        
         if lastm_only and self.pcl_meta.mtime:
             ## doesnt need to load database, and mtime is already
-            ## loaded
+            ## loaded            
             return None
 
         if not os.path.exists ( self.pcl_meta.pathname ):
             return None
 
-        try:
+        try:            
             with open ( self.pcl_meta.pathname, "rb" ) as f:
                 t0=time.time()
                 pclfilename = self.pcl_meta.pathname
                 self.pcl_meta = serializer.load ( f )
                 self.pcl_meta.pathname = pclfilename
                 if self.force_load == "pcl":
-                    self.txt_meta = self.pcl_meta
-                if not lastm_only:
+                    self.txt_meta = self.pcl_meta                    
+                if not lastm_only:                    
                     if not self.force_load == "pcl" and self.pcl_meta.needsUpdate ( self.txt_meta ):
                         logger.warning ( "Something changed in the environment."
                                          "Regenerating." )
                         self.createBinaryFile()
-                        return self
+                        return self                  
                     logger.info ( "loading binary db file %s format version %s" %
                             ( self.pcl_meta.pathname, self.pcl_meta.format_version ) )
                     self.expResultList = serializer.load ( f )
+
+                    print ("database")
+                    print self.expResultList[0].datasets[0].txnameList[0]._topologyList.getElements()[0].branches[0].particles[0][0]
                     t1=time.time()-t0
                     logger.info ( "Loaded database from %s in %.1f secs." % \
                             ( self.pcl_meta.pathname, t1 ) )
@@ -305,7 +312,7 @@ class Database(object):
 
         :returns: list of ExpResult objects
 
-        """
+        """        
         folders=[]
         for root, _, files in os.walk(self.txt_meta.pathname):
             folders.append ( (root, files) )
@@ -360,6 +367,7 @@ class Database(object):
                     if not pclmeta.needsUpdate ( txtmeta ):
                         logger.debug ( "we can use expres from pickle file %s" % pclfile )
                         expres = serializer.load ( f )
+                        #print expres
                     else:
                         logger.debug ( "we cannot use expres from pickle file %s" % pclfile )
                         logger.debug ( "txt meta %s" % txtmeta )
@@ -457,7 +465,8 @@ class Database(object):
             # Skip analysis not containing any of the required txnames:
             if not newExpResult.getTxNames():
                 continue
-            expResultList.append(newExpResult)
+            expResultList.append(newExpResult)               
+            
         return expResultList
 
     def updateBinaryFile ( self ):

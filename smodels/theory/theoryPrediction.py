@@ -16,6 +16,7 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 from smodels.tools.smodelsLogging import logger
 
+
 class TheoryPrediction(object):
     """
     An instance of this class represents the results of the theory prediction
@@ -140,14 +141,13 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2, useBestDataset=
                If False, returns predictions for all datasets.
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction objects    
     """
-
     dataSetResults = []
     #Compute predictions for each data set (for UL analyses there is one single set)
     for dataset in expResult.datasets:
         predList = _getDataSetPredictions(dataset,smsTopList,maxMassDist)
         if predList: dataSetResults.append(predList)
     if not dataSetResults: return None
-    
+  
     #For results with more than one dataset, select the best data set 
     #according to the expect upper limit
     if useBestDataset:
@@ -158,7 +158,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2, useBestDataset=
         return bestResults
     else:        
         allResults = sum(dataSetResults)
-        for theoPred in allResults: theoPred.expResult = expResult
+        for theoPred in allResults: theoPred.expResult = expResult       
         return allResults
 
 def _getBestResults(dataSetResults):
@@ -210,11 +210,10 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
     :parameter maxMassDist: maximum mass distance for clustering elements (float)
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction objects
     """
-    
     predictionList = TheoryPredictionList()
     # Select elements belonging to expResult and apply efficiencies
     elements = _getElementsFrom(smsTopList, dataset)
-    
+
     #Check dataset sqrts format:
     if (dataset.globalInfo.sqrts/TeV).normalize()._unit:
             ID = dataset.globalInfo.id
@@ -229,11 +228,12 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
         newelements.append(el)
     elements = newelements
     if len(elements) == 0: return None
-
+    
     # Combine elements according to their respective constraints and masses
     # (For efficiencyMap analysis group all elements)
     clusters = _combineElements(elements, dataset, maxDist=maxMassDist)
-    
+
+
     # Collect results and evaluate conditions    
     for cluster in clusters:
         theoryPrediction = TheoryPrediction()
@@ -267,9 +267,12 @@ def _getElementsFrom(smsTopList, dataset):
     elements = []
     for txname in dataset.txnameList:
         for top in smsTopList:
-            itop = txname._topologyList.index(top)  #Check if the topology appear in txname
+            itop = txname._topologyList.index(top)  #Check if the topology appears in txname
             if itop is None: continue   
             for el in top.getElements():
+                #print "theoryPredicition _getElementsFrom"
+                #print el.branches[0].particles[0][0]
+                #print txname._topologyList.getElements()[0].branches[0].particles[0][0]
                 newEl = txname.hasElementAs(el)  #Check if element appears in txname
                 if not newEl: continue
                 el.covered = True
@@ -280,7 +283,6 @@ def _getElementsFrom(smsTopList, dataset):
                 newEl.weight *= eff
                 newEl.txname = txname
                 elements.append(newEl) #Save element with correct branch ordering
-
     return elements
 
 
@@ -339,6 +341,7 @@ def _evalConstraint(cluster):
         if not txname.constraint or txname.constraint == "not yet assigned":
             return txname.constraint
         exprvalue = _evalExpression(txname.constraint,cluster)
+
         return exprvalue
     else:
         logger.error("Unknown data type %s" %(str(cluster.getDataType())))
@@ -367,6 +370,7 @@ def _evalConditions(cluster):
             raise SModelSError()
             
         # Loop over conditions
+        
         for cond in conditions:
             exprvalue = _evalExpression(cond,cluster)
             if type(exprvalue) == type(crossSection.XSection()):
@@ -394,31 +398,38 @@ def _evalExpression(stringExpr,cluster):
     :returns: xsection for the expression. Can be a XSection object, a float or not numerical (None,string,...)
     
     """
-
 #Get cross section info from cluster (to generate zero cross section values):
     infoList = cluster.elements[0].weight.getInfo()    
+
 #Generate elements appearing in the string expression with zero cross sections:
+ 
     elements = []
+
     for elStr in elementsInStr(stringExpr):
         el = element.Element(elStr)
-        el.weight = crossSection.XSectionList(infoList)
-        elements.append(el)
+        el.weight = crossSection.XSectionList(infoList)       
+        elements.append(el) 
+
 
 #Replace elements in strings by their weights and add weights from cluster to the elements list:
     expr = stringExpr[:].replace("'","").replace(" ","")
-    for iel, el in enumerate(elements):        
-        expr = expr.replace(str(el), "elements["+ str(iel) +"].weight")        
+    for iel, el in enumerate(elements): 
+    
+        expr = expr.replace(str(el), "elements["+ str(iel) +"].weight")    
         for el1 in cluster.elements:
             if el1.particlesMatch(el):
                 el.weight.combineWith(el1.weight)
                 el.combineMotherElements(el1) ## keep track of all mothers
-
+                
     if expr.find("Cgtr") >= 0 or expr.find("Csim") >= 0:
         expr = expr.replace("Cgtr", "cGtr")
         expr = expr.replace("Csim", "cSim")
+    
     exprvalue = eval(expr)
+
     if type(exprvalue) == type(crossSection.XSectionList()):
         if len(exprvalue) != 1:
             logger.error("Evaluation of expression "+expr+" returned multiple values.")
         return exprvalue[0] #Return XSection object
+    
     return exprvalue

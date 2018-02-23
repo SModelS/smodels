@@ -327,7 +327,7 @@ class TxTPrinter(BasicPrinter):
         """
         Format data for a Element object.
 
-        :param obj: A Element object to be printed.
+        :param obj: An Element object to be printed.
         """
 
         output = ""
@@ -357,6 +357,7 @@ class TxTPrinter(BasicPrinter):
         if not hasattr(self,"printdatabase") or not self.printdatabase:
             return None
 
+        
         output = ""
         
         output += "   ======================================================= \n"
@@ -364,11 +365,9 @@ class TxTPrinter(BasicPrinter):
         output += " || \t \t Selected Experimental Results \t \t ||\n"
         output += " || \t \t\t\t\t\t\t || \n"
         output += "   ======================================================= \n"
-        
 
         for expRes in obj.expResultList:
             output += self._formatExpResult(expRes)
-
         return output+"\n"
 
 
@@ -378,9 +377,9 @@ class TxTPrinter(BasicPrinter):
 
         :param obj: A ExpResult object to be printed.
         """
-
+        
         txnames = []
-        for dataset in obj.datasets:
+        for dataset in obj.datasets:            
             for txname in dataset.txnameList:
                 tx = txname.txName
                 if not tx in txnames: txnames.append(tx)
@@ -522,7 +521,7 @@ class TxTPrinter(BasicPrinter):
                     output += "Contributing elements %s\n" % str(contributing)
             if ix==0:
                 output += "================================================================================\n"
-        
+
         return output
                       
 
@@ -1113,3 +1112,5 @@ class SLHAPrinter(TxTPrinter):
                 cter += 1
                 if cter > 9: break
         return output
+
+

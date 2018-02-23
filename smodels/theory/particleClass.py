@@ -41,6 +41,7 @@ class Particles(object):
         self.spin = spin
         self.width = width
         self.branches = branches
+        
 
 
     def __eq__(self, other): 

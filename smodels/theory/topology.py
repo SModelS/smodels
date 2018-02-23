@@ -142,6 +142,7 @@ class Topology(object):
 
         # If the topology info has not been set yet, set it using the element
         # info
+
         if not self.vertparts:
             self.vertparts = newelement.getEinfo()["vertparts"]
         if not self.vertnumb:
@@ -336,7 +337,7 @@ class TopologyList(object):
         """
         elements = []
         for top in self.topos:
-            elements.extend(top.elementList)
+            elements.extend(top.elementList) 
         return elements
     
     def compressElements(self,doCompress,doInvisible,minmassgap):        
@@ -368,3 +369,5 @@ class TopologyList(object):
         for element in self.getElements():
             element.elID = elID
             elID += 1
+
+

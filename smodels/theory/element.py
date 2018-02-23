@@ -228,15 +228,15 @@ class Element(object):
         """
         
         ptcarray = []
-        
+        """
         if type(self.branches[0].particles[0][0]) == str:
             for branch in self.branches:
                 ptcarray.append(branch.particles)
-        
-        else:
-            for branch in self.branches:
-                particleNames = [[particle.label for particle in particleList ] for particleList in branch.particles ]
-                ptcarray.append(particleNames)                
+        """
+        #else:
+        for branch in self.branches:
+            particleNames = [[particle.label for particle in particleList ] for particleList in branch.particles ]
+            ptcarray.append(particleNames)                
 
     
         return ptcarray

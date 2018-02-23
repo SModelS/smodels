@@ -103,6 +103,7 @@ class TxName(object):
             el.sortBranches()
             self._topologyList.addElement(el)
 
+
     def hasOnlyZeroes ( self ):
         ozs = self.txnameData.onlyZeroValues()
         if self.txnameDataExp:
@@ -184,6 +185,8 @@ class TxName(object):
         """
 
         for el in self._topologyList.getElements():
+            #print "txnameObj hasElementAs"
+            #print el.branches[0].particles[0][0]
             if element.particlesMatch(el,branchOrder=True):
                 return element.copy()
             else:
