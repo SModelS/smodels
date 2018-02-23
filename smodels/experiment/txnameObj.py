@@ -22,6 +22,7 @@ from smodels.tools.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.caching import _memoize
 from scipy.linalg import svd
+from scipy.interpolate import interp1d
 import scipy.spatial.qhull as qhull
 import numpy as np
 import unum
@@ -353,8 +354,8 @@ class TxNameData(object):
             return None
         p= ( (np.matrix(porig)[0] - self.delta_x ) ).tolist()[0]
         P=np.dot(p,self._V)  ## rotate
-        dp=self.countNonZeros(P)
-        self.projected_value = self.interpolate([ P[:self.dimensionality] ])
+        dp = self.countNonZeros(P)
+        self.projected_value = self.interpolate(P[:self.dimensionality])
         if dp > self.dimensionality: ## we have data in different dimensions
             if self._accept_errors_upto == None:
                 return None
@@ -376,24 +377,38 @@ class TxNameData(object):
                     ret.append ( j )
         return ret
 
-    def interpolate(self, uvw, fill_value=np.nan):
-        tol = 1e-6
+    def interpolate(self, point, fill_value=np.nan):
+        
+        tol = 1e-6        
+        #Deal with 1D interpolation separately:
+        if self.dimensionality == 1:
+            ret = self.tri(point)[0]
+            if ret is None:
+                return fill_value
+            else:
+                return float(ret)
+        
         # tol = sys.float_info.epsilon * 1e10
-        simplex = self.tri.find_simplex(uvw, tol=tol)
-        if simplex[0]==-1: ## not inside any simplex?
+        simplex = self.tri.find_simplex(point, tol=tol)
+        if simplex==-1: ## not inside any simplex?
             return fill_value
+        
+        #Transformation matrix for the simplex:
+        simplexTrans = np.take(self.tri.transform, simplex, axis=0)
+        #Space dimension:
+        d = simplexTrans.shape[-1]
+        #Rotation and translation to baryocentric coordinates:
+        delta_x = simplexTrans[d,:]
+        rot = simplexTrans[:d,:]
+        bary = np.dot(rot,point-delta_x) #Point coordinates in the baryocentric system
+        #Weights for the vertices:
+        wts = np.append(bary, 1. - bary.sum())        
+        #Vertex indices:        
         vertices = np.take(self.tri.simplices, simplex, axis=0)
-        temp = np.take(self.tri.transform, simplex, axis=0)
-        d=temp.shape[2]
-        delta = uvw - temp[:, d]
-        bary = np.einsum('njk,nk->nj', temp[:, :d, :], delta)
-        wts = np.hstack((bary, 1 - bary.sum(axis=1, keepdims=True)))
-        if type (self.xsec[0]) in [ float, int, np.int64, np.float64 ]:
-            values = np.array ( [ float(x) for x in self.xsec ] )
-        else:
-            values = np.array ( [ x.asNumber() for x in self.xsec ] )
-        ret = np.einsum('nj,nj->n', np.take(values, vertices), wts)[0]
-        minXsec = min(np.take(values, vertices)[0])
+        #Compute the value:
+        values = np.array(self.xsecUnitless)
+        ret = np.dot(np.take(values, vertices),wts)
+        minXsec = min(np.take(values, vertices))
         if ret < minXsec:
             logger.debug('Interpolation below simplex values. Will take the smallest simplex value.')
             ret = minXsec
@@ -428,7 +443,7 @@ class TxNameData(object):
         for i in range ( self.dimensionality ):
             P2=copy.deepcopy(P)
             P2[i]+=alpha
-            pv = self.interpolate ( [ P2[:self.dimensionality] ] )
+            pv = self.interpolate( P2[:self.dimensionality] )
             g=float ( ( pv - self.projected_value ) / alpha )
             if math.isnan ( g ):
                 ## if we cannot compute a gradient, we return nan
@@ -447,8 +462,8 @@ class TxNameData(object):
         for grad in gradient:
             P3[i]+= grad
             P4[i]-= grad
-        agp=self.interpolate ( [ P3[:self.dimensionality] ] )
-        agm=self.interpolate ( [ P4[:self.dimensionality] ] )
+        agp=self.interpolate( P3[:self.dimensionality] )
+        agm=self.interpolate( P4[:self.dimensionality] )
         dep,dem=0.,0.
         if self.projected_value == 0.:
             if agp!=0.:
@@ -515,23 +530,22 @@ class TxNameData(object):
         self.massdim = np.array(values[0][0]).shape
 
         for ctr,(x,y) in enumerate(values):
-            # self.xsec.append ( y / self.unit )
-            # self.xsec.append ( y )
             self.xsec[ctr]=y
-            xp = self.flattenMassArray ( x )
-            Morig.append ( xp )
+            xp = self.flattenMassArray(x)
+            Morig.append( xp )
+        self.xsecUnitless = [x.asNumber() if isinstance(x,unum.Unum) else float(x) 
+                             for x in self.xsec]
         aM=np.matrix ( Morig )
         MT=aM.T.tolist()
         self.delta_x = np.matrix ( [ sum (x)/len(Morig) for x in MT ] )[0]
         M = []
 
         for Mx in Morig:
-            m=( np.matrix ( Mx ) - self.delta_x ).tolist()[0]
-            M.append ( m )
-            # M.append ( [ self.round_to_n ( x, 7 ) for x in m ] )
+            m=(np.matrix(Mx) - self.delta_x).tolist()[0]
+            M.append(m)
 
         ## we dont need thousands of points for SVD
-        n = int ( math.ceil ( len(M) / 2000. ) )
+        n = int (math.ceil ( len(M) / 2000. ) )
         Vt=svd(M[::n])[2]
         V=Vt.T
         self._V= V ## self.round ( V )
@@ -544,31 +558,19 @@ class TxNameData(object):
         for m in M:
             mp=np.dot(m,V)
             Mp.append ( mp )
-            nz=self.countNonZeros ( mp )
+            nz=self.countNonZeros(mp)
             if nz>self.dimensionality:
                 self.dimensionality=nz
         MpCut=[]
         for i in Mp:
-            if self.dimensionality > 1:
-                MpCut.append(i[:self.dimensionality].tolist() )
-            else:
-                MpCut.append([i[0].tolist(),0.])
-        if self.dimensionality == 1:
-            logger.debug("1-D data found. Extending to a small 2-D band around the line.")
-            MpCut += [[pt[0],pt[1]+0.0001] for pt in MpCut] + [[pt[0],pt[1]-0.0001] for pt in MpCut]
-            self._1dim = True
-            lx=len(self.xsec)
-            newxsec = np.ndarray ( shape=(3*lx,) )
-            for i in range(3):
-                newxsec[ i*lx : (i+1)*lx ] = self.xsec
-            self.xsec = newxsec
-            #self.xsec += self.xsec + self.xsec
-            self.dimensionality = 2
+            MpCut.append(i[:self.dimensionality].tolist() )
+
+        if self.dimensionality > 1:
+            self.tri = qhull.Delaunay(MpCut)
         else:
-            self._1dim = False
-             
-        # self.Mp=MpCut ## also keep the rotated points, with truncated zeros
-        self.tri = qhull.Delaunay( MpCut )
+            MpCut = [pt[0] for pt in MpCut]
+            self.tri = interp1d_picklable(MpCut,self.xsec,
+                                          bounds_error=False,fill_value=None)           
         
         
     def _getMassArrayFrom(self,pt,unit=GeV):
@@ -592,8 +594,19 @@ class TxNameData(object):
         mass = mass.reshape(self.massdim).tolist()
         if isinstance(unit,unum.Unum):
             mass = [[m*unit for m in br] for br in mass]
-            
+
         return mass
+
+     
+class interp1d_picklable:
+    """ class wrapper for piecewise linear function
+    """
+    def __init__(self, xi, yi, **kwargs):
+        self.xi = xi
+        self.yi = yi  
+        self.args = kwargs
+        self.points = [[x] for x in xi]
+        self.f = interp1d(xi, yi, **kwargs)
 
         
 
