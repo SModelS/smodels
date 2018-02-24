@@ -15,7 +15,6 @@ sys.path.insert(0,"../")
 import unittest
 import numpy
 from smodels.experiment.txnameObj import TxNameData
-from smodels.experiment import txnameObj
 from smodels.tools.physicsUnits import GeV, eV, fb, MeV, pb, keV
 import unum
 
@@ -36,7 +35,7 @@ class ExtrapolationTest(unittest.TestCase):
              [ [[ 200.*GeV,100.*GeV], [ 200.*GeV,100.*GeV] ],  5.*fb ],
              [ [[ 300.*GeV,200.*GeV], [ 300.*GeV,200.*GeV] ], 15.*fb ],
              [ [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ], 17.*fb ] ]
-        self.txnameData = TxNameData ( data, "upperLimits",
+        self.txnameData = TxNameData( data, "upperLimits",
                 sys._getframe().f_code.co_name, .05 )
 
     def tryWith ( self, masses ):
@@ -44,13 +43,15 @@ class ExtrapolationTest(unittest.TestCase):
 
     def testWithDirectData(self):
         result=self.tryWith ([[ 275.*GeV,175.*GeV], [ 275.*GeV,175.*GeV] ])
+
         self.assertAlmostEquals( result.asNumber(pb),0.0125 )
         eps = 1 * keV
         result=self.tryWith([[ 275.*GeV,175.*GeV + eps],
                              [ 275.*GeV + eps ,175.*GeV] ])
+        
         self.assertAlmostEquals( result.asNumber(pb),0.0125 )
 
-        result=self.tryWith([[ 275.*GeV,174.*GeV], [ 275.*GeV,176.*GeV] ])
+        result=self.tryWith([[ 275.*GeV,185.*GeV], [ 275.*GeV,165.*GeV] ])
         self.assertTrue ( result == None )
 
     def show ( self ):

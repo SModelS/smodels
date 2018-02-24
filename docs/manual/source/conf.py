@@ -145,7 +145,7 @@ html_static_path = ['_static']
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
 # directly to the root of the documentation.
-#html_extra_path = []
+html_extra_path = ['recipes']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -266,3 +266,6 @@ texinfo_documents = [
 #texinfo_no_detailmenu = False
 
 nitpicky = True
+
+#Run make whenever sphinx is built:
+os.system("cd .. && make copy_files recipes RstFilesFromHelp")

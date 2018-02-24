@@ -50,6 +50,7 @@ class Pythia6Wrapper(WrapperBase):
         self.executablePath = self.absPath(executablePath)
         self.executable = None
         self.srcPath = self.absPath(srcPath)
+        self.compiler = "gfortran"
         self.tempdir = None
         self.cfgfile = self.checkFileExists(configFile)
         self.keepTempDir = False
@@ -154,12 +155,6 @@ class Pythia6Wrapper(WrapperBase):
         f.write("%s=%s\n" % (param, str(value)))
         f.close()
 
-    def complain ( self ):
-        import sys
-        logger.error("please fix manually, e.g. try 'make' in smodels/lib, " \
-               " or file a complaint at smodels-users@lists.oeaw.ac.at" )
-        sys.exit(0)
-
     def run( self, slhafile, lhefile=None, unlink=True ):
         """
         Execute pythia_lhe with n events, at sqrt(s)=sqrts.
@@ -252,23 +247,13 @@ class Pythia6Wrapper(WrapperBase):
 
         """
         if do_check:
-            ci=self.checkInstallation()
-            if not ci:
-                if not do_compile:
-                    logger.error("couldnt find pythia6 binary." )
-                    self.complain()
-                logger.warning("couldnt find pythia6 binary. I have been asked to try to compile it, though. Lets see.")
-                # self.compile()
-                self.complain()
+            self.checkInstallation( do_compile )
         slha = self.checkFileExists(slhaFile)
         cfg = self.absPath(cfgfile)
         ck_cfg = self.checkFileExists(cfg)
         logger.debug("running with " + str(cfg))
         import shutil
         shutil.copy(slha, self.tempDirectory() + "/fort.61")
-        if not os.path.exists ( self.executablePath ):
-            logger.warn ( "Pythia6 executable does not exist. Will build it now." )
-            self.compile()
         cmd = "cd %s ; %s < %s" % \
              (self.tempDirectory(), self.executablePath, cfg)
         logger.debug("Now running " + str(cmd))
@@ -281,101 +266,6 @@ class Pythia6Wrapper(WrapperBase):
             f.write (out + "\n")
             f.close()
         return out
-
-    def chmod(self):
-        """
-        chmod 755 on pythia executable, if it exists.
-        Do nothing, if it doesnt exist.
-        """
-        if not os.path.exists ( self.executablePath ):
-            logger.error("%s doesnt exist" % self.executablePath )
-            return False
-        import stat
-        mode = stat.S_IRWXU | stat.S_IRWXG | stat.S_IXOTH | stat.S_IROTH
-        os.chmod ( self.executablePath, mode )
-        return True
-
-
-    def compile(self):
-        """
-        Compile pythia_lhe.
-
-        """
-        logger.info("Trying to compile Pythia6 in %s" % self.srcPath )
-        cmd = "cd %s; make" % self.srcPath
-        outputMessage = executor.getoutput(cmd)
-        #outputMessage = subprocess.check_output ( cmd, shell=True,
-        #                                          universal_newlines=True )
-        logger.info(outputMessage)
-        if not os.path.exists ( self.executablePath ):
-            logger.error ( "Compilation of Pythia8 failed." )
-            sys.exit()
-
-
-
-    def fetch(self):
-        """
-        Fetch and unpack tarball.
-
-        """
-        tempFile = "/tmp/pythia.tar.gz"
-        fileHandle = open(tempFile, "w")
-        logger.debug("Fetching tarball...")
-        url = "http://smodels.hephy.at/externaltools/pythia/pythia.tar.gz"
-        link = urllib.urlopen(url)
-        lines = link.readlines()
-        for line in lines:
-            fileHandle.write(line)
-        link.close()
-        fileHandle.close()
-        logger.debug("... done.")
-        logger.debug("Untarring...")
-        tar = tarfile.open(tempFile)
-        for item in tar:
-            tar.extract(item, self.srcPath)
-        logger.debug("... done.")
-
-
-    def checkInstallation( self ):
-        """
-        Check if installation of tool is correct by looking for executable and
-        running it.
-
-        :returns: True, if everything is ok
-
-        """
-        if not os.path.exists(self.executablePath):
-            logger.warning("Pythia6 executable not found. Building now. " )
-            self.compile()
-        if not os.access(self.executablePath, os.X_OK):
-            logger.warning("%s is not executable. Trying to chmod.", self.executable)
-            self.chmod()
-            return False
-        return True
-        """
-        slhaFile = "/inputFiles/slha/gluino_squarks.slha"
-        slhaPath = installation.installDirectory() + slhaFile
-        try:
-            output = self.run(slhaPath, "<install>/smodels/share/pythia_test.card" )
-            output = output.split("\n")
-            if output[-1].find("The following floating-point") > -1:
-                output.pop()
-
-            output.pop()
-            val = (" ********* Fraction of events that fail fragmentation "
-                   "cuts =  0.00000 *********")
-            lines = {-1 : val}
-            for (nr, line) in lines.items():
-                if output[nr].find(line) == -1:
-                    logger.error("Expected >>>%s<<< found >>>%s<<<", line,
-                                 output[nr])
-                    return False
-        except Exception as e:
-            logger.error("Something is wrong with the setup: exception %s" % e)
-            return False
-        return True
-            """
-
 
 if __name__ == "__main__":
     #from smodelsLogging import setLogLevel

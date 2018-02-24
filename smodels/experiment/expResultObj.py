@@ -8,13 +8,19 @@
 """
 
 import os
+import sys
 from smodels.experiment import infoObj
 from smodels.experiment import txnameObj
 from smodels.experiment import datasetObj
-from smodels.experiment.exceptions import DatabaseNotFoundException
+from smodels.experiment import metaObj
+from smodels.experiment.exceptions import DatabaseNotFoundException, SModelSExperimentError
 from smodels.tools.physicsUnits import fb
-
 from smodels.tools.smodelsLogging import logger
+
+try:
+    import cPickle as serializer
+except ImportError as e:
+    import pickle as serializer
 
 class ExpResult(object):
     """
@@ -27,32 +33,47 @@ class ExpResult(object):
                     in <path>    
     """
         
-    def __init__(self, path=None, discard_zeroes = True ):
+    def __init__( self, path = None, discard_zeroes = True,
+                  pcl_file = False ):
         """
         :param path: Path to the experimental result folder
         :param discard_zeroes: Discard maps with only zeroes
+        :param pcl_file: Write and maintain pickle file
         """ 
+        if not path: return
+        if not os.path.isdir ( path ):
+            raise SModelSExperimentError ( "%s is not a path" % path )
 
-        if path and os.path.isdir(path):
-            self.path = path
-            if not os.path.isfile(os.path.join(path, "globalInfo.txt")):
-                logger.error("globalInfo.txt file not found in " + path)
-                raise TypeError
-            self.globalInfo = infoObj.Info(os.path.join(path, "globalInfo.txt"))
-            self.datasets = []
-            folders=[]
-            for root, _, files in os.walk(path):
-                folders.append ( (root, files) )
-            folders.sort()
-            for root, files in folders:
-                if 'dataInfo.txt' in files:  # data folder found
-                    # Build data set
-                    try:
-                        dataset = datasetObj.DataSet(root, self.globalInfo,
-                                discard_zeroes = discard_zeroes )
-                        self.datasets.append(dataset)
-                    except TypeError:
-                        continue
+        self.discard_zeroes = discard_zeroes
+        self.path = path
+        if not os.path.isfile(os.path.join(path, "globalInfo.txt")):
+            logger.error("globalInfo.txt file not found in " + path)
+            raise TypeError
+        self.globalInfo = infoObj.Info(os.path.join(path, "globalInfo.txt"))
+        self.datasets = []
+        folders=[]
+        for root, _, files in os.walk(path):
+            folders.append ( (root, files) )
+        folders.sort()
+        for root, files in folders:
+            if 'dataInfo.txt' in files:  # data folder found
+                # Build data set
+                try:
+                    dataset = datasetObj.DataSet(root, self.globalInfo,
+                            discard_zeroes = discard_zeroes )
+                    self.datasets.append(dataset)
+                except TypeError:
+                    continue
+
+    def writePickle ( self, dbVersion ):
+        """ write the pickle file """
+        meta = metaObj.Meta ( self.path, self.discard_zeroes, databaseVersion=dbVersion )
+        pclfile = "%s/.%s" % ( self.path, meta.getPickleFileName() )
+        logger.debug ( "writing expRes pickle file %s, mtime=%s" % (pclfile, meta.cTime() ) )
+        f=open ( pclfile, "wb" )
+        serializer.dump ( meta, f )
+        serializer.dump ( self, f )
+        f.close()
 
     def __eq__(self, other ):
         if self.globalInfo != other.globalInfo:
@@ -63,12 +84,6 @@ class ExpResult(object):
             if myds != otherds:
                 return False
         return True
-
-    def __lt__ ( self, other ):
-        """ experimental results are sorted alphabetically according
-            to their description strings """
-        return str(self) < str(other)
-
 
     def __ne__(self, other ):
         return not self.__eq__ ( other )
@@ -295,3 +310,11 @@ class ExpResult(object):
             txnameList = txnameList[0]
 
         return txnameList
+
+
+    def __lt__ ( self, other ):
+        """ experimental results are sorted alphabetically according
+        to their description strings """
+        return str(self) < str(other)
+
+

@@ -30,7 +30,7 @@ def filetype ( filename ):
                 return "lhe"
             if "<event>" in line:
                 return "lhe"
-            if "BLOCK " in line:
+            if "block " in line.lower():
                 return "slha"
     return None
 
