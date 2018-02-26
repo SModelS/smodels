@@ -1,7 +1,7 @@
 """
 .. module:: infoObj
    :synopsis: Holds the classes and methods used to read and store the information in the
-              globalInfo.txt or dataglobalInfo.txt files.
+              globalInfo.txt or dataInfo.txt files.
 
 .. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -71,7 +71,12 @@ class Info(object):
         :param tag: information label (string)
         :param value: value for the field in string format 
         """
-                  
+        if tag in [ "lastUpdate" ]:
+            # dont eval these fields, take them strings
+            # needed for lastUpdate, because of the slashes, they would be 
+            # interpreted as divisions.
+            setattr(self,tag,value)
+            return
         try:
             setattr(self,tag,eval(value, {'fb':fb, 'pb':pb, 'GeV':GeV, 'TeV':TeV}))
         except SyntaxError:          
