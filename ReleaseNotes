@@ -2,7 +2,8 @@ Release v1.1.2, Mon 26 Feb 2018
 =======================================================
 
   * Fixed lastUpdate bug
-  * Pickling of database changed
+  * Changes in pickling (e.g. subpickling)
+	* Database path allows URLs
 
 
 Release v1.1.1, Tue 27 Jun 2017
