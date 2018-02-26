@@ -381,10 +381,10 @@ def _evalConditions(cluster):
         # Loop over conditions
         for cond in conditions:
             exprvalue = _evalExpression(cond,cluster)
-            if type(exprvalue) == type(crossSection.XSection()):
+            if isinstance(exprvalue,crossSection.XSection):
                 conditionVals[cond] = exprvalue.value
             else:
-                conditions[cond] = exprvalue
+                conditionVals[cond] = exprvalue
     
     if not conditionVals:
         return None
@@ -406,34 +406,28 @@ def _evalExpression(stringExpr,cluster):
     :returns: xsection for the expression. Can be a XSection object, a float or not numerical (None,string,...)
     
     """
-
+    
 #Get cross section info from cluster (to generate zero cross section values):
     infoList = cluster.elements[0].weight.getInfo()
 #Get final state info
     finalStates = cluster.elements[0].getFinalStates()      
-#Generate elements appearing in the string expression with zero cross sections:
-    elements = []
-    for elStr in elementsInStr(stringExpr):
+#Get weights for elements appearing in stringExpr
+    weightsDict = {}
+    evalExpr = stringExpr.replace("'","").replace(" ","")
+    for i,elStr in enumerate(elementsInStr(evalExpr)):
         el = element.Element(elStr)
-        el.weight = crossSection.XSectionList(infoList)
         el.setFinalState(finalStates)
-        elements.append(el)
-
-#Replace elements in strings by their weights and add weights from cluster to the elements list:
-    expr = stringExpr[:].replace("'","").replace(" ","")
-    for iel, el in enumerate(elements):        
-        expr = expr.replace(str(el), "elements["+ str(iel) +"].weight")        
+        weightsDict['w%i'%i] = crossSection.XSectionList(infoList)
         for el1 in cluster.elements:
             if el1.particlesMatch(el):
-                el.weight.combineWith(el1.weight)
-                el.combineMotherElements(el1) ## keep track of all mothers
+                weightsDict['w%i'%i].combineWith(el1.weight)
+                el.combineMotherElements(el1)
+        evalExpr = evalExpr.replace(elStr,'w%i'%i)
 
-    if expr.find("Cgtr") >= 0 or expr.find("Csim") >= 0:
-        expr = expr.replace("Cgtr", "cGtr")
-        expr = expr.replace("Csim", "cSim")
-    exprvalue = eval(expr)
+    weightsDict.update({"Cgtr" : cGtr, "cGtr" : cGtr, "cSim" : cSim, "Csim" : cSim})
+    exprvalue = eval(evalExpr, weightsDict)
     if type(exprvalue) == type(crossSection.XSectionList()):
         if len(exprvalue) != 1:
-            logger.error("Evaluation of expression "+expr+" returned multiple values.")
+            logger.error("Evaluation of expression "+evalExpr+" returned multiple values.")
         return exprvalue[0] #Return XSection object
     return exprvalue

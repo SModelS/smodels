@@ -92,12 +92,12 @@ class TxName(object):
             finalState = ["MET","MET"]        
         elements = []
         if hasattr(self,'constraint'):
-            elements += [Element(el,finalState) for el in elementsInStr(str(self.constraint))]
+            elements += [Element(el,finalState) for el in elementsInStr(self.constraint)]
         if hasattr(self,'condition') and self.condition:
             conds = self.condition
             if not isinstance(conds,list): conds = [conds]
             for cond in conds:
-                for el in elementsInStr(str(cond)):
+                for el in elementsInStr(cond):
                     newEl = Element(el,finalState)
                     if not newEl in elements: elements.append(newEl)
 
@@ -155,16 +155,18 @@ class TxName(object):
         if tag == 'constraint' or tag == 'condition':
             if isinstance(value,list):
                 value = [val.replace("'","") for val in value]
-            else: value = value.replace("'","")
-
-        try:
-            setattr(self,tag,eval(value, {'fb' : fb, 'pb' : pb, 'GeV' : GeV, 'TeV' : TeV}))
-        except SyntaxError:
-            setattr(self,tag,value)
-        except NameError:
-            setattr(self,tag,value)
-        except TypeError:
-            setattr(self,tag,value)
+            else:
+                value = value.replace("'","")
+            setattr(self,tag,value) #Make sure constraints/conditions are not evaluated
+        else:
+            try:
+                setattr(self,tag,eval(value, {'fb' : fb, 'pb' : pb, 'GeV' : GeV, 'TeV' : TeV}))
+            except SyntaxError:
+                setattr(self,tag,value)
+            except NameError:
+                setattr(self,tag,value)
+            except TypeError:
+                setattr(self,tag,value)
 
     def getInfo(self, infoLabel):
         """
