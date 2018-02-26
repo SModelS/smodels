@@ -22,7 +22,6 @@ from smodels.tools.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.caching import _memoize
 from scipy.linalg import svd
-from scipy.interpolate import interp1d
 import scipy.spatial.qhull as qhull
 import numpy as np
 import unum
@@ -622,7 +621,7 @@ class Delaunay1D:
         """
         Find 1D data interval (simplex) to which x belongs
         
-        :param x: Point (float) without units
+        :param x: 1D array without units (e.g. [10.])
         :param tol: Tolerance. If x is outside the data range with distance < tol, extrapolate.
         
         :return: simplex index (int)
@@ -630,12 +629,12 @@ class Delaunay1D:
         
         xi = self.find_index(self.points,x)
         if xi == -1:
-            if abs(x-self.points[0]) < tol:
+            if abs(x[0]-self.points[0][0]) < tol:
                 return 0
             else:
                 return -1
         elif xi == len(self.simplices):
-            if abs(x-self.points[-1]) < tol:
+            if abs(x[0]-self.points[-1][0]) < tol:
                 return xi-1
             else:
                 return -1

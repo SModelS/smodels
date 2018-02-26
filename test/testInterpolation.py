@@ -11,9 +11,8 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-import math
 from smodels.experiment.txnameObj import TxNameData
-from smodels.tools.physicsUnits import GeV, TeV, pb, fb
+from smodels.tools.physicsUnits import GeV, pb, fb
 from databaseLoader import database
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
