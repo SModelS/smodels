@@ -1,7 +1,8 @@
-Release v1.x, ??
+Release v1.1.2, Mon 26 Feb 2018
 =======================================================
 
-  * added option in python printer to print the contribution from each txname
+  * Fixed lastUpdate bug
+  * Pickling of database changed
 
 
 Release v1.1.1, Tue 27 Jun 2017
