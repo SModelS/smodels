@@ -399,7 +399,7 @@ class TxNameData(object):
         #Vertex indices:        
         vertices = np.take(self.tri.simplices, simplex, axis=0)
         #Compute the value:
-        values = np.array(self.xsecUnitless)
+        values = np.array(self.xsec)
         ret = np.dot(np.take(values, vertices),wts)
         minXsec = min(np.take(values, vertices))
         if ret < minXsec:
@@ -523,11 +523,14 @@ class TxNameData(object):
         self.massdim = np.array(values[0][0]).shape
 
         for ctr,(x,y) in enumerate(values):
-            self.xsec[ctr]=y
+            y_unitless = y
+            if isinstance(y,unum.Unum):
+                y_unitless = y.asNumber()
+            self.xsec[ctr]=y_unitless
             xp = self.flattenMassArray(x)
             Morig.append( xp )
-        self.xsecUnitless = [x.asNumber() if isinstance(x,unum.Unum) else float(x) 
-                             for x in self.xsec]
+        #self.xsecUnitless = [x.asNumber() if isinstance(x,unum.Unum) else float(x) 
+        #                     for x in self.xsec]
         aM=np.matrix ( Morig )
         MT=aM.T.tolist()
         self.delta_x = np.matrix ( [ sum (x)/len(Morig) for x in MT ] )[0]
