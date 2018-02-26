@@ -23,6 +23,8 @@ from xml.etree import ElementTree
 from databaseLoader import database
 import unum
 
+tol = 0.07
+
 def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None ):
     """
     Compare two objects.
@@ -181,8 +183,8 @@ class RunPrinterTest(unittest.TestCase):
         outputfile = os.path.join( idir(), "test/unitTestOutput/printer_output.smodels")
         samplefile = os.path.join( idir(), "test/gluino_squarks_default.txt")
         #Test summary output
-        output = summaryReader.Summary(outputfile,allowedDiff=0.05)
-        sample = summaryReader.Summary(samplefile,allowedDiff=0.05)
+        output = summaryReader.Summary(outputfile,allowedDiff=tol )
+        sample = summaryReader.Summary(samplefile,allowedDiff=tol )
         try:
             self.assertEqual(sample, output)
         except AssertionError as e:
@@ -210,7 +212,7 @@ class RunPrinterTest(unittest.TestCase):
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
                       key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
                                        res['AnalysisID'],res['DataSetID']])
-        equals = equalObjs( smodelsOutput,smodelsOutputDefault,allowedDiff=0.05,
+        equals = equalObjs( smodelsOutput,smodelsOutputDefault,allowedDiff=tol,
                             ignore=ignoreFields, where = "top" )
         self.assertTrue(equals)
         try:
@@ -239,7 +241,7 @@ class RunPrinterTest(unittest.TestCase):
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
                        key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
                                         res['AnalysisID'],res['DataSetID']])
-        equals = equalObjs( smodelsOutput,smodelsOutputDefault,allowedDiff=0.05,
+        equals = equalObjs( smodelsOutput,smodelsOutputDefault,allowedDiff=tol,
                             ignore=ignoreFields )
         self.assertTrue(equals)
         try:
@@ -270,7 +272,7 @@ class RunPrinterTest(unittest.TestCase):
         sortXML(xmlDefault)
         sortXML(xmlNew)
         try:
-            self.assertTrue(compareXML(xmlDefault,xmlNew,allowedDiff=0.05,ignore=['input_file','smodels_version', 'ncpus']))
+            self.assertTrue(compareXML(xmlDefault,xmlNew,allowedDiff=tol,ignore=['input_file','smodels_version', 'ncpus']))
         except AssertionError as e:
             msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
             raise AssertionError(msg)
@@ -296,7 +298,7 @@ class RunPrinterTest(unittest.TestCase):
         sortXML(xmlDefault)
         sortXML(xmlNew)
         try:
-            self.assertTrue(compareXML(xmlDefault,xmlNew,allowedDiff=0.05,ignore=['input_file','smodels_version', 'ncpus']))
+            self.assertTrue(compareXML(xmlDefault,xmlNew,allowedDiff=tol,ignore=['input_file','smodels_version', 'ncpus']))
         except AssertionError as e:
             msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
             raise AssertionError(msg)
