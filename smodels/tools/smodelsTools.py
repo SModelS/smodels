@@ -93,7 +93,7 @@ def main():
         import os
         Dir = "%ssmodels/lib/" % installation.installDirectory()
         try:
-            os.chmod ( Dir, 777 )
+            os.chmod ( Dir, 0o777 )
         except PermissionError:
             print ( "chmod failed (permission error). Please try as root, i.e. sudo smodelsTools.py fixpermissions" )
 
