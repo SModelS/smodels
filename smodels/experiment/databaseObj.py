@@ -10,6 +10,7 @@
 
 """
 
+from __future__ import print_function
 import os
 ## sweet spot for numpy multi-threading is 2? More threads
 ## make some weaker machines freeze when building the pickle file.
@@ -234,6 +235,13 @@ class Database(object):
     def fetchFromScratch ( self, path, store, discard_zeroes ):
         """ fetch database from scratch, together with
             description. """
+        def sizeof_fmt(num, suffix='B'):
+            for unit in [ '','K','M','G','T','P' ]:
+                if abs(num) < 1000.:
+                    return "%3.1f%s%s" % (num, unit, suffix)
+                num /= 1000.0
+            return "%.1f%s%s" % (num, 'Yi', suffix)
+
         import requests
         r = requests.get( path )
         if r.status_code != 200:
@@ -246,21 +254,32 @@ class Database(object):
         if not "url" in r.json().keys():
             logger.error ( "cannot parse json file %s." % path )
             sys.exit()
-        logger.debug ( "now fetch %s" % r.json()["url"] )
-        r2=requests.get ( r.json()["url"] )
-        logger.info ( "fetched %s" % r2.url ) 
+        size = r.json()["size"]
+        logger.info ( "need to fetch %s. size is %s." % \
+                      ( r.json()["url"], sizeof_fmt ( size ) ) )
+        t0=time.time()
+        r2=requests.get ( r.json()["url"], stream=True )
         filename= "./" + r2.url.split("/")[-1]
+        with open ( filename, "wb" ) as dump:
+            for x in r2.iter_content(chunk_size=int ( size / 75 ) ):
+                dump.write ( x )
+                dump.flush ()
+                print ( ".", end="" )
+                sys.stdout.flush()
+            print()
+            dump.close()
+        logger.info ( "fetched %s in %d secs." % ( r2.url, time.time()-t0 ) ) 
         logger.debug ( "store as %s" % filename )
-        with open( filename, "wb" ) as f:
-            f.write ( r2.content )
-            f.close()
+        #with open( filename, "wb" ) as f:
+        #    f.write ( r2.content )
+        #    f.close()
         self.force_load = "pcl"
-        return ( "./", "./%s" % filename )
+        return ( "./", "%s" % filename )
 
 
     def fetchFromServer ( self, path, discard_zeroes ):
         import requests, time, json
-        logger.debug ( "fetch from server: %s" % path )
+        logger.debug ( "need fetch from server: %s" % path )
         store = "." + path.replace ( ":","_" ).replace( "/", "_" ).replace(".","_" )
         if not os.path.isfile ( store ):
             ## completely new! fetch the description and the db!
