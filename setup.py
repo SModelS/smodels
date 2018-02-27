@@ -21,7 +21,7 @@ class OverrideInstall(install):
 
     def run(self):
         #uid, gid = 0, 0
-        mode = 0777
+        mode = 0o777
         install.run(self) # calling install.run(self) insures that everything 
                 # that happened previously still happens, 
         # so the installation does not break! 
@@ -83,19 +83,12 @@ def compile():
 
     """
     import sys
-    if len(sys.argv) < 2:
-        return
-    needs_build = False
-    for i in sys.argv[1:]:
-        if i in [ "build", "build_ext", "build_clib", "install", 
-                  "install_lib", "bdist", "bdist_rpm", "bdist_dumb", 
-                  "bdist_wininst", "bdist_wheel", "develop"]:
-            needs_build = True
-    if not needs_build:
-        return
-    subprocess.call(["make", "-C", "smodels/lib" ])
+    if "compile" in sys.argv:
+        sys.argv.remove ( "compile" )
+        print ( "Compiling tools!" )
+        subprocess.call(["make", "-C", "smodels/lib" ])
 
-# compile() ## not needed anymore as we perform compilation-on-demand now
+compile() ## only compiles if "compile" is given as cmdline argument
 
 setup(
     name = "smodels",
