@@ -536,7 +536,7 @@ class TxNameData(object):
                     break
             if allSimplicesZero:
                 removables.add ( vtx )
-        logger.error ( "checkRemovables spent %.3f s on %s simplices." \
+        logger.debug ( "checkRemovables spent %.3f s on %s simplices." \
                        "We had %d zeroes. Found %d removables." % \
                        ( time.time() - t0, ctr, len(zeroes), len(removables) ) )
         return removables
@@ -719,7 +719,7 @@ class TxNameData(object):
         removables = self.checkRemovableVertices() # check if we can remove vertices
         if len ( removables ) == 0:
             return
-        logger.error ( "we can remove %d points in %s!" % \
+        logger.debug ( "we can remove %d points in %s!" % \
                        ( len(removables), self._id ) )
         newvalues = []
         for ctr,value in enumerate ( self.value ):
