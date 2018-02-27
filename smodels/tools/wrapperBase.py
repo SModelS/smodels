@@ -73,7 +73,7 @@ class WrapperBase(object):
         # out = subprocess.check_output ( cmd, shell=True, universal_newlines=True )
         logger.debug(out)
         if not os.path.exists ( self.executablePath ):
-            logger.error ( "Compilation of %s failed. Is the %s compiler installed?" % ( self.executablePath, self.compiler ) )
+            logger.error ( "Compilation of %s failed. Is the %s compiler installed? Do you have to fix the permissions, via sudo smodelsTools.py fixpermissions?" % ( self.executablePath, self.compiler ) )
             sys.exit()
         logger.info ( "Compilation of %s succeeded!" % self.executablePath )
         return True
