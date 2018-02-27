@@ -88,9 +88,9 @@ class TxName(object):
 
         ident = self.globalInfo.id+":"+dataType[0]+":"+ str(self._infoObj.dataId)
         ident += ":" + self.txName
-        self.txnameData = TxNameData( data, dataType, ident )
+        self.txnameData = TxNameData(data, dataType, ident )
         if expectedData:
-            self.txnameDataExp = TxNameData( expectedData, dataType, ident+'_expected' )
+            self.txnameDataExp = TxNameData(expectedData, dataType, ident+'_expected' )
         if discard_zeroes and self.hasOnlyZeroes():
             return
 
@@ -112,25 +112,6 @@ class TxName(object):
             el.sortBranches()
             self._topologyList.addElement(el)
 
-        self.computeV()
-        self.removeExtraZeroes() ## and now remove the zeroes
-        self.cleanUp() ## and clean up
-
-    def computeV ( self ):
-        """ compute V of observed and expected """
-        self.txnameData.computeV()
-        if self.txnameDataExp:
-            self.txnameDataExp.computeV()
-
-    def removeExtraZeroes ( self ):
-        self.txnameData.removeExtraZeroes()
-        if self.txnameDataExp:
-            self.txnameDataExp.removeExtraZeroes()
-    
-    def cleanUp ( self ):
-        self.txnameData.cleanUp()
-        if self.txnameDataExp:
-            self.txnameDataExp.cleanUp()
 
     def hasOnlyZeroes ( self ):
         ozs = self.txnameData.onlyZeroValues()
@@ -267,7 +248,7 @@ class TxNameData(object):
         self._id = Id
         self._accept_errors_upto=accept_errors_upto
         self._V = None
-        self.loadData( value )
+        self.loadData(value)
         if self._keep_values:
             self.origdata = value
 
@@ -279,7 +260,6 @@ class TxNameData(object):
         if x==0.0:
             return x
         return round(x, int( -np.sign(x)* int(floor(log10(abs(x)))) + (n - 1)))
-
 
     def __ne__ ( self, other ):
         return not self.__eq__ ( other )
@@ -369,7 +349,6 @@ class TxNameData(object):
         else:
             return value
         
-        
     def loadData(self,value):
         """
         Uses the information in value to generate the data grid used for
@@ -401,8 +380,12 @@ class TxNameData(object):
 
         self.y_values = np.ndarray(shape = (len(self.value),))
         self.massdim = np.array(self.value[0][0]).shape
-        for ctr,(x,y) in enumerate(self.value):
-            self.y_values[ctr]=y
+        for ctr,pt in enumerate(self.value):
+            self.y_values[ctr] = pt[1]
+            
+        self.computeV()
+        self.removeExtraZeroes()
+        self.cleanUp()
 
     @_memoize
     def getValueFor(self,massarray):
@@ -536,7 +519,7 @@ class TxNameData(object):
                     break
             if allSimplicesZero:
                 removables.add ( vtx )
-        logger.error ( "checkRemovables spent %.3f s on %s simplices." \
+        logger.debug( "checkRemovables spent %.3f s on %s simplices." \
                        "We had %d zeroes. Found %d removables." % \
                        ( time.time() - t0, ctr, len(zeroes), len(removables) ) )
         return removables
@@ -659,18 +642,17 @@ class TxNameData(object):
             return False
         return True
 
-    def computeV ( self ):
-        """ compute rotation matrix _V, and triangulation self.tri """
+    def computeV(self):
+        """
+        Compute rotation matrix _V, and triangulation self.tri
         
-        if self._V!=None:
+        """
+        
+        if not self._V is None:
             return
         
-        Morig=[]
-
-        for ctr,(x,y) in enumerate(self.value):
-            xp = self.flattenArray(x)
-            Morig.append(xp)
-
+        Morig= [self.flattenArray(pt[0]) for pt in self.value]
+        
         aM = np.matrix(Morig)
         MT = aM.T.tolist()
         self.delta_x = np.matrix([ sum (x)/len(Morig) for x in MT ])[0]
@@ -689,7 +671,7 @@ class TxNameData(object):
 
         ## the dimensionality of the whole mass space, disrespecting equal branches
         ## assumption
-        self.full_dimensionality = len(xp)
+        self.full_dimensionality = len(Morig[0])
         self.dimensionality=0
         for m in M:
             mp=np.dot(m,V)
@@ -706,31 +688,41 @@ class TxNameData(object):
         else:            
             self.tri = Delaunay1D(MpCut)           
 
-    def hasNoZeroes ( self ):
-        """ maybe we have no zeroes at all? """
+    def hasNoZeroes(self):
+        """
+        Maybe we have no zeroes at all?
+        """
+        
         for i in self.y_values:
             if abs ( i ) < 1e-9:
                 return False
         return True
 
-    def removeExtraZeroes ( self ):
-        """ remove redundant zeroes in the triangulation """
-        if self.hasNoZeroes(): return ## no zeros? we return immediately.
+    def removeExtraZeroes(self):        
+        """
+        Remove redundant zeroes in the triangulation
+        """
+        
+        if self.hasNoZeroes():
+            return ## no zeros? return original list
+        
         removables = self.checkRemovableVertices() # check if we can remove vertices
-        if len ( removables ) == 0:
+        if len(removables) == 0:
             return
-        logger.error ( "we can remove %d points in %s!" % \
-                       ( len(removables), self._id ) )
+        
+        logger.debug("We can remove %d points in %s!" % \
+                       (len(removables), self._id ))
         newvalues = []
-        for ctr,value in enumerate ( self.value ):
+        for ctr,value in enumerate(self.value):
             if ctr not in removables:
-                newvalues.append ( value )
+                newvalues.append(value)
+                
         self._V = None
         self.value = newvalues
-        ## start over!
-        self.computeV ()
-
-    def cleanUp ( self ):
+        ##Recompute simplices
+        self.computeV()
+    
+    def cleanUp(self):
         if self._keep_values:
             return
         if hasattr(self, "value"):
