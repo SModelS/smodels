@@ -22,7 +22,6 @@ from smodels.tools.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.caching import _memoize
 from scipy.linalg import svd
-from scipy.interpolate import interp1d
 import scipy.spatial.qhull as qhull
 import numpy as np
 import unum
@@ -399,7 +398,7 @@ class TxNameData(object):
         #Vertex indices:        
         vertices = np.take(self.tri.simplices, simplex, axis=0)
         #Compute the value:
-        values = np.array(self.xsecUnitless)
+        values = np.array(self.xsec)
         ret = np.dot(np.take(values, vertices),wts)
         minXsec = min(np.take(values, vertices))
         if ret < minXsec:
@@ -523,11 +522,14 @@ class TxNameData(object):
         self.massdim = np.array(values[0][0]).shape
 
         for ctr,(x,y) in enumerate(values):
-            self.xsec[ctr]=y
+            y_unitless = y
+            if isinstance(y,unum.Unum):
+                y_unitless = y.asNumber()
+            self.xsec[ctr]=y_unitless
             xp = self.flattenMassArray(x)
             Morig.append( xp )
-        self.xsecUnitless = [x.asNumber() if isinstance(x,unum.Unum) else float(x) 
-                             for x in self.xsec]
+        #self.xsecUnitless = [x.asNumber() if isinstance(x,unum.Unum) else float(x) 
+        #                     for x in self.xsec]
         aM=np.matrix ( Morig )
         MT=aM.T.tolist()
         self.delta_x = np.matrix ( [ sum (x)/len(Morig) for x in MT ] )[0]
@@ -619,7 +621,7 @@ class Delaunay1D:
         """
         Find 1D data interval (simplex) to which x belongs
         
-        :param x: Point (float) without units
+        :param x: 1D array without units (e.g. [10.])
         :param tol: Tolerance. If x is outside the data range with distance < tol, extrapolate.
         
         :return: simplex index (int)
@@ -627,12 +629,12 @@ class Delaunay1D:
         
         xi = self.find_index(self.points,x)
         if xi == -1:
-            if abs(x-self.points[0]) < tol:
+            if abs(x[0]-self.points[0][0]) < tol:
                 return 0
             else:
                 return -1
         elif xi == len(self.simplices):
-            if abs(x-self.points[-1]) < tol:
+            if abs(x[0]-self.points[-1][0]) < tol:
                 return xi-1
             else:
                 return -1
