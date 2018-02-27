@@ -93,8 +93,12 @@ def main():
         import os, glob
         Dir = "%ssmodels/lib/" % installation.installDirectory()
         try:
-            for p in [ "pythia6", "pythia8" ] + glob.glob("nllfast/nllfast-*"):
-                os.chmod ( Dir+p, 0o777 )
+            Dirs = [ "%spythia6" % Dir, "%spythia8" % Dir ]
+            Dirs += glob.glob("%snllfast/nllfast-*" % Dir )
+            Dirs += glob.glob("%spythia8/*" % Dir )
+            for p in Dirs:
+                # print ( "Fixing %s" % (p) )
+                os.chmod ( p, 0o777 )
         except Exception as e:
             print ( "chmod failed (permission error). Please try as root, i.e.:" )
             print ( "sudo smodelsTools.py fixpermissions" )
