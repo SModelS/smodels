@@ -29,7 +29,10 @@ class ClustererTest(unittest.TestCase):
         info = Info(os.path.join("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/","dataInfo.txt"))
         globalInfo = Info(os.path.join("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/","globalInfo.txt"))
         txnameData=TxNameData(data, "efficiencyMap", Id=1)
-        txname=TxName("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/T2bb.txt",globalInfo,info)
+        txnameData.computeV()
+        txnameData.removeExtraZeroes()
+        txnameData.cleanUp()
+        txname=TxName("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/T2bb.txt",globalInfo,info,True)
         txname.txnameData = txnameData
 
         filename = "%sinputFiles/lhe/simplyGluino.lhe" % (installDirectory() )
