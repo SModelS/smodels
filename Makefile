@@ -29,7 +29,7 @@ pypi:
 	twine upload dist/*
 
 testpypi:
-	python setup.py sdist bdist_wheel
+	python setup.py compile sdist bdist_wheel
 	twine upload -r pypitest dist/*
 
 tarballs:
