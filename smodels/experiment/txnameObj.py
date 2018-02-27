@@ -709,7 +709,6 @@ class TxNameData(object):
         removables = self.checkRemovableVertices() # check if we can remove vertices
         if len(removables) == 0:
             return
-        
         logger.debug("We can remove %d points in %s!" % \
                        (len(removables), self._id ))
         newvalues = []

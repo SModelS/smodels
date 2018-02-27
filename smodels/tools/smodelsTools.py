@@ -90,14 +90,7 @@ def main():
 
     if args.subparser_name == 'fixpermissions':
         from smodels import installation
-        import os, glob
-        Dir = "%ssmodels/lib/" % installation.installDirectory()
-        try:
-            for p in [ "pythia6", "pythia8" ] + glob.glob("nllfast/nllfast-*"):
-                os.chmod ( Dir+p, 0o777 )
-        except Exception as e:
-            print ( "chmod failed (permission error). Please try as root, i.e.:" )
-            print ( "sudo smodelsTools.py fixpermissions" )
+        installation.fixpermissions()
 
     if args.subparser_name == 'installation':
         from smodels import installation
