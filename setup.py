@@ -21,7 +21,7 @@ class OverrideInstall(install):
 
     def run(self):
         #uid, gid = 0, 0
-        mode = 0777
+        mode = 0o777
         install.run(self) # calling install.run(self) insures that everything 
                 # that happened previously still happens, 
         # so the installation does not break! 

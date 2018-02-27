@@ -28,6 +28,10 @@ pypi:
 	python setup.py sdist bdist_wheel
 	twine upload dist/*
 
+testpypi:
+	python setup.py sdist bdist_wheel
+	twine upload -r pypitest dist/*
+
 tarballs:
 	cd distribution && make tarballs
 
