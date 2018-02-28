@@ -220,7 +220,8 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
     if ncpus == 0 or ncpus < -1:
         logger.error ( "Weird number of ncpus given in ini file: %d" % ncpus )
         sys.exit()
-    if ncpus == -1 or ncpus > ncpusAll: ncpus = ncpusAll
+    if ncpus == -1: ncpus = ncpusAll
+    # if ncpus == -1 or ncpus > ncpusAll: ncpus = ncpusAll
     logger.info ("Running SModelS on %d cores" % ncpus )
 
     cleanedList = []
