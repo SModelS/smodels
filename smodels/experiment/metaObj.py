@@ -63,7 +63,7 @@ class Meta(object):
             return self.databaseVersion
         try:
             vfile = os.path.join ( self.pathname, "version" )
-            versionFile = open( vfile )
+            versionFile = open( vfile, "r" )
             content = versionFile.readlines()
             versionFile.close()
             line = content[0].strip()

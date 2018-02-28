@@ -378,13 +378,12 @@ class TxNameData(object):
         if not isinstance(self.units[-1],unum.Unum) and not isinstance(self.units[-1],float):
             raise SModelSError("Error obtaining units from value: %s " %self.value[:80])
 
-        self.y_values = np.ndarray(shape = (len(self.value),))
+
+        self.y_values = np.array(self.value)[:,1]
         self.massdim = np.array(self.value[0][0]).shape
-        for ctr,pt in enumerate(self.value):
-            self.y_values[ctr] = pt[1]
-            
+
         self.computeV()
-        self.removeExtraZeroes()
+        self.removeExtraZeroes()            
         self.cleanUp()
 
     @_memoize
@@ -718,6 +717,7 @@ class TxNameData(object):
                 
         self._V = None
         self.value = newvalues
+        self.y_values = np.array(self.value)[:,1]        
         ##Recompute simplices
         self.computeV()
     
