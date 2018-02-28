@@ -156,7 +156,10 @@ class Database(object):
                         return self
                     logger.info ( "loading binary db file %s format version %s" %
                             ( self.pcl_meta.pathname, self.pcl_meta.format_version ) )
-                    self.expResultList = serializer.load ( f )
+                    if sys.version[0]=="2":
+                        self.expResultList = serializer.load ( f )
+                    else:
+                        self.expResultList = serializer.load ( f, encoding="latin1" )
                     t1=time.time()-t0
                     logger.info ( "Loaded database from %s in %.1f secs." % \
                             ( self.pcl_meta.pathname, t1 ) )
@@ -167,7 +170,7 @@ class Database(object):
                 self.pcl_meta.mtime = 0
                 return self
             logger.error ( "%s is not a binary database file, recreate it." % \
-                            self.pcl_meta.pathname )
+                            ( self.pcl_meta.pathname ) )
             self.createBinaryFile()
         # self.txt_meta = self.pcl_meta
         return self
@@ -234,12 +237,14 @@ class Database(object):
 
     def fetchFromScratch ( self, path, store, discard_zeroes ):
         """ fetch database from scratch, together with
-            description. """
+            description.
+            :param store: filename to store json file.
+        """
         def sizeof_fmt(num, suffix='B'):
             for unit in [ '','K','M','G','T','P' ]:
-                if abs(num) < 1000.:
+                if abs(num) < 1024.:
                     return "%3.1f%s%s" % (num, unit, suffix)
-                num /= 1000.0
+                num /= 1024.0
             return "%.1f%s%s" % (num, 'Yi', suffix)
 
         import requests
@@ -261,7 +266,9 @@ class Database(object):
         r2=requests.get ( r.json()["url"], stream=True )
         filename= "./" + r2.url.split("/")[-1]
         with open ( filename, "wb" ) as dump:
-            for x in r2.iter_content(chunk_size=int ( size / 75 ) ):
+            print ( "         " + " "*51 + "<", end="\r" )
+            print ( "loading >", end="" )
+            for x in r2.iter_content(chunk_size=int ( size / 50 ) ):
                 dump.write ( x )
                 dump.flush ()
                 print ( ".", end="" )
@@ -289,7 +296,8 @@ class Database(object):
             logger.error ( "Error %d: could not fetch %s from server." % \
                            ( r.status_code, path ) )
             sys.exit()
-        jsn = json.load(open(store))
+        with open(store,"r") as f:
+            jsn = json.load(f)
         if r.json()["lastchanged"] > jsn["lastchanged"]:
             ## has changed! redownload everything!
             return self.fetchFromScratch ( path, store, discard_zeroes )
