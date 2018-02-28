@@ -236,13 +236,22 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
         return runSetOfFiles( cleanedList, outputDir, parser, databaseVersion,
                               listOfExpRes, timeout, development, parameterFile )
 
+    import random
+    random.shuffle ( cleanedList ) ## shuffle them
     ### now split up for every fork
     chunkedFiles = [cleanedList[x::ncpus] for x in range(ncpus)]
     children = []
     for (i,chunk) in enumerate(chunkedFiles):
-        pid=os.fork()
+        if i == len(chunkedFiles)-1: ## last chunk is up to the mother
+            logger.debug("last chunk #%d: pid %d (parent %d)." %
+                    ( i, os.getpid(), os.getppid() ) )
+            logger.debug( " `-> %s" % " ".join ( chunk ) )
+            runSetOfFiles(chunk, outputDir, parser, databaseVersion, 
+                            listOfExpRes, timeout, development, parameterFile)
+            break
+        pid=os.fork() ## fork up to the last chunk
         logger.debug("Forking: %s %s %s " % ( i,pid,os.getpid() ) )
-        if pid == 0:
+        if pid == 0: ## child
             logger.debug("chunk #%d: pid %d (parent %d)." %
                     ( i, os.getpid(), os.getppid() ) )
             logger.debug( " `-> %s" % " ".join ( chunk ) )
@@ -252,7 +261,7 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
         if pid < 0:
             logger.error ( "fork did not succeed! Pid=%d" % pid )
             sys.exit()
-        if pid > 0:
+        if pid > 0: ## mother
             children.append ( pid )
     for child in children:
         r = os.waitpid ( child, 0 )
