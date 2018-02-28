@@ -77,7 +77,7 @@ class Meta(object):
             # return 'unknown version'
 
     def __str__ ( self ):
-        ret  = "Meta: path =%s\n" % self.pathname
+        ret  = "Meta: path=%s\n" % self.pathname
         ret += "      mtime=%s" % time.ctime ( self.mtime )
         ret += ", filecount=%d" % self.filecount
         ret += ", discard_0=%d" % self.discard_zeroes
