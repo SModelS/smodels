@@ -2,7 +2,7 @@ Release v1.1.2, Mon 26 Feb 2018
 =======================================================
 
   * Fixed lastUpdate bug
-  * Changes in pickling (e.g. subpickling)
+  * Changes in pickling (e.g. subpickling, removing redundant zeroes)
 	* Database path allows URLs
 	* Option to show individual contribution from
 		topologies to total theory prediction
