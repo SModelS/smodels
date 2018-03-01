@@ -620,22 +620,22 @@ class LikelihoodComputer:
             return chi2
 
 if __name__ == "__main__":
-    computer = LikelihoodComputer ( nobs_, nb_, deltab_**2 )
-    print ( "1d, computer:", computer.likelihood( nsig_, deltas_ )  )
-    computer = LikelihoodComputer ( [nobs_], [nb_], numpy.diag([deltab_**2]) )
-    print ( "mv 1d, computer:",computer.likelihood( [nsig_], deltas_) )
-    print ( "mv 1d, chi2:",computer.chi2 ( [nsig_] ) )
-    cov = numpy.diag ([deltab_**2,deltab_**2])
-    cov[0,1] = .01
-    cov[1,0] = .01
-    computer = LikelihoodComputer ( [nobs_,nobs_], [nb_,nb_], cov )
-    l = computer.likelihood ( array([nsig_,nsig_]), deltas_  )
-    print ( "mv 2d, computer:", l )
-    print ( "mv 2d, chi2:", computer.chi2 ( [nsig_,nsig_] ) )
-    dummy_nobs = [ 1964, 877, 354, 182, 82, 36, 15, 11 ]
-    dummy_nbg = [ 2006.4, 836.4, 350., 147.1, 62., 26.2, 11.1, 4.7 ]
-    dummy_si = [ 47., 29.4, 21.1, 14.3, 9.4, 7.1, 4.7, 4.3 ]
-    dummy_cov = [ [ 16787.2, -1691.3, -4520.3, -3599.9, -2286.4, -1316.5, -719.8, -381.1 ] ,
+    # computer = LikelihoodComputer ( nobs_, nb_, deltab_**2 )
+    # print ( "1d, computer:", computer.likelihood( nsig_, deltas_ )  )
+    # computer = LikelihoodComputer ( [nobs_], [nb_], numpy.diag([deltab_**2]) )
+    #print ( "mv 1d, computer:",computer.likelihood( [nsig_], deltas_) )
+    #print ( "mv 1d, chi2:",computer.chi2 ( [nsig_] ) )
+    #cov = numpy.diag ([deltab_**2,deltab_**2])
+    #cov[0,1] = .01
+    #cov[1,0] = .01
+    #computer = LikelihoodComputer ( [nobs_,nobs_], [nb_,nb_], cov )
+    #l = computer.likelihood ( array([nsig_,nsig_]), deltas_  )
+    #print ( "mv 2d, computer:", l )
+    #print ( "mv 2d, chi2:", computer.chi2 ( [nsig_,nsig_] ) )
+    nobs = [ 1964, 877, 354, 182, 82, 36, 15, 11 ]
+    nbg = [ 2006.4, 836.4, 350., 147.1, 62., 26.2, 11.1, 4.7 ]
+    si = [ 47., 29.4, 21.1, 14.3, 9.4, 7.1, 4.7, 4.3 ]
+    cov = [ [ 16787.2, -1691.3, -4520.3, -3599.9, -2286.4, -1316.5, -719.8, -381.1 ] ,
                   [ -1691.3, 603.1, 754.6, 513.3, 294., 154.9, 78.1, 38.3 ],
                   [ -4520.3, 754.6, 1454., 1110.9, 691.1, 392.3, 212.1, 111.2 ],
                   [ -3599.9, 513.3, 1110.9, 871.2, 551.8, 318.1, 174.3, 92.5 ],
@@ -644,3 +644,7 @@ if __name__ == "__main__":
                   [ -719.8, 78.1, 212.1, 174.3, 114.1, 67.6, 38.0, 20.6 ],
                   [ -381.1, 38.3, 111.2, 92.5, 61.0, 36.4, 20.6, 11.2 ],
     ]
+    computer = LikelihoodComputer ( nobs, nbg, cov )
+    l = computer.likelihood ( si  )
+    T = computer.chi2 ( si  )
+    print ( "l=", l,T )
