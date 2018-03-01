@@ -291,18 +291,25 @@ class Database(object):
         if not os.path.isfile ( store ):
             ## completely new! fetch the description and the db!
             return self.fetchFromScratch ( path, store, discard_zeroes )
-        r = requests.get( path )
-        if r.status_code != 200:
-            logger.error ( "Error %d: could not fetch %s from server." % \
-                           ( r.status_code, path ) )
-            sys.exit()
         with open(store,"r") as f:
             jsn = json.load(f)
+        filename= "./" + jsn["url"].split("/")[-1]
+        r = requests.get( path )
+        if r.status_code != 200:
+            logger.warning ( "Error %d: could not fetch %s from server." % \
+                           ( r.status_code, path ) )
+            if not os.path.isfile ( filename ):
+                logger.error ( "Cant find a local copy of the pickle file. Exit." )
+                sys.exit()
+            logger.warning ( "I do however have a local copy of the file. I work with that." )
+            self.force_load = "pcl"
+            # next step: check the timestamps
+            return ( "./", filename )
+
         if r.json()["lastchanged"] > jsn["lastchanged"]:
             ## has changed! redownload everything!
             return self.fetchFromScratch ( path, store, discard_zeroes )
         
-        filename= "./" + jsn["url"].split("/")[-1]
         if not os.path.isfile ( filename ):
             return self.fetchFromScratch ( path, store, discard_zeroes )
         self.force_load = "pcl"
