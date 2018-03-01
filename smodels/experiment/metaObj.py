@@ -80,8 +80,8 @@ class Meta(object):
         ret  = "Meta: path=%s\n" % self.pathname
         ret += "      mtime=%s" % time.ctime ( self.mtime )
         ret += ", filecount=%d" % self.filecount
-        ret += ", discard_0=%d" % self.discard_zeroes
-        ret += ", fl=%s" % self.hasFastLim
+        ret += ", discard_0=%d\n" % self.discard_zeroes
+        ret += "      fl=%s" % self.hasFastLim
         ret += ", format_version=%d" % self.format_version
         ret += ", dbVersion=%s" % self.databaseVersion
         return ret
