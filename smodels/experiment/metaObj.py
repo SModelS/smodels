@@ -63,7 +63,7 @@ class Meta(object):
             return self.databaseVersion
         try:
             vfile = os.path.join ( self.pathname, "version" )
-            versionFile = open( vfile )
+            versionFile = open( vfile, "r" )
             content = versionFile.readlines()
             versionFile.close()
             line = content[0].strip()
@@ -77,11 +77,11 @@ class Meta(object):
             # return 'unknown version'
 
     def __str__ ( self ):
-        ret  = "Meta: path =%s\n" % self.pathname
+        ret  = "Meta: path=%s\n" % self.pathname
         ret += "      mtime=%s" % time.ctime ( self.mtime )
         ret += ", filecount=%d" % self.filecount
-        ret += ", discard_0=%d" % self.discard_zeroes
-        ret += ", fl=%s" % self.hasFastLim
+        ret += ", discard_0=%d\n" % self.discard_zeroes
+        ret += "      fl=%s" % self.hasFastLim
         ret += ", format_version=%d" % self.format_version
         ret += ", dbVersion=%s" % self.databaseVersion
         return ret

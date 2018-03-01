@@ -32,7 +32,7 @@ def main():
         help="sqrt(s) TeV. Can supply more than one value. Default is both 8 and 13.",
         type=int, default=[])
     xseccomputer.add_argument('-e', '--nevents', type=int, default=10000,
-        help="number of events to be simulated.")
+        help="number of events to be simulated. Default is 10000.")
     xseccomputer.add_argument('-v', '--verbosity', type=str, default="info",
         help="Verbosity (debug, info, warning, error)")
     xseccomputer.add_argument('-c', '--ncpus', type=int, default=-1,

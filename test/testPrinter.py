@@ -22,6 +22,7 @@ import summaryReader
 from xml.etree import ElementTree
 from databaseLoader import database
 import unum
+from smodels.tools.smodelsLogging import setLogLevel
 
 tol = 0.07
 
@@ -194,6 +195,7 @@ class RunPrinterTest(unittest.TestCase):
  
     def testPythonPrinter(self):
            
+        setLogLevel ( "error" )
            
         mprinter = printer.MPrinter()
         mprinter.Printers['python'] = printer.PyPrinter(output = 'file')
@@ -222,6 +224,7 @@ class RunPrinterTest(unittest.TestCase):
             pass
  
     def testPythonPrinterSimple(self):
+        setLogLevel ( "error" )
  
         mprinter = printer.MPrinter()
         mprinter.Printers['python'] = printer.PyPrinter(output = 'file')

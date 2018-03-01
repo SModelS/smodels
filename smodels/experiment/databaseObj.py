@@ -156,7 +156,10 @@ class Database(object):
                         return self
                     logger.info ( "loading binary db file %s format version %s" %
                             ( self.pcl_meta.pathname, self.pcl_meta.format_version ) )
-                    self.expResultList = serializer.load ( f )
+                    if sys.version[0]=="2":
+                        self.expResultList = serializer.load ( f )
+                    else:
+                        self.expResultList = serializer.load ( f, encoding="latin1" )
                     t1=time.time()-t0
                     logger.info ( "Loaded database from %s in %.1f secs." % \
                             ( self.pcl_meta.pathname, t1 ) )
@@ -167,7 +170,7 @@ class Database(object):
                 self.pcl_meta.mtime = 0
                 return self
             logger.error ( "%s is not a binary database file, recreate it." % \
-                            self.pcl_meta.pathname )
+                            ( self.pcl_meta.pathname ) )
             self.createBinaryFile()
         # self.txt_meta = self.pcl_meta
         return self
@@ -234,12 +237,14 @@ class Database(object):
 
     def fetchFromScratch ( self, path, store, discard_zeroes ):
         """ fetch database from scratch, together with
-            description. """
+            description.
+            :param store: filename to store json file.
+        """
         def sizeof_fmt(num, suffix='B'):
             for unit in [ '','K','M','G','T','P' ]:
-                if abs(num) < 1000.:
+                if abs(num) < 1024.:
                     return "%3.1f%s%s" % (num, unit, suffix)
-                num /= 1000.0
+                num /= 1024.0
             return "%.1f%s%s" % (num, 'Yi', suffix)
 
         import requests
@@ -261,7 +266,9 @@ class Database(object):
         r2=requests.get ( r.json()["url"], stream=True )
         filename= "./" + r2.url.split("/")[-1]
         with open ( filename, "wb" ) as dump:
-            for x in r2.iter_content(chunk_size=int ( size / 75 ) ):
+            print ( "         " + " "*51 + "<", end="\r" )
+            print ( "loading >", end="" )
+            for x in r2.iter_content(chunk_size=int ( size / 50 ) ):
                 dump.write ( x )
                 dump.flush ()
                 print ( ".", end="" )
@@ -284,17 +291,31 @@ class Database(object):
         if not os.path.isfile ( store ):
             ## completely new! fetch the description and the db!
             return self.fetchFromScratch ( path, store, discard_zeroes )
-        r = requests.get( path )
+        with open(store,"r") as f:
+            jsn = json.load(f)
+        filename= "./" + jsn["url"].split("/")[-1]
+        class _: ## pseudo class for pseudo requests
+            def __init__ ( self ): self.status_code = -1
+        r=_()
+        try:
+            r = requests.get( path )
+        except Exception:
+            pass
         if r.status_code != 200:
-            logger.error ( "Error %d: could not fetch %s from server." % \
+            logger.warning ( "Error %d: could not fetch %s from server." % \
                            ( r.status_code, path ) )
-            sys.exit()
-        jsn = json.load(open(store))
+            if not os.path.isfile ( filename ):
+                logger.error ( "Cant find a local copy of the pickle file. Exit." )
+                sys.exit()
+            logger.warning ( "I do however have a local copy of the file. I work with that." )
+            self.force_load = "pcl"
+            # next step: check the timestamps
+            return ( "./", filename )
+
         if r.json()["lastchanged"] > jsn["lastchanged"]:
             ## has changed! redownload everything!
             return self.fetchFromScratch ( path, store, discard_zeroes )
         
-        filename= "./" + jsn["url"].split("/")[-1]
         if not os.path.isfile ( filename ):
             return self.fetchFromScratch ( path, store, discard_zeroes )
         self.force_load = "pcl"
@@ -312,6 +333,8 @@ class Database(object):
         logger.debug('Try to set the path for the database to: %s', path)
         if path.startswith( ( "http://", "https://", "ftp://" ) ):
             return self.fetchFromServer ( path, discard_zeroes )
+        if path.startswith( ( "file://" ) ):
+            path=path[7:]
             
         tmp = os.path.realpath(path)
         if os.path.isfile ( tmp ):
