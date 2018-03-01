@@ -294,7 +294,13 @@ class Database(object):
         with open(store,"r") as f:
             jsn = json.load(f)
         filename= "./" + jsn["url"].split("/")[-1]
-        r = requests.get( path )
+        class _: ## pseudo class for pseudo requests
+            def __init__ ( self ): self.status_code = -1
+        r=_()
+        try:
+            r = requests.get( path )
+        except Exception:
+            pass
         if r.status_code != 200:
             logger.warning ( "Error %d: could not fetch %s from server." % \
                            ( r.status_code, path ) )
