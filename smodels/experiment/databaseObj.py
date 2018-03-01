@@ -333,6 +333,8 @@ class Database(object):
         logger.debug('Try to set the path for the database to: %s', path)
         if path.startswith( ( "http://", "https://", "ftp://" ) ):
             return self.fetchFromServer ( path, discard_zeroes )
+        if path.startswith( ( "file://" ) ):
+            path=path[7:]
             
         tmp = os.path.realpath(path)
         if os.path.isfile ( tmp ):
