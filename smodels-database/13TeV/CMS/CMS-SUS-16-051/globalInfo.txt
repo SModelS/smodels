@@ -1,0 +1,9 @@
+id: CMS-SUS-16-051
+sqrts: 13*TeV
+lumi: 35.9/fb
+url: http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-16-051/index.html
+arxiv: http://arxiv.org/abs/1706.04402
+publication: JHEP 10 (2017) 019, http://dx.doi.org/10.1007/JHEP10(2017)019
+contact: cms-phys-conveners-sus@cern.ch
+implementedBy: Juhi Dutta
+lastUpdate: 2018/1/9
