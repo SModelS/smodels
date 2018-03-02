@@ -2,7 +2,7 @@ txName: T2
 constraint: [[['jet']],[['jet']]]
 condition: None
 conditionDescription: None
-figureUrl: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-02/figaux_29.png
+figureUrl: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-02/figaux_29b.png
 source: ATLAS
 validated: True
 axes: [[x, y], [x, y]]

@@ -13,10 +13,10 @@ depicted in the scheme below:
 
 
 The complete list of analyses and results included in the database can be
-consulted at `http://smodels.hephy.at/wiki/ListOfAnalysesv11 <http://smodels.hephy.at/wiki/ListOfAnalysesv11>`_.
+consulted at `http://smodels.hephy.at/wiki/ListOfAnalyses <http://smodels.hephy.at/wiki/ListOfAnalyses>`_.
 We note that all the results in the official database release have been
 carefully validated  and the validation material can be
-found at `http://smodels.hephy.at/wiki/Validationv11 <http://smodels.hephy.at/wiki/Validationv11>`_.
+found at `http://smodels.hephy.at/wiki/Validation <http://smodels.hephy.at/wiki/Validation>`_.
 
 
 Installation
@@ -38,7 +38,6 @@ needs to be exploded in the top level directory of the database.
 
 That is, the following steps need to be performed ::
 
- mv smodels-v1.1-fastlim-1.0.tgz <smodels-database folder>
  cd <smodels-database folder>
  tar -xzvf smodels-v1.1-fastlim-1.0.tgz
  rm smodels-v1.1-fastlim-1.0.tgz
