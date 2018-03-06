@@ -26,14 +26,17 @@ class Element(object):
                           Holds a pair of (whence, mother element), where
                           whence describes what process generated the element    
     """
-    def __init__(self, info=None):
+    def __init__(self, info=None, fs=None):
         """
         Initializes the element. If info is defined, tries to generate
         the element using it.
         
         :parameter info: string describing the element in bracket notation
                          (e.g. [[[e+],[jet]],[[e-],[jet]]])
+        :parameter fs: dummy, to work with Andres patch. FIXME
         """
+        if fs!=None:
+          print("argh. a wild fix to comply with andres changes!! Merge!!" )
         self.branches = [Branch(), Branch()]
         self.weight = crossSection.XSectionList()
         self.motherElements = []
