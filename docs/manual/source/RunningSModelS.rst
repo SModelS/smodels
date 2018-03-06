@@ -17,7 +17,6 @@
 .. |output| replace:: :ref:`output <smodelsOutput>`
 .. |results| replace:: :ref:`experimental results <ExpResult>`
 .. |txnames| replace:: :ref:`txnames <TxName>`
-.. |txname| replace:: :ref:`txname <TxName>`
 .. |EM| replace:: :ref:`EM-type <EMtype>`
 .. |UL| replace:: :ref:`UL-type <ULtype>`
 .. |EMr| replace:: :ref:`EM-type result <EMtype>`
@@ -144,7 +143,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 * *database*: allows for selection of a subset of :ref:`experimental results <ExpResult>` from the |database|
 
-  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`. Since v1.1.2, also http addresses may be given, e.g. http://smodels.hephy.at/database/official112. See `Databases <http://smodels.hephy.at/wiki/Databases>`_ for a list.
+  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`.
   * **analyses** (list of results): set to *all* to use all available results. If a list of :ref:`experimental analyses <ExpResult>`
     is given, only these will be used. For instance, setting analyses = CMS-PAS-SUS-13-008,ATLAS-CONF-2013-024
     will only use the |results| from `CMS-PAS-SUS-13-008 <https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13008>`_
@@ -183,8 +182,6 @@ Below we give more detailed information about each entry in the parameters file.
 
   * **addElementList** (True/False): set True to include in the Python output all information about all |elements| generated in the |decomposition|. If set to True the
     output file can be quite large.
-
-  * **addTxWeights** (True/False): set True to print the weights of each |txname| contributing to the total |theory prediction| value.
 
 * *xml-printer*: options for the xml printer
 

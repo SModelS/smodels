@@ -42,8 +42,7 @@ class DataSet(object):
             #Get list of TxName objects:
             for txtfile in glob.iglob(os.path.join(path,"*.txt")):
                 try:
-                    txname = txnameObj.TxName( txtfile,self.globalInfo,self.dataInfo,
-                                               discard_zeroes )
+                    txname = txnameObj.TxName(txtfile,self.globalInfo,self.dataInfo)
                     if discard_zeroes and txname.hasOnlyZeroes():
                         logger.debug ( "%s, %s has only zeroes. discard it." % \
                                          ( self.path, txname.txName ) )

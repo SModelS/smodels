@@ -13,9 +13,12 @@
 from __future__ import print_function
 import sys,os
 from smodels.theory.topology import TopologyList
+from smodels.theory.element import Element
+from smodels.theory.theoryPrediction import TheoryPredictionList
+from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.databaseObj import ExpResultList
 from smodels.tools.ioObjects import OutputStatus, ResultList
-from smodels.tools.coverage import Uncovered
+from smodels.tools.coverage import UncoveredList, Uncovered
 from smodels.tools.physicsUnits import GeV, fb, TeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
@@ -192,7 +195,7 @@ class BasicPrinter(object):
         """
         ret=""
 
-        for obj in self.toPrint:
+        for iobj,obj in enumerate(self.toPrint):
                 if obj is None: continue
                 output = self._formatObj(obj)                
                 if not output: continue  #Skip empty output                
@@ -646,7 +649,7 @@ class PyPrinter(BasicPrinter):
         """
         
         outputDict = {}
-        for obj in self.toPrint:
+        for iobj,obj in enumerate(self.toPrint):
             if obj is None: continue
             output = self._formatObj(obj)                
             if not output: continue  #Skip empty output
@@ -710,7 +713,7 @@ class PyPrinter(BasicPrinter):
             xsecs = [xsec.value.asNumber(fb) for xsec in obj.weight.getXsecsFor(sqrts)]
             if len(xsecs) != 1:
                 logger.warning("Element cross sections contain multiple values for %s .\
-                Only the first cross section will be printed" %str(sqrts))
+                Only the first cross section will be printed" %str(sqrt))
             xsecs = xsecs[0]
             sqrtsStr = 'xsec '+str(sqrts.asNumber(TeV))+' TeV'
             elDic["Weights (fb)"][sqrtsStr] = xsecs
@@ -766,33 +769,24 @@ class PyPrinter(BasicPrinter):
                 logger.error("Unknown dataType %s" %(str(dataType)))
                 continue            
             value = theoryPrediction.xsection.value
-            sqrts = dataset.globalInfo.sqrts
-            cluster = theoryPrediction.cluster
-            txnamesDict = {}
-            for el in cluster.elements:
-                if not el.txname.txName in txnamesDict:
-                    txnamesDict[el.txname.txName] = el.weight[0].value.asNumber(fb)
-                else:
-                    txnamesDict[el.txname.txName] += el.weight[0].value.asNumber(fb)            
+            txnames = [txname.txName for txname in theoryPrediction.txnames]
             maxconds = theoryPrediction.getmaxCondition()
             mass = theoryPrediction.mass
             if mass:
                 mass = [[m.asNumber(GeV) for m in mbr] for mbr in mass]
             else:
                 mass = None
-            
+            sqrts = dataset.globalInfo.sqrts
             resDict = {'maxcond': maxconds, 'theory prediction (fb)': value.asNumber(fb),
                         'upper limit (fb)': ul.asNumber(fb),
                         'expected upper limit (fb)': ulExpected,
-                        'TxNames': sorted(txnamesDict.keys()),
+                        'TxNames': txnames,
                         'Mass (GeV)': mass,
                         'AnalysisID': expID,
                         'DataSetID' : datasetID,
                         'AnalysisSqrts (TeV)': sqrts.asNumber(TeV),
                         'lumi (fb-1)' : (dataset.globalInfo.lumi*fb).asNumber(),
-                        'dataType' : dataType}  
-            if hasattr(self,"addtxweights") and self.addtxweights:
-                resDict['TxNames weights (fb)'] =  txnamesDict
+                        'dataType' : dataType}            
             if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
                 resDict['chi2'] = theoryPrediction.chi2
                 resDict['likelihood'] = theoryPrediction.likelihood                
@@ -973,7 +967,7 @@ class XmlPrinter(PyPrinter):
         """
 
         outputDict = {}
-        for obj in self.toPrint:
+        for iobj,obj in enumerate(self.toPrint):
             if obj is None: continue
             output = self._formatObj(obj)  # Conver to python dictionaries                        
             if not output: continue  #Skip empty output            
@@ -995,6 +989,7 @@ class XmlPrinter(PyPrinter):
                 with open(self.filename, "a") as outfile:
                     outfile.write(nice_xml)
                     outfile.close()
+            ret = nice_xml
 
         self.toPrint = [None]*len(self.printingOrder)
         return root

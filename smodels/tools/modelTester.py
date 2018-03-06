@@ -220,8 +220,7 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
     if ncpus == 0 or ncpus < -1:
         logger.error ( "Weird number of ncpus given in ini file: %d" % ncpus )
         sys.exit()
-    if ncpus == -1: ncpus = ncpusAll
-    # if ncpus == -1 or ncpus > ncpusAll: ncpus = ncpusAll
+    if ncpus == -1 or ncpus > ncpusAll: ncpus = ncpusAll
     logger.info ("Running SModelS on %d cores" % ncpus )
 
     cleanedList = []
@@ -236,22 +235,13 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
         return runSetOfFiles( cleanedList, outputDir, parser, databaseVersion,
                               listOfExpRes, timeout, development, parameterFile )
 
-    import random
-    random.shuffle ( cleanedList ) ## shuffle them
     ### now split up for every fork
     chunkedFiles = [cleanedList[x::ncpus] for x in range(ncpus)]
     children = []
     for (i,chunk) in enumerate(chunkedFiles):
-        if i == len(chunkedFiles)-1: ## last chunk is up to the mother
-            logger.debug("last chunk #%d: pid %d (parent %d)." %
-                    ( i, os.getpid(), os.getppid() ) )
-            logger.debug( " `-> %s" % " ".join ( chunk ) )
-            runSetOfFiles(chunk, outputDir, parser, databaseVersion, 
-                            listOfExpRes, timeout, development, parameterFile)
-            break
-        pid=os.fork() ## fork up to the last chunk
+        pid=os.fork()
         logger.debug("Forking: %s %s %s " % ( i,pid,os.getpid() ) )
-        if pid == 0: ## child
+        if pid == 0:
             logger.debug("chunk #%d: pid %d (parent %d)." %
                     ( i, os.getpid(), os.getppid() ) )
             logger.debug( " `-> %s" % " ".join ( chunk ) )
@@ -261,7 +251,7 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
         if pid < 0:
             logger.error ( "fork did not succeed! Pid=%d" % pid )
             sys.exit()
-        if pid > 0: ## mother
+        if pid > 0:
             children.append ( pid )
     for child in children:
         r = os.waitpid ( child, 0 )

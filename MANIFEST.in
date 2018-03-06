@@ -1,4 +1,4 @@
-include MANIFEST.in Makefile
+include README.rst COPYING MANIFEST.in Makefile
 include smodels/lib/Makefile smodels/lib/*/Makefile smodels/lib/*/*/Makefile smodels/lib/*/*.f smodels/lib/*/*/*.f smodels/lib/*/*/*.grid 
 include inputFiles/*/*
 include etc/*

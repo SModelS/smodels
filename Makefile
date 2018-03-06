@@ -15,7 +15,7 @@ pythia8:
 	cd smodels/lib && make pythia8
 
 clean:
-	yes | rm -rf build dist smodels.egg-info
+	yes | rm -rf build dist
 	cd smodels/lib && make clean
 
 buildrpm:
@@ -27,10 +27,6 @@ builddeb: buildrpm
 pypi:
 	python setup.py sdist bdist_wheel
 	twine upload dist/*
-
-testpypi:
-	python setup.py sdist bdist_wheel
-	twine upload -r pypitest dist/*
 
 tarballs:
 	cd distribution && make tarballs

@@ -43,9 +43,6 @@ MeV = unum.Unum.unit('MeV', 10 ** 6 * eV)
 GeV = unum.Unum.unit('GeV', 10 ** 9 * eV)
 TeV = unum.Unum.unit('TeV', 10 ** 12 * eV)
 
-#Define standard units to be used when storing data:
-standardUnits = [GeV, fb]
-
 
 if __name__ == "__main__":
     """

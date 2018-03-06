@@ -35,9 +35,6 @@ def verbose_run():
     n_tests, n_failed = 0, 0
     for series in alltests:
         for test in series:
-            if type(test) != unittest.TestSuite:
-                print ( "Error: %s is not a TestSuite" % test )
-                sys.exit()
             for t in test:
                 print ( "[#%3d] %s ... " % ( n_tests, t.id() ), end="" )
                 sys.stdout.flush()

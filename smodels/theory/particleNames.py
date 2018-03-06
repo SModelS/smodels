@@ -67,93 +67,111 @@ def elementsInStr(instring,removeQuotes=True):
     
     """
     
-    elements = []
-    if isinstance(instring,list):
-        for elStr in instring:
-            elements += elementsInStr(elStr, removeQuotes)
-    elif isinstance(instring,str):
-        if instring.count('[') != instring.count(']'):
-            raise SModelSError("Syntax error in string: ``%s''." \
-                  "Check your constraints and conditions in your database." % str(instring))
-
-        tempstring = instring.replace(" ", "")
-        while tempstring.find('[') != -1:
-            el0 = tempstring.find('[')
-            elf = el0
-            brackDiff = tempstring.count('[',el0,elf+1)-tempstring.count(']',el0,elf+1)
-            while brackDiff != 0:
-                elf = tempstring.find(']',elf+1)
-                brackDiff = tempstring.count('[',el0,elf+1)-tempstring.count(']',el0,elf+1)
-            tempEl = tempstring[el0:elf+1]
-            tempEl = tempEl.replace(']'," ").replace("["," ").replace(","," ")
-            particles = list(set([str(ptc) for ptc in tempEl.split() if ptc]))
-            particles = [ptc.replace("'","").replace('"',"").strip() for ptc in particles]
-            unknownParticles = [ptc for ptc in particles if ((not ptc in list(rEven.values()))
-                                                         and (not ptc in ptcDic) and ptc != '*')]
-            if unknownParticles:
-                raise SModelSError("Unknown particles: %s. Add missing particles to smodels/particles.py" 
-                                   %str(unknownParticles))
-            if removeQuotes:
-                elements.append(tempstring[el0:elf+1].replace("'","").replace('"',""))
-            else:
-                elements.append(tempstring[el0:elf+1])
-            tempstring = tempstring[:el0]+tempstring[elf+1:]
-        return elements
+    outstr = ""
+    if type(instring) == type('st'):
+        outstr = instring
+    elif type(instring) == type([]):
+        for st in instring:
+            if type(st) != type('st'):
+                logger.error("Input must be a string or a list of strings")
+                raise SModelSError()
+            # Combine list of strings in a single string
+            outstr += st
     else:
-        raise SModelSError("Input must be a string or a list of strings. Type %s found:\n %s" 
-                           %(type(instring),instring))
+        raise SModelSError ( "syntax error in constraint/condition: ``%s''." \
+              "Check your constraints and conditions in your database." % str(instring) )
+
+    elements = []
+    outstr = outstr.replace(" ", "")
+    if removeQuotes:
+        outstr = outstr.replace("'", "")
+    elStr = ""
+    nc = 0
+    # Parse the string and looks for matching ['s and ]'s, when the matching is
+    # complete, store element
+    for c in outstr:
+        delta = 0
+        if c == '[':
+            delta = -1
+        elif c == ']':
+            delta = 1
+        nc += delta
+        if nc != 0:
+            elStr += c
+        if nc == 0 and delta != 0:
+            elements.append(elStr + c)
+            elStr = ""
+            # Syntax checks
+            ptclist = elements[-1].replace(']', ',').replace('[', ',').\
+                    split(',')
+            for ptc in ptclist:
+                ptc = ptc.replace("'","")
+                if not ptc:
+                    continue
+                if not ptc in rEven.values() and not ptc in ptcDic:
+                    logger.error("Unknown particle. Add " + ptc + " to smodels/particles.py")
+                    raise SModelSError()
+
+    # Check if there are not unmatched ['s and/or ]'s in the string
+    if nc != 0:
+        logger.error("Wrong input (incomplete elements?) " + instring)
+        raise SModelSError()
+
+    return elements
 
 
-
-def vertInStr(instring,removeQuotes=True):
+def vertInStr(instring):
     """
     Parses instring (or a list of strings) and returns the list of particle
     vertices appearing in instring.
     
-    :param instring: string containing elements (e.g. "[[['e+']],[['e-']]]+[[['mu+']],[['mu-']]]")
-    :param removeQuotes: If True, it will remove the quotes from the particle labels.
-                         Set to False, if one wants to run eval on the output.
-    
-    :returns: list of elements appearing in instring in string format
-    
     """
-    
-    vertices = []
-    if isinstance(instring,list):
-        for elStr in instring:
-            vertices += elementsInStr(elStr, removeQuotes)
-    elif isinstance(instring,str):
-        if instring.count('[') != instring.count(']'):
-            raise SModelSError("Syntax error in string: ``%s''." \
-                  "Check your constraints and conditions in your database." % str(instring))
+    if type(instring) == type('st'):
+        outstr = instring
+    elif type(instring) == type([]):
+        outstr = ""
+        for st in instring:
+            if type(st) != type('st'):
+                logger.error("Input must be a string or a list of strings")
+                raise SModelSError()
+            # Combine list of strings in a single string
+            outstr += st
 
-        tempstring = instring.replace(" ", "")
-        while tempstring.find(']') != -1:
-            elf = tempstring.find(']')
-            el0 = tempstring.rfind('[',0,elf)
-            tempEl = tempstring[el0:elf+1]
-            tempEl = tempEl.replace(']'," ").replace("["," ").replace(","," ")
-            if not tempEl.strip():
-                tempstring = tempstring[:el0]+tempstring[elf+1:]
-                continue
-            particles = list(set([str(ptc) for ptc in tempEl.split() if ptc]))
-            particles = [ptc.replace("'","").replace('"',"").strip() for ptc in particles]
-            unknownParticles = [ptc for ptc in particles if ((not ptc in list(rEven.values()))
-                                                         and (not ptc in ptcDic) and ptc != '*')]
-            if unknownParticles:
-                raise SModelSError("Unknown particles: %s. Add missing particles to smodels/particles.py" 
-                                   %str(unknownParticles))
-            if removeQuotes:
-                vertices.append(tempstring[el0:elf+1].replace("'","").replace('"',""))
-            else:
-                vertices.append(tempstring[el0:elf+1])
-            tempstring = tempstring[:el0]+tempstring[elf+1:]
-        return vertices
-    else:
-        raise SModelSError("Input must be a string or a list of strings. Type %s found:\n %s" 
-                           %(type(instring),instring))
-        
-        
+    vertices = []
+    outstr = outstr.replace(" ", "").replace("'", "")
+    vertStr = ""
+    nc = 0
+    # Parse the string and looks for matching ['s and ]'s, when the matching is
+    # complete, store element
+    for c in outstr:
+        delta = 0
+        if c == '[':
+            delta = -1
+        elif c == ']':
+            delta = 1
+        nc += delta
+        if c == '[':
+            vertStr = ""
+        if nc != 0 and c != '[' and c != ']':
+            vertStr += c
+        if delta > 0 and vertStr:
+            vertices.append(vertStr.split(','))
+            # Syntax checks:
+            for ptc in vertices[-1]:
+                if not ptc:
+                    continue
+                if not ptc in rEven.values() and not ptc in ptcDic:
+                    logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
+                    raise SModelSError()
+            vertStr = ""
+
+    # Check if there are not unmatched ['s and/or ]'s in the string
+    if nc != 0:
+        logger.error("Wrong input (incomplete elements?) " + instring)
+        raise SModelSError()
+
+    return vertices
+
 def simParticles(plist1, plist2, useDict=True):
     """
     Compares two lists of particle names. Allows for dictionary

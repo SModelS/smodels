@@ -34,9 +34,7 @@ Inside SModelS there is a number of tools that may be convenient for the user:
 * a :ref:`cross section calculator <xsecCalc>` based on `Pythia8 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_ (or `Pythia6 <http://pythia6.hepforge.org>`_) and 
   `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_,
 * :ref:`SLHA and LHE file checkers <fileChecks>` to check your input files for completeness and sanity,
-* a :ref:`database browser <databaseBrowser>` to provide easy access to the |database| of experimental results.
-* a :ref:`file permissions fixer <permissionsFixer>` to fix a problem with file permissions for the cross section computers in system-wide installs.
-* a :ref:`toolbox <toolBox>` to quickly show the state of the external tools.
+* a :ref:`database Browser <databaseBrowser>` to provide easy access to the |database| of experimental results.
 
 .. _xsecCalc:
 
@@ -236,30 +234,4 @@ can be found in :ref:`Howto's <Examples>`.
 
 * **The Database browser tool is implemented by the**  `Browser class <../../../documentation/build/html/tools.html#tools.databaseBrowser.Browser>`_
 
-.. _permissionsFixer:
-
-File Permissions Fixer
-----------------------
-
-In case the software was installed under a different name than it is used
-(as is the case for system-wide installs), we ship a simple tool that fixes 
-the file permissions for the cross section calculation code.
-
-**The usage of the permissions fixer is:**
-
-.. include:: FixPermissions.rst
-
-Execute the command as root, i.e.: ::
-
-   sudo smodelsTools.py fixpermissions
-
-.. _toolBox:
-
-ToolBox
--------
-
-As a quick way to show the status of all external tools, use 
-**the toolbox:**
-
-.. include:: ToolBox.rst
 

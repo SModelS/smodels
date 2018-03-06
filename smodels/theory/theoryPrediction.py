@@ -10,6 +10,7 @@
 from smodels.theory import clusterTools, crossSection, element
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.auxiliaryFunctions import cSim, cGtr  #DO NOT REMOVE
+import sys
 from smodels.tools.physicsUnits import TeV,fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 

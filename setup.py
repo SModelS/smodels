@@ -21,7 +21,7 @@ class OverrideInstall(install):
 
     def run(self):
         #uid, gid = 0, 0
-        mode = 0o777
+        mode = 0777
         install.run(self) # calling install.run(self) insures that everything 
                 # that happened previously still happens, 
         # so the installation does not break! 
@@ -56,7 +56,7 @@ def listDirectory (dirname):
         extension = os.path.splitext ( file )[1]
         if os.path.isdir ( fullname ) or \
                 extension in [ ".out", ".tgz", ".1" ] or \
-                file in [ "Makefile", "README.rst", "INSTALLATION.rst" ]:
+                file in [ "Makefile", "README" ]:
             continue
         ret.append ( fullname )
     return ret
@@ -66,8 +66,8 @@ def dataFiles ():
     List all config files and binaries
 
     """
-    ret = []
-    ret.append ( ("smodels/", [ "smodels/version", "smodels/COPYING", "smodels/README.rst", "smodels/INSTALLATION.rst" ]) )
+    ret = [("", [ "README.rst", "INSTALLATION.rst", "COPYING" ])]
+    ret.append ( ("smodels/", [ "smodels/version" ]) )
     for directory in ["inputFiles/slha/", "inputFiles/lhe/", "smodels/share/",
           "smodels/etc/", "smodels/lib/nllfast/nllfast-1.2/", 
           "smodels/lib/nllfast/nllfast-2.1/", "smodels/lib/nllfast/nllfast-3.1/", 
@@ -83,12 +83,19 @@ def compile():
 
     """
     import sys
-    if "compile" in sys.argv:
-        sys.argv.remove ( "compile" )
-        print ( "Compiling tools!" )
-        subprocess.call(["make", "-C", "smodels/lib" ])
+    if len(sys.argv) < 2:
+        return
+    needs_build = False
+    for i in sys.argv[1:]:
+        if i in [ "build", "build_ext", "build_clib", "install", 
+                  "install_lib", "bdist", "bdist_rpm", "bdist_dumb", 
+                  "bdist_wininst", "bdist_wheel", "develop"]:
+            needs_build = True
+    if not needs_build:
+        return
+    subprocess.call(["make", "-C", "smodels/lib" ])
 
-compile() ## only compiles if "compile" is given as cmdline argument
+# compile() ## not needed anymore as we perform compilation-on-demand now
 
 setup(
     name = "smodels",

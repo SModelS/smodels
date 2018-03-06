@@ -151,7 +151,7 @@ class RunSModelSTest(unittest.TestCase):
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
                     res['AnalysisID'],res['DataSetID']])
-        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.07,
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                            ignore=ignoreFields)
         if not equals:
             print "output13.py and simplyGluino_default.py differ!"
