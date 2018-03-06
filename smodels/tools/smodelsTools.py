@@ -26,12 +26,13 @@ def main():
     subparsers = parser.add_subparsers(dest='subparser_name')
 
     installation = subparsers.add_parser('installation', description="Print installation setup and exit.")
+    fixpermissions = subparsers.add_parser('fixpermissions', description="Fix file permissions for xseccomputer.")
     xseccomputer = subparsers.add_parser('xseccomputer', description="Compute MSSM cross sections for a SLHA file.")
     xseccomputer.add_argument('-s', '--sqrts', nargs='+', action='append',
         help="sqrt(s) TeV. Can supply more than one value. Default is both 8 and 13.",
         type=int, default=[])
     xseccomputer.add_argument('-e', '--nevents', type=int, default=10000,
-        help="number of events to be simulated.")
+        help="number of events to be simulated. Default is 10000.")
     xseccomputer.add_argument('-v', '--verbosity', type=str, default="info",
         help="Verbosity (debug, info, warning, error)")
     xseccomputer.add_argument('-c', '--ncpus', type=int, default=-1,
@@ -86,6 +87,10 @@ def main():
     args = parser.parse_args()
 
     smodelsLogging.setLogLevel ( args.verbose )
+
+    if args.subparser_name == 'fixpermissions':
+        from smodels import installation
+        installation.fixpermissions()
 
     if args.subparser_name == 'installation':
         from smodels import installation

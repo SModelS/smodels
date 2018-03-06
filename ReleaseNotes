@@ -1,3 +1,14 @@
+Release v1.1.2, Mon 26 Feb 2018
+=======================================================
+
+  * Fixed lastUpdate bug
+  * Changes in pickling (e.g. subpickling, removing redundant zeroes)
+  * Database path allows URLs
+  * Option to show individual contribution from
+    topologies to total theory prediction
+  * smodelsTools.py has fixpermissions, for system-wide installs
+
+
 Release v1.1.1, Tue 27 Jun 2017
 =======================================================
 
@@ -30,7 +41,7 @@ Release v1.1.0, Mon 23 Jan 2017 08:00:00 PM CET
   * the database now supports also a more efficient binary format
   * performance improvement for the decomposition of the input model
   * inclusion of new simplified results to the database
-	  (including a few 13 TeV results)
+    (including a few 13 TeV results)
   * fastlim efficiency maps can now also be used in SModelS
 
 Release v1.0.4, Fri 11 Mar 2016 11:18:46 AM CET

@@ -256,7 +256,8 @@ Below we describe in detail the dictionary keys and values contained in the Pyth
   the signal cross section (theory prediction), the corresponding observed
   upper limit and the maximum condition violation (see :ref:`upper limit conditions <ULconditions>`) are shown.
   Furthermore, the masses of the |elements| contributing to the signal cross section and the :math:`\chi^2` and
-  likelihood values (if **computeStatistics** = True) are also included.
+  likelihood values (if **computeStatistics** = True) are also included. If **addTxWeights** = True the individual
+  weights of each txname contributing to the theory prediction value is also printed in a dictionary format.
   
 .. literalinclude:: /images/gluino_squarks.slha.py
    :lines: 5-9

@@ -10,6 +10,7 @@
 
 """
 
+from __future__ import print_function
 import os
 ## sweet spot for numpy multi-threading is 2? More threads
 ## make some weaker machines freeze when building the pickle file.
@@ -155,7 +156,10 @@ class Database(object):
                         return self
                     logger.info ( "loading binary db file %s format version %s" %
                             ( self.pcl_meta.pathname, self.pcl_meta.format_version ) )
-                    self.expResultList = serializer.load ( f )
+                    if sys.version[0]=="2":
+                        self.expResultList = serializer.load ( f )
+                    else:
+                        self.expResultList = serializer.load ( f, encoding="latin1" )
                     t1=time.time()-t0
                     logger.info ( "Loaded database from %s in %.1f secs." % \
                             ( self.pcl_meta.pathname, t1 ) )
@@ -166,7 +170,7 @@ class Database(object):
                 self.pcl_meta.mtime = 0
                 return self
             logger.error ( "%s is not a binary database file, recreate it." % \
-                            self.pcl_meta.pathname )
+                            ( self.pcl_meta.pathname ) )
             self.createBinaryFile()
         # self.txt_meta = self.pcl_meta
         return self
@@ -231,13 +235,107 @@ class Database(object):
         """
         return self.txt_meta.pathname
 
+    def fetchFromScratch ( self, path, store, discard_zeroes ):
+        """ fetch database from scratch, together with
+            description.
+            :param store: filename to store json file.
+        """
+        def sizeof_fmt(num, suffix='B'):
+            for unit in [ '','K','M','G','T','P' ]:
+                if abs(num) < 1024.:
+                    return "%3.1f%s%s" % (num, unit, suffix)
+                num /= 1024.0
+            return "%.1f%s%s" % (num, 'Yi', suffix)
+
+        import requests
+        r = requests.get( path )
+        if r.status_code != 200:
+            logger.error ( "Error %d: could not fetch %s from server." % \
+                           ( r.status_code, path ) )
+            sys.exit()
+        ## its new so store the description
+        with open( store, "w" ) as f:
+            f.write ( r.text )
+        if not "url" in r.json().keys():
+            logger.error ( "cannot parse json file %s." % path )
+            sys.exit()
+        size = r.json()["size"]
+        logger.info ( "need to fetch %s. size is %s." % \
+                      ( r.json()["url"], sizeof_fmt ( size ) ) )
+        t0=time.time()
+        r2=requests.get ( r.json()["url"], stream=True )
+        filename= "./" + r2.url.split("/")[-1]
+        with open ( filename, "wb" ) as dump:
+            print ( "         " + " "*51 + "<", end="\r" )
+            print ( "loading >", end="" )
+            for x in r2.iter_content(chunk_size=int ( size / 50 ) ):
+                dump.write ( x )
+                dump.flush ()
+                print ( ".", end="" )
+                sys.stdout.flush()
+            print()
+            dump.close()
+        logger.info ( "fetched %s in %d secs." % ( r2.url, time.time()-t0 ) ) 
+        logger.debug ( "store as %s" % filename )
+        #with open( filename, "wb" ) as f:
+        #    f.write ( r2.content )
+        #    f.close()
+        self.force_load = "pcl"
+        return ( "./", "%s" % filename )
+
+
+    def fetchFromServer ( self, path, discard_zeroes ):
+        import requests, time, json
+        logger.debug ( "need fetch from server: %s" % path )
+        store = "." + path.replace ( ":","_" ).replace( "/", "_" ).replace(".","_" )
+        if not os.path.isfile ( store ):
+            ## completely new! fetch the description and the db!
+            return self.fetchFromScratch ( path, store, discard_zeroes )
+        with open(store,"r") as f:
+            jsn = json.load(f)
+        filename= "./" + jsn["url"].split("/")[-1]
+        class _: ## pseudo class for pseudo requests
+            def __init__ ( self ): self.status_code = -1
+        r=_()
+        try:
+            r = requests.get( path )
+        except Exception:
+            pass
+        if r.status_code != 200:
+            logger.warning ( "Error %d: could not fetch %s from server." % \
+                           ( r.status_code, path ) )
+            if not os.path.isfile ( filename ):
+                logger.error ( "Cant find a local copy of the pickle file. Exit." )
+                sys.exit()
+            logger.warning ( "I do however have a local copy of the file. I work with that." )
+            self.force_load = "pcl"
+            # next step: check the timestamps
+            return ( "./", filename )
+
+        if r.json()["lastchanged"] > jsn["lastchanged"]:
+            ## has changed! redownload everything!
+            return self.fetchFromScratch ( path, store, discard_zeroes )
+        
+        if not os.path.isfile ( filename ):
+            return self.fetchFromScratch ( path, store, discard_zeroes )
+        self.force_load = "pcl"
+        # next step: check the timestamps
+        return ( "./", filename )
 
     def checkPathName( self, path, discard_zeroes ):
         """
         checks the path name,
-        returns the base directory and the pickle file name
+        returns the base directory and the pickle file name.
+        If path starts with http or ftp, fetch the description file
+        and the database.
+        :returns: directory name, (full) pickle file name
         """
         logger.debug('Try to set the path for the database to: %s', path)
+        if path.startswith( ( "http://", "https://", "ftp://" ) ):
+            return self.fetchFromServer ( path, discard_zeroes )
+        if path.startswith( ( "file://" ) ):
+            path=path[7:]
+            
         tmp = os.path.realpath(path)
         if os.path.isfile ( tmp ):
             base = os.path.dirname ( tmp )

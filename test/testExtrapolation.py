@@ -37,6 +37,9 @@ class ExtrapolationTest(unittest.TestCase):
              [ [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ], 17.*fb ] ]
         self.txnameData = TxNameData( data, "upperLimits",
                 sys._getframe().f_code.co_name, .05 )
+        self.txnameData.computeV()
+        self.txnameData.removeExtraZeroes()
+        self.txnameData.cleanUp()
 
     def tryWith ( self, masses ):
         return self.txnameData.getValueFor( masses )
