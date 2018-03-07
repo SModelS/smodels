@@ -726,30 +726,6 @@ class TxNameData(object):
             return
         if hasattr(self, "value"):
             del self.value
-        
-    def _getMassArrayFrom(self,pt,unit=physicsUnits.GeV):
-        """
-        Transforms the point pt in the PCA space to the original mass array
-        :param pt: point with the dimentions of the data dimensionality (e.g. [x,y])
-        :param unit: Unit for returning the mass array. If None, it will be
-                     returned unitless
-        :return: Mass array (e.g. [[mass1,mass2],[mass3,mass4]])
-        """
-        
-        if self._V is None:
-            logger.error("Data has not been loaded")
-            return None
-        if len(pt) != self.dimensionality:
-            logger.error("Wrong point dimensions (%i), it should be %i" 
-                         %(len(pt),self.dimensionality))
-            return None
-        fullpt = np.append(pt,[0.]*(self.full_dimensionality-len(pt)))
-        mass = np.dot(self._V,fullpt) + self.delta_x
-        mass = mass.reshape(self.massdim).tolist()
-        if isinstance(unit,unum.Unum):
-            mass = [[m*unit for m in br] for br in mass]
-
-        return mass
 
      
 class Delaunay1D:
