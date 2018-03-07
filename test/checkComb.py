@@ -9,15 +9,9 @@ from smodels.experiment.exceptions import SModelSExperimentError
 from smodels.tools.smodelsLogging import setLogLevel
 from smodels.tools.colors import colors
 from smodels.tools.physicsUnits import pb, fb, GeV
-from smodels.tools.likelihoods import LikelihoodComputer
-from smodels.tools.statistics import UpperLimitComputer
 from smodels.tools import ioObjects
 from smodels.tools import printer
 from smodels.theory import slhaDecomposer
-
-LikelihoodComputer.deltas_default = 1e-12
-LikelihoodComputer.debug_mode = True
-UpperLimitComputer.debug_mode = True
 
 prt = printer.PyPrinter( output="file", filename = "./out.py" )
 

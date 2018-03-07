@@ -47,13 +47,26 @@ except ImportError as e:
 class Model:
     """ A very simple data container to collect all the data
         of a specific statistical model """
+    def isScalar ( self, obj ):
+        """ determine if obj is a scalar (float or int) """
+        try:
+            _ = float(obj)
+            return True
+        except:
+            pass
+        return False
+
     def convert ( self, obj ):
         """ convert everything to numpy arrays """
+        if self.isScalar(obj):
+            return array ( [ obj ] )
         return array ( obj )
     def __str__ ( self ):
         return self.name + " (%d dims)" % self.n
     def convertCov ( self, obj ):
         ## if the matrix is flattened, unflatten it.
+        if self.isScalar(obj):
+            return array ( [ [ obj ] ] )
         if type(obj[0]) == float:
             return array ( [ obj[self.n*i:self.n*(i+1)] for i in range(self.n) ] )
         return obj
