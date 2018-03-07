@@ -17,24 +17,25 @@ from smodels.experiment.exceptions import DatabaseNotFoundException, SModelSExpe
 from smodels.tools.physicsUnits import fb
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.stringTools import cleanWalk
-from smodels.tools import statistics
+#from smodels.tools import statistics
+from smodels.tools.SimplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Model
 
 class ExpResult(object):
     """
     Object  containing the information and data corresponding to an
     experimental result (experimental conference note or publication).
-    
+
     :ivar path: path to the experimental result folder (i.e. ATLAS-CONF-2013-047)
     :ivar globalInfo: Info object holding the data in <path>/globalInfo.txt
-    :ivar datasets: List of DataSet objects corresponding to the dataset folders 
-                    in <path>    
+    :ivar datasets: List of DataSet objects corresponding to the dataset folders
+                    in <path>
     """
-        
+
     def __init__(self, path=None, discard_zeroes = True ):
         """
         :param path: Path to the experimental result folder
         :param discard_zeroes: Discard maps with only zeroes
-        """ 
+        """
 
         if path and os.path.isdir(path):
             self.path = path
@@ -94,7 +95,7 @@ class ExpResult(object):
             for txname in dataset.txnameList:
                 tx = txname.txName
                 if not tx in txnames:
-                    
+
                     txnames.append(tx)
         if isinstance(txnames, list):
             for txname in txnames:
@@ -115,7 +116,7 @@ class ExpResult(object):
 
     def getTxNames(self):
         """
-        Returns a list of all TxName objects appearing in all datasets.        
+        Returns a list of all TxName objects appearing in all datasets.
         """
         txnames = []
         for dataset in self.datasets:
@@ -140,7 +141,7 @@ class ExpResult(object):
         """
         can this expResult be safely assumed to be approximately uncorrelated
         with "other"? "Other" can be another expResult, or a dataset of
-        an expResult. 
+        an expResult.
         """
         if self == other: return False
         if other.globalInfo.dirName ( 1 ) != self.globalInfo.dirName ( 1 ):
@@ -157,10 +158,10 @@ class ExpResult(object):
 
     def combinedLikelihood ( self, nsig, deltas=None ):
         """
-        Computes the (combined) likelihood to observe nobs events, given a 
+        Computes the (combined) likelihood to observe nobs events, given a
         predicted signal "nsig", with nsig being a vector with one entry per
         dataset.  nsig has to obey the datasetOrder. Deltas is the error on
-        the signal efficiency. 
+        the signal efficiency.
         :param nsig: predicted signal (list)
         :param deltas: uncertainty on signal (None,float, or list).
         :returns: likelihood to observe nobs events (float)
@@ -172,7 +173,8 @@ class ExpResult(object):
         nobs = [ x.dataInfo.observedN for x in self.datasets ]
         bg = [ x.dataInfo.expectedBG for x in self.datasets ]
         cov = self.globalInfo.covariance
-        computer = statistics.LikelihoodComputer ( nobs, bg, cov )
+        # print ( "nsig=", nsig )
+        computer = LikelihoodComputer ( Model ( nobs, bg, cov, nsig ) )
         # print ( "computing combined likelihood for",nsig,"ds=",len(self.datasets ) )
         return computer.likelihood ( nsig, deltas )
 
@@ -181,7 +183,7 @@ class ExpResult(object):
         Computes the total chi2 for a given number of observed events, given a
         predicted signal "nsig", with nsig being a vector with one entry per
         dataset. nsig has to obey the datasetOrder. Deltas is the error on
-        the signal efficiency. 
+        the signal efficiency.
         :param nsig: predicted signal (list)
         :param deltas: uncertainty on signal (None,float, or list).
         :returns: chi2 (float)
@@ -193,14 +195,14 @@ class ExpResult(object):
         nobs = [ x.dataInfo.observedN for x in self.datasets ]
         bg = [ x.dataInfo.expectedBG for x in self.datasets ]
         cov = self.globalInfo.covariance
-        computer = statistics.LikelihoodComputer ( nobs, bg, cov )
+        computer = LikelihoodComputer ( Model ( nobs, bg, cov ) )
         return computer.chi2 ( nsig, deltas )
 
     def getCombinedUpperLimitFor ( self, effs, expected=False ):
         """
         Get combined upper limit. Effs are the signal efficiencies in the
         datasets. The order is defined in the dataset itself.
-        :param effs: the signal efficiencies for all datasets 
+        :param effs: the signal efficiencies for all datasets
                      (adding up the efficiencies for all txnames)
                      the efficiencies must be sorted according to datasetOrder
         :param expected: return expected, not observed value
@@ -219,8 +221,7 @@ class ExpResult(object):
         if len ( cov ) < 1:
             logger.error ( "covariance matrix has length %d." % len(cov) )
             sys.exit()
-        from smodels.tools.statistics import UpperLimitComputer
-        computer = UpperLimitComputer ( 2000, self.globalInfo.lumi )
+        computer = UpperLimitComputer ( self.globalInfo.lumi, 2000 )
         datasetOrder = self.globalInfo.datasetOrder
         if type ( datasetOrder ) == str:
             datasetOrder = tuple ( [ datasetOrder ] ) ## for debugging, allow one dataset
@@ -242,7 +243,7 @@ class ExpResult(object):
         no = nobs
         if expected:
             no = nb
-        ret = computer.ulSigma ( no, nb, cov, effs )
+        ret = computer.ulSigma ( Model ( no, nb, cov, effs ), marginalize=False )
         return ret
 
     def getUpperLimitFor(self, dataID=None, alpha=0.05, expected=False,
@@ -254,22 +255,22 @@ class ExpResult(object):
         for the given dataSet ID (signal region). For an Upper Limit type,
         returns the UL for the signal*BR for the given mass array and
         Txname.
-        
+
         :param dataID: dataset ID (string) (only for efficiency-map type results)
-        :param alpha: Can be used to change the C.L. value. The default value is 0.05 
+        :param alpha: Can be used to change the C.L. value. The default value is 0.05
                       (= 95% C.L.) (only for  efficiency-map results)
         :param expected: Compute expected limit, i.e. Nobserved = NexpectedBG
                          (only for efficiency-map results)
         :param txname: TxName object or txname string (only for UL-type results)
         :param mass: Mass array with units (only for UL-type results)
         :param compute: If True, the upper limit will be computed
-                        from expected and observed number of events. 
-                        If False, the value listed in the database will be used 
+                        from expected and observed number of events.
+                        If False, the value listed in the database will be used
                         instead.
-        
-        
+
+
         :return: upper limit (Unum object)
-        
+
         """
         if dataID == "combined":
             logger.error ( "you are asking for upper limit for the combined dataset. Use .getCombinedUpperLimitFor method instead." )
@@ -279,7 +280,7 @@ class ExpResult(object):
                 logger.error("The data set ID must be defined when computing ULs" \
                              " for efficiency-map results (as there is no covariance matrix).")
                 return False
-            
+
             useDataset = False
             for dataset in self.datasets:
                 if dataset.dataInfo.dataId == dataID:
@@ -288,7 +289,7 @@ class ExpResult(object):
             if useDataset is False:
                 logger.error("Data set ID ``%s'' not found." % dataID )
                 return False
-                
+
             if compute:
                 upperLimit = useDataset.getSRUpperLimit(alpha, expected, compute)
             else:
@@ -299,8 +300,8 @@ class ExpResult(object):
                 if (upperLimit/fb).normalize()._unit:
                     logger.error("Upper limit defined with wrong units for %s and %s"
                                   %(dataset.globalInfo.id,dataset.dataInfo.dataId))
-                    return False           
-            
+                    return False
+
         elif self.datasets[0].dataInfo.dataType == 'upperLimit':
             if not txname or not mass:
                 logger.error("A TxName and mass array must be defined when \
@@ -320,24 +321,24 @@ class ExpResult(object):
                         else: upperLimit = tx.txnameDataExp.getValueFor(mass)
                     else: upperLimit = tx.txnameData.getValueFor(mass)
         else:
-            logger.warning("Unkown data type: %s. Data will be ignored.", 
+            logger.warning("Unkown data type: %s. Data will be ignored.",
                            self.datasets[0].dataInfo.dataType)
 
-        
+
         return upperLimit
-    
+
 
     def getValuesFor(self, attribute=None):
         """
         Returns a list for the possible values appearing in the ExpResult
         for the required attribute (sqrts,id,constraint,...).
         If there is a single value, returns the value itself.
-        
+
         :param attribute: name of a field in the database (string). If not
-                          defined it will return a dictionary with all fields 
+                          defined it will return a dictionary with all fields
                           and their respective values
         :return: list of values or value
-        
+
         """
         fieldDict = list ( self.__dict__.items() )
         valuesDict = {}
@@ -373,10 +374,10 @@ class ExpResult(object):
         """
         Checks for all the fields/attributes it contains as well as the
         attributes of its objects if they belong to smodels.experiment.
-        
+
         :param showPrivate: if True, also returns the protected fields (_field)
         :return: list of field names (strings)
-        
+
         """
         fields = self.getValuesFor().keys()
         fields = list(set(fields))
@@ -386,22 +387,22 @@ class ExpResult(object):
                 if "_" == field[0]:
                     fields.remove(field)
         return fields
-    
+
 
     def getTxnameWith(self, restrDict={}):
         """
         Returns a list of TxName objects satisfying the restrictions.
         The restrictions specified as a dictionary.
-        
+
         :param restrDict: dictionary containing the fields and their allowed values.
                           E.g. {'txname' : 'T1', 'axes' : ....}
                           The dictionary values can be single entries or a list
                           of values.  For the fields not listed, all values are
                           assumed to be allowed.
         :return: list of TxName objects if more than one txname matches the selection
-                 criteria or a single TxName object, if only one matches the 
+                 criteria or a single TxName object, if only one matches the
                  selection.
-        
+
         """
         txnameList = []
         for tag, value in restrDict.items():
