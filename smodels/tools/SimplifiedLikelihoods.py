@@ -442,7 +442,7 @@ class UpperLimitComputer:
         mu_hat = computer.findMuHat ( model.efficiencies )
         theta_hat = computer.findThetaHat ( mu_hat * model.efficiencies ) 
         sigma_mu = computer.getSigmaMu ( model.efficiencies, 1., mu_hat, theta_hat )
-        print ( "mu_hat=", mu_hat )
+        # print ( "mu_hat=", mu_hat )
         if mu_hat < 0.: mu_hat = 0.
         nll0 = computer.likelihood ( model.efficiencies * mu_hat, 
                                      marginalize=marginalize, nll=True )
@@ -453,7 +453,7 @@ class UpperLimitComputer:
             nll = computer.likelihood ( nsig, marginalize=marginalize, nll=True ) 
             root = 2*( nll - nll0 ) - 1.64485**2 
             return root
-        print ( "model=%s " % model )
+        # print ( "model=%s " % model )
         mu_lim = optimize.brentq ( root_func, 1.5*mu_hat, 2.5*mu_hat + 2*sigma_mu )
         return mu_lim / self.lumi
 
