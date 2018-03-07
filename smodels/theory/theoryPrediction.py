@@ -177,7 +177,7 @@ class TheoryPrediction(object):
         exp_r = None
         if type(eul_)!=type(None):
                 exp_r = self.xsection.value / eul_
-        ret += "                      exp r: %s\n" % ( exp_r )
+        ret += "                      exp r: %f\n" % ( exp_r )
         ret += "                       chi2: %s\n" % ( self.chi2 )
         return ret
 
