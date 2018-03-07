@@ -490,11 +490,11 @@ class TxNameData(object):
         """ return list of indices for vertices with zero y_values.
             dont consider vertices on the convex hull. """
         zeroes = set()
-        for i,x in enumerate ( self.y_values ):
+        for i,x in enumerate(self.y_values):
             if i in self.tri.convex_hull:
                 continue
             if x < 1.e-9:
-                zeroes.add ( i )
+                zeroes.add(i)
         return zeroes
 
     def checkRemovableVertices ( self ):
@@ -760,6 +760,10 @@ class Delaunay1D:
                 xmax,xmin = data[simplex[0]][0],data[simplex[1]][0]
                 transform.append([[1./(xmax-xmin)],[xmin]])
             self.transform = np.array(transform)
+            
+            #Store convex hull (first and last point):
+            self.convex_hull = np.array([data.index(self.points[0]),data.index(self.points[-1])])
+            
         else:
             raise SModelSError()
         
