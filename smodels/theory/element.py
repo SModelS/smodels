@@ -26,7 +26,7 @@ class Element(object):
                           Holds a pair of (whence, mother element), where
                           whence describes what process generated the element    
     """
-    def __init__(self, info=None):
+    def __init__(self, info=None ):
         """
         Initializes the element. If info is defined, tries to generate
         the element using it.
