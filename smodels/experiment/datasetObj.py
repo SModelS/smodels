@@ -10,7 +10,7 @@
 
 import os,glob,sys
 from smodels.experiment import txnameObj,infoObj
-from smodels.tools import statistics
+from smodels.tools.SimplifiedLikelihoods import LikelihoodComputer, Model, UpperLimitComputer
 from smodels.tools.physicsUnits import fb
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.smodelsLogging import logger
@@ -161,8 +161,8 @@ class DataSet(object):
         :returns: likelihood to observe nobs events (float)
         """
 
-        computer = statistics.LikelihoodComputer ( self.dataInfo.observedN,
-                self.dataInfo.expectedBG, self.dataInfo.bgError**2 )
+        m = Model ( self.dataInfo.observedN, self.dataInfo.expectedBG, self.dataInfo.bgError**2 )
+        computer = LikelihoodComputer ( m )
         return computer.likelihood( nsig, deltas )
 
     def folderName ( self ):
@@ -199,12 +199,14 @@ class DataSet(object):
         given number of signal events "nsig", and error on signal "deltas".
         nobs, expectedBG and bgError are part of dataInfo.
         :param nsig: predicted signal (float)
-        :param deltas: relative uncertainty in signal (float). If None, default value (20%) will be used.
+        :param deltas: relative uncertainty in signal (float). 
+                       If None, default value (20%) will be used.
 
         :return: chi2 (float)
         """
-        computer = statistics.LikelihoodComputer ( self.dataInfo.observedN,
-                self.dataInfo.expectedBG, self.dataInfo.bgError**2 )
+        m = Model ( self.dataInfo.observedN, self.dataInfo.expectedBG, 
+                    self.dataInfo.bgError**2 )
+        computer = LikelihoodComputer ( m )
         return computer.chi2( nsig, deltas )
 
     def getAttributes(self,showPrivate=False):
@@ -265,7 +267,9 @@ class DataSet(object):
             logger.error("Luminosity defined with wrong units for %s" %(ID) )
             return False
 
-        maxSignalXsec = statistics.upperLimit(Nobs,Nexp,bgError,lumi,alpha)
+        m = Model ( Nobs,Nexp,bgError )
+        computer = UpperLimitComputer ( lumi, cl=1.-alpha )
+        maxSignalXsec = computer.ulSigma( m )
 
 
         return maxSignalXsec
