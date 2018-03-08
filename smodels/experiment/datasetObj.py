@@ -207,7 +207,7 @@ class DataSet(object):
         m = Model ( self.dataInfo.observedN, self.dataInfo.expectedBG, 
                     self.dataInfo.bgError**2 )
         computer = LikelihoodComputer ( m )
-        return computer.chi2( nsig, deltas )
+        return computer.chi2( nsig, deltas )[0]
 
     def getAttributes(self,showPrivate=False):
         """
