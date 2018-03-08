@@ -342,6 +342,7 @@ class LikelihoodComputer:
                           cov=(self.model.covariance+numpy.diag(deltas**2)),
                           size=self.ntoys )
             for lmbda in lambdas: ## perform 1000 times
+                if self.model.isScalar ( lmbda ): lmbda = array ( [ lmbda ] )
                 for ctr,v in enumerate ( lmbda ):
                     if v<=0.: lmbda[ctr]=1e-30
 #                    print ( "lmbda=",lmbda )
@@ -486,6 +487,8 @@ if __name__ == "__main__":
               efficiencies=[ x/100. for x in [47,29.4,21.1,14.3,9.4,7.1,4.7,4.3] ],
               name="CMS-NOTE-2017-001 model" )
     ulComp = UpperLimitComputer ( lumi = 1. / fb, ntoys=500, cl=.95 )
+    #uls = ulComp.ulSigma ( Model ( 15,17.5,3.2,0.00454755 ) )
+    #print ( "uls=", uls )
     ul_old = 131.828*fb ## ulComp.ulSigmaOld ( m )
     print ( "old ul=", ul_old )
     ul = ulComp.ulSigma ( m )
