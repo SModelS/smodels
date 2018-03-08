@@ -546,7 +546,7 @@ class XSectionList(object):
                     newList.add(newxsec)
 
         if len(self) != len(newList):
-            logger.info("Ignoring %i lower order cross sections",
+            logger.debug("Ignoring %i lower order cross sections",
                            (len(self) - len(newList)))
         self.xSections = newList.xSections
 
