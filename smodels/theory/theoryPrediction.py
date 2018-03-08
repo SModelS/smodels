@@ -259,7 +259,7 @@ def theoryPredictionsFor( expResult, smsTopList, maxMassDist=0.2,
     for xsecinfo,preds in preds.items():
         effs = [ pred.effectiveEff for pred in preds ]
         if sum ( effs ) == 0.:
-            logger.warning ( "all efficiencies of combination are zero. will skip." )
+            logger.info ( "all efficiencies of combination in %s are zero. will skip." % expResult.globalInfo.id )
             break
         cul = expResult.getCombinedUpperLimitFor ( effs )
         eul = expResult.getCombinedUpperLimitFor ( effs, expected=True )
