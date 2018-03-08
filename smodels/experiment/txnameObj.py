@@ -165,16 +165,24 @@ class TxName(object):
         if tag == 'constraint' or tag == 'condition':
             if isinstance(value,list):
                 value = [val.replace("'","") for val in value]
-            else: value = value.replace("'","")
+            else:
+                value = value.replace("'","")
 
-        try:
-            setattr(self,tag,eval(value, unitsDict))
-        except SyntaxError:
-            setattr(self,tag,value)
-        except NameError:
-            setattr(self,tag,value)
-        except TypeError:
-            setattr(self,tag,value)
+        if tag == 'constraint' or tag == 'condition':
+            if isinstance(value,list):
+                value = [val.replace("'","") for val in value]
+            else:
+                value = value.replace("'","")
+            setattr(self,tag,value) #Make sure constraints/conditions are not evaluated
+        else:
+            try:
+                setattr(self,tag,eval(value, unitsDict))
+            except SyntaxError:
+                setattr(self,tag,value)
+            except NameError:
+                setattr(self,tag,value)
+            except TypeError:
+                setattr(self,tag,value)
 
 
     def getInfo(self, infoLabel):
