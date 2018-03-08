@@ -16,7 +16,7 @@ from smodels.theory import slhaDecomposer
 from smodels.theory import lheDecomposer
 from smodels.theory.theoryPrediction import theoryPredictionsFor, TheoryPredictionList
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-from smodels.tools import crashReport, timeOut 
+from smodels.tools import crashReport, timeOut
 from smodels.tools.printer import MPrinter
 import os
 import sys
@@ -52,8 +52,8 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """Setup output printers"""
     masterPrinter = MPrinter()
     masterPrinter.setPrinterOptions(parser)
-    masterPrinter.setOutPutFiles(os.path.join(outputDir, os.path.basename(inputFile)))  
-    
+    masterPrinter.setOutPutFiles(os.path.join(outputDir, os.path.basename(inputFile)))
+
     """ Add list of analyses loaded to printer"""
     masterPrinter.addObj(ExpResultList(listOfExpRes))
 
@@ -64,10 +64,10 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """Initialize output status and exit if there were errors in the input"""
     outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile,
             dict(parser.items("parameters")), databaseVersion)
-    masterPrinter.addObj(outputStatus)              
-    if outputStatus.status < 0:          
+    masterPrinter.addObj(outputStatus)
+    if outputStatus.status < 0:
         return masterPrinter.flush()
-    
+
 
     """
     Decompose input file
@@ -99,7 +99,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         return masterPrinter.flush()
 
     masterPrinter.addObj(smstoplist)
-    
+
 
     """
     Compute theory predictions
@@ -113,7 +113,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         theorypredictions = theoryPredictionsFor(expResult, smstoplist,useBestDataset=True )
         if not theorypredictions: continue
         allPredictions += theorypredictions._theoryPredictions
-    
+
     """Compute chi-square and likelihood"""
     if parser.getboolean("options","computeStatistics"):
         for theoPred in allPredictions:
@@ -137,7 +137,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
             sqrts = None
         uncovered = coverage.Uncovered(smstoplist,sqrts=sqrts)
         masterPrinter.addObj(uncovered)
-    
+
     return masterPrinter.flush()
 
 def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
@@ -160,7 +160,7 @@ def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
                              listOfExpRes)
     except Exception as e:
         crashReportFacility = crashReport.CrashReport()
-         
+
         if development:
             print(crashReport.createStackTrace())
             raise e
@@ -186,6 +186,7 @@ def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
     """
     a={}
     for inputFile in inputFiles:
+        logger.info ( "Start testing %s" % os.path.relpath ( inputFile ) )
         a[inputFile] = runSingleFile(inputFile, outputDir, parser, databaseVersion,
                                   listOfExpRes, timeout, development, parameterFile)
     return a
@@ -259,7 +260,7 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
             logger.debug("chunk #%d: pid %d (parent %d)." %
                     ( i, os.getpid(), os.getppid() ) )
             logger.debug( " `-> %s" % " ".join ( chunk ) )
-            runSetOfFiles(chunk, outputDir, parser, databaseVersion, 
+            runSetOfFiles(chunk, outputDir, parser, databaseVersion,
                             listOfExpRes, timeout, development, parameterFile)
             os._exit(0) ## not sys.exit(), return, nor continue
         if pid < 0:
@@ -281,13 +282,13 @@ def checkForSemicolon ( strng, section, var ):
 def loadDatabase(parser, db):
     """
     Load database
-    
+
     :parameter parser: ConfigParser with path to database
     :parameter db: binary database object. If None, then database is loaded,
                    according to databasePath. If True, then database is loaded,
                    and text mode is forced.
     :returns: database object, database version
-        
+
     """
     try:
         dp = parser.get ( "path", "databasePath" )
@@ -323,11 +324,11 @@ def loadDatabase(parser, db):
 def loadDatabaseResults(parser, database):
     """
     Load database entries specified in parser
-    
+
     :parameter parser: ConfigParser, containing analysis and txnames selection
     :parameter database: Database object
     :returns: List of experimental results
-        
+
     """
     """ In case that a list of analyses or txnames are given, retrieve list """
     tmp = parser.get("database", "analyses").split(",")
@@ -344,11 +345,11 @@ def loadDatabaseResults(parser, database):
         dataTypes = ['all']
         tmp_dIDs = parser.get("database", "dataselector").split(",")
         datasetIDs = [ x.strip() for x in tmp_dIDs ]
-    
+
     useSuperseded=False
     useNonValidated=False
     if parser.has_option("database","useSuperseded"):
-        useSuperseded = parser.getboolean("database", "usesuperseded")        
+        useSuperseded = parser.getboolean("database", "usesuperseded")
     if parser.has_option("database","useNonValidated"):
         useNonValidated = parser.getboolean("database", "usenonvalidated")
     if useSuperseded:
@@ -359,7 +360,7 @@ def loadDatabaseResults(parser, database):
 
     """ Load analyses """
 
-    ret = database.getExpResults(analysisIDs=analyses, txnames=txnames, 
+    ret = database.getExpResults(analysisIDs=analyses, txnames=txnames,
                                  datasetIDs=datasetIDs, dataTypes=dataTypes,
                                  useSuperseded=useSuperseded, useNonValidated=useNonValidated)
     return ret
@@ -367,10 +368,10 @@ def loadDatabaseResults(parser, database):
 def getParameters(parameterFile):
     """
     Read parameter file, exit in case of errors
-    
+
     :parameter parameterFile: Path to parameter File
     :returns: ConfigParser read from parameterFile
-        
+
     """
     try:
         parser = ConfigParser( inline_comment_prefixes=( ';', ) )
@@ -385,10 +386,10 @@ def getParameters(parameterFile):
 def getAllInputFiles(inFile):
     """
     Given inFile, return list of all input files
-    
+
     :parameter inFile: Path to input file or directory containing input files
     :returns: List of all input files
-        
+
     """
     if os.path.isdir(inFile):
         fileList = os.listdir(inFile)
