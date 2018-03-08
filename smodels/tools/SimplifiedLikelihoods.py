@@ -340,8 +340,8 @@ class LikelihoodComputer:
             self.gammaln = special.gammaln(self.model.data + 1)
             lambdas = stats.multivariate_normal.rvs(mean=self.model.backgrounds+nsig,
                           cov=(self.model.covariance+numpy.diag(deltas**2)),
-                          size=self.ntoys )
-            for lmbda in lambdas: ## perform 1000 times
+                          size=self.ntoys ) ## get ntoys values
+            for lmbda in lambdas:
                 if self.model.isScalar ( lmbda ): lmbda = array ( [ lmbda ] )
                 for ctr,v in enumerate ( lmbda ):
                     if v<=0.: lmbda[ctr]=1e-30
