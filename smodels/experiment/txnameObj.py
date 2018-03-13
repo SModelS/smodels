@@ -539,7 +539,11 @@ class TxNameData(object):
             M.append ( m )
             # M.append ( [ self.round_to_n ( x, 7 ) for x in m ] )
 
-        Vt=svd(M)[2]
+        try:
+            Vt=svd(M)[2]
+        except Exception as e:
+            logger.error ( "exception caught when performing singular value decomposition: %s, %s" % ( type(e), e ) )
+            sys.exit()
         V=Vt.T
         self._V= V ## self.round ( V )
         Mp=[]
