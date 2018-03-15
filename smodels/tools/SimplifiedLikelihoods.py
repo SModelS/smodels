@@ -14,9 +14,9 @@
 
 from __future__ import print_function
 from scipy import stats, optimize, integrate, special
-from numpy import sqrt, exp, log, sign, array, matrix, ndarray
+from numpy  import sqrt, exp, log, sign, array, matrix, ndarray
 from functools import reduce
-import numpy
+import numpy as NP
 import sys
 
 def getLogger():
@@ -64,7 +64,7 @@ class Model:
         return False
 
     def convert ( self, obj ):
-        """ convert everything to numpy arrays """
+        """ convert everything to NP arrays """
         if type(obj) == type(None):
             return obj
         if self.isScalar(obj):
@@ -96,7 +96,29 @@ class Model:
         self.covariance = self.convertCov ( covariance )
         self.efficiencies = self.convert ( efficiencies )
         self.skewness = self.convert ( skewness )
+        if NP.sum ( [ abs(x) for x in self.skewness ] ) < 1e-10:
+            ## all zeroes? then we have no skewness
+            self.skewness = None
         self.name = name
+
+    def diagCov ( self ):
+        """ diagonal elements of covariance matrix. Convenience function. """
+        return NP.diag ( self.covariance )
+
+    def correlations ( self ):
+        """ correlation matrix, computed from covariance matrix. 
+            convenience function. """
+        if hasattr ( self, "corr" ):
+            return self.corr
+        import copy
+        self.corr = copy.deepcopy ( self.covariance )
+        for x in range(self.n):
+            self.corr[x][x]=1.
+            for y in range(x+1,self.n):
+                rho=self.corr[x][y]/sqrt(self.covariance[x][x]*self.covariance[y][y])
+                self.corr[x][y]=rho
+                self.corr[y][x]=rho
+        return self.corr
 
     def signals ( self, mu ):
         """ returns the signal cross sections, for all datasets,
@@ -162,13 +184,13 @@ class LikelihoodComputer:
             mu_hat_old = mu_hat
             #logger.info ( "theta hat[%d]=%s" % (ctr,list( theta_hat[:11] ) ) )
             #logger.info ( "   mu hat[%d]=%s" % (ctr, mu_hat ) )
-            mu_c = numpy.abs ( self.model.data - self.model.backgrounds - theta_hat ) / effs
+            mu_c = NP.abs ( self.model.data - self.model.backgrounds - theta_hat ) / effs
             ## find mu_hat by finding the root of 1/L dL/dmu. We know
             ## that the zero has to be between min(mu_c) and max(mu_c).
             lower,upper = 0.*max(mu_c),3.*max(mu_c)
             lower_v = self.dLdMu ( lower, effs, theta_hat )
             upper_v = self.dLdMu ( upper, effs, theta_hat )
-            total_sign = numpy.sign ( lower_v * upper_v )
+            total_sign = NP.sign ( lower_v * upper_v )
             if total_sign > -.5:
                 if upper_v < lower_v < 0.:
                     ## seems like we really want to go for mu_hat = 0.
@@ -178,7 +200,7 @@ class LikelihoodComputer:
                                " value." )
                 lower = 1e-4*max(mu_c)
                 lower_v = self.dLdMu ( lower, effs, theta_hat )
-                total_sign = numpy.sign ( lower_v * upper_v )
+                total_sign = NP.sign ( lower_v * upper_v )
                 if total_sign > -.5:
                     logger.error ( "cant find zero in Brentq bracket. l,u=%s,%s" % \
                                    ( lower, upper ) )
@@ -196,7 +218,7 @@ class LikelihoodComputer:
         """
         if type ( effs ) in [ list, ndarray ]:
             s_effs = sum ( effs )
-        sgm_mu = sqrt ( sum (self.model.data ) + sum ( numpy.diag ( self.model.covariance ) ) ) / s_effs / lumi
+        sgm_mu = sqrt ( sum (self.model.data ) + sum ( NP.diag ( self.model.covariance ) ) ) / s_effs / lumi
         return sgm_mu
 
     #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
@@ -206,13 +228,54 @@ class LikelihoodComputer:
         theta = array ( thetaA )
         # ntot = self.model.backgrounds + self.nsig
         lmbda = theta + self.ntot ## the lambda for the Poissonian
+        V = self.model.covariance+NP.diag(self.deltas**2)
         if type(self.model.skewness) != type(None):
+            covD = self.model.diagCov()
+            C=[]
+            for m2,m3 in zip(covD, self.model.skewness ):
+                if m3 == 0.: m3 = 1e-30
+                k=sqrt(2*m2 )   
+                dm = 8*m2**3 - m3**2
+                if dm >= 0:
+                    x=4.*NP.pi/3. + NP.arctan(sqrt(dm)/m3) / 3.
+                    C.append ( k*NP.cos(x) )
+                else:
+                    x = NP.arctanh( sqrt(-dm)/m3 ) / 3.
+                    C.append ( k*NP.cosh(x) )
+            C=NP.array(C)
+            #print ( "C=", C )
+            B = sqrt ( abs ( covD - 2*C**2 ) )
+            #print ( "B=", B )
+            A = self.model.backgrounds - 2*C**2
+            #print ( "A=", A )
+            """
+            rho = NP.array ( [ [0.]*self.model.n ]*self.model.n )
+            for x in range(self.model.n):
+                for y in range(x,self.model.n):
+                    e=(8.*C[x]*C[y])**(-1)*(sqrt( (B[x]*B[y])**2+16*C[x]*C[y]*self.model.covariance[x][y]) - B[x]*B[y] )
+                    rho[x][y]=e
+                    rho[y][x]=e
+            """
+            rho = self.model.correlations()
+            # print ( "rho=", rho )
+            def sandwich ( B, rho ):
+                """ sandwich product """
+                ret = NP.array ( [ [0.]*len(B) ]*len(B) )
+                for x in range(len(B)):
+                    for y in range(x,len(B)):
+                        T=B[x]*B[y]*rho[x][y]
+                        ret[x][y]=T
+                        ret[y][x]=T
+                return ret
+
+            V = sandwich ( B, rho )
+            # print ( "cov=", V )
             lmbda = theta + self.ntot + self.model.skewness * theta**2 / self.model.backgrounds**2 
         for ctr,i in enumerate ( lmbda ):
             if i==0. or i<0.:
                 lmbda[ctr]=1e-30
-        poisson = numpy.exp(self.model.data*numpy.log(lmbda) - lmbda - self.gammaln)
-        gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=(self.model.covariance+numpy.diag(self.deltas**2)))
+        poisson = NP.exp(self.model.data*NP.log(lmbda) - lmbda - self.gammaln)
+        gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=V)
         ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
         return ret
 
@@ -222,7 +285,7 @@ class LikelihoodComputer:
         xtot = theta + self.ntot
         xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
         # logger.info  ( "theta=%s" % theta )
-        logpoisson = self.model.data*numpy.log(xtot) - xtot - self.gammaln
+        logpoisson = self.model.data*NP.log(xtot) - xtot - self.gammaln
         loggaussian = stats.multivariate_normal.logpdf(theta,mean=[0.]*len(theta),cov=self.cov_tot)
         ret = - loggaussian - sum(logpoisson)
         return ret
@@ -232,7 +295,7 @@ class LikelihoodComputer:
         Makes it easier to find the maximum likelihood. """
         xtot = theta + self.ntot
         xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
-        nllp_ = self.ones - self.model.data / xtot + numpy.dot( theta , self.weight )
+        nllp_ = self.ones - self.model.data / xtot + NP.dot( theta , self.weight )
         return nllp_
 
     def nllHess ( self, theta ):
@@ -240,7 +303,7 @@ class LikelihoodComputer:
         Makes it easier to find the maximum likelihood. """
         xtot = theta + self.ntot
         xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
-        nllh_ = self.weight + numpy.diag ( self.model.data / (xtot**2) )
+        nllh_ = self.weight + NP.diag ( self.model.data / (xtot**2) )
         return nllh_
 
     def getThetaHat ( self, nobs, nb, nsig, covb, deltas, max_iterations ):
@@ -248,12 +311,12 @@ class LikelihoodComputer:
             maximizes our likelihood (poisson*gauss).  """
             self.nsig = nsig
             self.deltas = deltas
-            sigma2 = covb + numpy.diag ( deltas**2 )
+            sigma2 = covb + NP.diag ( deltas**2 )
             ## for now deal with variances only
             ntot = nb + nsig
-            cov = numpy.matrix ( sigma2 )
+            cov = NP.matrix ( sigma2 )
             weight = cov**(-1) ## weight matrix
-            diag_cov = numpy.diag(cov)
+            diag_cov = NP.diag(cov)
             # first: no covariances:
             q = diag_cov * ( ntot - nobs )
             p = ntot + diag_cov
@@ -268,7 +331,7 @@ class LikelihoodComputer:
                 for ctr,i in enumerate ( theta2 ):
                     if i == 0.:
                         theta2[ctr]=1e-20
-                return sum ( numpy.abs(theta1 - theta2) / numpy.abs ( theta1+theta2 ) )
+                return sum ( NP.abs(theta1 - theta2) / NP.abs ( theta1+theta2 ) )
 
             for ctr in range(max_iterations):
                 q = diag_cov * ( ntot - nobs )
@@ -282,10 +345,10 @@ class LikelihoodComputer:
                         dp = thetamax[j]*weight[i,j]*diag_cov[i]
                         if abs ( dq / q[i] ) > .3:
                             #logger.warning ( "too big a change in iteration." )
-                            dq=numpy.abs( .3 * q[i] ) * numpy.sign ( dq )
+                            dq=NP.abs( .3 * q[i] ) * NP.sign ( dq )
                         if abs ( dp / p[i] ) > .3:
                             #logger.warning ( "too big a change in iteration." )
-                            dp=numpy.abs( .3 * p[i] ) * numpy.sign ( dp )
+                            dp=NP.abs( .3 * p[i] ) * NP.sign ( dp )
                         q[i] += dq
                         p[i] += dp
                     thetamax = -p/2. * ( 1 - sign(p) * sqrt ( 1. - 4*q / p**2 ) )
@@ -312,12 +375,12 @@ class LikelihoodComputer:
             ## first step is to disregard the covariances and solve the
             ## quadratic equations
             ini = self.getThetaHat ( self.model.data, self.model.backgrounds, nsig, self.model.covariance, deltas, 0 )
-            self.cov_tot = self.model.covariance+numpy.diag(self.deltas**2)
-            self.weight = numpy.linalg.inv ( self.cov_tot )
+            self.cov_tot = self.model.covariance+NP.diag(self.deltas**2)
+            self.weight = NP.linalg.inv ( self.cov_tot )
             self.ntot = self.model.backgrounds + self.nsig
             self.ones = 1.
             if type ( self.model.data) in [ list, ndarray ]:
-                self.ones = numpy.ones ( len (self.model.data) )
+                self.ones = NP.ones ( len (self.model.data) )
             self.gammaln = special.gammaln(self.model.data + 1)
             try:
                 ret_c = optimize.fmin_ncg ( self.nll, ini, fprime=self.nllprime,
@@ -343,7 +406,7 @@ class LikelihoodComputer:
                 return ret,-2
             except Exception as e:
                 logger.error ( "exception: %s. ini[-3:]=%s" % (e,ini[-3:]) )
-                logger.error ( "cov-1=%s" % (self.model.covariance+numpy.diag(deltas))**(-1) )
+                logger.error ( "cov-1=%s" % (self.model.covariance+NP.diag(deltas))**(-1) )
                 sys.exit()
             return ini,-1
 
@@ -354,18 +417,18 @@ class LikelihoodComputer:
             vals=[]
             self.gammaln = special.gammaln(self.model.data + 1)
             lambdas = stats.multivariate_normal.rvs(mean=self.model.backgrounds+nsig,
-                          cov=(self.model.covariance+numpy.diag(deltas**2)),
+                          cov=(self.model.covariance+NP.diag(deltas**2)),
                           size=self.ntoys ) ## get ntoys values
             for lmbda in lambdas:
                 if self.model.isScalar ( lmbda ): lmbda = array ( [ lmbda ] )
                 for ctr,v in enumerate ( lmbda ):
                     if v<=0.: lmbda[ctr]=1e-30
 #                    print ( "lmbda=",lmbda )
-                poisson = self.model.data*numpy.log(lmbda) - lmbda - self.gammaln
-                # poisson = numpy.exp(self.model.data*numpy.log(lmbda) - lmbda - self.model.backgrounds - self.gammaln)
-                vals.append ( numpy.exp ( sum(poisson) ) )
+                poisson = self.model.data*NP.log(lmbda) - lmbda - self.gammaln
+                # poisson = NP.exp(self.model.data*NP.log(lmbda) - lmbda - self.model.backgrounds - self.gammaln)
+                vals.append ( NP.exp ( sum(poisson) ) )
                 #vals.append ( reduce(lambda x, y: x*y, poisson) )
-            mean = numpy.mean ( vals )
+            mean = NP.mean ( vals )
             # print ( "marginalized, vals=", vals, mean )
             return mean,0
 
@@ -487,19 +550,19 @@ class UpperLimitComputer:
         return mu_lim / self.lumi
 
 if __name__ == "__main__":
+    C=[ 18774.2, -2866.97, -5807.3, -4460.52, -2777.25, -1572.97, -846.653, -442.531,
+       -2866.97, 496.273, 900.195, 667.591, 403.92, 222.614, 116.779, 59.5958, 
+       -5807.3, 900.195, 1799.56, 1376.77, 854.448, 482.435, 258.92, 134.975, 
+       -4460.52, 667.591, 1376.77, 1063.03, 664.527, 377.714, 203.967, 106.926, 
+       -2777.25, 403.92, 854.448, 664.527, 417.837, 238.76, 129.55, 68.2075, 
+       -1572.97, 222.614, 482.435, 377.714, 238.76, 137.151, 74.7665, 39.5247,
+       -846.653, 116.779, 258.92, 203.967, 129.55, 74.7665, 40.9423, 21.7285, 
+       -442.531, 59.5958, 134.975, 106.926, 68.2075, 39.5247, 21.7285, 11.5732]
     m=Model ( data=[1964,877,354,182,82,36,15,11],
               backgrounds=[2006.4,836.4,350.,147.1,62.0,26.2,11.1,4.7],
-              covariance= [ 18774.2, -2866.97, -5807.3, -4460.52, -2777.25, -1572.97,
-                     -846.653, -442.531, -2866.97, 496.273, 900.195, 667.591, 403.92,
-                     222.614, 116.779, 59.5958, -5807.3, 900.195, 1799.56, 1376.77,
-                     854.448, 482.435, 258.92, 134.975, -4460.52, 667.591, 1376.77,
-                     1063.03, 664.527, 377.714, 203.967, 106.926, -2777.25, 403.92,
-                     854.448, 664.527, 417.837, 238.76, 129.55, 68.2075, -1572.97,
-                     222.614, 482.435, 377.714, 238.76, 137.151, 74.7665, 39.5247,
-                     -846.653, 116.779, 258.92, 203.967, 129.55, 74.7665, 40.9423,
-                     21.7285, -442.531, 59.5958, 134.975, 106.926, 68.2075, 39.5247,
-                     21.7285, 11.5732],
-              skewness = [ 0., 0., 0., 0., 0., 0., 0., 0. ],
+              covariance= C,
+#              skewness = [ 0.1, 0.02, 0.1, 0.1, 0.003, 0.0001, 0.0002, 0.0005 ],
+              skewness = [ 0. ] * 8,
               efficiencies=[ x/100. for x in [47,29.4,21.1,14.3,9.4,7.1,4.7,4.3] ],
               name="CMS-NOTE-2017-001 model" )
     ulComp = UpperLimitComputer ( lumi = 1. / fb, ntoys=500, cl=.95 )
