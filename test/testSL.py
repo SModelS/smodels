@@ -44,11 +44,18 @@ class SLTest(unittest.TestCase):
         m = Model ( data=m9.data.tolist(), backgrounds=m9.background.tolist(),
                 covariance=m9.covariance.tolist(), skewness=S, 
                 efficiencies=[x/100. for x in m9.signal ], name="model90" )
-        ulComp = UpperLimitComputer ( lumi = 1. / fb, ntoys=1000, cl=.95 )
+        ulComp = UpperLimitComputer ( lumi = 1. / fb, ntoys=100000, cl=.95 )
         t0=time.time()
         ul = ulComp.ulSigma ( m )
-        # print ( "ul,t=", ul, time.time()-t0 )
+        t1=time.time()
+        print ( "ul,t=", ul, t1-t0 )
         self.assertTrue( abs ( 1. - ul / ( 72.*fb) ) < 0.2 )
+        """
+        ulProf = ulComp.ulSigma ( m, marginalize=False )
+        t2=time.time()
+        print ( "ulProf,t=", ulProf, t2-t1 )
+        self.assertAlmostEqual( ulProf / ( 130.29*fb), 1.0, 2 )
+        """
 
 if __name__ == "__main__":
     unittest.main()
