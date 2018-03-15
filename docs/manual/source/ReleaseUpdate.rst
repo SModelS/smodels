@@ -40,6 +40,16 @@ has undergone significant structural changes. Version 1.1 comes
 with many new features. The major novelties of this release are 
 as follows:
 
+New in Version 1.1.2:
+^^^^^^^^^^^^^^^^^^^^^
+
+* Changes in pickling (subpickling, redundant zeroes are now removed)
+* URLs are allowed as database paths (see **database:path** in |parameters|)
+* Small bug fixes
+* Option to show individual contribution from topologies to total theory prediction (see **python-printer:addTxWeights** in |parameters|)
+* smodelsTools.py fixpermissions, for system-wide installs (see :ref:`Files Permissions Fixer <permissionsFixer>`)
+
+
 New in Version 1.1.1:
 ^^^^^^^^^^^^^^^^^^^^^
 
