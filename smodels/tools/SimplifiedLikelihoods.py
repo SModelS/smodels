@@ -20,7 +20,8 @@ import numpy
 import sys
 
 def getLogger():
-    """ configure the logger """
+    """ configure the logging facility. Maybe adapted to fit into 
+        your framework. """
     import logging
     logger = logging.getLogger("SL")
     formatter = logging.Formatter('%(module)s - %(levelname)s: %(message)s')
@@ -30,23 +31,29 @@ def getLogger():
     logger.addHandler(ch)
     return logger
 
-logger=getLogger()
-
-try:
-    import unum
+def importUnits():
+    """ Define units (fb,pb). Use unum, if possible. """
     try:
-        fb = unum.Unum.unit('fb')
-        pb = unum.Unum.unit('pb', 1000 * fb)
-    except unum.NameConflictError as e:
-        # already defined? lets trust everybody to mean that same thing
-        pass
-except ImportError as e:
-    logger.error ( "unum not installed. For now I will work without units. You are however advised to install the unum module." )
-    fb,pb=1.,1000.
+        import unum
+        try:
+            fb = unum.Unum.unit('fb')
+            pb = unum.Unum.unit('pb', 1000 * fb)
+            return fb,pb
+        except unum.NameConflictError as e:
+            # already defined? lets trust everybody to mean that same thing
+            return globals()["fb"],globals()["pb"]
+    except ImportError as e:
+        logger.error ( "unum not installed. For now I will work without units. You"
+                       " are however advised to install the unum module." )
+        fb,pb=1.,1000.
+        return fb,pb
+
+logger=getLogger()
+fb,pb=importUnits()
 
 class Model:
     """ A very simple data container to collect all the data
-        of a specific statistical model """
+        needed to fully define a specific statistical model """
     def isScalar ( self, obj ):
         """ determine if obj is a scalar (float or int) """
         try:
@@ -58,20 +65,25 @@ class Model:
 
     def convert ( self, obj ):
         """ convert everything to numpy arrays """
+        if type(obj) == type(None):
+            return obj
         if self.isScalar(obj):
             return array ( [ obj ] )
         return array ( obj )
+
     def __str__ ( self ):
         return self.name + " (%d dims)" % self.n
+
     def convertCov ( self, obj ):
-        ## if the matrix is flattened, unflatten it.
         if self.isScalar(obj):
             return array ( [ [ obj ] ] )
         if type(obj[0]) == float:
+            ## if the matrix is flattened, unflatten it.
             return array ( [ obj[self.n*i:self.n*(i+1)] for i in range(self.n) ] )
         return obj
-    def __init__ ( self, data, backgrounds, covariance, efficiencies=None, 
-                   name="model" ):
+
+    def __init__ ( self, data, backgrounds, covariance, skewness=None, 
+                         efficiencies=None, name="model" ):
         """
         :param data: number of observed events per dataset
         :param backgrounds: expected bg per dataset
@@ -83,6 +95,7 @@ class Model:
         self.n = len ( self.data )
         self.covariance = self.convertCov ( covariance )
         self.efficiencies = self.convert ( efficiencies )
+        self.skewness = self.convert ( skewness )
         self.name = name
 
     def signals ( self, mu ):
@@ -192,11 +205,13 @@ class LikelihoodComputer:
         """ probability, for nuicance parameters theta """
         theta = array ( thetaA )
         # ntot = self.model.backgrounds + self.nsig
-        xtot = theta + self.ntot
-        for ctr,i in enumerate ( xtot ):
+        lmbda = theta + self.ntot ## the lambda for the Poissonian
+        if type(self.model.skewness) != type(None):
+            lmbda = theta + self.ntot + self.model.skewness * theta**2 / self.model.backgrounds**2 
+        for ctr,i in enumerate ( lmbda ):
             if i==0. or i<0.:
-                xtot[ctr]=1e-30
-        poisson = numpy.exp(self.model.data*numpy.log(xtot) - theta - self.ntot - self.gammaln)
+                lmbda[ctr]=1e-30
+        poisson = numpy.exp(self.model.data*numpy.log(lmbda) - lmbda - self.gammaln)
         gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=(self.model.covariance+numpy.diag(self.deltas**2)))
         ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
         return ret
@@ -484,6 +499,7 @@ if __name__ == "__main__":
                      -846.653, 116.779, 258.92, 203.967, 129.55, 74.7665, 40.9423,
                      21.7285, -442.531, 59.5958, 134.975, 106.926, 68.2075, 39.5247,
                      21.7285, 11.5732],
+              skewness = [ 0., 0., 0., 0., 0., 0., 0., 0. ],
               efficiencies=[ x/100. for x in [47,29.4,21.1,14.3,9.4,7.1,4.7,4.3] ],
               name="CMS-NOTE-2017-001 model" )
     ulComp = UpperLimitComputer ( lumi = 1. / fb, ntoys=500, cl=.95 )
