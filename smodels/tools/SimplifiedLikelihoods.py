@@ -247,19 +247,14 @@ class LikelihoodComputer:
                     x = NP.arctanh( sqrt(-dm)/m3 ) / 3.
                     C.append ( k*NP.cosh(x) )
             C=NP.array(C)
-            #print ( "C=", C )
             B = sqrt ( abs ( covD - 2*C**2 ) )
-            #print ( "B=", B )
             A = self.model.backgrounds - 2*C**2
-            #print ( "A=", A )
             rho = NP.array ( [ [0.]*self.model.n ]*self.model.n )
             for x in range(self.model.n):
                 for y in range(x,self.model.n):
                     e=(8.*C[x]*C[y])**(-1)*(sqrt( (B[x]*B[y])**2+16*C[x]*C[y]*self.model.covariance[x][y]) - B[x]*B[y] )
                     rho[x][y]=e
                     rho[y][x]=e
-            # rho = self.model.correlations()
-            print ( "rho=", rho )
             def sandwich ( B, rho ):
                 """ sandwich product """
                 ret = NP.array ( [ [0.]*len(B) ]*len(B) )
@@ -272,7 +267,8 @@ class LikelihoodComputer:
 
             V = sandwich ( B, rho )
             # print ( "cov=", V )
-            lmbda = theta + self.ntot + self.model.skewness * theta**2 / self.model.backgrounds**2 
+            lmbda = self.nsig + A + theta + C * theta**2 / B**2 
+            # lmbda = theta + self.ntot + self.model.skewness * theta**2 / self.model.backgrounds**2 
         for ctr,i in enumerate ( lmbda ):
             if i==0. or i<0.:
                 lmbda[ctr]=1e-30

@@ -16,7 +16,7 @@ from smodels.tools.SimplifiedLikelihoods import Model, UpperLimitComputer
 
 class SLTest(unittest.TestCase):
 
-    def mestModel8(self):
+    def testModel8(self):
         C=[ 18774.2, -2866.97,-5807.3,-4460.52,-2777.25,-1572.97, -846.653, -442.531,
            -2866.97, 496.273, 900.195, 667.591, 403.92, 222.614, 116.779, 59.5958, 
            -5807.3, 900.195, 1799.56, 1376.77, 854.448, 482.435, 258.92, 134.975, 
@@ -39,11 +39,15 @@ class SLTest(unittest.TestCase):
 
     def testModel90(self):
         import model_90 as m9
+        import time
+        S=m9.third_moment.tolist()
         m = Model ( data=m9.data.tolist(), backgrounds=m9.background.tolist(),
-                covariance=m9.covariance.tolist(), skewness=m9.third_moment.tolist(), 
+                covariance=m9.covariance.tolist(), skewness=S, 
                 efficiencies=[x/100. for x in m9.signal ], name="model90" )
-        ulComp = UpperLimitComputer ( lumi = 1. / fb, ntoys=10000, cl=.95 )
+        ulComp = UpperLimitComputer ( lumi = 1. / fb, ntoys=1000, cl=.95 )
+        t0=time.time()
         ul = ulComp.ulSigma ( m )
+        # print ( "ul,t=", ul, time.time()-t0 )
         self.assertTrue( abs ( 1. - ul / ( 72.*fb) ) < 0.2 )
 
 if __name__ == "__main__":
