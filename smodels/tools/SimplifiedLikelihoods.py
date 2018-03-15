@@ -40,8 +40,12 @@ def importUnits():
             pb = unum.Unum.unit('pb', 1000 * fb)
             return fb,pb
         except unum.NameConflictError as e:
-            # already defined? lets trust everybody to mean that same thing
-            return globals()["fb"],globals()["pb"]
+            # already defined? reset!
+            unum.Unum("fb").reset()
+            unum.Unum("pb").reset()
+            fb = unum.Unum.unit('fb')
+            pb = unum.Unum.unit('pb', 1000 * fb)
+            return fb,pb
     except ImportError as e:
         logger.error ( "unum not installed. For now I will work without units. You"
                        " are however advised to install the unum module." )

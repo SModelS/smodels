@@ -11,7 +11,8 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.tools.SimplifiedLikelihoods import Model, UpperLimitComputer, fb, pb
+from smodels.tools.physicsUnits import fb, pb
+from smodels.tools.SimplifiedLikelihoods import Model, UpperLimitComputer
 
 class SLTest(unittest.TestCase):
 
@@ -44,7 +45,6 @@ class SLTest(unittest.TestCase):
         ulComp = UpperLimitComputer ( lumi = 1. / fb, ntoys=10000, cl=.95 )
         ul = ulComp.ulSigma ( m )
         self.assertTrue( abs ( 1. - ul / ( 72.*fb) ) < 0.2 )
-
 
 if __name__ == "__main__":
     unittest.main()
