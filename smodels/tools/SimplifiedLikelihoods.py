@@ -248,16 +248,14 @@ class LikelihoodComputer:
             #print ( "B=", B )
             A = self.model.backgrounds - 2*C**2
             #print ( "A=", A )
-            """
             rho = NP.array ( [ [0.]*self.model.n ]*self.model.n )
             for x in range(self.model.n):
                 for y in range(x,self.model.n):
                     e=(8.*C[x]*C[y])**(-1)*(sqrt( (B[x]*B[y])**2+16*C[x]*C[y]*self.model.covariance[x][y]) - B[x]*B[y] )
                     rho[x][y]=e
                     rho[y][x]=e
-            """
-            rho = self.model.correlations()
-            # print ( "rho=", rho )
+            # rho = self.model.correlations()
+            print ( "rho=", rho )
             def sandwich ( B, rho ):
                 """ sandwich product """
                 ret = NP.array ( [ [0.]*len(B) ]*len(B) )
@@ -275,9 +273,13 @@ class LikelihoodComputer:
             if i==0. or i<0.:
                 lmbda[ctr]=1e-30
         poisson = NP.exp(self.model.data*NP.log(lmbda) - lmbda - self.gammaln)
-        gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=V)
-        ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
-        return ret
+        try:
+            gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=V)
+            ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
+            return ret
+        except ValueError as e:
+            logger.error ( "ValueError %s, %s" % ( e, V ) )
+            sys.exit()
 
     def nll ( self, theta ):
         """ probability, for nuicance parameters theta,

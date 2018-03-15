@@ -41,11 +41,9 @@ class SLTest(unittest.TestCase):
         m = Model ( data=m9.data.tolist(), backgrounds=m9.background.tolist(),
                 covariance=m9.covariance.tolist(), skewness=m9.third_moment.tolist(), 
                 efficiencies=[x/100. for x in m9.signal ], name="model90" )
-        ulComp = UpperLimitComputer ( lumi = 1. / fb, ntoys=500, cl=.95 )
+        ulComp = UpperLimitComputer ( lumi = 1. / fb, ntoys=10000, cl=.95 )
         ul = ulComp.ulSigma ( m )
-        self.assertAlmostEqual( ul / ( 70.*fb), 1.0, 1 )
-        ulProf = ulComp.ulSigma ( m, marginalize=False )
-        self.assertAlmostEqual( ulProf / ( 48.8*fb), 1.0, 2 )
+        self.assertTrue( abs ( 1. - ul / ( 72.*fb) ) < 0.2 )
 
 
 if __name__ == "__main__":
