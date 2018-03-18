@@ -13,8 +13,9 @@ from smodels.tools import modelTester
 from smodels.tools import crashReport
 from smodels.tools import smodelsLogging
 
-"""Module variable, so particles.py can read it. Determined by command line
-parameter (overriding ini-file-entry overriding hard coded default smodels.particles_0"""
+""" Module variable, so particles.py can read it. Determined by command line
+parameter (overriding ini-file-entry overriding hard coded default smodels.default_particles)
+"""
 particlesModule = None
 
 def main():
@@ -35,7 +36,7 @@ def main():
             default=parameterFile)
     ap.add_argument('-P', '--particlesModule', 
             help='path of particles.py, where decays are described (optional argument).'
-            'If not set, parameterFile-entry is used, if not existing, defaults to ›smodels.particles_0‹')
+            'If not set, parameterFile-entry is used, if not existing, defaults to smodels.default_particles')
     ap.add_argument('-o', '--outputDir', 
             help='name of output directory (optional argument). The default folder is: ' +
             outputDir, default=outputDir)
@@ -110,7 +111,7 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
         if parser.has_option("particles","module"):
             particlesModule = parser.get( "particles", "module" )     
         else:
-            particlesModuleDefault = 'smodels.particles_0'
+            particlesModuleDefault = 'smodels.default_particles'
             particlesModule = particlesModuleDefault
     #print ( 'ParticlesModule: ' + particlesModule )
 
