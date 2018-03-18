@@ -11,7 +11,7 @@
 
 import sys
 import copy
-from smodels.particles import rEven, rOdd, ptcDic
+#from smodels.particles import rEven, rOdd, ptcDic
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import itertools
 
@@ -27,6 +27,8 @@ def getName(pdg):
     :returns: particle name (e.g. gluino, mu-, ...)
     
     """
+    
+    from smodels.particles import rEven, rOdd
     p = int(pdg)
     if p in rOdd:
         return rOdd[p]
@@ -45,6 +47,7 @@ def getPdg(name):
     :returns: particle pdg; None, if name could not be resolved
     
     """
+    from smodels.particles import rEven, rOdd
     for (pdg, pname) in rOdd.items():
         if name == pname:
             return abs(pdg)
@@ -77,6 +80,7 @@ def elementsInStr(instring,removeQuotes=True):
                   "Check your constraints and conditions in your database." % str(instring))
 
         tempstring = instring.replace(" ", "")
+        from smodels.particles import rEven, ptcDic
         while tempstring.find('[') != -1:
             el0 = tempstring.find('[')
             elf = el0
@@ -128,6 +132,7 @@ def vertInStr(instring,removeQuotes=True):
                   "Check your constraints and conditions in your database." % str(instring))
 
         tempstring = instring.replace(" ", "")
+        from smodels.particles import rEven, ptcDic
         while tempstring.find(']') != -1:
             elf = tempstring.find(']')
             el0 = tempstring.rfind('[',0,elf)
@@ -172,6 +177,7 @@ def simParticles(plist1, plist2, useDict=True):
         raise SModelSError()
     if len(plist1) != len(plist2):
         return False
+    from smodels.particles import rEven, ptcDic
     for i,p in enumerate(plist1):
         if not isinstance(p,str) or not isinstance(plist2[i],str):
             logger.error("Input must be a list of particle strings")

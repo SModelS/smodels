@@ -9,7 +9,7 @@
 import sys
 from smodels.theory.particleNames import simParticles, elementsInStr
 from smodels.tools.physicsUnits import fb, MeV
-from smodels.particles import rEven, ptcDic
+#from smodels.particles import rEven, ptcDic
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -40,6 +40,7 @@ class Branch(object):
         self.maxWeight = None
         self.vertnumb = None
         self.vertparts = None
+        from smodels.particles import rEven, ptcDic
         if type(info) == type(str()):
             branch = elementsInStr(info)
             if not branch or len(branch) > 1:
@@ -200,6 +201,7 @@ class Branch(object):
                             not have multiple PID lists!")
             return False   
 
+        from smodels.particles import rEven
         for partID in br.ids:
             # Add R-even particles to final state
             if partID in rEven:

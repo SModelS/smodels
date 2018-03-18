@@ -354,7 +354,8 @@ class UncoveredList(object):
         :parameter instr: element as string
         :returns: string of generalized element
         """
-        from smodels.theory.particleNames import ptcDic
+        #from smodels.theory.particleNames import ptcDic
+        from smodels.particles import ptcDic
         if self.sumL: exch = ["W", "l", "t", "ta"]
         else: exch = ["W", "e", "mu", "t", "ta"]
         if self.sumJet: exch.append("jet")
