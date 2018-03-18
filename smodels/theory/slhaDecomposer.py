@@ -141,13 +141,13 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
 
 def writeIgnoreMessage ( keys, rEven, rOdd ):
     msg = ""
-    import smodels.particles
+    from smodels.particles import rEven
     for pid in keys:
         if not pid in list(rEven) + list(rOdd):
             logger.warning("Particle %i not defined in particles.py, its decays will be ignored" %(pid))
             continue
         if pid in rEven:
-            msg += "%s, " % smodels.particles.rEven[pid]
+            msg += "%s, " % rEven[pid]
             continue         
     if len(msg)>0:
             logger.debug ( "Ignoring %s decays" % msg[:-2] )
@@ -161,23 +161,21 @@ def _getDictionariesFromSLHA(slhafile):
 
     res = pyslha.readSLHAFile(slhafile)
 
-    import smodels.particles
-    rOdd = smodels.particles.rOdd.keys()
-    rEven = smodels.particles.rEven.keys()
-    
     # Get mass and branching ratios for all particles
     brDic = {}
-    writeIgnoreMessage ( res.decays.keys(), rEven, rOdd )
+    
+    from smodels.particles import rOdd, rEven    
+    writeIgnoreMessage ( res.decays.keys(), rEven.keys(), rOdd.keys() )
 
     for pid in res.decays.keys():
-        if not pid in list(rOdd):
+        if not pid in list(rOdd.keys()):
             continue
         brs = []
         for decay in res.decays[pid].decays:
             nEven = nOdd = 0.
             for pidd in decay.ids:
-                if pidd in rOdd: nOdd += 1
-                elif pidd in rEven: nEven += 1
+                if pidd in rOdd.keys(): nOdd += 1
+                elif pidd in rEven.keys(): nEven += 1
                 else:
                     logger.warning("Particle %i not defined in particles.py,decay %i -> [%s] will be ignored" %(pidd,pid,decay.ids))
                     break
