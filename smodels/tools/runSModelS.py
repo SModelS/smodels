@@ -13,6 +13,8 @@ from smodels.tools import modelTester
 from smodels.tools import crashReport
 from smodels.tools import smodelsLogging
 
+particlesModule = None
+
 def main():
     import argparse
     """ Set default input and output files """
@@ -29,6 +31,9 @@ def main():
             help='name of parameter file, where most options are defined (optional argument). If not set, use '
             'all parameters from smodels/etc/parameters_default.ini', 
             default=parameterFile)
+    ap.add_argument('-P', '--particlesModule', 
+            help='path of particles.py, where decays are described (optional argument).'
+            'If not set, parameterFile-entry is used, if not existing, defaults to ›smodels.particles_0‹')
     ap.add_argument('-o', '--outputDir', 
             help='name of output directory (optional argument). The default folder is: ' +
             outputDir, default=outputDir)
@@ -56,6 +61,10 @@ def main():
     if args.colors:
         from smodels.tools.colors import colors
         colors.on = True
+        
+    if args.particlesModule:
+        global particlesModule
+        particlesModule = args.particlesModule
 
     db=None
     if args.force_txt: db=True
