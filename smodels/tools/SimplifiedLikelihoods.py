@@ -252,7 +252,7 @@ class LikelihoodComputer:
             rho = NP.array ( [ [0.]*self.model.n ]*self.model.n )
             for x in range(self.model.n):
                 for y in range(x,self.model.n):
-                    e=(8.*C[x]*C[y])**(-1)*(sqrt( (B[x]*B[y])**2+16*C[x]*C[y]*self.model.covariance[x][y]) - B[x]*B[y] )
+                    e=(4.*C[x]*C[y])**(-1)*(sqrt( (B[x]*B[y])**2+8*C[x]*C[y]*self.model.covariance[x][y]) - B[x]*B[y] )
                     rho[x][y]=e
                     rho[y][x]=e
             def sandwich ( B, rho ):
