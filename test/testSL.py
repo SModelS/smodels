@@ -13,10 +13,11 @@ sys.path.insert(0,"../")
 import unittest
 from smodels.tools.physicsUnits import fb, pb
 from smodels.tools.SimplifiedLikelihoods import Model, UpperLimitComputer
+from numpy  import array, sqrt
 
 class SLTest(unittest.TestCase):
 
-    def testModel8(self):
+    def mestModel8(self):
         C=[ 18774.2, -2866.97,-5807.3,-4460.52,-2777.25,-1572.97, -846.653, -442.531,
            -2866.97, 496.273, 900.195, 667.591, 403.92, 222.614, 116.779, 59.5958, 
            -5807.3, 900.195, 1799.56, 1376.77, 854.448, 482.435, 258.92, 134.975, 
@@ -37,7 +38,34 @@ class SLTest(unittest.TestCase):
         ulProf = ulComp.ulSigma ( m, marginalize=False )
         self.assertAlmostEqual( ulProf / ( 130.29*fb), 1.0, 2 )
 
-    def testModel90(self):
+    def createModel(self,n=3):
+        import model_90 as m9
+        S=m9.third_moment.tolist()[:n]
+        D=m9.data.tolist()[:n]
+        B=m9.background.tolist()[:n]
+        sig=[ x/100. for x in m9.signal.tolist()[:n] ]
+        C_=m9.covariance.tolist()
+        ncov=int(sqrt(len(C_)))
+        C=[]
+        for i in range(n):
+            C.append ( C_[ncov*i:ncov*i+n] )
+        m = Model ( data=D, backgrounds=B, covariance=C, skewness=S, 
+                    efficiencies=sig, name="model%d" % n )
+        return m
+
+    def testModel3(self):
+        """ take first 3 SRs of model-90 """
+        m = self.createModel ( 3 )
+        import time
+        ulComp = UpperLimitComputer ( lumi = 1. / fb, ntoys=10000, cl=.95 )
+        t0=time.time()
+        ul = ulComp.ulSigma ( m )
+        t1=time.time()
+        print ( "ul=%s, t=%s" % ( ul, t1-t0 ) )
+        ## Nick's profiling code gets xxx
+        self.assertTrue( abs ( 1. - ul / ( 1780.*fb) ) < 0.2 )
+
+    def mestModel90(self):
         import model_90 as m9
         import time
         S=m9.third_moment.tolist()
@@ -48,7 +76,8 @@ class SLTest(unittest.TestCase):
         t0=time.time()
         ul = ulComp.ulSigma ( m )
         t1=time.time()
-        print ( "ul,t=", ul, t1-t0 )
+        # print ( "ul,t=", ul, t1-t0 )
+        ## Nick's profiling code gets 72.0952
         self.assertTrue( abs ( 1. - ul / ( 72.*fb) ) < 0.2 )
         """
         ulProf = ulComp.ulSigma ( m, marginalize=False )
