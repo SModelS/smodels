@@ -54,12 +54,15 @@ class Database(object):
         :param subpickle: produce small pickle files per exp result.
             Should only be used when working on the database.
         """
+        self.source=None
         self.force_load = force_load
         self.subpickle = subpickle
         base, pclfile = self.checkPathName(base, discard_zeroes )
         self.pcl_meta = Meta( pclfile )
         self.expResultList = []
-        self.txt_meta = Meta ( base, discard_zeroes = discard_zeroes )
+        self.txt_meta = self.pcl_meta
+        if not self.force_load == "pcl":
+            self.txt_meta = Meta ( base, discard_zeroes = discard_zeroes )
         self.progressbar = None
         if progressbar:
             try:
@@ -202,8 +205,11 @@ class Database(object):
     def createBinaryFile ( self, filename=None ):
         """ create a pcl file from the text database,
             potentially overwriting an old pcl file. """
+        if self.txt_meta == None:
+            logger.error ( "Trying to create database pickle, but no txt_meta defined." )
+            sys.exit()
         logger.debug ( "database timestamp: %s, filecount: %d" % \
-                ( time.ctime ( self.txt_meta.mtime ), self.txt_meta.filecount ) )
+                     ( time.ctime ( self.txt_meta.mtime ), self.txt_meta.filecount ) )
         binfile = filename
         if binfile == None:
             binfile = self.pcl_meta.pathname
@@ -348,10 +354,7 @@ class Database(object):
                     sys.exit()
                 logger.info ( "File not found: %s. Will generate." % tmp )
                 base = os.path.dirname ( tmp )
-                # self.pcl_meta.pathname = os.path.basename ( tmp )
                 return ( base, tmp )
-                #if self.force_load in [ "txt", None, "None", "none" ]:
-                #sys.exit()
             logger.error ( "Supplied a pcl filename, but %s is not a file." % tmp )
             sys.exit()
 

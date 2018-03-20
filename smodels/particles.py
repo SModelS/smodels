@@ -24,6 +24,9 @@
 
 import os
 from smodels.tools.runSModelS import modelFile
+from smodels.tools.smodelsLogging import logger
+
+logger.debug ( "model file: %s" % modelFile )
 
 if "/" in modelFile:
     import shutil
