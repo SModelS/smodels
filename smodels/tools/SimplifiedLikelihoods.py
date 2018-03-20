@@ -552,11 +552,14 @@ class UpperLimitComputer:
             nll = computer.likelihood ( nsig, marginalize=marginalize, nll=True ) 
             nllA = compA.likelihood ( nsig, marginalize=marginalize, nll=True ) 
             qmu =  2*( nll - nll0 )
+            if qmu<0.: qmu=0.
             qA =  2*( nllA - nll0A )
             if qA<0.: qA=0.
             CLsb = 1. - stats.multivariate_normal.cdf ( sqrt ( qmu ) )
             CLb =  stats.multivariate_normal.cdf ( sqrt ( qA ) - sqrt(qmu) )
-            CLs = CLsb / CLb
+            CLs = 1.0
+            if CLb>0.:
+                CLs = CLsb / CLb
             root = CLs - 1. + self.cl 
             # print ( "mu=%s nll=%s nllo=%s qA=%s clb=%s clsb=%s cls=%s" % ( mu, nll, nll0, qA, CLb, CLsb, CLs ) )
             return root

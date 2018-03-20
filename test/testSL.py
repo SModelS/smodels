@@ -17,7 +17,7 @@ from numpy  import array, sqrt
 
 class SLTest(unittest.TestCase):
 
-    def mestModel8(self):
+    def testModel8(self):
         C=[ 18774.2, -2866.97,-5807.3,-4460.52,-2777.25,-1572.97, -846.653, -442.531,
            -2866.97, 496.273, 900.195, 667.591, 403.92, 222.614, 116.779, 59.5958, 
            -5807.3, 900.195, 1799.56, 1376.77, 854.448, 482.435, 258.92, 134.975, 
@@ -36,7 +36,8 @@ class SLTest(unittest.TestCase):
         ul = ulComp.ulSigma ( m )
         self.assertAlmostEqual( ul / ( 132.*fb), 1.0, 1 )
         ulProf = ulComp.ulSigma ( m, marginalize=False )
-        self.assertAlmostEqual( ulProf / ( 130.29*fb), 1.0, 2 )
+        #print ( "ul,ulprof=", ul,ulProf )
+        self.assertAlmostEqual( ulProf / ( 132.0*fb), 1.0, 1 )
 
     def createModel(self,n=3):
         import model_90 as m9
@@ -53,7 +54,7 @@ class SLTest(unittest.TestCase):
                     efficiencies=sig, name="model%d" % n )
         return m
 
-    def testModel3(self):
+    def testModel10(self):
         """ take first n SRs of model-90 """
         m = self.createModel ( 10 )
         import time
@@ -61,15 +62,15 @@ class SLTest(unittest.TestCase):
         t0=time.time()
         ul = ulComp.ulSigma ( m )
         t1=time.time()
-        print ( "ul=%s, t=%s" % ( ul, t1-t0 ) )
+        #print ( "ul=%s, t=%s" % ( ul, t1-t0 ) )
         ## Nick's profiling code gets xxx
-        # self.assertTrue( abs ( 1. - ul / ( 1780.*fb) ) < 0.2 )
+        self.assertAlmostEqual( ul / ( 357.*fb), 1.0, 1 )
         ulProf = ulComp.ulSigma ( m, marginalize=False )
         t2=time.time()
-        print ( "ulProf,t=", ulProf, t2-t1 )
-        self.assertAlmostEqual( ulProf / ( 130.29*fb), 1.0, 2 )
+        #print ( "ulProf,t=", ulProf, t2-t1 )
+        self.assertAlmostEqual( ulProf / ( 350.0*fb), 1.0, 1 )
 
-    def mestModel90(self):
+    def testModel90(self):
         import model_90 as m9
         import time
         S=m9.third_moment.tolist()
@@ -80,13 +81,13 @@ class SLTest(unittest.TestCase):
         t0=time.time()
         ul = ulComp.ulSigma ( m )
         t1=time.time()
-        # print ( "ul,t=", ul, t1-t0 )
+        #print ( "ul90,t=", ul, t1-t0 )
         ## Nick's profiling code gets 72.0952
-        self.assertTrue( abs ( 1. - ul / ( 72.*fb) ) < 0.2 )
+        self.assertAlmostEqual ( ul / (72.1*fb), 1.0, 1 )
         ulProf = ulComp.ulSigma ( m, marginalize=False )
         t2=time.time()
-        print ( "ulProf,t=", ulProf, t2-t1 )
-        self.assertAlmostEqual( ulProf / ( 130.29*fb), 1.0, 2 )
+        #print ( "ulProf90,t=", ulProf, t2-t1 )
+        self.assertAlmostEqual( ulProf / ( 73.*fb), 1.0, 1 )
 
 if __name__ == "__main__":
     unittest.main()
