@@ -17,7 +17,7 @@ from scipy import stats, optimize, integrate, special
 from numpy  import sqrt, exp, log, sign, array, matrix, ndarray
 from functools import reduce
 import numpy as NP
-import sys
+import sys, copy
 
 def getLogger():
     """ configure the logging facility. Maybe adapted to fit into 
@@ -114,7 +114,6 @@ class Model:
             convenience function. """
         if hasattr ( self, "corr" ):
             return self.corr
-        import copy
         self.corr = copy.deepcopy ( self.covariance )
         for x in range(self.n):
             self.corr[x][x]=1.
@@ -532,27 +531,34 @@ class UpperLimitComputer:
         :returns: upper limit on *production* xsec (efficiencies unfolded)
         """
         computer = LikelihoodComputer ( model, self.ntoys )
+        aModel = copy.deepcopy ( model )
+        aModel.data = aModel.backgrounds
+        compA = LikelihoodComputer ( aModel, self.ntoys )
         ## compute
         mu_hat = computer.findMuHat ( model.efficiencies )
         theta_hat = computer.findThetaHat ( mu_hat * model.efficiencies ) 
         sigma_mu = computer.getSigmaMu ( model.efficiencies, 1., mu_hat, theta_hat )
+        mu_hatA = compA.findMuHat ( model.efficiencies )
         # print ( "mu_hat=", mu_hat )
         if mu_hat < 0.: mu_hat = 0.
         nll0 = computer.likelihood ( model.efficiencies * mu_hat, 
                                      marginalize=marginalize, nll=True )
+        nll0A = compA.likelihood ( aModel.efficiencies * mu_hatA, 
+                                   marginalize=marginalize, nll=True )
         def root_func ( mu ):
             ## the function to minimize.
             nsig = mu*model.efficiencies
             computer.ntot = model.backgrounds + nsig
             nll = computer.likelihood ( nsig, marginalize=marginalize, nll=True ) 
+            nllA = compA.likelihood ( nsig, marginalize=marginalize, nll=True ) 
             qmu =  2*( nll - nll0 )
-            CLsb = 1. - stats.multivariate_normal.cdf ( sqrt ( 2*( nll - nll0 ) ) )
-            CLb = 0.8 ## FIXME!!!!
+            qA =  2*( nllA - nll0A )
+            if qA<0.: qA=0.
+            CLsb = 1. - stats.multivariate_normal.cdf ( sqrt ( qmu ) )
+            CLb =  stats.multivariate_normal.cdf ( sqrt ( qA ) - sqrt(qmu) )
             CLs = CLsb / CLb
             root = CLs - 1. + self.cl 
-            print ( "mu=%s nll=%s nllo=%s clsb=%s cls=%s" % ( mu, nll, nll0, CLsb, CLs ) )
-            #if abs(root)<1e-3: ## good enough!
-            #    root=0.
+            # print ( "mu=%s nll=%s nllo=%s qA=%s clb=%s clsb=%s cls=%s" % ( mu, nll, nll0, qA, CLb, CLsb, CLs ) )
             return root
         # print ( "model=%s " % model )
         mu_lim = optimize.brentq ( root_func, 1.5*mu_hat, 2.5*mu_hat + 2*sigma_mu, rtol=1e-03, xtol=1e-06 )
