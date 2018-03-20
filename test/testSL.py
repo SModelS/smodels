@@ -54,8 +54,8 @@ class SLTest(unittest.TestCase):
         return m
 
     def testModel3(self):
-        """ take first 3 SRs of model-90 """
-        m = self.createModel ( 3 )
+        """ take first n SRs of model-90 """
+        m = self.createModel ( 10 )
         import time
         ulComp = UpperLimitComputer ( lumi = 1. / fb, ntoys=10000, cl=.95 )
         t0=time.time()
@@ -63,7 +63,11 @@ class SLTest(unittest.TestCase):
         t1=time.time()
         print ( "ul=%s, t=%s" % ( ul, t1-t0 ) )
         ## Nick's profiling code gets xxx
-        self.assertTrue( abs ( 1. - ul / ( 1780.*fb) ) < 0.2 )
+        # self.assertTrue( abs ( 1. - ul / ( 1780.*fb) ) < 0.2 )
+        ulProf = ulComp.ulSigma ( m, marginalize=False )
+        t2=time.time()
+        print ( "ulProf,t=", ulProf, t2-t1 )
+        self.assertAlmostEqual( ulProf / ( 130.29*fb), 1.0, 2 )
 
     def mestModel90(self):
         import model_90 as m9
@@ -79,12 +83,10 @@ class SLTest(unittest.TestCase):
         # print ( "ul,t=", ul, t1-t0 )
         ## Nick's profiling code gets 72.0952
         self.assertTrue( abs ( 1. - ul / ( 72.*fb) ) < 0.2 )
-        """
         ulProf = ulComp.ulSigma ( m, marginalize=False )
         t2=time.time()
         print ( "ulProf,t=", ulProf, t2-t1 )
         self.assertAlmostEqual( ulProf / ( 130.29*fb), 1.0, 2 )
-        """
 
 if __name__ == "__main__":
     unittest.main()

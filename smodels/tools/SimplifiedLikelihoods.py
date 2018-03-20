@@ -545,10 +545,17 @@ class UpperLimitComputer:
             nsig = mu*model.efficiencies
             computer.ntot = model.backgrounds + nsig
             nll = computer.likelihood ( nsig, marginalize=marginalize, nll=True ) 
-            root = 2*( nll - nll0 ) - 1.64485**2 
+            qmu =  2*( nll - nll0 )
+            CLsb = 1. - stats.multivariate_normal.cdf ( sqrt ( 2*( nll - nll0 ) ) )
+            CLb = 0.8 ## FIXME!!!!
+            CLs = CLsb / CLb
+            root = CLs - 1. + self.cl 
+            print ( "mu=%s nll=%s nllo=%s clsb=%s cls=%s" % ( mu, nll, nll0, CLsb, CLs ) )
+            #if abs(root)<1e-3: ## good enough!
+            #    root=0.
             return root
         # print ( "model=%s " % model )
-        mu_lim = optimize.brentq ( root_func, 1.5*mu_hat, 2.5*mu_hat + 2*sigma_mu )
+        mu_lim = optimize.brentq ( root_func, 1.5*mu_hat, 2.5*mu_hat + 2*sigma_mu, rtol=1e-03, xtol=1e-06 )
         return mu_lim / self.lumi
 
 if __name__ == "__main__":
