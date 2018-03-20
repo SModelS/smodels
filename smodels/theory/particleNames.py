@@ -11,12 +11,27 @@
 
 import sys
 import copy
-#from smodels.particles import rEven, rOdd, ptcDic
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import itertools
 
 from smodels.tools.smodelsLogging import logger
 
+
+#Particle dictionary. Convenient for defining multiple particles with one label.                                                              
+ptcDic = {"e"  : ["e+",  "e-"],                                                                                                               
+          "mu" : ["mu+", "mu-"],                                                                                                              
+          "ta" : ["ta+", "ta-"],                                                                                                              
+          "l+" : ["e+",  "mu+"],                                                                                                              
+          "l-" : ["e-",  "mu-"],                                                                                                              
+          "l"  : ["e-",  "mu-", "e+", "mu+"],                                                                                                 
+          "W"  : ["W+",  "W-"],                                                                                                               
+          "t"  : ["t+",  "t-"],                                                                                                               
+          "L+" : ["e+",  "mu+", "ta+"],                                                                                                       
+          "L-" : ["e-",  "mu-", "ta-"],                                                                                                       
+          "L"  : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-"],                                                                                   
+          "jet" : ["q", "g", "c", "pi"],                                                                                                    
+          "all" : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-", "W+", "W-","Z",
+                   "photon","higgs","t+","t-","b","c","q","g","c","pi"]}
 
 def getName(pdg):
     """
@@ -80,7 +95,7 @@ def elementsInStr(instring,removeQuotes=True):
                   "Check your constraints and conditions in your database." % str(instring))
 
         tempstring = instring.replace(" ", "")
-        from smodels.particles import rEven, ptcDic
+        from smodels.particles import rEven
         while tempstring.find('[') != -1:
             el0 = tempstring.find('[')
             elf = el0
@@ -132,7 +147,7 @@ def vertInStr(instring,removeQuotes=True):
                   "Check your constraints and conditions in your database." % str(instring))
 
         tempstring = instring.replace(" ", "")
-        from smodels.particles import rEven, ptcDic
+        from smodels.particles import rEven
         while tempstring.find(']') != -1:
             elf = tempstring.find(']')
             el0 = tempstring.rfind('[',0,elf)
@@ -177,7 +192,7 @@ def simParticles(plist1, plist2, useDict=True):
         raise SModelSError()
     if len(plist1) != len(plist2):
         return False
-    from smodels.particles import rEven, ptcDic
+    from smodels.particles import rEven
     for i,p in enumerate(plist1):
         if not isinstance(p,str) or not isinstance(plist2[i],str):
             logger.error("Input must be a list of particle strings")

@@ -9,7 +9,6 @@
 import sys
 from smodels.theory.particleNames import simParticles, elementsInStr
 from smodels.tools.physicsUnits import fb, MeV
-#from smodels.particles import rEven, ptcDic
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -40,7 +39,8 @@ class Branch(object):
         self.maxWeight = None
         self.vertnumb = None
         self.vertparts = None
-        from smodels.particles import rEven, ptcDic
+        from smodels.particles import rEven
+        from smodels.theory.particleNames import ptcDic
         if type(info) == type(str()):
             branch = elementsInStr(info)
             if not branch or len(branch) > 1:

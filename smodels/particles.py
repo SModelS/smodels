@@ -22,21 +22,21 @@
 
 """
 
+import os
 from smodels.tools.runSModelS import modelFile
+
+if "/" in modelFile:
+    import shutil
+    filename=os.path.basename(modelFile)
+    shutil.copy ( modelFile, filename )
+    modelFile=filename
 
 if modelFile.endswith(".py"):
     modelFile=modelFile[:-3]
 
-modelFile=modelFile.replace("/",".")
-
 from importlib import import_module
-print ( "importing %s" % modelFile )
 pM=import_module (modelFile, package='smodels')
         
 rOdd = pM.rOdd
-
 rEven = pM.rEven
-
-ptcDic = pM.ptcDic
-
 qNumbers = pM.qNumbers

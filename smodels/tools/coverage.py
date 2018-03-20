@@ -356,8 +356,7 @@ class UncoveredList(object):
         """
         
         # 180318 mat: BUG? #############################
-        #from smodels.theory.particleNames import ptcDic
-        from smodels.particles import ptcDic
+        from smodels.theory.particleNames import ptcDic
         if self.sumL: exch = ["W", "l", "t", "ta"]
         else: exch = ["W", "e", "mu", "t", "ta"]
         if self.sumJet: exch.append("jet")

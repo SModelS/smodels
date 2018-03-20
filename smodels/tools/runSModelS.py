@@ -37,7 +37,7 @@ def main():
     ap.add_argument('-m', '--modelFile', 
             help='path of particles.py, where decays are described (optional argument).'
             'If not set, value is taken from parameter file. If value is not defined there, '\
-            'either, it defaults to smodels.share.default_particles')
+            'either, it defaults to smodels/share/default_particles.py.')
     ap.add_argument('-o', '--outputDir', 
             help='name of output directory (optional argument). The default folder is: ' +
             outputDir, default=outputDir)
@@ -114,9 +114,8 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
         if parser.has_option("particles","module"):
             particlesModule = parser.get( "particles", "module" )     
         else:
-            particlesModuleDefault = 'smodels.default_particles'
+            particlesModuleDefault = 'smodels.share.default_particles'
             particlesModule = particlesModuleDefault
-    #print ( 'ParticlesModule: ' + particlesModule )
 
     """ Check database location and load database, exit if not found """
     database, databaseVersion = modelTester.loadDatabase(parser, db)

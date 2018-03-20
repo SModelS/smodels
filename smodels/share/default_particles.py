@@ -10,8 +10,6 @@
    and their respective labels
    :parameter rEven: dictionary with PDG codes for the rEven (Z2-eveb)
    particles and their respective labels
-   :parameter ptcDic: dictionary with inclusive labels to help defining group
-   of particles in the analysis database
    
    HOW TO ADD NEW PARTICLES: simply add a new entry in rOdd (rEven) if the
    particle is Z2-odd (Z2-even). For now all decays of Z2-even particles are
@@ -133,21 +131,6 @@ rEven = {25 : "higgs",
          -111: "pi",
          211: "pi",
          -211: "pi" }
-
-#Particle dictionary. Convenient for defining multiple particles with one label.
-ptcDic = {"e"  : ["e+",  "e-"],
-          "mu" : ["mu+", "mu-"],
-          "ta" : ["ta+", "ta-"],
-          "l+" : ["e+",  "mu+"],
-          "l-" : ["e-",  "mu-"],
-          "l"  : ["e-",  "mu-", "e+", "mu+"],
-          "W"  : ["W+",  "W-"],
-          "t"  : ["t+",  "t-"],
-          "L+" : ["e+",  "mu+", "ta+"],
-          "L-" : ["e-",  "mu-", "ta-"],
-          "L"  : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-"],
-          "jet" : [ "q", "g", "c", "pi" ],
-          "all" : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-", "W+", "W-","Z","photon","higgs","t+","t-","b","c","q","g","c","pi"]}
 
 #Quantum numbers for the new particles. Just used by tools.slhaChecks
 #PDG: (spin*2, electrical charge*3, color dimension)

@@ -2,9 +2,9 @@
 
 """
 .. module:: particles
-   :synopsis: Defines the list of R-even and R-odd particles to be used.
+   :synopsis: Defines the list of R-even and R-odd particles for the NMSSM.
 
-.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
+.. moduleauthor:: Sabine Kraml <sabine.kraml@gmail.com>
 
    :parameter rOdd: dictionary with PDG codes for the rOdd (Z2-odd) particles
    and their respective labels
@@ -26,6 +26,7 @@ rOdd = {1000021 : "gluino",
         1000023 : "N2",
         1000025 : "N3",
         1000035 : "N4",
+        1000045 : "N5",
         1000024 : "C1",
         1000037 : "C2",
         1000039 : "gravitino",
@@ -58,6 +59,8 @@ rOdd = {1000021 : "gluino",
        -1000023 : "N2",
        -1000025 : "N3",
        -1000035 : "N4",
+       -1000045 : "N5",
+       -1000055 : "N6",
        -1000024 : "C1",
        -1000037 : "C2",
        -1000039 : "gravitino",
@@ -89,10 +92,14 @@ rOdd = {1000021 : "gluino",
 
 rEven = {25 : "higgs",
         -25 : "higgs",
-         35 : "H0",
-        -35 : "H0",
-         36 : "A0",
-        -36 : "A0",
+         35 : "h2",
+        -35 : "h2",
+         45 : "h3",
+        -45 : "h3",
+         36 : "a1",
+        -36 : "a1",
+         46 : "a2",
+        -46 : "a2",
          37 : "H+",
         -37 : "H-",
          23 : "Z",
@@ -132,19 +139,21 @@ rEven = {25 : "higgs",
          211: "pi",
          -211: "pi" }
 
-
 #Quantum numbers for the new particles. Just used by tools.slhaChecks
 #PDG: (spin*2, electrical charge*3, color dimension)
 qNumbers={
  35:[0,0,1],
  36:[0,0,1],
  37:[0,3,1],
+ 45:[0,0,1],
+ 46:[0,0,1],
  1000024:[1,3,1],
  1000037:[1,3,1],
  1000022:[1,0,1],
  1000023:[1,0,1],
  1000025:[1,0,1],
  1000035:[1,0,1],
+ 1000045:[1,0,1],
  1000021:[1,0,8],
  1000011:[0,-3,1],
  2000011:[0,-3,1],
@@ -167,8 +176,4 @@ qNumbers={
  2000006:[0,2,3],
  1000005:[0,-1,3],
  2000005:[0,-1,3],
- 2000004:[0,2,3],
- 1000111:[1,3,1],
- 1000255:[0,0,1]
 }
-
