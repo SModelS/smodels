@@ -22,10 +22,16 @@
 
 """
 
-from smodels.tools.runSModelS import particlesModule
+from smodels.tools.runSModelS import modelFile
+
+if modelFile.endswith(".py"):
+    modelFile=modelFile[:-3]
+
+modelFile=modelFile.replace("/",".")
 
 from importlib import import_module
-pM=import_module (particlesModule, package='smodels')
+print ( "importing %s" % modelFile )
+pM=import_module (modelFile, package='smodels')
         
 rOdd = pM.rOdd
 

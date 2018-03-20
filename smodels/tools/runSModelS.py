@@ -34,9 +34,10 @@ def main():
             help='name of parameter file, where most options are defined (optional argument). If not set, use '
             'all parameters from smodels/etc/parameters_default.ini', 
             default=parameterFile)
-    ap.add_argument('-P', '--particlesModule', 
+    ap.add_argument('-m', '--modelFile', 
             help='path of particles.py, where decays are described (optional argument).'
-            'If not set, parameterFile-entry is used, if not existing, defaults to smodels.default_particles')
+            'If not set, value is taken from parameter file. If value is not defined there, '\
+            'either, it defaults to smodels.share.default_particles')
     ap.add_argument('-o', '--outputDir', 
             help='name of output directory (optional argument). The default folder is: ' +
             outputDir, default=outputDir)
@@ -65,9 +66,11 @@ def main():
         from smodels.tools.colors import colors
         colors.on = True
         
-    if args.particlesModule:
-        global particlesModule
-        particlesModule = args.particlesModule
+    global modelFile
+    modelFile="smodels.share.default_particles"
+        
+    if args.modelFile:
+        modelFile = args.modelFile
 
     db=None
     if args.force_txt: db=True
