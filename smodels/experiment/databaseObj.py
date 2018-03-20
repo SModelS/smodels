@@ -292,7 +292,7 @@ class Database(object):
 
     def fetchFromServer ( self, path, discard_zeroes ):
         import requests, time, json
-        logger.debug ( "need fetch from server: %s" % path )
+        logger.debug ( "need to fetch from server: %s" % path )
         store = "." + path.replace ( ":","_" ).replace( "/", "_" ).replace(".","_" )
         if not os.path.isfile ( store ):
             ## completely new! fetch the description and the db!

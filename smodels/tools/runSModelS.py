@@ -16,7 +16,6 @@ from smodels.tools import smodelsLogging
 """ Module variable, so particles.py can read it. Determined by command line
 parameter (overriding ini-file-entry overriding hard coded default smodels.default_particles)
 """
-particlesModule = None
 
 def main():
     import argparse
@@ -34,10 +33,6 @@ def main():
             help='name of parameter file, where most options are defined (optional argument). If not set, use '
             'all parameters from smodels/etc/parameters_default.ini', 
             default=parameterFile)
-    ap.add_argument('-m', '--modelFile', 
-            help='path of particles.py, where decays are described (optional argument).'
-            'If not set, value is taken from parameter file. If value is not defined there, '\
-            'either, it defaults to smodels/share/default_particles.py.')
     ap.add_argument('-o', '--outputDir', 
             help='name of output directory (optional argument). The default folder is: ' +
             outputDir, default=outputDir)
@@ -66,12 +61,7 @@ def main():
         from smodels.tools.colors import colors
         colors.on = True
         
-    global modelFile
-    modelFile="smodels.share.default_particles"
         
-    if args.modelFile:
-        modelFile = args.modelFile
-
     db=None
     if args.force_txt: db=True
     smodelsLogging.setLogLevel ( args.verbose )
@@ -107,15 +97,13 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
 
     """ Read and check parameter file, exit parameterFile does not exist """
     parser = modelTester.getParameters(parameterFile)
+
+    global modelFile
+    modelFile="smodels.share.default_particles"
     
     """ Determine particles-Module from ini-file, if necessary"""
-    global particlesModule
-    if not particlesModule:
-        if parser.has_option("particles","module"):
-            particlesModule = parser.get( "particles", "module" )     
-        else:
-            particlesModuleDefault = 'smodels.share.default_particles'
-            particlesModule = particlesModuleDefault
+    if parser.has_option("particles","module"):
+        modelFile = parser.get( "particles", "module" )     
 
     """ Check database location and load database, exit if not found """
     database, databaseVersion = modelTester.loadDatabase(parser, db)
