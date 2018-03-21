@@ -85,7 +85,7 @@ BSMList = sparticles + sparticlesC
 
 BSMparticleList = ParticleList('BSM', BSMList)
 BSMpdgs = BSMparticleList.getPdgs()
-BSMparticles = BSMparticleList.getNames()
+BSMnames = BSMparticleList.getNames()
 
 
 

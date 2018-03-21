@@ -310,12 +310,13 @@ def groupAll(elements):
     allmothers = []
     #Collect the list of all mothers:
     for el in elements:
-        allmothers += [elMom[1].elID for elMom in el.motherElements]
+        allmothers += [elMom[1].elID for elMom in el.motherElements if not elMom[0]=='original']
         
     for el in elements:
         #Skip the element if it is a mother of another element in the list
-        if any((elMom is el.elID) for elMom in allmothers):
+        if any((elMom is el.elID) for elMom in allmothers): 
             continue
+
         cluster.elements.append(el) 
     
     #Collect the txnames appearing in the cluster

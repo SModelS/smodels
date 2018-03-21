@@ -9,7 +9,9 @@
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.branch import Branch
 from smodels.theory import crossSection
-from smodels.particleDefinitions import SMparticles
+from smodels.particleDefinitions import SMnames
+from smodels.SMparticleDefinitions import nuList
+from smodels.theory.particleClass import particleInList
 from smodels.theory.particleNames import getObjectFromPdg, getNamesList
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
@@ -37,7 +39,7 @@ class Element(object):
         """
         self.branches = [Branch(), Branch()]
         self.weight = crossSection.XSectionList()
-        self.motherElements = []
+        self.motherElements = [("original", self)]
         self.elID = 0
         self.covered = False
         self.tested = False
@@ -70,6 +72,7 @@ class Element(object):
             elif type(info) == type([]) and type(info[0]) == type(Branch()):
                 for ib, branch in enumerate(info):
                     self.branches[ib] = branch.copy()
+                    
         
     
     def __cmp__(self,other):
@@ -82,7 +85,8 @@ class Element(object):
         """
         
         #Compare branches:
-        if self.branches != other.branches:            
+
+        if self.branches != other.branches:          
             comp = self.branches > other.branches
             if comp: return 1
             else: return -1
@@ -152,7 +156,7 @@ class Element(object):
             return False
         else:       
         #Now check for opposite order
-            for ib,br in enumerate(self.switchBranches().branches):
+            for ib,br in enumerate(self.switchBranches().branches):                
                 if not br.particlesMatch(other.branches[ib]):
                     return False
 
@@ -242,13 +246,18 @@ class Element(object):
         Get the array of masses in the element.    
         
         :returns: list of masses (mass array)            
-        """
+        """        
         massarray = []
         for branch in self.branches:
-            masses = [particle.mass for particleList in branch.intmParticles for particle in particleList ]
-            particleNames = [[particle.label for particle in particleList ] for particleList in branch.intmParticles ]
-            massarray.append(masses)
-
+            if len(branch.BSMparticles) == 1:
+                masses = [particle.mass for particleList in branch.BSMparticles for particle in particleList ]
+                massarray.append(masses) 
+            elif len(branch.BSMparticles) > 1:
+                masses = [particle.mass for particle in branch.BSMparticles[0] ]
+                massarray.append(masses)
+            else: 
+                logger.error("There are no BSM particles in this branch: %s", branch)
+                return None
         return massarray
 
     def getPIDs(self):
@@ -263,12 +272,11 @@ class Element(object):
         
         particles = []
         pids = []
-        for ipid,PIDlist in enumerate(self.branches[0].intmParticles):         
-            for ipid2,PIDlist2 in enumerate(self.branches[1].intmParticles):
-                particles.append([self.branches[0].intmParticles[ipid],self.branches[1].intmParticles[ipid2]])
+        for ipid,PIDlist in enumerate(self.branches[0].BSMparticles):         
+            for ipid2,PIDlist2 in enumerate(self.branches[1].BSMparticles):
+                particles.append([self.branches[0].BSMparticles[ipid],self.branches[1].BSMparticles[ipid2]])
            
         pids = [[[particle.pdg for particle in particleList ] for particleList in outerlist ] for outerlist in particles]
-  
         return pids
 
     def getDaughters(self):
@@ -298,11 +306,13 @@ class Element(object):
         :returns: list of PDG ids
         """
         
-        pids = self.getPIDs()
+        pids = []
+        for mother in self.motherElements:
+            pids.extend( mother[1].getPIDs() )  
+
         momPIDs = []
         for pidlist in pids:
             momPIDs.append([pidlist[0][0],pidlist[1][0]])
-            
         return momPIDs    
 
 
@@ -346,7 +356,7 @@ class Element(object):
                     logger.error("Wrong syntax")
                     raise SModelSError()
                 for ptc in vertex:
-                    if not ptc in SMparticles and not ptc in getNamesList(particleLists):
+                    if not ptc in SMnames and not ptc in getNamesList(particleLists):
                         logger.error("Unknown particle. Add " + ptc + " to smodels/particleDefinitions.py")
                         raise SModelSError()
         return True
@@ -366,10 +376,11 @@ class Element(object):
         """
         
         if not doCompress and not doInvisible:
-            return []
+            return []            
         
         added = True
         newElements = [self]
+          
         # Keep compressing the new topologies generated so far until no new
         # compressions can happen:
         while added:
@@ -393,7 +404,7 @@ class Element(object):
                         newElements.append(newel)
                         added = True
 
-        newElements.pop(0)  # Remove original element
+        newElements.pop(0)  # Remove original element   
         return newElements
 
     def massCompress(self, minmassgap):
@@ -406,7 +417,6 @@ class Element(object):
         :returns: compressed copy of the element, if two masses in this
                   element are degenerate; None, if compression is not possible;        
         """
-        
         masses = self.getMasses()
         massDiffs = []
         #Compute mass differences in each branch
@@ -418,21 +428,23 @@ class Element(object):
             compVertices.append([])
             for iv,massD in enumerate(massbr):            
                 if massD < minmassgap: compVertices[ibr].append(iv)
-        if not sum(compVertices,[]): return None #Nothing to be compressed
-        else:
+
+        if not sum(compVertices,[]): 
+            return None #Nothing to be compressed
+        else:     
             newelement = self.copy()
             newelement.motherElements = [ ("mass", self) ]
             for ibr,compbr in enumerate(compVertices):
-                if compbr:            
+                if compbr:         
                     new_branch = newelement.branches[ibr]
                     ncomp = 0
-                    for iv in compbr:
-                        new_branch.intmParticles.pop(iv-ncomp)
+                    for iv in compbr:                       
+                        for BSMptclist in new_branch.BSMparticles:
+                            BSMptclist.pop(iv-ncomp)                                                     
                         new_branch.particles.pop(iv-ncomp)
                         ncomp +=1
                     new_branch.setInfo() 
-
-        newelement.sortBranches()
+        newelement.sortBranches()                                 
         return newelement
     
 
@@ -473,10 +485,10 @@ class Element(object):
             if not branch.particles:
                 continue # Nothing to be compressed
             #Go over the branch starting at the end and remove invisible vertices: 
-            for ivertex in reversed(range(len(particles))):
-                if all(particle.label == 'nu' for particle in particles[ivertex] ):
-                #if particles[ivertex].count('nu') == len(particles[ivertex]):
-                    newelement.branches[ib].intmParticles.pop(ivertex+1)
+            for ivertex in reversed(range(len(particles))):        
+                if all(particleInList(particle,[nuList]) for particle in particles[ivertex]):
+                    for BSMptclist in newelement.branches[ib].BSMparticles:
+                        BSMptclist.pop(ivertex+1) 
                     newelement.branches[ib].particles.pop(ivertex)
                 else:
                     break
@@ -496,21 +508,7 @@ class Element(object):
         :parameter el2: element (Element Object)  
         """
         
-        self.motherElements += el2.motherElements
-
-
-    def combinePIDs(self,el2):
-        """
-        Combine the PIDs of both elements. If the PIDs already appear in self,
-        do not add them to the list.
-        
-        :parameter el2: element (Element Object) 
-        """
-           
-        elPIDs = self.getPIDs()
-        newelPIDs = el2.getPIDs()
-        for pidlist in newelPIDs:                    
-            if not pidlist in elPIDs:
-                self.branches[0].intmParticles.append(getObjectFromPdg(pidlist[0])) 
-                self.branches[1].intmParticles.append(getObjectFromPdg(pidlist[1])) 
+        for mother in el2.motherElements:
+            self.motherElements += el2.motherElements
+    
 

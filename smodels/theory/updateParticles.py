@@ -6,6 +6,7 @@
 """
 
 import pyslha
+import copy
 from smodels.particleDefinitions import SMpdgs, BSMList, BSMpdgs
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import GeV
@@ -52,7 +53,13 @@ def updateParticles(slhafile, BSMList):
                         brs.append(decay)
                     else:
                         logger.info("Ignoring decay: %i -> [%s]",pid,decay.ids)
-                particle.branches = brs
+                
+                if particle.pdg == pid: particle.branches = brs
+                elif (-1)*particle.pdg == pid:
+                    brsConj = copy.deepcopy(brs)
+                    for br in brsConj:
+                        br.ids = [-x for x in br.ids]                              
+                    particle.branches = brsConj
 
 
 
