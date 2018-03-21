@@ -40,37 +40,7 @@ class Particles(object):
         self.colordim = colordim
         self.spin = spin
         self.width = width
-        self.branches = branches
-        
-    def __cmp__(self,other):
-        """
-        Compares the branch with other.        
-        The comparison is made based on .
-        OBS: The particles inside each vertex MUST BE sorted (see branch.sortParticles())         
-        :param other:  branch to be compared (Branch object)
-        :return: -1 if self < other, 0 if self == other, +1, if self > other.
-        """
-        
-        if self.vertnumb != other.vertnumb:
-            comp = self.vertnumb > other.vertnumb
-            if comp: return 1
-            else: return -1
-        elif self.vertparts != other.vertparts:
-            comp = self.vertparts > other.vertparts
-            if comp: return 1
-            else: return -1
-        elif self.particles != other.particles:    
-            comp = self.particles > other.particles
-            if comp: return 1
-            else: return -1   
-        else:
-            m1m2eq, compm = compareBSMparticles( self.BSMparticles, other.BSMparticles )                 
-            if not m1m2eq:              
-                if compm: return 1
-                else: return -1
-                
-            else:
-                return 0  #Branches are equal 
+        self.branches = branches        
 
     def __cmp__(self,other): 
         """
@@ -102,7 +72,6 @@ class Particles(object):
     def __eq__( self, p2 ):
         return self.__cmp__ ( p2 ) == 0
         
-
 
     def __str__(self): 
         """
