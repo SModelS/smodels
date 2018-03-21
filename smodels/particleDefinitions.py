@@ -15,8 +15,8 @@
 """
 
 
-from smodels.SMparticleDefinitions import SMList, SMpdgs, SMparticles, particleLists
-from smodels.MSSMparticleDefinitions import BSMList, BSMpdgs, BSMparticles
+from smodels.SMparticleDefinitions import SMList, SMpdgs, SMnames, particleLists
+from smodels.MSSMparticleDefinitions import BSMList, BSMpdgs, BSMnames
 
 
 # all particles and particle lists from the SM
