@@ -7,25 +7,24 @@
 """
 
 import sys
-#from smodels.theory.particleClass import simParticles
 from smodels.tools.physicsUnits import fb, MeV
-from smodels.particleDefinitions import SMpdgs, SMparticles, BSMpdgs, particleLists
-from smodels.theory.particleNames import elementsInStr, getObjectFromPdg, getObjectFromName , simParticles, getNamesList
+from smodels.particleDefinitions import SMpdgs, SMnames, BSMpdgs, particleLists
+from smodels.theory.particleNames import elementsInStr, getObjectFromPdg, getObjectFromName, getNamesList
+from smodels.theory.particleComparison import compareBSMparticles, simParticles
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
-#from smodels.particleClass import simParticles
+
 
 
 class Branch(object):
     """
     An instance of this class represents a branch.    
     A branch-element can be constructed from a string (e.g., ('[b,b],[W]').
-    
-    :ivar masses: list of masses for the intermediate states
+
     :ivar particles: list of particles (Particles objects) for the final states
-    :ivar PIDs: a list of the pdg numbers of the intermediate states appearing in the branch.
-                If the branch represents more than one possible pdg list, PIDs will correspond
-                to a nested list (PIDs = [[pid1,pid2,...],[pidA,pidB,...]])
+    :ivar BSMparticles: a list of the intermediate states particles appearing in the branch.
+                If the branch represents more than one possible particle list, BSMparticles will correspond
+                to a nested list (BSMparticles = [[particle1, particle2,...],[particleA, partcleB,...]])
     :ivar maxWeight: weight of the branch (XSection object)
     """
     def __init__(self, info=None):
@@ -36,9 +35,9 @@ class Branch(object):
         :parameter info: string describing the branch in bracket notation
                          (e.g. [[e+],[jet]])
         """
-
-        self.intmParticles = []
+        
         self.particles = []
+        self.BSMparticles = []
         
         self.maxWeight = None
         self.vertnumb = None
@@ -59,11 +58,10 @@ class Branch(object):
                         ptcs.append(getObjectFromName(name))
                     # Syntax check:
                     for ptc in particleNames:
-                        if not ptc in SMparticles \
+                        if not ptc in SMnames \
                                 and not ptc in getNamesList(particleLists):
                             logger.error("Unknown particle. Add " + ptc + " to smodels/particleDefinitions.py")
                             raise SModelSError()
-
                     self.particles.append(ptcs)
 
             self.vertnumb = len(self.particles)
@@ -79,6 +77,10 @@ class Branch(object):
         
         st = str([[particle.label for particle in particleList ] for particleList in self.particles ]).replace("'", "")
         st = st.replace(" ", "")
+        """
+        st = str([[particle.pdg for particle in particleList ] for particleList in self.BSMparticles ]).replace("'", "")
+        """
+        st = st.replace(" ", "")
         return st
 
     def __cmp__(self,other):
@@ -89,7 +91,7 @@ class Branch(object):
         :param other:  branch to be compared (Branch object)
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
-
+        
         if self.vertnumb != other.vertnumb:
             comp = self.vertnumb > other.vertnumb
             if comp: return 1
@@ -98,16 +100,19 @@ class Branch(object):
             comp = self.vertparts > other.vertparts
             if comp: return 1
             else: return -1
-        elif self.particles != other.particles:
+        elif self.particles != other.particles:    
             comp = self.particles > other.particles
             if comp: return 1
-            else: return -1
-        elif not self.intmParticles == other.intmParticles: #  masses
-            comp = self.intmParticles > other.intmParticles
-            if comp: return 1
-            else: return -1
+            else: return -1   
         else:
-            return 0  #Branches are equal
+            m1m2eq, compm = compareBSMparticles( self.BSMparticles, other.BSMparticles )                 
+            if not m1m2eq:              
+                if compm: return 1
+                else: return -1
+                
+            else:
+                return 0  #Branches are equal                             
+
 
     def sortParticles(self):
         """
@@ -115,7 +120,7 @@ class Branch(object):
         """
         
         for iv,vertex in enumerate(self.particles):
-            self.particles[iv] = sorted(vertex, key=lambda x: x.label.lower())
+            self.particles[iv] = sorted(vertex, key=lambda x: x.label)
 
     def setInfo(self):
         """
@@ -152,14 +157,14 @@ class Branch(object):
         for iv,vertex in enumerate(self.particles): 
             
             for i,p in enumerate(vertex):
-                if not p.label in list ( getNamesList(particleLists) ) + SMparticles :
+                if not p.label in list ( getNamesList(particleLists) ) + SMnames :
                     logger.error("Unknown particle: %s" %p)
                     raise SModelSError()
 
-                if not other.particles[iv][i].label in list ( getNamesList(particleLists) ) + SMparticles :
+                if not other.particles[iv][i].label in list ( getNamesList(particleLists) ) + SMnames :
                     logger.error("Unknown particle: %s" %other.particles[iv][i].label)
                     raise SModelSError()                
-                
+
             if not simParticles(vertex,other.particles[iv]):
                 return False           
                              
@@ -175,12 +180,12 @@ class Branch(object):
         """
         newbranch = Branch()
         newbranch.particles = self.particles[:]
-        newbranch.intmParticles = []
+        newbranch.BSMparticles = []
         self.setInfo()
         newbranch.vertnumb = self.vertnumb
         newbranch.vertparts = self.vertparts[:]
-        for pidList in self.intmParticles:
-            newbranch.intmParticles.append(pidList[:])
+        for pidList in self.BSMparticles:
+            newbranch.BSMparticles.append(pidList[:])
         if not self.maxWeight is None:
             newbranch.maxWeight = self.maxWeight.copy()
         return newbranch
@@ -193,7 +198,7 @@ class Branch(object):
         :returns: length of branch (number of R-odd particles)
         """
         
-        return len(self.intmParticles[0]) 
+        return len(self.BSMparticles[0]) 
 
     def __lt__( self, b2 ):
         return self.__cmp__ ( b2 ) == -1
@@ -212,9 +217,9 @@ class Branch(object):
         
         newBranch = self.copy()
         newparticles = []
-        newintmParticles = []
+        newBSMparticles = []
 
-        if len(self.intmParticles[0]) != 1: #if len(self.PIDs[0]) != 1:
+        if len(self.BSMparticles) != 1: 
             logger.error("During decay the branch should not have multiple PID lists!")
             return False   
 
@@ -225,9 +230,9 @@ class Branch(object):
                 
             else:
                 # Add non R-even particles to intermediate state    ;masses of non R-even particles to mass vector
-                newintmParticles.append(getObjectFromPdg(partID))
+                newBSMparticles.append(getObjectFromPdg(partID))
 
-        if len(newintmParticles) > 1: # newmass
+        if len(newBSMparticles) > 1: # newmass
             logger.warning("Multiple R-odd particles in the final state: " +
                            str(br.ids))
             return False
@@ -235,8 +240,8 @@ class Branch(object):
         if newparticles:
             newBranch.particles.append(sorted(newparticles, key=lambda x: x.label.lower()))
 
-        if newintmParticles:
-            newBranch.intmParticles[0].extend(newintmParticles)
+        if newBSMparticles:
+            newBranch.BSMparticles[0].extend(newBSMparticles)
 
         if not self.maxWeight is None:
             newBranch.maxWeight = self.maxWeight * br.br
@@ -251,18 +256,17 @@ class Branch(object):
         :returns: list of extended branches (Branch objects). Empty list if daughter is stable or
                   if daughterID was not defined.
         """   
-
-        if len(self.intmParticles) != 1: # PIDs
+        if len(self.BSMparticles) != 1: 
             logger.error("Can not decay branch with multiple PID lists")
             return False                
-        if not self.intmParticles[0][-1]: # PIDs
+        if not self.BSMparticles[0][-1]: 
             # Do nothing if there is no R-odd daughter (relevant for RPV decays
             # of the LSP)
             return []
         #If decay table is not defined, assume daughter is stable:
-        if not self.intmParticles[0][-1].pdg in BSMpdgs: return [] #PIDs without .pdg
+        if not self.BSMparticles[0][-1].pdg in BSMpdgs: return [] #PIDs without .pdg
         # List of possible decays (brs) for R-odd daughter in branch        
-        brs = self.intmParticles[0][-1].branches 
+        brs = self.BSMparticles[0][-1].branches 
         if len(brs) == 0:
             # Daughter is stable, there are no new branches
             return []
@@ -296,7 +300,7 @@ def decayBranches(branchList, sigcut=0. *fb):
                 # Remove the branches above sigcut and with length > topmax
                 continue
             # Add all possible decays of the R-odd daughter to the original
-            # branch (if any)
+            # branch (if any)            
             newBranches = inbranch.decayDaughter()
             if newBranches:
                 # New branches were generated, add them for next iteration
@@ -308,7 +312,8 @@ def decayBranches(branchList, sigcut=0. *fb):
         branchList = newBranchList
         
     #Sort list by initial branch PID:
-    finalBranchList = sorted(finalBranchList, key=lambda branch:  branch.intmParticles[0][0].pdg)  
+    finalBranchList = sorted(finalBranchList, key=lambda branch:  branch.BSMparticles[0][0].pdg)  
+        
     return finalBranchList
 
 
