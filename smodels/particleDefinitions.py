@@ -21,4 +21,5 @@ from smodels.MSSMparticleDefinitions import BSMList, BSMpdgs, BSMnames
 
 # all particles and particle lists from the SM
 SM = SMList + particleLists
+MSSM = SM + BSMList
 

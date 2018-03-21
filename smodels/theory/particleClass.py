@@ -25,7 +25,7 @@ class Particles(object):
 
         :parameter label: string, e.g. 'e-'
         :parameter pdg: number in pdg
-        :parameter mass: in MeV
+        :parameter mass: 
         :parameter charge: as multiples of the unit charge
         :parameter color charge: 
         :parameter width: total width 

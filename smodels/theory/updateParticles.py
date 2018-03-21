@@ -10,7 +10,7 @@ import copy
 from smodels.particleDefinitions import SMpdgs, BSMList, BSMpdgs
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import GeV
-#from smodels.theory.particleNames import getObjectFromPdg
+
 
 
 

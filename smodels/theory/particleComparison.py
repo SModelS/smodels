@@ -8,17 +8,19 @@
 
 from smodels.particleDefinitions import particleLists
 from smodels.theory.particleClass import particleInList, sortParticleList
+from smodels.tools.smodelsLogging import logger
 import itertools    
     
 def compareBSMparticles(BSMptcs1, BSMptcs2):
     """
-    Compares intermediate particles of two branches
+    Compares intermediate particles of two branches.
+    Comparison is done based on masses.
     :return: True/False, intermediate particles are/ are not equal
              comp representing whether the first masses are larger than the second
     """
     
-    plist1 = getIntmParticles(BSMptcs1)    
-    plist2 = getIntmParticles(BSMptcs2)    
+    plist1 = getBSMparticles(BSMptcs1)    
+    plist2 = getBSMparticles(BSMptcs2)    
     
     masses1 = [ particle.mass for particle in plist1 ]      
     masses2 = [ particle.mass for particle in plist2 ] 
@@ -29,7 +31,7 @@ def compareBSMparticles(BSMptcs1, BSMptcs2):
     return m1m2eq, comp  
 
 
-def getIntmParticles(BSMptcs):  
+def getBSMparticles(BSMptcs):  
     """
     Reduces the nested list structure of the BSM particles in branch to a list of particles
     :return: list of particle objects
@@ -47,9 +49,9 @@ def getIntmParticles(BSMptcs):
 
 def simParticles(plist1, plist2, useLists=True):
     """
-    Compares two lists of particles. Allows for particle lists
+    Compares two lists of particles. Allows for particleList objects
     (Ex: L = l, l+ = l, l = l-,...). Ignores particle ordering inside
-    the list
+    the list.
 
     :param plist1: first list of particles/ particle lists, e.g. [l,jet]
     :param plist2: second list of particles/ particle lists
