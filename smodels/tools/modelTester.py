@@ -84,6 +84,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
                     doCompress=parser.getboolean("options", "doCompress"),
                     doInvisible=parser.getboolean("options", "doInvisible"),
                     minmassgap=minmassgap)
+                    
         else:
             smstoplist = lheDecomposer.decompose(inputFile,
                     doCompress=parser.getboolean("options", "doCompress"),
@@ -140,7 +141,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
             sqrts = None
         uncovered = coverage.Uncovered(smstoplist,sqrts=sqrts)
         masterPrinter.addObj(uncovered)
-    
+
     return masterPrinter.flush()
 
 def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
@@ -307,7 +308,8 @@ def loadDatabase(parser, db):
         databaseVersion = database.databaseVersion
     except DatabaseNotFoundException:
         logger.error("Database not found in ``%s''" % os.path.realpath(databasePath))
-        sys.exit()
+        sys.exit()        
+                
 
     return database, databaseVersion
 

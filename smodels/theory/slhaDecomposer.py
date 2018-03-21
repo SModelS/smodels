@@ -76,7 +76,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     branchList = []
     for pid in maxWeight:
         branchList.append(Branch())
-        branchList[-1].intmParticles = [[getObjectFromPdg(pid)]] # [[pid]]
+        branchList[-1].BSMparticles = [[getObjectFromPdg(pid)]] # [[pid]]
         if not pid in BSMpdgs:
             logger.error ( "pid %d does not appear in BSMList" % pid )
         branchList[-1].maxWeight = maxWeight[pid]
@@ -88,14 +88,14 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     # Generate dictionary, where keys are the PIDs and values are the list of branches for the PID (for performance)
     branchListDict = {}
     for branch in finalBranchList:
-        if len(branch.intmParticles) != 1:
+        if len(branch.BSMparticles) != 1:
             logger.error("During decomposition the branches should \
                             not have multiple PID lists!")
             return False   
-        if branch.intmParticles[0][0].pdg in branchListDict:
-            branchListDict[branch.intmParticles[0][0].pdg].append(branch)
+        if branch.BSMparticles[0][0].pdg in branchListDict:
+            branchListDict[branch.BSMparticles[0][0].pdg].append(branch)
         else:
-            branchListDict[branch.intmParticles[0][0].pdg] = [branch]
+            branchListDict[branch.BSMparticles[0][0].pdg] = [branch]
 
     for pid in xSectionList.getPIDs():
         if not pid in branchListDict: branchListDict[pid] = []
@@ -103,7 +103,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     #Sort the branch lists by max weight to improve performance:
     for pid in branchListDict:
         branchListDict[pid] = sorted(branchListDict[pid], 
-                                     key=lambda br: br.maxWeight, reverse=True)
+                                     key=lambda br: br.maxWeight, reverse=True)                                                                       
     
     smsTopList = topology.TopologyList()
     # Combine pairs of branches into elements according to production
@@ -116,7 +116,8 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
         for branch1 in branchListDict[pids[0]]:
             BR1 = branch1.maxWeight/maxWeight[pids[0]]  #Branching ratio for first branch            
             if BR1 < minBR: break  #Stop loop if BR1 is already too low            
-            for branch2 in branchListDict[pids[1]]:
+            for branch2 in branchListDict[pids[1]]:           
+            
                 BR2 = branch2.maxWeight/maxWeight[pids[1]]  #Branching ratio for second branch
                 if BR2 < minBR: break  #Stop loop if BR2 is already too low
                 
@@ -126,7 +127,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
                     finalBR = finalBR.asNumber()
                 if finalBR < minBR: continue # Skip elements with xsec below sigcut
 
-                if len(branch1.intmParticles) != 1 or len(branch2.intmParticles) != 1:
+                if len(branch1.BSMparticles) != 1 or len(branch2.BSMparticles) != 1:
                     logger.error("During decomposition the branches should \
                             not have multiple PID lists!")
                     return False    
@@ -135,11 +136,12 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
                 
                 newElement.weight = weightList*finalBR
 
-                newElement.sortBranches()  #Make sure elements are sorted BEFORE adding them
-                smsTopList.addElement(newElement)
-    
+                newElement.sortBranches()  #Make sure elements are sorted BEFORE adding them              
+                smsTopList.addElement(newElement)            
+                    
     smsTopList.compressElements(doCompress, doInvisible, minmassgap)
-    smsTopList._setElementIds()
+    smsTopList._setElementIds()             
+       
 
     logger.debug("slhaDecomposer done in %.2f s." % (time.time() -t1 ) )
     return smsTopList
