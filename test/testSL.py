@@ -54,8 +54,24 @@ class SLTest(unittest.TestCase):
                     efficiencies=sig, name="model%d" % n )
         return m
 
-    def testModel10(self):
+    def testModel3(self):
         """ take first n SRs of model-90 """
+        m = self.createModel ( 3 )
+        import time
+        ulComp = UpperLimitComputer ( lumi = 1. / fb, ntoys=10000, cl=.95 )
+        t0=time.time()
+        ul = ulComp.ulSigma ( m )
+        t1=time.time()
+        #print ( "ul=%s, t=%s" % ( ul, t1-t0 ) )
+        ## Nick's profiling code gets for n=3 ul=2135.66
+        self.assertAlmostEqual( ul / ( 2135.66*fb), 1.0, 1 )
+        ulProf = ulComp.ulSigma ( m, marginalize=False )
+        t2=time.time()
+        #print ( "ulProf,t=", ulProf, t2-t1 )
+        self.assertAlmostEqual( ulProf / ( 2135.66*fb), 1.0, 1 )
+
+    def testModel10(self):
+        """ take first 10 SRs of model-90 """
         m = self.createModel ( 10 )
         import time
         ulComp = UpperLimitComputer ( lumi = 1. / fb, ntoys=10000, cl=.95 )
@@ -63,7 +79,7 @@ class SLTest(unittest.TestCase):
         ul = ulComp.ulSigma ( m )
         t1=time.time()
         #print ( "ul=%s, t=%s" % ( ul, t1-t0 ) )
-        ## Nick's profiling code gets xxx
+        ## Nick's profiling code gets for n=10 ul=357.568
         self.assertAlmostEqual( ul / ( 357.*fb), 1.0, 1 )
         ulProf = ulComp.ulSigma ( m, marginalize=False )
         t2=time.time()

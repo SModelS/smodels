@@ -14,7 +14,7 @@
 
 from __future__ import print_function
 from scipy import stats, optimize, integrate, special
-from numpy  import sqrt, exp, log, sign, array, matrix, ndarray
+from numpy  import sqrt, exp, log, sign, array, matrix, ndarray, floor
 from functools import reduce
 import numpy as NP
 import sys, copy
@@ -265,7 +265,6 @@ class LikelihoodComputer:
                 return ret
 
             V = sandwich ( B, rho )
-            # print ( "cov=", V )
             lmbda = self.nsig + A + theta + C * theta**2 / B**2 
             # lmbda = theta + self.ntot + self.model.skewness * theta**2 / self.model.backgrounds**2 
         for ctr,i in enumerate ( lmbda ):
@@ -532,7 +531,7 @@ class UpperLimitComputer:
         """
         computer = LikelihoodComputer ( model, self.ntoys )
         aModel = copy.deepcopy ( model )
-        aModel.data = aModel.backgrounds
+        aModel.data = array ( [ floor(x) for x in model.backgrounds ] )
         compA = LikelihoodComputer ( aModel, self.ntoys )
         ## compute
         mu_hat = computer.findMuHat ( model.efficiencies )
@@ -553,18 +552,36 @@ class UpperLimitComputer:
             nllA = compA.likelihood ( nsig, marginalize=marginalize, nll=True ) 
             qmu =  2*( nll - nll0 )
             if qmu<0.: qmu=0.
+            sqmu = sqrt (qmu)
             qA =  2*( nllA - nll0A )
             if qA<0.: qA=0.
-            CLsb = 1. - stats.multivariate_normal.cdf ( sqrt ( qmu ) )
-            CLb =  stats.multivariate_normal.cdf ( sqrt ( qA ) - sqrt(qmu) )
-            CLs = 1.0
+            sqA = sqrt ( qA )
+            CLsb = 1. - stats.multivariate_normal.cdf ( sqmu )
+            CLb = 0.
+            if qA >= qmu:
+                CLb =  stats.multivariate_normal.cdf ( sqA - sqmu )
+            else:
+                if qA == 0.:
+                    CLSb = 1.
+                    CLb  = 1.
+                else:
+                    CLsb = 1. - stats.multivariate_normal.cdf ( (qmu + qA)/(2*sqA) )
+                    CLb = 1. - stats.multivariate_normal.cdf ( (qmu - qA)/(2*sqA) )
+            CLs = 0.
             if CLb>0.:
                 CLs = CLsb / CLb
             root = CLs - 1. + self.cl 
             # print ( "mu=%s nll=%s nllo=%s qA=%s clb=%s clsb=%s cls=%s" % ( mu, nll, nll0, qA, CLb, CLsb, CLs ) )
             return root
         # print ( "model=%s " % model )
-        mu_lim = optimize.brentq ( root_func, 1.5*mu_hat, 2.5*mu_hat + 2*sigma_mu, rtol=1e-03, xtol=1e-06 )
+
+        a,b=1.5*mu_hat,2.5*mu_hat+2*sigma_mu
+        # print ( "a=%s, %s, %s" % ( type(a), a, root_func(a) ) )
+        while ( NP.sign ( root_func(a)* root_func(b) ) > -.5 ):
+            b=1.2*b
+            a=a-(b-a)*.2
+        #    a,b=.8*a,1.2*b ## widen bracket if we dont have opposite signs!
+        mu_lim = optimize.brentq ( root_func, a, b, rtol=1e-03, xtol=1e-06 )
         return mu_lim / self.lumi
 
 if __name__ == "__main__":
