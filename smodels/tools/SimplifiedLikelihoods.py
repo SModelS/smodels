@@ -577,9 +577,14 @@ class UpperLimitComputer:
 
         a,b=1.5*mu_hat,2.5*mu_hat+2*sigma_mu
         # print ( "a=%s, %s, %s" % ( type(a), a, root_func(a) ) )
+        ctr=0
         while ( NP.sign ( root_func(a)* root_func(b) ) > -.5 ):
             b=1.2*b
             a=a-(b-a)*.2
+            ctr+=1
+            if ctr>20:
+                logger.error("cannot find brent bracket")
+                return None
         #    a,b=.8*a,1.2*b ## widen bracket if we dont have opposite signs!
         mu_lim = optimize.brentq ( root_func, a, b, rtol=1e-03, xtol=1e-06 )
         return mu_lim / self.lumi
