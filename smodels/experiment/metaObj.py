@@ -163,7 +163,24 @@ class Meta(object):
         logger.info ( "FastLim v1.1 efficiencies loaded. Please cite: arXiv:1402.0492, EPJC74 (2014) 11" )
 
     def __eq__ ( self, other ):
-        return self == other
+        if other == None: return False
+        if self.pathname != other.pathname:
+            return False
+        if self.discard_zeroes != other.discard_zeroes:
+            return False
+        if self.mtime != other.mtime:
+            return False
+        if self.filecount != other.filecount:
+            return False
+        if self.hasFastLim != other.hasFastLim:
+            return False
+        if self.format_version != other.format_version:
+            return False
+        if self.python != other.python:
+            return False
+        if self.databaseVersion != other.databaseVersion:
+            return False
+        return True
 
     def needsUpdate ( self, current ):
         """ do we need an update, with respect to <current>.

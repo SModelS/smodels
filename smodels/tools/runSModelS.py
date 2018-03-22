@@ -12,11 +12,12 @@ from smodels.installation import installDirectory, version
 from smodels.tools import modelTester
 from smodels.tools import crashReport
 from smodels.tools import smodelsLogging
+from smodels.tools import runtime
 
 """ Module variable, so particles.py can read it. Determined by command line
 parameter (overriding ini-file-entry overriding hard coded default smodels.default_particles)
 """
-
+    
 def main():
     import argparse
     """ Set default input and output files """
@@ -98,12 +99,9 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
     """ Read and check parameter file, exit parameterFile does not exist """
     parser = modelTester.getParameters(parameterFile)
 
-    global modelFile
-    modelFile="smodels.share.default_particles"
-    
     """ Determine particles-Module from ini-file, if necessary"""
     if parser.has_option("particles","module"):
-        modelFile = parser.get( "particles", "module" )     
+        runtime.modelFile = parser.get( "particles", "module" )     
 
     """ Check database location and load database, exit if not found """
     database, databaseVersion = modelTester.loadDatabase(parser, db)
