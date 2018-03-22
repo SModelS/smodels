@@ -507,8 +507,7 @@ class Element(object):
         
         :parameter el2: element (Element Object)  
         """
-        
-        for mother in el2.motherElements:
-            self.motherElements += el2.motherElements
+                
+        self.motherElements += el2.motherElements
     
 
