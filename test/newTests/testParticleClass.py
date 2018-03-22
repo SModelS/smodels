@@ -4,10 +4,9 @@
 .. module:: testParticleClass
    :synopsis: Tests the smodels.theory.particleClass.Particles and .ParticleList class
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>   
-.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 """
 import sys
-sys.path.insert(0,"../")
+sys.path.insert(0,"../../")
 import unittest
 import copy
 from smodels.theory.particleClass import Particles, ParticleList, particleInList

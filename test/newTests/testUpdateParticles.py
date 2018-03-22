@@ -4,18 +4,13 @@
 .. module:: testUpdateParticles
    :synopsis: Tests the function of smodels.theory.updateParticles 
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>   
-.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 """
 import sys
-sys.path.insert(0,"../")
+sys.path.insert(0,"../../")
 import unittest
-
 from smodels.particleDefinitions import SMpdgs, BSMpdgs
 from smodels.theory.updateParticles import updateParticles
-
 from smodels.theory.particleClass import Particles
-from smodels.theory.particleComparison import compareBSMparticles, simParticles
-from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import GeV
 
 n1 = Particles(Z2parity='odd', label='N1', pdg=1000022, mass=None, eCharge=0, colordim=0, spin=1./2, width=None, branches=None) 

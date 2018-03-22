@@ -4,15 +4,12 @@
 .. module:: testParticleComparison
    :synopsis: Tests the functions of smodels.theory.particleComparison 
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>   
-.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 """
 import sys
-sys.path.insert(0,"../")
+sys.path.insert(0,"../../")
 import unittest
-
 from smodels.theory.particleClass import Particles
 from smodels.theory.particleComparison import compareBSMparticles, simParticles
-from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import GeV
 
 p1 = Particles(Z2parity='odd', label='p1', pdg=None, mass=100.*GeV, eCharge=None, colordim=None, spin=None, width=None, branches=None)
