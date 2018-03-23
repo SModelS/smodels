@@ -226,8 +226,9 @@ class LikelihoodComputer:
 
     #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
     # def prob(x0, x1 )
-    def probMV( self, *thetaA ):
-        """ probability, for nuicance parameters theta """
+    def probMV( self, nll, *thetaA ):
+        """ probability, for nuicance parameters theta
+        :params nll: compute negative log likelihood """
         theta = array ( thetaA )
         # ntot = self.model.backgrounds + self.nsig
         lmbda = theta + self.ntot ## the lambda for the Poissonian
@@ -270,10 +271,19 @@ class LikelihoodComputer:
         for ctr,i in enumerate ( lmbda ):
             if i==0. or i<0.:
                 lmbda[ctr]=1e-30
-        poisson = NP.exp(self.model.data*NP.log(lmbda) - lmbda - self.gammaln)
+        # poissonA = NP.exp(self.model.data*NP.log(lmbda) - lmbda - self.gammaln)
+        if nll:
+            poisson = self.model.data*NP.log(lmbda) - lmbda - self.gammaln
+        else:
+            poisson = stats.poisson.pmf ( self.model.data, lmbda )
+        # print ( "p,p=",poissonA,poisson )
         try:
-            gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=V)
-            ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
+            if nll:
+                gaussian = stats.multivariate_normal.logpdf(theta,mean=[0.]*len(theta),cov=V)
+                ret = - gaussian - sum(poisson)
+            else:
+                gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=V)
+                ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
             return ret
         except ValueError as e:
             logger.error ( "ValueError %s, %s" % ( e, V ) )
@@ -282,17 +292,12 @@ class LikelihoodComputer:
     def nll ( self, theta ):
         """ probability, for nuicance parameters theta,
         as a negative log likelihood. """
-        xtot = theta + self.ntot
-        xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
-        # logger.info  ( "theta=%s" % theta )
-        logpoisson = self.model.data*NP.log(xtot) - xtot - self.gammaln
-        loggaussian = stats.multivariate_normal.logpdf(theta,mean=[0.]*len(theta),cov=self.cov_tot)
-        ret = - loggaussian - sum(logpoisson)
-        return ret
+        return self.probMV(True,*theta)
 
     def nllprime ( self, theta ):
         """ the derivative of nll as a function of the thetas.
         Makes it easier to find the maximum likelihood. """
+        ### FIXME skewness !!
         xtot = theta + self.ntot
         xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
         nllp_ = self.ones - self.model.data / xtot + NP.dot( theta , self.weight )
@@ -443,7 +448,7 @@ class LikelihoodComputer:
         # compute the profiled (not normalized) likelihood of observing
         # nsig signal events
         theta_hat,err = self.findThetaHat ( nsig, deltas )
-        ret = self.probMV ( *theta_hat )
+        ret = self.probMV ( False, *theta_hat )
         # logger.error ( "theta_hat, err=%s, %s, %s" % ( theta_hat[0], err, ret ) )
         return (ret,err)
 
@@ -578,16 +583,21 @@ class UpperLimitComputer:
         a,b=1.5*mu_hat,2.5*mu_hat+2*sigma_mu
         # print ( "a=%s, %s, %s" % ( type(a), a, root_func(a) ) )
         ctr=0
-        while ( NP.sign ( root_func(a)* root_func(b) ) > -.5 ):
-            b=1.2*b
-            a=a-(b-a)*.2
-            ctr+=1
-            if ctr>20:
-                logger.error("cannot find brent bracket")
-                return None
-        #    a,b=.8*a,1.2*b ## widen bracket if we dont have opposite signs!
-        mu_lim = optimize.brentq ( root_func, a, b, rtol=1e-03, xtol=1e-06 )
-        return mu_lim / self.lumi
+        while True: 
+            while ( NP.sign ( root_func(a)* root_func(b) ) > -.5 ):
+                b=1.2*b
+                a=a-(b-a)*.2
+                ctr+=1
+                if ctr>20:
+                    logger.error("cannot find brent bracket")
+                    return None
+            #    a,b=.8*a,1.2*b ## widen bracket if we dont have opposite signs!
+            try:
+                mu_lim = optimize.brentq ( root_func, a, b, rtol=1e-03, xtol=1e-06 )
+                return mu_lim / self.lumi
+            except ValueError as e: ## it could still be that the signs arent opposite
+                # in that case, try again
+                pass
 
 if __name__ == "__main__":
     C=[ 18774.2, -2866.97, -5807.3, -4460.52, -2777.25, -1572.97, -846.653, -442.531,
