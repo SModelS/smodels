@@ -24,7 +24,7 @@ class Branch(object):
     :ivar particles: list of particles (Particles objects) for the final states
     :ivar BSMparticles: a list of the intermediate states particles appearing in the branch.
                 If the branch represents more than one possible particle list, BSMparticles will correspond
-                to a nested list (BSMparticles = [[particle1, particle2,...],[particleA, partcleB,...]])
+                to a nested list (BSMparticles = [[particle1, particle2,...],[particleA, particleB,...]])
     :ivar maxWeight: weight of the branch (XSection object)
     """
     def __init__(self, info=None):
@@ -77,16 +77,13 @@ class Branch(object):
         
         st = str([[particle.label for particle in particleList ] for particleList in self.particles ]).replace("'", "")
         st = st.replace(" ", "")
-        """
-        st = str([[particle.pdg for particle in particleList ] for particleList in self.BSMparticles ]).replace("'", "")
-        """
-        st = st.replace(" ", "")
+
         return st
 
     def __cmp__(self,other):
         """
         Compares the branch with other.        
-        The comparison is made based on .
+        The comparison is made based on vertnumb, vertparts, particles and BSMparticles.
         OBS: The particles inside each vertex MUST BE sorted (see branch.sortParticles())         
         :param other:  branch to be compared (Branch object)
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
@@ -245,7 +242,7 @@ class Branch(object):
 
         if not self.maxWeight is None:
             newBranch.maxWeight = self.maxWeight * br.br
-        
+            
         return newBranch
 
 
@@ -264,16 +261,17 @@ class Branch(object):
             # of the LSP)
             return []
         #If decay table is not defined, assume daughter is stable:
-        if not self.BSMparticles[0][-1].pdg in BSMpdgs: return [] #PIDs without .pdg
+        if not self.BSMparticles[0][-1].pdg in BSMpdgs: 
+            return []             
         # List of possible decays (brs) for R-odd daughter in branch        
         brs = self.BSMparticles[0][-1].branches 
-        if len(brs) == 0:
-            # Daughter is stable, there are no new branches
+        if len(brs) == 0: #Daughter is stable, there are no new branches
             return []
+        
         newBranches = []
-
         for br in brs:
-            if not br.br: continue  #Skip zero BRs
+            if not br.br: continue  #Skip zero BRs         
+            if not br.ids: continue   
             # Generate a new branch for each possible decay
             newBranches.append(self._addDecay(br))
 
@@ -289,13 +287,19 @@ def decayBranches(branchList, sigcut=0. *fb):
                    (all branches are kept)
     :returns: list of branches (Branch objects)    
     """
-
-    finalBranchList = []
-    while branchList:
-
+    finalDecayedBranchList = []
+    
+    stableBranchList = [ branch for branch in branchList if branch.BSMparticles[0][-1].isStable() ]
+    unstableBranchList = [ branch for branch in branchList if not branch.BSMparticles[0][-1].isStable() ]       
+    
+    #if not unstableBranchList:        
+    #    finalBranchList = sorted(stableBranches, key=lambda branch: branch.BSMparticles[0][0].pdg)
+    #else: 
+    
+    while unstableBranchList:
         # Store branches after adding one step cascade decay
         newBranchList = []
-        for inbranch in branchList:
+        for inbranch in unstableBranchList:
             if sigcut.asNumber() > 0. and inbranch.maxWeight < sigcut:
                 # Remove the branches above sigcut and with length > topmax
                 continue
@@ -307,13 +311,12 @@ def decayBranches(branchList, sigcut=0. *fb):
                 newBranchList.extend(newBranches)
             else:
                 # All particles have already decayed, store final branch
-                finalBranchList.append(inbranch)
+                finalDecayedBranchList.append(inbranch)
         # Use new branches (if any) for next iteration step
-        branchList = newBranchList
-        
-    #Sort list by initial branch PID:
-    finalBranchList = sorted(finalBranchList, key=lambda branch:  branch.BSMparticles[0][0].pdg)  
-        
+        unstableBranchList = newBranchList           
+    
+    #Sort list by initial branch pdg:        
+    finalBranchList = sorted(finalDecayedBranchList+stableBranchList, key=lambda branch: branch.BSMparticles[0][0].pdg)  
     return finalBranchList
 
 

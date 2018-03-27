@@ -7,14 +7,18 @@
 
 import pyslha
 import copy
+from math import exp
 from smodels.particleDefinitions import SMpdgs, BSMList, BSMpdgs
 from smodels.tools.smodelsLogging import logger
-from smodels.tools.physicsUnits import GeV
-
-
+from smodels.tools.physicsUnits import GeV, MeV, m, mm, fm
 
 
 def updateParticles(slhafile, BSMList):
+    getMassWidthBranches(slhafile, BSMList)
+    getPromptDecays(BSMList)
+    
+
+def getMassWidthBranches(slhafile, BSMList):
     """
     Update mass, total width and branches of BSM particles from input slha file. 
         
@@ -34,8 +38,8 @@ def updateParticles(slhafile, BSMList):
     for pid in res.decays.keys():
         for particle in BSMList:
             if abs(particle.pdg) == pid:
-                particle.mass = round(abs(res.blocks['MASS'][pid]),1)*GeV
-                particle.width = round(abs(res.decays[pid].totalwidth),1)*GeV
+                particle.mass = abs(res.blocks['MASS'][pid])*GeV
+                particle.width = abs(res.decays[pid].totalwidth)*GeV
 
                 if not pid in rOdd:
                     logger.warning("Particle %s is not in BSMList, its mass, width and branches cannot be included") %pid
@@ -61,6 +65,7 @@ def updateParticles(slhafile, BSMList):
                         br.ids = [-x for x in br.ids]                              
                     particle.branches = brsConj
 
+    #getPromptDecays(BSMList)
 
 
 def writeIgnoreMessage ( keys, rEven, rOdd ):
@@ -74,5 +79,33 @@ def writeIgnoreMessage ( keys, rEven, rOdd ):
             continue         
     if len(msg)>0:
             logger.info ( "Ignoring %s decays" % msg[:-2] )
+            
+            
+            
+def getPromptDecays(BSMList):
+    """
+    Update br including whether a particle decays promptly or is long-lived.
+    """
+    l_inner = 10.*mm
+    l_outer = 10.*m
+    gb_inner = 10.
+    gb_outer = 0.6    
+    
+    hc = 197.327*MeV*fm  #hbar * c
+
+    for particle in BSMList:    
+        F_prompt = 1. - exp( -1*particle.width * l_inner /(gb_inner*hc) )       
+        F_long = exp( -1*particle.width * l_outer /(gb_outer*hc) )
+
+        for branch in particle.branches:
+            branch.br *= F_prompt
+        
+        if F_long:
+            stable = pyslha.Decay(br=F_long, nda=0 ,ids=[])
+            particle.branches.append(stable)
+            
+        if (F_long+F_prompt) > 1.:
+            logger.error("Sum of decay fractions > 1 for "+str(particle.pdg))
+            return False    
             
 
