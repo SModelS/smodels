@@ -227,7 +227,7 @@ def _getPromptDecays(slhafile,brDic,l_inner=10.*mm,gb_inner=10,l_outer=1.*m,gb_o
     decays = res.decays    
         
     for pid in brDic:
-        width = decays[abs(pid)].totalwidth*GeV
+        width = abs(decays[abs(pid)].totalwidth)*GeV
         Fprompt = 1. - math.exp(-width*l_inner/(gb_inner*hc))
         Flong = math.exp(-width*l_outer/(gb_outer*hc))
         for decay in brDic[pid]:
