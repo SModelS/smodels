@@ -3,7 +3,8 @@
 """
 .. module:: SimplifiedLikelihoods
    :synopsis: Code that implements the simplified likelihoods as presented
-              in CMS-NOTE-2017-001, see https://cds.cern.ch/record/2242860.
+              in CMS-NOTE-2017-001, see https://cds.cern.ch/record/2242860,
+              and FIXME insert arXiv reference here.
 
 .. moduleauthor:: Andy Buckley <andy.buckley@cern.ch>
 .. moduleauthor:: Sylvain Fichet <sylvain.fichet@gmail.com>
@@ -20,7 +21,7 @@ import numpy as NP
 import sys, copy
 
 def getLogger():
-    """ configure the logging facility. Maybe adapted to fit into 
+    """ configure the logging facility. Maybe adapted to fit into
         your framework. """
     import logging
     logger = logging.getLogger("SL")
@@ -86,7 +87,7 @@ class Model:
             return array ( [ obj[self.n*i:self.n*(i+1)] for i in range(self.n) ] )
         return obj
 
-    def __init__ ( self, data, backgrounds, covariance, skewness=None, 
+    def __init__ ( self, data, backgrounds, covariance, skewness=None,
                          efficiencies=None, name="model" ):
         """
         :param data: number of observed events per dataset
@@ -104,13 +105,64 @@ class Model:
             ## all zeroes? then we have no skewness
             self.skewness = None
         self.name = name
+        self.deltas = array( [1e-10]*self.n )
+        self.computeABC()
+
+    def computeABC ( self ):
+        """ compute the terms A, B, C, rho, V. Corresponds with
+            Eqs. 1.27-1.30 in the second paper. """
+        self.V = self.covariance+NP.diag(self.deltas**2)
+        if type(self.skewness) == type(None):
+            return
+
+        covD = self.diagCov()
+        C=[]
+        for m2,m3 in zip(covD, self.skewness ):
+            if m3 == 0.: m3 = 1e-30
+            k=sqrt(2*m2 )
+            dm = 8*m2**3 - m3**2
+            if dm >= 0:
+                x=4.*NP.pi/3. + NP.arctan(sqrt(dm)/m3) / 3.
+                C.append ( k*NP.cos(x) )
+            else:
+                x = NP.arctanh( sqrt(-dm)/m3 ) / 3.
+                C.append ( k*NP.cosh(x) )
+        self.C=NP.array(C)
+        self.B = sqrt ( abs ( covD - 2*self.C**2 ) )
+        self.A = self.backgrounds - 2*self.C**2
+        self.rho = NP.array ( [ [0.]*self.n ]*self.n )
+        for x in range(self.n):
+            for y in range(x,self.n):
+                bxby=self.B[x]*self.B[y]
+                cxcy=self.C[x]*self.C[y]
+                e=(4.*cxcy)**(-1)*(sqrt( bxby**2+8*cxcy*self.covariance[x][y]) - bxby )
+                self.rho[x][y]=e
+                self.rho[y][x]=e
+
+
+        self.sandwich()
+        # self.V = sandwich ( self.B, self.rho )
+
+    def sandwich ( self ):
+        """ sandwich product """
+        ret = NP.array ( [ [0.]*len(self.B) ]*len(self.B) )
+        for x in range(len(self.B)):
+            for y in range(x,len(self.B)):
+                T=self.B[x]*self.B[y]*self.rho[x][y]
+                ret[x][y]=T
+                ret[y][x]=T
+        self.V = ret
+
+    def isLinear(self):
+        """ model is linear, i.e. no quadratic term in poissonians """
+        return self.C == None
 
     def diagCov ( self ):
         """ diagonal elements of covariance matrix. Convenience function. """
         return NP.diag ( self.covariance )
 
     def correlations ( self ):
-        """ correlation matrix, computed from covariance matrix. 
+        """ correlation matrix, computed from covariance matrix.
             convenience function. """
         if hasattr ( self, "corr" ):
             return self.corr
@@ -141,7 +193,7 @@ class LikelihoodComputer:
         :param ntoys: number of toys when marginalizing
         """
         self.model = model
-        self.ntoys = ntoys 
+        self.ntoys = ntoys
 
     def dLdMu ( self, mu, effs, theta_hat ):
         """ d (ln L)/d mu, if L is the likelihood. The function
@@ -231,62 +283,30 @@ class LikelihoodComputer:
         :params nll: compute negative log likelihood """
         theta = array ( thetaA )
         # ntot = self.model.backgrounds + self.nsig
-        lmbda = theta + self.ntot ## the lambda for the Poissonian
-        V = self.model.covariance+NP.diag(self.deltas**2)
-        if type(self.model.skewness) != type(None):
-            covD = self.model.diagCov()
-            C=[]
-            for m2,m3 in zip(covD, self.model.skewness ):
-                if m3 == 0.: m3 = 1e-30
-                k=sqrt(2*m2 )   
-                dm = 8*m2**3 - m3**2
-                if dm >= 0:
-                    x=4.*NP.pi/3. + NP.arctan(sqrt(dm)/m3) / 3.
-                    C.append ( k*NP.cos(x) )
-                else:
-                    x = NP.arctanh( sqrt(-dm)/m3 ) / 3.
-                    C.append ( k*NP.cosh(x) )
-            C=NP.array(C)
-            B = sqrt ( abs ( covD - 2*C**2 ) )
-            A = self.model.backgrounds - 2*C**2
-            rho = NP.array ( [ [0.]*self.model.n ]*self.model.n )
-            for x in range(self.model.n):
-                for y in range(x,self.model.n):
-                    e=(4.*C[x]*C[y])**(-1)*(sqrt( (B[x]*B[y])**2+8*C[x]*C[y]*self.model.covariance[x][y]) - B[x]*B[y] )
-                    rho[x][y]=e
-                    rho[y][x]=e
-            def sandwich ( B, rho ):
-                """ sandwich product """
-                ret = NP.array ( [ [0.]*len(B) ]*len(B) )
-                for x in range(len(B)):
-                    for y in range(x,len(B)):
-                        T=B[x]*B[y]*rho[x][y]
-                        ret[x][y]=T
-                        ret[y][x]=T
-                return ret
-
-            V = sandwich ( B, rho )
-            lmbda = self.nsig + A + theta + C * theta**2 / B**2 
-            # lmbda = theta + self.ntot + self.model.skewness * theta**2 / self.model.backgrounds**2 
-        for ctr,i in enumerate ( lmbda ):
-            if i==0. or i<0.:
-                lmbda[ctr]=1e-30
+        # lmbda = theta + self.ntot ## the lambda for the Poissonian
+        lmbda = self.nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
+        lmbda[lmbda<=0.] = 1e-30 ## turn zeroes to small values
+        # lmbda = theta + self.ntot + self.model.skewness * theta**2 / self.model.backgrounds**2
+        #for ctr,i in enumerate ( lmbda ):
+        #    if i==0. or i<0.:
+        #        lmbda[ctr]=1e-30
         # poissonA = NP.exp(self.model.data*NP.log(lmbda) - lmbda - self.gammaln)
         if nll:
-            poisson = self.model.data*NP.log(lmbda) - lmbda - self.gammaln
+            #poisson = self.model.data*NP.log(lmbda) - lmbda - self.gammaln
+            poisson = stats.poisson.logpmf ( self.model.data, lmbda )
         else:
             poisson = stats.poisson.pmf ( self.model.data, lmbda )
         # print ( "p,p=",poissonA,poisson )
         try:
             if nll:
-                gaussian = stats.multivariate_normal.logpdf(theta,mean=[0.]*len(theta),cov=V)
+                gaussian = stats.multivariate_normal.logpdf(theta,mean=[0.]*len(theta),cov=self.model.V)
                 ret = - gaussian - sum(poisson)
             else:
-                gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=V)
+                gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=self.model.V)
                 ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
             return ret
         except ValueError as e:
-            logger.error ( "ValueError %s, %s" % ( e, V ) )
+            logger.error ( "ValueError %s, %s" % ( e, self.model.V ) )
             sys.exit()
 
     def nll ( self, theta ):
@@ -298,7 +318,8 @@ class LikelihoodComputer:
         """ the derivative of nll as a function of the thetas.
         Makes it easier to find the maximum likelihood. """
         ### FIXME skewness !!
-        xtot = theta + self.ntot
+        #xtot = theta + self.ntot
+        xtot = self.nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
         xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
         nllp_ = self.ones - self.model.data / xtot + NP.dot( theta , self.weight )
         return nllp_
@@ -306,7 +327,8 @@ class LikelihoodComputer:
     def nllHess ( self, theta ):
         """ the Hessian of nll as a function of the thetas.
         Makes it easier to find the maximum likelihood. """
-        xtot = theta + self.ntot
+        # xtot = theta + self.ntot
+        xtot = self.nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
         xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
         nllh_ = self.weight + NP.diag ( self.model.data / (xtot**2) )
         return nllh_
@@ -540,21 +562,21 @@ class UpperLimitComputer:
         compA = LikelihoodComputer ( aModel, self.ntoys )
         ## compute
         mu_hat = computer.findMuHat ( model.efficiencies )
-        theta_hat = computer.findThetaHat ( mu_hat * model.efficiencies ) 
+        theta_hat = computer.findThetaHat ( mu_hat * model.efficiencies )
         sigma_mu = computer.getSigmaMu ( model.efficiencies, 1., mu_hat, theta_hat )
         mu_hatA = compA.findMuHat ( model.efficiencies )
         # print ( "mu_hat=", mu_hat )
         if mu_hat < 0.: mu_hat = 0.
-        nll0 = computer.likelihood ( model.efficiencies * mu_hat, 
+        nll0 = computer.likelihood ( model.efficiencies * mu_hat,
                                      marginalize=marginalize, nll=True )
-        nll0A = compA.likelihood ( aModel.efficiencies * mu_hatA, 
+        nll0A = compA.likelihood ( aModel.efficiencies * mu_hatA,
                                    marginalize=marginalize, nll=True )
         def root_func ( mu ):
             ## the function to minimize.
             nsig = mu*model.efficiencies
             computer.ntot = model.backgrounds + nsig
-            nll = computer.likelihood ( nsig, marginalize=marginalize, nll=True ) 
-            nllA = compA.likelihood ( nsig, marginalize=marginalize, nll=True ) 
+            nll = computer.likelihood ( nsig, marginalize=marginalize, nll=True )
+            nllA = compA.likelihood ( nsig, marginalize=marginalize, nll=True )
             qmu =  2*( nll - nll0 )
             if qmu<0.: qmu=0.
             sqmu = sqrt (qmu)
@@ -575,7 +597,7 @@ class UpperLimitComputer:
             CLs = 0.
             if CLb>0.:
                 CLs = CLsb / CLb
-            root = CLs - 1. + self.cl 
+            root = CLs - 1. + self.cl
             # print ( "mu=%s nll=%s nllo=%s qA=%s clb=%s clsb=%s cls=%s" % ( mu, nll, nll0, qA, CLb, CLsb, CLs ) )
             return root
         # print ( "model=%s " % model )
@@ -583,7 +605,7 @@ class UpperLimitComputer:
         a,b=1.5*mu_hat,2.5*mu_hat+2*sigma_mu
         # print ( "a=%s, %s, %s" % ( type(a), a, root_func(a) ) )
         ctr=0
-        while True: 
+        while True:
             while ( NP.sign ( root_func(a)* root_func(b) ) > -.5 ):
                 b=1.2*b
                 a=a-(b-a)*.2
@@ -601,12 +623,12 @@ class UpperLimitComputer:
 
 if __name__ == "__main__":
     C=[ 18774.2, -2866.97, -5807.3, -4460.52, -2777.25, -1572.97, -846.653, -442.531,
-       -2866.97, 496.273, 900.195, 667.591, 403.92, 222.614, 116.779, 59.5958, 
-       -5807.3, 900.195, 1799.56, 1376.77, 854.448, 482.435, 258.92, 134.975, 
-       -4460.52, 667.591, 1376.77, 1063.03, 664.527, 377.714, 203.967, 106.926, 
-       -2777.25, 403.92, 854.448, 664.527, 417.837, 238.76, 129.55, 68.2075, 
+       -2866.97, 496.273, 900.195, 667.591, 403.92, 222.614, 116.779, 59.5958,
+       -5807.3, 900.195, 1799.56, 1376.77, 854.448, 482.435, 258.92, 134.975,
+       -4460.52, 667.591, 1376.77, 1063.03, 664.527, 377.714, 203.967, 106.926,
+       -2777.25, 403.92, 854.448, 664.527, 417.837, 238.76, 129.55, 68.2075,
        -1572.97, 222.614, 482.435, 377.714, 238.76, 137.151, 74.7665, 39.5247,
-       -846.653, 116.779, 258.92, 203.967, 129.55, 74.7665, 40.9423, 21.7285, 
+       -846.653, 116.779, 258.92, 203.967, 129.55, 74.7665, 40.9423, 21.7285,
        -442.531, 59.5958, 134.975, 106.926, 68.2075, 39.5247, 21.7285, 11.5732]
     m=Model ( data=[1964,877,354,182,82,36,15,11],
               backgrounds=[2006.4,836.4,350.,147.1,62.0,26.2,11.1,4.7],
