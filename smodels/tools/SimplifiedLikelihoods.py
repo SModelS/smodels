@@ -113,6 +113,9 @@ class Model:
             Eqs. 1.27-1.30 in the second paper. """
         self.V = self.covariance+NP.diag(self.deltas**2)
         if type(self.skewness) == type(None):
+            self.A = None
+            self.B = None
+            self.C = None
             return
 
         covD = self.diagCov()
@@ -155,7 +158,7 @@ class Model:
 
     def isLinear(self):
         """ model is linear, i.e. no quadratic term in poissonians """
-        return self.C == None
+        return type(self.C) == type(None)
 
     def diagCov ( self ):
         """ diagonal elements of covariance matrix. Convenience function. """
@@ -284,19 +287,15 @@ class LikelihoodComputer:
         theta = array ( thetaA )
         # ntot = self.model.backgrounds + self.nsig
         # lmbda = theta + self.ntot ## the lambda for the Poissonian
-        lmbda = self.nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
+        if self.model.isLinear():
+            lmbda = self.model.backgrounds + self.nsig + theta
+        else:
+            lmbda = self.nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
         lmbda[lmbda<=0.] = 1e-30 ## turn zeroes to small values
-        # lmbda = theta + self.ntot + self.model.skewness * theta**2 / self.model.backgrounds**2
-        #for ctr,i in enumerate ( lmbda ):
-        #    if i==0. or i<0.:
-        #        lmbda[ctr]=1e-30
-        # poissonA = NP.exp(self.model.data*NP.log(lmbda) - lmbda - self.gammaln)
         if nll:
-            #poisson = self.model.data*NP.log(lmbda) - lmbda - self.gammaln
             poisson = stats.poisson.logpmf ( self.model.data, lmbda )
         else:
             poisson = stats.poisson.pmf ( self.model.data, lmbda )
-        # print ( "p,p=",poissonA,poisson )
         try:
             if nll:
                 gaussian = stats.multivariate_normal.logpdf(theta,mean=[0.]*len(theta),cov=self.model.V)
@@ -317,20 +316,31 @@ class LikelihoodComputer:
     def nllprime ( self, theta ):
         """ the derivative of nll as a function of the thetas.
         Makes it easier to find the maximum likelihood. """
-        ### FIXME skewness !!
-        #xtot = theta + self.ntot
-        xtot = self.nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
-        xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
-        nllp_ = self.ones - self.model.data / xtot + NP.dot( theta , self.weight )
+        if self.model.isLinear():
+            xtot = theta + self.model.backgrounds + self.nsig
+            xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
+            nllp_ = self.ones - self.model.data / xtot + NP.dot( theta , self.weight )
+            return nllp_
+        lmbda = self.nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
+        lmbda[lmbda<=0.] = 1e-30 ## turn zeroes to small values
+        # nllp_ = ( self.ones - self.model.data / lmbda + NP.dot( theta , self.weight ) ) * ( self.ones + 2*self.model.C * theta / self.model.B**2 )
+        T=self.ones + 2*self.model.C/self.model.B**2*theta
+        nllp_ = T - self.model.data / lmbda * ( T ) + NP.dot( theta , self.weight )
         return nllp_
 
     def nllHess ( self, theta ):
         """ the Hessian of nll as a function of the thetas.
         Makes it easier to find the maximum likelihood. """
         # xtot = theta + self.ntot
-        xtot = self.nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
-        xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
-        nllh_ = self.weight + NP.diag ( self.model.data / (xtot**2) )
+        if self.model.isLinear():
+            xtot = theta + self.model.backgrounds + self.nsig
+            xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
+            nllh_ = self.weight + NP.diag ( self.model.data / (xtot**2) )
+            return nllh_
+        lmbda = self.nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
+        lmbda[lmbda<=0.] = 1e-30 ## turn zeroes to small values
+        T=self.ones + 2*self.model.C/self.model.B**2*theta
+        nllh_ = self.weight + NP.diag ( self.model.data * T**2 / (lmbda**2) )  - NP.diag ( self.model.data / lmbda * 2 * self.model.C / self.model.B**2 )
         return nllh_
 
     def getThetaHat ( self, nobs, nb, nsig, covb, deltas, max_iterations ):
