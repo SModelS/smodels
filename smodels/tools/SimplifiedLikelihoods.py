@@ -113,9 +113,8 @@ class Model:
             Eqs. 1.27-1.30 in the second paper. """
         self.V = self.covariance+NP.diag(self.deltas**2)
         if type(self.skewness) == type(None):
-            self.A = None
-            self.B = None
-            self.C = None
+            self.A, self.B, self.C = None, None, None
+            self.rho = None
             return
 
         covD = self.diagCov()
@@ -427,17 +426,18 @@ class LikelihoodComputer:
                     bounds = [ ( -10*self.model.data, 10*self.model.data ) ]
                 else:
                     bounds = [ ( -10*x, 10*x ) for x in self.model.data ]
-                ini = ret_c
-                ret_c = optimize.fmin_tnc ( self.nll, ret_c[0], fprime=self.nllprime,
+                if ( sum(NP.isfinite(ret_c[0]))  == len(ret_c[0] ) ):
+                    ini = ret_c[0]
+                ret_c = optimize.fmin_tnc ( self.nll, ini, fprime=self.nllprime,
                                             disp=0, bounds=bounds )
                 if ret_c[-1] not in [ 0, 1, 2 ]:
                     is_expected=False
                     if ( self.model.data == self.model.backgrounds ).all():
                         is_expected=True
-                    return ret_c[0],ret_c[-1]
+                    return ini,ret_c[-1]
                 else:
-                    return ret_c[0],0
                     logger.debug ( "tnc worked." )
+                    return ini,0
 
                 ret = ret_c[0]
                 return ret,-2
@@ -559,17 +559,20 @@ class UpperLimitComputer:
         self.ntoys = ntoys
         self.cl = cl
 
-    def ulSigma ( self, model, marginalize=True ):
+    def ulSigma ( self, model, marginalize=True, toys=None ):
         """ upper limit obtained from combined efficiencies, by using
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
         :params marginalize: if true, marginalize nuisances, else profile them
+        :params toys: specify number of toys. Use default is none
         :returns: upper limit on *production* xsec (efficiencies unfolded)
         """
-        computer = LikelihoodComputer ( model, self.ntoys )
+        if toys==None:
+            toys=self.ntoys
+        computer = LikelihoodComputer ( model, toys )
         aModel = copy.deepcopy ( model )
         aModel.data = array ( [ floor(x) for x in model.backgrounds ] )
-        compA = LikelihoodComputer ( aModel, self.ntoys )
+        compA = LikelihoodComputer ( aModel, toys )
         ## compute
         mu_hat = computer.findMuHat ( model.efficiencies )
         theta_hat = computer.findThetaHat ( mu_hat * model.efficiencies )
@@ -617,13 +620,17 @@ class UpperLimitComputer:
         ctr=0
         while True:
             while ( NP.sign ( root_func(a)* root_func(b) ) > -.5 ):
-                b=1.2*b
-                a=a-(b-a)*.2
+                b=1.2*b  ## widen bracket
+                a=a-(b-a)*.2 ## widen bracket
                 ctr+=1
-                if ctr>20:
-                    logger.error("cannot find brent bracket")
-                    return None
-            #    a,b=.8*a,1.2*b ## widen bracket if we dont have opposite signs!
+                if ctr>20: ## but stop after 20 trials
+                    if toys > 2000:
+                       logger.error("cannot find brent bracket after 20 trials.")
+                        
+                       return None
+                    else:
+                       logger.error("cannot find brent bracket after 20 trials. but very low number of toys")
+                       return self.ulSigma ( model, marginalize, 4*toys )
             try:
                 mu_lim = optimize.brentq ( root_func, a, b, rtol=1e-03, xtol=1e-06 )
                 return mu_lim / self.lumi
