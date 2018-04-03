@@ -132,7 +132,8 @@ class Model:
                 C.append ( k*NP.cosh(x) )
         self.C=NP.array(C)
         self.B = sqrt ( abs ( covD - 2*self.C**2 ) )
-        self.A = self.backgrounds - 2*self.C**2
+        # self.A = self.backgrounds - 2*self.C**2
+        self.A = self.backgrounds - self.C
         self.rho = NP.array ( [ [0.]*self.n ]*self.n )
         for x in range(self.n):
             for y in range(x,self.n):
@@ -507,6 +508,8 @@ class LikelihoodComputer:
         else:
             l,err = self.profileLikelihood ( nsig, deltas )
         if nll: ## FIXME can optimize
+            if l == 0.:
+                return -10000. # a high number
             return -log(l)
         return l
 
@@ -624,12 +627,12 @@ class UpperLimitComputer:
         # print ( "model=%s " % model )
 
         a,b=1.5*mu_hat,2.5*mu_hat+2*sigma_mu
-        # print ( "a=%s, %s, %s" % ( type(a), a, root_func(a) ) )
         ctr=0
         while True:
             while ( NP.sign ( root_func(a)* root_func(b) ) > -.5 ):
                 b=1.2*b  ## widen bracket
                 a=a-(b-a)*.2 ## widen bracket
+                if a < 0.: a=0.
                 ctr+=1
                 if ctr>20: ## but stop after 20 trials
                     if toys > 2000:
@@ -637,7 +640,7 @@ class UpperLimitComputer:
                         
                        return None
                     else:
-                       logger.error("cannot find brent bracket after 20 trials. but very low number of toys")
+                       logger.debug("cannot find brent bracket after 20 trials. but very low number of toys")
                        return self.ulSigma ( model, marginalize, 4*toys )
             try:
                 mu_lim = optimize.brentq ( root_func, a, b, rtol=1e-03, xtol=1e-06 )
