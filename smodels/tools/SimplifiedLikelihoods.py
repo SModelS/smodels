@@ -340,7 +340,8 @@ class LikelihoodComputer:
         lmbda = self.nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
         lmbda[lmbda<=0.] = 1e-30 ## turn zeroes to small values
         T=self.ones + 2*self.model.C/self.model.B**2*theta
-        nllh_ = self.weight + NP.diag ( self.model.data * T**2 / (lmbda**2) )  - NP.diag ( self.model.data / lmbda * 2 * self.model.C / self.model.B**2 )
+        # T_i = 1_i + 2*c_i/B_i**2 * theta_i
+        nllh_ = self.weight + NP.diag ( self.model.data * T**2 / (lmbda**2) ) - NP.diag ( self.model.data / lmbda * 2 * self.model.C / self.model.B**2 ) + NP.diag ( 2*self.model.C/self.model.B**2 )
         return nllh_
 
     def getThetaHat ( self, nobs, nb, nsig, covb, deltas, max_iterations ):
@@ -424,7 +425,7 @@ class LikelihoodComputer:
             self.gammaln = special.gammaln(self.model.data + 1)
             try:
                 ret_c = optimize.fmin_ncg ( self.nll, ini, fprime=self.nllprime,
-                                            fhess=self.nllHess, full_output=True, disp=0 )
+                                       fhess=self.nllHess, full_output=True, disp=0 )
                 # then always continue with TNC
                 if type ( self.model.data ) in [ int, float ]:
                     bounds = [ ( -10*self.model.data, 10*self.model.data ) ]
@@ -456,10 +457,14 @@ class LikelihoodComputer:
                 deltas = array ( self.deltas_default * nsig )
             vals=[]
             self.gammaln = special.gammaln(self.model.data + 1)
-            lambdas = stats.multivariate_normal.rvs(mean=self.model.backgrounds+nsig,
-                          cov=(self.model.covariance+NP.diag(deltas**2)),
+            thetas = stats.multivariate_normal.rvs(mean=[0.]*self.model.n,
+                          cov=(self.model.V+NP.diag(deltas**2)),
                           size=self.ntoys ) ## get ntoys values
-            for lmbda in lambdas:
+            for theta in thetas :
+                if self.model.isLinear():
+                    lmbda = nsig + self.model.backgrounds + theta
+                else:
+                    lmbda = nsig + self.model.A + theta + self.model.C*theta**2/self.model.B**2
                 if self.model.isScalar ( lmbda ): lmbda = array ( [ lmbda ] )
                 for ctr,v in enumerate ( lmbda ):
                     if v<=0.: lmbda[ctr]=1e-30
