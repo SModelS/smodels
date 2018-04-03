@@ -126,15 +126,22 @@ class Model:
             dm = 8*m2**3 - m3**2
             if dm >= 0:
                 x=4.*NP.pi/3. + NP.arctan(sqrt(dm)/m3) / 3.
-                C.append ( k*NP.cos(x) )
+                C.append ( -k*NP.cos(x) )
+                #C.append ( k*NP.cos(x) )
             else:
                 x = NP.arctanh( sqrt(-dm)/m3 ) / 3.
-                C.append ( k*NP.cosh(x) )
+                C.append ( -k*NP.cosh(x) )
+                #C.append ( k*NP.cosh(x) )
         self.C=NP.array(C)
         self.B = sqrt ( abs ( covD - 2*self.C**2 ) )
         # self.A = self.backgrounds - 2*self.C**2
         self.A = self.backgrounds - self.C
         self.rho = NP.array ( [ [0.]*self.n ]*self.n )
+        """
+        print ( "A=", self.A )
+        print ( "B=", self.B )
+        print ( "C=", self.C )
+        """
         for x in range(self.n):
             for y in range(x,self.n):
                 bxby=self.B[x]*self.B[y]
