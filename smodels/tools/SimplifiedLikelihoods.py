@@ -113,8 +113,9 @@ class Model:
             Eqs. 1.27-1.30 in the second paper. """
         self.V = self.covariance+NP.diag(self.deltas**2)
         if type(self.skewness) == type(None):
-            self.A, self.B, self.C = None, None, None
-            self.rho = None
+            self.A = None
+            self.B = None
+            self.C = None
             return
 
         covD = self.diagCov()
@@ -412,8 +413,11 @@ class LikelihoodComputer:
             ## quadratic equations
             ini = self.getThetaHat ( self.model.data, self.model.backgrounds, nsig, self.model.covariance, deltas, 0 )
             self.cov_tot = self.model.covariance+NP.diag(self.deltas**2)
-            self.weight = NP.linalg.inv ( self.cov_tot )
             self.ntot = self.model.backgrounds + self.nsig
+            if not self.model.isLinear():
+                self.cov_tot = self.model.V+NP.diag(self.deltas**2)
+                self.ntot = None
+            self.weight = NP.linalg.inv ( self.cov_tot )
             self.ones = 1.
             if type ( self.model.data) in [ list, ndarray ]:
                 self.ones = NP.ones ( len (self.model.data) )
@@ -426,18 +430,17 @@ class LikelihoodComputer:
                     bounds = [ ( -10*self.model.data, 10*self.model.data ) ]
                 else:
                     bounds = [ ( -10*x, 10*x ) for x in self.model.data ]
-                if ( sum(NP.isfinite(ret_c[0]))  == len(ret_c[0] ) ):
-                    ini = ret_c[0]
-                ret_c = optimize.fmin_tnc ( self.nll, ini, fprime=self.nllprime,
+                ini = ret_c
+                ret_c = optimize.fmin_tnc ( self.nll, ret_c[0], fprime=self.nllprime,
                                             disp=0, bounds=bounds )
                 if ret_c[-1] not in [ 0, 1, 2 ]:
                     is_expected=False
                     if ( self.model.data == self.model.backgrounds ).all():
                         is_expected=True
-                    return ini,ret_c[-1]
+                    return ret_c[0],ret_c[-1]
                 else:
+                    return ret_c[0],0
                     logger.debug ( "tnc worked." )
-                    return ini,0
 
                 ret = ret_c[0]
                 return ret,-2
