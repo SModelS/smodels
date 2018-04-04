@@ -304,7 +304,7 @@ class LikelihoodComputer:
             lmbda = self.nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
         lmbda[lmbda<=0.] = 1e-30 ## turn zeroes to small values
         if nll:
-            # poisson = - self.model.data * log ( lmbda ) + lmbda
+            #poisson = self.model.data * log ( lmbda ) - lmbda #- self.gammaln
             poisson = stats.poisson.logpmf ( self.model.data, lmbda )
             #print ( "p",poisson,poisson2 )
         else:
@@ -312,7 +312,9 @@ class LikelihoodComputer:
             #print ( "nonll",poisson )
         try:
             if nll:
+                # gaussian = -.5 * (theta*NP.linalg.inv ( self.model.V ) * theta)[0][0]
                 gaussian = stats.multivariate_normal.logpdf(theta,mean=[0.]*len(theta),cov=self.model.V)
+                # print ( "gaussian=",gaussian,gaussian2)
                 ret = - gaussian - sum(poisson)
             else:
                 gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=self.model.V)
@@ -448,7 +450,7 @@ class LikelihoodComputer:
                 ini = ret_c
                 ret_c = optimize.fmin_tnc ( self.nll, ret_c[0], fprime=self.nllprime,
                                             disp=0, bounds=bounds )
-                #print ( "[findThetaHat] mu=%s bg=%s data=%s V=%s, nsig=%s theta=%s, nll=%s" % ( self.nsig[0]/self.model.efficiencies[0], self.model.backgrounds, self.model.data,self.model.covariance, self.nsig, ret_c[0], self.nll(ret_c[0]) ) )
+                # print ( "[findThetaHat] mu=%s bg=%s data=%s V=%s, nsig=%s theta=%s, nll=%s" % ( self.nsig[0]/self.model.efficiencies[0], self.model.backgrounds, self.model.data,self.model.covariance, self.nsig, ret_c[0], self.nll(ret_c[0]) ) )
                 if ret_c[-1] not in [ 0, 1, 2 ]:
                     is_expected=False
                     if ( self.model.data == self.model.backgrounds ).all():
@@ -591,15 +593,19 @@ class UpperLimitComputer:
         if toys==None:
             toys=self.ntoys
         computer = LikelihoodComputer ( model, toys )
+        mu_hat = computer.findMuHat ( model.efficiencies )
+        theta_hat = computer.findThetaHat ( mu_hat * model.efficiencies )
+        theta_hat0 = computer.findThetaHat ( 0 * model.efficiencies )
+        sigma_mu = computer.getSigmaMu ( model.efficiencies, 1., mu_hat, theta_hat )
+
         aModel = copy.deepcopy ( model )
-        aModel.data = array ( [ floor(x) for x in model.backgrounds ] )
+        aModel.data = array ( [ round(x+y) for x,y in zip(model.backgrounds,theta_hat0) ] )
+        #print ( "aModeldata=", aModel.data )
+        #aModel.data = array ( [ round(x) for x in model.backgrounds ] )
         aModel.name = aModel.name + "A"
         compA = LikelihoodComputer ( aModel, toys )
         ## compute
-        mu_hat = computer.findMuHat ( model.efficiencies )
-        theta_hat = computer.findThetaHat ( mu_hat * model.efficiencies )
-        sigma_mu = computer.getSigmaMu ( model.efficiencies, 1., mu_hat, theta_hat )
-        mu_hatA = compA.findMuHat ( model.efficiencies )
+        mu_hatA = compA.findMuHat ( aModel.efficiencies )
         # print ( "mu_hat=", mu_hat )
         if mu_hat < 0.: mu_hat = 0.
         nll0 = computer.likelihood ( model.efficiencies * mu_hat,
