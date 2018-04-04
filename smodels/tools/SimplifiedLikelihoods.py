@@ -595,11 +595,11 @@ class UpperLimitComputer:
         computer = LikelihoodComputer ( model, toys )
         mu_hat = computer.findMuHat ( model.efficiencies )
         theta_hat = computer.findThetaHat ( mu_hat * model.efficiencies )
-        theta_hat0 = computer.findThetaHat ( 0 * model.efficiencies )
+        theta_hat0,e = computer.findThetaHat ( 0 * model.efficiencies )
         sigma_mu = computer.getSigmaMu ( model.efficiencies, 1., mu_hat, theta_hat )
 
         aModel = copy.deepcopy ( model )
-        aModel.data = array ( [ round(x+y) for x,y in zip(model.backgrounds,theta_hat0) ] )
+        aModel.data = array ( [ round(x+y) for x,y in zip(model.backgrounds,theta_hat0 ) ] )
         #print ( "aModeldata=", aModel.data )
         #aModel.data = array ( [ round(x) for x in model.backgrounds ] )
         aModel.name = aModel.name + "A"
