@@ -304,9 +304,12 @@ class LikelihoodComputer:
             lmbda = self.nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
         lmbda[lmbda<=0.] = 1e-30 ## turn zeroes to small values
         if nll:
+            # poisson = - self.model.data * log ( lmbda ) + lmbda
             poisson = stats.poisson.logpmf ( self.model.data, lmbda )
+            #print ( "p",poisson,poisson2 )
         else:
             poisson = stats.poisson.pmf ( self.model.data, lmbda )
+            #print ( "nonll",poisson )
         try:
             if nll:
                 gaussian = stats.multivariate_normal.logpdf(theta,mean=[0.]*len(theta),cov=self.model.V)
@@ -445,6 +448,7 @@ class LikelihoodComputer:
                 ini = ret_c
                 ret_c = optimize.fmin_tnc ( self.nll, ret_c[0], fprime=self.nllprime,
                                             disp=0, bounds=bounds )
+                #print ( "[findThetaHat] mu=%s bg=%s data=%s V=%s, nsig=%s theta=%s, nll=%s" % ( self.nsig[0]/self.model.efficiencies[0], self.model.backgrounds, self.model.data,self.model.covariance, self.nsig, ret_c[0], self.nll(ret_c[0]) ) )
                 if ret_c[-1] not in [ 0, 1, 2 ]:
                     is_expected=False
                     if ( self.model.data == self.model.backgrounds ).all():
@@ -462,7 +466,7 @@ class LikelihoodComputer:
                 sys.exit()
             return ini,-1
 
-    def marginalizedLikelihood( self, nsig, deltas ):
+    def marginalizedLikelihood( self, nsig, nll, deltas ):
             """ compute the marginalized likelihood of observing nsig signal event"""
             if type(deltas) == type(None):
                 deltas = array ( self.deltas_default * nsig )
@@ -485,11 +489,12 @@ class LikelihoodComputer:
                 vals.append ( NP.exp ( sum(poisson) ) )
                 #vals.append ( reduce(lambda x, y: x*y, poisson) )
             mean = NP.mean ( vals )
-            # print ( "marginalized, vals=", vals, mean )
-            return mean,0
+            if nll:
+                mean = - log ( mean )
+            return mean
 
 
-    def profileLikelihood ( self, nsig, deltas = None ):
+    def profileLikelihood ( self, nsig, nll, deltas ):
         """ compute the profiled likelihood for nsig.
             Warning: not normalized.
             Returns profile likelihood and error code (0=no error)
@@ -499,9 +504,9 @@ class LikelihoodComputer:
         # compute the profiled (not normalized) likelihood of observing
         # nsig signal events
         theta_hat,err = self.findThetaHat ( nsig, deltas )
-        ret = self.probMV ( False, *theta_hat )
+        ret = self.probMV ( nll, *theta_hat )
         # logger.error ( "theta_hat, err=%s, %s, %s" % ( theta_hat[0], err, ret ) )
-        return (ret,err)
+        return ret
 
     def likelihood ( self, nsig, deltas = None, marginalize=False, nll=False ):
         """ compute likelihood for nsig, profiling the nuisances
@@ -513,15 +518,10 @@ class LikelihoodComputer:
         self.ntot = self.model.backgrounds + nsig
         if marginalize:
             # p,err = self.profileLikelihood ( nsig, deltas )
-            l,err = self.marginalizedLikelihood( nsig, deltas )
+            return self.marginalizedLikelihood( nsig, nll, deltas )
             # print ( "p,l=",p,l,p/l )
         else:
-            l,err = self.profileLikelihood ( nsig, deltas )
-        if nll: ## FIXME can optimize
-            if l == 0.:
-                return -10000. # a high number
-            return -log(l)
-        return l
+            return self.profileLikelihood ( nsig, nll, deltas )
 
     def chi2( self, nsig, deltas=None ):
             """
@@ -616,6 +616,7 @@ class UpperLimitComputer:
             if qmu<0.: qmu=0.
             sqmu = sqrt (qmu)
             qA =  2*( nllA - nll0A )
+            # print ( "mu: %s, qMu: %s, qA: %s nll0A: %s nllA: %s" % ( mu, qmu, qA, nll0A, nllA ) )
             if qA<0.: qA=0.
             sqA = sqrt ( qA )
             CLsb = 1. - stats.multivariate_normal.cdf ( sqmu )
