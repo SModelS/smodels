@@ -590,6 +590,7 @@ class UpperLimitComputer:
         computer = LikelihoodComputer ( model, toys )
         aModel = copy.deepcopy ( model )
         aModel.data = array ( [ floor(x) for x in model.backgrounds ] )
+        aModel.name = aModel.name + "A"
         compA = LikelihoodComputer ( aModel, toys )
         ## compute
         mu_hat = computer.findMuHat ( model.efficiencies )
