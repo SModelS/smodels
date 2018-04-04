@@ -61,6 +61,9 @@ class Model:
         needed to fully define a specific statistical model """
     def isScalar ( self, obj ):
         """ determine if obj is a scalar (float or int) """
+        if type(obj) == ndarray:
+            ## need to treat separately since casting array([0.]) to float works
+            return False
         try:
             _ = float(obj)
             return True
@@ -645,7 +648,7 @@ class UpperLimitComputer:
                 if ctr>20: ## but stop after 20 trials
                     if toys > 2000:
                        logger.error("cannot find brent bracket after 20 trials.")
-                        
+
                        return None
                     else:
                        logger.debug("cannot find brent bracket after 20 trials. but very low number of toys")
