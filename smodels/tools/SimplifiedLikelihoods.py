@@ -125,34 +125,20 @@ class Model:
         C=[]
         for m2,m3 in zip(covD, self.skewness ):
             if m3 == 0.: m3 = 1e-30
-            k=sqrt(2*m2 )
-            dm = 8*m2**3 - m3**2
-            if dm >= 0:
-                x=4.*NP.pi/3. + NP.arctan(sqrt(dm)/m3) / 3.
-                C.append ( -k*NP.cos(x) )
-                #C.append ( k*NP.cos(x) )
-            else:
-                x = NP.arctanh( sqrt(-dm)/m3 ) / 3.
-                C.append ( -k*NP.cosh(x) )
-                #C.append ( k*NP.cosh(x) )
+            k=-NP.sign(m3)*sqrt(2.*m2 )
+            dm = sqrt ( 8.*m2**3/m3**2 - 1. )
+            C.append ( k*NP.cos ( 4.*NP.pi/3. + NP.arctan(dm) / 3. ) )
         self.C=NP.array(C)
-        self.B = sqrt ( abs ( covD - 2*self.C**2 ) )
-        # self.A = self.backgrounds - 2*self.C**2
+        self.B = sqrt ( covD - 2*self.C**2 )
         self.A = self.backgrounds - self.C
         self.rho = NP.array ( [ [0.]*self.n ]*self.n )
-        """
-        print ( "A=", self.A )
-        print ( "B=", self.B )
-        print ( "C=", self.C )
-        """
         for x in range(self.n):
             for y in range(x,self.n):
                 bxby=self.B[x]*self.B[y]
                 cxcy=self.C[x]*self.C[y]
-                e=(4.*cxcy)**(-1)*(sqrt( bxby**2+8*cxcy*self.covariance[x][y]) - bxby )
+                e=(4.*cxcy)**(-1)*(sqrt( bxby**2+8*cxcy*self.covariance[x][y])-bxby)
                 self.rho[x][y]=e
                 self.rho[y][x]=e
-
 
         self.sandwich()
         # self.V = sandwich ( self.B, self.rho )
