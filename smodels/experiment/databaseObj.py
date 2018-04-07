@@ -493,9 +493,9 @@ class Database(object):
         one of the Tx names in the list.
 
         :param analysisID: list of analysis ids ([CMS-SUS-13-006,...])
-        :param dataType: dataType of the analysis (all, efficiencyMap or upperLimit)
         :param datasetIDs: list of dataset ids ([ANA-CUT0,...])
         :param txnames: list of txnames ([TChiWZ,...])
+        :param dataTypes: dataType of the analysis (all, efficiencyMap or upperLimit)
         :param useSuperseded: If False, the supersededBy results will not be included
         :param useNonValidated: If False, the results with validated = False
                                 will not be included
@@ -504,7 +504,15 @@ class Database(object):
         :returns: list of ExpResult objects or the ExpResult object if the list
                   contains only one result
 
-        """
+        """        
+        
+        # Test only!!! REMOVE THE FOLLOWING 4 LINES FOR PRODUCTION USE!
+        analysisIDs=['*']
+        dataTypes=['*']
+        datasetIDs=['*']
+        txnames=['*']
+
+        import fnmatch
         expResultList = []
         for expResult in self.expResultList:
             superseded = None
@@ -512,22 +520,53 @@ class Database(object):
                 superseded = expResult.globalInfo.supersededBy.replace(" ","")
             if superseded and (not useSuperseded):
                 continue
-            ID = expResult.globalInfo.getInfo('id')
+            
+            analysisID = expResult.globalInfo.getInfo('id')          
+            sqrts = expResult.globalInfo.getInfo('sqrts')
+            
             # Skip analysis not containing any of the required ids:
             if analysisIDs != ['all']:
-                if not ID in analysisIDs:
-                    continue
+                hits=False
+                for patternString in analysisIDs:
+                    # Extract centre-of-mass energy
+                    # Assuming 0 or 1 colons.
+                    # split string
+                    pattern = patternString.split(':')        
+                    hits = fnmatch.filter ( [ analysisID ], pattern[0] )
+                    if len ( pattern ) > 1:
+                        if not pattern[1].endswith('*TeV'):
+                            pattern[1] += '*TeV'
+                        if sqrts != eval(pattern[1]):
+                            hits = False
+                    if hits:
+                        continue
+                if not hits:
+                    continue                             
+
             newExpResult = ExpResult()
             newExpResult.path = expResult.path
             newExpResult.globalInfo = expResult.globalInfo
             newExpResult.datasets = []
+            
             for dataset in expResult.datasets:
                 if dataTypes != ['all']:
-                    if not dataset.dataInfo.dataType in dataTypes:
-                        continue
-                if datasetIDs != ['all']:
-                    if not dataset.dataInfo.dataId in datasetIDs:
-                        continue
+                    hits=False
+                    for pattern in dataTypes:
+                        hits = fnmatch.filter ( [ dataset.dataInfo.dataType ], pattern )
+                        if hits:
+                            continue
+                    if not hits:
+                        continue         
+
+                if hasattr(dataset.dataInfo, 'dataID') and datasetIDs != ['all']:                
+                    hits=False
+                    for pattern in datasetIDs:
+                        hits = fnmatch.filter ( [ dataset.dataInfo.dataID ], pattern )
+                        if hits:
+                            continue
+                    if not hits:
+                        continue              
+                
                 newDataSet = datasetObj.DataSet( dataset.path, dataset.globalInfo,
                        False, discard_zeroes=self.txt_meta.discard_zeroes )
                 newDataSet.dataInfo = dataset.dataInfo
@@ -545,8 +584,15 @@ class Database(object):
 #                    if txname.validated is False and (not useNonValidated):
                         continue
                     if txnames != ['all']:
-                        if not txname.txName in txnames:
-                            continue
+                        #Replaced by wildcard-evaluation below (2018-04-06 mat)
+                        hits=False
+                        for pattern in txnames:
+                            hits = fnmatch.filter ( [ txname.txName ], pattern )
+                            if hits:
+                                continue
+                        if not hits:
+                            continue                          
+                        
                     if onlyWithExpected and dataset.dataInfo.dataType == \
                         "upperLimit" and not txname.txnameDataExp:
                         continue
