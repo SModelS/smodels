@@ -507,10 +507,6 @@ class Database(object):
         """        
         
         # Test only!!! REMOVE THE FOLLOWING 4 LINES FOR PRODUCTION USE!
-        analysisIDs=['*']
-        dataTypes=['*']
-        datasetIDs=['*']
-        txnames=['*']
 
         import fnmatch
         expResultList = []
