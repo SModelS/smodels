@@ -101,7 +101,7 @@ setup(
                            'smodelsTools.py=smodels.tools.smodelsTools:main' ]
     },
     install_requires=[ 'docutils>=0.3', 'numpy>=1.13.0', 'scipy>=1.0.0', \
-                         'unum', 'argparse', 'pyslha>=3.1.0' ],
+                         'unum>=4.0.0', 'argparse', 'requests>=2.0.0', 'pyslha>=3.1.0' ],
     data_files=dataFiles() ,
     description=("A tool for interpreting simplified-model results from the "
                    "LHC"),
