@@ -55,7 +55,7 @@ The command-line tool (:ref:`runSModelS.py <runSModelS>`) and the example Python
 code (:ref:`Example.py <exampleCode>`) are described below.
 
 
-.. note:: For For non-MSSM (incl. non-SUSY) input models the user needs to modify *particles.py*
+.. note:: For non-MSSM (incl. non-SUSY) input models the user needs to write their own *particles.py*
           and specify which BSM particles are even or odd under the assumed
           Z\ :sub:`2` symmetry (see :ref:`adding new particles <newParticles>`).
           Finally, if the user wants to check the input files for possible issues using
@@ -141,6 +141,10 @@ Below we give more detailed information about each entry in the parameters file.
   * **ncpus** (int): number of CPUs. When processing multiple SLHA/LHE files,
     SModelS can run in a parallelized fashion, splitting up the input files in equal chunks.
     *ncpus = -1* uses the total number of CPU cores of the machine.
+
+* *particles*: defines the particle content of the BSM model
+ 
+  * **module**: pathname to the python file that defines the particle content of the BSM model, given either in Unix file notation ("/path/to/module.py") or as python module path ("path.to.module"). Defaults to *share.default_particles*. See inputFiles/models folder for more examples.
 
 * *database*: allows for selection of a subset of :ref:`experimental results <ExpResult>` from the |database|
 
