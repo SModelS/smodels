@@ -14,7 +14,6 @@ from smodels.tools.physicsUnits import fb, GeV
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import pyslha
-#import smodels.particles
 import copy
 
 
@@ -90,7 +89,7 @@ def elementFromEvent(event, weight=None):
 
     # Create branch list
     finalBranchList = []
-    from smodels.particles import rOdd, rEven
+    from smodels.particlesLoader import rOdd, rEven
     for ip, particle in enumerate(event.particles):
         keys = list ( rEven.keys() ) + \
                list ( rOdd.keys() )
@@ -163,7 +162,7 @@ def _getDictionariesFromEvent(event):
     for ibranch in branches.values():  #ibranch = position of primary mother
         massDic[ibranch] = {}
         brDic[ibranch] = {}
-    from smodels.particles import rEven
+    from smodels.particlesLoader import rEven
     for ip, particle in enumerate(particles):
         if particle.pdg in rEven or particle.status == -1:
             # Ignore R-even particles and initial state particles

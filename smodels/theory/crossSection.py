@@ -10,7 +10,6 @@
 
 from smodels.tools.physicsUnits import TeV, pb
 from smodels.theory import lheReader
-#import smodels.particles
 import pyslha
 import sys
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
@@ -570,7 +569,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
     # Store information about all cross sections in the SLHA file
     xSecsInFile = XSectionList()
     f=pyslha.readSLHAFile ( slhafile )
-    from smodels.particles import rOdd
+    from smodels.particlesLoader import rOdd
     for production in f.xsections:
         for pid in production[2:]:
             if not pid in rOdd.keys():

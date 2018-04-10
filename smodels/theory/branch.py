@@ -39,7 +39,7 @@ class Branch(object):
         self.maxWeight = None
         self.vertnumb = None
         self.vertparts = None
-        from smodels.particles import rEven
+        from smodels.particlesLoader import rEven
         from smodels.theory.particleNames import ptcDic
         if type(info) == type(str()):
             branch = elementsInStr(info)
@@ -201,7 +201,7 @@ class Branch(object):
                             not have multiple PID lists!")
             return False   
 
-        from smodels.particles import rEven
+        from smodels.particlesLoader import rEven
         for partID in br.ids:
             # Add R-even particles to final state
             if partID in rEven:

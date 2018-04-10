@@ -7,6 +7,7 @@
 .. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+.. moduleauthor:: Matthias Wolf <matthias.wolf@wot.at>
 
 """
 
@@ -492,10 +493,17 @@ class Database(object):
         in the list.  If txname is defined, returns only the results matching
         one of the Tx names in the list.
 
-        :param analysisID: list of analysis ids ([CMS-SUS-13-006,...])
-        :param datasetIDs: list of dataset ids ([ANA-CUT0,...])
-        :param txnames: list of txnames ([TChiWZ,...])
+        :param analysisID: list of analysis ids ([CMS-SUS-13-006,...]). Can
+                            be wildcarded with usual shell wildcards: * ? [<letters>]
+                            Furthermore, the centre-of-mass energy can be chosen
+                            as suffix, e.g. ›:13*TeV‹. Note that the asterisk 
+                            in the suffix is not a wildcard.
+        :param datasetIDs: list of dataset ids ([ANA-CUT0,...]). Can be wildcarded 
+                            with usual shell wildcards: * ? [<letters>]
+        :param txnames: list of txnames ([TChiWZ,...]). Can be wildcarded with 
+                            usual shell wildcards: * ? [<letters>]
         :param dataTypes: dataType of the analysis (all, efficiencyMap or upperLimit)
+                            Can be wildcarded with usual shell wildcards: * ? [<letters>]
         :param useSuperseded: If False, the supersededBy results will not be included
         :param useNonValidated: If False, the results with validated = False
                                 will not be included
@@ -506,8 +514,6 @@ class Database(object):
 
         """        
         
-        # Test only!!! REMOVE THE FOLLOWING 4 LINES FOR PRODUCTION USE!
-
         import fnmatch
         expResultList = []
         for expResult in self.expResultList:
@@ -526,7 +532,6 @@ class Database(object):
                 for patternString in analysisIDs:
                     # Extract centre-of-mass energy
                     # Assuming 0 or 1 colons.
-                    # split string
                     pattern = patternString.split(':')        
                     hits = fnmatch.filter ( [ analysisID ], pattern[0] )
                     if len ( pattern ) > 1:
