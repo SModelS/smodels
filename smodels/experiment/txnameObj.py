@@ -202,6 +202,15 @@ class TxName(object):
                     return elementB
         return False
 
+    def hasLikelihood ( self ):
+        """ can I construct a likelihood for this map? 
+        True for all efficiency maps, and for upper limits maps
+        with expected Values. """
+        if self._infoObj.dataType == "efficiencyMap":
+            return True
+        if self.txnameDataExp != None:
+            return True
+        return False
 
     def getEfficiencyFor(self,mass):
         """
@@ -247,8 +256,8 @@ class TxNameData(object):
         self.dataTag = datatag
         self._id = Id
         self._accept_errors_upto=accept_errors_upto
-        self._V = None
-        self.loadData(value)
+        self._V = None ## rotation matrix, derived from PCA
+        self.loadData( value )
         if self._keep_values:
             self.origdata = value
 
@@ -661,9 +670,13 @@ class TxNameData(object):
             m=(np.matrix(Mx) - self.delta_x).tolist()[0]
             M.append(m)
 
-        ## we dont need thousands of points for SVD
-        n = int(math.ceil ( len(M) / 2000. ) )
-        Vt=svd(M[::n])[2]
+        try:
+            ## we dont need thousands of points for SVD
+            n = int(math.ceil ( len(M) / 2000. ) )
+            Vt=svd(M[::n])[2]
+        except Exception as e:
+            logger.error ( "exception caught when performing singular value decomposition: %s, %s" % ( type(e), e ) )
+            sys.exit()
         V=Vt.T
         self._V= V ## self.round ( V )
         Mp=[]
@@ -681,17 +694,36 @@ class TxNameData(object):
         MpCut=[]
         for i in Mp:
             MpCut.append(i[:self.dimensionality].tolist() )
-
+        """ FIXME thats the code that was in the covariance patch,
+            instead of the single line above.
+            if self.dimensionality > 1:
+                MpCut.append(i[:self.dimensionality].tolist() )
+            else:
+                MpCut.append([i[0].tolist(),0.])
+        if self.dimensionality == 1:
+            logger.debug("1-D data found. Extending to a small 2-D band around the line.")
+            MpCut += [[pt[0],pt[1]+0.0001] for pt in MpCut] + [[pt[0],pt[1]-0.0001] for pt in MpCut]
+            self._1dim = True
+            lx=len(self.xsec)
+            newxsec = np.ndarray ( shape=(3*lx,) )
+            for i in range(3):
+                newxsec[ i*lx : (i+1)*lx ] = self.xsec
+            self.xsec = newxsec
+            #self.xsec += self.xsec + self.xsec
+            self.dimensionality = 2
+        else:
+            self._1dim = False
+        """
         if self.dimensionality > 1:
             self.tri = qhull.Delaunay(MpCut)
         else:            
             self.tri = Delaunay1D(MpCut)           
 
+        
     def hasNoZeroes(self):
         """
         Maybe we have no zeroes at all?
         """
-        
         for i in self.y_values:
             if abs ( i ) < 1e-9:
                 return False

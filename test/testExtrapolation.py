@@ -47,12 +47,12 @@ class ExtrapolationTest(unittest.TestCase):
     def testWithDirectData(self):
         result=self.tryWith ([[ 275.*GeV,175.*GeV], [ 275.*GeV,175.*GeV] ])
 
-        self.assertAlmostEquals( result.asNumber(pb),0.0125 )
+        self.assertAlmostEqual( result.asNumber(pb),0.0125 )
         eps = 1 * keV
         result=self.tryWith([[ 275.*GeV,175.*GeV + eps],
                              [ 275.*GeV + eps ,175.*GeV] ])
         
-        self.assertAlmostEquals( result.asNumber(pb),0.0125 )
+        self.assertAlmostEqual( result.asNumber(pb),0.0125 )
 
         result=self.tryWith([[ 275.*GeV,185.*GeV], [ 275.*GeV,165.*GeV] ])
         self.assertTrue ( result == None )

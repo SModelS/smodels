@@ -40,7 +40,7 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
         obj1,obj2=float(obj1),float(obj2)
 
     if type(obj1) != type(obj2):
-        logger.info("Data types differ (%s,%s)" %(type(obj1),type(obj2)))
+        logger.warning("Data types differ (%s,%s)" %(type(obj1),type(obj2)))
         return False
 
     if isinstance(obj1,unum.Unum):
@@ -64,11 +64,11 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
             if not equalObjs(obj1[key],obj2[key],allowedDiff, ignore=ignore ):
                 logger.warning( "Dictionaries differ in key ``%s''" % key )
                 s1,s2 = str(obj1[key]),str(obj2[key]) 
-                if len(s1) + len(s2) > 200:
+                if False: # len(s1) + len(s2) > 200:
                     logger.warning ( "The values are too long to print." )
                 else:
-                    logger.warning( 'The values are: %s (this run) versus %s (default)'%\
-                                ( s1,s2 ) )
+                    logger.warning( 'The values are: >>%s<< (this run) versus >>%s<< (default)'%\
+                                ( s1[:20],s2[:20] ) )
                 return False
     elif isinstance(obj1,list):
         if len(obj1) != len(obj2):
@@ -136,14 +136,14 @@ class RunSModelSTest(unittest.TestCase):
                     res['AnalysisID'],res['DataSetID']])
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                            ignore=ignoreFields)
+        self.assertTrue(equals)
         for i in [ './output.py', './output.pyc' ]:
             if os.path.exists ( i ): os.remove ( i )
-        self.assertTrue(equals)
     
     def testGoodFile13(self):
           
         filename = join ( iDir(), "inputFiles/slha/simplyGluino.slha" )
-        outputfile = self.runMain(filename)
+        outputfile = self.runMain(filename,suppressStdout = True )
         shutil.copyfile(outputfile,'./output13.py')
         from simplyGluino_default import smodelsOutputDefault
         from output13 import smodelsOutput

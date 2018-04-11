@@ -1,7 +1,7 @@
 """
 .. module:: infoObj
-   :synopsis: Holds the classes and methods used to read and store the information in the
-              globalInfo.txt or dataInfo.txt files.
+   :synopsis: Holds the classes and methods used to read and store the
+              information in the globalInfo.txt or dataInfo.txt files.
 
 .. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -60,6 +60,14 @@ class Info(object):
         if self.__dict__ != other.__dict__:
             return False
         return True
+
+    def dirName ( self, up=0 ):
+        """ directory name of path. If up>0, 
+            we step up 'up' directory levels.
+        """
+        s_up = "/".join ( [ ".." ] * up )
+        p = os.path.dirname ( self.path )
+        return os.path.abspath ( os.path.join ( p, s_up ) )
 
     def __ne__ ( self, other ):
         return not self.__eq__ ( other )

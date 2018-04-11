@@ -23,6 +23,7 @@ from smodels.experiment.metaObj import Meta
 from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.tools.physicsUnits import TeV
+from smodels.tools.stringTools import cleanWalk
 from smodels.tools.smodelsLogging import logger
 import logging
 
@@ -408,7 +409,9 @@ class Database(object):
 
         """
         folders=[]
-        for root, _, files in os.walk(self.txt_meta.pathname):
+        #for root, _, files in os.walk(self.txt_meta.pathname):
+        # for root, _, files in cleanWalk(self._base):
+        for root, _, files in cleanWalk(self.txt_meta.pathname):
             folders.append ( (root, files) )
         folders.sort()
 

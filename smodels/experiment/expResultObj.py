@@ -13,9 +13,13 @@ from smodels.experiment import infoObj
 from smodels.experiment import txnameObj
 from smodels.experiment import datasetObj
 from smodels.experiment import metaObj
+import numpy
 from smodels.experiment.exceptions import DatabaseNotFoundException, SModelSExperimentError
 from smodels.tools.physicsUnits import fb
 from smodels.tools.smodelsLogging import logger
+from smodels.tools.stringTools import cleanWalk
+#from smodels.tools import statistics
+from smodels.tools.SimplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Model
 
 try:
     import cPickle as serializer
@@ -26,11 +30,11 @@ class ExpResult(object):
     """
     Object  containing the information and data corresponding to an
     experimental result (experimental conference note or publication).
-    
+
     :ivar path: path to the experimental result folder (i.e. ATLAS-CONF-2013-047)
     :ivar globalInfo: Info object holding the data in <path>/globalInfo.txt
-    :ivar datasets: List of DataSet objects corresponding to the dataset folders 
-                    in <path>    
+    :ivar datasets: List of DataSet objects corresponding to the dataset folders
+                    in <path>
     """
         
     def __init__( self, path = None, discard_zeroes = True,
@@ -52,7 +56,7 @@ class ExpResult(object):
         self.globalInfo = infoObj.Info(os.path.join(path, "globalInfo.txt"))
         self.datasets = []
         folders=[]
-        for root, _, files in os.walk(path):
+        for root, _, files in cleanWalk(path):
             folders.append ( (root, files) )
         folders.sort()
         for root, files in folders:
@@ -88,6 +92,9 @@ class ExpResult(object):
     def __ne__(self, other ):
         return not self.__eq__ ( other )
 
+    def id(self):
+        return self.globalInfo.getInfo('id')
+
     def __str__(self):
         label = self.globalInfo.getInfo('id') + ": "
         dataIDs = [dataset.dataInfo.dataId for dataset in self.datasets]
@@ -103,7 +110,7 @@ class ExpResult(object):
             for txname in dataset.txnameList:
                 tx = txname.txName
                 if not tx in txnames:
-                    
+
                     txnames.append(tx)
         if isinstance(txnames, list):
             for txname in txnames:
@@ -124,7 +131,7 @@ class ExpResult(object):
 
     def getTxNames(self):
         """
-        Returns a list of all TxName objects appearing in all datasets.        
+        Returns a list of all TxName objects appearing in all datasets.
         """
         txnames = []
         for dataset in self.datasets:
@@ -142,47 +149,162 @@ class ExpResult(object):
         if dataset: return dataset.getEfficiencyFor ( txname, mass )
         return None
 
+    def hasCovarianceMatrix ( self ):
+        return hasattr ( self.globalInfo, "covariance" )
+
+    def isUncorrelatedWith ( self, other ):
+        """
+        can this expResult be safely assumed to be approximately uncorrelated
+        with "other"? "Other" can be another expResult, or a dataset of
+        an expResult.
+        """
+        if self == other: return False
+        if other.globalInfo.dirName ( 1 ) != self.globalInfo.dirName ( 1 ):
+            return True
+        # print ( "%s combinable with %s?" % ( self.globalInfo.id, other.globalInfo.id ) )
+        if hasattr ( self.globalInfo, "combinableWith" ):
+            #print ( "check: %s, %s" % (other.globalInfo.id, self.globalInfo.combinableWith) )
+            if other.globalInfo.id in self.globalInfo.combinableWith:
+                return True
+        if hasattr ( other.globalInfo, "combinableWith" ):
+            if self.globalInfo.id in other.globalInfo.combinableWith:
+                return True
+        return None ## FIXME implement
+
+    def combinedLikelihood ( self, nsig, deltas=None ):
+        """
+        Computes the (combined) likelihood to observe nobs events, given a
+        predicted signal "nsig", with nsig being a vector with one entry per
+        dataset.  nsig has to obey the datasetOrder. Deltas is the error on
+        the signal efficiency.
+        :param nsig: predicted signal (list)
+        :param deltas: uncertainty on signal (None,float, or list).
+        :returns: likelihood to observe nobs events (float)
+        """
+        if len ( self.datasets ) == 1: return self.datasets[0].likelihood ( nsig )
+        if not hasattr ( self.globalInfo, "covariance" ):
+            logger.error ( "asked for combined likelihood, but no covariance error given." )
+            return None
+        nobs = [ x.dataInfo.observedN for x in self.datasets ]
+        bg = [ x.dataInfo.expectedBG for x in self.datasets ]
+        cov = self.globalInfo.covariance
+        # print ( "nsig=", nsig )
+        computer = LikelihoodComputer ( Model ( nobs, bg, cov, nsig ) )
+        # print ( "computing combined likelihood for",nsig,"ds=",len(self.datasets ) )
+        return computer.likelihood ( nsig, deltas )
+
+    def totalChi2 ( self, nsig, deltas=None ):
+        """
+        Computes the total chi2 for a given number of observed events, given a
+        predicted signal "nsig", with nsig being a vector with one entry per
+        dataset. nsig has to obey the datasetOrder. Deltas is the error on
+        the signal efficiency.
+        :param nsig: predicted signal (list)
+        :param deltas: uncertainty on signal (None,float, or list).
+        :returns: chi2 (float)
+        """
+        if len ( self.datasets ) == 1: return self.datasets[0].chi2 ( nsig )
+        if not hasattr ( self.globalInfo, "covariance" ):
+            logger.error ( "asked for combined likelihood, but no covariance error given." )
+            return None
+        nobs = [ x.dataInfo.observedN for x in self.datasets ]
+        bg = [ x.dataInfo.expectedBG for x in self.datasets ]
+        cov = self.globalInfo.covariance
+        computer = LikelihoodComputer ( Model ( nobs, bg, cov ) )
+        return computer.chi2 ( nsig, deltas )
+
+    def getCombinedUpperLimitFor ( self, effs, expected=False ):
+        """
+        Get combined upper limit. Effs are the signal efficiencies in the
+        datasets. The order is defined in the dataset itself.
+        :param effs: the signal efficiencies for all datasets
+                     (adding up the efficiencies for all txnames)
+                     the efficiencies must be sorted according to datasetOrder
+        :param expected: return expected, not observed value
+        :returns: upper limit on sigma (*not* sigma*eff)
+        """
+        if not hasattr ( self.globalInfo, "covariance" ):
+            logger.error ( "no covariance matrix given in globalInfo.txt for %s" % self.globalInfo.id )
+            raise SModelSExperimentError ( "no covariance matrix given in globalInfo.txt for %s" % self.globalInfo.id )
+        if not hasattr ( self.globalInfo, "datasetOrder" ):
+            logger.error ( "datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id )
+            raise SModelSExperimentError ( "datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id )
+        cov = self.globalInfo.covariance
+        if type ( cov ) != list:
+            logger.error ( "covariance field has wrong type: %s" % type(cov) )
+            sys.exit()
+        if len ( cov ) < 1:
+            logger.error ( "covariance matrix has length %d." % len(cov) )
+            sys.exit()
+        computer = UpperLimitComputer ( self.globalInfo.lumi, 2000 )
+        datasetOrder = self.globalInfo.datasetOrder
+        if type ( datasetOrder ) == str:
+            datasetOrder = tuple ( [ datasetOrder ] ) ## for debugging, allow one dataset
+        # print ( "datasetOrder=", datasetOrder )
+        if len ( datasetOrder ) != len ( self.datasets ):
+            logger.error ( "Number of elements in datasetOrder(%d) not equals number of datasets(%d) in %s." % ( len(datasetOrder), len(self.datasets), self.globalInfo.id ) )
+            sys.exit()
+        dsDict={} ## make sure we respect datasetOrder.
+        for ds in self.datasets:
+            dsDict[ds.dataInfo.dataId]=ds
+        nobs, nb = [], []
+        for dsname in datasetOrder:
+            if not dsname in dsDict.keys():
+                logger.error ( "dataset %s appears in datasetOrder, but not as dataset in %s" % ( dsname, self.globalInfo.id ) )
+                sys.exit()
+            ds = dsDict[dsname]
+            nobs.append ( ds.dataInfo.observedN )
+            nb.append ( ds.dataInfo.expectedBG )
+        no = nobs
+        if expected:
+            no = nb
+        ret = computer.ulSigma ( Model ( no, nb, cov, effs ), marginalize=False )
+        return ret
+
     def getUpperLimitFor(self, dataID=None, alpha=0.05, expected=False,
                           txname=None, mass=None, compute=False):
         """
         Computes the 95% upper limit (UL) on the signal cross section according
         to the type of result.
-        For an Efficiency Map type, returns  the UL for the signal*efficiency
-        for the given dataSet ID (signal region).  For  an Upper Limit type,
-        returns the UL for the signal*BR for for the given mass array and
+        For an Efficiency Map type, returns the UL for the signal*efficiency
+        for the given dataSet ID (signal region). For an Upper Limit type,
+        returns the UL for the signal*BR for the given mass array and
         Txname.
-        
+
         :param dataID: dataset ID (string) (only for efficiency-map type results)
-        :param alpha: Can be used to change the C.L. value. The default value is 0.05 
+        :param alpha: Can be used to change the C.L. value. The default value is 0.05
                       (= 95% C.L.) (only for  efficiency-map results)
         :param expected: Compute expected limit, i.e. Nobserved = NexpectedBG
                          (only for efficiency-map results)
         :param txname: TxName object or txname string (only for UL-type results)
         :param mass: Mass array with units (only for UL-type results)
         :param compute: If True, the upper limit will be computed
-                        from expected and observed number of events. 
-                        If False, the value listed in the database will be used 
+                        from expected and observed number of events.
+                        If False, the value listed in the database will be used
                         instead.
-        
-        
+
+
         :return: upper limit (Unum object)
-        
+
         """
+        if dataID == "combined":
+            logger.error ( "you are asking for upper limit for the combined dataset. Use .getCombinedUpperLimitFor method instead." )
+            sys.exit()
         if self.datasets[0].dataInfo.dataType == 'efficiencyMap':
             if not dataID or not isinstance(dataID, str):
                 logger.error("The data set ID must be defined when computing ULs" \
-                             " for efficiency-map results.")
+                             " for efficiency-map results (as there is no covariance matrix).")
                 return False
-            
+
             useDataset = False
             for dataset in self.datasets:
                 if dataset.dataInfo.dataId == dataID:
                     useDataset = dataset
                     break
             if useDataset is False:
-                logger.error("The data set ID not found.")
+                logger.error("Data set ID ``%s'' not found." % dataID )
                 return False
-                
+
             if compute:
                 upperLimit = useDataset.getSRUpperLimit(alpha, expected, compute)
             else:
@@ -193,8 +315,8 @@ class ExpResult(object):
                 if (upperLimit/fb).normalize()._unit:
                     logger.error("Upper limit defined with wrong units for %s and %s"
                                   %(dataset.globalInfo.id,dataset.dataInfo.dataId))
-                    return False           
-            
+                    return False
+
         elif self.datasets[0].dataInfo.dataType == 'upperLimit':
             if not txname or not mass:
                 logger.error("A TxName and mass array must be defined when \
@@ -214,24 +336,24 @@ class ExpResult(object):
                         else: upperLimit = tx.txnameDataExp.getValueFor(mass)
                     else: upperLimit = tx.txnameData.getValueFor(mass)
         else:
-            logger.warning("Unkown data type: %s. Data will be ignored.", 
+            logger.warning("Unkown data type: %s. Data will be ignored.",
                            self.datasets[0].dataInfo.dataType)
 
-        
+
         return upperLimit
-    
+
 
     def getValuesFor(self, attribute=None):
         """
         Returns a list for the possible values appearing in the ExpResult
         for the required attribute (sqrts,id,constraint,...).
         If there is a single value, returns the value itself.
-        
+
         :param attribute: name of a field in the database (string). If not
-                          defined it will return a dictionary with all fields 
+                          defined it will return a dictionary with all fields
                           and their respective values
         :return: list of values or value
-        
+
         """
         fieldDict = list ( self.__dict__.items() )
         valuesDict = {}
@@ -267,10 +389,10 @@ class ExpResult(object):
         """
         Checks for all the fields/attributes it contains as well as the
         attributes of its objects if they belong to smodels.experiment.
-        
+
         :param showPrivate: if True, also returns the protected fields (_field)
         :return: list of field names (strings)
-        
+
         """
         fields = self.getValuesFor().keys()
         fields = list(set(fields))
@@ -280,22 +402,22 @@ class ExpResult(object):
                 if "_" == field[0]:
                     fields.remove(field)
         return fields
-    
+
 
     def getTxnameWith(self, restrDict={}):
         """
         Returns a list of TxName objects satisfying the restrictions.
         The restrictions specified as a dictionary.
-        
+
         :param restrDict: dictionary containing the fields and their allowed values.
                           E.g. {'txname' : 'T1', 'axes' : ....}
                           The dictionary values can be single entries or a list
                           of values.  For the fields not listed, all values are
                           assumed to be allowed.
         :return: list of TxName objects if more than one txname matches the selection
-                 criteria or a single TxName object, if only one matches the 
+                 criteria or a single TxName object, if only one matches the
                  selection.
-        
+
         """
         txnameList = []
         for tag, value in restrDict.items():

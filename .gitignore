@@ -61,5 +61,6 @@ docs/manual/source/SlhaChecker.rst
 docs/manual/source/ToolBox.rst
 docs/manual/source/XSecComputer.rst
 *~
+.http*
 *.crash
 .http*
