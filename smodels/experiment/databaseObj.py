@@ -499,7 +499,7 @@ class Database(object):
         :param analysisID: list of analysis ids ([CMS-SUS-13-006,...]). Can
                             be wildcarded with usual shell wildcards: * ? [<letters>]
                             Furthermore, the centre-of-mass energy can be chosen
-                            as suffix, e.g. ›:13*TeV‹. Note that the asterisk 
+                            as suffix, e.g. ":13*TeV". Note that the asterisk 
                             in the suffix is not a wildcard.
         :param datasetIDs: list of dataset ids ([ANA-CUT0,...]). Can be wildcarded 
                             with usual shell wildcards: * ? [<letters>]
