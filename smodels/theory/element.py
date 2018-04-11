@@ -325,7 +325,7 @@ class Element(object):
                   and exits otherwise.
         """
         info = self.getEinfo()
-        from smodels.particles import rEven
+        from smodels.particlesLoader import rEven
         from smodels.theory.particleNames import ptcDic
         for ib, branch in enumerate(self.branches):
             for iv, vertex in enumerate(branch.particles):

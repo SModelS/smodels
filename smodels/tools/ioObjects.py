@@ -15,7 +15,6 @@ from smodels.theory import lheReader
 from smodels.tools.physicsUnits import GeV, fb
 from smodels import installation
 import pyslha
-#from smodels.particles import qNumbers, rEven
 from smodels.theory import crossSection
 from smodels.theory.theoryPrediction import TheoryPrediction
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
@@ -381,7 +380,7 @@ class SlhaStatus(object):
         st = 1
         missing = []
         pids = self.slha.blocks["MASS"].keys()
-        from smodels.particles import rEven
+        from smodels.particlesLoader import rEven
         for pid in pids:
             if pid in rEven:
                 continue
@@ -406,7 +405,7 @@ class SlhaStatus(object):
             return 0, "Did not check for illegal decays"
         st = 1
         badDecay = "Illegal decay for PIDs "
-        from smodels.particles import rEven
+        from smodels.particlesLoader import rEven
         for particle, block in self.slha.decays.items():
             if particle in rEven : continue
             if not particle in self.slha.blocks["MASS"].keys(): continue
@@ -479,7 +478,7 @@ class SlhaStatus(object):
         """
         pid = 0
         minmass = None
-        from smodels.particles import rEven
+        from smodels.particlesLoader import rEven
         for particle, mass in self.slha.blocks["MASS"].items():
             if particle in rEven:
                 continue
@@ -556,7 +555,7 @@ class SlhaStatus(object):
         lsp = self.findLSP()
         pid = 0
         minmass = None
-        from smodels.particles import rEven
+        from smodels.particlesLoader import rEven
         for particle, mass in self.slha.blocks["MASS"].items():
             mass = abs(mass)
             if particle == lsp or particle in rEven:
@@ -621,7 +620,7 @@ class SlhaStatus(object):
         chargedList = []
         missingList = []
         ltstr = ""
-        from smodels.particles import rEven
+        from smodels.particlesLoader import rEven
         for pid in xsecList.getPIDs():
             if pid in rEven: continue
             if pid == self.findLSP(): continue
@@ -706,7 +705,7 @@ class Qnumbers:
     """
     def __init__(self, pid):
         self.pid = pid
-        from smodels.particles import qNumbers
+        from smodels.particlesLoader import qNumbers
         if not pid in qNumbers.keys():
             self.pid = 0
         else:
