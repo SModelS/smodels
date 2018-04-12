@@ -18,11 +18,12 @@ SModelS is a Python library that requires Python version 2.6 or later (including
 version 3) with the following *external* Python
 libraries:
 
- * unum
- * numpy
+ * unum>=4.0.0
+ * numpy>=1.13.0
  * argparse
+ * requests>=2.0.0
  * docutils>=0.3
- * scipy>=0.9.0
+ * scipy>=1.0.0
  * pyslha>=3.1.0
 
 In addition, the :ref:`cross section computer <xsecCalc>` provided by :ref:`smodelsTools.py <smodelsTools>`

@@ -17,8 +17,8 @@ setLogLevel ( "debug" )
 smstoplist = smstoplist = slhaDecomposer.decompose( "T2tt.slha" )
 # print ( "smstoplist=",len(smstoplist ) )
 # dir = "corrdb/"
-# dir = "../../git/smodels-database"
-dir = "database/"
+dir = "../../smodels-database"
+# dir = "database/"
 d=Database( dir, discard_zeroes = True )
 print(d)
 results=d.getExpResults()

@@ -171,8 +171,8 @@ class DataSet(object):
         """
         return os.path.basename ( self.path )
 
+    """ this feature is not yet ready
     def isUncorrelatedWith ( self, other ):
-        """
         can it be safely assumed that this dataset is approximately
         uncorrelated with "other"?
         "other" can be a dataset or an expResult, in which case it is
@@ -181,7 +181,6 @@ class DataSet(object):
         Two datasets of the same exp Result are considered never to be
         uncorrelated.
 
-        """
         if other == self: return False
         if type(other) == type(self): ## comparing with another dataset
             if self.globalInfo.path == other.globalInfo.path:
@@ -191,6 +190,7 @@ class DataSet(object):
                 return True
             ## different expResults
             return None ## FIXME implement
+    """
                 
 
     def chi2( self, nsig, deltas=None):

@@ -1,3 +1,16 @@
+Release v1.1.2, Thu 12 Apr 2018
+=======================================================
+
+  * Fixed lastUpdate bug
+  * Changes in pickling (e.g. subpickling, removing redundant zeroes)
+  * Database path allows URLs
+  * Option to show individual contribution from
+    topologies to total theory prediction
+  * smodelsTools.py has fixpermissions, for system-wide installs
+  * wildcards allowed when selecting analyses, datasets, txnames
+  * path to particles.py can now be specified in parameters.ini
+  * support for covariance matrices and combination of signal regions
+
 Release v1.1.1, Tue 27 Jun 2017
 =======================================================
 
