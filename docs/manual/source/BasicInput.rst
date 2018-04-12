@@ -45,7 +45,8 @@ which particles are Z\ :sub:`2`-odd states (:ref:`Intermediate states <odd state
 and which are Z\ :sub:`2`-even (:ref:`Final states <final states>`).
 These definitions must be given in the :download:`particles.py <images/particles.py>` file,
 where some default values (for SM and MSSM particles) are already loaded.
-To path to the user's own particles.py can be specified in the :ref:`parameter file <parameterFile>`.
+A path to a user's own particles.py can be specified in the :ref:`parameter file <parameterFile>`.
+(Long story short: in the parameter file with an entry section [particles], parameter module.)
 
 
 If the user wants to check the SLHA input file for possible errors (see :ref:`SLHA Checks <slhaChecks>`), 
