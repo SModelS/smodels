@@ -212,7 +212,10 @@ class RunPrinterTest(unittest.TestCase):
                                        res['AnalysisID'],res['DataSetID']])
         equals = equalObjs( smodelsOutput,smodelsOutputDefault,allowedDiff=0.05,
                             ignore=ignoreFields, where = "top" )
-        self.assertTrue(equals)
+        try:
+            self.assertTrue(equals)
+        except AssertionError as e:
+            print ( "Error: %s, when comparing %s \nwith %s." % (e,"output.py","gluino_squarks_default.py" ) )
         try:
             os.remove('./output.py')
             os.remove('./output.pyc')
@@ -241,7 +244,10 @@ class RunPrinterTest(unittest.TestCase):
                                         res['AnalysisID'],res['DataSetID']])
         equals = equalObjs( smodelsOutput,smodelsOutputDefault,allowedDiff=0.05,
                             ignore=ignoreFields )
-        self.assertTrue(equals)
+        try:
+            self.assertTrue(equals)
+        except AssertionError as e:
+            print ( "Error: %s, when comparing %s \nwith %s." % (e,"outputSimple.py","simplyGluino_default.py" ) )
         try:
             os.remove('./outputSimple.py')
             os.remove('./outputSimple.pyc')

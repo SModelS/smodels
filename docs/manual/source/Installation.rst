@@ -35,14 +35,32 @@ These tools need not be installed separately, as the SModelS build system takes 
 Finally, the :ref:`database browser <databaseBrowser>` provided by :ref:`smodelsTools.py <smodelsTools>`
 requires `IPython <https://ipython.org/>`_.
 
+If *pip* is installed in your machine, installing SModelS should be as easy as: ::
+
+  pip install smodels
+
+In this case, *gfortran* and *g++* need to be installed separately, if one
+wishes to compute cross sections with pythia6 and pythia8, respectively.
+Also, it might be necessary to perform::
+
+  sudo smodelsTools.py fixpermissions
+
+in case of system-wide installs. User-specific installations on the other hand: ::
+
+  pip install --user smodels
+
+will install smodels into the user's ~/.local directory. Depending on your
+platform, the environment variables $PATH, $PYTHONPATH, $LD_LIBRARY_PATH
+(or $DYLD_LIBRARY_PATH) might have to be set appropriately.
+
 If Python's *setuptools* is installed in your machine, SModelS and its dependencies
-can be installed with::
+can be installed with: ::
 
   python setup.py install
 
 If the python libraries are installed in a system folder (as is the default behavior),
 it will be necessary to run the install command with superuser privilege.
-Alternatively, one can run setup.py with the "--user" flag::
+Alternatively, one can run setup.py with the "--user" flag: ::
 
   python setup.py install --user
 
@@ -52,7 +70,7 @@ For Ubuntu, SL6 machines and other platforms, a recipe is given below.
 
 There is also a diagnostic tool available: ::
 
-   python smodelsTools.py toolbox
+  python smodelsTools.py toolbox
 
 should list and check all internal tools (Pythia and NLL-fast) and external
 (numpy, scipy, unum, ... ) dependencies.

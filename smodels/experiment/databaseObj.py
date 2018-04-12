@@ -7,9 +7,11 @@
 .. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+.. moduleauthor:: Matthias Wolf <matthias.wolf@wot.at>
 
 """
 
+from __future__ import print_function
 import os
 ## sweet spot for numpy multi-threading is 2? More threads
 ## make some weaker machines freeze when building the pickle file.
@@ -22,6 +24,7 @@ from smodels.experiment.metaObj import Meta
 from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.tools.physicsUnits import TeV
+from smodels.tools.stringTools import cleanWalk
 from smodels.tools.smodelsLogging import logger
 import logging
 
@@ -53,12 +56,15 @@ class Database(object):
         :param subpickle: produce small pickle files per exp result.
             Should only be used when working on the database.
         """
+        self.source=None
         self.force_load = force_load
         self.subpickle = subpickle
         base, pclfile = self.checkPathName(base, discard_zeroes )
         self.pcl_meta = Meta( pclfile )
         self.expResultList = []
-        self.txt_meta = Meta ( base, discard_zeroes = discard_zeroes )
+        self.txt_meta = self.pcl_meta
+        if not self.force_load == "pcl":
+            self.txt_meta = Meta ( base, discard_zeroes = discard_zeroes )
         self.progressbar = None
         if progressbar:
             try:
@@ -198,8 +204,11 @@ class Database(object):
     def createBinaryFile ( self, filename=None ):
         """ create a pcl file from the text database,
             potentially overwriting an old pcl file. """
+        if self.txt_meta == None:
+            logger.error ( "Trying to create database pickle, but no txt_meta defined." )
+            sys.exit()
         logger.debug ( "database timestamp: %s, filecount: %d" % \
-                ( time.ctime ( self.txt_meta.mtime ), self.txt_meta.filecount ) )
+                     ( time.ctime ( self.txt_meta.mtime ), self.txt_meta.filecount ) )
         binfile = filename
         if binfile == None:
             binfile = self.pcl_meta.pathname
@@ -231,6 +240,92 @@ class Database(object):
         """
         return self.txt_meta.pathname
 
+    def fetchFromScratch ( self, path, store, discard_zeroes ):
+        """ fetch database from scratch, together with
+            description.
+            :param store: filename to store json file.
+        """
+        def sizeof_fmt(num, suffix='B'):
+            for unit in [ '','K','M','G','T','P' ]:
+                if abs(num) < 1024.:
+                    return "%3.1f%s%s" % (num, unit, suffix)
+                num /= 1024.0
+            return "%.1f%s%s" % (num, 'Yi', suffix)
+
+        import requests
+        r = requests.get( path )
+        if r.status_code != 200:
+            logger.error ( "Error %d: could not fetch %s from server." % \
+                           ( r.status_code, path ) )
+            sys.exit()
+        ## its new so store the description
+        with open( store, "w" ) as f:
+            f.write ( r.text )
+        if not "url" in r.json().keys():
+            logger.error ( "cannot parse json file %s." % path )
+            sys.exit()
+        size = r.json()["size"]
+        logger.info ( "need to fetch %s. size is %s." % \
+                      ( r.json()["url"], sizeof_fmt ( size ) ) )
+        t0=time.time()
+        r2=requests.get ( r.json()["url"], stream=True )
+        filename= "./" + r2.url.split("/")[-1]
+        with open ( filename, "wb" ) as dump:
+            print ( "         " + " "*51 + "<", end="\r" )
+            print ( "loading >", end="" )
+            for x in r2.iter_content(chunk_size=int ( size / 50 ) ):
+                dump.write ( x )
+                dump.flush ()
+                print ( ".", end="" )
+                sys.stdout.flush()
+            print()
+            dump.close()
+        logger.info ( "fetched %s in %d secs." % ( r2.url, time.time()-t0 ) ) 
+        logger.debug ( "store as %s" % filename )
+        #with open( filename, "wb" ) as f:
+        #    f.write ( r2.content )
+        #    f.close()
+        self.force_load = "pcl"
+        return ( "./", "%s" % filename )
+
+
+    def fetchFromServer ( self, path, discard_zeroes ):
+        import requests, time, json
+        logger.debug ( "need to fetch from server: %s" % path )
+        store = "." + path.replace ( ":","_" ).replace( "/", "_" ).replace(".","_" )
+        if not os.path.isfile ( store ):
+            ## completely new! fetch the description and the db!
+            return self.fetchFromScratch ( path, store, discard_zeroes )
+        with open(store,"r") as f:
+            jsn = json.load(f)
+        filename= "./" + jsn["url"].split("/")[-1]
+        class _: ## pseudo class for pseudo requests
+            def __init__ ( self ): self.status_code = -1
+        r=_()
+        try:
+            r = requests.get( path )
+        except Exception:
+            pass
+        if r.status_code != 200:
+            logger.warning ( "Error %d: could not fetch %s from server." % \
+                           ( r.status_code, path ) )
+            if not os.path.isfile ( filename ):
+                logger.error ( "Cant find a local copy of the pickle file. Exit." )
+                sys.exit()
+            logger.warning ( "I do however have a local copy of the file. I work with that." )
+            self.force_load = "pcl"
+            # next step: check the timestamps
+            return ( "./", filename )
+
+        if r.json()["lastchanged"] > jsn["lastchanged"]:
+            ## has changed! redownload everything!
+            return self.fetchFromScratch ( path, store, discard_zeroes )
+        
+        if not os.path.isfile ( filename ):
+            return self.fetchFromScratch ( path, store, discard_zeroes )
+        self.force_load = "pcl"
+        # next step: check the timestamps
+        return ( "./", filename )
 
     def checkPathName( self, path, discard_zeroes ):
         """
@@ -250,10 +345,7 @@ class Database(object):
                     sys.exit()
                 logger.info ( "File not found: %s. Will generate." % tmp )
                 base = os.path.dirname ( tmp )
-                # self.pcl_meta.pathname = os.path.basename ( tmp )
                 return ( base, tmp )
-                #if self.force_load in [ "txt", None, "None", "none" ]:
-                #sys.exit()
             logger.error ( "Supplied a pcl filename, but %s is not a file." % tmp )
             sys.exit()
 
@@ -307,7 +399,9 @@ class Database(object):
 
         """
         folders=[]
-        for root, _, files in os.walk(self.txt_meta.pathname):
+        #for root, _, files in os.walk(self.txt_meta.pathname):
+        # for root, _, files in cleanWalk(self._base):
+        for root, _, files in cleanWalk(self.txt_meta.pathname):
             folders.append ( (root, files) )
         folders.sort()
 
@@ -391,10 +485,17 @@ class Database(object):
         in the list.  If txname is defined, returns only the results matching
         one of the Tx names in the list.
 
-        :param analysisID: list of analysis ids ([CMS-SUS-13-006,...])
-        :param dataType: dataType of the analysis (all, efficiencyMap or upperLimit)
-        :param datasetIDs: list of dataset ids ([ANA-CUT0,...])
-        :param txnames: list of txnames ([TChiWZ,...])
+        :param analysisID: list of analysis ids ([CMS-SUS-13-006,...]). Can
+                            be wildcarded with usual shell wildcards: * ? [<letters>]
+                            Furthermore, the centre-of-mass energy can be chosen
+                            as suffix, e.g. ":13*TeV". Note that the asterisk 
+                            in the suffix is not a wildcard.
+        :param datasetIDs: list of dataset ids ([ANA-CUT0,...]). Can be wildcarded 
+                            with usual shell wildcards: * ? [<letters>]
+        :param txnames: list of txnames ([TChiWZ,...]). Can be wildcarded with 
+                            usual shell wildcards: * ? [<letters>]
+        :param dataTypes: dataType of the analysis (all, efficiencyMap or upperLimit)
+                            Can be wildcarded with usual shell wildcards: * ? [<letters>]
         :param useSuperseded: If False, the supersededBy results will not be included
         :param useNonValidated: If False, the results with validated = False
                                 will not be included
@@ -403,7 +504,9 @@ class Database(object):
         :returns: list of ExpResult objects or the ExpResult object if the list
                   contains only one result
 
-        """
+        """        
+        
+        import fnmatch
         expResultList = []
         for expResult in self.expResultList:
             superseded = None
@@ -411,22 +514,52 @@ class Database(object):
                 superseded = expResult.globalInfo.supersededBy.replace(" ","")
             if superseded and (not useSuperseded):
                 continue
-            ID = expResult.globalInfo.getInfo('id')
+            
+            analysisID = expResult.globalInfo.getInfo('id')          
+            sqrts = expResult.globalInfo.getInfo('sqrts')
+            
             # Skip analysis not containing any of the required ids:
             if analysisIDs != ['all']:
-                if not ID in analysisIDs:
-                    continue
+                hits=False
+                for patternString in analysisIDs:
+                    # Extract centre-of-mass energy
+                    # Assuming 0 or 1 colons.
+                    pattern = patternString.split(':')        
+                    hits = fnmatch.filter ( [ analysisID ], pattern[0] )
+                    if len ( pattern ) > 1:
+                        if not pattern[1].endswith('*TeV'):
+                            pattern[1] += '*TeV'
+                        if sqrts != eval(pattern[1]):
+                            hits = False
+                    if hits:
+                        continue
+                if not hits:
+                    continue                             
+
             newExpResult = ExpResult()
             newExpResult.path = expResult.path
             newExpResult.globalInfo = expResult.globalInfo
             newExpResult.datasets = []
+            
             for dataset in expResult.datasets:
                 if dataTypes != ['all']:
-                    if not dataset.dataInfo.dataType in dataTypes:
-                        continue
-                if datasetIDs != ['all']:
-                    if not dataset.dataInfo.dataId in datasetIDs:
-                        continue
+                    hits=False
+                    for pattern in dataTypes:
+                        hits = fnmatch.filter ( [ dataset.dataInfo.dataType ], pattern )
+                        if hits:
+                            continue
+                    if not hits:
+                        continue         
+
+                if hasattr(dataset.dataInfo, 'dataID') and datasetIDs != ['all']:                
+                    hits=False
+                    for pattern in datasetIDs:
+                        hits = fnmatch.filter ( [ dataset.dataInfo.dataID ], pattern )
+                        if hits:
+                            continue
+                    if not hits:
+                        continue              
+                
                 newDataSet = datasetObj.DataSet( dataset.path, dataset.globalInfo,
                        False, discard_zeroes=self.txt_meta.discard_zeroes )
                 newDataSet.dataInfo = dataset.dataInfo
@@ -444,8 +577,15 @@ class Database(object):
 #                    if txname.validated is False and (not useNonValidated):
                         continue
                     if txnames != ['all']:
-                        if not txname.txName in txnames:
-                            continue
+                        #Replaced by wildcard-evaluation below (2018-04-06 mat)
+                        hits=False
+                        for pattern in txnames:
+                            hits = fnmatch.filter ( [ txname.txName ], pattern )
+                            if hits:
+                                continue
+                        if not hits:
+                            continue                          
+                        
                     if onlyWithExpected and dataset.dataInfo.dataType == \
                         "upperLimit" and not txname.txnameDataExp:
                         continue

@@ -2,7 +2,7 @@
 
 """
 .. module:: testStatistics
-   :synopsis: Tests the statistics module.
+   :synopsis: Tests the statistics functionality.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 .. moduleauthor:: Jory Sonneveld <jory@opmijnfiets.nl>
@@ -11,7 +11,7 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.tools import statistics
+from smodels.tools.SimplifiedLikelihoods import UpperLimitComputer, LikelihoodComputer, Model
 from smodels.tools.physicsUnits import fb
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from databaseLoader import database
@@ -22,7 +22,9 @@ import math
 
 class StatisticsTest(unittest.TestCase):
     def testUpperLimit(self):
-        re = statistics.upperLimit ( 100., 100., 0., 20./fb   )
+        m = Model ( 100., 100., 0.001, None, 1.0 )
+        comp = UpperLimitComputer ( 20. / fb )
+        re = comp.ulSigma ( m )
         self.assertAlmostEqual ( re.asNumber ( fb ), 1.06, 1 )
 
     def testPredictionInterface(self):
@@ -38,9 +40,12 @@ class StatisticsTest(unittest.TestCase):
         ill = math.log(prediction.likelihood)
         ichi2 = prediction.chi2
         nsig = (pred_signal_strength*expRes.globalInfo.lumi).asNumber()
-        dll = math.log(statistics.likelihood(nsig, 4, 2.2, 1.1, 0.2*nsig ))
-        dchi2 = statistics.chi2(nsig, 4, 2.2, 1.1, 0.2*nsig )
+        m = Model ( 4, 2.2, 1.1**2, None, nsig )
+        computer = LikelihoodComputer ( m )
+        dll = math.log( computer.likelihood( nsig, marginalize=False ) )
         self.assertAlmostEqual(ill, dll, places=2)
+        dchi2 = computer.chi2( nsig, None) ## 0.2*nsig )
+        # print ( "dchi2,ichi2",dchi2,ichi2)
         self.assertAlmostEqual(ichi2, dchi2, places=2)
 
     def round_to_sign(self, x, sig=3):
@@ -61,7 +66,6 @@ class StatisticsTest(unittest.TestCase):
         with the previously known result for the value of
         the chi2.
 
-
         All values of nobs, nsig, nb, deltab come from the
         SModelS database and are for the T1 simplified model
         from efficiency results of one of
@@ -75,7 +79,7 @@ class StatisticsTest(unittest.TestCase):
         expected_values = [
         # mgluino          mlsp          nsig               nobs              nb             deltab           llhd                 chi2
         # ----------       ----------    ---------------    ----------------  ----------     ----------       -------------------- ----------------
-        {'mgluino':  500, 'mlsp':  200, 'nsig':   384.898, 'nobs':  298.413, 'nb':  111.0 , 'deltab': 11.0 , 'llhd': 0.00024197 , 'chi2': 7.32614 },
+        {'mgluino':  500, 'mlsp':  200, 'nsig':   384.898, 'nobs':  298.413, 'nb':  111.0 , 'deltab': 11.0 , 'llhd': 0.00024197 , 'chi2': 7.32614 } ] 
         {'mgluino':  500, 'mlsp':  300, 'nsig':   185.166, 'nobs':  223.619, 'nb':  111.0 , 'deltab': 11.0 , 'llhd': 0.00215989 , 'chi2': 3.67088900 },
         {'mgluino':  500, 'mlsp':  400, 'nsig':   450.820, 'nobs':  2331.38, 'nb':  2120.0, 'deltab': 110.0, 'llhd': 0.00075499 , 'chi2': 2.85026 },
         {'mgluino':  600, 'mlsp':  100, 'nsig':   476.150, 'nobs':  437.874, 'nb':  126.0 , 'deltab': 13.0 , 'llhd': 0.00100575 , 'chi2': 3.52406595 },
@@ -123,7 +127,7 @@ class StatisticsTest(unittest.TestCase):
         {'mgluino': 1100, 'mlsp':  800, 'nsig':   1.79622, 'nobs':  120.858, 'nb':  126.0 , 'deltab': 13.0 , 'llhd': 0.02187799 , 'chi2': 0.134012 },
         {'mgluino': 1100, 'mlsp':  900, 'nsig':   4.82397, 'nobs':  2166.20, 'nb':  2120.0, 'deltab': 110.0, 'llhd': 0.00313424 , 'chi2': 0.119045 },
         {'mgluino': 1100, 'mlsp': 1000, 'nsig':   0.1606 , 'nobs':  25.0 ,   'nb':  37.0  , 'deltab': 6.0 ,  'llhd': 0.01796058 , 'chi2': 1.9806},
-        {'mgluino': 2100, 'mlsp': 1000, 'nsig':   0.1606 , 'nobs':  2.0 ,   'nb':  0.7  , 'deltab': 6.0 ,  'llhd': 0.108669 , 'chi2': -0.161304}]
+        {'mgluino': 2100, 'mlsp': 1000, 'nsig':   0.1606 , 'nobs':  2.0 ,   'nb':  0.7  , 'deltab': 6.0 ,  'llhd': 0.108669 , 'chi2': -0.161304}
 
 
 
@@ -133,23 +137,16 @@ class StatisticsTest(unittest.TestCase):
             nsig = d['nsig']
             nb = d['nb']
             deltab = d['deltab']
-            deltas = 0.2*d['nsig']
-
-
-#             logger.error("\nns="+str(nsig)+";\nnobs = "+str(nobs)+";\nnb="+str(nb)+";\ndb="+str(deltab))
+            deltas = 1e-4*d['nsig']
+            # print ("ns="+str(nsig)+"; nobs = "+str(nobs)+"; nb="+str(nb)+"; db="+str(deltab))
             # Chi2 as computed by statistics module:
-            chi2_actual = statistics.chi2( nsig, nobs, nb,
-                deltab, deltas)
-            
-#             logger.error("chi2= "+str(chi2_actual))
-            #print('chi2act', chi2_actual)
-#             if not chi2_actual==None and not np.isnan(chi2_actual) and chi2_actual > 1:
-#                 chi2_actual = self.round_to_sign(chi2_actual, 2)
-
-            # The previously computed chi2:
-            # (using:ntoys=100000)
+            m = Model ( nobs, nb, deltab**2 )
+            computer = LikelihoodComputer ( m )
+            #llhd = computer.likelihood( nsig, marginalize=True, nll=True )
+            #llhd0 = computer.likelihood( 0., marginalize=True, nll=True )
+            #print ( "X llhd=", nobs,nsig,nb, deltab, llhd, llhd0 )
+            chi2_actual = computer.chi2( nsig, .2*nsig )
             chi2_expected = d['chi2']
-            #print('chi2exp', chi2_expected)            
             if not chi2_expected==None and not np.isnan(chi2_expected):
 #                 chi2_expected = self.round_to_sign(chi2_expected, 2)
                 # Check that chi2 values agree:                                
@@ -159,8 +156,11 @@ class StatisticsTest(unittest.TestCase):
 
 
             # likelihood as computed by statistics module:
-            likelihood_actual = statistics.likelihood( nsig,
-                nobs, nb, deltab, deltas)
+            # computer = LikelihoodComputer( nobs, nb, deltab**2 )
+            #likelihood_actual = statistics.likelihood( nsig,
+            #    nobs, nb, deltab, deltas)
+            likelihood_actual = computer.likelihood(nsig, deltas, marginalize=True )
+            # likelihood_actual = statistics.likelihood()
 #             logger.error("llk= "+str(likelihood_actual)+" nsig="+str(nsig)+" nobs = "+str(nobs)+" nb="+str(nb)+"+-"+str(deltab))
             #print('llhdactual', likelihood_actual)
             if not likelihood_actual==None and not np.isnan(likelihood_actual):

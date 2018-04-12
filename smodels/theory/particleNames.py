@@ -11,12 +11,26 @@
 
 import sys
 import copy
-from smodels.particles import rEven, rOdd, ptcDic
+from smodels.particlesLoader import rEven, rOdd
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import itertools
 
 from smodels.tools.smodelsLogging import logger
 
+ptcDic = {"e"  : ["e+",  "e-"],                                                                                                               
+          "mu" : ["mu+", "mu-"],                                                                                                              
+          "ta" : ["ta+", "ta-"],                                                                                                              
+          "l+" : ["e+",  "mu+"],                                                                                                              
+          "l-" : ["e-",  "mu-"],                                                                                                              
+          "l"  : ["e-",  "mu-", "e+", "mu+"],                                                                                                 
+          "W"  : ["W+",  "W-"],                                                                                                               
+          "t"  : ["t+",  "t-"],                                                                                                               
+          "L+" : ["e+",  "mu+", "ta+"],                                                                                                       
+          "L-" : ["e-",  "mu-", "ta-"],                                                                                                       
+          "L"  : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-"],                                                                                   
+          "jet" : ["q", "g", "c", "pi"],                                                                                                      
+          "all" : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-", "W+", "W-","Z",                                                                   
+                   "photon","higgs","t+","t-","b","c","q","g","c","pi"]}
 
 def getName(pdg):
     """
@@ -109,7 +123,7 @@ def elementsInStr(instring,removeQuotes=True):
                 if not ptc:
                     continue
                 if not ptc in rEven.values() and not ptc in ptcDic:
-                    logger.error("Unknown particle. Add " + ptc + " to smodels/particles.py")
+                    logger.error("Unknown particle. Add " + ptc + " to your particles.py")
                     raise SModelSError()
 
     # Check if there are not unmatched ['s and/or ]'s in the string

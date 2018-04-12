@@ -30,7 +30,8 @@ class IntegrationTest(unittest.TestCase):
 
     def predchi2(self):
         return { 'ATLAS-SUSY-2013-02': None,
-                 'CMS-SUS-13-012': 19.9647839329 }
+     #            'CMS-SUS-13-012': 19.9647839329 } ## with 20% signal error
+                 'CMS-SUS-13-012': 45.35806410622854 } ## thats with no signal error
 
     def checkAnalysis(self,expresult,smstoplist):
         id = expresult.globalInfo.id

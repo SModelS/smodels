@@ -14,19 +14,17 @@ from __future__ import print_function
 import sys,os
 from smodels.theory.topology import TopologyList
 from smodels.theory.element import Element
-from smodels.theory.theoryPrediction import TheoryPredictionList
+from smodels.theory.theoryPrediction import TheoryPredictionList 
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.databaseObj import ExpResultList
 from smodels.tools.ioObjects import OutputStatus, ResultList
 from smodels.tools.coverage import UncoveredList, Uncovered
 from smodels.tools.physicsUnits import GeV, fb, TeV
-from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from collections import OrderedDict
 from xml.dom import minidom
 from xml.etree import ElementTree
-
-
 
 class MPrinter(object):
     """
@@ -404,7 +402,6 @@ class TxTPrinter(BasicPrinter):
 
         return output
     
-
     def _formatResultList(self, obj):
         """
         Format data for a ResultList object.
@@ -420,13 +417,18 @@ class TxTPrinter(BasicPrinter):
         output += " || \t \t\t\t\t\t\t || \n"
         output += "   ======================================================= \n"
                 
+        #try:
+        #    output += self.addCombinedLimits ( obj.theoryPredictions )
+        #except Exception as e:
+        #    output += "bla %s" % str(e)
         
         for theoryPrediction in obj.theoryPredictions:
             expRes = theoryPrediction.expResult
-            info = theoryPrediction.dataset.dataInfo
+            # info = theoryPrediction.dataset.dataInfo
+            dataId = theoryPrediction.dataId()
             output += "\n"
             output += "---------------Analysis Label = " + expRes.globalInfo.id + "\n"
-            output += "-------------------Dataset Label = " + str(info.dataId).replace("None","(UL)") + "\n"
+            output += "-------------------Dataset Label = " + str(dataId).replace("None","(UL)") + "\n"
             output += "-------------------Txname Labels = " + str([str(txname) for txname in theoryPrediction.txnames]) + "\n"
             output += "Analysis sqrts: " + str(expRes.globalInfo.sqrts) + \
                     "\n"
@@ -446,12 +448,19 @@ class TxTPrinter(BasicPrinter):
                 upperLimit = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass)
                 upperLimitExp = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass,expected=True)
             elif expRes.datasets[0].dataInfo.dataType == 'efficiencyMap':
-                upperLimit = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.dataInfo.dataId)
-                upperLimitExp = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.dataInfo.dataId,expected=True)
+                if theoryPrediction.dataId() == "combined":
+                    upperLimit = theoryPrediction.getUpperLimit()
+                    upperLimitExp = theoryPrediction.getUpperLimit( expected=True )
+                else:
+                    upperLimit = expRes.getUpperLimitFor(dataID=theoryPrediction.dataId() )
+                    upperLimitExp = expRes.getUpperLimitFor(dataID=theoryPrediction.dataId(), expected=True)
 
             output += "Observed experimental limit: " + str(upperLimit) + "\n"
             if not upperLimitExp is None:
                 output += "Expected experimental limit: " + str(upperLimitExp) + "\n"
+            output += "Observed r-Value: %s\n" % ( theoryPrediction.xsection.value / upperLimit )
+            if not upperLimitExp is None:
+                output += "Expected r-Value: %s\n" % ( theoryPrediction.xsection.value / upperLimitExp )
             if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
                 output += "Chi2: " + str(theoryPrediction.chi2) + "\n"
                 output += "Likelihood: " + str(theoryPrediction.likelihood) + "\n"
@@ -754,39 +763,53 @@ class PyPrinter(BasicPrinter):
         ExptRes = []
         for theoryPrediction in obj.theoryPredictions:            
             expResult = theoryPrediction.expResult
-            dataset = theoryPrediction.dataset
+            # dataset = theoryPrediction.dataset
             expID = expResult.globalInfo.id
-            datasetID = dataset.dataInfo.dataId
-            dataType = dataset.dataInfo.dataType
-            if dataType == 'upperLimit':
-                ul = expResult.getUpperLimitFor(txname=theoryPrediction.txnames[0],
-                                                mass=theoryPrediction.mass)
-                ulExpected = None
-            elif dataType == 'efficiencyMap':
-                ul = expResult.getUpperLimitFor(dataID=datasetID)
-                ulExpected = expResult.getUpperLimitFor(dataID=datasetID, expected=True).asNumber(fb)
+            datasetID = theoryPrediction.dataId()
+            dataType = theoryPrediction.dataType()
+            if datasetID == "combined":
+                ul = theoryPrediction.getUpperLimit()
+                ulExpected = theoryPrediction.getUpperLimit ( expected = True ).asNumber(fb)
             else:
-                logger.error("Unknown dataType %s" %(str(dataType)))
-                continue            
+                if dataType == 'upperLimit':
+                    ul = expResult.getUpperLimitFor(txname=theoryPrediction.txnames[0],
+                                                    mass=theoryPrediction.mass)
+                    ulExpected = None
+                elif dataType == 'efficiencyMap':
+                    ul = expResult.getUpperLimitFor(dataID=datasetID)
+                    ulExpected = expResult.getUpperLimitFor(dataID=datasetID, expected=True).asNumber(fb)
+                else:
+                    logger.error("Unknown dataType %s" %(str(dataType)))
+                    continue            
             value = theoryPrediction.xsection.value
-            txnames = [txname.txName for txname in theoryPrediction.txnames]
+            #txnames = [txname.txName for txname in theoryPrediction.txnames]
+            cluster = theoryPrediction.cluster # FIXME is this the better version?
+            txnamesDict = {}
+            for el in cluster.elements:
+                if not el.txname.txName in txnamesDict:
+                    txnamesDict[el.txname.txName] = el.weight[0].value.asNumber(fb)
+                else:
+                    txnamesDict[el.txname.txName] += el.weight[0].value.asNumber(fb)            
             maxconds = theoryPrediction.getmaxCondition()
             mass = theoryPrediction.mass
             if mass:
                 mass = [[m.asNumber(GeV) for m in mbr] for mbr in mass]
             else:
                 mass = None
-            sqrts = dataset.globalInfo.sqrts
+            sqrts = expResult.globalInfo.sqrts
             resDict = {'maxcond': maxconds, 'theory prediction (fb)': value.asNumber(fb),
                         'upper limit (fb)': ul.asNumber(fb),
                         'expected upper limit (fb)': ulExpected,
-                        'TxNames': txnames,
+                        'TxNames': sorted(txnamesDict.keys()),
                         'Mass (GeV)': mass,
+                        'efficiency': theoryPrediction.effectiveEff,
                         'AnalysisID': expID,
                         'DataSetID' : datasetID,
                         'AnalysisSqrts (TeV)': sqrts.asNumber(TeV),
-                        'lumi (fb-1)' : (dataset.globalInfo.lumi*fb).asNumber(),
-                        'dataType' : dataType}            
+                        'lumi (fb-1)' : (expResult.globalInfo.lumi*fb).asNumber(),
+                        'dataType' : dataType}  
+            if hasattr(self,"addtxweights") and self.addtxweights:
+                resDict['TxNames weights (fb)'] =  txnamesDict
             if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
                 resDict['chi2'] = theoryPrediction.chi2
                 resDict['likelihood'] = theoryPrediction.likelihood                

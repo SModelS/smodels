@@ -193,6 +193,15 @@ class TxName(object):
                     return elementB
         return False
 
+    def hasLikelihood ( self ):
+        """ can I construct a likelihood for this map? 
+        True for all efficiency maps, and for upper limits maps
+        with expected Values. """
+        if self._infoObj.dataType == "efficiencyMap":
+            return True
+        if self.txnameDataExp != None:
+            return True
+        return False
 
     def getEfficiencyFor(self,mass):
         """
@@ -238,7 +247,7 @@ class TxNameData(object):
         self.dataTag = datatag
         self._id = Id
         self._accept_errors_upto=accept_errors_upto
-        self._V = None
+        self._V = None ## rotation matrix, derived from PCA
         self.loadData( value )
         if self._keep_values:
             self.value = value
@@ -408,7 +417,52 @@ class TxNameData(object):
         return float(ret)
 
 
-    def _estimateExtrapolationError ( self, massarray ):
+    def zeroIndices ( self ):
+        """ return list of indices for vertices with zero y_values.
+            dont consider vertices on the convex hull. """
+        zeroes = set()
+        for i,x in enumerate(self.y_values):
+            if i in self.tri.convex_hull:
+                continue
+            if x < 1.e-9:
+                zeroes.add(i)
+        return zeroes
+
+    def checkRemovableVertices ( self ):
+        """ check if any of the vertices in the triangulation
+            is removable, because all adjacent simplices are zero-only """
+            
+        t0=time.time()
+        ## first get indices of zeroes not on the hull
+        zeroes = self.zeroIndices() 
+        if len(zeroes)<2: # a single zero cannot be removable
+            return []
+        removables = set()
+        zeroSimplices = [] ## all zero-only simplices, by index
+        verticesInSimplices = { x:[] for x in zeroes }
+        for ctr,s in enumerate(self.tri.simplices):
+            if self.checkZeroSimplex ( s, zeroes ):
+                zeroSimplices.append ( ctr )
+            for vtx in s: ## remember which vertex is in which simplex
+                if not vtx in zeroes: ## only needed for zeroes though
+                    continue
+                verticesInSimplices[vtx].append ( ctr )
+
+        for vtx in zeroes: ## for all zero vertices
+            allSimplicesZero=True
+            simplices = verticesInSimplices[vtx]
+            for simplex in simplices: ## go through all simplces with our vtx
+                if not simplex in zeroSimplices: ## not a zero simplex?
+                    allSimplicesZero=False
+                    break
+            if allSimplicesZero:
+                removables.add ( vtx )
+        logger.debug( "checkRemovables spent %.3f s on %s simplices." \
+                       "We had %d zeroes. Found %d removables." % \
+                       ( time.time() - t0, ctr, len(zeroes), len(removables) ) )
+        return removables
+
+    def _estimateExtrapolationError(self, massarray):
         """ when projecting a point p from n to the point P in m dimensions, we
             estimate the expected extrapolation error with the following
             strategy: we compute the gradient at point P, and let alpha be the
@@ -537,9 +591,13 @@ class TxNameData(object):
             m=(np.matrix(Mx) - self.delta_x).tolist()[0]
             M.append(m)
 
-        ## we dont need thousands of points for SVD
-        n = int (math.ceil ( len(M) / 2000. ) )
-        Vt=svd(M[::n])[2]
+        try:
+            ## we dont need thousands of points for SVD
+            n = int(math.ceil ( len(M) / 2000. ) )
+            Vt=svd(M[::n])[2]
+        except Exception as e:
+            logger.error ( "exception caught when performing singular value decomposition: %s, %s" % ( type(e), e ) )
+            sys.exit()
         V=Vt.T
         self._V= V ## self.round ( V )
         Mp=[]
@@ -557,12 +615,30 @@ class TxNameData(object):
         MpCut=[]
         for i in Mp:
             MpCut.append(i[:self.dimensionality].tolist() )
-
+        """ FIXME thats the code that was in the covariance patch,
+            instead of the single line above.
+            if self.dimensionality > 1:
+                MpCut.append(i[:self.dimensionality].tolist() )
+            else:
+                MpCut.append([i[0].tolist(),0.])
+        if self.dimensionality == 1:
+            logger.debug("1-D data found. Extending to a small 2-D band around the line.")
+            MpCut += [[pt[0],pt[1]+0.0001] for pt in MpCut] + [[pt[0],pt[1]-0.0001] for pt in MpCut]
+            self._1dim = True
+            lx=len(self.xsec)
+            newxsec = np.ndarray ( shape=(3*lx,) )
+            for i in range(3):
+                newxsec[ i*lx : (i+1)*lx ] = self.xsec
+            self.xsec = newxsec
+            #self.xsec += self.xsec + self.xsec
+            self.dimensionality = 2
+        else:
+            self._1dim = False
+        """
         if self.dimensionality > 1:
             self.tri = qhull.Delaunay(MpCut)
         else:            
             self.tri = Delaunay1D(MpCut)           
-        
         
     def _getMassArrayFrom(self,pt,unit=GeV):
         """
@@ -587,7 +663,45 @@ class TxNameData(object):
             mass = [[m*unit for m in br] for br in mass]
 
         return mass
+        
+    def hasNoZeroes(self):
+        """
+        Maybe we have no zeroes at all?
+        """
+        for i in self.y_values:
+            if abs ( i ) < 1e-9:
+                return False
+        return True
 
+    def removeExtraZeroes(self):        
+        """
+        Remove redundant zeroes in the triangulation
+        """
+        
+        if self.hasNoZeroes():
+            return ## no zeros? return original list
+        
+        removables = self.checkRemovableVertices() # check if we can remove vertices
+        if len(removables) == 0:
+            return
+        logger.debug("We can remove %d points in %s!" % \
+                       (len(removables), self._id ))
+        newvalues = []
+        for ctr,value in enumerate(self.value):
+            if ctr not in removables:
+                newvalues.append(value)
+                
+        self._V = None
+        self.value = newvalues
+        self.y_values = np.array(self.value)[:,1]        
+        ##Recompute simplices
+        self.computeV()
+    
+    def cleanUp(self):
+        if self._keep_values:
+            return
+        if hasattr(self, "value"):
+            del self.value
      
 class Delaunay1D:
     """
@@ -612,6 +726,10 @@ class Delaunay1D:
                 xmax,xmin = data[simplex[0]][0],data[simplex[1]][0]
                 transform.append([[1./(xmax-xmin)],[xmin]])
             self.transform = np.array(transform)
+            
+            #Store convex hull (first and last point):
+            self.convex_hull = np.array([data.index(self.points[0]),data.index(self.points[-1])])
+            
         else:
             raise SModelSError()
         

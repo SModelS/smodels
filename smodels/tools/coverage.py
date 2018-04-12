@@ -354,6 +354,8 @@ class UncoveredList(object):
         :parameter instr: element as string
         :returns: string of generalized element
         """
+        
+        # 180318 mat: BUG? #############################
         from smodels.theory.particleNames import ptcDic
         if self.sumL: exch = ["W", "l", "t", "ta"]
         else: exch = ["W", "e", "mu", "t", "ta"]

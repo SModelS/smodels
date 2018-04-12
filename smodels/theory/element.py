@@ -9,7 +9,6 @@
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.branch import Branch
 from smodels.theory import crossSection
-from smodels.particles import rEven, ptcDic
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -26,7 +25,7 @@ class Element(object):
                           Holds a pair of (whence, mother element), where
                           whence describes what process generated the element    
     """
-    def __init__(self, info=None):
+    def __init__(self, info=None ):
         """
         Initializes the element. If info is defined, tries to generate
         the element using it.
@@ -326,6 +325,8 @@ class Element(object):
                   and exits otherwise.
         """
         info = self.getEinfo()
+        from smodels.particlesLoader import rEven
+        from smodels.theory.particleNames import ptcDic
         for ib, branch in enumerate(self.branches):
             for iv, vertex in enumerate(branch.particles):
                 if len(vertex) != info['vertparts'][ib][iv]:

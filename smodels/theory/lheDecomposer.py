@@ -14,7 +14,6 @@ from smodels.tools.physicsUnits import fb, GeV
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import pyslha
-import smodels.particles
 import copy
 
 
@@ -90,9 +89,10 @@ def elementFromEvent(event, weight=None):
 
     # Create branch list
     finalBranchList = []
+    from smodels.particlesLoader import rOdd, rEven
     for ip, particle in enumerate(event.particles):
-        keys = list ( smodels.particles.rEven.keys() ) + \
-               list ( smodels.particles.rOdd.keys() )
+        keys = list ( rEven.keys() ) + \
+               list ( rOdd.keys() )
         if not particle.pdg in keys:
             logger.warning("Particle %i not defined in particles.py, events containing this particle will be ignored" %(particle.pdg))
             return None
@@ -162,8 +162,9 @@ def _getDictionariesFromEvent(event):
     for ibranch in branches.values():  #ibranch = position of primary mother
         massDic[ibranch] = {}
         brDic[ibranch] = {}
+    from smodels.particlesLoader import rEven
     for ip, particle in enumerate(particles):
-        if particle.pdg in smodels.particles.rEven or particle.status == -1:
+        if particle.pdg in rEven or particle.status == -1:
             # Ignore R-even particles and initial state particles
             continue
         ibranch = branches[ip]  # Get particle branch
@@ -181,7 +182,7 @@ def _getDictionariesFromEvent(event):
             continue
         ibranch = branches[ip]
         momPdg = particles[max(particle.moms) - 1].pdg
-        if momPdg in smodels.particles.rEven:
+        if momPdg in rEven:
             # Ignore R-even decays
             continue
         # BR = 1 always for an event

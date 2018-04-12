@@ -66,9 +66,9 @@ def dataFiles ():
     List all config files and binaries
 
     """
-    ret = [("", [ "README.rst", "INSTALLATION.rst", "COPYING" ])]
-    ret.append ( ("smodels/", [ "smodels/version" ]) )
-    for directory in ["inputFiles/slha/", "inputFiles/lhe/", "smodels/share/",
+    ret = []
+    ret.append ( ("smodels/", [ "smodels/version", "smodels/COPYING", "smodels/README.rst", "smodels/INSTALLATION.rst" ]) )
+    for directory in ["inputFiles/slha/", "inputFiles/lhe/", "inputFiles/models/", "smodels/share/",
           "smodels/etc/", "smodels/lib/nllfast/nllfast-1.2/", 
           "smodels/lib/nllfast/nllfast-2.1/", "smodels/lib/nllfast/nllfast-3.1/", 
           "smodels/lib/pythia6/", "smodels/lib/pythia8/" ]:
@@ -107,8 +107,8 @@ setup(
                            'runSModelS.py=smodels.tools.runSModelS:main',
                            'smodelsTools.py=smodels.tools.smodelsTools:main' ]
     },
-    install_requires=[ 'docutils>=0.3', 'scipy', 'numpy', 'scipy>=0.9.0', \
-                         'unum', 'argparse', 'pyslha>=3.1.0' ],
+    install_requires=[ 'docutils>=0.3', 'numpy>=1.13.0', 'scipy>=1.0.0', \
+                         'unum>=4.0.0', 'argparse', 'requests>=2.0.0', 'pyslha>=3.1.0' ],
     data_files=dataFiles() ,
     description=("A tool for interpreting simplified-model results from the "
                    "LHC"),

@@ -10,8 +10,8 @@
 
 import os,glob,sys
 from smodels.experiment import txnameObj,infoObj
-from smodels.tools import statistics
 from smodels.tools.physicsUnits import fb
+from smodels.tools.SimplifiedLikelihoods import LikelihoodComputer, Model, UpperLimitComputer
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.particleNames import elementsInStr
@@ -83,6 +83,8 @@ class DataSet(object):
         return ret
 
     def __eq__ ( self, other ):
+        if type ( other ) != type ( self ):
+            return False
         if self.dataInfo != other.dataInfo:
             return False
         if len(self.txnameList ) != len ( other.txnameList ):
@@ -120,7 +122,7 @@ class DataSet(object):
         """
 
 
-        fieldDict = self.__dict__.items()[:]
+        fieldDict = list ( self.__dict__.items() )
         valuesDict = {}
         while fieldDict:
             for field,value in fieldDict[:]:
@@ -129,8 +131,8 @@ class DataSet(object):
                     else: valuesDict[field].append(value)
                 else:
                     if isinstance(value,list):
-                        for entry in value: fieldDict += entry.__dict__.items()[:]
-                    else: fieldDict += value.__dict__.items()[:]
+                        for entry in value: fieldDict += list ( entry.__dict__.items() )
+                    else: fieldDict += list ( value.__dict__.items() )
                 fieldDict.remove((field,value))
 
         #Try to keep only the set of unique values
@@ -154,13 +156,42 @@ class DataSet(object):
         The values observedN, expectedBG, and bgError
         are part of dataInfo.
         :param nsig: predicted signal (float)
-        :param deltas: uncertainty on signal (float). If None, default value (20%) will be used.
-
-        :return: likelihood to observe nobs events (float)
+        :param deltas: uncertainty on signal (float). 
+            If None, default value (20%) will be used.
+        :returns: likelihood to observe nobs events (float)
         """
 
-        return statistics.likelihood(nsig, self.dataInfo.observedN,
-                self.dataInfo.expectedBG, self.dataInfo.bgError, deltas)
+        m = Model ( self.dataInfo.observedN, self.dataInfo.expectedBG, self.dataInfo.bgError**2 )
+        computer = LikelihoodComputer ( m )
+        return computer.likelihood( nsig, deltas )
+
+    def folderName ( self ):
+        """
+        Name of the folder in text database.
+        """
+        return os.path.basename ( self.path )
+
+    def isUncorrelatedWith ( self, other ):
+        """
+        can it be safely assumed that this dataset is approximately
+        uncorrelated with "other"?
+        "other" can be a dataset or an expResult, in which case it is
+        true only if we are uncorrelated with all datasets of "other".
+
+        Two datasets of the same exp Result are considered never to be
+        uncorrelated.
+
+        """
+        if other == self: return False
+        if type(other) == type(self): ## comparing with another dataset
+            if self.globalInfo.path == other.globalInfo.path:
+                return False ## same expResult? -> correlated!
+            if self.globalInfo.dirName ( 1 ) != other.globalInfo.dirName ( 1 ):
+                ## different folders? uncorrelated!
+                return True
+            ## different expResults
+            return None ## FIXME implement
+                
 
     def chi2( self, nsig, deltas=None):
         """
@@ -168,13 +199,16 @@ class DataSet(object):
         given number of signal events "nsig", and error on signal "deltas".
         nobs, expectedBG and bgError are part of dataInfo.
         :param nsig: predicted signal (float)
-        :param deltas: relative uncertainty in signal (float). If None, default value (20%) will be used.
+        :param deltas: relative uncertainty in signal (float). 
+                       If None, default value (20%) will be used.
 
         :return: chi2 (float)
         """
-
-        return statistics.chi2(nsig, self.dataInfo.observedN,
-                self.dataInfo.expectedBG, self.dataInfo.bgError, deltas)
+        m = Model ( self.dataInfo.observedN, self.dataInfo.expectedBG, 
+                    self.dataInfo.bgError**2 )
+        computer = LikelihoodComputer ( m )
+        ret = computer.chi2( nsig, deltas )
+        return ret
 
     def getAttributes(self,showPrivate=False):
         """
@@ -234,7 +268,9 @@ class DataSet(object):
             logger.error("Luminosity defined with wrong units for %s" %(ID) )
             return False
 
-        maxSignalXsec = statistics.upperLimit(Nobs,Nexp,bgError,lumi,alpha)
+        m = Model ( Nobs,Nexp,bgError )
+        computer = UpperLimitComputer ( lumi, cl=1.-alpha )
+        maxSignalXsec = computer.ulSigma( m )
 
 
         return maxSignalXsec
