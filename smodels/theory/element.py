@@ -271,7 +271,6 @@ class Element(object):
         """
         
         particles = []
-        pids = []
         for ipid,PIDlist in enumerate(self.branches[0].BSMparticles):         
             for ipid2,PIDlist2 in enumerate(self.branches[1].BSMparticles):
                 particles.append([self.branches[0].BSMparticles[ipid],self.branches[1].BSMparticles[ipid2]])
@@ -306,13 +305,22 @@ class Element(object):
         :returns: list of PDG ids
         """
         
+        # get a list of all original mothers, i.e. that only consists of first generation elements
+        allmothers = self.motherElements
+        while not all(mother[0] == 'original' for mother in allmothers):                        
+            for im, mother in enumerate(allmothers):
+                if mother[0] != 'original':
+                    allmothers.extend( mother[1].motherElements )
+                    allmothers.pop(im)                                    
+
+        # get the PIDs of all mothers      
         pids = []
-        for mother in self.motherElements:
-            pids.extend( mother[1].getPIDs() )  
+        for mother in allmothers:  
+            pids.extend( mother[1].getPIDs() )                 
 
         momPIDs = []
         for pidlist in pids:
-            momPIDs.append([pidlist[0][0],pidlist[1][0]])
+            momPIDs.append([pidlist[0][0],pidlist[1][0]])        
         return momPIDs    
 
 
