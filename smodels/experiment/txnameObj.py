@@ -706,7 +706,7 @@ class TxNameData(object):
 class Delaunay1D:
     """
     Uses a 1D data array to interpolate the data.
-    The attribute simplices is list of N-1 pair of ints with the indices of the points 
+    The attribute simplices is a list of N-1 pair of ints with the indices of the points 
     forming the simplices (e.g. [[0,1],[1,2],[3,4],...]).    
     """
     
