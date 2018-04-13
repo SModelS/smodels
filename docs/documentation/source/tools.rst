@@ -80,6 +80,7 @@ tools.modelTester module
 ------------------------
 
 .. automodule:: tools.modelTester
+    :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
@@ -164,10 +165,10 @@ tools.smodelsLogging module
     :undoc-members:
     :show-inheritance:
 
-tools.statistics module
------------------------
+tools.SimplifiedLikelihoods module
+----------------------------------
 
-.. automodule:: tools.statistics
+.. automodule:: tools.SimplifiedLikelihoods
     :members:
     :undoc-members:
     :show-inheritance:

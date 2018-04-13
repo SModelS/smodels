@@ -218,8 +218,8 @@ class ExpResult(object):
         Get combined upper limit. Effs are the signal efficiencies in the
         datasets. The order is defined in the dataset itself.
         :param effs: the signal efficiencies for all datasets
-                     (adding up the efficiencies for all txnames)
-                     the efficiencies must be sorted according to datasetOrder
+        (adding up the efficiencies for all txnames) the efficiencies must 
+        be sorted according to datasetOrder
         :param expected: return expected, not observed value
         :returns: upper limit on sigma (*not* sigma*eff)
         """
@@ -282,10 +282,7 @@ class ExpResult(object):
                         from expected and observed number of events.
                         If False, the value listed in the database will be used
                         instead.
-
-
         :return: upper limit (Unum object)
-
         """
         if dataID == "combined":
             logger.error ( "you are asking for upper limit for the combined dataset. Use .getCombinedUpperLimitFor method instead." )

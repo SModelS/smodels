@@ -18,7 +18,7 @@ class Uncovered(object):
     :ivar sumL: if true, sum up electron and muon to lepton, for missing topos
     :ivar sumJet: if true, sum up jets, for missing topos
     :ivar sqrts: Center of mass energy. If defined it will only consider cross-sections
-                for this value. Otherwise the highest sqrts value will be used.
+    for this value. Otherwise the highest sqrts value will be used.
     """
     def __init__(self, topoList, sumL=True, sumJet=True, sqrts=None):
         

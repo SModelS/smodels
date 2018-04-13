@@ -153,11 +153,10 @@ class DataSet(object):
         Computes the likelihood to observe nobs events,
         given a predicted signal "nsig", assuming "deltas"
         error on the signal efficiency.
-        The values observedN, expectedBG, and bgError
-        are part of dataInfo.
+        The values observedN, expectedBG, and bgError are part of dataInfo.
         :param nsig: predicted signal (float)
-        :param deltas: uncertainty on signal (float). 
-            If None, default value (20%) will be used.
+        :param deltas: uncertainty on signal (float).  If None, 
+        default value (20%) will be used.
         :returns: likelihood to observe nobs events (float)
         """
 
@@ -171,26 +170,25 @@ class DataSet(object):
         """
         return os.path.basename ( self.path )
 
-    """ this feature is not yet ready
-    def isUncorrelatedWith ( self, other ):
-        can it be safely assumed that this dataset is approximately
-        uncorrelated with "other"?
-        "other" can be a dataset or an expResult, in which case it is
-        true only if we are uncorrelated with all datasets of "other".
-
-        Two datasets of the same exp Result are considered never to be
-        uncorrelated.
-
-        if other == self: return False
-        if type(other) == type(self): ## comparing with another dataset
-            if self.globalInfo.path == other.globalInfo.path:
-                return False ## same expResult? -> correlated!
-            if self.globalInfo.dirName ( 1 ) != other.globalInfo.dirName ( 1 ):
-                ## different folders? uncorrelated!
-                return True
-            ## different expResults
-            return None ## FIXME implement
-    """
+#    this feature is not yet ready
+#    def isUncorrelatedWith ( self, other ):
+#        can it be safely assumed that this dataset is approximately
+#        uncorrelated with "other"?
+#        "other" can be a dataset or an expResult, in which case it is
+#        true only if we are uncorrelated with all datasets of "other".
+#
+#        Two datasets of the same exp Result are considered never to be
+#        uncorrelated.
+#
+#        if other == self: return False
+#        if type(other) == type(self): ## comparing with another dataset
+#            if self.globalInfo.path == other.globalInfo.path:
+#                return False ## same expResult? -> correlated!
+#            if self.globalInfo.dirName ( 1 ) != other.globalInfo.dirName ( 1 ):
+#                ## different folders? uncorrelated!
+#                return True
+#            ## different expResults
+#            return None ## FIXME implement
                 
 
     def chi2( self, nsig, deltas=None):
@@ -200,8 +198,7 @@ class DataSet(object):
         nobs, expectedBG and bgError are part of dataInfo.
         :param nsig: predicted signal (float)
         :param deltas: relative uncertainty in signal (float). 
-                       If None, default value (20%) will be used.
-
+        If None, default value (20%) will be used.
         :return: chi2 (float)
         """
         m = Model ( self.dataInfo.observedN, self.dataInfo.expectedBG, 
