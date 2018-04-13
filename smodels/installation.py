@@ -9,6 +9,7 @@
 """
 
 from __future__ import print_function
+from smodels.tools.smodelsLogging import logger
 import sys
 import os
 
@@ -114,6 +115,22 @@ def printHelp():
     print("--banner:     print SModelS banner")
     print("--copyright:  print SModelS copyright")
     sys.exit(0)
+
+def fixpermissions():
+    """ make sure that all filepermissions are such that
+        we can compile the wrappers for pythia and nllfast. """
+    import os, glob
+    Dir = "%ssmodels/lib/" % installDirectory()
+    try:
+        Dirs = [ "%spythia6" % Dir, "%spythia8" % Dir ]
+        Dirs += glob.glob("%snllfast/nllfast-*" % Dir )
+        Dirs += glob.glob("%spythia8/xml.doc" % Dir )
+        for p in Dirs:
+            logger.debug ( "chmod 777 %s" % (p) )
+            os.chmod ( p, 0o777 )
+    except Exception as e:
+        print ( "chmod failed (permission error). Please try as root, i.e.:" )
+        print ( "sudo smodelsTools.py fixpermissions" )
 
 def main():
     # print( banner() )
