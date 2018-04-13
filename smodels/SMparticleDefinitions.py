@@ -22,9 +22,9 @@ e = Particles(Z2parity='even', label='e-', pdg=11, mass=0.5*MeV, eCharge=-1, col
 mu = Particles(Z2parity='even', label='mu-', pdg=13, mass=106.*MeV, eCharge=-1, colordim=0, spin=1./2, width=0, branches=None)
 ta = Particles(Z2parity='even', label='ta-', pdg=15, mass=1777.*MeV, eCharge=-1, colordim=0, spin=1./2, width=0, branches=None)
 
-enu = Particles(Z2parity='even', label='nue', pdg=12, mass=0.*MeV, eCharge=0, colordim=0, spin=1./2, width=0, branches=None)
-munu = Particles(Z2parity='even', label='numu', pdg=14, mass=0.*MeV, eCharge=0, colordim=0, spin=1./2, width=0, branches=None)
-tanu = Particles(Z2parity='even', label='nuta', pdg=16, mass=0.*MeV, eCharge=0, colordim=0, spin=1./2, width=0, branches=None)
+nue = Particles(Z2parity='even', label='nue', pdg=12, mass=0.*MeV, eCharge=0, colordim=0, spin=1./2, width=0, branches=None)
+numu = Particles(Z2parity='even', label='numu', pdg=14, mass=0.*MeV, eCharge=0, colordim=0, spin=1./2, width=0, branches=None)
+nuta = Particles(Z2parity='even', label='nuta', pdg=16, mass=0.*MeV, eCharge=0, colordim=0, spin=1./2, width=0, branches=None)
 
 # use qd, qs, qu to have correct alphabetical ordering
 d = Particles(Z2parity='even', label='qd', pdg=1, mass=0.*MeV, eCharge=(-1./3.), colordim=3, spin=1./2, width=0, branches=None)
@@ -40,19 +40,19 @@ Z = Particles(Z2parity='even', label='Z', pdg=23, mass=91.*GeV , eCharge=0, colo
 W = Particles(Z2parity='even', label='W+', pdg=24, mass=80.*GeV, eCharge=1, colordim=0, spin=1, width=2.0*GeV, branches=None)
 higgs = Particles(Z2parity='even', label='higgs', pdg=25, mass=125.*GeV, eCharge=0, colordim=0, spin=0, width=0, branches=None)
 
-
+pi = Particles(Z2parity='even', label='pi', pdg=211, mass=140.*MeV, eCharge=+1, colordim=0, spin=0, width=0, branches=None)
 
 
 
 quarks = [u,d] + [c,s] + [t,b]
 quarksC = [p.chargeConjugate() for p in quarks]
-leptons = [e,enu] + [mu,munu] + [ta,tanu]
+leptons = [e,nue] + [mu,numu] + [ta,nuta]
 leptonsC = [p.chargeConjugate() for p in leptons]
 gauge = [g,photon,W,Z]
 gaugeC = [p.chargeConjugate() for p in gauge]
 
-SMparticles = quarks + leptons + gauge + [higgs]
-SMparticlesC = quarksC + leptonsC + gaugeC + [higgs.chargeConjugate()]
+SMparticles = quarks + leptons + gauge + [higgs] + [pi]
+SMparticlesC = quarksC + leptonsC + gaugeC + [higgs.chargeConjugate()] + [pi.chargeConjugate()]
 
 SMList = SMparticles + SMparticlesC
 
@@ -79,8 +79,8 @@ tList = ParticleList('t'  , [quarks[4],quarksC[4]])
 LpList = ParticleList('L+' , lpList.particles + [ leptonsC[4] ])
 LmList = ParticleList('L-' , lmList.particles + [ leptons[4] ])
 LList = ParticleList('L'  , LpList.particles + LmList.particles )
-jetList = ParticleList('jet' ,  quarks[0:4] + [ gauge[0] ])
-jetbarList =  ParticleList('jetbar' , quarksC[0:4] + [ gaugeC[0] ])
+jetList = ParticleList('jet' ,  quarks[0:4] + [ gauge[0] ] + [ pi ])
+jetbarList =  ParticleList('jetbar' , quarksC[0:4] + [ gaugeC[0] ] + [ pi.chargeConjugate() ])
 allParticles = ParticleList('all' , SMList)  
           
 particleLists = [eList, muList,taList,lpList,lmList,lList,nuList,WList,tList,
