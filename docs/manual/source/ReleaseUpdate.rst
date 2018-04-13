@@ -45,7 +45,6 @@ New in Version 1.1.2:
 
 * Fixed lastUpdate bug
 * Changes in pickling (subpickling, redundant zeroes are now removed)
-* Database path allows URLs 
 * URLs are allowed as database paths (see **database:path** in |parameters|)
 * Option to show individual contribution from topologies to total theory prediction (see **python-printer:addTxWeights** in |parameters|)
 * smodelsTools.py fixpermissions, for system-wide installs (see :ref:`Files Permissions Fixer <permissionsFixer>`)
