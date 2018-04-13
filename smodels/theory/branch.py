@@ -229,7 +229,7 @@ class Branch(object):
                 # Add non R-even particles to intermediate state    ;masses of non R-even particles to mass vector
                 newBSMparticles.append(getObjectFromPdg(partID))
 
-        if len(newBSMparticles) > 1: # newmass
+        if len(newBSMparticles) > 1: 
             logger.warning("Multiple R-odd particles in the final state: " +
                            str(br.ids))
             return False
@@ -241,7 +241,7 @@ class Branch(object):
             newBranch.BSMparticles[0].extend(newBSMparticles)
 
         if not self.maxWeight is None:
-            newBranch.maxWeight = self.maxWeight * br.br
+            newBranch.maxWeight = self.maxWeight * br.br                
             
         return newBranch
 
@@ -264,18 +264,21 @@ class Branch(object):
         if not self.BSMparticles[0][-1].pdg in BSMpdgs: 
             return []             
         # List of possible decays (brs) for R-odd daughter in branch        
-        brs = self.BSMparticles[0][-1].branches 
-        if len(brs) == 0: #Daughter is stable, there are no new branches
-            return []
         
+        if self.BSMparticles[0][-1].isStable(): #Daughter is stable, there are no new branches
+            return [], []
+        
+        brs = self.BSMparticles[0][-1].branches 
         newBranches = []
+        newStableBranches = []
         for br in brs:
-            if not br.br: continue  #Skip zero BRs         
-            if not br.ids: continue   
+            if not br.br: continue  #Skip zero BRs 
+            #Do not decay stable particles further                    
+            elif not br.ids and br.br > 0: newStableBranches.append(self._addDecay(br))    
             # Generate a new branch for each possible decay
-            newBranches.append(self._addDecay(br))
-
-        return newBranches
+            else: newBranches.append(self._addDecay(br))  
+        
+        return newBranches, newStableBranches
 
 
 def decayBranches(branchList, sigcut=0. *fb):
@@ -290,13 +293,10 @@ def decayBranches(branchList, sigcut=0. *fb):
     finalDecayedBranchList = []
     
     stableBranchList = [ branch for branch in branchList if branch.BSMparticles[0][-1].isStable() ]
-    unstableBranchList = [ branch for branch in branchList if not branch.BSMparticles[0][-1].isStable() ]       
-    
-    #if not unstableBranchList:        
-    #    finalBranchList = sorted(stableBranches, key=lambda branch: branch.BSMparticles[0][0].pdg)
-    #else: 
-    
+    unstableBranchList = [ branch for branch in branchList if not branch.BSMparticles[0][-1].isStable() ]           
+
     while unstableBranchList:
+        
         # Store branches after adding one step cascade decay
         newBranchList = []
         for inbranch in unstableBranchList:
@@ -305,18 +305,22 @@ def decayBranches(branchList, sigcut=0. *fb):
                 continue
             # Add all possible decays of the R-odd daughter to the original
             # branch (if any)            
-            newBranches = inbranch.decayDaughter()
+            newBranches, newStableBranches = inbranch.decayDaughter()
             if newBranches:
                 # New branches were generated, add them for next iteration
                 newBranchList.extend(newBranches)
             else:
                 # All particles have already decayed, store final branch
                 finalDecayedBranchList.append(inbranch)
-        # Use new branches (if any) for next iteration step
+            for stableBranch in newStableBranches:
+                # if new stable branches were generated, append to final branch list                
+                if stableBranch.maxWeight >= sigcut: finalDecayedBranchList.append(stableBranch)
+        # Use new unstable branches (if any) for next iteration step
         unstableBranchList = newBranchList           
     
     #Sort list by initial branch pdg:        
-    finalBranchList = sorted(finalDecayedBranchList+stableBranchList, key=lambda branch: branch.BSMparticles[0][0].pdg)  
+    finalBranchList = sorted(finalDecayedBranchList+stableBranchList, key=lambda branch: branch.BSMparticles[0][0].pdg)      
+
     return finalBranchList
 
 
