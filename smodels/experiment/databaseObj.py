@@ -517,6 +517,11 @@ class Database(object):
 
         """        
         
+        analysisIDs=["*"]
+        datasetIDs=["*"]
+        txnames=["*"]
+        dataTypes=["*"]
+        
         import fnmatch
         expResultList = []
         for expResult in self.expResultList:
