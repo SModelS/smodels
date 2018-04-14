@@ -538,8 +538,14 @@ class Database(object):
                     pattern = patternString.split(':')        
                     hits = fnmatch.filter ( [ analysisID ], pattern[0] )
                     if len ( pattern ) > 1:
-                        if not pattern[1].endswith('*TeV'):
-                            pattern[1] += '*TeV'
+                        # Parse suffix
+                        # Accepted Strings: ":13", ":13*TeV", ":13TeV", ":13 TeV"
+                        # Everything else will yield an error at the unum-conversion (eval())
+                        if pattern[1].endswith('TeV'):
+                            pattern[1] = pattern[1][:-3]
+                        if pattern[1][-1] in [" ", "*"]:
+                            pattern[1] = pattern[1][:-1]
+                        pattern[1] += "*TeV"
                         if sqrts != eval(pattern[1]):
                             hits = False
                     if hits:
