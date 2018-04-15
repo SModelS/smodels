@@ -62,6 +62,28 @@ fb,pb=importUnits()
 class Model:
     """ A very simple data container to collect all the data
         needed to fully define a specific statistical model """
+
+    def __init__ ( self, data, backgrounds, covariance, third_moment=None,
+                         efficiencies=None, name="model" ):
+        """
+        :param data: number of observed events per dataset
+        :param backgrounds: expected bg per dataset
+        :param covariance: uncertainty in background, as a covariance matrix
+        :param efficiencies: dataset effective signal efficiencies
+        """
+        self.data = self.convert ( data )
+        self.backgrounds = self.convert ( backgrounds )
+        self.n = len ( self.data )
+        self.covariance = self.convertCov ( covariance )
+        self.efficiencies = self.convert ( efficiencies )
+        self.third_moment = self.convert ( third_moment )
+        if type(self.third_moment) != type(None) and NP.sum ( [ abs(x) for x in self.third_moment ] ) < 1e-10:
+            ## all zeroes? then we have no third_moment
+            self.third_moment = None
+        self.name = name
+        self.deltas = array( [1e-10]*self.n )
+        self.computeABC()
+
     def isScalar ( self, obj ):
         """ determine if obj is a scalar (float or int) """
         if type(obj) == ndarray:
@@ -92,27 +114,6 @@ class Model:
             ## if the matrix is flattened, unflatten it.
             return array ( [ obj[self.n*i:self.n*(i+1)] for i in range(self.n) ] )
         return obj
-
-    def __init__ ( self, data, backgrounds, covariance, third_moment=None,
-                         efficiencies=None, name="model" ):
-        """
-        :param data: number of observed events per dataset
-        :param backgrounds: expected bg per dataset
-        :param covariance: uncertainty in background, as a covariance matrix
-        :param efficiencies: dataset effective signal efficiencies
-        """
-        self.data = self.convert ( data )
-        self.backgrounds = self.convert ( backgrounds )
-        self.n = len ( self.data )
-        self.covariance = self.convertCov ( covariance )
-        self.efficiencies = self.convert ( efficiencies )
-        self.third_moment = self.convert ( third_moment )
-        if type(self.third_moment) != type(None) and NP.sum ( [ abs(x) for x in self.third_moment ] ) < 1e-10:
-            ## all zeroes? then we have no third_moment
-            self.third_moment = None
-        self.name = name
-        self.deltas = array( [1e-10]*self.n )
-        self.computeABC()
 
     def computeABC ( self ):
         """ compute the terms A, B, C, rho, V. Corresponds with
@@ -660,16 +661,21 @@ class UpperLimitComputer:
         self.ntoys = ntoys
         self.cl = cl
 
-    def ulSigma ( self, model, marginalize=True, toys=None ):
+    def ulSigma ( self, model, marginalize=True, toys=None, expected=False ):
         """ upper limit obtained from combined efficiencies, by using
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
         :params marginalize: if true, marginalize nuisances, else profile them
         :params toys: specify number of toys. Use default is none
+        :params expected: compute the expected value, not the observed.
         :returns: upper limit on *production* xsec (efficiencies unfolded)
         """
         if toys==None:
             toys=self.ntoys
+        oldmodel = model
+        if expected:
+            model = copy.deepcopy ( oldmodel )
+            model.data = model.backgrounds
         computer = LikelihoodComputer ( model, toys )
         mu_hat = computer.findMuHat ( model.efficiencies )
         theta_hat = computer.findThetaHat ( mu_hat * model.efficiencies )
