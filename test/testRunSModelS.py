@@ -154,7 +154,7 @@ class RunSModelSTest(unittest.TestCase):
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                            ignore=ignoreFields)
         if not equals:
-            print "output13.py and simplyGluino_default.py differ!"
+            logger.error ( "output13.py and simplyGluino_default.py differ!" )
         for i in [ './output13.py', './output13.pyc' ]:
             if os.path.exists ( i ):
                 continue
