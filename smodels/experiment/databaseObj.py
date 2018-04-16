@@ -69,8 +69,8 @@ class Database(object):
         if progressbar:
             try:
                 import progressbar as P
-                self.progressbar = P.ProgressBar( widgets= 
-                        [ "Building Database ", P.Percentage(), 
+                self.progressbar = P.ProgressBar( widgets=
+                        [ "Building Database ", P.Percentage(),
                           P.Bar( marker=P.RotatingMarker() ), P.ETA() ] )
             except ImportError as e:
                 logger.warning ( "progressbar requested, but python-progressbar is not installed." )
@@ -280,7 +280,7 @@ class Database(object):
                 sys.stdout.flush()
             print()
             dump.close()
-        logger.info ( "fetched %s in %d secs." % ( r2.url, time.time()-t0 ) ) 
+        logger.info ( "fetched %s in %d secs." % ( r2.url, time.time()-t0 ) )
         logger.debug ( "store as %s" % filename )
         #with open( filename, "wb" ) as f:
         #    f.write ( r2.content )
@@ -320,7 +320,7 @@ class Database(object):
         if r.json()["lastchanged"] > jsn["lastchanged"]:
             ## has changed! redownload everything!
             return self.fetchFromScratch ( path, store, discard_zeroes )
-        
+
         if not os.path.isfile ( filename ):
             return self.fetchFromScratch ( path, store, discard_zeroes )
         self.force_load = "pcl"
@@ -330,9 +330,17 @@ class Database(object):
     def checkPathName( self, path, discard_zeroes ):
         """
         checks the path name,
+        returns the base directory and the pickle file name.
+        If path starts with http or ftp, fetch the description file
+        and the database.
         returns the base directory and the pickle file name
         """
         logger.debug('Try to set the path for the database to: %s', path)
+        if path.startswith( ( "http://", "https://", "ftp://" ) ):
+            return self.fetchFromServer ( path, discard_zeroes )
+        if path.startswith( ( "file://" ) ):
+            path=path[7:]
+
         tmp = os.path.realpath(path)
         if os.path.isfile ( tmp ):
             base = os.path.dirname ( tmp )
@@ -438,7 +446,7 @@ class Database(object):
 
     def createExpResult ( self, root ):
         """ create, from pickle file or text files """
-        txtmeta = Meta ( root, discard_zeroes = self.txt_meta.discard_zeroes, 
+        txtmeta = Meta ( root, discard_zeroes = self.txt_meta.discard_zeroes,
                          hasFastLim=None, databaseVersion = self.databaseVersion )
         pclfile = "%s/.%s" % ( root, txtmeta.getPickleFileName() )
         logger.debug ( "Creating %s, pcl=%s" % (root,pclfile ) )
@@ -488,11 +496,11 @@ class Database(object):
         :param analysisID: list of analysis ids ([CMS-SUS-13-006,...]). Can
                             be wildcarded with usual shell wildcards: * ? [<letters>]
                             Furthermore, the centre-of-mass energy can be chosen
-                            as suffix, e.g. ":13*TeV". Note that the asterisk 
+                            as suffix, e.g. ":13*TeV". Note that the asterisk
                             in the suffix is not a wildcard.
-        :param datasetIDs: list of dataset ids ([ANA-CUT0,...]). Can be wildcarded 
+        :param datasetIDs: list of dataset ids ([ANA-CUT0,...]). Can be wildcarded
                             with usual shell wildcards: * ? [<letters>]
-        :param txnames: list of txnames ([TChiWZ,...]). Can be wildcarded with 
+        :param txnames: list of txnames ([TChiWZ,...]). Can be wildcarded with
                             usual shell wildcards: * ? [<letters>]
         :param dataTypes: dataType of the analysis (all, efficiencyMap or upperLimit)
                             Can be wildcarded with usual shell wildcards: * ? [<letters>]
@@ -504,8 +512,8 @@ class Database(object):
         :returns: list of ExpResult objects or the ExpResult object if the list
                   contains only one result
 
-        """        
-        
+        """
+
         import fnmatch
         expResultList = []
         for expResult in self.expResultList:
@@ -514,17 +522,17 @@ class Database(object):
                 superseded = expResult.globalInfo.supersededBy.replace(" ","")
             if superseded and (not useSuperseded):
                 continue
-            
-            analysisID = expResult.globalInfo.getInfo('id')          
+
+            analysisID = expResult.globalInfo.getInfo('id')
             sqrts = expResult.globalInfo.getInfo('sqrts')
-            
+
             # Skip analysis not containing any of the required ids:
             if analysisIDs != ['all']:
                 hits=False
                 for patternString in analysisIDs:
                     # Extract centre-of-mass energy
                     # Assuming 0 or 1 colons.
-                    pattern = patternString.split(':')        
+                    pattern = patternString.split(':')
                     hits = fnmatch.filter ( [ analysisID ], pattern[0] )
                     if len ( pattern ) > 1:
                         if not pattern[1].endswith('*TeV'):
@@ -534,13 +542,13 @@ class Database(object):
                     if hits:
                         continue
                 if not hits:
-                    continue                             
+                    continue
 
             newExpResult = ExpResult()
             newExpResult.path = expResult.path
             newExpResult.globalInfo = expResult.globalInfo
             newExpResult.datasets = []
-            
+
             for dataset in expResult.datasets:
                 if dataTypes != ['all']:
                     hits=False
@@ -549,17 +557,17 @@ class Database(object):
                         if hits:
                             continue
                     if not hits:
-                        continue         
+                        continue
 
-                if hasattr(dataset.dataInfo, 'dataID') and datasetIDs != ['all']:                
+                if hasattr(dataset.dataInfo, 'dataID') and datasetIDs != ['all']:
                     hits=False
                     for pattern in datasetIDs:
                         hits = fnmatch.filter ( [ dataset.dataInfo.dataID ], pattern )
                         if hits:
                             continue
                     if not hits:
-                        continue              
-                
+                        continue
+
                 newDataSet = datasetObj.DataSet( dataset.path, dataset.globalInfo,
                        False, discard_zeroes=self.txt_meta.discard_zeroes )
                 newDataSet.dataInfo = dataset.dataInfo
@@ -584,8 +592,8 @@ class Database(object):
                             if hits:
                                 continue
                         if not hits:
-                            continue                          
-                        
+                            continue
+
                     if onlyWithExpected and dataset.dataInfo.dataType == \
                         "upperLimit" and not txname.txnameDataExp:
                         continue
