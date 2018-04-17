@@ -33,7 +33,7 @@ class OverrideInstall(install):
         """
         # so the installation does not break! 
         # here we start with doing our overriding and private magic ..
-        mode = 0777
+        mode = 0o777
         for filepath in self.get_outputs():
             # if self.install_scripts in filepath:
             if "smodels/lib/" in filepath:
