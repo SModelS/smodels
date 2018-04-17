@@ -124,7 +124,7 @@ setup(
               'smodels.experiment'],
     include_package_data = True,
     test_suite='test',
-    long_description=read('README.rst'),
+    long_description=read('smodels/README.rst'),
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Topic :: Scientific/Engineering :: Physics",
