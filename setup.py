@@ -12,7 +12,6 @@ import os
 import sys
 from setuptools import setup, Extension
 from setuptools.command.install import install
-from setuptools.command.install_scripts import install_scripts
 sys.path.insert ( 0, "./" )
 from smodels.installation import version, authors
 import subprocess
@@ -21,11 +20,20 @@ class OverrideInstall(install):
 
     def run(self):
         #uid, gid = 0, 0
-        mode = 0777
         install.run(self) # calling install.run(self) insures that everything 
                 # that happened previously still happens, 
+        """
+        if "Apple" in sys.version:
+            # a wild attempt at fixing a problem with Mac OS X. Somehow
+            # setup.py doesnt resolve the requirements!
+            try:
+                self.do_egg_install()
+            except Exception as e:
+                pass
+        """
         # so the installation does not break! 
         # here we start with doing our overriding and private magic ..
+        mode = 0777
         for filepath in self.get_outputs():
             # if self.install_scripts in filepath:
             if "smodels/lib/" in filepath:
