@@ -515,16 +515,25 @@ class LikelihoodComputer:
             a = max(0.,xmax-nrange*sqrt(self.sigma2))
             b = xmax+nrange*self.sigma_tot
             like = integrate.quad(prob,a,b,(nsig), epsabs=0.,epsrel=1e-3)[0]
+            if like==0.:
+                return 0.
 
             #Increase integration range until integral converges
             err = 1.
+            ctr=0
             while err > 0.01:
+                ctr+=1
+                if ctr > 10.:
+                    raise Exception("Could not compute likelihood within required precision")
+                    
                 like_old = like
                 nrange = nrange*2
-                a = max(0.,xmax-nrange*self.sigma_tot)
-                b = xmax+nrange*self.sigma_tot
+                a = max(0.,(xmax-nrange*self.sigma_tot)[0][0] )
+                b = (xmax+nrange*self.sigma_tot)[0][0]
                 like = integrate.quad(prob,a,b,(nsig),
                                           epsabs=0.,epsrel=1e-3)[0]
+                if like == 0.:
+                    continue
                 err = abs(like_old-like)/like
 
             #Renormalize the likelihood to account for the cut at x = 0.
@@ -613,22 +622,9 @@ class LikelihoodComputer:
             # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
             llhd = self.likelihood( nsig, marginalize=marg, nll=True )
 
-            #print ( "deltas=",deltas )
-            #print ( "nsig=",nsig )
-            #Percentual signal error:
-            denom = nsig
-            if type(denom)==float and denom == 0.:
-                denom = 1e10 ## when nsig is zero, then so is deltas
-            if type(denom)==ndarray:
-                ## when nsig is zero, then so is deltas
-                denom [ denom == 0. ] = 1e10
-
-            deltas_pct = deltas / denom ## float(nsig)
-
             # Compute the maximum likelihood H1, which sits at nsig = nobs - nb
             # (keeping the same % error on signal):
             dn = self.model.data-self.model.backgrounds
-            deltas = deltas_pct*( dn )
             maxllhd = self.likelihood( dn, marginalize=marg, nll=True )
 
             # Return infinite likelihood if it is zero
