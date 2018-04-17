@@ -338,7 +338,8 @@ def _sortPredictions ( expResult, smsTopList, maxMassDist, combine ):
                     preds[info]=[]
                 preds[info].append ( pred )
         else:
-            logger.error ( "this is the culprit. we have no predlist. but we need one for combination. lets make one artificially." )
+            pass
+            # logger.error ( "this is the culprit. we have no predlist. but we need one for combination. lets make one artificially." )
     return preds
 
 def _getBestResults(dataSetResults):
