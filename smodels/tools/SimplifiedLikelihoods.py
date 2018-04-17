@@ -64,12 +64,15 @@ class Model:
         needed to fully define a specific statistical model """
 
     def __init__ ( self, data, backgrounds, covariance, third_moment=None,
-                         efficiencies=None, name="model" ):
+                         efficiencies=None, name="model", deltas_rel=None ):
         """
         :param data: number of observed events per dataset
         :param backgrounds: expected bg per dataset
         :param covariance: uncertainty in background, as a covariance matrix
         :param efficiencies: dataset effective signal efficiencies
+        :param name: give the model a name, just for convenience
+        :param deltas_rel: the relative assumed error on signal hypotheses.
+        If None, then no error is assumed.
         """
         self.data = self.convert ( data )
         self.backgrounds = self.convert ( backgrounds )
@@ -81,7 +84,9 @@ class Model:
             ## all zeroes? then we have no third_moment
             self.third_moment = None
         self.name = name
-        self.deltas = array( [1e-10]*self.n )
+        self.deltas_rel = deltas_rel
+        if deltas_rel == None:
+            self.deltas_rel = 1e-10
         self.computeABC()
 
     def isScalar ( self, obj ):
@@ -118,7 +123,7 @@ class Model:
     def computeABC ( self ):
         """ compute the terms A, B, C, rho, V. Corresponds with
             Eqs. 1.27-1.30 in the second paper. """
-        self.V = self.covariance+NP.diag(self.deltas**2)
+        self.V = self.covariance
         if type(self.third_moment) == type(None):
             self.A = None
             self.B = None
@@ -188,7 +193,6 @@ class LikelihoodComputer:
 
     """ the default value for delta_s, the assumed relative error
     on signal yields. """
-    deltas_default = 1e-10
     debug_mode = False
 
     def __init__ ( self, model, ntoys = 1000 ):
@@ -412,10 +416,10 @@ class LikelihoodComputer:
                 (poisson*gauss).
             """
             if type(deltas) == type(None):
-                 deltas = self.deltas_default * nsig
+                 deltas = self.model.deltas_rel * nsig
                  if type(nsig) in [ list, ndarray, array ]:
                     # deltas = array ( [0.] * len(nsig) )
-                    deltas = array ( self.deltas_default * nsig )
+                    deltas = array ( self.model.deltas_rel * nsig )
             ## first step is to disregard the covariances and solve the
             ## quadratic equations
             ini = self.getThetaHat ( self.model.data, self.model.backgrounds, nsig, self.model.covariance, deltas, 0 )
@@ -547,7 +551,7 @@ class LikelihoodComputer:
                 return self.marginalizedLLHD1D ( nsig, deltas, nll )
 
             if type(deltas) == type(None):
-                deltas = array ( self.deltas_default * nsig )
+                deltas = array ( self.model.deltas_rel * nsig )
             vals=[]
             self.gammaln = special.gammaln(self.model.data + 1)
             thetas = stats.multivariate_normal.rvs(mean=[0.]*self.model.n,
@@ -578,7 +582,7 @@ class LikelihoodComputer:
             Returns profile likelihood and error code (0=no error)
         """
         if type(deltas) == type(None):
-            deltas = array ( self.deltas_default * nsig )
+            deltas = array ( self.model.deltas_rel * nsig )
         # compute the profiled (not normalized) likelihood of observing
         # nsig signal events
         theta_hat,err = self.findThetaHat ( nsig, deltas )
@@ -614,7 +618,7 @@ class LikelihoodComputer:
             nsig = self.model.convert ( nsig )
             marg=True
             if deltas == None:
-                deltas = self.deltas_default * nsig
+                deltas = self.model.deltas_rel * nsig
             # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
             llhd = self.likelihood( nsig, deltas, marginalize=marg, nll=True )
 
