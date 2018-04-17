@@ -198,7 +198,7 @@ class DataSet(object):
         nobs, expectedBG and bgError are part of dataInfo.
         :param nsig: predicted signal (float)
         :param deltas_rel: relative uncertainty in signal (float). 
-        If None, default value (20%) will be used.
+        If None, default value will be used.
         :return: chi2 (float)
         """
         m = Model ( self.dataInfo.observedN, self.dataInfo.expectedBG, 
