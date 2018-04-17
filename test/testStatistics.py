@@ -44,7 +44,7 @@ class StatisticsTest(unittest.TestCase):
         computer = LikelihoodComputer ( m )
         dll = math.log( computer.likelihood( nsig, marginalize=False ) )
         self.assertAlmostEqual(ill, dll, places=2)
-        dchi2 = computer.chi2( nsig, None) ## 0.2*nsig )
+        dchi2 = computer.chi2( nsig ) ## 0.2*nsig )
         # print ( "dchi2,ichi2",dchi2,ichi2)
         self.assertAlmostEqual(ichi2, dchi2, places=2)
 
@@ -140,12 +140,9 @@ class StatisticsTest(unittest.TestCase):
             deltas = 1e-4*d['nsig']
             # print ("ns="+str(nsig)+"; nobs = "+str(nobs)+"; nb="+str(nb)+"; db="+str(deltab))
             # Chi2 as computed by statistics module:
-            m = Model ( nobs, nb, deltab**2 )
+            m = Model ( nobs, nb, deltab**2, deltas_rel = 0.2 )
             computer = LikelihoodComputer ( m )
-            #llhd = computer.likelihood( nsig, marginalize=True, nll=True )
-            #llhd0 = computer.likelihood( 0., marginalize=True, nll=True )
-            #print ( "X llhd=", nobs,nsig,nb, deltab, llhd, llhd0 )
-            chi2_actual = computer.chi2( nsig, .2*nsig )
+            chi2_actual = computer.chi2( nsig ) ## , .2*nsig )
             chi2_expected = d['chi2']
             if not chi2_expected==None and not np.isnan(chi2_expected):
 #                 chi2_expected = self.round_to_sign(chi2_expected, 2)
@@ -159,7 +156,7 @@ class StatisticsTest(unittest.TestCase):
             # computer = LikelihoodComputer( nobs, nb, deltab**2 )
             #likelihood_actual = statistics.likelihood( nsig,
             #    nobs, nb, deltab, deltas)
-            likelihood_actual = computer.likelihood(nsig, deltas, marginalize=True )
+            likelihood_actual = computer.likelihood(nsig, marginalize=True )
             # likelihood_actual = statistics.likelihood()
 #             logger.error("llk= "+str(likelihood_actual)+" nsig="+str(nsig)+" nobs = "+str(nobs)+" nb="+str(nb)+"+-"+str(deltab))
             #print('llhdactual', likelihood_actual)
@@ -171,6 +168,7 @@ class StatisticsTest(unittest.TestCase):
             likelihood_expected = d['llhd']
             #print('llhdexp', likelihood_expected)
             if not likelihood_expected==None and not np.isnan(likelihood_expected):
+
                 likelihood_expected = self.round_to_sign(likelihood_expected, 4)
 
                 # Check that likelihood values agree:

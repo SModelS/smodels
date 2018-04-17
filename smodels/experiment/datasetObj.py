@@ -191,20 +191,20 @@ class DataSet(object):
 #            return None ## FIXME implement
                 
 
-    def chi2( self, nsig, deltas=None):
+    def chi2( self, nsig, deltas_rel=None ):
         """
         Computes the chi2 for a given number of observed events "nobs",
         given number of signal events "nsig", and error on signal "deltas".
         nobs, expectedBG and bgError are part of dataInfo.
         :param nsig: predicted signal (float)
-        :param deltas: relative uncertainty in signal (float). 
+        :param deltas_rel: relative uncertainty in signal (float). 
         If None, default value (20%) will be used.
         :return: chi2 (float)
         """
         m = Model ( self.dataInfo.observedN, self.dataInfo.expectedBG, 
-                    self.dataInfo.bgError**2 )
+                    self.dataInfo.bgError**2, deltas_rel = deltas_rel )
         computer = LikelihoodComputer ( m )
-        ret = computer.chi2( nsig, deltas )
+        ret = computer.chi2( nsig )
         return ret
 
     def getAttributes(self,showPrivate=False):

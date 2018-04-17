@@ -89,6 +89,10 @@ class Model:
             self.deltas_rel = 1e-10
         self.computeABC()
 
+    def var_s ( self, nsig ):
+        """ the variances, for nsig. convenience function. """
+        return NP.diag ( ( self.deltas_rel * nsig )**2 )
+
     def isScalar ( self, obj ):
         """ determine if obj is a scalar (float or int) """
         if type(obj) == ndarray:
@@ -237,7 +241,7 @@ class LikelihoodComputer:
         ## we need a very rough initial guess for mu(hat), to come
         ## up with a first theta
         self.nsig = array ( [0.] * len(self.model.data ) )
-        self.deltas = array ( [0.] * len(self.model.data) )
+        deltas = array ( [0.] * len(self.model.data) )
         ## we start with theta_hat being all zeroes
         theta_hat = array ( [0.] * len(self.model.data ) )
         mu_hat_old, mu_hat = 0., 1.
@@ -354,12 +358,11 @@ class LikelihoodComputer:
         nllh_ = self.weight + NP.diag ( self.model.data * T**2 / (lmbda**2) ) - NP.diag ( self.model.data / lmbda * 2 * self.model.C / self.model.B**2 ) + NP.diag ( 2*self.model.C/self.model.B**2 )
         return nllh_
 
-    def getThetaHat ( self, nobs, nb, nsig, covb, deltas, max_iterations ):
+    def getThetaHat ( self, nobs, nb, nsig, covb, max_iterations ):
             """ Compute nuisance parameter theta that
             maximizes our likelihood (poisson*gauss).  """
             self.nsig = nsig
-            self.deltas = deltas
-            sigma2 = covb + NP.diag ( deltas**2 )
+            sigma2 = covb + self.model.var_s ( nsig ) ## NP.diag ( (self.model.deltas_rel * nsig)**2 )
             ## for now deal with variances only
             ntot = nb + nsig
             cov = NP.matrix ( sigma2 )
@@ -411,22 +414,20 @@ class LikelihoodComputer:
                         return thetamax
             return thetamax
 
-    def findThetaHat ( self, nsig, deltas=None ):
+    def findThetaHat ( self, nsig ):
             """ Compute nuisance parameter theta that maximizes our likelihood
                 (poisson*gauss).
             """
-            if type(deltas) == type(None):
-                 deltas = self.model.deltas_rel * nsig
-                 if type(nsig) in [ list, ndarray, array ]:
-                    # deltas = array ( [0.] * len(nsig) )
-                    deltas = array ( self.model.deltas_rel * nsig )
+            deltas = self.model.deltas_rel * nsig
+            if type(nsig) in [ list, ndarray, array ]:
+                deltas = array ( self.model.deltas_rel * nsig )
             ## first step is to disregard the covariances and solve the
             ## quadratic equations
-            ini = self.getThetaHat ( self.model.data, self.model.backgrounds, nsig, self.model.covariance, deltas, 0 )
-            self.cov_tot = self.model.covariance+NP.diag(self.deltas**2)
+            ini = self.getThetaHat ( self.model.data, self.model.backgrounds, nsig, self.model.covariance, 0 )
+            self.cov_tot = self.model.covariance+NP.diag(deltas**2)
             self.ntot = self.model.backgrounds + self.nsig
             if not self.model.isLinear():
-                self.cov_tot = self.model.V+NP.diag(self.deltas**2)
+                self.cov_tot = self.model.V+NP.diag(deltas**2)
                 self.ntot = None
             self.weight = NP.linalg.inv ( self.cov_tot )
             self.ones = 1.
@@ -462,7 +463,7 @@ class LikelihoodComputer:
                 sys.exit()
             return ini,-1
 
-    def marginalizedLLHD1D(self, nsig, deltas, nll):
+    def marginalizedLLHD1D(self, nsig, nll):
             """
             Return the likelihood (of 1 signal region) to observe nobs events given the
             predicted background nb, error on this background (deltab),
@@ -472,18 +473,11 @@ class LikelihoodComputer:
             :param nobs: number of observed events (float)
             :param nb: predicted background (float)
             :param deltab: uncertainty on background (float)
-            :param deltas: uncertainty on signal (float)
 
             :return: likelihood to observe nobs events (float)
 
             """
-
-            #Set signal error to 20%, if not defined
-            if deltas is None:
-                deltas = 0.2*nsig
-
-            self.deltas = deltas
-            self.sigma2 = self.model.covariance + deltas**2
+            self.sigma2 = self.model.covariance + self.model.var_s ( nsig )## (nsig * self.model.deltas_rel)**2
             self.sigma_tot = sqrt( self.sigma2 )
             self.lngamma = math.lgamma(self.model.data[0] + 1)
             #     Why not a simple gamma function for the factorial:
@@ -545,13 +539,12 @@ class LikelihoodComputer:
 
             return like[0][0]
 
-    def marginalizedLikelihood( self, nsig, nll, deltas ):
+    def marginalizedLikelihood( self, nsig, nll ):
             """ compute the marginalized likelihood of observing nsig signal event"""
             if self.model.isLinear() and self.model.n == 1: ## 1-dimensional non-skewed llhds we can integrate analytically
-                return self.marginalizedLLHD1D ( nsig, deltas, nll )
+                return self.marginalizedLLHD1D ( nsig, nll )
 
-            if type(deltas) == type(None):
-                deltas = array ( self.model.deltas_rel * nsig )
+            deltas = array ( self.model.deltas_rel * nsig )
             vals=[]
             self.gammaln = special.gammaln(self.model.data + 1)
             thetas = stats.multivariate_normal.rvs(mean=[0.]*self.model.n,
@@ -576,21 +569,20 @@ class LikelihoodComputer:
             return mean
 
 
-    def profileLikelihood ( self, nsig, nll, deltas ):
+    def profileLikelihood ( self, nsig, nll ):
         """ compute the profiled likelihood for nsig.
             Warning: not normalized.
             Returns profile likelihood and error code (0=no error)
         """
-        if type(deltas) == type(None):
-            deltas = array ( self.model.deltas_rel * nsig )
+        deltas = array ( self.model.deltas_rel * nsig )
         # compute the profiled (not normalized) likelihood of observing
         # nsig signal events
-        theta_hat,err = self.findThetaHat ( nsig, deltas )
+        theta_hat,err = self.findThetaHat ( nsig )
         ret = self.probMV ( nll, *theta_hat )
         # logger.error ( "theta_hat, err=%s, %s, %s" % ( theta_hat[0], err, ret ) )
         return ret
 
-    def likelihood ( self, nsig, deltas = None, marginalize=False, nll=False ):
+    def likelihood ( self, nsig, marginalize=False, nll=False ):
         """ compute likelihood for nsig, profiling the nuisances
         :param deltas: error on signal
         :param marginalize: if true, marginalize, if false, profile
@@ -598,15 +590,15 @@ class LikelihoodComputer:
         """
         nsig = self.model.convert ( nsig )
         self.ntot = self.model.backgrounds + nsig
-        deltas = self.model.convert ( deltas )
+        deltas = self.model.deltas_rel * nsig
         if marginalize:
             # p,err = self.profileLikelihood ( nsig, deltas )
-            return self.marginalizedLikelihood( nsig, nll, deltas )
+            return self.marginalizedLikelihood( nsig, nll )
             # print ( "p,l=",p,l,p/l )
         else:
-            return self.profileLikelihood ( nsig, nll, deltas )
+            return self.profileLikelihood ( nsig, nll )
 
-    def chi2( self, nsig, deltas=None ):
+    def chi2( self, nsig ):
             """
             Computes the chi2 for a given number of observed events nobs given
             the predicted background nb, error on this background deltab,
@@ -617,10 +609,9 @@ class LikelihoodComputer:
             """
             nsig = self.model.convert ( nsig )
             marg=True
-            if deltas == None:
-                deltas = self.model.deltas_rel * nsig
+            deltas = self.model.deltas_rel * nsig
             # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
-            llhd = self.likelihood( nsig, deltas, marginalize=marg, nll=True )
+            llhd = self.likelihood( nsig, marginalize=marg, nll=True )
 
             #print ( "deltas=",deltas )
             #print ( "nsig=",nsig )
@@ -638,7 +629,7 @@ class LikelihoodComputer:
             # (keeping the same % error on signal):
             dn = self.model.data-self.model.backgrounds
             deltas = deltas_pct*( dn )
-            maxllhd = self.likelihood( dn, deltas, marginalize=marg, nll=True )
+            maxllhd = self.likelihood( dn, marginalize=marg, nll=True )
 
             # Return infinite likelihood if it is zero
             # This can happen in case e.g. nb >> nobs
