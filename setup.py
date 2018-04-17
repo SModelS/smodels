@@ -22,15 +22,15 @@ class OverrideInstall(install):
         #uid, gid = 0, 0
         install.run(self) # calling install.run(self) insures that everything 
                 # that happened previously still happens, 
-        """
-        if "Apple" in sys.version:
-            # a wild attempt at fixing a problem with Mac OS X. Somehow
-            # setup.py doesnt resolve the requirements!
-            try:
-                self.do_egg_install()
-            except Exception as e:
-                pass
-        """
+        enableStupidMacFix=False
+        if enableStupidMacFix:
+            if "Apple" in sys.version:
+                # a wild attempt at fixing a problem with Mac OS X. Somehow
+                # setup.py doesnt resolve the requirements!
+                try:
+                    self.do_egg_install()
+                except Exception as e:
+                    pass
         # so the installation does not break! 
         # here we start with doing our overriding and private magic ..
         mode = 0o777
