@@ -68,10 +68,11 @@ class Uncovered(object):
             if not missing: # any element that is not missing might be outside the grid                            
                 # outside grid should be smalles covered but not tested in compression                  
                 if el.covered and not el.tested: # verify first that element is covered but not tested                              
-                    if not el.weight.getXsecsFor(self.sqrts): continue # remove elements that only have weight at higher sqrts
-                    if self.inOutsideGridMothers(el): continue # if daughter element of current element is already counted skip this element
+                    if not el.weight.getXsecsFor(self.sqrts): continue # remove elements that only have weight at higher sqrts                    
+                    if self.inOutsideGridMothers(el): continue # if daughter element of current element is already counted skip this element                  
                     # in this way we do not double count, but always count the smallest compression that is outside the grid
                     outsideX = self.getOutsideX(el) # as for missing topo, recursively find untested cross section
+
                     if outsideX: # if all mothers are tested, this is no longer outside grid contribution, otherwise add to list
                         el.missingX =  outsideX # for combined printing function, call outside grid weight missingX as well
                         self.outsideGrid.addToTopos(el) # add to list of outsideGrid topos                         
@@ -159,7 +160,7 @@ class Uncovered(object):
         :returns: missing cross section in fb as number
         """
         #same as getMissingX, but we also keep track of the mother elements of outsideGrid contributions
-        # this is so we can find the smallest covered but not tested element in a chain of compressed elements
+        # this is so we can find the smallest covered but not tested element in a chain of compressed elements     
         mothers = el.motherElements
         alreadyChecked = []
         if not el.weight.getXsecsFor(self.sqrts): return 0.
@@ -175,9 +176,10 @@ class Uncovered(object):
                     missingX -= mother[-1].weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
                     continue
                 self.outsideGridMothers.append(mother[-1].elID) # mother element is not tested, but should no longer be considered as outside grid, because we already count its contribution here
-                if not mother[-1].motherElements: continue
+                if all(grandmother[0] == 'original' for grandmother in mother[-1].motherElements) : continue
                 else: newmothers += mother[-1].motherElements
             mothers = newmothers
+           
         return missingX
 
 
