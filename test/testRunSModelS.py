@@ -164,10 +164,13 @@ class RunSModelSTest(unittest.TestCase):
     def testBadFile(self):
         # since 112 we skip non-existing slha files!
         filename = join (iDir(), "inputFiles/slha/I_dont_exist.slha" )
+        of="unitTestOutput/I_dont_exist.slha.py"
+        if os.path.exists ( of ):
+            os.unlink ( of )
         outputfile = self.runMain(filename  )
+        self.assertTrue ( of in outputfile )
         self.assertTrue ( not os.path.exists ( outputfile ) )
         """
-        print ( "outputfile=", outputfile )
         shutil.copyfile(outputfile,'./bad_output.py')
         from bad_default import smodelsOutputDefault
         from bad_output import smodelsOutput
