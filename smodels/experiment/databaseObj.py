@@ -161,7 +161,10 @@ class Database(object):
                         return self
                     logger.info ( "loading binary db file %s format version %s" %
                             ( self.pcl_meta.pathname, self.pcl_meta.format_version ) )
-                    self.expResultList = serializer.load ( f )
+                    if sys.version[0]=="2":
+                        self.expResultList = serializer.load ( f )
+                    else:
+                        self.expResultList = serializer.load ( f, encoding="latin1" )
                     t1=time.time()-t0
                     logger.info ( "Loaded database from %s in %.1f secs." % \
                             ( self.pcl_meta.pathname, t1 ) )
