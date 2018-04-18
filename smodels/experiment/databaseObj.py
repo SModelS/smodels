@@ -56,7 +56,7 @@ class Database(object):
         :param subpickle: produce small pickle files per exp result.
             Should only be used when working on the database.
         """
-        self.source=None
+        self.source=""
         self.force_load = force_load
         self.subpickle = subpickle
         base, pclfile = self.checkPathName(base, discard_zeroes )
@@ -171,8 +171,11 @@ class Database(object):
                 self.pcl_meta.format_version = -1
                 self.pcl_meta.mtime = 0
                 return self
-            logger.error ( "%s is not a binary database file, recreate it." % \
-                            self.pcl_meta.pathname )
+            logger.error ( "%s is not readable (%s)." % \
+                            ( self.pcl_meta.pathname, str(e) ) )
+            if self.source in [ "http", "ftp", "pcl" ]:
+                logger.error ( "source cannot be rebuilt. supply a different path to the database in your ini file." )
+                sys.exit()
             self.createBinaryFile()
         # self.txt_meta = self.pcl_meta
         return self
@@ -292,11 +295,14 @@ class Database(object):
     def fetchFromServer ( self, path, discard_zeroes ):
         import requests, time, json
         logger.debug ( "need to fetch from server: %s" % path )
+        self.source = "http"
+        if "ftp://" in path:
+            self.source = "ftp"
         store = "." + path.replace ( ":","_" ).replace( "/", "_" ).replace(".","_" )
         if not os.path.isfile ( store ):
             ## completely new! fetch the description and the db!
             return self.fetchFromScratch ( path, store, discard_zeroes )
-        with open(store,"r") as f:
+        with open(store,"rb") as f:
             jsn = json.load(f)
         filename= "./" + jsn["url"].split("/")[-1]
         class _: ## pseudo class for pseudo requests
@@ -347,6 +353,7 @@ class Database(object):
             return ( base, tmp )
 
         if tmp[-4:]==".pcl":
+            self.source="pcl"
             if not os.path.exists ( tmp ):
                 if self.force_load == "pcl":
                     logger.error ( "File not found: %s" % tmp )
@@ -362,6 +369,7 @@ class Database(object):
             logger.error('%s is no valid path!' % path)
             raise DatabaseNotFoundException("Database not found")
         m=Meta ( path, discard_zeroes = discard_zeroes )
+        self.source="txt"
         return ( path, path + m.getPickleFileName() )
 
     def __str__(self):
