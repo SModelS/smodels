@@ -59,6 +59,32 @@ def authors():
         authors += to_add
     return authors
 
+def _toTuple_ ( ver ):
+    """ convert version string to tuple """
+    a = ver.replace(" ",".",1).split(".")
+    for ctr,el in enumerate(a):
+        try:
+            a[ctr]=int(el)
+        except ValueError:
+            a[ctr]=el
+    b=[]
+    for i in a:
+        found=False
+        for pf in [ "rc", "post", "pre" ]:
+            if type(i)==str and pf in i:
+                found=True
+                minor = i[:i.find(pf)]
+                try:
+                    minor = int(minor)
+                except:
+                    pass
+                b.append ( minor )
+                b.append ( i[i.find(pf):] )
+                continue
+        if not found:
+            b.append ( i )
+    return tuple(b)
+
 def version(astuple=False):
     """
     Print version number of the SModelS framework.
@@ -71,13 +97,7 @@ def version(astuple=False):
     l.strip()
     if not astuple:
         return l
-    a = l.replace(" ",".",1).split(".")
-    for ctr,el in enumerate(a):
-        try:
-            a[ctr]=int(el)
-        except ValueError:
-            a[ctr]=el
-    return tuple(a)
+    return _toTuple_ ( l )
 
 
 def license():
