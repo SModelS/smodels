@@ -305,7 +305,7 @@ class Database(object):
         if not os.path.isfile ( store ):
             ## completely new! fetch the description and the db!
             return self.fetchFromScratch ( path, store, discard_zeroes )
-        with open(store,"rb") as f:
+        with open(store,"r") as f:
             jsn = json.load(f)
         filename= "./" + jsn["url"].split("/")[-1]
         class _: ## pseudo class for pseudo requests
