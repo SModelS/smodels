@@ -254,7 +254,7 @@ class LikelihoodComputer:
             mu_c = NP.abs ( self.model.data - self.model.backgrounds - theta_hat ) / effs
             ## find mu_hat by finding the root of 1/L dL/dmu. We know
             ## that the zero has to be between min(mu_c) and max(mu_c).
-            lower,upper = 0.*max(mu_c),3.*max(mu_c)
+            lower,upper = 0.,3.*max(mu_c)
             lower_v = self.dLdMu ( lower, effs, theta_hat )
             upper_v = self.dLdMu ( upper, effs, theta_hat )
             total_sign = NP.sign ( lower_v * upper_v )
@@ -269,9 +269,9 @@ class LikelihoodComputer:
                 lower_v = self.dLdMu ( lower, effs, theta_hat )
                 total_sign = NP.sign ( lower_v * upper_v )
                 if total_sign > -.5:
-                    logger.error ( "cant find zero in Brentq bracket. l,u=%s,%s" % \
-                                   ( lower, upper ) )
-                    sys.exit()
+                    logger.error ( "cant find zero in Brentq bracket. l,u,ctr=%s,%s,%s" % \
+                                   ( lower, upper, ctr ) )
+                    continue
             mu_hat = optimize.brentq ( self.dLdMu, lower, upper, args=(effs, theta_hat ) )
             theta_hat,err = self.findThetaHat( mu_hat * effs )
             ctr+=1
@@ -618,7 +618,6 @@ class LikelihoodComputer:
             """
             nsig = self.model.convert ( nsig )
             marg=True
-            deltas = self.model.deltas_rel * nsig
             # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
             llhd = self.likelihood( nsig, marginalize=marg, nll=True )
 
