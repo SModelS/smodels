@@ -226,7 +226,7 @@ class Element(object):
 
     def getParticles(self):
         """
-        Get the array of particles in the element.
+        Get the array of final state particles in the element.
         
         :returns: list of particle strings                
         """
@@ -249,23 +249,27 @@ class Element(object):
         """        
         massarray = []
         for branch in self.branches:
-            if len(branch.BSMparticles) == 1:
-                masses = [particle.mass for particleList in branch.BSMparticles for particle in particleList ]
-                massarray.append(masses) 
-            elif len(branch.BSMparticles) > 1:
-                masses = [particle.mass for particle in branch.BSMparticles[0] ]
-                massarray.append(masses)
-            else: 
-                logger.error("There are no BSM particles in this branch: %s", branch)
-                return None
+            masses = [particle.mass for particle in branch.BSMparticles[0] ]
+            massarray.append(masses)
         return massarray
+        
+    def getBSMparticles(self):
+        """
+        Get the list of BSM particles (BSM particles appearing the cascade decay), i.e.
+        [  [[p1,p2,...],[p3,p4,...]] ].
+
+        :returns: list of PDG ids
+        """    
+        BSMparticlesArray = []
+        for branch in self.branches:
+            BSMparticles = [particle for particle in branch.BSMparticles[0] ]            
+            BSMparticlesArray.append(BSMparticles)
+        return BSMparticlesArray
 
     def getPIDs(self):
         """
         Get the list of IDs (PDGs of the intermediate states appearing the cascade decay), i.e.
         [  [[pdg1,pdg2,...],[pdg3,pdg4,...]] ].
-        The list might have more than one entry if the element combines different pdg lists:
-        [  [[pdg1,pdg2,...],[pdg3,pdg4,...]],  [[pdg1',pdg2',...],[pdg3',pdg4',...]], ...]
         
         :returns: list of PDG ids
         """
@@ -425,11 +429,13 @@ class Element(object):
         :returns: compressed copy of the element, if two masses in this
                   element are degenerate; None, if compression is not possible;        
         """
-        masses = self.getMasses()
-        massDiffs = []
-        #Compute mass differences in each branch
-        for massbr in masses:
-            massDiffs.append([massbr[i]-massbr[i+1] for i in range(len(massbr)-1)])
+        BSMparticles = self.getBSMparticles()
+        
+        massDiffs = [] 
+        #Compute mass differences in each branch    
+        for particlebr in BSMparticles:
+            massDiffs.append([particlebr[i].mass - particlebr[i+1].mass for i in range(len(particlebr)-1)  if particlebr[i].eCharge == particlebr[i+1].eCharge and particlebr[i].colordim == particlebr[i+1].colordim])
+        
         #Compute list of vertices to be compressed in each branch            
         compVertices = []
         for ibr,massbr in enumerate(massDiffs):
