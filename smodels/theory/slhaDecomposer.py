@@ -234,7 +234,7 @@ def _getPromptDecays(slhafile,brDic,l_inner=10.*mm,gb_inner=10,l_outer=10.*m,gb_
             decay.br *= Fprompt  #Reweight by prompt fraction
             
         #Add long-lived fraction:
-        if Flong:
+        if Flong > 1e-50:
             stableFraction = pyslha.Decay(br=Flong,ids=[],nda=0)
             brDic[pid].append(stableFraction) 
         if (Flong+Fprompt) > 1.:
