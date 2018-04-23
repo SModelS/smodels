@@ -189,7 +189,7 @@ class ExpResult(object):
         bg = [ x.dataInfo.expectedBG for x in self.datasets ]
         cov = self.globalInfo.covariance
         # print ( "nsig=", nsig )
-        computer = LikelihoodComputer ( Model ( nobs, bg, cov, nsig ) )
+        computer = LikelihoodComputer ( Model ( nobs, bg, cov, None, nsig ) )
         # print ( "computing combined likelihood for",nsig,"ds=",len(self.datasets ) )
         return computer.likelihood ( nsig, deltas )
 
@@ -210,8 +210,8 @@ class ExpResult(object):
         nobs = [ x.dataInfo.observedN for x in self.datasets ]
         bg = [ x.dataInfo.expectedBG for x in self.datasets ]
         cov = self.globalInfo.covariance
-        computer = LikelihoodComputer ( Model ( nobs, bg, cov ) )
-        return computer.chi2 ( nsig, deltas )
+        computer = LikelihoodComputer ( Model ( nobs, bg, cov, deltas_rel=deltas ) )
+        return computer.chi2 ( nsig )
 
     def getCombinedUpperLimitFor ( self, effs, expected=False ):
         """
@@ -258,7 +258,7 @@ class ExpResult(object):
         no = nobs
         if expected:
             no = nb
-        ret = computer.ulSigma ( Model ( no, nb, cov, effs ), marginalize=False )
+        ret = computer.ulSigma ( Model ( no, nb, cov, None, effs ), marginalize=True )
         return ret
 
     def getUpperLimitFor(self, dataID=None, alpha=0.05, expected=False,

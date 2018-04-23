@@ -686,6 +686,16 @@ class UpperLimitComputer:
         if mu_hat < 0.: mu_hat = 0.
         nll0 = computer.likelihood ( model.efficiencies * mu_hat,
                                      marginalize=marginalize, nll=True )
+        if NP.isinf ( nll0 ) and marginalize==False:
+            logger.warning ( "nll is infinite in profiling! we switch to marginalization, but only for this one!" )
+            marginalize=True
+            nll0 = computer.likelihood ( model.efficiencies * mu_hat,
+                                         marginalize=True, nll=True )
+            if NP.isinf ( nll0 ):
+                logger.warning ( "marginalization didnt help either. switch back." )
+                marginalize=False
+            else:
+                logger.warning ( "marginalization worked." )
         nll0A = compA.likelihood ( aModel.efficiencies * mu_hatA,
                                    marginalize=marginalize, nll=True )
         def root_func ( mu ):
