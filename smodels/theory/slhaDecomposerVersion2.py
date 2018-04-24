@@ -126,13 +126,13 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
                 branch1.decayType = 'longlived'
                 branches1 = [branch1]
             
-            #if max(BRs1) < minBR: break  #Stop loop if the largest possible BR1 is already too low
-            
-            #drop BR from list that is too small           
-            for i,br1 in enumerate(BRs1):
-                if br1 < minBR: 
+            #drop BR from list that is too small                     
+            i = 0
+            while i<len(BRs1): 
+                if BRs1[i] < minBR:
                     BRs1.pop(i)
                     branches1.pop(i)
+                else: i += 1                 
             if not BRs1: break
             
             for branch2 in branchListDict[pids[1]]:           
@@ -146,18 +146,17 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
                     branch2.decayType = 'longlived'
                     branches2 = [branch2]
                 
-                #if max(BRs2) < minBR: break  #Stop loop if BR2 is already too low
-                for i,br2 in enumerate(BRs2):
-                    if br2 < minBR: 
+                #if max(BRs2) < minBR: break  #Stop loop if BR2 is already too low                   
+                i = 0
+                while i<len(BRs2): 
+                    if BRs2[i] < minBR:
                         BRs2.pop(i)
                         branches2.pop(i)
+                    else: i += 1                  
                 if not BRs2: break                
                 
                 for i,b1 in enumerate(branches1):
-                    for j,b2 in enumerate(branches2):    
-                        print "\nbranches"
-                        print minBR
-                        print BRs1, BRs2                       
+                    for j,b2 in enumerate(branches2):                         
                         finalBR = BRs1[i]*BRs2[j]                        
                         if type(finalBR) == type(1.*fb):
                             finalBR = finalBR.asNumber()                            
@@ -173,30 +172,14 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
                         newElement.weight = weightList*finalBR
                          
                         newElement.sortBranches()  #Make sure elements are sorted BEFORE adding them   
-
-                        print "\nadd element"
-                        print newElement
-                        print "weight"
-                        print newElement.weight     
-                        print "final states"
-                        for branc in newElement.branches: print branc, branc.decayType               
+            
                         smsTopList.addElement(newElement)                                                 
                      
 
                                                     
     smsTopList.compressElements(doCompress, doInvisible, minmassgap)
     smsTopList._setElementIds()       
-    
-    print "\nsms top list \n"
-    for el in smsTopList.getElements():
-        print "\nelement"
-        print el
-        print "weight"
-        print el.weight
-        print "decaylabels"
-        for branc in el.branches: print branc, branc.decayType
-        
-                       
+                    
     logger.debug("slhaDecomposer done in %.2f s." % (time.time() -t1 ) )
     
     
