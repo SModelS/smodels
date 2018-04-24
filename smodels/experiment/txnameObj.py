@@ -557,14 +557,14 @@ class TxNameData(object):
     def onlyZeroValues ( self ):
         """ check if the map is zeroes only """
         eps = sys.float_info.epsilon
-        negative_values = bool ( sum ( [ x < -eps for x in self.xsec ] ) )
+        negative_values = bool ( sum ( [ x < -eps for x in self.xsecUnitless ] ) )
         if negative_values:
-            for x in self.xsec:
+            for x in self.xsecUnitless:
                 if x < -eps:
                     logger.error ( "negative error in result: %f, %s" % \
                                    ( x, self._id) )
                     sys.exit()
-        if sum(self.xsec) > 0.:
+        if sum(self.xsecUnitless) > 0.:
             return False
         return True
 
@@ -573,15 +573,15 @@ class TxNameData(object):
         if self._V!=None:
             return
         Morig=[]
-        self.xsec = np.ndarray ( shape = (len(values), ) )
+        xsec = np.ndarray ( shape = (len(values), ) )
         self.massdim = np.array(values[0][0]).shape
 
         for ctr,(x,y) in enumerate(values):
-            self.xsec[ctr]=y
+            xsec[ctr]=y
             xp = self.flattenMassArray(x)
             Morig.append( xp )
         self.xsecUnitless = [x.asNumber() if isinstance(x,unum.Unum) else float(x) 
-                             for x in self.xsec]
+                             for x in xsec]
         aM=np.matrix ( Morig )
         MT=aM.T.tolist()
         self.delta_x = np.matrix ( [ sum (x)/len(Morig) for x in MT ] )[0]
@@ -615,26 +615,6 @@ class TxNameData(object):
         MpCut=[]
         for i in Mp:
             MpCut.append(i[:self.dimensionality].tolist() )
-        """ FIXME thats the code that was in the covariance patch,
-            instead of the single line above.
-            if self.dimensionality > 1:
-                MpCut.append(i[:self.dimensionality].tolist() )
-            else:
-                MpCut.append([i[0].tolist(),0.])
-        if self.dimensionality == 1:
-            logger.debug("1-D data found. Extending to a small 2-D band around the line.")
-            MpCut += [[pt[0],pt[1]+0.0001] for pt in MpCut] + [[pt[0],pt[1]-0.0001] for pt in MpCut]
-            self._1dim = True
-            lx=len(self.xsec)
-            newxsec = np.ndarray ( shape=(3*lx,) )
-            for i in range(3):
-                newxsec[ i*lx : (i+1)*lx ] = self.xsec
-            self.xsec = newxsec
-            #self.xsec += self.xsec + self.xsec
-            self.dimensionality = 2
-        else:
-            self._1dim = False
-        """
         if self.dimensionality > 1:
             self.tri = qhull.Delaunay(MpCut)
         else:            
