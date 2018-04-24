@@ -125,7 +125,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
                 BRs1 = [BR1]
                 BR1labels = ['longlived']
             
-            if BRs1[0] < minBR: break  #Stop loop if the largest possible BR1 is already too low            
+            if max(BRs1) < minBR: break  #Stop loop if the largest possible BR1 is already too low            
             for branch2 in branchListDict[pids[1]]:           
             
                 BR2 =  branch2.maxWeight/maxWeight[pids[1]]  #Branching ratio for second branch                
@@ -136,7 +136,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
                     BRs2 = [BR2]
                     BR2labels = ['longlived']
                 
-                if BRs2[0] < minBR: break  #Stop loop if BR2 is already too low
+                if max(BRs2) < minBR: break  #Stop loop if BR2 is already too low
                 
                 finalBRs = [ BR1*BR2 for BR1 in BRs1 for BR2 in BRs2]
                 finalLabels = [ BR1label + '+' +  BR2label for BR1label in BR1labels for BR2label in BR2labels ] 
@@ -145,7 +145,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
                     if type(finalBR) == type(1.*fb):
                         finalBR = finalBR.asNumber()
                     
-                if finalBRs[0] < minBR: continue # Skip elements with xsec below sigcut
+                if max(finalBRs) < minBR: continue # Skip elements with xsec below sigcut
 
                 if len(branch1.BSMparticles) != 1 or len(branch2.BSMparticles) != 1:
                     logger.error("During decomposition the branches should \
