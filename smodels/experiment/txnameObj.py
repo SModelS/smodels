@@ -101,7 +101,6 @@ class TxName(object):
         # Builds up TopologyList with all the elements appearing in constraints
         # and conditions:
         for el in elements:
-            el.sortBranches()
             self._topologyList.addElement(el)
 
     def hasOnlyZeroes ( self ):
