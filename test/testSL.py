@@ -34,10 +34,10 @@ class SLTest(unittest.TestCase):
                   name="CMS-NOTE-2017-001 model" )
         ulComp = UpperLimitComputer ( lumi = 1. / fb, ntoys=2000, cl=.95 )
         ul = ulComp.ulSigma ( m )
-        self.assertAlmostEqual( ul / ( 132.*fb), 1.0, 1 )
+        self.assertAlmostEqual( ul.asNumber(fb) / 132., 1.0, 1 )
         ulProf = ulComp.ulSigma ( m, marginalize=False )
         #print ( "ul,ulprof=", ul,ulProf )
-        self.assertAlmostEqual( ulProf / ( 132.0*fb), 1.0, 1 )
+        self.assertAlmostEqual( ulProf.asNumber(fb) / 132.0, 1.0, 1 )
 
     def createModel(self,n=3):
         import model_90 as m9
@@ -64,11 +64,11 @@ class SLTest(unittest.TestCase):
         t1=time.time()
         #print ( "ul=%s, t=%s" % ( ul, t1-t0 ) )
         ## Nick's profiling code gets for n=3 ul=2135.66
-        self.assertAlmostEqual( ul / ( 2135.66*fb), 1.0, 1 )
+        self.assertAlmostEqual( ul.asNumber(fb) / 2135.66, 1.0, 1 )
         ulProf = ulComp.ulSigma ( m, marginalize=False )
         t2=time.time()
         #print ( "ulProf,t=", ulProf, t2-t1 )
-        self.assertAlmostEqual( ulProf / ( 2135.66*fb), 1.0, 1 )
+        self.assertAlmostEqual( ulProf.asNumber(fb) / 2135.66, 1.0, 1 )
 
     def testModel10(self):
         """ take first 10 SRs of model-90 """
@@ -80,11 +80,11 @@ class SLTest(unittest.TestCase):
         t1=time.time()
         #print ( "ul=%s, t=%s" % ( ul, t1-t0 ) )
         ## Nick's profiling code gets for n=10 ul=357.568
-        self.assertAlmostEqual( ul / ( 357.*fb), 1.0, 1 )
+        self.assertAlmostEqual( ul.asNumber(fb) / 357., 1.0, 1 )
         ulProf = ulComp.ulSigma ( m, marginalize=False )
         t2=time.time()
         #print ( "ulProf,t=", ulProf, t2-t1 )
-        self.assertAlmostEqual( ulProf / ( 350.0*fb), 1.0, 1 )
+        self.assertAlmostEqual( ulProf.asNumber(fb) / 350., 1.0, 1 )
 
     def testModel40(self):
         m = self.createModel ( 40 )
@@ -92,8 +92,8 @@ class SLTest(unittest.TestCase):
         ulComp = UpperLimitComputer ( lumi = 1./fb , ntoys=5000, cl=.95 )
         ul = ulComp.ulSigma ( m )
         ulProf = ulComp.ulSigma ( m, marginalize=False )
-        self.assertAlmostEqual ( ul / (66.0*fb), 1., 1 )
-        self.assertAlmostEqual( ulProf / ( 63.0*fb), 1.0, 1 )
+        self.assertAlmostEqual ( ul.asNumber(fb) / 66., 1., 1 )
+        self.assertAlmostEqual( ulProf.asNumber(fb) / 63., 1.0, 1 )
 
 if __name__ == "__main__":
     unittest.main()
