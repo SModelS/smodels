@@ -576,6 +576,8 @@ class LikelihoodComputer:
                 #vals.append ( reduce(lambda x, y: x*y, poisson) )
             mean = NP.mean ( vals )
             if nll:
+                if mean == 0.:
+                    mean = 1e-100
                 mean = - log ( mean )
             return mean
 
@@ -636,7 +638,10 @@ class LikelihoodComputer:
             # print ( "llhd,maxllhd=",llhd,maxllhd)
 
             chi2=2*(llhd-maxllhd)
-
+            
+            if not NP.isfinite ( chi2 ):
+                logger.error ( "chi2 is not a finite number! %s,%s,%s" % \
+                               (chi2, llhd,maxllhd) )
             # Return the test statistic -2log(H0/H1)
             return chi2
 
