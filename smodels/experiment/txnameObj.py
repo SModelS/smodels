@@ -62,7 +62,7 @@ class TxName(object):
         if not "txName" in txdata: raise TypeError
         if not 'upperLimits' in txdata and not 'efficiencyMap' in txdata:
             raise TypeError
-        content = concatenateLines (  txdata.split("\n") )
+        content = concatenateLines(  txdata.split("\n") )
 
         #Get tags in info file:
         tags = [line.split(':', 1)[0].strip() for line in content]
@@ -113,7 +113,6 @@ class TxName(object):
         # Builds up TopologyList with all the elements appearing in constraints
         # and conditions:
         for el in elements:
-            el.sortBranches()
             self._topologyList.addElement(el)
 
 
@@ -145,6 +144,7 @@ class TxName(object):
                           [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         :param expected: query self.txnameDataExp
         """
+        
         if not expected:
             return self.txnameData.getValueFor( massarray )
         else:
@@ -227,7 +227,7 @@ class TxName(object):
         :param element: Element object
         :return: efficiency (float)
         """
-
+        
         #Check if the element appears in Txname:
         val = self.txnameData.getValueFor(mass)
         if isinstance(val,unum.Unum):
@@ -362,7 +362,59 @@ class TxNameData(object):
                                %(str(value),str(stdUnits)))
         else:
             return value
+        
+    def getDataShape(self,value):
+        """
+        Stores the data format (mass shape) and store it for future use.
+        If there are wildcards (mass or branch = None), store their positions.
+        
+        :param value: list of data points
+        """
 
+        if isinstance(value,list):
+            return [self.getDataShape(m) for m in value]
+        elif isinstance(value,(float,int,unum.Unum)):
+            return type(value)
+        else:
+            return value
+
+    def formatInput(self,value,shapeArray):
+        """
+        Format value according to the shape in shapeArray.
+        If shapeArray contains entries = *, the corresponding entries
+        in value will be ignored.
+        
+        :param value: Array to be formatted (e.g. [[200.,100.],[200.,100.]])
+        :param shapeArray: Array with format info (e.f. ['*',[float,float]])
+        
+        :return: formatted array [[200.,100.]]
+        
+        """
+
+        if shapeArray == '*':
+            return None
+        elif isinstance(value,list):
+            if len(shapeArray) != len(value): 
+                raise SModelSError("Input value and data shape mismatch (%s,%s)" 
+                                   %(len(shapeArray),len(value)))
+            return [self.formatInput(xi,shapeArray[i]) for i,xi in enumerate(value) 
+                    if not self.formatInput(xi,shapeArray[i]) is None]
+        else:
+            return value
+        
+    def removeWildCards(self,value):
+        """
+        Remove all entries = '*' from value.
+        
+        :param value:  usually a list containing floats and '*' (e.g. [[200.,'*'],'*'],0.4],..)
+        """
+        
+        if value == "*":
+            return None
+        elif isinstance(value,list):
+            return [self.removeWildCards(v) for v in value if not self.removeWildCards(v) is None]
+        else:
+            return value
         
     def loadData(self,value):
         """
@@ -378,8 +430,10 @@ class TxNameData(object):
         else:
             val = value
             
-        self.units = self.getUnits(val)[0] #Store standard units        
+        self.units = self.getUnits(val)[0] #Store standard units
+        self.dataShape = self.getDataShape(val[0][0]) #Store the data (mass) format (useful if there are wildcards)        
         self.value = self.removeUnits(val) #Remove units and store the normalization units
+        self.value = self.removeWildCards(self.value)
 
 
         if len(self.value) < 1 or len(self.value[0]) < 2:
@@ -412,6 +466,7 @@ class TxNameData(object):
         """
         
         porig = self.removeUnits(massarray)
+        porig = self.formatInput(porig,self.dataShape) #Remove entries which match wildcards
         porig = self.flattenArray(porig) ## flatten        
         self.massarray = massarray ## only for bookkeeping and better error msgs
         
@@ -440,7 +495,7 @@ class TxNameData(object):
     
     def flattenArray(self, objList):
         """
-        Flatten any nested list to a 1D list
+        Flatten any nested list to a 1D list.
         
         :param objList: Any list or nested list of objects (e.g. [[[100.,100.],1.],[[200.,200.],2.],..]
         
@@ -455,7 +510,6 @@ class TxNameData(object):
             else:
                 ret.append(obj)
         return ret        
-      
 
     def interpolate(self, point, fill_value=np.nan):
         
@@ -550,6 +604,7 @@ class TxNameData(object):
         """
         
         porig = self.removeUnits(massarray)
+        porig = self.formatInput(porig,self.dataShape) #Remove entries which match wildcards
         porig = self.flattenArray(porig)
          
         p = ((np.matrix(porig)[0] - self.delta_x)).tolist()[0]

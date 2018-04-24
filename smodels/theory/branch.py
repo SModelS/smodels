@@ -6,8 +6,8 @@
         
 """
 
-from smodels.theory.particleNames import simParticles, elementsInStr, getFinalStateLabel
-from smodels.tools.physicsUnits import fb, MeV
+from smodels.theory.particleNames import simParticles, elementsInStr, getFinalStateLabel, StrWildcard
+from smodels.tools.physicsUnits import fb
 from smodels.particles import rEven, ptcDic, finalStates
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
@@ -55,11 +55,13 @@ class Branch(object):
                 for vertex in vertices:
                     ptcs = vertex[1:-1].split(',')
                     # Syntax check:
-                    for ptc in ptcs:
-                        if not ptc in rEven.values() \
-                                and not ptc in ptcDic:
-                            logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
-                            raise SModelSError()
+                    for i,ptc in enumerate(ptcs):
+                        if ptc == "*":
+                            ptc = StrWildcard()
+                            ptcs[i] = ptc
+                        if not ptc in list(rEven.values()) \
+                                and not ptc in list(ptcDic.keys()):
+                                raise SModelSError("Unknown particle. Add " + ptc + " to smodels/particle.py")
                     self.particles.append(ptcs)
             self.vertnumb = len(self.particles)
             self.vertparts = [len(v) for v in self.particles]
@@ -86,16 +88,18 @@ class Branch(object):
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
         
-        # print ( type ( self.masses[0] ) )
-        if self.vertnumb != other.vertnumb:
+        if not isinstance(other,Branch):
+            return -1
+
+        if not self.vertnumb == other.vertnumb:
             comp = self.vertnumb > other.vertnumb
             if comp: return 1
             else: return -1
-        elif self.vertparts != other.vertparts:
+        elif not self.vertparts == other.vertparts:
             comp = self.vertparts > other.vertparts
             if comp: return 1
             else: return -1
-        elif self.particles != other.particles:
+        elif not self.particles == other.particles:
             comp = self.particles > other.particles
             if comp: return 1
             else: return -1
@@ -103,7 +107,7 @@ class Branch(object):
             comp = self.masses > other.masses
             if comp: return 1
             else: return -1
-        elif self.finalState != other.finalState:
+        elif not self.finalState == other.finalState:
             comp = self.finalState > other.finalState
             if comp: return 1
             else: return -1            
@@ -137,9 +141,10 @@ class Branch(object):
         """
         
         if finalState:
-            if not finalState in finalStates:
-                logger.error("Final state %s has not been defined. Add it to particles.py." %finalState)
-                raise SModelSError
+            if finalState == '*':
+                finalState = StrWildcard()
+            if not finalState in list(finalStates.keys()):
+                raise SModelSError("Final state %s has not been defined. Add it to particles.py." %finalState)
             else:
                 self.finalState = finalState
         #If PIDs have been defined, use it:     
@@ -322,7 +327,8 @@ class Branch(object):
 
 class BranchWildcard(Branch):
     """
-    A branch wildcard class. It will return True when compared to any other branch object.
+    A branch wildcard class. It will return True when compared to any other branch object
+    with the same final state.
     """
     
     def __init__(self):
@@ -332,19 +338,19 @@ class BranchWildcard(Branch):
         self.PIDs = ListWildcard()
         self.vertnumb = IntWildcard()
         self.vertparts = ListWildcard()
-        self.finalState = ListWildcard()        
+        self.finalState = StrWildcard()        
         
     def __str__(self):
         return '[*]'
-
-    def __cmp__(self,other):
-        if isinstance(other,Branch):
-            return 0
-        else:
-            return -1
+    
+    def __repr__(self):
+        return self.__str__()
 
     def __eq__(self,other):
         return self.__cmp__(other) == 0
+
+    def __ne__(self,other):
+        return self.__cmp__(other) != 0
     
     def setInfo(self):
         """
@@ -365,7 +371,10 @@ class IntWildcard(int):
         int.__init__(self)
         
     def __str__(self):
-        return '*'    
+        return '*'   
+    
+    def __repr__(self):
+        return self.__str__()
 
     def __cmp__(self,other):
         if isinstance(other,int):
@@ -374,7 +383,11 @@ class IntWildcard(int):
             return -1
 
     def __eq__(self,other):
-        return self.__cmp__(other) == 0          
+        return self.__cmp__(other) == 0 
+    
+    def __ne__(self,other):
+        return self.__cmp__(other) != 0
+             
     
 class ListWildcard(list):    
     """
@@ -387,6 +400,9 @@ class ListWildcard(list):
     def __str__(self):
         return '[*]'    
 
+    def __repr__(self):
+        return self.__str__()
+
     def __cmp__(self,other):
         if isinstance(other,list):
             return 0
@@ -395,6 +411,10 @@ class ListWildcard(list):
 
     def __eq__(self,other):
         return self.__cmp__(other) == 0  
+    
+    def __ne__(self,other):
+        return self.__cmp__(other) != 0
+    
 
 def decayBranches(branchList, brDictionary, massDictionary,
                   sigcut=0. *fb):

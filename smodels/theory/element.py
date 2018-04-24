@@ -88,7 +88,10 @@ class Element(object):
         :param other:  element to be compared (Element object)
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
-        
+
+        if not isinstance(other,Element):
+            return -1
+                
         #Compare branches:
         if self.branches != other.branches:            
             comp = self.branches > other.branches
