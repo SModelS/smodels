@@ -40,7 +40,7 @@ has undergone significant structural changes. Version 1.1 comes
 with many new features. The major novelties of this release are
 as follows:
 
-New in Version 1.1.2:
+New in Version 1.1.3:
 ^^^^^^^^^^^^^^^^^^^^^
 
 * Fixed lastUpdate bug
@@ -52,6 +52,10 @@ New in Version 1.1.2:
 * path to particles.py can now be specified in parameters.ini
 * support for covariance matrices and combination of signal regions
 
+New in Version 1.1.2:
+^^^^^^^^^^^^^^^^^^^^^
+
+* Database update only, the code is the same as v1.1.1
 
 New in Version 1.1.1:
 ^^^^^^^^^^^^^^^^^^^^^
