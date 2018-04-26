@@ -12,6 +12,8 @@ from math import exp
 from smodels.particleDefinitions import SMpdgs, BSMList, BSMpdgs
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import GeV, MeV, m, mm, fm
+from smodels.theory.particleClass import particleInList
+from smodels.SMparticleDefinitions import jetList, LList
 
 
 def updateParticles(slhafile, BSMList):
@@ -134,45 +136,85 @@ def addPromptAndDisplaced(branch,BR):
     hc = 197.327*MeV*fm  #hbar * c
     
     F = []
-    labels = []
-    
     for particle in branch.BSMparticles[0]:
         if particle.isStable(): continue
         F_long = exp( -1*particle.width * l_outer /(gb_outer*hc) )    
         F_prompt = 1. - exp( -1*particle.width * l_inner /(gb_inner*hc) )         
         F_displaced = 1. - F_prompt - F_long
-        F.append([F_prompt,F_displaced])
-        #labels.append(['prompt','displaced'])
+        # allow for combinations of decays and a long lived particle only if the last BSM particle is the long lived one
+        if F_long and particle == branch.BSMparticles[0][-1]: F.append([F_long])
+        else: F.append([F_prompt,F_displaced])
         
         BR *= 1/(1-F_long)
-        
     
-    # alternatively call the whole branch prompt or displaced when all decays within this branch are, discard mixed decays
+    # call the whole branch 
+    # .) prompt when all decays within this branch are
+    # .) longlived if at least one is
+    # .) displaced if at least one is and no longlived
+    # discard others
+    
     if len(F) > 1: 
-        promptValue = 1
-        displacedValue = 1
-        for i,f in enumerate(F):
-            promptValue *= f[0]
-            displacedValue *= f[1]
-            
-        F = [promptValue, displacedValue]
-
+        # last BSM particle is long lived 
+        if len(F[-1]) == 1: 
+            branch.decayType = 'longlived'
+            branches = [branch]            
+            longValue = F[-1][0]           
+            F.pop(-1)
+            Plist = [list(P) for P in itertools.product(*F)]
+            F = []        
+            for P in Plist:
+                value = P[0]
+                for i in range(len(P)-1):
+                    value *= P[i+1]
+                F.append(value)
+            longValue *= sum(F)           
+            BRs = [BR*longValue] 
         
-    elif len(F)==1: 
+        else:    
+            promptValue = F[0][0]            
+            for i in range(len(F)-1):
+                promptValue *= F[i+1][0]                                            
+            
+            Plist = [list(P) for P in itertools.product(*F)]
+            Plist.pop(0)
+            displacedP = []        
+            for P in Plist:
+                value = P[0]
+                for i in range(len(P)-1):
+                    value *= P[i+1]
+                displacedP.append(value)
+            displacedValue = sum(displacedP)
+            F = [promptValue, displacedValue]
+
+            BRs, branches = labelPromptDisplaced(branch, BR, F)          
+        
+    elif len(F)==1:         
         F = F[0]
+        BRs, branches = labelPromptDisplaced(branch, BR, F)       
     else: logger.warning("No probabilities were calculated for the decay(s) in s%" %(branch))
-    
-    promptBranch = branch.copy()
-    displacedBranch = branch.copy()    
-    promptBranch.decayType = 'prompt'
-    displacedBranch.decayType = 'displaced'
-    branches = [promptBranch, displacedBranch]    
-    BRs = [f*BR for f in F]    
-    
+       
     return BRs, branches
 
 
-        
+def labelPromptDisplaced(branch, BR, F):
+    """
+    Label displaced decays and reweights the BRs
+    :param branch: original branch
+    :param BR: BR of this branch
+    :param F: probabilities for the different decays to rescale the BRs
+    :return: reweightes BRs and the branches with correct labels  
+    """
+    promptBranch = branch.copy()
+    promptBranch.decayType = 'prompt'
     
+    displacedBranch = branch.copy()      
+    if any(particleInList(particle,[jetList]) for particle in branch.getBranchParticles() ):
+        displacedBranch.decayType = 'displacedJet'
+    elif any(particleInList(particle,[LList]) for particle in branch.getBranchParticles() ):           
+        displacedBranch.decayType = 'displacedLepton'
+    else: displacedBranch.decayType = 'displaced(neither jet nor lepton)'
+    branches = [promptBranch, displacedBranch]    
+    BRs = [f*BR for f in F]    
+    return BRs, branches
         
 
