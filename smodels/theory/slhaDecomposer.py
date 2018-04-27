@@ -233,8 +233,8 @@ def _getPromptDecays(slhafile,brDic):
     massDict = dict(res.blocks['MASS'].items())
         
     for pid in brDic:
-        width = abs(decays[abs(pid)].totalwidth)*GeV
-        mass = massDict[abs(pid)]*GeV
+        width = abs(decays[abs(pid)].totalwidth)
+        mass = massDict[abs(pid)]
         f = fCalc(pdg=pid,width=width,mass=mass)
         Fprompt,Flong = f['Fprompt'],f['Flong']
         for decay in brDic[pid]:
