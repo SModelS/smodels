@@ -4,7 +4,7 @@
 .. module:: runtime
     :synopsis: Tools to gather info about runtime enviroment,
                ( nCPUs() ), or obtain file type ( filetype() ). Pointer
-               to model file is also kept here.
+               to model file and Flong calculator are also kept here. 
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
@@ -12,6 +12,7 @@
 
 ## place to keep the pointer to the model file
 modelFile="smodels.share.default_particles"
+FlongCalc="smodels.tools.flongCalc.FlongCalculator"
 
 def filetype ( filename ):
     """ obtain information about the filetype of an input file,
