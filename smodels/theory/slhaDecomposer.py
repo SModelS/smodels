@@ -18,6 +18,7 @@ from smodels.tools.physicsUnits import fb, GeV
 import smodels.particles
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
+from smodels.tools.flongCalc import FlongCalculator as fCalc #This method can be replaced by tools.runtime
 
 
 
@@ -214,19 +215,6 @@ def _getPromptDecays(slhafile,brDic):
     :return: Dictionary = {pid : decay}
     """
 
-    from smodels.tools.runtime import FlongPath,FlongMethod
-    import imp,os
-    
-    try:
-        mod = imp.load_source(os.path.basename(FlongPath).replace('.py',''),FlongPath)        
-        fCalc = getattr(mod,FlongMethod)
-        logger.debug("Flong calculator: %s from %s" %(FlongMethod,FlongPath))
-    except:
-        from smodels.tools.flongCalc import FlongCalculator as fCalc 
-        logger.warning("Could not load Flong calculator from %s. Using default." %FlongPath)    
-    
-    
-    
     #Get the widths:
     res = pyslha.readSLHAFile(slhafile)
     decays = res.decays

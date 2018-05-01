@@ -10,9 +10,10 @@
 
 """
 
-## place to keep the pointer to the calculator
-FlongPath="smodels/tools/flongCalc.py"
-FlongMethod="FlongCalculator"
+from smodels.installation import installDirectory
+from smodels.tools.smodelsLogging import logger
+import imp,os
+
 
 def filetype ( filename ):
     """ obtain information about the filetype of an input file,
@@ -59,6 +60,33 @@ def nCPUs():
     except ImportError as e:
         pass
     return None
+
+def setFlongCalc(path=os.path.abspath("%ssmodels/tools/flongCalc.py" %installDirectory()),
+             method="FlongCalculator"):
+    """
+    Define/replace the function used by the SLHA decomposer to compute
+    the fraction of long-lived and prompt decays.
+    It can be used to apply (external) user-defined function for
+    the calculation.  
+ 
+    :param method: Name of the function.
+    :param path: Path to the .py file defining the function.
+    """
+     
+    from smodels.theory import slhaDecomposer
+     
+    try:
+        mod = imp.load_source(os.path.basename(path).replace('.py',''),path)        
+        fCalc = getattr(mod,method)
+        logger.debug("Using Flong calculator: %s from %s" %(method,path))
+    except:
+        from smodels.tools.flongCalc import FlongCalculator as fCalc 
+        logger.warning("Could not load Flong calculator %s from %s. Using default." %(method,path))
+     
+    slhaDecomposer.fCalc = fCalc
+    
+    
+    
 
 if __name__ == "__main__":
     print ( "This machine has %d CPUs" % nCPUs() )
