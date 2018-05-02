@@ -149,7 +149,7 @@ def writeIgnoreMessage ( keys, rEven, rOdd ):
             msg += "%s, " % rEven[pid]
             continue         
     if len(msg)>0:
-            logger.info ( "Ignoring %s decays" % msg[:-2] )
+            logger.debug ( "Ignoring %s decays" % msg[:-2] )
 
 def _getDictionariesFromSLHA(slhafile):
     """
