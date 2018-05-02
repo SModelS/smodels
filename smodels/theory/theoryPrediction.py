@@ -304,7 +304,9 @@ def _mergePredictions ( preds, combinedUL, combinedEUL ):
     eff = eff / wtot
     # print ( "combinedUL=",combinedUL )
     ret.xsection.value = ret.xsection.value / ret.effectiveEff * eff ## / preds[0].effectiveEff
-    ret.combinedUL = combinedUL * eff
+    ret.combinedUL = None
+    if type(combinedUL) != type(None):
+        ret.combinedUL = combinedUL * eff
     ret.combinedExpectedUL = None
     if combinedEUL is not None:
         ret.combinedExpectedUL = combinedEUL * eff
