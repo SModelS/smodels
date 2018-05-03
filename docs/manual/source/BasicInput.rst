@@ -75,7 +75,7 @@ and the QCD order. *If the input file contains two cross sections for the same p
 the highest order will be used.*
 
 * **Reading of cross sections from an input file is
-  implemented by the** `getXsecFromSLHAFile <../../../documentation/build/html/theory.html#theory.crossSection.getXsecFromSLHAFile>`_ **method** 
+  implemented by the** `getXsecFromSLHAFile <theory.html#theory.crossSection.getXsecFromSLHAFile>`_ **method** 
 
   
 .. [*] SModelS can easily be used for non-SUSY models as long as they present a  Z\ :sub:`2`-type symmetry.

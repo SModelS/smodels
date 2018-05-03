@@ -74,7 +74,7 @@ the available processes in `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllw
 (gluino and squark production).
 When reading the input file, SModelS will then use only the highest order cross sections available for each process.
 
-* **The cross section calculation is implemented by the** `computeXSec function <../../../documentation/build/html/tools.html#tools.xsecComputer.computeXSec>`_
+* **The cross section calculation is implemented by the** `computeXSec function <tools.html#tools.xsecComputer.computeXSec>`_
 
 
 .. _fileChecks:
@@ -85,7 +85,7 @@ Input File Checks
 As discussed in :doc:`Basic Input <BasicInput>`,
 SModelS accepts both SLHA and LHE input files. It can be convenient to perform certain sanity checks on these files as described below.
 
-* **The input file checks are implemented by the** `FileStatus class <../../../documentation/build/html/tools.html#tools.ioObjects.FileStatus>`_
+* **The input file checks are implemented by the** `FileStatus class <tools.html#tools.ioObjects.FileStatus>`_
 
 .. _lheChecks:
 
@@ -234,7 +234,7 @@ A simple example is given below:
 Further Python example codes using the functionalities of the browser
 can be found in :ref:`Howto's <Examples>`.
 
-* **The Database browser tool is implemented by the**  `Browser class <../../../documentation/build/html/tools.html#tools.databaseBrowser.Browser>`_
+* **The Database browser tool is implemented by the**  `Browser class <tools.html#tools.databaseBrowser.Browser>`_
 
 .. _permissionsFixer:
 

@@ -48,14 +48,14 @@ ratio :math:`\mbox{(theory prediction)}/\mbox{(expected limit)}`.
 Thus each |EMr| will have a single theory prediction/upper limit, corresponding to the best |dataset|
 (based on the expected limit).
 If the user wants to have access to all the |datasets|, the default
-behavior can be disabled by setting *useBestDataset=False* in `theoryPredictionsFor <../../../documentation/build/html/theory.html#theory.theoryPrediction.theoryPredictionsFor>`_ (see :ref:`Example.py <exampleCode>`).
+behavior can be disabled by setting *useBestDataset=False* in `theoryPredictionsFor <theory.html#theory.theoryPrediction.theoryPredictionsFor>`_ (see :ref:`Example.py <exampleCode>`).
 
 
 The procedure described above can be applied to all the |ExpRess| in the database, resulting
 in a list of theory predictions and upper limits for each |ExpRes|. A model can then be considered
 excluded by the experimental results if, for one or more predictions, we have *theory prediction* :math:`>` *upper limit* [*]_.
 
-* **The upper limits for a given**  |ULr| **or** |EMr| **can be obtained using the** `getUpperLimitFor  method <../../../documentation/build/html/experiment.html#experiment.expResultObj.ExpResult.getUpperLimitFor>`_
+* **The upper limits for a given**  |ULr| **or** |EMr| **can be obtained using the** `getUpperLimitFor  method <experiment.html#experiment.expResultObj.ExpResult.getUpperLimitFor>`_
 
 .. _likelihoodCalc:
 
@@ -113,8 +113,8 @@ continuous regions of parameter space that give roughly the same phenomenology.
 
 
 
-* **The** :math:`\chi^2` **for a given** |EMr| **is computed using the** `chi2  method <../../../documentation/build/html/tools.html#tools.statistics.chi2>`_
-* **The likelihood for a given** |EMr| **is computed using the** `likelihood  method <../../../documentation/build/html/tools.html#tools.statistics.likelihood>`_
+* **The** :math:`\chi^2` **for a given** |EMr| **is computed using the** `chi2  method <tools.html#tools.SimplifiedLikelihoods.LikelihoodComputer.chi2>`_
+* **The likelihood for a given** |EMr| **is computed using the** `likelihood  method <tools.html#tools.SimplifiedLikelihoods.LikelihoodComputer.likelihood>`_
 
 
 .. [*] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model

@@ -5,6 +5,24 @@
 SModelS Code Documentation
 ==========================
 
-**Detailed documentation about the code structure can be found** `here <../../../documentation/build/html/index.html>`_
+**These pages constitute the SModelS code documentation.**
 
+
+Contents
+--------
+
+.. toctree::
+   :maxdepth: 2
+
+   theory
+   experiment
+   tools
+
+
+Indices and tables
+------------------
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
 

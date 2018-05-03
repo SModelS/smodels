@@ -20,6 +20,11 @@ import time
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('../../../'))
+sys.path.insert(0, os.path.abspath('../../../smodels/'))
+sys.path.insert(0, os.path.abspath('../../../smodels/theory/'))
+sys.path.insert(0, os.path.abspath('../../../smodels/experiment/'))
+sys.path.insert(0, os.path.abspath('../smodels/tools/'))
+
 
 from smodels.installation import authors
 from smodels.installation import version as Version
@@ -268,4 +273,4 @@ texinfo_documents = [
 nitpicky = True
 
 #Run make whenever sphinx is built:
-os.system("cd .. && make copy_files recipes RstFilesFromHelp")
+os.system("cd .. && make update_code copy_files recipes RstFilesFromHelp")
