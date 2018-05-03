@@ -164,7 +164,7 @@ class Browser(object):
             used for efficiencyMap results." % (expid))
             return None
 
-        return expres.getEfficiencyFor ( dataset, txname, massarray )
+        return expres.getEfficiencyFor(txname=txname, mass=massarray, dataset=dataset)
 
     def getULFor(self,expid,txname,massarray, expected=False ):
         """
