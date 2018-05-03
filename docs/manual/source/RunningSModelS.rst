@@ -274,15 +274,15 @@ Below we go step-by-step through this example code:
 
 * |Decompose| *model*. Depending on the type
   of input format, choose either
-  the `slhaDecomposer.decompose <../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose>`_ or
-  `lheDecomposer.decompose <../../../documentation/build/html/theory.html#theory.slhaDecomposer.decompose>`_ method. The **doCompress** and **doInvisible** options turn the |mass compression| and |invisible compression| on/off.
+  the `slhaDecomposer.decompose <theory.html#theory.slhaDecomposer.decompose>`_ or
+  `lheDecomposer.decompose <theory.html#theory.slhaDecomposer.decompose>`_ method. The **doCompress** and **doInvisible** options turn the |mass compression| and |invisible compression| on/off.
 
 .. literalinclude:: /examples/Example.py
    :lines: 41-45
 
 * *Access basic information* from decomposition, using the
-  `topology list <../../../documentation/build/html/theory.html#theory.topology.TopologyList>`_
-  and `topology  <../../../documentation/build/html/theory.html#theory.topology.Topology>`_ objects:
+  `topology list <theory.html#theory.topology.TopologyList>`_
+  and `topology  <theory.html#theory.topology.Topology>`_ objects:
 
 .. literalinclude:: /examples/Example.py
    :lines: 48-60
@@ -299,7 +299,7 @@ Below we go step-by-step through this example code:
 .. literalinclude:: /examples/Example.py
    :lines: 64
 
-Alternatively, the `getExpResults  <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database.getExpResults>`_ method
+Alternatively, the `getExpResults  <experiment.html#experiment.databaseObj.Database.getExpResults>`_ method
 can take as arguments specific results to be loaded.
 
 * *Print basic information about the results loaded*.
@@ -316,7 +316,7 @@ can take as arguments specific results to be loaded.
 
 * *Compute the* |theory predictions| for each |expres|.
   The output is a list of
-  `theory prediction objects <../../../documentation/build/html/theory.html#theory.theoryPrediction.TheoryPrediction>`_
+  `theory prediction objects <theory.html#theory.theoryPrediction.TheoryPrediction>`_
   (for each |expres|):
 
 .. literalinclude:: /examples/Example.py

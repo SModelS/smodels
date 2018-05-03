@@ -22,7 +22,7 @@
 Database Definitions
 ====================
 
-The so-called `experiment module <../../../documentation/build/html/experiment.html#experiment>`_ 
+The so-called `experiment module <experiment.html#experiment>`_ 
 contains the basic tools necessary for handling the database of experimental results.
 The SModelS database collects experimental
 results of SUSY searches from both ATLAS and CMS, which are used to compute the
@@ -75,7 +75,7 @@ Each publication or conference note can be included in the database
 as an :ref:`Experimental Result<ExpResult>`. Hence, the database is simply a collection of experimental results. 
 
 
-* **The Database is described by the** `Database Class <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
+* **The Database is described by the** `Database Class <experiment.html#experiment.databaseObj.Database>`_
 
 .. _ExpResult:
 
@@ -89,7 +89,7 @@ version allows for two possible types of experimental results: one containing
 upper limit maps (|UL|)
 and one containing efficiency maps (|EM|).
 
-* **Experimental Results are described by the** `ExpResult Class <../../../documentation/build/html/experiment.html#experiment.expResultObj.ExpResult>`_
+* **Experimental Results are described by the** `ExpResult Class <experiment.html#experiment.expResultObj.ExpResult>`_
 
 .. _ULtype:
 
@@ -262,7 +262,7 @@ limit, etc.
 In the folder structure shown in :ref:`database scheme <databaseScheme>`, the upper limit maps and efficiency maps
 for each |element| (or sum of |elements|) are stored in files labeled accoring to the :ref:`TxName convention <TxName>`.
 
-* **Data Sets are described by the** `DataSet Class <../../../documentation/build/html/experiment.html#experiment.datasetObj.DataSet>`_
+* **Data Sets are described by the** `DataSet Class <experiment.html#experiment.datasetObj.DataSet>`_
 
 
    
@@ -282,7 +282,7 @@ the constraint in the :ref:`example above <constraintplot>` is *TSlepSlep*.
 A complete list of TxNames can be found `here <http://smodels.hephy.at/wiki/SmsDictionary>`_.
 
 
-* **Upper limit and efficiency maps are described by the** `TxName Class <../../../documentation/build/html/experiment.html#experiment.txnameObj.TxName>`_
+* **Upper limit and efficiency maps are described by the** `TxName Class <experiment.html#experiment.txnameObj.TxName>`_
 
  
 *More details about the database folder structure and object
