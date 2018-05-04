@@ -14,3 +14,6 @@ sys.path.insert(0,"../")
 from smodels.experiment.databaseObj import Database
 database = Database ( "./database/db%d0.pcl" % int ( sys.version[0] ), \
                       discard_zeroes = False  )
+
+if __name__ == "__main__":
+    print ( database )
