@@ -6,6 +6,7 @@
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+.. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>
 
 """
 
@@ -18,6 +19,7 @@ from smodels.theory.branch import Branch, decayBranches
 from smodels.tools.physicsUnits import fb, GeV
 from smodels.particleDefinitions import BSMList, BSMpdgs
 from smodels.theory.particleNames import getObjectFromPdg
+from smodels.theory.updateParticles import addPromptAndDisplaced
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -63,7 +65,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     # of sqrtS)
     maxWeight = {}
     for pid in xSectionList.getPIDs():
-        maxWeight[pid] = xSectionList.getXsecsFor(pid).getMaxXsec()    
+        maxWeight[pid] = xSectionList.getXsecsFor(pid).getMaxXsec()   
 
     # Generate dictionary, where keys are the PIDs and values 
     # are the list of cross sections for the PID pair (for performance)
@@ -79,10 +81,10 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
         branchList[-1].BSMparticles = [[getObjectFromPdg(pid)]] # [[pid]]
         if not pid in BSMpdgs:
             logger.error ( "pid %d does not appear in BSMList" % pid )
-        branchList[-1].maxWeight = maxWeight[pid]
+        branchList[-1].maxWeight = maxWeight[pid]        
 
-    # Generate final branches (after all R-odd particles have decayed)   
-
+    # Generate final branches (after all R-odd particles have decayed)         
+    
     finalBranchList = decayBranches(branchList, sigcut)
 
     # Generate dictionary, where keys are the PIDs and values are the list of branches for the PID (for performance)
@@ -112,38 +114,74 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     for pids in xSectionList.getPIDpairs():
         weightList = xSectionListDict[pids]
         minBR = (sigcut/weightList.getMaxXsec()).asNumber()
+
         if minBR > 1.: continue
         for branch1 in branchListDict[pids[0]]:
-            BR1 = branch1.maxWeight/maxWeight[pids[0]]  #Branching ratio for first branch            
-            if BR1 < minBR: break  #Stop loop if BR1 is already too low            
+            BR1 =  branch1.maxWeight/maxWeight[pids[0]]  #Branching ratio for first branch            
+            
+            # add BRs as a list consisting of BR for prompt and a displaced decay
+            if branch1.particles: BRs1, branches1 = addPromptAndDisplaced(branch1,BR1)      
+            else: 
+                BRs1 = [BR1]
+                branch1.decayType = 'longlived'
+                branches1 = [branch1]
+            
+            #drop BR from list that is too small                       
+            i = 0
+            while i<len(BRs1): 
+                if BRs1[i] < minBR:
+                    BRs1.pop(i)
+                    branches1.pop(i)
+                else: i += 1                  
+            if not BRs1: break
+            
             for branch2 in branchListDict[pids[1]]:           
             
-                BR2 = branch2.maxWeight/maxWeight[pids[1]]  #Branching ratio for second branch
-                if BR2 < minBR: break  #Stop loop if BR2 is already too low
+                BR2 =  branch2.maxWeight/maxWeight[pids[1]]  #Branching ratio for second branch                
+                        
                 
-                finalBR = BR1*BR2     
-        
-                if type(finalBR) == type(1.*fb):
-                    finalBR = finalBR.asNumber()
-                if finalBR < minBR: continue # Skip elements with xsec below sigcut
-
-                if len(branch1.BSMparticles) != 1 or len(branch2.BSMparticles) != 1:
-                    logger.error("During decomposition the branches should \
-                            not have multiple PID lists!")
-                    return False    
-
-                newElement = element.Element([branch1, branch2])
+                if branch2.particles: BRs2, branches2 = addPromptAndDisplaced(branch2,BR2)
+                else: 
+                    BRs2 = [BR2]
+                    branch2.decayType = 'longlived'
+                    branches2 = [branch2]
+              
+                i = 0
+                while i<len(BRs2): 
+                    if BRs2[i] < minBR:
+                        BRs2.pop(i)
+                        branches2.pop(i)
+                    else: i += 1                 
+                if not BRs2: break                
                 
-                newElement.weight = weightList*finalBR
+                for i,b1 in enumerate(branches1):
+                    for j,b2 in enumerate(branches2):                         
+                        finalBR = BRs1[i]*BRs2[j]                        
+                        if type(finalBR) == type(1.*fb):
+                            finalBR = finalBR.asNumber()                            
+                        if finalBR < minBR: continue
+                        
+                
+                        if len(b1.BSMparticles) != 1 or len(b2.BSMparticles) != 1:
+                            logger.error("During decomposition the branches should \
+                                    not have multiple PID lists!")
+                            return False                         
+                        
+                        newElement = element.Element([b1, b2])
+                        newElement.weight = weightList*finalBR
+                         
+                        newElement.sortBranches()  #Make sure elements are sorted BEFORE adding them   
+            
+                        smsTopList.addElement(newElement)                                                 
+                     
 
-                newElement.sortBranches()  #Make sure elements are sorted BEFORE adding them              
-                smsTopList.addElement(newElement)            
-                    
+                                                    
     smsTopList.compressElements(doCompress, doInvisible, minmassgap)
-    smsTopList._setElementIds()             
-       
-
+    smsTopList._setElementIds()                   
+                       
     logger.debug("slhaDecomposer done in %.2f s." % (time.time() -t1 ) )
+    
+    
     return smsTopList
 
 

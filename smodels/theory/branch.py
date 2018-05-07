@@ -3,6 +3,7 @@
    :synopsis: Module holding the branch class and methods.
         
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
+.. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>
         
 """
 
@@ -38,6 +39,7 @@ class Branch(object):
         
         self.particles = []
         self.BSMparticles = []
+        self.decayType = None
         
         self.maxWeight = None
         self.vertnumb = None
@@ -88,7 +90,7 @@ class Branch(object):
         :param other:  branch to be compared (Branch object)
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
-        
+                   
         if self.vertnumb != other.vertnumb:
             comp = self.vertnumb > other.vertnumb
             if comp: return 1
@@ -107,8 +109,12 @@ class Branch(object):
                 if compm: return 1
                 else: return -1
                 
-            else:
-                return 0  #Branches are equal                             
+            elif self.decayType != other.decayType:
+                comp = self.decayType > other.decayType
+                if comp: return 1
+                else: return -1 
+           
+            else: return 0  #Branches are equal                             
 
 
     def sortParticles(self):
@@ -129,6 +135,13 @@ class Branch(object):
         self.vertnumb = len(self.particles)
         self.vertparts = [len(v) for v in self.particles]
 
+    def getBranchParticles(self):
+        """
+        List of final state particles in this branch, ignoring the bracket notation
+        :return: list of particle objects
+        """
+        particles = [ particle for particleList in self.particles for particle in particleList ]
+        return particles
     
     def particlesMatch(self, other):
         """
@@ -178,6 +191,7 @@ class Branch(object):
         newbranch = Branch()
         newbranch.particles = self.particles[:]
         newbranch.BSMparticles = []
+        newbranch.decayType = self.decayType
         self.setInfo()
         newbranch.vertnumb = self.vertnumb
         newbranch.vertparts = self.vertparts[:]
@@ -241,7 +255,7 @@ class Branch(object):
             newBranch.BSMparticles[0].extend(newBSMparticles)
 
         if not self.maxWeight is None:
-            newBranch.maxWeight = self.maxWeight * br.br                
+            newBranch.maxWeight =  self.maxWeight * br.br             
             
         return newBranch
 

@@ -38,7 +38,8 @@ class Element(object):
                          (e.g. [[[e+],[jet]],[[e-],[jet]]])
         """
         self.branches = [Branch(), Branch()]
-        self.weight = crossSection.XSectionList()
+        self.weight = crossSection.XSectionList() # gives the weight for all decays promptly
+        self.decayLabels = []
         self.motherElements = [("original", self)]
         self.elID = 0
         self.covered = False
@@ -83,9 +84,8 @@ class Element(object):
         :param other:  element to be compared (Element object)
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
-        
-        #Compare branches:
 
+        #Compare branches:
         if self.branches != other.branches:          
             comp = self.branches > other.branches
             if comp: return 1
@@ -126,6 +126,7 @@ class Element(object):
             br.sortParticles()
         #Now sort branches
         self.branches = sorted(self.branches)
+     
 
 
     def particlesMatch(self, other, branchOrder=False):
