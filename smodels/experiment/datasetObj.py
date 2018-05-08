@@ -160,9 +160,9 @@ class DataSet(object):
         :returns: likelihood to observe nobs events (float)
         """
 
-        m = Model ( self.dataInfo.observedN, self.dataInfo.expectedBG, self.dataInfo.bgError**2 )
+        m = Model ( self.dataInfo.observedN, self.dataInfo.expectedBG, self.dataInfo.bgError**2, deltas_rel = deltas )
         computer = LikelihoodComputer ( m )
-        return computer.likelihood( nsig, deltas )
+        return computer.likelihood( nsig )
 
     def folderName ( self ):
         """

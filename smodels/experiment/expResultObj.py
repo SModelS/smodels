@@ -188,10 +188,8 @@ class ExpResult(object):
         nobs = [ x.dataInfo.observedN for x in self.datasets ]
         bg = [ x.dataInfo.expectedBG for x in self.datasets ]
         cov = self.globalInfo.covariance
-        # print ( "nsig=", nsig )
-        computer = LikelihoodComputer ( Model ( nobs, bg, cov, None, nsig ) )
-        # print ( "computing combined likelihood for",nsig,"ds=",len(self.datasets ) )
-        return computer.likelihood ( nsig, deltas )
+        computer = LikelihoodComputer ( Model ( nobs, bg, cov, None, nsig, deltas_rel = deltas ) )
+        return computer.likelihood ( nsig, marginalize=True )
 
     def totalChi2 ( self, nsig, deltas=None ):
         """
