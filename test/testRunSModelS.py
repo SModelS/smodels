@@ -130,7 +130,7 @@ class RunSModelSTest(unittest.TestCase):
         shutil.copyfile(outputfile,'./output.py')
         from gluino_squarks_default import smodelsOutputDefault
         from output import smodelsOutput
-        ignoreFields = ['input file','smodels version', 'ncpus']
+        ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
                     res['AnalysisID'],res['DataSetID']])
@@ -147,7 +147,7 @@ class RunSModelSTest(unittest.TestCase):
         shutil.copyfile(outputfile,'./output13.py')
         from simplyGluino_default import smodelsOutputDefault
         from output13 import smodelsOutput
-        ignoreFields = ['input file','smodels version', 'ncpus', 'Element']
+        ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
                     res['AnalysisID'],res['DataSetID']])
@@ -170,18 +170,6 @@ class RunSModelSTest(unittest.TestCase):
         outputfile = self.runMain(filename  )
         self.assertTrue ( of in outputfile )
         self.assertTrue ( not os.path.exists ( outputfile ) )
-        """
-        shutil.copyfile(outputfile,'./bad_output.py')
-        from bad_default import smodelsOutputDefault
-        from bad_output import smodelsOutput
-        ignoreFields = ['input file','smodels version', 'ncpus']
-        equals = equalObjs( smodelsOutput,smodelsOutputDefault,allowedDiff=0.,
-                            ignore=ignoreFields)
-        for i in [ "./bad_output.py", "./bad_output.pyc" ]:
-            if os.path.exists ( i ):
-                os.remove( i )
-        self.assertTrue( equals )
-        """
   
     def cleanUp ( self ):
         for f in os.listdir("."):

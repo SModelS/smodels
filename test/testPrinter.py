@@ -206,7 +206,7 @@ class RunPrinterTest(unittest.TestCase):
         shutil.copyfile('./unitTestOutput/printer_output.py','./output.py')
         from gluino_squarks_default import smodelsOutputDefault 
         from output import smodelsOutput
-        ignoreFields = ['input file','smodels version', 'ncpus']
+        ignoreFields = ['input file','smodels version', 'ncpus', 'database version' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
                       key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
                                        res['AnalysisID'],res['DataSetID']])
@@ -238,7 +238,7 @@ class RunPrinterTest(unittest.TestCase):
         from simplyGluino_default import smodelsOutputDefault    
         from outputSimple import smodelsOutput
          
-        ignoreFields = ['input file','smodels version', 'ncpus']
+        ignoreFields = ['input file','smodels version', 'ncpus', 'database version' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
                        key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
                                         res['AnalysisID'],res['DataSetID']])
