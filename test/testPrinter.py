@@ -175,7 +175,7 @@ class RunPrinterTest(unittest.TestCase):
         mprinter.Printers['summary'].expandedSummary = True
          
         slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
-        mprinter.setOutPutFiles('./unitTestOutput/printer_output')
+        mprinter.setOutPutFiles('./unitTestOutput/printer_output',silent=True)
         self.runPrinterMain(slhafile,mprinter)
          
         outputfile = os.path.join( idir(), "test/unitTestOutput/printer_output.smodels")
@@ -199,7 +199,7 @@ class RunPrinterTest(unittest.TestCase):
         mprinter.Printers['python'].addElementList = False
                
         slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
-        mprinter.setOutPutFiles('./unitTestOutput/printer_output')
+        mprinter.setOutPutFiles('./unitTestOutput/printer_output',silent=True)
         self.runPrinterMain(slhafile,mprinter)
            
         #Test python output
@@ -230,7 +230,7 @@ class RunPrinterTest(unittest.TestCase):
         mprinter.Printers['python'].addelementlist = True
          
         slhafile = os.path.join ( idir(), "inputFiles/slha/simplyGluino.slha" )
-        mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple')
+        mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple',silent=True)
         self.runPrinterMain(slhafile,mprinter,addTopList=True)
         
         #Test python output
@@ -264,7 +264,7 @@ class RunPrinterTest(unittest.TestCase):
         mprinter.Printers['xml'].addelementlist = False                    
   
         slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
-        mprinter.setOutPutFiles('./unitTestOutput/printer_output')
+        mprinter.setOutPutFiles('./unitTestOutput/printer_output',silent=True)
         self.runPrinterMain(slhafile,mprinter)                    
                       
         defFile = os.path.join ( idir(), "test/default_output.xml" )
@@ -290,7 +290,7 @@ class RunPrinterTest(unittest.TestCase):
         mprinter.Printers['xml'].addelementlist = True   
  
         slhafile = os.path.join ( idir(), "inputFiles/slha/simplyGluino.slha" )
-        mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple')
+        mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple',silent=True)
         self.runPrinterMain(slhafile,mprinter,addTopList=True)                    
                      
         defFile = os.path.join ( idir(), "test/default_outputSimplyGluino.xml" )
