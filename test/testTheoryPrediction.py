@@ -47,8 +47,8 @@ class IntegrationTest(unittest.TestCase):
             predval=pred.xsection.value 
             defpredval = defpreds[id]
             self.assertAlmostEqual( predval.asNumber(fb), defpredval.asNumber (fb) )
-            pred.computeStatistics()
-            self.assertAlmostEqual ( pred.chi2, self.predchi2()[id] )
+            pred.computeStatistics( marginalize=True )
+            self.assertAlmostEqual ( pred.chi2 / self.predchi2()[id], 1.0, 1 )
 
     def testIntegration(self):
         from smodels.installation import installDirectory

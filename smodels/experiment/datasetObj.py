@@ -148,7 +148,7 @@ class DataSet(object):
         else:
             return valuesDict[attribute]
 
-    def likelihood ( self, nsig, deltas=None):
+    def likelihood ( self, nsig, deltas=None, marginalize=False ):
         """
         Computes the likelihood to observe nobs events,
         given a predicted signal "nsig", assuming "deltas"
@@ -157,12 +157,13 @@ class DataSet(object):
         :param nsig: predicted signal (float)
         :param deltas: uncertainty on signal (float).  If None, 
         default value (20%) will be used.
+        :param marginalize: if true, marginalize nuisances. Else, profile them.
         :returns: likelihood to observe nobs events (float)
         """
 
         m = Model ( self.dataInfo.observedN, self.dataInfo.expectedBG, self.dataInfo.bgError**2, deltas_rel = deltas )
         computer = LikelihoodComputer ( m )
-        return computer.likelihood( nsig )
+        return computer.likelihood( nsig, marginalize=marginalize )
 
     def folderName ( self ):
         """
@@ -191,7 +192,7 @@ class DataSet(object):
 #            return None ## FIXME implement
                 
 
-    def chi2( self, nsig, deltas_rel=None ):
+    def chi2( self, nsig, deltas_rel=None, marginalize=False ):
         """
         Computes the chi2 for a given number of observed events "nobs",
         given number of signal events "nsig", and error on signal "deltas".
@@ -199,12 +200,13 @@ class DataSet(object):
         :param nsig: predicted signal (float)
         :param deltas_rel: relative uncertainty in signal (float). 
         If None, default value will be used.
+        :param marginalize: if true, marginalize nuisances. Else, profile them.
         :return: chi2 (float)
         """
         m = Model ( self.dataInfo.observedN, self.dataInfo.expectedBG, 
                     self.dataInfo.bgError**2, deltas_rel = deltas_rel )
         computer = LikelihoodComputer ( m )
-        ret = computer.chi2( nsig )
+        ret = computer.chi2( nsig, marginalize=False )
         return ret
 
     def getAttributes(self,showPrivate=False):

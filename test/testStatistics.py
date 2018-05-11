@@ -40,11 +40,11 @@ class StatisticsTest(unittest.TestCase):
         ill = math.log(prediction.likelihood)
         ichi2 = prediction.chi2
         nsig = (pred_signal_strength*expRes.globalInfo.lumi).asNumber()
-        m = Model ( 4, 2.2, 1.1**2, None, nsig )
+        m = Model ( 4, 2.2, 1.1**2, None, efficiencies=nsig )
         computer = LikelihoodComputer ( m )
         dll = math.log( computer.likelihood( nsig, marginalize=False ) )
         self.assertAlmostEqual(ill, dll, places=2)
-        dchi2 = computer.chi2( nsig ) ## 0.2*nsig )
+        dchi2 = computer.chi2( nsig, marginalize=False ) ## 0.2*nsig )
         # print ( "dchi2,ichi2",dchi2,ichi2)
         self.assertAlmostEqual(ichi2, dchi2, places=2)
 
@@ -52,6 +52,7 @@ class StatisticsTest(unittest.TestCase):
         """
         Round the given number to the significant number of digits.
         """
+        if x==0.: return 0.
         rounding = sig - int(floor(log10(x))) - 1
         if rounding == 0:
             return int(x)
@@ -142,7 +143,7 @@ class StatisticsTest(unittest.TestCase):
             # Chi2 as computed by statistics module:
             m = Model ( nobs, nb, deltab**2, deltas_rel = 0.2 )
             computer = LikelihoodComputer ( m )
-            chi2_actual = computer.chi2( nsig ) ## , .2*nsig )
+            chi2_actual = computer.chi2( nsig, marginalize=True ) ## , .2*nsig )
             chi2_expected = d['chi2']
             if not chi2_expected==None and not np.isnan(chi2_expected):
 #                 chi2_expected = self.round_to_sign(chi2_expected, 2)
@@ -156,7 +157,7 @@ class StatisticsTest(unittest.TestCase):
             # computer = LikelihoodComputer( nobs, nb, deltab**2 )
             #likelihood_actual = statistics.likelihood( nsig,
             #    nobs, nb, deltab, deltas)
-            likelihood_actual = computer.likelihood(nsig, marginalize=True )
+            likelihood_actual = computer.likelihood(nsig, marginalize=False )
             # likelihood_actual = statistics.likelihood()
 #             logger.error("llk= "+str(likelihood_actual)+" nsig="+str(nsig)+" nobs = "+str(nobs)+" nb="+str(nb)+"+-"+str(deltab))
             #print('llhdactual', likelihood_actual)

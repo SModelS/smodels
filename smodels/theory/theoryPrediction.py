@@ -90,18 +90,20 @@ class TheoryPrediction(object):
             return None
         return self.xsection.value / self.getUpperLimit ()
 
-    def computeStatistics(self):
+    def computeStatistics(self,marginalize=False):
         """
         Compute the likelihood, chi2 and expected upper limit for this theory prediction.
-        The resulting values are stored as the likelihood, chi2 and expectedUL attributes.
+        The resulting values are stored as the likelihood, chi2 and expectedUL
+        attributes.
+        :param marginalize: if true, marginalize nuisances. Else, profile them.
         """
         if type ( self.dataset ) == list:
             ## a prediction for a combined result? special
             lumi = self.expResult.globalInfo.lumi
             pred = (self.xsection.value*lumi).asNumber() / self.effectiveEff
             nsig = [ pred * x for x in self.efficiencies ]
-            self.likelihood = self.expResult.combinedLikelihood ( nsig )
-            self.chi2 = self.expResult.totalChi2 ( nsig )
+            self.likelihood = self.expResult.combinedLikelihood ( nsig, marginalize=marginalize )
+            self.chi2 = self.expResult.totalChi2 ( nsig, marginalize=marginalize )
             # self.expectedUL = None
             return
 
@@ -114,8 +116,8 @@ class TheoryPrediction(object):
 
         lumi = self.dataset.globalInfo.lumi
         nsig = (self.xsection.value*lumi).asNumber()
-        llhd = self.dataset.likelihood(nsig)
-        chi2 = self.dataset.chi2(nsig)
+        llhd = self.dataset.likelihood(nsig,marginalize=marginalize)
+        chi2 = self.dataset.chi2(nsig,marginalize=marginalize)
         expectedUL = self.dataset.getSRUpperLimit(alpha = 0.05, expected = True)
 
         self.likelihood =  llhd

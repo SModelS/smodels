@@ -171,7 +171,7 @@ class ExpResult(object):
         return None ## FIXME implement
     """
 
-    def combinedLikelihood ( self, nsig, deltas=None ):
+    def combinedLikelihood ( self, nsig, deltas=None, marginalize=False ):
         """
         Computes the (combined) likelihood to observe nobs events, given a
         predicted signal "nsig", with nsig being a vector with one entry per
@@ -189,9 +189,9 @@ class ExpResult(object):
         bg = [ x.dataInfo.expectedBG for x in self.datasets ]
         cov = self.globalInfo.covariance
         computer = LikelihoodComputer ( Model ( nobs, bg, cov, None, nsig, deltas_rel = deltas ) )
-        return computer.likelihood ( nsig, marginalize=True )
+        return computer.likelihood ( nsig, marginalize=marginalize )
 
-    def totalChi2 ( self, nsig, deltas=None ):
+    def totalChi2 ( self, nsig, deltas=None, marginalize=False ):
         """
         Computes the total chi2 for a given number of observed events, given a
         predicted signal "nsig", with nsig being a vector with one entry per
@@ -201,7 +201,7 @@ class ExpResult(object):
         :param deltas: uncertainty on signal (None,float, or list).
         :returns: chi2 (float)
         """
-        if len ( self.datasets ) == 1: return self.datasets[0].chi2 ( nsig )
+        if len ( self.datasets ) == 1: return self.datasets[0].chi2 ( nsig, marginalize=marginalize )
         if not hasattr ( self.globalInfo, "covariance" ):
             logger.error ( "asked for combined likelihood, but no covariance error given." )
             return None
@@ -209,7 +209,7 @@ class ExpResult(object):
         bg = [ x.dataInfo.expectedBG for x in self.datasets ]
         cov = self.globalInfo.covariance
         computer = LikelihoodComputer ( Model ( nobs, bg, cov, deltas_rel=deltas ) )
-        return computer.chi2 ( nsig )
+        return computer.chi2 ( nsig, marginalize=marginalize )
 
     def getCombinedUpperLimitFor ( self, effs, expected=False ):
         """

@@ -611,24 +611,24 @@ class LikelihoodComputer:
         else:
             return self.profileLikelihood ( nsig, nll )
 
-    def chi2( self, nsig ):
+    def chi2( self, nsig, marginalize=False ):
             """
             Computes the chi2 for a given number of observed events nobs given
             the predicted background nb, error on this background deltab,
             expected number of signal events nsig and, if given, the error on
             signal (deltas).
+            :param marginalize: if true, marginalize, if false, profile
             :return: chi2 (float)
 
             """
             nsig = self.model.convert ( nsig )
-            marg=True
             # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
-            llhd = self.likelihood( nsig, marginalize=marg, nll=True )
+            llhd = self.likelihood( nsig, marginalize=marginalize, nll=True )
 
             # Compute the maximum likelihood H1, which sits at nsig = nobs - nb
             # (keeping the same % error on signal):
             dn = self.model.data-self.model.backgrounds
-            maxllhd = self.likelihood( dn, marginalize=marg, nll=True )
+            maxllhd = self.likelihood( dn, marginalize=marginalize, nll=True )
 
             # Return infinite likelihood if it is zero
             # This can happen in case e.g. nb >> nobs
@@ -658,7 +658,7 @@ class UpperLimitComputer:
         self.ntoys = ntoys
         self.cl = cl
 
-    def ulSigma ( self, model, marginalize=True, toys=None, expected=False ):
+    def ulSigma ( self, model, marginalize=False, toys=None, expected=False ):
         """ upper limit obtained from combined efficiencies, by using
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
