@@ -65,35 +65,23 @@ class ResultList(object):
         :returns: R value = weight / upper limit        
         """
         return theoPred.getRValue( expected )
-        """ FIXME is all now in theory prediction (I hope)
-        
-        expResult = theoPred.expResult
-        datasetID = theoPred.dataset.dataInfo.dataId
-        dataType = expResult.datasets[0].dataInfo.dataType
-        
-        if dataType == 'upperLimit':
-            ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass, expected = expected)
-        elif dataType == 'efficiencyMap':
-            ul = expResult.getUpperLimitFor(dataID=datasetID, expected=expected)
-        else:
-            logger.error("Unknown dataType %s" %(str(dataType)))
-        if type(ul)==bool and ul==False:
-            logger.info ( "upper limit is False. cannot compute r value." )
-            return None
-        if ul == 0. * fb:
-            logger.info ( "upper limit is 0. cannot compute r value." )
-            return None
-        #if type(ul) == bool and ul == False:
-        #    return None
-        return (theoPred.xsection.value/ul).asNumber()    
+
+    def _getRNone(self,theoPred, expected = False ):
         """
+        Simple helper function to sort also with None values.
+        None is replaced with -1.
+        """
+        ret = self.getR ( theoPred, expected )
+        if ret == None: return -1.
+        return ret
 
     def sort(self):
         """
         Reverse sort theoryPredictions by R value.
         
         """
-        self.theoryPredictions = sorted(self.theoryPredictions, key=self.getR, reverse=True)
+        self.theoryPredictions = sorted( self.theoryPredictions, key=self._getRNone, 
+                                         reverse=True )
 
     def getBestExpected(self):
         """
