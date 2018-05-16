@@ -17,6 +17,21 @@ from numpy  import array, sqrt
 
 class SLTest(unittest.TestCase):
 
+    def testPathologicalModel(self):
+        C=[ 1. ]
+        m=Model ( data=[0],
+                  backgrounds=[.0],
+                  covariance= C,
+                  third_moment = [ 0. ] * 8,
+                  efficiencies=[x/100. for x in [0.] ],
+                  name="pathological model" )
+        m.zeroEfficiencies()
+        ulComp = UpperLimitComputer ( lumi = 1. / fb, ntoys=10000, cl=.95 )
+        ul = ulComp.ulSigma ( m, marginalize=True )
+        ulProf = ulComp.ulSigma ( m, marginalize=False )
+        self.assertEqual( ul, None )
+        self.assertEqual( ulProf, None )
+
     def testModel8(self):
         C=[ 18774.2, -2866.97,-5807.3,-4460.52,-2777.25,-1572.97, -846.653, -442.531,
            -2866.97, 496.273, 900.195, 667.591, 403.92, 222.614, 116.779, 59.5958, 

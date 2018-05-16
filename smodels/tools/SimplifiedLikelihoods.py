@@ -89,6 +89,10 @@ class Model:
             self.deltas_rel = 1e-10
         self.computeABC()
 
+    def zeroEfficiencies ( self ):
+        """ are all efficiencies at zero? """
+        return len ( self.efficiencies[self.efficiencies>0.] ) == 0
+
     def var_s ( self, nsig ):
         """ the variances, for nsig. convenience function. """
         return NP.diag ( ( self.deltas_rel * nsig )**2 )
@@ -667,6 +671,9 @@ class UpperLimitComputer:
         :params expected: compute the expected value, not the observed.
         :returns: upper limit on *production* xsec (efficiencies unfolded)
         """
+        if model.zeroEfficiencies():
+            """ only zeroes in efficiencies? cannot give a limit! """
+            return None
         if toys==None:
             toys=self.ntoys
         oldmodel = model
