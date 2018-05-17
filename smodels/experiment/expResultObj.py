@@ -255,8 +255,8 @@ class ExpResult(object):
             nb.append ( ds.dataInfo.expectedBG )
         no = nobs
         if expected:
-            no = nb
-        ret = computer.ulSigma ( Model ( no, nb, cov, None, effs ), marginalize=True )
+            no = map(round, nb )
+        ret = computer.ulSigma ( Model ( no, nb, cov, None, effs ), marginalize=False )
         return ret
 
     def getUpperLimitFor(self, dataID=None, alpha=0.05, expected=False,
