@@ -84,12 +84,12 @@ class TheoryPrediction(object):
         """ get the r value = theory prediction / experimental upper limit """
         if expected:
             eul=self.getExpectedUpperLimit()
-            if type(eul)==type(None) or eul==0.:
+            if type(eul)==type(None) or eul.asNumber(fb)==0.:
                 return None
             return self.xsection.value / eul
 
         ul = self.getUpperLimit()
-        if type(ul) == type(None) or ul == 0.:
+        if type(ul) == type(None) or ul.asNumber(fb) == 0.:
             return None
         return self.xsection.value / ul
 
