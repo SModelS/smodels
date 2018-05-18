@@ -185,8 +185,12 @@ def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
     :returns: printers output
     """
     a={}
-    for inputFile in inputFiles:
-        logger.info ( "Start testing %s" % os.path.relpath ( inputFile ) )
+    n=len(inputFiles)
+    for i,inputFile in enumerate(inputFiles):
+        txt=""
+        if n>100:
+            txt="[%d/%d] " % ( i, n )
+        logger.info ( "Start testing %s%s" % (txt, os.path.relpath ( inputFile ) ) )
         a[inputFile] = runSingleFile(inputFile, outputDir, parser, databaseVersion,
                                   listOfExpRes, timeout, development, parameterFile)
     return a
