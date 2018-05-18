@@ -251,7 +251,7 @@ class LikelihoodComputer:
         mu_hat_old, mu_hat = 0., 1.
         ctr=0
         widener=3.
-        while abs ( mu_hat - mu_hat_old )/ mu_hat > 1e-2 and ctr < 20:
+        while abs(mu_hat - mu_hat_old)>1e-10 and abs ( mu_hat - mu_hat_old )/ (mu_hat+mu_hat_old) > .5e-2 and ctr < 20:
             ctr+=1
             mu_hat_old = mu_hat
             #logger.info ( "theta hat[%d]=%s" % (ctr,list( theta_hat[:11] ) ) )
