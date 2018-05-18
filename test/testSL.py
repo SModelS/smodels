@@ -32,6 +32,21 @@ class SLTest(unittest.TestCase):
         self.assertEqual( ul, None )
         self.assertEqual( ulProf, None )
 
+    def testPathologicalModel2(self):
+        C=[ 1. ]
+        m=Model ( data=[0],
+                  backgrounds=[.0],
+                  covariance= C,
+                  third_moment = [ 0. ] * 8,
+                  efficiencies=[x/100. for x in [0.1] ],
+                  name="pathological model 2" )
+        m.zeroEfficiencies()
+        ulComp = UpperLimitComputer ( lumi = 1. / fb, ntoys=10000, cl=.95 )
+        ul = ulComp.ulSigma ( m, marginalize=True )
+        ulProf = ulComp.ulSigma ( m, marginalize=False )
+        self.assertAlmostEqual( ul.asNumber(fb)/3049., 1., 1 )
+        self.assertAlmostEqual( ulProf.asNumber(fb)/1920., 1., 1 )
+
     def testModel8(self):
         C=[ 18774.2, -2866.97,-5807.3,-4460.52,-2777.25,-1572.97, -846.653, -442.531,
            -2866.97, 496.273, 900.195, 667.591, 403.92, 222.614, 116.779, 59.5958, 

@@ -679,7 +679,9 @@ class UpperLimitComputer:
         oldmodel = model
         if expected:
             model = copy.deepcopy ( oldmodel )
-            model.data = model.backgrounds
+            #model.data = model.backgrounds
+            for i,d in enumerate ( model.backgrounds):
+                model.data[i]=int(round(d))
         computer = LikelihoodComputer ( model, toys )
         mu_hat = computer.findMuHat ( model.efficiencies )
         theta_hat = computer.findThetaHat ( mu_hat * model.efficiencies )
@@ -746,14 +748,13 @@ class UpperLimitComputer:
         ctr=0
         while True:
             while ( NP.sign ( root_func(a)* root_func(b) ) > -.5 ):
-                b=1.2*b  ## widen bracket
-                a=a-(b-a)*.2 ## widen bracket
+                b=1.4*b  ## widen bracket FIXME make a linear extrapolation!
+                a=a-(b-a)*.3 ## widen bracket
                 if a < 0.: a=0.
                 ctr+=1
                 if ctr>20: ## but stop after 20 trials
                     if toys > 2000:
-                       logger.error("cannot find brent bracket after 20 trials.")
-
+                       logger.error("cannot find brent bracket after 20 trials. a,b=%s(%s),%s(%s)" % ( root_func(a),a,root_func(b),b ) )
                        return None
                     else:
                        logger.debug("cannot find brent bracket after 20 trials. but very low number of toys")
