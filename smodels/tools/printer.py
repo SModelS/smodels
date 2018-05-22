@@ -47,6 +47,7 @@ class MPrinter(object):
         #Define the printer types and the printer-specific options:
         printerTypes = parser.get("printer", "outputType").split(",")        
         for prt in printerTypes:
+            prt = prt.strip() ## trailing spaces shouldnt matter
             if prt == 'python':
                 newPrinter = PyPrinter(output = 'file')                
             elif prt == 'summary':        
@@ -588,20 +589,27 @@ class SummaryPrinter(TxTPrinter):
         output += "\n\n"
         for theoPred in theoPredictions:
             expResult = theoPred.expResult
-            datasetID = theoPred.dataset.dataInfo.dataId
-            dataType = expResult.datasets[0].dataInfo.dataType
+            datasetID = theoPred.dataId()
+            # dataType = expResult.datasets[0].dataInfo.dataType
+            dataType = theoPred.dataType()
             txnames = theoPred.txnames
-            if dataType == 'upperLimit':
-                ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass)
-                ul_expected = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass, expected=True)
-                signalRegion  = '(UL)'
-            elif dataType == 'efficiencyMap':
-                ul = expResult.getUpperLimitFor(dataID=datasetID)
-                ul_expected = expResult.getUpperLimitFor(dataID=datasetID, expected=True)
-                signalRegion  = theoPred.dataset.dataInfo.dataId
+            if datasetID == "combined":
+                ul = theoPred.getUpperLimit()
+                ul_expected = theoPred.getUpperLimit ( expected = True ).asNumber(fb)
+                signalRegion='(combined)'
             else:
-                logger.error("Unknown dataType %s" %(str(dataType)))
-                raise SModelSError()
+                if dataType == 'upperLimit':
+                    ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass)
+                    ul_expected = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass, expected=True)
+                    signalRegion  = '(UL)'
+                elif dataType == 'efficiencyMap':
+                    ul = expResult.getUpperLimitFor(dataID=datasetID)
+                    ul_expected = expResult.getUpperLimitFor(dataID=datasetID, expected=True)
+                    signalRegion  = theoPred.dataId()
+                    # signalRegion  = theoPred.dataset.dataInfo.dataId
+                else:
+                    logger.error("Unknown dataType %s" %(str(dataType)))
+                    raise SModelSError()
             value = theoPred.xsection.value
 
             r = (value/ul).asNumber()
@@ -1084,20 +1092,28 @@ class SLHAPrinter(TxTPrinter):
         cter = 1
         for theoPred in rList:
             expResult = theoPred.expResult
-            datasetID = theoPred.dataset.dataInfo.dataId
-            dataType = expResult.datasets[0].dataInfo.dataType
+            datasetID = theoPred.dataId()
+            # datasetID = theoPred.dataset.dataInfo.dataId
+            # dataType = expResult.datasets[0].dataInfo.dataType
+            dataType = theoPred.dataType()
             txnames = theoPred.txnames
-            if dataType == 'upperLimit':
-                ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass)
-                ul_expected = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass, expected=True)
-                signalRegion  = '(UL)'
-            elif dataType == 'efficiencyMap':
-                ul = expResult.getUpperLimitFor(dataID=datasetID)
-                ul_expected = expResult.getUpperLimitFor(dataID=datasetID, expected=True)
-                signalRegion  = theoPred.dataset.dataInfo.dataId
+            if datasetID == "combined":
+                ul = theoPred.getUpperLimit()
+                ul_expected = theoPred.getUpperLimit ( expected = True ).asNumber(fb)
+                signalRegion  = '(combined)'
             else:
-                logger.error("Unknown dataType %s" %(str(dataType)))
-                raise SModelSError()
+                if dataType == 'upperLimit':
+                    ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass)
+                    ul_expected = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass, expected=True)
+                    signalRegion  = '(UL)'
+                elif dataType == 'efficiencyMap':
+                    ul = expResult.getUpperLimitFor(dataID=datasetID)
+                    ul_expected = expResult.getUpperLimitFor(dataID=datasetID, expected=True)
+                    signalRegion  = theoPred.dataId()
+                    # signalRegion  = theoPred.dataset.dataInfo.dataId
+                else:
+                    logger.error("Unknown dataType %s" %(str(dataType)))
+                    raise SModelSError()
             value = theoPred.xsection.value
             r = (value/ul).asNumber()
             if type(ul_expected)==type(None): r_expected = None
