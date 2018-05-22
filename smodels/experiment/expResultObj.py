@@ -211,7 +211,7 @@ class ExpResult(object):
         computer = LikelihoodComputer ( Model ( nobs, bg, cov, deltas_rel=deltas ) )
         return computer.chi2 ( nsig, marginalize=marginalize )
 
-    def getCombinedUpperLimitFor ( self, effs, expected=False ):
+    def getCombinedUpperLimitFor ( self, effs, expected=False, marginalize=False ):
         """
         Get combined upper limit. Effs are the signal efficiencies in the
         datasets. The order is defined in the dataset itself.
@@ -219,6 +219,9 @@ class ExpResult(object):
         (adding up the efficiencies for all txnames) the efficiencies must 
         be sorted according to datasetOrder
         :param expected: return expected, not observed value
+        :param marginalize: if true, marginalize nuisances, if false, profile them.
+        if none profile for cases with less than 30 signal regions, and marginalize
+        for cases with 30 or more signal regions.
         :returns: upper limit on sigma (*not* sigma*eff)
         """
         if not hasattr ( self.globalInfo, "covariance" ):
@@ -234,7 +237,7 @@ class ExpResult(object):
         if len ( cov ) < 1:
             logger.error ( "covariance matrix has length %d." % len(cov) )
             sys.exit()
-        computer = UpperLimitComputer ( self.globalInfo.lumi, 2000 )
+        computer = UpperLimitComputer ( self.globalInfo.lumi, ntoys=10000 )
         datasetOrder = self.globalInfo.datasetOrder
         if type ( datasetOrder ) == str:
             datasetOrder = tuple ( [ datasetOrder ] ) ## for debugging, allow one dataset
@@ -256,7 +259,7 @@ class ExpResult(object):
         no = nobs
         if expected:
             no = list(map(round, nb ))
-        ret = computer.ulSigma ( Model ( no, nb, cov, None, effs ), marginalize=False )
+        ret = computer.ulSigma ( Model ( no, nb, cov, None, effs ), marginalize=marginalize )
         return ret
 
     def getUpperLimitFor(self, dataID=None, alpha=0.05, expected=False,

@@ -188,7 +188,7 @@ def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
     n=len(inputFiles)
     for i,inputFile in enumerate(inputFiles):
         txt=""
-        if n>100:
+        if n>20:
             txt="[%d/%d] " % ( i, n )
         logger.info ( "Start testing %s%s" % (txt, os.path.relpath ( inputFile ) ) )
         a[inputFile] = runSingleFile(inputFile, outputDir, parser, databaseVersion,
