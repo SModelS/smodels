@@ -1,4 +1,4 @@
-###### pyhtonic requirements ######
+###### pythonic requirements for readthedocs.io ######
 jupyter
 nbconvert
 unum
