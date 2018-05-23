@@ -85,6 +85,14 @@ def _toTuple_ ( ver ):
             b.append ( i )
     return tuple(b)
 
+def requirements():
+    ret=[]
+    f = open("%s/smodels/share/requirements.txt" % installDirectory())
+    lines=f.readlines()
+    for l in lines: ret.append ( l.strip() )
+    f.close()
+    return ret
+
 def version(astuple=False):
     """
     Print version number of the SModelS framework.
@@ -168,6 +176,9 @@ def main():
             sys.exit(0)
         if i in [ "--banner", "-b" ]:
             print(banner())
+            sys.exit(0)
+        if i in [ "--requirements", "-r" ]:
+            print(requirements())
             sys.exit(0)
         if i in [ "--help", "-h" ]:
             printHelp()

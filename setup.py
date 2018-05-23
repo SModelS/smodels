@@ -13,7 +13,7 @@ import sys
 from setuptools import setup, Extension
 from setuptools.command.install import install
 sys.path.insert ( 0, "./" )
-from smodels.installation import version, authors
+from smodels.installation import version, authors, requirements
 import subprocess
 
 class OverrideInstall(install):
@@ -115,8 +115,7 @@ setup(
                            'runSModelS.py=smodels.tools.runSModelS:main',
                            'smodelsTools.py=smodels.tools.smodelsTools:main' ]
     },
-    install_requires=[ 'docutils>=0.3', 'numpy>=1.13.0', 'scipy>=1.0.0', \
-                         'unum>=4.0.0', 'argparse', 'requests>=2.0.0', 'pyslha>=3.1.0' ],
+    install_requires=requirements(),
     data_files=dataFiles() ,
     description=("A tool for interpreting simplified-model results from the "
                    "LHC"),
