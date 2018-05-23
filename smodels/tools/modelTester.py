@@ -171,7 +171,7 @@ def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
     return None
 
 def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
-                    timeout, development, parameterFile):
+                    timeout, development, parameterFile, jobnr ):
     """
     Loop over all input files in inputFiles with testPoint
 
@@ -182,17 +182,23 @@ def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
     :parameter listOfExpRes: list of ExpResult objects to be considered
     :parameter development: turn on development mode (e.g. no crash report)
     :parameter parameterFile: parameter file, for crash reports
+    :parameter jobnr: number of process, in parallel mode. mostly for debugging.
     :returns: printers output
     """
     a={}
     n=len(inputFiles)
+    t_tot = 0. ## total time
     for i,inputFile in enumerate(inputFiles):
         txt=""
-        if n>20:
-            txt="[%d/%d] " % ( i, n )
+        if n>5: ## tell where we are in the list, if the list has more than 5 entries
+            txt="[%d: %d/%d] " % ( jobnr, i, n )
+            if i > 3: ## give the average time spent per point
+                txt="[%d: %d/%d, t~%.1fs] " % ( jobnr, i, n, t_tot/float(i) )
         logger.info ( "Start testing %s%s" % (txt, os.path.relpath ( inputFile ) ) )
+        t0=time.time()
         a[inputFile] = runSingleFile(inputFile, outputDir, parser, databaseVersion,
                                   listOfExpRes, timeout, development, parameterFile)
+        t_tot += ( time.time() - t0 )
     return a
 
 def _cleanList ( fileList, inDir ):
@@ -252,7 +258,7 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
 
     if ncpus == 1:
         return runSetOfFiles( cleanedList, outputDir, parser, databaseVersion,
-                              listOfExpRes, timeout, development, parameterFile )
+                              listOfExpRes, timeout, development, parameterFile, 0 )
 
     ### now split up for every fork
     chunkedFiles = [cleanedList[x::ncpus] for x in range(ncpus)]
@@ -265,7 +271,7 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
                     ( i, os.getpid(), os.getppid() ) )
             logger.debug( " `-> %s" % " ".join ( chunk ) )
             runSetOfFiles(chunk, outputDir, parser, databaseVersion,
-                            listOfExpRes, timeout, development, parameterFile)
+                            listOfExpRes, timeout, development, parameterFile, i )
             os._exit(0) ## not sys.exit(), return, nor continue
         if pid < 0:
             logger.error ( "fork did not succeed! Pid=%d" % pid )
