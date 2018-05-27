@@ -63,3 +63,8 @@ docs/manual/source/XSecComputer.rst
 *~
 .http*
 *.crash
+*.pcl
+test/unittest*.pcl
+docs/manual/source/experiment.rst
+docs/manual/source/theory.rst
+docs/manual/source/tools.rst
