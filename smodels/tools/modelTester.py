@@ -191,9 +191,9 @@ def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
     for i,inputFile in enumerate(inputFiles):
         txt=""
         if n>5: ## tell where we are in the list, if the list has more than 5 entries
-            txt="[%d: %d/%d] " % ( jobnr, i, n )
+            txt="[%d: %d/%d] " % ( jobnr, i+1, n )
             if i > 3: ## give the average time spent per point
-                txt="[%d: %d/%d, t~%.1fs] " % ( jobnr, i, n, t_tot/float(i) )
+                txt="[%d: %d/%d, t~%.1fs] " % ( jobnr, i+1, n, t_tot/float(i) )
         logger.info ( "Start testing %s%s" % (txt, os.path.relpath ( inputFile ) ) )
         t0=time.time()
         a[inputFile] = runSingleFile(inputFile, outputDir, parser, databaseVersion,
