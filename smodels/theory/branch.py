@@ -11,7 +11,7 @@ import sys
 from smodels.tools.physicsUnits import fb, MeV
 from smodels.particleDefinitions import SMpdgs, SMnames, BSMpdgs, particleLists
 from smodels.theory.particleNames import elementsInStr, getObjectFromPdg, getObjectFromName, getNamesList, StrWildcard
-from smodels.theory.particleComparison import compareBSMparticles, simParticles, ParticleWildcard
+from smodels.theory.particleComparison import compareBSMparticles, simParticles
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
