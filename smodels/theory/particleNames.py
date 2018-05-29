@@ -73,9 +73,9 @@ def elementsInStr(instring,removeQuotes=True):
     """
     
     outstr = ""
-    if type(instring) == type('st'):
+    if isinstance(instring,str):
         outstr = instring
-    elif type(instring) == type([]):
+    elif isinstance(instring,list):
         for st in instring:
             if type(st) != type('st'):
                 logger.error("Input must be a string or a list of strings")
@@ -112,15 +112,16 @@ def elementsInStr(instring,removeQuotes=True):
             for ptc in ptclist:
                 ptc = ptc.replace("'","")
                 if not ptc:
-                    continue
+                    continue          
+                #if ptc == '*':
+                #    ptc = StrWildcard()                            
                 if not ptc in SMnames and not ptc in getNamesList(particleLists):
                     logger.error("Unknown particle. Add " + ptc + " to smodels/particleDefinitions.py")
                     raise SModelSError()
 
     # Check if there are not unmatched ['s and/or ]'s in the string
     if nc != 0:
-        logger.error("Wrong input (incomplete elements?) " + instring)
-        raise SModelSError()
+        raise SModelSError("Wrong input (incomplete elements?) " + instring)
 
     return elements
 
@@ -165,6 +166,8 @@ def vertInStr(instring):
             for ptc in vertices[-1]:
                 if not ptc:
                     continue
+                #if ptc == '*':
+                #    ptc = StrWildcard()                    
                 if not ptc in SMnames and not ptc in getNamesList(particleLists):
                     logger.error("Unknown particle. Add " + ptc + " to smodels/particleDefinitions.py")
                     raise SModelSError()
@@ -176,6 +179,37 @@ def vertInStr(instring):
         raise SModelSError()
 
     return vertices
+
+
+
+
+class StrWildcard(str):
+    """
+    A string wildcard class. It will return True when compared to any other string.
+    """
+    
+    def __init__(self):
+        str.__init__(self)
+        
+    def __str__(self):
+        return '*'    
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __cmp__(self,other):
+        if isinstance(other,str):
+            return 0
+        else:
+            return -1
+
+    def __eq__(self,other):
+        return self.__cmp__(other) == 0  
+    
+    def __ne__(self,other):
+        return self.__cmp__(other) != 0
+     
+
 
 
 
