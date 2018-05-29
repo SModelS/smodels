@@ -10,8 +10,8 @@
 import sys
 from smodels.tools.physicsUnits import fb, MeV
 from smodels.particleDefinitions import SMpdgs, SMnames, BSMpdgs, particleLists
-from smodels.theory.particleNames import elementsInStr, getObjectFromPdg, getObjectFromName, getNamesList
-from smodels.theory.particleComparison import compareBSMparticles, simParticles
+from smodels.theory.particleNames import elementsInStr, getObjectFromPdg, getObjectFromName, getNamesList, StrWildcard
+from smodels.theory.particleComparison import compareBSMparticles, simParticles, ParticleWildcard
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -46,17 +46,21 @@ class Branch(object):
         self.vertparts = None
         
         if type(info) == type(str()):
-            branch = elementsInStr(info)            
+            branch = elementsInStr(info)      
             if not branch or len(branch) > 1:
                 logger.error("Wrong input string " + info)
                 raise SModelSError()
             else:                
                 branch = branch[0]
-                vertices = elementsInStr(branch[1:-1])           
+                vertices = elementsInStr(branch[1:-1])        
                 for vertex in vertices:
                     particleNames = vertex[1:-1].split(',')
                     ptcs = []
-                    for name in particleNames:
+                    for i,name in enumerate(particleNames):    
+                        #if name =="*":
+                        #    ptcs.append( ParticleWildcard() )   
+                        #    particleNames[i] = StrWildcard()
+                        #else:
                         ptcs.append(getObjectFromName(name))
                     # Syntax check:
                     for ptc in particleNames:
@@ -143,7 +147,7 @@ class Branch(object):
         particles = [ particle for particleList in self.particles for particle in particleList ]
         return particles
     
-    def particlesMatch(self, other):
+    def particlesMatch(self, other, checkDecayType=False):
         """
         Compare two Branches for matching particles, 
         allow for inclusive particle labels (such as the ones defined in particleDefinitions.py)
@@ -151,10 +155,18 @@ class Branch(object):
         :parameter other: branch to be compared (Branch object)
         :returns: True if branches are equal (particles and masses match); False otherwise.              
         """
-
-
-        if type (other) != type(self):
-            return False
+        if checkDecayType:         
+            if self.decayType != other.decayType:                
+                if self.decayType == 'longlived' and other.decayType == 'HSCP': pass
+                elif (self.decayType == 'METonly' or self.decayType == 'prompt') and other.decayType == 'MET': pass
+                else: return False
+        
+        #If particles are identical, avoid further checks
+        if self.particles == other.particles:
+            return True        
+       
+        if not isinstance(other,Branch):
+            return False 
         #Make sure number of vertices and particles have been defined
         self.setInfo()
         other.setInfo()
@@ -163,12 +175,12 @@ class Branch(object):
         
         if self.vertparts != other.vertparts:
             return False
-     
+        
         for iv,vertex in enumerate(self.particles): 
             
             for i,p in enumerate(vertex):
                 if not p.label in list ( getNamesList(particleLists) ) + SMnames :
-                    logger.error("Unknown particle: %s" %p)
+                    logger.error("Unknown particle: %s" %p.label)
                     raise SModelSError()
 
                 if not other.particles[iv][i].label in list ( getNamesList(particleLists) ) + SMnames :
@@ -338,5 +350,97 @@ def decayBranches(branchList, sigcut=0. *fb):
     return finalBranchList
 
 
+
+
+class BranchWildcard(Branch):
+    """
+    A branch wildcard class. It will return True when compared to any other branch object
+    with the same final state.
+    """
+    
+    def __init__(self):
+        Branch.__init__(self)  
+        self.particles = ListWildcard()
+        self.BSMparticles = ListWildcard()
+        self.decayType = StrWildcard()
+        
+        self.vertnumb = IntWildcard()
+        self.vertparts = ListWildcard()
+    
+        
+    def __str__(self):
+        return '[*]'
+    
+    def __repr__(self):
+        return self.__str__()
+
+    def __eq__(self,other):
+        return self.__cmp__(other) == 0
+
+    def __ne__(self,other):
+        return self.__cmp__(other) != 0
+    
+    def setInfo(self):
+        """
+        Defines the number of vertices (vertnumb) and number of
+        particles in each vertex (vertpats) properties, if they have not
+        been defined yet.
+        """
+
+        self.vertnumb = IntWildcard()
+        self.vertparts = ListWildcard()
+        
+class IntWildcard(int):
+    """
+    A integer wildcard class. It will return True when compared to any other integer object.
+    """
+    
+    def __init__(self):
+        int.__init__(self)
+        
+    def __str__(self):
+        return '*'   
+    
+    def __repr__(self):
+        return self.__str__()
+
+    def __cmp__(self,other):
+        if isinstance(other,int):
+            return 0
+        else:
+            return -1
+
+    def __eq__(self,other):
+        return self.__cmp__(other) == 0 
+    
+    def __ne__(self,other):
+        return self.__cmp__(other) != 0
+             
+    
+class ListWildcard(list):    
+    """
+    A list wildcard class. It will return True when compared to any other list object.
+    """
+    
+    def __init__(self):
+        int.__init__(self)
+        
+    def __str__(self):
+        return '[*]'    
+
+    def __repr__(self):
+        return self.__str__()
+    
+    def __cmp__(self,other):
+        if isinstance(other,list):
+            return 0
+        else:
+            return -1
+
+    def __eq__(self,other):
+        return self.__cmp__(other) == 0  
+    
+    def __ne__(self,other):
+        return self.__cmp__(other) != 0
 
 

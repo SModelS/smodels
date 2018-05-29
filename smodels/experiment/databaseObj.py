@@ -10,6 +10,7 @@
 
 """
 
+from __future__ import print_function
 import os
 ## sweet spot for numpy multi-threading is 2? More threads
 ## make some weaker machines freeze when building the pickle file.
@@ -29,6 +30,7 @@ try:
     import cPickle as serializer
 except ImportError as e:
     import pickle as serializer
+    
 
 class Database(object):
     """
@@ -60,7 +62,6 @@ class Database(object):
         self.expResultList = []
         self.txt_meta = Meta ( base, discard_zeroes = discard_zeroes )
         self.progressbar = None
-                
         if progressbar:
             try:
                 import progressbar as P
@@ -76,16 +77,15 @@ class Database(object):
             return
         if self.force_load=="pcl":
             self.loadBinaryFile()
-            self.pcl_meta.printFastlimBanner()            
+            self.pcl_meta.printFastlimBanner()
             return
         if self.force_load in [ None, "none", "None" ]:
             self.loadDatabase()
-            self.txt_meta.printFastlimBanner()                                    
+            self.txt_meta.printFastlimBanner()
             return
         logger.error ( "when initialising database: force_load=%s is not " \
                        "recognized. Valid values are: pcl, txt, None." % force_load )
         sys.exit()
-
 
     def __eq__ ( self, other ):
         """ compare two databases """
@@ -106,19 +106,17 @@ class Database(object):
             if binary file is available, then check if
             it needs update, create new binary file, in
             case it does need an update.
-        """        
+        """
         if not os.path.exists ( self.pcl_meta.pathname ):
             logger.info ( "Creating binary database " )
             logger.info ( "(this may take a few minutes, but it's done only once!)" )
             self.loadTextDatabase()
-            self.createBinaryFile()            
+            self.createBinaryFile()
         else:
             if self.needsUpdate():
-                self.createBinaryFile()                
+                self.createBinaryFile()
             else:
                 self.loadBinaryFile( lastm_only = False )
-                
-                
 
     def loadTextDatabase ( self ):
         """ simply loads the textdabase """
@@ -134,33 +132,35 @@ class Database(object):
 
         :param lastm_only: if true, the database itself is not read.
         :returns: database object, or None, if lastm_only == True.
-        """        
+        """
         if lastm_only and self.pcl_meta.mtime:
             ## doesnt need to load database, and mtime is already
-            ## loaded            
+            ## loaded
             return None
 
         if not os.path.exists ( self.pcl_meta.pathname ):
             return None
 
-        try:            
+        try:
             with open ( self.pcl_meta.pathname, "rb" ) as f:
                 t0=time.time()
                 pclfilename = self.pcl_meta.pathname
                 self.pcl_meta = serializer.load ( f )
                 self.pcl_meta.pathname = pclfilename
                 if self.force_load == "pcl":
-                    self.txt_meta = self.pcl_meta                    
-                if not lastm_only:                    
+                    self.txt_meta = self.pcl_meta
+                if not lastm_only:
                     if not self.force_load == "pcl" and self.pcl_meta.needsUpdate ( self.txt_meta ):
                         logger.warning ( "Something changed in the environment."
                                          "Regenerating." )
                         self.createBinaryFile()
-                        return self                  
+                        return self
                     logger.info ( "loading binary db file %s format version %s" %
                             ( self.pcl_meta.pathname, self.pcl_meta.format_version ) )
-                    self.expResultList = serializer.load ( f )
-
+                    if sys.version[0]=="2":
+                        self.expResultList = serializer.load ( f )
+                    else:
+                        self.expResultList = serializer.load ( f, encoding="latin1" )
                     t1=time.time()-t0
                     logger.info ( "Loaded database from %s in %.1f secs." % \
                             ( self.pcl_meta.pathname, t1 ) )
@@ -171,7 +171,7 @@ class Database(object):
                 self.pcl_meta.mtime = 0
                 return self
             logger.error ( "%s is not a binary database file, recreate it." % \
-                            self.pcl_meta.pathname )
+                            ( self.pcl_meta.pathname ) )
             self.createBinaryFile()
         # self.txt_meta = self.pcl_meta
         return self
@@ -236,13 +236,107 @@ class Database(object):
         """
         return self.txt_meta.pathname
 
+    def fetchFromScratch ( self, path, store, discard_zeroes ):
+        """ fetch database from scratch, together with
+            description.
+            :param store: filename to store json file.
+        """
+        def sizeof_fmt(num, suffix='B'):
+            for unit in [ '','K','M','G','T','P' ]:
+                if abs(num) < 1024.:
+                    return "%3.1f%s%s" % (num, unit, suffix)
+                num /= 1024.0
+            return "%.1f%s%s" % (num, 'Yi', suffix)
+
+        import requests
+        r = requests.get( path )
+        if r.status_code != 200:
+            logger.error ( "Error %d: could not fetch %s from server." % \
+                           ( r.status_code, path ) )
+            sys.exit()
+        ## its new so store the description
+        with open( store, "w" ) as f:
+            f.write ( r.text )
+        if not "url" in r.json().keys():
+            logger.error ( "cannot parse json file %s." % path )
+            sys.exit()
+        size = r.json()["size"]
+        logger.info ( "need to fetch %s. size is %s." % \
+                      ( r.json()["url"], sizeof_fmt ( size ) ) )
+        t0=time.time()
+        r2=requests.get ( r.json()["url"], stream=True )
+        filename= "./" + r2.url.split("/")[-1]
+        with open ( filename, "wb" ) as dump:
+            print ( "         " + " "*51 + "<", end="\r" )
+            print ( "loading >", end="" )
+            for x in r2.iter_content(chunk_size=int ( size / 50 ) ):
+                dump.write ( x )
+                dump.flush ()
+                print ( ".", end="" )
+                sys.stdout.flush()
+            print()
+            dump.close()
+        logger.info ( "fetched %s in %d secs." % ( r2.url, time.time()-t0 ) ) 
+        logger.debug ( "store as %s" % filename )
+        #with open( filename, "wb" ) as f:
+        #    f.write ( r2.content )
+        #    f.close()
+        self.force_load = "pcl"
+        return ( "./", "%s" % filename )
+
+
+    def fetchFromServer ( self, path, discard_zeroes ):
+        import requests, time, json
+        logger.debug ( "need fetch from server: %s" % path )
+        store = "." + path.replace ( ":","_" ).replace( "/", "_" ).replace(".","_" )
+        if not os.path.isfile ( store ):
+            ## completely new! fetch the description and the db!
+            return self.fetchFromScratch ( path, store, discard_zeroes )
+        with open(store,"r") as f:
+            jsn = json.load(f)
+        filename= "./" + jsn["url"].split("/")[-1]
+        class _: ## pseudo class for pseudo requests
+            def __init__ ( self ): self.status_code = -1
+        r=_()
+        try:
+            r = requests.get( path )
+        except Exception:
+            pass
+        if r.status_code != 200:
+            logger.warning ( "Error %d: could not fetch %s from server." % \
+                           ( r.status_code, path ) )
+            if not os.path.isfile ( filename ):
+                logger.error ( "Cant find a local copy of the pickle file. Exit." )
+                sys.exit()
+            logger.warning ( "I do however have a local copy of the file. I work with that." )
+            self.force_load = "pcl"
+            # next step: check the timestamps
+            return ( "./", filename )
+
+        if r.json()["lastchanged"] > jsn["lastchanged"]:
+            ## has changed! redownload everything!
+            return self.fetchFromScratch ( path, store, discard_zeroes )
+        
+        if not os.path.isfile ( filename ):
+            return self.fetchFromScratch ( path, store, discard_zeroes )
+        self.force_load = "pcl"
+        # next step: check the timestamps
+        return ( "./", filename )
 
     def checkPathName( self, path, discard_zeroes ):
         """
         checks the path name,
-        returns the base directory and the pickle file name
+        returns the base directory and the pickle file name.
+        If path starts with http or ftp, fetch the description file
+        and the database.
+        :returns: directory name, (full) pickle file name
         """
         logger.debug('Try to set the path for the database to: %s', path)
+        if path.startswith( ( "http://", "https://", "ftp://" ) ):
+            return self.fetchFromServer ( path, discard_zeroes )
+        if path.startswith( ( "file://" ) ):
+            path=path[7:]
+            
         tmp = os.path.realpath(path)
         if os.path.isfile ( tmp ):
             base = os.path.dirname ( tmp )
@@ -310,7 +404,7 @@ class Database(object):
 
         :returns: list of ExpResult objects
 
-        """        
+        """
         folders=[]
         for root, _, files in os.walk(self.txt_meta.pathname):
             folders.append ( (root, files) )
@@ -344,7 +438,6 @@ class Database(object):
             logger.warning("Zero results loaded.")
         if self.progressbar:
             self.progressbar.finish()
-
         return resultsList
 
     def createExpResult ( self, root ):
@@ -365,14 +458,14 @@ class Database(object):
                     if not pclmeta.needsUpdate ( txtmeta ):
                         logger.debug ( "we can use expres from pickle file %s" % pclfile )
                         expres = serializer.load ( f )
-                        #print expres
                     else:
                         logger.debug ( "we cannot use expres from pickle file %s" % pclfile )
                         logger.debug ( "txt meta %s" % txtmeta )
                         logger.debug ( "pcl meta %s" % pclmeta )
-                        logger.debug ( "pcl meta needs update %s" % pclmeta.needsUpdate ( txtmeta ) )
+                        logger.debug ( "pcl meta needs update %s" % pclmeta.needsUpdate ( txtmeta ) )        
         except IOError as e:
             logger.error ( "exception %s" % e )
+                       
         if not expres: ## create from text file
             expres = ExpResult(root, discard_zeroes = self.txt_meta.discard_zeroes )
             if self.subpickle and expres: expres.writePickle( self.databaseVersion )
@@ -411,22 +504,22 @@ class Database(object):
 
         """
         expResultList = []
-        for expResult in self.expResultList:
+        for expResult in self.expResultList:       
             superseded = None
             if hasattr(expResult.globalInfo,'supersededBy'):
                 superseded = expResult.globalInfo.supersededBy.replace(" ","")
             if superseded and (not useSuperseded):
                 continue
             ID = expResult.globalInfo.getInfo('id')
-            # Skip analysis not containing any of the required ids:
+            # Skip analysis not containing any of the required ids:   
             if analysisIDs != ['all']:
                 if not ID in analysisIDs:
-                    continue
-            newExpResult = ExpResult()
+                    continue                                                    
+            newExpResult = ExpResult()            
             newExpResult.path = expResult.path
             newExpResult.globalInfo = expResult.globalInfo
             newExpResult.datasets = []
-            for dataset in expResult.datasets:
+            for dataset in expResult.datasets:                                 
                 if dataTypes != ['all']:
                     if not dataset.dataInfo.dataType in dataTypes:
                         continue
@@ -434,13 +527,12 @@ class Database(object):
                     if not dataset.dataInfo.dataId in datasetIDs:
                         continue
                 newDataSet = datasetObj.DataSet( dataset.path, dataset.globalInfo,
-                       False, discard_zeroes=self.txt_meta.discard_zeroes )
+                       False, discard_zeroes=self.txt_meta.discard_zeroes )              
                 newDataSet.dataInfo = dataset.dataInfo
-                newDataSet.txnameList = []
+                newDataSet.txnameList = []               
                 for txname in dataset.txnameList:
                     if type(txname.validated) == str:
                         txname.validated = txname.validated.lower()
-                    # print ( "txname",txname.validated,type(txname.validated) )
                     if (txname.validated not in [True, False, "true", "false", "n/a", "tbd", None, "none"]):
                         logger.error("value of validated field '%s' in %s unknown." % (txname.validated, expResult))
                     if txname.validated in [None, "none"]: ## FIXME after 1.1.1 this becomes a warning msg?
@@ -463,8 +555,8 @@ class Database(object):
             # Skip analysis not containing any of the required txnames:
             if not newExpResult.getTxNames():
                 continue
-            expResultList.append(newExpResult)               
-            
+            expResultList.append(newExpResult)
+
         return expResultList
 
     def updateBinaryFile ( self ):

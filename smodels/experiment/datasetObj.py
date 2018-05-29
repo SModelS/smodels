@@ -8,7 +8,7 @@
 """
 
 
-import os,glob,sys
+import os,glob
 from smodels.experiment import txnameObj,infoObj
 from smodels.tools import statistics
 from smodels.tools.physicsUnits import fb
@@ -22,6 +22,7 @@ class DataSet(object):
     """
     Holds the information to a data set folder (TxName objects, dataInfo,...)
     """
+
     def __init__(self, path=None, info=None, createInfo=True, discard_zeroes=True):
         """ :param discard_zeroes: discard txnames with zero-only results """
 
@@ -37,19 +38,19 @@ class DataSet(object):
                 logger.error("dataInfo.txt file not found in " + path)
                 raise TypeError
             self.dataInfo = infoObj.Info(os.path.join(path,"dataInfo.txt"))
-
+            
             #Get list of TxName objects:
             for txtfile in glob.iglob(os.path.join(path,"*.txt")):
                 try:
-                    txname = txnameObj.TxName(txtfile,self.globalInfo,self.dataInfo)
+                    txname = txnameObj.TxName( txtfile,self.globalInfo,self.dataInfo,
+                                               discard_zeroes )
                     if discard_zeroes and txname.hasOnlyZeroes():
                         logger.debug ( "%s, %s has only zeroes. discard it." % \
                                          ( self.path, txname.txName ) )
                         continue
                     self.txnameList.append(txname)
-                except TypeError: continue
-                  
-
+                except TypeError: 
+                    continue
             self.txnameList.sort()
             self.checkForRedundancy()
 
@@ -62,18 +63,24 @@ class DataSet(object):
         logger.debug ( "checking for redundancy" )
         datasetElements = []
         for tx in self.txnameList:
-            for el in elementsInStr(tx.constraint):
-                datasetElements.append(Element(el))
+            if hasattr(tx, 'finalState'):
+                finalState = tx.finalState
+            else:
+                finalState = ['MET','MET']            
+            for el in elementsInStr(str(tx.constraint)):
+                newEl = Element(el)
+                newEl.branches[0].decayType = finalState[0]
+                newEl.branches[1].decayType = finalState[1]
+                datasetElements.append(newEl)
         combos = itertools.combinations ( datasetElements, 2 )
         for x,y in combos:
-            if x.particlesMatch ( y ):
+            if x.particlesMatch ( y, checkDecayType=True, branchOrder=False ):     
                 errmsg ="Constraints (%s) appearing in dataset %s, %s overlap "\
                         "(may result in double counting)." % \
                         (x,self.dataInfo.dataId,self.globalInfo.id )
                 logger.error( errmsg )
                 raise SModelSError ( errmsg )
-#                return True
-#        return False
+
 
     def __ne__ ( self, other ):
         return not self.__eq__ ( other )

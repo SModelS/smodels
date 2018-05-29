@@ -17,6 +17,8 @@ from smodels.theory.particleClass import Particles, ParticleList
 
 # SM particles
 
+anything = Particles(Z2parity=None, label='*', pdg=None, mass=None, eCharge=None, colordim=None, spin=None, width=None, branches=None)
+
 
 e = Particles(Z2parity='even', label='e-', pdg=11, mass=0.5*MeV, eCharge=-1, colordim=0, spin=1./2, width=0, branches=None) 
 mu = Particles(Z2parity='even', label='mu-', pdg=13, mass=106.*MeV, eCharge=-1, colordim=0, spin=1./2, width=0, branches=None)
@@ -51,7 +53,7 @@ leptonsC = [p.chargeConjugate() for p in leptons]
 gauge = [g,photon,W,Z]
 gaugeC = [p.chargeConjugate() for p in gauge]
 
-SMparticles = quarks + leptons + gauge + [higgs] + [pi]
+SMparticles = quarks + leptons + gauge + [higgs] + [pi] + [anything]
 SMparticlesC = quarksC + leptonsC + gaugeC + [higgs.chargeConjugate()] + [pi.chargeConjugate()]
 
 SMList = SMparticles + SMparticlesC

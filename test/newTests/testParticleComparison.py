@@ -9,7 +9,7 @@ import sys
 sys.path.insert(0,"../../")
 import unittest
 from smodels.theory.particleClass import Particles
-from smodels.theory.particleComparison import compareBSMparticles, simParticles
+from smodels.theory.particleComparison import compareBSMparticles, simParticles, ParticleWildcard
 from smodels.tools.physicsUnits import GeV
 
 p1 = Particles(Z2parity='odd', label='p1', pdg=None, mass=100.*GeV, eCharge=None, colordim=None, spin=None, width=None, branches=None)
@@ -40,6 +40,12 @@ class ParticleComparisonTest(unittest.TestCase):
         
         self.assertEqual( simParticles(l1, l2), True)
         
+    def testParticleWildCard(self):
+        particle2 = ParticleWildcard()
+        
+        self.assertTrue(isinstance(p1, Particles))
+        self.assertTrue(p1 == particle2)
+        self.assertTrue(particle2 == p1)
         
         
         
