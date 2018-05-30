@@ -114,16 +114,17 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     for pids in xSectionList.getPIDpairs():
         weightList = xSectionListDict[pids]
         minBR = (sigcut/weightList.getMaxXsec()).asNumber()
-
         if minBR > 1.: continue
         for branch1 in branchListDict[pids[0]]:
             BR1 =  branch1.maxWeight/maxWeight[pids[0]]  #Branching ratio for first branch            
-            
+            if BR1 < minBR: break #Stop loop if BR1 is already too low
+            """
             # add BRs as a list consisting of BR for prompt and a displaced decay
             if branch1.particles: BRs1, branches1 = addPromptAndDisplaced(branch1,BR1)      
             else: 
                 BRs1 = [BR1]
-                branch1.decayType = 'longlived'
+                if branch1.BSMparticles[0][0].isStable(): branch1.decayType = 'METonly'
+                else: branch1.decayType = 'longlived'
                 branches1 = [branch1]
             
             #drop BR from list that is too small                       
@@ -134,16 +135,16 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
                     branches1.pop(i)
                 else: i += 1                  
             if not BRs1: break
-            
-            for branch2 in branchListDict[pids[1]]:           
-            
+            """
+            for branch2 in branchListDict[pids[1]]:                       
                 BR2 =  branch2.maxWeight/maxWeight[pids[1]]  #Branching ratio for second branch                
-                        
-                
+                if BR1 < minBR: break #Stop loop if BR1 is already too low        
+                """
                 if branch2.particles: BRs2, branches2 = addPromptAndDisplaced(branch2,BR2)
                 else: 
                     BRs2 = [BR2]
-                    branch2.decayType = 'longlived'
+                    if branch2.BSMparticles[0][0].isStable(): branch2.decayType = 'METonly'
+                    else: branch2.decayType = 'longlived'
                     branches2 = [branch2]
               
                 i = 0
@@ -155,30 +156,37 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
                 if not BRs2: break                
                 
                 for i,b1 in enumerate(branches1):
-                    for j,b2 in enumerate(branches2):                         
+                    for j,b2 in enumerate(branches2):                        
                         finalBR = BRs1[i]*BRs2[j]                        
                         if type(finalBR) == type(1.*fb):
                             finalBR = finalBR.asNumber()                            
                         if finalBR < minBR: continue
-                        
-                
+                                        
                         if len(b1.BSMparticles) != 1 or len(b2.BSMparticles) != 1:
                             logger.error("During decomposition the branches should \
                                     not have multiple PID lists!")
-                            return False                         
-                        
-                        newElement = element.Element([b1, b2])
-                        newElement.weight = weightList*finalBR
-                         
-                        newElement.sortBranches()  #Make sure elements are sorted BEFORE adding them   
-            
-                        smsTopList.addElement(newElement)                                                 
-                     
+                            return False    
+                """
+                                     
+                finalBR = BR1*BR2                
+                if type(finalBR) == type(1.*fb):
+                    finalBR = finalBR.asNumber()
+                if finalBR < minBR: continue # Skip elements with xsec below sigcut
 
+                if len(branch1.BSMparticles) != 1 or len(branch2.BSMparticles) != 1:
+                    logger.error("During decomposition the branches should \
+                            not have multiple PID lists!")
+                    return False     
+                                       
+                newElement = element.Element([branch1, branch2])
+                newElement.weight = weightList*finalBR
+                 
+                newElement.sortBranches()  #Make sure elements are sorted BEFORE adding them              
+                smsTopList.addElement(newElement)                                                 
                                                     
     smsTopList.compressElements(doCompress, doInvisible, minmassgap)
-    smsTopList._setElementIds()                   
-                       
+    smsTopList._setElementIds()       
+            
     logger.debug("slhaDecomposer done in %.2f s." % (time.time() -t1 ) )
     
     
