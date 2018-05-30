@@ -45,7 +45,7 @@ class Database(object):
     """
 
     def __init__( self, base=None, force_load = None, discard_zeroes = True,
-                  progressbar = False, subpickle = False ):
+                  progressbar = False, subpickle = True ):
         """
         :param base: path to the database, or pickle file (string)
         :param force_load: force loading the text database ("txt"),

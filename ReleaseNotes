@@ -1,6 +1,7 @@
-Release v1.1.3, Thu 12 Apr 2018
+Release v1.1.3, Wed 30 May 2018
 =======================================================
 
+  * Default python is python3 now
   * Fixed lastUpdate bug
   * Changes in pickling (e.g. subpickling, removing redundant zeroes)
   * Database path allows URLs

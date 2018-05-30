@@ -43,6 +43,7 @@ as follows:
 New in Version 1.1.3:
 ^^^^^^^^^^^^^^^^^^^^^
 
+* Default python is python3 now
 * Fixed lastUpdate bug
 * Changes in pickling (subpickling, redundant zeroes are now removed)
 * URLs are allowed as database paths (see **database:path** in |parameters|)
