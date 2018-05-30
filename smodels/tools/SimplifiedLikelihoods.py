@@ -123,6 +123,8 @@ class Model:
     def convertCov ( self, obj ):
         if self.isScalar(obj):
             return array ( [ [ obj ] ] )
+        if type(obj[0]) == list:
+            return array ( obj )
         if type(obj[0]) == float:
             ## if the matrix is flattened, unflatten it.
             return array ( [ obj[self.n*i:self.n*(i+1)] for i in range(self.n) ] )
