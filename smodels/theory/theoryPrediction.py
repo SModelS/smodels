@@ -68,16 +68,13 @@ class TheoryPrediction(object):
         """
 
         if not self.conditions: return 0.        
-        # maxcond = 0.
         values = [ 0. ]
         for value in self.conditions.values():
             if value == 'N/A': return value
             if value == None: continue
-            #print ( "value=",value,type(value),float(value) )
-            #maxcond = max(maxcond,float(value))
             values.append ( float(value) )
         return max(values)
-        # return maxcond
+        
     
     def __str__(self):
         return "%s:%s" % ( self.analysis, self.xsection )
@@ -212,8 +209,8 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
     """
     predictionList = TheoryPredictionList()
     # Select elements belonging to expResult and apply efficiencies
-    elements = _getElementsFrom(smsTopList, dataset)
-
+    elements = _getElementsFrom(smsTopList, dataset)    
+    
     #Check dataset sqrts format:
     if (dataset.globalInfo.sqrts/TeV).normalize()._unit:
             ID = dataset.globalInfo.id
@@ -245,7 +242,7 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
         theoryPrediction.mass = cluster.getAvgMass()
         theoryPrediction.PIDs = cluster.getPIDs()
         theoryPrediction.IDs = cluster.getIDs()
-        predictionList._theoryPredictions.append(theoryPrediction)
+        predictionList._theoryPredictions.append(theoryPrediction)        
         
 
     if len(predictionList) == 0: return None
@@ -265,24 +262,24 @@ def _getElementsFrom(smsTopList, dataset):
     """
     
     elements = []
-    for txname in dataset.txnameList:
+    for txname in dataset.txnameList:  
         for top in smsTopList:
-            itop = txname._topologyList.index(top)  #Check if the topology appears in txname
-            if itop is None: continue   
-            for el in top.getElements():
-                #print "theoryPredicition _getElementsFrom"
-                #print el.branches[0].particles[0][0]
-                #print txname._topologyList.getElements()[0].branches[0].particles[0][0]
-                newEl = txname.hasElementAs(el)  #Check if element appears in txname
-                if not newEl: continue
-                el.covered = True
-                eff = txname.getEfficiencyFor(newEl.getMasses())
+            hasTop = txname._topologyList.hasTopology(top)
+            if not hasTop:                 
+                continue    
+            for el in top.getElements():                                                             
+                txnameEl = txname.hasElementAs(el)  #Check if element appears in txname
+                if not txnameEl: continue
+                el.covered = True            
+                newEl, eff = txname.reweightEfficiencyFor(txnameEl)
                 if not eff: continue
-                el.tested = True
-                newEl.eff = eff
-                newEl.weight *= eff
+                el.tested = True                                  
+                newEl.weight *= eff                                               
+                newEl.eff = eff  
+              
                 newEl.txname = txname
                 elements.append(newEl) #Save element with correct branch ordering
+    
     return elements
 
 
@@ -297,8 +294,7 @@ def _combineElements(elements, dataset, maxDist):
     :parameter expResult: Data Set to be considered (DataSet object)
     :returns: list of element clusters (ElementCluster objects)    
     """
-    
-    clusters = []   
+    clusters = []       
     
     if dataset.dataInfo.dataType == 'efficiencyMap':        
         cluster = clusterTools.groupAll(elements)  
@@ -311,12 +307,13 @@ def _combineElements(elements, dataset, maxDist):
                 if not element.txname == txname:
                     continue
                 else: txnameEls.append(element)
+                    
             txnameClusters = clusterTools.clusterElements(txnameEls, maxDist)         
             clusters += txnameClusters
     else:
         logger.warning("Unkown data type: %s. Data will be ignored." 
                        % dataset.dataInfo.dataType)
-                
+
     return clusters
 
 
@@ -355,7 +352,6 @@ def _evalConditions(cluster):
     :parameter cluster: cluster of elements (ElementCluster object)    
     :returns: list of condition values (floats) if analysis type == upper limit. None, otherwise.    
     """
-
     conditionVals = {}
     for txname in cluster.txnames:
         if not txname.condition or txname.condition == "not yet assigned":
@@ -370,9 +366,9 @@ def _evalConditions(cluster):
             raise SModelSError()
             
         # Loop over conditions
-        
+               
         for cond in conditions:
-            exprvalue = _evalExpression(cond,cluster)
+            exprvalue = _evalExpression(cond,cluster)            
             if type(exprvalue) == type(crossSection.XSection()):
                 conditionVals[cond] = exprvalue.value
             else:

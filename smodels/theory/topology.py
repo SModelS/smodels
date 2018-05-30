@@ -14,6 +14,7 @@ from smodels.theory.element import Element
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.theory.auxiliaryFunctions import index_bisect
 from smodels.tools.smodelsLogging import logger
+import itertools
 
 
 class Topology(object):
@@ -74,6 +75,12 @@ class Topology(object):
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
                 
+        #Check for any permutation of branches:
+        for v1 in itertools.permutations(self.vertparts):
+            for v2 in itertools.permutations(other.vertparts):
+                if v1 == v2:
+                    return 0
+
         if sorted(self.vertnumb,reverse=True) != sorted(other.vertnumb,reverse=True):
             comp = sorted(self.vertnumb,reverse=True) > sorted(other.vertnumb,reverse=True)
             if comp: return 1
@@ -83,8 +90,7 @@ class Topology(object):
             if comp: return 1
             else: return -1 
         else:
-            return 0        
-
+            return 0 
 
     def checkConsistency(self):
         """
@@ -157,9 +163,9 @@ class Topology(object):
         
         index = index_bisect(self.elementList,newelement)   
                 
-        if index != len(self.elementList) and self.elementList[index] == newelement:         
+        if index != len(self.elementList) and self.elementList[index] == newelement:  
             self.elementList[index].weight.combineWith(newelement.weight)
-            self.elementList[index].combineMotherElements(newelement)
+            self.elementList[index].combineMotherElements(newelement)     
         else:
             self.elementList.insert(index,newelement)
 
@@ -271,6 +277,20 @@ class TopologyList(object):
         
         return None
 
+    def hasTopology(self,topo):
+        """
+        Checks if topo appears in any of the topologies in the list.
+        
+        :param topo: Topology object
+        :return: True if topo appears in the list, False otherwise.
+        """
+
+        for t in self:
+            if t == topo:
+                return True
+        
+        return False 
+    
     
     def add(self, newTopology):
         """
@@ -314,9 +334,9 @@ class TopologyList(object):
         index = index_bisect(self,topoDummy)
         if index != len(self) and self.topos[index] == topoDummy:
             self.topos[index].addElement(newelement)
-        else:         
-            self.topos.insert(index,topoDummy)        
-
+        else:   
+            self.topos.insert(index,topoDummy)    
+            
 
     def getTotalWeight(self):
         """
@@ -337,7 +357,7 @@ class TopologyList(object):
 
         """
         elements = []
-        for top in self.topos:
+        for top in self.topos:                  
             elements.extend(top.elementList)             
         return elements
     
@@ -353,18 +373,18 @@ class TopologyList(object):
                                (if mass difference < minmassgap, perform mass compression)
 
         """
-        
-        for el in self.getElements():               
+           
+        for el in self.getElements():                      
             newElements = el.compressElement(doCompress,doInvisible,minmassgap)
 
             if not newElements:
                 continue
-            for newelement in newElements:                           
+            for newelement in newElements:                               
                 newelement.sortBranches()  #Make sure elements are sorted BEFORE adding them                                         
                     
                 self.addElement(newelement)    
-
-
+                
+                
     def _setElementIds(self):
         """
         Assign unique ID to each element in the Topology list

@@ -94,7 +94,7 @@ class ElementCluster(object):
         
         PIDs = []
         for el in self:
-            for pidList in el.getPIDs():
+            for pidList in el.getMotherPIDs():
                 if not pidList in PIDs: PIDs.append(pidList)
             
         return PIDs
