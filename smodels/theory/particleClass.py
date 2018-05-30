@@ -51,14 +51,17 @@ class Particles(object):
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
                 
         Allows for u, d, s quarks to be considered equal. Allows for all neutrinos to be considered equal.
+        Comparison to '*' always returns True. (= Particle Wild Card)
         """    
         if self.label != other.label:
         
+            if ( self.label == '*' ) or ( other.label == '*' ): return 0
+
             if ( self.label == 'qd' or self.label == 'qu' or self.label == 'qs' ) and ( other.label == 'qd' or other.label == 'qu' or other.label == 'qs' ):
                 return 0      
                 
             if ( self.label == 'nue' or self.label == 'numu' or self.label == 'nuta' ) and ( other.label == 'nue' or other.label == 'numu' or other.label == 'nuta' ):    
-                        return 0                  
+                return 0                  
         
             comp = self.label > other.label
             if comp: return 1
@@ -216,6 +219,6 @@ def sortParticleList(ptcList):
     newPtcList = sorted(ptcList, key=lambda x: x.label) 
     return newPtcList
     
-         
+
 
 

@@ -6,8 +6,9 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 """
 
-from smodels.particleDefinitions import particleLists
-from smodels.theory.particleClass import particleInList, sortParticleList
+from smodels.particleDefinitions import particleLists, SMnames
+from smodels.theory.particleClass import particleInList, sortParticleList, Particles
+from smodels.theory.particleNames import getNamesList, StrWildcard
 from smodels.tools.smodelsLogging import logger
 import itertools    
     
@@ -65,13 +66,23 @@ def simParticles(plist1, plist2, useLists=True):
         raise SModelSError()
     if len(plist1) != len(plist2):
         return False
-    
-    
                         
-    for i,p in enumerate(plist1):
+    for i,p in enumerate(plist1):        
+        """
+        if plist1[i].label == '*':
+            plist1[i] = ParticleWildcard()
+        if plist2[i].label == '*':
+            plist2[i] = ParticleWildcard()
+        """        
         if not isinstance(p.label,str) or not isinstance(plist2[i].label,str) :
             logger.error("Input must be two lists of particle or particle list objects which have a label")
             raise SModelSError()
+        elif not plist2[i].label in SMnames and not plist2[i].label in getNamesList(particleLists):
+            logger.error("Unknow particle: %s" %p)
+            raise SModelSError()
+        elif not plist2[i].label in SMnames and not plist2[i].label in getNamesList(particleLists):
+            logger.error("Unknow particle: %s" %plist2[i])
+            raise SModelSError()            
   
     l1 = sortParticleList(plist1) 
     l2 = sortParticleList(plist2)
@@ -104,5 +115,31 @@ def simParticles(plist1, plist2, useLists=True):
         if plist in extendedL2: return True  
     return False
     
+  
+"""  
+class ParticleWildcard(Particles):
 
+    #A particle wildcard class. It will return True when compared to any other particle object.
     
+    
+    def __init__(self):
+        Particles.__init__(self, None, StrWildcard(), None, None, None, None, None, None, None)
+
+    def __str__(self):
+        return '*'
+    
+    def __repr__(self):
+        return self.__str__()
+        
+    def __cmp__(self,other):
+        if isinstance(other, Particles):
+            return 0
+        else:
+            return -1        
+
+    def __eq__(self,other):
+        return self.__cmp__(other) == 0
+
+    def __ne__(self,other):
+        return self.__cmp__(other) != 0    
+"""        
