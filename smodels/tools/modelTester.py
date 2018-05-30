@@ -256,9 +256,8 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
     if len(cleanedList) == 1:
         return runSingleFile ( cleanedList[0], outputDir, parser, databaseVersion,
                                listOfExpRes, timeout, development, parameterFile )
-    # ncpus = _determineNCPus ( parser.getint("parameters", "ncpus"), len(cleanedList) )
-    ncpus = 1 ## dont parallelize, python itself is taking care of this!!
-    # logger.info ("Running SModelS on %d cores" % ncpus )
+    ncpus = _determineNCPus ( parser.getint("parameters", "ncpus"), len(cleanedList) )
+    logger.info ("Running SModelS on %d cores" % ncpus )
 
     if ncpus == 1:
         return runSetOfFiles( cleanedList, outputDir, parser, databaseVersion,
