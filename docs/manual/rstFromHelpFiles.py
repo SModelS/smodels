@@ -1,8 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 from __future__ import print_function
 
-import commands
+import subprocess
 
 def isEmpty ( string ):
     return string.strip() == ""
@@ -47,12 +47,12 @@ def write ( c, f ):
 
 def run ( tool, rstfile ):
     with open("source/%s.rst" % rstfile, "w" ) as f:
-        c = commands.getoutput ( "../../smodelsTools.py %s -h" % tool )
+        c = subprocess.getoutput ( "../../smodelsTools.py %s -h" % tool )
         write ( c, f )
 
 def runSModelS ():
     with open("source/RunSModelS.rst", "w" ) as f:
-        c = commands.getoutput ( "../../runSModelS.py -h" )
+        c = subprocess.getoutput ( "../../runSModelS.py -h" )
         write ( c, f )
 
 

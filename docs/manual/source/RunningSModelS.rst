@@ -139,7 +139,7 @@ Below we give more detailed information about each entry in the parameters file.
     *Only relevant for printing the* :ref:`output summary <fileOut>`.
   * **ncpus** (int): number of CPUs. When processing multiple SLHA/LHE files,
     SModelS can run in a parallelized fashion, splitting up the input files in equal chunks.
-    *ncpus = -1* uses the total number of CPU cores of the machine.
+    *ncpus = -1* uses the total number of CPU cores of the machine. Warning: do not change unless you know what you are doing!
 
 * *particles*: defines the particle content of the BSM model
  
