@@ -7,7 +7,7 @@
 """
 
 from smodels.theory.particleNames import elementsInStr
-from smodels.theory.branch import Branch
+from smodels.theory.branch import Branch, BranchWildcard
 from smodels.theory import crossSection
 from smodels.particleDefinitions import SMnames
 from smodels.SMparticleDefinitions import nuList
@@ -49,7 +49,6 @@ class Element(object):
             # Create element from particle string
             if type(info) == type(str()):
                 elements = elementsInStr(info)
-
                 if not elements or len(elements) > 1:
                     nel = 0
                     if elements:
@@ -57,18 +56,21 @@ class Element(object):
                     logger.error("Malformed input string. Number of elements "
                                   "is %d (expected 1) in: ``%s''", nel, info)
                     return None
-                else:
+                else:                                       
                     el = elements[0]
-                    branches = elementsInStr(el[1:-1])                 
+                    branches = elementsInStr(el[1:-1])               
                     if not branches or len(branches) != 2:
                         logger.error("Malformed input string. Number of "
                                       "branches is %d (expected 2) in: ``%s''",
                                       len(branches), info)
                         return None
-                    self.branches = []                    
+                    self.branches = []                  
                     for branch in branches:
-                        self.branches.append(Branch(branch))
-                         
+                        if branch == '[*]':
+                            self.branches.append(BranchWildcard())                            
+                        else:
+                            self.branches.append(Branch(branch)) 
+                        
             # Create element from branch pair
             elif type(info) == type([]) and type(info[0]) == type(Branch()):
                 for ib, branch in enumerate(info):
@@ -84,7 +86,9 @@ class Element(object):
         :param other:  element to be compared (Element object)
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
-
+        if not isinstance(other,Element):
+            return -1
+            
         #Compare branches:
         if self.branches != other.branches:          
             comp = self.branches > other.branches
@@ -108,11 +112,10 @@ class Element(object):
         Create the element bracket notation string, e.g. [[[jet]],[[jet]].
         
         :returns: string representation of the element (in bracket notation)    
-        """
-       
-        particleString = str(self.getParticles()).replace(" ", "").\
-                replace("'", "")
-        return particleString
+        """       
+        elStr = "["+",".join([str(br) for br in self.branches])+"]"
+        elStr = elStr.replace(" ", "").replace("'", "")
+        return elStr
     
     def sortBranches(self):
         """
@@ -129,7 +132,7 @@ class Element(object):
      
 
 
-    def particlesMatch(self, other, branchOrder=False):
+    def particlesMatch(self, other, checkDecayType=False, branchOrder=False):
         """
         Compare two Elements for matching particles only.
         Allow for inclusive particle labels (such as the ones defined in particleDefinitions.py).
@@ -141,6 +144,9 @@ class Element(object):
         :returns: True, if particles match; False, else;        
         """
 
+        if not isinstance(other,Element):
+            return False
+
         if type(self) != type(other):
             return False
         
@@ -150,7 +156,7 @@ class Element(object):
         #Check if particles inside each branch match in the correct order
         branchMatches = []
         for ib,br in enumerate(self.branches):
-            branchMatches.append(br.particlesMatch(other.branches[ib]))
+            branchMatches.append(br.particlesMatch(other.branches[ib], checkDecayType) )
         if sum(branchMatches) == 2:
                 return True
         elif branchOrder:
@@ -158,7 +164,7 @@ class Element(object):
         else:       
         #Now check for opposite order
             for ib,br in enumerate(self.switchBranches().branches):                
-                if not br.particlesMatch(other.branches[ib]):
+                if not br.particlesMatch(other.branches[ib], checkDecayType):
                     return False
 
             return True
@@ -308,8 +314,19 @@ class Element(object):
         [ [pdgMOM1,pdgMOM2],  [pdgMOM1',pdgMOM2']] 
         
         :returns: list of PDG ids
-        """
+        """                        
+        pids = self.getMotherPIDs()
         
+        momPIDs = []
+        for pidlist in pids:
+            momPIDs.append([pidlist[0][0],pidlist[1][0]])        
+        return momPIDs    
+        
+    def getMotherPIDs(self):
+        """
+        Get PIDs of all mothers
+        :returns: list of mother PDG ids
+        """
         # get a list of all original mothers, i.e. that only consists of first generation elements
         allmothers = self.motherElements
         while not all(mother[0] == 'original' for mother in allmothers):                        
@@ -319,14 +336,11 @@ class Element(object):
                     allmothers.pop(im)                                    
 
         # get the PIDs of all mothers      
-        pids = []
+        motherPids = []
         for mother in allmothers:  
-            pids.extend( mother[1].getPIDs() )                 
-
-        momPIDs = []
-        for pidlist in pids:
-            momPIDs.append([pidlist[0][0],pidlist[1][0]])        
-        return momPIDs    
+            motherPids.extend( mother[1].getPIDs() ) 
+        return motherPids     
+        
 
 
     def getEinfo(self):
@@ -339,8 +353,10 @@ class Element(object):
         vertnumb = []
         vertparts = []
         for branch in self.branches:
-            vertparts.append([len(ptcs) for ptcs in branch.particles])
-            vertnumb.append(len(branch.particles))
+            if branch.vertnumb is None:
+                branch.setInfo()
+            vertparts.append(branch.vertparts)
+            vertnumb.append(branch.vertnumb)
                 
         return {"vertnumb" : vertnumb, "vertparts" : vertparts}
 
