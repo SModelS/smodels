@@ -82,7 +82,7 @@ class XSection(object):
     An instance of this class represents a cross section.
     
     This class is used to store the information of a single cross section
-    (value, paritcle ids, center of mass, order and label).
+    (value, particle ids, center of mass, order and label).
     
     order = 0 (LO), 1 (NLO) or 2 (NLL).
     

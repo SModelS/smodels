@@ -61,7 +61,7 @@ class Uncovered(object):
             if self.inPrevMothers(el): 
                 missing = False # cannot be missing if element with same mothers has already appeared
             # this is because it can certainly be compressed further to the smaller element already seen in the loop
-            else: #if not the case, we add mothers to previous mothers and test if the topology is missin             
+            else: #if not the case, we add mothers to previous mothers and test if the topology is missing             
                 self.addPrevMothers(el)
                 missing = self.isMissingTopo(el) #missing topo only if not covered, and counting only weights of non-covered mothers
                 # in addition, mother elements cannot be missing, we consider only the most compressed one                                  

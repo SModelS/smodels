@@ -39,7 +39,7 @@ class ExpResult(object):
         :param path: Path to the experimental result folder
         :param discard_zeroes: Discard maps with only zeroes
         :param pcl_file: Write and maintain pickle file
-        """        
+        """ 
         if not path: return
         if not os.path.isdir ( path ):
             raise SModelSExperimentError ( "%s is not a path" % path )
@@ -58,13 +58,12 @@ class ExpResult(object):
         for root, files in folders:
             if 'dataInfo.txt' in files:  # data folder found
                 # Build data set
-                try:                    
+                try:
                     dataset = datasetObj.DataSet(root, self.globalInfo,
                             discard_zeroes = discard_zeroes )
                     self.datasets.append(dataset)
                 except TypeError:
                     continue
-
 
     def writePickle ( self, dbVersion ):
         """ write the pickle file """
@@ -194,7 +193,6 @@ class ExpResult(object):
                 if (upperLimit/fb).normalize()._unit:
                     logger.error("Upper limit defined with wrong units for %s and %s"
                                   %(dataset.globalInfo.id,dataset.dataInfo.dataId))
-                          
                     return False           
             
         elif self.datasets[0].dataInfo.dataType == 'upperLimit':
