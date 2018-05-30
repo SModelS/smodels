@@ -137,6 +137,9 @@ Below we give more detailed information about each entry in the parameters file.
     perfoming :ref:`mass compression <massComp>`. *Only used if doCompress = True*
   * **maxcond** (float): maximum allowed value (in the [0,1] interval) for the violation of :ref:`upper limit conditions <ULconditions>`. A zero value means the conditions are strictly enforced, while 1 means the conditions are never enforced.
     *Only relevant for printing the* :ref:`output summary <fileOut>`.
+  * **ncpus** (int): number of CPUs. When processing multiple SLHA/LHE files,
+    SModelS can run in a parallelized fashion, splitting up the input files in equal chunks.
+    *ncpus = -1* uses the total number of CPU cores of the machine.
 
 * *particles*: defines the particle content of the BSM model
  
