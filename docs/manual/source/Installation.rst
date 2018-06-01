@@ -14,9 +14,7 @@ Installation and Deployment
 Standard Installation
 ---------------------
 
-SModelS is a Python library that requires Python version 2.6 or later (including
-version 3) with the following *external* Python
-libraries:
+SModelS is a Python library that requires Python version 2.6 or later, including version 3, which is the default. It depends on the following *external* Python libraries:
 
  * unum>=4.0.0
  * numpy>=1.13.0
@@ -57,13 +55,13 @@ platform, the environment variables $PATH, $PYTHONPATH, $LD_LIBRARY_PATH
 If Python's *setuptools* is installed in your machine, SModelS and its dependencies
 can be installed with: ::
 
-  python setup.py install
+  setup.py install
 
 If the python libraries are installed in a system folder (as is the default behavior),
 it will be necessary to run the install command with superuser privilege.
 Alternatively, one can run setup.py with the "--user" flag: ::
 
-  python setup.py install --user
+  setup.py install --user
 
 If *setuptools* is not installed, you can try to install the external libraries
 manually and then rerun setup.py.
@@ -71,7 +69,7 @@ For Ubuntu, SL6 machines and other platforms, a recipe is given below.
 
 There is also a diagnostic tool available: ::
 
-  python smodelsTools.py toolbox
+  smodelsTools.py toolbox
 
 should list and check all internal tools (Pythia and NLL-fast) and external
 (numpy, scipy, unum, ... ) dependencies.
@@ -86,7 +84,7 @@ Installation on Ubuntu machines should be straightforward with superuser privile
 (if you do not have superuser privileges see instructions below):
 
  * sudo apt install gfortran python-setuptools python-scipy python-numpy python-docutils python-argparse
- * python setup.py install
+ * setup.py install
 
 Note that the last command can be run as superuser, or with the "--user" flag.
 
@@ -121,7 +119,7 @@ Installation on SL5 and similar distributions
 ---------------------------------------------
 
 In some distributions like SL5, the Python default version may be smaller than
-2.6.  In these cases, ``virtualenv`` has to be set up for a Python version >=         2.6.  E.g. for Python 2.6, do ``virtualenv --python=python2.6 <envname>``,            and modify by hand the first line in the executable from ``#!/usr/bin/env python``
+2.6.  In these cases, ``virtualenv`` has to be set up for a Python version >=         2.6.  E.g. for Python 2.6, do ``virtualenv --python=python2.6 <envname>``,            and modify by hand the first line in the executable from ``#!/usr/bin/env python3``
 to ``#!/usr/bin/env python2.6``.
 Then perform the steps listed under ``Installation on SL6``.
 
@@ -135,19 +133,19 @@ without superuser priviledges is via Anaconda (https://www.continuum.io/download
 Anaconda provides a local installation of pip as well as several additional python packages.
 Here we assume a version of gfortran is already installed in your system.
 
- * download and install Anaconda for Python 2.7 (https://www.continuum.io/downloads)
- * make sure Anaconda's bin and lib folders are added to your system and python paths ::
+ * download and install Anaconda for Python 3.6 (https://www.continuum.io/downloads)
+ * make sure Anaconda's bin and lib folders are added to your system and Python paths ::
 
     PATH="<anaconda-folder>/bin:$PATH"
-    PYTHONPATH=$PYTHONPATH:"<anaconda-folder>/lib/python2.7/site-packages"
+    PYTHONPATH=$PYTHONPATH:"<anaconda-folder>/lib/python3.6/site-packages"
 
 and then install SModelS as a user: ::
 
- python setup.py install --user
+ setup.py install --user
 
 In order to make sure all libraries have been correctly installed, you can run: ::
 
-    python smodelsTools.py toolBox
+    smodelsTools.py toolBox
 
 
 Installation of the C++ interface
@@ -214,7 +212,4 @@ Once the new folders and files have been added following the
 automatically rebuilds the binary (Pickle) database file.
 The added results will then be available for using with the
 the SModelS tools.
-
-
-
 
