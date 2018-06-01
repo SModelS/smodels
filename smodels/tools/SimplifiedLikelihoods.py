@@ -603,7 +603,6 @@ class LikelihoodComputer:
 
     def likelihood ( self, nsig, marginalize=False, nll=False ):
         """ compute likelihood for nsig, profiling the nuisances
-        :param deltas: error on signal
         :param marginalize: if true, marginalize, if false, profile
         :param nll: return nll instead of likelihood
         """

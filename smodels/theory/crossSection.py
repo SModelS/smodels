@@ -556,6 +556,10 @@ class XSectionList(object):
 
         self.xSections = sorted(self.xSections, key=lambda xsec: xsec.pid)
 
+    def __lt__(self, other):
+        return self.xSections[0].pid < other.xSections[0].pid
+
+
     def sort ( self ):
         """ sort the xsecs by the values """
         self.xSections = sorted(self.xSections,

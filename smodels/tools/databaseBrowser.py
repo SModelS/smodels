@@ -88,10 +88,10 @@ class Browser(object):
 
         fieldDict = []
         if expResult and isinstance(expResult,ExpResult):
-            fieldDict = expResult.__dict__.items()[:]   #Use only the entries for the expResult
+            fieldDict = list(expResult.__dict__.items())   #Use only the entries for the expResult
         else:
             for expResult in self:
-                fieldDict += expResult.__dict__.items()[:]     #Use all entries/expResults
+                fieldDict += list(expResult.__dict__.items())     #Use all entries/expResults
         valuesDict = {}
         while fieldDict:
             for field,value in fieldDict[:]:
@@ -100,8 +100,8 @@ class Browser(object):
                     else: valuesDict[field].append(value)
                 else:
                     if isinstance(value,list):
-                        for entry in value: fieldDict += entry.__dict__.items()[:]
-                    else: fieldDict += value.__dict__.items()[:]
+                        for entry in value: fieldDict += list(entry.__dict__.items())
+                    else: fieldDict += list(value.__dict__.items())
                 fieldDict.remove((field,value))
 
         #Try to keep only the set of unique values

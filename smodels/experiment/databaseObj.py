@@ -524,6 +524,10 @@ class Database(object):
                   contains only one result
 
         """
+        if type(analysisIDs)==str: analysisIDs=[analysisIDs]
+        if type(datasetIDs)==str: datasetIDs=[datasetIDs]
+        if type(txnames)==str: txnames=[txnames]
+        if type(dataTypes)==str: dataTypes=[dataTypes]
 
         import fnmatch
         expResultList = []
