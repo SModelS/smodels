@@ -1,4 +1,4 @@
-Release v1.1.3, Wed 30 May 2018
+Release v1.1.3, Jun 04 May 2018
 =======================================================
 
   * Default python is python3 now
@@ -11,6 +11,7 @@ Release v1.1.3, Wed 30 May 2018
   * wildcards allowed when selecting analyses, datasets, txnames
   * path to particles.py can now be specified in parameters.ini
   * support for covariance matrices and combination of signal regions
+  * fixed small issue with pair production of even particles
  
 Release v1.1.2, Fri 02 Mar 2018
 =======================================================
