@@ -9,8 +9,10 @@
 """
 import sys
 sys.path.insert(0,"../")
-from smodels.tools.physicsUnits import GeV, fb
 from smodels.theory import slhaDecomposer
+from smodels.tools import xsecComputer
+from smodels.tools.xsecComputer import NLL
+from smodels.tools.physicsUnits import GeV, fb, TeV
 import unittest
 
 class TxTest(unittest.TestCase):

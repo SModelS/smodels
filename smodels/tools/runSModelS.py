@@ -105,10 +105,9 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
         runtime.modelFile = parser.get( "particles", "module" )     
 
     
-    """Redfine method to compute Flong, if necessary """
     if parser.has_section("flongcalc"):
-        runtime.setFlongCalc(path=os.path.abspath(parser.get( "flongcalc", "modulePath" )),
-             method=parser.get( "flongcalc", "methodName" ))
+        runtime.FlongPath = os.path.abspath(parser.get( "flongcalc", "modulePath" ))
+        runtime.FlongMethod =  parser.get( "flongcalc", "methodName" )
 
     """ Check database location and load database, exit if not found """
     database, databaseVersion = modelTester.loadDatabase(parser, db)
