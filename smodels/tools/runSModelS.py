@@ -8,12 +8,11 @@
 
 from __future__ import print_function
 import os
-from smodels.tools import runtime
 from smodels.installation import installDirectory, version
 from smodels.tools import modelTester
 from smodels.tools import crashReport
 from smodels.tools import smodelsLogging
-
+from smodels.tools import runtime
 
 """ Module variable, so particles.py can read it. Determined by command line
 parameter (overriding ini-file-entry overriding hard coded default smodels.default_particles)
@@ -104,16 +103,19 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
     if parser.has_option("particles","module"):
         runtime.modelFile = parser.get( "particles", "module" )     
 
+    if parser.has_option("particles","module"):
+        runtime.modelFile = parser.get( "particles", "module" )     
+
     
-    if parser.has_section("flongcalc"):
-        runtime.FlongPath = os.path.abspath(parser.get( "flongcalc", "modulePath" ))
-        runtime.FlongMethod =  parser.get( "flongcalc", "methodName" )
+    if parser.has_option("flongcalc","flongcalculator"):
+        runtime.FlongCalc = parser.get( "flongcalc", "flongcalculator" )
+
 
     """ Check database location and load database, exit if not found """
     database, databaseVersion = modelTester.loadDatabase(parser, db)
 
     """ Get list of input files to be tested """
-    fileList = modelTester.getAllInputFiles(inFile)
+    fileList, inDir = modelTester.getAllInputFiles(inFile)
 
     """ Create output directory if missing """
     if not os.path.isdir(outputDir): os.mkdir(outputDir)
@@ -122,7 +124,7 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
     listOfExpRes = modelTester.loadDatabaseResults(parser, database)
 
     """ Test all input points """
-    modelTester.testPoints( fileList, inFile, outputDir, parser, databaseVersion, 
+    modelTester.testPoints( fileList, inDir, outputDir, parser, databaseVersion, 
                  listOfExpRes, timeout, development, parameterFile )
 
 if __name__ == "__main__":

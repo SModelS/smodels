@@ -18,6 +18,15 @@ from smodels.tools.physicsUnits import fb, GeV
 import smodels.particles
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
+from smodels.tools.runtime import FlongCalc
+import importlib
+
+try:
+    mod = importlib.import_module(FlongCalc.rsplit('.',1)[0])
+    fCalc = getattr(mod,FlongCalc.rsplit('.',1)[-1])
+except:
+    from smodels.tools.flongCalc import FlongCalculator as fCalc     
+    
 
 
 
@@ -213,18 +222,6 @@ def _getPromptDecays(slhafile,brDic):
     
     :return: Dictionary = {pid : decay}
     """
-
-    from smodels.tools.runtime import FlongPath,FlongMethod
-    import imp,os
-    
-    try:
-        mod = imp.load_source(os.path.basename(FlongPath).replace('.py',''),FlongPath)        
-        fCalc = getattr(mod,FlongMethod)
-        logger.debug("Flong calculator: %s from %s" %(FlongMethod,FlongPath))
-    except:
-        from smodels.tools.flongCalc import FlongCalculator as fCalc 
-        logger.warning("Could not load Flong calculator from %s. Using default." %FlongPath)    
-    
     
     
     #Get the widths:
@@ -234,8 +231,7 @@ def _getPromptDecays(slhafile,brDic):
         
     for pid in brDic:
         width = abs(decays[abs(pid)].totalwidth)*GeV
-        mass = massDict[abs(pid)]*GeV
-        f = fCalc(pdg=pid,width=width,mass=mass)
+        f = fCalc(pid,width,massDict[pid])
         Fprompt,Flong = f['Fprompt'],f['Flong']
         for decay in brDic[pid]:
             decay.br *= Fprompt  #Reweight by prompt fraction
