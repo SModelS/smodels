@@ -14,21 +14,11 @@ import time
 import pyslha
 from smodels.theory import element, topology, crossSection
 from smodels.theory.branch import Branch, decayBranches
-from smodels.tools.physicsUnits import fb, GeV
+from smodels.tools.physicsUnits import fb, GeV, mm, m, MeV,fm
+import math
 import smodels.particles
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
-from smodels.tools.runtime import FlongCalc
-import importlib
-
-try:
-    mod = importlib.import_module(FlongCalc.rsplit('.',1)[0])
-    fCalc = getattr(mod,FlongCalc.rsplit('.',1)[-1])
-except:
-    from smodels.tools.flongCalc import FlongCalculator as fCalc     
-    
-
-
 
 def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
               minmassgap=-1.*GeV, useXSecs=None):
@@ -211,33 +201,44 @@ def _getDictionariesFromSLHA(slhafile):
 
 
 
-def _getPromptDecays(slhafile,brDic):
+def _getPromptDecays(slhafile,brDic,l_inner=10.*mm,gb_inner=10,l_outer=10.*m,gb_outer=0.6):
     """
     Using the widths in the slhafile, reweights the BR dictionary with the fraction
     of prompt decays and add the fraction of "long-lived decays".
-    The fraction of prompt decays is computed with the fCalc function
-    defined as a paramter in parameters.ini or with the default 
-    one in smodels.tools.flongCalc.
+    The fraction of prompt decays and "long-lived decays" are defined as:
+    F_prompt = 1 - exp(-width*l_inner/gb_inner)
+    F_long = exp(-width*l_outer/gb_outer)
+    where l_inner is the inner radius of the detector, l_outer is the outer radius
+    and gb_x is the estimate for the kinematical factor gamma*beta for each case.
+    We use gb_outer = 10 and gb_inner= 0.5
     :param widthDic: Dictionary with the widths of the particles
+    :param l_inner: Radius of the inner tracker
+    :param gb_inner: Effective gamma*beta factor to be used for prompt decays
+    :param l_outer: Radius of the outer detector
+    :param gb_outer: Effective gamma*beta factor to be used for long-lived decays
     
     :return: Dictionary = {pid : decay}
     """
     
-    
+    hc = 197.327*MeV*fm  #hbar * c
+        
     #Get the widths:
     res = pyslha.readSLHAFile(slhafile)
-    decays = res.decays
-    massDict = dict(res.blocks['MASS'].items())
+    decays = res.decays    
         
     for pid in brDic:
         width = abs(decays[abs(pid)].totalwidth)*GeV
-        f = fCalc(pid,width,massDict[pid])
-        Fprompt,Flong = f['Fprompt'],f['Flong']
+        Fprompt = 1. - math.exp(-width*l_inner/(gb_inner*hc))
+        Flong = math.exp(-width*l_outer/(gb_outer*hc))
         for decay in brDic[pid]:
             decay.br *= Fprompt  #Reweight by prompt fraction
+            
         #Add long-lived fraction:
-        if Flong:
+        if Flong > 1e-50:
             stableFraction = pyslha.Decay(br=Flong,ids=[],nda=0)
             brDic[pid].append(stableFraction) 
+        if (Flong+Fprompt) > 1.:
+            logger.error("Sum of decay fractions > 1 for "+str(pid))
+            return False
         
     return brDic
