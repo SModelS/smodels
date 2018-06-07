@@ -261,25 +261,27 @@ def _getElementsFrom(smsTopList, dataset):
     :returns: list of elements (Element objects)    
     """
     
-    elements = []
+    elements = []    
     for txname in dataset.txnameList:  
         for top in smsTopList:
+            allNewElements = []
             hasTop = txname._topologyList.hasTopology(top)
             if not hasTop:                 
                 continue    
-            for el in top.getElements():                                                             
+            for i,el in enumerate(top.getElements()):      
                 txnameEl = txname.hasElementAs(el)  #Check if element appears in txname
-                if not txnameEl: continue
-                el.covered = True            
-                newEl, eff = txname.reweightEfficiencyFor(txnameEl)
-                if not eff: continue
-                el.tested = True                                  
-                newEl.weight *= eff                                               
-                newEl.eff = eff  
-              
-                newEl.txname = txname
-                elements.append(newEl) #Save element with correct branch ordering
-    
+                if not txnameEl: continue              
+                newElements, effs = txname.reweightEfficiencyFor(txnameEl)               
+                for i,newEl in enumerate(newElements):
+                    if not effs[i]: continue
+                    newEl.txname = txname                         
+                    newEl.weight *= effs[i]                                           
+                    newEl.eff = effs[i]                      
+                    if newEl.tested: elements.append(newEl) #Save element with correct branch ordering that are tested by experiment
+                    allNewElements.append(newEl)
+                    
+            top.elementList = allNewElements         
+                                                            
     return elements
 
 

@@ -255,39 +255,61 @@ class TxName(object):
         else:
             finalState = ["MET","MET"]  
 
-        # only keep the element that matches the type of decay in the database
+        newElements = []
+        effs = []
         for i,probability1 in enumerate(probabilities1):
             for j,probability2 in enumerate(probabilities2):
-                if sameLabel(branches1[i].decayType, finalState[0]) and sameLabel(branches2[j].decayType, finalState[1]): 
-                    newEl = element.copy()
-                    newEl.branches[0].decayType = branches1[i].decayType
-                    newEl.branches[1].decayType = branches2[j].decayType                  
-                    eff = self.getEfficiencyFor(element)        
-                    if not eff: return 0.,0.                    
+                
+                newEl = element.copy()
+                newEl.branches[0].decayType = branches1[i].decayType
+                newEl.branches[1].decayType = branches2[j].decayType  
+            
+                if sameDecayType(newEl.branches[0].decayType, finalState[0]) and sameDecayType(newEl.branches[1].decayType, finalState[1]):           
+                    newEl.covered = True                          
+                    eff = self.getEfficiencyFor(element)       
+                    if eff:                                          
+                        newEl.tested = True         
+                    else: eff = 1.                              
                     eff *= (probability1*probability2)                    
-                    return newEl, eff
-                    
-                elif sameLabel(branches1[i].decayType, finalState[1]) and sameLabel(branches2[j].decayType, finalState[0]): 
-                    newEl = element.copy()
+                    newElements.append(newEl)         
+                    effs.append(eff)                                
+                elif sameDecayType(newEl.branches[0].decayType, finalState[1]) and sameDecayType(newEl.branches[1].decayType, finalState[0]):                                      
+                    # decay types matched with switched branches
+                    newEl.covered = True
                     newElb = newEl.switchBranches()
+                    # check if element still belongs to this txname after switching branches
                     newElB = self.hasElementAs(newElb, switchBranches = False)
-                    if not newElB: return 0.,0.  
-                    newElB.branches[0].decayType = branches1[i].decayType
-                    newElB.branches[1].decayType = branches2[j].decayType
-                    effb = self.getEfficiencyFor(newElB)
-                    if not effb: return 0.,0.                  
-                    effb *= (probability1*probability2)
-                    return newElb, effb                      
-        return 0., 0.
+                    if newElB:
+                        eff = self.getEfficiencyFor(newElB)     
+                        if eff:                                    
+                            newElb.tested = True 
+                        else: eff = 1.
+                        eff *= (probability1*probability2)
+                        newElements.append(newElb)   
+                        effs.append(eff)
+                    else: 
+                        newElements.append(newEl)            
+                        eff = 1.
+                        eff *= (probability1*probability2)    
+                        effs.append(eff)                    
+                else: 
+                    newElements.append(newEl)            
+                    eff = 1.
+                    eff *= (probability1*probability2)
+                    effs.append(eff)
+
+        return newElements, effs
         
-def sameLabel(label1,label2):
+        
+        
+def sameDecayType(decayType1,decayType2):
     """
     Compares labels from different naming conventions, e.g. HSCP (in the database) == longlived (in the code)
     :return: True if the labels mean the same, False otherwise
     """
-    if label1 == label2: return True
-    elif label1 == 'longlived' and label2 == 'HSCP': return True    
-    elif (label1 == 'METonly' or label1 == 'prompt') and label2 == 'MET': return True
+    if decayType1 == decayType2: return True
+    elif decayType1 == 'longlived' and decayType2 == 'HSCP': return True    
+    elif (decayType1 == 'METonly' or decayType1 == 'prompt') and decayType2 == 'MET': return True
     else: return False
 
 class TxNameData(object):
@@ -969,3 +991,4 @@ if __name__ == "__main__":
         sm = "%.1f %.1f" % ( masses[0][0].asNumber(GeV), masses[0][1].asNumber(GeV) )
         print ( "%s %.3f fb" % ( sm, result.asNumber(fb) ) )
     print ( "%.2f ms" % ( (time.time()-t0)*1000. ) )
+        

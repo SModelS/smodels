@@ -10,6 +10,7 @@
 """
 import copy, sys
 from smodels.tools.physicsUnits import fb
+from smodels.theory.updateParticles import addPromptAndDisplaced
 
 class Uncovered(object):
     """
@@ -31,6 +32,9 @@ class Uncovered(object):
         self.outsideGrid = UncoveredList(sumL, sumJet, self.sqrts) # FIXME change this to derived objects for printout
         self.longCascade = UncoveredClassifier()
         self.asymmetricBranches = UncoveredClassifier()
+        self.longLived = UncoveredList(sumL, sumJet, self.sqrts)
+        self.displaced = UncoveredList(sumL, sumJet, self.sqrts)
+        self.MET = UncoveredList(sumL, sumJet, self.sqrts)
         self.motherIDs = []
         self.prevMothers = []
         self.outsideGridMothers = []
@@ -57,30 +61,59 @@ class Uncovered(object):
         Fills all corresponding objects
         :ivar topoList: sms topology list
         """
-        for el in topoList.getElements(): # loop over all elements, by construction we start with the most compressed
-            if self.inPrevMothers(el): 
-                missing = False # cannot be missing if element with same mothers has already appeared
-            # this is because it can certainly be compressed further to the smaller element already seen in the loop
-            else: #if not the case, we add mothers to previous mothers and test if the topology is missing             
-                self.addPrevMothers(el)
-                missing = self.isMissingTopo(el) #missing topo only if not covered, and counting only weights of non-covered mothers
-                # in addition, mother elements cannot be missing, we consider only the most compressed one                                  
-            if not missing: # any element that is not missing might be outside the grid                            
-                # outside grid should be smalles covered but not tested in compression                  
-                if el.covered and not el.tested: # verify first that element is covered but not tested                              
-                    if not el.weight.getXsecsFor(self.sqrts): continue # remove elements that only have weight at higher sqrts                    
-                    if self.inOutsideGridMothers(el): continue # if daughter element of current element is already counted skip this element                  
-                    # in this way we do not double count, but always count the smallest compression that is outside the grid
-                    outsideX = self.getOutsideX(el) # as for missing topo, recursively find untested cross section
+        for element in topoList.getElements(): # loop over all elements, by construction we start with the most compressed
 
-                    if outsideX: # if all mothers are tested, this is no longer outside grid contribution, otherwise add to list
-                        el.missingX =  outsideX # for combined printing function, call outside grid weight missingX as well
-                        self.outsideGrid.addToTopos(el) # add to list of outsideGrid topos                         
-                continue
- 
-            self.missingTopos.addToTopos(el) #keep track of all missing topologies
-            if self.hasLongCascade(el): self.longCascade.addToClasses(el)
-            elif self.hasAsymmetricBranches(el): self.asymmetricBranches.addToClasses(el) # if no long cascade, check for asymmetric branches
+            if not element.branches[0].decayType:
+                allElements = []
+                probabilities1, branches1 = addPromptAndDisplaced(element.branches[0])
+                probabilities2, branches2 = addPromptAndDisplaced(element.branches[1])               
+                for i,probability1 in enumerate(probabilities1):
+                    for j,probability2 in enumerate(probabilities2): 
+                        newEl = element.copy()     
+                        newEl.branches[0].decayType = branches1[i].decayType
+                        newEl.branches[1].decayType = branches2[j].decayType      
+                        newEl.weight *= (probability1*probability2)                                                              
+                        allElements.append(newEl)                       
+                
+            else: allElements = [element]        
+              
+            for el in allElements:                             
+                if self.inPrevMothers(el): 
+                    missing = False # cannot be missing if element with same mothers has already appeared
+                # this is because it can certainly be compressed further to the smaller element already seen in the loop
+                else: #if not the case, we add mothers to previous mothers and test if the topology is missing             
+                    self.addPrevMothers(el)
+                    missing = self.isMissingTopo(el) #missing topo only if not covered, and counting only weights of non-covered mothers
+                    # in addition, mother elements cannot be missing, we consider only the most compressed one                                  
+                if not missing: # any element that is not missing might be outside the grid                            
+                    # outside grid should be smalles covered but not tested in compression                  
+                    if el.covered and not el.tested: # verify first that element is covered but not tested                              
+                        if not el.weight.getXsecsFor(self.sqrts): continue # remove elements that only have weight at higher sqrts                    
+                        if self.inOutsideGridMothers(el): continue # if daughter element of current element is already counted skip this element                  
+                        # in this way we do not double count, but always count the smallest compression that is outside the grid
+                        outsideX = self.getOutsideX(el) # as for missing topo, recursively find untested cross section
+
+                        if outsideX: # if all mothers are tested, this is no longer outside grid contribution, otherwise add to list
+                            el.missingX =  outsideX # for combined printing function, call outside grid weight missingX as well
+                            self.outsideGrid.addToTopos(el) # add to list of outsideGrid topos             
+                            print "outside grid"
+                            print el, el.weight
+                            for br in el.branches: print br.decayType            
+                    continue
+    
+                self.missingTopos.addToTopos(el) #keep track of all missing topologies
+                if self.hasLongCascade(el): 
+                    #print "long cascade"
+                    #print el
+                    self.longCascade.addToClasses(el)
+                elif self.hasAsymmetricBranches(el): 
+                    #print "asymmetric branches"
+                    #print el
+                    self.asymmetricBranches.addToClasses(el) # if no long cascade, check for asymmetric branches
+
+                if self.hasLongLived(el): self.longLived.addToTopos(el)
+                elif self.hasDisplaced(el): self.displaced.addToTopos(el)
+                else: self.MET.addToTopos(el)
  
 
     def inPrevMothers(self, el): #check if smaller element with same mother has already been checked
@@ -114,6 +147,24 @@ class Uncovered(object):
         if el.branches[0] == el.branches[1]: 
             return False
         return True
+        
+    def hasLongLived(self, el):
+        """
+        Return True if Element has at least one long lived branch
+        :ivar el: Element
+        """  
+        if el.branches[0].decayType == 'longlived' or el.branches[1].decayType == 'longlived': 
+            return True 
+        return False     
+        
+    def hasDisplaced(self, el):
+        """
+        Return True if Element has at least one displaced branch but no longlived
+        :ivar el: Element
+        """  
+        if 'displaced' in el.branches[0].decayType or 'displaced' in el.branches[1].decayType: 
+            return True 
+        return False                    
 
     def isMissingTopo(self, el):
         """
@@ -184,41 +235,26 @@ class Uncovered(object):
 
 
 
-    def getMissingXsec(self, sqrts=None):
+    def getUncoveredListXsec(self, uncoveredList, sqrts=None):
         """
         Calculate total missing topology cross section at sqrts. If no sqrts is given use self.sqrts
         :ivar sqrts: sqrts
         """
         xsec = 0.
         if not sqrts: sqrts = self.sqrts
-        for topo in self.missingTopos.topos:
+        for topo in uncoveredList.topos:
             for el in topo.contributingElements:
                 xsec += el.missingX
         return xsec
-
-    def getOutOfGridXsec(self, sqrts=None): #FIXME same as getMissingXsec but different object, should not be separate functions
+    
+    def getUncoveredClassifierXsec(self, uncoveredClassifier, sqrts=None):
         xsec = 0.
         if not sqrts: sqrts = self.sqrts
-        for topo in self.outsideGrid.topos:
-            for el in topo.contributingElements:
-                xsec += el.missingX
-        return xsec
-
-    def getLongCascadeXsec(self, sqrts=None):
-        xsec = 0.
-        if not sqrts: sqrts = self.sqrts
-        for uncovClass in self.longCascade.classes:
+        for uncovClass in uncoveredClassifier.classes:
             for el in uncovClass.contributingElements:
                 xsec += el.missingX
         return xsec
 
-    def getAsymmetricXsec(self, sqrts=None):
-        xsec = 0.
-        if not sqrts: sqrts = self.sqrts
-        for uncovClass in self.asymmetricBranches.classes:
-            for el in uncovClass.contributingElements:
-                xsec += el.missingX
-        return xsec
           
 class UncoveredClassifier(object):
     """
@@ -351,6 +387,7 @@ class UncoveredList(object):
         """
 
         name = self.orderbranches(self.generalName(el.__str__()))
+        name = name + '  (%s)'%(str(el.branches[0].decayType) + ","+ str(el.branches[1].decayType) )
         for topo in self.topos:
             if name == topo.topo:
                 topo.contributingElements.append(el)
@@ -374,7 +411,7 @@ class UncoveredList(object):
                 if pn == particleList.label: 
                     particles = particleList.particles                
                     for on in particles:  
-                        instr = instr.replace(on.label, pn).replace("hijetjets","higgs")  # in higgs g,g,s all get replaced by jet
+                        instr = instr.replace(on.label, pn).replace("hijetjets","higgs")  # in higgs g gets replaced by jet
                         
                 else: continue  
         return instr
