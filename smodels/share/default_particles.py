@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: particles
@@ -10,8 +10,6 @@
    and their respective labels
    :parameter rEven: dictionary with PDG codes for the rEven (Z2-eveb)
    particles and their respective labels
-   :parameter ptcDic: dictionary with inclusive labels to help defining group
-   of particles in the analysis database
    
    HOW TO ADD NEW PARTICLES: simply add a new entry in rOdd (rEven) if the
    particle is Z2-odd (Z2-even). For now all decays of Z2-even particles are
@@ -86,11 +84,7 @@ rOdd = {1000021 : "gluino",
        -1000016 : "sneutrino",
        -2000012 : "sneutrino",
        -2000014 : "sneutrino",
-       -2000016 : "sneutrino",
-        1000111 : "he+",
-       -1000111 : "he-",
-        1000255 : "s0",
-       -1000255 : "s0"
+       -2000016 : "sneutrino"
 }
 
 rEven = {25 : "higgs",
@@ -138,25 +132,7 @@ rEven = {25 : "higgs",
          211: "pi",
          -211: "pi" }
 
-#Particle dictionary. Convenient for defining multiple particles with one label.
-ptcDic = {"e"  : ["e+",  "e-"],
-          "mu" : ["mu+", "mu-"],
-          "ta" : ["ta+", "ta-"],
-          "l+" : ["e+",  "mu+"],
-          "l-" : ["e-",  "mu-"],
-          "l"  : ["e-",  "mu-", "e+", "mu+"],
-          "W"  : ["W+",  "W-"],
-          "t"  : ["t+",  "t-"],
-          "L+" : ["e+",  "mu+", "ta+"],
-          "L-" : ["e-",  "mu-", "ta-"],
-          "L"  : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-"],
-          "jet" : [ "q", "g", "c", "pi" ],
-          "all" : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-", "W+", "W-","Z","photon","higgs","t+","t-","b","c","q","g","c","pi"]}
-
-#Include all R-even particles:
-ptcDic['?'] = list(rEven.values()) + list(ptcDic.keys())
-
-#Quantum numbers for the new particles.
+#Quantum numbers for the new particles. Just used by tools.slhaChecks
 #PDG: (spin*2, electrical charge*3, color dimension)
 qNumbers={
  35:[0,0,1],
@@ -193,15 +169,5 @@ qNumbers={
  2000004:[0,2,3],
  1000111:[1,3,1],
  1000255:[0,0,1]
-}
-
-#Final states. Define final state labels
-#according to the qNumbers tuples.
-
-finalStates = {
-"HSCP" : [[1,3,1],[1,-3,1],[0,3,1],[0,-3,1],[2,3,1],[2,-3,1]],
-"MET" : [[1,0,1],[0,0,1],[2,0,1]],
-"RHadronG" : [[1,0,8]],  #Gluino-like RHadron
-"RHadronQ" : [[0,2,3],[0,-1,3],[0,-2,3],[0,1,3]]  #Squark-like RHadron
 }
 
