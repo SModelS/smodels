@@ -29,7 +29,7 @@ class Uncovered(object):
         else:
             self.sqrts = sqrts
         self.missingTopos = UncoveredList(sumL, sumJet, self.sqrts)
-        self.outsideGrid = UncoveredList(sumL, sumJet, self.sqrts) # FIXME change this to derived objects for printout
+        self.outsideGrid = UncoveredList(sumL, sumJet, self.sqrts) 
         self.longCascade = UncoveredClassifier()
         self.asymmetricBranches = UncoveredClassifier()
         self.longLived = UncoveredList(sumL, sumJet, self.sqrts)
@@ -95,21 +95,12 @@ class Uncovered(object):
 
                         if outsideX: # if all mothers are tested, this is no longer outside grid contribution, otherwise add to list
                             el.missingX =  outsideX # for combined printing function, call outside grid weight missingX as well
-                            self.outsideGrid.addToTopos(el) # add to list of outsideGrid topos             
-                            print "outside grid"
-                            print el, el.weight
-                            for br in el.branches: print br.decayType            
+                            self.outsideGrid.addToTopos(el) # add to list of outsideGrid topos                        
                     continue
     
                 self.missingTopos.addToTopos(el) #keep track of all missing topologies
-                if self.hasLongCascade(el): 
-                    #print "long cascade"
-                    #print el
-                    self.longCascade.addToClasses(el)
-                elif self.hasAsymmetricBranches(el): 
-                    #print "asymmetric branches"
-                    #print el
-                    self.asymmetricBranches.addToClasses(el) # if no long cascade, check for asymmetric branches
+                if self.hasLongCascade(el): self.longCascade.addToClasses(el)
+                elif self.hasAsymmetricBranches(el): self.asymmetricBranches.addToClasses(el) # if no long cascade, check for asymmetric branches
 
                 if self.hasLongLived(el): self.longLived.addToTopos(el)
                 elif self.hasDisplaced(el): self.displaced.addToTopos(el)
