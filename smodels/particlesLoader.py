@@ -17,23 +17,27 @@
    
 """
 
-import os
-from smodels.tools.runtime import modelFile
-from smodels.tools.smodelsLogging import logger
+def load ():
+    import os
+    from smodels.tools.runtime import modelFile
+    from smodels.tools.smodelsLogging import logger
 
-logger.debug ( "model file: %s" % modelFile )
+    logger.debug ( "model file: %s" % modelFile )
 
-if "/" in modelFile:
-    import shutil
-    filename=os.path.basename(modelFile)
-    shutil.copy ( modelFile, filename )
-    modelFile=filename
+    if "/" in modelFile:
+        import shutil
+        filename=os.path.basename(modelFile)
+        shutil.copy ( modelFile, filename )
+        modelFile=filename
 
-if modelFile.endswith(".py"):
-    modelFile=modelFile[:-3]
+    if modelFile.endswith(".py"):
+        modelFile=modelFile[:-3]
 
-from importlib import import_module
-pM=import_module (modelFile, package='smodels')
+    from importlib import import_module
+    pM=import_module (modelFile, package='smodels')
+    return pM
+
+pM = load()
         
 rOdd = pM.rOdd
 rEven = pM.rEven
