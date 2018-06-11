@@ -22,7 +22,10 @@ def load ():
     from smodels.tools.runtime import modelFile
     from smodels.tools.smodelsLogging import logger
     from smodels.installation import installDirectory
-    fulldir = os.path.join(installDirectory(),"inputFiles","models")
+    fulldir = os.path.join(installDirectory(),"smodels","share","models")
+    # print ( "fulldir", fulldir )
+    sys.path.insert(0,installDirectory())
+    sys.path.insert(0,os.path.join(installDirectory(),"smodels") )
     sys.path.insert(0,fulldir)
     sys.path.insert(0,".")
 
