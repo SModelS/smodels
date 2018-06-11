@@ -157,7 +157,7 @@ class RunSModelSTest(unittest.TestCase):
             logger.error ( "output13.py and simplyGluino_default.py differ!" )
         for i in [ './output13.py', './output13.pyc' ]:
             if os.path.exists ( i ):
-                continue
+                # continue
                 os.remove ( i )
         self.assertTrue(equals)        
   
