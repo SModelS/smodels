@@ -18,11 +18,15 @@
 """
 
 def load ():
-    import os
+    import os, sys
     from smodels.tools.runtime import modelFile
     from smodels.tools.smodelsLogging import logger
+    from smodels.installation import installDirectory
+    fulldir = os.path.join(installDirectory(),"inputFiles","models")
+    sys.path.insert(0,fulldir)
+    sys.path.insert(0,".")
 
-    logger.debug ( "model file: %s" % modelFile )
+    logger.debug ( "Trying to load model file: %s" % modelFile )
 
     if "/" in modelFile:
         import shutil
@@ -34,8 +38,13 @@ def load ():
         modelFile=modelFile[:-3]
 
     from importlib import import_module
-    pM=import_module (modelFile, package='smodels')
-    return pM
+    try:
+        pM=import_module (modelFile, package='smodels')
+        logger.debug ( "Found model file at %s" % pM.__file__ )
+        return pM
+    except ModuleNotFoundError as e:
+        logger.error ( "Model file %s not found." % modelFile )
+        sys.exit()
 
 pM = load()
         

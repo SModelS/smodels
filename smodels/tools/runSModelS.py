@@ -14,10 +14,6 @@ from smodels.tools import crashReport
 from smodels.tools import smodelsLogging
 from smodels.tools import runtime
 
-""" Module variable, so particles.py can read it. Determined by command line
-parameter (overriding ini-file-entry overriding hard coded default smodels.default_particles)
-"""
-    
 def main():
     import argparse
     """ Set default input and output files """

@@ -11,7 +11,7 @@
 """
 
 ## place to keep the pointer to the model file
-modelFile="smodels.share.default_particles"
+modelFile="inputFiles.models.default_particles"
 
 def filetype ( filename ):
     """ obtain information about the filetype of an input file,
