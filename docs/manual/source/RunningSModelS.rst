@@ -143,11 +143,11 @@ Below we give more detailed information about each entry in the parameters file.
 
 * *particles*: defines the particle content of the BSM model
  
-  * **module**: pathname to the Python file that defines the particle content of the BSM model, given either in Unix file notation ("/path/to/module.py") or as Python module path ("path.to.module"). Defaults to *share.models.default_particles* which is a standard MSSM. See share/models folder for more examples. Directory name can be omitted; in that case, the current working directory as well as share/models are searched for.
+  * **module**: pathname to the Python file that defines the particle content of the BSM model, given either in Unix file notation ("/path/to/module.py") or as Python module path ("path.to.module"). Defaults to *share.models.default_particles* which is a standard MSSM. See smodels/share/models folder for more examples. Directory name can be omitted; in that case, the current working directory as well as smodels/share/models are searched for.
 
 * *database*: allows for selection of a subset of :ref:`experimental results <ExpResult>` from the |database|
 
-  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`. Since v1.1.2, also http addresses may be given, e.g. http://smodels.hephy.at/database/official112. See `Databases <http://smodels.hephy.at/wiki/Databases>`_ for a list.
+  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`. Since v1.1.3, also http addresses may be given, e.g. http://smodels.hephy.at/database/official113. See `Databases <http://smodels.hephy.at/wiki/Databases>`_ for a list.
   * **analyses** (list of results): set to ['all'] to use all available results. If a list of :ref:`experimental analyses <ExpResult>`
     is given, only these will be used. For instance, setting analyses = CMS-PAS-SUS-13-008,ATLAS-CONF-2013-024
     will only use the |results| from `CMS-PAS-SUS-13-008 <https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13008>`_
@@ -374,7 +374,7 @@ can take as arguments specific results to be loaded.
   the :ref:`missing topologies <topCoverage>` and print some basic information:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 125-144
+   :lines: 125-145
 
 
 *output:*

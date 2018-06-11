@@ -198,12 +198,12 @@ A simple example is given below:
 
 .. code-block:: IPython
 
-   In [1]: print browser  #Print all experimental results in the browser
+   In [1]: print ( browser )  #Print all experimental results in the browser
    ['ATLAS-SUSY-2015-01', 'ATLAS-SUSY-2015-01', 'ATLAS-SUSY-2015-02', 'ATLAS-SUSY-2015-02', ...
    
    In [2]: browser.selectExpResultsWith(txName = 'T1tttt', dataType = 'upperLimit') #Select only the UL results with the topology T1tttt
    
-   In [3]: print browser #Print all experimental results in the browser (after selection)
+   In [3]: print ( browser ) #Print all experimental results in the browser (after selection)
    ['ATLAS-SUSY-2015-09', 'CMS-PAS-SUS-15-002', 'CMS-PAS-SUS-16-014', 'CMS-PAS-SUS-16-015', ...
    
    In [4]: gluinoMass, LSPmass = 800.*GeV, 100.*GeV  #Define masses for the T1tttt topology
@@ -212,7 +212,7 @@ A simple example is given below:
    Out[5]: 5.03E-02 [pb]
      
    In [6]: for expResult in browser[:5]:  #Get the upper limits for the first five of the selected results for the given topology and mass
-      ...:     print expResult.getValuesFor('id'),'UL = ',expResult.getUpperLimitFor(txname='T1tttt',mass=[[gluinoMass,LSPmass],[gluinoMass,LSPmass]])
+      ...:     print ( expResult.getValuesFor('id'),'UL = ',expResult.getUpperLimitFor(txname='T1tttt',mass=[[gluinoMass,LSPmass],[gluinoMass,LSPmass]]) )
       ...:     
       ['ATLAS-SUSY-2015-09'] UL =  None
       ['CMS-PAS-SUS-15-002'] UL =  5.03E-02 [pb]
@@ -222,7 +222,7 @@ A simple example is given below:
 
       
    In [7]: for expResult in browser[:5]:  #Print the luminosities for the first five selected experimental results
-      ...:     print expResult.getValuesFor('id'),expResult.getValuesFor('lumi')
+      ...:     print ( expResult.getValuesFor('id'),expResult.getValuesFor('lumi') )
       ...:     
       ['ATLAS-SUSY-2015-09'] [3.20E+00 [1/fb]]
       ['CMS-PAS-SUS-15-002'] [2.20E+00 [1/fb]]
