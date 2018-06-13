@@ -273,6 +273,8 @@ def theoryPredictionsFor( expResult, smsTopList, maxMassDist=0.2,
         cul = expResult.getCombinedUpperLimitFor ( effs )
         eul = expResult.getCombinedUpperLimitFor ( effs, expected=True )
         combResults.append ( _mergePredictions ( preds, cul, eul ) )
+        #if combinedResults and not useBestDataset:
+        #    return combResults
 
     dataSetResults = []
     #Compute predictions for each data set (for UL analyses there is one single set)
@@ -283,7 +285,7 @@ def theoryPredictionsFor( expResult, smsTopList, maxMassDist=0.2,
 
     #For results with more than one dataset, select the best data set
     #according to the expect upper limit
-    if useBestDataset:
+    if useBestDataset or (combinedResults and preds == {} ):
         bestResults = _getBestResults(dataSetResults)
         bestResults.expResult = expResult
         for i in combResults:
@@ -291,13 +293,14 @@ def theoryPredictionsFor( expResult, smsTopList, maxMassDist=0.2,
         for theoPred in bestResults:
             theoPred.expResult = expResult
         return bestResults
-    else:
-        allResults = sum(dataSetResults)
-        for i in combResults:
-            allResults.append ( i )
-        for theoPred in allResults:
-            theoPred.expResult = expResult
-        return allResults
+    allResults = TheoryPredictionList() ## empty pred list if combined was selected
+    if combinedResults==False:
+        allResults = sum(dataSetResults) ## populate if combined was not selected
+    for i in combResults:
+        allResults.append ( i )
+    for theoPred in allResults:
+        theoPred.expResult = expResult
+    return allResults
 
 def _mergePredictions ( preds, combinedUL, combinedEUL ):
     """ merge theory predictions, for the combined prediction. """
@@ -325,7 +328,9 @@ def _mergePredictions ( preds, combinedUL, combinedEUL ):
     return ret
 
 def _sortPredictions ( expResult, smsTopList, maxMassDist, combine ):
-    """ returns list of predictions, sorted by XSectionInfo """
+    """ returns dictionary of predictions, sorted by XSectionInfo.
+        if combine is false, return empty dict.
+    """
     preds={}
     if not hasattr ( expResult.globalInfo, "covariance" ) or \
        not hasattr ( expResult.globalInfo, "datasetOrder" ) or \

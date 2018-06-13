@@ -108,9 +108,23 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
 
     """ Get theory prediction for each analysis and print basic output """
     allPredictions = []
+    combineResults=False
+    bestSR=True
+    try:
+        treatment = parser.get ("options","srTreatment").lower() ## FIXME here
+        if treatment not in [ "all", "both", "combine", "best" ]:
+            logger.error ( "options:srTreatment given in ini file is not one of: all, both, combine, best." )
+            sys.exit()
+        if treatment in [ "all", "both", "combine" ]:
+            combineResults = True
+            if treatment in [ "combine" ]:
+                bestSR=False
+    except Exception as e:
+        pass
     for expResult in listOfExpRes:
         # logger.error ("FIXME maybe need to set useBestDataset to FALSE")
-        theorypredictions = theoryPredictionsFor(expResult, smstoplist,useBestDataset=True )
+        theorypredictions = theoryPredictionsFor( expResult, smstoplist,
+                    useBestDataset=bestSR, combinedResults=combineResults )
         if not theorypredictions: continue
         allPredictions += theorypredictions._theoryPredictions
 
