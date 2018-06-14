@@ -36,9 +36,9 @@ def verbose_run():
     for series in alltests:
         for test in series:
             for t in test:
+                n_tests += 1
                 print ( "[#%3d] %s ... " % ( n_tests, t.id() ), end="" )
                 sys.stdout.flush()
-                n_tests += 1
                 try:
                     a=t.debug()
                 except Exception as e:
