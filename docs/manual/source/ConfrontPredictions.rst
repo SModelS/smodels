@@ -124,7 +124,7 @@ In case, the experiment provides a covariance matrix, signal regions can be comb
 Just as before, we follow the procedure given in `CMS NOTE 2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_. SModelS allows for a marginalization as well as a profiling of
 the nuisances; profiling is the default. As CPU performance is a concern in SModelS, we take
 the liberty of aggregating the official results to an acceptable number of aggregate regions, where *acceptable* is typically a number below 20.
-In *runSModelS.py*, combining signal regions is typically turned off. Instead, the result
+In *runSModelS.py*, combining signal regions is turned off per default, only the result from the best expected signal region is reported.
 from the best expected signal region is quoted. It can be turned of with the parameter **options:combineSRs**, see :ref:`parameter file <parameterFile>`.
 
 +----------------------------------------+---------------------------------------+------------------------------------------------+
