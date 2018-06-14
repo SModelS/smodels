@@ -4,7 +4,8 @@ convert:
 	./convert.sh
 
 run:
-	ipython notebook
+	jupyter notebook
+#ipython notebook
 
 remove_ipynb:
 	rm -rf *.ipynb
