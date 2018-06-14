@@ -126,6 +126,7 @@ Below we give more detailed information about each entry in the parameters file.
     (see :ref:`likelihood calculation <likelihoodCalc>`).
     If True, the likelihood and :math:`\chi^2` values are computed for the |EMrs|.
   * **testCoverage** (True/False): set to True to run the :ref:`coverage <topCoverage>` tool.
+  * **srTreatment** (best,combine,all): how are analyses with multiple signal regions treated; should only the best result be shown (*best*), should an attempt be made at combining the signal regions, in case a covariance matrix is available (*combine*), should both the best and the combined result be report (*all*)
 
 * *parameters*: basic parameter values for running SModelS
 
@@ -139,7 +140,7 @@ Below we give more detailed information about each entry in the parameters file.
     *Only relevant for printing the* :ref:`output summary <fileOut>`.
   * **ncpus** (int): number of CPUs. When processing multiple SLHA/LHE files,
     SModelS can run in a parallelized fashion, splitting up the input files in equal chunks.
-    *ncpus = -1* uses the total number of CPU cores of the machine. Warning: do not change unless you know what you are doing!
+    *ncpus = -1* parallelizes to as many processes as number of CPU cores of the machine. Default value is 1. Warning: python already parallelizes many tasks internally. Therefore, do not change unless you know what you are doing!
 
 * *particles*: defines the particle content of the BSM model
  

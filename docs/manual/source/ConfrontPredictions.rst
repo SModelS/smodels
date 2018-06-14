@@ -65,7 +65,7 @@ Likelihood Computation
 
 In the case of |EMrs|, additional statistical information
 about the constrained model can be provided by the SModelS output.
-Following the `CMS NOTE 2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_, we construct a simplified
+Following the procedure detailed in `CMS NOTE 2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_, we construct a simplified
 likelihood which describes the plausibility of the data :math:`D`, given a signal strength :math:`\mu`:
 
 .. math::
@@ -115,6 +115,19 @@ continuous regions of parameter space that give roughly the same phenomenology.
 
 * **The** :math:`\chi^2` **for a given** |EMr| **is computed using the** `chi2  method <tools.html#tools.SimplifiedLikelihoods.LikelihoodComputer.chi2>`_
 * **The likelihood for a given** |EMr| **is computed using the** `likelihood  method <tools.html#tools.SimplifiedLikelihoods.LikelihoodComputer.likelihood>`_
+
+
+Combination of Signal Regions
+-----------------------------
+
+In case, the experiment provides a covariance matrix, signal regions can be combined.
+Just as before, we follow the procedure given in `CMS NOTE 2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_. SModelS allows for a marginalization as well as a profiling of
+the nuisances; profiling is the default. As CPU performance is a concern in SModelS, we take
+the liberty of aggregating the official results to an acceptable number of aggregate regions, where *acceptable* is typically a number below 20.
+In runSModelS.py, combining signal regions is typically turned off. Instead, the result
+from the best expected signal region is quoted. It can be turned of with the parameter **options:srTreatment**, see :ref:`parameter file <parameterFile>`.
+
+.. image:: images/T2bbffff_bestSR.png
 
 
 .. [*] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model
