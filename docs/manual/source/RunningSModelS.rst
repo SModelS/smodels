@@ -126,7 +126,7 @@ Below we give more detailed information about each entry in the parameters file.
     (see :ref:`likelihood calculation <likelihoodCalc>`).
     If True, the likelihood and :math:`\chi^2` values are computed for the |EMrs|.
   * **testCoverage** (True/False): set to True to run the :ref:`coverage <topCoverage>` tool.
-  * **srTreatment** (best,combine,all): how are analyses with multiple signal regions treated; should only the best result be shown (*best*), should an attempt be made at combining the signal regions, in case a covariance matrix is available (*combine*), should both the best and the combined result be report (*all*)
+  * **combineSRs** (True/False): set to True to use, whenever available, covariance matrices to combine signal regions based on the simplified likelihoods approach. Set to False to use only the most sensitive signal region (faster!). Available v1.1.3 onwards. 
 
 * *parameters*: basic parameter values for running SModelS
 
@@ -148,7 +148,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 * *database*: allows for selection of a subset of :ref:`experimental results <ExpResult>` from the |database|
 
-  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`. Since v1.1.3, also http addresses may be given, e.g. http://smodels.hephy.at/database/official113. See `Databases <http://smodels.hephy.at/wiki/Databases>`_ for a list.
+  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`. Since v1.1.3, also http addresses may be given, e.g. http://smodels.hephy.at/database/official113. See `Databases <http://smodels.hephy.at/wiki/Databases>`_ for a list of public database versions.
   * **analyses** (list of results): set to ['all'] to use all available results. If a list of :ref:`experimental analyses <ExpResult>`
     is given, only these will be used. For instance, setting analyses = CMS-PAS-SUS-13-008,ATLAS-CONF-2013-024
     will only use the |results| from `CMS-PAS-SUS-13-008 <https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13008>`_
