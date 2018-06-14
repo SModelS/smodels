@@ -76,7 +76,7 @@ Here, :math:`\theta` denotes the nuisance parameter that describes the
 variations in the signal and background contribtions due to systematic
 effects. We assume :math:`p(\theta)` to follow a Gaussian distribution centered
 around zero and with a variance of :math:`\delta^2`,
-whereas :math:`P(D)` corresponds to a counting variable and is thus 
+whereas :math:`P(D)` corresponds to a counting variable and is thus
 properly described by a Poissonian. The complete likelihood thus reads:
 
 .. math::
@@ -89,27 +89,27 @@ A test statistic :math:`T` can now be constructed from a likelihood ratio test:
    \begin{split}T = -2 \ln \frac{H_0}{H_1} = -2 \ln \left(\frac{\mathcal{L}(\mu=n_{\mathrm{signal}},\theta|D)}{sup\{\mathcal{L}(\mu,\theta|D) : \mu \in \mathbb{R}^+ \}}\right)\end{split}
 
 As the signal hypothesis in the numerator presents a special case of the
-likelihood in the denominator, the Neyman-Pearson lemma holds, and we 
-can assume :math:`T` to be distributed according to a :math:`\chi^2` distribution 
-with one degree of freedom. Because :math:`H_0` assumes the signal strength of 
+likelihood in the denominator, the Neyman-Pearson lemma holds, and we
+can assume :math:`T` to be distributed according to a :math:`\chi^2` distribution
+with one degree of freedom. Because :math:`H_0` assumes the signal strength of
 a particular model, :math:`T=0`  corresponds to a perfect match between that
 model's prediction and the measured data. :math:`T \gtrsim 1.96` corresponds to
-a 95\% confidence level upper limit. 
+a 95\% confidence level upper limit.
 While :math:`n_{\mathrm{obs}}`, :math:`b`  and :math:`\delta_{b}` are directly extracted from
-the data set 
+the data set
 (coined *observedN*, *expectedBG* and *bgError*, respectively),
-:math:`n_{\mathrm{signal}}` is obtained from the calculation of the 
+:math:`n_{\mathrm{signal}}` is obtained from the calculation of the
 theory predictions. A default 20\% systematical uncertainty is assumed for :math:`n_{\mathrm{signal}}`,
 resulting in :math:`\delta^2 = \delta_{b}^2 + \left(0.2 n_{\mathrm{signal}}\right)^2`.
 
-SModelS reports the :math:`\chi^2` (:math:`T` values) and likelihood *for each* |EMr|, 
-together with the observed and expected :math:`r` values.  
+SModelS reports the :math:`\chi^2` (:math:`T` values) and likelihood *for each* |EMr|,
+together with the observed and expected :math:`r` values.
 We note that in the general case analyses may be correlated, so summing up the :math:`T`
-values will no longer follow a :math:`\chi^2_{(n)}`  distribution. 
-Therefore, for a conservative interpretation, only the result with the best expected limit should be used. 
-Moreover, for a statistically rigorous usage in scans, it is recommended to check that the analysis giving the 
-best expected limit does not wildly jump within 
-continuous regions of parameter space that give roughly the same phenomenology. 
+values will no longer follow a :math:`\chi^2_{(n)}`  distribution.
+Therefore, for a conservative interpretation, only the result with the best expected limit should be used.
+Moreover, for a statistically rigorous usage in scans, it is recommended to check that the analysis giving the
+best expected limit does not wildly jump within
+continuous regions of parameter space that give roughly the same phenomenology.
 
 
 
@@ -124,12 +124,16 @@ In case, the experiment provides a covariance matrix, signal regions can be comb
 Just as before, we follow the procedure given in `CMS NOTE 2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_. SModelS allows for a marginalization as well as a profiling of
 the nuisances; profiling is the default. As CPU performance is a concern in SModelS, we take
 the liberty of aggregating the official results to an acceptable number of aggregate regions, where *acceptable* is typically a number below 20.
-In runSModelS.py, combining signal regions is typically turned off. Instead, the result
-from the best expected signal region is quoted. It can be turned of with the parameter **options:srTreatment**, see :ref:`parameter file <parameterFile>`.
+In *runSModelS.py*, combining signal regions is typically turned off. Instead, the result
+from the best expected signal region is quoted. It can be turned of with the parameter **options:combineSRs**, see :ref:`parameter file <parameterFile>`.
 
-.. image:: images/T2bbffff_bestSR.png
-
++----------------------------------------+---------------------------------------+------------------------------------------------+
+| .. image:: images/T2bbffff_bestSR.png  | .. image:: images/T2bbffff_17.png     | .. image:: images/T2bbffff_44.png              |
+|            :width: 300px               |            :width: 300px              |            :width: 300px                       |
+| Best signal region                     | 17 aggregate regions                  | 44 signal regions                              |
++----------------------------------------+---------------------------------------+------------------------------------------------+
+  
+Figure: Comparison of validation plots, for CMS-PAS-SUS-16-052: for best signal region (left), for combination of 17 aggregate signal regions (center), for combination of all 44 signal regions (right).
 
 .. [*] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model
    is being tested by a large number of results simultaneously.
-
