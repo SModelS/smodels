@@ -19,8 +19,8 @@ from smodels.theory.theoryPrediction import theoryPredictionsFor
 class ElementIdTest(unittest.TestCase):
     def testGoodFile(self):
 
-        listOfIDs = {'ATLAS-CONF-2013-037': [28, 29, 30, 31, 24, 25, 26, 27], 
-                     'ATLAS-SUSY-2013-05' : [23]}
+        listOfIDs = {'ATLAS-CONF-2013-037': [31, 32, 33, 34, 27, 28, 29, 30], 
+                     'ATLAS-SUSY-2013-05' : [26]}
         filename = "%sinputFiles/slha/higgsinoStop.slha" % (installDirectory() )
         topoList = slhaDecomposer.decompose(filename,doCompress = True, doInvisible=True, minmassgap = 5*GeV)
         resultlist = database.getExpResults()

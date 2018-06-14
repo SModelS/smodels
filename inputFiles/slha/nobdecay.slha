@@ -1139,3 +1139,864 @@ XSECTION  8.00E+03  2212 2212 2 2000002 2000003   # Nevts: 10000 xsec unit: pb
 
 XSECTION  8.00E+03  2212 2212 2 1000001 2000001   # Nevts: 10000 xsec unit: pb
 	0  0  0  0  0  0    9.61355916E-03 SModelS 0.99
+
+XSECTION  1.30E+04  2212 2212 2 -1000005 1000005 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    9.01465001E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 2000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    6.75273233E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 2000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    6.38124950E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 2000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    6.09231841E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 2000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    5.86942871E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 1000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    5.84466319E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 1000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    5.76211145E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 1000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    4.68893883E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000001 1000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    4.63940779E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 1000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    4.51558018E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000002 1000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    2.08030385E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 2000001 2000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.71707619E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 2000002 2000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.48593132E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000022 2000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    6.93434616E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 2000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    6.76924268E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000001 1000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    6.52158746E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000001 1000024 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    6.43903572E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 1000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    6.43903572E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 1000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    6.10882876E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 2000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    6.02627702E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000002 1000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    5.11820788E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 1000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    5.03565614E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 2000002 2000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    4.95310440E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 2000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    4.04503526E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 2000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    4.04503526E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000002 1000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    3.96248352E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 2000002 2000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    3.96248352E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000002 1000023 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    3.87993178E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000001 1000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    3.87993178E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 2000001 2000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    3.71482830E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 1000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    3.54972482E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 2000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    3.46717308E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000021 2000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    3.30206960E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 1000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    3.05441438E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 1000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    3.05441438E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 2000001 2000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    3.05441438E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000002 1000021 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    3.05441438E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000024 1000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    2.88931090E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 2000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    2.80675916E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 1000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    2.72420742E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 2000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    2.64165568E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000005 1000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    2.55910394E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000002 1000005 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    2.55910394E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 -1000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    2.14634524E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000001 1000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    2.06379350E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 2000001 2000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.89869002E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000002 2000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.65103480E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 2000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.48593132E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000001 2000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.40337958E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 1000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.32082784E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000021 2000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.32082784E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000005 1000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.32082784E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000001 1000023 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.23827610E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000005 2000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.23827610E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000022 2000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.15572436E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 -2000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.07317262E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000003 1000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    9.90620880E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 1000022 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    9.08069140E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 -2000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000002 2000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000001 1000021 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 -1000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    6.60413920E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 2000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    6.60413920E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 -1000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    6.60413920E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 1000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    6.60413920E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 2000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    6.60413920E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000005 2000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    6.60413920E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 2000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    6.60413920E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 -2000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    5.77862180E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 -1000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    5.77862180E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 1000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    5.77862180E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 1000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    5.77862180E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 -2000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    5.77862180E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 -1000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    5.77862180E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 1000024 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    5.77862180E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 1000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    5.77862180E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 -1000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    4.95310440E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 -1000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    4.95310440E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000024 -1000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    4.95310440E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000005 -1000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    4.12758700E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 -1000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    4.12758700E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 -2000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    4.12758700E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 2000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    4.12758700E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 -2000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    4.12758700E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 2000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    4.12758700E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000024 1000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    4.12758700E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 2000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    4.12758700E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000001 2000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    4.12758700E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 1000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    3.30206960E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 1000023 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    3.30206960E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 1000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    3.30206960E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000003 1000024 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    3.30206960E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000004 1000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    3.30206960E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 1000024 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    3.30206960E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 -2000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    3.30206960E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 -1000005 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    3.30206960E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000002 1000022 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    3.30206960E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000022 2000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    2.47655220E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 1000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    2.47655220E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 1000023 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    2.47655220E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 1000005 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    2.47655220E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000001 2000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    2.47655220E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 1000005 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    2.47655220E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000005 -1000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    2.47655220E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000003 2000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    2.47655220E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 2000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    2.47655220E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 1000005 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    2.47655220E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 1000022 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.65103480E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000002 2000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.65103480E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 2000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.65103480E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000005 1000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.65103480E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 -1000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.65103480E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000003 1000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.65103480E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000024 -1000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.65103480E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 -2000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.65103480E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000004 2000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.65103480E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000005 2000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.65103480E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000004 1000023 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.65103480E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000005 1000022 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.65103480E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000022 1000022 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.65103480E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 1000023 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.65103480E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 1000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.65103480E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 1000021 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.65103480E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000023 1000024 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.65103480E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000005 2000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    1.65103480E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000001 1000037 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000002 2000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 2000002 2000005 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000005 1000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 -1000005 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000005 2000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000021 1000023 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 1000022 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000006 1000006 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000004 2000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 2000003 2000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 -2000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 2000004 2000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 1000021 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000005 1000022 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000001 1000022 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000021 1000022 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000023 1000023 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 1000021 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000022 2000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 1000005 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 1000022 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 1000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 -1000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000003 2000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 -1000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000002 1000035 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 1000021 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000003 1000023 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 1000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 1000022 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000005 2000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000021 1000024 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000021 1000021 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 1000021 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 -1000001 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 2000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000001 1000005 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000004 2000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 1000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 2000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 -1000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 1000021 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000004 1000005 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 -2000002 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000024 1000023 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 1000003 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 -1000004 # 10000 events, [pb], pythia8 for LO
+  0  0  0  0  0  0    8.25517400E-03 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000005 1000005 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.37924145E+01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 2000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    8.37338809E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 2000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    7.91274938E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 2000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    7.55447483E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 2000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    7.27809160E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 1000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    7.24738236E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 1000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    7.14501820E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 1000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    5.81428415E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000001 1000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    5.66007750E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 1000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    5.59931942E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000002 1000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    2.57957677E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 2000001 2000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    2.18068676E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 2000002 2000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.90199209E+00 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 2000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    8.39386092E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 1000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    7.98440429E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000001 1000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    7.82590495E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 1000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    7.57494766E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 2000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    7.47258350E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 2000002 2000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    6.29044259E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 1000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    6.24421361E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000002 1000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    6.24421361E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000021 2000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    5.08254553E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 2000002 2000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    5.07197891E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 2000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    5.01584372E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 2000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    5.01584372E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000002 1000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    4.91347956E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000001 1000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    4.73351677E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000002 1000021 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    4.70135461E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 2000001 2000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    4.68068366E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 1000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    4.40165878E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 2000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    4.29929462E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 2000001 2000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    3.84856212E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 1000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    3.78747383E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 1000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    3.78747383E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 2000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    3.48038136E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 1000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    3.37801720E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 2000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    3.27565304E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 -1000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    2.66146810E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000001 1000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    2.47655220E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 2000001 2000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    2.41133633E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000002 2000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    2.08030385E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000021 2000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    2.03301821E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 2000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.84255484E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000001 2000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.74019068E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 1000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.63782652E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 -2000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.33073405E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000001 1000021 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.27063638E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000003 1000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.20855747E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000002 2000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.03189675E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 -2000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.02364158E-01 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 -1000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    8.18913261E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 -1000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    8.18913261E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 2000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    8.18913261E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 1000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    8.18913261E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 2000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    8.18913261E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 2000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    8.18913261E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 -1000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    7.16549103E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 -2000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    7.16549103E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 1000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    7.16549103E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 -1000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    7.16549103E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 1000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    7.16549103E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 -2000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    7.16549103E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 1000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    7.16549103E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 -1000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    6.14184946E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 -1000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    6.14184946E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 -2000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    5.11820788E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 2000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    5.11820788E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 2000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    5.11820788E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 -1000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    5.11820788E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 -2000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    5.11820788E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 2000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    5.11820788E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000001 2000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    5.07693201E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 1000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    4.09456630E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 -2000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    4.09456630E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 1000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    4.09456630E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000004 1000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    4.09456630E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000003 2000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    3.07092473E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 1000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    3.07092473E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 2000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    3.07092473E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000001 2000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    3.04615921E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 1000021 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    2.54127276E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000002 2000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    2.08030385E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000004 2000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    2.08030385E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000021 1000021 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    2.05058522E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 -2000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    2.04728315E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 2000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    2.04728315E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 -1000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    2.04728315E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 1000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    2.04728315E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000003 1000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.98124176E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000006 1000006 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.49385629E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 1000021 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.27063638E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 1000021 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.27063638E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000001 1000021 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.27063638E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 1000021 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.27063638E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 1000021 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.27063638E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 2000004 2000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.05666227E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 2000003 2000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.04015192E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000002 2000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.03189675E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000004 2000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.03189675E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000004 2000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.03189675E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 2000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.02364158E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 2000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.02364158E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 1000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.02364158E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 -2000002 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.02364158E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 -2000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.02364158E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 1000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.02364158E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000004 -1000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.02364158E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000003 -1000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.02364158E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000003 1000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.02364158E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000002 -1000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.02364158E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000001 -1000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.02364158E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -1000002 1000003 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.02364158E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 -2000004 -1000004 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.02364158E-02 SModelSv1.1.3rc3
+
+XSECTION  1.30E+04  2212 2212 2 1000003 2000001 # 10000 events, [pb], pythia8 for LO
+  0  2  0  0  0  0    1.01538640E-02 SModelSv1.1.3rc3
