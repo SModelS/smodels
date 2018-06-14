@@ -73,9 +73,9 @@ class WrapperBase(object):
         # out = subprocess.check_output ( cmd, shell=True, universal_newlines=True )
         logger.debug(out)
         if not os.path.exists ( self.executablePath ):
-            logger.error ( "Compilation of nllfast failed. Is the %s compiler installed?" % self.compiler )
+            logger.error ( "Compilation of %s failed. Is the %s compiler installed?" % ( self.name, self.compiler ) )
             sys.exit()
-        logger.info ( "Compilation of nllfast succeeded!" )
+        logger.info ( "Compilation of %s succeeded!" % ( self.name ) )
         return True
 
 
