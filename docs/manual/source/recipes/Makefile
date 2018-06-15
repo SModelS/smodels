@@ -1,7 +1,7 @@
 all: convert # remove_ipynb
 
 convert:
-	./convert.sh
+	./convert.PY
 
 run:
 	jupyter notebook
