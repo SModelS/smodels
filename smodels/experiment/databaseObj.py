@@ -238,6 +238,20 @@ class Database(object):
         """
         return self.txt_meta.databaseVersion
 
+    def inNotebook(self):
+        """
+        Are we running within a notebook? Has an effect on the
+        progressbar we wish to use.
+        """
+        ret = False
+        try:
+            cfg = get_ipython().config 
+            if 'IPKernelApp' in cfg.keys():
+                return True
+            else:
+                return False
+        except NameError:
+            return False
 
     @property
     def base(self):
@@ -277,7 +291,8 @@ class Database(object):
         r2=requests.get ( r.json()["url"], stream=True )
         filename= "./" + r2.url.split("/")[-1]
         with open ( filename, "wb" ) as dump:
-            print ( "         " + " "*51 + "<", end="\r" )
+            if not self.inNotebook(): ## \r doesnt work in notebook
+                print ( "         " + " "*51 + "<", end="\r" )
             print ( "loading >", end="" )
             for x in r2.iter_content(chunk_size=int ( size / 50 ) ):
                 dump.write ( x )
