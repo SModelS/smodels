@@ -10,7 +10,7 @@
 from smodels.theory import clusterTools, crossSection, element
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.auxiliaryFunctions import cSim, cGtr # DO NOT REMOVE
-import sys, copy
+import copy
 from smodels.tools.physicsUnits import TeV,fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
@@ -41,7 +41,7 @@ class TheoryPrediction(object):
         self.conditions = None
         self.mass = None
 
-    def dataId ( self ):
+    def dataId( self ):
         """ return id of dataset,
             or "combined" for combined results """
         if type(self.dataset) == list:
@@ -54,31 +54,31 @@ class TheoryPrediction(object):
             return self.dataset[0].globalInfo.id
         return self.dataset.globalInfo.id
 
-    def dataType ( self ):
+    def dataType( self ):
         """ return EM / UL """
-        if type ( self.dataset ) == list:
+        if type(self.dataset) == list:
             ## combined result? must be efficiencyMap!
             return "efficiencyMap"
         return self.dataset.dataInfo.dataType
+    
 
-    def getUpperLimit ( self, expected=False ):
+    def getUpperLimit( self, expected=False ):
         """ Get the upper limit on sigma*eff
         :param expected: return expected Upper Limit, instead of observed.
         """
-        if self.dataId() == "combined":
-            if expected:
-                return self.combinedExpectedUL
-            return self.combinedUL
+               
         if expected:
-            if not hasattr ( self, "_eul" ):
-                self._eul = self.expResult.getUpperLimitFor ( mass=self.mass, \
-                           dataID=self.dataId(), expected=expected, txname = self.txnames[0])
-            return self._eul
-        if not hasattr ( self, "_ul" ):
-            ## store it for future retrieval
-            self._ul = self.expResult.getUpperLimitFor ( mass=self.mass, \
-                           dataID=self.dataId(), expected=expected, txname = self.txnames[0])
-        return self._ul
+            if not hasattr(self,'expectedUL'):
+                self.expectedUL = self.expResult.getUpperLimitFor(mass=self.mass, \
+                           dataID=self.dataset, expected=expected, txname = self.txnames[0])
+            return self.expectedUL
+        else:
+            if not hasattr(self,'upperLimit'):
+                self.upperLimit = self.expResult.getUpperLimitFor(mass=self.mass,
+                                                                  dataID=self.dataId(),
+                                                                  expected=expected,
+                                                                  txname = self.txnames[0])
+                return self.upperLimit
 
     def getRValue ( self, expected = False ):
         """ get the r value = theory prediction / experimental upper limit """
@@ -264,44 +264,52 @@ def theoryPredictionsFor( expResult, smsTopList, maxMassDist=0.2,
                objects
     """
 
-    combResults = []
-    preds = _sortPredictions ( expResult, smsTopList, maxMassDist, combinedResults )
-    for xsecinfo,preds in preds.items():
+    preds = _sortPredictions( expResult, smsTopList, maxMassDist, combinedResults)
+    for preds in preds.values():
         effs = [ pred.effectiveEff for pred in preds ]
-        if sum ( effs ) == 0.:
-            logger.info ( "all efficiencies of combination in %s are zero. will skip." % expResult.globalInfo.id )
+        if sum( effs ) == 0.:
+            logger.info( "all efficiencies of combination in %s are zero. will skip." % expResult.globalInfo.id )
             break
-        cul = expResult.getCombinedUpperLimitFor ( effs, marginalize=marginalize )
-        eul = expResult.getCombinedUpperLimitFor ( effs, expected=True, marginalize=marginalize )
-        combResults.append ( _mergePredictions ( preds, cul, eul ) )
-        #if combinedResults and not useBestDataset:
-        #    return combResults
 
     dataSetResults = []
     #Compute predictions for each data set (for UL analyses there is one single set)
     for dataset in expResult.datasets:
         predList = _getDataSetPredictions(dataset,smsTopList,maxMassDist)
-        if predList: dataSetResults.append(predList)
-    if not dataSetResults: return None
+        if predList:
+            dataSetResults.append(predList)
+    if not dataSetResults:
+        return None
 
-    #For results with more than one dataset, select the best data set
-    #according to the expect upper limit
-    if useBestDataset or (combinedResults and preds == {} ):
-        bestResults = _getBestResults(dataSetResults)
-        bestResults.expResult = expResult
-        for i in combResults:
-            bestResults.append ( i )
-        for theoPred in bestResults:
+    #For results with more than one dataset, return all dataset predictions
+    #if useBestDataSet=False and combinedResults=False:
+    if not useBestDataset and not combinedResults:
+        allResults = sum(dataSetResults)
+        for theoPred in allResults:
             theoPred.expResult = expResult
-        return bestResults
-    allResults = TheoryPredictionList() ## empty pred list if combined was selected
-    if combinedResults==False:
-        allResults = sum(dataSetResults) ## populate if combined was not selected
-    for i in combResults:
-        allResults.append ( i )
-    for theoPred in allResults:
+        return allResults
+    
+    #Else include best signal region results
+    bestResults = _getBestResults(dataSetResults)
+    #If combinedResults = True, also include the combined
+    #result (when available):
+    if combinedResults:
+        combinedDataSetResult = _getCombinedResultFor(dataSetResults,expResult)
+        if combinedDataSetResult:
+            bestResults.append(combinedDataSetResult)
+
+    for theoPred in bestResults:
         theoPred.expResult = expResult
-    return allResults
+        
+    return bestResults
+
+
+def _getCombinedResultsFor(dataSetResults,expResult):
+    """
+    Compute the compbined result for all datasets, if covariance
+    matrices are available. Return a TheoryPrediction object
+    with the signal cross-section summed over all the signal regions
+    and the respective upper limit.
+    """
 
 def _mergePredictions ( preds, combinedUL, combinedEUL ):
     """ merge theory predictions, for the combined prediction. """
@@ -386,7 +394,7 @@ def _getBestResults(dataSetResults):
             raise SModelSError()
         pred = predList[0]
         xsec = pred.xsection
-        expectedR = ( xsec.value/dataset.getSRUpperLimit(0.05,True,False) ).asNumber()
+        expectedR = (xsec.value/dataset.getSRUpperLimit(0.05,True,False) ).asNumber()
         if expectedR > bestExpectedR or (expectedR == bestExpectedR and xsec.value > bestXsec):
             bestExpectedR = expectedR
             bestPredList = predList
@@ -447,9 +455,9 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist,force_creation=False):
         theoryPrediction.conditions = _evalConditions(cluster)
         theoryPrediction.cluster = cluster
         theoryPrediction.mass = cluster.getAvgMass()
-        theoryPrediction.effectiveEff = cluster.getEffectiveEfficiency()
         theoryPrediction.PIDs = cluster.getPIDs()
         theoryPrediction.IDs = cluster.getIDs()
+        theoryPrediction.upperLimit = theoryPrediction.getUpperLimit()
         predictionList._theoryPredictions.append(theoryPrediction)
 
     if len(predictionList) == 0: return None
@@ -620,10 +628,8 @@ def _evalExpression(stringExpr,cluster):
                 el.weight.combineWith(el1.weight)
                 el.combineMotherElements(el1) ## keep track of all mothers
 
-    if expr.find("Cgtr") >= 0 or expr.find("Csim") >= 0:
-        expr = expr.replace("Cgtr", "cGtr")
-        expr = expr.replace("Csim", "cSim")
-    exprvalue = eval(expr)
+    exprvalue = eval(expr,globals(),
+                     {'cGtr' : cGtr, 'cSim' : cSim,'Cgtr' : cGtr, 'Csim' : cSim})
     if type(exprvalue) == type(crossSection.XSectionList()):
         if len(exprvalue) != 1:
             logger.error("Evaluation of expression "+expr+" returned multiple values.")
