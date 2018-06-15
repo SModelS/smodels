@@ -41,29 +41,32 @@ class TheoryPrediction(object):
         self.conditions = None
         self.mass = None
 
-    def dataId( self ):
-        """ return id of dataset,
-            or "combined" for combined results """
-        if type(self.dataset) == list:
-            return "combined"
-        return self.dataset.dataInfo.dataId
-
-    def analysisId ( self ):
-        """ return name of analysis """
-        if type(self.dataset) == list:
-            return self.dataset[0].globalInfo.id
+    def dataId(self):
+        """
+        Return ID of dataset
+        """
+        
+        return self.dataset.getID()
+    
+    
+    def analysisId(self):
+        """
+        Return experimental analysis ID
+        """
+        
         return self.dataset.globalInfo.id
 
     def dataType( self ):
-        """ return EM / UL """
-        if type(self.dataset) == list:
-            ## combined result? must be efficiencyMap!
-            return "efficiencyMap"
-        return self.dataset.dataInfo.dataType
+        """
+        Return the type of dataset
+        """
+                
+        return self.dataset.getType()
     
 
-    def getUpperLimit( self, expected=False ):
-        """ Get the upper limit on sigma*eff
+    def getUpperLimit(self, expected=False ):
+        """
+        Get the upper limit on sigma*eff
         :param expected: return expected Upper Limit, instead of observed.
         """
                
@@ -80,18 +83,24 @@ class TheoryPrediction(object):
                                                                   txname = self.txnames[0])
                 return self.upperLimit
 
-    def getRValue ( self, expected = False ):
-        """ get the r value = theory prediction / experimental upper limit """
+    def getRValue(self, expected = False ):
+        """
+        Get the r value = theory prediction / experimental upper limit
+        """
+        
         if expected:
-            eul=self.getUpperLimit( expected=True )
+            eul=self.getUpperLimit(expected=True)
             if type(eul)==type(None) or eul.asNumber(fb)==0.:
+                
                 return None
-            return self.xsection.value / eul
+            else:
+                return self.xsection.value/eul
 
         ul = self.getUpperLimit()
         if type(ul) == type(None) or ul.asNumber(fb) == 0.:
             return None
-        return self.xsection.value / ul
+        
+        return self.xsection.value/ul
 
     def computeStatistics(self,marginalize=False):
         """

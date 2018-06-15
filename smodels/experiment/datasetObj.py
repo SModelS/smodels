@@ -72,8 +72,6 @@ class DataSet(object):
                         (x,self.dataInfo.dataId,self.globalInfo.id )
                 logger.error( errmsg )
                 raise SModelSError ( errmsg )
-#                return True
-#        return False
 
     def __ne__ ( self, other ):
         return not self.__eq__ ( other )
@@ -90,6 +88,21 @@ class DataSet(object):
         if len(self.txnameList ) != len ( other.txnameList ):
             return False
         return True
+    
+    def getType(self):
+        """
+        Return the dataset type (EM/UL)
+        """
+        
+        return self.dataInfo.dataType
+
+    def getID(self):
+        """
+        Return the dataset ID
+        """
+        
+        return self.dataInfo.dataId
+
 
     def getTxName(self,txname):
         """
