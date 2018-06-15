@@ -595,7 +595,7 @@ class SummaryPrinter(TxTPrinter):
             txnames = theoPred.txnames
             if datasetID == "combined":
                 ul = theoPred.getUpperLimit()
-                ul_expected = theoPred.getUpperLimit ( expected = True ).asNumber(fb)
+                ul_expected = theoPred.getUpperLimit ( expected = True )#.asNumber(fb)
                 signalRegion='(combined)'
             else:
                 if dataType == 'upperLimit':
