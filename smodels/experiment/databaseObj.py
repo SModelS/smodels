@@ -299,7 +299,10 @@ class Database(object):
                 dump.flush ()
                 print ( ".", end="" )
                 sys.stdout.flush()
-            print()
+            if self.inNotebook():
+                print ( "done." )
+            else:
+                print()
             dump.close()
         logger.info ( "fetched %s in %d secs." % ( r2.url, time.time()-t0 ) )
         logger.debug ( "store as %s" % filename )
