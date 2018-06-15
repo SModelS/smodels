@@ -243,7 +243,7 @@ class TheoryPredictionList(object):
             return self.__add__(theoPredList)
 
 def theoryPredictionsFor( expResult, smsTopList, maxMassDist=0.2,
-                          useBestDataset=True, combinedResults=True ):
+                useBestDataset=True, combinedResults=True, marginalize=False ):
     """
     Compute theory predictions for the given experimental result, using the list of
     elements in smsTopList.
@@ -259,6 +259,7 @@ def theoryPredictionsFor( expResult, smsTopList, maxMassDist=0.2,
                If False, returns predictions for all datasets.
     :parameter combinedResults: add theory predictions that result from
                combining datasets.
+    :parameter marginalize: If true, marginalize nuisances. Ff false, profile them.
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction
                objects
     """
@@ -270,8 +271,8 @@ def theoryPredictionsFor( expResult, smsTopList, maxMassDist=0.2,
         if sum ( effs ) == 0.:
             logger.info ( "all efficiencies of combination in %s are zero. will skip." % expResult.globalInfo.id )
             break
-        cul = expResult.getCombinedUpperLimitFor ( effs )
-        eul = expResult.getCombinedUpperLimitFor ( effs, expected=True )
+        cul = expResult.getCombinedUpperLimitFor ( effs, marginalize=marginalize )
+        eul = expResult.getCombinedUpperLimitFor ( effs, expected=True, marginalize=marginalize )
         combResults.append ( _mergePredictions ( preds, cul, eul ) )
         #if combinedResults and not useBestDataset:
         #    return combResults
