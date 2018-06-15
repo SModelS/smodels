@@ -9,11 +9,11 @@
 
 from smodels.theory import clusterTools, crossSection, element
 from smodels.theory.particleNames import elementsInStr
-from smodels.theory.auxiliaryFunctions import cSim, cGtr # DO NOT REMOVE
+from smodels.theory.auxiliaryFunctions import cSim, cGtr
 import copy
 from smodels.tools.physicsUnits import TeV,fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-
+from smodels.experiment.datasetObj import CombinedDataSet, DataSet
 from smodels.tools.smodelsLogging import logger
 
 class TheoryPrediction(object):
@@ -48,7 +48,6 @@ class TheoryPrediction(object):
         
         return self.dataset.getID()
     
-    
     def analysisId(self):
         """
         Return experimental analysis ID
@@ -70,20 +69,23 @@ class TheoryPrediction(object):
         :param expected: return expected Upper Limit, instead of observed.
         """
                
+        ###FIX THIS! Outsource to dataset or experimental result? How to get it for the combined results/dataset
+        
+               
         if expected:
             if not hasattr(self,'expectedUL'):
-                self.expectedUL = self.expResult.getUpperLimitFor(mass=self.mass, \
+                self.expectedUL = self.data.getUpperLimitFor(mass=self.mass, \
                            dataID=self.dataset, expected=expected, txname = self.txnames[0])
             return self.expectedUL
         else:
             if not hasattr(self,'upperLimit'):
                 self.upperLimit = self.expResult.getUpperLimitFor(mass=self.mass,
-                                                                  dataID=self.dataId(),
+                                                                  dataID=self.dataset,
                                                                   expected=expected,
                                                                   txname = self.txnames[0])
                 return self.upperLimit
 
-    def getRValue(self, expected = False ):
+    def getRValue(self, expected = False):
         """
         Get the r value = theory prediction / experimental upper limit
         """
@@ -109,32 +111,21 @@ class TheoryPrediction(object):
         attributes.
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         """
-        if type ( self.dataset ) == list:
-            ## a prediction for a combined result? special
-            lumi = self.expResult.globalInfo.lumi
-            pred = (self.xsection.value*lumi).asNumber() / self.effectiveEff
-            nsig = [ pred * x for x in self.efficiencies ]
-            self.likelihood = self.expResult.combinedLikelihood ( nsig, marginalize=marginalize )
-            self.chi2 = self.expResult.totalChi2 ( nsig, marginalize=marginalize )
-            # self.expectedUL = None
-            return
-
-        if self.dataset.dataInfo.dataType == 'upperLimit':
-            ## FIXME need to write procedure for combined results!!
+        
+        
+        if self.dataType()  == 'upperLimit':
             self.likelihood = None
             self.chi2 = None
-            self.expectedUL = None
-            return
 
-        lumi = self.dataset.globalInfo.lumi
-        nsig = (self.xsection.value*lumi).asNumber()
-        llhd = self.dataset.likelihood(nsig,marginalize=marginalize)
-        chi2 = self.dataset.chi2(nsig,marginalize=marginalize)
-        expectedUL = self.dataset.getSRUpperLimit(alpha = 0.05, expected = True)
+        elif self.dataType() == 'efficiencyMap' or self.dataType() == 'combined':
+            
+            lumi = self.dataset.globalInfo.lumi
+            nsig = (self.xsection.value*lumi).asNumber()
+            llhd = self.dataset.likelihood(nsig,marginalize=marginalize)
+            chi2 = self.dataset.chi2(nsig,marginalize=marginalize)    
+            self.likelihood =  llhd
+            self.chi2 =  chi2
 
-        self.likelihood =  llhd
-        self.chi2 =  chi2
-        self.expectedUL = expectedUL
 
     def getmaxCondition(self):
         """
@@ -161,10 +152,6 @@ class TheoryPrediction(object):
         #ret += ", llhd=%f." % self.likelihood
         return ret
 
-    def isCombined ( self ):
-        """ does this theory pred stem from combining several datasets?
-            (implies the existence of a covariance matrix) """
-        return type(self.dataset)==list
 
     def describe ( self ):
         if not hasattr ( self, "chi2" ):
@@ -179,7 +166,6 @@ class TheoryPrediction(object):
             ds = "multiple (%d combined)" % len(self.dataset)
         else:
             dataId = self.dataset.dataInfo.dataId
-            folderName = self.dataset.dataInfo.path
             ds = "%s (%s)" % ( dataId, self.dataset.folderName() )
         ret += "                   datasets: %s\n" % ds
         ret += "      obs limit (sigma*eff): %s\n" % self.getUpperLimit()
@@ -251,7 +237,7 @@ class TheoryPredictionList(object):
         else:
             return self.__add__(theoPredList)
 
-def theoryPredictionsFor( expResult, smsTopList, maxMassDist=0.2,
+def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
                 useBestDataset=True, combinedResults=True, marginalize=False ):
     """
     Compute theory predictions for the given experimental result, using the list of
@@ -273,7 +259,7 @@ def theoryPredictionsFor( expResult, smsTopList, maxMassDist=0.2,
                objects
     """
 
-    preds = _sortPredictions( expResult, smsTopList, maxMassDist, combinedResults)
+    preds = _sortPredictions(expResult, smsTopList, maxMassDist, combinedResults)
     for preds in preds.values():
         effs = [ pred.effectiveEff for pred in preds ]
         if sum( effs ) == 0.:
@@ -298,10 +284,11 @@ def theoryPredictionsFor( expResult, smsTopList, maxMassDist=0.2,
         return allResults
     
     #Else include best signal region results
-    bestResults = _getBestResults(dataSetResults)
+    bestResults = TheoryPredictionList()
+    bestResults.append(_getBestResult(dataSetResults))
     #If combinedResults = True, also include the combined
     #result (when available):
-    if combinedResults:
+    if combinedResults and len(dataSetResults) > 1:
         combinedDataSetResult = _getCombinedResultFor(dataSetResults,expResult)
         if combinedDataSetResult:
             bestResults.append(combinedDataSetResult)
@@ -312,38 +299,66 @@ def theoryPredictionsFor( expResult, smsTopList, maxMassDist=0.2,
     return bestResults
 
 
-def _getCombinedResultsFor(dataSetResults,expResult):
+def _getCombinedResultFor(dataSetResults,expResult):
     """
     Compute the compbined result for all datasets, if covariance
     matrices are available. Return a TheoryPrediction object
     with the signal cross-section summed over all the signal regions
     and the respective upper limit.
+    
+    :param dataSetResults: List of TheoryPrediction objects for each signal region
+    :param expResult: ExpResult object corresponding to the experimental result
+    
+    :return: TheoryPrediction object
     """
-
-def _mergePredictions ( preds, combinedUL, combinedEUL ):
-    """ merge theory predictions, for the combined prediction. """
-    if len(preds) == 0: return None
-    ret=copy.deepcopy( preds[0] )
-    ret.efficiencies = []
-    eff, wtot = 0., 0.
-    for pred in preds:
-        w = pred.xsection.value.asNumber(fb)
-        eff += pred.effectiveEff * w
-        ret.efficiencies.append ( pred.effectiveEff )
-        wtot += w
-    eff = eff / wtot
-    # print ( "combinedUL=",combinedUL )
-    ret.xsection.value = ret.xsection.value / ret.effectiveEff * eff ## / preds[0].effectiveEff
-    ret.combinedUL = None
-    if type(combinedUL) != type(None):
-        ret.combinedUL = combinedUL * eff
-    ret.combinedExpectedUL = None
-    if combinedEUL is not None:
-        ret.combinedExpectedUL = combinedEUL * eff
-    ret.effectiveEff = eff
-    # ret.dataset = FIXME special
-    ret.dataset = [ x.dataset for x in preds ] # we collect all datasets
-    return ret
+    
+    if len(dataSetResults) == 1:
+        return dataSetResults[0]
+    
+    datasetList = []
+    txnameList = []
+    totalXsec = 0.*fb
+    massList = []
+    PIDList = []
+    IDList = []
+    for predList in dataSetResults:
+        if len(predList) != 1:
+            raise SModelSError("Results with multiple datasets should have a single theory prediction (EM-type)!")
+        pred = predList[0]                    
+        datasetList.append(pred.dataset)
+        txnameList += pred.txnames
+        totalXsec += pred.xsection
+        massList.append(pred.mass)
+        PIDList += pred.PIDs
+        IDList += pred.IDs
+        
+    datasetList = list(set(datasetList))
+    txnameList = list(set(txnameList))
+    massList = list(set(massList))
+    PIDList = list(set(PIDList))
+    IDList = list(set(IDList))
+    if len(massList) > 1:
+        mass = None
+    else:
+        mass = massList[0]
+    
+    
+    #Create a combinedDataSet object:
+    combinedDataset = CombinedDataSet(datasetList,expResult)
+    #Create a theory preidction object for the combined datasets:
+    theoryPrediction = TheoryPrediction()
+    theoryPrediction.dataset = combinedDataset
+    theoryPrediction.txnames = txnameList
+    theoryPrediction.xsection = totalXsec
+    theoryPrediction.conditions = None
+    theoryPrediction.cluster = None
+    theoryPrediction.mass = mass
+    theoryPrediction.PIDs = PIDList
+    theoryPrediction.IDs = IDList
+    theoryPrediction.upperLimit = combinedDataset.getUpperLimit()
+    
+    return theoryPrediction
+    
 
 def _sortPredictions ( expResult, smsTopList, maxMassDist, combine ):
     """ returns dictionary of predictions, sorted by XSectionInfo.
@@ -353,7 +368,7 @@ def _sortPredictions ( expResult, smsTopList, maxMassDist, combine ):
     if not hasattr ( expResult.globalInfo, "covariance" ) or \
        not hasattr ( expResult.globalInfo, "datasetOrder" ) or \
        not combine:
-           return preds
+            return preds
     dsOrder = expResult.globalInfo.datasetOrder
     if type ( dsOrder ) == str:
         ## for debugging only, we allow a single dataset
@@ -376,12 +391,12 @@ def _sortPredictions ( expResult, smsTopList, maxMassDist, combine ):
             # logger.error ( "this is the culprit. we have no predlist. but we need one for combination. lets make one artificially." )
     return preds
 
-def _getBestResults(dataSetResults):
+def _getBestResult(dataSetResults):
     """
     Returns the best result according to the expected upper limit
 
     :param dataSetResults: list of TheoryPredictionList objects
-    :return: best result (TheoryPredictionList object)
+    :return: best result (TheoryPrediction object)
     """
 
     #In the case of UL analyses or efficiency-maps with a single signal region
@@ -406,10 +421,10 @@ def _getBestResults(dataSetResults):
         expectedR = (xsec.value/dataset.getSRUpperLimit(0.05,True,False) ).asNumber()
         if expectedR > bestExpectedR or (expectedR == bestExpectedR and xsec.value > bestXsec):
             bestExpectedR = expectedR
-            bestPredList = predList
+            bestPred = pred
             bestXsec = xsec.value
 
-    return bestPredList
+    return bestPred
 
 def _getDataSetPredictions(dataset,smsTopList,maxMassDist,force_creation=False):
     """
@@ -469,8 +484,10 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist,force_creation=False):
         theoryPrediction.upperLimit = theoryPrediction.getUpperLimit()
         predictionList._theoryPredictions.append(theoryPrediction)
 
-    if len(predictionList) == 0: return None
-    else: return predictionList
+    if len(predictionList) == 0:
+        return None
+    else:
+        return predictionList
 
 def _getElementsFrom(smsTopList, dataset, force_creation):
     """

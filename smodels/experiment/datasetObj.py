@@ -8,7 +8,7 @@
 """
 
 
-import os,glob,sys
+import os,glob
 from smodels.experiment import txnameObj,infoObj
 from smodels.tools.physicsUnits import fb
 from smodels.tools.SimplifiedLikelihoods import LikelihoodComputer, Model, UpperLimitComputer
@@ -184,26 +184,7 @@ class DataSet(object):
         """
         return os.path.basename ( self.path )
 
-#    this feature is not yet ready
-#    def isUncorrelatedWith ( self, other ):
-#        can it be safely assumed that this dataset is approximately
-#        uncorrelated with "other"?
-#        "other" can be a dataset or an expResult, in which case it is
-#        true only if we are uncorrelated with all datasets of "other".
-#
-#        Two datasets of the same exp Result are considered never to be
-#        uncorrelated.
-#
-#        if other == self: return False
-#        if type(other) == type(self): ## comparing with another dataset
-#            if self.globalInfo.path == other.globalInfo.path:
-#                return False ## same expResult? -> correlated!
-#            if self.globalInfo.dirName ( 1 ) != other.globalInfo.dirName ( 1 ):
-#                ## different folders? uncorrelated!
-#                return True
-#            ## different expResults
-#            return None ## FIXME implement
-                
+               
 
     def chi2( self, nsig, deltas_rel=None, marginalize=False ):
         """
@@ -288,3 +269,23 @@ class DataSet(object):
         return maxSignalXsec
 
 
+
+class CombinedDataSet(object):
+    """
+    Holds the information for a combined dataset (used for combining multiple datasets).    
+    """
+    
+    def __init__(self, datasetList=[]):
+        
+        self._datasets = datasetList
+        
+    def __getattribute__(self, *args, **kwargs):
+        
+        try:
+            return getattr(self, *args, **kwargs)
+        except:
+            attrList = [getattr(dataset, *args, **kwargs) for dataset in self._datasets]
+            return attrList
+        
+    def getSRUpperLimit(self,alpha = 0.05, expected = False, compute = False ):
+    
