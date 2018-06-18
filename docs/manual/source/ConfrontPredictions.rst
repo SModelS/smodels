@@ -124,19 +124,19 @@ In case, the experiment provides a covariance matrix, signal regions can be comb
 Just as before, we follow the procedure given in `CMS NOTE 2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_. SModelS allows for a marginalization as well as a profiling of
 the nuisances; profiling is the default. As CPU performance is a concern in SModelS, we take
 the liberty of aggregating the official results to an acceptable number of aggregate regions, where *acceptable* is typically a number below 20.
-For the computation of the 95\% confidence level from the likelihoods, a CLs (=CLsb/CLb) limit is computed from a test statistic :math:`q_\mu`, as described in Eq. 14 in G. Cowan et al., `Asymptotic formulae for likelihood-based tests <https://arxiv.org/abs/1007.1727>`_.
-We then search for the root of the function :math:`CLs - 0.95` with the Brent bracketing technique, see the `scipy manual <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.brentq.html>`_.
+For the computation of the 95\% confidence level from the likelihoods, a CLs (=CLsb/CLb) limit is computed from the test statistic :math:`q_\mu`, as described in Eq. 14 in G. Cowan et al., `Asymptotic formulae for likelihood-based tests <https://arxiv.org/abs/1007.1727>`_.
+We then search for the root of the function CLs - 0.95 with the Brent bracketing technique, see the `scipy manual <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.brentq.html>`_.
 
 In *runSModelS.py*, combining signal regions is turned off per default, only the result from the best expected signal region is reported.
-from the best expected signal region is quoted. It can be turned of with the parameter **options:combineSRs**, see :ref:`parameter file <parameterFile>`.
+from the best expected signal region is quoted. It can be turned on with the parameter **options:combineSRs**, see :ref:`parameter file <parameterFile>`.
 
-+----------------------------------------+---------------------------------------+------------------------------------------------+
-| .. image:: images/T2bbffff_bestSR.png  | .. image:: images/T2bbffff_17.png     | .. image:: images/T2bbffff_44.png              |
-|            :width: 300px               |            :width: 300px              |            :width: 300px                       |
-| Best signal region                     | 17 aggregate regions                  | 44 signal regions                              |
-+----------------------------------------+---------------------------------------+------------------------------------------------+
++----------------------------------------+----------------------------------------+----------------------------------------+
+| .. image:: images/T2bbffff_bestSR.png  | .. image:: images/T2bbffff_17.png      | .. image:: images/T2bbffff_44.png      |
+|            :width: 300px               |            :width: 300px               |            :width: 300px               |
+| Best signal region                     | 17 aggregate regions                   | 44 signal regions                      |
++----------------------------------------+----------------------------------------+----------------------------------------+
 
-Figure: Comparison of validation plots, for CMS-PAS-SUS-16-052: for best signal region (left), for combination of 17 aggregate signal regions (center), for combination of all 44 signal regions (right). Already combining all 44 signal regions is conservative w.r.t. official result. Aggregating the most correlated signal regions to a total of 17 aggregate regions comes with almost no further loss in constraining power. Using only the best signal region, however, performs significantly worse.
+Figure: Comparison of validation plots, for CMS-PAS-SUS-16-052: for best signal region (left), for combination of 17 aggregate signal regions (center), for combination of all 44 signal regions (right). Already combining all 44 signal regions is conservative w.r.t. official result. Aggregating the most correlated signal regions to a total of 17 aggregate regions comes with only little further loss in constraining power. Using only the best signal region, however, performs significantly worse.
 
 .. [*] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model
    is being tested by a large number of results simultaneously.
