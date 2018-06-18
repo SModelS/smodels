@@ -13,7 +13,6 @@
 from __future__ import print_function
 import sys,os
 from smodels.theory.topology import TopologyList 
-from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.databaseObj import ExpResultList
 from smodels.tools.ioObjects import OutputStatus, ResultList
 from smodels.tools.coverage import Uncovered

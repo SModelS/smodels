@@ -199,7 +199,7 @@ class DataSet(object):
         return ret
     
 
-    def folderName ( self ):
+    def folderName( self ):
         """
         Name of the folder in text database.
         """
@@ -258,12 +258,14 @@ class DataSet(object):
                 logger.error("A TxName and mass array must be defined when \
                              computing ULs for upper-limit results.")
                 return False
-            elif isinstance(txnames,list) and len(txnames) != 1:
-                logger.error("txnames must be a TxName object, a string or a list with a single Txname object")
-                return False
+            elif isinstance(txnames,list):
+                if len(txnames) != 1:
+                    logger.error("txnames must be a TxName object, a string or a list with a single Txname object")
+                    return False
+                else:
+                    txname = txnames[0]
             else:
-                txname = txnames[0]
-                
+                txname = txnames
                 
             if not isinstance(txname, txnameObj.TxName) and \
             not isinstance(txname, str):
@@ -272,7 +274,7 @@ class DataSet(object):
             if not isinstance(mass, list):
                 logger.error("mass must be a mass array")
                 return False
-                        
+
             for tx in self.txnameList: 
                 if tx == txname or tx.txName == txname:
                     if expected:
@@ -282,13 +284,12 @@ class DataSet(object):
                             upperLimit = tx.txnameDataExp.getValueFor(mass)
                     else:
                         upperLimit = tx.txnameData.getValueFor(mass)
-        
+                        
+            return upperLimit        
         else:
             logger.warning("Unkown data type: %s. Data will be ignored.",
                            self.getType())
-
-
-        return upperLimit
+            return None        
             
             
     def getSRUpperLimit(self,alpha = 0.05, expected = False, compute = False ):
