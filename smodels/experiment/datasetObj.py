@@ -203,7 +203,7 @@ class DataSet(object):
         """
         Name of the folder in text database.
         """
-        return os.path.basename ( self.path )
+        return os.path.basename( self.path )
 
                
     def getAttributes(self,showPrivate=False):

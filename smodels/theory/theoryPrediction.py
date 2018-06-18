@@ -65,9 +65,14 @@ class TheoryPrediction(object):
     def getUpperLimit(self, expected=False ):
         """
         Get the upper limit on sigma*eff.
-        For UL-type results, use the 
+        For UL-type results, use the UL map. For EM-Type returns
+        the corresponding dataset (signal region) upper limit.
+        For combined results, returns the upper limit on the
+        total sigma*eff (for all signal regions/datasets). 
         
         :param expected: return expected Upper Limit, instead of observed.
+        
+        :return: upper limit (Unum object)
         """
         
         #First check if the upper-limit and expected upper-limit have already been computed.
@@ -112,7 +117,7 @@ class TheoryPrediction(object):
     def computeStatistics(self,marginalize=False):
         """
         Compute the likelihood, chi2 and expected upper limit for this theory prediction.
-        The resulting values are stored as the likelihood, chi2 and expectedUL
+        The resulting values are stored as the likelihood and chi2
         attributes.
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         """

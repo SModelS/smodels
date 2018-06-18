@@ -31,13 +31,12 @@ class ExpResult(object):
                     in <path>
     """
         
-    def __init__( self, path = None, discard_zeroes = True,
-                  pcl_file = False):
+    def __init__(self, path = None, discard_zeroes = True):
         """
         :param path: Path to the experimental result folder
         :param discard_zeroes: Discard maps with only zeroes
-        :param pcl_file: Write and maintain pickle file
         """ 
+        
         if not path:
             return
         if not os.path.isdir ( path ):
@@ -64,14 +63,15 @@ class ExpResult(object):
                 except TypeError:
                     continue
 
-    def writePickle( self, dbVersion ):
+    def writePickle(self, dbVersion):
         """ write the pickle file """
+        
         meta = metaObj.Meta ( self.path, self.discard_zeroes, databaseVersion=dbVersion )
         pclfile = "%s/.%s" % ( self.path, meta.getPickleFileName() )
         logger.debug ( "writing expRes pickle file %s, mtime=%s" % (pclfile, meta.cTime() ) )
-        f=open ( pclfile, "wb" )
-        serializer.dump ( meta, f )
-        serializer.dump ( self, f )
+        f=open( pclfile, "wb" )
+        serializer.dump( meta, f )
+        serializer.dump( self, f )
         f.close()
 
     def __eq__(self, other ):
@@ -133,15 +133,17 @@ class ExpResult(object):
             txnames += dataset.txnameList
         return txnames
 
-    def getEfficiencyFor ( self, txname, mass, dataset=None):
+    def getEfficiencyFor(self, txname, mass, dataset=None):
         """
         Convenience function. Get the efficiency for
         a specific dataset for a a specific txname.
         Equivalent to:
         self.getDataset ( dataset ).getEfficiencyFor ( txname, mass )
         """
-        dataset = self.getDataset ( dataset )
-        if dataset: return dataset.getEfficiencyFor ( txname, mass )
+        
+        dataset = self.getDataset( dataset )
+        if dataset:
+            return dataset.getEfficiencyFor( txname, mass )
         return None
 
     def hasCovarianceMatrix( self ):
@@ -193,16 +195,15 @@ class ExpResult(object):
         :return: upper limit (Unum object)
         """
         
-        for dataset in self.datasets:
-            if dataset.getID() == dataID:
-                upperLimit = dataset.getUpperLimitFor(mass=mass,expected = expected, 
+        dataset = self.getDataset(dataID)
+        if dataset:
+            upperLimit = dataset.getUpperLimitFor(mass=mass,expected = expected, 
                                                       txnames = txname,
                                                       compute=compute,alpha=alpha)
-                return upperLimit
-        
-        logger.error("Dataset ID %s not found in experimental result %s" %(dataID,self))      
-
-        return False
+            return upperLimit
+        else:
+            logger.error("Dataset ID %s not found in experimental result %s" %(dataID,self))     
+            return None
 
 
     def getValuesFor(self, attribute=None):
