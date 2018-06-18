@@ -149,8 +149,8 @@ class ExpResult(object):
         if dataset: return dataset.getEfficiencyFor ( txname, mass )
         return None
 
-    def hasCovarianceMatrix ( self ):
-        return hasattr ( self.globalInfo, "covariance" )
+    def hasCovarianceMatrix( self ):
+        return hasattr(self.globalInfo, "covariance")
 
     """ this feature is not yet ready
     def isUncorrelatedWith ( self, other ):
@@ -171,25 +171,6 @@ class ExpResult(object):
         return None ## FIXME implement
     """
 
-    def combinedLikelihood ( self, nsig, deltas=None, marginalize=False ):
-        """
-        Computes the (combined) likelihood to observe nobs events, given a
-        predicted signal "nsig", with nsig being a vector with one entry per
-        dataset.  nsig has to obey the datasetOrder. Deltas is the error on
-        the signal efficiency.
-        :param nsig: predicted signal (list)
-        :param deltas: uncertainty on signal (None,float, or list).
-        :returns: likelihood to observe nobs events (float)
-        """
-        if len ( self.datasets ) == 1: return self.datasets[0].likelihood ( nsig )
-        if not hasattr ( self.globalInfo, "covariance" ):
-            logger.error ( "asked for combined likelihood, but no covariance error given." )
-            return None
-        nobs = [ x.dataInfo.observedN for x in self.datasets ]
-        bg = [ x.dataInfo.expectedBG for x in self.datasets ]
-        cov = self.globalInfo.covariance
-        computer = LikelihoodComputer ( Model ( nobs, bg, cov, None, nsig, deltas_rel = deltas ) )
-        return computer.likelihood ( nsig, marginalize=marginalize )
 
     def totalChi2 ( self, nsig, deltas=None, marginalize=False ):
         """

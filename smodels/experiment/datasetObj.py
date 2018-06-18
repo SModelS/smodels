@@ -100,7 +100,7 @@ class DataSet(object):
         """
         Return the dataset ID
         """
-        
+
         return self.dataInfo.dataId
 
 
@@ -161,7 +161,7 @@ class DataSet(object):
         else:
             return valuesDict[attribute]
 
-    def likelihood ( self, nsig, deltas=None, marginalize=False ):
+    def likelihood(self, nsig, deltas=None, marginalize=False ):
         """
         Computes the likelihood to observe nobs events,
         given a predicted signal "nsig", assuming "deltas"
@@ -174,19 +174,12 @@ class DataSet(object):
         :returns: likelihood to observe nobs events (float)
         """
 
-        m = Model ( self.dataInfo.observedN, self.dataInfo.expectedBG, self.dataInfo.bgError**2, deltas_rel = deltas )
-        computer = LikelihoodComputer ( m )
-        return computer.likelihood( nsig, marginalize=marginalize )
-
-    def folderName ( self ):
-        """
-        Name of the folder in text database.
-        """
-        return os.path.basename ( self.path )
-
-               
-
-    def chi2( self, nsig, deltas_rel=None, marginalize=False ):
+        m = Model(self.dataInfo.observedN, self.dataInfo.expectedBG, self.dataInfo.bgError**2, deltas_rel = deltas)
+        computer = LikelihoodComputer(m)
+        return computer.likelihood(nsig, marginalize=marginalize)
+    
+    
+    def chi2(self, nsig, deltas_rel=None, marginalize=False):
         """
         Computes the chi2 for a given number of observed events "nobs",
         given number of signal events "nsig", and error on signal "deltas".
@@ -197,12 +190,22 @@ class DataSet(object):
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         :return: chi2 (float)
         """
-        m = Model ( self.dataInfo.observedN, self.dataInfo.expectedBG, 
-                    self.dataInfo.bgError**2, deltas_rel = deltas_rel )
-        computer = LikelihoodComputer ( m )
-        ret = computer.chi2( nsig, marginalize=False )
+        
+        m = Model(self.dataInfo.observedN, self.dataInfo.expectedBG, 
+                    self.dataInfo.bgError**2, deltas_rel = deltas_rel)
+        computer = LikelihoodComputer(m)
+        ret = computer.chi2( nsig, marginalize=marginalize)
+        
         return ret
+    
 
+    def folderName ( self ):
+        """
+        Name of the folder in text database.
+        """
+        return os.path.basename ( self.path )
+
+               
     def getAttributes(self,showPrivate=False):
         """
         Checks for all the fields/attributes it contains as well as the
@@ -341,19 +344,35 @@ class CombinedDataSet(object):
     Holds the information for a combined dataset (used for combining multiple datasets).    
     """
     
-    def __init__(self, datasetList=[],expResult=None):
+    def __init__(self, expResult):
         
-        self._datasets = datasetList
-        if expResult:
-            self.globalInfo = expResult.globalInfo
+        self.globalInfo = expResult.globalInfo
+        self._datasets = expResult.datasets[:]
+        self._marginalize = False        
+        self.sortDataSets()
+                
+                
+    def sortDataSets(self):
+        """
+        Sort datasets according to globalInfo.datasetOrder.
+        """
         
-    def __getattribute__(self, *args, **kwargs):
+        datasets = self._datasets[:]        
+        if not hasattr(self.globalInfo, "datasetOrder" ):        
+            raise SModelSError( "datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id )
+        datasetOrder = self.globalInfo.datasetOrder
+        if isinstance(datasetOrder,str):
+            datasetOrder = [datasetOrder]
         
-        try:
-            return getattr(self, *args, **kwargs)
-        except:
-            attrList = [getattr(dataset, *args, **kwargs) for dataset in self._datasets]
-            return attrList
+        if len(datasetOrder) != len(datasets):
+            raise SModelSError("Number of datasets in the datasetOrder field does not match the number of datasets for %s" 
+                               %self.globalInfo.id)
+        for dataset in datasets:
+            if not dataset.getID() in datasetOrder:
+                raise SModelSError("Dataset ID %s not found in datasetOrder" %dataset.getID())
+            dsIndex = datasetOrder.index(dataset.getID())
+            self._datasets[dsIndex] = dataset
+        
         
     def getType(self):
         """
@@ -367,67 +386,109 @@ class CombinedDataSet(object):
         Return the ID for the combined dataset
         """
         
-        return 'combined'
-        
-        
-    def getCombinedUpperLimitFor(self, predictionsList, expected=False, marginalize=False):
+        return '(combined)'
+    
+    def getDataSet(self,datasetID):
         """
-        Get combined upper limit. Effs are the signal efficiencies in the
-        datasets. The order is defined in the dataset itself.
-        :param effs: the signal efficiencies for all datasets
-        (adding up the efficiencies for all txnames) the efficiencies must 
-        be sorted according to datasetOrder
+        Returns the dataset with the corresponding dataset ID.
+        If the dataset is not found, returns None.
+        
+        :param datasetID: dataset ID (string)
+        
+        :return: DataSet object if found, otherwise None.
+        """
+        
+        for dataset in self._datasets:
+            if datasetID == dataset.getID():
+                return dataset
+        
+        return None
+    
+        
+    def getCombinedUpperLimitFor(self, nsig, expected=False):
+        """
+        Get combined upper limit.
+        
+        :param nsig: list of signal events in each signal region/dataset. The list
+                        should obey the ordering in globalInfo.datasetOrder.
         :param expected: return expected, not observed value
-        :param marginalize: if true, marginalize nuisances, if false, profile them.
-        if none profile for cases with less than 30 signal regions, and marginalize
-        for cases with 30 or more signal regions.
-        :returns: upper limit on sigma (*not* sigma*eff)
+        :returns: upper limit on sigma*eff
         """
         
         
         if not hasattr(self.globalInfo, "covariance" ):
             logger.error ( "no covariance matrix given in globalInfo.txt for %s" % self.globalInfo.id )
             raise SModelSError( "no covariance matrix given in globalInfo.txt for %s" % self.globalInfo.id )
-        if not hasattr ( self.globalInfo, "datasetOrder" ):
-            logger.error ( "datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id )
-            raise SModelSError( "datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id )
         cov = self.globalInfo.covariance
-        if type ( cov ) != list:
+        if type(cov) != list:
             raise SModelSError( "covariance field has wrong type: %s" % type(cov))
-        if len ( cov ) < 1:
+        if len(cov) < 1:
             raise SModelSError( "covariance matrix has length %d." % len(cov))
 
         computer = UpperLimitComputer(self.globalInfo.lumi, ntoys=10000)
         
-        
-        datasetOrder = self.globalInfo.datasetOrder
-        if type(datasetOrder) == str:
-            datasetOrder = tuple( [ datasetOrder ] ) ## for debugging, allow one dataset
-        # print ( "datasetOrder=", datasetOrder )
-        if len(datasetOrder) != len(self._datasets):
-            raise SModelSError("Number of elements in datasetOrder(%d) not equals number of datasets(%d) in %s." 
-                               % ( len(datasetOrder), len(self._datasets), self.globalInfo.id ) )
-        dsDict={} ## make sure we respect datasetOrder.        
-        for ds in self._datasets:
-            dsDict[ds.getID()] = ds
-        xsecDict = {}
-        for prediction in predictionsList:
-            xsecDict[prediction.dataset.getID()] = prediction.xsection
-            
-        nobs, nb, dsXsec = [], [], []
-        for dsname in datasetOrder:
-            if not dsname in dsDict.keys():
-                raise SModelSError( "dataset %s appears in datasetOrder, but not as dataset in %s" % ( dsname, self.globalInfo.id ) )
-            ds = dsDict[dsname]
-            nobs.append(ds.dataInfo.observedN)
-            nb.append(ds.dataInfo.expectedBG)
-            dsXsec.append(xsecDict[dsname])
+        nobs = [x.dataInfo.observedN for x in self.datasets]
+        bg = [x.dataInfo.expectedBG for x in self.datasets]
         no = nobs
         if expected:
-            no = list(map(round, nb ))
-        ret = computer.ulSigma(Model( no, nb, cov, None, dsXsec), 
-                               marginalize=marginalize )
+            no = list(map(round, bg ))
+        ret = computer.ulSigma(Model(no, bg, cov, None, nsig), 
+                               marginalize=self._marginalize)
         
         return ret
         
     
+    def combinedLikelihood(self, nsig, deltas=None, marginalize=False ):
+        """
+        Computes the (combined) likelihood to observe nobs events, given a
+        predicted signal "nsig", with nsig being a vector with one entry per
+        dataset.  nsig has to obey the datasetOrder. Deltas is the error on
+        the signal.
+        :param nsig: predicted signal (list)
+        :param deltas: uncertainty on signal (None,float, or list).
+        
+        :returns: likelihood to observe nobs events (float)
+        """
+        
+        if len(self._datasets) == 1:
+            if isinstance(nsig,list):
+                nsig = nsig[0]
+            return self._datasets[0].likelihood(nsig,marginalize=marginalize)
+        
+        if not hasattr(self.globalInfo, "covariance" ):
+            logger.error("Asked for combined likelihood, but no covariance error given." )
+            return None
+
+        nobs = [ x.dataInfo.observedN for x in self._datasets]
+        bg = [ x.dataInfo.expectedBG for x in self._datasets]
+        cov = self.globalInfo.covariance
+        computer = LikelihoodComputer(Model(nobs, bg, cov, None, nsig,
+                                              deltas_rel = deltas))
+        
+        return computer.likelihood(nsig, marginalize=marginalize )
+
+    def totalChi2(self, nsig, deltas=None, marginalize=False):
+        """
+        Computes the total chi2 for a given number of observed events, given a
+        predicted signal "nsig", with nsig being a vector with one entry per
+        dataset. nsig has to obey the datasetOrder. Deltas is the error on
+        the signal efficiency.
+        :param nsig: predicted signal (list)
+        :param deltas: uncertainty on signal (None,float, or list).
+        :returns: chi2 (float)
+        """
+        if len(self.datasets) == 1:
+            if isinstance(nsig,list):
+                nsig = nsig[0]            
+            return self._datasets[0].chi2(nsig, marginalize=marginalize)
+        
+        if not hasattr(self.globalInfo, "covariance" ):
+            logger.error("Asked for combined likelihood, but no covariance error given." )
+            return None
+        
+        nobs = [x.dataInfo.observedN for x in self._datasets ]
+        bg = [x.dataInfo.expectedBG for x in self._datasets ]
+        cov = self.globalInfo.covariance
+        computer = LikelihoodComputer(Model(nobs, bg, cov, deltas_rel=deltas))
+        
+        return computer.chi2(nsig, marginalize=marginalize)

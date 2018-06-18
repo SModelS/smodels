@@ -601,7 +601,7 @@ class LikelihoodComputer:
         # logger.error ( "theta_hat, err=%s, %s, %s" % ( theta_hat[0], err, ret ) )
         return ret
 
-    def likelihood ( self, nsig, marginalize=False, nll=False ):
+    def likelihood(self, nsig, marginalize=False, nll=False ):
         """ compute likelihood for nsig, profiling the nuisances
         :param marginalize: if true, marginalize, if false, profile
         :param nll: return nll instead of likelihood

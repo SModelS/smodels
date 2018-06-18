@@ -67,11 +67,9 @@ class TheoryPrediction(object):
         Get the upper limit on sigma*eff.
         For UL-type results, use the 
         
-        
         :param expected: return expected Upper Limit, instead of observed.
         """
-
-
+        
         #First check if the upper-limit and expected upper-limit have already been computed.
         #If not, compute it and store them.
         if not hasattr(self, 'expectedUL') or not hasattr(self, 'upperLimit'):
@@ -79,7 +77,7 @@ class TheoryPrediction(object):
             if self.dataType() == 'efficiencyMap':
                 self.expectedUL = self.dataset.getSRUpperLimit(expected=True)
                 self.upperLimit = self.dataset.getSRUpperLimit(expected=False)
-            if self.dataType() == 'upperLimit':
+            if self.dataType() == 'upperLimit':                
                 self.expectedUL = self.dataset.getUpperLimitFor(mass=self.mass,
                                                                 txnames=self.txnames,
                                                                 expected=True)
@@ -87,8 +85,12 @@ class TheoryPrediction(object):
                                                                 txnames=self.txnames,
                                                                 expected=False)
             if self.dataType() == 'combined':
-                self.expectedUL = self.dataset.getCombinedUpperLimitFor(self.dataSetResults,expected=True)
-                self.upperLimit = self.dataset.getCombinedUpperLimitFor(self.dataSetResults,expected=False)
+                lumi = self.expResult.globalInfo.lumi
+                #Create a list of signal events in each dataset/SR sorted according to datasetOrder
+                srNsigDict = dict([[pred.dataset.getID(),pred.xsection.value*lumi] for pred in self.dataSetResults])
+                srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]                
+                self.expectedUL = self.dataset.getCombinedUpperLimitFor(srNsigs,expected=True)
+                self.upperLimit = self.dataset.getCombinedUpperLimitFor(srNsigs,expected=False)
                           
         #Return the expected or observed UL:
         if expected:
@@ -101,19 +103,11 @@ class TheoryPrediction(object):
         Get the r value = theory prediction / experimental upper limit
         """
         
-        if expected:
-            eul=self.getUpperLimit(expected=True)
-            if type(eul)==type(None) or eul.asNumber(fb)==0.:
-                
-                return None
-            else:
-                return self.xsection.value/eul
-
-        ul = self.getUpperLimit()
-        if type(ul) == type(None) or ul.asNumber(fb) == 0.:
+        upperLimit = self.getUpperLimit(expected)
+        if upperLimit is None or upperLimit.asNumber(fb)==0.:                
             return None
-        
-        return self.xsection.value/ul
+        else:
+            return (self.xsection.value/upperLimit).asNumber()
 
     def computeStatistics(self,marginalize=False):
         """
@@ -128,14 +122,22 @@ class TheoryPrediction(object):
             self.likelihood = None
             self.chi2 = None
 
-        elif self.dataType() == 'efficiencyMap' or self.dataType() == 'combined':
-            
+        elif self.dataType() == 'efficiencyMap':            
             lumi = self.dataset.globalInfo.lumi
             nsig = (self.xsection.value*lumi).asNumber()
             llhd = self.dataset.likelihood(nsig,marginalize=marginalize)
             chi2 = self.dataset.chi2(nsig,marginalize=marginalize)    
             self.likelihood =  llhd
             self.chi2 =  chi2
+            
+        elif self.dataType() == 'combined':
+            lumi = self.expResult.globalInfo.lumi
+            #Create a list of signal events in each dataset/SR sorted according to datasetOrder
+            srNsigDict = dict([[pred.dataset.getID(),pred.xsection.value*lumi] for pred in self.dataSetResults])
+            srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]                
+            self.likelihood = self.dataset.combinedLikelihood(srNsigs, marginalize=marginalize)
+            self.chi2 = self.dataset.totalChi2(srNsigs, marginalize=marginalize)
+            
 
     def getmaxCondition(self):
         """
@@ -263,7 +265,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
                If False, returns predictions for all datasets.
     :parameter combinedResults: add theory predictions that result from
                combining datasets.
-    :parameter marginalize: If true, marginalize nuisances. Ff false, profile them.
+    :parameter marginalize: If true, marginalize nuisances. If false, profile them.
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction
                objects
     """
@@ -271,13 +273,16 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
     dataSetResults = []
     #Compute predictions for each data set (for UL analyses there is one single set)
     for dataset in expResult.datasets:
-        predList = _getDataSetPredictions(dataset,smsTopList,maxMassDist,expResult)
+        predList = _getDataSetPredictions(dataset,smsTopList,maxMassDist)
         if predList:
             dataSetResults.append(predList)
     if not dataSetResults:
         return None
     elif len(dataSetResults) == 1:
-        return dataSetResults[0]
+        result = dataSetResults[0]
+        for pred in result:
+            pred.expResult = expResult
+        return result
 
     #For results with more than one dataset, return all dataset predictions
     #if useBestDataSet=False and combinedResults=False:
@@ -292,7 +297,8 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
     bestResults.append(_getBestResult(dataSetResults))
     #If combinedResults = True, also include the combined result (when available):
     if combinedResults and len(dataSetResults) > 1:
-        combinedDataSetResult = _getCombinedResultFor(dataSetResults,expResult)
+        combinedDataSetResult = _getCombinedResultFor(dataSetResults,
+                                                      expResult,marginalize)
         if combinedDataSetResult:
             bestResults.append(combinedDataSetResult)
 
@@ -301,7 +307,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
         
     return bestResults
 
-def _getCombinedResultFor(dataSetResults,expResult):
+def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     """
     Compute the compbined result for all datasets, if covariance
     matrices are available. Return a TheoryPrediction object
@@ -310,31 +316,34 @@ def _getCombinedResultFor(dataSetResults,expResult):
     
     :param dataSetResults: List of TheoryPrediction objects for each signal region
     :param expResult: ExpResult object corresponding to the experimental result
+    :parameter marginalize: If true, marginalize nuisances. If false, profile them.    
     
     :return: TheoryPrediction object
     """
-    
+        
     if len(dataSetResults) == 1:
         return dataSetResults[0]
+    elif not expResult.hasCovarianceMatrix():
+        return None
     
-    datasetList = []
     txnameList = []
-    totalXsec = 0.*fb
+    totalXsec = None
     massList = []
     PIDList = []
     IDList = []
     for predList in dataSetResults:
         if len(predList) != 1:
             raise SModelSError("Results with multiple datasets should have a single theory prediction (EM-type)!")
-        pred = predList[0]                    
-        datasetList.append(pred.dataset)
+        pred = predList[0]
         txnameList += pred.txnames
-        totalXsec += pred.xsection
+        if not totalXsec:
+            totalXsec = pred.xsection
+        else:
+            totalXsec += pred.xsection
         massList.append(pred.mass)
         PIDList += pred.PIDs
         IDList += pred.IDs
         
-    datasetList = list(set(datasetList))
     txnameList = list(set(txnameList))
     massList = list(set(massList))
     PIDList = list(set(PIDList))
@@ -346,7 +355,8 @@ def _getCombinedResultFor(dataSetResults,expResult):
     
     
     #Create a combinedDataSet object:
-    combinedDataset = CombinedDataSet(datasetList,expResult)
+    combinedDataset = CombinedDataSet(expResult)
+    combinedDataset._marginalize = marginalize
     #Create a theory preidction object for the combined datasets:
     theoryPrediction = TheoryPrediction()
     theoryPrediction.dataset = combinedDataset
@@ -398,7 +408,7 @@ def _getBestResult(dataSetResults):
 
     return bestPred
 
-def _getDataSetPredictions(dataset,smsTopList,maxMassDist,force_creation=False):
+def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
     """
     Compute theory predictions for a given data set.
     For upper-limit results returns the list of theory predictions for the
@@ -412,16 +422,13 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist,force_creation=False):
     :parameter smsTopList: list of topologies containing elements 
                            (TopologyList object)
     :parameter maxMassDist: maximum mass distance for clustering elements (float)
-    :parameter force_creation: force creation of a prediction, even if efficiency
-                               is zero. We need this to have consistent input for
-                               combinations.
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction 
                objects
     """
 
     predictionList = TheoryPredictionList()
     # Select elements belonging to expResult and apply efficiencies
-    elements = _getElementsFrom(smsTopList, dataset,force_creation)
+    elements = _getElementsFrom(smsTopList, dataset)
 
     #Check dataset sqrts format:
     if (dataset.globalInfo.sqrts/TeV).normalize()._unit:
@@ -436,7 +443,8 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist,force_creation=False):
         if not el.weight: continue
         newelements.append(el)
     elements = newelements
-    if len(elements) == 0: return None
+    if len(elements) == 0:
+        return None
 
     # Combine elements according to their respective constraints and masses
     # (For efficiencyMap analysis group all elements)
@@ -461,7 +469,7 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist,force_creation=False):
     else:
         return predictionList
 
-def _getElementsFrom(smsTopList, dataset, force_creation):
+def _getElementsFrom(smsTopList, dataset):
     """
     Get elements that belong to any of the TxNames in dataset
     (appear in any of constraints in the result).
@@ -472,8 +480,6 @@ def _getElementsFrom(smsTopList, dataset, force_creation):
     :parameter dataset:  Data Set to be considered (DataSet object)
     :parameter smsTopList: list of topologies containing elements 
                            (TopologyList object)
-    :parameter force_creation: force creation of element, even if eff == 0. 
-                               This is needed for combined results.
     :returns: list of elements (Element objects)
     """
 
@@ -487,7 +493,8 @@ def _getElementsFrom(smsTopList, dataset, force_creation):
                 if not newEl: continue
                 el.covered = True
                 eff = txname.getEfficiencyFor(newEl.getMasses())
-                if not eff and not force_creation: continue
+                if not eff:
+                    continue
                 el.tested = True
                 newEl.eff = eff
                 newEl.weight *= eff
