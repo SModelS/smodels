@@ -195,20 +195,20 @@ class BasicPrinter(object):
         """
         ret=""
 
-        for iobj,obj in enumerate(self.toPrint):
-                if obj is None: continue
-                output = self._formatObj(obj)                
-                if not output: continue  #Skip empty output                
-                ret += output
-                if self.output == 'stdout':
-                    sys.stdout.write(output)
-                elif self.output == 'file':
-                    if not self.filename:
-                        logger.error('Filename not defined for printer')
-                        return False   
-                    with self.openOutFile(self.filename, "a") as outfile:
-                        outfile.write(output)
-                        outfile.close()
+        for obj in self.toPrint.values:
+            if obj is None: continue
+            output = self._formatObj(obj)                
+            if not output: continue  #Skip empty output                
+            ret += output
+            if self.output == 'stdout':
+                sys.stdout.write(output)
+            elif self.output == 'file':
+                if not self.filename:
+                    logger.error('Filename not defined for printer')
+                    return False   
+                with self.openOutFile(self.filename, "a") as outfile:
+                    outfile.write(output)
+                    outfile.close()
 
         self.toPrint = [None]*len(self.printingOrder)  #Reset printing objects
         return ret
@@ -448,16 +448,8 @@ class TxTPrinter(BasicPrinter):
                 output += str(condlist) + "\n"
 
             #Get upper limit for the respective prediction:
-            if expRes.datasets[0].dataInfo.dataType == 'upperLimit':
-                upperLimit = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass)
-                upperLimitExp = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass,expected=True)
-            elif expRes.datasets[0].dataInfo.dataType == 'efficiencyMap':
-                if theoryPrediction.dataId() == "combined":
-                    upperLimit = theoryPrediction.getUpperLimit()
-                    upperLimitExp = theoryPrediction.getUpperLimit( expected=True )
-                else:
-                    upperLimit = expRes.getUpperLimitFor(dataID=theoryPrediction.dataId() )
-                    upperLimitExp = expRes.getUpperLimitFor(dataID=theoryPrediction.dataId(), expected=True)
+            upperLimit = theoryPrediction.getUpperLimit(expected=False)
+            upperLimitExp = theoryPrediction.getUpperLimit(expected=True)
 
             output += "Observed experimental limit: " + str(upperLimit) + "\n"
             if not upperLimitExp is None:
@@ -590,7 +582,7 @@ class SummaryPrinter(TxTPrinter):
         for theoPred in theoPredictions:
             expResult = theoPred.expResult
             datasetID = theoPred.dataId()
-            # dataType = expResult.datasets[0].dataInfo.dataType
+            # dataType = expResult.datasets[0].getType()
             dataType = theoPred.dataType()
             txnames = theoPred.txnames
             if datasetID == "combined":
@@ -606,7 +598,7 @@ class SummaryPrinter(TxTPrinter):
                     ul = expResult.getUpperLimitFor(dataID=datasetID)
                     ul_expected = expResult.getUpperLimitFor(dataID=datasetID, expected=True)
                     signalRegion  = theoPred.dataId()
-                    # signalRegion  = theoPred.dataset.dataInfo.dataId
+                    # signalRegion  = theoPred.dataset.getID()
                 else:
                     logger.error("Unknown dataType %s" %(str(dataType)))
                     raise SModelSError()
@@ -1093,8 +1085,8 @@ class SLHAPrinter(TxTPrinter):
         for theoPred in rList:
             expResult = theoPred.expResult
             datasetID = theoPred.dataId()
-            # datasetID = theoPred.dataset.dataInfo.dataId
-            # dataType = expResult.datasets[0].dataInfo.dataType
+            # datasetID = theoPred.dataset.getID()
+            # dataType = expResult.datasets[0].getType()
             dataType = theoPred.dataType()
             txnames = theoPred.txnames
             if datasetID == "combined":
@@ -1110,7 +1102,7 @@ class SLHAPrinter(TxTPrinter):
                     ul = expResult.getUpperLimitFor(dataID=datasetID)
                     ul_expected = expResult.getUpperLimitFor(dataID=datasetID, expected=True)
                     signalRegion  = theoPred.dataId()
-                    # signalRegion  = theoPred.dataset.dataInfo.dataId
+                    # signalRegion  = theoPred.dataset.getID()
                 else:
                     logger.error("Unknown dataType %s" %(str(dataType)))
                     raise SModelSError()

@@ -231,7 +231,7 @@ class Browser(object):
             return None
 
         for dataset in expres.datasets:
-            if dataset.dataInfo.dataId != datasetID:
+            if dataset.getID() != datasetID:
                 continue
             return dataset.getSRUpperLimit()
 

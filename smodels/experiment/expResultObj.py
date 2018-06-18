@@ -97,7 +97,7 @@ class ExpResult(object):
 
     def __str__(self):
         label = self.globalInfo.getInfo('id') + ": "
-        dataIDs = [dataset.dataInfo.dataId for dataset in self.datasets]
+        dataIDs = [dataset.getID() for dataset in self.datasets]
         ct_dids=0
         if dataIDs:
             for dataid in dataIDs:
@@ -125,7 +125,7 @@ class ExpResult(object):
         retrieve dataset by dataId
         """
         for dataset in self.datasets:
-            if dataset.dataInfo.dataId == dataId:
+            if dataset.getID() == dataId:
                 return dataset
         return None
 
@@ -247,7 +247,7 @@ class ExpResult(object):
             sys.exit()
         dsDict={} ## make sure we respect datasetOrder.
         for ds in self.datasets:
-            dsDict[ds.dataInfo.dataId]=ds
+            dsDict[ds.getID()]=ds
         nobs, nb = [], []
         for dsname in datasetOrder:
             if not dsname in dsDict.keys():
@@ -285,60 +285,17 @@ class ExpResult(object):
                         instead.
         :return: upper limit (Unum object)
         """
-        if dataID == "combined":
-            logger.error ( "you are asking for upper limit for the combined dataset. Use .getCombinedUpperLimitFor method instead." )
-            sys.exit()
-        if self.datasets[0].dataInfo.dataType == 'efficiencyMap':
-            if not dataID or not isinstance(dataID, str):
-                logger.error("The data set ID must be defined when computing ULs" \
-                             " for efficiency-map results (as there is no covariance matrix).")
-                return False
+        
+        for dataset in self.datasets:
+            if dataset.getID() == dataID:
+                upperLimit = dataset.getUpperLimitFor(mass=mass,expected = expected, 
+                                                      txnames = txname,
+                                                      compute=compute,alpha=alpha)
+                return upperLimit
+        
+        logger.error("Dataset ID %s not found in experimental result %s" %(dataID,self))      
 
-            useDataset = False
-            for dataset in self.datasets:
-                if dataset.dataInfo.dataId == dataID:
-                    useDataset = dataset
-                    break
-            if useDataset is False:
-                logger.error("Data set ID ``%s'' not found." % dataID )
-                return False
-
-            if compute:
-                upperLimit = useDataset.getSRUpperLimit(alpha, expected, compute)
-            else:
-                if expected:
-                    upperLimit = useDataset.dataInfo.expectedUpperLimit
-                else:
-                    upperLimit = useDataset.dataInfo.upperLimit
-                if (upperLimit/fb).normalize()._unit:
-                    logger.error("Upper limit defined with wrong units for %s and %s"
-                                  %(dataset.globalInfo.id,dataset.dataInfo.dataId))
-                    return False
-
-        elif self.datasets[0].dataInfo.dataType == 'upperLimit':
-            if not txname or not mass:
-                logger.error("A TxName and mass array must be defined when \
-                             computing ULs for upper-limit results.")
-                return False
-            if not isinstance(txname, txnameObj.TxName) and \
-            not isinstance(txname, str):
-                logger.error("txname must be a TxName object or a string")
-                return False
-            if not isinstance(mass, list):
-                logger.error("mass must be a mass array")
-                return False
-            for tx in self.getTxNames():
-                if tx == txname or tx.txName == txname:
-                    if expected:
-                        if not tx.txnameDataExp: upperLimit = None
-                        else: upperLimit = tx.txnameDataExp.getValueFor(mass)
-                    else: upperLimit = tx.txnameData.getValueFor(mass)
-        else:
-            logger.warning("Unkown data type: %s. Data will be ignored.",
-                           self.datasets[0].dataInfo.dataType)
-
-
-        return upperLimit
+        return False
 
 
     def getValuesFor(self, attribute=None):

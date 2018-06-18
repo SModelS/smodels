@@ -10,10 +10,9 @@
 from smodels.theory import clusterTools, crossSection, element
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.auxiliaryFunctions import cSim, cGtr
-import copy
 from smodels.tools.physicsUnits import TeV,fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-from smodels.experiment.datasetObj import CombinedDataSet, DataSet
+from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
 
 class TheoryPrediction(object):
@@ -55,7 +54,7 @@ class TheoryPrediction(object):
         
         return self.dataset.globalInfo.id
 
-    def dataType( self ):
+    def dataType(self):
         """
         Return the type of dataset
         """
@@ -65,25 +64,37 @@ class TheoryPrediction(object):
 
     def getUpperLimit(self, expected=False ):
         """
-        Get the upper limit on sigma*eff
+        Get the upper limit on sigma*eff.
+        For UL-type results, use the 
+        
+        
         :param expected: return expected Upper Limit, instead of observed.
         """
-               
-        ###FIX THIS! Outsource to dataset or experimental result? How to get it for the combined results/dataset
-        
-               
+
+
+        #First check if the upper-limit and expected upper-limit have already been computed.
+        #If not, compute it and store them.
+        if not hasattr(self, 'expectedUL') or not hasattr(self, 'upperLimit'):
+            
+            if self.dataType() == 'efficiencyMap':
+                self.expectedUL = self.dataset.getSRUpperLimit(expected=True)
+                self.upperLimit = self.dataset.getSRUpperLimit(expected=False)
+            if self.dataType() == 'upperLimit':
+                self.expectedUL = self.dataset.getUpperLimitFor(mass=self.mass,
+                                                                txnames=self.txnames,
+                                                                expected=True)
+                self.upperLimit = self.dataset.getUpperLimitFor(mass=self.mass,
+                                                                txnames=self.txnames,
+                                                                expected=False)
+            if self.dataType() == 'combined':
+                self.expectedUL = self.dataset.getCombinedUpperLimitFor(self.dataSetResults,expected=True)
+                self.upperLimit = self.dataset.getCombinedUpperLimitFor(self.dataSetResults,expected=False)
+                          
+        #Return the expected or observed UL:
         if expected:
-            if not hasattr(self,'expectedUL'):
-                self.expectedUL = self.data.getUpperLimitFor(mass=self.mass, \
-                           dataID=self.dataset, expected=expected, txname = self.txnames[0])
             return self.expectedUL
         else:
-            if not hasattr(self,'upperLimit'):
-                self.upperLimit = self.expResult.getUpperLimitFor(mass=self.mass,
-                                                                  dataID=self.dataset,
-                                                                  expected=expected,
-                                                                  txname = self.txnames[0])
-                return self.upperLimit
+            return self.upperLimit
 
     def getRValue(self, expected = False):
         """
@@ -126,7 +137,6 @@ class TheoryPrediction(object):
             self.likelihood =  llhd
             self.chi2 =  chi2
 
-
     def getmaxCondition(self):
         """
         Returns the maximum xsection from the list conditions
@@ -152,7 +162,6 @@ class TheoryPrediction(object):
         #ret += ", llhd=%f." % self.likelihood
         return ret
 
-
     def describe ( self ):
         if not hasattr ( self, "chi2" ):
             self.computeStatistics()
@@ -165,7 +174,7 @@ class TheoryPrediction(object):
         if type (self.dataset) == list:
             ds = "multiple (%d combined)" % len(self.dataset)
         else:
-            dataId = self.dataset.dataInfo.dataId
+            dataId = self.dataset.getID()
             ds = "%s (%s)" % ( dataId, self.dataset.folderName() )
         ret += "                   datasets: %s\n" % ds
         ret += "      obs limit (sigma*eff): %s\n" % self.getUpperLimit()
@@ -259,21 +268,16 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
                objects
     """
 
-    preds = _sortPredictions(expResult, smsTopList, maxMassDist, combinedResults)
-    for preds in preds.values():
-        effs = [ pred.effectiveEff for pred in preds ]
-        if sum( effs ) == 0.:
-            logger.info( "all efficiencies of combination in %s are zero. will skip." % expResult.globalInfo.id )
-            break
-
     dataSetResults = []
     #Compute predictions for each data set (for UL analyses there is one single set)
     for dataset in expResult.datasets:
-        predList = _getDataSetPredictions(dataset,smsTopList,maxMassDist)
+        predList = _getDataSetPredictions(dataset,smsTopList,maxMassDist,expResult)
         if predList:
             dataSetResults.append(predList)
     if not dataSetResults:
         return None
+    elif len(dataSetResults) == 1:
+        return dataSetResults[0]
 
     #For results with more than one dataset, return all dataset predictions
     #if useBestDataSet=False and combinedResults=False:
@@ -286,8 +290,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
     #Else include best signal region results
     bestResults = TheoryPredictionList()
     bestResults.append(_getBestResult(dataSetResults))
-    #If combinedResults = True, also include the combined
-    #result (when available):
+    #If combinedResults = True, also include the combined result (when available):
     if combinedResults and len(dataSetResults) > 1:
         combinedDataSetResult = _getCombinedResultFor(dataSetResults,expResult)
         if combinedDataSetResult:
@@ -297,7 +300,6 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
         theoPred.expResult = expResult
         
     return bestResults
-
 
 def _getCombinedResultFor(dataSetResults,expResult):
     """
@@ -350,47 +352,17 @@ def _getCombinedResultFor(dataSetResults,expResult):
     theoryPrediction.dataset = combinedDataset
     theoryPrediction.txnames = txnameList
     theoryPrediction.xsection = totalXsec
+    theoryPrediction.dataSetResults = dataSetResults
     theoryPrediction.conditions = None
     theoryPrediction.cluster = None
     theoryPrediction.mass = mass
     theoryPrediction.PIDs = PIDList
     theoryPrediction.IDs = IDList
-    theoryPrediction.upperLimit = combinedDataset.getUpperLimit()
+    theoryPrediction.upperLimit = theoryPrediction.getUpperLimit()
+    theoryPrediction.expResult = expResult
     
     return theoryPrediction
     
-
-def _sortPredictions ( expResult, smsTopList, maxMassDist, combine ):
-    """ returns dictionary of predictions, sorted by XSectionInfo.
-        if combine is false, return empty dict.
-    """
-    preds={}
-    if not hasattr ( expResult.globalInfo, "covariance" ) or \
-       not hasattr ( expResult.globalInfo, "datasetOrder" ) or \
-       not combine:
-            return preds
-    dsOrder = expResult.globalInfo.datasetOrder
-    if type ( dsOrder ) == str:
-        ## for debugging only, we allow a single dataset
-        dsOrder = [ dsOrder ]
-    for dsname in dsOrder:
-        dataset=expResult.getDataset ( dsname )
-        if dataset == None:
-            txt = "In %s: dataset %s does not exist." % \
-                  ( expResult.globalInfo.id, dsname )
-            raise SModelSError ( txt )
-        predList = _getDataSetPredictions(dataset,smsTopList,maxMassDist,True)
-        if predList:
-            for pred in predList:
-                info = pred.xsection.info
-                if not info in preds.keys():
-                    preds[info]=[]
-                preds[info].append ( pred )
-        else:
-            pass
-            # logger.error ( "this is the culprit. we have no predlist. but we need one for combination. lets make one artificially." )
-    return preds
-
 def _getBestResult(dataSetResults):
     """
     Returns the best result according to the expected upper limit
@@ -413,7 +385,7 @@ def _getBestResult(dataSetResults):
             logger.error("Multiple clusters should only exist for upper limit results!")
             raise SModelSError()
         dataset = predList[0].dataset
-        if dataset.dataInfo.dataType != 'efficiencyMap':
+        if dataset.getType() != 'efficiencyMap':
             logger.error("Multiple data sets should only exist for efficiency map results!")
             raise SModelSError()
         pred = predList[0]
@@ -539,10 +511,10 @@ def _combineElements(elements, dataset, maxDist):
 
     clusters = []
 
-    if dataset.dataInfo.dataType == 'efficiencyMap':
+    if dataset.getType() == 'efficiencyMap':
         cluster = clusterTools.groupAll(elements)
         clusters.append(cluster)
-    elif dataset.dataInfo.dataType == 'upperLimit':
+    elif dataset.getType() == 'upperLimit':
         txnames = list(set([el.txname for el in elements]))
         for txname in txnames:
             txnameEls = []
@@ -554,7 +526,7 @@ def _combineElements(elements, dataset, maxDist):
             clusters += txnameClusters
     else:
         logger.warning("Unkown data type: %s. Data will be ignored."
-                       % dataset.dataInfo.dataType)
+                       % dataset.getType())
 
     return clusters
 
@@ -645,19 +617,22 @@ def _evalExpression(stringExpr,cluster):
         el.weight = crossSection.XSectionList(infoList)
         elements.append(el)
 
-#Replace elements in strings by their weights and add weights from cluster to the elements list:
-    expr = stringExpr[:].replace("'","").replace(" ","")
-    for iel, el in enumerate(elements):
-        expr = expr.replace(str(el), "elements["+ str(iel) +"].weight")
+#Get weights for elements appearing in stringExpr
+    weightsDict = {}
+    evalExpr = stringExpr.replace("'","").replace(" ","")
+    for i,elStr in enumerate(elementsInStr(evalExpr)):
+        el = element.Element(elStr)
+        weightsDict['w%i'%i] = crossSection.XSectionList(infoList)
         for el1 in cluster.elements:
             if el1.particlesMatch(el):
-                el.weight.combineWith(el1.weight)
-                el.combineMotherElements(el1) ## keep track of all mothers
+                weightsDict['w%i'%i].combineWith(el1.weight)
+                el.combineMotherElements(el1)
+        evalExpr = evalExpr.replace(elStr,'w%i'%i)
 
-    exprvalue = eval(expr,globals(),
-                     {'cGtr' : cGtr, 'cSim' : cSim,'Cgtr' : cGtr, 'Csim' : cSim})
+    weightsDict.update({"Cgtr" : cGtr, "cGtr" : cGtr, "cSim" : cSim, "Csim" : cSim})
+    exprvalue = eval(evalExpr, weightsDict)
     if type(exprvalue) == type(crossSection.XSectionList()):
         if len(exprvalue) != 1:
-            logger.error("Evaluation of expression "+expr+" returned multiple values.")
+            logger.error("Evaluation of expression "+evalExpr+" returned multiple values.")
         return exprvalue[0] #Return XSection object
     return exprvalue

@@ -10,7 +10,7 @@
 
 """
 
-import os, sys
+import os
 from smodels.theory import lheReader
 from smodels.tools.physicsUnits import GeV, fb
 from smodels import installation
@@ -92,8 +92,8 @@ class ResultList(object):
         bestExp = None
         for tP in self.theoryPredictions:
             expResult = tP.expResult
-            datasetID = tP.dataset.dataInfo.dataId
-            dataType = expResult.datasets[0].dataInfo.dataType
+            datasetID = tP.dataset.getID()
+            dataType = expResult.datasets[0].getType()
             if dataType != 'efficiencyMap':
                 continue
             ulExp = expResult.getUpperLimitFor(dataID=datasetID, expected = True)

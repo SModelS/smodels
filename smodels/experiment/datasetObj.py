@@ -57,7 +57,7 @@ class DataSet(object):
         """ In case of efficiency maps, check if any txnames have overlapping
             constraints. This would result in double counting, so we dont 
             allow it. """
-        if self.dataInfo.dataType == "upperLimit": 
+        if self.getType() == "upperLimit": 
             return False
         logger.debug ( "checking for redundancy" )
         datasetElements = []
@@ -69,7 +69,7 @@ class DataSet(object):
             if x.particlesMatch ( y ):
                 errmsg ="Constraints (%s) appearing in dataset %s, %s overlap "\
                         "(may result in double counting)." % \
-                        (x,self.dataInfo.dataId,self.globalInfo.id )
+                        (x,self.getID(),self.globalInfo.id )
                 logger.error( errmsg )
                 raise SModelSError ( errmsg )
 
@@ -220,8 +220,74 @@ class DataSet(object):
                 if "_" == field[0]: fields.remove(field)
 
         return fields
+    
+    def getUpperLimitFor(self,mass=None,expected = False, txnames = None
+                         ,compute=False,alpha=0.05):
+        """
+        Returns the upper limit for a given mass and txname. If
+        the dataset hold an EM map result the upper limit is independent of
+        the input txname or mass.
+
+        :param txname: TxName object or txname string (only for UL-type results)
+        :param mass: Mass array with units (only for UL-type results)        
+        :param alpha: Can be used to change the C.L. value. The default value is 0.05
+                      (= 95% C.L.) (only for  efficiency-map results)
+        :param expected: Compute expected limit, i.e. Nobserved = NexpectedBG
+                         (only for efficiency-map results)
+        :param compute: If True, the upper limit will be computed
+                        from expected and observed number of events.
+                        If False, the value listed in the database will be used
+                        instead.
+        :return: upper limit (Unum object)
+        """
+        
+        
+        if self.getType() == 'efficiencyMap':            
+            upperLimit =  self.getSRUpperLimit(expected=expected,alpha=alpha,compute=compute)
+            if (upperLimit/fb).normalize()._unit:
+                logger.error("Upper limit defined with wrong units for %s and %s"
+                              %(self.globalInfo.id,self.getID()))
+                return False
+            
+            
+        elif self.getType() == 'upperLimit':            
+            if not txnames or not mass:
+                logger.error("A TxName and mass array must be defined when \
+                             computing ULs for upper-limit results.")
+                return False
+            elif isinstance(txnames,list) and len(txnames) != 1:
+                logger.error("txnames must be a TxName object, a string or a list with a single Txname object")
+                return False
+            else:
+                txname = txnames[0]
+                
+                
+            if not isinstance(txname, txnameObj.TxName) and \
+            not isinstance(txname, str):
+                logger.error("txname must be a TxName object or a string")
+                return False
+            if not isinstance(mass, list):
+                logger.error("mass must be a mass array")
+                return False
+                        
+            for tx in self.txnameList: 
+                if tx == txname or tx.txName == txname:
+                    if expected:
+                        if not tx.txnameDataExp:
+                            upperLimit = None
+                        else:
+                            upperLimit = tx.txnameDataExp.getValueFor(mass)
+                    else:
+                        upperLimit = tx.txnameData.getValueFor(mass)
+        
+        else:
+            logger.warning("Unkown data type: %s. Data will be ignored.",
+                           self.getType())
 
 
+        return upperLimit
+            
+            
     def getSRUpperLimit(self,alpha = 0.05, expected = False, compute = False ):
         """
         Computes the 95% upper limit on the signal*efficiency for a given dataset (signal region).
@@ -236,7 +302,7 @@ class DataSet(object):
         :return: upper limit value
         """
 
-        if not self.dataInfo.dataType == 'efficiencyMap':
+        if not self.getType() == 'efficiencyMap':
             logger.error("getSRUpperLimit can only be used for efficiency map results!")
             raise SModelSError()
 
@@ -275,9 +341,11 @@ class CombinedDataSet(object):
     Holds the information for a combined dataset (used for combining multiple datasets).    
     """
     
-    def __init__(self, datasetList=[]):
+    def __init__(self, datasetList=[],expResult=None):
         
         self._datasets = datasetList
+        if expResult:
+            self.globalInfo = expResult.globalInfo
         
     def __getattribute__(self, *args, **kwargs):
         
@@ -287,5 +355,79 @@ class CombinedDataSet(object):
             attrList = [getattr(dataset, *args, **kwargs) for dataset in self._datasets]
             return attrList
         
-    def getSRUpperLimit(self,alpha = 0.05, expected = False, compute = False ):
+    def getType(self):
+        """
+        Return the dataset type (combined)
+        """
+        
+        return 'combined'
+    
+    def getID(self):
+        """
+        Return the ID for the combined dataset
+        """
+        
+        return 'combined'
+        
+        
+    def getCombinedUpperLimitFor(self, predictionsList, expected=False, marginalize=False):
+        """
+        Get combined upper limit. Effs are the signal efficiencies in the
+        datasets. The order is defined in the dataset itself.
+        :param effs: the signal efficiencies for all datasets
+        (adding up the efficiencies for all txnames) the efficiencies must 
+        be sorted according to datasetOrder
+        :param expected: return expected, not observed value
+        :param marginalize: if true, marginalize nuisances, if false, profile them.
+        if none profile for cases with less than 30 signal regions, and marginalize
+        for cases with 30 or more signal regions.
+        :returns: upper limit on sigma (*not* sigma*eff)
+        """
+        
+        
+        if not hasattr(self.globalInfo, "covariance" ):
+            logger.error ( "no covariance matrix given in globalInfo.txt for %s" % self.globalInfo.id )
+            raise SModelSError( "no covariance matrix given in globalInfo.txt for %s" % self.globalInfo.id )
+        if not hasattr ( self.globalInfo, "datasetOrder" ):
+            logger.error ( "datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id )
+            raise SModelSError( "datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id )
+        cov = self.globalInfo.covariance
+        if type ( cov ) != list:
+            raise SModelSError( "covariance field has wrong type: %s" % type(cov))
+        if len ( cov ) < 1:
+            raise SModelSError( "covariance matrix has length %d." % len(cov))
+
+        computer = UpperLimitComputer(self.globalInfo.lumi, ntoys=10000)
+        
+        
+        datasetOrder = self.globalInfo.datasetOrder
+        if type(datasetOrder) == str:
+            datasetOrder = tuple( [ datasetOrder ] ) ## for debugging, allow one dataset
+        # print ( "datasetOrder=", datasetOrder )
+        if len(datasetOrder) != len(self._datasets):
+            raise SModelSError("Number of elements in datasetOrder(%d) not equals number of datasets(%d) in %s." 
+                               % ( len(datasetOrder), len(self._datasets), self.globalInfo.id ) )
+        dsDict={} ## make sure we respect datasetOrder.        
+        for ds in self._datasets:
+            dsDict[ds.getID()] = ds
+        xsecDict = {}
+        for prediction in predictionsList:
+            xsecDict[prediction.dataset.getID()] = prediction.xsection
+            
+        nobs, nb, dsXsec = [], [], []
+        for dsname in datasetOrder:
+            if not dsname in dsDict.keys():
+                raise SModelSError( "dataset %s appears in datasetOrder, but not as dataset in %s" % ( dsname, self.globalInfo.id ) )
+            ds = dsDict[dsname]
+            nobs.append(ds.dataInfo.observedN)
+            nb.append(ds.dataInfo.expectedBG)
+            dsXsec.append(xsecDict[dsname])
+        no = nobs
+        if expected:
+            no = list(map(round, nb ))
+        ret = computer.ulSigma(Model( no, nb, cov, None, dsXsec), 
+                               marginalize=marginalize )
+        
+        return ret
+        
     
