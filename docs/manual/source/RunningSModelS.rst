@@ -126,7 +126,7 @@ Below we give more detailed information about each entry in the parameters file.
     (see :ref:`likelihood calculation <likelihoodCalc>`).
     If True, the likelihood and :math:`\chi^2` values are computed for the |EMrs|.
   * **testCoverage** (True/False): set to True to run the :ref:`coverage <topCoverage>` tool.
-  * **combineSRs** (True/False): set to True to use, whenever available, covariance matrices to combine signal regions based on the simplified likelihoods approach. Set to False to use only the most sensitive signal region (faster!). Available v1.1.3 onwards. 
+  * **combineSRs** (True/False): set to True to use, whenever available, covariance matrices to combine signal regions. NB this might take a few secs per point. Set to False to use only the most sensitive signal region (faster!). Available v1.1.3 onwards. 
 
 * *parameters*: basic parameter values for running SModelS
 

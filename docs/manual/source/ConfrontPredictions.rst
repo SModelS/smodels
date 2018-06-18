@@ -19,6 +19,7 @@
 .. |sigBR| replace:: :math:`\sigma \times BR`
 .. |sigBRe| replace:: :math:`\sigma \times BR \times \epsilon`
 .. |ssigBRe| replace:: :math:`\sum \sigma \times BR \times \epsilon`
+.. |covariace| replace:: :ref:`combination of signal regions <combineSRs>`
 
 .. _confrontPredictions:
 
@@ -44,7 +45,7 @@ This upper limit is easily computed using the number of observed and expected ev
 and their uncertainties and is typically stored in the :ref:`Database <database>`.
 Since most |EMrs| have several signal regions (|datasets|), there will be one theory prediction/upper limit
 for each |dataset|. By default SModelS keeps only the best |dataset|, i.e. the one with the largest
-ratio :math:`\mbox{(theory prediction)}/\mbox{(expected limit)}`.
+ratio :math:`\mbox{(theory prediction)}/\mbox{(expected limit)}`. (See below for |covariace|)
 Thus each |EMr| will have a single theory prediction/upper limit, corresponding to the best |dataset|
 (based on the expected limit).
 If the user wants to have access to all the |datasets|, the default
@@ -65,7 +66,7 @@ Likelihood Computation
 
 In the case of |EMrs|, additional statistical information
 about the constrained model can be provided by the SModelS output.
-Following the procedure detailed in `CMS NOTE 2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_, we construct a simplified
+Following the procedure detailed in `CMS-NOTE-2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_, we construct a simplified
 likelihood which describes the plausibility of the data :math:`D`, given a signal strength :math:`\mu`:
 
 .. math::
@@ -112,23 +113,27 @@ best expected limit does not wildly jump within
 continuous regions of parameter space that give roughly the same phenomenology.
 
 
-
 * **The** :math:`\chi^2` **for a given** |EMr| **is computed using the** `chi2  method <tools.html#tools.SimplifiedLikelihoods.LikelihoodComputer.chi2>`_
 * **The likelihood for a given** |EMr| **is computed using the** `likelihood  method <tools.html#tools.SimplifiedLikelihoods.LikelihoodComputer.likelihood>`_
 
 
+.. _combineSRs:
+
 Combination of Signal Regions
 -----------------------------
 
-In case, the experiment provides a covariance matrix, signal regions can be combined.
-Just as before, we follow the procedure given in `CMS NOTE 2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_. SModelS allows for a marginalization as well as a profiling of
-the nuisances; profiling is the default. As CPU performance is a concern in SModelS, we take
-the liberty of aggregating the official results to an acceptable number of aggregate regions, where *acceptable* is typically a number below 20.
-For the computation of the 95\% confidence level from the likelihoods, a CLs (=CLsb/CLb) limit is computed from the test statistic :math:`q_\mu`, as described in Eq. 14 in G. Cowan et al., `Asymptotic formulae for likelihood-based tests <https://arxiv.org/abs/1007.1727>`_.
+If the experiment provides a covariance matrix together with the efficiency maps, signal regions can be combined. 
+This is implemented in SModelS v1.1.3 onwards, following as above the simplified likelihood approach described in `CMS-NOTE-2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_. 
+
+SModelS allows for a marginalization as well as a profiling of the nuisances, with profiling being the default. (An example for marginalisation is discussed in the How To's)
+As CPU performance is a concern in SModelS, we try to aggregate the official results, which can comprise >100 signal regions, to an acceptable number of aggregate regions. Here *acceptable* means as few aggregate regions as possible without loosing in precision or constraining power. 
+The CPU time scales roughly linearly with the number of signal regions, so aggregating e.g. from 80 to 20 signal regions means gaining a factor 4 in computing time.
+
+For the computation of the 95\% confidence level from the likelihoods, a CLs (=CLsb/CLb) limit is computed from the test statistic :math:`q_\mu`, as described in Eq. 14 in G. Cowan et al., `Asymptotic formulae for likelihood-based tests <https://arxiv.org/abs/1007.1727>`_. 
 We then search for the root of the function CLs - 0.95 with the Brent bracketing technique, see the `scipy manual <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.brentq.html>`_.
 
-In *runSModelS.py*, combining signal regions is turned off per default, only the result from the best expected signal region is reported.
-from the best expected signal region is quoted. It can be turned on with the parameter **options:combineSRs**, see :ref:`parameter file <parameterFile>`.
+When using *runSModelS.py*, the combination of signal regions is turned on or off with the parameter **options:combineSRs**, see :ref:`parameter file <parameterFile>`. Per default it is turned off, in which case only the result from the best expected signal region (best SR) is reported. 
+If it is turned on, both the combined result and the one from the best SR are quoted. 
 
 +----------------------------------------+----------------------------------------+----------------------------------------+
 | .. image:: images/T2bbffff_bestSR.png  | .. image:: images/T2bbffff_17.png      | .. image:: images/T2bbffff_44.png      |
@@ -136,7 +141,8 @@ from the best expected signal region is quoted. It can be turned on with the par
 | Best signal region                     | 17 aggregate regions                   | 44 signal regions                      |
 +----------------------------------------+----------------------------------------+----------------------------------------+
 
-Figure: Comparison of validation plots, for CMS-PAS-SUS-16-052: for best signal region (left), for combination of 17 aggregate signal regions (center), for combination of all 44 signal regions (right). Already combining all 44 signal regions is conservative w.r.t. official result. Aggregating the most correlated signal regions to a total of 17 aggregate regions comes with only little further loss in constraining power. Using only the best signal region, however, performs significantly worse.
+Figure: Comparison of validation plots, for `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_: using only the best signal region (left), the combination of 17 aggregate signal regions (center), and the combination of all 44 signal regions (right). While the combined results are much closer to the official exclusion than the one from using only the best SR, aggregating the most correlated signal regions to a total of 17 aggregate regions comes with only little loss in constraining power. Combining 17 aggregate signal regions takes approximately 2 sec, combining 44 signal regions takes about 5 sec.
+
 
 .. [*] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model
    is being tested by a large number of results simultaneously.
