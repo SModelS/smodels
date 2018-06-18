@@ -332,6 +332,7 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
         return None
     
     txnameList = []
+    elementList = []
     totalXsec = None
     massList = []
     PIDList = []
@@ -341,6 +342,7 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
             raise SModelSError("Results with multiple datasets should have a single theory prediction (EM-type)!")
         pred = predList[0]
         txnameList += pred.txnames
+        elementList += pred.elements
         if not totalXsec:
             totalXsec = pred.xsection
         else:
@@ -369,7 +371,7 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     theoryPrediction.xsection = totalXsec
     theoryPrediction.dataSetResults = dataSetResults
     theoryPrediction.conditions = None
-    theoryPrediction.cluster = None
+    theoryPrediction.elements = elementList
     theoryPrediction.mass = mass
     theoryPrediction.PIDs = PIDList
     theoryPrediction.IDs = IDList
@@ -462,7 +464,7 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
         theoryPrediction.txnames = cluster.txnames
         theoryPrediction.xsection = _evalConstraint(cluster)
         theoryPrediction.conditions = _evalConditions(cluster)
-        theoryPrediction.cluster = cluster
+        theoryPrediction.elements = cluster.elements
         theoryPrediction.mass = cluster.getAvgMass()
         theoryPrediction.PIDs = cluster.getPIDs()
         theoryPrediction.IDs = cluster.getIDs()

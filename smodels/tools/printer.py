@@ -761,9 +761,8 @@ class PyPrinter(BasicPrinter):
                 ulExpected = ulExpected.asNumber(fb)
             value = theoryPrediction.xsection.value
             #txnames = [txname.txName for txname in theoryPrediction.txnames]
-            cluster = theoryPrediction.cluster # FIXME is this the better version?
             txnamesDict = {}
-            for el in cluster.elements:
+            for el in theoryPrediction.elements:
                 if not el.txname.txName in txnamesDict:
                     txnamesDict[el.txname.txName] = el.weight[0].value.asNumber(fb)
                 else:
