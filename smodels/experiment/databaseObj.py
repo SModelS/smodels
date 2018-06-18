@@ -273,7 +273,12 @@ class Database(object):
             return "%.1f%s%s" % (num, 'Yi', suffix)
 
         import requests
-        r = requests.get( path )
+        try:
+            r = requests.get( path )
+        except Exception as e:
+            logger.error ( "Exception when trying to fetch database: %s" % e )
+            logger.error ( "Consider supplying a different database path in the ini file (possibly a local one)" )
+            sys.exit()
         if r.status_code != 200:
             logger.error ( "Error %d: could not fetch %s from server." % \
                            ( r.status_code, path ) )
