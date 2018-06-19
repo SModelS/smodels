@@ -584,7 +584,8 @@ class Database(object):
                         if sqrts != eval(pattern[1]):
                             hits = False
                     if hits:
-                        continue
+                        break
+                        # continue
                 if not hits:
                     continue
 
