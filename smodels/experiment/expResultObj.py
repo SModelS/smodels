@@ -54,7 +54,7 @@ class ExpResult(object):
             logger.error("globalInfo.txt file not found in " + path)
             raise TypeError
         self.globalInfo = infoObj.Info(os.path.join(path, "globalInfo.txt"))
-        self.datasets = []
+        datasets = {}
         folders=[]
         for root, _, files in cleanWalk(path):
             folders.append ( (root, files) )
@@ -65,9 +65,16 @@ class ExpResult(object):
                 try:
                     dataset = datasetObj.DataSet(root, self.globalInfo,
                             discard_zeroes = discard_zeroes )
-                    self.datasets.append(dataset)
+                    datasets[dataset.dataInfo.dataId]=dataset
                 except TypeError:
                     continue
+        self.datasets = []
+        dsOrder = self.globalInfo.datasetOrder
+        if type ( dsOrder ) == str:
+            ## for debugging only, we allow a single dataset
+            dsOrder = [ dsOrder ]
+        for dsname in dsOrder:
+            self.datasets.append ( datasets[dsname] )
 
     def writePickle ( self, dbVersion ):
         """ write the pickle file """
