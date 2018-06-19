@@ -59,22 +59,31 @@ class ExpResult(object):
         for root, _, files in cleanWalk(path):
             folders.append ( (root, files) )
         folders.sort()
+        self.datasets = []
+        hasOrder = hasattr ( self.globalInfo, "datasetOrder" )
         for root, files in folders:
             if 'dataInfo.txt' in files:  # data folder found
                 # Build data set
                 try:
                     dataset = datasetObj.DataSet(root, self.globalInfo,
                             discard_zeroes = discard_zeroes )
-                    datasets[dataset.dataInfo.dataId]=dataset
+                    if hasOrder:
+                        datasets[dataset.dataInfo.dataId]=dataset
+                    else:
+                        self.datasets.append ( dataset )
                 except TypeError:
                     continue
-        self.datasets = []
+        if not hasOrder:
+            return
         dsOrder = self.globalInfo.datasetOrder
         if type ( dsOrder ) == str:
             ## for debugging only, we allow a single dataset
             dsOrder = [ dsOrder ]
         for dsname in dsOrder:
             self.datasets.append ( datasets[dsname] )
+        if len(self.datasets) != len(dsOrder):
+            raise SModelSExperimentError ( "lengths of datasets and datasetOrder mismatch" )
+            
 
     def writePickle ( self, dbVersion ):
         """ write the pickle file """
