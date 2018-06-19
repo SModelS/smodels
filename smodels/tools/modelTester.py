@@ -116,7 +116,8 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     for expResult in listOfExpRes:
         # logger.error ("FIXME maybe need to set useBestDataset to FALSE")
         theorypredictions = theoryPredictionsFor( expResult, smstoplist,
-                    useBestDataset=True, combinedResults=combineResults )
+                    useBestDataset=True, combinedResults=combineResults,
+                    marginalize=False )
         if not theorypredictions: continue
         allPredictions += theorypredictions._theoryPredictions
 
