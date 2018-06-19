@@ -92,7 +92,7 @@ class TheoryPrediction(object):
             if self.dataType() == 'combined':
                 lumi = self.expResult.globalInfo.lumi
                 #Create a list of signal events in each dataset/SR sorted according to datasetOrder
-                srNsigDict = dict([[pred.dataset.getID(),pred.xsection.value*lumi] for pred in self.dataSetResults])
+                srNsigDict = dict([[pred.dataset.getID(),pred.xsection.value*lumi] for pred in self.datasetPredictions])
                 srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]                
                 self.expectedUL = self.dataset.getCombinedUpperLimitFor(srNsigs,expected=True)
                 self.upperLimit = self.dataset.getCombinedUpperLimitFor(srNsigs,expected=False)
@@ -138,7 +138,7 @@ class TheoryPrediction(object):
         elif self.dataType() == 'combined':
             lumi = self.expResult.globalInfo.lumi
             #Create a list of signal events in each dataset/SR sorted according to datasetOrder
-            srNsigDict = dict([[pred.dataset.getID(),pred.xsection.value*lumi] for pred in self.dataSetResults])
+            srNsigDict = dict([[pred.dataset.getID(),pred.xsection.value*lumi] for pred in self.datasetPredictions])
             srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]                
             self.likelihood = self.dataset.combinedLikelihood(srNsigs, marginalize=marginalize)
             self.chi2 = self.dataset.totalChi2(srNsigs, marginalize=marginalize)
@@ -285,8 +285,9 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
         return None
     elif len(dataSetResults) == 1:
         result = dataSetResults[0]
-        for pred in result:
-            pred.expResult = expResult
+        for theoPred in result:
+            theoPred.expResult = expResult
+            theoPred.upperLimit = theoPred.getUpperLimit()
         return result
 
     #For results with more than one dataset, return all dataset predictions
@@ -295,6 +296,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
         allResults = sum(dataSetResults)
         for theoPred in allResults:
             theoPred.expResult = expResult
+            theoPred.upperLimit = theoPred.getUpperLimit()
         return allResults
     
     #Else include best signal region results
@@ -308,7 +310,9 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
             bestResults.append(combinedDataSetResult)
 
     for theoPred in bestResults:
+        print('theo=',theoPred,theoPred.dataset)
         theoPred.expResult = expResult
+        theoPred.upperLimit = theoPred.getUpperLimit()
         
     return bestResults
 
@@ -319,7 +323,7 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     with the signal cross-section summed over all the signal regions
     and the respective upper limit.
     
-    :param dataSetResults: List of TheoryPrediction objects for each signal region
+    :param datasetPredictions: List of TheoryPrediction objects for each signal region
     :param expResult: ExpResult object corresponding to the experimental result
     :parameter marginalize: If true, marginalize nuisances. If false, profile them.    
     
@@ -337,10 +341,12 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     massList = []
     PIDList = []
     IDList = []
+    datasetPredictions = []
     for predList in dataSetResults:
         if len(predList) != 1:
             raise SModelSError("Results with multiple datasets should have a single theory prediction (EM-type)!")
         pred = predList[0]
+        datasetPredictions.append(pred)
         txnameList += pred.txnames
         elementList += pred.elements
         if not totalXsec:
@@ -348,12 +354,13 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
         else:
             totalXsec += pred.xsection
         massList.append(pred.mass)
-        PIDList += pred.PIDs
+        for pidEntry in pred.PIDs:
+            if not pidEntry in PIDList:
+                PIDList.append(pidEntry)
         IDList += pred.IDs
         
     txnameList = list(set(txnameList))
     massList = list(set(massList))
-    PIDList = list(set(PIDList))
     IDList = list(set(IDList))
     if len(massList) > 1:
         mass = None
@@ -369,14 +376,13 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     theoryPrediction.dataset = combinedDataset
     theoryPrediction.txnames = txnameList
     theoryPrediction.xsection = totalXsec
-    theoryPrediction.dataSetResults = dataSetResults
+    theoryPrediction.datasetPredictions = datasetPredictions
     theoryPrediction.conditions = None
     theoryPrediction.elements = elementList
     theoryPrediction.mass = mass
     theoryPrediction.PIDs = PIDList
     theoryPrediction.IDs = IDList
-    theoryPrediction.upperLimit = theoryPrediction.getUpperLimit()
-    theoryPrediction.expResult = expResult
+    
     
     return theoryPrediction
     
@@ -384,7 +390,7 @@ def _getBestResult(dataSetResults):
     """
     Returns the best result according to the expected upper limit
 
-    :param dataSetResults: list of TheoryPredictionList objects
+    :param datasetPredictions: list of TheoryPredictionList objects
     :return: best result (TheoryPrediction object)
     """
 
@@ -468,7 +474,6 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
         theoryPrediction.mass = cluster.getAvgMass()
         theoryPrediction.PIDs = cluster.getPIDs()
         theoryPrediction.IDs = cluster.getIDs()
-        theoryPrediction.upperLimit = theoryPrediction.getUpperLimit()
         predictionList._theoryPredictions.append(theoryPrediction)
 
     if len(predictionList) == 0:

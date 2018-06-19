@@ -12,7 +12,7 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.tools.physicsUnits import fb, pb
-from smodels.tools.SimplifiedLikelihoods import Model, UpperLimitComputer
+from smodels.tools.simplifiedLikelihoods import Model, UpperLimitComputer
 from numpy  import array, sqrt
 
 class SLTest(unittest.TestCase):

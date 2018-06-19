@@ -11,7 +11,7 @@
 import os,glob
 from smodels.experiment import txnameObj,infoObj
 from smodels.tools.physicsUnits import fb
-from smodels.tools.SimplifiedLikelihoods import LikelihoodComputer, Model, UpperLimitComputer
+from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, Model, UpperLimitComputer
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.particleNames import elementsInStr
@@ -351,6 +351,11 @@ class CombinedDataSet(object):
         self._datasets = expResult.datasets[:]
         self._marginalize = False        
         self.sortDataSets()
+
+    def __str__(self):
+        ret = "Combined Dataset (%i datasets)" %len(self._datasets)
+        return ret
+
                 
                 
     def sortDataSets(self):
@@ -428,8 +433,8 @@ class CombinedDataSet(object):
 
         computer = UpperLimitComputer(self.globalInfo.lumi, ntoys=10000)
         
-        nobs = [x.dataInfo.observedN for x in self.datasets]
-        bg = [x.dataInfo.expectedBG for x in self.datasets]
+        nobs = [x.dataInfo.observedN for x in self._datasets]
+        bg = [x.dataInfo.expectedBG for x in self._datasets]
         no = nobs
         if expected:
             no = list(map(round, bg ))

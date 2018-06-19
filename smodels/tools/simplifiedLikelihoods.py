@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-.. module:: SimplifiedLikelihoods
+.. module:: simplifiedLikelihoods
    :synopsis: Code that implements the simplified likelihoods as presented
               in CMS-NOTE-2017-001, see https://cds.cern.ch/record/2242860,
               and FIXME insert arXiv reference here.

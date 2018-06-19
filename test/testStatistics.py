@@ -11,7 +11,7 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.tools.SimplifiedLikelihoods import UpperLimitComputer, LikelihoodComputer, Model
+from smodels.tools.simplifiedLikelihoods import UpperLimitComputer, LikelihoodComputer, Model
 from smodels.tools.physicsUnits import fb
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from databaseLoader import database

@@ -113,8 +113,8 @@ continuous regions of parameter space that give roughly the same phenomenology.
 
 
 
-* **The** :math:`\chi^2` **for a given** |EMr| **is computed using the** `chi2  method <tools.html#tools.SimplifiedLikelihoods.LikelihoodComputer.chi2>`_
-* **The likelihood for a given** |EMr| **is computed using the** `likelihood  method <tools.html#tools.SimplifiedLikelihoods.LikelihoodComputer.likelihood>`_
+* **The** :math:`\chi^2` **for a given** |EMr| **is computed using the** `chi2  method <tools.html#tools.simplifiedLikelihoods.LikelihoodComputer.chi2>`_
+* **The likelihood for a given** |EMr| **is computed using the** `likelihood  method <tools.html#tools.simplifiedLikelihoods.LikelihoodComputer.likelihood>`_
 
 
 Combination of Signal Regions
