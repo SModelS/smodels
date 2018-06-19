@@ -600,7 +600,8 @@ class Database(object):
                     for pattern in dataTypes:
                         hits = fnmatch.filter ( [ dataset.dataInfo.dataType ], pattern )
                         if hits:
-                            continue
+                            break
+                            #continue
                     if not hits:
                         continue
 
@@ -609,7 +610,8 @@ class Database(object):
                     for pattern in datasetIDs:
                         hits = fnmatch.filter ( [ dataset.dataInfo.dataID ], pattern )
                         if hits:
-                            continue
+                            break
+                            # continue
                     if not hits:
                         continue
 
