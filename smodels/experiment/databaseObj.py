@@ -273,7 +273,12 @@ class Database(object):
             return "%.1f%s%s" % (num, 'Yi', suffix)
 
         import requests
-        r = requests.get( path )
+        try:
+            r = requests.get( path )
+        except Exception as e:
+            logger.error ( "Exception when trying to fetch database: %s" % e )
+            logger.error ( "Consider supplying a different database path in the ini file (possibly a local one)" )
+            sys.exit()
         if r.status_code != 200:
             logger.error ( "Error %d: could not fetch %s from server." % \
                            ( r.status_code, path ) )
@@ -579,7 +584,8 @@ class Database(object):
                         if sqrts != eval(pattern[1]):
                             hits = False
                     if hits:
-                        continue
+                        break
+                        # continue
                 if not hits:
                     continue
 
@@ -592,7 +598,7 @@ class Database(object):
                 if dataTypes != ['all']:
                     hits=False
                     for pattern in dataTypes:
-                        hits = fnmatch.filter ( [ dataset.getType() ], pattern )
+                        hits = fnmatch.filter ( [ dataset.dataInfo.dataType ], pattern )
                         if hits:
                             break
                             #continue
@@ -602,7 +608,7 @@ class Database(object):
                 if hasattr(dataset.dataInfo, 'dataID') and datasetIDs != ['all']:
                     hits=False
                     for pattern in datasetIDs:
-                        hits = fnmatch.filter ( [ dataset.getID() ], pattern )
+                        hits = fnmatch.filter ( [ dataset.dataInfo.dataID ], pattern )
                         if hits:
                             break
                             # continue
@@ -619,9 +625,9 @@ class Database(object):
                     # print ( "txname",txname.validated,type(txname.validated) )
                     if (txname.validated not in [True, False, "true", "false", "n/a", "tbd", None, "none"]):
                         logger.error("value of validated field '%s' in %s unknown." % (txname.validated, expResult))
-                    if txname.validated in [None, "none"]:
+                    if txname.validated in [None, "none"]: ## FIXME after 1.1.1 this becomes a warning msg?
                         logger.debug("validated is None in %s/%s/%s. Please set to True, False, N/A, or tbd." % \
-                            ( expResult.globalInfo.id, dataset.getID(), txname ) )
+                            ( expResult.globalInfo.id, dataset.dataInfo.dataId, txname ) )
                     if txname.validated not in [ None, True, "true", "n/a", "tbd" ] and (not useNonValidated ):
 #                    if txname.validated is False and (not useNonValidated):
                         continue
@@ -635,7 +641,7 @@ class Database(object):
                         if not hits:
                             continue
 
-                    if onlyWithExpected and dataset.getType() == \
+                    if onlyWithExpected and dataset.dataInfo.dataType == \
                         "upperLimit" and not txname.txnameDataExp:
                         continue
                     newDataSet.txnameList.append(txname)

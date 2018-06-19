@@ -136,7 +136,7 @@ class RunPrinterTest(unittest.TestCase):
         if addTopList:
             mprinter.addObj(smstoplist)
     
-        listOfExpRes = database.getExpResults()
+        listOfExpRes = database.getExpResults(analysisIDs=['*:8*TeV','CMS-PAS-SUS-15-002','CMS-PAS-SUS-16-024'])
         # Compute the theory predictions for each analysis
         allPredictions = []
         for expResult in listOfExpRes:
