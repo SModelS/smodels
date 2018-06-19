@@ -92,8 +92,8 @@ class TheoryPrediction(object):
             if self.dataType() == 'combined':
                 lumi = self.expResult.globalInfo.lumi
                 #Create a list of signal events in each dataset/SR sorted according to datasetOrder
-                srNsigDict = dict([[pred.dataset.getID(),pred.xsection.value*lumi] for pred in self.datasetPredictions])
-                srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]                
+                srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
+                srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
                 self.expectedUL = self.dataset.getCombinedUpperLimitFor(srNsigs,expected=True)
                 self.upperLimit = self.dataset.getCombinedUpperLimitFor(srNsigs,expected=False)
                           
@@ -138,7 +138,7 @@ class TheoryPrediction(object):
         elif self.dataType() == 'combined':
             lumi = self.expResult.globalInfo.lumi
             #Create a list of signal events in each dataset/SR sorted according to datasetOrder
-            srNsigDict = dict([[pred.dataset.getID(),pred.xsection.value*lumi] for pred in self.datasetPredictions])
+            srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
             srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]                
             self.likelihood = self.dataset.combinedLikelihood(srNsigs, marginalize=marginalize)
             self.chi2 = self.dataset.totalChi2(srNsigs, marginalize=marginalize)
@@ -310,7 +310,6 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
             bestResults.append(combinedDataSetResult)
 
     for theoPred in bestResults:
-        print('theo=',theoPred,theoPred.dataset)
         theoPred.expResult = expResult
         theoPred.upperLimit = theoPred.getUpperLimit()
         

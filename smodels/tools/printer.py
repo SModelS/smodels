@@ -430,7 +430,7 @@ class TxTPrinter(BasicPrinter):
             output += "\n"
             output += "---------------Analysis Label = " + expRes.globalInfo.id + "\n"
             output += "-------------------Dataset Label = " + str(dataId).replace("None","(UL)") + "\n"
-            output += "-------------------Txname Labels = " + str([str(txname) for txname in theoryPrediction.txnames]) + "\n"
+            output += "-------------------Txname Labels = " + str(list(set([str(txname) for txname in theoryPrediction.txnames]))) + "\n"
             output += "Analysis sqrts: " + str(expRes.globalInfo.sqrts) + \
                     "\n"
 
@@ -596,7 +596,7 @@ class SummaryPrinter(TxTPrinter):
             else: output += "%10.3E  N/A" %r
             output += "\n"
             output += " Signal Region:  "+signalRegion+"\n"
-            txnameStr = str([str(tx) for tx in txnames])
+            txnameStr = str(list(set([str(tx) for tx in txnames])))
             txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
             output += " Txnames:  " + txnameStr + "\n"
             if hasattr(theoPred,'chi2') and not theoPred.chi2 is None:
@@ -1059,7 +1059,7 @@ class SLHAPrinter(TxTPrinter):
                 signalRegion = '(UL)'
             r = theoPred.getRValue()
             r_expected = theoPred.getRValue()
-            txnameStr = str([str(tx) for tx in txnames])
+            txnameStr = str(list(set([str(tx) for tx in txnames])))
             txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
 
             if r <1 and not excluded == 0: break

@@ -483,7 +483,7 @@ class CombinedDataSet(object):
         :param deltas: uncertainty on signal (None,float, or list).
         :returns: chi2 (float)
         """
-        if len(self.datasets) == 1:
+        if len(self._datasets) == 1:
             if isinstance(nsig,list):
                 nsig = nsig[0]            
             return self._datasets[0].chi2(nsig, marginalize=marginalize)

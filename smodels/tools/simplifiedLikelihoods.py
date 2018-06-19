@@ -15,7 +15,7 @@
 
 from __future__ import print_function
 from scipy import stats, optimize, integrate, special
-from numpy  import sqrt, exp, log, sign, array, matrix, ndarray, floor
+from numpy  import sqrt, exp, log, sign, array, ndarray
 from functools import reduce
 import numpy as NP
 import math
@@ -370,10 +370,10 @@ class LikelihoodComputer:
             """ Compute nuisance parameter theta that
             maximizes our likelihood (poisson*gauss).  """
             self.nsig = nsig
-            sigma2 = covb + self.model.var_s ( nsig ) ## NP.diag ( (self.model.deltas_rel * nsig)**2 )
+            sigma2 = covb + self.model.var_s(nsig) ## NP.diag ( (self.model.deltas_rel * nsig)**2 )
             ## for now deal with variances only
             ntot = nb + nsig
-            cov = NP.matrix ( sigma2 )
+            cov = NP.matrix(sigma2)
             weight = cov**(-1) ## weight matrix
             diag_cov = NP.diag(cov)
             # first: no covariances:
