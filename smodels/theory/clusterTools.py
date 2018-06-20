@@ -7,7 +7,6 @@
         
 """
 
-import sys
 from smodels.theory import crossSection
 from smodels.theory.auxiliaryFunctions import massAvg, massPosition, distance
 from smodels.tools.physicsUnits import fb, MeV
@@ -48,22 +47,6 @@ class ElementCluster(object):
             raise SModelSError()
         return totxsec[0]
 
-    def getEffectiveEfficiency ( self ):
-        """ 
-        get the 'effective' efficiency, that is the sum of all efficiencies
-        of all elements, weighted with the cross section of each element.
-
-        The cluster's total xsec, divided by this number gives the total
-        "unfolded" cross section.
-        """
-        eff = 0.
-        totalw = 0.
-        for el in self.elements:
-            w = float ( el.weight[0].value.asNumber(fb) )
-            eff += w * el.eff
-            totalw += w
-        if totalw == 0.: return 0.
-        return eff / totalw
 
     def getAvgMass(self):
         """

@@ -352,14 +352,14 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
             totalXsec = pred.xsection
         else:
             totalXsec += pred.xsection
-        massList.append(pred.mass)
+        if not pred.mass in massList:
+            massList.append(pred.mass)
         for pidEntry in pred.PIDs:
             if not pidEntry in PIDList:
                 PIDList.append(pidEntry)
         IDList += pred.IDs
         
     txnameList = list(set(txnameList))
-    massList = list(set(massList))
     IDList = list(set(IDList))
     if len(massList) > 1:
         mass = None

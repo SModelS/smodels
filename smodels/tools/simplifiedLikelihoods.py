@@ -3,13 +3,12 @@
 """
 .. module:: simplifiedLikelihoods
    :synopsis: Code that implements the simplified likelihoods as presented
-              in CMS-NOTE-2017-001, see https://cds.cern.ch/record/2242860,
-              and FIXME insert arXiv reference here.
+              in CMS-NOTE-2017-001, see https://cds.cern.ch/record/2242860.
+              In collaboration with Andy Buckley, Sylvain Fichet and Nickolas Wardle.
+              Additional developments will be presented in a future publication.
+             
 
-.. moduleauthor:: Andy Buckley <andy.buckley@cern.ch>
-.. moduleauthor:: Sylvain Fichet <sylvain.fichet@gmail.com>
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
-.. moduleauthor:: Nickolas Wardle <nicholas.wardle@cern.ch>
 
 """
 
@@ -19,12 +18,16 @@ from numpy  import sqrt, exp, log, sign, array, ndarray
 from functools import reduce
 import numpy as NP
 import math
-import sys, copy
+import copy
 
 def getLogger():
-    """ configure the logging facility. Maybe adapted to fit into
-        your framework. """
+    """
+    Configure the logging facility. Maybe adapted to fit into
+    your framework.
+    """
+    
     import logging
+    
     logger = logging.getLogger("SL")
     formatter = logging.Formatter('%(module)s - %(levelname)s: %(message)s')
     ch = logging.StreamHandler()
@@ -33,72 +36,64 @@ def getLogger():
     logger.addHandler(ch)
     return logger
 
-def importUnits():
-    """ Define units (fb,pb). Use unum, if possible. """
-    from smodels.tools.physicsUnits import fb, pb
-    return fb,pb
-    try:
-        import unum
-        try:
-            fb = unum.Unum.unit('fb')
-            pb = unum.Unum.unit('pb', 1000 * fb)
-            return fb,pb
-        except unum.NameConflictError as e:
-            # already defined? reset!
-            unum.Unum("fb").reset()
-            unum.Unum("pb").reset()
-            fb = unum.Unum.unit('fb')
-            pb = unum.Unum.unit('pb', 1000 * fb)
-            return fb,pb
-    except ImportError as e:
-        logger.error ( "unum not installed. For now I will work without units. You"
-                       " are however advised to install the unum module." )
-        fb,pb=1.,1000.
-        return fb,pb
-
 logger=getLogger()
-fb,pb=importUnits()
+
 
 class Model:
     """ A very simple data container to collect all the data
         needed to fully define a specific statistical model """
 
-    def __init__ ( self, data, backgrounds, covariance, third_moment=None,
-                         efficiencies=None, name="model", deltas_rel=None ):
+    def __init__(self, data, backgrounds, covariance, third_moment=None,
+                         nsignal=None, name="model", deltas = None ):
         """
         :param data: number of observed events per dataset
         :param backgrounds: expected bg per dataset
         :param covariance: uncertainty in background, as a covariance matrix
-        :param efficiencies: dataset effective signal efficiencies
+        :param nsignal: number of signal events in each dataset
         :param name: give the model a name, just for convenience
-        :param deltas_rel: the relative assumed error on signal hypotheses.
-        If None, then no error is assumed.
+        :param deltas: the assumed (absolute) error on the signal hypotheses. 
+                       If None, then no error is assumed.
         """
-        self.data = self.convert ( data )
-        self.backgrounds = self.convert ( backgrounds )
-        self.n = len ( self.data )
-        self.covariance = self.convertCov ( covariance )
-        self.efficiencies = self.convert ( efficiencies )
-        self.third_moment = self.convert ( third_moment )
-        if type(self.third_moment) != type(None) and NP.sum ( [ abs(x) for x in self.third_moment ] ) < 1e-10:
-            ## all zeroes? then we have no third_moment
+        self.data = self.convert(data)
+        self.backgrounds = self.convert(backgrounds)
+        self.n = len(self.data)
+        self.covariance = self.convertCov(covariance)
+        self.nsignal = self.convert(nsignal)
+        if self.nsignal is None:
+            self.signal_rel = self.convert(1.)        
+        elif self.nsignal.sum():
+            self.signal_rel = self.nsignal/self.nsignal.sum()            
+        else: 
+            self.signal_rel = array([0.]*len(self.nsignal))
+            
+        self.third_moment = self.convert(third_moment)
+        if type(self.third_moment) != type(None) and NP.sum([ abs(x) for x in self.third_moment ]) < 1e-10:
             self.third_moment = None
         self.name = name
-        self.deltas_rel = deltas_rel
-        if deltas_rel == None:
-            self.deltas_rel = 1e-10
+        self.deltas = deltas
+        if deltas is None:
+            self.deltas = 1e-10*self.signal_rel
         self.computeABC()
 
-    def zeroEfficiencies ( self ):
-        """ are all efficiencies at zero? """
-        return len ( self.efficiencies[self.efficiencies>0.] ) == 0
+    def zeroSignal(self):
+        """
+        Is the total number of signal events zero?
+        """
+        
+        return len(self.nsignal[self.nsignal>0.]) == 0
 
-    def var_s ( self, nsig ):
-        """ the variances, for nsig. convenience function. """
-        return NP.diag ( ( self.deltas_rel * nsig )**2 )
+    def var_s(self):
+        """
+        The signal variances. Convenience function.
+        """
+        
+        return NP.diag(self.deltas**2)
 
-    def isScalar ( self, obj ):
-        """ determine if obj is a scalar (float or int) """
+    def isScalar( self, obj ):
+        """
+        Determine if obj is a scalar (float or int)
+        """
+        
         if type(obj) == ndarray:
             ## need to treat separately since casting array([0.]) to float works
             return False
@@ -109,32 +104,41 @@ class Model:
             pass
         return False
 
-    def convert ( self, obj ):
-        """ convert everything to NP arrays """
+    def convert(self, obj):
+        """
+        Convert object to numpy arrays.
+        If object is a float or int, it is converted to a one element
+        array.
+        """
+        
         if type(obj) == type(None):
             return obj
         if self.isScalar(obj):
-            return array ( [ obj ] )
-        return array ( obj )
+            return array([obj])
+        return array(obj)
 
     def __str__ ( self ):
         return self.name + " (%d dims)" % self.n
 
-    def convertCov ( self, obj ):
+    def convertCov( self, obj):
+        
         if self.isScalar(obj):
             return array ( [ [ obj ] ] )
         if type(obj[0]) == list:
             return array ( obj )
         if type(obj[0]) == float:
             ## if the matrix is flattened, unflatten it.
-            return array ( [ obj[self.n*i:self.n*(i+1)] for i in range(self.n) ] )
+            return array ( [ obj[self.n*i:self.n*(i+1)] for i in range(self.n)])
+        
         return obj
 
-    def computeABC ( self ):
-        """ compute the terms A, B, C, rho, V. Corresponds with
-            Eqs. 1.27-1.30 in the second paper. """
+    def computeABC( self ):
+        """
+        Compute the terms A, B, C, rho, V. Corresponds with
+        Eqs. 1.27-1.30 in the second paper.
+        """
         self.V = self.covariance
-        if type(self.third_moment) == type(None):
+        if self.third_moment is None:
             self.A = None
             self.B = None
             self.C = None
@@ -142,15 +146,17 @@ class Model:
 
         covD = self.diagCov()
         C=[]
-        for m2,m3 in zip(covD, self.third_moment ):
-            if m3 == 0.: m3 = 1e-30
-            k=-NP.sign(m3)*sqrt(2.*m2 )
+        for m2,m3 in zip(covD, self.third_moment):
+            if m3 == 0.:
+                m3 = 1e-30
+            k = -NP.sign(m3)*sqrt(2.*m2 )
             dm = sqrt ( 8.*m2**3/m3**2 - 1. )
-            C.append ( k*NP.cos ( 4.*NP.pi/3. + NP.arctan(dm) / 3. ) )
+            C.append( k*NP.cos ( 4.*NP.pi/3. + NP.arctan(dm) / 3. ))
+            
         self.C=NP.array(C)
-        self.B = sqrt ( covD - 2*self.C**2 )
+        self.B = sqrt( covD - 2*self.C**2 )
         self.A = self.backgrounds - self.C
-        self.rho = NP.array ( [ [0.]*self.n ]*self.n )
+        self.rho = NP.array( [ [0.]*self.n ]*self.n )
         for x in range(self.n):
             for y in range(x,self.n):
                 bxby=self.B[x]*self.B[y]
@@ -162,8 +168,11 @@ class Model:
         self.sandwich()
         # self.V = sandwich ( self.B, self.rho )
 
-    def sandwich ( self ):
-        """ sandwich product """
+    def sandwich( self ):
+        """
+        Sandwich product
+        """
+        
         ret = NP.array ( [ [0.]*len(self.B) ]*len(self.B) )
         for x in range(len(self.B)):
             for y in range(x,len(self.B)):
@@ -173,19 +182,29 @@ class Model:
         self.V = ret
 
     def isLinear(self):
-        """ model is linear, i.e. no quadratic term in poissonians """
+        """
+        Model is linear, i.e. no quadratic term in poissonians
+        """
+        
         return type(self.C) == type(None)
 
-    def diagCov ( self ):
-        """ diagonal elements of covariance matrix. Convenience function. """
-        return NP.diag ( self.covariance )
+    def diagCov(self):
+        """
+        Diagonal elements of covariance matrix. Convenience function.
+        """
+        
+        return NP.diag( self.covariance )
 
-    def correlations ( self ):
-        """ correlation matrix, computed from covariance matrix.
-            convenience function. """
-        if hasattr ( self, "corr" ):
+    def correlations(self):
+        """
+        Correlation matrix, computed from covariance matrix.
+        Convenience function. 
+        """
+        
+        if hasattr(self, "corr"):
             return self.corr
-        self.corr = copy.deepcopy ( self.covariance )
+        
+        self.corr = copy.deepcopy(self.covariance)
         for x in range(self.n):
             self.corr[x][x]=1.
             for y in range(x+1,self.n):
@@ -194,111 +213,134 @@ class Model:
                 self.corr[y][x]=rho
         return self.corr
 
-    def signals ( self, mu ):
-        """ returns the signal cross sections, for all datasets,
-        given signal strength mu. """
-        return mu * self.efficiencies
+    def signals(self, mu):
+        """
+        Returns the number of expected signal events, for all datasets,
+        given total signal strength mu.
+        
+        :param mu: Total number of signal events summed over all datasets.
+        """
+        
+        return (mu*self.signal_rel)
 
 class LikelihoodComputer:
 
-    """ the default value for delta_s, the assumed relative error
-    on signal yields. """
     debug_mode = False
 
-    def __init__ ( self, model, ntoys = 1000 ):
+    def __init__(self, model, ntoys = 1000):
         """
         :param model: a Model object.
         :param ntoys: number of toys when marginalizing
         """
+        
         self.model = model
         self.ntoys = ntoys
 
-    def dLdMu ( self, mu, effs, theta_hat ):
-        """ d (ln L)/d mu, if L is the likelihood. The function
-            whose root gives us muhat, i.e. the mu that maximizes
-            the likelihood. """
-        denominator = mu*effs + self.model.backgrounds + theta_hat
-        for ctr,d in enumerate ( denominator ):
-            if d==0.:
-                if (self.model.data[ctr]*effs[ctr]) == 0.:
-                    logger.debug ( "zero denominator, but numerator also zero, so we set denom to 1." )
+    def dLdMu(self, mu, signal_rel, theta_hat):
+        """
+        d (ln L)/d mu, if L is the likelihood. The function
+        whose root gives us muhat, i.e. the mu that maximizes
+        the likelihood.
+        
+        :param mu: total number of signal events
+        :param signal_rel: array with the relative signal strengths for each dataset (signal region)
+        :param theta_hat: array with nuisance parameters
+        
+        """
+        
+        #Define relative signal strengths:
+        denominator = mu*signal_rel  + self.model.backgrounds + theta_hat
+        
+        for ctr,d in enumerate(denominator):
+            if d == 0.:
+                if (self.model.data[ctr]*signal_rel[ctr]) == 0.:
+                    logger.debug("zero denominator, but numerator also zero, so we set denom to 1.")
                     denominator[ctr]=1.
                 else:
-                    logger.error ( "we have a zero value in the denominator at pos %d, with a non-zero numerator. dont know how to handle." % ctr )
-        ret = self.model.data * effs / denominator - effs
-        if type (ret ) in [ array, ndarray, list ]:
-            ret = sum ( ret )
+                    raise Exception("we have a zero value in the denominator at pos %d, with a non-zero numerator. dont know how to handle." % ctr)
+        ret = self.model.data*signal_rel/denominator - signal_rel
+        
+        if type(ret) in [ array, ndarray, list ]:
+            ret = sum(ret)
         return ret
 
-    def findMuHat ( self, effs, lumi=1. ):
+    def findMuHat(self, signal_rel):
         """
-        find the most likely signal strength mu
-        :param lumi: return yield (lumi=1.) or cross section ("real" lumi)
-        :returns: mu_hat, either as signal yield (lumi=1.), or as cross section.
+        Find the most likely signal strength mu
+        given the relative signal strengths in each dataset (signal region).
+        
+        :param signal_rel: array with relative signal strengths 
+        
+        :returns: mu_hat, the total signal yield.
         """
-        if ( self.model.backgrounds == self.model.data ).all():
-            return 0. / lumi
-        if type ( effs ) in [ list, ndarray ]:
-            effs = array ( effs )
-        effs[effs==0.]=1e-20
-        if sum ( effs<0. ):
-            logger.error ( "Negative efficiencies!" )
-            sys.exit()
+        
+        if (self.model.backgrounds == self.model.data).all():
+            return 0.
+        
+        if type(signal_rel) in [list, ndarray]:
+            signal_rel = array(signal_rel)
+            
+        signal_rel[signal_rel==0.] = 1e-20
+        if sum(signal_rel<0.):
+            raise Exception("Negative relative signal strengths!")
+
         ## we need a very rough initial guess for mu(hat), to come
         ## up with a first theta
-        self.nsig = array ( [0.] * len(self.model.data ) )
-        deltas = array ( [0.] * len(self.model.data) )
+        self.nsig = array([0.]*len(self.model.data ))
         ## we start with theta_hat being all zeroes
-        theta_hat = array ( [0.] * len(self.model.data ) )
+        theta_hat = array([0.]*len(self.model.data ))
         mu_hat_old, mu_hat = 0., 1.
         ctr=0
         widener=3.
-        while abs(mu_hat - mu_hat_old)>1e-10 and abs ( mu_hat - mu_hat_old )/ (mu_hat+mu_hat_old) > .5e-2 and ctr < 20:
+        while abs(mu_hat - mu_hat_old)>1e-10 and abs(mu_hat - mu_hat_old )/(mu_hat+mu_hat_old) > .5e-2 and ctr < 20:
             ctr+=1
             mu_hat_old = mu_hat
             #logger.info ( "theta hat[%d]=%s" % (ctr,list( theta_hat[:11] ) ) )
             #logger.info ( "   mu hat[%d]=%s" % (ctr, mu_hat ) )
-            mu_c = NP.abs ( self.model.data - self.model.backgrounds - theta_hat ) / effs
+            mu_c = NP.abs(self.model.data - self.model.backgrounds - theta_hat)/signal_rel
             ## find mu_hat by finding the root of 1/L dL/dmu. We know
             ## that the zero has to be between min(mu_c) and max(mu_c).
             lower,upper = 0.,widener*max(mu_c)
-            lower_v = self.dLdMu ( lower, effs, theta_hat )
-            upper_v = self.dLdMu ( upper, effs, theta_hat )
-            total_sign = NP.sign ( lower_v * upper_v )
+            lower_v = self.dLdMu(lower, signal_rel, theta_hat)
+            upper_v = self.dLdMu(upper, signal_rel, theta_hat)
+            total_sign = NP.sign(lower_v * upper_v)
             if total_sign > -.5:
                 if upper_v < lower_v < 0.:
                     ## seems like we really want to go for mu_hat = 0.
-                    return 0. / lumi
+                    return 0.
                 logger.debug ( "weird. cant find a zero in the Brent bracket "\
                                "for finding mu(hat). Let me try with a very small"
                                " value." )
                 lower = 1e-4*max(mu_c)
-                lower_v = self.dLdMu ( lower, effs, theta_hat )
-                total_sign = NP.sign ( lower_v * upper_v )
+                lower_v = self.dLdMu( lower, signal_rel, theta_hat )
+                total_sign = NP.sign( lower_v * upper_v )
                 if total_sign > -.5:
                     logger.debug ( "cant find zero in Brentq bracket. l,u,ctr=%s,%s,%s" % \
                                   ( lower, upper, ctr ) )
                     widener=widener*1.5
                     continue
-            mu_hat = optimize.brentq ( self.dLdMu, lower, upper, args=(effs, theta_hat ) )
-            theta_hat,err = self.findThetaHat( mu_hat * effs )
+            mu_hat = optimize.brentq ( self.dLdMu, lower, upper, args=(signal_rel, theta_hat ) )
+            theta_hat,_ = self.findThetaHat( mu_hat*signal_rel)
             ctr+=1
 
-        return mu_hat / lumi
+        return mu_hat
 
-    def getSigmaMu ( self, effs, lumi, mu_hat, theta_hat ):
+    def getSigmaMu(self, signal_rel):
         """
-        get a rough estimate for the variance of mu around mu_max
-        FIXME need to do this more thorougly.
+        Get a rough estimate for the variance of mu around mu_max.
+        
+        :param signal_rel: array with relative signal strengths in each dataset (signal region)        
         """
-        if type ( effs ) in [ list, ndarray ]:
-            s_effs = sum ( effs )
-        sgm_mu = sqrt ( sum (self.model.data ) + sum ( NP.diag ( self.model.covariance ) ) ) / s_effs / lumi
+        if type(signal_rel) in [ list, ndarray ]:
+            s_effs = sum(signal_rel)
+            
+        sgm_mu = sqrt(sum(self.model.data) + sum(NP.diag(self.model.covariance)))/s_effs
+        
         return sgm_mu
 
     #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
     # def prob(x0, x1 )
-    def probMV( self, nll, *thetaA ):
+    def probMV(self, nll, *thetaA ):
         """ probability, for nuicance parameters theta
         :params nll: compute negative log likelihood """
         theta = array ( thetaA )
@@ -311,10 +353,10 @@ class LikelihoodComputer:
         lmbda[lmbda<=0.] = 1e-30 ## turn zeroes to small values
         if nll:
             #poisson = self.model.data * log ( lmbda ) - lmbda #- self.gammaln
-            poisson = stats.poisson.logpmf ( self.model.data, lmbda )
+            poisson = stats.poisson.logpmf( self.model.data, lmbda )
             #print ( "p",poisson,poisson2 )
         else:
-            poisson = stats.poisson.pmf ( self.model.data, lmbda )
+            poisson = stats.poisson.pmf( self.model.data, lmbda )
             #print ( "nonll",poisson )
         try:
             if nll:
@@ -327,15 +369,14 @@ class LikelihoodComputer:
                 ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
             return ret
         except ValueError as e:
-            logger.error ( "ValueError %s, %s" % ( e, self.model.V ) )
-            sys.exit()
+            raise Exception("ValueError %s, %s" % ( e, self.model.V ))
 
-    def nll ( self, theta ):
+    def nll( self, theta ):
         """ probability, for nuicance parameters theta,
         as a negative log likelihood. """
         return self.probMV(True,*theta)
 
-    def nllprime ( self, theta ):
+    def nllprime( self, theta ):
         """ the derivative of nll as a function of the thetas.
         Makes it easier to find the maximum likelihood. """
         if self.model.isLinear():
@@ -350,7 +391,7 @@ class LikelihoodComputer:
         nllp_ = T - self.model.data / lmbda * ( T ) + NP.dot( theta , self.weight )
         return nllp_
 
-    def nllHess ( self, theta ):
+    def nllHess( self, theta ):
         """ the Hessian of nll as a function of the thetas.
         Makes it easier to find the maximum likelihood. """
         # xtot = theta + self.ntot
@@ -370,7 +411,7 @@ class LikelihoodComputer:
             """ Compute nuisance parameter theta that
             maximizes our likelihood (poisson*gauss).  """
             self.nsig = nsig
-            sigma2 = covb + self.model.var_s(nsig) ## NP.diag ( (self.model.deltas_rel * nsig)**2 )
+            sigma2 = covb + self.model.var_s() ## NP.diag ( (self.model.deltas)**2 )
             ## for now deal with variances only
             ntot = nb + nsig
             cov = NP.matrix(sigma2)
@@ -392,7 +433,9 @@ class LikelihoodComputer:
                         theta2[ctr]=1e-20
                 return sum ( NP.abs(theta1 - theta2) / NP.abs ( theta1+theta2 ) )
 
-            for ctr in range(max_iterations):
+            ictr = 0
+            while ictr < max_iterations:
+                ictr += 1
                 q = diag_cov * ( ntot - nobs )
                 p = ntot + diag_cov
                 for i in range(ndims):
@@ -416,19 +459,20 @@ class LikelihoodComputer:
                     d1 = distance ( thetamaxes[-2], thetamax )
                     d2 = distance ( thetamaxes[-3], thetamaxes[-2] )
                     if d1 > d2:
-                        logger.error ( "diverging when computing thetamax: %f > %f" % ( d1, d2 ) )
-                        sys.exit()
+                        raise Exception("diverging when computing thetamax: %f > %f" % ( d1, d2 ))
                     if d1 < 1e-5:
                         return thetamax
             return thetamax
 
-    def findThetaHat ( self, nsig ):
+    def findThetaHat(self, nsig):
             """ Compute nuisance parameter theta that maximizes our likelihood
                 (poisson*gauss).
             """
-            deltas = self.model.deltas_rel * nsig
+            
+            deltas = self.model.deltas
+            
             if type(nsig) in [ list, ndarray, array ]:
-                deltas = array ( self.model.deltas_rel * nsig )
+                deltas = array(self.model.deltas)
             ## first step is to disregard the covariances and solve the
             ## quadratic equations
             ini = self.getThetaHat ( self.model.data, self.model.backgrounds, nsig, self.model.covariance, 0 )
@@ -466,9 +510,8 @@ class LikelihoodComputer:
                 ret = ret_c[0]
                 return ret,-2
             except Exception as e:
-                logger.error ( "exception: %s. ini[-3:]=%s" % (e,ini[-3:]) )
-                logger.error ( "cov-1=%s" % (self.model.covariance+NP.diag(deltas))**(-1) )
-                sys.exit()
+                logger.error("exception: %s. ini[-3:]=%s" % (e,ini[-3:]) )
+                raise Exception("cov-1=%s" % (self.model.covariance+NP.diag(deltas))**(-1))
             return ini,-1
 
     def marginalizedLLHD1D(self, nsig, nll):
@@ -485,7 +528,7 @@ class LikelihoodComputer:
             :return: likelihood to observe nobs events (float)
 
             """
-            self.sigma2 = self.model.covariance + self.model.var_s ( nsig )## (nsig * self.model.deltas_rel)**2
+            self.sigma2 = self.model.covariance + self.model.var_s()## (self.model.deltas_rel)**2
             self.sigma_tot = sqrt( self.sigma2 )
             self.lngamma = math.lgamma(self.model.data[0] + 1)
             #     Why not a simple gamma function for the factorial:
@@ -593,12 +636,11 @@ class LikelihoodComputer:
             Warning: not normalized.
             Returns profile likelihood and error code (0=no error)
         """
-        deltas = array ( self.model.deltas_rel * nsig )
         # compute the profiled (not normalized) likelihood of observing
         # nsig signal events
-        theta_hat,err = self.findThetaHat ( nsig )
+        theta_hat,_ = self.findThetaHat ( nsig )
         ret = self.probMV ( nll, *theta_hat )
-        # logger.error ( "theta_hat, err=%s, %s, %s" % ( theta_hat[0], err, ret ) )
+
         return ret
 
     def likelihood(self, nsig, marginalize=False, nll=False ):
@@ -606,15 +648,14 @@ class LikelihoodComputer:
         :param marginalize: if true, marginalize, if false, profile
         :param nll: return nll instead of likelihood
         """
-        nsig = self.model.convert ( nsig )
+        nsig = self.model.convert(nsig)
         self.ntot = self.model.backgrounds + nsig
-        deltas = self.model.deltas_rel * nsig
         if marginalize:
             # p,err = self.profileLikelihood ( nsig, deltas )
-            return self.marginalizedLikelihood( nsig, nll )
+            return self.marginalizedLikelihood(nsig, nll)
             # print ( "p,l=",p,l,p/l )
         else:
-            return self.profileLikelihood ( nsig, nll )
+            return self.profileLikelihood(nsig, nll)
 
     def chi2( self, nsig, marginalize=False ):
             """
@@ -645,26 +686,26 @@ class LikelihoodComputer:
             chi2=2*(llhd-maxllhd)
             
             if not NP.isfinite ( chi2 ):
-                logger.error ( "chi2 is not a finite number! %s,%s,%s" % \
-                               (chi2, llhd,maxllhd) )
+                logger.error("chi2 is not a finite number! %s,%s,%s" % \
+                               (chi2, llhd,maxllhd))
             # Return the test statistic -2log(H0/H1)
             return chi2
 
 class UpperLimitComputer:
     debug_mode = False
 
-    def __init__ ( self, lumi, ntoys=10000, cl=.95):
+    def __init__(self, ntoys=10000, cl=.95):
+
         """
-        :param lumi: integrated luminosity
         :param ntoys: number of toys when marginalizing
         :param cl: desired quantile for limits
         """
-        self.lumi = lumi
         self.ntoys = ntoys
         self.cl = cl
 
-    def ulSigma ( self, model, marginalize=False, toys=None, expected=False ):
-        """ upper limit obtained from combined efficiencies, by using
+    def ulSigma(self, model, marginalize=False, toys=None, expected=False ):
+        """ upper limit obtained from the defined Model (using the signal prediction
+            for each signal regio/dataset), by using
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
         :params marginalize: if true, marginalize nuisances, else profile them
@@ -672,78 +713,81 @@ class UpperLimitComputer:
         :params expected: compute the expected value, not the observed.
         :returns: upper limit on *production* xsec (efficiencies unfolded)
         """
-        if model.zeroEfficiencies():
+        if model.zeroSignal():
             """ only zeroes in efficiencies? cannot give a limit! """
             return None
         if toys==None:
             toys=self.ntoys
         oldmodel = model
         if expected:
-            model = copy.deepcopy ( oldmodel )
+            model = copy.deepcopy(oldmodel)
             #model.data = model.backgrounds
-            for i,d in enumerate ( model.backgrounds):
+            for i,d in enumerate(model.backgrounds):
                 model.data[i]=int(round(d))
-        computer = LikelihoodComputer ( model, toys )
-        mu_hat = computer.findMuHat ( model.efficiencies )
-        theta_hat = computer.findThetaHat ( mu_hat * model.efficiencies )
-        theta_hat0,e = computer.findThetaHat ( 0 * model.efficiencies )
-        sigma_mu = computer.getSigmaMu ( model.efficiencies, 1., mu_hat, theta_hat )
+        computer = LikelihoodComputer(model, toys)
+        mu_hat = computer.findMuHat(model.signal_rel)
+        theta_hat0,_ = computer.findThetaHat(0*model.signal_rel)
+        sigma_mu = computer.getSigmaMu(model.signal_rel)
 
-        aModel = copy.deepcopy ( model )
-        aModel.data = array ( [ round(x+y) for x,y in zip(model.backgrounds,theta_hat0 ) ] )
+        aModel = copy.deepcopy(model)
+        aModel.data = array([round(x+y) for x,y in zip(model.backgrounds,theta_hat0)])
         #print ( "aModeldata=", aModel.data )
         #aModel.data = array ( [ round(x) for x in model.backgrounds ] )
         aModel.name = aModel.name + "A"
-        compA = LikelihoodComputer ( aModel, toys )
+        compA = LikelihoodComputer(aModel, toys)
         ## compute
-        mu_hatA = compA.findMuHat ( aModel.efficiencies )
-        # print ( "mu_hat=", mu_hat )
-        if mu_hat < 0.: mu_hat = 0.
-        nll0 = computer.likelihood ( model.efficiencies * mu_hat,
-                                     marginalize=marginalize, nll=True )
-        if NP.isinf ( nll0 ) and marginalize==False:
-            logger.warning ( "nll is infinite in profiling! we switch to marginalization, but only for this one!" )
+        mu_hatA = compA.findMuHat(aModel.signal_rel)
+        if mu_hat < 0.:
+            mu_hat = 0.
+        nll0 = computer.likelihood(model.signals(mu_hat),
+                                     marginalize=marginalize,
+                                     nll=True)
+        if NP.isinf(nll0) and marginalize==False:
+            logger.warning("nll is infinite in profiling! we switch to marginalization, but only for this one!" )
             marginalize=True
-            nll0 = computer.likelihood ( model.efficiencies * mu_hat,
-                                         marginalize=True, nll=True )
-            if NP.isinf ( nll0 ):
-                logger.warning ( "marginalization didnt help either. switch back." )
+            nll0 = computer.likelihood(model.signals(mu_hat),
+                                         marginalize=True,
+                                         nll=True)
+            if NP.isinf(nll0):
+                logger.warning("marginalization didnt help either. switch back.")
                 marginalize=False
             else:
-                logger.warning ( "marginalization worked." )
-        nll0A = compA.likelihood ( aModel.efficiencies * mu_hatA,
-                                   marginalize=marginalize, nll=True )
-        def root_func ( mu ):
+                logger.warning("marginalization worked.")
+        nll0A = compA.likelihood(aModel.signals(mu_hatA),
+                                   marginalize=marginalize,
+                                   nll=True)
+        
+        def root_func(mu):
             ## the function to minimize.
-            nsig = mu*model.efficiencies
+            nsig = model.signals(mu)
             computer.ntot = model.backgrounds + nsig
-            nll = computer.likelihood ( nsig, marginalize=marginalize, nll=True )
-            nllA = compA.likelihood ( nsig, marginalize=marginalize, nll=True )
+            nll = computer.likelihood(nsig, marginalize=marginalize, nll=True )
+            nllA = compA.likelihood(nsig, marginalize=marginalize, nll=True )
             qmu =  2*( nll - nll0 )
             if qmu<0.: qmu=0.
             sqmu = sqrt (qmu)
             qA =  2*( nllA - nll0A )
             # print ( "mu: %s, qMu: %s, qA: %s nll0A: %s nllA: %s" % ( mu, qmu, qA, nll0A, nllA ) )
-            if qA<0.: qA=0.
-            sqA = sqrt ( qA )
-            CLsb = 1. - stats.multivariate_normal.cdf ( sqmu )
+            if qA<0.:
+                qA=0.
+            sqA = sqrt(qA)
+            CLsb = 1. - stats.multivariate_normal.cdf(sqmu)
             CLb = 0.
             if qA >= qmu:
-                CLb =  stats.multivariate_normal.cdf ( sqA - sqmu )
+                CLb =  stats.multivariate_normal.cdf(sqA - sqmu)
             else:
                 if qA == 0.:
-                    CLSb = 1.
+                    CLsb = 1.
                     CLb  = 1.
                 else:
-                    CLsb = 1. - stats.multivariate_normal.cdf ( (qmu + qA)/(2*sqA) )
-                    CLb = 1. - stats.multivariate_normal.cdf ( (qmu - qA)/(2*sqA) )
+                    CLsb = 1. - stats.multivariate_normal.cdf( (qmu + qA)/(2*sqA) )
+                    CLb = 1. - stats.multivariate_normal.cdf( (qmu - qA)/(2*sqA) )
             CLs = 0.
-            if CLb>0.:
-                CLs = CLsb / CLb
+            if CLb > 0.:
+                CLs = CLsb/CLb
             root = CLs - 1. + self.cl
-            # print ( "mu=%s nll=%s nllo=%s qA=%s clb=%s clsb=%s cls=%s" % ( mu, nll, nll0, qA, CLb, CLsb, CLs ) )
             return root
-        # print ( "model=%s " % model )
+
 
         a,b=1.5*mu_hat,2.5*mu_hat+2*sigma_mu
         ctr=0
@@ -755,20 +799,20 @@ class UpperLimitComputer:
                 ctr+=1
                 if ctr>20: ## but stop after 20 trials
                     if toys > 2000:
-                       logger.error("cannot find brent bracket after 20 trials. a,b=%s(%s),%s(%s)" % ( root_func(a),a,root_func(b),b ) )
-                       return None
+                        logger.error("cannot find brent bracket after 20 trials. a,b=%s(%s),%s(%s)" % ( root_func(a),a,root_func(b),b ) )
+                        return None
                     else:
-                       logger.debug("cannot find brent bracket after 20 trials. but very low number of toys")
-                       return self.ulSigma ( model, marginalize, 4*toys )
+                        logger.debug("cannot find brent bracket after 20 trials. but very low number of toys")
+                        return self.ulSigma ( model, marginalize, 4*toys )
             try:
                 mu_lim = optimize.brentq ( root_func, a, b, rtol=1e-03, xtol=1e-06 )
-                return mu_lim / self.lumi
+                return mu_lim
             except ValueError as e: ## it could still be that the signs arent opposite
                 # in that case, try again
                 pass
 
 if __name__ == "__main__":
-    C=[ 18774.2, -2866.97, -5807.3, -4460.52, -2777.25, -1572.97, -846.653, -442.531,
+    C = [ 18774.2, -2866.97, -5807.3, -4460.52, -2777.25, -1572.97, -846.653, -442.531,
        -2866.97, 496.273, 900.195, 667.591, 403.92, 222.614, 116.779, 59.5958,
        -5807.3, 900.195, 1799.56, 1376.77, 854.448, 482.435, 258.92, 134.975,
        -4460.52, 667.591, 1376.77, 1063.03, 664.527, 377.714, 203.967, 106.926,
@@ -776,17 +820,17 @@ if __name__ == "__main__":
        -1572.97, 222.614, 482.435, 377.714, 238.76, 137.151, 74.7665, 39.5247,
        -846.653, 116.779, 258.92, 203.967, 129.55, 74.7665, 40.9423, 21.7285,
        -442.531, 59.5958, 134.975, 106.926, 68.2075, 39.5247, 21.7285, 11.5732]
-    m=Model ( data=[1964,877,354,182,82,36,15,11],
+    m=Model( data=[1964,877,354,182,82,36,15,11],
               backgrounds=[2006.4,836.4,350.,147.1,62.0,26.2,11.1,4.7],
               covariance= C,
 #              third_moment = [ 0.1, 0.02, 0.1, 0.1, 0.003, 0.0001, 0.0002, 0.0005 ],
               third_moment = [ 0. ] * 8,
-              efficiencies=[ x/100. for x in [47,29.4,21.1,14.3,9.4,7.1,4.7,4.3] ],
+              nsignal=[ x for x in [20,19.4,21.1,14.3,9.4,7.1,4.7,4.0] ],
               name="CMS-NOTE-2017-001 model" )
-    ulComp = UpperLimitComputer ( lumi = 1. / fb, ntoys=500, cl=.95 )
+    ulComp = UpperLimitComputer(ntoys=500, cl=.95)
     #uls = ulComp.ulSigma ( Model ( 15,17.5,3.2,0.00454755 ) )
     #print ( "uls=", uls )
-    ul_old = 131.828*fb ## ulComp.ulSigmaOld ( m )
+    ul_old = 168.564 ## ulComp.ulSigmaOld ( m )
     print ( "old ul=", ul_old )
     ul = ulComp.ulSigma ( m )
     print ( "ul (marginalized)", ul )

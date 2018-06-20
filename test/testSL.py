@@ -25,7 +25,7 @@ class SLTest(unittest.TestCase):
                   third_moment = [ 0. ] * 8,
                   efficiencies=[x/100. for x in [0.] ],
                   name="pathological model" )
-        m.zeroEfficiencies()
+        m.zeroSignal()
         ulComp = UpperLimitComputer ( lumi = 1. / fb, ntoys=10000, cl=.95 )
         ul = ulComp.ulSigma ( m, marginalize=True )
         ulProf = ulComp.ulSigma ( m, marginalize=False )
@@ -40,7 +40,7 @@ class SLTest(unittest.TestCase):
                   third_moment = [ 0. ] * 8,
                   efficiencies=[x/100. for x in [0.1] ],
                   name="pathological model 2" )
-        m.zeroEfficiencies()
+        m.zeroSignal()
         ulComp = UpperLimitComputer ( lumi = 1. / fb, ntoys=10000, cl=.95 )
         ul = ulComp.ulSigma ( m, marginalize=True )
         ulProf = ulComp.ulSigma ( m, marginalize=False )

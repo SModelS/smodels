@@ -161,40 +161,50 @@ class DataSet(object):
         else:
             return valuesDict[attribute]
 
-    def likelihood(self, nsig, deltas=None, marginalize=False ):
+    def likelihood(self, nsig, deltas_rel=0.2, marginalize=False ):
         """
         Computes the likelihood to observe nobs events,
         given a predicted signal "nsig", assuming "deltas"
         error on the signal efficiency.
         The values observedN, expectedBG, and bgError are part of dataInfo.
         :param nsig: predicted signal (float)
-        :param deltas: uncertainty on signal (float).  If None, 
-        default value (20%) will be used.
+        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         :returns: likelihood to observe nobs events (float)
         """
 
-        m = Model(self.dataInfo.observedN, self.dataInfo.expectedBG, self.dataInfo.bgError**2, deltas_rel = deltas)
+        if deltas_rel:
+            deltaSig = nsig*deltas_rel
+        else:
+            deltaSig = None
+        
+            
+        m = Model(self.dataInfo.observedN, self.dataInfo.expectedBG, self.dataInfo.bgError**2)
         computer = LikelihoodComputer(m)
         return computer.likelihood(nsig, marginalize=marginalize)
     
     
-    def chi2(self, nsig, deltas_rel=None, marginalize=False):
+    def chi2(self, nsig, deltas_rel=0.2, marginalize=False):
         """
         Computes the chi2 for a given number of observed events "nobs",
         given number of signal events "nsig", and error on signal "deltas".
         nobs, expectedBG and bgError are part of dataInfo.
         :param nsig: predicted signal (float)
-        :param deltas_rel: relative uncertainty in signal (float). 
-        If None, default value will be used.
+        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         :return: chi2 (float)
         """
         
+        if deltas_rel:
+            deltaSig = nsig*deltas_rel
+        else:
+            deltaSig = None
+        
+        
         m = Model(self.dataInfo.observedN, self.dataInfo.expectedBG, 
-                    self.dataInfo.bgError**2, deltas_rel = deltas_rel)
+                    self.dataInfo.bgError**2)
         computer = LikelihoodComputer(m)
-        ret = computer.chi2( nsig, marginalize=marginalize)
+        ret = computer.chi2(nsig, marginalize=marginalize)
         
         return ret
     
@@ -225,7 +235,7 @@ class DataSet(object):
         return fields
     
     def getUpperLimitFor(self,mass=None,expected = False, txnames = None
-                         ,compute=False,alpha=0.05):
+                         ,compute=False,alpha=0.05,deltas_rel=0.2):
         """
         Returns the upper limit for a given mass and txname. If
         the dataset hold an EM map result the upper limit is independent of
@@ -235,6 +245,7 @@ class DataSet(object):
         :param mass: Mass array with units (only for UL-type results)        
         :param alpha: Can be used to change the C.L. value. The default value is 0.05
                       (= 95% C.L.) (only for  efficiency-map results)
+        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.                      
         :param expected: Compute expected limit, i.e. Nobserved = NexpectedBG
                          (only for efficiency-map results)
         :param compute: If True, the upper limit will be computed
@@ -246,7 +257,8 @@ class DataSet(object):
         
         
         if self.getType() == 'efficiencyMap':            
-            upperLimit =  self.getSRUpperLimit(expected=expected,alpha=alpha,compute=compute)
+            upperLimit =  self.getSRUpperLimit(expected=expected,alpha=alpha,compute=compute,
+                                               deltas_rel=deltas_rel)
             if (upperLimit/fb).normalize()._unit:
                 logger.error("Upper limit defined with wrong units for %s and %s"
                               %(self.globalInfo.id,self.getID()))
@@ -292,16 +304,18 @@ class DataSet(object):
             return None        
             
             
-    def getSRUpperLimit(self,alpha = 0.05, expected = False, compute = False ):
+    def getSRUpperLimit(self,alpha = 0.05, expected = False, compute = False, deltas_rel=0.2):
         """
         Computes the 95% upper limit on the signal*efficiency for a given dataset (signal region).
         Only to be used for efficiency map type results.
 
         :param alpha: Can be used to change the C.L. value. The default value is 0.05 (= 95% C.L.)
         :param expected: Compute expected limit ( i.e. Nobserved = NexpectedBG )
+        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.        
         :param compute: If True, the upper limit will be computed
                         from expected and observed number of events. If False, the value listed
                         in the database will be used instead.
+                        
 
         :return: upper limit value
         """
@@ -324,17 +338,13 @@ class DataSet(object):
         if expected:
             Nobs = self.dataInfo.expectedBG
         Nexp = self.dataInfo.expectedBG  #Number of expected BG events
-        bgError = self.dataInfo.bgError # error on BG
-        lumi = self.globalInfo.lumi
-        if (lumi*fb).normalize()._unit:
-            ID = self.globalInfo.id
-            logger.error("Luminosity defined with wrong units for %s" %(ID) )
-            return False
-
-        m = Model ( Nobs,Nexp,bgError )
-        computer = UpperLimitComputer ( lumi, cl=1.-alpha )
-        maxSignalXsec = computer.ulSigma( m )
-
+        bgError = self.dataInfo.bgError # error on BG        
+        deltaSig = deltas_rel
+        
+        m = Model(Nobs,Nexp,bgError)
+        computer = UpperLimitComputer(cl=1.-alpha )
+        maxSignalXsec = computer.ulSigma(m)
+        maxSignalXsec = maxSignalXsec/self.globalInfo.lumi
 
         return maxSignalXsec
 
@@ -365,7 +375,7 @@ class CombinedDataSet(object):
         
         datasets = self._datasets[:]        
         if not hasattr(self.globalInfo, "datasetOrder" ):        
-            raise SModelSError( "datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id )
+            raise SModelSError("datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id )
         datasetOrder = self.globalInfo.datasetOrder
         if isinstance(datasetOrder,str):
             datasetOrder = [datasetOrder]
@@ -411,7 +421,7 @@ class CombinedDataSet(object):
         return None
     
         
-    def getCombinedUpperLimitFor(self, nsig, expected=False):
+    def getCombinedUpperLimitFor(self, nsig, expected=False, deltas_rel=0.2):
         """
         Get combined upper limit.
         
@@ -431,20 +441,28 @@ class CombinedDataSet(object):
         if len(cov) < 1:
             raise SModelSError( "covariance matrix has length %d." % len(cov))
 
-        computer = UpperLimitComputer(self.globalInfo.lumi, ntoys=10000)
+        computer = UpperLimitComputer(ntoys=10000)
         
         nobs = [x.dataInfo.observedN for x in self._datasets]
         bg = [x.dataInfo.expectedBG for x in self._datasets]
         no = nobs
-        if expected:
-            no = list(map(round, bg ))
-        ret = computer.ulSigma(Model(no, bg, cov, None, nsig), 
-                               marginalize=self._marginalize)
+        if deltas_rel:
+            deltaSig = [ns*deltas_rel for ns in nsig]
+        else:
+            deltaSig = None
+        
+        ret = computer.ulSigma(Model(data=no, backgrounds=bg, covariance=cov, 
+                                     third_moment=None, nsignal=nsig), 
+                               marginalize=self._marginalize,
+                               expected=expected)
+        
+        #Convert limit on total number of signal events to a limit on sigma*eff
+        ret = ret/self.globalInfo.lumi
         
         return ret
         
     
-    def combinedLikelihood(self, nsig, deltas=None, marginalize=False ):
+    def combinedLikelihood(self, nsig, deltas=None, marginalize=False, deltas_rel=0.2):
         """
         Computes the (combined) likelihood to observe nobs events, given a
         predicted signal "nsig", with nsig being a vector with one entry per
@@ -468,19 +486,26 @@ class CombinedDataSet(object):
         nobs = [ x.dataInfo.observedN for x in self._datasets]
         bg = [ x.dataInfo.expectedBG for x in self._datasets]
         cov = self.globalInfo.covariance
-        computer = LikelihoodComputer(Model(nobs, bg, cov, None, nsig,
-                                              deltas_rel = deltas))
+        if deltas_rel:
+            deltaSig = [ns*deltas_rel for ns in nsig]
+        else:
+            deltaSig = None
+            
+        
+        computer = LikelihoodComputer(Model(nobs, bg, cov, None, nsig))
         
         return computer.likelihood(nsig, marginalize=marginalize )
 
-    def totalChi2(self, nsig, deltas=None, marginalize=False):
+    def totalChi2(self, nsig, marginalize=False, deltas_rel=0.2):
         """
         Computes the total chi2 for a given number of observed events, given a
         predicted signal "nsig", with nsig being a vector with one entry per
         dataset. nsig has to obey the datasetOrder. Deltas is the error on
         the signal efficiency.
         :param nsig: predicted signal (list)
-        :param deltas: uncertainty on signal (None,float, or list).
+        :param deltas_rel: relative uncertainty in signal (float). 
+        I                  f None, a relative 20% uncertainty will be assumed
+
         :returns: chi2 (float)
         """
         if len(self._datasets) == 1:
@@ -495,6 +520,12 @@ class CombinedDataSet(object):
         nobs = [x.dataInfo.observedN for x in self._datasets ]
         bg = [x.dataInfo.expectedBG for x in self._datasets ]
         cov = self.globalInfo.covariance
-        computer = LikelihoodComputer(Model(nobs, bg, cov, deltas_rel=deltas))
+        if deltas_rel:
+            deltaSig = [ns*0.2 for ns in nsig]
+        else:
+            deltaSig = None
+        
+        
+        computer = LikelihoodComputer(Model(nobs, bg, cov))
         
         return computer.chi2(nsig, marginalize=marginalize)
