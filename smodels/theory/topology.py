@@ -36,6 +36,8 @@ class Topology(object):
         self.vertnumb = []
         self.vertparts = []
         self.elementList = []
+        self.reweighted = False
+        self.reweightedElementList = []
 
         if elements:
             if isinstance(elements,Element):
@@ -360,6 +362,7 @@ class TopologyList(object):
         for top in self.topos:                  
             elements.extend(top.elementList)             
         return elements
+                
     
     def compressElements(self,doCompress,doInvisible,minmassgap):        
         """

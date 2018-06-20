@@ -15,6 +15,7 @@ from smodels.theory.particleClass import particleInList
 from smodels.theory.particleNames import getObjectFromPdg, getNamesList
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
+import itertools
 
 class Element(object):
     """
@@ -184,6 +185,8 @@ class Element(object):
         newel.weight = self.weight.copy()
         newel.motherElements = self.motherElements[:]
         newel.elID = self.elID
+        newel.covered = self.covered
+        newel.tested = self.tested
         return newel
 
 
@@ -243,8 +246,6 @@ class Element(object):
         for branch in self.branches:
             particleNames = [[particle.label for particle in particleList ] for particleList in branch.particles ]
             ptcarray.append(particleNames)                
-
-    
         return ptcarray
 
 
@@ -281,12 +282,8 @@ class Element(object):
         :returns: list of PDG ids
         """
         
-        particles = []
-        for ipid,PIDlist in enumerate(self.branches[0].BSMparticles):         
-            for ipid2,PIDlist2 in enumerate(self.branches[1].BSMparticles):
-                particles.append([self.branches[0].BSMparticles[ipid],self.branches[1].BSMparticles[ipid2]])
-           
-        pids = [[[particle.pdg for particle in particleList ] for particleList in outerlist ] for outerlist in particles]
+        particles = ([self.branches[0].BSMparticles[0],self.branches[1].BSMparticles[0]])
+        pids = [[particle.pdg for particle in branchParticles] for branchParticles in particles] 
         return pids
 
     def getDaughters(self):
@@ -309,7 +306,7 @@ class Element(object):
     def getMothers(self):
         """
         Get a pair of mother IDs (PDGs of the first intermediate 
-        state appearing the cascade decay), i.e. [ [pdgMOM1,pdgMOM2] ]    
+        state appearing in the cascade decay), i.e. [ [pdgMOM1,pdgMOM2] ]    
         Can be a list, if the element combines several mothers:
         [ [pdgMOM1,pdgMOM2],  [pdgMOM1',pdgMOM2']] 
         
@@ -338,7 +335,18 @@ class Element(object):
         # get the PIDs of all mothers      
         motherPids = []
         for mother in allmothers:  
-            motherPids.extend( mother[1].getPIDs() ) 
+            motherPids.append( mother[1].getPIDs() ) 
+
+        branch1 = []
+        branch2 = []
+        for motherPid in motherPids:
+            branch1.append(motherPid[0])
+            branch2.append(motherPid[1])
+        for pid1 in branch1:
+            for pid2 in branch2:
+                pids = [pid1,pid2]
+                if not pids in motherPids: motherPids.append(pids)  
+   
         return motherPids     
         
 

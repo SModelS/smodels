@@ -62,7 +62,6 @@ class Uncovered(object):
         :ivar topoList: sms topology list
         """
         for element in topoList.getElements(): # loop over all elements, by construction we start with the most compressed
-
             if not element.branches[0].decayType:
                 allElements = []
                 probabilities1, branches1 = addPromptAndDisplaced(element.branches[0])
@@ -72,7 +71,8 @@ class Uncovered(object):
                         newEl = element.copy()     
                         newEl.branches[0].decayType = branches1[i].decayType
                         newEl.branches[1].decayType = branches2[j].decayType      
-                        newEl.weight *= (probability1*probability2)                                                              
+                        newEl.weight *= (probability1*probability2)            
+                                                                          
                         allElements.append(newEl)                       
                 
             else: allElements = [element]        
@@ -376,9 +376,14 @@ class UncoveredList(object):
         in the list, add weight to topology
         :parameter el: element to be added
         """
-
-        name = self.orderbranches(self.generalName(el.__str__()))
-        name = name + '  (%s)'%(str(el.branches[0].decayType) + ","+ str(el.branches[1].decayType) )
+        name, switchBranches = self.orderbranches(self.generalName(el.__str__()))     
+        if switchBranches: 
+            branch1 = el.branches[1]
+            branch2 = el.branches[0]
+        else: 
+            branch1 = el.branches[0]
+            branch2 = el.branches[1]        
+        name = name + '  (%s)'%(str(branch1.decayType) + ","+ str(branch2.decayType) )
         for topo in self.topos:
             if name == topo.topo:
                 topo.contributingElements.append(el)
@@ -389,24 +394,23 @@ class UncoveredList(object):
     def generalName(self, instr):
         """
         generalize by summing over charges
-        e, mu are combined to l
+        sumL: e, mu are combined to l
+        sumJet: quarks, g, pi are combined to jet
         :parameter instr: element as string
         :returns: string of generalized element
-        """       
-        from smodels.particleDefinitions import particleLists
-        if self.sumL: exch = ["W", "l", "t", "ta", "nu"]
-        else: exch = ["W", "e", "mu", "t", "ta", "nu"]
-        if self.sumJet: exch.append("jet")
-        for pn in exch:
-            for particleList in particleLists:
-                if pn == particleList.label: 
-                    particles = particleList.particles                
-                    for on in particles:  
-                        instr = instr.replace(on.label, pn).replace("hijetjets","higgs")  # in higgs g gets replaced by jet
-                        
-                else: continue  
+        """
+        
+        import smodels.SMparticleDefinitions as SM
+        if self.sumL: exch = [SM.WList, SM.lList, SM.tList, SM.taList, SM.nuList] 
+        else: exch = [SM.WList, SM.eList, SM.muList,SM.tList, SM.taList, SM.nuList]
+        if self.sumJet: exch.append(SM.jetList)
+        for particleList in exch: 
+            particles = particleList.particles                
+            for p in particles:  
+                instr = instr.replace(p.label, particleList.label).replace("hijetjets","higgs")  # in higgs 'g' gets replaced by jet 
         return instr
-
+                
+                
     def orderbranches(self, instr):
         """
         unique ordering of branches
@@ -417,7 +421,9 @@ class UncoveredList(object):
         li = Element(instr).getParticles()
         for be in li:
             for ve in be:
-                ve.sort()
-        li.sort()
-        return str(li).replace("'", "").replace(" ", "")
+                ve.sort()      
+        newLi = sorted(li)
+        if li != newLi: switchBranches = True
+        else: switchBranches = False
+        return str(newLi).replace("'", "").replace(" ", ""), switchBranches                
 

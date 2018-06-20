@@ -225,7 +225,8 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
         newelements.append(el)
     elements = newelements
     if len(elements) == 0: return None
-    
+       
+
     # Combine elements according to their respective constraints and masses
     # (For efficiencyMap analysis group all elements)
     clusters = _combineElements(elements, dataset, maxDist=maxMassDist)
@@ -261,27 +262,43 @@ def _getElementsFrom(smsTopList, dataset):
     :returns: list of elements (Element objects)    
     """
     
-    elements = []    
-    for txname in dataset.txnameList:  
-        for top in smsTopList:
+    elements = []  
+    for txname in dataset.txnameList:
+        for top in smsTopList:      
             allNewElements = []
             hasTop = txname._topologyList.hasTopology(top)
             if not hasTop:                 
-                continue    
+                continue                 
             for i,el in enumerate(top.getElements()):      
-                txnameEl = txname.hasElementAs(el)  #Check if element appears in txname
-                if not txnameEl: continue              
-                newElements, effs = txname.reweightEfficiencyFor(txnameEl)               
-                for i,newEl in enumerate(newElements):
-                    if not effs[i]: continue
-                    newEl.txname = txname                         
-                    newEl.weight *= effs[i]                                           
-                    newEl.eff = effs[i]                      
-                    if newEl.tested: elements.append(newEl) #Save element with correct branch ordering that are tested by experiment
-                    allNewElements.append(newEl)
+                txnameEl = txname.hasElementAs(el)  #Check if element appears in txname                
+                if not txnameEl:
+                    allNewElements.append(el) 
+                    continue  
+ 
+                if not txnameEl.branches[0].decayType:          
+                    newElements, effs = txname.reweightEfficiencyFor(txnameEl)
+                else: 
+                    newElements = [txnameEl]
+                    effs = [1.]
+
+                for i,newEl in enumerate(newElements):    
                     
-            top.elementList = allNewElements         
-                                                            
+                    if newEl.tested: 
+                        allNewElements.append(newEl)
+                        continue
+                                                         
+                    if not effs[i]: continue                     
+                    newElement, newEff = txname.checkDecayTypes(newEl, effs[i])
+                    newElements[i] = newElement
+                    effs[i] = newEff                                            
+                    newElement.txname = txname                         
+                    newElement.weight *= effs[i]                                       
+                    newElement.eff = effs[i]   
+                    allNewElements.append(newElement)                   
+                    if newElement.tested: elements.append(newElement) #Save element with correct branch ordering that are tested by experiment
+
+            top.elementList = allNewElements      
+   
     return elements
 
 

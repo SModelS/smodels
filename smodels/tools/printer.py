@@ -475,7 +475,7 @@ class TxTPrinter(BasicPrinter):
         :param obj: Uncovered object to be printed.
         """
                 
-        nprint = 10  # Number of missing topologies to be printed (ordered by cross sections)
+        nprint = 20  # Number of missing topologies to be printed (ordered by cross sections)
 
         output = ""
         output += "\nTotal missing topology cross section (fb): %10.3E\n" %(obj.getUncoveredListXsec(obj.missingTopos))

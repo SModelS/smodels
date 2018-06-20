@@ -209,7 +209,7 @@ class TxName(object):
                 in the Txname constraint or condition.
         """
         
-        for el in self._topologyList.getElements():        
+        for el in self._topologyList.getElements():       
             if element.particlesMatch(el, checkDecayType=False, branchOrder=True):
                 return element.copy()
             else:
@@ -245,61 +245,70 @@ class TxName(object):
             raise SModelSError()
         return eff
         
-    def reweightEfficiencyFor(self,element):         
-            
-        probabilities1, branches1 = addPromptAndDisplaced(element.branches[0])
+    def reweightEfficiencyFor(self,element):    
+        """
+        Calculates factors for reweighting for all possible decay types and generates new elements.
+        :param element: Element object to be reweighted
+        :return: elements generated from combinations of decay types, effs = factors for reweighting
+        """                       
+                            
+        probabilities1, branches1 = addPromptAndDisplaced(element.branches[0]) 
         probabilities2, branches2 = addPromptAndDisplaced(element.branches[1])
+
+        newElements = []        
+        effs = []
+        for i,probability1 in enumerate(probabilities1):
+            for j,probability2 in enumerate(probabilities2):
+                                
+                newEl = element.copy()
+                newEl.branches[0].decayType = branches1[i].decayType
+                newEl.branches[1].decayType = branches2[j].decayType 
+                eff = (probability1*probability2) 
+                newElements.append(newEl)         
+                effs.append(eff)                
+    
+        return newElements, effs
+        
+        
+    def checkDecayTypes(self,element, efficiency):
+        """
+        checks whether the decay types match those of the experiment, calls getEfficiency for those that matched
+        :param element: Element object to be compared
+        :param efficiency: efficiency coming from reweighting
+        :return: returns element after testing against experiment, efficiency multiplied with efficiency from experiment
+        """
+        
 
         if hasattr(self,'finalState'):
             finalState = self.finalState
         else:
             finalState = ["MET","MET"]  
-
-        newElements = []
-        effs = []
-        for i,probability1 in enumerate(probabilities1):
-            for j,probability2 in enumerate(probabilities2):
-                
-                newEl = element.copy()
-                newEl.branches[0].decayType = branches1[i].decayType
-                newEl.branches[1].decayType = branches2[j].decayType  
             
-                if sameDecayType(newEl.branches[0].decayType, finalState[0]) and sameDecayType(newEl.branches[1].decayType, finalState[1]):           
-                    newEl.covered = True                          
-                    eff = self.getEfficiencyFor(element)       
-                    if eff:                                          
-                        newEl.tested = True         
-                    else: eff = 1.                              
-                    eff *= (probability1*probability2)                    
-                    newElements.append(newEl)         
-                    effs.append(eff)                                
-                elif sameDecayType(newEl.branches[0].decayType, finalState[1]) and sameDecayType(newEl.branches[1].decayType, finalState[0]):                                      
-                    # decay types matched with switched branches
-                    newEl.covered = True
-                    newElb = newEl.switchBranches()
-                    # check if element still belongs to this txname after switching branches
-                    newElB = self.hasElementAs(newElb, switchBranches = False)
-                    if newElB:
-                        eff = self.getEfficiencyFor(newElB)     
-                        if eff:                                    
-                            newElb.tested = True 
-                        else: eff = 1.
-                        eff *= (probability1*probability2)
-                        newElements.append(newElb)   
-                        effs.append(eff)
-                    else: 
-                        newElements.append(newEl)            
-                        eff = 1.
-                        eff *= (probability1*probability2)    
-                        effs.append(eff)                    
-                else: 
-                    newElements.append(newEl)            
-                    eff = 1.
-                    eff *= (probability1*probability2)
-                    effs.append(eff)
+        if sameDecayType(element.branches[0].decayType, finalState[0]) and sameDecayType(element.branches[1].decayType, finalState[1]):             
+            element.covered = True                          
+            eff = self.getEfficiencyFor(element)  
+            if eff:    
+                efficiency *= eff                                      
+                element.tested = True                           
 
-        return newElements, effs
-        
+                                        
+        elif sameDecayType(element.branches[0].decayType, finalState[1]) and sameDecayType(element.branches[1].decayType, finalState[0]):                                      
+            # decay types matched with switched branches                    
+            newElb = element.switchBranches()
+            # check if element still belongs to this txname after switching branches
+            newElB = self.hasElementAs(newElb, switchBranches = False)                    
+            if newElB:
+                element = newElB
+                element.covered = True
+                eff = self.getEfficiencyFor(newElB)     
+                if eff:    
+                    efficiency *= eff                                
+                    element.tested = True 
+                                      
+        return element, efficiency
+                    
+                    
+
         
         
 def sameDecayType(decayType1,decayType2):
