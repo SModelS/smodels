@@ -22,10 +22,10 @@ import math
 
 class StatisticsTest(unittest.TestCase):
     def testUpperLimit(self):
-        m = Model ( 100., 100., 0.001, None, 1.0 )
-        comp = UpperLimitComputer ( 20. / fb )
-        re = comp.ulSigma ( m )
-        self.assertAlmostEqual ( re.asNumber ( fb ), 1.06, 1 )
+        m = Model( 100., 100., 0.001, None, 1.0)
+        comp = UpperLimitComputer()
+        re = comp.ulSigma(m)
+        self.assertAlmostEqual(re/(1.06*20.),1., 1)
 
     def testPredictionInterface(self):
         """ A simple test to see that the interface in datasetObj
@@ -40,9 +40,9 @@ class StatisticsTest(unittest.TestCase):
         ill = math.log(prediction.likelihood)
         ichi2 = prediction.chi2
         nsig = (pred_signal_strength*expRes.globalInfo.lumi).asNumber()
-        m = Model ( 4, 2.2, 1.1**2, None, efficiencies=nsig )
-        computer = LikelihoodComputer ( m )
-        dll = math.log( computer.likelihood( nsig, marginalize=False ) )
+        m = Model(4, 2.2, 1.1**2, None, nsignal=nsig )
+        computer = LikelihoodComputer(m)
+        dll = math.log(computer.likelihood(nsig, marginalize=False ) )
         self.assertAlmostEqual(ill, dll, places=2)
         dchi2 = computer.chi2( nsig, marginalize=False ) ## 0.2*nsig )
         # print ( "dchi2,ichi2",dchi2,ichi2)
@@ -138,12 +138,12 @@ class StatisticsTest(unittest.TestCase):
             nsig = d['nsig']
             nb = d['nb']
             deltab = d['deltab']
-            deltas = 1e-4*d['nsig']
+            deltas = 0.2*d['nsig']
             # print ("ns="+str(nsig)+"; nobs = "+str(nobs)+"; nb="+str(nb)+"; db="+str(deltab))
             # Chi2 as computed by statistics module:
-            m = Model ( nobs, nb, deltab**2, deltas_rel = 0.2 )
-            computer = LikelihoodComputer ( m )
-            chi2_actual = computer.chi2( nsig, marginalize=True ) ## , .2*nsig )
+            m = Model(nobs, nb, deltab**2, deltas=deltas)
+            computer = LikelihoodComputer(m)
+            chi2_actual = computer.chi2(nsig, marginalize=True ) ## , .2*nsig )
             chi2_expected = d['chi2']
             if not chi2_expected==None and not np.isnan(chi2_expected):
 #                 chi2_expected = self.round_to_sign(chi2_expected, 2)

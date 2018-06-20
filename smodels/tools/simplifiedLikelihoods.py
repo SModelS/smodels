@@ -70,9 +70,9 @@ class Model:
         if type(self.third_moment) != type(None) and NP.sum([ abs(x) for x in self.third_moment ]) < 1e-10:
             self.third_moment = None
         self.name = name
-        self.deltas = deltas
-        if deltas is None:
-            self.deltas = 1e-10*self.signal_rel
+        self.deltas = self.convert(deltas)
+        if self.deltas is None:
+            self.deltas = 1e-10*self.signal_rel #Use signal_rel to avoid issues if nsignal = None
         self.computeABC()
 
     def zeroSignal(self):
@@ -604,7 +604,7 @@ class LikelihoodComputer:
             if self.model.isLinear() and self.model.n == 1: ## 1-dimensional non-skewed llhds we can integrate analytically
                 return self.marginalizedLLHD1D ( nsig, nll )
 
-            deltas = array ( self.model.deltas_rel * nsig )
+            deltas = self.model.deltas
             vals=[]
             self.gammaln = special.gammaln(self.model.data + 1)
             thetas = stats.multivariate_normal.rvs(mean=[0.]*self.model.n,
@@ -657,32 +657,32 @@ class LikelihoodComputer:
         else:
             return self.profileLikelihood(nsig, nll)
 
-    def chi2( self, nsig, marginalize=False ):
+    def chi2(self, nsig, marginalize=False):
             """
             Computes the chi2 for a given number of observed events nobs given
             the predicted background nb, error on this background deltab,
             expected number of signal events nsig and, if given, the error on
             signal (deltas).
             :param marginalize: if true, marginalize, if false, profile
+            :param nsig: number of signal events
             :return: chi2 (float)
 
             """
-            nsig = self.model.convert ( nsig )
+            nsig = self.model.convert(nsig)
+            
             # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
-            llhd = self.likelihood( nsig, marginalize=marginalize, nll=True )
+            llhd = self.likelihood(nsig, marginalize=marginalize, nll=True)
 
             # Compute the maximum likelihood H1, which sits at nsig = nobs - nb
             # (keeping the same % error on signal):
             dn = self.model.data-self.model.backgrounds
-            maxllhd = self.likelihood( dn, marginalize=marginalize, nll=True )
-
-            # Return infinite likelihood if it is zero
-            # This can happen in case e.g. nb >> nobs
-            #if llhd == 0.:
-                ## set to insanely small number
-            #    llhd = 1e-300
-            # print ( "llhd,maxllhd=",llhd,maxllhd)
-
+            #Temporarily rescale the model uncertainties, so the relative uncertainties are constant:
+            deltas = self.model.deltas[:]
+            self.model.deltas = deltas*dn.sum()/nsig.sum()
+            maxllhd = self.likelihood(dn, marginalize=marginalize, nll=True )
+            #Restore the uncertatinties:
+            self.model.deltas = deltas[:]
+            
             chi2=2*(llhd-maxllhd)
             
             if not NP.isfinite ( chi2 ):
@@ -820,17 +820,18 @@ if __name__ == "__main__":
        -1572.97, 222.614, 482.435, 377.714, 238.76, 137.151, 74.7665, 39.5247,
        -846.653, 116.779, 258.92, 203.967, 129.55, 74.7665, 40.9423, 21.7285,
        -442.531, 59.5958, 134.975, 106.926, 68.2075, 39.5247, 21.7285, 11.5732]
+    nsignal = [ x/100. for x in [47,29.4,21.1,14.3,9.4,7.1,4.7,4.3] ]
     m=Model( data=[1964,877,354,182,82,36,15,11],
               backgrounds=[2006.4,836.4,350.,147.1,62.0,26.2,11.1,4.7],
               covariance= C,
 #              third_moment = [ 0.1, 0.02, 0.1, 0.1, 0.003, 0.0001, 0.0002, 0.0005 ],
               third_moment = [ 0. ] * 8,
-              nsignal=[ x for x in [20,19.4,21.1,14.3,9.4,7.1,4.7,4.0] ],
+              nsignal = nsignal,
               name="CMS-NOTE-2017-001 model" )
     ulComp = UpperLimitComputer(ntoys=500, cl=.95)
     #uls = ulComp.ulSigma ( Model ( 15,17.5,3.2,0.00454755 ) )
     #print ( "uls=", uls )
-    ul_old = 168.564 ## ulComp.ulSigmaOld ( m )
+    ul_old = 131.828*sum(nsignal) #With respect to the older refernece value one must normalize the xsec
     print ( "old ul=", ul_old )
     ul = ulComp.ulSigma ( m )
     print ( "ul (marginalized)", ul )

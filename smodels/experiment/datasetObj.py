@@ -504,10 +504,11 @@ class CombinedDataSet(object):
         the signal efficiency.
         :param nsig: predicted signal (list)
         :param deltas_rel: relative uncertainty in signal (float). 
-        I                  f None, a relative 20% uncertainty will be assumed
+                            If None, a relative 20% uncertainty will be assumed
 
         :returns: chi2 (float)
         """
+        
         if len(self._datasets) == 1:
             if isinstance(nsig,list):
                 nsig = nsig[0]            
