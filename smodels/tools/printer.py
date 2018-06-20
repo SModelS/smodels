@@ -382,9 +382,10 @@ class TxTPrinter(BasicPrinter):
         for dataset in obj.datasets:
             for txname in dataset.txnameList:
                 tx = txname.txName
-                if not tx in txnames: txnames.append(tx)
+                if not tx in txnames:
+                    txnames.append(tx)
 
-
+        txnames = sorted(txnames)
         output = ""
         output += "========================================================\n"
         output += "Experimental Result ID: " + obj.globalInfo.id + '\n'
@@ -427,10 +428,12 @@ class TxTPrinter(BasicPrinter):
             expRes = theoryPrediction.expResult
             # info = theoryPrediction.dataset.dataInfo
             dataId = theoryPrediction.dataId()
+            txnames = [str(txname) for txname in theoryPrediction.txnames]
+            txnames = sorted(list(set(txnames)))
             output += "\n"
             output += "---------------Analysis Label = " + expRes.globalInfo.id + "\n"
             output += "-------------------Dataset Label = " + str(dataId).replace("None","(UL)") + "\n"
-            output += "-------------------Txname Labels = " + str(list(set([str(txname) for txname in theoryPrediction.txnames]))) + "\n"
+            output += "-------------------Txname Labels = " + str(txnames) + "\n"
             output += "Analysis sqrts: " + str(expRes.globalInfo.sqrts) + \
                     "\n"
 
@@ -596,7 +599,7 @@ class SummaryPrinter(TxTPrinter):
             else: output += "%10.3E  N/A" %r
             output += "\n"
             output += " Signal Region:  "+signalRegion+"\n"
-            txnameStr = str(list(set([str(tx) for tx in txnames])))
+            txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
             txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
             output += " Txnames:  " + txnameStr + "\n"
             if hasattr(theoPred,'chi2') and not theoPred.chi2 is None:
@@ -1059,7 +1062,7 @@ class SLHAPrinter(TxTPrinter):
                 signalRegion = '(UL)'
             r = theoPred.getRValue()
             r_expected = theoPred.getRValue()
-            txnameStr = str(list(set([str(tx) for tx in txnames])))
+            txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
             txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
 
             if r <1 and not excluded == 0: break
