@@ -308,22 +308,28 @@ def _mergePredictions ( preds, combinedUL, combinedEUL ):
     if len(preds) == 0: return None
     ret=copy.deepcopy( preds[0] )
     ret.efficiencies = []
-    eff, wtot = 0., 0.
+    #eff, wtot, S, E = 0., 0., 0.*fb, 0.
+    S, E = 0.*fb, 0.
     for pred in preds:
-        w = pred.xsection.value.asNumber(fb)
-        eff += pred.effectiveEff * w
+        #w = pred.xsection.value.asNumber(fb)
         ret.efficiencies.append ( pred.effectiveEff )
-        wtot += w
-    eff = eff / wtot
-    # print ( "combinedUL=",combinedUL )
-    ret.xsection.value = ret.xsection.value / ret.effectiveEff * eff ## / preds[0].effectiveEff
+        # eff += pred.effectiveEff * w
+        #if w > 0.:
+            #eff += w
+            #wtot += w / pred.effectiveEff
+        S += pred.xsection.value
+        E += pred.effectiveEff
+    #eff = eff / wtot
+    #ret.xsection.value = ret.xsection.value / ret.effectiveEff * eff ## / preds[0].effectiveEff
+    ret.xsection.value = S
     ret.combinedUL = None
     if type(combinedUL) != type(None):
-        ret.combinedUL = combinedUL * eff
+        ret.combinedUL = combinedUL * E
     ret.combinedExpectedUL = None
     if combinedEUL is not None:
-        ret.combinedExpectedUL = combinedEUL * eff
-    ret.effectiveEff = eff
+        ret.combinedExpectedUL = combinedEUL * E
+    # ret.effectiveEff = eff
+    ret.effectiveEff = E
     # ret.dataset = FIXME special
     ret.dataset = [ x.dataset for x in preds ] # we collect all datasets
     return ret
