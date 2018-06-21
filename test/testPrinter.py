@@ -13,7 +13,7 @@ sys.path.insert(0,"../")
 import unittest
 from smodels.installation import installDirectory as idir
 from smodels.theory import slhaDecomposer
-from smodels.tools.physicsUnits import fb, GeV, TeV
+from smodels.tools.physicsUnits import fb, GeV
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.tools import printer, ioObjects
