@@ -8,18 +8,12 @@
 """
 
 import os
-import sys
 from smodels.experiment import infoObj
-from smodels.experiment import txnameObj
 from smodels.experiment import datasetObj
 from smodels.experiment import metaObj
-import numpy
-from smodels.experiment.exceptions import DatabaseNotFoundException, SModelSExperimentError
-from smodels.tools.physicsUnits import fb
+from smodels.experiment.exceptions import SModelSExperimentError
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.stringTools import cleanWalk
-#from smodels.tools import statistics
-from smodels.tools.SimplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Model
 
 try:
     import cPickle as serializer
@@ -37,14 +31,14 @@ class ExpResult(object):
                     in <path>
     """
         
-    def __init__( self, path = None, discard_zeroes = True,
-                  pcl_file = False ):
+    def __init__(self, path = None, discard_zeroes = True):
         """
         :param path: Path to the experimental result folder
         :param discard_zeroes: Discard maps with only zeroes
-        :param pcl_file: Write and maintain pickle file
         """ 
-        if not path: return
+        
+        if not path:
+            return
         if not os.path.isdir ( path ):
             raise SModelSExperimentError ( "%s is not a path" % path )
 
@@ -85,14 +79,15 @@ class ExpResult(object):
             raise SModelSExperimentError ( "lengths of datasets and datasetOrder mismatch" )
             
 
-    def writePickle ( self, dbVersion ):
+    def writePickle(self, dbVersion):
         """ write the pickle file """
+        
         meta = metaObj.Meta ( self.path, self.discard_zeroes, databaseVersion=dbVersion )
         pclfile = "%s/.%s" % ( self.path, meta.getPickleFileName() )
         logger.debug ( "writing expRes pickle file %s, mtime=%s" % (pclfile, meta.cTime() ) )
-        f=open ( pclfile, "wb" )
-        serializer.dump ( meta, f )
-        serializer.dump ( self, f )
+        f=open( pclfile, "wb" )
+        serializer.dump( meta, f )
+        serializer.dump( self, f )
         f.close()
 
     def __eq__(self, other ):
@@ -113,7 +108,7 @@ class ExpResult(object):
 
     def __str__(self):
         label = self.globalInfo.getInfo('id') + ": "
-        dataIDs = [dataset.dataInfo.dataId for dataset in self.datasets]
+        dataIDs = [dataset.getID() for dataset in self.datasets]
         ct_dids=0
         if dataIDs:
             for dataid in dataIDs:
@@ -141,7 +136,7 @@ class ExpResult(object):
         retrieve dataset by dataId
         """
         for dataset in self.datasets:
-            if dataset.dataInfo.dataId == dataId:
+            if dataset.getID() == dataId:
                 return dataset
         return None
 
@@ -154,19 +149,22 @@ class ExpResult(object):
             txnames += dataset.txnameList
         return txnames
 
-    def getEfficiencyFor ( self, txname, mass, dataset=None):
+    def getEfficiencyFor(self, txname, mass, dataset=None):
         """
         Convenience function. Get the efficiency for
         a specific dataset for a a specific txname.
         Equivalent to:
         self.getDataset ( dataset ).getEfficiencyFor ( txname, mass )
         """
-        dataset = self.getDataset ( dataset )
-        if dataset: return dataset.getEfficiencyFor ( txname, mass )
+        
+        dataset = self.getDataset( dataset )
+        if dataset:
+            return dataset.getEfficiencyFor( txname, mass )
         return None
 
-    def hasCovarianceMatrix ( self ):
-        return hasattr ( self.globalInfo, "covariance" )
+    def hasCovarianceMatrix( self ):
+        return hasattr(self.globalInfo, "covariance")
+
 
     """ this feature is not yet ready
     def isUncorrelatedWith ( self, other ):
@@ -187,96 +185,7 @@ class ExpResult(object):
         return None ## FIXME implement
     """
 
-    def combinedLikelihood ( self, nsig, deltas=None, marginalize=False ):
-        """
-        Computes the (combined) likelihood to observe nobs events, given a
-        predicted signal "nsig", with nsig being a vector with one entry per
-        dataset.  nsig has to obey the datasetOrder. Deltas is the error on
-        the signal efficiency.
-        :param nsig: predicted signal (list)
-        :param deltas: uncertainty on signal (None,float, or list).
-        :returns: likelihood to observe nobs events (float)
-        """
-        if len ( self.datasets ) == 1: return self.datasets[0].likelihood ( nsig )
-        if not hasattr ( self.globalInfo, "covariance" ):
-            logger.error ( "asked for combined likelihood, but no covariance error given." )
-            return None
-        nobs = [ x.dataInfo.observedN for x in self.datasets ]
-        bg = [ x.dataInfo.expectedBG for x in self.datasets ]
-        cov = self.globalInfo.covariance
-        computer = LikelihoodComputer ( Model ( nobs, bg, cov, None, nsig, deltas_rel = deltas ) )
-        return computer.likelihood ( nsig, marginalize=marginalize )
 
-    def totalChi2 ( self, nsig, deltas=None, marginalize=False ):
-        """
-        Computes the total chi2 for a given number of observed events, given a
-        predicted signal "nsig", with nsig being a vector with one entry per
-        dataset. nsig has to obey the datasetOrder. Deltas is the error on
-        the signal efficiency.
-        :param nsig: predicted signal (list)
-        :param deltas: uncertainty on signal (None,float, or list).
-        :returns: chi2 (float)
-        """
-        if len ( self.datasets ) == 1: return self.datasets[0].chi2 ( nsig, marginalize=marginalize )
-        if not hasattr ( self.globalInfo, "covariance" ):
-            logger.error ( "asked for combined likelihood, but no covariance error given." )
-            return None
-        nobs = [ x.dataInfo.observedN for x in self.datasets ]
-        bg = [ x.dataInfo.expectedBG for x in self.datasets ]
-        cov = self.globalInfo.covariance
-        computer = LikelihoodComputer ( Model ( nobs, bg, cov, deltas_rel=deltas ) )
-        return computer.chi2 ( nsig, marginalize=marginalize )
-
-    def getCombinedUpperLimitFor ( self, effs, expected=False, marginalize=False ):
-        """
-        Get combined upper limit. Effs are the signal efficiencies in the
-        datasets. The order is defined in the dataset itself.
-        :param effs: the signal efficiencies for all datasets
-        (adding up the efficiencies for all txnames) the efficiencies must 
-        be sorted according to datasetOrder
-        :param expected: return expected, not observed value
-        :param marginalize: if true, marginalize nuisances, if false, profile them.
-        if none profile for cases with less than 30 signal regions, and marginalize
-        for cases with 30 or more signal regions.
-        :returns: upper limit on sigma (*not* sigma*eff)
-        """
-        if not hasattr ( self.globalInfo, "covariance" ):
-            logger.error ( "no covariance matrix given in globalInfo.txt for %s" % self.globalInfo.id )
-            raise SModelSExperimentError ( "no covariance matrix given in globalInfo.txt for %s" % self.globalInfo.id )
-        if not hasattr ( self.globalInfo, "datasetOrder" ):
-            logger.error ( "datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id )
-            raise SModelSExperimentError ( "datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id )
-        cov = self.globalInfo.covariance
-        if type ( cov ) != list:
-            logger.error ( "covariance field has wrong type: %s" % type(cov) )
-            sys.exit()
-        if len ( cov ) < 1:
-            logger.error ( "covariance matrix has length %d." % len(cov) )
-            sys.exit()
-        computer = UpperLimitComputer ( self.globalInfo.lumi, ntoys=10000 )
-        datasetOrder = self.globalInfo.datasetOrder
-        if type ( datasetOrder ) == str:
-            datasetOrder = tuple ( [ datasetOrder ] ) ## for debugging, allow one dataset
-        # print ( "datasetOrder=", datasetOrder )
-        if len ( datasetOrder ) != len ( self.datasets ):
-            logger.error ( "Number of elements in datasetOrder(%d) not equals number of datasets(%d) in %s." % ( len(datasetOrder), len(self.datasets), self.globalInfo.id ) )
-            sys.exit()
-        dsDict={} ## make sure we respect datasetOrder.
-        for ds in self.datasets:
-            dsDict[ds.dataInfo.dataId]=ds
-        nobs, nb = [], []
-        for dsname in datasetOrder:
-            if not dsname in dsDict.keys():
-                logger.error ( "dataset %s appears in datasetOrder, but not as dataset in %s" % ( dsname, self.globalInfo.id ) )
-                sys.exit()
-            ds = dsDict[dsname]
-            nobs.append ( ds.dataInfo.observedN )
-            nb.append ( ds.dataInfo.expectedBG )
-        no = nobs
-        if expected:
-            no = list(map(round, nb ))
-        ret = computer.ulSigma ( Model ( no, nb, cov, None, effs ), marginalize=marginalize )
-        return ret
 
     def getUpperLimitFor(self, dataID=None, alpha=0.05, expected=False,
                           txname=None, mass=None, compute=False):
@@ -301,60 +210,16 @@ class ExpResult(object):
                         instead.
         :return: upper limit (Unum object)
         """
-        if dataID == "combined":
-            logger.error ( "you are asking for upper limit for the combined dataset. Use .getCombinedUpperLimitFor method instead." )
-            sys.exit()
-        if self.datasets[0].dataInfo.dataType == 'efficiencyMap':
-            if not dataID or not isinstance(dataID, str):
-                logger.error("The data set ID must be defined when computing ULs" \
-                             " for efficiency-map results (as there is no covariance matrix).")
-                return False
-
-            useDataset = False
-            for dataset in self.datasets:
-                if dataset.dataInfo.dataId == dataID:
-                    useDataset = dataset
-                    break
-            if useDataset is False:
-                logger.error("Data set ID ``%s'' not found." % dataID )
-                return False
-
-            if compute:
-                upperLimit = useDataset.getSRUpperLimit(alpha, expected, compute)
-            else:
-                if expected:
-                    upperLimit = useDataset.dataInfo.expectedUpperLimit
-                else:
-                    upperLimit = useDataset.dataInfo.upperLimit
-                if (upperLimit/fb).normalize()._unit:
-                    logger.error("Upper limit defined with wrong units for %s and %s"
-                                  %(dataset.globalInfo.id,dataset.dataInfo.dataId))
-                    return False
-
-        elif self.datasets[0].dataInfo.dataType == 'upperLimit':
-            if not txname or not mass:
-                logger.error("A TxName and mass array must be defined when \
-                             computing ULs for upper-limit results.")
-                return False
-            if not isinstance(txname, txnameObj.TxName) and \
-            not isinstance(txname, str):
-                logger.error("txname must be a TxName object or a string")
-                return False
-            if not isinstance(mass, list):
-                logger.error("mass must be a mass array")
-                return False
-            for tx in self.getTxNames():
-                if tx == txname or tx.txName == txname:
-                    if expected:
-                        if not tx.txnameDataExp: upperLimit = None
-                        else: upperLimit = tx.txnameDataExp.getValueFor(mass)
-                    else: upperLimit = tx.txnameData.getValueFor(mass)
+        
+        dataset = self.getDataset(dataID)
+        if dataset:
+            upperLimit = dataset.getUpperLimitFor(mass=mass,expected = expected, 
+                                                      txnames = txname,
+                                                      compute=compute,alpha=alpha)
+            return upperLimit
         else:
-            logger.warning("Unkown data type: %s. Data will be ignored.",
-                           self.datasets[0].dataInfo.dataType)
-
-
-        return upperLimit
+            logger.error("Dataset ID %s not found in experimental result %s" %(dataID,self))     
+            return None
 
 
     def getValuesFor(self, attribute=None):

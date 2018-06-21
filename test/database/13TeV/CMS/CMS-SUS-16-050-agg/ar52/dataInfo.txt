@@ -1,0 +1,8 @@
+dataId: ar52
+dataType: efficiencyMap
+observedN: 0
+expectedBG: 0.3
+bgError: 0.8013738203859669
+upperLimit: 0.081340*fb
+expectedUpperLimit: 0.081340*fb
+aggregated: t>=3b1MT2>=300MET250__350

@@ -1,0 +1,8 @@
+dataId: ar23
+dataType: efficiencyMap
+observedN: 3
+expectedBG: 2.7
+bgError: 2.588435821108957
+upperLimit: 0.194149*fb
+expectedUpperLimit: 0.194149*fb
+aggregated: t1b>=3MT21000__1500MET>=550

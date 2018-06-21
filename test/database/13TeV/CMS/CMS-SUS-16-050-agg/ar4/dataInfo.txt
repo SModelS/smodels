@@ -1,0 +1,8 @@
+dataId: ar4
+dataType: efficiencyMap
+observedN: 7
+expectedBG: 3.6
+bgError: 11.067971810589327
+upperLimit: 0.718198*fb
+expectedUpperLimit: 0.626606*fb
+aggregated: t1b1MT2200__300MET600__750

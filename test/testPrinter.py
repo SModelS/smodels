@@ -13,7 +13,7 @@ sys.path.insert(0,"../")
 import unittest
 from smodels.installation import installDirectory as idir
 from smodels.theory import slhaDecomposer
-from smodels.tools.physicsUnits import fb, GeV, TeV
+from smodels.tools.physicsUnits import fb, GeV
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.tools import printer, ioObjects
@@ -136,7 +136,7 @@ class RunPrinterTest(unittest.TestCase):
         if addTopList:
             mprinter.addObj(smstoplist)
     
-        listOfExpRes = database.getExpResults()
+        listOfExpRes = database.getExpResults(analysisIDs=['*:8*TeV','CMS-PAS-SUS-15-002','CMS-PAS-SUS-16-024'])
         # Compute the theory predictions for each analysis
         allPredictions = []
         for expResult in listOfExpRes:
