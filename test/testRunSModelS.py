@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-
+ 
 """
 .. module:: testRunSModelS
    :synopsis: Tests runSModelS
-
+ 
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
-
+ 
 """
-
+ 
 import sys,shutil,os
 sys.path.insert(0,"../")
 import unittest
@@ -22,14 +22,14 @@ from smodels.tools.runSModelS import run
 import redirector
 import unum
 import time
-
+ 
 from smodels.tools.smodelsLogging import logger, setLogLevel
-
+ 
 def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
     """
     Compare two objects.
     The numerical values are compared up to the precision defined by allowedDiff.
-
+ 
     :param obj1: First python object to be compared
     :param obj2: Second python object to be compared
     :param allowedDiff: Allowed % difference between two numerical values
@@ -38,11 +38,11 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
     """
     if type(obj1) in [ float, int ] and type ( obj2) in [ float, int ]:
         obj1,obj2=float(obj1),float(obj2)
-
+ 
     if type(obj1) != type(obj2):
         logger.warning("Data types differ (%s,%s)" %(type(obj1),type(obj2)))
         return False
-
+ 
     if isinstance(obj1,unum.Unum):
         if obj1 == obj2:
             return True
@@ -82,10 +82,10 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[]):
                 return False
     else:
         return obj1 == obj2
-
+ 
     return True
-
-
+ 
+ 
 class RunSModelSTest(unittest.TestCase):
     def runMain(self, filename, timeout = 0, suppressStdout=True, development=False,
                  inifile = "testParameters.ini" ):
@@ -102,7 +102,7 @@ class RunSModelSTest(unittest.TestCase):
                  development = development)
             sfile = join(iDir(),"test/unitTestOutput/%s.py" % basename(filename))
             return sfile
-
+ 
     def testMultipleFiles( self ):
         out = join( iDir(), "test/unitTestOutput")
         for i in os.listdir( out ):
@@ -115,15 +115,15 @@ class RunSModelSTest(unittest.TestCase):
         if nout != nin:
             logger.error("Number of output file (%d) differ from number of input files (%d)" % (nout, nin))
         self.assertTrue( nout == nin )
-   
+     
     def timeoutRun(self):
         filename = join ( iDir(), "inputFiles/slha/complicated.slha" )
         outputfile = self.runMain(filename, timeout=1, suppressStdout=True,
                      development=True, inifile = "timeout.ini" )
-   
+     
     def testTimeout(self):
         self.assertRaises(NoTime, self.timeoutRun)
- 
+  
     def testGoodFile(self):
         filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
         outputfile = self.runMain(filename)
@@ -139,9 +139,9 @@ class RunSModelSTest(unittest.TestCase):
         self.assertTrue(equals)
         for i in [ './output.py', './output.pyc' ]:
             if os.path.exists ( i ): os.remove ( i )
-    
+      
     def testGoodFile13(self):
-          
+            
         filename = join ( iDir(), "inputFiles/slha/simplyGluino.slha" )
         outputfile = self.runMain(filename,suppressStdout = True )
         shutil.copyfile(outputfile,'./output13.py')
@@ -160,7 +160,7 @@ class RunSModelSTest(unittest.TestCase):
                 # continue
                 os.remove ( i )
         self.assertTrue(equals)        
-  
+    
     def testBadFile(self):
         # since 112 we skip non-existing slha files!
         filename = join (iDir(), "inputFiles/slha/I_dont_exist.slha" )
@@ -170,13 +170,13 @@ class RunSModelSTest(unittest.TestCase):
         outputfile = self.runMain(filename  )
         self.assertTrue ( of in outputfile )
         self.assertTrue ( not os.path.exists ( outputfile ) )
-  
+    
     def cleanUp ( self ):
         for f in os.listdir("."):
             if ".crash" in f: os.remove(f)
         for i in [ "crash_report_parameter", "crash_report_input" ]:
             if os.path.exists ( i ): os.remove ( i )
-  
+    
     def testCrash(self):
         filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
         ctr=0
@@ -198,7 +198,7 @@ class RunSModelSTest(unittest.TestCase):
                 ctr+=1
         self.assertEqual ( ctr, 1 )
         inp, par = crashReport.readCrashReportFile(crash_file)
-   
+     
         with open(filename) as f:
             with open(inp) as g:
                 self.assertEqual(f.readlines(), g.readlines())
@@ -206,6 +206,6 @@ class RunSModelSTest(unittest.TestCase):
             with open(par) as g:
                self.assertEqual( f.readlines(), g.readlines())
         self.cleanUp()
-
+ 
 if __name__ == "__main__":
     unittest.main()

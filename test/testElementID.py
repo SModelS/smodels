@@ -23,13 +23,13 @@ class ElementIdTest(unittest.TestCase):
                      'ATLAS-SUSY-2013-05' : [26]}
         filename = "%sinputFiles/slha/higgsinoStop.slha" % (installDirectory() )
         topoList = slhaDecomposer.decompose(filename,doCompress = True, doInvisible=True, minmassgap = 5*GeV)
-        resultlist = database.getExpResults()
+        resultlist = database.getExpResults(analysisIDs=['*:8*TeV','CMS-PAS-SUS-15-002','CMS-PAS-SUS-16-024'])
         for res in resultlist:
             theorypredictions = theoryPredictionsFor(res, topoList)
             if not theorypredictions: continue
-            self.assertEquals(len(theorypredictions),1)
+            self.assertEqual(len(theorypredictions),1)
             tpIDs = theorypredictions[0].IDs 
-            self.assertEquals(sorted(tpIDs),sorted(listOfIDs[res.globalInfo.id]))
+            self.assertEqual(sorted(tpIDs),sorted(listOfIDs[res.globalInfo.id]))
             
 
 if __name__ == "__main__":

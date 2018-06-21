@@ -14,7 +14,7 @@ from smodels.tools import ioObjects
 from smodels.tools import coverage, runtime
 from smodels.theory import slhaDecomposer
 from smodels.theory import lheDecomposer
-from smodels.theory.theoryPrediction import theoryPredictionsFor, TheoryPredictionList
+from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools import crashReport, timeOut
 from smodels.tools.printer import MPrinter
@@ -114,11 +114,11 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     except Exception as e:
         pass
     for expResult in listOfExpRes:
-        # logger.error ("FIXME maybe need to set useBestDataset to FALSE")
         theorypredictions = theoryPredictionsFor( expResult, smstoplist,
                     useBestDataset=True, combinedResults=combineResults,
                     marginalize=False )
-        if not theorypredictions: continue
+        if not theorypredictions:
+            continue
         allPredictions += theorypredictions._theoryPredictions
 
     """Compute chi-square and likelihood"""

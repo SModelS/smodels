@@ -12,10 +12,9 @@ from __future__ import print_function
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.tools.physicsUnits import fb, GeV, pb
+from smodels.tools.physicsUnits import fb, GeV
 from databaseLoader import database
 import inspect
-import os
 
 class IntegrationTest(unittest.TestCase):
     def configureLogger(self):
@@ -49,10 +48,9 @@ class IntegrationTest(unittest.TestCase):
             self.assertAlmostEqual( predval.asNumber(fb), defpredval.asNumber (fb) )
             predchi = self.predchi2()[id]
             pred.computeStatistics( marginalize=True )
-            if predchi == None:
-                self.assertEqual ( pred.chi2, None )
-            else:
-                self.assertAlmostEqual ( pred.chi2 / predchi, 1.0, 1 )
+            if pred.chi2 != self.predchi2()[id]:
+                self.assertAlmostEqual(pred.chi2/self.predchi2()[id], 1.0, 1 )
+
 
     def testIntegration(self):
         from smodels.installation import installDirectory

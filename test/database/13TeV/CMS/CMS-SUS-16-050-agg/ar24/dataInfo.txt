@@ -1,0 +1,8 @@
+dataId: ar24
+dataType: efficiencyMap
+observedN: 2
+expectedBG: 9.6
+bgError: 3.705401462729781
+upperLimit: 0.111937*fb
+expectedUpperLimit: 0.295298*fb
+aggregated: t1b>=3MT2>=1500MET250__350

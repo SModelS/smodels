@@ -1,0 +1,8 @@
+dataId: ar45
+dataType: efficiencyMap
+observedN: 3
+expectedBG: 9.6
+bgError: 2.906200268391702
+upperLimit: 0.112038*fb
+expectedUpperLimit: 0.268492*fb
+aggregated: t2b>=3MT2300__900MET250__350
