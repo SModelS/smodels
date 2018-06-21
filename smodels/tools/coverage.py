@@ -62,20 +62,20 @@ class Uncovered(object):
         :ivar topoList: sms topology list
         """
         for element in topoList.getElements(): # loop over all elements, by construction we start with the most compressed
-            if not element.branches[0].decayType:
-                allElements = []
-                probabilities1, branches1 = addPromptAndDisplaced(element.branches[0])
-                probabilities2, branches2 = addPromptAndDisplaced(element.branches[1])               
-                for i,probability1 in enumerate(probabilities1):
-                    for j,probability2 in enumerate(probabilities2): 
-                        newEl = element.copy()     
-                        newEl.branches[0].decayType = branches1[i].decayType
-                        newEl.branches[1].decayType = branches2[j].decayType      
-                        newEl.weight *= (probability1*probability2)            
-                                                                          
-                        allElements.append(newEl)                       
-                
-            else: allElements = [element]        
+            if element.tested: continue
+            allElements = []
+            probabilities1, branches1 = addPromptAndDisplaced(element.branches[0])
+            probabilities2, branches2 = addPromptAndDisplaced(element.branches[1])               
+            for i,probability1 in enumerate(probabilities1):
+                for j,probability2 in enumerate(probabilities2): 
+                    newEl = element.copy()   
+                    newEl.tested = element.tested
+                    newEl.covered = element.covered
+                    newEl.branches[0].decayType = branches1[i].decayType
+                    newEl.branches[1].decayType = branches2[j].decayType      
+                    newEl.weight *= (probability1*probability2)            
+                    allElements.append(newEl)                       
+                        
               
             for el in allElements:                             
                 if self.inPrevMothers(el): 
@@ -97,7 +97,7 @@ class Uncovered(object):
                             el.missingX =  outsideX # for combined printing function, call outside grid weight missingX as well
                             self.outsideGrid.addToTopos(el) # add to list of outsideGrid topos                        
                     continue
-    
+                
                 self.missingTopos.addToTopos(el) #keep track of all missing topologies
                 if self.hasLongCascade(el): self.longCascade.addToClasses(el)
                 elif self.hasAsymmetricBranches(el): self.asymmetricBranches.addToClasses(el) # if no long cascade, check for asymmetric branches

@@ -185,8 +185,6 @@ class Element(object):
         newel.weight = self.weight.copy()
         newel.motherElements = self.motherElements[:]
         newel.elID = self.elID
-        newel.covered = self.covered
-        newel.tested = self.tested
         return newel
 
 

@@ -267,38 +267,29 @@ def _getElementsFrom(smsTopList, dataset):
         for top in smsTopList:      
             allNewElements = []
             hasTop = txname._topologyList.hasTopology(top)
-            if not hasTop:                 
-                continue                 
-            for i,el in enumerate(top.getElements()):      
+            if not hasTop: continue                 
+            for i,el in enumerate(top.getElements()):        
                 txnameEl = txname.hasElementAs(el)  #Check if element appears in txname                
-                if not txnameEl:
-                    allNewElements.append(el) 
-                    continue  
- 
-                if not txnameEl.branches[0].decayType:          
-                    newElements, effs = txname.reweightEfficiencyFor(txnameEl)
-                else: 
-                    newElements = [txnameEl]
-                    effs = [1.]
+                if not txnameEl: continue  
 
-                for i,newEl in enumerate(newElements):    
-                    
-                    if newEl.tested: 
-                        allNewElements.append(newEl)
-                        continue
-                                                         
-                    if not effs[i]: continue                     
-                    newElement, newEff = txname.checkDecayTypes(newEl, effs[i])
-                    newElements[i] = newElement
-                    effs[i] = newEff                                            
+                newElements, factors = txname.getNewElementsAndFactors(txnameEl)
+
+                for i,newEl in enumerate(newElements):                                       
+                    if not factors[i]: continue                    
+                    newElement, eff = txname.checkDecayTypes(newEl)   
+                    if not eff: continue 
+                    else: newElement.tested = True                                        
                     newElement.txname = txname                         
-                    newElement.weight *= effs[i]                                       
-                    newElement.eff = effs[i]   
-                    allNewElements.append(newElement)                   
-                    if newElement.tested: elements.append(newElement) #Save element with correct branch ordering that are tested by experiment
+                    newElement.weight *= factors[i]*eff                                     
+                    newElement.eff = factors[i]*eff 
+      
+                    if newElement.covered:
+                        el.covered = True             
+                    if newElement.tested:                                               
+                        el.tested = True
+                        elements.append(newElement) #Save element with correct branch ordering that are tested by experiment
 
-            top.elementList = allNewElements      
-   
+
     return elements
 
 

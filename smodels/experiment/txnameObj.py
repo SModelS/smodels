@@ -245,7 +245,7 @@ class TxName(object):
             raise SModelSError()
         return eff
         
-    def reweightEfficiencyFor(self,element):    
+    def getNewElementsAndFactors(self,element):    
         """
         Calculates factors for reweighting for all possible decay types and generates new elements.
         :param element: Element object to be reweighted
@@ -256,26 +256,25 @@ class TxName(object):
         probabilities2, branches2 = addPromptAndDisplaced(element.branches[1])
 
         newElements = []        
-        effs = []
+        factors = []
         for i,probability1 in enumerate(probabilities1):
             for j,probability2 in enumerate(probabilities2):
                                 
                 newEl = element.copy()
                 newEl.branches[0].decayType = branches1[i].decayType
                 newEl.branches[1].decayType = branches2[j].decayType 
-                eff = (probability1*probability2) 
+                factor = (probability1*probability2) 
                 newElements.append(newEl)         
-                effs.append(eff)                
+                factors.append(factor)                
     
-        return newElements, effs
+        return newElements, factors
         
         
-    def checkDecayTypes(self,element, efficiency):
+    def checkDecayTypes(self,element):
         """
         checks whether the decay types match those of the experiment, calls getEfficiency for those that matched
         :param element: Element object to be compared
-        :param efficiency: efficiency coming from reweighting
-        :return: returns element after testing against experiment, efficiency multiplied with efficiency from experiment
+        :return: returns element after testing against experiment, efficiency from experiment
         """
         
 
@@ -286,24 +285,22 @@ class TxName(object):
             
         if sameDecayType(element.branches[0].decayType, finalState[0]) and sameDecayType(element.branches[1].decayType, finalState[1]):             
             element.covered = True                          
-            eff = self.getEfficiencyFor(element)  
-            if eff:    
-                efficiency *= eff                                      
-                element.tested = True                           
-
+            efficiency = self.getEfficiencyFor(element)  
                                         
         elif sameDecayType(element.branches[0].decayType, finalState[1]) and sameDecayType(element.branches[1].decayType, finalState[0]):                                      
-            # decay types matched with switched branches                    
+            # decay types matched with switched branches                   
             newElb = element.switchBranches()
             # check if element still belongs to this txname after switching branches
-            newElB = self.hasElementAs(newElb, switchBranches = False)                    
+            newElB = self.hasElementAs(newElb, switchBranches = False)    
+                        
             if newElB:
                 element = newElB
                 element.covered = True
-                eff = self.getEfficiencyFor(newElB)     
-                if eff:    
-                    efficiency *= eff                                
-                    element.tested = True 
+                efficiency = self.getEfficiencyFor(newElB)     
+                
+            else: efficiency = 0.
+                
+        else: efficiency = 0.
                                       
         return element, efficiency
                     
