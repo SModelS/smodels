@@ -8,7 +8,7 @@
 
 """
 
-import sys,shutil,os
+import sys,os
 sys.path.insert(0,"../")
 import unittest
 from smodels.installation import installDirectory as idir
@@ -168,7 +168,8 @@ class RunPrinterTest(unittest.TestCase):
 
 
     def testTextPrinter(self):
-         
+        outputfile = os.path.join( idir(), "test/unitTestOutput/printer_output.smodels")
+        self.removeOutputs ( outputfile )
         mprinter = printer.MPrinter()
         mprinter.Printers['summary'] = printer.SummaryPrinter(output = 'file')        
         #Define options:
@@ -178,7 +179,6 @@ class RunPrinterTest(unittest.TestCase):
         mprinter.setOutPutFiles('./unitTestOutput/printer_output',silent=True)
         self.runPrinterMain(slhafile,mprinter)
          
-        outputfile = os.path.join( idir(), "test/unitTestOutput/printer_output.smodels")
         samplefile = os.path.join( idir(), "test/gluino_squarks_default.txt")
         #Test summary output
         output = summaryReader.Summary(outputfile,allowedDiff=0.05)
@@ -188,11 +188,15 @@ class RunPrinterTest(unittest.TestCase):
         except AssertionError as e:
             msg = "%s != %s" %(sample, output) 
             raise AssertionError(msg)
+        self.removeOutputs ( outputfile )
  
+    def removeOutputs ( self, f ):
+        """ remove cruft outputfiles """
+        for i in [ f, f.replace(".py",".pyc") ]:
+            if os.path.exists ( i ): os.remove ( i )
  
     def testPythonPrinter(self):
-           
-           
+        self.removeOutputs ( './unitTestOutput/printer_output.py' )
         mprinter = printer.MPrinter()
         mprinter.Printers['python'] = printer.PyPrinter(output = 'file')
         #Define options:
@@ -202,10 +206,9 @@ class RunPrinterTest(unittest.TestCase):
         mprinter.setOutPutFiles('./unitTestOutput/printer_output',silent=True)
         self.runPrinterMain(slhafile,mprinter)
            
+        from unitTestOutput.printer_output import smodelsOutput
         #Test python output
-        shutil.copyfile('./unitTestOutput/printer_output.py','./output.py')
         from gluino_squarks_default import smodelsOutputDefault 
-        from output import smodelsOutput
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
                       key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
@@ -217,13 +220,10 @@ class RunPrinterTest(unittest.TestCase):
         except AssertionError as e:
             print ( "Error: %s, when comparing %s \nwith %s." % (e,"output.py","gluino_squarks_default.py" ) )
             raise AssertionError(e)
-        try:
-            os.remove('./output.py')
-            os.remove('./output.pyc')
-        except OSError:
-            pass
+        self.removeOutputs ( './unitTestOutput/printer_output.py' )
  
     def testPythonPrinterSimple(self):
+        self.removeOutputs ( './unitTestOutput/printer_output_simple.py' )
  
         mprinter = printer.MPrinter()
         mprinter.Printers['python'] = printer.PyPrinter(output = 'file')
@@ -235,9 +235,8 @@ class RunPrinterTest(unittest.TestCase):
         self.runPrinterMain(slhafile,mprinter,addTopList=True)
         
         #Test python output
-        shutil.copyfile('./unitTestOutput/printer_output_simple.py','./outputSimple.py')
+        from unitTestOutput.printer_output_simple import smodelsOutput
         from simplyGluino_default import smodelsOutputDefault    
-        from outputSimple import smodelsOutput
          
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
@@ -250,15 +249,11 @@ class RunPrinterTest(unittest.TestCase):
         except AssertionError as e:
             print ( "Error: %s, when comparing %s \nwith %s." % (e,"outputSimple.py","simplyGluino_default.py" ) )
             raise AssertionError(e)
-        try:
-            os.remove('./outputSimple.py')
-            os.remove('./outputSimple.pyc')
-        except OSError:
-            pass
+        self.removeOutputs ( './unitTestOutput/printer_output_simple.py' )
   
   
     def testXmlPrinter(self):
-          
+        self.removeOutputs ( './unitTestOutput/printer_output.xml' )  
   
         mprinter = printer.MPrinter()
         mprinter.Printers['xml'] = printer.XmlPrinter(output = 'file')
@@ -282,9 +277,10 @@ class RunPrinterTest(unittest.TestCase):
         except AssertionError as e:
             msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
             raise AssertionError(msg)
- 
+        self.removeOutputs ( './unitTestOutput/printer_output.xml' )  
  
     def testXmlPrinterSimple(self):
+        self.removeOutputs ( './unitTestOutput/printer_output_simple.xml' )  
  
         mprinter = printer.MPrinter()
         mprinter.Printers['xml'] = printer.XmlPrinter(output = 'file')
@@ -308,7 +304,7 @@ class RunPrinterTest(unittest.TestCase):
         except AssertionError as e:
             msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
             raise AssertionError(msg)
-         
+        self.removeOutputs ( './unitTestOutput/printer_output_simple.xml' )  
 
 
 if __name__ == "__main__":
