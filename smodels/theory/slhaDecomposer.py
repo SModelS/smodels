@@ -23,7 +23,7 @@ from smodels.theory.updateParticles import addPromptAndDisplaced
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
-def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
+def decompose(model, sigcut=.1 * fb, doCompress=False, doInvisible=False,
               minmassgap=-1.*GeV, useXSecs=None):
     """
     Perform SLHA-based decomposition.
@@ -40,6 +40,8 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
 
     """
     t1 = time.time()
+    
+    slhafile = model.inputFile
 
     if doCompress and minmassgap / GeV < 0.:
         logger.error("Asked for compression without specifying minmassgap. Please set minmassgap.")        
@@ -110,10 +112,9 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     smsTopList = topology.TopologyList()
     # Combine pairs of branches into elements according to production
     # cross section list
-    
     for pids in xSectionList.getPIDpairs():
         weightList = xSectionListDict[pids]
-        minBR = (sigcut/weightList.getMaxXsec()).asNumber()
+        minBR = 0. #(sigcut/weightList.getMaxXsec()).asNumber()        
         if minBR > 1.: continue
         for branch1 in branchListDict[pids[0]]:
             BR1 =  branch1.maxWeight/maxWeight[pids[0]]  #Branching ratio for first branch            
@@ -134,7 +135,6 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
                                        
                 newElement = element.Element([branch1, branch2])
                 newElement.weight = weightList*finalBR
-                 
                 newElement.sortBranches()  #Make sure elements are sorted BEFORE adding them              
                 smsTopList.addElement(newElement)                                                 
                                                     
@@ -142,8 +142,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     smsTopList._setElementIds()       
             
     logger.debug("slhaDecomposer done in %.2f s." % (time.time() -t1 ) )
-    
-    
+  
     return smsTopList
 
 
