@@ -15,11 +15,11 @@
 """
 
 
-from smodels.SMparticleDefinitions import SMList, SMpdgs, SMnames, particleLists
-from smodels.MSSMparticleDefinitions import BSMList, BSMpdgs, BSMnames
+from smodels.SMparticleDefinitions import SMList, SMpdgs, SMLabels, particleLists
+from smodels.MSSMparticleDefinitions import BSMList, BSMpdgs, BSMLabels, BSMparticleList
 
 
 # all particles and particle lists from the SM
 SM = SMList + particleLists
-MSSM = SM + BSMList
+MSSM = SM + BSMparticleList.particles
 

@@ -6,8 +6,8 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 """
 
-from smodels.particleDefinitions import particleLists, SMnames
-from smodels.theory.particleClass import particleInList, sortParticleList, Particles
+from smodels.particleDefinitions import particleLists, SMLabels
+from smodels.theory.particle import Particle
 from smodels.theory.particleNames import getNamesList, StrWildcard
 from smodels.tools.smodelsLogging import logger
 import itertools    
@@ -67,21 +67,15 @@ def simParticles(plist1, plist2, useLists=True):
     if len(plist1) != len(plist2):
         return False
                         
-    for i,p in enumerate(plist1):        
-        """
-        if plist1[i].label == '*':
-            plist1[i] = ParticleWildcard()
-        if plist2[i].label == '*':
-            plist2[i] = ParticleWildcard()
-        """        
+    for i,p in enumerate(plist1):              
         if not isinstance(p.label,str) or not isinstance(plist2[i].label,str) :
             logger.error("Input must be two lists of particle or particle list objects which have a label")
             raise SModelSError()
-        elif not plist2[i].label in SMnames and not plist2[i].label in getNamesList(particleLists):
-            logger.error("Unknow particle: %s" %p)
+        elif not plist2[i].label in SMLabels and not plist2[i].label in getNamesList(particleLists):
+            logger.error("Unknown particle: %s" %p)
             raise SModelSError()
-        elif not plist2[i].label in SMnames and not plist2[i].label in getNamesList(particleLists):
-            logger.error("Unknow particle: %s" %plist2[i])
+        elif not plist2[i].label in SMLabels and not plist2[i].label in getNamesList(particleLists):
+            logger.error("Unknown particle: %s" %plist2[i])
             raise SModelSError()            
   
     l1 = sortParticleList(plist1) 
@@ -91,10 +85,11 @@ def simParticles(plist1, plist2, useLists=True):
         
     #If lists are to be used, replace particles by their list entries (list.particles)
     #e.g. [jet,mu+] -> [[q,g,c],[mu+]], [jet,mu] -> [[q,g,c],[mu+,mu-]] 
-
+    
+    listLabels = [plist.label for plist in particleLists]
     extendedL1 = []    
     for i,p in enumerate(plist1):
-        if not particleInList(p,particleLists, inlist=False): 
+        if not p.label in listLabels:
             extendedL1.append([p])
         else:
             extendedL1.append( p.particles )
@@ -102,7 +97,7 @@ def simParticles(plist1, plist2, useLists=True):
      
     extendedL2 = []    
     for i,p in enumerate(plist2):
-        if not particleInList(p,particleLists, inlist=False):
+        if not p.label in listLabels:
             extendedL2.append([p])
         else:    
             extendedL2.append( p.particles )  
@@ -114,32 +109,15 @@ def simParticles(plist1, plist2, useLists=True):
     for plist in extendedL1:
         if plist in extendedL2: return True  
     return False
+     
+     
+     
+def sortParticleList(ptcList):
+    """
+    sorts a list of particle or particle list objects by their label
+    :param ptcList: list to be sorted containing particle or particle list objects
+    :return: sorted list of particles
+    """
     
-  
-"""  
-class ParticleWildcard(Particles):
-
-    #A particle wildcard class. It will return True when compared to any other particle object.
-    
-    
-    def __init__(self):
-        Particles.__init__(self, None, StrWildcard(), None, None, None, None, None, None, None)
-
-    def __str__(self):
-        return '*'
-    
-    def __repr__(self):
-        return self.__str__()
-        
-    def __cmp__(self,other):
-        if isinstance(other, Particles):
-            return 0
-        else:
-            return -1        
-
-    def __eq__(self,other):
-        return self.__cmp__(other) == 0
-
-    def __ne__(self,other):
-        return self.__cmp__(other) != 0    
-"""        
+    newPtcList = sorted(ptcList, key=lambda x: x.label) 
+    return newPtcList    

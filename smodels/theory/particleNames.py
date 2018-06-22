@@ -10,7 +10,7 @@
 """
 
 import sys
-from smodels.particleDefinitions import SMList, BSMList, SMnames, particleLists, SM
+from smodels.particleDefinitions import SMList, BSMList, SMLabels, particleLists, SM
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -28,11 +28,11 @@ def getObjectFromPdg(pdg):
             found = True
             p = particle
     if found: return p
-    else: logger.warning("Particle %i not defined in particleClass.py" %(pdg))
+    else: logger.warning("Particle %i not defined in particle.py" %(pdg))
     
     
     
-def getObjectFromName(name):
+def getObjectFromLabel(label):
     """
     Convert particle label to object according to the Particle class.
     :type name: str
@@ -40,12 +40,12 @@ def getObjectFromName(name):
     """    
     found = False
     for particle in SM + BSMList:
-        if particle.label == name: 
+        if particle.label == label: 
             found = True
             p = particle
 
     if found: return p
-    else: logger.warning("Particle %s not defined in particleClass.py" %(name))
+    else: logger.warning("Particle %s not defined in particle.py" %(name))
 
 
 
@@ -115,7 +115,7 @@ def elementsInStr(instring,removeQuotes=True):
                     continue          
                 #if ptc == '*':
                 #    ptc = StrWildcard()                            
-                if not ptc in SMnames and not ptc in getNamesList(particleLists):
+                if not ptc in SMLabels and not ptc in getNamesList(particleLists):
                     logger.error("Unknown particle. Add " + ptc + " to smodels/particleDefinitions.py")
                     raise SModelSError()
 
@@ -168,7 +168,7 @@ def vertInStr(instring):
                     continue
                 #if ptc == '*':
                 #    ptc = StrWildcard()                    
-                if not ptc in SMnames and not ptc in getNamesList(particleLists):
+                if not ptc in SMLabels and not ptc in getNamesList(particleLists):
                     logger.error("Unknown particle. Add " + ptc + " to smodels/particleDefinitions.py")
                     raise SModelSError()
             vertStr = ""
