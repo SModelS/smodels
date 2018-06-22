@@ -9,8 +9,8 @@
 
 import sys
 from smodels.tools.physicsUnits import fb, MeV
-from smodels.particleDefinitions import SMpdgs, SMnames, BSMpdgs, particleLists
-from smodels.theory.particleNames import elementsInStr, getObjectFromPdg, getObjectFromName, getNamesList, StrWildcard
+from smodels.particleDefinitions import SMpdgs, SMLabels, BSMpdgs, particleLists
+from smodels.theory.particleNames import elementsInStr, getObjectFromPdg, getObjectFromLabel, getNamesList, StrWildcard
 from smodels.theory.particleComparison import compareBSMparticles, simParticles
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
@@ -22,7 +22,7 @@ class Branch(object):
     An instance of this class represents a branch.    
     A branch-element can be constructed from a string (e.g., ('[b,b],[W]').
 
-    :ivar particles: list of particles (Particles objects) for the final states
+    :ivar particles: list of particles (Particle objects) for the final states
     :ivar BSMparticles: a list of the intermediate states particles appearing in the branch.
                 If the branch represents more than one possible particle list, BSMparticles will correspond
                 to a nested list (BSMparticles = [[particle1, particle2,...],[particleA, particleB,...]])
@@ -57,14 +57,10 @@ class Branch(object):
                     particleNames = vertex[1:-1].split(',')
                     ptcs = []
                     for i,name in enumerate(particleNames):    
-                        #if name =="*":
-                        #    ptcs.append( ParticleWildcard() )   
-                        #    particleNames[i] = StrWildcard()
-                        #else:
-                        ptcs.append(getObjectFromName(name))
+                        ptcs.append(getObjectFromLabel(name))
                     # Syntax check:
                     for ptc in particleNames:
-                        if not ptc in SMnames \
+                        if not ptc in SMLabels \
                                 and not ptc in getNamesList(particleLists):
                             logger.error("Unknown particle. Add " + ptc + " to smodels/particleDefinitions.py")
                             raise SModelSError()
@@ -179,11 +175,11 @@ class Branch(object):
         for iv,vertex in enumerate(self.particles): 
             
             for i,p in enumerate(vertex):
-                if not p.label in list ( getNamesList(particleLists) ) + SMnames :
+                if not p.label in list ( getNamesList(particleLists) ) + SMLabels :
                     logger.error("Unknown particle: %s" %p.label)
                     raise SModelSError()
 
-                if not other.particles[iv][i].label in list ( getNamesList(particleLists) ) + SMnames :
+                if not other.particles[iv][i].label in list ( getNamesList(particleLists) ) + SMLabels :
                     logger.error("Unknown particle: %s" %other.particles[iv][i].label)
                     raise SModelSError()                
 

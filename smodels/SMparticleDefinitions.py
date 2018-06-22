@@ -1,5 +1,5 @@
 """
-.. module:: particles
+.. module:: SMparticleDefinitions
    :synopsis: Defines the particles to be used.
               All particles appearing in the model as well as the SM particles
               must be defined here.
@@ -10,39 +10,38 @@
 """
 
 from smodels.tools.physicsUnits import MeV , GeV
-from smodels.theory.particleClass import Particles, ParticleList
+from smodels.theory.particle import Particle, ParticleList
 
 
 
 
 # SM particles
 
-anything = Particles(Z2parity=None, label='*', pdg=None, mass=None, eCharge=None, colordim=None, spin=None, width=None, branches=None)
+anything = Particle(Z2parity=None, label='*', pdg=None, mass=None, eCharge=None, colordim=None, spin=None, width=None, decays=None)
 
 
-e = Particles(Z2parity='even', label='e-', pdg=11, mass=0.5*MeV, eCharge=-1, colordim=0, spin=1./2, width=0, branches=None) 
-mu = Particles(Z2parity='even', label='mu-', pdg=13, mass=106.*MeV, eCharge=-1, colordim=0, spin=1./2, width=0, branches=None)
-ta = Particles(Z2parity='even', label='ta-', pdg=15, mass=1777.*MeV, eCharge=-1, colordim=0, spin=1./2, width=0, branches=None)
+e = Particle(Z2parity='even', label='e-', pdg=11, mass=0.5*MeV, eCharge=-1, colordim=0, spin=1./2, width=0, decays=None) 
+mu = Particle(Z2parity='even', label='mu-', pdg=13, mass=106.*MeV, eCharge=-1, colordim=0, spin=1./2, width=0, decays=None)
+ta = Particle(Z2parity='even', label='ta-', pdg=15, mass=1777.*MeV, eCharge=-1, colordim=0, spin=1./2, width=0, decays=None)
 
-nue = Particles(Z2parity='even', label='nue', pdg=12, mass=0.*MeV, eCharge=0, colordim=0, spin=1./2, width=0, branches=None)
-numu = Particles(Z2parity='even', label='numu', pdg=14, mass=0.*MeV, eCharge=0, colordim=0, spin=1./2, width=0, branches=None)
-nuta = Particles(Z2parity='even', label='nuta', pdg=16, mass=0.*MeV, eCharge=0, colordim=0, spin=1./2, width=0, branches=None)
+nue = Particle(Z2parity='even', label='neu', pdg=12, mass=0.*MeV, eCharge=0, colordim=0, spin=1./2, width=0, decays=None)
+numu = Particle(Z2parity='even', label='neu', pdg=14, mass=0.*MeV, eCharge=0, colordim=0, spin=1./2, width=0, decays=None)
+nuta = Particle(Z2parity='even', label='neu', pdg=16, mass=0.*MeV, eCharge=0, colordim=0, spin=1./2, width=0, decays=None)
 
-# use qd, qs, qu to have correct alphabetical ordering
-d = Particles(Z2parity='even', label='qd', pdg=1, mass=0.*MeV, eCharge=(-1./3.), colordim=3, spin=1./2, width=0, branches=None)
-u = Particles(Z2parity='even', label='qu', pdg=2, mass=0.*MeV, eCharge=(2./3.), colordim=3, spin=1./2, width=0, branches=None)
-s = Particles(Z2parity='even', label='qs', pdg=3, mass=0.*MeV, eCharge=(-1./3.), colordim=3, spin=1./2, width=0, branches=None)
-c = Particles(Z2parity='even', label='c', pdg=4, mass=0.*MeV, eCharge=(2./3.), colordim=3, spin=1./2, width=0, branches=None)
-b = Particles(Z2parity='even', label='b', pdg=5, mass=0.*MeV, eCharge=(-1./3.), colordim=3, spin=1./2, width=0, branches=None)
-t = Particles(Z2parity='even', label='t+', pdg=6, mass=0.*MeV, eCharge=(2./3.), colordim=3, spin=1./2, width=1.4*GeV, branches=None)
+d = Particle(Z2parity='even', label='q', pdg=1, mass=0.*MeV, eCharge=(-1./3.), colordim=3, spin=1./2, width=0, decays=None)
+u = Particle(Z2parity='even', label='q', pdg=2, mass=0.*MeV, eCharge=(2./3.), colordim=3, spin=1./2, width=0, decays=None)
+s = Particle(Z2parity='even', label='q', pdg=3, mass=0.*MeV, eCharge=(-1./3.), colordim=3, spin=1./2, width=0, decays=None)
+c = Particle(Z2parity='even', label='c', pdg=4, mass=0.*MeV, eCharge=(2./3.), colordim=3, spin=1./2, width=0, decays=None)
+b = Particle(Z2parity='even', label='b', pdg=5, mass=0.*MeV, eCharge=(-1./3.), colordim=3, spin=1./2, width=0, decays=None)
+t = Particle(Z2parity='even', label='t+', pdg=6, mass=0.*MeV, eCharge=(2./3.), colordim=3, spin=1./2, width=1.4*GeV, decays=None)
 
-g = Particles(Z2parity='even', label='g', pdg=21, mass=0.*MeV, eCharge=0, colordim=8, spin=1, width=0, branches=None)
-photon = Particles(Z2parity='even', label='photon',pdg=22, mass=0.*MeV, eCharge=0, colordim=0, spin=1, width=0, branches=None)
-Z = Particles(Z2parity='even', label='Z', pdg=23, mass=91.*GeV , eCharge=0, colordim=0, spin=1, width=2.5*GeV, branches=None)
-W = Particles(Z2parity='even', label='W+', pdg=24, mass=80.*GeV, eCharge=1, colordim=0, spin=1, width=2.0*GeV, branches=None)
-higgs = Particles(Z2parity='even', label='higgs', pdg=25, mass=125.*GeV, eCharge=0, colordim=0, spin=0, width=0, branches=None)
+g = Particle(Z2parity='even', label='g', pdg=21, mass=0.*MeV, eCharge=0, colordim=8, spin=1, width=0, decays=None)
+photon = Particle(Z2parity='even', label='photon',pdg=22, mass=0.*MeV, eCharge=0, colordim=0, spin=1, width=0, decays=None)
+Z = Particle(Z2parity='even', label='Z', pdg=23, mass=91.*GeV , eCharge=0, colordim=0, spin=1, width=2.5*GeV, decays=None)
+W = Particle(Z2parity='even', label='W+', pdg=24, mass=80.*GeV, eCharge=1, colordim=0, spin=1, width=2.0*GeV, decays=None)
+higgs = Particle(Z2parity='even', label='higgs', pdg=25, mass=125.*GeV, eCharge=0, colordim=0, spin=0, width=0, decays=None)
 
-pi = Particles(Z2parity='even', label='pi', pdg=211, mass=140.*MeV, eCharge=+1, colordim=0, spin=0, width=0, branches=None)
+pi = Particle(Z2parity='even', label='pi', pdg=211, mass=140.*MeV, eCharge=+1, colordim=0, spin=0, width=0, decays=None)
 
 
 
@@ -60,7 +59,7 @@ SMList = SMparticles + SMparticlesC
 
 SMparticleList = ParticleList( 'SM', SMList)
 SMpdgs = SMparticleList.getPdgs()
-SMnames = SMparticleList.getNames()
+SMLabels = SMparticleList.getLabels()
 
 
 
@@ -74,15 +73,14 @@ taList = ParticleList('ta' , [leptons[4], leptonsC[4]])
 lpList = ParticleList('l+' , [leptonsC[0],leptonsC[2]])
 lmList = ParticleList('l-'  , [leptons[0],leptons[2]]) 
 lList = ParticleList('l' , lpList.particles + lmList.particles ) 
-nuList = ParticleList('nu' , [leptons[1],leptons[3],leptons[5],
-                                 leptonsC[1],leptonsC[3],leptonsC[5]])
+nuList = ParticleList('nu' , [leptons[1],leptons[3],leptons[5],leptonsC[1],leptonsC[3],leptonsC[5]])
 WList = ParticleList('W'  , [gauge[2],gaugeC[2]])
 tList = ParticleList('t'  , [quarks[4],quarksC[4]])
 LpList = ParticleList('L+' , lpList.particles + [ leptonsC[4] ])
 LmList = ParticleList('L-' , lmList.particles + [ leptons[4] ])
 LList = ParticleList('L'  , LpList.particles + LmList.particles )
 jetList = ParticleList('jet' ,  quarks[0:4] + [ gauge[0] ] + [ pi ])
-jetbarList =  ParticleList('jetbar' , quarksC[0:4] + [ gaugeC[0] ] + [ pi.chargeConjugate() ])
+jetbarList =  ParticleList('jet~' , quarksC[0:4] + [ gaugeC[0] ] + [ pi.chargeConjugate() ])
 allParticles = ParticleList('all' , SMList)  
           
 particleLists = [eList, muList,taList,lpList,lmList,lList,nuList,WList,tList,

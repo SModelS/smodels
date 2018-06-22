@@ -93,7 +93,7 @@ def elementFromEvent(event, weight=None):
     for ip, particle in enumerate(event.particles):
         keys = SMpdgs+BSMpdgs
         if not particle.pdg in keys:
-            logger.warning("Particle %i not defined in particleClass.py, events containing this particle will be ignored" %(particle.pdg))
+            logger.warning("Particle %i not defined in particle.py, events containing this particle will be ignored" %(particle.pdg))
             return None
         
         # Particle came from initial state (primary mother)

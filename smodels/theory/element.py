@@ -9,9 +9,8 @@
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.branch import Branch, BranchWildcard
 from smodels.theory import crossSection
-from smodels.particleDefinitions import SMnames
+from smodels.particleDefinitions import SMLabels
 from smodels.SMparticleDefinitions import nuList
-from smodels.theory.particleClass import particleInList
 from smodels.theory.particleNames import getObjectFromPdg, getNamesList
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
@@ -391,7 +390,7 @@ class Element(object):
                     logger.error("Wrong syntax")
                     raise SModelSError()
                 for ptc in vertex:
-                    if not ptc in SMnames and not ptc in getNamesList(particleLists):
+                    if not ptc in SMLabels and not ptc in getNamesList(particleLists):
                         logger.error("Unknown particle. Add " + ptc + " to smodels/particleDefinitions.py")
                         raise SModelSError()
         return True
@@ -523,7 +522,7 @@ class Element(object):
                 continue # Nothing to be compressed
             #Go over the branch starting at the end and remove invisible vertices: 
             for ivertex in reversed(range(len(particles))):        
-                if all(particleInList(particle,[nuList]) for particle in particles[ivertex]):
+                if all(particle==nuList for particle in particles[ivertex]):
                     for BSMptclist in newelement.branches[ib].BSMparticles:
                         BSMptclist.pop(ivertex+1) 
                     newelement.branches[ib].particles.pop(ivertex)
