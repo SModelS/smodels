@@ -114,8 +114,9 @@ class RunSModelSTest(unittest.TestCase):
             equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                                ignore=ignoreFields)
             self.assertTrue(equals)
-        if os.path.exists ( outputfile ):
-            os.remove ( outputfile )
+        for i in [ outputfile, outputfile.replace(".py",".pyc") ]:
+            if os.path.exists ( i ):
+                os.remove ( i )
  
 if __name__ == "__main__":
     unittest.main()

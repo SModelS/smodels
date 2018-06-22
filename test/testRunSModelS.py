@@ -9,7 +9,7 @@
  
 """
  
-import sys,shutil,os
+import sys,os,imp
 sys.path.insert(0,"../")
 import unittest
 import glob
@@ -123,13 +123,19 @@ class RunSModelSTest(unittest.TestCase):
      
     def testTimeout(self):
         self.assertRaises(NoTime, self.timeoutRun)
+
+    def removeOutputs ( self, f ):
+        """ remove cruft outputfiles """
+        for i in [ f, f.replace(".py",".pyc") ]:
+            if os.path.exists ( i ): os.remove ( i )
   
     def testGoodFile(self):
         filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
         outputfile = self.runMain(filename)
-        shutil.copyfile(outputfile,'./output.py')
+        with open( outputfile, 'rb') as fp: ## imports file with dots in name
+            output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
+            smodelsOutput = output_module.smodelsOutput
         from gluino_squarks_default import smodelsOutputDefault
-        from output import smodelsOutput
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
@@ -137,16 +143,16 @@ class RunSModelSTest(unittest.TestCase):
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                            ignore=ignoreFields)
         self.assertTrue(equals)
-        for i in [ './output.py', './output.pyc' ]:
-            if os.path.exists ( i ): os.remove ( i )
+        self.removeOutputs ( outputfile )
       
     def testGoodFile13(self):
             
         filename = join ( iDir(), "inputFiles/slha/simplyGluino.slha" )
         outputfile = self.runMain(filename,suppressStdout = True )
-        shutil.copyfile(outputfile,'./output13.py')
+        with open( outputfile, 'rb') as fp: ## imports file with dots in name
+            output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
+            smodelsOutput = output_module.smodelsOutput
         from simplyGluino_default import smodelsOutputDefault
-        from output13 import smodelsOutput
         ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
@@ -154,19 +160,20 @@ class RunSModelSTest(unittest.TestCase):
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                            ignore=ignoreFields)
         if not equals:
-            logger.error ( "output13.py and simplyGluino_default.py differ!" )
-        for i in [ './output13.py', './output13.pyc' ]:
-            if os.path.exists ( i ):
-                # continue
-                os.remove ( i )
+            e =  "output13.py and simplyGluino_default.py differ!" 
+            logger.error ( e )
+            # raise AssertionError ( e )
+
         self.assertTrue(equals)        
+
+        ## test went through, so remove the output files
+        self.removeOutputs ( outputfile )
     
     def testBadFile(self):
         # since 112 we skip non-existing slha files!
         filename = join (iDir(), "inputFiles/slha/I_dont_exist.slha" )
         of="unitTestOutput/I_dont_exist.slha.py"
-        if os.path.exists ( of ):
-            os.unlink ( of )
+        self.removeOutputs ( of )
         outputfile = self.runMain(filename  )
         self.assertTrue ( of in outputfile )
         self.assertTrue ( not os.path.exists ( outputfile ) )
