@@ -11,7 +11,7 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.tools.simplifiedLikelihoods import UpperLimitComputer, LikelihoodComputer, Model
+from smodels.tools.simplifiedLikelihoods import UpperLimitComputer, LikelihoodComputer, Data
 from smodels.tools.physicsUnits import fb
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from databaseLoader import database
@@ -22,7 +22,7 @@ import math
 
 class StatisticsTest(unittest.TestCase):
     def testUpperLimit(self):
-        m = Model( 100., 100., 0.001, None, 1.0)
+        m = Data( 100., 100., 0.001, None, 1.0)
         comp = UpperLimitComputer()
         re = comp.ulSigma(m)
         self.assertAlmostEqual(re/(1.06*20.),1., 1)
@@ -40,7 +40,7 @@ class StatisticsTest(unittest.TestCase):
         ill = math.log(prediction.likelihood)
         ichi2 = prediction.chi2
         nsig = (pred_signal_strength*expRes.globalInfo.lumi).asNumber()
-        m = Model(4, 2.2, 1.1**2, None, nsignal=nsig )
+        m = Data(4, 2.2, 1.1**2, None, nsignal=nsig )
         computer = LikelihoodComputer(m)
         dll = math.log(computer.likelihood(nsig, marginalize=False ) )
         self.assertAlmostEqual(ill, dll, places=2)
@@ -141,7 +141,7 @@ class StatisticsTest(unittest.TestCase):
             deltas = 0.2*d['nsig']
             # print ("ns="+str(nsig)+"; nobs = "+str(nobs)+"; nb="+str(nb)+"; db="+str(deltab))
             # Chi2 as computed by statistics module:
-            m = Model(nobs, nb, deltab**2, deltas=deltas)
+            m = Data(nobs, nb, deltab**2, deltas=deltas)
             computer = LikelihoodComputer(m)
             chi2_actual = computer.chi2(nsig, marginalize=True ) ## , .2*nsig )
             chi2_expected = d['chi2']

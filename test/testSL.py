@@ -12,14 +12,14 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.tools.physicsUnits import fb
-from smodels.tools.simplifiedLikelihoods import Model, UpperLimitComputer
+from smodels.tools.simplifiedLikelihoods import Data, UpperLimitComputer
 from numpy  import sqrt
 
 class SLTest(unittest.TestCase):
 
     def testPathologicalModel(self):
         C=[ 1. ]
-        m=Model ( data=[0],
+        m=Data ( observed=[0],
                   backgrounds=[.0],
                   covariance= C,
                   third_moment = [ 0. ] * 8,
@@ -34,7 +34,7 @@ class SLTest(unittest.TestCase):
 
     def testPathologicalModel2(self):
         C=[ 1. ]
-        m=Model(data=[0],
+        m=Data(observed=[0],
                   backgrounds=[.0],
                   covariance= C,
                   third_moment = [ 0. ] * 8,
@@ -57,7 +57,7 @@ class SLTest(unittest.TestCase):
            -846.653, 116.779, 258.92, 203.967, 129.55, 74.7665, 40.9423, 21.7285, 
            -442.531, 59.5958, 134.975, 106.926, 68.2075, 39.5247, 21.7285, 11.5732]
         nsignal = [ x/100. for x in [47,29.4,21.1,14.3,9.4,7.1,4.7,4.3] ]
-        m=Model ( data=[1964,877,354,182,82,36,15,11],
+        m=Data ( observed=[1964,877,354,182,82,36,15,11],
                   backgrounds=[2006.4,836.4,350.,147.1,62.0,26.2,11.1,4.7],
                   covariance= C,
                   third_moment = [ 0. ] * 8,
@@ -73,7 +73,7 @@ class SLTest(unittest.TestCase):
     def createModel(self,n=3):
         import model_90 as m9
         S=m9.third_moment.tolist()[:n]
-        D=m9.data.tolist()[:n]
+        D=m9.observed.tolist()[:n]
         B=m9.background.tolist()[:n]
         sig=[ x/100. for x in m9.signal.tolist()[:n] ]
         C_=m9.covariance.tolist()
@@ -81,7 +81,7 @@ class SLTest(unittest.TestCase):
         C=[]
         for i in range(n):
             C.append ( C_[ncov*i:ncov*i+n] )
-        m = Model ( data=D, backgrounds=B, covariance=C, third_moment=S, 
+        m = Data ( observed=D, backgrounds=B, covariance=C, third_moment=S, 
                     nsignal=sig, name="model%d" % n )
         return m
 

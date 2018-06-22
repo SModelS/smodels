@@ -11,7 +11,7 @@
 import os,glob
 from smodels.experiment import txnameObj,infoObj
 from smodels.tools.physicsUnits import fb
-from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, Model, UpperLimitComputer
+from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, Data, UpperLimitComputer
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.particleNames import elementsInStr
@@ -179,7 +179,7 @@ class DataSet(object):
             deltaSig = None
         
             
-        m = Model(self.dataInfo.observedN, self.dataInfo.expectedBG, self.dataInfo.bgError**2)
+        m = Data(self.dataInfo.observedN, self.dataInfo.expectedBG, self.dataInfo.bgError**2)
         computer = LikelihoodComputer(m)
         return computer.likelihood(nsig, marginalize=marginalize)
     
@@ -201,7 +201,7 @@ class DataSet(object):
             deltaSig = None
         
         
-        m = Model(self.dataInfo.observedN, self.dataInfo.expectedBG, 
+        m = Data(self.dataInfo.observedN, self.dataInfo.expectedBG, 
                     self.dataInfo.bgError**2)
         computer = LikelihoodComputer(m)
         ret = computer.chi2(nsig, marginalize=marginalize)
@@ -341,7 +341,7 @@ class DataSet(object):
         bgError = self.dataInfo.bgError # error on BG        
         deltaSig = deltas_rel
         
-        m = Model(Nobs,Nexp,bgError)
+        m = Data(Nobs,Nexp,bgError)
         computer = UpperLimitComputer(cl=1.-alpha )
         maxSignalXsec = computer.ulSigma(m)
         maxSignalXsec = maxSignalXsec/self.globalInfo.lumi
@@ -451,7 +451,7 @@ class CombinedDataSet(object):
         else:
             deltaSig = None
         
-        ret = computer.ulSigma(Model(data=no, backgrounds=bg, covariance=cov, 
+        ret = computer.ulSigma(Data(observed=no, backgrounds=bg, covariance=cov, 
                                      third_moment=None, nsignal=nsig), 
                                marginalize=self._marginalize,
                                expected=expected)
@@ -492,7 +492,7 @@ class CombinedDataSet(object):
             deltaSig = None
             
         
-        computer = LikelihoodComputer(Model(nobs, bg, cov, None, nsig))
+        computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig))
         
         return computer.likelihood(nsig, marginalize=marginalize )
 
@@ -527,6 +527,6 @@ class CombinedDataSet(object):
             deltaSig = None
         
         
-        computer = LikelihoodComputer(Model(nobs, bg, cov))
+        computer = LikelihoodComputer(Data(nobs, bg, cov))
         
         return computer.chi2(nsig, marginalize=marginalize)
