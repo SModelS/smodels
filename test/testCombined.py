@@ -9,7 +9,7 @@
  
 """
  
-import sys,os
+import sys,os,imp
 sys.path.insert(0,"../")
 import unittest
 from os.path import join, basename
@@ -18,7 +18,6 @@ from databaseLoader import database ## to make sure the db exists
 from smodels.tools.runSModelS import run
 import redirector
 import unum
-import shutil
  
 from smodels.tools.smodelsLogging import logger, setLogLevel
  
@@ -104,18 +103,19 @@ class RunSModelSTest(unittest.TestCase):
     def testCombinedResult(self):
         filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
         outputfile = self.runMain(filename)
-        shutil.copyfile(outputfile,'./output.py')
-        from gluino_squarks_default_agg import smodelsOutputDefault
-        from output import smodelsOutput
-        ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
-        smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                    key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
-                    res['AnalysisID'],res['DataSetID']])
-        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
-                           ignore=ignoreFields)
-        self.assertTrue(equals)
-        if os.path.isfile('./output.py'):
-            os.remove('./output.py')
+        with open( outputfile, 'rb') as fp: ## imports file with dots in name
+            output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
+            smodelsOutput = output_module.smodelsOutput
+            from gluino_squarks_default_agg import smodelsOutputDefault
+            ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
+            smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
+                        key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
+                        res['AnalysisID'],res['DataSetID']])
+            equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
+                               ignore=ignoreFields)
+            self.assertTrue(equals)
+        if os.path.exists ( outputfile ):
+            os.remove ( outputfile )
  
 if __name__ == "__main__":
     unittest.main()
