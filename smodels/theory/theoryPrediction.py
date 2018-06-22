@@ -62,7 +62,7 @@ class TheoryPrediction(object):
         return self.dataset.getType()
     
 
-    def getUpperLimit(self, expected=False ):
+    def getUpperLimit(self, expected=False, deltas_rel=0.2):
         """
         Get the upper limit on sigma*eff.
         For UL-type results, use the UL map. For EM-Type returns
@@ -71,6 +71,7 @@ class TheoryPrediction(object):
         total sigma*eff (for all signal regions/datasets). 
         
         :param expected: return expected Upper Limit, instead of observed.
+        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.        
         
         :return: upper limit (Unum object)
         """
@@ -80,8 +81,8 @@ class TheoryPrediction(object):
         if not hasattr(self, 'expectedUL') or not hasattr(self, 'upperLimit'):
             
             if self.dataType() == 'efficiencyMap':
-                self.expectedUL = self.dataset.getSRUpperLimit(expected=True)
-                self.upperLimit = self.dataset.getSRUpperLimit(expected=False)
+                self.expectedUL = self.dataset.getSRUpperLimit(expected=True,deltas_rel=deltas_rel)
+                self.upperLimit = self.dataset.getSRUpperLimit(expected=False,deltas_rel=deltas_rel)
             if self.dataType() == 'upperLimit':                
                 self.expectedUL = self.dataset.getUpperLimitFor(mass=self.mass,
                                                                 txnames=self.txnames,
@@ -94,8 +95,8 @@ class TheoryPrediction(object):
                 #Create a list of signal events in each dataset/SR sorted according to datasetOrder
                 srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
                 srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
-                self.expectedUL = self.dataset.getCombinedUpperLimitFor(srNsigs,expected=True)
-                self.upperLimit = self.dataset.getCombinedUpperLimitFor(srNsigs,expected=False)
+                self.expectedUL = self.dataset.getCombinedUpperLimitFor(srNsigs,expected=True,deltas_rel=deltas_rel)
+                self.upperLimit = self.dataset.getCombinedUpperLimitFor(srNsigs,expected=False,deltas_rel=deltas_rel)
                           
         #Return the expected or observed UL:
         if expected:
@@ -114,12 +115,13 @@ class TheoryPrediction(object):
         else:
             return (self.xsection.value/upperLimit).asNumber()
 
-    def computeStatistics(self,marginalize=False):
+    def computeStatistics(self,marginalize=False,deltas_rel=0.2):
         """
         Compute the likelihood, chi2 and expected upper limit for this theory prediction.
         The resulting values are stored as the likelihood and chi2
         attributes.
         :param marginalize: if true, marginalize nuisances. Else, profile them.
+        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         """
         
         
@@ -130,8 +132,8 @@ class TheoryPrediction(object):
         elif self.dataType() == 'efficiencyMap':            
             lumi = self.dataset.globalInfo.lumi
             nsig = (self.xsection.value*lumi).asNumber()
-            llhd = self.dataset.likelihood(nsig,marginalize=marginalize)
-            chi2 = self.dataset.chi2(nsig,marginalize=marginalize)    
+            llhd = self.dataset.likelihood(nsig,marginalize=marginalize,deltas_rel=deltas_rel)
+            chi2 = self.dataset.chi2(nsig,marginalize=marginalize,deltas_rel=deltas_rel)    
             self.likelihood =  llhd
             self.chi2 =  chi2
             
@@ -140,8 +142,8 @@ class TheoryPrediction(object):
             #Create a list of signal events in each dataset/SR sorted according to datasetOrder
             srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
             srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]                
-            self.likelihood = self.dataset.combinedLikelihood(srNsigs, marginalize=marginalize)
-            self.chi2 = self.dataset.totalChi2(srNsigs, marginalize=marginalize)
+            self.likelihood = self.dataset.combinedLikelihood(srNsigs, marginalize=marginalize,deltas_rel=deltas_rel)
+            self.chi2 = self.dataset.totalChi2(srNsigs, marginalize=marginalize,deltas_rel=deltas_rel)
             
 
     def getmaxCondition(self):
@@ -254,7 +256,8 @@ class TheoryPredictionList(object):
             return self.__add__(theoPredList)
 
 def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
-                useBestDataset=True, combinedResults=True, marginalize=False ):
+                useBestDataset=True, combinedResults=True,
+                marginalize=False,deltas_rel=0.2):
     """
     Compute theory predictions for the given experimental result, using the list of
     elements in smsTopList.
@@ -271,6 +274,8 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
     :parameter combinedResults: add theory predictions that result from
                combining datasets.
     :parameter marginalize: If true, marginalize nuisances. If false, profile them.
+    :parameter deltas_rel: relative uncertainty in signal (float). Default value is 20%.    
+    
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction
                objects
     """
@@ -287,7 +292,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
         result = dataSetResults[0]
         for theoPred in result:
             theoPred.expResult = expResult
-            theoPred.upperLimit = theoPred.getUpperLimit()
+            theoPred.upperLimit = theoPred.getUpperLimit(deltas_rel=deltas_rel)
         return result
 
     #For results with more than one dataset, return all dataset predictions
@@ -296,7 +301,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
         allResults = sum(dataSetResults)
         for theoPred in allResults:
             theoPred.expResult = expResult
-            theoPred.upperLimit = theoPred.getUpperLimit()
+            theoPred.upperLimit = theoPred.getUpperLimit(deltas_rel=deltas_rel)
         return allResults
     
     #Else include best signal region results
@@ -311,7 +316,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
 
     for theoPred in bestResults:
         theoPred.expResult = expResult
-        theoPred.upperLimit = theoPred.getUpperLimit()
+        theoPred.upperLimit = theoPred.getUpperLimit(deltas_rel=deltas_rel)
         
     return bestResults
 

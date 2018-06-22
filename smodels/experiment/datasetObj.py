@@ -173,13 +173,8 @@ class DataSet(object):
         :returns: likelihood to observe nobs events (float)
         """
 
-        if deltas_rel:
-            deltaSig = nsig*deltas_rel
-        else:
-            deltaSig = None
-        
-            
-        m = Data(self.dataInfo.observedN, self.dataInfo.expectedBG, self.dataInfo.bgError**2)
+        m = Data(self.dataInfo.observedN, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
+                 deltas_rel=deltas_rel)
         computer = LikelihoodComputer(m)
         return computer.likelihood(nsig, marginalize=marginalize)
     
@@ -195,14 +190,8 @@ class DataSet(object):
         :return: chi2 (float)
         """
         
-        if deltas_rel:
-            deltaSig = nsig*deltas_rel
-        else:
-            deltaSig = None
-        
-        
         m = Data(self.dataInfo.observedN, self.dataInfo.expectedBG, 
-                    self.dataInfo.bgError**2)
+                    self.dataInfo.bgError**2,deltas_rel=deltas_rel)
         computer = LikelihoodComputer(m)
         ret = computer.chi2(nsig, marginalize=marginalize)
         
@@ -339,9 +328,8 @@ class DataSet(object):
             Nobs = self.dataInfo.expectedBG
         Nexp = self.dataInfo.expectedBG  #Number of expected BG events
         bgError = self.dataInfo.bgError # error on BG        
-        deltaSig = deltas_rel
-        
-        m = Data(Nobs,Nexp,bgError)
+
+        m = Data(Nobs,Nexp,bgError,detlas_rel=deltas_rel)
         computer = UpperLimitComputer(cl=1.-alpha )
         maxSignalXsec = computer.ulSigma(m)
         maxSignalXsec = maxSignalXsec/self.globalInfo.lumi
@@ -428,6 +416,8 @@ class CombinedDataSet(object):
         :param nsig: list of signal events in each signal region/dataset. The list
                         should obey the ordering in globalInfo.datasetOrder.
         :param expected: return expected, not observed value
+        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.        
+        
         :returns: upper limit on sigma*eff
         """
         
@@ -446,13 +436,9 @@ class CombinedDataSet(object):
         nobs = [x.dataInfo.observedN for x in self._datasets]
         bg = [x.dataInfo.expectedBG for x in self._datasets]
         no = nobs
-        if deltas_rel:
-            deltaSig = [ns*deltas_rel for ns in nsig]
-        else:
-            deltaSig = None
         
         ret = computer.ulSigma(Data(observed=no, backgrounds=bg, covariance=cov, 
-                                     third_moment=None, nsignal=nsig), 
+                                     third_moment=None, nsignal=nsig, deltas_rel=deltas_rel), 
                                marginalize=self._marginalize,
                                expected=expected)
         
@@ -462,14 +448,14 @@ class CombinedDataSet(object):
         return ret
         
     
-    def combinedLikelihood(self, nsig, deltas=None, marginalize=False, deltas_rel=0.2):
+    def combinedLikelihood(self, nsig, marginalize=False, deltas_rel=0.2):
         """
         Computes the (combined) likelihood to observe nobs events, given a
         predicted signal "nsig", with nsig being a vector with one entry per
         dataset.  nsig has to obey the datasetOrder. Deltas is the error on
         the signal.
         :param nsig: predicted signal (list)
-        :param deltas: uncertainty on signal (None,float, or list).
+        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         
         :returns: likelihood to observe nobs events (float)
         """
@@ -486,13 +472,9 @@ class CombinedDataSet(object):
         nobs = [ x.dataInfo.observedN for x in self._datasets]
         bg = [ x.dataInfo.expectedBG for x in self._datasets]
         cov = self.globalInfo.covariance
-        if deltas_rel:
-            deltaSig = [ns*deltas_rel for ns in nsig]
-        else:
-            deltaSig = None
             
         
-        computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig))
+        computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
         
         return computer.likelihood(nsig, marginalize=marginalize )
 
@@ -503,9 +485,8 @@ class CombinedDataSet(object):
         dataset. nsig has to obey the datasetOrder. Deltas is the error on
         the signal efficiency.
         :param nsig: predicted signal (list)
-        :param deltas_rel: relative uncertainty in signal (float). 
-                            If None, a relative 20% uncertainty will be assumed
-
+        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
+        
         :returns: chi2 (float)
         """
         
@@ -521,12 +502,7 @@ class CombinedDataSet(object):
         nobs = [x.dataInfo.observedN for x in self._datasets ]
         bg = [x.dataInfo.expectedBG for x in self._datasets ]
         cov = self.globalInfo.covariance
-        if deltas_rel:
-            deltaSig = [ns*0.2 for ns in nsig]
-        else:
-            deltaSig = None
         
-        
-        computer = LikelihoodComputer(Data(nobs, bg, cov))
+        computer = LikelihoodComputer(Data(nobs, bg, cov, deltas_rel=deltas_rel))
         
         return computer.chi2(nsig, marginalize=marginalize)

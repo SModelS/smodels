@@ -11,7 +11,6 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.tools.physicsUnits import fb
 from smodels.tools.simplifiedLikelihoods import Data, UpperLimitComputer
 from numpy  import sqrt
 
@@ -24,7 +23,7 @@ class SLTest(unittest.TestCase):
                   covariance= C,
                   third_moment = [ 0. ] * 8,
                   nsignal=[x/100. for x in [0.] ],
-                  name="pathological model" )
+                  name="pathological model",deltas_rel=0. )
         m.zeroSignal()
         ulComp = UpperLimitComputer(ntoys=10000, cl=.95 )
         ul = ulComp.ulSigma(m, marginalize=True )
@@ -39,7 +38,7 @@ class SLTest(unittest.TestCase):
                   covariance= C,
                   third_moment = [ 0. ] * 8,
                   nsignal=[x/100. for x in [0.1] ],
-                  name="pathological model 2" )
+                  name="pathological model 2",deltas_rel=0. )
         m.zeroSignal()
         ulComp = UpperLimitComputer(ntoys=10000, cl=.95 )
         ul = ulComp.ulSigma(m, marginalize=True )
@@ -62,7 +61,7 @@ class SLTest(unittest.TestCase):
                   covariance= C,
                   third_moment = [ 0. ] * 8,
                   nsignal= nsignal,
-                  name="CMS-NOTE-2017-001 model" )
+                  name="CMS-NOTE-2017-001 model",deltas_rel=0. )
         ulComp = UpperLimitComputer (ntoys=2000, cl=.95 )
         ul = ulComp.ulSigma ( m )
         self.assertAlmostEqual( ul/(131.828*sum(nsignal)), 1.0, 1 )
@@ -82,7 +81,7 @@ class SLTest(unittest.TestCase):
         for i in range(n):
             C.append ( C_[ncov*i:ncov*i+n] )
         m = Data ( observed=D, backgrounds=B, covariance=C, third_moment=S, 
-                    nsignal=sig, name="model%d" % n )
+                    nsignal=sig, name="model%d" % n, deltas_rel=0. )
         return m
 
     def testModel3(self):

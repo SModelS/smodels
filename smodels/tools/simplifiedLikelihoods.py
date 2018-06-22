@@ -44,15 +44,15 @@ class Data:
         needed to fully define a specific statistical model """
 
     def __init__(self, observed, backgrounds, covariance, third_moment=None,
-                         nsignal=None, name="model", deltas = None ):
+                         nsignal=None, name="model", deltas_rel = 0.2):
         """
         :param observed: number of observed events per dataset
         :param backgrounds: expected bg per dataset
         :param covariance: uncertainty in background, as a covariance matrix
         :param nsignal: number of signal events in each dataset
         :param name: give the model a name, just for convenience
-        :param deltas: the assumed (absolute) error on the signal hypotheses. 
-                       If None, then no error is assumed.
+        :param deltas_rel: the assumed relative error on the signal hypotheses. 
+                           The default is 20%.
         """
         self.observed = self.convert(observed)
         self.backgrounds = self.convert(backgrounds)
@@ -70,9 +70,10 @@ class Data:
         if type(self.third_moment) != type(None) and NP.sum([ abs(x) for x in self.third_moment ]) < 1e-10:
             self.third_moment = None
         self.name = name
-        self.deltas = self.convert(deltas)
-        if self.deltas is None:
-            self.deltas = 1e-10*self.signal_rel #Use signal_rel to avoid issues if nsignal = None
+        if deltas_rel:
+            self.deltas_rel = deltas_rel
+        else:
+            self.deltas_rel = 0.
         self.computeABC()
 
     def zeroSignal(self):
@@ -82,14 +83,23 @@ class Data:
         
         return len(self.nsignal[self.nsignal>0.]) == 0
 
-    def var_s(self):
+    def var_s(self,nsig=None):
         """
         The signal variances. Convenience function.
+        
+        :param nsig: If None, it will use the model expected number of signal events,
+                    otherwise will return the variances for the input value using the relative
+                    signal uncertainty defined for the model.
+        
         """
         
-        return NP.diag(self.deltas**2)
+        if nsig is None:
+            nsig = self.nsignal
+        else:
+            nsig = self.convert(nsig)
+        return NP.diag((nsig*self.deltas_rel)**2)
 
-    def isScalar( self, obj ):
+    def isScalar(self, obj):
         """
         Determine if obj is a scalar (float or int)
         """
@@ -117,10 +127,10 @@ class Data:
             return array([obj])
         return array(obj)
 
-    def __str__ ( self ):
+    def __str__(self):
         return self.name + " (%d dims)" % self.n
 
-    def convertCov( self, obj):
+    def convertCov(self, obj):
         
         if self.isScalar(obj):
             return array ( [ [ obj ] ] )
@@ -128,7 +138,7 @@ class Data:
             return array ( obj )
         if type(obj[0]) == float:
             ## if the matrix is flattened, unflatten it.
-            return array ( [ obj[self.n*i:self.n*(i+1)] for i in range(self.n)])
+            return array([ obj[self.n*i:self.n*(i+1)] for i in range(self.n)])
         
         return obj
 
@@ -227,13 +237,13 @@ class LikelihoodComputer:
 
     debug_mode = False
 
-    def __init__(self, model, ntoys = 1000):
+    def __init__(self, data, ntoys = 1000):
         """
-        :param model: a Data object.
+        :param data: a Data object.
         :param ntoys: number of toys when marginalizing
         """
         
-        self.model = model
+        self.model = data
         self.ntoys = ntoys
 
     def dLdMu(self, mu, signal_rel, theta_hat):
@@ -286,9 +296,9 @@ class LikelihoodComputer:
 
         ## we need a very rough initial guess for mu(hat), to come
         ## up with a first theta
-        self.nsig = array([0.]*len(self.model.observed ))
+        self.nsig = array([0.]*len(self.model.observed))
         ## we start with theta_hat being all zeroes
-        theta_hat = array([0.]*len(self.model.observed ))
+        theta_hat = array([0.]*len(self.model.observed))
         mu_hat_old, mu_hat = 0., 1.
         ctr=0
         widener=3.
@@ -407,11 +417,11 @@ class LikelihoodComputer:
         nllh_ = self.weight + NP.diag ( self.model.observed * T**2 / (lmbda**2) ) - NP.diag ( self.model.observed / lmbda * 2 * self.model.C / self.model.B**2 ) + NP.diag ( 2*self.model.C/self.model.B**2 )
         return nllh_
 
-    def getThetaHat ( self, nobs, nb, nsig, covb, max_iterations ):
+    def getThetaHat(self, nobs, nb, nsig, covb, max_iterations ):
             """ Compute nuisance parameter theta that
             maximizes our likelihood (poisson*gauss).  """
             self.nsig = nsig
-            sigma2 = covb + self.model.var_s() ## NP.diag ( (self.model.deltas)**2 )
+            sigma2 = covb + self.model.var_s(nsig) ## NP.diag ( (self.model.deltas)**2 )
             ## for now deal with variances only
             ntot = nb + nsig
             cov = NP.matrix(sigma2)
@@ -469,19 +479,15 @@ class LikelihoodComputer:
                 (poisson*gauss).
             """
             
-            deltas = self.model.deltas
-            
-            if type(nsig) in [ list, ndarray, array ]:
-                deltas = array(self.model.deltas)
             ## first step is to disregard the covariances and solve the
             ## quadratic equations
             ini = self.getThetaHat ( self.model.observed, self.model.backgrounds, nsig, self.model.covariance, 0 )
-            self.cov_tot = self.model.covariance+NP.diag(deltas**2)
+            self.cov_tot = self.model.covariance+ self.model.var_s(nsig)
             self.ntot = self.model.backgrounds + self.nsig
             if not self.model.isLinear():
-                self.cov_tot = self.model.V+NP.diag(deltas**2)
+                self.cov_tot = self.model.V + self.model.var_s(nsig)
                 self.ntot = None
-            self.weight = NP.linalg.inv ( self.cov_tot )
+            self.weight = NP.linalg.inv(self.cov_tot)
             self.ones = 1.
             if type ( self.model.observed) in [ list, ndarray ]:
                 self.ones = NP.ones ( len (self.model.observed) )
@@ -499,9 +505,6 @@ class LikelihoodComputer:
                                             disp=0, bounds=bounds )
                 # print ( "[findThetaHat] mu=%s bg=%s observed=%s V=%s, nsig=%s theta=%s, nll=%s" % ( self.nsig[0]/self.model.efficiencies[0], self.model.backgrounds, self.model.observed,self.model.covariance, self.nsig, ret_c[0], self.nll(ret_c[0]) ) )
                 if ret_c[-1] not in [ 0, 1, 2 ]:
-                    is_expected=False
-                    if ( self.model.observed == self.model.backgrounds ).all():
-                        is_expected=True
                     return ret_c[0],ret_c[-1]
                 else:
                     return ret_c[0],0
@@ -511,14 +514,14 @@ class LikelihoodComputer:
                 return ret,-2
             except Exception as e:
                 logger.error("exception: %s. ini[-3:]=%s" % (e,ini[-3:]) )
-                raise Exception("cov-1=%s" % (self.model.covariance+NP.diag(deltas))**(-1))
+                raise Exception("cov-1=%s" % (self.model.covariance+self.model.var_s(nsig))**(-1))
             return ini,-1
 
     def marginalizedLLHD1D(self, nsig, nll):
             """
             Return the likelihood (of 1 signal region) to observe nobs events given the
             predicted background nb, error on this background (deltab),
-            expected number of signal events nsig and the error on the signal (deltas).
+            expected number of signal events nsig and the relative error on the signal (deltas_rel).
 
             :param nsig: predicted signal (float)
             :param nobs: number of observed events (float)
@@ -528,8 +531,8 @@ class LikelihoodComputer:
             :return: likelihood to observe nobs events (float)
 
             """
-            self.sigma2 = self.model.covariance + self.model.var_s()## (self.model.deltas_rel)**2
-            self.sigma_tot = sqrt( self.sigma2 )
+            self.sigma2 = self.model.covariance + self.model.var_s(nsig)## (self.model.deltas)**2
+            self.sigma_tot = sqrt(self.sigma2)
             self.lngamma = math.lgamma(self.model.observed[0] + 1)
             #     Why not a simple gamma function for the factorial:
             #     -----------------------------------------------------
@@ -599,31 +602,31 @@ class LikelihoodComputer:
 
             return like[0][0]
 
-    def marginalizedLikelihood( self, nsig, nll ):
+    def marginalizedLikelihood(self, nsig, nll ):
             """ compute the marginalized likelihood of observing nsig signal event"""
             if self.model.isLinear() and self.model.n == 1: ## 1-dimensional non-skewed llhds we can integrate analytically
                 return self.marginalizedLLHD1D ( nsig, nll )
 
-            deltas = self.model.deltas
             vals=[]
             self.gammaln = special.gammaln(self.model.observed + 1)
             thetas = stats.multivariate_normal.rvs(mean=[0.]*self.model.n,
-                          cov=(self.model.V+NP.diag(deltas**2)),
+                          cov=(self.model.V + self.model.var_s(nsig)),
                           size=self.ntoys ) ## get ntoys values
             for theta in thetas :
                 if self.model.isLinear():
                     lmbda = nsig + self.model.backgrounds + theta
                 else:
                     lmbda = nsig + self.model.A + theta + self.model.C*theta**2/self.model.B**2
-                if self.model.isScalar ( lmbda ): lmbda = array ( [ lmbda ] )
-                for ctr,v in enumerate ( lmbda ):
+                if self.model.isScalar( lmbda ):
+                    lmbda = array([lmbda])
+                for ctr,v in enumerate( lmbda ):
                     if v<=0.: lmbda[ctr]=1e-30
 #                    print ( "lmbda=",lmbda )
                 poisson = self.model.observed*NP.log(lmbda) - lmbda - self.gammaln
                 # poisson = NP.exp(self.model.observed*NP.log(lmbda) - lmbda - self.model.backgrounds - self.gammaln)
-                vals.append ( NP.exp ( sum(poisson) ) )
+                vals.append( NP.exp ( sum(poisson) ) )
                 #vals.append ( reduce(lambda x, y: x*y, poisson) )
-            mean = NP.mean ( vals )
+            mean = NP.mean( vals )
             if nll:
                 if mean == 0.:
                     mean = 1e-100
@@ -631,7 +634,7 @@ class LikelihoodComputer:
             return mean
 
 
-    def profileLikelihood ( self, nsig, nll ):
+    def profileLikelihood( self, nsig, nll ):
         """ compute the profiled likelihood for nsig.
             Warning: not normalized.
             Returns profile likelihood and error code (0=no error)
@@ -661,8 +664,8 @@ class LikelihoodComputer:
             """
             Computes the chi2 for a given number of observed events nobs given
             the predicted background nb, error on this background deltab,
-            expected number of signal events nsig and, if given, the error on
-            signal (deltas).
+            expected number of signal events nsig and the relative error on
+            signal (deltas_rel).
             :param marginalize: if true, marginalize, if false, profile
             :param nsig: number of signal events
             :return: chi2 (float)
@@ -676,12 +679,7 @@ class LikelihoodComputer:
             # Compute the maximum likelihood H1, which sits at nsig = nobs - nb
             # (keeping the same % error on signal):
             dn = self.model.observed-self.model.backgrounds
-            #Temporarily rescale the model uncertainties, so the relative uncertainties are constant:
-            deltas = self.model.deltas[:]
-            self.model.deltas = deltas*dn.sum()/nsig.sum()
             maxllhd = self.likelihood(dn, marginalize=marginalize, nll=True )
-            #Restore the uncertatinties:
-            self.model.deltas = deltas[:]
             
             chi2=2*(llhd-maxllhd)
             

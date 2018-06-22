@@ -22,7 +22,7 @@ import math
 
 class StatisticsTest(unittest.TestCase):
     def testUpperLimit(self):
-        m = Data( 100., 100., 0.001, None, 1.0)
+        m = Data( 100., 100., 0.001, None, 1.0,deltas_rel=0.)
         comp = UpperLimitComputer()
         re = comp.ulSigma(m)
         self.assertAlmostEqual(re/(1.06*20.),1., 1)
@@ -34,13 +34,13 @@ class StatisticsTest(unittest.TestCase):
         expRes = database.getExpResults( analysisIDs=['CMS-SUS-13-012'] )[0]
         slhafile="../inputFiles/slha/simplyGluino.slha"
         smstoplist = slhaDecomposer.decompose( slhafile )
-        prediction = theoryPredictionsFor ( expRes, smstoplist )[0]
+        prediction = theoryPredictionsFor(expRes, smstoplist,deltas_rel=0.)[0]
         pred_signal_strength = prediction.xsection.value
         prediction.computeStatistics()
         ill = math.log(prediction.likelihood)
         ichi2 = prediction.chi2
         nsig = (pred_signal_strength*expRes.globalInfo.lumi).asNumber()
-        m = Data(4, 2.2, 1.1**2, None, nsignal=nsig )
+        m = Data(4, 2.2, 1.1**2, None, nsignal=nsig,deltas_rel=0.)
         computer = LikelihoodComputer(m)
         dll = math.log(computer.likelihood(nsig, marginalize=False ) )
         self.assertAlmostEqual(ill, dll, places=2)
@@ -138,10 +138,9 @@ class StatisticsTest(unittest.TestCase):
             nsig = d['nsig']
             nb = d['nb']
             deltab = d['deltab']
-            deltas = 0.2*d['nsig']
             # print ("ns="+str(nsig)+"; nobs = "+str(nobs)+"; nb="+str(nb)+"; db="+str(deltab))
             # Chi2 as computed by statistics module:
-            m = Data(nobs, nb, deltab**2, deltas=deltas)
+            m = Data(nobs, nb, deltab**2,deltas_rel=0.2)
             computer = LikelihoodComputer(m)
             chi2_actual = computer.chi2(nsig, marginalize=True ) ## , .2*nsig )
             chi2_expected = d['chi2']
