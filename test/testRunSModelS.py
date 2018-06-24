@@ -13,43 +13,23 @@ import sys,os,imp
 sys.path.insert(0,"../")
 import unittest
 import glob
-from os.path import join, basename
+from os.path import join 
 from smodels.installation import installDirectory as iDir
 from smodels.tools import crashReport
 from smodels.tools.timeOut import NoTime
-from databaseLoader import database ## to make sure the db exists
-from unitTestHelpers import equalObjs
-from smodels.tools.runSModelS import run
-import redirector
-import unum
+from unitTestHelpers import equalObjs, runMain
 import time
  
-from smodels.tools.smodelsLogging import logger, setLogLevel
+from smodels.tools.smodelsLogging import logger
  
 class RunSModelSTest(unittest.TestCase):
-    def runMain(self, filename, timeout = 0, suppressStdout=True, development=False,
-                 inifile = "testParameters.ini" ):
-        to = None
-        level = 'debug'
-        if suppressStdout:
-            level = 'error'
-            to = os.devnull
-        with redirector.stdout_redirected ( to = to ):
-            out = join( iDir(), "test/unitTestOutput" )
-            setLogLevel ( level )
-            run(filename, parameterFile=join ( iDir(), "test/%s" % inifile ),
-                 outputDir= out, db= database, timeout = timeout,
-                 development = development)
-            sfile = join(iDir(),"test/unitTestOutput/%s.py" % basename(filename))
-            return sfile
- 
     def testMultipleFiles( self ):
         out = join( iDir(), "test/unitTestOutput")
         for i in os.listdir( out ):
             if i[-8:]==".smodels":
                 os.unlink( os.path.join ( out, i ))
         dirname = join( iDir(), "inputFiles/slha/" )
-        self.runMain(dirname)
+        runMain(dirname)
         nout = len([i for i in glob.iglob("unitTestOutput/*smodels") if not "~" in i])
         nin = len([i for i in glob.iglob("%s/*slha" % dirname) if not "~" in i])
         if nout != nin:
@@ -58,8 +38,8 @@ class RunSModelSTest(unittest.TestCase):
      
     def timeoutRun(self):
         filename = join ( iDir(), "inputFiles/slha/complicated.slha" )
-        outputfile = self.runMain(filename, timeout=1, suppressStdout=True,
-                     development=True, inifile = "timeout.ini" )
+        outputfile = runMain(filename, timeout=1, suppressStdout=True,
+                             development=True, inifile = "timeout.ini" )
      
     def testTimeout(self):
         self.assertRaises(NoTime, self.timeoutRun)
@@ -71,7 +51,7 @@ class RunSModelSTest(unittest.TestCase):
   
     def testGoodFile(self):
         filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
-        outputfile = self.runMain(filename)
+        outputfile = runMain(filename)
         with open( outputfile, 'rb') as fp: ## imports file with dots in name
             output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
             smodelsOutput = output_module.smodelsOutput
@@ -88,7 +68,7 @@ class RunSModelSTest(unittest.TestCase):
     def testGoodFile13(self):
             
         filename = join ( iDir(), "inputFiles/slha/simplyGluino.slha" )
-        outputfile = self.runMain(filename,suppressStdout = True )
+        outputfile = runMain(filename,suppressStdout = True )
         with open( outputfile, 'rb') as fp: ## imports file with dots in name
             output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
             smodelsOutput = output_module.smodelsOutput
@@ -114,7 +94,7 @@ class RunSModelSTest(unittest.TestCase):
         filename = join (iDir(), "inputFiles/slha/I_dont_exist.slha" )
         of="unitTestOutput/I_dont_exist.slha.py"
         self.removeOutputs ( of )
-        outputfile = self.runMain(filename  )
+        outputfile = runMain(filename  )
         self.assertTrue ( of in outputfile )
         self.assertTrue ( not os.path.exists ( outputfile ) )
     
@@ -129,7 +109,7 @@ class RunSModelSTest(unittest.TestCase):
         ctr=0
         crash_file = None
         self.cleanUp()
-        outputfile = self.runMain(filename, timeout=1, suppressStdout=True,
+        outputfile = runMain(filename, timeout=1, suppressStdout=True,
                                    inifile= "timeout.ini" )
         try:
             ## trying to sync!!

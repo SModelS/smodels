@@ -12,37 +12,16 @@
 import sys,os,imp
 sys.path.insert(0,"../")
 import unittest
-from os.path import join, basename
+from os.path import join
 from smodels.installation import installDirectory as iDir
-from databaseLoader import database ## to make sure the db exists
-from unitTestHelpers import equalObjs
-from smodels.tools.runSModelS import run
-import redirector
-import unum
+from unitTestHelpers import equalObjs, runMain
  
 from smodels.tools.smodelsLogging import logger, setLogLevel
  
 class CombinedTest(unittest.TestCase):
-    def runMain(self, filename, timeout = 0, suppressStdout=True, development=False,
-                 inifile = "testParameters_agg.ini" ):
-        to = None
-        level = 'debug'
-        if suppressStdout:
-            level = 'error'
-            to = os.devnull
-        with redirector.stdout_redirected ( to = to ):
-            out = join( iDir(), "test/unitTestOutput" )
-            setLogLevel ( level )
-            run(filename, parameterFile=join ( iDir(), "test/%s" % inifile ),
-                 outputDir= out, db= database, timeout = timeout,
-                 development = development)
-            sfile = join(iDir(),"test/unitTestOutput/%s.py" % basename(filename))
-            return sfile
- 
-    
     def testCombinedResult(self):
         filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
-        outputfile = self.runMain(filename)
+        outputfile = runMain(filename,inifile = "testParameters_agg.ini")
         with open( outputfile, 'rb') as fp: ## imports file with dots in name
             output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
             smodelsOutput = output_module.smodelsOutput
