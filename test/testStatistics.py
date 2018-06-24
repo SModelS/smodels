@@ -40,11 +40,11 @@ class StatisticsTest(unittest.TestCase):
         ill = math.log(prediction.likelihood)
         ichi2 = prediction.chi2
         nsig = (pred_signal_strength*expRes.globalInfo.lumi).asNumber()
-        m = Data(4, 2.2, 1.1**2, None, nsignal=nsig,deltas_rel=0.)
+        m = Data(4, 2.2, 1.1**2, None, nsignal=nsig,deltas_rel=0.2)
         computer = LikelihoodComputer(m)
         dll = math.log(computer.likelihood(nsig, marginalize=False ) )
         self.assertAlmostEqual(ill, dll, places=2)
-        dchi2 = computer.chi2( nsig, marginalize=False ) ## 0.2*nsig )
+        dchi2 = computer.chi2( nsig, marginalize=False )
         # print ( "dchi2,ichi2",dchi2,ichi2)
         self.assertAlmostEqual(ichi2, dchi2, places=2)
 

@@ -57,7 +57,7 @@ class Data:
         self.observed = self.convert(observed)
         self.backgrounds = self.convert(backgrounds)
         self.n = len(self.observed)
-        self.covariance = self.convertCov(covariance)
+        self.covariance = self._convertCov(covariance)
         self.nsignal = self.convert(nsignal)
         if self.nsignal is None:
             self.signal_rel = self.convert(1.)        
@@ -70,11 +70,20 @@ class Data:
         if type(self.third_moment) != type(None) and NP.sum([ abs(x) for x in self.third_moment ]) < 1e-10:
             self.third_moment = None
         self.name = name
-        if deltas_rel:
-            self.deltas_rel = deltas_rel
+        self.deltas_rel = deltas_rel
+        self._computeABC()
+
+    def totalCovariance ( self, nsig ):
+        """ get the total covariance matrix, taking into account
+        also signal uncertainty for the signal hypothesis <nsig>. 
+        If nsig is None, the predefined signal hypothesis is taken.
+        """
+        if self.isLinear():
+            cov_tot = self.V + self.var_s( nsig )
         else:
-            self.deltas_rel = 0.
-        self.computeABC()
+            cov_tot = self.covariance+ self.var_s(nsig)
+        return cov_tot
+
 
     def zeroSignal(self):
         """
@@ -130,7 +139,7 @@ class Data:
     def __str__(self):
         return self.name + " (%d dims)" % self.n
 
-    def convertCov(self, obj):
+    def _convertCov(self, obj):
         
         if self.isScalar(obj):
             return array ( [ [ obj ] ] )
@@ -142,7 +151,7 @@ class Data:
         
         return obj
 
-    def computeABC( self ):
+    def _computeABC( self ):
         """
         Compute the terms A, B, C, rho, V. Corresponds with
         Eqs. 1.27-1.30 in the second paper.
@@ -163,10 +172,10 @@ class Data:
             dm = sqrt ( 8.*m2**3/m3**2 - 1. )
             C.append( k*NP.cos ( 4.*NP.pi/3. + NP.arctan(dm) / 3. ))
             
-        self.C=NP.array(C)
-        self.B = sqrt( covD - 2*self.C**2 )
-        self.A = self.backgrounds - self.C
-        self.rho = NP.array( [ [0.]*self.n ]*self.n )
+        self.C=NP.array(C) ## C, as define in Eq. 1.27 (?) in the second paper
+        self.B = sqrt( covD - 2*self.C**2 ) ## B, as defined in Eq. 1.28(?)
+        self.A = self.backgrounds - self.C ## A, Eq. 1.30(?)
+        self.rho = NP.array( [ [0.]*self.n ]*self.n ) ## Eq. 1.29 (?)
         for x in range(self.n):
             for y in range(x,self.n):
                 bxby=self.B[x]*self.B[y]
@@ -193,7 +202,7 @@ class Data:
 
     def isLinear(self):
         """
-        Data is linear, i.e. no quadratic term in poissonians
+        Statistical model is linear, i.e. no quadratic term in poissonians
         """
         
         return type(self.C) == type(None)
@@ -352,7 +361,7 @@ class LikelihoodComputer:
     # def prob(x0, x1 )
     def probMV(self, nll, *thetaA ):
         """ probability, for nuicance parameters theta
-        :params nll: compute negative log likelihood """
+        :params nll: if True, compute negative log likelihood """
         theta = array ( thetaA )
         # ntot = self.model.backgrounds + self.nsig
         # lmbda = theta + self.ntot ## the lambda for the Poissonian
@@ -370,16 +379,17 @@ class LikelihoodComputer:
             #print ( "nonll",poisson )
         try:
             if nll:
-                # gaussian = -.5 * (theta*NP.linalg.inv ( self.model.V ) * theta)[0][0]
+                #gaussian = stats.multivariate_normal.logpdf(theta,mean=[0.]*len(theta),cov=self.model.totalCovariance(self.nsig))
                 gaussian = stats.multivariate_normal.logpdf(theta,mean=[0.]*len(theta),cov=self.model.V)
-                # print ( "gaussian=",gaussian,gaussian2)
                 ret = - gaussian - sum(poisson)
             else:
+                # gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=self.model.totalCovariance(self.nsig))
                 gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=self.model.V)
                 ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
             return ret
         except ValueError as e:
-            raise Exception("ValueError %s, %s" % ( e, self.model.V ))
+            raise Exception("ValueError %s, %s" % ( e, self.model.totalCovariance(nsig) ))
+            # raise Exception("ValueError %s, %s" % ( e, self.model.V ))
 
     def nll( self, theta ):
         """ probability, for nuicance parameters theta,
@@ -482,11 +492,13 @@ class LikelihoodComputer:
             ## first step is to disregard the covariances and solve the
             ## quadratic equations
             ini = self.getThetaHat ( self.model.observed, self.model.backgrounds, nsig, self.model.covariance, 0 )
-            self.cov_tot = self.model.covariance+ self.model.var_s(nsig)
-            self.ntot = self.model.backgrounds + self.nsig
-            if not self.model.isLinear():
-                self.cov_tot = self.model.V + self.model.var_s(nsig)
-                self.ntot = None
+            # self.cov_tot = self.model.covariance+ self.model.var_s(nsig)
+            self.cov_tot = self.model.totalCovariance ( nsig )
+            # self.ntot = self.model.backgrounds + self.nsig
+            # if not self.model.isLinear():
+                # self.cov_tot = self.model.V + self.model.var_s(nsig)
+                # self.cov_tot = self.model.totalCovariance (nsig)
+                #self.ntot = None
             self.weight = NP.linalg.inv(self.cov_tot)
             self.ones = 1.
             if type ( self.model.observed) in [ list, ndarray ]:
@@ -610,7 +622,8 @@ class LikelihoodComputer:
             vals=[]
             self.gammaln = special.gammaln(self.model.observed + 1)
             thetas = stats.multivariate_normal.rvs(mean=[0.]*self.model.n,
-                          cov=(self.model.V + self.model.var_s(nsig)),
+                          cov=(self.model.totalCovariance(nsig)),
+                          # cov=(self.model.V + self.model.var_s(nsig)),
                           size=self.ntoys ) ## get ntoys values
             for theta in thetas :
                 if self.model.isLinear():
