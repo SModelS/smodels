@@ -293,7 +293,7 @@ def _getElementsFrom(smsTopList, dataset):
                         if not newElement in newMissingelements: 
                             newMissingelements.append(newElement)
 
-    # collect new elements that were reweighted and them  
+    # collect new elements that were reweighted and and then did not match anymore (because of decay type) 
     newMissingelements = [missingEl for missingEl in newMissingelements if not missingEl in elements]
     smsTopList.extraMissingElements = newMissingelements  
                       
