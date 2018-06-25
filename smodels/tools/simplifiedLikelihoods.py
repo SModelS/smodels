@@ -379,12 +379,12 @@ class LikelihoodComputer:
             #print ( "nonll",poisson )
         try:
             if nll:
-                #gaussian = stats.multivariate_normal.logpdf(theta,mean=[0.]*len(theta),cov=self.model.totalCovariance(self.nsig))
-                gaussian = stats.multivariate_normal.logpdf(theta,mean=[0.]*len(theta),cov=self.model.V)
+                gaussian = stats.multivariate_normal.logpdf(theta,mean=[0.]*len(theta),cov=self.model.totalCovariance(self.nsig))
+                # gaussian = stats.multivariate_normal.logpdf(theta,mean=[0.]*len(theta),cov=self.model.V)
                 ret = - gaussian - sum(poisson)
             else:
-                # gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=self.model.totalCovariance(self.nsig))
-                gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=self.model.V)
+                gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=self.model.totalCovariance(self.nsig))
+                # gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=self.model.V)
                 ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
             return ret
         except ValueError as e:

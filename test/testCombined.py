@@ -32,6 +32,8 @@ class CombinedTest(unittest.TestCase):
                         res['AnalysisID'],res['DataSetID']])
             equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                                ignore=ignoreFields)
+            if not equals:
+                logger.error ( "%s differs form %s!" % ( "gluino_squarks_default_agg.py", outputfile) ) 
             self.assertTrue(equals)
         for i in [ outputfile, outputfile.replace(".py",".pyc") ]:
             if os.path.exists ( i ):
