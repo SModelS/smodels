@@ -215,6 +215,8 @@ class TopologyList(object):
         self.topos = []
         for topo in topologies:
             self.add(topo)
+        self.extraMissingElements = []    
+        
 
     def __ne__(self,other):
         return not self.__eq__(other)

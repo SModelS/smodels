@@ -61,23 +61,27 @@ class Uncovered(object):
         Fills all corresponding objects
         :ivar topoList: sms topology list
         """
-        for element in topoList.getElements(): # loop over all elements, by construction we start with the most compressed
-            if element.tested: continue
-            allElements = []
-            probabilities1, branches1 = addPromptAndDisplaced(element.branches[0])
-            probabilities2, branches2 = addPromptAndDisplaced(element.branches[1])               
-            for i,probability1 in enumerate(probabilities1):
-                for j,probability2 in enumerate(probabilities2): 
-                    newEl = element.copy()   
-                    newEl.tested = element.tested
-                    newEl.covered = element.covered
-                    newEl.branches[0].decayType = branches1[i].decayType
-                    newEl.branches[1].decayType = branches2[j].decayType      
-                    newEl.weight *= (probability1*probability2)            
-                    allElements.append(newEl)                       
-                        
-              
-            for el in allElements:                             
+        elements =  topoList.extraMissingElements + topoList.getElements()
+        for element in elements: # loop over all elements, by construction we start with the most compressed
+            if element.tested: continue  
+            if not element.branches[0].decayType:   
+                allElements = []       
+                probabilities1, branches1 = addPromptAndDisplaced(element.branches[0])
+                probabilities2, branches2 = addPromptAndDisplaced(element.branches[1])               
+                for i,probability1 in enumerate(probabilities1):
+                    for j,probability2 in enumerate(probabilities2): 
+                        newEl = element.copy()   
+                        newEl.tested = element.tested
+                        newEl.covered = element.covered
+                        newEl.branches[0].decayType = branches1[i].decayType
+                        newEl.branches[1].decayType = branches2[j].decayType      
+                        newEl.weight *= (probability1*probability2)    
+                        switchedElement = newEl.switchBranches()
+                        if not newEl in topoList.extraMissingElements and not switchedElement in topoList.extraMissingElements:     
+                            allElements.append(newEl) 
+            else: allElements = [element]                       
+ 
+            for el in allElements:                           
                 if self.inPrevMothers(el): 
                     missing = False # cannot be missing if element with same mothers has already appeared
                 # this is because it can certainly be compressed further to the smaller element already seen in the loop

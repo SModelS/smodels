@@ -209,7 +209,7 @@ class TxName(object):
                 in the Txname constraint or condition.
         """
         
-        for el in self._topologyList.getElements():       
+        for el in self._topologyList.getElements():      
             if element.particlesMatch(el, checkDecayType=False, branchOrder=True):
                 return element.copy()
             else:

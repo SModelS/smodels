@@ -261,35 +261,42 @@ def _getElementsFrom(smsTopList, dataset):
     :parameter smsTopList: list of topologies containing elements (TopologyList object)
     :returns: list of elements (Element objects)    
     """
-    
     elements = []  
+    newMissingelements = []
     for txname in dataset.txnameList:
         for top in smsTopList:      
             allNewElements = []
             hasTop = txname._topologyList.hasTopology(top)
             if not hasTop: continue                 
-            for i,el in enumerate(top.getElements()):        
+            for i,el in enumerate(top.getElements()):       
                 txnameEl = txname.hasElementAs(el)  #Check if element appears in txname                
                 if not txnameEl: continue  
-
                 newElements, factors = txname.getNewElementsAndFactors(txnameEl)
 
-                for i,newEl in enumerate(newElements):                                       
+                for i,newEl in enumerate(newElements):                                
                     if not factors[i]: continue                    
-                    newElement, eff = txname.checkDecayTypes(newEl)   
-                    if not eff: continue 
-                    else: newElement.tested = True                                        
-                    newElement.txname = txname                         
-                    newElement.weight *= factors[i]*eff                                     
-                    newElement.eff = factors[i]*eff 
+                    newElement, eff = txname.checkDecayTypes(newEl)    
+                    if eff: 
+                        newElement.tested = True                                        
+                        newElement.txname = txname                         
+                        newElement.weight *= factors[i]*eff                                     
+                        newElement.eff = factors[i]*eff  
+                    else: newElement.weight *= factors[i]     
       
                     if newElement.covered:
-                        el.covered = True             
+                        el.covered = True     
+                                
                     if newElement.tested:                                               
                         el.tested = True
                         elements.append(newElement) #Save element with correct branch ordering that are tested by experiment
+                    else: 
+                        if not newElement in newMissingelements: 
+                            newMissingelements.append(newElement)
 
-
+    # collect new elements that were reweighted and them  
+    newMissingelements = [missingEl for missingEl in newMissingelements if not missingEl in elements]
+    smsTopList.extraMissingElements = newMissingelements  
+                      
     return elements
 
 
