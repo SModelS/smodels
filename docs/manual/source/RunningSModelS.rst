@@ -144,7 +144,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 * *particles*: defines the particle content of the BSM model
  
-  * **module**: pathname to the Python file that defines the particle content of the BSM model, given either in Unix file notation ("/path/to/module.py") or as Python module path ("path.to.module"). Defaults to *share.models.default_particles* which is a standard MSSM. See smodels/share/models folder for more examples. Directory name can be omitted; in that case, the current working directory as well as smodels/share/models are searched for.
+  * **model**: pathname to the Python file that defines the particle content of the BSM model, given either in Unix file notation ("/path/to/model.py") or as Python module path ("path.to.model"). Defaults to *share.models.default_particles* which is a standard MSSM. See smodels/share/models folder for more examples. Directory name can be omitted; in that case, the current working directory as well as smodels/share/models are searched for.
 
 * *database*: allows for selection of a subset of :ref:`experimental results <ExpResult>` from the |database|
 
