@@ -10,14 +10,14 @@
 """
 
 from smodels.tools.physicsUnits import MeV , GeV
-from smodels.theory.particle import Particle, ParticleList
+from smodels.theory.particle import Particle, ParticleList,ParticleWildcard
 
 
 
 
 # SM particles
 
-anything = Particle(Z2parity=None, label='*', pdg=None, mass=None, eCharge=None, colordim=None, spin=None, width=None, decays=None)
+anything = ParticleWildcard()
 
 
 e = Particle(Z2parity='even', label='e-', pdg=11, mass=0.5*MeV, eCharge=-1, colordim=0, spin=1./2, width=0, decays=None) 

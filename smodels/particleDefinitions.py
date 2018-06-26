@@ -16,10 +16,22 @@
 
 
 from smodels import SMparticleDefinitions, MSSMparticleDefinitions
-
+from smodels.theory.particle import Particle,ParticleList
 
 # all particles and particle lists from the SM
-SM = [getattr(SMparticleDefinitions,pname) for pname in dir(SMparticleDefinitions)]
-BSM = [getattr(MSSMparticleDefinitions,pname) for pname in dir(MSSMparticleDefinitions)]
+SM = []
+for pname in dir(SMparticleDefinitions):
+    obj =  getattr(SMparticleDefinitions,pname)
+    if not isinstance(obj,Particle) and not isinstance(obj,ParticleList):
+        continue
+    SM.append(obj)
+    
+BSM = []
+for pname in dir(MSSMparticleDefinitions):
+    obj =  getattr(MSSMparticleDefinitions,pname)
+    if not isinstance(obj,Particle) and not isinstance(obj,ParticleList):
+        continue
+    BSM.append(obj)
+    
 BSM = SM + BSM
 

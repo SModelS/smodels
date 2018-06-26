@@ -37,7 +37,7 @@ def getObjectFromLabel(label):
     :returns: Particles object or ParticleList object
     """    
 
-    for particle in BSM:
+    for particle in BSM:         
         if particle.label == label:
             return particle 
 

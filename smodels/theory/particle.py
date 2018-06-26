@@ -80,11 +80,17 @@ class Particle(object):
                  
 
     def __lt__( self, p2 ):
-        return self.__cmp__ ( p2 ) == -1
+        return self.__cmp__(p2) == -1
+
+    def __gt__( self, p2 ):
+        return self.__cmp__(p2) == 1
 
     def __eq__( self, p2 ):
-        return self.__cmp__ ( p2 ) == 0
+        return self.__cmp__(p2) == 0
         
+    def __ne__( self, p2 ):
+        return self.__cmp__(p2) != 0
+
 
     def __str__(self): 
         if hasattr(self, 'label'):
@@ -207,8 +213,10 @@ class ParticleList(object):
         if isinstance(other,ParticleList):
             if self.particles != other.particles:
                 comp = self.particles > other.particles
-                if comp: return 1
-                else: return -1 
+                if comp:
+                    return 1
+                else:
+                    return -1 
             else:
                 return 0
         
@@ -219,7 +227,18 @@ class ParticleList(object):
                 for p in self.particles:
                     if p > other: return +1
                 return -1
+            
+    def __eq__( self, p2 ):
+        return self.__cmp__(p2) == 0
+        
+    def __ne__( self, p2 ):
+        return self.__cmp__(p2) != 0
+    
+    def __lt__( self, p2 ):
+        return self.__cmp__(p2) == -1
 
+    def __gt__( self, p2 ):
+        return self.__cmp__(p2) == 1
 
     def __str__(self): 
         
@@ -237,9 +256,9 @@ class ParticleList(object):
         :return: Attribute or list with the attribute values in self.particles
         """
         
-        if hasattr(self, name):
-            return ParticleList.__getattribute__(self, name)
-        else:
+        try:
+            return object.__getattribute__(self, name)
+        except:
             values = [getattr(particle,name) for particle in self.particles]
             if len(list(set(values))) == 1:
                 values = values[0]
@@ -279,5 +298,28 @@ class ParticleList(object):
         
         neutrals = [particle.isNeutral() for particle in self.particles]
         return sum(neutrals) == len(self.particles)
+
+
+class ParticleWildcard(Particle):
+    """
+    A particle wildcard class. It will return True when compared to any other Particle or ParticleList object.
+    """
     
+    def __init__(self):
+        Particle.__init__(self,label='*',pdg=None)
+        
+    def __repr__(self):
+        return self.__str__()
+
+    def __cmp__(self,other):
+        if isinstance(other,Particle) or isinstance(other,ParticleList):
+            return 0
+        else:
+            return -1
+
+    def __eq__(self,other):
+        return self.__cmp__(other) == 0  
+    
+    def __ne__(self,other):
+        return self.__cmp__(other) != 0    
         
