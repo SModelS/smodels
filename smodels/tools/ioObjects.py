@@ -15,7 +15,8 @@ from smodels.theory import lheReader
 from smodels.tools.physicsUnits import GeV, fb
 from smodels import installation
 import pyslha
-from smodels.particles import qNumbers, rEven
+from smodels.particleDefinitions import SMpdgs
+from smodels.theory.particleNames import getObjectFromPdg
 from smodels.theory import crossSection
 from smodels.theory.theoryPrediction import TheoryPrediction
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
@@ -368,7 +369,7 @@ class SlhaStatus(object):
 
     def findMissingDecayBlocks(self, findMissingBlocks):
         """
-        For all non-rEven particles listed in mass block, check if decay block is written
+        For all non-SMpdgs particles listed in mass block, check if decay block is written
         
         :returns: status flag and message
         
@@ -379,7 +380,7 @@ class SlhaStatus(object):
         missing = []
         pids = self.slha.blocks["MASS"].keys()
         for pid in pids:
-            if pid in rEven:
+            if pid in SMpdgs:
                 continue
             if not pid in self.slha.decays:
                 missing.append(pid)
@@ -403,14 +404,14 @@ class SlhaStatus(object):
         st = 1
         badDecay = "Illegal decay for PIDs "
         for particle, block in self.slha.decays.items():
-            if particle in rEven : continue
+            if particle in SMpdgs : continue
             if not particle in self.slha.blocks["MASS"].keys(): continue
             mMom = abs(self.slha.blocks["MASS"][particle])
             for dcy in block.decays:
                 mDau = 0.
                 for ptc in dcy.ids:
                     ptc = abs(ptc)
-                    if ptc in SMmasses: mDau += SMmasses[ptc]
+                    if ptc in SMpdgs: mDau += getObjectFromPdg(ptc).mass
                     elif ptc in self.slha.blocks["MASS"].keys(): mDau += abs(self.slha.blocks["MASS"][ptc])
                     else:
                         return -2, "Unknown PID %s in decay of %s" % (str(ptc), str(particle) + ". Add " + str(ptc) + " to smodels/particle.py")
@@ -456,18 +457,18 @@ class SlhaStatus(object):
         """
         if not checkLSP:
             return 0, "Did not check for charged lsp"
-        qn = Qnumbers(self.lsp)
-        if qn.pid == 0:
+        lsp = getObjectFromPdg(self.lsp) 
+        if lsp.pdg ==0:
             return -1, "lsp pid " + str(self.lsp) + " is not known\n"
-        if qn.charge3 != 0 or qn.cdim != 1:
-            return -1, "lsp has 3*electrical charge = " + str(qn.charge3) + \
-                       " and color dimension = " + str(qn.cdim) + "\n"
+        if lsp.eCharge != 0 or lsp.colordim != 0:
+            return -1, "lsp has 3*electrical charge = " + str(3*lsp.eCharge) + \
+                       " and color dimension = " + str(lsp.colordim) + "\n"           
         return 1, "lsp is neutral"
 
 
     def findLSP(self, returnmass=None):
         """
-        Find lightest particle (not in rEven).
+        Find lightest particle (not in SMpdgs).
         
         :returns: pid, mass of the lsp, if returnmass == True
         
@@ -475,7 +476,7 @@ class SlhaStatus(object):
         pid = 0
         minmass = None
         for particle, mass in self.slha.blocks["MASS"].items():
-            if particle in rEven:
+            if particle in SMpdgs:
                 continue
             mass = abs(mass)
             if minmass == None:
@@ -542,7 +543,7 @@ class SlhaStatus(object):
 
     def findNLSP(self, returnmass=None):
         """
-        Find second lightest particle (not in rEven).
+        Find second lightest particle (not in SMpdgs).
         
         :returns: pid ,mass of the NLSP, if returnmass == True
         
@@ -552,7 +553,7 @@ class SlhaStatus(object):
         minmass = None
         for particle, mass in self.slha.blocks["MASS"].items():
             mass = abs(mass)
-            if particle == lsp or particle in rEven:
+            if particle == lsp or particle in SMpdgs:
                 continue
             if minmass == None:
                 pid, minmass = particle, mass
@@ -615,7 +616,7 @@ class SlhaStatus(object):
         missingList = []
         ltstr = ""
         for pid in xsecList.getPIDs():
-            if pid in rEven: continue
+            if pid in SMpdgs: continue
             if pid == self.findLSP(): continue
             xsecmax = xsecList.getXsecsFor(pid).getMaxXsec()
             if xsecmax < self.sigmacut: continue
@@ -674,10 +675,10 @@ class SlhaStatus(object):
         """
         if pid in SMvisible: return True
         if pid in SMinvisible: return False
-        qn = Qnumbers(pid)
-        if qn.pid == 0:
+        particle = getObjectFromPdg(pid)
+        if particle.pdg == 0:
             return True
-        if qn.charge3 != 0 or qn.cdim != 1:
+        if particle.eCharge != 0 or particle.colordim != 1:
             return True
         if decay:
             if not pid in self.slha.decays:
@@ -689,24 +690,6 @@ class SlhaStatus(object):
         return False
 
 
-class Qnumbers:
-    """
-    An instance of this class represents quantum numbers.
-    
-    Get quantum numbers (spin*2, electrical charge*3, color dimension) from qNumbers.
-    
-    """
-    def __init__(self, pid):
-        self.pid = pid
-        if not pid in qNumbers.keys():
-            self.pid = 0
-        else:
-            self.l = qNumbers[pid]
-            self.spin2 = self.l[0]
-            self.charge3 = self.l[1]
-            self.cdim = self.l[2]
-
-SMmasses = {1: 4.8e-3 , 2: 2.3e-3 , 3: 95e-2 , 4: 1.275 , 5: 4.18 , 6: 173.21 , 11: 0.51099e-3 , 12: 0, 13: 105.658e-3 , 14: 0 , 15: 1.177682 , 16: 0 , 21: 0 , 22: 0 , 23: 91.1876 , 24: 80.385 , 25: 125.5, 111: 0.135, 211: 0.140}
 
 SMvisible = [1, 2, 3, 4, 5, 6, 11, 13, 15, 21, 22, 23, 24, 25, 211, 111]
 SMinvisible = [12, 14, 16]

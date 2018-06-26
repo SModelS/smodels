@@ -74,7 +74,7 @@ class Topology(object):
         :param other:  topology to be compared (Topology object)
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
-        
+
         #Check for any permutation of branches:
         for v1 in itertools.permutations(self.vertparts):
             for v2 in itertools.permutations(other.vertparts):
@@ -131,7 +131,7 @@ class Topology(object):
         Get list of elements of the topology.
 
         :return: elementList (list of Element objects)
-        """
+        """        
         return self.elementList
 
     
@@ -149,22 +149,23 @@ class Topology(object):
 
         # If the topology info has not been set yet, set it using the element
         # info
+
         if not self.vertparts:
             self.vertparts = newelement.getEinfo()["vertparts"]
         if not self.vertnumb:
             self.vertnumb = newelement.getEinfo()["vertnumb"]
 
         #First check if element matches topology structure
-        info = newelement.getEinfo()        
+        info = newelement.getEinfo()       
+
         if info != self._getTinfo():
             logger.warning('Element to be added does not match topology')
             return False
         
-        index = index_bisect(self.elementList,newelement)        
+        index = index_bisect(self.elementList,newelement)   
+                
         if index != len(self.elementList) and self.elementList[index] == newelement:
-            self.elementList[index].weight.combineWith(newelement.weight)
-            self.elementList[index].combinePIDs(newelement)
-            self.elementList[index].combineMotherElements(newelement)
+            self.elementList[index].combineWith(newelement)     
         else:
             self.elementList.insert(index,newelement)
 
@@ -212,6 +213,8 @@ class TopologyList(object):
         self.topos = []
         for topo in topologies:
             self.add(topo)
+        self.extraMissingElements = []    
+        
 
     def __ne__(self,other):
         return not self.__eq__(other)
@@ -329,14 +332,14 @@ class TopologyList(object):
         topoDummy = Topology()
         topoDummy.elementList.append(newelement)
         topoDummy.vertnumb = elInfo["vertnumb"]
-        topoDummy.vertparts = elInfo["vertparts"]
+        topoDummy.vertparts = elInfo["vertparts"]        
         
         index = index_bisect(self,topoDummy)
         if index != len(self) and self.topos[index] == topoDummy:
             self.topos[index].addElement(newelement)
-        else:
-            self.topos.insert(index,topoDummy)
-
+        else:   
+            self.topos.insert(index,topoDummy)    
+            
 
     def getTotalWeight(self):
         """
@@ -357,13 +360,14 @@ class TopologyList(object):
 
         """
         elements = []
-        for top in self.topos:
-            elements.extend(top.elementList)
+        for top in self.topos:                  
+            elements.extend(top.elementList)             
         return elements
+                
     
     def compressElements(self,doCompress,doInvisible,minmassgap):        
         """
-        Compress all elements in the list and included the compressed
+        Compress all elements in the list and include the compressed
         elements in the topology list.
         
         :parameter doCompress: if True, perform mass compression
@@ -373,15 +377,18 @@ class TopologyList(object):
                                (if mass difference < minmassgap, perform mass compression)
 
         """
-        
-        for el in self.getElements():
+           
+        for el in self.getElements():                      
             newElements = el.compressElement(doCompress,doInvisible,minmassgap)
+
             if not newElements:
                 continue
-            for newelement in newElements:
-                newelement.sortBranches()  #Make sure elements are sorted BEFORE adding them
-                self.addElement(newelement)
-
+            for newelement in newElements:                               
+                newelement.sortBranches()  #Make sure elements are sorted BEFORE adding them                                         
+                    
+                self.addElement(newelement)    
+                
+                
     def _setElementIds(self):
         """
         Assign unique ID to each element in the Topology list
@@ -390,3 +397,5 @@ class TopologyList(object):
         for element in self.getElements():
             element.elID = elID
             elID += 1
+
+

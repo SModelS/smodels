@@ -7,9 +7,9 @@
 """
 
 from smodels.theory.particleNames import elementsInStr
-from smodels.theory.branch import Branch,BranchWildcard
+from smodels.theory.branch import Branch, BranchWildcard
 from smodels.theory import crossSection
-from smodels.particles import rEven, ptcDic
+from smodels.theory.particleNames import getNamesList
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -39,8 +39,9 @@ class Element(object):
                          
         """
         self.branches = [Branch(), Branch()]
-        self.weight = crossSection.XSectionList()
-        self.motherElements = []
+        self.weight = crossSection.XSectionList() # gives the weight for all decays promptly
+        self.decayLabels = []
+        self.motherElements = [("original", self)]
         self.elID = 0
         self.covered = False
         self.tested = False
@@ -56,29 +57,32 @@ class Element(object):
                     logger.error("Malformed input string. Number of elements "
                                   "is %d (expected 1) in: ``%s''", nel, info)
                     return None
-                else:
+                else:                                       
                     el = elements[0]
-                    branches = elementsInStr(el[1:-1])
+                    branches = elementsInStr(el[1:-1])               
                     if not branches or len(branches) != 2:
                         logger.error("Malformed input string. Number of "
                                       "branches is %d (expected 2) in: ``%s''",
                                       len(branches), info)
                         return None
-                    self.branches = []                    
-                    for branch in branches:
+                    self.branches = []
+                    if finalState:
+                        if len(finalState) != len(branches):
+                            raise SModelSError("Number of final states (%i) does not match number of branches (%i)" 
+                                               %(len(finalState),len(branches)))
+                    else:
+                        finalState = [None]*len(branches)                  
+                    for ibr,branch in enumerate(branches):                        
                         if branch == '[*]':
-                            self.branches.append(BranchWildcard())
+                            self.branches.append(BranchWildcard())                            
                         else:
-                            self.branches.append(Branch(branch))
+                            self.branches.append(Branch(branch,finalState[ibr])) 
+
             # Create element from branch pair
             elif type(info) == type([]) and type(info[0]) == type(Branch()):
                 for ib, branch in enumerate(info):
                     self.branches[ib] = branch.copy()
         
-        if finalState is None:
-            self.setFinalState([finalState]*len(self.branches))
-        else:
-            self.setFinalState(finalState)
     
     def __cmp__(self,other):
         """
@@ -91,9 +95,9 @@ class Element(object):
 
         if not isinstance(other,Element):
             return -1
-                
+
         #Compare branches:
-        if self.branches != other.branches:            
+        if self.branches != other.branches:          
             comp = self.branches > other.branches
             if comp: return 1
             else: return -1
@@ -133,25 +137,12 @@ class Element(object):
             br.sortParticles()
         #Now sort branches
         self.branches = sorted(self.branches)
-        
-    def setFinalState(self,finalStates):
-        """
-        If finalStates = None, define the element final states according to the PID of the
-        last R-odd particle appearing in the cascade decay.
-        Else set the final states according to the finalStates list (must
-        match the branch ordering)
-        
-        :parameter finalStates: List with final state labels (must match the branch ordering)
-        """
 
-        for i,br in enumerate(self.branches):
-            br.setFinalState(finalStates[i])
 
-    def particlesMatch(self, other, branchOrder=False):
+    def particlesMatch(self, other, checkDecayType=False, branchOrder=False):
         """
         Compare two Elements for matching particles only.
-        Allow for inclusive particle labels (such as the ones defined in particles.py)
-        and includes final state comparison.
+        Allow for inclusive particle labels (such as the ones defined in particleDefinitions.py).
         If branchOrder = False, check both branch orderings.
         
         :parameter other: element to be compared (Element object)
@@ -160,8 +151,10 @@ class Element(object):
         :returns: True, if particles match; False, else;        
         """
 
-        
         if not isinstance(other,Element):
+            return False
+
+        if type(self) != type(other):
             return False
         
         if len(self.branches) != len(other.branches):
@@ -177,7 +170,7 @@ class Element(object):
             return False
         else:       
         #Now check for opposite order
-            for ib,br in enumerate(self.switchBranches().branches):
+            for ib,br in enumerate(self.switchBranches().branches):                
                 if not br.particlesMatch(other.branches[ib]):
                     return False
 
@@ -203,35 +196,6 @@ class Element(object):
         return newel
 
 
-    def setMasses(self, mass, sameOrder=True, opposOrder=False):
-        """
-        Set the element masses to the input mass array.
-        
-        
-        :parameter mass: list of masses ([[masses for branch1],[masses for branch2]])
-        :parameter sameOrder: if True, set the masses to the same branch ordering
-                              If True and opposOrder=True, set the masses to the
-                              smaller of the two orderings.
-        :parameter opposOrder: if True, set the masses to the opposite branch ordering.
-                               If True and sameOrder=True, set the masses to the
-                               smaller of the two orderings.             
-        """
-        if sameOrder and opposOrder:
-            newmass = sorted(mass)
-        elif sameOrder:
-            newmass = mass
-        elif opposOrder:
-            newmass = [mass[1], mass[0]]
-        else:
-            logger.error("Called with no possible ordering")            
-            raise SModelSError()
-        if len(newmass) != len(self.branches):
-            logger.error("Called with wrong number of mass branches")
-            raise SModelSError()
-
-        for i, mass in enumerate(newmass):
-            self.branches[i].masses = mass[:]
-
 
     def switchBranches(self):
         """
@@ -248,90 +212,132 @@ class Element(object):
 
     def getParticles(self):
         """
-        Get the array of particles in the element.
+        Get the array of particle labels in the element.
         
         :returns: list of particle strings                
         """
         
         ptcarray = []
+
         for branch in self.branches:
-            ptcarray.append(branch.particles)
+            particleNames = [[particle.label for particle in particleList ] for particleList in branch.particles ]
+            ptcarray.append(particleNames)                
         return ptcarray
     
     def getFinalStates(self):
         """
-        Get the array of particles in the element.
+        Get the array of final state (last BSM particle) labels in the element.
         
         :returns: list of particle strings                
         """
         
         fsarray = []
         for branch in self.branches:
-            fsarray.append(branch.finalState)
-        return fsarray    
+            fsarray.append(branch.BSMparticles[-1].label)
+        return fsarray
 
 
     def getMasses(self):
         """
-        Get the array of masses in the element.    
+        Get the array of BSM masses in the element.    
         
         :returns: list of masses (mass array)            
-        """
-        massarray = []
-        for branch in self.branches:
-            massarray.append(branch.masses)
+        """        
+        
+        massarray = [branch.getMasses() for branch in self.branches]
+
         return massarray
+        
+    def getBSMparticles(self):
+        """
+        Get the list of BSM particles appearing the cascade decay,
+        including the last (stable) one.
+
+        :returns: list of Particle or ParticleList objects
+        """    
+        
+        BSMparticles = []
+        for branch in self.branches:
+            BSMparticles.append([particle for particle in branch.BSMparticles])      
+
+        return BSMparticles
 
     def getPIDs(self):
         """
         Get the list of IDs (PDGs of the intermediate states appearing the cascade decay), i.e.
         [  [[pdg1,pdg2,...],[pdg3,pdg4,...]] ].
-        The list might have more than one entry if the element combines different pdg lists:
-        [  [[pdg1,pdg2,...],[pdg3,pdg4,...]],  [[pdg1',pdg2',...],[pdg3',pdg4',...]], ...]
         
         :returns: list of PDG ids
         """
-        
-        pids = []
-        for PIDlist in self.branches[0].PIDs:            
-            for PIDlist2 in self.branches[1].PIDs:
-                pids.append([PIDlist,PIDlist2])
-        
-        return pids
+
+        BSMpids = []
+        for branch in self.getBSMparticles():
+            BSMpids.append([particle.pdg for particle in branch])
+
+        return BSMpids
 
     def getDaughters(self):
         """
-        Get a pair of daughter IDs (PDGs of the last intermediate 
-        state appearing the cascade decay), i.e. [ [pdgLSP1,pdgLSP2] ]    
-        Can be a list, if the element combines several daughters:
-        [ [pdgLSP1,pdgLSP2],  [pdgLSP1',pdgLSP2']] 
+        Get the list of daughter (last/stable BSM particle in the decay) PDGs. 
+        Can be a nested list, if the element combines several daughters:
+        [ [pdgDAUG1,pdgDAUG2],  [pdgDAUG1',pdgDAUG2']] 
+
         
         :returns: list of PDG ids
         """
         
-        pids = self.getPIDs()
         daughterPIDs = []
-        for pidlist in pids:
-            daughterPIDs.append([pidlist[0][-1],pidlist[1][-1]])
+        for branch in self.branches():
+            daughterPIDs.append(branch.BSMparticles[-1].pdg)
             
         return daughterPIDs
     
     def getMothers(self):
         """
-        Get a pair of mother IDs (PDGs of the first intermediate 
-        state appearing the cascade decay), i.e. [ [pdgMOM1,pdgMOM2] ]    
-        Can be a list, if the element combines several mothers:
+        Get list of mother PDGs.    
+        Can be a nested list, if the element combines several mothers:
         [ [pdgMOM1,pdgMOM2],  [pdgMOM1',pdgMOM2']] 
         
         :returns: list of PDG ids
+        """                        
+
+        momPIDs = []
+        for branch in self.branches:
+            momPIDs.append(branch.BSMparticles[0].pdg)        
+        return momPIDs    
+        
+    def getMotherPIDs(self):
+        """
+        Get PIDs of all mothers.
+        
+        :returns: list of mother PDG ids
         """
         
-        pids = self.getPIDs()
-        momPIDs = []
-        for pidlist in pids:
-            momPIDs.append([pidlist[0][0],pidlist[1][0]])
-            
-        return momPIDs    
+        # get a list of all original mothers, i.e. that only consists of first generation elements
+        allmothers = self.motherElements
+        while not all(mother[0] == 'original' for mother in allmothers):                        
+            for im, mother in enumerate(allmothers):
+                if mother[0] != 'original':
+                    allmothers.extend( mother[1].motherElements )
+                    allmothers.pop(im)                                    
+
+        # get the PIDs of all mothers      
+        motherPids = []
+        for mother in allmothers:  
+            motherPids.append( mother[1].getPIDs() ) 
+
+        branch1 = []
+        branch2 = []
+        for motherPid in motherPids:
+            branch1.append(motherPid[0])
+            branch2.append(motherPid[1])
+        for pid1 in branch1:
+            for pid2 in branch2:
+                pids = [pid1,pid2]
+                if not pids in motherPids: motherPids.append(pids)  
+   
+        return motherPids     
+        
 
 
     def getEinfo(self):
@@ -370,14 +376,15 @@ class Element(object):
                   and exits otherwise.
         """
         info = self.getEinfo()
+        particleLabels = getNamesList()
         for ib, branch in enumerate(self.branches):
             for iv, vertex in enumerate(branch.particles):
                 if len(vertex) != info['vertparts'][ib][iv]:
                     logger.error("Wrong syntax")
                     raise SModelSError()
                 for ptc in vertex:
-                    if not ptc in rEven.values() and not ptc in ptcDic:
-                        logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
+                    if not ptc in particleLabels:
+                        logger.error("Unknown particle. Add " + ptc + " to smodels/particleDefinitions.py")
                         raise SModelSError()
         return True
 
@@ -396,10 +403,11 @@ class Element(object):
         """
         
         if not doCompress and not doInvisible:
-            return []
+            return []            
         
         added = True
         newElements = [self]
+          
         # Keep compressing the new topologies generated so far until no new
         # compressions can happen:
         while added:
@@ -423,8 +431,23 @@ class Element(object):
                         newElements.append(newel)
                         added = True
 
-        newElements.pop(0)  # Remove original element
+        newElements.pop(0)  # Remove original element   
         return newElements
+    
+    
+    def removeVertex(self,ibr,iv):
+        """
+        Remove vertex iv located in branch ibr.
+        The "vertex-mother" in BSMparticles and (SM) particles in the vertex
+        are removed from the branch. The vertex index corresponds
+        to the BSM decay (iv = 0 will remove the first BSM particle,...)
+        
+        :parameter ibr: Index of branch (int)
+        :parameter iv: Index of vertex in branch ibr (int)
+        
+        """
+        
+        self.branches[ibr].removeVertex(iv)
 
     def massCompress(self, minmassgap):
         """
@@ -436,36 +459,86 @@ class Element(object):
         :returns: compressed copy of the element, if two masses in this
                   element are degenerate; None, if compression is not possible;        
         """
-        
-        masses = self.getMasses()
-        massDiffs = []
-        #Compute mass differences in each branch
-        for massbr in masses:
-            massDiffs.append([massbr[i]-massbr[i+1] for i in range(len(massbr)-1)])
-        #Compute list of vertices to be compressed in each branch            
-        compVertices = []
-        for ibr,massbr in enumerate(massDiffs):
-            compVertices.append([])
-            for iv,massD in enumerate(massbr):            
-                if massD < minmassgap: compVertices[ibr].append(iv)
-        if not sum(compVertices,[]): return None #Nothing to be compressed
-        else:
-            newelement = self.copy()
-            newelement.motherElements = [ ("mass", self) ]
-            for ibr,compbr in enumerate(compVertices):
-                if compbr:            
-                    new_branch = newelement.branches[ibr]
-                    ncomp = 0
-                    for iv in compbr:
-                        new_branch.masses.pop(iv-ncomp)
-                        new_branch.particles.pop(iv-ncomp)
-                        ncomp +=1
-                    new_branch.setInfo() 
 
-        newelement.sortBranches()
-        return newelement
+        newelement = self.copy()
+        newelement.motherElements = [("mass", self)]
+        #Loop over branches and look for small mass differences 
+        for ibr,branch in enumerate(newelement.branches):
+            #Get mass differences      
+            massDiffs = [mom.mass - branch.BSMparticles[i+1].mass for i,mom in branch.BSMparticles[:-1]]
+            #Get vertices which have deltaM < minmassgap:
+            removeVertices = [iv for iv,m in enumerate(massDiffs) if m < minmassgap]
+            #Remove vertices till they exist:
+            while removeVertices:
+                newelement.removeVertex(ibr,removeVertices[0])
+                branch = newelement.branches[ibr]
+                massDiffs = [mom.mass - branch.BSMparticles[i+1].mass for i,mom in branch.BSMparticles[:-1]]
+                removeVertices = [iv for iv,m in enumerate(massDiffs) if m < minmassgap]
+                
+        for ibr,branch in enumerate(newelement.branches):
+            if branch.vertnumb != self.branches[ibr].vertnumb:
+                newelement.sortBranches()
+                return newelement
+            
+        #New element was not compressed, return None
+        return None
     
 
+    def invisibleCompress(self):
+        """
+        Perform invisible compression.
+        
+        :returns: compressed copy of the element, if element ends with invisible
+                  particles; None, if compression is not possible
+        """
+        
+        newelement = self.copy()
+        newelement.motherElements = [("invisible", self)]
+
+        # Loop over branches
+        for branch in newelement.branches:
+            #Check if the last decay should be removed:            
+            neutralSM = [ptc.isNeutral for ptc in branch.particles[-1]]
+            if branch.BSMparticles[-2].isNeutral() and (not False in neutralSM):
+                removeLastVertex = True
+            else:
+                removeLastVertex = False
+                
+            while len(branch.BSMparticles) > 1 and removeLastVertex:
+                branch.removeVertex(len(branch.BSMparticles)-2)
+                #Re-check if the last decay should be removed:            
+                neutralSM = [ptc.isNeutral for ptc in branch.particles[-1]]
+                if branch.BSMparticles[-2].isNeutral() and (not False in neutralSM):
+                    removeLastVertex = True
+                else:
+                    removeLastVertex = False
+
+        for ibr,branch in enumerate(newelement.branches):
+            if branch.vertnumb != self.branches[ibr].vertnumb:
+                newelement.sortBranches()
+                return newelement
+            
+        #New element was not compressed, return None
+        return None
+
+
+    def combineWith(self, other):
+        """
+        Combine two elements. Should only be used if the elements
+        are considered as equal.
+        The elements branches and weights are combined as well as their mothers. 
+        
+        :parameter other: element (Element Object)  
+        """
+        
+        if self != other:
+            raise SModelSError("Asked to combine distinct elements")
+                
+        self.motherElements += other.motherElements
+        self.weight.combineWith(other.weight)
+        for ibr,branch in enumerate(self.branches):
+            branch.combineWith(other.branches[ibr])
+    
     def hasTopInList(self, elementList):
         """
         Check if the element topology matches any of the topologies in the
@@ -486,62 +559,3 @@ class Element(object):
                 return True
         return False
 
-
-    def invisibleCompress(self):
-        """
-        Perform invisible compression.
-        
-        :returns: compressed copy of the element, if element ends with invisible
-                  particles; None, if compression is not possible
-        """
-        newelement = self.copy()
-        newelement.motherElements = [ ("invisible", self) ]
-
-        # Loop over branches
-        for ib, branch in enumerate(self.branches):
-            #Make sure to only compress branches ending up in MET
-            if not branch.finalState == 'MET':
-                continue
-            particles = branch.particles
-            if not branch.particles:
-                continue # Nothing to be compressed
-            #Go over the branch starting at the end and remove invisible vertices: 
-            for ivertex in reversed(range(len(particles))):
-                if particles[ivertex].count('nu') == len(particles[ivertex]):
-                    newelement.branches[ib].masses.pop(ivertex+1)
-                    newelement.branches[ib].particles.pop(ivertex)
-                else:
-                    break
-            newelement.branches[ib].setInfo()
-
-        newelement.sortBranches()
-        if newelement == self:
-            return None
-        else:            
-            return newelement
-
-
-    def combineMotherElements ( self, el2 ):
-        """
-        Combine mother elements from self and el2 into self
-        
-        :parameter el2: element (Element Object)  
-        """
-        
-        self.motherElements += el2.motherElements
-
-
-    def combinePIDs(self,el2):
-        """
-        Combine the PIDs of both elements. If the PIDs already appear in self,
-        do not add them to the list.
-        
-        :parameter el2: element (Element Object) 
-        """
-           
-        elPIDs = self.getPIDs()
-        newelPIDs = el2.getPIDs()
-        for pidlist in newelPIDs:                    
-            if not pidlist in elPIDs:
-                self.branches[0].PIDs.append(pidlist[0])
-                self.branches[1].PIDs.append(pidlist[1])

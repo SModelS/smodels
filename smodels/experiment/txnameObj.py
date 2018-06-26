@@ -18,6 +18,7 @@ from smodels.theory.particleNames import elementsInStr
 from smodels.tools.stringTools import concatenateLines
 from smodels.theory.element import Element
 from smodels.theory.topology import TopologyList
+from smodels.theory.updateParticles import addPromptAndDisplaced
 from smodels.tools.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.caching import _memoize
@@ -76,14 +77,15 @@ class TxName(object):
             if tags.count(tag) != 1:
                 logger.info("Duplicated field %s found in file %s" \
                              % (tag, self.path))
-            if ';' in value: value = value.split(';')
+            if ';' in value: value = value.split(';')            
+            
             if tag == 'upperLimits' or tag == 'efficiencyMap':
                 data = value
                 dataType = tag
             elif tag == 'expectedUpperLimits':
                 expectedData = value
                 dataType = 'upperLimits'
-            else:
+            else:          
                 self.addInfo(tag,value)
 
         ident = self.globalInfo.id+":"+dataType[0]+":"+ str(self._infoObj.dataId)
@@ -160,29 +162,23 @@ class TxName(object):
         
         :param tag: information label (string)
         :param value: value for the field in string format
-        """
-
-        if tag == 'constraint' or tag == 'condition':
+        """   
+        if tag == 'constraint' or tag == 'condition':        
             if isinstance(value,list):
                 value = [val.replace("'","") for val in value]
             else:
                 value = value.replace("'","")
-
-        if tag == 'constraint' or tag == 'condition':
-            if isinstance(value,list):
-                value = [val.replace("'","") for val in value]
-            else:
-                value = value.replace("'","")
-            setattr(self,tag,value) #Make sure constraints/conditions are not evaluated
+            if value == 'None': setattr(self,tag, eval(value))                           
+            else: setattr(self,tag, value) #Make sure constraints/conditions are not evaluated
         else:
             try:
-                setattr(self,tag,eval(value, unitsDict))
+                setattr(self,tag,eval(value, unitsDict))              
             except SyntaxError:
                 setattr(self,tag,value)
             except NameError:
                 setattr(self,tag,value)
             except TypeError:
-                setattr(self,tag,value)
+                setattr(self,tag,value)               
 
 
     def getInfo(self, infoLabel):
@@ -196,7 +192,7 @@ class TxName(object):
         if hasattr(self,infoLabel): return getattr(self,infoLabel)
         else: return False
 
-    def hasElementAs(self,element):
+    def hasElementAs(self,element, switchBranches = True):
         """
         Verify if the conditions or constraint in Txname contains the element.
         Check both branch orderings.
@@ -205,18 +201,19 @@ class TxName(object):
         :return: A copy of the element on the correct branch ordering appearing
                 in the Txname constraint or condition.
         """
-
-        for el in self._topologyList.getElements():
-            if element.particlesMatch(el,branchOrder=True):
+        
+        for el in self._topologyList.getElements():      
+            if element.particlesMatch(el, checkDecayType=False, branchOrder=True):
                 return element.copy()
             else:
-                elementB = element.switchBranches()
-                if elementB.particlesMatch(el,branchOrder=True):
-                    return elementB
+                if switchBranches:
+                    elementB = element.switchBranches()
+                    if elementB.particlesMatch(el, checkDecayType=False, branchOrder=True): 
+                        return elementB
         return False
 
 
-    def getEfficiencyFor(self,mass):
+    def getEfficiencyFor(self,element):
         """
         For upper limit results, checks if the input mass falls inside the
         upper limit grid.  If it does, returns efficiency = 1, else returns
@@ -229,7 +226,7 @@ class TxName(object):
         """
         
         #Check if the element appears in Txname:
-        val = self.txnameData.getValueFor(mass)
+        val = self.txnameData.getValueFor(element.getMasses())
         if isinstance(val,unum.Unum):
             return 1.  #The element has an UL, return 1
         elif val is None or math.isnan(val):
@@ -239,6 +236,32 @@ class TxName(object):
         else:
             logger.error("Unknown txnameData value: %s" % (str(type(val))))
             raise SModelSError()
+        return val
+        
+    def getNewElementsAndFactors(self,element):    
+        """
+        Calculates factors for reweighting for all possible decay types and generates new elements.
+        :param element: Element object to be reweighted
+        :return: elements generated from combinations of decay types, effs = factors for reweighting
+        """                       
+                            
+        probabilities1, branches1 = addPromptAndDisplaced(element.branches[0]) 
+        probabilities2, branches2 = addPromptAndDisplaced(element.branches[1])
+
+        newElements = []        
+        factors = []
+        for i,probability1 in enumerate(probabilities1):
+            for j,probability2 in enumerate(probabilities2):
+                                
+                newEl = element.copy()
+                newEl.branches[0].decayType = branches1[i].decayType
+                newEl.branches[1].decayType = branches2[j].decayType 
+                factor = (probability1*probability2) 
+                newElements.append(newEl)         
+                factors.append(factor)                
+    
+        return newElements, factors
+        
 
 class TxNameData(object):
     """
@@ -434,7 +457,6 @@ class TxNameData(object):
         self.dataShape = self.getDataShape(val[0][0]) #Store the data (mass) format (useful if there are wildcards)        
         self.value = self.removeUnits(val) #Remove units and store the normalization units
         self.value = self.removeWildCards(self.value)
-
 
         if len(self.value) < 1 or len(self.value[0]) < 2:
                 raise SModelSError("input value not in correct format. expecting sth " \
@@ -897,7 +919,7 @@ class Delaunay1D:
 
 if __name__ == "__main__":
 
-    from smodels.tools.physicsUnits import GeV
+    from smodels.tools.physicsUnits import GeV,fb
     data = [ [ [[ 150.*GeV, 50.*GeV], [ 150.*GeV, 50.*GeV] ],  3.*fb ],
          [ [[ 200.*GeV,100.*GeV], [ 200.*GeV,100.*GeV] ],  5.*fb ],
          [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], 10.*fb ],
@@ -919,3 +941,4 @@ if __name__ == "__main__":
         sm = "%.1f %.1f" % ( masses[0][0].asNumber(GeV), masses[0][1].asNumber(GeV) )
         print ( "%s %.3f fb" % ( sm, result.asNumber(fb) ) )
     print ( "%.2f ms" % ( (time.time()-t0)*1000. ) )
+        

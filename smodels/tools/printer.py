@@ -323,7 +323,7 @@ class TxTPrinter(BasicPrinter):
         """
         Format data for a Element object.
 
-        :param obj: A Element object to be printed.
+        :param obj: An Element object to be printed.
         """
 
         output = ""
@@ -355,6 +355,7 @@ class TxTPrinter(BasicPrinter):
         if not hasattr(self,"printdatabase") or not self.printdatabase:
             return None
 
+        
         output = ""
         
         output += "   ======================================================= \n"
@@ -362,11 +363,9 @@ class TxTPrinter(BasicPrinter):
         output += " || \t \t Selected Experimental Results \t \t ||\n"
         output += " || \t \t\t\t\t\t\t || \n"
         output += "   ======================================================= \n"
-        
 
         for expRes in obj.expResultList:    
             output += self._formatExpResult(expRes)
-
         return output+"\n"
 
 
@@ -376,9 +375,9 @@ class TxTPrinter(BasicPrinter):
 
         :param obj: A ExpResult object to be printed.
         """
-
+        
         txnames = []
-        for dataset in obj.datasets:
+        for dataset in obj.datasets:            
             for txname in dataset.txnameList:
                 tx = txname.txName
                 if not tx in txnames: txnames.append(tx)
@@ -474,13 +473,17 @@ class TxTPrinter(BasicPrinter):
         :param obj: Uncovered object to be printed.
         """
                 
-        nprint = 10  # Number of missing topologies to be printed (ordered by cross sections)
+        nprint = 20  # Number of missing topologies to be printed (ordered by cross sections)
 
         output = ""
-        output += "\nTotal missing topology cross section (fb): %10.3E\n" %(obj.getMissingXsec())
-        output += "Total cross section where we are outside the mass grid (fb): %10.3E\n" %(obj.getOutOfGridXsec())
-        output += "Total cross section in long cascade decays (fb): %10.3E\n" %(obj.getLongCascadeXsec())
-        output += "Total cross section in decays with asymmetric branches (fb): %10.3E\n" %(obj.getAsymmetricXsec())        
+        output += "\nTotal missing topology cross section (fb): %10.3E\n" %(obj.getUncoveredListXsec(obj.missingTopos))
+        output += "Total cross section where we are outside the mass grid (fb): %10.3E\n" %(obj.getUncoveredListXsec(obj.outsideGrid))
+        output += "Total cross section in long cascade decays (fb): %10.3E\n" %(obj.getUncoveredClassifierXsec(obj.longCascade))
+        output += "Total cross section in decays with asymmetric branches (fb): %10.3E\n" %(obj.getUncoveredClassifierXsec(obj.asymmetricBranches))       
+        output += "Total cross section with longlived decays (fb): %10.3E\n" %(obj.getUncoveredListXsec(obj.longLived))
+        output += "Total cross section with displaced decays (fb): %10.3E\n" %(obj.getUncoveredListXsec(obj.displaced))
+        output += "Total cross section with MET decays (fb): %10.3E\n" %(obj.getUncoveredListXsec(obj.MET))
+                                        
         output += "\nFull information on unconstrained cross sections\n"
         output += "================================================================================\n"
         for ix, uncovEntry in enumerate([obj.missingTopos, obj.outsideGrid]):
@@ -498,9 +501,9 @@ class TxTPrinter(BasicPrinter):
                     output += "Missing topologies with the highest cross sections (up to " + str(nprint) + "):\n"
                 else:
                     output += "Contributions outside the mass grid (up to " + str(nprint) + "):\n"
-                output += "Sqrts (TeV)   Weight (fb)        Element description\n"        
+                output += "Sqrts (TeV)   Weight (fb)                  Element description\n"        
                 for topo in sorted(uncovEntry.topos, key=lambda x: x.value, reverse=True)[:nprint]:
-                    output += "%5s %10.3E    # %45s\n" % (str(obj.missingTopos.sqrts.asNumber(TeV)),topo.value, str(topo.topo))
+                    output += "%5s         %10.3E    # %53s\n" % (str(obj.missingTopos.sqrts.asNumber(TeV)),topo.value, str(topo.topo))
                     if hasattr(self, "addcoverageid") and self.addcoverageid:
                         contributing = []
                         for el in topo.contributingElements:
@@ -518,8 +521,33 @@ class TxTPrinter(BasicPrinter):
                     for el in ent.contributingElements:
                         contributing.append(el.elID)
                     output += "Contributing elements %s\n" % str(contributing)
+            output += "================================================================================\n"         
+        for ix, uncovEntry in enumerate([obj.longLived, obj.displaced, obj.MET]):
             if ix==0:
-                output += "================================================================================\n"
+                output += "Missing topos: long lived decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV))
+                
+            elif ix==1:
+                output += "Missing topos: displaced decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV))
+                
+            else:
+                output += "Missing topos: MET decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV))                
+            
+            output += "Sqrts (TeV)   Weight (fb)                  Element description\n"  
+            
+            for topo in uncovEntry.topos:
+                if topo.value > 0.: continue
+                for el in topo.contributingElements:
+                    topo.value += el.missingX            
+            
+            for topo in sorted(uncovEntry.topos, key=lambda x: x.value, reverse=True)[:nprint]:
+                output += "%5s         %10.3E    # %60s\n" % (str(obj.missingTopos.sqrts.asNumber(TeV)),topo.value, str(topo.topo))
+                if hasattr(self, "addcoverageid") and self.addcoverageid:
+                    contributing = []
+                    for el in topo.contributingElements:
+                        contributing.append(el.elID)
+                    output += "Contributing elements %s\n" % str(contributing)       
+                 
+            output += "================================================================================\n"         
         
         return output
                       
@@ -1114,3 +1142,5 @@ class SLHAPrinter(TxTPrinter):
                 cter += 1
                 if cter > 9: break
         return output
+
+

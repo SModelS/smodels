@@ -14,7 +14,7 @@ from smodels.tools.physicsUnits import fb, GeV
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import pyslha
-import smodels.particles
+from smodels.particleDefinitions import SMpdgs,BSMpdgs
 import copy
 
 
@@ -91,10 +91,9 @@ def elementFromEvent(event, weight=None):
     # Create branch list
     finalBranchList = []
     for ip, particle in enumerate(event.particles):
-        keys = list ( smodels.particles.rEven.keys() ) + \
-               list ( smodels.particles.rOdd.keys() )
+        keys = SMpdgs+BSMpdgs
         if not particle.pdg in keys:
-            logger.warning("Particle %i not defined in particles.py, events containing this particle will be ignored" %(particle.pdg))
+            logger.warning("Particle %i not defined in particle.py, events containing this particle will be ignored" %(particle.pdg))
             return None
         
         # Particle came from initial state (primary mother)
@@ -110,8 +109,8 @@ def elementFromEvent(event, weight=None):
             branchMass = massDic[ip]
             mombranch.masses = [branchMass[mombranch.PIDs[0][0]]]
             # Generate final branches (after all R-odd particles have decayed)
-            finalBranchList += branch.decayBranches([mombranch], branchBR,
-                                                    branchMass, sigcut=0. * fb )
+            finalBranchList += branch.decayBranches([mombranch], sigcut=0. * fb )
+                                                     
 
     if len(finalBranchList) != 2:
         logger.error(str(len(finalBranchList)) + " branches found in event; "
@@ -165,7 +164,7 @@ def _getDictionariesFromEvent(event):
         massDic[ibranch] = {}
         brDic[ibranch] = {}
     for ip, particle in enumerate(particles):
-        if particle.pdg in smodels.particles.rEven or particle.status == -1:
+        if particle.pdg in SMpdgs or particle.status == -1:
             # Ignore R-even particles and initial state particles
             continue
         ibranch = branches[ip]  # Get particle branch
@@ -183,7 +182,7 @@ def _getDictionariesFromEvent(event):
             continue
         ibranch = branches[ip]
         momPdg = particles[max(particle.moms) - 1].pdg
-        if momPdg in smodels.particles.rEven:
+        if momPdg in SMpdgs:
             # Ignore R-even decays
             continue
         # BR = 1 always for an event

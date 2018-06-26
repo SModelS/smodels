@@ -38,7 +38,7 @@ class DataSet(object):
                 logger.error("dataInfo.txt file not found in " + path)
                 raise TypeError
             self.dataInfo = infoObj.Info(os.path.join(path,"dataInfo.txt"))
-
+            
             #Get list of TxName objects:
             for txtfile in glob.iglob(os.path.join(path,"*.txt")):
                 try:
@@ -49,8 +49,8 @@ class DataSet(object):
                                          ( self.path, txname.txName ) )
                         continue
                     self.txnameList.append(txname)
-                except TypeError: continue
-
+                except TypeError: 
+                    continue
             self.txnameList.sort()
             self.checkForRedundancy()
 
@@ -72,14 +72,13 @@ class DataSet(object):
                 datasetElements.append(newEl)
         combos = itertools.combinations ( datasetElements, 2 )
         for x,y in combos:
-            if x.particlesMatch ( y ):
+            if x.particlesMatch ( y, checkDecayType=True, branchOrder=False ):     
                 errmsg ="Constraints (%s) appearing in dataset %s, %s overlap "\
                         "(may result in double counting)." % \
                         (x,self.dataInfo.dataId,self.globalInfo.id )
                 logger.error( errmsg )
                 raise SModelSError ( errmsg )
-#                return True
-#        return False
+
 
     def __ne__ ( self, other ):
         return not self.__eq__ ( other )

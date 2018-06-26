@@ -14,12 +14,15 @@ from smodels.tools import ioObjects
 from smodels.tools import coverage, runtime
 from smodels.theory import slhaDecomposer
 from smodels.theory import lheDecomposer
-from smodels.theory.theoryPrediction import theoryPredictionsFor
+from smodels.particleDefinitions import BSMparticleList
+from smodels.theory.model import Model
+from smodels.theory.theoryPrediction import theoryPredictionsFor, TheoryPredictionList
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools import crashReport, timeOut 
 from smodels.tools.printer import MPrinter
 import os
 import sys
+from pyexpat import model
 try:
     from ConfigParser import SafeConfigParser
 except ImportError as e:
@@ -41,7 +44,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     :parameter listOfExpRes: list of ExpResult objects to be considered
     :returns: output of printers
     """
-
+    
     """Get run parameters and options from the parser"""
     sigmacut = parser.getfloat("parameters", "sigmacut") * fb
     minmassgap = parser.getfloat("parameters", "minmassgap") * GeV
@@ -75,10 +78,12 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     try:
         """ Decompose input SLHA file, store the output elements in smstoplist """
         if inputType == 'slha':
-            smstoplist = slhaDecomposer.decompose(inputFile, sigmacut,
+            model = loadModelFromSLHA(inputFile, BSMparticleList)
+            smstoplist = slhaDecomposer.decompose(model, sigmacut,
                     doCompress=parser.getboolean("options", "doCompress"),
                     doInvisible=parser.getboolean("options", "doInvisible"),
                     minmassgap=minmassgap)
+                    
         else:
             smstoplist = lheDecomposer.decompose(inputFile,
                     doCompress=parser.getboolean("options", "doCompress"),
@@ -107,7 +112,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
 
     """ Get theory prediction for each analysis and print basic output """
     allPredictions = []
-    for expResult in listOfExpRes:
+    for expResult in listOfExpRes:       
         theorypredictions = theoryPredictionsFor(expResult, smstoplist)
         if not theorypredictions: continue
         allPredictions += theorypredictions._theoryPredictions
@@ -135,7 +140,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
             sqrts = None
         uncovered = coverage.Uncovered(smstoplist,sqrts=sqrts)
         masterPrinter.addObj(uncovered)
-    
+
     return masterPrinter.flush()
 
 def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
@@ -273,6 +278,23 @@ def checkForSemicolon ( strng, section, var ):
     if ";" in strng:
         logger.warning ( "A semicolon (;) has been found in [%s] %s, in your config file. If this was meant as comment, then please a space before it." % ( section, var) )
 
+
+def loadModelFromSLHA(inputFile, BSMparticleList):
+    """
+    Load model
+    
+    :parameter inputFile: input slha file
+    :parameter BSMparticleList: BSM particles of the model
+    
+    :returns: model object that contains all information about the model
+    """
+    
+    model = Model(inputFile, BSMparticleList)
+    updatedModel = model.updateParticles()
+    return updatedModel
+
+    
+
 def loadDatabase(parser, db):
     """
     Load database
@@ -312,7 +334,8 @@ def loadDatabase(parser, db):
         databaseVersion = database.databaseVersion
     except DatabaseNotFoundException:
         logger.error("Database not found in ``%s''" % os.path.realpath(databasePath))
-        sys.exit()
+        sys.exit()                                           
+
     return database, databaseVersion
 
 def loadDatabaseResults(parser, database):
@@ -324,9 +347,10 @@ def loadDatabaseResults(parser, database):
     :returns: List of experimental results
         
     """
-    """ In case that a list of analyses or txnames are given, retrieve list """
+    """ In case that a list of analyses or txnames are given, retrieve list """        
+    
     tmp = parser.get("database", "analyses").split(",")
-    analyses = [ x.strip() for x in tmp ]
+    analyses = [ x.strip() for x in tmp ]    
     tmp_tx = parser.get("database", "txnames").split(",")
     txnames = [ x.strip() for x in tmp_tx ]
     if parser.get("database", "dataselector") == "efficiencyMap":
@@ -353,10 +377,10 @@ def loadDatabaseResults(parser, database):
 
 
     """ Load analyses """
-
     ret = database.getExpResults(analysisIDs=analyses, txnames=txnames, 
                                  datasetIDs=datasetIDs, dataTypes=dataTypes,
-                                 useSuperseded=useSuperseded, useNonValidated=useNonValidated)
+                                 useSuperseded=useSuperseded, useNonValidated=useNonValidated)                                       
+                                                                                          
     return ret
 
 def getParameters(parameterFile):

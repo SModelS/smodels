@@ -15,6 +15,7 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 from smodels.tools.smodelsLogging import logger
 
+
 class TheoryPrediction(object):
     """
     An instance of this class represents the results of the theory prediction
@@ -66,16 +67,13 @@ class TheoryPrediction(object):
         """
 
         if not self.conditions: return 0.        
-        # maxcond = 0.
         values = [ 0. ]
         for value in self.conditions.values():
             if value == 'N/A': return value
             if value == None: continue
-            #print ( "value=",value,type(value),float(value) )
-            #maxcond = max(maxcond,float(value))
             values.append ( float(value) )
         return max(values)
-        # return maxcond
+        
     
     def __str__(self):
         return "%s:%s" % ( self.analysis, self.xsection )
@@ -139,14 +137,13 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2, useBestDataset=
                If False, returns predictions for all datasets.
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction objects    
     """
-
     dataSetResults = []
     #Compute predictions for each data set (for UL analyses there is one single set)
     for dataset in expResult.datasets:
         predList = _getDataSetPredictions(dataset,smsTopList,maxMassDist)
         if predList: dataSetResults.append(predList)
     if not dataSetResults: return None
-    
+  
     #For results with more than one dataset, select the best data set 
     #according to the expect upper limit
     if useBestDataset:
@@ -157,7 +154,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2, useBestDataset=
         return bestResults
     else:        
         allResults = sum(dataSetResults)
-        for theoPred in allResults: theoPred.expResult = expResult
+        for theoPred in allResults: theoPred.expResult = expResult       
         return allResults
 
 def _getBestResults(dataSetResults):
@@ -209,10 +206,9 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
     :parameter maxMassDist: maximum mass distance for clustering elements (float)
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction objects
     """
-    
     predictionList = TheoryPredictionList()
     # Select elements belonging to expResult and apply efficiencies
-    elements = _getElementsFrom(smsTopList, dataset)
+    elements = _getElementsFrom(smsTopList, dataset)    
     
     #Check dataset sqrts format:
     if (dataset.globalInfo.sqrts/TeV).normalize()._unit:
@@ -228,11 +224,13 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
         newelements.append(el)
     elements = newelements
     if len(elements) == 0: return None
+       
 
     # Combine elements according to their respective constraints and masses
     # (For efficiencyMap analysis group all elements)
     clusters = _combineElements(elements, dataset, maxDist=maxMassDist)
-    
+
+
     # Collect results and evaluate conditions    
     for cluster in clusters:
         theoryPrediction = TheoryPrediction()
@@ -244,7 +242,7 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
         theoryPrediction.mass = cluster.getAvgMass()
         theoryPrediction.PIDs = cluster.getPIDs()
         theoryPrediction.IDs = cluster.getIDs()
-        predictionList._theoryPredictions.append(theoryPrediction)
+        predictionList._theoryPredictions.append(theoryPrediction)        
         
 
     if len(predictionList) == 0: return None
@@ -262,7 +260,6 @@ def _getElementsFrom(smsTopList, dataset):
     :parameter smsTopList: list of topologies containing elements (TopologyList object)
     :returns: list of elements (Element objects)    
     """
-    
     elements = []
     for txname in dataset.txnameList:
         for top in smsTopList:
@@ -307,8 +304,7 @@ def _combineElements(elements, dataset, maxDist):
     :parameter expResult: Data Set to be considered (DataSet object)
     :returns: list of element clusters (ElementCluster objects)    
     """
-    
-    clusters = []   
+    clusters = []       
     
     if dataset.dataInfo.dataType == 'efficiencyMap':        
         cluster = clusterTools.groupAll(elements)  
@@ -321,12 +317,13 @@ def _combineElements(elements, dataset, maxDist):
                 if not element.txname == txname:
                     continue
                 else: txnameEls.append(element)
+                    
             txnameClusters = clusterTools.clusterElements(txnameEls, maxDist)         
             clusters += txnameClusters
     else:
         logger.warning("Unkown data type: %s. Data will be ignored." 
                        % dataset.dataInfo.dataType)
-                
+
     return clusters
 
 
@@ -351,6 +348,7 @@ def _evalConstraint(cluster):
         if not txname.constraint or txname.constraint == "not yet assigned":
             return txname.constraint
         exprvalue = _evalExpression(txname.constraint,cluster)
+
         return exprvalue
     else:
         logger.error("Unknown data type %s" %(str(cluster.getDataType())))
@@ -364,7 +362,6 @@ def _evalConditions(cluster):
     :parameter cluster: cluster of elements (ElementCluster object)    
     :returns: list of condition values (floats) if analysis type == upper limit. None, otherwise.    
     """
-
     conditionVals = {}
     for txname in cluster.txnames:
         if not txname.condition or txname.condition == "not yet assigned":
@@ -379,6 +376,7 @@ def _evalConditions(cluster):
             raise SModelSError()
             
         # Loop over conditions
+               
         for cond in conditions:
             exprvalue = _evalExpression(cond,cluster)
             if isinstance(exprvalue,crossSection.XSection):
@@ -426,8 +424,10 @@ def _evalExpression(stringExpr,cluster):
 
     weightsDict.update({"Cgtr" : cGtr, "cGtr" : cGtr, "cSim" : cSim, "Csim" : cSim})
     exprvalue = eval(evalExpr, weightsDict)
+
     if type(exprvalue) == type(crossSection.XSectionList()):
         if len(exprvalue) != 1:
             logger.error("Evaluation of expression "+evalExpr+" returned multiple values.")
         return exprvalue[0] #Return XSection object
+    
     return exprvalue

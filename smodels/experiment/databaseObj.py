@@ -438,7 +438,6 @@ class Database(object):
             logger.warning("Zero results loaded.")
         if self.progressbar:
             self.progressbar.finish()
-
         return resultsList
 
     def createExpResult ( self, root ):
@@ -463,9 +462,10 @@ class Database(object):
                         logger.debug ( "we cannot use expres from pickle file %s" % pclfile )
                         logger.debug ( "txt meta %s" % txtmeta )
                         logger.debug ( "pcl meta %s" % pclmeta )
-                        logger.debug ( "pcl meta needs update %s" % pclmeta.needsUpdate ( txtmeta ) )
+                        logger.debug ( "pcl meta needs update %s" % pclmeta.needsUpdate ( txtmeta ) )        
         except IOError as e:
             logger.error ( "exception %s" % e )
+                       
         if not expres: ## create from text file
             expres = ExpResult(root, discard_zeroes = self.txt_meta.discard_zeroes )
             if self.subpickle and expres: expres.writePickle( self.databaseVersion )
@@ -504,22 +504,22 @@ class Database(object):
 
         """
         expResultList = []
-        for expResult in self.expResultList:
+        for expResult in self.expResultList:       
             superseded = None
             if hasattr(expResult.globalInfo,'supersededBy'):
                 superseded = expResult.globalInfo.supersededBy.replace(" ","")
             if superseded and (not useSuperseded):
                 continue
             ID = expResult.globalInfo.getInfo('id')
-            # Skip analysis not containing any of the required ids:
+            # Skip analysis not containing any of the required ids:   
             if analysisIDs != ['all']:
                 if not ID in analysisIDs:
-                    continue
-            newExpResult = ExpResult()
+                    continue                                                    
+            newExpResult = ExpResult()            
             newExpResult.path = expResult.path
             newExpResult.globalInfo = expResult.globalInfo
             newExpResult.datasets = []
-            for dataset in expResult.datasets:
+            for dataset in expResult.datasets:                                 
                 if dataTypes != ['all']:
                     if not dataset.dataInfo.dataType in dataTypes:
                         continue
@@ -527,13 +527,12 @@ class Database(object):
                     if not dataset.dataInfo.dataId in datasetIDs:
                         continue
                 newDataSet = datasetObj.DataSet( dataset.path, dataset.globalInfo,
-                       False, discard_zeroes=self.txt_meta.discard_zeroes )
+                       False, discard_zeroes=self.txt_meta.discard_zeroes )              
                 newDataSet.dataInfo = dataset.dataInfo
-                newDataSet.txnameList = []
+                newDataSet.txnameList = []               
                 for txname in dataset.txnameList:
                     if type(txname.validated) == str:
                         txname.validated = txname.validated.lower()
-                    # print ( "txname",txname.validated,type(txname.validated) )
                     if (txname.validated not in [True, False, "true", "false", "n/a", "tbd", None, "none"]):
                         logger.error("value of validated field '%s' in %s unknown." % (txname.validated, expResult))
                     if txname.validated in [None, "none"]: ## FIXME after 1.1.1 this becomes a warning msg?
@@ -557,6 +556,7 @@ class Database(object):
             if not newExpResult.getTxNames():
                 continue
             expResultList.append(newExpResult)
+
         return expResultList
 
     def updateBinaryFile ( self ):
