@@ -48,7 +48,6 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """Get run parameters and options from the parser"""
     sigmacut = parser.getfloat("parameters", "sigmacut") * fb
     minmassgap = parser.getfloat("parameters", "minmassgap") * GeV
-    inputType = runtime.filetype ( inputFile )
 
 
     """Setup output printers"""

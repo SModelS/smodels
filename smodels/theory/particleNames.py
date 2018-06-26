@@ -25,7 +25,6 @@ def getObjectFromPdg(pdg):
     for particle in allParticles:        
         if not hasattr(particle,'pdg'):
             continue
-        print(particle,particle.pdg)
         if particle.pdg==pdg:
             return particle
     
@@ -72,9 +71,12 @@ def getPDGList(particleList=allParticles):
     :returns: list of str
     """
     
-    pdgsList = [particle.pdg for particle in particleList]
-    pdgsList = list(set(pdgsList))
-    
+    pdgsList = []
+    for particle in particleList:
+        if hasattr(particle,'pdg') and not isinstance(particle.pdg,list):
+            if not particle.pdg in pdgsList:
+                pdgsList.append(particle.pdg)
+                    
     return pdgsList
 
 

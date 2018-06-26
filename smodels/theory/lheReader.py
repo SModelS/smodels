@@ -271,24 +271,30 @@ def getDictionariesFrom(lheFile,nevts=None):
         
     #Compute the decay dictionaries:
     for pdg,eventDecays in decaysDict.items():
-        daughterIDs = list(set([sorted(eventDec.ids) for eventDec in eventDecays]))
+        daughterIDs = []
+        for eventDec in eventDecays:
+            pids = sorted(eventDec.ids)
+            if not pids in daughterIDs:
+                daughterIDs.append(pids)
         n = len(eventDecays) #Number of times the particle appears in all events
         combinedDecays = []
         for daughterID in daughterIDs:
-            decay = pyslha.Decay(br=1.,nda=len(daughterID),ids=daughterID,parentid=pdg)
+            decay = pyslha.Decay(br=0.,nda=len(daughterID),ids=daughterID,parentid=pdg)
             for eventDecay in eventDecays:
                 if sorted(eventDecay.ids) != daughterID:
                     continue
-                decay.br += 1./float(n) #Count this decay
-        combinedDecays.append(decay)
-        
-        decaysDict[pdg] = combinedDecays
-        
+                decay.br += 1./float(n) #Count this decay            
+            combinedDecays.append(decay)
+        if not combinedDecays:
+            decaysDict.pop(pdg)
+        else:
+            decaysDict[pdg] = combinedDecays
+    
     #Remove anti-particle decays and masses:
-    for pdg in massDict:
+    for pdg in massDict.keys()[:]:
         if -abs(pdg) in massDict and abs(pdg) in massDict:
             massDict.pop(-abs(pdg))
-    for pdg in decaysDict:
+    for pdg in decaysDict.keys()[:]:
         if -abs(pdg) in decaysDict and abs(pdg) in decaysDict:
             decaysDict.pop(-abs(pdg))
 
@@ -324,13 +330,13 @@ def getDictionariesFromEvent(event):
         for ipn,newparticle in enumerate(particles):
             if ipn == ip:
                 continue
-            if not ip in newparticle.moms: #newparticle is not a daughter of particle
+            if not ip+1 in newparticle.moms: #newparticle is not a daughter of particle
                 continue
            
             # Check if particle has a single parent
             # (as it should)
-            if newparticle.moms[0] != newparticle.moms[1] and \
-                    min(particle.moms) != 0:
+            newparticle.moms = [mom for mom in newparticle.moms if mom != 0]
+            if len(newparticle.moms) != 1:
                 raise SModelSError("More than one parent particle found")
             
             decay.nda += 1

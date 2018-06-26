@@ -44,21 +44,36 @@ class Model(object):
         :param stableWidth: Minimum width for considering particles as stable
             
         """
-    
+        
+        #Trick to suppress pyslha error messages:
+        import sys
+        storeErr = sys.stderr
         try:
+            sys.stderr = None
             res = pyslha.readSLHAFile(self.inputFile)
             massDict = res.blocks['MASS'] 
             decaysDict = res.decays
-            self.xsections = crossSection.getXsecFromSLHAFile(self.inputFile)
+            self.xsections = crossSection.getXsecFromSLHAFile(self.inputFile)            
         except:
             massDict,decaysDict = lheReader.getDictionariesFrom(self.inputFile)
             self.xsections = crossSection.getXsecFromLHEFile(self.inputFile)
-            
+        sys.stderr = storeErr
+        
         SMpdgs = getPDGList(SM)
         allpdgs = getPDGList()
         BSMpdgs = [pdg for pdg in allpdgs if not abs(pdg) in SMpdgs]
-        evenPDGs = [particle.pdg for particle in allParticles if particle.Z2parity == 'even']
-        oddPDGs = [particle.pdg for particle in allParticles if particle.Z2parity == 'odd']
+        evenPDGs = []
+        oddPDGs = []
+        for particle in allParticles:
+            if not hasattr(particle,'pdg') or not hasattr(particle,'Z2parity'):
+                continue
+            if isinstance(particle.pdg,list):
+                continue
+            if particle.Z2parity == 'even' and not particle.pdg in evenPDGs:
+                evenPDGs.append(particle.pdg)
+            elif particle.Z2parity == 'odd' and not particle.pdg in oddPDGs:
+                evenPDGs.append(particle.pdg)
+                
 
         for pdg in massDict:
             if not pdg in allpdgs:
