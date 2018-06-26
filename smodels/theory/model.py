@@ -10,13 +10,16 @@ from smodels.particleDefinitions import allParticles, SM
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import GeV
 from smodels.theory.particleNames import getObjectFromPdg, getPDGList
+from smodels.theory import lheReader, crossSection
 
 
 class Model(object):
     """
-    An instance of this class represents a allParticles model
-    This class contains the input file and the particles of the model
+    An instance of this class holds all the relevant information from the input model.
+    This class contains the input file, the particles of the model and their production
+    cross-sections.
     """
+    
     def __init__(self, inputFile, BSMparticleList):
         """
         Initializes the model
@@ -30,29 +33,34 @@ class Model(object):
         return self.inputFile
     
 
-    def updateParticles(self):
+    def updateParticles(self):        
         self.getParticleData()
-        self.addLongLived()
-        return self
-        
     
     def getParticleData(self, promptWidth = 1e-8*GeV, stableWidth = 1e-25*GeV):
         """
-        Update mass, total width and branches of allParticles particles from input slha file. 
+        Update mass, total width and branches of allParticles particles from input SLHA or LHE file. 
             
         :param promptWidth: Maximum width for considering particles as decaying prompt
         :param stableWidth: Minimum width for considering particles as stable
             
         """
     
-        res = pyslha.readSLHAFile(self.inputFile)
+        try:
+            res = pyslha.readSLHAFile(self.inputFile)
+            massDict = res.blocks['MASS'] 
+            decaysDict = res.decays
+            self.xsections = crossSection.getXsecFromSLHAFile(self.inputFile)
+        except:
+            massDict,decaysDict = lheReader.getDictionariesFrom(self.inputFile)
+            self.xsections = crossSection.getXsecFromLHEFile(self.inputFile)
+            
         SMpdgs = getPDGList(SM)
         allpdgs = getPDGList()
         BSMpdgs = [pdg for pdg in allpdgs if not abs(pdg) in SMpdgs]
         evenPDGs = [particle.pdg for particle in allParticles if particle.Z2parity == 'even']
         oddPDGs = [particle.pdg for particle in allParticles if particle.Z2parity == 'odd']
 
-        for pdg in res.blocks['MASS']:
+        for pdg in massDict:
             if not pdg in allpdgs:
                 logger.info("Particle %s is not in defined and will be ignored") %pdg
                 continue
@@ -69,15 +77,15 @@ class Model(object):
             for particle in particles:
                 if not particle:
                     continue
-                particle.mass = abs(res.blocks['MASS'][pdg])*GeV
+                particle.mass = abs(massDict[pdg])*GeV
 
             particle.decays = []
-            if not pdg in res.decays:
+            if not pdg in decaysDict:
                 logger.debug("No decay found for %i. It will be considered stable" %particle.pdg)                
                 particle.width = 0.*GeV
                 continue
             
-            decays = res.decays[pdg]
+            decays = decaysDict[pdg]
             particle.totalwidth = abs(decays.totalwidth)*GeV
             if particle.totalwidth < stableWidth:
                 particle.totalwidth = 0.*GeV  #Treat particle as stable
@@ -103,4 +111,4 @@ class Model(object):
                 particle.decays.append(decay)
                 particle.decays[-1].ids = [pid*chargeConj for pid in decay.ids] #Conjugated decays
                  
-                 
+        

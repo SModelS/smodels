@@ -11,6 +11,7 @@
 from smodels.tools.physicsUnits import TeV, pb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
+import pyslha
 
 class LheReader(object):
     """
@@ -126,7 +127,7 @@ class LheReader(object):
             if len(line) == 0:
                 line = self.file.readline()
                 continue
-            particle = Particle()
+            particle = LHEParticle()
             linep = [float(x) for x in line.split()]
             if len(linep) < 11:
                 logger.error("Line >>%s<< in %s cannot be parsed",
@@ -146,13 +147,6 @@ class LheReader(object):
             line = self.file.readline()
         return ret
 
-
-    def close(self):
-        """
-        Close the lhe file, if open.
-        
-        """
-        self.file.close()
 
 
 
@@ -216,7 +210,7 @@ class SmsEvent(object):
         return ret
 
 
-class Particle(object):
+class LHEParticle(object):
     """
     An instance of this class represents a particle.
     
@@ -238,3 +232,113 @@ class Particle(object):
         return "particle pdg %d p=(%.1f,%.1f,%.1f,m=%.1f) status %d moms %s" \
                 % (self.pdg, self.px, self.py, self.pz, self.mass,
                    self.status, self.moms)
+
+
+
+def getDictionariesFrom(lheFile,nevts=None):
+    """
+    Reads all events in the LHE file and create mass and BR dictionaries for each branch in an event.
+    
+    :param lheFile: LHE file
+    :param nevts: (maximum) number of events used in the decomposition. If
+                  None, all events from file are processed.
+    
+    :returns: BR and mass dictionaries for the particles appearing in the event    
+    """
+    
+    reader = LheReader(lheFile, nevts)
+    # Loop over events and decompose
+    massDict = {}
+    decaysDict = {}
+    for event in reader:
+        eventMass,eventDecays = getDictionariesFromEvent(event)
+        for pdg,mass in eventMass.items():
+            if not pdg in massDict:
+                massDict[pdg] = mass
+            else:
+                massDict[pdg] += mass
+                
+        for pdg,decays in eventDecays.items():
+            if not pdg in decaysDict:
+                decaysDict[pdg] = decays
+            else:
+                decaysDict[pdg] += decays
+    
+
+    #Use averaged mass over all events:
+    for pdg,masses in massDict.items():
+        massDict[pdg] = sum(masses)/len(masses)
+        
+    #Compute the decay dictionaries:
+    for pdg,eventDecays in decaysDict.items():
+        daughterIDs = list(set([sorted(eventDec.ids) for eventDec in eventDecays]))
+        n = len(eventDecays) #Number of times the particle appears in all events
+        combinedDecays = []
+        for daughterID in daughterIDs:
+            decay = pyslha.Decay(br=1.,nda=len(daughterID),ids=daughterID,parentid=pdg)
+            for eventDecay in eventDecays:
+                if sorted(eventDecay.ids) != daughterID:
+                    continue
+                decay.br += 1./float(n) #Count this decay
+        combinedDecays.append(decay)
+        
+        decaysDict[pdg] = combinedDecays
+        
+    #Remove anti-particle decays and masses:
+    for pdg in massDict:
+        if -abs(pdg) in massDict and abs(pdg) in massDict:
+            massDict.pop(-abs(pdg))
+    for pdg in decaysDict:
+        if -abs(pdg) in decaysDict and abs(pdg) in decaysDict:
+            decaysDict.pop(-abs(pdg))
+
+    return massDict,decaysDict
+
+
+def getDictionariesFromEvent(event):
+    """
+    Create mass and BR dictionaries for each branch in an event.
+    
+    :param event: LHE event
+    :returns: BR and mass dictionaries for the branches in the event
+    
+    """
+
+    particles = event.particles
+
+    # Identify and label to which branch each particle belongs 
+    #(the branch label is the position of the primary mother)
+    masses = {}
+    decays = {}
+    for ip, particle in enumerate(particles):
+        if particle.status == -1: #Ignore incoming particles
+            continue
+        
+        if not particle.pdg in masses:
+            masses[particle.pdg] = [particle.mass]
+            decays[particle.pdg] = []
+        
+        #Get event decay:
+        decay = pyslha.Decay(0, 0, [], particle.pdg)
+        #Collect all daughters:
+        for ipn,newparticle in enumerate(particles):
+            if ipn == ip:
+                continue
+            if not ip in newparticle.moms: #newparticle is not a daughter of particle
+                continue
+           
+            # Check if particle has a single parent
+            # (as it should)
+            if newparticle.moms[0] != newparticle.moms[1] and \
+                    min(particle.moms) != 0:
+                raise SModelSError("More than one parent particle found")
+            
+            decay.nda += 1
+            decay.br = 1.
+            decay.ids.append(newparticle.pdg)
+
+        if decay.ids:
+            decay.ids = sorted(decay.ids)
+            decays[particle.pdg].append(decay)
+
+    return masses,decays

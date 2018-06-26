@@ -12,17 +12,17 @@
 
 from smodels.tools import ioObjects
 from smodels.tools import coverage, runtime
-from smodels.theory import slhaDecomposer
-from smodels.theory import lheDecomposer
-from smodels.particleDefinitions import BSMparticleList
+from smodels.theory import decomposer
+from smodels.particleDefinitions import BSM
 from smodels.theory.model import Model
-from smodels.theory.theoryPrediction import theoryPredictionsFor, TheoryPredictionList
+from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools import crashReport, timeOut 
 from smodels.tools.printer import MPrinter
 import os
 import sys
-from pyexpat import model
+
+
 try:
     from ConfigParser import SafeConfigParser
 except ImportError as e:
@@ -70,22 +70,32 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     if outputStatus.status < 0:          
         return masterPrinter.flush()
     
+    """
+    Load the input model
+    ==================== 
+    """    
+    try:
+        """
+        Load the input model and  update it with the information from the input file
+        """
+        model = Model(inputFile, BSM)
+        model.updateParticles()
+    except SModelSError as e:
+        print ( "Exception %s %s" % ( e, type(e) ) )
+        """ Update status to fail, print error message and exit """
+        outputStatus.updateStatus(-1)
+        return masterPrinter.flush()        
+
 
     """
-    Decompose input file
-    ====================
+    Decompose input model
+    =====================
     """
-    try:
-        """ Decompose input SLHA file, store the output elements in smstoplist """
-        if inputType == 'slha':
-            model = loadModelFromSLHA(inputFile, BSMparticleList)
-            smstoplist = slhaDecomposer.decompose(model, sigmacut,
-                    doCompress=parser.getboolean("options", "doCompress"),
-                    doInvisible=parser.getboolean("options", "doInvisible"),
-                    minmassgap=minmassgap)
-                    
-        else:
-            smstoplist = lheDecomposer.decompose(inputFile,
+       
+    try:        
+        
+        """ Decompose the input model, store the output elements in smstoplist """
+        smstoplist = decomposer.decompose(model, sigmacut,
                     doCompress=parser.getboolean("options", "doCompress"),
                     doInvisible=parser.getboolean("options", "doInvisible"),
                     minmassgap=minmassgap)

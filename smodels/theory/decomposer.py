@@ -11,8 +11,7 @@
 """
 
 import time
-import pyslha
-from smodels.theory import element, topology, crossSection
+from smodels.theory import element, topology
 from smodels.theory.branch import Branch, decayBranches
 from smodels.tools.physicsUnits import fb, GeV
 from smodels.theory.particleNames import getObjectFromPdg, getPDGList
@@ -20,25 +19,21 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
 def decompose(model, sigcut=.1 * fb, doCompress=False, doInvisible=False,
-              minmassgap=-1.*GeV, useXSecs=None):
+              minmassgap=-1.*GeV):
     """
-    Perform SLHA-based decomposition.
+    Perform decomposition using the information stored in model.
     
     :param sigcut: minimum sigma*BR to be generated, by default sigcut = 0.1 fb
     :param doCompress: turn mass compression on/off
     :param doInvisible: turn invisible compression on/off
     :param minmassgap: maximum value (in GeV) for considering two R-odd particles
                        degenerate (only revelant for doCompress=True )
-    :param useXSecs: optionally a dictionary with cross sections for pair
-                 production, by default reading the cross sections
-                 from the SLHA file.
     :returns: list of topologies (TopologyList object)
 
     """
     t1 = time.time()
     
-    slhafile = model.inputFile
-    
+    xSectionList = model.xsections    
     pdgList = getPDGList()
 
     if doCompress and minmassgap / GeV < 0.:
@@ -48,15 +43,6 @@ def decompose(model, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     if type(sigcut) == type(1.):
         sigcut = sigcut * fb
 
-    try:
-        f=pyslha.readSLHAFile ( slhafile )
-    except pyslha.ParseError as e:
-        logger.error ( "The file %s cannot be parsed as an SLHA file: %s" % (slhafile, e) )
-        raise SModelSError()
-
-    # Get cross section from file
-    xSectionList = crossSection.getXsecFromSLHAFile(slhafile, useXSecs) 
-    # Only use the highest order cross sections for each process
     xSectionList.removeLowerOrder()
     # Order xsections by PDGs to improve performance
     xSectionList.order()
@@ -134,6 +120,6 @@ def decompose(model, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     smsTopList.compressElements(doCompress, doInvisible, minmassgap)
     smsTopList._setElementIds()       
             
-    logger.debug("slhaDecomposer done in %.2f s." % (time.time() -t1 ) )
+    logger.debug("decomposer done in %.2f s." % (time.time() -t1 ) )
   
     return smsTopList

@@ -12,12 +12,14 @@
 
 """ Import basic functions (this file must be executed in the installation folder) """
 
-from smodels.theory import slhaDecomposer,lheDecomposer
+from smodels.theory import decomposer
 from smodels.tools.physicsUnits import fb, GeV, TeV
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.experiment.databaseObj import Database
 from smodels.tools import coverage
 from smodels.tools.smodelsLogging import setLogLevel
+from smodels.particleDefinitions import BSM
+from smodels.theory.model import Model
 setLogLevel("info")
 
 # Set the path to the database folder
@@ -30,19 +32,17 @@ def main():
     """
     
     # Path to input file (either a SLHA or LHE file)
-    slhafile = 'inputFiles/slha/lightEWinos.slha'
-    lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
+    inputFile = 'inputFiles/slha/lightEWinos.slha'
+    model = Model(inputFile, BSM)
+    model.updateParticles()
+
 
     # Set main options for decomposition
     sigmacut = 0.3 * fb
     mingap = 5. * GeV
 
-    # Decompose model (use slhaDecomposer for SLHA input or lheDecomposer for LHE input)
-    slhaInput = True
-    if slhaInput:
-        toplist = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
-    else:
-        toplist = lheDecomposer.decompose(lhefile, doCompress=True,doInvisible=True, minmassgap=mingap)
+    # Decompose model (use decomposer for SLHA input or lheDecomposer for LHE input)
+    toplist = decomposer.decompose(model, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
     
     # Access basic information from decomposition, using the topology list and topology objects:
     print "\n Decomposition Results: "

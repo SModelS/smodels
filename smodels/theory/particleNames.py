@@ -22,9 +22,10 @@ def getObjectFromPdg(pdg):
     :returns: Particles object 
     """
 
-    for particle in allParticles:
+    for particle in allParticles:        
         if not hasattr(particle,'pdg'):
             continue
+        print(particle,particle.pdg)
         if particle.pdg==pdg:
             return particle
     
