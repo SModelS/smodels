@@ -36,9 +36,8 @@ def simParticles(plist1, plist2):
         return False
     
     for p in plist1+plist2:              
-        if not p in particleNames:
-            logger.error("Unknown particle: %s" %p)
-            raise SModelSError()
+        if not p.label in particleNames:
+            raise SModelSError("Unknown particle: %s" %p)
   
     #Expand inclusive particles (ParticleList objects) 
     extendedL1 = []    

@@ -8,32 +8,38 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-import copy
-from smodels.theory.particle import Particle, ParticleList
+from smodels.theory.particle import Particle, ParticleList, ParticleWildcard
 from smodels.tools.physicsUnits import GeV
-from smodels.theory.particleNames import getObjectFromLabel
+from smodels.theory.particleNames import elementsInStr
 
 p1 = Particle(Z2parity='odd', label='p1', pdg=None, mass=100.*GeV, eCharge=None, colordim=None, spin=None, width=None, branches=None)
 p2 = Particle(Z2parity='odd', label='p1', pdg=1000021, mass=None, eCharge=None, colordim=None, spin=None, width=None, branches=None)
 p3 = Particle(Z2parity='odd', label='p3', pdg=1, mass=110.*GeV, eCharge=None, colordim=None, spin=None, width=None, branches=None)
 p4 = Particle(Z2parity='odd', label='p4', pdg=None, mass=110.*GeV, eCharge=None, colordim=None, spin=None, width=None, branches=None)
+p4a = Particle(Z2parity='odd', label='p4~', pdg=None, mass=110.*GeV, eCharge=None, colordim=None, spin=None, width=None, branches=None)
 p5 = Particle(Z2parity='odd', label='p5+', pdg=2, mass=110.*GeV, eCharge=1., colordim=None, spin=None, width=None, branches=None)
+p5m = Particle(Z2parity='odd', label='p5-', pdg=-2, mass=110.*GeV, eCharge=-1., colordim=None, spin=None, width=None, branches=None)
 
-p1c = copy.copy(p1)
+p1c = p1.copy()
+p1c.pdg = 10
 p5cc = p5.chargeConjugate()
 p3cc = p3.chargeConjugate()
 
 
+
+
+
 class ParticleTest(unittest.TestCase):
+    
     def testParticle(self):     
         #only comparisons by label for now           
-        self.assertEqual( p1.label, 'p1')
-        self.assertEqual( p1 , p2) 
-        self.assertLess( p1 , p3)     
-        self.assertFalse( p4 == p3 == p2) 
-        self.assertEqual( p1c , p1)
+        self.assertEqual(p1.label, 'p1')
+        self.assertEqual(p1 , p2) 
+        self.assertLess(p1 , p3)     
+        self.assertFalse(p4 == p3 == p2) 
+        self.assertEqual(p1c , p1)
         
-
+        
     def testParticleList(self):
         l1 = ParticleList(label='plist', particles=[p1,p2])
         from smodels.SMparticleDefinitions import lList, LList
@@ -46,24 +52,37 @@ class ParticleTest(unittest.TestCase):
         
     def testChargeConjugation(self):
         self.assertEqual(p5cc.label , 'p5-')
+        self.assertNotEqual(p5cc,p5)
+        self.assertEqual(p5cc,p5m)
         self.assertEqual(p5cc.eCharge , -1.)
-        self.assertEqual(p3cc.label, p3.label)
         self.assertEqual(p3cc.pdg, -1)
+        self.assertEqual(p4.chargeConjugate(), p4a)
         
     def testParticleWildCard(self):
-        particle2 = getObjectFromLabel('*')
+        anything = ParticleWildcard(label='anything')
         l1 = ParticleList(label='plist', particles=[p1,p2,p4])
         from smodels.SMparticleDefinitions import lList
-        
-        
+        from smodels.particleDefinitions import anySM,anyBSM
+              
         self.assertTrue(isinstance(p1, Particle))
-        self.assertTrue(p1 == particle2)
-        self.assertTrue(particle2 == p1)
-        self.assertTrue(particle2 == l1)
-        self.assertTrue(l1 == particle2)
-        self.assertTrue(particle2 == lList)
-        self.assertTrue(lList == particle2)
-
+        self.assertTrue(p1 == anything)
+        self.assertTrue(anything == p1)
+        self.assertTrue(anything == l1)
+        self.assertTrue(l1 == anything)
+        self.assertTrue(anything == lList)
+        self.assertTrue(lList == anything)
+        
+        self.assertTrue(anything == anySM)
+        self.assertTrue(anything == anyBSM)
+        self.assertFalse(anyBSM == anySM)
+        self.assertFalse(anySM == anyBSM)
+        
+        
+        
+    def testInStr(self):
+        instring="[[['t+'],['W-']],[['t+'],['W-']]]+[[['t-'],['W+']],[['t-'],['W+']]]+[[['t+'],['W-']],[['t-'],['W+']]]"        
+        out= elementsInStr(instring)
+        self.assertEqual(out, ['[[[t+],[W-]],[[t+],[W-]]]', '[[[t-],[W+]],[[t-],[W+]]]', '[[[t+],[W-]],[[t-],[W+]]]'])
         
         
           

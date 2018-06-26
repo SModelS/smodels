@@ -16,17 +16,13 @@ from smodels.theory.particle import Particle, ParticleList,ParticleWildcard
 
 
 # SM particles
-
-anything = ParticleWildcard()
-
-
 e = Particle(Z2parity='even', label='e-', pdg=11, mass=0.5*MeV, eCharge=-1, colordim=0, spin=1./2, width=0, decays=None) 
 mu = Particle(Z2parity='even', label='mu-', pdg=13, mass=106.*MeV, eCharge=-1, colordim=0, spin=1./2, width=0, decays=None)
 ta = Particle(Z2parity='even', label='ta-', pdg=15, mass=1777.*MeV, eCharge=-1, colordim=0, spin=1./2, width=0, decays=None)
 
-nue = Particle(Z2parity='even', label='neu', pdg=12, mass=0.*MeV, eCharge=0, colordim=0, spin=1./2, width=0, decays=None)
-numu = Particle(Z2parity='even', label='neu', pdg=14, mass=0.*MeV, eCharge=0, colordim=0, spin=1./2, width=0, decays=None)
-nuta = Particle(Z2parity='even', label='neu', pdg=16, mass=0.*MeV, eCharge=0, colordim=0, spin=1./2, width=0, decays=None)
+nue = Particle(Z2parity='even', label='nu', pdg=12, mass=0.*MeV, eCharge=0, colordim=0, spin=1./2, width=0, decays=None)
+numu = Particle(Z2parity='even', label='nu', pdg=14, mass=0.*MeV, eCharge=0, colordim=0, spin=1./2, width=0, decays=None)
+nuta = Particle(Z2parity='even', label='nu', pdg=16, mass=0.*MeV, eCharge=0, colordim=0, spin=1./2, width=0, decays=None)
 
 d = Particle(Z2parity='even', label='q', pdg=1, mass=0.*MeV, eCharge=(-1./3.), colordim=3, spin=1./2, width=0, decays=None)
 u = Particle(Z2parity='even', label='q', pdg=2, mass=0.*MeV, eCharge=(2./3.), colordim=3, spin=1./2, width=0, decays=None)
@@ -51,21 +47,15 @@ leptonsC = [p.chargeConjugate() for p in leptons]
 gauge = [g,photon,W,Z]
 gaugeC = [p.chargeConjugate() for p in gauge]
 
-SMparticles = quarks + leptons + gauge + [higgs] + [pi] + [anything]
+SMparticles = quarks + leptons + gauge + [higgs] + [pi]
 SMparticlesC = quarksC + leptonsC + gaugeC + [higgs.chargeConjugate()] + [pi.chargeConjugate()]
 
 SMList = SMparticles + SMparticlesC
 
 SMparticleList = ParticleList( 'SM', SMList)
-SMpdgs = SMparticleList.getPdgs()
-SMLabels = SMparticleList.getLabels()
 
 
-
-
-
-#Particle groups 
-
+#Particle groups
 eList = ParticleList('e' , [leptons[0], leptonsC[0]])
 muList = ParticleList('mu' , [leptons[2], leptonsC[2]])
 taList = ParticleList('ta' , [leptons[4], leptonsC[4]])
@@ -82,6 +72,3 @@ jetList = ParticleList('jet' ,  quarks[0:4] + [ gauge[0] ] + [ pi ])
 jetbarList =  ParticleList('jet~' , quarksC[0:4] + [ gaugeC[0] ] + [ pi.chargeConjugate() ])
 allParticles = ParticleList('all' , SMList)  
           
-particleLists = [eList, muList,taList,lpList,lmList,lList,nuList,WList,tList,
-LpList,LmList,LList,jetList,jetbarList,allParticles]
-

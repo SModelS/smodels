@@ -7,7 +7,6 @@
 """
 
 from smodels.tools.physicsUnits import GeV
-from copy import copy
 
 
 class Particle(object):
@@ -46,10 +45,13 @@ class Particle(object):
         Comparison to '*' always returns True. (= Particle Wild Card)
         """    
         
-        if not isinstance(other,ParticleList) and not isinstance(other,Particle):
+        if not isinstance(other,(ParticleList,Particle,ParticleWildcard)):
             return +1
         
         if isinstance(other,ParticleList):
+            return other.__cmp__(self)
+        
+        if isinstance(other,ParticleWildcard):
             return other.__cmp__(self)
         
         #Make sure particles with distinct Z2 parity are distinct
@@ -63,13 +65,6 @@ class Particle(object):
                 
         if hasattr(self, 'label') and hasattr(other, 'label'):
             if self.label != other.label:            
-                #Deal with generic labels:
-                if (self.label == '*') or (other.label == '*'):
-                    return 0                
-
-                if (self.label == 'BSM') or (other.label == 'BSM'):
-                    return 0                
-                            
                 comp = self.label > other.label
                 if comp:
                     return 1
@@ -96,6 +91,9 @@ class Particle(object):
         if hasattr(self, 'label'):
             return self.label
         else: return ''
+        
+    def __repr__(self):
+        return self.__str__()        
     
     def describe(self):
         return str(self.__dict__)
@@ -115,7 +113,20 @@ class Particle(object):
             setattr(self, label, value)    
 
 
+    def copy(self):
+        """
+        Make a copy of self.
+        
+        :return: A Particle object identical to self
+        """
 
+        p = Particle()
+        for name in dir(self):
+            if '__' in name:
+                continue
+            setattr(p,name,getattr(self,name))
+
+        return p
 
     def chargeConjugate(self):
         """
@@ -127,40 +138,24 @@ class Particle(object):
         :return: the charge conjugate particle (Particle object)
         """
 
-        pConjugate = copy(self)
-        if hasattr(pConjugate, 'pdg'):
-            pConjugate.pdg *= -1
-        if hasattr(pConjugate, 'eCharge') and not pConjugate.eCharge: return pConjugate    # for neutral particle only conjugate pdg      
-        
-        if hasattr(pConjugate, 'eCharge'):
+        pConjugate = self.copy()
+                    
+        if hasattr(pConjugate, 'pdg') and pConjugate.pdg:
+            pConjugate.pdg *= -1       
+        if hasattr(pConjugate, 'eCharge') and pConjugate.eCharge:
             pConjugate.eCharge *= -1    
-        if hasattr(pConjugate, 'label'):    
+        if hasattr(pConjugate, 'label'):                
             if pConjugate.label[-1] == "+":
                 pConjugate.label = pConjugate.label[:-1] + "-"
             elif pConjugate.label[-1] == "-":
                 pConjugate.label = pConjugate.label[:-1] + "+"
-            #elif pConjugate.label[-1] == "~":
-            #    pConjugate.label = pConjugate.label[:-1]
-            #else: pConjugate.label = pConjugate.label + "~"            
+            elif pConjugate.label[-1] == "~":
+                pConjugate.label = pConjugate.label[:-1]
+            else:
+                pConjugate.label += "~"            
                 
         return pConjugate
 
-
-
-    def isStable(self):
-        """
-        Return True if particle is stable, false otherwise.
-        A particle is considered stable if it has zero width or if
-        the width has not been defined
-        :return: True/False
-        """
-        if self.width is None:
-            return True
-        elif type(self.width) == type(1.*GeV) and self.width > 0.*GeV:
-            return False
-        else:
-            return True 
-        
         
     def isNeutral(self):
         """
@@ -186,16 +181,18 @@ class ParticleList(object):
         The properties are: label, pdg, mass, electric charge, color charge, width 
     """
     
-    def __init__(self, label, particles):
+    def __init__(self, label, particles, **kwargs):
 
         """ 
         Initializes the particle list.
-
-        :parameter label: string, e.g. 'jet'
-        :parameter particles: particle objects to be added to list
         """        
+                
         self.label = label
         self.particles = particles
+        
+        for key,value in kwargs.items():
+            self.addProperty(key,value)
+        
         
      
     def __cmp__(self,other):
@@ -240,9 +237,11 @@ class ParticleList(object):
     def __gt__( self, p2 ):
         return self.__cmp__(p2) == 1
 
-    def __str__(self): 
-        
+    def __str__(self):         
         return self.label
+    
+    def __repr__(self):
+        return self.__str__()    
     
     def __getattribute__(self,name):
         """
@@ -263,6 +262,20 @@ class ParticleList(object):
             if len(list(set(values))) == 1:
                 values = values[0]
             return values
+        
+    def addProperty(self,label,value,overwrite=False):
+        """
+        Add property with label and value.
+        If overwrite = False and property already exists, it will not be overwritten
+        :parameter label: property label (e.g. "mass", "label",...)
+        :parameter value: property value (e.g. 171*GeV, "t+",...)
+        """
+        
+        if overwrite:
+            setattr(self, label, value)
+        elif not hasattr(self, label) or getattr(self, label) is None:
+            setattr(self, label, value)    
+        
 
 
     def describe(self):
@@ -303,16 +316,27 @@ class ParticleList(object):
 class ParticleWildcard(Particle):
     """
     A particle wildcard class. It will return True when compared to any other Particle or ParticleList object.
+    The only exception is if the ParticleWildcard has a defined parity. In this case it will only be equal
+    to particles with the same parity.
     """
     
-    def __init__(self):
-        Particle.__init__(self,label='*',pdg=None)
+    def __init__(self,**kwargs):
+        if not kwargs or not 'label' in kwargs:
+            kwargs['label'] = '*'
+        Particle.__init__(self,**kwargs)
         
     def __repr__(self):
         return self.__str__()
 
     def __cmp__(self,other):
-        if isinstance(other,Particle) or isinstance(other,ParticleList):
+        #Make sure particles with distinct Z2 parity are distinct
+        if hasattr(self, 'Z2parity') and hasattr(other, 'Z2parity') and self.Z2parity != other.Z2parity:
+            comp = self.Z2parity > other.Z2parity
+            if comp:
+                return 1
+            else:
+                return -1        
+        elif isinstance(other,(Particle,ParticleList,ParticleWildcard)):
             return 0
         else:
             return -1

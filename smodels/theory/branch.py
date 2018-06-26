@@ -12,7 +12,8 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from particleComparison import simParticles
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import fb
-from smodels.theory.particle import Particle,ParticleList 
+from smodels.theory.particle import ParticleList,ParticleWildcard
+from smodels.tools.wildCards import ValueWildcard,ListWildcard
 
 
 
@@ -54,7 +55,7 @@ class Branch(object):
                 branch = branch[0]
                 vertices = elementsInStr(branch[1:-1])        
                 for vertex in vertices:
-                    self.BSMparticles.append(getObjectFromLabel('BSM'))
+                    self.BSMparticles.append(getObjectFromLabel('anyBSM'))
                     particleNames = vertex[1:-1].split(',')
                     ptcs = []
                     for pname in particleNames:    
@@ -65,9 +66,6 @@ class Branch(object):
             self.vertparts = [len(v) for v in self.particles]
         if finalState:
             self.BSMparticles.append(getObjectFromLabel(finalState))
-        else:
-            self.BSMparticles.append(getObjectFromLabel('MET'))
-        
 
     def __str__(self):
         """
@@ -91,10 +89,11 @@ class Branch(object):
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
 
-        
-        if not isinstance(other,Branch):
-            return -1
 
+        if not isinstance(other,(Branch,BranchWildcard)):
+            return -1
+        
+        
         if self.vertnumb != other.vertnumb:
             comp = self.vertnumb > other.vertnumb
             if comp: return 1
@@ -103,10 +102,11 @@ class Branch(object):
             comp = self.vertparts > other.vertparts
             if comp: return 1
             else: return -1
-        elif self.particles != other.particles:    
+        elif self.particles != other.particles:  
             comp = self.particles > other.particles
             if comp: return 1
             else: return -1
+        #For BSM particles only compare masses and final states:
         elif self.getMasses() != other.getMasses():
             comp = self.getMasses() > other.getMasses()
             if comp:
@@ -136,7 +136,6 @@ class Branch(object):
         
         :return: List with masses
         """          
-        
         bsmMasses = [bsm.mass for bsm in self.BSMparticles]
         
         return bsmMasses             
@@ -181,16 +180,16 @@ class Branch(object):
     
     def particlesMatch(self, other):
         """
-        Compare two Branches for matching particles, 
-        allow for inclusive particle labels (such as the ones defined in particleDefinitions.py)
+        Compare two Branches for matching particles.
+        Only the final state particles (self.particles and self.BSMparticles[-1])
+        are used for comparison.
+        Allow for inclusive particle labels (such as the ones defined in particleDefinitions.py)
 
         :parameter other: branch to be compared (Branch object)
-        :returns: True if branches are equal (particles and masses match); False otherwise.              
+        
+        :returns: True if branches are equal (particles and last BSM particle match); False otherwise.              
         """
         
-        #If particles are identical, avoid further checks
-        if self.particles == other.particles:
-            return True        
        
         if not isinstance(other,Branch):
             return False        
@@ -203,12 +202,16 @@ class Branch(object):
         
         if self.vertparts != other.vertparts:
             return False
+
+        #If particles are identical, avoid further checks
+        if self.particles != other.particles:
+            for iv,vertex in enumerate(self.particles):
+                if not simParticles(vertex,other.particles[iv]):
+                    return False
         
-        for iv,vertex in enumerate(self.particles):
-            if not simParticles(vertex,other.particles[iv]):
-                return False
-        for ip,bsmParticle in self.BSMparticles:           
-            if not simParticles([bsmParticle], [other.BSMparticles[ip]]):
+        #If BSM particles are identical, avoid further checks                
+        if self.BSMparticles[-1] != other.BSMparticles[-1]:                       
+            if not simParticles([self.BSMparticles[-1]], [other.BSMparticles[-1]]):
                 return False             
         
         return True
@@ -294,7 +297,8 @@ class Branch(object):
         
         if not self.maxWeight is None:
             newBranch.maxWeight =  self.maxWeight*decay.br             
-            
+        
+        newBranch.setInfo()
         return newBranch
 
 
@@ -331,20 +335,27 @@ class BranchWildcard(Branch):
     with the same final state.
     """
     
-    def __init__(self):
+    def __init__(self,finalState=None):
         Branch.__init__(self)
         self.masses = ListWildcard()
         self.particles =  ListWildcard()
-        self.BSMparticles =  ListWildcard()
-        self.vertnumb = IntWildcard()
+        if finalState:
+            self.BSMparticles = [getObjectFromLabel(finalState)]
+        else:
+            self.BSMparticles = [ParticleWildcard()]
+        self.vertnumb = ValueWildcard()
         self.vertparts = ListWildcard()
+        
+        
+    def getMasses(self):
+        return ListWildcard()
         
     def __str__(self):
         return '[*]'
     
     def __repr__(self):
         return self.__str__()
-
+    
     def __eq__(self,other):
         return self.__cmp__(other) == 0
 
@@ -358,7 +369,7 @@ class BranchWildcard(Branch):
         been defined yet.
         """
 
-        self.vertnumb = IntWildcard()
+        self.vertnumb = ValueWildcard()
         self.vertparts = ListWildcard()
         
     def decayDaughter(self):
@@ -368,58 +379,6 @@ class BranchWildcard(Branch):
         
         return False
         
-class IntWildcard(int):
-    """
-    A integer wildcard class. It will return True when compared to any other integer object.
-    """
-    
-    def __init__(self):
-        int.__init__(self)
-        
-    def __str__(self):
-        return '*'   
-    
-    def __repr__(self):
-        return self.__str__()
-
-    def __cmp__(self,other):
-        if isinstance(other,int):
-            return 0
-        else:
-            return -1
-
-    def __eq__(self,other):
-        return self.__cmp__(other) == 0 
-    
-    def __ne__(self,other):
-        return self.__cmp__(other) != 0
-             
-    
-class ListWildcard(list):    
-    """
-    A list wildcard class. It will return True when compared to any other list object.
-    """
-    
-    def __init__(self):
-        int.__init__(self)
-        
-    def __str__(self):
-        return '[*]'    
-
-    def __repr__(self):
-        return self.__str__()
-
-    def __cmp__(self,other):
-        if isinstance(other,list):
-            return 0
-        else:
-            return -1
-
-    def __eq__(self,other):
-        return self.__cmp__(other) == 0  
-    
-    def __ne__(self,other):
-        return self.__cmp__(other) != 0
     
 
 

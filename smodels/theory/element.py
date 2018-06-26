@@ -74,7 +74,7 @@ class Element(object):
                         finalState = [None]*len(branches)                  
                     for ibr,branch in enumerate(branches):                        
                         if branch == '[*]':
-                            self.branches.append(BranchWildcard())                            
+                            self.branches.append(BranchWildcard(finalState[ibr]))                           
                         else:
                             self.branches.append(Branch(branch,finalState[ibr])) 
 

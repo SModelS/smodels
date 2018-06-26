@@ -221,7 +221,7 @@ class TxName(object):
         inside the efficiency map grid.  If it does, returns the corresponding
         efficiency value, else returns efficiency = 0.
 
-        :param element: Element object
+        :param element: Element object or mass array
         :return: efficiency (float)
         """
         
@@ -238,30 +238,7 @@ class TxName(object):
             raise SModelSError()
         return val
         
-    def getNewElementsAndFactors(self,element):    
-        """
-        Calculates factors for reweighting for all possible decay types and generates new elements.
-        :param element: Element object to be reweighted
-        :return: elements generated from combinations of decay types, effs = factors for reweighting
-        """                       
-                            
-        probabilities1, branches1 = addPromptAndDisplaced(element.branches[0]) 
-        probabilities2, branches2 = addPromptAndDisplaced(element.branches[1])
-
-        newElements = []        
-        factors = []
-        for i,probability1 in enumerate(probabilities1):
-            for j,probability2 in enumerate(probabilities2):
-                                
-                newEl = element.copy()
-                newEl.branches[0].decayType = branches1[i].decayType
-                newEl.branches[1].decayType = branches2[j].decayType 
-                factor = (probability1*probability2) 
-                newElements.append(newEl)         
-                factors.append(factor)                
-    
-        return newElements, factors
-        
+       
 
 class TxNameData(object):
     """

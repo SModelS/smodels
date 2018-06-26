@@ -14,60 +14,57 @@
 
 from smodels.theory.particle import Particle, ParticleList
 
-
-# MSSM particles
-
 ####  R-odd   ##########
 #1st generation squarks and its conjugates:
-sdl = Particle(Z2parity='odd', label='sd_L', pdg=1000001, mass=None, eCharge=-1./3, colordim=3, spin=0, width=None, decays=None)
-sul = Particle(Z2parity='odd', label='su_L', pdg=1000002, mass=None, eCharge=2./3, colordim=3, spin=0, width=None, decays=None)
-sdr = Particle(Z2parity='odd', label='sd_R', pdg=2000001, mass=None, eCharge=-1./3, colordim=3, spin=0, width=None, decays=None)
-sur = Particle(Z2parity='odd', label='su_R', pdg=2000002, mass=None, eCharge=2./3, colordim=3, spin=0, width=None, decays=None)
+sdl = Particle(Z2parity='odd', label='sd_L', pdg=1000001, eCharge=-1./3, colordim=3, spin=0)
+sul = Particle(Z2parity='odd', label='su_L', pdg=1000002, eCharge=2./3, colordim=3, spin=0)
+sdr = Particle(Z2parity='odd', label='sd_R', pdg=2000001, eCharge=-1./3, colordim=3, spin=0)
+sur = Particle(Z2parity='odd', label='su_R', pdg=2000002, eCharge=2./3, colordim=3, spin=0)
 
 #2nd generation squarks and its conjugates:
-ssl = Particle(Z2parity='odd', label='ss_L', pdg=1000003, mass=None, eCharge=-1./3, colordim=3, spin=0, width=None, decays=None)
-scl = Particle(Z2parity='odd', label='sc_L', pdg=1000004, mass=None, eCharge=2./3, colordim=3, spin=0, width=None, decays=None)
-ssr = Particle(Z2parity='odd', label='ss_R', pdg=2000003, mass=None, eCharge=-1./3, colordim=3, spin=0, width=None, decays=None)
-scr = Particle(Z2parity='odd', label='sc_R', pdg=2000004, mass=None, eCharge=2./3, colordim=3, spin=0, width=None, decays=None)
+ssl = Particle(Z2parity='odd', label='ss_L', pdg=1000003, eCharge=-1./3, colordim=3, spin=0)
+scl = Particle(Z2parity='odd', label='sc_L', pdg=1000004, eCharge=2./3, colordim=3, spin=0)
+ssr = Particle(Z2parity='odd', label='ss_R', pdg=2000003, eCharge=-1./3, colordim=3, spin=0)
+scr = Particle(Z2parity='odd', label='sc_R', pdg=2000004, eCharge=2./3, colordim=3, spin=0)
 
 #3rd generation squarks and its conjugates:
-sb1 = Particle(Z2parity='odd', label='sb_1', pdg=1000005, mass=None, eCharge=2./3, colordim=3, spin=0, width=None, decays=None)
-st1 = Particle(Z2parity='odd', label='st_1', pdg=1000006, mass=None, eCharge=-1./3, colordim=3, spin=0, width=None, decays=None)
-sb2 = Particle(Z2parity='odd', label='sb_2', pdg=2000005, mass=None, eCharge=2./3, colordim=3, spin=0, width=None, decays=None)
-st2 = Particle(Z2parity='odd', label='st_2', pdg=2000006, mass=None, eCharge=-1./3, colordim=3, spin=0, width=None, decays=None)
+sb1 = Particle(Z2parity='odd', label='sb_1', pdg=1000005, eCharge=2./3, colordim=3, spin=0)
+st1 = Particle(Z2parity='odd', label='st_1', pdg=1000006, eCharge=-1./3, colordim=3, spin=0)
+sb2 = Particle(Z2parity='odd', label='sb_2', pdg=2000005, eCharge=2./3, colordim=3, spin=0)
+st2 = Particle(Z2parity='odd', label='st_2', pdg=2000006, eCharge=-1./3, colordim=3, spin=0)
 
 #1st generation sleptons and its conjugates:
-sel = Particle(Z2parity='odd', label='se_L', pdg=1000011, mass=None, eCharge=-1, colordim=0, spin=0, width=None, decays=None)
-snel = Particle(Z2parity='odd', label='sne_L', pdg=1000012, mass=None, eCharge=0, colordim=0, spin=0, width=None, decays=None)
-ser = Particle(Z2parity='odd', label='se_R', pdg=2000011, mass=None, eCharge=0, colordim=0, spin=0, width=None, decays=None)
+sel = Particle(Z2parity='odd', label='se_L', pdg=1000011, eCharge=-1, colordim=0, spin=0)
+snel = Particle(Z2parity='odd', label='sne_L', pdg=1000012, eCharge=0, colordim=0, spin=0)
+ser = Particle(Z2parity='odd', label='se_R', pdg=2000011, eCharge=0, colordim=0, spin=0)
 
 #2nd generation sleptons and its conjugates:
-smul = Particle(Z2parity='odd', label='smu_L', pdg=1000013, mass=None, eCharge=-1, colordim=0, spin=0, width=None, decays=None)
-snmul = Particle(Z2parity='odd', label='snmu_L', pdg=1000014, mass=None, eCharge=0, colordim=0, spin=0, width=None, decays=None)
-smur = Particle(Z2parity='odd', label='smu_R', pdg=2000013, mass=None, eCharge=-1, colordim=0, spin=0, width=None, decays=None)
+smul = Particle(Z2parity='odd', label='smu_L', pdg=1000013, eCharge=-1, colordim=0, spin=0)
+snmul = Particle(Z2parity='odd', label='snmu_L', pdg=1000014, eCharge=0, colordim=0, spin=0)
+smur = Particle(Z2parity='odd', label='smu_R', pdg=2000013, eCharge=-1, colordim=0, spin=0)
 
 #3rd generation sleptons and its conjugates:
-sta1 = Particle(Z2parity='odd', label='sta_1', pdg=1000015, mass=None, eCharge=-1, colordim=0, spin=0, width=None, decays=None)
-sntal = Particle(Z2parity='odd', label='snta_L', pdg=1000016, mass=None, eCharge=0, colordim=0, spin=0, width=None, decays=None)
-sta2 = Particle(Z2parity='odd', label='sta_2', pdg=2000015, mass=None, eCharge=-1, colordim=0, spin=0, width=None, decays=None)
+sta1 = Particle(Z2parity='odd', label='sta_1', pdg=1000015, eCharge=-1, colordim=0, spin=0)
+sntal = Particle(Z2parity='odd', label='snta_L', pdg=1000016, eCharge=0, colordim=0, spin=0)
+sta2 = Particle(Z2parity='odd', label='sta_2', pdg=2000015, eCharge=-1, colordim=0, spin=0)
 
 #Gluino:
-gluino = Particle(Z2parity='odd', label='gluino', pdg=1000021, mass=None, eCharge=0, colordim=8, spin=1./2, width=None, decays=None)
+gluino = Particle(Z2parity='odd', label='gluino', pdg=1000021, eCharge=0, colordim=8, spin=1./2)
 #Neutralinos
-n1 = Particle(Z2parity='odd', label='N1', pdg=1000022, mass=None, eCharge=0, colordim=0, spin=1./2, width=None, decays=None)  
-n2 = Particle(Z2parity='odd', label='N2', pdg=1000023, mass=None, eCharge=0, colordim=0, spin=1./2, width=None, decays=None)  
-n3 = Particle(Z2parity='odd', label='N3', pdg=1000025, mass=None, eCharge=0, colordim=0, spin=1./2, width=None, decays=None)  
-n4 = Particle(Z2parity='odd', label='N4', pdg=1000035, mass=None, eCharge=0, colordim=0, spin=1./2, width=None, decays=None)  
+n1 = Particle(Z2parity='odd', label='N1', pdg=1000022, eCharge=0, colordim=0, spin=1./2)  
+n2 = Particle(Z2parity='odd', label='N2', pdg=1000023, eCharge=0, colordim=0, spin=1./2)  
+n3 = Particle(Z2parity='odd', label='N3', pdg=1000025, eCharge=0, colordim=0, spin=1./2)  
+n4 = Particle(Z2parity='odd', label='N4', pdg=1000035, eCharge=0, colordim=0, spin=1./2)  
 
 #Charginos
-c1 = Particle(Z2parity='odd', label='C1+', pdg=1000024, mass=None, eCharge=1, colordim=0, spin=1./2, width=None, decays=None)  
-c2 = Particle(Z2parity='odd', label='C2+', pdg=1000037, mass=None, eCharge=1, colordim=0, spin=1./2, width=None, decays=None)  
+c1 = Particle(Z2parity='odd', label='C1+', pdg=1000024, eCharge=1, colordim=0, spin=1./2)  
+c2 = Particle(Z2parity='odd', label='C2+', pdg=1000037, eCharge=1, colordim=0, spin=1./2)  
 
 ##### R-even  ###############
 #Higgs
-H = Particle(Z2parity='even', label='H+', pdg=37, mass=None, eCharge=+1, colordim=0, spin=0, width=None, decays=None)  
-A0 = Particle(Z2parity='even', label='A0', pdg=36, mass=None, eCharge=0, colordim=0, spin=0, width=None, decays=None)  
-H0 = Particle(Z2parity='even', label='H0', pdg=35, mass=None, eCharge=0, colordim=0, spin=0, width=None, decays=None)  
+H = Particle(Z2parity='even', label='H+', pdg=37, eCharge=+1, colordim=0, spin=0)  
+A0 = Particle(Z2parity='even', label='A0', pdg=36, eCharge=0, colordim=0, spin=0)  
+H0 = Particle(Z2parity='even', label='H0', pdg=35, eCharge=0, colordim=0, spin=0)  
 
 
 squarks = [sdl,sul,sdr,sur] + [ssl,scl,ssr,scr] + [sb1,st1,sb2,st2]
@@ -81,25 +78,7 @@ sparticlesC = [p.chargeConjugate() for p in sparticles]  #Define the charge conj
 
 #Generic BSM particles:
 
-HSCP = Particle(Z2parity='odd', label='HSCP',width=0.,eCharge=+1,colordim=0,decays=None)
-
-RHadronG = Particle(Z2parity='odd', label='RHadronG',width=0.,eCharge=0,colordim=8,decays=None)
-RHadronQ = Particle(Z2parity='odd', label='RHadronQ',width=0.,colordim=3,decays=None)
-
-
-
 BSMList = sparticles + sparticlesC
-MET = ParticleList(label='MET', particles = [sparticle for sparticle in BSMList 
-                                 if sparticle.eCharge == 0 and sparticle.colordim == 0])
-HSCP = ParticleList(label='HSCP', particles = [sparticle for sparticle in BSMList 
-                                   if abs(sparticle.eCharge) == 1 and sparticle.colordim == 0])
-RHadronG = ParticleList(label='RHadronG', particles = [sparticle for sparticle in BSMList 
-                                           if sparticle.eCharge == 0 and sparticle.colordim == 8])
-RHadronQ = ParticleList(label='RHadronQ', particles = [sparticle for sparticle in BSMList 
-                                           if abs(sparticle.eCharge) in [2./3.,1./3.] and sparticle.colordim == 3])
 BSMparticleList = ParticleList('BSM', BSMList)
-BSMpdgs = BSMparticleList.getPdgs()
-BSMLabels = BSMparticleList.getLabels()
-
 
 

@@ -6,7 +6,7 @@
 """
 
 import pyslha
-from smodels.particleDefinitions import BSM, SM
+from smodels.particleDefinitions import allParticles, SM
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import GeV
 from smodels.theory.particleNames import getObjectFromPdg, getPDGList
@@ -14,7 +14,7 @@ from smodels.theory.particleNames import getObjectFromPdg, getPDGList
 
 class Model(object):
     """
-    An instance of this class represents a BSM model
+    An instance of this class represents a allParticles model
     This class contains the input file and the particles of the model
     """
     def __init__(self, inputFile, BSMparticleList):
@@ -38,7 +38,7 @@ class Model(object):
     
     def getParticleData(self, promptWidth = 1e-8*GeV, stableWidth = 1e-25*GeV):
         """
-        Update mass, total width and branches of BSM particles from input slha file. 
+        Update mass, total width and branches of allParticles particles from input slha file. 
             
         :param promptWidth: Maximum width for considering particles as decaying prompt
         :param stableWidth: Minimum width for considering particles as stable
@@ -49,8 +49,8 @@ class Model(object):
         SMpdgs = getPDGList(SM)
         allpdgs = getPDGList()
         BSMpdgs = [pdg for pdg in allpdgs if not abs(pdg) in SMpdgs]
-        evenPDGs = [particle.pdg for particle in BSM if particle.Z2parity == 'even']
-        oddPDGs = [particle.pdg for particle in BSM if particle.Z2parity == 'odd']
+        evenPDGs = [particle.pdg for particle in allParticles if particle.Z2parity == 'even']
+        oddPDGs = [particle.pdg for particle in allParticles if particle.Z2parity == 'odd']
 
         for pdg in res.blocks['MASS']:
             if not pdg in allpdgs:

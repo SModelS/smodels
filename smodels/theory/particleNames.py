@@ -9,7 +9,7 @@
 
 """
 
-from smodels.particleDefinitions import BSM
+from smodels.particleDefinitions import allParticles
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -22,7 +22,9 @@ def getObjectFromPdg(pdg):
     :returns: Particles object 
     """
 
-    for particle in BSM:
+    for particle in allParticles:
+        if not hasattr(particle,'pdg'):
+            continue
         if particle.pdg==pdg:
             return particle
     
@@ -37,7 +39,7 @@ def getObjectFromLabel(label):
     :returns: Particles object or ParticleList object
     """    
 
-    for particle in BSM:         
+    for particle in allParticles:  
         if particle.label == label:
             return particle 
 
@@ -45,7 +47,7 @@ def getObjectFromLabel(label):
 
 
 
-def getNamesList(particleList=BSM):
+def getNamesList(particleList=allParticles):
     """ 
 	Convert list of particles to list of particle names according to the Particle class.
 	If particleList is not define, use all particles defined.
@@ -60,7 +62,7 @@ def getNamesList(particleList=BSM):
     return namesList
 
 
-def getPDGList(particleList=BSM):
+def getPDGList(particleList=allParticles):
     """ 
     Convert list of particles to list of particle PDGs according to the Particle class.
     If particleList is not define, use all particles defined.
@@ -132,8 +134,7 @@ def elementsInStr(instring,removeQuotes=True):
                 if not ptc:
                     continue          
                 if not ptc in particleNames:
-                    logger.error("Unknown particle. Add " + ptc + " to smodels/particleDefinitions.py")
-                    raise SModelSError()
+                    raise SModelSError("Unknown particle. Add " + ptc + " to smodels/particleDefinitions.py")
 
     # Check if there are not unmatched ['s and/or ]'s in the string
     if nc != 0:
