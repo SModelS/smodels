@@ -246,7 +246,7 @@ class LikelihoodComputer:
 
     debug_mode = False
 
-    def __init__(self, data, ntoys = 1000):
+    def __init__(self, data, ntoys = 10000 ):
         """
         :param data: a Data object.
         :param ntoys: number of toys when marginalizing

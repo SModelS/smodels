@@ -2,7 +2,8 @@
 
 """
 .. module:: databaseObj
-   :synopsis: Contains Database class that represents the database of experimental results.
+   :synopsis: Contains Database class that represents the database of
+   experimental results.
 
 .. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -47,7 +48,8 @@ class Database(object):
     def __init__( self, base=None, force_load = None, discard_zeroes = True,
                   progressbar = False, subpickle = True ):
         """
-        :param base: path to the database, or pickle file (string)
+        :param base: path to the database, or pickle file (string), or http
+            address. If None, or "official", use the official database.
         :param force_load: force loading the text database ("txt"),
             or binary database ("pcl"), dont force anything if None
         :param discard_zeroes: discard txnames with only zeroes as entries.
@@ -59,6 +61,9 @@ class Database(object):
         self.source=""
         self.force_load = force_load
         self.subpickle = subpickle
+        if base in [ None, "official" ]:
+            from smodels.installation import officialDatabase
+            base = officialDatabase()
         base, pclfile = self.checkPathName(base, discard_zeroes )
         self.pcl_meta = Meta( pclfile )
         self.expResultList = []

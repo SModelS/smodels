@@ -135,12 +135,13 @@ def printHelp():
 
     """
     print("Usage: " + sys.argv[0] + " [--help|-h] [--installdir|-i] [--pythondir|-p]")
-    print("                      [--version|-v] [--banner|-b] [--license|--copyright|-c]:")
+    print("                [--database|-d] [--version|-v] [--banner|-b] [--license|--copyright|-c]:")
     print("--help:       show this message")
     print("--installdir: print SModelS installation directory")
     print("--pythondir:  print SModelS python path")
     print("--version:    print SModelS version number")
     print("--banner:     print SModelS banner")
+    print("--database:   print SModelS official database url for this release")
     print("--copyright:  print SModelS copyright")
     sys.exit(0)
 
@@ -159,6 +160,10 @@ def fixpermissions():
     except Exception as e:
         print ( "chmod failed (permission error). Please try as root, i.e.:" )
         print ( "sudo smodelsTools.py fixpermissions" )
+
+def officialDatabase():
+    r="http://smodels.hephy.at/database/official%s" % version().replace(".","")
+    return r
 
 def main():
     # print( banner() )
@@ -182,6 +187,9 @@ def main():
             sys.exit(0)
         if i in [ "--help", "-h" ]:
             printHelp()
+            sys.exit(0)
+        if i in [ "--database", "-d" ]:
+            print ( officialDatabase() )
             sys.exit(0)
         if i in [ "--license", "--copyright", "-c" ]:
             print(license())
