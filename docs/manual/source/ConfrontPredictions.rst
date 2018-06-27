@@ -135,13 +135,13 @@ We then search for the root of the function CLs - 0.95 with the Brent bracketing
 When using *runSModelS.py*, the combination of signal regions is turned on or off with the parameter **options:combineSRs**, see :ref:`parameter file <parameterFile>`. Per default it is turned off, in which case only the result from the best expected signal region (best SR) is reported. 
 If it is turned on, both the combined result and the one from the best SR are quoted. 
 
-+----------------------------------------+----------------------------------------+----------------------------------------+
-| .. image:: images/T2bbffff_bestSR.png  | .. image:: images/T2bbffff_17.png      | .. image:: images/T2bbffff_44.png      |
-|            :width: 300px               |            :width: 300px               |            :width: 300px               |
-| Best signal region                     | 17 aggregate regions                   | 44 signal regions                      |
-+----------------------------------------+----------------------------------------+----------------------------------------+
++------------------------------------------------+------------------------------------------------+------------------------------------------------+
+| .. image:: images/T2bbWWoffSemiLep_bestSR.png  | .. image:: images/T2bbWWoffSemiLep_17.png      | .. image:: images/T2bbWWoffSemiLep_44.png      |
+|            :width: 300px                       |            :width: 300px                       |            :width: 300px                       |
+| Best signal region                             | 17 aggregate regions                           | 44 signal regions                              |
++------------------------------------------------+------------------------------------------------+------------------------------------------------+
 
-Figure: Comparison of validation plots, for `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_: using only the best signal region (left), the combination of 17 aggregate signal regions (center), and the combination of all 44 signal regions (right). While the combined results are much closer to the official exclusion than the one from using only the best SR, aggregating the most correlated signal regions to a total of 17 aggregate regions comes with only little loss in constraining power. Combining 17 aggregate signal regions takes approximately 2 sec, combining 44 signal regions takes about 5 sec.
+Figure: Comparison of validation plots, for `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_: using only the best signal region (left), the combination of 17 aggregate signal regions (center), and the combination of all 44 signal regions (right). While the combined results are much closer to the official exclusion than the one from using only the best SR, aggregating the most correlated signal regions to a total of 17 aggregate regions comes with only little loss in constraining power. Combining 17 aggregate signal regions takes approximately 2 sec, combining 44 signal regions takes about 5 sec, on a typical desktop computer.
 
 
 .. [*] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model
