@@ -160,7 +160,8 @@ class Meta(object):
         """ check if fastlim appears in data.
             If yes, print a statement to stdout. """
         if not self.hasFastLim: return
-        print ( "FastLim v1.1 efficiencies loaded. Please cite: arXiv:1402.0492, EPJC74 (2014) 11" )
+        # print ( "FastLim v1.1 efficiencies loaded. Please cite: arXiv:1402.0492, EPJC74 (2014) 11" )
+        logger.info ( "FastLim v1.1 efficiencies loaded. Please cite: arXiv:1402.0492, EPJC74 (2014) 11" )
 
     def __eq__ ( self, other ):
         if other == None: return False
