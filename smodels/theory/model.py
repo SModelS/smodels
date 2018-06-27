@@ -53,7 +53,7 @@ class Model(object):
             res = pyslha.readSLHAFile(self.inputFile)
             massDict = res.blocks['MASS'] 
             decaysDict = res.decays
-            self.xsections = crossSection.getXsecFromSLHAFile(self.inputFile)            
+            self.xsections = crossSection.getXsecFromSLHAFile(self.inputFile)                        
         except:
             massDict,decaysDict = lheReader.getDictionariesFrom(self.inputFile)
             self.xsections = crossSection.getXsecFromLHEFile(self.inputFile)
@@ -71,8 +71,20 @@ class Model(object):
                 evenPDGs.append(particle.pdg)
             elif particle.Z2parity == 'odd' and not particle.pdg in oddPDGs:
                 oddPDGs.append(particle.pdg)
-        allPDGs = list(set(evenPDGs + oddPDGs))               
+        allPDGs = list(set(evenPDGs + oddPDGs))
 
+        
+        #Remove cross-sections for even particles or particles which do not belong to the model:
+        modelPDGs = [particle.pdg for particle in self.particles if not isinstance(particle.pdg,list)]
+        for xsec in self.xsections.xSections[:]:
+            for pid in xsec.pid:
+                if not pid in modelPDGs:
+                    logger.debug("Cross-section for %s includes particles not belonging to model and will be ignored" %str(xsec.pid))
+                    self.xsections.delete(xsec)                    
+                if not pid in oddPDGs:
+                    logger.debug("Cross-section for %s includes even particles and will be ignored" %str(xsec.pid))
+                    self.xsections.delete(xsec)
+        
 
 
         for particle in self.particles:
@@ -90,12 +102,18 @@ class Model(object):
                 particle.mass = None
 
             particle.decays = []
-            if not pdg in decaysDict:
+            if not pdg in decaysDict and not -pdg in decaysDict:
                 logger.debug("No decay found for %i. It will be considered stable" %particle.pdg)                
                 particle.width = 0.*GeV
                 continue
             
-            particleData = decaysDict[pdg]
+            if pdg in decaysDict:
+                particleData = decaysDict[pdg]
+                chargeConj = 1
+            else:
+                particleData = decaysDict[-pdg]
+                chargeConj = -1
+                
             particle.totalwidth = abs(particleData.totalwidth)*GeV
             if particle.totalwidth < stableWidth:
                 particle.totalwidth = 0.*GeV  #Treat particle as stable
@@ -105,8 +123,9 @@ class Model(object):
             if particle.totalwidth > promptWidth:
                 particle.totalwidth = float('inf')  #Treat particle as prompt
                 logger.debug("Particle %s has width above the threshold and will be assumed as prompt" %particle.pdg)
+            else:
+                particle.decays.append(None) #Include possibility for particle being long-lived (non-prompt)
             
-            chargeConj = pdg/particle.pdg # = +1 for particle and -1 for anti-particle
             for decay in particleData.decays:
                 pids = decay.ids
                 missingIDs = set(pids).difference(set(allPDGs))
@@ -118,7 +137,10 @@ class Model(object):
                 if len(oddPids) != 1 or len(evenPids+oddPids) != len(decay.ids):
                     logger.info("Decay %s is not of the form Z2-odd -> Z2-odd + [Z2-even particles] and will be ignored" %(decay))
                     continue
-                particle.decays.append(decay)
-                particle.decays[-1].ids = [pid*chargeConj for pid in decay.ids] #Conjugated decays
+                newDecay = pyslha.Decay(br=decay.br,nda=decay.nda,parentid=decay.parentid,ids=decay.ids[:])
+                #Conjugated decays if needed:
+                if chargeConj == -1:
+                    newDecay.ids = [pid*chargeConj if pid in allPDGs else pid for pid in decay.ids] 
+                particle.decays.append(newDecay)
                  
         

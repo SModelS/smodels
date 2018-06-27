@@ -18,8 +18,8 @@ from smodels.theory.particleNames import getObjectFromPdg, getPDGList
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
-def decompose(model, sigcut=.1 * fb, doCompress=False, doInvisible=False,
-              minmassgap=-1.*GeV):
+def decompose(model, sigcut= 0*fb, doCompress=False, doInvisible=False,
+              minmassgap= 0*GeV):
     """
     Perform decomposition using the information stored in model.
     

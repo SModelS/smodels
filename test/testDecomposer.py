@@ -16,16 +16,16 @@ from smodels.theory.model import Model
 from smodels.installation import installDirectory
 from smodels.theory import decomposer
 from smodels.theory.element import Element 
-from smodels.tools.physicsUnits import GeV,pb,TeV
+from smodels.tools.physicsUnits import GeV,pb,TeV,fb
 
 class DecomposerTest(unittest.TestCase):
 
     def testDecomposerLHE(self):
-
+ 
         filename = "%sinputFiles/lhe/simplyGluino.lhe" %(installDirectory())  
         model = Model(filename, BSM)
         model.updateParticles()
-        
+         
         topList = decomposer.decompose(model)
         self.assertTrue(len(topList.getElements()) == 1)
         element = topList.getElements()[0]
@@ -56,6 +56,29 @@ class DecomposerTest(unittest.TestCase):
         xsec = [xsec for xsec in element.weight if xsec.info.sqrts == 8.*TeV][0]
         xsec = xsec.value.asNumber(pb)
         self.assertAlmostEqual(element.weight[0].value.asNumber(pb),0.572,3)
+
+ 
+    def testDecomposerLongLived(self):
+  
+        filename = "%sinputFiles/slha/longLived.slha" %(installDirectory())
+        #Consider a simpler model
+        newModel = [ptc for ptc in BSM if not isinstance(ptc.pdg,list) and abs(ptc.pdg) in [1000015,1000022]] 
+        model = Model(filename, newModel)
+        model.updateParticles()
+          
+        topList = decomposer.decompose(model)
+        self.assertTrue(len(topList.getElements()) == 10)
+        expectedWeights = {str(sorted([['N1'],['N1']])).replace(' ','') : 0.020,
+                           str(sorted([['sta_1'],['sta_1~']])).replace(' ','') : 0.26,
+                           str(sorted([['sta_1'],['sta_1~','N1~']])).replace(' ','') : 0.13,
+                           str(sorted([['sta_1~'],['sta_1','N1']])).replace(' ','') : 0.13,
+                           str(sorted([['sta_1~','N1~'],['sta_1','N1']])).replace(' ','') : 0.065}
+            
+        for el in topList.getElements():
+            bsmLabels = str(sorted([[bsm.label for bsm in branch] for branch in el.getBSMparticles()]))
+            bsmLabels = bsmLabels.replace(' ','')
+            xsec = el.weight.getXsecsFor(8.*TeV)[0].value.asNumber(fb)
+            self.assertAlmostEqual(expectedWeights[bsmLabels], xsec,2)
 
 
 

@@ -315,8 +315,8 @@ class Branch(object):
 
         newBranches = []
         for decay in self.BSMparticles[-1].decays:
-            if not decay.br:
-                continue  #Skip zero BRs            
+            if not decay or not decay.br:
+                continue  #Skip decay = None and zero BRs
             # Generate a new branch for each possible decay:
             newBr = self._addDecay(decay)
             if newBr:
@@ -411,10 +411,13 @@ def decayBranches(branchList, sigcut=0.*fb):
             if sigcut.asNumber() > 0. and inbranch.maxWeight < sigcut:
                 # Remove the branches above sigcut and with length > topmax
                 continue
+            
+            #If None appear amongst the decays, add the possibility for the particle not decaying prompt
+            if None in inbranch.BSMparticles[-1].decays:
+                stableBranches.append(inbranch)
+            
             # Add all possible decays of the R-odd daughter to the original
             # branch (if any)
-                     
-
             newBranches = inbranch.decayDaughter()
             if newBranches:
                 # New branches were generated, add them for next iteration
