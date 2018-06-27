@@ -80,8 +80,8 @@ class LHEReaderTest(unittest.TestCase):
         self.assertEqual(massDict,{1000021: 675.0, 1000022: 200.0, 1: 0.33, 2 : 0.33})
         gluinoDecs = [pyslha.Decay(br=0.3,nda=3,ids=[-1,1,1000022],parentid=1000021),
                       pyslha.Decay(br=0.7,nda=3,ids=[-2,2,1000022],parentid=1000021)]
-        self.assertEqual(len(decayDict[1000021]),len(gluinoDecs))
-        self.assertTrue(compareDecays(gluinoDecs,decayDict[1000021]))            
+        self.assertEqual(len(decayDict[1000021].decays),len(gluinoDecs))
+        self.assertTrue(compareDecays(gluinoDecs,decayDict[1000021].decays))            
         
         re = pyslha.readSLHAFile("%sinputFiles/slha/gluino_squarks.slha" % (installDirectory()))
 
@@ -91,7 +91,7 @@ class LHEReaderTest(unittest.TestCase):
             if pdg < 100000:
                 continue            
             self.assertAlmostEqual(re.blocks['MASS'][pdg],massDict[pdg])
-
+            
         #Expected answer:
         decayRes = {}
         decayRes[1000024] = [pyslha.Decay(br=1.0000,ids=[1000022, 24],parentid=1000024,nda=2)]
@@ -109,7 +109,12 @@ class LHEReaderTest(unittest.TestCase):
                              pyslha.Decay(br=0.1250,ids=[1000023, -6, 6],parentid=1000021,nda=3)]
 
         for pdg in decayRes:
-            self.assertTrue(compareDecays(decayDict[pdg],decayRes[pdg]))
+            self.assertTrue(compareDecays(decayDict[pdg].decays,decayRes[pdg]))
+            self.assertEqual(decayDict[pdg].totalwidth,float('inf'))
+            
+        for pdg in decayDict:
+            if not decayDict[pdg].decays:
+                self.assertEqual(decayDict[pdg].totalwidth,0.)
 
 if __name__ == "__main__":
     unittest.main()

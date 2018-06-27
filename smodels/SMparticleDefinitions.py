@@ -10,7 +10,7 @@
 """
 
 from smodels.tools.physicsUnits import MeV , GeV
-from smodels.theory.particle import Particle, ParticleList,ParticleWildcard
+from smodels.theory.particle import Particle, ParticleList
 
 
 

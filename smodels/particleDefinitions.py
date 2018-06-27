@@ -26,9 +26,11 @@ def add(ptcList,obj):
     """
     
     if isinstance(obj,Particle) or isinstance(obj,ParticleWildcard):
-        ptcList.append(obj)
+        if not any(obj is ptc for ptc in ptcList):
+            ptcList.append(obj)
     elif isinstance(obj,ParticleList):
-        ptcList.append(obj)        
+        if not any(obj is ptc for ptc in ptcList):
+            ptcList.append(obj)        
         for ptc in obj.particles:
             add(ptcList,ptc)
     elif isinstance(obj,list):

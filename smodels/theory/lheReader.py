@@ -297,6 +297,17 @@ def getDictionariesFrom(lheFile,nevts=None):
     for pdg in decaysDict.keys()[:]:
         if -abs(pdg) in decaysDict and abs(pdg) in decaysDict:
             decaysDict.pop(-abs(pdg))
+            
+    #Add widths to decaysDict using the pyslha.Particle class:
+    for pdg,decays in decaysDict.items():
+        decaysDict[pdg] = pyslha.Particle(pid=pdg)
+        if abs(pdg) in massDict:
+            decaysDict[pdg].mass = massDict[abs(pdg)]
+        if decays:
+            decaysDict[pdg].totalwidth = float('inf')
+        else:
+            decaysDict[pdg].totalwidth = 0.
+        decaysDict[pdg].decays = decays
 
     return massDict,decaysDict
 
