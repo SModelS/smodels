@@ -36,6 +36,8 @@ class Browser(object):
         if force_txt == True:
             load = "txt"
         if isinstance(database,str):
+            if database.endswith(".pcl"):
+                load = "pcl"
             self.database = Database(database, load )
         elif isinstance(database,Database):
             self.database = database
@@ -314,7 +316,7 @@ def main(args):
         header += "\n"
         header += "fb, pb, GeV, TeV defined.\n"
         header +=  "\nBrowser loaded for %s \n" %( args.path_to_database )
-        header += "Try 'print browser' for the list of available results.\n"
+        header += "Try 'print(browser)' for the list of available results.\n"
         header += "More examples on how to access the database can be found in the SModelS manual.\n"
         header += "\nType 'exit' to exit this session."
 
