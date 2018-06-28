@@ -16,7 +16,8 @@ import types
 from smodels import installation
 from smodels.theory import decomposer
 from smodels.tools.smodelsLogging import logger
-from smodels.particleDefinitions import BSM
+from smodels.share.models.MSSMparticles import BSMList
+from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
 
 
@@ -138,7 +139,7 @@ if __name__ == "__main__":
     if args.lhe != "":
         filename = args.lhe
 
-    model = Model(filename, BSM)
+    model = Model(inputFile=filename, BSMparticles=BSMList, SMparticles=SMList)
     model.updateParticles()
     topList = decomposer.decompose(model)
     element = topList.getElements()[0]
