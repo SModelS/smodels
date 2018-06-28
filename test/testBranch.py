@@ -1,0 +1,108 @@
+#!/usr/bin/env python
+
+"""
+.. module:: testBranchClass
+   :synopsis: Tests the theory.branch.Branch class
+
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
+
+"""
+import sys
+sys.path.insert(0,"../")
+from smodels.theory.exceptions import SModelSTheoryError
+import unittest
+from smodels.theory.particle import Particle, ParticleList
+from smodels.theory.branch import Branch, decayBranches, BranchWildcard
+from smodels.tools.physicsUnits import GeV, fb, MeV
+import pyslha
+import pickle
+
+#Load the particle dictionaries
+    
+sq1 = Particle(Z2parity='odd', mass = 150.*GeV, pdg=1000005, width = 1*GeV)
+sq2 = Particle(Z2parity='odd',label = 'sq2', mass = 100.*GeV, pdg=2000005, colordim = 3, width = 1*GeV)
+sq2b = Particle(Z2parity='odd',label = 'sq2b', mass = 100.*GeV,  pdg = 1000004, colordim = 3,  width = 1*GeV)
+sn1 = Particle(Z2parity='odd',label='neutralino1', mass = 50.*GeV,  pdg = 1000022, width = 0.*GeV, decays=[])
+sn1B = Particle(Z2parity='odd', label='neutralino1', pdg = 1000022, eCharge = 0, colordim = 0, width = 0.*GeV)
+u = Particle(Z2parity='even', label='q',  pdg = 3, width = 0.*GeV, eCharge = 2./3.)
+e = Particle(Z2parity='even', label='e-', pdg=11, mass=0.5*MeV, eCharge=-1, colordim=0, spin=1./2, width = 0.*GeV, decays=[]) 
+
+g_decays = [pyslha.Decay(br=0.3,nda=3,ids=[-1,1,1000022],parentid=1000021),
+                      pyslha.Decay(br=0.7,nda=3,ids=[-2,2,1000022],parentid=1000021)]
+g_decays[0].daughters = [u,u,sn1]
+g_decays[1].daughters = [u,u,sn1]
+g = Particle(mass=500.*GeV,pdg=1000021, Z2Parity=-1, width = 1*GeV, decays = g_decays )
+
+class BranchTest(unittest.TestCase):
+        
+    def testBranch(self):
+        
+        b1 = Branch(info = '[[q,q],[q],[q,q]]', finalState = 'MET')
+        b2 = Branch(info = '[[q]]')
+        b2.BSMparticles = [g]
+        b3 = Branch(info = '[[e-]]')       
+        b4 = Branch(info = '[[q]]')
+        b4.BSMparticles = [sq1]
+        b5 = BranchWildcard()
+
+        self.assertTrue( str(b1) == '[[q,q],[q],[q,q]]')
+        self.assertTrue(b1 > b2)  #Larger by number of vertices
+        self.assertEqual(b1, b5) #always true because b3 is a wildcard
+        self.assertFalse(b2 < b3)  #Bigger by label of particles
+        self.assertFalse(b2 < b4)  #Bigger by mass of g compared to sq1
+
+        
+    def testBranchInclusive(self):
+
+        bi1 = Branch( '[[e-],[q]]' )
+        bi1b = Branch( '[[l],[jet]]' )
+        
+        self.assertTrue( bi1.particlesMatch(bi1b)) #Test if inclusive label comparison works
+
+        
+    def testcombineWith(self):
+        
+        b6 = Branch( '[[e-],[q]]' )
+        b6.BSMparticles = [sq2]
+        b6b = Branch( '[[e-],[q]]' )
+        b6b.BSMparticles = [sq2b]
+        
+        b6.combineWith(b6b)
+        
+        self.assertTrue( isinstance(b6.BSMparticles[0],ParticleList) )
+        self.assertEqual( b6.BSMparticles[0].label, 'BSM (combined)' )
+        self.assertEqual(len(b6.BSMparticles[0].particles), 2)
+        
+        
+        
+
+    def testBranchDecay(self):
+
+        b = Branch(info = '[[q]]', finalState = 'MET')
+        b.BSMparticles = [g]
+        
+        newBranches = b.decayDaughter()
+        nb1 = Branch()
+        self.assertEqual(len(newBranches), 2)
+        self.assertEqual(newBranches[0].particles, [[u],[u,u]])
+        self.assertEqual(newBranches[0].BSMparticles, [g,sn1])
+
+        
+        
+        
+        
+    def testDecayBranches(self):
+        
+        b = Branch(info = '[[q]]', finalState = 'MET')
+        b.maxWeight = 2.0*fb
+        b.BSMparticles = [g]
+        
+        dList = decayBranches([b])
+        
+        self.assertEqual(len(dList), 2)
+        self.assertEqual(dList[0].maxWeight, .6*fb)
+        self.assertEqual(dList[1].maxWeight, 1.4*fb)
+        
+        
+if __name__ == "__main__":
+    unittest.main()
