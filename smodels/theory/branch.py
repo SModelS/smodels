@@ -7,13 +7,13 @@
         
 """
 
-from smodels.theory.particleNames import elementsInStr, getObjectFromLabel
+from smodels.theory.auxiliaryFunctions import elementsInStr,simParticles
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-from particleComparison import simParticles
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import fb
 from smodels.theory.particle import ParticleList,ParticleWildcard
 from smodels.tools.wildCards import ValueWildcard,ListWildcard
+from smodels.experiment.finalStateParticles import finalStates
 
 
 
@@ -54,17 +54,32 @@ class Branch(object):
                 branch = branch[0]
                 vertices = elementsInStr(branch[1:-1])        
                 for vertex in vertices:
-                    self.BSMparticles.append(getObjectFromLabel('anyBSM'))
+                    bsmParticle = finalStates.getParticlesWith(label='anyBSM')
+                    if not bsmParticle:
+                        raise SModelSError("Final state anyBSM has not been defined in finalStateParticles.py")
+                    if len(bsmParticle) != 1:
+                        raise SModelSError("Ambiguos defintion of label %s in finalStates" %bsmParticle[0].label)          
+                    self.BSMparticles.append(bsmParticle[0])
                     particleNames = vertex[1:-1].split(',')
                     ptcs = []
-                    for pname in particleNames:    
-                        ptcs.append(getObjectFromLabel(pname))
+                    for pname in particleNames:
+                        smParticle = finalStates.getParticlesWith(label=pname)
+                        if not smParticle:
+                            raise SModelSError("Final state %s has not been defined in finalStateParticles.py " %pname)
+                        if len(smParticle) != 1:
+                            raise SModelSError("Ambiguos defintion of label %s in finalStateParticles.py" %pname)
+                        ptcs.append(smParticle)
                     self.particles.append(ptcs)
 
             self.vertnumb = len(self.particles)
             self.vertparts = [len(v) for v in self.particles]
         if finalState:
-            self.BSMparticles.append(getObjectFromLabel(finalState))
+            bsmParticle = finalStates.getParticlesWith(label=finalState)
+            if not bsmParticle:
+                raise SModelSError("Final state %s has not been defined in finalStateParticles.py")
+            if len(bsmParticle) != 1:
+                raise SModelSError("Ambiguos defintion of label %s in finalStateParticles.py" %finalState)
+            self.BSMparticles.append(bsmParticle[0])
 
     def __str__(self):
         """
@@ -118,7 +133,7 @@ class Branch(object):
                 return comp
             
         #Compare final BSM state by Z2parity and quantum numbers:
-        comp = self.BSMparticles[-1].cmpProperties(other.BSMparticles[iptc],
+        comp = self.BSMparticles[-1].cmpProperties(other.BSMparticles[-1],
                                                    properties=['Z2parity','colordim','eCharge'])
         if comp:
             return comp 
@@ -208,21 +223,16 @@ class Branch(object):
         
         if self.vertparts != other.vertparts:
             return False
-
-
         
         #If particles are identical, avoid further checks
         if self.particles != other.particles:
             for iv,vertex in enumerate(self.particles):
                 if not simParticles(vertex,other.particles[iv]):
                     return False
-        
-        
-        compare quantum numbers:
-        #If BSM particles are identical, avoid further checks                
-        if self.BSMparticles[-1] != other.BSMparticles[-1]:                       
-            if not simParticles([self.BSMparticles[-1]], [other.BSMparticles[-1]]):
-                return False             
+
+        #If the final state BSM particles have the same quantum numbers: 
+        if not self.BSMparticles[-1].eqProperties(other.BSMparticles[-1],properties=['colordim','eCharge']):
+            return False             
         
         return True
    
@@ -271,16 +281,30 @@ class Branch(object):
             raise SModelSError("Asked to combine distinct branches")
         
         for iptc,bsm in enumerate(other.BSMparticles):
-            if bsm == self.BSMparticles[iptc]:
-                continue
+            
+            if bsm is self.BSMparticles[iptc]:
+                continue #Particles are the same (do nothing)
+            
+            #Else create a particle list with particles from both
             if not isinstance(self.BSMparticles[iptc],ParticleList):
                 bsmList = ParticleList(label = 'BSM (combined)', particles=[self.BSMparticles[iptc]])
-                self.BSMparticles[iptc] = bsmList
                 
-            if isinstance(bsm,ParticleList):
-                self.BSMparticles[iptc].particles += bsm.particles
+            #Now combine particles from both branches:
+            if not isinstance(bsm,ParticleList):
+                bsmList.particles.append(bsm)
             else:
-                self.BSMparticles[iptc].particles.append(bsm)
+                bsmList.particles += bsm.particles
+            
+            #Finally, remove duplicates:
+            newList = []
+            for ptc in bsmList.particles:
+                if any(ptc is x for x in newList):
+                    continue
+                newList.append(ptc)
+            bsmList.particles = newList
+            
+            self.BSMparticles[iptc] = bsmList
+                        
 
 
     def _addDecay(self, decay):
@@ -292,11 +316,8 @@ class Branch(object):
         :returns: extended branch (Branch object). False if there was an error.
         """
         
-        newBranch = self.copy()
-        
-        Move pdg->ParticleOBj to model.update
-        
-        particles = [getObjectFromPdg(pdg) for pdg in decay.ids]
+        newBranch = self.copy()      
+        particles = [ptc for ptc in decay.daughters]
         oddParticles = [p for p in particles if p.Z2parity == 'odd']
         evenParticles = [p for p in particles if p.Z2parity == 'even']
         
@@ -353,7 +374,12 @@ class BranchWildcard(Branch):
         self.masses = ListWildcard()
         self.particles =  ListWildcard()
         if finalState:
-            self.BSMparticles = [getObjectFromLabel(finalState)]
+            bsmParticle = finalStates.getParticlesWith(label=finalState)
+            if not bsmParticle:
+                raise SModelSError("Final state %s has not been defined in finalStateParticles.py" %finalState)
+            if len(bsmParticle) != 1:
+                raise SModelSError("Ambiguos defintion of label %s in finalStates" %bsmParticle[0].label)          
+            self.BSMparticles = [bsmParticle[0]]
         else:
             self.BSMparticles = [ParticleWildcard()]
         self.vertnumb = ValueWildcard()
@@ -376,7 +402,13 @@ class BranchWildcard(Branch):
         
         #If BSM particles are identical, avoid further checks                
         if self.BSMparticles and other.BSMparticles:
-            comp = 
+            #Compare final BSM state by Z2parity and quantum numbers:
+            comp = self.BSMparticles[-1].cmpProperties(other.BSMparticles[-1],
+                                                       properties=['Z2parity','colordim','eCharge'])
+            if comp:
+                return comp 
+    
+        return 0  #Branches are equal    
         
         
        

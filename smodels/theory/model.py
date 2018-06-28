@@ -11,7 +11,6 @@ from smodels.tools.physicsUnits import GeV
 from smodels.theory import lheReader, crossSection
 from smodels.theory.particle import ParticleList,ParticleWildcard
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-from smodels.particleDefinitions import SM
 
 class Model(object):
     """
@@ -20,22 +19,67 @@ class Model(object):
     cross-sections.
     """
     
-    def __init__(self, BSMparticles, inputFile=None):
+    def __init__(self, BSMparticles, SMparticles, inputFile=None):
         """
         Initializes the model
-        :parameter inputFile: input file
-        :parameter particles: ParticleList object containing the particles of the model
+        :parameter inputFile: input file (SLHA or LHE)
+        :parameter BSMparticles: list with BSM particle objects
+        :parameter SMparticles: list with SM particle objects
         """
+        
+        
         self.inputFile = inputFile
-        self.particles = [copy.deepcopy(particle) for particle in BSMparticles]
+        self.BSMparticles = [copy.deepcopy(particle) for particle in BSMparticles]
+        self.SMparticles = SMparticles[:]
         
     def __str__(self):
+        
         return self.inputFile
 
-    def updateParticles(self, promptWidth = 1e-8*GeV, stableWidth = 1e-25*GeV):        
-        self.getParticleData(promptWidth, stableWidth)
+    def getParticlesWith(self,**kwargs):
+        """
+        Return the particle objects with the listed attributes.
+        
+        :returns: List of particle objects 
+        """
     
-    def getParticleData(self, promptWidth = 1e-8*GeV, stableWidth = 1e-25*GeV):
+        particleList = []
+        for particle in self.BSMparticles + self.SMparticles:            
+            if any(not hasattr(particle,attr) for attr in kwargs.keys()):
+                continue
+            if any(getattr(particle,attr) != value for attr,value in kwargs.items()):
+                continue
+
+            #Avoid double counting:
+            if not any(particle is ptc for ptc in particleList):
+                particleList.append(particle)
+        
+        if not particleList:
+            logger.warning("Particle with attributes %s not found in models" %str(kwargs))
+        
+        return particleList
+    
+    def getValuesFor(self,attributeStr):
+        """ 
+        Returns a list with all the values for attribute appearing in the model.
+         
+        :param attributeStr: String for the desired attribute
+         
+        :returns: list of values
+        """
+        
+        valueList = []
+        for particle in self.BSMparticles+self.SMparticles:
+            if not hasattr(particle,attributeStr):
+                continue
+            value = getattr(particle,attributeStr)
+            if not value in valueList:
+                valueList.append(value)
+        
+        return valueList
+    
+
+    def updateParticles(self, promptWidth = 1e-8*GeV, stableWidth = 1e-25*GeV):        
         """
         Update mass, total width and branches of allParticles particles from input SLHA or LHE file. 
             
@@ -59,26 +103,13 @@ class Model(object):
             logger.info("Using LHE input. All unstable particles will be assumed to have prompt decays.")
         sys.stderr = storeErr
         
-        evenPDGs = []
-        oddPDGs = []
-        for particle in (self.particles+SM):
-            if not hasattr(particle,'pdg') or not hasattr(particle,'Z2parity'):
-                continue
-            if isinstance(particle.pdg,list):
-                continue
-            if particle.Z2parity == 'even' and not particle.pdg in evenPDGs:
-                evenPDGs.append(particle.pdg)
-            elif particle.Z2parity == 'odd' and not particle.pdg in oddPDGs:
-                oddPDGs.append(particle.pdg)
+        evenPDGs = list(set([ptc.pdg for ptc in self.getParticlesWith(Z2parity='even') if isinstance(ptc.pdg,int)]))
+        oddPDGs = list(set([ptc.pdg for ptc in self.getParticlesWith(Z2parity='odd') if isinstance(ptc.pdg,int)]))
         allPDGs = list(set(evenPDGs + oddPDGs))
-
         
         #Remove cross-sections for even particles or particles which do not belong to the model:
-        modelPDGs = [particle.pdg for particle in self.particles if not isinstance(particle.pdg,list)]
+        modelPDGs = [particle.pdg for particle in self.BSMparticles if isinstance(particle.pdg,int)]
         for xsec in self.xsections.xSections[:]:
-            
-            Move pdg->ParticleOBj
-            
             for pid in xsec.pid:
                 if not pid in modelPDGs:
                     logger.debug("Cross-section for %s includes particles not belonging to model and will be ignored" %str(xsec.pid))
@@ -89,7 +120,7 @@ class Model(object):
         
 
 
-        for particle in self.particles:
+        for particle in self.BSMparticles:
             if isinstance(particle,(ParticleList,ParticleWildcard)):
                 continue
 
@@ -139,13 +170,15 @@ class Model(object):
                 if len(oddPids) != 1 or len(evenPids+oddPids) != len(decay.ids):
                     logger.info("Decay %s is not of the form Z2-odd -> Z2-odd + [Z2-even particles] and will be ignored" %(decay))
                     continue
-                
-                Move pdg->ParticleOBj
-                
+
                 newDecay = pyslha.Decay(br=decay.br,nda=decay.nda,parentid=decay.parentid,ids=decay.ids[:])
                 #Conjugated decays if needed:
                 if chargeConj == -1:
                     newDecay.ids = [pid*chargeConj if pid in allPDGs else pid for pid in decay.ids] 
+                    
+                    
+                #Convert PDGs to particle objects:
+                newDecay.daughters = [self.getParticlesWith(pdg=pdg)[0] for pdg in newDecay.ids]
                 particle.decays.append(newDecay)
                  
         

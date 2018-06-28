@@ -13,8 +13,13 @@ from scipy import stats
 from collections import Iterable
 import copy
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-
 from smodels.tools.smodelsLogging import logger
+from smodels.experiment.finalStateParticles import finalStates
+from particle import Particle,ParticleList
+import itertools    
+
+#Get all finalStateLabels
+finalStateLabels = finalStates.getValuesFor('label')
 
 def massPosition(mass, txdata):
     """ Give mass position in upper limit space.    
@@ -221,3 +226,180 @@ def index_bisect(inlist, el):
         if inlist[mid] < el: lo = mid+1
         else: hi = mid
     return lo
+
+
+def elementsInStr(instring,removeQuotes=True):
+    """
+    Parse instring and return a list of elements appearing in instring.
+    instring can also be a list of strings.
+    
+    :param instring: string containing elements (e.g. "[[['e+']],[['e-']]]+[[['mu+']],[['mu-']]]")
+    :param removeQuotes: If True, it will remove the quotes from the particle labels.
+                         Set to False, if one wants to run eval on the output.
+    
+    :returns: list of elements appearing in instring in string format
+    
+    """
+
+    outstr = ""
+    if isinstance(instring,str):
+        outstr = instring
+    elif isinstance(instring,list):
+        for st in instring:
+            if not isinstance(st,str):
+                logger.error("Input must be a string or a list of strings")
+                raise SModelSError()
+            # Combine list of strings in a single string
+            outstr += st
+    else:
+        raise SModelSError ( "syntax error in constraint/condition: ``%s''." \
+              "Check your constraints and conditions in your database." % str(instring) )
+
+    elements = []
+    outstr = outstr.replace(" ", "")
+    if removeQuotes:
+        outstr = outstr.replace("'", "")
+    elStr = ""
+    nc = 0
+    # Parse the string and looks for matching ['s and ]'s, when the matching is
+    # complete, store element
+    for c in outstr:
+        delta = 0
+        if c == '[':
+            delta = -1
+        elif c == ']':
+            delta = 1
+        nc += delta
+        if nc != 0:
+            elStr += c
+        if nc == 0 and delta != 0:
+            elements.append(elStr + c)
+            elStr = ""
+            # Syntax checks
+            ptclist = elements[-1].replace(']', ',').replace('[', ',').\
+                    split(',')       
+            for ptc in ptclist:
+                ptc = ptc.replace("'","")
+                if not ptc:
+                    continue          
+                if not ptc in finalStateLabels:
+                    raise SModelSError("Unknown particle. Add " + ptc + " to finalStateParticles.py")
+
+    # Check if there are not unmatched ['s and/or ]'s in the string
+    if nc != 0:
+        raise SModelSError("Wrong input (incomplete elements?) " + instring)
+
+    return elements
+
+
+def vertInStr(instring):
+    """
+    Parses instring (or a list of strings) and returns the list of particle
+    vertices appearing in instring.
+    
+    """
+    
+   
+    if type(instring) == type('st'):
+        outstr = instring
+    elif type(instring) == type([]):
+        outstr = ""
+        for st in instring:
+            if type(st) != type('st'):
+                logger.error("Input must be a string or a list of strings")
+                raise SModelSError()
+            # Combine list of strings in a single string
+            outstr += st
+
+    vertices = []
+    outstr = outstr.replace(" ", "").replace("'", "")
+    vertStr = ""
+    nc = 0
+    # Parse the string and looks for matching ['s and ]'s, when the matching is
+    # complete, store element
+    for c in outstr:
+        delta = 0
+        if c == '[':
+            delta = -1
+        elif c == ']':
+            delta = 1
+        nc += delta
+        if c == '[':
+            vertStr = ""
+        if nc != 0 and c != '[' and c != ']':
+            vertStr += c
+        if delta > 0 and vertStr:
+            vertices.append(vertStr.split(','))
+            # Syntax checks:
+            for ptc in vertices[-1]:
+                if not ptc:
+                    continue
+                if not ptc in finalStateLabels:
+                    logger.error("Unknown particle. Add " + ptc + " to finalStateParticles.py")
+                    raise SModelSError()
+            vertStr = ""
+
+    # Check if there are not unmatched ['s and/or ]'s in the string
+    if nc != 0:
+        logger.error("Wrong input (incomplete elements?) " + instring)
+        raise SModelSError()
+
+    return vertices
+
+
+def simParticles(plist1, plist2):
+    """
+    Compares two lists of particles. Allows for particleList objects
+    (Ex: L = l, l+ = l, l = l-,...). Ignores particle ordering inside
+    the list.
+
+    :param plist1: first list of Particle or ParticleList objects
+    :param plist2: first list of Particle or ParticleList objects
+    :param useLists: use the particle lists, i.e. allow e to stand for
+                    e+ or e-, l+ to stand for e+ or mu+, etc 
+    :returns: True/False if the particles lists match (ignoring order)    
+    """    
+   
+    if not isinstance(plist1,list) or type(plist1) != type(plist2):
+        logger.error("Input must be a list")
+        raise SModelSError()
+    if len(plist1) != len(plist2):
+        return False
+    
+ 
+    #Expand inclusive particles (ParticleList objects) 
+    extendedL1 = []    
+    for p in plist1:
+        if isinstance(p,Particle):
+            extendedL1.append([p])
+        elif isinstance(p,ParticleList):
+            extendedL1.append(p.particles)
+
+     
+    extendedL2 = []    
+    for p in plist2:
+        if isinstance(p,Particle):
+            extendedL2.append([p])
+        elif isinstance(p,ParticleList):
+            extendedL2.append(p.particles)
+
+    extendedL1 = [sortParticleList(list(i)) for i in itertools.product(*extendedL1)]
+    extendedL2 = [sortParticleList(list(i)) for i in itertools.product(*extendedL2)]
+
+    #Now compare the two lists and see if there is a match:
+    for plist in extendedL1:
+        if plist in extendedL2:
+            return True  
+    return False
+     
+     
+     
+def sortParticleList(ptcList):
+    """
+    sorts a list of particle or particle list objects by their label
+    :param ptcList: list to be sorted containing particle or particle list objects
+    :return: sorted list of particles
+    """
+    
+    newPtcList = sorted(ptcList, key=lambda x: x.label) 
+    return newPtcList    

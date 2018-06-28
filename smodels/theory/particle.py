@@ -115,16 +115,15 @@ class Particle(object):
         
         :return: 0 if properties are equal, -1 if self < other and 1 if self > other.
         """
-        
-        
+
         if isinstance(other,(ParticleList,ParticleWildcard)):
-            return other.cmpProperties(self)
+            return other.cmpProperties(self,properties=properties)
         
         for prop in properties:
             if not hasattr(self,prop) or not hasattr(other,prop):
                 continue
-            x = getattr(self.prop)
-            y = getattr(other.prop)
+            x = getattr(self,prop)
+            y = getattr(other,prop)
             if x == y:
                 continue
             if x > y:
@@ -150,12 +149,14 @@ class Particle(object):
 
         return p
 
-    def chargeConjugate(self):
+    def chargeConjugate(self,label=None):
         """
         Returns the charge conjugate particle (flips the sign of eCharge).        
         If it has a pdg property also flips its sign.
-        The charge conjugate name is defined as the original name plus "~" or
+        If label is None, the charge conjugate name is defined as the original name plus "~" or
         if the original name ends in "+" ("-"), it is replaced by "-" ("+")
+
+        :parameter label: If defined, defines the label of the charge conjugated particle.
 
         :return: the charge conjugate particle (Particle object)
         """
@@ -175,7 +176,10 @@ class Particle(object):
                 pConjugate.label = pConjugate.label[:-1]
             else:
                 pConjugate.label += "~"            
-                
+        
+        if not label is None:
+            pConjugate.label = label
+            
         return pConjugate
 
         
@@ -331,6 +335,9 @@ class ParticleList(object):
         :return: 0 if properties are equal, -1 if self < other and 1 if self > other.
         """
         
+        if isinstance(other,ParticleWildcard):
+            return other.cmpProperties(self,properties=properties)
+        
         for prop in properties:            
             if not hasattr(self,prop) or not hasattr(other,prop):
                 continue
@@ -351,10 +358,10 @@ class ParticleList(object):
             elif not isinstance(x,list) and isinstance(y,list): #Compare list to single value
                 if any(yval == x for yval in y):
                     continue
-                elif any(yval > x for yval in x):
-                    return 1
-                else:
+                elif any(yval > x for yval in y):
                     return -1
+                else:
+                    return 1
             else:
                 if any(xval in y for xval in x): #See if any element in the two lists match
                     continue
@@ -418,17 +425,37 @@ class ParticleWildcard(Particle):
     def __repr__(self):
         return self.__str__()
 
-    def __cmp__(self,other):
-        """
-        Compares particle with other.
-        The comparison is done based only on the label.
-        :param other:  particle to be compared (Particle object)
-        
-        :return: -1 if self < other, 0 if self == other, +1, if self > other.
-        """    
-        
-        if not isinstance(other,(ParticleList,Particle,ParticleWildcard)):
-            return +1
-        
-        return self.cmpProperties(other, properties=['Z2parity']) 
 
+
+    def cmpProperties(self,other, properties = ['Z2parity']):
+        """
+        Returns 0 if the Z2parities match, otherwise
+        -1 if self.Z2parity < other.Z2parity and 1 if self.Z2parity > other.Z2parity.
+        
+        :param other: a Particle, ParticleList or ParticleWildCard object
+        :param properties: (dummy) list with properties to be compared. It is not used.
+        
+        :return: 0 if properties are equal, -1 if self < other and 1 if self > other.
+        """
+        
+        prop = 'Z2parity'
+                
+        if not hasattr(self,prop) or not hasattr(other,prop):
+            return 0
+        else:
+            x = getattr(self,prop)
+            y = getattr(other,prop)
+            if isinstance(y,list):
+                if x in y:
+                    return 0
+                elif any(yval > x for yval in y):
+                    return -1
+                else:
+                    return 1
+            else:
+                if x == y:
+                    return 0
+                elif x > y:
+                    return 1
+                else:
+                    return -1

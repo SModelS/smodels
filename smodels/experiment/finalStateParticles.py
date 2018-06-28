@@ -9,9 +9,9 @@
 """
 
 from smodels.theory.particle import ParticleWildcard,Particle,ParticleList
-from smodels.share.models.SMparticles import leptons,quarks,leptonsC,quarksC,gauge,gaugeC,pi
-
-
+from smodels.share.models.SMparticles import *
+# from smodels.share.models.SMparticles import leptons,quarks,quarksC,leptonsC,gauge,gaugeC,pi
+from smodels.theory.model import Model
 
 #Particle groups
 eList = ParticleList('e' , [leptons[0], leptonsC[0]])
@@ -26,7 +26,7 @@ tList = ParticleList('t'  , [quarks[4],quarksC[4]])
 LpList = ParticleList('L+' , lpList.particles + [ leptonsC[4] ])
 LmList = ParticleList('L-' , lmList.particles + [ leptons[4] ])
 LList = ParticleList('L'  , LpList.particles + LmList.particles )
-jetList = ParticleList('jet' ,  quarks[0:4] + [ gauge[0] ] + [ pi ] + quarksC[0:4] + [ gaugeC[0] ] + [ pi.chargeConjugate() ])
+jetList = ParticleList('jet' ,  quarks[0:4] + [gauge[0]] + [pi] + quarksC[0:4] + [ gaugeC[0] ] + [pi.chargeConjugate()])
 
 
 
@@ -46,4 +46,18 @@ RHadronU = Particle(label='RHadronU', Z2parity = 'odd', eCharge = 2./3., colordi
 RHadronD = Particle(label='RHadronD', Z2parity = 'odd', eCharge = -1./3., colordim = 3)
 RHadronQ = ParticleList(label='RHadronQ', particles = [RHadronU,RHadronU.chargeConjugate(),
                                                                          RHadronD,RHadronD.chargeConjugate()])
+
+#Get all objects defined so far:
+objects = list(locals().values())[:]
+    
+allFinalStates = []
+#Get all particles defined here:
+for obj in objects:
+    if isinstance(obj,list):
+        allFinalStates += [ptc for ptc in obj if isinstance(ptc,(Particle,ParticleList,ParticleWildcard)) and 
+                           not any(obj is x for x in allFinalStates)]
+    elif isinstance(obj,(Particle,ParticleList,ParticleWildcard)):
+        if not any(obj is x for x in allFinalStates):
+            allFinalStates.append(obj)
+finalStates = Model(SMparticles = allFinalStates, BSMparticles=[])
 

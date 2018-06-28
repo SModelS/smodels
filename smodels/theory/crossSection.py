@@ -13,7 +13,6 @@ from smodels.theory import lheReader
 import pyslha
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
-from smodels.theory.particleNames import getObjectFromPdg
 
 ## orders in perturbation theory
 LO,NLO,NLL = range(3)
@@ -570,15 +569,6 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
     xSecsInFile = XSectionList()
     f=pyslha.readSLHAFile(slhafile)
     for production in f.xsections:
-        for pid in production[2:]:
-            particle = getObjectFromPdg(pid)
-            if not particle:
-                logger.warning("Particle %i  is not defined. Cross section for %s production will be ignored" %(pid,str(production)))
-                break
-            elif not particle.Z2parity == 'odd':
-                # ignore production of R-Even Particles
-                logger.warning("Particle %i is not z2-odd. Cross section for %s production will be ignored" %(pid,str(production)))                 
-                break
         process = f.xsections.get ( production )
         for pxsec in process.xsecs:
             csOrder = pxsec.qcd_order
