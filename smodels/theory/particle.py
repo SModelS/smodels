@@ -6,6 +6,7 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 """
 
+import copy
 
 class Particle(object):
     """
@@ -136,18 +137,12 @@ class Particle(object):
 
     def copy(self):
         """
-        Make a copy of self.
+        Make a copy of self (using deepcopy)
         
         :return: A Particle object identical to self
         """
 
-        p = Particle()
-        for name in dir(self):
-            if '__' in name:
-                continue
-            setattr(p,name,getattr(self,name))
-
-        return p
+        return copy.deepcopy(self)
 
     def chargeConjugate(self,label=None):
         """
@@ -160,7 +155,7 @@ class Particle(object):
 
         :return: the charge conjugate particle (Particle object)
         """
-
+        
         pConjugate = self.copy()
                     
         if hasattr(pConjugate, 'pdg') and pConjugate.pdg:

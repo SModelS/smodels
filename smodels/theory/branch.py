@@ -66,9 +66,7 @@ class Branch(object):
                         smParticle = finalStates.getParticlesWith(label=pname)
                         if not smParticle:
                             raise SModelSError("Final state %s has not been defined in finalStateParticles.py " %pname)
-                        if len(smParticle) != 1:
-                            raise SModelSError("Ambiguos defintion of label %s in finalStateParticles.py" %pname)
-                        ptcs.append(smParticle)
+                        ptcs.append(smParticle[0])
                     self.particles.append(ptcs)
 
             self.vertnumb = len(self.particles)
