@@ -112,14 +112,10 @@ class WildCardTest(unittest.TestCase):
         tx = TxName(f,gInfo,gInfo,True)
          
         el = element.Element(info="[[],[[e+]]]",finalState = ['HSCP','MET'])
-        el.branches[0].BSMparticles[0].mass = 1.25E+02*GeV
-        el.branches[1].BSMparticles[0].mass = 4.40E+02*GeV
-        el.branches[1].BSMparticles[1].mass = 1.00E+00*GeV
         newEl = tx.hasElementAs(el)  #newEl should be equal to el, but with opposite branch ordering
         self.assertFalse(newEl is None)
-        self.assertTrue(newEl.getMasses() == [[4.40E+02*GeV, 1.00E+00*GeV],[1.25E+02*GeV]])
-        res = tx.txnameData.getValueFor(newEl.getMasses())
-        self.assertAlmostEqual(res,0.090999)
+        bsmParticles = [[str(bsm) for bsm in br] for br in newEl.getBSMparticles()]        
+        self.assertTrue(bsmParticles == [['anyBSM','MET'],['HSCP']])
         
 
 if __name__ == "__main__":
