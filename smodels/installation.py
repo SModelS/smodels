@@ -113,7 +113,7 @@ def license():
     Print license information of the SModelS framework.
 
     """
-    f = open(installDirectory() + "COPYING")
+    f = open(installDirectory() + "smodels/COPYING")
     lines = f.readlines()
     f.close()
     return "".join(lines)
@@ -128,22 +128,6 @@ def banner():
     lines = f.readlines()
     f.close()
     return "".join(lines)
-
-def printHelp():
-    """
-    Print usage information of this module.
-
-    """
-    print("Usage: " + sys.argv[0] + " [--help|-h] [--installdir|-i] [--pythondir|-p]")
-    print("                [--database|-d] [--version|-v] [--banner|-b] [--license|--copyright|-c]:")
-    print("--help:       show this message")
-    print("--installdir: print SModelS installation directory")
-    print("--pythondir:  print SModelS python path")
-    print("--version:    print SModelS version number")
-    print("--banner:     print SModelS banner")
-    print("--database:   print SModelS official database url for this release")
-    print("--copyright:  print SModelS copyright")
-    sys.exit(0)
 
 def fixpermissions():
     """ make sure that all filepermissions are such that
@@ -165,37 +149,34 @@ def officialDatabase():
     r="http://smodels.hephy.at/database/official%s" % version().replace(".","")
     return r
 
+def testDatabase():
+    r="http://smodels.hephy.at/database/unittest%s" % version().replace(".","")
+    return r
+
 def main():
-    # print( banner() )
-    if len(sys.argv) < 2:
-        printHelp()
-    for i in sys.argv[1:]:
-        if i in [ "--installdir", "-i" ]:
-            print(installDirectory())
-            sys.exit(0)
-        if i in [ "--pythondir", "-p" ]:
-            print(pythonDirectory())
-            sys.exit(0)
-        if i in [ "--version", "-v" ]:
-            print(version())
-            sys.exit(0)
-        if i in [ "--banner", "-b" ]:
-            print(banner())
-            sys.exit(0)
-        if i in [ "--requirements", "-r" ]:
-            print(requirements())
-            sys.exit(0)
-        if i in [ "--help", "-h" ]:
-            printHelp()
-            sys.exit(0)
-        if i in [ "--database", "-d" ]:
-            print ( officialDatabase() )
-            sys.exit(0)
-        if i in [ "--license", "--copyright", "-c" ]:
-            print(license())
-            sys.exit(0)
-    print("Error: cannot parse %s.\n" % i )
-    printHelp()
+    import argparse
+    ap = argparse.ArgumentParser( description= "installation helper" )
+    ap.add_argument( "-i", "--installdir", help="print SModelS installation directory", action="store_true" )
+    ap.add_argument( "-p", "--pythondir", help="print SModelS python path", 
+                     action="store_true" )
+    ap.add_argument( "-v", "--version", help="print SModelS version number", 
+                     action="store_true" )
+    ap.add_argument( "-b", "--banner", help="print SModelS banner", 
+                     action="store_true" )
+    ap.add_argument( "-r", "--requirements",help="print SModelS python requirements", 
+                     action="store_true" )
+    ap.add_argument( "-d", "--database", 
+                     help="print SModelS official database url for this release", action="store_true")
+    ap.add_argument( "-t", "--test-database", help="print SModelS official unittest database url for this release", action="store_true" )
+    ap.add_argument( "-c", "--copyright", "--license", 
+                     help="print SModelS copyright", action="store_true" )
+    args = ap.parse_args()
+    funcs = { "installdir": installDirectory, "pythondir": pythonDirectory,
+              "version": version, "banner": banner, "requirements": requirements,
+              "database": officialDatabase, "test_database": testDatabase,
+              "copyright": license }
+    for f,v in args.__dict__.items():
+        if v: print ( funcs[f]() )
 
 if __name__ == "__main__":
     main()

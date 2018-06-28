@@ -64,6 +64,9 @@ class Database(object):
         if base in [ None, "official" ]:
             from smodels.installation import officialDatabase
             base = officialDatabase()
+        if base in [ "unittest" ]:
+            from smodels.installation import testDatabase
+            base = testDatabase()
         base, pclfile = self.checkPathName(base, discard_zeroes )
         self.pcl_meta = Meta( pclfile )
         self.expResultList = []
