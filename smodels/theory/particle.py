@@ -98,7 +98,7 @@ class Particle(object):
         :return: True if all properties are the same, False otherwise.
         """
         
-        if self.compareProperties(other, properties=properties) == 0:
+        if self.cmpProperties(other, properties=properties) == 0:
             return True
         else:
             return False
@@ -306,7 +306,7 @@ class ParticleList(object):
         :return: True if all properties are the same, False otherwise.
         """
         
-        if self.compareProperties(other, properties=properties) == 0:
+        if self.cmpProperties(other, properties=properties) == 0:
             return True
         else:
             return False
@@ -337,8 +337,8 @@ class ParticleList(object):
             if not hasattr(self,prop) or not hasattr(other,prop):
                 continue
             
-            x = getattr(self.prop)
-            y = getattr(other.prop)
+            x = getattr(self,prop)
+            y = getattr(other,prop)
             if x == y:
                 continue
             

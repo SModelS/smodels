@@ -14,7 +14,7 @@
 
 import os,sys
 from smodels.tools import physicsUnits
-from smodels.theory.particleNames import elementsInStr
+from smodels.theory.auxiliaryFunctions import elementsInStr
 from smodels.tools.stringTools import concatenateLines
 from smodels.theory.element import Element
 from smodels.theory.topology import TopologyList

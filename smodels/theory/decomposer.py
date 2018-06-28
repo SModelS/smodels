@@ -14,7 +14,6 @@ import time
 from smodels.theory import element, topology
 from smodels.theory.branch import Branch, decayBranches
 from smodels.tools.physicsUnits import fb, GeV
-from smodels.theory.particleNames import getObjectFromPdg, getPDGList
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -34,7 +33,7 @@ def decompose(model, sigcut= 0*fb, doCompress=False, doInvisible=False,
     t1 = time.time()
     
     xSectionList = model.xsections    
-    pdgList = getPDGList()
+    pdgList = model.getValuesFor('pdg')
 
     if doCompress and minmassgap / GeV < 0.:
         logger.error("Asked for compression without specifying minmassgap. Please set minmassgap.")        
@@ -59,12 +58,16 @@ def decompose(model, sigcut= 0*fb, doCompress=False, doInvisible=False,
     for pids in xSectionList.getPIDpairs():
         xSectionListDict[pids] = xSectionList.getXsecsFor(pids)
 
-    # Create 1-particle branches with all possible mothers
-    
+    # Create 1-particle branches with all possible mothers    
     branchList = []
     for pid in maxWeight:
         branchList.append(Branch())
-        branchList[-1].BSMparticles = [getObjectFromPdg(pid)] # [[pid]]
+        bsmParticle = model.getParticlesWith(pdg=pid)
+        if not bsmParticle:
+            raise SModelSError("Particle for pdg %i has not been defined.")
+        if len(bsmParticle) != 1:
+            raise SModelSError("Particle with pdg %i has multiple definitions.")
+        branchList[-1].BSMparticles = [bsmParticle[0]]
         if not pid in pdgList:
             logger.error("PDG %i has not been defined" %int(pid))
         branchList[-1].maxWeight = maxWeight[pid]        

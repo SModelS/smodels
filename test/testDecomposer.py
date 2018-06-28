@@ -11,21 +11,20 @@
 import unittest
 import sys
 sys.path.insert(0,"../")
-from smodels.particleDefinitions import BSM as BSMoriginal
+from smodels.share.models.MSSMparticles import BSMList
+from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
 from smodels.installation import installDirectory
 from smodels.theory import decomposer
 from smodels.theory.element import Element 
 from smodels.tools.physicsUnits import GeV,pb,TeV,fb
-import copy
 
 class DecomposerTest(unittest.TestCase):
 
     def testDecomposerLHE(self):
  
-        BSM = copy.deepcopy(BSMoriginal)
         filename = "%sinputFiles/lhe/simplyGluino.lhe" %(installDirectory())  
-        model = Model(filename, BSM)
+        model = Model(BSMList,SMList,filename)
         model.updateParticles()
          
         topList = decomposer.decompose(model)
@@ -43,9 +42,8 @@ class DecomposerTest(unittest.TestCase):
 
     def testDecomposerSLHA(self):
 
-        BSM = copy.deepcopy(BSMoriginal)
         filename = "%sinputFiles/slha/simplyGluino.slha" %(installDirectory())  
-        model = Model(filename, BSM)
+        model = Model(BSMList,SMList,filename)
         model.updateParticles()
         
         topList = decomposer.decompose(model)
@@ -63,11 +61,10 @@ class DecomposerTest(unittest.TestCase):
  
     def testDecomposerLongLived(self):
   
-        BSM = copy.deepcopy(BSMoriginal)
         filename = "%sinputFiles/slha/longLived.slha" %(installDirectory())
         #Consider a simpler model
-        newModel = [ptc for ptc in BSM if not isinstance(ptc.pdg,list) and abs(ptc.pdg) in [1000015,1000022]] 
-        model = Model(filename, newModel)
+        newModel = [ptc for ptc in BSMList if not isinstance(ptc.pdg,list) and abs(ptc.pdg) in [1000015,1000022]] 
+        model = Model(newModel,SMList,filename)
         model.updateParticles()
           
         topList = decomposer.decompose(model)

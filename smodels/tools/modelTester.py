@@ -13,7 +13,8 @@
 from smodels.tools import ioObjects
 from smodels.tools import coverage, runtime
 from smodels.theory import decomposer
-from smodels.particleDefinitions import BSM
+from smodels.share.models.MSSMparticles import BSMList
+from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
@@ -77,7 +78,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         """
         Load the input model and  update it with the information from the input file
         """
-        model = Model(inputFile, BSM)
+        model = Model(inputFile=inputFile, BSMparticles=BSMList, SMparticles=SMList)
         model.updateParticles()
     except SModelSError as e:
         print ( "Exception %s %s" % ( e, type(e) ) )

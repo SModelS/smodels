@@ -6,10 +6,9 @@
     
 """
 
-from smodels.theory.particleNames import elementsInStr
+from smodels.theory.auxiliaryFunctions import elementsInStr
 from smodels.theory.branch import Branch, BranchWildcard
 from smodels.theory import crossSection
-from smodels.theory.particleNames import getNamesList
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -369,23 +368,18 @@ class Element(object):
 
     def checkConsistency(self):
         """
-        Check if the particles defined in the element exist and are consistent
+        Check if the particles defined in the element are consistent
         with the element info.
         
         :returns: True if the element is consistent. Print error message
                   and exits otherwise.
         """
         info = self.getEinfo()
-        particleLabels = getNamesList()
         for ib, branch in enumerate(self.branches):
             for iv, vertex in enumerate(branch.particles):
                 if len(vertex) != info['vertparts'][ib][iv]:
                     logger.error("Wrong syntax")
                     raise SModelSError()
-                for ptc in vertex:
-                    if not ptc in particleLabels:
-                        logger.error("Unknown particle. Add " + ptc + " to smodels/particleDefinitions.py")
-                        raise SModelSError()
         return True
 
     
