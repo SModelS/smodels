@@ -1,11 +1,11 @@
-python_version_full := $(wordlist 2,4,$(subst ., ,$(shell python --version 2>&1)))
+python_version_full := $(wordlist 2,4,$(subst ., ,$(shell python3 --version 2>&1)))
 python_version_major := $(word 1,${python_version_full})
 python_version_minor := $(word 2,${python_version_full})
 libpython := -lpython$(python_version_major).$(python_version_minor)
-LDFLAGS := $(shell python-config --ldflags)
-#LIBDIR := $(shell python-config --prefix)
-#CFLAGS := $(shell python-config --cflags)
-#EXECPATH := $(shell python-config --exec-prefix)/lib/python$(python_version_major).$(python_version_minor)
+LDFLAGS := $(shell python3-config --ldflags)
+#LIBDIR := $(shell python3-config --prefix)
+#CFLAGS := $(shell python3-config --cflags)
+#EXECPATH := $(shell python3-config --exec-prefix)/lib/python$(python_version_major).$(python_version_minor)
 
 GCC=g++
 

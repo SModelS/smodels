@@ -413,7 +413,7 @@ def getAllInputFiles(inFile):
     Given inFile, return list of all input files
 
     :parameter inFile: Path to input file or directory containing input files
-    :returns: List of all input files
+    :returns: List of all input files, and the directory name
 
     """
     if os.path.isdir(inFile):
