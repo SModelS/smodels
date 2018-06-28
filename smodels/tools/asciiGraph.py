@@ -14,10 +14,11 @@ import os
 import argparse
 import types
 from smodels import installation
-from smodels.theory import lheReader
-from smodels.theory import lheDecomposer
-from smodels.theory import crossSection
+from smodels.theory import decomposer
 from smodels.tools.smodelsLogging import logger
+from smodels.particleDefinitions import BSM
+from smodels.theory.model import Model
+
 
 
 def _printParticle(label):
@@ -31,7 +32,7 @@ def _printParticle(label):
     return label[:2]
 
 
-def _drawBranch(branch, upwards, labels, htmlFormat, border, l):
+def _drawBranch(branch, upwards, htmlFormat, border, l):
     """
     Draw a single branch.
     
@@ -53,11 +54,11 @@ def _drawBranch(branch, upwards, labels, htmlFormat, border, l):
             continue
         lines[1] += "*----"
         if len(insertions) == 1:
-            labels += " " + _printParticle(insertions[0]) + "  "
+            labels += " " + _printParticle(insertions[0].label) + "  "
             lines[0] += " |   "
         if len(insertions) == 2:
-            labels += _printParticle(insertions[0]) + " " + \
-                    _printParticle(insertions[1])
+            labels += _printParticle(insertions[0].label) + " " + \
+                    _printParticle(insertions[1].label)
             if upwards:
                 lines[0] += "\\ /  "
             else:
@@ -110,7 +111,7 @@ def asciidraw(element, labels=True, html=False, border=False):
     for (ct, branch) in enumerate(element.branches):
         l.append(int(str(branch).count("[")))
     for (ct, branch) in enumerate(element.branches):
-        ret+=_drawBranch(branch, upwards=(ct == 0), labels=labels, htmlFormat=html,
+        ret+=_drawBranch(branch, upwards=(ct == 0), htmlFormat=html,
                     border=border, l=max(l))
     return ret
 
@@ -137,8 +138,8 @@ if __name__ == "__main__":
     if args.lhe != "":
         filename = args.lhe
 
-    reader = lheReader.LheReader(filename)
-    event = reader.next()
-    element = lheDecomposer.elementFromEvent(event,
-                                             crossSection.XSectionList())
+    model = Model(filename, BSM)
+    model.updateParticles()
+    topList = decomposer.decompose(model)
+    element = topList.getElements()[0]
     print(asciidraw(element, border=args.border) )

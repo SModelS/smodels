@@ -18,7 +18,6 @@ from smodels.theory.particleNames import elementsInStr
 from smodels.tools.stringTools import concatenateLines
 from smodels.theory.element import Element
 from smodels.theory.topology import TopologyList
-from smodels.theory.updateParticles import addPromptAndDisplaced
 from smodels.tools.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.caching import _memoize
@@ -110,7 +109,8 @@ class TxName(object):
             for cond in conds:
                 for el in elementsInStr(cond):
                     newEl = Element(el,finalState)
-                    if not newEl in elements: elements.append(newEl)
+                    if not newEl in elements:
+                        elements.append(newEl)
 
         # Builds up TopologyList with all the elements appearing in constraints
         # and conditions:

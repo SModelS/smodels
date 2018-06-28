@@ -6,8 +6,6 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 """
 
-from smodels.tools.physicsUnits import GeV
-
 
 class Particle(object):
     """
@@ -35,43 +33,19 @@ class Particle(object):
         for key,value in kwargs.items():
             self.addProperty(key,value)
 
-    def __cmp__(self,other): 
+    def __cmp__(self,other):
         """
         Compares particle with other.
-        The comparison is done based on the label.
+        The comparison is done based only on the label.
         :param other:  particle to be compared (Particle object)
+        
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
-
-        Comparison to '*' always returns True. (= Particle Wild Card)
         """    
         
         if not isinstance(other,(ParticleList,Particle,ParticleWildcard)):
             return +1
         
-        if isinstance(other,ParticleList):
-            return other.__cmp__(self)
-        
-        if isinstance(other,ParticleWildcard):
-            return other.__cmp__(self)
-        
-        #Make sure particles with distinct Z2 parity are distinct
-        if hasattr(self, 'Z2parity') and hasattr(other, 'Z2parity'):
-            if self.Z2parity != other.Z2parity:
-                comp = self.Z2parity > other.Z2parity
-                if comp:
-                    return 1
-                else:
-                    return -1
-                
-        if hasattr(self, 'label') and hasattr(other, 'label'):
-            if self.label != other.label:            
-                comp = self.label > other.label
-                if comp:
-                    return 1
-                else:
-                    return -1       
-            
-        return 0  #Particles are equal
+        return self.cmpProperties(other, properties=['Z2parity','label']) 
                  
 
     def __lt__( self, p2 ):
@@ -112,6 +86,54 @@ class Particle(object):
         elif not hasattr(self, label) or getattr(self, label) is None:
             setattr(self, label, value)    
 
+    def eqProperties(self,other, properties = ['spin','colordim','eCharge']):
+        """
+        Check if particle has the same properties (default is spin, colordim and eCharge)
+        as other. Only compares the attributes which have been defined in both objects.
+        
+        :param other: a Particle, ParticleList or ParticleWildCard object
+        :param properties: list with properties to be compared. Default is spin, colordim and eCharge
+        
+        :return: True if all properties are the same, False otherwise.
+        """
+        
+        if self.compareProperties(other, properties=properties) == 0:
+            return True
+        else:
+            return False
+            
+    def cmpProperties(self,other, properties = ['spin','colordim','eCharge']):
+        """
+        Compare properties (default is spin, colordim and eCharge).
+        Return 0 if properties are equal, -1 if self < other and 1 if self > other.
+        Only compares the attributes which have been defined in both objects.
+        The comparison is made in hierarchical order, following the order
+        defined by the properties list.
+        
+        :param other: a Particle, ParticleList or ParticleWildCard object
+        :param properties: list with properties to be compared. Default is spin, colordim and eCharge
+        
+        :return: 0 if properties are equal, -1 if self < other and 1 if self > other.
+        """
+        
+        
+        if isinstance(other,(ParticleList,ParticleWildcard)):
+            return other.cmpProperties(self)
+        
+        for prop in properties:
+            if not hasattr(self,prop) or not hasattr(other,prop):
+                continue
+            x = getattr(self.prop)
+            y = getattr(other.prop)
+            if x == y:
+                continue
+            if x > y:
+                return 1
+            else:
+                return -1
+            
+        return 0
+            
 
     def copy(self):
         """
@@ -165,15 +187,11 @@ class Particle(object):
         :return: True/False
         """
         
-        if self.label == 'MET':
-            return True
         if self.eCharge == 0 and self.colordim == 0:
             return True
         
         return False
         
-        
-
 
 class ParticleList(object):
 
@@ -225,17 +243,17 @@ class ParticleList(object):
                     if p > other: return +1
                 return -1
             
-    def __eq__( self, p2 ):
-        return self.__cmp__(p2) == 0
+    def __eq__( self, other ):
+        return self.__cmp__(other) == 0
         
-    def __ne__( self, p2 ):
-        return self.__cmp__(p2) != 0
+    def __ne__( self, other ):
+        return self.__cmp__(other) != 0
     
-    def __lt__( self, p2 ):
-        return self.__cmp__(p2) == -1
+    def __lt__( self, other ):
+        return self.__cmp__(other) == -1
 
-    def __gt__( self, p2 ):
-        return self.__cmp__(p2) == 1
+    def __gt__( self, other ):
+        return self.__cmp__(other) == 1
 
     def __str__(self):         
         return self.label
@@ -247,8 +265,9 @@ class ParticleList(object):
         """
         If ParticleList does not have attribute, return a list
         if the attributes of each particle in self.particles.
+        If not all particles have the attribute, it will raise an exception.
         If all particles share a common attribute, a single value
-        will be return.
+        will be returned.
         
         :parameter name: Attribute string
         
@@ -259,8 +278,9 @@ class ParticleList(object):
             return object.__getattribute__(self, name)
         except:
             values = [getattr(particle,name) for particle in self.particles]
-            if len(list(set(values))) == 1:
-                values = values[0]
+            if all(type(x) == type(values[0]) for x in values):
+                if all(x == values[0] for x in values):
+                    return values[0]
             return values
         
     def addProperty(self,label,value,overwrite=False):
@@ -275,7 +295,77 @@ class ParticleList(object):
             setattr(self, label, value)
         elif not hasattr(self, label) or getattr(self, label) is None:
             setattr(self, label, value)    
+
+    def eqProperties(self,other, properties = ['spin','colordim','eCharge']):
+        """
+        Check if particle has the same properties (default is spin, colordim and eCharge)
+        as other. Only compares the attributes which have been defined in both objects.
         
+        :param other: a Particle, ParticleList or ParticleWildCard object
+        :param properties: list with properties to be compared. Default is spin, colordim and eCharge
+        
+        :return: True if all properties are the same, False otherwise.
+        """
+        
+        if self.compareProperties(other, properties=properties) == 0:
+            return True
+        else:
+            return False
+
+        
+    def cmpProperties(self,other, properties = ['spin','colordim','eCharge']):
+        """
+        Compares the properties in self with the ones in other (default is spin, colordim and eCharge).
+        Return 0 if properties are equal, -1 if self < other and 1 if self > other.
+        Only compares the attributes which have been defined in both objects.
+        The comparison is made in hierarchical order, following the order
+        defined by the properties list.
+        
+        If the property in the ParticleList is a list, check if any value of the list
+        matches the property of other. If both properties are lists, check if the
+        lists share at least one common element.
+        
+        :param other: a Particle, ParticleList or ParticleWildCard object
+        :param properties: list with properties to be compared. Default is spin, colordim and eCharge
+        
+        :return: 0 if properties are equal, -1 if self < other and 1 if self > other.
+        """
+        
+        for prop in properties:            
+            if not hasattr(self,prop) or not hasattr(other,prop):
+                continue
+            
+            x = getattr(self.prop)
+            y = getattr(other.prop)
+            if x == y:
+                continue
+            
+            if isinstance(x,list) and not isinstance(y,list): #Compare list to single value
+                if any(xval == y for xval in x):
+                    continue
+                elif any(xval > y for xval in x):
+                    return 1
+                else:
+                    return -1
+            
+            elif not isinstance(x,list) and isinstance(y,list): #Compare list to single value
+                if any(yval == x for yval in y):
+                    continue
+                elif any(yval > x for yval in x):
+                    return 1
+                else:
+                    return -1
+            else:
+                if any(xval in y for xval in x): #See if any element in the two lists match
+                    continue
+                elif x > y:
+                    return 1
+                else:
+                    return -1
+            
+        return 0
+
+
 
 
     def describe(self):
@@ -329,21 +419,16 @@ class ParticleWildcard(Particle):
         return self.__str__()
 
     def __cmp__(self,other):
-        #Make sure particles with distinct Z2 parity are distinct
-        if hasattr(self, 'Z2parity') and hasattr(other, 'Z2parity') and self.Z2parity != other.Z2parity:
-            comp = self.Z2parity > other.Z2parity
-            if comp:
-                return 1
-            else:
-                return -1        
-        elif isinstance(other,(Particle,ParticleList,ParticleWildcard)):
-            return 0
-        else:
-            return -1
-
-    def __eq__(self,other):
-        return self.__cmp__(other) == 0  
-    
-    def __ne__(self,other):
-        return self.__cmp__(other) != 0    
+        """
+        Compares particle with other.
+        The comparison is done based only on the label.
+        :param other:  particle to be compared (Particle object)
         
+        :return: -1 if self < other, 0 if self == other, +1, if self > other.
+        """    
+        
+        if not isinstance(other,(ParticleList,Particle,ParticleWildcard)):
+            return +1
+        
+        return self.cmpProperties(other, properties=['Z2parity']) 
+

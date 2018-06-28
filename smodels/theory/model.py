@@ -5,7 +5,7 @@
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>
 """
 
-import pyslha
+import pyslha,copy
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import GeV
 from smodels.theory import lheReader, crossSection
@@ -20,21 +20,20 @@ class Model(object):
     cross-sections.
     """
     
-    def __init__(self, inputFile, BSMparticleList):
+    def __init__(self, BSMparticles, inputFile=None):
         """
         Initializes the model
         :parameter inputFile: input file
         :parameter particles: ParticleList object containing the particles of the model
         """
         self.inputFile = inputFile
-        self.particles = BSMparticleList
+        self.particles = [copy.deepcopy(particle) for particle in BSMparticles]
         
     def __str__(self):
         return self.inputFile
-    
 
-    def updateParticles(self):        
-        self.getParticleData()
+    def updateParticles(self, promptWidth = 1e-8*GeV, stableWidth = 1e-25*GeV):        
+        self.getParticleData(promptWidth, stableWidth)
     
     def getParticleData(self, promptWidth = 1e-8*GeV, stableWidth = 1e-25*GeV):
         """
@@ -77,6 +76,9 @@ class Model(object):
         #Remove cross-sections for even particles or particles which do not belong to the model:
         modelPDGs = [particle.pdg for particle in self.particles if not isinstance(particle.pdg,list)]
         for xsec in self.xsections.xSections[:]:
+            
+            Move pdg->ParticleOBj
+            
             for pid in xsec.pid:
                 if not pid in modelPDGs:
                     logger.debug("Cross-section for %s includes particles not belonging to model and will be ignored" %str(xsec.pid))
@@ -137,6 +139,9 @@ class Model(object):
                 if len(oddPids) != 1 or len(evenPids+oddPids) != len(decay.ids):
                     logger.info("Decay %s is not of the form Z2-odd -> Z2-odd + [Z2-even particles] and will be ignored" %(decay))
                     continue
+                
+                Move pdg->ParticleOBj
+                
                 newDecay = pyslha.Decay(br=decay.br,nda=decay.nda,parentid=decay.parentid,ids=decay.ids[:])
                 #Conjugated decays if needed:
                 if chargeConj == -1:

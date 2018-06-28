@@ -7,7 +7,7 @@
         
 """
 
-from smodels.theory.particleNames import elementsInStr, getObjectFromLabel, getObjectFromPdg
+from smodels.theory.particleNames import elementsInStr, getObjectFromLabel
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from particleComparison import simParticles
 from smodels.tools.smodelsLogging import logger
@@ -42,12 +42,11 @@ class Branch(object):
         
         self.particles = []
         self.BSMparticles = []
-        self.decayType = None
         
         self.maxWeight = None
         self.vertnumb = None
         self.vertparts = None
-        if type(info) == type(str()):
+        if isinstance(info,str):
             branch = elementsInStr(info)      
             if not branch or len(branch) > 1:
                 raise SModelSError("Wrong input string " + info)
@@ -93,6 +92,9 @@ class Branch(object):
         if not isinstance(other,(Branch,BranchWildcard)):
             return -1
         
+        elif isinstance(other,BranchWildcard):
+            return other.__cmp__(self)
+        
         
         if self.vertnumb != other.vertnumb:
             comp = self.vertnumb > other.vertnumb
@@ -102,25 +104,26 @@ class Branch(object):
             comp = self.vertparts > other.vertparts
             if comp: return 1
             else: return -1
-        elif self.particles != other.particles:  
-            comp = self.particles > other.particles
-            if comp: return 1
-            else: return -1
-        #For BSM particles only compare masses and final states:
-        elif self.getMasses() != other.getMasses():
-            comp = self.getMasses() > other.getMasses()
+            
+        #Compare SM final states by label and Z2parity:
+        for iptc,particle in self.particles:
+            comp = particle.cmpProperties(other.particles[iptc],properties=['Z2parity','label'])
             if comp:
-                return 1
-            else:
-                return -1
-        elif self.BSMparticles[-1] != other.BSMparticles[-1]:
-            comp = self.BSMparticles[-1] > other.BSMparticles[-1]
+                return comp 
+
+        #Compare BSM states by Z2parity and mass:
+        for iptc,bsmParticle in self.BSMparticles:
+            comp = bsmParticle.cmpProperties(other.BSMparticles[iptc],properties=['Z2parity','mass'])
             if comp:
-                return 1
-            else:
-                return -1            
-        else:
-            return 0  #Branches are equal    
+                return comp
+            
+        #Compare final BSM state by Z2parity and quantum numbers:
+        comp = self.BSMparticles[-1].cmpProperties(other.BSMparticles[iptc],
+                                                   properties=['Z2parity','colordim','eCharge'])
+        if comp:
+            return comp 
+
+        return 0  #Branches are equal    
         
 
     def __lt__( self, b2 ):
@@ -129,6 +132,9 @@ class Branch(object):
     def __eq__( self, b2 ):
         return self.__cmp__(b2) == 0
           
+    def __ne__( self, b2 ):
+        return not self.__cmp__(b2) == 0
+
         
     def getMasses(self):
         """
@@ -203,12 +209,16 @@ class Branch(object):
         if self.vertparts != other.vertparts:
             return False
 
+
+        
         #If particles are identical, avoid further checks
         if self.particles != other.particles:
             for iv,vertex in enumerate(self.particles):
                 if not simParticles(vertex,other.particles[iv]):
                     return False
         
+        
+        compare quantum numbers:
         #If BSM particles are identical, avoid further checks                
         if self.BSMparticles[-1] != other.BSMparticles[-1]:                       
             if not simParticles([self.BSMparticles[-1]], [other.BSMparticles[-1]]):
@@ -283,6 +293,9 @@ class Branch(object):
         """
         
         newBranch = self.copy()
+        
+        Move pdg->ParticleOBj to model.update
+        
         particles = [getObjectFromPdg(pdg) for pdg in decay.ids]
         oddParticles = [p for p in particles if p.Z2parity == 'odd']
         evenParticles = [p for p in particles if p.Z2parity == 'even']
@@ -346,21 +359,33 @@ class BranchWildcard(Branch):
         self.vertnumb = ValueWildcard()
         self.vertparts = ListWildcard()
         
+    def __cmp__(self,other):
+        """
+        Always returns true. The only exception is if a final state particle has been
+        defined. In this case, will include the final state in the comparison.        
+        The comparison is made based on vertnumb, vertparts, particles, masses of BSM particles
+        and the last BSM particle appearing in the cascade decay.
+        OBS: The particles inside each vertex MUST BE sorted (see branch.sortParticles())         
+        :param other:  branch to be compared (Branch object)
+        :return: -1 if self < other, 0 if self == other, +1, if self > other.
+        """
+
+
+        if not isinstance(other,(Branch,BranchWildcard)):
+            return -1
         
-    def getMasses(self):
-        return ListWildcard()
+        #If BSM particles are identical, avoid further checks                
+        if self.BSMparticles and other.BSMparticles:
+            comp = 
         
+        
+       
     def __str__(self):
         return '[*]'
     
-    def __repr__(self):
-        return self.__str__()
     
-    def __eq__(self,other):
-        return self.__cmp__(other) == 0
-
-    def __ne__(self,other):
-        return self.__cmp__(other) != 0
+    def getMasses(self):
+        return ListWildcard()
     
     def setInfo(self):
         """
@@ -379,8 +404,6 @@ class BranchWildcard(Branch):
         
         return False
         
-    
-
 
 def decayBranches(branchList, sigcut=0.*fb):
     """

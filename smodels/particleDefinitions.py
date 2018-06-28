@@ -15,9 +15,10 @@
 """
 
 
-from smodels import SMparticleDefinitions, MSSMparticleDefinitions
+from smodels.share.models import MSSMparticles
+from smodels.share.models import SMparticles
 from smodels.theory.particle import Particle,ParticleList,ParticleWildcard
-from smodels.tools.wildCards import ValueWildcard
+from smodels.experiment import finalStateParticles
 
 def add(ptcList,obj):
     """
@@ -40,41 +41,24 @@ def add(ptcList,obj):
 
 # all particles and particle lists from the SM
 SM = []
-for pname in dir(SMparticleDefinitions):
-    obj =  getattr(SMparticleDefinitions,pname)
+for pname in dir(SMparticles):
+    obj =  getattr(SMparticles,pname)
     add(SM,obj)
 
     
 BSM = []
-for pname in dir(MSSMparticleDefinitions):
-    obj =  getattr(MSSMparticleDefinitions,pname)
+for pname in dir(MSSMparticles):
+    obj =  getattr(MSSMparticles,pname)
     add(BSM,obj)
     
-
-#Used to construct generic allParticles (z2-odd) and SM (z2-even) particles:
-anyBSM = ParticleWildcard(label='anyBSM',Z2parity='odd', mass =ValueWildcard())
-anySM = ParticleWildcard(label='*',Z2parity='even')
-
-#Used to construct final states:
-
-MET = ParticleList(label='MET', particles = [sparticle for sparticle in BSM 
-                                if isinstance(sparticle,Particle) and sparticle.eCharge == 0 and sparticle.colordim == 0
-                                and sparticle.Z2parity == 'odd'],
-                                mass = ValueWildcard())
-HSCP = ParticleList(label='HSCP', particles = [sparticle for sparticle in BSM 
-                                if isinstance(sparticle,Particle) and abs(sparticle.eCharge) == 1 and sparticle.colordim == 0
-                                and sparticle.Z2parity == 'odd'],
-                                mass = ValueWildcard())
-RHadronG = ParticleList(label='RHadronG', particles = [sparticle for sparticle in BSM 
-                                if isinstance(sparticle,Particle) and sparticle.eCharge == 0 and sparticle.colordim == 8
-                                and sparticle.Z2parity == 'odd'],
-                                mass = ValueWildcard())
-RHadronQ = ParticleList(label='RHadronQ', particles = [sparticle for sparticle in BSM 
-                                if isinstance(sparticle,Particle) and abs(sparticle.eCharge) in [2./3.,1./3.] and sparticle.colordim == 3
-                                and sparticle.Z2parity == 'odd'],
-                                mass = ValueWildcard())
-
+finalStates = []
+for pname in dir(finalStateParticles):
+    obj =  getattr(finalStateParticles,pname)
+    add(finalStates,obj)
 
 #Store all particles:
-allParticles = BSM + SM + [anyBSM,anySM,MET,HSCP,RHadronG,RHadronQ]
+allParticles = []
+for particle in SM+BSM+finalStates:
+    if not any(particle is ptc for ptc in allParticles):
+        allParticles.append(particle)
 

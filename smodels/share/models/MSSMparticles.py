@@ -1,12 +1,9 @@
 """
-.. module:: particles
-   :synopsis: Defines the particles to be used.
-              All particles appearing in the model as well as the SM particles
-              must be defined here.
+.. module:: MSSMparticleDefinitions 
+   :synopsis: Defines the BSM particles to be used.
 
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
-
 
    Properties not defined here and defined by the LHE or SLHA input file 
    (such as masses, width and BRs) are automatically added later.
