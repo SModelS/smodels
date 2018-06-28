@@ -119,13 +119,14 @@ class Branch(object):
             else: return -1
             
         #Compare SM final states by label and Z2parity:
-        for iptc,particle in self.particles:
-            comp = particle.cmpProperties(other.particles[iptc],properties=['Z2parity','label'])
-            if comp:
-                return comp 
+        for iptcl,ptclist in enumerate(self.particles):
+            for iptc,particle in enumerate(ptclist):
+                comp = particle.cmpProperties(other.particles[iptcl][iptc],properties=['Z2parity','label'])
+                if comp:
+                    return comp 
 
         #Compare BSM states by Z2parity and mass:
-        for iptc,bsmParticle in self.BSMparticles:
+        for iptc,bsmParticle in enumerate(self.BSMparticles):
             comp = bsmParticle.cmpProperties(other.BSMparticles[iptc],properties=['Z2parity','mass'])
             if comp:
                 return comp
