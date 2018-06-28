@@ -11,12 +11,12 @@
 import unittest
 import sys
 sys.path.insert(0,"../")
-from smodels.particleDefinitions import BSM
+from smodels.share.models.MSSMparticles import BSMList
+from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
 from smodels.tools import asciiGraph
 from smodels.installation import installDirectory
 from smodels.theory import decomposer
-import copy
 
 class AsciiTest(unittest.TestCase):
     def orig(self):
@@ -33,9 +33,8 @@ class AsciiTest(unittest.TestCase):
     def testGraph(self):
         """ draw ascii graph """
         
-        BSM = copy.deepcopy(BSM)
         filename = "%sinputFiles/lhe/simplyGluino.lhe" % (installDirectory() )        
-        model = Model(filename, BSM)
+        model = Model(inputFile=filename, BSMparticles = BSMList, SMparticles = SMList)
         model.updateParticles()
         
         
