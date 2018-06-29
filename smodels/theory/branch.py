@@ -119,9 +119,9 @@ class Branch(object):
             else: return -1
             
         #Compare SM final states by label and Z2parity:
-        for iv,vertex in enumerate(self.particles):            
-            for iptc,particle in enumerate(vertex):
-                comp = particle.cmpProperties(other.particles[iv][iptc],properties=['Z2parity','label'])
+        for iptcl,ptclist in enumerate(self.particles):
+            for iptc,particle in enumerate(ptclist):
+                comp = particle.cmpProperties(other.particles[iptcl][iptc],properties=['Z2parity','label'])
                 if comp:
                     return comp 
 
@@ -467,9 +467,9 @@ def decayBranches(branchList, sigcut=0.*fb):
             if sigcut.asNumber() > 0. and inbranch.maxWeight < sigcut:
                 # Remove the branches above sigcut and with length > topmax
                 continue
-            
+
             #If None appear amongst the decays, add the possibility for the particle not decaying prompt
-            if None in inbranch.BSMparticles[-1].decays:
+            if any(x is None for x in inbranch.BSMparticles[-1].decays):            
                 stableBranches.append(inbranch)
             
             # Add all possible decays of the R-odd daughter to the original

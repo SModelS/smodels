@@ -127,8 +127,9 @@ class Model(object):
             if not hasattr(particle,'pdg') or not hasattr(particle,'Z2parity'):
                 raise SModelSError("PDG and/or Z2-parity for particle %s has not been defined" %particle.label)
 
-            pdg = particle.pdg            
-            if abs(pdg) in massDict:
+            pdg = particle.pdg  
+            
+            if abs(pdg) in massDict.keys():                
                 particle.mass = abs(massDict[abs(pdg)])*GeV
             else:
                 logger.debug("No mass found for %i. Its mass will be set to None." %particle.pdg)

@@ -9,7 +9,10 @@
 """
 import sys
 sys.path.insert(0,"../")
-from smodels.theory import slhaDecomposer
+from smodels.share.models.MSSMparticles import BSMList
+from smodels.share.models.SMparticles import SMList
+from smodels.theory import decomposer
+from smodels.theory.model import Model
 from smodels.tools import xsecComputer
 from smodels.tools.xsecComputer import NLL
 from smodels.tools.physicsUnits import GeV, fb, TeV
@@ -22,14 +25,16 @@ class TxTest(unittest.TestCase):
         self.logger.info ( "T1" )
         """ test with the T1 slha input file """
         slhafile="../inputFiles/slha/simplyGluino.slha"
-        topos = slhaDecomposer.decompose ( slhafile, .1*fb, False, False, 5.*GeV )
+        model = Model( BSMparticles=BSMList, SMparticles=SMList, inputFile=slhafile)
+        model.updateParticles()
+        topos = decomposer.decompose ( model, .1*fb, False, False, 5.*GeV )
         for topo in topos:
             for element in topo.elementList:
                 masses=element.getMasses()
                 # print "e=",element,"masses=",masses
                 mgluino=masses[0][0]
                 mLSP=masses[0][1]
-                self.assertEqual ( str(element), "[[[q,q]],[[q,q]]]" )
+                self.assertEqual ( str(element), "[[[q,q~]],[[q,q~]]]" )
                 self.assertEqual ( int ( mgluino / GeV ), 675 )
                 self.assertEqual ( int ( mLSP / GeV ), 200 )
 
