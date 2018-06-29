@@ -47,19 +47,13 @@ w2 = w1.copy()
 w2.xSections[0].value = 22.*fb
 w3 = w1.copy()
 w3.xSections[0].value = 2.*fb
-"""
-setattr(getParticlesWith(label = 'gluino'), 'mass', 400.*GeV)
-setattr(getParticlesWith(label = 'st1'), 'mass', 300.*GeV)
-setattr(getParticlesWith(label = 'n3'), 'mass', 150.*GeV)
-setattr(getParticlesWith(label = 'n2'), 'mass', 100.*GeV)
-setattr(getParticlesWith(label = 'n1'), 'mass', 100.*GeV)
-"""
+
 b1 = Branch()
 b1.particles = [[t],[b,t]]
 b1.BSMparticles = [gluino,st1,n1]
 b1b = Branch()
 b1b.particles = [[t],[b,t]]
-b1b.BSMparticles = [gluino,st1,n2]
+b1b.BSMparticles = [gluino,st1,n1]
 b2 = Branch()
 b2.particles = [[b,t]]
 b2.BSMparticles = [st1,n1]
