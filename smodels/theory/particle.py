@@ -118,7 +118,7 @@ class Particle(object):
         """
 
         if isinstance(other,(ParticleList,ParticleWildcard)):
-            return other.cmpProperties(self,properties=properties)
+            return -1*other.cmpProperties(self,properties=properties)
         
         for prop in properties:
             if not hasattr(self,prop) or not hasattr(other,prop):
@@ -346,7 +346,7 @@ class ParticleList(object):
         """
         
         if isinstance(other,ParticleWildcard):
-            return other.cmpProperties(self,properties=properties)
+            return -1*other.cmpProperties(self,properties=properties)
         
         for prop in properties:            
             if not hasattr(self,prop) or not hasattr(other,prop):

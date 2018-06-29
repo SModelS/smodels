@@ -106,7 +106,7 @@ class Branch(object):
             return -1
         
         elif isinstance(other,BranchWildcard):
-            return other.__cmp__(self)
+            return -1*other.__cmp__(self)
         
         
         if self.vertnumb != other.vertnumb:
@@ -119,12 +119,12 @@ class Branch(object):
             else: return -1
             
         #Compare SM final states by label and Z2parity:
-        for iptcl,ptclist in enumerate(self.particles):
-            for iptc,particle in enumerate(ptclist):
-                comp = particle.cmpProperties(other.particles[iptcl][iptc],properties=['Z2parity','label'])
+        for iv,vertex in enumerate(self.particles):            
+            for iptc,particle in enumerate(vertex):
+                comp = particle.cmpProperties(other.particles[iv][iptc],properties=['Z2parity','label'])
                 if comp:
-                    return comp 
-
+                    return comp
+                
         #Compare BSM states by Z2parity and mass:
         for iptc,bsmParticle in enumerate(self.BSMparticles):
             comp = bsmParticle.cmpProperties(other.BSMparticles[iptc],properties=['Z2parity','mass'])
@@ -142,6 +142,7 @@ class Branch(object):
 
     def __lt__( self, b2 ):
         return self.__cmp__(b2) == -1
+
 
     def __eq__( self, b2 ):
         return self.__cmp__(b2) == 0

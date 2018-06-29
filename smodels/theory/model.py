@@ -79,12 +79,13 @@ class Model(object):
         return valueList
     
 
-    def updateParticles(self, promptWidth = 1e-8*GeV, stableWidth = 1e-25*GeV):        
+    def updateParticles(self, promptWidth = 1e-8*GeV, stableWidth = 1e-25*GeV, roundMasses = 1):        
         """
         Update mass, total width and branches of allParticles particles from input SLHA or LHE file. 
             
         :param promptWidth: Maximum width for considering particles as decaying prompt
         :param stableWidth: Minimum width for considering particles as stable
+        :param roundMasses: If set, it will round the masses to this number of digits (int)  
             
         """
         
@@ -129,8 +130,11 @@ class Model(object):
 
             pdg = particle.pdg  
             
-            if abs(pdg) in massDict.keys():                
-                particle.mass = abs(massDict[abs(pdg)])*GeV
+            if abs(pdg) in massDict.keys():
+                if roundMasses and int(roundMasses) > 0:
+                    particle.mass = round(abs(massDict[abs(pdg)]),int(roundMasses))*GeV
+                else:
+                    particle.mass = abs(massDict[abs(pdg)])*GeV
             else:
                 logger.debug("No mass found for %i. Its mass will be set to None." %particle.pdg)
                 particle.mass = None
