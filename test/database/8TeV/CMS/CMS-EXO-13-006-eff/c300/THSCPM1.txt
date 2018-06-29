@@ -2,6 +2,7 @@ txName: THSCPM1
 constraint: [[],[]]
 condition: None
 susyProcess: pp --> chargino^pm_1 chargino^pm_1, chargino^pm_1 chargino^pm_1 --> chargino^pm_1 chargino^pm_1
+figureUrl: None
 dataUrl: None
 source: SModelS
 validated: N/A

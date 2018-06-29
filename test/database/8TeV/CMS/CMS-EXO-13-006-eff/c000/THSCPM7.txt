@@ -1,8 +1,9 @@
 txName: THSCPM7
-constraint: [[['?']],[['?'],['?']]]
+constraint: [[['*']],[['*'],['*']]]
 condition: None
 conditionDescription: None
 susyProcess: pp --> lsp chargino^pm_2, lsp chargino^pm_2 --> tau stau_1 chargino^pm_1, chargino^pm_1 --> nu stau_1
+figureUrl: None
 dataUrl: None
 source: SModelS
 validated: N/A

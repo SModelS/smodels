@@ -1,8 +1,9 @@
 txName: THSCPM8
-constraint: [[['?','?']],[['?','?']]]
+constraint: [[['*','*']],[['*','*']]]
 condition: None
 conditionDescription: None
 susyProcess: pp --> squark squark, squark --> quark quark stau_1
+figureUrl: None
 dataUrl: None
 source: SModelS
 validated: N/A
