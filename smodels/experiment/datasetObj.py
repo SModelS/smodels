@@ -14,7 +14,7 @@ from smodels.tools import statistics
 from smodels.tools.physicsUnits import fb
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.smodelsLogging import logger
-from smodels.theory.particleNames import elementsInStr
+from smodels.theory.auxiliaryFunctions import elementsInStr
 from smodels.theory.element import Element
 import itertools
 
