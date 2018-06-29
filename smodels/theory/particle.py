@@ -190,6 +190,21 @@ class Particle(object):
             return True
         
         return False
+    
+    def isMET(self):
+        """
+        Checks if the particle can be considered as MET.
+        If the isMET attribute has not been defined, it will return True/False is isNeutral() = True/False.
+        Else it will return the isMET attribute.
+        
+        :return: True/False
+        """
+        
+        if hasattr(self,'_isMET'):
+            return self._isMET
+        else:
+            return self.isNeutral()
+    
         
 
 class ParticleList(object):
@@ -409,6 +424,17 @@ class ParticleList(object):
         
         neutral = all(particle.isNeutral() for particle in self.particles)
         return neutral
+
+    def isMET(self):
+        """
+        Checks if all the particles in self can be considered as MET.
+        
+        :return: True/False
+        """
+        
+        met = all(particle.isMET() for particle in self.particles)
+        return met
+
 
 
 class ParticleWildcard(Particle):

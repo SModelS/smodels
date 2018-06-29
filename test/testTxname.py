@@ -9,13 +9,11 @@
 """
 import sys
 sys.path.insert(0,"../")
-from smodels.share.models import SMparticles, MSSMparticles
-from smodels.experiment import finalStateParticles 
-from smodels.theory.branch import Branch
+from smodels.share.models import MSSMparticles
 from smodels.theory.element import Element
 from smodels.experiment import infoObj
 from smodels.experiment.txnameObj import TxName
-from smodels.tools.physicsUnits import GeV, fb, TeV
+from smodels.tools.physicsUnits import GeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import unittest
 

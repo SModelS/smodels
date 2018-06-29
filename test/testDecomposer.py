@@ -22,15 +22,15 @@ from smodels.tools.physicsUnits import GeV,pb,TeV,fb
 class DecomposerTest(unittest.TestCase):
 
     def testDecomposerLHE(self):
- 
+  
         filename = "%sinputFiles/lhe/simplyGluino.lhe" %(installDirectory())  
         model = Model(BSMList,SMList,filename)
         model.updateParticles()
-         
+          
         topList = decomposer.decompose(model)
         self.assertTrue(len(topList.getElements()) == 1)
         element = topList.getElements()[0]
-        el = Element("[[[q,q~]],[[q,q~]]]",finalState=['MET','MET'])
+        el = Element("[[[q,q]],[[q,q]]]",finalState=['MET','MET'])
         self.assertTrue(el == element)
         bsmLabels = [[bsm.label for bsm in branch] for branch in element.getBSMparticles()]
         self.assertEqual(bsmLabels,[['gluino','N1']]*2)
@@ -38,18 +38,18 @@ class DecomposerTest(unittest.TestCase):
         xsec = [xsec for xsec in element.weight if xsec.info.sqrts == 8.*TeV][0]
         xsec = xsec.value.asNumber(pb)        
         self.assertAlmostEqual(xsec,0.262,3)
-
-
+ 
+ 
     def testDecomposerSLHA(self):
-
+ 
         filename = "%sinputFiles/slha/simplyGluino.slha" %(installDirectory())  
         model = Model(BSMList,SMList,filename)
         model.updateParticles()
-        
+         
         topList = decomposer.decompose(model)
         self.assertTrue(len(topList.getElements()) == 1)
         element = topList.getElements()[0]
-        el = Element("[[[q,q~]],[[q,q~]]]",finalState=['MET','MET'])
+        el = Element("[[[q,q]],[[q,q]]]",finalState=['MET','MET'])
         self.assertTrue(el == element)
         bsmLabels = [[bsm.label for bsm in branch] for branch in element.getBSMparticles()]
         self.assertEqual(bsmLabels,[['gluino','N1']]*2)
@@ -57,16 +57,16 @@ class DecomposerTest(unittest.TestCase):
         xsec = [xsec for xsec in element.weight if xsec.info.sqrts == 8.*TeV][0]
         xsec = xsec.value.asNumber(pb)
         self.assertAlmostEqual(element.weight[0].value.asNumber(pb),0.572,3)
-
  
-    def testDecomposerLongLived(self):
   
+    def testDecomposerLongLived(self):
+   
         filename = "%sinputFiles/slha/longLived.slha" %(installDirectory())
         #Consider a simpler model
         newModel = [ptc for ptc in BSMList if not isinstance(ptc.pdg,list) and abs(ptc.pdg) in [1000015,1000022]] 
         model = Model(newModel,SMList,filename)
         model.updateParticles()
-          
+           
         topList = decomposer.decompose(model)
         self.assertTrue(len(topList.getElements()) == 10)
         expectedWeights = {str(sorted([['N1'],['N1']])).replace(' ','') : 0.020,
@@ -74,7 +74,7 @@ class DecomposerTest(unittest.TestCase):
                            str(sorted([['sta_1'],['sta_1~','N1~']])).replace(' ','') : 0.13,
                            str(sorted([['sta_1~'],['sta_1','N1']])).replace(' ','') : 0.13,
                            str(sorted([['sta_1~','N1~'],['sta_1','N1']])).replace(' ','') : 0.065}
-            
+             
         for el in topList.getElements():
             bsmLabels = str(sorted([[bsm.label for bsm in branch] for branch in el.getBSMparticles()]))
             bsmLabels = bsmLabels.replace(' ','')
@@ -82,6 +82,61 @@ class DecomposerTest(unittest.TestCase):
             self.assertAlmostEqual(expectedWeights[bsmLabels], xsec,2)
 
 
+    def testCompression(self):
+        
+        filename = "%sinputFiles/slha/higgsinoStop.slha" %(installDirectory())
+        model = Model(BSMList,SMList,filename)
+        model.updateParticles(promptWidth=1e-12*GeV) #Force charginos/neutralinos to be considered as prompt
+        
+        
+        tested = False
+        topos = decomposer.decompose(model, sigcut=0.1*fb, doCompress=False, doInvisible=False, minmassgap=5.*GeV )
+        for topo in topos:
+            if str(topo)!="[1,1][1,1]":
+                continue
+            for element in topo.elementList:
+                if str(element)!="[[[q],[W+]],[[t-],[t+]]]":
+                    continue
+                tested = True
+                self.assertEqual(element.motherElements[0][0],"original")
+                self.assertEqual(len(element.motherElements),1)
+        self.assertTrue(tested) #Make sure the test was performed
+         
+         
+        tested = False
+        topos = decomposer.decompose(model, sigcut=0.1*fb, doCompress=False, doInvisible=True, minmassgap=5.*GeV )
+        for topo in topos:
+            if str(topo)!="[][]":
+                continue
+            for element in topo.elementList:
+                if str(element) != "[[],[]]":
+                    continue
+                tested = True
+                self.assertEqual(str(element.motherElements[0][1]),"[[],[[nu,nu]]]")
+                bsmLabels = [[bsm.label for bsm in br] for br in element.getBSMparticles()]
+                self.assertEqual(bsmLabels,[['N1'],['N2']])
+                ## all neutrinos are considered as equal, so there should be a single mother:
+                self.assertEqual(len(element.motherElements), 1) 
+                self.assertEqual(str(element.motherElements[0][0]),"invisible" )
+        self.assertTrue(tested) #Make sure the test was performed
+        
+        
+        tested = False                 
+        topos = decomposer.decompose(model, sigcut=0.1*fb, doCompress=True, doInvisible=False, minmassgap=5.*GeV )
+        for topo in topos:
+            if str(topo)!="[1][1]":
+                continue
+            for element in topo.elementList:
+                if str(element)!="[[[b]],[[b]]]":
+                    continue
+                masses = element.motherElements[0][1].getMasses()
+                dm = abs(masses[0][1]-masses[0][2])/GeV
+                tested = True
+                self.assertEqual(len(element.motherElements),24)
+                self.assertEqual(str(element.motherElements[0][0]),"mass" )
+                self.assertTrue(dm < 5.0)
+        self.assertTrue(tested) #Make sure the test was performed
+                        
 
 if __name__ == "__main__":
     unittest.main()

@@ -191,15 +191,6 @@ class ElementTest(unittest.TestCase):
         n3.mass = 320.*GeV 
         n4.mass = 330.*GeV  
            
-#         v0 = Vertex(inParticle=None, outParticles=[gluino])        
-#         v0c = Vertex(inParticle=None, outParticles=[n3])
-#         v1 = Vertex(inParticle=gluino, outParticles=[st1,t])
-#         v2 = Vertex(inParticle=st1, outParticles=[n3,t])
-#         v3 = Vertex(inParticle=n3, outParticles=[n1,nue,nue])        
-#         v4 = Vertex(inParticle=n3, outParticles=[n2,nue])
-#         v5 = Vertex(inParticle=n2, outParticles=[n1,nue,nue,nue,nue])
-#         v6 = Vertex(inParticle=n2, outParticles=[n1,nue,nue,nue,em])
-          
         #Compress one step:
         #N3 --> N1 + [nue,nue]
         #gluino --> st_1 + [t+]/st_1 --> N3 + [t+]/N3 --> N1 + [nue,nue]
@@ -303,7 +294,7 @@ class ElementTest(unittest.TestCase):
         el1.combineWith(el3)
         self.assertEqual(el1.weight[0].value,34.*fb)
         self.assertEqual(el1.getPIDs(),[[1000021,[1000022,1000023]],[1000021,[1000022,1000023]]])
-                
+        
         
 if __name__ == "__main__":
     unittest.main()
