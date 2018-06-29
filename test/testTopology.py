@@ -104,13 +104,9 @@ class TopologyTest(unittest.TestCase):
         top2 = Topology(elements=[el2.copy()])
         topL1 = TopologyList(topologies=[top1])
         topL2 = TopologyList(topologies=[top2])
-        print topL1
-        print topL2
-        print "topL1 != topL2"
-        print topL1 != topL2
         
         self.assertEqual(len(topL1) == len(topL2) == 1, True)
-        self.assertEqual(topL1 < topL2, True) #Bigger by number of vertices
+        self.assertEqual(top1 < top2, False) #Bigger by number of vertices
         
         topL = TopologyList()
         topL.addList(topL1)
