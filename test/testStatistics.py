@@ -14,8 +14,12 @@ import unittest
 from smodels.tools import statistics
 from smodels.tools.physicsUnits import fb
 from smodels.theory.theoryPrediction import theoryPredictionsFor
+from smodels.share.models.MSSMparticles import BSMList
+from smodels.share.models.SMparticles import SMList
+from smodels.theory.model import Model
 from databaseLoader import database
-from smodels.theory import slhaDecomposer
+from smodels.theory import decomposer
+from smodels.installation import installDirectory
 from math import floor, log10
 import numpy as np
 import math
@@ -30,9 +34,12 @@ class StatisticsTest(unittest.TestCase):
         and TheoryPrediction to the statistics tools is working correctly
         """
         expRes = database.getExpResults( analysisIDs=['CMS-SUS-13-012'] )[0]
-        slhafile="../inputFiles/slha/simplyGluino.slha"
-        smstoplist = slhaDecomposer.decompose( slhafile )
-        prediction = theoryPredictionsFor ( expRes, smstoplist )[0]
+
+        filename = "%sinputFiles/lhe/simplyGluino.slha" %(installDirectory())  
+        model = Model(BSMList,SMList,filename)
+        model.updateParticles()           
+        smstoplist = decomposer.decompose(model)
+        prediction = theoryPredictionsFor(expRes, smstoplist)[0]
         pred_signal_strength = prediction.xsection.value
         prediction.computeStatistics()
         ill = math.log(prediction.likelihood)

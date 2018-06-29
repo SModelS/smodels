@@ -97,7 +97,7 @@ def decompose(model, sigcut= 0*fb, doCompress=False, doInvisible=False,
     # cross section list
     for pids in xSectionList.getPIDpairs():
         weightList = xSectionListDict[pids]
-        minBR = 0. #(sigcut/weightList.getMaxXsec()).asNumber()        
+        minBR = (sigcut/weightList.getMaxXsec()).asNumber()        
         if minBR > 1.:
             continue
         for branch1 in branchListDict[pids[0]]:
