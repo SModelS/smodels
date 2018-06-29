@@ -287,6 +287,8 @@ class Branch(object):
             #Else create a particle list with particles from both
             if not isinstance(self.BSMparticles[iptc],ParticleList):
                 bsmList = ParticleList(label = 'BSM (combined)', particles=[self.BSMparticles[iptc]])
+            else:
+                bsmList = self.BSMparticles[iptc]
                 
             #Now combine particles from both branches:
             if not isinstance(bsm,ParticleList):

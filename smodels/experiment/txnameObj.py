@@ -203,12 +203,12 @@ class TxName(object):
         """
         
         for el in self._topologyList.getElements():      
-            if element.particlesMatch(el, checkDecayType=False, branchOrder=True):
+            if element.particlesMatch(el, branchOrder=True):
                 return element.copy()
             else:
                 if switchBranches:
                     elementB = element.switchBranches()
-                    if elementB.particlesMatch(el, checkDecayType=False, branchOrder=True): 
+                    if elementB.particlesMatch(el, branchOrder=True): 
                         return elementB
         return False
 

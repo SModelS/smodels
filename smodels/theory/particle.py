@@ -339,10 +339,16 @@ class ParticleList(object):
             
             x = getattr(self,prop)
             y = getattr(other,prop)
+            
             if x == y:
                 continue
             
-            if isinstance(x,list) and not isinstance(y,list): #Compare list to single value
+            if not isinstance(x,list) and not isinstance(y,list): #Compare single values:
+                if x > y:
+                    return 1
+                else:
+                    return -1            
+            elif isinstance(x,list) and not isinstance(y,list): #Compare list to single value
                 if any(xval == y for xval in x):
                     continue
                 elif any(xval > y for xval in x):
@@ -401,8 +407,8 @@ class ParticleList(object):
         :return: True/False
         """
         
-        neutrals = [particle.isNeutral() for particle in self.particles]
-        return sum(neutrals) == len(self.particles)
+        neutral = all(particle.isNeutral() for particle in self.particles)
+        return neutral
 
 
 class ParticleWildcard(Particle):

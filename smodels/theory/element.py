@@ -78,9 +78,12 @@ class Element(object):
                             self.branches.append(Branch(branch,finalState[ibr])) 
 
             # Create element from branch pair
-            elif type(info) == type([]) and type(info[0]) == type(Branch()):
-                for ib, branch in enumerate(info):
-                    self.branches[ib] = branch.copy()
+            elif isinstance(info,list) and all(isinstance(x,(Branch,BranchWildcard)) for x in info):                
+                self.branches = [br.copy() for br in info]
+            else:
+                raise SModelSError("Can not create element from input type %s" %type(info))
+        
+        self.setEinfo()
         
     
     def __cmp__(self,other):
@@ -124,6 +127,10 @@ class Element(object):
         elStr = elStr.replace(" ", "").replace("'", "")
         return elStr
     
+    def __repr__(self):
+        
+        return self.__str__()
+    
     def sortBranches(self):
         """
         Sort branches. The smallest branch is the first one.
@@ -138,7 +145,7 @@ class Element(object):
         self.branches = sorted(self.branches)
 
 
-    def particlesMatch(self, other, checkDecayType=False, branchOrder=False):
+    def particlesMatch(self, other, branchOrder=False):
         """
         Compare two Elements for matching particles only.
         Allow for inclusive particle labels (such as the ones defined in particleDefinitions.py).
@@ -270,8 +277,8 @@ class Element(object):
         """
 
         BSMpids = []
-        for branch in self.getBSMparticles():
-            BSMpids.append([particle.pdg for particle in branch])
+        for br in self.getBSMparticles():
+            BSMpids.append([particle.pdg for particle in br])
 
         return BSMpids
 
@@ -355,6 +362,14 @@ class Element(object):
             vertnumb.append(branch.vertnumb)
                 
         return {"vertnumb" : vertnumb, "vertparts" : vertparts}
+
+    def setEinfo(self):
+        """
+        Set topology info for each branch.  
+        """
+        
+        for branch in self.branches:
+            branch.setInfo()
 
 
     def _getLength(self):
@@ -459,14 +474,14 @@ class Element(object):
         #Loop over branches and look for small mass differences 
         for ibr,branch in enumerate(newelement.branches):
             #Get mass differences      
-            massDiffs = [mom.mass - branch.BSMparticles[i+1].mass for i,mom in branch.BSMparticles[:-1]]
+            massDiffs = [mom.mass - branch.BSMparticles[i+1].mass for i,mom in enumerate(branch.BSMparticles[:-1])]
             #Get vertices which have deltaM < minmassgap:
             removeVertices = [iv for iv,m in enumerate(massDiffs) if m < minmassgap]
             #Remove vertices till they exist:
             while removeVertices:
                 newelement.removeVertex(ibr,removeVertices[0])
                 branch = newelement.branches[ibr]
-                massDiffs = [mom.mass - branch.BSMparticles[i+1].mass for i,mom in branch.BSMparticles[:-1]]
+                massDiffs = [mom.mass - branch.BSMparticles[i+1].mass for i,mom in enumerate(branch.BSMparticles[:-1])]
                 removeVertices = [iv for iv,m in enumerate(massDiffs) if m < minmassgap]
                 
         for ibr,branch in enumerate(newelement.branches):
@@ -491,18 +506,27 @@ class Element(object):
 
         # Loop over branches
         for branch in newelement.branches:
+            if not branch.particles:
+                continue
             #Check if the last decay should be removed:            
-            neutralSM = [ptc.isNeutral for ptc in branch.particles[-1]]
-            if branch.BSMparticles[-2].isNeutral() and (not False in neutralSM):
+            neutralSM = all(ptc.isNeutral() for ptc in branch.particles[-1])
+            neutralBSM = branch.BSMparticles[-2].isNeutral() 
+            if neutralBSM and neutralSM:
                 removeLastVertex = True
             else:
                 removeLastVertex = False
                 
             while len(branch.BSMparticles) > 1 and removeLastVertex:
+                bsmMom = branch.BSMparticles[-2]
                 branch.removeVertex(len(branch.BSMparticles)-2)
-                #Re-check if the last decay should be removed:            
-                neutralSM = [ptc.isNeutral for ptc in branch.particles[-1]]
-                if branch.BSMparticles[-2].isNeutral() and (not False in neutralSM):
+                #For invisible compression, keep the mother of the vertex and not the daughter:
+                branch.BSMparticles[-1] = bsmMom
+                #Re-check if the last decay should be removed:
+                if not branch.particles:
+                    continue
+                neutralSM = all(ptc.isNeutral() for ptc in branch.particles[-1])
+                neutralBSM = branch.BSMparticles[-2].isNeutral()
+                if neutralBSM and neutralSM:
                     removeLastVertex = True
                 else:
                     removeLastVertex = False
