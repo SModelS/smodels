@@ -509,8 +509,8 @@ class Element(object):
             if not branch.particles:
                 continue
             #Check if the last decay should be removed:            
-            neutralSM = all(ptc.isNeutral() for ptc in branch.particles[-1])
-            neutralBSM = branch.BSMparticles[-2].isNeutral() 
+            neutralSM = all(ptc.isMET() for ptc in branch.particles[-1])
+            neutralBSM = branch.BSMparticles[-2].isMET() 
             if neutralBSM and neutralSM:
                 removeLastVertex = True
             else:
@@ -524,8 +524,8 @@ class Element(object):
                 #Re-check if the last decay should be removed:
                 if not branch.particles:
                     continue
-                neutralSM = all(ptc.isNeutral() for ptc in branch.particles[-1])
-                neutralBSM = branch.BSMparticles[-2].isNeutral()
+                neutralSM = all(ptc.isMET() for ptc in branch.particles[-1])
+                neutralBSM = branch.BSMparticles[-2].isMET()
                 if neutralBSM and neutralSM:
                     removeLastVertex = True
                 else:
@@ -551,8 +551,8 @@ class Element(object):
         
         if self != other:
             raise SModelSError("Asked to combine distinct elements")
-                
-        self.motherElements += other.motherElements
+
+        self.motherElements += other.motherElements[:]
         self.weight.combineWith(other.weight)
         for ibr,branch in enumerate(self.branches):
             branch.combineWith(other.branches[ibr])

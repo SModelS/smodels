@@ -26,7 +26,8 @@ tList = ParticleList('t'  , [quarks[4],quarksC[4]])
 LpList = ParticleList('L+' , lpList.particles + [ leptonsC[4] ])
 LmList = ParticleList('L-' , lmList.particles + [ leptons[4] ])
 LList = ParticleList('L'  , LpList.particles + LmList.particles )
-jetList = ParticleList('jet' ,  quarks[0:4] + [gauge[0]] + [pi] + quarksC[0:4] + [ gaugeC[0] ] + [pi.chargeConjugate()])
+jetList = ParticleList('jet' ,  quarks[0:4] + [gauge[0]] + [pip,piz] + quarksC[0:4] + [ gaugeC[0] ] 
+                       + [piz.chargeConjugate('pi'),pip.chargeConjugate('pi')])
 
 
 
