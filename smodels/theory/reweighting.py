@@ -1,6 +1,6 @@
 """
-.. module:: particles
-   :synopsis: Updates masses, width and branches from SLHA file
+.. module:: reweighting
+   :synopsis: calculate probabilities and relabel branches  
 
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>
 """
@@ -10,7 +10,7 @@ import itertools
 from math import exp
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import MeV, m, mm, fm
-from smodels.SMparticleDefinitions import jetList, lList
+from smodels.experiment.finalStateParticles import jetList, lList
 
         
 
@@ -22,7 +22,7 @@ def addPromptAndDisplaced(branch):
     """
     
     if not branch.particles: # no decays happened
-        if branch.BSMparticles[0][0].isStable(): 
+        if branch.BSMparticles[0][0].totalwidth == 0.*MeV: 
             branch.decayType = 'METonly'
             probabilities = [1.]
             branches = [branch]
@@ -30,7 +30,7 @@ def addPromptAndDisplaced(branch):
    
     F = []
     for particle in branch.BSMparticles[0]:
-        if particle.isStable(): continue
+        if particle.totalwidth == 0.*MeV: continue
         F_long, F_prompt, F_displaced = calculateProbabilities(particle)
         # allow for combinations of decays and a long lived particle only if the last BSM particle is the long lived one
         if F_long and particle == branch.BSMparticles[0][-1]: F.append([F_long])
@@ -89,8 +89,8 @@ def calculateProbabilities(particle):
     """
     The fraction of prompt and displaced decays are defined as:
     
-    F_long = exp(-width*l_outer/gb_outer)
-    F_prompt = 1 - exp(-width*l_inner/gb_inner)
+    F_long = exp(-totalwidth*l_outer/gb_outer)
+    F_prompt = 1 - exp(-totaltotalwidth*l_inner/gb_inner)
     F_displaced = 1 - F_prompt - F_long
     
     where l_inner (l_outer) is the inner (outer) radius of the detector
@@ -106,8 +106,8 @@ def calculateProbabilities(particle):
     gb_outer = 0.6
     hc = 197.327*MeV*fm  #hbar * c
     
-    F_long = exp( -1*particle.width * l_outer /(gb_outer*hc) )    
-    F_prompt = 1. - exp( -1*particle.width * l_inner /(gb_inner*hc) )         
+    F_long = exp( -1*particle.totalwidth * l_outer /(gb_outer*hc) )    
+    F_prompt = 1. - exp( -1*particle.totalwidth * l_inner /(gb_inner*hc) )         
     F_displaced = 1. - F_prompt - F_long
     
     return F_long, F_prompt, F_displaced
@@ -124,9 +124,9 @@ def labelPromptDisplaced(branch):
     promptBranch.decayType = 'prompt'
     
     displacedBranch = branch.copy()      
-    if any(particle==jetList for particle in branch.getBranchParticles() ):
+    if any(particle==jetList for particle in branch.particles ):
         displacedBranch.decayType = 'displacedJet'
-    elif any(particle==lList for particle in branch.getBranchParticles() ):           
+    elif any(particle==lList for particle in branch.particles ):           
         displacedBranch.decayType = 'displacedLepton'
     else: displacedBranch.decayType = 'displaced(neither jet nor lepton)'
     
