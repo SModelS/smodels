@@ -62,7 +62,6 @@ for obj in objects:
             allFinalStates.append(obj)
             
 #Protect all final state properties:
-#Protect all particles properties:
 for ptc in allFinalStates:
     ptc._static = True
     
