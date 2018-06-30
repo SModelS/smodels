@@ -7,6 +7,7 @@
 """
 
 import copy
+from smodels.theory.exceptions import SModelSTheoryError
 
 class Particle(object):
     """
@@ -31,8 +32,14 @@ class Particle(object):
                  
         """  
 
-        for key,value in kwargs.items():
-            self.addProperty(key,value)
+        self._static = False
+        for attr,value in kwargs.items():
+            if not attr == '_static':
+                setattr(self,attr,value)
+                
+        #Leave the static attribute for last:
+        if '_static' in kwargs:
+            self._static = kwargs['_static']
 
     def __cmp__(self,other):
         """
@@ -70,22 +77,21 @@ class Particle(object):
     def __repr__(self):
         return self.__str__()        
     
+    def __setattr__(self,attr,value):
+        """
+        Override setattr method.
+        If the _static attribute is True, will not
+        change the particle attribute.
+        """
+         
+        if attr == '_static':
+            self.__dict__[attr] = value
+        elif self._static is False:            
+            self.__dict__[attr] = value
+    
     def describe(self):
         return str(self.__dict__)
     
-    
-    def addProperty(self,label,value,overwrite=False):
-        """
-        Add property with label and value.
-        If overwrite = False and property already exists, it will not be overwritten
-        :parameter label: property label (e.g. "mass", "label",...)
-        :parameter value: property value (e.g. 171*GeV, "t+",...)
-        """
-        
-        if overwrite:
-            setattr(self, label, value)
-        elif not hasattr(self, label) or getattr(self, label) is None:
-            setattr(self, label, value)    
 
     def eqProperties(self,other, properties = ['spin','colordim','eCharge']):
         """
@@ -207,7 +213,7 @@ class Particle(object):
     
         
 
-class ParticleList(object):
+class ParticleList(Particle):
 
     """ An instance of this class represents a list of particle object to allow for inclusive expresions such as jet. 
         The properties are: label, pdg, mass, electric charge, color charge, width 
@@ -218,13 +224,12 @@ class ParticleList(object):
         """ 
         Initializes the particle list.
         """        
-                
+        
+
+        self._static = False
         self.label = label
         self.particles = particles
-        
-        for key,value in kwargs.items():
-            self.addProperty(key,value)
-        
+        Particle.__init__(self,**kwargs)        
         
      
     def __cmp__(self,other):
@@ -289,44 +294,25 @@ class ParticleList(object):
         """
         
         try:
-            return object.__getattribute__(self, name)
+            return super(ParticleList,self).__getattribute__(name) #Python2
         except:
+            pass
+        
+        try:
+            return super().__getattribute__(name) #Python3
+        except:
+            pass
+        
+        try:
             values = [getattr(particle,name) for particle in self.particles]
             if all(type(x) == type(values[0]) for x in values):
                 if all(x == values[0] for x in values):
                     return values[0]
             return values
-        
-    def addProperty(self,label,value,overwrite=False):
-        """
-        Add property with label and value.
-        If overwrite = False and property already exists, it will not be overwritten
-        :parameter label: property label (e.g. "mass", "label",...)
-        :parameter value: property value (e.g. 171*GeV, "t+",...)
-        """
-        
-        if overwrite:
-            setattr(self, label, value)
-        elif not hasattr(self, label) or getattr(self, label) is None:
-            setattr(self, label, value)    
+        except:
+            raise SModelSTheoryError("Could not obtain property %s from object ParticleList %s" %(name,str(self)))
 
-    def eqProperties(self,other, properties = ['spin','colordim','eCharge']):
-        """
-        Check if particle has the same properties (default is spin, colordim and eCharge)
-        as other. Only compares the attributes which have been defined in both objects.
-        
-        :param other: a Particle, ParticleList or ParticleWildCard object
-        :param properties: list with properties to be compared. Default is spin, colordim and eCharge
-        
-        :return: True if all properties are the same, False otherwise.
-        """
-        
-        if self.cmpProperties(other, properties=properties) == 0:
-            return True
-        else:
-            return False
-
-        
+            
     def cmpProperties(self,other, properties = ['spin','colordim','eCharge']):
         """
         Compares the properties in self with the ones in other (default is spin, colordim and eCharge).

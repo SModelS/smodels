@@ -60,5 +60,11 @@ for obj in objects:
     elif isinstance(obj,(Particle,ParticleList,ParticleWildcard)):
         if not any(obj is x for x in allFinalStates):
             allFinalStates.append(obj)
+            
+#Protect all final state properties:
+#Protect all particles properties:
+for ptc in allFinalStates:
+    ptc._static = True
+    
 finalStates = Model(SMparticles = allFinalStates, BSMparticles=[])
 

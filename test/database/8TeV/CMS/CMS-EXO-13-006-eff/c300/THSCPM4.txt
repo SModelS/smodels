@@ -1,8 +1,9 @@
 txName: THSCPM4
-constraint: [[*],[['?']]]
+constraint: [[*],[['*']]]
 condition: None
 conditionDescription: None
 susyProcess: pp --> squark squark, squark --> quark chargino_1 (quark lsp)
+figureUrl: None
 dataUrl: None
 source: SModelS
 validated: N/A

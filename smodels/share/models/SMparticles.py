@@ -52,6 +52,9 @@ SMparticles = quarks + leptons + gauge + [higgs] + [pip,piz]
 SMparticlesC = quarksC + leptonsC + gaugeC + [higgs.chargeConjugate()] + [pip.chargeConjugate('pi'),piz.chargeConjugate('pi')]
 
 SMList = SMparticles + SMparticlesC
+#Protect all particles properties:
+for ptc in SMList:
+    ptc._static = True
 
 SMparticleList = ParticleList('SM', SMList)
           
