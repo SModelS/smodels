@@ -83,11 +83,19 @@ class Particle(object):
         If the _static attribute is True, will not
         change the particle attribute.
         """
-         
+          
         if attr == '_static':
             self.__dict__[attr] = value
         elif self._static is False:            
             self.__dict__[attr] = value
+     
+    def __setstate__(self, state):
+        """
+        Override setstate method. Required for pickling.
+        """
+          
+        self._static = False
+        self.__dict__.update(state)    
     
     def describe(self):
         return str(self.__dict__)
@@ -280,37 +288,37 @@ class ParticleList(Particle):
     def __repr__(self):
         return self.__str__()    
     
-    def __getattribute__(self,name):
+    def __getattribute__(self,attr):
         """
         If ParticleList does not have attribute, return a list
         if the attributes of each particle in self.particles.
         If not all particles have the attribute, it will raise an exception.
         If all particles share a common attribute, a single value
         will be returned.
-        
-        :parameter name: Attribute string
-        
+         
+        :parameter attr: Attribute string
+         
         :return: Attribute or list with the attribute values in self.particles
         """
-        
+         
         try:
-            return super(ParticleList,self).__getattribute__(name) #Python2
+            return super(ParticleList,self).__getattribute__(attr) #Python2
         except:
             pass
-        
+         
         try:
-            return super().__getattribute__(name) #Python3
+            return super().__getattribute__(attr) #Python3
         except:
             pass
-        
+         
         try:
-            values = [getattr(particle,name) for particle in self.particles]
+            values = [getattr(particle,attr) for particle in self.particles]
             if all(type(x) == type(values[0]) for x in values):
                 if all(x == values[0] for x in values):
                     return values[0]
             return values
         except:
-            raise SModelSTheoryError("Could not obtain property %s from object ParticleList %s" %(name,str(self)))
+            raise SModelSTheoryError("Could not obtain property %s from object ParticleList %s" %(attr,str(self)))
 
             
     def cmpProperties(self,other, properties = ['spin','colordim','eCharge']):
