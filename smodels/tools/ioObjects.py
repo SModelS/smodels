@@ -15,13 +15,15 @@ from smodels.theory import lheReader
 from smodels.tools.physicsUnits import GeV, fb
 from smodels import installation
 import pyslha
-from smodels.particleDefinitions import SMpdgs
+from smodels.share.models.SMparticles import SMparticleList
 from smodels.theory.particleNames import getObjectFromPdg
 from smodels.theory import crossSection
 from smodels.theory.theoryPrediction import TheoryPrediction
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.tools import runtime
+
+SMpdgs = SMparticleList.pdg
 
 class ResultList(object):
     """
