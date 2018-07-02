@@ -9,8 +9,8 @@
 
 """
 import copy
-from smodels.tools.physicsUnits import fb
-from smodels.theory.updateParticles import addPromptAndDisplaced
+from smodels.tools.physicsUnits import fb, GeV
+from smodels.theory.reweighting import addPromptAndDisplaced
 
 class Uncovered(object):
     """
@@ -55,31 +55,28 @@ class Uncovered(object):
                     self.motherIDs.append(motherID)
                 
 
-    def fill(self, topoList):
+    def fill(self, topoList, sigcut = 10**(-8)*fb):
         """
         Check all elements, categorise those not tested / missing, classify long cascade decays and asymmetric branches
         Fills all corresponding objects
         :ivar topoList: sms topology list
         """
-        elements =  topoList.extraMissingElements + topoList.getElements()
-        for element in elements: # loop over all elements, by construction we start with the most compressed
+
+        for element in topoList.getElements(): # loop over all elements, by construction we start with the most compressed
             if element.tested: continue  
-            if not element.branches[0].decayType:   
-                allElements = []       
-                probabilities1, branches1 = addPromptAndDisplaced(element.branches[0])
-                probabilities2, branches2 = addPromptAndDisplaced(element.branches[1])               
-                for i,probability1 in enumerate(probabilities1):
-                    for j,probability2 in enumerate(probabilities2): 
-                        newEl = element.copy()   
-                        newEl.tested = element.tested
-                        newEl.covered = element.covered
-                        newEl.branches[0].decayType = branches1[i].decayType
-                        newEl.branches[1].decayType = branches2[j].decayType      
-                        newEl.weight *= (probability1*probability2)    
-                        switchedElement = newEl.switchBranches()
-                        if not newEl in topoList.extraMissingElements and not switchedElement in topoList.extraMissingElements:     
-                            allElements.append(newEl) 
-            else: allElements = [element]                       
+            allElements = []       
+            probabilities1, branches1 = addPromptAndDisplaced(element.branches[0])
+            probabilities2, branches2 = addPromptAndDisplaced(element.branches[1])               
+            for i,probability1 in enumerate(probabilities1):
+                for j,probability2 in enumerate(probabilities2): 
+                    newEl = element.copy()   
+                    newEl.tested = element.tested
+                    newEl.covered = element.covered
+                    newEl.branches[0]._decayType = branches1[i]._decayType
+                    newEl.branches[1]._decayType = branches2[j]._decayType      
+                    newEl.weight *= (probability1*probability2)    
+                    if newEl.weight.getMaxXsec() < sigcut: continue 
+                    allElements.append(newEl) 
  
             for el in allElements:                           
                 if self.inPrevMothers(el): 
@@ -103,9 +100,9 @@ class Uncovered(object):
                     continue
                 
                 self.missingTopos.addToTopos(el) #keep track of all missing topologies
-                if self.hasLongCascade(el): self.longCascade.addToClasses(el)
-                elif self.hasAsymmetricBranches(el): self.asymmetricBranches.addToClasses(el) # if no long cascade, check for asymmetric branches
-
+                #if self.hasLongCascade(el): self.longCascade.addToClasses(el)
+                #elif self.hasAsymmetricBranches(el): self.asymmetricBranches.addToClasses(el) # if no long cascade, check for asymmetric branches
+             
                 if self.hasLongLived(el): self.longLived.addToTopos(el)
                 elif self.hasDisplaced(el): self.displaced.addToTopos(el)
                 else: self.MET.addToTopos(el)
@@ -148,7 +145,7 @@ class Uncovered(object):
         Return True if Element has at least one long lived branch
         :ivar el: Element
         """  
-        if el.branches[0].decayType == 'longlived' or el.branches[1].decayType == 'longlived': 
+        if el.branches[0]._decayType == 'longlived' or el.branches[1]._decayType == 'longlived': 
             return True 
         return False     
         
@@ -157,7 +154,7 @@ class Uncovered(object):
         Return True if Element has at least one displaced branch but no longlived
         :ivar el: Element
         """  
-        if 'displaced' in el.branches[0].decayType or 'displaced' in el.branches[1].decayType: 
+        if 'displaced' in el.branches[0]._decayType or 'displaced' in el.branches[1]._decayType: 
             return True 
         return False                    
 
@@ -380,8 +377,14 @@ class UncoveredList(object):
         in the list, add weight to topology
         :parameter el: element to be added
         """
-        name = self.orderbranches(self.generalName(el.__str__()))
-        name = name + ' (%s)'%(str(el.getFinalStates()).replace('[','').replace(']',''))
+        name, switchBranches = self.orderbranches(self.generalName(el.__str__()))     
+        if switchBranches: 
+            branch1 = el.branches[1]
+            branch2 = el.branches[0]
+        else: 
+            branch1 = el.branches[0]
+            branch2 = el.branches[1]  
+        name = name + '  (%s)'%(str(branch1._decayType) + ","+ str(branch2._decayType) )            
 
         for topo in self.topos:
             if name == topo.topo:
@@ -399,10 +402,10 @@ class UncoveredList(object):
         :returns: string of generalized element
         """
         
-        import smodels.SMparticleDefinitions as SM
-        if self.sumL: exch = [SM.WList, SM.lList, SM.tList, SM.taList, SM.nuList] 
-        else: exch = [SM.WList, SM.eList, SM.muList,SM.tList, SM.taList, SM.nuList]
-        if self.sumJet: exch.append(SM.jetList)
+        import smodels.experiment.finalStateParticles as fS
+        if self.sumL: exch = [fS.WList, fS.lList, fS.tList, fS.taList, fS.nuList] 
+        else: exch = [fS.WList, fS.eList, fS.muList,fS.tList, fS.taList, fS.nuList]
+        if self.sumJet: exch.append(fS.jetList)
         for particleList in exch: 
             particles = particleList.particles                
             for p in particles:  
@@ -424,5 +427,5 @@ class UncoveredList(object):
         newLi = sorted(li)
         if li != newLi: switchBranches = True
         else: switchBranches = False
-        return str(newLi).replace("'", "").replace(" ", ""), switchBranches                
+        return str(newLi).replace("'", "").replace(" ", ""), switchBranches           
 

@@ -22,18 +22,18 @@ def addPromptAndDisplaced(branch):
     """
     
     if not branch.particles: # no decays happened
-        if branch.BSMparticles[0][0].totalwidth == 0.*MeV: 
-            branch.decayType = 'METonly'
+        if branch.BSMparticles[0].totalwidth == 0.*MeV: 
+            branch._decayType = 'METonly'
             probabilities = [1.]
             branches = [branch]
             return probabilities, branches 
    
     F = []
-    for particle in branch.BSMparticles[0]:
+    for particle in branch.BSMparticles:
         if particle.totalwidth == 0.*MeV: continue
         F_long, F_prompt, F_displaced = calculateProbabilities(particle)
         # allow for combinations of decays and a long lived particle only if the last BSM particle is the long lived one
-        if F_long and particle == branch.BSMparticles[0][-1]: F.append([F_long])
+        if F_long and particle == branch.BSMparticles[-1]: F.append([F_long])
         else: F.append([F_prompt,F_displaced])
     
     # call the whole branch: 
@@ -43,7 +43,7 @@ def addPromptAndDisplaced(branch):
     # discard others
          
     if len(F[-1]) == 1:  # last BSM particle is long lived
-        branch.decayType = 'longlived'
+        branch._decayType = 'longlived'
         branches = [branch]            
         longValue = F[-1][0] 
         
@@ -121,14 +121,14 @@ def labelPromptDisplaced(branch):
     :return: branches with correct labels  
     """
     promptBranch = branch.copy()
-    promptBranch.decayType = 'prompt'
+    promptBranch._decayType = 'prompt'
     
     displacedBranch = branch.copy()      
     if any(particle==jetList for particle in branch.particles ):
-        displacedBranch.decayType = 'displacedJet'
+        displacedBranch._decayType = 'displacedJet'
     elif any(particle==lList for particle in branch.particles ):           
-        displacedBranch.decayType = 'displacedLepton'
-    else: displacedBranch.decayType = 'displaced(neither jet nor lepton)'
+        displacedBranch._decayType = 'displacedLepton'
+    else: displacedBranch._decayType = 'displaced(neither jet nor lepton)'
     
     branches = [promptBranch, displacedBranch]    
     return branches
