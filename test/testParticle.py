@@ -73,7 +73,18 @@ class ParticleTest(unittest.TestCase):
         self.assertTrue(anything == anyBSM)
         self.assertFalse(anyBSM == anySM)
         self.assertFalse(anySM == anyBSM)
-         
+        
+        
+    def testParticleStatic(self):
+        ptc = Particle(label = 'p1', mass = 100.*GeV)
+        self.assertEqual(ptc.mass,100.*GeV)
+        #Change particle mass:
+        ptc.mass = 200.*GeV
+        self.assertEqual(ptc.mass,200.*GeV)
+        #Set particle as static:
+        ptc._static = True
+        ptc.mass = 300.*GeV #Particle mass should not change!
+        self.assertEqual(ptc.mass,200.*GeV)
          
          
     def testInStr(self):

@@ -26,14 +26,14 @@ import math
 
 class StatisticsTest(unittest.TestCase):
     def testUpperLimit(self):
-        re = statistics.upperLimit ( 100., 100., 0., 20./fb   )
-        self.assertAlmostEqual ( re.asNumber ( fb ), 1.06, 1 )
+        re = statistics.upperLimit( 100., 100., 0., 20./fb   )
+        self.assertAlmostEqual( re.asNumber ( fb ), 1.06, 1 )
 
     def testPredictionInterface(self):
         """ A simple test to see that the interface in datasetObj
         and TheoryPrediction to the statistics tools is working correctly
         """
-        expRes = database.getExpResults( analysisIDs=['CMS-SUS-13-012'] )[0]
+        expRes = database.getExpResults(analysisIDs=['CMS-SUS-13-012'] )[0]
 
         filename = "%sinputFiles/lhe/simplyGluino.slha" %(installDirectory())  
         model = Model(BSMList,SMList,filename)
