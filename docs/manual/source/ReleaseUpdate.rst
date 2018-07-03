@@ -43,15 +43,18 @@ as follows:
 New in Version 1.1.3:
 ^^^^^^^^^^^^^^^^^^^^^
 
-* Default python is python3 now
-* Fixed lastUpdate bug
-* Changes in pickling (subpickling, redundant zeroes are now removed)
-* URLs are allowed as database paths (see **database:path** in |parameters|)
-* Option to show individual contribution from topologies to total theory prediction (see **python-printer:addTxWeights** in |parameters|)
-* smodelsTools.py fixpermissions, for system-wide installs (see :ref:`Files Permissions Fixer <permissionsFixer>`)
-* wildcards allowed when selecting analyses, datasets, txnames
-* path to particles.py can now be specified in parameters.ini
-* support for covariance matrices and combination of signal regions
+  * Support for covariance matrices and combination of signal regions
+  * Path to particles.py can now be specified in parameters.ini file (see **particles:model** in |parameters|)
+  * Wildcards allowed when selecting analyses, datasets, txnames
+  * Option to show individual contribution from topologies to total theory prediction (see **python-printer:addTxWeights** in |parameters|)
+  * URLs are allowed as database paths (see **database:path** in |parameters|)
+  * Python default changed from python2 to python3
+  * Fixed lastUpdate bug, now giving correct date 
+  * Changes in pickling (e.g. subpickling, removing redundant zeroes)
+  * Added fixpermissions to smodelsTools.py, for system-wide installs (see :ref:`Files Permissions Fixer <permissionsFixer>`)
+  * Fixed small issue with pair production of even particles
+  * Moved the :ref:`code documentation <CodeDocs>` to the manual
+
 
 New in Version 1.1.2:
 ^^^^^^^^^^^^^^^^^^^^^

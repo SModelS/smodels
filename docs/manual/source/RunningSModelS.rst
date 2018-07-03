@@ -148,7 +148,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 * *database*: allows for selection of a subset of :ref:`experimental results <ExpResult>` from the |database|
 
-  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`. Since v1.1.3, also http addresses may be given, e.g. http://smodels.hephy.at/database/official113. See `Databases <http://smodels.hephy.at/wiki/Databases>`_ for a list of public database versions.
+  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`. Since v1.1.3, also http addresses may be given, e.g. http://smodels.hephy.at/database/official113. See the `github database release page <https://github.com/SModelS/smodels-database-release/releases>`_ for a list of public database versions.
   * **analyses** (list of results): set to ['all'] to use all available results. If a list of :ref:`experimental analyses <ExpResult>`
     is given, only these will be used. For instance, setting analyses = CMS-PAS-SUS-13-008,ATLAS-CONF-2013-024
     will only use the |results| from `CMS-PAS-SUS-13-008 <https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13008>`_
@@ -195,10 +195,14 @@ Below we give more detailed information about each entry in the parameters file.
   * **addElementList** (True/False): set True to include in the Python output all information about all |elements| generated in the |decomposition|. If set to True the
     output file can be quite large.
 
+  * **addTxWeights** (True/False): set True to print the contribution from individual topologies to each theory prediction. Available v1.1.3 onwards.
+
 * *xml-printer*: options for the xml printer
 
   * **addElementList** (True/False): set True to include in the xml output all information about all |elements| generated in the |decomposition|. If set to True the
     output file can be quite large.
+
+  * **addTxWeights** (True/False): set True to print the contribution from individual topologies to each theory prediction. Available v1.1.3 onwards.
 
 
 
