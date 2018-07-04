@@ -509,7 +509,8 @@ class XSectionList(object):
                 for oldXsec in self:
                     if newXsec.info == oldXsec.info:
                         oldXsec.value = oldXsec.value + newXsec.value
-                        oldXsec.pid = (None, None)
+                        if newXsec.pid != oldXsec.pid:
+                            oldXsec.pid = (None, None)
 
 
     def removeLowerOrder(self):
