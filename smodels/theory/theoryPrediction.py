@@ -407,19 +407,16 @@ def _evalExpression(stringExpr,cluster):
     
 #Get cross section info from cluster (to generate zero cross section values):
     infoList = cluster.elements[0].weight.getInfo()
-#Get final state info
-    finalStates = cluster.elements[0].getFinalStates()      
 #Get weights for elements appearing in stringExpr
     weightsDict = {}
     evalExpr = stringExpr.replace("'","").replace(" ","")
     for i,elStr in enumerate(elementsInStr(evalExpr)):
         el = element.Element(elStr)
-        el.setFinalState(finalStates)
         weightsDict['w%i'%i] = crossSection.XSectionList(infoList)
         for el1 in cluster.elements:
             if el1.particlesMatch(el):
                 weightsDict['w%i'%i].combineWith(el1.weight)
-                el.combineMotherElements(el1)
+                el.motherElements += el1.motherElements[:]                
         evalExpr = evalExpr.replace(elStr,'w%i'%i)
 
     weightsDict.update({"Cgtr" : cGtr, "cGtr" : cGtr, "cSim" : cSim, "Csim" : cSim})

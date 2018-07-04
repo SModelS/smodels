@@ -52,17 +52,25 @@ class IntegrationTest(unittest.TestCase):
     def testIntegration(self):
         from smodels.installation import installDirectory
         from smodels.tools.physicsUnits import fb, GeV
-        from smodels.theory import slhaDecomposer
+        from smodels.theory import decomposer
+        from smodels.share.models.MSSMparticles import BSMList
+        from smodels.share.models.SMparticles import SMList
+        from smodels.theory.model import Model
+        
         slhafile = '../inputFiles/slha/simplyGluino.slha'
+        model = Model(BSMList,SMList,slhafile)
+        model.updateParticles()
+                   
         self.configureLogger()
-        smstoplist = slhaDecomposer.decompose(slhafile, .1*fb, doCompress=True,
+        smstoplist = decomposer.decompose(model, .1*fb, doCompress=True,
                 doInvisible=True, minmassgap=5.*GeV)
+        
         listofanalyses = database.getExpResults( 
                 analysisIDs= [ "ATLAS-SUSY-2013-02", "CMS-SUS-13-012" ], 
                 txnames = [ "T1" ] )
         if type(listofanalyses) != list:
             listofanalyses= [ listofanalyses] 
-        for analysis in listofanalyses:
+        for analysis in listofanalyses: 
             self.checkAnalysis(analysis,smstoplist)
 
 if __name__ == "__main__":
