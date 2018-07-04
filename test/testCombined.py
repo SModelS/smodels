@@ -28,8 +28,7 @@ class CombinedTest(unittest.TestCase):
             from gluino_squarks_default_agg import smodelsOutputDefault
             ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
             smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                        key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
-                        res['AnalysisID'],res['DataSetID']])
+                        key=lambda res: res['r'], reverse=True)
             equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                                ignore=ignoreFields)
             if not equals:

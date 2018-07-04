@@ -156,8 +156,7 @@ class RunPrinterTest(unittest.TestCase):
         from gluino_squarks_default import smodelsOutputDefault 
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
-                      key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
-                                       res['AnalysisID'],res['DataSetID']])
+                      key=lambda res: res['r'], reverse=True)
         equals = equalObjs( smodelsOutput,smodelsOutputDefault,allowedDiff=0.05,
                             ignore=ignoreFields, where = "top" )
         try:
@@ -185,8 +184,7 @@ class RunPrinterTest(unittest.TestCase):
          
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
-                       key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
-                                        res['AnalysisID'],res['DataSetID']])
+                       key=lambda res: res['r'], reverse=True)
         equals = equalObjs( smodelsOutput,smodelsOutputDefault,allowedDiff=0.05,
                             ignore=ignoreFields )
         try:
