@@ -460,7 +460,7 @@ class ParticleWildcard(Particle):
         """
         
         prop = 'Z2parity'
-                
+
         if not hasattr(self,prop) or not hasattr(other,prop):
             return 0
         else:

@@ -45,16 +45,17 @@ class DataSet(object):
                     txname = txnameObj.TxName( txtfile,self.globalInfo,self.dataInfo,
                                                discard_zeroes )
                     if discard_zeroes and txname.hasOnlyZeroes():
-                        logger.debug ( "%s, %s has only zeroes. discard it." % \
-                                         ( self.path, txname.txName ) )
+                        logger.debug("%s, %s has only zeroes. discard it." % \
+                                         ( self.path, txname.txName ))
                         continue
                     self.txnameList.append(txname)
-                except TypeError: 
+                except TypeError:
+                    logger.debug('Failed to create txname from file %s' %txtfile) 
                     continue
             self.txnameList.sort()
             self.checkForRedundancy()
 
-    def checkForRedundancy ( self ):
+    def checkForRedundancy( self ):
         """ In case of efficiency maps, check if any txnames have overlapping
             constraints. This would result in double counting, so we dont 
             allow it. """
@@ -70,14 +71,14 @@ class DataSet(object):
             for el in elementsInStr(str(tx.constraint)):
                 newEl = Element(el,finalState)
                 datasetElements.append(newEl)
-        combos = itertools.combinations ( datasetElements, 2 )
+        combos = itertools.combinations(datasetElements, 2)
         for x,y in combos:
-            if x.particlesMatch ( y, checkDecayType=True, branchOrder=False ):     
+            if x.particlesMatch(y, branchOrder=False):     
                 errmsg ="Constraints (%s) appearing in dataset %s, %s overlap "\
                         "(may result in double counting)." % \
                         (x,self.dataInfo.dataId,self.globalInfo.id )
-                logger.error( errmsg )
-                raise SModelSError ( errmsg )
+                logger.error(errmsg)
+                raise SModelSError (errmsg)
 
 
     def __ne__ ( self, other ):

@@ -35,7 +35,7 @@ class StatisticsTest(unittest.TestCase):
         """
         expRes = database.getExpResults(analysisIDs=['CMS-SUS-13-012'] )[0]
 
-        filename = "%sinputFiles/lhe/simplyGluino.slha" %(installDirectory())  
+        filename = "%sinputFiles/slha/simplyGluino.slha" %(installDirectory())  
         model = Model(BSMList,SMList,filename)
         model.updateParticles()           
         smstoplist = decomposer.decompose(model)
@@ -67,8 +67,8 @@ class StatisticsTest(unittest.TestCase):
         and expected upper limit and a theory prediction
         with the previously known result for the value of
         the chi2.
-
-
+ 
+ 
         All values of nobs, nsig, nb, deltab come from the
         SModelS database and are for the T1 simplified model
         from efficiency results of one of
@@ -76,9 +76,9 @@ class StatisticsTest(unittest.TestCase):
         ATLAS-CONF-2013-047
         CMS-SUS-13-012
         ATLAS-CONF-2013-054
-
+ 
         """
-
+ 
         expected_values = [
         # mgluino          mlsp          nsig               nobs              nb             deltab           llhd                 chi2
         # ----------       ----------    ---------------    ----------------  ----------     ----------       -------------------- ----------------
@@ -131,28 +131,28 @@ class StatisticsTest(unittest.TestCase):
         {'mgluino': 1100, 'mlsp':  900, 'nsig':   4.82397, 'nobs':  2166.20, 'nb':  2120.0, 'deltab': 110.0, 'llhd': 0.00313424 , 'chi2': 0.119045 },
         {'mgluino': 1100, 'mlsp': 1000, 'nsig':   0.1606 , 'nobs':  25.0 ,   'nb':  37.0  , 'deltab': 6.0 ,  'llhd': 0.01796058 , 'chi2': 1.9806},
         {'mgluino': 2100, 'mlsp': 1000, 'nsig':   0.1606 , 'nobs':  2.0 ,   'nb':  0.7  , 'deltab': 6.0 ,  'llhd': 0.108669 , 'chi2': -0.161304}]
-
-
-
-
+ 
+ 
+ 
+ 
         for d in expected_values:
             nobs = d['nobs']
             nsig = d['nsig']
             nb = d['nb']
             deltab = d['deltab']
             deltas = 0.2*d['nsig']
-
-
+ 
+ 
 #             logger.error("\nns="+str(nsig)+";\nnobs = "+str(nobs)+";\nnb="+str(nb)+";\ndb="+str(deltab))
             # Chi2 as computed by statistics module:
             chi2_actual = statistics.chi2( nsig, nobs, nb,
                 deltab, deltas)
-            
+             
 #             logger.error("chi2= "+str(chi2_actual))
             #print('chi2act', chi2_actual)
 #             if not chi2_actual==None and not np.isnan(chi2_actual) and chi2_actual > 1:
 #                 chi2_actual = self.round_to_sign(chi2_actual, 2)
-
+ 
             # The previously computed chi2:
             # (using:ntoys=100000)
             chi2_expected = d['chi2']
@@ -163,8 +163,8 @@ class StatisticsTest(unittest.TestCase):
                 self.assertAlmostEqual(abs(chi2_actual-chi2_expected)/chi2_expected,0., places=2 )
             else:
                 self.assertTrue(chi2_actual == None or np.isnan(chi2_actual))
-
-
+ 
+ 
             # likelihood as computed by statistics module:
             likelihood_actual = statistics.likelihood( nsig,
                 nobs, nb, deltab, deltas)
@@ -172,14 +172,14 @@ class StatisticsTest(unittest.TestCase):
             #print('llhdactual', likelihood_actual)
             if not likelihood_actual==None and not np.isnan(likelihood_actual):
                 likelihood_actual = self.round_to_sign(likelihood_actual, 4)
-
+ 
             # The previously computed likelihood:
             # (using: ntoys=100000)
             likelihood_expected = d['llhd']
             #print('llhdexp', likelihood_expected)
             if not likelihood_expected==None and not np.isnan(likelihood_expected):
                 likelihood_expected = self.round_to_sign(likelihood_expected, 4)
-
+ 
                 # Check that likelihood values agree:
                 self.assertAlmostEqual(likelihood_actual, likelihood_expected,
                         delta=2*1e-1)

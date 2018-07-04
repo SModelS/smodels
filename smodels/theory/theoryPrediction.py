@@ -268,8 +268,9 @@ def _getElementsFrom(smsTopList, dataset):
                 newEl = txname.hasElementAs(el)  #Check if element appears in txname
                 if not newEl: continue
                 el.covered = True
-                eff = txname.getEfficiencyFor(newEl.getMasses())
-                if not eff: continue
+                eff = txname.getEfficiencyFor(newEl)
+                if not eff:
+                    continue
                 el.tested = True
                 newEl.eff = eff
                 newEl.weight *= eff
@@ -281,14 +282,14 @@ def _getElementsFrom(smsTopList, dataset):
     allmothers = []
     #First collect the list of all mothers:
     for el in elements:
-        allmothers += [elMom[1].elID for elMom in el.motherElements]
+        allmothers += [elMom[1].elID for elMom in el.motherElements if not 'original' in elMom[0]]        
     elementsClean = []
     for el in elements:
         #Skip the element if it is a mother of another element in the list
         if any((elMom is el.elID) for elMom in allmothers):
             continue
         elementsClean.append(el)
-        
+
     return elementsClean
 
 

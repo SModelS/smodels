@@ -33,12 +33,10 @@ class ExpResult(object):
                     in <path>    
     """
         
-    def __init__( self, path = None, discard_zeroes = True,
-                  pcl_file = False ):
+    def __init__( self, path = None, discard_zeroes = True):
         """
         :param path: Path to the experimental result folder
         :param discard_zeroes: Discard maps with only zeroes
-        :param pcl_file: Write and maintain pickle file
         """ 
         if not path: return
         if not os.path.isdir ( path ):
@@ -63,6 +61,7 @@ class ExpResult(object):
                             discard_zeroes = discard_zeroes )
                     self.datasets.append(dataset)
                 except TypeError:
+                    logger.debug('Failed to create dataset from folder %s' %root)
                     continue
 
     def writePickle ( self, dbVersion ):
