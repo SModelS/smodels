@@ -43,9 +43,9 @@ as follows:
 New in Version 1.1.3:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * Support for covariance matrices and combination of signal regions
+  * Support for :ref:`covariance matrices <combineSRs>` and combination of signal regions (see **options:combineSR** in |parameters|)
   * Path to particles.py can now be specified in parameters.ini file (see **particles:model** in |parameters|)
-  * Wildcards allowed when selecting analyses, datasets, txnames
+  * Wildcards allowed when selecting analyses, datasets, txnames (see example 
   * Option to show individual contribution from topologies to total theory prediction (see **python-printer:addTxWeights** in |parameters|)
   * URLs are allowed as database paths (see **database:path** in |parameters|)
   * Python default changed from python2 to python3
