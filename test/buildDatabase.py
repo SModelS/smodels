@@ -23,8 +23,8 @@ d=Database( dir, discard_zeroes = True )
 print(d)
 results=d.getExpResults()
 
-print ( "is uncorrelated?" )
-print ( results[0].isUncorrelatedWith ( results[1] ) )
+# print ( "is uncorrelated?" )
+# print ( results[0].isUncorrelatedWith ( results[1] ) )
 sys.exit()
 
 massvec = [[400.*GeV,75*GeV], [400*GeV,75*GeV]]
@@ -59,7 +59,7 @@ for e in results[:1]:
         print ( "Prediction Mass = ",mass )   #Value for average cluster mass (average mass of the elements in cluster)
         print ( "Prediction PIDs = ",PIDs )   #Value for average cluster mass (average mass of the elements in cluster)
         print ( "Theory Prediction = ",theoryPrediction.xsection )  #Signal cross section
-        print ( "Effective efficiency= ",theoryPrediction.effectiveEff ) # effective efficiency
+        # print ( "Effective efficiency= ",theoryPrediction.effectiveEff ) # effective efficiency
         print ( "Condition Violation = ",theoryPrediction.conditions ) #Condition violation values
           
         ul = theoryPrediction.getUpperLimit()                     
