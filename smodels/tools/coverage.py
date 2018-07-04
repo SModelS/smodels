@@ -30,18 +30,15 @@ class Uncovered(object):
             self.sqrts = sqrts
         self.missingTopos = UncoveredList(sumL, sumJet, self.sqrts)
         self.outsideGrid = UncoveredList(sumL, sumJet, self.sqrts) 
-        self.longCascade = UncoveredClassifier()
-        self.asymmetricBranches = UncoveredClassifier()
         self.longLived = UncoveredList(sumL, sumJet, self.sqrts)
         self.displaced = UncoveredList(sumL, sumJet, self.sqrts)
         self.MET = UncoveredList(sumL, sumJet, self.sqrts)
+        
         self.motherIDs = []
         self.prevMothers = []
         self.outsideGridMothers = []
         self.getAllMothers(topoList)
         self.fill(topoList)
-        self.asymmetricBranches.combine()
-        self.longCascade.combine()
 
     def getAllMothers(self, topoList):
         """
@@ -100,9 +97,7 @@ class Uncovered(object):
                     continue
                 
                 self.missingTopos.addToTopos(el) #keep track of all missing topologies
-                #if self.hasLongCascade(el): self.longCascade.addToClasses(el)
-                #elif self.hasAsymmetricBranches(el): self.asymmetricBranches.addToClasses(el) # if no long cascade, check for asymmetric branches
-             
+
                 if self.hasLongLived(el): self.longLived.addToTopos(el)
                 elif self.hasDisplaced(el): self.displaced.addToTopos(el)
                 else: self.MET.addToTopos(el)
@@ -122,23 +117,6 @@ class Uncovered(object):
     def addPrevMothers(self, el): #add mother elements of currently tested element to previous mothers
         for mEl in el.motherElements:
             self.prevMothers.append(mEl[-1].elID)
-
-    def hasLongCascade(self, el):
-        """
-        Return True if element has more than 3 particles in the decay chain
-        :ivar el: Element
-        """
-        if el._getLength() > 3: return True
-        return False
-
-    def hasAsymmetricBranches(self, el):
-        """
-        Return True if Element branches are not equal
-        :ivar el: Element
-        """  
-        if el.branches[0] == el.branches[1]: 
-            return False
-        return True
         
     def hasLongLived(self, el):
         """
@@ -239,113 +217,7 @@ class Uncovered(object):
                 xsec += el.missingX
         return xsec
     
-    def getUncoveredClassifierXsec(self, uncoveredClassifier, sqrts=None):
-        xsec = 0.
-        if not sqrts: sqrts = self.sqrts
-        for uncovClass in uncoveredClassifier.classes:
-            for el in uncovClass.contributingElements:
-                xsec += el.missingX
-        return xsec
-
           
-class UncoveredClassifier(object):
-    """
-    Object collecting elements with long cascade decays or asymmetric branches.
-    Objects are grouped according to the initially produced particle PID pair.
-    """
-    def __init__(self):
-        self.classes = []
-
-    def addToClasses(self, el):
-        """
-        Add Element in corresponding UncoveredClass, defined by mother PIDs.
-        If no corresponding class in self.classes, add new UncoveredClass
-        :ivar el: Element
-        """        
-        motherPIDs = self.getMotherPIDs(el)
-        for entry in self.classes:
-            if entry.add(motherPIDs, el): return
-        self.classes.append(UncoveredClass(motherPIDs, el))
-
-    def getMotherPIDs(self, el):
-        allPIDs = []
-        
-        for pids in el.getMothers():
-            cPIDs = []
-            for pid in pids:
-                cPIDs.append(abs(pid))
-            cPIDs.sort()
-            if not cPIDs in allPIDs:
-                allPIDs.append(cPIDs)
-        allPIDs.sort()
-
-        return allPIDs
-
-    def combine(self):
-        for ecopy in copy.deepcopy(self.classes):
-            for e in self.classes:
-                if e.isSubset(ecopy):
-                    e.combine(ecopy)
-                    self.remove(ecopy)
-
-    def remove(self, cl):
-        """
-        Remove element where mother pids match exactly
-        """
-        for i, o in enumerate(self.classes):
-            if o.motherPIDs == cl.motherPIDs:
-                del self.classes[i]
-                break
-
-    def getSorted(self,sqrts):
-        """
-        Returns list of UncoveredClass objects in self.classes, sorted by weight
-        :ivar sqrts: sqrts for weight lookup
-        """
-        return sorted(self.classes, key=lambda x: x.getWeight(), reverse=True)
-
-class UncoveredClass(object):
-    """
-    Object collecting all elements contributing to the same uncovered class, defined by the mother PIDs.
-    :ivar motherPIDs: PID of initially produces particles, sorted and without charge information
-    :ivar el: Element
-    """
-    def __init__(self, motherPIDs, el):
-        self.motherPIDs = motherPIDs # holds nested list of mother PIDs as given by element.getMothers
-        self.contributingElements = [el] # collect all contributing elements, to keep track of weights as well
-    def add(self, motherPIDs, el):
-        """
-        Add Element to this UncoveredClass object if motherPIDs match and return True, else return False
-        :ivar motherPIDs: PID of initially produces particles, sorted and without charge information
-        :ivar el: Element
-        """
-        if not motherPIDs == self.motherPIDs: return False
-        self.contributingElements.append(el)
-        return True
-
-    def combine(self, other):
-        for el in other.contributingElements:
-            self.contributingElements.append(el)
-
-    def getWeight(self):
-        """
-        Calculate weight at sqrts
-        :ivar sqrts: sqrts
-        """
-        xsec = 0.
-        for el in self.contributingElements:
-            xsec += el.missingX     
-        return xsec
-
-    def isSubset(self, other):
-        """
-        True if motherPIDs of others are subset of the motherPIDs of this UncoveredClass
-        """
-        if len(other.motherPIDs) >= len(self.motherPIDs): return False
-        for mothers in other.motherPIDs:
-            if not mothers in self.motherPIDs: return False
-        return True
-  
 class UncoveredTopo(object):
     """
     Object to describe one missing topology result / one topology outside the mass grid
