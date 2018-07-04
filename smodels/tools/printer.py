@@ -647,7 +647,7 @@ class PyPrinter(BasicPrinter):
         """
         
         outputDict = {}
-        for iobj,obj in enumerate(self.toPrint):
+        for obj in self.toPrint:
             if obj is None: continue
             output = self._formatObj(obj)                
             if not output: continue  #Skip empty output
@@ -762,7 +762,7 @@ class PyPrinter(BasicPrinter):
                 ul = ul.asNumber(fb)
             if isinstance(ulExpected,unum.Unum):
                 ulExpected = ulExpected.asNumber(fb)
-            value = theoryPrediction.xsection.value
+            value = theoryPrediction.xsection.value.asNumber(fb)
             #txnames = [txname.txName for txname in theoryPrediction.txnames]
             txnamesDict = {}
             for el in theoryPrediction.elements:
@@ -777,7 +777,11 @@ class PyPrinter(BasicPrinter):
             else:
                 mass = None
             sqrts = expResult.globalInfo.sqrts
-            resDict = {'maxcond': maxconds, 'theory prediction (fb)': value.asNumber(fb),
+            
+            r = theoryPrediction.getRValue(expected=False)
+            r_expected = theoryPrediction.getRValue(expected=True)
+            
+            resDict = {'maxcond': maxconds, 'theory prediction (fb)': value,
                         'upper limit (fb)': ul,
                         'expected upper limit (fb)': ulExpected,
                         'TxNames': sorted(txnamesDict.keys()),
@@ -786,17 +790,15 @@ class PyPrinter(BasicPrinter):
                         'DataSetID' : datasetID,
                         'AnalysisSqrts (TeV)': sqrts.asNumber(TeV),
                         'lumi (fb-1)' : (expResult.globalInfo.lumi*fb).asNumber(),
-                        'dataType' : dataType}  
+                        'dataType' : dataType,
+                        'r' : r, 'r_expected' : r_expected}  
             if hasattr(self,"addtxweights") and self.addtxweights:
                 resDict['TxNames weights (fb)'] =  txnamesDict
             if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
                 resDict['chi2'] = theoryPrediction.chi2
                 resDict['likelihood'] = theoryPrediction.likelihood                
             ExptRes.append(resDict)
-
-        ExptRes = sorted(ExptRes, key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
-                                                   res['AnalysisID'],res['DataSetID']])
-        
+       
 
         return {'ExptRes' : ExptRes}
 
