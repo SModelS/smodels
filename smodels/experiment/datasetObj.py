@@ -54,10 +54,11 @@ class DataSet(object):
             self.txnameList.sort()
             self.checkForRedundancy()
 
+
     def checkForRedundancy ( self ):
-        """ In case of efficiency maps, check if any txnames have overlapping
-            constraints. This would result in double counting, so we dont 
-            allow it. """
+         #In case of efficiency maps, check if any txnames have overlapping
+            #constraints. This would result in double counting, so we dont 
+            #allow it. 
         if self.dataInfo.dataType == "upperLimit": 
             return False
         logger.debug ( "checking for redundancy" )
@@ -72,13 +73,12 @@ class DataSet(object):
                 datasetElements.append(newEl)
         combos = itertools.combinations ( datasetElements, 2 )
         for x,y in combos:
-            if x.particlesMatch ( y, checkDecayType=True, branchOrder=False ):     
+            if x.particlesMatch ( y ): 
                 errmsg ="Constraints (%s) appearing in dataset %s, %s overlap "\
                         "(may result in double counting)." % \
                         (x,self.dataInfo.dataId,self.globalInfo.id )
                 logger.error( errmsg )
-                raise SModelSError ( errmsg )
-
+                raise SModelSError ( errmsg )            
 
     def __ne__ ( self, other ):
         return not self.__eq__ ( other )

@@ -9,7 +9,7 @@ import copy
 import itertools
 from math import exp
 from smodels.tools.smodelsLogging import logger
-from smodels.tools.physicsUnits import MeV, m, mm, fm
+from smodels.tools.physicsUnits import MeV, GeV, m, mm, fm
 from smodels.experiment.finalStateParticles import jetList, lList
 
         
@@ -22,7 +22,7 @@ def addPromptAndDisplaced(branch):
     """
     
     if not branch.particles: # no decays happened
-        if branch.BSMparticles[0].totalwidth == 0.*MeV: 
+        if branch.BSMparticles[0].totalwidth == 0.*GeV: 
             branch._decayType = 'METonly'
             probabilities = [1.]
             branches = [branch]
@@ -30,8 +30,11 @@ def addPromptAndDisplaced(branch):
    
     F = []
     for particle in branch.BSMparticles:
-        if particle.totalwidth == 0.*MeV: continue
-        F_long, F_prompt, F_displaced = calculateProbabilities(particle)
+        if particle.totalwidth == float('inf')*GeV:
+            F_long, F_prompt, F_displaced = [0.,1.,0.]
+        else:
+            if particle.totalwidth == 0.*GeV: continue
+            F_long, F_prompt, F_displaced = calculateProbabilities(particle)
         # allow for combinations of decays and a long lived particle only if the last BSM particle is the long lived one
         if F_long and particle == branch.BSMparticles[-1]: F.append([F_long])
         else: F.append([F_prompt,F_displaced])
