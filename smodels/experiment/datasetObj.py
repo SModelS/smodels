@@ -80,7 +80,6 @@ class DataSet(object):
                 logger.error(errmsg)
                 raise SModelSError (errmsg)
 
-
     def __ne__ ( self, other ):
         return not self.__eq__ ( other )
 

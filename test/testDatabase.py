@@ -35,11 +35,14 @@ class DatabaseTest(unittest.TestCase):
 
     def testSelectors(self):
         from databaseLoader import database 
+
         validated = database.getExpResults ( useNonValidated = False )
         nonval = database.getExpResults ( useNonValidated = True )
-        print ( "validated=",len(validated),map ( str, validated ) )
+        #print ( "validated=",len(validated),map ( str, validated ) )
         self.assertEqual ( len(validated), 9 )
         self.assertEqual ( len(nonval), 10 )
+        
+
 
 
 
