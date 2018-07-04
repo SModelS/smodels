@@ -27,7 +27,6 @@ class TheoryPrediction(object):
                 For EM-type analyses, it corresponds to sigma*eff, for
                 UL-type analyses, eff is considered to be 1.
                 It is a XSection object.
-    :ivar effectiveEff: the effective efficiency for EM-type analyses.
     :ivar conditions: list of values for the analysis conditions
                       (only for upper limit-type analysis, e.g. analysis=ULanalysis)
     :ivar mass: mass of the cluster to which the theory prediction refers
@@ -36,7 +35,6 @@ class TheoryPrediction(object):
     """
     def __init__(self):
         self.xsection = None
-        self.effectiveEff = None
         self.conditions = None
         self.mass = None
 
@@ -176,30 +174,34 @@ class TheoryPrediction(object):
             self.computeStatistics()
         # return a lengthy description
         ret =  "[theoryPrediction] analysis: %s\n" % self.analysisId()
-        ret += "     prediction (sigma*eff): %s\n" % self.xsection
-        ret += "         prediction (sigma): %s\n" % ( self.xsection.value / self.effectiveEff )
-        ret += "       effective efficiency: %s\n" % self.effectiveEff
+        ret += "     prediction: %s\n" % self.xsection
+        # ret += "         prediction (sigma): %s\n" % ( self.xsection.value / self.effectiveEff )
+        # ret += "       effective efficiency: %s\n" % self.effectiveEff
         ds = "None"
         if type (self.dataset) == list:
             ds = "multiple (%d combined)" % len(self.dataset)
         else:
             dataId = self.dataset.getID()
-            ds = "%s (%s)" % ( dataId, self.dataset.folderName() )
+            fname="" ## folder name
+            if not "combined" in dataId:
+                fname=" (%s)" % self.dataset.folderName()
+
+            ds = "%s%s" % ( dataId, fname ) 
         ret += "                   datasets: %s\n" % ds
-        ret += "      obs limit (sigma*eff): %s\n" % self.getUpperLimit()
-        ret += "      exp limit (sigma*eff): %s\n" % self.getUpperLimit( expected=True )
-        ret += "          obs limit (sigma): %s\n" % (self.getUpperLimit() / self.effectiveEff )
-        eul_ = self.getUpperLimit( expected=True )
-        eul = eul_
-        if type(eul)!=type(None):
-            eul = eul / self.effectiveEff
-         
-        ret += "          exp limit (sigma): %s\n" % ( eul )
-        ret += "                      obs r: %f\n" % ( self.xsection.value / self.getUpperLimit() )
-        exp_r = None
-        if type(eul_)!=type(None):
-                exp_r = self.xsection.value / eul_
-        ret += "                      exp r: %f\n" % ( exp_r )
+        ret += "      obs limit: %s\n" % self.getUpperLimit()
+        ret += "      exp limit: %s\n" % self.getUpperLimit( expected=True )
+        # ret += "          obs limit (sigma): %s\n" % (self.getUpperLimit() / self.effectiveEff )
+        # eul_ = self.getUpperLimit( expected=True )
+        # eul = eul_
+        #if type(eul)!=type(None):
+        #    eul = eul / self.effectiveEff
+        # 
+        #ret += "          exp limit (sigma): %s\n" % ( eul )
+        ret += "                      obs r: %f\n" % ( self.getRValue(expected=False) )
+        #exp_r = None
+#if type(eul_)!=type(None):
+#               exp_r = self.xsection.value / eul_
+        ret += "                      exp r: %f\n" % ( self.getRValue(expected=True) )
         ret += "                       chi2: %s\n" % ( self.chi2 )
         return ret
 
@@ -286,9 +288,9 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
         predList = _getDataSetPredictions(dataset,smsTopList,maxMassDist)
         if predList:
             dataSetResults.append(predList)
-    if not dataSetResults:
+    if not dataSetResults: ## no results at all?
         return None
-    elif len(dataSetResults) == 1:
+    elif len(dataSetResults) == 1: ## only a single dataset? Easy case.
         result = dataSetResults[0]
         for theoPred in result:
             theoPred.expResult = expResult
@@ -304,9 +306,10 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
             theoPred.upperLimit = theoPred.getUpperLimit(deltas_rel=deltas_rel)
         return allResults
     
-    #Else include best signal region results
+    #Else include best signal region results, if asked for.
     bestResults = TheoryPredictionList()
-    bestResults.append(_getBestResult(dataSetResults))
+    if True: # useBestDataset:
+        bestResults.append(_getBestResult(dataSetResults))
     #If combinedResults = True, also include the combined result (when available):
     if combinedResults and len(dataSetResults) > 1:
         combinedDataSetResult = _getCombinedResultFor(dataSetResults,
