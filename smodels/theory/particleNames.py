@@ -107,7 +107,7 @@ def elementsInStr(instring,removeQuotes=True):
                 if not ptc:
                     continue
                 if ptc == '*':
-                    ptc = StrWildcard()
+                    ptc = InclusiveStr()
                 if not ptc in rEven.values() and not ptc in ptcDic:
                     raise SModelSError("Unknown particle. Add " + ptc + " to your particles.py")
 
@@ -159,7 +159,7 @@ def vertInStr(instring):
                 if not ptc:
                     continue
                 if ptc == '*':
-                    ptc = StrWildcard()                
+                    ptc = InclusiveStr()                
                 if not ptc in rEven.values() and not ptc in ptcDic:
                     logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
                     raise SModelSError()
@@ -192,9 +192,9 @@ def simParticles(plist1, plist2, useDict=True):
         return False
     for i,p in enumerate(plist1):
         if plist1[i] == '*':
-            plist1[i] = StrWildcard()
+            plist1[i] = InclusiveStr()
         if plist2[i] == '*':
-            plist2[i] = StrWildcard()
+            plist2[i] = InclusiveStr()
         if not isinstance(p,str) or not isinstance(plist2[i],str):
             logger.error("Input must be a list of particle strings")
             raise SModelSError()
@@ -262,7 +262,7 @@ def getFinalStateLabel(pid):
     raise SModelSError
 
 
-class StrWildcard(str):
+class InclusiveStr(str):
     """
     A string wildcard class. It will return True when compared to any other string.
     """

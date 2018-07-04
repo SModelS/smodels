@@ -6,7 +6,7 @@
         
 """
 
-from smodels.theory.particleNames import simParticles, elementsInStr, getFinalStateLabel, StrWildcard
+from smodels.theory.particleNames import simParticles, elementsInStr, getFinalStateLabel, InclusiveStr
 from smodels.tools.physicsUnits import fb
 from smodels.particles import rEven, ptcDic, finalStates
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
@@ -57,7 +57,7 @@ class Branch(object):
                     # Syntax check:
                     for i,ptc in enumerate(ptcs):
                         if ptc == "*":
-                            ptc = StrWildcard()
+                            ptc = InclusiveStr()
                             ptcs[i] = ptc
                         if not ptc in list(rEven.values()) \
                                 and not ptc in list(ptcDic.keys()):
@@ -142,7 +142,7 @@ class Branch(object):
         
         if finalState:
             if finalState == '*':
-                finalState = StrWildcard()
+                finalState = InclusiveStr()
             if not finalState in list(finalStates.keys()):
                 raise SModelSError("Final state %s has not been defined. Add it to particles.py." %finalState)
             else:
@@ -325,7 +325,7 @@ class Branch(object):
 
 
 
-class BranchWildcard(Branch):
+class InclusiveBranch(Branch):
     """
     A branch wildcard class. It will return True when compared to any other branch object
     with the same final state.
@@ -333,12 +333,12 @@ class BranchWildcard(Branch):
     
     def __init__(self):
         Branch.__init__(self)
-        self.masses = ListWildcard()
-        self.particles =  ListWildcard()
-        self.PIDs = ListWildcard()
-        self.vertnumb = IntWildcard()
-        self.vertparts = ListWildcard()
-        self.finalState = StrWildcard()        
+        self.masses = InclusiveList()
+        self.particles =  InclusiveList()
+        self.PIDs = InclusiveList()
+        self.vertnumb = InclusiveInt()
+        self.vertparts = InclusiveList()
+        self.finalState = InclusiveStr()        
         
     def __str__(self):
         return '[*]'
@@ -359,10 +359,10 @@ class BranchWildcard(Branch):
         been defined yet.
         """
 
-        self.vertnumb = IntWildcard()
-        self.vertparts = ListWildcard()
+        self.vertnumb = InclusiveInt()
+        self.vertparts = InclusiveList()
         
-class IntWildcard(int):
+class InclusiveInt(int):
     """
     A integer wildcard class. It will return True when compared to any other integer object.
     """
@@ -389,7 +389,7 @@ class IntWildcard(int):
         return self.__cmp__(other) != 0
              
     
-class ListWildcard(list):    
+class InclusiveList(list):    
     """
     A list wildcard class. It will return True when compared to any other list object.
     """

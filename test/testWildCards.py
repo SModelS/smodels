@@ -22,7 +22,7 @@ class WildCardTest(unittest.TestCase):
     def testIntWildcard(self):
 
         x,y = 5,10.
-        z = branch.IntWildcard()
+        z = branch.InclusiveInt()
         self.assertTrue(x == z)
         self.assertFalse(y == z)
         self.assertTrue(str(z) == '*')
@@ -31,7 +31,7 @@ class WildCardTest(unittest.TestCase):
         
         x = [1,'a',10.,-5]
         y = 'string'
-        z = branch.ListWildcard()
+        z = branch.InclusiveList()
         
         self.assertTrue(x == z)
         self.assertFalse(y == z)
@@ -41,7 +41,7 @@ class WildCardTest(unittest.TestCase):
         
         x = branch.Branch(info='[[e+],[e-,mu+]]',finalState = 'MET')
         y = 1e10
-        z = branch.BranchWildcard()
+        z = branch.InclusiveBranch()
         
         self.assertTrue(x == z)
         self.assertFalse(y == z)
