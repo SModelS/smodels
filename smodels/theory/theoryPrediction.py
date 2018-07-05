@@ -272,7 +272,8 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
                            (TopologyList object)
     :parameter maxMassDist: maximum mass distance for clustering elements (float)
     :parameter useBestDataset: If True, uses only the best dataset (signal region).
-               If False, returns predictions for all datasets.
+               If False, returns predictions for all datasets (if combinedResults is False),
+               or only the combinedResults (if combinedResults is True).
     :parameter combinedResults: add theory predictions that result from
                combining datasets.
     :parameter marginalize: If true, marginalize nuisances. If false, profile them.
@@ -308,7 +309,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
     
     #Else include best signal region results, if asked for.
     bestResults = TheoryPredictionList()
-    if True: # useBestDataset:
+    if useBestDataset:
         bestResults.append(_getBestResult(dataSetResults))
     #If combinedResults = True, also include the combined result (when available):
     if combinedResults and len(dataSetResults) > 1:
