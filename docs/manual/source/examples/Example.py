@@ -3,15 +3,14 @@
 from __future__ import print_function
 """
 .. module:: Example
-   :synopsis: Basic main file example for using SModelS.
-   
+   :synopsis: Basic main file example for using SModelS.   
    This file must be run under the installation folder.
 """
-""" Define the input model particles and import basic functions (this file must be executed in the installation folder) """
+""" Import basic functions (this file must be executed in the installation folder) """
 
+from importlib import reload
 from smodels.tools import runtime
-runtime.modelFile = 'mssm' #Define your model (list of rEven and rOdd particles)
-
+from smodels import particlesLoader
 from smodels.theory import slhaDecomposer,lheDecomposer
 from smodels.tools.physicsUnits import fb, GeV, TeV
 from smodels.theory.theoryPrediction import theoryPredictionsFor
@@ -19,15 +18,16 @@ from smodels.experiment.databaseObj import Database
 from smodels.tools import coverage
 from smodels.tools.smodelsLogging import setLogLevel
 setLogLevel("info")
-
 # Set the path to the database folder
 database = Database("./smodels-database/")
 
 def main():
     """
     Main program. Displays basic use case.
-
     """
+    #Define your model (list of rEven and rOdd particles)
+    runtime.modelFile = 'smodels.share.models.mssm' 
+    reload(particlesLoader) #Make sure all the model particles are up-to-date
     
     # Path to input file (either a SLHA or LHE file)
     slhafile = 'inputFiles/slha/lightEWinos.slha'
@@ -98,11 +98,10 @@ def main():
             print ( "Condition Violation = ",theoryPrediction.conditions ) #Condition violation values
               
             # Get the corresponding upper limit:
-            ul = expResult.getUpperLimitFor(txname=txnames[0],mass=mass,dataID=datasetID)                     
-            print ( "UL for theory prediction = ",ul )
+            print ( "UL for theory prediction = ",theoryPrediction.upperLimit )
 
             # Compute the r-value
-            r = theoryPrediction.xsection.value/ul
+            r = theoryPrediction.xsection.value/theoryPrediction.upperLimit
             print ( "r = ",r )
             #Compute likelihhod and chi^2 for EM-type results:
             if dataset.dataInfo.dataType == 'efficiencyMap':

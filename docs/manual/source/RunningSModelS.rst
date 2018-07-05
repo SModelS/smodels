@@ -256,30 +256,31 @@ users more familiar with Python and the SModelS language may prefer to write the
 A simple example code for this purpose is provided in :download:`examples/Example.py`.
 Below we go step-by-step through this example code:
 
-* *Define the input model*. By default SModelS assumes the MSSM particle content. For using SModelS
-  with a different particle content, the user must define the new particle content and set modelFile
-  to the path of the model file (see **particles:model** in :ref:`Parameter File <parameterFile>`).
-
-.. literalinclude:: /examples/Example.py
-   :lines: 12-13
-
 
 * *Import the SModelS modules and methods*. If the example code file is not located in
   the smodels installation folder, simply add "sys.path.append(<smodels installation path>)" before importing smodels. Set SModelS verbosity level.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 15-21
+   :lines: 11-20
 
 * *Set the path to the database folder*. Specify where the SModelS :ref:`database <databaseStruct>` has been installed and load the database.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 23-24
+   :lines: 21-22
+
+* *Define the input model*. By default SModelS assumes the MSSM particle content. For using SModelS
+  with a different particle content, the user must define the new particle content and set modelFile
+  to the path of the model file (see **particles:model** in :ref:`Parameter File <parameterFile>`).
+
+.. literalinclude:: /examples/Example.py
+   :lines: 29-30
+
 
 * *Path to the input file*. Specify the location of the input file. It must be a
   SLHA or LHE file (see :ref:`Basic Input <BasicInput>`).
 
 .. literalinclude:: /examples/Example.py
-   :lines: 33
+   :lines: 33-34
 
 * *Set main options for* |decomposition|.
   Specify the values of :ref:`sigmacut <minweight>` and :ref:`minmassgap <massComp>`:
