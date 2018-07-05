@@ -14,7 +14,6 @@ import unittest
 from smodels.installation import installDirectory as idir
 from smodels.theory import slhaDecomposer
 from smodels.tools.physicsUnits import fb, GeV
-from smodels.tools.smodelsLogging import logger
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.tools import printer, ioObjects
 from smodels.tools import coverage
@@ -22,7 +21,9 @@ import summaryReader
 from xml.etree import ElementTree
 from databaseLoader import database
 from unitTestHelpers import equalObjs
-import unum
+from importlib import reload
+from smodels.tools import runtime
+from smodels import particlesLoader
 
 def sortXML(xmltree):
     for el in xmltree:        
@@ -67,6 +68,9 @@ class RunPrinterTest(unittest.TestCase):
         Main program. Displays basic use case.
     
         """
+        
+        runtime.modelFile = 'mssm'
+        reload(particlesLoader)
 
         #Set main options for decomposition:
         sigmacut = 0.03 * fb

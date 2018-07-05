@@ -13,6 +13,8 @@ from smodels.tools import modelTester
 from smodels.tools import crashReport
 from smodels.tools import smodelsLogging
 from smodels.tools import runtime
+from smodels import particlesLoader
+from importlib import reload
 
 def main():
     import argparse
@@ -98,6 +100,7 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
     """ Determine particles module from ini file, if necessary """
     if parser.has_option("particles","model"):
         runtime.modelFile = parser.get( "particles", "model" )
+        reload(particlesLoader)
 
     """ Check database location and load database, exit if not found """
     database, databaseVersion = modelTester.loadDatabase(parser, db)

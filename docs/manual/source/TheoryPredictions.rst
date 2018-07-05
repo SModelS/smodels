@@ -55,7 +55,12 @@ Consequently, in this case SModelS must compute |sigBRe| for each |element|, usi
 the corresponding |Dataset|. The final theoretical prediction is the sum over all |elements|
 with a non-zero value of |sigBRe|.
 This value can then be compared with the signal upper limit for the respective 
-signal region (|dataset|).
+signal region (|dataset|). 
+
+For experimental results for which the covariance matrix is provided, it
+is possible to combine all the signal regions (see :ref:`Combination of Signal Regions <combineSRs>`).
+In this case the final theory prediction corresponds to the sum of |sigBRe| over all signal regions (and all elements)
+and the upper limit is computed for this sum.
 
 Although the details of the theoretical prediction computation differ depending on the type
 of |ExpRes| (|ULrs| or |EMrs|), the overall procedure is common for both type of results. Below we schematically
