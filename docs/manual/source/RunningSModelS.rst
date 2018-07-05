@@ -128,6 +128,11 @@ Below we give more detailed information about each entry in the parameters file.
   * **testCoverage** (True/False): set to True to run the :ref:`coverage <topCoverage>` tool.
   * **combineSRs** (True/False): set to True to use, whenever available, covariance matrices to combine signal regions. NB this might take a few secs per point. Set to False to use only the most sensitive signal region (faster!). Available v1.1.3 onwards. 
 
+* *particles*: defines the particle content of the BSM model
+ 
+  * **model**: pathname to the Python file that defines the particle content of the BSM model, given either in Unix file notation ("/path/to/model.py") or as Python module path ("path.to.model"). Defaults to *share.models.mssm* which is a standard MSSM. See smodels/share/models folder for more examples. Directory name can be omitted; in that case, the current working directory as well as smodels/share/models are searched for.
+
+
 * *parameters*: basic parameter values for running SModelS
 
   * **sigmacut** (float): minimum value for an |element| weight (in fb). :ref:`Elements <element>` 
@@ -142,9 +147,6 @@ Below we give more detailed information about each entry in the parameters file.
     SModelS can run in a parallelized fashion, splitting up the input files in equal chunks.
     *ncpus = -1* parallelizes to as many processes as number of CPU cores of the machine. Default value is 1. Warning: python already parallelizes many tasks internally. Therefore, do not change unless you know what you are doing!
 
-* *particles*: defines the particle content of the BSM model
- 
-  * **model**: pathname to the Python file that defines the particle content of the BSM model, given either in Unix file notation ("/path/to/model.py") or as Python module path ("path.to.model"). Defaults to *share.models.mssm* which is a standard MSSM. See smodels/share/models folder for more examples. Directory name can be omitted; in that case, the current working directory as well as smodels/share/models are searched for.
 
 * *database*: allows for selection of a subset of :ref:`experimental results <ExpResult>` from the |database|
 
@@ -253,6 +255,14 @@ Although :ref:`runSModelS.py <runSModelS>` provides the main SModelS features wi
 users more familiar with Python and the SModelS language may prefer to write their own main program.
 A simple example code for this purpose is provided in :download:`examples/Example.py`.
 Below we go step-by-step through this example code:
+
+* *Define the input model*. By default SModelS assumes the MSSM particle content. For using SModelS
+  with a different particle content, the user must define the new particle content and set modelFile
+  to the path of the model file (see **particles:model** in :ref:`Parameter File <parameterFile>`).
+
+.. literalinclude:: /examples/Example.py
+   :lines: 12-13
+
 
 * *Import the SModelS modules and methods*. If the example code file is not located in
   the smodels installation folder, simply add "sys.path.append(<smodels installation path>)" before importing smodels. Set SModelS verbosity level.

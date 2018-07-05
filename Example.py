@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 
 from __future__ import print_function
-
 """
 .. module:: Example
    :synopsis: Basic main file example for using SModelS.
    
    This file must be run under the installation folder.
-
 """
+""" Define the input model particles and import basic functions (this file must be executed in the installation folder) """
 
-""" Import basic functions (this file must be executed in the installation folder) """
+from smodels.tools import runtime
+runtime.modelFile = 'mssm' #Define your model (list of rEven and rOdd particles)
 
 from smodels.theory import slhaDecomposer,lheDecomposer
 from smodels.tools.physicsUnits import fb, GeV, TeV
