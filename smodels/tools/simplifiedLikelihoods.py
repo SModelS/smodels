@@ -269,11 +269,11 @@ class LikelihoodComputer:
         
         #Define relative signal strengths:
         denominator = mu*signal_rel  + self.model.backgrounds + theta_hat
-        
+
         for ctr,d in enumerate(denominator):
             if d == 0.:
                 if (self.model.observed[ctr]*signal_rel[ctr]) == 0.:
-                    logger.debug("zero denominator, but numerator also zero, so we set denom to 1.")
+                #    logger.debug("zero denominator, but numerator also zero, so we set denom to 1.")
                     denominator[ctr]=1.
                 else:
                     raise Exception("we have a zero value in the denominator at pos %d, with a non-zero numerator. dont know how to handle." % ctr)
