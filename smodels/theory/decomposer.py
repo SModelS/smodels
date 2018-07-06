@@ -17,7 +17,7 @@ from smodels.tools.physicsUnits import fb, GeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
-def decompose(model, sigcut= 0*fb, doCompress=False, doInvisible=False,
+def decompose(model, sigcut= 0.1*fb, doCompress=True, doInvisible=True,
               minmassgap= 0*GeV):
     """
     Perform decomposition using the information stored in model.
@@ -74,7 +74,7 @@ def decompose(model, sigcut= 0*fb, doCompress=False, doInvisible=False,
 
     # Generate final branches (after all R-odd particles have decayed)
     finalBranchList = decayBranches(branchList, sigcut)
-
+    
     # Generate dictionary, where keys are the PIDs and values are the list of branches for the PID (for performance)
     branchListDict = {}
     for branch in finalBranchList:
@@ -90,8 +90,8 @@ def decompose(model, sigcut= 0*fb, doCompress=False, doInvisible=False,
     #Sort the branch lists by max weight to improve performance:
     for pid in branchListDict:
         branchListDict[pid] = sorted(branchListDict[pid], 
-                                     key=lambda br: br.maxWeight, reverse=True)                                                                       
-    
+                                     key=lambda br: br.maxWeight, reverse=True)        
+
     smsTopList = topology.TopologyList()
     # Combine pairs of branches into elements according to production
     # cross section list
