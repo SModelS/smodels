@@ -1,7 +1,7 @@
-dataId: 6NJet8_1250HT1500_450MHTinf
 dataType: efficiencyMap
+dataId: 6NJet8_1250HT1500_450MHTinf
 observedN: 2
 expectedBG: 0.5
-bgError: 2.6
-upperLimit: 0.274*fb
-expectedUpperLimit: 0.154*fb
+bgError: 0.4
+upperLimit: 0.299855204996*fb
+expectedUpperLimit: 0.153872179684*fb

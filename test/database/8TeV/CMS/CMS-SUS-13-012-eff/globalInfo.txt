@@ -1,12 +1,10 @@
-id: CMS-SUS-13-012
 sqrts: 8.0*TeV
 lumi: 19.5/fb
-prettyName: jet multiplicity + HTmiss
+id: CMS-SUS-13-012
 url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13012
 arxiv: http://arxiv.org/abs/1402.4770
 publication: JHEP06(2014)055
-contact: cms-pag-conveners-sus@cern.ch, SModelS collaboration
-comment: T1,T2,T1tttt official efficiency maps from the CMS collaboration; T1btbt,T1bbbb,T2bb,T2tt,T5,T5bbbb,T5tttt,T6bbWW,TChiWZ,TChiZZ,TChiWW created by the SModelS collaboration using MadAnalysis5
+contact: cms-pag-conveners-sus@cern.ch
 private: False
-implementedBy: Andre Lessa
-lastUpdate: 2017/6/15
+implementedBy: Federico A
+lastUpdate: 2015/5/14

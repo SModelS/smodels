@@ -1,7 +1,7 @@
-dataId: 3NJet6_500HT800_600MHTinf
 dataType: efficiencyMap
+dataId: 3NJet6_500HT800_600MHTinf
 observedN: 62
 expectedBG: 57.4
 bgError: 11.2
-upperLimit: 1.6*fb
-expectedUpperLimit: 1.4*fb
+upperLimit: 1.61967447792*fb
+expectedUpperLimit: 1.39117821369*fb
