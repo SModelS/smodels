@@ -14,7 +14,7 @@ from smodels.tools.physicsUnits import GeV, pb
 from smodels.installation import installDirectory
 from databaseLoader import database
 
-class UpperLimitTest(unittest.TestCase):
+class UpperLimitTest(unittest.TestCase): 
 
     def testDirectDecay(self):
         expRes=database.getExpResults ( analysisIDs = [ "ATLAS-SUSY-2013-05" ], 

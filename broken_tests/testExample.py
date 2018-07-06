@@ -56,12 +56,19 @@ class ExampleTest(unittest.TestCase):
         # Load all analyses from database
         database = Database("./database",force_load = "txt")
         listOfExpRes = database.getExpResults()
-        self.assertEqual(len(listOfExpRes), 4)
+        #self.assertEqual(len(listOfExpRes), 4)
                 
         # Compute the theory predictions for each analysis
         for expResult in listOfExpRes[1:2]:
-            predictions = theoryPredictionsFor(expResult, smstoplist, useBestDataset=False)            
-            if not predictions: continue
+            print "expRes"
+            print expResult
+            print "topologies"
+            predictions = theoryPredictionsFor(expResult, smstoplist, useBestDataset=False)   
+            print "predictions"
+            print predictions         
+            if not predictions: 
+                print "no predictions"
+                continue
             print('\n',expResult.getValuesFor('id')[0])
             for theoryPrediction in predictions:
                 dataset = theoryPrediction.dataset

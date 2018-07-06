@@ -11,7 +11,10 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.installation import installDirectory
-from smodels.theory import slhaDecomposer
+from smodels.share.models.MSSMparticles import BSMList
+from smodels.share.models.SMparticles import SMList
+from smodels.theory import decomposer
+from smodels.theory.model import Model
 from smodels.tools.physicsUnits import GeV
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from databaseLoader import database
@@ -20,7 +23,10 @@ class ConditionTest(unittest.TestCase):
     def testGoodFile(self):
 
         filename = "%sinputFiles/slha/lightEWinos.slha" % (installDirectory() )
-        topolist = slhaDecomposer.decompose(filename,doCompress=True, doInvisible=True, minmassgap = 5*GeV)
+        model = Model(BSMList,SMList,filename)
+        model.updateParticles()
+                
+        topolist = decomposer.decompose(model,doCompress=True, doInvisible=True, minmassgap = 5*GeV)
         analyses = database.getExpResults (txnames=["TChiWZoff"])
         theoryPrediction = theoryPredictionsFor(analyses[0], topolist)[0]
         conditionViolation = theoryPrediction.conditions

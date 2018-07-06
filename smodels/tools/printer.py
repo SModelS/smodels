@@ -478,8 +478,6 @@ class TxTPrinter(BasicPrinter):
         output = ""
         output += "\nTotal missing topology cross section (fb): %10.3E\n" %(obj.getUncoveredListXsec(obj.missingTopos))
         output += "Total cross section where we are outside the mass grid (fb): %10.3E\n" %(obj.getUncoveredListXsec(obj.outsideGrid))
-        output += "Total cross section in long cascade decays (fb): %10.3E\n" %(obj.getUncoveredClassifierXsec(obj.longCascade))
-        output += "Total cross section in decays with asymmetric branches (fb): %10.3E\n" %(obj.getUncoveredClassifierXsec(obj.asymmetricBranches))       
         output += "Total cross section with longlived decays (fb): %10.3E\n" %(obj.getUncoveredListXsec(obj.longLived))
         output += "Total cross section with displaced decays (fb): %10.3E\n" %(obj.getUncoveredListXsec(obj.displaced))
         output += "Total cross section with MET decays (fb): %10.3E\n" %(obj.getUncoveredListXsec(obj.MET))
@@ -510,18 +508,7 @@ class TxTPrinter(BasicPrinter):
                             contributing.append(el.elID)
                         output += "Contributing elements %s\n" % str(contributing)            
             output += "================================================================================\n"
-        for ix, uncovEntry in enumerate([obj.longCascade, obj.asymmetricBranches]):
-            if ix==0: output += "Missing topos: long cascade decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV))
-            else: output += "Missing topos: asymmetric branches (w/o long cascades, up to %s), sqrts = %d TeV\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV))
-            output += "Mother1 Mother2 Weight (fb) # allMothers\n"
-            for ent in uncovEntry.getSorted(obj.sqrts)[:nprint]:
-                output += "%s %s %10.3E # %s\n" %(ent.motherPIDs[0][0], ent.motherPIDs[0][1], ent.getWeight(), str(ent.motherPIDs))
-                if hasattr(self, "addcoverageid") and self.addcoverageid:
-                    contributing = []
-                    for el in ent.contributingElements:
-                        contributing.append(el.elID)
-                    output += "Contributing elements %s\n" % str(contributing)
-            output += "================================================================================\n"         
+       
         for ix, uncovEntry in enumerate([obj.longLived, obj.displaced, obj.MET]):
             if ix==0:
                 output += "Missing topos: long lived decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV))

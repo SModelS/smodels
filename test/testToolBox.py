@@ -21,6 +21,6 @@ class TestToolBox(unittest.TestCase):
         box = toolBox.ToolBox()
         ok=box.checkInstallation ( make=True, printit=False )
         self.assertTrue ( ok )
-
+ 
 if __name__ == "__main__":
     unittest.main()
