@@ -159,7 +159,7 @@ class Model(object):
                 continue
 
             if particle.totalwidth > promptWidth:
-                particle.totalwidth = float('inf')  #Treat particle as prompt
+                particle.totalwidth = float('inf')*GeV  #Treat particle as prompt
                 logger.debug("Particle %s has width above the threshold and will be assumed as prompt" %particle.pdg)
             else:
                 particle.decays.append(None) #Include possibility for particle being long-lived (non-prompt)
