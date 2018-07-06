@@ -17,7 +17,7 @@ from smodels.tools.physicsUnits import fb, GeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
-def decompose(model, sigcut= 0.1*fb, doCompress=True, doInvisible=True,
+def decompose(model, sigcut= 0*fb, doCompress=True, doInvisible=True,
               minmassgap= 0*GeV):
     """
     Perform decomposition using the information stored in model.

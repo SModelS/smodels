@@ -15,12 +15,15 @@ import unittest
 class ClustererTest(unittest.TestCase):
     def testClusterer(self):
         """ test the mass clusterer """
-        from smodels.theory import lheReader, lheDecomposer, crossSection
+        from smodels.theory.element import Element
+        from smodels.theory.branch import Branch
         from smodels.theory import clusterTools
         from smodels.experiment.txnameObj import TxName, TxNameData
         from smodels.experiment.infoObj import Info
         from smodels.installation import installDirectory
-        from smodels.tools.physicsUnits import GeV, pb, fb
+        from smodels.share.models import SMparticles, MSSMparticles
+        from smodels.theory.crossSection import XSection,XSectionInfo,XSectionList        
+        from smodels.tools.physicsUnits import GeV, TeV, pb, fb
         import copy
         
         data = [[ [[ 674.99*GeV, 199.999*GeV], [ 674.99*GeV, 199.999*GeV] ],.03*fb ], 
@@ -34,38 +37,50 @@ class ClustererTest(unittest.TestCase):
         txnameData.cleanUp()
         txname=TxName("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/T2bb.txt",globalInfo,info,True)
         txname.txnameData = txnameData
+        
+        u = SMparticles.u
+        gluino = MSSMparticles.gluino
+        gluino.__setattr__("mass", 675.*GeV)
+        n1 = MSSMparticles.n1
+        n1.__setattr__("mass", 200.*GeV)
+        
 
-        filename = "%sinputFiles/lhe/simplyGluino.lhe" % (installDirectory() )
-        reader = lheReader.LheReader(filename)
-        event = reader.next()
-        reader.close()
-        event_xsec=event.metainfo["totalxsec"]
-        self.assertTrue ( abs ( event_xsec - 0.262 * pb ) < .1 *pb )
-        xsecs = crossSection.getXsecFromLHEFile(filename)
-        element = lheDecomposer.elementFromEvent(event, xsecs )
-        element.txname=None
-        e0=copy.deepcopy(element) ## has a gluino with mass of 675 GeV
+        w1 = XSectionList()
+        w1.xSections.append(XSection())
+        w1.xSections[0].info = XSectionInfo()
+        w1.xSections[0].info.sqrts = 8.*TeV
+        w1.xSections[0].info.label = '8 TeV'
+        w1.xSections[0].info.order = 0
+        w1.xSections[0].value = 10.*fb
+
+        b1 = Branch()
+        b1.particles = [[u,u]]
+        b1.BSMparticles = [gluino, n1]
+        b2 = b1.copy()
+        el1 = Element()
+        el1.branches=[b1,b2]  
+        el1.weight = w1       
+        el1.txname = txname           
 
 
         ## make a second element with a slightly different gluino mass
-        e1=copy.deepcopy(element)
-        e1.branches[0].masses[0]=725*GeV
-        e1.branches[1].masses[0]=725*GeV
-        e0.txname = txname
-        e1.txname = txname
+        el2=copy.deepcopy(el1)
+        el2.branches[0].BSMparticles[0].__setattr__("mass", 725.*GeV) 
+        el2.branches[1].BSMparticles[0].__setattr__("mass", 725.*GeV)  
+        el2.txname = txname
 
         # lets now cluster the two different gluino masses.
-        newel=clusterTools.groupAll ( [e0,e1] )
+        newel=clusterTools.groupAll ( [el1,el2] )
         newmasses=newel.getAvgMass()
         self.assertTrue ( newmasses==None ) ## in the case of efficiency maps the avg mass is none
         ## since it makes no sense
 
         txname.txnameData.dataTag = 'upperLimits'
-        newel=clusterTools.clusterElements ( [e0,e1], 5. )
+        newel=clusterTools.clusterElements ( [el1,el2], 5. )
         ## this example gives an avg cluster mass of 700 gev
         self.assertTrue ( newel[0].getAvgMass()[0][0] == 700. * GeV )
         
-        newel=clusterTools.clusterElements ( [e0,e1], .5 )
+        newel=clusterTools.clusterElements ( [el1,el2], .5 )
         #in this example the distance is not in maxdist, so we dont cluster
         self.assertTrue ( len(newel)==2 )
 

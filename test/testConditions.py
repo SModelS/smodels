@@ -15,7 +15,7 @@ from smodels.share.models.MSSMparticles import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory import decomposer
 from smodels.theory.model import Model
-from smodels.tools.physicsUnits import GeV
+from smodels.tools.physicsUnits import GeV, fb
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from databaseLoader import database
 
@@ -26,7 +26,7 @@ class ConditionTest(unittest.TestCase):
         model = Model(BSMList,SMList,filename)
         model.updateParticles()
                 
-        topolist = decomposer.decompose(model,doCompress=True, doInvisible=True, minmassgap = 5*GeV)
+        topolist = decomposer.decompose(model, sigcut= 0.1*fb, doCompress=True, doInvisible=True, minmassgap = 5*GeV)
         analyses = database.getExpResults (txnames=["TChiWZoff"])
         theoryPrediction = theoryPredictionsFor(analyses[0], topolist)[0]
         conditionViolation = theoryPrediction.conditions

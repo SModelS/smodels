@@ -15,7 +15,9 @@ from smodels.theory import lheReader
 from smodels.tools.physicsUnits import GeV, fb
 from smodels import installation
 import pyslha
-from smodels.share.models.SMparticles import SMparticleList
+from smodels.share.models.MSSMparticles import BSMList
+from smodels.share.models.SMparticles import SMList, SMparticleList
+from smodels.theory.model import Model
 from smodels.theory.particleNames import getObjectFromPdg
 from smodels.theory import crossSection
 from smodels.theory.theoryPrediction import TheoryPrediction
@@ -291,12 +293,18 @@ class SlhaStatus(object):
         self.maxDisplacement = maxDisplacement
         self.sigmacut = sigmacut
         self.slha = self.read()
+
+        model = Model(BSMList,SMList,filename)
+        model.updateParticles()     
+        self.model = model   
+        
         if not self.slha:
             self.status = -3, "Could not read input SLHA file"
             return
         try:
             self.lsp = self.findLSP()
             self.lspStatus = self.testLSP(checkLSP)
+            print "checking illegal"
             self.illegalDecays = self.findIllegalDecay(findIllegalDecays)
             self.xsec = self.hasXsec(checkXsec)
             self.decayBlocksStatus = self.findMissingDecayBlocks(findMissingDecayBlocks)
@@ -401,6 +409,7 @@ class SlhaStatus(object):
         :returns: status flag and message
         
         """
+        print "find illegal"
         if not findIllegal:
             return 0, "Did not check for illegal decays"
         st = 1
@@ -408,13 +417,21 @@ class SlhaStatus(object):
         for particle, block in self.slha.decays.items():
             if particle in SMpdgs : continue
             if not particle in self.slha.blocks["MASS"].keys(): continue
+            print "mom"
+            print particle
             mMom = abs(self.slha.blocks["MASS"][particle])
+            print mMom
             for dcy in block.decays:
+                print "checking decay"
                 mDau = 0.
                 for ptc in dcy.ids:
+                    print "daughter"
+                    print ptc
                     ptc = abs(ptc)
-                    if ptc in SMpdgs: mDau += getObjectFromPdg(ptc).mass
-                    elif ptc in self.slha.blocks["MASS"].keys(): mDau += abs(self.slha.blocks["MASS"][ptc])
+                    if ptc in SMpdgs: mDau += self.model.getParticlesWith(pdg=ptc).mass
+                    elif ptc in self.slha.blocks["MASS"].keys(): 
+                        mDau += abs(self.slha.blocks["MASS"][ptc])
+                        print mDau
                     else:
                         return -2, "Unknown PID %s in decay of %s" % (str(ptc), str(particle) + ". Add " + str(ptc) + " to smodels/particle.py")
                 if mDau > mMom:
