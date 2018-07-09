@@ -11,10 +11,9 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.experiment.txnameObj import TxName
-from smodels.tools.physicsUnits import GeV, pb
+from smodels.tools.physicsUnits import GeV
 from smodels.theory import branch,element
 from smodels.experiment import infoObj
-from smodels.experiment.databaseObj import Database
 
 
 class WildCardTest(unittest.TestCase):
@@ -80,7 +79,7 @@ class WildCardTest(unittest.TestCase):
         f = './database/13TeV/CMS/CMS-PAS-EXO-16-036-eff/c000/THSCPM2.txt'
         gInfo = infoObj.Info('./database/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
         gInfo.addInfo('dataId','c000')
-        tx = TxName(f,gInfo,gInfo,True)
+        tx = TxName(f,gInfo,gInfo)
         res = tx.getEfficiencyFor([[100.*GeV]]*2)
         self.assertAlmostEqual(res,0.058038)
         res = tx.getEfficiencyFor([[500.*GeV,150.*GeV,10.*GeV],[100.*GeV]])
@@ -94,7 +93,7 @@ class WildCardTest(unittest.TestCase):
         f = './database/13TeV/CMS/CMS-PAS-EXO-16-036-eff/c000/THSCPM6.txt'
         gInfo = infoObj.Info('./database/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
         gInfo.addInfo('dataId','c000')
-        tx = TxName(f,gInfo,gInfo,True)
+        tx = TxName(f,gInfo,gInfo)
         res = tx.getEfficiencyFor([[279.*GeV,170.*GeV,100.*GeV]]*2)
         self.assertAlmostEqual(res,0.097172,6)
         res = tx.getEfficiencyFor([[100.*GeV],[279.*GeV,170.*GeV,100.*GeV]])
@@ -111,7 +110,7 @@ class WildCardTest(unittest.TestCase):
         f = './database/13TeV/CMS/CMS-PAS-EXO-16-036-eff/c000/THSCPM2.txt'
         gInfo = infoObj.Info('./database/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
         gInfo.addInfo('dataId','c000')
-        tx = TxName(f,gInfo,gInfo,True)
+        tx = TxName(f,gInfo,gInfo)
         
         el = element.Element(info="[[],[[e+]]]",finalState = ['HSCP','MET'])
         el.setMasses([[1.25E+02*GeV], [4.40E+02*GeV, 1.00E+00*GeV]])

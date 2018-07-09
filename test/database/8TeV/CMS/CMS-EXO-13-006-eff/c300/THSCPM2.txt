@@ -3,6 +3,7 @@ constraint: [[*],[]]
 condition: None
 conditionDescription: None
 susyProcess: pp --> lsp chargino^pm_1, chargino^pm_1 lsp --> chargino^pm_1 lsp
+figureUrl: None
 dataUrl: None
 source: SModelS
 validated: N/A

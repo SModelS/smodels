@@ -253,6 +253,19 @@ class Element(object):
         for branch in self.branches:
             ptcarray.append(branch.particles)
         return ptcarray
+    
+    
+    def getFinalStates(self):
+        """
+        Get the array of particles in the element.
+        
+        :returns: list of particle strings                
+        """
+        
+        fsarray = []
+        for branch in self.branches:
+            fsarray.append(branch.finalState)
+        return fsarray      
 
 
     def getMasses(self):

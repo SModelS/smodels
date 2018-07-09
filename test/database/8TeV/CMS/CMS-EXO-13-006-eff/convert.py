@@ -79,7 +79,7 @@ for i,name in enumerate(datasetNames):
     #+++++++ next txName block ++++++++++++++
     HSCPM3 = dataset.addTxName('THSCPM3')
     HSCPM3.checked =''
-    HSCPM3.constraint = "[[['?']],[['?']]]"  ##Here '?' represents any (single) even particle
+    HSCPM3.constraint = "[[['*']],[['*']]]"  ##Here '*' represents any (single) even particle
     HSCPM3.condition =None
     HSCPM3.conditionDescription =None
     HSCPM3.finalState = ['HSCP','HSCP']
@@ -92,7 +92,7 @@ for i,name in enumerate(datasetNames):
     #+++++++ next txName block ++++++++++++++
     HSCPM5 = dataset.addTxName('THSCPM5')
     HSCPM5.checked =''
-    HSCPM5.constraint = "[[['?'],['?']],[['?'],['?']]]" ##Here '?' represents any (single) even particle
+    HSCPM5.constraint = "[[['*'],['*']],[['*'],['*']]]" ##Here '*' represents any (single) even particle
     HSCPM5.condition =None
     HSCPM5.conditionDescription =None
     HSCPM5.finalState = ['HSCP','HSCP']
@@ -105,7 +105,7 @@ for i,name in enumerate(datasetNames):
     #+++++++ next txName block ++++++++++++++
     HSCPM7 = dataset.addTxName('THSCPM7')
     HSCPM7.checked =''
-    HSCPM7.constraint = "[[['?']],[['?'],['?']]]" ##Here '?' represents any (single) even particle
+    HSCPM7.constraint = "[[['*']],[['*'],['*']]]" ##Here '*' represents any (single) even particle
     HSCPM7.condition =None
     HSCPM7.conditionDescription =None
     HSCPM7.finalState = ['HSCP','HSCP']
@@ -118,7 +118,7 @@ for i,name in enumerate(datasetNames):
     #+++++++ next txName block ++++++++++++++
     HSCPM8 = dataset.addTxName('THSCPM8')
     HSCPM8.checked =''
-    HSCPM8.constraint = "[[['?','?']],[['?','?']]]" ##Here '?','?' represents any pair of even particles
+    HSCPM8.constraint = "[[['*','*']],[['*','*']]]" ##Here '*','*' represents any pair of even particles
     HSCPM8.condition =None
     HSCPM8.conditionDescription =None
     HSCPM8.finalState = ['HSCP','HSCP']
@@ -144,7 +144,7 @@ for i,name in enumerate(datasetNames):
     #+++++++ next txName block ++++++++++++++
     HSCPM4 = dataset.addTxName('THSCPM4')
     HSCPM4.checked =''
-    HSCPM4.constraint = "[[*],[['?']]]" ##Here [*] represents one branch with any list of vertices
+    HSCPM4.constraint = "[[*],[['*']]]" ##Here [*] represents one branch with any list of vertices
     HSCPM4.condition =None
     HSCPM4.conditionDescription =None
     HSCPM4.finalState = ['MET','HSCP']
@@ -157,7 +157,7 @@ for i,name in enumerate(datasetNames):
     #+++++++ next txName block ++++++++++++++
     HSCPM6 = dataset.addTxName('THSCPM6')
     HSCPM6.checked =''
-    HSCPM6.constraint = "[[*],[['?'],[ '?']]]" ##Here [*] represents one branch with any list of vertices
+    HSCPM6.constraint = "[[*],[['*'],[ '*']]]" ##Here [*] represents one branch with any list of vertices
     HSCPM6.condition =None
     HSCPM6.conditionDescription =None
     HSCPM6.finalState = ['MET','HSCP']

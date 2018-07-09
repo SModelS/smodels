@@ -29,7 +29,7 @@ def load ():
     sys.path.insert(0,fulldir)
     sys.path.insert(0,".")
 
-    logger.debug ( "Trying to load model file: %s" % modelFile )
+    logger.debug("Trying to load model file: %s" % modelFile)
 
     if "/" in modelFile:
         import shutil

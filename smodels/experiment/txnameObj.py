@@ -13,7 +13,7 @@
 """
 
 import os,sys
-from smodels.tools.physicsUnits import GeV, fb, TeV, pb
+from smodels.tools import physicsUnits
 from smodels.theory.particleNames import elementsInStr
 from smodels.tools.stringTools import concatenateLines
 from smodels.theory.element import Element
@@ -22,7 +22,6 @@ from smodels.tools.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.caching import _memoize
 from scipy.linalg import svd
-from scipy.interpolate import interp1d
 import scipy.spatial.qhull as qhull
 import numpy as np
 import unum
@@ -43,7 +42,7 @@ class TxName(object):
     file (constraint, condition,...) as well as the data.
     """
 
-    def __init__(self, path, globalObj, infoObj ):
+    def __init__(self, path, globalObj, infoObj):
         self.path = path
         self.globalInfo = globalObj
         self._infoObj = infoObj
@@ -436,27 +435,25 @@ class TxNameData(object):
             
         self.units = self.getUnits(val)[0] #Store standard units
         self.dataShape = self.getDataShape(val[0][0]) #Store the data (mass) format (useful if there are wildcards)        
-        self.value = self.removeUnits(val) #Remove units and store the normalization units
-        self.value = self.removeWildCards(self.value)
+        values = self.removeUnits(val) #Remove units and store the normalization units
+        values = self.removeWildCards(values)
 
 
-        if len(self.value) < 1 or len(self.value[0]) < 2:
+        if len(values) < 1 or len(values[0]) < 2:
                 raise SModelSError("input value not in correct format. expecting sth " \
                                "like [ [ [[ 300.*GeV,100.*GeV], "\
                                "[ 300.*GeV,100.*GeV] ], 10.*fb ], ... ] "\
                                "for upper limits or [ [ [[ 300.*GeV,100.*GeV],"\
                                " [ 300.*GeV,100.*GeV] ], .1 ], ... ] for "\
-                               "efficiency maps. Received %s" % self.value[:80])
+                               "efficiency maps. Received %s" % values[:80])
 
                 
         if not isinstance(self.units[-1],unum.Unum) and not isinstance(self.units[-1],float):
-            raise SModelSError("Error obtaining units from value: %s " %self.value[:80])
+            raise SModelSError("Error obtaining units from value: %s " %values[:80])
 
 
-        self.y_values = np.array(self.value)[:,1]
-        self.computeV()
-        self.removeExtraZeroes()            
-        self.cleanUp()
+        self.y_values = np.array(values)[:,1]
+        self.computeV(values)
 
     @_memoize
     def getValueFor(self,massarray):
@@ -663,16 +660,18 @@ class TxNameData(object):
             return False
         return True
 
-    def computeV(self):
+    def computeV(self,values):
         """
         Compute rotation matrix _V, and triangulation self.tri
+        
+        :param values: Nested array with the data values
         
         """
         
         if not self._V is None:
             return
         
-        Morig= [self.flattenArray(pt[0]) for pt in self.value]
+        Morig= [self.flattenArray(pt[0]) for pt in values]
         
         aM = np.matrix(Morig)
         MT = aM.T.tolist()
@@ -713,11 +712,6 @@ class TxNameData(object):
         else:            
             self.tri = Delaunay1D(MpCut)           
    
-    def cleanUp(self):
-        if self._keep_values:
-            return
-        if hasattr(self, "origdata"):
-            del self.origdata
         
     def _getMassArrayFrom(self,pt,unit=physicsUnits.GeV):
         """
@@ -841,7 +835,7 @@ class Delaunay1D:
 
 if __name__ == "__main__":
     import time
-    from smodels.tools.physicsUnits import GeV
+    from smodels.tools.physicsUnits import GeV,fb
     data = [ [ [[ 150.*GeV, 50.*GeV], [ 150.*GeV, 50.*GeV] ],  3.*fb ],
          [ [[ 200.*GeV,100.*GeV], [ 200.*GeV,100.*GeV] ],  5.*fb ],
          [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], 10.*fb ],

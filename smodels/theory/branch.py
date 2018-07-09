@@ -6,11 +6,10 @@
         
 """
 
-import sys
 from smodels.theory.particleNames import simParticles, elementsInStr
-from smodels.tools.physicsUnits import fb, MeV
+from smodels.tools.physicsUnits import fb
 from smodels.particlesLoader import rEven
-from smodels.theory.particleNames import ptcDic
+from smodels.theory.particleNames import ptcDic, finalStates, getFinalStateLabel, InclusiveStr
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -61,7 +60,7 @@ class Branch(object):
                         if ptc == "*":
                             ptc = InclusiveStr()
                             ptcs[i] = ptc
-                        if not ptc in list(rEven.values()) \
+                        if not ptc in rEven.values() \
                                 and not ptc in list(ptcDic.keys()):
                                 raise SModelSError("Unknown particle. Add " + ptc + " to smodels/particle.py")
                     self.particles.append(ptcs)

@@ -148,7 +148,7 @@ def writeIgnoreMessage ( keys, rEven, rOdd ):
             logger.warning("Particle %i not defined in particles.py, its decays will be ignored" %(pid))
             continue
         if pid in rEven:
-            msg += "%s, " % smodels.particles.rEven[pid]
+            msg += "%s, " % rEven[pid]
             continue         
     if len(msg)>0:
             logger.debug ( "Ignoring %s decays" % msg[:-2] )
@@ -162,15 +162,13 @@ def _getDictionariesFromSLHA(slhafile):
 
     res = pyslha.readSLHAFile(slhafile)
 
-    rOdd = smodels.particles.rOdd.keys()
-    rEven = smodels.particles.rEven.keys()
-    
+   
     # Get mass and branching ratios for all particles
     brDic = {}
     writeIgnoreMessage(res.decays.keys(), rEven, rOdd)
 
     for pid in res.decays.keys():
-        if not pid in list(rOdd.keys()):
+        if not pid in rOdd.keys():
             continue
         brs = []
         for decay in res.decays[pid].decays:

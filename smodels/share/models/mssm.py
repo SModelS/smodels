@@ -137,8 +137,6 @@ rEven = {25 : "higgs",
          -211: "pi" }
 
 
-#Include all R-even particles:
-ptcDic['?'] = list(rEven.values()) + list(ptcDic.keys())
 
 #Quantum numbers for the new particles.
 #PDG: (spin*2, electrical charge*3, color dimension)
@@ -179,13 +177,4 @@ qNumbers={
  1000255:[0,0,1]
 }
 
-#Final states. Define final state labels
-#according to the qNumbers tuples.
-
-finalStates = {
-"HSCP" : [[1,3,1],[1,-3,1],[0,3,1],[0,-3,1],[2,3,1],[2,-3,1]],
-"MET" : [[1,0,1],[0,0,1],[2,0,1]],
-"RHadronG" : [[1,0,8]],  #Gluino-like RHadron
-"RHadronQ" : [[0,2,3],[0,-1,3],[0,-2,3],[0,1,3]]  #Squark-like RHadron
-}
 
