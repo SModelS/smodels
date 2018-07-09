@@ -20,6 +20,7 @@ from smodels.tools import crashReport, timeOut
 from smodels.tools.printer import MPrinter
 import os
 import sys
+import time
 try:
     from ConfigParser import SafeConfigParser
 except ImportError as e:
