@@ -71,21 +71,6 @@ rEven = {25 : "higgs",
          211: "pi",
          -211: "pi" }
 
-#Particle dictionary. Convenient for defining multiple particles with one label.
-ptcDic = {"e"  : ["e+",  "e-"],
-          "mu" : ["mu+", "mu-"],
-          "ta" : ["ta+", "ta-"],
-          "l+" : ["e+",  "mu+"],
-          "l-" : ["e-",  "mu-"],
-          "l"  : ["e-",  "mu-", "e+", "mu+"],
-          "W"  : ["W+",  "W-"],
-          "t"  : ["t+",  "t-"],
-          "L+" : ["e+",  "mu+", "ta+"],
-          "L-" : ["e-",  "mu-", "ta-"],
-          "L"  : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-"],
-          "jet" : [ "q", "g", "c", "pi" ],
-          "all" : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-", "W+", "W-","Z","photon","higgs","t+","t-","b","c","q","g","c","pi"]}
-
 #Quantum numbers for the new particles.
 #PDG: (spin*2, electrical charge*3, color dimension)
 qNumbers={
@@ -93,14 +78,3 @@ qNumbers={
  36:[0,0,1],
  37:[0,3,1],
 }
-
-#Final states. Define final state labels
-#according to the qNumbers tuples.
-
-finalStates = {
-"HSCP" : [[1,3,1],[1,-3,1],[0,3,1],[0,-3,1],[2,3,1],[2,-3,1]],
-"MET" : [[1,0,1],[0,0,1],[2,0,1]],
-"RHadronG" : [[1,0,8]],  #Gluino-like RHadron
-"RHadronQ" : [[0,2,3],[0,-1,3],[0,-2,3],[0,1,3]]  #Squark-like RHadron
-}
-
