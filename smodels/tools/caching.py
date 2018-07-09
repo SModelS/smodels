@@ -41,7 +41,7 @@ class Cache:
     """ a class for storing results from interpolation """
     _cache = {}
     _cache_order=[]
-    n_stored = 50000 ## number of interpolations we keep per result
+    n_stored = 1000 ## number of interpolations we keep per result
 
     @staticmethod
     def size():

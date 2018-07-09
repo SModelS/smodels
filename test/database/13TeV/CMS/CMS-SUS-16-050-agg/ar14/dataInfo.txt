@@ -1,0 +1,8 @@
+dataId: ar14
+dataType: efficiencyMap
+observedN: 1
+expectedBG: 3.0
+bgError: 1.8049930747789589
+upperLimit: 0.098815*fb
+expectedUpperLimit: 0.159873*fb
+aggregated: t1b2MT2200__650MET>=750

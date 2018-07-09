@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: installation
@@ -9,6 +9,7 @@
 """
 
 from __future__ import print_function
+from smodels.tools.smodelsLogging import logger
 import sys
 import os
 
@@ -58,6 +59,40 @@ def authors():
         authors += to_add
     return authors
 
+def _toTuple_ ( ver ):
+    """ convert version string to tuple """
+    a = ver.replace(" ",".",1).split(".")
+    for ctr,el in enumerate(a):
+        try:
+            a[ctr]=int(el)
+        except ValueError:
+            a[ctr]=el
+    b=[]
+    for i in a:
+        found=False
+        for pf in [ "rc", "post", "pre" ]:
+            if type(i)==str and pf in i:
+                found=True
+                minor = i[:i.find(pf)]
+                try:
+                    minor = int(minor)
+                except:
+                    pass
+                b.append ( minor )
+                b.append ( i[i.find(pf):] )
+                continue
+        if not found:
+            b.append ( i )
+    return tuple(b)
+
+def requirements():
+    ret=[]
+    f = open("%s/smodels/share/requirements.txt" % installDirectory())
+    lines=f.readlines()
+    for l in lines: ret.append ( l.strip() )
+    f.close()
+    return ret
+
 def version(astuple=False):
     """
     Print version number of the SModelS framework.
@@ -70,13 +105,7 @@ def version(astuple=False):
     l.strip()
     if not astuple:
         return l
-    a = l.replace(" ",".",1).split(".")
-    for ctr,el in enumerate(a):
-        try:
-            a[ctr]=int(el)
-        except ValueError:
-            a[ctr]=el
-    return tuple(a)
+    return _toTuple_ ( l )
 
 
 def license():
@@ -84,7 +113,7 @@ def license():
     Print license information of the SModelS framework.
 
     """
-    f = open(installDirectory() + "COPYING")
+    f = open(installDirectory() + "smodels/COPYING")
     lines = f.readlines()
     f.close()
     return "".join(lines)
@@ -100,21 +129,6 @@ def banner():
     f.close()
     return "".join(lines)
 
-def printHelp():
-    """
-    Print usage information of this module.
-
-    """
-    print("Usage: " + sys.argv[0] + " [--help|-h] [--installdir|-i] [--pythondir|-p]")
-    print("                      [--version|-v] [--banner|-b] [--license|--copyright|-c]:")
-    print("--help:       show this message")
-    print("--installdir: print SModelS installation directory")
-    print("--pythondir:  print SModelS python path")
-    print("--version:    print SModelS version number")
-    print("--banner:     print SModelS banner")
-    print("--copyright:  print SModelS copyright")
-    sys.exit(0)
-
 def fixpermissions():
     """ make sure that all filepermissions are such that
         we can compile the wrappers for pythia and nllfast. """
@@ -125,38 +139,44 @@ def fixpermissions():
         Dirs += glob.glob("%snllfast/nllfast-*" % Dir )
         Dirs += glob.glob("%spythia8/xml.doc" % Dir )
         for p in Dirs:
-            # print ( "Fixing %s" % (p) )
+            logger.debug ( "chmod 777 %s" % (p) )
             os.chmod ( p, 0o777 )
     except Exception as e:
         print ( "chmod failed (permission error). Please try as root, i.e.:" )
         print ( "sudo smodelsTools.py fixpermissions" )
 
+def officialDatabase():
+    r="http://smodels.hephy.at/database/official%s" % version().replace(".","")
+    return r
+
+def testDatabase():
+    r="http://smodels.hephy.at/database/unittest%s" % version().replace(".","")
+    return r
 
 def main():
-    # print( banner() )
-    if len(sys.argv) < 2:
-        printHelp()
-    for i in sys.argv[1:]:
-        if i in [ "--installdir", "-i" ]:
-            print(installDirectory())
-            sys.exit(0)
-        if i in [ "--pythondir", "-p" ]:
-            print(pythonDirectory())
-            sys.exit(0)
-        if i in [ "--version", "-v" ]:
-            print(version())
-            sys.exit(0)
-        if i in [ "--banner", "-b" ]:
-            print(banner())
-            sys.exit(0)
-        if i in [ "--help", "-h" ]:
-            printHelp()
-            sys.exit(0)
-        if i in [ "--license", "--copyright", "-c" ]:
-            print(license())
-            sys.exit(0)
-    print("Error: cannot parse %s.\n" % i )
-    printHelp()
+    import argparse
+    ap = argparse.ArgumentParser( description= "installation helper" )
+    ap.add_argument( "-i", "--installdir", help="print SModelS installation directory", action="store_true" )
+    ap.add_argument( "-p", "--pythondir", help="print SModelS python path", 
+                     action="store_true" )
+    ap.add_argument( "-v", "--version", help="print SModelS version number", 
+                     action="store_true" )
+    ap.add_argument( "-b", "--banner", help="print SModelS banner", 
+                     action="store_true" )
+    ap.add_argument( "-r", "--requirements",help="print SModelS python requirements", 
+                     action="store_true" )
+    ap.add_argument( "-d", "--database", 
+                     help="print SModelS official database url for this release", action="store_true")
+    ap.add_argument( "-t", "--test-database", help="print SModelS official unittest database url for this release", action="store_true" )
+    ap.add_argument( "-c", "--copyright", "--license", 
+                     help="print SModelS copyright", action="store_true" )
+    args = ap.parse_args()
+    funcs = { "installdir": installDirectory, "pythondir": pythonDirectory,
+              "version": version, "banner": banner, "requirements": requirements,
+              "database": officialDatabase, "test_database": testDatabase,
+              "copyright": license }
+    for f,v in args.__dict__.items():
+        if v: print ( funcs[f]() )
 
 if __name__ == "__main__":
     main()

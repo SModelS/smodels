@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: coverage
@@ -18,7 +18,7 @@ class Uncovered(object):
     :ivar sumL: if true, sum up electron and muon to lepton, for missing topos
     :ivar sumJet: if true, sum up jets, for missing topos
     :ivar sqrts: Center of mass energy. If defined it will only consider cross-sections
-                for this value. Otherwise the highest sqrts value will be used.
+    for this value. Otherwise the highest sqrts value will be used.
     """
     def __init__(self, topoList, sumL=True, sumJet=True, sqrts=None):
         
@@ -355,6 +355,8 @@ class UncoveredList(object):
         :parameter instr: element as string
         :returns: string of generalized element
         """
+        
+        # 180318 mat: BUG? #############################
         from smodels.theory.particleNames import ptcDic
         if self.sumL: exch = ["W", "l", "t", "ta"]
         else: exch = ["W", "e", "mu", "t", "ta"]

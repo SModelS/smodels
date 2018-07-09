@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: particleNames
@@ -9,12 +9,28 @@
 
 """
 
-from smodels.particles import rEven, rOdd, ptcDic, qNumbers, finalStates
+import sys
+import copy
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import itertools
+from smodels.particlesLoader import rEven, rOdd, qNumbers
 
 from smodels.tools.smodelsLogging import logger
 
+ptcDic = {"e"  : ["e+",  "e-"],                                                                                                               
+          "mu" : ["mu+", "mu-"],                                                                                                              
+          "ta" : ["ta+", "ta-"],                                                                                                              
+          "l+" : ["e+",  "mu+"],                                                                                                              
+          "l-" : ["e-",  "mu-"],                                                                                                              
+          "l"  : ["e-",  "mu-", "e+", "mu+"],                                                                                                 
+          "W"  : ["W+",  "W-"],                                                                                                               
+          "t"  : ["t+",  "t-"],                                                                                                               
+          "L+" : ["e+",  "mu+", "ta+"],                                                                                                       
+          "L-" : ["e-",  "mu-", "ta-"],                                                                                                       
+          "L"  : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-"],                                                                                   
+          "jet" : ["q", "g", "c", "pi"],                                                                                                      
+          "all" : ["e+",  "mu+", "ta+", "e-", "mu-", "ta-", "W+", "W-","Z",                                                                   
+                   "photon","higgs","t+","t-","b","c","q","g","c","pi"]}
 
 def getName(pdg):
     """
@@ -25,6 +41,7 @@ def getName(pdg):
     :returns: particle name (e.g. gluino, mu-, ...)
     
     """
+
     p = int(pdg)
     if p in rOdd:
         return rOdd[p]
@@ -43,6 +60,7 @@ def getPdg(name):
     :returns: particle pdg; None, if name could not be resolved
     
     """
+    from smodels.particlesLoader import rEven, rOdd
     for (pdg, pname) in rOdd.items():
         if name == pname:
             return abs(pdg)
@@ -64,6 +82,7 @@ def elementsInStr(instring,removeQuotes=True):
     :returns: list of elements appearing in instring in string format
     
     """
+    from smodels.particlesLoader import rEven, rOdd
     
     outstr = ""
     if isinstance(instring,str):
@@ -122,6 +141,10 @@ def vertInStr(instring):
     """
     Parses instring (or a list of strings) and returns the list of particle
     vertices appearing in instring.
+    
+    :param instring: string containing elements (e.g. "[[['e+']],[['e-']]]+[[['mu+']],[['mu-']]]")
+    
+    :returns: list of elements appearing in instring in string format
     
     """
     if type(instring) == type('st'):
@@ -184,6 +207,7 @@ def simParticles(plist1, plist2, useDict=True):
                     e+ or e-, l+ to stand for e+ or mu+, etc 
     :returns: True/False if the particles list match (ignoring order)    
     """
+    
 
     if not isinstance(plist1,list) or type(plist1) != type(plist2):
         logger.error("Input must be a list")

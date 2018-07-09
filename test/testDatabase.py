@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: testDatabase
@@ -35,8 +35,10 @@ class DatabaseTest(unittest.TestCase):
 
     def testSelectors(self):
         from databaseLoader import database 
-        validated = database.getExpResults ( useNonValidated = False )
-        nonval = database.getExpResults ( useNonValidated = True )
+        validated = database.getExpResults(analysisIDs=['*:8*TeV','CMS-PAS-SUS-15-002','CMS-PAS-SUS-16-024'],
+                                            useNonValidated = False )
+        nonval = database.getExpResults(analysisIDs=['*:8*TeV','CMS-PAS-SUS-15-002','CMS-PAS-SUS-16-024'],
+                                         useNonValidated = True )
         #print ( "validated=",len(validated),map ( str, validated ) )
         self.assertTrue ( len(validated)==9 )
         self.assertTrue ( len(nonval)==10 )

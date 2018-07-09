@@ -6,9 +6,11 @@
         
 """
 
-from smodels.theory.particleNames import simParticles, elementsInStr, getFinalStateLabel, InclusiveStr
-from smodels.tools.physicsUnits import fb
-from smodels.particles import rEven, ptcDic, finalStates
+import sys
+from smodels.theory.particleNames import simParticles, elementsInStr
+from smodels.tools.physicsUnits import fb, MeV
+from smodels.particlesLoader import rEven
+from smodels.theory.particleNames import ptcDic
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 

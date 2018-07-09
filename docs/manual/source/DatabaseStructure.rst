@@ -61,7 +61,7 @@ The third level of the directory hierarchy encodes the |ExpRess|:
 * ...
 
 
-* **The Database folder is described by the** `Database Class <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
+* **The Database folder is described by the** `Database Class <experiment.html#experiment.databaseObj.Database>`_
 
 Experimental Result Folder
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -79,8 +79,8 @@ data.  Here is the content of CMS-SUS-12-024/globalInfo.txt as an example:
 .. literalinclude:: /literals/globalInfo.txt
    :lines: 1-11
 
-* **Experimental Result folder is described by the** `ExpResult Class <../../../documentation/build/html/experiment.html#experiment.expResultObj.ExpResult>`_
-* **globalInfo files  are descrived by the** `Info Class <../../../documentation/build/html/experiment.html#experiment.infoObj.Info>`_
+* **Experimental Result folder is described by the** `ExpResult Class <experiment.html#experiment.expResultObj.ExpResult>`_
+* **globalInfo files  are descrived by the** `Info Class <experiment.html#experiment.infoObj.Info>`_
 
 Data Set Folder
 ^^^^^^^^^^^^^^^
@@ -90,9 +90,9 @@ Each |Dataset| folder (e.g. ``data``) contains:
 * the Upper Limit maps for |ULrs| or Efficiency maps for |EMrs| (``TxName.txt`` files)
 * a ``dataInfo.txt`` file containing meta information about the |Dataset|
 
-* **Data Set folders are  described by the** `DataSet Class <../../../documentation/build/html/experiment.html#experiment.datasetObj.DataSet>`_
-* **TxName files are described by the** `TxName Class <../../../documentation/build/html/experiment.html#experiment.txnameObj.TxName>`_
-* **dataInfo files are described by the** `Info Class <../../../documentation/build/html/experiment.html#experiment.infoObj.Info>`_
+* **Data Set folders are  described by the** `DataSet Class <experiment.html#experiment.datasetObj.DataSet>`_
+* **TxName files are described by the** `TxName Class <experiment.html#experiment.txnameObj.TxName>`_
+* **dataInfo files are described by the** `Info Class <experiment.html#experiment.infoObj.Info>`_
 
 Data Set Folder: Upper Limit Type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -172,12 +172,12 @@ The type of Python object (Python class, Python list,...) is shown in brackets.
 For convenience, below we explicitly list the main database folders/files and
 the Python objects they are mapped to:
 
-* |Database| folder :math:`\rightarrow` `Database Class <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
-* |ExpRes| folder :math:`\rightarrow` `ExpResult Class <../../../documentation/build/html/experiment.html#experiment.databaseObj.ExpResult>`_
-* |Dataset| folder :math:`\rightarrow` `DataSet Class <../../../documentation/build/html/experiment.html#experiment.datasetObj.DataSet>`_
-* ``globalInfo.txt`` file  :math:`\rightarrow` `Info Class <../../../documentation/build/html/experiment.html#experiment.infoObj.Info>`_
-* ``dataInfo.txt`` file  :math:`\rightarrow` `Info Class <../../../documentation/build/html/experiment.html#experiment.infoObj.Info>`_
-* ``Txname.txt`` file  :math:`\rightarrow` `TxName Class <../../../documentation/build/html/experiment.html#experiment.txnameObj.TxName>`_
+* |Database| folder :math:`\rightarrow` `Database Class <experiment.html#experiment.databaseObj.Database>`_
+* |ExpRes| folder :math:`\rightarrow` `ExpResult Class <experiment.html#experiment.databaseObj.ExpResult>`_
+* |Dataset| folder :math:`\rightarrow` `DataSet Class <experiment.html#experiment.datasetObj.DataSet>`_
+* ``globalInfo.txt`` file  :math:`\rightarrow` `Info Class <experiment.html#experiment.infoObj.Info>`_
+* ``dataInfo.txt`` file  :math:`\rightarrow` `Info Class <experiment.html#experiment.infoObj.Info>`_
+* ``Txname.txt`` file  :math:`\rightarrow` `TxName Class <experiment.html#experiment.txnameObj.TxName>`_
 
 
 .. _databasePickle:
@@ -186,7 +186,7 @@ Database: Binary (Pickle) Format
 --------------------------------
 
 At the first time of instantiating the 
-`Database <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
+`Database <experiment.html#experiment.databaseObj.Database>`_
 class, the text files in *<database-path>*.
 are loaded and parsed, and the corresponding                                                    
 data objects are built. The efficiency and upper limit maps themselves are                                                                    
@@ -212,7 +212,7 @@ version has changed, SModelS will automatically re-build the pickle file. This
 action may take a few minutes, but it is again performed only once.                                                                           
 If desired, the pickling process can be skipped using the option *force_load = `txt'*
 in the constructor of
-`Database <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_ .  
+`Database <experiment.html#experiment.databaseObj.Database>`_ .  
 
 
 ..
@@ -223,7 +223,7 @@ in the constructor of
  testing a single input file.  Furthermore this procedure does not have to be
  repeated every time SModelS is run.
  In order to avoid these issues, SModelS serializes the 
- `database object <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
+ `database object <experiment.html#experiment.databaseObj.Database>`_
  into a pickle file (*<database-path>/database.pcl*), which can then be read
  directly when loading the database.
  Since reading the pickle file is much faster than parsing the :ref:`database folders <folderStruct>`,
@@ -233,9 +233,9 @@ in the constructor of
  SModelS will automatically re-build the pickle file.
  This action may take a few minutes, but it is only performed once.
  SModelS automatically builds (if necessary) and loads the binary database when a 
- `Database object <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_
+ `Database object <experiment.html#experiment.databaseObj.Database>`_
  is created. Nonetheless, the user can enforce loading (parsing) the *text
  database* using the option *force_load = 'txt'* in the constructor of
- `Database <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database>`_ .  
+ `Database <experiment.html#experiment.databaseObj.Database>`_ .  
 
-* The pickle file is created by the `createBinaryFile method <../../../documentation/build/html/experiment.html#experiment.databaseObj.Database.createBinaryFile>`_ 
+* The pickle file is created by the `createBinaryFile method <experiment.html#experiment.databaseObj.Database.createBinaryFile>`_ 

@@ -58,10 +58,15 @@ copy_files:
 	cp ../../cpp/run.cpp source/images/
 	cp ../../Example.py source/examples/
 
+update_code:
+	sphinx-apidoc -f -T -o source/ ../../smodels/experiment/
+	sphinx-apidoc -f -T -o source/ ../../smodels/theory/
+	sphinx-apidoc -f -T -o source/ ../../smodels/tools/
+
 RstFilesFromHelp:
 	./rstFromHelpFiles.py
 
-html: copy_files recipes RstFilesFromHelp htmlnorecipes
+html: update_code copy_files recipes RstFilesFromHelp htmlnorecipes
 
 htmlnorecipes:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html

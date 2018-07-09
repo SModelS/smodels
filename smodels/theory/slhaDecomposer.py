@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: slhaDecomposer
@@ -16,7 +16,7 @@ from smodels.theory import element, topology, crossSection
 from smodels.theory.branch import Branch, decayBranches
 from smodels.tools.physicsUnits import fb, GeV, mm, m, MeV,fm
 import math
-import smodels.particles
+from smodels.particlesLoader import rEven, rOdd
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -167,17 +167,17 @@ def _getDictionariesFromSLHA(slhafile):
     
     # Get mass and branching ratios for all particles
     brDic = {}
-    writeIgnoreMessage( res.decays.keys(), rEven, rOdd )
+    writeIgnoreMessage(res.decays.keys(), rEven, rOdd)
 
     for pid in res.decays.keys():
-        if not pid in list(rOdd):
+        if not pid in list(rOdd.keys()):
             continue
         brs = []
         for decay in res.decays[pid].decays:
             nEven = nOdd = 0.
             for pidd in decay.ids:
-                if pidd in rOdd: nOdd += 1
-                elif pidd in rEven: nEven += 1
+                if pidd in rOdd.keys(): nOdd += 1
+                elif pidd in rEven.keys(): nEven += 1
                 else:
                     logger.warning("Particle %i not defined in particles.py,decay %i -> [%s] will be ignored" %(pidd,pid,decay.ids))
                     break

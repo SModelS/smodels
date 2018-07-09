@@ -56,7 +56,6 @@ For your convenience, the relevant
 citations are provided in bibtex format in *references.bib*.
 
 For citing the experimental analyses in the database, you can use
-
 *smodels-database/database.bib*.
 
 .. _manual: https://arxiv.org/abs/1701.06586
@@ -66,4 +65,3 @@ For citing the experimental analyses in the database, you can use
 .. _pyslha: http://www.insectnation.org/projects/pyslha.html
 .. _NLL-fast: http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast 
 .. _SModelS online manual: http://smodels.readthedocs.io/
-

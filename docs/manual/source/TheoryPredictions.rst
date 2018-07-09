@@ -55,7 +55,12 @@ Consequently, in this case SModelS must compute |sigBRe| for each |element|, usi
 the corresponding |Dataset|. The final theoretical prediction is the sum over all |elements|
 with a non-zero value of |sigBRe|.
 This value can then be compared with the signal upper limit for the respective 
-signal region (|dataset|).
+signal region (|dataset|). 
+
+For experimental results for which the covariance matrix is provided, it
+is possible to combine all the signal regions (see :ref:`Combination of Signal Regions <combineSRs>`).
+In this case the final theory prediction corresponds to the sum of |sigBRe| over all signal regions (and all elements)
+and the upper limit is computed for this sum.
 
 Although the details of the theoretical prediction computation differ depending on the type
 of |ExpRes| (|ULrs| or |EMrs|), the overall procedure is common for both type of results. Below we schematically
@@ -79,7 +84,7 @@ Below we describe in detail the *element selection* and *element clustering*
 methods for computing the theory predictions for each type
 of |ExpRes| separately.
 
-* **Theory predictions are computed using the** `theoryPredictionsFor <../../../documentation/build/html/theory.html#theory.theoryPrediction.theoryPredictionsFor>`_ **method** 
+* **Theory predictions are computed using the** `theoryPredictionsFor <theory.html#theory.theoryPrediction.theoryPredictionsFor>`_ **method** 
 
 .. _thePredUL:
 
@@ -114,7 +119,7 @@ The procedure described above is illustrated graphically in the figure below for
 
 
 
-* **The element selection is implemented by the** `getElementsFrom <../../../documentation/build/html/theory.html#theoryPrediction._getElementsFrom>`_ **method**
+* **The element selection is implemented by the** `getElementsFrom <theory.html#theoryPrediction._getElementsFrom>`_ **method**
 
 .. _ULcluster:
 
@@ -141,7 +146,7 @@ measure of the distance between two |element| masses, as described in :ref:`Mass
 
 
 If two of the selected |elements| have a :ref:`mass distance <massdist>` smaller
-than a maximum value (defined by `maxDist <../../../documentation/build/html/theory.html#theory.clusterTools.clusterElements>`_),
+than a maximum value (defined by `maxDist <theory.html#theory.clusterTools.clusterElements>`_),
 they are gouped in the same mass cluster, as illustrated by the example below:
 
 
@@ -155,7 +160,7 @@ and compared against the experimental upper limit.
 
 
 
-* **The clustering of elements is implemented by the** `clusterElements <../../../documentation/build/html/theory.html#theory.clusterTools.clusterElements>`_  **method**.
+* **The clustering of elements is implemented by the** `clusterElements <theory.html#theory.clusterTools.clusterElements>`_  **method**.
 
 .. _massdist:  
 
@@ -179,7 +184,7 @@ upper limits. More explicitly:
                                        & \Rightarrow \mbox{mass distance}(A,B) = \frac{|x-y|}{(x+y)/2}
    
 where :math:`M_A,M_B` (:math:`x,y`) are the mass arrays (upper limits) for the |elements| A and B, respectively.
-If the mass distance of two |elements| is smaller than `maxDist <../../../documentation/build/html/theory.html#theory.clusterTools.clusterElements>`_,
+If the mass distance of two |elements| is smaller than `maxDist <theory.html#theory.clusterTools.clusterElements>`_,
 the two masses are considered similar.
 
 Notice that the above definition of mass distance quantifies the experimental analysis
@@ -187,7 +192,7 @@ sensitivity to mass differences, which is the relevant parameter when :ref:`clus
 Also, a check is performed to ensure that masses with very distinct values but similar upper limits are not
 clustered together.
 
-* **The mass distance function is implemented by the** `distance <../../../documentation/build/html/theory.html#theory.auxiliaryFunctions.distance>`_ **method**
+* **The mass distance function is implemented by the** `distance <theory.html#theory.auxiliaryFunctions.distance>`_ **method**
 
 
 
@@ -233,7 +238,7 @@ Nonetheless, the element selection for a  |Dataset| is usually more inclusive th
 the one applied for the |ULr|, resulting in less conservative values for the theory prediction.
 
 
-* **The element selection is implemented by the** `getElementsFrom <../../../documentation/build/html/theory.html#theoryPrediction._getElementsFrom>`_ **method**
+* **The element selection is implemented by the** `getElementsFrom <theory.html#theoryPrediction._getElementsFrom>`_ **method**
 
 .. _EMcluster:
 
@@ -249,7 +254,7 @@ As a result, after the :ref:`element selection <EMselection>` all elements belon
 .. image:: images/EMcluster.png
    :width: 80%
 
-* **The (trivial) clustering of elements is implemented by the** `clusterElements <../../../documentation/build/html/theory.html#theory.clusterTools.clusterElements>`_  **method**.
+* **The (trivial) clustering of elements is implemented by the** `clusterElements <theory.html#theory.clusterTools.clusterElements>`_  **method**.
 
 
 

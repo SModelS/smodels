@@ -1,12 +1,14 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: databaseObj
-   :synopsis: Contains Database class that represents the database of experimental results.
+   :synopsis: Contains Database class that represents the database of
+   experimental results.
 
 .. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+.. moduleauthor:: Matthias Wolf <matthias.wolf@wot.at>
 
 """
 
@@ -23,6 +25,7 @@ from smodels.experiment.metaObj import Meta
 from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.tools.physicsUnits import TeV
+from smodels.tools.stringTools import cleanWalk
 from smodels.tools.smodelsLogging import logger
 import logging
 
@@ -44,9 +47,10 @@ class Database(object):
     """
 
     def __init__( self, base=None, force_load = None, discard_zeroes = True,
-                  progressbar = False, subpickle = False ):
+                  progressbar = False, subpickle = True ):
         """
-        :param base: path to the database, or pickle file (string)
+        :param base: path to the database, or pickle file (string), or http
+            address. If None, or "official", use the official database.
         :param force_load: force loading the text database ("txt"),
             or binary database ("pcl"), dont force anything if None
         :param discard_zeroes: discard txnames with only zeroes as entries.
@@ -55,18 +59,27 @@ class Database(object):
         :param subpickle: produce small pickle files per exp result.
             Should only be used when working on the database.
         """
+        self.source=""
         self.force_load = force_load
         self.subpickle = subpickle
+        if base in [ None, "official" ]:
+            from smodels.installation import officialDatabase
+            base = officialDatabase()
+        if base in [ "unittest" ]:
+            from smodels.installation import testDatabase
+            base = testDatabase()
         base, pclfile = self.checkPathName(base, discard_zeroes )
         self.pcl_meta = Meta( pclfile )
         self.expResultList = []
-        self.txt_meta = Meta ( base, discard_zeroes = discard_zeroes )
+        self.txt_meta = self.pcl_meta
+        if not self.force_load == "pcl":
+            self.txt_meta = Meta ( base, discard_zeroes = discard_zeroes )
         self.progressbar = None
         if progressbar:
             try:
                 import progressbar as P
-                self.progressbar = P.ProgressBar( widgets= 
-                        [ "Building Database ", P.Percentage(), 
+                self.progressbar = P.ProgressBar( widgets=
+                        [ "Building Database ", P.Percentage(),
                           P.Bar( marker=P.RotatingMarker() ), P.ETA() ] )
             except ImportError as e:
                 logger.warning ( "progressbar requested, but python-progressbar is not installed." )
@@ -170,8 +183,11 @@ class Database(object):
                 self.pcl_meta.format_version = -1
                 self.pcl_meta.mtime = 0
                 return self
-            logger.error ( "%s is not a binary database file, recreate it." % \
-                            ( self.pcl_meta.pathname ) )
+            logger.error ( "%s is not readable (%s)." % \
+                            ( self.pcl_meta.pathname, str(e) ) )
+            if self.source in [ "http", "ftp", "pcl" ]:
+                logger.error ( "source cannot be rebuilt. supply a different path to the database in your ini file." )
+                sys.exit()
             self.createBinaryFile()
         # self.txt_meta = self.pcl_meta
         return self
@@ -203,8 +219,11 @@ class Database(object):
     def createBinaryFile ( self, filename=None ):
         """ create a pcl file from the text database,
             potentially overwriting an old pcl file. """
+        if self.txt_meta == None:
+            logger.error ( "Trying to create database pickle, but no txt_meta defined." )
+            sys.exit()
         logger.debug ( "database timestamp: %s, filecount: %d" % \
-                ( time.ctime ( self.txt_meta.mtime ), self.txt_meta.filecount ) )
+                     ( time.ctime ( self.txt_meta.mtime ), self.txt_meta.filecount ) )
         binfile = filename
         if binfile == None:
             binfile = self.pcl_meta.pathname
@@ -228,6 +247,20 @@ class Database(object):
         """
         return self.txt_meta.databaseVersion
 
+    def inNotebook(self):
+        """
+        Are we running within a notebook? Has an effect on the
+        progressbar we wish to use.
+        """
+        ret = False
+        try:
+            cfg = get_ipython().config 
+            if 'IPKernelApp' in cfg.keys():
+                return True
+            else:
+                return False
+        except NameError:
+            return False
 
     @property
     def base(self):
@@ -249,7 +282,12 @@ class Database(object):
             return "%.1f%s%s" % (num, 'Yi', suffix)
 
         import requests
-        r = requests.get( path )
+        try:
+            r = requests.get( path )
+        except Exception as e:
+            logger.error ( "Exception when trying to fetch database: %s" % e )
+            logger.error ( "Consider supplying a different database path in the ini file (possibly a local one)" )
+            sys.exit()
         if r.status_code != 200:
             logger.error ( "Error %d: could not fetch %s from server." % \
                            ( r.status_code, path ) )
@@ -267,16 +305,20 @@ class Database(object):
         r2=requests.get ( r.json()["url"], stream=True )
         filename= "./" + r2.url.split("/")[-1]
         with open ( filename, "wb" ) as dump:
-            print ( "         " + " "*51 + "<", end="\r" )
+            if not self.inNotebook(): ## \r doesnt work in notebook
+                print ( "         " + " "*51 + "<", end="\r" )
             print ( "loading >", end="" )
             for x in r2.iter_content(chunk_size=int ( size / 50 ) ):
                 dump.write ( x )
                 dump.flush ()
                 print ( ".", end="" )
                 sys.stdout.flush()
-            print()
+            if self.inNotebook():
+                print ( "done." )
+            else:
+                print()
             dump.close()
-        logger.info ( "fetched %s in %d secs." % ( r2.url, time.time()-t0 ) ) 
+        logger.info ( "fetched %s in %d secs." % ( r2.url, time.time()-t0 ) )
         logger.debug ( "store as %s" % filename )
         #with open( filename, "wb" ) as f:
         #    f.write ( r2.content )
@@ -287,7 +329,10 @@ class Database(object):
 
     def fetchFromServer ( self, path, discard_zeroes ):
         import requests, time, json
-        logger.debug ( "need fetch from server: %s" % path )
+        logger.debug ( "need to fetch from server: %s" % path )
+        self.source = "http"
+        if "ftp://" in path:
+            self.source = "ftp"
         store = "." + path.replace ( ":","_" ).replace( "/", "_" ).replace(".","_" )
         if not os.path.isfile ( store ):
             ## completely new! fetch the description and the db!
@@ -316,7 +361,7 @@ class Database(object):
         if r.json()["lastchanged"] > jsn["lastchanged"]:
             ## has changed! redownload everything!
             return self.fetchFromScratch ( path, store, discard_zeroes )
-        
+
         if not os.path.isfile ( filename ):
             return self.fetchFromScratch ( path, store, discard_zeroes )
         self.force_load = "pcl"
@@ -329,30 +374,28 @@ class Database(object):
         returns the base directory and the pickle file name.
         If path starts with http or ftp, fetch the description file
         and the database.
-        :returns: directory name, (full) pickle file name
+        returns the base directory and the pickle file name
         """
         logger.debug('Try to set the path for the database to: %s', path)
         if path.startswith( ( "http://", "https://", "ftp://" ) ):
             return self.fetchFromServer ( path, discard_zeroes )
         if path.startswith( ( "file://" ) ):
             path=path[7:]
-            
+
         tmp = os.path.realpath(path)
         if os.path.isfile ( tmp ):
             base = os.path.dirname ( tmp )
             return ( base, tmp )
 
         if tmp[-4:]==".pcl":
+            self.source="pcl"
             if not os.path.exists ( tmp ):
                 if self.force_load == "pcl":
                     logger.error ( "File not found: %s" % tmp )
                     sys.exit()
                 logger.info ( "File not found: %s. Will generate." % tmp )
                 base = os.path.dirname ( tmp )
-                # self.pcl_meta.pathname = os.path.basename ( tmp )
                 return ( base, tmp )
-                #if self.force_load in [ "txt", None, "None", "none" ]:
-                #sys.exit()
             logger.error ( "Supplied a pcl filename, but %s is not a file." % tmp )
             sys.exit()
 
@@ -361,6 +404,7 @@ class Database(object):
             logger.error('%s is no valid path!' % path)
             raise DatabaseNotFoundException("Database not found")
         m=Meta ( path, discard_zeroes = discard_zeroes )
+        self.source="txt"
         return ( path, path + m.getPickleFileName() )
 
     def __str__(self):
@@ -406,7 +450,9 @@ class Database(object):
 
         """
         folders=[]
-        for root, _, files in os.walk(self.txt_meta.pathname):
+        #for root, _, files in os.walk(self.txt_meta.pathname):
+        # for root, _, files in cleanWalk(self._base):
+        for root, _, files in cleanWalk(self.txt_meta.pathname):
             folders.append ( (root, files) )
         folders.sort()
 
@@ -443,7 +489,7 @@ class Database(object):
 
     def createExpResult ( self, root ):
         """ create, from pickle file or text files """
-        txtmeta = Meta ( root, discard_zeroes = self.txt_meta.discard_zeroes, 
+        txtmeta = Meta ( root, discard_zeroes = self.txt_meta.discard_zeroes,
                          hasFastLim=None, databaseVersion = self.databaseVersion )
         pclfile = "%s/.%s" % ( root, txtmeta.getPickleFileName() )
         logger.debug ( "Creating %s, pcl=%s" % (root,pclfile ) )
@@ -490,10 +536,17 @@ class Database(object):
         in the list.  If txname is defined, returns only the results matching
         one of the Tx names in the list.
 
-        :param analysisID: list of analysis ids ([CMS-SUS-13-006,...])
-        :param dataType: dataType of the analysis (all, efficiencyMap or upperLimit)
-        :param datasetIDs: list of dataset ids ([ANA-CUT0,...])
-        :param txnames: list of txnames ([TChiWZ,...])
+        :param analysisID: list of analysis ids ([CMS-SUS-13-006,...]). Can
+                            be wildcarded with usual shell wildcards: * ? [<letters>]
+                            Furthermore, the centre-of-mass energy can be chosen
+                            as suffix, e.g. ":13*TeV". Note that the asterisk
+                            in the suffix is not a wildcard.
+        :param datasetIDs: list of dataset ids ([ANA-CUT0,...]). Can be wildcarded
+                            with usual shell wildcards: * ? [<letters>]
+        :param txnames: list of txnames ([TChiWZ,...]). Can be wildcarded with
+                            usual shell wildcards: * ? [<letters>]
+        :param dataTypes: dataType of the analysis (all, efficiencyMap or upperLimit)
+                            Can be wildcarded with usual shell wildcards: * ? [<letters>]
         :param useSuperseded: If False, the supersededBy results will not be included
         :param useNonValidated: If False, the results with validated = False
                                 will not be included
@@ -503,6 +556,12 @@ class Database(object):
                   contains only one result
 
         """
+        if type(analysisIDs)==str: analysisIDs=[analysisIDs]
+        if type(datasetIDs)==str: datasetIDs=[datasetIDs]
+        if type(txnames)==str: txnames=[txnames]
+        if type(dataTypes)==str: dataTypes=[dataTypes]
+
+        import fnmatch
         expResultList = []
         for expResult in self.expResultList:
             superseded = None
@@ -510,22 +569,61 @@ class Database(object):
                 superseded = expResult.globalInfo.supersededBy.replace(" ","")
             if superseded and (not useSuperseded):
                 continue
-            ID = expResult.globalInfo.getInfo('id')
+
+            analysisID = expResult.globalInfo.getInfo('id')
+            sqrts = expResult.globalInfo.getInfo('sqrts')
+
             # Skip analysis not containing any of the required ids:
             if analysisIDs != ['all']:
-                if not ID in analysisIDs:
+                hits=False
+                for patternString in analysisIDs:
+                    # Extract centre-of-mass energy
+                    # Assuming 0 or 1 colons.
+                    pattern = patternString.split(':')
+                    hits = fnmatch.filter ( [ analysisID ], pattern[0] )
+                    if len ( pattern ) > 1:
+                        # Parse suffix
+                        # Accepted Strings: ":13", ":13*TeV", ":13TeV", ":13 TeV"
+                        # Everything else will yield an error at the unum-conversion (eval())
+                        if pattern[1].endswith('TeV'):
+                            pattern[1] = pattern[1][:-3]
+                        if pattern[1][-1] in [" ", "*"]:
+                            pattern[1] = pattern[1][:-1]
+                        pattern[1] += "*TeV"
+                        if sqrts != eval(pattern[1]):
+                            hits = False
+                    if hits:
+                        break
+                        # continue
+                if not hits:
                     continue
+
             newExpResult = ExpResult()
             newExpResult.path = expResult.path
             newExpResult.globalInfo = expResult.globalInfo
             newExpResult.datasets = []
+
             for dataset in expResult.datasets:
                 if dataTypes != ['all']:
-                    if not dataset.dataInfo.dataType in dataTypes:
+                    hits=False
+                    for pattern in dataTypes:
+                        hits = fnmatch.filter ( [ dataset.dataInfo.dataType ], pattern )
+                        if hits:
+                            break
+                            #continue
+                    if not hits:
                         continue
-                if datasetIDs != ['all']:
-                    if not dataset.dataInfo.dataId in datasetIDs:
+
+                if hasattr(dataset.dataInfo, 'dataID') and datasetIDs != ['all']:
+                    hits=False
+                    for pattern in datasetIDs:
+                        hits = fnmatch.filter ( [ dataset.dataInfo.dataID ], pattern )
+                        if hits:
+                            break
+                            # continue
+                    if not hits:
                         continue
+
                 newDataSet = datasetObj.DataSet( dataset.path, dataset.globalInfo,
                        False, discard_zeroes=self.txt_meta.discard_zeroes )
                 newDataSet.dataInfo = dataset.dataInfo
@@ -543,8 +641,15 @@ class Database(object):
 #                    if txname.validated is False and (not useNonValidated):
                         continue
                     if txnames != ['all']:
-                        if not txname.txName in txnames:
+                        #Replaced by wildcard-evaluation below (2018-04-06 mat)
+                        hits=False
+                        for pattern in txnames:
+                            hits = fnmatch.filter ( [ txname.txName ], pattern )
+                            if hits:
+                                continue
+                        if not hits:
                             continue
+
                     if onlyWithExpected and dataset.dataInfo.dataType == \
                         "upperLimit" and not txname.txnameDataExp:
                         continue

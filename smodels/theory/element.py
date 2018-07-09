@@ -9,7 +9,6 @@
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.branch import Branch,InclusiveBranch
 from smodels.theory import crossSection
-from smodels.particles import rEven, ptcDic
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -159,7 +158,6 @@ class Element(object):
                                 check the same branch ordering
         :returns: True, if particles match; False, else;        
         """
-
         
         if not isinstance(other,Element):
             return False
@@ -191,9 +189,7 @@ class Element(object):
         
         :returns: copy of element (Element object)   
         """
-
-        #Allows for derived classes (like wildcard classes)
-        newel = self.__class__()
+        newel = Element()
         newel.branches = []
         for branch in self.branches:
             newel.branches.append(branch.copy())
@@ -257,18 +253,6 @@ class Element(object):
         for branch in self.branches:
             ptcarray.append(branch.particles)
         return ptcarray
-    
-    def getFinalStates(self):
-        """
-        Get the array of particles in the element.
-        
-        :returns: list of particle strings                
-        """
-        
-        fsarray = []
-        for branch in self.branches:
-            fsarray.append(branch.finalState)
-        return fsarray    
 
 
     def getMasses(self):
@@ -293,9 +277,9 @@ class Element(object):
         """
         
         pids = []
-        for PIDlist in self.branches[0].PIDs:            
-            for PIDlist2 in self.branches[1].PIDs:
-                pids.append([PIDlist,PIDlist2])
+        for ipid,PIDlist in enumerate(self.branches[0].PIDs):            
+            for ipid2,PIDlist2 in enumerate(self.branches[1].PIDs):
+                pids.append([self.branches[0].PIDs[ipid],self.branches[1].PIDs[ipid2]])
         
         return pids
 
@@ -344,10 +328,8 @@ class Element(object):
         vertnumb = []
         vertparts = []
         for branch in self.branches:
-            if branch.vertnumb is None:
-                branch.setInfo()
-            vertparts.append(branch.vertparts)
-            vertnumb.append(branch.vertnumb)
+            vertparts.append([len(ptcs) for ptcs in branch.particles])
+            vertnumb.append(len(branch.particles))
                 
         return {"vertnumb" : vertnumb, "vertparts" : vertparts}
 
@@ -499,9 +481,6 @@ class Element(object):
 
         # Loop over branches
         for ib, branch in enumerate(self.branches):
-            #Make sure to only compress branches ending up in MET
-            if not branch.finalState == 'MET':
-                continue
             particles = branch.particles
             if not branch.particles:
                 continue # Nothing to be compressed

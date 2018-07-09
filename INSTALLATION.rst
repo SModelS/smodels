@@ -1,1 +1,0 @@
-smodels/INSTALLATION.rst

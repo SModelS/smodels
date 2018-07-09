@@ -80,7 +80,7 @@ in the :ref:`parameters file <parameterFile>`.
 In the output, contributions in each category are ordered by cross section. 
 By default only the ones with the ten largest cross sections are shown.
 
-* **The topology coverage tool is implemented by the** `Uncovered class <../../../documentation/build/html/tools.html#tools.coverage.Uncovered>`_ 
+* **The topology coverage tool is implemented by the** `Uncovered class <tools.html#tools.coverage.Uncovered>`_ 
 
 
 .. [*] If :ref:`mass <massComp>` or :ref:`invisible compression <invComp>` are turned on, elements which can be :ref:`compressed <elementComp>` are not considered, to avoid double counting.

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: runCompleteTestSuite
@@ -35,13 +35,10 @@ def verbose_run():
     n_tests, n_failed = 0, 0
     for series in alltests:
         for test in series:
-            if type(test) != unittest.TestSuite:
-                print ( "Error: %s is not a TestSuite" % test )
-                sys.exit()
             for t in test:
+                n_tests += 1
                 print ( "[#%3d] %s ... " % ( n_tests, t.id() ), end="" )
                 sys.stdout.flush()
-                n_tests += 1
                 try:
                     a=t.debug()
                 except Exception as e:

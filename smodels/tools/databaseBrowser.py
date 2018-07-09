@@ -36,6 +36,8 @@ class Browser(object):
         if force_txt == True:
             load = "txt"
         if isinstance(database,str):
+            if database.endswith(".pcl"):
+                load = "pcl"
             self.database = Database(database, load )
         elif isinstance(database,Database):
             self.database = database
@@ -88,10 +90,10 @@ class Browser(object):
 
         fieldDict = []
         if expResult and isinstance(expResult,ExpResult):
-            fieldDict = list(expResult.__dict__.items())[:]   #Use only the entries for the expResult
+            fieldDict = list(expResult.__dict__.items())   #Use only the entries for the expResult
         else:
             for expResult in self:
-                fieldDict += list(expResult.__dict__.items())[:]     #Use all entries/expResults
+                fieldDict += list(expResult.__dict__.items())     #Use all entries/expResults
         valuesDict = {}
         while fieldDict:
             for field,value in fieldDict[:]:
@@ -100,8 +102,8 @@ class Browser(object):
                     else: valuesDict[field].append(value)
                 else:
                     if isinstance(value,list):
-                        for entry in value: fieldDict += list(entry.__dict__.items())[:]
-                    else: fieldDict += list(value.__dict__.items())[:]
+                        for entry in value: fieldDict += list(entry.__dict__.items())
+                    else: fieldDict += list(value.__dict__.items())
                 fieldDict.remove((field,value))
 
         #Try to keep only the set of unique values
@@ -164,7 +166,7 @@ class Browser(object):
             used for efficiencyMap results." % (expid))
             return None
 
-        return expres.getEfficiencyFor ( dataset, txname, massarray )
+        return expres.getEfficiencyFor(txname=txname, mass=massarray, dataset=dataset)
 
     def getULFor(self,expid,txname,massarray, expected=False ):
         """
@@ -231,7 +233,7 @@ class Browser(object):
             return None
 
         for dataset in expres.datasets:
-            if dataset.dataInfo.dataId != datasetID:
+            if dataset.getID() != datasetID:
                 continue
             return dataset.getSRUpperLimit()
 
@@ -314,7 +316,7 @@ def main(args):
         header += "\n"
         header += "fb, pb, GeV, TeV defined.\n"
         header +=  "\nBrowser loaded for %s \n" %( args.path_to_database )
-        header += "Try 'print browser' for the list of available results.\n"
+        header += "Try 'print(browser)' for the list of available results.\n"
         header += "More examples on how to access the database can be found in the SModelS manual.\n"
         header += "\nType 'exit' to exit this session."
 

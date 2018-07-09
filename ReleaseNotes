@@ -1,24 +1,31 @@
-
-Release v1.2, ??
+Release v1.2, dd/mm 2018
 =======================================================
 
-  * added option in python printer to print the contribution from each txname
-  * added finalState property for Elements (backwards compatible)
-  * improvements in some error msgs
-  * introduced wildcard branches
-  * allows for non-prompt (long-lived) BSM particles
-  * added final state definitions in particles.py
+  * Added finalState property for Elements (backwards compatible)
+  * Introduced inclusive branches and particles
+  * Allows for non-prompt (long-lived) BSM particles
+  * Added final state definitions in particleNames.py
 
-Release v1.1.2, Mon 26 Feb 2018
+Release v1.1.3, dd/mm 2018
 =======================================================
 
-  * Fixed lastUpdate bug
-  * Changes in pickling (e.g. subpickling, removing redundant zeroes)
-  * Database path allows URLs
-  * Option to show individual contribution from
+  * support for covariance matrices and combination of signal regions
+  * path to particles.py can now be specified in parameters.ini file
+  * wildcards allowed when selecting analyses, datasets, txnames
+  * Added option to show individual contributions from
     topologies to total theory prediction
-  * smodelsTools.py has fixpermissions, for system-wide installs
+  * Database path allows URLs
+  * Python default changed from python2 to python3
+  * Fixed lastUpdate bug, now giving correct date 
+  * Changes in pickling (e.g. subpickling, removing redundant zeroes)
+  * smodelsTools.py now has fixpermissions, for system-wide installs
+  * fixed small issue with pair production of even particles
+  * Moved the code documentation to the manual
+ 
+Release v1.1.2, Fri 02 Mar 2018
+=======================================================
 
+  * Database update only, the code is identical with v1.1.1
 
 Release v1.1.1, Tue 27 Jun 2017
 =======================================================

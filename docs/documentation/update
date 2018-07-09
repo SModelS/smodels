@@ -1,5 +1,0 @@
-sphinx-apidoc -f -T -o source/ ../../smodels/experiment/
-sphinx-apidoc -f -T -o source/ ../../smodels/theory/
-sphinx-apidoc -f -T -o source/ ../../smodels/tools/
-make clean
-make html

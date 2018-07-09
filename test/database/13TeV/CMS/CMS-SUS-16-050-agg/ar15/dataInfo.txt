@@ -1,0 +1,8 @@
+dataId: ar15
+dataType: efficiencyMap
+observedN: 69
+expectedBG: 67.0
+bgError: 17.852170736355845
+upperLimit: 1.137516*fb
+expectedUpperLimit: 1.079063*fb
+aggregated: t1b2MT2350__450MET250__400

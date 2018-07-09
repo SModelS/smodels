@@ -15,7 +15,7 @@ pythia8:
 	cd smodels/lib && make pythia8
 
 clean:
-	yes | rm -rf build dist smodels.egg-info
+	yes | rm -rf build dist
 	cd smodels/lib && make clean
 
 buildrpm:
@@ -28,7 +28,9 @@ pypi:
 	python setup.py sdist bdist_wheel
 	twine upload dist/*
 
-testpypi:
+testpypi: 
+	# to install from testpypi: 
+	# pip3 install --user --upgrade --index-url https://test.pypi.org/simple/ smodels
 	python setup.py sdist bdist_wheel
 	twine upload -r pypitest dist/*
 
