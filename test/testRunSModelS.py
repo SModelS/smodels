@@ -106,10 +106,9 @@ class RunSModelSTest(unittest.TestCase):
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                            ignore=ignoreFields)
              
-        for i in [ './outputHSC.py', './outputHSCP.pyc' ]:
-            if os.path.exists ( i ): os.remove ( i )
         self.assertTrue(equals)               
- 
+
+        self.removeOutputs(outputfile) 
      
     def testBadFile(self):
         # since 112 we skip non-existing slha files!

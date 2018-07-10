@@ -11,7 +11,6 @@
 from smodels.tools.physicsUnits import GeV, TeV, pb
 from smodels.theory import lheReader
 import pyslha
-import sys
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 

@@ -57,6 +57,7 @@ Expected r-Value: 6.589244963630262
 Chi2: 22.633432915475076
 Likelihood: 8.193807968109442e-07
 
+Total cross section considered (fb):  5.722E+02
 Total missing topology cross section (fb):  0.000E+00
 Total cross section where we are outside the mass grid (fb):  0.000E+00
 Total cross section in long cascade decays (fb):  0.000E+00

@@ -35,6 +35,7 @@ class Uncovered(object):
         self.motherIDs = []
         self.prevMothers = []
         self.outsideGridMothers = []
+        self.uncompressedEls = []
         self.getAllMothers(topoList)
         self.fill(topoList)
         self.asymmetricBranches.combine()
@@ -57,7 +58,10 @@ class Uncovered(object):
         :ivar topoList: sms topology list
         """
         for el in topoList.getElements(): # loop over all elements, by construction we start with the most compressed
-            if self.inPrevMothers(el): missing = False # cannot be missing if element with same mothers has already appeared
+            if not el.motherElements:
+                self.uncompressedEls.append(el) #Store all compressed elements
+            if self.inPrevMothers(el):
+                missing = False # cannot be missing if element with same mothers has already appeared
             # this is because it can certainly be compressed further to the smaller element already seen in the loop
             else: #if not the case, we add mothers to previous mothers and test if the topology is missin
                 self.addPrevMothers(el)
@@ -175,6 +179,17 @@ class Uncovered(object):
             mothers = newmothers
         return missingX
 
+    def getTotalXsec(self,sqrts=None):
+        """
+        Calculate total cross-section from decomposition (excluding compressed elements)
+        :ivar sqrts: sqrts
+        """
+        xsec = 0.
+        if not sqrts:
+            sqrts = self.sqrts
+        for el in self.uncompressedEls:
+            xsec += el.weight.getXsecsFor(sqrts).getMaxXsec().asNumber(fb)
+        return xsec
 
 
     def getMissingXsec(self, sqrts=None):

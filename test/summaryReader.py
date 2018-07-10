@@ -21,6 +21,16 @@ class Output():
     def __eq__(self, other):
         return fuzzycomp(self,other,self.allowedDiff)
 
+class TotalOutput():
+    def __init__(self, l,allowedDiff=0.):
+        self.weight = eval(l[-1])
+        self.allowedDiff = allowedDiff
+
+    def __eq__(self, other):
+        return fuzzycomp(self,other,self.allowedDiff)
+
+
+
 class MissOutput():
     def __init__(self, l,allowedDiff=0.):
         self.sqrts = eval(l[0])
@@ -57,6 +67,7 @@ class Summary():
         self.outsideTopos = []
         self.longTopos = []
         self.asymmetricTopos = []
+        self.totalXsec = []
         self.allowedDiff = allowedDiff
         self.read(filename)
         
@@ -85,6 +96,9 @@ class Summary():
                 continue
             if "#Analysis" in l:
                 resultLines = True
+                continue
+            elif "Total cross section considered" in l:
+                self.totalXsec.append(TotalOutput(l.split()))
                 continue
             elif "Missing topologies" in l:
                 missingLines = True
@@ -139,6 +153,8 @@ class Summary():
     def __eq__(self, other):
         if not len(self.results) == len(other.results):            
             return False
+        if not len(self.totalXsec) == len(other.totalXsec):
+            return False
         if not len(self.missedTopos) == len(other.missedTopos):
             return False
         if not len(self.outsideTopos) == len(other.outsideTopos):
@@ -149,7 +165,9 @@ class Summary():
             return False
 
         if self.results != other.results:
-            return False        
+            return False
+        if self.totalXsec != other.totalXsec:
+            return False                
         if self.missedTopos != other.missedTopos:
             return False
         if self.outsideTopos != other.outsideTopos:

@@ -191,17 +191,7 @@ class TheoryPrediction(object):
         ret += "                   datasets: %s\n" % ds
         ret += "      obs limit: %s\n" % self.getUpperLimit()
         ret += "      exp limit: %s\n" % self.getUpperLimit( expected=True )
-        # ret += "          obs limit (sigma): %s\n" % (self.getUpperLimit() / self.effectiveEff )
-        # eul_ = self.getUpperLimit( expected=True )
-        # eul = eul_
-        #if type(eul)!=type(None):
-        #    eul = eul / self.effectiveEff
-        # 
-        #ret += "          exp limit (sigma): %s\n" % ( eul )
         ret += "                      obs r: %f\n" % ( self.getRValue(expected=False) )
-        #exp_r = None
-#if type(eul_)!=type(None):
-#               exp_r = self.xsection.value / eul_
         ret += "                      exp r: %f\n" % ( self.getRValue(expected=True) )
         ret += "                       chi2: %s\n" % ( self.chi2 )
         return ret

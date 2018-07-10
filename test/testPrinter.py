@@ -137,7 +137,7 @@ class RunPrinterTest(unittest.TestCase):
         except AssertionError as e:
             msg = "%s != %s" %(sample, output) 
             raise AssertionError(msg)
-        self.removeOutputs ( outputfile )
+        self.removeOutputs(outputfile)
  
     def removeOutputs ( self, f ):
         """ remove cruft outputfiles """
@@ -169,7 +169,7 @@ class RunPrinterTest(unittest.TestCase):
         except AssertionError as e:
             print ( "Error: %s, when comparing %s \nwith %s." % (e,"output.py","gluino_squarks_default.py" ) )
             raise AssertionError(e)
-        self.removeOutputs ( './unitTestOutput/printer_output.py' )
+        self.removeOutputs('./unitTestOutput/printer_output.py')
  
     def testPythonPrinterSimple(self):
         self.removeOutputs ( './unitTestOutput/printer_output_simple.py' )
@@ -197,7 +197,7 @@ class RunPrinterTest(unittest.TestCase):
         except AssertionError as e:
             print ( "Error: %s, when comparing %s \nwith %s." % (e,"outputSimple.py","simplyGluino_default.py" ) )
             raise AssertionError(e)
-        self.removeOutputs ( './unitTestOutput/printer_output_simple.py' )
+        self.removeOutputs('./unitTestOutput/printer_output_simple.py')
   
   
     def testXmlPrinter(self):
@@ -225,7 +225,7 @@ class RunPrinterTest(unittest.TestCase):
         except AssertionError as e:
             msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
             raise AssertionError(msg)
-        self.removeOutputs ( './unitTestOutput/printer_output.xml' )  
+        self.removeOutputs( './unitTestOutput/printer_output.xml' )  
  
     def testXmlPrinterSimple(self):
         self.removeOutputs ( './unitTestOutput/printer_output_simple.xml' )  
@@ -252,7 +252,7 @@ class RunPrinterTest(unittest.TestCase):
         except AssertionError as e:
             msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
             raise AssertionError(msg)
-        self.removeOutputs ( './unitTestOutput/printer_output_simple.xml' )  
+        self.removeOutputs( './unitTestOutput/printer_output_simple.xml')  
 
 
 if __name__ == "__main__":

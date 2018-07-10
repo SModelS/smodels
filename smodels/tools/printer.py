@@ -74,9 +74,6 @@ class MPrinter(object):
             if parser.has_section(prt+'-printer'):
                 newPrinter.setOptions(parser.items(prt+'-printer'))
             self.Printers[prt] = newPrinter
-            
-                
-
 
     def addObj(self,obj):
         """
@@ -100,7 +97,6 @@ class MPrinter(object):
         
         for printer in self.Printers.values():
             printer.setOutPutFile(filename,silent=silent)
-
 
     def flush(self):
         """
@@ -485,7 +481,8 @@ class TxTPrinter(BasicPrinter):
         nprint = 10  # Number of missing topologies to be printed (ordered by cross sections)
 
         output = ""
-        output += "\nTotal missing topology cross section (fb): %10.3E\n" %(obj.getMissingXsec())
+        output += "\nTotal cross section considered (fb): %10.3E\n" %(obj.getTotalXsec())
+        output += "Total missing topology cross section (fb): %10.3E\n" %(obj.getMissingXsec())
         output += "Total cross section where we are outside the mass grid (fb): %10.3E\n" %(obj.getOutOfGridXsec())
         output += "Total cross section in long cascade decays (fb): %10.3E\n" %(obj.getLongCascadeXsec())
         output += "Total cross section in decays with asymmetric branches (fb): %10.3E\n" %(obj.getAsymmetricXsec())        
@@ -906,7 +903,8 @@ class PyPrinter(BasicPrinter):
             asymmetricBranches.append(asymmetric)
 
 
-        return {'Missed Topologies': missedTopos, 'Long Cascades' : longCascades,
+        return {'Total xsec considered (fb)' : obj.getTotalXsec(), 
+                'Missed Topologies': missedTopos, 'Long Cascades' : longCascades,
                      'Asymmetric Branches': asymmetricBranches, 'Outside Grid': outsideGrid}
     
 class XmlPrinter(PyPrinter):
