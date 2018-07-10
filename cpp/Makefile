@@ -11,6 +11,9 @@ GCC=g++
 
 all: library executable
 
+clean:
+	rm -rf run libSModelS.so
+
 library:
 	$(GCC) SModelS.cc -I. $(CFLAGS) $(LDFLAGS) $(libpython) -shared -fPIC -o libSModelS.so
 
