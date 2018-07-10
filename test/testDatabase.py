@@ -39,9 +39,9 @@ class DatabaseTest(unittest.TestCase):
                                             useNonValidated = False )
         nonval = database.getExpResults(analysisIDs=['*:8*TeV','CMS-PAS-SUS-15-002','CMS-PAS-SUS-16-024'],
                                          useNonValidated = True )
-        #print ( "validated=",len(validated),map ( str, validated ) )
-        self.assertTrue ( len(validated)==9 )
-        self.assertTrue ( len(nonval)==10 )
+#         print ( "validated=",len(validated),map ( str, validated ) )
+        self.assertTrue(len(validated)==8)
+        self.assertTrue(len(nonval)==9)
 
 
 

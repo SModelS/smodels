@@ -317,7 +317,7 @@ class Branch(object):
         brs = brDictionary[self.PIDs[0][-1]]       
         newBranches = []
         for br in brs:
-            if not br.br or not br.ids or not br.nda:
+            if not br.br:
                 continue  #Skip zero BRs            
             # Generate a new branch for each possible decay (including "stable decays")
             newBranches.append(self._addDecay(br, massDictionary))

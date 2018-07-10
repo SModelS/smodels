@@ -333,8 +333,8 @@ class TxTPrinter(BasicPrinter):
         output += "\n"
         output += "\t\t Particles in element: " + str(obj.getParticles())
         output += "\n"
-#         output += "\t\t Final states in element: " + str(obj.getFinalStates())
-#         output += "\n"        
+        output += "\t\t Final states in element: " + str(obj.getFinalStates())
+        output += "\n"        
         output += "\t\t The element masses are \n"
         for i, mass in enumerate(obj.getMasses()):
             output += "\t\t Branch %i: " % i + str(mass) + "\n"
