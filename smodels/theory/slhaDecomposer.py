@@ -16,7 +16,6 @@ from smodels.theory import element, topology, crossSection
 from smodels.theory.branch import Branch, decayBranches
 from smodels.tools.physicsUnits import fb, GeV, mm, m, MeV,fm
 import math
-from smodels.particlesLoader import rEven, rOdd
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -85,7 +84,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
         branchList[-1].masses = [massDic[pid]]
         branchList[-1].maxWeight = maxWeight[pid]
 
-    # Generate final branches (after all R-odd particles have decayed)    
+    # Generate final branches (after all R-odd particles have decayed)
     finalBranchList = decayBranches(branchList, brDic, massDic, sigcut)
     # Generate dictionary, where keys are the PIDs and values are the list of branches for the PID (for performance)
     branchListDict = {}
@@ -141,7 +140,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     logger.debug("slhaDecomposer done in %.2f s." % (time.time() -t1 ) )
     return smsTopList
 
-def writeIgnoreMessage ( keys, rEven, rOdd ):
+def writeIgnoreMessage(keys, rEven, rOdd):
     msg = ""
     for pid in keys:
         if not pid in list(rEven) + list(rOdd):
@@ -149,7 +148,7 @@ def writeIgnoreMessage ( keys, rEven, rOdd ):
             continue
         if pid in rEven:
             msg += "%s, " % rEven[pid]
-            continue         
+            continue
     if len(msg)>0:
             logger.debug ( "Ignoring %s decays" % msg[:-2] )
 
@@ -160,6 +159,8 @@ def _getDictionariesFromSLHA(slhafile):
 
     """
 
+    from smodels.particlesLoader import rEven, rOdd
+
     res = pyslha.readSLHAFile(slhafile)
 
    
@@ -168,14 +169,14 @@ def _getDictionariesFromSLHA(slhafile):
     writeIgnoreMessage(res.decays.keys(), rEven, rOdd)
 
     for pid in res.decays.keys():
-        if not pid in rOdd.keys():
+        if not pid in rOdd:
             continue
         brs = []
         for decay in res.decays[pid].decays:
             nEven = nOdd = 0.
             for pidd in decay.ids:
-                if pidd in rOdd.keys(): nOdd += 1
-                elif pidd in rEven.keys(): nEven += 1
+                if pidd in rOdd: nOdd += 1
+                elif pidd in rEven: nEven += 1
                 else:
                     logger.warning("Particle %i not defined in particles.py,decay %i -> [%s] will be ignored" %(pidd,pid,decay.ids))
                     break

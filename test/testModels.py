@@ -20,7 +20,7 @@ from smodels.tools import runtime
 from smodels import particlesLoader
 from importlib import reload
 
-setLogLevel('debug')
+# setLogLevel('debug')
  
  
 class ModelsTest(unittest.TestCase):

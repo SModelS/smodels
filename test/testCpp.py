@@ -33,13 +33,13 @@ class CppTest(unittest.TestCase):
         """ now run the example """
         cmd = "cd ../cpp; ./run"
         l = subprocess.getoutput ( cmd )
-        la = l.split("\n")[6:] 
+        la = l.split("\n")[9:] 
         a = [ x.strip() for x in la ]
         with open("default_cpp.txt","r" ) as f:
             l = f.readlines()
-            lb=l[6:]
+            lb=l[9:]
             b = [ x.strip() for x in lb ]
-        self.assertEqual ( a, b )
+        self.assertEqual(a, b)
 
     def testRun(self):
         self.compile()

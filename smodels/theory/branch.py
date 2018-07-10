@@ -8,7 +8,6 @@
 
 from smodels.theory.particleNames import simParticles, elementsInStr
 from smodels.tools.physicsUnits import fb
-from smodels.particlesLoader import rEven
 from smodels.theory.particleNames import ptcDic, finalStates, getFinalStateLabel, InclusiveStr
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
@@ -37,6 +36,9 @@ class Branch(object):
         :parameter finalState: final state label string for the branch
                          (e.g. 'MET' or 'HSCP')                         
         """
+        
+        from smodels.particlesLoader import rEven
+        
         self.masses = []
         self.particles = []
         self.PIDs = []
@@ -248,6 +250,9 @@ class Branch(object):
         :parameter massDictionary: dictionary containing the masses for all intermediate states.
         :returns: extended branch (Branch object). False if there was an error.
         """
+        
+        from smodels.particlesLoader import rEven
+        
         newBranch = self.copy()
         newparticles = []
         newmass = []
@@ -312,10 +317,11 @@ class Branch(object):
         brs = brDictionary[self.PIDs[0][-1]]       
         newBranches = []
         for br in brs:
-            if not br.br:
+            if not br.br or not br.ids or not br.nda:
                 continue  #Skip zero BRs            
             # Generate a new branch for each possible decay (including "stable decays")
             newBranches.append(self._addDecay(br, massDictionary))
+        
         
         if not newBranches:
             # Daughter is stable, there are no new branches
@@ -389,7 +395,6 @@ class InclusiveInt(int):
     def __ne__(self,other):
         return self.__cmp__(other) != 0
              
-    
 class InclusiveList(list):    
     """
     A list wildcard class. It will return True when compared to any other list object.
@@ -436,6 +441,7 @@ def decayBranches(branchList, brDictionary, massDictionary,
     :returns: list of branches (Branch objects)    
     """
 
+
     #Check for stable branches
     stableBranches = [branch for branch in branchList if branch.stable]
     unstableBranches = [branch for branch in branchList if not branch.stable]
@@ -450,5 +456,6 @@ def decayBranches(branchList, brDictionary, massDictionary,
         for branch in unstableBranches:
             newBranches += [br for br in branch.decayDaughter(brDictionary, massDictionary) 
                            if br.maxWeight >= sigcut]
+    
         
         return decayBranches(newBranches+stableBranches,brDictionary, massDictionary,sigcut)
