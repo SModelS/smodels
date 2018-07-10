@@ -22,7 +22,7 @@ class CppTest(unittest.TestCase):
         self.assertTrue ( "done" in a[-1] )
 
     def writeOutput(self):
-        """ write the default output """
+        """ write the default output. will *define* the unit test. """
         f=open("default_cpp.txt","w" )
         cmd = "cd ../cpp; ./run"
         a = subprocess.getoutput ( cmd )
@@ -40,7 +40,9 @@ class CppTest(unittest.TestCase):
             l = f.readlines()
             lb=l[skip:]
             b = [ x.strip() for x in lb ]
-        self.assertEqual ( a, b )
+        self.assertEqual ( len(a), len(b) )
+        for x,y in zip(a,b):
+            self.assertEqual ( x, y )
 
     def testRun(self):
         self.compile()
