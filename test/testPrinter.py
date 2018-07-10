@@ -8,7 +8,7 @@
 
 """
 
-import sys,shutil,os
+import sys,os
 sys.path.insert(0,"../")
 import unittest
 from smodels.installation import installDirectory as idir

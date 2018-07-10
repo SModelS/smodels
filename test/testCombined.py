@@ -16,7 +16,7 @@ from os.path import join
 from smodels.installation import installDirectory as iDir
 from unitTestHelpers import equalObjs, runMain
  
-from smodels.tools.smodelsLogging import logger, setLogLevel
+from smodels.tools.smodelsLogging import logger
 
  
 class CombinedTest(unittest.TestCase):

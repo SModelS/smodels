@@ -10,6 +10,7 @@
 """
 import copy
 from smodels.tools.physicsUnits import fb
+from smodels.theory.element import Element
 
 class Uncovered(object):
     """
@@ -339,8 +340,12 @@ class UncoveredList(object):
         in the list, add weight to topology
         :parameter el: element to be added
         """
-        name = self.orderbranches(self.generalName(el.__str__()))
-        name = name + ' (%s)'%(str(el.getFinalStates()).replace('[','').replace(']',''))
+        
+        #Create a new element with the general name in order to fix the branch ordering:
+        newEl = Element(self.generalName(str(el)),finalState=el.getFinalStates())
+        newEl.sortBranches()
+        name =str(newEl).replace("'","").replace(' ','')
+        name = name + ' (%s)'%(str(newEl.getFinalStates()).replace('[','').replace(']',''))
         for topo in self.topos:
             if name == topo.topo:
                 topo.contributingElements.append(el)
@@ -365,18 +370,3 @@ class UncoveredList(object):
             for on in ptcDic[pn]:
                 instr = instr.replace(on, pn).replace("hijetjets","higgs")
         return instr
-
-    def orderbranches(self, instr):
-        """
-        unique ordering of branches
-        :parameter instr: element as string
-        :returns: string of ordered element
-        """
-        from smodels.theory.element import Element
-        li = Element(instr).getParticles()
-        for be in li:
-            for ve in be:
-                ve.sort()
-        li.sort()
-        return str(li).replace("'", "").replace(" ", "")
-
