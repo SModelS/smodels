@@ -21,9 +21,10 @@ from smodels.tools.smodelsLogging import logger, setLogLevel
 class CombinedTest(unittest.TestCase):
     def testCombinedResult(self):
         filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
-        outputfile = runMain(filename,inifile = "testParameters_agg.ini")
+        outputfile = runMain(filename,inifile="testParameters_agg.ini", suppressStdout=True )
         with open( outputfile, 'rb') as fp: ## imports file with dots in name
-            output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
+            output_module = imp.load_module("output",fp,outputfile, 
+                                            ('.py', 'rb', imp.PY_SOURCE) )
             smodelsOutput = output_module.smodelsOutput
             from gluino_squarks_default_agg import smodelsOutputDefault
             ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
