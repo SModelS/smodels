@@ -359,7 +359,7 @@ class LikelihoodComputer:
 
     #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
     # def prob(x0, x1 )
-    def probMV(self, nll, *thetaA ):
+    def probMV(self, nll, thetaA ):
         """ probability, for nuicance parameters theta
         :params nll: if True, compute negative log likelihood """
         theta = array ( thetaA )
@@ -394,7 +394,7 @@ class LikelihoodComputer:
     def nll( self, theta ):
         """ probability, for nuicance parameters theta,
         as a negative log likelihood. """
-        return self.probMV(True,*theta)
+        return self.probMV(True,theta)
 
     def nllprime( self, theta ):
         """ the derivative of nll as a function of the thetas.
@@ -655,7 +655,7 @@ class LikelihoodComputer:
         # compute the profiled (not normalized) likelihood of observing
         # nsig signal events
         theta_hat,_ = self.findThetaHat ( nsig )
-        ret = self.probMV ( nll, *theta_hat )
+        ret = self.probMV ( nll, theta_hat )
 
         return ret
 
