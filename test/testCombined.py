@@ -33,11 +33,12 @@ class CombinedTest(unittest.TestCase):
             equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                                ignore=ignoreFields)
             if equals != True:
-                logger.error ( "%s differs form %s!" % ( "gluino_squarks_default_agg.py", outputfile) ) 
+                logger.error ( "%s differs from %s!" % ( "gluino_squarks_default_agg.py", outputfile) ) 
             self.assertTrue(equals)
         for i in [ outputfile, outputfile.replace(".py",".pyc") ]:
             if os.path.exists ( i ):
                 os.remove ( i )
  
 if __name__ == "__main__":
+    setLogLevel ( "debug" )
     unittest.main()

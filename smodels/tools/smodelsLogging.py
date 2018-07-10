@@ -63,6 +63,11 @@ def getLogger ():
 
 logger = getLogger()
 
+def getLogLevel():
+    """ obtain the current log level. """
+    # return logger.level
+    return logger.getEffectiveLevel()
+
 def setLogLevel ( level ):
     """ set the log level of the central logger.
         can either be directly an integer ( e.g. logging.DEBUG ),
