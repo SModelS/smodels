@@ -137,8 +137,8 @@ the likelihood for the signal hypothesis when combining signal regions is given 
 
 where the product is over all :math:`N` signal regions, :math:`\mu` is the overall signal strength, :math:`s_i^r` the relative signal strength
 in each signal region and :math:`V` represents the covariance matrix. 
-As in the case of a single signal region, we include a default 20\% uncertainty in the signal, which is added
-to the diagonal of the covariance matrix.
+Note, however, that unlike the case of a single signal region, we do not include any signal uncertainties, since this
+should correspond to a second order effect.
 
 
 Using the above likelihood we compute a 95\% confidence level limit on :math:`\mu` using the :math:`CL_s` (:math:`CL_{sb}/CL_{b}`) limit from the 

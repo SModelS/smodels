@@ -54,7 +54,7 @@ class Data:
         :param deltas_rel: the assumed relative error on the signal hypotheses. 
                            The default is 20%.
         """
-        self.observed = self.convert(observed)
+        self.observed = NP.around(self.convert(observed)) #Make sure observed number of events are integers
         self.backgrounds = self.convert(backgrounds)
         self.n = len(self.observed)
         self.covariance = self._convertCov(covariance)
@@ -688,7 +688,7 @@ class LikelihoodComputer:
 
             """
             nsig = self.model.convert(nsig)
-            
+           
             # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
             llhd = self.likelihood(nsig, marginalize=marginalize, nll=True)
 
