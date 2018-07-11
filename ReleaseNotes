@@ -2,8 +2,10 @@ Release v1.2, dd/mm 2018
 =======================================================
 
   * Added finalState property for Elements (backwards compatible)
-  * Introduced inclusive branches and particles
-  * Allows for non-prompt (long-lived) BSM particles
+  * Introduced inclusive branches and particles (for description of HSCP results)
+  * Introduced reweighting 
+
+Allows for non-prompt (long-lived) BSM particles
   * Added final state definitions in particleNames.py
 
 Release v1.1.3, dd/mm 2018
