@@ -11,13 +11,16 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-import subprocess
+if sys.version[0]=="2":
+    import commands as CMD
+else:
+    import subprocess as CMD
 
 class CppTest(unittest.TestCase):
     def compile(self):
         """ compile the C++ interface """
         cmd = "cd ../cpp; make"
-        a = subprocess.getoutput ( cmd ).split("\n" )
+        a = CMD.getoutput ( cmd ).split("\n" )
         ## now check if "done" appears in the last line
         self.assertTrue ( "done" in a[-1] )
 
@@ -25,14 +28,14 @@ class CppTest(unittest.TestCase):
         """ write the default output. will *define* the unit test. """
         f=open("default_cpp.txt","w" )
         cmd = "cd ../cpp; ./run"
-        a = subprocess.getoutput ( cmd )
+        a = CMD.getoutput ( cmd )
         f.write ( a )
         f.close()
 
     def runExample(self):
         """ now run the example """
         cmd = "cd ../cpp; ./run"
-        l = subprocess.getoutput ( cmd )
+        l = CMD.getoutput ( cmd )
         skip=8 ## skip first lines
         la = l.split("\n")[skip:] 
         a = [ x.strip() for x in la ]
@@ -46,8 +49,8 @@ class CppTest(unittest.TestCase):
 
     def testRun(self):
         self.compile()
-        # self.runExample()
-        self.writeOutput()
+        self.runExample()
+        # self.writeOutput()
 
 if __name__ == "__main__":
     unittest.main()
